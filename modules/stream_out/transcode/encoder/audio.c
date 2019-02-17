@@ -77,7 +77,7 @@ int transcode_encoder_audio_open( transcode_encoder_t *p_enc,
 static int encoder_audio_configure( vlc_object_t *p_obj,
                                     const transcode_encoder_config_t *p_cfg,
                                     const audio_format_t *p_dec_out,
-                                    encoder_t *p_enc )
+                                    encoder_t *p_enc, bool b_keep_fmtin )
 {
     VLC_UNUSED(p_obj);
     audio_format_t *p_enc_in = &p_enc->fmt_in.audio;
@@ -107,8 +107,12 @@ static int encoder_audio_configure( vlc_object_t *p_obj,
     if( p_enc_out->i_channels >= ARRAY_SIZE(pi_channels_maps) )
         p_enc_out->i_channels = ARRAY_SIZE(pi_channels_maps) - 1;
 
-    p_enc_in->i_physical_channels =
     p_enc_out->i_physical_channels = pi_channels_maps[p_enc_out->i_channels];
+
+    if( b_keep_fmtin ) /* This is tested/wanted decoder fmtin */
+        return VLC_SUCCESS;
+
+    p_enc_in->i_physical_channels = p_enc_out->i_physical_channels;
 
     /* Initialization of encoder format structures */
     p_enc->fmt_in.i_codec = p_dec_out->i_format;
@@ -132,9 +136,10 @@ static int encoder_audio_configure( vlc_object_t *p_obj,
 int transcode_encoder_audio_configure( vlc_object_t *p_obj,
                                        const transcode_encoder_config_t *p_cfg,
                                        const audio_format_t *p_dec_out,
-                                       transcode_encoder_t *p_enc )
+                                       transcode_encoder_t *p_enc,
+                                       bool b_keep_fmtin )
 {
-    return encoder_audio_configure( p_obj, p_cfg, p_dec_out, p_enc->p_encoder );
+    return encoder_audio_configure( p_obj, p_cfg, p_dec_out, p_enc->p_encoder, b_keep_fmtin );
 }
 
 int transcode_encoder_audio_test( vlc_object_t *p_obj,
@@ -155,7 +160,7 @@ int transcode_encoder_audio_test( vlc_object_t *p_obj,
 
     audio_format_t *p_afmt_out = &p_encoder->fmt_out.audio;
 
-    if( encoder_audio_configure( p_obj, p_cfg, &p_dec_out->audio, p_encoder ) )
+    if( encoder_audio_configure( p_obj, p_cfg, &p_dec_out->audio, p_encoder, false ) )
     {
         es_format_Clean( &p_encoder->fmt_in );
         es_format_Clean( &p_encoder->fmt_out );

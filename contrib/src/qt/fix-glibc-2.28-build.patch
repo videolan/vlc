@@ -1,0 +1,49 @@
+Description: Fix qmake build with glibc 2.28
+ We haven't yet run the configure checks to see if statx and renameat2
+ are present in glibc, so this fails when we redefine the structures and
+ functions.
+Author: Thiago Macieira <thiago.macieira@intel.com>
+Origin: upstream
+Applied-Upstream: commit:25feee4
+Last-Update: 2018-08-25
+--- a/src/corelib/global/qconfig-bootstrapped.h
++++ b/src/corelib/global/qconfig-bootstrapped.h
+@@ -98,10 +98,18 @@
+ #define QT_NO_QOBJECT
+ #define QT_FEATURE_process -1
+ #define QT_FEATURE_regularexpression -1
+-#define QT_FEATURE_renameat2 -1
++#ifdef __GLIBC_PREREQ
++# define QT_FEATURE_renameat2 (__GLIBC_PREREQ(2, 28) ? 1 : -1)
++#else
++# define QT_FEATURE_renameat2 -1
++#endif
+ #define QT_FEATURE_sharedmemory -1
+ #define QT_FEATURE_slog2 -1
+-#define QT_FEATURE_statx -1
++#ifdef __GLIBC_PREREQ
++# define QT_FEATURE_statx (__GLIBC_PREREQ(2, 28) ? 1 : -1)
++#else
++# define QT_FEATURE_statx -1
++#endif
+ #define QT_FEATURE_syslog -1
+ #define QT_NO_SYSTEMLOCALE
+ #define QT_FEATURE_systemsemaphore -1
+--- a/src/corelib/io/qfilesystemengine_unix.cpp
++++ b/src/corelib/io/qfilesystemengine_unix.cpp
+@@ -91,7 +91,6 @@ extern "C" NSString *NSTemporaryDirector
+ #  include <sys/syscall.h>
+ #  include <sys/sendfile.h>
+ #  include <linux/fs.h>
+-#  include <linux/stat.h>
+ 
+ // in case linux/fs.h is too old and doesn't define it:
+ #ifndef FICLONE
+@@ -112,6 +111,7 @@ static int renameat2(int oldfd, const ch
+ #    endif
+ 
+ #    if !QT_CONFIG(statx) && defined(SYS_statx)
++#      include <linux/stat.h>
+ static int statx(int dirfd, const char *pathname, int flag, unsigned mask, struct statx *statxbuf)
+ { return syscall(SYS_statx, dirfd, pathname, flag, mask, statxbuf); }
+ #    elif !QT_CONFIG(statx) && !defined(SYS_statx)

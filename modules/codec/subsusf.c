@@ -2,7 +2,6 @@
  * subsusf.c : USF subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2006 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Bernie Purcell <bitmap@videolan.org>
  *
@@ -508,16 +507,14 @@ static int ParseImageAttachments( decoder_t *p_dec )
 
                 if( p_block != NULL )
                 {
-                    video_format_t     fmt_in;
+                    es_format_t        es_in;
                     video_format_t     fmt_out;
 
                     memcpy( p_block->p_buffer, p_attach->p_data, p_attach->i_data );
 
-                    memset( &fmt_in,  0, sizeof( video_format_t));
-                    memset( &fmt_out, 0, sizeof( video_format_t));
-
-                    fmt_in.i_chroma  = type;
-                    fmt_out.i_chroma = VLC_CODEC_YUVA;
+                    es_format_Init( &es_in, VIDEO_ES, type );
+                    es_in.video.i_chroma = type;
+                    video_format_Init( &fmt_out, VLC_CODEC_YUVA );
 
                     /* Find a suitable decoder module */
                     if( module_exists( "sdl_image" ) )
@@ -529,8 +526,10 @@ static int ParseImageAttachments( decoder_t *p_dec )
                         var_SetString( p_dec, "codec", "sdl_image" );
                     }
 
-                    p_pic = image_Read( p_image, p_block, &fmt_in, &fmt_out );
+                    p_pic = image_Read( p_image, p_block, &es_in, &fmt_out );
                     var_Destroy( p_dec, "codec" );
+                    es_format_Clean( &es_in );
+                    video_format_Clean( &fmt_out );
                 }
 
                 image_HandlerDelete( p_image );

@@ -2,7 +2,6 @@
  * vlc_input.h: Core input structures
  *****************************************************************************
  * Copyright (C) 1999-2015 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -395,6 +394,9 @@ typedef enum input_event_type_e
 
     /* subs_fps has changed */
     INPUT_EVENT_SUBS_FPS,
+
+    /* Thumbnail generation */
+    INPUT_EVENT_THUMBNAIL_READY,
 } input_event_type_e;
 
 #define VLC_INPUT_CAPABILITIES_SEEKABLE (1<<0)
@@ -419,7 +421,7 @@ struct vlc_input_event_title
     {
         struct
         {
-            const input_title_t **array;
+            input_title_t *const *array;
             size_t count;
         } list;
         size_t selected_idx;
@@ -528,6 +530,8 @@ struct vlc_input_event
         bool vbi_transparent;
         /* INPUT_EVENT_SUBS_FPS */
         float subs_fps;
+        /* INPUT_EVENT_THUMBNAIL_READY */
+        picture_t *thumbnail;
     };
 };
 
@@ -619,6 +623,12 @@ VLC_API input_thread_t * input_Create( vlc_object_t *p_parent,
 VLC_API input_thread_t *input_CreatePreparser(vlc_object_t *obj,
                                               input_thread_events_cb events_cb,
                                               void *events_data, input_item_t *item)
+VLC_USED;
+
+VLC_API
+input_thread_t *input_CreateThumbnailer(vlc_object_t *obj,
+                                        input_thread_events_cb events_cb,
+                                        void *events_data, input_item_t *item)
 VLC_USED;
 
 VLC_API int input_Start( input_thread_t * );

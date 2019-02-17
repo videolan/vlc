@@ -2,7 +2,6 @@
  * var.c: object variables for input thread
  *****************************************************************************
  * Copyright (C) 2004-2007 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -422,8 +421,11 @@ void input_LegacyEvents( input_thread_t *p_input,
             var_Change( p_input, "cache", VLC_VAR_SETVALUE, val );
             break;
         case INPUT_EVENT_VOUT:
-            break;
         case INPUT_EVENT_SUBITEMS:
+        case INPUT_EVENT_THUMBNAIL_READY:
+        case INPUT_EVENT_VBI_PAGE:
+        case INPUT_EVENT_VBI_TRANSPARENCY:
+        case INPUT_EVENT_SUBS_FPS:
             break;
     }
     Trigger( p_input, event->type );
@@ -596,8 +598,7 @@ static void input_LegacyVarNavigation( input_thread_t *p_input )
         sprintf( title, "title %2u", i );
         var_Destroy( p_input, title );
         var_Create( p_input, title, VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-        var_AddCallback( p_input, title,
-                         NavigationCallback, (void *)(intptr_t)i );
+        var_AddCallback( p_input, title, NavigationCallback, NULL );
 
         char psz_length[MSTRTIME_MAX_SIZE + sizeof(" []")];
         if( input_priv(p_input)->title[i]->i_length > 0 )
@@ -1007,7 +1008,7 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
 
     /* Issue a title change */
-    val.i_int = (intptr_t)p_data;
+    sscanf(psz_cmd, "title %"SCNu64, &val.i_int);
     input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TITLE, &val );
 
     var_Change( p_input, "title", VLC_VAR_SETVALUE, val );
@@ -1016,7 +1017,7 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
     input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SEEKPOINT, &newval );
 
     var_Change( p_input, "chapter", VLC_VAR_SETVALUE, newval );
-
+    (void) p_data;
     return VLC_SUCCESS;
 }
 

@@ -2,7 +2,6 @@
  * stream_output.h : internal stream output
  *****************************************************************************
  * Copyright (C) 2002-2005 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>

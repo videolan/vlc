@@ -35,7 +35,7 @@ apps:
 parts:
   desktop-qt5-vlc:
     source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-commit: 3a6209d90bcec218618348f7f41c873bdacc723f
+    source-commit: de8dc068a05d24cea5c0438863280ab641226570
     source-subdir: qt/
     plugin: make
     make-parameters: ["FLAVOR=qt5"]
@@ -63,6 +63,7 @@ parts:
       ./bootstrap
       make -j $(getconf _NPROCESSORS_ONLN) .protoc
       make -j $(getconf _NPROCESSORS_ONLN) .nasm
+      make -j $(getconf _NPROCESSORS_ONLN) .meson
       cd ../../
       export PATH=$PWD/extras/tools/build/bin:$PATH
       cd contrib && mkdir linux && cd linux
@@ -70,11 +71,10 @@ parts:
         --enable-libdsm \
         --enable-dvdcss \
         --disable-upnp \
-        --disable-srt \
         --disable-chromaprint
       make list
       make -j $(getconf _NPROCESSORS_ONLN) fetch
-      make -j $(getconf _NPROCESSORS_ONLN) install
+      make -j $(getconf _NPROCESSORS_ONLN) -k install || make -j1
       cd ../../
       export NOCONFIGURE=1
       autoreconf -fi
@@ -151,6 +151,7 @@ parts:
       - zlib1g-dev
       - bison
       - flex
+      - libvulkan-dev
     stage-packages:
       - fonts-freefont-ttf
       - dbus-x11
@@ -205,6 +206,10 @@ parts:
       - libupnp6
       - libzvbi0
       - libnotify4
+      - libvulkan1
+      - libaacs0
+      - mesa-vulkan-drivers
+      - libvulkan-dev
     filesets:
       exclusion:
       - "-usr/lib/*/cmake/*"
@@ -220,6 +225,13 @@ parts:
 
   wrapper:
     plugin: dump
+    after: [vlc]
     source: .
     organize:
       vlc-snap-wrapper.sh: bin/vlc-snap-wrapper.sh
+
+  fixup-vulkan-icd-paths:
+    plugin: nil
+    after: [wrapper]
+    override-build: |
+      sed -i -E 's,(^.+"library_path": ")/.*/,\1,' $SNAPCRAFT_STAGE/usr/share/vulkan/icd.d/*.json

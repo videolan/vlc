@@ -2,7 +2,6 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002 - 2015 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -1347,10 +1346,11 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                                  YUVFromRGB,
                                  FillYUVAPicture,
                                  BlendYUVAPixel );
-            else if( *p_chroma == VLC_CODEC_RGBA )
+            else if( *p_chroma == VLC_CODEC_RGBA
+                  || *p_chroma == VLC_CODEC_BGRA )
                 rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox,
-                                 VLC_CODEC_RGBA,
+                                 *p_chroma,
                                  &p_region_out->fmt,
                                  RGBFromRGB,
                                  FillRGBAPicture,

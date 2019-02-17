@@ -206,6 +206,7 @@ void vdp_release_x11(vdp_t *);
 /* VLC specifics */
 # include <stdatomic.h>
 # include <stdbool.h>
+# include <stdint.h>
 # include <vlc_common.h>
 # include <vlc_fourcc.h>
 # include <vlc_picture.h>
@@ -256,14 +257,6 @@ bool vlc_fourcc_to_vdp_ycc(vlc_fourcc_t fourcc,
     return true;
 }
 
-typedef struct
-{
-    VdpOutputSurface surface;
-    VdpDevice device;
-    vdp_t *vdp;
-    void *gl_nv_surface;
-} picture_sys_t;
-
 typedef struct vlc_vdp_video_frame
 {
     VdpVideoSurface surface;
@@ -293,7 +286,7 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *, VdpVideoSurface);
 
 static inline void vlc_vdp_video_destroy(vlc_vdp_video_field_t *f)
 {
-    return f->context.destroy(&f->context);
+    f->context.destroy(&f->context);
 }
 
 /**
@@ -305,4 +298,19 @@ static inline vlc_vdp_video_field_t *vlc_vdp_video_copy(
 {
     return (vlc_vdp_video_field_t *)fold->context.copy(&fold->context);
 }
+
+typedef struct vlc_vdp_output_surface
+{
+    VdpOutputSurface surface;
+    VdpDevice device;
+    vdp_t *vdp;
+    ptrdiff_t gl_nv_surface;
+} vlc_vdp_output_surface_t;
+
+struct picture_pool_t;
+
+struct picture_pool_t *vlc_vdp_output_pool_create(vdp_t *, VdpRGBAFormat,
+                                                  const video_format_t *,
+                                                  unsigned count);
+
 #endif

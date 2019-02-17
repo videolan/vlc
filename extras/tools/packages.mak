@@ -6,11 +6,11 @@ VIDEOLAN=http://downloads.videolan.org/pub/contrib
 YASM_VERSION=1.2.0
 YASM_URL=http://www.tortall.net/projects/yasm/releases/yasm-$(YASM_VERSION).tar.gz
 
-NASM_VERSION=2.13.03
+NASM_VERSION=2.14
 NASM_URL=http://www.nasm.us/pub/nasm/releasebuilds/$(NASM_VERSION)/nasm-$(NASM_VERSION).tar.gz
 
-CMAKE_VERSION=3.8.2
-CMAKE_URL=http://www.cmake.org/files/v3.8/cmake-$(CMAKE_VERSION).tar.gz
+CMAKE_VERSION=3.13.1
+CMAKE_URL=http://www.cmake.org/files/v3.13/cmake-$(CMAKE_VERSION).tar.gz
 
 LIBTOOL_VERSION=2.4.2
 LIBTOOL_URL=$(GNU)/libtool/libtool-$(LIBTOOL_VERSION).tar.gz
@@ -59,3 +59,9 @@ GETTEXT_URL=$(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
 
 HELP2MAN_VERSION=1.47.6
 HELP2MAN_URL=$(GNU)/help2man/help2man-$(HELP2MAN_VERSION).tar.xz
+
+MESON_VERSION=0.49.1
+MESON_URL=https://github.com/mesonbuild/meson/releases/download/$(MESON_VERSION)/meson-$(MESON_VERSION).tar.gz
+
+NINJA_VERSION=1.8.2
+NINJA_URL=https://github.com/ninja-build/ninja/archive/v$(NINJA_VERSION).tar.gz

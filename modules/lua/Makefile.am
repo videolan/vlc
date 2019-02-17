@@ -5,7 +5,7 @@ liblua_plugin_la_SOURCES = \
 	lua/extension_thread.c \
 	lua/intf.c \
 	lua/meta.c \
-	lua/demux.c \
+	lua/stream_filter.c \
 	lua/services_discovery.c \
 	lua/vlc.c lua/vlc.h \
 	lua/libs.h \

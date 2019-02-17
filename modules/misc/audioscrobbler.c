@@ -2,7 +2,6 @@
  * audioscrobbler.c : audioscrobbler submission plugin
  *****************************************************************************
  * Copyright © 2006-2011 the VideoLAN team
- * $Id$
  *
  * Author: Rafaël Carré <funman at videolanorg>
  *         Ilkka Ollakka <ileoo at videolan org>
@@ -37,9 +36,6 @@
 
 #include <assert.h>
 #include <time.h>
-#ifdef HAVE_POLL
-# include <poll.h>
-#endif
 
 #define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
 #include <vlc_common.h>
@@ -49,10 +45,11 @@
 #include <vlc_dialog.h>
 #include <vlc_meta.h>
 #include <vlc_md5.h>
+#include <vlc_memstream.h>
 #include <vlc_stream.h>
 #include <vlc_url.h>
-#include <vlc_network.h>
-#include <vlc_playlist.h>
+#include <vlc_tls.h>
+#include <vlc_playlist_legacy.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -738,137 +735,122 @@ static void *Run(void *data)
         }
 
         msg_Dbg(p_intf, "Going to submit some data...");
-        char *psz_submit;
         vlc_url_t *url;
-        char *psz_submit_song, *psz_submit_tmp;
+        struct vlc_memstream req, payload;
 
-        if (asprintf(&psz_submit, "s=%s", p_sys->psz_auth_token) == -1)
-            break;
+        vlc_memstream_open(&payload);
+        vlc_memstream_printf(&payload, "s=%s", p_sys->psz_auth_token);
 
         /* forge the HTTP POST request */
         vlc_mutex_lock(&p_sys->lock);
 
         if (p_sys->b_submit_nowp)
         {
+            audioscrobbler_song_t *p_song = &p_sys->p_current_song;
+
             b_nowp_submission_ongoing = true;
             url = &p_sys->p_nowp_url;
-            if (asprintf(&psz_submit_song,
-                "&a=%s"
-                "&t=%s"
-                "&b=%s"
-                "&l=%d"
-                "&n=%s"
-                "&m=%s",
-                p_sys->p_current_song.psz_a,
-                p_sys->p_current_song.psz_t,
-                p_sys->p_current_song.psz_b ? p_sys->p_current_song.psz_b : "",
-                p_sys->p_current_song.i_l,
-                p_sys->p_current_song.psz_n ? p_sys->p_current_song.psz_n : "",
-                p_sys->p_current_song.psz_m ? p_sys->p_current_song.psz_m : ""
-                ) == -1)
-            {   /* Out of memory */
-                vlc_mutex_unlock(&p_sys->lock);
-                goto out;
-            }
 
+            vlc_memstream_printf(&payload, "&a=%s", p_song->psz_a);
+            vlc_memstream_printf(&payload, "&t=%s", p_song->psz_t);
+            vlc_memstream_puts(&payload, "&b=");
+            if (p_song->psz_b != NULL)
+                vlc_memstream_puts(&payload, p_song->psz_b);
+            vlc_memstream_printf(&payload, "&l=%d", p_song->i_l);
+            vlc_memstream_puts(&payload, "&n=");
+            if (p_song->psz_n != NULL)
+                vlc_memstream_puts(&payload, p_song->psz_n);
+            vlc_memstream_puts(&payload, "&m=");
+            if (p_song->psz_m != NULL)
+                vlc_memstream_puts(&payload, p_song->psz_m);
         }
         else
         {
             url = &p_sys->p_submit_url;
-            audioscrobbler_song_t *p_song;
+
             for (int i_song = 0 ; i_song < p_sys->i_songs ; i_song++)
             {
-                p_song = &p_sys->p_queue[i_song];
-                if (asprintf(&psz_submit_song,
-                        "&a%%5B%d%%5D=%s"
-                        "&t%%5B%d%%5D=%s"
-                        "&i%%5B%d%%5D=%u"
-                        "&o%%5B%d%%5D=P"
-                        "&r%%5B%d%%5D="
-                        "&l%%5B%d%%5D=%d"
-                        "&b%%5B%d%%5D=%s"
-                        "&n%%5B%d%%5D=%s"
-                        "&m%%5B%d%%5D=%s",
-                        i_song, p_song->psz_a,
-                        i_song, p_song->psz_t,
-                        i_song, (unsigned)p_song->date, /* HACK: %ju (uintmax_t) unsupported on Windows */
-                        i_song,
-                        i_song,
-                        i_song, p_song->i_l,
-                        i_song, p_song->psz_b ? p_song->psz_b : "",
-                        i_song, p_song->psz_n ? p_song->psz_n : "",
-                        i_song, p_song->psz_m ? p_song->psz_m : ""
-                       ) == -1)
-                {   /* Out of memory */
-                        vlc_mutex_unlock(&p_sys->lock);
-                        goto out;
-                }
+                audioscrobbler_song_t *p_song = &p_sys->p_queue[i_song];
+
+                vlc_memstream_printf(&payload, "&a%%5B%d%%5D=%s",
+                                     i_song, p_song->psz_a);
+                vlc_memstream_printf(&payload, "&t%%5B%d%%5D=%s",
+                                     i_song, p_song->psz_t);
+                vlc_memstream_printf(&payload, "&i%%5B%d%%5D=%"PRIu64,
+                                     i_song, (uint64_t)p_song->date);
+                vlc_memstream_printf(&payload, "&o%%5B%d%%5D=P", i_song);
+                vlc_memstream_printf(&payload, "&r%%5B%d%%5D=", i_song);
+                vlc_memstream_printf(&payload, "&l%%5B%d%%5D=%d",
+                                     i_song, p_song->i_l);
+                vlc_memstream_printf(&payload, "&b=%%5B%d%%5D=", i_song);
+                if (p_song->psz_b != NULL)
+                    vlc_memstream_puts(&payload, p_song->psz_b);
+                vlc_memstream_printf(&payload, "&n=%%5B%d%%5D=", i_song);
+                if (p_song->psz_n != NULL)
+                    vlc_memstream_puts(&payload, p_song->psz_n);
+                vlc_memstream_printf(&payload, "&m=%%5B%d%%5D=", i_song);
+                if (p_song->psz_m != NULL)
+                    vlc_memstream_puts(&payload, p_song->psz_m);
             }
         }
 
-        psz_submit_tmp = psz_submit;
-        int print_ret = asprintf(&psz_submit, "%s%s",
-                                 psz_submit_tmp, psz_submit_song);
-        free(psz_submit_tmp);
-        free(psz_submit_song);
         vlc_mutex_unlock(&p_sys->lock);
 
-        if (print_ret == -1)
-        {   /* Out of memory */
+        if (vlc_memstream_close(&payload))
             goto out;
-        }
 
-        int i_post_socket = net_ConnectTCP(p_intf, url->psz_host,
-                                        url->i_port);
+        vlc_memstream_open(&req);
+        vlc_memstream_printf(&req, "POST %s HTTP/1.1\r\n", url->psz_path);
+        vlc_memstream_printf(&req, "Host: %s\r\n", url->psz_host);
+        vlc_memstream_puts(&req, "User-Agent:"
+                                 " "PACKAGE_NAME"/"PACKAGE_VERSION"\r\n");
+        vlc_memstream_puts(&req, "Connection: close\r\n");
+        vlc_memstream_puts(&req, "Accept-Encoding: identity\r\n");
+        vlc_memstream_puts(&req, "Content-Type:"
+                                 " application/x-www-form-urlencoded\r\n");
+        vlc_memstream_printf(&req, "Content-Length: %zu\r\n", payload.length);
+        vlc_memstream_puts(&req, "\r\n");
+        /* Could avoid copying payload with iovec... but efforts */
+        vlc_memstream_write(&req, payload.ptr, payload.length);
+        vlc_memstream_puts(&req, "\r\n\r\n");
+        free(payload.ptr);
 
-        if (i_post_socket == -1)
+        if (vlc_memstream_close(&req)) /* Out of memory */
+            goto out;
+
+        vlc_tls_t *sock = vlc_tls_SocketOpenTCP(VLC_OBJECT(p_intf),
+                                                url->psz_host, url->i_port);
+        if (sock == NULL)
         {
             /* If connection fails, we assume we must handshake again */
             HandleInterval(&next_exchange, &i_interval);
             b_handshaked = false;
-            free(psz_submit);
+            free(req.ptr);
             continue;
         }
 
         /* we transmit the data */
-        int i_net_ret = net_Printf(p_intf, i_post_socket,
-            "POST %s HTTP/1.1\r\n"
-            "Host: %s\r\n"
-            "User-Agent: "PACKAGE_NAME"/"PACKAGE_VERSION"\r\n"
-            "Connection: close\r\n"
-            "Accept-Encoding: identity\r\n"
-            "Content-Type: application/x-www-form-urlencoded\r\n"
-            "Content-Length: %zu\r\n"
-            "\r\n"
-            "%s\r\n"
-            "\r\n",
-            url->psz_path, url->psz_host, strlen(psz_submit), psz_submit);
-
-        free(psz_submit);
+        int i_net_ret = vlc_tls_Write(sock, req.ptr, req.length);
+        free(req.ptr);
         if (i_net_ret == -1)
         {
             /* If connection fails, we assume we must handshake again */
             HandleInterval(&next_exchange, &i_interval);
             b_handshaked = false;
-            net_Close(i_post_socket);
+            vlc_tls_Close(sock);
             continue;
         }
 
         /* FIXME: this might wait forever */
-        struct pollfd ufd = { .fd = i_post_socket, .events = POLLIN };
-        while( poll( &ufd, 1, -1 ) == -1 );
-
         /* FIXME: With TCP, you should never assume that a single read will
          * return the entire response... */
-        i_net_ret = recv(i_post_socket, p_buffer, sizeof(p_buffer) - 1, 0);
+        i_net_ret = vlc_tls_Read(sock, p_buffer, sizeof(p_buffer) - 1, false);
+        vlc_tls_Close(sock);
         if (i_net_ret <= 0)
         {
             /* if we get no answer, something went wrong : try again */
-            net_Close(i_post_socket);
             continue;
         }
-
-        net_Close(i_post_socket);
         p_buffer[i_net_ret] = '\0';
 
         char *failed = strstr((char *) p_buffer, "FAILED");

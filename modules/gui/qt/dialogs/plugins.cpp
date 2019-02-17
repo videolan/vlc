@@ -2,7 +2,6 @@
  * plugins.cpp : Plug-ins and extensions listing
  ****************************************************************************
  * Copyright (C) 2008-2010 the VideoLAN team
- * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb (at) videolan.org>
  *          Jean-Philippe André <jpeg (at) videolan.org>

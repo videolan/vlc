@@ -2,7 +2,6 @@
  * caca.c: Color ASCII Art "vout display" module using libcaca
  *****************************************************************************
  * Copyright (C) 2003-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
@@ -37,7 +36,6 @@
 #include <vlc_block.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_picture_pool.h>
 #if !defined(_WIN32) && !defined(__APPLE__)
 # ifdef X_DISPLAY_MISSING
 #  error Xlib required due to XInitThreads
@@ -53,9 +51,10 @@ struct vout_display_sys_t {
     caca_display_t *dp;
     cucul_dither_t *dither;
 
-    picture_pool_t *pool;
     block_fifo_t *fifo;
     vlc_thread_t thread;
+    vout_window_t *window;
+    vout_display_place_t place;
 
     vlc_tick_t cursor_timeout;
     vlc_tick_t cursor_deadline;
@@ -75,7 +74,7 @@ noreturn static void *VoutDisplayEventKeyDispatch(void *data)
 
         memcpy(&key, event->p_buffer, sizeof (key));
         block_Release(event);
-        vout_window_ReportKeyPress(vd->cfg->window, key);
+        vout_window_ReportKeyPress(sys->window, key);
         vlc_restorecancel(cancel);
     }
 }
@@ -90,25 +89,13 @@ static void VoutDisplayEventKey(vout_display_sys_t *sys, int key)
 }
 
 /**
- * Return a pool of direct buffers
- */
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (!sys->pool)
-        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
-    return sys->pool;
-}
-
-/**
  * Compute the place in canvas unit.
  */
-static void Place(vout_display_t *vd, vout_display_place_t *place)
+static void Place(vout_display_t *vd, const vout_display_cfg_t *cfg)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    vout_display_PlacePicture(place, &vd->source, vd->cfg, false);
+    vout_display_PlacePicture(&sys->place, &vd->source, cfg);
 
     const int canvas_width   = cucul_get_canvas_width(sys->cv);
     const int canvas_height  = cucul_get_canvas_height(sys->cv);
@@ -116,15 +103,15 @@ static void Place(vout_display_t *vd, vout_display_place_t *place)
     const int display_height = caca_get_display_height(sys->dp);
 
     if (display_width > 0 && display_height > 0) {
-        place->x      =  place->x      * canvas_width  / display_width;
-        place->y      =  place->y      * canvas_height / display_height;
-        place->width  = (place->width  * canvas_width  + display_width/2)  / display_width;
-        place->height = (place->height * canvas_height + display_height/2) / display_height;
+        sys->place.x      =  sys->place.x      * canvas_width  / display_width;
+        sys->place.y      =  sys->place.y      * canvas_height / display_height;
+        sys->place.width  = (sys->place.width  * canvas_width  + display_width/2)  / display_width;
+        sys->place.height = (sys->place.height * canvas_height + display_height/2) / display_height;
     } else {
-        place->x = 0;
-        place->y = 0;
-        place->width  = canvas_width;
-        place->height = display_height;
+        sys->place.x = 0;
+        sys->place.y = 0;
+        sys->place.width  = canvas_width;
+        sys->place.height = display_height;
     }
 }
 
@@ -146,9 +133,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
                                             vd->source.i_visible_width,
                                             vd->source.i_visible_height,
                                             picture->p[0].i_pitch,
-                                            vd->fmt.i_rmask,
-                                            vd->fmt.i_gmask,
-                                            vd->fmt.i_bmask,
+                                            picture->format.i_rmask,
+                                            picture->format.i_gmask,
+                                            picture->format.i_bmask,
                                             0x00000000);
 
         if (!sys->dither) {
@@ -157,16 +144,13 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         }
     }
 
-    vout_display_place_t place;
-    Place(vd, &place);
-
     cucul_set_color_ansi(sys->cv, CUCUL_COLOR_DEFAULT, CUCUL_COLOR_BLACK);
     cucul_clear_canvas(sys->cv);
 
     const int crop_offset = vd->source.i_y_offset * picture->p->i_pitch +
                             vd->source.i_x_offset * picture->p->i_pixel_pitch;
-    cucul_dither_bitmap(sys->cv, place.x, place.y,
-                        place.width, place.height,
+    cucul_dither_bitmap(sys->cv, sys->place.x, sys->place.y,
+                        sys->place.width, sys->place.height,
                         sys->dither,
                         &picture->p->p_pixels[crop_offset]);
     VLC_UNUSED(subpicture);
@@ -334,7 +318,7 @@ static void Manage(vout_display_t *vd)
         case CACA_EVENT_MOUSE_MOTION:
             caca_set_mouse(sys->dp, 1);
             sys->cursor_deadline = vlc_tick_now() + sys->cursor_timeout;
-            vout_window_ReportMouseMoved(vd->cfg->window,
+            vout_window_ReportMouseMoved(sys->window,
                                          caca_get_event_mouse_x(&ev),
                                          caca_get_event_mouse_y(&ev));
             break;
@@ -347,10 +331,10 @@ static void Manage(vout_display_t *vd)
             for (int i = 0; mouses[i].caca != -1; i++) {
                 if (mouses[i].caca == caca) {
                     if (caca_get_event_type(&ev) == CACA_EVENT_MOUSE_PRESS)
-                        vout_window_ReportMousePressed(vd->cfg->window,
+                        vout_window_ReportMousePressed(sys->window,
                                                        mouses[i].vlc);
                     else
-                        vout_window_ReportMouseReleased(vd->cfg->window,
+                        vout_window_ReportMouseReleased(sys->window,
                                                         mouses[i].vlc);
                     return;
                 }
@@ -358,7 +342,7 @@ static void Manage(vout_display_t *vd)
             break;
         }
         case CACA_EVENT_QUIT:
-            vout_window_ReportClose(vd->cfg->window);
+            vout_window_ReportClose(sys->window);
             break;
         default:
             break;
@@ -372,9 +356,11 @@ static void Manage(vout_display_t *vd)
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys;
 
-    if (vout_display_IsWindowed(vd))
+    if (vout_display_cfg_IsWindowed(cfg))
         return VLC_EGENERIC;
 #if !defined(__APPLE__) && !defined(_WIN32)
 # ifndef X_DISPLAY_MISSING
@@ -443,6 +429,7 @@ static int Open(vlc_object_t *object)
         goto error;
     }
 
+    sys->window = cfg->window;
     const char *driver = NULL;
 #ifdef __APPLE__
     // Make sure we don't try to open a window.
@@ -475,7 +462,7 @@ static int Open(vlc_object_t *object)
     sys->cursor_deadline = INVALID_DEADLINE;
 
     /* Fix format */
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt = *fmtp;
     if (fmt.i_chroma != VLC_CODEC_RGB32) {
         fmt.i_chroma = VLC_CODEC_RGB32;
         fmt.i_rmask = 0x00ff0000;
@@ -484,9 +471,8 @@ static int Open(vlc_object_t *object)
     }
 
     /* Setup vout_display now that everything is fine */
-    vd->fmt = fmt;
+    *fmtp = fmt;
 
-    vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = PictureDisplay;
     vd->control = Control;
@@ -494,12 +480,12 @@ static int Open(vlc_object_t *object)
     /* Fix initial state */
     caca_refresh_display(sys->dp);
 
+    Place(vd, cfg);
+
     return VLC_SUCCESS;
 
 error:
     if (sys) {
-        if (sys->pool)
-            picture_pool_Release(sys->pool);
         if (sys->dither)
             cucul_free_dither(sys->dither);
         if (sys->dp)
@@ -528,8 +514,6 @@ static void Close(vlc_object_t *object)
         vlc_join(sys->thread, NULL);
         block_FifoRelease(sys->fifo);
     }
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
     if (sys->dither)
         cucul_free_dither(sys->dither);
     caca_free_display(sys->dp);

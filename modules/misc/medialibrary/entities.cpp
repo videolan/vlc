@@ -38,6 +38,9 @@
 #include <medialibrary/IAudioTrack.h>
 #include <medialibrary/IVideoTrack.h>
 #include <medialibrary/IFolder.h>
+#include <medialibrary/filesystem/IDevice.h>
+
+#include <algorithm>
 
 static auto const strdup_helper = []( std::string const& src, char*& dst )
 {
@@ -215,12 +218,22 @@ bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output )
 
     if ( input->isThumbnailGenerated() == true )
     {
-        output.psz_artwork_mrl = strdup( input->thumbnail().c_str() );
-        if ( unlikely( output.psz_artwork_mrl == nullptr ) )
-            return false;
+        output.b_artwork_generated = true;
+        const auto& thumbnail = input->thumbnail();
+        if ( thumbnail.empty() == true )
+            output.psz_artwork_mrl = nullptr;
+        else
+        {
+            output.psz_artwork_mrl = strdup( thumbnail.c_str() );
+            if ( unlikely( output.psz_artwork_mrl == nullptr ) )
+                return false;
+        }
     }
     else
+    {
         output.psz_artwork_mrl = nullptr;
+        output.b_artwork_generated = false;
+    }
 
     return true;
 }
@@ -248,8 +261,18 @@ bool Convert( const medialibrary::IFile* input, vlc_ml_file_t& output )
             vlc_assert_unreachable();
     }
 
-    if( !strdup_helper( input->mrl(), output.psz_mrl ) )
-        return false;
+    output.b_removable = input->isRemovable();
+    output.b_present = true;
+    try
+    {
+        if( !strdup_helper( input->mrl(), output.psz_mrl ) )
+            return false;
+    }
+    catch ( const medialibrary::fs::DeviceRemovedException& )
+    {
+        output.psz_mrl = nullptr;
+        output.b_present = false;
+    }
 
     output.b_external = input->isExternal();
     return true;
@@ -289,23 +312,25 @@ bool Convert( const medialibrary::IAlbum* input, vlc_ml_album_t& output )
     return true;
 }
 
+static const char* artistName( const medialibrary::IArtist* artist )
+{
+    switch ( artist->id() )
+    {
+        case medialibrary::UnknownArtistID:
+            return _( "Unknown Artist" );
+        case medialibrary::VariousArtistID:
+            return _( "Various Artist" );
+        default:
+            return artist->name().c_str();
+    }
+}
+
 bool Convert( const medialibrary::IArtist* input, vlc_ml_artist_t& output )
 {
     output.i_id = input->id();
     output.i_nb_album = input->nbAlbums();
     output.i_nb_tracks = input->nbTracks();
-    switch ( input->id() )
-    {
-        case medialibrary::UnknownArtistID:
-            output.psz_name = strdup( _( "Unknown Artist" ) );
-            break;
-        case medialibrary::VariousArtistID:
-            output.psz_name = strdup( _( "Various Artist" ) );
-            break;
-        default:
-            output.psz_name = strdup( input->name().c_str() );
-            break;
-    }
+    output.psz_name = strdup( artistName( input ) );
     if ( unlikely( output.psz_name == nullptr ) )
         return false;
 
@@ -357,17 +382,94 @@ bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )
 
 bool Convert( const medialibrary::IFolder* input, vlc_ml_entry_point_t& output )
 {
-    if ( input->isPresent() == true )
+    try
     {
         if ( strdup_helper( input->mrl(), output.psz_mrl ) == false )
             return false;
         output.b_present = true;
     }
-    else
+    catch ( const medialibrary::fs::DeviceRemovedException& )
     {
         output.psz_mrl = nullptr;
         output.b_present = false;
     }
     output.b_banned = input->isBanned();
     return true;
+}
+
+input_item_t* MediaToInputItem( const medialibrary::IMedia* media )
+{
+    auto files = media->files();
+    const auto it = std::find_if( files.cbegin(), files.cend(),
+                                  [](const medialibrary::FilePtr& f) {
+        return f->type() == medialibrary::IFile::Type::Main;
+    });
+    assert( it != files.cend() );
+    std::string mrl;
+    try
+    {
+        mrl = (*it)->mrl();
+    }
+    catch ( const medialibrary::fs::DeviceRemovedException& ex )
+    {
+        return nullptr;
+    }
+    auto inputItem = vlc::wrap_cptr<input_item_t>(
+                input_item_NewExt( mrl.c_str(), media->fileName().c_str(),
+                                   VLC_TICK_FROM_MS( media->duration() ),
+                                   ITEM_TYPE_FILE, ITEM_NET_UNKNOWN ),
+                &input_item_Release );
+    if ( media->isThumbnailGenerated() == true )
+    {
+        auto thumbnail = media->thumbnail();
+        if ( thumbnail.length() > 0 )
+            input_item_SetArtworkURL( inputItem.get(), thumbnail.c_str() );
+    }
+    switch ( media->type() )
+    {
+        case medialibrary::IMedia::Type::External:
+        case medialibrary::IMedia::Type::Stream:
+        case medialibrary::IMedia::Type::Unknown:
+            // Those types are not analyzed
+            break;
+        case medialibrary::IMedia::Type::Video:
+            break;
+        case medialibrary::IMedia::Type::Audio:
+        {
+            if ( media->subType() != medialibrary::IMedia::SubType::AlbumTrack )
+                break;
+            auto track = media->albumTrack();
+            if ( track == nullptr )
+                return nullptr;
+            auto album = track->album();
+            if ( album == nullptr )
+                return nullptr;
+            auto artist = track->artist();
+            if ( artist == nullptr )
+                return nullptr;
+            // From the track itself:
+            input_item_SetTitle( inputItem.get(), media->title().c_str() );
+            input_item_SetDiscNumber( inputItem.get(),
+                                      std::to_string( track->discNumber() ).c_str() );
+            input_item_SetTrackNumber( inputItem.get(),
+                                       std::to_string( track->trackNumber() ).c_str() );
+
+            // From the album:
+            input_item_SetTrackTotal( inputItem.get(),
+                                      std::to_string( album->nbTracks() ).c_str() );
+            auto albumTitle = album->title();
+            if ( albumTitle.empty() == true )
+                input_item_SetAlbum( inputItem.get(), _( "Unknown album" ) );
+            else
+                input_item_SetAlbum( inputItem.get(), albumTitle.c_str() );
+
+            // From the artist/albumArtist
+            input_item_SetArtist( inputItem.get(), artistName( artist.get() ) );
+            auto albumArtist = album->albumArtist();
+            if ( albumArtist != nullptr )
+                input_item_SetArtist( inputItem.get(), artistName( albumArtist.get() ) );
+        }
+    }
+
+    return inputItem.release();
 }

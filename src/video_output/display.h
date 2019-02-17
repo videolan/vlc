@@ -2,7 +2,6 @@
  * display.h: "vout display" management
  *****************************************************************************
  * Copyright (C) 2009 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
@@ -22,14 +21,5 @@
  *****************************************************************************/
 
 #include "vout_wrapper.h"
-
-vout_display_t *vout_NewSplitter(vout_thread_t *vout,
-                                 const video_format_t *source,
-                                 const vout_display_state_t *state,
-                                 const char *module,
-                                 const char *splitter_module);
-
-/* FIXME should not be there */
-void vout_SendDisplayEventMouse(vout_thread_t *, const vlc_mouse_t *);
 
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *);

@@ -2,7 +2,6 @@
  * httpcookies.c: HTTP cookie utilities
  *****************************************************************************
  * Copyright (C) 2014 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Antti Ajanki <antti.ajanki@iki.fi>
  *

@@ -5,7 +5,7 @@
 #USE_FFMPEG ?= 1
 
 ifndef USE_LIBAV
-FFMPEG_HASH=d0e740b8fb30f02914594d00eb311a32442a63f8
+FFMPEG_HASH=0e833f615b59cd7611374d1d77257eaf00635ad7
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
 USE_FFMPEG := 1
@@ -33,6 +33,7 @@ FFMPEGCONF = \
 	--disable-protocol=concat \
 	--disable-bsfs \
 	--disable-bzlib \
+	--disable-libvpx \
 	--disable-avresample \
 	--enable-bsf=vp9_superframe
 
@@ -70,11 +71,8 @@ ifndef BUILD_NETWORK
 FFMPEGCONF += --disable-network
 endif
 ifdef BUILD_ENCODERS
-FFMPEGCONF += --enable-libmp3lame --enable-libvpx --disable-decoder=libvpx_vp8 --disable-decoder=libvpx_vp9
-ifndef USE_FFMPEG
-FFMPEGCONF += --disable-decoder=libvpx
-endif
-DEPS_ffmpeg += lame $(DEPS_lame) vpx $(DEPS_vpx)
+FFMPEGCONF += --enable-libmp3lame
+DEPS_ffmpeg += lame $(DEPS_lame)
 else
 FFMPEGCONF += --disable-encoders --disable-muxers
 endif
@@ -241,7 +239,7 @@ $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz:
 ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
 	rm -Rf $@ $@-$(FFMPEG_BASENAME)
 	mkdir -p $@-$(FFMPEG_BASENAME)
-	tar xvJf "$<" --strip-components=1 -C $@-$(FFMPEG_BASENAME)
+	tar xvJfo "$<" --strip-components=1 -C $@-$(FFMPEG_BASENAME)
 ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
 	$(APPLY) $(SRC)/ffmpeg/dxva_vc1_crash.patch

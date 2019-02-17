@@ -2,7 +2,6 @@
  * cmd_playlist.cpp
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
- * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -23,7 +22,7 @@
  *****************************************************************************/
 
 #include "cmd_playlist.hpp"
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_url.h>
 #include "../src/vlcproc.hpp"
 #include "../utils/var_bool.hpp"

@@ -2,7 +2,6 @@
  * vlcproc.cpp
  *****************************************************************************
  * Copyright (C) 2003-2009 the VideoLAN team
- * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -30,7 +29,7 @@
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_vout.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
 

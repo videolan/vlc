@@ -2,7 +2,6 @@
  * vlc_block.h: Data blocks management functions
  *****************************************************************************
  * Copyright (C) 2003 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -201,7 +200,7 @@ VLC_API block_t *block_Realloc(block_t *, ssize_t pre, size_t body) VLC_USED;
  */
 VLC_API void block_Release(block_t *block);
 
-static inline void block_CopyProperties( block_t *dst, block_t *src )
+static inline void block_CopyProperties( block_t *dst, const block_t *src )
 {
     dst->i_flags   = src->i_flags;
     dst->i_nb_samples = src->i_nb_samples;
@@ -218,7 +217,7 @@ static inline void block_CopyProperties( block_t *dst, block_t *src )
  * @return the duplicate on success, NULL on error.
  */
 VLC_USED
-static inline block_t *block_Duplicate( block_t *p_block )
+static inline block_t *block_Duplicate( const block_t *p_block )
 {
     block_t *p_dup = block_Alloc( p_block->i_buffer );
     if( p_dup == NULL )

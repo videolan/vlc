@@ -66,16 +66,13 @@ static inline subpicture_region_t *
 spuregion_CreateFromPicture( vlc_object_t *p_this, video_format_t *p_fmt,
                              const char *psz_uri )
 {
-    video_format_t fmt_in;
-    video_format_Init( &fmt_in, 0 );
-
     picture_t *p_pic = NULL;
     int i_flags = p_this->obj.flags;
     p_this->obj.flags |= OBJECT_FLAGS_NOINTERACT|OBJECT_FLAGS_QUIET;
     image_handler_t *p_image = image_HandlerCreate( p_this );
     if( p_image )
     {
-        p_pic = image_ReadUrl( p_image, psz_uri, &fmt_in, p_fmt );
+        p_pic = image_ReadUrl( p_image, psz_uri, p_fmt );
         image_HandlerDelete( p_image );
     }
     p_this->obj.flags = i_flags;

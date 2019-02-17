@@ -2,7 +2,6 @@
  * iso-639_def.h: languages codes and abbreviations
  *****************************************************************************
  * Copyright (C) 1998-2004 VLC authors and VideoLAN
- * $Id$
  *
  * This is used in iso_lang.cpp and is taken from the GNU glibc 2.2.5
  * tarball. It has been partially completed with native language names.

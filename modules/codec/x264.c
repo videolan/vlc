@@ -2,7 +2,6 @@
  * x264.c: h264 video encoder
  *****************************************************************************
  * Copyright (C) 2004-2010 the VideoLAN team
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Ilkka Ollakka <ileoo (at)videolan org>
@@ -816,7 +815,7 @@ static int  Open ( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     fullrange = var_GetBool( p_enc, SOUT_CFG_PREFIX "fullrange" );
-    fullrange |= p_enc->fmt_in.video.b_color_range_full;
+    fullrange |= p_enc->fmt_in.video.color_range == COLOR_RANGE_FULL;
     p_enc->fmt_in.i_codec = fullrange ? VLC_CODEC_J420 : VLC_CODEC_I420;
     p_sys->i_colorspace = X264_CSP_I420;
     char *psz_profile = var_GetString( p_enc, SOUT_CFG_PREFIX "profile" );

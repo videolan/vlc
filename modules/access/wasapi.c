@@ -31,6 +31,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#define _DECL_DLLMAIN
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_demux.h>
@@ -40,9 +41,7 @@
 
 static LARGE_INTEGER freq; /* performance counters frequency */
 
-BOOL WINAPI DllMain(HINSTANCE, DWORD, LPVOID); /* avoid warning */
-
-BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID reserved)
+BOOL WINAPI DllMain(HANDLE dll, DWORD reason, LPVOID reserved)
 {
     (void) dll;
     (void) reserved;

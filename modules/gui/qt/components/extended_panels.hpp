@@ -2,7 +2,6 @@
  * extended_panels.hpp : Exentended Panels
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Antoine Cellerier <dionoea at videolan dot org>

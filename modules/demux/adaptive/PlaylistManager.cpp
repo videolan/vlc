@@ -364,7 +364,8 @@ bool PlaylistManager::setPosition(vlc_tick_t time)
 
 bool PlaylistManager::needsUpdate() const
 {
-    return playlist->isLive() && (failedupdates < 3);
+    return playlist->needsUpdates() &&
+           playlist->isLive() && (failedupdates < 3);
 }
 
 void PlaylistManager::scheduleNextUpdate()

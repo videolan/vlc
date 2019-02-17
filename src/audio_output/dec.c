@@ -2,7 +2,6 @@
  * dec.c : audio output API towards decoders
  *****************************************************************************
  * Copyright (C) 2002-2007 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -41,10 +40,9 @@
 /**
  * Creates an audio output
  */
-int aout_DecNew( audio_output_t *p_aout,
-                 const audio_sample_format_t *p_format,
-                 const audio_replay_gain_t *p_replay_gain,
-                 const aout_request_vout_t *p_request_vout )
+int aout_DecNew(audio_output_t *p_aout,
+                const audio_sample_format_t *p_format,
+                const audio_replay_gain_t *p_replay_gain)
 {
     if( p_format->i_bitspersample > 0 )
     {
@@ -80,7 +78,6 @@ int aout_DecNew( audio_output_t *p_aout,
     atomic_store_explicit(&owner->restart, 0, memory_order_relaxed);
     owner->input_format = *p_format;
     owner->mixer_format = owner->input_format;
-    owner->request_vout = *p_request_vout;
 
     owner->filters_cfg = AOUT_FILTERS_CFG_INIT;
     if (aout_OutputNew (p_aout, &owner->mixer_format, &owner->filters_cfg))
@@ -88,9 +85,8 @@ int aout_DecNew( audio_output_t *p_aout,
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
     /* Create the audio filtering "input" pipeline */
-    owner->filters = aout_FiltersNew (p_aout, p_format, &owner->mixer_format,
-                                      &owner->request_vout,
-                                      &owner->filters_cfg);
+    owner->filters = aout_FiltersNew(p_aout, p_format, &owner->mixer_format,
+                                     &owner->filters_cfg);
     if (owner->filters == NULL)
     {
         aout_OutputDelete (p_aout);
@@ -165,10 +161,9 @@ static int aout_CheckReady (audio_output_t *aout)
 
         if (owner->mixer_format.i_format)
         {
-            owner->filters = aout_FiltersNew (aout, &owner->input_format,
-                                              &owner->mixer_format,
-                                              &owner->request_vout,
-                                              &owner->filters_cfg);
+            owner->filters = aout_FiltersNew(aout, &owner->input_format,
+                                             &owner->mixer_format,
+                                             &owner->filters_cfg);
             if (owner->filters == NULL)
             {
                 aout_OutputDelete (aout);
@@ -446,4 +441,5 @@ void aout_DecFlush (audio_output_t *aout, bool wait)
 
         aout->flush(aout, wait);
     }
+    owner->sync.discontinuity = true;
 }

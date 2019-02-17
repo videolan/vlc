@@ -130,69 +130,89 @@ int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
     return VLC_SUCCESS;
 }
 
+#undef D3D11_GetDriverVersion
 
 #if !VLC_WINSTORE_APP
-static HKEY GetAdapterRegistry(DXGI_ADAPTER_DESC *adapterDesc)
+static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc)
 {
     HKEY hKey;
     TCHAR key[128];
     TCHAR szData[256], lookup[256];
     DWORD len = 256;
+    LSTATUS ret;
 
     _sntprintf(lookup, 256, TEXT("pci\\ven_%04x&dev_%04x"), adapterDesc->VendorId, adapterDesc->DeviceId);
     for (int i=0;;i++)
     {
         _sntprintf(key, 128, TEXT("SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\%04d"), i);
-        if( RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey) != ERROR_SUCCESS )
+        ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey);
+        if ( ret != ERROR_SUCCESS )
+        {
+            msg_Warn(obj, "failed to read the %d Display Adapter registry key (%d)", i, ret);
             return NULL;
+        }
 
         len = sizeof(szData);
-        if( RegQueryValueEx( hKey, TEXT("MatchingDeviceId"), NULL, NULL, (LPBYTE) &szData, &len ) == ERROR_SUCCESS ) {
+        ret = RegQueryValueEx( hKey, TEXT("MatchingDeviceId"), NULL, NULL, (LPBYTE) &szData, &len );
+        if ( ret == ERROR_SUCCESS ) {
             if (_tcsncmp(lookup, szData, _tcslen(lookup)) == 0)
                 return hKey;
+            msg_Dbg(obj, "different %d device %s vs %s", i, lookup, szData);
         }
+        else
+            msg_Warn(obj, "failed to get the %d MatchingDeviceId (%d)", i, ret);
 
         RegCloseKey(hKey);
     }
     return NULL;
 }
-#endif
 
-#undef D3D11_GetDriverVersion
 void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 {
     memset(&d3d_dev->WDDM, 0, sizeof(d3d_dev->WDDM));
 
-#if VLC_WINSTORE_APP
-    return;
-#else
     IDXGIAdapter *pAdapter = D3D11DeviceAdapter(d3d_dev->d3ddevice);
-    if (!pAdapter)
+    if (unlikely(!pAdapter))
+    {
+        msg_Warn(obj, "can't get adapter from device %p", (void*)d3d_dev->d3ddevice);
         return;
+    }
 
     DXGI_ADAPTER_DESC adapterDesc;
     HRESULT hr = IDXGIAdapter_GetDesc(pAdapter, &adapterDesc);
     IDXGIAdapter_Release(pAdapter);
     if (FAILED(hr))
+    {
+        msg_Warn(obj, "can't get adapter description");
         return;
+    }
 
     LONG err = ERROR_ACCESS_DENIED;
     TCHAR szData[256];
     DWORD len = 256;
-    HKEY hKey = GetAdapterRegistry(&adapterDesc);
+    HKEY hKey = GetAdapterRegistry(obj, &adapterDesc);
     if (hKey == NULL)
+    {
+        msg_Warn(obj, "can't find adapter in registry");
         return;
+    }
 
     err = RegQueryValueEx( hKey, TEXT("DriverVersion"), NULL, NULL, (LPBYTE) &szData, &len );
     RegCloseKey(hKey);
 
     if (err != ERROR_SUCCESS )
+    {
+        msg_Warn(obj, "failed to read the adapter DriverVersion");
         return;
+    }
 
     int wddm, d3d_features, revision, build;
     /* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics */
     if (_stscanf(szData, TEXT("%d.%d.%d.%d"), &wddm, &d3d_features, &revision, &build) != 4)
+    {
+        msg_Warn(obj, "the adapter DriverVersion '%s' doesn't match the expected format", szData);
         return;
+    }
     d3d_dev->WDDM.wddm         = wddm;
     d3d_dev->WDDM.d3d_features = d3d_features;
     d3d_dev->WDDM.revision     = revision;
@@ -203,8 +223,15 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
         /* new Intel driver format */
         d3d_dev->WDDM.build += (revision - 100) * 1000;
     }
-#endif
 }
+#else /* VLC_WINSTORE_APP */
+void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
+{
+    VLC_UNUSED(obj);
+    VLC_UNUSED(d3d_dev);
+    return;
+}
+#endif /* VLC_WINSTORE_APP */
 
 void D3D11_ReleaseDevice(d3d11_device_t *d3d_dev)
 {
@@ -228,8 +255,45 @@ void D3D11_ReleaseDevice(d3d11_device_t *d3d_dev)
 #endif
 }
 
+#undef D3D11_CreateDeviceExternal
+HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *d3d11ctx,
+                                   bool hw_decoding, d3d11_device_t *out)
+{
+    HRESULT hr;
+    ID3D11DeviceContext_GetDevice( d3d11ctx, &out->d3ddevice );
+
+    if (hw_decoding)
+    {
+        UINT creationFlags = ID3D11Device_GetCreationFlags(out->d3ddevice);
+        if (!(creationFlags & D3D11_CREATE_DEVICE_VIDEO_SUPPORT))
+        {
+            msg_Err(obj, "the provided D3D11 device doesn't support decoding");
+            ID3D11Device_Release(out->d3ddevice);
+            out->d3ddevice = NULL;
+            return E_FAIL;
+        }
+    }
+
+    ID3D11DeviceContext_AddRef( d3d11ctx );
+    out->d3dcontext = d3d11ctx;
+    out->owner = false;
+    out->feature_level = ID3D11Device_GetFeatureLevel(out->d3ddevice );
+
+    HANDLE context_lock = INVALID_HANDLE_VALUE;
+    UINT dataSize = sizeof(context_lock);
+    hr = ID3D11DeviceContext_GetPrivateData(d3d11ctx, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
+    if (SUCCEEDED(hr))
+        out->context_mutex = context_lock;
+    else
+        out->context_mutex = INVALID_HANDLE_VALUE;
+
+    D3D11_GetDriverVersion(obj, out);
+    return S_OK;
+}
+
 #undef D3D11_CreateDevice
 HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
+                           IDXGIAdapter *adapter,
                            bool hw_decoding, d3d11_device_t *out)
 {
 #if !VLC_WINSTORE_APP
@@ -275,10 +339,11 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
         D3D_FEATURE_LEVEL_9_3, D3D_FEATURE_LEVEL_9_2, D3D_FEATURE_LEVEL_9_1
     };
 
-    for (UINT driver = 0; driver < ARRAY_SIZE(driverAttempts); driver++) {
-        hr = D3D11CreateDevice(NULL, driverAttempts[driver], NULL, creationFlags,
-                    D3D11_features, ARRAY_SIZE(D3D11_features), D3D11_SDK_VERSION,
-                    &out->d3ddevice, &out->feature_level, &out->d3dcontext);
+    for (UINT driver = 0; driver < (adapter ? 1 : ARRAY_SIZE(driverAttempts)); driver++) {
+        hr = D3D11CreateDevice(adapter, adapter ? D3D_DRIVER_TYPE_UNKNOWN : driverAttempts[driver],
+                               NULL, creationFlags,
+                               D3D11_features, ARRAY_SIZE(D3D11_features), D3D11_SDK_VERSION,
+                               &out->d3ddevice, &out->feature_level, &out->d3dcontext);
         if (SUCCEEDED(hr)) {
             msg_Dbg(obj, "Created the D3D11 device type %d level %x.",
                     driverAttempts[driver], out->feature_level);
@@ -391,28 +456,28 @@ int D3D11CheckDriverVersion(d3d11_device_t *d3d_dev, UINT vendorId, const struct
     {
         if (d3d_dev->WDDM.wddm > min_ver->wddm)
             return VLC_SUCCESS;
-        else if (d3d_dev->WDDM.wddm != min_ver->wddm)
+        if (d3d_dev->WDDM.wddm != min_ver->wddm)
             return VLC_EGENERIC;
     }
     if (min_ver->d3d_features)
     {
         if (d3d_dev->WDDM.d3d_features > min_ver->d3d_features)
             return VLC_SUCCESS;
-        else if (d3d_dev->WDDM.d3d_features != min_ver->d3d_features)
+        if (d3d_dev->WDDM.d3d_features != min_ver->d3d_features)
             return VLC_EGENERIC;
     }
     if (min_ver->revision)
     {
         if (d3d_dev->WDDM.revision > min_ver->revision)
             return VLC_SUCCESS;
-        else if (d3d_dev->WDDM.revision != min_ver->revision)
+        if (d3d_dev->WDDM.revision != min_ver->revision)
             return VLC_EGENERIC;
     }
     if (min_ver->build)
     {
         if (d3d_dev->WDDM.build > min_ver->build)
             return VLC_SUCCESS;
-        else if (d3d_dev->WDDM.build != min_ver->build)
+        if (d3d_dev->WDDM.build != min_ver->build)
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -670,6 +735,9 @@ int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d, bool with_shaders)
             return VLC_EGENERIC;
         }
     }
+#else
+    hd3d->hdll = NULL;
+    hd3d->compiler_dll = NULL;
 #endif
     return VLC_SUCCESS;
 }

@@ -109,7 +109,7 @@ static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
 }
 
 static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
-                const es_format_t *fmt, picture_sys_t *p_sys)
+                const es_format_t *fmt, void *p_sys)
 {
     if (pix_fmt != AV_PIX_FMT_VDPAU)
         return VLC_EGENERIC;
@@ -192,10 +192,9 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
                  i, refs);
 
     const char *infos;
-    if (vdp_get_information_string(sys->vdp, &infos) != VDP_STATUS_OK)
-        infos = "VDPAU";
+    if (vdp_get_information_string(sys->vdp, &infos) == VDP_STATUS_OK)
+        msg_Info(va, "Using %s", infos);
 
-    va->description = infos;
     va->get = Lock;
     return VLC_SUCCESS;
 

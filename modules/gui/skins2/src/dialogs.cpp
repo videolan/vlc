@@ -2,7 +2,6 @@
  * dialogs.cpp
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
- * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -29,7 +28,7 @@
 #include "../commands/cmd_quit.hpp"
 #include "../commands/cmd_playlist.hpp"
 #include "../commands/cmd_playtree.hpp"
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_modules.h>
 #include <vlc_url.h>
 

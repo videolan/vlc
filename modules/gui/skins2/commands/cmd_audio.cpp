@@ -2,7 +2,6 @@
  * cmd_audio.cpp
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
- * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -23,7 +22,7 @@
 
 #include "cmd_audio.hpp"
 #include "../src/vlcproc.hpp"
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_input.h>
 #include <string>
 

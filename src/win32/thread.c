@@ -29,6 +29,7 @@
 # include "config.h"
 #endif
 
+#define _DECL_DLLMAIN
 #include <vlc_common.h>
 
 #include "libvlc.h"
@@ -997,9 +998,8 @@ void vlc_threads_setup(libvlc_int_t *vlc)
 #define LOOKUP(s) (((s##_) = (void *)GetProcAddress(h, #s)) != NULL)
 
 extern vlc_rwlock_t config_lock;
-BOOL WINAPI DllMain (HINSTANCE, DWORD, LPVOID);
 
-BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
+BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
     (void) hinstDll;
     (void) lpvReserved;

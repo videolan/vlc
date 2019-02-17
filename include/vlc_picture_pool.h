@@ -2,7 +2,6 @@
  * vlc_picture_pool.h: picture pool definitions
  *****************************************************************************
  * Copyright (C) 2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
@@ -130,20 +129,6 @@ VLC_API picture_t * picture_pool_Get( picture_pool_t * ) VLC_USED;
  * @note This function is thread-safe.
  */
 VLC_API picture_t *picture_pool_Wait(picture_pool_t *) VLC_USED;
-
-/**
- * Enumerates all pictures in a pool, both free and allocated.
- *
- * @param cb callback to invoke once for each picture
- * @param data opaque data parameter for the callback (first argument)
- *
- * @note Allocated pictures may be accessed asynchronously by other threads.
- * Therefore, only read-only picture parameters can be read by the callback,
- * typically picture_t.p_sys.
- * Provided those rules are respected, the function is thread-safe.
- */
-VLC_API void picture_pool_Enum( picture_pool_t *,
-                                void (*cb)(void *, picture_t *), void *data );
 
 /**
  * Cancel the picture pool.

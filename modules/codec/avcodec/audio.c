@@ -2,7 +2,6 @@
  * audio.c: audio decoder using libavcodec library
  *****************************************************************************
  * Copyright (C) 1999-2003 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -390,7 +389,12 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 if( ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL) )
                     goto end;
                 else
+                {
+                    char errorstring[AV_ERROR_MAX_STRING_SIZE];
+                    if( !av_strerror( ret, errorstring, AV_ERROR_MAX_STRING_SIZE ) )
+                        msg_Err( p_dec, "%s", errorstring );
                     goto drop;
+                }
             }
         }
 

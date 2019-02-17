@@ -2,7 +2,6 @@
  * dialogs_provider.hpp : Dialogs provider
  ****************************************************************************
  * Copyright (C) 2006-2008 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>

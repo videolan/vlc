@@ -192,12 +192,9 @@ static void vlc_h2_output_flush_unlocked(struct vlc_h2_output *out)
  */
 static ssize_t vlc_https_send(vlc_tls_t *tls, const void *buf, size_t len)
 {
-    struct pollfd ufd;
     struct iovec iov;
     size_t count = 0;
 
-    ufd.fd = vlc_tls_GetFD(tls);
-    ufd.events = POLLOUT;
     iov.iov_base = (void *)buf;
     iov.iov_len = len;
 
@@ -222,6 +219,10 @@ static ssize_t vlc_https_send(vlc_tls_t *tls, const void *buf, size_t len)
         if (errno != EINTR && errno != EAGAIN)
             return count ? (ssize_t)count : -1;
 
+        struct pollfd ufd;
+
+        ufd.events = POLLOUT;
+        ufd.fd = vlc_tls_GetPollFD(tls, &ufd.events);
         poll(&ufd, 1, -1);
     }
 

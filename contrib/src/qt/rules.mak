@@ -30,8 +30,14 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Disable-systray-notification-sounds.patch
 	$(APPLY) $(SRC)/qt/0003-configure-Treat-win32-clang-g-the-same-as-win32-g.patch
 	$(APPLY) $(SRC)/qt/0004-qmake-Fix-building-with-lld-with-mingw-makefiles.patch
+	$(APPLY) $(SRC)/qt/0005-qsimd-Fix-compilation-with-trunk-clang-for-mingw.patch
 ifndef HAVE_WIN64
 	$(APPLY) $(SRC)/qt/0001-disable-qt_random_cpu.patch
+endif
+	$(APPLY) $(SRC)/qt/fix-glibc-2.28-build.patch
+ifndef HAVE_CROSS_COMPILE
+	cd qt-$(QT_VERSION_FULL); for i in QtFontDatabaseSupport QtWindowsUIAutomationSupport QtEventDispatcherSupport QtCore; do \
+		sed -i -e 's,"../../../../../src,"../src,g' include/$$i/$(QT_VERSION)/$$i/private/*.h; done
 endif
 endif
 	$(MOVE)
@@ -62,7 +68,7 @@ endif
 
 QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl $(QT_OPENGL) -no-dbus \
-	-no-sql-odbc -no-pch \
+	-no-vulkan -no-sql-odbc -no-pch \
 	-no-compile-examples -nomake examples -qt-zlib
 
 QT_CONFIG += -release
@@ -95,14 +101,6 @@ ifdef HAVE_WIN32
 	# Fix Qt5Widget.pc file to include qwindowsvistastyle before Qt5Widget, as it depends on it
 	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/ -lQt5Widget/ -lqwindowsvistastyle -lQt5Widget/' Qt5Widgets.pc
 endif
-ifdef HAVE_CROSS_COMPILE
-	# Building Qt build tools for Xcompilation
-	cd $</include/QtCore; $(LN_S)f $(QT_VERSION)/QtCore/private private
-	cd $<; $(MAKE) -C qmake
+	# Install a qmake with correct paths set
 	cd $<; $(MAKE) sub-qmake-qmake-aux-pro-install_subtargets install_mkspecs
-	cd $</src/tools; \
-	for i in bootstrap uic rcc moc; \
-		do (cd $$i; echo $$i && ../../../bin/qmake -spec $(QT_SPEC) QMAKE_RC=$(HOST)-windres && $(MAKE) clean && $(MAKE) CC=$(HOST)-gcc CXX=$(HOST)-g++ LINKER=$(HOST)-g++ LIB="$(HOST)-ar -rc" && $(MAKE) install); \
-	done
-endif
 	touch $@

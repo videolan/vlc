@@ -2,7 +2,6 @@
  * events.c: Windows video output events handler
  *****************************************************************************
  * Copyright (C) 2001-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Martell Malone <martellmalone@gmail.com>
@@ -193,7 +192,6 @@ static void *EventThread( void *p_this )
     for( ;; )
     {
         vout_display_place_t place;
-        video_format_t       source;
 
         if( !GetMessage( &msg, 0, 0, 0 ) )
         {
@@ -240,22 +238,20 @@ static void *EventThread( void *p_this )
         case WM_MOUSEMOVE:
             vlc_mutex_lock( &p_event->lock );
             place  = p_event->place;
-            source = p_event->source;
             vlc_mutex_unlock( &p_event->lock );
 
             if( place.width > 0 && place.height > 0 )
             {
+                int x = GET_X_LPARAM(msg.lParam);
+                int y = GET_Y_LPARAM(msg.lParam);
+
                 if( msg.hwnd == p_event->hvideownd )
                 {
                     /* Child window */
-                    place.x = 0;
-                    place.y = 0;
+                    x += place.x;
+                    y += place.y;
                 }
-                const int x = source.i_x_offset +
-                    (int64_t)(GET_X_LPARAM(msg.lParam) - place.x) * source.i_width  / place.width;
-                const int y = source.i_y_offset +
-                    (int64_t)(GET_Y_LPARAM(msg.lParam) - place.y) * source.i_height / place.height;
-                vout_display_SendEventMouseMoved(vd, x, y);
+                vout_display_SendMouseMovedDisplayCoordinates(vd, x, y);
             }
             break;
         case WM_NCMOUSEMOVE:
@@ -313,7 +309,7 @@ static void *EventThread( void *p_this )
                     i_key |= KEY_MODIFIER_ALT;
                 }
 
-                vout_display_SendEventKey(vd, i_key);
+                vout_window_ReportKeyPress(p_event->parent_window, i_key);
             }
             break;
         }
@@ -343,7 +339,7 @@ static void *EventThread( void *p_this )
                 {
                     i_key |= KEY_MODIFIER_ALT;
                 }
-                vout_display_SendEventKey(vd, i_key);
+                vout_window_ReportKeyPress(p_event->parent_window, i_key);
             }
             break;
         }
@@ -456,8 +452,11 @@ bool EventThreadGetAndResetHasMoved( event_thread_t *p_event )
     return atomic_exchange(&p_event->has_moved, false);
 }
 
-event_thread_t *EventThreadCreate( vout_display_t *vd)
+event_thread_t *EventThreadCreate( vout_display_t *vd, const vout_display_cfg_t *vdcfg)
 {
+    if (vdcfg->window->type != VOUT_WINDOW_TYPE_HWND &&
+        !(vdcfg->window->type == VOUT_WINDOW_TYPE_DUMMY && vdcfg->window->handle.hwnd == 0))
+        return NULL;
      /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
      * Windows can stay blocked inside this call for a long time, and when
@@ -474,13 +473,15 @@ event_thread_t *EventThreadCreate( vout_display_t *vd)
     vlc_mutex_init( &p_event->lock );
     vlc_cond_init( &p_event->wait );
 
+    p_event->parent_window = vdcfg->window;
+
     p_event->is_cursor_hidden = false;
     p_event->button_pressed = 0;
     p_event->psz_title = NULL;
     p_event->source = vd->source;
     p_event->hwnd = NULL;
     atomic_init(&p_event->has_moved, false);
-    vout_display_PlacePicture(&p_event->place, &vd->source, vd->cfg, false);
+    vout_display_PlacePicture(&p_event->place, &vd->source, vdcfg);
 
     _sntprintf( p_event->class_main, sizeof(p_event->class_main)/sizeof(*p_event->class_main),
                _T("VLC video main %p"), (void *)p_event );
@@ -690,11 +691,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     #endif
     {
         /* If an external window was specified, we'll draw in it. */
-        p_event->parent_window = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_HWND);
-        if( p_event->parent_window )
-            p_event->hparent = p_event->parent_window->handle.hwnd;
-        else
-            p_event->hparent = NULL;
+        p_event->hparent = p_event->parent_window->handle.hwnd;
     }
     #if defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)
     else
@@ -1012,7 +1009,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
 
     /* the user wants to close the window */
     case WM_CLOSE:
-        vout_display_SendEventClose(vd);
+        vout_window_ReportClose(p_event->parent_window);
         return 0;
 
     /* the window has been closed so shut down everything now */

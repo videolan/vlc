@@ -19,6 +19,7 @@ pkginclude_HEADERS = \
 	../include/vlc/libvlc_media_list_player.h \
 	../include/vlc/libvlc_media_player.h \
 	../include/vlc/libvlc_renderer_discoverer.h \
+	../include/vlc/libvlc_picture.h \
 	../include/vlc/vlc.h
 
 nodist_pkginclude_HEADERS = ../include/vlc/libvlc_version.h
@@ -34,6 +35,7 @@ libvlc_la_SOURCES = \
 	media_internal.h \
 	media_list_internal.h \
 	media_player_internal.h \
+	picture_internal.h \
 	renderer_discoverer_internal.h \
 	core.c \
 	dialog.c \
@@ -50,7 +52,8 @@ libvlc_la_SOURCES = \
 	media_list_path.h \
 	media_list_player.c \
 	media_library.c \
-	media_discoverer.c
+	media_discoverer.c \
+	picture.c
 EXTRA_DIST = libvlc.pc.in libvlc.sym ../include/vlc/libvlc_version.h.in
 
 libvlc_la_LIBADD = ../src/libvlccore.la ../compat/libcompat.la $(LIBM)

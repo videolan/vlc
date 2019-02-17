@@ -1,7 +1,6 @@
 --[[
- $Id$
 
- Copyright © 2009-2013 the VideoLAN team
+ Copyright © 2009-2019 the VideoLAN team
 
  Authors: Konstantin Pavlov (thresh@videolan.org)
           François Revol (revol@free.fr)
@@ -24,45 +23,31 @@
 
 -- Probe function.
 function probe()
-    local path = vlc.path
-    path = path:gsub("^www%.", "")
     return ( vlc.access == "http" or vlc.access == "https" )
-        and ( string.match( path, "^vimeo%.com/%d+$" )
-              or string.match( path, "^vimeo%.com/channels/(.-)/%d+$" )
-              or string.match( path, "^player%.vimeo%.com/" ) )
-        -- do not match other addresses,
-        -- else we'll also try to decode the actual video url
+        and ( string.match( vlc.path, "^vimeo%.com/%d+" )
+              or string.match( vlc.path, "^vimeo%.com/channels/.-/%d+" )
+              or string.match( vlc.path, "^player%.vimeo%.com/" ) )
 end
 
 -- Parse function.
 function parse()
-    if not string.match( vlc.path, "player%.vimeo%.com" ) then -- Web page URL
+    if string.match( vlc.path, "^player%.vimeo%.com/" ) then
+        -- The /config API will return the data on a single line.
+        -- Otherwise, search the web page for the config.
+        local config = vlc.readline()
         while true do
             local line = vlc.readline()
             if not line then break end
-
-            -- Get the appropriate ubiquitous meta tag
-            -- <meta name="twitter:player" content="https://player.vimeo.com/video/123456789">
-            local meta = string.match( line, "(<meta[^>]- name=\"twitter:player\"[^>]->)" )
-            if meta then
-                local path = string.match( meta, " content=\"(.-)\"" )
-                if path then
-                    path = vlc.strings.resolve_xml_special_chars( path )
-                    return { { path = path } }
-                end
+            if string.match( line, "var config = {" ) then
+                config = line
+                break
             end
         end
 
-        vlc.msg.err( "Couldn't extract vimeo video URL, please check for updates to this script" )
-        return { }
-
-    else -- API URL
-
         local prefres = vlc.var.inherit(nil, "preferred-resolution")
         local bestres = nil
-        local line = vlc.readline() -- data is on one line only
 
-        for stream in string.gmatch( line, "{([^}]*\"profile\":[^}]*)}" ) do
+        for stream in string.gmatch( config, "{([^}]*\"profile\":[^}]*)}" ) do
             local url = string.match( stream, "\"url\":\"(.-)\"" )
             if url then
                 -- Apparently the different formats available are listed
@@ -89,11 +74,18 @@ function parse()
             return { }
         end
 
-        local name = string.match( line, "\"title\":\"(.-)\"" )
-        local artist = string.match( line, "\"owner\":{[^}]-\"name\":\"(.-)\"" )
-        local arturl = string.match( line, "\"thumbs\":{\"[^\"]+\":\"(.-)\"" )
-        local duration = string.match( line, "\"duration\":(%d+)[,}]" )
+        local name = string.match( config, "\"title\":\"(.-)\"" )
+        local artist = string.match( config, "\"owner\":{[^}]-\"name\":\"(.-)\"" )
+        local arturl = string.match( config, "\"thumbs\":{\"[^\"]+\":\"(.-)\"" )
+        local duration = string.match( config, "\"duration\":(%d+)[,}]" )
 
         return { { path = path; name = name; artist = artist; arturl = arturl; duration = duration } }
+
+    else -- Video web page
+        local path = string.gsub( vlc.path, "^vimeo%.com/channels/.-/(%d+)", "/%1" )
+        local video_id = string.match( path, "/(%d+)" )
+
+        local api = vlc.access.."://player.vimeo.com/video/"..video_id.."/config"
+        return { { path = api } }
     end
 end

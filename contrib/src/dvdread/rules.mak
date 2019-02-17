@@ -18,6 +18,7 @@ $(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
 
 dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 	$(UNPACK)
+	$(APPLY) $(SRC)/dvdread/0001-Invalidate-cache-when-forcing-filesize.patch
 	cd $(UNPACK_DIR) && sed -i -e 's,Requires.private,Requires,g' misc/*.pc.in
 	$(MOVE)
 

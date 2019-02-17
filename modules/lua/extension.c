@@ -2,7 +2,6 @@
  * extension.c: Lua Extensions (meta data, web information, ...)
  *****************************************************************************
  * Copyright (C) 2009-2010 VideoLAN and authors
- * $Id$
  *
  * Authors: Jean-Philippe André < jpeg # videolan.org >
  *
@@ -517,54 +516,53 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
     switch( i_control )
     {
         case EXTENSION_ACTIVATE:
-            p_ext = ( extension_t* ) va_arg( args, extension_t* );
+            p_ext = va_arg( args, extension_t* );
             return Activate( p_mgr, p_ext );
 
         case EXTENSION_DEACTIVATE:
-            p_ext = ( extension_t* ) va_arg( args, extension_t* );
+            p_ext = va_arg( args, extension_t* );
             return Deactivate( p_mgr, p_ext );
 
         case EXTENSION_IS_ACTIVATED:
-            p_ext = ( extension_t* ) va_arg( args, extension_t* );
-            pb = ( bool* ) va_arg( args, bool* );
+            p_ext = va_arg( args, extension_t* );
+            pb = va_arg( args, bool* );
             vlc_mutex_lock( &p_ext->p_sys->command_lock );
             *pb = p_ext->p_sys->b_activated;
             vlc_mutex_unlock( &p_ext->p_sys->command_lock );
             break;
 
         case EXTENSION_HAS_MENU:
-            p_ext = ( extension_t* ) va_arg( args, extension_t* );
-            pb = ( bool* ) va_arg( args, bool* );
+            p_ext = va_arg( args, extension_t* );
+            pb = va_arg( args, bool* );
             *pb = ( p_ext->p_sys->i_capabilities & EXT_HAS_MENU ) ? 1 : 0;
             break;
 
         case EXTENSION_GET_MENU:
-            p_ext = ( extension_t* ) va_arg( args, extension_t* );
-            pppsz = ( char*** ) va_arg( args, char*** );
-            ppus = ( uint16_t** ) va_arg( args, uint16_t** );
+            p_ext = va_arg( args, extension_t* );
+            pppsz = va_arg( args, char*** );
+            ppus = va_arg( args, uint16_t** );
             if( p_ext == NULL )
                 return VLC_EGENERIC;
             return GetMenuEntries( p_mgr, p_ext, pppsz, ppus );
 
         case EXTENSION_TRIGGER_ONLY:
-            p_ext = ( extension_t* ) va_arg( args, extension_t* );
-            pb = ( bool* ) va_arg( args, bool* );
+            p_ext = va_arg( args, extension_t* );
+            pb = va_arg( args, bool* );
             *pb = ( p_ext->p_sys->i_capabilities & EXT_TRIGGER_ONLY ) ? 1 : 0;
             break;
 
         case EXTENSION_TRIGGER:
-            p_ext = ( extension_t* ) va_arg( args, extension_t* );
+            p_ext = va_arg( args, extension_t* );
             return TriggerExtension( p_mgr, p_ext );
 
         case EXTENSION_TRIGGER_MENU:
-            p_ext = ( extension_t* ) va_arg( args, extension_t* );
-            // GCC: 'uint16_t' is promoted to 'int' when passed through '...'
-            i = ( int ) va_arg( args, int );
+            p_ext = va_arg( args, extension_t* );
+            i = va_arg( args, int );
             return TriggerMenu( p_ext, i );
 
         case EXTENSION_SET_INPUT:
         {
-            p_ext = ( extension_t* ) va_arg( args, extension_t* );
+            p_ext = va_arg( args, extension_t* );
             input_thread_t *p_input = va_arg( args, struct input_thread_t * );
 
             if( p_ext == NULL )
@@ -623,10 +621,9 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
         }
         case EXTENSION_PLAYING_CHANGED:
         {
-            extension_t *p_ext;
-            p_ext = ( extension_t* ) va_arg( args, extension_t* );
+            p_ext = va_arg( args, extension_t* );
             assert( p_ext->psz_name != NULL );
-            i = ( int ) va_arg( args, int );
+            i = va_arg( args, int );
             if( p_ext->p_sys->i_capabilities & EXT_PLAYING_LISTENER )
             {
                 PushCommand( p_ext, CMD_PLAYING_CHANGED, i );
@@ -635,8 +632,7 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
         }
         case EXTENSION_META_CHANGED:
         {
-            extension_t *p_ext;
-            p_ext = ( extension_t* ) va_arg( args, extension_t* );
+            p_ext = va_arg( args, extension_t* );
             PushCommand( p_ext, CMD_UPDATE_META );
             break;
         }
@@ -945,11 +941,11 @@ int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
     {
         if( type == LUA_NUM )
         {
-            lua_pushnumber( L , ( int ) va_arg( args, int ) );
+            lua_pushnumber( L , va_arg( args, int ) );
         }
         else if( type == LUA_TEXT )
         {
-            lua_pushstring( L , ( char * ) va_arg( args, char* ) );
+            lua_pushstring( L , va_arg( args, char* ) );
         }
         else
         {

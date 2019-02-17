@@ -2,7 +2,6 @@
  * rss.c : rss/atom feed display video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003-2006 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
  *          Rémi Duraffort <ivoire -at- videolan -dot- org>
@@ -358,8 +357,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     int i_feed, i_item;
     rss_feed_t *p_feed;
 
-    memset( &fmt, 0, sizeof(video_format_t) );
-
     vlc_mutex_lock( &p_sys->lock );
 
     /* Check if the feeds have been fetched and that we have some feeds */
@@ -406,7 +403,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         return NULL;
     }
 
-    fmt.i_chroma = VLC_CODEC_TEXT;
+    video_format_Init( &fmt, VLC_CODEC_TEXT );
 
     p_spu->p_region = subpicture_region_New( &fmt );
     if( !p_spu->p_region )
@@ -505,9 +502,8 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         picture_t *p_pic = p_feed->p_pic;
         video_format_t fmt_out;
 
-        memset( &fmt_out, 0, sizeof(video_format_t) );
+        video_format_Init( &fmt_out, VLC_CODEC_YUVA );
 
-        fmt_out.i_chroma = VLC_CODEC_YUVA;
         fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
         fmt_out.i_width =
             fmt_out.i_visible_width = p_pic->p[Y_PLANE].i_visible_pitch;
@@ -551,17 +547,14 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 static picture_t *LoadImage( filter_t *p_filter, const char *psz_url )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    video_format_t fmt_in;
     video_format_t fmt_out;
     picture_t *p_orig;
     picture_t *p_pic = NULL;
     image_handler_t *p_handler = image_HandlerCreate( p_filter );
 
-    memset( &fmt_in, 0, sizeof(video_format_t) );
-    memset( &fmt_out, 0, sizeof(video_format_t) );
+    video_format_Init( &fmt_out, VLC_CODEC_YUVA );
 
-    fmt_out.i_chroma = VLC_CODEC_YUVA;
-    p_orig = image_ReadUrl( p_handler, psz_url, &fmt_in, &fmt_out );
+    p_orig = image_ReadUrl( p_handler, psz_url, &fmt_out );
 
     if( !p_orig )
     {
@@ -569,8 +562,9 @@ static picture_t *LoadImage( filter_t *p_filter, const char *psz_url )
     }
     else if( p_sys->p_style->i_font_size > 0 )
     {
+        video_format_t fmt_in;
+        video_format_Copy( &fmt_in, &fmt_out );
 
-        fmt_in.i_chroma = VLC_CODEC_YUVA;
         fmt_in.i_height = p_orig->p[Y_PLANE].i_visible_lines;
         fmt_in.i_width = p_orig->p[Y_PLANE].i_visible_pitch;
         fmt_out.i_width = p_orig->p[Y_PLANE].i_visible_pitch
@@ -579,6 +573,7 @@ static picture_t *LoadImage( filter_t *p_filter, const char *psz_url )
 
         p_pic = image_Convert( p_handler, p_orig, &fmt_in, &fmt_out );
         picture_Release( p_orig );
+        video_format_Clean( &fmt_in );
         if( !p_pic )
         {
             msg_Warn( p_filter, "Error while converting %s", psz_url );
@@ -589,6 +584,7 @@ static picture_t *LoadImage( filter_t *p_filter, const char *psz_url )
         p_pic = p_orig;
     }
 
+    video_format_Clean( &fmt_out );
     image_HandlerDelete( p_handler );
 
     return p_pic;

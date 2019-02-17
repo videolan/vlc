@@ -2,7 +2,6 @@
  * oggspots.c: OggSpots decoder module.
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Michael Taenzer <neo@nhng.de>
  *
@@ -268,12 +267,12 @@ static int ProcessHeader(decoder_t* p_dec)
      * latter are underspecified. */
 
     if (p_sys->b_packetizer) {
-        void* p_extra = realloc(p_dec->fmt_out.p_extra,
+        void* p_new_extra = realloc(p_dec->fmt_out.p_extra,
                                 p_dec->fmt_in.i_extra);
-        if (unlikely(p_extra == NULL)) {
+        if (unlikely(p_new_extra == NULL)) {
             return VLC_ENOMEM;
         }
-        p_dec->fmt_out.p_extra = p_extra;
+        p_dec->fmt_out.p_extra = p_new_extra;
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
         memcpy(p_dec->fmt_out.p_extra,
                p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra);
@@ -375,7 +374,7 @@ static picture_t* DecodePacket(decoder_t* p_dec, block_t* p_block)
     p_block->p_buffer += i_img_offset;
 
     p_pic = image_Read(p_sys->p_image, p_block,
-                       &p_dec->fmt_in.video,
+                       &p_dec->fmt_in,
                        &p_dec->fmt_out.video);
     if (p_pic == NULL) {
         return NULL;

@@ -153,6 +153,8 @@ check flex
 check_nasm 2.13.01
 check gettext
 check help2man
+check meson 0.48.1
+check ninja
 
 DEPS_ONLY="help2man"
 
@@ -197,7 +199,7 @@ for t in $NEEDED; do
     esac
 done
 
-[ -n "$PACKAGES" ] && mkdir -p build/ && echo "To-be-built packages: $PACKAGES"
+[ -n "$PACKAGES" ] && mkdir -p build/bin && echo "To-be-built packages: $PACKAGES"
 
 cat >> Makefile << EOF
 all: $TARGETS

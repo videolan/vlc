@@ -2,7 +2,6 @@
  * interface_widgets.cpp : Custom widgets for the main interface
  ****************************************************************************
  * Copyright (C) 2006-2010 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
@@ -117,13 +116,9 @@ void VideoWidget::sync( void )
 /**
  * Request the video to avoid the conflicts
  **/
-bool VideoWidget::request( struct vout_window_t *p_wnd )
+void VideoWidget::request( struct vout_window_t *p_wnd )
 {
-    if( stable )
-    {
-        msg_Dbg( p_intf, "embedded video already in use" );
-        return false;
-    }
+    assert( stable == NULL );
     assert( !p_window );
 
     /* The owner of the video window needs a stable handle (WinId). Reparenting
@@ -190,7 +185,6 @@ bool VideoWidget::request( struct vout_window_t *p_wnd )
         default:
             vlc_assert_unreachable();
     }
-    return true;
 }
 
 QSize VideoWidget::physicalSize() const

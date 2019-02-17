@@ -2,7 +2,6 @@
  * text_layout.c : Text shaping and layout
  *****************************************************************************
  * Copyright (C) 2015 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Salah-Eddin Shaban <salshaaban@gmail.com>
  *          Laurent Aimar <fenrir@videolan.org>

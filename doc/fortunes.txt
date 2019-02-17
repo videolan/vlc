@@ -1073,3 +1073,23 @@ reactor leaks ionizing radiations."
 < wm4> won't j-b buy hanna some pants???
  -- #videolan, about HDR
 %
+< ePirat> Daemon404, https://www.stonepages.com/prehistorama.html
+< Daemon404> :D
+< ePirat> Wow QuickTime 7 still works on macOS 10.14 and can play these :D
+< Daemon404> yeah
+< Daemon404> next os x + qt wont
+< thresh> bribe Kostya to RE it?
+< Daemon404> not hard to RE, and the api spec is xbox hueg
+< Daemon404> just nobody cares
+< durandal_1707> what is left to RE?
+< Daemon404> durandal_1707, tons of stuff in quicktime ;)
+< Daemon404> all the effects 'codecs', qtvr, qtma, etc
+< durandal_1707> i mean useful codecs, like behere?? something
+< Daemon404> 'useful' is in the eye of the beholder
+< durandal_1707> BeHereiVideo.qtx --> RE that one
+< Daemon404> never heard of it
+< durandal_1707> now you heard
+< koda> it's a video codec, of course you can't hear it
+-courmisch:#videolan- badum ching
+ -- #videolan, about "hearing" video codecs from the 90s.
+%

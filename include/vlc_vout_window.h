@@ -3,7 +3,6 @@
  *****************************************************************************
  * Copyright (C) 2008 Rémi Denis-Courmont
  * Copyright (C) 2009 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
@@ -38,7 +37,6 @@
  */
 
 typedef struct vout_window_t vout_window_t;
-typedef struct vout_window_sys_t vout_window_sys_t;
 
 struct wl_display;
 struct wl_surface;
@@ -53,17 +51,6 @@ enum vout_window_type {
     VOUT_WINDOW_TYPE_NSOBJECT /**< MacOS X view */,
     VOUT_WINDOW_TYPE_ANDROID_NATIVE /**< Android native window */,
     VOUT_WINDOW_TYPE_WAYLAND /**< Wayland surface */,
-};
-
-/**
- * Control query for vout_window_t
- */
-enum vout_window_control {
-    VOUT_WINDOW_SET_STATE, /* unsigned state */
-    VOUT_WINDOW_SET_SIZE,   /* unsigned i_width, unsigned i_height */
-    VOUT_WINDOW_SET_FULLSCREEN, /* void */
-    VOUT_WINDOW_UNSET_FULLSCREEN, /* void */
-    VOUT_WINDOW_HIDE_MOUSE VLC_DEPRECATED_ENUM,
 };
 
 /**
@@ -96,10 +83,21 @@ typedef struct vout_window_mouse_event_t
     int button_mask;
 } vout_window_mouse_event_t;
 
+/**
+ * Window (desired) configuration.
+ *
+ * This structure describes the intended initial configuration
+ * of a \ref vout_window_t.
+ */
 typedef struct vout_window_cfg_t {
-    /* If true, a standalone window is requested */
-    bool is_standalone;
+    /**
+     * Whether the window should be in full screen mode or not.
+     */
     bool is_fullscreen;
+
+    /**
+     * Whether the window should have decorations or not.
+     */
     bool is_decorated;
 
 #ifdef __APPLE__
@@ -108,8 +106,14 @@ typedef struct vout_window_cfg_t {
     int y;
 #endif
 
-    /* Windows size hint */
+    /**
+     * Intended pixel width of the window.
+     */
     unsigned width;
+
+    /**
+     * Intended pixel height of the window.
+     */
     unsigned height;
 
 } vout_window_cfg_t;
@@ -126,6 +130,23 @@ struct vout_window_callbacks {
     void (*keyboard_event)(vout_window_t *, unsigned key);
 
     void (*output_event)(vout_window_t *, const char *id, const char *desc);
+};
+
+struct vout_window_operations {
+    int (*enable)(vout_window_t *, const vout_window_cfg_t *);
+    void (*disable)(vout_window_t *);
+    void (*resize)(vout_window_t *, unsigned width, unsigned height);
+
+    /**
+     * Destroy the window.
+     *
+     * Destroys the window and releases all associated resources.
+     */
+    void (*destroy)(vout_window_t *);
+
+    void (*set_state)(vout_window_t *, unsigned state);
+    void (*unset_fullscreen)(vout_window_t *);
+    void (*set_fullscreen)(vout_window_t *, const char *id);
 };
 
 typedef struct vout_window_owner {
@@ -189,16 +210,7 @@ struct vout_window_t {
         struct wl_display *wl; /**< Wayland display (client pointer) */
     } display;
 
-    /**
-     * Control callback (mandatory)
-     *
-     * This callback handles some control request regarding the window.
-     * See \ref vout_window_control.
-     *
-     * This field should not be used directly when manipulating a window.
-     * vout_window_Control() should be used instead.
-     */
-    int (*control)(vout_window_t *, int query, va_list);
+    const struct vout_window_operations *ops;
 
     struct {
         bool has_double_click; /**< Whether double click events are sent,
@@ -209,7 +221,7 @@ struct vout_window_t {
      *
      * A module is free to use it as it wishes.
      */
-    vout_window_sys_t *sys;
+    void *sys;
 
     vout_window_owner_t owner;
 };
@@ -218,10 +230,9 @@ struct vout_window_t {
  * Creates a new window.
  *
  * @param module plugin name (usually "$window")
- * @note If you are inside a "vout display", you must use
- * vout_display_NewWindow() instead. This enables recycling windows.
+ * @note don't use it inside a "vout display" module
  */
-VLC_API vout_window_t * vout_window_New(vlc_object_t *, const char *module, const vout_window_cfg_t *, const vout_window_owner_t *);
+VLC_API vout_window_t * vout_window_New(vlc_object_t *, const char *module, const vout_window_owner_t *);
 
 /**
  * Deletes a window created by vout_window_New().
@@ -232,72 +243,81 @@ VLC_API void vout_window_Delete(vout_window_t *);
 
 void vout_window_SetInhibition(vout_window_t *window, bool enabled);
 
-static inline int vout_window_vaControl(vout_window_t *window, int query,
-                                        va_list ap)
-{
-    return window->control(window, query, ap);
-}
-
-/**
- * Reconfigures a window.
- *
- * @note The vout_window_* wrappers should be used instead of this function.
- *
- * @warning The caller must own the window, as vout_window_t is not thread safe.
- */
-static inline int vout_window_Control(vout_window_t *window, int query, ...)
-{
-    va_list ap;
-    int ret;
-
-    va_start(ap, query);
-    ret = vout_window_vaControl(window, query, ap);
-    va_end(ap);
-    return ret;
-}
-
 /**
  * Configures the window manager state for this window.
  */
-static inline int vout_window_SetState(vout_window_t *window, unsigned state)
+static inline void vout_window_SetState(vout_window_t *window, unsigned state)
 {
-    return vout_window_Control(window, VOUT_WINDOW_SET_STATE, state);
+    if (window->ops->set_state != NULL)
+        window->ops->set_state(window, state);
 }
 
 /**
- * Configures the window display (i.e. inner/useful) size.
+ * Requests a new window size.
+ *
+ * This requests a change of the window size.
+ *
+ * \warning  The windowing system may or may not actually resize the window
+ * to the requested size. Track the resized event to determine the actual size.
+ *
+ * \note The size is expressed in terms of the "useful" area,
+ * i.e. it excludes any side decoration added by the windowing system.
+ *
+ * \param width pixel width
+ * \param height height width
  */
-static inline int vout_window_SetSize(vout_window_t *window,
+static inline void vout_window_SetSize(vout_window_t *window,
                                       unsigned width, unsigned height)
 {
-    return vout_window_Control(window, VOUT_WINDOW_SET_SIZE, width, height);
+    if (window->ops->resize != NULL)
+        window->ops->resize(window, width, height);
 }
 
 /**
  * Requests fullscreen mode.
  *
  * \param id nul-terminated output identifier, NULL for default
- *
- * \retval VLC_SUCCESS The request has been queued to the windowing system
- * (that does <b>not</b> imply that the request is complete nor succesful).
- * \retval VLC_EGENERIC The request could not be queued, e.g. the back-end does
- * not implement toggling between fullscreen and windowed modes.
  */
-static inline int vout_window_SetFullScreen(vout_window_t *window,
+static inline void vout_window_SetFullScreen(vout_window_t *window,
                                             const char *id)
 {
-    return vout_window_Control(window, VOUT_WINDOW_SET_FULLSCREEN, id);
+    if (window->ops->set_fullscreen != NULL)
+        window->ops->set_fullscreen(window, id);
 }
 
 /**
  * Requests windowed mode.
- *
- * \return \see vout_window_SetFullScreen()
  */
-static inline int vout_window_UnsetFullScreen(vout_window_t *window)
+static inline void vout_window_UnsetFullScreen(vout_window_t *window)
 {
-    return vout_window_Control(window, VOUT_WINDOW_UNSET_FULLSCREEN);
+    if (window->ops->unset_fullscreen != NULL)
+        window->ops->unset_fullscreen(window);
 }
+
+/**
+ * Enables a window.
+ *
+ * This informs the window provider that the window is about to be taken into
+ * active use. A window is always initially disabled. This is so that the
+ * window provider can provide a persistent connection to the display server,
+ * and track any useful events, such as monitors hotplug.
+ *
+ * The window handle (vout_window_t.handle) and display (vout_window_t.display)
+ * must remain valid and constant while the window is enabled.
+ */
+VLC_API
+int vout_window_Enable(vout_window_t *window, const vout_window_cfg_t *cfg);
+
+/**
+ * Disables a window.
+ *
+ * This informs the window provider that the window is no longer needed.
+ *
+ * Note that the window may be re-enabled later by a call to
+ * vout_window_Enable().
+ */
+VLC_API
+void vout_window_Disable(vout_window_t *window);
 
 /**
  * Report current window size

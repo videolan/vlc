@@ -90,6 +90,7 @@ typedef struct
 
 #if !defined (HAVE_ALIGNED_ALLOC) || \
     !defined (HAVE_MEMRCHR) || \
+    !defined (HAVE_QSORT_R) || \
     !defined (HAVE_STRLCPY) || \
     !defined (HAVE_STRNDUP) || \
     !defined (HAVE_STRNLEN) || \
@@ -402,8 +403,8 @@ enum
 struct pollfd
 {
     int fd;
-    unsigned events;
-    unsigned revents;
+    short events;
+    short revents;
 };
 #endif
 #ifndef HAVE_POLL

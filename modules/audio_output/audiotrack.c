@@ -81,13 +81,11 @@ static const struct {
 
 typedef struct
 {
-    /* sw gain */
-    float soft_gain;
-    bool soft_mute;
-
     enum at_dev at_dev;
 
     jobject p_audiotrack; /* AudioTrack ref */
+    float volume;
+    bool mute;
 
     audio_sample_format_t fmt; /* fmt setup by Start */
 
@@ -169,8 +167,6 @@ typedef struct
     } circular;
 } aout_sys_t;
 
-/* Soft volume helper */
-#include "audio_output/volume.h"
 
 // Don't use Float for now since 5.1/7.1 Float is down sampled to Stereo Float
 //#define AUDIOTRACK_USE_FLOAT
@@ -191,7 +187,6 @@ vlc_module_begin ()
     add_integer( "audiotrack-session-id", 0,
             AUDIOTRACK_SESSION_ID_TEXT, NULL, true )
         change_private()
-    add_sw_gain()
     add_shortcut( "audiotrack" )
     set_callbacks( Open, Close )
 vlc_module_end ()
@@ -220,6 +215,8 @@ static struct
         jmethodID getTimestamp;
         jmethodID getMinBufferSize;
         jmethodID getNativeOutputSampleRate;
+        jmethodID setVolume;
+        jmethodID setStereoVolume;
         jint STATE_INITIALIZED;
         jint MODE_STREAM;
         jint ERROR;
@@ -378,6 +375,11 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     GET_ID( GetStaticMethodID, AudioTrack.getNativeOutputSampleRate,
             "getNativeOutputSampleRate",  "(I)I", true );
 #endif
+    GET_ID( GetMethodID, AudioTrack.setVolume,
+            "setVolume",  "(F)I", false );
+    if( !jfields.AudioTrack.setVolume )
+        GET_ID( GetMethodID, AudioTrack.setStereoVolume,
+                "setStereoVolume",  "(FF)I", true );
     GET_CONST_INT( AudioTrack.STATE_INITIALIZED, "STATE_INITIALIZED", true );
     GET_CONST_INT( AudioTrack.MODE_STREAM, "MODE_STREAM", true );
     GET_CONST_INT( AudioTrack.ERROR, "ERROR", true );
@@ -1159,6 +1161,11 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
                     return VLC_EGENERIC;
                 i_at_format = jfields.AudioFormat.ENCODING_AC3;
                 break;
+            case VLC_CODEC_EAC3:
+                if( !jfields.AudioFormat.has_ENCODING_E_AC3 )
+                    return VLC_EGENERIC;
+                i_at_format = jfields.AudioFormat.ENCODING_E_AC3;
+                break;
             case VLC_CODEC_DTS:
                 if( !jfields.AudioFormat.has_ENCODING_DTS )
                     return VLC_EGENERIC;
@@ -1481,8 +1488,10 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     CHECK_AT_EXCEPTION( "play" );
 
     *p_fmt = p_sys->fmt;
-    aout_SoftVolumeStart( p_aout );
 
+    p_aout->volume_set(p_aout, p_sys->volume);
+    if (p_sys->mute)
+        p_aout->mute_set(p_aout, true);
     aout_FormatPrint( p_aout, "VLC will output:", &p_sys->fmt );
 
     return VLC_SUCCESS;
@@ -1874,12 +1883,59 @@ AudioTrack_Thread( void *p_data )
     return NULL;
 }
 
+static int
+ConvertFromIEC61937( audio_output_t *p_aout, block_t *p_buffer )
+{
+    /* This function is only used for Android API 23 when AudioTrack is
+     * configured with ENCODING_ AC3/E_AC3/DTS. In that case, only the codec
+     * data is needed (without the IEC61937 encapsulation). This function
+     * recovers the codec data from an EC61937 frame. It is the opposite of the
+     * code found in converter/tospdif.c. We could also request VLC core to
+     * send us the codec data directly, but in that case, we wouldn't benefit
+     * from the eac3 block merger of tospdif.c. */
+
+    VLC_UNUSED( p_aout );
+    uint8_t i_length_mul;
+
+    switch( GetWBE( &p_buffer->p_buffer[4] ) & 0xFF )
+    {
+        case 0x01: /* IEC61937_AC3 */
+            i_length_mul = 8;
+            break;
+        case 0x15: /* IEC61937_EAC3 */
+            i_length_mul = 1;
+            break;
+        case 0x0B: /* IEC61937_DTS1 */
+        case 0x0C: /* IEC61937_DTS2 */
+        case 0x0D: /* IEC61937_DTS3 */
+        case 0x11: /* IEC61937_DTSHD */
+            i_length_mul = 8;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+    uint16_t i_length = GetWBE( &p_buffer->p_buffer[6] );
+    if( i_length == 0 )
+        return -1;
+    p_buffer->p_buffer += 8; /* SPDIF_HEADER_SIZE */
+    p_buffer->i_buffer = i_length / i_length_mul;
+
+    return 0;
+}
+
 static void
 Play( audio_output_t *p_aout, block_t *p_buffer, vlc_tick_t i_date )
 {
     JNIEnv *env = NULL;
     size_t i_buffer_offset = 0;
     aout_sys_t *p_sys = p_aout->sys;
+
+    if( p_sys->b_passthrough && !jfields.AudioFormat.has_ENCODING_IEC61937
+     && ConvertFromIEC61937( p_aout, p_buffer ) != 0 )
+    {
+        block_Release(p_buffer);
+        return;
+    }
 
     vlc_mutex_lock( &p_sys->lock );
 
@@ -2048,6 +2104,61 @@ bailout:
     vlc_mutex_unlock( &p_sys->lock );
 }
 
+static int
+VolumeSet( audio_output_t *p_aout, float volume )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    JNIEnv *env;
+    float gain = 1.0f;
+
+    if (volume > 1.f)
+    {
+        p_sys->volume = 1.f;
+        gain = volume;
+    }
+    else
+        p_sys->volume = volume;
+
+    if( !p_sys->b_error && p_sys->p_audiotrack != NULL && ( env = GET_ENV() ) )
+    {
+        if( jfields.AudioTrack.setVolume )
+        {
+            JNI_AT_CALL_INT( setVolume, volume );
+            CHECK_AT_EXCEPTION( "setVolume" );
+        } else
+        {
+            JNI_AT_CALL_INT( setStereoVolume, volume, volume );
+            CHECK_AT_EXCEPTION( "setStereoVolume" );
+        }
+    }
+    aout_VolumeReport(p_aout, volume);
+    aout_GainRequest(p_aout, gain * gain * gain);
+    return 0;
+}
+
+static int
+MuteSet( audio_output_t *p_aout, bool mute )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    JNIEnv *env;
+    p_sys->mute = mute;
+
+    if( !p_sys->b_error && p_sys->p_audiotrack != NULL && ( env = GET_ENV() ) )
+    {
+        if( jfields.AudioTrack.setVolume )
+        {
+            JNI_AT_CALL_INT( setVolume, mute ? 0.0f : p_sys->volume );
+            CHECK_AT_EXCEPTION( "setVolume" );
+        } else
+        {
+            JNI_AT_CALL_INT( setStereoVolume, mute ? 0.0f : p_sys->volume, mute ? 0.0f : p_sys->volume );
+            CHECK_AT_EXCEPTION( "setStereoVolume" );
+        }
+    }
+    aout_MuteReport(p_aout, mute);
+    return 0;
+}
+
 static int DeviceSelect(audio_output_t *p_aout, const char *p_id)
 {
     aout_sys_t *p_sys = p_aout->sys;
@@ -2131,7 +2242,10 @@ Open( vlc_object_t *obj )
     for( unsigned int i = 0; at_devs[i].id; ++i )
         aout_HotplugReport(p_aout, at_devs[i].id, at_devs[i].name);
 
-    aout_SoftVolumeInit( p_aout );
+    p_aout->volume_set = VolumeSet;
+    p_aout->mute_set = MuteSet;
+    p_sys->volume = 1.0f;
+    p_sys->mute = false;
 
     return VLC_SUCCESS;
 }

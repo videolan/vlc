@@ -54,6 +54,7 @@ void       mp4mux_track_SetSamplePriv(mp4mux_trackinfo_t *, const uint8_t *, siz
 bool       mp4mux_track_HasSamplePriv(const mp4mux_trackinfo_t *);
 vlc_tick_t mp4mux_track_GetDefaultSampleDuration(const mp4mux_trackinfo_t *);
 uint32_t   mp4mux_track_GetDefaultSampleSize(const mp4mux_trackinfo_t *);
+const es_format_t * mp4mux_track_GetFmt(const mp4mux_trackinfo_t *);
 
 /* ELST */
 typedef struct

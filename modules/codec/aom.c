@@ -84,6 +84,9 @@ vlc_module_begin ()
             change_integer_range( 0, 6 ) /* 1 << 6 == MAX_TILE_ROWS */
         add_integer( SOUT_CFG_PREFIX "tile-columns", 0, "Tile Columns (in log2 units)", NULL, true )
             change_integer_range( 0, 6 ) /* 1 << 6 == MAX_TILE_COLS */
+#ifdef AOM_CTRL_AV1E_SET_ROW_MT
+        add_bool( SOUT_CFG_PREFIX "row-mt", false, "Row Multithreading", NULL, true )
+#endif
 #endif
 vlc_module_end ()
 
@@ -225,7 +228,7 @@ static void OutputFrame(decoder_t *dec, const struct aom_image *img)
         v->primaries = iso_23001_8_cp_to_vlc_primaries(img->cp);
         v->transfer = iso_23001_8_tc_to_vlc_xfer(img->tc);
         v->space = iso_23001_8_mc_to_vlc_coeffs(img->mc);
-        v->b_color_range_full = img->range == AOM_CR_FULL_RANGE;
+        v->color_range = img->range == AOM_CR_FULL_RANGE ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
     }
 
     dec->fmt_out.video.projection_mode = dec->fmt_in.video.projection_mode;
@@ -360,6 +363,10 @@ static int OpenDecoder(vlc_object_t *p_this)
         dec->fmt_out.video.i_sar_num = dec->fmt_in.video.i_sar_num;
         dec->fmt_out.video.i_sar_den = dec->fmt_in.video.i_sar_den;
     }
+    dec->fmt_out.video.primaries   = dec->fmt_in.video.primaries;
+    dec->fmt_out.video.transfer    = dec->fmt_in.video.transfer;
+    dec->fmt_out.video.space       = dec->fmt_in.video.space;
+    dec->fmt_out.video.color_range = dec->fmt_in.video.color_range;
 
     return VLC_SUCCESS;
 }
@@ -423,12 +430,16 @@ static int OpenEncoder(vlc_object_t *p_this)
     enccfg.g_threads = __MIN(vlc_GetCPUCount(), 4);
     enccfg.g_w = p_enc->fmt_in.video.i_visible_width;
     enccfg.g_h = p_enc->fmt_in.video.i_visible_height;
+    enccfg.g_lag_in_frames = 16; /* we have no pcr on sout */
 
     int enc_flags;
     int i_profile = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "profile" );
     int i_bit_depth = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "bitdepth" );
     int i_tile_rows = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "tile-rows" );
     int i_tile_columns = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "tile-columns" );
+#ifdef AOM_CTRL_AV1E_SET_ROW_MT
+    bool b_row_mt = var_GetBool( p_enc, SOUT_CFG_PREFIX "row-mt" );
+#endif
 
     /* TODO: implement higher profiles, bit depths and other pixformats. */
     switch( i_profile )
@@ -494,6 +505,17 @@ static int OpenEncoder(vlc_object_t *p_this)
         free(p_sys);
         return VLC_EGENERIC;
     }
+
+#ifdef AOM_CTRL_AV1E_SET_ROW_MT
+    if (b_row_mt &&
+        aom_codec_control(ctx, AV1E_SET_ROW_MT, b_row_mt))
+    {
+        AOM_ERR(p_this, ctx, "Failed to set row-multithreading");
+        destroy_context(p_this, ctx);
+        free(p_sys);
+        return VLC_EGENERIC;
+    }
+#endif
 
     p_enc->pf_encode_video = Encode;
 

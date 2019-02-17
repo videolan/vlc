@@ -2,7 +2,6 @@
  * audio.c: transcoding stream output module (audio)
  *****************************************************************************
  * Copyright (C) 2003-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -71,7 +70,7 @@ static int transcode_audio_filters_init( sout_stream_t *p_stream,
     var_Create( p_stream, "audio-filter", VLC_VAR_STRING );
     if( p_cfg->psz_filters )
         var_SetString( p_stream, "audio-filter", p_cfg->psz_filters );
-    *pp_chain = aout_FiltersNew( p_stream, p_dec_out, p_enc_in, NULL, NULL );
+    *pp_chain = aout_FiltersNew( p_stream, p_dec_out, p_enc_in, NULL );
     var_Destroy( p_stream, "audio-filter" );
     var_Destroy( p_stream, "audio-time-stretch" );
     return ( *pp_chain != NULL ) ? VLC_SUCCESS : VLC_EGENERIC;
@@ -200,7 +199,7 @@ int transcode_audio_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     return VLC_SUCCESS;
 }
 
-void transcode_audio_clean( sout_stream_id_sys_t *id )
+void transcode_audio_clean( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     /* Close decoder */
     if( id->p_decoder->p_module )
@@ -219,7 +218,7 @@ void transcode_audio_clean( sout_stream_id_sys_t *id )
 
     /* Close filters */
     if( id->p_af_chain != NULL )
-        aout_FiltersDelete( (vlc_object_t *)NULL, id->p_af_chain );
+        aout_FiltersDelete( p_stream, id->p_af_chain );
 }
 
 static bool transcode_audio_format_IsSimilar( const audio_format_t *a,
@@ -264,7 +263,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
             if( !transcode_encoder_opened( id->encoder ) )
             {
                 transcode_encoder_audio_configure( VLC_OBJECT(p_stream), id->p_enccfg,
-                                                   &id->decoder_out.audio, id->encoder );
+                                                   &id->decoder_out.audio, id->encoder, true );
                 id->fmt_input_audio = id->decoder_out.audio;
             }
             else

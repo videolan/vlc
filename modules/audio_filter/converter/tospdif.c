@@ -2,7 +2,6 @@
  * tospdif.c : encapsulates A/52 and DTS frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2002, 2006-2016 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -280,7 +279,7 @@ static int write_buffer_eac3( filter_t *p_filter, block_t *p_in_buf )
 
         if( vlc_a52_header_Parse( &a52_dep, dep_buf, dep_size ) != VLC_SUCCESS
          || a52_dep.i_size > dep_size
-         || !a52_dep.b_eac3 || a52_dep.eac3.strmtyp != EAC3_STRMTYP_DEPENDENT
+         || !a52_dep.b_eac3 || a52_dep.bs.eac3.strmtyp != EAC3_STRMTYP_DEPENDENT
          || p_in_buf->i_buffer > a52.i_size + a52_dep.i_size )
             return SPDIF_ERROR;
     }

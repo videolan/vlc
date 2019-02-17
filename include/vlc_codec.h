@@ -2,7 +2,6 @@
  * vlc_codec.h: Definition of the decoder and encoder structures
  *****************************************************************************
  * Copyright (C) 1999-2003 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -51,7 +50,7 @@ struct decoder_owner_callbacks
         {
             int         (*format_update)( decoder_t * );
 
-            /* cf. decoder_NewPicture */
+            /* cf. decoder_NewPicture, can be called from any decoder thread */
             picture_t*  (*buffer_new)( decoder_t * );
             /* cf.decoder_QueueVideo */
             void        (*queue)( decoder_t *, picture_t * );

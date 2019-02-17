@@ -2,7 +2,6 @@
  * opus.h : Opus demux helpers
  *****************************************************************************
  * Copyright (C) 2012 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Timothy B. Terriberry <tterribe@xiph.org>
  *

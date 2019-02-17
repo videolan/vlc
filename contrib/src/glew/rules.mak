@@ -1,5 +1,5 @@
 # GLEW
-GLEW_VERSION := 1.7.0
+GLEW_VERSION := 2.1.0
 GLEW_URL := $(SF)/glew/glew/$(GLEW_VERSION)/glew-$(GLEW_VERSION).tgz
 
 ifeq ($(call need_pkg,"glew"),)
@@ -13,15 +13,9 @@ $(TARBALLS)/glew-$(GLEW_VERSION).tar.gz:
 
 glew: glew-$(GLEW_VERSION).tar.gz .sum-glew
 	$(UNPACK)
-ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/glew/win32.patch
-endif
 	$(MOVE)
 
-.glew: glew
-	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -DGLEW_STATIC" $(MAKE)
-	cd $< && $(HOSTVARS) GLEW_DEST=$(PREFIX) $(MAKE) install
-ifdef HAVE_WIN32
-	-rm $(PREFIX)/lib/*glew32.dll*
-endif
+.glew: glew toolchain.cmake
+	cd $</build/cmake && $(HOSTVARS_PIC) $(CMAKE) -DBUILD_SHARED_LIBS:BOOL=OFF -DGLEW_USE_STATIC_LIBS:BOOL=ON
+	cd $</build/cmake && $(MAKE) install
 	touch $@

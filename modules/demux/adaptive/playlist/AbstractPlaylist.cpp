@@ -46,6 +46,7 @@ AbstractPlaylist::AbstractPlaylist (vlc_object_t *p_object_) :
     minBufferTime = 0;
     timeShiftBufferDepth.Set( 0 );
     suggestedPresentationDelay.Set( 0 );
+    b_needsUpdates = true;
 }
 
 AbstractPlaylist::~AbstractPlaylist()
@@ -134,6 +135,11 @@ BasePeriod* AbstractPlaylist::getNextPeriod(BasePeriod *period)
     }
 
     return NULL;
+}
+
+bool AbstractPlaylist::needsUpdates() const
+{
+    return b_needsUpdates;
 }
 
 void AbstractPlaylist::mergeWith(AbstractPlaylist *updatedAbstractPlaylist, vlc_tick_t prunebarrier)

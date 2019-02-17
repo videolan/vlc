@@ -2,7 +2,6 @@
  * mmal.c: MMAL-based decoder plugin for Raspberry Pi
  *****************************************************************************
  * Copyright © 2014 jusst technologies GmbH
- * $Id$
  *
  * Authors: Dennis Hamester <dennis.hamester@gmail.com>
  *          Julian Scheel <julian@jusst.de>

@@ -2,7 +2,6 @@
  * xspf.c : XSPF playlist export functions
  ******************************************************************************
  * Copyright (C) 2006-2009 the VideoLAN team
- * $Id$
  *
  * Authors: Daniel Stränger <vlc at schmaller dot de>
  *          Yoann Peronneau <yoann@videolan.org>
@@ -31,7 +30,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_input.h>
 #include <vlc_strings.h>
 #include <vlc_url.h>

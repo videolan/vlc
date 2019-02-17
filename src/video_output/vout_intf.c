@@ -42,6 +42,7 @@
 #include <vlc_strings.h>
 #include <vlc_charset.h>
 #include "vout_internal.h"
+#include "snapshot.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -249,8 +250,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     /* Add a variable to indicate if the window should be below all others */
     var_Create( p_vout, "video-wallpaper", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_AddCallback( p_vout, "video-wallpaper", WallPaperCallback,
-                     (void *)(uintptr_t)VOUT_WINDOW_STATE_BELOW );
+    var_AddCallback( p_vout, "video-wallpaper", WallPaperCallback, NULL );
 
     /* Add a variable to indicate whether we want window decoration or not */
     var_Create( p_vout, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -298,16 +298,10 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "viewpoint", VLC_VAR_ADDRESS  );
     var_AddCallback( p_vout, "viewpoint", ViewpointCallback, NULL );
     var_Create( p_vout, "viewpoint-changeable", VLC_VAR_BOOL );
-
-    vout_IntfReinit( p_vout );
 }
 
 void vout_IntfReinit( vout_thread_t *p_vout )
 {
-    var_TriggerCallback( p_vout, "zoom" );
-    var_TriggerCallback( p_vout, "crop" );
-    var_TriggerCallback( p_vout, "aspect-ratio" );
-
     var_TriggerCallback( p_vout, "video-on-top" );
     var_TriggerCallback( p_vout, "video-wallpaper" );
 
@@ -315,6 +309,27 @@ void vout_IntfReinit( vout_thread_t *p_vout )
     var_TriggerCallback( p_vout, "sub-source" );
     var_TriggerCallback( p_vout, "sub-filter" );
     var_TriggerCallback( p_vout, "sub-margin" );
+}
+
+void vout_IntfDeinit(vlc_object_t *obj)
+{
+    var_DelCallback(obj, "viewpoint", ViewpointCallback, NULL);
+    var_DelCallback(obj, "sub-margin", SubMarginCallback, NULL);
+    var_DelCallback(obj, "sub-filter", SubFilterCallback, NULL);
+    var_DelCallback(obj, "sub-source", SubSourceCallback, NULL);
+    var_DelCallback(obj, "video-filter", VideoFilterCallback, NULL);
+    var_DelCallback(obj, "video-snapshot", SnapshotCallback, NULL);
+    var_DelCallback(obj, "fullscreen", FullscreenCallback, NULL);
+    var_DelCallback(obj, "video-wallpaper", WallPaperCallback, NULL);
+    var_DelCallback(obj, "video-on-top", AboveCallback, NULL);
+    var_DelCallback(obj, "aspect-ratio", AspectCallback, NULL);
+    var_DelCallback(obj, "crop", CropCallback, NULL);
+    var_DelCallback(obj, "crop-bottom", CropBorderCallback, NULL);
+    var_DelCallback(obj, "crop-right", CropBorderCallback, NULL);
+    var_DelCallback(obj, "crop-top", CropBorderCallback, NULL);
+    var_DelCallback(obj, "crop-left", CropBorderCallback, NULL);
+    var_DelCallback(obj, "zoom", ZoomCallback, NULL);
+    var_DelCallback(obj, "autoscale", AutoScaleCallback, NULL);
 }
 
 /*****************************************************************************
@@ -441,15 +456,15 @@ static int CropCallback( vlc_object_t *object, char const *cmd,
     unsigned left, top, right, bottom;
 
     if (sscanf(newval.psz_string, "%u:%u", &num, &den) == 2) {
-        vout_ControlChangeCropRatio(vout, num, den);
+        vout_ChangeCropRatio(vout, num, den);
     } else if (sscanf(newval.psz_string, "%ux%u+%u+%u",
                       &width, &height, &x, &y) == 4) {
-        vout_ControlChangeCropWindow(vout, x, y, width, height);
+        vout_ChangeCropWindow(vout, x, y, width, height);
     } else if (sscanf(newval.psz_string, "%u+%u+%u+%u",
                     &left, &top, &right, &bottom) == 4) {
-        vout_ControlChangeCropBorder(vout, left, top, right, bottom);
+        vout_ChangeCropBorder(vout, left, top, right, bottom);
     } else if (*newval.psz_string == '\0') {
-        vout_ControlChangeCropRatio(vout, 0, 0);
+        vout_ChangeCropRatio(vout, 0, 0);
     } else {
         msg_Err(object, "Unknown crop format (%s)", newval.psz_string);
     }
@@ -481,9 +496,9 @@ static int AspectCallback( vlc_object_t *object, char const *cmd,
 
     if (sscanf(newval.psz_string, "%u:%u", &num, &den) == 2 &&
         (num != 0) == (den != 0))
-        vout_ControlChangeSampleAspectRatio(vout, num, den);
+        vout_ChangeSampleAspectRatio(vout, num, den);
     else if (*newval.psz_string == '\0')
-        vout_ControlChangeSampleAspectRatio(vout, 0, 0);
+        vout_ChangeSampleAspectRatio(vout, 0, 0);
     return VLC_SUCCESS;
 }
 
@@ -493,7 +508,7 @@ static int AutoScaleCallback( vlc_object_t *obj, char const *name,
     vout_thread_t *p_vout = (vout_thread_t *)obj;
 
     (void) name; (void) prev; (void) data;
-    vout_ControlChangeDisplayFilled( p_vout, cur.b_bool );
+    vout_ChangeDisplayFilled(p_vout, cur.b_bool);
     return VLC_SUCCESS;
 }
 
@@ -503,15 +518,15 @@ static int ZoomCallback( vlc_object_t *obj, char const *name,
     vout_thread_t *p_vout = (vout_thread_t *)obj;
 
     (void) name; (void) prev; (void) data;
-    vout_ControlChangeZoom( p_vout, 1000 * cur.f_float, 1000 );
+    vout_ChangeZoom(p_vout, 1000 * cur.f_float, 1000);
     return VLC_SUCCESS;
 }
 
 static int AboveCallback( vlc_object_t *obj, char const *name,
                           vlc_value_t prev, vlc_value_t cur, void *data )
 {
-    vout_ControlChangeWindowState( (vout_thread_t *)obj,
-        cur.b_bool ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL );
+    vout_ChangeWindowState((vout_thread_t *)obj,
+        cur.b_bool ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL);
     (void) name; (void) prev; (void) data;
     return VLC_SUCCESS;
 }
@@ -523,8 +538,8 @@ static int WallPaperCallback( vlc_object_t *obj, char const *name,
 
     if( cur.b_bool )
     {
-        vout_ControlChangeWindowState( vout, VOUT_WINDOW_STATE_BELOW );
-        vout_ControlChangeFullscreen( vout, NULL );
+        vout_ChangeWindowState(vout, VOUT_WINDOW_STATE_BELOW);
+        vout_ChangeFullscreen(vout, NULL);
     }
     else
     {
@@ -542,9 +557,9 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
     (void)psz_cmd; (void) oldval; (void)p_data;
 
     if( newval.b_bool )
-        vout_ControlChangeFullscreen( p_vout, NULL );
+        vout_ChangeFullscreen(p_vout, NULL);
     else
-        vout_ControlChangeWindowed( p_vout );
+        vout_ChangeWindowed(p_vout);
     return VLC_SUCCESS;
 }
 
@@ -595,7 +610,7 @@ static int SubMarginCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
-    vout_ControlChangeSubMargin( p_vout, newval.i_int );
+    vout_ChangeSubMargin(p_vout, newval.i_int);
     return VLC_SUCCESS;
 }
 
@@ -606,6 +621,6 @@ static int ViewpointCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     if( newval.p_address != NULL )
-        vout_ControlChangeViewpoint( p_vout, newval.p_address );
+        vout_ChangeViewpoint(p_vout, newval.p_address);
     return VLC_SUCCESS;
 }

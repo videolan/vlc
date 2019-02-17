@@ -1,10 +1,7 @@
 /*****************************************************************************
- * vlc_playlist.h : Playlist functions
+ * vlc_playlist.h
  *****************************************************************************
- * Copyright (C) 1999-2004 VLC authors and VideoLAN
- * $Id$
- *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Copyright (C) 2018 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -21,406 +18,840 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_PLAYLIST_H_
-#define VLC_PLAYLIST_H_
+#ifndef VLC_PLAYLIST_NEW_H
+#define VLC_PLAYLIST_NEW_H
+
+#include <vlc_common.h>
 
 # ifdef __cplusplus
 extern "C" {
 # endif
 
-#include <vlc_events.h>
-
-TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t)
-
-struct intf_thread_t;
-
 /**
- * \defgroup playlist VLC playlist
- * \ingroup interface
- * VLC playlist controls
+ * \defgroup playlist playlist
+ * \ingroup playlist
  * @{
- * \file
- * VLC playlist control interface
- *
- * The VLC playlist system has a tree structure. This allows advanced
- * categorization, like for SAP streams (which are grouped by "sap groups").
- *
- * The base structure for all playlist operations is the playlist_item_t.
- * This is essentially a node within the playlist tree. Each playlist item
- * references an input_item_t which contains the input stream info, such as
- * location, name and meta-data.
- *
- * A playlist item is uniquely identified by its input item:
- * \ref playlist_ItemGetByInput(). A single input item cannot be used by more
- * than one playlist item at a time; if necessary, a copy of the input item can
- * be made instead.
- *
- * The same playlist tree is visible to all user interfaces. To arbitrate
- * access, a lock is used, see \ref playlist_Lock() and \ref playlist_Unlock().
- *
- * Under the playlist root item node, the top-level items are the main
- * media sources and include:
- * - the actual playlist,
- * - the service discovery root node, whose children are services discovery
- *   module instances.
- *
- * So, here is an example:
- * \verbatim
- * Inputs array
- *  - input 1 -> name = foo 1 uri = ...
- *  - input 2 -> name = foo 2 uri = ...
- *
- * Playlist items tree
- * - playlist (id 1)
- *    - category 1 (id 2)
- *      - foo 2 (id 6 - input 2)
- * \endverbatim
- *
- * Sometimes, an item creates subitems. This happens for the directory access
- * for example. In that case, if the item is under the "playlist" top-level
- * item and playlist is configured to be flat then the item will be deleted and
- * replaced with new subitems. If the item is under another top-level item, it
- * will be transformed to a node and removed from the list of all items without
- * nodes.
- *
- * For "standard" item addition, you can use playlist_Add(), playlist_AddExt()
- * (more options) or playlist_AddInput() if you already created your input
- * item. This will add the item at the root of "Playlist" in each of the two trees.
- *
- * You can create nodes with playlist_NodeCreate() and can create items from
- * existing input items to be placed under any node with
- * playlist_NodeAddInput().
- *
- * To delete an item, use playlist_NodeDelete( p_item ).
- *
- * The playlist defines the following event variables:
- *
- * - "item-change": It will contain a pointer to the input_item_t of a
- * changed input item monitored by the playlist.
- *
- * - "playlist-item-append": It will contain a pointer to a playlist_item_t.
- * - "playlist-item-deleted": It will contain a pointer to the playlist_item_t
- * about to be deleted.
- *
- * - "leaf-to-parent": It will contain the playlist_item_t->i_id of an item that is transformed
- *   into a node.
- *
- * The playlist contains rate-variable which is propagated to current input if
- * available also rate-slower/rate-faster is in use.
  */
-
-/** Helper structure to export to file part of the playlist */
-typedef struct playlist_export_t
-{
-    struct vlc_common_members obj;
-    char *base_url;
-    FILE *p_file;
-    playlist_item_t *p_root;
-} playlist_export_t;
-
-/** playlist item / node */
-struct playlist_item_t
-{
-    input_item_t           *p_input;    /**< Linked input item */
-
-    playlist_item_t      **pp_children; /**< Children nodes/items */
-    playlist_item_t       *p_parent;    /**< Item parent */
-    int                    i_children;  /**< Number of children, -1 if not a node */
-    unsigned               i_nb_played; /**< Times played */
-
-    int                    i_id;        /**< Playlist item specific id */
-    uint8_t                i_flags;     /**< Flags \see playlist_item_flags_e */
-};
-
-typedef enum {
-    PLAYLIST_DBL_FLAG          = 0x04,  /**< Is it disabled ? */
-    PLAYLIST_RO_FLAG           = 0x08,  /**< Write-enabled ? */
-    PLAYLIST_SUBITEM_STOP_FLAG = 0x40,  /**< Must playlist stop if the item gets subitems ?*/
-    PLAYLIST_NO_INHERIT_FLAG   = 0x80,  /**< Will children inherit flags the R/O flag ? */
-} playlist_item_flags_e;
-
-/** Playlist status */
-typedef enum
-{ PLAYLIST_STOPPED,PLAYLIST_RUNNING,PLAYLIST_PAUSED } playlist_status_t;
-
-/** Structure containing information about the playlist */
-struct playlist_t
-{
-    struct vlc_common_members obj;
-
-    playlist_item_array_t items; /**< Arrays of items */
-
-    playlist_item_array_t current; /**< Items currently being played */
-    int                   i_current_index; /**< Index in current array */
-
-    /* Predefined items */
-    playlist_item_t  root;
-    playlist_item_t *p_playing;
-};
-
-/* A bit of macro magic to generate an enum out of the following list,
- * and later, to generate a list of static functions out of the same list.
- * There is also SORT_RANDOM, which is always last and handled specially.
- */
-#define VLC_DEFINE_SORT_FUNCTIONS \
-    DEF( SORT_ID )\
-    DEF( SORT_TITLE )\
-    DEF( SORT_TITLE_NODES_FIRST )\
-    DEF( SORT_ARTIST )\
-    DEF( SORT_GENRE )\
-    DEF( SORT_DURATION )\
-    DEF( SORT_TITLE_NUMERIC )\
-    DEF( SORT_ALBUM )\
-    DEF( SORT_TRACK_NUMBER )\
-    DEF( SORT_DESCRIPTION )\
-    DEF( SORT_RATING )\
-    DEF( SORT_URI )\
-    DEF( SORT_DISC_NUMBER )\
-    DEF( SORT_DATE )
-
-#define DEF( s ) s,
-enum
-{
-    VLC_DEFINE_SORT_FUNCTIONS
-    SORT_RANDOM,
-    NUM_SORT_FNS=SORT_RANDOM
-};
-#undef  DEF
-#ifndef VLC_INTERNAL_PLAYLIST_SORT_FUNCTIONS
-#undef  VLC_DEFINE_SORT_FUNCTIONS
-#endif
-
-enum
-{
-    ORDER_NORMAL = 0,
-    ORDER_REVERSE = 1,
-};
-
-#define PLAYLIST_END           -1
-
-enum pl_locked_state
-{
-    pl_Locked = true,
-    pl_Unlocked = false
-};
-
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-
-/* Helpers */
-#define PL_LOCK playlist_Lock( p_playlist )
-#define PL_UNLOCK playlist_Unlock( p_playlist )
-#define PL_ASSERT_LOCKED assert(playlist_Locked(p_playlist))
-
-/** Playlist commands */
-enum {
-    PLAYLIST_PLAY,      /**< No arg.                            res=can fail*/
-    PLAYLIST_VIEWPLAY,  /**< arg1= playlist_item_t*,*/
-                        /**  arg2 = playlist_item_t*          , res=can fail */
-    PLAYLIST_TOGGLE_PAUSE, /**< No arg                          res=can fail */
-    PLAYLIST_STOP,      /**< No arg                             res=can fail*/
-    PLAYLIST_SKIP,      /**< arg1=int,                          res=can fail*/
-    PLAYLIST_PAUSE,     /**< No arg */
-    PLAYLIST_RESUME,    /**< No arg */
-};
-
-#define playlist_Play(p) playlist_Control(p,PLAYLIST_PLAY, pl_Unlocked )
-#define playlist_TogglePause(p) \
-        playlist_Control(p, PLAYLIST_TOGGLE_PAUSE, pl_Unlocked)
-#define playlist_Stop(p) playlist_Control(p,PLAYLIST_STOP, pl_Unlocked )
-#define playlist_Next(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, 1)
-#define playlist_Prev(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, -1)
-#define playlist_Skip(p,i) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked,  (i) )
-#define playlist_Pause(p) \
-        playlist_Control(p, PLAYLIST_PAUSE, pl_Unlocked)
-#define playlist_Resume(p) \
-        playlist_Control(p, PLAYLIST_RESUME, pl_Unlocked)
 
 /**
- * Locks the playlist.
+ * A VLC playlist contains a list of "playlist items".
  *
- * This function locks the playlist. While the playlist is locked, no other
- * thread can modify the playlist tree layout or current playing item and node.
+ * Each playlist item contains exactly one media (input item). In the future,
+ * it might contain associated data.
  *
- * Locking the playlist is necessary before accessing, either for reading or
- * writing, any playlist item.
+ * The API is intended to be simple, UI-friendly and allow for an
+ * implementation both correct (no race conditions) and performant for common
+ * use cases.
  *
- * \note Because of the potential for lock inversion / deadlocks, locking the
- * playlist shall not be attemped while holding an input item lock. An input
- * item lock can be acquired while holding the playlist lock.
+ * UI frameworks typically use "list models" to provide a list of items to a
+ * list view component. A list model requires to implement functions to:
+ *  - return the total number of items,
+ *  - return the item at a given index.
  *
- * While holding the playlist lock, a thread shall not attempt to:
- * - probe, initialize or deinitialize a module or a plugin,
- * - install or deinstall a variable or event callback,
- * - set a variable or trigger a variable callback, with the sole exception
- *   of the playlist core triggering add/remove/leaf item callbacks,
- * - invoke a module/plugin callback other than:
- *   - playlist export,
- *   - logger message callback.
+ * In addition, it must notify the view when changes occur when:
+ *  - items are inserted (providing index and count),
+ *  - items are removed (providing index and count),
+ *  - items are moved (providing index, count, and target index),
+ *  - items are updated (providing index and count),
+ *  - the model is reset (the whole content should be considered changed).
+ *
+ * The API directly exposes what list models require.
+ *
+ * The core playlist may be modified from any thread, so it may not be used as
+ * a direct data source for a list model. In other word, the functions of a
+ * list model must not delegate the calls to the playlist. This would require
+ * locking the playlist individually for each call to get the count and
+ * retrieve each item (which is, in itself, not a good idea for UI
+ * responsiveness), and would not be sufficient to guarantee correctness: the
+ * playlist content could change between view calls so that a request to
+ * retrieve an item at a specific index could be invalid (which would break the
+ * list model expected behavior).
+ *
+ * As a consequence, the UI playlist should be considered as a remote
+ * out-of-sync view of the core playlist. This implies that the UI needs to
+ * keep a copy of the playlist content.
+ *
+ * Note that the copy must not limited to the list of playlist items (pointers)
+ * themselves, but also to the items content which is displayed and susceptible
+ * to change asynchronously (e.g. media metadata, like title or duration). The
+ * UI should never lock a media (input item) for rendering a playlist item;
+ * otherwise, the content could be changed (and exposed) before the list model
+ * notified the view of this change (which, again, would break the list model
+ * expected behavior).
+ *
+ * It is very important that the copy hold by the UI is only modified through
+ * the core playlist callbacks, to guarantee that the indexes notified are
+ * valid in the context of the list model. In other words, from the client, the
+ * playlist copy is a read-only "desynchronized" view of the core playlist.
+ *
+ * Moreover, the events triggered by the playlist must be kept in order until
+ * they are handled. The callbacks may be called from any thread, with lock
+ * held (in practice, the thread from which a change is requested). An UI will
+ * typically need to handle the events in the UI thread, so it will usually
+ * post the events in an even loop, to handle them from the UI thread. In that
+ * case, be careful to always post the events in the event loop, even if the
+ * current thread is already the UI thread, not to break the order of events.
+ *
+ * The playlist also handles the playback order and the repeat mode. It also
+ * manages a cursor to the "current" item, and expose whether a previous and
+ * next items (which depend on the playback order and repeat mode) are
+ * available.
+ *
+ * When a user requests to insert, move or remove items, or to set the current
+ * item, before the core playlist lock is successfully acquired, another client
+ * may have changed the list. Therefore, vlc_playlist_Request*() functions are
+ * exposed to resolve potential conflicts and apply the changes. The actual
+ * changes applied are notified through the callbacks
  */
-VLC_API void playlist_Lock( playlist_t * );
 
-/**
- * Unlocks the playlist.
- *
- * This function unlocks the playlist, allowing other threads to lock it. The
- * calling thread must have called playlist_Lock() before.
- *
- * This function invalidates all or any playlist item pointers.
- * There are no ways to ensure that playlist items are not modified or deleted
- * by another thread past this function call.
- *
- * To retain a reference to a playlist item while not holding the playlist
- * lock, a thread should take a reference to the input item within the
- * playlist item before unlocking. If this is not practical, then the thread
- * can store the playlist item ID (i_id) before unlocking.
- * Either way, this will not ensure that the playlist item is not deleted, so
- * the thread must be ready to handle that case later when calling
- * playlist_ItemGetByInput() or playlist_ItemGetById().
- *
- * Furthermore, if ID is used, then the playlist item might be deleted, and
- * another item could be assigned the same ID. To avoid that problem, use
- * the input item instead of the ID.
- */
-VLC_API void playlist_Unlock( playlist_t * );
+/* forward declarations */
+typedef struct input_item_t input_item_t;
+typedef struct vlc_player_t vlc_player_t;
 
-VLC_API bool playlist_Locked( const playlist_t * );
-#define playlist_AssertLocked(pl) (assert(playlist_Locked(pl)), pl)
+/* opaque types */
+typedef struct vlc_playlist vlc_playlist_t;
+typedef struct vlc_playlist_item vlc_playlist_item_t;
+typedef struct vlc_playlist_listener_id vlc_playlist_listener_id;
 
-VLC_API void playlist_Deactivate( playlist_t * );
-
-/**
- * Do a playlist action.
- * If there is something in the playlist then you can do playlist actions.
- * Possible queries are listed in vlc_common.h
- * \param p_playlist the playlist to do the command on
- * \param i_query the command to do
- * \param b_locked TRUE if playlist is locked when entering this function
- * \param variable number of arguments
- */
-VLC_API void playlist_Control( playlist_t *p_playlist, int i_query, int b_locked, ...  );
-
-static inline void playlist_ViewPlay(playlist_t *pl, playlist_item_t *node,
-                                     playlist_item_t *item)
+enum vlc_playlist_playback_repeat
 {
-    playlist_Control(pl, PLAYLIST_VIEWPLAY, pl_Locked, node, item);
+    VLC_PLAYLIST_PLAYBACK_REPEAT_NONE,
+    VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT,
+    VLC_PLAYLIST_PLAYBACK_REPEAT_ALL,
+};
+
+enum vlc_playlist_playback_order
+{
+    VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL,
+    VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM,
+};
+
+enum vlc_playlist_sort_key
+{
+    VLC_PLAYLIST_SORT_KEY_TITLE,
+    VLC_PLAYLIST_SORT_KEY_DURATION,
+    VLC_PLAYLIST_SORT_KEY_ARTIST,
+    VLC_PLAYLIST_SORT_KEY_ALBUM,
+    VLC_PLAYLIST_SORT_KEY_ALBUM_ARTIST,
+    VLC_PLAYLIST_SORT_KEY_GENRE,
+    VLC_PLAYLIST_SORT_KEY_DATE,
+    VLC_PLAYLIST_SORT_KEY_TRACK_NUMBER,
+    VLC_PLAYLIST_SORT_KEY_DISC_NUMBER,
+    VLC_PLAYLIST_SORT_KEY_URL,
+    VLC_PLAYLIST_SORT_KEY_RATING,
+};
+
+enum vlc_playlist_sort_order
+{
+    VLC_PLAYLIST_SORT_ORDER_ASCENDING,
+    VLC_PLAYLIST_SORT_ORDER_DESCENDING,
+};
+
+struct vlc_playlist_sort_criterion
+{
+    enum vlc_playlist_sort_key key;
+    enum vlc_playlist_sort_order order;
+};
+
+/**
+ * Playlist callbacks.
+ *
+ * A client may register a listener using vlc_playlist_AddListener() to listen
+ * playlist events.
+ *
+ * All callbacks are called with the playlist locked (see vlc_playlist_Lock()).
+ */
+struct vlc_playlist_callbacks
+{
+    /**
+     * Called when the whole content has changed (e.g. when the playlist has
+     * been cleared, shuffled or sorted).
+     *
+     * \param playlist the playlist
+     * \param items    the whole new content of the playlist
+     * \param count    the number of items
+     * \param userdata userdata provided to AddListener()
+     */
+    void
+    (*on_items_reset)(vlc_playlist_t *, vlc_playlist_item_t *const items[],
+                      size_t count, void *userdata);
+
+    /**
+     * Called when items have been added to the playlist.
+     *
+     * \param playlist the playlist
+     * \param index    the index of the insertion
+     * \param items    the array of added items
+     * \param count    the number of items added
+     * \param userdata userdata provided to AddListener()
+     */
+    void
+    (*on_items_added)(vlc_playlist_t *playlist, size_t index,
+                      vlc_playlist_item_t *const items[], size_t count,
+                      void *userdata);
+
+    /**
+     * Called when a slice of items have been moved.
+     *
+     * \param playlist the playlist
+     * \param index    the index of the first moved item
+     * \param count    the number of items moved
+     * \param target   the new index of the moved slice
+     * \param userdata userdata provided to AddListener()
+     */
+    void
+    (*on_items_moved)(vlc_playlist_t *playlist, size_t index, size_t count,
+                      size_t target, void *userdata);
+    /**
+     * Called when a slice of items have been removed from the playlist.
+     *
+     * \param playlist the playlist
+     * \param index    the index of the first removed item
+     * \param count    the number of items removed
+     * \param userdata userdata provided to AddListener()
+     */
+    void
+    (*on_items_removed)(vlc_playlist_t *playlist, size_t index, size_t count,
+                        void *userdata);
+
+    /**
+     * Called when an item has been updated via (pre-)parsing.
+     *
+     * \param playlist the playlist
+     * \param index    the index of the first updated item
+     * \param items    the array of updated items
+     * \param count    the number of items updated
+     * \param userdata userdata provided to AddListener()
+     */
+    void
+    (*on_items_updated)(vlc_playlist_t *playlist, size_t index,
+                        vlc_playlist_item_t *const items[], size_t count,
+                        void *userdata);
+
+    /**
+     * Called when the playback repeat mode has been changed.
+     *
+     * \param playlist the playlist
+     * \param repeat   the new playback "repeat" mode
+     * \param userdata userdata provided to AddListener()
+     */
+    void
+    (*on_playback_repeat_changed)(vlc_playlist_t *playlist,
+                                  enum vlc_playlist_playback_repeat repeat,
+                                  void *userdata);
+
+    /**
+     * Called when the playback order mode has been changed.
+     *
+     * \param playlist the playlist
+     * \param rorder   the new playback order
+     * \param userdata userdata provided to AddListener()
+     */
+    void
+    (*on_playback_order_changed)(vlc_playlist_t *playlist,
+                                 enum vlc_playlist_playback_order order,
+                                 void *userdata);
+
+    /**
+     * Called when the current item index has changed.
+     *
+     * Note that the current item index may have changed while the current item
+     * is still the same: it may have been moved.
+     *
+     * \param playlist the playlist
+     * \param index    the new current index (-1 if there is no current item)
+     * \param userdata userdata provided to AddListener()
+     */
+    void
+    (*on_current_index_changed)(vlc_playlist_t *playlist, ssize_t index,
+                                void *userdata);
+
+    /**
+     * Called when the "has previous item" property has changed.
+     *
+     * This is typically useful to update any "previous" button in the UI.
+     *
+     * \param playlist the playlist
+     * \param has_prev true if there is a previous item, false otherwise
+     * \param userdata userdata provided to AddListener()
+     */
+    void
+    (*on_has_prev_changed)(vlc_playlist_t *playlist, bool has_prev,
+                           void *userdata);
+
+    /**
+     * Called when the "has next item" property has changed.
+     *
+     * This is typically useful to update any "next" button in the UI.
+     *
+     * \param playlist the playlist
+     * \param has_next true if there is a next item, false otherwise
+     * \param userdata userdata provided to AddListener()
+     */
+    void
+    (*on_has_next_changed)(vlc_playlist_t *playlist,
+                           bool has_next, void *userdata);
+};
+
+/* Playlist items */
+
+/**
+ * Hold a playlist item.
+ *
+ * Increment the refcount of the playlist item.
+ */
+VLC_API void
+vlc_playlist_item_Hold(vlc_playlist_item_t *);
+
+/**
+ * Release a playlist item.
+ *
+ * Decrement the refcount of the playlist item, and destroy it if necessary.
+ */
+VLC_API void
+vlc_playlist_item_Release(vlc_playlist_item_t *);
+
+/**
+ * Return the media associated to the playlist item.
+ */
+VLC_API input_item_t *
+vlc_playlist_item_GetMedia(vlc_playlist_item_t *);
+
+/* Playlist */
+
+/**
+ * Create a new playlist.
+ *
+ * \param parent   a VLC object
+ * \return a pointer to a valid playlist instance, or NULL if an error occurred
+ */
+VLC_API VLC_USED vlc_playlist_t *
+vlc_playlist_New(vlc_object_t *parent);
+
+/**
+ * Delete a playlist.
+ *
+ * All playlist items are released, and listeners are removed and destroyed.
+ */
+VLC_API void
+vlc_playlist_Delete(vlc_playlist_t *);
+
+/**
+ * Lock the playlist/player.
+ *
+ * The playlist and its player share the same lock, to avoid lock-order
+ * inversion issues.
+ *
+ * \warning Do not forget that the playlist and player lock are the same (or
+ * you could lock twice the same and deadlock).
+ *
+ * Almost all playlist functions must be called with lock held (check their
+ * description).
+ *
+ * The lock is not recursive.
+ */
+VLC_API void
+vlc_playlist_Lock(vlc_playlist_t *);
+
+/**
+ * Unlock the playlist/player.
+ */
+VLC_API void
+vlc_playlist_Unlock(vlc_playlist_t *);
+
+/**
+ * Add a playlist listener.
+ *
+ * Return an opaque listener identifier, to be passed to
+ * vlc_player_RemoveListener().
+ *
+ * If notify_current_state is true, the callbacks are called once with the
+ * current state of the playlist. This is useful because when a client
+ * registers to the playlist, it may already contain items. Calling callbacks
+ * is a convenient way to initialize the client automatically.
+ *
+ * \param playlist             the playlist, locked
+ * \param cbs                  the callbacks (must be valid until the listener
+ *                             is removed)
+ * \param userdata             userdata provided as a parameter in callbacks
+ * \param notify_current_state true to notify the current state immediately via
+ *                             callbacks
+ * \return a listener identifier, or NULL if an error occurred
+ */
+VLC_API VLC_USED vlc_playlist_listener_id *
+vlc_playlist_AddListener(vlc_playlist_t *playlist,
+                         const struct vlc_playlist_callbacks *cbs,
+                         void *userdata, bool notify_current_state);
+
+/**
+ * Remove a player listener.
+ *
+ * \param playlist the playlist, locked
+ * \param id       the listener identifier returned by
+ *                 vlc_playlist_AddListener()
+ */
+VLC_API void
+vlc_playlist_RemoveListener(vlc_playlist_t *, vlc_playlist_listener_id *);
+
+/**
+ * Return the number of items.
+ *
+ * \param playlist the playlist, locked
+ */
+VLC_API size_t
+vlc_playlist_Count(vlc_playlist_t *playlist);
+
+/**
+ * Return the item at a given index.
+ *
+ * The index must be in range (less than vlc_playlist_Count()).
+ *
+ * \param playlist the playlist, locked
+ * \param index    the index
+ * \return the playlist item
+ */
+VLC_API vlc_playlist_item_t *
+vlc_playlist_Get(vlc_playlist_t *playlist, size_t index);
+
+/**
+ * Clear the playlist.
+ *
+ * \param playlist the playlist, locked
+ */
+VLC_API void
+vlc_playlist_Clear(vlc_playlist_t *playlist);
+
+/**
+ * Insert a list of media at a given index.
+ *
+ * The index must be in range (less than or equal to vlc_playlist_Count()).
+ *
+ * \param playlist the playlist, locked
+ * \index index    the index where the media are to be inserted
+ * \param media    the array of media to insert
+ * \param count    the number of media to insert
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API int
+vlc_playlist_Insert(vlc_playlist_t *playlist, size_t index,
+                    input_item_t *const media[], size_t count);
+
+/**
+ * Insert a media at a given index.
+ *
+ * The index must be in range (less than or equal to vlc_playlist_Count()).
+ *
+ * \param playlist the playlist, locked
+ * \index index    the index where the media is to be inserted
+ * \param media    the media to insert
+ * \return VLC_SUCCESS on success, another value on error
+ */
+static inline int
+vlc_playlist_InsertOne(vlc_playlist_t *playlist, size_t index,
+                       input_item_t *media)
+{
+    return vlc_playlist_Insert(playlist, index, &media, 1);
 }
 
-/** Get current playing input. The object is retained.
- */
-VLC_API input_thread_t * playlist_CurrentInput( playlist_t *p_playlist ) VLC_USED;
-VLC_API input_thread_t *playlist_CurrentInputLocked( playlist_t *p_playlist ) VLC_USED;
-
-/** Get the duration of all items in a node.
- */
-VLC_API vlc_tick_t playlist_GetNodeDuration( playlist_item_t * );
-
-/** Clear the playlist
- * \param b_locked TRUE if playlist is locked when entering this function
- */
-VLC_API void playlist_Clear( playlist_t *, bool );
-
-/* Playlist sorting */
-VLC_API int playlist_TreeMove( playlist_t *, playlist_item_t *, playlist_item_t *, int );
-VLC_API int playlist_TreeMoveMany( playlist_t *, int, playlist_item_t **, playlist_item_t *, int );
-VLC_API int playlist_RecursiveNodeSort( playlist_t *, playlist_item_t *,int, int );
-
-VLC_API playlist_item_t * playlist_CurrentPlayingItem( playlist_t * ) VLC_USED;
-VLC_API int playlist_Status( playlist_t * );
-
 /**
- * Export a node of the playlist to a certain type of playlistfile
- * \param psz_filename the location where the exported file will be saved
- * \param psz_type the type of playlist file to create (m3u, pls, ..)
- * \return VLC_SUCCESS on success
+ * Add a list of media at the end of the playlist.
+ *
+ * \param playlist the playlist, locked
+ * \param media    the array of media to append
+ * \param count    the number of media to append
+ * \return VLC_SUCCESS on success, another value on error
  */
-VLC_API int playlist_Export( playlist_t *p_playlist, const char *psz_name,
-                             const char *psz_type );
-
-/**
- * Open a playlist file, add its content to the current playlist
- */
-VLC_API int playlist_Import( playlist_t *p_playlist, const char *psz_file );
-
-/********************** Services discovery ***********************/
-
-/** Add a service discovery module */
-VLC_API int playlist_ServicesDiscoveryAdd(playlist_t *, const char *);
-/** Remove a services discovery module by name */
-VLC_API int playlist_ServicesDiscoveryRemove(playlist_t *, const char *);
-/** Check whether a given SD is loaded */
-VLC_API bool playlist_IsServicesDiscoveryLoaded( playlist_t *,const char *) VLC_DEPRECATED;
-/** Query a services discovery */
-VLC_API int playlist_ServicesDiscoveryControl( playlist_t *, const char *, int, ... );
-
-/********************** Renderer ***********************/
-/**
- * Sets a renderer or remove the current one
- * @param p_item    The renderer item to be used, or NULL to disable the current
- *                  one. If a renderer is provided, its reference count will be
- *                  incremented.
- */
-VLC_API int playlist_SetRenderer( playlist_t* p_pl, vlc_renderer_item_t* p_item );
-
-
-/********************************************************
- * Item management
- ********************************************************/
-
-/******************** Item addition ********************/
-VLC_API int playlist_Add( playlist_t *, const char *, bool );
-VLC_API int playlist_AddExt( playlist_t *, const char *, const char *, bool, int, const char *const *, unsigned );
-VLC_API int playlist_AddInput( playlist_t *, input_item_t *, bool );
-VLC_API playlist_item_t * playlist_NodeAddInput( playlist_t *, input_item_t *, playlist_item_t *, int );
-VLC_API int playlist_NodeAddCopy( playlist_t *, playlist_item_t *, playlist_item_t *, int );
-
-/********************************** Item search *************************/
-VLC_API playlist_item_t * playlist_ItemGetById(playlist_t *, int ) VLC_USED;
-VLC_API playlist_item_t *playlist_ItemGetByInput(playlist_t *,
-                                                 const input_item_t * )
-VLC_USED;
-
-VLC_API int playlist_LiveSearchUpdate(playlist_t *, playlist_item_t *, const char *, bool );
-
-/********************************************************
- * Tree management
- ********************************************************/
-/* Node management */
-VLC_API playlist_item_t * playlist_NodeCreate( playlist_t *, const char *, playlist_item_t * p_parent, int i_pos, int i_flags );
-VLC_API playlist_item_t * playlist_ChildSearchName(playlist_item_t*, const char* ) VLC_USED;
-VLC_API void playlist_NodeDelete( playlist_t *, playlist_item_t * );
-
-/**************************
- * Audio output management
- **************************/
-
-VLC_API struct audio_output *playlist_GetAout( playlist_t * );
-
-VLC_API float playlist_VolumeGet( playlist_t * );
-VLC_API int playlist_VolumeSet( playlist_t *, float );
-VLC_API int playlist_VolumeUp( playlist_t *, int, float * );
-#define playlist_VolumeDown(a, b, c) playlist_VolumeUp(a, -(b), c)
-VLC_API int playlist_MuteSet( playlist_t *, bool );
-VLC_API int playlist_MuteGet( playlist_t * );
-
-static inline int playlist_MuteToggle( playlist_t *pl )
+static inline int
+vlc_playlist_Append(vlc_playlist_t *playlist, input_item_t *const media[],
+                    size_t count)
 {
-    int val = playlist_MuteGet( pl );
-    if (val >= 0)
-        val = playlist_MuteSet( pl, !val );
-    return val;
+    size_t size = vlc_playlist_Count(playlist);
+    return vlc_playlist_Insert(playlist, size, media, count);
 }
 
-VLC_API void playlist_EnableAudioFilter( playlist_t *, const char *, bool );
+/**
+ * Add a media at the end of the playlist.
+ *
+ * \param playlist the playlist, locked
+ * \param media    the media to append
+ * \return VLC_SUCCESS on success, another value on error
+ */
+static inline int
+vlc_playlist_AppendOne(vlc_playlist_t *playlist, input_item_t *media)
+{
+    return vlc_playlist_Append(playlist, &media, 1);
+}
 
-/** Tell if the playlist is empty */
-#define playlist_IsEmpty(p_playlist) \
-    (playlist_AssertLocked(p_playlist)->items.i_size == 0)
+/**
+ * Move a slice of items to a given target index.
+ *
+ * The slice and the target must be in range (both index+count and target+count
+ * less than or equal to vlc_playlist_Count()).
+ *
+ * \param playlist the playlist, locked
+ * \param index    the index of the first item to move
+ * \param count    the number of items to move
+ * \param target   the new index of the moved slice
+ */
+VLC_API void
+vlc_playlist_Move(vlc_playlist_t *playlist, size_t index, size_t count,
+                  size_t target);
 
-/** Tell the number of items in the current playing context */
-#define playlist_CurrentSize(p_playlist) \
-    (playlist_AssertLocked(p_playlist)->current.i_size)
+/**
+ * Move an item to a given target index.
+ *
+ * The index and the target must be in range (index less than, and target less
+ * than or equal to, vlc_playlist_Count()).
+ *
+ * \param playlist the playlist, locked
+ * \param index    the index of the item to move
+ * \param target   the new index of the moved item
+ */
+static inline void
+vlc_playlist_MoveOne(vlc_playlist_t *playlist, size_t index, size_t target)
+{
+    vlc_playlist_Move(playlist, index, 1, target);
+}
+
+/**
+ * Remove a slice of items at a given index.
+ *
+ * The slice must be in range (index+count less than or equal to
+ * vlc_playlist_Count()).
+ *
+ * \param playlist the playlist, locked
+ * \param index    the index of the first item to remove
+ * \param count    the number of items to remove
+ */
+VLC_API void
+vlc_playlist_Remove(vlc_playlist_t *playlist, size_t index, size_t count);
+
+/**
+ * Remove an item at a given index.
+ *
+ * The index must be in range (less than vlc_playlist_Count()).
+ *
+ * \param playlist the playlist, locked
+ * \param index    the index of the item to remove
+ */
+static inline void
+vlc_playlist_RemoveOne(vlc_playlist_t *playlist, size_t index)
+{
+    vlc_playlist_Remove(playlist, index, 1);
+}
+
+/**
+ * Insert a list of media at a given index (if in range), or append.
+ *
+ * Contrary to vlc_playlist_Insert(), the index need not be in range: if it is
+ * out of bounds, items will be appended.
+ *
+ * This is an helper to apply a desynchronized insert request, i.e. the
+ * playlist content may have changed since the request had been submitted.
+ * This is typically the case for user requests (e.g. from UI), because the
+ * playlist lock has to be acquired *after* the user requested the
+ * change.
+ *
+ * \param playlist the playlist, locked
+ * \index index    the index where the media are to be inserted
+ * \param media    the array of media to insert
+ * \param count    the number of media to insert
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API int
+vlc_playlist_RequestInsert(vlc_playlist_t *playlist, size_t index,
+                           input_item_t *const media[], size_t count);
+
+/**
+ * Move a slice of items by value.
+ *
+ * If the indices are known, use vlc_playlist_Move() instead.
+ *
+ * This is an helper to apply a desynchronized move request, i.e. the playlist
+ * content may have changed since the request had been submitted. This is
+ * typically the case for user requests (e.g. from UI), because the playlist
+ * lock has to be acquired *after* the user requested the change.
+ *
+ * For optimization purpose, it is possible to pass an `index_hint`, which is
+ * the expected index of the first item of the slice (as known by the client).
+ * Hopefully, the index should often match, since conflicts are expected to be
+ * rare. Pass -1 not to pass any hint.
+ *
+ * \param playlist   the playlist, locked
+ * \param items      the array of items to move
+ * \param count      the number of items to move
+ * \param target     the new index of the moved slice
+ * \param index_hint the expected index of the first item (-1 for none)
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API int
+vlc_playlist_RequestMove(vlc_playlist_t *playlist,
+                         vlc_playlist_item_t *const items[], size_t count,
+                         size_t target, ssize_t index_hint);
+
+/**
+ * Remove a slice of items by value.
+ *
+ * If the indices are known, use vlc_playlist_Remove() instead.
+ *
+ * This is an helper to apply a desynchronized remove request, i.e. the
+ * playlist content may have changed since the request had been submitted.
+ * This is typically the case for user requests (e.g. from UI), because the
+ * playlist lock has to be acquired *after* the user requested the change.
+ *
+ * For optimization purpose, it is possible to pass an `index_hint`, which is
+ * the expected index of the first item of the slice (as known by the client).
+ * Hopefully, the index should often match, since conflicts are expected to be
+ * rare. Pass -1 not to pass any hint.
+ *
+ * \param playlist   the playlist, locked
+ * \param items      the array of items to remove
+ * \param count      the number of items to remove
+ * \param index_hint the expected index of the first item (-1 for none)
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API int
+vlc_playlist_RequestRemove(vlc_playlist_t *playlist,
+                           vlc_playlist_item_t *const items[], size_t count,
+                           ssize_t index_hint);
+
+/**
+ * Shuffle the playlist.
+ *
+ * \param playlist the playlist, locked
+ */
+VLC_API void
+vlc_playlist_Shuffle(vlc_playlist_t *playlist);
+
+/**
+ * Sort the playlist by a list of criteria.
+ *
+ * \param playlist the playlist, locked
+ * \param criteria the sort criteria (in order)
+ * \param count    the number of criteria
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API int
+vlc_playlist_Sort(vlc_playlist_t *playlist,
+                  const struct vlc_playlist_sort_criterion criteria[],
+                  size_t count);
+
+/**
+ * Return the index of a given item.
+ *
+ * \param playlist the playlist, locked
+ * \param item     the item to locate
+ * \return the index of the item (-1 if not found)
+ */
+VLC_API ssize_t
+vlc_playlist_IndexOf(vlc_playlist_t *playlist, const vlc_playlist_item_t *item);
+
+/**
+ * Return the index of a given media.
+ *
+ * \param playlist the playlist, locked
+ * \param media    the media to locate
+ * \return the index of the playlist item containing the media (-1 if not found)
+ */
+VLC_API ssize_t
+vlc_playlist_IndexOfMedia(vlc_playlist_t *playlist, const input_item_t *media);
+
+/**
+ * Return the playback "repeat" mode.
+ *
+ * \param playlist the playlist, locked
+ * \return the playback "repeat" mode
+ */
+VLC_API enum vlc_playlist_playback_repeat
+vlc_playlist_GetPlaybackRepeat(vlc_playlist_t *playlist);
+
+/**
+ * Return the playback order.
+ *
+ * \param playlist the playlist, locked
+ * \return the playback order
+ */
+VLC_API enum vlc_playlist_playback_order
+vlc_playlist_GetPlaybackOrder(vlc_playlist_t *);
+
+/**
+ * Change the playback "repeat" mode.
+ *
+ * \param playlist the playlist, locked
+ * \param repeat the new playback "repeat" mode
+ */
+VLC_API void
+vlc_playlist_SetPlaybackRepeat(vlc_playlist_t *playlist,
+                               enum vlc_playlist_playback_repeat repeat);
+
+/**
+ * Change the playback order
+ *
+ * \param playlist the playlist, locked
+ * \param repeat the new playback order
+ */
+VLC_API void
+vlc_playlist_SetPlaybackOrder(vlc_playlist_t *playlist,
+                              enum vlc_playlist_playback_order order);
+
+/**
+ * Return the index of the current item.
+ *
+ * \param playlist the playlist, locked
+ * \return the index of the current item, -1 if none.
+ */
+VLC_API ssize_t
+vlc_playlist_GetCurrentIndex(vlc_playlist_t *playlist);
+
+/**
+ * Indicate whether a previous item is available.
+ *
+ * \param playlist the playlist, locked
+ * \retval true if a previous item is available
+ * \retval false if no previous item is available
+ */
+VLC_API bool
+vlc_playlist_HasPrev(vlc_playlist_t *playlist);
+
+/**
+ * Indicate whether a next item is available.
+ *
+ * \param playlist the playlist, locked
+ * \retval true if a next item is available
+ * \retval false if no next item is available
+ */
+VLC_API bool
+vlc_playlist_HasNext(vlc_playlist_t *playlist);
+
+/**
+ * Go to the previous item.
+ *
+ * Return VLC_EGENERIC if vlc_playlist_HasPrev() returns false.
+ *
+ * \param playlist the playlist, locked
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API int
+vlc_playlist_Prev(vlc_playlist_t *playlist);
+
+/**
+ * Go to the next item.
+ *
+ * Return VLC_EGENERIC if vlc_playlist_HasNext() returns false.
+ *
+ * \param playlist the playlist, locked
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API int
+vlc_playlist_Next(vlc_playlist_t *playlist);
+
+/**
+ * Go to a given index.
+ *
+ * the index must be -1 or in range (less than vlc_playlist_Count()).
+ *
+ * \param playlist the playlist, locked
+ * \param index    the index to go to (-1 to none)
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API int
+vlc_playlist_GoTo(vlc_playlist_t *playlist, ssize_t index);
+
+/**
+ * Go to a given item.
+ *
+ * If the index is known, use vlc_playlist_GoTo() instead.
+ *
+ * This is an helper to apply a desynchronized "go to" request, i.e. the
+ * playlist content may have changed since the request had been submitted.
+ * This is typically the case for user requests (e.g. from UI), because the
+ * playlist lock has to be acquired *after* the user requested the change.
+ *
+ * For optimization purpose, it is possible to pass an `index_hint`, which is
+ * the expected index of the first item of the slice (as known by the client).
+ * Hopefully, the index should often match, since conflicts are expected to be
+ * rare. Pass -1 not to pass any hint.
+ *
+ * \param playlist   the playlist, locked
+ * \param item       the item to go to (NULL for none)
+ * \param index_hint the expected index of the item (-1 for none)
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API int
+vlc_playlist_RequestGoTo(vlc_playlist_t *playlist, vlc_playlist_item_t *item,
+                         ssize_t index_hint);
+
+/**
+ * Return the player owned by the playlist.
+ *
+ * \param playlist the playlist (not necessarily locked)
+ * \return the player
+ */
+VLC_API vlc_player_t *
+vlc_playlist_GetPlayer(vlc_playlist_t *playlist);
+
+/**
+ * Start the player.
+ *
+ * \param playlist the playlist, locked
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API int
+vlc_playlist_Start(vlc_playlist_t *playlist);
+
+/**
+ * Stop the player.
+ *
+ * \param playlist the playlist, locked
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API void
+vlc_playlist_Stop(vlc_playlist_t *playlist);
+
+/**
+ * Pause the player.
+ *
+ * \param playlist the playlist, locked
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API void
+vlc_playlist_Pause(vlc_playlist_t *playlist);
+
+/**
+ * Resume the player.
+ *
+ * \param playlist the playlist, locked
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API void
+vlc_playlist_Resume(vlc_playlist_t *playlist);
+
+/**
+ * Go to the given index and plays the corresponding item.
+ *
+ * \param playlist the playlist, locked
+ * \param index    the index to play at
+ * \return VLC_SUCCESS on success, another value on error
+ */
+static inline int
+vlc_playlist_PlayAt(vlc_playlist_t *playlist, size_t index)
+{
+    int ret = vlc_playlist_GoTo(playlist, index);
+    if (ret != VLC_SUCCESS)
+        return ret;
+    return vlc_playlist_Start(playlist);
+}
+
+/**
+ * Preparse a media, and expand it in the playlist on subitems added.
+ *
+ * \param playlist the playlist (not necessarily locked)
+ * \param libvlc the libvlc instance
+ * \param media the media to preparse
+ */
+VLC_API void
+vlc_playlist_Preparse(vlc_playlist_t *playlist, libvlc_int_t *libvlc,
+                      input_item_t *media);
 
 /** @} */
 # ifdef __cplusplus

@@ -2,7 +2,6 @@
  * core.c: Core libvlc new API functions : initialization
  *****************************************************************************
  * Copyright (C) 2005 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *

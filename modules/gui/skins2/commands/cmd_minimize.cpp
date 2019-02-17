@@ -2,7 +2,6 @@
  * cmd_minimize.cpp
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
- * $Id$
  *
  * Authors: Mohammed Adnène Trojette     <adn@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>

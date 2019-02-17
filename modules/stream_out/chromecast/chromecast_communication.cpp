@@ -55,7 +55,7 @@ ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module,
                                    NULL, NULL );
     if (m_tls == NULL)
     {
-        vlc_tls_Delete(m_creds);
+        vlc_tls_ClientDelete(m_creds);
         throw std::runtime_error( "Failed to create client session" );
     }
 
@@ -76,7 +76,7 @@ void ChromecastCommunication::disconnect()
     if ( m_tls != NULL )
     {
         vlc_tls_Close(m_tls);
-        vlc_tls_Delete(m_creds);
+        vlc_tls_ClientDelete(m_creds);
         m_tls = NULL;
     }
 }
@@ -121,9 +121,6 @@ int ChromecastCommunication::buildMessage(const std::string & namespace_,
 ssize_t ChromecastCommunication::receive( uint8_t *p_data, size_t i_size, int i_timeout, bool *pb_timeout )
 {
     ssize_t i_received = 0;
-    struct pollfd ufd[1];
-    ufd[0].fd = vlc_tls_GetFD( m_tls );
-    ufd[0].events = POLLIN;
 
     struct iovec iov;
     iov.iov_base = p_data;
@@ -146,6 +143,11 @@ ssize_t ChromecastCommunication::receive( uint8_t *p_data, size_t i_size, int i_
             {
                 return -1;
             }
+
+            struct pollfd ufd[1];
+            ufd[0].events = POLLIN;
+            ufd[0].fd = vlc_tls_GetPollFD( m_tls, &ufd[0].events );
+
             ssize_t val = vlc_poll_i11e(ufd, 1, i_timeout);
             if ( val < 0 )
                 return -1;

@@ -2,7 +2,6 @@
  * directdraw.c: Windows DirectDraw video output
  *****************************************************************************
  * Copyright (C) 2001-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -93,8 +92,9 @@
 #define DX_HELP N_("Recommended video output for Windows XP. " \
     "Incompatible with Vista's Aero interface" )
 
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static int  Open (vout_display_t *, const vout_display_cfg_t *,
+                  video_format_t *, vlc_video_context *);
+static void Close(vout_display_t *);
 
 static int FindDevicesCallback(const char *, char ***, char ***);
 
@@ -114,7 +114,7 @@ vlc_module_begin()
     add_string("directx-device", "", DEVICE_TEXT, DEVICE_LONGTEXT, true)
         change_string_cb(FindDevicesCallback)
 
-    set_capability("vout display", 230)
+    set_capability("vout display", 180)
     add_shortcut("directx", "directdraw")
     set_callbacks(Open, Close)
 vlc_module_end()
@@ -184,9 +184,9 @@ static void WallpaperChange(vout_display_t *vd, bool use_wallpaper);
 
 /** This function allocates and initialize the DirectX vout display.
  */
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
     /* Allocate structure */
@@ -210,20 +210,19 @@ static int Open(vlc_object_t *object)
     var_Create(vd, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
     /* Initialisation */
-    if (CommonInit(vd))
+    if (CommonInit(vd, false, cfg))
         goto error;
 
     /* */
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt = *fmtp;
 
     if (DirectXOpen(vd, &fmt))
         goto error;
 
-    /* */
-    vout_display_info_t info = vd->info;
-    info.is_slow = true;
-    info.has_double_click = true;
-    info.has_pictures_invalid = true;
+    /* Setup vout_display now that everything is fine */
+    vd->info.is_slow = true;
+    vd->info.has_double_click = true;
+    vd->info.has_pictures_invalid = true;
 
     /* Interaction TODO support starting with wallpaper mode */
     vlc_mutex_init(&sys->lock);
@@ -234,10 +233,8 @@ static int Open(vlc_object_t *object)
     var_Change(vd, "video-wallpaper", VLC_VAR_SETTEXT, _("Wallpaper"));
     var_AddCallback(vd, "video-wallpaper", WallpaperCallback, NULL);
 
-    /* Setup vout_display now that everything is fine */
-    video_format_Clean(&vd->fmt);
-    video_format_Copy(&vd->fmt, &fmt);
-    vd->info    = info;
+    video_format_Clean(fmtp);
+    video_format_Copy(fmtp, &fmt);
 
     vd->pool    = Pool;
     vd->prepare = NULL;
@@ -256,9 +253,8 @@ error:
 
 /** Terminate a vout display created by Open.
  */
-static void Close(vlc_object_t *object)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
 
     var_DelCallback(vd, "video-wallpaper", WallpaperCallback, NULL);
@@ -346,9 +342,13 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
     switch (query) {
     case VOUT_DISPLAY_RESET_PICTURES:
+    {
+        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
+        video_format_t *fmt = va_arg(args, video_format_t *);
         DirectXClose(vd);
         /* Make sure the wallpaper is restored */
         if (sys->use_wallpaper) {
+
             vlc_mutex_lock(&sys->lock);
             if (!sys->ch_wallpaper) {
                 sys->ch_wallpaper = true;
@@ -358,7 +358,9 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
             WallpaperChange(vd, false);
         }
-        return DirectXOpen(vd, &vd->fmt);
+        (void) cfg;
+        return DirectXOpen(vd, fmt);
+    }
     default:
         return CommonControl(vd, query, args);
     }
@@ -427,7 +429,7 @@ static int DirectXOpen(vout_display_t *vd, video_format_t *fmt)
         msg_Err(vd, "cannot initialize DirectX DirectDraw");
         return VLC_EGENERIC;
     }
-    UpdateRects(vd, NULL, true);
+    UpdateRects(vd, true);
 
     /* Create the picture pool */
     if (DirectXCreatePool(vd, &sys->sys.use_overlay, fmt)) {
@@ -438,17 +440,20 @@ static int DirectXOpen(vout_display_t *vd, video_format_t *fmt)
     /* */
     if (sys->sys.use_overlay)
         DirectXUpdateOverlay(vd, NULL);
-    EventThreadUseOverlay(sys->sys.event, sys->sys.use_overlay);
+    if (!sys->sys.b_windowless)
+    {
+        EventThreadUseOverlay(sys->sys.event, sys->sys.use_overlay);
 
-    /* Change the window title bar text */
-    const char *fallback;
-    if (sys->sys.use_overlay)
-        fallback = VOUT_TITLE " (hardware YUV overlay DirectX output)";
-    else if (vlc_fourcc_IsYUV(fmt->i_chroma))
-        fallback = VOUT_TITLE " (hardware YUV DirectX output)";
-    else
-        fallback = VOUT_TITLE " (software RGB DirectX output)";
-    EventThreadUpdateTitle(sys->sys.event, fallback);
+        /* Change the window title bar text */
+        const char *fallback;
+        if (sys->sys.use_overlay)
+            fallback = VOUT_TITLE " (hardware YUV overlay DirectX output)";
+        else if (vlc_fourcc_IsYUV(fmt->i_chroma))
+            fallback = VOUT_TITLE " (hardware YUV DirectX output)";
+        else
+            fallback = VOUT_TITLE " (software RGB DirectX output)";
+        EventThreadUpdateTitle(sys->sys.event, fallback);
+    }
 
     return VLC_SUCCESS;
 }
@@ -1272,6 +1277,10 @@ static void DirectXUnlock(picture_t *picture)
     DirectXUnlockSurface(p_sys->front_surface,
                          p_sys->surface);
 }
+static void DirectXDestroyPicture(picture_t *picture)
+{
+    free(picture->p_sys);
+}
 
 static int DirectXCreatePool(vout_display_t *vd,
                              bool *use_overlay, video_format_t *fmt)
@@ -1285,7 +1294,9 @@ static int DirectXCreatePool(vout_display_t *vd,
         return VLC_EGENERIC;
 
     /* Create the associated picture */
-    picture_resource_t resource = { .p_sys = sys->picsys };
+    picture_resource_t resource = {
+        .p_sys = sys->picsys, .pf_destroy = DirectXDestroyPicture,
+    };
     picture_t *picture = picture_NewFromResource(fmt, &resource);
     if (!picture) {
         DirectXDestroyPictureResource(vd);
@@ -1341,12 +1352,25 @@ static int DirectXUpdateOverlay(vout_display_t *vd, LPDIRECTDRAWSURFACE2 surface
         src.bottom = vd->source.i_y_offset + vd->source.i_visible_height;
         AlignRect(&src, sys->sys.i_align_src_boundary, sys->sys.i_align_src_size);
 
-        vout_display_cfg_t cfg = *vd->cfg;
+        vout_display_cfg_t cfg = sys->sys.vdcfg;
         cfg.display.width  = sys->sys.rect_display.right;
         cfg.display.height = sys->sys.rect_display.bottom;
 
         vout_display_place_t place;
-        vout_display_PlacePicture(&place, &vd->source, &cfg, true);
+        vout_display_PlacePicture(&place, &vd->source, &cfg);
+
+        if (place.x < 0) {
+            place.width += -place.x;
+            place.x = 0;
+        }
+        if (place.y < 0) {
+            place.height += -place.y;
+            place.y = 0;
+        }
+        if (place.width > cfg.display.width)
+            place.width = cfg.display.width;
+        if (place.height > cfg.display.height)
+            place.height = cfg.display.height;
 
         dst.left   = sys->sys.rect_display.left + place.x;
         dst.top    = sys->sys.rect_display.top  + place.y;

@@ -273,6 +273,7 @@ Filter(filter_t * filter, picture_t * src,
                                          VAProcPipelineParameterBuffer *))
 {
     filter_sys_t *const filter_sys = filter->p_sys;
+    VABufferID          pipeline_buf = VA_INVALID_ID;
     picture_t *const    dest = picture_pool_Wait(filter_sys->dest_pics);
     if (!dest)
         return NULL;
@@ -301,7 +302,6 @@ Filter(filter_t * filter, picture_t * src,
     if (pf_prepare_render_surface)
         pf_prepare_render_surface(filter_sys->p_data);
 
-    VABufferID                          pipeline_buf = VA_INVALID_ID;
     VAProcPipelineParameterBuffer *     pipeline_params;
 
     pipeline_buf =

@@ -34,6 +34,7 @@
 #endif
 
 #include "upnp-wrapper.hpp"
+#include <vlc_cxx_helpers.hpp>
 
 UpnpInstanceWrapper* UpnpInstanceWrapper::s_instance;
 UpnpInstanceWrapper::Listeners UpnpInstanceWrapper::s_listeners;
@@ -129,6 +130,7 @@ UpnpClient_Handle UpnpInstanceWrapper::handle() const
 
 int UpnpInstanceWrapper::Callback(Upnp_EventType event_type, UpnpEventPtr p_event, void *p_user_data)
 {
+    vlc::threads::mutex_locker lock( &s_lock );
     for (Listeners::iterator iter = s_listeners.begin(); iter != s_listeners.end(); ++iter)
     {
         (*iter)->onEvent(event_type, p_event, p_user_data);
@@ -139,26 +141,15 @@ int UpnpInstanceWrapper::Callback(Upnp_EventType event_type, UpnpEventPtr p_even
 
 void UpnpInstanceWrapper::addListener(ListenerPtr listener)
 {
-    vlc_mutex_lock( &s_lock );
-    if ( std::find( s_listeners.begin(), s_listeners.end(), listener) != s_listeners.end() )
-    {
-        vlc_mutex_unlock( &s_lock );
-        return;
-    }
-    s_listeners.push_back( std::move(listener) );
-    vlc_mutex_unlock( &s_lock );
+    vlc::threads::mutex_locker lock( &s_lock );
+    if ( std::find( s_listeners.begin(), s_listeners.end(), listener) == s_listeners.end() )
+        s_listeners.push_back( std::move(listener) );
 }
 
 void UpnpInstanceWrapper::removeListener(ListenerPtr listener)
 {
-    vlc_mutex_lock( &s_lock );
+    vlc::threads::mutex_locker lock( &s_lock );
     Listeners::iterator iter = std::find( s_listeners.begin(), s_listeners.end(), listener );
-    if ( iter == s_listeners.end() )
-    {
-        vlc_mutex_unlock( &s_lock );
-        return;
-    }
-
-    s_listeners.erase( iter );
-    vlc_mutex_unlock( &s_lock );
+    if ( iter != s_listeners.end() )
+        s_listeners.erase( iter );
 }

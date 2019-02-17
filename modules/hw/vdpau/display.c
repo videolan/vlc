@@ -32,14 +32,14 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_picture_pool.h>
 #include <vlc_xlib.h>
 
 #include "vlc_vdpau.h"
 #include "events.h"
 
-static int Open(vlc_object_t *);
-static void Close(vlc_object_t *);
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 
 vlc_module_begin()
     set_shortname(N_("VDPAU"))
@@ -62,106 +62,10 @@ struct vout_display_sys_t
     VdpDevice device; /**< VDPAU device handle */
     VdpPresentationQueueTarget target; /**< VDPAU presentation queue target */
     VdpPresentationQueue queue; /**< VDPAU presentation queue */
-    VdpRGBAFormat rgb_fmt; /**< Output surface format */
 
-    picture_pool_t *pool; /**< pictures pool */
+    unsigned width;
+    unsigned height;
 };
-
-static void pictureSys_DestroyVDPAU(picture_sys_t *psys)
-{
-    vdp_output_surface_destroy(psys->vdp, psys->surface);
-    vdp_release_x11(psys->vdp);
-    free(psys);
-}
-
-static void PictureDestroyVDPAU(picture_t *pic)
-{
-    pictureSys_DestroyVDPAU(pic->p_sys);
-    free(pic);
-}
-
-static VdpStatus picture_NewVDPAU(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
-                                  const video_format_t *restrict fmt,
-                                  picture_t **restrict picp)
-{
-    picture_sys_t *psys = malloc(sizeof (*psys));
-    if (unlikely(psys == NULL))
-        return VDP_STATUS_RESOURCES;
-
-    psys->vdp = vdp_hold_x11(vdp, &psys->device);
-
-    VdpStatus err = vdp_output_surface_create(psys->vdp, psys->device,
-                          rgb_fmt, fmt->i_visible_width, fmt->i_visible_height,
-                                              &psys->surface);
-    if (err != VDP_STATUS_OK)
-    {
-        vdp_release_x11(psys->vdp);
-        free(psys);
-        return err;
-    }
-
-    picture_resource_t res = {
-        .p_sys = psys,
-        .pf_destroy = PictureDestroyVDPAU,
-    };
-
-    picture_t *pic = picture_NewFromResource(fmt, &res);
-    if (unlikely(pic == NULL))
-    {
-        pictureSys_DestroyVDPAU(psys);
-        return VDP_STATUS_RESOURCES;
-    }
-    *picp = pic;
-    return VDP_STATUS_OK;
-}
-
-static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
-{
-    vout_display_sys_t *sys = vd->sys;
-    picture_t *pics[requested_count];
-
-    unsigned count = 0;
-    while (count < requested_count)
-    {
-        VdpStatus err = picture_NewVDPAU(sys->vdp, sys->rgb_fmt, &vd->fmt,
-                                         pics + count);
-        if (err != VDP_STATUS_OK)
-        {
-            msg_Err(vd, "%s creation failure: %s", "output surface",
-                    vdp_get_error_string(sys->vdp, err));
-            break;
-        }
-        count++;
-    }
-    sys->current = NULL;
-
-    if (count == 0)
-        return NULL;
-
-    picture_pool_t *pool = picture_pool_New(count, pics);
-    if (unlikely(pool == NULL))
-        while (count > 0)
-            picture_Release(pics[--count]);
-    return pool;
-}
-
-static void PoolFree(vout_display_t *vd, picture_pool_t *pool)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (sys->current != NULL)
-        picture_Release(sys->current);
-    picture_pool_Release(pool);
-}
-
-static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (sys->pool == NULL)
-        sys->pool = PoolAlloc(vd, requested_count);
-    return sys->pool;
-}
 
 static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
                          const subpicture_t *subpic,
@@ -203,17 +107,17 @@ static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
 
     /* Render onto main surface */
     VdpRect area = {
-        reg->i_x * vd->fmt.i_visible_width
+        reg->i_x * sys->width
             / subpic->i_original_picture_width,
-        reg->i_y * vd->fmt.i_visible_height
+        reg->i_y * sys->height
             / subpic->i_original_picture_height,
-        (reg->i_x + reg->fmt.i_visible_width) * vd->fmt.i_visible_width
+        (reg->i_x + reg->fmt.i_visible_width) * sys->width
             / subpic->i_original_picture_width,
-        (reg->i_y + reg->fmt.i_visible_height) * vd->fmt.i_visible_height
+        (reg->i_y + reg->fmt.i_visible_height) * sys->height
             / subpic->i_original_picture_height,
     };
     VdpColor color = { 1.f, 1.f, 1.f,
-        reg->i_alpha * subpic->i_alpha / 65535.f };
+        reg->i_alpha * subpic->i_alpha / 65025.f };
     VdpOutputSurfaceRenderBlendState state = {
         .struct_version = VDP_OUTPUT_SURFACE_RENDER_BLEND_STATE_VERSION,
         .blend_factor_source_color =
@@ -243,7 +147,7 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                   vlc_tick_t date)
 {
     vout_display_sys_t *sys = vd->sys;
-    picture_sys_t *p_sys = pic->p_sys;
+    vlc_vdp_output_surface_t *p_sys = pic->p_sys;
     VdpOutputSurface surface = p_sys->surface;
     VdpStatus err;
 
@@ -268,8 +172,6 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     {
         msg_Err(vd, "presentation queue time failure: %s",
                 vdp_get_error_string(sys->vdp, err));
-        if (err == VDP_STATUS_DISPLAY_PREEMPTED)
-            vout_display_SendEventPicturesInvalid(vd);
         return;
     }
 
@@ -299,7 +201,7 @@ static void Wait(vout_display_t *vd, picture_t *pic)
     picture_t *current = sys->current;
     if (current != NULL)
     {
-        picture_sys_t *psys = current->p_sys;
+        vlc_vdp_output_surface_t *psys = current->p_sys;
         VdpTime pts;
         VdpStatus err;
 
@@ -330,23 +232,18 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     {
     case VOUT_DISPLAY_RESET_PICTURES:
     {
-        msg_Dbg(vd, "resetting pictures");
-        if (sys->pool != NULL)
-        {
-            PoolFree(vd, sys->pool);
-            sys->pool = NULL;
-        }
-
+        const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
+        video_format_t *fmt = va_arg(ap, video_format_t *);
         const video_format_t *src= &vd->source;
-        video_format_t *fmt = &vd->fmt;
         vout_display_place_t place;
 
-        vout_display_PlacePicture(&place, src, vd->cfg, false);
+        msg_Dbg(vd, "resetting pictures");
+        vout_display_PlacePicture(&place, src, cfg);
 
         fmt->i_width = src->i_width * place.width / src->i_visible_width;
         fmt->i_height = src->i_height * place.height / src->i_visible_height;
-        fmt->i_visible_width  = place.width;
-        fmt->i_visible_height = place.height;
+        sys->width = fmt->i_visible_width = place.width;
+        sys->height = fmt->i_visible_height = place.height;
         fmt->i_x_offset = src->i_x_offset * place.width / src->i_visible_width;
         fmt->i_y_offset = src->i_y_offset * place.height / src->i_visible_height;
 
@@ -363,13 +260,10 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
         vout_display_place_t place;
 
-        vout_display_PlacePicture(&place, &vd->source, cfg, false);
+        vout_display_PlacePicture(&place, &vd->source, cfg);
         if (place.width  != vd->fmt.i_visible_width
          || place.height != vd->fmt.i_visible_height)
-        {
-            vout_display_SendEventPicturesInvalid(vd);
-            return VLC_SUCCESS;
-        }
+            return VLC_EGENERIC;
 
         const uint32_t values[] = { place.x, place.y,
                                     place.width, place.height, };
@@ -383,8 +277,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        vout_display_SendEventPicturesInvalid (vd);
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
     default:
         msg_Err(vd, "unknown control request %d", query);
         return VLC_EGENERIC;
@@ -408,30 +301,30 @@ static int xcb_screen_num(xcb_connection_t *conn, const xcb_screen_t *screen)
     return -1;
 }
 
-static int Open(vlc_object_t *obj)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    if (!vlc_xlib_init(obj))
+    if (!vlc_xlib_init(VLC_OBJECT(vd)))
         return VLC_EGENERIC;
 
-    vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
     const xcb_screen_t *screen;
-    if (vlc_xcb_parent_Create(vd, &sys->conn, &screen) == NULL)
+    if (vlc_xcb_parent_Create(vd, cfg, &sys->conn, &screen) == NULL)
     {
         free(sys);
         return VLC_EGENERIC;
     }
 
     /* Load the VDPAU back-end and create a device instance */
-    VdpStatus err = vdp_get_x11(vd->cfg->window->display.x11,
+    VdpStatus err = vdp_get_x11(cfg->window->display.x11,
                                 xcb_screen_num(sys->conn, screen),
                                 &sys->vdp, &sys->device);
     if (err != VDP_STATUS_OK)
     {
-        msg_Dbg(obj, "device creation failure: error %d", (int)err);
+        msg_Dbg(vd, "device creation failure: error %d", (int)err);
         xcb_disconnect(sys->conn);
         free(sys);
         return VLC_EGENERIC;
@@ -446,7 +339,7 @@ static int Open(vlc_object_t *obj)
     VdpChromaType chroma;
     VdpYCbCrFormat format;
 
-    video_format_ApplyRotation(&fmt, &vd->fmt);
+    video_format_ApplyRotation(&fmt, fmtp);
 
     if (fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
      || fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_422
@@ -527,40 +420,8 @@ static int Open(vlc_object_t *obj)
     }
     fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
 
-    /* Select surface format */
-    static const VdpRGBAFormat rgb_fmts[] = {
-        VDP_RGBA_FORMAT_R10G10B10A2, VDP_RGBA_FORMAT_B10G10R10A2,
-        VDP_RGBA_FORMAT_B8G8R8A8, VDP_RGBA_FORMAT_R8G8B8A8,
-    };
-    unsigned i;
-
-    for (i = 0; i < sizeof (rgb_fmts) / sizeof (rgb_fmts[0]); i++)
-    {
-        uint32_t w, h;
-        VdpBool ok;
-
-        err = vdp_output_surface_query_capabilities(sys->vdp, sys->device,
-                                                    rgb_fmts[i], &ok, &w, &h);
-        if (err != VDP_STATUS_OK)
-        {
-            msg_Err(vd, "%s capabilities query failure: %s", "output surface",
-                    vdp_get_error_string(sys->vdp, err));
-            continue;
-        }
-        /* NOTE: Wrong! No warranties that zoom <= 100%! */
-        if (!ok || w < fmt.i_width || h < fmt.i_height)
-            continue;
-
-        sys->rgb_fmt = rgb_fmts[i];
-        msg_Dbg(vd, "using RGBA format %u", sys->rgb_fmt);
-        break;
-    }
-    if (i == sizeof (rgb_fmts) / sizeof (rgb_fmts[0]))
-    {
-        msg_Err(vd, "no supported output surface format");
-        goto error;
-    }
-
+    sys->width = fmtp->i_visible_width;
+    sys->height = fmtp->i_visible_height;
     /* VDPAU-X11 requires a window dedicated to the back-end */
     {
         xcb_pixmap_t pix = xcb_generate_id(sys->conn);
@@ -577,12 +438,12 @@ static int Open(vlc_object_t *obj)
         };
         vout_display_place_t place;
 
-        vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
+        vout_display_PlacePicture(&place, &vd->source, cfg);
         sys->window = xcb_generate_id(sys->conn);
 
         xcb_void_cookie_t c =
             xcb_create_window_checked(sys->conn, screen->root_depth,
-                sys->window, vd->cfg->window->handle.xid, place.x, place.y,
+                sys->window, cfg->window->handle.xid, place.x, place.y,
                 place.width, place.height, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT,
                 screen->root_visual, mask, values);
         if (vlc_xcb_error_Check(vd, sys->conn, "window creation failure", c))
@@ -634,19 +495,18 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    sys->pool = NULL;
-
     /* */
+    sys->current = NULL;
     vd->sys = sys;
     vd->info.has_pictures_invalid = true;
     vd->info.subpicture_chromas = spu_chromas;
-    vd->fmt = fmt;
+    *fmtp = fmt;
 
-    vd->pool = Pool;
     vd->prepare = Queue;
     vd->display = Wait;
     vd->control = Control;
 
+    (void) context;
     return VLC_SUCCESS;
 
 error:
@@ -656,16 +516,15 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Close(vlc_object_t *obj)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
 
     vdp_presentation_queue_destroy(sys->vdp, sys->queue);
     vdp_presentation_queue_target_destroy(sys->vdp, sys->target);
 
-    if (sys->pool != NULL)
-        PoolFree(vd, sys->pool);
+    if (sys->current != NULL)
+        picture_Release(sys->current);
 
     vdp_release_x11(sys->vdp);
     xcb_disconnect(sys->conn);

@@ -21,9 +21,15 @@ endif
 libdsm: libdsm-$(LIBDSM_VERSION).tar.gz .sum-libdsm
 	$(UNPACK)
 	$(APPLY) $(SRC)/libdsm/0001-build-fix-nl_langinfo-detection-on-Android.patch
+	$(APPLY) $(SRC)/libdsm/fix-pc-generation.patch
+	$(APPLY) $(SRC)/libdsm/fix-pipe-compat.patch
+	$(APPLY) $(SRC)/libdsm/0001-compat-Don-t-use-_pipe-when-building-for-winstore.patch
 	$(MOVE)
 
 DEPS_libdsm = libtasn1 iconv
+ifdef HAVE_WIN32
+DEPS_libdsm += pthreads $(DEPS_pthreads)
+endif
 
 .libdsm: libdsm
 	$(RECONF)

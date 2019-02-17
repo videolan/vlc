@@ -2,7 +2,6 @@
  * glwin32.c: Windows OpenGL provider
  *****************************************************************************
  * Copyright (C) 2001-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -35,15 +34,15 @@
 
 #define GLEW_STATIC
 #include "../opengl/vout_helper.h"
-#include <GL/wglew.h>
 
 #include "common.h"
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static int  Open (vout_display_t *, const vout_display_cfg_t *,
+                  video_format_t *, vlc_video_context *);
+static void Close(vout_display_t *);
 
 vlc_module_begin()
     set_category(CAT_VIDEO)
@@ -83,11 +82,9 @@ static int Control(vout_display_t *vd, int query, va_list args)
     return CommonControl(vd, query, args);
 }
 
-static int EmbedVideoWindow_Control(vout_window_t *wnd, int query, va_list ap)
+static const struct vout_window_operations embedVideoWindow_Ops =
 {
-    VLC_UNUSED( ap ); VLC_UNUSED( query );
-    return VLC_EGENERIC;
-}
+};
 
 static vout_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
 {
@@ -102,20 +99,20 @@ static vout_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
 
     wnd->type = VOUT_WINDOW_TYPE_HWND;
     wnd->handle.hwnd = sys->sys.hvideownd;
-    wnd->control = EmbedVideoWindow_Control;
+    wnd->ops = &embedVideoWindow_Ops;
     return wnd;
 }
 
 /**
  * It creates an OpenGL vout display.
  */
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
     /* do not use OpenGL on XP unless forced */
-    if(!object->obj.force && !IsWindowsVistaOrGreater())
+    if(!vd->obj.force && !IsWindowsVistaOrGreater())
         return VLC_EGENERIC;
 
     /* Allocate structure */
@@ -124,17 +121,18 @@ static int Open(vlc_object_t *object)
         return VLC_ENOMEM;
 
     /* */
-    if (CommonInit(vd))
+    if (CommonInit(vd, false, cfg))
         goto error;
 
-    EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (OpenGL output)");
+    if (!sys->sys.b_windowless)
+        EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (OpenGL output)");
 
     vout_window_t *surface = EmbedVideoWindow_Create(vd);
     if (!surface)
         goto error;
 
     char *modlist = var_InheritString(surface, "gl");
-    sys->gl = vlc_gl_Create (surface, VLC_OPENGL, modlist);
+    sys->gl = vlc_gl_Create(cfg, VLC_OPENGL, modlist);
     free(modlist);
     if (!sys->gl)
     {
@@ -142,25 +140,23 @@ static int Open(vlc_object_t *object)
         goto error;
     }
 
-    vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
+    vlc_gl_Resize (sys->gl, cfg->display.width, cfg->display.height);
 
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt = *fmtp;
     const vlc_fourcc_t *subpicture_chromas;
     if (vlc_gl_MakeCurrent (sys->gl))
         goto error;
     sys->vgl = vout_display_opengl_New(&fmt, &subpicture_chromas, sys->gl,
-                                       &vd->cfg->viewpoint);
+                                       &cfg->viewpoint);
     vlc_gl_ReleaseCurrent (sys->gl);
     if (!sys->vgl)
         goto error;
 
-    vout_display_info_t info = vd->info;
-    info.has_double_click = true;
-    info.subpicture_chromas = subpicture_chromas;
+    /* Setup vout_display now that everything is fine */
+    vd->info.has_double_click = true;
+    vd->info.subpicture_chromas = subpicture_chromas;
 
-   /* Setup vout_display now that everything is fine */
-    vd->fmt  = fmt;
-    vd->info = info;
+    *fmtp    = fmt;
 
     vd->pool    = Pool;
     vd->prepare = Prepare;
@@ -170,16 +166,15 @@ static int Open(vlc_object_t *object)
     return VLC_SUCCESS;
 
 error:
-    Close(object);
+    Close(vd);
     return VLC_EGENERIC;
 }
 
 /**
  * It destroys an OpenGL vout display.
  */
-static void Close(vlc_object_t *object)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
     vlc_gl_t *gl = sys->gl;
 

@@ -38,4 +38,7 @@ AM_LDFLAGS += $(top_builddir)/modules/module.rc.lo -Wc,-static
 endif
 AM_YFLAGS = -d
 
-SUFFIXES = .l .y
+SUFFIXES = .l .y .asm
+
+.asm.lo:
+	$(LIBTOOL) --mode=compile --tag=ASM $(X86ASM) $(X86ASMFLAGS) $(X86ASMDEFS) -I$(top_srcdir)/extras/include/x86/ $< -o $@

@@ -3,7 +3,6 @@
  *****************************************************************************
  * Copyright (C) 2005-2010 VLC authors and VideoLAN
  *
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Filippo Carone <littlejohn@videolan.org>
@@ -31,6 +30,7 @@
 
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_renderer_discoverer.h>
+#include <vlc/libvlc_picture.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_media_player.h>
 

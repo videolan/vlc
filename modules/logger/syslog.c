@@ -101,7 +101,19 @@ static int var_InheritFacility(vlc_object_t *obj, const char *varname)
 
 static const char default_ident[] = PACKAGE;
 
-static vlc_log_cb Open(vlc_object_t *obj, void **sysp)
+static void Close(void *opaque)
+{
+    char *ident = opaque;
+
+    closelog();
+    if (ident != default_ident)
+        free(ident);
+}
+
+static const struct vlc_logger_operations ops = { Log, Close };
+
+static const struct vlc_logger_operations *Open(vlc_object_t *obj,
+                                                void **restrict sysp)
 {
     if (!var_InheritBool(obj, "syslog"))
         return NULL;
@@ -123,16 +135,7 @@ static vlc_log_cb Open(vlc_object_t *obj, void **sysp)
 
     setlogmask(mask);
 
-    return Log;
-}
-
-static void Close(void *opaque)
-{
-    char *ident = opaque;
-
-    closelog();
-    if (ident != default_ident)
-        free(ident);
+    return &ops;
 }
 
 #define SYSLOG_TEXT N_("System log (syslog)")
@@ -153,7 +156,7 @@ vlc_module_begin()
     set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
     set_capability("logger", 20)
-    set_callbacks(Open, Close)
+    set_callbacks(Open, NULL)
 
     add_bool("syslog", false, SYSLOG_TEXT, SYSLOG_LONGTEXT,
              false)

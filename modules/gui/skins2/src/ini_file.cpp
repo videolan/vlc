@@ -2,7 +2,6 @@
  * ini_file.cpp
  *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
- * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *

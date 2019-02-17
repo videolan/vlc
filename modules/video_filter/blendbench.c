@@ -2,7 +2,6 @@
  * blendbench.c : blending benchmark plugin for vlc
  *****************************************************************************
  * Copyright (C) 2007 VLC authors and VideoLAN
- * $Id$
  *
  * Author: Søren Bøg <avacore@videolan.org>
  *
@@ -123,14 +122,13 @@ static int blendbench_LoadImage( vlc_object_t *p_this, picture_t **pp_pic,
                                  vlc_fourcc_t i_chroma, char *psz_file, const char *psz_name )
 {
     image_handler_t *p_image;
-    video_format_t fmt_in, fmt_out;
+    video_format_t fmt_out;
 
-    memset( &fmt_in, 0, sizeof(video_format_t) );
-    memset( &fmt_out, 0, sizeof(video_format_t) );
+    video_format_Init( &fmt_out, i_chroma );
 
-    fmt_out.i_chroma = i_chroma;
     p_image = image_HandlerCreate( p_this );
-    *pp_pic = image_ReadUrl( p_image, psz_file, &fmt_in, &fmt_out );
+    *pp_pic = image_ReadUrl( p_image, psz_file, &fmt_out );
+    video_format_Clean( &fmt_out );
     image_HandlerDelete( p_image );
 
     if( *pp_pic == NULL )

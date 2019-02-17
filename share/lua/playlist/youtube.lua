@@ -107,11 +107,11 @@ function js_descramble( sig, js_url )
     end
 
     -- Look for the descrambler function's name
-    -- k.s&&f.set(k.sp,DK(k.s));
+    -- k.s&&f.set(k.sp,(0,window.encodeURIComponent)(DK((0,window.decodeURIComponent)(k.s))));
     -- k.s (from stream map field "s") holds the input scrambled signature
     -- k.sp (from stream map field "sp") holds a parameter name (normally
     -- "signature") to set with the output, descrambled signature
-    local descrambler = js_extract( js, "%.set%([^,]-%.sp,([^)]-)%(" )
+    local descrambler = js_extract( js, "%.set%([^,]-%.sp,[^;]-%((..)%(" )
     if not descrambler then
         vlc.msg.dbg( "Couldn't extract youtube video URL signature descrambling function name" )
         return sig
@@ -316,7 +316,7 @@ function parse()
                 if not path then
                     -- If this is a live stream, the URL map will be empty
                     -- and we get the URL from this field instead
-                    local hlsvp = string.match( line, "\"hlsvp\": *\"(.-)\"" )
+                    local hlsvp = string.match( line, '\\"hlsManifestUrl\\": *\\"(.-)\\"' )
                     if hlsvp then
                         hlsvp = string.gsub( hlsvp, "\\/", "/" )
                         path = hlsvp
@@ -372,7 +372,7 @@ function parse()
         if not path then
             -- If this is a live stream, the URL map will be empty
             -- and we get the URL from this field instead
-            local hlsvp = string.match( line, "&hlsvp=([^&]*)" )
+            local hlsvp = string.match( line, "%%22hlsManifestUrl%%22%%3A%%22(.-)%%22" )
             if hlsvp then
                 hlsvp = vlc.strings.decode_uri( hlsvp )
                 path = hlsvp

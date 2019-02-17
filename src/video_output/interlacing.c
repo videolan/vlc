@@ -2,7 +2,6 @@
  * interlacing.c
  *****************************************************************************
  * Copyright (C) 2010 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
@@ -96,7 +95,7 @@ static int DeinterlaceCallback(vlc_object_t *object, char const *cmd,
     return VLC_SUCCESS;
 }
 
-void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
+void vout_InitInterlacingSupport(vout_thread_t *vout)
 {
     vlc_value_t val;
 
@@ -156,15 +155,11 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
     /* */
     val.psz_string = deinterlace_mode ? deinterlace_mode : optm->orig.psz;
     var_Change(vout, "deinterlace-mode", VLC_VAR_SETVALUE, val);
-    val.b_bool = is_interlaced;
-    var_Change(vout, "deinterlace-needed", VLC_VAR_SETVALUE, val);
 
     var_SetInteger(vout, "deinterlace", deinterlace_state);
     free(deinterlace_mode);
 
-    vout->p->interlacing.is_interlaced = is_interlaced;
-    if (is_interlaced)
-        vout->p->interlacing.date = vlc_tick_now();
+    vout->p->interlacing.is_interlaced = false;
 }
 
 void vout_ReinitInterlacingSupport(vout_thread_t *vout)

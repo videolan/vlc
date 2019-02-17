@@ -2,7 +2,6 @@
  * dynamicoverlay_commands.c : dynamic overlay plugin commands
  *****************************************************************************
  * Copyright (C) 2008 VLC authors and VideoLAN
- * $Id$
  *
  * Author: Søren Bøg <avacore@videolan.org>
  *         Jean-Paul Saman <jpsaman@videolan.org>

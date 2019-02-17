@@ -2,7 +2,6 @@
  * media_list.c: libvlc new API media list functions
  *****************************************************************************
  * Copyright (C) 2007 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
  *
@@ -28,6 +27,7 @@
 #include <assert.h>
 
 #include <vlc/libvlc.h>
+#include <vlc/libvlc_picture.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_media_list.h>
 #include <vlc/libvlc_events.h>

@@ -3,7 +3,6 @@
  *            (using libtwolame from http://www.twolame.org/)
  *****************************************************************************
  * Copyright (C) 2004-2005 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin

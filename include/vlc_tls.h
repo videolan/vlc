@@ -39,84 +39,135 @@
 
 # include <vlc_network.h>
 
-/** Transport layer socket */
+/**
+ * Transport layer socket.
+ *
+ * Transport layer sockets are full-duplex, meaning data can be sent and
+ * received at the same time. As such, it is permitted for two threads to
+ * use the same TLS simultaneously, if one thread is receiving data while the
+ * other is sending data. However receiving or rending data from two threads
+ * concurrently is undefined behaviour.
+ *
+ * The following functions are treated as sending data:
+ * - vlc_tls_Write(),
+ * - vlc_tls_Shutdown(),
+ * - callback vlc_tls_operations.writev,
+ * - callback vlc_tls_operations.shutdown.
+ *
+ * The following funcitons are treated as receiving data:
+ * - vlc_tls_Read(),
+ * - vlc_tls_GetLine(),
+ * - callback vlc_tls_operations.readv,
+ * - vlc_tls_Shutdown() if the duplex flag is true,
+ * - callback vlc_tls_operations.shutdown if the duplex flag is true.
+ */
 typedef struct vlc_tls
 {
+    /** Callbacks to operate on the stream. */
     const struct vlc_tls_operations *ops;
+    /** Reserved. Pointer to the underlying stream, or NULL if none. */
     struct vlc_tls *p;
 } vlc_tls_t;
 
 struct vlc_tls_operations
 {
-    int (*get_fd)(struct vlc_tls *);
-    ssize_t (*readv)(struct vlc_tls *, struct iovec *, unsigned);
-    ssize_t (*writev)(struct vlc_tls *, const struct iovec *, unsigned);
+    /** Callback for events polling.
+     *
+     * See \ref vlc_tls_GetPollFD().
+     */
+    int (*get_fd)(struct vlc_tls *, short *events);
+
+    /** Callback for receiving data.
+     *
+     * This callback receives/reads data into an I/O vector
+     * in non-blocking mode.
+     *
+     * @param iov I/O vector to read data into
+     * @param len number of entries of the I/O vector
+     * @return the number of bytes received or -1 on error
+     *
+     * If no data is available without blocking, the function returns -1 and
+     * sets @c errno to @c EAGAIN .
+     */
+    ssize_t (*readv)(struct vlc_tls *, struct iovec *iov, unsigned len);
+
+    /** Callback for sending data.
+     *
+     * This callback sends/writes data from an I/O vector
+     * in non-blocking mode.
+     *
+     * @param iov I/O vector to write data from
+     * @param len number of entries of the I/O vector
+     * @return the number of bytes sent or -1 on error
+     *
+     * If no data can be sent without blocking, the function returns -1 and
+     * sets @c errno to @c EAGAIN .
+     */
+    ssize_t (*writev)(struct vlc_tls *, const struct iovec *iov, unsigned len);
+
+    /** Callback for shutting down.
+     *
+     * This callback marks the end of the output (send/write) half of the
+     * stream. If the duplex flag is set, it also marks the end of the input
+     * (receive/read) half. See also \ref vlc_tls_Shutdown().
+     */
     int (*shutdown)(struct vlc_tls *, bool duplex);
+
+    /** Callback for closing.
+     *
+     * This callback terminates the stream and releases any associated
+     * resources. However, it does <b>not</b> destroy the underlying stream
+     * if there is one. See also \ref vlc_tls_SessionDelete().
+     */
     void (*close)(struct vlc_tls *);
 };
 
 /**
  * \defgroup tls Transport Layer Security
  * @{
+ * \defgroup tls_client TLS client
+ * @{
  */
 
 /**
- * TLS credentials
+ * TLS client-side credentials
  *
- * This structure contains the credentials for establishing TLS sessions.
- * This includes root Certificate Authorities (on client side),
- * trust and cryptographic parameters,
- * public certificates and private keys.
+ * This structure contains the credentials for establishing TLS sessions
+ * on client side, essentially the set of trusted root Certificate Authorities
+ * with which to validate certificate chains presented by servers.
  */
-typedef struct vlc_tls_creds
+typedef struct vlc_tls_client
 {
     struct vlc_common_members obj;
-
-    module_t *module;
+    const struct vlc_tls_client_operations *ops;
     void *sys;
+} vlc_tls_client_t;
 
-    vlc_tls_t *(*open)(struct vlc_tls_creds *, vlc_tls_t *sock,
+struct vlc_tls_client_operations
+{
+    vlc_tls_t *(*open)(struct vlc_tls_client *, vlc_tls_t *sock,
                        const char *host, const char *const *alpn);
-    int  (*handshake)(struct vlc_tls_creds *, vlc_tls_t *session,
+    int  (*handshake)(vlc_tls_t *session,
                       const char *hostname, const char *service,
                       char ** /*restrict*/ alp);
-} vlc_tls_creds_t;
+    void (*destroy)(struct vlc_tls_client *);
+};
 
 /**
- * Allocates TLS credentials for a client.
+ * Allocates TLS client-side credentials.
+ *
  * Credentials can be cached and reused across multiple TLS sessions.
  *
  * @return TLS credentials object, or NULL on error.
  **/
-VLC_API vlc_tls_creds_t *vlc_tls_ClientCreate(vlc_object_t *);
+VLC_API vlc_tls_client_t *vlc_tls_ClientCreate(vlc_object_t *);
 
 /**
- * Allocates server TLS credentials.
+ * Releases TLS client-side credentials.
  *
- * @param cert path to an x509 certificate (required)
- * @param key path to the PKCS private key for the certificate,
- *            or NULL to use cert path
- *
- * @return TLS credentials object, or NULL on error.
+ * Releases data allocated with vlc_tls_ClientCreate().
  */
-VLC_API vlc_tls_creds_t *vlc_tls_ServerCreate(vlc_object_t *, const char *cert,
-                                              const char *key);
-
-static inline int vlc_tls_SessionHandshake (vlc_tls_creds_t *crd,
-                                            vlc_tls_t *tls)
-{
-    return crd->handshake(crd, tls, NULL, NULL, NULL);
-}
-
-/**
- * Releases TLS credentials.
- *
- * Releases data allocated with vlc_tls_ClientCreate() or
- * vlc_tls_ServerCreate().
- *
- * @param srv object to be destroyed (or NULL)
- */
-VLC_API void vlc_tls_Delete(vlc_tls_creds_t *);
+VLC_API void vlc_tls_ClientDelete(vlc_tls_client_t *);
 
 /**
  * Initiates a client TLS session.
@@ -142,12 +193,61 @@ VLC_API void vlc_tls_Delete(vlc_tls_creds_t *);
  *
  * @return TLS session, or NULL on error.
  **/
-VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *creds,
+VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_client_t *creds,
                                                vlc_tls_t *sock,
                                                const char *host,
                                                const char *service,
                                                const char *const *alpn,
                                                char **alp);
+
+/**
+ * @}
+ * \defgroup tls_server TLS server
+ * @{
+ */
+
+/**
+ * TLS server-side credentials
+ *
+ * This structure contains the credentials for establishing TLS sessions.
+ * This includes root Certificate Authorities (on client side),
+ * trust and cryptographic parameters,
+ * public certificates and private keys.
+ */
+typedef struct vlc_tls_server
+{
+    struct vlc_common_members obj;
+    const struct vlc_tls_server_operations *ops;
+    void *sys;
+
+} vlc_tls_server_t;
+
+struct vlc_tls_server_operations
+{
+    vlc_tls_t *(*open)(struct vlc_tls_server *, vlc_tls_t *sock,
+                       const char *const *alpn);
+    int  (*handshake)(vlc_tls_t *session, char ** /*restrict*/ alp);
+    void (*destroy)(struct vlc_tls_server *);
+};
+
+/**
+ * Allocates server TLS credentials.
+ *
+ * @param cert path to an x509 certificate (required)
+ * @param key path to the PKCS private key for the certificate,
+ *            or NULL to use cert path
+ *
+ * @return TLS credentials object, or NULL on error.
+ */
+VLC_API vlc_tls_server_t *vlc_tls_ServerCreate(vlc_object_t *,
+                                               const char *cert,
+                                               const char *key);
+
+static inline int vlc_tls_SessionHandshake(vlc_tls_server_t *crd,
+                                           vlc_tls_t *tls)
+{
+    return crd->ops->handshake(tls, NULL);
+}
 
 /**
  * Creates a TLS server session.
@@ -168,14 +268,23 @@ VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *creds,
  *
  * @return TLS session, or NULL on error.
  */
-VLC_API vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *creds,
+VLC_API vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_server_t *creds,
                                                vlc_tls_t *sock,
                                                const char *const *alpn);
+
+/**
+ * Releases server-side TLS credentials.
+ *
+ * Releases data allocated with vlc_tls_ServerCreate().
+ */
+VLC_API void vlc_tls_ServerDelete(vlc_tls_server_t *);
+
+/** @} */
 
 /** @} */
 
 /**
- * Destroys a TLS session down.
+ * Destroys a TLS session.
  *
  * All resources associated with the TLS session are released.
  *
@@ -188,9 +297,35 @@ VLC_API vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *creds,
  */
 VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 
+/**
+ * Generates an event polling description.
+ *
+ * This function provides the necessary informations to make an event polling
+ * description for use with poll() or similar event multiplexing functions.
+ *
+ * This function is necessary both for receiving and sending data, therefore
+ * it is reentrant. It is not a cancellation point.
+ *
+ * @param events a pointer to a mask of poll events (e.g. POLLIN, POLLOUT)
+ *               [IN/OUT]
+ * @return the file descriptor to poll
+ */
+static inline int vlc_tls_GetPollFD(vlc_tls_t *tls, short *events)
+{
+    return tls->ops->get_fd(tls, events);
+}
+
+/**
+ * Returns the underlying file descriptor.
+ *
+ * This function returns the file descriptor underlying the transport layer
+ * stream object. This function is reentrant and is not a cancellation point.
+ */
 static inline int vlc_tls_GetFD(vlc_tls_t *tls)
 {
-    return tls->ops->get_fd(tls);
+    short events = 0;
+
+    return vlc_tls_GetPollFD(tls, &events);
 }
 
 /**
@@ -302,6 +437,14 @@ struct addrinfo;
  * - if the transport protocol is not TCP (IPPROTO_TCP), or
  * - if TCP Fast Open should be attempted.
  *
+ * @note If the @c defer_connect flag is @c true , data must be sent with a
+ * data sending function (other than vlc_tls_Shutdown()) before data can be
+ * received.
+ * Notwithstanding the thread-safety and reentrancy promises of \ref vlc_tls_t,
+ * the owner of the stream object is responsible for ensuring that data will be
+ * sent at least once before any attempt to receive data.
+ * Otherwise @c defer_connect must be @c false .
+ *
  * @param ai a filled addrinfo structure (the ai_next member is ignored)
  * @param defer_connect whether to attempt a TCP Fast Open connection or not
  */
@@ -329,9 +472,9 @@ VLC_API vlc_tls_t *vlc_tls_SocketOpenTCP(vlc_object_t *obj,
  * connection to the specified host and port number, and finally attempts to
  * establish a TLS session over the TCP/IP stream.
  *
- * See also vlc_tls_SocketOpenTCP() and vlc_tls_SessionCreate().
+ * See also vlc_tls_SocketOpenTCP() and vlc_tls_ClientSessionCreate().
  */
-VLC_API vlc_tls_t *vlc_tls_SocketOpenTLS(vlc_tls_creds_t *crd,
+VLC_API vlc_tls_t *vlc_tls_SocketOpenTLS(vlc_tls_client_t *crd,
                                          const char *hostname, unsigned port,
                                          const char *service,
                                          const char *const *alpn, char **alp);

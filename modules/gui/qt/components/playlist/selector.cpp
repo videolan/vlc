@@ -2,7 +2,6 @@
  * selector.cpp : Playlist source selector
  ****************************************************************************
  * Copyright (C) 2006-2009 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf
@@ -44,7 +43,7 @@
 #include <QResource>
 #include <assert.h>
 
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_services_discovery.h>
 
 void SelectorActionButton::paintEvent( QPaintEvent *event )

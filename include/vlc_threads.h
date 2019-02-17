@@ -1068,17 +1068,27 @@ struct vlc_cleanup_t
     void          *data;
 };
 
-/* This macros opens a code block on purpose. This is needed for multiple
- * calls within a single function. This also prevent Win32 developers from
- * writing code that would break on POSIX (POSIX opens a block as well). */
+# ifndef __cplusplus
+/* This macros opens a code block on purpose: It reduces the chance of
+ * not pairing the push and pop. It also matches the POSIX Thread internals.
+ * That way, Win32 developers will not accidentally break other platforms.
+ */
 # define vlc_cleanup_push( routine, arg ) \
     do { \
-        vlc_cleanup_t vlc_cleanup_data = { NULL, routine, arg, }; \
-        vlc_control_cancel (VLC_CLEANUP_PUSH, &vlc_cleanup_data)
+        vlc_control_cancel(VLC_CLEANUP_PUSH, \
+                           &(vlc_cleanup_t){ NULL, routine, arg })
 
-# define vlc_cleanup_pop( ) \
+#  define vlc_cleanup_pop( ) \
         vlc_control_cancel (VLC_CLEANUP_POP); \
     } while (0)
+# else
+/* Those macros do not work in C++. However common C/C++ helpers may call them
+ * anyway - this is fine if the code is never cancelled in C++ case.
+ * So define the macros to do nothing.
+ */
+#  define vlc_cleanup_push(routine, arg) do { (routine, arg)
+#  define vlc_cleanup_pop() } while (0)
+# endif
 
 #endif /* !LIBVLC_USE_PTHREAD_CLEANUP */
 

@@ -2,7 +2,6 @@
  * wingdi.c : Win32 / WinCE GDI video output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Samuel Hocevar <sam@zoy.org>
@@ -42,8 +41,9 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static int  Open (vout_display_t *, const vout_display_cfg_t *,
+                  video_format_t *, vlc_video_context *);
+static void Close(vout_display_t *);
 
 vlc_module_begin ()
     set_category(CAT_VIDEO)
@@ -79,15 +79,14 @@ struct vout_display_sys_t
 
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Display(vout_display_t *, picture_t *);
-static int            Control(vout_display_t *, int, va_list);
 
 static int            Init(vout_display_t *, video_format_t *);
 static void           Clean(vout_display_t *);
 
 /* */
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
     if ( !vd->obj.force && vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
@@ -97,39 +96,30 @@ static int Open(vlc_object_t *object)
     if (!sys)
         return VLC_ENOMEM;
 
-    if (CommonInit(vd))
+    if (CommonInit(vd, false, cfg))
         goto error;
 
     /* */
-    video_format_t fmt = vd->fmt;
-    if (Init(vd, &fmt))
+    if (Init(vd, fmtp))
         goto error;
 
-    vout_display_info_t info = vd->info;
-    info.is_slow              = false;
-    info.has_double_click     = true;
-    info.has_pictures_invalid = true;
-
     /* */
-    vd->fmt  = fmt;
-    vd->info = info;
+    vd->info.has_double_click     = true;
 
     vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;
-    vd->control = Control;
+    vd->control = CommonControl;
     return VLC_SUCCESS;
 
 error:
-    Close(VLC_OBJECT(vd));
+    Close(vd);
     return VLC_EGENERIC;
 }
 
 /* */
-static void Close(vlc_object_t *object)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)object;
-
     Clean(vd);
 
     CommonClean(vd);
@@ -185,18 +175,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
     CommonDisplay(vd);
     CommonManage(vd);
-}
-
-static int Control(vout_display_t *vd, int query, va_list args)
-{
-    switch (query) {
-    case VOUT_DISPLAY_RESET_PICTURES:
-        vlc_assert_unreachable();
-        return VLC_EGENERIC;
-    default:
-        return CommonControl(vd, query, args);
-    }
-
 }
 
 static int Init(vout_display_t *vd, video_format_t *fmt)
@@ -290,7 +268,8 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     SelectObject(sys->off_dc, sys->off_bitmap);
     ReleaseDC(sys->sys.hvideownd, window_dc);
 
-    EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (WinGDI output)");
+    if (!sys->sys.b_windowless)
+        EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (WinGDI output)");
 
     /* */
     picture_resource_t rsc;
@@ -305,7 +284,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     else
         sys->sys.pool = NULL;
 
-    UpdateRects(vd, NULL, true);
+    UpdateRects(vd, true);
 
     return VLC_SUCCESS;
 }

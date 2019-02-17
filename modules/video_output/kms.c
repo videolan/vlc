@@ -605,7 +605,6 @@ static void CustomDestroyPicture(picture_t *p_picture)
     vlc_close(sys->drm_fd);
     sys->drm_fd = 0;
     free(p_picture->p_sys);
-    free(p_picture);
 }
 
 
@@ -674,7 +673,10 @@ static void Display(vout_display_t *vd, picture_t *picture)
 }
 
 
-static void CloseDisplay(vout_display_t *vd)
+/**
+ * Terminate an output method created by Open
+ */
+static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -685,37 +687,25 @@ static void CloseDisplay(vout_display_t *vd)
         drmDropMaster(sys->drm_fd);
 }
 
-
-/**
- * Terminate an output method created by Open
- */
-static void Close(vlc_object_t *object)
-{
-    vout_display_t *vd = (vout_display_t *)object;
-
-    CloseDisplay(vd);
-}
-
-
 /**
  * This function allocates and initializes a KMS vout method.
  */
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
     vlc_fourcc_t local_vlc_chroma;
     uint32_t local_drm_chroma;
     video_format_t fmt = {};
     char *chroma;
 
-    if (vout_display_IsWindowed(vd))
+    if (vout_display_cfg_IsWindowed(cfg))
         return VLC_EGENERIC;
 
     /*
      * Allocate instance and initialize some members
      */
-    vd->sys = sys = vlc_obj_calloc(object, 1, sizeof(*sys));
+    vd->sys = sys = vlc_obj_calloc(VLC_OBJECT(vd), 1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
 
@@ -727,14 +717,14 @@ static int Open(vlc_object_t *object)
             sys->vlc_fourcc = local_vlc_chroma;
             msg_Dbg(vd, "Forcing VLC to use chroma '%4s'", chroma);
          } else {
-            sys->vlc_fourcc = vd->fmt.i_chroma;
+            sys->vlc_fourcc = fmtp->i_chroma;
             msg_Dbg(vd, "Chroma %4s invalid, using default", chroma);
          }
 
         free(chroma);
         chroma = NULL;
     } else {
-        sys->vlc_fourcc = vd->fmt.i_chroma;
+        sys->vlc_fourcc = fmtp->i_chroma;
         msg_Dbg(vd, "Chroma %4s invalid, using default", chroma);
     }
 
@@ -756,23 +746,23 @@ static int Open(vlc_object_t *object)
     }
 
     if (OpenDisplay(vd) != VLC_SUCCESS) {
-        Close(VLC_OBJECT(vd));
+        Close(vd);
         return VLC_EGENERIC;
     }
 
-    video_format_ApplyRotation(&fmt, &vd->fmt);
+    video_format_ApplyRotation(&fmt, fmtp);
 
     fmt.i_width = fmt.i_visible_width  = sys->width;
     fmt.i_height = fmt.i_visible_height = sys->height;
     fmt.i_chroma = sys->vlc_fourcc;
+    *fmtp = fmt;
 
-    vd->fmt     = fmt;
     vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
 
-    vout_window_ReportSize(vd->cfg->window, sys->width, sys->height);
+    (void) context;
     return VLC_SUCCESS;
 }
 

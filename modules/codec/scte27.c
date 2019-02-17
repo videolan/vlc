@@ -2,7 +2,6 @@
  * scte27.c : SCTE-27 subtitles decoder
  *****************************************************************************
  * Copyright (C) Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *

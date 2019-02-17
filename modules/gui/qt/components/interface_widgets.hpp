@@ -2,7 +2,6 @@
  * interface_widgets.hpp : Custom widgets for the main interface
  ****************************************************************************
  * Copyright (C) 2006-2008 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
@@ -60,7 +59,7 @@ public:
     VideoWidget( intf_thread_t *, QWidget* p_parent );
     virtual ~VideoWidget();
 
-    bool request( struct vout_window_t * );
+    void request( struct vout_window_t * );
     void release( void );
     void sync( void );
 

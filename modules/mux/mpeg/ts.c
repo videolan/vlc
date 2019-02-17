@@ -2,7 +2,6 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001-2005 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -512,7 +511,7 @@ static csa_t *csaSetup( vlc_object_t *p_this )
 
     var_Create( p_mux, SOUT_CFG_PREFIX "csa-use", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa-use", ActiveKeyCallback, NULL );
-    var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa-ck", ChangeKeyCallback, (void *)1 );
+    var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa-ck", ChangeKeyCallback, p_mux );
     var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa2-ck", ChangeKeyCallback, NULL );
 
     vlc_value_t use_val;
@@ -766,7 +765,7 @@ static void Close( vlc_object_t * p_this )
 
     if( p_sys->csa )
     {
-        var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa-ck", ChangeKeyCallback, NULL );
+        var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa-ck", ChangeKeyCallback, p_mux );
         var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa2-ck", ChangeKeyCallback, NULL );
         var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa-use", ActiveKeyCallback, NULL );
         csa_Delete( p_sys->csa );
@@ -795,7 +794,7 @@ static int ChangeKeyCallback( vlc_object_t *p_this, char const *psz_cmd,
     int ret;
 
     vlc_mutex_lock(&p_sys->csa_lock);
-    ret = csa_SetCW(p_this, p_sys->csa, newval.psz_string, !!(intptr_t)p_data);
+    ret = csa_SetCW(p_this, p_sys->csa, newval.psz_string, p_data != NULL);
     vlc_mutex_unlock(&p_sys->csa_lock);
 
     return ret;

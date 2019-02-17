@@ -1,0 +1,11 @@
+--- libtasn1/src/Makefile.am.old	2018-11-20 16:44:09.003920133 +0100
++++ libtasn1/src/Makefile.am	2018-11-20 16:42:16.591920562 +0100
+@@ -21,7 +21,7 @@
+ 
+ LDADD = ../lib/libtasn1.la ../gl/libgnu.la
+ 
+-bin_PROGRAMS = asn1Parser asn1Coding asn1Decoding
++EXTRA_PROGRAMS = asn1Parser asn1Coding asn1Decoding
+ 
+ asn1Parser_SOURCES = asn1Parser.c
+ 

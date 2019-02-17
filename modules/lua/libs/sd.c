@@ -2,7 +2,6 @@
  * sd.c: Services discovery related functions
  *****************************************************************************
  * Copyright (C) 2007-2008 the VideoLAN team
- * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
  *          Fabio Ritrovato <sephiroth87 at videolan dot org>
@@ -37,7 +36,7 @@
 #include <math.h>
 #include <vlc_common.h>
 #include <vlc_services_discovery.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_charset.h>
 #include <vlc_md5.h>
 

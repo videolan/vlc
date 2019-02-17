@@ -2,7 +2,6 @@
  * m3u.c : M3U playlist export module
  *****************************************************************************
  * Copyright (C) 2004-2009 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -30,7 +29,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_input.h>
 #include <vlc_meta.h>
 #include <vlc_charset.h>

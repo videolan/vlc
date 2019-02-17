@@ -1,8 +1,8 @@
 # libplacebo
 
-PLACEBO_VERSION := 1.7.0-rc1
-PLACEBO_URL := https://github.com/haasn/libplacebo/archive/v$(PLACEBO_VERSION).tar.gz
-PLACEBO_ARCHIVE = libplacebo-$(PLACEBO_VERSION).tar.gz
+PLACEBO_VERSION := 1.7.0
+PLACEBO_ARCHIVE = libplacebo-v$(PLACEBO_VERSION).tar.gz
+PLACEBO_URL := https://code.videolan.org/videolan/libplacebo/-/archive/v$(PLACEBO_VERSION)/$(PLACEBO_ARCHIVE)
 
 DEPS_libplacebo = glslang
 
@@ -12,12 +12,11 @@ PKGS_FOUND += libplacebo
 endif
 
 ifdef HAVE_WIN32
-PLACEBOCONF :=
-else
-PLACEBOCONF := -Dvulkan=enabled \
-	-Dglslang=enabled \
-	-Dshaderc=disabled
+DEPS_libplacebo += pthreads $(DEPS_pthreads)
 endif
+
+PLACEBOCONF := -Dglslang=enabled \
+	-Dshaderc=disabled
 
 $(TARBALLS)/$(PLACEBO_ARCHIVE):
 	$(call download_pkg,$(PLACEBO_URL),libplacebo)
@@ -34,5 +33,5 @@ libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	cd $< && $(HOSTVARS_MESON) $(MESON) $(PLACEBOCONF) build
 	cd $< && cd build && ninja install
 # Work-around messon issue https://github.com/mesonbuild/meson/issues/4091
-	sed -i $(PREFIX)/lib/pkgconfig/libplacebo.pc -e 's/Libs: \(.*\) -L$${libdir} -lplacebo/Libs: -L$${libdir} -lplacebo \1/g'
+	sed -i.orig -e 's/Libs: \(.*\) -L$${libdir} -lplacebo/Libs: -L$${libdir} -lplacebo \1/g' $(PREFIX)/lib/pkgconfig/libplacebo.pc
 	touch $@

@@ -118,6 +118,23 @@ typedef struct
     bool woken;
 } access_sys_t;
 
+VLC_FORMAT(3, 4)
+static void net_Printf(stream_t *access, int fd, const char *fmt, ...)
+{
+    va_list ap;
+    char *str;
+    int val;
+
+    va_start(ap, fmt);
+    val = vasprintf(&str, fmt, ap);
+    va_end(ap);
+
+    if (val >= 0) {
+        net_Write(access, fd, str, val);
+        free(str);
+    }
+}
+
 static void parse_session(char *request_line, char *session, unsigned max, int *timeout) {
     char *state;
     char *tok;
@@ -125,7 +142,7 @@ static void parse_session(char *request_line, char *session, unsigned max, int *
     tok = strtok_r(request_line, ";", &state);
     if (tok == NULL)
         return;
-    strncpy(session, tok, __MIN(strlen(tok), max - 1));
+    memcpy(session, tok, __MIN(strlen(tok), max - 1));
 
     while ((tok = strtok_r(NULL, ";", &state)) != NULL) {
         if (strncmp(tok, "timeout=", 8) == 0) {
@@ -165,13 +182,13 @@ static int parse_transport(stream_t *access, char *request_line) {
 
     while ((tok = strtok_r(NULL, ";", &state)) != NULL) {
         if (strncmp(tok, "destination=", 12) == 0) {
-            strncpy(sys->udp_address, tok + 12, __MIN(strlen(tok + 12), UDP_ADDRESS_LEN - 1));
+            memcpy(sys->udp_address, tok + 12, __MIN(strlen(tok + 12), UDP_ADDRESS_LEN - 1));
         } else if (strncmp(tok, "port=", 5) == 0) {
             char port[6];
             char *end;
 
             memset(port, 0x00, 6);
-            strncpy(port, tok + 5, __MIN(strlen(tok + 5), 5));
+            memcpy(port, tok + 5, __MIN(strlen(tok + 5), 5));
             if ((end = strstr(port, "-")) != NULL)
                 *end = '\0';
             err = parse_port(port, &sys->udp_port);
@@ -666,7 +683,7 @@ static int satip_open(vlc_object_t *obj)
     }
 
     msg_Dbg(access, "connect to host '%s'", psz_host);
-    sys->tcp_sock = net_ConnectTCP(access, psz_host, url.i_port);
+    sys->tcp_sock = net_Connect(access, psz_host, url.i_port, SOCK_STREAM, 0);
     if (sys->tcp_sock < 0) {
         msg_Err(access, "Failed to connect to RTSP server %s:%d",
                 psz_host, url.i_port);

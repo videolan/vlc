@@ -1,0 +1,11 @@
+--- libshout/Makefile.am.old	2018-11-22 12:46:19.971954640 +0100
++++ libshout/Makefile.am	2018-11-22 12:46:30.695954599 +0100
+@@ -3,7 +3,7 @@
+ AUTOMAKE_OPTIONS = 1.6 foreign
+ ACLOCAL_AMFLAGS = -I m4
+ 
+-SUBDIRS = include src examples doc win32
++SUBDIRS = include src win32
+ 
+ EXTRA_DIST = INSTALL m4/shout.m4 m4/acx_pthread.m4 \
+ 	m4/ogg.m4 m4/vorbis.m4 m4/xiph_compiler.m4 m4/xiph_net.m4 \

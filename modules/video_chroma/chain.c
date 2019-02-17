@@ -2,7 +2,6 @@
  * chain.c : chain multiple video filter modules as a last resort solution
  *****************************************************************************
  * Copyright (C) 2007-2017 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan dot org>
  *
@@ -197,7 +196,7 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
         free( p_sys );
         return VLC_EGENERIC;
     }
-    else if( p_filter->b_allow_fmt_out_change )
+    if( p_filter->b_allow_fmt_out_change )
     {
         es_format_Clean( &p_filter->fmt_out );
         es_format_Copy( &p_filter->fmt_out,

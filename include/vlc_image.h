@@ -2,7 +2,6 @@
  * vlc_image.h : wrapper for image reading/writing facilities
  *****************************************************************************
  * Copyright (C) 2004 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -39,13 +38,14 @@ extern "C" {
 struct image_handler_t
 {
     picture_t * (*pf_read)      ( image_handler_t *, block_t *,
-                                  const video_format_t *, video_format_t * );
+                                  const es_format_t *,
+                                  video_format_t * );
     picture_t * (*pf_read_url)  ( image_handler_t *, const char *,
-                                  video_format_t *, video_format_t * );
+                                  video_format_t * );
     block_t * (*pf_write)       ( image_handler_t *, picture_t *,
                                   const video_format_t *, const video_format_t * );
     int (*pf_write_url)         ( image_handler_t *, picture_t *,
-                                  const video_format_t *, video_format_t *,
+                                  const video_format_t *, const video_format_t *,
                                   const char * );
 
     picture_t * (*pf_convert)   ( image_handler_t *, picture_t *,
@@ -55,7 +55,7 @@ struct image_handler_t
     vlc_object_t *p_parent;
     decoder_t *p_dec;
     encoder_t *p_enc;
-    filter_t  *p_filter;
+    filter_t  *p_converter;
 
     picture_fifo_t *outfifo;
 };
@@ -65,7 +65,7 @@ VLC_API image_handler_t * image_HandlerCreate( vlc_object_t * ) VLC_USED;
 VLC_API void image_HandlerDelete( image_handler_t * );
 
 #define image_Read( a, b, c, d ) a->pf_read( a, b, c, d )
-#define image_ReadUrl( a, b, c, d ) a->pf_read_url( a, b, c, d )
+#define image_ReadUrl( a, b, c ) a->pf_read_url( a, b, c )
 #define image_Write( a, b, c, d ) a->pf_write( a, b, c, d )
 #define image_WriteUrl( a, b, c, d, e ) a->pf_write_url( a, b, c, d, e )
 #define image_Convert( a, b, c, d ) a->pf_convert( a, b, c, d )

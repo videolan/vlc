@@ -70,6 +70,7 @@ typedef struct
 {
     JPEG_SYS_COMMON_MEMBERS
 
+    JSAMPARRAY p_row_pointers;
     struct jpeg_decompress_struct p_jpeg;
 } decoder_sys_t;
 
@@ -177,9 +178,11 @@ static int OpenDecoder(vlc_object_t *p_this)
     /* Set callbacks */
     p_dec->pf_decode = DecodeBlock;
 
+    p_dec->fmt_out.video.i_chroma =
     p_dec->fmt_out.i_codec = VLC_CODEC_RGB24;
     p_dec->fmt_out.video.transfer = TRANSFER_FUNC_SRGB;
-    p_dec->fmt_out.video.b_color_range_full = true;
+    p_dec->fmt_out.video.color_range = COLOR_RANGE_FULL;
+    video_format_FixRgb(&p_dec->fmt_out.video);
 
     return VLC_SUCCESS;
 }
@@ -498,7 +501,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     decoder_sys_t *p_sys = p_dec->p_sys;
     picture_t *p_pic = 0;
 
-    JSAMPARRAY p_row_pointers = NULL;
+    p_sys->p_row_pointers = NULL;
 
     if (!p_block) /* No Drain */
         return VLCDEC_SUCCESS;
@@ -551,25 +554,25 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     }
 
     /* Decode picture */
-    p_row_pointers = vlc_alloc(p_sys->p_jpeg.output_height, sizeof(JSAMPROW));
-    if (!p_row_pointers)
+    p_sys->p_row_pointers = vlc_alloc(p_sys->p_jpeg.output_height, sizeof(JSAMPROW));
+    if (!p_sys->p_row_pointers)
     {
         goto error;
     }
     for (unsigned i = 0; i < p_sys->p_jpeg.output_height; i++) {
-        p_row_pointers[i] = p_pic->p->p_pixels + p_pic->p->i_pitch * i;
+        p_sys->p_row_pointers[i] = p_pic->p->p_pixels + p_pic->p->i_pitch * i;
     }
 
     while (p_sys->p_jpeg.output_scanline < p_sys->p_jpeg.output_height)
     {
         jpeg_read_scanlines(&p_sys->p_jpeg,
-                p_row_pointers + p_sys->p_jpeg.output_scanline,
+                p_sys->p_row_pointers + p_sys->p_jpeg.output_scanline,
                 p_sys->p_jpeg.output_height - p_sys->p_jpeg.output_scanline);
     }
 
     jpeg_finish_decompress(&p_sys->p_jpeg);
     jpeg_destroy_decompress(&p_sys->p_jpeg);
-    free(p_row_pointers);
+    free(p_sys->p_row_pointers);
 
     p_pic->date = p_block->i_pts != VLC_TICK_INVALID ? p_block->i_pts : p_block->i_dts;
 
@@ -580,7 +583,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 error:
 
     jpeg_destroy_decompress(&p_sys->p_jpeg);
-    free(p_row_pointers);
+    free(p_sys->p_row_pointers);
 
     block_Release(p_block);
     return VLCDEC_SUCCESS;

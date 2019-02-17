@@ -3,7 +3,6 @@
  * Also contains some internal utility functions
  *****************************************************************************
  * Copyright (C) 2005-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -31,6 +30,7 @@
 
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_dialog.h>
+#include <vlc/libvlc_picture.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_events.h>
 

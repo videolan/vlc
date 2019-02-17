@@ -45,8 +45,6 @@ struct demux_cc
         :p_demux(demux)
         ,p_renderer(renderer)
         ,m_enabled( true )
-        ,m_pause_date( VLC_TICK_INVALID )
-        ,m_pause_delay( VLC_TICK_INVALID )
     {
         init();
     }
@@ -177,21 +175,14 @@ struct demux_cc
                                          cc_input_arg { false } );
     }
 
-    void setPauseState(bool paused, vlc_tick_t delay)
+    void setPauseState(bool paused)
     {
-        p_renderer->pf_set_pause_state( p_renderer->p_opaque, paused, delay );
+        p_renderer->pf_set_pause_state( p_renderer->p_opaque, paused );
     }
 
     vlc_tick_t getCCTime()
     {
-        vlc_tick_t system, delay;
-        if( es_out_ControlGetPcrSystem( p_demux->p_next->out, &system, &delay ) )
-            return VLC_TICK_INVALID;
-
-        vlc_tick_t cc_time = p_renderer->pf_get_time( p_renderer->p_opaque );
-        if( cc_time != VLC_TICK_INVALID )
-            return cc_time - system + m_pause_delay;
-        return VLC_TICK_INVALID;
+        return p_renderer->pf_get_time( p_renderer->p_opaque );
     }
 
     vlc_tick_t getTime()
@@ -353,8 +344,6 @@ struct demux_cc
 
         case DEMUX_SET_POSITION:
         {
-            m_pause_delay = m_pause_date = VLC_TICK_INVALID;
-
             double pos = va_arg( args, double );
             /* Force unprecise seek */
             int ret = demux_Control( p_demux->p_next, DEMUX_SET_POSITION, pos, false );
@@ -367,8 +356,6 @@ struct demux_cc
         }
         case DEMUX_SET_TIME:
         {
-            m_pause_delay = m_pause_date = VLC_TICK_INVALID;
-
             vlc_tick_t time = va_arg( args, vlc_tick_t );
             /* Force unprecise seek */
             int ret = demux_Control( p_demux->p_next, DEMUX_SET_TIME, time, false );
@@ -387,21 +374,7 @@ struct demux_cc
             int paused = va_arg( ap, int );
             va_end( ap );
 
-            if (paused)
-            {
-                if (m_pause_date == VLC_TICK_INVALID)
-                    m_pause_date = vlc_tick_now();
-            }
-            else
-            {
-                if (m_pause_date != VLC_TICK_INVALID)
-                {
-                    m_pause_delay += vlc_tick_now() - m_pause_date;
-                    m_pause_date = VLC_TICK_INVALID;
-                }
-            }
-
-            setPauseState( paused != 0, m_pause_delay );
+            setPauseState( paused != 0 );
             break;
         }
         case DEMUX_SET_ES:
@@ -449,8 +422,6 @@ protected:
     double        m_last_pos;
     vlc_tick_t    m_start_time;
     vlc_tick_t    m_last_time;
-    vlc_tick_t    m_pause_date;
-    vlc_tick_t    m_pause_delay;
 };
 
 static void on_paused_changed_cb( void *data, bool paused )

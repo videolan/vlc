@@ -37,7 +37,7 @@
 #elif defined(__APPLE__)
 #include <vlc_common.h>
 #include <vlc_charset.h>
-typedef const CFStringRef decklink_str_t;
+typedef CFStringRef decklink_str_t;
 #define DECKLINK_STRDUP(s) FromCFString(s, kCFStringEncodingUTF8)
 #define DECKLINK_FREE(s) CFRelease(s)
 #else

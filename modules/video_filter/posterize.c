@@ -2,7 +2,6 @@
  * posterize.c : Posterize video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2010 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Branko Kokanovic <branko.kokanovic@gmail.com>
  *

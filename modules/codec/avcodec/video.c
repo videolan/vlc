@@ -2,7 +2,6 @@
  * video.c: video decoder using the libavcodec library
  *****************************************************************************
  * Copyright (C) 1999-2001 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -238,19 +237,15 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
                                  * __MAX(ctx->ticks_per_frame, 1);
     }
 
-    /* FIXME we should only set the known values and let the core decide
-     * later of fallbacks, but we can't do that with a boolean */
     switch ( ctx->color_range )
     {
     case AVCOL_RANGE_JPEG:
-        fmt->b_color_range_full = true;
-        break;
-    case AVCOL_RANGE_UNSPECIFIED:
-        fmt->b_color_range_full = !vlc_fourcc_IsYUV( fmt->i_chroma );
+        fmt->color_range = COLOR_RANGE_FULL;
         break;
     case AVCOL_RANGE_MPEG:
-    default:
-        fmt->b_color_range_full = false;
+        fmt->color_range = COLOR_RANGE_LIMITED;
+        break;
+    default: /* do nothing */
         break;
     }
 
@@ -1305,6 +1300,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* Send decoded frame to vout */
         if (i_pts != VLC_TICK_INVALID)
         {
+            if(p_frame_info->b_eos)
+                p_pic->b_still = true;
             p_sys->b_first_frame = false;
             decoder_QueueVideo( p_dec, p_pic );
         }
@@ -1457,12 +1454,15 @@ static void lavc_ReleaseFrame(void *opaque, uint8_t *data)
     picture_Release(picture);
 }
 
-static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
-                            picture_t *pic)
+static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
 {
     decoder_t *dec = ctx->opaque;
     decoder_sys_t *p_sys = dec->p_sys;
     vlc_va_t *va = p_sys->p_va;
+
+    picture_t *pic = decoder_NewPicture(dec);
+    if (pic == NULL)
+        return -1;
 
     if (vlc_va_Get(va, pic, &frame->data[0]))
     {
@@ -1486,14 +1486,17 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
     return 0;
 }
 
-static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
-                            picture_t *pic)
+static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
 {
-    decoder_t *dec = (decoder_t *)ctx->opaque;
+    decoder_t *dec = ctx->opaque;
     decoder_sys_t *sys = dec->p_sys;
 
     if (ctx->pix_fmt == AV_PIX_FMT_PAL8)
-        goto error;
+        return -1;
+
+    picture_t *pic = decoder_NewPicture(dec);
+    if (pic == NULL)
+        return -1;
 
     int width = frame->width;
     int height = frame->height;
@@ -1546,6 +1549,7 @@ static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
 
     frame->opaque = pic;
     /* The loop above held one reference to the picture for each plane. */
+    assert(pic->i_planes > 0);
     picture_Release(pic);
     return 0;
 error:
@@ -1563,7 +1567,6 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
 {
     decoder_t *dec = ctx->opaque;
     decoder_sys_t *sys = dec->p_sys;
-    picture_t *pic;
 
     for (unsigned i = 0; i < AV_NUM_DATA_POINTERS; i++)
     {
@@ -1593,16 +1596,12 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     }
     post_mt(sys);
 
-    pic = decoder_NewPicture(dec);
-    if (pic == NULL)
-        return -ENOMEM;
-
     if (sys->p_va != NULL)
-        return lavc_va_GetFrame(ctx, frame, pic);
+        return lavc_va_GetFrame(ctx, frame);
 
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so we need to check for direct rendering again. */
-    int ret = lavc_dr_GetFrame(ctx, frame, pic);
+    int ret = lavc_dr_GetFrame(ctx, frame);
     if (ret)
         ret = avcodec_default_get_buffer2(ctx, frame, flags);
     return ret;
@@ -1738,9 +1737,6 @@ no_reuse:
             wait_mt(p_sys);
             continue; /* Unsupported codec profile or such */
         }
-
-        if (va->description != NULL)
-            msg_Info(p_dec, "Using %s for hardware decoding", va->description);
 
         p_sys->p_va = va;
         p_sys->pix_fmt = hwfmt;

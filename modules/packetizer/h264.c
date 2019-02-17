@@ -2,7 +2,6 @@
  * h264.c: h264/avc video packetizer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2006 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -227,10 +226,12 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
                 }
             }
             if( p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF )
+            {
                 h264_get_colorimetry( p_sps, &p_dec->fmt_out.video.primaries,
                                       &p_dec->fmt_out.video.transfer,
                                       &p_dec->fmt_out.video.space,
-                                      &p_dec->fmt_out.video.b_color_range_full );
+                                      &p_dec->fmt_out.video.color_range );
+            }
         }
 
         if( p_dec->fmt_out.i_extra == 0 && p_pps )
@@ -841,10 +842,11 @@ static block_t *OutputPicture( decoder_t *p_dec )
     }
 
     /* Now rebuild NAL Sequence, inserting PPS/SPS if any */
-    if( p_sys->frame.p_head->i_flags & BLOCK_FLAG_PRIVATE_AUD )
+    if( p_sys->leading.p_head &&
+       (p_sys->leading.p_head->i_flags & BLOCK_FLAG_PRIVATE_AUD) )
     {
-        block_t *p_au = p_sys->frame.p_head;
-        p_sys->frame.p_head = p_au->p_next;
+        block_t *p_au = p_sys->leading.p_head;
+        p_sys->leading.p_head = p_au->p_next;
         p_au->p_next = NULL;
         block_ChainLastAppend( &pp_pic_last, p_au );
     }
@@ -938,6 +940,9 @@ static block_t *OutputPicture( decoder_t *p_dec )
                 date_Decrement( &pts, -diff );
 
             p_pic->i_pts = date_Get( &pts );
+            /* non monotonically increasing dts on some videos 33333 33333...35000 */
+            if( p_pic->i_pts < p_pic->i_dts )
+                p_pic->i_pts = p_pic->i_dts;
         }
         /* In case there's no PTS at all */
         else if( CanSwapPTSwithDTS( &p_sys->slice, p_sps ) )

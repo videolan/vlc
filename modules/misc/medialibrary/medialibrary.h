@@ -26,6 +26,7 @@
 #include <medialibrary/parser/IItem.h>
 #include <medialibrary/parser/Parser.h>
 #include <medialibrary/IMedia.h>
+#include <medialibrary/IThumbnailer.h>
 
 #include <vlc_common.h>
 #include <vlc_threads.h>
@@ -38,6 +39,7 @@
 
 struct vlc_event_t;
 struct vlc_object_t;
+struct vlc_thumbnailer_t;
 
 class Logger;
 
@@ -47,23 +49,25 @@ private:
     struct ParseContext
     {
         ParseContext( MetadataExtractor* mde, medialibrary::parser::IItem& item )
-            : inputItem( nullptr, &input_item_Release )
-            , input( nullptr, &input_Close )
-            , needsProbing( false )
+            : needsProbing( false )
             , state( INIT_S )
             , mde( mde )
             , item( item )
+            , inputItem( nullptr, &input_item_Release )
+            , input( nullptr, &input_Close )
         {
         }
 
-        std::unique_ptr<input_item_t, decltype(&input_item_Release)> inputItem;
-        std::unique_ptr<input_thread_t, decltype(&input_Close)> input;
         vlc::threads::condition_variable m_cond;
         vlc::threads::mutex m_mutex;
         bool needsProbing;
         input_state_e state;
         MetadataExtractor* mde;
         medialibrary::parser::IItem& item;
+        std::unique_ptr<input_item_t, decltype(&input_item_Release)> inputItem;
+        // Needs to be last to be destroyed first, otherwise a late callback
+        // could use some already destroyed fields
+        std::unique_ptr<input_thread_t, decltype(&input_Close)> input;
     };
 
 public:
@@ -90,6 +94,18 @@ private:
 
 private:
     vlc_object_t* m_obj;
+};
+
+class Thumbnailer : public medialibrary::IThumbnailer
+{
+public:
+    Thumbnailer( vlc_medialibrary_module_t* ml, std::string thumbnailsDir);
+    virtual bool generate( medialibrary::MediaPtr media, const std::string& mrl ) override;
+
+private:
+    vlc_medialibrary_module_t* m_ml;
+    std::string m_thumbnailDir;
+    std::unique_ptr<vlc_thumbnailer_t, void(*)(vlc_thumbnailer_t*)> m_thumbnailer;
 };
 
 class MediaLibrary : public medialibrary::IMediaLibraryCb
@@ -165,6 +181,7 @@ bool Convert( const medialibrary::IShow* input, vlc_ml_show_t& output );
 bool Convert( const medialibrary::ILabel* input, vlc_ml_label_t& output );
 bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output );
 bool Convert( const medialibrary::IFolder* input, vlc_ml_entry_point_t& output );
+input_item_t* MediaToInputItem( const medialibrary::IMedia* media );
 
 template <typename To, typename ItemType, typename From>
 To* ml_convert_list( const std::vector<std::shared_ptr<From>>& input )

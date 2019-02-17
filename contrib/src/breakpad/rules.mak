@@ -15,6 +15,7 @@ $(TARBALLS)/breakpad-$(BREAKPAD_VERSION).tar.gz:
 
 breakpad: breakpad-$(BREAKPAD_VERSION).tar.gz .sum-breakpad
 	$(UNPACK)
+	$(APPLY) $(SRC)/breakpad/0001-mac-client-Upgrade-Breakpad.xib-to-new-format.patch
 	$(MOVE)
 
 .breakpad: breakpad

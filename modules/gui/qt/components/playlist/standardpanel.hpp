@@ -2,7 +2,6 @@
  * standardpanel.hpp : Panels for the playlist
  ****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -35,7 +34,7 @@
 #include <QWidget>
 #include <QModelIndexList>
 
-#include <vlc_playlist.h> /* playlist_item_t */
+#include <vlc_playlist_legacy.h> /* playlist_item_t */
 
 class QSignalMapper;
 class QWheelEvent;

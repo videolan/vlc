@@ -94,11 +94,11 @@ typedef struct vlc_tls_proxy
     vlc_tls_t *sock;
 } vlc_tls_proxy_t;
 
-static int vlc_tls_ProxyGetFD(vlc_tls_t *tls)
+static int vlc_tls_ProxyGetFD(vlc_tls_t *tls, short *restrict events)
 {
     vlc_tls_proxy_t *proxy = (vlc_tls_proxy_t *)tls;
 
-    return vlc_tls_GetFD(proxy->sock);
+    return vlc_tls_GetPollFD(proxy->sock, events);
 }
 
 static ssize_t vlc_tls_ProxyRead(vlc_tls_t *tls, struct iovec *iov,
@@ -142,7 +142,7 @@ static const struct vlc_tls_operations vlc_tls_proxy_ops =
     vlc_tls_ProxyClose,
 };
 
-vlc_tls_t *vlc_https_connect_proxy(void *ctx, vlc_tls_creds_t *creds,
+vlc_tls_t *vlc_https_connect_proxy(void *ctx, vlc_tls_client_t *creds,
                                    const char *hostname, unsigned port,
                                    bool *restrict two, const char *proxy)
 {

@@ -1,5 +1,8 @@
 muxdir = $(pluginsdir)/mux
 
+extradata_builder_SOURCES = mux/extradata.c mux/extradata.h \
+                            packetizer/av1_obu.c
+
 libmux_dummy_plugin_la_SOURCES = mux/dummy.c
 
 libmux_asf_plugin_la_SOURCES = mux/asf.c demux/asf/libasf_guid.h
@@ -10,6 +13,8 @@ libmux_mp4_plugin_la_SOURCES = mux/mp4/mp4.c \
 	packetizer/hxxx_nal.c packetizer/hxxx_nal.h \
         packetizer/hevc_nal.c packetizer/hevc_nal.h \
         packetizer/h264_nal.c packetizer/h264_nal.h
+libmux_mp4_plugin_la_SOURCES += $(extradata_builder_SOURCES)
+
 libmux_mpjpeg_plugin_la_SOURCES = mux/mpjpeg.c
 libmux_ps_plugin_la_SOURCES = \
 	mux/mpeg/pes.c mux/mpeg/pes.h \

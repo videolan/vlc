@@ -35,7 +35,8 @@
 #include <vlc_common.h>
 #include "conn.h"
 
-#define CTX ((void *)(uintptr_t)0x44556677)
+static char dummy;
+static char *const CTX = &dummy;
 
 static unsigned settings;
 

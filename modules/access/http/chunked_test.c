@@ -39,9 +39,10 @@ static const char *stream_content;
 static size_t stream_length;
 static bool stream_bad;
 
-static int fd_callback(struct vlc_tls *tls)
+static int fd_callback(struct vlc_tls *tls, short *restrict events)
 {
     (void) tls;
+    (void) events;
     return -1;
 }
 

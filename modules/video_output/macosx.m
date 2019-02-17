@@ -2,7 +2,6 @@
  * macosx.m: MacOS X OpenGL provider
  *****************************************************************************
  * Copyright (C) 2001-2013 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *          Eric Petit <titer@m0k.org>
@@ -34,13 +33,13 @@
  * Preamble
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
-#import <OpenGL/OpenGL.h>
-#import <dlfcn.h>
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#import <Cocoa/Cocoa.h>
+#import <OpenGL/OpenGL.h>
+#import <dlfcn.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -52,8 +51,9 @@
 /**
  * Forward declarations
  */
-static int Open (vlc_object_t *);
-static void Close (vlc_object_t *);
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmt, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 
 static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count);
 static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,
@@ -113,7 +113,7 @@ struct vout_display_sys_t
     picture_t *current;
     bool has_first_frame;
 
-    vout_display_place_t place;
+    vout_display_cfg_t cfg;
 };
 
 struct gl_sys
@@ -129,17 +129,21 @@ static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
     return dlsym(RTLD_DEFAULT, name);
 }
 
-static int Open (vlc_object_t *this)
+static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
+                 video_format_t *fmt, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)this;
     vout_display_sys_t *sys = calloc (1, sizeof(*sys));
+
+    if (cfg->window->type != VOUT_WINDOW_TYPE_NSOBJECT)
+        return VLC_EGENERIC;
 
     if (!sys)
         return VLC_ENOMEM;
+    sys->cfg = *cfg;
 
     @autoreleasepool {
         if (!CGDisplayUsesOpenGLAcceleration (kCGDirectMainDisplay))
-            msg_Err (this, "no OpenGL hardware acceleration found. this can lead to slow output and unexpected results");
+            msg_Err (vd, "no OpenGL hardware acceleration found. this can lead to slow output and unexpected results");
 
         vd->sys = sys;
         sys->pool = NULL;
@@ -152,9 +156,8 @@ static int Open (vlc_object_t *this)
         /* Get the drawable object */
         id container = var_CreateGetAddress (vd, "drawable-nsobject");
         if (!container) {
-            sys->embed = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_NSOBJECT);
-            if (sys->embed)
-                container = sys->embed->handle.nsobject;
+            sys->embed = cfg->window;
+            container = sys->embed->handle.nsobject;
 
             if (!container) {
                 msg_Err(vd, "No drawable-nsobject nor vout_window_t found, passing over.");
@@ -198,7 +201,7 @@ static int Open (vlc_object_t *this)
         }
 
         /* Initialize common OpenGL video display */
-        sys->gl = vlc_object_create(this, sizeof(*sys->gl));
+        sys->gl = vlc_object_create(vd, sizeof(*sys->gl));
 
         if( unlikely( !sys->gl ) )
             goto error;
@@ -226,21 +229,16 @@ static int Open (vlc_object_t *this)
             msg_Err(vd, "Can't attach gl context");
             goto error;
         }
-        sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, sys->gl,
-                                            &vd->cfg->viewpoint);
+        sys->vgl = vout_display_opengl_New (fmt, &subpicture_chromas, sys->gl,
+                                            &cfg->viewpoint);
         vlc_gl_ReleaseCurrent(sys->gl);
         if (!sys->vgl) {
             msg_Err(vd, "Error while initializing opengl display.");
             goto error;
         }
 
-        /* */
-        vout_display_info_t info = vd->info;
-        info.has_pictures_invalid = false;
-        info.subpicture_chromas = subpicture_chromas;
-
         /* Setup vout_display_t once everything is fine */
-        vd->info = info;
+        vd->info.subpicture_chromas = subpicture_chromas;
 
         vd->pool = Pool;
         vd->prepare = PictureRender;
@@ -248,19 +246,19 @@ static int Open (vlc_object_t *this)
         vd->control = Control;
 
         /* */
-        vout_display_SendEventDisplaySize (vd, vd->fmt.i_visible_width, vd->fmt.i_visible_height);
+        vout_window_ReportSize(sys->embed, fmt->i_visible_width, fmt->i_visible_height);
 
+        (void) context;
         return VLC_SUCCESS;
 
     error:
-        Close(this);
+        Close(vd);
         return VLC_EGENERIC;
     }
 }
 
-void Close (vlc_object_t *this)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)this;
     vout_display_sys_t *sys = vd->sys;
 
     @autoreleasepool {
@@ -361,28 +359,23 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
             {
-                const vout_display_cfg_t *cfg;
-
-                if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
-                    cfg = vd->cfg;
-                } else {
-                    cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
-                }
+                const vout_display_cfg_t *cfg =
+                    va_arg (ap, const vout_display_cfg_t *);
 
                 /* we always use our current frame here, because we have some size constraints
                  in the ui vout provider */
                 vout_display_cfg_t cfg_tmp = *cfg;
 
                 /* Reverse vertical alignment as the GL tex are Y inverted */
-                if (cfg_tmp.align.vertical == VOUT_DISPLAY_ALIGN_TOP)
-                    cfg_tmp.align.vertical = VOUT_DISPLAY_ALIGN_BOTTOM;
-                else if (cfg_tmp.align.vertical == VOUT_DISPLAY_ALIGN_BOTTOM)
-                    cfg_tmp.align.vertical = VOUT_DISPLAY_ALIGN_TOP;
+                if (cfg_tmp.align.vertical == VLC_VIDEO_ALIGN_TOP)
+                    cfg_tmp.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+                else if (cfg_tmp.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+                    cfg_tmp.align.vertical = VLC_VIDEO_ALIGN_TOP;
 
                 vout_display_place_t place;
-                vout_display_PlacePicture (&place, &vd->source, &cfg_tmp, false);
+                vout_display_PlacePicture(&place, &vd->source, &cfg_tmp);
                 @synchronized (sys->glView) {
-                    sys->place = place;
+                    sys->cfg = *cfg;
                 }
 
                 if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
@@ -639,19 +632,19 @@ static void OpenglSwap (vlc_gl_t *gl)
 
     @synchronized(self) {
         if (vd) {
-            vout_display_cfg_t cfg_tmp = *(vd->cfg);
-            cfg_tmp.display.width  = bounds.size.width;
-            cfg_tmp.display.height = bounds.size.height;
+            vout_display_sys_t *sys = vd->sys;
+            sys->cfg.display.width  = bounds.size.width;
+            sys->cfg.display.height = bounds.size.height;
 
-            vout_display_PlacePicture (&place, &vd->source, &cfg_tmp, false);
-            vd->sys->place = place;
-            vout_display_SendEventDisplaySize (vd, bounds.size.width, bounds.size.height);
+            vout_display_PlacePicture(&place, &vd->source, &sys->cfg);
+            vout_window_ReportSize(sys->embed, bounds.size.width, bounds.size.height);
         }
     }
 
     if ([self lockgl]) {
         // x / y are top left corner, but we need the lower left one
-        glViewport (place.x, bounds.size.height - (place.y + place.height), place.width, place.height);
+        glViewport (place.x, bounds.size.height - (place.y + place.height),
+                    place.width, place.height);
 
         @synchronized(self) {
             // This may be cleared before -drawRect is being called,
@@ -787,9 +780,8 @@ static void OpenglSwap (vlc_gl_t *gl)
     if (b_inside) {
         @synchronized (self) {
             if (vd) {
-                vout_display_SendMouseMovedDisplayCoordinates(vd, ORIENT_NORMAL,
-                                                              (int)ml.x, videoRect.size.height - (int)ml.y,
-                                                              &vd->sys->place);
+                vout_display_SendMouseMovedDisplayCoordinates(vd,
+                                                              (int)ml.x, videoRect.size.height - (int)ml.y);
             }
         }
     }

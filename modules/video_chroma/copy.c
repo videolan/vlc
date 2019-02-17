@@ -2,7 +2,6 @@
  * copy.c: Fast YV12/NV12 copy
  *****************************************************************************
  * Copyright (C) 2010 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *          Victorien Le Couviour--Tuffet <victorien.lecouviour.tuffet@gmail.com>
@@ -1085,7 +1084,6 @@ static void pic_rsc_destroy(picture_t *pic)
 {
     for (unsigned i = 0; i < 3; i++)
         free(pic->p[i].p_pixels);
-    free(pic);
 }
 
 static picture_t *pic_new_unaligned(const video_format_t *fmt)

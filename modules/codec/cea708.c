@@ -696,9 +696,9 @@ static void CEA708_Window_Scroll( cea708_window_t *p_w )
             break;
         case CEA708_WA_DIRECTION_TB:
             /* Move DOWN */
-            if( p_w->i_firstrow == CEA708_WINDOW_MAX_ROWS - 1 )
+            if( p_w->i_lastrow == CEA708_WINDOW_MAX_ROWS - 1 )
                 CEA708_Window_Truncate( p_w, CEA708_WA_DIRECTION_TB );
-            for( int i=p_w->i_lastrow; i > p_w->i_firstrow; i-- )
+            for( int i=p_w->i_lastrow; i >= p_w->i_firstrow; i-- )
                 p_w->rows[i+1] = p_w->rows[i];
             p_w->rows[p_w->i_firstrow] = NULL;
             p_w->i_firstrow++;
@@ -749,8 +749,7 @@ static void CEA708_Window_CarriageReturn( cea708_window_t *p_w )
                        0 : CEA708_WINDOW_MAX_COLS - 1;
             break;
         case CEA708_WA_DIRECTION_BT:
-            if( p_w->row + 1 < CEA708_WINDOW_MAX_ROWS &&
-                CEA708_Window_RowCount( p_w ) < p_w->i_row_count )
+            if( p_w->row + 1 < p_w->i_row_count )
                 p_w->row++;
             else
                 CEA708_Window_Scroll( p_w );
@@ -987,8 +986,27 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
     if( p_region == NULL && !(p_region = SubpictureUpdaterSysRegionNew()) )
         return;
 
+    int first, last;
+
+    if (p_w->style.scroll_direction == CEA708_WA_DIRECTION_BT) {
+        /* BT is a bit of a special case since we need to grab the last N
+           rows between first and last, rather than the first... */
+        last = p_w->i_lastrow;
+        if (p_w->i_lastrow - p_w->i_row_count < p_w->i_firstrow)
+            first = p_w->i_firstrow;
+        else
+            first = p_w->i_lastrow - p_w->i_row_count + 1;
+
+    } else {
+        first = p_w->i_firstrow;
+        if (p_w->i_firstrow + p_w->i_row_count > p_w->i_lastrow)
+            last = p_w->i_lastrow;
+        else
+            last = p_w->i_firstrow + p_w->i_row_count - 1;
+    }
+
     text_segment_t **pp_last = &p_region->p_segments;
-    for( uint8_t i=p_w->i_firstrow; i<=p_w->i_lastrow; i++ )
+    for( uint8_t i=first; i<=last; i++ )
     {
         if( !p_w->rows[i] )
             continue;
@@ -1000,8 +1018,25 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
 
     if( p_w->b_relative )
     {
+        /* FIXME: take into account left/right anchors */
         p_region->origin.x = p_w->i_anchor_offset_h / 100.0;
-        p_region->origin.y = p_w->i_anchor_offset_v / 100.0;
+
+        switch (p_w->anchor_point) {
+        case CEA708_ANCHOR_TOP_LEFT:
+        case CEA708_ANCHOR_TOP_CENTER:
+        case CEA708_ANCHOR_TOP_RIGHT:
+            p_region->origin.y = p_w->i_anchor_offset_v / 100.0;
+            break;
+        case CEA708_ANCHOR_BOTTOM_LEFT:
+        case CEA708_ANCHOR_BOTTOM_CENTER:
+        case CEA708_ANCHOR_BOTTOM_RIGHT:
+            p_region->origin.y = 1.0 - (p_w->i_anchor_offset_v / 100.0);
+            break;
+        default:
+            /* FIXME: for CENTER vertical justified, just position as top */
+            p_region->origin.y = p_w->i_anchor_offset_v / 100.0;
+            break;
+        }
     }
     else
     {
@@ -1049,12 +1084,14 @@ static subpicture_t *CEA708_BuildSubtitle( cea708_t *p_cea708 )
 
     p_spu_sys->margin_ratio = CEA708_SCREEN_SAFE_MARGIN_RATIO;
 
+    bool first = true;
+
     for(size_t i=0; i<CEA708_WINDOWS_COUNT; i++)
     {
         cea708_window_t *p_w = &p_cea708->window[i];
         if( p_w->b_defined && p_w->b_visible && CEA708_Window_RowCount( p_w ) )
         {
-            if( p_region != &p_spu_sys->region )
+            if( !first )
             {
                 substext_updater_region_t *p_newregion =
                         SubpictureUpdaterSysRegionNew();
@@ -1063,6 +1100,8 @@ static subpicture_t *CEA708_BuildSubtitle( cea708_t *p_cea708 )
                 SubpictureUpdaterSysRegionAdd( p_region, p_newregion );
                 p_region = p_newregion;
             }
+            first = false;
+
             /* Fill region */
             CEA708SpuConvert( p_w, p_region );
         }
@@ -1491,7 +1530,7 @@ static int CEA708_Decode_C1( uint8_t code, cea708_t *p_cea708 )
                 p_cea708->p_cw->i_anchor_offset_h = v;
                 v = cea708_input_buffer_get( ib );
                 p_cea708->p_cw->anchor_point = v >> 4;
-                p_cea708->p_cw->i_row_count = v & 0x0F;
+                p_cea708->p_cw->i_row_count = (v & 0x0F) + 1;
                 v = cea708_input_buffer_get( ib );
                 p_cea708->p_cw->i_col_count = v & 0x3F;
                 v = cea708_input_buffer_get( ib );

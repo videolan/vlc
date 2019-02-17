@@ -2,7 +2,6 @@
  * demux.hpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2003-2004 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Steve Lhomme <steve.lhomme@free.fr>
@@ -61,7 +60,7 @@ public:
         vlc_mutex_init( &lock_demuxer );
     }
 
-    virtual ~demux_sys_t();
+    ~demux_sys_t();
 
     /* current data */
     demux_t                 & demuxer;

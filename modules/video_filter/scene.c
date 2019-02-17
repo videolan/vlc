@@ -2,7 +2,6 @@
  * scene.c : scene video filter (based on modules/video_output/image.c)
  *****************************************************************************
  * Copyright (C) 2004-2008 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@videolan.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -280,14 +279,13 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
     char *psz_temp = NULL;
     int i_ret;
 
-    memset( &fmt_out, 0, sizeof(video_format_t) );
+    video_format_Init( &fmt_out, p_sys->i_format );
 
     /* Save snapshot psz_format to a memory zone */
     fmt_in = p_pic->format;
     fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
     fmt_out.i_width = p_sys->i_width;
     fmt_out.i_height = p_sys->i_height;
-    fmt_out.i_chroma = p_sys->i_format;
 
     /*
      * Save the snapshot to a temporary file and

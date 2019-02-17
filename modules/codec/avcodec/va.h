@@ -2,7 +2,6 @@
  * va.h: Video Acceleration API for avcodec
  *****************************************************************************
  * Copyright (C) 2009 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir_AT_ videolan _DOT_ org>
  *
@@ -33,10 +32,7 @@ struct vlc_va_t {
     struct vlc_common_members obj;
 
     vlc_va_sys_t *sys;
-    module_t *module;
-    const char *description;
-
-    int  (*get)(vlc_va_t *, picture_t *pic, uint8_t **data);
+    int  (*get)(vlc_va_t *, picture_t *pic, uint8_t **surface);
 };
 
 /**
@@ -59,20 +55,26 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *,
                      void *p_sys);
 
 /**
- * Allocates a hardware video surface for a libavcodec frame.
+ * Get a hardware video surface for a libavcodec frame.
  * The surface will be used as output for the hardware decoder, and possibly
  * also as a reference frame to decode other surfaces.
  *
- * @param pic pointer to VLC picture being allocated [IN/OUT]
- * @param data pointer to the AVFrame data[0] and data[3] pointers [OUT]
+ * The type of the surface depends on the hardware pixel format:
+ * AV_PIX_FMT_D3D11VA_VLD - ID3D11VideoDecoderOutputView*
+ * AV_PIX_FMT_DXVA2_VLD   - IDirect3DSurface9*
+ * AV_PIX_FMT_VDPAU       - VdpVideoSurface
+ * AV_PIX_FMT_VAAPI_VLD   - VASurfaceID
+ *
+ * @param pic pointer to VLC picture containing the surface [IN/OUT]
+ * @param surface pointer to the AVFrame data[0] and data[3] pointers [OUT]
  *
  * @note This function needs not be reentrant.
  *
  * @return VLC_SUCCESS on success, otherwise an error code.
  */
-static inline int vlc_va_Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
+static inline int vlc_va_Get(vlc_va_t *va, picture_t *pic, uint8_t **surface)
 {
-    return va->get(va, pic, data);
+    return va->get(va, pic, surface);
 }
 
 /**

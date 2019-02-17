@@ -28,6 +28,7 @@
 #include <assert.h>
 #include <vlc_common.h>
 #include <vlc_picture.h>
+#include <vlc_picture_pool.h>
 #include "vlc_vdpau.h"
 
 #pragma GCC visibility push(default)
@@ -35,9 +36,10 @@
 static_assert(offsetof (vlc_vdp_video_field_t, context) == 0,
               "Cast assumption failure");
 
-static void SurfaceDestroy(struct picture_context_t *ctx)
+static void VideoSurfaceDestroy(struct picture_context_t *ctx)
 {
-    vlc_vdp_video_field_t *field = (vlc_vdp_video_field_t *)ctx;
+    vlc_vdp_video_field_t *field = container_of(ctx, vlc_vdp_video_field_t,
+                                                context);
     vlc_vdp_video_frame_t *frame = field->frame;
     VdpStatus err;
 
@@ -56,16 +58,17 @@ static void SurfaceDestroy(struct picture_context_t *ctx)
     free(frame);
 }
 
-static picture_context_t *SurfaceCopy(picture_context_t *ctx)
+static picture_context_t *VideoSurfaceCopy(picture_context_t *ctx)
 {
-    vlc_vdp_video_field_t *fold = (vlc_vdp_video_field_t *)ctx;
+    vlc_vdp_video_field_t *fold = container_of(ctx, vlc_vdp_video_field_t,
+                                               context);
     vlc_vdp_video_frame_t *frame = fold->frame;
     vlc_vdp_video_field_t *fnew = malloc(sizeof (*fnew));
     if (unlikely(fnew == NULL))
         return NULL;
 
-    fnew->context.destroy = SurfaceDestroy;
-    fnew->context.copy = SurfaceCopy;
+    fnew->context.destroy = VideoSurfaceDestroy;
+    fnew->context.copy = VideoSurfaceCopy;
     fnew->frame = frame;
     fnew->structure = fold->structure;
     fnew->procamp = fold->procamp;
@@ -97,8 +100,8 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
         return NULL;
     }
 
-    field->context.destroy = SurfaceDestroy;
-    field->context.copy = SurfaceCopy;
+    field->context.destroy = VideoSurfaceDestroy;
+    field->context.copy = VideoSurfaceCopy;
     field->frame = frame;
     field->structure = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
     field->procamp = procamp_default;
@@ -123,4 +126,73 @@ VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
     assert(pic->context == NULL);
     pic->context = &field->context;
     return VDP_STATUS_OK;
+}
+
+static void vlc_vdp_output_surface_destroy(picture_t *pic)
+{
+    vlc_vdp_output_surface_t *sys = pic->p_sys;
+
+    vdp_output_surface_destroy(sys->vdp, sys->surface);
+    vdp_release_x11(sys->vdp);
+    free(sys);
+}
+
+static
+picture_t *vlc_vdp_output_surface_create(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
+                                         const video_format_t *restrict fmt)
+{
+    vlc_vdp_output_surface_t *sys = malloc(sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return NULL;
+
+    sys->vdp = vdp_hold_x11(vdp, &sys->device);
+    sys->gl_nv_surface = 0;
+
+    VdpStatus err = vdp_output_surface_create(vdp, sys->device, rgb_fmt,
+        fmt->i_visible_width, fmt->i_visible_height, &sys->surface);
+    if (err != VDP_STATUS_OK)
+    {
+error:
+        vdp_release_x11(vdp);
+        free(sys);
+        return NULL;
+    }
+
+    picture_resource_t res = {
+        .p_sys = sys,
+        .pf_destroy = vlc_vdp_output_surface_destroy,
+    };
+
+    picture_t *pic = picture_NewFromResource(fmt, &res);
+    if (unlikely(pic == NULL))
+    {
+        vdp_output_surface_destroy(vdp, sys->surface);
+        goto error;
+    }
+    return pic;
+}
+
+picture_pool_t *vlc_vdp_output_pool_create(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
+                                           const video_format_t *restrict fmt,
+                                           unsigned requested_count)
+{
+    picture_t *pics[requested_count];
+    unsigned count = 0;
+
+    while (count < requested_count)
+    {
+        pics[count] = vlc_vdp_output_surface_create(vdp, rgb_fmt, fmt);
+        if (pics[count] == NULL)
+            break;
+        count++;
+    }
+
+    if (count == 0)
+        return NULL;
+
+    picture_pool_t *pool = picture_pool_New(count, pics);
+    if (unlikely(pool == NULL))
+        while (count > 0)
+            picture_Release(pics[--count]);
+    return pool;
 }

@@ -2,7 +2,6 @@
  * directory.c : Use access readdir to output folder content to playlist
  *****************************************************************************
  * Copyright (C) 2014 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Julien 'Lta' BALLET <contact # lta . io >
  *

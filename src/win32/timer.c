@@ -79,12 +79,16 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
         if (value < 0)
             value = 0;
     }
-    value = (value + (1000-1)) / 1000;
-    interval = (interval + (1000-1)) / 1000;
 
-    if (!CreateTimerQueueTimer (&timer->handle, NULL, vlc_timer_do, timer,
-                                MS_FROM_VLC_TICK(value), MS_FROM_VLC_TICK(interval),
-                                WT_EXECUTEDEFAULT))
+    DWORD val    = MS_FROM_VLC_TICK(value);
+    DWORD interv = MS_FROM_VLC_TICK(interval);
+    if (val == 0 && value != 0)
+        val = 1; /* rounding error */
+    if (interv == 0 && interval != 0)
+        interv = 1; /* rounding error */
+
+    if (!CreateTimerQueueTimer(&timer->handle, NULL, vlc_timer_do, timer,
+                               val, interv, WT_EXECUTEDEFAULT))
         abort ();
 }
 
