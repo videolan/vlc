@@ -291,8 +291,8 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     if( !p_owner )
         return NULL;
     p_sys->p_decoder = &p_owner->dec;
-    p_sys->p_decoder->p_module = NULL;
-    p_sys->p_decoder->fmt_in = *p_fmt;
+    decoder_Init( p_sys->p_decoder, p_fmt );
+
     p_sys->p_decoder->b_frame_drop_allowed = true;
     p_sys->p_decoder->fmt_out = p_sys->p_decoder->fmt_in;
     p_sys->p_decoder->fmt_out.i_extra = 0;

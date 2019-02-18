@@ -217,15 +217,9 @@ bool AbstractDecodedStream::init(const es_format_t *p_fmt)
     p_owner->id = this;
 
     p_decoder = &p_owner->dec;
-    p_decoder->p_module = NULL;
-    es_format_Init(&p_decoder->fmt_out, p_fmt->i_cat, 0);
-    es_format_Copy(&p_decoder->fmt_in, p_fmt);
-    p_decoder->b_frame_drop_allowed = false;
+    decoder_Init( p_decoder, p_fmt );
 
     setCallbacks();
-
-    p_decoder->pf_decode = NULL;
-    p_decoder->pf_get_cc = NULL;
 
     p_decoder->p_module = module_need_var(p_decoder, category, "codec");
     if(!p_decoder->p_module)
