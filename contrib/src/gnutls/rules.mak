@@ -35,9 +35,7 @@ GNUTLS_CONF := \
 	--without-p11-kit \
 	--disable-cxx \
 	--disable-srp-authentication \
-	--disable-psk-authentication-FIXME \
 	--disable-anon-authentication \
-	--disable-openpgp-authentication \
 	--disable-openssl-compatibility \
 	--disable-guile \
 	--disable-nls \
