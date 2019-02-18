@@ -87,16 +87,9 @@ static void queue_sub(decoder_t *dec, subpicture_t *p_subpic)
 static int decoder_load(decoder_t *decoder, bool is_packetizer,
                          const es_format_t *restrict fmt)
 {
+    decoder_Init( decoder, fmt );
+
     decoder->b_frame_drop_allowed = true;
-    decoder->i_extra_picture_buffers = 0;
-
-    decoder->pf_decode = NULL;
-    decoder->pf_get_cc = NULL;
-    decoder->pf_packetize = NULL;
-    decoder->pf_flush = NULL;
-
-    es_format_Copy(&decoder->fmt_in, fmt);
-    es_format_Init(&decoder->fmt_out, fmt->i_cat, 0);
 
     if (!is_packetizer)
     {

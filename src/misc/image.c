@@ -673,11 +673,7 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fm
     p_dec = &p_owner->dec;
     p_owner->p_image = p_image;
 
-    p_dec->p_module = NULL;
-
-    es_format_Copy( &p_dec->fmt_in, fmt );
-    es_format_Init( &p_dec->fmt_out, VIDEO_ES, 0 );
-    p_dec->b_frame_drop_allowed = false;
+    decoder_Init( p_dec, fmt );
 
     static const struct decoder_owner_callbacks dec_cbs =
     {

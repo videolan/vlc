@@ -169,16 +169,9 @@ static inline struct decoder_owner *dec_get_owner( decoder_t *p_dec )
 static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
                         const es_format_t *restrict p_fmt )
 {
+    decoder_Init( p_dec, p_fmt );
+
     p_dec->b_frame_drop_allowed = true;
-    p_dec->i_extra_picture_buffers = 0;
-
-    p_dec->pf_decode = NULL;
-    p_dec->pf_get_cc = NULL;
-    p_dec->pf_packetize = NULL;
-    p_dec->pf_flush = NULL;
-
-    es_format_Copy( &p_dec->fmt_in, p_fmt );
-    es_format_Init( &p_dec->fmt_out, p_fmt->i_cat, 0 );
 
     /* Find a suitable decoder/packetizer module */
     if( !b_packetizer )
