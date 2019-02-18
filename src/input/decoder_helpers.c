@@ -75,10 +75,11 @@ void decoder_Destroy( decoder_t *p_dec )
 int decoder_UpdateVideoFormat( decoder_t *dec )
 {
     vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+    if ( unlikely(dec->fmt_in.i_cat != VIDEO_ES || dec->cbs == NULL ||
+                  dec->cbs->video.format_update == NULL) )
+        return -1;
 
-    if( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs->video.format_update != NULL )
-        return dec->cbs->video.format_update( dec );
-    return -1;
+    return dec->cbs->video.format_update( dec );
 }
 
 picture_t *decoder_NewPicture( decoder_t *dec )
