@@ -327,6 +327,13 @@ VLC_API void decoder_Init( decoder_t *dec, const es_format_t * );
 VLC_API void decoder_Destroy( decoder_t *p_dec );
 
 /**
+ * Unload a decoder module and reset the input/output formats.
+ *
+ * To be used by decoder owners.
+ */
+VLC_API void decoder_Clean( decoder_t *p_dec );
+
+/**
  * This function queues a single picture to the video output.
  *
  * \note

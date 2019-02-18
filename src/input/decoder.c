@@ -189,38 +189,16 @@ static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
 
     if( !p_dec->p_module )
     {
-        es_format_Clean( &p_dec->fmt_in );
+        decoder_Clean( p_dec );
         return -1;
     }
-    else
-        return 0;
-}
-
-/**
- * Unload a decoder module
- */
-static void UnloadDecoder( decoder_t *p_dec )
-{
-    if( p_dec->p_module )
-    {
-        module_unneed( p_dec, p_dec->p_module );
-        p_dec->p_module = NULL;
-    }
-
-    if( p_dec->p_description )
-    {
-        vlc_meta_Delete( p_dec->p_description );
-        p_dec->p_description = NULL;
-    }
-
-    es_format_Clean( &p_dec->fmt_in );
-    es_format_Clean( &p_dec->fmt_out );
+    return 0;
 }
 
 static int ReloadDecoder( decoder_t *p_dec, bool b_packetizer,
                           const es_format_t *restrict p_fmt, enum reload reload )
 {
-    /* Copy p_fmt since it can be destroyed by UnloadDecoder */
+    /* Copy p_fmt since it can be destroyed by decoder_Clean */
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     es_format_t fmt_in;
     if( es_format_Copy( &fmt_in, p_fmt ) != VLC_SUCCESS )
@@ -230,7 +208,7 @@ static int ReloadDecoder( decoder_t *p_dec, bool b_packetizer,
     }
 
     /* Restart the decoder module */
-    UnloadDecoder( p_dec );
+    decoder_Clean( p_dec );
     p_owner->error = false;
 
     if( reload == RELOAD_DECODER_AOUT )
@@ -1974,7 +1952,7 @@ static void DeleteDecoder( decoder_t * p_dec )
              (char*)&p_dec->fmt_in.i_codec );
 
     const enum es_format_category_e i_cat =p_dec->fmt_in.i_cat;
-    UnloadDecoder( p_dec );
+    decoder_Clean( p_dec );
 
     /* Free all packets still in the decoder fifo. */
     block_FifoRelease( p_owner->p_fifo );

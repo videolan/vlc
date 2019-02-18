@@ -46,7 +46,7 @@ void decoder_Init( decoder_t *p_dec, const es_format_t *restrict p_fmt )
     es_format_Init( &p_dec->fmt_out, p_fmt->i_cat, 0 );
 }
 
-static void decoder_Clean( decoder_t *p_dec )
+void decoder_Clean( decoder_t *p_dec )
 {
     es_format_Clean( &p_dec->fmt_in );
     es_format_Clean( &p_dec->fmt_out );

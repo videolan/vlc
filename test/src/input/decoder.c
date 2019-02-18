@@ -106,26 +106,10 @@ static int decoder_load(decoder_t *decoder, bool is_packetizer,
 
     if (!decoder->p_module)
     {
-        es_format_Clean(&decoder->fmt_in);
+        decoder_Clean( decoder );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
-}
-
-static void decoder_unload(decoder_t *decoder)
-{
-    if (decoder->p_module != NULL)
-    {
-        module_unneed(decoder, decoder->p_module);
-        decoder->p_module = NULL;
-        es_format_Clean(&decoder->fmt_out);
-    }
-    es_format_Clean(&decoder->fmt_in);
-    if (decoder->p_description)
-    {
-        vlc_meta_Delete(decoder->p_description);
-        decoder->p_description = NULL;
-    }
 }
 
 void test_decoder_destroy(decoder_t *decoder)
@@ -237,7 +221,7 @@ int test_decoder_process(decoder_t *decoder, block_t *p_block)
             decoder->pf_decode(decoder, NULL);
 
             /* Reload decoder */
-            decoder_unload(decoder);
+            decoder_Clean(decoder);
             if (decoder_load(decoder, false, &packetizer->fmt_out) != VLC_SUCCESS)
             {
                 block_ChainRelease(p_packetized_block);
