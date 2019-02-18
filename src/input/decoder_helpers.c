@@ -80,3 +80,9 @@ int decoder_UpdateVideoFormat( decoder_t *dec )
         return dec->cbs->video.format_update( dec );
     return -1;
 }
+
+picture_t *decoder_NewPicture( decoder_t *dec )
+{
+    vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+    return dec->cbs->video.buffer_new( dec );
+}

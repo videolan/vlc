@@ -286,12 +286,7 @@ VLC_API int decoder_UpdateVideoFormat( decoder_t *dec );
  *
  * \return a picture buffer on success, NULL on error
  */
-VLC_USED
-static inline picture_t *decoder_NewPicture( decoder_t *dec )
-{
-    vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
-    return dec->cbs->video.buffer_new( dec );
-}
+VLC_API picture_t *decoder_NewPicture( decoder_t *dec );
 
 /**
  * Abort any calls of decoder_NewPicture

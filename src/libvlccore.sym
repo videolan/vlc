@@ -73,6 +73,7 @@ date_Change
 date_Decrement
 date_Increment
 date_Init
+decoder_NewPicture
 decoder_Init
 decoder_Clean
 decoder_Destroy
