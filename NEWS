@@ -1,8 +1,22 @@
 Changes between 3.0.6 and 3.0.7:
 --------------------------------
 
+Access:
+ * Improve Blu-ray support
+
+Audio output:
+ * Fix pass-through on Android-23
+
 Video Output:
  * Fix 12 bits sources playback with Direct3D11
+ * Fix crash on iOS
+
+Stream Output:
+ * Improve Chromecast support with new ChromeCast apps
+
+Misc:
+ * Update Youtube, Dailymotion, Vimeo scripts
+
 
 Changes between 3.0.5 and 3.0.6:
 --------------------------------
@@ -13,6 +27,7 @@ Core:
 Codec:
  * Add support for 12 bits decoding of AV1
  * Fix HDR support in AV1 when the container provides the metadata
+
 
 Changes between 3.0.4 and 3.0.5:
 --------------------------------
