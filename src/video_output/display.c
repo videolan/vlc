@@ -418,7 +418,7 @@ bool vout_IsDisplayFiltered(vout_display_t *vd)
     return osys->converters == NULL || !filter_chain_IsEmpty(osys->converters);
 }
 
-picture_t *vout_FilterDisplay(vout_display_t *vd, picture_t *picture)
+picture_t *vout_ConvertForDisplay(vout_display_t *vd, picture_t *picture)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
@@ -452,7 +452,7 @@ picture_t *vout_display_Prepare(vout_display_t *vd, picture_t *picture,
                                 subpicture_t *subpic, vlc_tick_t date)
 {
     assert(subpic == NULL); /* TODO */
-    picture = vout_FilterDisplay(vd, picture);
+    picture = vout_ConvertForDisplay(vd, picture);
 
     if (picture != NULL && vd->prepare != NULL)
         vd->prepare(vd, picture, subpic, date);

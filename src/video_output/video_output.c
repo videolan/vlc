@@ -1079,7 +1079,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     /* Render the direct buffer */
     vout_UpdateDisplaySourceProperties(vd, &todisplay->format);
 
-    todisplay = vout_FilterDisplay(vd, todisplay);
+    todisplay = vout_ConvertForDisplay(vd, todisplay);
     if (todisplay == NULL) {
         if (subpic != NULL)
             subpicture_Delete(subpic);

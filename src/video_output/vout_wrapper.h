@@ -33,7 +33,7 @@ picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count);
  * It destroy a vout managed display.
  */
 bool vout_IsDisplayFiltered(vout_display_t *);
-picture_t * vout_FilterDisplay(vout_display_t *, picture_t *);
+picture_t * vout_ConvertForDisplay(vout_display_t *, picture_t *);
 void vout_FilterFlush(vout_display_t *);
 
 void vout_SetDisplayFilled(vout_display_t *, bool is_filled);
