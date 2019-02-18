@@ -267,16 +267,7 @@ struct encoder_t
  *
  * @return 0 if the video output was set up successfully, -1 otherwise.
  */
-VLC_USED
-static inline int decoder_UpdateVideoFormat( decoder_t *dec )
-{
-    vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
-
-    if( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs->video.format_update != NULL )
-        return dec->cbs->video.format_update( dec );
-    else
-        return -1;
-}
+VLC_API int decoder_UpdateVideoFormat( decoder_t *dec );
 
 /**
  * Allocates an output picture buffer.

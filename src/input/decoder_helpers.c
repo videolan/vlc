@@ -71,3 +71,12 @@ void decoder_Destroy( decoder_t *p_dec )
         vlc_object_release( p_dec );
     }
 }
+
+int decoder_UpdateVideoFormat( decoder_t *dec )
+{
+    vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+
+    if( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs->video.format_update != NULL )
+        return dec->cbs->video.format_update( dec );
+    return -1;
+}
