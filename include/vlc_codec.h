@@ -312,6 +312,14 @@ static inline picture_t *decoder_NewPicture( decoder_t *dec )
 VLC_API void decoder_AbortPictures( decoder_t *dec, bool b_abort );
 
 /**
+ * Initialize a decoder structure before creating the decoder.
+ *
+ * To be used by decoder owners.
+ * By default frame drop is not allowed.
+ */
+VLC_API void decoder_Init( decoder_t *dec, const es_format_t * );
+
+/**
  * This function queues a single picture to the video output.
  *
  * \note
