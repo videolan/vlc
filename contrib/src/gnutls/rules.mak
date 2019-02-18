@@ -64,7 +64,7 @@ ifeq ($(ARCH),x86_64)
 endif
 endif
 ifdef HAVE_WIN32
-	GNUTLS_CONF += --without-libidn2
+	GNUTLS_CONF += --without-idn
 ifdef HAVE_CLANG
 ifeq ($(ARCH),aarch64)
 	GNUTLS_CONF += --disable-hardware-acceleration
