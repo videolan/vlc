@@ -131,12 +131,9 @@ static void decoder_unload(decoder_t *decoder)
 void test_decoder_destroy(decoder_t *decoder)
 {
     struct decoder_owner *owner = dec_get_owner(decoder);
-    decoder_t *packetizer = owner->packetizer;
 
-    decoder_unload(packetizer);
-    decoder_unload(decoder);
-    vlc_object_release(packetizer);
-    vlc_object_release(decoder);
+    decoder_Destroy(owner->packetizer);
+    decoder_Destroy(decoder);
 }
 
 decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
@@ -205,8 +202,7 @@ decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
 
     if (decoder_load(decoder, false, &packetizer->fmt_out) != VLC_SUCCESS)
     {
-        decoder_unload(packetizer);
-        vlc_object_release(packetizer);
+        decoder_Destroy(packetizer);
         vlc_object_release(decoder);
         return NULL;
     }

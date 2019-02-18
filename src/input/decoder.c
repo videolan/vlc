@@ -2032,11 +2032,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     if( p_owner->p_description )
         vlc_meta_Delete( p_owner->p_description );
 
-    if( p_owner->p_packetizer )
-    {
-        UnloadDecoder( p_owner->p_packetizer );
-        vlc_object_release( p_owner->p_packetizer );
-    }
+    decoder_Destroy( p_owner->p_packetizer );
 
     vlc_cond_destroy( &p_owner->wait_timed );
     vlc_cond_destroy( &p_owner->wait_fifo );
@@ -2045,7 +2041,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     vlc_mutex_destroy( &p_owner->lock );
     vlc_mutex_destroy( &p_owner->mouse_lock );
 
-    vlc_object_release( p_dec );
+    decoder_Destroy( p_dec );
 }
 
 /* */

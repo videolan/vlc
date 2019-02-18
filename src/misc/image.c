@@ -73,7 +73,6 @@ static picture_t *ImageConvert( image_handler_t *, picture_t *,
                                 const video_format_t *, video_format_t * );
 
 static decoder_t *CreateDecoder( image_handler_t *, const es_format_t * );
-static void DeleteDecoder( decoder_t * );
 static encoder_t *CreateEncoder( vlc_object_t *, const video_format_t *,
                                  const video_format_t * );
 static void DeleteEncoder( encoder_t * );
@@ -117,7 +116,7 @@ void image_HandlerDelete( image_handler_t *p_image )
 {
     if( !p_image ) return;
 
-    if( p_image->p_dec ) DeleteDecoder( p_image->p_dec );
+    decoder_Destroy( p_image->p_dec );
     if( p_image->p_enc ) DeleteEncoder( p_image->p_enc );
     if( p_image->p_converter ) DeleteConverter( p_image->p_converter );
 
@@ -154,8 +153,8 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
     if( p_image->p_dec &&
         p_image->p_dec->fmt_in.i_codec != p_es_in->video.i_chroma )
     {
-        DeleteDecoder( p_image->p_dec );
-        p_image->p_dec = 0;
+        decoder_Destroy( p_image->p_dec );
+        p_image->p_dec = NULL;
     }
 
     /* Start a decoder */
@@ -169,7 +168,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         }
         if( p_image->p_dec->fmt_out.i_cat != VIDEO_ES )
         {
-            DeleteDecoder( p_image->p_dec );
+            decoder_Destroy( p_image->p_dec );
             p_image->p_dec = NULL;
             block_Release(p_block);
             return NULL;
@@ -693,26 +692,13 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fm
                  "VLC probably does not support this image format.",
                  (char*)&p_dec->fmt_in.i_codec );
 
-        DeleteDecoder( p_dec );
+        decoder_Destroy( p_dec );
         p_dec = NULL;
     }
 
     return p_dec;
 }
 
-static void DeleteDecoder( decoder_t * p_dec )
-{
-    if( p_dec->p_module ) module_unneed( p_dec, p_dec->p_module );
-
-    es_format_Clean( &p_dec->fmt_in );
-    es_format_Clean( &p_dec->fmt_out );
-
-    if( p_dec->p_description )
-        vlc_meta_Delete( p_dec->p_description );
-
-    vlc_object_release( p_dec );
-    p_dec = NULL;
-}
 
 static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt_in,
                                  const video_format_t *fmt_out )
