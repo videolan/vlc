@@ -26,7 +26,7 @@
 /**
  * Mouse buttons
  */
-enum
+enum vlc_mouse_button
 {
     MOUSE_BUTTON_LEFT=0,
     MOUSE_BUTTON_CENTER,
