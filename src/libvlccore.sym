@@ -74,6 +74,7 @@ date_Decrement
 date_Increment
 date_Init
 decoder_Init
+decoder_Destroy
 decoder_AbortPictures
 decoder_NewAudioBuffer
 demux_PacketizerDestroy
