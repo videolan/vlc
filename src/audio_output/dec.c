@@ -276,7 +276,7 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t dec_pts)
     /* Early audio output.
      * This is rare except at startup when the buffers are still empty. */
     if (drift < (owner->sync.discontinuity ? 0
-                : lroundf(-3 * AOUT_MAX_PTS_ADVANCE * rate)))
+                : lroundf(-3 * AOUT_MAX_PTS_ADVANCE / rate)))
     {
         if (!owner->sync.discontinuity)
             msg_Warn (aout, "playback way too early (%"PRId64"): "
