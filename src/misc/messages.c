@@ -338,11 +338,10 @@ static const struct vlc_logger_operations switch_ops = {
     vlc_LogSwitchClose,
 };
 
-static void vlc_LogSwitch(libvlc_int_t *vlc,
+static void vlc_LogSwitch(vlc_logger_t *logger,
                           const struct vlc_logger_operations *ops,
                           void *opaque)
 {
-    struct vlc_logger *logger = libvlc_priv(vlc)->logger;
     struct vlc_logger_switch *logswitch = logger->sys;
     struct vlc_logger old_logger;
 
@@ -436,7 +435,7 @@ void vlc_LogInit(libvlc_int_t *vlc)
             vlc_object_release(VLC_OBJECT(module));
     }
 
-    vlc_LogSwitch(vlc, ops, module);
+    vlc_LogSwitch(vlc->obj.logger, ops, module);
 }
 
 /**
@@ -459,8 +458,6 @@ int vlc_LogPreinit(libvlc_int_t *vlc)
         free(logger);
         return -1;
     }
-
-    libvlc_priv(vlc)->logger = logger;
     vlc->obj.logger = logger;
 
     const struct vlc_logger_operations *ops;
@@ -479,7 +476,7 @@ int vlc_LogPreinit(libvlc_int_t *vlc)
 void vlc_LogSet(libvlc_int_t *vlc, const struct vlc_logger_operations *ops,
                 void *opaque)
 {
-    vlc_LogSwitch(vlc, ops, opaque);
+    vlc_LogSwitch(vlc->obj.logger, ops, opaque);
 
     /* Announce who we are */
     msg_Dbg (vlc, "VLC media player - %s", VERSION_MESSAGE);

@@ -479,7 +479,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     if( !var_InheritBool( p_libvlc, "ignore-config" ) )
         config_AutoSaveConfigFile( VLC_OBJECT(p_libvlc) );
 
-    vlc_LogDestroy(priv->logger);
+    vlc_LogDestroy(p_libvlc->obj.logger);
     /* Free module bank. It is refcounted, so we call this each time  */
     module_EndBank (true);
 #if defined(_WIN32) || defined(__OS2__)
