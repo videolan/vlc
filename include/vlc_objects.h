@@ -28,6 +28,8 @@
  * Common VLC object defintions
  */
 
+struct vlc_logger;
+
 /**
  * VLC object common members
  *
@@ -37,6 +39,8 @@
  */
 struct vlc_common_members
 {
+    struct vlc_logger *logger;
+
     /** Log messages header
      *
      * Human-readable header for log messages. This is not thread-safe and

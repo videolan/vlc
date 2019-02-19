@@ -128,11 +128,8 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
 #endif
 
     /* Pass message to the callback */
-    if (obj != NULL) {
-        vlc_logger_t *logger = libvlc_priv(vlc_object_instance(obj))->logger;
-
-        vlc_vaLogCallback(logger, type, &msg, format, args);
-    }
+    if (obj != NULL)
+        vlc_vaLogCallback(obj->obj.logger, type, &msg, format, args);
 }
 
 /**
@@ -464,6 +461,7 @@ int vlc_LogPreinit(libvlc_int_t *vlc)
     }
 
     libvlc_priv(vlc)->logger = logger;
+    vlc->obj.logger = logger;
 
     const struct vlc_logger_operations *ops;
     void *opaque;
