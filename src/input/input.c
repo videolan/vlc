@@ -119,17 +119,16 @@ static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO f
  *
  * \param p_parent a vlc_object
  * \param p_item an input item
- * \param psz_log an optional prefix for this input logs
  * \param p_resource an optional input ressource
  * \return a pointer to the spawned input thread
  */
 input_thread_t *input_Create( vlc_object_t *p_parent,
                               input_thread_events_cb events_cb, void *events_data,
                               input_item_t *p_item,
-                              const char *psz_log, input_resource_t *p_resource,
+                              input_resource_t *p_resource,
                               vlc_renderer_item_t *p_renderer )
 {
-    return Create( p_parent, events_cb, events_data, p_item, psz_log, false,
+    return Create( p_parent, events_cb, events_data, p_item, NULL, false,
                    false, p_resource, p_renderer );
 }
 

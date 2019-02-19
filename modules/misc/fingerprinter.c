@@ -183,7 +183,7 @@ static void DoFingerprint( fingerprinter_thread_t *p_fingerprinter,
 
     input_thread_t *p_input = input_Create( p_fingerprinter, InputEvent,
                                             p_fingerprinter->p_sys,
-                                            p_item, "fingerprinter", NULL, NULL );
+                                            p_item, NULL, NULL );
     input_item_Release( p_item );
 
     if( p_input == NULL )

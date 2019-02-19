@@ -229,7 +229,7 @@ static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     input_thread_t *p_input_thread = input_Create( p_playlist,
                                                    on_input_event, p_playlist,
-                                                   p_input, NULL,
+                                                   p_input,
                                                    p_sys->p_input_resource,
                                                    p_renderer );
     if( p_renderer )

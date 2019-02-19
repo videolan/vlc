@@ -1011,7 +1011,7 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
     media_attach_preparsed_event( p_mi->p_md );
 
     p_input_thread = input_Create( p_mi, on_input_event, p_mi,
-                                   p_mi->p_md->p_input_item, NULL,
+                                   p_mi->p_md->p_input_item,
                                    p_mi->input.p_resource,
                                    p_mi->input.p_renderer );
     unlock(p_mi);

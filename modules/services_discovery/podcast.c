@@ -212,7 +212,7 @@ static void Close( vlc_object_t *p_this )
 static input_thread_t *InputCreateAndStart( services_discovery_t *sd,
                                             input_item_t *item )
 {
-    input_thread_t *input = input_Create( sd, input_LegacyEvents, NULL, item, NULL, NULL, NULL );
+    input_thread_t *input = input_Create( sd, input_LegacyEvents, NULL, item, NULL, NULL );
     if( input != NULL && input_Start( input ) )
     {
         input_LegacyVarInit( input );

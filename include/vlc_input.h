@@ -597,9 +597,9 @@ enum input_query_e
  *****************************************************************************/
 VLC_API input_thread_t * input_Create( vlc_object_t *p_parent,
                                        input_thread_events_cb event_cb, void *events_data,
-                                       input_item_t *, const char *psz_log, input_resource_t *,
+                                       input_item_t *, input_resource_t *,
                                        vlc_renderer_item_t* p_renderer ) VLC_USED;
-#define input_Create(a,b,c,d,e,f,g) input_Create(VLC_OBJECT(a),b,c,d,e,f,g)
+#define input_Create(a,b,c,d,e,f) input_Create(VLC_OBJECT(a),b,c,d,e,f)
 
 
 /**

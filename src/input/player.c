@@ -671,7 +671,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     input->abloop_state[0].set = input->abloop_state[1].set = false;
 
     input->thread = input_Create(player, input_thread_Events, input, item,
-                                 NULL, player->resource, player->renderer);
+                                 player->resource, player->renderer);
     if (!input->thread)
     {
         free(input);

@@ -618,7 +618,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             TAB_INIT(data.i_es, data.es);
 
             p_input = input_Create( p_media, input_LegacyEvents, NULL,
-                                    p_media->vod.p_item, NULL, NULL, NULL );
+                                    p_media->vod.p_item, NULL, NULL );
             if( p_input )
             {
                 vlc_sem_t sem_preparse;
@@ -999,7 +999,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 
     p_instance->p_input = input_Create( p_instance->p_parent,
                                         input_LegacyEvents, NULL,
-                                        p_instance->p_item, NULL,
+                                        p_instance->p_item,
                                         p_instance->p_input_resource, NULL );
     if( p_instance->p_input )
     {
