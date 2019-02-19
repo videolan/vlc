@@ -580,7 +580,6 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             /* Pre-parse the input */
             input_thread_t *p_input;
             char *psz_output;
-            char *psz_header;
             char *psz_dup;
 
             input_item_Release( p_media->vod.p_item );
@@ -615,14 +614,11 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                 input_item_AddOption( p_media->vod.p_item,
                                       p_cfg->ppsz_option[i], VLC_INPUT_OPTION_TRUSTED );
 
-            if( asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name ) == -1 )
-                psz_header = NULL;
-
             sout_description_data_t data;
             TAB_INIT(data.i_es, data.es);
 
             p_input = input_Create( p_media, input_LegacyEvents, NULL,
-                                    p_media->vod.p_item, psz_header, NULL, NULL );
+                                    p_media->vod.p_item, NULL, NULL, NULL );
             if( p_input )
             {
                 vlc_sem_t sem_preparse;
@@ -648,7 +644,6 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                 input_Close( p_input );
                 vlc_sem_destroy( &sem_preparse );
             }
-            free( psz_header );
 
             /* XXX: Don't do it that way, but properly use a new input item ref. */
             input_item_t item = *p_media->vod.p_item;;
