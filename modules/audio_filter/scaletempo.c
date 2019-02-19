@@ -237,18 +237,13 @@ static size_t fill_queue( filter_t      *p_filter,
 /*****************************************************************************
  * transform_buffer: main filter loop
  *****************************************************************************/
-static size_t transform_buffer( filter_t        *p_filter,
-                                uint8_t         *p_buffer,
-                                size_t           i_buffer,
-                                uint8_t         *pout )
+static size_t transform_buffer( filter_t *p_filter,
+                                uint8_t *pout )
 {
     filter_sys_t *p = p_filter->p_sys;
+    unsigned bytes_out, bytes_off = 0;
 
-    size_t offset_in = fill_queue( p_filter, p_buffer, i_buffer, 0 );
-    unsigned bytes_out = 0;
-    while( p->bytes_queued >= p->bytes_queue_max ) {
-        unsigned bytes_off = 0;
-
+    {
         // output stride
         if( p->output_overlap ) {
             if( p->best_overlap_offset ) {
@@ -259,8 +254,7 @@ static size_t transform_buffer( filter_t        *p_filter,
         memcpy( pout + p->bytes_overlap,
                 p->buf_queue + bytes_off + p->bytes_overlap,
                 p->bytes_standing );
-        pout += p->bytes_stride;
-        bytes_out += p->bytes_stride;
+        bytes_out = p->bytes_stride;
 
         // input stride
         memcpy( p->buf_overlap,
@@ -270,8 +264,6 @@ static size_t transform_buffer( filter_t        *p_filter,
         unsigned frames_to_stride_whole = (int)frames_to_slide;
         p->bytes_to_slide       = frames_to_stride_whole * p->bytes_per_frame;
         p->frames_stride_error  = frames_to_slide - frames_to_stride_whole;
-
-        offset_in += fill_queue( p_filter, p_buffer, i_buffer, offset_in );
     }
 
     return bytes_out;
@@ -583,9 +575,19 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
         return NULL;
     }
 
-    size_t bytes_out = transform_buffer( p_filter,
-        p_in_buf->p_buffer, p_in_buf->i_buffer,
-        p_out_buf->p_buffer );
+    size_t offset_in = fill_queue( p_filter, p_in_buf->p_buffer,
+                                   p_in_buf->i_buffer, 0 );
+    /* indent for next commits */
+    {
+        size_t bytes_out = 0;
+        while( p->bytes_queued >= p->bytes_queue_max )
+        {
+            bytes_out += transform_buffer( p_filter,
+                                           &p_out_buf->p_buffer[bytes_out] );
+            offset_in += fill_queue( p_filter, p_in_buf->p_buffer,
+                                     p_in_buf->i_buffer, offset_in );
+        }
+    }
 
     p_out_buf->i_buffer     = bytes_out;
     p_out_buf->i_nb_samples = bytes_out / p->bytes_per_frame;
