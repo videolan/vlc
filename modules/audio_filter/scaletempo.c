@@ -566,18 +566,19 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
                (int)( p->bytes_stride / p->bytes_per_frame ) );
     }
 
+    block_t *p_out_buf = NULL;
     size_t i_outsize = calculate_output_buffer_size ( p_filter, p_in_buf->i_buffer );
-    block_t *p_out_buf = block_Alloc( i_outsize );
-    if( p_out_buf == NULL )
-    {
-        block_Release( p_in_buf );
-        return NULL;
-    }
 
     size_t offset_in = fill_queue( p_filter, p_in_buf->p_buffer,
                                    p_in_buf->i_buffer, 0 );
-    /* indent for next commits */
+    if( i_outsize > 0 )
     {
+        p_out_buf = block_Alloc( i_outsize );
+        if( p_out_buf == NULL )
+        {
+            block_Release( p_in_buf );
+            return NULL;
+        }
         size_t bytes_out = 0;
         while( p->bytes_queued >= p->bytes_queue_max )
         {
@@ -587,13 +588,12 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
             offset_in += fill_queue( p_filter, p_in_buf->p_buffer,
                                      p_in_buf->i_buffer, offset_in );
         }
+        p_out_buf->i_buffer     = bytes_out;
+        p_out_buf->i_nb_samples = bytes_out / p->bytes_per_frame;
+        p_out_buf->i_dts        = p_in_buf->i_dts;
+        p_out_buf->i_pts        = p_in_buf->i_pts;
+        p_out_buf->i_length     = p_in_buf->i_length;
     }
-
-    p_out_buf->i_buffer     = bytes_out;
-    p_out_buf->i_nb_samples = bytes_out / p->bytes_per_frame;
-    p_out_buf->i_dts        = p_in_buf->i_dts;
-    p_out_buf->i_pts        = p_in_buf->i_pts;
-    p_out_buf->i_length     = p_in_buf->i_length;
 
     block_Release( p_in_buf );
     return p_out_buf;
