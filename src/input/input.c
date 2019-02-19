@@ -61,7 +61,7 @@ static  void *Run( void * );
 static  void *Preparse( void * );
 
 static input_thread_t * Create  ( vlc_object_t *, input_thread_events_cb, void *,
-                                  input_item_t *, const char *, bool, bool,
+                                  input_item_t *, bool, bool,
                                   input_resource_t *, vlc_renderer_item_t * );
 static  int             Init    ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
@@ -128,7 +128,7 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
                               input_resource_t *p_resource,
                               vlc_renderer_item_t *p_renderer )
 {
-    return Create( p_parent, events_cb, events_data, p_item, NULL, false,
+    return Create( p_parent, events_cb, events_data, p_item, false,
                    false, p_resource, p_renderer );
 }
 
@@ -144,7 +144,7 @@ int input_Read( vlc_object_t *p_parent, input_item_t *p_item,
                 input_thread_events_cb events_cb, void *events_data )
 {
     input_thread_t *p_input = Create( p_parent, events_cb, events_data, p_item,
-                                      NULL, false, false, NULL, NULL );
+                                      false, false, NULL, NULL );
     if( !p_input )
         return VLC_EGENERIC;
 
@@ -162,14 +162,14 @@ input_thread_t *input_CreatePreparser( vlc_object_t *parent,
                                        input_thread_events_cb events_cb,
                                        void *events_data, input_item_t *item )
 {
-    return Create( parent, events_cb, events_data, item, NULL, true, false, NULL, NULL );
+    return Create( parent, events_cb, events_data, item, true, false, NULL, NULL );
 }
 
 input_thread_t *input_CreateThumbnailer(vlc_object_t *obj,
                                         input_thread_events_cb events_cb,
                                         void *events_data, input_item_t *item)
 {
-    return Create( obj, events_cb, events_data, item, NULL, false, true, NULL, NULL );
+    return Create( obj, events_cb, events_data, item, false, true, NULL, NULL );
 }
 
 /**
@@ -311,7 +311,7 @@ input_item_t *input_GetItem( input_thread_t *p_input )
  *****************************************************************************/
 static input_thread_t *Create( vlc_object_t *p_parent,
                                input_thread_events_cb events_cb, void *events_data,
-                               input_item_t *p_item, const char *psz_header,
+                               input_item_t *p_item,
                                bool b_preparsing, bool b_thumbnailing,
                                input_resource_t *p_resource,
                                vlc_renderer_item_t *p_renderer )
@@ -332,8 +332,6 @@ static input_thread_t *Create( vlc_object_t *p_parent,
 
     /* Parse input options */
     input_item_ApplyOptions( VLC_OBJECT(p_input), p_item );
-
-    p_input->obj.header = psz_header ? strdup( psz_header ) : NULL;
 
     /* Init Common fields */
     priv->events_cb = events_cb;
