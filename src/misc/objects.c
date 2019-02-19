@@ -232,8 +232,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     }
     else
     {
-        libvlc_int_t *self = (libvlc_int_t *)obj;
-
         obj->obj.flags = 0;
         obj->obj.parent = NULL;
 
