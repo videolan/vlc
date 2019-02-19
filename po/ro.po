@@ -8,7 +8,7 @@
 # Circo Radu <circo DOT radusorin AT gmail DOT com>, 2005
 # Cristian Secară <cristi AT secarica DOT ro>, 2007-2013
 # Cristian Silaghi <cristian.silaghi@mozilla.ro>, 2013-2014
-# eduard pintilie <eduard.pintilie@gmail.com>, 2014,2018-2019
+# Eduard Pintilie <eduard.pintilie@gmail.com>, 2014,2018-2019
 # Ioan-Simion Ghejan <simi@simi.ro>, 2014
 # Ileana Vucicovici <ileana.vucicovici@gmail.com>, 2013
 # laura berindei <lauraagavriloae@yahoo.com>, 2014
@@ -21,7 +21,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
 "PO-Revision-Date: 2019-02-19 14:08+0100\n"
-"Last-Translator: eduard pintilie <eduard.pintilie@gmail.com>, 2019\n"
+"Last-Translator: Eduard Pintilie <eduard.pintilie@gmail.com>, 2019\n"
 "Language-Team: Romanian (https://www.transifex.com/yaron/teams/16553/ro/)\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
