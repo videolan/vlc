@@ -367,7 +367,7 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
 
     block = aout_FiltersPlay(owner->filters, block, owner->sync.rate);
     if (block == NULL)
-        goto lost;
+        return ret;
 
     /* Software volume */
     aout_volume_Amplify (owner->volume, block);
@@ -384,7 +384,6 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
 drop:
     owner->sync.discontinuity = true;
     block_Release (block);
-lost:
     atomic_fetch_add_explicit(&owner->buffers_lost, 1, memory_order_relaxed);
     return ret;
 }
