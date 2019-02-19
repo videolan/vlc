@@ -200,7 +200,7 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
 
     for (int i = MOUSE_BUTTON_WHEEL_UP; i <= MOUSE_BUTTON_WHEEL_RIGHT; i++)
         if (pressed & (1 << i))
-            var_SetInteger(p_intf->obj.libvlc, "key-pressed",
+            var_SetInteger(vlc_object_instance(p_intf), "key-pressed",
                            i - MOUSE_BUTTON_WHEEL_UP + KEY_MOUSEWHEELUP);
 
     return VLC_SUCCESS;
@@ -349,7 +349,7 @@ static int Open( vlc_object_t *p_this )
 
     vlc_mutex_init( &p_sys->lock );
 
-    var_AddCallback( p_intf->obj.libvlc, "key-action", ActionEvent, p_intf );
+    var_AddCallback( vlc_object_instance(p_intf), "key-action", ActionEvent, p_intf );
 
     var_AddCallback( pl_Get(p_intf), "input-current", PlaylistEvent, p_intf );
 
@@ -366,7 +366,7 @@ static void Close( vlc_object_t *p_this )
 
     var_DelCallback( pl_Get(p_intf), "input-current", PlaylistEvent, p_intf );
 
-    var_DelCallback( p_intf->obj.libvlc, "key-action", ActionEvent, p_intf );
+    var_DelCallback( vlc_object_instance(p_intf), "key-action", ActionEvent, p_intf );
 
     ChangeInput( p_intf, NULL );
 
@@ -389,7 +389,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
     {
         /* Libvlc / interface actions */
         case ACTIONID_QUIT:
-            libvlc_Quit( p_intf->obj.libvlc );
+            libvlc_Quit( vlc_object_instance(p_intf) );
 
             ClearChannels( p_vout, slider_chan );
             DisplayMessage( p_vout, _( "Quit" ) );

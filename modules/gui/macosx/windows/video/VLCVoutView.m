@@ -181,7 +181,7 @@
                 [[VLCCoreInteraction sharedInstance] toggleFullscreen];
             else if (p_vout) {
                 val.i_int |= (int)CocoaKeyToVLC(key);
-                var_Set(p_vout->obj.libvlc, "key-pressed", val);
+                var_Set(vlc_object_instance(p_vout), "key-pressed", val);
             }
             else
                 msg_Dbg(getIntf(), "could not send keyevent to VLC core");
@@ -283,7 +283,7 @@
 
         while (ABS(f_cumulatedYScrollValue) >= f_yThreshold) {
             f_cumulatedYScrollValue -= (f_cumulatedYScrollValue > 0 ? f_yThreshold : -f_yThreshold);
-            var_SetInteger(p_intf->obj.libvlc, "key-pressed", key);
+            var_SetInteger(vlc_object_instance(p_intf), "key-pressed", key);
             msg_Dbg(p_intf, "Scrolling in y direction");
         }
 
@@ -297,7 +297,7 @@
 
         while (ABS(f_cumulatedXScrollValue) >= f_xThreshold) {
             f_cumulatedXScrollValue -= (f_cumulatedXScrollValue > 0 ? f_xThreshold : -f_xThreshold);
-            var_SetInteger(p_intf->obj.libvlc, "key-pressed", key);
+            var_SetInteger(vlc_object_instance(p_intf), "key-pressed", key);
             msg_Dbg(p_intf, "Scrolling in x direction");
         }
     }

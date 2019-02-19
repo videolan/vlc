@@ -499,6 +499,7 @@ static void *Run( void *data )
 {
     intf_thread_t *p_intf = data;
     intf_sys_t *p_sys = p_intf->p_sys;
+    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_intf));
 
     char p_buffer[ MAX_LINE_LENGTH + 1 ];
     bool b_showpos = var_InheritBool( p_intf, "rc-show-pos" );
@@ -647,16 +648,16 @@ static void *Run( void *data )
                     psz_cmd, i_ret, vlc_error( i_ret ) );
         }
         /* Or maybe it's a global command */
-        else if( var_Type( p_intf->obj.libvlc, psz_cmd ) & VLC_VAR_ISCOMMAND )
+        else if( var_Type( vlc, psz_cmd ) & VLC_VAR_ISCOMMAND )
         {
             int i_ret = VLC_SUCCESS;
 
             /* FIXME: it's a global command, but we should pass the
-             * local object as an argument, not p_intf->obj.libvlc. */
-            if ((var_Type( p_intf->obj.libvlc, psz_cmd) & VLC_VAR_CLASS) == VLC_VAR_VOID)
+             * local object as an argument, not vlc_object_instance(p_intf). */
+            if ((var_Type( vlc, psz_cmd) & VLC_VAR_CLASS) == VLC_VAR_VOID)
                 var_TriggerCallback( p_intf, psz_cmd );
             else
-                i_ret = var_SetString( p_intf->obj.libvlc, psz_cmd, psz_arg );
+                i_ret = var_SetString( vlc, psz_cmd, psz_arg );
             if( i_ret != 0 )
             {
                 msg_rc( "%s: returned %i (%s)",
@@ -742,8 +743,7 @@ static void *Run( void *data )
         }
         else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
         {
-            var_SetInteger( p_intf->obj.libvlc, "key-action",
-                            vlc_actions_get_id( psz_arg ) );
+            var_SetInteger( vlc, "key-action", vlc_actions_get_id( psz_arg ) );
         }
         else switch( psz_cmd[0] )
         {
@@ -1015,7 +1015,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            var_SetInteger( p_intf->obj.libvlc, "key-action", ACTIONID_JUMP_FORWARD_EXTRASHORT );
+            var_SetInteger( vlc_object_instance(p_this), "key-action", ACTIONID_JUMP_FORWARD_EXTRASHORT );
         }
         i_error = VLC_SUCCESS;
     }
@@ -1029,7 +1029,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            var_SetInteger( p_intf->obj.libvlc, "key-action", ACTIONID_JUMP_BACKWARD_EXTRASHORT );
+            var_SetInteger( vlc_object_instance(p_this), "key-action", ACTIONID_JUMP_BACKWARD_EXTRASHORT );
         }
         i_error = VLC_SUCCESS;
     }
@@ -1420,7 +1420,7 @@ static int Quit( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(p_data); VLC_UNUSED(psz_cmd);
     VLC_UNUSED(oldval); VLC_UNUSED(newval);
 
-    libvlc_Quit( p_this->obj.libvlc );
+    libvlc_Quit( vlc_object_instance(p_this) );
     return VLC_SUCCESS;
 }
 
@@ -1859,7 +1859,7 @@ bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
         {
             if( read( 0/*STDIN_FILENO*/, p_buffer + *pi_size, 1 ) <= 0 )
             {   /* Standard input closed: exit */
-                libvlc_Quit( p_intf->obj.libvlc );
+                libvlc_Quit( vlc_object_instance(p_intf) );
                 p_buffer[*pi_size] = 0;
                 return true;
             }

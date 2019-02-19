@@ -402,8 +402,8 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
     /* Don't do anything if we are for somehow reason sliding */
     if( !isSliding && isEnabled() )
     {
-        int64_t i_size = var_InheritInteger( p_intf->obj.libvlc, "short-jump-size" );
-        int i_mode = var_InheritInteger( p_intf->obj.libvlc, "hotkeys-x-wheel-mode" );
+        int64_t i_size = var_InheritInteger( vlc_object_instance(p_intf), "short-jump-size" );
+        int i_mode = var_InheritInteger( vlc_object_instance(p_intf), "hotkeys-x-wheel-mode" );
         if ( ( event->delta() < 0 && i_mode != 3 ) || ( event->delta() > 0 && i_mode == 3 ) )
             i_size = - i_size;
         float posOffset = static_cast<float>( i_size ) / static_cast<float>( inputLength );

@@ -220,7 +220,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         vlc_object_internals_t *papriv = vlc_internals (parent);
 
         obj->obj.flags = parent->obj.flags;
-        obj->obj.libvlc = parent->obj.libvlc;
+        obj->obj.libvlc = vlc_object_instance(parent);
 
         /* Attach the child to its parent (no lock needed) */
         obj->obj.parent = vlc_object_hold (parent);

@@ -139,8 +139,10 @@ static int Open( vlc_object_t *p_this )
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     p_filter->pf_audio_filter = DoWork;
 
-    var_Create(p_filter->obj.libvlc, "audiobargraph_v-alarm", VLC_VAR_BOOL);
-    var_Create(p_filter->obj.libvlc, "audiobargraph_v-i_values", VLC_VAR_STRING);
+    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_filter));
+
+    var_Create(vlc, "audiobargraph_v-alarm", VLC_VAR_BOOL);
+    var_Create(vlc, "audiobargraph_v-i_values", VLC_VAR_STRING);
 
     return VLC_SUCCESS;
 }
@@ -157,7 +159,8 @@ static void SendValues(filter_t *p_filter, float *value, int nbChannels)
     }
 
     //msg_Dbg(p_filter, "values: %s", msg);
-    var_SetString(p_filter->obj.libvlc, "audiobargraph_v-i_values", msg);
+    var_SetString(vlc_object_instance(p_filter), "audiobargraph_v-i_values",
+                  msg);
 }
 
 /*****************************************************************************
@@ -224,7 +227,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
             sum = sqrtf(sum);
 
             /* 5 - compare it to the threshold */
-            var_SetBool(p_filter->obj.libvlc, "audiobargraph_v-alarm",
+            var_SetBool(vlc_object_instance(p_filter), "audiobargraph_v-alarm",
                         sum < p_sys->alarm_threshold);
 
             p_sys->lastAlarm = p_in_buf->i_pts;
@@ -246,9 +249,10 @@ static void Close( vlc_object_t *p_this )
 {
     filter_t * p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
+    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_filter));
 
-    var_Destroy(p_filter->obj.libvlc, "audiobargraph_v-i_values");
-    var_Destroy(p_filter->obj.libvlc, "audiobargraph_v-alarm");
+    var_Destroy(vlc, "audiobargraph_v-i_values");
+    var_Destroy(vlc, "audiobargraph_v-alarm");
 
     while (p_sys->first != NULL) {
         ValueDate_t *current = p_sys->first;

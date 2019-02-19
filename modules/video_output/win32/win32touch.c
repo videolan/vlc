@@ -98,7 +98,7 @@ static BOOL DecodeGestureAction( vlc_object_t *p_this, win32_gesture_sys_t *p_ge
                     else
                         action_id = ACTIONID_JUMP_FORWARD_SHORT;
                 }
-                var_SetInteger( p_this->obj.libvlc, "key-action", action_id );
+                var_SetInteger( vlc_object_instance(p_this), "key-action", action_id );
             }
             /* Reset the values */
             p_gesture->i_action = GESTURE_ACTION_UNDEFINED;
@@ -137,9 +137,9 @@ static BOOL DecodeGestureAction( vlc_object_t *p_this, win32_gesture_sys_t *p_ge
                 int offset = p_gesture->i_lasty - p_gi->ptsLocation.y;
 
                 if( offset > 100)
-                    var_SetInteger( p_this->obj.libvlc, "key-action", ACTIONID_VOL_UP );
+                    var_SetInteger( vlc_object_instance(p_this), "key-action", ACTIONID_VOL_UP );
                 else if( offset < -100)
-                    var_SetInteger( p_this->obj.libvlc, "key-action", ACTIONID_VOL_DOWN );
+                    var_SetInteger( vlc_object_instance(p_this), "key-action", ACTIONID_VOL_DOWN );
                 else
                     break;
 
@@ -153,19 +153,19 @@ static BOOL DecodeGestureAction( vlc_object_t *p_this, win32_gesture_sys_t *p_ge
 
                 if( p_gesture->i_lasty - p_gesture->i_beginy > 80 )
                 {
-                    var_SetInteger( p_this->obj.libvlc, "key-action", ACTIONID_BRIGHTNESS_DOWN );
+                    var_SetInteger( vlc_object_instance(p_this), "key-action", ACTIONID_BRIGHTNESS_DOWN );
                     p_gesture->i_lasty = p_gi->ptsLocation.y;
                 }
                 else if ( p_gesture->i_lasty - p_gesture->i_beginy < 80 )
                 {
-                    var_SetInteger( p_this->obj.libvlc, "key-action", ACTIONID_BRIGHTNESS_UP );
+                    var_SetInteger( vlc_object_instance(p_this), "key-action", ACTIONID_BRIGHTNESS_UP );
                     p_gesture->i_lasty = p_gi->ptsLocation.y;
                 } */
             }
             break;
         case GID_TWOFINGERTAP:
             p_gesture->i_type = GID_TWOFINGERTAP;
-            var_SetInteger( p_this->obj.libvlc, "key-action", ACTIONID_PLAY_PAUSE );
+            var_SetInteger( vlc_object_instance(p_this), "key-action", ACTIONID_PLAY_PAUSE );
             bHandled = TRUE;
             break;
         case GID_ZOOM:
@@ -180,10 +180,10 @@ static BOOL DecodeGestureAction( vlc_object_t *p_this, win32_gesture_sys_t *p_ge
                         double k = (double)(p_gi->ullArguments) /
                                    (double)(p_gesture->i_ullArguments);
                         if( k > 1 )
-                            var_SetInteger( p_this->obj.libvlc, "key-action",
+                            var_SetInteger( vlc_object_instance(p_this), "key-action",
                                     ACTIONID_TOGGLE_FULLSCREEN );
                         else
-                            var_SetInteger( p_this->obj.libvlc, "key-action",
+                            var_SetInteger( vlc_object_instance(p_this), "key-action",
                                     ACTIONID_LEAVE_FULLSCREEN );
                     }
                     break;
@@ -227,7 +227,7 @@ static BOOL DecodeGestureProjection( vlc_object_t *p_this, win32_gesture_sys_t *
                         action_id = ACTIONID_JUMP_BACKWARD_SHORT;
                     else
                         action_id = ACTIONID_JUMP_FORWARD_SHORT;
-                    var_SetInteger( p_this->obj.libvlc, "key-action", action_id );
+                    var_SetInteger( vlc_object_instance(p_this), "key-action", action_id );
                 }
             }
             /* Reset the values */
@@ -265,9 +265,9 @@ static BOOL DecodeGestureProjection( vlc_object_t *p_this, win32_gesture_sys_t *
                 int offset = p_gesture->i_lasty - p_gi->ptsLocation.y;
 
                 if( offset > 100)
-                    var_SetInteger( p_this->obj.libvlc, "key-action", ACTIONID_VOL_UP );
+                    var_SetInteger( vlc_object_instance(p_this), "key-action", ACTIONID_VOL_UP );
                 else if( offset < -100)
-                    var_SetInteger( p_this->obj.libvlc, "key-action", ACTIONID_VOL_DOWN );
+                    var_SetInteger( vlc_object_instance(p_this), "key-action", ACTIONID_VOL_DOWN );
                 else
                     break;
 
@@ -276,7 +276,7 @@ static BOOL DecodeGestureProjection( vlc_object_t *p_this, win32_gesture_sys_t *
             break;
         case GID_TWOFINGERTAP:
             p_gesture->i_type = GID_TWOFINGERTAP;
-            var_SetInteger( p_this->obj.libvlc, "key-action", ACTIONID_PLAY_PAUSE );
+            var_SetInteger( vlc_object_instance(p_this), "key-action", ACTIONID_PLAY_PAUSE );
             bHandled = TRUE;
             break;
         case GID_ZOOM:
@@ -295,12 +295,12 @@ static BOOL DecodeGestureProjection( vlc_object_t *p_this, win32_gesture_sys_t *
 
                     if (k > p_gesture->f_lastzoom * 1.01)
                     {
-                        var_SetInteger( p_this->obj.libvlc, "key-action", ACTIONID_VIEWPOINT_FOV_IN );
+                        var_SetInteger( vlc_object_instance(p_this), "key-action", ACTIONID_VIEWPOINT_FOV_IN );
                         p_gesture->f_lastzoom = k;
                     }
                     else if (k < p_gesture->f_lastzoom * 0.99)
                     {
-                        var_SetInteger( p_this->obj.libvlc, "key-action", ACTIONID_VIEWPOINT_FOV_OUT );
+                        var_SetInteger( vlc_object_instance(p_this), "key-action", ACTIONID_VIEWPOINT_FOV_OUT );
                         p_gesture->f_lastzoom = k;
                     }
                     break;

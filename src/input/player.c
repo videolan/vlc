@@ -966,7 +966,7 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
                     if (player->input && player->started)
                         vlc_player_input_Start(player->input);
                     else
-                        libvlc_Quit(player->obj.libvlc);
+                        libvlc_Quit(vlc_object_instance(player));
                     break;
                 case VLC_PLAYER_MEDIA_STOPPED_CONTINUE:
                     if (player->input && player->started)

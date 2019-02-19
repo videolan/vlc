@@ -738,7 +738,7 @@ static int SubDrawObject(intf_sys_t *sys, int l, vlc_object_t *p_obj, int i_leve
 static int DrawObjects(intf_thread_t *intf, input_thread_t *input)
 {
     (void) input;
-    return SubDrawObject(intf->p_sys, 0, VLC_OBJECT(intf->obj.libvlc), 0, "");
+    return SubDrawObject(intf->p_sys, 0, VLC_OBJECT(vlc_object_instance(intf)), 0, "");
 }
 
 static int DrawMeta(intf_thread_t *intf, input_thread_t *p_input)
@@ -1575,7 +1575,7 @@ static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,
     case 'q':
     case 'Q':
     case KEY_EXIT:
-        libvlc_Quit(intf->obj.libvlc);
+        libvlc_Quit(vlc_object_instance(intf));
         return;
 
     case 'h':
@@ -1803,7 +1803,7 @@ static int Open(vlc_object_t *p_this)
     vlc_mutex_init(&sys->msg_lock);
 
     sys->verbosity = var_InheritInteger(intf, "verbose");
-    vlc_LogSet(intf->obj.libvlc, &log_ops, sys);
+    vlc_LogSet(vlc_object_instance(intf), &log_ops, sys);
 
     sys->box_type = BOX_PLAYLIST;
     sys->plidx_follow = true;
@@ -1870,7 +1870,7 @@ static void Close(vlc_object_t *p_this)
 
     endwin();   /* Close the ncurses interface */
 
-    vlc_LogSet(p_this->obj.libvlc, NULL, NULL);
+    vlc_LogSet(vlc_object_instance(p_this), NULL, NULL);
     vlc_mutex_destroy(&sys->msg_lock);
     for(unsigned i = 0; i < sizeof sys->msgs / sizeof *sys->msgs; i++) {
         if (sys->msgs[i].item)

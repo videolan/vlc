@@ -130,6 +130,13 @@ VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
 #define vlc_object_release(a) \
     vlc_object_release( VLC_OBJECT(a) )
 
+VLC_USED
+static inline libvlc_int_t *vlc_object_instance(vlc_object_t *obj)
+{
+    return obj->obj.libvlc;
+}
+#define vlc_object_instance(o) vlc_object_instance(VLC_OBJECT(o))
+
 /**
  * @defgroup objres Object resources
  *

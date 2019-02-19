@@ -289,7 +289,7 @@ static vlc_mutex_t sys_lock = VLC_STATIC_MUTEX;
 
 static decklink_sys_t *HoldDLSys(vlc_object_t *obj, int i_cat)
 {
-    vlc_object_t *libvlc = VLC_OBJECT(obj->obj.libvlc);
+    vlc_object_t *libvlc = VLC_OBJECT(vlc_object_instance(obj));
     decklink_sys_t *sys;
 
     vlc_mutex_lock(&sys_lock);
@@ -335,7 +335,7 @@ static decklink_sys_t *HoldDLSys(vlc_object_t *obj, int i_cat)
 
 static void ReleaseDLSys(vlc_object_t *obj, int i_cat)
 {
-    vlc_object_t *libvlc = VLC_OBJECT(obj->obj.libvlc);
+    vlc_object_t *libvlc = VLC_OBJECT(vlc_object_instance(obj));
 
     vlc_mutex_lock(&sys_lock);
 

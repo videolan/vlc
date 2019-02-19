@@ -161,11 +161,13 @@ static int Open( vlc_object_t *p_this, enum type_e i_type )
 
     p_sd->description = vlc_gettext(desc);
 
-    var_AddCallback( p_sd->obj.libvlc, p_sys->psz_var, onNewFileAdded, p_sd );
+    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_sd));
+
+    var_AddCallback( vlc, p_sys->psz_var, onNewFileAdded, p_sd );
 
     if( vlc_clone( &p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW ) )
     {
-        var_DelCallback( p_sd->obj.libvlc, p_sys->psz_var, onNewFileAdded, p_sd );
+        var_DelCallback( vlc, p_sys->psz_var, onNewFileAdded, p_sd );
         free( p_sys->psz_dir[1] );
         free( p_sys->psz_dir[0] );
         free( p_sys );
@@ -221,10 +223,11 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = (services_discovery_t *)p_this;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
+    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_sd));
 
     vlc_join( p_sys->thread, NULL );
 
-    var_DelCallback( p_sd->obj.libvlc, p_sys->psz_var, onNewFileAdded, p_sd );
+    var_DelCallback( vlc, p_sys->psz_var, onNewFileAdded, p_sd );
 
     free( p_sys->psz_dir[1] );
     free( p_sys->psz_dir[0] );

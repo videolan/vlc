@@ -61,8 +61,10 @@ static inline void* MtaMainLoop( void* opaque )
  */
 static inline bool vlc_mta_acquire( vlc_object_t *p_parent )
 {
+    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_parent));
+
     vlc_global_lock( VLC_MTA_MUTEX );
-    vlc_mta_holder* p_mta = (vlc_mta_holder*)var_CreateGetAddress( p_parent->obj.libvlc, "mta-holder" );
+    vlc_mta_holder* p_mta = (vlc_mta_holder*)var_CreateGetAddress( vlc, "mta-holder" );
     if ( p_mta == NULL )
     {
         p_mta = (vlc_mta_holder*)malloc( sizeof( *p_mta ) );
@@ -83,7 +85,7 @@ static inline bool vlc_mta_acquire( vlc_object_t *p_parent )
             vlc_global_unlock( VLC_MTA_MUTEX );
             return false;
         }
-        var_SetAddress( p_parent->obj.libvlc, "mta-holder", p_mta );
+        var_SetAddress( vlc, "mta-holder", p_mta );
         vlc_sem_wait( &p_mta->ready_sem );
     }
     else
@@ -99,12 +101,14 @@ static inline bool vlc_mta_acquire( vlc_object_t *p_parent )
  */
 static inline void vlc_mta_release( vlc_object_t* p_parent )
 {
+    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_parent));
+
     vlc_global_lock( VLC_MTA_MUTEX );
-    vlc_mta_holder *p_mta = (vlc_mta_holder*)var_InheritAddress( p_parent->obj.libvlc, "mta-holder" );
+    vlc_mta_holder *p_mta = (vlc_mta_holder*)var_InheritAddress( vlc, "mta-holder" );
     assert( p_mta != NULL );
     int i_refcount = --p_mta->i_refcount;
     if ( i_refcount == 0 )
-        var_SetAddress( p_parent->obj.libvlc, "mta-holder", NULL );
+        var_SetAddress( vlc, "mta-holder", NULL );
     vlc_global_unlock( VLC_MTA_MUTEX );
     if ( i_refcount == 0 )
     {

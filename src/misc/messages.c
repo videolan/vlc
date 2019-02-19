@@ -135,7 +135,7 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
 
     /* Pass message to the callback */
     if (obj != NULL)
-        vlc_vaLogCallback(obj->obj.libvlc, type, &msg, format, args);
+        vlc_vaLogCallback(vlc_object_instance(obj), type, &msg, format, args);
 }
 
 /**
@@ -254,7 +254,7 @@ static void vlc_LogEarlyClose(void *d)
 {
     vlc_logger_early_t *sys = d;
     vlc_logger_t *logger = sys->sink;
-    libvlc_int_t *vlc = logger->obj.libvlc;
+    libvlc_int_t *vlc = vlc_object_instance(logger);
 
     /* Drain early log messages */
     for (vlc_log_early_t *log = sys->head, *next; log != NULL; log = next)

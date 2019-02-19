@@ -87,7 +87,7 @@ static const struct vlc_logger_operations log_ops = { MsgCallback, NULL };
 - (void)dealloc
 {
     if (getIntf())
-        vlc_LogSet( getIntf()->obj.libvlc, NULL, NULL );
+        vlc_LogSet( vlc_object_instance(getIntf()), NULL, NULL );
 }
 
 - (void)windowDidLoad
@@ -125,7 +125,7 @@ static const struct vlc_logger_operations log_ops = { MsgCallback, NULL };
     }
 
     // Subscribe to LibVLCCore's messages
-    vlc_LogSet(getIntf()->obj.libvlc, &log_ops, (__bridge void*)self);
+    vlc_LogSet(vlc_object_instance(getIntf()), &log_ops, (__bridge void*)self);
     _refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.3
                                                      target:self
                                                    selector:@selector(appendMessageBuffer)
@@ -137,7 +137,7 @@ static const struct vlc_logger_operations log_ops = { MsgCallback, NULL };
 - (void)windowWillClose:(NSNotification *)notification
 {
     // Unsubscribe from LibVLCCore's messages
-    vlc_LogSet( getIntf()->obj.libvlc, NULL, NULL );
+    vlc_LogSet( vlc_object_instance(getIntf()), NULL, NULL );
 
     // Remove all messages
     [self clearMessageBuffer];
@@ -217,14 +217,14 @@ static const struct vlc_logger_operations log_ops = { MsgCallback, NULL };
 - (IBAction)clearLog:(id)sender
 {
     // Unregister handler
-    vlc_LogSet(getIntf()->obj.libvlc, NULL, NULL);
+    vlc_LogSet(vlc_object_instance(getIntf()), NULL, NULL);
 
     // Remove all messages
     [self clearMessageBuffer];
     [self clearMessageTable];
 
     // Reregister handler, to write new header to log
-    vlc_LogSet(getIntf()->obj.libvlc, &log_ops, (__bridge void*)self);
+    vlc_LogSet(vlc_object_instance(getIntf()), &log_ops, (__bridge void*)self);
 }
 
 /* Refresh log action

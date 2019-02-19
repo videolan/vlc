@@ -52,7 +52,7 @@ static const luaL_Reg vlclua_vlm_reg[] = {
 static int vlclua_vlm_new( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
-    vlm_t *p_vlm = vlm_New( p_this->obj.libvlc, NULL );
+    vlm_t *p_vlm = vlm_New( vlc_object_instance(p_this), NULL );
     if( !p_vlm )
         return luaL_error( L, "Cannot start VLM." );
 

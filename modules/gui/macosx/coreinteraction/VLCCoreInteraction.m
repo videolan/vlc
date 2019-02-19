@@ -576,7 +576,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (p_input != NULL) {
         vout_thread_t *p_vout = input_GetVout(p_input);
         if (p_vout != NULL) {
-            var_SetInteger(getIntf()->obj.libvlc, "key-action", ACTIONID_POSITION);
+            var_SetInteger(vlc_object_instance(getIntf()), "key-action", ACTIONID_POSITION);
             vlc_object_release(p_vout);
         }
         vlc_object_release(p_input);
@@ -769,7 +769,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         }
 
         if (b_found_key) {
-            var_SetInteger(p_intf->obj.libvlc, "key-pressed", val.i_int);
+            var_SetInteger(vlc_object_instance(p_intf), "key-pressed", val.i_int);
             return YES;
         }
     }

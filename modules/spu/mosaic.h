@@ -42,6 +42,7 @@ typedef struct bridge_t
 
 static bridge_t *GetBridge( vlc_object_t *p_object )
 {
-    return var_GetAddress(VLC_OBJECT(p_object->obj.libvlc), "mosaic-struct");
+    return var_GetAddress(VLC_OBJECT(vlc_object_instance(p_object)),
+                          "mosaic-struct");
 }
 #define GetBridge(a) GetBridge( VLC_OBJECT(a) )

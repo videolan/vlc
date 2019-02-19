@@ -876,7 +876,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         case CONFIG_ITEM_KEY:
             /* So you don't need to restart to have the changes take effect */
             val.i_int = [self intValue];
-            var_Set(getIntf()->obj.libvlc, psz_name, val);
+            var_Set(vlc_object_instance(getIntf()), psz_name, val);
         case CONFIG_ITEM_INTEGER:
         case CONFIG_ITEM_BOOL:
             config_PutInt(psz_name, [self intValue]);

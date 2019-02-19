@@ -402,7 +402,7 @@ static void *Thread( void *p_data )
                     if( p_map->p_keys[j] == e->detail &&
                         p_map->i_modifier == e->state )
                     {
-                        var_SetInteger( p_intf->obj.libvlc,
+                        var_SetInteger( vlc_object_instance(p_intf),
                                         "global-key-pressed", p_map->i_vlc );
                         goto done;
                     }

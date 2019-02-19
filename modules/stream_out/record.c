@@ -356,7 +356,7 @@ static int OutputNew( sout_stream_t *p_stream,
     }
 
     if( psz_file && psz_extension )
-        var_SetString( p_stream->obj.libvlc, "record-file", psz_file );
+        var_SetString( vlc_object_instance(p_stream), "record-file", psz_file );
 
     free( psz_file );
     free( psz_output );

@@ -178,7 +178,7 @@ void X11Loop::handleX11Event()
                 (Atom)event.xclient.data.l[0] == wm_delete )
             {
                 msg_Dbg( getIntf(), "Received WM_DELETE_WINDOW message" );
-                libvlc_Quit( getIntf()->obj.libvlc );
+                libvlc_Quit( vlc_object_instance(getIntf()) );
             }
         }
         return;

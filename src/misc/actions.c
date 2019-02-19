@@ -637,6 +637,6 @@ vlc_actions_get_keycodes(vlc_object_t *p_obj, const char *psz_key_name,
 const char* const*
 vlc_actions_get_key_names(vlc_object_t *p_obj)
 {
-    vlc_actions_t *as = libvlc_priv(p_obj->obj.libvlc)->actions;
+    vlc_actions_t *as = libvlc_priv(vlc_object_instance(p_obj))->actions;
     return as->ppsz_keys;
 }

@@ -775,16 +775,17 @@ static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 /** Acquire a drawable */
 static int AcquireDrawable (vlc_object_t *obj, xcb_window_t window)
 {
+    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(obj));
     xcb_window_t *used;
     size_t n = 0;
 
-    if (var_Create (obj->obj.libvlc, "xid-in-use", VLC_VAR_ADDRESS))
+    if (var_Create(vlc, "xid-in-use", VLC_VAR_ADDRESS))
         return VLC_ENOMEM;
 
     /* Keep a list of busy drawables, so we don't overlap videos if there are
      * more than one video track in the stream. */
     vlc_mutex_lock (&serializer);
-    used = var_GetAddress (obj->obj.libvlc, "xid-in-use");
+    used = var_GetAddress(vlc, "xid-in-use");
     if (used != NULL)
     {
         while (used[n])
@@ -800,7 +801,7 @@ static int AcquireDrawable (vlc_object_t *obj, xcb_window_t window)
     {
         used[n] = window;
         used[n + 1] = 0;
-        var_SetAddress (obj->obj.libvlc, "xid-in-use", used);
+        var_SetAddress(vlc, "xid-in-use", used);
     }
     else
     {
@@ -816,11 +817,12 @@ skip:
 /** Remove this drawable from the list of busy ones */
 static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
 {
+    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(obj));
     xcb_window_t *used;
     size_t n = 0;
 
     vlc_mutex_lock (&serializer);
-    used = var_GetAddress (obj->obj.libvlc, "xid-in-use");
+    used = var_GetAddress(vlc, "xid-in-use");
     assert (used);
     while (used[n] != window)
     {
@@ -832,7 +834,7 @@ static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
     while (used[++n]);
 
     if (!used[0])
-        var_SetAddress (obj->obj.libvlc, "xid-in-use", NULL);
+        var_SetAddress(vlc, "xid-in-use", NULL);
     else
         used = NULL;
 
@@ -841,7 +843,7 @@ static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
     free( used );
 
     /* Variables are reference-counted... */
-    var_Destroy (obj->obj.libvlc, "xid-in-use");
+    var_Destroy(vlc, "xid-in-use");
 }
 
 static void EmClose(vout_window_t *);

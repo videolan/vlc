@@ -58,7 +58,7 @@ static int vlclua_object_find( lua_State *L )
 
 static int vlclua_get_libvlc( lua_State *L )
 {
-    libvlc_int_t *p_libvlc = vlclua_get_this( L )->obj.libvlc;
+    libvlc_int_t *p_libvlc = vlc_object_instance(vlclua_get_this( L ));
     vlc_object_hold( p_libvlc );
     vlclua_push_vlc_object( L, p_libvlc );
     return 1;

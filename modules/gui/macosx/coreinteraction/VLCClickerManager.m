@@ -211,11 +211,11 @@
                 break;
             case kRemoteButtonVolume_Plus_Hold:
                 if (p_intf)
-                    var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_UP);
+                    var_SetInteger(vlc_object_instance(p_intf), "key-action", ACTIONID_VOL_UP);
                 break;
             case kRemoteButtonVolume_Minus_Hold:
                 if (p_intf)
-                    var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_DOWN);
+                    var_SetInteger(vlc_object_instance(p_intf), "key-action", ACTIONID_VOL_DOWN);
                 break;
         }
         if (b_remote_button_hold) {
@@ -254,14 +254,14 @@
                 [NSSound increaseSystemVolume];
             else
                 if (p_intf)
-                    var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_UP);
+                    var_SetInteger(vlc_object_instance(p_intf), "key-action", ACTIONID_VOL_UP);
             break;
         case kRemoteButtonVolume_Minus:
             if (config_GetInt("macosx-appleremote-sysvol"))
                 [NSSound decreaseSystemVolume];
             else
                 if (p_intf)
-                    var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_DOWN);
+                    var_SetInteger(vlc_object_instance(p_intf), "key-action", ACTIONID_VOL_DOWN);
             break;
         case kRemoteButtonRight:
             if (config_GetInt("macosx-appleremote-prevnext"))

@@ -356,7 +356,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
 
         case GESTURE(DOWN,LEFT,NONE,NONE):
             /* FIXME: Should close the vout!"*/
-            libvlc_Quit( p_intf->obj.libvlc );
+            libvlc_Quit( vlc_object_instance(p_intf) );
             break;
 
         case GESTURE(DOWN,LEFT,UP,RIGHT):

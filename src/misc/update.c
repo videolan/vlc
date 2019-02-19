@@ -110,7 +110,7 @@ update_t *update_New( vlc_object_t *p_this )
 
     vlc_mutex_init( &p_update->lock );
 
-    p_update->p_libvlc = p_this->obj.libvlc;
+    p_update->p_libvlc = vlc_object_instance(p_this);
 
     p_update->release.psz_url = NULL;
     p_update->release.psz_desc = NULL;
@@ -731,7 +731,7 @@ static void* update_DownloadReal( void *obj )
         MultiByteToWideChar( CP_UTF8, 0, psz_destfile, -1, psz_wdestfile, MAX_PATH );
         answer = (int)ShellExecuteW( NULL, L"open", psz_wdestfile, NULL, NULL, SW_SHOW);
         if(answer > 32)
-            libvlc_Quit(p_udt->obj.libvlc);
+            libvlc_Quit(vlc_object_instance(p_udt));
     }
 #endif
 end:

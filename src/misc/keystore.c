@@ -156,7 +156,7 @@ libvlc_InternalKeystoreClean(libvlc_int_t *p_libvlc)
 static vlc_keystore *
 get_memory_keystore(vlc_object_t *p_obj)
 {
-    return libvlc_priv(p_obj->obj.libvlc)->p_memory_keystore;
+    return libvlc_priv(vlc_object_instance(p_obj))->p_memory_keystore;
 }
 
 static vlc_keystore_entry *

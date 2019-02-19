@@ -305,7 +305,7 @@ LRESULT CALLBACK WMHOTKEYPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                 vlc_action_id_t action = vlc_actions_get_id( psz_atomName );
                 if( action != ACTIONID_NONE )
                 {
-                    var_SetInteger( p_intf->obj.libvlc,
+                    var_SetInteger( vlc_object_instance(p_intf),
                             "key-action", action );
                     return 1;
                 }

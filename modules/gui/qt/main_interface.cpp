@@ -1678,7 +1678,7 @@ void MainInterface::handleKeyPress( QKeyEvent *e )
     int i_vlck = qtEventToVLCKey( e );
     if( i_vlck > 0 )
     {
-        var_SetInteger( p_intf->obj.libvlc, "key-pressed", i_vlck );
+        var_SetInteger( vlc_object_instance(p_intf), "key-pressed", i_vlck );
         e->accept();
     }
     else
@@ -1688,7 +1688,7 @@ void MainInterface::handleKeyPress( QKeyEvent *e )
 void MainInterface::wheelEvent( QWheelEvent *e )
 {
     int i_vlckey = qtWheelEventToVLCKey( e );
-    var_SetInteger( p_intf->obj.libvlc, "key-pressed", i_vlckey );
+    var_SetInteger( vlc_object_instance(p_intf), "key-pressed", i_vlckey );
     e->accept();
 }
 

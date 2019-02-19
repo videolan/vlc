@@ -678,7 +678,7 @@ void InputManager::requestArtUpdate( input_item_t *p_item, bool b_forced )
             if ( status & ( ITEM_ART_NOTFOUND|ITEM_ART_FETCHED ) )
                 return;
         }
-        libvlc_ArtRequest( p_intf->obj.libvlc, p_item,
+        libvlc_ArtRequest( vlc_object_instance(p_intf), p_item,
                            (b_forced) ? META_REQUEST_OPTION_SCOPE_ANY
                                       : META_REQUEST_OPTION_NONE,
                            NULL, NULL );
@@ -896,12 +896,12 @@ void InputManager::faster()
 
 void InputManager::littlefaster()
 {
-    var_SetInteger( p_intf->obj.libvlc, "key-action", ACTIONID_RATE_FASTER_FINE );
+    var_SetInteger( vlc_object_instance(p_intf), "key-action", ACTIONID_RATE_FASTER_FINE );
 }
 
 void InputManager::littleslower()
 {
-    var_SetInteger( p_intf->obj.libvlc, "key-action", ACTIONID_RATE_SLOWER_FINE );
+    var_SetInteger( vlc_object_instance(p_intf), "key-action", ACTIONID_RATE_SLOWER_FINE );
 }
 
 void InputManager::normalRate()
