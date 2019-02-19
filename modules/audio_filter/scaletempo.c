@@ -243,28 +243,26 @@ static size_t transform_buffer( filter_t *p_filter,
     filter_sys_t *p = p_filter->p_sys;
     unsigned bytes_out, bytes_off = 0;
 
-    {
-        // output stride
-        if( p->output_overlap ) {
-            if( p->best_overlap_offset ) {
-                bytes_off = p->best_overlap_offset( p_filter );
-            }
-            p->output_overlap( p_filter, pout, bytes_off );
+    // output stride
+    if( p->output_overlap ) {
+        if( p->best_overlap_offset ) {
+            bytes_off = p->best_overlap_offset( p_filter );
         }
-        memcpy( pout + p->bytes_overlap,
-                p->buf_queue + bytes_off + p->bytes_overlap,
-                p->bytes_standing );
-        bytes_out = p->bytes_stride;
-
-        // input stride
-        memcpy( p->buf_overlap,
-                p->buf_queue + bytes_off + p->bytes_stride,
-                p->bytes_overlap );
-        double frames_to_slide = p->frames_stride_scaled + p->frames_stride_error;
-        unsigned frames_to_stride_whole = (int)frames_to_slide;
-        p->bytes_to_slide       = frames_to_stride_whole * p->bytes_per_frame;
-        p->frames_stride_error  = frames_to_slide - frames_to_stride_whole;
+        p->output_overlap( p_filter, pout, bytes_off );
     }
+    memcpy( pout + p->bytes_overlap,
+            p->buf_queue + bytes_off + p->bytes_overlap,
+            p->bytes_standing );
+    bytes_out = p->bytes_stride;
+
+    // input stride
+    memcpy( p->buf_overlap,
+            p->buf_queue + bytes_off + p->bytes_stride,
+            p->bytes_overlap );
+    double frames_to_slide = p->frames_stride_scaled + p->frames_stride_error;
+    unsigned frames_to_stride_whole = (int)frames_to_slide;
+    p->bytes_to_slide       = frames_to_stride_whole * p->bytes_per_frame;
+    p->frames_stride_error  = frames_to_slide - frames_to_stride_whole;
 
     return bytes_out;
 }
