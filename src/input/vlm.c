@@ -753,6 +753,14 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
     if( !p_media )
         return VLC_ENOMEM;
 
+    if( asprintf( &p_media->obj.header, _("Media: %s"),
+                  p_cfg->psz_name ) == -1 )
+    {
+        p_media->obj.header = NULL;
+        vlc_object_release( p_media );
+        return VLC_ENOMEM;
+    }
+
     vlm_media_Copy( &p_media->cfg, p_cfg );
     p_media->cfg.id = p_vlm->i_id++;
     /* FIXME do we do something here if enabled is true ? */
