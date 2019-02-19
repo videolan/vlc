@@ -1,5 +1,5 @@
 # Romanian translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -8,7 +8,7 @@
 # Circo Radu <circo DOT radusorin AT gmail DOT com>, 2005
 # Cristian Secară <cristi AT secarica DOT ro>, 2007-2013
 # Cristian Silaghi <cristian.silaghi@mozilla.ro>, 2013-2014
-# eduard pintilie <eduard.pintilie@gmail.com>, 2014,2018
+# eduard pintilie <eduard.pintilie@gmail.com>, 2014,2018-2019
 # Ioan-Simion Ghejan <simi@simi.ro>, 2014
 # Ileana Vucicovici <ileana.vucicovici@gmail.com>, 2013
 # laura berindei <lauraagavriloae@yahoo.com>, 2014
@@ -17,11 +17,11 @@
 # Dorin V. Barbu <the.sethan@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-09 01:23+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-02-19 14:08+0100\n"
+"Last-Translator: eduard pintilie <eduard.pintilie@gmail.com>, 2019\n"
 "Language-Team: Romanian (https://www.transifex.com/yaron/teams/16553/ro/)\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -178,7 +178,7 @@ msgstr "Setări video generale"
 
 #: include/vlc_config_cat.h:79
 msgid "General settings for video output modules."
-msgstr ""
+msgstr "Setări generale pentru modulele audio de ieșire."
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
@@ -197,11 +197,11 @@ msgstr ""
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
-msgstr ""
+msgstr "Separatoare"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr ""
+msgstr "Separatoarele video separă fluxul în mai multe videoclipuri."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
@@ -1162,7 +1162,7 @@ msgstr "ITU-R BT.601 (625 linii, 50 Hz)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
-msgstr ""
+msgstr "Culori primare"
 
 #: src/input/es_out.c:3229 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1188,7 +1188,7 @@ msgstr ""
 
 #: src/input/es_out.c:3255
 msgid "Full"
-msgstr ""
+msgstr "Întreg"
 
 #: src/input/es_out.c:3262 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -12079,7 +12079,7 @@ msgstr ""
 
 #: modules/codec/lpcm.c:71
 msgid "Linear PCM audio encoder"
-msgstr ""
+msgstr "Decodor audio liniar PCM"
 
 #: modules/codec/mad.c:78
 msgid "MPEG audio layer I/II/III decoder"
@@ -23429,9 +23429,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Pachetizor video H.264"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
