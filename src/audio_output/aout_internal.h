@@ -62,7 +62,6 @@ typedef struct
 
     struct
     {
-        vlc_tick_t end; /**< Last seen PTS */
         float rate; /**< Play-out speed rate */
         vlc_tick_t resamp_start_drift; /**< Resampler drift absolute value */
         int resamp_type; /**< Resampler mode (FIXME: redundant / resampling) */
