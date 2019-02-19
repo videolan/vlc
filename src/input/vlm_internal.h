@@ -47,6 +47,7 @@ typedef struct
 
 typedef struct
 {
+    struct vlc_common_members obj;
     vlm_media_t cfg;
 
     struct

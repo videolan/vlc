@@ -748,7 +748,8 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
         p_vlm->p_vod->pf_media_control = vlm_MediaVodControl;
     }
 
-    p_media = calloc( 1, sizeof( vlm_media_sys_t ) );
+    p_media = vlc_custom_create( VLC_OBJECT(p_vlm), sizeof( *p_media ),
+                                 "media" );
     if( !p_media )
         return VLC_ENOMEM;
 
@@ -799,7 +800,7 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
         p_vlm->p_vod->pf_media_del( p_vlm->p_vod, p_media->vod.p_media );
 
     TAB_REMOVE( p_vlm->i_media, p_vlm->media, p_media );
-    free( p_media );
+    vlc_object_release( p_media );
 
     return VLC_SUCCESS;
 }
