@@ -81,6 +81,17 @@ int vlc_LogPreinit(libvlc_int_t *) VLC_USED;
 void vlc_LogInit(libvlc_int_t *);
 
 /**
+ * Creates a prefixed message log.
+ *
+ * This creates a message log that prefixes all its messages and forwards them
+ * in another log.
+ * \param parent message log to inject into
+ * \param str nul-terminated prefix (a.k.a. "header")
+ * \return a new message log on success or @c NULL on error
+ */
+vlc_logger_t *vlc_LogHeaderCreate(vlc_logger_t *parent, const char *str);
+
+/**
  * Destroys a message log.
  */
 void vlc_LogDestroy(vlc_logger_t *);

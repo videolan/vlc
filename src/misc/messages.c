@@ -466,6 +466,48 @@ int vlc_LogPreinit(libvlc_int_t *vlc)
 }
 
 /**
+ * Message log with "header".
+ */
+struct vlc_logger_header {
+    struct vlc_logger logger;
+    struct vlc_logger *parent;
+    char header[];
+};
+
+static void vlc_vaLogHeader(void *d, int type, const vlc_log_t *item,
+                            const char *format, va_list ap)
+{
+    struct vlc_logger_header *header = d;
+    struct vlc_logger *logger = header->parent;
+    vlc_log_t hitem = *item;
+
+    hitem.psz_header = header->header;
+    logger->ops->log(logger->sys, type, &hitem, format, ap);
+}
+
+static const struct vlc_logger_operations header_ops = {
+    vlc_vaLogHeader,
+    NULL,
+};
+
+struct vlc_logger *vlc_LogHeaderCreate(struct vlc_logger *parent,
+                                       const char *str)
+{
+    size_t len = strlen(str) + 1;
+    struct vlc_logger_header *header = malloc(sizeof (*header) + len);
+    if (unlikely(header == NULL))
+        return NULL;
+
+    static_assert (offsetof (struct vlc_logger_header, logger) == 0,
+                   "Bad free");
+    header->logger.ops = &header_ops;
+    header->logger.sys = header;
+    header->parent = parent;
+    memcpy(header->header, str, len);
+    return &header->logger;
+}
+
+/**
  * Sets the message logging callback.
  * \param ops message callback, or NULL to clear
  * \param data data pointer for the message callback
