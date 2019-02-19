@@ -913,7 +913,6 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 {
     vlm_media_sys_t *p_media = vlm_ControlMediaGetById( p_vlm, id );
     vlm_media_instance_sys_t *p_instance;
-    char *psz_log;
 
     if( !p_media || !p_media->cfg.b_enabled || p_media->cfg.i_input <= 0 )
         return VLC_EGENERIC;
@@ -1003,35 +1002,30 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     else
         input_item_SetURI( p_instance->p_item, p_media->cfg.ppsz_input[p_instance->i_index] ) ;
 
-    if( asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name ) != -1 )
+    p_instance->p_input = input_Create( p_instance->p_parent,
+                                        input_LegacyEvents, NULL,
+                                        p_instance->p_item, NULL,
+                                        p_instance->p_input_resource, NULL );
+    if( p_instance->p_input )
     {
-        p_instance->p_input = input_Create( p_instance->p_parent,
-                                            input_LegacyEvents, NULL,
-                                            p_instance->p_item, psz_log,
-                                            p_instance->p_input_resource,
-                                            NULL );
-        if( p_instance->p_input )
-        {
-            input_LegacyVarInit( p_instance->p_input );
-            var_AddCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
+        input_LegacyVarInit( p_instance->p_input );
+        var_AddCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
 
-            if( input_Start( p_instance->p_input ) != VLC_SUCCESS )
-            {
-                var_DelCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
-                input_Close( p_instance->p_input );
-                p_instance->p_input = NULL;
-            }
+        if( input_Start( p_instance->p_input ) != VLC_SUCCESS )
+        {
+            var_DelCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
+            input_Close( p_instance->p_input );
+            p_instance->p_input = NULL;
         }
+    }
 
-        if( !p_instance->p_input )
-        {
-            vlm_MediaInstanceDelete( p_vlm, id, p_instance, p_media );
-        }
-        else
-        {
-            vlm_SendEventMediaInstanceStarted( p_vlm, id, p_media->cfg.psz_name );
-        }
-        free( psz_log );
+    if( !p_instance->p_input )
+    {
+        vlm_MediaInstanceDelete( p_vlm, id, p_instance, p_media );
+    }
+    else
+    {
+        vlm_SendEventMediaInstanceStarted( p_vlm, id, p_media->cfg.psz_name );
     }
 
     return VLC_SUCCESS;
