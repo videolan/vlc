@@ -37,12 +37,6 @@
  */
 struct vlc_common_members
 {
-    /** Object type name
-     *
-     * A constant string identifying the type of the object (for logging)
-     */
-    const char *object_type;
-
     /** Log messages header
      *
      * Human-readable header for log messages. This is not thread-safe and

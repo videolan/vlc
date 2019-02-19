@@ -199,6 +199,8 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     vlc_object_internals_t *priv = malloc (sizeof (*priv) + length);
     if (unlikely(priv == NULL))
         return NULL;
+
+    priv->typename = typename;
     priv->psz_name = NULL;
     priv->var_root = NULL;
     vlc_mutex_init (&priv->var_lock);
@@ -210,7 +212,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     priv->resources = NULL;
 
     vlc_object_t *obj = (vlc_object_t *)(priv + 1);
-    obj->obj.object_type = typename;
     obj->obj.header = NULL;
     obj->obj.force = false;
     memset (obj + 1, 0, length - sizeof (*obj)); /* type-specific stuff */
@@ -280,7 +281,7 @@ void vlc_object_set_destructor( vlc_object_t *p_this,
 
 const char *vlc_object_typename(const vlc_object_t *obj)
 {
-    return obj->obj.object_type;
+    return vlc_internals(obj)->typename;
 }
 
 static vlc_mutex_t name_lock = VLC_STATIC_MUTEX;
