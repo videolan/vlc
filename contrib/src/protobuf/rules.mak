@@ -37,13 +37,12 @@ PROTOBUF_CONF = -DBUILD_SHARED_LIBS=OFF -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_BU
 protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 	$(UNPACK)
 	mv protobuf-$(PROTOBUF_VERSION) protobuf-$(PROTOBUF_VERSION)-cpp
-	$(APPLY) $(SRC)/protobuf/dont-build-protoc.patch
 	$(APPLY) $(SRC)/protobuf/protobuf-win32.patch
 	$(APPLY) $(SRC)/protobuf/protobuf-cmake-pkgconfig.patch
 	$(MOVE)
 
 .protobuf: protobuf toolchain.cmake
 	cd $</ && mkdir -p $(HOST)
-	cd $</$(HOST) && $(HOSTVARS_PIC) $(CMAKE) -S .. -B ../cmake $(PROTOBUF_CONF)
+	cd $</ && $(HOSTVARS_PIC) $(CMAKE) -S cmake -B $(HOST) $(PROTOBUF_CONF)
 	cd $</ && $(MAKE) -C $(HOST) && $(MAKE) -C $(HOST) install
 	touch $@
