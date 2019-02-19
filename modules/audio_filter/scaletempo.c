@@ -238,11 +238,12 @@ static size_t fill_queue( filter_t      *p_filter,
  * transform_buffer: main filter loop
  *****************************************************************************/
 static size_t transform_buffer( filter_t *p_filter,
-                                uint8_t *pout )
+                                uint8_t *pout, size_t i_max_bytes_out )
 {
     filter_sys_t *p = p_filter->p_sys;
     unsigned bytes_out, bytes_off = 0;
 
+    assert( i_max_bytes_out >= p->bytes_stride );
     // output stride
     if( p->output_overlap ) {
         if( p->best_overlap_offset ) {
@@ -581,7 +582,8 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
         while( p->bytes_queued >= p->bytes_queue_max )
         {
             bytes_out += transform_buffer( p_filter,
-                                           &p_out_buf->p_buffer[bytes_out] );
+                                           &p_out_buf->p_buffer[bytes_out],
+                                           p_out_buf->i_buffer - bytes_out );
             offset_in += fill_queue( p_filter, p_in_buf->p_buffer,
                                      p_in_buf->i_buffer, offset_in );
         }
