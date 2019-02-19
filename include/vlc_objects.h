@@ -59,12 +59,6 @@ struct vlc_common_members
      */
     bool force;
 
-    /** LibVLC instance
-     *
-     * Root VLC object of the objects tree that this object belongs in.
-     */
-    libvlc_int_t *libvlc;
-
     /** Parent object
      *
      * The parent VLC object in the objects tree. For the root (the LibVLC
@@ -133,7 +127,9 @@ VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
 VLC_USED
 static inline libvlc_int_t *vlc_object_instance(vlc_object_t *obj)
 {
-    return obj->obj.libvlc;
+    while (obj->obj.parent != NULL)
+        obj = obj->obj.parent;
+    return (libvlc_int_t *)obj;
 }
 #define vlc_object_instance(o) vlc_object_instance(VLC_OBJECT(o))
 
