@@ -205,7 +205,7 @@ static void on_input_event(input_thread_t *input,
  */
 static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
-    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_playlist));
+    libvlc_int_t *vlc = vlc_object_instance(p_playlist);
     playlist_private_t *p_sys = pl_priv(p_playlist);
     input_item_t *p_input = p_item->p_input;
     vlc_renderer_item_t *p_renderer;
