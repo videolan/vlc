@@ -403,11 +403,11 @@ void vlc_LogSet(libvlc_int_t *vlc, const struct vlc_logger_operations *ops,
     msg_Dbg (vlc, "configured with %s", CONFIGURE_LINE);
 }
 
-void vlc_LogDeinit(libvlc_int_t *vlc)
+void vlc_LogDestroy(vlc_logger_t *logger)
 {
-    vlc_logger_t *logger = libvlc_priv(vlc)->logger;
+    if (logger->ops->destroy != NULL)
+        logger->ops->destroy(logger->sys);
 
-    vlc_LogSwitch(vlc, NULL, NULL);
     vlc_rwlock_destroy(&logger->lock);
     vlc_object_release(logger);
 }

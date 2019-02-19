@@ -79,7 +79,11 @@ typedef struct vlc_logger_t vlc_logger_t;
 
 int vlc_LogPreinit(libvlc_int_t *) VLC_USED;
 void vlc_LogInit(libvlc_int_t *);
-void vlc_LogDeinit(libvlc_int_t *);
+
+/**
+ * Destroys a message log.
+ */
+void vlc_LogDestroy(vlc_logger_t *);
 
 /*
  * LibVLC exit event handling
