@@ -110,7 +110,7 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
     vlc_log_t msg;
 
     msg.i_object_id = (uintptr_t)obj;
-    msg.psz_object_type = (obj != NULL) ? obj->obj.object_type : "generic";
+    msg.psz_object_type = (obj != NULL) ? vlc_object_typename(obj) : "generic";
     msg.psz_module = module;
     msg.psz_header = NULL;
     msg.file = file;

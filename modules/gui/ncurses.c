@@ -714,7 +714,7 @@ static int SubDrawObject(intf_sys_t *sys, int l, vlc_object_t *p_obj, int i_leve
 {
     char *name = vlc_object_get_name(p_obj);
     MainBoxWrite(sys, l++, "%*s%s%s \"%s\" (%p)", 2 * i_level++, "", prefix,
-                  p_obj->obj.object_type, name ? name : "", (void *)p_obj);
+                 vlc_object_typename(p_obj), name ? name : "", (void *)p_obj);
     free(name);
 
     size_t count = 0, size;

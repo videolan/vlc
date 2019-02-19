@@ -85,7 +85,7 @@ static void PrintObject(vlc_object_t *obj)
     PrintObjectPrefix(obj, true);
     printf("\xE2\x94\x80\xE2\x94%c\xE2\x95\xB4%p %s, %u refs\n",
            vlc_list_is_empty(&priv->children) ? 0x80 : 0xAC,
-           (void *)obj, obj->obj.object_type, atomic_load(&priv->refs));
+           (void *)obj, vlc_object_typename(obj), atomic_load(&priv->refs));
 
     vlc_restorecancel (canc);
 }
@@ -173,8 +173,8 @@ static int VarsCommand (vlc_object_t *obj, char const *cmd,
     else
         vlc_object_hold (obj);
 
-    printf(" o %p %s, parent %p\n", (void *)obj,
-           obj->obj.object_type, (void *)obj->obj.parent);
+    printf(" o %p %s, parent %p\n", (void *)obj, vlc_object_typename(obj),
+           (void *)obj->obj.parent);
     DumpVariables (obj);
     vlc_object_release (obj);
 
@@ -278,6 +278,11 @@ void vlc_object_set_destructor( vlc_object_t *p_this,
     p_priv->pf_destructor = pf_destructor;
 }
 
+const char *vlc_object_typename(const vlc_object_t *obj)
+{
+    return obj->obj.object_type;
+}
+
 static vlc_mutex_t name_lock = VLC_STATIC_MUTEX;
 
 #undef vlc_object_set_name
@@ -375,8 +380,7 @@ static int strcmp_void(const void *a, const void *b)
  * Finds a named object and increment its reference count.
  * Beware that objects found in this manner can be "owned" by another thread,
  * be of _any_ type, and be attached to any module (if any). With such an
- * object reference, you can set or get object variables, emit log messages,
- * and read write-once object parameters (obj.object_type, etc).
+ * object reference, you can set or get object variables, emit log messages.
  * You CANNOT cast the object to a more specific object type, and you
  * definitely cannot invoke object type-specific callbacks with this.
  *

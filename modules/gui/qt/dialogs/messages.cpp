@@ -304,7 +304,7 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
 
     char *name = vlc_object_get_name( p_obj );
     item->setText( 0, QString("%1%2 (0x%3)")
-                   .arg( qfu( p_obj->obj.object_type ) )
+                   .arg( qfu( vlc_object_typename(p_obj) ) )
                    .arg( ( name != NULL )
                          ? QString( " \"%1\"" ).arg( qfu( name ) )
                              : "" )

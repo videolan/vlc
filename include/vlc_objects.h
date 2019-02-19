@@ -111,6 +111,17 @@ VLC_API vlc_object_t *vlc_object_find_name( vlc_object_t *, const char * ) VLC_U
 VLC_API void * vlc_object_hold( vlc_object_t * );
 VLC_API void vlc_object_release( vlc_object_t * );
 VLC_API size_t vlc_list_children(vlc_object_t *, vlc_object_t **, size_t) VLC_USED;
+
+/**
+ * Returns the object type name.
+ *
+ * This returns a nul-terminated string identifying the object type.
+ * The string is valid for at least as long as the object reference.
+ *
+ * \param obj object whose type name to get
+ */
+VLC_API const char *vlc_object_typename(const vlc_object_t *obj) VLC_USED;
+
 VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
 
 #define vlc_object_create(a,b) vlc_object_create( VLC_OBJECT(a), b )
