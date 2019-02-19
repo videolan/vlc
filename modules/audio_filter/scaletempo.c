@@ -556,14 +556,13 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
 
     double scale = p_filter->fmt_in.audio.i_rate / (double)p->sample_rate;
     if( scale != p->scale ) {
-      p->scale = scale;
-      p->bytes_stride_scaled  = p->bytes_stride * p->scale;
-      p->frames_stride_scaled = p->bytes_stride_scaled / p->bytes_per_frame;
-      p->bytes_to_slide = 0;
-      msg_Dbg( p_filter, "%.3f scale, %.3f stride_in, %i stride_out",
-               p->scale,
-               p->frames_stride_scaled,
-               (int)( p->bytes_stride / p->bytes_per_frame ) );
+        p->scale = scale;
+        p->bytes_stride_scaled  = p->bytes_stride * p->scale;
+        p->frames_stride_scaled = p->bytes_stride_scaled / p->bytes_per_frame;
+        p->bytes_to_slide = 0;
+        msg_Dbg( p_filter, "%.3f scale, %.3f stride_in, %i stride_out rate: %u",
+                 p->scale, p->frames_stride_scaled,
+                 (int)( p->bytes_stride / p->bytes_per_frame ), p->sample_rate );
     }
 
     block_t *p_out_buf = NULL;
