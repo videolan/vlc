@@ -48,6 +48,12 @@ void decoder_Init( decoder_t *p_dec, const es_format_t *restrict p_fmt )
 
 void decoder_Clean( decoder_t *p_dec )
 {
+    if ( p_dec->p_module != NULL )
+    {
+        module_unneed(p_dec, p_dec->p_module);
+        p_dec->p_module = NULL;
+    }
+
     es_format_Clean( &p_dec->fmt_in );
     es_format_Clean( &p_dec->fmt_out );
 
@@ -55,11 +61,6 @@ void decoder_Clean( decoder_t *p_dec )
     {
         vlc_meta_Delete(p_dec->p_description);
         p_dec->p_description = NULL;
-    }
-    if ( p_dec->p_module != NULL )
-    {
-        module_unneed(p_dec, p_dec->p_module);
-        p_dec->p_module = NULL;
     }
 }
 
