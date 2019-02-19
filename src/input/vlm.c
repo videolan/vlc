@@ -867,7 +867,8 @@ static vlm_media_instance_sys_t *vlm_ControlMediaInstanceGetByName( vlm_media_sy
     }
     return NULL;
 }
-static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char *psz_name )
+
+static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_media_sys_t *p_media, const char *psz_name )
 {
     vlm_media_instance_sys_t *p_instance = calloc( 1, sizeof(vlm_media_instance_sys_t) );
     if( !p_instance )
@@ -881,7 +882,7 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char 
 
     p_instance->i_index = 0;
     p_instance->b_sout_keep = false;
-    p_instance->p_parent = vlc_object_create( p_vlm, sizeof (vlc_object_t) );
+    p_instance->p_parent = vlc_object_create( p_media, sizeof (vlc_object_t) );
     p_instance->p_input = NULL;
     p_instance->p_input_resource = input_resource_New( p_instance->p_parent );
 
@@ -930,7 +931,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     {
         vlm_media_t *p_cfg = &p_media->cfg;
 
-        p_instance = vlm_MediaInstanceNew( p_vlm, psz_id );
+        p_instance = vlm_MediaInstanceNew( p_media, psz_id );
         if( !p_instance )
             return VLC_ENOMEM;
 
