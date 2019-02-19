@@ -621,7 +621,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             sout_description_data_t data;
             TAB_INIT(data.i_es, data.es);
 
-            p_input = input_Create( p_vlm->p_vod, input_LegacyEvents, NULL,
+            p_input = input_Create( p_media, input_LegacyEvents, NULL,
                                     p_media->vod.p_item, psz_header, NULL, NULL );
             if( p_input )
             {
