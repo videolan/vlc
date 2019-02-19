@@ -304,19 +304,6 @@ static const struct vlc_logger_operations discard_ops =
     NULL,
 };
 
-static int vlc_logger_load(void *func, va_list ap)
-{
-    const struct vlc_logger_operations *(*activate)(vlc_object_t *,
-                                                    void **) = func;
-    vlc_logger_t *logger = va_arg(ap, vlc_logger_t *);
-    const struct vlc_logger_operations **ops = va_arg(ap,
-                                        const struct vlc_logger_operations **);
-    void **sys = va_arg(ap, void **);
-
-    *ops = activate(VLC_OBJECT(logger), sys);
-    return (*ops != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
-}
-
 static void vlc_LogSwitch(libvlc_int_t *vlc,
                           const struct vlc_logger_operations *ops,
                           void *opaque)
@@ -339,6 +326,70 @@ static void vlc_LogSwitch(libvlc_int_t *vlc,
 
     if (old_ops->destroy != NULL)
         old_ops->destroy(old_opaque);
+}
+
+/**
+ * Module-based message log.
+ */
+struct vlc_logger_module {
+    struct vlc_common_members obj;
+    const struct vlc_logger_operations *ops;
+    void *sys;
+};
+
+static int vlc_logger_load(void *func, va_list ap)
+{
+    const struct vlc_logger_operations *(*activate)(vlc_object_t *,
+                                                    void **) = func;
+    struct vlc_logger_module *module = va_arg(ap, struct vlc_logger_module *);
+
+    module->ops = activate(VLC_OBJECT(module), &module->sys);
+    return (module->ops != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
+static void vlc_vaLogModule(void *d, int type, const vlc_log_t *item,
+                            const char *format, va_list ap)
+{
+    struct vlc_logger_module *module = d;
+
+    module->ops->log(module->sys, type, item, format, ap);
+}
+
+static void vlc_LogModuleClose(void *d)
+{
+    struct vlc_logger_module *module = d;
+
+    if (module->ops->destroy != NULL)
+        module->ops->destroy(module->sys);
+
+    vlc_object_release(VLC_OBJECT(module));
+}
+
+static const struct vlc_logger_operations module_ops = {
+    vlc_vaLogModule,
+    vlc_LogModuleClose,
+};
+
+/**
+ * Initializes the messages logging subsystem and drain the early messages to
+ * the configured log.
+ */
+void vlc_LogInit(libvlc_int_t *vlc)
+{
+    struct vlc_logger_module *module;
+    const struct vlc_logger_operations *ops = &discard_ops;
+
+    module = vlc_custom_create(vlc, sizeof (*module), "logger");
+    if (likely(module != NULL)) {
+        /* TODO: module configuration item */
+        if (vlc_module_load(VLC_OBJECT(module), "logger", NULL, false,
+                            vlc_logger_load, module) != NULL)
+            ops = &module_ops;
+        else
+            vlc_object_release(VLC_OBJECT(module));
+    }
+
+    vlc_LogSwitch(vlc, ops, module);
 }
 
 /**
@@ -366,24 +417,6 @@ int vlc_LogPreinit(libvlc_int_t *vlc)
     ops = vlc_LogEarlyOpen(logger, &opaque);
     vlc_LogSet(vlc, ops, opaque);
     return 0;
-}
-
-/**
- * Initializes the messages logging subsystem and drain the early messages to
- * the configured log.
- */
-void vlc_LogInit(libvlc_int_t *vlc)
-{
-    vlc_logger_t *logger = libvlc_priv(vlc)->logger;
-    const struct vlc_logger_operations *ops;
-    void *opaque;
-
-    /* TODO: module configuration item */
-    if (vlc_module_load(logger, "logger", NULL, false,
-                        vlc_logger_load, logger, &ops, &opaque) == NULL)
-        ops = NULL;
-
-    vlc_LogSwitch(vlc, ops, opaque);
 }
 
 /**
