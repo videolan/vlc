@@ -107,7 +107,8 @@ GetVencOption( sout_stream_t *p_stream, std::vector<vlc_fourcc_t> codecs,
 
             if( p_sout_test != NULL )
             {
-                p_sout_test->obj.flags |= OBJECT_FLAGS_QUIET|OBJECT_FLAGS_NOINTERACT;
+                p_sout_test->obj.logger = NULL;
+                p_sout_test->obj.flags |= OBJECT_FLAGS_NOINTERACT;
 
                 es_format_t fmt;
                 es_format_InitFromVideo( &fmt, p_vid );

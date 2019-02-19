@@ -488,7 +488,7 @@ int tt_OpenDemux( vlc_object_t* p_this )
         goto error;
 
 #ifndef TTML_DEMUX_DEBUG
-    p_sys->p_reader->obj.flags |= OBJECT_FLAGS_QUIET;
+    p_sys->p_reader->obj.logger = NULL;
 #endif
 
     if( ReadTTML( p_demux ) != VLC_SUCCESS )
