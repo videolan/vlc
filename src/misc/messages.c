@@ -109,13 +109,6 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
     msg.func = func;
     msg.tid = vlc_thread_id();
 
-    for (vlc_object_t *o = obj; o != NULL; o = o->obj.parent)
-        if (o->obj.header != NULL)
-        {
-            msg.psz_header = o->obj.header;
-            break;
-        }
-
 #ifdef _WIN32
     va_list ap;
 

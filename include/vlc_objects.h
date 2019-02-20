@@ -41,13 +41,6 @@ struct vlc_common_members
 {
     struct vlc_logger *logger;
 
-    /** Log messages header
-     *
-     * Human-readable header for log messages. This is not thread-safe and
-     * only used by VLM and Lua interfaces.
-     */
-    char *header;
-
     bool no_interact;
 
     /** Module probe flag
