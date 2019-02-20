@@ -281,6 +281,8 @@ vlc_memstream_printf
 vlc_Log
 vlc_LogSet
 vlc_vaLog
+vlc_LogHeaderCreate
+vlc_LogDestroy
 vlc_strerror
 vlc_strerror_c
 vlc_obj_malloc
