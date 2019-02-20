@@ -388,84 +388,84 @@ extern vlc_plugin_cb vlc_static_modules[];
 
 #ifdef HAVE_DECODERS
 #define DECODER_PLUGINS(f) \
-    f(adpcm) \
-    f(aes3) \
-    f(araw) \
-    f(g711) \
-    f(lpcm) \
-    f(uleaddvaudio) \
-    f(rawvideo) \
-    f(cc) \
-    f(cvdsub) \
-    f(dvbsub) \
-    f(scte18) \
-    f(scte27) \
-    f(spudec) \
-    f(stl) \
-    f(subsdec) \
-    f(subsusf) \
-    f(svcdsub) \
-    f(textst) \
-    f(substx3g)
+    f(codec_adpcm) \
+    f(codec_aes3) \
+    f(codec_araw) \
+    f(codec_g711) \
+    f(codec_lpcm) \
+    f(codec_uleaddvaudio) \
+    f(codec_rawvideo) \
+    f(codec_cc) \
+    f(codec_cvdsub) \
+    f(codec_dvbsub) \
+    f(codec_scte18) \
+    f(codec_scte27) \
+    f(codec_spudec_spudec) \
+    f(codec_stl) \
+    f(codec_subsdec) \
+    f(codec_subsusf) \
+    f(codec_svcdsub) \
+    f(codec_textst) \
+    f(codec_substx3g)
 #else
 #define DECODER_PLUGINS(f)
 #endif
 
 #define PLUGINS(f) \
-    f(xml) \
-    f(console) \
-    f(filesystem) \
-    f(aiff) \
-    f(asf) \
-    f(au) \
-    f(avi) \
-    f(caf) \
-    f(es) \
-    f(flacsys) \
-    f(h26x) \
-    f(mjpeg) \
+    f(misc_xml_xml) \
+    f(logger_console) \
+    f(access_filesystem) \
+    f(demux_aiff) \
+    f(demux_asf_asf) \
+    f(demux_au) \
+    f(demux_avi_avi) \
+    f(demux_caf) \
+    f(demux_mpeg_es) \
+    f(demux_flacsys) \
+    f(demux_mpeg_h26x) \
+    f(demux_mjpeg) \
     PLUGIN_MKV(f) \
-    f(mp4) \
-    f(nsc) \
-    f(nsv) \
-    f(ps) \
-    f(pva) \
-    f(sap) \
-    f(smf) \
-    f(subtitle) \
+    f(demux_mp4_mp4) \
+    f(demux_nsc) \
+    f(demux_nsv) \
+    f(demux_mpeg_ps) \
+    f(demux_pva) \
+    f(services_discovery_sap) \
+    f(demux_smf) \
+    f(demux_subtitle) \
     PLUGIN_TS(f) \
-    f(tta) \
-    f(ttml) \
-    f(ty) \
-    f(voc) \
-    f(wav) \
-    f(webvtt) \
-    f(xa) \
-    f(a52) \
-    f(copy) \
-    f(dts) \
-    f(flac) \
-    f(h264) \
-    f(hevc) \
-    f(mlp) \
-    f(mpeg4audio) \
-    f(mpeg4video) \
-    f(mpegaudio) \
-    f(mpegvideo) \
-    f(vc1) \
-    f(rawvid) \
-    f(rawaud) \
-    f(ogg) \
+    f(demux_tta) \
+    f(codec_ttml_ttml) \
+    f(demux_ty) \
+    f(demux_voc) \
+    f(demux_wav) \
+    f(codec_webvtt_webvtt) \
+    f(demux_xa) \
+    f(packetizer_a52) \
+    f(packetizer_copy) \
+    f(packetizer_dts) \
+    f(packetizer_flac) \
+    f(packetizer_h264) \
+    f(packetizer_hevc) \
+    f(packetizer_mlp) \
+    f(packetizer_mpeg4audio) \
+    f(packetizer_mpeg4video) \
+    f(packetizer_mpegaudio) \
+    f(packetizer_mpegvideo) \
+    f(packetizer_vc1) \
+    f(demux_rawvid) \
+    f(demux_rawaud) \
+    f(demux_ogg) \
     DECODER_PLUGINS(f)
 
 #ifdef HAVE_DVBPSI
-# define PLUGIN_TS(f) f(ts)
+# define PLUGIN_TS(f) f(demux_mpeg_ts)
 #else
 # define PLUGIN_TS(f)
 #endif
 
 #ifdef HAVE_MATROSKA
-# define PLUGIN_MKV(f) f(mkv)
+# define PLUGIN_MKV(f) f(demux_mkv_mkv)
 #else
 # define PLUGIN_MKV(f)
 #endif
