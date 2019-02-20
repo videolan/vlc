@@ -63,7 +63,7 @@ static void vlc_vaLogCallback(vlc_logger_t *logger, int type,
     if (logger != NULL) {
         int canc = vlc_savecancel();
 
-        logger->ops->log(logger->sys, type, item, format, ap);
+        logger->ops->log(logger, type, item, format, ap);
         vlc_restorecancel(canc);
     }
 }
@@ -209,8 +209,7 @@ typedef struct vlc_log_early_t
     char *msg;
 } vlc_log_early_t;
 
-typedef struct
-{
+typedef struct vlc_logger_early {
     vlc_mutex_t lock;
     vlc_log_early_t *head;
     vlc_log_early_t **tailp;
@@ -221,7 +220,9 @@ typedef struct
 static void vlc_vaLogEarly(void *d, int type, const vlc_log_t *item,
                            const char *format, va_list ap)
 {
-    vlc_logger_early_t *sys = d;
+    struct vlc_logger *logger = d;
+    struct vlc_logger_early *early =
+        container_of(logger, struct vlc_logger_early, logger);
 
     vlc_log_early_t *log = malloc(sizeof (*log));
     if (unlikely(log == NULL))
@@ -241,31 +242,33 @@ static void vlc_vaLogEarly(void *d, int type, const vlc_log_t *item,
     if (vasprintf(&log->msg, format, ap) == -1)
         log->msg = NULL;
 
-    vlc_mutex_lock(&sys->lock);
-    assert(sys->tailp != NULL);
-    assert(*(sys->tailp) == NULL);
-    *(sys->tailp) = log;
-    sys->tailp = &log->next;
-    vlc_mutex_unlock(&sys->lock);
+    vlc_mutex_lock(&early->lock);
+    assert(early->tailp != NULL);
+    assert(*(early->tailp) == NULL);
+    *(early->tailp) = log;
+    early->tailp = &log->next;
+    vlc_mutex_unlock(&early->lock);
 }
 
 static void vlc_LogEarlyClose(void *d)
 {
-    vlc_logger_early_t *sys = d;
-    vlc_logger_t *logger = sys->sink;
+    struct vlc_logger *logger = d;
+    struct vlc_logger_early *early =
+        container_of(logger, struct vlc_logger_early, logger);
+    vlc_logger_t *sink = early->sink;
 
     /* Drain early log messages */
-    for (vlc_log_early_t *log = sys->head, *next; log != NULL; log = next)
+    for (vlc_log_early_t *log = early->head, *next; log != NULL; log = next)
     {
-        vlc_LogCallback(logger, log->type, &log->meta, "%s",
+        vlc_LogCallback(sink, log->type, &log->meta, "%s",
                         (log->msg != NULL) ? log->msg : "message lost");
         free(log->msg);
         next = log->next;
         free(log);
     }
 
-    vlc_mutex_destroy(&sys->lock);
-    free(sys);
+    vlc_mutex_destroy(&early->lock);
+    free(early);
 }
 
 static const struct vlc_logger_operations early_ops = {
@@ -320,22 +323,27 @@ struct vlc_logger_switch {
 static void vlc_vaLogSwitch(void *d, int type, const vlc_log_t *item,
                             const char *format, va_list ap)
 {
-    struct vlc_logger_switch *logswitch = d;
+    struct vlc_logger *logger = d;
+    struct vlc_logger_switch *logswitch =
+        container_of(logger, struct vlc_logger_switch, frontend);
     struct vlc_logger *backend;
 
     vlc_rwlock_rdlock(&logswitch->lock);
     backend = logswitch->backend;
-    backend->ops->log(backend->sys, type, item, format, ap);
+    backend->ops->log(backend, type, item, format, ap);
     vlc_rwlock_unlock(&logswitch->lock);
 }
 
 static void vlc_LogSwitchClose(void *d)
 {
-    struct vlc_logger_switch *logswitch = d;
+    struct vlc_logger *logger = d;
+    struct vlc_logger_switch *logswitch =
+        container_of(logger, struct vlc_logger_switch, frontend);
     struct vlc_logger *backend = logswitch->backend;
 
     logswitch->backend = &discard_log;
-    backend->ops->destroy(backend->sys);
+    backend->ops->destroy(backend);
+
     vlc_rwlock_destroy(&logswitch->lock);
     free(logswitch);
 }
@@ -361,7 +369,7 @@ static void vlc_LogSwitch(vlc_logger_t *logger, vlc_logger_t *new_logger)
     logswitch->backend = new_logger;
     vlc_rwlock_unlock(&logswitch->lock);
 
-    old_logger->ops->destroy(old_logger->sys);
+    old_logger->ops->destroy(old_logger);
 }
 
 static struct vlc_logger *vlc_LogSwitchCreate(void)
@@ -399,7 +407,9 @@ static int vlc_logger_load(void *func, va_list ap)
 static void vlc_vaLogModule(void *d, int type, const vlc_log_t *item,
                             const char *format, va_list ap)
 {
-    struct vlc_logger_module *module = d;
+    struct vlc_logger *logger = d;
+    struct vlc_logger_module *module =
+        container_of(logger, struct vlc_logger_module, frontend);
     struct vlc_logger *backend = &module->backend;
 
     backend->ops->log(backend->sys, type, item, format, ap);
@@ -407,7 +417,9 @@ static void vlc_vaLogModule(void *d, int type, const vlc_log_t *item,
 
 static void vlc_LogModuleClose(void *d)
 {
-    struct vlc_logger_module *module = d;
+    struct vlc_logger *logger = d;
+    struct vlc_logger_module *module =
+        container_of(logger, struct vlc_logger_module, frontend);
     struct vlc_logger *backend = &module->backend;
 
     if (backend->ops->destroy != NULL)
@@ -490,12 +502,14 @@ struct vlc_logger_header {
 static void vlc_vaLogHeader(void *d, int type, const vlc_log_t *item,
                             const char *format, va_list ap)
 {
-    struct vlc_logger_header *header = d;
-    struct vlc_logger *logger = header->parent;
+    struct vlc_logger *logger = d;
+    struct vlc_logger_header *header =
+        container_of(logger, struct vlc_logger_header, logger);
+    struct vlc_logger *parent = header->parent;
     vlc_log_t hitem = *item;
 
     hitem.psz_header = header->header;
-    logger->ops->log(logger->sys, type, &hitem, format, ap);
+    parent->ops->log(parent, type, &hitem, format, ap);
 }
 
 static const struct vlc_logger_operations header_ops = {
@@ -587,5 +601,5 @@ void vlc_LogSet(libvlc_int_t *vlc, const struct vlc_logger_operations *ops,
 
 void vlc_LogDestroy(vlc_logger_t *logger)
 {
-    logger->ops->destroy(logger->sys);
+    logger->ops->destroy(logger);
 }
