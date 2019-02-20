@@ -1,0 +1,24 @@
+--- protobuf/src/Makefile.am.old	2017-04-20 17:58:28.941775687 +0200
++++ protobuf/src/Makefile.am	2017-04-20 17:57:40.629763450 +0200
+@@ -481,7 +481,10 @@
+   google/protobuf/compiler/csharp/csharp_wrapper_field.cc      \
+   google/protobuf/compiler/csharp/csharp_wrapper_field.h
+ 
++EXTRA_PROGRAMS = protoc
++if !USE_EXTERNAL_PROTOC
+ bin_PROGRAMS = protoc
++endif
+ protoc_LDADD = $(PTHREAD_LIBS) libprotobuf.la libprotoc.la
+ protoc_SOURCES = google/protobuf/compiler/main.cc
+ 
+--- protobuf/src/Makefile.am.old	2018-03-14 15:00:19.974044729 +0100
++++ protobuf/src/Makefile.am	2018-03-14 15:01:03.158043968 +0100
+@@ -174,7 +174,7 @@
+   google/protobuf/util/type_resolver_util.h                     \
+   google/protobuf/util/message_differencer.h
+ 
+-lib_LTLIBRARIES = libprotobuf-lite.la libprotobuf.la libprotoc.la
++lib_LTLIBRARIES = libprotobuf-lite.la libprotobuf.la
+ 
+ libprotobuf_lite_la_LIBADD = $(PTHREAD_LIBS)
+ libprotobuf_lite_la_LDFLAGS = -version-info 11:0:0 -export-dynamic -no-undefined
