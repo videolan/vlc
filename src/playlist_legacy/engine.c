@@ -432,8 +432,11 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "rate-faster", VLC_VAR_VOID );
     var_AddCallback( p_playlist, "rate-faster", RateOffsetCallback, NULL );
 
-    var_Create( p_playlist, "video-splitter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_AddCallback( p_playlist, "video-splitter", VideoSplitterCallback, NULL );
+    if (config_GetType("video-splitter"))
+    {
+        var_Create( p_playlist, "video-splitter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+        var_AddCallback( p_playlist, "video-splitter", VideoSplitterCallback, NULL );
+    }
 
     var_Create( p_playlist, "video-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "sub-source", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
