@@ -551,8 +551,6 @@ static int Mpeg4ReadAudioChannelConfiguration(bs_t *s)
 
 static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_withext)
 {
-    memset(p_cfg, 0, sizeof(*p_cfg));
-
     p_cfg->i_object_type = Mpeg4ReadAudioObjectType(s);
     p_cfg->i_samplerate = Mpeg4ReadAudioSamplerate(s);
     p_cfg->i_channel = Mpeg4ReadAudioChannelConfiguration(s);
@@ -562,6 +560,8 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
     p_cfg->extension.i_object_type = 0;
     p_cfg->extension.i_samplerate = 0;
     p_cfg->extension.i_channel = -1;
+    p_cfg->i_frame_length = 0;
+
     if (p_cfg->i_object_type == AOT_AAC_SBR ||
         p_cfg->i_object_type == AOT_AAC_PS) {
         p_cfg->i_sbr = 1;
