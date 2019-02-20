@@ -82,6 +82,8 @@ static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
     chain->callbacks = *callbacks;
     if( owner != NULL )
         chain->owner = *owner;
+    else
+        memset(&chain->owner, 0, sizeof(chain->owner));
     chain->first = NULL;
     chain->last = NULL;
     es_format_Init( &chain->fmt_in, cat, 0 );
