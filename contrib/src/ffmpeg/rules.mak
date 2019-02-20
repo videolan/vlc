@@ -237,6 +237,7 @@ ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/0003-arm-swscale-Only-compile-the-rgb2yuv-asm-if-.dn-alia.patch
 	$(APPLY) $(SRC)/ffmpeg/0004-arm-hevcdsp-Avoid-using-macro-expansion-counters.patch
 	$(APPLY) $(SRC)/ffmpeg/0005-arm-hevcdsp-Add-commas-between-macro-arguments.patch
+	$(APPLY) $(SRC)/ffmpeg/0006-ffmpeg-Fix-memset-size-on-ctts_data-in-mov_read_trun.patch
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
 	$(APPLY) $(SRC)/ffmpeg/dxva_vc1_crash.patch
 	$(APPLY) $(SRC)/ffmpeg/h264_early_SAR.patch
