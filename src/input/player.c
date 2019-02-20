@@ -3380,7 +3380,7 @@ vlc_vout_filter_type_to_varname(enum vlc_vout_filter_type type)
     switch (type)
     {
         case VLC_VOUT_FILTER_VIDEO_SPLITTER:
-            return "video-splitter";
+            return config_GetType("video-splitter") ? "video-splitter" : NULL;
         case VLC_VOUT_FILTER_VIDEO_FILTER:
             return "video-filter";
         case VLC_VOUT_FILTER_SUB_SOURCE:
@@ -3397,15 +3397,16 @@ vlc_player_vout_SetFilter(vlc_player_t *player, enum vlc_vout_filter_type type,
                           const char *value)
 {
     const char *varname = vlc_vout_filter_type_to_varname(type);
-    vlc_player_vout_SetVar(player, varname, VLC_VAR_STRING,
-                           (vlc_value_t) { .psz_string = (char *) value });
+    if (varname)
+        vlc_player_vout_SetVar(player, varname, VLC_VAR_STRING,
+                               (vlc_value_t) { .psz_string = (char *) value });
 }
 
 char *
 vlc_player_vout_GetFilter(vlc_player_t *player, enum vlc_vout_filter_type type)
 {
     const char *varname = vlc_vout_filter_type_to_varname(type);
-    return var_GetString(player, varname);
+    return varname ? var_GetString(player, varname) : NULL;
 }
 
 void
@@ -3528,7 +3529,8 @@ vlc_player_New(vlc_object_t *parent,
     VAR_CREATE("demux-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
     /* vout variables */
-    VAR_CREATE("video-splitter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    if (config_GetType("video-splitter"))
+        VAR_CREATE("video-splitter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     VAR_CREATE("video-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     VAR_CREATE("sub-source", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     VAR_CREATE("sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
