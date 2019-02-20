@@ -547,26 +547,6 @@ static int Mpeg4ReadAudioChannelConfiguration(bs_t *s)
 
 static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_withext)
 {
-#if 0
-    static const char *ppsz_otype[] = {
-        "NULL",
-        "AAC Main", "AAC LC", "AAC SSR", "AAC LTP", "SBR", "AAC Scalable",
-        "TwinVQ",
-        "CELP", "HVXC",
-        "Reserved", "Reserved",
-        "TTSI",
-        "Main Synthetic", "Wavetables Synthesis", "General MIDI",
-        "Algorithmic Synthesis and Audio FX",
-        "ER AAC LC",
-        "Reserved",
-        "ER AAC LTP", "ER AAC Scalable", "ER TwinVQ", "ER BSAC", "ER AAC LD",
-        "ER CELP", "ER HVXC", "ER HILN", "ER Parametric",
-        "SSC",
-        "PS", "Reserved", "Escape",
-        "Layer 1", "Layer 2", "Layer 3",
-        "DST",
-    };
-#endif
     memset(p_cfg, 0, sizeof(*p_cfg));
 
     p_cfg->i_object_type = Mpeg4ReadAudioObjectType(s);
@@ -669,9 +649,31 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
         }
     }
 
-    //fprintf(stderr, "Mpeg4ReadAudioSpecificInfo: t=%s(%d)f=%d c=%d sbr=%d\n",
-    //         ppsz_otype[p_cfg->i_object_type], p_cfg->i_object_type, p_cfg->i_samplerate, p_cfg->i_channel, p_cfg->i_sbr);
+#if 0
+    static const char *ppsz_otype[] = {
+        "NULL",
+        "AAC Main", "AAC LC", "AAC SSR", "AAC LTP", "SBR", "AAC Scalable",
+        "TwinVQ",
+        "CELP", "HVXC",
+        "Reserved", "Reserved",
+        "TTSI",
+        "Main Synthetic", "Wavetables Synthesis", "General MIDI",
+        "Algorithmic Synthesis and Audio FX",
+        "ER AAC LC",
+        "Reserved",
+        "ER AAC LTP", "ER AAC Scalable", "ER TwinVQ", "ER BSAC", "ER AAC LD",
+        "ER CELP", "ER HVXC", "ER HILN", "ER Parametric",
+        "SSC",
+        "PS", "MPEG Surround", "Escape",
+        "Layer 1", "Layer 2", "Layer 3",
+        "DST", "ALS", "SLS", "SLS non-core", "ELD",
+        "SMR Simple", "SMR Main",
+    };
 
+    fprintf(stderr, "Mpeg4ReadAudioSpecificInfo: t=%s(%d)f=%d c=%d sbr=%d\n",
+            ppsz_otype[p_cfg->i_object_type], p_cfg->i_object_type,
+            p_cfg->i_samplerate, p_cfg->i_channel, p_cfg->i_sbr);
+#endif
     return VLC_SUCCESS;
 }
 
