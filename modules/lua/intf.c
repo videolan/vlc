@@ -204,29 +204,36 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
         return VLC_EGENERIC;
 
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    struct vlc_logger *logger = p_intf->obj.logger;
     lua_State *L;
+    char *namebuf = NULL;
 
     config_ChainParse( p_intf, "lua-", ppsz_intf_options, p_intf->p_cfg );
 
     if( name == NULL )
     {
-        char *n = var_InheritString( p_this, "lua-intf" );
-        if( unlikely(n == NULL) )
+        namebuf = var_InheritString( p_this, "lua-intf" );
+        if( unlikely(namebuf == NULL) )
             return VLC_EGENERIC;
-        name = p_intf->obj.header = n;
+        name = namebuf;
     }
-    else
-        /* Cleaned up by vlc_object_release() */
-        p_intf->obj.header = strdup( name );
 
     intf_sys_t *p_sys = malloc( sizeof(*p_sys) );
     if( unlikely(p_sys == NULL) )
     {
-        free( p_intf->obj.header );
-        p_intf->obj.header = NULL;
+        free( namebuf );
         return VLC_ENOMEM;
     }
     p_intf->p_sys = p_sys;
+
+    p_intf->obj.logger = vlc_LogHeaderCreate( logger, name );
+    if( p_intf->obj.logger == NULL )
+    {
+        p_intf->obj.logger = logger;
+        free( p_sys );
+        free( namebuf );
+        return VLC_ENOMEM;
+    }
 
     p_sys->psz_filename = vlclua_find_file( "intf", name );
     if( !p_sys->psz_filename )
@@ -380,13 +387,14 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
         lua_close( p_sys->L );
         goto error;
     }
-
+    free( namebuf );
     return VLC_SUCCESS;
 error:
     free( p_sys->psz_filename );
     free( p_sys );
-    free( p_intf->obj.header );
-    p_intf->obj.header = NULL;
+    vlc_LogDestroy( p_intf->obj.logger );
+    p_intf->obj.logger = logger;
+    free( namebuf );
     return VLC_EGENERIC;
 }
 
@@ -402,6 +410,7 @@ void Close_LuaIntf( vlc_object_t *p_this )
     vlclua_fd_cleanup( &p_sys->dtable );
     free( p_sys->psz_filename );
     free( p_sys );
+    vlc_LogDestroy( p_intf->obj.logger );
 }
 
 static void *Run( void *data )
