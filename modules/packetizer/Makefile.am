@@ -10,7 +10,8 @@ libpacketizer_mpegvideo_plugin_la_SOURCES = packetizer/mpegvideo.c \
 libpacketizer_mpeg4video_plugin_la_SOURCES = packetizer/mpeg4video.c \
                                              packetizer/iso_color_tables.h
 libpacketizer_mjpeg_plugin_la_SOURCES = packetizer/mjpeg.c
-libpacketizer_mpeg4audio_plugin_la_SOURCES = packetizer/mpeg4audio.c
+libpacketizer_mpeg4audio_plugin_la_SOURCES = packetizer/mpeg4audio.c \
+                                             packetizer/mpeg4audio.h
 libpacketizer_mpegaudio_plugin_la_SOURCES = packetizer/mpegaudio.c
 libpacketizer_h264_plugin_la_SOURCES = \
 	packetizer/h264_nal.c packetizer/h264_nal.h \

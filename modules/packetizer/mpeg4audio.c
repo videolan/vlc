@@ -37,6 +37,7 @@
 
 #include <vlc_block_helper.h>
 #include "packetizer_helper.h"
+#include "mpeg4audio.h"
 
 #include <assert.h>
 
@@ -493,9 +494,9 @@ static int Mpeg4GAProgramConfigElement(bs_t *s)
 static int Mpeg4GASpecificConfig(mpeg4_asc_t *p_cfg, bs_t *s)
 {
     p_cfg->i_frame_length = bs_read1(s) ? 960 : 1024;
-    if(p_cfg->i_object_type == 23) /* 14496-3 4.5.1.1 */
+    if(p_cfg->i_object_type == AOT_ER_AAC_LD) /* 14496-3 4.5.1.1 */
         p_cfg->i_frame_length >>= 1;
-    else if(p_cfg->i_object_type == 3)
+    else if(p_cfg->i_object_type == AOT_AAC_SSR)
         p_cfg->i_frame_length = 256;
 
     if (bs_read1(s))     // depend on core coder
@@ -504,14 +505,17 @@ static int Mpeg4GASpecificConfig(mpeg4_asc_t *p_cfg, bs_t *s)
     int i_extension_flag = bs_read1(s);
     if (p_cfg->i_channel == 0)
         Mpeg4GAProgramConfigElement(s);
-    if (p_cfg->i_object_type == 6 || p_cfg->i_object_type == 20)
+    if (p_cfg->i_object_type == AOT_AAC_SC ||
+        p_cfg->i_object_type == AOT_ER_AAC_SC)
         bs_skip(s, 3);    // layer
 
     if (i_extension_flag) {
-        if (p_cfg->i_object_type == 22)
+        if (p_cfg->i_object_type == AOT_ER_BSAC)
             bs_skip(s, 5 + 11);   // numOfSubFrame + layer length
-        if (p_cfg->i_object_type == 17 || p_cfg->i_object_type == 19 ||
-            p_cfg->i_object_type == 20 || p_cfg->i_object_type == 23)
+        if (p_cfg->i_object_type == AOT_ER_AAC_LC ||
+            p_cfg->i_object_type == AOT_ER_AAC_LTP ||
+            p_cfg->i_object_type == AOT_ER_AAC_SC ||
+            p_cfg->i_object_type == AOT_ER_AAC_LD)
             bs_skip(s, 1+1+1);    // ER data : section scale spectral */
         if (bs_read1(s))     // extension 3
             fprintf(stderr, "Mpeg4GASpecificConfig: error 1\n");
@@ -558,52 +562,70 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
     p_cfg->extension.i_object_type = 0;
     p_cfg->extension.i_samplerate = 0;
     p_cfg->extension.i_channel = -1;
-    if (p_cfg->i_object_type == 5 || p_cfg->i_object_type == 29) {
+    if (p_cfg->i_object_type == AOT_AAC_SBR ||
+        p_cfg->i_object_type == AOT_AAC_PS) {
         p_cfg->i_sbr = 1;
-        if (p_cfg->i_object_type == 29)
+        if (p_cfg->i_object_type == AOT_AAC_PS)
            p_cfg->i_ps = 1;
-        p_cfg->extension.i_object_type = 5;
+        p_cfg->extension.i_object_type = AOT_AAC_SBR;
         p_cfg->extension.i_samplerate = Mpeg4ReadAudioSamplerate(s);
 
         p_cfg->i_object_type = Mpeg4ReadAudioObjectType(s);
-        if(p_cfg->i_object_type == 22)
+        if(p_cfg->i_object_type == AOT_ER_BSAC)
             p_cfg->extension.i_channel = Mpeg4ReadAudioChannelConfiguration(s);
     }
 
     switch(p_cfg->i_object_type)
     {
-    case 1: case 2: case 3: case 4:
-    case 6: case 7:
-    case 17: case 19: case 20: case 21: case 22: case 23:
+    case AOT_AAC_MAIN:
+    case AOT_AAC_LC:
+    case AOT_AAC_SSR:
+    case AOT_AAC_LTP:
+    case AOT_AAC_SC:
+    case AOT_TWINVQ:
+    case AOT_ER_AAC_LC:
+    case AOT_ER_AAC_LTP:
+    case AOT_ER_AAC_SC:
+    case AOT_ER_TWINVQ:
+    case AOT_ER_BSAC:
+    case AOT_ER_AAC_LD:
         Mpeg4GASpecificConfig(p_cfg, s);
         break;
-    case 8:
+    case AOT_CELP:
         // CelpSpecificConfig();
-    case 9:
+    case AOT_HVXC:
         // HvxcSpecificConfig();
-    case 12:
+    case AOT_TTSI:
         // TTSSSpecificConfig();
-    case 13: case 14: case 15: case 16:
+    case AOT_MAIN_SYNTHETIC:
+    case AOT_WAVETABLES:
+    case AOT_GENERAL_MIDI:
+    case AOT_ALGORITHMIC:
         // StructuredAudioSpecificConfig();
-    case 24:
+    case AOT_ER_CELP:
         // ERCelpSpecificConfig();
-    case 25:
+    case AOT_ER_HXVC:
         // ERHvxcSpecificConfig();
-    case 26: case 27:
+    case AOT_ER_HILN:
+    case AOT_ER_Parametric:
         // ParametricSpecificConfig();
-    case 28:
+    case AOT_SSC:
         // SSCSpecificConfig();
-    case 32: case 33: case 34:
+    case AOT_LAYER1:
+    case AOT_LAYER2:
+    case AOT_LAYER3:
         // MPEG_1_2_SpecificConfig();
-    case 35:
+    case AOT_DST:
         // DSTSpecificConfig();
-    case 36:
+    case AOT_ALS:
         // ALSSpecificConfig();
-    case 37: case 38:
+    case AOT_SLS:
+    case AOT_SLS_NON_CORE:
         // SLSSpecificConfig();
-    case 39:
+    case AOT_ER_AAC_ELD:
         // ELDSpecificConfig();
-    case 40: case 41:
+    case AOT_SMR_SIMPLE:
+    case AOT_SMR_MAIN:
         // SymbolicMusicSpecificConfig();
     default:
         // error
@@ -612,8 +634,17 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
 
     switch(p_cfg->i_object_type)
     {
-    case 17: case 19: case 20: case 21: case 22: case 23:
-    case 24: case 25: case 26: case 27: case 39:
+    case AOT_ER_AAC_LC:
+    case AOT_ER_AAC_LTP:
+    case AOT_ER_AAC_SC:
+    case AOT_ER_TWINVQ:
+    case AOT_ER_BSAC:
+    case AOT_ER_AAC_LD:
+    case AOT_ER_CELP:
+    case AOT_ER_HXVC:
+    case AOT_ER_HILN:
+    case AOT_ER_Parametric:
+    case AOT_ER_AAC_ELD:
     {
         int epConfig = bs_read(s, 2);
         if (epConfig == 2 || epConfig == 3)
@@ -628,10 +659,11 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
         break;
     }
 
-    if (b_withext && p_cfg->extension.i_object_type != 5 && bs_remain(s) >= 16 &&
-        bs_read(s, 11) == 0x2b7) {
+    if (b_withext && p_cfg->extension.i_object_type != AOT_AAC_SBR &&
+        bs_remain(s) >= 16 && bs_read(s, 11) == 0x2b7)
+    {
         p_cfg->extension.i_object_type = Mpeg4ReadAudioObjectType(s);
-        if (p_cfg->extension.i_object_type == 5)
+        if (p_cfg->extension.i_object_type == AOT_AAC_SBR)
         {
             p_cfg->i_sbr  = bs_read1(s);
             if (p_cfg->i_sbr == 1) {
@@ -640,7 +672,7 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
                    p_cfg->i_ps = bs_read1(s);
             }
         }
-        else if (p_cfg->extension.i_object_type == 22)
+        else if (p_cfg->extension.i_object_type == AOT_ER_BSAC)
         {
             p_cfg->i_sbr  = bs_read1(s);
             if(p_cfg->i_sbr)
@@ -756,8 +788,10 @@ static int LatmReadStreamMuxConfiguration(latm_mux_t *m, bs_t *s)
             {
                 bs_skip(s, 8); /* latmBufferFullnes */
                 if (!m->b_same_time_framing)
-                    if (st->cfg.i_object_type == 6 || st->cfg.i_object_type == 20 ||
-                        st->cfg.i_object_type == 8 || st->cfg.i_object_type == 24)
+                    if (st->cfg.i_object_type == AOT_AAC_SC ||
+                        st->cfg.i_object_type == AOT_CELP ||
+                        st->cfg.i_object_type == AOT_ER_AAC_SC ||
+                        st->cfg.i_object_type == AOT_ER_CELP)
                         bs_skip(s, 6); /* eFrameOffset */
                 break;
             }
