@@ -82,9 +82,6 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
                 const char *file, unsigned line, const char *func,
                 const char *format, va_list args)
 {
-    if (obj != NULL && obj->obj.flags & OBJECT_FLAGS_QUIET)
-        return;
-
     /* Get basename from the module filename */
     char *p = strrchr(module, '/');
     if (p != NULL)

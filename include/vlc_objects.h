@@ -83,7 +83,6 @@ struct vlc_common_members
 #endif
 
 /* Object flags */
-#define OBJECT_FLAGS_QUIET       0x0002
 #define OBJECT_FLAGS_NOINTERACT  0x0004
 
 /*****************************************************************************
