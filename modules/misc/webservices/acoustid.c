@@ -166,7 +166,7 @@ int DoAcoustIdWebRequest( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data )
     stream_t *p_stream = vlc_stream_NewURL( p_obj, psz_url );
 
     free( psz_url );
-    p_obj->obj.no_interact = false;
+    p_obj->obj.no_interact = saved_no_interact;
     if ( p_stream == NULL )
         return VLC_EGENERIC;
 
