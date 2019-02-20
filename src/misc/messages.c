@@ -206,6 +206,7 @@ typedef struct
     vlc_log_early_t *head;
     vlc_log_early_t **tailp;
     vlc_logger_t *sink;
+    struct vlc_logger logger;
 } vlc_logger_early_t;
 
 static void vlc_vaLogEarly(void *d, int type, const vlc_log_t *item,
@@ -263,20 +264,19 @@ static const struct vlc_logger_operations early_ops = {
     vlc_LogEarlyClose,
 };
 
-static
-const struct vlc_logger_operations *vlc_LogEarlyOpen(vlc_logger_t *logger,
-                                                     void **restrict sysp)
+static struct vlc_logger *vlc_LogEarlyOpen(struct vlc_logger *logger)
 {
-    vlc_logger_early_t *sys = malloc(sizeof (*sys));
-    if (unlikely(sys == NULL))
+    vlc_logger_early_t *early = malloc(sizeof (*early));
+    if (unlikely(early == NULL))
         return NULL;
 
-    vlc_mutex_init(&sys->lock);
-    sys->head = NULL;
-    sys->tailp = &sys->head;
-    sys->sink = logger;
-    *sysp = sys;
-    return &early_ops;
+    early->logger.ops = &early_ops;
+    early->logger.sys = early;
+    vlc_mutex_init(&early->lock);
+    early->head = NULL;
+    early->tailp = &early->head;
+    early->sink = logger;
+    return &early->logger;
 }
 
 static void vlc_vaLogDiscard(void *d, int type, const vlc_log_t *item,
@@ -468,11 +468,9 @@ int vlc_LogPreinit(libvlc_int_t *vlc)
     }
     vlc->obj.logger = logger;
 
-    const struct vlc_logger_operations *ops;
-    void *opaque;
-
-    ops = vlc_LogEarlyOpen(logger, &opaque);
-    vlc_LogSet(vlc, ops, opaque);
+    struct vlc_logger *early = vlc_LogEarlyOpen(logger);
+    if (early != NULL)
+        vlc_LogSet(vlc, early->ops, early->sys);
     return 0;
 }
 
