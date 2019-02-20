@@ -51,12 +51,12 @@ static void vlc_vaLogCallback(vlc_logger_t *logger, int type,
                               const vlc_log_t *item, const char *format,
                               va_list ap)
 {
-    int canc;
+    if (logger != NULL) {
+        int canc = vlc_savecancel();
 
-    assert(logger != NULL);
-    canc = vlc_savecancel();
-    logger->ops->log(logger->sys, type, item, format, ap);
-    vlc_restorecancel(canc);
+        logger->ops->log(logger->sys, type, item, format, ap);
+        vlc_restorecancel(canc);
+    }
 }
 
 static void vlc_LogCallback(vlc_logger_t *logger, int type,
