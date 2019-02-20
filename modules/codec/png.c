@@ -238,8 +238,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( setjmp( png_jmpbuf( p_png ) ) )
         goto error;
 
-    png_set_read_fn( p_png, (void *)p_block, user_read );
-    png_set_error_fn( p_png, (void *)p_dec, user_error, user_warning );
+    png_set_read_fn( p_png, p_block, user_read );
+    png_set_error_fn( p_png, p_sys, user_error, user_warning );
 
     png_read_info( p_png, p_info );
     if( p_sys->b_error ) goto error;
@@ -399,7 +399,7 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
         goto error;
 
     png_set_write_fn( p_png, p_block, user_write, user_flush );
-    png_set_error_fn( p_png, p_enc, user_error, user_warning );
+    png_set_error_fn( p_png, p_sys, user_error, user_warning );
 
     p_info = png_create_info_struct( p_png );
     if( p_info == NULL )
