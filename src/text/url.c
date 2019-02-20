@@ -511,7 +511,8 @@ static int vlc_UrlParseInner(vlc_url_t *restrict url, const char *str)
             if (next != NULL)
                 *(next++) = '\0';
 
-            url->psz_host = vlc_idna_to_ascii(vlc_uri_decode(cur));
+            const char *host = vlc_uri_decode(cur);
+            url->psz_host = (host != NULL) ? vlc_idna_to_ascii(host) : NULL;
         }
 
         if (url->psz_host == NULL)
