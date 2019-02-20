@@ -20,10 +20,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "avcommon_compat.h"
-
 #ifndef VLC_AVCODEC_VA_H
 #define VLC_AVCODEC_VA_H 1
+
+#include "avcommon_compat.h"
 
 typedef struct vlc_va_t vlc_va_t;
 typedef struct vlc_va_sys_t vlc_va_sys_t;
