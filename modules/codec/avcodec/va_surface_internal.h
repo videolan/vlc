@@ -32,8 +32,6 @@
 #include <libavcodec/avcodec.h>
 #include "va.h"
 
-#include <stdatomic.h>
-
 /* */
 typedef struct vlc_va_surface_t vlc_va_surface_t;
 
