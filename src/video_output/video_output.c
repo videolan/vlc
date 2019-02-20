@@ -1665,7 +1665,8 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vout->p = sys;
 
     /* Get splitter name if present */
-    sys->splitter_name = var_InheritString(vout, "video-splitter");
+    sys->splitter_name = config_GetType("video-splitter") ?
+        var_InheritString(vout, "video-splitter") : NULL;
     if (sys->splitter_name != NULL) {
         var_Create(vout, "window", VLC_VAR_STRING);
         var_SetString(vout, "window", "wdummy");
