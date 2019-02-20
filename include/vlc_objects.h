@@ -48,7 +48,7 @@ struct vlc_common_members
      */
     char *header;
 
-    int  flags;
+    bool no_interact;
 
     /** Module probe flag
      *
@@ -81,9 +81,6 @@ struct vlc_common_members
 #else
 # define VLC_OBJECT(x) ((vlc_object_t *)(x))
 #endif
-
-/* Object flags */
-#define OBJECT_FLAGS_NOINTERACT  0x0004
 
 /*****************************************************************************
  * The vlc_object_t type. Yes, it's that simple :-)

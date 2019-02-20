@@ -68,16 +68,16 @@ spuregion_CreateFromPicture( vlc_object_t *p_this, video_format_t *p_fmt,
 {
     picture_t *p_pic = NULL;
     struct vlc_logger *logger = p_this->obj.logger;
-    int i_flags = p_this->obj.flags;
+    bool no_interact = p_this->obj.no_interact;
     p_this->obj.logger = NULL;
-    p_this->obj.flags |= OBJECT_FLAGS_NOINTERACT;
+    p_this->obj.no_interact = true;
     image_handler_t *p_image = image_HandlerCreate( p_this );
     if( p_image )
     {
         p_pic = image_ReadUrl( p_image, psz_uri, p_fmt );
         image_HandlerDelete( p_image );
     }
-    p_this->obj.flags = i_flags;
+    p_this->obj.no_interact = no_interact;
     p_this->obj.logger = logger;
 
     if(!p_pic)

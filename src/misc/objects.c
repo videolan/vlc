@@ -221,7 +221,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         vlc_object_internals_t *papriv = vlc_internals (parent);
 
         obj->obj.logger = parent->obj.logger;
-        obj->obj.flags = parent->obj.flags;
+        obj->obj.no_interact = parent->obj.no_interact;
 
         /* Attach the child to its parent (no lock needed) */
         obj->obj.parent = vlc_object_hold (parent);
@@ -233,7 +233,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     }
     else
     {
-        obj->obj.flags = 0;
+        obj->obj.no_interact = false;
         obj->obj.parent = NULL;
 
         /* TODO: should be in src/libvlc.c */

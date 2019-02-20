@@ -1172,9 +1172,9 @@ static picture_t * picture_CreateFromPNG( decoder_t *p_dec,
 
     picture_t *p_pic = NULL;
     struct vlc_logger *logger = p_dec->obj.logger;
-    int i_flags = p_dec->obj.flags;
+    bool no_interact = p_dec->obj.no_interact;
     p_dec->obj.logger = NULL;
-    p_dec->obj.flags |= OBJECT_FLAGS_NOINTERACT;
+    p_dec->obj.no_interact = true;
     image_handler_t *p_image = image_HandlerCreate( p_dec );
     if( p_image )
     {
@@ -1182,7 +1182,7 @@ static picture_t * picture_CreateFromPNG( decoder_t *p_dec,
         image_HandlerDelete( p_image );
     }
     else block_Release( p_block );
-    p_dec->obj.flags = i_flags;
+    p_dec->obj.no_interact = no_interact;
     p_dec->obj.logger = logger;
     es_format_Clean( &es_in );
     video_format_Clean( &fmt_out );
