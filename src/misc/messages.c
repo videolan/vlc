@@ -300,6 +300,7 @@ static struct vlc_logger discard_log = { &discard_ops, NULL };
  */
 struct vlc_logger_switch {
     struct vlc_logger *backend;
+    struct vlc_logger frontend;
     vlc_rwlock_t lock;
 };
 
@@ -336,11 +337,11 @@ static const struct vlc_logger_operations switch_ops = {
 
 static void vlc_LogSwitch(vlc_logger_t *logger, vlc_logger_t *new_logger)
 {
-    struct vlc_logger_switch *logswitch = logger->sys;
+    struct vlc_logger_switch *logswitch =
+        container_of(logger, struct vlc_logger_switch, frontend);
     struct vlc_logger *old_logger;
 
     assert(logger->ops == &switch_ops);
-    assert(logswitch != NULL);
 
     if (new_logger == NULL)
         new_logger = &discard_log;
@@ -354,17 +355,17 @@ static void vlc_LogSwitch(vlc_logger_t *logger, vlc_logger_t *new_logger)
         old_logger->ops->destroy(old_logger->sys);
 }
 
-static
-const struct vlc_logger_operations *vlc_LogSwitchCreate(void **restrict sysp)
+static struct vlc_logger *vlc_LogSwitchCreate(void)
 {
     struct vlc_logger_switch *logswitch = malloc(sizeof (*logswitch));
     if (unlikely(logswitch == NULL))
         return NULL;
 
+    logswitch->frontend.ops = &switch_ops;
+    logswitch->frontend.sys = logswitch;
     logswitch->backend = &discard_log;
     vlc_rwlock_init(&logswitch->lock);
-    *sysp = logswitch;
-    return &switch_ops;
+    return &logswitch->frontend;
 }
 
 /**
@@ -455,15 +456,9 @@ void vlc_LogInit(libvlc_int_t *vlc)
  */
 int vlc_LogPreinit(libvlc_int_t *vlc)
 {
-    vlc_logger_t *logger = malloc(sizeof (*logger));
+    vlc_logger_t *logger = vlc_LogSwitchCreate();
     if (unlikely(logger == NULL))
         return -1;
-
-    logger->ops = vlc_LogSwitchCreate(&logger->sys);
-    if (unlikely(logger->ops == NULL)) {
-        free(logger);
-        return -1;
-    }
     vlc->obj.logger = logger;
 
     struct vlc_logger *early = vlc_LogEarlyOpen(logger);
