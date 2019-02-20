@@ -363,6 +363,18 @@ int vlc_demux_process_path(const struct vlc_run_args *args, const char *path)
     return ret;
 }
 
+int libvlc_demux_process_memory(libvlc_instance_t *vlc,
+                                const struct vlc_run_args *args,
+                                const unsigned char *buf, size_t length)
+{
+    stream_t *s = vlc_stream_MemoryNew(VLC_OBJECT(vlc->p_libvlc_int),
+                                       (void *)buf, length, true);
+    if (s == NULL)
+        fprintf(stderr, "Error: cannot create input stream\n");
+
+    return demux_process_stream(args, s);
+}
+
 int vlc_demux_process_memory(const struct vlc_run_args *args,
                              const unsigned char *buf, size_t length)
 {
@@ -370,12 +382,7 @@ int vlc_demux_process_memory(const struct vlc_run_args *args,
     if (vlc == NULL)
         return -1;
 
-    stream_t *s = vlc_stream_MemoryNew(VLC_OBJECT(vlc->p_libvlc_int),
-                                       (void *)buf, length, true);
-    if (s == NULL)
-        fprintf(stderr, "Error: cannot create input stream\n");
-
-    int ret = demux_process_stream(args, s);
+    int ret = libvlc_demux_process_memory(vlc, args, buf, length);
     libvlc_release(vlc);
     return ret;
 }
