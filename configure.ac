@@ -1903,7 +1903,7 @@ PKG_ENABLE_MODULES_VLC([DVDREAD], [], [dvdread > 6.0.0], [dvdread input module],
 dnl
 dnl libdvdnav plugin
 dnl
-PKG_ENABLE_MODULES_VLC([DVDNAV], [], [dvdnav > 6.0.0], [DVD with navigation input module (dvdnav)], [auto])
+PKG_ENABLE_MODULES_VLC([DVDNAV], [], [dvdnav >= 6.0.0], [DVD with navigation input module (dvdnav)], [auto])
 
 dnl
 dnl  Blu-ray Disc Support with libbluray
