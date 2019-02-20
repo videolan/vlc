@@ -285,10 +285,14 @@ static void vlc_vaLogDiscard(void *d, int type, const vlc_log_t *item,
     (void) d; (void) type; (void) item; (void) format; (void) ap;
 }
 
-static const struct vlc_logger_operations discard_ops =
+static void vlc_LogDiscardClose(void *d)
 {
+    (void) d;
+}
+
+static const struct vlc_logger_operations discard_ops = {
     vlc_vaLogDiscard,
-    NULL,
+    vlc_LogDiscardClose,
 };
 
 static struct vlc_logger discard_log = { &discard_ops, NULL };
@@ -322,10 +326,7 @@ static void vlc_LogSwitchClose(void *d)
     struct vlc_logger *backend = logswitch->backend;
 
     logswitch->backend = &discard_log;
-
-    if (backend->ops->destroy != NULL)
-        backend->ops->destroy(backend->sys);
-
+    backend->ops->destroy(backend->sys);
     vlc_rwlock_destroy(&logswitch->lock);
     free(logswitch);
 }
@@ -351,8 +352,7 @@ static void vlc_LogSwitch(vlc_logger_t *logger, vlc_logger_t *new_logger)
     logswitch->backend = new_logger;
     vlc_rwlock_unlock(&logswitch->lock);
 
-    if (old_logger->ops->destroy != NULL)
-        old_logger->ops->destroy(old_logger->sys);
+    old_logger->ops->destroy(old_logger->sys);
 }
 
 static struct vlc_logger *vlc_LogSwitchCreate(void)
@@ -581,6 +581,5 @@ void vlc_LogSet(libvlc_int_t *vlc, const struct vlc_logger_operations *ops,
 
 void vlc_LogDestroy(vlc_logger_t *logger)
 {
-    if (logger->ops->destroy != NULL)
-        logger->ops->destroy(logger->sys);
+    logger->ops->destroy(logger->sys);
 }
