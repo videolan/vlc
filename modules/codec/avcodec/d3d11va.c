@@ -427,18 +427,19 @@ static int D3dCreateDevice(vlc_va_t *va)
     }
 
 #if VLC_WINSTORE_APP
-    sys->d3d_dev.d3dcontext = var_InheritInteger(va, "winrt-d3dcontext");
-    if (likely(sys->d3d_dev.d3dcontext))
+    if (sys->d3d_dev.d3dcontext == NULL)
+        sys->d3d_dev.d3dcontext = var_InheritInteger(va, "winrt-d3dcontext"); /* LEGACY */
+#endif
+    if (sys->d3d_dev.d3dcontext != NULL)
     {
         ID3D11Device* d3ddevice = NULL;
         ID3D11DeviceContext_GetDevice(sys->d3d_dev.d3dcontext, &sys->d3d_dev.d3ddevice);
         ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
         ID3D11Device_Release(sys->d3d_dev.d3ddevice);
     }
-#endif
 
     /* */
-    if (!sys->d3d_dev.d3ddevice)
+    else
     {
         hr = D3D11_CreateDevice(va, &sys->hd3d, NULL, true, &sys->d3d_dev);
         if (FAILED(hr)) {
