@@ -377,10 +377,6 @@ static const char *const ppsz_pos_descriptions[] =
     "VLC can avoid creating window caption, frames, etc... around the video" \
     ", giving a \"minimal\" window.")
 
-#define VIDEO_SPLITTER_TEXT N_("Video splitter module")
-#define VIDEO_SPLITTER_LONGTEXT N_( \
-    "This adds video splitters like clone or wall" )
-
 #define VIDEO_FILTER_TEXT N_("Video filter module")
 #define VIDEO_FILTER_LONGTEXT N_( \
     "This adds post-processing filters to enhance the " \
