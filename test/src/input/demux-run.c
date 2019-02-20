@@ -415,7 +415,6 @@ extern vlc_plugin_cb vlc_static_modules[];
     f(xml) \
     f(console) \
     f(filesystem) \
-    f(xml) \
     f(aiff) \
     f(asf) \
     f(au) \
