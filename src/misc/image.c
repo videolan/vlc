@@ -301,23 +301,23 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     if( p_block == NULL )
         goto error;
 
-    es_format_t fmtin;
-    es_format_Init( &fmtin, VIDEO_ES, 0 ); /* no chroma, the MIME type of the picture will be used */
-
+    vlc_fourcc_t i_chroma = 0;
     char *psz_mime = stream_MimeType( p_stream );
     if( psz_mime != NULL )
     {
-        fmtin.video.i_chroma = image_Mime2Fourcc( psz_mime );
+        i_chroma = image_Mime2Fourcc( psz_mime );
         free( psz_mime );
     }
-    if( !fmtin.video.i_chroma )
+    if( !i_chroma )
     {
        /* Try to guess format from file name */
-       fmtin.video.i_chroma = image_Ext2Fourcc( psz_url );
+       i_chroma = image_Ext2Fourcc( psz_url );
     }
     vlc_stream_Delete( p_stream );
 
 
+    es_format_t fmtin;
+    es_format_Init( &fmtin, VIDEO_ES, i_chroma );
     p_pic = ImageRead( p_image, p_block, &fmtin, p_fmt_out );
 
     es_format_Clean( &fmtin );
