@@ -59,38 +59,38 @@
  *****************************************************************************/
 typedef struct
 {
-    int i_object_type;
-    int i_samplerate;
+    enum mpeg4_audioObjectType i_object_type;
+    unsigned i_samplerate;
     int i_channel;
-    int i_sbr;          // 0: no sbr, 1: sbr, -1: unknown
-    int i_ps;           // 0: no ps,  1: ps,  -1: unknown
+    int8_t i_sbr;          // 0: no sbr, 1: sbr, -1: unknown
+    int8_t i_ps;           // 0: no ps,  1: ps,  -1: unknown
 
     struct
     {
-        int i_object_type;
-        int i_samplerate;
+        enum mpeg4_audioObjectType i_object_type;
+        unsigned i_samplerate;
         int i_channel;
     } extension;
 
     /* GASpecific */
-    int i_frame_length;   // 1024 or 960
+    unsigned i_frame_length;   // 1024 or 960
 
 } mpeg4_asc_t;
 
 #define LATM_MAX_EXTRA_SIZE 64
 typedef struct
 {
-    int i_program;
-    int i_layer;
+    uint8_t i_program;
+    uint8_t i_layer;
 
-    int i_frame_length_type;
-    int i_frame_length;         // type 1
-    int i_frame_length_index;   // type 3 4 5 6 7
+    unsigned i_frame_length;         // type 1
+    uint8_t i_frame_length_type;
+    uint8_t i_frame_length_index;   // type 3 4 5 6 7
 
     mpeg4_asc_t cfg;
 
     /* Raw configuration */
-    int     i_extra;
+    size_t i_extra;
     uint8_t extra[LATM_MAX_EXTRA_SIZE];
 
 } latm_stream_t;
@@ -99,19 +99,19 @@ typedef struct
 #define LATM_MAX_PROGRAM (16)
 typedef struct
 {
-    int b_same_time_framing;
-    int i_sub_frames;
-    int i_programs;
+    bool b_same_time_framing;
+    uint8_t i_sub_frames;
+    uint8_t i_programs;
 
-    int pi_layers[LATM_MAX_PROGRAM];
+    uint8_t pi_layers[LATM_MAX_PROGRAM];
 
-    int pi_stream[LATM_MAX_PROGRAM][LATM_MAX_LAYER];
+    uint8_t pi_stream[LATM_MAX_PROGRAM][LATM_MAX_LAYER];
 
-    int i_streams;
+    uint8_t i_streams;
     latm_stream_t stream[LATM_MAX_PROGRAM*LATM_MAX_LAYER];
 
     uint32_t i_other_data;
-    int i_crc;  /* -1 if not set */
+    int16_t  i_crc;  /* -1 if not set */
 } latm_mux_t;
 
 typedef struct
@@ -523,7 +523,7 @@ static int Mpeg4GASpecificConfig(mpeg4_asc_t *p_cfg, bs_t *s)
     return 0;
 }
 
-static int Mpeg4ReadAudioObjectType(bs_t *s)
+static enum mpeg4_audioObjectType Mpeg4ReadAudioObjectType(bs_t *s)
 {
     int i_type = bs_read(s, 5);
     if (i_type == 31)
@@ -531,7 +531,7 @@ static int Mpeg4ReadAudioObjectType(bs_t *s)
     return i_type;
 }
 
-static int Mpeg4ReadAudioSamplerate(bs_t *s)
+static unsigned Mpeg4ReadAudioSamplerate(bs_t *s)
 {
     int i_index = bs_read(s, 4);
     if (i_index != 0x0f)
@@ -717,10 +717,10 @@ static uint32_t LatmGetValue(bs_t *s)
     return v;
 }
 
-static uint32_t AudioSpecificConfigBitsToBytes(bs_t *s, uint32_t i_bits, uint8_t *p_data)
+static size_t AudioSpecificConfigBitsToBytes(bs_t *s, uint32_t i_bits, uint8_t *p_data)
 {
-    uint32_t i_extra = __MIN((i_bits + 7) / 8, LATM_MAX_EXTRA_SIZE);
-    for (uint32_t i = 0; i < i_extra; i++) {
+    size_t i_extra = __MIN((i_bits + 7) / 8, LATM_MAX_EXTRA_SIZE);
+    for (size_t i = 0; i < i_extra; i++) {
         const uint32_t i_read = __MIN(8, i_bits - 8*i);
         p_data[i] = bs_read(s, i_read) << (8-i_read);
     }
@@ -750,10 +750,10 @@ static int LatmReadStreamMuxConfiguration(latm_mux_t *m, bs_t *s)
     m->i_sub_frames = 1 + bs_read(s, 6);
     m->i_programs = 1 + bs_read(s, 4);
 
-    for (int i_program = 0; i_program < m->i_programs; i_program++) {
+    for (uint8_t i_program = 0; i_program < m->i_programs; i_program++) {
         m->pi_layers[i_program] = 1+bs_read(s, 3);
 
-        for (int i_layer = 0; i_layer < m->pi_layers[i_program]; i_layer++) {
+        for (uint8_t i_layer = 0; i_layer < m->pi_layers[i_program]; i_layer++) {
             latm_stream_t *st = &m->stream[m->i_streams];
             bool b_previous_cfg;
 
@@ -845,7 +845,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
             p_sys->latm.i_streams > 0) {
         const latm_stream_t *st = &p_sys->latm.stream[0];
 
-        if(st->cfg.i_samplerate <= 0 || st->cfg.i_channel <=0 || st->cfg.i_frame_length <= 0)
+        if(st->cfg.i_samplerate == 0 || st->cfg.i_channel <=0 || st->cfg.i_frame_length == 0)
             return 0;
 
         p_sys->i_channels = st->cfg.i_channel;
@@ -854,7 +854,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
 
         if (p_sys->i_channels && p_sys->i_rate && p_sys->i_frame_length > 0)
         {
-            if(p_dec->fmt_out.i_extra != st->i_extra ||
+            if((size_t)p_dec->fmt_out.i_extra != st->i_extra ||
                (p_dec->fmt_out.i_extra > 0 &&
                 memcmp(p_dec->fmt_out.p_extra, st->extra, st->i_extra)) )
             {
@@ -892,17 +892,17 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
     if (p_sys->latm.i_sub_frames > 1)
         msg_Err(p_dec, "latm sub frames not yet supported, please send a sample");
 
-    for (int i_sub = 0; i_sub < p_sys->latm.i_sub_frames; i_sub++) {
-        int pi_payload[LATM_MAX_PROGRAM][LATM_MAX_LAYER];
+    for (uint8_t i_sub = 0; i_sub < p_sys->latm.i_sub_frames; i_sub++) {
+        unsigned pi_payload[LATM_MAX_PROGRAM][LATM_MAX_LAYER];
         if (p_sys->latm.b_same_time_framing) {
             /* Payload length */
-            for (int i_program = 0; i_program < p_sys->latm.i_programs; i_program++) {
-                for (int i_layer = 0; i_layer < p_sys->latm.pi_layers[i_program]; i_layer++) {
+            for (uint8_t i_program = 0; i_program < p_sys->latm.i_programs; i_program++) {
+                for (uint8_t i_layer = 0; i_layer < p_sys->latm.pi_layers[i_program]; i_layer++) {
                     latm_stream_t *st = &p_sys->latm.stream[p_sys->latm.pi_stream[i_program][i_layer]];
                     if (st->i_frame_length_type == 0) {
-                        int i_payload = 0;
+                        unsigned i_payload = 0;
                         for (;;) {
-                            int i_tmp = bs_read(&s, 8);
+                            uint8_t i_tmp = bs_read(&s, 8);
                             i_payload += i_tmp;
                             if (i_tmp != 255)
                                 break;
@@ -922,8 +922,8 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
             }
 
             /* Payload Data */
-            for (int i_program = 0; i_program < p_sys->latm.i_programs; i_program++) {
-                for (int i_layer = 0; i_layer < p_sys->latm.pi_layers[i_program]; i_layer++) {
+            for (uint8_t i_program = 0; i_program < p_sys->latm.i_programs; i_program++) {
+                for (uint8_t i_layer = 0; i_layer < p_sys->latm.pi_layers[i_program]; i_layer++) {
                     /* XXX we only extract 1 stream */
                     if (i_program != 0 || i_layer != 0)
                         break;
@@ -932,7 +932,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
                         continue;
 
                     /* FIXME that's slow (and a bit ugly to write in place) */
-                    for (int i = 0; i < pi_payload[i_program][i_layer]; i++) {
+                    for (unsigned i = 0; i < pi_payload[i_program][i_layer]; i++) {
                         if (i_accumulated >= i_buffer)
                             return 0;
                         p_buffer[i_accumulated++] = bs_read(&s, 8);
