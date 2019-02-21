@@ -134,6 +134,7 @@ typedef struct
     int i_frame_size;
     unsigned int i_channels;
     unsigned int i_rate, i_frame_length, i_header_size;
+    int i_aac_profile;
 
     int i_input_rate;
 
@@ -180,6 +181,29 @@ static int ChannelConfigurationToVLC(uint8_t i_channel)
     else if (i_channel >= 8)
         i_channel = -1;
     return i_channel;
+}
+
+static int AOTtoAACProfile(uint8_t i_object_type)
+{
+    switch(i_object_type)
+    {
+        case AOT_AAC_MAIN:
+        case AOT_AAC_LC:
+        case AOT_AAC_SSR:
+        case AOT_AAC_LTP:
+        case AOT_AAC_SBR:
+        case AOT_AAC_SC:
+        case AOT_ER_AAC_LD:
+        case AOT_AAC_PS:
+        case AOT_ER_AAC_ELD:
+            {
+            static_assert(AOT_AAC_MAIN == AAC_PROFILE_MAIN + 1,
+                          "invalid profile to object mapping");
+            return i_object_type - 1;
+            }
+        default:
+            return -1;
+    }
 }
 
 #define ADTS_HEADER_SIZE 9
@@ -284,6 +308,8 @@ static int OpenPacketizer(vlc_object_t *p_this)
             p_dec->fmt_out.audio.i_frame_length = asc.i_frame_length;
             p_dec->fmt_out.audio.i_channels =
                     ChannelConfigurationToVLC(asc.i_channel_configuration);
+            if(p_dec->fmt_out.i_profile != -1)
+                p_dec->fmt_out.i_profile = AOTtoAACProfile(asc.i_object_type);
 
             msg_Dbg(p_dec, "%sAAC%s %dHz %d samples/frame",
                     (asc.i_sbr) ? "HE-" : "",
@@ -532,6 +558,70 @@ static int Mpeg4GASpecificConfig(mpeg4_asc_t *p_cfg, bs_t *s)
     return 0;
 }
 
+static int Mpeg4ELDSpecificConfig(mpeg4_asc_t *p_cfg, bs_t *s)
+{
+    p_cfg->i_frame_length = bs_read1(s) ? 960 : 480;
+
+    /* ELDSpecificConfig Table 4.180 */
+
+    bs_skip(s, 3);
+    if(bs_read1(s)) /* ldSbrPresentFlag */
+    {
+        bs_skip(s, 2);
+        /* ld_sbr_header(channelConfiguration) Table 4.181 */
+        unsigned numSbrHeader;
+        switch(p_cfg->i_channel_configuration)
+        {
+            case 1: case 2:
+                numSbrHeader = 1;
+                break;
+            case 3:
+                numSbrHeader = 2;
+                break;
+            case 4: case 5: case 6:
+                numSbrHeader = 3;
+                break;
+            case 7:
+                numSbrHeader = 4;
+                break;
+            default:
+                numSbrHeader = 0;
+                break;
+        }
+        for( ; numSbrHeader; numSbrHeader-- )
+        {
+            /* sbr_header() Table 4.63 */
+            bs_read(s, 14);
+            bool header_extra_1 = bs_read1(s);
+            bool header_extra_2 = bs_read1(s);
+            if(header_extra_1)
+                bs_read(s, 5);
+            if(header_extra_2)
+                bs_read(s, 6);
+        }
+    }
+
+    for(unsigned eldExtType = bs_read(s, 4);
+        eldExtType != 0x0 /* ELDEXT_TERM */;
+        eldExtType = bs_read(s, 4))
+    {
+        unsigned eldExtLen = bs_read(s, 4);
+        unsigned eldExtLenAdd = 0;
+        if(eldExtLen == 15)
+        {
+            eldExtLenAdd = bs_read(s, 8);
+            eldExtLen += eldExtLenAdd;
+        }
+        if(eldExtLenAdd == 255)
+            eldExtLen += bs_read(s, 16);
+        /* reserved extensions */
+        for(; eldExtLen; eldExtLen--)
+            bs_skip(s, 8);
+    }
+
+    return 0;
+}
+
 static enum mpeg4_audioObjectType Mpeg4ReadAudioObjectType(bs_t *s)
 {
     int i_type = bs_read(s, 5);
@@ -622,7 +712,8 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
     case AOT_SLS_NON_CORE:
         // SLSSpecificConfig();
     case AOT_ER_AAC_ELD:
-        // ELDSpecificConfig();
+        Mpeg4ELDSpecificConfig(p_cfg, s);
+        break;
     case AOT_SMR_SIMPLE:
     case AOT_SMR_MAIN:
         // SymbolicMusicSpecificConfig();
@@ -851,6 +942,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
         p_sys->i_channels = ChannelConfigurationToVLC(st->cfg.i_channel_configuration);
         p_sys->i_rate = st->cfg.i_samplerate;
         p_sys->i_frame_length = st->cfg.i_frame_length;
+        p_sys->i_aac_profile = AOTtoAACProfile(st->cfg.i_object_type);
 
         if (p_sys->i_channels && p_sys->i_rate && p_sys->i_frame_length > 0)
         {
@@ -1015,6 +1107,8 @@ static void SetupOutput(decoder_t *p_dec, block_t *p_block)
     p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
     p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->i_frame_size;
     p_dec->fmt_out.audio.i_frame_length = p_sys->i_frame_length;
+    /* Will reload extradata on change */
+    p_dec->fmt_out.i_profile = p_sys->i_aac_profile;
 
 #if 0
     p_dec->fmt_out.audio.i_physical_channels = p_sys->i_channels_conf;
