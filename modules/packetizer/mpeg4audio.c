@@ -61,7 +61,7 @@ typedef struct
 {
     enum mpeg4_audioObjectType i_object_type;
     unsigned i_samplerate;
-    int i_channel;
+    uint8_t i_channel_configuration;
     int8_t i_sbr;          // 0: no sbr, 1: sbr, -1: unknown
     int8_t i_ps;           // 0: no ps,  1: ps,  -1: unknown
 
@@ -69,7 +69,7 @@ typedef struct
     {
         enum mpeg4_audioObjectType i_object_type;
         unsigned i_samplerate;
-        int i_channel;
+        uint8_t i_channel_configuration;
     } extension;
 
     /* GASpecific */
@@ -172,6 +172,16 @@ static const int pi_sample_rates[16] =
     16000, 12000, 11025, 8000,  7350,  0,     0,     0
 };
 
+
+static int ChannelConfigurationToVLC(uint8_t i_channel)
+{
+    if (i_channel == 7)
+        i_channel = 8; // 7.1
+    else if (i_channel >= 8)
+        i_channel = -1;
+    return i_channel;
+}
+
 #define ADTS_HEADER_SIZE 9
 #define LOAS_HEADER_SIZE 3
 
@@ -272,7 +282,8 @@ static int OpenPacketizer(vlc_object_t *p_this)
         {
             p_dec->fmt_out.audio.i_rate = asc.i_samplerate;
             p_dec->fmt_out.audio.i_frame_length = asc.i_frame_length;
-            p_dec->fmt_out.audio.i_channels = asc.i_channel;
+            p_dec->fmt_out.audio.i_channels =
+                    ChannelConfigurationToVLC(asc.i_channel_configuration);
 
             msg_Dbg(p_dec, "%sAAC%s %dHz %d samples/frame",
                     (asc.i_sbr) ? "HE-" : "",
@@ -503,7 +514,7 @@ static int Mpeg4GASpecificConfig(mpeg4_asc_t *p_cfg, bs_t *s)
         bs_skip(s, 14);   // core coder delay
 
     int i_extension_flag = bs_read1(s);
-    if (p_cfg->i_channel == 0)
+    if (p_cfg->i_channel_configuration == 0)
         Mpeg4GAProgramConfigElement(s);
     if (p_cfg->i_object_type == AOT_AAC_SC ||
         p_cfg->i_object_type == AOT_ER_AAC_SC)
@@ -539,27 +550,17 @@ static unsigned Mpeg4ReadAudioSamplerate(bs_t *s)
     return bs_read(s, 24);
 }
 
-static int Mpeg4ReadAudioChannelConfiguration(bs_t *s)
-{
-    int i_channel = bs_read(s, 4);
-    if (i_channel == 7)
-        i_channel = 8; // 7.1
-    else if (i_channel >= 8)
-        i_channel = -1;
-    return i_channel;
-}
-
 static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_withext)
 {
     p_cfg->i_object_type = Mpeg4ReadAudioObjectType(s);
     p_cfg->i_samplerate = Mpeg4ReadAudioSamplerate(s);
-    p_cfg->i_channel = Mpeg4ReadAudioChannelConfiguration(s);
+    p_cfg->i_channel_configuration = bs_read(s, 4);
 
     p_cfg->i_sbr = -1;
     p_cfg->i_ps  = -1;
     p_cfg->extension.i_object_type = 0;
     p_cfg->extension.i_samplerate = 0;
-    p_cfg->extension.i_channel = -1;
+    p_cfg->extension.i_channel_configuration = 0;
     p_cfg->i_frame_length = 0;
 
     if (p_cfg->i_object_type == AOT_AAC_SBR ||
@@ -572,7 +573,7 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
 
         p_cfg->i_object_type = Mpeg4ReadAudioObjectType(s);
         if(p_cfg->i_object_type == AOT_ER_BSAC)
-            p_cfg->extension.i_channel = Mpeg4ReadAudioChannelConfiguration(s);
+            p_cfg->extension.i_channel_configuration = bs_read(s, 4);
     }
 
     switch(p_cfg->i_object_type)
@@ -677,7 +678,7 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
             p_cfg->i_sbr  = bs_read1(s);
             if(p_cfg->i_sbr)
                 p_cfg->extension.i_samplerate = Mpeg4ReadAudioSamplerate(s);
-            p_cfg->extension.i_channel = Mpeg4ReadAudioChannelConfiguration(s);
+            p_cfg->extension.i_channel_configuration = bs_read(s, 4);
         }
     }
 
@@ -845,10 +846,11 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
             p_sys->latm.i_streams > 0) {
         const latm_stream_t *st = &p_sys->latm.stream[0];
 
-        if(st->cfg.i_samplerate == 0 || st->cfg.i_channel <=0 || st->cfg.i_frame_length == 0)
+        if(st->cfg.i_samplerate == 0 || st->cfg.i_frame_length == 0 ||
+           ChannelConfigurationToVLC(st->cfg.i_channel_configuration) == 0)
             return 0;
 
-        p_sys->i_channels = st->cfg.i_channel;
+        p_sys->i_channels = ChannelConfigurationToVLC(st->cfg.i_channel_configuration);
         p_sys->i_rate = st->cfg.i_samplerate;
         p_sys->i_frame_length = st->cfg.i_frame_length;
 
