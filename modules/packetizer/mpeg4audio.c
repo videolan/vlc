@@ -443,10 +443,8 @@ static int ADTSSyncInfo(decoder_t * p_dec, const uint8_t * p_buf,
     /* Build the decoder specific info header */
     if (!p_dec->fmt_out.i_extra) {
         p_dec->fmt_out.p_extra = malloc(2);
-        if (!p_dec->fmt_out.p_extra) {
-            p_dec->fmt_out.i_extra = 0;
+        if (!p_dec->fmt_out.p_extra)
             return 0;
-        }
         p_dec->fmt_out.i_extra = 2;
         ((uint8_t *)p_dec->fmt_out.p_extra)[0] =
             (i_profile + 1) << 3 | (i_sample_rate_idx >> 1);
