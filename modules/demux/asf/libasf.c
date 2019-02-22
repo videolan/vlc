@@ -1408,6 +1408,7 @@ static void ASF_FreeObject_marker( asf_object_t *p_obj)
     {
         FREENULL( p_mk->marker[i].p_marker_description  );
     }
+    FREENULL( p_mk->marker );
     FREENULL( p_mk->name );
 }
 
