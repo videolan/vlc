@@ -336,6 +336,19 @@ AS_IF([test "${SYS}" = "mingw32"],[
   ])
 AC_DEFINE_UNQUOTED(VLC_WINSTORE_APP, ${vlc_winstore_app}, [Define to 1 if you want to build for Windows Store apps])
 
+vlc_build_pdb=0
+AC_ARG_ENABLE([pdb],
+     AS_HELP_STRING([--enable-pdb],
+                    [Build PDB files for windows targets (default off)]))
+AS_IF([test "${SYS}" = "mingw32"],[
+  AS_IF([test "${enable_pdb}" = "yes"], [
+    vlc_build_pdb=1
+    AX_APPEND_FLAG([-g -gcodeview],[CFLAGS])
+    AX_APPEND_FLAG([-g -gcodeview],[CXXFLAGS])
+    LDFLAGS="${LDFLAGS} -Wl,-pdb="
+  ],[])
+])
+
 AM_CONDITIONAL(HAVE_LINUX,   test "${SYS}" = "linux")
 AM_CONDITIONAL(HAVE_OS2,     test "${SYS}" = "os2")
 
@@ -351,6 +364,7 @@ AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1") dnl Only used for the packaging
 AM_CONDITIONAL([HAVE_WINSTORE], [test "$vlc_winstore_app" = "1"])
 AM_CONDITIONAL([HAVE_WIN32_DESKTOP], [test "${SYS}" = "mingw32" -a "$vlc_winstore_app" = "0"])
+AM_CONDITIONAL([ENABLE_PDB],   [test "$vlc_build_pdb" = "1"])
 
 dnl
 dnl Sadly autoconf does not think about testing foo.exe when ask to test
