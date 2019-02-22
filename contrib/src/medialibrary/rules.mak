@@ -26,7 +26,7 @@ medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.xz .sum-medialibrary
 
 .medialibrary: medialibrary
 	$(RECONF)
-	cd $< && $(HOSTVARS_PIC) ./configure CXXFLAGS="-g -O0" --disable-tests --without-libvlc $(HOSTCONF)
+	cd $< && $(HOSTVARS_PIC) ./configure --disable-tests --without-libvlc $(HOSTCONF)
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) install
 	touch $@
