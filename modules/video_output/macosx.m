@@ -85,7 +85,7 @@ vlc_module_end ()
 /**
  * Obj-C protocol declaration that drawable-nsobject should follow
  */
-@protocol VLCOpenGLVideoViewEmbedding <NSObject>
+@protocol VLCVideoViewEmbedding <NSObject>
 - (void)addVoutSubview:(NSView *)view;
 - (void)removeVoutSubview:(NSView *)view;
 @end
@@ -103,7 +103,7 @@ vlc_module_end ()
 struct vout_display_sys_t
 {
     VLCOpenGLVideoView *glView;
-    id<VLCOpenGLVideoViewEmbedding> container;
+    id<VLCVideoViewEmbedding> container;
 
     vout_window_t *embed;
     vlc_gl_t *gl;
@@ -196,7 +196,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
                                           withObject:[NSValue valueWithPointer:parentView]
                                        waitUntilDone:NO];
         } else {
-            msg_Err(vd, "Invalid drawable-nsobject object. drawable-nsobject must either be an NSView or comply to the @protocol VLCOpenGLVideoViewEmbedding.");
+            msg_Err(vd, "Invalid drawable-nsobject object. drawable-nsobject must either be an NSView or comply to the @protocol VLCVideoViewEmbedding.");
             goto error;
         }
 

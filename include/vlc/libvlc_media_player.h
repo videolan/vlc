@@ -558,11 +558,11 @@ int libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
  *
  * Use the vout called "macosx".
  *
- * The drawable is an NSObject that follow the VLCOpenGLVideoViewEmbedding
+ * The drawable is an NSObject that follow the VLCVideoViewEmbedding
  * protocol:
  *
  * @code{.m}
- * \@protocol VLCOpenGLVideoViewEmbedding <NSObject>
+ * \@protocol VLCVideoViewEmbedding <NSObject>
  * - (void)addVoutSubview:(NSView *)view;
  * - (void)removeVoutSubview:(NSView *)view;
  * \@end
@@ -585,7 +585,7 @@ int libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
  *
  * \param p_mi the Media Player
  * \param drawable the drawable that is either an NSView or an object following
- * the VLCOpenGLVideoViewEmbedding protocol.
+ * the VLCVideoViewEmbedding protocol.
  */
 LIBVLC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_mi, void * drawable );
 
