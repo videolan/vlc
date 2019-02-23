@@ -1641,8 +1641,7 @@ static void VoutDestructor(vlc_object_t *object)
     video_format_Clean(&vout->p->original);
 }
 
-static vout_thread_t *VoutCreate(vlc_object_t *object,
-                                 const vout_configuration_t *cfg)
+static vout_thread_t *VoutCreate(vlc_object_t *object)
 {
     /* Allocate descriptor */
     vout_thread_t *vout = vlc_custom_create(object,
@@ -1673,7 +1672,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     }
 
     sys->input = NULL;
-    VoutFixFormat(&sys->original, cfg->fmt);
     sys->source.dar.num = 0;
     sys->source.dar.den = 0;
     sys->source.crop.mode = VOUT_CROP_NONE;
@@ -1707,25 +1705,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
 
     /* */
     vlc_object_set_destructor(vout, VoutDestructor);
-
-    vout_window_cfg_t wcfg = {
-        .is_fullscreen = var_GetBool(vout, "fullscreen"),
-        .is_decorated = var_InheritBool(vout, "video-deco"),
-        // TODO: take pixel A/R, crop and zoom into account
-#ifdef __APPLE__
-        .x = var_InheritInteger(vout, "video-x"),
-        .y = var_InheritInteger(vout, "video-y"),
-#endif
-    };
-
-    VoutGetDisplayCfg(vout, &sys->display_cfg);
-    vout_SizeWindow(vout, &wcfg.width, &wcfg.height);
-
-    if (sys->display_cfg.window != NULL
-     && vout_window_Enable(sys->display_cfg.window, &wcfg)) {
-        vout_display_window_Delete(sys->display_cfg.window);
-        sys->display_cfg.window = NULL;
-    }
 
     if (sys->display_cfg.window == NULL) {
         spu_Destroy(sys->spu);
@@ -1789,11 +1768,35 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         vout_UpdateWindowSize(vout);
         vlc_mutex_unlock(&vout->p->window_lock);
     } else {
-        vout = VoutCreate(object, cfg);
+        vout = VoutCreate(object);
         if (vout == NULL)
             return NULL;
 
         sys = vout->p;
+
+        VoutFixFormat(&sys->original, cfg->fmt);
+
+        vout_window_cfg_t wcfg = {
+            .is_fullscreen = var_GetBool(vout, "fullscreen"),
+            .is_decorated = var_InheritBool(vout, "video-deco"),
+        // TODO: take pixel A/R, crop and zoom into account
+#ifdef __APPLE__
+            .x = var_InheritInteger(vout, "video-x"),
+            .y = var_InheritInteger(vout, "video-y"),
+#endif
+        };
+
+        VoutGetDisplayCfg(vout, &sys->display_cfg);
+        vout_SizeWindow(vout, &wcfg.width, &wcfg.height);
+
+        if (vout_window_Enable(sys->display_cfg.window, &wcfg)) {
+            vout_display_window_Delete(sys->display_cfg.window);
+            sys->display_cfg.window = NULL;
+            spu_Destroy(sys->spu);
+            vlc_object_release(vout);
+            return NULL;
+        }
+
         if (input != NULL)
             vout->p->input = vlc_object_hold((vlc_object_t *)input);
     }
