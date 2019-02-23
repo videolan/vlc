@@ -484,7 +484,6 @@ $Id$
  * xcb_screen: input module that takes screenshots of the primary monitor
  * xcb_window: XCB window provider
  * xcb_x11: a X11 video output using XCB
- * xcb_xv: a XVideo video output using XCB
  * xdg_screensaver: xdg-utils screensaver inhibition
  * xdg_shell: XDG shell surface window provider using Wayland-client
  * xml: LibXML xml parser

@@ -1242,7 +1242,6 @@ modules/video_output/wayland/xdg-shell.c
 modules/video_output/xcb/render.c
 modules/video_output/xcb/window.c
 modules/video_output/xcb/x11.c
-modules/video_output/xcb/xvideo.c
 modules/video_output/yuv.c
 modules/video_splitter/clone.c
 modules/video_splitter/panoramix.c

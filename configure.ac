@@ -3182,8 +3182,6 @@ AS_IF([test "${enable_xcb}" != "no"], [
     xcb_err="$xcb_err ${XCB_SHM_PKG_ERRORS}."])
   PKG_CHECK_MODULES([XCB_XKB], [xcb-xkb],, [
     xcb_err="$xcb_err ${XCB_XKB_PKG_ERRORS}."])
-  PKG_CHECK_MODULES([XCB_XV], [xcb-xv >= 1.1.90.1],, [
-    xcb_err="$xcb_err ${XCB_XV_PKG_ERRORS}."])
 
   dnl xproto
   PKG_CHECK_MODULES(XPROTO, [xproto],, [
