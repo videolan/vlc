@@ -52,7 +52,7 @@ void Dialogs::showChangeSkinCB( intf_dialog_args_t *pArg )
                 // Push the command in the asynchronous command queue
                 AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
                 pQueue->push( CmdGenericPtr( pCmd ) );
-	    }
+            }
         }
     }
     else if( !pIntf->p_sys->p_theme )
