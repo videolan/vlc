@@ -398,8 +398,8 @@ static vlc_tls_t *vnc_connect( filter_t *p_filter )
         }
 
         int err = vnc_encrypt_bytes( challenge, p_sys->psz_passwd );
-	if (err != VLC_SUCCESS)
-	    return false;
+        if (err != VLC_SUCCESS)
+            return false;
 
         if( !write_exact(fd, challenge, CHALLENGESIZE ) )
         {
@@ -1327,7 +1327,7 @@ static int vnc_encrypt_bytes( unsigned char *bytes, char *passwd )
     gcry_cipher_hd_t ctx;
     int err = gcry_cipher_open( &ctx, GCRY_CIPHER_DES, GCRY_CIPHER_MODE_ECB,0);
     if (err)
-	return VLC_EGENERIC;
+        return VLC_EGENERIC;
 
     /* reverse bits of the key */
     for( unsigned i = 0 ; i < 8 ; i++ )
