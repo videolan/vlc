@@ -36,6 +36,7 @@
 #include <vlc_modules.h>
 #include <vlc_filter.h>
 #include <vlc_picture_pool.h>
+#include <vlc_codec.h>
 
 #include <libvlc.h>
 
@@ -294,6 +295,9 @@ typedef struct {
     atomic_bool reset_pictures;
 #endif
     picture_pool_t *pool;
+
+    /* temporary: must come from decoder module */
+    vlc_video_context video_context;
 } vout_display_priv_t;
 
 static const struct filter_video_callbacks vout_display_filter_cbs = {
@@ -765,10 +769,14 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     vd->sys = NULL;
     vd->owner = *owner;
 
+    osys->video_context.device = vlc_decoder_device_Create(vd->cfg->window);
+    vlc_video_context *video_context = osys->video_context.device ?
+        &osys->video_context : NULL;
+
     vd->module = vlc_module_load(vd, "vout display", module,
                                  module && *module != '\0',
                                  vout_display_start, vd, &osys->cfg,
-                                 &vd->fmt, (vlc_video_context *)NULL);
+                                 &vd->fmt, video_context);
     if (vd->module == NULL)
         goto error;
 
@@ -794,6 +802,8 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     return vd;
 error:
     video_format_Clean(&vd->source);
+    if (osys->video_context.device)
+        vlc_decoder_device_Release(osys->video_context.device);
     vlc_object_release(vd);
     return NULL;
 }
@@ -810,6 +820,9 @@ void vout_display_Delete(vout_display_t *vd)
 
     if (vd->module != NULL)
         vlc_module_unload(vd, vd->module, vout_display_stop, vd);
+
+    if (osys->video_context.device)
+        vlc_decoder_device_Release(osys->video_context.device);
 
     video_format_Clean(&vd->source);
     video_format_Clean(&vd->fmt);
