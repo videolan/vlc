@@ -1727,7 +1727,6 @@ vout_thread_t *vout_Request(vlc_object_t *object,
                             input_thread_t *input)
 {
     vout_thread_t *vout = cfg->vout;
-    vout_thread_sys_t *sys;
 
     assert(cfg->fmt != NULL);
 
@@ -1742,8 +1741,6 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 
     /* If a vout is provided, try reusing it */
     if (vout) {
-        sys = vout->p;
-
         /* TODO: If dimensions are equal or slightly smaller, update the aspect
          * ratio and crop settings, instead of recreating a display.
          */
@@ -1756,23 +1753,24 @@ vout_thread_t *vout_Request(vlc_object_t *object,
             msg_Warn(vout, "DPB need to be increased");
         }
 
-        if (sys->original.i_chroma != 0)
+        if (vout->p->original.i_chroma != 0)
             vout_Stop(vout);
 
         vout_ReinitInterlacingSupport(vout);
-        sys->original = original;
-
-        vlc_mutex_lock(&vout->p->window_lock);
-        vout_UpdateWindowSize(vout);
-        vlc_mutex_unlock(&vout->p->window_lock);
     } else {
         vout = VoutCreate(object);
         if (vout == NULL)
             return NULL;
+    }
 
-        sys = vout->p;
-        sys->original = original;
+    vout_thread_sys_t *sys = vout->p;
+    sys->original = original;
 
+    if (cfg->vout != NULL) {
+        vlc_mutex_lock(&vout->p->window_lock);
+        vout_UpdateWindowSize(vout);
+        vlc_mutex_unlock(&vout->p->window_lock);
+    } else {
         vout_window_cfg_t wcfg = {
             .is_fullscreen = var_GetBool(vout, "fullscreen"),
             .is_decorated = var_InheritBool(vout, "video-deco"),
