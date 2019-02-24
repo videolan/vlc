@@ -399,7 +399,12 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
         vlc_mutex_unlock(&p_resource->lock_hold);
     }
 
-    if (vout_Request(cfg, p_resource->p_input) == 0) {
+    if (vout_Request(cfg, p_resource->p_input)) {
+        vlc_mutex_unlock(&p_resource->lock);
+        input_resource_PutVout(p_resource, vout);
+        return NULL;
+    }
+
         vout =  cfg->vout;
         DisplayVoutTitle(p_resource, vout);
 
@@ -418,10 +423,6 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
                     .action = VLC_INPUT_EVENT_VOUT_ADDED,
                     .vout = vout,
                 });
-    } else {
-       vout_Close(vout);
-       vout = NULL;
-    }
 out:
     vlc_mutex_unlock( &p_resource->lock );
     return vout;
