@@ -533,7 +533,7 @@ typedef void (*vlc_decoder_device_Close)(vlc_decoder_device *device);
  * This function will be hidden in the future. It is now used by opengl vout
  * module as a transition.
  */
-VLC_API /* temporary */ VLC_USED vlc_decoder_device *
+VLC_USED vlc_decoder_device *
 vlc_decoder_device_Create(vout_window_t *window);
 
 /**
