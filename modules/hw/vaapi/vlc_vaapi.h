@@ -36,6 +36,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_codec.h>
 #include <vlc_fourcc.h>
 #include <vlc_picture_pool.h>
 
@@ -63,14 +64,9 @@ vlc_vaapi_InitializeInstanceDRM(vlc_object_t *o,
                                 VADisplay *pdpy, const char *device);
 
 
-/* Increments the VAAPI instance refcount */
-VADisplay
-vlc_vaapi_HoldInstance(struct vlc_vaapi_instance *inst);
-
-/* Decrements the VAAPI instance refcount, and call vaTerminate if that counter
- * reaches 0 */
+/* Destroy the VAAPI instance refcount, and call vaTerminate */
 void
-vlc_vaapi_ReleaseInstance(struct vlc_vaapi_instance *inst);
+vlc_vaapi_DestroyInstance(struct vlc_vaapi_instance *inst);
 
 /**************************
  * VAAPI create & destroy *
@@ -194,7 +190,7 @@ vlc_vaapi_CreateConfigChecked(vlc_object_t *o, VADisplay dpy,
 /* Create a pool backed by VASurfaceID. render_targets will destroyed once
  * the pool and every pictures are released. */
 picture_pool_t *
-vlc_vaapi_PoolNew(vlc_object_t *o, struct vlc_vaapi_instance *vainst,
+vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
                   VADisplay dpy, unsigned count, VASurfaceID **render_targets,
                   const video_format_t *restrict fmt, bool b_force_fourcc);
 
@@ -204,7 +200,7 @@ unsigned
 vlc_vaapi_PicSysGetRenderTargets(void *sys, VASurfaceID **render_targets);
 
 /* Get and hold the VADisplay instance attached to the picture sys */
-struct vlc_vaapi_instance *
+vlc_decoder_device *
 vlc_vaapi_PicSysHoldInstance(void *sys, VADisplay *dpy);
 
 /* Attachs the VASurface to the picture context, the picture must be allocated

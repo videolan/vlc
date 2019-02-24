@@ -50,7 +50,7 @@
 
 struct vlc_va_sys_t
 {
-    struct vlc_vaapi_instance *va_inst;
+    vlc_decoder_device *dec_device;
     struct vaapi_context hw_ctx;
 };
 
@@ -141,7 +141,7 @@ static void Delete(vlc_va_t *va, void *hwctx)
 
     vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
     vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
-    vlc_vaapi_ReleaseInstance(sys->va_inst);
+    vlc_decoder_device_Release(sys->dec_device);
     free(sys);
 }
 
@@ -159,7 +159,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     /* The picture must be allocated by the vout */
     VADisplay va_dpy;
-    struct vlc_vaapi_instance *va_inst =
+    vlc_decoder_device *dec_device =
         vlc_vaapi_PicSysHoldInstance(p_sys, &va_dpy);
 
     VASurfaceID *render_targets;
@@ -183,7 +183,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     memset(sys, 0, sizeof (*sys));
 
     /* */
-    sys->va_inst = va_inst;
+    sys->dec_device = dec_device;
     sys->hw_ctx.display = va_dpy;
     sys->hw_ctx.config_id = VA_INVALID_ID;
     sys->hw_ctx.context_id = VA_INVALID_ID;
@@ -218,7 +218,7 @@ error:
             vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
         free(sys);
     }
-    vlc_vaapi_ReleaseInstance(va_inst);
+    vlc_decoder_device_Release(dec_device);
     return ret;
 }
 

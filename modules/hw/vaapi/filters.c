@@ -44,11 +44,11 @@
  * filter is destroyed before the other ones. */
 static struct {
     vlc_mutex_t lock;
-    struct vlc_vaapi_instance *inst;
+    vlc_decoder_device *dec_device;
     filter_t *owner;
 } holder = { VLC_STATIC_MUTEX, NULL, NULL };
 
-struct vlc_vaapi_instance *
+vlc_decoder_device *
 vlc_vaapi_FilterHoldInstance(filter_t *filter, VADisplay *dpy)
 {
 
@@ -62,35 +62,36 @@ vlc_vaapi_FilterHoldInstance(filter_t *filter, VADisplay *dpy)
         return NULL;
     }
 
-    struct vlc_vaapi_instance *va_inst = NULL;
+    vlc_decoder_device *dec_device = NULL;
 
     vlc_mutex_lock(&holder.lock);
-    if (holder.inst != NULL)
+    if (holder.dec_device != NULL)
     {
-        va_inst = holder.inst;
-        *dpy = vlc_vaapi_HoldInstance(holder.inst);
+        dec_device = vlc_decoder_device_Hold(holder.dec_device);
+        *dpy = dec_device->opaque;
     }
     else
     {
         holder.owner = filter;
-        holder.inst = va_inst = pic->p_sys ?
+        holder.dec_device = dec_device = pic->p_sys ?
             vlc_vaapi_PicSysHoldInstance(pic->p_sys, dpy) : NULL;
+        assert(holder.dec_device->type == VLC_DECODER_DEVICE_VAAPI);
     }
     vlc_mutex_unlock(&holder.lock);
     picture_Release(pic);
 
-    return va_inst;
+    return dec_device;
 }
 
 void
 vlc_vaapi_FilterReleaseInstance(filter_t *filter,
-                                struct vlc_vaapi_instance *va_inst)
+                                vlc_decoder_device *dec_device)
 {
-    vlc_vaapi_ReleaseInstance(va_inst);
+    vlc_decoder_device_Release(dec_device);
     vlc_mutex_lock(&holder.lock);
     if (filter == holder.owner)
     {
-        holder.inst = NULL;
+        holder.dec_device = NULL;
         holder.owner = NULL;
     }
     vlc_mutex_unlock(&holder.lock);
@@ -101,7 +102,7 @@ vlc_vaapi_FilterReleaseInstance(filter_t *filter,
 
 struct  va_filter_desc
 {
-    struct vlc_vaapi_instance *inst;
+    vlc_decoder_device *dec_device;
     VADisplay           dpy;
     VAConfigID          conf;
     VAContextID         ctx;
@@ -374,13 +375,13 @@ Open(filter_t * filter,
     filter_sys->va.conf = VA_INVALID_ID;
     filter_sys->va.ctx = VA_INVALID_ID;
     filter_sys->va.buf = VA_INVALID_ID;
-    filter_sys->va.inst =
+    filter_sys->va.dec_device =
         vlc_vaapi_FilterHoldInstance(filter, &filter_sys->va.dpy);
-    if (!filter_sys->va.inst)
+    if (!filter_sys->va.dec_device)
         goto error;
 
     filter_sys->dest_pics =
-        vlc_vaapi_PoolNew(VLC_OBJECT(filter), filter_sys->va.inst,
+        vlc_vaapi_PoolNew(VLC_OBJECT(filter), filter_sys->va.dec_device,
                           filter_sys->va.dpy, DEST_PICS_POOL_SZ,
                           &filter_sys->va.surface_ids, &filter->fmt_out.video,
                           true);
@@ -455,8 +456,8 @@ error:
                                 filter_sys->va.dpy, filter_sys->va.conf);
     if (filter_sys->dest_pics)
         picture_pool_Release(filter_sys->dest_pics);
-    if (filter_sys->va.inst)
-        vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va.inst);
+    if (filter_sys->va.dec_device)
+        vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va.dec_device);
     free(filter_sys);
     return VLC_EGENERIC;
 }
@@ -469,7 +470,7 @@ Close(filter_t *filter, filter_sys_t * filter_sys)
     vlc_vaapi_DestroyBuffer(obj, filter_sys->va.dpy, filter_sys->va.buf);
     vlc_vaapi_DestroyContext(obj, filter_sys->va.dpy, filter_sys->va.ctx);
     vlc_vaapi_DestroyConfig(obj, filter_sys->va.dpy, filter_sys->va.conf);
-    vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va.inst);
+    vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va.dec_device);
     free(filter_sys);
 }
 

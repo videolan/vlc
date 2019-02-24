@@ -39,7 +39,7 @@
 
 typedef struct
 {
-    struct vlc_vaapi_instance *va_inst;
+    vlc_decoder_device *dec_device;
     VADisplay           dpy;
     picture_pool_t *    dest_pics;
     VASurfaceID *       va_surface_ids;
@@ -345,22 +345,22 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
     filter_sys->image_fallback_failed = false;
     if (is_upload)
     {
-        filter_sys->va_inst = vlc_vaapi_FilterHoldInstance(filter,
-                                                           &filter_sys->dpy);
+        filter_sys->dec_device = vlc_vaapi_FilterHoldInstance(filter,
+                                                               &filter_sys->dpy);
 
-        if (filter_sys->va_inst == NULL)
+        if (filter_sys->dec_device == NULL)
         {
             free(filter_sys);
             return VLC_EGENERIC;
         }
 
         filter_sys->dest_pics =
-            vlc_vaapi_PoolNew(obj, filter_sys->va_inst, filter_sys->dpy,
+            vlc_vaapi_PoolNew(obj, filter_sys->dec_device, filter_sys->dpy,
                               DEST_PICS_POOL_SZ, &filter_sys->va_surface_ids,
                               &filter->fmt_out.video, true);
         if (!filter_sys->dest_pics)
         {
-            vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va_inst);
+            vlc_vaapi_FilterReleaseInstance(filter, filter_sys->dec_device);
             free(filter_sys);
             return VLC_EGENERIC;
         }
@@ -369,7 +369,7 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
     {
         /* Don't fetch the vaapi instance since it may be not created yet at
          * this point (in case of cpu rendering) */
-        filter_sys->va_inst = NULL;
+        filter_sys->dec_device = NULL;
         filter_sys->dpy = NULL;
         filter_sys->dest_pics = NULL;
     }
@@ -380,7 +380,7 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
         if (is_upload)
         {
             picture_pool_Release(filter_sys->dest_pics);
-            vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va_inst);
+            vlc_vaapi_FilterReleaseInstance(filter, filter_sys->dec_device);
         }
         free(filter_sys);
         return VLC_EGENERIC;
@@ -404,8 +404,8 @@ vlc_vaapi_CloseChroma(vlc_object_t *obj)
 
     if (filter_sys->dest_pics)
         picture_pool_Release(filter_sys->dest_pics);
-    if (filter_sys->va_inst != NULL)
-        vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va_inst);
+    if (filter_sys->dec_device != NULL)
+        vlc_vaapi_FilterReleaseInstance(filter, filter_sys->dec_device);
     CopyCleanCache(&filter_sys->cache);
 
     free(filter_sys);
