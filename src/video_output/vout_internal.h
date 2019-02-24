@@ -160,6 +160,7 @@ struct vout_thread_sys_t
     void            *mouse_opaque;
 
     /* Video output window */
+    bool            window_active;
     vlc_mutex_t     window_lock;
 
     /* Video output display */

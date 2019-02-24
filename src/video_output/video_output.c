@@ -1597,7 +1597,10 @@ void vout_Stop(vout_thread_t *vout)
     vout_StopDisplay(vout);
 
     vlc_mutex_lock(&sys->window_lock);
-    vout_window_Disable(sys->display_cfg.window);
+    if (!sys->window_active) {
+        vout_window_Disable(sys->display_cfg.window);
+        sys->window_active = false;
+    }
     vlc_mutex_unlock(&sys->window_lock);
 }
 
@@ -1706,6 +1709,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     sys->display_cfg.window = vout_display_window_New(vout);
     if (sys->splitter_name != NULL)
         var_Destroy(vout, "window");
+    sys->window_active = false;
     vlc_mutex_init(&sys->window_lock);
 
     /* Arbitrary initial time */
@@ -1759,12 +1763,11 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
     vout_ReinitInterlacingSupport(vout);
 
     vout_thread_sys_t *sys = vout->p;
-    bool enable = sys->original.i_chroma == 0;
 
     sys->original = original;
 
     vlc_mutex_lock(&sys->window_lock);
-    if (enable) {
+    if (!sys->window_active) {
         vout_window_cfg_t wcfg = {
             .is_fullscreen = var_GetBool(vout, "fullscreen"),
             .is_decorated = var_InheritBool(vout, "video-deco"),
@@ -1782,6 +1785,7 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
             vlc_mutex_unlock(&sys->window_lock);
             goto error;
         }
+        sys->window_active = true;
     } else
         vout_UpdateWindowSize(vout);
     vlc_mutex_unlock(&vout->p->window_lock);
