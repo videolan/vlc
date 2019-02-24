@@ -393,7 +393,7 @@ vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
 
     video_format_AdjustColorSpace(&adj_fmt);
 
-    if (vout_Request(&cfg, NULL) == NULL) {
+    if (vout_Request(&cfg, NULL)) {
         vout_Close(vout);
         vout = NULL;
     }

@@ -1731,8 +1731,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     return vout;
 }
 
-vout_thread_t *vout_Request(const vout_configuration_t *cfg,
-                            input_thread_t *input)
+int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
 {
     vout_thread_t *vout = cfg->vout;
 
@@ -1740,7 +1739,7 @@ vout_thread_t *vout_Request(const vout_configuration_t *cfg,
     assert(cfg->fmt != NULL);
 
     if (!VoutCheckFormat(cfg->fmt))
-        return NULL;
+        return -1;
 
     video_format_t original;
     VoutFixFormat(&original, cfg->fmt);
@@ -1752,7 +1751,7 @@ vout_thread_t *vout_Request(const vout_configuration_t *cfg,
         if (cfg->dpb_size <= vout->p->dpb_size) {
             video_format_Clean(&original);
             /* It is assumed that the SPU input matches input already. */
-            return vout;
+            return 0;
         }
         msg_Warn(vout, "DPB need to be increased");
     }
@@ -1800,11 +1799,11 @@ vout_thread_t *vout_Request(const vout_configuration_t *cfg,
 error:
         msg_Err(vout, "video output creation failed");
         video_format_Clean(&sys->original);
-        return NULL;
+        return -1;
     }
 
     if (input != NULL)
         spu_Attach(vout->p->spu, input);
     vout_IntfReinit(vout);
-    return vout;
+    return 0;
 }

@@ -193,10 +193,10 @@ vout_thread_t *vout_Create(vlc_object_t *obj) VLC_USED;
  *
  * \param cfg the video configuration requested.
  * \param input used to get attachments for spu filters
- * \return a vout
+ * \retval 0 on success
+ * \retval -1 on error
  */
-vout_thread_t * vout_Request(const vout_configuration_t *cfg,
-                             input_thread_t *input);
+int vout_Request(const vout_configuration_t *cfg, input_thread_t *input);
 
 /**
  * Disables a vout.
