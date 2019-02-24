@@ -1732,9 +1732,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     return vout;
 }
 
-#undef vout_Request
-vout_thread_t *vout_Request(vlc_object_t *object,
-                            const vout_configuration_t *cfg,
+vout_thread_t *vout_Request(const vout_configuration_t *cfg,
                             input_thread_t *input)
 {
     vout_thread_t *vout = cfg->vout;

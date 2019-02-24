@@ -393,7 +393,7 @@ vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
 
     video_format_AdjustColorSpace(&adj_fmt);
 
-    return vout_Request(VLC_OBJECT(filter), &cfg, NULL);
+    return vout_Request(&cfg, NULL);
 }
 
 static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,

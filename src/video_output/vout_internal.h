@@ -191,14 +191,12 @@ vout_thread_t *vout_Create(vlc_object_t *obj) VLC_USED;
  *
  * You can release the returned value either by vout_Request() or vout_Close().
  *
- * \param object a vlc object
  * \param cfg the video configuration requested.
  * \param input used to get attachments for spu filters
  * \return a vout
  */
-vout_thread_t * vout_Request( vlc_object_t *object, const vout_configuration_t *cfg,
-                              input_thread_t *input );
-#define vout_Request(a,b,c) vout_Request(VLC_OBJECT(a),b,c)
+vout_thread_t * vout_Request(const vout_configuration_t *cfg,
+                             input_thread_t *input);
 
 /**
  * Disables a vout.

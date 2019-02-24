@@ -399,7 +399,7 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
         vlc_mutex_unlock(&p_resource->lock_hold);
     }
 
-    vout = vout_Request(p_resource->p_parent, cfg, p_resource->p_input);
+    vout = vout_Request(cfg, p_resource->p_input);
     if (vout != NULL) {
         DisplayVoutTitle(p_resource, vout);
 
