@@ -348,7 +348,7 @@ typedef struct vout_window_t {
     /**
      * Window handle (mandatory)
      *
-     * This must be filled by the plugin upon activation.
+     * This must be filled by the plugin upon succesful vout_window_Enable().
      *
      * Depending on the \ref type above, a different member of this union is
      * used.
@@ -496,8 +496,8 @@ static inline void vout_window_UnsetFullScreen(vout_window_t *window)
  * window provider can provide a persistent connection to the display server,
  * and track any useful events, such as monitors hotplug.
  *
- * The window handle (vout_window_t.handle) and display (vout_window_t.display)
- * must remain valid and constant while the window is enabled.
+ * The window handle (vout_window_t.handle) must remain valid and constant
+ * while the window is enabled.
  */
 VLC_API
 int vout_window_Enable(vout_window_t *window, const vout_window_cfg_t *cfg);
