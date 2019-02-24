@@ -184,6 +184,7 @@ int main (void)
     test_b64 ("foobar", "Zm9vYmFy");
 
     /* Path test */
+    test_path("", NULL);
 #ifndef _WIN32
     test_path ("/", "file:///");
     test_path ("/home/john/", "file:///home/john/");
@@ -219,7 +220,6 @@ int main (void)
 
     test_current_directory_path ("movie.ogg", tmpdir, "movie.ogg");
     test_current_directory_path (".", tmpdir, ".");
-    test_current_directory_path ("", tmpdir, "");
 #endif
 
     /*val = fchdir (fd);

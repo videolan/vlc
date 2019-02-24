@@ -198,6 +198,8 @@ char *vlc_path2uri (const char *path, const char *scheme)
     {   /* Relative path: prepend the current working directory */
         char *cwd, *ret;
 
+        if (path[0] == '\0')
+            return NULL;
         if ((cwd = vlc_getcwd ()) == NULL)
             return NULL;
         if (asprintf (&buf, "%s"DIR_SEP"%s", cwd, path) == -1)
