@@ -120,13 +120,13 @@ static void test_url_parse(const char *in, const char *protocol,
         return;
     }
 
-    test_compare(in, url.psz_protocol, protocol);
-    test_compare(in, url.psz_username, user);
-    test_compare(in, url.psz_password, pass);
+    test_compare(in, protocol, url.psz_protocol);
+    test_compare(in, user, url.psz_username);
+    test_compare(in, pass, url.psz_password);
 
     if (ret != 0 && errno == ENOSYS)
     {
-        test_compare(in, url.psz_host, NULL);
+        test_compare(in, NULL, url.psz_host);
         exitcode = 77;
     }
     else
@@ -139,8 +139,8 @@ static void test_url_parse(const char *in, const char *protocol,
         exit(2);
     }
 
-    test_compare(in, url.psz_path, path);
-    test_compare(in, url.psz_option, option);
+    test_compare(in, path, url.psz_path);
+    test_compare(in, option, url.psz_option);
     vlc_UrlClean(&url);
 }
 
