@@ -1789,11 +1789,6 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
         vout_UpdateWindowSize(vout);
     vlc_mutex_unlock(&vout->p->window_lock);
 
-    if (cfg->vout == NULL) {
-        if (input != NULL)
-            vout->p->input = vlc_object_hold((vlc_object_t *)input);
-    }
-
     if (vout_Start(vout, cfg)
      || vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
 error:
