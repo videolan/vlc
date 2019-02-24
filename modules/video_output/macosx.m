@@ -230,7 +230,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
             goto error;
         }
         sys->vgl = vout_display_opengl_New (fmt, &subpicture_chromas, sys->gl,
-                                            &cfg->viewpoint);
+                                            &cfg->viewpoint, context);
         vlc_gl_ReleaseCurrent(sys->gl);
         if (!sys->vgl) {
             msg_Err(vd, "Error while initializing opengl display.");
@@ -248,7 +248,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         /* */
         vout_window_ReportSize(sys->embed, fmt->i_visible_width, fmt->i_visible_height);
 
-        (void) context;
         return VLC_SUCCESS;
 
     error:

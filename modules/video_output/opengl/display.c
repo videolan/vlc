@@ -137,7 +137,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
 
     sys->vgl = vout_display_opengl_New (fmt, &spu_chromas, sys->gl,
-                                        &cfg->viewpoint);
+                                        &cfg->viewpoint, context);
     vlc_gl_ReleaseCurrent (sys->gl);
 
     if (sys->vgl == NULL)
@@ -156,7 +156,6 @@ error:
         vlc_gl_Release (sys->gl);
     free (sys);
     return VLC_EGENERIC;
-    (void) context;
 }
 
 /**
