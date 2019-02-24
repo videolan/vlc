@@ -1739,11 +1739,8 @@ vout_thread_t *vout_Request(const vout_configuration_t *cfg,
     assert(vout != NULL);
     assert(cfg->fmt != NULL);
 
-    if (!VoutCheckFormat(cfg->fmt)) {
-        if (vout != NULL)
-            vout_Close(vout);
+    if (!VoutCheckFormat(cfg->fmt))
         return NULL;
-    }
 
     video_format_t original;
     VoutFixFormat(&original, cfg->fmt);
@@ -1802,9 +1799,7 @@ vout_thread_t *vout_Request(const vout_configuration_t *cfg,
      || vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
 error:
         msg_Err(vout, "video output creation failed");
-        vout_display_window_Delete(sys->display_cfg.window);
-        spu_Destroy(sys->spu);
-        vlc_object_release(vout);
+        video_format_Clean(&sys->original);
         return NULL;
     }
 

@@ -418,6 +418,9 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
                     .action = VLC_INPUT_EVENT_VOUT_ADDED,
                     .vout = vout,
                 });
+    } else {
+       vout_Close(vout);
+       vout = NULL;
     }
 out:
     vlc_mutex_unlock( &p_resource->lock );
