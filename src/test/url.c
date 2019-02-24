@@ -37,18 +37,20 @@ static void test_compare(const char *in, const char *exp, const char *res)
     if (res == NULL)
     {
         if (exp != NULL)
-            fprintf(stderr, "\"%s\" returned NULL, expected \"%s\"", in, exp);
+            fprintf(stderr, "\"%s\" returned NULL, expected \"%s\"\n",
+                    in, exp);
         else
             return;
     }
     else
     {
         if (exp == NULL)
-            fprintf(stderr, "\"%s\" returned \"%s\", expected NULL", in, res);
+            fprintf(stderr, "\"%s\" returned \"%s\", expected NULL\n",
+                    in, res);
         else
         if (strcmp(res, exp))
-            fprintf(stderr, "\"%s\" returned \"%s\", expected \"%s\"\n", in,
-                    res, exp);
+            fprintf(stderr, "\"%s\" returned \"%s\", expected \"%s\"\n",
+                    in, res, exp);
         else
             return;
     }
