@@ -1737,12 +1737,12 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         return NULL;
     }
 
+    video_format_t original;
+    VoutFixFormat(&original, cfg->fmt);
+
     /* If a vout is provided, try reusing it */
     if (vout) {
-        video_format_t original;
-
         sys = vout->p;
-        VoutFixFormat(&original, cfg->fmt);
 
         /* TODO: If dimensions are equal or slightly smaller, update the aspect
          * ratio and crop settings, instead of recreating a display.
@@ -1771,8 +1771,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
             return NULL;
 
         sys = vout->p;
-
-        VoutFixFormat(&sys->original, cfg->fmt);
+        sys->original = original;
 
         vout_window_cfg_t wcfg = {
             .is_fullscreen = var_GetBool(vout, "fullscreen"),
