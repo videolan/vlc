@@ -79,7 +79,11 @@ typedef struct picture_buffer_t
     off_t offset;
 } picture_buffer_t;
 
-typedef struct vlc_video_context vlc_video_context;
+typedef struct vlc_decoder_device vlc_decoder_device;
+typedef struct vlc_video_context
+{
+    vlc_decoder_device *device;
+} vlc_video_context;
 
 /**
  * Video picture
