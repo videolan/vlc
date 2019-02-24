@@ -27,6 +27,7 @@
 
 #include <vlc_block.h>
 #include <vlc_es.h>
+#include <vlc_vout_window.h>
 #include <vlc_picture.h>
 #include <vlc_subpicture.h>
 
@@ -472,5 +473,80 @@ static inline float decoder_GetDisplayRate( decoder_t *dec )
 }
 
 /** @} */
+
+/**
+ * \defgroup decoder_device Decoder hardware device
+ * \ingroup input
+ * @{
+ */
+
+/** Decoder device type */
+enum vlc_decoder_device_type
+{
+    VLC_DECODER_DEVICE_NONE,
+    VLC_DECODER_DEVICE_VAAPI,
+    VLC_DECODER_DEVICE_VDPAU,
+    VLC_DECODER_DEVICE_DXVA2,
+    VLC_DECODER_DEVICE_D3D11VA,
+    VLC_DECODER_DEVICE_AWINDOW,
+};
+
+/**
+ * Decoder context struct
+ */
+typedef struct vlc_decoder_device
+{
+    struct vlc_common_members obj;
+
+    /** Private context that could be used by the "decoder device" module
+     * implementation */
+    void *sys;
+
+    /** Must be set from the "decoder device" module open entry point */
+    enum vlc_decoder_device_type type;
+
+    /**
+     * Could be set from the "decoder device" module open entry point and will
+     * be used by hardware decoder modules.
+     *
+     * The type of pointer will depend of the type:
+     * VAAPI: VADisplay
+     * VDPAU: vdp_t *
+     */
+    void *opaque;
+} vlc_decoder_device;
+
+/**
+ * "decoder device" module open entry point
+ *
+ * @param device the "decoder device" structure to initialize
+ * @param window pointer to a window to help device initialization (can be NULL)
+ **/
+typedef int (*vlc_decoder_device_Open)(vlc_decoder_device *device,
+                                        vout_window_t *window);
+/** "decoder device" module close entry point */
+typedef void (*vlc_decoder_device_Close)(vlc_decoder_device *device);
+
+/**
+ * Create a decoder device from a window
+ *
+ * This function will be hidden in the future. It is now used by opengl vout
+ * module as a transition.
+ */
+VLC_API /* temporary */ VLC_USED vlc_decoder_device *
+vlc_decoder_device_Create(vout_window_t *window);
+
+/**
+ * Hold a decoder device
+ */
+VLC_API vlc_decoder_device *
+vlc_decoder_device_Hold(vlc_decoder_device *device);
+
+/**
+ * Release a decoder device
+ */
+VLC_API void
+vlc_decoder_device_Release(vlc_decoder_device *device);
+
 /** @} */
 #endif /* _VLC_CODEC_H */

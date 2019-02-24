@@ -931,6 +931,8 @@ static const char *const ppsz_prefres[] = {
     "This allows you to select a list of encoders that VLC will use in " \
     "priority.")
 
+#define DEC_DEV_TEXT N_("Preferred decoder hardware device")
+
 /*****************************************************************************
  * Sout
  ****************************************************************************/
@@ -1963,6 +1965,7 @@ vlc_module_begin ()
                 CODEC_LONGTEXT, true )
     add_string( "encoder",  NULL, ENCODER_TEXT,
                 ENCODER_LONGTEXT, true )
+    add_string( "dec-dev", NULL, DEC_DEV_TEXT, NULL, true )
 
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_category_hint(N_("Input"), INPUT_CAT_LONGTEXT)

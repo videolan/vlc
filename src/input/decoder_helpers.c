@@ -28,6 +28,7 @@
 
 #include <vlc_common.h>
 #include <vlc_codec.h>
+#include <vlc_atomic.h>
 #include <vlc_meta.h>
 #include <vlc_modules.h>
 
@@ -87,4 +88,80 @@ picture_t *decoder_NewPicture( decoder_t *dec )
 {
     vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
     return dec->cbs->video.buffer_new( dec );
+}
+
+struct vlc_decoder_device_priv
+{
+    struct vlc_decoder_device device;
+    vlc_atomic_rc_t rc;
+    module_t *module;
+};
+
+static int decoder_device_Open(void *func, va_list ap)
+{
+    vlc_decoder_device_Open open = func;
+    vlc_decoder_device *device = va_arg(ap, vlc_decoder_device *);
+    vout_window_t *window = va_arg(ap, vout_window_t *);
+    int ret = open(device, window);
+    if (ret != VLC_SUCCESS)
+    {
+        device->sys = NULL;
+        device->type = VLC_DECODER_DEVICE_NONE;
+        device->opaque = NULL;
+    }
+    else
+    {
+        assert(device->type != VLC_DECODER_DEVICE_NONE);
+    }
+    return ret;
+}
+
+static void decoder_device_Close(void *func, va_list ap)
+{
+    vlc_decoder_device_Close close = func;
+    vlc_decoder_device *device = va_arg(ap, vlc_decoder_device *);
+    close(device);
+}
+
+vlc_decoder_device *
+vlc_decoder_device_Create(vout_window_t *window)
+{
+    struct vlc_decoder_device_priv *priv =
+            vlc_object_create(window, sizeof (*priv));
+    if (!priv)
+        return NULL;
+    char *name = var_InheritString(window, "dec-dev");
+    priv->module = vlc_module_load(&priv->device, "decoder device", name,
+                                    true, decoder_device_Open, &priv->device,
+                                    window);
+    free(name);
+    if (!priv->module)
+    {
+        vlc_object_release(&priv->device);
+        return NULL;
+    }
+    vlc_atomic_rc_init(&priv->rc);
+    return &priv->device;
+}
+
+vlc_decoder_device *
+vlc_decoder_device_Hold(vlc_decoder_device *device)
+{
+    struct vlc_decoder_device_priv *priv =
+            container_of(device, struct vlc_decoder_device_priv, device);
+    vlc_atomic_rc_inc(&priv->rc);
+    return device;
+}
+
+void
+vlc_decoder_device_Release(vlc_decoder_device *device)
+{
+    struct vlc_decoder_device_priv *priv =
+            container_of(device, struct vlc_decoder_device_priv, device);
+    if (vlc_atomic_rc_dec(&priv->rc))
+    {
+        vlc_module_unload(device, priv->module, decoder_device_Close,
+                          device);
+        vlc_object_release(device);
+    }
 }
