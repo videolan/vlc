@@ -178,6 +178,11 @@ struct vout_thread_sys_t
 };
 
 /**
+ * Creates a video output.
+ */
+vout_thread_t *vout_Create(vlc_object_t *obj) VLC_USED;
+
+/**
  * Returns a suitable vout or release the given one.
  *
  * If cfg->fmt is non NULL and valid, a vout will be returned, reusing cfg->vout

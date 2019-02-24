@@ -1652,7 +1652,7 @@ static void VoutDestructor(vlc_object_t *object)
     video_format_Clean(&vout->p->original);
 }
 
-static vout_thread_t *VoutCreate(vlc_object_t *object)
+vout_thread_t *vout_Create(vlc_object_t *object)
 {
     /* Allocate descriptor */
     vout_thread_t *vout = vlc_custom_create(object,
@@ -1769,7 +1769,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 
         vout_ReinitInterlacingSupport(vout);
     } else {
-        vout = VoutCreate(object);
+        vout = vout_Create(object);
         if (vout == NULL)
             return NULL;
     }

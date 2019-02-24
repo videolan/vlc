@@ -382,8 +382,14 @@ static int VisualizationCallback (vlc_object_t *obj, const char *var,
 
 vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
 {
+    vout_thread_t *vout = vout_Create(VLC_OBJECT(filter));
+    if (unlikely(vout == NULL))
+        return NULL;
+
     video_format_t adj_fmt = *fmt;
-    vout_configuration_t cfg = { .fmt = &adj_fmt, .dpb_size = 1 };
+    vout_configuration_t cfg = {
+        .vout = vout, .fmt = &adj_fmt, .dpb_size = 1,
+    };
 
     video_format_AdjustColorSpace(&adj_fmt);
 

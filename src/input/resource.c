@@ -379,14 +379,18 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
     assert(cfg->fmt != NULL);
     vlc_mutex_lock( &p_resource->lock );
 
-    if (cfg->vout == NULL && p_resource->p_vout_free != NULL) {
-        msg_Dbg(p_resource->p_parent, "trying to reuse free vout");
-
+    if (cfg->vout == NULL) {
         cfg_buf = *cfg;
         cfg_buf.vout = p_resource->p_vout_free;
         p_resource->p_vout_free = NULL;
         cfg = &cfg_buf;
 
+        if (cfg_buf.vout == NULL) {
+            cfg_buf.vout = vout = vout_Create(p_resource->p_parent);
+            if (vout == NULL)
+                goto out;
+        } else
+            msg_Dbg(p_resource->p_parent, "trying to reuse free vout");
     }  else if (cfg->vout != NULL) {
         assert(cfg->vout != p_resource->p_vout_free);
 
@@ -415,6 +419,7 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
                     .vout = vout,
                 });
     }
+out:
     vlc_mutex_unlock( &p_resource->lock );
     return vout;
 }
