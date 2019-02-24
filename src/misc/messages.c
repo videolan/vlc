@@ -315,9 +315,12 @@ static void vlc_vaLogSwitch(void *d, int type, const vlc_log_t *item,
 static void vlc_LogSwitchClose(void *d)
 {
     struct vlc_logger_switch *logswitch = d;
+    struct vlc_logger backend = logswitch->backend;
 
-    if (logswitch->backend.ops->destroy != NULL)
-        logswitch->backend.ops->destroy(logswitch->backend.sys);
+    logswitch->backend.ops = &discard_ops;
+
+    if (backend.ops->destroy != NULL)
+        backend.ops->destroy(backend.sys);
 
     vlc_rwlock_destroy(&logswitch->lock);
     free(logswitch);
