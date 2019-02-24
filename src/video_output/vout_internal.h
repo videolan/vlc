@@ -63,9 +63,6 @@ struct vout_thread_sys_t
     /* Splitter module if used */
     char            *splitter_name;
 
-    /* Input thread for spu attachments */
-    input_thread_t    *input;
-
     /* */
     video_format_t  original;   /* Original format ie coming from the decoder */
     struct {

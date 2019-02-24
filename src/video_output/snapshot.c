@@ -175,12 +175,11 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
 {
     /* */
     char *filename;
-    input_thread_t *input = (input_thread_t*)p_vout->p->input;
 
     /* */
     char *prefix = NULL;
     if (cfg->prefix_fmt)
-        prefix = str_format(input, NULL, cfg->prefix_fmt);
+        prefix = str_format(NULL, NULL, cfg->prefix_fmt);
     if (prefix)
         filename_sanitize(prefix);
     else {
