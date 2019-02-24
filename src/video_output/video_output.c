@@ -1588,7 +1588,6 @@ static void vout_StopDisplay(vout_thread_t *vout)
     spu_Detach(sys->spu);
     sys->mouse_event = NULL;
     video_format_Clean(&sys->original);
-    sys->original.i_chroma = 0;
 }
 
 void vout_Stop(vout_thread_t *vout)
