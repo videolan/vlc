@@ -1739,6 +1739,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 {
     vout_thread_t *vout = cfg->vout;
 
+    assert(vout != NULL);
     assert(cfg->fmt != NULL);
 
     if (!VoutCheckFormat(cfg->fmt)) {
@@ -1750,29 +1751,22 @@ vout_thread_t *vout_Request(vlc_object_t *object,
     video_format_t original;
     VoutFixFormat(&original, cfg->fmt);
 
-    /* If a vout is provided, try reusing it */
-    if (vout) {
-        /* TODO: If dimensions are equal or slightly smaller, update the aspect
-         * ratio and crop settings, instead of recreating a display.
-         */
-        if (video_format_IsSimilar(&original, &vout->p->original)) {
-            if (cfg->dpb_size <= vout->p->dpb_size) {
-                video_format_Clean(&original);
-                /* It is assumed that the SPU input matches input already. */
-                return vout;
-            }
-            msg_Warn(vout, "DPB need to be increased");
+    /* TODO: If dimensions are equal or slightly smaller, update the aspect
+     * ratio and crop settings, instead of recreating a display.
+     */
+    if (video_format_IsSimilar(&original, &vout->p->original)) {
+        if (cfg->dpb_size <= vout->p->dpb_size) {
+            video_format_Clean(&original);
+            /* It is assumed that the SPU input matches input already. */
+            return vout;
         }
-
-        if (vout->p->original.i_chroma != 0)
-            vout_StopDisplay(vout);
-
-        vout_ReinitInterlacingSupport(vout);
-    } else {
-        vout = vout_Create(object);
-        if (vout == NULL)
-            return NULL;
+        msg_Warn(vout, "DPB need to be increased");
     }
+
+    if (vout->p->original.i_chroma != 0)
+        vout_StopDisplay(vout);
+
+    vout_ReinitInterlacingSupport(vout);
 
     vout_thread_sys_t *sys = vout->p;
     bool enable = sys->original.i_chroma == 0;
