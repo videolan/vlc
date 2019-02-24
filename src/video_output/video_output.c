@@ -1577,7 +1577,7 @@ out:
     return NULL;
 }
 
-void vout_Stop(vout_thread_t *vout)
+static void vout_StopDisplay(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
 
@@ -1589,6 +1589,17 @@ void vout_Stop(vout_thread_t *vout)
     sys->mouse_event = NULL;
     video_format_Clean(&sys->original);
     sys->original.i_chroma = 0;
+}
+
+void vout_Stop(vout_thread_t *vout)
+{
+    vout_thread_sys_t *sys = vout->p;
+
+    vout_StopDisplay(vout);
+
+    vlc_mutex_lock(&sys->window_lock);
+    vout_window_Disable(sys->display_cfg.window);
+    vlc_mutex_unlock(&sys->window_lock);
 }
 
 void vout_Close(vout_thread_t *vout)
@@ -1754,7 +1765,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         }
 
         if (vout->p->original.i_chroma != 0)
-            vout_Stop(vout);
+            vout_StopDisplay(vout);
 
         vout_ReinitInterlacingSupport(vout);
     } else {
@@ -1764,13 +1775,12 @@ vout_thread_t *vout_Request(vlc_object_t *object,
     }
 
     vout_thread_sys_t *sys = vout->p;
+    bool enable = sys->original.i_chroma == 0;
+
     sys->original = original;
 
-    if (cfg->vout != NULL) {
-        vlc_mutex_lock(&vout->p->window_lock);
-        vout_UpdateWindowSize(vout);
-        vlc_mutex_unlock(&vout->p->window_lock);
-    } else {
+    vlc_mutex_lock(&sys->window_lock);
+    if (enable) {
         vout_window_cfg_t wcfg = {
             .is_fullscreen = var_GetBool(vout, "fullscreen"),
             .is_decorated = var_InheritBool(vout, "video-deco"),
@@ -1785,19 +1795,21 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         vout_SizeWindow(vout, &wcfg.width, &wcfg.height);
 
         if (vout_window_Enable(sys->display_cfg.window, &wcfg)) {
-            vout_display_window_Delete(sys->display_cfg.window);
-            sys->display_cfg.window = NULL;
-            spu_Destroy(sys->spu);
-            vlc_object_release(vout);
-            return NULL;
+            vlc_mutex_unlock(&sys->window_lock);
+            goto error;
         }
+    } else
+        vout_UpdateWindowSize(vout);
+    vlc_mutex_unlock(&vout->p->window_lock);
 
+    if (cfg->vout == NULL) {
         if (input != NULL)
             vout->p->input = vlc_object_hold((vlc_object_t *)input);
     }
 
     if (vout_Start(vout, cfg)
      || vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
+error:
         msg_Err(vout, "video output creation failed");
         vout_display_window_Delete(sys->display_cfg.window);
         spu_Destroy(sys->spu);
