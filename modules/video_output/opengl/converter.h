@@ -23,6 +23,7 @@
 
 #include <vlc_plugin.h>
 #include <vlc_common.h>
+#include <vlc_codec.h>
 #include <vlc_picture_pool.h>
 #include <vlc_opengl.h>
 
@@ -257,6 +258,9 @@ struct opengl_tex_converter_t
 
     /* Pointer to object gl, set by the caller */
     vlc_gl_t *gl;
+
+    /* Pointer to decoder device, set by the caller (can be NULL) */
+    vlc_decoder_device *dec_device;
 
     /* libplacebo context, created by the caller (optional) */
     struct pl_context *pl_ctx;

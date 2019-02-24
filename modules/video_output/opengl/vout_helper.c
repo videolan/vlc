@@ -580,8 +580,9 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
 }
 
 static int
-opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
-                    const char *glexts, const video_format_t *fmt, bool subpics,
+opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
+                    struct prgm *prgm, const char *glexts,
+                    const video_format_t *fmt, bool subpics,
                     bool b_dump_shaders)
 {
     opengl_tex_converter_t *tc =
@@ -646,6 +647,7 @@ opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
         if (desc->plane_count == 0)
         {
             /* Opaque chroma: load a module to handle it */
+            tc->dec_device = context ? context->device : NULL;
             tc->p_module = module_need_var(tc, "glconv", "glconv");
         }
 
@@ -869,7 +871,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     GL_ASSERT_NOERROR();
     int ret;
-    ret = opengl_init_program(vgl, vgl->prgm, extensions, fmt, false,
+    ret = opengl_init_program(vgl, context, vgl->prgm, extensions, fmt, false,
                               b_dump_shaders);
     if (ret != VLC_SUCCESS)
     {
@@ -880,7 +882,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     GL_ASSERT_NOERROR();
-    ret = opengl_init_program(vgl, vgl->sub_prgm, extensions, fmt, true,
+    ret = opengl_init_program(vgl, context, vgl->sub_prgm, extensions, fmt, true,
                               b_dump_shaders);
     if (ret != VLC_SUCCESS)
     {
