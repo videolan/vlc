@@ -1646,8 +1646,6 @@ static void VoutDestructor(vlc_object_t *object)
 
     /* */
     vout_snapshot_Destroy(vout->p->snapshot);
-    if (vout->p->input != NULL)
-        vlc_object_release((vlc_object_t *)vout->p->input);
     video_format_Clean(&vout->p->original);
 }
 
