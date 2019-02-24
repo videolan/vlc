@@ -1,18 +1,18 @@
 # Irish translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # David Ó Laıġeanáın, 2015,2016
 # Seanán Ó Coistín <seananoc@gmail.com>, 2010,2016-2018
-# Seán Ó Séaghdha <sean.anseo@gmail.com>, 2017
+# Seán Ó Séaghdha <sean.anseo@gmail.com>, 2017-2019
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-04 21:15+0200\n"
-"Last-Translator: Seanán Ó Coistín <seananoc@gmail.com>, 2018\n"
+"PO-Revision-Date: 2019-02-24 13:36+0100\n"
+"Last-Translator: Seán Ó Séaghdha <sean.anseo@gmail.com>, 2019\n"
 "Language-Team: Irish (https://www.transifex.com/yaron/teams/16553/ga/)\n"
 "Language: ga\n"
 "MIME-Version: 1.0\n"
@@ -22356,9 +22356,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Déantóir ceangaltáin físeáin H.264"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -22444,7 +22443,7 @@ msgstr ""
 #: modules/services_discovery/mediadirs.c:133
 #: modules/services_discovery/mediadirs.c:357
 msgid "My Videos"
-msgstr "Mo Fhíseáin"
+msgstr "M’Fhíseáin"
 
 #: modules/services_discovery/mediadirs.c:78
 #: modules/services_discovery/mediadirs.c:141
@@ -22460,7 +22459,7 @@ msgstr "Pictiúr"
 #: modules/services_discovery/mediadirs.c:149
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
-msgstr "Mo Íomhánna"
+msgstr "Mo Phictiúir"
 
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
