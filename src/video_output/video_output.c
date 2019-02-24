@@ -1581,11 +1581,14 @@ void vout_Stop(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
 
-    spu_Detach(sys->spu);
+    assert(sys->original.i_chroma != 0);
+    vout_control_PushVoid(&sys->control, VOUT_CONTROL_CLEAN);
+    vlc_join(sys->thread, NULL);
 
-    vout_control_Hold(&sys->control);
+    spu_Detach(sys->spu);
     sys->mouse_event = NULL;
-    vout_control_Release(&sys->control);
+    video_format_Clean(&sys->original);
+    sys->original.i_chroma = 0;
 }
 
 void vout_Close(vout_thread_t *vout)
@@ -1594,15 +1597,12 @@ void vout_Close(vout_thread_t *vout)
 
     vout_thread_sys_t *sys = vout->p;
 
+    if (sys->original.i_chroma != 0)
+        vout_Stop(vout);
+
     vout_IntfDeinit(VLC_OBJECT(vout));
-
-    spu_Detach(sys->spu);
     vout_snapshot_End(sys->snapshot);
-
-    vout_control_PushVoid(&sys->control, VOUT_CONTROL_CLEAN);
     vout_control_Dead(&sys->control);
-    vlc_join(sys->thread, NULL);
-
     vout_chrono_Clean(&sys->render);
 
     vlc_mutex_destroy(&sys->window_lock);
@@ -1672,6 +1672,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object)
     }
 
     sys->input = NULL;
+    sys->original.i_chroma = 0;
     sys->source.dar.num = 0;
     sys->source.dar.den = 0;
     sys->source.crop.mode = VOUT_CROP_NONE;
@@ -1755,13 +1756,10 @@ vout_thread_t *vout_Request(vlc_object_t *object,
             msg_Warn(vout, "DPB need to be increased");
         }
 
-        vout_control_PushVoid(&sys->control, VOUT_CONTROL_CLEAN);
-        msg_Dbg(object, "reusing provided vout");
-        vlc_join(sys->thread, NULL);
+        if (sys->original.i_chroma != 0)
+            vout_Stop(vout);
 
         vout_ReinitInterlacingSupport(vout);
-
-        video_format_Clean(&sys->original);
         sys->original = original;
 
         vlc_mutex_lock(&vout->p->window_lock);
