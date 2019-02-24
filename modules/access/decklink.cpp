@@ -317,7 +317,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
     if (videoFrame) {
         if (videoFrame->GetFlags() & bmdFrameHasNoInputSource) {
             msg_Warn(demux_, "No input signal detected (%ldx%ld)",
-			    videoFrame->GetWidth(), videoFrame->GetHeight());
+                     videoFrame->GetWidth(), videoFrame->GetHeight());
             return S_OK;
         }
 
