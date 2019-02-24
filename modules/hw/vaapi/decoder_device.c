@@ -26,6 +26,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 #include <vlc_codec.h>
+#include <vlc_fs.h>
 
 #include "hw/vaapi/vlc_vaapi.h"
 #include <va/va_drmcommon.h>
@@ -45,6 +46,57 @@
 # include <fcntl.h>
 #endif
 
+typedef void (*vaapi_native_destroy_cb)(VANativeDisplay);
+struct vaapi_instance;
+
+struct vaapi_instance
+{
+    VADisplay dpy;
+    VANativeDisplay native;
+    vaapi_native_destroy_cb native_destroy_cb;
+};
+
+/* Initializes the VADisplay. If not NULL, native_destroy_cb will be called
+ * when the instance is released in order to destroy the native holder (that
+ * can be a drm/x11/wl). On error, dpy is terminated and the destroy callback
+ * is called. */
+static struct vaapi_instance *
+vaapi_InitializeInstance(vlc_object_t *o, VADisplay dpy,
+                             VANativeDisplay native,
+                             vaapi_native_destroy_cb native_destroy_cb)
+{
+    int major = 0, minor = 0;
+    VAStatus s = vaInitialize(dpy, &major, &minor);
+    if (s != VA_STATUS_SUCCESS)
+    {
+        msg_Err(o, "vaInitialize: %s", vaErrorStr(s));
+        goto error;
+    }
+    struct vaapi_instance *inst = malloc(sizeof(*inst));
+
+    if (unlikely(inst == NULL))
+        goto error;
+    inst->dpy = dpy;
+    inst->native = native;
+    inst->native_destroy_cb = native_destroy_cb;
+
+    return inst;
+error:
+    vaTerminate(dpy);
+    if (native != NULL && native_destroy_cb != NULL)
+        native_destroy_cb(native);
+    return NULL;
+}
+
+static void
+vaapi_DestroyInstance(struct vaapi_instance *inst)
+{
+    vaTerminate(inst->dpy);
+    if (inst->native != NULL && inst->native_destroy_cb != NULL)
+        inst->native_destroy_cb(inst->native);
+    free(inst);
+}
+
 #ifdef HAVE_VA_X11
 static void
 x11_native_destroy_cb(VANativeDisplay native)
@@ -52,7 +104,7 @@ x11_native_destroy_cb(VANativeDisplay native)
     XCloseDisplay(native);
 }
 
-static struct vlc_vaapi_instance *
+static struct vaapi_instance *
 x11_init_vaapi_instance(vlc_decoder_device *device, vout_window_t *window,
                         VADisplay *vadpyp)
 {
@@ -70,22 +122,83 @@ x11_init_vaapi_instance(vlc_decoder_device *device, vout_window_t *window,
         return NULL;
     }
 
-    return vlc_vaapi_InitializeInstance(VLC_OBJECT(device), vadpy,
-                                        x11dpy, x11_native_destroy_cb);
+    return vaapi_InitializeInstance(VLC_OBJECT(device), vadpy,
+                                    x11dpy, x11_native_destroy_cb);
 }
 #endif
 
 #ifdef HAVE_VA_DRM
-static struct vlc_vaapi_instance *
+
+static void
+native_drm_destroy_cb(VANativeDisplay native)
+{
+    vlc_close((intptr_t) native);
+}
+
+/* Get and Initializes a VADisplay from a DRM device. If device is NULL, this
+ * function will try to open default devices. */
+static struct vaapi_instance *
+vaapi_InitializeInstanceDRM(vlc_object_t *o,
+                            VADisplay (*pf_getDisplayDRM)(int),
+                            VADisplay *pdpy, const char *device)
+{
+    static const char *default_drm_device_paths[] = {
+        "/dev/dri/renderD128",
+        "/dev/dri/card0",
+        "/dev/dri/renderD129",
+        "/dev/dri/card1",
+    };
+
+    const char *user_drm_device_paths[] = { device };
+    const char **drm_device_paths;
+    size_t drm_device_paths_count;
+
+    if (device != NULL)
+    {
+        drm_device_paths = user_drm_device_paths;
+        drm_device_paths_count = 1;
+    }
+    else
+    {
+        drm_device_paths = default_drm_device_paths;
+        drm_device_paths_count = ARRAY_SIZE(default_drm_device_paths);
+    }
+
+    for (size_t i = 0; i < drm_device_paths_count; i++)
+    {
+        int drm_fd = vlc_open(drm_device_paths[i], O_RDWR);
+        if (drm_fd < 0)
+            continue;
+
+        VADisplay dpy = pf_getDisplayDRM(drm_fd);
+        if (dpy)
+        {
+            struct vaapi_instance *va_inst =
+                vaapi_InitializeInstance(o, dpy,
+                                         (VANativeDisplay)(intptr_t)drm_fd,
+                                         native_drm_destroy_cb);
+            if (va_inst)
+            {
+                *pdpy = dpy;
+                return va_inst;
+            }
+        }
+        else
+            vlc_close(drm_fd);
+    }
+    return NULL;
+}
+
+static struct vaapi_instance *
 drm_init_vaapi_instance(vlc_decoder_device *device, VADisplay *vadpyp)
 {
-    return vlc_vaapi_InitializeInstanceDRM(VLC_OBJECT(device), vaGetDisplayDRM,
-                                           vadpyp, NULL);
+    return vaapi_InitializeInstanceDRM(VLC_OBJECT(device), vaGetDisplayDRM,
+                                       vadpyp, NULL);
 }
 #endif
 
 #ifdef HAVE_VA_WL
-static struct vlc_vaapi_instance *
+static struct vaapi_instance *
 wl_init_vaapi_instance(vlc_decoder_device *device, vout_window_t *window,
                        VADisplay *vadpyp)
 {
@@ -93,21 +206,21 @@ wl_init_vaapi_instance(vlc_decoder_device *device, vout_window_t *window,
     if (vadpy == NULL)
         return NULL;
 
-    return vlc_vaapi_InitializeInstance(VLC_OBJECT(device), vadpy, NULL, NULL);
+    return vaapi_InitializeInstance(VLC_OBJECT(device), vadpy, NULL, NULL);
 }
 #endif
 
 static void
 Close(vlc_decoder_device *device)
 {
-    vlc_vaapi_DestroyInstance(device->sys);
+    vaapi_DestroyInstance(device->sys);
 }
 
 static int
 Open(vlc_decoder_device *device, vout_window_t *window)
 {
     VADisplay vadpy = NULL;
-    struct vlc_vaapi_instance *vainst = NULL;
+    struct vaapi_instance *vainst = NULL;
 #if defined (HAVE_VA_X11)
     if (window && window->type == VOUT_WINDOW_TYPE_XID)
         vainst = x11_init_vaapi_instance(device, window, &vadpy);

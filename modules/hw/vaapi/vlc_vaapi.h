@@ -41,34 +41,6 @@
 #include <vlc_picture_pool.h>
 
 /**************************
- * VA instance management *
- **************************/
-
-typedef void (*vlc_vaapi_native_destroy_cb)(VANativeDisplay);
-struct vlc_vaapi_instance;
-
-/* Initializes the VADisplay and sets the reference counter to 1. If not NULL,
- * native_destroy_cb will be called when the instance is released in order to
- * destroy the native holder (that can be a drm/x11/wl). On error, dpy is
- * terminated and the destroy callback is called. */
-struct vlc_vaapi_instance *
-vlc_vaapi_InitializeInstance(vlc_object_t *o, VADisplay dpy,
-                             VANativeDisplay native,
-                             vlc_vaapi_native_destroy_cb native_destroy_cb);
-
-/* Get and Initializes a VADisplay from a DRM device. If device is NULL, this
- * function will try to open default devices. */
-struct vlc_vaapi_instance *
-vlc_vaapi_InitializeInstanceDRM(vlc_object_t *o,
-                                VADisplay (*pf_getDisplayDRM)(int),
-                                VADisplay *pdpy, const char *device);
-
-
-/* Destroy the VAAPI instance refcount, and call vaTerminate */
-void
-vlc_vaapi_DestroyInstance(struct vlc_vaapi_instance *inst);
-
-/**************************
  * VAAPI create & destroy *
  **************************/
 
