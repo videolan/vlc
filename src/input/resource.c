@@ -405,24 +405,24 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
         return NULL;
     }
 
-        vout =  cfg->vout;
-        DisplayVoutTitle(p_resource, vout);
+    vout = cfg->vout;
+    DisplayVoutTitle(p_resource, vout);
 
-        /* Send original viewpoint to the input in order to update other ESes */
-        if (p_resource->p_input != NULL)
-            input_Control(p_resource->p_input, INPUT_SET_INITIAL_VIEWPOINT,
-                          &cfg->fmt->pose);
+    /* Send original viewpoint to the input in order to update other ESes */
+    if (p_resource->p_input != NULL)
+        input_Control(p_resource->p_input, INPUT_SET_INITIAL_VIEWPOINT,
+                      &cfg->fmt->pose);
 
-        vlc_mutex_lock(&p_resource->lock_hold);
-        TAB_APPEND(p_resource->i_vout, p_resource->pp_vout, vout);
-        vlc_mutex_unlock(&p_resource->lock_hold);
+    vlc_mutex_lock(&p_resource->lock_hold);
+    TAB_APPEND(p_resource->i_vout, p_resource->pp_vout, vout);
+    vlc_mutex_unlock(&p_resource->lock_hold);
 
-        if (p_resource->p_input != NULL)
-            input_SendEventVout(p_resource->p_input,
-                &(struct vlc_input_event_vout) {
-                    .action = VLC_INPUT_EVENT_VOUT_ADDED,
-                    .vout = vout,
-                });
+    if (p_resource->p_input != NULL)
+        input_SendEventVout(p_resource->p_input,
+            &(struct vlc_input_event_vout) {
+                .action = VLC_INPUT_EVENT_VOUT_ADDED,
+                .vout = vout,
+            });
 out:
     vlc_mutex_unlock( &p_resource->lock );
     return vout;
