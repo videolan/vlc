@@ -127,16 +127,17 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys->sys.b_windowless)
         EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (OpenGL output)");
 
-    vout_window_t *surface = EmbedVideoWindow_Create(vd);
-    if (!surface)
+    vout_display_cfg_t embed_cfg = *cfg;
+    embed_cfg.window = EmbedVideoWindow_Create(vd);
+    if (!embed_cfg.window)
         goto error;
 
-    char *modlist = var_InheritString(surface, "gl");
-    sys->gl = vlc_gl_Create(cfg, VLC_OPENGL, modlist);
+    char *modlist = var_InheritString(embed_cfg.window, "gl");
+    sys->gl = vlc_gl_Create(&embed_cfg, VLC_OPENGL, modlist);
     free(modlist);
     if (!sys->gl)
     {
-        vlc_object_release(surface);
+        vlc_object_release(embed_cfg.window);
         goto error;
     }
 
