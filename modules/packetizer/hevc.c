@@ -62,6 +62,11 @@ vlc_module_end ()
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
+struct hevc_tuple_s
+{
+    block_t *p_nal;
+    void *p_decoded;
+};
 
 typedef struct
 {
@@ -76,13 +81,9 @@ typedef struct
 
     uint8_t  i_nal_length_size;
 
-    struct
-    {
-        block_t *p_nal;
-        void *p_decoded;
-    } rg_vps[HEVC_VPS_ID_MAX + 1],
-      rg_sps[HEVC_SPS_ID_MAX + 1],
-      rg_pps[HEVC_PPS_ID_MAX + 1];
+    struct hevc_tuple_s rg_vps[HEVC_VPS_ID_MAX + 1],
+                        rg_sps[HEVC_SPS_ID_MAX + 1],
+                        rg_pps[HEVC_PPS_ID_MAX + 1];
 
     const hevc_video_parameter_set_t    *p_active_vps;
     const hevc_sequence_parameter_set_t *p_active_sps;
@@ -344,31 +345,27 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
                       const block_t *p_nalb)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    void **pp_decoded;
+    struct hevc_tuple_s *p_tuple;
     void **pp_active;
-    block_t **pp_nal;
 
     switch(i_nal_type)
     {
         case HEVC_NAL_VPS:
             if(i_id > HEVC_VPS_ID_MAX)
                 return false;
-            pp_decoded = &p_sys->rg_vps[i_id].p_decoded;
-            pp_nal = &p_sys->rg_vps[i_id].p_nal;
+            p_tuple = &p_sys->rg_vps[i_id];
             pp_active = (void**)&p_sys->p_active_vps;
             break;
         case HEVC_NAL_SPS:
             if(i_id > HEVC_SPS_ID_MAX)
                 return false;
-            pp_decoded = &p_sys->rg_sps[i_id].p_decoded;
-            pp_nal = &p_sys->rg_sps[i_id].p_nal;
+            p_tuple = &p_sys->rg_sps[i_id];
             pp_active = (void**)&p_sys->p_active_sps;
             break;
         case HEVC_NAL_PPS:
             if(i_id > HEVC_PPS_ID_MAX)
                 return false;
-            pp_decoded = &p_sys->rg_pps[i_id].p_decoded;
-            pp_nal = &p_sys->rg_pps[i_id].p_nal;
+            p_tuple = &p_sys->rg_pps[i_id];
             pp_active = (void**)&p_sys->p_active_pps;
             break;
         default:
@@ -376,10 +373,10 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
     }
 
     /* Check if we really need to re-decode/replace */
-    if(*pp_nal)
+    if(p_tuple->p_nal)
     {
-        const uint8_t *p_stored = (*pp_nal)->p_buffer;
-        size_t i_stored = (*pp_nal)->i_buffer;
+        const uint8_t *p_stored = p_tuple->p_nal->p_buffer;
+        size_t i_stored = p_tuple->p_nal->i_buffer;
         hxxx_strip_AnnexB_startcode(&p_stored, &i_stored);
         const uint8_t *p_new = p_nalb->p_buffer;
         size_t i_new = p_nalb->i_buffer;
@@ -389,33 +386,33 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
     }
 
     /* Free associated decoded version */
-    if(*pp_decoded)
+    if(p_tuple->p_decoded)
     {
         switch(i_nal_type)
         {
             case HEVC_NAL_VPS:
-                hevc_rbsp_release_vps(*pp_decoded);
+                hevc_rbsp_release_vps(p_tuple->p_decoded);
                 break;
             case HEVC_NAL_SPS:
-                hevc_rbsp_release_sps(*pp_decoded);
+                hevc_rbsp_release_sps(p_tuple->p_decoded);
                 break;
             case HEVC_NAL_PPS:
-                hevc_rbsp_release_pps(*pp_decoded);
+                hevc_rbsp_release_pps(p_tuple->p_decoded);
                 break;
         }
-        if(*pp_active == *pp_decoded)
+        if(*pp_active == p_tuple->p_decoded)
             *pp_active = NULL;
         else
             pp_active = NULL; /* don't change pointer */
-        *pp_decoded = NULL;
+        p_tuple->p_decoded = NULL;
     }
     else pp_active = NULL;
 
     /* Free raw stored version */
-    if(*pp_nal)
+    if(p_tuple->p_nal)
     {
-        block_Release(*pp_nal);
-        *pp_nal = NULL;
+        block_Release(p_tuple->p_nal);
+        p_tuple->p_nal = NULL;
     }
 
     const uint8_t *p_buffer = p_nalb->p_buffer;
@@ -426,24 +423,24 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
         switch(i_nal_type)
         {
             case HEVC_NAL_SPS:
-                *pp_decoded = hevc_decode_sps(p_buffer, i_buffer, true);
-                if(!*pp_decoded)
+                p_tuple->p_decoded = hevc_decode_sps(p_buffer, i_buffer, true);
+                if(!p_tuple->p_decoded)
                 {
                     msg_Err(p_dec, "Failed decoding SPS id %d", i_id);
                     return false;
                 }
                 break;
             case HEVC_NAL_PPS:
-                *pp_decoded = hevc_decode_pps(p_buffer, i_buffer, true);
-                if(!*pp_decoded)
+                p_tuple->p_decoded = hevc_decode_pps(p_buffer, i_buffer, true);
+                if(!p_tuple->p_decoded)
                 {
                     msg_Err(p_dec, "Failed decoding PPS id %d", i_id);
                     return false;
                 }
                 break;
             case HEVC_NAL_VPS:
-                *pp_decoded = hevc_decode_vps(p_buffer, i_buffer, true);
-                if(!*pp_decoded)
+                p_tuple->p_decoded = hevc_decode_vps(p_buffer, i_buffer, true);
+                if(!p_tuple->p_decoded)
                 {
                     msg_Err(p_dec, "Failed decoding VPS id %d", i_id);
                     return false;
@@ -451,10 +448,10 @@ static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
                 break;
         }
 
-        if(*pp_decoded && pp_active) /* restore active by id */
-            *pp_active = *pp_decoded;
+        if(p_tuple->p_decoded && pp_active) /* restore active by id */
+            *pp_active = p_tuple->p_decoded;
 
-        *pp_nal = block_Duplicate((block_t *)p_nalb);
+        p_tuple->p_nal = block_Duplicate((block_t *)p_nalb);
 
         return true;
     }
