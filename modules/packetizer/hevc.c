@@ -62,15 +62,6 @@ vlc_module_end ()
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static block_t *PacketizeAnnexB(decoder_t *, block_t **);
-static block_t *PacketizeHVC1(decoder_t *, block_t **);
-static void PacketizeFlush( decoder_t * );
-static void PacketizeReset(void *p_private, bool b_broken);
-static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *);
-static block_t *ParseNALBlock(decoder_t *, bool *pb_ts_used, block_t *);
-static int PacketizeValidate(void *p_private, block_t *);
-static bool ParseSEICallback( const hxxx_sei_data_t *, void * );
-static block_t *GetCc( decoder_t *, decoder_cc_desc_t * );
 
 typedef struct
 {
@@ -106,6 +97,16 @@ typedef struct
     /* */
     cc_storage_t *p_ccs;
 } decoder_sys_t;
+
+static block_t *PacketizeAnnexB(decoder_t *, block_t **);
+static block_t *PacketizeHVC1(decoder_t *, block_t **);
+static void PacketizeFlush( decoder_t * );
+static void PacketizeReset(void *p_private, bool b_broken);
+static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *);
+static block_t *ParseNALBlock(decoder_t *, bool *pb_ts_used, block_t *);
+static int PacketizeValidate(void *p_private, block_t *);
+static bool ParseSEICallback( const hxxx_sei_data_t *, void * );
+static block_t *GetCc( decoder_t *, decoder_cc_desc_t * );
 
 #define BLOCK_FLAG_DROP (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 
