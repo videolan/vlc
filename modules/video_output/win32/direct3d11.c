@@ -608,72 +608,72 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     surface_fmt.i_width  = sys->picQuad.i_width;
     surface_fmt.i_height = sys->picQuad.i_height;
 
-        ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
-        memset(textures, 0, sizeof(textures));
-        unsigned slices = pool_size;
-        if (!CanUseVoutPool(&sys->d3d_dev, pool_size))
-            /* only provide enough for the filters, we can still do direct rendering */
-            slices = __MIN(slices, 6);
+    ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
+    memset(textures, 0, sizeof(textures));
+    unsigned slices = pool_size;
+    if (!CanUseVoutPool(&sys->d3d_dev, pool_size))
+        /* only provide enough for the filters, we can still do direct rendering */
+        slices = __MIN(slices, 6);
 
-        if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &surface_fmt, slices, textures))
+    if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &surface_fmt, slices, textures))
+        goto error;
+
+    pictures = calloc(pool_size, sizeof(*pictures));
+    if (!pictures)
+        goto error;
+
+    for (picture_count = 0; picture_count < pool_size; picture_count++) {
+        picture_sys_t *picsys = calloc(1, sizeof(*picsys));
+        if (unlikely(picsys == NULL))
             goto error;
 
-        pictures = calloc(pool_size, sizeof(*pictures));
-        if (!pictures)
+        for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
+            picsys->texture[plane] = textures[picture_count * D3D11_MAX_SHADER_VIEW + plane];
+
+        picture_resource_t resource = {
+            .p_sys = picsys,
+            .pf_destroy = DestroyDisplayPoolPicture,
+        };
+
+        picture = picture_NewFromResource(&surface_fmt, &resource);
+        if (unlikely(picture == NULL)) {
+            free(picsys);
+            msg_Err( vd, "Failed to create picture %d in the pool.", picture_count );
             goto error;
-
-        for (picture_count = 0; picture_count < pool_size; picture_count++) {
-            picture_sys_t *picsys = calloc(1, sizeof(*picsys));
-            if (unlikely(picsys == NULL))
-                goto error;
-
-            for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
-                picsys->texture[plane] = textures[picture_count * D3D11_MAX_SHADER_VIEW + plane];
-
-            picture_resource_t resource = {
-                .p_sys = picsys,
-                .pf_destroy = DestroyDisplayPoolPicture,
-            };
-
-            picture = picture_NewFromResource(&surface_fmt, &resource);
-            if (unlikely(picture == NULL)) {
-                free(picsys);
-                msg_Err( vd, "Failed to create picture %d in the pool.", picture_count );
-                goto error;
-            }
-
-            pictures[picture_count] = picture;
-            picsys->slice_index = picture_count;
-            picsys->formatTexture = sys->picQuad.textureFormat->formatTexture;
-            /* each picture_t holds a ref to the context and release it on Destroy */
-            picsys->context = sys->d3d_dev.d3dcontext;
-            ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
         }
+
+        pictures[picture_count] = picture;
+        picsys->slice_index = picture_count;
+        picsys->formatTexture = sys->picQuad.textureFormat->formatTexture;
+        /* each picture_t holds a ref to the context and release it on Destroy */
+        picsys->context = sys->d3d_dev.d3dcontext;
+        ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
+    }
 
 #ifdef HAVE_ID3D11VIDEODECODER
-        if (is_d3d11_opaque(surface_fmt.i_chroma) && !sys->legacy_shader)
+    if (is_d3d11_opaque(surface_fmt.i_chroma) && !sys->legacy_shader)
 #endif
-        {
-            for (picture_count = 0; picture_count < pool_size; picture_count++) {
-                picture_sys_t *p_sys = pictures[picture_count]->p_sys;
-                if (!p_sys->texture[0])
-                    continue;
-                if (D3D11_AllocateResourceView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.textureFormat,
-                                             p_sys->texture, picture_count,
-                                             p_sys->renderSrc))
-                    goto error;
-            }
+    {
+        for (picture_count = 0; picture_count < pool_size; picture_count++) {
+            picture_sys_t *p_sys = pictures[picture_count]->p_sys;
+            if (!p_sys->texture[0])
+                continue;
+            if (D3D11_AllocateResourceView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.textureFormat,
+                                         p_sys->texture, picture_count,
+                                         p_sys->renderSrc))
+                goto error;
         }
+    }
 
-        picture_pool_configuration_t pool_cfg = {
-            .picture       = pictures,
-            .picture_count = pool_size,
-        };
-        if (vd->info.is_slow && !is_d3d11_opaque(surface_fmt.i_chroma)) {
-            pool_cfg.lock          = Direct3D11MapPoolTexture;
-            //pool_cfg.unlock        = Direct3D11UnmapPoolTexture;
-        }
-        sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
+    picture_pool_configuration_t pool_cfg = {
+        .picture       = pictures,
+        .picture_count = pool_size,
+    };
+    if (vd->info.is_slow && !is_d3d11_opaque(surface_fmt.i_chroma)) {
+        pool_cfg.lock          = Direct3D11MapPoolTexture;
+        //pool_cfg.unlock        = Direct3D11UnmapPoolTexture;
+    }
+    sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
 
 error:
     if (sys->sys.pool == NULL) {
