@@ -601,7 +601,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if (sys->sys.pool)
         return sys->sys.pool;
 
-    if (vd->info.is_slow)
+    if (!is_d3d11_opaque(vd->fmt.i_chroma))
         pool_size = 1;
 
     video_format_t surface_fmt = vd->fmt;
@@ -669,7 +669,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         .picture       = pictures,
         .picture_count = pool_size,
     };
-    if (vd->info.is_slow && !is_d3d11_opaque(surface_fmt.i_chroma)) {
+    if (!is_d3d11_opaque(surface_fmt.i_chroma)) {
         pool_cfg.lock          = Direct3D11MapPoolTexture;
         //pool_cfg.unlock        = Direct3D11UnmapPoolTexture;
     }
@@ -1599,7 +1599,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
          vd->source.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
         SetQuadVSProjection( vd, &sys->picQuad, &sys->sys.vdcfg.viewpoint );
 
-    if (!vd->info.is_slow) {
+    if (is_d3d11_opaque(fmt->i_chroma)) {
         ID3D10Multithread *pMultithread;
         hr = ID3D11Device_QueryInterface( sys->d3d_dev.d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
         if (SUCCEEDED(hr)) {
