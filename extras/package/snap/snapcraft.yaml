@@ -30,6 +30,7 @@ apps:
       - x11
       - desktop
       - desktop-legacy
+      - dvb
     slots:
       - mpris
 
