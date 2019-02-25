@@ -1306,8 +1306,6 @@ static int DirectXUpdateOverlay(vout_display_t *vd, LPDIRECTDRAWSURFACE2 surface
     }
 
     if (!surface) {
-        if (!sys->sys.pool)
-            return VLC_EGENERIC;
         surface = sys->front_surface;
     }
 
