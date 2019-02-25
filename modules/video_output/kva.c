@@ -30,7 +30,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_picture_pool.h>
 
 #include <ctype.h>
 #include <float.h>
@@ -100,29 +99,24 @@ struct vout_display_sys_t
     RECTL              client_rect;
     vout_window_t     *parent_window;
     HWND               parent;
-    picture_pool_t    *pool;
     unsigned           button_pressed;
     bool               is_mouse_hidden;
     bool               is_on_top;
     ULONG              cursor_timeout;
-};
 
-typedef struct
-{
-    int i_chroma_shift;
-} picture_sys_t;
+    int                i_chroma_shift;
+};
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static picture_pool_t *Pool   (vout_display_t *, unsigned);
 static void            Display(vout_display_t *, picture_t *);
 static int             Control(vout_display_t *, int, va_list);
 
 static int  OpenDisplay ( vout_display_t *, video_format_t * );
 static void CloseDisplay( vout_display_t * );
 
-static int  KVALock( picture_t * );
+static int  KVALock( vout_display_sys_t *, picture_t * );
 static void KVAUnlock( picture_t * );
 
 static void             MorphToPM     ( void );
@@ -149,6 +143,18 @@ struct open_init
     const vout_display_cfg_t *cfg;
     video_format_t *fmtp;
 };
+
+static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic, vlc_tick_t date)
+{
+    VLC_UNUSED(subpic);
+    VLC_UNUSED(date);
+    picture_t fake_pic = *pic;
+    if (KVALock(vd->sys, &fake_pic) == VLC_SUCCESS)
+    {
+        picture_CopyPixels(&fake_pic, pic);
+        KVAUnlock(&fake_pic);
+    }
+}
 
 static void PMThread( void *arg )
 {
@@ -268,8 +274,7 @@ static void PMThread( void *arg )
 
     vd->info.has_double_click = true;
 
-    vd->pool    = Pool;
-    vd->prepare = NULL;
+    vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
 
@@ -363,23 +368,9 @@ static void Close ( vlc_object_t *object )
 
     DosWaitThread( &sys->tid, DCWW_WAIT );
 
-    if( sys->pool )
-        picture_pool_Release( sys->pool );
-
     DosCloseEventSem( sys->ack_event );
 
     free( sys );
-}
-
-/**
- * Return a pool of direct buffers
- */
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
-{
-    vout_display_sys_t *sys = vd->sys;
-    VLC_UNUSED(count);
-
-    return sys->pool;
 }
 
 /*****************************************************************************
@@ -598,36 +589,7 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
         return VLC_EGENERIC;
     }
 
-    /* Create the associated picture */
-    picture_sys_t *picsys = malloc( sizeof( *picsys ) );
-    if( picsys == NULL )
-        return VLC_ENOMEM;
-    picsys->i_chroma_shift = i_chroma_shift;
-
-    picture_resource_t resource = {
-        .p_sys = picsys, .pf_destroy = DestroyPicture,
-    };
-    picture_t *picture = picture_NewFromResource( fmt, &resource );
-    if( !picture )
-    {
-        free( picsys );
-        return VLC_ENOMEM;
-    }
-
-    /* Wrap it into a picture pool */
-    picture_pool_configuration_t pool_cfg;
-    memset( &pool_cfg, 0, sizeof( pool_cfg ));
-    pool_cfg.picture_count = 1;
-    pool_cfg.picture       = &picture;
-    pool_cfg.lock          = KVALock;
-    pool_cfg.unlock        = KVAUnlock;
-
-    sys->pool = picture_pool_NewExtended( &pool_cfg );
-    if( !sys->pool )
-    {
-        picture_Release( picture );
-        return VLC_ENOMEM;
-    }
+    sys->i_chroma_shift = i_chroma_shift;
 
     char *title = var_InheritString( vd, "video-title" );
     if (title != NULL
@@ -681,9 +643,8 @@ static void CloseDisplay( vout_display_t *vd )
     VLC_UNUSED( vd );
 }
 
-static int KVALock( picture_t *picture )
+static int KVALock( vout_display_sys_t *sys, picture_t *picture )
 {
-    picture_sys_t *picsys = picture->p_sys;
     PVOID kva_buffer;
     ULONG kva_bpl;
 
@@ -702,8 +663,8 @@ static int KVALock( picture_t *picture )
         plane_t *p = &picture->p[n];
 
         p->p_pixels = o->p_pixels + o->i_lines * o->i_pitch;
-        p->i_pitch  = kva_bpl >> picsys->i_chroma_shift;
-        p->i_lines  = picture->format.i_height >> picsys->i_chroma_shift;
+        p->i_pitch  = kva_bpl >> sys->i_chroma_shift;
+        p->i_lines  = picture->format.i_height >> sys->i_chroma_shift;
     }
 
     return VLC_SUCCESS;
