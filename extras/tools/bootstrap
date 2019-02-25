@@ -160,7 +160,7 @@ DEPS_ONLY="help2man"
 
 CPUS=
 case `uname` in
-    Linux|MINGW32*|MINGW64*)
+    Linux|MINGW32*|MINGW64*|*MSYS*)
         CPUS=`getconf _NPROCESSORS_ONLN 2>&1`
      ;;
     Darwin|FreeBSD|NetBSD)
