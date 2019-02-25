@@ -123,13 +123,6 @@ vlc_module_end()
  * Local prototypes.
  *****************************************************************************/
 
-typedef struct
-{
-    LPDIRECTDRAWSURFACE2 surface;
-    LPDIRECTDRAWSURFACE2 front_surface;
-    picture_t            *fallback;
-} picture_sys_t;
-
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
@@ -155,7 +148,9 @@ struct vout_display_sys_t
     LPDIRECTDRAWCLIPPER  clipper;             /* clipper used for blitting */
     HINSTANCE            hddraw_dll;       /* handle of the opened ddraw dll */
 
-    picture_sys_t        *picsys;
+    LPDIRECTDRAWSURFACE2 surface;
+    LPDIRECTDRAWSURFACE2 front_surface;
+    picture_t            *fallback;
 
     /* It protects the following variables */
     vlc_mutex_t    lock;
@@ -175,12 +170,24 @@ static int WallpaperCallback(vlc_object_t *, char const *,
 static int  DirectXOpen(vout_display_t *, video_format_t *fmt);
 static void DirectXClose(vout_display_t *);
 
-static int  DirectXLock(picture_t *);
-static void DirectXUnlock(picture_t *);
+static int  DirectXLock(vout_display_sys_t *, picture_t *);
+static void DirectXUnlock(vout_display_sys_t *,picture_t *);
 
 static int DirectXUpdateOverlay(vout_display_t *, LPDIRECTDRAWSURFACE2 surface);
 
 static void WallpaperChange(vout_display_t *vd, bool use_wallpaper);
+
+static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic, vlc_tick_t date)
+{
+    VLC_UNUSED(subpic);
+    VLC_UNUSED(date);
+    picture_t fake_pic = *pic;
+    if (DirectXLock(vd->sys, &fake_pic) == VLC_SUCCESS)
+    {
+        picture_CopyPixels(&fake_pic, pic);
+        DirectXUnlock(vd->sys, &fake_pic);
+    }
+}
 
 /** This function allocates and initialize the DirectX vout display.
  */
@@ -236,8 +243,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     video_format_Clean(fmtp);
     video_format_Copy(fmtp, &fmt);
 
-    vd->pool    = Pool;
-    vd->prepare = NULL;
+    vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
     return VLC_SUCCESS;
@@ -272,15 +278,9 @@ static void Close(vout_display_t *vd)
     free(sys);
 }
 
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
-{
-    VLC_UNUSED(count);
-    return vd->sys->sys.pool;
-}
 static void Display(vout_display_t *vd, picture_t *picture)
 {
     vout_display_sys_t *sys = vd->sys;
-    picture_sys_t *p_sys = picture->p_sys;
 
     assert(sys->display);
 
@@ -296,12 +296,10 @@ static void Display(vout_display_t *vd, picture_t *picture)
         DirectXUpdateOverlay(vd, NULL);
 
     /* */
-    DirectXUnlock(picture);
-
     if (sys->sys.use_overlay) {
         /* Flip the overlay buffers if we are using back buffers */
-        if (p_sys->surface != p_sys->front_surface) {
-            HRESULT hr = IDirectDrawSurface2_Flip(p_sys->front_surface,
+        if (sys->surface != sys->front_surface) {
+            HRESULT hr = IDirectDrawSurface2_Flip(sys->front_surface,
                                                   NULL, DDFLIP_WAIT);
             if (hr != DD_OK)
                 msg_Warn(vd, "could not flip overlay (error %li)", hr);
@@ -315,13 +313,12 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
         HRESULT hr = IDirectDrawSurface2_Blt(sys->display,
                                              &sys->sys.rect_dest_clipped,
-                                             p_sys->surface,
+                                             sys->surface,
                                              &sys->sys.rect_src_clipped,
                                              DDBLT_ASYNC, &ddbltfx);
         if (hr != DD_OK)
             msg_Warn(vd, "could not blit surface (error %li)", hr);
     }
-    DirectXLock(picture);
 
     if (sys->sys.is_first_display) {
         IDirectDraw_WaitForVerticalBlank(sys->ddobject,
@@ -407,8 +404,10 @@ static void DirectXCloseDDraw(vout_display_t *);
 static int  DirectXOpenDisplay(vout_display_t *vd);
 static void DirectXCloseDisplay(vout_display_t *vd);
 
-static int  DirectXCreatePool(vout_display_t *, bool *, video_format_t *);
-static void DirectXDestroyPool(vout_display_t *);
+static int DirectXCreatePictureResource(vout_display_t *,
+                                        bool *use_overlay,
+                                        video_format_t *fmt);
+static void DirectXDestroyPictureResource(vout_display_t *);
 
 static int DirectXOpen(vout_display_t *vd, video_format_t *fmt)
 {
@@ -431,11 +430,8 @@ static int DirectXOpen(vout_display_t *vd, video_format_t *fmt)
     }
     UpdateRects(vd, true);
 
-    /* Create the picture pool */
-    if (DirectXCreatePool(vd, &sys->sys.use_overlay, fmt)) {
-        msg_Err(vd, "cannot create any DirectX surface");
+    if (DirectXCreatePictureResource(vd, &sys->sys.use_overlay, fmt))
         return VLC_EGENERIC;
-    }
 
     /* */
     if (sys->sys.use_overlay)
@@ -459,7 +455,7 @@ static int DirectXOpen(vout_display_t *vd, video_format_t *fmt)
 }
 static void DirectXClose(vout_display_t *vd)
 {
-    DirectXDestroyPool(vd);
+    DirectXDestroyPictureResource(vd);
     DirectXCloseDisplay(vd);
     DirectXCloseDDraw(vd);
 }
@@ -1070,10 +1066,9 @@ static int DirectXCreatePictureResourceYuvOverlay(vout_display_t *vd,
     }
 
     /* */
-    picture_sys_t *picsys = sys->picsys;
-    picsys->front_surface = front_surface;
-    picsys->surface       = surface;
-    picsys->fallback      = NULL;
+    sys->front_surface = front_surface;
+    sys->surface       = surface;
+    sys->fallback      = NULL;
     return VLC_SUCCESS;
 }
 static int DirectXCreatePictureResourceYuv(vout_display_t *vd,
@@ -1126,10 +1121,9 @@ static int DirectXCreatePictureResourceYuv(vout_display_t *vd,
     }
 
     /* */
-    picture_sys_t *picsys = sys->picsys;
-    picsys->front_surface = surface;
-    picsys->surface       = surface;
-    picsys->fallback      = NULL;
+    sys->front_surface = surface;
+    sys->surface       = surface;
+    sys->fallback      = NULL;
     return VLC_SUCCESS;
 }
 static int DirectXCreatePictureResourceRgb(vout_display_t *vd,
@@ -1186,10 +1180,9 @@ static int DirectXCreatePictureResourceRgb(vout_display_t *vd,
     }
 
     /* */
-    picture_sys_t *picsys = sys->picsys;
-    picsys->front_surface = surface;
-    picsys->surface       = surface;
-    picsys->fallback      = NULL;
+    sys->front_surface = surface;
+    sys->surface       = surface;
+    sys->fallback      = NULL;
     return VLC_SUCCESS;
 }
 
@@ -1198,12 +1191,6 @@ static int DirectXCreatePictureResource(vout_display_t *vd,
                                         video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
-
-    /* */
-    picture_sys_t *picsys = calloc(1, sizeof(*picsys));
-    if (unlikely(picsys == NULL))
-        return VLC_ENOMEM;
-    sys->picsys = picsys;
 
     /* */
     bool allow_hw_yuv  = sys->can_blit_fourcc &&
@@ -1253,82 +1240,26 @@ static void DirectXDestroyPictureResource(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->picsys->front_surface != sys->picsys->surface)
-        DirectXDestroySurface(sys->picsys->surface);
-    DirectXDestroySurface(sys->picsys->front_surface);
-    if (sys->picsys->fallback)
-        picture_Release(sys->picsys->fallback);
+    if (sys->front_surface != sys->surface)
+        DirectXDestroySurface(sys->surface);
+    DirectXDestroySurface(sys->front_surface);
+    if (sys->fallback)
+        picture_Release(sys->fallback);
 }
 
-static int DirectXLock(picture_t *picture)
+static int DirectXLock(vout_display_sys_t *sys, picture_t *picture)
 {
-    picture_sys_t *p_sys = picture->p_sys;
     DDSURFACEDESC ddsd;
-    if (DirectXLockSurface(p_sys->front_surface,
-                           p_sys->surface, &ddsd))
-        return CommonUpdatePicture(picture, &p_sys->fallback, NULL, 0);
+    if (DirectXLockSurface(sys->front_surface,
+                           sys->surface, &ddsd))
+        return CommonUpdatePicture(picture, &sys->fallback, NULL, 0);
 
     CommonUpdatePicture(picture, NULL, ddsd.lpSurface, ddsd.lPitch);
     return VLC_SUCCESS;
 }
-static void DirectXUnlock(picture_t *picture)
+static void DirectXUnlock(vout_display_sys_t *sys, picture_t *picture)
 {
-    picture_sys_t *p_sys = picture->p_sys;
-    DirectXUnlockSurface(p_sys->front_surface,
-                         p_sys->surface);
-}
-static void DirectXDestroyPicture(picture_t *picture)
-{
-    free(picture->p_sys);
-}
-
-static int DirectXCreatePool(vout_display_t *vd,
-                             bool *use_overlay, video_format_t *fmt)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    /* */
-    *fmt = vd->source;
-
-    if (DirectXCreatePictureResource(vd, use_overlay, fmt))
-        return VLC_EGENERIC;
-
-    /* Create the associated picture */
-    picture_resource_t resource = {
-        .p_sys = sys->picsys, .pf_destroy = DirectXDestroyPicture,
-    };
-    picture_t *picture = picture_NewFromResource(fmt, &resource);
-    if (!picture) {
-        DirectXDestroyPictureResource(vd);
-        free(sys->picsys);
-        return VLC_ENOMEM;
-    }
-
-    /* Wrap it into a picture pool */
-    picture_pool_configuration_t cfg;
-    memset(&cfg, 0, sizeof(cfg));
-    cfg.picture_count = 1;
-    cfg.picture       = &picture;
-    cfg.lock          = DirectXLock;
-    cfg.unlock        = DirectXUnlock;
-
-    sys->sys.pool = picture_pool_NewExtended(&cfg);
-    if (!sys->sys.pool) {
-        picture_Release(picture);
-        DirectXDestroyPictureResource(vd);
-        return VLC_ENOMEM;
-    }
-    return VLC_SUCCESS;
-}
-static void DirectXDestroyPool(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (sys->sys.pool) {
-        DirectXDestroyPictureResource(vd);
-        picture_pool_Release(sys->sys.pool);
-    }
-    sys->sys.pool = NULL;
+    DirectXUnlockSurface(sys->front_surface, sys->surface);
 }
 
 /**
@@ -1382,7 +1313,7 @@ static int DirectXUpdateOverlay(vout_display_t *vd, LPDIRECTDRAWSURFACE2 surface
     if (!surface) {
         if (!sys->sys.pool)
             return VLC_EGENERIC;
-        surface = sys->picsys->front_surface;
+        surface = sys->front_surface;
     }
 
     /* The new window dimensions should already have been computed by the
