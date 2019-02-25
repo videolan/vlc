@@ -150,7 +150,6 @@ struct vout_display_sys_t
 
     LPDIRECTDRAWSURFACE2 surface;
     LPDIRECTDRAWSURFACE2 front_surface;
-    picture_t            *fallback;
 
     /* It protects the following variables */
     vlc_mutex_t    lock;
@@ -1068,7 +1067,6 @@ static int DirectXCreatePictureResourceYuvOverlay(vout_display_t *vd,
     /* */
     sys->front_surface = front_surface;
     sys->surface       = surface;
-    sys->fallback      = NULL;
     return VLC_SUCCESS;
 }
 static int DirectXCreatePictureResourceYuv(vout_display_t *vd,
@@ -1123,7 +1121,6 @@ static int DirectXCreatePictureResourceYuv(vout_display_t *vd,
     /* */
     sys->front_surface = surface;
     sys->surface       = surface;
-    sys->fallback      = NULL;
     return VLC_SUCCESS;
 }
 static int DirectXCreatePictureResourceRgb(vout_display_t *vd,
@@ -1182,7 +1179,6 @@ static int DirectXCreatePictureResourceRgb(vout_display_t *vd,
     /* */
     sys->front_surface = surface;
     sys->surface       = surface;
-    sys->fallback      = NULL;
     return VLC_SUCCESS;
 }
 
@@ -1243,8 +1239,6 @@ static void DirectXDestroyPictureResource(vout_display_t *vd)
     if (sys->front_surface != sys->surface)
         DirectXDestroySurface(sys->surface);
     DirectXDestroySurface(sys->front_surface);
-    if (sys->fallback)
-        picture_Release(sys->fallback);
 }
 
 static int DirectXLock(vout_display_sys_t *sys, picture_t *picture)
@@ -1252,7 +1246,7 @@ static int DirectXLock(vout_display_sys_t *sys, picture_t *picture)
     DDSURFACEDESC ddsd;
     if (DirectXLockSurface(sys->front_surface,
                            sys->surface, &ddsd))
-        return CommonUpdatePicture(picture, &sys->fallback, NULL, 0);
+        return VLC_EGENERIC;
 
     CommonUpdatePicture(picture, NULL, ddsd.lpSurface, ddsd.lPitch);
     return VLC_SUCCESS;
