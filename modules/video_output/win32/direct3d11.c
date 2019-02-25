@@ -566,7 +566,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     else
         vd->info.subpicture_chromas = NULL;
 
-    if (sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_UNKNOWN)
+    if (is_d3d11_opaque(vd->fmt.i_chroma))
         vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
@@ -885,7 +885,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->picQuad.textureFormat->formatTexture == DXGI_FORMAT_UNKNOWN)
+    if (sys->picQuad.textureFormat->formatTexture == DXGI_FORMAT_UNKNOWN || !is_d3d11_opaque(picture->format.i_chroma))
     {
         D3D11_MAPPED_SUBRESOURCE mappedResource;
         D3D11_TEXTURE2D_DESC texDesc;
