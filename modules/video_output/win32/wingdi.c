@@ -37,6 +37,7 @@
 #include <windows.h>
 
 #include "common.h"
+#include "../video_chroma/copy.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -68,6 +69,9 @@ struct vout_display_sys_t
     HDC        off_dc;
     HBITMAP    off_bitmap;
 
+    void    *p_pic_buffer;
+    int     i_pic_pitch;
+
     struct
     {
         BITMAPINFO bitmapinfo;
@@ -77,11 +81,21 @@ struct vout_display_sys_t
     };
 };
 
-static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Display(vout_display_t *, picture_t *);
 
 static int            Init(vout_display_t *, video_format_t *);
 static void           Clean(vout_display_t *);
+
+static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic,
+                    vlc_tick_t date)
+{
+    VLC_UNUSED(subpic);
+    VLC_UNUSED(date);
+    vout_display_sys_t *sys = vd->sys;
+    picture_t fake_pic = *picture;
+    picture_UpdatePlanes(&fake_pic, sys->p_pic_buffer, sys->i_pic_pitch);
+    picture_CopyPixels(&fake_pic, picture);
+}
 
 /* */
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
@@ -106,8 +120,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     /* */
     vd->info.has_double_click     = true;
 
-    vd->pool    = Pool;
-    vd->prepare = NULL;
+    vd->prepare = Prepare;
     vd->display = Display;
     vd->control = CommonControl;
     return VLC_SUCCESS;
@@ -125,13 +138,6 @@ static void Close(vout_display_t *vd)
     CommonClean(vd);
 
     free(vd->sys);
-}
-
-/* */
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
-{
-    VLC_UNUSED(count);
-    return vd->sys->sys.pool;
 }
 
 static void Display(vout_display_t *vd, picture_t *picture)
@@ -232,8 +238,6 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
         return VLC_EGENERIC;
     }
 
-    void *p_pic_buffer;
-    int     i_pic_pitch;
     /* Initialize offscreen bitmap */
     BITMAPINFO *bi = &sys->bitmapinfo;
     memset(bi, 0, sizeof(BITMAPINFO) + 3 * sizeof(RGBQUAD));
@@ -257,11 +261,11 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     bih->biXPelsPerMeter = 0;
     bih->biYPelsPerMeter = 0;
 
-    i_pic_pitch = bih->biBitCount * bih->biWidth / 8;
+    sys->i_pic_pitch = bih->biBitCount * bih->biWidth / 8;
     sys->off_bitmap = CreateDIBSection(window_dc,
                                        (BITMAPINFO *)bih,
                                        DIB_RGB_COLORS,
-                                       &p_pic_buffer, NULL, 0);
+                                       &sys->p_pic_buffer, NULL, 0);
 
     sys->off_dc = CreateCompatibleDC(window_dc);
 
@@ -271,19 +275,6 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     if (!sys->sys.b_windowless)
         EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (WinGDI output)");
 
-    /* */
-    picture_resource_t rsc;
-    memset(&rsc, 0, sizeof(rsc));
-    rsc.p[0].p_pixels = p_pic_buffer;
-    rsc.p[0].i_lines  = fmt->i_height;
-    rsc.p[0].i_pitch  = i_pic_pitch;;
-
-    picture_t *picture = picture_NewFromResource(fmt, &rsc);
-    if (picture != NULL)
-        sys->sys.pool = picture_pool_New(1, &picture);
-    else
-        sys->sys.pool = NULL;
-
     UpdateRects(vd, true);
 
     return VLC_SUCCESS;
@@ -292,10 +283,6 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
 static void Clean(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-
-    if (sys->sys.pool)
-        picture_pool_Release(sys->sys.pool);
-    sys->sys.pool = NULL;
 
     if (sys->off_dc)
         DeleteDC(sys->off_dc);
