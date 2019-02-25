@@ -434,30 +434,6 @@ void CommonDisplay(vout_display_t *vd)
 }
 #endif
 
-/**
- * It updates a picture data/pitches.
- */
-int CommonUpdatePicture(picture_t *picture, picture_t **fallback,
-                        uint8_t *data, unsigned pitch)
-{
-    if (fallback) {
-        if (*fallback == NULL) {
-            *fallback = picture_NewFromFormat(&picture->format);
-            if (*fallback == NULL)
-                return VLC_EGENERIC;
-        }
-        for (int n = 0; n < picture->i_planes; n++) {
-            const plane_t *src = &(*fallback)->p[n];
-            plane_t       *dst = &picture->p[n];
-            dst->p_pixels = src->p_pixels;
-            dst->i_pitch  = src->i_pitch;
-            dst->i_lines  = src->i_lines;
-        }
-        return VLC_SUCCESS;
-    }
-    return picture_UpdatePlanes(picture, data, pitch);
-}
-
 void AlignRect(RECT *r, int align_boundary, int align_size)
 {
     if (align_boundary)
