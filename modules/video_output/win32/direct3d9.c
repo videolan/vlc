@@ -279,12 +279,7 @@ static picture_pool_t *Direct3D9CreatePicturePool(vlc_object_t *o,
         pictures[picture_count] = picture;
     }
 
-    picture_pool_configuration_t pool_cfg;
-    memset(&pool_cfg, 0, sizeof(pool_cfg));
-    pool_cfg.picture_count = count;
-    pool_cfg.picture       = pictures;
-
-    pool = picture_pool_NewExtended( &pool_cfg );
+    pool = picture_pool_New( count, pictures );
 
 error:
     if (pool == NULL && pictures) {
