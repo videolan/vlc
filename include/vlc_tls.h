@@ -45,7 +45,7 @@
  * Transport layer sockets are full-duplex, meaning data can be sent and
  * received at the same time. As such, it is permitted for two threads to
  * use the same TLS simultaneously, if one thread is receiving data while the
- * other is sending data. However receiving or rending data from two threads
+ * other is sending data. However receiving or sending data from two threads
  * concurrently is undefined behaviour.
  *
  * The following functions are treated as sending data:
