@@ -631,17 +631,10 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         }
     }
 
-    picture_pool_configuration_t pool_cfg = {
-        .picture       = pictures,
-        .picture_count = pool_size,
-    };
-    sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
+    sys->sys.pool = picture_pool_New( pool_size, pictures );
 
 error:
     if (sys->sys.pool == NULL) {
-        picture_pool_configuration_t pool_cfg = {
-            .picture_count = 0,
-        };
         if (pictures) {
             msg_Dbg(vd, "Failed to create the picture d3d11 pool");
             for (unsigned i=0;i<picture_count; ++i)
@@ -650,7 +643,7 @@ error:
         }
 
         /* create an empty pool to avoid crashing */
-        sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
+        sys->sys.pool = picture_pool_New( 0, NULL );
     } else {
         msg_Dbg(vd, "D3D11 pool succeed with %d surfaces (%dx%d) context 0x%p",
                 pool_size, surface_fmt.i_width, surface_fmt.i_height, sys->d3d_dev.d3dcontext);
