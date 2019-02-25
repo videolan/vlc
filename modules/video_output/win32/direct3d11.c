@@ -566,7 +566,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     else
         vd->info.subpicture_chromas = NULL;
 
-    vd->pool    = Pool;
+    if (sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_UNKNOWN)
+        vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
@@ -607,10 +608,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     surface_fmt.i_width  = sys->picQuad.i_width;
     surface_fmt.i_height = sys->picQuad.i_height;
 
-    if (sys->picQuad.textureFormat->formatTexture == DXGI_FORMAT_UNKNOWN)
-        sys->sys.pool = picture_pool_NewFromFormat( &surface_fmt, pool_size );
-    else
-    {
         ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
         memset(textures, 0, sizeof(textures));
         unsigned slices = pool_size;
@@ -677,7 +674,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             //pool_cfg.unlock        = Direct3D11UnmapPoolTexture;
         }
         sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
-    }
 
 error:
     if (sys->sys.pool == NULL) {
