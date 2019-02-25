@@ -154,37 +154,6 @@ static void UpdatePicQuadPosition(vout_display_t *);
 
 static int Control(vout_display_t *, int, va_list);
 
-static int Direct3D11MapPoolTexture(picture_t *picture)
-{
-    picture_sys_t *p_sys = picture->p_sys;
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-    HRESULT hr;
-
-    ID3D11Device *dev;
-    ID3D11DeviceContext_GetDevice(p_sys->context, &dev);
-    ID3D11Device_Release(dev);
-
-#ifndef NDEBUG
-    D3D11_TEXTURE2D_DESC dsc;
-    ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &dsc);
-    assert(dsc.CPUAccessFlags & D3D11_CPU_ACCESS_WRITE);
-    assert(dsc.Usage & D3D11_USAGE_DYNAMIC);
-#endif
-
-    hr = ID3D11DeviceContext_Map(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], p_sys->slice_index, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-    if( FAILED(hr) )
-    {
-        return VLC_EGENERIC;
-    }
-    return CommonUpdatePicture(picture, NULL, mappedResource.pData, mappedResource.RowPitch);
-}
-
-static void Direct3D11UnmapPoolTexture(picture_t *picture)
-{
-    picture_sys_t *p_sys = picture->p_sys;
-    ID3D11DeviceContext_Unmap(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], 0);
-}
-
 #if VLC_WINSTORE_APP
 static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
 {
@@ -543,7 +512,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     if (Direct3D11Open(vd, fmtp)) {
         msg_Err(vd, "Direct3D11 could not be opened");
-        assert(!vd->info.is_slow); /* vd->info was not modified */
         goto error;
     }
 
@@ -601,9 +569,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if (sys->sys.pool)
         return sys->sys.pool;
 
-    if (!is_d3d11_opaque(vd->fmt.i_chroma))
-        pool_size = 1;
-
     video_format_t surface_fmt = vd->fmt;
     surface_fmt.i_width  = sys->picQuad.i_width;
     surface_fmt.i_height = sys->picQuad.i_height;
@@ -651,7 +616,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     }
 
 #ifdef HAVE_ID3D11VIDEODECODER
-    if (is_d3d11_opaque(surface_fmt.i_chroma) && !sys->legacy_shader)
+    if (!sys->legacy_shader)
 #endif
     {
         for (picture_count = 0; picture_count < pool_size; picture_count++) {
@@ -669,10 +634,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         .picture       = pictures,
         .picture_count = pool_size,
     };
-    if (!is_d3d11_opaque(surface_fmt.i_chroma)) {
-        pool_cfg.lock          = Direct3D11MapPoolTexture;
-        //pool_cfg.unlock        = Direct3D11UnmapPoolTexture;
-    }
     sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
 
 error:
@@ -926,13 +887,10 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     {
         picture_sys_t *p_sys = ActivePictureSys(picture);
 
-        if (is_d3d11_opaque(picture->format.i_chroma))
-            d3d11_device_lock( &sys->d3d_dev );
+        d3d11_device_lock( &sys->d3d_dev );
 
-        if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader) {
+        if (sys->legacy_shader) {
             D3D11_TEXTURE2D_DESC srcDesc,texDesc;
-            if (!is_d3d11_opaque(picture->format.i_chroma))
-                Direct3D11UnmapPoolTexture(picture);
             ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &srcDesc);
             ID3D11Texture2D_GetDesc(sys->stagingSys.texture[0], &texDesc);
             D3D11_BOX box = {
@@ -1039,7 +997,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             SleepEx(2, TRUE);
     }
 
-    if (is_d3d11_opaque(picture->format.i_chroma))
+    if (is_d3d11_opaque(picture->format.i_chroma) && sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_UNKNOWN)
         d3d11_device_unlock( &sys->d3d_dev );
 }
 
@@ -1632,7 +1590,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     }
 #endif
 
-    vd->info.is_slow = !is_d3d11_opaque(fmt->i_chroma) && sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_UNKNOWN;
+    vd->info.is_slow = false;
     return VLC_SUCCESS;
 }
 
