@@ -2,6 +2,7 @@ name: vlc
 version-script: cat $SNAPCRAFT_STAGE/version
 version: "daily"
 grade: stable
+base: core18
 summary: Read, capture, broadcast your multimedia streams
 description: |
   VLC is a free and open source cross-platform multimedia player and
@@ -171,9 +172,9 @@ parts:
       - libqt5gui5
       - librsvg2-2
       - libsecret-1-0
-      - libva-drm1
-      - libva-x11-1
-      - libva1
+      - libva-drm2
+      - libva-x11-2
+      - libva2
       - libvdpau1
       - libx11-6
       - libxcb-composite0
@@ -202,7 +203,6 @@ parts:
       - libgtk-3-0
       - liblua5.2-0
       - libmtp9
-      - libschroedinger-1.0-0
       - libupnp6
       - libzvbi0
       - libnotify4
@@ -210,6 +210,7 @@ parts:
       - libaacs0
       - mesa-vulkan-drivers
       - libvulkan-dev
+      - openjdk-8-jdk
     filesets:
       exclusion:
       - "-usr/lib/*/cmake/*"
