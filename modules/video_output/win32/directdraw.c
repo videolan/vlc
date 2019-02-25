@@ -50,6 +50,7 @@
 #include <commctrl.h>       /* ListView_(Get|Set)* */
 
 #include "common.h"
+#include "../video_chroma/copy.h"
 
 /* Unicode function "DirectDrawEnumerateExW" has been desactivated
    since in some cases this function fails and the callbacks are not
@@ -1248,7 +1249,7 @@ static int DirectXLock(vout_display_sys_t *sys, picture_t *picture)
                            sys->surface, &ddsd))
         return VLC_EGENERIC;
 
-    CommonUpdatePicture(picture, NULL, ddsd.lpSurface, ddsd.lPitch);
+    picture_UpdatePlanes(picture, ddsd.lpSurface, ddsd.lPitch);
     return VLC_SUCCESS;
 }
 static void DirectXUnlock(vout_display_sys_t *sys, picture_t *picture)

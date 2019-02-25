@@ -53,6 +53,7 @@
 
 #include "common.h"
 #include "builtin_shaders.h"
+#include "../video_chroma/copy.h"
 
 #include <assert.h>
 
@@ -1243,7 +1244,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         }
 
         picture_t fake_pic = *picture;
-        CommonUpdatePicture(&fake_pic, NULL, d3drect.pBits, d3drect.Pitch);
+        picture_UpdatePlanes(&fake_pic, d3drect.pBits, d3drect.Pitch);
         picture_CopyPixels(&fake_pic, picture);
         IDirect3DSurface9_UnlockRect(surface);
     }
