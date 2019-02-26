@@ -299,7 +299,7 @@ static struct vlc_logger discard_log = { &discard_ops, NULL };
  * A message log that can be redirected live.
  */
 struct vlc_logger_switch {
-    struct vlc_logger backend;
+    struct vlc_logger *backend;
     vlc_rwlock_t lock;
 };
 
@@ -307,22 +307,23 @@ static void vlc_vaLogSwitch(void *d, int type, const vlc_log_t *item,
                             const char *format, va_list ap)
 {
     struct vlc_logger_switch *logswitch = d;
+    struct vlc_logger *backend;
 
     vlc_rwlock_rdlock(&logswitch->lock);
-    logswitch->backend.ops->log(logswitch->backend.sys, type, item,
-                                format, ap);
+    backend = logswitch->backend;
+    backend->ops->log(backend->sys, type, item, format, ap);
     vlc_rwlock_unlock(&logswitch->lock);
 }
 
 static void vlc_LogSwitchClose(void *d)
 {
     struct vlc_logger_switch *logswitch = d;
-    struct vlc_logger backend = logswitch->backend;
+    struct vlc_logger *backend = logswitch->backend;
 
-    logswitch->backend.ops = &discard_ops;
+    logswitch->backend = &discard_log;
 
-    if (backend.ops->destroy != NULL)
-        backend.ops->destroy(backend.sys);
+    if (backend->ops->destroy != NULL)
+        backend->ops->destroy(backend->sys);
 
     vlc_rwlock_destroy(&logswitch->lock);
     free(logswitch);
@@ -333,27 +334,24 @@ static const struct vlc_logger_operations switch_ops = {
     vlc_LogSwitchClose,
 };
 
-static void vlc_LogSwitch(vlc_logger_t *logger,
-                          const struct vlc_logger_operations *ops,
-                          void *opaque)
+static void vlc_LogSwitch(vlc_logger_t *logger, vlc_logger_t *new_logger)
 {
     struct vlc_logger_switch *logswitch = logger->sys;
-    struct vlc_logger old_logger;
+    struct vlc_logger *old_logger;
 
     assert(logger->ops == &switch_ops);
     assert(logswitch != NULL);
 
-    if (ops == NULL)
-        ops = &discard_ops;
+    if (new_logger == NULL)
+        new_logger = &discard_log;
 
     vlc_rwlock_wrlock(&logswitch->lock);
     old_logger = logswitch->backend;
-    logswitch->backend.ops = ops;
-    logswitch->backend.sys = opaque;
+    logswitch->backend = new_logger;
     vlc_rwlock_unlock(&logswitch->lock);
 
-    if (old_logger.ops->destroy != NULL)
-        old_logger.ops->destroy(old_logger.sys);
+    if (old_logger->ops->destroy != NULL)
+        old_logger->ops->destroy(old_logger->sys);
 }
 
 static
@@ -363,7 +361,7 @@ const struct vlc_logger_operations *vlc_LogSwitchCreate(void **restrict sysp)
     if (unlikely(logswitch == NULL))
         return NULL;
 
-    logswitch->backend.ops = &discard_ops;
+    logswitch->backend = &discard_log;
     vlc_rwlock_init(&logswitch->lock);
     *sysp = logswitch;
     return &switch_ops;
@@ -443,7 +441,7 @@ void vlc_LogInit(libvlc_int_t *vlc)
     if (logger == NULL)
         logger = &discard_log;
 
-    vlc_LogSwitch(vlc->obj.logger, logger->ops, logger->sys);
+    vlc_LogSwitch(vlc->obj.logger, logger);
 }
 
 /**
@@ -574,15 +572,10 @@ void vlc_LogSet(libvlc_int_t *vlc, const struct vlc_logger_operations *ops,
     else
         logger = NULL;
 
-    if (logger != NULL) {
-        ops = logger->ops;
-        opaque = logger->sys;
-    } else {
-        ops = &discard_ops;
-        opaque = NULL;
-    }
+    if (logger == NULL)
+        logger = &discard_log;
 
-    vlc_LogSwitch(vlc->obj.logger, ops, opaque);
+    vlc_LogSwitch(vlc->obj.logger, logger);
 
     /* Announce who we are */
     msg_Dbg (vlc, "VLC media player - %s", VERSION_MESSAGE);
