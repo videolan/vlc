@@ -1246,6 +1246,16 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
     double scale[2];    // scale factor; sx = scale[0] , sy = scale[1]
     int32_t *matrix = p_box->data.p_tkhd->i_matrix;
 
+    int32_t fmatrix[9];
+    int64_t det = (int64_t)matrix[0] * matrix[4] - (int64_t)matrix[1] * matrix[3];
+    if (det < 0) {
+        /* If determinant is negative copy the matrix and flip it horizontally. */
+        const int flip[] = { -1, 1, 1 };
+        for (int j = 0; j < 9; j++)
+            matrix[j] *= flip[j % 3];
+        p_box->data.p_tkhd->i_flip = 1;
+    }
+
     scale[0] = sqrt(conv_fx(matrix[0]) * conv_fx(matrix[0]) +
                     conv_fx(matrix[3]) * conv_fx(matrix[3]));
     scale[1] = sqrt(conv_fx(matrix[1]) * conv_fx(matrix[1]) +

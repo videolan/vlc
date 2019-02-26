@@ -347,11 +347,24 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             p_track->fmt.video.orientation = ORIENT_ROTATED_90;
             break;
         case 180:
-            p_track->fmt.video.orientation = ORIENT_ROTATED_180;
+            if (p_track->i_flip == 1) {
+                p_track->fmt.video.orientation = ORIENT_VFLIPPED;
+            } else {
+                p_track->fmt.video.orientation = ORIENT_ROTATED_180;
+            }
             break;
         case 270:
             p_track->fmt.video.orientation = ORIENT_ROTATED_270;
             break;
+    }
+
+    /* Flip, unless already flipped */
+    if (p_track->i_flip == 1 && (int)p_track->f_rotation != 180) {
+    fprintf(stderr, "p_track->f_rotation %f flip %d\n", p_track->f_rotation, p_track->i_flip);
+        video_transform_t transform = (video_transform_t)p_track->fmt.video.orientation;
+        /* Flip first then rotate */
+        p_track->fmt.video.orientation = ORIENT_HFLIPPED;
+        video_format_TransformBy(&p_track->fmt.video, transform);
     }
 
     /* Set 360 video mode */

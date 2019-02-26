@@ -543,6 +543,7 @@ typedef struct MP4_Box_data_tkhd_s
     int32_t  i_width;
     int32_t  i_height;
     float    f_rotation;
+    int      i_flip;
 
 } MP4_Box_data_tkhd_t;
 

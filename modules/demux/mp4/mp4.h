@@ -98,6 +98,7 @@ typedef struct
     int i_width;
     int i_height;
     float f_rotation;
+    int i_flip;
 
     /* more internal data */
     uint32_t        i_timescale;    /* time scale for this track only */

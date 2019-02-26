@@ -3361,6 +3361,7 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
     p_track->i_width = BOXDATA(p_tkhd)->i_width / BLOCK16x16;
     p_track->i_height = BOXDATA(p_tkhd)->i_height / BLOCK16x16;
     p_track->f_rotation = BOXDATA(p_tkhd)->f_rotation;
+    p_track->i_flip = BOXDATA(p_tkhd)->i_flip;
 
     /* FIXME: unhandled box: tref */
 
