@@ -3082,6 +3082,8 @@ static void Ogg_ReadSkeletonHeader( demux_t *p_demux, logical_stream_t *p_stream
                                     ogg_packet *p_oggpacket )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    if( p_oggpacket->bytes < 12 )
+        return;
 
     p_sys->p_skelstream = p_stream;
     /* There can be only 1 skeleton for streams */
