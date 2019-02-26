@@ -116,22 +116,6 @@ static void get_rotation(es_format_t *fmt, AVStream *s)
     AVDictionaryEntry *rotation = av_dict_get(s->metadata, kRotateKey, NULL, 0);
     long angle = 0;
 
-    if( rotation )
-    {
-        angle = strtol(rotation->value, NULL, 10);
-
-        if (angle > 45 && angle < 135)
-            fmt->video.orientation = ORIENT_ROTATED_90;
-
-        else if (angle > 135 && angle < 225)
-            fmt->video.orientation = ORIENT_ROTATED_180;
-
-        else if (angle > 225 && angle < 315)
-            fmt->video.orientation = ORIENT_ROTATED_270;
-
-        else
-            fmt->video.orientation = ORIENT_NORMAL;
-    }
     int32_t *matrix = (int32_t *)av_stream_get_side_data(s, AV_PKT_DATA_DISPLAYMATRIX, NULL);
     if( matrix ) {
         angle = lround(av_display_rotation_get(matrix));
@@ -144,6 +128,21 @@ static void get_rotation(es_format_t *fmt, AVStream *s)
 
         else if (angle < -45 && angle > -135)
             fmt->video.orientation = ORIENT_ROTATED_90;
+
+        else
+            fmt->video.orientation = ORIENT_NORMAL;
+
+    } else if( rotation ) {
+        angle = strtol(rotation->value, NULL, 10);
+
+        if (angle > 45 && angle < 135)
+            fmt->video.orientation = ORIENT_ROTATED_90;
+
+        else if (angle > 135 && angle < 225)
+            fmt->video.orientation = ORIENT_ROTATED_180;
+
+        else if (angle > 225 && angle < 315)
+            fmt->video.orientation = ORIENT_ROTATED_270;
 
         else
             fmt->video.orientation = ORIENT_NORMAL;
