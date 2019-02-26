@@ -504,6 +504,51 @@ struct vlc_logger *vlc_LogHeaderCreate(struct vlc_logger *parent,
 }
 
 /**
+ * External custom log callback
+ */
+struct vlc_logger_external {
+    struct vlc_logger logger;
+    const struct vlc_logger_operations *ops;
+    void *opaque;
+};
+
+static void vlc_vaLogExternal(void *d, int type, const vlc_log_t *item,
+                              const char *format, va_list ap)
+{
+    struct vlc_logger_external *ext = d;
+
+    ext->ops->log(ext->opaque, type, item, format, ap);
+}
+
+static void vlc_LogExternalClose(void *d)
+{
+    struct vlc_logger_external *ext = d;
+
+    if (ext->ops->destroy != NULL)
+        ext->ops->destroy(ext->opaque);
+    free(ext);
+}
+
+static const struct vlc_logger_operations external_ops = {
+    vlc_vaLogExternal,
+    vlc_LogExternalClose,
+};
+
+static struct vlc_logger *
+vlc_LogExternalCreate(const struct vlc_logger_operations *ops, void *opaque)
+{
+    struct vlc_logger_external *ext = malloc(sizeof (*ext));
+    if (unlikely(ext == NULL))
+        return NULL;
+
+    ext->logger.ops = &external_ops;
+    ext->logger.sys = ext;
+    ext->ops = ops;
+    ext->opaque = opaque;
+    return &ext->logger;
+}
+
+/**
  * Sets the message logging callback.
  * \param ops message callback, or NULL to clear
  * \param data data pointer for the message callback
@@ -511,6 +556,21 @@ struct vlc_logger *vlc_LogHeaderCreate(struct vlc_logger *parent,
 void vlc_LogSet(libvlc_int_t *vlc, const struct vlc_logger_operations *ops,
                 void *opaque)
 {
+    struct vlc_logger *logger;
+
+    if (ops != NULL)
+        logger = vlc_LogExternalCreate(ops, opaque);
+    else
+        logger = NULL;
+
+    if (logger != NULL) {
+        ops = logger->ops;
+        opaque = logger->sys;
+    } else {
+        ops = &discard_ops;
+        opaque = NULL;
+    }
+
     vlc_LogSwitch(vlc->obj.logger, ops, opaque);
 
     /* Announce who we are */
