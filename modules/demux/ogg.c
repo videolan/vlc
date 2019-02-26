@@ -3146,6 +3146,8 @@ static void Ogg_ReadAnnodexHeader( demux_t *p_demux,
 static void Ogg_ReadSkeletonHeader( demux_t *p_demux, logical_stream_t *p_stream,
                                     ogg_packet *p_oggpacket )
 {
+    if( p_oggpacket->bytes < 12 )
+        return;
     p_demux->p_sys->p_skelstream = p_stream;
     /* There can be only 1 skeleton for streams */
     p_demux->p_sys->skeleton.major = GetWLE( &p_oggpacket->packet[8] );
