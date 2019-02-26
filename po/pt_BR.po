@@ -4,14 +4,14 @@
 #
 # Translators:
 # André de Barros Martins Ribeiro  <andrerib at ajato.com dot br>, 2003
-# ssdoria <ssdoria@gmail.com>, 2008-2019
+# Sidney Doria <ssdoria@gmail.com>, 2008-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
 "PO-Revision-Date: 2019-02-26 16:27+0100\n"
-"Last-Translator: ssdoria <ssdoria@gmail.com>, 2019\n"
+"Last-Translator: Sidney Doria <ssdoria@gmail.com>, 2019\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/yaron/"
 "teams/16553/pt_BR/)\n"
 "Language: pt_BR\n"
