@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_arrays.h>
+#include <cassert>
 
 using namespace adaptive::playlist;
 
@@ -63,6 +64,11 @@ void BasePeriod::addAdaptationSet(BaseAdaptationSet *adaptationSet)
 {
     if ( adaptationSet != NULL )
     {
+        if(adaptationSet->getRepresentations().empty())
+        {
+            assert(!adaptationSet->getRepresentations().empty());
+            return; /* will leak */
+        }
         adaptationSets.push_back(adaptationSet);
         childs.push_back(adaptationSet);
     }

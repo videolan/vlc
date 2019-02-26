@@ -248,7 +248,10 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
             for(it = qualLevels.begin(); it != qualLevels.end(); ++it)
                 ParseQualityLevel(adaptSet, *it, type, nextid++, id);
         }
-        period->addAdaptationSet(adaptSet);
+        if(!adaptSet->getRepresentations().empty())
+            period->addAdaptationSet(adaptSet);
+        else
+            delete adaptSet;
     }
 }
 

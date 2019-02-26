@@ -516,10 +516,13 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
         BaseAdaptationSet *adaptSet = new (std::nothrow) BaseAdaptationSet(period);
         if(adaptSet)
         {
-            period->addAdaptationSet(adaptSet);
             AttributesTag *tag = new AttributesTag(AttributesTag::EXTXSTREAMINF, "");
             tag->addAttribute(new Attribute("URI", playlisturl));
             createAndFillRepresentation(p_object, adaptSet, tag, tagslist);
+            if(!adaptSet->getRepresentations().empty())
+                period->addAdaptationSet(adaptSet);
+            else
+                delete adaptSet;
             delete tag;
         }
     }
