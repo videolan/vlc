@@ -155,6 +155,7 @@ struct vout_display_sys_t
 
     const d3d9_format_t     *sw_texture_fmt;  /* Rendering texture(s) format */
     IDirect3DSurface9       *dx_render;
+    picture_pool_t          *pool; /* hardware decoding pool */
 
     /* */
     bool                    reset_device;
@@ -292,11 +293,12 @@ error:
 
 static picture_pool_t *DisplayPool(vout_display_t *vd, unsigned count)
 {
-    if ( vd->sys->sys.pool != NULL )
-        return vd->sys->sys.pool;
-    vd->sys->sys.pool = Direct3D9CreatePicturePool(VLC_OBJECT(vd), &vd->sys->d3d_dev,
-        &vd->fmt, count);
-    return vd->sys->sys.pool;
+    if ( vd->sys->pool == NULL )
+    {
+        vd->sys->pool = Direct3D9CreatePicturePool(VLC_OBJECT(vd), &vd->sys->d3d_dev,
+                                                   &vd->fmt, count);
+    }
+    return vd->sys->pool;
 }
 
 /**
@@ -526,10 +528,10 @@ static void Direct3D9DestroyResources(vout_display_t *vd)
         IDirect3DSurface9_Release(vd->sys->dx_render);
         vd->sys->dx_render = NULL;
     }
-    if (vd->sys->sys.pool)
+    if (vd->sys->pool)
     {
-        picture_pool_Release(vd->sys->sys.pool);
-        vd->sys->sys.pool = NULL;
+        picture_pool_Release(vd->sys->pool);
+        vd->sys->pool = NULL;
     }
     Direct3D9DestroyShaders(vd);
 }

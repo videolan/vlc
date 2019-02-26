@@ -69,7 +69,6 @@ typedef struct vout_display_sys_win32_t
     RECT         rect_dest;
     RECT         rect_dest_clipped;
 
-    picture_pool_t *pool;
     vout_display_cfg_t vdcfg;
 
     bool use_desktop;     /* show video on desktop window ? */

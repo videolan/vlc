@@ -64,6 +64,7 @@ struct vout_display_sys_t
 
     vlc_gl_t              *gl;
     vout_display_opengl_t *vgl;
+    picture_pool_t        *pool;
 };
 
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
@@ -202,12 +203,12 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (!sys->sys.pool && vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
+    if (!sys->pool && vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
     {
-        sys->sys.pool = vout_display_opengl_GetPool(sys->vgl, count);
+        sys->pool = vout_display_opengl_GetPool(sys->vgl, count);
         vlc_gl_ReleaseCurrent (sys->gl);
     }
-    return sys->sys.pool;
+    return sys->pool;
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture,

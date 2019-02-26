@@ -102,6 +102,7 @@ struct vout_display_sys_t
     ID3D11Query              *prepareWait;
 
     picture_sys_t            stagingSys;
+    picture_pool_t           *pool; /* hardware decoding pool */
 
     ID3D11RenderTargetView   *swapchainTargetView[D3D11_MAX_SHADER_VIEW];
 
@@ -567,8 +568,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     picture_t *picture;
     unsigned  picture_count = 0;
 
-    if (sys->sys.pool)
-        return sys->sys.pool;
+    if (sys->pool)
+        return sys->pool;
 
     video_format_t surface_fmt = vd->fmt;
     surface_fmt.i_width  = sys->picQuad.i_width;
@@ -631,10 +632,10 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         }
     }
 
-    sys->sys.pool = picture_pool_New( pool_size, pictures );
+    sys->pool = picture_pool_New( pool_size, pictures );
 
 error:
-    if (sys->sys.pool == NULL) {
+    if (sys->pool == NULL) {
         if (pictures) {
             msg_Dbg(vd, "Failed to create the picture d3d11 pool");
             for (unsigned i=0;i<picture_count; ++i)
@@ -643,12 +644,12 @@ error:
         }
 
         /* create an empty pool to avoid crashing */
-        sys->sys.pool = picture_pool_New( 0, NULL );
+        sys->pool = picture_pool_New( 0, NULL );
     } else {
         msg_Dbg(vd, "D3D11 pool succeed with %d surfaces (%dx%d) context 0x%p",
                 pool_size, surface_fmt.i_width, surface_fmt.i_height, sys->d3d_dev.d3dcontext);
     }
-    return sys->sys.pool;
+    return sys->pool;
 }
 
 static void DestroyDisplayPoolPicture(picture_t *picture)
@@ -1675,10 +1676,10 @@ static void Direct3D11DestroyPool(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->sys.pool)
+    if (sys->pool)
     {
-        picture_pool_Release(sys->sys.pool);
-        sys->sys.pool = NULL;
+        picture_pool_Release(sys->pool);
+        sys->pool = NULL;
     }
 }
 
