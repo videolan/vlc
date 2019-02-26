@@ -1,17 +1,17 @@
 # Brazilian Portuguese translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # André de Barros Martins Ribeiro  <andrerib at ajato.com dot br>, 2003
-# ssdoria <ssdoria@gmail.com>, 2008-2018
+# ssdoria <ssdoria@gmail.com>, 2008-2019
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-09 01:17+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-02-26 16:27+0100\n"
+"Last-Translator: ssdoria <ssdoria@gmail.com>, 2019\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/yaron/"
 "teams/16553/pt_BR/)\n"
 "Language: pt_BR\n"
@@ -9520,7 +9520,7 @@ msgstr "Saída IceCAST"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Tamanho da chave criptográfica em bytes"
 
 #: modules/access_output/srt.c:57
 msgid "16 bytes"
@@ -9540,7 +9540,7 @@ msgstr "Saída de fluxo SRT"
 
 #: modules/access_output/srt.c:446
 msgid "Password for stream encryption"
-msgstr ""
+msgstr "Senha para criptografia do fluxo"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10713,7 +10713,7 @@ msgstr "Desabilitado"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Habilitado (somente para AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -16602,7 +16602,7 @@ msgstr "Capas"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Aplicar perfil na próxima execução"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17161,7 +17161,7 @@ msgstr "Ir ao item anterior"
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
 msgid "Leave fullscreen"
-msgstr ""
+msgstr "Desabilitar tela inteira"
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:80
@@ -18508,7 +18508,7 @@ msgstr "Estilo da interface"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:313
 msgid "Dark"
-msgstr "Escura"
+msgstr "Escuro"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:314
 msgid "Bright"
@@ -23892,9 +23892,8 @@ msgid "avparser packetizer"
 msgstr "Empacotador avparser"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Empacotador de vídeo Daala"
+msgstr "Empacotador de vídeo AV1"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -24095,8 +24094,8 @@ msgid ""
 "This enables actual parsing of the announces by the SAP module. Otherwise, "
 "all announcements are parsed by the \"live555\" (RTP/RTSP) module."
 msgstr ""
-"Habilita a leitura real dos anúncios do módulo SAP. Senão, todos os anúncios "
-"são lidos pelo módulo \"live555\" (RTP/RTSP)."
+"Habilita a análise real dos anúncios do módulo SAP. Senão, todos os anúncios "
+"são analisados pelo módulo \"live555\" (RTP/RTSP)."
 
 #: modules/services_discovery/sap.c:95
 msgid "SAP Strict mode"
@@ -27316,7 +27315,7 @@ msgstr "Pós processamento"
 
 #: modules/video_filter/postproc.c:238
 msgid "Lowest"
-msgstr "O Menor"
+msgstr "O mais baixo"
 
 #: modules/video_filter/postproc.c:241
 msgid "Highest"
