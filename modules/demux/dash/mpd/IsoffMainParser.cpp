@@ -264,7 +264,11 @@ void    IsoffMainParser::parseAdaptationSets  (Node *periodNode, Period *period)
         parseSegmentInformation(*it, adaptationSet, &nextid);
 
         parseRepresentations((*it), adaptationSet);
-        period->addAdaptationSet(adaptationSet);
+
+        if(!adaptationSet->getRepresentations().empty())
+            period->addAdaptationSet(adaptationSet);
+        else
+            delete adaptationSet;
     }
 }
 void    IsoffMainParser::parseRepresentations (Node *adaptationSetNode, AdaptationSet *adaptationSet)
