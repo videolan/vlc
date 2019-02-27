@@ -49,13 +49,6 @@ struct vlc_common_members
      * See \ref module_need().
      */
     bool force;
-
-    /** Parent object
-     *
-     * The parent VLC object in the objects tree. For the root (the LibVLC
-     * instance) object, this is NULL.
-     */
-    vlc_object_t *parent;
 };
 
 /**

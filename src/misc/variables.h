@@ -37,6 +37,7 @@ typedef struct vlc_object_internals vlc_object_internals_t;
 struct vlc_object_internals
 {
     alignas (max_align_t) /* ensure vlc_externals() is maximally aligned */
+    vlc_object_t *parent; /**< Parent object (or NULL) */
     const char *typename; /**< Object type human-readable name */
     char           *psz_name; /* given name */
 

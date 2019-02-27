@@ -224,7 +224,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         obj->obj.no_interact = parent->obj.no_interact;
 
         /* Attach the child to its parent (no lock needed) */
-        obj->obj.parent = vlc_object_hold (parent);
+        priv->parent = vlc_object_hold(parent);
 
         /* Attach the parent to its child (structure lock needed) */
         vlc_mutex_lock (&papriv->tree_lock);
@@ -234,7 +234,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     else
     {
         obj->obj.no_interact = false;
-        obj->obj.parent = NULL;
+        priv->parent = NULL;
 
         /* TODO: should be in src/libvlc.c */
         int canc = vlc_savecancel ();
@@ -285,7 +285,7 @@ const char *vlc_object_typename(const vlc_object_t *obj)
 
 vlc_object_t *(vlc_object_parent)(vlc_object_t *obj)
 {
-    return obj->obj.parent;
+    return vlc_internals(obj)->parent;
 }
 
 static vlc_mutex_t name_lock = VLC_STATIC_MUTEX;
@@ -333,7 +333,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     if( p_priv->pf_destructor )
         p_priv->pf_destructor( p_this );
 
-    if (unlikely(p_this->obj.parent == NULL))
+    if (unlikely(p_priv->parent == NULL))
     {
         /* TODO: should be in src/libvlc.c */
         var_DelCallback (p_this, "vars", VarsCommand, NULL);
