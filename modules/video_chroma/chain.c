@@ -171,7 +171,7 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
     }
 
     int type = VLC_VAR_INTEGER;
-    if( var_Type( p_filter->obj.parent, "chain-level" ) != 0 )
+    if( var_Type( vlc_object_parent(p_filter), "chain-level" ) != 0 )
         type |= VLC_VAR_DOINHERIT;
 
     var_Create( p_filter, "chain-level", type );
@@ -233,7 +233,7 @@ static int ActivateFilter( vlc_object_t *p_this )
     if( !p_filter->b_allow_fmt_out_change || p_filter->psz_name == NULL )
         return VLC_EGENERIC;
 
-    if( var_Type( p_filter->obj.parent, "chain-filter-level" ) != 0 )
+    if( var_Type( vlc_object_parent(p_filter), "chain-filter-level" ) != 0 )
         return VLC_EGENERIC;
 
     var_Create( p_filter, "chain-filter-level", VLC_VAR_INTEGER );

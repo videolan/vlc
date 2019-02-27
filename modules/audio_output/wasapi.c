@@ -480,7 +480,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
 
     if (fmt.i_format == VLC_CODEC_DTS)
     {
-        b_dtshd = var_GetBool(s->obj.parent, "dtshd");
+        b_dtshd = var_GetBool(vlc_object_parent(s), "dtshd");
         if (b_dtshd)
         {
             b_hdmi = true;
@@ -553,7 +553,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
                      "fallback to 48kHz (S/PDIF) (error 0x%lx)", hr);
             IAudioClient_Release(sys->client);
             free(sys);
-            var_SetBool(s->obj.parent, "dtshd", false);
+            var_SetBool(vlc_object_parent(s), "dtshd", false);
             return Start(s, pfmt, sid);
         }
         msg_Err(s, "cannot negotiate audio format (error 0x%lx)%s", hr,

@@ -53,8 +53,9 @@ stream_t *vlc_stream_FilterNew( stream_t *p_source,
     assert(p_source != NULL);
 
     struct vlc_stream_filter_private *priv;
-    stream_t *s = vlc_stream_CustomNew(p_source->obj.parent, StreamDelete,
-                                       sizeof (*priv), "stream filter");
+    stream_t *s = vlc_stream_CustomNew(vlc_object_parent(p_source),
+                                       StreamDelete, sizeof (*priv),
+                                       "stream filter");
     if( s == NULL )
         return NULL;
 

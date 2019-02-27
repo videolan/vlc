@@ -427,7 +427,7 @@ protected:
 static void on_paused_changed_cb( void *data, bool paused )
 {
     demux_t *p_demux = reinterpret_cast<demux_t*>(data);
-    vlc_object_t *obj = p_demux->p_next->obj.parent;
+    vlc_object_t *obj = vlc_object_parent(p_demux->p_next);
 
     /* XXX: Ugly: Notify the parent of the input_thread_t that the corks state
      * changed */
@@ -440,7 +440,7 @@ static void on_paused_changed_cb( void *data, bool paused )
             ( paused ? var_IncInteger : var_DecInteger )( obj, "corks" );
             return;
         }
-        obj = obj->obj.parent;
+        obj = vlc_object_parent(obj);
     }
 }
 

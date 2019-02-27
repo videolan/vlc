@@ -93,7 +93,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->f_gain = var_InheritFloat( p_filter->obj.parent, "gain-value" );
+    p_sys->f_gain = var_InheritFloat( vlc_object_parent(p_filter),
+                                      "gain-value" );
     msg_Dbg( p_filter, "gain multiplier sets to %.2fx", p_sys->f_gain );
 
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;

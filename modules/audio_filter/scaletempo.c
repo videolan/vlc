@@ -501,7 +501,7 @@ static int OpenPitch( vlc_object_t *p_this )
         return err;
 
     filter_t     *p_filter = (filter_t *)p_this;
-    vlc_object_t *p_aout = p_filter->obj.parent;
+    vlc_object_t *p_aout = vlc_object_parent(p_filter);
     filter_sys_t *p_sys = p_filter->p_sys;
 
     float pitch_shift  = var_CreateGetFloat( p_aout, "pitch-shift" );
@@ -535,7 +535,7 @@ static void ClosePitch( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
-    vlc_object_t *p_aout = p_filter->obj.parent;
+    vlc_object_t *p_aout = vlc_object_parent(p_filter);
     var_DelCallback( p_aout, "pitch-shift", PitchCallback, p_sys );
     var_Destroy( p_aout, "pitch-shift" );
     module_unneed( p_sys->resampler, p_sys->resampler->p_module );

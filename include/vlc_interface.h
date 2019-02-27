@@ -93,7 +93,7 @@ VLC_API void libvlc_Quit( libvlc_int_t * );
 
 static inline playlist_t *pl_Get( struct intf_thread_t *intf )
 {
-    return (playlist_t *)(intf->obj.parent);
+    return (playlist_t *)vlc_object_parent(intf);
 }
 
 VLC_API vlc_playlist_t *

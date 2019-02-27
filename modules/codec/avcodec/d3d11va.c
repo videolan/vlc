@@ -777,7 +777,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 #if !D3D11_DIRECT_DECODE
         size_t surface_idx;
         for (surface_idx = 0; surface_idx < surface_count; surface_idx++) {
-            picture_t *pic = decoder_NewPicture( (decoder_t*) va->obj.parent );
+            picture_t *pic = decoder_NewPicture( (decoder_t*) vlc_object_parent(va) );
             sys->extern_pics[surface_idx] = pic;
             dx_sys->hw_surface[surface_idx] = NULL;
             if (pic==NULL)

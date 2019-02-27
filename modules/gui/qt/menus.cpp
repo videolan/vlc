@@ -1090,7 +1090,7 @@ QMenu* VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
         /* In skins interface, append some items */
         if( p_intf->p_sys->b_isDialogProvider )
         {
-            vlc_object_t* p_object = p_intf->obj.parent;
+            vlc_object_t* p_object = vlc_object_parent(p_intf);
             submenu->setTitle( qtr( "Interface" ) );
 
             /* Open skin dialog box */

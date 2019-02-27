@@ -279,7 +279,7 @@ static int DeviceSelect(audio_output_t *aout, const char* psz_device)
     if (aout->sys->client == (IAudioClient*)ptr)
         return VLC_SUCCESS;
     aout->sys->client = (IAudioClient*)ptr;
-    var_SetAddress( aout->obj.parent, "winstore-client", aout->sys->client );
+    var_SetAddress( vlc_object_parent(aout), "winstore-client", aout->sys->client );
     aout_RestartRequest( aout, AOUT_RESTART_OUTPUT );
     return VLC_SUCCESS;
 }
@@ -294,7 +294,7 @@ static int Open(vlc_object_t *obj)
 
     aout->sys = sys;
     sys->stream = NULL;
-    aout->sys->client = var_CreateGetAddress( aout->obj.parent, "winstore-client" );
+    aout->sys->client = var_CreateGetAddress( vlc_object_parent(aout), "winstore-client" );
     if (aout->sys->client != NULL)
         msg_Dbg( aout, "Reusing previous client: %p", aout->sys->client );
     aout->start = Start;

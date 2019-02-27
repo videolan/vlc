@@ -282,7 +282,7 @@ static int EqzInit( filter_t *p_filter, int i_rate )
     eqz_config_t cfg;
     int i, ch;
     vlc_value_t val1, val2, val3;
-    vlc_object_t *p_aout = p_filter->obj.parent;
+    vlc_object_t *p_aout = vlc_object_parent(p_filter);
     int i_ret = VLC_ENOMEM;
 
     bool b_vlcFreqs = var_InheritBool( p_aout, "equalizer-vlcfreqs" );
@@ -451,7 +451,7 @@ static void EqzFilter( filter_t *p_filter, float *out, float *in,
 static void EqzClean( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    vlc_object_t *p_aout = p_filter->obj.parent;
+    vlc_object_t *p_aout = vlc_object_parent(p_filter);
 
     var_DelCallback( p_aout, "equalizer-bands", BandsCallback, p_sys );
     var_DelCallback( p_aout, "equalizer-preset", PresetCallback, p_sys );

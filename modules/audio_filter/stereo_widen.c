@@ -117,7 +117,7 @@ static int MakeRingBuffer( float **pp_buffer, size_t *pi_buffer,
 static int Open( vlc_object_t *obj )
 {
     filter_t *p_filter  = (filter_t *)obj;
-    vlc_object_t *p_aout = p_filter->obj.parent;
+    vlc_object_t *p_aout = vlc_object_parent(p_filter);
     filter_sys_t *p_sys;
 
     if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
@@ -197,7 +197,7 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
 static void Close( vlc_object_t *obj )
 {
     filter_t *p_filter  = (filter_t *)obj;
-    vlc_object_t *p_aout = p_filter->obj.parent;
+    vlc_object_t *p_aout = vlc_object_parent(p_filter);
     filter_sys_t *p_sys = p_filter->p_sys;
 
 #define DEL_VAR(var) \

@@ -1337,7 +1337,7 @@ static int Init( input_thread_t * p_input )
     input_ChangeState( p_input, OPENING_S );
     input_SendEventCache( p_input, 0.0 );
 
-    if( var_Type( p_input->obj.parent, "meta-file" ) )
+    if( var_Type( vlc_object_parent(p_input), "meta-file" ) )
     {
         msg_Dbg( p_input, "Input is a meta file: disabling unneeded options" );
         var_SetString( p_input, "sout", "" );

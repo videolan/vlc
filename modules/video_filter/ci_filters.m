@@ -665,8 +665,8 @@ Open(vlc_object_t *obj, char const *psz_filter)
         if (Open_CreateFilters(filter, &ctx->fchain, filter_types))
             goto error;
 
-        var_Create(filter->obj.parent, "ci-filters-ctx", VLC_VAR_ADDRESS);
-        var_SetAddress(filter->obj.parent, "ci-filters-ctx", ctx);
+        var_Create(vlc_object_parent(filter), "ci-filters-ctx", VLC_VAR_ADDRESS);
+        var_SetAddress(vlc_object_parent(filter), "ci-filters-ctx", ctx);
     }
     else if (Open_CreateFilters(filter, &ctx->fchain, filter_types))
         goto error;
@@ -753,7 +753,7 @@ Close(vlc_object_t *obj)
         if (ctx->cvpx_pool)
             CVPixelBufferPoolRelease(ctx->cvpx_pool);
         free(ctx);
-        var_Destroy(filter->obj.parent, "ci-filters-ctx");
+        var_Destroy(vlc_object_parent(filter), "ci-filters-ctx");
     }
     free(p_sys);
 }

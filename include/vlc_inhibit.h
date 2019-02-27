@@ -50,7 +50,7 @@ struct vlc_inhibit
 
 static inline struct vout_window_t *vlc_inhibit_GetWindow(vlc_inhibit_t *ih)
 {
-    return (struct vout_window_t *)(ih->obj.parent);
+    return (struct vout_window_t *)vlc_object_parent(ih);
 }
 
 static inline void vlc_inhibit_Set (vlc_inhibit_t *ih, unsigned flags)

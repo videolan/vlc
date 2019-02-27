@@ -60,15 +60,16 @@
 
 static void PrintObjectPrefix(vlc_object_t *obj, bool last)
 {
+    vlc_object_t *parent = vlc_object_parent(obj);
     const char *str;
 
-    if (obj->obj.parent == NULL)
+    if (parent == NULL)
         return;
 
-    PrintObjectPrefix(obj->obj.parent, false);
+    PrintObjectPrefix(parent, false);
 
     if (vlc_list_is_last(&vlc_internals(obj)->siblings,
-                         &vlc_internals(obj->obj.parent)->children))
+                         &vlc_internals(parent)->children))
         str = last ? " \xE2\x94\x94" : "  ";
     else
         str = last ? " \xE2\x94\x9C" : " \xE2\x94\x82";
@@ -174,7 +175,7 @@ static int VarsCommand (vlc_object_t *obj, char const *cmd,
         vlc_object_hold (obj);
 
     printf(" o %p %s, parent %p\n", (void *)obj, vlc_object_typename(obj),
-           (void *)obj->obj.parent);
+           (void *)vlc_object_parent(obj));
     DumpVariables (obj);
     vlc_object_release (obj);
 
@@ -453,7 +454,7 @@ void vlc_object_release (vlc_object_t *obj)
         assert (refs > 0);
     }
 
-    vlc_object_t *parent = obj->obj.parent;
+    vlc_object_t *parent = vlc_object_parent(obj);
 
     if (unlikely(parent == NULL))
     {   /* Destroying the root object */

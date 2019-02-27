@@ -135,9 +135,13 @@ VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
 VLC_USED
 static inline libvlc_int_t *vlc_object_instance(vlc_object_t *obj)
 {
-    while (obj->obj.parent != NULL)
-        obj = obj->obj.parent;
-    return (libvlc_int_t *)obj;
+    vlc_object_t *parent;
+
+    do
+        parent = obj;
+    while ((obj = vlc_object_parent(obj)) != NULL);
+
+    return (libvlc_int_t *)parent;
 }
 #define vlc_object_instance(o) vlc_object_instance(VLC_OBJECT(o))
 

@@ -340,7 +340,7 @@ int WindowOpen(vout_window_t *p_wnd)
 
     [newVideoWindow setAlphaValue: config_GetFloat("macosx-opaqueness")];
 
-    [voutView setVoutThread:(vout_thread_t *)p_wnd->obj.parent];
+    [voutView setVoutThread:(vout_thread_t *)vlc_object_parent(p_wnd)];
     [newVideoWindow setHasActiveVideo: YES];
     [voutWindows setObject:newVideoWindow forKey:[NSValue valueWithPointer:p_wnd]];
 
@@ -367,7 +367,7 @@ int WindowOpen(vout_window_t *p_wnd)
 
         // this is not set when we start in fullscreen because of
         // fullscreen settings in video prefs the second time
-        var_SetBool(p_wnd->obj.parent, "fullscreen", 1);
+        var_SetBool(vlc_object_parent(p_wnd), "fullscreen", 1);
 
         [self setFullscreen:1 forWindow:p_wnd withAnimation:NO];
     }

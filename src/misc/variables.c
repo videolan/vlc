@@ -1037,7 +1037,7 @@ int var_Inherit( vlc_object_t *p_this, const char *psz_name, int i_type,
                  vlc_value_t *p_val )
 {
     i_type &= VLC_VAR_CLASS;
-    for( vlc_object_t *obj = p_this; obj != NULL; obj = obj->obj.parent )
+    for (vlc_object_t *obj = p_this; obj != NULL; obj = vlc_object_parent(obj))
     {
         if( var_GetChecked( obj, psz_name, i_type, p_val ) == VLC_SUCCESS )
             return VLC_SUCCESS;

@@ -420,7 +420,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 
     /* set up the playlist to work on */
     if( isDialogProvider )
-        p_sys->p_playlist = pl_Get( (intf_thread_t *)p_intf->obj.parent );
+        p_sys->p_playlist = pl_Get( (intf_thread_t *)vlc_object_parent(p_intf) );
     else
         p_sys->p_playlist = pl_Get( p_intf );
 
