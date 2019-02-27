@@ -93,9 +93,7 @@ MarshalCanSetFullscreen( intf_thread_t *p_intf, DBusMessageIter *container )
 
     if (p_intf->p_sys->p_input)
     {
-        p_input = (input_thread_t*) vlc_object_hold( p_intf->p_sys->p_input );
-        vout_thread_t* p_vout = input_GetVout( p_input );
-        vlc_object_release( p_input );
+        vout_thread_t* p_vout = input_GetVout( p_intf->p_sys->p_input );
 
         if ( p_vout )
         {
@@ -138,9 +136,7 @@ DBUS_METHOD( FullscreenSet )
 
     if (INTF->p_sys->p_input)
     {
-        p_input = (input_thread_t*) vlc_object_hold( INTF->p_sys->p_input );
-        vout_thread_t* p_vout = input_GetVout( p_input );
-        vlc_object_release( p_input );
+        vout_thread_t* p_vout = input_GetVout( INTF->p_sys->p_input );
 
         if ( p_vout )
             var_SetBool( p_vout, "fullscreen", ( b_fullscreen == TRUE ) );
