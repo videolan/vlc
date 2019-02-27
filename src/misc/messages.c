@@ -53,7 +53,6 @@ static void vlc_LogSpam(vlc_object_t *obj)
 
 struct vlc_logger {
     const struct vlc_logger_operations *ops;
-    void *sys;
 };
 
 static void vlc_vaLogCallback(vlc_logger_t *logger, int type,
@@ -283,7 +282,6 @@ static struct vlc_logger *vlc_LogEarlyOpen(struct vlc_logger *logger)
         return NULL;
 
     early->logger.ops = &early_ops;
-    early->logger.sys = early;
     vlc_mutex_init(&early->lock);
     early->head = NULL;
     early->tailp = &early->head;
@@ -307,7 +305,7 @@ static const struct vlc_logger_operations discard_ops = {
     vlc_LogDiscardClose,
 };
 
-static struct vlc_logger discard_log = { &discard_ops, NULL };
+static struct vlc_logger discard_log = { &discard_ops };
 
 /**
  * Switchable message log.
@@ -379,7 +377,6 @@ static struct vlc_logger *vlc_LogSwitchCreate(void)
         return NULL;
 
     logswitch->frontend.ops = &switch_ops;
-    logswitch->frontend.sys = logswitch;
     logswitch->backend = &discard_log;
     vlc_rwlock_init(&logswitch->lock);
     return &logswitch->frontend;
@@ -391,7 +388,8 @@ static struct vlc_logger *vlc_LogSwitchCreate(void)
 struct vlc_logger_module {
     struct vlc_common_members obj;
     struct vlc_logger frontend;
-    struct vlc_logger backend;
+    const struct vlc_logger_operations *ops;
+    void *opaque;
 };
 
 static int vlc_logger_load(void *func, va_list ap)
@@ -400,8 +398,8 @@ static int vlc_logger_load(void *func, va_list ap)
                                                     void **) = func;
     struct vlc_logger_module *module = va_arg(ap, struct vlc_logger_module *);
 
-    module->backend.ops = activate(VLC_OBJECT(module), &module->backend.sys);
-    return (module->backend.ops != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
+    module->ops = activate(VLC_OBJECT(module), &module->opaque);
+    return (module->ops != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static void vlc_vaLogModule(void *d, int type, const vlc_log_t *item,
@@ -410,9 +408,8 @@ static void vlc_vaLogModule(void *d, int type, const vlc_log_t *item,
     struct vlc_logger *logger = d;
     struct vlc_logger_module *module =
         container_of(logger, struct vlc_logger_module, frontend);
-    struct vlc_logger *backend = &module->backend;
 
-    backend->ops->log(backend->sys, type, item, format, ap);
+    module->ops->log(module->opaque, type, item, format, ap);
 }
 
 static void vlc_LogModuleClose(void *d)
@@ -420,10 +417,9 @@ static void vlc_LogModuleClose(void *d)
     struct vlc_logger *logger = d;
     struct vlc_logger_module *module =
         container_of(logger, struct vlc_logger_module, frontend);
-    struct vlc_logger *backend = &module->backend;
 
-    if (backend->ops->destroy != NULL)
-        backend->ops->destroy(backend->sys);
+    if (module->ops->destroy != NULL)
+        module->ops->destroy(module->opaque);
 
     vlc_object_release(VLC_OBJECT(module));
 }
@@ -449,7 +445,6 @@ static struct vlc_logger *vlc_LogModuleCreate(vlc_object_t *parent)
     }
 
     module->frontend.ops = &module_ops;
-    module->frontend.sys = module;
     return &module->frontend;
 }
 
@@ -526,7 +521,6 @@ struct vlc_logger *vlc_LogHeaderCreate(struct vlc_logger *parent,
         return NULL;
 
     header->logger.ops = &header_ops;
-    header->logger.sys = header;
     header->parent = parent;
     memcpy(header->header, str, len);
     return &header->logger;
@@ -571,7 +565,6 @@ vlc_LogExternalCreate(const struct vlc_logger_operations *ops, void *opaque)
         return NULL;
 
     ext->logger.ops = &external_ops;
-    ext->logger.sys = ext;
     ext->ops = ops;
     ext->opaque = opaque;
     return &ext->logger;
