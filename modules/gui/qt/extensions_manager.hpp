@@ -62,11 +62,9 @@ public:
     inline bool isUnloading() { return b_unloading; }
     void menu( QMenu *current );
 
-    /** Get the extensions_manager_t if it is loaded and hold the object */
+    /** Get the extensions_manager_t if it is loaded */
     extensions_manager_t* getManager()
     {
-        if( !p_extensions_manager ) return NULL;
-        vlc_object_hold( p_extensions_manager );
         return p_extensions_manager;
     }
 
