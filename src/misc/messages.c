@@ -471,8 +471,10 @@ int vlc_LogPreinit(libvlc_int_t *vlc)
     vlc->obj.logger = logger;
 
     struct vlc_logger *early = vlc_LogEarlyOpen(logger);
-    if (early != NULL)
-        vlc_LogSet(vlc, early->ops, early->sys);
+    if (early != NULL) {
+        vlc_LogSwitch(logger, early);
+        vlc_LogSpam(VLC_OBJECT(vlc));
+    }
     return 0;
 }
 
