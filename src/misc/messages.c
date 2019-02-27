@@ -483,7 +483,7 @@ static void vlc_vaLogHeader(void *d, int type, const vlc_log_t *item,
 
 static const struct vlc_logger_operations header_ops = {
     vlc_vaLogHeader,
-    NULL,
+    free,
 };
 
 struct vlc_logger *vlc_LogHeaderCreate(struct vlc_logger *parent,
@@ -494,8 +494,6 @@ struct vlc_logger *vlc_LogHeaderCreate(struct vlc_logger *parent,
     if (unlikely(header == NULL))
         return NULL;
 
-    static_assert (offsetof (struct vlc_logger_header, logger) == 0,
-                   "Bad free");
     header->logger.ops = &header_ops;
     header->logger.sys = header;
     header->parent = parent;
@@ -584,6 +582,4 @@ void vlc_LogDestroy(vlc_logger_t *logger)
 {
     if (logger->ops->destroy != NULL)
         logger->ops->destroy(logger->sys);
-
-    free(logger);
 }
