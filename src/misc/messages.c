@@ -42,6 +42,15 @@
 #include <vlc_modules.h>
 #include "../libvlc.h"
 
+static void vlc_LogSpam(vlc_object_t *obj)
+{
+    /* Announce who we are */
+    msg_Dbg(obj, "VLC media player - %s", VERSION_MESSAGE);
+    msg_Dbg(obj, "%s", COPYRIGHT_MESSAGE);
+    msg_Dbg(obj, "revision %s", psz_vlc_changeset);
+    msg_Dbg(obj, "configured with %s", CONFIGURE_LINE);
+}
+
 struct vlc_logger {
     const struct vlc_logger_operations *ops;
     void *sys;
@@ -571,12 +580,7 @@ void vlc_LogSet(libvlc_int_t *vlc, const struct vlc_logger_operations *ops,
         logger = &discard_log;
 
     vlc_LogSwitch(vlc->obj.logger, logger);
-
-    /* Announce who we are */
-    msg_Dbg (vlc, "VLC media player - %s", VERSION_MESSAGE);
-    msg_Dbg (vlc, "%s", COPYRIGHT_MESSAGE);
-    msg_Dbg (vlc, "revision %s", psz_vlc_changeset);
-    msg_Dbg (vlc, "configured with %s", CONFIGURE_LINE);
+    vlc_LogSpam(VLC_OBJECT(vlc));
 }
 
 void vlc_LogDestroy(vlc_logger_t *logger)
