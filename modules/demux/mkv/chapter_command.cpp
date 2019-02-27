@@ -716,7 +716,7 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
         }
 
         std::string st = sz_command.substr( i+1, j-i-1 );
-        int64_t i_chapter_uid = atoi( st.c_str() );
+        int64_t i_chapter_uid = atoll( st.c_str() );
 
         virtual_segment_c *p_vsegment;
         virtual_chapter_c *p_vchapter = sys.FindChapter( i_chapter_uid, p_vsegment );
