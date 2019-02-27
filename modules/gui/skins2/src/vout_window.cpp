@@ -48,8 +48,6 @@ VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
 
     if( m_pWnd )
     {
-        vlc_object_hold( m_pWnd );
-
         updateWindowConfiguration( m_pWnd );
 
         m_pTimer = pOsFactory->createOSTimer( m_cmdHideMouse );
@@ -62,7 +60,6 @@ VoutWindow::~VoutWindow()
     if( m_pWnd )
     {
         delete m_pTimer;
-        vlc_object_release( m_pWnd );
     }
 }
 
