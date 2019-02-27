@@ -44,6 +44,9 @@
  * The possible extensions for subtitle files we support
  */
 static const char *const sub_exts[] = { SLAVE_SPU_EXTENSIONS, "" };
+/* As core can't handle non default program hijacking by slaves,
+ * we need to disable any SPU slave for those masters for now */
+static const char *const noslave_exts[] = { "m2ts", "ts" };
 
 static void strcpy_trim( char *d, const char *s )
 {
@@ -228,6 +231,19 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
     char *psz_fname = vlc_uri2path( psz_name_org );
     if( !psz_fname )
         return VLC_EGENERIC;
+
+    const char *ext = strrchr( psz_fname, '.' );
+    if( ext != NULL )
+    {
+        for( size_t i=0; i<ARRAY_SIZE(noslave_exts); i++ )
+        {
+            if( !strcasecmp( &ext[1], noslave_exts[i] ) )
+            {
+                free( psz_fname );
+                return VLC_EGENERIC;
+            }
+        }
+    }
 
     /* extract filename & dirname from psz_fname */
     char *f_dir = strdup( psz_fname );
