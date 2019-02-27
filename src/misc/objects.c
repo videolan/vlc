@@ -282,6 +282,11 @@ const char *vlc_object_typename(const vlc_object_t *obj)
     return vlc_internals(obj)->typename;
 }
 
+vlc_object_t *(vlc_object_parent)(vlc_object_t *obj)
+{
+    return obj->obj.parent;
+}
+
 static vlc_mutex_t name_lock = VLC_STATIC_MUTEX;
 
 #undef vlc_object_set_name

@@ -675,6 +675,7 @@ vlc_object_find_name
 vlc_object_hold
 vlc_object_release
 vlc_object_typename
+vlc_object_parent
 vlc_object_get_name
 vlc_once
 vlc_rand_bytes

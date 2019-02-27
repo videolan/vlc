@@ -109,6 +109,16 @@ VLC_API size_t vlc_list_children(vlc_object_t *, vlc_object_t **, size_t) VLC_US
  */
 VLC_API const char *vlc_object_typename(const vlc_object_t *obj) VLC_USED;
 
+/**
+ * Gets the parent of an object.
+ *
+ * \return the parent object (NULL if none)
+ *
+ * \note The returned parent object pointer is valid as long as the child is.
+ */
+VLC_API vlc_object_t *vlc_object_parent(vlc_object_t *obj) VLC_USED;
+#define vlc_object_parent(o) vlc_object_parent(VLC_OBJECT(o))
+
 VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
 
 #define vlc_object_create(a,b) vlc_object_create( VLC_OBJECT(a), b )
