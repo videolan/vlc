@@ -491,9 +491,9 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++ )
                 {
-                    if( p_glyph->bitmap.buffer[y * p_glyph->bitmap.width + x] )
+                    if( p_glyph->bitmap.buffer[y * p_glyph->bitmap.pitch + x] )
                         p_dst[(i_glyph_y + y) * i_pitch + (i_glyph_x + x)] =
-                            (p_glyph->bitmap.buffer[y * p_glyph->bitmap.width + x] + 8)/16;
+                            (p_glyph->bitmap.buffer[y * p_glyph->bitmap.pitch + x] + 8)/16;
                 }
             }
         }
@@ -681,7 +681,7 @@ static inline void BlendAXYZGlyph( picture_t *p_picture,
         for( unsigned int dx = 0; dx < p_glyph->bitmap.width; dx++ )
             BlendPixel( p_picture, i_picture_x + dx, i_picture_y + dy,
                         i_a, i_x, i_y, i_z,
-                        p_glyph->bitmap.buffer[dy * p_glyph->bitmap.width + dx] );
+                        p_glyph->bitmap.buffer[dy * p_glyph->bitmap.pitch + dx] );
     }
 }
 
