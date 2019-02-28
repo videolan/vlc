@@ -633,6 +633,11 @@ static const char *const ppsz_prefres[] = {
     N_("Very Low Definition (240 lines)"),
 };
 
+#define INPUT_LOWDELAY_TEXT N_("Low delay mode")
+#define INPUT_LOWDELAY_LONGTEXT N_(\
+    "Try to minimize delay along decoding chain."\
+    "Might break with non compliant streams.")
+
 #define INPUT_REPEAT_TEXT N_("Input repetitions")
 #define INPUT_REPEAT_LONGTEXT N_( \
     "Number of time the same input will be repeated")
@@ -1778,6 +1783,9 @@ vlc_module_begin ()
                  INPUT_PREFERREDRESOLUTION_LONGTEXT, false )
         change_safe ()
         change_integer_list( pi_prefres, ppsz_prefres )
+    add_bool( "low-delay", 0, INPUT_LOWDELAY_TEXT,
+              INPUT_LOWDELAY_LONGTEXT, true )
+        change_safe ()
 
     set_section( N_( "Playback control" ) , NULL)
     add_integer( "input-repeat", 0,
