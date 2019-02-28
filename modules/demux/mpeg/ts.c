@@ -1400,11 +1400,15 @@ static block_t * ConvertPESBlock( demux_t *p_demux, ts_es_t *p_es,
  ****************************************************************************/
 static void SendDataChain( demux_t *p_demux, ts_es_t *p_es, block_t *p_chain )
 {
+    bool b_lowdelay = var_InheritBool(p_demux, "low-delay");
     while( p_chain )
     {
         block_t *p_block = p_chain;
         p_chain = p_block->p_next;
         p_block->p_next = NULL;
+
+        if( b_lowdelay )
+            p_block->i_flags |= BLOCK_FLAG_AU_END;
 
         ts_es_t *p_es_send = p_es;
         if( p_es_send->i_next_block_flags )
