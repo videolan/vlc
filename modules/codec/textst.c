@@ -75,6 +75,8 @@ static size_t textst_FillRegion(decoder_t *p_dec, const uint8_t *p_data, size_t 
      /*   forced_on_flag b1 */
      /*   ? b6 */
 
+     assert( i_data >= 4 );
+
      //uint8_t region_style_id_ref = p_data[1];
      uint16_t i_data_length = GetWBE(&p_data[2]);
 
@@ -211,7 +213,7 @@ static void textst_FillRegions(decoder_t *p_dec, const uint8_t *p_data, size_t i
         uint8_t i_region_count = p_data[0];
         p_data++; i_data--;
 
-        for(uint8_t i=0; i<i_region_count && i_data > 0; i++)
+        for(uint8_t i=0; i<i_region_count && i_data > 4; i++)
         {
             if(*pp_last == NULL)
             {
