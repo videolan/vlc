@@ -1543,8 +1543,11 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     return VLC_EGENERIC;
                 }
 
-                /* FIXME: check return value */
-                ogg_stream_packetpeek( &p_stream->os, &oggpacket );
+                if ( ogg_stream_packetpeek( &p_stream->os, &oggpacket ) != 1 )
+                {
+                    msg_Err( p_demux, "error in ogg_stream_packetpeek" );
+                    return VLC_EGENERIC;
+                }
 
                 /* Check for Vorbis header */
                 if( oggpacket.bytes >= 7 &&
