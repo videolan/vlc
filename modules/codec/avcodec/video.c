@@ -479,6 +479,12 @@ static int OpenVideoCodec( decoder_t *p_dec )
         ctx->flags |= AV_CODEC_FLAG_LOW_DELAY;
     }
 
+    if( var_InheritBool(p_dec, "low-delay") )
+    {
+        ctx->flags |= AV_CODEC_FLAG_LOW_DELAY;
+        ctx->active_thread_type = FF_THREAD_SLICE;
+    }
+
     post_mt( p_sys );
     ret = ffmpeg_OpenCodec( p_dec, ctx, codec );
     wait_mt( p_sys );
