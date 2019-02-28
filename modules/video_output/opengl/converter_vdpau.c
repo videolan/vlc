@@ -62,7 +62,8 @@ static picture_pool_t *
 tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
                      unsigned int requested_count)
 {
-    return vlc_vdp_output_pool_create(tc->priv, VDP_RGBA_FORMAT_B8G8R8A8,
+    return vlc_vdp_output_pool_create(tc->dec_device->opaque,
+                                      VDP_RGBA_FORMAT_B8G8R8A8,
                                       &tc->fmt, requested_count);
 }
 
