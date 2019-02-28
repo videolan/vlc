@@ -1553,7 +1553,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "found invalid vorbis header" );
                         Ogg_LogicalStreamDelete( p_demux, p_stream );
                         p_stream = NULL;
-                        p_ogg->i_streams--;
+                        TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                   p_ogg->i_streams - 1 );
                     }
                 }
                 /* Check for Speex header */
@@ -1574,7 +1575,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "found invalid Speex header" );
                         Ogg_LogicalStreamDelete( p_demux, p_stream );
                         p_stream = NULL;
-                        p_ogg->i_streams--;
+                        TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                   p_ogg->i_streams - 1 );
                     }
                 }
                 /* Check for Opus header */
@@ -1628,7 +1630,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "found invalid Flac header" );
                         Ogg_LogicalStreamDelete( p_demux, p_stream );
                         p_stream = NULL;
-                        p_ogg->i_streams--;
+                        TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                   p_ogg->i_streams - 1 );
                     }
                     p_stream->fmt.b_packetized = false;
                 }
@@ -1647,7 +1650,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "found invalid Theora header" );
                         Ogg_LogicalStreamDelete( p_demux, p_stream );
                         p_stream = NULL;
-                        p_ogg->i_streams--;
+                        TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                   p_ogg->i_streams - 1 );
                     }
                 }
                 /* Check for Daala header */
@@ -1665,7 +1669,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "found invalid Daala header" );
                         Ogg_LogicalStreamDelete( p_demux, p_stream );
                         p_stream = NULL;
-                        p_ogg->i_streams--;
+                        TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                   p_ogg->i_streams - 1 );
                     }
                 }
                 /* Check for Dirac header */
@@ -1682,7 +1687,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Warn( p_demux, "found dirac header isn't decodable" );
                         Ogg_LogicalStreamDelete( p_demux, p_stream );
                         p_stream = NULL;
-                        p_ogg->i_streams--;
+                        TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                   p_ogg->i_streams - 1 );
                     }
                 }
                 /* Check for VP8 header */
@@ -1701,7 +1707,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "invalid VP8 header found");
                         Ogg_LogicalStreamDelete( p_demux, p_stream );
                         p_stream = NULL;
-                        p_ogg->i_streams--;
+                        TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                   p_ogg->i_streams - 1 );
                     }
                 }
                 /* Check for Annodex header */
@@ -1711,7 +1718,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     Ogg_ReadAnnodexHeader( p_demux, p_stream, &oggpacket );
                     /* kill annodex track */
                     FREENULL( p_stream );
-                    p_ogg->i_streams--;
+                    TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                               p_ogg->i_streams - 1 );
                 }
                 /* Check for Annodex header */
                 else if( oggpacket.bytes >= 7 &&
@@ -1731,7 +1739,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "invalid kate header found");
                         Ogg_LogicalStreamDelete( p_demux, p_stream );
                         p_stream = NULL;
-                        p_ogg->i_streams--;
+                        TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                   p_ogg->i_streams - 1 );
                     }
                 }
                 /* Check for OggDS */
@@ -1787,7 +1796,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         {
                             Ogg_LogicalStreamDelete( p_demux, p_stream );
                             p_stream = NULL;
-                            p_ogg->i_streams--;
+                            TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                       p_ogg->i_streams - 1 );
                         }
                     }
                     /* Check for audio header (old format) */
@@ -1850,7 +1860,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                             msg_Dbg( p_demux, "invalid oggds audio header" );
                             Ogg_LogicalStreamDelete( p_demux, p_stream );
                             p_stream = NULL;
-                            p_ogg->i_streams--;
+                            TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                       p_ogg->i_streams - 1 );
                         }
                     }
                     else
@@ -1858,7 +1869,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "stream %d has an old header "
                             "but is of an unknown type", p_ogg->i_streams-1 );
                         FREENULL( p_stream );
-                        p_ogg->i_streams--;
+                        TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                   p_ogg->i_streams - 1 );
                     }
                 }
                 /* Check for OggDS */
@@ -1997,7 +2009,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                             msg_Dbg( p_demux, "invalid oggds audio header" );
                             Ogg_LogicalStreamDelete( p_demux, p_stream );
                             p_stream = NULL;
-                            p_ogg->i_streams--;
+                            TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                       p_ogg->i_streams - 1 );
                         }
                     }
                     /* Check for text (subtitles) header */
@@ -2015,7 +2028,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "stream %d has a header marker "
                             "but is of an unknown type", p_ogg->i_streams-1 );
                         FREENULL( p_stream );
-                        p_ogg->i_streams--;
+                        TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                   p_ogg->i_streams - 1 );
                     }
                 }
                 else if( oggpacket.bytes >= 8 &&
@@ -2041,14 +2055,16 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Err( p_demux, "found invalid OggSpots header" );
                         Ogg_LogicalStreamDelete( p_demux, p_stream );
                         p_stream = NULL;
-                        p_ogg->i_streams--;
+                        TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                                   p_ogg->i_streams - 1 );
                     }
                 }
                 else
                 {
                     Ogg_LogicalStreamDelete( p_demux, p_stream );
                     p_stream = NULL;
-                    p_ogg->i_streams--;
+                    TAB_ERASE( p_ogg->i_streams, p_ogg->pp_stream,
+                               p_ogg->i_streams - 1 );
                     msg_Dbg( p_demux, "stream %d is of unknown type",
                              p_ogg->i_streams );
                 }
