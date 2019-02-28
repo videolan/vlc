@@ -45,7 +45,7 @@ static inline unsigned int xiph_CountHeaders( const void *extra, unsigned int i_
         {
             uint16_t i_size = GetWBE( extra );
             p_extra += 2 + i_size;
-            if ( overall_len > i_extra - i_size )
+            if ( i_extra < i_size || overall_len > i_extra - i_size )
                 return 0;
             overall_len += i_size;
         }
