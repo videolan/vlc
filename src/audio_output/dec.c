@@ -99,6 +99,7 @@ error:
     owner->sync.rate = 1.f;
     owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
     owner->sync.discontinuity = true;
+    owner->original_pts = VLC_TICK_INVALID;
 
     atomic_init (&owner->buffers_lost, 0);
     atomic_init (&owner->buffers_played, 0);
@@ -352,7 +353,10 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
         goto drop; /* Pipeline is unrecoverably broken :-( */
 
     if (block->i_flags & BLOCK_FLAG_DISCONTINUITY)
+    {
         owner->sync.discontinuity = true;
+        owner->original_pts = VLC_TICK_INVALID;
+    }
 
     if (atomic_load_explicit(&owner->vp.update, memory_order_relaxed))
     {
@@ -360,6 +364,15 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
         aout_FiltersChangeViewpoint (owner->filters, &owner->vp.value);
         atomic_store_explicit(&owner->vp.update, false, memory_order_relaxed);
         vlc_mutex_unlock (&owner->vp.lock);
+    }
+
+    if (owner->original_pts == VLC_TICK_INVALID)
+    {
+        /* Use the original PTS for synchronization and as a play date of the
+         * aout module. This PTS need to be saved here in order to use the PTS
+         * of the first block that has been filtered. Indeed, aout filters may
+         * need more than one block to output a new one. */
+        owner->original_pts = block->i_pts;
     }
 
     block = aout_FiltersPlay(owner->filters, block, owner->sync.rate);
@@ -370,15 +383,17 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     aout_volume_Amplify (owner->volume, block);
 
     /* Drift correction */
-    aout_DecSynchronize(aout, block->i_pts);
+    aout_DecSynchronize(aout, owner->original_pts);
 
     /* Output */
     owner->sync.discontinuity = false;
-    aout->play(aout, block, block->i_pts);
+    aout->play(aout, block, owner->original_pts);
+    owner->original_pts = VLC_TICK_INVALID;
     atomic_fetch_add_explicit(&owner->buffers_played, 1, memory_order_relaxed);
     return ret;
 drop:
     owner->sync.discontinuity = true;
+    owner->original_pts = VLC_TICK_INVALID;
     block_Release (block);
     atomic_fetch_add_explicit(&owner->buffers_lost, 1, memory_order_relaxed);
     return ret;
@@ -428,4 +443,5 @@ void aout_DecFlush (audio_output_t *aout, bool wait)
         aout->flush(aout, wait);
     }
     owner->sync.discontinuity = true;
+    owner->original_pts = VLC_TICK_INVALID;
 }

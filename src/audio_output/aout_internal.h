@@ -67,6 +67,7 @@ typedef struct
         int resamp_type; /**< Resampler mode (FIXME: redundant / resampling) */
         bool discontinuity;
     } sync;
+    vlc_tick_t original_pts;
 
     int requested_stereo_mode; /**< Requested stereo mode set by the user */
 
