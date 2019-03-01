@@ -71,4 +71,10 @@ static inline void vlc_viewpoint_clip( vlc_viewpoint_t *p_vp )
 VLC_API
 void vlc_viewpoint_to_4x4( const vlc_viewpoint_t *vp, float *matrix );
 
+void vlc_viewpoint_from_euler( vlc_viewpoint_t *vp,
+                               float yaw, float pitch, float roll );
+
+void vlc_viewpoint_to_euler( const vlc_viewpoint_t *vp,
+                             float *yaw, float *pitch, float *roll );
+
 #endif /* VLC_VIEWPOINT_H_ */

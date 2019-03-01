@@ -103,3 +103,19 @@ void vlc_viewpoint_from_orientation(vlc_viewpoint_t *vp,
             break;
     }
 }
+
+void vlc_viewpoint_from_euler(vlc_viewpoint_t *vp,
+                              float yaw, float pitch, float roll)
+{
+    vp->yaw   = yaw;
+    vp->pitch = pitch;
+    vp->roll  = roll;
+}
+
+void vlc_viewpoint_to_euler(const vlc_viewpoint_t *vp,
+                            float *yaw, float *pitch, float *roll)
+{
+    *yaw   = vp->yaw;
+    *pitch = vp->pitch;
+    *roll  = vp->roll;
+}
