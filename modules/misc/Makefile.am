@@ -45,6 +45,12 @@ libsecuretransport_plugin_la_LDFLAGS += -Wl,-U,_SSLCopyALPNProtocols,-U,_SSLSetA
 misc_LTLIBRARIES += libsecuretransport_plugin.la
 endif
 
+if HAVE_OSX
+libiokit_inhibit_plugin_la_SOURCES = misc/inhibit/iokit-inhibit.c
+libiokit_inhibit_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation,-framework,IOKit
+misc_LTLIBRARIES += libiokit_inhibit_plugin.la
+endif
+
 libxdg_screensaver_plugin_la_SOURCES = misc/inhibit/xdg.c
 if HAVE_XCB
 misc_LTLIBRARIES += libxdg_screensaver_plugin.la

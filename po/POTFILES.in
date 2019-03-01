@@ -1043,6 +1043,7 @@ modules/misc/audioscrobbler.c
 modules/misc/fingerprinter.c
 modules/misc/gnutls.c
 modules/misc/inhibit/dbus.c
+modules/misc/inhibit/iokit-inhibit.c
 modules/misc/inhibit/wl-idle-inhibit.c
 modules/misc/inhibit/xdg.c
 modules/misc/medialibrary/medialib.cpp

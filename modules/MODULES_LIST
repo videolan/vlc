@@ -204,6 +204,7 @@ $Id$
  * inflate: zlib decompression stream_filter module
  * integer_mixer: Integer audio mixer
  * invert: inverse video filter
+ * iokit_inhibit: macOS sleep inhibition with IOKit
  * jack: jack server audio output
  * jpeg: JPEG image decoder
  * kai: OS/2 audio output
