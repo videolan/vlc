@@ -1,5 +1,5 @@
---- automake/lib/depcomp.clangmsvc	2014-12-31 14:26:32.000000000 +0100
-+++ automake/lib/depcomp	2019-03-01 11:33:02.672713200 +0100
+--- automake/lib/depcomp	2019-03-01 16:29:06.073143400 +0100
++++ automake/lib/depcomp.gccwindows	2019-03-01 16:29:30.646075800 +0100
 @@ -563,6 +563,36 @@ msvc7msys)
    exit 1
    ;;
@@ -37,3 +37,15 @@
  #nosideeffect)
    # This comment above is used by automake to tell side-effect
    # dependency tracking mechanisms from slower ones.
+--- automake/m4/depend.m4	2019-03-01 16:22:29.083243300 +0100
++++ automake/m4/depend.m4.gccwindows	2019-03-01 16:22:36.408049300 +0100
+@@ -152,7 +152,8 @@ fi
+ AC_SUBST([$1DEPMODE], [depmode=$am_cv_$1_dependencies_compiler_type])
+ AM_CONDITIONAL([am__fastdep$1], [
+   test "x$enable_dependency_tracking" != xno \
+-  && test "$am_cv_$1_dependencies_compiler_type" = gcc3])
++  && ( test "$am_cv_$1_dependencies_compiler_type" = gcc3 ||
++       test "$am_cv_$1_dependencies_compiler_type" = gccwindows )])
+ ])
+ 
+ 
