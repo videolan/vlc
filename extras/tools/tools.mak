@@ -189,6 +189,7 @@ automake-$(AUTOMAKE_VERSION).tar.gz:
 
 automake: automake-$(AUTOMAKE_VERSION).tar.gz
 	$(UNPACK)
+	$(APPLY) automake-clang.patch
 	$(MOVE)
 
 .buildautomake: automake .autoconf
