@@ -153,7 +153,7 @@ static void WindowSetState(vout_window_t *p_wnd, unsigned state)
 {
     NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
 
-    [o_window setLevel:i_state];
+    [o_window setLevel:state];
 }
 
 static void WindowUnsetFullscreen(vout_window_t *p_wnd)
