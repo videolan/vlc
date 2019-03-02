@@ -56,7 +56,7 @@ typedef struct
     char *psz_id;
     bool b_inited;
 
-    int i_chroma; /* force image format chroma */
+    vlc_fourcc_t i_chroma; /* force image format chroma */
 
     filter_chain_t *p_vf2;
 } sout_stream_sys_t;
