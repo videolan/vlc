@@ -137,6 +137,7 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
             psz_server = p_sys->url.psz_host;
             psz_path = NULL;
             psz_name = NULL;
+            /* fall through */
         case SMBC_FILE_SHARE:
         case SMBC_DIR:
             i_type = ITEM_TYPE_DIRECTORY;
