@@ -35,7 +35,6 @@
 - (void)inputThreadChanged;
 
 - (void)playbackStatusUpdated;
-- (void)playbackPositionUpdated;
 
 - (void)onPlaybackHasEnded:(id)sender;
 

@@ -36,7 +36,6 @@
 #import <vlc_plugin.h>
 #import <vlc_config_cat.h>
 
-#import "coreinteraction/VLCCoreInteraction.h"
 #import "extensions/misc.h"
 #import "extensions/NSScreen+VLCAdditions.h"
 #import "main/CompatibilityFixes.h"

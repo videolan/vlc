@@ -149,7 +149,6 @@
 		7DB7F20B20CC082800C2CAED /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DB7F20A20CC082800C2CAED /* QuartzCore.framework */; };
 		7DC21A7422049A6600F98A02 /* VLCOpenInputMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DC21A7322049A6600F98A02 /* VLCOpenInputMetadata.m */; };
 		7DD2F5C52081B73B007EE187 /* VLCRemoteControlService.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DD2F5C42081B73B007EE187 /* VLCRemoteControlService.m */; };
-		7DE9C7D82205EF030089108F /* VLCPlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DE9C7D72205EF030089108F /* VLCPlayerController.m */; };
 		7DE9C7DD220728420089108F /* VLCPlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DE9C7DC220728420089108F /* VLCPlayerController.m */; };
 /* End PBXBuildFile section */
 
@@ -1535,7 +1534,6 @@
 				1CCC88F82078A3D500E5626F /* CoreDialogs.xib in Sources */,
 				1CCC88F92078A3D500E5626F /* DetachedVideoWindow.xib in Sources */,
 				1CCC88FA2078A3D500E5626F /* ErrorPanel.xib in Sources */,
-				7DE9C7D82205EF030089108F /* VLCPlayerController.m in Sources */,
 				1CCC88FB2078A3D500E5626F /* Help.xib in Sources */,
 				1CCC88FC2078A3D500E5626F /* LogMessageWindow.xib in Sources */,
 				1CCC88FD2078A3D500E5626F /* Open.xib in Sources */,

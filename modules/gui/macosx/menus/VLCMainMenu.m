@@ -24,7 +24,6 @@
 #import "main/VLCMain.h"
 
 #import <vlc_common.h>
-#import <vlc_playlist_legacy.h>
 #import <vlc_input.h>
 
 #import "coreinteraction/VLCCoreInteraction.h"
@@ -672,10 +671,7 @@
 - (void)setRateControlsEnabled:(BOOL)b_enabled
 {
     [_rate_sld setEnabled: b_enabled];
-    [_rate_sld setIntValue: [[VLCCoreInteraction sharedInstance] playbackRate]];
-    int i = [[VLCCoreInteraction sharedInstance] playbackRate];
-    double speed =  pow(2, (double)i / 17);
-    [_rateTextField setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
+    [self updatePlaybackRate];
 
     NSColor *color = b_enabled ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
 

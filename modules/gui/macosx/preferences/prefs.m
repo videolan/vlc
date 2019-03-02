@@ -56,7 +56,6 @@
 #import <vlc_modules.h>
 #import <vlc_plugin.h>
 
-#import "coreinteraction/VLCCoreInteraction.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "preferences/prefs.h"
