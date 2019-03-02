@@ -281,7 +281,7 @@ skip:
      * we should gather blocks and increase mtu
      * and allocate new overflow block.  See Open()
      */
-    if (unlikely(len > sys->mtu))
+    if (unlikely((size_t)len > sys->mtu))
     {
         msg_Warn(access, "%zd bytes packet received (MTU was %zu), adjusting mtu",
                 len, sys->mtu);
