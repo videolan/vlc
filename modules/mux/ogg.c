@@ -938,7 +938,6 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
     block_t *p_hdr = NULL;
     block_t *p_og = NULL;
     ogg_packet op;
-    ogg_stream_t *p_stream;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
 
     if( sout_AccessOutControl( p_mux->p_access,
@@ -959,8 +958,8 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
     {
         for ( int i=0; i< p_mux->i_nb_inputs; i++ )
         {
-            p_stream = (ogg_stream_t*) p_mux->pp_inputs[i]->p_sys;
-            if ( p_stream->p_oggds_header )
+            ogg_stream_t *p_stream = p_mux->pp_inputs[i]->p_sys;
+            if( p_stream->p_oggds_header )
             {
                 /* We don't want skeleton for OggDS */
                 p_sys->skeleton.b_create = false;
@@ -998,7 +997,7 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
         for( int i = 0; i < p_mux->i_nb_inputs; i++ )
         {
             sout_input_t *p_input = p_mux->pp_inputs[i];
-            p_stream = (ogg_stream_t*)p_input->p_sys;
+            ogg_stream_t *p_stream = p_input->p_sys;
 
             bool video = ( p_stream->fmt.i_codec == VLC_CODEC_THEORA ||
                            p_stream->fmt.i_codec == VLC_CODEC_DIRAC ||
@@ -1117,7 +1116,7 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
         for( int i = 0; i < p_mux->i_nb_inputs; i++ )
         {
             sout_input_t *p_input = p_mux->pp_inputs[i];
-            ogg_stream_t *p_stream = (ogg_stream_t*)p_input->p_sys;
+            ogg_stream_t *p_stream = p_input->p_sys;
             if ( p_stream->skeleton.b_fisbone_done ) continue;
             OggGetSkeletonFisbone( &op.packet, &op.bytes, p_input, p_mux );
             if ( op.packet == NULL ) return false;
