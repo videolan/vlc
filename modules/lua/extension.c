@@ -378,7 +378,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
                 {
                     /* Key is at index -2 and value at index -1. Discard key */
                     const char *psz_cap = luaL_checkstring( L, -1 );
-                    bool b_ok = false;
+                    bool found = false;
                     /* Find this capability's flag */
                     for( size_t i = 0; i < sizeof(caps)/sizeof(caps[0]); i++ )
                     {
@@ -386,11 +386,11 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
                         {
                             /* Flag it! */
                             p_ext->p_sys->i_capabilities |= 1 << i;
-                            b_ok = true;
+                            found = true;
                             break;
                         }
                     }
-                    if( !b_ok )
+                    if( !found )
                     {
                         msg_Warn( p_mgr, "Extension capability '%s' unknown in"
                                   " script %s", psz_cap, psz_script );
