@@ -88,7 +88,6 @@ MarshalIdentity( intf_thread_t *p_intf, DBusMessageIter *container )
 static int
 MarshalCanSetFullscreen( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    input_thread_t *p_input = NULL;
     dbus_bool_t     b_ret   = FALSE;
 
     if (p_intf->p_sys->p_input)
@@ -129,7 +128,6 @@ DBUS_METHOD( FullscreenSet )
 {
     REPLY_INIT;
     dbus_bool_t b_fullscreen;
-    input_thread_t *p_input = NULL;
 
     if( VLC_SUCCESS != DemarshalSetPropertyValue( p_from, &b_fullscreen ) )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
