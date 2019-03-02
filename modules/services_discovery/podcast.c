@@ -316,10 +316,10 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
     char **ppsz_new_urls = NULL;
     p_sys->b_savedurls_loaded = true;
 
-    int i, j;
-
     for( ;; )
     {
+        int i;
+
         if( !psz_urls )
             break;
 
@@ -356,8 +356,10 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
     }
 
     /* delete removed items and signal the removal */
-    for( i = 0; i<p_sys->i_items; ++i )
+    for( int i = 0; i<p_sys->i_items; ++i )
     {
+        int j;
+
         for( j = 0; j < i_new_items; ++j )
             if( pp_new_items[j] == p_sys->pp_items[i] ) break;
         if( j == i_new_items )
