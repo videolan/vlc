@@ -289,23 +289,13 @@ function sd_remove(name,client,arg)
 end
 
 function services_discovery(name,client,arg)
-    if arg then
-        if vlc.sd.is_loaded(arg) then
-            vlc.sd.remove(arg)
-            client:append(arg.." disabled.")
-        else
-            vlc.sd.add(arg)
-            client:append(arg.." enabled.")
-        end
-    else
-        local sd = vlc.sd.get_services_names()
-        client:append("+----[ Services discovery ]")
-        for n,ln in pairs(sd) do
-            client:append("| "..n..": " .. ln)
-        end
-        client:append("+----[ End of services discovery ]")
-        client:append("Enabled services discovery sources appear in the playlist.")
+    local sd = vlc.sd.get_services_names()
+    client:append("+----[ Services discovery ]")
+    for n,ln in pairs(sd) do
+        client:append("| "..n..": " .. ln)
     end
+    client:append("+----[ End of services discovery ]")
+    client:append("Enabled services discovery sources appear in the playlist.")
 end
 
 function load_vlm(name, client, value)
