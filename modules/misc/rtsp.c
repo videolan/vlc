@@ -1414,8 +1414,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             psz_session = httpd_MsgGet( query, "Session" );
             msg_Dbg( p_vod, "HTTPD_MSG_PLAY for session: %s", psz_session );
 
-            p_rtsp = RtspClientGet( p_media, psz_session );
-
             psz_position = httpd_MsgGet( query, "Range" );
             if( psz_position ) psz_position = strstr( psz_position, "npt=" );
             if( psz_position )
