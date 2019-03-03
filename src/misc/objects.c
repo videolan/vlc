@@ -290,8 +290,12 @@ static vlc_mutex_t name_lock = VLC_STATIC_MUTEX;
 int vlc_object_set_name(vlc_object_t *obj, const char *name)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
-    char *newname = name ? strdup (name) : NULL;
+    char *newname = NULL;
     char *oldname;
+
+    /* See vlc_object_find_name(). */
+    if (unlikely(strcmp(name, "v4l2") == 0))
+        newname = strdup(name);
 
     vlc_mutex_lock (&name_lock);
     oldname = priv->psz_name;
@@ -364,11 +368,6 @@ static vlc_object_t *FindName (vlc_object_t *obj, const char *name)
     return found;
 }
 
-static int strcmp_void(const void *a, const void *b)
-{
-    return strcmp(a, b);
-}
-
 #undef vlc_object_find_name
 /**
  * Finds a named object and increment its reference count.
@@ -393,15 +392,10 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
      * deal with asynchronous and external state changes. There may be multiple
      * objects with the same name, and the function may fail even if a matching
      * object exists. DO NOT USE THIS IN NEW CODE. */
-#ifndef NDEBUG
-    /* This was officially deprecated on August 19 2009. For the convenience of
-     * wannabe code janitors, this is the list of names that remain used
-     * and unfixed since then. */
-    static const char bad[][5] = { "v4l2", "zvbi" };
-    if( bsearch( psz_name, bad, 2, 5, strcmp_void ) == NULL )
+    /* This was officially deprecated on August 19 2009. As of 2019, only
+     * the V4L2 input controls still rely on this. */
+    if (strcmp(psz_name, "v4l2"))
         return NULL;
-    msg_Err( p_this, "looking for object \"%s\"... FIXME XXX", psz_name );
-#endif
 
     vlc_mutex_lock (&name_lock);
     vlc_mutex_lock(&tree_lock);
