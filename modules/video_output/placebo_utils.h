@@ -283,7 +283,7 @@ static const char * const scale_text[] = {
     "Custom (see below)",
 };
 
-static const struct pl_filter_config *scale_config[] = {
+static const struct pl_filter_config *const scale_config[] = {
     [SCALE_BUILTIN]             = NULL,
     [SCALE_SPLINE16]            = &pl_filter_spline16,
     [SCALE_SPLINE36]            = &pl_filter_spline36,
@@ -391,7 +391,7 @@ static const char * const filter_text[] = {
     "Spline64",
 };
 
-static const struct pl_filter_function *filter_fun[] = {
+static const struct pl_filter_function *const filter_fun[] = {
     [FILTER_NONE]           = NULL,
     [FILTER_BOX]            = &pl_filter_function_box,
     [FILTER_TRIANGLE]       = &pl_filter_function_triangle,
