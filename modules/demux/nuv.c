@@ -770,7 +770,6 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
     if( fh.i_type != 'Q' )
     {
         msg_Warn( p_demux, "invalid seektable, frame type=%c", fh.i_type );
-        vlc_stream_Seek( p_demux->s, i_original_pos );
         return VLC_EGENERIC;
     }
 
