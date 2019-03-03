@@ -25,9 +25,9 @@
 #define FFABS abs
 
 #define CHECK(j)\
-    {   int score = FFABS(cur[mrefs-1+(j)] - cur[prefs-1-(j)])\
-                  + FFABS(cur[mrefs  +(j)] - cur[prefs  -(j)])\
-                  + FFABS(cur[mrefs+1+(j)] - cur[prefs+1-(j)]);\
+        score = FFABS(cur[mrefs-1+(j)] - cur[prefs-1-(j)])\
+              + FFABS(cur[mrefs  +(j)] - cur[prefs  -(j)])\
+              + FFABS(cur[mrefs+1+(j)] - cur[prefs+1-(j)]);\
         if (score < spatial_score) {\
             spatial_score= score;\
             spatial_pred= (cur[mrefs  +(j)] + cur[prefs  -(j)])>>1;\
@@ -44,9 +44,10 @@
         int spatial_pred = (c+e)>>1; \
         int spatial_score = FFABS(cur[mrefs-1] - cur[prefs-1]) + FFABS(c-e) \
                           + FFABS(cur[mrefs+1] - cur[prefs+1]) - 1; \
+        int score; \
  \
-        CHECK(-1) CHECK(-2) }} }} \
-        CHECK( 1) CHECK( 2) }} }} \
+        CHECK(-1) CHECK(-2) }} \
+        CHECK( 1) CHECK( 2) }} \
  \
         if (mode < 2) { \
             int b = (prev2[2*mrefs] + next2[2*mrefs])>>1; \
