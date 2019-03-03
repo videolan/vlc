@@ -864,6 +864,7 @@ int Oggseek_BlindSeektoPosition( demux_t *p_demux, logical_stream_t *p_stream,
     }
 
     OggDebug( msg_Dbg( p_demux, "=================== Seeked To %"PRId64" granule %"PRId64, i_pagepos, i_granule ) );
+    (void) i_pagepos;
     return VLC_SUCCESS;
 }
 
