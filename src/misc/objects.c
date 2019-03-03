@@ -66,6 +66,11 @@ static bool ObjectIsLastChild(vlc_object_t *obj, vlc_object_t *parent)
                             &vlc_internals(parent)->children);
 }
 
+static bool ObjectHasChild(vlc_object_t *obj)
+{
+    return !vlc_list_is_empty(&vlc_internals(obj)->children);
+}
+
 static void PrintObjectPrefix(vlc_object_t *obj, bool last)
 {
     vlc_object_t *parent = vlc_object_parent(obj);
@@ -92,7 +97,7 @@ static void PrintObject(vlc_object_t *obj)
 
     PrintObjectPrefix(obj, true);
     printf("\xE2\x94\x80\xE2\x94%c\xE2\x95\xB4%p %s, %u refs\n",
-           vlc_list_is_empty(&priv->children) ? 0x80 : 0xAC,
+           ObjectHasChild(obj) ? 0xAC : 0x80,
            (void *)obj, vlc_object_typename(obj), atomic_load(&priv->refs));
 
     vlc_restorecancel (canc);
@@ -434,7 +439,7 @@ void vlc_object_release (vlc_object_t *obj)
         refs = atomic_fetch_sub_explicit(&priv->refs, 1, memory_order_relaxed);
         assert (refs == 1); /* nobody to race against in this case */
         /* no children can be left */
-        assert(vlc_list_is_empty(&priv->children));
+        assert(!ObjectHasChild(obj));
 
         int canc = vlc_savecancel ();
         vlc_object_destroy (obj);
@@ -456,7 +461,7 @@ void vlc_object_release (vlc_object_t *obj)
     {
         atomic_thread_fence(memory_order_acquire);
         /* no children can be left (because children reference their parent) */
-        assert(vlc_list_is_empty(&priv->children));
+        assert(!ObjectHasChild(obj));
 
         int canc = vlc_savecancel ();
         vlc_object_destroy (obj);
