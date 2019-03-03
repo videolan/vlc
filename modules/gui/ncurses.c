@@ -99,7 +99,6 @@ enum
     BOX_OPEN,
     BOX_BROWSE,
     BOX_META,
-    BOX_OBJECTS,
     BOX_STATS
 };
 
@@ -113,7 +112,6 @@ static const char box_title[][19] = {
     [BOX_OPEN]      = " Playlist ",
     [BOX_BROWSE]    = " Browse ",
     [BOX_META]      = " Meta-information ",
-    [BOX_OBJECTS]   = " Objects ",
     [BOX_STATS]     = " Stats ",
 };
 
@@ -710,37 +708,6 @@ static void MainBoxWrite(intf_sys_t *sys, int l, const char *p_fmt, ...)
     free(p_buf);
 }
 
-static int SubDrawObject(intf_sys_t *sys, int l, vlc_object_t *p_obj, int i_level, const char *prefix)
-{
-    char *name = vlc_object_get_name(p_obj);
-    MainBoxWrite(sys, l++, "%*s%s%s \"%s\" (%p)", 2 * i_level++, "", prefix,
-                 vlc_object_typename(p_obj), name ? name : "", (void *)p_obj);
-    free(name);
-
-    size_t count = 0, size;
-    vlc_object_t **tab = NULL;
-
-    do {
-        size = count;
-        tab = xrealloc(tab, size * sizeof (*tab));
-        count = vlc_list_children(p_obj, tab, size);
-    } while (size < count);
-
-    for (size_t i = 0; i < count ; i++) {
-        l = SubDrawObject(sys, l, tab[i], i_level,
-            (i == count - 1) ? "`-" : "|-" );
-        vlc_object_release(tab[i]);
-    }
-    free(tab);
-    return l;
-}
-
-static int DrawObjects(intf_thread_t *intf, input_thread_t *input)
-{
-    (void) input;
-    return SubDrawObject(intf->p_sys, 0, VLC_OBJECT(vlc_object_instance(intf)), 0, "");
-}
-
 static int DrawMeta(intf_thread_t *intf, input_thread_t *p_input)
 {
     intf_sys_t *sys = intf->p_sys;
@@ -875,7 +842,6 @@ static int DrawHelp(intf_thread_t *intf, input_thread_t *input)
     H(_(" L                      Show/Hide messages box"));
     H(_(" P                      Show/Hide playlist box"));
     H(_(" B                      Show/Hide filebrowser"));
-    H(_(" x                      Show/Hide objects box"));
     H(_(" S                      Show/Hide statistics box"));
     H(_(" Esc                    Close Add/Search entry"));
     H(_(" Ctrl-l                 Refresh the screen"));
@@ -1155,7 +1121,6 @@ static void FillBox(intf_thread_t *intf, input_thread_t *input)
         [BOX_HELP]      = DrawHelp,
         [BOX_INFO]      = DrawInfo,
         [BOX_META]      = DrawMeta,
-        [BOX_OBJECTS]   = DrawObjects,
         [BOX_STATS]     = DrawStats,
         [BOX_BROWSE]    = DrawBrowse,
         [BOX_PLAYLIST]  = DrawPlaylist,
@@ -1586,7 +1551,6 @@ static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,
     case 'L': BoxSwitch(sys, BOX_LOG);        return;
     case 'P': BoxSwitch(sys, BOX_PLAYLIST);   return;
     case 'B': BoxSwitch(sys, BOX_BROWSE);     return;
-    case 'x': BoxSwitch(sys, BOX_OBJECTS);    return;
     case 'S': BoxSwitch(sys, BOX_STATS);      return;
 
     case '/': /* Search */
