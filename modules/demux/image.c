@@ -430,8 +430,7 @@ static bool IsWebP(stream_t *s)
     if (memcmp(&header[8], "WEBPVP8 ", 8))
         return false;
     /* skip headers */
-    vlc_stream_Seek(s, 20);
-    return true;
+    return vlc_stream_Seek(s, 20) == 0;
 }
 
 static bool IsSpiff(stream_t *s)
@@ -558,10 +557,11 @@ static bool IsTarga(stream_t *s)
         return false;
 
     const uint8_t *footer;
-    bool is_targa = vlc_stream_Peek(s, &footer, 26) >= 26 &&
-                    !memcmp(&footer[8], "TRUEVISION-XFILE.\x00", 18);
-    vlc_stream_Seek(s, position);
-    return is_targa;
+    if (vlc_stream_Peek(s, &footer, 26) < 26
+     || memcmp(&footer[8], "TRUEVISION-XFILE.\x00", 18))
+        return false;
+
+    return vlc_stream_Seek(s, position) == 0;
 }
 
 typedef struct {
