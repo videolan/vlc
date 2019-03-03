@@ -89,7 +89,6 @@ static void deNoiseSpacial(
     }
 
     for (long Y = 1; Y < H; Y++){
-        unsigned int PixelAnt;
         sLineOffs += sStride, dLineOffs += dStride;
         /* First pixel on each line doesn't have previous pixel */
         PixelAnt = Frame[sLineOffs]<<16;
@@ -97,7 +96,6 @@ static void deNoiseSpacial(
         FrameDest[dLineOffs]= ((PixelDst+0x10007FFF)>>16);
 
         for (long X = 1; X < W; X++){
-            unsigned int PixelDst;
             /* The rest are normal */
             PixelAnt = LowPassMul(PixelAnt, Frame[sLineOffs+X]<<16, Horizontal);
             PixelDst = LineAnt[X] = LowPassMul(LineAnt[X], PixelAnt, Vertical);
@@ -156,7 +154,6 @@ static void deNoise(unsigned char *Frame,        // mpi->planes[x]
     }
 
     for (long Y = 1; Y < H; Y++){
-        unsigned int PixelAnt;
         unsigned short* LinePrev=&FrameAnt[Y*W];
         sLineOffs += sStride, dLineOffs += dStride;
         /* First pixel on each line doesn't have previous pixel */
@@ -167,7 +164,6 @@ static void deNoise(unsigned char *Frame,        // mpi->planes[x]
         FrameDest[dLineOffs]= ((PixelDst+0x10007FFF)>>16);
 
         for (long X = 1; X < W; X++){
-            unsigned int PixelDst;
             /* The rest are normal */
             PixelAnt = LowPassMul(PixelAnt, Frame[sLineOffs+X]<<16, Horizontal);
             LineAnt[X] = LowPassMul(LineAnt[X], PixelAnt, Vertical);
