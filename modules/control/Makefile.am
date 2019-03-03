@@ -30,16 +30,6 @@ endif
 libvlc_motion_la_LDFLAGS = -static
 noinst_LTLIBRARIES += libvlc_motion.la
 
-libmotion_plugin_la_SOURCES = control/motion.c
-libmotion_plugin_la_LIBADD = libvlc_motion.la
-libmotion_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(controldir)'
-if HAVE_DARWIN
-libmotion_plugin_la_LDFLAGS += -Wl,-framework,IOKit,-framework,CoreFoundation
-endif
-if !HAVE_WIN32
-control_LTLIBRARIES += libmotion_plugin.la
-endif
-
 libdbus_plugin_la_SOURCES = \
 	control/dbus/dbus_introspect.h control/dbus/dbus_common.h \
 	control/dbus/dbus_root.c control/dbus/dbus_root.h \
