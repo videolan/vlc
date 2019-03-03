@@ -313,7 +313,7 @@ main(int i_argc, char *ppsz_argv[])
         static const char *args[] = {
             "--no-qt-privacy-ask", /* avoid dialog that ask for privacy */
         };
-        libvlc_instance_t *p_libvlc = libvlc_new(1, args);
+        p_libvlc = libvlc_new(1, args);
         assert(p_libvlc != NULL);
 
         int i_ret = libvlc_InternalAddIntf(p_libvlc->p_libvlc_int, "qt");
