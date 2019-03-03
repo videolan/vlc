@@ -128,7 +128,7 @@ static void DarkenField( picture_t *p_dst,
              i_plane < p_dst->i_planes;
              i_plane++ )
         {
-            int w = p_dst->p[i_plane].i_visible_pitch;
+            w = p_dst->p[i_plane].i_visible_pitch;
             p_out = p_dst->p[i_plane].p_pixels;
             p_out_end = p_out + p_dst->p[i_plane].i_pitch
                               * p_dst->p[i_plane].i_visible_lines;
@@ -211,9 +211,9 @@ static void DarkenFieldMMX( picture_t *p_dst,
              i_plane < p_dst->i_planes;
              i_plane++ )
         {
-            int w = p_dst->p[i_plane].i_visible_pitch;
-            int wm8 = w % 8;   /* remainder */
-            int w8  = w - wm8; /* part of width that is divisible by 8 */
+            w = p_dst->p[i_plane].i_visible_pitch;
+            wm8 = w % 8;   /* remainder */
+            w8  = w - wm8; /* part of width that is divisible by 8 */
 
             p_out = p_dst->p[i_plane].p_pixels;
             p_out_end = p_out + p_dst->p[i_plane].i_pitch
