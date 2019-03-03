@@ -240,7 +240,7 @@ static void SetDecoration(vout_window_t *wnd, bool decorated)
         msg_Err(wnd, "server-side decoration not supported");
 }
 #else
-# define SetDecoration(wnd, deco) (wnd, (void)(deco))
+# define SetDecoration(wnd, deco) ((void) wnd, (void)(deco))
 #endif
 
 static int Enable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
