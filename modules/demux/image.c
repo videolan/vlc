@@ -28,6 +28,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
@@ -669,6 +671,8 @@ static vlc_fourcc_t Detect(stream_t *s)
             if (val < 0)
                 continue;
         }
+
+        assert(img->marker_size > 0); /* ensure peek is a valid pointer */
 
         if (peek_size >= img->marker_size
          && memcmp(peek, img->marker, img->marker_size) == 0)
