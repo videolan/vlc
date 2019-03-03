@@ -60,6 +60,12 @@ static vlc_mutex_t tree_lock = VLC_STATIC_MUTEX;
 #define vlc_children_foreach(pos, priv) \
     vlc_list_foreach(pos, &priv->children, siblings)
 
+static bool ObjectIsLastChild(vlc_object_t *obj, vlc_object_t *parent)
+{
+    return vlc_list_is_last(&vlc_internals(obj)->siblings,
+                            &vlc_internals(parent)->children);
+}
+
 static void PrintObjectPrefix(vlc_object_t *obj, bool last)
 {
     vlc_object_t *parent = vlc_object_parent(obj);
@@ -70,8 +76,7 @@ static void PrintObjectPrefix(vlc_object_t *obj, bool last)
 
     PrintObjectPrefix(parent, false);
 
-    if (vlc_list_is_last(&vlc_internals(obj)->siblings,
-                         &vlc_internals(parent)->children))
+    if (ObjectIsLastChild(obj, parent))
         str = last ? " \xE2\x94\x94" : "  ";
     else
         str = last ? " \xE2\x94\x9C" : " \xE2\x94\x82";
