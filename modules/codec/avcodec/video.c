@@ -182,9 +182,9 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
     fmt->i_width = width;
     fmt->i_height = height;
     if ( dec->fmt_in.video.i_visible_width != 0 &&
-         dec->fmt_in.video.i_visible_width <= ctx->width &&
+         dec->fmt_in.video.i_visible_width <= (unsigned)ctx->width &&
          dec->fmt_in.video.i_visible_height != 0 &&
-         dec->fmt_in.video.i_visible_height <= ctx->height )
+         dec->fmt_in.video.i_visible_height <= (unsigned)ctx->height )
     {
         /* the demuxer/packetizer provided crop info that are lost in lavc */
         fmt->i_visible_width  = dec->fmt_in.video.i_visible_width;
