@@ -113,10 +113,10 @@ static void DumpStructure(vlc_object_t *obj, unsigned level)
         return;
     }
 
-    vlc_object_internals_t *priv = vlc_internals(obj);
+    vlc_object_internals_t *priv;
 
     vlc_mutex_assert(&tree_lock);
-    vlc_children_foreach(priv, priv)
+    vlc_children_foreach(priv, vlc_internals(obj))
         DumpStructure(vlc_externals(priv), level + 1);
 }
 
@@ -145,11 +145,11 @@ static vlc_object_t *ObjectExists (vlc_object_t *root, void *obj)
     if (root == obj)
         return vlc_object_hold (root);
 
-    vlc_object_internals_t *priv = vlc_internals(root);
+    vlc_object_internals_t *priv;
     vlc_object_t *ret = NULL;
 
     vlc_mutex_assert(&tree_lock);
-    vlc_children_foreach(priv, priv)
+    vlc_children_foreach(priv, vlc_internals(root))
     {
         ret = ObjectExists (vlc_externals (priv), obj);
         if (ret != NULL)
@@ -345,7 +345,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
 static vlc_object_t *FindV4L2(vlc_object_t *obj)
 {
-    vlc_object_internals_t *priv = vlc_internals(obj);
+    vlc_object_internals_t *priv = vlc_internals(obj), *cpriv;
 
     if (atomic_load_explicit(&priv->is_v4l2, memory_order_relaxed))
         return vlc_object_hold (obj);
@@ -353,9 +353,9 @@ static vlc_object_t *FindV4L2(vlc_object_t *obj)
     vlc_object_t *found = NULL;
 
     vlc_mutex_assert(&tree_lock);
-    vlc_children_foreach(priv, priv)
+    vlc_children_foreach(cpriv, priv)
     {
-        found = FindV4L2(vlc_externals(priv));
+        found = FindV4L2(vlc_externals(cpriv));
         if (found != NULL)
             break;
     }
