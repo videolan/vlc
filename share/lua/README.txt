@@ -341,7 +341,6 @@ sd.get_services_names(): Get a table of all available service discovery
   modules. The module name is used as key, the long name is used as value.
 sd.add( name ): Add service discovery.
 sd.remove( name ): Remove service discovery.
-sd.is_loaded( name ): Check if service discovery is loaded.
 
 Services discovery scripts can use the following SD functions:
 
