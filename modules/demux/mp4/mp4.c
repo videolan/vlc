@@ -4031,7 +4031,8 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
         {
             uint64_t i_dur = elst->i_segment_duration[tk->i_elst];
 
-            if( tk->i_elst_time <= i_mvt && i_mvt < tk->i_elst_time + i_dur )
+            if( tk->i_elst_time <= i_mvt
+             && i_mvt < (int64_t)(tk->i_elst_time + i_dur) )
             {
                 break;
             }
