@@ -672,7 +672,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys  = p_demux->p_sys;
     vlc_meta_t *p_meta;
     vlc_tick_t i64;
-    double *pf, f;
+    double f;
     bool *pb_bool, b, acc;
     logical_stream_t *p_stream;
 
@@ -745,19 +745,24 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
-        case DEMUX_GET_POSITION:
-            pf = va_arg( args, double * );
+        case DEMUX_GET_POSITION: {
+            double pos = 0.;
+            uint64_t size;
+
             if( p_sys->i_length > 0 && p_sys->i_pcr != VLC_TICK_INVALID )
             {
-                *pf =  (double) p_sys->i_pcr /
-                       (double) vlc_tick_from_sec( p_sys->i_length );
+                vlc_tick_t duration = vlc_tick_from_sec( p_sys->i_length );
+                pos = (double) p_sys->i_pcr / (double) duration;
             }
-            else if( stream_Size( p_demux->s ) > 0 )
+            else if( vlc_stream_GetSize( p_demux->s, &size ) == 0 && size > 0 )
             {
-                *pf = (double) vlc_stream_Tell( p_demux->s ) / stream_Size( p_demux->s );
+                uint64_t offset = vlc_stream_Tell( p_demux->s );
+                pos = (double) offset / (double) size;
             }
-            else *pf = 0.0;
+
+            *va_arg( args, double * ) = pos;
             return VLC_SUCCESS;
+        }
 
         case DEMUX_SET_POSITION:
             /* forbid seeking if we haven't initialized all logical bitstreams yet;
