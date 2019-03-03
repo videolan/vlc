@@ -53,7 +53,6 @@ struct vlc_object_internals
     /* Objects tree structure */
     struct vlc_list siblings;  /**< Siblings list node */
     struct vlc_list children; /**< Children list */
-    vlc_mutex_t tree_lock;
 
     /* Object resources */
     struct vlc_res *resources;
