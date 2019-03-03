@@ -35,8 +35,6 @@
 #include <QPainter>
 #include <QTime>
 
-#define MSTRTIME_MAX_SIZE 22
-
 class QMouseEvent;
 class QWheelEvent;
 class QHideEvent;
