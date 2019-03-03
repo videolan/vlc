@@ -39,7 +39,7 @@ struct vlc_object_internals
     alignas (max_align_t) /* ensure vlc_externals() is maximally aligned */
     vlc_object_t *parent; /**< Parent object (or NULL) */
     const char *typename; /**< Object type human-readable name */
-    char           *psz_name; /* given name */
+    atomic_bool is_v4l2; /* Temporary backward-compatibility hack */
 
     /* Object variables */
     void           *var_root;

@@ -199,7 +199,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         return NULL;
 
     priv->typename = typename;
-    priv->psz_name = NULL;
+    atomic_init(&priv->is_v4l2, false);
     priv->var_root = NULL;
     vlc_mutex_init (&priv->var_lock);
     vlc_cond_init (&priv->var_wait);
@@ -284,38 +284,23 @@ vlc_object_t *(vlc_object_parent)(vlc_object_t *obj)
     return vlc_internals(obj)->parent;
 }
 
-static vlc_mutex_t name_lock = VLC_STATIC_MUTEX;
-
 #undef vlc_object_set_name
 int vlc_object_set_name(vlc_object_t *obj, const char *name)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
-    char *newname = NULL;
-    char *oldname;
-
     /* See vlc_object_find_name(). */
-    if (unlikely(strcmp(name, "v4l2") == 0))
-        newname = strdup(name);
+    bool newname = unlikely(strcmp(name, "v4l2") == 0);
 
-    vlc_mutex_lock (&name_lock);
-    oldname = priv->psz_name;
-    priv->psz_name = newname;
-    vlc_mutex_unlock (&name_lock);
-
-    free (oldname);
-    return (priv->psz_name || !name) ? VLC_SUCCESS : VLC_ENOMEM;
+    atomic_store_explicit(&priv->is_v4l2, newname, memory_order_release);
+    return VLC_SUCCESS;
 }
 
 char *vlc_object_get_name(const vlc_object_t *obj)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
-    char *name;
 
-    vlc_mutex_lock (&name_lock);
-    name = priv->psz_name ? strdup (priv->psz_name) : NULL;
-    vlc_mutex_unlock (&name_lock);
-
-    return name;
+    return atomic_load_explicit(&priv->is_v4l2, memory_order_acquire)
+           ? strdup("v4l2") : NULL;
 }
 
 /**
@@ -345,15 +330,14 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     vlc_cond_destroy( &p_priv->var_wait );
     vlc_mutex_destroy( &p_priv->var_lock );
-    free( p_priv->psz_name );
     free( p_priv );
 }
 
-static vlc_object_t *FindName (vlc_object_t *obj, const char *name)
+static vlc_object_t *FindV4L2(vlc_object_t *obj)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
 
-    if (priv->psz_name != NULL && !strcmp (priv->psz_name, name))
+    if (atomic_load_explicit(&priv->is_v4l2, memory_order_relaxed))
         return vlc_object_hold (obj);
 
     vlc_object_t *found = NULL;
@@ -361,7 +345,7 @@ static vlc_object_t *FindName (vlc_object_t *obj, const char *name)
     vlc_mutex_assert(&tree_lock);
     vlc_children_foreach(priv, priv)
     {
-        found = FindName (vlc_externals(priv), name);
+        found = FindV4L2(vlc_externals(priv));
         if (found != NULL)
             break;
     }
@@ -397,11 +381,9 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
     if (strcmp(psz_name, "v4l2"))
         return NULL;
 
-    vlc_mutex_lock (&name_lock);
     vlc_mutex_lock(&tree_lock);
-    p_found = FindName (p_this, psz_name);
+    p_found = FindV4L2(p_this);
     vlc_mutex_unlock(&tree_lock);
-    vlc_mutex_unlock (&name_lock);
     return p_found;
 }
 
