@@ -122,13 +122,9 @@ static int TreeCommand (vlc_object_t *obj, char const *cmd,
 {
     (void) cmd; (void) oldval; (void) newval; (void) data;
 
-    if (cmd[0] == 't')
-    {
-        flockfile(stdout);
-        DumpStructure (obj, 0);
-        funlockfile(stdout);
-    }
-
+    flockfile(stdout);
+    DumpStructure(obj, 0);
+    funlockfile(stdout);
     return VLC_SUCCESS;
 }
 
