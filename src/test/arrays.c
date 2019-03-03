@@ -123,7 +123,6 @@ static void test_array_bsearch(void)
     struct item {
         int value;
     };
-    struct item item;
 
     DECL_ARRAY(struct item) array;
     ARRAY_INIT(array);
