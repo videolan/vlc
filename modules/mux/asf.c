@@ -843,13 +843,11 @@ static void asf_chunk_add( bo_t *bo,
 static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    asf_track_t    *tk;
     vlc_tick_t i_duration = 0;
     int i_size, i_header_ext_size;
     int i_ci_size, i_cm_size = 0, i_cd_size = 0;
     block_t *out;
     bo_t bo;
-    tk=NULL;
 
     msg_Dbg( p_mux, "Asf muxer creating header" );
 
@@ -863,7 +861,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     i_ci_size = 44;
     for( size_t i = 0; i < vlc_array_count( &p_sys->tracks ); i++ )
     {
-        tk = vlc_array_item_at_index( &p_sys->tracks, i );
+        asf_track_t *tk = vlc_array_item_at_index( &p_sys->tracks, i );
         /* update also track-id */
         tk->i_id = i + 1;
 
@@ -1055,7 +1053,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     /* stream properties */
     for( size_t i = 0; i < vlc_array_count( &p_sys->tracks ); i++ )
     {
-        tk = vlc_array_item_at_index( &p_sys->tracks, i);
+        asf_track_t *tk = vlc_array_item_at_index( &p_sys->tracks, i);
 
         bo_add_guid ( &bo, &asf_object_stream_properties_guid );
         bo_addle_u64( &bo, 78 + tk->i_extra + (tk->b_audio_correction ? 8:0) );
@@ -1099,7 +1097,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     bo_addle_u32( &bo, vlc_array_count( &p_sys->tracks ) );
     for( size_t i = 0; i < vlc_array_count( &p_sys->tracks ); i++ )
     {
-        tk = vlc_array_item_at_index( &p_sys->tracks ,i);
+        asf_track_t *tk = vlc_array_item_at_index( &p_sys->tracks ,i);
 
         if( tk->i_cat == VIDEO_ES ) bo_addle_u16( &bo, 1 /* video */ );
         else if( tk->i_cat == AUDIO_ES ) bo_addle_u16( &bo, 2 /* audio */ );
