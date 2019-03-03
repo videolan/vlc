@@ -903,12 +903,11 @@ static const commanddesc_static_t p_commands[] =
 void RegisterCommand( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    size_t i_index = 0;
 
     p_sys->i_commands = ARRAY_SIZE(p_commands);
     p_sys->pp_commands = (commanddesc_t **) calloc( p_sys->i_commands, sizeof(commanddesc_t*) );
     if( !p_sys->pp_commands ) return;
-    for( i_index = 0; i_index < p_sys->i_commands; i_index ++ )
+    for( size_t i_index = 0; i_index < p_sys->i_commands; i_index ++ )
     {
         p_sys->pp_commands[i_index] = (commanddesc_t *) malloc( sizeof(commanddesc_t) );
         if( !p_sys->pp_commands[i_index] ) return;
