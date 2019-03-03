@@ -51,8 +51,7 @@ struct vlc_object_internals
     vlc_destructor_t pf_destructor;
 
     /* Objects tree structure */
-    struct vlc_list siblings;  /**< Siblings list node */
-    struct vlc_list children; /**< Children list */
+    struct vlc_list list; /**< Legacy list node */
 
     /* Object resources */
     struct vlc_res *resources;

@@ -56,19 +56,33 @@
 #include <assert.h>
 
 static vlc_mutex_t tree_lock = VLC_STATIC_MUTEX;
+static struct vlc_list tree_list = VLC_LIST_INITIALIZER(&tree_list);
 
 #define vlc_children_foreach(pos, priv) \
-    vlc_list_foreach(pos, &priv->children, siblings)
+    vlc_list_foreach(pos, &tree_list, list) \
+        if (pos->parent == vlc_externals(priv))
 
 static bool ObjectIsLastChild(vlc_object_t *obj, vlc_object_t *parent)
 {
-    return vlc_list_is_last(&vlc_internals(obj)->siblings,
-                            &vlc_internals(parent)->children);
+    struct vlc_list *node = &vlc_internals(obj)->list;
+
+    while ((node = node->next) != &tree_list) {
+        vlc_object_internals_t *priv =
+            container_of(node, vlc_object_internals_t, list);
+
+        if (priv->parent == parent)
+            return false;
+    }
+    return true;
 }
 
 static bool ObjectHasChild(vlc_object_t *obj)
 {
-    return !vlc_list_is_empty(&vlc_internals(obj)->children);
+    vlc_object_internals_t *priv;
+
+    vlc_children_foreach(priv, vlc_internals(obj))
+        return true;
+    return false;
 }
 
 static void PrintObjectPrefix(vlc_object_t *obj, bool last)
@@ -215,7 +229,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     vlc_cond_init (&priv->var_wait);
     atomic_init (&priv->refs, 1);
     priv->pf_destructor = NULL;
-    vlc_list_init(&priv->children);
     priv->resources = NULL;
 
     vlc_object_t *obj = (vlc_object_t *)(priv + 1);
@@ -224,8 +237,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
 
     if (likely(parent != NULL))
     {
-        vlc_object_internals_t *papriv = vlc_internals (parent);
-
         obj->obj.logger = parent->obj.logger;
         obj->obj.no_interact = parent->obj.no_interact;
 
@@ -234,7 +245,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
 
         /* Attach the parent to its child (structure lock needed) */
         vlc_mutex_lock(&tree_lock);
-        vlc_list_append(&priv->siblings, &papriv->children);
+        vlc_list_append(&priv->list, &tree_list);
         vlc_mutex_unlock(&tree_lock);
     }
     else
@@ -454,7 +465,7 @@ void vlc_object_release (vlc_object_t *obj)
 
     if (likely(refs == 1))
         /* Detach from parent to protect against vlc_object_find_name() */
-        vlc_list_remove(&priv->siblings);
+        vlc_list_remove(&priv->list);
     vlc_mutex_unlock(&tree_lock);
 
     if (likely(refs == 1))
