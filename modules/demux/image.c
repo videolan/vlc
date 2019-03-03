@@ -661,7 +661,10 @@ static vlc_fourcc_t Detect(stream_t *s)
             if (img->detect(s))
                 return img->codec;
 
-            /* detect callbacks can invalidate the current peek buffer */
+            if (vlc_stream_Seek(s, 0))
+               return 0;
+
+            /* Seeking invalidates the current peek buffer */
             peek_size = 0;
             continue;
         }
