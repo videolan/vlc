@@ -1569,9 +1569,10 @@ static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,
     switch(key)
     {
     case 0x1b:  /* ESC */
+        /* See comment in HandleEditBoxKey() */
         if (getch() != ERR)
             return;
-
+        /* fall through */
     case 'q':
     case 'Q':
     case KEY_EXIT:
