@@ -831,7 +831,9 @@ void Copy420_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
               src[0], src_pitch[0], height, 0);
 
     const unsigned copy_lines = (height+1) / 2;
-    const unsigned copy_pitch = __MIN(src_pitch[1], dst->p[1].i_pitch / 2);
+    unsigned copy_pitch = src_pitch[1];
+    if (copy_pitch > (size_t)dst->p[1].i_pitch / 2)
+        copy_pitch = dst->p[1].i_pitch / 2;
 
     const int i_extra_pitch_uv = dst->p[1].i_pitch - 2 * copy_pitch;
     const int i_extra_pitch_u  = src_pitch[U_PLANE] - copy_pitch;
