@@ -36,21 +36,23 @@
 
 void vlc_http_err(void *ctx, const char *fmt, ...)
 {
+    struct vlc_logger *logger = ctx;
     va_list ap;
 
     va_start(ap, fmt);
-    vlc_object_vaLog(ctx, VLC_MSG_ERR, "http", __FILE__, __LINE__, __func__,
-                     fmt, ap);
+    vlc_vaLog(&logger, VLC_MSG_ERR, "generic", "http",
+              __FILE__, __LINE__, __func__, fmt, ap);
     va_end(ap);
 }
 
 void vlc_http_dbg(void *ctx, const char *fmt, ...)
 {
+    struct vlc_logger *logger = ctx;
     va_list ap;
 
     va_start(ap, fmt);
-    vlc_object_vaLog(ctx, VLC_MSG_DBG, "http", __FILE__, __LINE__, __func__,
-                     fmt, ap);
+    vlc_vaLog(&logger, VLC_MSG_DBG, "generic", "http",
+              __FILE__, __LINE__, __func__, fmt, ap);
     va_end(ap);
 }
 
@@ -96,6 +98,7 @@ static char *vlc_http_proxy_find(const char *hostname, unsigned port,
 
 struct vlc_http_mgr
 {
+    struct vlc_logger *logger;
     vlc_object_t *obj;
     vlc_tls_client_t *creds;
     struct vlc_http_cookie_jar_t *jar;
@@ -189,9 +192,9 @@ static struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
      * NOTE: We do not enforce TLS version 1.2 for HTTP 2.0 explicitly.
      */
     if (http2)
-        conn = vlc_h2_conn_create(mgr->obj, tls);
+        conn = vlc_h2_conn_create(mgr->logger, tls);
     else
-        conn = vlc_h1_conn_create(mgr->obj, tls, false);
+        conn = vlc_h1_conn_create(mgr->logger, tls, false);
 
     if (unlikely(conn == NULL))
     {
@@ -227,7 +230,7 @@ static struct vlc_http_msg *vlc_http_request(struct vlc_http_mgr *mgr,
         free(proxy);
 
         if (url.psz_host != NULL)
-            stream = vlc_h1_request(mgr->obj, url.psz_host,
+            stream = vlc_h1_request(mgr->logger, url.psz_host,
                                     url.i_port ? url.i_port : 80, true, req,
                                     true, &conn);
         else
@@ -236,8 +239,8 @@ static struct vlc_http_msg *vlc_http_request(struct vlc_http_mgr *mgr,
         vlc_UrlClean(&url);
     }
     else
-        stream = vlc_h1_request(mgr->obj, host, port ? port : 80, false, req,
-                                true, &conn);
+        stream = vlc_h1_request(mgr->logger, host, port ? port : 80, false,
+                                req, true, &conn);
 
     if (stream == NULL)
         return NULL;
@@ -272,6 +275,7 @@ struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj,
     if (unlikely(mgr == NULL))
         return NULL;
 
+    mgr->logger = obj->obj.logger;
     mgr->obj = obj;
     mgr->creds = NULL;
     mgr->jar = jar;
