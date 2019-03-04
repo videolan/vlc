@@ -82,14 +82,12 @@ static void Win32DebugOutputMsg (void *, int , const vlc_log_t *,
                                  const char *, va_list);
 #endif
 
-/**
- * Emit a log message. This function is the variable argument list equivalent
- * to vlc_Log().
- */
-void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
-                const char *file, unsigned line, const char *func,
-                const char *format, va_list args)
+void vlc_vaLog(struct vlc_logger *const *loggerp, int type,
+               const char *typename, const char *module,
+               const char *file, unsigned line, const char *func,
+               const char *format, va_list args)
 {
+    struct vlc_logger *logger = *loggerp;
     /* Get basename from the module filename */
     char *p = strrchr(module, '/');
     if (p != NULL)
@@ -108,8 +106,8 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
     /* Fill message information fields */
     vlc_log_t msg;
 
-    msg.i_object_id = (uintptr_t)obj;
-    msg.psz_object_type = (obj != NULL) ? vlc_object_typename(obj) : "generic";
+    msg.i_object_id = (uintptr_t)(void *)loggerp;
+    msg.psz_object_type = typename;
     msg.psz_module = module;
     msg.psz_header = NULL;
     msg.file = file;
@@ -126,29 +124,19 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
 #endif
 
     /* Pass message to the callback */
-    if (obj != NULL)
-        vlc_vaLogCallback(obj->obj.logger, type, &msg, format, args);
+    if (logger != NULL)
+        vlc_vaLogCallback(logger, type, &msg, format, args);
 }
 
-/**
- * Emit a log message.
- * \param obj VLC object emitting the message or NULL
- * \param type VLC_MSG_* message type (info, error, warning or debug)
- * \param module name of module from which the message come
- *               (normally vlc_module_name)
- * \param file source module file name (normally __FILE__) or NULL
- * \param line function call source line number (normally __LINE__) or 0
- * \param func calling function name (normally __func__) or NULL
- * \param format printf-like message format
- */
-void vlc_Log(vlc_object_t *obj, int type, const char *module,
+void vlc_Log(struct vlc_logger *const *logger, int type,
+             const char *typename, const char *module,
              const char *file, unsigned line, const char *func,
              const char *format, ... )
 {
     va_list ap;
 
     va_start(ap, format);
-    vlc_vaLog(obj, type, module, file, line, func, format, ap);
+    vlc_vaLog(logger, type, typename, module, file, line, func, format, ap);
     va_end(ap);
 }
 

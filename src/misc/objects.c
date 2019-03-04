@@ -429,6 +429,33 @@ void vlc_object_release (vlc_object_t *obj)
     }
 }
 
+void vlc_object_vaLog(vlc_object_t *obj, int prio, const char *module,
+                      const char *file, unsigned line, const char *func,
+                      const char *format, va_list ap)
+{
+    if (obj == NULL)
+        return;
+
+    const char *typename = vlc_object_typename(obj);
+    /* FIXME: libvlc allows NULL type but modules don't */
+    if (typename == NULL)
+        typename = "generic";
+
+    vlc_vaLog(&obj->obj.logger, prio, typename, module, file, line, func,
+              format, ap);
+}
+
+void vlc_object_Log(vlc_object_t *obj, int prio, const char *module,
+                    const char *file, unsigned line, const char *func,
+                    const char *format, ...)
+{
+    va_list ap;
+
+    va_start(ap, format);
+    vlc_object_vaLog(obj, prio, module, file, line, func, format, ap);
+    va_end(ap);
+}
+
 /**
  * Lists the children of an object.
  *

@@ -64,19 +64,38 @@ typedef struct vlc_log_t
     unsigned long tid; /**< Emitter thread ID */
 } vlc_log_t;
 
-VLC_API void vlc_Log(vlc_object_t *obj, int prio, const char *module,
-                     const char *file, unsigned line, const char *func,
-                     const char *format, ...) VLC_FORMAT(7, 8);
-VLC_API void vlc_vaLog(vlc_object_t *obj, int prio, const char *module,
-                       const char *file, unsigned line, const char *func,
-                       const char *format, va_list ap);
+/**
+ * Emit a log message.
+ *
+ * \param obj VLC object emitting the message or NULL
+ * \param type VLC_MSG_* message type (info, error, warning or debug)
+ * \param module name of module from which the message come
+ *               (normally vlc_module_name)
+ * \param file source module file name (normally __FILE__) or NULL
+ * \param line function call source line number (normally __LINE__) or 0
+ * \param func calling function name (normally __func__) or NULL
+ * \param format printf-like message format
+ */
+VLC_API void vlc_object_Log(vlc_object_t *obj, int prio, const char *module,
+                            const char *file, unsigned line, const char *func,
+                            const char *format, ...) VLC_FORMAT(7, 8);
+
+/**
+ * Emit a log message.
+ *
+ * This function is the variable argument list equivalent to vlc_object_Log().
+ */
+VLC_API void vlc_object_vaLog(vlc_object_t *obj, int prio, const char *module,
+                             const char *file, unsigned line, const char *func,
+                              const char *format, va_list ap);
+
 #define msg_GenericVa(o, p, fmt, ap) \
-    vlc_vaLog(VLC_OBJECT(o), p, vlc_module_name, __FILE__, __LINE__, \
-              __func__, fmt, ap)
+    vlc_object_vaLog(VLC_OBJECT(o), p, vlc_module_name, __FILE__, __LINE__, \
+                     __func__, fmt, ap)
 
 #define msg_Generic(o, p, ...) \
-    vlc_Log(VLC_OBJECT(o), p, vlc_module_name, __FILE__, __LINE__, \
-            __func__, __VA_ARGS__)
+    vlc_object_Log(VLC_OBJECT(o), p, vlc_module_name, __FILE__, __LINE__, \
+                   __func__, __VA_ARGS__)
 #define msg_Info(p_this, ...) \
     msg_Generic(p_this, VLC_MSG_INFO, __VA_ARGS__)
 #define msg_Err(p_this, ...) \
@@ -99,6 +118,15 @@ VLC_API const char *vlc_strerror_c(int);
  */
 
 struct vlc_logger;
+
+VLC_API void vlc_Log(struct vlc_logger *const *logger, int prio,
+                     const char *type, const char *module,
+                     const char *file, unsigned line, const char *func,
+                     const char *format, ...) VLC_FORMAT(8, 9);
+VLC_API void vlc_vaLog(struct vlc_logger *const *logger, int prio,
+                       const char *type, const char *module,
+                       const char *file, unsigned line, const char *func,
+                       const char *format, va_list ap);
 
 /**
  * Message logging callback signature.
