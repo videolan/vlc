@@ -979,13 +979,13 @@ Deinterlace_Flush(filter_t *filter)
 
 static inline bool
 OpenDeinterlace_IsValidType(filter_t * filter,
-                            VAProcDeinterlacingType const caps[],
+                            VAProcFilterCapDeinterlacing const caps[],
                             unsigned int num_caps,
                             struct deint_mode const * deint_mode)
 {
     (void) filter;
     for (unsigned int j = 0; j < num_caps; ++j)
-        if (caps[j] == deint_mode->type)
+        if (caps[j].type == deint_mode->type)
             return true;
     return false;
 }
@@ -993,7 +993,7 @@ OpenDeinterlace_IsValidType(filter_t * filter,
 static inline int
 OpenDeinterlace_GetMode(filter_t * filter, char const * deint_mode,
                         struct deint_mode * p_deint_mode,
-                        VAProcDeinterlacingType const caps[],
+                        VAProcFilterCapDeinterlacing const caps[],
                         unsigned int num_caps)
 {
     bool fallback = false;
@@ -1046,7 +1046,8 @@ OpenDeinterlace_InitFilterParams(filter_t * filter, void * p_data,
 {
     struct deint_data *const    p_deint_data = p_data;
     filter_sys_t *const         filter_sys = filter->p_sys;
-    VAProcDeinterlacingType     caps[VAProcDeinterlacingCount];
+    VAProcFilterCapDeinterlacing
+                                caps[VAProcDeinterlacingCount];
     unsigned int                num_caps = VAProcDeinterlacingCount;
 
     if (vlc_vaapi_QueryVideoProcFilterCaps(VLC_OBJECT(filter),
