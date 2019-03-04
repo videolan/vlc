@@ -315,6 +315,8 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     assert(p_priv->resources == NULL);
 
+    int canc = vlc_savecancel();
+
     /* Call the custom "subclass" destructor */
     if( p_priv->pf_destructor )
         p_priv->pf_destructor( p_this );
@@ -328,6 +330,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     /* Destroy the associated variables. */
     var_DestroyAll( p_this );
+    vlc_restorecancel(canc);
 
     vlc_cond_destroy( &p_priv->var_wait );
     vlc_mutex_destroy( &p_priv->var_lock );
@@ -398,10 +401,7 @@ void vlc_object_release (vlc_object_t *obj)
         assert (refs == 1); /* nobody to race against in this case */
         /* no children can be left */
         assert(!ObjectHasChild(obj));
-
-        int canc = vlc_savecancel ();
         vlc_object_destroy (obj);
-        vlc_restorecancel (canc);
         return;
     }
 
@@ -420,11 +420,7 @@ void vlc_object_release (vlc_object_t *obj)
         atomic_thread_fence(memory_order_acquire);
         /* no children can be left (because children reference their parent) */
         assert(!ObjectHasChild(obj));
-
-        int canc = vlc_savecancel ();
         vlc_object_destroy (obj);
-        vlc_restorecancel (canc);
-
         vlc_object_release (parent);
     }
 }
