@@ -75,9 +75,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     }
 
     /* Hook for screensaver inhibition */
-    if (var_InheritBool(obj, "disable-screensaver") &&
-        (window->type == VOUT_WINDOW_TYPE_XID || window->type == VOUT_WINDOW_TYPE_HWND
-      || window->type == VOUT_WINDOW_TYPE_WAYLAND))
+    if (var_InheritBool(obj, "disable-screensaver"))
         w->inhibit = vlc_inhibit_Create(VLC_OBJECT(window));
     else
         w->inhibit = NULL;
