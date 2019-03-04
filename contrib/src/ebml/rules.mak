@@ -21,6 +21,6 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 EBML_CXXFLAGS := $(CXXFLAGS) $(PIC) -fexceptions -fvisibility=hidden
 
 .ebml: ebml toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) CXXFLAGS="$(EBML_CXXFLAGS)" $(CMAKE) -DBUILD_SHARED_LIBS=OFF
+	cd $< && $(HOSTVARS_PIC) CXXFLAGS="$(EBML_CXXFLAGS)" $(CMAKE) -DBUILD_SHARED_LIBS=OFF -DENABLE_WIN32_IO=OFF
 	cd $< && $(MAKE) install
 	touch $@
