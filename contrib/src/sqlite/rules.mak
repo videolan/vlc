@@ -9,6 +9,11 @@ ifeq ($(call need_pkg,"sqlite3"),)
 PKGS_FOUND += sqlite
 endif
 
+SQLITE_CFLAGS := $(CFLAGS)
+ifdef HAVE_WINSTORE
+SQLITE_CFLAGS += -DSQLITE_OS_WINRT=1
+endif
+
 SQLITE_CONF = $(HOSTCONF) --disable-readline
 
 $(TARBALLS)/sqlite-autoconf-$(SQLITE_VERSION).tar.gz:
@@ -22,6 +27,6 @@ sqlite: sqlite-autoconf-$(SQLITE_VERSION).tar.gz .sum-sqlite
 	$(MOVE)
 
 .sqlite: sqlite
-	cd $< && $(HOSTVARS) ./configure $(SQLITE_CONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(SQLITE_CFLAGS)" ./configure $(SQLITE_CONF)
 	cd $< && $(MAKE) && $(MAKE) install
 	touch $@
