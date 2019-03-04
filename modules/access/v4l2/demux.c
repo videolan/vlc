@@ -103,7 +103,7 @@ int DemuxOpen( vlc_object_t *obj )
         goto error;
     }
 
-    sys->controls = ControlsInit (VLC_OBJECT(demux), fd);
+    sys->controls = ControlsInit(vlc_object_parent(obj), fd);
     sys->start = vlc_tick_now ();
     demux->pf_demux = NULL;
     demux->pf_control = DemuxControl;
@@ -623,7 +623,7 @@ void DemuxClose( vlc_object_t *obj )
     vlc_join (sys->thread, NULL);
     if (sys->bufv != NULL)
         StopMmap (sys->fd, sys->bufv, sys->bufc);
-    ControlsDeinit( obj, sys->controls );
+    ControlsDeinit(vlc_object_parent(obj), sys->controls);
     v4l2_close (sys->fd);
 
 #ifdef ZVBI_COMPILED

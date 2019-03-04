@@ -86,7 +86,7 @@ int AccessOpen( vlc_object_t *obj )
         goto error;
     }
 
-    sys->controls = ControlsInit (VLC_OBJECT(access), fd);
+    sys->controls = ControlsInit(vlc_object_parent(obj), fd);
     access->pf_seek = NULL;
     access->pf_control = AccessControl;
     return VLC_SUCCESS;
@@ -192,7 +192,7 @@ void AccessClose( vlc_object_t *obj )
 
     if (sys->bufv != NULL)
         StopMmap (sys->fd, sys->bufv, sys->bufc);
-    ControlsDeinit( obj, sys->controls );
+    ControlsDeinit(vlc_object_parent(obj), sys->controls);
     v4l2_close (sys->fd);
     free( sys );
 }

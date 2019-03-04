@@ -100,7 +100,7 @@ int RadioOpen (vlc_object_t *obj)
         goto error;
 
     sys->fd = fd;
-    sys->controls = ControlsInit (VLC_OBJECT(demux), fd);
+    sys->controls = ControlsInit(vlc_object_parent(obj), fd);
     sys->start = vlc_tick_now ();
 
     demux->p_sys = sys;
@@ -118,7 +118,7 @@ void RadioClose (vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     demux_sys_t *sys = demux->p_sys;
 
-    ControlsDeinit (obj, sys->controls);
+    ControlsDeinit(vlc_object_parent(obj), sys->controls);
     v4l2_close (sys->fd);
     free (sys);
 }
