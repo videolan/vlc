@@ -495,6 +495,7 @@ else
 endif
 	echo "set(CMAKE_SYSTEM_PROCESSOR $(ARCH))" >> $@
 ifdef HAVE_WIN32
+ifdef HAVE_VISUALSTUDIO
 ifdef HAVE_WINDOWSPHONE
 	echo "set(CMAKE_SYSTEM_NAME WindowsPhone)" >> $@
 else
@@ -502,6 +503,7 @@ ifdef HAVE_WINSTORE
 	echo "set(CMAKE_SYSTEM_NAME WindowsStore)" >> $@
 else
 	echo "set(CMAKE_SYSTEM_NAME Windows)" >> $@
+endif
 endif
 endif
 ifdef HAVE_CROSS_COMPILE
