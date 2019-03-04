@@ -48,8 +48,11 @@ static int vout_window_start(void *func, bool forced, va_list ap)
     int (*activate)(vout_window_t *) = func;
     vout_window_t *wnd = va_arg(ap, vout_window_t *);
 
+    int ret = activate(wnd);
+    if (ret)
+        vlc_objres_clear(VLC_OBJECT(wnd));
     (void) forced;
-    return activate(wnd);
+    return ret;
 }
 
 vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
