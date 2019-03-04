@@ -387,6 +387,18 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     vlc_player_Unlock(_p_player);
 }
 
+- (void)togglePlayPause
+{
+    vlc_player_Lock(_p_player);
+    if (_playerState == VLC_PLAYER_STATE_PLAYING) {
+        vlc_player_Pause(_p_player);
+    } else if (_playerState == VLC_PLAYER_STATE_PAUSED) {
+        vlc_player_Resume(_p_player);
+    } else
+        vlc_player_Start(_p_player);
+    vlc_player_Unlock(_p_player);
+}
+
 - (void)stop
 {
     vlc_player_Lock(_p_player);

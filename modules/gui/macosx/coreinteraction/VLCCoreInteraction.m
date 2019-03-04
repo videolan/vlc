@@ -31,6 +31,7 @@
 #import "main/VLCMain.h"
 #import "coreinteraction/VLCClickerManager.h"
 #import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistModel.h"
 #import "windows/VLCOpenWindowController.h"
 
@@ -117,18 +118,18 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)playOrPause
 {
-    input_thread_t *p_input = pl_CurrentInput(getIntf());
-    playlist_t *p_playlist = pl_Get(getIntf());
+    VLCMain *mainInstance = [VLCMain sharedInstance];
+    VLCPlaylistController *playlistController = mainInstance.playlistController;
+    input_item_t *p_input_item = playlistController.currentlyPlayingInputItem;
 
-    if (p_input) {
-        playlist_TogglePause(p_playlist);
-        vlc_object_release(p_input);
+    if (p_input_item) {
+        [playlistController.playerController togglePlayPause];
+        input_item_Release(p_input_item);
     } else {
-        VLCMain *mainInstance = [VLCMain sharedInstance];
         if (mainInstance.playlistController.playlistModel.numberOfPlaylistItems == 0)
             [[mainInstance open] openFileGeneric];
         else
-            [mainInstance.playlistController startPlaylist];
+            [playlistController startPlaylist];
     }
 }
 

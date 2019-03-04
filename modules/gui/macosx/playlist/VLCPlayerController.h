@@ -172,6 +172,11 @@ extern NSString *VLCPlayerMuteChanged;
 - (void)resume;
 
 /**
+ * Convinience method to either start or pause playback
+ */
+- (void)togglePlayPause;
+
+/**
  * Stop the current playback
  */
 - (void)stop;
