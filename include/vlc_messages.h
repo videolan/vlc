@@ -128,6 +128,14 @@ VLC_API void vlc_vaLog(struct vlc_logger *const *logger, int prio,
                        const char *file, unsigned line, const char *func,
                        const char *format, va_list ap);
 
+#define vlc_log_gen(logger, prio, ...) \
+        vlc_Log(&(logger), prio, "generic", vlc_module_name, \
+                __FILE__, __LINE__, __func__, __VA_ARGS__)
+#define vlc_info(logger, ...)    vlc_log_gen(logger, VLC_MSG_INFO, __VA_ARGS__)
+#define vlc_error(logger, ...)   vlc_log_gen(logger, VLC_MSG_ERR,  __VA_ARGS__)
+#define vlc_warning(logger, ...) vlc_log_gen(logger, VLC_MSG_WARN, __VA_ARGS__)
+#define vlc_debug(logger, ...)   vlc_log_gen(logger, VLC_MSG_DBG,  __VA_ARGS__)
+
 /**
  * Message logging callback signature.
  * \param data data pointer as provided to vlc_msg_SetCallback().
