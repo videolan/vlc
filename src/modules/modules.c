@@ -332,13 +332,20 @@ static void generic_stop(void *func, va_list ap)
 module_t *module_need(vlc_object_t *obj, const char *cap, const char *name,
                       bool strict)
 {
-    return vlc_module_load(obj, cap, name, strict, generic_start, obj);
+    module_t *module = vlc_module_load(obj, cap, name, strict,
+                                       generic_start, obj);
+    if (module != NULL) {
+        var_Create(obj, "module-name", VLC_VAR_STRING);
+        var_SetString(obj, "module-name", module_get_object(module));
+    }
+    return module;
 }
 
 #undef module_unneed
 void module_unneed(vlc_object_t *obj, module_t *module)
 {
     msg_Dbg(obj, "removing module \"%s\"", module_get_object(module));
+    var_Destroy(obj, "module-name");
     vlc_module_unload(obj, module, generic_stop, obj);
 }
 
