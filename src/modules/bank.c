@@ -497,7 +497,7 @@ static void AllocateAllPlugins (vlc_object_t *p_this)
  *
  * \return 0 on success, -1 on failure
  */
-int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
+int module_Map(struct vlc_logger *log, vlc_plugin_t *plugin)
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
@@ -511,8 +511,8 @@ int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
     if (handle == NULL)
     {
         char *errmsg = vlc_dlerror();
-        msg_Err(obj, "cannot load plug-in %s: %s", plugin->abspath,
-                errmsg ? errmsg : "unknown error");
+        vlc_error(log, "cannot load plug-in %s: %s",
+                  plugin->abspath, errmsg ? errmsg : "unknown error");
         free(errmsg);
         return -1;
     }
@@ -520,7 +520,8 @@ int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
     vlc_plugin_cb entry = vlc_dlsym(handle, vlc_entry_name);
     if (entry == NULL)
     {
-        msg_Err(obj, "cannot find plug-in entry point in %s", plugin->abspath);
+        vlc_error(log, "cannot find plug-in entry point in %s",
+                  plugin->abspath);
         goto error;
     }
 

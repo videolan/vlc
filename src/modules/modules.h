@@ -110,7 +110,7 @@ void module_InitBank (void);
 void module_LoadPlugins(vlc_object_t *);
 #define module_LoadPlugins(a) module_LoadPlugins(VLC_OBJECT(a))
 void module_EndBank (bool);
-int module_Map(vlc_object_t *, vlc_plugin_t *);
+int module_Map(struct vlc_logger *, vlc_plugin_t *);
 
 ssize_t module_list_cap (module_t ***, const char *);
 
