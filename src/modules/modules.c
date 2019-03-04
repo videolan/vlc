@@ -151,12 +151,12 @@ static bool module_match_name(const module_t *m, const char *name, size_t len)
      return false;
 }
 
-static int module_load (vlc_object_t *obj, module_t *m,
-                        vlc_activate_t init, bool forced, va_list args)
+static int module_load(vlc_logger_t *log, module_t *m,
+                       vlc_activate_t init, bool forced, va_list args)
 {
     int ret = VLC_SUCCESS;
 
-    if (module_Map(obj->obj.logger, m->plugin))
+    if (module_Map(log, m->plugin))
         return VLC_EGENERIC;
 
     if (m->pf_activate != NULL)
@@ -171,7 +171,6 @@ static int module_load (vlc_object_t *obj, module_t *m,
     return ret;
 }
 
-#undef vlc_module_load
 /**
  * Finds and instantiates the best module of a certain type.
  * All candidates modules having the specified capability and name will be
@@ -184,7 +183,7 @@ static int module_load (vlc_object_t *obj, module_t *m,
  * variable arguments passed to this function. This scheme is meant to
  * support arbitrary prototypes for the module entry point.
  *
- * \param obj VLC object
+ * \param log logger (or NULL to ignore)
  * \param capability capability, i.e. class of module
  * \param name name of the module asked, if any
  * \param strict if true, do not fallback to plugin with a different name
@@ -192,9 +191,9 @@ static int module_load (vlc_object_t *obj, module_t *m,
  * \param probe module probe callback
  * \return the module or NULL in case of a failure
  */
-module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
-                          const char *name, bool strict,
-                          vlc_activate_t probe, ...)
+module_t *(vlc_module_load)(struct vlc_logger *log, const char *capability,
+                            const char *name, bool strict,
+                            vlc_activate_t probe, ...)
 {
     if (name == NULL || name[0] == '\0')
         name = "any";
@@ -203,12 +202,12 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
     module_t **mods;
     ssize_t total = module_list_cap (&mods, capability);
 
-    msg_Dbg (obj, "looking for %s module matching \"%s\": %zd candidates",
-             capability, name, total);
+    vlc_debug(log, "looking for %s module matching \"%s\": %zd candidates",
+              capability, name, total);
     if (total <= 0)
     {
         module_list_free (mods);
-        msg_Dbg (obj, "no %s modules", capability);
+        vlc_debug(log, "no %s modules", capability);
         return NULL;
     }
 
@@ -237,7 +236,7 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
                 continue;
             mods[i] = NULL; // only try each module once at most...
 
-            int ret = module_load(obj, cand, probe, force, args);
+            int ret = module_load(log, cand, probe, force, args);
             switch (ret)
             {
                 case VLC_SUCCESS:
@@ -258,7 +257,7 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
             if (cand == NULL || module_get_score (cand) <= 0)
                 continue;
 
-            int ret = module_load(obj, cand, probe, false, args);
+            int ret = module_load(log, cand, probe, false, args);
             switch (ret)
             {
                 case VLC_SUCCESS:
@@ -274,10 +273,10 @@ done:
     module_list_free (mods);
 
     if (module != NULL)
-        msg_Dbg (obj, "using %s module \"%s\"", capability,
-                 module_get_object (module));
+        vlc_debug(log, "using %s module \"%s\"", capability,
+                  module_get_object (module));
     else
-        msg_Dbg (obj, "no %s modules matched", capability);
+        vlc_debug(log, "no %s modules matched", capability);
     return module;
 }
 
@@ -325,7 +324,7 @@ module_t *module_need(vlc_object_t *obj, const char *cap, const char *name,
                       bool strict)
 {
     const bool b_force_backup = obj->obj.force; /* FIXME: remove this */
-    module_t *module = vlc_module_load(obj, cap, name, strict,
+    module_t *module = vlc_module_load(obj->obj.logger, cap, name, strict,
                                        generic_start, obj);
     if (module != NULL) {
         var_Create(obj, "module-name", VLC_VAR_STRING);

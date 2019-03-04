@@ -30,14 +30,27 @@
 
 typedef int (*vlc_activate_t)(void *func, bool forced, va_list args);
 typedef void (*vlc_deactivate_t)(void *func, va_list args);
+struct vlc_logger;
 
 /*****************************************************************************
  * Exported functions.
  *****************************************************************************/
 
-VLC_API module_t * vlc_module_load( vlc_object_t *obj, const char *cap, const char *name, bool strict, vlc_activate_t probe, ... ) VLC_USED;
-#define vlc_module_load(o, c, n, ...) \
-        vlc_module_load(VLC_OBJECT(o), c, n, __VA_ARGS__)
+VLC_API module_t *vlc_module_load(struct vlc_logger *log, const char *cap,
+                                  const char *name, bool strict,
+                                  vlc_activate_t probe, ... ) VLC_USED;
+#ifndef __cplusplus
+#define vlc_module_load(ctx, cap, name, strict, ...) \
+    _Generic ((ctx), \
+        struct vlc_logger *: \
+            vlc_module_load((void *)(ctx), cap, name, strict, __VA_ARGS__), \
+        void *: \
+            vlc_module_load((void *)(ctx), cap, name, strict, __VA_ARGS__), \
+        default: \
+            vlc_module_load(vlc_object_logger((vlc_object_t *)(ctx)), cap, \
+                            name, strict, __VA_ARGS__))
+#endif
+
 VLC_API void vlc_module_unload(module_t *, vlc_deactivate_t deinit, ... );
 
 VLC_API module_t * module_need( vlc_object_t *, const char *, const char *, bool ) VLC_USED;
