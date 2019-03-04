@@ -1697,6 +1697,7 @@ main(void)
         "--no-media-library",
         /* Avoid leaks from various dlopen... */
         "--codec=araw,rawvideo,subsdec,none",
+        "--dec-dev=none",
         "--vout=dummy",
         "--aout=dummy",
     };
