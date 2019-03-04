@@ -53,8 +53,11 @@ static int tls_server_load(void *func, bool forced, va_list ap)
     const char *cert = va_arg (ap, const char *);
     const char *key = va_arg (ap, const char *);
 
+    int ret = activate (crd, cert, key);
+    if (ret)
+        vlc_objres_clear(VLC_OBJECT(crd));
     (void) forced;
-    return activate (crd, cert, key);
+    return ret;
 }
 
 static int tls_client_load(void *func, bool forced, va_list ap)
@@ -62,8 +65,11 @@ static int tls_client_load(void *func, bool forced, va_list ap)
     int (*activate)(vlc_tls_client_t *) = func;
     vlc_tls_client_t *crd = va_arg(ap, vlc_tls_client_t *);
 
+    int ret = activate (crd);
+    if (ret)
+        vlc_objres_clear(VLC_OBJECT(crd));
     (void) forced;
-    return activate (crd);
+    return ret;
 }
 
 vlc_tls_server_t *
