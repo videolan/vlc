@@ -223,7 +223,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         return NULL;
 
     priv->typename = typename;
-    atomic_init(&priv->is_v4l2, false);
     priv->var_root = NULL;
     vlc_mutex_init (&priv->var_lock);
     vlc_cond_init (&priv->var_wait);
@@ -308,20 +307,15 @@ vlc_object_t *(vlc_object_parent)(vlc_object_t *obj)
 #undef vlc_object_set_name
 int vlc_object_set_name(vlc_object_t *obj, const char *name)
 {
-    vlc_object_internals_t *priv = vlc_internals(obj);
-    /* See vlc_object_find_name(). */
-    bool newname = unlikely(strcmp(name, "v4l2") == 0);
-
-    atomic_store_explicit(&priv->is_v4l2, newname, memory_order_release);
+    assert(obj != NULL);
+    (void) name;
     return VLC_SUCCESS;
 }
 
 char *vlc_object_get_name(const vlc_object_t *obj)
 {
-    vlc_object_internals_t *priv = vlc_internals(obj);
-
-    return atomic_load_explicit(&priv->is_v4l2, memory_order_acquire)
-           ? strdup("v4l2") : NULL;
+    assert(obj != NULL);
+    return NULL;
 }
 
 /**
@@ -354,25 +348,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     free( p_priv );
 }
 
-static vlc_object_t *FindV4L2(vlc_object_t *obj)
-{
-    vlc_object_internals_t *priv = vlc_internals(obj), *cpriv;
-
-    if (atomic_load_explicit(&priv->is_v4l2, memory_order_relaxed))
-        return vlc_object_hold (obj);
-
-    vlc_object_t *found = NULL;
-
-    vlc_mutex_assert(&tree_lock);
-    vlc_children_foreach(cpriv, priv)
-    {
-        found = FindV4L2(vlc_externals(cpriv));
-        if (found != NULL)
-            break;
-    }
-    return found;
-}
-
 #undef vlc_object_find_name
 /**
  * Finds a named object and increment its reference count.
@@ -390,22 +365,8 @@ static vlc_object_t *FindV4L2(vlc_object_t *obj)
  */
 vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
 {
-    vlc_object_t *p_found;
-
-    /* The object name is not thread-safe, provides no warranty that the
-     * object is fully initialized and still active, and that its owner can
-     * deal with asynchronous and external state changes. There may be multiple
-     * objects with the same name, and the function may fail even if a matching
-     * object exists. DO NOT USE THIS IN NEW CODE. */
-    /* This was officially deprecated on August 19 2009. As of 2019, only
-     * the V4L2 input controls still rely on this. */
-    if (strcmp(psz_name, "v4l2"))
-        return NULL;
-
-    vlc_mutex_lock(&tree_lock);
-    p_found = FindV4L2(p_this);
-    vlc_mutex_unlock(&tree_lock);
-    return p_found;
+    (void) p_this; (void) psz_name;
+    return NULL;
 }
 
 #undef vlc_object_hold
