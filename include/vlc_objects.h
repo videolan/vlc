@@ -112,6 +112,12 @@ VLC_API const char *vlc_object_typename(const vlc_object_t *obj) VLC_USED;
 VLC_API vlc_object_t *vlc_object_parent(vlc_object_t *obj) VLC_USED;
 #define vlc_object_parent(o) vlc_object_parent(VLC_OBJECT(o))
 
+static inline struct vlc_logger *vlc_object_logger(vlc_object_t *obj)
+{
+    return obj->obj.logger;
+}
+#define vlc_object_logger(o) vlc_object_logger(VLC_OBJECT(o))
+
 /**
  * Tries to get the name of module bound to an object.
  *
