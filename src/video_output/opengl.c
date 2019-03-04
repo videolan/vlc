@@ -112,7 +112,7 @@ void vlc_gl_Release(vlc_gl_t *gl)
     if (!vlc_atomic_rc_dec(&glpriv->rc))
         return;
 
-    vlc_module_unload(gl, gl->module, vlc_gl_stop, gl);
+    vlc_module_unload(gl->module, vlc_gl_stop, gl);
     vlc_objres_clear(VLC_OBJECT(gl));
     vlc_object_release(gl);
 }

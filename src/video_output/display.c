@@ -797,7 +797,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
 
     if (VoutDisplayCreateRender(vd)) {
         if (vd->module != NULL) {
-            vlc_module_unload(vd, vd->module, vout_display_stop, vd);
+            vlc_module_unload(vd->module, vout_display_stop, vd);
             vlc_objres_clear(VLC_OBJECT(vd));
         }
         video_format_Clean(&vd->fmt);
@@ -823,7 +823,7 @@ void vout_display_Delete(vout_display_t *vd)
         picture_pool_Release(osys->pool);
 
     if (vd->module != NULL) {
-        vlc_module_unload(vd, vd->module, vout_display_stop, vd);
+        vlc_module_unload(vd->module, vout_display_stop, vd);
         vlc_objres_clear(VLC_OBJECT(vd));
     }
 

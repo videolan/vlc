@@ -161,8 +161,7 @@ vlc_decoder_device_Release(vlc_decoder_device *device)
             container_of(device, struct vlc_decoder_device_priv, device);
     if (vlc_atomic_rc_dec(&priv->rc))
     {
-        vlc_module_unload(device, priv->module, decoder_device_Close,
-                          device);
+        vlc_module_unload(priv->module, decoder_device_Close, device);
         vlc_object_release(device);
     }
 }

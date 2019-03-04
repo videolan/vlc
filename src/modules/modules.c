@@ -284,14 +284,12 @@ done:
     return module;
 }
 
-#undef vlc_module_unload
 /**
  * Deinstantiates a module.
  * \param module the module pointer as returned by vlc_module_load()
  * \param deinit deactivation callback
  */
-void vlc_module_unload(vlc_object_t *obj, module_t *module,
-                       vlc_deactivate_t deinit, ...)
+void vlc_module_unload(module_t *module, vlc_deactivate_t deinit, ...)
 {
     if (module->pf_deactivate != NULL)
     {
@@ -346,7 +344,7 @@ void module_unneed(vlc_object_t *obj, module_t *module)
 {
     msg_Dbg(obj, "removing module \"%s\"", module_get_object(module));
     var_Destroy(obj, "module-name");
-    vlc_module_unload(obj, module, generic_stop, obj);
+    vlc_module_unload(module, generic_stop, obj);
     vlc_objres_clear(obj);
 }
 
