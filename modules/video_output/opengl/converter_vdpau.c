@@ -112,6 +112,7 @@ Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
     _glVDPAUFiniNV(); assert(tc->vt->GetError() == GL_NO_ERROR);
+    vdp_release_x11(tc->dec_device->opaque);
 }
 
 static int
