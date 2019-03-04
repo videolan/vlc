@@ -42,24 +42,11 @@
 #include "vlc_arrays.h"
 #include "modules/modules.h"
 
-/**
- * Checks whether a module implements a capability.
- *
- * \param m the module
- * \param cap the capability to check
- * \return true if the module has the capability
- */
 bool module_provides (const module_t *m, const char *cap)
 {
     return !strcmp (module_get_capability (m), cap);
 }
 
-/**
- * Get the internal name of a module
- *
- * \param m the module
- * \return the module name
- */
 const char *module_get_object( const module_t *m )
 {
     if (unlikely(m->i_shortcuts == 0))
@@ -67,13 +54,6 @@ const char *module_get_object( const module_t *m )
     return m->pp_shortcuts[0];
 }
 
-/**
- * Get the human-friendly name of a module.
- *
- * \param m the module
- * \param long_name TRUE to have the long name of the module
- * \return the short or long name of the module
- */
 const char *module_get_name( const module_t *m, bool long_name )
 {
     if( long_name && ( m->psz_longname != NULL) )
@@ -84,46 +64,21 @@ const char *module_get_name( const module_t *m, bool long_name )
     return module_get_object (m);
 }
 
-/**
- * Get the help for a module
- *
- * \param m the module
- * \return the help
- */
 const char *module_get_help( const module_t *m )
 {
     return m->psz_help;
 }
 
-/**
- * Gets the capability of a module
- *
- * \param m the module
- * \return the capability, or "none" if unspecified
- */
 const char *module_get_capability (const module_t *m)
 {
     return (m->psz_capability != NULL) ? m->psz_capability : "none";
 }
 
-/**
- * Get the score for a module
- *
- * \param m the module
- * return the score for the capability
- */
 int module_get_score( const module_t *m )
 {
     return m->i_score;
 }
 
-/**
- * Translate a string using the module's text domain
- *
- * \param m the module
- * \param str the American English ASCII string to localize
- * \return the gettext-translated string
- */
 const char *module_gettext (const module_t *m, const char *str)
 {
     if (unlikely(str == NULL || *str == '\0'))
@@ -280,11 +235,6 @@ done:
     return module;
 }
 
-/**
- * Deinstantiates a module.
- * \param module the module pointer as returned by vlc_module_load()
- * \param deinit deactivation callback
- */
 void vlc_module_unload(module_t *module, vlc_deactivate_t deinit, ...)
 {
     if (module->pf_deactivate != NULL)
@@ -344,12 +294,6 @@ void module_unneed(vlc_object_t *obj, module_t *module)
     vlc_objres_clear(obj);
 }
 
-/**
- * Get a pointer to a module_t given it's name.
- *
- * \param name the name of the module
- * \return a pointer to the module or NULL in case of a failure
- */
 module_t *module_find (const char *name)
 {
     size_t count;
@@ -373,24 +317,11 @@ module_t *module_find (const char *name)
     return NULL;
 }
 
-/**
- * Tell if a module exists
- *
- * \param psz_name th name of the module
- * \return TRUE if the module exists
- */
 bool module_exists (const char * psz_name)
 {
     return module_find (psz_name) != NULL;
 }
 
-/**
- * Get the configuration of a module
- *
- * \param module the module
- * \param psize the size of the configuration returned
- * \return the configuration as an array
- */
 module_config_t *module_config_get( const module_t *module, unsigned *restrict psize )
 {
     const vlc_plugin_t *plugin = module->plugin;
@@ -427,12 +358,6 @@ module_config_t *module_config_get( const module_t *module, unsigned *restrict p
     return config;
 }
 
-/**
- * Release the configuration
- *
- * \param the configuration
- * \return nothing
- */
 void module_config_free( module_config_t *config )
 {
     free( config );
