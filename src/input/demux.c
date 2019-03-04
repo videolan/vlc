@@ -175,8 +175,11 @@ static int demux_Probe(void *func, bool forced, va_list ap)
         return VLC_EGENERIC;
     }
 
+    int ret = probe(VLC_OBJECT(demux));
+    if (ret)
+        vlc_objres_clear(VLC_OBJECT(demux));
     (void) forced;
-    return probe(VLC_OBJECT(demux));
+    return ret;
 }
 
 demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
