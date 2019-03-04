@@ -312,12 +312,6 @@ int vlc_object_set_name(vlc_object_t *obj, const char *name)
     return VLC_SUCCESS;
 }
 
-char *vlc_object_get_name(const vlc_object_t *obj)
-{
-    assert(obj != NULL);
-    return NULL;
-}
-
 /**
  * Destroys a VLC object once it has no more references.
  *

@@ -112,7 +112,18 @@ VLC_API const char *vlc_object_typename(const vlc_object_t *obj) VLC_USED;
 VLC_API vlc_object_t *vlc_object_parent(vlc_object_t *obj) VLC_USED;
 #define vlc_object_parent(o) vlc_object_parent(VLC_OBJECT(o))
 
-VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
+/**
+ * Tries to get the name of module bound to an object.
+ *
+ * \warning This function is intrinsically race-prone, as a module may be
+ * bound or unbound asynchronously by another thread.
+ * Do not trust the result for any purpose other than debugging/tracing.
+ *
+ * \return Normally, this returns a heap-allocated nul-terminated string
+ * which is the name of the module. If no module are bound to the object, it
+ * returns NULL. It also returns NULL on error.
+ */
+#define vlc_object_get_name(obj) var_GetString(obj, "module-name")
 
 #define vlc_object_create(a,b) vlc_object_create( VLC_OBJECT(a), b )
 
