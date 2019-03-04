@@ -168,9 +168,6 @@ static int module_load (vlc_object_t *obj, module_t *m,
         va_end (ap);
     }
 
-    if (ret != VLC_SUCCESS)
-        vlc_objres_clear(obj);
-
     return ret;
 }
 
@@ -304,8 +301,6 @@ void vlc_module_unload(vlc_object_t *obj, module_t *module,
         deinit(module->pf_deactivate, ap);
         va_end(ap);
     }
-
-    vlc_objres_clear(obj);
 }
 
 
@@ -313,9 +308,13 @@ static int generic_start(void *func, bool forced, va_list ap)
 {
     vlc_object_t *obj = va_arg(ap, vlc_object_t *);
     int (*activate)(vlc_object_t *) = func;
+    int ret;
 
     obj->obj.force = forced;
-    return activate(obj);
+    ret = activate(obj);
+    if (ret != VLC_SUCCESS)
+        vlc_objres_clear(obj);
+    return ret;
 }
 
 static void generic_stop(void *func, va_list ap)
@@ -348,6 +347,7 @@ void module_unneed(vlc_object_t *obj, module_t *module)
     msg_Dbg(obj, "removing module \"%s\"", module_get_object(module));
     var_Destroy(obj, "module-name");
     vlc_module_unload(obj, module, generic_stop, obj);
+    vlc_objres_clear(obj);
 }
 
 /**
