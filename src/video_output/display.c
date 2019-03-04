@@ -80,8 +80,10 @@ static int vout_display_start(void *func, bool forced, va_list ap)
     vd->obj.force = forced; /* TODO: pass to activate() instead? */
 
     int ret = activate(vd, cfg, fmtp, context);
-    if (ret != VLC_SUCCESS)
+    if (ret != VLC_SUCCESS) {
         video_format_Clean(fmtp);
+        vlc_objres_clear(VLC_OBJECT(vd));
+    }
     return ret;
 }
 
@@ -794,9 +796,10 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
 #endif
 
     if (VoutDisplayCreateRender(vd)) {
-        if (vd->module != NULL)
+        if (vd->module != NULL) {
             vlc_module_unload(vd, vd->module, vout_display_stop, vd);
-
+            vlc_objres_clear(VLC_OBJECT(vd));
+        }
         video_format_Clean(&vd->fmt);
         goto error;
     }
@@ -819,8 +822,10 @@ void vout_display_Delete(vout_display_t *vd)
     if (osys->pool != NULL)
         picture_pool_Release(osys->pool);
 
-    if (vd->module != NULL)
+    if (vd->module != NULL) {
         vlc_module_unload(vd, vd->module, vout_display_stop, vd);
+        vlc_objres_clear(VLC_OBJECT(vd));
+    }
 
     if (osys->video_context.device)
         vlc_decoder_device_Release(osys->video_context.device);

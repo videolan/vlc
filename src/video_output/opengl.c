@@ -45,8 +45,11 @@ static int vlc_gl_start(void *func, bool forced, va_list ap)
     unsigned width = va_arg(ap, unsigned);
     unsigned height = va_arg(ap, unsigned);
 
+    int ret = activate(gl, width, height);
+    if (ret)
+        vlc_objres_clear(VLC_OBJECT(gl));
     (void) forced;
-    return activate(gl, width, height);
+    return ret;
 }
 
 static void vlc_gl_stop(void *func, va_list ap)
@@ -110,6 +113,7 @@ void vlc_gl_Release(vlc_gl_t *gl)
         return;
 
     vlc_module_unload(gl, gl->module, vlc_gl_stop, gl);
+    vlc_objres_clear(VLC_OBJECT(gl));
     vlc_object_release(gl);
 }
 
