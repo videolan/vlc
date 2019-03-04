@@ -38,13 +38,14 @@ struct vlc_gl_priv_t
     vlc_atomic_rc_t rc;
 };
 
-static int vlc_gl_start(void *func, va_list ap)
+static int vlc_gl_start(void *func, bool forced, va_list ap)
 {
     int (*activate)(vlc_gl_t *, unsigned, unsigned) = func;
     vlc_gl_t *gl = va_arg(ap, vlc_gl_t *);
     unsigned width = va_arg(ap, unsigned);
     unsigned height = va_arg(ap, unsigned);
 
+    (void) forced;
     return activate(gl, width, height);
 }
 

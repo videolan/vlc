@@ -28,7 +28,7 @@
  * This file defines functions for modules in vlc
  */
 
-typedef int (*vlc_activate_t)(void *func, va_list args);
+typedef int (*vlc_activate_t)(void *func, bool forced, va_list args);
 typedef void (*vlc_deactivate_t)(void *func, va_list args);
 
 /*****************************************************************************

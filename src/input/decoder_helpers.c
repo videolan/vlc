@@ -97,7 +97,7 @@ struct vlc_decoder_device_priv
     module_t *module;
 };
 
-static int decoder_device_Open(void *func, va_list ap)
+static int decoder_device_Open(void *func, bool forced, va_list ap)
 {
     vlc_decoder_device_Open open = func;
     vlc_decoder_device *device = va_arg(ap, vlc_decoder_device *);
@@ -113,6 +113,7 @@ static int decoder_device_Open(void *func, va_list ap)
     {
         assert(device->type != VLC_DECODER_DEVICE_NONE);
     }
+    (void) forced;
     return ret;
 }
 

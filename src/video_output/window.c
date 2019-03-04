@@ -43,11 +43,12 @@ typedef struct
     vlc_inhibit_t *inhibit;
 } window_t;
 
-static int vout_window_start(void *func, va_list ap)
+static int vout_window_start(void *func, bool forced, va_list ap)
 {
     int (*activate)(vout_window_t *) = func;
     vout_window_t *wnd = va_arg(ap, vout_window_t *);
 
+    (void) forced;
     return activate(wnd);
 }
 

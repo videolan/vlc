@@ -46,21 +46,23 @@
 
 /*** TLS credentials ***/
 
-static int tls_server_load(void *func, va_list ap)
+static int tls_server_load(void *func, bool forced, va_list ap)
 {
     int (*activate)(vlc_tls_server_t *, const char *, const char *) = func;
     vlc_tls_server_t *crd = va_arg(ap, vlc_tls_server_t *);
     const char *cert = va_arg (ap, const char *);
     const char *key = va_arg (ap, const char *);
 
+    (void) forced;
     return activate (crd, cert, key);
 }
 
-static int tls_client_load(void *func, va_list ap)
+static int tls_client_load(void *func, bool forced, va_list ap)
 {
     int (*activate)(vlc_tls_client_t *) = func;
     vlc_tls_client_t *crd = va_arg(ap, vlc_tls_client_t *);
 
+    (void) forced;
     return activate (crd);
 }
 

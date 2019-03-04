@@ -392,12 +392,13 @@ struct vlc_logger_module {
     void *opaque;
 };
 
-static int vlc_logger_load(void *func, va_list ap)
+static int vlc_logger_load(void *func, bool forced, va_list ap)
 {
     const struct vlc_logger_operations *(*activate)(vlc_object_t *,
                                                     void **) = func;
     struct vlc_logger_module *module = va_arg(ap, struct vlc_logger_module *);
 
+    (void) forced;
     module->ops = activate(VLC_OBJECT(module), &module->opaque);
     return (module->ops != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
 }

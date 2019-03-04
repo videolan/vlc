@@ -152,7 +152,7 @@ static bool module_match_name(const module_t *m, const char *name, size_t len)
 }
 
 static int module_load (vlc_object_t *obj, module_t *m,
-                        vlc_activate_t init, va_list args)
+                        vlc_activate_t init, bool forced, va_list args)
 {
     int ret = VLC_SUCCESS;
 
@@ -164,7 +164,7 @@ static int module_load (vlc_object_t *obj, module_t *m,
         va_list ap;
 
         va_copy (ap, args);
-        ret = init (m->pf_activate, ap);
+        ret = init(m->pf_activate, forced, ap);
         va_end (ap);
     }
 
@@ -216,7 +216,6 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
     }
 
     module_t *module = NULL;
-    const bool b_force_backup = obj->obj.force; /* FIXME: remove this */
     va_list args;
 
     va_start(args, probe);
@@ -231,7 +230,7 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
         if (!strcasecmp ("none", shortcut))
             goto done;
 
-        obj->obj.force = strict && strcasecmp ("any", shortcut);
+        bool force = strict && strcasecmp ("any", shortcut);
         for (ssize_t i = 0; i < total; i++)
         {
             module_t *cand = mods[i];
@@ -241,7 +240,7 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
                 continue;
             mods[i] = NULL; // only try each module once at most...
 
-            int ret = module_load (obj, cand, probe, args);
+            int ret = module_load(obj, cand, probe, force, args);
             switch (ret)
             {
                 case VLC_SUCCESS:
@@ -256,14 +255,13 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
     /* None of the shortcuts matched, fall back to any module */
     if (!strict)
     {
-        obj->obj.force = false;
         for (ssize_t i = 0; i < total; i++)
         {
             module_t *cand = mods[i];
             if (cand == NULL || module_get_score (cand) <= 0)
                 continue;
 
-            int ret = module_load (obj, cand, probe, args);
+            int ret = module_load(obj, cand, probe, false, args);
             switch (ret)
             {
                 case VLC_SUCCESS:
@@ -276,7 +274,6 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
     }
 done:
     va_end (args);
-    obj->obj.force = b_force_backup;
     module_list_free (mods);
 
     if (module != NULL)
@@ -312,11 +309,12 @@ void vlc_module_unload(vlc_object_t *obj, module_t *module,
 }
 
 
-static int generic_start(void *func, va_list ap)
+static int generic_start(void *func, bool forced, va_list ap)
 {
     vlc_object_t *obj = va_arg(ap, vlc_object_t *);
     int (*activate)(vlc_object_t *) = func;
 
+    obj->obj.force = forced;
     return activate(obj);
 }
 
@@ -332,12 +330,15 @@ static void generic_stop(void *func, va_list ap)
 module_t *module_need(vlc_object_t *obj, const char *cap, const char *name,
                       bool strict)
 {
+    const bool b_force_backup = obj->obj.force; /* FIXME: remove this */
     module_t *module = vlc_module_load(obj, cap, name, strict,
                                        generic_start, obj);
     if (module != NULL) {
         var_Create(obj, "module-name", VLC_VAR_STRING);
         var_SetString(obj, "module-name", module_get_object(module));
     }
+
+    obj->obj.force = b_force_backup;
     return module;
 }
 

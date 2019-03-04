@@ -88,7 +88,7 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt)
     }
 }
 
-static int vlc_va_Start(void *func, va_list ap)
+static int vlc_va_Start(void *func, bool forced, va_list ap)
 {
     vlc_va_t *va = va_arg(ap, vlc_va_t *);
     AVCodecContext *ctx = va_arg(ap, AVCodecContext *);
@@ -98,6 +98,7 @@ static int vlc_va_Start(void *func, va_list ap)
     int (*open)(vlc_va_t *, AVCodecContext *, enum PixelFormat,
                 const es_format_t *, void *) = func;
 
+    (void) forced;
     return open(va, ctx, pix_fmt, fmt, p_sys);
 }
 

@@ -65,7 +65,7 @@ static picture_t *VideoBufferNew(filter_t *filter)
  *
  *****************************************************************************/
 
-static int vout_display_start(void *func, va_list ap)
+static int vout_display_start(void *func, bool forced, va_list ap)
 {
     vout_display_open_cb activate = func;
     vout_display_t *vd = va_arg(ap, vout_display_t *);
@@ -77,6 +77,7 @@ static int vout_display_start(void *func, va_list ap)
     video_format_Copy(fmtp, &vd->source);
     fmtp->i_sar_num = 0;
     fmtp->i_sar_den = 0;
+    vd->obj.force = forced; /* TODO: pass to activate() instead? */
 
     int ret = activate(vd, cfg, fmtp, context);
     if (ret != VLC_SUCCESS)

@@ -162,7 +162,7 @@ static void demux_DestroyDemux(demux_t *demux)
     vlc_stream_Delete(demux->s);
 }
 
-static int demux_Probe(void *func, va_list ap)
+static int demux_Probe(void *func, bool forced, va_list ap)
 {
     int (*probe)(vlc_object_t *) = func;
     demux_t *demux = va_arg(ap, demux_t *);
@@ -175,6 +175,7 @@ static int demux_Probe(void *func, va_list ap)
         return VLC_EGENERIC;
     }
 
+    (void) forced;
     return probe(VLC_OBJECT(demux));
 }
 
