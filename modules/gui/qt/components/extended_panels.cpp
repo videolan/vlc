@@ -639,7 +639,7 @@ void ExtV4l2::showEvent( QShowEvent *event )
 
 void ExtV4l2::Refresh( void )
 {
-    vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( THEPL, "v4l2" );
+    vlc_object_t *p_obj = (vlc_object_t *)THEMIM->getInput();
     help->hide();
     if( box )
     {
@@ -647,7 +647,8 @@ void ExtV4l2::Refresh( void )
         delete box;
         box = NULL;
     }
-    if( p_obj )
+
+    if( p_obj != NULL && var_Type(p_obj, "controls") )
     {
         vlc_value_t *val;
         char **text;
@@ -781,7 +782,6 @@ void ExtV4l2::Refresh( void )
         }
         free(text);
         free(val);
-        vlc_object_release( p_obj );
     }
     else
     {
@@ -800,7 +800,7 @@ void ExtV4l2::ValueChange( bool value )
 void ExtV4l2::ValueChange( int value )
 {
     QObject *s = sender();
-    vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( THEPL, "v4l2" );
+    vlc_object_t *p_obj = (vlc_object_t*)THEMIM->getInput();
     if( p_obj )
     {
         QString var = s->objectName();
@@ -822,7 +822,6 @@ void ExtV4l2::ValueChange( int value )
                 var_TriggerCallback( p_obj, qtu( var ) );
                 break;
         }
-        vlc_object_release( p_obj );
     }
     else
     {
