@@ -136,12 +136,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     input_thread_t *p_current_input;
     dispatch_queue_t informInputChangedQueue;
 
-    /* sleep management */
-    IOPMAssertionID systemSleepAssertionID;
-    IOPMAssertionID monitorSleepAssertionID;
-
-    IOPMAssertionID userActivityAssertionID;
-
     /* iTunes/Spotify play/pause support */
     BOOL b_has_itunes_paused;
     BOOL b_has_spotify_paused;
@@ -273,7 +267,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)playbackStatusUpdated
 {
-    // On shutdown, input might not be dead yet. Cleanup actions like inhibit, itunes playback
+    // On shutdown, input might not be dead yet. Cleanup actions like itunes playback
     // and playback positon are done in different code paths (dealloc and appWillTerminate:).
     if ([[VLCMain sharedInstance] isTerminating]) {
         return;
@@ -295,8 +289,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     if (state == PLAYING_S) {
         [self stopItunesPlayback];
 
-        [self inhibitSleep];
-
         [[o_main mainMenu] setPause];
         [[o_main mainWindow] setPause];
 
@@ -309,7 +301,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         [[o_main mainWindow] setPlay];
 
         if (state == PAUSE_S) {
-            [self releaseSleepBlockers];
 
             if (@available(macOS 10.12.2, *)) {
                 [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStatePaused;
@@ -345,7 +336,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 {
     msg_Dbg(getIntf(), "Playback has been ended");
 
-    [self releaseSleepBlockers];
     [self resumeItunesPlayback];
     hasEndedTimer = nil;
 }
@@ -414,77 +404,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     b_has_itunes_paused = NO;
     b_has_spotify_paused = NO;
-}
-
-- (void)inhibitSleep
-{
-    BOOL shouldDisableScreensaver = var_InheritBool(getIntf(), "disable-screensaver");
-
-    /* Declare user activity.
-     This wakes the display if it is off, and postpones display sleep according to the users system preferences
-     Available from 10.7.3 */
-    if ([o_main activeVideoPlayback] && &IOPMAssertionDeclareUserActivity && shouldDisableScreensaver)
-    {
-        CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
-        IOReturn success = IOPMAssertionDeclareUserActivity(reasonForActivity,
-                                                            kIOPMUserActiveLocal,
-                                                            &userActivityAssertionID);
-        CFRelease(reasonForActivity);
-
-        if (success != kIOReturnSuccess)
-            msg_Warn(getIntf(), "failed to declare user activity");
-
-    }
-
-    // Only set assertion if no previous / active assertion exist. This is necessary to keep
-    // audio only playback awake. If playback switched from video to audio or vice vesa, deactivate
-    // the other assertion and activate the needed assertion instead.
-    void(^activateAssertion)(CFStringRef, IOPMAssertionID*, IOPMAssertionID*) = ^void(CFStringRef assertionType, IOPMAssertionID* assertionIdRef, IOPMAssertionID* otherAssertionIdRef) {
-
-        if (*otherAssertionIdRef > 0) {
-            msg_Dbg(getIntf(), "Releasing old IOKit other assertion (%i)" , *otherAssertionIdRef);
-            IOPMAssertionRelease(*otherAssertionIdRef);
-            *otherAssertionIdRef = 0;
-        }
-
-        if (*assertionIdRef) {
-            msg_Dbg(getIntf(), "Continue to use IOKit assertion %s (%i)", [(__bridge NSString *)(assertionType) UTF8String], *assertionIdRef);
-            return;
-        }
-
-        CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
-
-        IOReturn success = IOPMAssertionCreateWithName(assertionType, kIOPMAssertionLevelOn, reasonForActivity, assertionIdRef);
-        CFRelease(reasonForActivity);
-
-        if (success == kIOReturnSuccess)
-            msg_Dbg(getIntf(), "Activated assertion %s through IOKit (%i)", [(__bridge NSString *)(assertionType) UTF8String], *assertionIdRef);
-        else
-            msg_Warn(getIntf(), "Failed to prevent system sleep through IOKit");
-    };
-
-    if ([o_main activeVideoPlayback] && shouldDisableScreensaver) {
-        activateAssertion(kIOPMAssertionTypeNoDisplaySleep, &monitorSleepAssertionID, &systemSleepAssertionID);
-    } else {
-        activateAssertion(kIOPMAssertionTypeNoIdleSleep, &systemSleepAssertionID, &monitorSleepAssertionID);
-    }
-
-}
-
-- (void)releaseSleepBlockers
-{
-    /* allow the system to sleep again */
-    if (systemSleepAssertionID > 0) {
-        msg_Dbg(getIntf(), "Releasing IOKit system sleep blocker (%i)" , systemSleepAssertionID);
-        IOPMAssertionRelease(systemSleepAssertionID);
-        systemSleepAssertionID = 0;
-    }
-
-    if (monitorSleepAssertionID > 0) {
-        msg_Dbg(getIntf(), "Releasing IOKit monitor sleep blocker (%i)" , monitorSleepAssertionID);
-        IOPMAssertionRelease(monitorSleepAssertionID);
-        monitorSleepAssertionID = 0;
-    }
 }
 
 - (void)updateMetaAndInfo

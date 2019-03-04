@@ -23,7 +23,6 @@
 #include <vlc_common.h>
 #import <vlc_interface.h>
 
-#import <IOKit/pwr_mgt/IOPMLib.h>           /* for sleep prevention */
 
 
 @class VLCMain;
