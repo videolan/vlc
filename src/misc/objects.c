@@ -304,14 +304,6 @@ vlc_object_t *(vlc_object_parent)(vlc_object_t *obj)
     return vlc_internals(obj)->parent;
 }
 
-#undef vlc_object_set_name
-int vlc_object_set_name(vlc_object_t *obj, const char *name)
-{
-    assert(obj != NULL);
-    (void) name;
-    return VLC_SUCCESS;
-}
-
 /**
  * Destroys a VLC object once it has no more references.
  *

@@ -274,11 +274,8 @@ done:
     module_list_free (mods);
 
     if (module != NULL)
-    {
         msg_Dbg (obj, "using %s module \"%s\"", capability,
                  module_get_object (module));
-        vlc_object_set_name (obj, module_get_object (module));
-    }
     else
         msg_Dbg (obj, "no %s modules matched", capability);
     return module;
