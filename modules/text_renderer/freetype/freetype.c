@@ -566,12 +566,14 @@ static inline void BlendYUVAPixel( picture_t *p_picture,
     }
     else
     {
-        *p_a = 255 - (255 - *p_a) * (255 - i_an) / 255;
+        int i_ani = 255 - i_an;
+        int i_aoni = i_ao * i_ani / 255;
+        *p_a = 255 - (255 - *p_a) * i_ani / 255;
         if( *p_a != 0 )
         {
-            *p_y = ( *p_y * i_ao * (255 - i_an) / 255 + i_y * i_an ) / *p_a;
-            *p_u = ( *p_u * i_ao * (255 - i_an) / 255 + i_u * i_an ) / *p_a;
-            *p_v = ( *p_v * i_ao * (255 - i_an) / 255 + i_v * i_an ) / *p_a;
+            *p_y = ( *p_y * i_aoni + i_y * i_an ) / *p_a;
+            *p_u = ( *p_u * i_aoni + i_u * i_an ) / *p_a;
+            *p_v = ( *p_v * i_aoni + i_v * i_an ) / *p_a;
         }
     }
 }
@@ -611,12 +613,14 @@ static inline void BlendRGBAPixel( picture_t *p_picture,
     }
     else
     {
-        p_rgba[3] = 255 - (255 - p_rgba[3]) * (255 - i_an) / 255;
+        int i_ani = 255 - i_an;
+        p_rgba[3] = 255 - (255 - p_rgba[3]) * i_ani / 255;
         if( p_rgba[3] != 0 )
         {
-            p_rgba[0] = ( p_rgba[0] * i_ao * (255 - i_an) / 255 + i_r * i_an ) / p_rgba[3];
-            p_rgba[1] = ( p_rgba[1] * i_ao * (255 - i_an) / 255 + i_g * i_an ) / p_rgba[3];
-            p_rgba[2] = ( p_rgba[2] * i_ao * (255 - i_an) / 255 + i_b * i_an ) / p_rgba[3];
+            int i_aoni = i_ao * i_ani / 255;
+            p_rgba[0] = ( p_rgba[0] * i_aoni + i_r * i_an ) / p_rgba[3];
+            p_rgba[1] = ( p_rgba[1] * i_aoni + i_g * i_an ) / p_rgba[3];
+            p_rgba[2] = ( p_rgba[2] * i_aoni + i_b * i_an ) / p_rgba[3];
         }
     }
 }
@@ -659,12 +663,14 @@ static inline void BlendARGBPixel(picture_t *pic, int pic_x, int pic_y,
     }
     else
     {
-        rgba[0] = 255 - (255 - rgba[0]) * (255 - an) / 255;
+        int ani = 255 - an;
+        rgba[0] = 255 - (255 - rgba[0]) * ani / 255;
         if (rgba[0] != 0)
         {
-            rgba[1] = (rgba[1] * ao * (255 - an) / 255 + r * an ) / rgba[0];
-            rgba[2] = (rgba[2] * ao * (255 - an) / 255 + g * an ) / rgba[0];
-            rgba[3] = (rgba[3] * ao * (255 - an) / 255 + b * an ) / rgba[0];
+            int aoni = ao * ani / 255;
+            rgba[1] = (rgba[1] * aoni + r * an ) / rgba[0];
+            rgba[2] = (rgba[2] * aoni + g * an ) / rgba[0];
+            rgba[3] = (rgba[3] * aoni + b * an ) / rgba[0];
         }
     }
 }
