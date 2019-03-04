@@ -84,7 +84,7 @@ vlc_object_t * vlclua_get_this( lua_State *L )
 int vlclua_push_ret( lua_State *L, int i_error )
 {
     lua_pushnumber( L, i_error );
-    lua_pushstring( L, vlc_error( i_error ) );
+    lua_pushstring( L, vlc_error_string( i_error ) );
     return 2;
 }
 

@@ -30,12 +30,12 @@
 #include <vlc_common.h>
 
 /*****************************************************************************
- * vlc_error: strerror() equivalent
+ * vlc_error_string: strerror() equivalent
  *****************************************************************************
  * This function returns a string describing the error code passed in the
  * argument. A list of all errors can be found in include/vlc_common.h.
  *****************************************************************************/
-char const * vlc_error ( int i_err )
+const char *vlc_error_string(int i_err)
 {
     switch( i_err )
     {

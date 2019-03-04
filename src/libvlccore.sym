@@ -573,7 +573,7 @@ vlc_sem_wait
 vlc_control_cancel
 vlc_GetCPUCount
 vlc_CPU
-vlc_error
+vlc_error_string
 vlc_event_attach
 vlc_event_detach
 vlc_filenamecmp

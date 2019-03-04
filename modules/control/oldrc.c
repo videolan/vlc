@@ -645,7 +645,7 @@ static void *Run( void *data )
             else
                 i_ret = var_SetString( p_intf, psz_cmd, psz_arg );
             msg_rc( "%s: returned %i (%s)",
-                    psz_cmd, i_ret, vlc_error( i_ret ) );
+                    psz_cmd, i_ret, vlc_error_string( i_ret ) );
         }
         /* Or maybe it's a global command */
         else if( var_Type( vlc, psz_cmd ) & VLC_VAR_ISCOMMAND )
@@ -661,7 +661,7 @@ static void *Run( void *data )
             if( i_ret != 0 )
             {
                 msg_rc( "%s: returned %i (%s)",
-                         psz_cmd, i_ret, vlc_error( i_ret ) );
+                         psz_cmd, i_ret, vlc_error_string( i_ret ) );
             }
         }
         else if( !strcmp( psz_cmd, "logout" ) )

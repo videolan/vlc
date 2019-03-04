@@ -945,7 +945,7 @@ static inline bool mul_overflow(unsigned long long a, unsigned long long b,
 
 #define EMPTY_STR(str) (!str || !*str)
 
-VLC_API char const * vlc_error( int ) VLC_USED;
+VLC_API const char *vlc_error_string(int) VLC_USED;
 
 #include <vlc_arrays.h>
 
