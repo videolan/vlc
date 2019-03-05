@@ -273,9 +273,6 @@ libzvbi_plugin_la_SOURCES = codec/zvbi.c
 libzvbi_plugin_la_CFLAGS = $(AM_CFLAGS) $(ZVBI_CFLAGS) $(CFLAGS_zvbi)
 libzvbi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libzvbi_plugin_la_LIBADD = $(ZVBI_LIBS) $(SOCKET_LIBS)
-if HAVE_WINSTORE
-libzvbi_plugin_la_LIBADD += -lpthreadGC2
-endif
 EXTRA_LTLIBRARIES += libzvbi_plugin.la
 codec_LTLIBRARIES += $(LTLIBzvbi)
 
