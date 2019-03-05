@@ -607,8 +607,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             /* Drop byte of padding */
             FlushBuffer( p_sys, 0 );
         }
-
-        continue;
     }
 
     return VLCDEC_SUCCESS;
