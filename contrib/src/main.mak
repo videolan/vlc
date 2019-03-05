@@ -5,11 +5,6 @@
 
 all: install
 
-# bootstrap configuration
-include config.mak
-
-TOPSRC ?= ../../contrib
-TOPDST ?= ..
 SRC := $(TOPSRC)/src
 TARBALLS := $(TOPSRC)/tarballs
 

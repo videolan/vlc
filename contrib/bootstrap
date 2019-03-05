@@ -164,8 +164,9 @@ fi
 #
 # Prepare files
 #
-echo "Creating configuration file... config.mak"
-exec 3>config.mak || exit $?
+echo "Creating makefile..."
+test -e Makefile && unlink Makefile
+exec 3>Makefile || exit $?
 cat >&3 << EOF
 # This file was automatically generated.
 # Any change will be overwritten if ../bootstrap is run again.
@@ -398,8 +399,9 @@ esac
 #
 # Results output
 #
-test -e Makefile && unlink Makefile
-ln -sf ../../contrib/src/main.mak Makefile || exit $?
+echo TOPSRC = .. >> Makefile
+echo TOPDST = . >> Makefile
+echo include $\(TOPSRC\)/src/main.mak >> Makefile
 echo "Bootstrap completed."
 make help
 mkdir -p ../../contrib/tarballs || exit $?
