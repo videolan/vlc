@@ -31,6 +31,6 @@ endif
 .speex: speex
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SPEEX_CONF)
 	cd $< && $(MAKE)
-	cd $< && ../../../contrib/src/pkg-static.sh speex.pc
+	cd $< && $(SRC)/pkg-static.sh speex.pc
 	cd $< && $(MAKE) install
 	touch $@

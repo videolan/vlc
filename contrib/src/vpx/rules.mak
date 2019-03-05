@@ -178,6 +178,6 @@ endif
 	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) ./configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
 	cd $< && $(MAKE)
-	cd $< && ../../../contrib/src/pkg-static.sh vpx.pc
+	cd $< && $(SRC)/pkg-static.sh vpx.pc
 	cd $< && $(MAKE) install
 	touch $@
