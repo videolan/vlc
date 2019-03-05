@@ -564,9 +564,9 @@ static void module_Unmap(vlc_plugin_t *plugin)
         vlc_dlclose(handle);
 }
 #else
-int module_Map(vlc_object_t *obj, vlc_plugin_t *plugin)
+int module_Map(struct vlc_logger *log, vlc_plugin_t *plugin)
 {
-    (void) obj; (void) plugin;
+    (void) log; (void) plugin;
     return 0;
 }
 
