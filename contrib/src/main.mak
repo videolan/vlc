@@ -7,8 +7,9 @@ all: install
 
 SRC := $(TOPSRC)/src
 TARBALLS := $(TOPSRC)/tarballs
+VLC_TOOLS ?= $(TOPSRC)/../extras/tools/build
 
-PATH :=$(abspath ../../extras/tools/build/bin):$(PATH)
+PATH :=$(abspath $(VLC_TOOLS)/bin):$(PATH)
 export PATH
 
 PKGS_ALL := $(patsubst $(SRC)/%/rules.mak,%,$(wildcard $(SRC)/*/rules.mak))
@@ -142,7 +143,7 @@ CCAS=$(CC) -c
 
 ifdef HAVE_IOS
 ifdef HAVE_NEON
-AS=perl $(abspath ../../extras/tools/build/bin/gas-preprocessor.pl) $(CC)
+AS=perl $(abspath $(VLC_TOOLS)/bin/gas-preprocessor.pl) $(CC)
 CCAS=gas-preprocessor.pl $(CC) -c
 endif
 EXTRA_CFLAGS += $(CFLAGS)
@@ -209,8 +210,8 @@ HAVE_FPU = 1
 endif
 
 ACLOCAL_AMFLAGS += -I$(PREFIX)/share/aclocal
-ifneq ($(wildcard $(TOPSRC)/../extras/tools/build/share/aclocal/*),)
-ACLOCAL_AMFLAGS += -I$(abspath $(TOPSRC)/../extras/tools/build/share/aclocal)
+ifneq ($(wildcard $(VLC_TOOLS)/share/aclocal/*),)
+ACLOCAL_AMFLAGS += -I$(abspath $(VLC_TOOLS)/share/aclocal)
 endif
 export ACLOCAL_AMFLAGS
 
