@@ -239,8 +239,14 @@ SoXR_Resample( filter_t *p_filter, soxr_t soxr, block_t *p_in, size_t i_olen )
     const size_t i_oframesize = p_filter->fmt_out.audio.i_bytes_per_frame;
     const size_t i_ilen = p_in ? p_in->i_nb_samples : 0;
 
-    block_t *p_out = i_ilen >= i_olen ? p_in
-                   : block_Alloc( i_olen * i_oframesize );
+    block_t *p_out;
+    if( i_ilen >= i_olen )
+    {
+        i_olen = i_ilen;
+        p_out = p_in;
+    }
+    else
+        p_out = block_Alloc( i_olen * i_oframesize );
 
     soxr_error_t error = soxr_process( soxr, p_in ? p_in->p_buffer : NULL,
                                        i_ilen, &i_idone, p_out->p_buffer,
