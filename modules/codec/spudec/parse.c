@@ -326,6 +326,11 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
             p_spu_properties->i_height = (((p_sys->buffer[i_index+5]&0x0f)<<8)|
                               p_sys->buffer[i_index+6]) - p_spu_properties->i_y + 1;
 
+            if (p_spu_properties->i_width < 0 || p_spu_properties->i_height < 0) {
+                msg_Err( p_dec, "integer overflow in SPU command" );
+                return VLC_EGENERIC;
+            }
+
             /* Auto crop fullscreen subtitles */
             if( p_spu_properties->i_height > 250 )
                 p_spu_data->b_auto_crop = true;
