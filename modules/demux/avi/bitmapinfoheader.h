@@ -99,7 +99,8 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
     /* Extradata is the remainder of the chunk less the BIH */
     const uint8_t *p_bihextra = (const uint8_t *) &p_bih[1];
     size_t i_bihextra;
-    if( i_bih <= INT_MAX - sizeof(VLC_BITMAPINFOHEADER) )
+    if( i_bih <= INT_MAX - sizeof(VLC_BITMAPINFOHEADER) &&
+            i_bih >= sizeof(VLC_BITMAPINFOHEADER) )
         i_bihextra = i_bih - sizeof(VLC_BITMAPINFOHEADER);
     else
         i_bihextra = 0;
