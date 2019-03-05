@@ -98,7 +98,6 @@ struct sout_stream_sys_t
         , first_video_keyframe_pts( -1 )
         , es_changed( true )
         , cc_has_input( false )
-        , cc_reload( false )
         , cc_flushing( false )
         , cc_eof( false )
         , has_video( false )
@@ -146,7 +145,6 @@ struct sout_stream_sys_t
 
     bool                               es_changed;
     bool                               cc_has_input;
-    bool                               cc_reload;
     bool                               cc_flushing;
     bool                               cc_eof;
     bool                               has_video;
@@ -816,7 +814,6 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
 
     msg_Dbg( p_stream, "Creating chain %s", sout.c_str() );
     cc_has_input = false;
-    cc_reload = false;
     first_video_keyframe_pts = -1;
     video_proxy_id = NULL;
     has_video = false;
