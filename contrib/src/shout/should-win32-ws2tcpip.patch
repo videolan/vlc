@@ -1,0 +1,10 @@
+--- libshout/src/common/net/resolver.c.ws2tcpip	2015-01-27 19:08:54.000000000 +0100
++++ libshout/src/common/net/resolver.c	2019-03-05 12:02:46.595628700 +0100
+@@ -39,6 +39,7 @@
+ #include <arpa/inet.h>
+ #else
+ #include <winsock2.h>
++#include <ws2tcpip.h>
+ #endif
+ 
+ #ifndef NO_THREAD
