@@ -302,7 +302,7 @@ Resample( filter_t *p_filter, block_t *p_in )
         block_t *p_flushed_out = NULL, *p_out = NULL;
         const double f_ratio = p_filter->fmt_out.audio.i_rate
                              / (double) p_filter->fmt_in.audio.i_rate;
-        const size_t i_olen = SoXR_GetOutLen( p_in->i_nb_samples, 1.0f );
+        const size_t i_olen = SoXR_GetOutLen( p_in->i_nb_samples, f_ratio );
 
         if( f_ratio != p_sys->f_fixed_ratio )
         {
