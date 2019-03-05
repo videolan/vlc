@@ -46,7 +46,7 @@ public:
     void SetPci(const pci_t *data);
     void ResetPci();
 
-    void AddES( es_out_id_t* es, int category );
+    bool AddES( es_out_id_t* es, int category );
     void DelES( es_out_id_t* es );
 
 private:

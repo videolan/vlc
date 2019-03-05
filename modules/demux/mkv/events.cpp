@@ -334,7 +334,7 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
     }
 }
 
-void event_thread_t::AddES( es_out_id_t* es, int category )
+bool event_thread_t::AddES( es_out_id_t* es, int category )
 {
     vlc_mutex_locker lock_guard( &lock );
 
@@ -348,9 +348,10 @@ void event_thread_t::AddES( es_out_id_t* es, int category )
         {
             msg_Warn( p_demux, "Unable to subscribe to mouse events" );
             es_list.erase( info );
-            return;
+            return false;
         }
     }
+    return true;
 }
 
 void event_thread_t::DelES( es_out_id_t* es )
