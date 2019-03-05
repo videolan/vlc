@@ -337,7 +337,7 @@ download_git = \
 	rm -f "$(@:.xz=)" && \
 	mv -f -- "$@.tmp" "$@"
 check_githash = \
-	h=`sed -n -e "s,^\([0-9a-fA-F]\{40\}\) $<,\1,p" \
+	h=`sed -e "s,^\([0-9a-fA-F]\{40\}\) .*/$(notdir $<),\1,g" \
 		< "$(<:.tar.xz=.githash)"` && \
 	test "$$h" = "$1"
 
