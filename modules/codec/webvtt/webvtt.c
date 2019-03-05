@@ -247,7 +247,7 @@ void webvtt_text_parser_Feed( webvtt_text_parser_t *p, char *psz_line )
             if( webvtt_scan_time( p->reads[1], &i_start ) &&
                 webvtt_scan_time( psz_split + 5,  &i_stop ) && i_start <= i_stop )
             {
-                const char *psz_attrs = strchr( psz_split + 5 + 9, ' ' );
+                const char *psz_attrs = strchr( psz_split + 5 + 5, ' ' );
                 p->p_cue = ( p->pf_get_cue ) ? p->pf_get_cue( p->priv ) : NULL;
                 if( p->p_cue )
                 {
