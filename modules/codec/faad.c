@@ -513,13 +513,13 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         /* Convert frame.channel_position to our own channel values */
         p_dec->fmt_out.audio.i_physical_channels = 0;
 
-        uint8_t  pi_neworder_table[AOUT_CHAN_MAX];
-        uint32_t pi_faad_channels_positions[FAAD_CHANNEL_ID_COUNT + 1] = {0};
+        uint8_t  pi_neworder_table[64] = {0};
+        uint32_t pi_faad_channels_positions[64 + 1] = {0};
 
         bool b_reorder = false;
         if (p_dec->fmt_out.audio.channel_type == AUDIO_CHANNEL_TYPE_BITMAP)
         {
-            for( size_t i = 0; i < frame.channels && i < FAAD_CHANNEL_ID_COUNT; i++ )
+            for( size_t i = 0; i < frame.channels; i++ )
             {
                 unsigned pos = frame.channel_position[i];
                 if( likely(pos < FAAD_CHANNEL_ID_COUNT) )
