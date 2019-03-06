@@ -11,7 +11,7 @@ PKGS_FOUND += vncclient
 endif
 
 $(TARBALLS)/LibVNCServer-$(VNCCLIENT_VERSION).tar.gz:
-	$(call download,$(VNCCLIENT_URL))
+	$(call download_pkg,$(VNCCLIENT_URL),vncclient)
 
 .sum-vncclient: LibVNCServer-$(VNCCLIENT_VERSION).tar.gz
 
