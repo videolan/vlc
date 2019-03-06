@@ -30,6 +30,7 @@
 #include "vout_wrapper.h"
 #include "statistic.h"
 #include "chrono.h"
+#include "../clock/clock.h"
 
 /* It should be high enough to absorbe jitter due to difficult picture(s)
  * to decode but not too high as memory is not that cheap.
@@ -243,6 +244,9 @@ void vout_CloseWrapper(vout_thread_t *);
 int spu_ProcessMouse(spu_t *, const vlc_mouse_t *, const video_format_t *);
 void spu_Attach( spu_t *, input_thread_t *input );
 void spu_Detach( spu_t * );
+void spu_clock_Set(spu_t *, vlc_clock_t *);
+void spu_clock_Reset(spu_t *);
+void spu_clock_SetDelay(spu_t *spu, vlc_tick_t delay);
 void spu_ChangeMargin(spu_t *, int);
 void spu_SetHighlight(spu_t *, const vlc_spu_highlight_t*);
 
