@@ -42,14 +42,6 @@
  * Generic vlc_object_t wrapper creation
  *****************************************************************************/
 
-static int vlclua_object_release( lua_State *L )
-{
-    vlc_object_t **p_obj = (vlc_object_t **)luaL_checkudata( L, 1, "vlc_object" );
-    lua_pop( L, 1 );
-    vlc_object_release( *p_obj );
-    return 0;
-}
-
 static int vlclua_push_vlc_object(lua_State *L, vlc_object_t *p_obj,
                                   int (*release)(lua_State *))
 {
