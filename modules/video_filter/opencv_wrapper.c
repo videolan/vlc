@@ -182,7 +182,7 @@ static int Create( vlc_object_t *p_this )
     {
         msg_Err( p_filter, "can't open internal opencv filter: %s", p_sys->psz_inner_name );
         free( p_sys->psz_inner_name );
-        vlc_object_release( p_sys->p_opencv );
+        vlc_object_delete(p_sys->p_opencv);
         free( p_sys );
 
         return VLC_ENOMOD;
@@ -268,7 +268,7 @@ static void Destroy( vlc_object_t *p_this )
 
     // Release the internal OpenCV filter.
     module_unneed( p_sys->p_opencv, p_sys->p_opencv->p_module );
-    vlc_object_release( p_sys->p_opencv );
+    vlc_object_delete(p_sys->p_opencv);
 
     free( p_sys );
 }

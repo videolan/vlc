@@ -1626,7 +1626,7 @@ void vout_Close(vout_thread_t *vout)
     sys->spu = NULL;
     vlc_mutex_unlock(&sys->spu_lock);
 
-    vlc_object_release(vout);
+    vlc_object_delete(vout);
 }
 
 static void VoutDestructor(vlc_object_t *object)
@@ -1720,7 +1720,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
 
     if (sys->display_cfg.window == NULL) {
         spu_Destroy(sys->spu);
-        vlc_object_release(vout);
+        vlc_object_delete(vout);
         return NULL;
     }
 

@@ -43,7 +43,7 @@ fingerprinter_thread_t *fingerprinter_Create( vlc_object_t *p_this )
                                            NULL, false );
     if( !p_fingerprint->p_module )
     {
-        vlc_object_release( p_fingerprint );
+        vlc_object_delete(p_fingerprint);
         msg_Err( p_this, "AcoustID fingerprinter not found" );
         return NULL;
     }
@@ -54,5 +54,5 @@ fingerprinter_thread_t *fingerprinter_Create( vlc_object_t *p_this )
 void fingerprinter_Destroy( fingerprinter_thread_t *p_fingerprint )
 {
     module_unneed( p_fingerprint, p_fingerprint->p_module );
-    vlc_object_release( p_fingerprint );
+    vlc_object_delete(p_fingerprint);
 }

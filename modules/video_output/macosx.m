@@ -209,7 +209,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         struct gl_sys *glsys = sys->gl->sys = malloc(sizeof(struct gl_sys));
         if( unlikely( !sys->gl->sys ) )
         {
-            vlc_object_release(sys->gl);
+            vlc_object_delete(sys->gl);
             goto error;
         }
         glsys->locked_ctx = NULL;
@@ -290,7 +290,7 @@ static void Close(vout_display_t *vd)
         {
             assert(((struct gl_sys *)sys->gl->sys)->locked_ctx == NULL);
             free(sys->gl->sys);
-            vlc_object_release(sys->gl);
+            vlc_object_delete(sys->gl);
         }
 
         [sys->glView release];

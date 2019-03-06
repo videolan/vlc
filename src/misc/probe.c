@@ -49,6 +49,6 @@ void *vlc_probe (vlc_object_t *obj,
 
     void *ret = probe->list;
     *pcount = probe->count;
-    vlc_object_release (probe);
+    vlc_object_delete(probe);
     return ret;
 }

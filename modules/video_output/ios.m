@@ -243,7 +243,7 @@ static void Close(vout_display_t *vd)
                     flushed = YES;
                 }
             }
-            vlc_object_release(sys->gl);
+            vlc_object_delete(sys->gl);
         }
 
         [sys->glESView cleanAndRelease:flushed];

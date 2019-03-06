@@ -410,7 +410,7 @@ static void vlc_LogModuleClose(void *d)
     if (module->ops->destroy != NULL)
         module->ops->destroy(module->opaque);
 
-    vlc_object_release(VLC_OBJECT(module));
+    vlc_object_delete(VLC_OBJECT(module));
 }
 
 static const struct vlc_logger_operations module_ops = {
@@ -429,7 +429,7 @@ static struct vlc_logger *vlc_LogModuleCreate(vlc_object_t *parent)
     /* TODO: module configuration item */
     if (vlc_module_load(VLC_OBJECT(module), "logger", NULL, false,
                         vlc_logger_load, module) == NULL) {
-        vlc_object_release(VLC_OBJECT(module));
+        vlc_object_delete(VLC_OBJECT(module));
         return NULL;
     }
 

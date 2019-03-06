@@ -236,7 +236,7 @@ void vlc_rd_release(vlc_renderer_discovery_t *p_rd)
     module_unneed(p_rd, p_rd->p_module);
     config_ChainDestroy(p_rd->p_cfg);
     free(p_rd->psz_name);
-    vlc_object_release(p_rd);
+    vlc_object_delete(p_rd);
 }
 
 vlc_renderer_discovery_t *
@@ -259,7 +259,7 @@ vlc_rd_new(vlc_object_t *p_obj, const char *psz_name,
             psz_name);
         free(p_rd->psz_name);
         config_ChainDestroy(p_rd->p_cfg);
-        vlc_object_release(p_rd);
+        vlc_object_delete(p_rd);
         p_rd = NULL;
     }
 

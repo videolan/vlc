@@ -54,7 +54,7 @@ void transcode_encoder_delete( transcode_encoder_t *p_enc )
         }
         es_format_Clean( &p_enc->p_encoder->fmt_in );
         es_format_Clean( &p_enc->p_encoder->fmt_out );
-        vlc_object_release( p_enc->p_encoder );
+        vlc_object_delete(p_enc->p_encoder);
     }
     free( p_enc );
 }
@@ -101,7 +101,7 @@ transcode_encoder_t * transcode_encoder_new( vlc_object_t *p_obj,
             {
                 es_format_Clean( &p_enc->p_encoder->fmt_in );
                 es_format_Clean( &p_enc->p_encoder->fmt_out );
-                vlc_object_release( p_enc->p_encoder );
+                vlc_object_delete(p_enc->p_encoder);
                 free( p_enc );
                 return NULL;
             }

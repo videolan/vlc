@@ -222,7 +222,7 @@ ReleaseObject(void *obj)
 #ifdef TEST_MEDIA_SOURCE
     free(obj);
 #else
-    vlc_object_release((vlc_object_t *) obj);
+    vlc_object_delete((vlc_media_source_provider_t *)obj);
 #endif
 }
 

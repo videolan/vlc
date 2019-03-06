@@ -165,7 +165,7 @@
 
         if (!p_extensions_manager->p_module) {
             msg_Err(p_intf, "Unable to load extensions module");
-            vlc_object_release(p_extensions_manager);
+            vlc_object_delete(p_extensions_manager);
             p_extensions_manager = NULL;
             b_failed = true;
             return false;
@@ -184,7 +184,7 @@
     _isUnloading = true;
 
     module_unneed(p_extensions_manager, p_extensions_manager->p_module);
-    vlc_object_release(p_extensions_manager);
+    vlc_object_delete(p_extensions_manager);
     p_extensions_manager = NULL;
 }
 
@@ -290,7 +290,7 @@
 
     _extensionDialogProvider = nil;
     if (p_extensions_manager)
-        vlc_object_release(p_extensions_manager);
+        vlc_object_delete(p_extensions_manager);
 }
 
 - (BOOL)isLoaded

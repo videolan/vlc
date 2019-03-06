@@ -128,7 +128,7 @@ static void se_Release( struct stream_extractor_private* priv )
             vlc_stream_Delete( priv->source );
     }
 
-    vlc_object_release( priv->object );
+    vlc_object_delete(priv->object);
 }
 
 /**

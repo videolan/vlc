@@ -1706,7 +1706,7 @@ void vlc_readdir_helper_init(struct vlc_readdir_helper *p_rdh,
     TAB_INIT(p_rdh->i_dirs, p_rdh->pp_dirs);
 
     if (p_var_obj != NULL)
-        vlc_object_release(p_var_obj);
+        vlc_object_delete(p_var_obj);
 }
 
 void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_success)

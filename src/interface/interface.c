@@ -122,7 +122,7 @@ error:
     if( p_intf->p_module )
         module_unneed( p_intf, p_intf->p_module );
     config_ChainDestroy( p_intf->p_cfg );
-    vlc_object_release( p_intf );
+    vlc_object_delete(p_intf);
     return VLC_EGENERIC;
 }
 
@@ -311,7 +311,7 @@ void intf_DestroyAll(libvlc_int_t *libvlc)
             module_unneed(intf, intf->p_module);
             config_ChainDestroy(intf->p_cfg);
             var_DelCallback(intf, "intf-add", AddIntfCallback, playlist);
-            vlc_object_release(intf);
+            vlc_object_delete(intf);
 
             vlc_mutex_lock(&lock);
         }

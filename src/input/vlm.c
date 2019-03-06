@@ -157,7 +157,7 @@ vlm_t *vlm_New( libvlc_int_t *libvlc, const char *psz_vlmconf )
         vlc_cond_destroy( &p_vlm->wait_manage );
         vlc_mutex_destroy( &p_vlm->lock );
         vlc_mutex_destroy( &p_vlm->lock_manage );
-        vlc_object_release( p_vlm );
+        vlc_object_delete(p_vlm);
         vlc_mutex_unlock( &vlm_mutex );
         return NULL;
     }
@@ -221,7 +221,7 @@ void vlm_Delete( vlm_t *p_vlm )
     if( p_vlm->p_vod )
     {
         module_unneed( p_vlm->p_vod, p_vlm->p_vod->p_module );
-        vlc_object_release( p_vlm->p_vod );
+        vlc_object_delete(p_vlm->p_vod);
     }
 
     libvlc_priv(vlc_object_instance(p_vlm))->p_vlm = NULL;
@@ -232,7 +232,7 @@ void vlm_Delete( vlm_t *p_vlm )
     vlc_cond_destroy( &p_vlm->wait_manage );
     vlc_mutex_destroy( &p_vlm->lock );
     vlc_mutex_destroy( &p_vlm->lock_manage );
-    vlc_object_release( p_vlm );
+    vlc_object_delete(p_vlm);
 }
 
 /*****************************************************************************
@@ -735,7 +735,7 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
         if( !p_vlm->p_vod->p_module )
         {
             msg_Err( p_vlm, "cannot find vod server" );
-            vlc_object_release( p_vlm->p_vod );
+            vlc_object_delete(p_vlm->p_vod);
             p_vlm->p_vod = NULL;
             return VLC_EGENERIC;
         }
@@ -751,7 +751,7 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
 
     if( asprintf( &header, _("Media: %s"), p_cfg->psz_name ) == -1 )
     {
-        vlc_object_release( p_media );
+        vlc_object_delete(p_media);
         return VLC_ENOMEM;
     }
 
@@ -760,7 +760,7 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
 
     if( p_media->obj.logger == NULL )
     {
-        vlc_object_release( p_media );
+        vlc_object_delete(p_media);
         return VLC_ENOMEM;
     }
 
@@ -812,7 +812,7 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
 
     TAB_REMOVE( p_vlm->i_media, p_vlm->media, p_media );
     vlc_LogDestroy( p_media->obj.logger );
-    vlc_object_release( p_media );
+    vlc_object_delete(p_media);
 
     return VLC_SUCCESS;
 }
@@ -904,7 +904,7 @@ static void vlm_MediaInstanceDelete( vlm_t *p_vlm, int64_t id, vlm_media_instanc
     }
     input_resource_Terminate( p_instance->p_input_resource );
     input_resource_Release( p_instance->p_input_resource );
-    vlc_object_release( p_instance->p_parent );
+    vlc_object_delete(p_instance->p_parent);
 
     TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
     input_item_Release( p_instance->p_item );

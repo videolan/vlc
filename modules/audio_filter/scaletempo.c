@@ -488,7 +488,7 @@ static filter_t *ResamplerCreate(filter_t *p_filter)
     if( p_resampler->p_module == NULL )
     {
         msg_Err( p_filter, "Could not load resampler" );
-        vlc_object_release( p_resampler );
+        vlc_object_delete(p_resampler);
         return NULL;
     }
     return p_resampler;
@@ -539,7 +539,7 @@ static void ClosePitch( vlc_object_t *p_this )
     var_DelCallback( p_aout, "pitch-shift", PitchCallback, p_sys );
     var_Destroy( p_aout, "pitch-shift" );
     module_unneed( p_sys->resampler, p_sys->resampler->p_module );
-    vlc_object_release( p_sys->resampler );
+    vlc_object_delete(p_sys->resampler);
     Close( p_this );
 }
 #endif

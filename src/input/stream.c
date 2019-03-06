@@ -124,7 +124,7 @@ void stream_CommonDelete(stream_t *s)
         block_Release(priv->block);
 
     free(s->psz_url);
-    vlc_object_release(s);
+    vlc_object_delete(s);
 }
 
 /**

@@ -531,12 +531,12 @@ Close_RemoveConverters(filter_t *filter, struct ci_filters_ctx *ctx)
     if (ctx->src_converter)
     {
         module_unneed(ctx->src_converter, ctx->src_converter->p_module);
-        vlc_object_release(ctx->src_converter);
+        vlc_object_delete(ctx->src_converter);
     }
     if (ctx->dst_converter)
     {
         module_unneed(ctx->dst_converter, ctx->dst_converter->p_module);
-        vlc_object_release(ctx->dst_converter);
+        vlc_object_delete(ctx->dst_converter);
     }
 }
 
@@ -576,7 +576,7 @@ CVPX_to_CVPX_converter_Create(filter_t *filter, bool to_rgba)
     converter->p_module = module_need(converter, "video converter", NULL, false);
     if (!converter->p_module)
     {
-        vlc_object_release(converter);
+        vlc_object_delete(converter);
         return NULL;
     }
 

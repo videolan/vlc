@@ -509,7 +509,7 @@ static void DeleteFilter( filter_t * p_filter )
     es_format_Clean( &p_filter->fmt_in );
     es_format_Clean( &p_filter->fmt_out );
 
-    vlc_object_release( p_filter );
+    vlc_object_delete(p_filter);
 }
 
 static picture_t *NewBuffer(filter_t *p_filter)

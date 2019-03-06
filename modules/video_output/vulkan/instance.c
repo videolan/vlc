@@ -55,7 +55,7 @@ vlc_vk_t *vlc_vk_Create(struct vout_window_t *wnd, const char *name)
     vk->module = module_need(vk, "vulkan", name, true);
     if (vk->module == NULL)
     {
-        vlc_object_release(vk);
+        vlc_object_delete(vk);
         return NULL;
     }
     vlc_atomic_rc_init(&vk->ref_count);
@@ -73,5 +73,5 @@ void vlc_vk_Release(vlc_vk_t *vk)
     if (!vlc_atomic_rc_dec(&vk->ref_count))
         return;
     module_unneed(vk, vk->module);
-    vlc_object_release(vk);
+    vlc_object_delete(vk);
 }

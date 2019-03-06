@@ -232,7 +232,7 @@ void input_Close( input_thread_t *p_input )
     if( input_priv(p_input)->is_running )
         vlc_join( input_priv(p_input)->thread, NULL );
     vlc_interrupt_deinit( &input_priv(p_input)->interrupt );
-    vlc_object_release( p_input );
+    vlc_object_delete(p_input);
 }
 
 void input_SetTime( input_thread_t *p_input, vlc_tick_t i_time, bool b_fast )
@@ -2864,7 +2864,7 @@ static void InputSourceMeta( input_thread_t *p_input,
         }
         module_unneed( p_demux, p_id3 );
     }
-    vlc_object_release( p_demux_meta );
+    vlc_object_delete(p_demux_meta);
 }
 
 

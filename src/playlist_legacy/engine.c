@@ -342,7 +342,7 @@ void playlist_Destroy( playlist_t *p_playlist )
         vlc_http_cookies_destroy( cookies );
     }
 
-    vlc_object_release( p_playlist );
+    vlc_object_delete(p_playlist);
 }
 
 /** Get current playing input.

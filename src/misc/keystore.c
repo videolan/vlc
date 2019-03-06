@@ -43,7 +43,7 @@ keystore_create(vlc_object_t *p_parent, const char *psz_name)
     p_keystore->p_module = module_need(p_keystore, "keystore", psz_name, true);
     if (p_keystore->p_module == NULL)
     {
-        vlc_object_release(p_keystore);
+        vlc_object_delete(p_keystore);
         return NULL;
     }
     assert(p_keystore->pf_store);
@@ -72,7 +72,7 @@ vlc_keystore_release(vlc_keystore *p_keystore)
     assert(p_keystore);
     module_unneed(p_keystore, p_keystore->p_module);
 
-    vlc_object_release(p_keystore);
+    vlc_object_delete(p_keystore);
 }
 
 int

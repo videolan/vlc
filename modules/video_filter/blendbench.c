@@ -245,7 +245,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( !p_blend->p_module )
     {
         picture_Release( p_pic );
-        vlc_object_release( p_blend );
+        vlc_object_delete(p_blend);
         return NULL;
     }
 
@@ -268,7 +268,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     module_unneed( p_blend, p_blend->p_module );
 
-    vlc_object_release( p_blend );
+    vlc_object_delete(p_blend);
 
     p_sys->b_done = true;
     return p_pic;

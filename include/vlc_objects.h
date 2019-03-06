@@ -101,12 +101,25 @@ VLC_API vlc_object_t *vlc_object_find_name( vlc_object_t *, const char * ) VLC_U
 VLC_API void * vlc_object_hold(vlc_object_t *obj);
 
 /**
- * Drops a reference to an object.
+ * Removes a weak reference to an object.
  *
  * This atomically decrements the reference count.
  * If the count reaches zero, the object is destroyed.
  */
 VLC_API void vlc_object_release(vlc_object_t *obj);
+
+/**
+ * Drops the strong reference to an object.
+ *
+ * This removes the initial strong reference to a given object. This must be
+ * called exactly once per allocated object after it is no longer needed,
+ * matching vlc_object_create() or vlc_custom_create().
+ */
+static inline void vlc_object_delete(vlc_object_t *obj)
+{
+    vlc_object_release(obj);
+}
+#define vlc_object_delete(obj) vlc_object_delete(VLC_OBJECT(obj))
 
 VLC_API size_t vlc_list_children(vlc_object_t *, vlc_object_t **, size_t) VLC_USED;
 

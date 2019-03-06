@@ -133,5 +133,5 @@ void vlc_sd_Destroy(services_discovery_t *sd)
         module_unneed(sd, sd->p_module);
     config_ChainDestroy(sd->p_cfg);
     free(sd->psz_name);
-    vlc_object_release(sd);
+    vlc_object_delete(sd);
 }

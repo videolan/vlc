@@ -976,7 +976,7 @@ error:
         net_ListenClose(host->fds);
         vlc_cond_destroy(&host->wait);
         vlc_mutex_destroy(&host->lock);
-        vlc_object_release(host);
+        vlc_object_delete(host);
     }
 
     vlc_tls_ServerDelete(p_tls);
@@ -1013,7 +1013,7 @@ void httpd_HostDelete(httpd_host_t *host)
     net_ListenClose(host->fds);
     vlc_cond_destroy(&host->wait);
     vlc_mutex_destroy(&host->lock);
-    vlc_object_release(host);
+    vlc_object_delete(host);
     vlc_mutex_unlock(&httpd.mutex);
 }
 

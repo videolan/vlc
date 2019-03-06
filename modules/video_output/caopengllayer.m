@@ -257,7 +257,7 @@ static void Close(vout_display_t *vd)
             assert(((struct gl_sys *)sys->gl->sys)->locked_ctx == NULL);
             free(sys->gl->sys);
         }
-        vlc_object_release(sys->gl);
+        vlc_object_delete(sys->gl);
     }
 
     free(sys);

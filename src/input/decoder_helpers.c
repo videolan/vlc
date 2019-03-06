@@ -70,7 +70,7 @@ void decoder_Destroy( decoder_t *p_dec )
     if (p_dec != NULL)
     {
         decoder_Clean( p_dec );
-        vlc_object_release( p_dec );
+        vlc_object_delete(p_dec);
     }
 }
 
@@ -138,7 +138,7 @@ vlc_decoder_device_Create(vout_window_t *window)
     free(name);
     if (!priv->module)
     {
-        vlc_object_release(&priv->device);
+        vlc_object_delete(&priv->device);
         return NULL;
     }
     vlc_atomic_rc_init(&priv->rc);
@@ -162,6 +162,6 @@ vlc_decoder_device_Release(vlc_decoder_device *device)
     if (vlc_atomic_rc_dec(&priv->rc))
     {
         vlc_module_unload(priv->module, decoder_device_Close, device);
-        vlc_object_release(device);
+        vlc_object_delete(device);
     }
 }

@@ -1848,7 +1848,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->p_fifo = block_FifoNew();
     if( unlikely(p_owner->p_fifo == NULL) )
     {
-        vlc_object_release( p_dec );
+        vlc_object_delete(p_dec);
         return NULL;
     }
 
@@ -1868,7 +1868,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
         {
             if( LoadDecoder( p_owner->p_packetizer, true, fmt ) )
             {
-                vlc_object_release( p_owner->p_packetizer );
+                vlc_object_delete(p_owner->p_packetizer);
                 p_owner->p_packetizer = NULL;
             }
             else

@@ -320,7 +320,7 @@ int transcode_encoder_video_test( vlc_object_t *p_obj,
     es_format_Clean( &p_encoder->fmt_in );
     es_format_Clean( &p_encoder->fmt_out );
 
-    vlc_object_release( p_encoder );
+    vlc_object_delete(p_encoder);
 
     return p_module != NULL ? VLC_SUCCESS : VLC_EGENERIC;
 }

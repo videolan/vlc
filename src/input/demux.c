@@ -431,7 +431,7 @@ decoder_t *demux_PacketizerNew( demux_t *p_demux, es_format_t *p_fmt, const char
     if( !p_packetizer->p_module )
     {
         es_format_Clean( p_fmt );
-        vlc_object_release( p_packetizer );
+        vlc_object_delete(p_packetizer);
         msg_Err( p_demux, "cannot find packetizer for %s", psz_msg );
         return NULL;
     }
@@ -447,7 +447,7 @@ void demux_PacketizerDestroy( decoder_t *p_packetizer )
     es_format_Clean( &p_packetizer->fmt_out );
     if( p_packetizer->p_description )
         vlc_meta_Delete( p_packetizer->p_description );
-    vlc_object_release( p_packetizer );
+    vlc_object_delete(p_packetizer);
 }
 
 unsigned demux_TestAndClearFlags( demux_t *p_demux, unsigned flags )

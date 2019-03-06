@@ -78,7 +78,7 @@ static filter_t *CreateFilter(vlc_object_t *obj, const char *type,
 
     if (filter->p_module == NULL)
     {
-        vlc_object_release (filter);
+        vlc_object_delete(filter);
         filter = NULL;
     }
     else
@@ -115,7 +115,7 @@ static void aout_FiltersPipelineDestroy(filter_t *const *filters, unsigned n)
         filter_t *p_filter = filters[i];
 
         module_unneed( p_filter, p_filter->p_module );
-        vlc_object_release( p_filter );
+        vlc_object_delete(p_filter);
     }
 }
 
@@ -427,7 +427,7 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
     {
         msg_Err (filter, "cannot add user %s \"%s\" (skipped)", type, name);
         module_unneed (filter, filter->p_module);
-        vlc_object_release (filter);
+        vlc_object_delete(filter);
         return -1;
     }
 

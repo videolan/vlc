@@ -525,7 +525,7 @@ static int Install( addons_storage_t *p_storage, addon_entry_t *p_entry )
         module_unneed( p_finder, p_module );
     }
 
-    vlc_object_release( p_finder );
+    vlc_object_delete(p_finder);
 
     return i_ret;
 }

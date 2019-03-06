@@ -138,7 +138,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     free(modlist);
     if (!sys->gl)
     {
-        vlc_object_release(embed_cfg.window);
+        vlc_object_delete(embed_cfg.window);
         goto error;
     }
 
@@ -190,7 +190,7 @@ static void Close(vout_display_t *vd)
             vlc_gl_ReleaseCurrent (gl);
         }
         vlc_gl_Release (gl);
-        vlc_object_release(surface);
+        vlc_object_delete(surface);
     }
 
     CommonClean(vd);

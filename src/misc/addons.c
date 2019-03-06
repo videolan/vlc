@@ -319,7 +319,7 @@ static void LoadLocalStorage( addons_manager_t *p_manager )
 
         ARRAY_RESET( p_finder->entries );
     }
-    vlc_object_release( p_finder );
+    vlc_object_delete(p_finder);
 }
 
 static void finder_thread_interrupted( void* p_data )
@@ -376,7 +376,7 @@ static void *FinderThread( void *p_data )
             }
             ARRAY_RESET( p_finder->entries );
             free( psz_uri );
-            vlc_object_release( p_finder );
+            vlc_object_delete(p_finder);
         }
 
         p_manager->owner.discovery_ended( p_manager );
@@ -406,7 +406,7 @@ static int addons_manager_WriteCatalog( addons_manager_t *p_manager )
         vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
         module_unneed( p_storage, p_module );
     }
-    vlc_object_release( p_storage );
+    vlc_object_delete(p_storage);
 
     return i_return;
 }
@@ -443,7 +443,7 @@ static int installOrRemoveAddon( addons_manager_t *p_manager, addon_entry_t *p_e
             vlc_mutex_unlock( &p_entry->lock );
         }
     }
-    vlc_object_release( p_storage );
+    vlc_object_delete(p_storage);
 
     return i_return;
 }

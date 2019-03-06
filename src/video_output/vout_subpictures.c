@@ -163,7 +163,7 @@ static void FilterRelease(filter_t *filter)
 {
     if (filter->p_module)
         module_unneed(filter, filter->p_module);
-    vlc_object_release(filter);
+    vlc_object_delete(filter);
 }
 
 static picture_t *spu_new_video_buffer(filter_t *filter)
@@ -1387,7 +1387,7 @@ void spu_Destroy(spu_t *spu)
 
     vlc_mutex_destroy(&sys->lock);
 
-    vlc_object_release(spu);
+    vlc_object_delete(spu);
 }
 
 /**

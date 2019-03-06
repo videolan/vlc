@@ -265,7 +265,7 @@ error:
         msg_Err( parent, "Failed to create %s", capability );
     es_format_Clean( &filter->fmt_out );
     es_format_Clean( &filter->fmt_in );
-    vlc_object_release( filter );
+    vlc_object_delete(filter);
     return NULL;
 }
 
@@ -315,7 +315,7 @@ void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
     es_format_Clean( &filter->fmt_out );
     es_format_Clean( &filter->fmt_in );
 
-    vlc_object_release( filter );
+    vlc_object_delete(filter);
     /* FIXME: check fmt_in/fmt_out consitency */
 }
 

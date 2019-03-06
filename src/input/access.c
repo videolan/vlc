@@ -315,7 +315,7 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
         s->psz_url = strdup(access->psz_url);
         if (unlikely(s->psz_url == NULL))
         {
-            vlc_object_release(s);
+            vlc_object_delete(s);
             vlc_stream_Delete(access);
             return NULL;
         }

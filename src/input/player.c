@@ -3475,7 +3475,7 @@ vlc_player_Delete(vlc_player_t *player)
     if (player->renderer)
         vlc_renderer_item_release(player->renderer);
 
-    vlc_object_release(player);
+    vlc_object_delete(player);
 }
 
 vlc_player_t *
@@ -3596,6 +3596,6 @@ error:
     if (player->resource)
         input_resource_Release(player->resource);
 
-    vlc_object_release(player);
+    vlc_object_delete(player);
     return NULL;
 }

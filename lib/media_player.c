@@ -751,7 +751,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     mp->input.p_resource = input_resource_New(VLC_OBJECT(mp));
     if (unlikely(mp->input.p_resource == NULL))
     {
-        vlc_object_release(mp);
+        vlc_object_delete(mp);
         return NULL;
     }
     audio_output_t *aout = input_resource_GetAout(mp->input.p_resource);
@@ -846,7 +846,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     }
 
     libvlc_instance_t *instance = p_mi->p_libvlc_instance;
-    vlc_object_release( p_mi );
+    vlc_object_delete(p_mi);
     libvlc_release(instance);
 }
 

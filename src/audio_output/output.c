@@ -262,7 +262,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     if (owner->module == NULL)
     {
         msg_Err (aout, "no suitable audio output module");
-        vlc_object_release (aout);
+        vlc_object_delete(aout);
         return NULL;
     }
 
@@ -378,7 +378,7 @@ void aout_Destroy (audio_output_t *aout)
     var_SetFloat (aout, "volume", -1.f);
     var_DelCallback(aout, "volume", var_Copy, vlc_object_parent(aout));
     var_DelCallback (aout, "stereo-mode", StereoModeCallback, NULL);
-    vlc_object_release (aout);
+    vlc_object_delete(aout);
 }
 
 /**

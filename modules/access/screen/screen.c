@@ -264,7 +264,7 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->p_blend )
     {
         module_unneed( p_sys->p_blend, p_sys->p_blend->p_module );
-        vlc_object_release( p_sys->p_blend );
+        vlc_object_delete(p_sys->p_blend);
     }
 #endif
     free( p_sys );
@@ -382,7 +382,7 @@ void RenderCursor( demux_t *p_demux, int i_x, int i_y,
             if( !p_sys->p_blend->p_module )
             {
                 msg_Err( p_demux, "Could not load video blending module" );
-                vlc_object_release( p_sys->p_blend );
+                vlc_object_delete(p_sys->p_blend);
                 p_sys->p_blend = NULL;
             }
         }

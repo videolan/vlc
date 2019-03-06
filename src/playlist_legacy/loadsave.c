@@ -82,7 +82,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
    fclose( p_export->p_file );
 out:
    free( p_export->base_url );
-   vlc_object_release( p_export );
+   vlc_object_delete(p_export);
    return ret;
 }
 
@@ -104,6 +104,6 @@ int playlist_Import( playlist_t *p_playlist, const char *psz_file )
 
     int ret = input_Read( dummy, p_input, NULL, NULL );
 
-    vlc_object_release( dummy );
+    vlc_object_delete(dummy);
     return ret;
 }

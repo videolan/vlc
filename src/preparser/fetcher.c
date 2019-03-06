@@ -158,7 +158,7 @@ static int InvokeModule( input_fetcher_t* fetcher, input_item_t* item,
     if( mf_module )
         module_unneed( mf, mf_module );
 
-    vlc_object_release( mf );
+    vlc_object_delete(mf);
 
     return VLC_SUCCESS;
 }

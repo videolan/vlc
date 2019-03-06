@@ -246,7 +246,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     if (sys->module == NULL)
     {
-        vlc_object_release(s);
+        vlc_object_delete(s);
         return -1;
     }
 
@@ -265,7 +265,7 @@ static void Stop(audio_output_t *aout)
     vlc_module_unload(sys->module, aout_stream_Stop, sys->stream);
     LeaveMTA();
 
-    vlc_object_release(sys->stream);
+    vlc_object_delete(sys->stream);
     sys->stream = NULL;
 }
 

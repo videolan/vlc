@@ -132,7 +132,7 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
     free(modlist);
     if (priv->module == NULL)
     {
-        vlc_object_release(va);
+        vlc_object_delete(va);
         va = NULL;
     }
     return va;
@@ -143,5 +143,5 @@ void vlc_va_Delete(vlc_va_t *va, void **hwctx)
     struct vlc_va_priv *priv = container_of(va, struct vlc_va_priv, va);
 
     vlc_module_unload(priv->module, vlc_va_Stop, va, hwctx);
-    vlc_object_release(va);
+    vlc_object_delete(va);
 }

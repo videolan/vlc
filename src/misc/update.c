@@ -144,7 +144,7 @@ void update_Delete( update_t *p_update )
     {
         atomic_store( &p_update->p_download->aborted, true );
         vlc_join( p_update->p_download->thread, NULL );
-        vlc_object_release( p_update->p_download );
+        vlc_object_delete(p_update->p_download);
     }
 
     vlc_mutex_destroy( &p_update->lock );
@@ -507,7 +507,7 @@ void update_Download( update_t *p_update, const char *psz_destdir )
     {
         atomic_store( &p_update->p_download->aborted, true );
         vlc_join( p_update->p_download->thread, NULL );
-        vlc_object_release( p_update->p_download );
+        vlc_object_delete(p_update->p_download);
     }
 
     update_download_thread_t *p_udt =

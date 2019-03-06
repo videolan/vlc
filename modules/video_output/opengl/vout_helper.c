@@ -576,7 +576,7 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
         pl_context_destroy(&tc->pl_ctx);
 #endif
 
-    vlc_object_release(tc);
+    vlc_object_delete(tc);
 }
 
 static int
@@ -641,7 +641,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
 
         if (desc == NULL)
         {
-            vlc_object_release(tc);
+            vlc_object_delete(tc);
             return VLC_EGENERIC;
         }
         if (desc->plane_count == 0)
@@ -663,7 +663,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
 
     if (ret != VLC_SUCCESS)
     {
-        vlc_object_release(tc);
+        vlc_object_delete(tc);
         return VLC_EGENERIC;
     }
 

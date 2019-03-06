@@ -90,7 +90,7 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
                                  cfg->display.width, cfg->display.height);
     if (gl->module == NULL)
     {
-        vlc_object_release(gl);
+        vlc_object_delete(gl);
         return NULL;
     }
     assert(gl->makeCurrent && gl->releaseCurrent && gl->swap
@@ -114,7 +114,7 @@ void vlc_gl_Release(vlc_gl_t *gl)
 
     vlc_module_unload(gl->module, vlc_gl_stop, gl);
     vlc_objres_clear(VLC_OBJECT(gl));
-    vlc_object_release(gl);
+    vlc_object_delete(gl);
 }
 
 #include <vlc_vout_window.h>

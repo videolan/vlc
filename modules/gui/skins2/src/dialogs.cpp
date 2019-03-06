@@ -123,7 +123,7 @@ Dialogs::~Dialogs()
     {
         // Detach the dialogs provider from its parent interface
         module_unneed( m_pProvider, m_pModule );
-        vlc_object_release( m_pProvider );
+        vlc_object_delete(m_pProvider);
 
         /* Unregister callbacks */
         var_DelCallback( pl_Get(getIntf()), "intf-popupmenu",
@@ -170,7 +170,7 @@ bool Dialogs::init()
     m_pModule = module_need( m_pProvider, "dialogs provider", NULL, false );
     if( m_pModule == NULL )
     {
-        vlc_object_release( m_pProvider );
+        vlc_object_delete(m_pProvider);
         m_pProvider = NULL;
         return false;
     }

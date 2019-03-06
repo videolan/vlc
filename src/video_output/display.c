@@ -808,7 +808,7 @@ error:
     video_format_Clean(&vd->source);
     if (osys->video_context.device)
         vlc_decoder_device_Release(osys->video_context.device);
-    vlc_object_release(vd);
+    vlc_object_delete(vd);
     return NULL;
 }
 
@@ -832,5 +832,5 @@ void vout_display_Delete(vout_display_t *vd)
 
     video_format_Clean(&vd->source);
     video_format_Clean(&vd->fmt);
-    vlc_object_release(vd);
+    vlc_object_delete(vd);
 }

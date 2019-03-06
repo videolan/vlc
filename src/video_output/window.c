@@ -70,7 +70,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     w->module = vlc_module_load(window, "vout window", module, false,
                                 vout_window_start, window);
     if (!w->module) {
-        vlc_object_release(window);
+        vlc_object_delete(window);
         return NULL;
     }
 
@@ -122,7 +122,7 @@ void vout_window_Delete(vout_window_t *window)
     if (window->ops->destroy != NULL)
         window->ops->destroy(window);
     vlc_objres_clear(VLC_OBJECT(window));
-    vlc_object_release(window);
+    vlc_object_delete(window);
 }
 
 void vout_window_SetInhibition(vout_window_t *window, bool enabled)

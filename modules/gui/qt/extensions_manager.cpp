@@ -63,7 +63,7 @@ ExtensionsManager::~ExtensionsManager()
     if( p_extensions_manager )
     {
         module_unneed( p_extensions_manager, p_extensions_manager->p_module );
-        vlc_object_release( p_extensions_manager );
+        vlc_object_delete(p_extensions_manager);
     }
 }
 
@@ -86,7 +86,7 @@ bool ExtensionsManager::loadExtensions()
         if( !p_extensions_manager->p_module )
         {
             msg_Err( p_intf, "Unable to load extensions module" );
-            vlc_object_release( p_extensions_manager );
+            vlc_object_delete(p_extensions_manager);
             p_extensions_manager = NULL;
             b_failed = true;
             emit extensionsUpdated();
@@ -101,7 +101,7 @@ bool ExtensionsManager::loadExtensions()
             msg_Err( p_intf, "Unable to create dialogs provider for extensions" );
             module_unneed( p_extensions_manager,
                            p_extensions_manager->p_module );
-            vlc_object_release( p_extensions_manager );
+            vlc_object_delete(p_extensions_manager);
             p_extensions_manager = NULL;
             b_failed = true;
             emit extensionsUpdated();
@@ -121,7 +121,7 @@ void ExtensionsManager::unloadExtensions()
     b_unloading = true;
     ExtensionsDialogProvider::killInstance();
     module_unneed( p_extensions_manager, p_extensions_manager->p_module );
-    vlc_object_release( p_extensions_manager );
+    vlc_object_delete(p_extensions_manager);
     p_extensions_manager = NULL;
 }
 
