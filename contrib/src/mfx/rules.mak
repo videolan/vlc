@@ -1,13 +1,21 @@
 # mfx (Media SDK)
 
 mfx_GITURL := https://github.com/lu-zero/mfx_dispatch.git
-MFX_GITHASH := b3b0bc9524a8a936fb1b80ca2db45566feb2e868
+MFX_GITHASH := 612558419be4889ac6d059516457e83c163edcd2
 
 ifeq ($(call need_pkg,"mfx"),)
 PKGS_FOUND += mfx
 endif
 ifdef HAVE_WIN32
 PKGS += mfx
+endif
+
+MFX_CFLAGS := $(CFLAGS)
+MFX_CXXFLAGS := $(CFLAGS)
+
+ifdef HAVE_WINSTORE
+MFX_CFLAGS   += -DMEDIASDK_UWP_LOADER -DMEDIASDK_UWP_PROCTABLE
+MFX_CXXFLAGS += -DMEDIASDK_UWP_LOADER -DMEDIASDK_UWP_PROCTABLE
 endif
 
 $(TARBALLS)/mfx-$(MFX_GITHASH).tar.xz:
@@ -23,6 +31,6 @@ mfx: mfx-$(MFX_GITHASH).tar.xz .sum-mfx
 	$(MOVE)
 
 .mfx: mfx
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(MFX_CFLAGS)" CXXFLAGS="$(MFX_CXXFLAGS)" ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
