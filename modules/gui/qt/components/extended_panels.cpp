@@ -660,7 +660,6 @@ void ExtV4l2::Refresh( void )
         {
             msg_Err( p_intf, "Oops, v4l2 object doesn't have a 'controls' variable." );
             help->show();
-            vlc_object_release( p_obj );
             return;
         }
 
