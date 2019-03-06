@@ -8,20 +8,20 @@ lld (impersonating GNU ld) only supports response files, not
 linker scripts. Using a linker script as input just to pass a
 list of files is overkill for cases when a response file is enough.
 ---
- libltdl/config/ltmain.m4sh | 28 ++++++++++++++--------------
- libltdl/m4/libtool.m4      |  2 ++
+ libtool-2.4.6/config/ltmain.m4sh | 28 ++++++++++++++--------------
+ libtool-2.4.6/m4/libtool.m4      |  2 ++
  2 files changed, 16 insertions(+), 14 deletions(-)
 
-diff --git a/libltdl/config/ltmain.m4sh b/libltdl/config/ltmain.m4sh
+diff --git libtool-2.4.6/build-aux/ltmain.sh.orig libtool-2.4.6/build-aux/ltmain.sh
 index 2641327..f6b4217 100644
---- a/libltdl/config/ltmain.m4sh
-+++ b/libltdl/config/ltmain.m4sh
-@@ -7545,20 +7545,7 @@ EOF
+--- libtool-2.4.6/build-aux/ltmain.sh.orig	2019-05-14 15:41:21.977391100 +0200
++++ libtool-2.4.6/build-aux/ltmain.sh	2019-05-14 15:43:07.767697900 +0200
+@@ -9852,20 +9852,7 @@ EOF
  	  last_robj=
  	  k=1
  
--	  if test -n "$save_libobjs" && test "X$skipped_export" != "X:" && test "$with_gnu_ld" = yes; then
--	    output=${output_objdir}/${output_la}.lnkscript
+-	  if test -n "$save_libobjs" && test : != "$skipped_export" && test yes = "$with_gnu_ld"; then
+-	    output=$output_objdir/$output_la.lnkscript
 -	    func_verbose "creating GNU ld script: $output"
 -	    echo 'INPUT (' > $output
 -	    for obj in $save_libobjs
@@ -33,17 +33,17 @@ index 2641327..f6b4217 100644
 -	    func_append delfiles " $output"
 -	    func_to_tool_file "$output"
 -	    output=$func_to_tool_file_result
--	  elif test -n "$save_libobjs" && test "X$skipped_export" != "X:" && test "X$file_list_spec" != X; then
-+	  if test -n "$save_libobjs" && test "X$skipped_export" != "X:" && test "X$file_list_spec" != X; then
- 	    output=${output_objdir}/${output_la}.lnk
+-	  elif test -n "$save_libobjs" && test : != "$skipped_export" && test -n "$file_list_spec"; then
++	  if test -n "$save_libobjs" && test : != "$skipped_export" && test -n "$file_list_spec"; then
+ 	    output=$output_objdir/$output_la.lnk
  	    func_verbose "creating linker input file list: $output"
  	    : > $output
-@@ -7577,6 +7564,19 @@ EOF
+@@ -9884,6 +9871,19 @@ EOF
  	    func_append delfiles " $output"
  	    func_to_tool_file "$output"
  	    output=$firstobj\"$file_list_spec$func_to_tool_file_result\"
-+	  elif test -n "$save_libobjs" && test "X$skipped_export" != "X:" && test "$with_gnu_ld" = yes; then
-+	    output=${output_objdir}/${output_la}.lnkscript
++	  elif test -n "$save_libobjs" && test : != "$skipped_export" && test yes = "$with_gnu_ld"; then
++	    output=$output_objdir/$output_la.lnkscript
 +	    func_verbose "creating GNU ld script: $output"
 +	    echo 'INPUT (' > $output
 +	    for obj in $save_libobjs
@@ -58,10 +58,10 @@ index 2641327..f6b4217 100644
  	  else
  	    if test -n "$save_libobjs"; then
  	      func_verbose "creating reloadable object files..."
-diff --git a/libltdl/m4/libtool.m4 b/libltdl/m4/libtool.m4
+diff --git libtool-2.4.6/m4/libtool.m4.orig libtool-2.4.6/m4/libtool.m4
 index 6f93d32..2c5c2f0 100644
---- a/libltdl/m4/libtool.m4
-+++ b/libltdl/m4/libtool.m4
+--- libtool-2.4.6/m4/libtool.m4.orig
++++ libtool-2.4.6/m4/libtool.m4
 @@ -4750,6 +4750,7 @@ _LT_EOF
        _LT_TAGVAR(enable_shared_with_static_runtimes, $1)=yes
        _LT_TAGVAR(export_symbols_cmds, $1)='$NM $libobjs $convenience | $global_symbol_pipe | $SED -e '\''/^[[BCDGRS]][[ ]]/s/.*[[ ]]\([[^ ]]*\)/\1 DATA/;s/^.*[[ ]]__nm__\([[^ ]]*\)[[ ]][[^ ]]*/\1 DATA/;/^I[[ ]]/d;/^[[AITW]][[ ]]/s/.* //'\'' | sort | uniq > $export_symbols'

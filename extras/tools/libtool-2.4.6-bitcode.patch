@@ -1,37 +1,35 @@
-diff -ru libtool/libltdl/config/ltmain.m4sh libtool-fixed/libltdl/config/ltmain.m4sh
---- libtool/libltdl/config/ltmain.m4sh	2011-10-17 12:17:05.000000000 +0200
-+++ libtool-fixed/libltdl/config/ltmain.m4sh.new	2015-09-30 22:03:22.000000000 +0200
-@@ -7928,16 +7928,6 @@
+--- libtool-2.4.6/build-aux/ltmain.in.orig	2019-03-06 17:18:05.670433700 +0100
++++ libtool-2.4.6/build-aux/ltmain.in	2019-03-06 17:21:23.122227200 +0100
+@@ -8296,16 +8296,6 @@
  
        case $host in
        *-*-darwin*)
 -	# Don't allow lazy linking, it breaks C++ global constructors
 -	# But is supposedly fixed on 10.4 or later (yay!).
--	if test "$tagname" = CXX ; then
+-	if test CXX = "$tagname"; then
 -	  case ${MACOSX_DEPLOYMENT_TARGET-10.0} in
 -	    10.[0123])
--	      func_append compile_command " ${wl}-bind_at_load"
--	      func_append finalize_command " ${wl}-bind_at_load"
+-	      func_append compile_command " $wl-bind_at_load"
+-	      func_append finalize_command " $wl-bind_at_load"
 -	    ;;
 -	  esac
 -	fi
  	# Time to change all our "foo.ltframework" stuff back to "-framework foo"
  	compile_deplibs=`$ECHO " $compile_deplibs" | $SED 's% \([^ $]*\).ltframework% -framework \1%g'`
  	finalize_deplibs=`$ECHO " $finalize_deplibs" | $SED 's% \([^ $]*\).ltframework% -framework \1%g'`
-diff -ru libtool/libltdl/config/ltmain.sh libtool-fixed/libltdl/config/ltmain.sh
---- libtool/libltdl/config/ltmain.sh	2011-10-17 12:19:35.000000000 +0200
-+++ libtool-fixed/libltdl/config/ltmain.sh.new	2015-09-30 22:03:44.000000000 +0200
-@@ -8715,16 +8715,6 @@
+--- libtool-2.4.6/build-aux/ltmain.sh.orig	2019-03-06 17:18:05.690203200 +0100
++++ libtool-2.4.6/build-aux/ltmain.sh	2019-03-06 17:21:40.825606300 +0100
+@@ -10208,16 +10208,6 @@
  
        case $host in
        *-*-darwin*)
 -	# Don't allow lazy linking, it breaks C++ global constructors
 -	# But is supposedly fixed on 10.4 or later (yay!).
--	if test "$tagname" = CXX ; then
+-	if test CXX = "$tagname"; then
 -	  case ${MACOSX_DEPLOYMENT_TARGET-10.0} in
 -	    10.[0123])
--	      func_append compile_command " ${wl}-bind_at_load"
--	      func_append finalize_command " ${wl}-bind_at_load"
+-	      func_append compile_command " $wl-bind_at_load"
+-	      func_append finalize_command " $wl-bind_at_load"
 -	    ;;
 -	  esac
 -	fi
