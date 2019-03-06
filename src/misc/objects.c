@@ -264,15 +264,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     return obj;
 }
 
-#undef vlc_object_create
-/**
- * Allocates and initializes a vlc object.
- *
- * @param i_size object byte size
- *
- * @return the new object, or NULL on error.
- */
-void *vlc_object_create( vlc_object_t *p_this, size_t i_size )
+void *(vlc_object_create)(vlc_object_t *p_this, size_t i_size)
 {
     return vlc_custom_create( p_this, i_size, "generic" );
 }
@@ -358,11 +350,7 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
     return NULL;
 }
 
-#undef vlc_object_hold
-/**
- * Increment an object reference counter.
- */
-void * vlc_object_hold( vlc_object_t *p_this )
+void *(vlc_object_hold)(vlc_object_t *p_this)
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
     unsigned refs = atomic_fetch_add_explicit(&internals->refs, 1,
@@ -373,12 +361,7 @@ void * vlc_object_hold( vlc_object_t *p_this )
     return p_this;
 }
 
-#undef vlc_object_release
-/**
- * Drops a reference to an object (decrements the reference count).
- * If the count reaches zero, the object is destroyed.
- */
-void vlc_object_release (vlc_object_t *obj)
+void (vlc_object_release)(vlc_object_t *obj)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
     unsigned refs = atomic_load_explicit(&priv->refs, memory_order_relaxed);
