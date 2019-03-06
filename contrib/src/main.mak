@@ -488,6 +488,22 @@ help:
 
 .PHONY: all fetch fetch-all install mostlyclean clean distclean package list help prebuilt
 
+CMAKE_SYSTEM_NAME =
+ifdef HAVE_WIN32
+CMAKE_SYSTEM_NAME = Windows
+ifdef HAVE_VISUALSTUDIO
+ifdef HAVE_WINSTORE
+CMAKE_SYSTEM_NAME = WindowsStore
+endif
+ifdef HAVE_WINDOWSPHONE
+CMAKE_SYSTEM_NAME = WindowsPhone
+endif
+endif
+endif
+ifdef HAVE_DARWIN_OS
+CMAKE_SYSTEM_NAME = Darwin
+endif
+
 # CMake toolchain
 toolchain.cmake:
 	$(RM) $@
@@ -497,24 +513,15 @@ else
 	echo "set(CMAKE_BUILD_TYPE Release)" >> $@
 endif
 	echo "set(CMAKE_SYSTEM_PROCESSOR $(ARCH))" >> $@
+	if test -n "$(CMAKE_SYSTEM_NAME)"; then \
+		echo "set(CMAKE_SYSTEM_NAME $(CMAKE_SYSTEM_NAME))" >> $@; \
+	fi;
 ifdef HAVE_WIN32
-ifdef HAVE_VISUALSTUDIO
-ifdef HAVE_WINDOWSPHONE
-	echo "set(CMAKE_SYSTEM_NAME WindowsPhone)" >> $@
-else
-ifdef HAVE_WINSTORE
-	echo "set(CMAKE_SYSTEM_NAME WindowsStore)" >> $@
-else
-	echo "set(CMAKE_SYSTEM_NAME Windows)" >> $@
-endif
-endif
-endif
 ifdef HAVE_CROSS_COMPILE
 	echo "set(CMAKE_RC_COMPILER $(WINDRES))" >> $@
 endif
 endif
 ifdef HAVE_DARWIN_OS
-	echo "set(CMAKE_SYSTEM_NAME Darwin)" >> $@
 	echo "set(CMAKE_C_FLAGS \"$(CFLAGS) $(EXTRA_CFLAGS)\")" >> $@
 	echo "set(CMAKE_CXX_FLAGS \"$(CFLAGS) $(EXTRA_CXXFLAGS)\")" >> $@
 	echo "set(CMAKE_LD_FLAGS \"$(LDFLAGS)\")" >> $@
