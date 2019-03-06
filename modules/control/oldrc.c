@@ -1652,7 +1652,7 @@ static int AudioChannel( vlc_object_t *obj, char const *cmd,
                          vlc_value_t old, vlc_value_t cur, void *dummy )
 {
     intf_thread_t *p_intf = (intf_thread_t*)obj;
-    vlc_object_t *p_aout = (vlc_object_t *)playlist_GetAout( pl_Get(p_intf) );
+    audio_output_t *p_aout = playlist_GetAout( pl_Get(p_intf) );
     if ( p_aout == NULL )
          return VLC_ENOOBJ;
 

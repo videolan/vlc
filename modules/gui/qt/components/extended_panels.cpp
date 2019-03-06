@@ -873,7 +873,7 @@ void FilterSliderData::updateText( int i )
 
 float FilterSliderData::initialValue()
 {
-    vlc_object_t *p_aout = (vlc_object_t *) THEMIM->getAout();
+    audio_output_t *p_aout = THEMIM->getAout();
     float f = p_data->f_value;
     if( p_aout )
     {
@@ -900,7 +900,7 @@ float FilterSliderData::initialValue()
 void FilterSliderData::onValueChanged( int i )
 {
     float f = ((float) i) * p_data->f_resolution;
-    vlc_object_t *p_aout = (vlc_object_t *) THEMIM->getAout();
+    audio_output_t *p_aout = THEMIM->getAout();
     if ( p_aout )
     {
         var_SetFloat( p_aout, qtu(p_data->name), f );
@@ -1012,7 +1012,7 @@ EqualizerSliderData::EqualizerSliderData( QObject *parent, intf_thread_t *_p_int
 
 QStringList EqualizerSliderData::getBandsFromAout() const
 {
-    vlc_object_t *p_aout = (vlc_object_t *) THEMIM->getAout();
+    audio_output_t *p_aout = THEMIM->getAout();
     QStringList bands;
     if( p_aout )
     {
@@ -1062,7 +1062,7 @@ void EqualizerSliderData::onValueChanged( int i )
     {
         float f = ((float) i) * p_data->f_resolution;
         bands[ index ] = QLocale( QLocale::C ).toString( f );
-        vlc_object_t *p_aout = (vlc_object_t *) THEMIM->getAout();
+        audio_output_t *p_aout = THEMIM->getAout();
         if ( p_aout )
         {
             var_SetString( p_aout, qtu(p_data->name), qtu(bands.join( " " )) );
@@ -1196,7 +1196,7 @@ void Equalizer::build()
     CONNECT( ui.presetsCombo, activated(int), this, setCorePreset(int) );
 
     /* Set enable checkbox */
-    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
+    audio_output_t *p_aout = THEMIM->getAout();
     char *psz_af;
     if( p_aout )
         psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
@@ -1243,7 +1243,7 @@ void Equalizer::setCorePreset( int i_preset )
                             sliderDatas.count() ) ; i++ )
         sliderDatas[i]->setValue( eqz_preset_10b[i_preset].f_amp[i] );
 
-    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
+    audio_output_t *p_aout = THEMIM->getAout();
     if( p_aout )
     {
         var_SetString( p_aout , "equalizer-preset" , preset_list[i_preset] );
@@ -1255,7 +1255,7 @@ void Equalizer::setCorePreset( int i_preset )
 /* Function called when the set2Pass button is activated */
 void Equalizer::enable2Pass( bool b_enable )
 {
-    vlc_object_t *p_aout= (vlc_object_t *)THEMIM->getAout();
+    audio_output_t *p_aout= THEMIM->getAout();
 
     if( p_aout )
     {
