@@ -963,7 +963,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         render_subtitle_date = sys->pause.date;
     else
         render_subtitle_date = filtered->date > 1 ? filtered->date : vlc_tick_now();
-    vlc_tick_t render_osd_date = vlc_tick_now(); /* FIXME wrong */
+    vlc_tick_t system_now = vlc_tick_now();
 
     /*
      * Get the subpicture to be displayed
@@ -1024,9 +1024,9 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     video_format_ApplyRotation(&fmt_spu_rot, &fmt_spu);
     subpicture_t *subpic = spu_Render(sys->spu,
                                       subpicture_chromas, &fmt_spu_rot,
-                                      &vd->source,
-                                      render_subtitle_date, render_osd_date,
-                                      do_snapshot,
+                                      &vd->source, system_now,
+                                      render_subtitle_date,
+                                      1.f, do_snapshot,
                                       vd->info.can_scale_spu);
     /*
      * Perform rendering
