@@ -40,8 +40,8 @@
 #include "aout_internal.h"
 #include "../video_output/vout_internal.h" /* for vout_Request */
 
-static filter_t *CreateFilter(vlc_object_t *obj, const char *type,
-                              const char *name,
+static filter_t *CreateFilter(vlc_object_t *obj, vlc_clock_t *clock,
+                              const char *type, const char *name,
                               const audio_sample_format_t *infmt,
                               const audio_sample_format_t *outfmt,
                               config_chain_t *cfg, bool const_fmt)
@@ -50,6 +50,7 @@ static filter_t *CreateFilter(vlc_object_t *obj, const char *type,
     if (unlikely(filter == NULL))
         return NULL;
 
+    filter->owner.sys = clock;
     filter->p_cfg = cfg;
     filter->fmt_in.audio = *infmt;
     filter->fmt_in.i_codec = infmt->i_format;
@@ -90,7 +91,7 @@ static filter_t *FindConverter (vlc_object_t *obj,
                                 const audio_sample_format_t *infmt,
                                 const audio_sample_format_t *outfmt)
 {
-    return CreateFilter(obj, "audio converter", NULL, infmt, outfmt,
+    return CreateFilter(obj, NULL, "audio converter", NULL, infmt, outfmt,
                         NULL, true);
 }
 
@@ -99,7 +100,7 @@ static filter_t *FindResampler (vlc_object_t *obj,
                                 const audio_sample_format_t *outfmt)
 {
     char *modlist = var_InheritString(obj, "audio-resampler");
-    filter_t *filter = CreateFilter(obj, "audio resampler", modlist,
+    filter_t *filter = CreateFilter(obj, NULL, "audio resampler", modlist,
                                     infmt, outfmt, NULL, true);
     free(modlist);
     return filter;
@@ -205,7 +206,7 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
         config_chain_t *cfg = NULL;
         if (headphones)
             config_ChainParseOptions(&cfg, "{headphones=true}");
-        filter_t *f = CreateFilter(obj, filter_type, NULL,
+        filter_t *f = CreateFilter(obj, NULL, filter_type, NULL,
                                    &input, &output, cfg, true);
         if (cfg)
             config_ChainDestroy(cfg);
@@ -347,6 +348,7 @@ struct aout_filters
         (either the scaletempo filter or a resampler) */
     filter_t *resampler; /**< The resampler */
     int resampling; /**< Current resampling (Hz) */
+    vlc_clock_t *clock;
 
     unsigned count; /**< Number of filters */
     filter_t *tab[AOUT_MAX_FILTERS]; /**< Configured user filters
@@ -388,7 +390,7 @@ vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
 
     video_format_t adj_fmt = *fmt;
     vout_configuration_t cfg = {
-        .vout = vout, .fmt = &adj_fmt, .dpb_size = 1,
+        .vout = vout, .clock = filter->owner.sys, .fmt = &adj_fmt, .dpb_size = 1,
     };
 
     video_format_AdjustColorSpace(&adj_fmt);
@@ -413,7 +415,7 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
         return -1;
     }
 
-    filter_t *filter = CreateFilter(obj, type, name,
+    filter_t *filter = CreateFilter(obj, filters->clock, type, name,
                                     infmt, outfmt, cfg, false);
     if (filter == NULL)
     {
@@ -484,19 +486,10 @@ static int AppendRemapFilter(vlc_object_t *obj, aout_filters_t *restrict filters
     return ret;
 }
 
-#undef aout_FiltersNew
-/**
- * Sets a chain of audio filters up.
- * \param obj parent object for the filters
- * \param infmt chain input format [IN]
- * \param outfmt chain output format [IN]
- * \param cfg a valid aout_filters_cfg_t struct or NULL.
- * \return a filters chain or NULL on failure
- */
-aout_filters_t *aout_FiltersNew(vlc_object_t *obj,
-                                const audio_sample_format_t *restrict infmt,
-                                const audio_sample_format_t *restrict outfmt,
-                                const aout_filters_cfg_t *cfg)
+aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *obj, const vlc_clock_t *clock,
+                                         const audio_sample_format_t *restrict infmt,
+                                         const audio_sample_format_t *restrict outfmt,
+                                         const aout_filters_cfg_t *cfg)
 {
     aout_filters_t *filters = malloc (sizeof (*filters));
     if (unlikely(filters == NULL))
@@ -506,6 +499,14 @@ aout_filters_t *aout_FiltersNew(vlc_object_t *obj,
     filters->resampler = NULL;
     filters->resampling = 0;
     filters->count = 0;
+    if (clock)
+    {
+        filters->clock = vlc_clock_CreateSlave(clock);
+        if (!filters->clock)
+            goto error;
+    }
+    else
+        filters->clock = NULL;
 
     /* Prepare format structure */
     aout_FormatPrint (obj, "input", infmt);
@@ -646,8 +647,39 @@ aout_filters_t *aout_FiltersNew(vlc_object_t *obj,
 error:
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
     var_DelCallback(obj, "visual", VisualizationCallback, NULL);
+    if (filters->clock)
+        vlc_clock_Delete(filters->clock);
     free (filters);
     return NULL;
+}
+
+void aout_FiltersResetClock(aout_filters_t *filters)
+{
+    assert(filters->clock);
+    vlc_clock_Reset(filters->clock);
+}
+
+void aout_FiltersSetClockDelay(aout_filters_t *filters, vlc_tick_t delay)
+{
+    assert(filters->clock);
+    vlc_clock_SetDelay(filters->clock, delay);
+}
+
+#undef aout_FiltersNew
+/**
+ * Sets a chain of audio filters up.
+ * \param obj parent object for the filters
+ * \param infmt chain input format [IN]
+ * \param outfmt chain output format [IN]
+ * \param cfg a valid aout_filters_cfg_t struct or NULL.
+ * \return a filters chain or NULL on failure
+ */
+aout_filters_t *aout_FiltersNew(vlc_object_t *obj,
+                                const audio_sample_format_t *restrict infmt,
+                                const audio_sample_format_t *restrict outfmt,
+                                const aout_filters_cfg_t *cfg)
+{
+    return aout_FiltersNewWithClock(obj, NULL, infmt, outfmt, cfg);
 }
 
 #undef aout_FiltersDelete
@@ -662,6 +694,8 @@ void aout_FiltersDelete (vlc_object_t *obj, aout_filters_t *filters)
         aout_FiltersPipelineDestroy (&filters->resampler, 1);
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
     var_DelCallback(obj, "visual", VisualizationCallback, NULL);
+    if (filters->clock)
+        vlc_clock_Delete(filters->clock);
     free (filters);
 }
 

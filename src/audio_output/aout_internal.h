@@ -26,6 +26,7 @@
 # include <stdatomic.h>
 
 # include <vlc_viewpoint.h>
+# include "../clock/clock.h"
 
 /* Max input rate factor (1/4 -> 4) */
 # define AOUT_MAX_INPUT_RATE (4)
@@ -158,6 +159,18 @@ static inline void aout_SetWavePhysicalChannels(audio_sample_format_t *fmt)
 }
 
 /* From filters.c */
+
+/* Extended version of aout_FiltersNew
+ *
+ * The clock, that is not mandatory, will be used to create a new slave clock
+ * for the filter vizualisation plugins.
+ */
+aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *, const vlc_clock_t *,
+                                         const audio_sample_format_t *,
+                                         const audio_sample_format_t *,
+                                         const aout_filters_cfg_t *cfg) VLC_USED;
+void aout_FiltersResetClock(aout_filters_t *filters);
+void aout_FiltersSetClockDelay(aout_filters_t *filters, vlc_tick_t delay);
 bool aout_FiltersCanResample (aout_filters_t *filters);
 
 #endif /* !LIBVLC_AOUT_INTERNAL_H */
