@@ -216,7 +216,7 @@ static input_thread_t *InputCreateAndStart( services_discovery_t *sd,
     if( input != NULL && input_Start( input ) )
     {
         input_LegacyVarInit( input );
-        vlc_object_release( input );
+        input_Close(input);
         input = NULL;
     }
     return input;
