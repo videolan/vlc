@@ -777,7 +777,6 @@ static void DeleteEncoder( encoder_t * p_enc )
     es_format_Clean( &p_enc->fmt_out );
 
     vlc_object_release( p_enc );
-    p_enc = NULL;
 }
 
 static picture_t *filter_new_picture( filter_t *p_filter )
