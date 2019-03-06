@@ -288,30 +288,25 @@ static bool jpeg_ParseXMP(const uint8_t *p_buf, size_t i_buf,
     fmt->projection_mode = PROJECTION_MODE_EQUIRECTANGULAR;
 
     /* pose handling */
+    float yaw = 0.f, pitch = 0.f, roll = 0.f;
     float value;
     if (getRDFFloat(psz_rdf, &value, "PoseHeadingDegrees") &&
         value >= 0.f && value <= 360.f)
-        fmt->pose.yaw = value;
+        yaw = value;
 
-    if (getRDFFloat(psz_rdf, &value, "PosePitchDegrees"))
-        fmt->pose.pitch = value;
-
-    if (getRDFFloat(psz_rdf, &value, "PoseRollDegrees"))
-        fmt->pose.roll = value;
+    getRDFFloat(psz_rdf, &pitch, "PosePitchDegrees");
+    getRDFFloat(psz_rdf, &roll, "PoseRollDegrees");
 
     /* initial view */
-    if (getRDFFloat(psz_rdf, &value, "InitialViewHeadingDegrees"))
-        fmt->pose.yaw = value;
-
-    if (getRDFFloat(psz_rdf, &value, "InitialViewPitchDegrees"))
-        fmt->pose.pitch = value;
-
-    if (getRDFFloat(psz_rdf, &value, "InitialViewRollDegrees"))
-        fmt->pose.roll = value;
+    getRDFFloat(psz_rdf, &yaw, "InitialViewHeadingDegrees");
+    getRDFFloat(psz_rdf, &pitch, "InitialViewPitchDegrees");
+    getRDFFloat(psz_rdf, &roll, "InitialViewRollDegrees");
 
     if (getRDFFloat(psz_rdf, &value, "InitialHorizontalFOVDegrees") &&
         value >= FIELD_OF_VIEW_DEGREES_MIN && value <= FIELD_OF_VIEW_DEGREES_MAX)
         fmt->pose.fov = value;
+
+    vlc_viewpoint_from_euler(&fmt->pose, yaw, pitch, roll);
 
     free(psz_rdf);
 
