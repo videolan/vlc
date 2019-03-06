@@ -51,13 +51,12 @@ void AvgRescale(average_t *, int range);
 /* */
 typedef struct
 {
-    vlc_tick_t i_stream;
-    vlc_tick_t i_system;
+    vlc_tick_t system;
+    vlc_tick_t stream;
 } clock_point_t;
 
-static inline clock_point_t clock_point_Create( vlc_tick_t i_stream, vlc_tick_t i_system )
+static inline clock_point_t clock_point_Create(vlc_tick_t system, vlc_tick_t stream)
 {
-    clock_point_t p = { .i_stream = i_stream, .i_system = i_system };
-    return p;
+    return (clock_point_t) { .system = system, .stream = stream };
 }
 
