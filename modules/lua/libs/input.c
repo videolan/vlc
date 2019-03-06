@@ -59,14 +59,7 @@ input_thread_t * vlclua_get_input_internal( lua_State *L )
     }
 
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    if( p_playlist != NULL )
-    {
-        input_thread_t *p_input = playlist_CurrentInput( p_playlist );
-        if( p_input )
-            return p_input;
-    }
-
-    return NULL;
+    return playlist_CurrentInput( p_playlist );
 }
 
 static int vlclua_input_item_info( lua_State *L )
