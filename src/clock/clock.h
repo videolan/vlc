@@ -44,7 +44,7 @@ void vlc_clock_main_Abort(vlc_clock_main_t *main_clock);
 void vlc_clock_main_Reset(vlc_clock_main_t *main_clock);
 
 void vlc_clock_main_SetFirstPcr(vlc_clock_main_t *main_clock,
-                                vlc_tick_t system_now, vlc_tick_t pts);
+                                vlc_tick_t system_now, vlc_tick_t ts);
 void vlc_clock_main_SetInputDejitter(vlc_clock_main_t *main_clock,
                                      vlc_tick_t delay);
 
@@ -90,7 +90,7 @@ void vlc_clock_Delete(vlc_clock_t *clock);
  * This function will update the clock drift and returns the drift
  */
 vlc_tick_t vlc_clock_Update(vlc_clock_t *clock, vlc_tick_t system_now,
-                            vlc_tick_t pts, double rate);
+                            vlc_tick_t ts, double rate);
 
 /**
  * This function resets the clock drift
@@ -103,25 +103,25 @@ void vlc_clock_Reset(vlc_clock_t *clock);
  * It returns the amount of time the clock owner need to wait in order to reach
  * the time introduced by the new positive delay.
  */
-vlc_tick_t vlc_clock_SetDelay(vlc_clock_t *clock, vlc_tick_t pts_delay);
+vlc_tick_t vlc_clock_SetDelay(vlc_clock_t *clock, vlc_tick_t ts_delay);
 
 /**
  * Wait for a timestamp expressed in stream time
  */
-int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t pts,
+int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
                    double rate, vlc_tick_t max_duration);
 
 /**
  * This function converts a timestamp from stream to system
  */
 vlc_tick_t vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
-                                     vlc_tick_t pts, double rate);
+                                     vlc_tick_t ts, double rate);
 
 /**
  * This functon converts an array of timestamp from stream to system
  */
 void vlc_clock_ConvertArrayToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
-                                    vlc_tick_t *pts_array, size_t pts_count,
+                                    vlc_tick_t *ts_array, size_t ts_count,
                                     double rate);
 
 /**

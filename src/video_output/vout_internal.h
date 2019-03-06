@@ -45,6 +45,7 @@
  */
 typedef struct {
     vout_thread_t        *vout;
+    vlc_clock_t          *clock;
     const video_format_t *fmt;
     unsigned             dpb_size;
     vlc_mouse_event      mouse_event;
@@ -63,6 +64,12 @@ struct vout_thread_sys_t
 {
     /* Splitter module if used */
     char            *splitter_name;
+
+    vlc_clock_t     *clock;
+    float           rate;
+    float           spu_rate;
+    vlc_tick_t      delay;
+    vlc_tick_t      spu_delay;
 
     /* */
     video_format_t  original;   /* Original format ie coming from the decoder */
@@ -241,6 +248,7 @@ int vout_OpenWrapper(vout_thread_t *, const char *,
 void vout_CloseWrapper(vout_thread_t *);
 
 /* */
+void vout_SetSubpictureClock(vout_thread_t *vout, vlc_clock_t *clock);
 int spu_ProcessMouse(spu_t *, const vlc_mouse_t *, const video_format_t *);
 void spu_Attach( spu_t *, input_thread_t *input );
 void spu_Detach( spu_t * );
@@ -255,6 +263,30 @@ void spu_SetHighlight(spu_t *, const vlc_spu_highlight_t*);
  * It is thread safe
  */
 void vout_ChangePause( vout_thread_t *, bool b_paused, vlc_tick_t i_date );
+
+/**
+ * This function will change the rate of the vout
+ * It is thread safe
+ */
+void vout_ChangeRate( vout_thread_t *, float rate );
+
+/**
+ * This function will change the delay of the vout
+ * It is thread safe
+ */
+void vout_ChangeDelay( vout_thread_t *, vlc_tick_t delay );
+
+/**
+ * This function will change the rate of the spu channel
+ * It is thread safe
+ */
+void vout_ChangeSpuRate( vout_thread_t *, float rate );
+/**
+ * This function will change the delay of the spu channel
+ * It is thread safe
+ */
+void vout_ChangeSpuDelay( vout_thread_t *, vlc_tick_t delay );
+
 
 /**
  * Updates the pointing device state.

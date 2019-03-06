@@ -71,6 +71,14 @@ typedef struct {
             unsigned width;
             unsigned height;
         } window;
+        struct {
+            int channel;
+            float value;
+        } spu_rate;
+        struct {
+            int channel;
+            vlc_tick_t value;
+        } spu_delay;
         vlc_mouse_t mouse;
         vlc_viewpoint_t viewpoint;
     };
