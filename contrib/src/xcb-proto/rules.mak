@@ -8,7 +8,7 @@ PKGS_FOUND += xcb-proto
 endif
 
 $(TARBALLS)/xcb-proto-$(XCB_PROTO_VERSION).tar.bz2:
-	$(call download,$(XCB_PROTO_URL))
+	$(call download_pkg,$(XCB_PROTO_URL),xcb)
 
 .sum-xcb-proto: xcb-proto-$(XCB_PROTO_VERSION).tar.bz2
 
