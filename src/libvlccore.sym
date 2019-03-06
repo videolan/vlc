@@ -1022,6 +1022,8 @@ vlc_media_tree_Find
 vlc_media_tree_Preparse
 vlc_viewpoint_to_4x4
 vlc_viewpoint_from_orientation
+vlc_viewpoint_from_euler
+vlc_viewpoint_to_euler
 vlc_video_context_Create
 vlc_video_context_Release
 vlc_video_context_GetType
