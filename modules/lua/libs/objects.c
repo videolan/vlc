@@ -36,14 +36,21 @@
 
 #include "../vlc.h"
 #include "../libs.h"
-#include "objects.h"
 #include "input.h"
 
 /*****************************************************************************
  * Generic vlc_object_t wrapper creation
  *****************************************************************************/
 
-int (vlclua_push_vlc_object)(lua_State *L, vlc_object_t *p_obj)
+static int vlclua_object_release( lua_State *L )
+{
+    vlc_object_t **p_obj = (vlc_object_t **)luaL_checkudata( L, 1, "vlc_object" );
+    lua_pop( L, 1 );
+    vlc_object_release( *p_obj );
+    return 0;
+}
+
+static int vlclua_push_vlc_object(lua_State *L, vlc_object_t *p_obj)
 {
     vlc_object_t **udata =
         (vlc_object_t **)lua_newuserdata(L, sizeof (vlc_object_t *));
@@ -63,14 +70,6 @@ int (vlclua_push_vlc_object)(lua_State *L, vlc_object_t *p_obj)
     return 1;
 }
 
-static int vlclua_object_release( lua_State *L )
-{
-    vlc_object_t **p_obj = (vlc_object_t **)luaL_checkudata( L, 1, "vlc_object" );
-    lua_pop( L, 1 );
-    vlc_object_release( *p_obj );
-    return 0;
-}
-
 static int vlclua_object_find( lua_State *L )
 {
     lua_pushnil( L );
@@ -81,7 +80,7 @@ static int vlclua_get_libvlc( lua_State *L )
 {
     libvlc_int_t *p_libvlc = vlc_object_instance(vlclua_get_this( L ));
     vlc_object_hold( p_libvlc );
-    vlclua_push_vlc_object( L, p_libvlc );
+    vlclua_push_vlc_object(L, VLC_OBJECT(p_libvlc));
     return 1;
 }
 
@@ -91,7 +90,7 @@ static int vlclua_get_playlist( lua_State *L )
     if( p_playlist )
     {
         vlc_object_hold( p_playlist );
-        vlclua_push_vlc_object( L, p_playlist );
+        vlclua_push_vlc_object(L, VLC_OBJECT(p_playlist));
     }
     else lua_pushnil( L );
     return 1;
@@ -103,7 +102,7 @@ static int vlclua_get_input( lua_State *L )
     if( p_input )
     {
         /* NOTE: p_input is already held by vlclua_get_input_internal() */
-        vlclua_push_vlc_object( L, p_input );
+        vlclua_push_vlc_object(L, VLC_OBJECT(p_input));
     }
     else lua_pushnil( L );
     return 1;
