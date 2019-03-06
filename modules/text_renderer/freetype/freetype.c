@@ -549,6 +549,9 @@ static inline void BlendYUVAPixel( picture_t *p_picture,
                                    int i_a, int i_y, int i_u, int i_v,
                                    int i_alpha )
 {
+    if( i_alpha == 0 )
+        return;
+
     int i_an = i_a * i_alpha / 255;
 
     uint8_t *p_y = &p_picture->p[0].p_pixels[i_picture_y * p_picture->p[0].i_pitch + i_picture_x];
@@ -599,6 +602,9 @@ static inline void BlendRGBAPixel( picture_t *p_picture,
                                    int i_a, int i_r, int i_g, int i_b,
                                    int i_alpha )
 {
+    if( i_alpha == 0 )
+        return;
+
     int i_an = i_a * i_alpha / 255;
 
     uint8_t *p_rgba = &p_picture->p->p_pixels[i_picture_y * p_picture->p->i_pitch + 4 * i_picture_x];
@@ -650,6 +656,9 @@ static void FillARGBPicture(picture_t *pic, int a, int r, int g, int b)
 static inline void BlendARGBPixel(picture_t *pic, int pic_x, int pic_y,
                                   int a, int r, int g, int b, int alpha)
 {
+    if (alpha == 0)
+        return;
+
     uint8_t *rgba = &pic->p->p_pixels[pic_y * pic->p->i_pitch + 4 * pic_x];
     int an = a * alpha / 255;
     int ao = rgba[3];
