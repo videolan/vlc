@@ -4540,12 +4540,15 @@ static void EsOutUpdateInfo(es_out_sys_t *p_sys,
            info_category_AddInfo( p_cat, _("Projection"), "%s",
                                   vlc_gettext(psz_loc_name) );
 
+           float yaw, pitch, roll;
+           vlc_viewpoint_to_euler(&fmt->video.pose, &yaw, &pitch, &roll);
+
            info_category_AddInfo( p_cat, vlc_pgettext("ViewPoint", "Yaw"),
-                                  "%.2f", fmt->video.pose.yaw );
+                                  "%.2f", yaw );
            info_category_AddInfo( p_cat, vlc_pgettext("ViewPoint", "Pitch"),
-                                  "%.2f", fmt->video.pose.pitch );
+                                  "%.2f", pitch );
            info_category_AddInfo( p_cat, vlc_pgettext("ViewPoint", "Roll"),
-                                  "%.2f", fmt->video.pose.roll );
+                                  "%.2f", roll );
            info_category_AddInfo( p_cat,
                                   vlc_pgettext("ViewPoint", "Field of view"),
                                   "%.2f", fmt->video.pose.fov );
