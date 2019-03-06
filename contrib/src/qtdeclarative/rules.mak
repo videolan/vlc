@@ -20,7 +20,7 @@ PKGS_FOUND += qtdeclarative
 endif
 
 $(TARBALLS)/qtdeclarative-$(QTDECLARATIVE_VERSION).tar.xz:
-	$(call download,$(QTDECLARATIVE_URL))
+	$(call download_pkg,$(QTDECLARATIVE_URL),qt)
 
 .sum-qtdeclarative: qtdeclarative-$(QTDECLARATIVE_VERSION).tar.xz
 

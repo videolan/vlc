@@ -5,7 +5,7 @@ QTQC_URL := http://download.qt.io/official_releases/qt/5.11/$(QTQC_VERSION)/subm
 DEPS_qtquickcontrols = qtquickcontrols2 $(DEPS_qtquickcontrols2)
 
 $(TARBALLS)/qtquickcontrols-$(QTQC_VERSION).tar.xz:
-	$(call download,$(QTQC_URL))
+	$(call download_pkg,$(QTQC_URL),qt)
 
 .sum-qtquickcontrols: qtquickcontrols-$(QTQC_VERSION).tar.xz
 

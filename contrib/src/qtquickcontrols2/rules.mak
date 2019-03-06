@@ -18,7 +18,7 @@ endif
 DEPS_qtquickcontrols2 = qtdeclarative $(DEPS_qtdeclarative)
 
 $(TARBALLS)/qtquickcontrols2-$(QTQC2_VERSION).tar.xz:
-	$(call download,$(QTQC2_URL))
+	$(call download_pkg,$(QTQC2_URL),qt)
 
 .sum-qtquickcontrols2: qtquickcontrols2-$(QTQC2_VERSION).tar.xz
 

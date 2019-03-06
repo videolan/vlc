@@ -18,7 +18,7 @@ PKGS_FOUND += qt
 endif
 
 $(TARBALLS)/qt-$(QT_VERSION_FULL).tar.xz:
-	$(call download,$(QT_URL))
+	$(call download_pkg,$(QT_URL),qt)
 
 .sum-qt: qt-$(QT_VERSION_FULL).tar.xz
 

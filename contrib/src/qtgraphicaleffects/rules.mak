@@ -17,7 +17,7 @@ PKGS_FOUND += qtgraphicaleffects
 endif
 
 $(TARBALLS)/qtgraphicaleffects-$(QTGE_VERSION).tar.xz:
-	$(call download,$(QTGE_URL))
+	$(call download_pkg,$(QTGE_URL),qt)
 
 .sum-qtgraphicaleffects: qtgraphicaleffects-$(QTGE_VERSION).tar.xz
 
