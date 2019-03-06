@@ -6,12 +6,12 @@ ifeq ($(call need_pkg,"glew"),)
 PKGS_FOUND += glew
 endif
 
-$(TARBALLS)/glew-$(GLEW_VERSION).tar.gz:
+$(TARBALLS)/glew-$(GLEW_VERSION).tgz:
 	$(call download_pkg,$(GLEW_URL),glew)
 
-.sum-glew: glew-$(GLEW_VERSION).tar.gz
+.sum-glew: glew-$(GLEW_VERSION).tgz
 
-glew: glew-$(GLEW_VERSION).tar.gz .sum-glew
+glew: glew-$(GLEW_VERSION).tgz .sum-glew
 	$(UNPACK)
 	$(MOVE)
 
