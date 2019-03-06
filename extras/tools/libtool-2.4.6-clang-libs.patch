@@ -6,15 +6,14 @@ compiler libraries.
 https://crbug.com/749263
 https://debbugs.gnu.org/cgi/bugreport.cgi?bug=27866
 
---- a/libltdl/m4/libtool.m4
-+++ b/libltdl/m4/libtool.m4
-@@ -7531,7 +7544,7 @@
+--- libtool-2.4.6/m4/libtool.m4	2015-01-20 17:15:19.000000000 +0100
++++ libtool-2.4.6/m4/libtool.m4.clang	2019-03-06 17:27:40.620395700 +0100
+@@ -7531,7 +7531,7 @@
    for p in `eval "$output_verbose_link_cmd"`; do
      case $prev$p in
-
+ 
 -    -L* | -R* | -l*)
 +    -L* | -R* | -l* | */libclang_rt.*.a)
         # Some compilers place space between "-{L,R}" and the path.
         # Remove the space.
         if test x-L = "$p" ||
-

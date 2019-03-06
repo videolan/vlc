@@ -12,33 +12,31 @@ linker to allow trivial use of the clang address sanitizer.
 Signed-off-by: Jeremy Huddleston Sequoia <jeremyhu@macports.org>
 Copyright-paperwork-exempt: Yes
 ---
-diff -ru libtool/libltdl/config/ltmain.m4sh libtool-fixed/libltdl/config/ltmain.m4sh
---- libtool/libltdl/config/ltmain.m4sh	2017-10-16 08:20:47.000000000 +0200
-+++ libtool-fixed/libltdl/config/ltmain.m4sh	2017-10-16 08:22:23.000000000 +0200
-@@ -5064,9 +5064,10 @@
-       # -tp=*                Portland pgcc target processor selection
+--- libtool-2.4.6/build-aux/ltmain.in.orig	2019-03-06 17:24:29.400776100 +0100
++++ libtool-2.4.6/build-aux/ltmain.in	2019-03-06 17:26:31.994381100 +0100
+@@ -5361,9 +5361,10 @@
        # --sysroot=*          for sysroot support
-       # -O*, -flto*, -fwhopr*, -fuse-linker-plugin GCC link-time optimization
+       # -O*, -g*, -flto*, -fwhopr*, -fuse-linker-plugin GCC link-time optimization
+       # -stdlib=*            select c++ std lib with clang
 +      # -fsanitize=*         Clang/GCC memory and address sanitizer
        -64|-mips[0-9]|-r[0-9][0-9]*|-xarch=*|-xtarget=*|+DA*|+DD*|-q*|-m*| \
        -t[45]*|-txscale*|-p|-pg|--coverage|-fprofile-*|-F*|@*|-tp=*|--sysroot=*| \
--      -O*|-flto*|-fwhopr*|-fuse-linker-plugin)
-+      -O*|-flto*|-fwhopr*|-fuse-linker-plugin|-fsanitize=*)
+-      -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*)
++      -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*|-fsanitize=*)
          func_quote_for_eval "$arg"
- 	arg="$func_quote_for_eval_result"
+ 	arg=$func_quote_for_eval_result
          func_append compile_command " $arg"
-diff -ru libtool/libltdl/config/ltmain.sh libtool-fixed/libltdl/config/ltmain.sh
---- libtool/libltdl/config/ltmain.sh	2017-10-16 08:20:47.000000000 +0200
-+++ libtool-fixed/libltdl/config/ltmain.sh	2017-10-16 08:22:58.000000000 +0200
-@@ -5851,9 +5851,10 @@
-       # -tp=*                Portland pgcc target processor selection
+--- libtool-2.4.6/build-aux/ltmain.sh.orig	2019-03-06 17:25:38.610781500 +0100
++++ libtool-2.4.6/build-aux/ltmain.sh	2019-03-06 17:26:53.790387700 +0100
+@@ -7273,9 +7273,10 @@
        # --sysroot=*          for sysroot support
-       # -O*, -flto*, -fwhopr*, -fuse-linker-plugin GCC link-time optimization
+       # -O*, -g*, -flto*, -fwhopr*, -fuse-linker-plugin GCC link-time optimization
+       # -stdlib=*            select c++ std lib with clang
 +      # -fsanitize=*         Clang/GCC memory and address sanitizer
        -64|-mips[0-9]|-r[0-9][0-9]*|-xarch=*|-xtarget=*|+DA*|+DD*|-q*|-m*| \
        -t[45]*|-txscale*|-p|-pg|--coverage|-fprofile-*|-F*|@*|-tp=*|--sysroot=*| \
--      -O*|-flto*|-fwhopr*|-fuse-linker-plugin)
-+      -O*|-flto*|-fwhopr*|-fuse-linker-plugin|-fsanitize=*)
+-      -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*)
++      -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*|-fsanitize=*)
          func_quote_for_eval "$arg"
- 	arg="$func_quote_for_eval_result"
+ 	arg=$func_quote_for_eval_result
          func_append compile_command " $arg"
