@@ -9,7 +9,7 @@ PKGS_FOUND += aom
 endif
 
 $(TARBALLS)/aom-$(AOM_VERSION).tar.gz:
-	$(call download,$(AOM_GITURL))
+	$(call download_pkg,$(AOM_GITURL),aom)
 
 .sum-aom: aom-$(AOM_VERSION).tar.gz
 	$(warning $@ not implemented)
