@@ -532,7 +532,7 @@ void input_clock_SetJitter( input_clock_t *cl,
     if( i_cr_average < 10 )
         i_cr_average = 10;
 
-    if( cl->drift.i_divider != i_cr_average )
+    if( cl->drift.range != i_cr_average )
         AvgRescale( &cl->drift, i_cr_average );
 
     vlc_mutex_unlock( &cl->lock );

@@ -30,47 +30,52 @@
 /*****************************************************************************
  * Long term average helpers
  *****************************************************************************/
-void AvgInit( average_t *p_avg, int i_divider )
+void AvgInit(average_t *avg, int range)
 {
-    p_avg->i_divider = i_divider;
-    AvgReset( p_avg );
+    avg->range = range;
+    AvgReset(avg);
 }
 
-void AvgClean( average_t *p_avg )
+void AvgClean(average_t * avg)
 {
-    VLC_UNUSED(p_avg);
+    VLC_UNUSED(avg);
 }
 
-void AvgReset( average_t *p_avg )
+void AvgReset(average_t *avg)
 {
-    p_avg->i_value = 0;
-    p_avg->i_residue = 0;
-    p_avg->i_count = 0;
+    avg->value = 0.0f;
+    avg->count = 0;
 }
 
-void AvgUpdate( average_t *p_avg, vlc_tick_t i_value )
+void AvgUpdate(average_t *avg, double value)
 {
-    const int i_f0 = __MIN( p_avg->i_divider - 1, p_avg->i_count );
-    const int i_f1 = p_avg->i_divider - i_f0;
+    const int new_value_weight = 1;
+    int average_weight;
+    int divider;
+    if (avg->count < avg->range)
+    {
+        average_weight = avg->count++;
+        divider = avg->count;
+    }
+    else
+    {
+        average_weight = avg->range - 1;
+        divider = avg->range;
+    }
 
-    const vlc_tick_t i_tmp = i_f0 * p_avg->i_value + i_f1 * i_value + p_avg->i_residue;
-
-    p_avg->i_value   = i_tmp / p_avg->i_divider;
-    p_avg->i_residue = i_tmp % p_avg->i_divider;
-
-    p_avg->i_count++;
+    const double tmp = average_weight * avg->value + new_value_weight * value;
+    avg->value = tmp / divider;
 }
 
-vlc_tick_t AvgGet( average_t *p_avg )
+double AvgGet(average_t *avg)
 {
-    return p_avg->i_value;
+    return avg->value;
 }
 
-void AvgRescale( average_t *p_avg, int i_divider )
+void AvgRescale(average_t *avg, int range)
 {
-    const vlc_tick_t i_tmp = p_avg->i_value * p_avg->i_divider + p_avg->i_residue;
+    const double tmp = avg->value * avg->range;
 
-    p_avg->i_divider = i_divider;
-    p_avg->i_value   = i_tmp / p_avg->i_divider;
-    p_avg->i_residue = i_tmp % p_avg->i_divider;
+    avg->range = range;
+    avg->value = tmp / avg->range;
 }
