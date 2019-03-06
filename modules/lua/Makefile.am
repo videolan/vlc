@@ -18,7 +18,7 @@ liblua_plugin_la_SOURCES = \
 	lua/libs/messages.c \
 	lua/libs/misc.c lua/libs/misc.h \
 	lua/libs/net.c \
-	lua/libs/objects.c lua/libs/objects.h \
+	lua/libs/objects.c \
 	lua/libs/osd.c \
 	lua/libs/playlist.c \
 	lua/libs/sd.c \

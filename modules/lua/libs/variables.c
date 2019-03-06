@@ -38,7 +38,6 @@
 #include "../vlc.h"
 #include "../libs.h"
 #include "variables.h"
-#include "objects.h"
 
 /*****************************************************************************
  * Variables handling
