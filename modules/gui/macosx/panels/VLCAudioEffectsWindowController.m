@@ -204,7 +204,7 @@
     }
 
     if (p_aout)
-        vlc_object_release(p_aout);
+        aout_Release(p_aout);
 }
 
 - (void)windowDidLoad
@@ -618,7 +618,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     if (!psz_string)
         psz_string = var_GetNonEmptyString(p_aout, "audio-filter");
 
-    vlc_object_release(p_aout);
+    aout_Release(p_aout);
 
     if (!psz_string)
         return false;
@@ -658,7 +658,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         char *psz_preset_string = var_GetNonEmptyString(p_aout, "equalizer-preset");
         currentPreset = toNSStr(psz_preset_string);
         free(psz_preset_string);
-        vlc_object_release(p_aout);
+        aout_Release(p_aout);
     }
 
     NSUInteger currentPresetIndex = 0;
@@ -759,7 +759,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     char const *psz_preset_values = [[self generatePresetString] UTF8String];
     if (p_aout) {
         var_SetString(p_aout, "equalizer-bands", psz_preset_values);
-        vlc_object_release(p_aout);
+        aout_Release(p_aout);
     }
     var_SetString(pl_Get(getIntf()), "equalizer-bands", psz_preset_values);
 }
@@ -778,7 +778,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetString(p_aout, "equalizer-bands", psz_eq_bands);
         var_SetFloat(p_aout, "equalizer-preamp", f_eq_preamp);
         var_SetString(p_aout, "equalizer-preset" , psz_eq_preset);
-        vlc_object_release(p_aout);
+        aout_Release(p_aout);
     }
 
     [_equalizerPreampSlider setFloatValue: f_eq_preamp];
@@ -796,7 +796,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     audio_output_t *p_aout = getAout();
     if (p_aout) {
         var_SetFloat(p_aout, "equalizer-preamp", fPreamp);
-        vlc_object_release(p_aout);
+        aout_Release(p_aout);
     }
     var_SetFloat(pl_Get(getIntf()), "equalizer-preamp", fPreamp);
 }
@@ -808,7 +808,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     audio_output_t *p_aout = getAout();
     if (p_aout) {
         var_SetBool(p_aout, "equalizer-2pass", b_2p);
-        vlc_object_release(p_aout);
+        aout_Release(p_aout);
     }
 
     var_SetBool(pl_Get(getIntf()), "equalizer-2pass", b_2p);
@@ -850,7 +850,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         audio_output_t *p_aout = getAout();
         if (p_aout) {
             var_SetString(p_aout, "equalizer-preset", psz_eq_preset);
-            vlc_object_release(p_aout);
+            aout_Release(p_aout);
         }
 
         var_SetString(pl_Get(getIntf()), "equalizer-preset", psz_eq_preset);
@@ -949,7 +949,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetFloat(p_aout, "compressor-ratio", 8.000000);
         var_SetFloat(p_aout, "compressor-knee", 2.500000);
         var_SetFloat(p_aout, "compressor-makeup-gain", 7.000000);
-        vlc_object_release(p_aout);
+        aout_Release(p_aout);
     }
     [self resetCompressor];
 }
@@ -985,7 +985,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     audio_output_t *p_aout = getAout();
     if (p_aout) {
         var_SetFloat(p_aout, psz_property, f_value);
-        vlc_object_release(p_aout);
+        aout_Release(p_aout);
     }
     var_SetFloat(pl_Get(getIntf()), psz_property, f_value);
 
@@ -1051,7 +1051,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetFloat(p_aout, "spatializer-wet", .4);
         var_SetFloat(p_aout, "spatializer-dry", .5);
         var_SetFloat(p_aout, "spatializer-damp", .5);
-        vlc_object_release(p_aout);
+        aout_Release(p_aout);
     }
     [self resetSpatializer];
 }
@@ -1083,7 +1083,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     audio_output_t *p_aout = getAout();
     if (p_aout) {
         var_SetFloat(p_aout, psz_property, f_value / 10.f);
-        vlc_object_release(p_aout);
+        aout_Release(p_aout);
     }
     var_SetFloat(pl_Get(getIntf()), psz_property, f_value / 10.f);
 
@@ -1147,7 +1147,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
     if (p_aout) {
         var_SetFloat(p_aout, "norm-max-level", f_value);
-        vlc_object_release(p_aout);
+        aout_Release(p_aout);
     }
 
     var_SetFloat(pl_Get(getIntf()), "norm-max-level", f_value);

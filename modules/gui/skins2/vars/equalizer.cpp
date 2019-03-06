@@ -113,7 +113,7 @@ void EqualizerBands::onUpdate( Subject<VarPercent> &rBand, void *arg )
     }
 
     if( pAout )
-        vlc_object_release( pAout );
+        aout_Release(pAout);
 }
 
 
@@ -144,5 +144,5 @@ void EqualizerPreamp::set( float percentage, bool updateVLC )
     }
 
     if( pAout )
-        vlc_object_release( pAout );
+        aout_Release(pAout);
 }

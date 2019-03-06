@@ -1762,7 +1762,7 @@ static void ViewpointApply( input_thread_t *p_input )
         /* This variable can only be read from callbacks */
         var_Change( p_aout, "viewpoint", VLC_VAR_SETVALUE,
                     (vlc_value_t) { .p_address = NULL } );
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
     }
 }
 
@@ -1845,7 +1845,7 @@ static void ControlNav( input_thread_t *p_input, int i_type )
         if( p_aout )
         {
             aout_VolumeUpdate( p_aout, vol_direction, NULL );
-            vlc_object_release( p_aout );
+            aout_Release(p_aout);
         }
     }
 }

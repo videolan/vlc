@@ -579,7 +579,7 @@
 
             [self setupVarMenuItem:_visual target: (vlc_object_t *)p_aout
                                      var:"visual" selector: @selector(toggleVar:)];
-            vlc_object_release(p_aout);
+            aout_Release(p_aout);
         }
 
         vout_thread_t *p_vout = getVoutForActiveWindow();
@@ -879,7 +879,7 @@
 
     int n = aout_DevicesList(p_aout, &ids, &names);
     if (n == -1) {
-        vlc_object_release(p_aout);
+        aout_Release(p_aout);
         return;
     }
 
@@ -891,7 +891,7 @@
         [_tmp setTarget:self];
         [_tmp setTag:[[NSString stringWithFormat:@"%s", ids[x]] intValue]];
     }
-    vlc_object_release(p_aout);
+    aout_Release(p_aout);
 
     [[_audioDeviceMenu itemWithTag:[[NSString stringWithFormat:@"%s", currentDevice] intValue]] setState:NSOnState];
 
@@ -924,7 +924,7 @@
     if (returnValue != 0)
         msg_Warn(getIntf(), "failed to set audio device %li", [sender tag]);
 
-    vlc_object_release(p_aout);
+    aout_Release(p_aout);
     [self refreshAudioDeviceList];
 }
 

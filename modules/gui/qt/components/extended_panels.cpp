@@ -879,13 +879,13 @@ float FilterSliderData::initialValue()
     {
         if ( var_Type( p_aout, qtu(p_data->name) ) == 0 )
         {
-            vlc_object_release( p_aout );
+            aout_Release(p_aout);
             /* Not found, will try in config */
         }
         else
         {
             f = var_GetFloat( p_aout, qtu(p_data->name) );
-            vlc_object_release( p_aout );
+            aout_Release(p_aout);
             return f;
         }
     }
@@ -904,7 +904,7 @@ void FilterSliderData::onValueChanged( int i )
     if ( p_aout )
     {
         var_SetFloat( p_aout, qtu(p_data->name), f );
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
     }
     writeToConfig();
 }
@@ -1025,7 +1025,7 @@ QStringList EqualizerSliderData::getBandsFromAout() const
                 free( psz_bands );
             }
         }
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
     }
 
     if ( bands.count() ) return bands;
@@ -1066,7 +1066,7 @@ void EqualizerSliderData::onValueChanged( int i )
         if ( p_aout )
         {
             var_SetString( p_aout, qtu(p_data->name), qtu(bands.join( " " )) );
-            vlc_object_release( p_aout );
+            aout_Release(p_aout);
         }
         writeToConfig();
     }
@@ -1228,7 +1228,7 @@ void Equalizer::build()
     ui.eq2PassCheck->setChecked( var_InheritBool( p_aout, "equalizer-2pass" ) );
     CONNECT( ui.eq2PassCheck, toggled(bool), this, enable2Pass(bool) );
     if( p_aout )
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
 }
 
 void Equalizer::setCorePreset( int i_preset )
@@ -1247,7 +1247,7 @@ void Equalizer::setCorePreset( int i_preset )
     if( p_aout )
     {
         var_SetString( p_aout , "equalizer-preset" , preset_list[i_preset] );
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
     }
     emit configChanged( qfu( "equalizer-preset" ), QVariant( qfu( preset_list[i_preset] ) ) );
 }
@@ -1260,7 +1260,7 @@ void Equalizer::enable2Pass( bool b_enable )
     if( p_aout )
     {
         var_SetBool( p_aout, "equalizer-2pass", b_enable );
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
     }
     emit configChanged( qfu( "equalizer-2pass" ), QVariant( b_enable ) );
 }

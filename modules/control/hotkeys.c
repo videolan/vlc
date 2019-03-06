@@ -564,7 +564,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
 
             if( !aout_DeviceSet( p_aout, ids[idx] ) )
                 DisplayMessage( p_vout, _("Audio Device: %s"), names[idx] );
-            vlc_object_release( p_aout );
+            aout_Release(p_aout);
 
             for( int i = 0; i < n; i++ )
             {

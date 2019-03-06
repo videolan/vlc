@@ -565,7 +565,7 @@ bool InputManager::hasVisualisation()
         return false;
 
     char *visual = var_InheritString( aout, "visual" );
-    vlc_object_release( aout );
+    aout_Release( aout );
 
     if( !visual )
         return false;
@@ -1238,7 +1238,7 @@ void MainInputManager::menusUpdateAudio( const QString& data )
     if( aout != NULL )
     {
         aout_DeviceSet( aout, qtu(data) );
-        vlc_object_release( aout );
+        aout_Release(aout);
     }
 }
 

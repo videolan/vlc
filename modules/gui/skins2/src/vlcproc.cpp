@@ -797,7 +797,7 @@ void VlcProc::init_equalizer()
     pVarPreamp->set( (preamp + 20.0) / 40.0 );
 
     if( pAout )
-        vlc_object_release( pAout);
+        aout_Release(pAout);
 }
 
 void VlcProc::setFullscreenVar( bool b_fullscreen )

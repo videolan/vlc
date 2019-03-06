@@ -67,13 +67,13 @@ static int vlclua_preamp_get( lua_State *L )
     if( !psz_af || strstr ( psz_af, "equalizer" ) == NULL )
     {
         free( psz_af );
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
         return 0;
     }
     free( psz_af );
 
     lua_pushnumber( L, var_GetFloat( p_aout, "equalizer-preamp") );
-    vlc_object_release( p_aout );
+    aout_Release(p_aout);
     return 1;
 }
 
@@ -92,13 +92,13 @@ static int vlclua_preamp_set( lua_State *L )
     if( !psz_af || strstr ( psz_af, "equalizer" ) == NULL )
     {
         free( psz_af );
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
         return 0;
     }
     free( psz_af );
 
     var_SetFloat( p_aout, "equalizer-preamp", luaL_checknumber( L, 1 ) );
-    vlc_object_release( p_aout );
+    aout_Release(p_aout);
     return 1;
 }
 
@@ -132,7 +132,7 @@ static int vlclua_equalizer_get( lua_State *L )
     if( !psz_af || strstr ( psz_af, "equalizer" ) == NULL )
     {
         free( psz_af );
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
         return 0;
     }
     free( psz_af );
@@ -141,7 +141,7 @@ static int vlclua_equalizer_get( lua_State *L )
     psz_bands_origin = psz_bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
     if( !psz_bands )
     {
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
         return 0;
     }
 
@@ -175,7 +175,7 @@ static int vlclua_equalizer_get( lua_State *L )
         uselocale (oldloc);
         freelocale (loc);
     }
-    vlc_object_release( p_aout );
+    aout_Release(p_aout);
     return error ? 0 : 1;
 }
 
@@ -198,7 +198,7 @@ static int vlclua_equalizer_set( lua_State *L )
     if( !psz_af || strstr ( psz_af, "equalizer" ) == NULL )
     {
         free( psz_af );
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
         return 0;
     }
     free( psz_af );
@@ -233,7 +233,7 @@ static int vlclua_equalizer_set( lua_State *L )
         freelocale (loc);
     }
     free( bands );
-    vlc_object_release( p_aout );
+    aout_Release(p_aout);
     return 0;
 }
 
@@ -259,7 +259,7 @@ static int vlclua_equalizer_setpreset( lua_State *L )
         ret = 1;
     }
     free( psz_af );
-    vlc_object_release( p_aout );
+    aout_Release(p_aout);
     return ret;
 }
  

@@ -51,7 +51,7 @@ float playlist_VolumeGet (playlist_t *pl)
     if (aout != NULL)
     {
         volume = aout_VolumeGet (aout);
-        vlc_object_release (aout);
+        aout_Release(aout);
     }
     return volume;
 }
@@ -64,7 +64,7 @@ int playlist_VolumeSet (playlist_t *pl, float vol)
     if (aout != NULL)
     {
         ret = aout_VolumeSet (aout, vol);
-        vlc_object_release (aout);
+        aout_Release(aout);
     }
     return ret;
 }
@@ -82,7 +82,7 @@ int playlist_VolumeUp (playlist_t *pl, int value, float *volp)
     if (aout != NULL)
     {
         ret = aout_VolumeUpdate (aout, value, volp);
-        vlc_object_release (aout);
+        aout_Release(aout);
     }
     return ret;
 }
@@ -95,7 +95,7 @@ int playlist_MuteGet (playlist_t *pl)
     if (aout != NULL)
     {
         mute = aout_MuteGet (aout);
-        vlc_object_release (aout);
+        aout_Release(aout);
     }
     return mute;
 }
@@ -108,7 +108,7 @@ int playlist_MuteSet (playlist_t *pl, bool mute)
     if (aout != NULL)
     {
         ret = aout_MuteSet (aout, mute);
-        vlc_object_release (aout);
+        aout_Release(aout);
     }
     return ret;
 }
@@ -119,6 +119,6 @@ void playlist_EnableAudioFilter (playlist_t *pl, const char *name, bool add)
     if (aout)
     {
         aout_EnableFilter(aout, name, add);
-        vlc_object_release (aout);
+        aout_Release(aout);
     }
 }

@@ -705,7 +705,7 @@ static inline int input_UpdateViewpoint( input_thread_t *p_input,
  * Return the audio output (if any) associated with an input.
  * @param p_input an input thread
  * @return NULL on error, or the audio output (which needs to be
- * released with vlc_object_release()).
+ * released with aout_Release()).
  */
 static inline audio_output_t *input_GetAout( input_thread_t *p_input )
 {
@@ -782,7 +782,7 @@ VLC_API void input_resource_Terminate( input_resource_t * );
 
 /**
  * \return the current audio output if any.
- * Use vlc_object_release() to drop the reference.
+ * Use aout_Release() to drop the reference.
  */
 VLC_API audio_output_t *input_resource_HoldAout( input_resource_t * );
 

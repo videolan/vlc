@@ -2551,7 +2551,7 @@ void input_DecoderGetObjects( decoder_t *p_dec,
             vout_Hold(p_owner->p_vout) : NULL;
     if( pp_aout )
         *pp_aout = p_dec->fmt_in.i_cat == AUDIO_ES && p_owner->p_aout ?
-            vlc_object_hold( p_owner->p_aout ) : NULL;
+            aout_Hold(p_owner->p_aout) : NULL;
     vlc_mutex_unlock( &p_owner->lock );
 }
 

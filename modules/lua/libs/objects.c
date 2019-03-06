@@ -140,6 +140,16 @@ static int vlclua_get_vout( lua_State *L )
     lua_pushnil( L );
     return 1;
 }
+
+static int vlclua_aout_release(lua_State *L)
+{
+    vlc_object_t **pp = luaL_checkudata(L, 1, "vlc_object");
+
+    lua_pop(L, 1);
+    aout_Release((audio_output_t *)*pp);
+    return 0;
+}
+
 static int vlclua_get_aout( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
@@ -147,7 +157,7 @@ static int vlclua_get_aout( lua_State *L )
     if( p_aout != NULL )
     {
         vlclua_push_vlc_object(L, (vlc_object_t *)p_aout,
-                               vlclua_object_release);
+                               vlclua_aout_release);
         return 1;
     }
     lua_pushnil( L );

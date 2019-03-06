@@ -3081,7 +3081,7 @@ vlc_player_aout_GetVolume(vlc_player_t *player)
     if (!aout)
         return -1.f;
     float vol = aout_VolumeGet(aout);
-    vlc_object_release(aout);
+    aout_Release(aout);
 
     return vol;
 }
@@ -3093,7 +3093,7 @@ vlc_player_aout_SetVolume(vlc_player_t *player, float volume)
     if (!aout)
         return -1;
     int ret = aout_VolumeSet(aout, volume);
-    vlc_object_release(aout);
+    aout_Release(aout);
 
     return ret;
 }
@@ -3105,7 +3105,7 @@ vlc_player_aout_IncrementVolume(vlc_player_t *player, int steps, float *result)
     if (!aout)
         return -1;
     int ret = aout_VolumeUpdate(aout, steps, result);
-    vlc_object_release(aout);
+    aout_Release(aout);
 
     return ret;
 }
@@ -3117,7 +3117,7 @@ vlc_player_aout_IsMuted(vlc_player_t *player)
     if (!aout)
         return -1;
     int ret = aout_MuteGet(aout);
-    vlc_object_release(aout);
+    aout_Release(aout);
 
     return ret;
 }
@@ -3129,7 +3129,7 @@ vlc_player_aout_Mute(vlc_player_t *player, bool mute)
     if (!aout)
         return -1;
     int ret = aout_MuteSet (aout, mute);
-    vlc_object_release(aout);
+    aout_Release(aout);
 
     return ret;
 }
@@ -3142,7 +3142,7 @@ vlc_player_aout_EnableFilter(vlc_player_t *player, const char *name, bool add)
     if (!aout)
         return -1;
     aout_EnableFilter(aout, name, add);
-    vlc_object_release(aout);
+    aout_Release(aout);
 
     return 0;
 }
@@ -3469,7 +3469,7 @@ vlc_player_Delete(vlc_player_t *player)
         var_DelCallback(aout, "volume", vlc_player_AoutCallback, player);
         var_DelCallback(aout, "mute", vlc_player_AoutCallback, player);
         var_DelCallback(player, "corks", vlc_player_CorkCallback, NULL);
-        vlc_object_release(aout);
+        aout_Release(aout);
     }
     input_resource_Release(player->resource);
     if (player->renderer)

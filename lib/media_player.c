@@ -2005,7 +2005,7 @@ int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, libvlc_equal
         }
 
         var_SetString( p_aout, "audio-filter", p_equalizer ? "equalizer" : "" );
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
     }
 
     return 0;

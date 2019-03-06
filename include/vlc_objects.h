@@ -197,6 +197,19 @@ static inline void vout_Release(vout_thread_t *vout)
     vlc_object_release((vlc_object_t *)vout);
 }
 
+/* Here for backward compatibility. TODO: Move to <vlc_aout.h>! */
+static inline audio_output_t *aout_Hold(audio_output_t *aout)
+{
+    vlc_object_hold((vlc_object_t *)aout);
+    return aout;
+}
+
+static inline void aout_Release(audio_output_t *aout)
+{
+    vlc_object_release((vlc_object_t *)aout);
+}
+
+
 /**
  * @defgroup objres Object resources
  *

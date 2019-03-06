@@ -2449,7 +2449,7 @@ vlc_player_SetPauseOnCork(vlc_player_t *player, bool enabled);
 /**
  * Get the audio output
  *
- * @warning The returned pointer must be released with vlc_object_release().
+ * @warning The returned pointer must be released with aout_Release().
  *
  * @param player player instance
  * @return a valid audio_output_t * or NULL (if there is no aouts)

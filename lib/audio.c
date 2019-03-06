@@ -153,7 +153,7 @@ libvlc_audio_output_device_enum( libvlc_media_player_t *mp )
     char **values, **texts;
 
     int n = aout_DevicesList( aout, &values, &texts );
-    vlc_object_release( aout );
+    aout_Release(aout);
     if( n < 0 )
         goto err;
 
@@ -256,7 +256,7 @@ void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
         return;
 
     aout_DeviceSet( aout, devid );
-    vlc_object_release( aout );
+    aout_Release(aout);
 }
 
 char *libvlc_audio_output_device_get( libvlc_media_player_t *mp )
@@ -267,7 +267,7 @@ char *libvlc_audio_output_device_get( libvlc_media_player_t *mp )
 
     char *devid = aout_DeviceGet( aout );
 
-    vlc_object_release( aout );
+    aout_Release(aout);
 
     return devid;
 }
@@ -287,7 +287,7 @@ int libvlc_audio_get_mute( libvlc_media_player_t *mp )
     if( aout != NULL )
     {
         mute = aout_MuteGet( aout );
-        vlc_object_release( aout );
+        aout_Release(aout);
     }
     return mute;
 }
@@ -298,7 +298,7 @@ void libvlc_audio_set_mute( libvlc_media_player_t *mp, int mute )
     if( aout != NULL )
     {
         mute = aout_MuteSet( aout, mute );
-        vlc_object_release( aout );
+        aout_Release(aout);
     }
 }
 
@@ -310,7 +310,7 @@ int libvlc_audio_get_volume( libvlc_media_player_t *mp )
     if( aout != NULL )
     {
         float vol = aout_VolumeGet( aout );
-        vlc_object_release( aout );
+        aout_Release(aout);
         volume = lroundf( vol * 100.f );
     }
     return volume;
@@ -330,7 +330,7 @@ int libvlc_audio_set_volume( libvlc_media_player_t *mp, int volume )
     if( aout != NULL )
     {
         ret = aout_VolumeSet( aout, vol );
-        vlc_object_release( aout );
+        aout_Release(aout);
     }
     return ret;
 }
@@ -417,7 +417,7 @@ int libvlc_audio_get_channel( libvlc_media_player_t *mp )
         return 0;
 
     int val = var_GetInteger( p_aout, "stereo-mode" );
-    vlc_object_release( p_aout );
+    aout_Release(p_aout);
     return val;
 }
 
@@ -437,7 +437,7 @@ int libvlc_audio_set_channel( libvlc_media_player_t *mp, int channel )
         libvlc_printerr( "Audio channel out of range" );
         ret = -1;
     }
-    vlc_object_release( p_aout );
+    aout_Release(p_aout);
     return ret;
 }
 

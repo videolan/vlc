@@ -1643,7 +1643,7 @@ static int AudioDevice( vlc_object_t *obj, char const *cmd,
     else
         aout_DeviceSet( p_aout, cur.psz_string );
 out:
-    vlc_object_release( p_aout );
+    aout_Release(p_aout);
     (void) old; (void) dummy;
     return VLC_SUCCESS;
 }
@@ -1688,7 +1688,7 @@ static int AudioChannel( vlc_object_t *obj, char const *cmd,
     else
         ret = var_SetInteger( p_aout, "stereo-mode", atoi( cur.psz_string ) );
 out:
-    vlc_object_release( p_aout );
+    aout_Release(p_aout);
     (void) old; (void) dummy;
     return ret;
 }

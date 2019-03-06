@@ -771,7 +771,7 @@ char *vlc_strfinput(input_thread_t *input, input_item_t *item, const char *s)
                     if (aout != NULL)
                     {
                         vol = aout_VolumeGet(aout);
-                        vlc_object_release(aout);
+                        aout_Release(aout);
                     }
                 }
                 if (vol >= 0.f)

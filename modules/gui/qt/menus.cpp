@@ -266,7 +266,7 @@ static int AudioAutoMenuBuilder( input_thread_t *p_input,
     PUSH_VAR( "visual" );
 
     if( p_object )
-        vlc_object_release( p_object );
+        aout_Release( p_object );
     return VLC_SUCCESS;
 }
 
@@ -636,7 +636,7 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 
     if( p_aout )
     {
-        vlc_object_release( p_aout );
+        aout_Release(p_aout);
     }
 
     return Populate( current, varnames, objects );
