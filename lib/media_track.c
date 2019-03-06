@@ -86,9 +86,10 @@ libvlc_media_trackpriv_from_es( libvlc_media_trackpriv_t *trackpriv,
                 ( es->video.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD ) );
         track->video->i_projection = (int) es->video.projection_mode;
 
-        track->video->pose.f_yaw = es->video.pose.yaw;
-        track->video->pose.f_pitch = es->video.pose.pitch;
-        track->video->pose.f_roll = es->video.pose.roll;
+        vlc_viewpoint_to_euler(&es->video.pose,
+                               &track->video->pose.f_yaw,
+                               &track->video->pose.f_pitch,
+                               &track->video->pose.f_roll);
         track->video->pose.f_field_of_view = es->video.pose.fov;
 
         assert( es->video.multiview_mode >= MULTIVIEW_2D &&
