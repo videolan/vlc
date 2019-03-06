@@ -264,7 +264,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                                             vlc_gettext("Subtitle track added"));
                             break;
                     }
-                    vlc_object_release( (vlc_object_t *)p_vout );
+                    vout_Release(p_vout);
                 }
             }
             return VLC_SUCCESS;

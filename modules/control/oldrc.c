@@ -765,7 +765,7 @@ static void *Run( void *data )
                 if( p_vout )
                 {
                     var_SetBool( p_vout, "fullscreen", fs );
-                    vlc_object_release( p_vout );
+                    vout_Release(p_vout);
                 }
             }
             break;
@@ -1556,7 +1556,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
             psz_value = var_GetString( p_vout, psz_variable );
             if( psz_value == NULL )
             {
-                vlc_object_release( p_vout );
+                vout_Release(p_vout);
                 return VLC_EGENERIC;
             }
         }
@@ -1564,7 +1564,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         if ( var_Change( p_vout, psz_variable, VLC_VAR_GETCHOICES,
                          &count, &val, &text ) < 0 )
         {
-            vlc_object_release( p_vout );
+            vout_Release(p_vout);
             free( psz_value );
             return VLC_EGENERIC;
         }
@@ -1601,7 +1601,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
 
         free( name );
     }
-    vlc_object_release( p_vout );
+    vout_Release(p_vout);
     return i_error;
 }
 

@@ -597,7 +597,7 @@
             [self setupVarMenuItem:_deinterlace_mode target: (vlc_object_t *)p_vout
                                      var:"deinterlace-mode" selector: @selector(toggleVar:)];
 
-            vlc_object_release(p_vout);
+            vout_Release(p_vout);
 
             [self refreshVoutDeviceMenu:nil];
         }
@@ -949,7 +949,7 @@
         {
             [[NSApp keyWindow] performZoom:sender];
         }
-        vlc_object_release(p_vout);
+        vout_Release(p_vout);
     }
 }
 
@@ -963,7 +963,7 @@
             BOOL b_fs = var_ToggleBool(p_vout, "video-on-top");
             var_SetBool(pl_Get(getIntf()), "video-on-top", b_fs);
 
-            vlc_object_release(p_vout);
+            vout_Release(p_vout);
         }
         input_Release(p_input);
     }
@@ -1636,7 +1636,7 @@
                 [mi setState: _playerController.fullscreen];
 
             enabled = YES;
-            vlc_object_release(p_vout);
+            vout_Release(p_vout);
         }
 
         [self setupMenus]; /* Make sure video menu is up to date */

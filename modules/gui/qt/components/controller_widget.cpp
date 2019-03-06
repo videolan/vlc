@@ -293,7 +293,7 @@ void AspectRatioComboBox::updateRatios()
     setEnabled( true );
     free(text_list);
     free(val_list);
-    vlc_object_release( p_vout );
+    vout_Release(p_vout);
 }
 
 void AspectRatioComboBox::updateAspectRatio( int x )
@@ -304,6 +304,6 @@ void AspectRatioComboBox::updateAspectRatio( int x )
         var_SetString( p_vout, "aspect-ratio", qtu( itemData(x).toString() ) );
     }
     if( p_vout )
-        vlc_object_release( p_vout );
+        vout_Release(p_vout);
 }
 

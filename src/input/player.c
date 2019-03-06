@@ -279,7 +279,7 @@ vlc_player_vout_OSDReleaseAll(vlc_player_t *player, vout_thread_t **vouts,
                             size_t count)
 {
     for (size_t i = 0; i < count; ++i)
-        vlc_object_release(vouts[i]);
+        vout_Release(vouts[i]);
     free(vouts);
     (void) player;
 }
@@ -3333,7 +3333,7 @@ vlc_player_vout_SetVar(vlc_player_t *player, const char *name, int type,
     for (size_t i = 0; i < count; i++)
     {
         var_SetChecked(vouts[i], name, type, val);
-        vlc_object_release(vouts[i]);
+        vout_Release(vouts[i]);
     }
     free(vouts);
 }
@@ -3347,7 +3347,7 @@ vlc_player_vout_TriggerOption(vlc_player_t *player, const char *option)
     for (size_t i = 0; i < count; ++i)
     {
         var_TriggerCallback(vouts[i], option);
-        vlc_object_release(vouts[i]);
+        vout_Release(vouts[i]);
     }
     free(vouts);
 }

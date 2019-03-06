@@ -607,7 +607,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
         if( p_owner->p_vout )
         {
             vlc_mutex_lock( &p_owner->lock );
-            vlc_object_release( p_owner->p_vout );
+            vout_Release(p_owner->p_vout);
             p_owner->p_vout = NULL;
             vlc_mutex_unlock( &p_owner->lock );
         }
@@ -621,12 +621,12 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 
         vlc_mutex_lock( &p_owner->lock );
         if( p_owner->p_vout )
-            vlc_object_release( p_owner->p_vout );
+            vout_Release(p_owner->p_vout);
         p_owner->p_vout = p_vout;
         vlc_mutex_unlock( &p_owner->lock );
     }
     else
-        vlc_object_release( p_vout );
+        vout_Release(p_vout);
 
     p_subpic = subpicture_New( p_updater );
     if( p_subpic )
@@ -1994,7 +1994,7 @@ static void DeleteDecoder( decoder_t * p_dec )
             {
                 vout_FlushSubpictureChannel( p_owner->p_vout,
                                              p_owner->i_spu_channel );
-                vlc_object_release( p_owner->p_vout );
+                vout_Release(p_owner->p_vout);
             }
             break;
         }
@@ -2548,7 +2548,7 @@ void input_DecoderGetObjects( decoder_t *p_dec,
     vlc_mutex_lock( &p_owner->lock );
     if( pp_vout )
         *pp_vout = p_dec->fmt_in.i_cat == VIDEO_ES && p_owner->p_vout ?
-            vlc_object_hold( p_owner->p_vout ) : NULL;
+            vout_Hold(p_owner->p_vout) : NULL;
     if( pp_aout )
         *pp_aout = p_dec->fmt_in.i_cat == AUDIO_ES && p_owner->p_aout ?
             vlc_object_hold( p_owner->p_aout ) : NULL;

@@ -2592,8 +2592,7 @@ vlc_player_aout_EnableFilter(vlc_player_t *player, const char *name, bool add);
 /**
  * Get and hold the main video output
  *
- * @warning the returned vout_thread_t * must be released with
- * vlc_object_release().
+ * @warning the returned vout_thread_t * must be released with vout_Release().
  * @see vlc_players_cbs.on_vout_list_changed
  *
  * @param player player instance
@@ -2606,7 +2605,7 @@ vlc_player_vout_Hold(vlc_player_t *player);
  * Get and hold the list of video output
  *
  * @warning All vout_thread_t * element of the array must be released with
- * vlc_object_release(). The returned array must be freed.
+ * vout_Release(). The returned array must be freed.
  *
  * @see vlc_players_cbs.on_vout_list_changed
  *

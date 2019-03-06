@@ -112,7 +112,7 @@ size_t input_DecoderGetFifoSize( decoder_t *p_dec );
 /**
  * This function returns the objects associated to a decoder
  *
- * They must be released using vlc_object_release().
+ * They must be released.
  */
 void input_DecoderGetObjects( decoder_t *, vout_thread_t **, audio_output_t ** );
 

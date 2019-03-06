@@ -241,7 +241,7 @@ static void ChangeVout( intf_thread_t *p_intf, vout_thread_t *p_vout )
         var_DelCallback( p_old_vout, "mouse-button-down", ButtonEvent,
                          p_intf );
         var_DelCallback( p_old_vout, "mouse-moved", MovedEvent, p_intf );
-        vlc_object_release( p_old_vout );
+        vout_Release(p_old_vout);
     }
 
     if( p_vout != NULL )
@@ -308,7 +308,7 @@ static void ChangeInput( intf_thread_t *p_intf, input_thread_t *p_input )
     if( p_old_input != NULL )
     {
         if( p_old_vout != NULL )
-            vlc_object_release( p_old_vout );
+            vout_Release(p_old_vout);
         input_Release(p_old_input);
     }
 
@@ -1446,7 +1446,7 @@ static int ActionEvent( vlc_object_t *libvlc, char const *psz_var,
     vlc_mutex_lock( &p_intf->p_sys->lock );
     input_thread_t *p_input = p_sys->p_input ? input_Hold(p_sys->p_input)
                                              : NULL;
-    vout_thread_t *p_vout = p_sys->p_vout ? vlc_object_hold( p_sys->p_vout )
+    vout_thread_t *p_vout = p_sys->p_vout ? vout_Hold(p_sys->p_vout)
                                           : NULL;
     int slider_chan = p_sys->slider_chan;
     bool b_vrnav = p_sys->vrnav.b_can_change;
@@ -1458,7 +1458,7 @@ static int ActionEvent( vlc_object_t *libvlc, char const *psz_var,
     if( p_input != NULL )
         input_Release(p_input);
     if( p_vout != NULL )
-        vlc_object_release( p_vout );
+        vout_Release(p_vout);
 
     return i_ret;
 }

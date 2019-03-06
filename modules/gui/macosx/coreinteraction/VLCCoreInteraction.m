@@ -390,7 +390,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Random Off"));
     }
 
-    vlc_object_release(p_vout);
+    vout_Release(p_vout);
 }
 
 - (void)repeatAll
@@ -400,7 +400,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     vout_thread_t *p_vout = getVout();
     if (p_vout) {
         vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat All"));
-        vlc_object_release(p_vout);
+        vout_Release(p_vout);
     }
 }
 
@@ -411,7 +411,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     vout_thread_t *p_vout = getVout();
     if (p_vout) {
         vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat One"));
-        vlc_object_release(p_vout);
+        vout_Release(p_vout);
     }
 }
 
@@ -422,7 +422,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     vout_thread_t *p_vout = getVout();
     if (p_vout) {
         vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat Off"));
-        vlc_object_release(p_vout);
+        vout_Release(p_vout);
     }
 }
 
@@ -578,7 +578,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         vout_thread_t *p_vout = input_GetVout(p_input);
         if (p_vout != NULL) {
             var_SetInteger(vlc_object_instance(getIntf()), "key-action", ACTIONID_POSITION);
-            vlc_object_release(p_vout);
+            vout_Release(p_vout);
         }
         input_Release(p_input);
     }
@@ -606,7 +606,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (p_vout) {
         BOOL b_fs = var_ToggleBool(p_vout, "fullscreen");
         var_SetBool(pl_Get(p_intf), "fullscreen", b_fs);
-        vlc_object_release(p_vout);
+        vout_Release(p_vout);
     } else { // e.g. lion fullscreen toggle
         BOOL b_fs = var_ToggleBool(pl_Get(p_intf), "fullscreen");
         [[[VLCMain sharedInstance] voutProvider] setFullscreen:b_fs forWindow:nil withAnimation:YES];
@@ -693,7 +693,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                             eventHandled = YES;
                         }
                     }
-                    vlc_object_release(p_vout);
+                    vout_Release(p_vout);
                 }
                 input_Release(p_input);
             }

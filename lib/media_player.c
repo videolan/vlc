@@ -390,7 +390,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         else
         {
             for( size_t i = 0; i < i_vout; i++ )
-                vlc_object_release( pp_vout[i] );
+                vout_Release(pp_vout[i]);
             free( pp_vout );
         }
 

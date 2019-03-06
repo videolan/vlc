@@ -171,7 +171,7 @@ static void Close ( vlc_object_t *p_this )
         var_DelCallback( p_sys->p_vout, "mouse-moved", MovedEvent, p_intf );
         var_DelCallback( p_sys->p_vout, "mouse-button-down",
                          ButtonEvent, p_intf );
-        vlc_object_release( p_sys->p_vout );
+        vout_Release(p_sys->p_vout);
     }
 
     /* Destroy structure */
@@ -483,7 +483,7 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_var,
                              p_intf );
             var_DelCallback( p_sys->p_vout, "mouse-button-down", ButtonEvent,
                              p_intf );
-            vlc_object_release( p_sys->p_vout );
+            vout_Release(p_sys->p_vout);
         }
 
         p_sys->p_vout = input_GetVout( p_input );

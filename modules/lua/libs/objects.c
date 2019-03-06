@@ -115,6 +115,15 @@ static int vlclua_get_input( lua_State *L )
     return 1;
 }
 
+static int vlclua_vout_release(lua_State *L)
+{
+    vlc_object_t **pp = luaL_checkudata(L, 1, "vlc_object");
+
+    lua_pop(L, 1);
+    vout_Release((vout_thread_t *)*pp);
+    return 0;
+}
+
 static int vlclua_get_vout( lua_State *L )
 {
     input_thread_t *p_input = vlclua_get_input_internal( L );
@@ -124,8 +133,7 @@ static int vlclua_get_vout( lua_State *L )
         input_Release(p_input);
         if(p_vout)
         {
-            vlclua_push_vlc_object(L, VLC_OBJECT(p_vout),
-                                   vlclua_object_release);
+            vlclua_push_vlc_object(L, VLC_OBJECT(p_vout), vlclua_vout_release);
             return 1;
         }
     }

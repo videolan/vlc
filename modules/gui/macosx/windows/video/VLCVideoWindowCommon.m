@@ -452,7 +452,7 @@
         vout_thread_t *p_vout = getVoutForActiveWindow();
         if (p_vout) {
             var_SetBool(p_vout, "fullscreen", true);
-            vlc_object_release(p_vout);
+            vout_Release(p_vout);
         }
     }
 
@@ -498,7 +498,7 @@
         vout_thread_t *p_vout = getVoutForActiveWindow();
         if (p_vout) {
             var_SetBool(p_vout, "fullscreen", false);
-            vlc_object_release(p_vout);
+            vout_Release(p_vout);
         }
     }
 

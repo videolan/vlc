@@ -77,7 +77,7 @@ static int vlclua_osd_icon( lua_State *L )
         if( p_vout )
         {
             vout_OSDIcon( p_vout, i_chan, i_icon );
-            vlc_object_release( p_vout );
+            vout_Release(p_vout);
         }
         input_Release(p_input);
     }
@@ -125,7 +125,7 @@ static int vlclua_osd_message( lua_State *L )
         {
             vout_OSDText( p_vout, i_chan, vlc_osd_position_from_string( psz_position ),
                           duration, psz_message );
-            vlc_object_release( p_vout );
+            vout_Release(p_vout);
         }
         input_Release(p_input);
     }
@@ -168,7 +168,7 @@ static int vlclua_osd_slider( lua_State *L )
         if( p_vout )
         {
             vout_OSDSlider( p_vout, i_chan, i_position, i_type );
-            vlc_object_release( p_vout );
+            vout_Release(p_vout);
         }
         input_Release(p_input);
     }
@@ -189,7 +189,7 @@ static int vlclua_spu_channel_register( lua_State *L )
     }
 
     int i_chan = vout_RegisterSubpictureChannel( p_vout );
-    vlc_object_release( p_vout );
+    vout_Release( p_vout );
     lua_pushinteger( L, i_chan );
     return 1;
 }
@@ -208,7 +208,7 @@ static int vlclua_spu_channel_clear( lua_State *L )
     }
 
     vout_FlushSubpictureChannel( p_vout, i_chan );
-    vlc_object_release( p_vout );
+    vout_Release(p_vout);
     return 0;
 }
 

@@ -42,7 +42,7 @@ void CmdQuit::execute()
         if( pVout )
         {
             vout_OSDMessage( pVout, VOUT_SPU_CHANNEL_OSD, "%s", _( "Quit" ) );
-            vlc_object_release( pVout );
+            vout_Release(pVout);
         }
     }
 

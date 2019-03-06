@@ -125,7 +125,7 @@
         for (NSValue *ptr in vouts) {
             vout_thread_t *p_vout = [ptr pointerValue];
             var_SetString(p_vout, "sub-source", [tempString UTF8String]);
-            vlc_object_release(p_vout);
+            vout_Release(p_vout);
         }
 
     tempString = B64DecNSStr([items objectAtIndex:2]);
@@ -1023,7 +1023,7 @@
             var_SetInteger(p_vout, "crop-bottom", [_cropBottomTextField intValue]);
             var_SetInteger(p_vout, "crop-left", [_cropLeftTextField intValue]);
             var_SetInteger(p_vout, "crop-right", [_cropRightTextField intValue]);
-            vlc_object_release(p_vout);
+            vout_Release(p_vout);
         }
 }
 

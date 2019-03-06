@@ -645,7 +645,7 @@ void InputManager::UpdateVout()
 
     /* Release the vout list */
     for( size_t i = 0; i < i_vout; i++ )
-        vlc_object_release( (vlc_object_t*)pp_vout[i] );
+        vout_Release(pp_vout[i]);
     free( pp_vout );
 }
 

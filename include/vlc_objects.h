@@ -185,6 +185,18 @@ static inline void input_Release(input_thread_t *input)
     vlc_object_release((vlc_object_t *)input);
 }
 
+/* Here for backward compatibility. TODO: Move to <vlc_vout.h>! */
+static inline vout_thread_t *vout_Hold(vout_thread_t *vout)
+{
+    vlc_object_hold((vlc_object_t *)vout);
+    return vout;
+}
+
+static inline void vout_Release(vout_thread_t *vout)
+{
+    vlc_object_release((vlc_object_t *)vout);
+}
+
 /**
  * @defgroup objres Object resources
  *

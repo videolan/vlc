@@ -106,7 +106,7 @@
             for (NSValue * val in vouts) {
                 vout_thread_t *p_vout = [val pointerValue];
                 var_SetString(p_vout, psz_filter_type, psz_string);
-                vlc_object_release(p_vout);
+                vout_Release(p_vout);
             }
     }
 
@@ -172,7 +172,7 @@
 
     if (vouts)
         for (NSValue *ptr in vouts)
-            vlc_object_release((vout_thread_t *)[ptr pointerValue]);
+            vout_Release((vout_thread_t *)[ptr pointerValue]);
 }
 
 

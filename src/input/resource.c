@@ -201,7 +201,7 @@ static vout_thread_t *HoldVout( input_resource_t *p_resource )
 
     vout_thread_t *p_vout = p_resource->i_vout > 0 ? p_resource->pp_vout[0] : NULL;
     if( p_vout )
-        vlc_object_hold( p_vout );
+        vout_Hold(p_vout);
 
     vlc_mutex_unlock( &p_resource->lock_hold );
 
@@ -231,7 +231,7 @@ static void HoldVouts( input_resource_t *p_resource, vout_thread_t ***ppp_vout,
     for( int i = 0; i < p_resource->i_vout; i++ )
     {
         pp_vout[i] = p_resource->pp_vout[i];
-        vlc_object_hold( pp_vout[i] );
+        vout_Hold(pp_vout[i]);
     }
 
 exit:

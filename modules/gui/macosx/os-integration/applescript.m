@@ -159,7 +159,7 @@
     if (!p_vout)
         return NO;
     BOOL b_value = var_GetBool(p_vout, "fullscreen");
-    vlc_object_release(p_vout);
+    vout_Release(p_vout);
     return b_value;
 }
 
@@ -168,10 +168,10 @@
     if (!p_vout)
         return;
     if (var_GetBool(p_vout, "fullscreen") == mode) {
-        vlc_object_release(p_vout);
+        vout_Release(p_vout);
         return;
     }
-    vlc_object_release(p_vout);
+    vout_Release(p_vout);
     [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 

@@ -80,7 +80,7 @@ static vout_thread_t *GetVout (libvlc_media_player_t *mp, size_t num)
 
     for (size_t i = 0; i < n; i++)
         if (i != num)
-            vlc_object_release (pp_vouts[i]);
+            vout_Release(pp_vouts[i]);
     free (pp_vouts);
 
     if (p_vout == NULL)
@@ -104,7 +104,7 @@ void libvlc_set_fullscreen( libvlc_media_player_t *p_mi, int b_fullscreen )
     for (size_t i = 0; i < n; i++)
     {
         var_SetBool (pp_vouts[i], "fullscreen", b_fullscreen);
-        vlc_object_release (pp_vouts[i]);
+        vout_Release(pp_vouts[i]);
     }
     free (pp_vouts);
 }
@@ -126,7 +126,7 @@ void libvlc_toggle_fullscreen( libvlc_media_player_t *p_mi )
         vout_thread_t *p_vout = pp_vouts[i];
 
         var_SetBool (p_vout, "fullscreen", b_fullscreen);
-        vlc_object_release (p_vout);
+        vout_Release(p_vout);
     }
     free (pp_vouts);
 }
@@ -165,7 +165,7 @@ libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, unsigned num,
     var_Create( p_vout, "snapshot-format", VLC_VAR_STRING );
     var_SetString( p_vout, "snapshot-format", "png" );
     var_TriggerCallback( p_vout, "video-snapshot" );
-    vlc_object_release( p_vout );
+    vout_Release(p_vout);
     return 0;
 }
 
@@ -199,7 +199,7 @@ int libvlc_video_get_cursor( libvlc_media_player_t *mp, unsigned num,
         return -1;
 
     var_GetCoords (p_vout, "mouse-moved", px, py);
-    vlc_object_release (p_vout);
+    vout_Release(p_vout);
     return 0;
 }
 
@@ -208,7 +208,7 @@ unsigned libvlc_media_player_has_vout( libvlc_media_player_t *p_mi )
     size_t n;
     vout_thread_t **pp_vouts = GetVouts (p_mi, &n);
     for (size_t i = 0; i < n; i++)
-        vlc_object_release (pp_vouts[i]);
+        vout_Release(pp_vouts[i]);
     free (pp_vouts);
     return n;
 }
@@ -237,7 +237,7 @@ void libvlc_video_set_scale( libvlc_media_player_t *p_mp, float f_scale )
         if (isfinite(f_scale) && f_scale != 0.f)
             var_SetFloat (p_vout, "zoom", f_scale);
         var_SetBool (p_vout, "autoscale", f_scale == 0.f);
-        vlc_object_release (p_vout);
+        vout_Release(p_vout);
     }
     free (pp_vouts);
 }
@@ -261,7 +261,7 @@ void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi,
         vout_thread_t *p_vout = pp_vouts[i];
 
         var_SetString (p_vout, "aspect-ratio", psz_aspect);
-        vlc_object_release (p_vout);
+        vout_Release(p_vout);
     }
     free (pp_vouts);
 }
@@ -437,7 +437,7 @@ void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi,
         vout_thread_t *p_vout = pp_vouts[i];
 
         var_SetString (p_vout, "crop", psz_geometry);
-        vlc_object_release (p_vout);
+        vout_Release(p_vout);
     }
     free (pp_vouts);
 }
@@ -628,7 +628,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int deinterlace,
             var_SetString (p_vout, "deinterlace-mode", psz_mode);
 
         var_SetInteger (p_vout, "deinterlace", deinterlace);
-        vlc_object_release (p_vout);
+        vout_Release(p_vout);
     }
     free (pp_vouts);
 }
@@ -729,14 +729,14 @@ static bool find_sub_source_by_name( libvlc_media_player_t *p_mi, const char *re
     if( !psz_sources )
     {
         libvlc_printerr( "%s not enabled", name );
-        vlc_object_release( vout );
+        vout_Release(vout);
         return false;
     }
 
     /* Find 'name'  */
     char *p = strstr( psz_sources, name );
     free( psz_sources );
-    vlc_object_release( vout );
+    vout_Release(vout);
     return (p != NULL);
 }
 
@@ -792,7 +792,7 @@ set_value( libvlc_media_player_t *p_mi, const char *restrict name,
         var_SetChecked( pp_vouts[i], psz_opt_name, i_type, new_val );
         if( b_sub_source )
             var_TriggerCallback( pp_vouts[i], "sub-source" );
-        vlc_object_release( pp_vouts[i] );
+        vout_Release(pp_vouts[i]);
     }
 
     if( opt->type == 0 )

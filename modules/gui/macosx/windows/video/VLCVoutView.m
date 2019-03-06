@@ -68,7 +68,7 @@
 - (void)dealloc
 {
     if (p_vout)
-        vlc_object_release(p_vout);
+        vout_Release(p_vout);
 
     [self unregisterDraggedTypes];
 }
@@ -316,13 +316,13 @@
 {
     assert(p_vout == NULL);
     p_vout = p_vout_thread;
-    vlc_object_hold(p_vout);
+    vout_Hold(p_vout);
 }
 
 - (vout_thread_t *)voutThread
 {
     if (p_vout) {
-        vlc_object_hold(p_vout);
+        vout_Hold(p_vout);
         return p_vout;
     }
 
@@ -332,7 +332,7 @@
 - (void)releaseVoutThread
 {
     if (p_vout) {
-        vlc_object_release(p_vout);
+        vout_Release(p_vout);
         p_vout = NULL;
     }
 }

@@ -205,7 +205,7 @@
                 vout_thread_t *p_vout = [ptr pointerValue];
 
                 var_SetFloat(p_vout, SUBSDELAY_CFG_FACTOR, f_factor);
-                vlc_object_release(p_vout);
+                vout_Release(p_vout);
             }
         [VLCVideoFilterHelper setVideoFilter: "subsdelay" on: f_factor > 0];
 

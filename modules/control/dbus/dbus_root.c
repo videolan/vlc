@@ -97,7 +97,7 @@ MarshalCanSetFullscreen( intf_thread_t *p_intf, DBusMessageIter *container )
         if ( p_vout )
         {
             b_ret = TRUE;
-            vlc_object_release( p_vout );
+            vout_Release(p_vout);
         }
     }
 

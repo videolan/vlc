@@ -58,7 +58,7 @@ static int vlclua_fullscreen( lua_State *L )
 
     i_ret = vlclua_var_toggle_or_set( L, p_vout, "fullscreen" );
 
-    vlc_object_release( p_vout );
+    vout_Release(p_vout);
     return i_ret;
 }
 

@@ -1750,7 +1750,7 @@ static void ViewpointApply( input_thread_t *p_input )
         /* This variable can only be read from callbacks */
         var_Change( pp_vout[i], "viewpoint", VLC_VAR_SETVALUE,
                     (vlc_value_t) { .p_address = NULL } );
-        vlc_object_release( pp_vout[i] );
+        vout_Release(pp_vout[i]);
     }
     free( pp_vout );
 
@@ -1814,7 +1814,7 @@ static void ControlNav( input_thread_t *p_input, int i_type )
         if( !b_viewpoint_ch
          && var_GetBool( pp_vout[i], "viewpoint-changeable" ) )
             b_viewpoint_ch = true;
-        vlc_object_release( pp_vout[i] );
+        vout_Release(pp_vout[i]);
     }
     free( pp_vout );
 

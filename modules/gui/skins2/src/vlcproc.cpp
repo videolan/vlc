@@ -186,7 +186,7 @@ VlcProc::~VlcProc()
 {
     if( m_pVout )
     {
-        vlc_object_release( m_pVout );
+        vout_Release(m_pVout);
         m_pVout = NULL;
     }
 
@@ -495,7 +495,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
             {
                 // end of input or vout reuse (nothing to do)
                 if( pVout )
-                    vlc_object_release( pVout );
+                    vout_Release(pVout);
                 break;
             }
             if( m_pVout )
@@ -503,7 +503,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
                 // remove previous Vout callbacks
                 var_DelCallback( m_pVout, "mouse-moved",
                                  onGenericCallback, this );
-                vlc_object_release( m_pVout );
+                vout_Release(m_pVout);
                 m_pVout = NULL;
             }
 

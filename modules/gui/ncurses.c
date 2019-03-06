@@ -1574,7 +1574,7 @@ static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,
             if (p_vout) {
                 bool fs = var_ToggleBool(p_playlist, "fullscreen");
                 var_SetBool(p_vout, "fullscreen", fs);
-                vlc_object_release(p_vout);
+                vout_Release(p_vout);
             }
         }
         return;

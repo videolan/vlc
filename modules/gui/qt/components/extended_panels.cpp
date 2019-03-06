@@ -277,7 +277,7 @@ void ExtVideo::cropChange()
         var_SetInteger( p_vout, "crop-bottom", ui.cropBotPx->value() );
         var_SetInteger( p_vout, "crop-left", ui.cropLeftPx->value() );
         var_SetInteger( p_vout, "crop-right", ui.cropRightPx->value() );
-        vlc_object_release( p_vout );
+        vout_Release(p_vout);
     }
 }
 
@@ -318,7 +318,7 @@ static void UpdateVFiltersString( struct intf_thread_t *p_intf,
         foreach( vout_thread_t *p_vout, p_vouts )
         {
             var_SetString( p_vout, psz_filter_type, value );
-            vlc_object_release( p_vout );
+            vout_Release(p_vout);
         }
     }
 }
@@ -565,7 +565,7 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
     }
 
     foreach( vout_thread_t *p_vout, p_vouts )
-        vlc_object_release( p_vout );
+        vout_Release(p_vout);
 }
 
 void ExtVideo::updateFilterOptions()
@@ -1574,7 +1574,7 @@ void SyncControls::subsdelaySetFactor( double f_factor )
     foreach( vout_thread_t *p_vout, p_vouts )
     {
         var_SetFloat( p_vout, SUBSDELAY_CFG_FACTOR, f_factor );
-        vlc_object_release( p_vout );
+        vout_Release(p_vout);
     }
 }
 

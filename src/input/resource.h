@@ -44,14 +44,14 @@ void input_resource_PutVout(input_resource_t *, vout_thread_t *);
 /**
  * This function returns one of the current vout if any.
  *
- * You must call vlc_object_release on the value returned (if non NULL).
+ * You must call vout_Release() on the value returned (if non NULL).
  */
 vout_thread_t *input_resource_HoldVout( input_resource_t * );
 
 /**
  * This function returns all current vouts if any.
  *
- * You must call vlc_object_release on all values returned (if non NULL).
+ * You must call vout_Release() on all values returned (if non NULL).
  */
 void input_resource_HoldVouts( input_resource_t *, vout_thread_t ***, size_t * );
 

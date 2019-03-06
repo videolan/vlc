@@ -244,7 +244,7 @@ static int VideoAutoMenuBuilder( playlist_t *pl, input_thread_t *p_input,
     PUSH_VAR( "deinterlace-mode" );
 
     if( p_object )
-        vlc_object_release( p_object );
+        vout_Release( p_object );
     return VLC_SUCCESS;
 }
 
@@ -1036,7 +1036,7 @@ QMenu* VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
                         qtr( "Leave Fullscreen" ),"" , ITEM_NORMAL,
                         VLC_OBJECT(THEPL), val, VLC_VAR_BOOL, b_isFullscreen );
             }
-            vlc_object_release( p_vout );
+            vout_Release(p_vout);
 
             menu->addSeparator();
         }
@@ -1535,7 +1535,7 @@ void VLCMenuBar::DoAction( QObject *data )
             if( vout != NULL )
             {
                 var_Set( vout, var, val ); /* never void class */
-                vlc_object_release( vout );
+                vout_Release(vout);
             }
         }
     }

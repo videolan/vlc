@@ -127,7 +127,7 @@ void ActionsManager::fullscreen()
     if( p_vout)
     {
         var_SetBool( p_vout, "fullscreen", fs );
-        vlc_object_release( p_vout );
+        vout_Release(p_vout);
     }
 }
 
@@ -137,7 +137,7 @@ void ActionsManager::snapshot()
     if( p_vout )
     {
         var_TriggerCallback( p_vout, "video-snapshot" );
-        vlc_object_release( p_vout );
+        vout_Release(p_vout);
     }
 }
 
