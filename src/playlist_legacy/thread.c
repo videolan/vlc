@@ -243,7 +243,7 @@ static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
         {
             var_DelCallback( p_input_thread, "intf-event",
                              InputEvent, p_playlist );
-            vlc_object_release( p_input_thread );
+            input_Close(p_input_thread);
             p_input_thread = NULL;
         }
     }
