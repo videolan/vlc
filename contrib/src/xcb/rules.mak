@@ -15,7 +15,7 @@ PKGS_FOUND += xcb
 endif
 
 $(TARBALLS)/libxcb-$(XCB_VERSION).tar.bz2:
-	$(call download,$(XCB_URL))
+	$(call download_pkg,$(XCB_URL),xcb)
 
 .sum-xcb: libxcb-$(XCB_VERSION).tar.bz2
 
