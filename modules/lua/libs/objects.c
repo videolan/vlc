@@ -74,12 +74,6 @@ static int vlclua_input_release(lua_State *L)
     return 0;
 }
 
-static int vlclua_object_find( lua_State *L )
-{
-    lua_pushnil( L );
-    return 1;
-}
-
 static int vlclua_get_libvlc( lua_State *L )
 {
     libvlc_int_t *p_libvlc = vlc_object_instance(vlclua_get_this( L ));
@@ -162,7 +156,6 @@ static const luaL_Reg vlclua_object_reg[] = {
     { "input", vlclua_get_input },
     { "playlist", vlclua_get_playlist },
     { "libvlc", vlclua_get_libvlc },
-    { "find", vlclua_object_find },
     { "vout", vlclua_get_vout},
     { "aout", vlclua_get_aout},
     { NULL, NULL }

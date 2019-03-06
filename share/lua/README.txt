@@ -237,8 +237,6 @@ object.libvlc(): Get the libvlc object.
 object.aout(): Get the audio output object.
 object.vout(): Get the video output object.
 
-object.find( object, type, mode ): Return nil. DO NOT USE.
-
 OSD
 ---
 osd.icon( type, [id] ): Display an icon on the given OSD channel. Uses the
