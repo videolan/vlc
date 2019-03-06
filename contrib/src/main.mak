@@ -54,6 +54,13 @@ else
 need_pkg = $(shell $(PKG_CONFIG) $(1) || echo 1)
 endif
 
+ifeq ($(findstring mingw32,$(BUILD)),mingw32)
+MSYS_BUILD := 1
+endif
+ifeq ($(findstring msys,$(BUILD)),msys)
+MSYS_BUILD := 1
+endif
+
 #
 # Default values for tools
 #
@@ -365,7 +372,7 @@ RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 	cd $< && $(AUTORECONF) -fiv $(ACLOCAL_AMFLAGS)
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX) $(CMAKE_GENERATOR) -DCMAKE_DEBUG_POSTFIX:STRING=
-ifeq ($(findstring mingw32,$(BUILD)),mingw32)
+ifdef MSYS_BUILD
 CMAKE += -DCMAKE_LINK_LIBRARY_SUFFIX:STRING=.a
 endif
 
@@ -545,7 +552,7 @@ endif
 endif
 	echo "set(CMAKE_C_COMPILER $(CC))" >> $@
 	echo "set(CMAKE_CXX_COMPILER $(CXX))" >> $@
-ifeq ($(findstring msys,$(BUILD)),msys)
+ifdef MSYS_BUILD
 	echo "set(CMAKE_FIND_ROOT_PATH `cygpath -m $(PREFIX)`)" >> $@
 else
 	echo "set(CMAKE_FIND_ROOT_PATH $(PREFIX))" >> $@
