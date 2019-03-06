@@ -154,7 +154,7 @@ int input_Read( vlc_object_t *p_parent, input_item_t *p_item,
         End( p_input );
     }
 
-    vlc_object_release( p_input );
+    input_Close(p_input);
     return VLC_SUCCESS;
 }
 
