@@ -351,7 +351,7 @@ static int ItemChange(vlc_object_t *p_this, const char *psz_var,
     if (p_sys->p_input != NULL)
     {
         var_DelCallback(p_sys->p_input, "intf-event", PlayingChange, p_intf);
-        vlc_object_release(p_sys->p_input);
+        input_Release(p_sys->p_input);
         p_sys->p_input = NULL;
     }
 
@@ -372,7 +372,7 @@ static int ItemChange(vlc_object_t *p_this, const char *psz_var,
     time(&p_sys->p_current_song.date);        /* to be sent to last.fm */
     p_sys->p_current_song.i_start = vlc_tick_now();    /* only used locally */
 
-    p_sys->p_input = vlc_object_hold(p_input);
+    p_sys->p_input = input_Hold(p_input);
     var_AddCallback(p_input, "intf-event", PlayingChange, p_intf);
 
     if (input_item_IsPreparsed(p_item))
@@ -428,7 +428,7 @@ static void Close(vlc_object_t *p_this)
     if (p_sys->p_input != NULL)
     {
         var_DelCallback(p_sys->p_input, "intf-event", PlayingChange, p_intf);
-        vlc_object_release(p_sys->p_input);
+        input_Release(p_sys->p_input);
     }
 
     int i;

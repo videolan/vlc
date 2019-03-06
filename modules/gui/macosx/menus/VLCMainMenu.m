@@ -602,7 +602,7 @@
             [self refreshVoutDeviceMenu:nil];
         }
         [_postprocessing setEnabled:YES];
-        vlc_object_release(p_input);
+        input_Release(p_input);
     } else {
         [_postprocessing setEnabled:NO];
     }
@@ -965,7 +965,7 @@
 
             vlc_object_release(p_vout);
         }
-        vlc_object_release(p_input);
+        input_Release(p_input);
     }
 }
 
@@ -1021,7 +1021,7 @@
 
     input_item_t *p_item = input_GetItem(p_input);
     if (!p_item) {
-        vlc_object_release(p_input);
+        input_Release(p_input);
         return;
     }
 
@@ -1041,7 +1041,7 @@
     url = [url URLByDeletingLastPathComponent];
     [openPanel setDirectoryURL: url];
     free(path);
-    vlc_object_release(p_input);
+    input_Release(p_input);
 
     i_returnValue = [openPanel runModal];
 

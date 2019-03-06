@@ -168,7 +168,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     p_input = pl_CurrentInput(p_intf);
     if (p_input) {
         var_ToggleBool(p_input, "record");
-        vlc_object_release(p_input);
+        input_Release(p_input);
     }
 }
 
@@ -194,7 +194,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     p_input = pl_CurrentInput(p_intf);
     if (p_input) {
         f_rate = var_GetFloat(p_input, "rate");
-        vlc_object_release(p_input);
+        input_Release(p_input);
     } else {
         playlist_t * p_playlist = pl_Get(getIntf());
         f_rate = var_GetFloat(p_playlist, "rate");
@@ -234,7 +234,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         return -1;
 
     i_duration = var_GetInteger(p_input, "length");
-    vlc_object_release(p_input);
+    input_Release(p_input);
 
     return SEC_FROM_VLC_TICK(i_duration);
 }
@@ -251,20 +251,20 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     input_item_t *p_item = input_GetItem(p_input);
     if (!p_item) {
-        vlc_object_release(p_input);
+        input_Release(p_input);
         return nil;
     }
 
     char *psz_uri = input_item_GetURI(p_item);
     if (!psz_uri) {
-        vlc_object_release(p_input);
+        input_Release(p_input);
         return nil;
     }
 
     NSURL *o_url;
     o_url = [NSURL URLWithString:toNSStr(psz_uri)];
     free(psz_uri);
-    vlc_object_release(p_input);
+    input_Release(p_input);
 
     return o_url;
 }
@@ -281,13 +281,13 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     input_item_t *p_item = input_GetItem(p_input);
     if (!p_item) {
-        vlc_object_release(p_input);
+        input_Release(p_input);
         return nil;
     }
 
     char *psz_uri = input_item_GetURI(p_item);
     if (!psz_uri) {
-        vlc_object_release(p_input);
+        input_Release(p_input);
         return nil;
     }
 
@@ -309,7 +309,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         else
             o_name = [o_url absoluteString];
     }
-    vlc_object_release(p_input);
+    input_Release(p_input);
     return o_name;
 }
 
@@ -326,7 +326,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             val = val * -1;
         var_SetInteger( p_input, "time-offset", val );
     }
-    vlc_object_release(p_input);
+    input_Release(p_input);
 }
 
 - (void)forwardExtraShort
@@ -434,7 +434,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             msg_Dbg(getIntf(), "Setting A value");
 
             timeA = var_GetInteger(p_input, "time");
-            vlc_object_release(p_input);
+            input_Release(p_input);
         }
     } else if (!timeB) {
         input_thread_t * p_input = pl_CurrentInput(getIntf());
@@ -442,7 +442,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             msg_Dbg(getIntf(), "Setting B value");
 
             timeB = var_GetInteger(p_input, "time");
-            vlc_object_release(p_input);
+            input_Release(p_input);
         }
     } else
         [self resetAtoB];
@@ -463,7 +463,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             vlc_tick_t currentTime = var_GetInteger(p_input, "time");
             if ( currentTime >= timeB || currentTime < timeA)
                 var_SetInteger(p_input, "time", timeA);
-            vlc_object_release(p_input);
+            input_Release(p_input);
         }
     }
 }
@@ -473,7 +473,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     input_thread_t * p_input = pl_CurrentInput(getIntf());
     if (p_input) {
         var_SetInteger(p_input, "time", time);
-        vlc_object_release(p_input);
+        input_Release(p_input);
     }
 }
 
@@ -568,7 +568,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             msg_Err(getIntf(), "unable to load subtitles from '%s'", mrl);
         free(mrl);
     }
-    vlc_object_release(p_input);
+    input_Release(p_input);
 }
 
 - (void)showPosition
@@ -580,7 +580,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             var_SetInteger(vlc_object_instance(getIntf()), "key-action", ACTIONID_POSITION);
             vlc_object_release(p_vout);
         }
-        vlc_object_release(p_input);
+        input_Release(p_input);
     }
 }
 
@@ -621,7 +621,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         return;
 
     input_Control(p_input_thread, INPUT_NAV_ACTIVATE, NULL );
-    vlc_object_release(p_input_thread);
+    input_Release(p_input_thread);
 }
 
 - (void)moveMenuFocusLeft
@@ -631,7 +631,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         return;
 
     input_Control(p_input_thread, INPUT_NAV_LEFT, NULL );
-    vlc_object_release(p_input_thread);
+    input_Release(p_input_thread);
 }
 
 - (void)moveMenuFocusRight
@@ -641,7 +641,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         return;
 
     input_Control(p_input_thread, INPUT_NAV_RIGHT, NULL );
-    vlc_object_release(p_input_thread);
+    input_Release(p_input_thread);
 }
 
 - (void)moveMenuFocusUp
@@ -651,7 +651,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         return;
 
     input_Control(p_input_thread, INPUT_NAV_UP, NULL );
-    vlc_object_release(p_input_thread);
+    input_Release(p_input_thread);
 }
 
 - (void)moveMenuFocusDown
@@ -661,7 +661,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         return;
 
     input_Control(p_input_thread, INPUT_NAV_DOWN, NULL );
-    vlc_object_release(p_input_thread);
+    input_Release(p_input_thread);
 }
 
 #pragma mark -
@@ -695,7 +695,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                     }
                     vlc_object_release(p_vout);
                 }
-                vlc_object_release(p_input);
+                input_Release(p_input);
             }
         }
     }

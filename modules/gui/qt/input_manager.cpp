@@ -100,7 +100,7 @@ void InputManager::setInput( input_thread_t *_p_input )
     if( p_input != NULL )
     {
         msg_Dbg( p_intf, "IM: Setting an input" );
-        vlc_object_hold( p_input );
+        input_Hold(p_input);
         addCallbacks();
 
         UpdateStatus();
@@ -187,7 +187,7 @@ void InputManager::delInput()
         p_input_vbi = NULL;
     }
 
-    vlc_object_release( p_input );
+    input_Release( p_input );
     p_input = NULL;
 
     emit positionUpdated( -1.0, 0 ,0 );
@@ -1005,7 +1005,7 @@ MainInputManager::~MainInputManager()
 {
     if( p_input )
     {
-       vlc_object_release( p_input );
+       input_Release(p_input);
        p_input = NULL;
        emit inputChanged( false );
     }
@@ -1086,7 +1086,7 @@ void MainInputManager::customEvent( QEvent *event )
 void MainInputManager::probeCurrentInput()
 {
     if( p_input != NULL )
-        vlc_object_release( p_input );
+        input_Release(p_input);
     p_input = playlist_CurrentInput( THEPL );
     emit inputChanged( p_input != NULL );
 }

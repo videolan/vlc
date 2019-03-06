@@ -31,7 +31,7 @@ void CmdDvdNextTitle::execute()
     if( p_input )
     {
         var_TriggerCallback( p_input, "next-title" );
-        vlc_object_release( p_input );
+        input_Release(p_input);
     }
 }
 
@@ -43,7 +43,7 @@ void CmdDvdPreviousTitle::execute()
     if( p_input )
     {
         var_TriggerCallback( p_input, "prev-title" );
-        vlc_object_release( p_input );
+        input_Release(p_input);
     }
 }
 
@@ -55,7 +55,7 @@ void CmdDvdNextChapter::execute()
     if( p_input )
     {
         var_TriggerCallback( p_input, "next-chapter" );
-        vlc_object_release( p_input );
+        input_Release(p_input);
     }
 }
 
@@ -67,7 +67,7 @@ void CmdDvdPreviousChapter::execute()
     if( p_input )
     {
         var_TriggerCallback( p_input, "prev-chapter" );
-        vlc_object_release( p_input );
+        input_Release(p_input);
     }
 }
 
@@ -79,7 +79,7 @@ void CmdDvdRootMenu::execute()
     if( p_input )
     {
         var_SetInteger( p_input, "title  0", 2);
-        vlc_object_release( p_input );
+        input_Release(p_input);
     }
 }
 

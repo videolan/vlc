@@ -59,7 +59,7 @@
 - (void)dealloc
 {
     if (p_old_input)
-        vlc_object_release(p_old_input);
+        input_Release(p_old_input);
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -132,7 +132,7 @@
         input_Control(p_input, INPUT_ADD_BOOKMARK, &bookmark);
     }
 
-    vlc_object_release(p_input);
+    input_Release(p_input);
 
     [_dataTable reloadData];
 }
@@ -147,7 +147,7 @@
 
     input_Control(p_input, INPUT_CLEAR_BOOKMARKS);
 
-    vlc_object_release(p_input);
+    input_Release(p_input);
 
     [_dataTable reloadData];
 }
@@ -166,12 +166,12 @@
         return;
 
     if (row < 0) {
-        vlc_object_release(p_input);
+        input_Release(p_input);
         return;
     }
 
     if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS) {
-        vlc_object_release(p_input);
+        input_Release(p_input);
         return;
     }
 
@@ -182,7 +182,7 @@
      * changes. Note, we don't need to keep a reference to the object.
      * so release it now. */
     p_old_input = p_input;
-    vlc_object_release(p_input);
+    input_Release(p_input);
 
     [self.window beginSheet:_editBookmarksWindow completionHandler:nil];
 
@@ -223,12 +223,12 @@
         [alert setInformativeText:_NS("Input has changed, unable to save bookmark. Suspending playback with \"Pause\" while editing bookmarks to ensure to keep the same input.")];
         [alert beginSheetModalForWindow:self.window
                       completionHandler:nil];
-        vlc_object_release(p_input);
+        input_Release(p_input);
         return;
     }
 
     if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS) {
-        vlc_object_release(p_input);
+        input_Release(p_input);
         return;
     }
 
@@ -257,7 +257,7 @@
     }
 
     [_dataTable reloadData];
-    vlc_object_release(p_input);
+    input_Release(p_input);
 
     [NSApp endSheet: _editBookmarksWindow];
     [_editBookmarksWindow close];
@@ -279,7 +279,7 @@ clear:
 
     input_Control(p_input, INPUT_SET_BOOKMARK, [_dataTable selectedRow]);
 
-    vlc_object_release(p_input);
+    input_Release(p_input);
 }
 
 - (IBAction)remove:(id)sender
@@ -294,7 +294,7 @@ clear:
     if (i_focused >= 0)
         input_Control(p_input, INPUT_DEL_BOOKMARK, i_focused);
 
-    vlc_object_release(p_input);
+    input_Release(p_input);
 
     [_dataTable reloadData];
 }
@@ -326,7 +326,7 @@ clear:
         return 0;
 
     int returnValue = input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks);
-    vlc_object_release(p_input);
+    input_Release(p_input);
 
     if (returnValue != VLC_SUCCESS)
         return 0;
@@ -365,7 +365,7 @@ clear:
             vlc_seekpoint_Delete(pp_bookmarks[i]);
         free(pp_bookmarks);
     }
-    vlc_object_release(p_input);
+    input_Release(p_input);
     return ret;
 }
 

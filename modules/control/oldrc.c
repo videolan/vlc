@@ -405,7 +405,7 @@ static void Deactivate( vlc_object_t *p_this )
     if( p_sys->p_input != NULL )
     {
         var_DelCallback( p_sys->p_input, "intf-event", InputEvent, p_intf );
-        vlc_object_release( p_sys->p_input );
+        input_Release(p_sys->p_input);
     }
 
     net_ListenClose( p_sys->pi_socket_listen );
@@ -564,7 +564,7 @@ static void *Run( void *data )
           || state == END_S) )
         {
             var_DelCallback( p_sys->p_input, "intf-event", InputEvent, p_intf );
-            vlc_object_release( p_sys->p_input );
+            input_Release(p_sys->p_input);
             p_sys->p_input = NULL;
 
             p_sys->i_last_state = PLAYLIST_STOPPED;
@@ -1164,7 +1164,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         free( name );
     }
 out:
-    vlc_object_release( p_input );
+    input_Release(p_input);
     return i_error;
 }
 
@@ -1198,7 +1198,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     if( p_input )
     {
         int state = var_GetInteger( p_input, "state" );
-        vlc_object_release( p_input );
+        input_Release(p_input);
 
         if( state == PAUSE_S )
         {
@@ -1369,7 +1369,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             /* Replay the current state of the system. */
             char *psz_uri =
                     input_item_GetURI( input_GetItem( p_input ) );
-            vlc_object_release( p_input );
+            input_Release(p_input);
             if( likely(psz_uri != NULL) )
             {
                 msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
@@ -1498,7 +1498,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         return VLC_ENOOBJ;
 
     p_vout = input_GetVout( p_input );
-    vlc_object_release( p_input );
+    input_Release(p_input);
     if( !p_vout )
         return VLC_ENOOBJ;
 
@@ -1705,7 +1705,7 @@ static int Statistics ( vlc_object_t *p_this, char const *psz_cmd,
         return VLC_ENOOBJ;
 
     updateStatistics( p_intf, input_GetItem(p_input) );
-    vlc_object_release( p_input );
+    input_Release(p_input);
     return VLC_SUCCESS;
 }
 

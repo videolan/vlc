@@ -189,7 +189,7 @@
         return NO;
 
     input_state_e i_state = var_GetInteger(p_input, "state");
-    vlc_object_release(p_input);
+    input_Release(p_input);
 
     return ((i_state == OPENING_S) || (i_state == PLAYING_S));
 }
@@ -210,7 +210,7 @@
         return -1;
 
     i_delay = var_GetInteger(p_input, "audio-delay");
-    vlc_object_release(p_input);
+    input_Release(p_input);
 
     return MS_FROM_VLC_TICK( i_delay );
 }
@@ -221,7 +221,7 @@
         return;
 
     var_SetInteger(p_input, "audio-delay", VLC_TICK_FROM_MS( i_audioDesync ));
-    vlc_object_release(p_input);
+    input_Release(p_input);
 }
 
 - (int) currentTime {
@@ -232,7 +232,7 @@
         return -1;
 
     i_currentTime = var_GetInteger(p_input, "time");
-    vlc_object_release(p_input);
+    input_Release(p_input);
 
     return (int)SEC_FROM_VLC_TICK(i_currentTime);
 }
@@ -247,7 +247,7 @@
 
         input_SetTime(p_input, vlc_tick_from_sec(i64_value),
                       var_GetBool(p_input, "input-fast-seek"));
-        vlc_object_release(p_input);
+        input_Release(p_input);
     }
 }
 
@@ -277,7 +277,7 @@
     /* fetch data */
     int coreret = input_Control(p_input_thread, INPUT_GET_FULL_TITLE_INFO,
                                 &p_input_title, &count);
-    vlc_object_release(p_input_thread);
+    input_Release(p_input_thread);
 
     if (coreret != VLC_SUCCESS)
         return NO;

@@ -63,7 +63,7 @@ static vout_thread_t **GetVouts( libvlc_media_player_t *p_mi, size_t *n )
         *n = 0;
         pp_vouts = NULL;
     }
-    vlc_object_release (p_input);
+    input_Release(p_input);
     return pp_vouts;
 }
 
@@ -292,10 +292,10 @@ int libvlc_video_update_viewpoint( libvlc_media_player_t *p_mi,
         if( input_UpdateViewpoint( p_input_thread, &update,
                                    b_absolute ) != VLC_SUCCESS )
         {
-            vlc_object_release( p_input_thread );
+            input_Release(p_input_thread);
             return -1;
         }
-        vlc_object_release( p_input_thread );
+        input_Release(p_input_thread);
         return 0;
     }
 
@@ -326,7 +326,7 @@ int libvlc_video_get_spu( libvlc_media_player_t *p_mi )
     }
 
     int i_spu = var_GetInteger( p_input_thread, "spu-es" );
-    vlc_object_release( p_input_thread );
+    input_Release(p_input_thread);
     return i_spu;
 }
 
@@ -339,7 +339,7 @@ int libvlc_video_get_spu_count( libvlc_media_player_t *p_mi )
         return 0;
 
     i_spu_count = var_CountChoices( p_input_thread, "spu-es" );
-    vlc_object_release( p_input_thread );
+    input_Release(p_input_thread);
     return i_spu_count;
 }
 
@@ -373,7 +373,7 @@ int libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu )
     }
     libvlc_printerr( "Track identifier not found" );
 end:
-    vlc_object_release (p_input_thread);
+    input_Release(p_input_thread);
     free(list);
     return i_ret;
 }
@@ -386,7 +386,7 @@ int64_t libvlc_video_get_spu_delay( libvlc_media_player_t *p_mi )
     if( p_input_thread )
     {
         val = US_FROM_VLC_TICK( var_GetInteger( p_input_thread, "spu-delay" ) );
-        vlc_object_release( p_input_thread );
+        input_Release(p_input_thread);
     }
     else
     {
@@ -405,7 +405,7 @@ int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi,
     if( p_input_thread )
     {
         var_SetInteger( p_input_thread, "spu-delay", VLC_TICK_FROM_US( i_delay ) );
-        vlc_object_release( p_input_thread );
+        input_Release(p_input_thread);
         ret = 0;
     }
     else
@@ -503,7 +503,7 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
 
     if( var_CountChoices( p_input_thread, "teletext-es" ) <= 0 )
     {
-        vlc_object_release( p_input_thread );
+        input_Release(p_input_thread);
         return;
     }
 
@@ -531,7 +531,7 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
         else
             libvlc_printerr("Key action sent while the teletext is disabled");
     }
-    vlc_object_release( p_input_thread );
+    input_Release(p_input_thread);
 }
 
 int libvlc_video_get_track_count( libvlc_media_player_t *p_mi )
@@ -544,7 +544,7 @@ int libvlc_video_get_track_count( libvlc_media_player_t *p_mi )
 
     i_track_count = var_CountChoices( p_input_thread, "video-es" );
 
-    vlc_object_release( p_input_thread );
+    input_Release(p_input_thread);
     return i_track_count;
 }
 
@@ -562,7 +562,7 @@ int libvlc_video_get_track( libvlc_media_player_t *p_mi )
         return -1;
 
     int id = var_GetInteger( p_input_thread, "video-es" );
-    vlc_object_release( p_input_thread );
+    input_Release(p_input_thread);
     return id;
 }
 
@@ -591,7 +591,7 @@ int libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track )
     libvlc_printerr( "Track identifier not found" );
 end:
     free(val_list);
-    vlc_object_release( p_input_thread );
+    input_Release(p_input_thread);
     return i_ret;
 }
 

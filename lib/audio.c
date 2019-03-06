@@ -348,7 +348,7 @@ int libvlc_audio_get_track_count( libvlc_media_player_t *p_mi )
 
     i_track_count = var_CountChoices( p_input_thread, "audio-es" );
 
-    vlc_object_release( p_input_thread );
+    input_Release(p_input_thread);
     return i_track_count;
 }
 
@@ -371,7 +371,7 @@ int libvlc_audio_get_track( libvlc_media_player_t *p_mi )
         return -1;
 
     int id = var_GetInteger( p_input_thread, "audio-es" );
-    vlc_object_release( p_input_thread );
+    input_Release(p_input_thread);
     return id;
 }
 
@@ -403,7 +403,7 @@ int libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track )
     libvlc_printerr( "Track identifier not found" );
 end:
     free( val_list );
-    vlc_object_release( p_input_thread );
+    input_Release(p_input_thread);
     return i_ret;
 }
 
@@ -451,7 +451,7 @@ int64_t libvlc_audio_get_delay( libvlc_media_player_t *p_mi )
     if( p_input_thread != NULL )
     {
       val = US_FROM_VLC_TICK( var_GetInteger( p_input_thread, "audio-delay" ) );
-      vlc_object_release( p_input_thread );
+      input_Release(p_input_thread);
     }
     return val;
 }
@@ -466,7 +466,7 @@ int libvlc_audio_set_delay( libvlc_media_player_t *p_mi, int64_t i_delay )
     if( p_input_thread != NULL )
     {
       var_SetInteger( p_input_thread, "audio-delay", VLC_TICK_FROM_US( i_delay ) );
-      vlc_object_release( p_input_thread );
+      input_Release(p_input_thread);
     }
     else
     {

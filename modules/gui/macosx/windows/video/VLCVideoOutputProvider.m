@@ -511,7 +511,7 @@ int WindowOpen(vout_window_t *p_wnd)
 
             }
             if (p_input)
-                vlc_object_release(p_input);
+                input_Release(p_input);
         } else {
             // leaving fullscreen is always allowed
             [o_current_window leaveFullscreenWithAnimation:YES];

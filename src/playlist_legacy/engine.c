@@ -353,7 +353,7 @@ input_thread_t *playlist_CurrentInputLocked( playlist_t *p_playlist )
 
     input_thread_t *p_input = pl_priv(p_playlist)->p_input;
     if( p_input != NULL )
-        vlc_object_hold( p_input );
+        input_Hold( p_input );
     return p_input;
 }
 

@@ -437,7 +437,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
         msg_Dbg( getIntf(), "new input %p detected", (void *)pInput );
 
         getIntf()->p_sys->p_input = pInput;
-        vlc_object_hold( pInput );
+        input_Hold(pInput);
 
         // update global variables pertaining to this input
         update_current_input();
@@ -535,7 +535,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
             var_DelCallback( pInput, "bit-rate", onGenericCallback, this );
             var_DelCallback( pInput, "sample-rate", onGenericCallback, this );
             var_DelCallback( pInput, "can-record" , onGenericCallback, this );
-            vlc_object_release( pInput );
+            input_Release(pInput);
             getIntf()->p_sys->p_input = NULL;
             reset_input();
             break;

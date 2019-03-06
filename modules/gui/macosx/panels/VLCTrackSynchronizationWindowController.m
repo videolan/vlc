@@ -123,7 +123,7 @@
         var_SetInteger(p_input, "spu-delay", 0);
         var_SetFloat(p_input, "sub-fps", 1.0);
         [self svDurationValueChanged:nil];
-        vlc_object_release(p_input);
+        input_Release(p_input);
     }
 }
 
@@ -135,7 +135,7 @@
         [_av_advanceTextField setDoubleValue: secf_from_vlc_tick(var_GetInteger(p_input, "audio-delay"))];
         [_sv_advanceTextField setDoubleValue: secf_from_vlc_tick(var_GetInteger(p_input, "spu-delay"))];
         [_sv_speedTextField setFloatValue: var_GetFloat(p_input, "sub-fps")];
-        vlc_object_release(p_input);
+        input_Release(p_input);
     }
     [_avStepper setDoubleValue: [_av_advanceTextField doubleValue]];
     [_sv_advanceStepper setDoubleValue: [_sv_advanceTextField doubleValue]];
@@ -153,7 +153,7 @@
 
     if (p_input) {
         var_SetInteger(p_input, "audio-delay", vlc_tick_from_sec([_av_advanceTextField doubleValue]));
-        vlc_object_release(p_input);
+        input_Release(p_input);
     }
 }
 
@@ -168,7 +168,7 @@
 
     if (p_input) {
         var_SetInteger(p_input, "spu-delay", vlc_tick_from_sec([_sv_advanceTextField doubleValue]));
-        vlc_object_release(p_input);
+        input_Release(p_input);
     }
 }
 
@@ -183,7 +183,7 @@
 
     if (p_input) {
         var_SetFloat(p_input, "sub-fps", [_sv_speedTextField floatValue]);
-        vlc_object_release(p_input);
+        input_Release(p_input);
     }
 }
 
@@ -209,7 +209,7 @@
             }
         [VLCVideoFilterHelper setVideoFilter: "subsdelay" on: f_factor > 0];
 
-        vlc_object_release(p_input);
+        input_Release(p_input);
     }
 }
 

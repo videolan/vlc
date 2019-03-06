@@ -53,7 +53,7 @@ input_thread_t * vlclua_get_input_internal( lua_State *L )
         input_thread_t *p_input = p_extension->p_sys->p_input;
         if( p_input )
         {
-            vlc_object_hold(p_input);
+            input_Hold(p_input);
             return p_input;
         }
     }
@@ -92,7 +92,7 @@ static int vlclua_input_is_playing( lua_State *L )
     input_thread_t * p_input = vlclua_get_input_internal( L );
     lua_pushboolean( L, !!p_input );
     if( p_input )
-        vlc_object_release( p_input );
+        input_Release(p_input);
     return 1;
 }
 
@@ -222,7 +222,7 @@ static int vlclua_input_add_subtitle( lua_State *L, bool b_path )
         return luaL_error( L, "can't add subtitle: no current input" );
     if( !lua_isstring( L, 1 ) )
     {
-        vlc_object_release( p_input );
+        input_Release(p_input);
         return luaL_error( L, "vlc.input.add_subtitle() usage: (path)" );
     }
     if( lua_gettop( L ) >= 2 )
@@ -239,7 +239,7 @@ static int vlclua_input_add_subtitle( lua_State *L, bool b_path )
             free( psz_mrl );
         }
     }
-    vlc_object_release( p_input );
+    input_Release(p_input);
     return 1;
 }
 
@@ -290,13 +290,15 @@ static int vlclua_input_item_get_current( lua_State *L )
     if( !p_item )
     {
         lua_pushnil( L );
-        if( p_input ) vlc_object_release( p_input );
+        if (p_input != NULL)
+            input_Release(p_input);
         return 1;
     }
 
     vlclua_input_item_get( L, p_item );
 
-    if( p_input ) vlc_object_release( p_input );
+    if (p_input != NULL)
+        input_Release(p_input);
     return 1;
 }
 

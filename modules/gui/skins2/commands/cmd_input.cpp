@@ -35,7 +35,7 @@ void CmdPlay::execute()
     if( pInput )
     {
         var_SetFloat( getPL(), "rate", 1.0 );
-        vlc_object_release( pInput );
+        input_Release(pInput);
     }
 
     playlist_Lock( pPlaylist );

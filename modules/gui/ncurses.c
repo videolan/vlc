@@ -1747,7 +1747,7 @@ static void *Run(void *data)
         Redraw(intf, input);
         HandleKey(intf, input);
         if (input)
-            vlc_object_release(input);
+            input_Release(input);
         vlc_restorecancel(canc);
     }
     vlc_assert_unreachable();

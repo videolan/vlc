@@ -101,7 +101,7 @@ vlc_intf_GetMainPlaylist(intf_thread_t *intf);
 
 /**
  * Retrieves the current input thread from the playlist.
- * @note The returned object must be released with vlc_object_release().
+ * @note The returned object must be released with input_Release().
  */
 #define pl_CurrentInput(intf) (playlist_CurrentInput(pl_Get(intf)))
 

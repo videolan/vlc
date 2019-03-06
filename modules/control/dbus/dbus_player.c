@@ -51,7 +51,7 @@ MarshalPosition( intf_thread_t *p_intf, DBusMessageIter *container )
     else
     {
         i_pos = US_FROM_VLC_TICK(var_GetInteger( p_input, "time" ));
-        vlc_object_release( p_input );
+        input_Release(p_input);
     }
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_INT64, &i_pos ) )
@@ -99,7 +99,7 @@ DBUS_METHOD( SetPosition )
     if( input != NULL )
     {
         var_SetInteger( input, "time", VLC_TICK_FROM_US(i_pos) );
-        vlc_object_release( input );
+        input_Release(input);
     }
 
     REPLY_SEND;
@@ -133,7 +133,7 @@ DBUS_METHOD( Seek )
     }
 
     if( p_input )
-        vlc_object_release( p_input );
+        input_Release(p_input);
 
     REPLY_SEND;
 }
@@ -286,7 +286,7 @@ MarshalCanPause( intf_thread_t *p_intf, DBusMessageIter *container )
     if( p_input )
     {
         b_can_pause = var_GetBool( p_input, "can-pause" );
-        vlc_object_release( p_input );
+        input_Release(p_input);
     }
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
@@ -318,7 +318,7 @@ MarshalCanSeek( intf_thread_t *p_intf, DBusMessageIter *container )
     if( p_input )
     {
         b_can_seek = var_GetBool( p_input, "can-seek" );
-        vlc_object_release( p_input );
+        input_Release(p_input);
     }
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
@@ -374,7 +374,7 @@ MarshalPlaybackStatus( intf_thread_t *p_intf, DBusMessageIter *container )
                 psz_playback_status = PLAYBACK_STATUS_STOPPED;
         }
 
-        vlc_object_release( (vlc_object_t*) p_input );
+        input_Release(p_input);
     }
     else
         psz_playback_status = PLAYBACK_STATUS_STOPPED;
@@ -395,7 +395,7 @@ MarshalRate( intf_thread_t *p_intf, DBusMessageIter *container )
     if( p_input != NULL )
     {
         d_rate = var_GetFloat( p_input, "rate" );
-        vlc_object_release( (vlc_object_t*) p_input );
+        input_Release(p_input);
     }
     else
         d_rate = 1.0;
@@ -420,7 +420,7 @@ DBUS_METHOD( RateSet )
     if( p_input != NULL )
     {
         var_SetFloat( p_input, "rate", (float) d_rate );
-        vlc_object_release( (vlc_object_t*) p_input );
+        input_Release(p_input);
     }
     else
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -547,7 +547,7 @@ DBUS_SIGNAL( SeekedSignal )
     if( p_input )
     {
         i_pos = US_FROM_VLC_TICK(var_GetInteger( p_input, "time" ));
-        vlc_object_release( p_input );
+        input_Release(p_input);
     }
 
     ADD_INT64( &i_pos );

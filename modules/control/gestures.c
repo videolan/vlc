@@ -201,7 +201,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
             int it = var_InheritInteger( p_intf , "short-jump-size" );
             if( it > 0 )
                 var_SetInteger( p_input, "time-offset", vlc_tick_from_sec( -it ) );
-            vlc_object_release( p_input );
+            input_Release(p_input);
             break;
         }
 
@@ -216,7 +216,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
             int it = var_InheritInteger( p_intf , "short-jump-size" );
             if( it > 0 )
                 var_SetInteger( p_input, "time-offset", vlc_tick_from_sec( it ) );
-            vlc_object_release( p_input );
+            input_Release(p_input);
             break;
         }
 
@@ -242,7 +242,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
             int i_state = var_GetInteger( p_input, "state" );
             i_state = (i_state == PLAYING_S) ? PAUSE_S : PLAYING_S;
             var_SetInteger( p_input, "state", i_state );
-            vlc_object_release( p_input );
+            input_Release(p_input);
             break;
         }
 
@@ -304,7 +304,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
                 var_SetInteger( p_input, "audio-es", list[i].i_int );
             }
             free(list);
-            vlc_object_release( p_input );
+            input_Release(p_input);
             break;
         }
 
@@ -342,7 +342,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
                 var_SetInteger( p_input, "audio-es", list[i].i_int );
             }
             free(list);
-            vlc_object_release( p_input );
+            input_Release(p_input);
             break;
         }
 

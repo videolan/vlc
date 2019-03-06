@@ -628,7 +628,7 @@ static const float f_min_window_height = 307.;
             [self setRepresentedURL: nil];
         }
 
-        vlc_object_release(p_input);
+        input_Release(p_input);
     } else {
         [self setTitle: _NS("VLC media player")];
         [self setRepresentedURL: nil];
@@ -650,7 +650,7 @@ static const float f_min_window_height = 307.;
         /* seekable streams */
         b_seekable = var_GetBool(p_input, "can-seek");
 
-        vlc_object_release(p_input);
+        input_Release(p_input);
     }
 
     if ([self.fspanel respondsToSelector:@selector(setSeekable:)])

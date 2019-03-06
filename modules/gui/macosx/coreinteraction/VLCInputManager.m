@@ -197,7 +197,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         [self storePlaybackPositionForItem:p_current_input];
 
         var_DelCallback(p_current_input, "intf-event", InputEvent, (__bridge void *)self);
-        vlc_object_release(p_current_input);
+        input_Release(p_current_input);
         p_current_input = NULL;
     }
 
@@ -212,7 +212,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 {
     if (p_current_input) {
         var_DelCallback(p_current_input, "intf-event", InputEvent, (__bridge void *)self);
-        vlc_object_release(p_current_input);
+        input_Release(p_current_input);
         p_current_input = NULL;
 
         [[o_main mainMenu] setRateControlsEnabled: NO];
@@ -237,7 +237,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
             [[o_main mainWindow] changePlaylistState: psPlaylistItemChangedEvent];
         }
 
-        p_input_changed = vlc_object_hold(p_current_input);
+        p_input_changed = input_Hold(p_current_input);
 
 //        [[o_main playlist] currentlyPlayingItemChanged];
 
@@ -261,7 +261,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     dispatch_async(informInputChangedQueue, ^{
         [[self->o_main extensionsManager] inputChanged:p_input_changed];
         if (p_input_changed)
-            vlc_object_release(p_input_changed);
+            input_Release(p_input_changed);
     });
 }
 

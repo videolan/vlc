@@ -299,7 +299,7 @@ static void ChangeInput( intf_thread_t *p_intf, input_thread_t *p_input )
 
     /* Replace input and vout locked */
     vlc_mutex_lock( &p_sys->lock );
-    p_sys->p_input = p_input ? vlc_object_hold( p_input ) : NULL;
+    p_sys->p_input = p_input ? input_Hold(p_input) : NULL;
     p_sys->p_vout = NULL;
     p_sys->vrnav.b_can_change = false;
     vlc_mutex_unlock( &p_sys->lock );
@@ -309,7 +309,7 @@ static void ChangeInput( intf_thread_t *p_intf, input_thread_t *p_input )
     {
         if( p_old_vout != NULL )
             vlc_object_release( p_old_vout );
-        vlc_object_release( p_old_input );
+        input_Release(p_old_input);
     }
 
     /* Register input events */
@@ -1444,7 +1444,7 @@ static int ActionEvent( vlc_object_t *libvlc, char const *psz_var,
     (void)oldval;
 
     vlc_mutex_lock( &p_intf->p_sys->lock );
-    input_thread_t *p_input = p_sys->p_input ? vlc_object_hold( p_sys->p_input )
+    input_thread_t *p_input = p_sys->p_input ? input_Hold(p_sys->p_input)
                                              : NULL;
     vout_thread_t *p_vout = p_sys->p_vout ? vlc_object_hold( p_sys->p_vout )
                                           : NULL;
@@ -1456,7 +1456,7 @@ static int ActionEvent( vlc_object_t *libvlc, char const *psz_var,
                            newval.i_int );
 
     if( p_input != NULL )
-        vlc_object_release( p_input );
+        input_Release(p_input);
     if( p_vout != NULL )
         vlc_object_release( p_vout );
 

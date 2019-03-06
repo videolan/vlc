@@ -306,7 +306,7 @@ static void Close   ( vlc_object_t *p_this )
         var_DelCallback( p_sys->p_input, "intf-event", InputCallback, p_intf );
         var_DelCallback( p_sys->p_input, "can-pause", AllCallback, p_intf );
         var_DelCallback( p_sys->p_input, "can-seek", AllCallback, p_intf );
-        vlc_object_release( p_sys->p_input );
+        input_Release(p_sys->p_input);
     }
 
     /* The dbus connection is private, so we are responsible
@@ -592,7 +592,7 @@ static void ProcessEvents( intf_thread_t *p_intf,
             if( p_input )
             {
                 p_item = input_GetItem( p_input );
-                vlc_object_release( p_input );
+                input_Release(p_input);
 
                 if( p_item )
                     vlc_dictionary_insert( &player_properties,
@@ -1080,7 +1080,7 @@ static int TrackChange( intf_thread_t *p_intf )
         var_DelCallback( p_sys->p_input, "intf-event", InputCallback, p_intf );
         var_DelCallback( p_sys->p_input, "can-pause", AllCallback, p_intf );
         var_DelCallback( p_sys->p_input, "can-seek", AllCallback, p_intf );
-        vlc_object_release( p_sys->p_input );
+        input_Release(p_sys->p_input);
         p_sys->p_input = NULL;
     }
 
@@ -1095,7 +1095,7 @@ static int TrackChange( intf_thread_t *p_intf )
     p_item = input_GetItem( p_input );
     if( !p_item )
     {
-        vlc_object_release( p_input );
+        input_Release(p_input);
         return VLC_EGENERIC;
     }
 

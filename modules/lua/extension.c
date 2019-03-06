@@ -592,11 +592,10 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
                                       p_ext );
                     input_item_Release( p_item );
                 }
-                vlc_object_release( old );
+                input_Release(old);
             }
 
-            p_ext->p_sys->p_input = p_input ? vlc_object_hold( p_input )
-                                            : p_input;
+            p_ext->p_sys->p_input = p_input ? input_Hold(p_input) : NULL;
 
             // Tell the script the input changed
             if( p_ext->p_sys->i_capabilities & EXT_INPUT_LISTENER )
@@ -669,7 +668,7 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
             input_item_t *p_item = input_GetItem( p_ext->p_sys->p_input );
             input_item_Release( p_item );
         }
-        vlc_object_release( p_ext->p_sys->p_input );
+        input_Release(p_ext->p_sys->p_input);
         p_ext->p_sys->p_input = NULL;
     }
 

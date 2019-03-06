@@ -38,7 +38,7 @@ static inline vout_thread_t *getVout(void)
     if (!p_input)
         return NULL;
     vout_thread_t *p_vout = input_GetVout(p_input);
-    vlc_object_release(p_input);
+    input_Release(p_input);
     return p_vout;
 }
 

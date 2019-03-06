@@ -184,7 +184,7 @@ void EpgDialog::updateInfos()
         p_input_item = input_GetItem( p_input_thread );
         if ( p_input_item ) input_item_Hold( p_input_item );
         PL_UNLOCK;
-        vlc_object_release( p_input_thread );
+        input_Release( p_input_thread );
         if ( p_input_item )
         {
             epg->updateEPG( p_input_item );

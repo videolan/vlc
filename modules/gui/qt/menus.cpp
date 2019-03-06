@@ -1531,7 +1531,7 @@ void VLCMenuBar::DoAction( QObject *data )
         if( input != NULL )
         {
             vout_thread_t *vout = input_GetVout( input );
-            vlc_object_release( input );
+            input_Release(input);
             if( vout != NULL )
             {
                 var_Set( vout, var, val ); /* never void class */
