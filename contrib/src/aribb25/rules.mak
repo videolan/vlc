@@ -4,7 +4,9 @@ ARIBB25_VERSION := 0.2.7
 ARIBB25_URL := $(VIDEOLAN)/aribb25/$(ARIBB25_VERSION)/aribb25-$(ARIBB25_VERSION).tar.gz
 
 ifdef HAVE_WIN32
+ifndef HAVE_WINSTORE
 PKGS += aribb25
+endif
 endif
 ifeq ($(call need_pkg,"pcslite"),)
 PKGS += aribb25
