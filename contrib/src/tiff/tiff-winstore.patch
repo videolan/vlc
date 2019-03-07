@@ -1,0 +1,41 @@
+--- tiff/libtiff/tif_win32.c.winstore	2019-03-07 11:51:43.944778200 +0100
++++ tiff/libtiff/tif_win32.c	2019-03-07 11:58:04.931465200 +0100
+@@ -56,6 +56,7 @@
+ #include "tiffiop.h"
+ 
+ #include <windows.h>
++#include <winapifamily.h>
+ 
+ static tmsize_t
+ _tiffReadProc(thandle_t fd, void* buf, tmsize_t size)
+@@ -181,6 +182,7 @@ _tiffDummyMapProc(thandle_t fd, void** p
+ static int
+ _tiffMapProc(thandle_t fd, void** pbase, toff_t* psize)
+ {
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	uint64 size;
+ 	tmsize_t sizem;
+ 	HANDLE hMapFile;
+@@ -201,6 +203,9 @@ _tiffMapProc(thandle_t fd, void** pbase,
+ 		return (0);
+ 	*psize = size;
+ 	return(1);
++#else
++	return(0);
++#endif
+ }
+ 
+ static void
+@@ -235,8 +240,12 @@ TIFFFdOpen(int ifd, const char* name, co
+ 	{
+ 		if (mode[m]=='u')
+ 		{
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 			fSuppressMap=1;
+ 			break;
++#else
++			return NULL;
++#endif
+ 		}
+ 	}
+ 	tif = TIFFClientOpen(name, mode, (thandle_t)ifd, /* FIXME: WIN64 cast to pointer warning */
