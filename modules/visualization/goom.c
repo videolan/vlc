@@ -100,6 +100,7 @@ typedef struct
 } goom_thread_t;
 
 static block_t *DoWork ( filter_t *, block_t * );
+static void Flush( filter_t * );
 
 static void *Thread( void * );
 
@@ -156,6 +157,7 @@ static int Open( vlc_object_t *p_this )
     p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     p_filter->pf_audio_filter = DoWork;
+    p_filter->pf_flush = Flush;
     return VLC_SUCCESS;
 }
 
@@ -192,6 +194,12 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     vlc_mutex_unlock( &p_thread->lock );
 
     return p_in_buf;
+}
+
+static void Flush( filter_t *p_filter )
+{
+    goom_thread_t *p_thread = p_filter->p_sys;
+    vout_FlushAll( p_thread->p_vout );
 }
 
 /*****************************************************************************
