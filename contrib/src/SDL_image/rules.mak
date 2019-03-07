@@ -20,8 +20,10 @@ SDL_image: SDL_image-$(SDL_IMAGE_VERSION).tar.gz .sum-SDL_image
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
-DEPS_SDL_image = jpeg $(DEPS_jpeg) tiff $(DEPS_tiff) \
-	sdl $(DEPS_sdl)
+DEPS_SDL_image = jpeg $(DEPS_jpeg) tiff $(DEPS_tiff)
+ifndef HAVE_WINSTORE
+DEPS_SDL_image += sdl $(DEPS_sdl)
+endif
 
 .SDL_image: SDL_image
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-tif --disable-sdltest --disable-png
