@@ -6,7 +6,9 @@ X265_SNAPURL := https://bitbucket.org/multicoreware/x265/get/$(X265_VERSION).tar
 
 ifdef BUILD_ENCODERS
 ifdef GPL
+ifndef HAVE_WINSTORE
 PKGS += x265
+endif
 endif
 endif
 
