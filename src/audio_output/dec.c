@@ -46,6 +46,7 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
 {
     assert(p_aout);
     assert(p_format);
+    assert(clock);
     if( p_format->i_bitspersample > 0 )
     {
         /* Sanitize audio format, input need to have a valid physical channels
@@ -228,7 +229,7 @@ static void aout_DecSilence (audio_output_t *aout, vlc_tick_t length, vlc_tick_t
     block->i_length = length;
 
     const vlc_tick_t system_now = vlc_tick_now();
-    const vlc_tick_t system_pts = !owner->sync.clock ? pts :
+    const vlc_tick_t system_pts =
        vlc_clock_ConvertToSystem(owner->sync.clock, system_now, pts,
                                  owner->sync.rate);
     aout->play(aout, block, system_pts);
@@ -259,7 +260,7 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t system_now,
     if (aout->time_get(aout, &delay) != 0)
         return; /* nothing can be done if timing is unknown */
 
-    if (owner->sync.discontinuity && owner->sync.clock)
+    if (owner->sync.discontinuity)
     {
         /* Chicken-egg situation for most aout modules that can't be started
          * deferred (all except PulseAudio). These modules will start to play
@@ -290,7 +291,7 @@ void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
 {
     aout_owner_t *owner = aout_owner (aout);
     float rate = owner->sync.rate;
-    vlc_tick_t drift = !owner->sync.clock ? system_ts - audio_ts :
+    vlc_tick_t drift =
         -vlc_clock_Update(owner->sync.clock, system_ts, audio_ts, rate);
 
     /* Late audio output.
@@ -429,7 +430,7 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     aout_volume_Amplify (owner->volume, block);
 
     /* Update delay */
-    if (owner->sync.clock && owner->sync.request_delay != owner->sync.delay)
+    if (owner->sync.request_delay != owner->sync.delay)
     {
         owner->sync.delay = owner->sync.request_delay;
         vlc_tick_t delta = vlc_clock_SetDelay(owner->sync.clock, owner->sync.delay);
@@ -442,7 +443,7 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     vlc_tick_t system_now = vlc_tick_now();
     aout_DecSynchronize(aout, system_now, original_pts);
 
-    const vlc_tick_t play_date = !owner->sync.clock ? original_pts :
+    const vlc_tick_t play_date =
         vlc_clock_ConvertToSystem(owner->sync.clock, system_now, original_pts,
                                   owner->sync.rate);
     /* Output */
@@ -513,13 +514,10 @@ void aout_DecFlush (audio_output_t *aout, bool wait)
             aout_FiltersFlush (owner->filters);
 
         aout->flush(aout, wait);
-        if (owner->sync.clock)
-        {
-            vlc_clock_Reset(owner->sync.clock);
-            aout_FiltersResetClock(owner->filters);
-        }
+        vlc_clock_Reset(owner->sync.clock);
+        aout_FiltersResetClock(owner->filters);
 
-        if (owner->sync.clock && owner->sync.delay > 0)
+        if (owner->sync.delay > 0)
         {
             /* Also reset the delay in case of a positive delay. This will
              * trigger a silence playback before the next play. Consequently,
