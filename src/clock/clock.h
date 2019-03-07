@@ -31,6 +31,27 @@ typedef struct vlc_clock_main_t vlc_clock_main_t;
 typedef struct vlc_clock_t vlc_clock_t;
 
 /**
+ * Callbacks for the owner of the main clock
+ */
+struct vlc_clock_cbs
+{
+    /**
+     * Called when a clock is updated
+     *
+     * @param system_ts system date when the ts will be rendered,
+     * VLC_TICK_INVALID when the clock is reset or INT64_MAX when the update is
+     * forced (an output was still rendered while paused for example). Note:
+     * when valid, this date can be in the future, it is not necessarily now.
+     * @param ts stream timestamp or VLC_TICK_INVALID when the clock is reset,
+     * should be subtracted with VLC_TICK_0 to get the original value
+     * @param rate rate used when updated
+     * @param data opaque pointer set from vlc_clock_main_New()
+     */
+    void (*on_update)(vlc_tick_t system_ts, vlc_tick_t ts, double rate,
+                      void *data);
+};
+
+/**
  * This function creates the vlc_clock_main_t of the program
  */
 vlc_clock_main_t *vlc_clock_main_New(void);
@@ -72,14 +93,18 @@ void vlc_clock_main_SetMaster(vlc_clock_main_t *main_clock, vlc_clock_t *clock);
  *
  * You must use vlc_clock_Delete to free it.
  */
-vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock);
+vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
+                                         const struct vlc_clock_cbs *cbs,
+                                         void *cbs_data);
 
 /**
  * This function creates a new slave vlc_clock_t interface
  *
  * You must use vlc_clock_Delete to free it.
  */
-vlc_clock_t *vlc_clock_main_CreateSlave(vlc_clock_main_t *main_clock);
+vlc_clock_t *vlc_clock_main_CreateSlave(vlc_clock_main_t *main_clock,
+                                         const struct vlc_clock_cbs *cbs,
+                                         void *cbs_data);
 
 /**
  * This function creates a new slave vlc_clock_t interface

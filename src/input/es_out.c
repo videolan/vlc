@@ -2009,9 +2009,10 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
      && p_es->fmt.i_cat == p_sys->i_master_source_cat
      && p_es->p_pgrm->p_master_clock == NULL )
         p_es->p_pgrm->p_master_clock = p_es->p_clock =
-            vlc_clock_main_CreateMaster( p_es->p_pgrm->p_main_clock );
+            vlc_clock_main_CreateMaster( p_es->p_pgrm->p_main_clock, NULL, NULL );
     else
-        p_es->p_clock = vlc_clock_main_CreateSlave( p_es->p_pgrm->p_main_clock );
+        p_es->p_clock = vlc_clock_main_CreateSlave( p_es->p_pgrm->p_main_clock,
+                                                    NULL, NULL );
     if( !p_es->p_clock )
         return;
 
