@@ -63,10 +63,14 @@ typedef struct
 
     struct
     {
+        struct vlc_clock_t *clock;
         float rate; /**< Play-out speed rate */
         vlc_tick_t resamp_start_drift; /**< Resampler drift absolute value */
         int resamp_type; /**< Resampler mode (FIXME: redundant / resampling) */
         bool discontinuity;
+        vlc_tick_t request_delay;
+        vlc_tick_t delay;
+        vlc_tick_t first_pts;
     } sync;
     vlc_tick_t original_pts;
 
@@ -129,12 +133,13 @@ void aout_FormatsPrint(vlc_object_t *, const char *,
 #define AOUT_DEC_FAILED VLC_EGENERIC
 
 int aout_DecNew(audio_output_t *, const audio_sample_format_t *,
-                const audio_replay_gain_t *);
+                struct vlc_clock_t *clock, const audio_replay_gain_t *);
 void aout_DecDelete(audio_output_t *);
 int aout_DecPlay(audio_output_t *aout, block_t *block);
 void aout_DecGetResetStats(audio_output_t *, unsigned *, unsigned *);
 void aout_DecChangePause(audio_output_t *, bool b_paused, vlc_tick_t i_date);
 void aout_DecChangeRate(audio_output_t *aout, float rate);
+void aout_DecChangeDelay(audio_output_t *aout, vlc_tick_t delay);
 void aout_DecFlush(audio_output_t *, bool wait);
 void aout_RequestRestart (audio_output_t *, unsigned);
 void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,

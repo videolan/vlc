@@ -345,7 +345,7 @@ static int aout_update_format( decoder_t *p_dec )
             if( p_dec->fmt_out.i_codec == VLC_CODEC_DTS )
                 var_SetBool( p_aout, "dtshd", p_dec->fmt_out.i_profile > 0 );
 
-            if( aout_DecNew( p_aout, &format,
+            if( aout_DecNew( p_aout, &format, NULL,
                              &p_dec->fmt_out.audio_replay_gain ) )
             {
                 input_resource_PutAout( p_owner->p_resource, p_aout );
