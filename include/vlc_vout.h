@@ -119,6 +119,16 @@ VLC_API void vout_PutPicture( vout_thread_t *, picture_t * );
 VLC_API void vout_PutSubpicture( vout_thread_t *, subpicture_t * );
 VLC_API int vout_RegisterSubpictureChannel( vout_thread_t * );
 VLC_API void vout_FlushSubpictureChannel( vout_thread_t *, int );
+/**
+ * This function will ensure that all ready/displayed pictures have at most
+ * the provided date.
+ */
+VLC_API void vout_Flush( vout_thread_t *p_vout, vlc_tick_t i_date );
+
+/**
+ * Empty all the pending pictures in the vout
+ */
+#define vout_FlushAll( vout )  vout_Flush( vout, VLC_TICK_INVALID )
 
 /**@}*/
 

@@ -749,6 +749,7 @@ vout_PutPicture
 vout_PutSubpicture
 vout_RegisterSubpictureChannel
 vout_FlushSubpictureChannel
+vout_Flush
 vout_GetSnapshot
 vout_OSDIcon
 vout_OSDMessageVa

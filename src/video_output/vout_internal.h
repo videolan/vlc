@@ -304,17 +304,6 @@ void spu_OffsetSubtitleDate( spu_t *p_spu, vlc_tick_t i_duration );
 void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,
                              unsigned *pi_lost );
 
-/**
- * This function will ensure that all ready/displayed pictures have at most
- * the provided date.
- */
-void vout_Flush( vout_thread_t *p_vout, vlc_tick_t i_date );
-
-/**
- * Empty all the pending pictures in the vout
- */
-#define vout_FlushAll( vout )  vout_Flush( vout, VLC_TICK_INVALID )
-
 /*
  * Cancel the vout, if cancel is true, it won't return any pictures after this
  * call.
