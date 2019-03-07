@@ -28,7 +28,7 @@
 #include <vlc_codec.h>
 #include <vlc_mouse.h>
 
-decoder_t *input_DecoderNew( input_thread_t *, es_format_t *, input_clock_t *,
+decoder_t *input_DecoderNew( input_thread_t *, es_format_t *, vlc_clock_t *,
                              sout_instance_t * ) VLC_USED;
 
 /**
