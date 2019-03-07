@@ -95,7 +95,7 @@ struct es_out_id_t
 {
     vlc_es_id_t id;
 
-    /* weak reference, used by input_decoder_callbacks */
+    /* weak reference, used by input_decoder_callbacks and vlc_clock_cbs */
     es_out_t *out;
 
     /* ES ID */
@@ -121,6 +121,9 @@ struct es_out_id_t
     decoder_t   *p_dec;
     decoder_t   *p_dec_record;
     vlc_clock_t *p_clock;
+
+    /* Used by vlc_clock_cbs, need to be const during the lifetime of the clock */
+    bool master;
 
     vlc_tick_t delay;
 
@@ -1946,6 +1949,7 @@ static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
     es->p_dec = NULL;
     es->p_dec_record = NULL;
     es->p_clock = NULL;
+    es->master = false;
     es->cc.type = 0;
     es->cc.i_bitmap = 0;
     es->p_master = p_master;
@@ -1999,22 +2003,49 @@ static bool EsIsSelected( es_out_id_t *es )
         return es->p_dec != NULL;
     }
 }
+
+static void ClockUpdate(vlc_tick_t system_ts, vlc_tick_t ts, double rate,
+                        unsigned frame_rate, unsigned frame_rate_base,
+                        void *data)
+{
+    es_out_id_t *es = data;
+    es_out_sys_t *p_sys = container_of(es->out, es_out_sys_t, out);
+
+    input_SendEventOutputClock(p_sys->p_input, &es->id, es->master, system_ts,
+                               ts, rate, frame_rate, frame_rate_base);
+}
+
 static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t *p_input = p_sys->p_input;
     decoder_t *dec;
 
+    static const struct vlc_clock_cbs clock_cbs = {
+        .on_update = ClockUpdate
+    };
+
     if( p_es->fmt.i_cat != UNKNOWN_ES
      && p_es->fmt.i_cat == p_sys->i_master_source_cat
      && p_es->p_pgrm->p_master_clock == NULL )
+    {
+        p_es->master = true;
         p_es->p_pgrm->p_master_clock = p_es->p_clock =
-            vlc_clock_main_CreateMaster( p_es->p_pgrm->p_main_clock, NULL, NULL );
+            vlc_clock_main_CreateMaster( p_es->p_pgrm->p_main_clock,
+                                         &clock_cbs, p_es );
+    }
     else
+    {
+        p_es->master = false;
         p_es->p_clock = vlc_clock_main_CreateSlave( p_es->p_pgrm->p_main_clock,
-                                                    NULL, NULL );
+                                                    &clock_cbs, p_es );
+    }
+
     if( !p_es->p_clock )
+    {
+        p_es->master = false;
         return;
+    }
 
     input_thread_private_t *priv = input_priv(p_input);
     dec = input_DecoderNew( VLC_OBJECT(p_input), &p_es->fmt, p_es->p_clock,

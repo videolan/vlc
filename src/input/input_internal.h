@@ -90,6 +90,9 @@ typedef enum input_event_type_e
     /* At least one of "position", "time" "length" has changed */
     INPUT_EVENT_TIMES,
 
+    /* The output PTS changed */
+    INPUT_EVENT_OUTPUT_CLOCK,
+
     /* A title has been added or removed or selected.
      * It implies that the chapter has changed (no chapter event is sent) */
     INPUT_EVENT_TITLE,
@@ -152,6 +155,17 @@ struct vlc_input_event_times
     float percentage;
     vlc_tick_t ms;
     vlc_tick_t length;
+};
+
+struct vlc_input_event_output_clock
+{
+    vlc_es_id_t *id;
+    bool master;
+    vlc_tick_t system_ts;
+    vlc_tick_t ts;
+    double rate;
+    unsigned frame_rate;
+    unsigned frame_rate_base;
 };
 
 struct vlc_input_event_title
@@ -243,6 +257,8 @@ struct vlc_input_event
         int capabilities; /**< cf. VLC_INPUT_CAPABILITIES_* bitwise flags */
         /* INPUT_EVENT_TIMES */
         struct vlc_input_event_times times;
+        /* INPUT_EVENT_OUTPUT_CLOCK */
+        struct vlc_input_event_output_clock output_clock;
         /* INPUT_EVENT_TITLE */
         struct vlc_input_event_title title;
         /* INPUT_EVENT_CHAPTER */
