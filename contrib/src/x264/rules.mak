@@ -88,6 +88,7 @@ x264 x26410b: %: $(X264_BASENAME) .sum-%
 	mkdir -p $*-git
 	tar xvjfo "$<" --strip-components=1 -C $*-git
 	$(UPDATE_AUTOCONFIG)
+	$(APPLY) $(SRC)/x264/x264-winstore.patch
 	mv $*-git $*
 
 x262: x262-git.tar.gz .sum-x262
