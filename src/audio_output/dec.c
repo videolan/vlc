@@ -270,10 +270,8 @@ void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
         else
             msg_Dbg (aout, "playback too late (%"PRId64"): "
                      "flushing buffers", drift);
-        aout->flush(aout, false);
-
+        aout_DecFlush(aout, false);
         aout_StopResampling (aout);
-        owner->sync.discontinuity = true;
 
         return; /* nothing can be done if timing is unknown */
 }
