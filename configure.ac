@@ -1575,6 +1575,7 @@ asm volatile("punpckhqdq256 %%ymm1,%%ymm2"::"r"(p):"ymm1", "ymm2");
       ac_cv_avx2_inline=no
     ])
   ])
+  VLC_RESTORE_FLAGS
   AS_IF([test "${ac_cv_avx2_inline}" != "no" -a "${SYS}" != "solaris"], [
     AC_DEFINE(CAN_COMPILE_AVX2, 1, [Define to 1 if AVX2 inline assembly is available.])
     have_avx2="yes"
