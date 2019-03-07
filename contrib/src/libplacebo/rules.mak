@@ -6,7 +6,9 @@ PLACEBO_URL := https://code.videolan.org/videolan/libplacebo/-/archive/v$(PLACEB
 
 DEPS_libplacebo = glslang
 
+ifndef HAVE_WINSTORE
 PKGS += libplacebo
+endif
 ifeq ($(call need_pkg,"libplacebo"),)
 PKGS_FOUND += libplacebo
 endif
