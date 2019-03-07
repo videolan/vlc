@@ -844,7 +844,7 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool fra
             if (decoded) {
                 if (is_late_dropped && !decoded->b_force) {
                     const vlc_tick_t date = vlc_tick_now();
-                    const vlc_tick_t system_pts = !vout->p->clock ? decoded->date :
+                    const vlc_tick_t system_pts =
                         vlc_clock_ConvertToSystem(vout->p->clock, date,
                                                   decoded->date, sys->rate);
                     const vlc_tick_t late = date - system_pts;
@@ -978,7 +978,6 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         render_subtitle_date = sys->pause.date;
     else
         render_subtitle_date = filtered->date <= 1 ? system_now :
-            !sys->clock ? filtered->date :
             vlc_clock_ConvertToSystem(sys->clock, system_now, filtered->date,
                                       sys->rate);
 
@@ -1107,7 +1106,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
     system_now = vlc_tick_now();
     const vlc_tick_t pts = todisplay->date;
-    const vlc_tick_t system_pts = !sys->clock ? pts :
+    const vlc_tick_t system_pts =
         vlc_clock_ConvertToSystem(sys->clock, system_now, pts, sys->rate);
 
     if (vd->prepare != NULL)
@@ -1125,14 +1124,9 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
     if (!is_forced)
     {
-        if (sys->clock)
-        {
-            system_now = vlc_tick_now();
-            vlc_clock_Wait(sys->clock, system_now, pts, sys->rate,
-                           VOUT_REDISPLAY_DELAY);
-        }
-        else
-            vlc_tick_wait(pts);
+        system_now = vlc_tick_now();
+        vlc_clock_Wait(sys->clock, system_now, pts, sys->rate,
+                       VOUT_REDISPLAY_DELAY);
     }
 
     /* Display the direct buffer returned by vout_RenderPicture */
@@ -1140,7 +1134,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     if (subpic)
         subpicture_Delete(subpic);
 
-    if (!is_forced && sys->clock)
+    if (!is_forced)
     {
         system_now = vlc_tick_now();
         const vlc_tick_t drift = vlc_clock_Update(sys->clock, system_now,
@@ -1162,6 +1156,8 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
     bool paused = sys->pause.is_on;
     bool first = !sys->displayed.current;
 
+    assert(sys->clock);
+
     if (first)
         if (ThreadDisplayPreparePicture(vout, true, frame_by_frame)) /* FIXME not sure it is ok */
             return VLC_EGENERIC;
@@ -1177,7 +1173,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
     vlc_tick_t date_next = VLC_TICK_INVALID;
 
     if (!paused && sys->displayed.next) {
-        const vlc_tick_t next_system_pts = !sys->clock ? sys->displayed.next->date :
+        const vlc_tick_t next_system_pts =
             vlc_clock_ConvertToSystem(sys->clock, system_now,
                                       sys->displayed.next->date, sys->rate);
 
@@ -1234,23 +1230,9 @@ void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
     vout_control_Hold(&vout->p->control);
     assert(!vout->p->pause.is_on || !is_paused);
 
-    if (vout->p->pause.is_on) {
-        if (!vout->p->clock)
-        {
-            const vlc_tick_t duration = date - vout->p->pause.date;
-
-            if (vout->p->step.timestamp != VLC_TICK_INVALID)
-                vout->p->step.timestamp += duration;
-            if (vout->p->step.last != VLC_TICK_INVALID)
-                vout->p->step.last += duration;
-            picture_fifo_OffsetDate(vout->p->decoder_fifo, duration);
-            if (vout->p->displayed.decoded)
-                vout->p->displayed.decoded->date += duration;
-            spu_OffsetSubtitleDate(vout->p->spu, duration);
-        }
- 
+    if (vout->p->pause.is_on)
         ThreadFilterFlush(vout, false);
-    } else {
+    else {
         vout->p->step.timestamp = VLC_TICK_INVALID;
         vout->p->step.last      = VLC_TICK_INVALID;
     }
@@ -1287,11 +1269,8 @@ static void vout_FlushUnlocked(vout_thread_t *vout, bool below,
     picture_fifo_Flush(vout->p->decoder_fifo, date, below);
     vout_FilterFlush(vout->p->display);
 
-    if (vout->p->clock)
-    {
-        vlc_clock_Reset(vout->p->clock);
-        vlc_clock_SetDelay(vout->p->clock, vout->p->delay);
-    }
+    vlc_clock_Reset(vout->p->clock);
+    vlc_clock_SetDelay(vout->p->clock, vout->p->delay);
 
     vlc_mutex_lock(&vout->p->spu_lock);
     if (vout->p->spu)
@@ -1337,8 +1316,7 @@ void vout_ChangeDelay(vout_thread_t *vout, vlc_tick_t delay)
     vout_thread_sys_t *sys = vout->p;
 
     vout_control_Hold(&sys->control);
-    if (vout->p->clock)
-        vlc_clock_SetDelay(vout->p->clock, delay);
+    vlc_clock_SetDelay(vout->p->clock, delay);
     vout->p->delay = delay;
     vout_control_Release(&sys->control);
 }
@@ -1830,6 +1808,7 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
 
     assert(vout != NULL);
     assert(cfg->fmt != NULL);
+    assert(cfg->clock != NULL);
 
     if (!VoutCheckFormat(cfg->fmt))
         return -1;
