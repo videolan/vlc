@@ -44,6 +44,8 @@ int aout_DecNew(audio_output_t *p_aout,
                 const audio_sample_format_t *p_format,
                 const audio_replay_gain_t *p_replay_gain)
 {
+    assert(p_aout);
+    assert(p_format);
     if( p_format->i_bitspersample > 0 )
     {
         /* Sanitize audio format, input need to have a valid physical channels
