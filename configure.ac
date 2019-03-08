@@ -1659,7 +1659,7 @@ frobzor = (uint64_t)_mm256_extract_epi64(a, 0);]])], [
   AC_CACHE_CHECK([if $CC groks AVX inline assembly], [ac_cv_avx_inline], [
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
-asm volatile("xorps256 %%ymm1,%%ymm2"::"r"(p):"ymm1", "ymm2");
+asm volatile("vxorps %%ymm1,%%ymm2,%%ymm3"::"r"(p):"ymm1", "ymm2", "ymm3");
 ]])
     ], [
       ac_cv_avx_inline=yes
@@ -1675,7 +1675,7 @@ asm volatile("xorps256 %%ymm1,%%ymm2"::"r"(p):"ymm1", "ymm2");
   AC_CACHE_CHECK([if $CC groks AVX2 inline assembly], [ac_cv_avx2_inline], [
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
-asm volatile("punpckhqdq256 %%ymm1,%%ymm2"::"r"(p):"ymm1", "ymm2");
+asm volatile("vpunpckhqdq %%ymm1,%%ymm2,%%ymm3"::"r"(p):"ymm1", "ymm2", "ymm3");
 ]])
     ], [
       ac_cv_avx2_inline=yes
