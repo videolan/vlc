@@ -32,7 +32,8 @@ enum
     STATE_HEADER,
     STATE_NEXT_SYNC,
     STATE_GET_DATA,
-    STATE_SEND_DATA
+    STATE_SEND_DATA,
+    STATE_CUSTOM_FIRST,
 };
 
 typedef void (*packetizer_reset_t)( void *p_private, bool b_broken );
