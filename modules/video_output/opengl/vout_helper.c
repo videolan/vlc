@@ -104,6 +104,7 @@ struct prgm
         GLfloat YRotMatrix[16];
         GLfloat XRotMatrix[16];
         GLfloat ZoomMatrix[16];
+        GLfloat ViewMatrix[16];
     } var;
 
     struct { /* UniformLocation */
@@ -162,6 +163,7 @@ struct vout_display_opengl_t {
     bool supports_npot;
 
     /* View point */
+    vlc_viewpoint_t vp;
     float f_teta;
     float f_phi;
     float f_roll;
@@ -279,6 +281,9 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
         getXRotMatrix(vgl->f_phi, prgm->var.XRotMatrix);
         getZRotMatrix(vgl->f_roll, prgm->var.ZRotMatrix);
         getZoomMatrix(vgl->f_z, prgm->var.ZoomMatrix);
+
+        /* vgl->vp has been reversed and is a world transform */
+        vlc_viewpoint_to_4x4(&vgl->vp, prgm->var.ViewMatrix);
     }
     else
     {
@@ -288,6 +293,7 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
         memcpy(prgm->var.XRotMatrix, identity, sizeof(identity));
         memcpy(prgm->var.ZoomMatrix, identity, sizeof(identity));
     }
+
 }
 
 static void getOrientationTransformMatrix(video_orientation_t orientation,
@@ -1053,6 +1059,8 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
     vgl->f_phi  = RAD(p_vp->pitch);
     vgl->f_roll = RAD(p_vp->roll);
 
+    /* vgl->vp needs to be converted into world transform */
+    vlc_viewpoint_reverse(&vgl->vp, p_vp);
 
     if (fabsf(f_fovx - vgl->f_fovx) >= 0.001f)
     {
