@@ -63,6 +63,27 @@ static int AddIntfCallback( vlc_object_t *, char const *,
 static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
 /**
+ * Creates the playlist if necessary, and return a pointer to it.
+ * @note The playlist is not reference-counted. So the pointer is only valid
+ * until intf_DestroyAll() destroys interfaces.
+ */
+static playlist_t *intf_GetPlaylist(libvlc_int_t *libvlc)
+{
+    playlist_t *playlist;
+
+    vlc_mutex_lock(&lock);
+    playlist = libvlc_priv(libvlc)->playlist;
+    if (playlist == NULL)
+    {
+        playlist = playlist_Create(VLC_OBJECT(libvlc));
+        libvlc_priv(libvlc)->playlist = playlist;
+    }
+    vlc_mutex_unlock(&lock);
+
+    return playlist;
+}
+
+/**
  * Create and start an interface.
  *
  * @param playlist playlist and parent object for the interface
@@ -124,27 +145,6 @@ error:
     config_ChainDestroy( p_intf->p_cfg );
     vlc_object_delete(p_intf);
     return VLC_EGENERIC;
-}
-
-/**
- * Creates the playlist if necessary, and return a pointer to it.
- * @note The playlist is not reference-counted. So the pointer is only valid
- * until intf_DestroyAll() destroys interfaces.
- */
-static playlist_t *intf_GetPlaylist(libvlc_int_t *libvlc)
-{
-    playlist_t *playlist;
-
-    vlc_mutex_lock(&lock);
-    playlist = libvlc_priv(libvlc)->playlist;
-    if (playlist == NULL)
-    {
-        playlist = playlist_Create(VLC_OBJECT(libvlc));
-        libvlc_priv(libvlc)->playlist = playlist;
-    }
-    vlc_mutex_unlock(&lock);
-
-    return playlist;
 }
 
 static void
