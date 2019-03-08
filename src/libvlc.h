@@ -177,6 +177,7 @@ typedef struct vlc_keystore vlc_keystore;
 typedef struct vlc_actions_t vlc_actions_t;
 typedef struct vlc_playlist vlc_playlist_t;
 typedef struct vlc_media_source_provider_t vlc_media_source_provider_t;
+typedef struct intf_thread_t intf_thread_t;
 
 typedef struct libvlc_priv_t
 {
