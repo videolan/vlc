@@ -130,16 +130,16 @@ PlaylistConfigureFromVariables(vlc_playlist_t *playlist, vlc_object_t *obj)
 vlc_playlist_t *
 vlc_intf_GetMainPlaylist(intf_thread_t *intf)
 {
-    libvlc_priv_t *priv = libvlc_priv(vlc_object_instance(intf));
+    libvlc_int_t *libvlc = vlc_object_instance(intf);
+    libvlc_priv_t *priv = libvlc_priv(libvlc);
 
     vlc_mutex_lock(&lock);
     vlc_playlist_t *playlist = priv->main_playlist;
     if (priv->main_playlist == NULL)
     {
-        vlc_object_t *libvlc_obj = VLC_OBJECT(vlc_object_instance(intf));
-        playlist = priv->main_playlist = vlc_playlist_New(libvlc_obj);
+        playlist = priv->main_playlist = vlc_playlist_New(VLC_OBJECT(libvlc));
         if (playlist)
-            PlaylistConfigureFromVariables(playlist, libvlc_obj);
+            PlaylistConfigureFromVariables(playlist, VLC_OBJECT(libvlc));
     }
     vlc_mutex_unlock(&lock);
 
