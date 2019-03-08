@@ -112,8 +112,10 @@ unsigned vlc_CPU_raw(void);
 
 # ifdef __AVX__
 #  define vlc_CPU_AVX() (1)
+#  define VLC_AVX
 # else
 #  define vlc_CPU_AVX() ((vlc_CPU() & VLC_CPU_AVX) != 0)
+#  define VLC_AVX __attribute__ ((__target__ ("avx")))
 # endif
 
 # ifdef __AVX2__
