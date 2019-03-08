@@ -199,8 +199,8 @@ static int intf_CreateInternal( libvlc_int_t *libvlc, playlist_t *playlist,
     }
 
     vlc_mutex_lock( &lock );
-    p_intf->p_next = priv->interface;
-    priv->interface = p_intf;
+    p_intf->p_next = priv->interfaces;
+    priv->interfaces = p_intf;
     vlc_mutex_unlock( &lock );
 
     return VLC_SUCCESS;
@@ -317,7 +317,7 @@ void intf_DestroyAll(libvlc_int_t *libvlc)
     playlist = libvlc_priv(libvlc)->playlist;
     if (playlist != NULL)
     {
-        intf_thread_t *intf, **pp = &priv->interface;
+        intf_thread_t *intf, **pp = &priv->interfaces;
 
         while ((intf = *pp) != NULL)
         {
