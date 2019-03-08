@@ -152,7 +152,8 @@ static block_t * OutputQueues(decoder_sys_t *p_sys, bool b_valid)
             }
             block_ChainLastAppend(&pp_output_last, GetXPSCopy(p_sys));
         }
-        block_ChainLastAppend(&pp_output_last, p_sys->pre.p_chain);
+        if(p_sys->pre.p_chain)
+            block_ChainLastAppend(&pp_output_last, p_sys->pre.p_chain);
         INITQ(pre);
     }
 
