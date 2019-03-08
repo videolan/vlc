@@ -801,7 +801,7 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
         getXRotMatrix(f_phi, dst_data->RotX);
         getYRotMatrix(f_teta,   dst_data->RotY);
         getZRotMatrix(f_roll,  dst_data->RotZ);
-        getZoomMatrix(SPHERE_RADIUS * f_z, dst_data->View);
+        getZoomMatrix(SPHERE_RADIUS * f_z, dst_data->Zoom);
         getProjectionMatrix(f_sar, f_fovy, dst_data->Projection);
     }
     ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0);
