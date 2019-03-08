@@ -340,7 +340,7 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
         if( asprintf( &psz_temp, "%s,none", psz_module ) != -1 )
         {
             /* Try to create the interface */
-            if( intf_Create( pl_Get(p_intf), psz_temp ) )
+            if( intf_Create( vlc_object_instance(p_intf), psz_temp ) )
             {
                 msg_Err( p_intf, "interface \"%s\" initialization failed",
                          psz_temp );

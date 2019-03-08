@@ -83,15 +83,17 @@ static playlist_t *intf_GetPlaylist(libvlc_int_t *libvlc)
     return playlist;
 }
 
-/**
- * Create and start an interface.
- *
- * @param playlist playlist and parent object for the interface
- * @param chain configuration chain string
- * @return VLC_SUCCESS or an error code
- */
-int intf_Create( playlist_t *playlist, const char *chain )
+static int intf_CreateInternal( libvlc_int_t *libvlc, playlist_t *playlist,
+                                const char *chain )
 {
+    assert( !!libvlc != !!playlist );
+    if (!playlist)
+    {
+        playlist = intf_GetPlaylist(libvlc);
+        if (!playlist)
+            return VLC_EGENERIC;
+    }
+
     /* Allocate structure */
     intf_thread_t *p_intf = vlc_custom_create( playlist, sizeof( *p_intf ),
                                                "interface" );
@@ -145,6 +147,18 @@ error:
     config_ChainDestroy( p_intf->p_cfg );
     vlc_object_delete(p_intf);
     return VLC_EGENERIC;
+}
+
+/**
+ * Create and start an interface.
+ *
+ * @param playlist playlist and parent object for the interface
+ * @param chain configuration chain string
+ * @return VLC_SUCCESS or an error code
+ */
+int intf_Create( libvlc_int_t *libvlc, const char *chain )
+{
+    return intf_CreateInternal( libvlc, NULL, chain );
 }
 
 static void
@@ -267,7 +281,7 @@ int libvlc_InternalAddIntf(libvlc_int_t *libvlc, const char *name)
         ret = VLC_ENOMEM;
     else
     if (name != NULL)
-        ret = intf_Create(playlist, name);
+        ret = intf_CreateInternal(NULL, playlist, name);
     else
     {   /* Default interface */
         char *intf = var_InheritString(libvlc, "intf");
@@ -279,7 +293,7 @@ int libvlc_InternalAddIntf(libvlc_int_t *libvlc, const char *name)
                 msg_Info(libvlc, _("Running vlc with the default interface. "
                          "Use 'cvlc' to use vlc without interface."));
         }
-        ret = intf_Create(playlist, intf);
+        ret = intf_CreateInternal(NULL, playlist, intf);
         free(intf);
         name = "default";
     }
@@ -331,7 +345,7 @@ static int AddIntfCallback( vlc_object_t *obj, char const *var,
 {
     playlist_t *playlist = data;
 
-    int ret = intf_Create( playlist, cur.psz_string );
+    int ret = intf_CreateInternal( NULL, playlist, cur.psz_string );
     if( ret )
         msg_Err( obj, "interface \"%s\" initialization failed",
                  cur.psz_string );
