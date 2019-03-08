@@ -100,9 +100,6 @@ struct prgm
     struct {
         GLfloat OrientationMatrix[16];
         GLfloat ProjectionMatrix[16];
-        GLfloat ZRotMatrix[16];
-        GLfloat YRotMatrix[16];
-        GLfloat XRotMatrix[16];
         GLfloat ZoomMatrix[16];
         GLfloat ViewMatrix[16];
     } var;
@@ -110,9 +107,7 @@ struct prgm
     struct { /* UniformLocation */
         GLint OrientationMatrix;
         GLint ProjectionMatrix;
-        GLint ZRotMatrix;
-        GLint YRotMatrix;
-        GLint XRotMatrix;
+        GLint ViewMatrix;
         GLint ZoomMatrix;
     } uloc;
     struct { /* AttribLocation */
@@ -185,60 +180,6 @@ static const GLfloat identity[] = {
     0.0f, 0.0f, 0.0f, 1.0f
 };
 
-/* rotation around the Z axis */
-static void getZRotMatrix(float theta, GLfloat matrix[static 16])
-{
-    float st, ct;
-
-    sincosf(theta, &st, &ct);
-
-    const GLfloat m[] = {
-    /*  x    y    z    w */
-        ct,  -st, 0.f, 0.f,
-        st,  ct,  0.f, 0.f,
-        0.f, 0.f, 1.f, 0.f,
-        0.f, 0.f, 0.f, 1.f
-    };
-
-    memcpy(matrix, m, sizeof(m));
-}
-
-/* rotation around the Y axis */
-static void getYRotMatrix(float theta, GLfloat matrix[static 16])
-{
-    float st, ct;
-
-    sincosf(theta, &st, &ct);
-
-    const GLfloat m[] = {
-    /*  x    y    z    w */
-        ct,  0.f, -st, 0.f,
-        0.f, 1.f, 0.f, 0.f,
-        st,  0.f, ct,  0.f,
-        0.f, 0.f, 0.f, 1.f
-    };
-
-    memcpy(matrix, m, sizeof(m));
-}
-
-/* rotation around the X axis */
-static void getXRotMatrix(float phi, GLfloat matrix[static 16])
-{
-    float sp, cp;
-
-    sincosf(phi, &sp, &cp);
-
-    const GLfloat m[] = {
-    /*  x    y    z    w */
-        1.f, 0.f, 0.f, 0.f,
-        0.f, cp,  sp,  0.f,
-        0.f, -sp, cp,  0.f,
-        0.f, 0.f, 0.f, 1.f
-    };
-
-    memcpy(matrix, m, sizeof(m));
-}
-
 static void getZoomMatrix(float zoom, GLfloat matrix[static 16]) {
 
     const GLfloat m[] = {
@@ -277,9 +218,6 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
         || projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
     {
         getProjectionMatrix(vgl->f_sar, vgl->f_fovy, prgm->var.ProjectionMatrix);
-        getYRotMatrix(vgl->f_teta, prgm->var.YRotMatrix);
-        getXRotMatrix(vgl->f_phi, prgm->var.XRotMatrix);
-        getZRotMatrix(vgl->f_roll, prgm->var.ZRotMatrix);
         getZoomMatrix(vgl->f_z, prgm->var.ZoomMatrix);
 
         /* vgl->vp has been reversed and is a world transform */
@@ -288,10 +226,8 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
     else
     {
         memcpy(prgm->var.ProjectionMatrix, identity, sizeof(identity));
-        memcpy(prgm->var.ZRotMatrix, identity, sizeof(identity));
-        memcpy(prgm->var.YRotMatrix, identity, sizeof(identity));
-        memcpy(prgm->var.XRotMatrix, identity, sizeof(identity));
         memcpy(prgm->var.ZoomMatrix, identity, sizeof(identity));
+        memcpy(prgm->var.ViewMatrix, identity, sizeof(identity));
     }
 
 }
@@ -381,14 +317,13 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "attribute vec3 VertexPosition;\n"
         "uniform mat4 OrientationMatrix;\n"
         "uniform mat4 ProjectionMatrix;\n"
-        "uniform mat4 XRotMatrix;\n"
-        "uniform mat4 YRotMatrix;\n"
-        "uniform mat4 ZRotMatrix;\n"
         "uniform mat4 ZoomMatrix;\n"
+        "uniform mat4 ViewMatrix;\n"
         "void main() {\n"
         " TexCoord0 = vec4(OrientationMatrix * MultiTexCoord0).st;\n"
         "%s%s"
-        " gl_Position = ProjectionMatrix * ZoomMatrix * ZRotMatrix * XRotMatrix * YRotMatrix * vec4(VertexPosition, 1.0);\n"
+        " gl_Position = ProjectionMatrix * ZoomMatrix * ViewMatrix\n"
+        "               * vec4(VertexPosition, 1.0);\n"
         "}";
 
     const char *coord1_header = plane_count > 1 ?
@@ -530,9 +465,7 @@ opengl_link_program(struct prgm *prgm)
 #define GET_ALOC(x, str) GET_LOC(Attrib, prgm->aloc.x, str)
     GET_ULOC(OrientationMatrix, "OrientationMatrix");
     GET_ULOC(ProjectionMatrix, "ProjectionMatrix");
-    GET_ULOC(ZRotMatrix, "ZRotMatrix");
-    GET_ULOC(YRotMatrix, "YRotMatrix");
-    GET_ULOC(XRotMatrix, "XRotMatrix");
+    GET_ULOC(ViewMatrix, "ViewMatrix");
     GET_ULOC(ZoomMatrix, "ZoomMatrix");
 
     GET_ALOC(VertexPosition, "VertexPosition");
@@ -1052,12 +985,8 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
             || p_vp->fov < FIELD_OF_VIEW_DEGREES_MIN)
         return VLC_EBADVAR;
 
-#define RAD(d) ((float) ((d) * M_PI / 180.f))
-    float f_fovx = RAD(p_vp->fov);
-
-    vgl->f_teta = RAD(p_vp->yaw) - (float) M_PI_2;
-    vgl->f_phi  = RAD(p_vp->pitch);
-    vgl->f_roll = RAD(p_vp->roll);
+    // Convert degree into radian
+    float f_fovx = p_vp->fov * (float)M_PI / 180.f;
 
     /* vgl->vp needs to be converted into world transform */
     vlc_viewpoint_reverse(&vgl->vp, p_vp);
@@ -1072,7 +1001,6 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
     getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
 
     return VLC_SUCCESS;
-#undef RAD
 }
 
 
@@ -1592,12 +1520,8 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
                              prgm->var.OrientationMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
                              prgm->var.ProjectionMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE,
-                             prgm->var.ZRotMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE,
-                             prgm->var.YRotMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE,
-                             prgm->var.XRotMatrix);
+    vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
+                             prgm->var.ViewMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                              prgm->var.ZoomMatrix);
 
@@ -1775,12 +1699,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
                                  prgm->var.OrientationMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
                                  prgm->var.ProjectionMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.ZRotMatrix, 1, GL_FALSE,
-                                 prgm->var.ZRotMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.YRotMatrix, 1, GL_FALSE,
-                                 prgm->var.YRotMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.XRotMatrix, 1, GL_FALSE,
-                                 prgm->var.XRotMatrix);
+        vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
+                                 prgm->var.ViewMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                                  prgm->var.ZoomMatrix);
 
