@@ -44,6 +44,7 @@ typedef struct
     unsigned int    i_bitrate;
     unsigned int    i_frame_size;
     unsigned int    i_frame_length;
+    uint32_t        i_substream_header_size;
     uint16_t        i_physical_channels;
     uint16_t        i_chan_mode;
 } vlc_dts_header_t;

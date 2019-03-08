@@ -241,18 +241,20 @@ static int dts_header_ParseSubstream( vlc_dts_header_t *p_header,
     bs_skip( &s, 32 /*SYNCEXTSSH*/ + 8 /*UserDefinedBits*/ + 2 /*nExtSSIndex*/ );
     uint8_t bHeaderSizeType = bs_read1( &s );
     uint32_t nuBits4ExSSFsize;
+    uint16_t nuExtSSHeaderSize;
     if( bHeaderSizeType == 0 )
     {
-        bs_skip( &s, 8 /*nuBits4Header*/ );
+        nuExtSSHeaderSize = bs_read( &s, 8 /*nuBits4Header*/ );
         nuBits4ExSSFsize = bs_read( &s, 16 );
     }
     else
     {
-        bs_skip( &s, 12 /*nuBits4Header*/ );
+        nuExtSSHeaderSize = bs_read( &s, 12 /*nuBits4Header*/ );
         nuBits4ExSSFsize = bs_read( &s, 20 );
     }
     memset( p_header, 0, sizeof(*p_header) );
     p_header->syncword = DTS_SYNC_SUBSTREAM;
+    p_header->i_substream_header_size = nuExtSSHeaderSize + 1;
     p_header->i_frame_size = nuBits4ExSSFsize + 1;
     return VLC_SUCCESS;
 }
