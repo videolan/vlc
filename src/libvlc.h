@@ -186,6 +186,7 @@ typedef struct libvlc_priv_t
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
     vlc_dialog_provider *p_dialog_provider; ///< dialog provider
     vlc_keystore      *p_memory_keystore; ///< memory keystore
+    struct intf_thread_t *interface; ///< Linked-list of interfaces
     struct playlist_t *playlist; ///< Playlist for interfaces
     vlc_playlist_t *main_playlist;
     struct input_preparser_t *parser; ///< Input item meta data handler

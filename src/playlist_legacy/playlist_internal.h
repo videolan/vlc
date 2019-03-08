@@ -43,7 +43,6 @@ void playlist_ServicesDiscoveryKillAll( playlist_t *p_playlist );
 typedef struct playlist_private_t
 {
     playlist_t           public_data;
-    struct intf_thread_t *interface; /**< Linked-list of interfaces */
 
     void *input_tree; /**< Search tree for input item
                            to playlist item mapping */
