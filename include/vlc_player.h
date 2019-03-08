@@ -2446,6 +2446,16 @@ VLC_API void
 vlc_player_SetPauseOnCork(vlc_player_t *player, bool enabled);
 
 /**
+ * Get the V4L2 object used to do controls
+ *
+ * @param player locked player instance
+ * @return the V4L2 object or NULL if not any. This object must be used with
+ * the player lock held.
+ */
+VLC_API vlc_object_t *
+vlc_player_GetV4l2Object(vlc_player_t *player) VLC_DEPRECATED;
+
+/**
  * Set a video splitter to the main vout
  *
  * @param player locked instance

@@ -855,6 +855,7 @@ vlc_player_GetTitleList
 vlc_player_GetTrack
 vlc_player_GetTrackAt
 vlc_player_GetTrackCount
+vlc_player_GetV4l2Object
 vlc_player_HasTeletextMenu
 vlc_player_IncrementRate
 vlc_player_InvalidateNextMedia
