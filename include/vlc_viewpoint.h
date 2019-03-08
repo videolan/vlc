@@ -59,4 +59,23 @@ static inline void vlc_viewpoint_clip( vlc_viewpoint_t *p_vp )
                           FIELD_OF_VIEW_DEGREES_MAX );
 }
 
+/**
+ * Reverse the viewpoint rotation.
+ *
+ * It can be used to convert a camera view into a world transformation.
+ * It will also copy non-rotation related data from \p src to \p dst.
+ *
+ * \param dst the viewpoint with the final reversed rotation
+ * \param src the viewpoint for which the rotation need to be reversed
+ */
+static inline void vlc_viewpoint_reverse( vlc_viewpoint_t *dst,
+                                          const vlc_viewpoint_t *src )
+{
+    dst->yaw   = -src->yaw;
+    dst->pitch = -src->pitch;
+    dst->roll  = -src->roll;
+
+    dst->fov   = src->fov;
+}
+
 #endif /* VLC_VIEWPOINT_H_ */
