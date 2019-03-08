@@ -169,6 +169,7 @@ cbuffer VS_PROJECTION_CONST : register(b0)\n\
    float4x4 RotX;\n\
    float4x4 RotY;\n\
    float4x4 RotZ;\n\
+   float4x4 View;\n\
    float4x4 Zoom;\n\
    float4x4 Projection;\n\
 };\n\
