@@ -89,6 +89,7 @@ static inline void vlc_viewpoint_reverse( vlc_viewpoint_t *dst,
  * \param vp a valid viewpoint object
  * \param matrix a 4x4-sized array which will contain the matrix data
  */
+VLC_API
 void vlc_viewpoint_to_4x4( const vlc_viewpoint_t *vp, float *matrix );
 
 #endif /* VLC_VIEWPOINT_H_ */

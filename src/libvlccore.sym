@@ -980,3 +980,4 @@ vlc_media_tree_Lock
 vlc_media_tree_Unlock
 vlc_media_tree_Find
 vlc_media_tree_Preparse
+vlc_viewpoint_to_4x4
