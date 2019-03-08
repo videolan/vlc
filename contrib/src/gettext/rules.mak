@@ -2,7 +2,9 @@
 GETTEXT_VERSION := 0.19.8.1
 GETTEXT_URL := $(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
 
+ifndef HAVE_WINSTORE
 PKGS += gettext
+endif
 ifneq ($(filter gnu%,$(subst -, ,$(HOST))),)
 # GNU platform should have gettext (?)
 PKGS_FOUND += gettext
