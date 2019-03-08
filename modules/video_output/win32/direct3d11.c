@@ -659,60 +659,6 @@ static void DestroyDisplayPoolPicture(picture_t *picture)
     free(p_sys);
 }
 
-/* rotation around the Z axis */
-static void getZRotMatrix(float theta, FLOAT matrix[static 16])
-{
-    float st, ct;
-
-    sincosf(theta, &st, &ct);
-
-    const FLOAT m[] = {
-    /*  x    y    z    w */
-        ct,  -st, 0.f, 0.f,
-        st,  ct,  0.f, 0.f,
-        0.f, 0.f, 1.f, 0.f,
-        0.f, 0.f, 0.f, 1.f
-    };
-
-    memcpy(matrix, m, sizeof(m));
-}
-
-/* rotation around the Y axis */
-static void getYRotMatrix(float theta, FLOAT matrix[static 16])
-{
-    float st, ct;
-
-    sincosf(theta, &st, &ct);
-
-    const FLOAT m[] = {
-    /*  x    y    z    w */
-        ct,  0.f, -st, 0.f,
-        0.f, 1.f, 0.f, 0.f,
-        st,  0.f, ct,  0.f,
-        0.f, 0.f, 0.f, 1.f
-    };
-
-    memcpy(matrix, m, sizeof(m));
-}
-
-/* rotation around the X axis */
-static void getXRotMatrix(float phi, FLOAT matrix[static 16])
-{
-    float sp, cp;
-
-    sincosf(phi, &sp, &cp);
-
-    const FLOAT m[] = {
-    /*  x    y    z    w */
-        1.f, 0.f, 0.f, 0.f,
-        0.f, cp,  sp,  0.f,
-        0.f, -sp, cp,  0.f,
-        0.f, 0.f, 0.f, 1.f
-    };
-
-    memcpy(matrix, m, sizeof(m));
-}
-
 static void getZoomMatrix(float zoom, FLOAT matrix[static 16]) {
 
     const FLOAT m[] = {
@@ -780,16 +726,13 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
     if (!quad->pVertexShaderConstants)
         return;
 
-#define RAD(d) ((float) ((d) * M_PI / 180.f))
-    float f_fovx = RAD(p_vp->fov);
+    // Convert degree into radian
+    float f_fovx = p_vp->fov * (float)M_PI / 180.f;
     if ( f_fovx > FIELD_OF_VIEW_DEGREES_MAX * M_PI / 180 + 0.001f ||
          f_fovx < -0.001f )
         return;
 
     float f_sar = (float) sys->sys.vdcfg.display.width / sys->sys.vdcfg.display.height;
-    float f_teta = RAD(p_vp->yaw) - (float) M_PI_2;
-    float f_phi  = RAD(p_vp->pitch);
-    float f_roll = RAD(p_vp->roll);
     float f_fovy = UpdateFOVy(f_fovx, f_sar);
     float f_z = UpdateZ(f_fovx, f_fovy);
 
@@ -798,9 +741,6 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
     hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
     if (SUCCEEDED(hr)) {
         VS_PROJECTION_CONST *dst_data = mapped.pData;
-        getXRotMatrix(f_phi, dst_data->RotX);
-        getYRotMatrix(f_teta,   dst_data->RotY);
-        getZRotMatrix(f_roll,  dst_data->RotZ);
         getZoomMatrix(SPHERE_RADIUS * f_z, dst_data->Zoom);
         getProjectionMatrix(f_sar, f_fovy, dst_data->Projection);
 
@@ -809,7 +749,6 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
         vlc_viewpoint_to_4x4(&vp, dst_data->View);
     }
     ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0);
-#undef RAD
 }
 
 static int Control(vout_display_t *vd, int query, va_list args)
