@@ -506,8 +506,8 @@ modules/gui/macosx/panels/VLCAudioEffectsWindowController.h
 modules/gui/macosx/panels/VLCAudioEffectsWindowController.m
 modules/gui/macosx/panels/VLCBookmarksWindowController.h
 modules/gui/macosx/panels/VLCBookmarksWindowController.m
-modules/gui/macosx/panels/VLCPlaylistInfo.h
-modules/gui/macosx/panels/VLCPlaylistInfo.m
+modules/gui/macosx/panels/VLCInformationWindowController.h
+modules/gui/macosx/panels/VLCInformationWindowController.m
 modules/gui/macosx/panels/VLCTimeSelectionPanelController.h
 modules/gui/macosx/panels/VLCTimeSelectionPanelController.m
 modules/gui/macosx/panels/VLCTrackSynchronizationWindowController.h
