@@ -31,7 +31,6 @@
 #import "os-integration/VLCRemoteControlService.h"
 #import "os-integration/iTunes.h"
 #import "os-integration/Spotify.h"
-#import "panels/VLCInformationWindowController.h"
 #import "panels/VLCTrackSynchronizationWindowController.h"
 #import "panels/dialogs/VLCResumeDialogController.h"
 #import "windows/extensions/VLCExtensionsManager.h"
@@ -83,9 +82,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                 [inputManager performSelectorOnMainThread:@selector(updateMainWindow) withObject:nil waitUntilDone:NO];
                 break;
             case INPUT_EVENT_STATISTICS:
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [[[VLCMain sharedInstance] currentMediaInfoPanel] updateStatistics];
-                });
                 break;
             case INPUT_EVENT_ES:
                 break;

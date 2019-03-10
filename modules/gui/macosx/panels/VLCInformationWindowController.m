@@ -26,6 +26,7 @@
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 #import <vlc_url.h>
 
@@ -62,10 +63,15 @@
 {
     self = [super initWithWindowNibName:@"MediaInfo"];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self
+        NSNotificationCenter *defaultNotificationCenter = [NSNotificationCenter defaultCenter];
+        [defaultNotificationCenter addObserver:self
                                                  selector:@selector(currentPlaylistItemChanged:)
                                                      name:VLCPlaylistCurrentItemChanged
                                                    object:nil];
+        [defaultNotificationCenter addObserver:self
+                                      selector:@selector(updateStatistics:)
+                                          name:VLCPlayerStatisticsUpdated
+                                        object:nil];
     }
     return self;
 }
@@ -265,43 +271,41 @@ FREENULL( psz_##foo );
 
     /* reload the codec details table */
     [self updateStreamsList];
-
-    /* update the stats once to display p_item change faster */
-    [self updateStatistics];
 }
 
-- (void)updateStatistics
+- (void)updateStatistics:(NSNotification *)aNotification
 {
     if (!self.isWindowLoaded || !b_stats)
         return;
 
-    if (!_mediaItem || !_mediaItem->p_stats) {
+    if (![self.window isVisible])
+        return;
+
+    VLCInputStats *inputStats = aNotification.userInfo[VLCPlayerInputStats];
+    if (!inputStats) {
         [self initMediaPanelStats];
         return;
     }
 
-    if (![self.window isVisible])
-        return;
-
     /* input */
     [_readBytesTextField setStringValue: [NSString stringWithFormat:
-                                          @"%8.0f KiB", (float)(_mediaItem->p_stats->i_read_bytes)/1024]];
+                                          @"%8.0f KiB", (float)(inputStats.inputReadBytes)/1024]];
     [_inputBitrateTextField setStringValue: [NSString stringWithFormat:
-                                             @"%6.0f kb/s", (float)(_mediaItem->p_stats->f_input_bitrate)*8000]];
+                                             @"%6.0f kb/s", (float)(inputStats.inputBitrate)*8000]];
     [_demuxBytesTextField setStringValue: [NSString stringWithFormat:
-                                           @"%8.0f KiB", (float)(_mediaItem->p_stats->i_demux_read_bytes)/1024]];
+                                           @"%8.0f KiB", (float)(inputStats.demuxReadBytes)/1024]];
     [_demuxBitrateTextField setStringValue: [NSString stringWithFormat:
-                                             @"%6.0f kb/s", (float)(_mediaItem->p_stats->f_demux_bitrate)*8000]];
+                                             @"%6.0f kb/s", (float)(inputStats.demuxBitrate)*8000]];
 
     /* Video */
-    [_videoDecodedTextField setIntegerValue: _mediaItem->p_stats->i_decoded_video];
-    [_displayedTextField setIntegerValue: _mediaItem->p_stats->i_displayed_pictures];
-    [_lostFramesTextField setIntegerValue: _mediaItem->p_stats->i_lost_pictures];
+    [_videoDecodedTextField setIntegerValue: inputStats.decodedVideo];
+    [_displayedTextField setIntegerValue: inputStats.displayedPictures];
+    [_lostFramesTextField setIntegerValue: inputStats.lostPictures];
 
     /* Audio */
-    [_audioDecodedTextField setIntegerValue: _mediaItem->p_stats->i_decoded_audio];
-    [_playedAudioBuffersTextField setIntegerValue: _mediaItem->p_stats->i_played_abuffers];
-    [_lostAudioBuffersTextField setIntegerValue: _mediaItem->p_stats->i_lost_abuffers];
+    [_audioDecodedTextField setIntegerValue: inputStats.decodedAudio];
+    [_playedAudioBuffersTextField setIntegerValue: inputStats.playedAudioBuffers];
+    [_lostAudioBuffersTextField setIntegerValue: inputStats.lostAudioBuffers];
 }
 
 - (void)updateStreamsList

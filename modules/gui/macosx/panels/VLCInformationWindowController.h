@@ -93,6 +93,4 @@
 
 - (void)updatePanelWithItem:(input_item_t *)newInputItem;
 
-- (void)updateStatistics;
-
 @end
