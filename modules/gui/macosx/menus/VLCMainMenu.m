@@ -236,6 +236,18 @@
                            selector:@selector(updateRecordState)
                                name:VLCPlayerRecordingChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playbackStateChanged:)
+                               name:VLCPlayerStateChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playModeChanged:)
+                               name:VLCPlaybackRepeatChanged
+                             object:self];
+    [notificationCenter addObserver:self
+                           selector:@selector(playOrderChanged:)
+                               name:VLCPlaybackOrderChanged
+                             object:self];
 
     [self setupVarMenuItem:_add_intf target: (vlc_object_t *)p_intf
                              var:"intf-add" selector: @selector(toggleVar:)];
@@ -1297,7 +1309,40 @@
     [[[VLCMain sharedInstance] currentMediaInfoPanel] toggleWindow:sender];
 }
 
-#pragma mark - convinience stuff for other objects
+#pragma mark - playback state
+
+- (void)playbackStateChanged:(NSNotification *)aNotification
+{
+    enum vlc_player_state playerState = [_playlistController playerController].playerState;
+    if (playerState == VLC_PLAYER_STATE_PLAYING) {
+        [self setPause];
+    } else {
+        [self setPlay];
+    }
+}
+
+- (void)playModeChanged:(NSNotification *)aNotification
+{
+    enum vlc_playlist_playback_repeat repeatState = _playlistController.playbackRepeat;
+    switch (repeatState) {
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+            [self setRepeatAll];
+            break;
+
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+            [self setRepeatOne];
+            break;
+
+        default:
+            [self setRepeatOff];
+            break;
+    }
+}
+
+- (void)playOrderChanged:(NSNotification *)aNotification
+{
+    [_random setState:_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM];
+}
 
 - (void)setPlay
 {
@@ -1329,11 +1374,6 @@
 {
     [_repeat setState: NSOffState];
     [_loop setState: NSOffState];
-}
-
-- (void)setShuffle
-{
-    [_random setState:_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM];
 }
 
 #pragma mark - Dynamic menu creation and validation

@@ -277,12 +277,9 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     if (state == PLAYING_S) {
         [self stopItunesPlayback];
-
-        [[o_main mainMenu] setPause];
         [[o_main mainWindow] setPause];
     } else {
         [[o_main mainMenu] setSubmenusEnabled: FALSE];
-        [[o_main mainMenu] setPlay];
         [[o_main mainWindow] setPlay];
 
         if (state == END_S || state == -1) {
@@ -302,7 +299,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     }
 
     [self updateMainWindow];
-    [self sendDistributedNotificationWithUpdatedPlaybackStatus];
 }
 
 // Called when playback has ended and likely no subsequent media will start playing
@@ -399,14 +395,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 {
     [[o_main mainMenu] setupMenus];
     [[VLCCoreInteraction sharedInstance] resetAtoB];
-}
-
-- (void)sendDistributedNotificationWithUpdatedPlaybackStatus
-{
-    [[NSDistributedNotificationCenter defaultCenter] postNotificationName:@"VLCPlayerStateDidChange"
-                                                                   object:nil
-                                                                 userInfo:nil
-                                                       deliverImmediately:YES];
 }
 
 - (BOOL)hasInput

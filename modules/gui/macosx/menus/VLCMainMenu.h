@@ -284,12 +284,6 @@
 - (IBAction)showMainWindow:(id)sender;
 - (IBAction)showPlaylist:(id)sender;
 
-- (void)setPlay;
-- (void)setPause;
-- (void)setRepeatOne;
-- (void)setRepeatAll;
-- (void)setRepeatOff;
-- (void)setShuffle;
 @end
 
 /*****************************************************************************
