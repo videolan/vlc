@@ -33,6 +33,7 @@
 #import "main/VLCMain.h"
 #import "coreinteraction/VLCCoreInteraction.h"
 #import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 #import "windows/VLCOpenInputMetadata.h"
 
 /*****************************************************************************
@@ -159,25 +160,12 @@
 
 - (BOOL)scriptFullscreenMode
 {
-    vout_thread_t * p_vout = getVoutForActiveWindow();
-    if (!p_vout)
-        return NO;
-    BOOL b_value = var_GetBool(p_vout, "fullscreen");
-    vout_Release(p_vout);
-    return b_value;
+    return [[[[VLCMain sharedInstance] playlistController] playerController] fullscreen];
 }
 
 - (void)setScriptFullscreenMode:(BOOL)mode
 {
-    vout_thread_t * p_vout = getVoutForActiveWindow();
-    if (!p_vout)
-        return;
-    if (var_GetBool(p_vout, "fullscreen") == mode) {
-        vout_Release(p_vout);
-        return;
-    }
-    vout_Release(p_vout);
-    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+    [[[[VLCMain sharedInstance] playlistController] playerController] setFullscreen:mode];
 }
 
 - (BOOL)muted
@@ -187,23 +175,18 @@
 
 - (BOOL)playing
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return NO;
+    enum vlc_player_state playerState = [[[[VLCMain sharedInstance] playlistController] playerController] playerState];
 
-    input_thread_t * p_input = pl_CurrentInput(p_intf);
-    if (!p_input)
-        return NO;
+    if (playerState == VLC_PLAYER_STATE_STARTED || playerState == VLC_PLAYER_STATE_PLAYING) {
+        return YES;
+    }
 
-    input_state_e i_state = var_GetInteger(p_input, "state");
-    input_Release(p_input);
-
-    return ((i_state == OPENING_S) || (i_state == PLAYING_S));
+    return NO;
 }
 
 - (int)audioVolume
 {
-    return ([[VLCCoreInteraction sharedInstance] volume]);
+    return [[VLCCoreInteraction sharedInstance] volume];
 }
 
 - (void)setAudioVolume:(int)volume
@@ -213,54 +196,22 @@
 
 - (long long)audioDesync
 {
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-    vlc_tick_t i_delay;
-
-    if (!p_input)
-        return -1;
-
-    i_delay = var_GetInteger(p_input, "audio-delay");
-    input_Release(p_input);
-
-    return MS_FROM_VLC_TICK( i_delay );
+    return MS_FROM_VLC_TICK([[[[VLCMain sharedInstance] playlistController] playerController] audioDelay]);
 }
 
 - (void)setAudioDesync:(long long)audioDelay
 {
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-    if (!p_input)
-        return;
-
-    var_SetInteger(p_input, "audio-delay", VLC_TICK_FROM_MS( audioDelay ));
-    input_Release(p_input);
+    [[[[VLCMain sharedInstance] playlistController] playerController] setAudioDelay: VLC_TICK_FROM_MS(audioDelay)];
 }
 
 - (int)currentTime
 {
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-    vlc_tick_t i_currentTime;
-
-    if (!p_input)
-        return -1;
-
-    i_currentTime = var_GetInteger(p_input, "time");
-    input_Release(p_input);
-
-    return (int)SEC_FROM_VLC_TICK(i_currentTime);
+    return (int)SEC_FROM_VLC_TICK([[[[VLCMain sharedInstance] playlistController] playerController] time]);
 }
 
-- (void)setCurrentTime:(int)currenTime
+- (void)setCurrentTime:(int)currentTime
 {
-    if (currenTime) {
-        input_thread_t * p_input = pl_CurrentInput(getIntf());
-
-        if (!p_input)
-            return;
-
-        input_SetTime(p_input, vlc_tick_from_sec(currenTime),
-                      var_GetBool(p_input, "input-fast-seek"));
-        input_Release(p_input);
-    }
+    [[[[VLCMain sharedInstance] playlistController] playerController] setTimeFast: VLC_TICK_FROM_SEC(currentTime)];
 }
 
 - (NSInteger)durationOfCurrentItem
@@ -280,37 +231,16 @@
 
 - (BOOL)playbackShowsMenu
 {
-    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
-
-    if (!p_input_thread)
+    const struct vlc_player_title *currentTitle = [[[[VLCMain sharedInstance] playlistController] playerController] selectedTitle];
+    if (currentTitle == NULL) {
         return NO;
-
-    int i_current_title = (int)var_GetInteger(p_input_thread, "title");
-
-    input_title_t **p_input_title;
-    int count;
-
-    /* fetch data */
-    int coreret = input_Control(p_input_thread, INPUT_GET_FULL_TITLE_INFO,
-                                &p_input_title, &count);
-    input_Release(p_input_thread);
-
-    if (coreret != VLC_SUCCESS)
-        return NO;
-
-    BOOL ret = NO;
-
-    if (count > 0 && i_current_title < count) {
-        ret = p_input_title[i_current_title]->i_flags & INPUT_TITLE_MENU;
     }
 
-    /* free array */
-    for (int i = 0; i < count; i++) {
-        vlc_input_title_Delete(p_input_title[i]);
+    if (currentTitle->flags & VLC_PLAYER_TITLE_MENU) {
+        return YES;
     }
-    free(p_input_title);
 
-    return ret;
+    return NO;
 }
 
 @end
