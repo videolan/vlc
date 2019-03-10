@@ -20,8 +20,6 @@
 
 #import "VLCInputManager.h"
 
-#import <MediaPlayer/MediaPlayer.h>
-
 #include <vlc_url.h>
 
 #import "coreinteraction/VLCCoreInteraction.h"
@@ -37,11 +35,9 @@
 #import "windows/mainwindow/VLCMainWindow.h"
 #import "windows/video/VLCVoutView.h"
 
-
 @interface VLCInputManager()
 - (void)updateMainMenu;
 - (void)updateMainWindow;
-- (void)updateMetaAndInfo;
 - (void)updateDelays;
 @end
 
@@ -91,7 +87,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
             case INPUT_EVENT_ITEM_INFO:
                 [inputManager performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
                 [inputManager performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
-                [inputManager performSelectorOnMainThread:@selector(updateMetaAndInfo) withObject: nil waitUntilDone:NO];
                 break;
             case INPUT_EVENT_BOOKMARK:
                 break;
@@ -243,8 +238,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                                                             object:nil];
     }
 
-    [self updateMetaAndInfo];
-
     [self updateMainWindow];
     [self updateDelays];
     [self updateMainMenu];
@@ -287,21 +280,10 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
         [[o_main mainMenu] setPause];
         [[o_main mainWindow] setPause];
-
-        if (@available(macOS 10.12.2, *)) {
-            [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStatePlaying;
-        }
     } else {
         [[o_main mainMenu] setSubmenusEnabled: FALSE];
         [[o_main mainMenu] setPlay];
         [[o_main mainWindow] setPlay];
-
-        if (state == PAUSE_S) {
-
-            if (@available(macOS 10.12.2, *)) {
-                [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStatePaused;
-            }
-        }
 
         if (state == END_S || state == -1) {
             /* continue playback where you left off */
@@ -316,10 +298,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                                                            selector: @selector(onPlaybackHasEnded:)
                                                            userInfo: nil
                                                             repeats: NO];
-
-            if (@available(macOS 10.12.2, *)) {
-                [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStateStopped;
-            }
         }
     }
 
@@ -400,43 +378,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     b_has_itunes_paused = NO;
     b_has_spotify_paused = NO;
-}
-
-- (void)updateMetaAndInfo
-{
-    input_item_t *p_input_item = input_GetItem(p_current_input);
-
-    if (!p_input_item) {
-        return;
-    }
-
-    if (@available(macOS 10.12.2, *)) {
-        NSMutableDictionary *currentlyPlayingTrackInfo = [NSMutableDictionary dictionary];
-
-        currentlyPlayingTrackInfo[MPMediaItemPropertyPlaybackDuration] = @(SEC_FROM_VLC_TICK(input_item_GetDuration(p_input_item)));
-        currentlyPlayingTrackInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = @(var_GetInteger(p_current_input, "time"));
-        currentlyPlayingTrackInfo[MPNowPlayingInfoPropertyPlaybackRate] = @(var_GetFloat(p_current_input, "rate"));
-
-        char *psz_title = input_item_GetTitle(p_input_item);
-        if (!psz_title)
-            psz_title = input_item_GetName(p_input_item);
-        currentlyPlayingTrackInfo[MPMediaItemPropertyTitle] = toNSStr(psz_title);
-        FREENULL(psz_title);
-
-        char *psz_artist = input_item_GetArtist(p_input_item);
-        currentlyPlayingTrackInfo[MPMediaItemPropertyArtist] = toNSStr(psz_artist);
-        FREENULL(psz_artist);
-
-        char *psz_album = input_item_GetAlbum(p_input_item);
-        currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTitle] = toNSStr(psz_album);
-        FREENULL(psz_album);
-
-        char *psz_track_number = input_item_GetTrackNumber(p_input_item);
-        currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTrackNumber] = @([toNSStr(psz_track_number) intValue]);
-        FREENULL(psz_track_number);
-
-        [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = currentlyPlayingTrackInfo;
-    }
 }
 
 - (void)updateMainWindow

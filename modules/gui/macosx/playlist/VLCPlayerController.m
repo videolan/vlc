@@ -23,6 +23,8 @@
 #import "VLCPlayerController.h"
 #import "main/VLCMain.h"
 
+#import <MediaPlayer/MediaPlayer.h>
+
 NSString *VLCPlayerCurrentMediaItem = @"VLCPlayerCurrentMediaItem";
 NSString *VLCPlayerCurrentMediaItemChanged = @"VLCPlayerCurrentMediaItemChanged";
 NSString *VLCPlayerStateChanged = @"VLCPlayerStateChanged";
@@ -79,6 +81,7 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 - (void)recordingChanged:(BOOL)recording;
 - (void)inputStatsUpdated:(VLCInputStats *)inputStats;
 - (void)stopActionChanged:(enum vlc_player_media_stopped_action)stoppedAction;
+- (void)metaDataChangedForInput:(input_item_t *)inputItem;
 
 /* video */
 - (void)fullscreenChanged:(BOOL)isFullscreen;
@@ -289,7 +292,23 @@ static void cb_player_media_stopped_action_changed(vlc_player_t *p_player,
                                                    enum vlc_player_media_stopped_action newAction,
                                                    void *p_data)
 {
+    VLC_UNUSED(p_player);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController stopActionChanged:newAction];
+    });
+}
 
+static void cb_player_item_meta_changed(vlc_player_t *p_player,
+                                        input_item_t *p_mediaItem,
+                                        void *p_data)
+{
+    VLC_UNUSED(p_player);
+    input_item_Hold(p_mediaItem);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController metaDataChangedForInput:p_mediaItem];
+    });
 }
 
 static const struct vlc_player_cbs player_callbacks = {
@@ -321,7 +340,7 @@ static const struct vlc_player_cbs player_callbacks = {
     cb_player_stats_changed,
     NULL, //cb_player_atobloop_changed,
     cb_player_media_stopped_action_changed,
-    NULL, //cb_player_item_meta_changed,
+    cb_player_item_meta_changed,
     NULL, //cb_player_item_epg_changed,
     NULL, //cb_player_subitems_changed,
     NULL, //cb_player_vout_list_changed,
@@ -488,6 +507,39 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     vlc_player_Unlock(_p_player);
 }
 
+- (void)metaDataChangedForInput:(input_item_t *)inputItem
+{
+    if (@available(macOS 10.12.2, *)) {
+        NSMutableDictionary *currentlyPlayingTrackInfo = [NSMutableDictionary dictionary];
+
+        currentlyPlayingTrackInfo[MPMediaItemPropertyPlaybackDuration] = @(SEC_FROM_VLC_TICK(input_item_GetDuration(inputItem)));
+        currentlyPlayingTrackInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = @(SEC_FROM_VLC_TICK([self time]));
+        currentlyPlayingTrackInfo[MPNowPlayingInfoPropertyPlaybackRate] = @([self playbackRate]);
+
+        char *psz_title = input_item_GetTitle(inputItem);
+        if (!psz_title)
+            psz_title = input_item_GetName(inputItem);
+        currentlyPlayingTrackInfo[MPMediaItemPropertyTitle] = toNSStr(psz_title);
+        FREENULL(psz_title);
+
+        char *psz_artist = input_item_GetArtist(inputItem);
+        currentlyPlayingTrackInfo[MPMediaItemPropertyArtist] = toNSStr(psz_artist);
+        FREENULL(psz_artist);
+
+        char *psz_album = input_item_GetAlbum(inputItem);
+        currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTitle] = toNSStr(psz_album);
+        FREENULL(psz_album);
+
+        char *psz_track_number = input_item_GetTrackNumber(inputItem);
+        currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTrackNumber] = @([toNSStr(psz_track_number) intValue]);
+        FREENULL(psz_track_number);
+
+        [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = currentlyPlayingTrackInfo;
+    }
+
+    input_item_Release(inputItem);
+}
+
 - (void)nextVideoFrame
 {
     vlc_player_Lock(_p_player);
@@ -534,6 +586,27 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     _playerState = state;
     [_defaultNotificationCenter postNotificationName:VLCPlayerStateChanged
                                               object:self];
+
+    if (@available(macOS 10.12.2, *)) {
+        switch (_playerState) {
+            case VLC_PLAYER_STATE_PLAYING:
+                [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStatePlaying;
+                break;
+
+            case VLC_PLAYER_STATE_PAUSED:
+                [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStatePaused;
+                break;
+
+            case VLC_PLAYER_STATE_STOPPED:
+            case VLC_PLAYER_STATE_STOPPING:
+                [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStateStopped;
+                break;
+
+            default:
+                [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStateUnknown;
+                break;
+        }
+    }
 }
 
 - (void)errorChanged:(enum vlc_player_error)error
