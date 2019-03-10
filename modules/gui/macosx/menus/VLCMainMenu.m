@@ -1578,9 +1578,6 @@
 {
     BOOL enabled = YES;
     input_item_t *inputItem = _playlistController.currentlyPlayingInputItem;
-    if (inputItem) {
-        input_item_Hold(inputItem);
-    }
 
     if (mi == _stop || mi == _voutMenustop || mi == _dockMenustop) {
         if (!inputItem)

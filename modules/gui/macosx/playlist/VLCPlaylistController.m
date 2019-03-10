@@ -36,6 +36,7 @@ NSString *VLCPlaybackOrderChanged = @"VLCPlaybackOrderChanged";
 NSString *VLCPlaybackRepeatChanged = @"VLCPlaybackRepeatChanged";
 NSString *VLCPlaybackHasPreviousChanged = @"VLCPlaybackHasPreviousChanged";
 NSString *VLCPlaybackHasNextChanged = @"VLCPlaybackHasNextChanged";
+NSString *VLCPlaylistCurrentItemChanged = @"VLCPlaylistCurrentItemChanged";
 
 @interface VLCPlaylistController ()
 {
@@ -277,6 +278,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 {
     _currentPlaylistIndex = index;
     [_playlistDataSource playlistUpdated];
+    [[NSNotificationCenter defaultCenter] postNotificationName:VLCPlaylistCurrentItemChanged object:nil];
 }
 
 - (void)playlistHasPreviousItem:(BOOL)hasPrevious
@@ -449,6 +451,9 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     vlc_player_t *player = vlc_playlist_GetPlayer(_p_playlist);
     vlc_player_Lock(player);
     input_item_t *inputItem = vlc_player_GetCurrentMedia(player);
+    if (inputItem) {
+        input_item_Hold(inputItem);
+    }
     vlc_player_Unlock(player);
     return inputItem;
 }
