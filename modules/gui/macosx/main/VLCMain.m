@@ -334,7 +334,6 @@ static VLCMain *sharedInstance = nil;
         return;
     b_intf_terminating = true;
 
-    [_input_manager onPlaybackHasEnded:nil];
     [_input_manager deinit];
 
     if (notification == nil)

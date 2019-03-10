@@ -21,7 +21,11 @@
  *****************************************************************************/
 
 #import "VLCPlayerController.h"
+
 #import "main/VLCMain.h"
+#import "os-integration/VLCRemoteControlService.h"
+#import "os-integration/iTunes.h"
+#import "os-integration/Spotify.h"
 
 #import <MediaPlayer/MediaPlayer.h>
 
@@ -60,6 +64,15 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
     vlc_player_vout_listener_id *_playerVoutListenerID;
     vlc_player_title_list *_currentTitleList;
     NSNotificationCenter *_defaultNotificationCenter;
+
+    /* remote control support */
+    VLCRemoteControlService *_remoteControlService;
+
+    /* iTunes/Spotify play/pause support */
+    BOOL _iTunesPlaybackWasPaused;
+    BOOL _SpotifyPlaybackWasPaused;
+
+    NSTimer *_playbackHasTruelyEndedTimer;
 }
 
 - (void)currentMediaItemChanged:(input_item_t *)newMediaItem;
@@ -420,6 +433,10 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
         _playerVoutListenerID = vlc_player_vout_AddListener(_p_player,
                                                             &player_vout_callbacks,
                                                             (__bridge void *)self);
+        if (@available(macOS 10.12.2, *)) {
+            _remoteControlService = [[VLCRemoteControlService alloc] init];
+            [_remoteControlService subscribeToRemoteCommands];
+        }
     }
 
     return self;
@@ -427,6 +444,10 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
 - (void)deinitialize
 {
+    [self onPlaybackHasTruelyEnded:nil];
+    if (@available(macOS 10.12.2, *)) {
+        [_remoteControlService unsubscribeFromRemoteCommands];
+    }
     if (_currentTitleList) {
         vlc_player_title_list_Release(_currentTitleList);
     }
@@ -584,6 +605,15 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     /* instead of using vlc_player_GetState, we cache the state and provide it through a synthesized getter
      * as the direct call might not reflect the actual state due the asynchronous API nature */
     _playerState = state;
+
+    /* we seem to start (over), don't start other players */
+    if (_playerState != VLC_PLAYER_STATE_STOPPED) {
+        if (_playbackHasTruelyEndedTimer) {
+            [_playbackHasTruelyEndedTimer invalidate];
+            _playbackHasTruelyEndedTimer = nil;
+        }
+    }
+
     [_defaultNotificationCenter postNotificationName:VLCPlayerStateChanged
                                               object:self];
 
@@ -607,6 +637,103 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
                 break;
         }
     }
+
+    /* notify third party apps through an informal protocol that our state changed */
+    [[NSDistributedNotificationCenter defaultCenter] postNotificationName:@"VLCPlayerStateDidChange"
+                                                                   object:nil
+                                                                 userInfo:nil
+                                                       deliverImmediately:YES];
+
+    /* schedule a timer to restart iTunes / Spotify because we are done here */
+    if (_playerState == VLC_PLAYER_STATE_STOPPED) {
+        if (_playbackHasTruelyEndedTimer) {
+            [_playbackHasTruelyEndedTimer invalidate];
+        }
+        _playbackHasTruelyEndedTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
+                                                                        target:self
+                                                                      selector:@selector(onPlaybackHasTruelyEnded:)
+                                                                      userInfo:nil
+                                                                       repeats:NO];
+    }
+
+    /* pause external players */
+    if (_playerState == VLC_PLAYER_STATE_PLAYING || _playerState == VLC_PLAYER_STATE_STARTED) {
+        [self stopOtherAudioPlaybackApps];
+    }
+}
+
+// Called when playback has truely ended and likely no subsequent media will start playing
+- (void)onPlaybackHasTruelyEnded:(id)sender
+{
+    msg_Dbg(getIntf(), "Playback has been ended");
+
+    [self resumeOtherAudioPlaybackApps];
+    _playbackHasTruelyEndedTimer = nil;
+}
+
+- (void)stopOtherAudioPlaybackApps
+{
+    intf_thread_t *p_intf = getIntf();
+    int64_t controlOtherPlayers = var_InheritInteger(p_intf, "macosx-control-itunes");
+    if (controlOtherPlayers <= 0)
+        return;
+
+    // pause iTunes
+    if (!_iTunesPlaybackWasPaused) {
+        iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+        if (iTunesApp && [iTunesApp isRunning]) {
+            if ([iTunesApp playerState] == iTunesEPlSPlaying) {
+                msg_Dbg(p_intf, "pausing iTunes");
+                [iTunesApp pause];
+                _iTunesPlaybackWasPaused = YES;
+            }
+        }
+    }
+
+    // pause Spotify
+    if (!_SpotifyPlaybackWasPaused) {
+        SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
+        if (spotifyApp) {
+            if ([spotifyApp respondsToSelector:@selector(isRunning)] && [spotifyApp respondsToSelector:@selector(playerState)]) {
+                if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePlaying) {
+                    msg_Dbg(p_intf, "pausing Spotify");
+                    [spotifyApp pause];
+                    _SpotifyPlaybackWasPaused = YES;
+                }
+            }
+        }
+    }
+}
+
+- (void)resumeOtherAudioPlaybackApps
+{
+    intf_thread_t *p_intf = getIntf();
+    if (var_InheritInteger(p_intf, "macosx-control-itunes") > 1) {
+        if (_iTunesPlaybackWasPaused) {
+            iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+            if (iTunesApp && [iTunesApp isRunning]) {
+                if ([iTunesApp playerState] == iTunesEPlSPaused) {
+                    msg_Dbg(p_intf, "unpausing iTunes");
+                    [iTunesApp playpause];
+                }
+            }
+        }
+
+        if (_SpotifyPlaybackWasPaused) {
+            SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
+            if (spotifyApp) {
+                if ([spotifyApp respondsToSelector:@selector(isRunning)] && [spotifyApp respondsToSelector:@selector(playerState)]) {
+                    if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePaused) {
+                        msg_Dbg(p_intf, "unpausing Spotify");
+                        [spotifyApp play];
+                    }
+                }
+            }
+        }
+    }
+
+    _iTunesPlaybackWasPaused = NO;
+    _SpotifyPlaybackWasPaused = NO;
 }
 
 - (void)errorChanged:(enum vlc_player_error)error

@@ -36,8 +36,6 @@
 
 - (void)playbackStatusUpdated;
 
-- (void)onPlaybackHasEnded:(id)sender;
-
 - (BOOL)hasInput;
 
 @end

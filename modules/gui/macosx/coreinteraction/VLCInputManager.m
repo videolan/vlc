@@ -26,9 +26,6 @@
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
-#import "os-integration/VLCRemoteControlService.h"
-#import "os-integration/iTunes.h"
-#import "os-integration/Spotify.h"
 #import "panels/VLCTrackSynchronizationWindowController.h"
 #import "panels/dialogs/VLCResumeDialogController.h"
 #import "windows/extensions/VLCExtensionsManager.h"
@@ -126,15 +123,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     input_thread_t *p_current_input;
     dispatch_queue_t informInputChangedQueue;
-
-    /* iTunes/Spotify play/pause support */
-    BOOL b_has_itunes_paused;
-    BOOL b_has_spotify_paused;
-
-    /* remote control support */
-    VLCRemoteControlService *_remoteControlService;
-
-    NSTimer *hasEndedTimer;
 }
 @end
 
@@ -160,11 +148,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         var_AddCallback(pl_Get(getIntf()), "input-current", InputThreadChanged, (__bridge void *)self);
 
         informInputChangedQueue = dispatch_queue_create("org.videolan.vlc.inputChangedQueue", DISPATCH_QUEUE_SERIAL);
-
-        if (@available(macOS 10.12.2, *)) {
-            _remoteControlService = [[VLCRemoteControlService alloc] init];
-            [_remoteControlService subscribeToRemoteCommands];
-        }
     }
     return self;
 }
@@ -179,9 +162,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 - (void)deinit
 {
     msg_Dbg(getIntf(), "Deinitializing input manager");
-    if (@available(macOS 10.12.2, *)) {
-        [_remoteControlService unsubscribeFromRemoteCommands];
-    }
 
     if (p_current_input) {
         /* continue playback where you left off */
@@ -267,16 +247,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         state = var_GetInteger(p_current_input, "state");
     }
 
-    // cancel itunes timer if next item starts playing
-    if (state > -1 && state != END_S) {
-        if (hasEndedTimer) {
-            [hasEndedTimer invalidate];
-            hasEndedTimer = nil;
-        }
-    }
-
     if (state == PLAYING_S) {
-        [self stopItunesPlayback];
         [[o_main mainWindow] setPause];
     } else {
         [[o_main mainMenu] setSubmenusEnabled: FALSE];
@@ -286,94 +257,10 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
             /* continue playback where you left off */
             if (p_current_input)
                 [self storePlaybackPositionForItem:p_current_input];
-
-            if (hasEndedTimer) {
-                [hasEndedTimer invalidate];
-            }
-            hasEndedTimer = [NSTimer scheduledTimerWithTimeInterval: 0.5
-                                                             target: self
-                                                           selector: @selector(onPlaybackHasEnded:)
-                                                           userInfo: nil
-                                                            repeats: NO];
         }
     }
 
     [self updateMainWindow];
-}
-
-// Called when playback has ended and likely no subsequent media will start playing
-- (void)onPlaybackHasEnded:(id)sender
-{
-    msg_Dbg(getIntf(), "Playback has been ended");
-
-    [self resumeItunesPlayback];
-    hasEndedTimer = nil;
-}
-
-- (void)stopItunesPlayback
-{
-    intf_thread_t *p_intf = getIntf();
-    int64_t controlItunes = var_InheritInteger(p_intf, "macosx-control-itunes");
-    if (controlItunes <= 0)
-        return;
-
-    // pause iTunes
-    if (!b_has_itunes_paused) {
-        iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
-        if (iTunesApp && [iTunesApp isRunning]) {
-            if ([iTunesApp playerState] == iTunesEPlSPlaying) {
-                msg_Dbg(p_intf, "pausing iTunes");
-                [iTunesApp pause];
-                b_has_itunes_paused = YES;
-            }
-        }
-    }
-
-    // pause Spotify
-    if (!b_has_spotify_paused) {
-        SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
-
-        if (spotifyApp) {
-            if ([spotifyApp respondsToSelector:@selector(isRunning)] && [spotifyApp respondsToSelector:@selector(playerState)]) {
-                if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePlaying) {
-                    msg_Dbg(p_intf, "pausing Spotify");
-                    [spotifyApp pause];
-                    b_has_spotify_paused = YES;
-                }
-            }
-        }
-    }
-}
-
-- (void)resumeItunesPlayback
-{
-    intf_thread_t *p_intf = getIntf();
-    if (var_InheritInteger(p_intf, "macosx-control-itunes") > 1) {
-        if (b_has_itunes_paused) {
-            iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
-            if (iTunesApp && [iTunesApp isRunning]) {
-                if ([iTunesApp playerState] == iTunesEPlSPaused) {
-                    msg_Dbg(p_intf, "unpausing iTunes");
-                    [iTunesApp playpause];
-                }
-            }
-        }
-
-        if (b_has_spotify_paused) {
-            SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
-            if (spotifyApp) {
-                if ([spotifyApp respondsToSelector:@selector(isRunning)] && [spotifyApp respondsToSelector:@selector(playerState)]) {
-                    if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePaused) {
-                        msg_Dbg(p_intf, "unpausing Spotify");
-                        [spotifyApp play];
-                    }
-                }
-            }
-        }
-    }
-
-    b_has_itunes_paused = NO;
-    b_has_spotify_paused = NO;
 }
 
 - (void)updateMainWindow
