@@ -1,19 +1,19 @@
 # Breton translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Denis ARNAUD <denisarnuad@hotmail.com>, 2012,2015
 # ernest olory <ernestolory@hotmail.fr>, 2016
-# Gwenn M <tornoz@laposte.net>, 2016,2018
-# Irriep Nala Novram <allannkorh@yahoo.fr>, 2016
+# Gwenn M <tornoz@laposte.net>, 2016-2019
+# Irriep Nala Novram <allannkorh@yahoo.fr>, 2016-2019
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-06 16:14+0200\n"
-"Last-Translator: Gwenn M <tornoz@laposte.net>, 2018\n"
+"PO-Revision-Date: 2019-03-10 12:00+0100\n"
+"Last-Translator: Gwenn M <tornoz@laposte.net>, 2019\n"
 "Language-Team: Breton (https://www.transifex.com/yaron/teams/16553/br/)\n"
 "Language: br\n"
 "MIME-Version: 1.0\n"
@@ -57,27 +57,27 @@ msgstr "Etrefas"
 
 #: include/vlc_config_cat.h:39
 msgid "Settings for VLC's interfaces"
-msgstr "Arventennoù evit ar c'hetalioù VLC"
+msgstr "Arventennoù evit etrefasoù VLC"
 
 #: include/vlc_config_cat.h:41
 msgid "Main interfaces settings"
-msgstr "Arventennoù ar c'hetal pennañ"
+msgstr "Arventennoù ar etrefas pennañ"
 
 #: include/vlc_config_cat.h:43
 msgid "Main interfaces"
-msgstr "Ketalioù pennañ"
+msgstr "Etrefasoù pennañ"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for the main interface"
-msgstr "Arventennoù ar c'hetal pennañ"
+msgstr "Arventennoù an etrefas pennañ"
 
 #: include/vlc_config_cat.h:46 src/libvlc-module.c:81
 msgid "Control interfaces"
-msgstr "Ketalioù reoliñ"
+msgstr "Etrefasoù kontrolliñ"
 
 #: include/vlc_config_cat.h:47
 msgid "Settings for VLC's control interfaces"
-msgstr "Arventennoù evit reoliadur ketal VLC"
+msgstr "Arventennoù evit kontroloù etrefas VLC"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
 #: modules/gui/macosx/VLCSimplePrefsController.m:237
@@ -132,11 +132,11 @@ msgstr "Skrammadennoù an aodio"
 
 #: include/vlc_config_cat.h:66 include/vlc_config_cat.h:78
 msgid "Output modules"
-msgstr "Molladoù an ec'hankad"
+msgstr "Moduloù an ezvont"
 
 #: include/vlc_config_cat.h:67
 msgid "General settings for audio output modules."
-msgstr "Arventennoù hollek ar molladoù enankad aodio"
+msgstr "Arventennoù hollek ar vodulenn enankad aodio"
 
 #: include/vlc_config_cat.h:69 src/libvlc-module.c:2027
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:196
@@ -146,7 +146,7 @@ msgstr "Liesseurt"
 
 #: include/vlc_config_cat.h:70
 msgid "Miscellaneous audio settings and modules."
-msgstr "Arventennoù aodio liesseurt ha molladoù."
+msgstr "Arventennoù aodio liesseurt ha moduloù."
 
 #: include/vlc_config_cat.h:73 src/input/es_out.c:3164 src/libvlc-module.c:142
 #: src/libvlc-module.c:1551 modules/access/imem.c:64
@@ -210,7 +210,7 @@ msgstr "Arventennoù evit biskrivañ, diliesaat, diskodiñ hag enkodañ"
 
 #: include/vlc_config_cat.h:101
 msgid "Access modules"
-msgstr "Molladoù haeziñ"
+msgstr "Moduloù moned"
 
 #: include/vlc_config_cat.h:103
 msgid ""
@@ -365,7 +365,7 @@ msgstr "VOD"
 
 #: include/vlc_config_cat.h:169
 msgid "VLC's implementation of Video On Demand"
-msgstr "Emplementadur Video VLC dre c’houlenn"
+msgstr "Kefloueradur Video VLC dre c’houlenn"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2070
 #: src/playlist/engine.c:243 modules/demux/playlist/playlist.c:64
@@ -1042,7 +1042,7 @@ msgstr "Deskrivadur"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:185
 #: modules/gui/macosx/VLCOutput.m:75 modules/gui/qt/dialogs/plugins.cpp:1487
 msgid "Type"
-msgstr "Rizh"
+msgstr "Doare"
 
 #: src/input/es_out.c:3123
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:175
@@ -1092,11 +1092,11 @@ msgstr "%.2f dB"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr "Spisder ar video"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
-msgstr ""
+msgstr "Mentoù ar skurzerioù"
 
 #: src/input/es_out.c:3183 src/input/es_out.c:3186 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1114,57 +1114,57 @@ msgstr "Furmad digodet"
 
 #: src/input/es_out.c:3199
 msgid "Top left"
-msgstr ""
+msgstr "Laez kleiz"
 
 #: src/input/es_out.c:3199
 msgid "Left top"
-msgstr ""
+msgstr "Kleiz laez"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr ""
+msgstr "Traoñ dehou"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
-msgstr ""
+msgstr "Laez dehou"
 
 #: src/input/es_out.c:3201
 msgid "Bottom left"
-msgstr ""
+msgstr "Traoñ kleiz"
 
 #: src/input/es_out.c:3201
 msgid "Bottom right"
-msgstr ""
+msgstr "Traoñ dehou"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
-msgstr ""
+msgstr "Kleiz traoñ"
 
 #: src/input/es_out.c:3202
 msgid "Right top"
-msgstr ""
+msgstr "Dehou laez"
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
-msgstr ""
+msgstr "Tuadur"
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
 #: modules/access/dtv/access.c:77 modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
-msgstr ""
+msgstr "Didermenet"
 
 #: src/input/es_out.c:3212
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 linenn, 60 Hz)"
 
 #: src/input/es_out.c:3214
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 linenn, 50 Hz)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
-msgstr ""
+msgstr "Livioù deraouad"
 
 #: src/input/es_out.c:3229 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1173,24 +1173,24 @@ msgstr "Linennek"
 
 #: src/input/es_out.c:3236
 msgid "Hybrid Log-Gamma"
-msgstr ""
+msgstr "Renabl-Gamma hiron"
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
-msgstr ""
+msgstr "Arc'hweladur treuskas liv"
 
 #: src/input/es_out.c:3253
 msgid "Color space"
-msgstr ""
+msgstr "Spas al liv"
 
 #: src/input/es_out.c:3253
 #, c-format
 msgid "%s Range"
-msgstr ""
+msgstr "%s Renk"
 
 #: src/input/es_out.c:3255
 msgid "Full"
-msgstr ""
+msgstr "Klok"
 
 #: src/input/es_out.c:3262 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1205,83 +1205,83 @@ msgstr "Kreizañ"
 
 #: src/input/es_out.c:3263
 msgid "Top Left"
-msgstr ""
+msgstr "Laez kleiz"
 
 #: src/input/es_out.c:3264
 msgid "Top Center"
-msgstr ""
+msgstr "Laez kreiz"
 
 #: src/input/es_out.c:3265
 msgid "Bottom Left"
-msgstr ""
+msgstr "Traoñ kleiz"
 
 #: src/input/es_out.c:3266
 msgid "Bottom Center"
-msgstr ""
+msgstr "Traoñ kreiz"
 
 #: src/input/es_out.c:3270
 msgid "Chroma location"
-msgstr ""
+msgstr "Lec'hiadur Chroma"
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
-msgstr ""
+msgstr "Skouergornek"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
-msgstr ""
+msgstr "Keitskouergornek"
 
 #: src/input/es_out.c:3285
 msgid "Cubemap"
-msgstr ""
+msgstr "Kartenngub"
 
 #: src/input/es_out.c:3291
 msgid "Projection"
-msgstr ""
+msgstr "Bannñ"
 
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Dizroenn"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Tachenn"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "Rollad"
 
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "Maezienn welet"
 
 #: src/input/es_out.c:3305
 msgid "Max. luminance"
-msgstr ""
+msgstr "Sklaerijenn uhelañ"
 
 #: src/input/es_out.c:3310
 msgid "Min. luminance"
-msgstr ""
+msgstr "Sklaerijenn izelañ"
 
 #: src/input/es_out.c:3318
 msgid "Primary R"
-msgstr ""
+msgstr "R deraouad"
 
 #: src/input/es_out.c:3325
 msgid "Primary G"
-msgstr ""
+msgstr "G deraouad"
 
 #: src/input/es_out.c:3332
 msgid "Primary B"
-msgstr ""
+msgstr "B deraouad"
 
 #: src/input/es_out.c:3339
 msgid "White point"
-msgstr ""
+msgstr "Poent gwenn"
 
 #: src/input/es_out.c:3354 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1402,11 +1402,11 @@ msgstr "Aktrourien"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 msgid "Album Artist"
-msgstr ""
+msgstr "Albom an arzour"
 
 #: src/input/meta.c:80
 msgid "Disc number"
-msgstr ""
+msgstr "Niverenn disk"
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1448,7 +1448,7 @@ msgstr "Titl kent"
 
 #: src/input/var.c:278
 msgid "Menu title"
-msgstr ""
+msgstr "Titl al lañser"
 
 #: src/input/var.c:285
 msgid "Menu popup"
@@ -1480,7 +1480,7 @@ msgstr "Media : %s"
 #: src/interface/interface.c:82 modules/gui/macosx/VLCMainMenu.m:346
 #: modules/gui/macosx/VLCMainMenu.m:347
 msgid "Add Interface"
-msgstr "Ouzhpennañ ur c'hetal"
+msgstr "Ouzhpennañ un etrefas"
 
 #: src/interface/interface.c:89
 msgid "Console"
@@ -1544,7 +1544,7 @@ msgstr ""
 
 #: src/libvlc-module.c:68
 msgid "Interface module"
-msgstr "Mollad ar c'hetal"
+msgstr "Etrefas ar vodulenn"
 
 #: src/libvlc-module.c:70
 msgid ""
@@ -1552,11 +1552,11 @@ msgid ""
 "automatically select the best module available."
 msgstr ""
 "Setu ar c’hetal pennañ a zo implijet gant VLC. Evit dibab en doare emfiñv ar "
-"mollad dieub ar gwellañ eo realezh an diouer."
+"vodulenn dieub ar gwellañ eo realezh an diouer."
 
 #: src/libvlc-module.c:74 modules/control/ntservice.c:60
 msgid "Extra interface modules"
-msgstr "Molladoù dreist ketal"
+msgstr "Moduloù dreist etrefas"
 
 #: src/libvlc-module.c:76
 msgid ""
@@ -1565,14 +1565,14 @@ msgid ""
 "list of interface modules. (common values are \"rc\" (remote control), \"http"
 "\", \"gestures\" ...)"
 msgstr ""
-"Gallout a rit dibab \"ketaloù ouzhpenn\" evit VLC. Lusket e vint en "
-"drektalenn ouzhpenn ketal an diouer. Implij ur roll molladoù ketal disrannet "
-"gant ur c’holon. (talvoudegezhioù boutin a zo \"dk\" (diframmañ kontroll), "
+"Gallout a rit diuzañ \"etrefasoù ouzhpenn\" evit VLC. Loc'het e vint e-barzh "
+"drekleur ouzhpenn an etrefas dre ziouer. Implijit ul listenn moduloù etrefas "
+"skejet gant ur c’holon. (talvoudegezhioù boutin a zo \"rc\" (pellurzhierez), "
 "\"http\", \"jestroù\"...)"
 
 #: src/libvlc-module.c:83
 msgid "You can select control interfaces for VLC."
-msgstr "Gallout a rit dibab ketaloù kontroll evit VLC."
+msgstr "Gallout a rit diuzañ kontrolloù etrefas evit VLC."
 
 #: src/libvlc-module.c:85
 msgid "Verbosity (0,1,2)"
@@ -1639,7 +1639,7 @@ msgstr ""
 
 #: src/libvlc-module.c:123
 msgid "Audio output module"
-msgstr "Mollad an ec'hankad aodio"
+msgstr "Modulenn an ec'hankad aodio"
 
 #: src/libvlc-module.c:125
 msgid ""
@@ -1668,11 +1668,11 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "Sonerezh"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
-msgstr ""
+msgstr "Kehentiñ"
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
@@ -1680,27 +1680,27 @@ msgstr "C'hoari"
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "Kemennoù"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
-msgstr ""
+msgstr "Skeudennoù-bev"
 
 #: src/libvlc-module.c:143
 msgid "Production"
-msgstr ""
+msgstr "Produadur"
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
-msgstr ""
+msgstr "Tizhusted"
 
 #: src/libvlc-module.c:144
 msgid "Test"
-msgstr ""
+msgstr "Test"
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
-msgstr ""
+msgstr "Gounid aodio"
 
 #: src/libvlc-module.c:149
 msgid "This linear gain will be applied to outputted audio."
@@ -1882,7 +1882,7 @@ msgstr ""
 
 #: src/libvlc-module.c:253
 msgid "Video output module"
-msgstr "Mollad an ec'hankad video"
+msgstr "Modulenn an ec'hankad video"
 
 #: src/libvlc-module.c:255
 msgid ""
@@ -1999,7 +1999,7 @@ msgstr "Traoñ"
 #: modules/spu/audiobargraph_v.c:66 modules/spu/logo.c:81
 #: modules/spu/marq.c:130 modules/spu/mosaic.c:171 modules/spu/rss.c:172
 msgid "Top-Left"
-msgstr ""
+msgstr "Laez-kleiz"
 
 #: src/libvlc-module.c:296 src/libvlc-module.c:369 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:84
@@ -2008,7 +2008,7 @@ msgstr ""
 #: modules/spu/audiobargraph_v.c:66 modules/spu/logo.c:81
 #: modules/spu/marq.c:130 modules/spu/mosaic.c:171 modules/spu/rss.c:172
 msgid "Top-Right"
-msgstr ""
+msgstr "Laez-Dehou"
 
 #: src/libvlc-module.c:296 src/libvlc-module.c:369 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:84
@@ -2017,7 +2017,7 @@ msgstr ""
 #: modules/spu/audiobargraph_v.c:66 modules/spu/logo.c:81
 #: modules/spu/marq.c:130 modules/spu/mosaic.c:171 modules/spu/rss.c:172
 msgid "Bottom-Left"
-msgstr ""
+msgstr "Traoñ-kleiz"
 
 #: src/libvlc-module.c:296 src/libvlc-module.c:369 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:84
@@ -2026,7 +2026,7 @@ msgstr ""
 #: modules/spu/audiobargraph_v.c:66 modules/spu/logo.c:81
 #: modules/spu/marq.c:130 modules/spu/mosaic.c:171 modules/spu/rss.c:172
 msgid "Bottom-Right"
-msgstr ""
+msgstr "Traoñ-dehou"
 
 #: src/libvlc-module.c:298
 msgid "Zoom video"
@@ -2056,7 +2056,7 @@ msgstr ""
 
 #: src/libvlc-module.c:311
 msgid "Fullscreen video output"
-msgstr ""
+msgstr "Ezvont ar video skramm-leun"
 
 #: src/libvlc-module.c:313
 msgid "Start video in fullscreen mode"
@@ -2064,7 +2064,7 @@ msgstr ""
 
 #: src/libvlc-module.c:315 src/video_output/vout_intf.c:253
 msgid "Always on top"
-msgstr ""
+msgstr "Dalc'hmat el laez"
 
 #: src/libvlc-module.c:317
 msgid "Always place the video window on top of other windows."
@@ -2148,7 +2148,7 @@ msgstr ""
 #: src/libvlc-module.c:361 modules/hw/vdpau/chroma.c:883
 #: modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Bob"
-msgstr ""
+msgstr "Bob"
 
 #: src/libvlc-module.c:362 modules/video_filter/deinterlace/deinterlace.h:59
 msgid "Phosphor"
@@ -2179,7 +2179,7 @@ msgstr ""
 
 #: src/libvlc-module.c:379
 msgid "Video splitter module"
-msgstr "Mollad ar troc'her video"
+msgstr "Modulenn ar troc'her video"
 
 #: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
@@ -2187,7 +2187,7 @@ msgstr ""
 
 #: src/libvlc-module.c:383
 msgid "Video filter module"
-msgstr "Mollad ar sil video"
+msgstr "Modulenn ar sil video"
 
 #: src/libvlc-module.c:385
 msgid ""
@@ -2491,7 +2491,7 @@ msgstr "Enaouiñ"
 
 #: src/libvlc-module.c:542
 msgid "MTU of the network interface"
-msgstr "MTU ar c'hetal rouedad"
+msgstr "MTU an etrefas kenrouedad"
 
 #: src/libvlc-module.c:544
 msgid ""
@@ -2606,7 +2606,7 @@ msgstr "ID froud ar roudenn istitl d'ober ganti."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
-msgstr "Ezvoneger istitloù muiañ karet"
+msgstr "Digoder istitloù muiañ karet"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -2654,7 +2654,7 @@ msgstr ""
 
 #: src/libvlc-module.c:634 modules/gui/macosx/VLCOpenWindowController.m:159
 msgid "Start time"
-msgstr ""
+msgstr "Amzer deraouiñ"
 
 #: src/libvlc-module.c:636
 msgid "The stream will start at this position (in seconds)."
@@ -2837,7 +2837,7 @@ msgstr ""
 
 #: src/libvlc-module.c:726
 msgid "Subpictures source module"
-msgstr "Mollad mammenn an isskeudennoù"
+msgstr "Modulenn mammenn an isskeudennoù"
 
 #: src/libvlc-module.c:728
 msgid ""
@@ -2864,8 +2864,8 @@ msgid ""
 "Automatically detect a subtitle file, if no subtitle filename is specified "
 "(based on the filename of the movie)."
 msgstr ""
-"Em-ziguzhiñ ur restr istitloù, ma n'eus anv restr istitl ebet spisaet "
-"(diazezet war an anv-restr ar film)."
+"DInoiñ ur restr istitloù ent emgefreek, ma n'eus anv restr istitl ebet "
+"spisaet (diazezet war anv restr ar film)."
 
 #: src/libvlc-module.c:741
 msgid "Subtitle autodetection fuzziness"
@@ -3282,7 +3282,7 @@ msgstr ""
 
 #: src/libvlc-module.c:978
 msgid "Access output module"
-msgstr "Mollad an ec'hank haeziñ"
+msgstr "Modulenn an ec'hank haeziñ"
 
 #: src/libvlc-module.c:980
 msgid "This is a legacy entry to let you configure access output modules"
@@ -3312,7 +3312,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1001
 msgid "Access module"
-msgstr "Mollad haeziñ"
+msgstr "Modulenn haeziñ"
 
 #: src/libvlc-module.c:1003
 msgid ""
@@ -3323,7 +3323,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1007
 msgid "Stream filter module"
-msgstr "Mollad silañ al lanv"
+msgstr "Modulenn silañ al lanv"
 
 #: src/libvlc-module.c:1009
 msgid "Stream filters are used to modify the stream that is being read."
@@ -3351,7 +3351,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1022
 msgid "VoD server module"
-msgstr "Mollad an dafariad VoD"
+msgstr "Modulenn an dafariad VoD"
 
 #: src/libvlc-module.c:1024
 msgid ""
@@ -3574,7 +3574,7 @@ msgstr "Na ober van ouzh ar restroù o kregiñ gant '.'"
 
 #: src/libvlc-module.c:1151
 msgid "Services discovery modules"
-msgstr "Molladoù an dizoleiñ ar servijoù"
+msgstr "Modulenn an dizoleiñ ar servijoù"
 
 #: src/libvlc-module.c:1153
 msgid ""
@@ -4611,7 +4611,7 @@ msgstr "VLM"
 
 #: src/libvlc-module.c:2026
 msgid "Special modules"
-msgstr "Molladoù arbennik"
+msgstr "Modulenn arbennik"
 
 #: src/libvlc-module.c:2031 modules/gui/qt/dialogs/plugins.cpp:89
 msgid "Plugins"
@@ -7539,7 +7539,7 @@ msgstr "Dilesa RTSP"
 
 #: modules/access/live555.cpp:673
 msgid "Please enter a valid login name and a password."
-msgstr "Roit un anv kennaskañ talvoudek hag ur ger-tremen."
+msgstr "Roit un anv kevreañ mat hag ur ger-tremen."
 
 #: modules/access/live555.cpp:698
 msgid "RTSP connection failed"
@@ -8227,11 +8227,11 @@ msgstr "Sked pe live du ar skeudenn."
 
 #: modules/access/v4l2/v4l2.c:86
 msgid "Automatic brightness"
-msgstr "Sked emgefre"
+msgstr "Lintr emgefre"
 
 #: modules/access/v4l2/v4l2.c:88
 msgid "Automatically adjust the picture brightness."
-msgstr "Em-geidañ sked ar skeudenn."
+msgstr "Keidañ lintr ar skeudenn ent emgefreek"
 
 #: modules/access/v4l2/v4l2.c:89
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:205
@@ -13540,7 +13540,7 @@ msgstr "Berradennoù"
 #: modules/control/globalhotkeys/win32.c:50
 #: modules/control/globalhotkeys/xcb.c:53
 msgid "Global Hotkeys interface"
-msgstr "Ketal ar berradennoù "
+msgstr "Etrefas ar berradennoù "
 
 #: modules/control/hotkeys.c:100
 #: modules/gui/macosx/VLCSimplePrefsController.m:237
@@ -13879,7 +13879,7 @@ msgstr "RC"
 
 #: modules/control/oldrc.c:191
 msgid "Remote control interface"
-msgstr "Ketal ar reolién a-bell"
+msgstr "Etrefas ar bellurzhierez"
 
 #: modules/control/oldrc.c:369
 msgid "Remote control interface initialized. Type `help' for help."
@@ -15150,7 +15150,7 @@ msgstr ""
 
 #: modules/demux/playlist/podcast.c:314
 msgid "Podcast Type"
-msgstr "Rizh ar podskignaoù"
+msgstr "Doare ar podskignaoù"
 
 #: modules/demux/playlist/podcast.c:328
 msgid "Podcast Size"
@@ -16158,7 +16158,7 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:79
 #: modules/gui/macosx/VLCSimplePrefsController.m:320
 msgid "Control system volume with the Apple Remote"
-msgstr "Kontrolit al live-son sistem gant ar pellurzhier Apple"
+msgstr "Reoilhit an ampled reizhiad gant ar pellurzhier Apple"
 
 #: modules/gui/macosx/macosx.m:80
 msgid ""
@@ -16354,7 +16354,7 @@ msgstr "Live-son maksimom diskouezet"
 
 #: modules/gui/macosx/macosx.m:149
 msgid "Mac OS X interface"
-msgstr "Ketal Mac OS X"
+msgstr "Etrefas Mac OS X"
 
 #: modules/gui/macosx/macosx.m:156
 msgid "Appearance"
@@ -16747,7 +16747,7 @@ msgstr ""
 #: modules/gui/macosx/VLCMainWindow.m:221
 #: modules/gui/qt/components/playlist/selector.cpp:580
 msgid "Subscribe"
-msgstr "En em enrollañ"
+msgstr "Koumanantiñ"
 
 #: modules/gui/macosx/VLCMainWindow.m:216
 #: modules/gui/macosx/VLCMainWindow.m:227
@@ -17233,7 +17233,7 @@ msgstr ""
 #: modules/gui/qt/components/simple_preferences.cpp:712
 #: modules/gui/qt/dialogs/plugins.cpp:375
 msgid "Interface Settings"
-msgstr "Arventennoù ar c'hetal"
+msgstr "Arventennoù an etrefas"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:229
 #: modules/gui/qt/components/simple_preferences.cpp:234
@@ -17358,7 +17358,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:312
 msgid "Interface style"
-msgstr "Rizh ar c'hetal"
+msgstr "Doare an etrefas"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:313
 msgid "Dark"
@@ -17986,7 +17986,7 @@ msgstr "Diuzañ"
 
 #: modules/gui/minimal_macosx/macosx.c:57
 msgid "Minimal Mac OS X interface"
-msgstr "Ketal Mac OS X izek"
+msgstr "Etefas Mac OS X bihanañ"
 
 #: modules/gui/ncurses.c:71
 msgid "Filebrowser starting point"
@@ -18000,7 +18000,7 @@ msgstr ""
 
 #: modules/gui/ncurses.c:78
 msgid "Ncurses interface"
-msgstr "Ketal Ncurses"
+msgstr "Etrefas Ncurses"
 
 #: modules/gui/ncurses.c:771
 #, c-format
@@ -19166,7 +19166,7 @@ msgstr "Tarzh :"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:59
 msgid "Type:"
-msgstr "Rizh :"
+msgstr "Doare:"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:127
 msgid "This module writes the transcoded stream to a file."
@@ -20126,7 +20126,7 @@ msgstr "Enlu&gelladoù hag askouezhioù"
 
 #: modules/gui/qt/menus.cpp:442
 msgid "Customi&ze Interface..."
-msgstr "Personalaat ar c'hetal..."
+msgstr "Personalaat an etrefas..."
 
 #: modules/gui/qt/menus.cpp:445
 msgid "&Preferences"
@@ -20162,7 +20162,7 @@ msgstr "Ctrl+H"
 
 #: modules/gui/qt/menus.cpp:519
 msgid "&Fullscreen Interface"
-msgstr "Ketal skramm a-bezh"
+msgstr "Etre&fas skramm a-bezh"
 
 #: modules/gui/qt/menus.cpp:527
 msgid "&Advanced Controls"
@@ -20568,7 +20568,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:218
 msgid "Qt interface"
-msgstr "Ketal Qt"
+msgstr "Etrefas Qt"
 
 #: modules/gui/qt/util/customwidgets.cpp:81
 msgid "errors"
@@ -20669,7 +20669,7 @@ msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:536
 msgid "Skinnable Interface"
-msgstr "Ketal gwiskadus"
+msgstr "Etrefas gwiskadus"
 
 #: modules/gui/skins2/src/theme_repository.cpp:58
 msgid "Select skin"
@@ -21139,7 +21139,7 @@ msgstr ""
 
 #: modules/lua/vlc.c:49
 msgid "Lua interface"
-msgstr "Ketal Lua"
+msgstr "Etrefas Lua"
 
 #: modules/lua/vlc.c:50
 msgid "Lua interface module to load"
@@ -21147,7 +21147,7 @@ msgstr ""
 
 #: modules/lua/vlc.c:52
 msgid "Lua interface configuration"
-msgstr "Kefluniañ ar c'hetal Lua"
+msgstr "Kefluniañ etrefas Lua"
 
 #: modules/lua/vlc.c:53
 msgid ""
@@ -21259,7 +21259,7 @@ msgstr "Askouezh Lua"
 
 #: modules/lua/vlc.c:167
 msgid "Lua SD Module"
-msgstr "Mollad SD Lua"
+msgstr "Modulenn SD Lua"
 
 #: modules/meta_engine/folder.c:71
 msgid "Folder meta data"
@@ -22509,9 +22509,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Paketer video H.264"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -22767,7 +22766,7 @@ msgstr "HD DVD"
 
 #: modules/services_discovery/udev.c:612
 msgid "Unknown type"
-msgstr "Rizh dianav"
+msgstr "Doare dianav"
 
 #: modules/services_discovery/upnp.cpp:72
 msgid "SAT>IP channel list"
@@ -24368,7 +24367,7 @@ msgstr "Digenweañ ar video a-raok an enbonegadur."
 
 #: modules/stream_out/transcode/transcode.c:64
 msgid "Deinterlace module"
-msgstr "Mollad an digenweañ"
+msgstr "Modulenn an digenweañ"
 
 #: modules/stream_out/transcode/transcode.c:66
 msgid "Specify the deinterlace module to use."
@@ -25486,7 +25485,7 @@ msgstr "A-serzh"
 
 #: modules/video_filter/mirror.c:69
 msgid "Horizontal"
-msgstr "A-zremm"
+msgstr "A-blaen"
 
 #: modules/video_filter/mirror.c:71
 msgid "Direction"
@@ -26586,7 +26585,7 @@ msgstr ""
 
 #: modules/video_splitter/clone.c:43
 msgid "Video output modules"
-msgstr "Molladoù an ec'hankad video"
+msgstr "Modulenn an ec'hankad video"
 
 #: modules/video_splitter/clone.c:44
 msgid ""
@@ -27214,7 +27213,7 @@ msgstr "Amzer :"
 #: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
 #: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile_view.html:25
 msgid "VLC media player - Web Interface"
-msgstr "Lenner mediaoù VLC - Ketal web"
+msgstr "Lenner mediaoù VLC - Etrefas web"
 
 #: share/lua/http/index.html:215
 msgid "Hide / Show Library"
@@ -27343,7 +27342,7 @@ msgstr "En&rollañ evel..."
 
 #: modules/gui/qt/ui/messages_panel.h:143
 msgid "Modules Tree"
-msgstr "Gwezennad ar molladoù"
+msgstr "Gwezenn ar moduloù"
 
 #: modules/gui/qt/ui/open.h:263
 msgid "Show extended options"
@@ -27682,7 +27681,7 @@ msgstr "%"
 
 #: modules/gui/qt/ui/sprefs_audio.h:415
 msgid "Output module:"
-msgstr "Mollad an ec'hankad :"
+msgstr "Modulenn an ec'hankad:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:418
 msgid "Use S/PDIF when available"
@@ -27806,7 +27805,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:538
 msgid "Resize interface to video size"
-msgstr "Adventañ ar c'hetal da vent ar video"
+msgstr "Adventañ an etrefas war ment ar video"
 
 #: modules/gui/qt/ui/sprefs_interface.h:539
 msgid "Show controls in full screen mode"
