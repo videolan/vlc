@@ -1,7 +1,7 @@
 /*****************************************************************************
  * applescript.m: MacOS X AppleScript support
  *****************************************************************************
- * Copyright (C) 2002-2013 VLC authors and VideoLAN
+ * Copyright (C) 2002-2019 VLC authors and VideoLAN
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
@@ -40,16 +40,17 @@
  *****************************************************************************/
 @implementation VLGetURLScriptCommand
 
-- (id)performDefaultImplementation {
-    NSString *o_command = [[self commandDescription] commandName];
-    NSString *o_urlString = [self directParameter];
+- (id)performDefaultImplementation
+{
+    NSString *commandString = [[self commandDescription] commandName];
+    NSString *parameterString = [self directParameter];
 
-    if ([o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"]) {
-        if (o_urlString) {
-            VLCOpenInputMetadata *o_inputMetadata = [[VLCOpenInputMetadata alloc] init];
-            o_inputMetadata.MRLString = o_urlString;
+    if ([commandString isEqualToString:@"GetURL"] || [commandString isEqualToString:@"OpenURL"]) {
+        if (parameterString) {
+            VLCOpenInputMetadata *inputMetadata = [[VLCOpenInputMetadata alloc] init];
+            inputMetadata.MRLString = parameterString;
 
-            [[[VLCMain sharedInstance] playlistController] addPlaylistItems:@[o_inputMetadata]];
+            [[[VLCMain sharedInstance] playlistController] addPlaylistItems:@[inputMetadata]];
         }
     }
     return nil;
@@ -67,82 +68,84 @@
  */
 @implementation VLControlScriptCommand
 
-- (id)performDefaultImplementation {
-    NSString *o_command = [[self commandDescription] commandName];
-    NSString *o_parameter = [self directParameter];
+- (id)performDefaultImplementation
+{
+    NSString *commandString = [[self commandDescription] commandName];
+    NSString *parameterString = [self directParameter];
+    VLCCoreInteraction *coreInteractionInstance = [VLCCoreInteraction sharedInstance];
 
-    if ([o_command isEqualToString:@"play"])
-        [[VLCCoreInteraction sharedInstance] playOrPause];
-    else if ([o_command isEqualToString:@"stop"])
-        [[VLCCoreInteraction sharedInstance] stop];
-    else if ([o_command isEqualToString:@"previous"])
-        [[VLCCoreInteraction sharedInstance] previous];
-    else if ([o_command isEqualToString:@"next"])
-        [[VLCCoreInteraction sharedInstance] next];
-    else if ([o_command isEqualToString:@"fullscreen"])
-        [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-    else if ([o_command isEqualToString:@"mute"])
-        [[VLCCoreInteraction sharedInstance] toggleMute];
-    else if ([o_command isEqualToString:@"volumeUp"])
-        [[VLCCoreInteraction sharedInstance] volumeUp];
-    else if ([o_command isEqualToString:@"volumeDown"])
-        [[VLCCoreInteraction sharedInstance] volumeDown];
-    else if ([o_command isEqualToString:@"moveMenuFocusUp"])
-        [[VLCCoreInteraction sharedInstance] moveMenuFocusUp];
-    else if ([o_command isEqualToString:@"moveMenuFocusDown"])
-        [[VLCCoreInteraction sharedInstance] moveMenuFocusDown];
-    else if ([o_command isEqualToString:@"moveMenuFocusLeft"])
-        [[VLCCoreInteraction sharedInstance] moveMenuFocusLeft];
-    else if ([o_command isEqualToString:@"moveMenuFocusRight"])
-        [[VLCCoreInteraction sharedInstance] moveMenuFocusRight];
-    else if ([o_command isEqualToString:@"menuFocusActivate"])
-        [[VLCCoreInteraction sharedInstance] menuFocusActivate];
-    else if ([o_command isEqualToString:@"stepForward"]) {
+    if ([commandString isEqualToString:@"play"])
+        [coreInteractionInstance playOrPause];
+    else if ([commandString isEqualToString:@"stop"])
+        [coreInteractionInstance stop];
+    else if ([commandString isEqualToString:@"previous"])
+        [coreInteractionInstance previous];
+    else if ([commandString isEqualToString:@"next"])
+        [coreInteractionInstance next];
+    else if ([commandString isEqualToString:@"fullscreen"])
+        [coreInteractionInstance toggleFullscreen];
+    else if ([commandString isEqualToString:@"mute"])
+        [coreInteractionInstance toggleMute];
+    else if ([commandString isEqualToString:@"volumeUp"])
+        [coreInteractionInstance volumeUp];
+    else if ([commandString isEqualToString:@"volumeDown"])
+        [coreInteractionInstance volumeDown];
+    else if ([commandString isEqualToString:@"moveMenuFocusUp"])
+        [coreInteractionInstance moveMenuFocusUp];
+    else if ([commandString isEqualToString:@"moveMenuFocusDown"])
+        [coreInteractionInstance moveMenuFocusDown];
+    else if ([commandString isEqualToString:@"moveMenuFocusLeft"])
+        [coreInteractionInstance moveMenuFocusLeft];
+    else if ([commandString isEqualToString:@"moveMenuFocusRight"])
+        [coreInteractionInstance moveMenuFocusRight];
+    else if ([commandString isEqualToString:@"menuFocusActivate"])
+        [coreInteractionInstance menuFocusActivate];
+    else if ([commandString isEqualToString:@"stepForward"]) {
         //default: forwardShort
-        if (o_parameter) {
-            int i_parameter = [o_parameter intValue];
-            switch (i_parameter) {
+        if (parameterString) {
+            int parameterInt = [parameterString intValue];
+            switch (parameterInt) {
                 case 1:
-                    [[VLCCoreInteraction sharedInstance] forwardExtraShort];
+                    [coreInteractionInstance forwardExtraShort];
                     break;
                 case 2:
-                    [[VLCCoreInteraction sharedInstance] forwardShort];
+                    [coreInteractionInstance forwardShort];
                     break;
                 case 3:
-                    [[VLCCoreInteraction sharedInstance] forwardMedium];
+                    [coreInteractionInstance forwardMedium];
                     break;
                 case 4:
-                    [[VLCCoreInteraction sharedInstance] forwardLong];
+                    [coreInteractionInstance forwardLong];
                     break;
                 default:
-                    [[VLCCoreInteraction sharedInstance] forwardShort];
+                    [coreInteractionInstance forwardShort];
                     break;
             }
         } else
-            [[VLCCoreInteraction sharedInstance] forwardShort];
-    } else if ([o_command isEqualToString:@"stepBackward"]) {
+            [coreInteractionInstance forwardShort];
+    } else if ([commandString isEqualToString:@"stepBackward"]) {
         //default: backwardShort
-        if (o_parameter) {
-            int i_parameter = [o_parameter intValue];
-            switch (i_parameter) {
+        if (parameterString) {
+            int parameterInt = [parameterString intValue];
+            switch (parameterInt) {
                 case 1:
-                    [[VLCCoreInteraction sharedInstance] backwardExtraShort];
+                    [coreInteractionInstance backwardExtraShort];
                     break;
                 case 2:
-                    [[VLCCoreInteraction sharedInstance] backwardShort];
+                    [coreInteractionInstance backwardShort];
                     break;
                 case 3:
-                    [[VLCCoreInteraction sharedInstance] backwardMedium];
+                    [coreInteractionInstance backwardMedium];
                     break;
                 case 4:
-                    [[VLCCoreInteraction sharedInstance] backwardLong];
+                    [coreInteractionInstance backwardLong];
                     break;
                 default:
-                    [[VLCCoreInteraction sharedInstance] backwardShort];
+                    [coreInteractionInstance backwardShort];
                     break;
             }
         } else
-            [[VLCCoreInteraction sharedInstance] backwardShort];
+            [coreInteractionInstance backwardShort];
     }
    return nil;
 }
@@ -154,7 +157,8 @@
  *****************************************************************************/
 @implementation NSApplication(ScriptSupport)
 
-- (BOOL)scriptFullscreenMode {
+- (BOOL)scriptFullscreenMode
+{
     vout_thread_t * p_vout = getVoutForActiveWindow();
     if (!p_vout)
         return NO;
@@ -163,7 +167,8 @@
     return b_value;
 }
 
-- (void)setScriptFullscreenMode:(BOOL)mode {
+- (void)setScriptFullscreenMode:(BOOL)mode
+{
     vout_thread_t * p_vout = getVoutForActiveWindow();
     if (!p_vout)
         return;
@@ -175,11 +180,13 @@
     [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 
-- (BOOL) muted {
+- (BOOL)muted
+{
     return [[VLCCoreInteraction sharedInstance] mute];
 }
 
-- (BOOL) playing {
+- (BOOL)playing
+{
     intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return NO;
@@ -194,15 +201,18 @@
     return ((i_state == OPENING_S) || (i_state == PLAYING_S));
 }
 
-- (int) audioVolume {
+- (int)audioVolume
+{
     return ([[VLCCoreInteraction sharedInstance] volume]);
 }
 
-- (void) setAudioVolume:(int)i_audioVolume {
-    [[VLCCoreInteraction sharedInstance] setVolume:(int)i_audioVolume];
+- (void)setAudioVolume:(int)volume
+{
+    [[VLCCoreInteraction sharedInstance] setVolume:volume];
 }
 
-- (long long) audioDesync {
+- (long long)audioDesync
+{
     input_thread_t * p_input = pl_CurrentInput(getIntf());
     vlc_tick_t i_delay;
 
@@ -215,16 +225,18 @@
     return MS_FROM_VLC_TICK( i_delay );
 }
 
-- (void) setAudioDesync:(long long)i_audioDesync {
+- (void)setAudioDesync:(long long)audioDelay
+{
     input_thread_t * p_input = pl_CurrentInput(getIntf());
     if (!p_input)
         return;
 
-    var_SetInteger(p_input, "audio-delay", VLC_TICK_FROM_MS( i_audioDesync ));
+    var_SetInteger(p_input, "audio-delay", VLC_TICK_FROM_MS( audioDelay ));
     input_Release(p_input);
 }
 
-- (int) currentTime {
+- (int)currentTime
+{
     input_thread_t * p_input = pl_CurrentInput(getIntf());
     vlc_tick_t i_currentTime;
 
@@ -237,33 +249,37 @@
     return (int)SEC_FROM_VLC_TICK(i_currentTime);
 }
 
-- (void) setCurrentTime:(int)i_currentTime {
-    if (i_currentTime) {
-        int64_t i64_value = (int64_t)i_currentTime;
+- (void)setCurrentTime:(int)currenTime
+{
+    if (currenTime) {
         input_thread_t * p_input = pl_CurrentInput(getIntf());
 
         if (!p_input)
             return;
 
-        input_SetTime(p_input, vlc_tick_from_sec(i64_value),
+        input_SetTime(p_input, vlc_tick_from_sec(currenTime),
                       var_GetBool(p_input, "input-fast-seek"));
         input_Release(p_input);
     }
 }
 
-- (NSInteger) durationOfCurrentItem {
+- (NSInteger)durationOfCurrentItem
+{
     return [[VLCCoreInteraction sharedInstance] durationOfCurrentPlaylistItem];
 }
 
-- (NSString*) pathOfCurrentItem {
+- (NSString *)pathOfCurrentItem
+{
     return [[[VLCCoreInteraction sharedInstance] URLOfCurrentPlaylistItem] path];
 }
 
-- (NSString*) nameOfCurrentItem {
+- (NSString *)nameOfCurrentItem
+{
     return [[VLCCoreInteraction sharedInstance] nameOfCurrentPlaylistItem];
 }
 
-- (BOOL)playbackShowsMenu {
+- (BOOL)playbackShowsMenu
+{
     input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
 
     if (!p_input_thread)
