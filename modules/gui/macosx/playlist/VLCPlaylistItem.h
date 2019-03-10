@@ -35,6 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, retain, nullable) NSString *artistName;
 @property (readwrite, retain, nullable) NSString *albumName;
 @property (readwrite, retain, nullable) NSString *artworkURLString;
+@property (readonly, copy) NSImage *artworkImage;
 
 - (instancetype)initWithPlaylistItem:(vlc_playlist_item_t *)p_item;
 - (void)updateRepresentation;

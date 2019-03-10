@@ -29,11 +29,14 @@ static const float fontSizeForMediaTitle = 13.;
 - (void)setRepresentsCurrentPlaylistItem:(BOOL)representsCurrentPlaylistItem
 {
     _representsCurrentPlaylistItem = representsCurrentPlaylistItem;
+    NSFont *displayedFont;
     if (_representsCurrentPlaylistItem) {
-        self.mediaTitleTextField.font = [NSFont boldSystemFontOfSize:fontSizeForMediaTitle];
+        displayedFont = [NSFont boldSystemFontOfSize:fontSizeForMediaTitle];
     } else {
-        self.mediaTitleTextField.font = [NSFont systemFontOfSize:fontSizeForMediaTitle];
+        displayedFont = [NSFont systemFontOfSize:fontSizeForMediaTitle];
     }
+    self.mediaTitleTextField.font = displayedFont;
+    self.secondaryMediaTitleTextField.font = displayedFont;
 }
 
 @end

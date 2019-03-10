@@ -30,7 +30,7 @@
 
 static const float f_min_window_width = 604.;
 static const float f_min_window_height = 307.;
-static const float f_playlist_row_height = 40.;
+static const float f_playlist_row_height = 72.;
 
 static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 

@@ -78,9 +78,22 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
         return cellView;
     }
 
-    cellView.mediaTitleTextField.stringValue = item.title;
+    NSString *artist = item.artistName;
+    if (artist && artist.length > 0) {
+        cellView.mediaTitleTextField.hidden = YES;
+        cellView.secondaryMediaTitleTextField.hidden = NO;
+        cellView.artistTextField.hidden = NO;
+        cellView.secondaryMediaTitleTextField.stringValue = item.title;
+        cellView.artistTextField.stringValue = artist;
+    } else {
+        cellView.mediaTitleTextField.hidden = NO;
+        cellView.secondaryMediaTitleTextField.hidden = YES;
+        cellView.artistTextField.hidden = YES;
+        cellView.mediaTitleTextField.stringValue = item.title;
+    }
+
     cellView.durationTextField.stringValue = [NSString stringWithTimeFromTicks:item.duration];
-    cellView.mediaImageView.image = [NSImage imageNamed: @"noart.png"];
+    cellView.mediaImageView.image = item.artworkImage;
     cellView.representsCurrentPlaylistItem = _playlistController.currentPlaylistIndex == row;
 
     return cellView;

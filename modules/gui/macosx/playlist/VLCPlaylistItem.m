@@ -85,4 +85,17 @@
     return path;
 }
 
+- (NSImage *)artworkImage
+{
+    NSImage *image;
+
+    if (_artworkURLString != nil && _artworkURLString.length > 0) {
+        image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString:_artworkURLString]];
+    } else {
+        image = [NSImage imageNamed: @"noart.png"];
+    }
+
+    return image;
+}
+
 @end
