@@ -408,16 +408,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)updateMetaAndInfo
 {
-    if (!p_current_input) {
-        [[[VLCMain sharedInstance] currentMediaInfoPanel] updatePanelWithItem:nil];
-        return;
-    }
-
     input_item_t *p_input_item = input_GetItem(p_current_input);
-
-    // FIXME: update metadata in playlist model if needed
-//    [[[o_main playlist] model] updateItem:p_input_item];
-    [[[VLCMain sharedInstance] currentMediaInfoPanel] updatePanelWithItem:p_input_item];
 
     if (!p_input_item) {
         return;

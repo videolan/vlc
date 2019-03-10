@@ -91,9 +91,8 @@
 - (IBAction)saveMetaData:(id)sender;
 - (IBAction)downloadCoverArt:(id)sender;
 
-- (void)updatePanelWithItem:(input_item_t *)_p_item;
+- (void)updatePanelWithItem:(input_item_t *)newInputItem;
 
-- (void)updateMetadata;
 - (void)updateStatistics;
 
 @end

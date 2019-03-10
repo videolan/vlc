@@ -25,13 +25,13 @@
 
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
+#import "playlist/VLCPlaylistController.h"
 
 #import <vlc_url.h>
 
-/**
- * Holds information for one element in the codec information panel
- */
-@interface VLCInfoTreeItem : NSObject
+#pragma mark - data storage object
+
+@interface VLCCodecInformationTreeItem : NSObject
 
 @property (readwrite) NSString *name;
 @property (readwrite) NSString *value;
@@ -40,11 +40,17 @@
 
 @end
 
+@implementation VLCCodecInformationTreeItem
+
+@end
+
+#pragma mark - window controller
+
 @interface VLCInformationWindowController () <NSOutlineViewDataSource>
 {
-    VLCInfoTreeItem *rootItem;
+    VLCCodecInformationTreeItem *rootItem;
 
-    input_item_t *p_item;
+    input_item_t *_mediaItem;
 
     BOOL b_stats;
 }
@@ -55,8 +61,21 @@
 - (id)init
 {
     self = [super initWithWindowNibName:@"MediaInfo"];
-
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(currentPlaylistItemChanged:)
+                                                     name:VLCPlaylistCurrentItemChanged
+                                                   object:nil];
+    }
     return self;
+}
+
+- (void)dealloc
+{
+    if (_mediaItem)
+        input_item_Release(_mediaItem);
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)windowDidLoad
@@ -116,17 +135,9 @@
     else
         [self initMediaPanelStats];
 
-
     /* We may be awoken from nib way after initialisation
-     *Update ourselves */
-    [self updatePanelWithItem:p_item];
-}
-
-
-- (void)dealloc
-{
-    if (p_item)
-        input_item_Release(p_item);
+     * Update ourselves */
+    [self updatePanelWithItem:_mediaItem];
 }
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
@@ -164,29 +175,26 @@
     [_lostAudioBuffersTextField setIntValue: 0];
 }
 
-- (void)updateMetadata
+- (void)currentPlaylistItemChanged:(NSNotification *)aNotification
 {
-    if (!p_item)
-        return;
-
-    [self updatePanelWithItem:p_item];
+    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+    input_item_t *currentMediaItem = playlistController.currentlyPlayingInputItem;
+    [self updatePanelWithItem:currentMediaItem];
 }
 
-- (void)updatePanelWithItem:(input_item_t *)_p_item;
+- (void)updatePanelWithItem:(input_item_t *)newInputItem;
 {
-    if (_p_item != p_item) {
-        if (p_item)
-            input_item_Release(p_item);
+    if (newInputItem != _mediaItem) {
+        if (_mediaItem)
+            input_item_Release(_mediaItem);
         [_saveMetaDataButton setEnabled: NO];
-        if (_p_item)
-            input_item_Hold(_p_item);
-        p_item = _p_item;
+        _mediaItem = newInputItem;
     }
 
     if (!self.isWindowLoaded)
         return;
 
-    if (!p_item) {
+    if (!_mediaItem) {
         /* Erase */
 #define SET( foo ) \
 [_##foo##TextField setStringValue:@""];
@@ -206,24 +214,24 @@
 #undef SET
         [_imageWell setImage: [NSImage imageNamed: @"noart.png"]];
     } else {
-        if (!input_item_IsPreparsed(p_item))
-            libvlc_MetadataRequest(vlc_object_instance(getIntf()), p_item, META_REQUEST_OPTION_NONE,
+        if (!input_item_IsPreparsed(_mediaItem))
+            libvlc_MetadataRequest(vlc_object_instance(getIntf()), _mediaItem, META_REQUEST_OPTION_NONE,
                                    NULL, NULL, -1, NULL);
 
         /* fill uri info */
-        char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
+        char *psz_url = vlc_uri_decode(input_item_GetURI(_mediaItem));
         [_uriTextField setStringValue:toNSStr(psz_url)];
         free(psz_url);
 
         /* fill title info */
-        char *psz_title = input_item_GetTitle(p_item);
+        char *psz_title = input_item_GetTitle(_mediaItem);
         if (!psz_title)
-            psz_title = input_item_GetName(p_item);
+            psz_title = input_item_GetName(_mediaItem);
         [_titleTextField setStringValue:toNSStr(psz_title)];
         free(psz_title);
 
 #define SET( foo, bar ) \
-char *psz_##foo = input_item_Get##bar ( p_item ); \
+char *psz_##foo = input_item_Get##bar ( _mediaItem ); \
 [_##foo##TextField setStringValue:toNSStr(psz_##foo)]; \
 FREENULL( psz_##foo );
 
@@ -244,7 +252,7 @@ FREENULL( psz_##foo );
 
         char *psz_meta;
         NSImage *image;
-        psz_meta = input_item_GetArtURL(p_item);
+        psz_meta = input_item_GetArtURL(_mediaItem);
 
         /* FIXME Can also be attachment:// */
         if (psz_meta && strncmp(psz_meta, "attachment://", 13))
@@ -267,7 +275,7 @@ FREENULL( psz_##foo );
     if (!self.isWindowLoaded || !b_stats)
         return;
 
-    if (!p_item || !p_item->p_stats) {
+    if (!_mediaItem || !_mediaItem->p_stats) {
         [self initMediaPanelStats];
         return;
     }
@@ -277,46 +285,46 @@ FREENULL( psz_##foo );
 
     /* input */
     [_readBytesTextField setStringValue: [NSString stringWithFormat:
-                                          @"%8.0f KiB", (float)(p_item->p_stats->i_read_bytes)/1024]];
+                                          @"%8.0f KiB", (float)(_mediaItem->p_stats->i_read_bytes)/1024]];
     [_inputBitrateTextField setStringValue: [NSString stringWithFormat:
-                                             @"%6.0f kb/s", (float)(p_item->p_stats->f_input_bitrate)*8000]];
+                                             @"%6.0f kb/s", (float)(_mediaItem->p_stats->f_input_bitrate)*8000]];
     [_demuxBytesTextField setStringValue: [NSString stringWithFormat:
-                                           @"%8.0f KiB", (float)(p_item->p_stats->i_demux_read_bytes)/1024]];
+                                           @"%8.0f KiB", (float)(_mediaItem->p_stats->i_demux_read_bytes)/1024]];
     [_demuxBitrateTextField setStringValue: [NSString stringWithFormat:
-                                             @"%6.0f kb/s", (float)(p_item->p_stats->f_demux_bitrate)*8000]];
+                                             @"%6.0f kb/s", (float)(_mediaItem->p_stats->f_demux_bitrate)*8000]];
 
     /* Video */
-    [_videoDecodedTextField setIntegerValue: p_item->p_stats->i_decoded_video];
-    [_displayedTextField setIntegerValue: p_item->p_stats->i_displayed_pictures];
-    [_lostFramesTextField setIntegerValue: p_item->p_stats->i_lost_pictures];
+    [_videoDecodedTextField setIntegerValue: _mediaItem->p_stats->i_decoded_video];
+    [_displayedTextField setIntegerValue: _mediaItem->p_stats->i_displayed_pictures];
+    [_lostFramesTextField setIntegerValue: _mediaItem->p_stats->i_lost_pictures];
 
     /* Audio */
-    [_audioDecodedTextField setIntegerValue: p_item->p_stats->i_decoded_audio];
-    [_playedAudioBuffersTextField setIntegerValue: p_item->p_stats->i_played_abuffers];
-    [_lostAudioBuffersTextField setIntegerValue: p_item->p_stats->i_lost_abuffers];
+    [_audioDecodedTextField setIntegerValue: _mediaItem->p_stats->i_decoded_audio];
+    [_playedAudioBuffersTextField setIntegerValue: _mediaItem->p_stats->i_played_abuffers];
+    [_lostAudioBuffersTextField setIntegerValue: _mediaItem->p_stats->i_lost_abuffers];
 }
 
 - (void)updateStreamsList
 {
-    rootItem = [[VLCInfoTreeItem alloc] init];
+    rootItem = [[VLCCodecInformationTreeItem alloc] init];
 
-    if (p_item) {
-        vlc_mutex_lock(&p_item->lock);
+    if (_mediaItem) {
+        vlc_mutex_lock(&_mediaItem->lock);
         // build list of streams
         NSMutableArray *streams = [NSMutableArray array];
 
-        for (int i = 0; i < p_item->i_categories; i++) {
-            info_category_t *cat = p_item->pp_categories[i];
+        for (int i = 0; i < _mediaItem->i_categories; i++) {
+            info_category_t *cat = _mediaItem->pp_categories[i];
             info_t *info;
 
-            VLCInfoTreeItem *subItem = [[VLCInfoTreeItem alloc] init];
+            VLCCodecInformationTreeItem *subItem = [[VLCCodecInformationTreeItem alloc] init];
             subItem.name = toNSStr(cat->psz_name);
 
             // Build list of codec details
             NSMutableArray *infos = [NSMutableArray array];
 
             info_foreach(info, &cat->infos) {
-                VLCInfoTreeItem *infoItem = [[VLCInfoTreeItem alloc] init];
+                VLCCodecInformationTreeItem *infoItem = [[VLCCodecInformationTreeItem alloc] init];
                 infoItem.name = toNSStr(info->psz_name);
                 infoItem.value = toNSStr(info->psz_value);
                 [infos addObject:infoItem];
@@ -327,7 +335,7 @@ FREENULL( psz_##foo );
         }
 
         rootItem.children = [streams copy];
-        vlc_mutex_unlock(&p_item->lock);
+        vlc_mutex_unlock(&_mediaItem->lock);
     }
 
     [_outlineView reloadData];
@@ -341,7 +349,7 @@ FREENULL( psz_##foo );
 
 - (IBAction)saveMetaData:(id)sender
 {
-    if (!p_item) {
+    if (!_mediaItem) {
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setMessageText:_NS("Error while saving meta")];
         [alert setInformativeText:_NS("VLC was unable to save the meta data.")];
@@ -353,30 +361,30 @@ FREENULL( psz_##foo );
     #define utf8( _blub ) \
         [[_blub stringValue] UTF8String]
 
-    input_item_SetName( p_item, utf8( _titleTextField ) );
-    input_item_SetTitle( p_item, utf8( _titleTextField ) );
-    input_item_SetArtist( p_item, utf8( _authorTextField ) );
-    input_item_SetAlbum( p_item, utf8( _collectionTextField ) );
-    input_item_SetGenre( p_item, utf8( _genreTextField ) );
-    input_item_SetTrackNum( p_item, utf8( _seqNumTextField ) );
-    input_item_SetDate( p_item, utf8( _dateTextField ) );
-    input_item_SetCopyright( p_item, utf8( _copyrightTextField ) );
-    input_item_SetPublisher( p_item, utf8( _publisherTextField ) );
-    input_item_SetDescription( p_item, utf8( _descriptionTextField ) );
-    input_item_SetLanguage( p_item, utf8( _languageTextField ) );
+    input_item_SetName( _mediaItem, utf8( _titleTextField ) );
+    input_item_SetTitle( _mediaItem, utf8( _titleTextField ) );
+    input_item_SetArtist( _mediaItem, utf8( _authorTextField ) );
+    input_item_SetAlbum( _mediaItem, utf8( _collectionTextField ) );
+    input_item_SetGenre( _mediaItem, utf8( _genreTextField ) );
+    input_item_SetTrackNum( _mediaItem, utf8( _seqNumTextField ) );
+    input_item_SetDate( _mediaItem, utf8( _dateTextField ) );
+    input_item_SetCopyright( _mediaItem, utf8( _copyrightTextField ) );
+    input_item_SetPublisher( _mediaItem, utf8( _publisherTextField ) );
+    input_item_SetDescription( _mediaItem, utf8( _descriptionTextField ) );
+    input_item_SetLanguage( _mediaItem, utf8( _languageTextField ) );
 
     playlist_t *p_playlist = pl_Get(getIntf());
-    input_item_WriteMeta(VLC_OBJECT(p_playlist), p_item);
+    input_item_WriteMeta(VLC_OBJECT(p_playlist), _mediaItem);
 
-    [self updatePanelWithItem: p_item];
+    [self updatePanelWithItem: _mediaItem];
 
     [_saveMetaDataButton setEnabled: NO];
 }
 
 - (IBAction)downloadCoverArt:(id)sender
 {
-    if (p_item)
-        libvlc_ArtRequest(vlc_object_instance(getIntf()), p_item, META_REQUEST_OPTION_NONE,
+    if (_mediaItem)
+        libvlc_ArtRequest(vlc_object_instance(getIntf()), _mediaItem, META_REQUEST_OPTION_NONE,
                           NULL, NULL);
 }
 
@@ -385,34 +393,36 @@ FREENULL( psz_##foo );
 
 @implementation VLCInformationWindowController (NSTableDataSource)
 
-- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView
+  numberOfChildrenOfItem:(id)item
 {
     return (item == nil) ? [rootItem children].count : [item children].count;
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item {
+- (BOOL)outlineView:(NSOutlineView *)outlineView
+   isItemExpandable:(id)item {
     return ([item children].count > 0);
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView
+            child:(NSInteger)index
+           ofItem:(id)item
 {
-    return (item == nil) ? [[rootItem children] objectAtIndex:index] : [[item children]objectAtIndex:index];
+    return (item == nil) ? [rootItem children][index] : [item children][index];
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView
+objectValueForTableColumn:(NSTableColumn *)tableColumn
+           byItem:(id)item
 {
     if (!item)
         return @"";
 
-    if ([[tableColumn identifier] isEqualToString:@"0"])
+    if ([[tableColumn identifier] isEqualToString:@"0"]) {
         return [item name];
-    else
+    } else {
         return [item value];
+    }
 }
-
-@end
-
-
-@implementation VLCInfoTreeItem
 
 @end
