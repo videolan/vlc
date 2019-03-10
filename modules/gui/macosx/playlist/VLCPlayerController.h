@@ -81,6 +81,18 @@ extern NSString *VLCPlayerTimeAndPositionChanged;
 extern NSString *VLCPlayerLengthChanged;
 
 /**
+ * Listen to VLCPlayerTitleSelectionChanged to be notified if the selected title of the current media changes
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerTitleSelectionChanged;
+
+/**
+ * Listen to VLCPlayerTitleListChanged to be notified if the list of titles of the current media changes
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerTitleListChanged;
+
+/**
  * Listen to VLCPlayerTeletextMenuAvailable to be notified if a teletext menu becomes (un-)available
  * @note the affected player object will be the object of the notification
  */
@@ -383,6 +395,30 @@ extern NSString *VLCPlayerMuteChanged;
  * @note listen to VLCPlayerLengthChanged to be notified about changes to this property
  */
 @property (readonly) vlc_tick_t length;
+
+/**
+ * set/get the currently selected title
+ * @note listen to VLCPlayerTitleSelectionChanged to be notified about changes to this property
+ */
+@property (readwrite, nonatomic) size_t selectedTitleIndex;
+
+/**
+ * convinience method to get the current title
+ * @note this may return NULL if there is no title
+ */
+- (const struct vlc_player_title * _Nullable)selectedTitle;
+
+/**
+ * get the number of titles available for the currently playing media item
+ * @note listen to VLCPlayerTitleListChanged to be notified about changes to this property
+ */
+@property (readonly) size_t numberOfTitlesOfCurrentMedia;
+
+/**
+ * get a vlc_player_title by the index
+ * @note listen to VLCPlayerTitleListChanged in case the list changes so previous indexes will no longer be valid anymore
+ */
+- (const struct vlc_player_title *)titleAtIndexForCurrentMedia:(size_t)index;
 
 /**
  * exposes whether a teletext menu is available or not

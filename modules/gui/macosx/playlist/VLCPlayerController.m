@@ -33,6 +33,8 @@ NSString *VLCPlayerRateChanged = @"VLCPlayerRateChanged";
 NSString *VLCPlayerCapabilitiesChanged = @"VLCPlayerCapabilitiesChanged";
 NSString *VLCPlayerTimeAndPositionChanged = @"VLCPlayerTimeAndPositionChanged";
 NSString *VLCPlayerLengthChanged = @"VLCPlayerLengthChanged";
+NSString *VLCPlayerTitleSelectionChanged = @"VLCPlayerTitleSelectionChanged";
+NSString *VLCPlayerTitleListChanged = @"VLCPlayerTitleListChanged";
 NSString *VLCPlayerTeletextMenuAvailable = @"VLCPlayerTeletextMenuAvailable";
 NSString *VLCPlayerTeletextEnabled = @"VLCPlayerTeletextEnabled";
 NSString *VLCPlayerTeletextPageChanged = @"VLCPlayerTeletextPageChanged";
@@ -54,6 +56,7 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
     vlc_player_listener_id *_playerListenerID;
     vlc_player_aout_listener_id *_playerAoutListenerID;
     vlc_player_vout_listener_id *_playerVoutListenerID;
+    vlc_player_title_list *_currentTitleList;
     NSNotificationCenter *_defaultNotificationCenter;
 }
 
@@ -65,6 +68,8 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 - (void)capabilitiesChanged:(int)newCapabilities;
 - (void)position:(float)position andTimeChanged:(vlc_tick_t)time;
 - (void)lengthChanged:(vlc_tick_t)length;
+- (void)titleListChanged:(vlc_player_title_list *)p_titles;
+- (void)selectedTitleChanged:(size_t)selectedTitle;
 - (void)teletextAvailibilityChanged:(BOOL)hasTeletextMenu;
 - (void)teletextEnabledChanged:(BOOL)teletextOn;
 - (void)teletextPageChanged:(unsigned int)page;
@@ -155,6 +160,31 @@ static void cb_player_length_changed(vlc_player_t *p_player, vlc_tick_t newLengt
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
         [playerController lengthChanged:newLength];
+    });
+}
+
+static void cb_player_titles_changed(vlc_player_t *p_player,
+                                     vlc_player_title_list *p_titles,
+                                     void *p_data)
+{
+    VLC_UNUSED(p_player);
+    vlc_player_title_list_Hold(p_titles);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController titleListChanged:p_titles];
+    });
+}
+
+static void cb_player_title_selection_changed(vlc_player_t *p_player,
+                                              const struct vlc_player_title *p_new_title,
+                                              size_t selectedIndex,
+                                              void *p_data)
+{
+    VLC_UNUSED(p_player);
+    VLC_UNUSED(p_new_title);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController selectedTitleChanged:selectedIndex];
     });
 }
 
@@ -275,8 +305,8 @@ static const struct vlc_player_cbs player_callbacks = {
     NULL, //cb_player_track_selection_changed,
     NULL, //cb_player_program_list_changed,
     NULL, //cb_player_program_selection_changed,
-    NULL, //cb_player_titles_changed,
-    NULL, //cb_player_title_selection_changed,
+    cb_player_titles_changed,
+    cb_player_title_selection_changed,
     NULL, //cb_player_chapter_selection_changed,
     cb_player_teletext_menu_availability_changed,
     cb_player_teletext_enabled_changed,
@@ -378,6 +408,9 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
 - (void)deinitialize
 {
+    if (_currentTitleList) {
+        vlc_player_title_list_Release(_currentTitleList);
+    }
     if (_p_player) {
         if (_playerListenerID) {
             vlc_player_Lock(_p_player);
@@ -657,6 +690,52 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     _length = length;
     [_defaultNotificationCenter postNotificationName:VLCPlayerLengthChanged
                                               object:self];
+}
+
+- (void)titleListChanged:(vlc_player_title_list *)p_titles
+{
+    if (_currentTitleList) {
+        vlc_player_title_list_Release(_currentTitleList);
+    }
+    /* the new list was already hold earlier */
+    _currentTitleList = p_titles;
+    [_defaultNotificationCenter postNotificationName:VLCPlayerTitleListChanged
+                                              object:self];
+}
+
+- (void)selectedTitleChanged:(size_t)selectedTitle
+{
+    _selectedTitleIndex = selectedTitle;
+    [_defaultNotificationCenter postNotificationName:VLCPlayerTitleSelectionChanged
+                                              object:self];
+}
+
+- (const struct vlc_player_title *)selectedTitle
+{
+    if (_selectedTitleIndex >= 0 && _selectedTitleIndex < [self numberOfTitlesOfCurrentMedia]) {
+        return vlc_player_title_list_GetAt(_currentTitleList, _selectedTitleIndex);
+    }
+    return NULL;
+}
+
+- (void)setSelectedTitleIndex:(size_t)selectedTitleIndex
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_SelectTitleIdx(_p_player, selectedTitleIndex);
+    vlc_player_Unlock(_p_player);
+}
+
+- (const struct vlc_player_title *)titleAtIndexForCurrentMedia:(size_t)index
+{
+    return vlc_player_title_list_GetAt(_currentTitleList, index);
+}
+
+- (size_t)numberOfTitlesOfCurrentMedia
+{
+    if (!_currentTitleList) {
+        return 0;
+    }
+    return vlc_player_title_list_GetCount(_currentTitleList);
 }
 
 - (void)teletextAvailibilityChanged:(BOOL)hasTeletextMenu
