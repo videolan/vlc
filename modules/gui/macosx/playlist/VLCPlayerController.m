@@ -41,6 +41,8 @@ NSString *VLCPlayerAudioDelayChanged = @"VLCPlayerAudioDelayChanged";
 NSString *VLCPlayerSubtitlesDelayChanged = @"VLCPlayerSubtitlesDelayChanged";
 NSString *VLCPlayerSubtitleTextScalingFactorChanged = @"VLCPlayerSubtitleTextScalingFactorChanged";
 NSString *VLCPlayerRecordingChanged = @"VLCPlayerRecordingChanged";
+NSString *VLCPlayerInputStats = @"VLCPlayerInputStats";
+NSString *VLCPlayerStatisticsUpdated = @"VLCPlayerStatisticsUpdated";
 NSString *VLCPlayerFullscreenChanged = @"VLCPlayerFullscreenChanged";
 NSString *VLCPlayerWallpaperModeChanged = @"VLCPlayerWallpaperModeChanged";
 NSString *VLCPlayerVolumeChanged = @"VLCPlayerVolumeChanged";
@@ -70,6 +72,7 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 - (void)audioDelayChanged:(vlc_tick_t)audioDelay;
 - (void)subtitlesDelayChanged:(vlc_tick_t)subtitlesDelay;
 - (void)recordingChanged:(BOOL)recording;
+- (void)inputStatsUpdated:(VLCInputStats *)inputStats;
 - (void)stopActionChanged:(enum vlc_player_media_stopped_action)stoppedAction;
 
 /* video */
@@ -218,6 +221,40 @@ static void cb_player_record_changed(vlc_player_t *p_player, bool recording, voi
     });
 }
 
+static void cb_player_stats_changed(vlc_player_t *p_player,
+                                    const struct input_stats_t *p_stats,
+                                    void *p_data)
+{
+    VLC_UNUSED(p_player);
+
+    /* the provided structure is valid in this context only, so copy all data to our own */
+    VLCInputStats *inputStats = [[VLCInputStats alloc] init];
+
+    inputStats.inputReadPackets = p_stats->i_read_packets;
+    inputStats.inputReadBytes = p_stats->i_read_bytes;
+    inputStats.inputBitrate = p_stats->f_input_bitrate;
+
+    inputStats.demuxReadPackets = p_stats->i_demux_read_packets;
+    inputStats.demuxReadBytes = p_stats->i_demux_read_bytes;
+    inputStats.demuxBitrate = p_stats->f_demux_bitrate;
+    inputStats.demuxCorrupted = p_stats->i_demux_corrupted;
+    inputStats.demuxDiscontinuity = p_stats->i_demux_discontinuity;
+
+    inputStats.decodedAudio = p_stats->i_decoded_audio;
+    inputStats.decodedVideo = p_stats->i_decoded_video;
+
+    inputStats.displayedPictures = p_stats->i_displayed_pictures;
+    inputStats.lostPictures = p_stats->i_lost_pictures;
+
+    inputStats.playedAudioBuffers = p_stats->i_played_abuffers;
+    inputStats.lostAudioBuffers = p_stats->i_lost_abuffers;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController inputStatsUpdated:inputStats];
+    });
+}
+
 static void cb_player_media_stopped_action_changed(vlc_player_t *p_player,
                                                    enum vlc_player_media_stopped_action newAction,
                                                    void *p_data)
@@ -251,7 +288,7 @@ static const struct vlc_player_cbs player_callbacks = {
     NULL, //cb_player_renderer_changed,
     cb_player_record_changed,
     NULL, //cb_player_signal_changed,
-    NULL, //cb_player_stats_changed,
+    cb_player_stats_changed,
     NULL, //cb_player_atobloop_changed,
     cb_player_media_stopped_action_changed,
     NULL, //cb_player_item_meta_changed,
@@ -727,6 +764,14 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
                                               object:self];
 }
 
+- (void)inputStatsUpdated:(VLCInputStats *)inputStats
+{
+    _statistics = inputStats;
+    [_defaultNotificationCenter postNotificationName:VLCPlayerStatisticsUpdated
+                                              object:self
+                                            userInfo:@{VLCPlayerInputStats : inputStats}];
+}
+
 - (void)setEnableRecording:(BOOL)enableRecording
 {
     vlc_player_Lock(_p_player);
@@ -817,5 +862,9 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 {
     vlc_player_aout_Mute(_p_player, !_mute);
 }
+
+@end
+
+@implementation VLCInputStats
 
 @end

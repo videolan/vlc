@@ -25,6 +25,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCInputStats;
+
 extern NSString *VLCPlayerCurrentMediaItem;
 /**
  * Listen to VLCPlayerCurrentMediaItemChanged to notified if the current media item changes for the player
@@ -119,6 +121,14 @@ extern NSString *VLCPlayerSubtitlesDelayChanged;
  * @note the affected player object will be the object of the notification
  */
 extern NSString *VLCPlayerRecordingChanged;
+
+extern NSString *VLCPlayerInputStats;
+/**
+ * Listen to VLCPlayerStatisticsUpdated to be notified if the playback statistics state of the current media update
+ * @note the affected player object will be the object of the notification
+ * @note the userInfo dictionary will have an instance of VLCInputStats for key VLCPlayerInputStats representating the new state
+ */
+extern NSString *VLCPlayerStatisticsUpdated;
 
 /**
  * Listen to VLCPlayerFullscreenChanged to be notified whether the fullscreen state of the video output changes
@@ -438,6 +448,13 @@ extern NSString *VLCPlayerMuteChanged;
  */
 - (void)toggleRecord;
 
+/**
+ * the latest available playback statistics
+ * @return an instance of VLCInputStats holding the data
+ * @note listen to VLCPlayerStatisticsUpdated to be notified about changes to this property
+ */
+@property (readonly) VLCInputStats *statistics;
+
 #pragma mark - video output properties
 
 /**
@@ -491,6 +508,34 @@ extern NSString *VLCPlayerMuteChanged;
  * helper function to inverse the current mute state
  */
 - (void)toggleMute;
+
+@end
+
+@interface VLCInputStats : NSObject
+
+/* Input */
+@property (readwrite) int64_t inputReadPackets;
+@property (readwrite) int64_t inputReadBytes;
+@property (readwrite) float inputBitrate;
+
+/* Demux */
+@property (readwrite) int64_t demuxReadPackets;
+@property (readwrite) int64_t demuxReadBytes;
+@property (readwrite) float demuxBitrate;
+@property (readwrite) int64_t demuxCorrupted;
+@property (readwrite) int64_t demuxDiscontinuity;
+
+/* Decoders */
+@property (readwrite) int64_t decodedAudio;
+@property (readwrite) int64_t decodedVideo;
+
+/* Vout */
+@property (readwrite) int64_t displayedPictures;
+@property (readwrite) int64_t lostPictures;
+
+/* Aout */
+@property (readwrite) int64_t playedAudioBuffers;
+@property (readwrite) int64_t lostAudioBuffers;
 
 @end
 
