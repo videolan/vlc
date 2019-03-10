@@ -36,7 +36,7 @@
 #import "panels/dialogs/VLCResumeDialogController.h"
 #import "panels/VLCVideoEffectsWindowController.h"
 #import "panels/VLCAudioEffectsWindowController.h"
-#import "panels/VLCPlaylistInfo.h"
+#import "panels/VLCInformationWindowController.h"
 #import "panels/VLCBookmarksWindowController.h"
 #import "panels/VLCTrackSynchronizationWindowController.h"
 

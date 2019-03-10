@@ -1,7 +1,7 @@
 /*****************************************************************************
- * VLCPlaylistInfo.m: Controller for the codec info panel
+ * VLCInformationWindowController.m: Controller for the codec info panel
  *****************************************************************************
- * Copyright (C) 2002-2015 VLC authors and VideoLAN
+ * Copyright (C) 2002-2019 VLC authors and VideoLAN
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
@@ -21,14 +21,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  ******************************************************************************/
 
-#import "VLCPlaylistInfo.h"
-
-#import <vlc_url.h>
+#import "VLCInformationWindowController.h"
 
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 
-@interface VLCInfo () <NSOutlineViewDataSource>
+#import <vlc_url.h>
+
+/**
+ * Holds information for one element in the codec information panel
+ */
+@interface VLCInfoTreeItem : NSObject
+
+@property (readwrite) NSString *name;
+@property (readwrite) NSString *value;
+
+@property (readwrite) NSArray *children;
+
+@end
+
+@interface VLCInformationWindowController () <NSOutlineViewDataSource>
 {
     VLCInfoTreeItem *rootItem;
 
@@ -38,14 +50,11 @@
 }
 @end
 
-@implementation VLCInfo
+@implementation VLCInformationWindowController
 
 - (id)init
 {
     self = [super initWithWindowNibName:@"MediaInfo"];
-    if (self) {
-
-    }
 
     return self;
 }
@@ -374,7 +383,7 @@ FREENULL( psz_##foo );
 @end
 
 
-@implementation VLCInfo (NSTableDataSource)
+@implementation VLCInformationWindowController (NSTableDataSource)
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {

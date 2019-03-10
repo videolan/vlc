@@ -57,7 +57,7 @@
 #import "panels/dialogs/VLCCoreDialogProvider.h"
 #import "panels/VLCAudioEffectsWindowController.h"
 #import "panels/VLCBookmarksWindowController.h"
-#import "panels/VLCPlaylistInfo.h"
+#import "panels/VLCInformationWindowController.h"
 #import "panels/VLCVideoEffectsWindowController.h"
 #import "panels/VLCTrackSynchronizationWindowController.h"
 
@@ -186,7 +186,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCVideoEffectsWindowController *_videoEffectsPanel;
     VLCConvertAndSaveWindowController *_convertAndSaveWindow;
     VLCExtensionsManager *_extensionsManager;
-    VLCInfo *_currentMediaInfoPanel;
+    VLCInformationWindowController *_currentMediaInfoPanel;
     VLCLibraryWindowController *_libraryWindowController;
 
     bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
@@ -518,10 +518,10 @@ static VLCMain *sharedInstance = nil;
     return _videoEffectsPanel;
 }
 
-- (VLCInfo *)currentMediaInfoPanel;
+- (VLCInformationWindowController *)currentMediaInfoPanel;
 {
     if (!_currentMediaInfoPanel)
-        _currentMediaInfoPanel = [[VLCInfo alloc] init];
+        _currentMediaInfoPanel = [[VLCInformationWindowController alloc] init];
 
     return _currentMediaInfoPanel;
 }

@@ -62,7 +62,7 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
  * VLCMain interface
  *****************************************************************************/
 @class AppleRemote;
-@class VLCInfo;
+@class VLCInformationWindowController;
 @class VLCMainMenu;
 @class VLCInputManager;
 @class VLCResumeDialogController;
@@ -78,7 +78,6 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 @class VLCVideoEffectsWindowController;
 @class VLCConvertAndSaveWindowController;
 @class VLCExtensionsManager;
-@class VLCInfo;
 @class VLCStatusBarIcon;
 @class VLCPlaylistController;
 
@@ -111,7 +110,7 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 - (VLCAudioEffectsWindowController *)audioEffectsPanel;
 - (VLCVideoEffectsWindowController *)videoEffectsPanel;
 
-- (VLCInfo *)currentMediaInfoPanel;
+- (VLCInformationWindowController *)currentMediaInfoPanel;
 
 
 - (VLCConvertAndSaveWindowController *)convertAndSaveWindow;

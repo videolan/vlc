@@ -1,7 +1,7 @@
 /*****************************************************************************
- * VLCPlaylistInfo.h: Controller for the codec info panel
+ * VLCInformationWindowController.h: Controller for the codec info panel
  *****************************************************************************
- * Copyright (C) 2002-2015 VLC authors and VideoLAN
+ * Copyright (C) 2002-2019 VLC authors and VideoLAN
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
@@ -21,15 +21,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * VLCPlaylistInfo interface
- *****************************************************************************/
-
 #import <Cocoa/Cocoa.h>
-
 #import <vlc_common.h>
 
-@interface VLCInfo : NSWindowController
+@interface VLCInformationWindowController : NSWindowController
 
 @property (readonly) input_item_t *item;
 
@@ -100,17 +95,5 @@
 
 - (void)updateMetadata;
 - (void)updateStatistics;
-
-@end
-
-/**
- * Holds information for one element in the codec information panel
- */
-@interface VLCInfoTreeItem : NSObject
-
-@property (readwrite) NSString *name;
-@property (readwrite) NSString *value;
-
-@property (readwrite) NSArray *children;
 
 @end

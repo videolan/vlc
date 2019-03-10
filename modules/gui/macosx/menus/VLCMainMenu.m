@@ -39,7 +39,7 @@
 #import "panels/VLCVideoEffectsWindowController.h"
 #import "panels/VLCBookmarksWindowController.h"
 #import "panels/dialogs/VLCCoreDialogProvider.h"
-#import "panels/VLCPlaylistInfo.h"
+#import "panels/VLCInformationWindowController.h"
 #import "panels/VLCTimeSelectionPanelController.h"
 
 #import "playlist/VLCPlaylistController.h"

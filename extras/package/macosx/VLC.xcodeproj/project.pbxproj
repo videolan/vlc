@@ -45,7 +45,7 @@
 		1C3113DD1E508C6900D4DD76 /* VLCTrackSynchronizationWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC707EC4137464CD0003010A /* VLCTrackSynchronizationWindowController.m */; };
 		1C3113DF1E508C6900D4DD76 /* VLCVideoEffectsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCE366E13817E4500694F2A /* VLCVideoEffectsWindowController.m */; };
 		1C3113E11E508C6900D4DD76 /* VLCVoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCCDCA11413E1C000FE3DE1 /* VLCVoutView.m */; };
-		1C3113E51E508C6900D4DD76 /* VLCPlaylistInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E49720106417F6800370C9F /* VLCPlaylistInfo.m */; };
+		1C3113E51E508C6900D4DD76 /* VLCInformationWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E49720106417F6800370C9F /* VLCInformationWindowController.m */; };
 		1C3113E91E508C6900D4DD76 /* VLCScrollingClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */; };
 		1C3113ED1E508C6900D4DD76 /* VLCTimeSelectionPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CD3667A1B7A242E0054E39F /* VLCTimeSelectionPanelController.m */; };
 		1C3113EF1E508C7600D4DD76 /* VLCRendererDiscovery.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBBB8B61D114628001BD9BA /* VLCRendererDiscovery.m */; };
@@ -519,8 +519,8 @@
 		7DF812EE1B555A340052293C /* VLCInputManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCInputManager.m; sourceTree = "<group>"; };
 		7DF812EF1B555C8E0052293C /* VLCKeyboardBacklightControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCKeyboardBacklightControl.h; sourceTree = "<group>"; };
 		7DF812F01B555C8E0052293C /* VLCKeyboardBacklightControl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCKeyboardBacklightControl.m; sourceTree = "<group>"; };
-		8E49720006417F6800370C9F /* VLCPlaylistInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCPlaylistInfo.h; sourceTree = "<group>"; };
-		8E49720106417F6800370C9F /* VLCPlaylistInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCPlaylistInfo.m; sourceTree = "<group>"; };
+		8E49720006417F6800370C9F /* VLCInformationWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCInformationWindowController.h; sourceTree = "<group>"; };
+		8E49720106417F6800370C9F /* VLCInformationWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCInformationWindowController.m; sourceTree = "<group>"; };
 		8E55FB7F0459B0FD00FB3317 /* VLCOutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCOutput.h; sourceTree = "<group>"; };
 		8E55FB800459B0FD00FB3317 /* VLCOutput.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCOutput.m; sourceTree = "<group>"; };
 		8E6BC6F6041643860059A3A7 /* applescript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = applescript.h; sourceTree = "<group>"; };
@@ -713,8 +713,8 @@
 				CC5560241365CDC800D54038 /* VLCAudioEffectsWindowController.m */,
 				DCE7BD0708A5724D007B10AE /* VLCBookmarksWindowController.h */,
 				DCE7BD0608A5724D007B10AE /* VLCBookmarksWindowController.m */,
-				8E49720006417F6800370C9F /* VLCPlaylistInfo.h */,
-				8E49720106417F6800370C9F /* VLCPlaylistInfo.m */,
+				8E49720006417F6800370C9F /* VLCInformationWindowController.h */,
+				8E49720106417F6800370C9F /* VLCInformationWindowController.m */,
 				1CD366791B7A242E0054E39F /* VLCTimeSelectionPanelController.h */,
 				1CD3667A1B7A242E0054E39F /* VLCTimeSelectionPanelController.m */,
 				CC707EC3137464CD0003010A /* VLCTrackSynchronizationWindowController.h */,
@@ -1636,7 +1636,7 @@
 				6B6FFF701EF9EC350001CEB1 /* CompatibilityFixes.m in Sources */,
 				1C3113DF1E508C6900D4DD76 /* VLCVideoEffectsWindowController.m in Sources */,
 				1C3113E11E508C6900D4DD76 /* VLCVoutView.m in Sources */,
-				1C3113E51E508C6900D4DD76 /* VLCPlaylistInfo.m in Sources */,
+				1C3113E51E508C6900D4DD76 /* VLCInformationWindowController.m in Sources */,
 				6B7F1FDF1F07DA920002BDD8 /* VLCHexNumberFormatter.m in Sources */,
 				7DB40D2A20CBCEB500F63173 /* VLCMainMenu.m in Sources */,
 				1C3113E91E508C6900D4DD76 /* VLCScrollingClipView.m in Sources */,

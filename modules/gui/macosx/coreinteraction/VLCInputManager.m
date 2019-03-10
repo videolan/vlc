@@ -31,7 +31,7 @@
 #import "os-integration/VLCRemoteControlService.h"
 #import "os-integration/iTunes.h"
 #import "os-integration/Spotify.h"
-#import "panels/VLCPlaylistInfo.h"
+#import "panels/VLCInformationWindowController.h"
 #import "panels/VLCTrackSynchronizationWindowController.h"
 #import "panels/dialogs/VLCResumeDialogController.h"
 #import "windows/extensions/VLCExtensionsManager.h"
