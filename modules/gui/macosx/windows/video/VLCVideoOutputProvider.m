@@ -24,6 +24,7 @@
 #import "VLCVideoOutputProvider.h"
 
 #include <vlc_vout_display.h>
+#import <vlc_playlist_legacy.h>
 
 #import "extensions/NSScreen+VLCAdditions.h"
 

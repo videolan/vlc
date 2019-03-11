@@ -29,6 +29,7 @@
 
 #import <vlc_common.h>
 #import <vlc_url.h>
+#import <vlc_playlist_legacy.h>
 
 /* mini doc:
  * the used NSMatrix includes a bunch of cells referenced most easily by tags. There you go: */

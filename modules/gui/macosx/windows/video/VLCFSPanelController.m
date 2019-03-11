@@ -26,6 +26,7 @@
 #import "VLCFSPanelController.h"
 
 #import <vlc_aout.h>
+#import <vlc_playlist_legacy.h>
 
 #import "coreinteraction/VLCCoreInteraction.h"
 #import "main/CompatibilityFixes.h"

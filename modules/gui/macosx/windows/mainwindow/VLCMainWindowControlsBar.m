@@ -31,6 +31,7 @@
 #import "menus/VLCMainMenu.h"
 #import "windows/mainwindow/VLCMainWindowControlsBar.h"
 
+#import <vlc_playlist_legacy.h>
 
 /*****************************************************************************
  * VLCMainWindowControlsBar

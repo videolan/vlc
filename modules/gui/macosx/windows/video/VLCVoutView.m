@@ -43,6 +43,8 @@
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
 
+#import <vlc_playlist_legacy.h>
+
 /*****************************************************************************
  * VLCVoutView implementation
  *****************************************************************************/

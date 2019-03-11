@@ -36,6 +36,7 @@
 #import "VLCBookmarksWindowController.h"
 
 #import "main/CompatibilityFixes.h"
+#import <vlc_playlist_legacy.h>
 
 @interface VLCBookmarksWindowController() <NSTableViewDataSource, NSTableViewDelegate>
 {

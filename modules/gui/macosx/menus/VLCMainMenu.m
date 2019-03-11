@@ -58,6 +58,8 @@
 #import "windows/logging/VLCLogWindowController.h"
 #import "windows/addons/VLCAddonsWindowController.h"
 
+#import "extensions/helpers.h"
+
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>
 #endif

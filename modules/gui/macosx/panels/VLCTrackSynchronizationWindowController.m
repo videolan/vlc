@@ -28,6 +28,8 @@
 #import "coreinteraction/VLCVideoFilterHelper.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
+#import <vlc_playlist_legacy.h>
+#import "extensions/helpers.h"
 
 #define SUBSDELAY_CFG_MODE                     "subsdelay-mode"
 #define SUBSDELAY_CFG_FACTOR                   "subsdelay-factor"

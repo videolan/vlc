@@ -377,8 +377,7 @@ FREENULL( psz_##foo );
     input_item_SetDescription( _mediaItem, utf8( _descriptionTextField ) );
     input_item_SetLanguage( _mediaItem, utf8( _languageTextField ) );
 
-    playlist_t *p_playlist = pl_Get(getIntf());
-    input_item_WriteMeta(VLC_OBJECT(p_playlist), _mediaItem);
+    input_item_WriteMeta(VLC_OBJECT(getIntf()), _mediaItem);
 
     [self updatePanelWithItem: _mediaItem];
 

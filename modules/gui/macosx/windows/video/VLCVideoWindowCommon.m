@@ -29,6 +29,9 @@
 #import "main/VLCMain.h"
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 #import "windows/mainwindow/VLCMainWindow.h"
+#import "windows/video/VLCVoutView.h"
+#import <vlc_playlist_legacy.h>
+#import "extensions/helpers.h"
 
 /*****************************************************************************
  * VLCVideoWindowCommon

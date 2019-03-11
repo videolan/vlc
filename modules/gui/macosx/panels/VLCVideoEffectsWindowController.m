@@ -30,6 +30,9 @@
 #import "panels/dialogs/VLCPopupPanelController.h"
 #import "panels/dialogs/VLCTextfieldPanelController.h"
 
+#import <vlc_playlist_legacy.h>
+#import "extensions/helpers.h"
+
 #define getWidgetBoolValue(w)   ((vlc_value_t){ .b_bool = [w state] })
 #define getWidgetIntValue(w)    ((vlc_value_t){ .i_int = [w intValue] })
 #define getWidgetFloatValue(w)  ((vlc_value_t){ .f_float = [w floatValue] })

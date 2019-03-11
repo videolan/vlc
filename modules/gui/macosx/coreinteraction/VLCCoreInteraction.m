@@ -28,6 +28,8 @@
 #import <vlc_plugin.h>
 #import <vlc_actions.h>
 
+#import <vlc_playlist_legacy.h>
+
 #import "main/VLCMain.h"
 #import "coreinteraction/VLCClickerManager.h"
 #import "playlist/VLCPlaylistController.h"
@@ -35,6 +37,7 @@
 #import "playlist/VLCPlaylistModel.h"
 #import "windows/VLCOpenWindowController.h"
 
+#import "extensions/helpers.h"
 
 static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t new_val, void *param)

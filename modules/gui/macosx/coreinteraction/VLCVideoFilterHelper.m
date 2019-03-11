@@ -24,8 +24,10 @@
 
 #import <vlc_modules.h>
 #import <vlc_charset.h>
+#import <vlc_playlist_legacy.h>
 
 #import "main/VLCMain.h"
+#import "extensions/helpers.h"
 
 @implementation VLCVideoFilterHelper
 

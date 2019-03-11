@@ -29,6 +29,7 @@
 
 #import <vlc_common.h>
 #import <math.h>
+#import <vlc_playlist_legacy.h>
 
 #import "../../../audio_filter/equalizer_presets.h"
 
@@ -37,6 +38,8 @@
 #import "main/CompatibilityFixes.h"
 #import "panels/dialogs/VLCPopupPanelController.h"
 #import "panels/dialogs/VLCTextfieldPanelController.h"
+
+#import "extensions/helpers.h"
 
 
 #pragma mark -

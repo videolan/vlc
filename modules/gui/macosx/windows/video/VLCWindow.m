@@ -26,6 +26,7 @@
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "windows/video/VLCVideoWindowCommon.h"
+#import "windows/video/VLCVoutView.h"
 
 /*****************************************************************************
  * VLCWindow

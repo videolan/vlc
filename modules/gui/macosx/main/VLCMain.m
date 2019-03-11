@@ -41,6 +41,7 @@
 #include <vlc_dialog.h>
 #include <vlc_url.h>
 #include <vlc_variables.h>
+#import <vlc_playlist_legacy.h>
 
 #import "coreinteraction/VLCCoreInteraction.h"
 #import "coreinteraction/VLCInputManager.h"
@@ -73,6 +74,7 @@
 #import "windows/VLCOpenInputMetadata.h"
 #import "windows/video/VLCVoutView.h"
 
+#import "extensions/helpers.h"
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */

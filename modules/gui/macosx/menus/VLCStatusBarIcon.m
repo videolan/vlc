@@ -24,7 +24,6 @@
 #import "VLCStatusBarIcon.h"
 
 #import <vlc_common.h>
-#import <vlc_playlist_legacy.h>
 #import <vlc_input.h>
 #import <vlc_url.h>
 

@@ -31,6 +31,8 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
+#import <vlc_playlist_legacy.h>
+
 /*****************************************************************************
  * VLCControlsBarCommon
  *
