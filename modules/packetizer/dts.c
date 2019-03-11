@@ -75,6 +75,7 @@ typedef struct
 enum
 {
     STATE_SYNC_SUBSTREAM_EXTENSIONS = STATE_CUSTOM_FIRST,
+    STATE_NEXT_SYNC_SUBSTREAM_EXTENSIONS,
 };
 
 static void PacketizeFlush( decoder_t *p_dec )
@@ -285,12 +286,18 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                                               VLC_DTS_HEADER_SIZE )
                         == VLC_SUCCESS && next_header.syncword == DTS_SYNC_SUBSTREAM )
                     {
-                        p_dec->fmt_out.i_profile = PROFILE_DTS_HD;
                         p_sys->i_input_size += next_header.i_frame_size;
+                        p_sys->i_state = STATE_NEXT_SYNC_SUBSTREAM_EXTENSIONS;
+                        break;
                     }
                 }
                 p_sys->i_state = STATE_GET_DATA;
             }
+            break;
+
+        case STATE_NEXT_SYNC_SUBSTREAM_EXTENSIONS:
+            p_dec->fmt_out.i_profile = PROFILE_DTS_HD;
+            p_sys->i_state = STATE_GET_DATA;
             break;
 
         case STATE_GET_DATA:
