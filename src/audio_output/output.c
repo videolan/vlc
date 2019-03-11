@@ -43,12 +43,6 @@ struct aout_dev
 
 
 /* Local functions */
-static void aout_OutputAssertLocked (audio_output_t *aout)
-{
-    aout_owner_t *owner = aout_owner (aout);
-
-    vlc_mutex_assert (&owner->lock);
-}
 
 static int var_Copy (vlc_object_t *src, const char *name, vlc_value_t prev,
                      vlc_value_t value, void *data)
@@ -156,7 +150,7 @@ static int aout_GainNotify (audio_output_t *aout, float gain)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    aout_OutputAssertLocked (aout);
+    vlc_mutex_assert(&owner->lock);
     aout_volume_SetVolume (owner->volume, gain);
     /* XXX: ideally, return -1 if format cannot be amplified */
     return 0;
@@ -206,20 +200,6 @@ static int ViewpointCallback (vlc_object_t *obj, const char *var,
         aout_ChangeViewpoint((audio_output_t *)obj, cur.p_address );
     (void) var; (void) data; (void) prev;
     return VLC_SUCCESS;
-}
-
-static void aout_OutputLock(audio_output_t *aout)
-{
-    aout_owner_t *owner = aout_owner(aout);
-
-    vlc_mutex_lock(&owner->lock);
-}
-
-static void aout_OutputUnlock(audio_output_t *aout)
-{
-    aout_owner_t *owner = aout_owner(aout);
-
-    vlc_mutex_unlock(&owner->lock);
 }
 
 #undef aout_New
@@ -376,13 +356,13 @@ void aout_Destroy (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    aout_OutputLock (aout);
+    vlc_mutex_lock(&owner->lock);
     module_unneed (aout, owner->module);
     /* Protect against late call from intf.c */
     aout->volume_set = NULL;
     aout->mute_set = NULL;
     aout->device_select = NULL;
-    aout_OutputUnlock (aout);
+    vlc_mutex_unlock(&owner->lock);
 
     var_DelCallback (aout, "viewpoint", ViewpointCallback, NULL);
     var_DelCallback (aout, "audio-filter", FilterCallback, NULL);
@@ -584,10 +564,10 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
 
     aout->current_sink_info.headphones = false;
 
-    aout_OutputLock(aout);
+    vlc_mutex_lock(&owner->lock);
     int ret = aout->start(aout, fmt);
     assert(aout->flush && aout->play && aout->time_get && aout->pause);
-    aout_OutputUnlock(aout);
+    vlc_mutex_unlock(&owner->lock);
     if (ret)
     {
         msg_Err (aout, "module not functional");
@@ -610,9 +590,10 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
  */
 void aout_OutputDelete (audio_output_t *aout)
 {
-    aout_OutputLock(aout);
+    aout_owner_t *owner = aout_owner(aout);
+    vlc_mutex_lock(&owner->lock);
     aout->stop (aout);
-    aout_OutputUnlock(aout);
+    vlc_mutex_unlock(&owner->lock);
 }
 
 /**
@@ -632,11 +613,12 @@ float aout_VolumeGet (audio_output_t *aout)
  */
 int aout_VolumeSet (audio_output_t *aout, float vol)
 {
+    aout_owner_t *owner = aout_owner(aout);
     int ret;
 
-    aout_OutputLock(aout);
+    vlc_mutex_lock(&owner->lock);
     ret = aout->volume_set(aout, vol);
-    aout_OutputUnlock(aout);
+    vlc_mutex_unlock(&owner->lock);
     return ret ? -1 : 0;
 }
 
@@ -682,11 +664,12 @@ int aout_MuteGet (audio_output_t *aout)
  */
 int aout_MuteSet (audio_output_t *aout, bool mute)
 {
+    aout_owner_t *owner = aout_owner(aout);
     int ret;
 
-    aout_OutputLock(aout);
+    vlc_mutex_lock(&owner->lock);
     ret = aout->mute_set(aout, mute);
-    aout_OutputUnlock(aout);
+    vlc_mutex_unlock(&owner->lock);
     return ret ? -1 : 0;
 }
 
@@ -707,11 +690,12 @@ char *aout_DeviceGet (audio_output_t *aout)
  */
 int aout_DeviceSet (audio_output_t *aout, const char *id)
 {
+    aout_owner_t *owner = aout_owner(aout);
     int ret;
 
-    aout_OutputLock(aout);
+    vlc_mutex_lock(&owner->lock);
     ret = aout->device_select(aout, id);
-    aout_OutputUnlock(aout);
+    vlc_mutex_unlock(&owner->lock);
     return ret ? -1 : 0;
 }
 
