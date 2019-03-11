@@ -37,8 +37,6 @@
 #import "playlist/VLCPlaylistModel.h"
 #import "windows/VLCOpenWindowController.h"
 
-#import "extensions/helpers.h"
-
 static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
@@ -383,7 +381,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     }
     config_PutInt("random", on);
 
-    vout_thread_t *p_vout = getVout();
+    vout_thread_t *p_vout = [[_playlistController playerController] mainVideoOutputThread];
     if (!p_vout) {
         return;
     }
@@ -400,7 +398,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
 
-    vout_thread_t *p_vout = getVout();
+    vout_thread_t *p_vout = [[_playlistController playerController] mainVideoOutputThread];
     if (p_vout) {
         vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat All"));
         vout_Release(p_vout);
@@ -411,7 +409,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
 
-    vout_thread_t *p_vout = getVout();
+    vout_thread_t *p_vout = [[_playlistController playerController] mainVideoOutputThread];
     if (p_vout) {
         vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat One"));
         vout_Release(p_vout);
@@ -422,7 +420,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
 
-    vout_thread_t *p_vout = getVout();
+    vout_thread_t *p_vout = [[_playlistController playerController] mainVideoOutputThread];
     if (p_vout) {
         vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat Off"));
         vout_Release(p_vout);
@@ -576,14 +574,10 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)showPosition
 {
-    input_thread_t *p_input = pl_CurrentInput(getIntf());
-    if (p_input != NULL) {
-        vout_thread_t *p_vout = input_GetVout(p_input);
-        if (p_vout != NULL) {
-            var_SetInteger(vlc_object_instance(getIntf()), "key-action", ACTIONID_POSITION);
-            vout_Release(p_vout);
-        }
-        input_Release(p_input);
+    vout_thread_t *p_vout = [[_playlistController playerController] mainVideoOutputThread];
+    if (p_vout != NULL) {
+        var_SetInteger(vlc_object_instance(getIntf()), "key-action", ACTIONID_POSITION);
+        vout_Release(p_vout);
     }
 }
 
@@ -605,7 +599,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (!p_intf)
         return;
 
-    vout_thread_t *p_vout = getVoutForActiveWindow();
+    vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
     if (p_vout) {
         BOOL b_fs = var_ToggleBool(p_vout, "fullscreen");
         var_SetBool(pl_Get(p_intf), "fullscreen", b_fs);
@@ -684,21 +678,16 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         unichar key = [characters characterAtIndex: 0];
 
         if (key) {
-            input_thread_t * p_input = pl_CurrentInput(getIntf());
-            if (p_input != NULL) {
-                vout_thread_t *p_vout = input_GetVout(p_input);
-
-                if (p_vout != NULL) {
-                    /* Escape */
-                    if (key == (unichar) 0x1b) {
-                        if (var_GetBool(p_vout, "fullscreen")) {
-                            [self toggleFullscreen];
-                            eventHandled = YES;
-                        }
+            vout_thread_t *p_vout = [[_playlistController playerController] mainVideoOutputThread];
+            if (p_vout != NULL) {
+                /* Escape */
+                if (key == (unichar) 0x1b) {
+                    if (var_GetBool(p_vout, "fullscreen")) {
+                        [self toggleFullscreen];
+                        eventHandled = YES;
                     }
-                    vout_Release(p_vout);
                 }
-                input_Release(p_input);
+                vout_Release(p_vout);
             }
         }
     }

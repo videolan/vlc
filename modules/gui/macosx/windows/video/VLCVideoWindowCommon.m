@@ -30,8 +30,9 @@
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 #import "windows/mainwindow/VLCMainWindow.h"
 #import "windows/video/VLCVoutView.h"
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 #import <vlc_playlist_legacy.h>
-#import "extensions/helpers.h"
 
 /*****************************************************************************
  * VLCVideoWindowCommon
@@ -452,7 +453,7 @@
     frameBeforeLionFullscreen = [self frame];
 
     if ([self hasActiveVideo]) {
-        vout_thread_t *p_vout = getVoutForActiveWindow();
+        vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
         if (p_vout) {
             var_SetBool(p_vout, "fullscreen", true);
             vout_Release(p_vout);
@@ -498,7 +499,7 @@
     if ([self hasActiveVideo]) {
         var_SetBool(pl_Get(getIntf()), "fullscreen", false);
 
-        vout_thread_t *p_vout = getVoutForActiveWindow();
+        vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
         if (p_vout) {
             var_SetBool(p_vout, "fullscreen", false);
             vout_Release(p_vout);

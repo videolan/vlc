@@ -29,15 +29,15 @@
 #import "main/VLCMain.h"
 #import "panels/dialogs/VLCPopupPanelController.h"
 #import "panels/dialogs/VLCTextfieldPanelController.h"
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 #import <vlc_playlist_legacy.h>
-#import "extensions/helpers.h"
 
 #define getWidgetBoolValue(w)   ((vlc_value_t){ .b_bool = [w state] })
 #define getWidgetIntValue(w)    ((vlc_value_t){ .i_int = [w intValue] })
 #define getWidgetFloatValue(w)  ((vlc_value_t){ .f_float = [w floatValue] })
 #define getWidgetStringValue(w) ((vlc_value_t){ .psz_string = (char *)[[w stringValue] UTF8String] })
-
 
 #pragma mark -
 #pragma mark Initialization
@@ -111,7 +111,7 @@
 
     /* filter handling */
     NSString *tempString = B64DecNSStr([items firstObject]);
-    NSArray<NSValue *> *vouts = getVouts();
+    NSArray<NSValue *> *vouts = [[[[VLCMain sharedInstance] playlistController] playerController] allVideoOutputThreads];
 
     /* enable the new filters */
     var_SetString(p_playlist, "video-filter", [tempString UTF8String]);
@@ -1018,7 +1018,7 @@
             [self setCropRightValue: [self cropLeftValue]];
     }
 
-    NSArray<NSValue *> *vouts = getVouts();
+    NSArray<NSValue *> *vouts = [[[[VLCMain sharedInstance] playlistController] playerController] allVideoOutputThreads];
     if (vouts)
         for (NSValue *ptr in vouts) {
             vout_thread_t *p_vout = [ptr pointerValue];

@@ -58,8 +58,6 @@
 #import "windows/logging/VLCLogWindowController.h"
 #import "windows/addons/VLCAddonsWindowController.h"
 
-#import "extensions/helpers.h"
-
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>
 #endif
@@ -586,7 +584,7 @@
         [self setupVarMenuItem:_subtitle_track target: (vlc_object_t *)p_input
                                  var:"spu-es" selector: @selector(toggleVar:)];
 
-        audio_output_t *p_aout = playlist_GetAout(p_playlist);
+        audio_output_t *p_aout = _playlistController.playerController.mainAudioOutput;
         if (p_aout != NULL) {
             [self setupVarMenuItem:_channels target: (vlc_object_t *)p_aout
                                      var:"stereo-mode" selector: @selector(toggleVar:)];
@@ -596,7 +594,7 @@
             aout_Release(p_aout);
         }
 
-        vout_thread_t *p_vout = getVoutForActiveWindow();
+        vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
 
         if (p_vout != NULL) {
             [self setupVarMenuItem:_aspect_ratio target: (vlc_object_t *)p_vout
@@ -887,7 +885,7 @@
 
     [_audioDeviceMenu removeAllItems];
 
-    audio_output_t *p_aout = getAout();
+    audio_output_t *p_aout = _playlistController.playerController.mainAudioOutput;
     if (!p_aout)
         return;
 
@@ -924,7 +922,7 @@
 
 - (void)toggleAudioDevice:(id)sender
 {
-    audio_output_t *p_aout = getAout();
+    audio_output_t *p_aout = _playlistController.playerController.mainAudioOutput;
     if (!p_aout)
         return;
 
@@ -951,7 +949,7 @@
 
 - (IBAction)resizeVideoWindow:(id)sender
 {
-    vout_thread_t *p_vout = getVoutForActiveWindow();
+    vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
     if (p_vout) {
         if (sender == _half_window)
             var_SetFloat(p_vout, "zoom", 0.5);
@@ -972,7 +970,7 @@
     // FIXME re-write using VLCPlayerController
     input_thread_t *p_input = pl_CurrentInput(getIntf());
     if (p_input) {
-        vout_thread_t *p_vout = getVoutForActiveWindow();
+        vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
         if (p_vout) {
             BOOL b_fs = var_ToggleBool(p_vout, "video-on-top");
             var_SetBool(pl_Get(getIntf()), "video-on-top", b_fs);
@@ -1665,7 +1663,7 @@
                mi == _floatontop
                ) {
 
-        vout_thread_t *p_vout = getVoutForActiveWindow();
+        vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
         if (p_vout != NULL) {
             // FIXME: re-write using VLCPlayerController
             if (mi == _floatontop)

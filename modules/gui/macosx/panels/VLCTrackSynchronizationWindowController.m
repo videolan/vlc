@@ -24,12 +24,13 @@
 #import "VLCTrackSynchronizationWindowController.h"
 
 #import <vlc_common.h>
+#import <vlc_playlist_legacy.h>
 
 #import "coreinteraction/VLCVideoFilterHelper.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
-#import <vlc_playlist_legacy.h>
-#import "extensions/helpers.h"
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 #define SUBSDELAY_CFG_MODE                     "subsdelay-mode"
 #define SUBSDELAY_CFG_FACTOR                   "subsdelay-factor"
@@ -200,7 +201,7 @@
 
     if (p_input) {
         float f_factor = [_sv_durTextField floatValue];
-        NSArray<NSValue *> *vouts = getVouts();
+        NSArray<NSValue *> *vouts = [[[[VLCMain sharedInstance] playlistController] playerController] allVideoOutputThreads];
 
         if (vouts)
             for (NSValue *ptr in vouts) {

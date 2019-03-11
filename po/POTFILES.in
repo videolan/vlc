@@ -466,7 +466,6 @@ modules/gui/macosx/extensions/NSString+Helpers.h
 modules/gui/macosx/extensions/NSString+Helpers.m
 modules/gui/macosx/extensions/VLCHexNumberFormatter.h
 modules/gui/macosx/extensions/VLCHexNumberFormatter.m
-modules/gui/macosx/extensions/helpers.h
 modules/gui/macosx/extensions/misc.h
 modules/gui/macosx/extensions/misc.m
 modules/gui/macosx/library/VLCLibraryCollectionViewItem.h
