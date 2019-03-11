@@ -208,7 +208,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
-            if( p_sys->dts.b_substream  )
+            if( p_sys->dts.syncword == DTS_SYNC_SUBSTREAM )
             {
                 msg_Warn( p_dec, "substream without the paired core stream, "
                           "skip it" );
@@ -275,7 +275,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                     vlc_dts_header_t next_header;
                     if( vlc_dts_header_Parse( &next_header, p_header,
                                               VLC_DTS_HEADER_SIZE )
-                        == VLC_SUCCESS && next_header.b_substream )
+                        == VLC_SUCCESS && next_header.syncword == DTS_SYNC_SUBSTREAM )
                     {
                         p_dec->fmt_out.i_profile = PROFILE_DTS_HD;
                         p_sys->i_input_size += next_header.i_frame_size;

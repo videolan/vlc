@@ -27,10 +27,19 @@
 #define PROFILE_DTS 0
 #define PROFILE_DTS_HD 1
 
+enum vlc_dts_syncword_e
+{
+    DTS_SYNC_NONE = 0,
+    DTS_SYNC_CORE_BE,
+    DTS_SYNC_CORE_LE,
+    DTS_SYNC_CORE_14BITS_BE,
+    DTS_SYNC_CORE_14BITS_LE,
+    DTS_SYNC_SUBSTREAM,
+};
+
 typedef struct
 {
-    bool            b_substream;
-    bool            b_14b;
+    enum vlc_dts_syncword_e syncword;
     unsigned int    i_rate;
     unsigned int    i_bitrate;
     unsigned int    i_frame_size;
