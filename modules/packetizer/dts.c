@@ -72,6 +72,11 @@ struct decoder_sys_t
     size_t  i_input_size;
 };
 
+enum
+{
+    STATE_SYNC_SUBSTREAM_EXTENSIONS = STATE_CUSTOM_FIRST,
+};
+
 static void PacketizeFlush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -208,6 +213,13 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             }
 
             if( p_sys->dts.syncword == DTS_SYNC_SUBSTREAM )
+                p_sys->i_state = STATE_SYNC_SUBSTREAM_EXTENSIONS;
+            else
+                p_sys->i_state = STATE_NEXT_SYNC;
+            p_sys->i_input_size = p_sys->i_next_offset = p_sys->dts.i_frame_size;
+            break;
+
+        case STATE_SYNC_SUBSTREAM_EXTENSIONS:
             {
                 msg_Warn( p_dec, "substream without the paired core stream, "
                           "skip it" );
@@ -215,12 +227,8 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 if( block_SkipBytes( &p_sys->bytestream,
                                      p_sys->dts.i_frame_size ) != VLC_SUCCESS )
                     return NULL;
-                break;
             }
-
-            p_sys->i_input_size = p_sys->i_next_offset = p_sys->dts.i_frame_size;
-            p_sys->i_state = STATE_NEXT_SYNC;
-            /* fallthrough */
+            break;
 
         case STATE_NEXT_SYNC:
             /* Check if next expected frame contains the sync word */
