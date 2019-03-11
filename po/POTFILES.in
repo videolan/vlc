@@ -361,7 +361,6 @@ modules/codec/videotoolbox.m
 modules/codec/vorbis.c
 modules/codec/vpx.c
 modules/codec/webvtt/webvtt.c
-modules/codec/wmafixed/wma.c
 modules/codec/x264.c
 modules/codec/x265.c
 modules/codec/xwd.c

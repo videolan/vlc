@@ -1,3 +1,2 @@
 extras/misc/mpris.xml
-modules/codec/wmafixed/bswap.h
 modules/access/dvb/scan.c

@@ -86,20 +86,6 @@ codec_LTLIBRARIES += $(LTLIBmpg123)
 libuleaddvaudio_plugin_la_SOURCES = codec/uleaddvaudio.c
 codec_LTLIBRARIES += libuleaddvaudio_plugin.la
 
-libwma_fixed_plugin_la_SOURCES = \
-	codec/wmafixed/asf.h codec/wmafixed/bswap.h \
-	codec/wmafixed/fft.c codec/wmafixed/fft.h \
-	codec/wmafixed/mdct.c codec/wmafixed/mdct.h \
-	codec/wmafixed/wma.c codec/wmafixed/wmadeci.c \
-	codec/wmafixed/bitstream.c codec/wmafixed/bitstream.h \
-	codec/wmafixed/wmadata.h codec/wmafixed/wmadec.h \
-	codec/wmafixed/wmafixed.c codec/wmafixed/wmafixed.h
-libwma_fixed_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-libwma_fixed_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-EXTRA_LTLIBRARIES += libwma_fixed_plugin.la
-codec_LTLIBRARIES += $(LTLIBwma_fixed)
-
-
 ### Video codecs ###
 
 libcdg_plugin_la_SOURCES = codec/cdg.c

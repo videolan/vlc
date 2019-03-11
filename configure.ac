@@ -2345,16 +2345,6 @@ dnl
 EXTEND_HELP_STRING([Codec plugins:])
 
 dnl
-dnl wmafixed plugin
-dnl
-AC_ARG_ENABLE([wma-fixed],
-  AS_HELP_STRING([--enable-wma-fixed], [libwma-fixed module (default disabled)]))
-if test "${enable_wma_fixed}" = "yes"
-then
-  VLC_ADD_PLUGIN([wma_fixed])
-fi
-
-dnl
 dnl shine encoder plugin
 dnl
 PKG_ENABLE_MODULES_VLC([SHINE], [], [shine >= 3.0.0], [MPEG Audio Layer 3 encoder], [auto], [], [], [])
