@@ -414,7 +414,8 @@ static int write_buffer_dts( filter_t *p_filter, block_t *p_in_buf )
         return SPDIF_ERROR;
     }
 
-    if( core.b_14b )
+    if( core.syncword == DTS_SYNC_CORE_14BITS_BE ||
+        core.syncword == DTS_SYNC_CORE_14BITS_LE )
     {
         if( p_in_buf->i_buffer > p_in_buf->i_nb_samples * 4 )
             return SPDIF_ERROR;
