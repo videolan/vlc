@@ -129,7 +129,7 @@
     seekpoint_t bookmark;
 
     if (!input_Control(p_input, INPUT_GET_BOOKMARK, &bookmark)) {
-        bookmark.psz_name = _("Untitled");
+        bookmark.psz_name = (char *)_("Untitled");
         input_Control(p_input, INPUT_ADD_BOOKMARK, &bookmark);
     }
 

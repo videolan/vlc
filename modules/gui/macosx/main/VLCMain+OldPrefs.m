@@ -88,7 +88,7 @@ static const int kCurrentPreferencesVersion = 4;
     } else if (version == 3) {
         /* version 4 (introduced in 3.0.0) adds RTL settings depending on stored language */
         [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
-        BOOL hasUpdated = [VLCSimplePrefsController updateRightToLeftSettings];
+        [VLCSimplePrefsController updateRightToLeftSettings];
         [defaults synchronize];
 
         // In VLC 2.2.x, config for filters was fully controlled by audio and video effects panel.
