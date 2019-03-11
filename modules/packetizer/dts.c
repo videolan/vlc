@@ -68,7 +68,7 @@ typedef struct
     vlc_tick_t i_pts;
     bool    b_discontinuity;
 
-    vlc_dts_header_t dts;
+    vlc_dts_header_t first, second;
     size_t  i_input_size;
 } decoder_sys_t;
 
@@ -93,33 +93,33 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( !p_sys->b_date_set
-     || p_dec->fmt_out.audio.i_rate != p_sys->dts.i_rate )
+     || p_dec->fmt_out.audio.i_rate != p_sys->first.i_rate )
     {
         msg_Dbg( p_dec, "DTS samplerate:%d bitrate:%d",
-                 p_sys->dts.i_rate, p_sys->dts.i_bitrate );
+                 p_sys->first.i_rate, p_sys->first.i_bitrate );
 
-        date_Init( &p_sys->end_date, p_sys->dts.i_rate, 1 );
+        date_Init( &p_sys->end_date, p_sys->first.i_rate, 1 );
         date_Set( &p_sys->end_date, p_sys->i_pts );
         p_sys->b_date_set = true;
     }
 
-    p_dec->fmt_out.audio.i_rate     = p_sys->dts.i_rate;
-    if( p_dec->fmt_out.audio.i_bytes_per_frame < p_sys->dts.i_frame_size )
-        p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->dts.i_frame_size;
-    p_dec->fmt_out.audio.i_frame_length = p_sys->dts.i_frame_length;
+    p_dec->fmt_out.audio.i_rate     = p_sys->first.i_rate;
+    if( p_dec->fmt_out.audio.i_bytes_per_frame < p_sys->first.i_frame_size )
+        p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->first.i_frame_size;
+    p_dec->fmt_out.audio.i_frame_length = p_sys->first.i_frame_length;
 
-    p_dec->fmt_out.audio.i_chan_mode = p_sys->dts.i_chan_mode;
-    p_dec->fmt_out.audio.i_physical_channels = p_sys->dts.i_physical_channels;
+    p_dec->fmt_out.audio.i_chan_mode = p_sys->first.i_chan_mode;
+    p_dec->fmt_out.audio.i_physical_channels = p_sys->first.i_physical_channels;
     p_dec->fmt_out.audio.i_channels =
         vlc_popcount( p_dec->fmt_out.audio.i_physical_channels );
 
-    p_dec->fmt_out.i_bitrate = p_sys->dts.i_bitrate;
+    p_dec->fmt_out.i_bitrate = p_sys->first.i_bitrate;
 
     block_t *p_block = block_Alloc( p_sys->i_input_size );
     if( p_block == NULL )
         return NULL;
 
-    p_block->i_nb_samples = p_sys->dts.i_frame_length;
+    p_block->i_nb_samples = p_sys->first.i_frame_length;
     p_block->i_pts = p_block->i_dts = date_Get( &p_sys->end_date );
     p_block->i_length =
         date_Increment( &p_sys->end_date, p_block->i_nb_samples ) - p_block->i_pts;
@@ -205,7 +205,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             }
 
             /* Check if frame is valid and get frame info */
-            if( vlc_dts_header_Parse( &p_sys->dts, p_header,
+            if( vlc_dts_header_Parse( &p_sys->first, p_header,
                                       VLC_DTS_HEADER_SIZE ) != VLC_SUCCESS )
             {
                 msg_Dbg( p_dec, "emulated sync word" );
@@ -214,11 +214,11 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
-            if( p_sys->dts.syncword == DTS_SYNC_SUBSTREAM )
+            if( p_sys->first.syncword == DTS_SYNC_SUBSTREAM )
                 p_sys->i_state = STATE_SYNC_SUBSTREAM_EXTENSIONS;
             else
                 p_sys->i_state = STATE_NEXT_SYNC;
-            p_sys->i_input_size = p_sys->i_next_offset = p_sys->dts.i_frame_size;
+            p_sys->i_input_size = p_sys->i_next_offset = p_sys->first.i_frame_size;
             break;
 
         case STATE_SYNC_SUBSTREAM_EXTENSIONS:
@@ -227,7 +227,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                           "skip it" );
                 p_sys->i_state = STATE_NOSYNC;
                 if( block_SkipBytes( &p_sys->bytestream,
-                                     p_sys->dts.i_frame_size ) != VLC_SUCCESS )
+                                     p_sys->first.i_frame_size ) != VLC_SUCCESS )
                     return NULL;
             }
             break;
@@ -260,13 +260,13 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 if( !vlc_dts_header_IsSync( p_header, VLC_DTS_HEADER_SIZE ) )
                 {
                     /* Even frame size is likely incorrect FSIZE #18166 */
-                    if( (p_sys->dts.i_frame_size % 2) && p_sys->i_next_offset > 0 &&
+                    if( (p_sys->first.i_frame_size % 2) && p_sys->i_next_offset > 0 &&
                         block_PeekOffsetBytes( &p_sys->bytestream,
                                                p_sys->i_next_offset - 1, p_header,
                                                VLC_DTS_HEADER_SIZE ) == 0 &&
                          vlc_dts_header_IsSync( p_header, VLC_DTS_HEADER_SIZE ) )
                     {
-                        p_sys->i_input_size = p_sys->i_next_offset = p_sys->dts.i_frame_size - 1;
+                        p_sys->i_input_size = p_sys->i_next_offset = p_sys->first.i_frame_size - 1;
                         /* reenter */
                         break;
                     }
@@ -279,14 +279,12 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
 
                 /* Check if a DTS substream packet is located just after
                  * the core packet */
-                if( p_sys->i_next_offset == p_sys->dts.i_frame_size )
+                if( p_sys->i_next_offset == p_sys->first.i_frame_size )
                 {
-                    vlc_dts_header_t next_header;
-                    if( vlc_dts_header_Parse( &next_header, p_header,
+                    if( vlc_dts_header_Parse( &p_sys->second, p_header,
                                               VLC_DTS_HEADER_SIZE )
-                        == VLC_SUCCESS && next_header.syncword == DTS_SYNC_SUBSTREAM )
+                        == VLC_SUCCESS && p_sys->second.syncword == DTS_SYNC_SUBSTREAM )
                     {
-                        p_sys->i_input_size += next_header.i_frame_size;
                         p_sys->i_state = STATE_NEXT_SYNC_SUBSTREAM_EXTENSIONS;
                         break;
                     }
@@ -298,6 +296,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_NEXT_SYNC_SUBSTREAM_EXTENSIONS:
             p_dec->fmt_out.i_profile = PROFILE_DTS_HD;
             p_sys->i_state = STATE_GET_DATA;
+            p_sys->i_input_size += p_sys->second.i_frame_size;
             break;
 
         case STATE_GET_DATA:
@@ -371,7 +370,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pts = VLC_TICK_INVALID;
     p_sys->b_date_set = false;
     p_sys->b_discontinuity = false;
-    memset(&p_sys->dts, 0, sizeof(vlc_dts_header_t));
+    memset(&p_sys->first, 0, sizeof(vlc_dts_header_t));
+    memset(&p_sys->second, 0, sizeof(vlc_dts_header_t));
     block_BytestreamInit( &p_sys->bytestream );
 
     /* Set output properties (passthrough only) */
