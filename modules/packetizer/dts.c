@@ -222,14 +222,47 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             break;
 
         case STATE_SYNC_SUBSTREAM_EXTENSIONS:
+            /* Peek into the substream extension (sync + header size < frame_size) */
+            if( block_PeekOffsetBytes( &p_sys->bytestream,
+                                       p_sys->first.i_substream_header_size,
+                                       p_header,
+                                       VLC_DTS_HEADER_SIZE ) != VLC_SUCCESS )
             {
-                msg_Warn( p_dec, "substream without the paired core stream, "
-                          "skip it" );
-                p_sys->i_state = STATE_NOSYNC;
-                if( block_SkipBytes( &p_sys->bytestream,
-                                     p_sys->first.i_frame_size ) != VLC_SUCCESS )
-                    return NULL;
+                /* Need more data */
+                return NULL;
             }
+
+            vlc_dts_header_t xssheader;
+            if( vlc_dts_header_Parse( &xssheader, p_header,
+                                      VLC_DTS_HEADER_SIZE ) != VLC_SUCCESS )
+            {
+                msg_Dbg( p_dec, "emulated substream sync word, can't find extension" );
+                block_SkipByte( &p_sys->bytestream );
+                p_sys->i_state = STATE_NOSYNC;
+                break;
+            }
+
+            if( xssheader.syncword == DTS_SYNC_SUBSTREAM_LBR )
+            {
+                /*
+                 * LBR exists as independant SUBSTREAM. It is seen valid
+                 * only when SUBSTREAM[LBR]..SUBTREAM.
+                 * CORE...SUBSTREAM is regular extension.
+                 * SUBSTREAM...CORE is sync issue.
+                 */
+                p_dec->fmt_out.i_profile = PROFILE_DTS_EXPRESS;
+                p_sys->first.i_rate = xssheader.i_rate;
+                p_sys->first.i_frame_length = xssheader.i_frame_length;
+                p_sys->i_state = STATE_NEXT_SYNC;
+                break;
+            }
+
+            msg_Warn( p_dec, "substream without the paired core stream, skip it" );
+            p_sys->i_state = STATE_NOSYNC;
+            p_dec->fmt_out.i_profile = PROFILE_DTS;
+            if( block_SkipBytes( &p_sys->bytestream,
+                                 p_sys->first.i_frame_size ) != VLC_SUCCESS )
+                return NULL;
             break;
 
         case STATE_NEXT_SYNC:
@@ -279,24 +312,34 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
 
                 /* Check if a DTS substream packet is located just after
                  * the core packet */
-                if( p_sys->i_next_offset == p_sys->first.i_frame_size )
+                if( p_sys->i_next_offset == p_sys->first.i_frame_size &&
+                    vlc_dts_header_Parse( &p_sys->second,
+                                          p_header, VLC_DTS_HEADER_SIZE ) == VLC_SUCCESS &&
+                    p_sys->second.syncword == DTS_SYNC_SUBSTREAM )
                 {
-                    if( vlc_dts_header_Parse( &p_sys->second, p_header,
-                                              VLC_DTS_HEADER_SIZE )
-                        == VLC_SUCCESS && p_sys->second.syncword == DTS_SYNC_SUBSTREAM )
-                    {
-                        p_sys->i_state = STATE_NEXT_SYNC_SUBSTREAM_EXTENSIONS;
-                        break;
-                    }
+                    p_sys->i_state = STATE_NEXT_SYNC_SUBSTREAM_EXTENSIONS;
                 }
-                p_sys->i_state = STATE_GET_DATA;
+                else
+                {
+                    p_dec->fmt_out.i_profile = PROFILE_DTS;
+                    p_sys->i_state = STATE_GET_DATA;
+                }
             }
             break;
 
         case STATE_NEXT_SYNC_SUBSTREAM_EXTENSIONS:
-            p_dec->fmt_out.i_profile = PROFILE_DTS_HD;
+            assert(p_sys->second.syncword == DTS_SYNC_SUBSTREAM);
+            if( p_sys->first.syncword == DTS_SYNC_SUBSTREAM )
+            {
+                /* First substream must have been LBR */
+                p_dec->fmt_out.i_profile = PROFILE_DTS_EXPRESS;
+            }
+            else /* Otherwise that's core + extensions, we need to output both */
+            {
+                p_dec->fmt_out.i_profile = PROFILE_DTS_HD;
+                p_sys->i_input_size += p_sys->second.i_frame_size;
+            }
             p_sys->i_state = STATE_GET_DATA;
-            p_sys->i_input_size += p_sys->second.i_frame_size;
             break;
 
         case STATE_GET_DATA:

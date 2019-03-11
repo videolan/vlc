@@ -113,6 +113,9 @@ static enum vlc_dts_syncword_e dts_header_getSyncword( const uint8_t *p_buf )
      && (p_buf[4] & 0xf0) == 0xf0 && p_buf[5] == 0x07 )
         return DTS_SYNC_CORE_14BITS_LE;
     else
+    if( memcmp( p_buf, "\x0A\x80\x19\x21", 4 ) == 0 )
+        return DTS_SYNC_SUBSTREAM_LBR;
+    else
         return DTS_SYNC_NONE;
 }
 
@@ -233,6 +236,49 @@ static uint16_t dca_get_channels( uint8_t i_amode, bool b_lfe,
     return i_physical_channels;
 }
 
+static uint8_t dca_get_LBR_channels( uint16_t nuSpkrActivityMask,
+                                     uint16_t *pi_chans )
+{
+    uint16_t i_physical_channels = 0;
+    uint8_t i_channels = 0;
+
+    static const struct
+    {
+        int phy;
+        uint8_t nb;
+    } bitmask[16] = {
+         /* table 7-10 */
+        { AOUT_CHAN_CENTER,     1 },
+        { AOUT_CHANS_FRONT,     2 },
+        { AOUT_CHANS_MIDDLE,    2 },
+        { AOUT_CHAN_LFE,        1 },
+        { AOUT_CHAN_REARCENTER, 1 },
+        { 0,                    2 },
+        { AOUT_CHANS_REAR,      2 },
+        { 0,                    1 },
+        { 0,                    1 },
+        { 0,                    2 },
+        { AOUT_CHANS_FRONT,     2 },
+        { AOUT_CHANS_MIDDLE,    2 },
+        { 0,                    1 },
+        { 0,                    2 },
+        { 0,                    1 },
+        { 0,                    2 },
+    };
+
+    for( int i=0 ; nuSpkrActivityMask; nuSpkrActivityMask >>= 1 )
+    {
+        if( nuSpkrActivityMask & 1 )
+        {
+            i_physical_channels |= bitmask[i].phy;
+            i_channels += bitmask[i].nb;
+        }
+        ++i;
+    }
+    *pi_chans = i_physical_channels;
+    return i_channels;
+}
+
 static int dts_header_ParseSubstream( vlc_dts_header_t *p_header,
                                       const void *p_buffer )
 {
@@ -288,12 +334,13 @@ static int dts_header_ParseLBRExtSubstream( vlc_dts_header_t *p_header,
         p_header->i_frame_length = 4096;
 
     uint16_t i_spkrmask = bs_read( &s, 16 );
+    dca_get_LBR_channels( i_spkrmask, &p_header->i_physical_channels );
     bs_skip( &s, 16 );
     bs_skip( &s, 8 );
-    bs_skip( &s, 8 );
+    uint16_t nLBRBitRateMSnybbles = bs_read( &s, 8 );
     bs_skip( &s, 16 );
-    bs_skip( &s, 16 );
-
+    uint16_t nLBRScaledBitRate_LSW = bs_read( &s, 16 );
+    p_header->i_bitrate = nLBRScaledBitRate_LSW | ((nLBRBitRateMSnybbles & 0xF0) << 12);
     return VLC_SUCCESS;
 }
 
@@ -388,6 +435,8 @@ int vlc_dts_header_Parse( vlc_dts_header_t *p_header,
         }
         case DTS_SYNC_SUBSTREAM:
             return dts_header_ParseSubstream( p_header, p_buffer );
+        case DTS_SYNC_SUBSTREAM_LBR:
+            return dts_header_ParseLBRExtSubstream( p_header, p_buffer );
         default:
             vlc_assert_unreachable();
     }

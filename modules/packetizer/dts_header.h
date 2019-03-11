@@ -26,6 +26,7 @@
 #define PROFILE_DTS_INVALID -1
 #define PROFILE_DTS 0
 #define PROFILE_DTS_HD 1
+#define PROFILE_DTS_EXPRESS 2
 
 enum vlc_dts_syncword_e
 {
@@ -35,6 +36,8 @@ enum vlc_dts_syncword_e
     DTS_SYNC_CORE_14BITS_BE,
     DTS_SYNC_CORE_14BITS_LE,
     DTS_SYNC_SUBSTREAM,
+    /* Substreams internal syncs */
+    DTS_SYNC_SUBSTREAM_LBR,
 };
 
 typedef struct
