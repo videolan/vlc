@@ -401,7 +401,6 @@ uninstall_playlist_observer(libvlc_media_list_player_t * p_mlp)
 static void
 install_media_player_observer(libvlc_media_list_player_t * p_mlp)
 {
-    assert_locked(p_mlp);
     libvlc_event_attach(mplayer_em(p_mlp), libvlc_MediaPlayerEndReached, media_player_reached_end, p_mlp);
 }
 
