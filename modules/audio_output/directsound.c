@@ -137,7 +137,7 @@ typedef struct
     } volume;
 } aout_sys_t;
 
-static HRESULT Flush( aout_stream_sys_t *sys, bool drain);
+static HRESULT Flush( aout_stream_sys_t *sys );
 static HRESULT TimeGet( aout_stream_sys_t *sys, vlc_tick_t *delay )
 {
     DWORD read, status;
@@ -168,7 +168,7 @@ static HRESULT TimeGet( aout_stream_sys_t *sys, vlc_tick_t *delay )
 
     if( sys->i_data < 0 )
         /* underrun */
-        Flush(sys, false);
+        Flush(sys);
 
     *delay = vlc_tick_from_samples( sys->i_data / sys->i_bytes_per_sample, sys->i_rate );
 
@@ -340,10 +340,10 @@ static void OutputPause( audio_output_t *aout, bool pause, vlc_tick_t date )
     (void) date;
 }
 
-static HRESULT Flush( aout_stream_sys_t *sys, bool drain)
+static HRESULT Flush( aout_stream_sys_t *sys )
 {
     HRESULT ret = IDirectSoundBuffer_Stop( sys->p_dsbuffer );
-    if( ret == DS_OK && !drain )
+    if( ret == DS_OK )
     {
         vlc_mutex_lock(&sys->lock);
         sys->i_data = 0;
@@ -357,13 +357,22 @@ static HRESULT Flush( aout_stream_sys_t *sys, bool drain)
 
 static HRESULT StreamFlush( aout_stream_t *s )
 {
-    return Flush( s->sys, false );
+    return Flush( s->sys );
 }
 
 static void OutputFlush( audio_output_t *aout, bool drain )
 {
     aout_sys_t *sys = aout->sys;
-    Flush( &sys->s, drain );
+    if (drain)
+    {   /* Loosy drain emulation */
+        vlc_tick_t delay;
+
+        if( OutputTimeGet( aout, &delay ) == 0 &&
+            delay <= VLC_TICK_FROM_SEC( 5 ) )
+            Sleep( MS_FROM_VLC_TICK( delay ) + 1 );
+    }
+    else
+        Flush( &sys->s );
 }
 
 /**
