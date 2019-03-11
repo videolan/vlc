@@ -26,6 +26,7 @@
 #import "os-integration/VLCRemoteControlService.h"
 #import "os-integration/iTunes.h"
 #import "os-integration/Spotify.h"
+#import "windows/video/VLCVoutView.h"
 
 #import <MediaPlayer/MediaPlayer.h>
 
@@ -53,6 +54,7 @@ NSString *VLCPlayerInputStats = @"VLCPlayerInputStats";
 NSString *VLCPlayerStatisticsUpdated = @"VLCPlayerStatisticsUpdated";
 NSString *VLCPlayerFullscreenChanged = @"VLCPlayerFullscreenChanged";
 NSString *VLCPlayerWallpaperModeChanged = @"VLCPlayerWallpaperModeChanged";
+NSString *VLCPlayerListOfVideoOutputThreadsChanged = @"VLCPlayerListOfVideoOutputThreadsChanged";
 NSString *VLCPlayerVolumeChanged = @"VLCPlayerVolumeChanged";
 NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 
@@ -95,6 +97,7 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 - (void)inputStatsUpdated:(VLCInputStats *)inputStats;
 - (void)stopActionChanged:(enum vlc_player_media_stopped_action)stoppedAction;
 - (void)metaDataChangedForInput:(input_item_t *)inputItem;
+- (void)voutListUpdated;
 
 /* video */
 - (void)fullscreenChanged:(BOOL)isFullscreen;
@@ -324,6 +327,19 @@ static void cb_player_item_meta_changed(vlc_player_t *p_player,
     });
 }
 
+static void cb_player_vout_list_changed(vlc_player_t *p_player,
+                                        enum vlc_player_list_action action,
+                                        vout_thread_t *p_vout,
+                                        void *p_data)
+{
+    VLC_UNUSED(p_player);
+    VLC_UNUSED(p_vout);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController voutListUpdated];
+    });
+}
+
 static const struct vlc_player_cbs player_callbacks = {
     cb_player_current_media_changed,
     cb_player_state_changed,
@@ -356,7 +372,7 @@ static const struct vlc_player_cbs player_callbacks = {
     cb_player_item_meta_changed,
     NULL, //cb_player_item_epg_changed,
     NULL, //cb_player_subitems_changed,
-    NULL, //cb_player_vout_list_changed,
+    cb_player_vout_list_changed,
 };
 
 #pragma mark - video specific callback implementations
@@ -1101,6 +1117,55 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     vlc_player_vout_Snapshot(_p_player);
 }
 
+- (void)voutListUpdated
+{
+    [_defaultNotificationCenter postNotificationName:VLCPlayerListOfVideoOutputThreadsChanged
+                                              object:self];
+}
+
+- (vout_thread_t *)mainVideoOutputThread
+{
+    return vlc_player_vout_Hold(_p_player);
+}
+
+- (vout_thread_t *)videoOutputThreadForKeyWindow
+{
+    vout_thread_t *p_vout = nil;
+
+    id currentWindow = [NSApp keyWindow];
+    if ([currentWindow respondsToSelector:@selector(videoView)]) {
+        VLCVoutView *videoView = [currentWindow videoView];
+        if (videoView) {
+            p_vout = [videoView voutThread];
+        }
+    }
+
+    if (!p_vout)
+        p_vout = [self mainVideoOutputThread];
+
+    return p_vout;
+}
+
+- (NSArray<NSValue *> *)allVideoOutputThreads
+{
+    size_t numberOfVoutThreads = 0;
+    vout_thread_t **pp_vouts = vlc_player_vout_HoldAll(_p_player, &numberOfVoutThreads);
+    if (numberOfVoutThreads == 0) {
+        return nil;
+    }
+
+    NSMutableArray<NSValue *> *vouts = [NSMutableArray arrayWithCapacity:numberOfVoutThreads];
+
+    for (size_t i = 0; i < numberOfVoutThreads; ++i)
+    {
+        assert(pp_vouts[i]);
+        [vouts addObject:[NSValue valueWithPointer:pp_vouts[i]]];
+    }
+
+    free(pp_vouts);
+    return vouts;
+}
+
 #pragma mark - audio specific delegation
 
 - (void)volumeChanged:(float)volume
@@ -1140,6 +1205,11 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 - (void)toggleMute
 {
     vlc_player_aout_Mute(_p_player, !_mute);
+}
+
+- (audio_output_t *)mainAudioOutput
+{
+    return vlc_player_aout_Hold(_p_player);
 }
 
 @end

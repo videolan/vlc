@@ -149,6 +149,12 @@ extern NSString *VLCPlayerStatisticsUpdated;
 extern NSString *VLCPlayerFullscreenChanged;
 
 /**
+ * Listen to VLCPlayerListOfVideoOutputThreadsChanged to be notified when a video output thread was added or removed
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerListOfVideoOutputThreadsChanged;
+
+/**
  * Listen to VLCPlayerWallpaperModeChanged to be notified whether the fullscreen state of the video output changes
  * @note the affected player object will be the object of the notification
  */
@@ -494,6 +500,28 @@ extern NSString *VLCPlayerMuteChanged;
 #pragma mark - video output properties
 
 /**
+ * the main video output thread
+ * @warning the returned vout_thread_t * must be released with vout_Release().
+ * @note listen to VLCPlayerListOfVideoOutputThreadsChanged to be notified about changes
+ * @return the current video output thread or NULL if there is none
+ */
+@property (readonly, nullable) vout_thread_t *mainVideoOutputThread;
+
+/**
+ * the video output embedded in the current key window
+ * @warning the returned vout_thread_t * must be released with vout_Release().
+ * @return the current video output thread for the key window or the main video output thread or NULL if there is none
+ */
+@property (readonly, nullable) vout_thread_t *videoOutputThreadForKeyWindow;
+
+/**
+ * an array holding all current video output threads
+ * @warning the returned vout_thread_t * instances must be individually released with vout_Release().
+ * @note listen to VLCPlayerListOfVideoOutputThreadsChanged to be notified about changes
+ */
+@property (readonly, nullable, copy) NSArray<NSValue *> *allVideoOutputThreads;
+
+/**
  * indicates whether video is displayed in fullscreen or shall to
  * @note listen to VLCPlayerFullscreenChanged to be notified about changes to this property
  */
@@ -544,6 +572,13 @@ extern NSString *VLCPlayerMuteChanged;
  * helper function to inverse the current mute state
  */
 - (void)toggleMute;
+
+/**
+ * the main audio output thread
+ * @warning the returned vout_thread_t * must be released with aout_Release().
+ * @return the current audio output instance or NULL if there is none
+ */
+@property (readonly, nullable) audio_output_t *mainAudioOutput;
 
 @end
 
