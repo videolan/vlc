@@ -23,7 +23,8 @@
 #import <Foundation/Foundation.h>
 
 #include <vlc_common.h>
-#include <vlc_playlist_legacy.h>
+
+@class VLCPlayerController;
 
 /**
  \c VLCRendererItem is a simple wrapper class for libvlc’s
@@ -66,10 +67,10 @@
 
 /**
  Sets the renderer represented by this \c VLCRendererItem as active
- for the given playlist.
+ for the given player controller.
 
- \param playlist The playlist for which to set the renderer
+ \param playerController The player controller for which to set the renderer
  */
-- (void)setRendererForPlaylist:(playlist_t*)playlist;
+- (void)setRendererForPlayerController:(VLCPlayerController *)playerController;
 
 @end

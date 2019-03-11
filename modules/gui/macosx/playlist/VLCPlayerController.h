@@ -134,6 +134,12 @@ extern NSString *VLCPlayerSubtitlesDelayChanged;
  */
 extern NSString *VLCPlayerRecordingChanged;
 
+/**
+ * Listen to VLCPlayerRendererChanged to be notified if the renderer (such as a Chromecast device) changes
+ * @note the affected playser object will be the obejct of the notification
+ */
+extern NSString *VLCPlayerRendererChanged;
+
 extern NSString *VLCPlayerInputStats;
 /**
  * Listen to VLCPlayerStatisticsUpdated to be notified if the playback statistics state of the current media update
@@ -489,6 +495,13 @@ extern NSString *VLCPlayerMuteChanged;
  * helper function to inverse the current recording state
  */
 - (void)toggleRecord;
+
+/**
+ * set / get the renderer for the current player
+ * @warning the returned vlc_renderer_item_t * must be released with vlc_renderer_item_release().
+ * @note listen to VLCPlayerRendererChanged to be notified about changes
+ */
+@property (readwrite, nonatomic, nullable) vlc_renderer_item_t *rendererItem;
 
 /**
  * the latest available playback statistics

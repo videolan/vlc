@@ -25,6 +25,7 @@
 
 #import <vlc_common.h>
 #import <vlc_input.h>
+#import <vlc_playlist_legacy.h>
 
 #import "coreinteraction/VLCCoreInteraction.h"
 #import "coreinteraction/VLCVideoFilterHelper.h"

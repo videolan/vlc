@@ -50,6 +50,7 @@ NSString *VLCPlayerAudioDelayChanged = @"VLCPlayerAudioDelayChanged";
 NSString *VLCPlayerSubtitlesDelayChanged = @"VLCPlayerSubtitlesDelayChanged";
 NSString *VLCPlayerSubtitleTextScalingFactorChanged = @"VLCPlayerSubtitleTextScalingFactorChanged";
 NSString *VLCPlayerRecordingChanged = @"VLCPlayerRecordingChanged";
+NSString *VLCPlayerRendererChanged = @"VLCPlayerRendererChanged";
 NSString *VLCPlayerInputStats = @"VLCPlayerInputStats";
 NSString *VLCPlayerStatisticsUpdated = @"VLCPlayerStatisticsUpdated";
 NSString *VLCPlayerFullscreenChanged = @"VLCPlayerFullscreenChanged";
@@ -92,6 +93,7 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 - (void)teletextPageChanged:(unsigned int)page;
 - (void)teletextTransparencyChanged:(BOOL)isTransparent;
 - (void)audioDelayChanged:(vlc_tick_t)audioDelay;
+- (void)rendererChanged:(vlc_renderer_item_t *)newRendererItem;
 - (void)subtitlesDelayChanged:(vlc_tick_t)subtitlesDelay;
 - (void)recordingChanged:(BOOL)recording;
 - (void)inputStatsUpdated:(VLCInputStats *)inputStats;
@@ -257,7 +259,18 @@ static void cb_player_subtitle_delay_changed(vlc_player_t *p_player, vlc_tick_t 
     VLC_UNUSED(p_player);
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
-        [playerController audioDelayChanged:newDelay];
+        [playerController subtitlesDelayChanged:newDelay];
+    });
+}
+
+static void cb_player_renderer_changed(vlc_player_t *p_player,
+                                       vlc_renderer_item_t *p_new_renderer,
+                                       void *p_data)
+{
+    VLC_UNUSED(p_player);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController rendererChanged:p_new_renderer];
     });
 }
 
@@ -363,7 +376,7 @@ static const struct vlc_player_cbs player_callbacks = {
     cb_player_audio_delay_changed,
     cb_player_subtitle_delay_changed,
     NULL, //cb_player_associated_subs_fps_changed,
-    NULL, //cb_player_renderer_changed,
+    cb_player_renderer_changed,
     cb_player_record_changed,
     NULL, //cb_player_signal_changed,
     cb_player_stats_changed,
@@ -1049,6 +1062,20 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
     vlc_player_Lock(_p_player);
     vlc_player_SetSubtitleTextScale(_p_player, subtitleTextScalingFactor);
+    vlc_player_Unlock(_p_player);
+}
+
+- (void)rendererChanged:(vlc_renderer_item_t *)newRenderer
+{
+    _rendererItem = newRenderer;
+    [_defaultNotificationCenter postNotificationName:VLCPlayerRendererChanged
+                                              object:self];
+}
+
+- (void)setRendererItem:(vlc_renderer_item_t *)rendererItem
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_SetRenderer(_p_player, rendererItem);
     vlc_player_Unlock(_p_player);
 }
 

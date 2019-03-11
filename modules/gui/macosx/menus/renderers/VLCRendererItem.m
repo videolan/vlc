@@ -21,7 +21,9 @@
  *****************************************************************************/
 
 #import "VLCRendererItem.h"
+
 #import "extensions/NSString+Helpers.h"
+#import "playlist/VLCPlayerController.h"
 
 #include <vlc_common.h>
 #include <vlc_renderer_discovery.h>
@@ -75,9 +77,9 @@
     return vlc_renderer_item_flags(_rendererItem);
 }
 
-- (void)setRendererForPlaylist:(playlist_t*)playlist
+- (void)setRendererForPlayerController:(VLCPlayerController *)playerController
 {
-    playlist_SetRenderer(playlist, _rendererItem);
+    [playerController setRendererItem:_rendererItem];
 }
 
 - (BOOL)isEqual:(id)object

@@ -25,6 +25,8 @@
 
 #import "main/VLCMain.h"
 #import "menus/renderers/VLCRendererItem.h"
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 #include <vlc_renderer_discovery.h>
 
@@ -68,13 +70,11 @@
 
 - (void)loadRendererDiscoveries
 {
-    playlist_t *playlist = pl_Get(p_intf);
-
     // Service Discovery subnodes
     char **ppsz_longnames;
     char **ppsz_names;
 
-    if (vlc_rd_get_names(playlist, &ppsz_names, &ppsz_longnames) != VLC_SUCCESS) {
+    if (vlc_rd_get_names(VLC_OBJECT(p_intf), &ppsz_names, &ppsz_longnames) != VLC_SUCCESS) {
         return;
     }
     char **ppsz_name = ppsz_names;
@@ -162,22 +162,14 @@
     [sender setState:NSOnState];
     _selectedItem = sender;
 
-    VLCRendererItem* item = [sender representedObject];
-    playlist_t *playlist = pl_Get(p_intf);
-
-    if (!playlist)
-        return;
+    VLCRendererItem *item = [sender representedObject];
+    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
 
     if (item) {
-        [item setRendererForPlaylist:playlist];
+        [item setRendererForPlayerController:playerController];
     } else {
-        [self unsetRendererForPlaylist:playlist];
+        [playerController setRendererItem:NULL];
     }
-}
-
-- (void)unsetRendererForPlaylist:(playlist_t*)playlist
-{
-    playlist_SetRenderer(playlist, NULL);
 }
 
 #pragma mark VLCRendererDiscovery delegate methods
