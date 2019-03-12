@@ -70,6 +70,26 @@ chroma_LTLIBRARIES += \
 	libi420_yuy2_altivec_plugin.la
 endif
 
+# MMX
+libi420_rgb_mmx_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
+	video_chroma/i420_rgb16_x86.c video_chroma/i420_rgb_mmx.h
+libi420_rgb_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMMX
+
+libi420_yuy2_mmx_plugin_la_SOURCES = video_chroma/i420_yuy2.c video_chroma/i420_yuy2.h
+libi420_yuy2_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DMODULE_NAME_IS_i420_yuy2_mmx
+
+libi422_yuy2_mmx_plugin_la_SOURCES = video_chroma/i422_yuy2.c video_chroma/i422_yuy2.h
+libi422_yuy2_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DMODULE_NAME_IS_i422_yuy2_mmx
+
+if HAVE_MMX
+chroma_LTLIBRARIES += \
+	libi420_rgb_mmx_plugin.la \
+	libi420_yuy2_mmx_plugin.la \
+	libi422_yuy2_mmx_plugin.la
+endif
+
 # SSE2
 libi420_rgb_sse2_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
 	video_chroma/i420_rgb16_x86.c video_chroma/i420_rgb_sse2.h

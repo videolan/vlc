@@ -21,7 +21,7 @@
  *****************************************************************************/
 #include <limits.h>
 
-#if !defined (AVX2) && !defined (SSE2)
+#if !defined (AVX2) && !defined (SSE2) && !defined (MMX)
 # define PLAIN
 #endif
 

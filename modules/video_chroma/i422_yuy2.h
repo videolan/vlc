@@ -22,7 +22,115 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined( MODULE_NAME_IS_i422_yuy2_sse2 )
+#ifdef MODULE_NAME_IS_i422_yuy2_mmx
+
+#if defined(CAN_COMPILE_MMX)
+
+/* MMX assembly */
+ 
+#define MMX_CALL(MMX_INSTRUCTIONS)          \
+    do {                                    \
+    __asm__ __volatile__(                   \
+        ".p2align 3 \n\t"                   \
+        MMX_INSTRUCTIONS                    \
+        :                                   \
+        : "r" (p_line), "r" (p_y),          \
+          "r" (p_u), "r" (p_v)              \
+        : "mm0", "mm1", "mm2" );            \
+        p_line += 16; p_y += 8;             \
+        p_u += 4; p_v += 4;                 \
+    } while(0)
+
+#define MMX_END __asm__ __volatile__ ( "emms" )
+
+#define MMX_YUV422_YUYV "                                                 \n\
+movq       (%1), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
+movd       (%2), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+movd       (%3), %%mm2  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+punpcklbw %%mm2, %%mm1  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
+movq      %%mm0, %%mm2  #                     y7 y6 y5 y4 y3 y2 y1 y0     \n\
+punpcklbw %%mm1, %%mm2  #                     v1 y3 u1 y2 v0 y1 u0 y0     \n\
+movq      %%mm2, (%0)   # Store low YUYV                                  \n\
+punpckhbw %%mm1, %%mm0  #                     v3 y7 u3 y6 v2 y5 u2 y4     \n\
+movq      %%mm0, 8(%0)  # Store high YUYV                                 \n\
+"
+
+#define MMX_YUV422_YVYU "                                                 \n\
+movq       (%1), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
+movd       (%2), %%mm2  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+movd       (%3), %%mm1  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+punpcklbw %%mm2, %%mm1  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
+movq      %%mm0, %%mm2  #                     y7 y6 y5 y4 y3 y2 y1 y0     \n\
+punpcklbw %%mm1, %%mm2  #                     u1 y3 v1 y2 u0 y1 v0 y0     \n\
+movq      %%mm2, (%0)   # Store low YUYV                                  \n\
+punpckhbw %%mm1, %%mm0  #                     u3 y7 v3 y6 u2 y5 v2 y4     \n\
+movq      %%mm0, 8(%0)  # Store high YUYV                                 \n\
+"
+
+#define MMX_YUV422_UYVY "                                                 \n\
+movq       (%1), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
+movd       (%2), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+movd       (%3), %%mm2  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+punpcklbw %%mm2, %%mm1  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
+movq      %%mm1, %%mm2  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
+punpcklbw %%mm0, %%mm2  #                     y3 v1 y2 u1 y1 v0 y0 u0     \n\
+movq      %%mm2, (%0)   # Store low UYVY                                  \n\
+punpckhbw %%mm0, %%mm1  #                     y7 v3 y6 u3 y5 v2 y4 u2     \n\
+movq      %%mm1, 8(%0)  # Store high UYVY                                 \n\
+"
+
+#elif defined(HAVE_MMX_INTRINSICS)
+
+/* MMX intrinsics */
+
+#include <mmintrin.h>
+
+#define MMX_CALL(MMX_INSTRUCTIONS)  \
+    do {                            \
+        __m64 mm0, mm1, mm2;        \
+        MMX_INSTRUCTIONS            \
+        p_line += 16; p_y += 8;     \
+        p_u += 4; p_v += 4;         \
+    } while(0)
+
+#define MMX_END _mm_empty()
+
+#define MMX_YUV422_YUYV                     \
+    mm0 = (__m64)*(uint64_t*)p_y;           \
+    mm1 = _mm_cvtsi32_si64(*(int*)p_u);     \
+    mm2 = _mm_cvtsi32_si64(*(int*)p_v);     \
+    mm1 = _mm_unpacklo_pi8(mm1, mm2);       \
+    mm2 = mm0;                              \
+    mm2 = _mm_unpacklo_pi8(mm2, mm1);       \
+    *(uint64_t*)p_line = (uint64_t)mm2;     \
+    mm0 = _mm_unpackhi_pi8(mm0, mm1);       \
+    *(uint64_t*)(p_line+8) = (uint64_t)mm0;
+ 
+#define MMX_YUV422_YVYU                     \
+    mm0 = (__m64)*(uint64_t*)p_y;           \
+    mm2 = _mm_cvtsi32_si64(*(int*)p_u);     \
+    mm1 = _mm_cvtsi32_si64(*(int*)p_v);     \
+    mm1 = _mm_unpacklo_pi8(mm1, mm2);       \
+    mm2 = mm0;                              \
+    mm2 = _mm_unpacklo_pi8(mm2, mm1);       \
+    *(uint64_t*)p_line = (uint64_t)mm2;     \
+    mm0 = _mm_unpackhi_pi8(mm0, mm1);       \
+    *(uint64_t*)(p_line+8) = (uint64_t)mm0;
+
+#define MMX_YUV422_UYVY                     \
+    mm0 = (__m64)*(uint64_t*)p_y;           \
+    mm1 = _mm_cvtsi32_si64(*(int*)p_u);     \
+    mm2 = _mm_cvtsi32_si64(*(int*)p_v);     \
+    mm1 = _mm_unpacklo_pi8(mm1, mm2);       \
+    mm2 = mm1;                              \
+    mm2 = _mm_unpacklo_pi8(mm2, mm0);       \
+    *(uint64_t*)p_line = (uint64_t)mm2;     \
+    mm1 = _mm_unpackhi_pi8(mm1, mm0);       \
+    *(uint64_t*)(p_line+8) = (uint64_t)mm1;
+
+#endif
+ 
+#elif defined( MODULE_NAME_IS_i422_yuy2_sse2 )
 
 #if defined(CAN_COMPILE_SSE2)
 
@@ -380,4 +488,5 @@ vmovdqu    [[l]+32], ymm1    ; Store high UYVY                                 \
     *(p_line)++ = *(p_u) - 0x80; p_u += 2;                                  \
     *(p_line)++ = *(p_y); p_y += 2;                                         \
     *(p_line)++ = *(p_v) - 0x80; p_v += 2;                                  \
+
 

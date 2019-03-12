@@ -71,6 +71,11 @@ vlc_module_begin ()
     set_capability( "video converter", 80 )
 # define vlc_CPU_capable() (true)
 # define VLC_TARGET
+#elif defined (MODULE_NAME_IS_i422_yuy2_mmx)
+    set_description( N_("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) )
+    set_capability( "video converter", 100 )
+# define vlc_CPU_capable() vlc_CPU_MMX()
+# define VLC_TARGET VLC_MMX
 #elif defined (MODULE_NAME_IS_i422_yuy2_sse2)
     set_description( N_("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     set_capability( "video converter", 120 )
@@ -279,10 +284,14 @@ static void I422_YUY2( filter_t *p_filter, picture_t *p_source,
     {
         for( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 8 ; i_x-- ; )
         {
+#if defined (MODULE_NAME_IS_i422_yuy2)
             C_YUV422_YUYV( p_line, p_y, p_u, p_v );
             C_YUV422_YUYV( p_line, p_y, p_u, p_v );
             C_YUV422_YUYV( p_line, p_y, p_u, p_v );
             C_YUV422_YUYV( p_line, p_y, p_u, p_v );
+#elif defined (MODULE_NAME_IS_i422_yuy2_mmx)
+            MMX_CALL( MMX_YUV422_YUYV );
+#endif
         }
         for( i_x = ( (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) % 8 ) / 2; i_x-- ; )
         {
@@ -293,6 +302,9 @@ static void I422_YUY2( filter_t *p_filter, picture_t *p_source,
         p_v += i_source_margin_c;
         p_line += i_dest_margin;
     }
+#if defined (MODULE_NAME_IS_i422_yuy2_mmx)
+    MMX_END;
+#endif
 
 #endif
 }
@@ -421,10 +433,14 @@ static void I422_YVYU( filter_t *p_filter, picture_t *p_source,
     {
         for( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 8 ; i_x-- ; )
         {
+#if defined (MODULE_NAME_IS_i422_yuy2)
             C_YUV422_YVYU( p_line, p_y, p_u, p_v );
             C_YUV422_YVYU( p_line, p_y, p_u, p_v );
             C_YUV422_YVYU( p_line, p_y, p_u, p_v );
             C_YUV422_YVYU( p_line, p_y, p_u, p_v );
+#elif defined (MODULE_NAME_IS_i422_yuy2_mmx)
+            MMX_CALL( MMX_YUV422_YVYU );
+#endif
         }
         for( i_x = ( (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) % 8 ) / 2; i_x-- ; )
         {
@@ -435,6 +451,9 @@ static void I422_YVYU( filter_t *p_filter, picture_t *p_source,
         p_v += i_source_margin_c;
         p_line += i_dest_margin;
     }
+#if defined (MODULE_NAME_IS_i422_yuy2_mmx)
+    MMX_END;
+#endif
 
 #endif
 }
@@ -563,10 +582,14 @@ static void I422_UYVY( filter_t *p_filter, picture_t *p_source,
     {
         for( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 8 ; i_x-- ; )
         {
+#if defined (MODULE_NAME_IS_i422_yuy2)
             C_YUV422_UYVY( p_line, p_y, p_u, p_v );
             C_YUV422_UYVY( p_line, p_y, p_u, p_v );
             C_YUV422_UYVY( p_line, p_y, p_u, p_v );
             C_YUV422_UYVY( p_line, p_y, p_u, p_v );
+#elif defined (MODULE_NAME_IS_i422_yuy2_mmx)
+            MMX_CALL( MMX_YUV422_UYVY );
+#endif
         }
         for( i_x = ( (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) % 8 ) / 2; i_x-- ; )
         {
@@ -577,6 +600,9 @@ static void I422_UYVY( filter_t *p_filter, picture_t *p_source,
         p_v += i_source_margin_c;
         p_line += i_dest_margin;
     }
+#if defined (MODULE_NAME_IS_i422_yuy2_mmx)
+    MMX_END;
+#endif
 
 #endif
 }
