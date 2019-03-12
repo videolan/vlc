@@ -190,17 +190,14 @@ $Id$
  * i420_rgb: planar YUV to packed RGB conversion functions
  * i420_rgb_mmx: MMX accelerated version of i420_rgb
  * i420_rgb_sse2: sse2 accelerated version of i420_rgb
- * i420_rgb_avx2: avx2 accelerated version of i420_rgb
  * i420_yuy2: planar 4:2:0 YUV to packed YUV conversion functions
  * i420_yuy2_altivec: AltiVec accelerated version of i420_yuy2
  * i420_yuy2_mmx: MMX accelerated version of i420_yuy2
  * i420_yuy2_sse2: sse2 accelerated version of i420_yuy2
- * i420_yuy2_avx2: avx2 accelerated version of i420_yuy2
  * i422_i420: 4:2:2 to 4:2:0 conversion functions
  * i422_yuy2: planar 4:2:2 YUV to packed YUV conversion functions
  * i422_yuy2_mmx: MMX accelerated version of i422_yuy2
  * i422_yuy2_sse2: sse2 accelerated version of i422_yuy2
- * i422_yuy2_avx2: avx2 accelerated version of i422_yuy2
  * idummy: dummy input
  * image: Image file video output
  * imem: memory input access module

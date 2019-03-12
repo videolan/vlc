@@ -1,7 +1,7 @@
 /*****************************************************************************
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001, 2019 VLC authors and VideoLAN
+ * Copyright (C) 2000, 2001 VLC authors and VideoLAN
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Damien Fouilleul <damien@videolan.org>
@@ -55,9 +55,6 @@
 #elif defined (MODULE_NAME_IS_i420_yuy2_altivec)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422"
 #    define VLC_TARGET
-#elif defined (MODULE_NAME_IS_i420_yuy2_avx2)
-#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV"
-#    define VLC_TARGET VLC_AVX
 #endif
 
 /*****************************************************************************
@@ -101,10 +98,6 @@ vlc_module_begin ()
             _("AltiVec conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "video converter", 250 )
 # define vlc_CPU_capable() vlc_CPU_ALTIVEC()
-#elif defined (MODULE_NAME_IS_i420_yuy2_avx2)
-    set_description( N_("AVX2 conversions from " SRC_FOURCC " to " DEST_FOURCC) )
-    set_capability( "video converter", 260 )
-# define vlc_CPU_capable() vlc_CPU_AVX2()
 #endif
     set_callbacks( Activate, NULL )
 vlc_module_end ()
@@ -301,7 +294,7 @@ static void I420_YUY2( filter_t *p_filter, picture_t *p_source,
                                - p_dest->p->i_visible_pitch
                                - ( p_filter->fmt_out.video.i_x_offset * 2 );
 
-#if !defined(MODULE_NAME_IS_i420_yuy2_sse2) && !defined(MODULE_NAME_IS_i420_yuy2_avx2)
+#if !defined(MODULE_NAME_IS_i420_yuy2_sse2)
     for( i_y = (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) / 2 ; i_y-- ; )
     {
         p_line1 = p_line2;
@@ -341,9 +334,11 @@ static void I420_YUY2( filter_t *p_filter, picture_t *p_source,
     }
 #endif
 
-#elif defined(MODULE_NAME_IS_i420_yuy2_sse2)
-
-    /* SSE2 aligned store/load is faster, requires 16-byte alignment */
+#else // defined(MODULE_NAME_IS_i420_yuy2_sse2)
+    /*
+    ** SSE2 128 bits fetch/store instructions are faster
+    ** if memory access is 16 bytes aligned
+    */
 
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
         ((intptr_t)p_line2|(intptr_t)p_y2))) )
@@ -401,71 +396,7 @@ static void I420_YUY2( filter_t *p_filter, picture_t *p_source,
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined(MODULE_NAME_IS_i420_yuy2_avx2)
-
-    /* AVX2 aligned store/load can require 32-byte alignment */
-
-    if( 0 == (31 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
-        ((intptr_t)p_line2|(intptr_t)p_y2))) )
-    {
-        /* use AVX2 aligned fetch and store */
-        for( i_y = (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) / 2 ; i_y-- ; )
-        {
-            p_line1 = p_line2;
-            p_line2 += p_dest->p->i_pitch;
-
-            p_y1 = p_y2;
-            p_y2 += p_source->p[Y_PLANE].i_pitch;
-
-            for( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32 ; i_x-- ; )
-            {
-                AVX2_CALL(
-                    AVX2_INIT_ALIGNED
-                    AVX2_YUV420_YUYV_ALIGNED
-                );
-            }
-            for( i_x = ( (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) % 32 ) / 2; i_x-- ; )
-            {
-                C_YUV420_YUYV( );
-            }
-
-            p_y2 += i_source_margin;
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-            p_line2 += i_dest_margin;
-        }
-    }
-    else {
-        /* use AVX2 unaligned fetch and store */
-        for( i_y = (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) / 2 ; i_y-- ; )
-        {
-            p_line1 = p_line2;
-            p_line2 += p_dest->p->i_pitch;
-
-            p_y1 = p_y2;
-            p_y2 += p_source->p[Y_PLANE].i_pitch;
-
-            for( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32 ; i_x-- ; )
-            {
-                AVX2_CALL(
-                    AVX2_INIT_UNALIGNED
-                    AVX2_YUV420_YUYV_UNALIGNED
-                );
-            }
-            for( i_x = ( (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) % 32 ) / 2; i_x-- ; )
-            {
-                C_YUV420_YUYV( );
-            }
-
-            p_y2 += i_source_margin;
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-            p_line2 += i_dest_margin;
-        }
-    }
-    /* make sure all AVX2 stores are visible thereafter */
-    AVX2_END;
-#endif // defined(MODULE_NAME_IS_i420_yuy2_avx2)
+#endif // defined(MODULE_NAME_IS_i420_yuy2_sse2)
 }
 
 /*****************************************************************************
@@ -572,7 +503,7 @@ static void I420_YVYU( filter_t *p_filter, picture_t *p_source,
                                - p_dest->p->i_visible_pitch
                                - ( p_filter->fmt_out.video.i_x_offset * 2 );
 
-#if !defined(MODULE_NAME_IS_i420_yuy2_sse2) && !defined(MODULE_NAME_IS_i420_yuy2_avx2)
+#if !defined(MODULE_NAME_IS_i420_yuy2_sse2)
     for( i_y = (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) / 2 ; i_y-- ; )
     {
         p_line1 = p_line2;
@@ -612,10 +543,11 @@ static void I420_YVYU( filter_t *p_filter, picture_t *p_source,
     }
 #endif
 
-#elif defined(MODULE_NAME_IS_i420_yuy2_sse2)
-
-    /* SSE2 aligned store/load is faster, requires 16-byte alignment */
-
+#else // defined(MODULE_NAME_IS_i420_yuy2_sse2)
+    /*
+    ** SSE2 128 bits fetch/store instructions are faster
+    ** if memory access is 16 bytes aligned
+    */
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
         ((intptr_t)p_line2|(intptr_t)p_y2))) )
     {
@@ -671,72 +603,7 @@ static void I420_YVYU( filter_t *p_filter, picture_t *p_source,
     }
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
-
-#elif defined(MODULE_NAME_IS_i420_yuy2_avx2)
-
-    /* AVX2 aligned store/load can require 32-byte alignment */
-
-    if( 0 == (31 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
-        ((intptr_t)p_line2|(intptr_t)p_y2))) )
-    {
-        /* use AVX2 aligned fetch and store */
-        for( i_y = (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) / 2 ; i_y-- ; )
-        {
-            p_line1 = p_line2;
-            p_line2 += p_dest->p->i_pitch;
-
-            p_y1 = p_y2;
-            p_y2 += p_source->p[Y_PLANE].i_pitch;
-
-            for( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32 ; i_x-- ; )
-            {
-                AVX2_CALL(
-                    AVX2_INIT_ALIGNED
-                    AVX2_YUV420_YVYU_ALIGNED
-                );
-            }
-            for( i_x = ( (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) % 32 ) / 2; i_x-- ; )
-            {
-                C_YUV420_YVYU( );
-            }
-
-            p_y2 += i_source_margin;
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-            p_line2 += i_dest_margin;
-        }
-    }
-    else {
-        /* use AVX2 unaligned fetch and store */
-        for( i_y = (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) / 2 ; i_y-- ; )
-        {
-            p_line1 = p_line2;
-            p_line2 += p_dest->p->i_pitch;
-
-            p_y1 = p_y2;
-            p_y2 += p_source->p[Y_PLANE].i_pitch;
-
-            for( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32 ; i_x-- ; )
-            {
-                AVX2_CALL(
-                    AVX2_INIT_UNALIGNED
-                    AVX2_YUV420_YVYU_UNALIGNED
-                );
-            }
-            for( i_x = ( (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) % 32 ) / 2; i_x-- ; )
-            {
-                C_YUV420_YVYU( );
-            }
-
-            p_y2 += i_source_margin;
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-            p_line2 += i_dest_margin;
-        }
-    }
-    /* make sure all AVX2 stores are visible thereafter */
-    AVX2_END;
-#endif // defined(MODULE_NAME_IS_i420_yuy2_avx2)
+#endif // defined(MODULE_NAME_IS_i420_yuy2_sse2)
 }
 
 /*****************************************************************************
@@ -843,7 +710,7 @@ static void I420_UYVY( filter_t *p_filter, picture_t *p_source,
                                - p_dest->p->i_visible_pitch
                                - ( p_filter->fmt_out.video.i_x_offset * 2 );
 
-#if !defined(MODULE_NAME_IS_i420_yuy2_sse2) && !defined(MODULE_NAME_IS_i420_yuy2_avx2)
+#if !defined(MODULE_NAME_IS_i420_yuy2_sse2)
     for( i_y = (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) / 2 ; i_y-- ; )
     {
         p_line1 = p_line2;
@@ -883,10 +750,11 @@ static void I420_UYVY( filter_t *p_filter, picture_t *p_source,
     }
 #endif
 
-#elif defined(MODULE_NAME_IS_i420_yuy2_sse2)
-
-    /* SSE2 aligned store/load is faster, requires 16-byte alignment */
-
+#else // defined(MODULE_NAME_IS_i420_yuy2_sse2)
+    /*
+    ** SSE2 128 bits fetch/store instructions are faster
+    ** if memory access is 16 bytes aligned
+    */
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
         ((intptr_t)p_line2|(intptr_t)p_y2))) )
     {
@@ -942,72 +810,7 @@ static void I420_UYVY( filter_t *p_filter, picture_t *p_source,
     }
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
-
-#elif defined(MODULE_NAME_IS_i420_yuy2_avx2)
-
-    /* AVX2 aligned store/load can require 32-byte alignment */
-
-    if( 0 == (31 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
-        ((intptr_t)p_line2|(intptr_t)p_y2))) )
-    {
-        /* use AVX2 aligned fetch and store */
-        for( i_y = (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) / 2 ; i_y-- ; )
-        {
-            p_line1 = p_line2;
-            p_line2 += p_dest->p->i_pitch;
-
-            p_y1 = p_y2;
-            p_y2 += p_source->p[Y_PLANE].i_pitch;
-
-            for( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32 ; i_x-- ; )
-            {
-                AVX2_CALL(
-                    AVX2_INIT_ALIGNED
-                    AVX2_YUV420_UYVY_ALIGNED
-                );
-            }
-            for( i_x = ( (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) % 32 ) / 2; i_x-- ; )
-            {
-                C_YUV420_UYVY( );
-            }
-
-            p_y2 += i_source_margin;
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-            p_line2 += i_dest_margin;
-        }
-    }
-    else {
-        /* use AVX2 unaligned fetch and store */
-        for( i_y = (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) / 2 ; i_y-- ; )
-        {
-            p_line1 = p_line2;
-            p_line2 += p_dest->p->i_pitch;
-
-            p_y1 = p_y2;
-            p_y2 += p_source->p[Y_PLANE].i_pitch;
-
-            for( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32 ; i_x-- ; )
-            {
-                AVX2_CALL(
-                    AVX2_INIT_UNALIGNED
-                    AVX2_YUV420_UYVY_UNALIGNED
-                );
-            }
-            for( i_x = ( (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) % 32 ) / 2; i_x-- ; )
-            {
-                C_YUV420_UYVY( );
-            }
-
-            p_y2 += i_source_margin;
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-            p_line2 += i_dest_margin;
-        }
-    }
-    /* make sure all AVX2 stores are visible thereafter */
-    AVX2_END;
-#endif // defined(MODULE_NAME_IS_i420_yuy2_avx2)
+#endif // defined(MODULE_NAME_IS_i420_yuy2_sse2)
 }
 
 #if !defined (MODULE_NAME_IS_i420_yuy2_altivec)

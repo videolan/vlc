@@ -1,11 +1,10 @@
 /*****************************************************************************
  * i422_yuy2.h : YUV to YUV conversion module for vlc
  *****************************************************************************
- * Copyright (C) 2002, 2019 VLC authors and VideoLAN
+ * Copyright (C) 2002 VLC authors and VideoLAN
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Damien Fouilleul <damienf@videolan.org>
- *          Lyndon Brown <jnqnfe@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -307,159 +306,6 @@ movdqu    %%xmm1, 16(%0)  # Store high UYVY                             \n\
     _mm_storeu_si128((__m128i*)(p_line), xmm2); \
     xmm1 = _mm_unpackhi_epi8(xmm1, xmm0);       \
     _mm_storeu_si128((__m128i*)(p_line+16), xmm1);
-
-#endif
-
-#elif defined( MODULE_NAME_IS_i422_yuy2_avx2 )
-
-#if defined(CAN_COMPILE_AVX2)
-
-/* AVX2 assembly */
-
-#define AVX2_CALL(AVX2_INSTRUCTIONS)        \
-    do {                                    \
-    __asm__ __volatile__(                   \
-        "p2align 3 \n\t"                    \
-        AVX2_INSTRUCTIONS                   \
-        :                                   \
-        : [l]"r"(p_line), [y]"r"(p_y),      \
-          [u]"r"(p_u), [v]"r"(p_v)          \
-        : "ymm0", "ymm1", "ymm2" );         \
-        p_line += 64; p_y += 32;            \
-        p_u += 16; p_v += 16;               \
-    } while(0)
-
-#define AVX2_END  __asm__ __volatile__ ( "sfence" ::: "memory" )
-
-#define AVX2_INIT_ALIGNED "                                                    \n\
-vmovdqa      ymm0, [[y]]     ; Load 32 Y                      ...  y2  y1  y0  \n\
-vmovdqa      xmm1, [[u]]     ; Load 16 Cb into lower half     ...  u2  u1  u0  \n\
-vmovdqa      xmm2, [[v]]     ; Load 16 Cr into lower half     ...  v2  v1  v0  \n\
-"
-
-#define AVX2_INIT_UNALIGNED "                                                  \n\
-vmovdqu      ymm0, [[y]]     ; Load 32 Y                      ...  y2  y1  y0  \n\
-vmovdqu      xmm1, [[u]]     ; Load 16 Cb into lower half     ...  u2  u1  u0  \n\
-vmovdqu      xmm2, [[v]]     ; Load 16 Cr into lower half     ...  v2  v1  v0  \n\
-prefetchnta  [[l]]           ; Tell CPU not to cache output data               \n\
-"
-
-#define AVX2_YUV422_YUYV_ALIGNED "                                             \n\
-vpunpcklbw ymm1, ymm1, ymm2  ; Interleave u,v              ... v1  u1  v0  u0  \n\
-vpunpcklbw ymm2, ymm0, ymm1  ; Interleave (low) y,uv       ... v0  y1  u0  y0  \n\
-vmovntdq   [[l]], ymm2       ; Store low YUYV                                  \n\
-vpunpckhbw ymm1, ymm0, ymm1  ; Interleave (high) y,uv      ... v8 y17  u8 y16  \n\
-vmovntdq   [[l]+32], ymm1    ; Store high YUYV                                 \n\
-"
-
-#define AVX2_YUV422_YUYV_UNALIGNED "                                           \n\
-vpunpcklbw ymm1, ymm1, ymm2  ; Interleave u,v              ... v1  u1  v0  u0  \n\
-vpunpcklbw ymm2, ymm0, ymm1  ; Interleave (low) y,uv       ... v0  y1  u0  y0  \n\
-vmovdqu    [[l]], ymm2       ; Store low YUYV                                  \n\
-vpunpckhbw ymm1, ymm0, ymm1  ; Interleave (high) y,uv      ... v8 y17  u8 y16  \n\
-vmovdqu    [[l]+32], ymm1    ; Store high YUYV                                 \n\
-"
-
-#define AVX2_YUV422_YVYU_ALIGNED "                                             \n\
-vpunpcklbw ymm1, ymm2, ymm1  ; Interleave v,u              ... u1  v1  u0  v0  \n\
-vpunpcklbw ymm2, ymm0, ymm1  ; Interleave (low) y,vu       ... u0  y1  v0  y0  \n\
-vmovntdq   [[l]], ymm2       ; Store low YUYV                                  \n\
-vpunpckhbw ymm1, ymm0, ymm1  ; Interleave (high) y,vu      ... u8 y17  v8 y16  \n\
-vmovntdq   [[l]+32], ymm1    ; Store high YUYV                                 \n\
-"
-
-#define AVX2_YUV422_YVYU_UNALIGNED "                                           \n\
-vpunpcklbw ymm1, ymm2, ymm1  ; Interleave v,u              ... u1  v1  u0  v0  \n\
-vpunpcklbw ymm2, ymm0, ymm1  ; Interleave (low) y,vu       ... u0  y1  v0  y0  \n\
-vmovdqu    [[l]], ymm2       ; Store low YUYV                                  \n\
-vpunpckhbw ymm1, ymm0, ymm1  ; Interleave (high) y,vu      ... u8 y17  v8 y16  \n\
-vmovdqu    [[l]+32], ymm1    ; Store high YUYV                                 \n\
-"
-
-#define AVX2_YUV422_UYVY_ALIGNED "                                             \n\
-vpunpcklbw ymm1, ymm1, ymm2  ; Interleave u,v              ... v1  u1  v0  u0  \n\
-vpunpcklbw ymm2, ymm1, ymm0  ; Interleave (low) uv,y       ... y1  v0  y0  u0  \n\
-vmovntdq   [[l]], ymm2       ; Store low UYVY                                  \n\
-vpunpckhbw ymm1, ymm1, ymm0  ; Interleave (high) uv,y     ... y17  v8 y16  u8  \n\
-vmovntdq   [[l]+32], ymm1    ; Store high UYVY                                 \n\
-"
-
-#define AVX2_YUV422_UYVY_UNALIGNED "                                           \n\
-vpunpcklbw ymm1, ymm1, ymm2  ; Interleave u,v              ... v1  u1  v0  u0  \n\
-vpunpcklbw ymm2, ymm1, ymm0  ; Interleave (low) uv,y       ... y1  v0  y0  u0  \n\
-vmovdqu    [[l]], ymm2       ; Store low UYVY                                  \n\
-vpunpckhbw ymm1, ymm1, ymm0  ; Interleave (high) uv,y     ... y17  v8 y16  u8  \n\
-vmovdqu    [[l]+32], ymm1    ; Store high UYVY                                 \n\
-"
-
-#elif defined(HAVE_AVX2_INTRINSICS)
-
-/* AVX2 intrinsics */
-
-#include <immintrin.h>
-
-#define AVX2_CALL(AVX2_INSTRUCTIONS)    \
-    do {                                \
-        __m256i ymm0, ymm1, ymm2;       \
-        AVX2_INSTRUCTIONS               \
-        p_line += 64; p_y += 32;        \
-        p_u += 16; p_v += 16;           \
-    } while(0)
-
-#define AVX2_END  _mm_sfence()
-
-#define AVX2_INIT_ALIGNED                      \
-    ymm0 = _mm256_load_si256((__m256i *)p_y);  \
-    ymm1 = _mm256_inserti128_si256(ymm1, *((__m128i*)p_u), 0); \
-    ymm2 = _mm256_inserti128_si256(ymm2, *((__m128i*)p_v), 0);
-
-#define AVX2_INIT_UNALIGNED                    \
-    ymm0 = _mm256_loadu_si256((__m256i *)p_y); \
-    ymm1 = _mm256_inserti128_si256(ymm1, *((__m128i*)p_u), 0); \
-    ymm2 = _mm256_inserti128_si256(ymm2, *((__m128i*)p_v), 0); \
-    _mm_prefetch(p_line, _MM_HINT_NTA);
-
-#define AVX2_YUV422_YUYV_ALIGNED                     \
-    ymm1 = _mm256_unpacklo_epi8(ymm1, ymm2);         \
-    ymm2 = _mm256_unpacklo_epi8(ymm0, ymm1);         \
-    _mm256_stream_si256((__m256i*)(p_line), ymm2);   \
-    ymm1 = _mm256_unpackhi_epi8(ymm0, ymm1);         \
-    _mm256_stream_si256((__m256i*)(p_line+32), ymm1);
-
-#define AVX2_YUV422_YUYV_UNALIGNED                   \
-    ymm1 = _mm256_unpacklo_epi8(ymm1, ymm2);         \
-    ymm2 = _mm256_unpacklo_epi8(ymm0, ymm1);         \
-    _mm256_storeu_si256((__m256i*)(p_line), ymm2);   \
-    ymm1 = _mm256_unpackhi_epi8(ymm0, ymm1);         \
-    _mm256_storeu_si256((__m256i*)(p_line+32), ymm1);
-
-#define AVX2_YUV422_YVYU_ALIGNED                     \
-    ymm1 = _mm256_unpacklo_epi8(ymm2, ymm1);         \
-    ymm2 = _mm256_unpacklo_epi8(ymm0, ymm1);         \
-    _mm256_stream_si256((__m256i*)(p_line), ymm2);   \
-    ymm1 = _mm256_unpackhi_epi8(ymm0, ymm1);         \
-    _mm256_stream_si256((__m256i*)(p_line+32), ymm1);
-
-#define AVX2_YUV422_YVYU_UNALIGNED                   \
-    ymm1 = _mm256_unpacklo_epi8(ymm2, ymm1);         \
-    ymm2 = _mm256_unpacklo_epi8(ymm0, ymm1);         \
-    _mm256_storeu_si256((__m256i*)(p_line), ymm2);   \
-    ymm1 = _mm256_unpackhi_epi8(ymm0, ymm1);         \
-    _mm256_storeu_si256((__m256i*)(p_line+32), ymm1);
-
-#define AVX2_YUV422_UYVY_ALIGNED                     \
-    ymm1 = _mm256_unpacklo_epi8(ymm1, ymm2);         \
-    ymm2 = _mm256_unpacklo_epi8(ymm1, ymm0);         \
-    _mm256_stream_si256((__m256i*)(p_line), ymm2);   \
-    ymm1 = _mm256_unpackhi_epi8(ymm1, ymm0);         \
-    _mm256_stream_si256((__m256i*)(p_line+32), ymm1);
-
-#define AVX2_YUV422_UYVY_UNALIGNED                   \
-    ymm1 = _mm256_unpacklo_epi8(ymm1, ymm2);         \
-    ymm2 = _mm256_unpacklo_epi8(ymm1, ymm0);         \
-    _mm256_storeu_si256((__m256i*)(p_line), ymm2);   \
-    ymm1 = _mm256_unpackhi_epi8(ymm1, ymm0);         \
-    _mm256_storeu_si256((__m256i*)(p_line+32), ymm1);
 
 #endif
 

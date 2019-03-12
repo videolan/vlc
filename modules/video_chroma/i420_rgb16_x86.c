@@ -1,7 +1,7 @@
 /*****************************************************************************
  * i420_rgb16_x86.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2019 VLC authors and VideoLAN
+ * Copyright (C) 2000 VLC authors and VideoLAN
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Damien Fouilleul <damienf@videolan.org>
@@ -31,15 +31,10 @@
 #include <vlc_cpu.h>
 
 #include "i420_rgb.h"
-#ifdef AVX2
-# include "i420_rgb_avx2.h"
-# define VLC_TARGET VLC_AVX
-#endif
 #ifdef SSE2
 # include "i420_rgb_sse2.h"
 # define VLC_TARGET VLC_SSE
-#endif
-#ifdef MMX
+#else
 # include "i420_rgb_mmx.h"
 # define VLC_TARGET VLC_MMX
 #endif
@@ -166,125 +161,14 @@ void I420_R5G5B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
                     (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) :
                     (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);
 
-#if defined (MODULE_NAME_IS_i420_rgb_avx2) // AVX2
-
-    i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 31;
-
-    /* AVX2 aligned store/load can require 32-byte alignment */
-
-    if( 0 == (31 & (p_src->p[Y_PLANE].i_pitch|
-                    p_dest->p->i_pitch|
-                    ((intptr_t)p_y)|
-                    ((intptr_t)p_buffer))) )
-    {
-        /* use AVX2 aligned fetch and store */
-        for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-        {
-            p_pic_start = p_pic;
-            p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-            for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)/32; i_x--; )
-            {
-                AVX2_CALL (
-                    AVX2_INIT_16_ALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_15_ALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-                p_buffer += 32;
-            }
-            /* Here we do some unaligned reads and duplicate conversions, but
-             * at least we have all the pixels */
-            if( i_rewind )
-            {
-                p_y -= i_rewind;
-                p_u -= i_rewind >> 1;
-                p_v -= i_rewind >> 1;
-                p_buffer -= i_rewind;
-
-                AVX2_CALL (
-                    AVX2_INIT_16_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_15_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-            }
-            SCALE_WIDTH;
-            SCALE_HEIGHT( 420, 2 );
-
-            p_y += i_source_margin;
-            if( i_y % 2 )
-            {
-                p_u += i_source_margin_c;
-                p_v += i_source_margin_c;
-            }
-        }
-    }
-    else {
-        /* use AVX2 unaligned fetch and store */
-        for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-        {
-            p_pic_start = p_pic;
-            p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-            for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)/32; i_x--; )
-            {
-                AVX2_CALL (
-                    AVX2_INIT_16_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_15_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-                p_buffer += 32;
-            }
-            /* Here we do some unaligned reads and duplicate conversions, but
-             * at least we have all the pixels */
-            if( i_rewind )
-            {
-                p_y -= i_rewind;
-                p_u -= i_rewind >> 1;
-                p_v -= i_rewind >> 1;
-                p_buffer -= i_rewind;
-
-                AVX2_CALL (
-                    AVX2_INIT_16_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_15_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-            }
-            SCALE_WIDTH;
-            SCALE_HEIGHT( 420, 2 );
-
-            p_y += i_source_margin;
-            if( i_y % 2 )
-            {
-                p_u += i_source_margin_c;
-                p_v += i_source_margin_c;
-            }
-        }
-    }
-
-    /* make sure all AVX2 stores are visible thereafter */
-    AVX2_END;
-
-#elif defined (MODULE_NAME_IS_i420_rgb_sse2) // SSE2
+#ifdef SSE2
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 15;
 
-    /* SSE2 aligned store/load is faster, requires 16-byte alignment */
+    /*
+    ** SSE2 128 bits fetch/store instructions are faster
+    ** if memory access is 16 bytes aligned
+    */
 
     p_buffer = b_hscale ? p_buffer_start : p_pic;
 
@@ -397,7 +281,7 @@ void I420_R5G5B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx) // MMX
+#else /* SSE2 */
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
 
@@ -451,7 +335,8 @@ void I420_R5G5B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     }
     /* re-enable FPU registers */
     MMX_END;
-#endif
+
+#endif /* SSE2 */
 }
 
 VLC_TARGET
@@ -516,125 +401,14 @@ void I420_R5G6B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
                     (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) :
                     (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);
 
-#if defined (MODULE_NAME_IS_i420_rgb_avx2) // AVX2
-
-    i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 31;
-
-    /* AVX2 aligned store/load can require 32-byte alignment */
-
-    if( 0 == (31 & (p_src->p[Y_PLANE].i_pitch|
-                    p_dest->p->i_pitch|
-                    ((intptr_t)p_y)|
-                    ((intptr_t)p_buffer))) )
-    {
-        /* use AVX2 aligned fetch and store */
-        for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-        {
-            p_pic_start = p_pic;
-            p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-            for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)/32; i_x--; )
-            {
-                AVX2_CALL(
-                    AVX2_INIT_16_ALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_16_ALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-                p_buffer += 32;
-            }
-            /* Here we do some unaligned reads and duplicate conversions, but
-             * at least we have all the pixels */
-            if( i_rewind )
-            {
-                p_y -= i_rewind;
-                p_u -= i_rewind >> 1;
-                p_v -= i_rewind >> 1;
-                p_buffer -= i_rewind;
-
-                AVX2_CALL(
-                    AVX2_INIT_16_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_16_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-            }
-            SCALE_WIDTH;
-            SCALE_HEIGHT( 420, 2 );
-
-            p_y += i_source_margin;
-            if( i_y % 2 )
-            {
-                p_u += i_source_margin_c;
-                p_v += i_source_margin_c;
-            }
-        }
-    }
-    else {
-        /* use AVX2 unaligned fetch and store */
-        for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-        {
-            p_pic_start = p_pic;
-            p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-            for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)/32; i_x--; )
-            {
-                AVX2_CALL(
-                    AVX2_INIT_16_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_16_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-                p_buffer += 32;
-            }
-            /* Here we do some unaligned reads and duplicate conversions, but
-             * at least we have all the pixels */
-            if( i_rewind )
-            {
-                p_y -= i_rewind;
-                p_u -= i_rewind >> 1;
-                p_v -= i_rewind >> 1;
-                p_buffer -= i_rewind;
-
-                AVX2_CALL(
-                    AVX2_INIT_16_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_16_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-            }
-            SCALE_WIDTH;
-            SCALE_HEIGHT( 420, 2 );
-
-            p_y += i_source_margin;
-            if( i_y % 2 )
-            {
-                p_u += i_source_margin_c;
-                p_v += i_source_margin_c;
-            }
-        }
-    }
-
-    /* make sure all AVX2 stores are visible thereafter */
-    AVX2_END;
-
-#elif defined (MODULE_NAME_IS_i420_rgb_sse2) // SSE2
+#ifdef SSE2
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 15;
 
-    /* SSE2 aligned store/load is faster, requires 16-byte alignment */
+    /*
+    ** SSE2 128 bits fetch/store instructions are faster
+    ** if memory access is 16 bytes aligned
+    */
 
     p_buffer = b_hscale ? p_buffer_start : p_pic;
 
@@ -747,7 +521,7 @@ void I420_R5G6B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx) // MMX
+#else /* SSE2 */
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
 
@@ -801,7 +575,8 @@ void I420_R5G6B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     }
     /* re-enable FPU registers */
     MMX_END;
-#endif
+
+#endif /* SSE2 */
 }
 
 VLC_TARGET
@@ -866,125 +641,14 @@ void I420_A8R8G8B8( filter_t *p_filter, picture_t *p_src,
                     (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) :
                     (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);
 
-#if defined (MODULE_NAME_IS_i420_rgb_avx2) // AVX2
-
-    i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 31;
-
-    /* AVX2 aligned store/load can require 32-byte alignment */
-
-    if( 0 == (31 & (p_src->p[Y_PLANE].i_pitch|
-                    p_dest->p->i_pitch|
-                    ((intptr_t)p_y)|
-                    ((intptr_t)p_buffer))) )
-    {
-        /* use AVX2 aligned fetch and store */
-        for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-        {
-            p_pic_start = p_pic;
-            p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-            for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32; i_x--; )
-            {
-                AVX2_CALL (
-                    AVX2_INIT_32_ALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_ARGB_ALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-                p_buffer += 32;
-            }
-
-            /* Here we do some unaligned reads and duplicate conversions, but
-             * at least we have all the pixels */
-            if( i_rewind )
-            {
-                p_y -= i_rewind;
-                p_u -= i_rewind >> 1;
-                p_v -= i_rewind >> 1;
-                p_buffer -= i_rewind;
-                AVX2_CALL (
-                    AVX2_INIT_32_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_ARGB_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-            }
-            SCALE_WIDTH;
-            SCALE_HEIGHT( 420, 4 );
-
-            p_y += i_source_margin;
-            if( i_y % 2 )
-            {
-                p_u += i_source_margin_c;
-                p_v += i_source_margin_c;
-            }
-        }
-    }
-    else {
-        /* use AVX2 unaligned fetch and store */
-        for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-        {
-            p_pic_start = p_pic;
-            p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-            for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32; i_x--; )
-            {
-                AVX2_CALL (
-                    AVX2_INIT_32_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_ARGB_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-                p_buffer += 32;
-            }
-
-            /* Here we do some unaligned reads and duplicate conversions, but
-             * at least we have all the pixels */
-            if( i_rewind )
-            {
-                p_y -= i_rewind;
-                p_u -= i_rewind >> 1;
-                p_v -= i_rewind >> 1;
-                p_buffer -= i_rewind;
-                AVX2_CALL (
-                    AVX2_INIT_32_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_ARGB_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-            }
-            SCALE_WIDTH;
-            SCALE_HEIGHT( 420, 4 );
-
-            p_y += i_source_margin;
-            if( i_y % 2 )
-            {
-                p_u += i_source_margin_c;
-                p_v += i_source_margin_c;
-            }
-        }
-    }
-
-    /* make sure all AVX2 stores are visible thereafter */
-    AVX2_END;
-
-#elif defined (MODULE_NAME_IS_i420_rgb_sse2) // SSE2
+#ifdef SSE2
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 15;
 
-    /* SSE2 aligned store/load is faster, requires 16-byte alignment */
+    /*
+    ** SSE2 128 bits fetch/store instructions are faster
+    ** if memory access is 16 bytes aligned
+    */
 
     p_buffer = b_hscale ? p_buffer_start : p_pic;
 
@@ -1097,7 +761,7 @@ void I420_A8R8G8B8( filter_t *p_filter, picture_t *p_src,
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx) // MMX
+#else
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
 
@@ -1151,6 +815,7 @@ void I420_A8R8G8B8( filter_t *p_filter, picture_t *p_src,
 
     /* re-enable FPU registers */
     MMX_END;
+
 #endif
 }
 
@@ -1215,125 +880,14 @@ void I420_R8G8B8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
                     (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) :
                     (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);
 
-#if defined (MODULE_NAME_IS_i420_rgb_avx2) // AVX2
-
-    i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 31;
-
-    /* AVX2 aligned store/load can require 32-byte alignment */
-
-    if( 0 == (31 & (p_src->p[Y_PLANE].i_pitch|
-                    p_dest->p->i_pitch|
-                    ((intptr_t)p_y)|
-                    ((intptr_t)p_buffer))) )
-    {
-        /* use AVX2 aligned fetch and store */
-        for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-        {
-            p_pic_start = p_pic;
-            p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-            for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32; i_x--; )
-            {
-                AVX2_CALL (
-                    AVX2_INIT_32_ALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_RGBA_ALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-                p_buffer += 32;
-            }
-
-            /* Here we do some unaligned reads and duplicate conversions, but
-             * at least we have all the pixels */
-            if( i_rewind )
-            {
-                p_y -= i_rewind;
-                p_u -= i_rewind >> 1;
-                p_v -= i_rewind >> 1;
-                p_buffer -= i_rewind;
-                AVX2_CALL (
-                    AVX2_INIT_32_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_RGBA_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-            }
-            SCALE_WIDTH;
-            SCALE_HEIGHT( 420, 4 );
-
-            p_y += i_source_margin;
-            if( i_y % 2 )
-            {
-                p_u += i_source_margin_c;
-                p_v += i_source_margin_c;
-            }
-        }
-    }
-    else {
-        /* use AVX2 unaligned fetch and store */
-        for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-        {
-            p_pic_start = p_pic;
-            p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-            for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32; i_x--; )
-            {
-                AVX2_CALL (
-                    AVX2_INIT_32_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_RGBA_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-                p_buffer += 32;
-            }
-
-            /* Here we do some unaligned reads and duplicate conversions, but
-             * at least we have all the pixels */
-            if( i_rewind )
-            {
-                p_y -= i_rewind;
-                p_u -= i_rewind >> 1;
-                p_v -= i_rewind >> 1;
-                p_buffer -= i_rewind;
-                AVX2_CALL (
-                    AVX2_INIT_32_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_RGBA_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-            }
-            SCALE_WIDTH;
-            SCALE_HEIGHT( 420, 4 );
-
-            p_y += i_source_margin;
-            if( i_y % 2 )
-            {
-                p_u += i_source_margin_c;
-                p_v += i_source_margin_c;
-            }
-        }
-    }
-
-    /* make sure all AVX2 stores are visible thereafter */
-    AVX2_END;
-
-#elif defined (MODULE_NAME_IS_i420_rgb_sse2) // SSE2
+#ifdef SSE2
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 15;
 
-    /* SSE2 aligned store/load is faster, requires 16-byte alignment */
+    /*
+    ** SSE2 128 bits fetch/store instructions are faster
+    ** if memory access is 16 bytes aligned
+    */
 
     p_buffer = b_hscale ? p_buffer_start : p_pic;
 
@@ -1446,7 +1000,7 @@ void I420_R8G8B8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx) // MMX
+#else
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
 
@@ -1500,6 +1054,7 @@ void I420_R8G8B8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
 
     /* re-enable FPU registers */
     MMX_END;
+
 #endif
 }
 
@@ -1564,125 +1119,14 @@ void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
                     (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) :
                     (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);
 
-#if defined (MODULE_NAME_IS_i420_rgb_avx2) // AVX2
-
-    i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 31;
-
-    /* AVX2 aligned store/load can require 32-byte alignment */
-
-    if( 0 == (31 & (p_src->p[Y_PLANE].i_pitch|
-                    p_dest->p->i_pitch|
-                    ((intptr_t)p_y)|
-                    ((intptr_t)p_buffer))) )
-    {
-        /* use AVX2 aligned fetch and store */
-        for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-        {
-            p_pic_start = p_pic;
-            p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-            for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32; i_x--; )
-            {
-                AVX2_CALL (
-                    AVX2_INIT_32_ALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_BGRA_ALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-                p_buffer += 32;
-            }
-
-            /* Here we do some unaligned reads and duplicate conversions, but
-             * at least we have all the pixels */
-            if( i_rewind )
-            {
-                p_y -= i_rewind;
-                p_u -= i_rewind >> 1;
-                p_v -= i_rewind >> 1;
-                p_buffer -= i_rewind;
-                AVX2_CALL (
-                    AVX2_INIT_32_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_BGRA_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-            }
-            SCALE_WIDTH;
-            SCALE_HEIGHT( 420, 4 );
-
-            p_y += i_source_margin;
-            if( i_y % 2 )
-            {
-                p_u += i_source_margin_c;
-                p_v += i_source_margin_c;
-            }
-        }
-    }
-    else {
-        /* use AVX2 unaligned fetch and store */
-        for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-        {
-            p_pic_start = p_pic;
-            p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-            for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32; i_x--; )
-            {
-                AVX2_CALL (
-                    AVX2_INIT_32_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_BGRA_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-                p_buffer += 32;
-            }
-
-            /* Here we do some unaligned reads and duplicate conversions, but
-             * at least we have all the pixels */
-            if( i_rewind )
-            {
-                p_y -= i_rewind;
-                p_u -= i_rewind >> 1;
-                p_v -= i_rewind >> 1;
-                p_buffer -= i_rewind;
-                AVX2_CALL (
-                    AVX2_INIT_32_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_BGRA_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-            }
-            SCALE_WIDTH;
-            SCALE_HEIGHT( 420, 4 );
-
-            p_y += i_source_margin;
-            if( i_y % 2 )
-            {
-                p_u += i_source_margin_c;
-                p_v += i_source_margin_c;
-            }
-        }
-    }
-
-    /* make sure all AVX2 stores are visible thereafter */
-    AVX2_END;
-
-#elif defined (MODULE_NAME_IS_i420_rgb_sse2) // SSE2
+#ifdef SSE2
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 15;
 
-    /* SSE2 aligned store/load is faster, requires 16-byte alignment */
+    /*
+    ** SSE2 128 bits fetch/store instructions are faster
+    ** if memory access is 16 bytes aligned
+    */
 
     p_buffer = b_hscale ? p_buffer_start : p_pic;
 
@@ -1795,7 +1239,7 @@ void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx) // MMX
+#else
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
 
@@ -1849,6 +1293,7 @@ void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
 
     /* re-enable FPU registers */
     MMX_END;
+
 #endif
 }
 
@@ -1913,125 +1358,14 @@ void I420_A8B8G8R8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
                     (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) :
                     (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);
 
-#if defined (MODULE_NAME_IS_i420_rgb_avx2) // AVX2
-
-    i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 31;
-
-    /* AVX2 aligned store/load can require 32-byte alignment */
-
-    if( 0 == (31 & (p_src->p[Y_PLANE].i_pitch|
-                    p_dest->p->i_pitch|
-                    ((intptr_t)p_y)|
-                    ((intptr_t)p_buffer))) )
-    {
-        /* use AVX2 aligned fetch and store */
-        for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-        {
-            p_pic_start = p_pic;
-            p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-            for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32; i_x--; )
-            {
-                AVX2_CALL (
-                    AVX2_INIT_32_ALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_ABGR_ALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-                p_buffer += 32;
-            }
-
-            /* Here we do some unaligned reads and duplicate conversions, but
-             * at least we have all the pixels */
-            if( i_rewind )
-            {
-                p_y -= i_rewind;
-                p_u -= i_rewind >> 1;
-                p_v -= i_rewind >> 1;
-                p_buffer -= i_rewind;
-                AVX2_CALL (
-                    AVX2_INIT_32_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_ABGR_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-            }
-            SCALE_WIDTH;
-            SCALE_HEIGHT( 420, 4 );
-
-            p_y += i_source_margin;
-            if( i_y % 2 )
-            {
-                p_u += i_source_margin_c;
-                p_v += i_source_margin_c;
-            }
-        }
-    }
-    else {
-        /* use AVX2 unaligned fetch and store */
-        for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-        {
-            p_pic_start = p_pic;
-            p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-            for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 32; i_x--; )
-            {
-                AVX2_CALL (
-                    AVX2_INIT_32_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_ABGR_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-                p_buffer += 32;
-            }
-
-            /* Here we do some unaligned reads and duplicate conversions, but
-             * at least we have all the pixels */
-            if( i_rewind )
-            {
-                p_y -= i_rewind;
-                p_u -= i_rewind >> 1;
-                p_v -= i_rewind >> 1;
-                p_buffer -= i_rewind;
-                AVX2_CALL (
-                    AVX2_INIT_32_UNALIGNED
-                    AVX2_YUV_MUL
-                    AVX2_YUV_ADD
-                    AVX2_UNPACK_32_ABGR_UNALIGNED
-                );
-                p_y += 32;
-                p_u += 16;
-                p_v += 16;
-            }
-            SCALE_WIDTH;
-            SCALE_HEIGHT( 420, 4 );
-
-            p_y += i_source_margin;
-            if( i_y % 2 )
-            {
-                p_u += i_source_margin_c;
-                p_v += i_source_margin_c;
-            }
-        }
-    }
-
-    /* make sure all AVX2 stores are visible thereafter */
-    AVX2_END;
-
-#elif defined (MODULE_NAME_IS_i420_rgb_sse2) // SSE2
+#ifdef SSE2
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 15;
 
-    /* SSE2 aligned store/load is faster, requires 16-byte alignment */
+    /*
+    ** SSE2 128 bits fetch/store instructions are faster
+    ** if memory access is 16 bytes aligned
+    */
 
     p_buffer = b_hscale ? p_buffer_start : p_pic;
 
@@ -2144,7 +1478,7 @@ void I420_A8B8G8R8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx) // MMX
+#else
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
 
@@ -2198,5 +1532,6 @@ void I420_A8B8G8R8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
 
     /* re-enable FPU registers */
     MMX_END;
+
 #endif
 }
