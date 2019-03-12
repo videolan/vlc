@@ -595,7 +595,7 @@ void InputManager::UpdateTeletext()
             vlc_object_release( p_input_vbi );
         }
 
-        if( input_GetEsObjects( p_input, i_teletext_es, &p_input_vbi, NULL, NULL ) )
+        if( input_GetEsObjects( p_input, i_teletext_es, &p_input_vbi ) )
             p_input_vbi = NULL;
 
         if( p_input_vbi )
