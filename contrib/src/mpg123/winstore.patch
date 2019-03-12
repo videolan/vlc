@@ -75,3 +75,23 @@
  #endif
  #ifdef HAVE_SYS_STAT_H
  #  include <sys/stat.h>
+--- mpg123/configure.ac.winstore	2019-03-12 14:32:33.852490800 +0100
++++ mpg123/configure.ac	2019-03-12 14:44:17.475401200 +0100
+@@ -2202,7 +2202,7 @@ if test "x$win32_specific_codes" = xenab
+       {
+         MultiByteToWideChar (0, 0, NULL, 0, NULL, 0);
+         WideCharToMultiByte (0, 0, NULL, 0, NULL, 0, NULL, NULL);
+-        PathCombineW(0,0,0);
++        //PathCombineW(0,0,0);
+         return 0;
+       }
+     ])], [win32_wide_working=yes], [win32_winver_bump=yes])
+@@ -2217,7 +2217,7 @@ if test "x$win32_specific_codes" = xenab
+         {
+           MultiByteToWideChar (0, 0, NULL, 0, NULL, 0);
+           WideCharToMultiByte (0, 0, NULL, 0, NULL, 0, NULL, NULL);
+-          PathCombineW(0,0,0);
++          //PathCombineW(0,0,0);
+           return 0;
+         }
+       ])], [win32_wide_working=yes], [AC_MSG_RESULT([no])])
