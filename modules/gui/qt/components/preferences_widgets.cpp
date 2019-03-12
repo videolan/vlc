@@ -464,8 +464,7 @@ QString StringListConfigControl::getValue() const
     return combo->itemData( combo->currentIndex() ).toString();
 }
 
-void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
-                            QComboBox *combo )
+void setfillVLCConfigCombo( const char *configname, QComboBox *combo )
 {
     module_config_t *p_config = config_FindConfig( configname );
     if( p_config == NULL )

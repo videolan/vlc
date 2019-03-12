@@ -456,8 +456,7 @@ private slots:
     void comboIndexChanged( int );
 };
 
-void setfillVLCConfigCombo(const char *configname, intf_thread_t *p_intf,
-                        QComboBox *combo );
+void setfillVLCConfigCombo(const char *configname, QComboBox *combo );
 
 #if 0
 struct ModuleCheckBox {
