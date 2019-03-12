@@ -1,7 +1,7 @@
 /*****************************************************************************
  * startcode_helper.h: Startcodes helpers
  *****************************************************************************
- * Copyright (C) 2016, 2019 VideoLAN Authors
+ * Copyright (C) 2016 VideoLAN Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -22,9 +22,6 @@
 
 #include <vlc_cpu.h>
 
-#if !defined(CAN_COMPILE_AVX2) && defined(HAVE_AVX2_INTRINSICS)
-   #include <immintrin.h>
-#endif
 #if !defined(CAN_COMPILE_SSE2) && defined(HAVE_SSE2_INTRINSICS)
    #include <emmintrin.h>
 #endif
@@ -47,91 +44,15 @@
         }\
     }
 
-#if defined(CAN_COMPILE_AVX2) || defined(HAVE_AVX2_INTRINSICS)
-
-__attribute__ ((__target__ ("avx2")))
-static inline const uint8_t * startcode_FindAnnexB_AVX2( const uint8_t *p, const uint8_t *end )
-{
-    end -= 3;
-
-    /* First align to 32 */
-    const uint8_t *alignedend = p + 32 - ((intptr_t)p & 31);
-    for (; p < alignedend && p <= end; p++) {
-        if (p[0] == 0 && p[1] == 0 && p[2] == 1)
-            return p;
-    }
-
-    if( p == end )
-        return NULL;
-
-    alignedend = end - ((intptr_t) end & 31);
-    if( alignedend > p )
-    {
-#ifdef CAN_COMPILE_AVX2
-        asm volatile(
-            "vpxor   %%ymm1, %%ymm1\n"
-            ::: "ymm1"
-        );
-#else
-        __m256i zeros = _mm256_set1_epi8( 0x00 );
-#endif
-        for( ; p < alignedend; p += 32)
-        {
-            uint32_t match;
-#ifdef CAN_COMPILE_AVX2
-            asm volatile(
-                "vmovdqa   0(%[v]),   %%ymm0\n"
-                "vpcmpeqb   %%ymm1,   %%ymm0\n"
-                "vpmovmskb  %%ymm0,   %[match]\n"
-                : [match]"=r"(match)
-                : [v]"r"(p)
-                : "ymm0"
-            );
-#else
-            __m256i v = _mm256_load_si256((__m256i*)p);
-            __m256i res = _mm256_cmpeq_epi8( zeros, v );
-            match = _mm256_movemask_epi8( res ); /* mask will be in reversed match order */
-#endif
-            if( match & 0x0000000F )
-                TRY_MATCH(p, 0);
-            if( match & 0x000000F0 )
-                TRY_MATCH(p, 4);
-            if( match & 0x00000F00 )
-                TRY_MATCH(p, 8);
-            if( match & 0x0000F000 )
-                TRY_MATCH(p, 12);
-            if( match & 0x000F0000 )
-                TRY_MATCH(p, 16);
-            if( match & 0x00F00000 )
-                TRY_MATCH(p, 20);
-            if( match & 0x0F000000 )
-                TRY_MATCH(p, 24);
-            if( match & 0xF0000000 )
-                TRY_MATCH(p, 28);
-        }
-    }
-
-    for (; p <= end; p++) {
-        if (p[0] == 0 && p[1] == 0 && p[2] == 1)
-            return p;
-    }
-
-    return NULL;
-}
-
-#endif
-
 #if defined(CAN_COMPILE_SSE2) || defined(HAVE_SSE2_INTRINSICS)
 
 __attribute__ ((__target__ ("sse2")))
 static inline const uint8_t * startcode_FindAnnexB_SSE2( const uint8_t *p, const uint8_t *end )
 {
-    end -= 3;
-
     /* First align to 16 */
     /* Skipping this step and doing unaligned loads isn't faster */
     const uint8_t *alignedend = p + 16 - ((intptr_t)p & 15);
-    for (; p < alignedend && p <= end; p++) {
+    for (end -= 3; p < alignedend && p <= end; p++) {
         if (p[0] == 0 && p[1] == 0 && p[2] == 1)
             return p;
     }
@@ -219,18 +140,13 @@ static inline const uint8_t * startcode_FindAnnexB_Bits( const uint8_t *p, const
 }
 #undef TRY_MATCH
 
-#if defined(CAN_COMPILE_AVX2) || defined(HAVE_AVX2_INTRINSICS) || defined(CAN_COMPILE_SSE2) || defined(HAVE_SSE2_INTRINSICS)
+#if defined(CAN_COMPILE_SSE2) || defined(HAVE_SSE2_INTRINSICS)
 static inline const uint8_t * startcode_FindAnnexB( const uint8_t *p, const uint8_t *end )
 {
-#if defined(CAN_COMPILE_AVX2) || defined(HAVE_AVX2_INTRINSICS)
-    if (vlc_CPU_AVX2())
-        return startcode_FindAnnexB_AVX2(p, end);
-#endif
-#if defined(CAN_COMPILE_SSE2) || defined(HAVE_SSE2_INTRINSICS)
     if (vlc_CPU_SSE2())
         return startcode_FindAnnexB_SSE2(p, end);
-#endif
-    return startcode_FindAnnexB_Bits(p, end);
+    else
+        return startcode_FindAnnexB_Bits(p, end);
 }
 #else
     #define startcode_FindAnnexB startcode_FindAnnexB_Bits
