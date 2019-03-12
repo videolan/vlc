@@ -154,11 +154,6 @@ static inline void es_out_SetJitter( es_out_t *p_out,
                                 i_pts_delay, i_pts_jitter, i_cr_average );
     assert( !i_ret );
 }
-static inline int es_out_GetEsObjects( es_out_t *p_out, int i_id,
-                                       vlc_object_t **pp_decoder, vout_thread_t **pp_vout, audio_output_t **pp_aout )
-{
-    return es_out_Control( p_out, ES_OUT_GET_ES_OBJECTS_BY_ID, i_id, pp_decoder, pp_vout, pp_aout );
-}
 static inline int es_out_GetGroupForced( es_out_t *p_out )
 {
     int i_group;
