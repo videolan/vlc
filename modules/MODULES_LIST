@@ -410,7 +410,6 @@ $Id$
  * textst: HDMV text subtitles decoder
  * theora: a theora video decoder/packetizer/encoder using the libtheora
  * timecode: clock/timecode as a subtitle input
- * tizen_audio: audio output for Tizen
  * tospdif: Audio converter module to encapsulate A/52 and DTS into S/PDIF
  * transform: filter for horizontal and vertical image flips and 90° rotations
  * tremor: a vorbis audio decoder using the libvorbisidec (aka tremor) library

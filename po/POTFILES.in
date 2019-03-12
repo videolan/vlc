@@ -279,7 +279,6 @@ modules/audio_output/oss.c
 modules/audio_output/pulse.c
 modules/audio_output/sndio.c
 modules/audio_output/vlcpulse.c
-modules/audio_output/tizen_audio.c
 modules/audio_output/volume.h
 modules/audio_output/wasapi.c
 modules/audio_output/waveout.c

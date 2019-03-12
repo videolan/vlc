@@ -117,8 +117,3 @@ endif
 if HAVE_TVOS
 aout_LTLIBRARIES += libaudiounit_ios_plugin.la
 endif
-
-libtizen_audio_plugin_la_SOURCES = audio_output/tizen_audio.c
-libtizen_audio_plugin_la_CFLAGS = $(AM_CFLAGS)
-EXTRA_LTLIBRARIES += libtizen_audio_plugin.la
-aout_LTLIBRARIES += $(LTLIBtizen_audio)
