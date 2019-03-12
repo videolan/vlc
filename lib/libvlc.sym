@@ -53,7 +53,6 @@ libvlc_free
 libvlc_get_changeset
 libvlc_get_compiler
 libvlc_get_fullscreen
-libvlc_get_input_thread
 libvlc_get_version
 libvlc_log_get_context
 libvlc_log_get_object
@@ -128,7 +127,6 @@ libvlc_media_new_fd
 libvlc_media_new_location
 libvlc_media_new_path
 libvlc_media_new_as_node
-libvlc_media_new_from_input_item
 libvlc_media_parse
 libvlc_media_parse_async
 libvlc_media_parse_with_options
@@ -192,7 +190,6 @@ libvlc_media_slaves_clear
 libvlc_media_slaves_get
 libvlc_media_slaves_release
 libvlc_media_set_meta
-libvlc_media_set_state
 libvlc_media_set_user_data
 libvlc_media_subitems
 libvlc_media_tracks_get
