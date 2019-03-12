@@ -125,7 +125,7 @@ static void PrintObject(vlc_object_t *obj, FILE *output)
     vlc_restorecancel (canc);
 }
 
-static void DumpStructureLocked(vlc_object_t *obj, FILE *output, unsigned level)
+void DumpStructureLocked(vlc_object_t *obj, FILE *output, unsigned level)
 {
     PrintObject(obj, output);
 
