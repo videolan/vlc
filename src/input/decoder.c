@@ -1137,7 +1137,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
         msg_Dbg( p_dec, "end of audio preroll" );
 
         if( p_owner->p_aout )
-            aout_DecFlush( p_owner->p_aout, false );
+            aout_DecFlush( p_owner->p_aout );
     }
 
     /* */
@@ -1464,7 +1464,7 @@ static void DecoderProcessFlush( decoder_t *p_dec )
     if( p_dec->fmt_out.i_cat == AUDIO_ES )
     {
         if( p_owner->p_aout )
-            aout_DecFlush( p_owner->p_aout, false );
+            aout_DecFlush( p_owner->p_aout );
     }
     else if( p_dec->fmt_out.i_cat == VIDEO_ES )
     {
@@ -1687,7 +1687,7 @@ static void *DecoderThread( void *p_data )
         {   /* Draining: the decoder is drained and all decoded buffers are
              * queued to the output at this point. Now drain the output. */
             if( p_owner->p_aout != NULL )
-                aout_DecFlush( p_owner->p_aout, true );
+                aout_DecDrain( p_owner->p_aout );
         }
         vlc_restorecancel( canc );
 

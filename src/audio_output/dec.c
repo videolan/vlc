@@ -122,7 +122,7 @@ void aout_DecDelete (audio_output_t *aout)
 
     if (owner->mixer_format.i_format)
     {
-        aout_DecFlush(aout, false);
+        aout_DecFlush(aout);
         aout_FiltersDelete (aout, owner->filters);
         aout_OutputDelete (aout);
     }
@@ -310,7 +310,7 @@ void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
         else
             msg_Dbg (aout, "playback too late (%"PRId64"): "
                      "flushing buffers", drift);
-        aout_DecFlush(aout, false);
+        aout_DecFlush(aout);
         aout_StopResampling (aout);
 
         return; /* nothing can be done if timing is unknown */
@@ -499,22 +499,15 @@ void aout_DecChangeDelay(audio_output_t *aout, vlc_tick_t delay)
     owner->sync.request_delay = delay;
 }
 
-void aout_DecFlush (audio_output_t *aout, bool wait)
+void aout_DecFlush(audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
     if (owner->mixer_format.i_format)
     {
-        if (wait)
-        {
-            block_t *block = aout_FiltersDrain (owner->filters);
-            if (block)
-                aout->play(aout, block, vlc_tick_now());
-        }
-        else
-            aout_FiltersFlush (owner->filters);
+        aout_FiltersFlush (owner->filters);
 
-        aout->flush(aout, wait);
+        aout->flush(aout, false);
         vlc_clock_Reset(owner->sync.clock);
         aout_FiltersResetClock(owner->filters);
 
@@ -532,6 +525,25 @@ void aout_DecFlush (audio_output_t *aout, bool wait)
             owner->sync.delay = 0;
         }
     }
+    owner->sync.discontinuity = true;
+    owner->original_pts = VLC_TICK_INVALID;
+}
+
+void aout_DecDrain(audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    if (!owner->mixer_format.i_format)
+        return;
+
+    block_t *block = aout_FiltersDrain (owner->filters);
+    if (block)
+        aout->play(aout, block, vlc_tick_now());
+    aout->flush(aout, true);
+
+    vlc_clock_Reset(owner->sync.clock);
+    aout_FiltersResetClock(owner->filters);
+
     owner->sync.discontinuity = true;
     owner->original_pts = VLC_TICK_INVALID;
 }
