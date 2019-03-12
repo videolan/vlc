@@ -2495,21 +2495,6 @@ size_t input_DecoderGetFifoSize( decoder_t *p_dec )
     return block_FifoSize( p_owner->p_fifo );
 }
 
-void input_DecoderGetObjects( decoder_t *p_dec,
-                              vout_thread_t **pp_vout, audio_output_t **pp_aout )
-{
-    struct decoder_owner *p_owner = dec_get_owner( p_dec );
-
-    vlc_mutex_lock( &p_owner->lock );
-    if( pp_vout )
-        *pp_vout = p_dec->fmt_in.i_cat == VIDEO_ES && p_owner->p_vout ?
-            vout_Hold(p_owner->p_vout) : NULL;
-    if( pp_aout )
-        *pp_aout = p_dec->fmt_in.i_cat == AUDIO_ES && p_owner->p_aout ?
-            aout_Hold(p_owner->p_aout) : NULL;
-    vlc_mutex_unlock( &p_owner->lock );
-}
-
 void input_DecoderSetVoutMouseEvent( decoder_t *dec, vlc_mouse_event mouse_event,
                                     void *user_data )
 {
