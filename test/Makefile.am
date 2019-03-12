@@ -40,6 +40,7 @@ check_PROGRAMS = \
 	test_src_misc_epg \
 	test_src_misc_keystore \
 	test_src_misc_image \
+	test_src_misc_viewpoint \
 	test_src_video_output \
 	test_src_video_output_opengl \
 	test_modules_lua_extension \
@@ -197,6 +198,8 @@ test_src_misc_keystore_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_image_cvpx_SOURCES = src/misc/image_cvpx.c
 test_src_misc_image_cvpx_LDADD = $(LIBVLCCORE) $(LIBVLC) ../modules/libvlc_vtutils.la
 test_src_misc_image_cvpx_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreVideo
+test_src_misc_viewpoint_SOURCES = src/misc/viewpoint.c
+test_src_misc_viewpoint_LDADD = $(LIBVLCCORE) $(LIBM)
 test_src_interface_dialog_SOURCES = src/interface/dialog.c
 test_src_interface_dialog_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_media_source_LDADD = $(LIBVLCCORE) $(LIBVLC)
