@@ -30,7 +30,6 @@
 #include <QMap>
 #include <vlc_common.h>
 #include <vlc_dialog.h>
-#include "adapters/variables.hpp"
 
 struct intf_thread_t;
 class QProgressDialog;
