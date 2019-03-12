@@ -93,7 +93,7 @@ static bool ObjectHasChild(vlc_object_t *obj)
     return ret;
 }
 
-static void PrintObjectPrefix(vlc_object_t *obj, bool last)
+static void PrintObjectPrefix(vlc_object_t *obj, FILE *output, bool last)
 {
     vlc_object_t *parent = vlc_object_parent(obj);
     const char *str;
@@ -101,33 +101,33 @@ static void PrintObjectPrefix(vlc_object_t *obj, bool last)
     if (parent == NULL)
         return;
 
-    PrintObjectPrefix(parent, false);
+    PrintObjectPrefix(parent, output, false);
 
     if (ObjectIsLastChild(obj, parent))
         str = last ? " \xE2\x94\x94" : "  ";
     else
         str = last ? " \xE2\x94\x9C" : " \xE2\x94\x82";
 
-    fputs(str, stdout);
+    fputs(str, output);
 }
 
-static void PrintObject(vlc_object_t *obj)
+static void PrintObject(vlc_object_t *obj, FILE *output)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
 
     int canc = vlc_savecancel ();
 
-    PrintObjectPrefix(obj, true);
-    printf("\xE2\x94\x80\xE2\x94%c\xE2\x95\xB4%p %s, %u refs\n",
+    PrintObjectPrefix(obj, output, true);
+    fprintf(output, "\xE2\x94\x80\xE2\x94%c\xE2\x95\xB4%p %s, %u refs\n",
            ObjectHasChildLocked(obj) ? 0xAC : 0x80,
            (void *)obj, vlc_object_typename(obj), atomic_load(&priv->refs));
 
     vlc_restorecancel (canc);
 }
 
-static void DumpStructure(vlc_object_t *obj, unsigned level)
+static void DumpStructure(vlc_object_t *obj, FILE *output, unsigned level)
 {
-    PrintObject(obj);
+    PrintObject(obj, output);
 
     if (unlikely(level > 100))
     {
@@ -139,7 +139,7 @@ static void DumpStructure(vlc_object_t *obj, unsigned level)
 
     vlc_mutex_assert(&tree_lock);
     vlc_children_foreach(priv, vlc_internals(obj))
-        DumpStructure(vlc_externals(priv), level + 1);
+        DumpStructure(vlc_externals(priv), output, level + 1);
 }
 
 /**
@@ -156,7 +156,7 @@ static int TreeCommand (vlc_object_t *obj, char const *cmd,
 
     flockfile(stdout);
     vlc_mutex_lock(&tree_lock);
-    DumpStructure(obj, 0);
+    DumpStructure(obj, stdout, 0);
     vlc_mutex_unlock(&tree_lock);
     funlockfile(stdout);
     return VLC_SUCCESS;
