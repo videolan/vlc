@@ -38,6 +38,18 @@
 #include "clock/clock.h"
 #include "libvlc.h"
 
+static void aout_Drain(audio_output_t *aout)
+{
+    if (aout->drain)
+        aout->drain(aout);
+    else
+    {
+        vlc_tick_t delay;
+        if (aout->time_get(aout, &delay) == 0)
+            vlc_tick_sleep(delay);
+    }
+}
+
 /**
  * Creates an audio output
  */
@@ -481,7 +493,7 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, vlc_tick_t date)
         if (aout->pause != NULL)
             aout->pause(aout, paused, date);
         else if (paused)
-            aout->flush(aout, false);
+            aout->flush(aout);
     }
 }
 
@@ -507,7 +519,7 @@ void aout_DecFlush(audio_output_t *aout)
     {
         aout_FiltersFlush (owner->filters);
 
-        aout->flush(aout, false);
+        aout->flush(aout);
         vlc_clock_Reset(owner->sync.clock);
         aout_FiltersResetClock(owner->filters);
 
@@ -539,7 +551,8 @@ void aout_DecDrain(audio_output_t *aout)
     block_t *block = aout_FiltersDrain (owner->filters);
     if (block)
         aout->play(aout, block, vlc_tick_now());
-    aout->flush(aout, true);
+
+    aout_Drain(aout);
 
     vlc_clock_Reset(owner->sync.clock);
     aout_FiltersResetClock(owner->filters);

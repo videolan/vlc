@@ -74,7 +74,7 @@ static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Play    ( audio_output_t *_p_aout, block_t *block, vlc_tick_t );
 static void Pause   ( audio_output_t *, bool, vlc_tick_t );
-static void Flush   ( audio_output_t *, bool );
+static void Flush   ( audio_output_t * );
 static int  TimeGet ( audio_output_t *, vlc_tick_t *restrict );
 
 static ULONG APIENTRY KaiCallback ( PVOID, PVOID, ULONG );
@@ -310,23 +310,15 @@ static void Pause( audio_output_t *aout, bool pause, vlc_tick_t date )
         kaiResume( sys->hkai );
 }
 
-static void Flush( audio_output_t *aout, bool drain )
+static void Flush( audio_output_t *aout )
 {
     aout_sys_t     *sys = aout->sys;
     audio_buffer_t *buffer = sys->buffer;
 
     vlc_mutex_lock( &buffer->mutex );
 
-    if( drain )
-    {
-        while( buffer->length > 0 )
-            vlc_cond_wait( &buffer->cond, &buffer->mutex );
-    }
-    else
-    {
-        buffer->read_pos = buffer->write_pos;
-        buffer->length   = 0;
-    }
+    buffer->read_pos = buffer->write_pos;
+    buffer->length   = 0;
 
     vlc_mutex_unlock( &buffer->mutex );
 }

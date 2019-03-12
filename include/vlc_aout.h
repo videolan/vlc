@@ -212,13 +212,19 @@ struct audio_output
       * \note This callback cannot be called in stopped state.
       */
 
-    void (*flush)( audio_output_t *, bool wait);
-    /**< Flushes or drains the playback buffers (mandatory, cannot be NULL).
+    void (*flush)( audio_output_t *);
+    /**< Flushes the playback buffers (mandatory, cannot be NULL).
       *
       * \param wait true to wait for playback of pending buffers (drain),
       *             false to discard pending buffers (flush)
       *
       * \note This callback cannot be called in stopped state.
+      */
+    void (*drain)(audio_output_t *);
+    /**< Drain the playback buffers (can be NULL).
+      *
+      * If NULL, the caller will wait for the delay returned by time_get before
+      * calling stop().
       */
 
     int (*volume_set)(audio_output_t *, float volume);
@@ -456,7 +462,7 @@ static inline void aout_PauseDefault(audio_output_t *aout, bool paused,
                                      vlc_tick_t date)
 {
     if (paused && aout->flush != NULL)
-        aout->flush(aout, false);
+        aout->flush(aout);
     (void) date;
 }
 

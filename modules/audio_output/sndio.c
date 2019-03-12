@@ -45,7 +45,7 @@ vlc_module_end ()
 
 static int TimeGet (audio_output_t *, vlc_tick_t *);
 static void Play(audio_output_t *, block_t *, vlc_tick_t);
-static void Flush (audio_output_t *, bool);
+static void Flush (audio_output_t *);
 static int VolumeSet (audio_output_t *, float);
 static int MuteSet (audio_output_t *, bool);
 static void VolumeChanged (void *, unsigned);
@@ -240,7 +240,7 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
     (void) date;
 }
 
-static void Flush (audio_output_t *aout, bool wait)
+static void Flush (audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
 
@@ -248,7 +248,6 @@ static void Flush (audio_output_t *aout, bool wait)
     sys->started = 0;
     sys->delay = 0;
     sio_start (sys->hdl);
-    (void)wait;
 }
 
 static void VolumeChanged (void *arg, unsigned volume)

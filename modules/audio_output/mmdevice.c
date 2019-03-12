@@ -162,13 +162,13 @@ static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
     (void) date;
 }
 
-static void Flush(audio_output_t *aout, bool wait)
+static void Flush(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
     EnterMTA();
-    hr = aout_stream_Flush(sys->stream, wait);
+    hr = aout_stream_Flush(sys->stream);
     LeaveMTA();
 
     vlc_FromHR(aout, hr);

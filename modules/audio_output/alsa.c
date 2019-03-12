@@ -294,7 +294,8 @@ static int TimeGet (audio_output_t *aout, vlc_tick_t *);
 static void Play(audio_output_t *, block_t *, vlc_tick_t);
 static void Pause (audio_output_t *, bool, vlc_tick_t);
 static void PauseDummy (audio_output_t *, bool, vlc_tick_t);
-static void Flush (audio_output_t *, bool);
+static void Flush (audio_output_t *);
+static void Drain (audio_output_t *);
 
 /** Initializes an ALSA playback stream */
 static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
@@ -714,20 +715,26 @@ static void PauseDummy (audio_output_t *aout, bool pause, vlc_tick_t date)
 }
 
 /**
- * Flushes/drains the audio playback buffer.
+ * Flushes the audio playback buffer.
  */
-static void Flush (audio_output_t *aout, bool wait)
+static void Flush (audio_output_t *aout)
 {
     aout_sys_t *p_sys = aout->sys;
     snd_pcm_t *pcm = p_sys->pcm;
-
-    if (wait)
-        snd_pcm_drain (pcm);
-    else
-        snd_pcm_drop (pcm);
+    snd_pcm_drop (pcm);
     snd_pcm_prepare (pcm);
 }
 
+/**
+ * Drains the audio playback buffer.
+ */
+static void Drain (audio_output_t *aout)
+{
+    aout_sys_t *p_sys = aout->sys;
+    snd_pcm_t *pcm = p_sys->pcm;
+    snd_pcm_drain (pcm);
+    snd_pcm_prepare (pcm);
+}
 
 /**
  * Releases the audio output.
@@ -851,6 +858,7 @@ static int Open(vlc_object_t *obj)
     aout->time_get = TimeGet;
     aout->play = Play;
     aout->flush = Flush;
+    aout->drain = Drain;
 
     return VLC_SUCCESS;
 error:

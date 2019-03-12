@@ -71,7 +71,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 static void Play         ( audio_output_t * p_aout, block_t *, vlc_tick_t );
 static void Pause        ( audio_output_t *aout, bool paused, vlc_tick_t date );
-static void Flush        ( audio_output_t *p_aout, bool wait );
+static void Flush        ( audio_output_t *p_aout );
 static int  TimeGet      ( audio_output_t *, vlc_tick_t * );
 static int  Process      ( jack_nframes_t i_frames, void *p_arg );
 static int  GraphChange  ( void *p_arg );
@@ -328,18 +328,10 @@ static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
     }
 }
 
-static void Flush(audio_output_t *p_aout, bool wait)
+static void Flush(audio_output_t *p_aout)
 {
     aout_sys_t * p_sys = p_aout->sys;
     jack_ringbuffer_t *rb = p_sys->p_jack_ringbuffer;
-
-    /* Sleep if wait was requested */
-    if( wait )
-    {
-        vlc_tick_t delay;
-        if (!TimeGet(p_aout, &delay))
-            vlc_tick_sleep(delay);
-    }
 
     /* reset ringbuffer read and write pointers */
     jack_ringbuffer_reset(rb);

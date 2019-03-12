@@ -409,15 +409,7 @@ Pause (audio_output_t *p_aout, bool pause, vlc_tick_t date)
      * that we loose 1-2 sec of audio when resuming. The order is important
      * here, ca_Flush need to be called when paused. */
     if (pause)
-        ca_Flush(p_aout, false);
-}
-
-static void
-Flush(audio_output_t *p_aout, bool wait)
-{
-    aout_sys_t * p_sys = p_aout->sys;
-
-    ca_Flush(p_aout, wait);
+        ca_Flush(p_aout);
 }
 
 static int
@@ -430,7 +422,7 @@ MuteSet(audio_output_t *p_aout, bool mute)
     {
         Pause(p_aout, mute, 0);
         if (mute)
-            ca_Flush(p_aout, false);
+            ca_Flush(p_aout);
     }
 
     return VLC_SUCCESS;
@@ -562,7 +554,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     p_aout->mute_set  = MuteSet;
     p_aout->pause = Pause;
-    p_aout->flush = Flush;
 
     aout_SoftVolumeStart( p_aout );
 

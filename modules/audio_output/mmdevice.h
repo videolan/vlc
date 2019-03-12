@@ -77,19 +77,9 @@ static inline HRESULT aout_stream_Pause(aout_stream_t *s, bool paused)
     return (s->pause)(s, paused);
 }
 
-static inline HRESULT aout_stream_Flush(aout_stream_t *s, bool wait)
+static inline HRESULT aout_stream_Flush(aout_stream_t *s)
 {
-    if (wait)
-    {   /* Loosy drain emulation */
-        vlc_tick_t delay;
-
-        if (SUCCEEDED(aout_stream_TimeGet(s, &delay)) &&
-            delay <= VLC_TICK_FROM_SEC(5))
-            Sleep(MS_FROM_VLC_TICK( delay ) + 1);
-        return S_OK;
-    }
-    else
-        return (s->flush)(s);
+    return (s->flush)(s);
 }
 
 static inline

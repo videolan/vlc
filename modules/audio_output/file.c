@@ -75,7 +75,7 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
 static int     Open        ( vlc_object_t * );
 static void    Play        ( audio_output_t *, block_t *, vlc_tick_t );
 static void    Pause       ( audio_output_t *, bool, vlc_tick_t );
-static void    Flush       ( audio_output_t *, bool );
+static void    Flush       ( audio_output_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -339,12 +339,11 @@ static void Pause( audio_output_t *aout, bool paused, vlc_tick_t date )
     (void) aout; (void) paused; (void) date;
 }
 
-static void Flush( audio_output_t *aout, bool wait )
+static void Flush( audio_output_t *aout )
 {
     aout_sys_t *p_sys = aout->sys;
     if( fflush( p_sys->p_file ) )
         msg_Err( aout, "flush error: %s", vlc_strerror_c(errno) );
-    (void) wait;
 }
 
 static int Open(vlc_object_t *obj)

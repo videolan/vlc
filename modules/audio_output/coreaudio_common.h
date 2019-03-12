@@ -89,7 +89,7 @@ void ca_Render(audio_output_t *p_aout, uint32_t i_nb_samples, uint64_t i_host_ti
 
 int  ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay);
 
-void ca_Flush(audio_output_t *p_aout, bool wait);
+void ca_Flush(audio_output_t *p_aout);
 
 void ca_Pause(audio_output_t * p_aout, bool pause, vlc_tick_t date);
 

@@ -52,9 +52,9 @@ static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
     (void) aout; (void) paused; (void) date;
 }
 
-static void Flush(audio_output_t *aout, bool wait)
+static void Flush(audio_output_t *aout)
 {
-    (void) aout; (void) wait;
+    (void) aout;
 }
 
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)

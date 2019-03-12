@@ -533,32 +533,38 @@ static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
 /**
  * Flush or drain the playback stream
  */
-static void Flush(audio_output_t *aout, bool wait)
+static void Flush(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
-    pa_operation *op;
 
     pa_threaded_mainloop_lock(sys->mainloop);
 
-    if (wait)
-    {
-        op = pa_stream_drain(s, NULL, NULL);
-
-        /* XXX: Loosy drain emulation.
-         * See #18141: drain callback is never received */
-        vlc_tick_t delay;
-        if (TimeGet(aout, &delay) == 0 && delay <= VLC_TICK_FROM_SEC(5))
-            vlc_tick_sleep(delay);
-    }
-    else
-        op = pa_stream_flush(s, NULL, NULL);
+    pa_operation *op = pa_stream_flush(s, NULL, NULL);
     if (op != NULL)
         pa_operation_unref(op);
     sys->last_date = VLC_TICK_INVALID;
     stream_stop(s, aout);
 
     pa_threaded_mainloop_unlock(sys->mainloop);
+}
+
+static void Drain(audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+    pa_stream *s = sys->stream;
+
+    pa_threaded_mainloop_lock(sys->mainloop);
+    pa_operation *op = pa_stream_drain(s, NULL, NULL);
+    if (op != NULL)
+        pa_operation_unref(op);
+    pa_threaded_mainloop_unlock(sys->mainloop);
+
+    /* XXX: Loosy drain emulation.
+     * See #18141: drain callback is never received */
+    vlc_tick_t delay;
+    if (TimeGet(aout, &delay) == 0 && delay <= VLC_TICK_FROM_SEC(5))
+        vlc_tick_sleep(delay);
 }
 
 static int VolumeSet(audio_output_t *aout, float vol)
@@ -1006,6 +1012,7 @@ static int Open(vlc_object_t *obj)
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
+    aout->drain = Drain;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
     aout->device_select = StreamMove;

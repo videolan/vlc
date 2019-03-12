@@ -230,42 +230,21 @@ ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
 }
 
 void
-ca_Flush(audio_output_t *p_aout, bool wait)
+ca_Flush(audio_output_t *p_aout)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
     lock_lock(p_sys);
-    if (wait)
-    {
-        while (p_sys->i_out_size > 0)
-        {
-            if (p_sys->b_paused)
-            {
-                ca_ClearOutBuffers(p_aout);
-                break;
-            }
 
-            /* Calculate the duration of the circular buffer, in order to wait
-             * for the render thread to play it all */
-            const vlc_tick_t i_frame_us =
-                FramesToUs(p_sys, BytesToFrames(p_sys, p_sys->i_out_size)) + VLC_TICK_FROM_MS(10);
-            lock_unlock(p_sys);
-            vlc_tick_sleep(i_frame_us);
-            lock_lock(p_sys);
-        }
-    }
+    assert(!p_sys->b_do_flush);
+    if (p_sys->b_paused)
+        ca_ClearOutBuffers(p_aout);
     else
     {
-        assert(!p_sys->b_do_flush);
-        if (p_sys->b_paused)
-            ca_ClearOutBuffers(p_aout);
-        else
-        {
-            p_sys->b_do_flush = true;
-            lock_unlock(p_sys);
-            vlc_sem_wait(&p_sys->flush_sem);
-            lock_lock(p_sys);
-        }
+        p_sys->b_do_flush = true;
+        lock_unlock(p_sys);
+        vlc_sem_wait(&p_sys->flush_sem);
+        lock_lock(p_sys);
     }
 
     p_sys->i_render_host_time = 0;

@@ -177,30 +177,24 @@ static int TimeGet(audio_output_t* aout, vlc_tick_t* restrict drift)
     return 0;
 }
 
-static void Flush(audio_output_t *aout, bool drain)
+static void Flush(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
 
-    if (drain) {
-        vlc_tick_t delay;
-        if (!TimeGet(aout, &delay))
-            vlc_tick_sleep(delay);
-    } else {
-        vlc_mutex_lock(&sys->lock);
-        SetPlayState(sys->playerPlay, SL_PLAYSTATE_STOPPED);
-        Clear(sys->playerBufferQueue);
-        SetPlayState(sys->playerPlay, SL_PLAYSTATE_PLAYING);
+    vlc_mutex_lock(&sys->lock);
+    SetPlayState(sys->playerPlay, SL_PLAYSTATE_STOPPED);
+    Clear(sys->playerBufferQueue);
+    SetPlayState(sys->playerPlay, SL_PLAYSTATE_PLAYING);
 
-        /* release audio data not yet written to opensles */
-        block_ChainRelease(sys->p_buffer_chain);
-        sys->p_buffer_chain = NULL;
-        sys->pp_buffer_last = &sys->p_buffer_chain;
+    /* release audio data not yet written to opensles */
+    block_ChainRelease(sys->p_buffer_chain);
+    sys->p_buffer_chain = NULL;
+    sys->pp_buffer_last = &sys->p_buffer_chain;
 
-        sys->samples = 0;
-        sys->started = false;
+    sys->samples = 0;
+    sys->started = false;
 
-        vlc_mutex_unlock(&sys->lock);
-    }
+    vlc_mutex_unlock(&sys->lock);
 }
 
 static int VolumeSet(audio_output_t *aout, float vol)

@@ -90,7 +90,7 @@ vlc_module_end ()
 static int TimeGet (audio_output_t *, vlc_tick_t *);
 static void Play(audio_output_t *, block_t *, vlc_tick_t);
 static void Pause (audio_output_t *, bool, vlc_tick_t);
-static void Flush (audio_output_t *, bool);
+static void Flush (audio_output_t *);
 
 static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
@@ -302,15 +302,13 @@ static void Pause (audio_output_t *aout, bool pause, vlc_tick_t date)
 }
 
 /**
- * Flushes/drains the audio playback buffer.
+ * Flushes the audio playback buffer.
  */
-static void Flush (audio_output_t *aout, bool wait)
+static void Flush (audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
     int fd = sys->fd;
 
-    if (wait)
-        return; /* drain is implicit with OSS */
     ioctl (fd, SNDCTL_DSP_HALT, NULL);
 }
 

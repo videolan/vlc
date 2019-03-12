@@ -2040,7 +2040,7 @@ bailout:
 }
 
 static void
-Flush( audio_output_t *p_aout, bool b_wait )
+Flush( audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
@@ -2061,25 +2061,10 @@ Flush( audio_output_t *p_aout, bool b_wait )
      * that has not been played back will be discarded.  No-op if not stopped
      * or paused, or if the track's creation mode is not MODE_STREAM.
      */
-    if( b_wait )
-    {
-        /* Wait for the thread to process the circular buffer */
-        while( !p_sys->b_error
-            && p_sys->circular.i_read != p_sys->circular.i_write )
-            vlc_cond_wait( &p_sys->aout_cond, &p_sys->lock );
-        if( p_sys->b_error )
-            goto bailout;
-
-        JNI_AT_CALL_VOID( stop );
-        if( CHECK_AT_EXCEPTION( "stop" ) )
-            goto bailout;
-    } else
-    {
-        JNI_AT_CALL_VOID( pause );
-        if( CHECK_AT_EXCEPTION( "pause" ) )
-            goto bailout;
-        JNI_AT_CALL_VOID( flush );
-    }
+    JNI_AT_CALL_VOID( pause );
+    if( CHECK_AT_EXCEPTION( "pause" ) )
+        goto bailout;
+    JNI_AT_CALL_VOID( flush );
     p_sys->circular.i_read = p_sys->circular.i_write = 0;
 
     /* HACK: Before Android 4.4, the head position is not reset to zero and is

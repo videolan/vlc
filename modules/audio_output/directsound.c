@@ -360,19 +360,10 @@ static HRESULT StreamFlush( aout_stream_t *s )
     return Flush( s->sys );
 }
 
-static void OutputFlush( audio_output_t *aout, bool drain )
+static void OutputFlush( audio_output_t *aout )
 {
     aout_sys_t *sys = aout->sys;
-    if (drain)
-    {   /* Loosy drain emulation */
-        vlc_tick_t delay;
-
-        if( OutputTimeGet( aout, &delay ) == 0 &&
-            delay <= VLC_TICK_FROM_SEC( 5 ) )
-            Sleep( MS_FROM_VLC_TICK( delay ) + 1 );
-    }
-    else
-        Flush( &sys->s );
+    Flush( &sys->s );
 }
 
 /**
