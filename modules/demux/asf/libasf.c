@@ -1359,6 +1359,9 @@ static int ASF_ReadObject_marker(stream_t *s, asf_object_t *p_obj)
 
     p_data = &p_peek[ASF_OBJECT_COMMON_SIZE];
 
+    if( !ASF_HAVE( 16+4+2+2 ) )
+        return VLC_EGENERIC;
+
     ASF_GetGUID( &p_mk->i_reserved1, p_data );
     ASF_SKIP( 16 );
     p_mk->i_count = ASF_READ4();
