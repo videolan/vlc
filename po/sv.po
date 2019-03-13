@@ -1,9 +1,9 @@
 # Swedish translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Anton Regnander <anton_r_3@hotmail.com>, 2014-2018
+# Anton Regnander <anton_r_3@hotmail.com>, 2014-2019
 # Christopher Rönngren <christopher.ronngren@hotmail.com>, 2015
 # Claes-Göran Nydahl <goldug@gmail.com>, 2016
 # Daniel <daniel.a.back@telia.com>, 2015
@@ -19,7 +19,7 @@
 # Jonathan Schmidt <jhschmidt@wpsdk12.org>, 2016
 # Josef Andersson <josef.andersson@fripost.org>, 2015
 # Andreas Everos, 2014
-# Kristoffer Grundström <kristoffer.grundstrom1983@gmail.com>, 2015-2018
+# Kristoffer Grundström <hamnisdude@gmail.com>, 2015-2018
 # Isis, 2013,2014
 # leveebreaks, 2013,2014
 # Linus Malmgren <linus@malmgren.nu>, 2015
@@ -36,11 +36,11 @@
 # Isis, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-05 09:13+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-03-13 11:22+0100\n"
+"Last-Translator: Anton Regnander <anton_r_3@hotmail.com>, 2019\n"
 "Language-Team: Swedish (https://www.transifex.com/yaron/teams/16553/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -1668,7 +1668,7 @@ msgstr "Mediaroll"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
-msgstr ""
+msgstr "Media(spelarens) roll för operativsystemets policy."
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:267
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:410
@@ -13750,7 +13750,7 @@ msgstr ""
 
 #: modules/codec/x264.c:378
 msgid "Slightly improve quality of SMP, at the cost of repeatability."
-msgstr ""
+msgstr "Förbättrar kvaliteten en aning för SMP, på bekostnad av upprepning."
 
 #: modules/codec/x264.c:381
 msgid "CPU optimizations"
@@ -13777,6 +13777,8 @@ msgid ""
 "Compute and print PSNR stats. This has no effect on the actual encoding "
 "quality."
 msgstr ""
+"Beräkna och skriv ut PSNR-statistik. Detta påverkar inte den nuvarande "
+"kodningskvaliteten."
 
 #: modules/codec/x264.c:391
 msgid "SSIM computation"
@@ -13787,6 +13789,8 @@ msgid ""
 "Compute and print SSIM stats. This has no effect on the actual encoding "
 "quality."
 msgstr ""
+"Beräkna och skriv ut SSIM-statistik. Detta påverkar inte den nuvarande "
+"kodningskvaliteten."
 
 #: modules/codec/x264.c:395
 msgid "Quiet mode"
@@ -15519,15 +15523,15 @@ msgstr "Huvudljud"
 
 #: modules/demux/mpeg/ts_psi.c:423
 msgid "Audio description for the visually impaired"
-msgstr ""
+msgstr "Ljudbeskrivning för synskadade"
 
 #: modules/demux/mpeg/ts_psi.c:424
 msgid "Clean audio for the hearing impaired"
-msgstr ""
+msgstr "Rent ljud för hörselskadade"
 
 #: modules/demux/mpeg/ts_psi.c:425
 msgid "Spoken subtitles for the visually impaired"
-msgstr ""
+msgstr "Upplästa undertexter för synskadade"
 
 #: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:465
 #: modules/gui/qt/dialogs/toolbar.cpp:541
@@ -21933,6 +21937,10 @@ msgid ""
 "but can also bind to a plain TCP socket (\"localhost:4212\") or use the "
 "telnet protocol (\"telnet://0.0.0.0:4212\")"
 msgstr ""
+"Accepterar kommandon från denna källa. Kommandoradsgränssnittet använder "
+"stdin (\"*console\") som standard, men kan även bindas till en vanlig TCP-"
+"socket (\"localhost:4212\") eller använda telnet-protokollet "
+"(\"telnet://0.0.0.0:4212\")"
 
 #: modules/lua/vlc.c:85
 msgid "Lua"
@@ -23275,9 +23283,8 @@ msgid "avparser packetizer"
 msgstr "avparser-paketerare"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Daala-videopaketerare"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -23824,6 +23831,8 @@ msgid ""
 "Opacity (inverse of transparency) of overlayed text. 0 = transparent, 255 = "
 "totally opaque."
 msgstr ""
+"Opacitet (motsatsen till genomskinlighet) för överläggande text. 0 = "
+"genomskinlig, 255 = helt opak."
 
 #: modules/spu/marq.c:111 modules/spu/rss.c:148
 msgid "Font size, pixels"
@@ -24350,19 +24359,19 @@ msgstr ""
 
 #: modules/stream_filter/cache_block.c:498
 msgid "Block stream cache"
-msgstr ""
+msgstr "Cache för blockström"
 
 #: modules/stream_filter/cache_read.c:570
 msgid "Byte stream cache"
-msgstr ""
+msgstr "Cache för byteström"
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
-msgstr ""
+msgstr "LZMA-avkomprimering"
 
 #: modules/stream_filter/decomp.c:66
 msgid "Burrows-Wheeler decompression"
-msgstr ""
+msgstr "Avkomprimering av Burrows-Wheeler"
 
 #: modules/stream_filter/decomp.c:71
 msgid "gzip decompression"
@@ -24374,7 +24383,7 @@ msgstr "HTTP-dynamisk strömning"
 
 #: modules/stream_filter/inflate.c:201
 msgid "Zlib decompression filter"
-msgstr ""
+msgstr "Avkomprimeringsfilter för Zlib"
 
 #: modules/stream_filter/prefetch.c:531
 msgid "Stream prefetch filter"
@@ -24386,7 +24395,7 @@ msgstr "Buffertstorlek"
 
 #: modules/stream_filter/prefetch.c:535
 msgid "Prefetch buffer size (KiB)"
-msgstr ""
+msgstr "Bufferstorlek av förhandshämtning (KiB)"
 
 #: modules/stream_filter/prefetch.c:537
 msgid "Read size"
@@ -24402,7 +24411,7 @@ msgstr "Tröskel för snabbspolning"
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
-msgstr ""
+msgstr "Tröskel för förhandshämtning av sökning framåt (byte)"
 
 #: modules/stream_filter/record.c:49
 msgid "Internal stream record"
@@ -24617,11 +24626,11 @@ msgstr ""
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
-msgstr ""
+msgstr "cykel"
 
 #: modules/stream_out/cycle.c:326
 msgid "Cyclic stream output"
-msgstr ""
+msgstr "Utmatning för cykelström"
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
@@ -25789,7 +25798,7 @@ msgstr "Antalet gånger att blanda"
 
 #: modules/video_filter/blendbench.c:54
 msgid "The number of time the blend will be performed"
-msgstr ""
+msgstr "Antalet gånger blandningen ska utföras"
 
 #: modules/video_filter/blendbench.c:56
 msgid "Alpha of the blended image"
@@ -26278,11 +26287,11 @@ msgstr ""
 
 #: modules/video_filter/gradient.c:62
 msgid "Distort mode"
-msgstr ""
+msgstr "Förvrängningsläge"
 
 #: modules/video_filter/gradient.c:63
 msgid "Distort mode, one of \"gradient\", \"edge\" and \"hough\"."
-msgstr ""
+msgstr "Förvrängningsläge, antingen \"gradient\", \"edge\" eller \"hough\"."
 
 #: modules/video_filter/gradient.c:65
 msgid "Gradient image type"
@@ -26306,7 +26315,7 @@ msgstr ""
 
 #: modules/video_filter/gradient.c:73
 msgid "Apply color gradient or edge detection effects"
-msgstr ""
+msgstr "Tillämpa färggradient eller kantidentifieringseffekter"
 
 #: modules/video_filter/gradient.c:81
 msgid "Gradient video filter"
