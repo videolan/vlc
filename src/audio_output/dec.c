@@ -122,6 +122,7 @@ void aout_DecDelete (audio_output_t *aout)
 
     if (owner->mixer_format.i_format)
     {
+        aout_DecFlush(aout, false);
         aout_FiltersDelete (aout, owner->filters);
         aout_OutputDelete (aout);
     }

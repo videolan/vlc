@@ -1932,7 +1932,6 @@ static void DeleteDecoder( decoder_t * p_dec )
             if( p_owner->p_aout )
             {
                 /* TODO: REVISIT gap-less audio */
-                aout_DecFlush( p_owner->p_aout, false );
                 aout_DecDelete( p_owner->p_aout );
                 input_resource_PutAout( p_owner->p_resource, p_owner->p_aout );
             }
