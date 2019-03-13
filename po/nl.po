@@ -1,19 +1,19 @@
 # Dutch translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Alexander Henket <ahenket at xs4all dot nl>, 2009
 # Derk-Jan Hartman <hartman at videolan dot org>, 2004-2005
 # Myckel Habets <myckel at sdf dot lonestar dot org>, 2007-2010
-# Thomas De Rocker <thomasderocker at outlook dot com>, 2008-2018
+# Thomas De Rocker <thomasderocker at outlook dot com>, 2008-2019
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-09 01:09+0200\n"
-"Last-Translator: Thomas De Rocker, 2018\n"
+"PO-Revision-Date: 2019-03-13 12:59+0100\n"
+"Last-Translator: Thomas De Rocker <thomasderocker at outlook dot com>, 2019\n"
 "Language-Team: Dutch (https://www.transifex.com/yaron/teams/16553/nl/)\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -17975,7 +17975,7 @@ msgstr ""
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:75
 #: share/lua/http/index.html:239
 msgid "Shuffle"
-msgstr "Shuffle"
+msgstr "Willekeurige volgorde"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:85
 msgid "Full Volume"
@@ -23895,9 +23895,8 @@ msgid "avparser packetizer"
 msgstr "avparser packetizer"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Daala video-packetizer"
+msgstr "AV1 video packetizer"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
