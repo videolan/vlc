@@ -172,6 +172,11 @@ EXTRA_LDFLAGS += -m32
 endif
 endif
 
+ifdef HAVE_WINSTORE
+EXTRA_CFLAGS += -DWINSTORECOMPAT
+EXTRA_LDFLAGS += -lwinstorecompat
+endif
+
 cppcheck = $(shell $(CC) $(CFLAGS) -E -dM - < /dev/null | grep -E $(1))
 
 EXTRA_CFLAGS += -I$(PREFIX)/include
