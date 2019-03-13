@@ -611,8 +611,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     sys->format = fmt->i_format;
 
-    aout->time_get = TimeGet;
-    aout->play = Play;
     if (snd_pcm_hw_params_can_pause (hw))
         aout->pause = Pause;
     else
@@ -620,7 +618,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         aout->pause = PauseDummy;
         msg_Warn (aout, "device cannot be paused");
     }
-    aout->flush = Flush;
     aout_SoftVolumeStart (aout);
     return 0;
 
@@ -850,6 +847,10 @@ static int Open(vlc_object_t *obj)
         free (names);
         free (ids);
     }
+
+    aout->time_get = TimeGet;
+    aout->play = Play;
+    aout->flush = Flush;
 
     return VLC_SUCCESS;
 error:
