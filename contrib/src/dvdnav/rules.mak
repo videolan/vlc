@@ -5,7 +5,9 @@ LIBDVDNAV_URL := $(VIDEOLAN)/libdvdnav/$(LIBDVDNAV_VERSION)/libdvdnav-$(LIBDVDNA
 
 ifdef BUILD_DISCS
 ifdef GPL
+ifndef HAVE_WINSTORE
 PKGS += dvdnav
+endif
 endif
 endif
 ifeq ($(call need_pkg,"dvdnav >= 5.0.3"),)
