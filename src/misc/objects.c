@@ -76,13 +76,21 @@ static bool ObjectIsLastChild(vlc_object_t *obj, vlc_object_t *parent)
     return true;
 }
 
-static bool ObjectHasChild(vlc_object_t *obj)
+static bool ObjectHasChildLocked(vlc_object_t *obj)
 {
     vlc_object_internals_t *priv;
 
     vlc_children_foreach(priv, vlc_internals(obj))
         return true;
     return false;
+}
+
+static bool ObjectHasChild(vlc_object_t *obj)
+{
+    vlc_mutex_lock(&tree_lock);
+    bool ret = ObjectHasChildLocked(obj);
+    vlc_mutex_unlock(&tree_lock);
+    return ret;
 }
 
 static void PrintObjectPrefix(vlc_object_t *obj, bool last)
@@ -111,7 +119,7 @@ static void PrintObject(vlc_object_t *obj)
 
     PrintObjectPrefix(obj, true);
     printf("\xE2\x94\x80\xE2\x94%c\xE2\x95\xB4%p %s, %u refs\n",
-           ObjectHasChild(obj) ? 0xAC : 0x80,
+           ObjectHasChildLocked(obj) ? 0xAC : 0x80,
            (void *)obj, vlc_object_typename(obj), atomic_load(&priv->refs));
 
     vlc_restorecancel (canc);
