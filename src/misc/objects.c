@@ -125,7 +125,7 @@ static void PrintObject(vlc_object_t *obj, FILE *output)
     vlc_restorecancel (canc);
 }
 
-static void DumpStructure(vlc_object_t *obj, FILE *output, unsigned level)
+static void DumpStructureLocked(vlc_object_t *obj, FILE *output, unsigned level)
 {
     PrintObject(obj, output);
 
@@ -137,9 +137,8 @@ static void DumpStructure(vlc_object_t *obj, FILE *output, unsigned level)
 
     vlc_object_internals_t *priv;
 
-    vlc_mutex_assert(&tree_lock);
     vlc_children_foreach(priv, vlc_internals(obj))
-        DumpStructure(vlc_externals(priv), output, level + 1);
+        DumpStructureLocked(vlc_externals(priv), output, level + 1);
 }
 
 /**
@@ -156,7 +155,7 @@ static int TreeCommand (vlc_object_t *obj, char const *cmd,
 
     flockfile(stdout);
     vlc_mutex_lock(&tree_lock);
-    DumpStructure(obj, stdout, 0);
+    DumpStructureLocked(obj, stdout, 0);
     vlc_mutex_unlock(&tree_lock);
     funlockfile(stdout);
     return VLC_SUCCESS;
