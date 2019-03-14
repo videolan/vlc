@@ -75,14 +75,10 @@ public:
     {
         vlc_mutex_init( &m_lock );
         vlc_cond_init( &m_wait );
-        if( m_pObj )
-            vlc_object_hold( m_pObj );
     }
 
     virtual ~CmdExecuteBlock()
     {
-        if( m_pObj )
-            vlc_object_release( m_pObj );
         vlc_cond_destroy( &m_wait );
         vlc_mutex_destroy( &m_lock );
     }
