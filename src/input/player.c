@@ -50,8 +50,6 @@ static_assert(VLC_PLAYER_TITLE_MENU == INPUT_TITLE_MENU &&
               VLC_PLAYER_TITLE_INTERACTIVE == INPUT_TITLE_INTERACTIVE,
               "player/input title flag mismatch");
 
-#define GAPLESS 0 /* TODO */
-
 typedef struct VLC_VECTOR(struct vlc_player_program *)
     vlc_player_program_vector;
 
@@ -173,9 +171,6 @@ struct vlc_player_t
     bool releasing_media;
     bool has_next_media;
     input_item_t *next_media;
-#if GAPLESS
-    struct vlc_player_input *next_input;
-#endif
 
     enum vlc_player_state global_state;
     bool started;
@@ -225,15 +220,8 @@ struct vlc_player_t
     vlc_mutex_unlock(&player->vout_listeners_lock); \
 } while(0)
 
-#if GAPLESS
-#define vlc_player_foreach_inputs(it) \
-    for (struct vlc_player_input *it = player->input; \
-         it != NULL; \
-         it = (it == player->input ? player->next_input : NULL))
-#else
 #define vlc_player_foreach_inputs(it) \
     for (struct vlc_player_input *it = player->input; it != NULL; it = NULL)
-#endif
 
 static void
 input_thread_Events(input_thread_t *, const struct vlc_input_event *, void *);
@@ -1911,16 +1899,6 @@ input_thread_Events(input_thread_t *input_thread,
                                  input->capabilities);
             break;
         case INPUT_EVENT_POSITION:
-#if GAPLESS
-            /* XXX case INPUT_EVENT_EOF: */
-            if (player->next_input == NULL)
-                break;
-            vlc_tick_t length = input->length;
-            vlc_tick_t time = event->position.ms;
-            if (length > 0 && time > 0
-             && length - time <= AOUT_MAX_PREPARE_TIME)
-                vlc_player_OpenNextMedia(player);
-#endif
             if (input->time != event->position.ms ||
                 input->position != event->position.percentage)
             {
@@ -2174,15 +2152,6 @@ vlc_player_InvalidateNextMedia(vlc_player_t *player)
     }
     player->has_next_media = false;
 
-#if GAPLESS
-    if (player->next_input)
-    {
-        /* Cause the get_next callback to be called when this input is
-         * dead */
-        vlc_player_destructor_AddInput(player, player->next_input);
-        player->next_input = NULL;
-    }
-#endif
 }
 
 int
@@ -2249,13 +2218,6 @@ vlc_player_Stop(vlc_player_t *player)
     vlc_player_destructor_AddInput(player, input);
     player->input = NULL;
 
-#if GAPLESS
-    if (player->next_input)
-    {
-        vlc_player_destructor_AddInput(player, next_input);
-        player->next_input = NULL;
-    }
-#endif
 }
 
 void
@@ -3472,10 +3434,6 @@ vlc_player_Delete(vlc_player_t *player)
 
     if (player->input)
         vlc_player_destructor_AddInput(player, player->input);
-#if GAPLESS
-    if (player->next_input)
-        vlc_player_destructor_AddInput(player, player->next_inpu);
-#endif
 
     player->deleting = true;
     vlc_cond_signal(&player->destructor.wait);
@@ -3543,9 +3501,6 @@ vlc_player_New(vlc_object_t *parent,
     player->releasing_media = false;
     player->has_next_media = false;
     player->next_media = NULL;
-#if GAPLESS
-    player->next_input = NULL;
-#endif
 
 #define VAR_CREATE(var, flag) do { \
     if (var_Create(player, var, flag) != VLC_SUCCESS) \
