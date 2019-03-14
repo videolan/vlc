@@ -25,10 +25,6 @@ $(TARBALLS)/dav1d-$(DAV1D_VERSION).tar.xz:
 dav1d: dav1d-$(DAV1D_VERSION).tar.xz .sum-dav1d
 	$(UNPACK)
 	$(APPLY) $(SRC)/dav1d/0001-pass-the-sequence-header-corresponding-to-the-pictur.patch
-	$(APPLY) $(SRC)/dav1d/0002-Clip-coefficients-in-SSSE3-AVX2-inverse-transform-as.patch
-	$(APPLY) $(SRC)/dav1d/0003-Remove-carriage-return-characters.patch
-	$(APPLY) $(SRC)/dav1d/0004-itx-replace-qw_-constant-prefix-with-pw_.patch
-	$(APPLY) $(SRC)/dav1d/0005-Implement-support-for-PIC-in-x86-32-asm.patch
 	$(MOVE)
 
 .dav1d: dav1d crossfile.meson
