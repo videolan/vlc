@@ -269,6 +269,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
         vlc_object_delete(aout);
         return NULL;
     }
+    assert(aout->start && aout->stop);
 
     /*
      * Persistent audio output variables
@@ -585,6 +586,7 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
 
     aout_OutputLock(aout);
     int ret = aout->start(aout, fmt);
+    assert(aout->flush && aout->play && aout->time_get && aout->pause);
     aout_OutputUnlock(aout);
     if (ret)
     {

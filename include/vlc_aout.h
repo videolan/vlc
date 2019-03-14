@@ -461,7 +461,7 @@ static inline int aout_TimeGetDefault(audio_output_t *aout,
 static inline void aout_PauseDefault(audio_output_t *aout, bool paused,
                                      vlc_tick_t date)
 {
-    if (paused && aout->flush != NULL)
+    if (paused)
         aout->flush(aout);
     (void) date;
 }
