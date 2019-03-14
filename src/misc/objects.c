@@ -161,55 +161,6 @@ static int TreeCommand (vlc_object_t *obj, char const *cmd,
     return VLC_SUCCESS;
 }
 
-static vlc_object_t *ObjectExists (vlc_object_t *root, void *obj)
-{
-    if (root == obj)
-        return vlc_object_hold (root);
-
-    vlc_object_internals_t *priv;
-    vlc_object_t *ret = NULL;
-
-    vlc_mutex_assert(&tree_lock);
-    vlc_children_foreach(priv, vlc_internals(root))
-    {
-        ret = ObjectExists (vlc_externals (priv), obj);
-        if (ret != NULL)
-            break;
-    }
-    return ret;
-}
-
-static int VarsCommand (vlc_object_t *obj, char const *cmd,
-                        vlc_value_t oldval, vlc_value_t newval, void *data)
-{
-    void *p;
-
-    (void) cmd; (void) oldval; (void) data;
-
-    if (sscanf (newval.psz_string, "%p", &p) == 1)
-    {
-        vlc_mutex_lock(&tree_lock);
-        p = ObjectExists (obj, p);
-        vlc_mutex_unlock(&tree_lock);
-
-        if (p == NULL)
-        {
-            msg_Err (obj, "no such object: %s", newval.psz_string);
-            return VLC_ENOOBJ;
-        }
-        obj = p;
-    }
-    else
-        vlc_object_hold (obj);
-
-    printf(" o %p %s, parent %p\n", (void *)obj, vlc_object_typename(obj),
-           (void *)vlc_object_parent(obj));
-    DumpVariables (obj);
-    vlc_object_release (obj);
-
-    return VLC_SUCCESS;
-}
-
 #undef vlc_custom_create
 void *vlc_custom_create (vlc_object_t *parent, size_t length,
                          const char *typename)
@@ -263,8 +214,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         int canc = vlc_savecancel ();
         var_Create (obj, "tree", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
         var_AddCallback (obj, "tree", TreeCommand, NULL);
-        var_Create (obj, "vars", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
-        var_AddCallback (obj, "vars", VarsCommand, NULL);
         vlc_restorecancel (canc);
     }
 
@@ -323,7 +272,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     if (unlikely(p_priv->parent == NULL))
     {
         /* TODO: should be in src/libvlc.c */
-        var_DelCallback (p_this, "vars", VarsCommand, NULL);
         var_DelCallback (p_this, "tree", TreeCommand, NULL);
     }
 
