@@ -42,7 +42,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/NSString+Helpers.m \
 	gui/macosx/extensions/VLCHexNumberFormatter.h \
 	gui/macosx/extensions/VLCHexNumberFormatter.m \
-	gui/macosx/extensions/helpers.h \
 	gui/macosx/extensions/misc.h \
 	gui/macosx/extensions/misc.m \
 	gui/macosx/imported/AppleRemote/AppleRemote.h \
