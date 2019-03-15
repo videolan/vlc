@@ -1580,7 +1580,6 @@
 
         p_object = [menuContent vlcObject];
         var_Set(p_object, [menuContent name], [menuContent value]);
-        vlc_object_release(p_object);
         return true;
     }
 }
@@ -1757,7 +1756,7 @@
 
 - (vlc_object_t *)vlcObject
 {
-    return vlc_object_hold(vlc_object);
+    return vlc_object;
 }
 
 - (int)type
