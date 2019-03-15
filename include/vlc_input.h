@@ -716,7 +716,6 @@ static inline audio_output_t *input_GetAout( input_thread_t *p_input )
 /**
  * Returns the objects associated to an ES.
  *
- * You must release all non-NULL objects.
  * You may set pointer of pointer to NULL to avoid retrieving it.
  */
 static inline int input_GetEsObjects( input_thread_t *p_input, int i_id,

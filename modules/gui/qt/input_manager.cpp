@@ -578,7 +578,6 @@ void InputManager::UpdateTeletext()
         {
             i_page = var_GetInteger( p_input_vbi, "vbi-page" );
             b_transparent = !var_GetBool( p_input_vbi, "vbi-opaque" );
-            vlc_object_release( p_input_vbi );
         }
         emit newTelexPageSet( i_page );
         emit teletextTransparencyActivated( b_transparent );
@@ -814,7 +813,6 @@ void InputManager::telexSetPage( int page )
             return;
 
         var_SetInteger(input_vbi, "vbi-page", page);
-        vlc_object_release(input_vbi);
         emit newTelexPageSet(page);
     }
 }
@@ -835,7 +833,6 @@ void InputManager::telexSetTransparency( bool b_transparentTelextext )
             return;
 
         var_SetBool(input_vbi, "vbi-opaque", !b_transparentTelextext);
-        vlc_object_release(input_vbi);
         emit teletextTransparencyActivated( b_transparentTelextext );
     }
 }

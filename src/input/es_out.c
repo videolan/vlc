@@ -2940,11 +2940,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         if( !p_es )
             return VLC_EGENERIC;
 
-        vlc_object_t    **pp_decoder = va_arg( args, vlc_object_t ** );
-        if( p_es->p_dec )
-            *pp_decoder = vlc_object_hold( p_es->p_dec );
-        else
-            *pp_decoder = NULL;
+        *va_arg( args, vlc_object_t ** ) = VLC_OBJECT(p_es->p_dec);
         return VLC_SUCCESS;
     }
 

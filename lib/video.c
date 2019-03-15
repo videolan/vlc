@@ -520,7 +520,6 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
                 == VLC_SUCCESS )
             {
                 var_SetInteger( p_zvbi, "vbi-page", i_page );
-                vlc_object_release( p_zvbi );
             }
         }
         else if (!b_key)
