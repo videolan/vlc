@@ -35,6 +35,7 @@ usage()
 	echo "  --enable-ad-clauses configure to build packages with advertising clauses"
 	echo "                   (USE AT YOUR OWN LEGAL RISKS)"
 	echo "  --disable-optim  disable optimization in libraries"
+	echo "  --enable-pdb     generate debug information in PDB format"
 }
 
 BUILD=
@@ -49,6 +50,7 @@ GPL="1"
 GNUV3="1"
 AD_CLAUSES=
 WITH_OPTIMIZATION="1"
+ENABLE_PDB=
 
 if test ! -f "../../contrib/src/main.mak"
 then
@@ -83,6 +85,9 @@ do
 			;;
 		--disable-optim)
 			WITH_OPTIMIZATION=
+			;;
+		--enable-pdb)
+			ENABLE_PDB=1
 			;;
 		--enable-small)
 			ENABLE_SMALL=1
@@ -287,6 +292,7 @@ test -z "$GPL" || add_make_enabled "GPL"
 test -z "$GNUV3" || add_make_enabled "GNUV3"
 test -z "$AD_CLAUSES" || add_make_enabled "AD_CLAUSES"
 test -z "$WITH_OPTIMIZATION" || add_make_enabled "WITH_OPTIMIZATION"
+test -z "$ENABLE_PDB" || add_make_enabled "ENABLE_PDB"
 test "`uname -o 2>/dev/null`" != "Msys" || add_make "CMAKE_GENERATOR := -G \"MSYS Makefiles\""
 
 #

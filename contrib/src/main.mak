@@ -310,6 +310,11 @@ CFLAGS := $(CFLAGS) -g -O2
 CXXFLAGS := $(CXXFLAGS) -g -O2
 endif
 
+ifdef ENABLE_PDB
+CFLAGS := $(CFLAGS) -gcodeview
+CXXFLAGS := $(CXXFLAGS) -gcodeview
+endif
+
 HOSTVARS := $(HOSTTOOLS) \
 	CPPFLAGS="$(CPPFLAGS)" \
 	CFLAGS="$(CFLAGS)" \
