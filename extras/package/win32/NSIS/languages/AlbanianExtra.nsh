@@ -57,6 +57,8 @@ ${LangFileString} Action_OnArrivalSVCDMovie "Luaj film SVCD"
 ${LangFileString} Action_OnArrivalVideoFiles "Luaj dokument video"
 ${LangFileString} Action_OnArrivalMusicFiles "Luaj dokument audio"
 ${LangFileString} Action_OnArrivalDVDAudio "Luaj audio DVD"
+${LangFileString} Action_OnArrivalBluray "Luaj Blu-ray"
+
 ${LangFileString} License_NextText "Ju tani jeni të vetëdijshëm për të drejtat tuaja. Klikoni Tjetër për të vazhduar."
 
 ${LangFileString} Detail_CheckProcesses "Duke kontrolluar proceset..."
