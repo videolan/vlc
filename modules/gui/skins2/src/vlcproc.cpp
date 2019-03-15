@@ -366,6 +366,7 @@ int VlcProc::onInputCallback( vlc_object_t *pObj, const char *pVariable,
                               void *pParam )
 {
     (void)oldVal;
+    input_thread_t *pInput = (input_thread_t *)pObj;
     VlcProc *pThis = (VlcProc*)pParam;
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     std::string label = pVariable;
@@ -376,8 +377,8 @@ int VlcProc::onInputCallback( vlc_object_t *pObj, const char *pVariable,
     ADD_CALLBACK_ENTRY( "can-record", on_can_record_changed, false )
         vlc_assert_unreachable();
 
-    CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal, cb,
-                                        label );
+    CmdGeneric *pCmd = new CmdInputCallback( pThis->getIntf(), pInput, newVal,
+                                             cb, label );
     if( pCmd )
         pQueue->push( CmdGenericPtr( pCmd ), remove );
 
@@ -389,6 +390,7 @@ int VlcProc::onVoutCallback( vlc_object_t *pObj, const char *pVariable,
                                 void *pParam )
 {
     (void)oldVal;
+    vout_thread_t *pVout = (vout_thread_t *)pObj;
     VlcProc *pThis = (VlcProc*)pParam;
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     std::string label = pVariable;
@@ -397,8 +399,8 @@ int VlcProc::onVoutCallback( vlc_object_t *pObj, const char *pVariable,
     ADD_CALLBACK_ENTRY( "mouse-moved", on_mouse_moved_changed, false )
         vlc_assert_unreachable();
 
-    CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal, cb,
-                                        label );
+    CmdGeneric *pCmd = new CmdVoutCallback( pThis->getIntf(), pVout, newVal,
+                                            cb, label );
     if( pCmd )
         pQueue->push( CmdGenericPtr( pCmd ), remove );
 
@@ -410,6 +412,7 @@ int VlcProc::onAoutCallback( vlc_object_t *pObj, const char *pVariable,
                                 void *pParam )
 {
     (void)oldVal;
+    audio_output_t *pAout = (audio_output_t *)pObj;
     VlcProc *pThis = (VlcProc*)pParam;
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     std::string label = pVariable;
@@ -418,8 +421,8 @@ int VlcProc::onAoutCallback( vlc_object_t *pObj, const char *pVariable,
     ADD_CALLBACK_ENTRY( "audio-filter", on_audio_filter_changed, false )
         vlc_assert_unreachable();
 
-    CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal, cb,
-                                        label );
+    CmdGeneric *pCmd = new CmdAoutCallback( pThis->getIntf(), pAout, newVal,
+                                            cb, label );
     if( pCmd )
         pQueue->push( CmdGenericPtr( pCmd ), remove );
 

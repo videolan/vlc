@@ -61,6 +61,78 @@ private:
     void (VlcProc::*m_pfExecute)(vlc_object_t *,vlc_value_t);
 };
 
+class CmdInputCallback : public CmdCallback
+{
+public:
+    CmdInputCallback( intf_thread_t *pIntf, input_thread_t *pInput,
+                      vlc_value_t newVal,
+                      void (VlcProc::*func)(vlc_object_t *,vlc_value_t),
+                      std::string label )
+        : CmdCallback( pIntf, VLC_OBJECT(pInput), newVal, func, label ),
+          m_pInput( pInput )
+    {
+        if( m_pInput )
+            input_Hold( m_pInput );
+    }
+
+    virtual ~CmdInputCallback()
+    {
+        if( m_pInput )
+            input_Release( m_pInput );
+    }
+
+private:
+    input_thread_t *m_pInput;
+};
+
+class CmdVoutCallback : public CmdCallback
+{
+public:
+    CmdVoutCallback( intf_thread_t *pIntf, vout_thread_t *pVout,
+                     vlc_value_t newVal,
+                     void (VlcProc::*func)(vlc_object_t *,vlc_value_t),
+                     std::string label )
+        : CmdCallback( pIntf, VLC_OBJECT(pVout), newVal, func, label ),
+          m_pVout( pVout )
+    {
+        if( m_pVout )
+            vout_Hold( m_pVout );
+    }
+
+    virtual ~CmdVoutCallback()
+    {
+        if( m_pVout )
+            vout_Release( m_pVout );
+    }
+
+private:
+    vout_thread_t *m_pVout;
+};
+
+class CmdAoutCallback : public CmdCallback
+{
+public:
+    CmdAoutCallback( intf_thread_t *pIntf, audio_output_t *pAout,
+                     vlc_value_t newVal,
+                     void (VlcProc::*func)(vlc_object_t *,vlc_value_t),
+                     std::string label )
+        : CmdCallback( pIntf, VLC_OBJECT(pAout), newVal, func, label ),
+          m_pAout( pAout )
+    {
+        if( m_pAout )
+            aout_Hold( m_pAout );
+    }
+
+    virtual ~CmdAoutCallback()
+    {
+        if( m_pAout )
+            aout_Release( m_pAout );
+    }
+
+private:
+    audio_output_t *m_pAout;
+};
+
 
 class CmdExecuteBlock : public CmdGeneric
 {
