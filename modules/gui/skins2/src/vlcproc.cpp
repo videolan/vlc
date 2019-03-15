@@ -216,9 +216,9 @@ int VlcProc::onInputNew( vlc_object_t *pObj, const char *pVariable,
     if( pInput != NULL )
     {
         var_AddCallback( pInput, "intf-event", onIntfEvent, pThis );
-        var_AddCallback( pInput, "bit-rate", onGenericCallback, pThis );
-        var_AddCallback( pInput, "sample-rate", onGenericCallback, pThis );
-        var_AddCallback( pInput, "can-record", onGenericCallback, pThis );
+        var_AddCallback( pInput, "bit-rate", onInputCallback, pThis );
+        var_AddCallback( pInput, "sample-rate", onInputCallback, pThis );
+        var_AddCallback( pInput, "can-record", onInputCallback, pThis );
     }
     return VLC_SUCCESS;
 }
@@ -328,17 +328,8 @@ int VlcProc::onEqPreampChange( vlc_object_t *pObj, const char *pVariable,
     return VLC_SUCCESS;
 }
 
-
-int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
-                                vlc_value_t oldVal, vlc_value_t newVal,
-                                void *pParam )
-{
-    (void)oldVal;
-    VlcProc *pThis = (VlcProc*)pParam;
-    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-
 #define ADD_CALLBACK_ENTRY( var, func, remove ) \
-    { \
+{ \
     if( strcmp( pVariable, var ) == 0 ) \
     { \
         std::string label = var; \
@@ -348,31 +339,68 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
             pQueue->push( CmdGenericPtr( pCmd ), remove ); \
         return VLC_SUCCESS; \
     } \
-    }
+}
+
+int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
+                                vlc_value_t oldVal, vlc_value_t newVal,
+                                void *pParam )
+{
+    (void)oldVal;
+    VlcProc *pThis = (VlcProc*)pParam;
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
 
     ADD_CALLBACK_ENTRY( "volume", on_volume_changed, true )
     ADD_CALLBACK_ENTRY( "mute", on_mute_changed, true )
-
-    ADD_CALLBACK_ENTRY( "bit-rate", on_bit_rate_changed, false )
-    ADD_CALLBACK_ENTRY( "sample-rate", on_sample_rate_changed, false )
-    ADD_CALLBACK_ENTRY( "can-record", on_can_record_changed, false )
 
     ADD_CALLBACK_ENTRY( "random", on_random_changed, false )
     ADD_CALLBACK_ENTRY( "loop", on_loop_changed, false )
     ADD_CALLBACK_ENTRY( "repeat", on_repeat_changed, false )
 
-    ADD_CALLBACK_ENTRY( "audio-filter", on_audio_filter_changed, false )
-
     ADD_CALLBACK_ENTRY( "intf-toggle-fscontrol", on_intf_show_changed, false )
-
-    ADD_CALLBACK_ENTRY( "mouse-moved", on_mouse_moved_changed, false )
-
-#undef ADD_CALLBACK_ENTRY
 
     msg_Err( pThis->getIntf(), "no callback entry for %s", pVariable );
     return VLC_EGENERIC;
 }
 
+int VlcProc::onInputCallback( vlc_object_t *pObj, const char *pVariable,
+                              vlc_value_t oldVal, vlc_value_t newVal,
+                              void *pParam )
+{
+    (void)oldVal;
+    VlcProc *pThis = (VlcProc*)pParam;
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+
+    ADD_CALLBACK_ENTRY( "bit-rate", on_bit_rate_changed, false )
+    ADD_CALLBACK_ENTRY( "sample-rate", on_sample_rate_changed, false )
+    ADD_CALLBACK_ENTRY( "can-record", on_can_record_changed, false )
+    vlc_assert_unreachable();
+}
+
+int VlcProc::onVoutCallback( vlc_object_t *pObj, const char *pVariable,
+                                vlc_value_t oldVal, vlc_value_t newVal,
+                                void *pParam )
+{
+    (void)oldVal;
+    VlcProc *pThis = (VlcProc*)pParam;
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+
+    ADD_CALLBACK_ENTRY( "mouse-moved", on_mouse_moved_changed, false )
+    vlc_assert_unreachable();
+}
+
+int VlcProc::onAoutCallback( vlc_object_t *pObj, const char *pVariable,
+                                vlc_value_t oldVal, vlc_value_t newVal,
+                                void *pParam )
+{
+    (void)oldVal;
+    VlcProc *pThis = (VlcProc*)pParam;
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+
+    ADD_CALLBACK_ENTRY( "audio-filter", on_audio_filter_changed, false )
+    vlc_assert_unreachable();
+}
+
+#undef ADD_CALLBACK_ENTRY
 
 int VlcProc::onIntfEvent( vlc_object_t *pObj, const char *pVariable,
                           vlc_value_t oldVal, vlc_value_t newVal,
@@ -499,14 +527,13 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
             {
                 // remove previous Vout callbacks
                 var_DelCallback( m_pVout, "mouse-moved",
-                                 onGenericCallback, this );
+                                 onVoutCallback, this );
                 vout_Release(m_pVout);
                 m_pVout = NULL;
             }
 
             // add new Vout callbackx
-            var_AddCallback( pVout, "mouse-moved",
-                             onGenericCallback, this );
+            var_AddCallback( pVout, "mouse-moved", onVoutCallback, this );
             m_pVout = pVout;
             break;
         }
@@ -529,9 +556,9 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
                      (void *)pInput );
 
             var_DelCallback( pInput, "intf-event", onIntfEvent, this );
-            var_DelCallback( pInput, "bit-rate", onGenericCallback, this );
-            var_DelCallback( pInput, "sample-rate", onGenericCallback, this );
-            var_DelCallback( pInput, "can-record" , onGenericCallback, this );
+            var_DelCallback( pInput, "bit-rate", onInputCallback, this );
+            var_DelCallback( pInput, "sample-rate", onInputCallback, this );
+            var_DelCallback( pInput, "can-record" , onInputCallback, this );
             input_Release(pInput);
             getIntf()->p_sys->p_input = NULL;
             reset_input();
@@ -760,8 +787,7 @@ void VlcProc::init_equalizer()
                         VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
 
         // New Aout (addCallbacks)
-        var_AddCallback( pAout, "audio-filter",
-                         onGenericCallback, this );
+        var_AddCallback( pAout, "audio-filter", onAoutCallback, this );
         var_AddCallback( pAout, "equalizer-bands",
                          onEqBandsChange, this );
         var_AddCallback( pAout, "equalizer-preamp",

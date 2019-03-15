@@ -206,6 +206,16 @@ private:
     static int onGenericCallback( vlc_object_t *pObj, const char *pVariable,
                                   vlc_value_t oldVal, vlc_value_t newVal,
                                   void *pParam );
+    static int onInputCallback( vlc_object_t *pObj, const char *pVariable,
+                                vlc_value_t oldVal, vlc_value_t newVal,
+                                void *pParam );
+
+    static int onVoutCallback( vlc_object_t *pObj, const char *pVariable,
+                               vlc_value_t oldVal, vlc_value_t newVal,
+                               void *pParam );
+    static int onAoutCallback( vlc_object_t *pObj, const char *pVariable,
+                               vlc_value_t oldVal, vlc_value_t newVal,
+                               void *pParam );
 
     /// Generic Callback for intf-event
     static int onIntfEvent( vlc_object_t *pObj, const char *pVariable,
