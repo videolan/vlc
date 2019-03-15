@@ -37,13 +37,9 @@ public:
         : CmdGeneric( pIntf ), m_pObj( pObj ), m_newVal( newVal ),
           m_label( label ), m_pfExecute( func )
     {
-        if( m_pObj )
-            vlc_object_hold( m_pObj );
     }
     virtual ~CmdCallback()
     {
-        if( m_pObj )
-            vlc_object_release( m_pObj );
     }
     virtual void execute()
     {
