@@ -449,9 +449,10 @@ VLC_USED;
  * vlc_stream_fifo_Close() respectively.
  *
  * \param parent parent VLC object for the stream
+ * \param reader location to store read side stream pointer [OUT]
  * \return a stream object or NULL on memory error.
  */
-VLC_API stream_t *vlc_stream_fifo_New(vlc_object_t *parent);
+VLC_API stream_t *vlc_stream_fifo_New(vlc_object_t *parent, stream_t **reader);
 
 /**
  * Writes a block to a FIFO stream.

@@ -103,7 +103,7 @@ static int vlc_stream_fifo_Control(stream_t *s, int query, va_list ap)
     return VLC_SUCCESS;
 }
 
-stream_t *vlc_stream_fifo_New(vlc_object_t *parent)
+stream_t *vlc_stream_fifo_New(vlc_object_t *parent, stream_t **reader)
 {
     vlc_fifo_t *fifo = block_FifoNew();
     if (unlikely(fifo == NULL))
@@ -124,6 +124,7 @@ stream_t *vlc_stream_fifo_New(vlc_object_t *parent)
     s->pf_block = vlc_stream_fifo_Block;
     s->pf_seek = NULL;
     s->pf_control = vlc_stream_fifo_Control;
+    *reader = s;
     return vlc_object_hold(s);
 }
 
