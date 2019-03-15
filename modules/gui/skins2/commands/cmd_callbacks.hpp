@@ -51,9 +51,6 @@ public:
             return;
 
         (VlcProc::instance( getIntf() )->*m_pfExecute)( m_pObj, m_newVal );
-
-        vlc_object_release( m_pObj );
-        m_pObj = NULL;
     }
     virtual std::string getType() const { return m_label; }
 
