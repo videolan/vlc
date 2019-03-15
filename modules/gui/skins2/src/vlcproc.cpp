@@ -329,17 +329,9 @@ int VlcProc::onEqPreampChange( vlc_object_t *pObj, const char *pVariable,
 }
 
 #define ADD_CALLBACK_ENTRY( var, func, remove ) \
-{ \
     if( strcmp( pVariable, var ) == 0 ) \
-    { \
-        std::string label = var; \
-        CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal, \
-                                            &VlcProc::func, label ); \
-        if( pCmd ) \
-            pQueue->push( CmdGenericPtr( pCmd ), remove ); \
-        return VLC_SUCCESS; \
-    } \
-}
+        cb = &VlcProc::func; \
+    else
 
 int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
                                 vlc_value_t oldVal, vlc_value_t newVal,
@@ -348,6 +340,8 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    std::string label = pVariable;
+    void (VlcProc::*cb)(vlc_object_t *,vlc_value_t);
 
     ADD_CALLBACK_ENTRY( "volume", on_volume_changed, true )
     ADD_CALLBACK_ENTRY( "mute", on_mute_changed, true )
@@ -357,9 +351,14 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     ADD_CALLBACK_ENTRY( "repeat", on_repeat_changed, false )
 
     ADD_CALLBACK_ENTRY( "intf-toggle-fscontrol", on_intf_show_changed, false )
+       vlc_assert_unreachable();
 
-    msg_Err( pThis->getIntf(), "no callback entry for %s", pVariable );
-    return VLC_EGENERIC;
+    CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal, cb,
+                                        label );
+    if( pCmd )
+        pQueue->push( CmdGenericPtr( pCmd ), remove );
+
+    return VLC_SUCCESS;
 }
 
 int VlcProc::onInputCallback( vlc_object_t *pObj, const char *pVariable,
@@ -369,11 +368,20 @@ int VlcProc::onInputCallback( vlc_object_t *pObj, const char *pVariable,
     (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    std::string label = pVariable;
+    void (VlcProc::*cb)(vlc_object_t *,vlc_value_t);
 
     ADD_CALLBACK_ENTRY( "bit-rate", on_bit_rate_changed, false )
     ADD_CALLBACK_ENTRY( "sample-rate", on_sample_rate_changed, false )
     ADD_CALLBACK_ENTRY( "can-record", on_can_record_changed, false )
-    vlc_assert_unreachable();
+        vlc_assert_unreachable();
+
+    CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal, cb,
+                                        label );
+    if( pCmd )
+        pQueue->push( CmdGenericPtr( pCmd ), remove );
+
+    return VLC_SUCCESS;
 }
 
 int VlcProc::onVoutCallback( vlc_object_t *pObj, const char *pVariable,
@@ -383,9 +391,18 @@ int VlcProc::onVoutCallback( vlc_object_t *pObj, const char *pVariable,
     (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    std::string label = pVariable;
+    void (VlcProc::*cb)(vlc_object_t *,vlc_value_t);
 
     ADD_CALLBACK_ENTRY( "mouse-moved", on_mouse_moved_changed, false )
-    vlc_assert_unreachable();
+        vlc_assert_unreachable();
+
+    CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal, cb,
+                                        label );
+    if( pCmd )
+        pQueue->push( CmdGenericPtr( pCmd ), remove );
+
+    return VLC_SUCCESS;
 }
 
 int VlcProc::onAoutCallback( vlc_object_t *pObj, const char *pVariable,
@@ -395,9 +412,18 @@ int VlcProc::onAoutCallback( vlc_object_t *pObj, const char *pVariable,
     (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    std::string label = pVariable;
+    void (VlcProc::*cb)(vlc_object_t *,vlc_value_t);
 
     ADD_CALLBACK_ENTRY( "audio-filter", on_audio_filter_changed, false )
-    vlc_assert_unreachable();
+        vlc_assert_unreachable();
+
+    CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal, cb,
+                                        label );
+    if( pCmd )
+        pQueue->push( CmdGenericPtr( pCmd ), remove );
+
+    return VLC_SUCCESS;
 }
 
 #undef ADD_CALLBACK_ENTRY
