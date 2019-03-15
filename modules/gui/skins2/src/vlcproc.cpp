@@ -215,7 +215,7 @@ int VlcProc::onInputNew( vlc_object_t *pObj, const char *pVariable,
 
     if( pInput != NULL )
     {
-        var_AddCallback( pInput, "intf-event", onGenericCallback2, pThis );
+        var_AddCallback( pInput, "intf-event", onIntfEvent, pThis );
         var_AddCallback( pInput, "bit-rate", onGenericCallback, pThis );
         var_AddCallback( pInput, "sample-rate", onGenericCallback, pThis );
         var_AddCallback( pInput, "can-record", onGenericCallback, pThis );
@@ -374,9 +374,9 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
 }
 
 
-int VlcProc::onGenericCallback2( vlc_object_t *pObj, const char *pVariable,
-                                 vlc_value_t oldVal, vlc_value_t newVal,
-                                 void *pParam )
+int VlcProc::onIntfEvent( vlc_object_t *pObj, const char *pVariable,
+                          vlc_value_t oldVal, vlc_value_t newVal,
+                          void *pParam )
 {
     (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
@@ -390,39 +390,36 @@ int VlcProc::onGenericCallback2( vlc_object_t *pObj, const char *pVariable,
      *
      * for others, don't discard commands (remove=false)
      **/
-    if( strcmp( pVariable, "intf-event" ) == 0 )
-    {
-        std::stringstream label;
-        bool b_remove;
-        switch( newVal.i_int )
-        {
-            case INPUT_EVENT_STATE:
-            case INPUT_EVENT_POSITION:
-            case INPUT_EVENT_RATE:
-            case INPUT_EVENT_ES:
-            case INPUT_EVENT_CHAPTER:
-            case INPUT_EVENT_RECORD:
-                b_remove = true;
-                break;
-            case INPUT_EVENT_VOUT:
-            case INPUT_EVENT_DEAD:
-                b_remove = false;
-                break;
-            default:
-                return VLC_SUCCESS;
-        }
-        label <<  pVariable << "_" << newVal.i_int;
-        CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal,
-                                            &VlcProc::on_intf_event_changed,
-                                            label.str() );
-        if( pCmd )
-            pQueue->push( CmdGenericPtr( pCmd ), b_remove );
+    std::stringstream label;
+    bool b_remove;
 
-        return VLC_SUCCESS;
+    switch( newVal.i_int )
+    {
+        case INPUT_EVENT_STATE:
+        case INPUT_EVENT_POSITION:
+        case INPUT_EVENT_RATE:
+        case INPUT_EVENT_ES:
+        case INPUT_EVENT_CHAPTER:
+        case INPUT_EVENT_RECORD:
+            b_remove = true;
+            break;
+        case INPUT_EVENT_VOUT:
+        case INPUT_EVENT_DEAD:
+            b_remove = false;
+            break;
+        default:
+            return VLC_SUCCESS;
     }
 
-    msg_Err( pThis->getIntf(), "no callback entry for %s", pVariable );
-    return VLC_EGENERIC;
+    label <<  pVariable << "_" << newVal.i_int;
+
+    CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal,
+                                        &VlcProc::on_intf_event_changed,
+                                        label.str() );
+    if( pCmd )
+        pQueue->push( CmdGenericPtr( pCmd ), b_remove );
+
+    return VLC_SUCCESS;
 }
 
 
@@ -531,7 +528,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
             msg_Dbg( getIntf(), "end of input detected for %p",
                      (void *)pInput );
 
-            var_DelCallback( pInput, "intf-event", onGenericCallback2, this );
+            var_DelCallback( pInput, "intf-event", onIntfEvent, this );
             var_DelCallback( pInput, "bit-rate", onGenericCallback, this );
             var_DelCallback( pInput, "sample-rate", onGenericCallback, this );
             var_DelCallback( pInput, "can-record" , onGenericCallback, this );
