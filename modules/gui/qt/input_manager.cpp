@@ -44,8 +44,6 @@
 
 static int InputEvent( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
-static int VbiEvent( vlc_object_t *, const char *,
-                     vlc_value_t, vlc_value_t, void * );
 
 /* Ensure arbitratry (not dynamically allocated) event IDs are not in use */
 static inline void registerAndCheckEventIds( int start, int end )
@@ -349,6 +347,7 @@ static int InputEvent( vlc_object_t *, const char *,
         break;
 
     case INPUT_EVENT_ES:
+    case INPUT_EVENT_VBI_PAGE:
         event = new IMEvent( IMEvent::ItemEsChanged );
         break;
 
@@ -405,16 +404,6 @@ static int InputEvent( vlc_object_t *, const char *,
 
     if( event )
         QApplication::postEvent( im, event );
-    return VLC_SUCCESS;
-}
-
-static int VbiEvent( vlc_object_t *, const char *,
-                     vlc_value_t, vlc_value_t, void *param )
-{
-    InputManager *im = (InputManager*)param;
-    IMEvent *event = new IMEvent( IMEvent::ItemEsChanged );
-
-    QApplication::postEvent( im, event );
     return VLC_SUCCESS;
 }
 
@@ -591,7 +580,6 @@ void InputManager::UpdateTeletext()
 
         if( p_input_vbi )
         {
-            var_DelCallback( p_input_vbi, "vbi-page", VbiEvent, this );
             vlc_object_release( p_input_vbi );
         }
 
@@ -600,10 +588,6 @@ void InputManager::UpdateTeletext()
 
         if( p_input_vbi )
         {
-            /* This callback is not remove explicitly, but interfaces
-             * are guaranted to outlive input */
-            var_AddCallback( p_input_vbi, "vbi-page", VbiEvent, this );
-
             i_page = var_GetInteger( p_input_vbi, "vbi-page" );
             b_transparent = !var_GetBool( p_input_vbi, "vbi-opaque" );
         }
