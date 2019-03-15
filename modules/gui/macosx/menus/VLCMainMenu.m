@@ -585,7 +585,7 @@
         [self setupVarMenuItem:_subtitle_track target: (vlc_object_t *)p_input
                                  var:"spu-es" selector: @selector(toggleVar:)];
 
-        audio_output_t *p_aout = _playlistController.playerController.mainAudioOutput;
+        audio_output_t *p_aout = [_playerController mainAudioOutput];
         if (p_aout != NULL) {
             [self setupVarMenuItem:_channels target: (vlc_object_t *)p_aout
                                      var:"stereo-mode" selector: @selector(toggleVar:)];
@@ -595,7 +595,7 @@
             aout_Release(p_aout);
         }
 
-        vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
+        vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
 
         if (p_vout != NULL) {
             [self setupVarMenuItem:_aspect_ratio target: (vlc_object_t *)p_vout
@@ -886,7 +886,7 @@
 
     [_audioDeviceMenu removeAllItems];
 
-    audio_output_t *p_aout = _playlistController.playerController.mainAudioOutput;
+    audio_output_t *p_aout = [_playerController mainAudioOutput];
     if (!p_aout)
         return;
 
@@ -923,7 +923,7 @@
 
 - (void)toggleAudioDevice:(id)sender
 {
-    audio_output_t *p_aout = _playlistController.playerController.mainAudioOutput;
+    audio_output_t *p_aout = [_playerController mainAudioOutput];
     if (!p_aout)
         return;
 
@@ -950,7 +950,7 @@
 
 - (IBAction)resizeVideoWindow:(id)sender
 {
-    vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
+    vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
     if (p_vout) {
         if (sender == _half_window)
             var_SetFloat(p_vout, "zoom", 0.5);
@@ -971,7 +971,7 @@
     // FIXME re-write using VLCPlayerController
     input_thread_t *p_input = pl_CurrentInput(getIntf());
     if (p_input) {
-        vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
+        vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
         if (p_vout) {
             BOOL b_fs = var_ToggleBool(p_vout, "video-on-top");
             var_SetBool(pl_Get(getIntf()), "video-on-top", b_fs);
@@ -1659,7 +1659,7 @@
                mi == _floatontop
                ) {
 
-        vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
+        vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
         if (p_vout != NULL) {
             // FIXME: re-write using VLCPlayerController
             if (mi == _floatontop)
