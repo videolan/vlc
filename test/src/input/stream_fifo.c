@@ -37,7 +37,7 @@
 
 static libvlc_instance_t *vlc;
 static vlc_object_t *parent;
-static stream_t *writer;
+static vlc_stream_fifo_t *writer;
 static stream_t *reader;
 
 int main(void)

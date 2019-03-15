@@ -33,34 +33,47 @@
 
 #include "stream.h"
 
-struct vlc_stream_fifo_private
-{
+struct vlc_stream_fifo {
     vlc_fifo_t *fifo;
     bool eof;
 };
 
-static void vlc_stream_fifo_Destroy(stream_t *s)
+struct vlc_stream_fifo_private {
+    vlc_stream_fifo_t *writer;
+};
+
+static vlc_stream_fifo_t *vlc_stream_fifo_Writer(stream_t *s)
 {
     struct vlc_stream_fifo_private *sys = vlc_stream_Private(s);
-    vlc_fifo_t *fifo = sys->fifo;
+
+    return sys->writer;
+}
+
+static void vlc_stream_fifo_Destroy(stream_t *s)
+{
+    struct vlc_stream_fifo *writer = vlc_stream_fifo_Writer(s);
+    vlc_fifo_t *fifo = writer->fifo;
     block_t *block;
     bool closed;
 
     vlc_fifo_Lock(fifo);
     block = vlc_fifo_DequeueAllUnlocked(fifo);
-    closed = sys->eof;
-    sys->eof = true;
+    closed = writer->eof;
+    writer->eof = true;
     vlc_fifo_Unlock(fifo);
 
     block_ChainRelease(block);
 
-    if (closed) /* Destroy shared state if write end is already closed */
+    if (closed) {
+        /* Destroy shared state if write end is already closed */
         block_FifoRelease(fifo);
+        free(writer);
+    }
 }
 
 static block_t *vlc_stream_fifo_Block(stream_t *s, bool *restrict eof)
 {
-    struct vlc_stream_fifo_private *sys = vlc_stream_Private(s);
+    struct vlc_stream_fifo *sys = vlc_stream_fifo_Writer(s);
     vlc_fifo_t *fifo = sys->fifo;
     block_t *block;
 
@@ -103,38 +116,43 @@ static int vlc_stream_fifo_Control(stream_t *s, int query, va_list ap)
     return VLC_SUCCESS;
 }
 
-stream_t *vlc_stream_fifo_New(vlc_object_t *parent, stream_t **reader)
+vlc_stream_fifo_t *vlc_stream_fifo_New(vlc_object_t *parent, stream_t **reader)
 {
-    vlc_fifo_t *fifo = block_FifoNew();
-    if (unlikely(fifo == NULL))
+    struct vlc_stream_fifo *writer = malloc(sizeof (*writer));
+    if (unlikely(writer == NULL))
         return NULL;
+
+    writer->fifo = block_FifoNew();
+    if (unlikely(writer->fifo == NULL)) {
+        free(writer);
+        return NULL;
+    }
+    writer->eof = false;
 
     struct vlc_stream_fifo_private *sys;
     stream_t *s = vlc_stream_CustomNew(parent, vlc_stream_fifo_Destroy,
                                        sizeof (*sys), "stream");
-    if (unlikely(s == NULL))
-    {
-        block_FifoRelease(fifo);
+    if (unlikely(s == NULL)) {
+        block_FifoRelease(writer->fifo);
+        free(writer);
         return NULL;
     }
 
     sys = vlc_stream_Private(s);
-    sys->fifo = fifo;
-    sys->eof = false;
+    sys->writer = writer;
     s->pf_block = vlc_stream_fifo_Block;
     s->pf_seek = NULL;
     s->pf_control = vlc_stream_fifo_Control;
     *reader = s;
-    return vlc_object_hold(s);
+    return writer;
 }
 
-int vlc_stream_fifo_Queue(stream_t *s, block_t *block)
+int vlc_stream_fifo_Queue(vlc_stream_fifo_t *writer, block_t *block)
 {
-    struct vlc_stream_fifo_private *sys = vlc_stream_Private(s);
-    vlc_fifo_t *fifo = sys->fifo;
+    vlc_fifo_t *fifo = writer->fifo;
 
     vlc_fifo_Lock(fifo);
-    if (likely(!sys->eof))
+    if (likely(!writer->eof))
     {
         vlc_fifo_QueueUnlocked(fifo, block);
         block = NULL;
@@ -150,30 +168,31 @@ int vlc_stream_fifo_Queue(stream_t *s, block_t *block)
     return 0;
 }
 
-ssize_t vlc_stream_fifo_Write(stream_t *s, const void *buf, size_t len)
+ssize_t vlc_stream_fifo_Write(vlc_stream_fifo_t *writer,
+                              const void *buf, size_t len)
 {
     block_t *block = block_Alloc(len);
     if (unlikely(block == NULL))
         return -1;
 
     memcpy(block->p_buffer, buf, len);
-    return vlc_stream_fifo_Queue(s, block) ? -1 : (ssize_t)len;
+    return vlc_stream_fifo_Queue(writer, block) ? -1 : (ssize_t)len;
 }
 
-void vlc_stream_fifo_Close(stream_t *s)
+void vlc_stream_fifo_Close(vlc_stream_fifo_t *writer)
 {
-    struct vlc_stream_fifo_private *sys = vlc_stream_Private(s);
-    vlc_fifo_t *fifo = sys->fifo;
+    vlc_fifo_t *fifo = writer->fifo;
     bool closed;
 
     vlc_fifo_Lock(fifo);
-    closed = sys->eof;
-    sys->eof = true;
+    closed = writer->eof;
+    writer->eof = true;
     vlc_fifo_Signal(fifo);
     vlc_fifo_Unlock(fifo);
 
-    if (closed) /* Destroy shared state if read end is already closed */
+    if (closed) {
+        /* Destroy shared state if read end is already closed */
         block_FifoRelease(fifo);
-
-    vlc_object_release(s);
+        free(writer);
+    }
 }

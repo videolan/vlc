@@ -34,7 +34,7 @@
 
 struct vlc_demux_chained_t
 {
-    stream_t *writer;
+    vlc_stream_fifo_t *writer;
     stream_t *reader;
 
     vlc_thread_t thread;
