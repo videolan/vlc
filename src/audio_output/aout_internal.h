@@ -84,6 +84,8 @@ typedef struct
     atomic_uint buffers_lost;
     atomic_uint buffers_played;
     atomic_uchar restart;
+
+    atomic_uintptr_t refs;
 } aout_owner_t;
 
 typedef struct

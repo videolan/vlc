@@ -244,6 +244,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     vlc_mutex_init (&owner->vp.lock);
     vlc_viewpoint_init (&owner->vp.value);
     atomic_init (&owner->vp.update, false);
+    atomic_init(&owner->refs, 0);
 
     vlc_object_set_destructor (aout, aout_Destructor);
 
@@ -365,7 +366,9 @@ audio_output_t *aout_New (vlc_object_t *parent)
 
 audio_output_t *aout_Hold(audio_output_t *aout)
 {
-    (vlc_object_hold)(VLC_OBJECT(aout));
+    aout_owner_t *owner = aout_owner(aout);
+
+    atomic_fetch_add_explicit(&owner->refs, 1, memory_order_relaxed);
     return aout;
 }
 
@@ -391,12 +394,18 @@ void aout_Destroy (audio_output_t *aout)
     var_SetFloat (aout, "volume", -1.f);
     var_DelCallback(aout, "volume", var_Copy, vlc_object_parent(aout));
     var_DelCallback (aout, "stereo-mode", StereoModeCallback, NULL);
-    vlc_object_delete(aout);
+    aout_Release(aout);
 }
 
 void aout_Release(audio_output_t *aout)
 {
-    (vlc_object_release)(VLC_OBJECT(aout));
+    aout_owner_t *owner = aout_owner(aout);
+
+    if (atomic_fetch_sub_explicit(&owner->refs, 1, memory_order_release))
+        return;
+
+    atomic_thread_fence(memory_order_acquire);
+    vlc_object_delete(VLC_OBJECT(aout));
 }
 
 /**
