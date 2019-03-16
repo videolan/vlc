@@ -363,6 +363,12 @@ audio_output_t *aout_New (vlc_object_t *parent)
     return aout;
 }
 
+audio_output_t *aout_Hold(audio_output_t *aout)
+{
+    (vlc_object_hold)(VLC_OBJECT(aout));
+    return aout;
+}
+
 /**
  * Deinitializes an audio output module and destroys an audio output object.
  */
@@ -386,6 +392,11 @@ void aout_Destroy (audio_output_t *aout)
     var_DelCallback(aout, "volume", var_Copy, vlc_object_parent(aout));
     var_DelCallback (aout, "stereo-mode", StereoModeCallback, NULL);
     vlc_object_delete(aout);
+}
+
+void aout_Release(audio_output_t *aout)
+{
+    (vlc_object_release)(VLC_OBJECT(aout));
 }
 
 /**

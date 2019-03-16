@@ -194,17 +194,8 @@ static inline void vout_Release(vout_thread_t *vout)
 }
 
 /* Here for backward compatibility. TODO: Move to <vlc_aout.h>! */
-static inline audio_output_t *aout_Hold(audio_output_t *aout)
-{
-    vlc_object_hold((vlc_object_t *)aout);
-    return aout;
-}
-
-static inline void aout_Release(audio_output_t *aout)
-{
-    vlc_object_release((vlc_object_t *)aout);
-}
-
+VLC_API audio_output_t *aout_Hold(audio_output_t *aout);
+VLC_API void aout_Release(audio_output_t *aout);
 
 /* TODO: remove vlc_object_hold/_release() for GUIs, remove this */
 VLC_DEPRECATED static inline void *vlc_object_hold_dyn(vlc_object_t *o)

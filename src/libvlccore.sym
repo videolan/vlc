@@ -28,6 +28,8 @@ aout_FiltersDrain
 aout_FiltersFlush
 aout_FiltersPlay
 aout_FiltersAdjustResampling
+aout_Hold
+aout_Release
 block_Alloc
 block_FifoCount
 block_FifoEmpty
