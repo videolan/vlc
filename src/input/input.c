@@ -517,6 +517,17 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     return p_input;
 }
 
+input_thread_t *input_Hold(input_thread_t *input)
+{
+    (vlc_object_hold)(VLC_OBJECT(input));
+    return input;
+}
+
+void input_Release(input_thread_t *input)
+{
+    (vlc_object_release)(VLC_OBJECT(input));
+}
+
 /*****************************************************************************
  * Run: main thread loop
  * This is the "normal" thread that spawns the input processing chain,

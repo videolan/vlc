@@ -218,6 +218,8 @@ input_resource_PutAout
 input_resource_ResetAout
 input_Start
 input_Stop
+input_Hold
+input_Release
 input_vaControl
 input_SetTime
 input_SetPosition
