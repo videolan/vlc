@@ -30,8 +30,6 @@ QVLCVariable::QVLCVariable (vlc_object_t *obj, const char *varname, int type,
                             bool inherit)
     : object (obj), name (qfu(varname))
 {
-    vlc_object_hold (object);
-
     if (inherit)
         type |= VLC_VAR_DOINHERIT;
     var_Create (object, qtu(name), type);
@@ -42,7 +40,6 @@ QVLCVariable::~QVLCVariable (void)
 {
     var_DelCallback (object, qtu(name), callback, this);
     var_Destroy (object, qtu(name));
-    vlc_object_release (object);
 }
 
 int QVLCVariable::callback(vlc_object_t *, const char *,
