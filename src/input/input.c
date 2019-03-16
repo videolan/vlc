@@ -254,43 +254,6 @@ void input_SetPosition( input_thread_t *p_input, float f_position, bool b_fast )
 }
 
 /**
- * Input destructor (called when the object's refcount reaches 0).
- */
-static void input_Destructor( input_thread_t *p_input )
-{
-    input_thread_private_t *priv = input_priv(p_input);
-#ifndef NDEBUG
-    char * psz_name = input_item_GetName( priv->p_item );
-    msg_Dbg( p_input, "Destroying the input for '%s'", psz_name);
-    free( psz_name );
-#endif
-
-    if( priv->p_renderer )
-        vlc_renderer_item_release( priv->p_renderer );
-    if( priv->p_es_out_display )
-        es_out_Delete( priv->p_es_out_display );
-
-    if( priv->p_resource )
-        input_resource_Release( priv->p_resource );
-    if( priv->p_resource_private )
-        input_resource_Release( priv->p_resource_private );
-
-    input_item_Release( priv->p_item );
-
-    if( priv->stats != NULL )
-        input_stats_Destroy( priv->stats );
-
-    for( size_t i = 0; i < priv->i_control; i++ )
-    {
-        input_control_t *p_ctrl = &priv->control[i];
-        ControlRelease( p_ctrl->i_type, &p_ctrl->param );
-    }
-
-    vlc_cond_destroy( &priv->wait_control );
-    vlc_mutex_destroy( &priv->lock_control );
-}
-
-/**
  * Get the item from an input thread
  * FIXME it does not increase ref count of the item.
  * if it is used after p_input is destroyed nothing prevent it from
@@ -531,7 +494,37 @@ void input_Release(input_thread_t *input)
         return;
 
     atomic_thread_fence(memory_order_acquire);
-    input_Destructor(input);
+
+#ifndef NDEBUG
+    char *name = input_item_GetName(priv->p_item);
+    msg_Dbg(input, "destroying input for '%s'", name);
+    free(name);
+#endif
+
+    if (priv->p_renderer != NULL)
+        vlc_renderer_item_release(priv->p_renderer);
+    if (priv->p_es_out_display != NULL)
+        es_out_Delete(priv->p_es_out_display);
+
+    if (priv->p_resource != NULL)
+        input_resource_Release(priv->p_resource);
+    if (priv->p_resource_private != NULL)
+        input_resource_Release(priv->p_resource_private);
+
+    input_item_Release(priv->p_item);
+
+    if (priv->stats != NULL)
+        input_stats_Destroy(priv->stats);
+
+    for (size_t i = 0; i < priv->i_control; i++)
+    {
+        input_control_t *ctrl = &priv->control[i];
+
+        ControlRelease(ctrl->i_type, &ctrl->param);
+    }
+
+    vlc_cond_destroy(&priv->wait_control);
+    vlc_mutex_destroy(&priv->lock_control);
     vlc_object_delete(VLC_OBJECT(input));
 }
 
