@@ -54,6 +54,10 @@
 		1C3114031E508C8800D4DD76 /* AppleRemote.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */; };
 		1C31140D1E508C8800D4DD76 /* SPMediaKeyTap.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */; };
 		1C5716AC1F5B142200678627 /* coreaudio_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 1C5716AB1F5B142200678627 /* coreaudio_common.c */; };
+		1C64E32F223DB3A90046F895 /* netconf.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C64E32D223DB3A90046F895 /* netconf.m */; };
+		1C64E330223DB3A90046F895 /* dirs.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C64E32E223DB3A90046F895 /* dirs.m */; };
+		1C64E333223DB3B60046F895 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 1C64E331223DB3B60046F895 /* error.c */; };
+		1C64E334223DB3B60046F895 /* thread.c in Sources */ = {isa = PBXBuildFile; fileRef = 1C64E332223DB3B60046F895 /* thread.c */; };
 		1CAC3EE820CD1B3B00613DB2 /* VLCVideoOutputProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CAC3EE620CD1B3B00613DB2 /* VLCVideoOutputProvider.m */; };
 		1CCC88EC2078A3D500E5626F /* MainMenu.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224091E4D2A9000833BE1 /* MainMenu.xib */; };
 		1CCC88ED2078A3D500E5626F /* MainWindow.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82240A1E4D2A9000833BE1 /* MainWindow.xib */; };
@@ -166,6 +170,10 @@
 		1C39ABBC1DA9AB9B00FE052A /* VLCDocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCDocumentController.h; sourceTree = "<group>"; };
 		1C39ABBD1DA9AB9B00FE052A /* VLCDocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCDocumentController.m; sourceTree = "<group>"; };
 		1C5716AB1F5B142200678627 /* coreaudio_common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = coreaudio_common.c; path = ../../../modules/audio_output/coreaudio_common.c; sourceTree = "<group>"; };
+		1C64E32D223DB3A90046F895 /* netconf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = netconf.m; path = ../../../src/darwin/netconf.m; sourceTree = "<group>"; };
+		1C64E32E223DB3A90046F895 /* dirs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dirs.m; path = ../../../src/darwin/dirs.m; sourceTree = "<group>"; };
+		1C64E331223DB3B60046F895 /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = error.c; path = ../../../src/darwin/error.c; sourceTree = "<group>"; };
+		1C64E332223DB3B60046F895 /* thread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = thread.c; path = ../../../src/darwin/thread.c; sourceTree = "<group>"; };
 		1C67C8A31D58C0980079E1C1 /* VLCHelpWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHelpWindowController.h; sourceTree = "<group>"; };
 		1C67C8A41D58C0980079E1C1 /* VLCHelpWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHelpWindowController.m; sourceTree = "<group>"; };
 		1C67C8A61D58C0A40079E1C1 /* VLCAboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCAboutWindowController.h; sourceTree = "<group>"; };
@@ -571,8 +579,6 @@
 		CCCE366D13817E4500694F2A /* VLCVideoEffectsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCVideoEffectsWindowController.h; sourceTree = "<group>"; };
 		CCCE366E13817E4500694F2A /* VLCVideoEffectsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = VLCVideoEffectsWindowController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CCDBA3B313D32E200006127B /* macosx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/video_output/macosx.m; sourceTree = "<group>"; };
-		CCDDF1AC172FF4C4007729A1 /* netconf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = netconf.c; path = ../../../src/darwin/netconf.c; sourceTree = "<group>"; };
-		CCDDF1AD172FF4C4007729A1 /* dirs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = dirs.c; path = ../../../src/darwin/dirs.c; sourceTree = "<group>"; };
 		CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPMediaKeyTap.h; sourceTree = "<group>"; };
 		CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPMediaKeyTap.m; sourceTree = "<group>"; };
 		DCC8017816FCA036007FE736 /* avcapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = avcapture.m; path = ../../../modules/access/avcapture.m; sourceTree = "<group>"; };
@@ -1397,10 +1403,12 @@
 		CCDDF1AF172FF4D6007729A1 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				1C64E32E223DB3A90046F895 /* dirs.m */,
+				1C64E32D223DB3A90046F895 /* netconf.m */,
 				1CC25CA71B2C585D0003F994 /* darwinvlc.m */,
 				CC4D67F71348F601003FCC5B /* specific.c */,
-				CCDDF1AC172FF4C4007729A1 /* netconf.c */,
-				CCDDF1AD172FF4C4007729A1 /* dirs.c */,
+				1C64E331223DB3B60046F895 /* error.c */,
+				1C64E332223DB3B60046F895 /* thread.c */,
 			);
 			name = core;
 			sourceTree = "<group>";
@@ -1489,7 +1497,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */;
+			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
 			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -1514,6 +1522,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C64E333223DB3B60046F895 /* error.c in Sources */,
 				1CCC88EC2078A3D500E5626F /* MainMenu.xib in Sources */,
 				1CCC88ED2078A3D500E5626F /* MainWindow.xib in Sources */,
 				7D713D362201DC640042BEB7 /* VLCLibraryWindow.xib in Sources */,
@@ -1533,6 +1542,7 @@
 				1CCC88F92078A3D500E5626F /* DetachedVideoWindow.xib in Sources */,
 				1CCC88FA2078A3D500E5626F /* ErrorPanel.xib in Sources */,
 				1CCC88FB2078A3D500E5626F /* Help.xib in Sources */,
+				1C64E330223DB3A90046F895 /* dirs.m in Sources */,
 				1CCC88FC2078A3D500E5626F /* LogMessageWindow.xib in Sources */,
 				1CCC88FD2078A3D500E5626F /* Open.xib in Sources */,
 				1CCC88FE2078A3D500E5626F /* PlaylistAccessoryView.xib in Sources */,
@@ -1575,6 +1585,7 @@
 				6BBBF9851F7B257100B404CD /* VLCLogMessage.m in Sources */,
 				7D445D8E2203375100263D34 /* VLCPlaylistMenuController.m in Sources */,
 				1C31139A1E508C6900D4DD76 /* VLCBookmarksWindowController.m in Sources */,
+				1C64E32F223DB3A90046F895 /* netconf.m in Sources */,
 				6B0AB0F01F1AC8B3003A1B4E /* VLCSlider.m in Sources */,
 				6BF5C5041EFE66EF008A9C12 /* VLCHUDTableView.m in Sources */,
 				6BBB05E01EEFF165003A1019 /* VLCHUDTableCornerView.m in Sources */,
@@ -1608,6 +1619,7 @@
 				1C3113C71E508C6900D4DD76 /* VLCOpenWindowController.m in Sources */,
 				7D0F64062202047900FDB91F /* VLCLibraryCollectionViewItem.m in Sources */,
 				7D713D322201AE350042BEB7 /* VLCLibraryWindow.m in Sources */,
+				1C64E334223DB3B60046F895 /* thread.c in Sources */,
 				1C3113C91E508C6900D4DD76 /* VLCOutput.m in Sources */,
 				1C1C62011F8260A90052DD4F /* VLCWrappableTextField.m in Sources */,
 				6BBB05DA1EEFEA29003A1019 /* VLCHUDOutlineView.m in Sources */,
@@ -1931,7 +1943,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */ = {
+		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C2F2A6EB09588F1B00018C74 /* Development */,
