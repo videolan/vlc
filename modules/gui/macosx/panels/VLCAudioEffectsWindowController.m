@@ -41,11 +41,6 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
-@interface VLCAudioEffectsWindowController ()
-{
-    VLCPlayerController *_playerController;
-}
-@end
 
 #pragma mark -
 #pragma mark Initialization
@@ -101,8 +96,6 @@
 {
     self = [super initWithWindowNibName:@"AudioEffects"];
     if (self) {
-        _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
-
         self.popupPanel = [[VLCPopupPanelController alloc] init];
         self.textfieldPanel = [[VLCTextfieldPanelController alloc] init];
 
@@ -160,7 +153,7 @@
 
     /* eq preset */
     char const *psz_eq_preset = [B64DecNSStr([items firstObject]) UTF8String];
-    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
     if (p_aout)
         var_SetString(p_aout, "equalizer-preset", psz_eq_preset);
     var_SetString(p_playlist, "equalizer-preset", psz_eq_preset);
@@ -616,11 +609,10 @@
 #pragma mark -
 #pragma mark Equalizer
 static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
-                               VLCPlayerController *playerController,
                                char *psz_name)
 {
     char *psz_parser, *psz_string = NULL;
-    audio_output_t *p_aout = [playerController mainAudioOutput];
+    audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
     if (!p_aout)
         return false;
 
@@ -662,7 +654,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         [[_equalizerPresetsPopup lastItem] setAction: @selector(deletePresetAction:)];
     }
 
-    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
 
     NSString *currentPreset = nil;
     if (p_aout) {
@@ -692,7 +684,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     intf_thread_t *p_intf = getIntf();
     playlist_t *p_playlist = pl_Get(p_intf);
     bool b_2p = var_CreateGetBool(p_playlist, "equalizer-2pass");
-    bool bEnabled = GetEqualizerStatus(p_intf, _playerController, (char *)"equalizer");
+    bool bEnabled = GetEqualizerStatus(p_intf, (char *)"equalizer");
 
     /* Setup sliders */
     var_Create(p_playlist, "equalizer-preset",
@@ -766,7 +758,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)equalizerBandSliderUpdated:(id)sender
 {
-    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
     char const *psz_preset_values = [[self generatePresetString] UTF8String];
     if (p_aout) {
         var_SetString(p_aout, "equalizer-bands", psz_preset_values);
@@ -784,7 +776,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     float f_eq_preamp = [[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:numberOfChosenPreset] floatValue];
     char const *psz_eq_preset = [[[defaults objectForKey:@"EQNames"] objectAtIndex:numberOfChosenPreset] UTF8String];
 
-    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
     if (p_aout) {
         var_SetString(p_aout, "equalizer-bands", psz_eq_bands);
         var_SetFloat(p_aout, "equalizer-preamp", f_eq_preamp);
@@ -804,7 +796,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 {
     float fPreamp = [sender floatValue] ;
 
-    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
     if (p_aout) {
         var_SetFloat(p_aout, "equalizer-preamp", fPreamp);
         aout_Release(p_aout);
@@ -816,7 +808,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 {
     bool b_2p = [sender state] ? true : false;
 
-    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
     if (p_aout) {
         var_SetBool(p_aout, "equalizer-2pass", b_2p);
         aout_Release(p_aout);
@@ -858,7 +850,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
         /* update VLC internals */
         char const *psz_eq_preset = [decomposedStringWithCanonicalMapping UTF8String];
-        audio_output_t *p_aout = [self->_playerController mainAudioOutput];
+        audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
         if (p_aout) {
             var_SetString(p_aout, "equalizer-preset", psz_eq_preset);
             aout_Release(p_aout);
@@ -951,7 +943,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     var_SetFloat(p_playlist, "compressor-knee", 2.500000);
     var_SetFloat(p_playlist, "compressor-makeup-gain", 7.000000);
 
-    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
     if (p_aout) {
         var_SetFloat(p_aout, "compressor-rms-peak", 0.000000);
         var_SetFloat(p_aout, "compressor-attack", 25.000000);
@@ -993,7 +985,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
     assert(psz_property);
 
-    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
     if (p_aout) {
         var_SetFloat(p_aout, psz_property, f_value);
         aout_Release(p_aout);
@@ -1055,7 +1047,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     var_SetFloat(p_playlist, "spatializer-dry", .5);
     var_SetFloat(p_playlist, "spatializer-damp", .5);
 
-    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
     if (p_aout) {
         var_SetFloat(p_aout, "spatializer-roomsize", .85);
         var_SetFloat(p_aout, "spatializer-width", 1.);
@@ -1091,7 +1083,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
     assert(psz_property);
 
-    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
     if (p_aout) {
         var_SetFloat(p_aout, psz_property, f_value / 10.f);
         aout_Release(p_aout);
@@ -1153,7 +1145,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)filterVolumeNormSliderUpdated:(id)sender
 {
-    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    audio_output_t *p_aout = [[[[VLCMain sharedInstance] playlistController] playerController] mainAudioOutput];
     float f_value = [_filterNormLevelSlider floatValue];
 
     if (p_aout) {

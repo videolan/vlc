@@ -61,7 +61,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     VLCClickerManager *_clickerManager;
     VLCPlaylistController *_playlistController;
-    VLCPlayerController *_playerController;
 }
 @end
 
@@ -95,7 +94,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
         _clickerManager = [[VLCClickerManager alloc] init];
         _playlistController = [[VLCMain sharedInstance] playlistController];
-        _playerController = [_playlistController playerController];
 
         var_AddCallback(pl_Get(p_intf), "intf-boss", BossCallback, (__bridge void *)self);
     }
@@ -121,16 +119,18 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)playOrPause
 {
-    input_item_t *p_input_item = _playlistController.currentlyPlayingInputItem;
+    VLCMain *mainInstance = [VLCMain sharedInstance];
+    VLCPlaylistController *playlistController = mainInstance.playlistController;
+    input_item_t *p_input_item = playlistController.currentlyPlayingInputItem;
 
     if (p_input_item) {
-        [_playerController togglePlayPause];
+        [playlistController.playerController togglePlayPause];
         input_item_Release(p_input_item);
     } else {
-        if (_playlistController.playlistModel.numberOfPlaylistItems == 0)
-            [[[VLCMain sharedInstance] open] openFileGeneric];
+        if (mainInstance.playlistController.playlistModel.numberOfPlaylistItems == 0)
+            [[mainInstance open] openFileGeneric];
         else
-            [_playlistController startPlaylist];
+            [playlistController startPlaylist];
     }
 }
 
@@ -381,7 +381,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     }
     config_PutInt("random", on);
 
-    vout_thread_t *p_vout = [_playerController mainVideoOutputThread];
+    vout_thread_t *p_vout = [[_playlistController playerController] mainVideoOutputThread];
     if (!p_vout) {
         return;
     }
@@ -398,7 +398,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
 
-    vout_thread_t *p_vout = [_playerController mainVideoOutputThread];
+    vout_thread_t *p_vout = [[_playlistController playerController] mainVideoOutputThread];
     if (p_vout) {
         vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat All"));
         vout_Release(p_vout);
@@ -409,7 +409,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
 
-    vout_thread_t *p_vout = [_playerController mainVideoOutputThread];
+    vout_thread_t *p_vout = [[_playlistController playerController] mainVideoOutputThread];
     if (p_vout) {
         vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat One"));
         vout_Release(p_vout);
@@ -420,7 +420,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
 
-    vout_thread_t *p_vout = [_playerController mainVideoOutputThread];
+    vout_thread_t *p_vout = [[_playlistController playerController] mainVideoOutputThread];
     if (p_vout) {
         vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat Off"));
         vout_Release(p_vout);
@@ -574,7 +574,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)showPosition
 {
-    vout_thread_t *p_vout = [_playerController mainVideoOutputThread];
+    vout_thread_t *p_vout = [[_playlistController playerController] mainVideoOutputThread];
     if (p_vout != NULL) {
         var_SetInteger(vlc_object_instance(getIntf()), "key-action", ACTIONID_POSITION);
         vout_Release(p_vout);
@@ -678,7 +678,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         unichar key = [characters characterAtIndex: 0];
 
         if (key) {
-            vout_thread_t *p_vout = [_playerController mainVideoOutputThread];
+            vout_thread_t *p_vout = [[_playlistController playerController] mainVideoOutputThread];
             if (p_vout != NULL) {
                 /* Escape */
                 if (key == (unichar) 0x1b) {
