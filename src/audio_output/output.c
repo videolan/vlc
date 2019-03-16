@@ -50,8 +50,6 @@ static void aout_OutputAssertLocked (audio_output_t *aout)
     vlc_mutex_assert (&owner->lock);
 }
 
-static void aout_Destructor(audio_output_t *);
-
 static int var_Copy (vlc_object_t *src, const char *name, vlc_value_t prev,
                      vlc_value_t value, void *data)
 {
@@ -403,16 +401,6 @@ void aout_Release(audio_output_t *aout)
         return;
 
     atomic_thread_fence(memory_order_acquire);
-    aout_Destructor(aout);
-    vlc_object_delete(VLC_OBJECT(aout));
-}
-
-/**
- * Destroys the audio output lock used (asynchronously) by interface functions.
- */
-static void aout_Destructor(audio_output_t *aout)
-{
-    aout_owner_t *owner = aout_owner (aout);
 
     vlc_mutex_destroy (&owner->dev.lock);
     for (aout_dev_t *dev = owner->dev.list, *next; dev != NULL; dev = next)
@@ -424,6 +412,7 @@ static void aout_Destructor(audio_output_t *aout)
 
     vlc_mutex_destroy (&owner->vp.lock);
     vlc_mutex_destroy (&owner->lock);
+    vlc_object_delete(VLC_OBJECT(aout));
 }
 
 static void aout_PrepareStereoMode (audio_output_t *aout,
