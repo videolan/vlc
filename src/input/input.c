@@ -256,9 +256,8 @@ void input_SetPosition( input_thread_t *p_input, float f_position, bool b_fast )
 /**
  * Input destructor (called when the object's refcount reaches 0).
  */
-static void input_Destructor( vlc_object_t *obj )
+static void input_Destructor( input_thread_t *p_input )
 {
-    input_thread_t *p_input = (input_thread_t *)obj;
     input_thread_private_t *priv = input_priv(p_input);
 #ifndef NDEBUG
     char * psz_name = input_item_GetName( priv->p_item );
@@ -512,7 +511,6 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     priv->p_es_out = NULL;
 
     /* Set the destructor when we are sure we are initialized */
-    vlc_object_set_destructor( p_input, input_Destructor );
     atomic_init(&priv->refs, 0);
     return p_input;
 }
@@ -533,6 +531,7 @@ void input_Release(input_thread_t *input)
         return;
 
     atomic_thread_fence(memory_order_acquire);
+    input_Destructor(input);
     vlc_object_delete(VLC_OBJECT(input));
 }
 
