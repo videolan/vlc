@@ -232,7 +232,7 @@ void input_Close( input_thread_t *p_input )
     if( input_priv(p_input)->is_running )
         vlc_join( input_priv(p_input)->thread, NULL );
     vlc_interrupt_deinit( &input_priv(p_input)->interrupt );
-    vlc_object_delete(p_input);
+    input_Release(p_input);
 }
 
 void input_SetTime( input_thread_t *p_input, vlc_tick_t i_time, bool b_fast )
@@ -513,19 +513,27 @@ static input_thread_t *Create( vlc_object_t *p_parent,
 
     /* Set the destructor when we are sure we are initialized */
     vlc_object_set_destructor( p_input, input_Destructor );
-
+    atomic_init(&priv->refs, 0);
     return p_input;
 }
 
 input_thread_t *input_Hold(input_thread_t *input)
 {
-    (vlc_object_hold)(VLC_OBJECT(input));
+    input_thread_private_t *priv = input_priv(input);
+
+    atomic_fetch_add_explicit(&priv->refs, 1, memory_order_relaxed);
     return input;
 }
 
 void input_Release(input_thread_t *input)
 {
-    (vlc_object_release)(VLC_OBJECT(input));
+    input_thread_private_t *priv = input_priv(input);
+
+    if (atomic_fetch_sub_explicit(&priv->refs, 1, memory_order_release))
+        return;
+
+    atomic_thread_fence(memory_order_acquire);
+    vlc_object_delete(VLC_OBJECT(input));
 }
 
 /*****************************************************************************

@@ -200,6 +200,7 @@ typedef struct input_thread_private_t
 
     vlc_thread_t thread;
     vlc_interrupt_t interrupt;
+    atomic_uintptr_t refs;
 } input_thread_private_t;
 
 static inline input_thread_private_t *input_priv(input_thread_t *input)
