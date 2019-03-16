@@ -594,11 +594,6 @@ Open(vlc_object_t *obj, char const *psz_filter)
         case VLC_CODEC_CVPX_UYVY:
         case VLC_CODEC_CVPX_I420:
         case VLC_CODEC_CVPX_BGRA:
-            if (&kCGColorSpaceITUR_709 == nil)
-            {
-                msg_Warn(obj, "iOS/macOS version is too old, aborting...");
-                return VLC_EGENERIC;
-            }
             break;
         default:
             return VLC_EGENERIC;
