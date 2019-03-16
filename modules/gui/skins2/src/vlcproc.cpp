@@ -328,7 +328,7 @@ int VlcProc::onEqPreampChange( vlc_object_t *pObj, const char *pVariable,
     return VLC_SUCCESS;
 }
 
-#define ADD_CALLBACK_ENTRY( var, func, remove ) \
+#define ADD_CALLBACK_ENTRY( var, func ) \
     if( strcmp( pVariable, var ) == 0 ) \
         cb = &VlcProc::func; \
     else
@@ -352,11 +352,11 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
         do_remove = true;
     } else
 
-    ADD_CALLBACK_ENTRY( "random", on_random_changed, false )
-    ADD_CALLBACK_ENTRY( "loop", on_loop_changed, false )
-    ADD_CALLBACK_ENTRY( "repeat", on_repeat_changed, false )
+    ADD_CALLBACK_ENTRY( "random", on_random_changed )
+    ADD_CALLBACK_ENTRY( "loop", on_loop_changed )
+    ADD_CALLBACK_ENTRY( "repeat", on_repeat_changed )
 
-    ADD_CALLBACK_ENTRY( "intf-toggle-fscontrol", on_intf_show_changed, false )
+    ADD_CALLBACK_ENTRY( "intf-toggle-fscontrol", on_intf_show_changed )
        vlc_assert_unreachable();
 
     CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal, cb,
@@ -378,9 +378,9 @@ int VlcProc::onInputCallback( vlc_object_t *pObj, const char *pVariable,
     std::string label = pVariable;
     void (VlcProc::*cb)(vlc_object_t *,vlc_value_t);
 
-    ADD_CALLBACK_ENTRY( "bit-rate", on_bit_rate_changed, false )
-    ADD_CALLBACK_ENTRY( "sample-rate", on_sample_rate_changed, false )
-    ADD_CALLBACK_ENTRY( "can-record", on_can_record_changed, false )
+    ADD_CALLBACK_ENTRY( "bit-rate", on_bit_rate_changed )
+    ADD_CALLBACK_ENTRY( "sample-rate", on_sample_rate_changed )
+    ADD_CALLBACK_ENTRY( "can-record", on_can_record_changed )
         vlc_assert_unreachable();
 
     CmdGeneric *pCmd = new CmdInputCallback( pThis->getIntf(), pInput, newVal,
@@ -402,7 +402,7 @@ int VlcProc::onVoutCallback( vlc_object_t *pObj, const char *pVariable,
     std::string label = pVariable;
     void (VlcProc::*cb)(vlc_object_t *,vlc_value_t);
 
-    ADD_CALLBACK_ENTRY( "mouse-moved", on_mouse_moved_changed, false )
+    ADD_CALLBACK_ENTRY( "mouse-moved", on_mouse_moved_changed )
         vlc_assert_unreachable();
 
     CmdGeneric *pCmd = new CmdVoutCallback( pThis->getIntf(), pVout, newVal,
@@ -424,7 +424,7 @@ int VlcProc::onAoutCallback( vlc_object_t *pObj, const char *pVariable,
     std::string label = pVariable;
     void (VlcProc::*cb)(vlc_object_t *,vlc_value_t);
 
-    ADD_CALLBACK_ENTRY( "audio-filter", on_audio_filter_changed, false )
+    ADD_CALLBACK_ENTRY( "audio-filter", on_audio_filter_changed )
         vlc_assert_unreachable();
 
     CmdGeneric *pCmd = new CmdAoutCallback( pThis->getIntf(), pAout, newVal,
