@@ -32,7 +32,6 @@
 #include "components/playlist/views.hpp"          /* 3 views */
 #include "components/playlist/selector.hpp"       /* PLSelector */
 #include "util/animators.hpp"                     /* PixmapAnimator */
-#include "menus.hpp"                              /* Popup */
 #include "input_manager.hpp"                      /* THEMIM */
 #include "dialogs_provider.hpp"                   /* THEDP */
 #include "recents.hpp"                            /* RecentMRL */

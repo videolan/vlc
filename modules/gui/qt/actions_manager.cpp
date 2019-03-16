@@ -34,7 +34,6 @@
 #include "main_interface.hpp"        /* Show playlist */
 #include "components/controller.hpp" /* Toggle FSC controller width */
 #include "components/extended_panels.hpp"
-#include "menus.hpp"
 
 ActionsManager::ActionsManager( intf_thread_t * _p_i )
     : p_intf( _p_i )

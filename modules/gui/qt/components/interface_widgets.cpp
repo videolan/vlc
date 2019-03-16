@@ -32,8 +32,6 @@
 #include "dialogs_provider.hpp"
 #include "util/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 
-#include "menus.hpp"             /* Popup menu on bgWidget */
-
 #include <QLabel>
 #include <QToolButton>
 #include <QPalette>
