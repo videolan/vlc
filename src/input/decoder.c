@@ -988,7 +988,6 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
         p_owner->b_has_data = true;
         vlc_cond_signal( &p_owner->wait_acknowledge );
     }
-    bool b_first_after_wait = p_owner->b_waiting && p_owner->b_has_data;
 
     DecoderWaitUnblock( p_dec );
 
