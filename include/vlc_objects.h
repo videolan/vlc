@@ -164,12 +164,6 @@ static inline struct vlc_logger *vlc_object_logger(vlc_object_t *obj)
 #define vlc_object_find_name(a,b) \
     vlc_object_find_name( VLC_OBJECT(a),b)
 
-#define vlc_object_hold(a) \
-    vlc_object_hold( VLC_OBJECT(a) )
-
-#define vlc_object_release(a) \
-    vlc_object_release( VLC_OBJECT(a) )
-
 VLC_USED
 static inline libvlc_int_t *vlc_object_instance(vlc_object_t *obj)
 {
@@ -219,6 +213,34 @@ static inline void aout_Release(audio_output_t *aout)
     vlc_object_release((vlc_object_t *)aout);
 }
 
+
+/* TODO: remove vlc_object_hold/_release() for GUIs, remove this */
+VLC_DEPRECATED static inline void *vlc_object_hold_dyn(vlc_object_t *o)
+{
+    const char *tn = vlc_object_typename(o);
+
+    if (!strcmp(tn, "input"))
+        input_Hold((input_thread_t *)o);
+    if (!strcmp(tn, "audio output"))
+        aout_Hold((audio_output_t *)o);
+    if (!strcmp(tn, "video output"))
+        vout_Hold((vout_thread_t *)o);
+    return o;
+}
+#define vlc_object_hold(a) vlc_object_hold_dyn(a)
+
+static inline void vlc_object_release_dyn(vlc_object_t *o)
+{
+    const char *tn = vlc_object_typename(o);
+
+    if (!strcmp(tn, "input"))
+        input_Release((input_thread_t *)o);
+    if (!strcmp(tn, "audio output"))
+        aout_Release((audio_output_t *)o);
+    if (!strcmp(tn, "video output"))
+        vout_Release((vout_thread_t *)o);
+}
+#define vlc_object_release(a) vlc_object_release_dyn(a)
 
 /**
  * @defgroup objres Object resources
