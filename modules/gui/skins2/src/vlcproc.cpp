@@ -342,9 +342,15 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     std::string label = pVariable;
     void (VlcProc::*cb)(vlc_object_t *,vlc_value_t);
+    bool do_remove = false;
 
-    ADD_CALLBACK_ENTRY( "volume", on_volume_changed, true )
-    ADD_CALLBACK_ENTRY( "mute", on_mute_changed, true )
+    if( strcmp( pVariable, "volume" ) == 0 ) {
+        cb = &VlcProc::on_volume_changed;
+        do_remove = true;
+    } else if( strcmp( pVariable, "mute" ) == 0 ) {
+        cb = &VlcProc::on_mute_changed;
+        do_remove = true;
+    } else
 
     ADD_CALLBACK_ENTRY( "random", on_random_changed, false )
     ADD_CALLBACK_ENTRY( "loop", on_loop_changed, false )
@@ -356,7 +362,7 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal, cb,
                                         label );
     if( pCmd )
-        pQueue->push( CmdGenericPtr( pCmd ), remove );
+        pQueue->push( CmdGenericPtr( pCmd ), do_remove );
 
     return VLC_SUCCESS;
 }
@@ -380,7 +386,7 @@ int VlcProc::onInputCallback( vlc_object_t *pObj, const char *pVariable,
     CmdGeneric *pCmd = new CmdInputCallback( pThis->getIntf(), pInput, newVal,
                                              cb, label );
     if( pCmd )
-        pQueue->push( CmdGenericPtr( pCmd ), remove );
+        pQueue->push( CmdGenericPtr( pCmd ), false );
 
     return VLC_SUCCESS;
 }
@@ -402,7 +408,7 @@ int VlcProc::onVoutCallback( vlc_object_t *pObj, const char *pVariable,
     CmdGeneric *pCmd = new CmdVoutCallback( pThis->getIntf(), pVout, newVal,
                                             cb, label );
     if( pCmd )
-        pQueue->push( CmdGenericPtr( pCmd ), remove );
+        pQueue->push( CmdGenericPtr( pCmd ), false );
 
     return VLC_SUCCESS;
 }
@@ -424,7 +430,7 @@ int VlcProc::onAoutCallback( vlc_object_t *pObj, const char *pVariable,
     CmdGeneric *pCmd = new CmdAoutCallback( pThis->getIntf(), pAout, newVal,
                                             cb, label );
     if( pCmd )
-        pQueue->push( CmdGenericPtr( pCmd ), remove );
+        pQueue->push( CmdGenericPtr( pCmd ), false );
 
     return VLC_SUCCESS;
 }
