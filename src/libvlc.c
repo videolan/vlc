@@ -68,7 +68,6 @@
 
 #include "libvlc.h"
 #include "playlist_legacy/playlist_internal.h"
-#include "misc/variables.h"
 
 #include <vlc_vlm.h>
 
@@ -460,7 +459,6 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
         }
     }
 #endif
-    assert( atomic_load(&(vlc_internals(p_libvlc)->refs)) == 1 );
     vlc_object_delete(p_libvlc);
 }
 

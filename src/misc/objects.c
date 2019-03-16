@@ -105,14 +105,12 @@ static void PrintObjectPrefix(vlc_object_t *obj, FILE *output, bool last)
 
 static void PrintObject(vlc_object_t *obj, FILE *output)
 {
-    vlc_object_internals_t *priv = vlc_internals(obj);
-
     int canc = vlc_savecancel ();
 
     PrintObjectPrefix(obj, output, true);
-    fprintf(output, "\xE2\x94\x80\xE2\x94%c\xE2\x95\xB4%p %s, %u refs\n",
+    fprintf(output, "\xE2\x94\x80\xE2\x94%c\xE2\x95\xB4%p %s\n",
            ObjectHasChildLocked(obj) ? 0xAC : 0x80,
-           (void *)obj, vlc_object_typename(obj), atomic_load(&priv->refs));
+           (void *)obj, vlc_object_typename(obj));
 
     vlc_restorecancel (canc);
 }
@@ -177,7 +175,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     priv->var_root = NULL;
     vlc_mutex_init (&priv->var_lock);
     vlc_cond_init (&priv->var_wait);
-    atomic_init (&priv->refs, 1);
     priv->pf_destructor = NULL;
     priv->resources = NULL;
 
@@ -295,43 +292,19 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
 void (vlc_object_delete)(vlc_object_t *obj)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
-    unsigned refs = atomic_load_explicit(&priv->refs, memory_order_relaxed);
-
-    /* Fast path */
-    while (refs > 1)
-    {
-        if (atomic_compare_exchange_weak_explicit(&priv->refs, &refs, refs - 1,
-                                   memory_order_release, memory_order_relaxed))
-            return; /* There are still other references to the object */
-
-        assert (refs > 0);
-    }
-
     vlc_object_t *parent = vlc_object_parent(obj);
 
     if (unlikely(parent == NULL))
     {   /* Destroying the root object */
-        refs = atomic_fetch_sub_explicit(&priv->refs, 1, memory_order_relaxed);
-        assert (refs == 1); /* nobody to race against in this case */
         vlc_object_destroy (obj);
         return;
     }
 
-    /* Slow path */
     vlc_mutex_lock(&tree_lock);
-    refs = atomic_fetch_sub_explicit(&priv->refs, 1, memory_order_release);
-    assert (refs > 0);
-
-    if (likely(refs == 1))
-        /* Detach from parent to protect against vlc_object_find_name() */
-        vlc_list_remove(&priv->list);
+    /* Detach from parent to protect against vlc_object_find_name() */
+    vlc_list_remove(&priv->list);
     vlc_mutex_unlock(&tree_lock);
-
-    if (likely(refs == 1))
-    {
-        atomic_thread_fence(memory_order_acquire);
-        vlc_object_destroy (obj);
-    }
+    vlc_object_destroy (obj);
 }
 
 void vlc_object_vaLog(vlc_object_t *obj, int prio, const char *module,

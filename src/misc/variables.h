@@ -24,7 +24,6 @@
 # define LIBVLC_VARIABLES_H 1
 
 # include <stdalign.h>
-# include <stdatomic.h>
 # include <vlc_list.h>
 
 struct vlc_res;
@@ -46,7 +45,6 @@ struct vlc_object_internals
     vlc_cond_t      var_wait;
 
     /* Objects management */
-    atomic_uint     refs;
     vlc_destructor_t pf_destructor;
 
     /* Objects tree structure */
