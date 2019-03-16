@@ -182,16 +182,8 @@ VLC_API input_thread_t *input_Hold(input_thread_t *input);
 VLC_API void input_Release(input_thread_t *input);
 
 /* Here for backward compatibility. TODO: Move to <vlc_vout.h>! */
-static inline vout_thread_t *vout_Hold(vout_thread_t *vout)
-{
-    vlc_object_hold((vlc_object_t *)vout);
-    return vout;
-}
-
-static inline void vout_Release(vout_thread_t *vout)
-{
-    vlc_object_release((vlc_object_t *)vout);
-}
+VLC_API vout_thread_t *vout_Hold(vout_thread_t *vout);
+VLC_API void vout_Release(vout_thread_t *vout);
 
 /* Here for backward compatibility. TODO: Move to <vlc_aout.h>! */
 VLC_API audio_output_t *aout_Hold(audio_output_t *aout);

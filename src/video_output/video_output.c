@@ -1699,6 +1699,11 @@ void vout_Close(vout_thread_t *vout)
     vlc_object_delete(vout);
 }
 
+void vout_Release(vout_thread_t *vout)
+{
+    (vlc_object_release)(VLC_OBJECT(vout));
+}
+
 static void VoutDestructor(vlc_object_t *object)
 {
     vout_thread_t *vout = (vout_thread_t *)object;
@@ -1799,6 +1804,12 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     else if (var_InheritBool(vout, "video-on-top"))
         vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_ABOVE);
 
+    return vout;
+}
+
+vout_thread_t *vout_Hold(vout_thread_t *vout)
+{
+    (vlc_object_hold)(VLC_OBJECT(vout));
     return vout;
 }
 

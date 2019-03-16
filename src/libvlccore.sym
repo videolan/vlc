@@ -749,6 +749,8 @@ vlm_MessageNew
 vlm_MessageSimpleNew
 vlm_New
 vout_Close
+vout_Hold
+vout_Release
 vout_GetPicture
 vout_PutPicture
 vout_PutSubpicture
