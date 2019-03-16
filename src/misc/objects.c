@@ -85,14 +85,6 @@ static bool ObjectHasChildLocked(vlc_object_t *obj)
     return false;
 }
 
-static bool ObjectHasChild(vlc_object_t *obj)
-{
-    vlc_mutex_lock(&tree_lock);
-    bool ret = ObjectHasChildLocked(obj);
-    vlc_mutex_unlock(&tree_lock);
-    return ret;
-}
-
 static void PrintObjectPrefix(vlc_object_t *obj, FILE *output, bool last)
 {
     vlc_object_t *parent = vlc_object_parent(obj);
@@ -180,6 +172,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     if (unlikely(priv == NULL))
         return NULL;
 
+    priv->parent = parent;
     priv->typename = typename;
     priv->var_root = NULL;
     vlc_mutex_init (&priv->var_lock);
@@ -197,9 +190,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         obj->obj.logger = parent->obj.logger;
         obj->obj.no_interact = parent->obj.no_interact;
 
-        /* Attach the child to its parent (no lock needed) */
-        priv->parent = vlc_object_hold(parent);
-
         /* Attach the parent to its child (structure lock needed) */
         vlc_mutex_lock(&tree_lock);
         vlc_list_append(&priv->list, &tree_list);
@@ -208,7 +198,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     else
     {
         obj->obj.no_interact = false;
-        priv->parent = NULL;
 
         /* TODO: should be in src/libvlc.c */
         int canc = vlc_savecancel ();
@@ -337,8 +326,6 @@ void (vlc_object_release)(vlc_object_t *obj)
     {   /* Destroying the root object */
         refs = atomic_fetch_sub_explicit(&priv->refs, 1, memory_order_relaxed);
         assert (refs == 1); /* nobody to race against in this case */
-        /* no children can be left */
-        assert(!ObjectHasChild(obj));
         vlc_object_destroy (obj);
         return;
     }
@@ -356,10 +343,7 @@ void (vlc_object_release)(vlc_object_t *obj)
     if (likely(refs == 1))
     {
         atomic_thread_fence(memory_order_acquire);
-        /* no children can be left (because children reference their parent) */
-        assert(!ObjectHasChild(obj));
         vlc_object_destroy (obj);
-        vlc_object_release (parent);
     }
 }
 
