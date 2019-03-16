@@ -1696,12 +1696,17 @@ void vout_Close(vout_thread_t *vout)
     sys->spu = NULL;
     vlc_mutex_unlock(&sys->spu_lock);
 
-    vlc_object_delete(vout);
+    vout_Release(vout);
 }
 
 void vout_Release(vout_thread_t *vout)
 {
-    (vlc_object_release)(VLC_OBJECT(vout));
+    vout_thread_sys_t *sys = vout->p;
+
+    if (atomic_fetch_sub_explicit(&sys->refs, 1, memory_order_release))
+        return;
+
+    vlc_object_delete(VLC_OBJECT(vout));
 }
 
 static void VoutDestructor(vlc_object_t *object)
@@ -1792,6 +1797,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
 
     /* */
     vlc_object_set_destructor(vout, VoutDestructor);
+    atomic_init(&sys->refs, 0);
 
     if (sys->display_cfg.window == NULL) {
         spu_Destroy(sys->spu);
@@ -1809,7 +1815,9 @@ vout_thread_t *vout_Create(vlc_object_t *object)
 
 vout_thread_t *vout_Hold(vout_thread_t *vout)
 {
-    (vlc_object_hold)(VLC_OBJECT(vout));
+    vout_thread_sys_t *sys = vout->p;
+
+    atomic_fetch_add_explicit(&sys->refs, 1, memory_order_relaxed);
     return vout;
 }
 
