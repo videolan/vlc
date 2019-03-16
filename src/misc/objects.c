@@ -248,8 +248,6 @@ void (vlc_object_delete)(vlc_object_t *obj)
 
 /**
  * Destroys a VLC object once it has no more references.
- *
- * This function must be called with cancellation disabled (currently).
  */
 static void vlc_object_destroy( vlc_object_t *p_this )
 {
