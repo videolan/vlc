@@ -458,12 +458,12 @@ libvlccore_la_SOURCES += posix/sort.c
 
 if HAVE_DARWIN
 libvlccore_la_SOURCES += \
-	darwin/dirs.c \
 	darwin/error.c \
 	darwin/specific.c \
 	darwin/thread.c
 
 libvlccore_objc_la_SOURCES = \
+	darwin/dirs.m \
 	darwin/netconf.m
 noinst_LTLIBRARIES = libvlccore_objc.la
 else
