@@ -1699,6 +1699,8 @@ void vout_Close(vout_thread_t *vout)
     vout_Release(vout);
 }
 
+static void VoutDestructor(vout_thread_t *vout);
+
 void vout_Release(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
@@ -1706,16 +1708,12 @@ void vout_Release(vout_thread_t *vout)
     if (atomic_fetch_sub_explicit(&sys->refs, 1, memory_order_release))
         return;
 
+    VoutDestructor(vout);
     vlc_object_delete(VLC_OBJECT(vout));
 }
 
-static void VoutDestructor(vlc_object_t *object)
+static void VoutDestructor(vout_thread_t *vout)
 {
-    vout_thread_t *vout = (vout_thread_t *)object;
-
-    /* Make sure the vout was stopped first */
-    //assert(!vout->p_module);
-
     free(vout->p->splitter_name);
 
     /* Destroy the locks */
@@ -1796,7 +1794,6 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     vout_chrono_Init(&sys->render, 5, VLC_TICK_FROM_MS(10));
 
     /* */
-    vlc_object_set_destructor(vout, VoutDestructor);
     atomic_init(&sys->refs, 0);
 
     if (sys->display_cfg.window == NULL) {
