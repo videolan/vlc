@@ -238,10 +238,7 @@ vlc_object_t *(vlc_object_parent)(vlc_object_t *obj)
     return vlc_internals(obj)->parent;
 }
 
-/**
- * Destroys a VLC object once it has no more references.
- */
-static void vlc_object_destroy(vlc_object_t *obj)
+void (vlc_object_delete)(vlc_object_t *obj)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
 
@@ -257,6 +254,12 @@ static void vlc_object_destroy(vlc_object_t *obj)
     {
         /* TODO: should be in src/libvlc.c */
         var_DelCallback(obj, "tree", TreeCommand, NULL);
+    }
+    else
+    {
+        vlc_mutex_lock(&tree_lock);
+        vlc_list_remove(&priv->list);
+        vlc_mutex_unlock(&tree_lock);
     }
 
     /* Destroy the associated variables. */
@@ -287,24 +290,6 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
 {
     (void) p_this; (void) psz_name;
     return NULL;
-}
-
-void (vlc_object_delete)(vlc_object_t *obj)
-{
-    vlc_object_internals_t *priv = vlc_internals(obj);
-    vlc_object_t *parent = vlc_object_parent(obj);
-
-    if (unlikely(parent == NULL))
-    {   /* Destroying the root object */
-        vlc_object_destroy (obj);
-        return;
-    }
-
-    vlc_mutex_lock(&tree_lock);
-    /* Detach from parent to protect against vlc_object_find_name() */
-    vlc_list_remove(&priv->list);
-    vlc_mutex_unlock(&tree_lock);
-    vlc_object_destroy (obj);
 }
 
 void vlc_object_vaLog(vlc_object_t *obj, int prio, const char *module,
