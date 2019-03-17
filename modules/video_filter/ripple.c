@@ -139,7 +139,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     for( int i_index = 0; i_index < p_pic->i_planes; i_index++ )
     {
-        int i_first_line, i_num_lines, i_offset, i_pixel_pitch,
+        int i_first_line, i_visible_pitch, i_num_lines, i_offset, i_pixel_pitch,
             i_visible_pixels;
         uint16_t black_pixel;
         uint8_t *p_in, *p_out;
@@ -148,6 +148,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                                                                     : 0x80;
 
         i_num_lines = p_pic->p[i_index].i_visible_lines;
+        i_visible_pitch = p_pic->p[i_index].i_visible_pitch;
         i_pixel_pitch = p_pic->p[i_index].i_pixel_pitch;
 
         switch( p_filter->fmt_in.video.i_chroma )
@@ -168,7 +169,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 black_pixel = 0x00;
         }
 
-        i_visible_pixels = p_pic->p[i_index].i_visible_pitch/i_pixel_pitch;
+        i_visible_pixels = i_visible_pitch/i_pixel_pitch;
 
         i_first_line = i_num_lines * 4 / 5;
 
@@ -177,7 +178,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         for( int i_line = 0; i_line < i_first_line; i_line++ )
         {
-            memcpy( p_out, p_in, p_pic->p[i_index].i_visible_pitch );
+            memcpy( p_out, p_in, i_visible_pitch );
             p_in += p_pic->p[i_index].i_pitch;
             p_out += p_outpic->p[i_index].i_pitch;
         }
@@ -200,19 +201,15 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 if( i_offset < 0 )
                 {
                     memcpy( p_out, p_in - i_offset,
-                                p_pic->p[i_index].i_visible_pitch + i_offset );
-                    p_in -= p_pic->p[i_index].i_pitch;
-                    p_out += p_outpic->p[i_index].i_pitch;
-                    p_black_out = &p_out[i_offset];
+                                i_visible_pitch + i_offset );
+                    p_black_out = &p_out[i_visible_pitch + i_offset];
                     i_offset = -i_offset;
                 }
                 else
                 {
                     memcpy( p_out + i_offset, p_in,
-                                p_pic->p[i_index].i_visible_pitch - i_offset );
+                                i_visible_pitch - i_offset );
                     p_black_out = p_out;
-                    p_in -= p_pic->p[i_index].i_pitch;
-                    p_out += p_outpic->p[i_index].i_pitch;
                 }
                 if (black_pixel > 0xFF)
                 {
@@ -225,11 +222,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             }
             else
             {
-                memcpy( p_out, p_in, p_pic->p[i_index].i_visible_pitch );
-                p_in -= p_pic->p[i_index].i_pitch;
-                p_out += p_outpic->p[i_index].i_pitch;
+                memcpy( p_out, p_in, i_visible_pitch );
             }
-
+            p_in -= p_pic->p[i_index].i_pitch;
+            p_out += p_outpic->p[i_index].i_pitch;
         }
     }
 
