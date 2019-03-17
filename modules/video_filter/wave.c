@@ -176,9 +176,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 {
                     memcpy( p_out, p_in - i_offset,
                                 i_visible_pitch + i_offset );
-                    p_in += p_pic->p[i_index].i_pitch;
-                    p_out += p_outpic->p[i_index].i_pitch;
-                    p_black_out = &p_out[i_offset];
+                    p_black_out = &p_out[i_visible_pitch + i_offset];
                     i_offset = -i_offset;
                 }
                 else
@@ -186,8 +184,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                     memcpy( p_out + i_offset, p_in,
                                 i_visible_pitch - i_offset );
                     p_black_out = p_out;
-                    p_in += p_pic->p[i_index].i_pitch;
-                    p_out += p_outpic->p[i_index].i_pitch;
                 }
                 if (black_pixel > 0xFF)
                 {
@@ -201,10 +197,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             else
             {
                 memcpy( p_out, p_in, i_visible_pitch );
-                p_in += p_pic->p[i_index].i_pitch;
-                p_out += p_outpic->p[i_index].i_pitch;
             }
-
+            p_in += p_pic->p[i_index].i_pitch;
+            p_out += p_outpic->p[i_index].i_pitch;
         }
     }
 
