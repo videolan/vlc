@@ -241,11 +241,6 @@ vlc_object_t *(vlc_object_parent)(vlc_object_t *obj)
     return vlc_internals(obj)->parent;
 }
 
-void (vlc_object_delete)(vlc_object_t *obj)
-{
-    (vlc_object_release)(obj);
-}
-
 /**
  * Destroys a VLC object once it has no more references.
  */
@@ -297,7 +292,7 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
     return NULL;
 }
 
-void (vlc_object_release)(vlc_object_t *obj)
+void (vlc_object_delete)(vlc_object_t *obj)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
     unsigned refs = atomic_load_explicit(&priv->refs, memory_order_relaxed);

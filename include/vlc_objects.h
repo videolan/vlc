@@ -94,14 +94,6 @@ VLC_API void *vlc_object_create( vlc_object_t *, size_t ) VLC_MALLOC VLC_USED;
 VLC_API vlc_object_t *vlc_object_find_name( vlc_object_t *, const char * ) VLC_USED VLC_DEPRECATED;
 
 /**
- * Removes a weak reference to an object.
- *
- * This atomically decrements the reference count.
- * If the count reaches zero, the object is destroyed.
- */
-VLC_API void vlc_object_release(vlc_object_t *obj);
-
-/**
  * Drops the strong reference to an object.
  *
  * This removes the initial strong reference to a given object. This must be
@@ -196,7 +188,7 @@ VLC_DEPRECATED static inline void *vlc_object_hold(vlc_object_t *o)
     return o;
 }
 
-static inline void vlc_object_release_dyn(vlc_object_t *o)
+static inline void vlc_object_release(vlc_object_t *o)
 {
     const char *tn = vlc_object_typename(o);
 
@@ -207,7 +199,6 @@ static inline void vlc_object_release_dyn(vlc_object_t *o)
     if (!strcmp(tn, "video output"))
         vout_Release((vout_thread_t *)o);
 }
-#define vlc_object_release(a) vlc_object_release_dyn(a)
 
 /**
  * @defgroup objres Object resources
