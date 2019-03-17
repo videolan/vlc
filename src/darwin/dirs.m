@@ -33,49 +33,26 @@
 
 #include <libgen.h>
 #include <dlfcn.h>
-#include <mach-o/dyld.h>
 
-#include <CoreFoundation/CoreFoundation.h>
+#include <Foundation/Foundation.h>
+
+static bool isBundle()
+{
+    NSBundle *bundle = [NSBundle mainBundle];
+    NSString *bundlePath = bundle.bundlePath;
+    return [bundlePath hasSuffix:@".app"] || [bundlePath hasSuffix:@".framework"];
+}
 
 char *config_GetLibDir (void)
 {
-    /* Get the full program path and name */
-    /* First try to see if we are linked to the framework */
-    for (unsigned i = 0; i < _dyld_image_count(); i++)
-    {
-        const char *psz_img_name = _dyld_get_image_name(i);
-        const char *p = strstr( psz_img_name, "VLCKit.framework/Versions/" );
+    if (isBundle()) {
+        NSBundle *bundle = [NSBundle mainBundle];
+        NSString *path = bundle.executablePath;
+        if (!path)
+            return NULL;
 
-        /* Check for "VLCKit.framework/Versions/Current/VLCKit",
-         * as well as "VLCKit.framework/Versions/A/VLCKit" and
-         * "VLC.framework/Versions/B/VLCKit" */
-        if (p != NULL) {
-            /* Look for the next forward slash */
-            p += 26; /* p_char += strlen(" VLCKit.framework/Versions/" ) */
-            p += strcspn( p, "/" );
-
-            /* If the string ends with VLCKit then we've found a winner */
-            if (!strcmp( p, "/VLCKit"))
-                return strdup( dirname(psz_img_name) );
-        }
-
-        /* Do we end by "VLC"? If so we are the legacy VLC.app that doesn't
-         * link to VLCKit. */
-        size_t len = strlen(psz_img_name);
-        if (len >= 3 && !strcmp( psz_img_name + len - 3, "VLC"))
-            return strdup( dirname(psz_img_name) );
-
-        /* Do we end by "VLC-Plugin"? oh, we must be the NPAPI plugin */
-        if (len >= 10 && !strcmp( psz_img_name + len - 10, "VLC-Plugin"))
-            return strdup( dirname(psz_img_name) );
-
-        /* Do we end by "VLC for iOS"? so we are the iOS app */
-        if (len >= 11 && !strcmp( psz_img_name + len - 11, "VLC for iOS"))
-            return strdup( dirname(psz_img_name) );
-
-        /* Do we end by "VLC-TV"? so we are the tvOS app */
-        if (len >= 6 && !strcmp( psz_img_name + len - 6, "VLC-TV"))
-            return strdup( dirname(psz_img_name) );
+        path = [path stringByDeletingLastPathComponent];
+        return strdup(path.UTF8String);
     }
 
     /* we are not part of any Mac-style package but were installed
