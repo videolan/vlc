@@ -1140,10 +1140,9 @@ vlc_module_begin()
 
     add_submodule()
     set_callback_video_filter(OpenDenoiseFilter)
-    add_float_with_range("denoise-sigma", 1.f, .0f, .0f,
-                         "Denoise strength (0-2)",
-                         "Set the Denoise strength, between 0 and 2. "
-                            "Defaults to 1.")
+    add_float_with_range("denoise-sigma", 1.f, .0f, 2.f,
+                         "Denoise strength",
+                         "Set the Denoise strength. (Defaults to 1).")
     add_shortcut("denoise")
 
     add_submodule()
