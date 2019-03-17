@@ -671,6 +671,7 @@ vlc_mutex_unlock
 vlc_mutex_marked
 vlc_global_mutex
 vlc_object_create
+vlc_object_delete
 vlc_object_find_name
 vlc_object_hold
 vlc_object_release

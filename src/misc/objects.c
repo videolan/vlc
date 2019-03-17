@@ -241,6 +241,11 @@ vlc_object_t *(vlc_object_parent)(vlc_object_t *obj)
     return vlc_internals(obj)->parent;
 }
 
+void (vlc_object_delete)(vlc_object_t *obj)
+{
+    (vlc_object_release)(obj);
+}
+
 /**
  * Destroys a VLC object once it has no more references.
  *

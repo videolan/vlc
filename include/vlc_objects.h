@@ -115,10 +115,7 @@ VLC_API void vlc_object_release(vlc_object_t *obj);
  * called exactly once per allocated object after it is no longer needed,
  * matching vlc_object_create() or vlc_custom_create().
  */
-static inline void vlc_object_delete(vlc_object_t *obj)
-{
-    vlc_object_release(obj);
-}
+VLC_API void vlc_object_delete(vlc_object_t *obj);
 #define vlc_object_delete(obj) vlc_object_delete(VLC_OBJECT(obj))
 
 VLC_API size_t vlc_list_children(vlc_object_t *, vlc_object_t **, size_t) VLC_USED;
