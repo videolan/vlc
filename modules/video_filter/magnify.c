@@ -245,7 +245,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     /* print a small "VLC ZOOM" */
 
     if( b_visible || p_sys->i_last_activity + p_sys->i_hide_timeout > vlc_tick_now() )
-        DrawZoomStatus( p_oyp->p_pixels, p_oyp->i_visible_pitch, p_oyp->i_pitch, p_oyp->i_lines,
+        DrawZoomStatus( p_oyp->p_pixels, p_oyp->i_pitch, p_oyp->i_visible_pitch, p_oyp->i_lines,
                         1, v_h, b_visible );
 
     if( b_visible )
