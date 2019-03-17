@@ -241,31 +241,31 @@ vlc_object_t *(vlc_object_parent)(vlc_object_t *obj)
 /**
  * Destroys a VLC object once it has no more references.
  */
-static void vlc_object_destroy( vlc_object_t *p_this )
+static void vlc_object_destroy(vlc_object_t *obj)
 {
-    vlc_object_internals_t *p_priv = vlc_internals( p_this );
+    vlc_object_internals_t *priv = vlc_internals(obj);
 
-    assert(p_priv->resources == NULL);
+    assert(priv->resources == NULL);
 
     int canc = vlc_savecancel();
 
     /* Call the custom "subclass" destructor */
-    if( p_priv->pf_destructor )
-        p_priv->pf_destructor( p_this );
+    if (priv->pf_destructor != NULL)
+        priv->pf_destructor(obj);
 
-    if (unlikely(p_priv->parent == NULL))
+    if (unlikely(priv->parent == NULL))
     {
         /* TODO: should be in src/libvlc.c */
-        var_DelCallback (p_this, "tree", TreeCommand, NULL);
+        var_DelCallback(obj, "tree", TreeCommand, NULL);
     }
 
     /* Destroy the associated variables. */
-    var_DestroyAll( p_this );
+    var_DestroyAll(obj);
     vlc_restorecancel(canc);
 
-    vlc_cond_destroy( &p_priv->var_wait );
-    vlc_mutex_destroy( &p_priv->var_lock );
-    free( p_priv );
+    vlc_cond_destroy(&priv->var_wait);
+    vlc_mutex_destroy(&priv->var_lock);
+    free(priv);
 }
 
 #undef vlc_object_find_name
