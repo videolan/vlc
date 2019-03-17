@@ -297,17 +297,6 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
     return NULL;
 }
 
-void *(vlc_object_hold)(vlc_object_t *p_this)
-{
-    vlc_object_internals_t *internals = vlc_internals( p_this );
-    unsigned refs = atomic_fetch_add_explicit(&internals->refs, 1,
-                                              memory_order_relaxed);
-
-    assert (refs > 0); /* Avoid obvious freed object uses */
-    (void) refs;
-    return p_this;
-}
-
 void (vlc_object_release)(vlc_object_t *obj)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);

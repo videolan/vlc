@@ -94,13 +94,6 @@ VLC_API void *vlc_object_create( vlc_object_t *, size_t ) VLC_MALLOC VLC_USED;
 VLC_API vlc_object_t *vlc_object_find_name( vlc_object_t *, const char * ) VLC_USED VLC_DEPRECATED;
 
 /**
- * Adds a weak reference to an object.
- *
- * This atomically increments the reference count of an object.
- */
-VLC_API void * vlc_object_hold(vlc_object_t *obj);
-
-/**
  * Removes a weak reference to an object.
  *
  * This atomically decrements the reference count.
@@ -190,7 +183,7 @@ VLC_API audio_output_t *aout_Hold(audio_output_t *aout);
 VLC_API void aout_Release(audio_output_t *aout);
 
 /* TODO: remove vlc_object_hold/_release() for GUIs, remove this */
-VLC_DEPRECATED static inline void *vlc_object_hold_dyn(vlc_object_t *o)
+VLC_DEPRECATED static inline void *vlc_object_hold(vlc_object_t *o)
 {
     const char *tn = vlc_object_typename(o);
 
@@ -202,7 +195,6 @@ VLC_DEPRECATED static inline void *vlc_object_hold_dyn(vlc_object_t *o)
         vout_Hold((vout_thread_t *)o);
     return o;
 }
-#define vlc_object_hold(a) vlc_object_hold_dyn(a)
 
 static inline void vlc_object_release_dyn(vlc_object_t *o)
 {
