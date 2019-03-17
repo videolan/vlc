@@ -207,7 +207,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         picture_CopyPixels( p_outpic, p_pic );
     }
 
-    /* */
+    /* zoom area selector */
     p_oyp = &p_outpic->p[Y_PLANE];
     if( b_visible )
     {
@@ -242,15 +242,15 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         v_h = 1;
     }
 
-    /* print a small "VLC ZOOM" */
+    /* print a small hide/show toggle text control */
 
     if( b_visible || p_sys->i_last_activity + p_sys->i_hide_timeout > vlc_tick_now() )
         DrawZoomStatus( p_oyp->p_pixels, p_oyp->i_pitch, p_oyp->i_visible_pitch, p_oyp->i_lines,
                         1, v_h, b_visible );
 
+    /* zoom gauge */
     if( b_visible )
     {
-        /* zoom gauge */
         memset( p_oyp->p_pixels + (v_h+9)*p_oyp->i_pitch, 0xff, 41 );
         for( int y = v_h + 10; y < v_h + 90; y++ )
         {
@@ -275,17 +275,17 @@ static void DrawZoomStatus( uint8_t *pb_dst, int i_pitch, int i_width, int i_hei
                             int i_offset_x, int i_offset_y, bool b_visible )
 {
     static const char *p_hide =
-        "X   X X      XXXX   XXXXX  XXX   XXX  XX XX   X   X XXXXX XXXX  XXXXXL"
-        "X   X X     X          X  X   X X   X X X X   X   X   X   X   X X    L"
-        " X X  X     X         X   X   X X   X X   X   XXXXX   X   X   X XXXX L"
-        " X X  X     X        X    X   X X   X X   X   X   X   X   X   X X    L"
-        "  X   XXXXX  XXXX   XXXXX  XXX   XXX  X   X   X   X XXXXX XXXX  XXXXXL";
+        "X   X XXXXX XXXX  XXXXX   XXXXX  XXX   XXX  XX XXL"
+        "X   X   X   X   X X          X  X   X X   X X X XL"
+        "XXXXX   X   X   X XXXX      X   X   X X   X X   XL"
+        "X   X   X   X   X X        X    X   X X   X X   XL"
+        "X   X XXXXX XXXX  XXXXX   XXXXX  XXX   XXX  X   XL";
     static const char *p_show =
-        "X   X X      XXXX   XXXXX  XXX   XXX  XX XX    XXXX X   X  XXX  X   XL"
-        "X   X X     X          X  X   X X   X X X X   X     X   X X   X X   XL"
-        " X X  X     X         X   X   X X   X X   X    XXX  XXXXX X   X X X XL"
-        " X X  X     X        X    X   X X   X X   X       X X   X X   X X X XL"
-        "  X   XXXXX  XXXX   XXXXX  XXX   XXX  X   X   XXXX  X   X  XXX   X X L";
+        " XXXX X   X  XXX  X   X   XXXXX  XXX   XXX  XX XXL"
+        "X     X   X X   X X   X      X  X   X X   X X X XL"
+        " XXX  XXXXX X   X X X X     X   X   X X   X X   XL"
+        "    X X   X X   X X X X    X    X   X X   X X   XL"
+        "XXXX  X   X  XXX   X X    XXXXX  XXX   XXX  X   XL";
     const char *p_draw = b_visible ? p_hide : p_show;
 
     for( int i = 0, x = i_offset_x, y = i_offset_y; p_draw[i] != '\0'; i++ )
