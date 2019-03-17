@@ -211,23 +211,6 @@ void *(vlc_object_create)(vlc_object_t *p_this, size_t i_size)
     return vlc_custom_create( p_this, i_size, "generic" );
 }
 
-#undef vlc_object_set_destructor
-/**
- ****************************************************************************
- * Set the destructor of a vlc object
- *
- * This function sets the destructor of the vlc object. It will be called
- * when the object is destroyed when the its refcount reaches 0.
- * (It is called by the internal function vlc_object_destroy())
- *****************************************************************************/
-void vlc_object_set_destructor( vlc_object_t *p_this,
-                                vlc_destructor_t pf_destructor )
-{
-    vlc_object_internals_t *p_priv = vlc_internals(p_this );
-
-    p_priv->pf_destructor = pf_destructor;
-}
-
 const char *vlc_object_typename(const vlc_object_t *obj)
 {
     return vlc_internals(obj)->typename;
