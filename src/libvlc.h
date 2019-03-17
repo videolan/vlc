@@ -115,9 +115,6 @@ vlc_custom_create (vlc_object_t *p_this, size_t i_size, const char *psz_type);
 #define vlc_custom_create(o, s, n) \
         vlc_custom_create(VLC_OBJECT(o), s, n)
 
-/* Types */
-typedef void (*vlc_destructor_t) (struct vlc_object_t *);
-
 /**
  * Allocates an object resource.
  *

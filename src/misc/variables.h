@@ -44,9 +44,6 @@ struct vlc_object_internals
     vlc_mutex_t     var_lock;
     vlc_cond_t      var_wait;
 
-    /* Objects management */
-    vlc_destructor_t pf_destructor;
-
     /* Objects tree structure */
     struct vlc_list list; /**< Legacy list node */
 

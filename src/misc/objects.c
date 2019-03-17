@@ -175,7 +175,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     priv->var_root = NULL;
     vlc_mutex_init (&priv->var_lock);
     vlc_cond_init (&priv->var_wait);
-    priv->pf_destructor = NULL;
     priv->resources = NULL;
 
     vlc_object_t *obj = (vlc_object_t *)(priv + 1);
@@ -228,10 +227,6 @@ void (vlc_object_delete)(vlc_object_t *obj)
     assert(priv->resources == NULL);
 
     int canc = vlc_savecancel();
-
-    /* Call the custom "subclass" destructor */
-    if (priv->pf_destructor != NULL)
-        priv->pf_destructor(obj);
 
     if (unlikely(priv->parent == NULL))
     {
