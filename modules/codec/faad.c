@@ -175,7 +175,13 @@ static int Open( vlc_object_t *p_this )
     if( p_dec->fmt_in.audio.i_rate )
         cfg->defSampleRate = p_dec->fmt_in.audio.i_rate;
     cfg->outputFormat = HAVE_FPU ? FAAD_FMT_FLOAT : FAAD_FMT_16BIT;
-    NeAACDecSetConfiguration( p_sys->hfaad, cfg );
+    if( !NeAACDecSetConfiguration( p_sys->hfaad, cfg ) )
+    {
+        msg_Err( p_dec, "Failed to set faad configuration" );
+        NeAACDecClose( p_sys->hfaad );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     p_sys->i_last_length = 0;
 
