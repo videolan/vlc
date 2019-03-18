@@ -18,6 +18,7 @@ taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/taglib/unicode.patch
 endif
+	$(APPLY) $(SRC)/taglib/use_resolvers_on_streams.patch
 	$(MOVE)
 
 .taglib: taglib toolchain.cmake

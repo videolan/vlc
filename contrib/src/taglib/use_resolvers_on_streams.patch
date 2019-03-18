@@ -1,0 +1,44 @@
+From e648e07b7ebc4a1254a8673388c8f578fedf62a6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Mon, 18 Mar 2019 15:57:28 +0100
+Subject: [PATCH] fileref: Use user defined resolvers with IOStream
+
+---
+ taglib/fileref.cpp | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/taglib/fileref.cpp b/taglib/fileref.cpp
+index 3a7f2c65..b0369a0c 100644
+--- a/taglib/fileref.cpp
++++ b/taglib/fileref.cpp
+@@ -88,13 +88,6 @@ namespace
+     return 0;
+   }
+ 
+-  template <>
+-  File *resolveFileType<IOStream *>(IOStream *arg, bool readProperties,
+-                                    AudioProperties::ReadStyle style)
+-  {
+-    return 0;
+-  }
+-
+   template <>
+   File *resolveFileType<FileName>(FileName arg, bool readProperties,
+                                   AudioProperties::ReadStyle style)
+@@ -109,6 +102,13 @@ namespace
+     return 0;
+   }
+ 
++  template <>
++  File *resolveFileType<IOStream *>(IOStream *arg, bool readProperties,
++                                    AudioProperties::ReadStyle style)
++  {
++    return resolveFileType(arg->name(), readProperties, style);
++  }
++
+   template <typename T>
+   File* createInternal(T arg, bool readAudioProperties,
+                        AudioProperties::ReadStyle audioPropertiesStyle)
+-- 
+2.20.1
+
