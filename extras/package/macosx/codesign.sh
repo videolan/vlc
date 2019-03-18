@@ -139,40 +139,27 @@ do
     sign "$i"
 done
 
-info "Signing the headers"
-for i in $(find VLC.app/Contents/MacOS/include -type f -exec echo {} \;)
-do
-    sign "$i"
-done
-
 info "Signing the modules"
 
-for i in $(find VLC.app/Contents/MacOS/plugins -type f \( -name "*.dylib" -o -name "*.jar" \)  -exec echo {} \;)
+for i in $(find VLC.app/Contents/Frameworks/plugins -type f \( -name "*.dylib" -o -name "*.jar" \)  -exec echo {} \;)
 do
     sign "$i"
 done
 
 if [ ! -z "$VLCCACHEGEN" ]; then
-    $VLCCACHEGEN VLC.app/Contents/MacOS/plugins
+    $VLCCACHEGEN VLC.app/Contents/Frameworks/plugins
 fi
 
-sign "VLC.app/Contents/MacOS/plugins/plugins.dat"
+sign "VLC.app/Contents/Frameworks/plugins/plugins.dat"
 
 info "Signing the libraries"
 
-for i in $(find VLC.app/Contents/MacOS/lib -type f -exec echo {} \;)
+for i in $(find VLC.app/Contents/Frameworks -type f -name "*.dylib" -d 1 -exec echo {} \;)
 do
     sign "$i"
 done
 
-info "Signing share"
-
-for i in $(find VLC.app/Contents/MacOS/share -type f -exec echo {} \;)
-do
-    sign "$i"
-done
-
-for i in $(find VLC.app/Contents/MacOS/lua -type f -exec echo {} \;)
+for i in $(find VLC.app/Contents/Frameworks/lua -type f -exec echo {} \;)
 do
     sign "$i"
 done
