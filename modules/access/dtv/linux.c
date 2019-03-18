@@ -476,6 +476,7 @@ static int dvb_open_frontend (dvb_device_t *d)
  */
 unsigned dvb_enum_systems (dvb_device_t *d)
 {
+    unsigned systems = 0;
     if (dvb_open_frontend (d))
         return 0;
 #if DVBv5(5)
@@ -516,7 +517,6 @@ unsigned dvb_enum_systems (dvb_device_t *d)
         //[SYS_TURBO]
         [SYS_DVBC_ANNEX_C] = DTV_DELIVERY_ISDB_C, // another name for ISDB-C?
     };
-    unsigned systems = 0;
 
     msg_Dbg (d->obj, "probing frontend (kernel API v%u.%u, user API v%u.%u)",
              prop[0].u.data >> 8, prop[0].u.data & 0xFF,
@@ -546,7 +546,6 @@ legacy:
         .num = 1,
         .props = prop
     };
-    unsigned systems = 0;
 #endif
     if (ioctl (d->frontend, FE_GET_PROPERTY, &props) < 0)
     {
