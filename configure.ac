@@ -923,9 +923,6 @@ AC_CHECK_TYPE(ssize_t,, [
 dnl It seems that autoconf detects pkg-config only during the first
 dnl PKG_CHECK_MODULES from configure.ac - which makes sense. But in our case,
 dnl it is nested within a conditional block, so it was not working right.
-dnl Make PKG_CONFIG_PATH precious so that it appears in the help and get saved
-AC_ARG_VAR(PKG_CONFIG_PATH,
-       [Paths where to find .pc not at the default location])
 PKG_PROG_PKG_CONFIG()
 
 dnl On some OS we need static linking
