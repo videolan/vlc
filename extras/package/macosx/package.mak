@@ -38,9 +38,6 @@ if BUILD_LUA
 endif
 	## HRTFs
 	cp -r $(srcdir)/share/hrtfs $@/Contents/Resources/share/
-	## Copy some other stuff (?)
-	mkdir -p $@/Contents/MacOS/include/
-	(cd "$(prefix)/include" && $(AMTAR) -c --exclude "plugins" vlc) | $(AMTAR) -x -C $@/Contents/MacOS/include/
 	## Copy translations
 	-cp -a "$(prefix)/share/locale" $@/Contents/Resources/share/
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
