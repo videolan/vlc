@@ -115,30 +115,6 @@ if [ -e "VLC.app/Contents/Frameworks/Breakpad.framework" ]; then
     sign "VLC.app/Contents/Frameworks/Breakpad.framework/Versions/A"
 fi
 
-info "Signing the framework headers"
-for i in $(find VLC.app/Contents/Frameworks -type f -name "*.h" -exec echo {} \;)
-do
-    sign "$i"
-done
-
-info "Signing the framework strings"
-for i in $(find VLC.app/Contents/Frameworks -type f -name "*.strings" -exec echo {} \;)
-do
-    sign "$i"
-done
-
-info "Signing the framework plist files"
-for i in $(find VLC.app/Contents/Frameworks -type f -name "*.plist" -exec echo {} \;)
-do
-    sign "$i"
-done
-
-info "Signing the framework nib files"
-for i in $(find VLC.app/Contents/Frameworks -type f -name "*.nib" -exec echo {} \;)
-do
-    sign "$i"
-done
-
 info "Signing the modules"
 
 for i in $(find VLC.app/Contents/Frameworks/plugins -type f \( -name "*.dylib" -o -name "*.jar" \)  -exec echo {} \;)
