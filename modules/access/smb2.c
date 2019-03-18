@@ -550,6 +550,8 @@ vlc_smb2_resolve(stream_t *access, const char *host, unsigned port)
     /* Test if the host is a netbios name */
     char *out_host = NULL;
     netbios_ns *ns = netbios_ns_new();
+    if (!ns)
+        return NULL;
     uint32_t ip4_addr;
     if (netbios_ns_resolve(ns, host, NETBIOS_FILESERVER, &ip4_addr) == 0)
     {
