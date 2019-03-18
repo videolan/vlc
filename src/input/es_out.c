@@ -1841,6 +1841,11 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
             input_DecoderSetVoutMouseEvent( dec, p_es->mouse_event_cb,
                                             p_es->mouse_event_userdata );
     }
+    else
+    {
+        vlc_clock_Delete( p_es->p_clock );
+        p_es->p_clock = NULL;
+    }
     p_es->p_dec = dec;
 
     EsOutDecoderChangeDelay( out, p_es );
