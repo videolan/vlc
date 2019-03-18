@@ -51,7 +51,11 @@ endif
 ifdef HAVE_CROSS_COMPILE
 need_pkg = 1
 else
+ifeq ($(findstring mingw32,$(BUILD)),mingw32)
+need_pkg = $(shell PKG_CONFIG_LIBDIR="${PKG_CONFIG_PATH}" $(PKG_CONFIG) $(1) || echo 1)
+else
 need_pkg = $(shell $(PKG_CONFIG) $(1) || echo 1)
+endif
 endif
 
 ifeq ($(findstring mingw32,$(BUILD)),mingw32)
@@ -228,6 +232,9 @@ PKG_CONFIG_LIBDIR := /usr/$(HOST)/lib/pkgconfig
 export PKG_CONFIG_LIBDIR
 endif
 PKG_CONFIG_PATH := $(PREFIX)/lib/pkgconfig:$(PKG_CONFIG_PATH)
+ifeq ($(findstring mingw32,$(BUILD)),mingw32)
+PKG_CONFIG_PATH := $(shell cygpath -pm ${PKG_CONFIG_PATH})
+endif
 export PKG_CONFIG_PATH
 
 ifndef GIT
