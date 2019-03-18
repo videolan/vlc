@@ -354,7 +354,7 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
                             }
                         }
                         /* Check if we have the 1 to 1 mapping */
-                        if( vlc_popcount(i_vlcmask) != i_wfxchannels )
+                        if( (unsigned) vlc_popcount(i_vlcmask) != i_wfxchannels )
                         {
                             msg_Warn( p_dec, "Unsupported channel mask %x", i_wfxmask );
                             return;
