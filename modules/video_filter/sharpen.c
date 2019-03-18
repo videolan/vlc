@@ -166,8 +166,8 @@ static void Destroy( vlc_object_t *p_this )
         data_t *restrict p_src = (data_t *)p_pic->p[Y_PLANE].p_pixels;  \
         data_t *restrict p_out = (data_t *)p_outpic->p[Y_PLANE].p_pixels; \
         const unsigned data_sz = sizeof(data_t);                        \
-        const int i_src_line_len = p_outpic->p[Y_PLANE].i_pitch / data_sz; \
-        const int i_out_line_len = p_pic->p[Y_PLANE].i_pitch / data_sz; \
+        const int i_src_line_len = p_pic->p[Y_PLANE].i_pitch / data_sz; \
+        const int i_out_line_len = p_outpic->p[Y_PLANE].i_pitch / data_sz; \
         const int sigma = atomic_load(&p_sys->sigma);         \
                                                                         \
         memcpy(p_out, p_src, i_visible_pitch);                          \
