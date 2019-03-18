@@ -129,17 +129,17 @@ static char *config_GetHomeDir (void)
 
 static char *getAppDependentDir(vlc_userdir_t type)
 {
-    const char *psz_path;
+    NSString *formatString;
     switch (type) {
         case VLC_CONFIG_DIR:
-            psz_path = "%s/Library/Preferences/%s";
+            formatString = @"%s/Library/Preferences/%@";
             break;
         case VLC_TEMPLATES_DIR:
         case VLC_USERDATA_DIR:
-            psz_path = "%s/Library/Application Support/%s";
+            formatString = @"%s/Library/Application Support/%@";
             break;
         case VLC_CACHE_DIR:
-            psz_path = "%s/Library/Caches/%s";
+            formatString = @"%s/Library/Caches/%@";
             break;
         default:
             vlc_assert_unreachable();
@@ -147,24 +147,18 @@ static char *getAppDependentDir(vlc_userdir_t type)
     }
 
     // Default fallback
-    const char *fallback = "org.videolan.vlc";
-    char *name = NULL;
-
-    CFBundleRef mainBundle = CFBundleGetMainBundle();
+    NSString *identifier = @"org.videolan.vlc";
+    NSBundle *mainBundle = [NSBundle mainBundle];
     if (mainBundle) {
-        CFStringRef identifierAsNS = CFBundleGetIdentifier(mainBundle);
-        if (identifierAsNS)
-            name = FromCFString(identifierAsNS, kCFStringEncodingUTF8);
+        NSString *bundleId = mainBundle.bundleIdentifier;
+        if (bundleId)
+            identifier = bundleId;
     }
 
-    char *psz_parent = config_GetHomeDir ();
-    char *psz_dir;
-    if ( asprintf( &psz_dir, psz_path, psz_parent, (name) ? name : fallback) == -1 )
-        psz_dir = NULL;
-    free(psz_parent);
-    free(name);
-
-    return psz_dir;
+    char *homeDir = config_GetHomeDir();
+    NSString *result = [NSString stringWithFormat:formatString, homeDir, identifier];
+    free(homeDir);
+    return strdup(result.UTF8String);
 }
 
 char *config_GetUserDir (vlc_userdir_t type)
