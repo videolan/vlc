@@ -346,7 +346,7 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     es_format_InitFromVideo(&src, &v_src);
 
     /* */
-    int ret;
+    int ret = -1;
 
     for (int i = 0; i < 1 + (v_dst_cmp.i_chroma != v_dst.i_chroma); i++) {
         es_format_t dst;
