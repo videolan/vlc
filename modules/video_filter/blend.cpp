@@ -146,8 +146,8 @@ private:
     {
         if (plane == 1 || plane == 2)
             return (pixel*)&data[plane][(x + dx) / rx * sizeof(pixel)];
-        else
-            return (pixel*)&data[plane][(x + dx) /  1 * sizeof(pixel)];
+
+        return (pixel*)&data[plane][(x + dx) /  1 * sizeof(pixel)];
     }
     uint8_t *data[4];
 };
@@ -280,7 +280,12 @@ public:
             }
             offset_a = 3;
         } else {
-            GetPackedRgbIndexes(fmt, &offset_r, &offset_g, &offset_b);
+            if (GetPackedRgbIndexes(fmt, &offset_r, &offset_g, &offset_b) != VLC_SUCCESS) {
+                /* at least init to something on error to silence compiler warnings */
+                offset_r = 0;
+                offset_g = 1;
+                offset_b = 2;
+            }
         }
         data = CPicture::getLine<1>(0);
     }
