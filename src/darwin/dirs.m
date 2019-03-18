@@ -47,11 +47,10 @@ char *config_GetLibDir (void)
 {
     if (isBundle()) {
         NSBundle *bundle = [NSBundle mainBundle];
-        NSString *path = bundle.executablePath;
+        NSString *path = bundle.privateFrameworksPath;
         if (!path)
             return NULL;
 
-        path = [path stringByDeletingLastPathComponent];
         return strdup(path.UTF8String);
     }
 

@@ -34,7 +34,7 @@ endif
 if BUILD_LUA
 	## Copy lua scripts
 	cp -r "$(pkgdatadir)/lua" $@/Contents/Resources/share/
-	cp -r "$(pkglibexecdir)/lua" $@/Contents/MacOS/
+	cp -r "$(pkglibexecdir)/lua" $@/Contents/Frameworks/
 endif
 	## HRTFs
 	cp -r $(srcdir)/share/hrtfs $@/Contents/Resources/share/
@@ -45,17 +45,16 @@ endif
 	test -d "$(prefix)/share/locale" && cp -r "$(prefix)/share/locale" $@/Contents/Resources/share/ || true
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
 	## Copy libs
-	mkdir -p $@/Contents/MacOS/lib
-	find $(prefix)/lib -name 'libvlc*.dylib' -maxdepth 1 -exec cp -a {} $@/Contents/MacOS/lib \;
+	find $(prefix)/lib -name 'libvlc*.dylib' -maxdepth 1 -exec cp -a {} $@/Contents/Frameworks \;
 	## Copy plugins
-	mkdir -p $@/Contents/MacOS/plugins
-	find $(prefix)/lib/vlc/plugins -name 'lib*_plugin.dylib' -maxdepth 2 -exec cp -a {} $@/Contents/MacOS/plugins \;
+	mkdir -p $@/Contents/Frameworks/plugins
+	find $(prefix)/lib/vlc/plugins -name 'lib*_plugin.dylib' -maxdepth 2 -exec cp -a {} $@/Contents/Frameworks/plugins \;
 	## Copy libbluray jar
-	-cp -a $(CONTRIB_DIR)/share/java/libbluray*.jar $@/Contents/MacOS/plugins/
+	-cp -a $(CONTRIB_DIR)/share/java/libbluray*.jar $@/Contents/Frameworks/plugins/
 	## Install binary
 	cp $(prefix)/bin/vlc $@/Contents/MacOS/VLC
 	## Generate plugin cache
-	bin/vlc-cache-gen $@/Contents/MacOS/plugins
+	bin/vlc-cache-gen $@/Contents/Frameworks/plugins
 	find $@ -type d -exec chmod ugo+rx '{}' \;
 	find $@ -type f -exec chmod ugo+r '{}' \;
 
