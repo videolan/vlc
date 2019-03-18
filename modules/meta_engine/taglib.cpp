@@ -165,7 +165,9 @@ public:
 
     FileName name() const
     {
-        return m_stream->psz_location;
+        // Taglib only cares about the file name part, so it doesn't matter
+        // whether we include the mrl scheme or not
+        return m_stream->psz_url;
     }
 
     ByteVector readBlock(ulong length)
