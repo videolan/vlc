@@ -76,6 +76,17 @@ static char *config_GetDataDir(void)
     if (path)
         return strdup (path);
 
+    if (isBundle()) {
+        NSBundle *bundle = [NSBundle mainBundle];
+        NSString *path = bundle.resourcePath;
+        if (!path)
+            return NULL;
+
+        path = [path stringByAppendingPathComponent:@"share"];
+        return strdup(path.UTF8String);
+    }
+
+    // Fallback
     char *vlcpath = config_GetLibDir ();
     char *datadir;
 

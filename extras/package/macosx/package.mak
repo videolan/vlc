@@ -29,19 +29,20 @@ endif
 if HAVE_BREAKPAD
 	cp -R $(CONTRIB_DIR)/Frameworks/Breakpad.framework $@/Contents/Frameworks
 endif
-	mkdir -p $@/Contents/MacOS/share/
+	mkdir -p $@/Contents/Resources/share/
+	mkdir -p $@/Contents/MacOS/
 if BUILD_LUA
 	## Copy lua scripts
-	cp -r "$(pkgdatadir)/lua" $@/Contents/MacOS/share/
+	cp -r "$(pkgdatadir)/lua" $@/Contents/Resources/share/
 	cp -r "$(pkglibexecdir)/lua" $@/Contents/MacOS/
 endif
 	## HRTFs
-	cp -r $(srcdir)/share/hrtfs $@/Contents/MacOS/share/
+	cp -r $(srcdir)/share/hrtfs $@/Contents/Resources/share/
 	## Copy some other stuff (?)
 	mkdir -p $@/Contents/MacOS/include/
 	(cd "$(prefix)/include" && $(AMTAR) -c --exclude "plugins" vlc) | $(AMTAR) -x -C $@/Contents/MacOS/include/
 	## Copy translations
-	test -d "$(prefix)/share/locale" && cp -r "$(prefix)/share/locale" $@/Contents/MacOS/share/ || true
+	test -d "$(prefix)/share/locale" && cp -r "$(prefix)/share/locale" $@/Contents/Resources/share/ || true
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
 	## Copy libs
 	mkdir -p $@/Contents/MacOS/lib
