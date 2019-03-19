@@ -2353,7 +2353,7 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
         }
     }
 
-    size_t configMax = 5*strlen(dup);
+    size_t configMax = 4*i_records+strlen(configStr);
     unsigned char *cfg = new unsigned char[configMax];
     psz = dup;
     for( size_t i = 0; i < i_records; ++i )
