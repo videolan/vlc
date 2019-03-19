@@ -159,7 +159,7 @@ struct audio_output
       */
 
     void (*stop)(audio_output_t *);
-    /**< Stops the existing stream (optional, may be NULL).
+    /**< Stops the existing stream (mandatory, cannot be NULL).
       *
       * This callback terminates the current audio stream,
       * and returns the audio output to stopped state.

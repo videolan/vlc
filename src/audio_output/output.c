@@ -609,8 +609,7 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
 void aout_OutputDelete (audio_output_t *aout)
 {
     aout_OutputLock(aout);
-    if (aout->stop != NULL)
-        aout->stop (aout);
+    aout->stop (aout);
     aout_OutputUnlock(aout);
 }
 
