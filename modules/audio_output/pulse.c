@@ -558,13 +558,20 @@ static void Drain(audio_output_t *aout)
     pa_operation *op = pa_stream_drain(s, NULL, NULL);
     if (op != NULL)
         pa_operation_unref(op);
-    pa_threaded_mainloop_unlock(sys->mainloop);
+    sys->last_date = VLC_TICK_INVALID;
 
     /* XXX: Loosy drain emulation.
      * See #18141: drain callback is never received */
     vlc_tick_t delay;
     if (TimeGet(aout, &delay) == 0 && delay <= VLC_TICK_FROM_SEC(5))
+    {
+        pa_threaded_mainloop_unlock(sys->mainloop);
         vlc_tick_sleep(delay);
+        pa_threaded_mainloop_lock(sys->mainloop);
+    }
+
+    stream_stop(s, aout);
+    pa_threaded_mainloop_unlock(sys->mainloop);
 }
 
 static int VolumeSet(audio_output_t *aout, float vol)
