@@ -130,6 +130,19 @@ class SRTDestBox: public VirtualDestBox
         QString mux;
 };
 
+class RISTDestBox: public VirtualDestBox
+{
+    Q_OBJECT
+    public:
+        RISTDestBox( QWidget *_parent = NULL, const char *mux = NULL );
+        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
+    private:
+        QLineEdit *RISTAddress;
+        QSpinBox *RISTPort;
+        QLineEdit *RISTName;
+        QString mux;
+};
+
 class RTPDestBox: public VirtualDestBox
 {
     Q_OBJECT

@@ -415,6 +415,60 @@ QString SRTDestBox::getMRL(const QString&)
     return m.getMrl();
 }
 
+RISTDestBox::RISTDestBox( QWidget *_parent, const char *_mux )
+    : VirtualDestBox( _parent ), mux( qfu(_mux) )
+{
+    label->setText( qtr( "This module outputs the stream using the RIST protocol (TR06).") );
+
+    QLabel *RISTAddressLabel = new QLabel( qtr("Destination Address"), this );
+    RISTAddress = new QLineEdit(this);
+    layout->addWidget(RISTAddressLabel, 1, 0, 1, 1);
+    layout->addWidget(RISTAddress, 1, 1, 1, 1);
+
+    QLabel *RISTPortLabel = new QLabel( qtr("Destination Port"), this );
+    RISTPort = new QSpinBox(this);
+    RISTPort->setMaximumSize(QSize(90, 16777215));
+    RISTPort->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+    RISTPort->setMinimum(1);
+    RISTPort->setMaximum(65535);
+    RISTPort->setValue(1968);
+    layout->addWidget(RISTPortLabel, 2, 0, 1, 1);
+    layout->addWidget(RISTPort, 2, 1, 1, 1);
+
+    QLabel *RISTNameLabel = new QLabel( qtr("Stream Name"), this );
+    RISTName = new QLineEdit(this);
+    layout->addWidget(RISTNameLabel, 3, 0, 1, 1);
+    layout->addWidget(RISTName, 3, 1, 1, 1);
+
+    CT( RISTAddress );
+    CS( RISTPort );
+    CT( RISTName );
+}
+
+QString RISTDestBox::getMRL( const QString& )
+{
+    QString addr = RISTAddress->text();
+    QString name = RISTName->text();
+
+    if( addr.isEmpty() ) return qfu("");
+    QString destination = addr + ":" + QString::number(RISTPort->value());
+    SoutMrl m;
+    m.begin( "std" );
+    if( !name.isEmpty() )
+    {
+        m.option( "access", "rist{stream-name=" + name + "}" );
+    }
+    else
+    {
+        m.option( "access", "rist" );
+    }
+    m.option( "mux", "ts" );
+    m.option( "dst", destination );
+    m.end();
+
+    return m.getMrl();
+}
+
 
 RTPDestBox::RTPDestBox( QWidget *_parent, const char *_mux )
     : VirtualDestBox( _parent ), mux( qfu(_mux) )

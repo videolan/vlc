@@ -70,6 +70,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     ui.destBox->addItem( "MS-WMSP (MMSH)" );
     ui.destBox->addItem( "RTSP" );
     ui.destBox->addItem( "SRT / MPEG Transport Stream" );
+    ui.destBox->addItem( "RIST / MPEG Transport Stream" );
     ui.destBox->addItem( "RTP / MPEG Transport Stream" );
     ui.destBox->addItem( "RTP Audio/Video Profile" );
     ui.destBox->addItem( "UDP (legacy)" );
@@ -137,18 +138,22 @@ void SoutDialog::addDest( )
             caption = "SRT/TS";
             break;
         case 5:
+            db = new RISTDestBox( this, "ts" );
+            caption = "RIST/TS";
+            break;
+        case 6:
             db = new RTPDestBox( this, "ts" );
             caption = "RTP/TS";
             break;
-        case 6:
+        case 7:
             db = new RTPDestBox( this );
             caption = "RTP/AVP";
             break;
-        case 7:
+        case 8:
             db = new UDPDestBox( this );
             caption = "UDP";
             break;
-        case 8:
+        case 9:
             db = new ICEDestBox( this );
             caption = "Icecast";
             break;
