@@ -359,6 +359,61 @@ QString UDPDestBox::getMRL( const QString& mux )
     return m.getMrl();
 }
 
+SRTDestBox::SRTDestBox(QWidget *_parent, const char *_mux) :
+        VirtualDestBox( _parent ), mux( qfu( _mux ) )
+{
+    label->setText(
+            qtr( "This module outputs the transcoded stream to a network"
+                    " via SRT." ) );
+
+    QLabel *SRTLabel = new QLabel( qtr( "Address" ), this );
+    SRTEdit = new QLineEdit( this );
+    layout->addWidget( SRTLabel, 1, 0, 1, 1 );
+    layout->addWidget( SRTEdit, 1, 1, 1, 1 );
+
+    QLabel *SRTPortLabel = new QLabel( qtr( "Base port" ), this );
+    SRTPort = new QSpinBox( this );
+    SRTPort->setMaximumSize( QSize( 90, 16777215 ) );
+    SRTPort->setAlignment(
+            Qt::AlignRight | Qt::AlignTrailing | Qt::AlignVCenter );
+    SRTPort->setMinimum( 1 );
+    SRTPort->setMaximum( 65535 );
+    SRTPort->setValue( 7001 );
+    layout->addWidget( SRTPortLabel, 2, 0, 1, 1 );
+    layout->addWidget( SRTPort, 2, 1, 1, 1 );
+
+    QLabel *SAPNameLabel = new QLabel( qtr( "Stream name" ), this );
+    SAPName = new QLineEdit( this );
+    layout->addWidget( SAPNameLabel, 3, 0, 1, 1 );
+    layout->addWidget( SAPName, 3, 1, 1, 1 );
+
+    CT( SRTEdit );
+    CS( SRTPort );
+    CT( SAPName );
+}
+
+QString SRTDestBox::getMRL(const QString&)
+{
+    QString addr = SRTEdit->text();
+    QString name = SAPName->text();
+
+    if (addr.isEmpty())
+        return qfu( "" );
+    QString destination = addr + ":" + QString::number( SRTPort->value() );
+    SoutMrl m;
+    m.begin( "srt" );
+    m.option( "dst", destination );
+    /* mp4-mux ain't usable in rtp-output either */
+    if (!mux.isEmpty())
+        m.option( "mux", mux );
+    if (!name.isEmpty()) {
+        m.option( "sap" );
+        m.option( "name", name );
+    }
+    m.end();
+
+    return m.getMrl();
+}
 
 
 RTPDestBox::RTPDestBox( QWidget *_parent, const char *_mux )

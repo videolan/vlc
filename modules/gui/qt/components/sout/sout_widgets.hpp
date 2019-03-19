@@ -117,6 +117,19 @@ class UDPDestBox: public VirtualDestBox
         QSpinBox *UDPPort;
 };
 
+class SRTDestBox: public VirtualDestBox
+{
+    Q_OBJECT
+    public:
+        SRTDestBox( QWidget *_parent = NULL, const char *mux = NULL );
+        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
+    private:
+        QLineEdit *SRTEdit;
+        QSpinBox *SRTPort;
+        QLineEdit *SAPName;
+        QString mux;
+};
+
 class RTPDestBox: public VirtualDestBox
 {
     Q_OBJECT
