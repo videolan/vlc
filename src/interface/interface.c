@@ -60,7 +60,7 @@ static int AddIntfCallback( vlc_object_t *, char const *,
  * other function that depends on the playlist is only called BEFORE
  * intf_DestroyAll() has the possibility to destroy all interfaces.
  */
-static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+static vlc_mutex_t old_playlist_lock = VLC_STATIC_MUTEX;
 static playlist_t *old_playlist = NULL;
 
 /**
@@ -72,10 +72,10 @@ playlist_t *pl_Get( struct intf_thread_t *intf )
 {
     assert( intf );
 
-    vlc_mutex_lock(&lock);
+    vlc_mutex_lock(&old_playlist_lock);
     if (old_playlist == NULL)
         old_playlist = playlist_Create(VLC_OBJECT(intf));
-    vlc_mutex_unlock(&lock);
+    vlc_mutex_unlock(&old_playlist_lock);
 
     return old_playlist;
 }
@@ -131,7 +131,7 @@ libvlc_GetMainPlaylist(libvlc_int_t *libvlc)
 {
     libvlc_priv_t *priv = libvlc_priv(libvlc);
 
-    vlc_mutex_lock(&lock);
+    vlc_mutex_lock(&priv->lock);
     vlc_playlist_t *playlist = priv->main_playlist;
     if (priv->main_playlist == NULL)
     {
@@ -139,7 +139,7 @@ libvlc_GetMainPlaylist(libvlc_int_t *libvlc)
         if (playlist)
             PlaylistConfigureFromVariables(playlist, VLC_OBJECT(libvlc));
     }
-    vlc_mutex_unlock(&lock);
+    vlc_mutex_unlock(&priv->lock);
 
     return playlist;
 }
@@ -208,10 +208,10 @@ int intf_Create( libvlc_int_t *libvlc, const char *chain )
         goto error;
     }
 
-    vlc_mutex_lock( &lock );
+    vlc_mutex_lock(&priv->lock);
     p_intf->p_next = priv->interfaces;
     priv->interfaces = p_intf;
-    vlc_mutex_unlock( &lock );
+    vlc_mutex_unlock(&priv->lock);
 
     return VLC_SUCCESS;
 
@@ -309,25 +309,27 @@ void intf_DestroyAll(libvlc_int_t *libvlc)
 {
     libvlc_priv_t *priv = libvlc_priv(libvlc);
 
-    vlc_mutex_lock(&lock);
+    vlc_mutex_lock(&priv->lock);
     intf_thread_t *intf, **pp = &priv->interfaces;
 
     while ((intf = *pp) != NULL)
     {
         *pp = intf->p_next;
-        vlc_mutex_unlock(&lock);
+        vlc_mutex_unlock(&priv->lock);
 
         module_unneed(intf, intf->p_module);
         config_ChainDestroy(intf->p_cfg);
         var_DelCallback(intf, "intf-add", AddIntfCallback, NULL);
         vlc_object_delete(intf);
 
-        vlc_mutex_lock(&lock);
+        vlc_mutex_lock(&priv->lock);
     }
-    vlc_mutex_unlock(&lock);
+    vlc_mutex_unlock(&priv->lock);
 
+    vlc_mutex_lock(&old_playlist_lock);
     if (old_playlist)
         playlist_Destroy(old_playlist);
+    vlc_mutex_unlock(&old_playlist_lock);
 }
 
 /* Following functions are local */

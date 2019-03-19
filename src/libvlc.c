@@ -93,6 +93,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
         return NULL;
 
     priv = libvlc_priv (p_libvlc);
+    vlc_mutex_init(&priv->lock);
     priv->interfaces = NULL;
     priv->main_playlist = NULL;
     priv->p_vlm = NULL;
@@ -472,6 +473,7 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
         }
     }
 #endif
+    vlc_mutex_destroy(&priv->lock);
     vlc_object_delete(p_libvlc);
 }
 

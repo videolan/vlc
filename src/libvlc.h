@@ -178,6 +178,7 @@ typedef struct libvlc_priv_t
     libvlc_int_t       public_data;
 
     /* Singleton objects */
+    vlc_mutex_t lock; ///< protect playlist and interfaces
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
     vlc_dialog_provider *p_dialog_provider; ///< dialog provider
     vlc_keystore      *p_memory_keystore; ///< memory keystore
