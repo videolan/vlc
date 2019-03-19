@@ -92,11 +92,11 @@ struct rist_flow {
     char cname[MAX_CNAME];
     struct sockaddr_storage peer_sockaddr;
     socklen_t peer_socklen;
-    uint16_t ri,
-        wi;
+    uint16_t ri, wi;
     int fd_in;
     int fd_out;
     int fd_rtcp;
+    int fd_rtcp_m;
     int fd_nack;
     uint8_t nacks_retries[RIST_QUEUE_SIZE];
     uint32_t hi_timestamp;
@@ -336,4 +336,32 @@ static inline ssize_t rist_WriteTo(int fd, const void *buf, size_t len, const st
 static inline ssize_t rist_Write(int fd, const void *buf, size_t len)
 {
     return rist_WriteTo(fd, buf, len, NULL, 0);
+}
+
+static bool is_multicast_address(char *psz_dst_server)
+{
+    int ret;
+    int ismulticast = 0;
+
+    struct addrinfo hint = {
+        .ai_socktype = SOCK_DGRAM,
+        .ai_protocol = IPPROTO_UDP,
+        .ai_flags = AI_NUMERICSERV | AI_IDN | AI_PASSIVE,
+    }, *res;
+
+    ret = vlc_getaddrinfo(psz_dst_server, 0, &hint, &res);
+    if (ret) {
+        return 0;
+    } else if(res->ai_family == AF_INET) {
+        unsigned long addr = ntohl(inet_addr(psz_dst_server));
+        ismulticast =  IN_MULTICAST(addr);
+    } else if (res->ai_family == AF_INET6) {
+        if (strlen(psz_dst_server) >= 5 && (strncmp("[ff00", psz_dst_server, 5) == 0 ||
+                    strncmp("[FF00", psz_dst_server, 5) == 0))
+            ismulticast = 1;
+    }
+
+    freeaddrinfo(res);
+
+    return ismulticast;
 }
