@@ -1,5 +1,5 @@
 /*****************************************************************************
- * srt.c: SRT (Secure Reliable Transport) output module
+ * srt.c: SRT (Secure Reliable Transport) access_output module
  *****************************************************************************
  * Copyright (C) 2017-2018, Collabora Ltd.
  * Copyright (C) 2018, Haivision Systems Inc.
@@ -21,11 +21,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc_common.h>
 #include <vlc_interrupt.h>
 #include <vlc_fs.h>
@@ -34,28 +29,7 @@
 #include <vlc_block.h>
 #include <vlc_network.h>
 
-#include <srt/srt.h>
-
-/* libsrt defines default packet size as 1316 internally
- * so srt module takes same value. */
-#define SRT_DEFAULT_CHUNK_SIZE 1316
-/* libsrt tutorial uses 9000 as a default binding port */
-#define SRT_DEFAULT_PORT 9000
-/* The default timeout is -1 (infinite) */
-#define SRT_DEFAULT_POLL_TIMEOUT 100
-/* The default latency is 125
- * which uses srt library internally */
-#define SRT_DEFAULT_LATENCY 125
-/* Crypto key length in bytes. */
-#define SRT_KEY_LENGTH_TEXT N_("Crypto key length in bytes")
-#define SRT_DEFAULT_KEY_LENGTH 16
-static const int srt_key_lengths[] = {
-    16, 24, 32,
-};
-
-static const char *const srt_key_length_names[] = {
-    N_("16 bytes"), N_("24 bytes"), N_("32 bytes"),
-};
+#include <srt_common.h>
 
 typedef struct
 {
@@ -86,20 +60,24 @@ static void srt_wait_interrupted(void *p_data)
 
 static bool srt_schedule_reconnect(sout_access_out_t *p_access)
 {
-    char                    *psz_dst_addr = NULL;
-    int                      i_dst_port;
-    int                      i_latency;
-    int                      stat;
-    char                    *psz_passphrase = NULL;
-
+    vlc_object_t *access_obj = (vlc_object_t *) p_access;
+    int stat;
+    char *psz_dst_addr = NULL;
+    int i_dst_port;
+    int i_latency=var_InheritInteger( p_access, SRT_PARAM_LATENCY );
+    int i_payload_size = var_InheritInteger( p_access, SRT_PARAM_PAYLOAD_SIZE );
+    char *psz_passphrase = var_InheritString( p_access, SRT_PARAM_PASSPHRASE );
+    bool passphrase_needs_free = true;
+    int i_max_bandwidth_limit =
+    var_InheritInteger( p_access, SRT_PARAM_BANDWIDTH_OVERHEAD_LIMIT );
+    char *url = NULL;
+    srt_params_t params;
     struct addrinfo hints = {
         .ai_socktype = SOCK_DGRAM,
     }, *res = NULL;
 
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     bool failed = false;
-
-    psz_passphrase = var_InheritString( p_access, "passphrase" );
 
     i_dst_port = SRT_DEFAULT_PORT;
     char *psz_parser = psz_dst_addr = strdup( p_access->psz_path );
@@ -146,6 +124,21 @@ static bool srt_schedule_reconnect(sout_access_out_t *p_access)
         goto out;
     }
 
+    if (psz_dst_addr) {
+        url = strdup( psz_dst_addr );
+        if (srt_parse_url( url, &params )) {
+            if (params.latency != -1)
+                i_latency = params.latency;
+            if (params.payload_size != -1)
+                i_payload_size = params.payload_size;
+            if (params.passphrase != NULL) {
+                free( psz_passphrase );
+                passphrase_needs_free = false;
+                psz_passphrase = (char *) params.passphrase;
+            }
+        }
+    }
+
     /* Make SRT non-blocking */
     srt_setsockopt( p_sys->sock, 0, SRTO_SNDSYN,
         &(bool) { false }, sizeof( bool ) );
@@ -161,18 +154,28 @@ static bool srt_schedule_reconnect(sout_access_out_t *p_access)
         &(int) { 1 }, sizeof( int ) );
 
     /* Set latency */
-    i_latency = var_InheritInteger( p_access, "latency" );
-    srt_setsockopt( p_sys->sock, 0, SRTO_TSBPDDELAY,
-        &i_latency, sizeof( int ) );
+    srt_set_socket_option( access_obj, SRT_PARAM_LATENCY, p_sys->sock,
+            SRTO_TSBPDDELAY, &i_latency, sizeof(i_latency) );
 
-    if ( psz_passphrase != NULL && psz_passphrase[0] != '\0')
-    {
-        int i_key_length = var_InheritInteger( p_access, "key-length" );
-        srt_setsockopt( p_sys->sock, 0, SRTO_PASSPHRASE,
-            psz_passphrase, strlen( psz_passphrase ) );
-        srt_setsockopt( p_sys->sock, 0, SRTO_PBKEYLEN,
-            &i_key_length, sizeof( int ) );
+    /* set passphrase */
+    if (psz_passphrase != NULL && psz_passphrase[0] != '\0') {
+        int i_key_length = var_InheritInteger( access_obj, SRT_PARAM_KEY_LENGTH );
+
+        srt_set_socket_option( access_obj, SRT_PARAM_KEY_LENGTH, p_sys->sock,
+                SRTO_PBKEYLEN, &i_key_length, sizeof(i_key_length) );
+
+        srt_set_socket_option( access_obj, SRT_PARAM_PASSPHRASE, p_sys->sock,
+                SRTO_PASSPHRASE, &psz_passphrase, sizeof(psz_passphrase) );
     }
+
+    /* set maximumu payload size */
+    srt_set_socket_option( access_obj, SRT_PARAM_PAYLOAD_SIZE, p_sys->sock,
+            SRTO_PAYLOADSIZE, &i_payload_size, sizeof(i_payload_size) );
+
+    /* set maximum bandwidth limit*/
+    srt_set_socket_option( access_obj, SRT_PARAM_BANDWIDTH_OVERHEAD_LIMIT,
+            p_sys->sock, SRTO_OHEADBW, &i_max_bandwidth_limit,
+            sizeof(i_max_bandwidth_limit) );
 
     srt_setsockopt( p_sys->sock, 0, SRTO_SENDER, &(int) { 1 }, sizeof(int) );
 
@@ -199,8 +202,10 @@ out:
         p_sys->sock = SRT_INVALID_SOCK;
     }
 
-    free( psz_passphrase );
+    if (passphrase_needs_free)
+        free( psz_passphrase );
     free( psz_dst_addr );
+    free( url );
     freeaddrinfo( res );
 
     return !failed;
@@ -210,8 +215,8 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     int i_len = 0;
-    size_t i_chunk_size = var_InheritInteger( p_access, "chunk-size" );
-    int i_poll_timeout = var_InheritInteger( p_access, "poll-timeout" );
+    size_t i_chunk_size = var_InheritInteger( p_access, SRT_PARAM_CHUNK_SIZE);
+    int i_poll_timeout = var_InheritInteger( p_access, SRT_PARAM_POLL_TIMEOUT );
     bool b_interrupted = false;
 
     vlc_interrupt_register( srt_wait_interrupted, p_access);
@@ -421,20 +426,28 @@ static void Close( vlc_object_t * p_this )
 
 /* Module descriptor */
 vlc_module_begin()
-    set_shortname( N_("SRT") )
-    set_description( N_("SRT stream output") )
+    set_shortname( N_( "SRT" ) )
+    set_description( N_( "SRT stream output" ) )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
 
-    add_integer( "chunk-size", SRT_DEFAULT_CHUNK_SIZE,
-            N_("SRT chunk size (bytes)"), NULL, true )
-    add_integer( "poll-timeout", SRT_DEFAULT_POLL_TIMEOUT,
-            N_("Return poll wait after timeout milliseconds (-1 = infinite)"), NULL, true )
-    add_integer( "latency", SRT_DEFAULT_LATENCY, N_("SRT latency (ms)"), NULL, true )
-    add_password("passphrase", "", N_("Password for stream encryption"), NULL)
-    add_integer( "key-length", SRT_DEFAULT_KEY_LENGTH,
-            SRT_KEY_LENGTH_TEXT, SRT_KEY_LENGTH_TEXT, false )
-        change_integer_list( srt_key_lengths, srt_key_length_names )
+    add_integer( SRT_PARAM_CHUNK_SIZE, SRT_DEFAULT_CHUNK_SIZE,
+            N_( "SRT chunk size (bytes)" ), NULL, true )
+    add_integer( SRT_PARAM_POLL_TIMEOUT, SRT_DEFAULT_POLL_TIMEOUT,
+            N_( "Return poll wait after timeout milliseconds (-1 = infinite)" ),
+            NULL, true )
+    add_integer( SRT_PARAM_LATENCY, SRT_DEFAULT_LATENCY, N_( "SRT latency (ms)" ),
+            NULL, true )
+    add_password( SRT_PARAM_PASSPHRASE, "", N_( "Password for stream encryption" ),
+            NULL )
+    add_integer( SRT_PARAM_PAYLOAD_SIZE, SRT_DEFAULT_PAYLOAD_SIZE,
+            N_( "SRT maximum payload size (bytes)" ), NULL, true )
+    add_integer( SRT_PARAM_BANDWIDTH_OVERHEAD_LIMIT,
+            SRT_DEFAULT_BANDWIDTH_OVERHEAD_LIMIT,
+            N_( "SRT maximum bandwidth ceiling (bytes)" ), NULL, true )
+    add_integer( SRT_PARAM_KEY_LENGTH, SRT_DEFAULT_KEY_LENGTH, SRT_KEY_LENGTH_TEXT,
+            SRT_KEY_LENGTH_TEXT, false )
+    change_integer_list( srt_key_lengths, srt_key_length_names )
 
     set_capability( "sout access", 0 )
     add_shortcut( "srt" )
