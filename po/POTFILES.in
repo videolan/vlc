@@ -217,6 +217,7 @@ modules/access/shm.c
 modules/access/smb.c
 modules/access/smb_common.h
 modules/access/srt.c
+modules/access/srt_common.c
 modules/access/tcp.c
 modules/access/timecode.c
 modules/access/udp.c
