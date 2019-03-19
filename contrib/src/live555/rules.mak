@@ -84,6 +84,8 @@ endif
 	$(APPLY) $(SRC)/live555/expose_server_string.patch
 	# Fix creating static libs on mingw
 	$(APPLY) $(SRC)/live555/mingw-static-libs.patch
+	# FormatMessageA is available on all Windows versions, even WinRT
+	$(APPLY) $(SRC)/live555/live555-formatmessage.patch
         # Disable Multicast interface lookup option
 	$(APPLY) $(SRC)/live555/DISABLE_LOOPBACK_IP_ADDRESS_CHECK.patch
 ifdef HAVE_ANDROID
