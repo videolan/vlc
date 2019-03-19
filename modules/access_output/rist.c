@@ -72,6 +72,7 @@ static const char *const ppsz_sout_options[] = {
     "caching",
     "buffer-size",
     "ssrc",
+    "stream-name",
     NULL
 };
 
@@ -85,6 +86,7 @@ typedef struct
     vlc_thread_t senderthread;
     size_t       i_packet_size;
     bool         b_mtu_warning;
+    bool         b_ismulticast;
     vlc_mutex_t  lock;
     vlc_mutex_t  fd_lock;
     block_t      *p_pktbuffer;
@@ -112,12 +114,13 @@ static struct rist_flow *rist_init_tx()
     }
     flow->fd_out = -1;
     flow->fd_rtcp = -1;
+    flow->fd_rtcp_m = -1;
 
     return flow;
 }
 
 static struct rist_flow *rist_udp_transmitter(sout_access_out_t *p_access, char *psz_dst_server, 
-    int i_dst_port)
+    int i_dst_port, bool b_ismulticast)
 {
     struct rist_flow *flow;
     flow = rist_init_tx();
@@ -131,6 +134,16 @@ static struct rist_flow *rist_udp_transmitter(sout_access_out_t *p_access, char 
         goto fail;
     }
 
+    if (b_ismulticast) {
+        flow->fd_rtcp_m = net_OpenDgram(p_access, psz_dst_server, i_dst_port + 1,
+            NULL, 0, IPPROTO_UDP);
+        if (flow->fd_rtcp_m < 0)
+        {
+            msg_Err( p_access, "cannot open multicast nack socket" );
+            goto fail;
+        }
+    }
+
     flow->fd_rtcp = net_ConnectDgram(p_access, psz_dst_server, i_dst_port + 1, -1, IPPROTO_UDP );
     if (flow->fd_rtcp < 0)
     {
@@ -138,7 +151,18 @@ static struct rist_flow *rist_udp_transmitter(sout_access_out_t *p_access, char 
         goto fail;
     }
 
-    populate_cname(flow->fd_rtcp, flow->cname);
+    char *psz_streamname = NULL;
+    psz_streamname = var_InheritString( p_access, SOUT_CFG_PREFIX "stream-name" );
+    if ( psz_streamname != NULL && psz_streamname[0] != '\0')
+    {
+        int name_length = snprintf(flow->cname, MAX_CNAME, "%s", psz_streamname);
+        if (name_length >= MAX_CNAME)
+            flow->cname[MAX_CNAME-1] = 0;
+        free( psz_streamname );
+    }
+    else
+        populate_cname(flow->fd_rtcp, flow->cname);
+
     msg_Info(p_access, "our cname is %s", flow->cname);
 
     return flow;
@@ -148,6 +172,8 @@ fail:
         vlc_close(flow->fd_out);
     if (flow->fd_rtcp != -1)
         vlc_close(flow->fd_rtcp);
+    if (flow->fd_rtcp_m != -1)
+        vlc_close(flow->fd_rtcp_m);
     free(flow->buffer);
     free(flow);
     return NULL;
@@ -188,6 +214,7 @@ static void rist_retransmit(sout_access_out_t *p_access, struct rist_flow *flow,
                 != (ssize_t)pkt->buffer->i_buffer) {
             msg_Err(p_access, "Error sending retransmitted packet after 2 tries ...");
         }
+
         vlc_mutex_unlock( &p_sys->fd_lock );
     }
 }
@@ -298,23 +325,29 @@ static void rist_rtcp_recv(sout_access_out_t *p_access, struct rist_flow *flow, 
                 break;
 
             case RTCP_PT_RR:
-                /*process_rr(f, pkt, len);*/
+                /*
+                if (p_sys->b_ismulticast == false)
+                    process_rr(f, pkt, len);
+                */
                 break;
 
             case RTCP_PT_SDES:
                 {
-                    int8_t name_length = rtcp_sdes_get_name_length(pkt);
-                    if (name_length > bytes_left)
+                    if (p_sys->b_ismulticast == false)
                     {
-                        /* check for a sane number of bytes */
-                        msg_Err(p_access, "Malformed SDES packet, wrong cname len %u, got a " \
-                            "buffer of %u bytes.", name_length, bytes_left);
-                        return;
-                    }
-                    if (memcmp(pkt + RTCP_SDES_SIZE, p_sys->receiver_name, name_length) != 0)
-                    {
-                        memcpy(p_sys->receiver_name, pkt + RTCP_SDES_SIZE, name_length);
-                        msg_Info(p_access, "Receiver name: %s", p_sys->receiver_name);
+                        int8_t name_length = rtcp_sdes_get_name_length(pkt);
+                        if (name_length > bytes_left)
+                        {
+                            /* check for a sane number of bytes */
+                            msg_Err(p_access, "Malformed SDES packet, wrong cname len %u, got a " \
+                                "buffer of %u bytes.", name_length, bytes_left);
+                            return;
+                        }
+                        if (memcmp(pkt + RTCP_SDES_SIZE, p_sys->receiver_name, name_length) != 0)
+                        {
+                            memcpy(p_sys->receiver_name, pkt + RTCP_SDES_SIZE, name_length);
+                            msg_Info(p_access, "Receiver name: %s", p_sys->receiver_name);
+                        }
                     }
                 }
                 break;
@@ -382,15 +415,22 @@ static void *rist_thread(void *data)
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     uint64_t now;
     uint8_t pkt[RTP_PKT_SIZE];
-    struct pollfd pfd[1];
+    struct pollfd pfd[2];
     int ret;
     ssize_t r;
 
+    int poll_sockets = 1;
     pfd[0].fd = p_sys->flow->fd_rtcp;
     pfd[0].events = POLLIN;
+    if (p_sys->b_ismulticast)
+    {
+        pfd[1].fd = p_sys->flow->fd_rtcp_m;
+        pfd[1].events = POLLIN;
+        poll_sockets++;
+    }
 
     for (;;) {
-        ret = poll(pfd, 1, RTCP_INTERVAL >> 1);
+        ret = poll(pfd, poll_sockets, RTCP_INTERVAL >> 1);
         int canc = vlc_savecancel();
         if (ret > 0)
         {
@@ -403,6 +443,21 @@ static void *rist_thread(void *data)
                 }
                 if (unlikely(r == -1)) {
                     msg_Err(p_access, "socket %d error: %s\n", p_sys->flow->fd_rtcp, 
+                        gai_strerror(errno));
+                }
+                else {
+                    rist_rtcp_recv(p_access, p_sys->flow, pkt, r);
+                }
+            }
+            if (p_sys->b_ismulticast && (pfd[1].revents & POLLIN))
+            {
+                r = rist_Read(p_sys->flow->fd_rtcp_m, pkt, RTP_PKT_SIZE);
+                if (r == RTP_PKT_SIZE) {
+                    msg_Err(p_access, "Rist RTCP messsage is too big (%zd bytes) and was " \
+                        "probably cut, please keep it under %d bytes", r, RTP_PKT_SIZE);
+                }
+                if (unlikely(r == -1)) {
+                    msg_Err(p_access, "mcast socket %d error: %s\n", p_sys->flow->fd_rtcp_m,
                         gai_strerror(errno));
                 }
                 else {
@@ -457,8 +512,11 @@ static void* ThreadSend( void *data )
         if ((seq % 14) == 0) {
             /*msg_Err(p_access, "Dropped packet with seq number %d ...", seq);*/
         }
-        else if (rist_Write(flow->fd_out, out->p_buffer, len) != len) {
-            msg_Err(p_access, "Error sending data packet after 2 tries ...");
+        else
+        {
+            if (rist_Write(flow->fd_out, out->p_buffer, len) != len) {
+                msg_Err(p_access, "Error sending data packet after 2 tries ...");
+            }
         }
 #else
         if (rist_Write(flow->fd_out, out->p_buffer, len) != len) {
@@ -638,8 +696,11 @@ static void Clean( sout_access_out_t *p_access )
         if (p_sys->flow->fd_out >= 0) {
             net_Close (p_sys->flow->fd_out);
         }
-        if (p_sys->flow->fd_nack >= 0) {
+        if (p_sys->flow->fd_rtcp >= 0) {
             net_Close (p_sys->flow->fd_rtcp);
+        }
+        if (p_sys->flow->fd_rtcp_m >= 0) {
+            net_Close (p_sys->flow->fd_rtcp_m);
         }
         for (int i=0; i<RIST_QUEUE_SIZE; i++) {
             struct rtp_pkt *pkt = &(p_sys->flow->buffer[i]);
@@ -714,7 +775,9 @@ static int Open( vlc_object_t *p_this )
 
     msg_Info(p_access, "Connecting RIST output to %s:%d and %s:%d", psz_dst_addr, i_dst_port, 
         psz_dst_addr, i_dst_port+1);
-    struct rist_flow *flow = rist_udp_transmitter(p_access, psz_dst_addr, i_dst_port);
+    p_sys->b_ismulticast = is_multicast_address(psz_dst_addr);
+    struct rist_flow *flow = rist_udp_transmitter(p_access, psz_dst_addr, i_dst_port,
+        p_sys->b_ismulticast);
     free (psz_dst_addr);
     if (!flow)
         goto failed;
@@ -786,6 +849,10 @@ failed:
     "Use this setting to specify a known SSRC for the RTP header. This is only useful " \
     "if your receiver acts on it. When using VLC as receiver, it is not." )
 
+#define NAME_TEXT N_("Stream name")
+#define NAME_LONGTEXT N_( \
+    "This Stream name will be sent to the receiver using the rist RTCP channel" )
+
 /* Module descriptor */
 vlc_module_begin()
 
@@ -802,6 +869,7 @@ vlc_module_begin()
             BUFFER_TEXT, BUFFER_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "ssrc", 0,
             SSRC_TEXT, SSRC_LONGTEXT, true )
+    add_string( SOUT_CFG_PREFIX "stream-name", NULL, NAME_TEXT, NAME_LONGTEXT, true )
 
     set_capability( "sout access", 0 )
     add_shortcut( "rist", "tr06" )
