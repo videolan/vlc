@@ -306,19 +306,17 @@ void intf_DestroyAll(libvlc_int_t *libvlc)
     vlc_mutex_lock(&lock);
     intf_thread_t *intf, **pp = &priv->interfaces;
 
+    while ((intf = *pp) != NULL)
     {
-        while ((intf = *pp) != NULL)
-        {
-            *pp = intf->p_next;
-            vlc_mutex_unlock(&lock);
+        *pp = intf->p_next;
+        vlc_mutex_unlock(&lock);
 
-            module_unneed(intf, intf->p_module);
-            config_ChainDestroy(intf->p_cfg);
-            var_DelCallback(intf, "intf-add", AddIntfCallback, NULL);
-            vlc_object_delete(intf);
+        module_unneed(intf, intf->p_module);
+        config_ChainDestroy(intf->p_cfg);
+        var_DelCallback(intf, "intf-add", AddIntfCallback, NULL);
+        vlc_object_delete(intf);
 
-            vlc_mutex_lock(&lock);
-        }
+        vlc_mutex_lock(&lock);
     }
     vlc_mutex_unlock(&lock);
 
