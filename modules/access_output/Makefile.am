@@ -27,7 +27,7 @@ access_out_LTLIBRARIES += $(LTLIBaccess_output_shout)
 EXTRA_LTLIBRARIES += libaccess_output_shout_plugin.la
 
 ### SRT ###
-libaccess_output_srt_plugin_la_SOURCES = access_output/srt.c dummy.cpp
+libaccess_output_srt_plugin_la_SOURCES = access_output/srt.c access/srt_common.c access/srt_common.h dummy.cpp
 libaccess_output_srt_plugin_la_CFLAGS = $(AM_CFLAGS) $(SRT_CFLAGS)
 libaccess_output_srt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SRT_CPPFLAGS)
 libaccess_output_srt_plugin_la_LIBADD = $(SRT_LIBS)
