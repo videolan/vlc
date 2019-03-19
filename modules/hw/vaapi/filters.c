@@ -75,7 +75,7 @@ vlc_vaapi_FilterHoldInstance(filter_t *filter, VADisplay *dpy)
         holder.owner = filter;
         holder.dec_device = dec_device = pic->p_sys ?
             vlc_vaapi_PicSysHoldInstance(pic->p_sys, dpy) : NULL;
-        assert(holder.dec_device->type == VLC_DECODER_DEVICE_VAAPI);
+        assert(dec_device == NULL || dec_device->type == VLC_DECODER_DEVICE_VAAPI);
     }
     vlc_mutex_unlock(&holder.lock);
     picture_Release(pic);
