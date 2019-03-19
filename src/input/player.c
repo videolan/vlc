@@ -169,7 +169,7 @@ struct vlc_player_t
     struct vlc_player_input *input;
 
     bool releasing_media;
-    bool has_next_media;
+    bool next_media_requested;
     input_item_t *next_media;
 
     enum vlc_player_state global_state;
@@ -704,13 +704,13 @@ vlc_player_PrepareNextMedia(vlc_player_t *player)
 
     if (!player->media_provider 
      || player->media_stopped_action != VLC_PLAYER_MEDIA_STOPPED_CONTINUE
-     || player->has_next_media)
+     || player->next_media_requested)
         return;
 
     assert(player->next_media == NULL);
     player->next_media =
         player->media_provider->get_next(player, player->media_provider_data);
-    player->has_next_media = true;
+    player->next_media_requested = true;
 }
 
 static int
@@ -718,7 +718,7 @@ vlc_player_OpenNextMedia(vlc_player_t *player)
 {
     assert(player->input == NULL);
 
-    player->has_next_media = false;
+    player->next_media_requested = false;
 
     int ret = VLC_SUCCESS;
     if (player->releasing_media)
@@ -2060,14 +2060,14 @@ vlc_player_SetCurrentMedia(vlc_player_t *player, input_item_t *media)
         /* Switch to this new media when the current input is stopped */
         player->next_media = input_item_Hold(media);
         player->releasing_media = false;
-        player->has_next_media = true;
+        player->next_media_requested = true;
     }
     else if (player->media)
     {
         /* The current media will be set to NULL once the current input is
          * stopped */
         player->releasing_media = true;
-        player->has_next_media = false;
+        player->next_media_requested = false;
     }
     else
         return VLC_SUCCESS;
@@ -2150,7 +2150,7 @@ vlc_player_InvalidateNextMedia(vlc_player_t *player)
         input_item_Release(player->next_media);
         player->next_media = NULL;
     }
-    player->has_next_media = false;
+    player->next_media_requested = false;
 
 }
 
@@ -3499,7 +3499,7 @@ vlc_player_New(vlc_object_t *parent,
     player->error_count = 0;
 
     player->releasing_media = false;
-    player->has_next_media = false;
+    player->next_media_requested = false;
     player->next_media = NULL;
 
 #define VAR_CREATE(var, flag) do { \
