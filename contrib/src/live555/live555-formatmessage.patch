@@ -1,0 +1,31 @@
+--- live555/BasicUsageEnvironment/BasicUsageEnvironment0.cpp.unicode	2019-03-19 10:00:21.845187700 +0100
++++ live555/BasicUsageEnvironment/BasicUsageEnvironment0.cpp	2019-03-19 09:59:40.204996800 +0100
+@@ -19,9 +19,6 @@ along with this library; if not, write t
+ 
+ #include "BasicUsageEnvironment0.hh"
+ #include <stdio.h>
+-#if defined(__WIN32__) || defined(_WIN32) || defined(_WIN32_WCE)
+-#define snprintf _snprintf
+-#endif
+ 
+ 
+ ////////// BasicUsageEnvironment //////////
+@@ -68,7 +65,6 @@ void BasicUsageEnvironment0::setResultEr
+ 
+   if (err == 0) err = getErrno();
+ #if defined(__WIN32__) || defined(_WIN32) || defined(_WIN32_WCE)
+-#ifndef _UNICODE
+   char errMsg[RESULT_MSG_BUFFER_MAX] = "\0";
+   if (0 != FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, errMsg, sizeof(errMsg)/sizeof(errMsg[0]), NULL)) {
+     // Remove all trailing '\r', '\n' and '.'
+@@ -76,9 +72,8 @@ void BasicUsageEnvironment0::setResultEr
+       *p = '\0';
+     }
+   } else
+-    snprintf(errMsg, sizeof(errMsg)/sizeof(errMsg[0]), "error %d", err);
++    _snprintf(errMsg, sizeof(errMsg)/sizeof(errMsg[0]), "error %d", err);
+   appendToResultMsg(errMsg);
+-#endif
+ #else
+   appendToResultMsg(strerror(err));
+ #endif

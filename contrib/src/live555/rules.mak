@@ -79,6 +79,8 @@ endif
 	$(APPLY) $(SRC)/live555/expose_server_string.patch
 	# Fix creating static libs on mingw
 	$(APPLY) $(SRC)/live555/mingw-static-libs.patch
+	# FormatMessageA is available on all Windows versions, even WinRT
+	$(APPLY) $(SRC)/live555/live555-formatmessage.patch
 ifdef HAVE_ANDROID
 	# Fix in_addr.s_addr field access
 	$(APPLY) $(SRC)/live555/in_addr-s_addr-field.patch
