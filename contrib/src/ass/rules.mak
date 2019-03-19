@@ -50,6 +50,7 @@ libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(APPLY) $(SRC)/ass/ass-macosx.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/ass/use-topendir.patch
+	$(APPLY) $(SRC)/ass/libass-no-tchar.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/ass/dwrite.patch
 endif

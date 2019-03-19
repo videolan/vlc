@@ -1,0 +1,34 @@
+--- libass/libass/ass_fontselect.c.tchar	2019-03-19 12:07:15.464633200 +0100
++++ libass/libass/ass_fontselect.c	2019-03-19 12:06:48.404627300 +0100
+@@ -48,7 +48,6 @@
+ #include "ass_string.h"
+ 
+ #include <windows.h>
+-#include <tchar.h>
+ 
+ #define ABS(x) ((x) < 0 ? -(x) : (x))
+ #define MAX_FULLNAME 100
+@@ -195,12 +194,12 @@ static inline wchar_t *ToWide (const cha
+ static void load_fonts_from_dir(ASS_Library *library, const char *dir)
+ {
+     wchar_t *dirw = ToWide(dir);
+-    _TDIR *d = _topendir(dirw);
++    _WDIR *d = _wopendir(dirw);
+     free(dirw);
+     if (!d)
+         return;
+     while (1) {
+-        struct _tdirent *entry = _treaddir(d);
++        struct _wdirent *entry = _wreaddir(d);
+         if (!entry)
+             break;
+         char* d_name = FromWide(entry->d_name);
+@@ -220,7 +219,7 @@ static void load_fonts_from_dir(ASS_Libr
+         }
+         free(d_name);
+     }
+-    _tclosedir(d);
++    _wclosedir(d);
+ }
+ 
+ /**
