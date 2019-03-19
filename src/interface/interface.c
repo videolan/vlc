@@ -129,10 +129,9 @@ PlaylistConfigureFromVariables(vlc_playlist_t *playlist, vlc_object_t *obj)
     vlc_playlist_Unlock(playlist);
 }
 
-vlc_playlist_t *
-vlc_intf_GetMainPlaylist(intf_thread_t *intf)
+static vlc_playlist_t *
+libvlc_GetMainPlaylist(libvlc_int_t *libvlc)
 {
-    libvlc_int_t *libvlc = vlc_object_instance(intf);
     libvlc_priv_t *priv = libvlc_priv(libvlc);
 
     vlc_mutex_lock(&lock);
@@ -146,6 +145,12 @@ vlc_intf_GetMainPlaylist(intf_thread_t *intf)
     vlc_mutex_unlock(&lock);
 
     return playlist;
+}
+
+vlc_playlist_t *
+vlc_intf_GetMainPlaylist(intf_thread_t *intf)
+{
+    return libvlc_GetMainPlaylist(vlc_object_instance(intf));
 }
 
 static int intf_CreateInternal( libvlc_int_t *libvlc, playlist_t *playlist,
