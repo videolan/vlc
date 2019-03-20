@@ -1045,7 +1045,7 @@ static int Demux_Seekable( demux_t *p_demux )
 
         if( i_pos == -1 )
         {
-            int i_loop_count = 0;
+            unsigned short i_loop_count = 0;
 
             /* no valid index, we will parse directly the stream
              * in case we fail we will disable all finished stream */
@@ -1092,7 +1092,7 @@ static int Demux_Seekable( demux_t *p_demux )
                     {
                         vlc_tick_sleep( VLC_HARD_MIN_SLEEP );
 
-                        if( !(i_loop_count % (1024 * 10)) )
+                        if( !i_loop_count )
                             msg_Warn( p_demux,
                                       "don't seem to find any data..." );
                     }
@@ -1786,7 +1786,7 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     avi_packet_t avi_pk;
-    int i_loop_count = 0;
+    unsigned short i_loop_count = 0;
 
     /* find first chunk of i_stream that isn't in index */
 
@@ -1827,7 +1827,7 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
             {
                 vlc_tick_sleep( VLC_HARD_MIN_SLEEP );
 
-                if( !(i_loop_count % (1024 * 10)) )
+                if( !i_loop_count )
                     msg_Warn( p_demux, "don't seem to find any data..." );
             }
         }
@@ -2215,7 +2215,7 @@ static int AVI_PacketSearch( demux_t *p_demux )
 {
     demux_sys_t     *p_sys = p_demux->p_sys;
     avi_packet_t    avi_pk;
-    int             i_count = 0;
+    unsigned short  i_count = 0;
 
     for( ;; )
     {
@@ -2245,7 +2245,7 @@ static int AVI_PacketSearch( demux_t *p_demux )
         if( !(++i_count % 1024) )
         {
             vlc_tick_sleep( VLC_HARD_MIN_SLEEP );
-            if( !(i_count % (1024 * 10)) )
+            if( !i_count )
                 msg_Warn( p_demux, "trying to resync..." );
         }
     }
