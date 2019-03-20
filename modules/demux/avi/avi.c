@@ -1085,17 +1085,8 @@ static int Demux_Seekable( demux_t *p_demux )
                         return( AVI_TrackStopFinishedStreams( p_demux ) ? 0 : 1 );
                     }
 
-                    /* Prevents from eating all the CPU with broken files.
-                     * This value should be low enough so that it doesn't
-                     * affect the reading speed too much. */
-                    if( !(++i_loop_count % 1024) )
-                    {
-                        vlc_tick_sleep( VLC_HARD_MIN_SLEEP );
-
-                        if( !i_loop_count )
-                            msg_Warn( p_demux,
-                                      "don't seem to find any data..." );
-                    }
+                    if( !++i_loop_count )
+                         msg_Warn( p_demux, "don't seem to find any data..." );
                     continue;
                 }
                 else
@@ -1820,16 +1811,8 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
                 return VLC_EGENERIC;
             }
 
-            /* Prevents from eating all the CPU with broken files.
-             * This value should be low enough so that it doesn't
-             * affect the reading speed too much. */
-            if( !(++i_loop_count % 1024) )
-            {
-                vlc_tick_sleep( VLC_HARD_MIN_SLEEP );
-
-                if( !i_loop_count )
-                    msg_Warn( p_demux, "don't seem to find any data..." );
-            }
+            if( !++i_loop_count )
+                 msg_Warn( p_demux, "don't seem to find any data..." );
         }
         else
         {
@@ -2238,16 +2221,8 @@ static int AVI_PacketSearch( demux_t *p_demux )
                 return VLC_SUCCESS;
         }
 
-        /* Prevents from eating all the CPU with broken files.
-         * This value should be low enough so that it doesn't affect the
-         * reading speed too much (not that we care much anyway because
-         * this code is called only on broken files). */
-        if( !(++i_count % 1024) )
-        {
-            vlc_tick_sleep( VLC_HARD_MIN_SLEEP );
-            if( !i_count )
-                msg_Warn( p_demux, "trying to resync..." );
-        }
+        if( !++i_count )
+            msg_Warn( p_demux, "trying to resync..." );
     }
 }
 
