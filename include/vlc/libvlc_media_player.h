@@ -290,6 +290,42 @@ LIBVLC_API int libvlc_media_player_set_renderer( libvlc_media_player_t *p_mi,
                                                  libvlc_renderer_item_t *p_item );
 
 /**
+ * Enumeration of the Video color primaries.
+ */
+typedef enum libvlc_video_color_primaries_t {
+    libvlc_video_primaries_BT601_525 = 1,
+    libvlc_video_primaries_BT601_625 = 2,
+    libvlc_video_primaries_BT709     = 3,
+    libvlc_video_primaries_BT2020    = 4,
+    libvlc_video_primaries_DCI_P3    = 5,
+    libvlc_video_primaries_BT470_M   = 6,
+} libvlc_video_color_primaries_t;
+
+/**
+ * Enumeration of the Video color spaces.
+ */
+typedef enum libvlc_video_color_space_t {
+    libvlc_video_colorspace_BT601  = 1,
+    libvlc_video_colorspace_BT709  = 2,
+    libvlc_video_colorspace_BT2020 = 3,
+} libvlc_video_color_space_t;
+
+/**
+ * Enumeration of the Video transfer functions.
+ */
+typedef enum libvlc_video_transfer_func_t {
+    libvlc_video_transfer_func_LINEAR     = 1,
+    libvlc_video_transfer_func_SRGB       = 2,
+    libvlc_video_transfer_func_BT470_BG   = 3,
+    libvlc_video_transfer_func_BT470_M    = 4,
+    libvlc_video_transfer_func_BT709      = 5,
+    libvlc_video_transfer_func_PQ         = 6,
+    libvlc_video_transfer_func_SMPTE_240  = 7,
+    libvlc_video_transfer_func_HLG        = 8,
+} libvlc_video_transfer_func_t;
+
+
+/**
  * Callback prototype to allocate and lock a picture buffer.
  *
  * Whenever a new video frame needs to be decoded, the lock callback is
@@ -556,6 +592,171 @@ int libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_makeCurrent_cb makeCurrent_cb,
                                         libvlc_video_getProcAddress_cb getProcAddress_cb,
                                         void* opaque );
+
+
+/**
+ * Enumeration of the Video engine to be used on output.
+ * can be passed to @a libvlc_video_direct3d_set_callbacks
+ */
+typedef enum libvlc_video_direct3d_engine_t {
+    /** Direct3D11 rendering engine */
+    libvlc_video_direct3d_engine_d3d11,
+    /** Direct3D9 rendering engine */
+    libvlc_video_direct3d_engine_d3d9,
+} libvlc_video_direct3d_engine_t;
+
+typedef struct
+{
+    bool hardware_decoding; /** set if D3D11_CREATE_DEVICE_VIDEO_SUPPORT is needed for D3D11 */
+} libvlc_video_direct3d_device_cfg_t;
+
+typedef struct
+{
+    void *device_context; /** ID3D11DeviceContext* for D3D11, IDirect3DDevice9 * for D3D9 */
+} libvlc_video_direct3d_device_setup_t;
+
+/** Setup the rendering environment.
+ *
+ * \param opaque private pointer passed to the @a libvlc_video_direct3d_set_callbacks()
+ *               on input. The callback can change this value on output to be
+ *               passed to all the other callbacks set on @a libvlc_video_direct3d_set_callbacks(). [IN/OUT]
+ * \param cfg requested configuration of the video device [IN]
+ * \param out libvlc_video_direct3d_device_setup_t* to fill [OUT]
+ * \return true on success
+ * \version LibVLC 4.0.0 or later
+ *
+ * For \ref libvlc_video_direct3d_engine_d3d9 the output must be a IDirect3DDevice9*.
+ * A reference to this object is held until the \ref LIBVLC_VIDEO_DEVICE_CLEANUP is called.
+ * the device must be created with D3DPRESENT_PARAMETERS.hDeviceWindow set to 0.
+ *
+ * For \ref libvlc_video_direct3d_engine_d3d11 the output must be a ID3D11DeviceContext*.
+ * A reference to this object is held until the \ref LIBVLC_VIDEO_DEVICE_CLEANUP is called.
+ * The ID3D11Device used to create ID3D11DeviceContext must have multithreading enabled.
+ */
+typedef bool( *libvlc_video_direct3d_device_setup_cb )( void **opaque,
+                                                        const libvlc_video_direct3d_device_cfg_t *cfg,
+                                                        libvlc_video_direct3d_device_setup_t *out );
+
+/** Cleanup the rendering environment initialized during \ref libvlc_video_direct3d_device_setup_cb.
+ *
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \version LibVLC 4.0.0 or later
+ */
+typedef void( *libvlc_video_direct3d_device_cleanup_cb )( void *opaque );
+
+typedef struct
+{
+    unsigned width;                        /** rendering video width in pixel */
+    unsigned height;                      /** rendering video height in pixel */
+    unsigned bitdepth;      /** rendering video bit depth in bits per channel */
+    bool full_range;          /** video is full range or studio/limited range */
+    libvlc_video_color_space_t colorspace;              /** video color space */
+    libvlc_video_color_primaries_t primaries;       /** video color primaries */
+    libvlc_video_transfer_func_t transfer;        /** video transfer function */
+} libvlc_video_direct3d_cfg_t;
+
+typedef struct
+{
+    int surface_format;  /** the rendering DXGI_FORMAT for \ref libvlc_video_direct3d_engine_d3d11,
+                          D3DFORMAT for \ref libvlc_video_direct3d_engine_d3d9 */
+    bool full_range;          /** video is full range or studio/limited range */
+    libvlc_video_color_space_t colorspace;              /** video color space */
+    libvlc_video_color_primaries_t primaries;       /** video color primaries */
+    libvlc_video_transfer_func_t transfer;        /** video transfer function */
+} libvlc_video_output_cfg_t;
+
+/** Update the rendering output setup.
+ *
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \param cfg configuration of the video that will be rendered [IN]
+ * \param output configuration describing with how the rendering is setup [OUT]
+ * \version LibVLC 4.0.0 or later
+ *
+ * Tone mapping, range and color conversion will be done depending on the values
+ * set in the output structure.
+ */
+typedef bool( *libvlc_video_direct3d_update_output_cb )( void *opaque,
+                                                         const libvlc_video_direct3d_cfg_t *cfg,
+                                                         libvlc_video_output_cfg_t *output );
+
+/** Tell the host the rendering is about to start/has finished.
+ *
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \param enter true if the rendering is about to start, false if it's finished
+ * \return true on success
+ * \version LibVLC 4.0.0 or later
+ *
+ * On Direct3D9 the following may change on the provided IDirect3DDevice9*
+ * between \ref enter being true and \ref enter being false:
+ * - D3DSAMP_ADDRESSU
+ * - D3DSAMP_ADDRESSV
+ * - D3DSAMP_MINFILTER
+ * - D3DSAMP_MAGFILTER
+ * - D3DRS_AMBIENT
+ * - D3DRS_CULLMODE
+ * - D3DRS_ZENABLE
+ * - D3DRS_LIGHTING
+ * - D3DRS_DITHERENABLE
+ * - D3DRS_STENCILENABLE
+ * - D3DRS_ALPHABLENDENABLE
+ * - D3DRS_SRCBLEND,D3DBLEND_SRCALPHA
+ * - D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA
+ * - D3DPCMPCAPS_GREATER
+ * - D3DRS_ALPHATESTENABLE
+ * - D3DRS_ALPHAREF
+ * - D3DRS_ALPHAFUNC
+ * - D3DTSS_COLOROP
+ * - D3DTSS_COLORARG1
+ * - D3DTSS_ALPHAOP
+ * - D3DTSS_ALPHAARG1
+ * - D3DTSS_ALPHAARG2
+ *
+ * On Direct3D11 the following may change on the provided ID3D11DeviceContext*
+ * between \ref enter being true and \ref enter being false:
+ * - IASetPrimitiveTopology()
+ * - IASetInputLayout()
+ * - IASetVertexBuffers()
+ * - IASetIndexBuffer()
+ * - VSSetConstantBuffers()
+ * - VSSetShader()
+ * - PSSetSamplers()
+ * - PSSetConstantBuffers()
+ * - PSSetShaderResources()
+ * - PSSetShader()
+ * - RSSetViewports()
+ * - DrawIndexed()
+ */
+typedef bool( *libvlc_video_direct3d_start_end_rendering_cb )( void *opaque, bool enter );
+
+
+/**
+ * Set callbacks and data to render decoded video to a custom Direct3D output
+ *
+ * \warning VLC will perform video rendering in its own thread and at its own rate,
+ * You need to provide your own synchronisation mechanism.
+ *
+ * \param mp the media player
+ * \param engine the GPU engine to use
+ * \param setup_cb callback to setup and return the device to use (cannot be NULL)
+ * \param cleanup_cb callback to cleanup the device given by the \ref setup_cb callback
+ * \param update_output_cb callback to notify of the source format and get the
+ *                         rendering format used by the host (cannot be NULL)
+ * \param swap_cb callback to tell the host it should display the rendered picture (cannot be NULL)
+ * \param makeCurrent_cb callback to tell the host the rendering is starting/ended (cannot be NULL)
+ * \param select_plane_cb callback to select different D3D11 rendering targets
+ * \param opaque private pointer passed to the \ref cleanup_cb callback
+ * \libvlc_return_bool
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API
+int libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
+                                         libvlc_video_direct3d_engine_t engine,
+                                         libvlc_video_direct3d_device_setup_cb setup_cb,
+                                         libvlc_video_direct3d_device_cleanup_cb cleanup_cb,
+                                         libvlc_video_direct3d_update_output_cb update_output_cb,
+                                         libvlc_video_swap_cb swap_cb,
+                                         libvlc_video_direct3d_start_end_rendering_cb makeCurrent_cb,
+                                         void* opaque );
 
 /**
  * Set the NSView handler where the media player should render its video output.
