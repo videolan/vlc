@@ -306,7 +306,7 @@ static int Open( vlc_object_t* p_this )
         case LIBSSH2_HOSTKEY_TYPE_DSS:
             knownhost_fingerprint_algo = LIBSSH2_KNOWNHOST_KEY_SSHDSS;
             break;
-#if LIBSSH2_VERSION_NUM >= 0x010801
+#if LIBSSH2_VERSION_NUM >= 0x010900
         case LIBSSH2_HOSTKEY_TYPE_ECDSA_256:
             knownhost_fingerprint_algo = LIBSSH2_KNOWNHOST_KEY_ECDSA_256;
             break;
