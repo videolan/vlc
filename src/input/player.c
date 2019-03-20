@@ -278,7 +278,12 @@ vouts_osd_Message(vout_thread_t **vouts, size_t count, const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     for (size_t i = 0; i < count; ++i)
-        vout_OSDMessageVa(vouts[i], VOUT_SPU_CHANNEL_OSD, fmt, args);
+    {
+        va_list acpy;
+        va_copy(acpy, args);
+        vout_OSDMessageVa(vouts[i], VOUT_SPU_CHANNEL_OSD, fmt, acpy);
+        va_end(acpy);
+    }
     va_end(args);
 }
 
@@ -307,7 +312,12 @@ vlc_player_vout_OSDMessage(vlc_player_t *player, const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     for (size_t i = 0; i < count; ++i)
-        vout_OSDMessageVa(vouts[i], VOUT_SPU_CHANNEL_OSD, fmt, args);
+    {
+        va_list acpy;
+        va_copy(acpy, args);
+        vout_OSDMessageVa(vouts[i], VOUT_SPU_CHANNEL_OSD, fmt, acpy);
+        va_end(acpy);
+    }
     va_end(args);
 
     vlc_player_vout_OSDReleaseAll(player, vouts, count);
