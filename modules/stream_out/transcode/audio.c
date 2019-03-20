@@ -201,15 +201,6 @@ int transcode_audio_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
 
 void transcode_audio_clean( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
-    /* Close decoder */
-    if( id->p_decoder->p_module )
-        module_unneed( id->p_decoder, id->p_decoder->p_module );
-    id->p_decoder->p_module = NULL;
-
-    if( id->p_decoder->p_description )
-        vlc_meta_Delete( id->p_decoder->p_description );
-    id->p_decoder->p_description = NULL;
-
     /* Close encoder */
     transcode_encoder_close( id->encoder );
     transcode_encoder_delete( id->encoder );

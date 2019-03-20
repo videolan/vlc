@@ -310,12 +310,6 @@ void transcode_video_clean( sout_stream_t *p_stream,
 {
     VLC_UNUSED(p_stream);
 
-    /* Close decoder */
-    if( id->p_decoder->p_module )
-        module_unneed( id->p_decoder, id->p_decoder->p_module );
-    if( id->p_decoder->p_description )
-        vlc_meta_Delete( id->p_decoder->p_description );
-
     /* Close encoder */
     transcode_encoder_close( id->encoder );
     transcode_encoder_delete( id->encoder );
