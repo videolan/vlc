@@ -1051,7 +1051,9 @@ static int Demux_Seekable( demux_t *p_demux )
              * in case we fail we will disable all finished stream */
             if( p_sys->b_seekable && p_sys->i_movi_lastchunk_pos >= p_sys->i_movi_begin + 12 )
             {
-                vlc_stream_Seek( p_demux->s, p_sys->i_movi_lastchunk_pos );
+                if (vlc_stream_Seek(p_demux->s, p_sys->i_movi_lastchunk_pos))
+                    return VLC_DEMUXER_EGENERIC;
+
                 if( AVI_PacketNext( p_demux ) )
                 {
                     return( AVI_TrackStopFinishedStreams( p_demux ) ? 0 : 1 );
@@ -1059,7 +1061,8 @@ static int Demux_Seekable( demux_t *p_demux )
             }
             else
             {
-                vlc_stream_Seek( p_demux->s, p_sys->i_movi_begin + 12 );
+                if (vlc_stream_Seek(p_demux->s, p_sys->i_movi_begin + 12))
+                    return VLC_DEMUXER_EGENERIC;
             }
 
             for( ;; )
@@ -1129,7 +1132,8 @@ static int Demux_Seekable( demux_t *p_demux )
         }
         else
         {
-            vlc_stream_Seek( p_demux->s, i_pos );
+            if (vlc_stream_Seek(p_demux->s, i_pos))
+                return VLC_DEMUXER_EGENERIC;
         }
 
         /* Set the track to use */
@@ -1434,8 +1438,9 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, double f_ratio, bool b_acc
             if ( i_ret )
             {
                 /* Go back to position before index failure */
-                if ( vlc_stream_Tell( p_demux->s ) - i_pos_backup )
-                    vlc_stream_Seek( p_demux->s, i_pos_backup );
+                if (vlc_stream_Tell(p_demux->s) != i_pos_backup
+                 && vlc_stream_Seek(p_demux->s, i_pos_backup))
+                    return VLC_EGENERIC;
 
                 if ( p_sys->i_avih_flags & AVIF_MUSTUSEINDEX )
                     return VLC_EGENERIC;
@@ -1787,7 +1792,8 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
 
     if( p_sys->i_movi_lastchunk_pos >= p_sys->i_movi_begin + 12 )
     {
-        vlc_stream_Seek( p_demux->s, p_sys->i_movi_lastchunk_pos );
+        if (vlc_stream_Seek(p_demux->s, p_sys->i_movi_lastchunk_pos))
+            return VLC_EGENERIC;
         if( AVI_PacketNext( p_demux ) )
         {
             return VLC_EGENERIC;
@@ -1795,7 +1801,8 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
     }
     else
     {
-        vlc_stream_Seek( p_demux->s, p_sys->i_movi_begin + 12 );
+        if (vlc_stream_Seek(p_demux->s, p_sys->i_movi_begin + 12))
+            return VLC_EGENERIC;
     }
 
     for( ;; )
