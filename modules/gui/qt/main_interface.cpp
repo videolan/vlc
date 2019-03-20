@@ -154,6 +154,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf ),
     /* */
     b_pauseOnMinimize = var_InheritBool( p_intf, "qt-pause-minimized" );
 
+    /* Get the available interfaces */
+    m_extraInterfaces = new VLCVarChoiceModel(p_intf, "intf-add", this);
+
     /* Set the other interface settings */
     settings = getSettings();
 
@@ -442,7 +445,8 @@ bool MainInterface::getVideo( struct vout_window_t *p_wnd )
     p_wnd->ops = &ops;
     p_wnd->info.has_double_click = true;
     p_wnd->sys = this;
-    m_videoRenderer->setupVoutWindow(p_wnd);
+    if (!m_videoRenderer->setupVoutWindow(p_wnd))
+        return false;
 
     m_hasEmbededVideo = true;
     emit hasEmbededVideoChanged(true);
@@ -1095,6 +1099,11 @@ void MainInterface::setRaise()
 {
     activateWindow();
     raise();
+}
+
+VLCVarChoiceModel* MainInterface::getExtraInterfaces()
+{
+    return m_extraInterfaces;
 }
 
 /*****************************************************************************

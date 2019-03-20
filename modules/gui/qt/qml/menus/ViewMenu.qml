@@ -59,11 +59,12 @@ Utils.MenuExt {
         }
     }
 
-    /* FIXME unimplemented
-    Menu {
+    MenuSeparator {}
+
+    CheckableModelSubMenu{
         title: qsTr("Add Interface")
+        model: rootWindow.extraInterfaces
     }
-    */
 
     /* FIXME unimplemented
     extensions

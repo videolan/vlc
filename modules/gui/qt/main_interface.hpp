@@ -66,6 +66,7 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(bool interfaceAlwaysOnTop READ isInterfaceAlwaysOnTop WRITE setInterfaceAlwaysOnTop NOTIFY interfaceAlwaysOnTopChanged)
     Q_PROPERTY(bool interfaceFullScreen READ isInterfaceFullScreen WRITE setInterfaceFullScreen NOTIFY interfaceFullScreenChanged)
     Q_PROPERTY(bool hasEmbededVideo READ hasEmbededVideo NOTIFY hasEmbededVideoChanged)
+    Q_PROPERTY(VLCVarChoiceModel* extraInterfaces READ getExtraInterfaces CONSTANT)
 
 public:
     /* tors */
@@ -78,6 +79,7 @@ public:
     bool getVideo( struct vout_window_t * );
 private:
     bool m_hasEmbededVideo = false;
+    VLCVarChoiceModel* m_extraInterfaces;
     std::atomic_flag videoActive;
     static int enableVideo( struct vout_window_t *,
                             const struct vout_window_cfg_t * );
@@ -202,6 +204,7 @@ public slots:
 
     virtual void reloadPrefs();
     void toolBarConfUpdated();
+    VLCVarChoiceModel* getExtraInterfaces();
 
 protected slots:
     void setVLCWindowsTitle( const QString& title = "" );
