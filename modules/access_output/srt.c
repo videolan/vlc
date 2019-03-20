@@ -21,15 +21,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#include <vlc_common.h>
+
+#include <srt_common.h>
+
 #include <vlc_interrupt.h>
 #include <vlc_fs.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_network.h>
-
-#include <srt_common.h>
 
 typedef struct
 {
