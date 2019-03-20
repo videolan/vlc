@@ -5447,10 +5447,9 @@ static void MP4_BoxDumpStructure_Internal( stream_t *s, const MP4_Box_t *p_box,
         }
 
         snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
-                  "+ %4.4s size %"PRIu64" offset %" PRIuMAX "%s",
-                    (char*)&i_displayedtype, p_box->i_size,
-                  (uintmax_t)p_box->i_pos,
-                p_box->e_flags & BOX_FLAG_INCOMPLETE ? " (\?\?\?\?)" : "" );
+                  "+ %4.4s size %"PRIu64" offset %"PRIu64"%s",
+                  (char *)&i_displayedtype, p_box->i_size, p_box->i_pos,
+                  p_box->e_flags & BOX_FLAG_INCOMPLETE ? " (\?\?\?\?)" : "" );
         msg_Dbg( s, "%s", str );
     }
     p_child = p_box->p_first;
