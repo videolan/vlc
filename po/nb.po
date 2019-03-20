@@ -1,16 +1,17 @@
 # Norwegian Bokmål translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Alexander Mackinnon Jansen <bornxlo@gmail.com>, 2013-2015
+# Alexander Mackinnon Jansen <bornxlo@gmail.com>, 2013-2019
 # Allan Nordhøy <epost@anotheragency.no>, 2014-2017
 # Andreas Dreyer Hysing <andreashysing@gmail.com>, 2016
 # asd, 2014
 # bobbaluba <bobbaluba@gmail.com>, 2013-2014
 # Christian, 2015
-# Harald H. <haarektrans@gmail.com>, 2014,2015
-# Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2017
+# Erlend Østlie <erlendandreas12368@gmail.com>, 2018
+# Harald H. <haarektrans@gmail.com>, 2014-2015
+# Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2018
 # Kim Malmo <berencamlost@msn.com>, 2018
 # Kristoffer Berge <kristoffer.berge@gmail.com>, 2015
 # Kurt-Håkon Eilertsen <kurt@kheds.com>, 2014,2016
@@ -22,18 +23,18 @@
 # thomhov, 2014
 # Torstein Husebø <torstein.huseboe@gmail.com>, 2017
 # Tronn Dyrstad <translate@dyrstad.no>, 2016
-# tyler moss <tls@tutanota.com>, 2015,2016
+# tyler moss <tls@tutanota.com>, 2015-2016
 # Yomawaru, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-09 01:07+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-03-20 16:27+0100\n"
+"Last-Translator: Alexander Mackinnon Jansen <bornxlo@gmail.com>, 2019\n"
 "Language-Team: Norwegian Bokmål (Norway) (https://www.transifex.com/yaron/"
 "teams/16553/nb_NO/)\n"
-"Language: nb\n"
+"Language: nb_NO\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -425,7 +426,7 @@ msgstr "Avansert"
 
 #: include/vlc_config_cat.h:185
 msgid "Advanced settings. Use with care..."
-msgstr "Avanserte innstillinger. Bruk med forsiktighet …"
+msgstr "Avanserte innstillinger. Bruk forsiktig …"
 
 #: include/vlc_config_cat.h:187
 msgid "Advanced settings"
@@ -936,7 +937,7 @@ msgstr "Kodek ikke støttet"
 #: src/input/decoder.c:1893
 #, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr "VLC kunne ikke dekode formatet \"%4.4s\" (%s)"
+msgstr "VLC kunne ikke dekode formatet «%4.4s» (%s)"
 
 #: src/input/decoder.c:1897
 msgid "Unidentified codec"
@@ -1162,7 +1163,7 @@ msgstr "ITU-R BT.601 (625 linjer, 50 Hz)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
-msgstr ""
+msgstr "Primærfarger"
 
 #: src/input/es_out.c:3229 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1240,22 +1241,22 @@ msgstr "Projisering"
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Turbulens"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Tone"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "Rull"
 
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "Synsfelt"
 
 #: src/input/es_out.c:3305
 msgid "Max. luminance"
@@ -1398,7 +1399,7 @@ msgstr "Skuespillere"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 msgid "Album Artist"
-msgstr "Album artist"
+msgstr "Albumartist"
 
 #: src/input/meta.c:80
 msgid "Disc number"
@@ -1563,8 +1564,8 @@ msgid ""
 msgstr ""
 "Du kan velge ytterligere grensesnitt som VLC kan benytte med dette "
 "alternativet. Disse startes i bakgrunnen i tillegg til hovedgrensesnittet. "
-"Bruk en kolonseparert liste med grensesnittmoduler. (vanlige verdier er \"rc"
-"\" (remote control), \"http\", \"gestures\"…)"
+"Bruk en kolonseparert liste med grensesnittmoduler. (vanlige verdier er "
+"«rc» (remote control), «http», «gestures»…)"
 
 #: src/libvlc-module.c:83
 msgid "You can select control interfaces for VLC."
@@ -1894,10 +1895,10 @@ msgid ""
 "\"video filters\" modules section. You can also set many miscellaneous video "
 "options."
 msgstr ""
-"Disse alternativene tillater deg å endre oppførselen til videoutgangens "
+"Disse alternativene lar deg endre oppførselen til videoutgangens "
 "undersystem. Du kan for eksempel aktivere videofiltre (linjedeling, "
-"bildejustering, osv). Aktivér disse filtrene her og endre på dem i "
-"\"videofiltre\"-seksjonen. Du kan også sette mange diverse videoalternativer."
+"bildejustering, osv). Aktiver disse filtrene her og endre på dem i "
+"«videofiltre»-seksjonen. Du kan også sette mange diverse videoalternativer."
 
 #: src/libvlc-module.c:253
 msgid "Video output module"
@@ -2075,7 +2076,7 @@ msgstr "Skaler videoen med den spesifiserte faktoren."
 
 #: src/libvlc-module.c:302
 msgid "Grayscale video output"
-msgstr "videoeksport i gråtoner"
+msgstr "Videoeksport i gråtoner"
 
 #: src/libvlc-module.c:304
 msgid ""
@@ -8474,7 +8475,7 @@ msgstr ""
 
 #: modules/access/srt.c:395 modules/access_output/srt.c:445
 msgid "SRT latency (ms)"
-msgstr ""
+msgstr "SRT-latens (ms)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9423,15 +9424,15 @@ msgstr ""
 
 #: modules/access_output/srt.c:57
 msgid "16 bytes"
-msgstr ""
+msgstr "16 bytes"
 
 #: modules/access_output/srt.c:57
 msgid "24 bytes"
-msgstr ""
+msgstr "24 bytes"
 
 #: modules/access_output/srt.c:57
 msgid "32 bytes"
-msgstr ""
+msgstr "32 bytes"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
@@ -9717,7 +9718,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:77
 msgid "Binauralizer"
-msgstr ""
+msgstr "Binauralisator"
 
 #: modules/audio_filter/channel_mixer/trivial.c:42
 msgid "Audio filter for trivial channel mixing"
@@ -10596,7 +10597,7 @@ msgstr "K Audio Interface-lydutdata"
 
 #: modules/audio_output/mmdevice.c:1451 modules/gui/qt/ui/sprefs_audio.h:419
 msgid "HDMI/SPDIF audio passthrough"
-msgstr ""
+msgstr "HDMI-/SPDIF-lydgjennomgang"
 
 #: modules/audio_output/mmdevice.c:1453
 msgid ""
@@ -10610,7 +10611,7 @@ msgstr "Skrudd av"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Aktivert (Kun AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -12624,11 +12625,11 @@ msgstr ""
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
-msgstr ""
+msgstr "SCTE-18"
 
 #: modules/codec/scte18.h:24
 msgid "Emergency Alert Messaging for Cable"
-msgstr ""
+msgstr "Nødalarmbeskjeder for amerikansk kabel-TV"
 
 #: modules/codec/scte27.c:42
 msgid "SCTE-27 decoder"
@@ -13137,7 +13138,7 @@ msgstr ""
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
-msgstr ""
+msgstr "TTML"
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
@@ -14092,7 +14093,7 @@ msgstr "Standard forhåndsinnstilling er brukt"
 
 #: modules/codec/x264.c:415
 msgid "x264 advanced options"
-msgstr ""
+msgstr "Avanserte x264-innstillinger"
 
 #: modules/codec/x264.c:416
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
@@ -15016,15 +15017,15 @@ msgstr "Windows-meldingsgrensesnitt"
 
 #: modules/demux/adaptive/adaptive.cpp:68
 msgid "Maximum device width"
-msgstr ""
+msgstr "Maks enhetsbredde"
 
 #: modules/demux/adaptive/adaptive.cpp:69
 msgid "Maximum device height"
-msgstr ""
+msgstr "Maks enhetshøyde"
 
 #: modules/demux/adaptive/adaptive.cpp:71
 msgid "Fixed Bandwidth in KiB/s"
-msgstr ""
+msgstr "Fastsatt båndbredde i KiB/s"
 
 #: modules/demux/adaptive/adaptive.cpp:72
 msgid "Preferred bandwidth for non adaptive streams"
@@ -15032,7 +15033,7 @@ msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:74
 msgid "Adaptive Logic"
-msgstr ""
+msgstr "Adaptiv logikk"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Use regular HTTP modules"
@@ -15044,31 +15045,31 @@ msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:98
 msgid "Predictive"
-msgstr ""
+msgstr "Anslående"
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
-msgstr ""
+msgstr "Tilnærmet optimalt"
 
 #: modules/demux/adaptive/adaptive.cpp:100
 msgid "Bandwidth Adaptive"
-msgstr ""
+msgstr "Tilpassbar båndbredde"
 
 #: modules/demux/adaptive/adaptive.cpp:101
 msgid "Fixed Bandwidth"
-msgstr ""
+msgstr "Fastsatt båndbredde"
 
 #: modules/demux/adaptive/adaptive.cpp:102
 msgid "Lowest Bandwidth/Quality"
-msgstr ""
+msgstr "Laveste båndbredde/kvalitet"
 
 #: modules/demux/adaptive/adaptive.cpp:103
 msgid "Highest Bandwidth/Quality"
-msgstr ""
+msgstr "Høyeste båndbredde/kvalitet"
 
 #: modules/demux/adaptive/adaptive.cpp:112
 msgid "Adaptive"
-msgstr ""
+msgstr "Adaptiv"
 
 #: modules/demux/adaptive/adaptive.cpp:113
 msgid "Unified adaptive streaming for DASH/HLS"
@@ -15190,7 +15191,7 @@ msgstr "Spill av som det er"
 
 #: modules/demux/avi/avi.c:852 modules/demux/mp4/mp4.c:1690
 msgid "Broken or missing Index"
-msgstr ""
+msgstr "Ødelagt eller manglende indeks"
 
 #: modules/demux/avi/avi.c:2735
 msgid "Broken or missing AVI Index"
@@ -15242,7 +15243,7 @@ msgstr "Dirac-videodemultiplekser"
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
-msgstr ""
+msgstr "Mappeimportering"
 
 #: modules/demux/filter/noseek.c:79
 msgid "Seek prevention demux filter"
@@ -15594,7 +15595,7 @@ msgstr "Eksekutiv produsent"
 
 #: modules/demux/mp4/meta.c:102
 msgid "Encoding Params"
-msgstr ""
+msgstr "Kodingsparametere"
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
@@ -15638,7 +15639,7 @@ msgstr "Ikke sanntidsspol"
 
 #: modules/demux/mp4/mp4.c:1688
 msgid "Build index"
-msgstr ""
+msgstr "Bygg en indeks"
 
 #: modules/demux/mpc.c:63
 msgid "MusePack demuxer"
@@ -16705,7 +16706,7 @@ msgstr "Sett opp kringkasting…"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:147
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:404
 msgid "Select Streaming Method"
-msgstr ""
+msgstr "Velg strømmemetode"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
@@ -16939,7 +16940,7 @@ msgstr "Gå til forrige element"
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
 msgid "Leave fullscreen"
-msgstr ""
+msgstr "Forlat fullskjerm"
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:80
@@ -17445,7 +17446,7 @@ msgstr "Hopp til tid"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
-msgstr ""
+msgstr "Rendrer"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -17905,11 +17906,11 @@ msgstr "Underskjerm øverst"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:212
 msgid "Subscreen Width"
-msgstr ""
+msgstr "Underskjermens bredde"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:213
 msgid "Subscreen Height"
-msgstr ""
+msgstr "Underskjermens høyde"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:215
 msgid "Capture Audio"
@@ -20308,7 +20309,7 @@ msgstr "Justeringer og effekter"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
 msgid "Stereo Widener"
-msgstr ""
+msgstr "Stereoutbreder"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -21925,7 +21926,7 @@ msgstr "Nei"
 
 #: modules/keystore/keychain.m:41
 msgid "Any"
-msgstr ""
+msgstr "Enhver"
 
 #: modules/keystore/keychain.m:47
 msgid "System default"
@@ -21933,11 +21934,11 @@ msgstr "Systemforvalg"
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock"
-msgstr ""
+msgstr "Etter første opplåsing"
 
 #: modules/keystore/keychain.m:49
 msgid "After first unlock, on this device only"
-msgstr ""
+msgstr "Etter første opplåsing, kun på denne enheten"
 
 #: modules/keystore/keychain.m:51
 msgid "When passcode set, on this device only"
@@ -21949,11 +21950,11 @@ msgstr ""
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked"
-msgstr ""
+msgstr "Når den ikke er låst"
 
 #: modules/keystore/keychain.m:54
 msgid "When unlocked, on this device only"
-msgstr ""
+msgstr "Når den ikke er låst, kun på denne enheten"
 
 #: modules/keystore/keychain.m:57
 msgid "Synchronize stored items"
@@ -22022,15 +22023,15 @@ msgstr "Vær stille"
 
 #: modules/logger/console.c:115
 msgid "Turn off all messages on the console."
-msgstr ""
+msgstr "Skru av alle meldinger i konsollen."
 
 #: modules/logger/console.c:118
 msgid "Console log"
-msgstr ""
+msgstr "Konsollogg"
 
 #: modules/logger/console.c:119
 msgid "Console logger"
-msgstr ""
+msgstr "Konsolloggfører"
 
 #: modules/logger/file.c:193
 msgid "HTML"
@@ -22080,15 +22081,15 @@ msgstr ""
 
 #: modules/logger/file.c:219
 msgid "Logger"
-msgstr ""
+msgstr "Loggfører"
 
 #: modules/logger/file.c:220
 msgid "File logger"
-msgstr ""
+msgstr "Filloggfører"
 
 #: modules/logger/journal.c:77
 msgid "Journal"
-msgstr ""
+msgstr "Journal"
 
 #: modules/logger/journal.c:78
 msgid "SystemD journal logger"
@@ -22096,7 +22097,7 @@ msgstr ""
 
 #: modules/logger/syslog.c:138
 msgid "System log (syslog)"
-msgstr ""
+msgstr "Systemlogg (syslog)"
 
 #: modules/logger/syslog.c:139
 msgid "Emit log messages through the POSIX system log."
@@ -22104,7 +22105,7 @@ msgstr ""
 
 #: modules/logger/syslog.c:141
 msgid "Debug messages"
-msgstr ""
+msgstr "Avlusingsmeldinger"
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
@@ -22128,7 +22129,7 @@ msgstr ""
 
 #: modules/logger/syslog.c:151
 msgid "syslog"
-msgstr ""
+msgstr "syslog"
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
@@ -22987,7 +22988,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:756
 msgid "Use system trust database"
-msgstr ""
+msgstr "Bruk systemets troverdighetsdatabase"
 
 #: modules/misc/gnutls.c:758
 msgid ""
@@ -22997,7 +22998,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:761
 msgid "Trust directory"
-msgstr ""
+msgstr "Stol på mappen"
 
 #: modules/misc/gnutls.c:763
 msgid ""
@@ -23601,9 +23602,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Daala-videoinnpakker"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -24895,7 +24895,7 @@ msgstr ""
 #: modules/stream_out/chromecast/cast.cpp:190
 #: modules/stream_out/chromecast/cast.cpp:1200
 msgid "Performance warning"
-msgstr ""
+msgstr "Ytelsesadvarsel"
 
 #: modules/stream_out/chromecast/cast.cpp:191
 msgid "Display a performance warning when transcoding"
@@ -24903,7 +24903,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Enable Audio passthrough"
-msgstr ""
+msgstr "Skru på lydgjennomgang"
 
 #: modules/stream_out/chromecast/cast.cpp:193
 msgid "Disable if your receiver does not support Dolby®."
@@ -24927,7 +24927,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:221
 msgid "Conversion quality"
-msgstr ""
+msgstr "Konverteringskvalitet"
 
 #: modules/stream_out/chromecast/cast.cpp:222
 msgid "Change this option to increase conversion speed or quality."
@@ -24969,7 +24969,7 @@ msgstr ""
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
-msgstr ""
+msgstr "syklus"
 
 #: modules/stream_out/cycle.c:326
 msgid "Cyclic stream output"
@@ -26812,7 +26812,7 @@ msgstr "Retning"
 
 #: modules/video_filter/mirror.c:72
 msgid "Direction of the mirroring."
-msgstr ""
+msgstr "Speilvendingens retning."
 
 #: modules/video_filter/mirror.c:75
 msgid "Left to right/Top to bottom"
@@ -28795,7 +28795,7 @@ msgstr "Starttid"
 
 #: modules/gui/qt/ui/open.h:273
 msgid "Stop Time"
-msgstr ""
+msgstr "Stopp tiden"
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
