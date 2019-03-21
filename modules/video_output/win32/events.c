@@ -992,7 +992,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         case IDM_TOGGLE_ON_TOP:            /* toggle the "on top" status */
         {
             msg_Dbg(vd, "WinProc WM_SYSCOMMAND: IDM_TOGGLE_ON_TOP");
-            HMENU hMenu = GetSystemMenu(vd->sys->hwnd, FALSE);
+            HMENU hMenu = GetSystemMenu(p_event->hwnd, FALSE);
             vout_display_SendWindowState(vd, (GetMenuState(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND) & MF_CHECKED) ?
                     VOUT_WINDOW_STATE_NORMAL : VOUT_WINDOW_STATE_ABOVE);
             return 0;
