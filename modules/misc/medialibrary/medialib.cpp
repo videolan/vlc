@@ -811,6 +811,20 @@ void* MediaLibrary::Get( int query, va_list args )
             auto playlist = m_ml->playlist( id );
             return CreateAndConvert<vlc_ml_playlist_t>( playlist.get() );
         }
+        case VLC_ML_GET_MEDIA_BY_MRL:
+        {
+            auto mrl = va_arg( args, const char* );
+            auto media = m_ml->media( mrl );
+            return CreateAndConvert<vlc_ml_media_t>( media.get() );
+        }
+        case VLC_ML_GET_INPUT_ITEM_BY_MRL:
+        {
+            auto mrl = va_arg( args, const char* );
+            auto media = m_ml->media( mrl );
+            if ( media == nullptr )
+                return nullptr;
+            return MediaToInputItem( media.get() );
+        }
         default:
             vlc_assert_unreachable();
 

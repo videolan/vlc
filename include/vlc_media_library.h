@@ -326,7 +326,9 @@ struct vlc_ml_query_params_t
 enum vlc_ml_get_queries
 {
     VLC_ML_GET_MEDIA,           /**< arg1: Media    ID; ret: vlc_ml_media_t*    */
+    VLC_ML_GET_MEDIA_BY_MRL,    /**< arg1: Media   MRL; ret: vlc_ml_media_t*    */
     VLC_ML_GET_INPUT_ITEM,      /**< arg1: Media    ID; ret: input_item_t*      */
+    VLC_ML_GET_INPUT_ITEM_BY_MRL,/**< arg1: Media  MRL; ret: input_item_t*      */
     VLC_ML_GET_ALBUM,           /**< arg1: Album    ID; ret: vlc_ml_album_t*    */
     VLC_ML_GET_ARTIST,          /**< arg1: Artist   ID; ret: vlc_ml_artist_t*   */
     VLC_ML_GET_GENRE,           /**< arg1: Genre    ID; ret: vlc_ml_genre_t*    */
@@ -867,9 +869,21 @@ static inline vlc_ml_media_t* vlc_ml_get_media( vlc_medialibrary_t* p_ml, int64_
     return (vlc_ml_media_t*)vlc_ml_get( p_ml, VLC_ML_GET_MEDIA, i_media_id );
 }
 
+static inline vlc_ml_media_t* vlc_ml_get_media_by_mrl( vlc_medialibrary_t* p_ml,
+                                                       const char* psz_mrl )
+{
+    return (vlc_ml_media_t*)vlc_ml_get( p_ml, VLC_ML_GET_MEDIA_BY_MRL, psz_mrl );
+}
+
 static inline input_item_t* vlc_ml_get_input_item( vlc_medialibrary_t* p_ml, int64_t i_media_id )
 {
     return (input_item_t*)vlc_ml_get( p_ml, VLC_ML_GET_INPUT_ITEM, i_media_id );
+}
+
+static inline input_item_t* vlc_ml_get_input_item_by_mrl( vlc_medialibrary_t* p_ml,
+                                                          const char* psz_mrl )
+{
+    return (input_item_t*)vlc_ml_get( p_ml, VLC_ML_GET_INPUT_ITEM_BY_MRL, psz_mrl );
 }
 
 static inline vlc_ml_album_t* vlc_ml_get_album( vlc_medialibrary_t* p_ml, int64_t i_album_id )
