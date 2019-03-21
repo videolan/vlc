@@ -48,6 +48,7 @@ struct vlc_playlist
 {
     vlc_player_t *player;
     libvlc_int_t *libvlc;
+    bool auto_preparse;
     /* all remaining fields are protected by the lock of the player */
     struct vlc_player_listener_id *player_listener;
     playlist_item_vector_t items;

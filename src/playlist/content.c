@@ -28,6 +28,7 @@
 #include "item.h"
 #include "notify.h"
 #include "playlist.h"
+#include "preparse.h"
 
 void
 vlc_playlist_ClearItems(vlc_playlist_t *playlist)
@@ -74,6 +75,12 @@ vlc_playlist_ItemsInserted(vlc_playlist_t *playlist, size_t index, size_t count)
     vlc_playlist_item_t **items = &playlist->items.data[index];
     vlc_playlist_Notify(playlist, on_items_added, index, items, count);
     vlc_playlist_state_NotifyChanges(playlist, &state);
+
+    for (size_t i = index; i < index + count; ++i)
+    {
+        vlc_playlist_item_t *item = playlist->items.data[i];
+        vlc_playlist_AutoPreparse(playlist, item->media);
+    }
 }
 
 static void
@@ -167,6 +174,8 @@ vlc_playlist_ItemReplaced(vlc_playlist_t *playlist, size_t index)
     vlc_playlist_Notify(playlist, on_items_updated, index,
                         &playlist->items.data[index], 1);
     vlc_playlist_state_NotifyChanges(playlist, &state);
+
+    vlc_playlist_AutoPreparse(playlist, playlist->items.data[index]->media);
 }
 
 size_t

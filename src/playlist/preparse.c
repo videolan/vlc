@@ -124,3 +124,10 @@ vlc_playlist_Preparse(vlc_playlist_t *playlist, input_item_t *input)
                         &input_preparser_callbacks, playlist, -1, NULL);
 #endif
 }
+
+void
+vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input)
+{
+    if (playlist->auto_preparse && !input_item_IsPreparsed(input))
+        vlc_playlist_Preparse(playlist, input);
+}
