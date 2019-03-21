@@ -302,6 +302,9 @@ static input_thread_t *Create( vlc_object_t *p_parent,
         case INPUT_CREATE_OPTION_PREPARSING:
             option_str = "preparsing ";
             break;
+        case INPUT_CREATE_OPTION_THUMBNAILING:
+            option_str = "thumbnailing ";
+            break;
         default:
             option_str = "";
             break;
