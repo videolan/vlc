@@ -47,6 +47,7 @@ typedef struct VLC_VECTOR(vlc_playlist_item_t *) playlist_item_vector_t;
 struct vlc_playlist
 {
     vlc_player_t *player;
+    libvlc_int_t *libvlc;
     /* all remaining fields are protected by the lock of the player */
     struct vlc_player_listener_id *player_listener;
     playlist_item_vector_t items;
