@@ -8,13 +8,3 @@
  #endif
  
  #ifndef NO_THREAD
---- libshout.nok/src/common/net/sock.c.ws2tcpip	2019-03-06 13:20:11.624823900 +0100
-+++ libshout.nok/src/common/net/sock.c	2019-03-07 07:21:23.841338100 +0100
-@@ -57,6 +57,7 @@
- #include <netdb.h>
- #else
- #include <winsock2.h>
-+#include <ws2tcpip.h>
- #endif
- 
- #include "sock.h"
