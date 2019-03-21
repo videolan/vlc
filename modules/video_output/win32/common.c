@@ -162,29 +162,27 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
     }
 
     /* If nothing changed, we can return */
-    bool has_moved;
-    bool is_resized;
+    bool moved_or_resized;
 #if VLC_WINSTORE_APP
-    has_moved = false;
-    is_resized = rect.right  != RECTWidth(sys->rect_display) ||
-                 rect.bottom != RECTHeight(sys->rect_display);
+    moved_or_resized = rect.right  != RECTWidth(sys->rect_display) ||
+                       rect.bottom != RECTHeight(sys->rect_display);
     sys->rect_display = rect;
 #else
     if (sys->b_windowless)
     {
-        has_moved = is_resized = false;
+        moved_or_resized = false;
     }
     else
     {
         /* Retrieve the window position */
         ClientToScreen(sys->hwnd, &point);
 
-        EventThreadUpdateWindowPosition(sys->event, &has_moved, &is_resized,
+        EventThreadUpdateWindowPosition(sys->event, &moved_or_resized,
             point.x, point.y,
             rect.right, rect.bottom);
-}
+    }
 #endif
-    if (!is_forced && !has_moved && !is_resized)
+    if (!is_forced && !moved_or_resized)
         return;
 
     /* Update the window position and size */
