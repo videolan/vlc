@@ -27,6 +27,7 @@
 #include "content.h"
 #include "item.h"
 #include "playlist.h"
+#include "notify.h"
 #include "libvlc.h" /* for vlc_MetadataRequest() */
 
 typedef struct VLC_VECTOR(input_item_t *) media_vector_t;
@@ -87,7 +88,26 @@ on_subtree_added(input_item_t *media, input_item_node_t *subtree,
     vlc_playlist_Unlock(playlist);
 }
 
+static void
+on_preparse_ended(input_item_t *media,
+                  enum input_item_preparse_status status, void *userdata)
+{
+    VLC_UNUSED(media); /* retrieved by subtree->p_item */
+    vlc_playlist_t *playlist = userdata;
+
+    if (status != ITEM_PREPARSE_DONE)
+        return;
+
+    vlc_playlist_Lock(playlist);
+    ssize_t index = vlc_playlist_IndexOfMedia(playlist, media);
+    if (index != -1)
+        vlc_playlist_Notify(playlist, on_items_updated, index,
+                            &playlist->items.data[index], 1);
+    vlc_playlist_Unlock(playlist);
+}
+
 static const input_preparser_callbacks_t input_preparser_callbacks = {
+    .on_preparse_ended = on_preparse_ended,
     .on_subtree_added = on_subtree_added,
 };
 
