@@ -575,6 +575,29 @@ static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt)
     cfg.width  = sys->area.vdcfg.display.width;
     cfg.height = sys->area.vdcfg.display.height;
 
+    switch (fmt->i_chroma)
+    {
+    case VLC_CODEC_D3D9_OPAQUE:
+        cfg.bitdepth = 8;
+        break;
+    case VLC_CODEC_D3D9_OPAQUE_10B:
+        cfg.bitdepth = 10;
+        break;
+    default:
+        {
+            const vlc_chroma_description_t *p_format = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
+            if (p_format == NULL)
+            {
+                cfg.bitdepth = 8;
+            }
+            else
+            {
+                cfg.bitdepth = p_format->pixel_bits == 0 ? 8 : p_format->pixel_bits /
+                                                               (p_format->plane_count==1 ? p_format->pixel_size : 1);
+            }
+        }
+        break;
+    }
 
     struct output_cfg_t out;
     if (!sys->updateOutputCb( sys->outside_opaque, &cfg, &out ))

@@ -34,6 +34,7 @@ struct device_setup_t {
 struct direct3d_cfg_t {
     unsigned width;
     unsigned height;
+    unsigned bitdepth;
 };
 
 struct output_cfg_t {

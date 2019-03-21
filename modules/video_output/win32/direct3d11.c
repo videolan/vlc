@@ -169,14 +169,42 @@ static void UpdatePicQuadPosition(vout_display_t *);
 
 static int Control(vout_display_t *, int, va_list);
 
-static HRESULT UpdateBackBuffer(vout_display_t *vd)
+static HRESULT UpdateBackBuffer(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
+    struct direct3d_cfg_t cfg;
 
-    const struct direct3d_cfg_t cfg = {
-        .width  = sys->area.vdcfg.display.width,
-        .height = sys->area.vdcfg.display.height
-    };
+    cfg.width  = sys->area.vdcfg.display.width;
+    cfg.height = sys->area.vdcfg.display.height;
+
+    switch (fmt->i_chroma)
+    {
+    case VLC_CODEC_D3D11_OPAQUE:
+        cfg.bitdepth = 8;
+        break;
+    case VLC_CODEC_D3D11_OPAQUE_RGBA:
+    case VLC_CODEC_D3D11_OPAQUE_BGRA:
+        cfg.bitdepth = 8;
+        break;
+    case VLC_CODEC_D3D11_OPAQUE_10B:
+        cfg.bitdepth = 10;
+        break;
+    default:
+        {
+            const vlc_chroma_description_t *p_format = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
+            if (p_format == NULL)
+            {
+                cfg.bitdepth = 8;
+            }
+            else
+            {
+                cfg.bitdepth = p_format->pixel_bits == 0 ? 8 : p_format->pixel_bits /
+                                                               (p_format->plane_count==1 ? p_format->pixel_size : 1);
+            }
+        }
+        break;
+    }
+
     struct output_cfg_t out;
     if (!sys->updateOutputCb( sys->outside_opaque, &cfg, &out ))
         return E_FAIL;
@@ -190,7 +218,7 @@ static void UpdateSize(vout_display_t *vd)
     msg_Dbg(vd, "Detected size change %dx%d", sys->area.place.width,
             sys->area.place.height);
 
-    UpdateBackBuffer(vd);
+    UpdateBackBuffer(vd, &vd->fmt);
 
     d3d11_device_lock( &sys->d3d_dev );
 
@@ -315,6 +343,7 @@ static bool UpdateSwapchain( void *opaque, const struct direct3d_cfg_t *cfg )
     HRESULT hr;
 
     D3D11_TEXTURE2D_DESC dsc = { 0 };
+    uint8_t bitsPerChannel = 0;
 
     if ( sys->internal_swapchain.swapchainTargetView[0] ) {
         ID3D11Resource *res = NULL;
@@ -324,9 +353,12 @@ static bool UpdateSwapchain( void *opaque, const struct direct3d_cfg_t *cfg )
             ID3D11Texture2D_GetDesc( (ID3D11Texture2D*) res, &dsc );
             ID3D11Resource_Release( res );
         }
+        assert(sys->display.pixelFormat->formatTexture == dsc.Format);
+        bitsPerChannel = sys->display.pixelFormat->bitsPerChannel;
     }
 
-    if ( dsc.Width == cfg->width && dsc.Height == cfg->height )
+    if ( dsc.Width == cfg->width && dsc.Height == cfg->height && cfg->bitdepth <= bitsPerChannel )
+        /* TODO also check the colorimetry */
         return true; /* nothing changed */
 
     for ( size_t i = 0; i < ARRAY_SIZE( sys->internal_swapchain.swapchainTargetView ); i++ )
@@ -1271,6 +1303,12 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
         }
     }
 
+    hr = UpdateBackBuffer(vd, &fmt);
+    if (FAILED(hr)) {
+       msg_Err(vd, "Could not update the backbuffer. (hr=0x%lX)", hr);
+       return VLC_EGENERIC;
+    }
+
     if (Direct3D11CreateGenericResources(vd)) {
         msg_Err(vd, "Failed to allocate resources");
         if ( sys->cleanupDeviceCb )
@@ -1618,12 +1656,6 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     if (SUCCEEDED(hr)) {
         ID3D11DeviceContext_OMSetDepthStencilState(sys->d3d_dev.d3dcontext, pDepthStencilState, 0);
         ID3D11DepthStencilState_Release(pDepthStencilState);
-    }
-
-    hr = UpdateBackBuffer(vd);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not update the backbuffer. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
     }
 
     if (sys->regionQuad.textureFormat != NULL)
