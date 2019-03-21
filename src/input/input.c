@@ -57,11 +57,17 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+enum input_create_option {
+    INPUT_CREATE_OPTION_NONE,
+    INPUT_CREATE_OPTION_PREPARSING,
+    INPUT_CREATE_OPTION_THUMBNAILING,
+};
+
 static  void *Run( void * );
 static  void *Preparse( void * );
 
 static input_thread_t * Create  ( vlc_object_t *, input_thread_events_cb, void *,
-                                  input_item_t *, bool, bool,
+                                  input_item_t *, enum input_create_option option,
                                   input_resource_t *, vlc_renderer_item_t * );
 static  int             Init    ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
@@ -128,8 +134,8 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
                               input_resource_t *p_resource,
                               vlc_renderer_item_t *p_renderer )
 {
-    return Create( p_parent, events_cb, events_data, p_item, false,
-                   false, p_resource, p_renderer );
+    return Create( p_parent, events_cb, events_data, p_item,
+                   INPUT_CREATE_OPTION_NONE, p_resource, p_renderer );
 }
 
 #undef input_Read
@@ -144,7 +150,7 @@ int input_Read( vlc_object_t *p_parent, input_item_t *p_item,
                 input_thread_events_cb events_cb, void *events_data )
 {
     input_thread_t *p_input = Create( p_parent, events_cb, events_data, p_item,
-                                      false, false, NULL, NULL );
+                                      INPUT_CREATE_OPTION_NONE, NULL, NULL );
     if( !p_input )
         return VLC_EGENERIC;
 
@@ -162,14 +168,16 @@ input_thread_t *input_CreatePreparser( vlc_object_t *parent,
                                        input_thread_events_cb events_cb,
                                        void *events_data, input_item_t *item )
 {
-    return Create( parent, events_cb, events_data, item, true, false, NULL, NULL );
+    return Create( parent, events_cb, events_data, item,
+                   INPUT_CREATE_OPTION_PREPARSING, NULL, NULL );
 }
 
 input_thread_t *input_CreateThumbnailer(vlc_object_t *obj,
                                         input_thread_events_cb events_cb,
                                         void *events_data, input_item_t *item)
 {
-    return Create( obj, events_cb, events_data, item, false, true, NULL, NULL );
+    return Create( obj, events_cb, events_data, item,
+                   INPUT_CREATE_OPTION_THUMBNAILING, NULL, NULL );
 }
 
 /**
@@ -274,7 +282,7 @@ input_item_t *input_GetItem( input_thread_t *p_input )
 static input_thread_t *Create( vlc_object_t *p_parent,
                                input_thread_events_cb events_cb, void *events_data,
                                input_item_t *p_item,
-                               bool b_preparsing, bool b_thumbnailing,
+                               enum input_create_option option,
                                input_resource_t *p_resource,
                                vlc_renderer_item_t *p_renderer )
 {
@@ -288,8 +296,17 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     input_thread_t *p_input = &priv->input;
 
     char * psz_name = input_item_GetName( p_item );
-    msg_Dbg( p_input, "Creating an input for %s'%s'",
-             b_preparsing ? "preparsing " : "", psz_name);
+    const char *option_str;
+    switch (option)
+    {
+        case INPUT_CREATE_OPTION_PREPARSING:
+            option_str = "preparsing ";
+            break;
+        default:
+            option_str = "";
+            break;
+    }
+    msg_Dbg( p_input, "Creating an input for %s'%s'", option_str, psz_name);
     free( psz_name );
 
     /* Parse input options */
@@ -298,7 +315,8 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     /* Init Common fields */
     priv->events_cb = events_cb;
     priv->events_data = events_data;
-    priv->b_preparsing = b_preparsing;
+    priv->b_preparsing = option == INPUT_CREATE_OPTION_PREPARSING;
+    priv->b_thumbnailing = option == INPUT_CREATE_OPTION_THUMBNAILING;
     priv->b_can_pace_control = true;
     priv->i_start = 0;
     priv->i_time  = 0;
@@ -310,15 +328,14 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     priv->is_running = false;
     priv->is_stopped = false;
     priv->b_recording = false;
-    priv->b_thumbnailing = b_thumbnailing;
     priv->rate = 1.f;
     memset( &priv->bookmark, 0, sizeof(priv->bookmark) );
     TAB_INIT( priv->i_bookmark, priv->pp_bookmark );
     TAB_INIT( priv->i_attachment, priv->attachment );
     priv->attachment_demux = NULL;
     priv->p_sout   = NULL;
-    priv->b_out_pace_control = b_thumbnailing;
-    priv->p_renderer = p_renderer && b_preparsing == false ?
+    priv->b_out_pace_control = priv->b_thumbnailing;
+    priv->p_renderer = p_renderer && priv->b_preparsing == false ?
                 vlc_renderer_item_hold( p_renderer ) : NULL;
 
     priv->viewpoint_changed = false;
