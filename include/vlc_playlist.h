@@ -865,8 +865,7 @@ vlc_playlist_PlayAt(vlc_playlist_t *playlist, size_t index)
  * \param media the media to preparse
  */
 VLC_API void
-vlc_playlist_Preparse(vlc_playlist_t *playlist, libvlc_int_t *libvlc,
-                      input_item_t *media);
+vlc_playlist_Preparse(vlc_playlist_t *playlist, input_item_t *media);
 
 /** @} */
 # ifdef __cplusplus

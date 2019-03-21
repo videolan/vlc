@@ -92,17 +92,15 @@ static const input_preparser_callbacks_t input_preparser_callbacks = {
 };
 
 void
-vlc_playlist_Preparse(vlc_playlist_t *playlist, libvlc_int_t *libvlc,
-                      input_item_t *input)
+vlc_playlist_Preparse(vlc_playlist_t *playlist, input_item_t *input)
 {
 #ifdef TEST_PLAYLIST
     VLC_UNUSED(playlist);
-    VLC_UNUSED(libvlc);
     VLC_UNUSED(input);
     VLC_UNUSED(input_preparser_callbacks);
 #else
     /* vlc_MetadataRequest is not exported */
-    vlc_MetadataRequest(libvlc, input, META_REQUEST_OPTION_NONE,
+    vlc_MetadataRequest(playlist->libvlc, input, META_REQUEST_OPTION_NONE,
                         &input_preparser_callbacks, playlist, -1, NULL);
 #endif
 }
