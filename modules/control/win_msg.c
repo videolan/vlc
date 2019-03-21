@@ -29,7 +29,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
-#include <vlc_playlist_legacy.h>
+#include <vlc_playlist.h>
 #include <vlc_input.h>
 #include <vlc_url.h> // FIXME: move URL generation to calling process
 
@@ -49,6 +49,25 @@ typedef struct
     int enqueue;
     char data[];
 } vlc_ipc_data_t;
+
+static void add_to_playlist(intf_thread_t *intf, const char *uri,
+                            bool play_now, int options_count,
+                            const char *const *options)
+{
+    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(intf);
+
+    input_item_t *media = input_item_New(uri, NULL);
+    if (!media)
+        return;
+    input_item_AddOptions(media, options_count, options, VLC_INPUT_OPTION_TRUSTED);
+
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_AppendOne(playlist, media);
+    if (play_now)
+        vlc_playlist_Start(playlist);
+    vlc_playlist_Unlock(playlist);
+    input_item_Release(media);
+}
 
 static LRESULT CALLBACK WMCOPYWNDPROC(HWND hwnd, UINT uMsg,
                                       WPARAM wParam, LPARAM lParam)
@@ -98,13 +117,9 @@ static LRESULT CALLBACK WMCOPYWNDPROC(HWND hwnd, UINT uMsg,
                 char *psz_URI = NULL;
                 if( strstr( ppsz_argv[i_opt], "://" ) == NULL )
                     psz_URI = vlc_path2uri( ppsz_argv[i_opt], NULL );
-                playlist_AddExt( pl_Get(intf),
-                        (psz_URI != NULL) ? psz_URI : ppsz_argv[i_opt],
-                        NULL, (i_opt == 0 && !p_data->enqueue),
-                        i_options,
-                        (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                        VLC_INPUT_OPTION_TRUSTED );
-
+                add_to_playlist(intf, (psz_URI != NULL) ? psz_URI : ppsz_argv[i_opt],
+                                (i_opt == 0 && !p_data->enqueue), i_options,
+                                (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ));
                 i_opt += i_options;
                 free( psz_URI );
             }
