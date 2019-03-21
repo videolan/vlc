@@ -138,6 +138,7 @@ typedef struct
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
+    display_win32_area_t     area;
 
     bool allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
     struct {
@@ -485,9 +486,9 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     };
     RECT rect_dst = {
         .left   = 0,
-        .right  = vd->sys->sys.place.width,
+        .right  = vd->sys->area.place.width,
         .top    = 0,
-        .bottom = vd->sys->sys.place.height,
+        .bottom = vd->sys->area.place.height,
     };
     Direct3D9SetupVertices(region->vertex, &rect_src, &copy_rect,
                            &rect_dst, 255, vd->source.orientation);
@@ -899,7 +900,7 @@ static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
         return VLC_EGENERIC;
     }
 
-    UpdateRects(vd, &sys->sys);
+    UpdateRects(vd, &sys->area, &sys->sys);
 
     /* re-create them */
     if (Direct3D9CreateResources(vd, fmtp)) {
@@ -915,7 +916,7 @@ static void UpdateDesktopMode(vout_display_t *vd)
 
     if (sys->sys.use_desktop) {
         /* Save non-desktop state */
-        sys->desktop_save.is_fullscreen = sys->sys.vdcfg.is_fullscreen;
+        sys->desktop_save.is_fullscreen = sys->area.vdcfg.is_fullscreen;
         sys->desktop_save.is_on_top     = sys->sys.is_on_top;
 
         /* Disable fullscreen/on_top while using desktop */
@@ -1026,8 +1027,8 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         }
 
         /* Map the subpicture to sys->sys.sys.place */
-        const float scale_w = (float)(sys->sys.place.width)  / subpicture->i_original_picture_width;
-        const float scale_h = (float)(sys->sys.place.height) / subpicture->i_original_picture_height;
+        const float scale_w = (float)(sys->area.place.width)  / subpicture->i_original_picture_width;
+        const float scale_h = (float)(sys->area.place.height) / subpicture->i_original_picture_height;
 
         RECT dst;
         dst.left   =            scale_w * r->i_x,
@@ -1207,7 +1208,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
-    CommonManage(vd, &sys->sys);
+    CommonManage(vd, &sys->area, &sys->sys);
 
     /* Desktop mode change */
     bool prev_desktop = sys->sys.use_desktop;
@@ -1216,7 +1217,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         UpdateDesktopMode(vd);
 
     /* Position Change */
-    if (sys->sys.place_changed) {
+    if (sys->area.place_changed) {
 #if 0 /* need that when bicubic filter is available */
         RECT rect;
         UINT width, height;
@@ -1234,7 +1235,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         }
 #endif
         sys->clear_scene = true;
-        sys->sys.place_changed = false;
+        sys->area.place_changed = false;
     }
 
     picture_sys_t *p_sys = picture->p_sys;
@@ -1333,9 +1334,9 @@ static void Swap(void *opaque)
     // No stretching should happen here !
     RECT src = {
         .left   = 0,
-        .right  = sys->sys.place.width,
+        .right  = sys->area.place.width,
         .top    = 0,
-        .bottom = sys->sys.place.height
+        .bottom = sys->area.place.height
     };
     
     HRESULT hr;
@@ -1504,7 +1505,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
     fmt->i_bmask  = d3dfmt->bmask;
     sys->sw_texture_fmt = d3dfmt;
 
-    UpdateRects(vd, &sys->sys);
+    UpdateRects(vd, &sys->area, &sys->sys);
 
     if (Direct3D9CreateResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate resources");
@@ -1555,7 +1556,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     }
     default:
-        return CommonControl(vd, &sys->sys, query, args);
+        return CommonControl(vd, &sys->area, &sys->sys, query, args);
     }
 }
 
@@ -1679,7 +1680,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->desktop_save.is_fullscreen = cfg->is_fullscreen;
     sys->desktop_save.is_on_top     = false;
 
-    if (CommonInit(vd, &sys->sys, d3d9_device != NULL, cfg))
+    if (CommonInit(vd, &sys->area, &sys->sys, d3d9_device != NULL, cfg))
         goto error;
 
     /* */

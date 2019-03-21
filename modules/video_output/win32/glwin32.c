@@ -61,6 +61,7 @@ vlc_module_end()
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
+    display_win32_area_t     area;
 
     vlc_gl_t              *gl;
     vout_display_opengl_t *vgl;
@@ -82,7 +83,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return vout_display_opengl_SetViewpoint(sys->vgl,
             &va_arg (args, const vout_display_cfg_t* )->viewpoint);
 
-    return CommonControl(vd, &sys->sys, query, args);
+    return CommonControl(vd, &sys->area, &sys->sys, query, args);
 }
 
 static const struct vout_window_operations embedVideoWindow_Ops =
@@ -121,7 +122,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     /* */
-    if (CommonInit(vd, &sys->sys, false, cfg))
+    if (CommonInit(vd, &sys->area, &sys->sys, false, cfg))
         goto error;
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
@@ -220,10 +221,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
-    CommonManage(vd, &sys->sys);
+    CommonManage(vd, &sys->area, &sys->sys);
 
-    const int width  = sys->sys.place.width;
-    const int height = sys->sys.place.height;
+    const int width  = sys->area.place.width;
+    const int height = sys->area.place.height;
     vlc_gl_Resize (sys->gl, width, height);
     if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
         return;

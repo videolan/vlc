@@ -74,19 +74,21 @@ static bool GetExternalDimensions(void *opaque, UINT *width, UINT *height)
 }
 
 /* */
-int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowless, const vout_display_cfg_t *vdcfg)
+int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys,
+               bool b_windowless, const vout_display_cfg_t *vdcfg)
 {
+    area->place_changed = false;
+    area->pf_GetDisplayDimensions = GetExternalDimensions;
+    area->opaque_dimensions = vd;
+    area->vdcfg = *vdcfg;
+
     sys->hwnd      = NULL;
     sys->hvideownd = NULL;
     sys->hparent   = NULL;
     sys->hfswnd    = NULL;
-    sys->place_changed = false;
     sys->b_windowless = b_windowless;
     sys->is_first_placement = true;
     sys->is_on_top        = false;
-
-    sys->pf_GetDisplayDimensions = GetExternalDimensions;
-    sys->opaque_dimensions = vd;
 
 #if !VLC_WINSTORE_APP
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
@@ -94,14 +96,12 @@ int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowl
 #endif
     if (!b_windowless)
     {
-        sys->pf_GetDisplayDimensions = GetWindowDimensions;
-        sys->opaque_dimensions = sys;
+        area->pf_GetDisplayDimensions = GetWindowDimensions;
+        area->opaque_dimensions = sys;
     }
     SetRectEmpty(&sys->rect_parent);
 
     var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
-
-    sys->vdcfg = *vdcfg;
 
     if (b_windowless)
         return VLC_SUCCESS;
@@ -145,17 +145,17 @@ int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowl
 * its job is to update the source and destination RECTs used to display the
 * picture.
 *****************************************************************************/
-void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys)
+void UpdateRects(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys)
 {
     const video_format_t *source = &vd->source;
 
     UINT  display_width, display_height;
 
     /* */
-    const vout_display_cfg_t *cfg = &sys->vdcfg;
+    const vout_display_cfg_t *cfg = &area->vdcfg;
 
     /* Retrieve the window size */
-    if (!sys->pf_GetDisplayDimensions(sys->opaque_dimensions, &display_width, &display_height))
+    if (!area->pf_GetDisplayDimensions(area->opaque_dimensions, &display_width, &display_height))
     {
         msg_Err(vd, "could not get the window dimensions");
         return;
@@ -174,13 +174,13 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys)
         place_cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
 #endif
 
-    vout_display_place_t before_place = sys->place;
-    vout_display_PlacePicture(&sys->place, source, &place_cfg);
+    vout_display_place_t before_place = area->place;
+    vout_display_PlacePicture(&area->place, source, &place_cfg);
 
     /* Signal the change in size/position */
-    if (!vout_display_PlaceEquals(&before_place, &sys->place))
+    if (!vout_display_PlaceEquals(&before_place, &area->place))
     {
-        sys->place_changed |= true;
+        area->place_changed |= true;
 
 #ifndef NDEBUG
         msg_Dbg(vd, "DirectXUpdateRects source"
@@ -190,14 +190,14 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys)
             source->i_width, source->i_height);
         msg_Dbg(vd, "DirectXUpdateRects image_dst"
             " coords: %i,%i,%i,%i",
-            sys->place.x, sys->place.y,
-            sys->place.x + sys->place.width, sys->place.y + sys->place.height);
+            area->place.x, area->place.y,
+            area->place.x + area->place.width, area->place.y + area->place.height);
 #endif
 
 #if !VLC_WINSTORE_APP
         if (sys != NULL)
         {
-            EventThreadUpdatePlace(sys->event, &sys->place);
+            EventThreadUpdatePlace(sys->event, &area->place);
 
             if (sys->hvideownd)
             {
@@ -208,7 +208,7 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys)
                     sys->is_first_placement = false;
                 }
                 SetWindowPos(sys->hvideownd, 0,
-                    sys->place.x, sys->place.y, sys->place.width, sys->place.height,
+                    area->place.x, area->place.y, area->place.width, area->place.height,
                     swpFlags);
             }
 
@@ -229,13 +229,13 @@ void CommonClean(vlc_object_t *obj, vout_display_sys_win32_t *sys)
     }
 }
 
-void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys)
+void CommonManage(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys)
 {
     if (sys->b_windowless)
         return;
 
     if (EventThreadGetAndResetSizeChanged(sys->event))
-        UpdateRects(vd, sys);
+        UpdateRects(vd, area, sys);
 }
 
 /* */
@@ -373,27 +373,27 @@ static int CommonControlSetFullscreen(vlc_object_t *obj, vout_display_sys_win32_
 }
 #endif /* !VLC_WINSTORE_APP */
 
-int CommonControl(vout_display_t *vd, vout_display_sys_win32_t *sys, int query, va_list args)
+int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys, int query, va_list args)
 {
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED: /* const vout_display_cfg_t *p_cfg */
     case VOUT_DISPLAY_CHANGE_ZOOM:           /* const vout_display_cfg_t *p_cfg */
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {
-        sys->vdcfg = *va_arg(args, const vout_display_cfg_t *);
-        UpdateRects(vd, sys);
+        area->vdcfg = *va_arg(args, const vout_display_cfg_t *);
+        UpdateRects(vd, area, sys);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg */
     {   /* Update dimensions */
-        sys->vdcfg = *va_arg(args, const vout_display_cfg_t *);
+        area->vdcfg = *va_arg(args, const vout_display_cfg_t *);
 #if !VLC_WINSTORE_APP
-        if (!sys->vdcfg.is_fullscreen && !sys->b_windowless) {
+        if (!area->vdcfg.is_fullscreen && !sys->b_windowless) {
             RECT rect_window = {
                 .top    = 0,
                 .left   = 0,
-                .right  = sys->vdcfg.display.width,
-                .bottom = sys->vdcfg.display.height,
+                .right  = area->vdcfg.display.width,
+                .bottom = area->vdcfg.display.height,
             };
             AdjustWindowRect(&rect_window, EventThreadGetWindowStyle(sys->event), 0);
             SetWindowPos(sys->hwnd, 0, 0, 0,
@@ -401,7 +401,7 @@ int CommonControl(vout_display_t *vd, vout_display_sys_win32_t *sys, int query, 
                          RECTHeight(rect_window), SWP_NOMOVE);
         }
 #endif /* !VLC_WINSTORE_APP */
-        UpdateRects(vd, sys);
+        UpdateRects(vd, area, sys);
         return VLC_SUCCESS;
     }
 #if !VLC_WINSTORE_APP
@@ -428,7 +428,7 @@ int CommonControl(vout_display_t *vd, vout_display_sys_win32_t *sys, int query, 
         bool fs = va_arg(args, int);
         if (CommonControlSetFullscreen(VLC_OBJECT(vd), sys, fs))
             return VLC_EGENERIC;
-        UpdateRects(vd, sys);
+        UpdateRects(vd, area, sys);
         return VLC_SUCCESS;
     }
 #endif /* !VLC_WINSTORE_APP */

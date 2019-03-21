@@ -90,6 +90,7 @@ vlc_module_end ()
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
+    display_win32_area_t     area;
 
     /* Sensors */
     void *p_sensors;
@@ -188,8 +189,8 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     UINT i_width, i_height;
-    i_width  = sys->sys.place.width;
-    i_height = sys->sys.place.height;
+    i_width  = sys->area.place.width;
+    i_height = sys->area.place.height;
 
     if (!sys->resizeCb(sys->outside_opaque, i_width, i_height))
         return E_FAIL;
@@ -200,8 +201,8 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
 static void UpdateSize(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    msg_Dbg(vd, "Detected size change %dx%d", sys->sys.place.width,
-            sys->sys.place.height);
+    msg_Dbg(vd, "Detected size change %dx%d", sys->area.place.width,
+            sys->area.place.height);
 
     UpdateBackBuffer(vd);
 
@@ -285,15 +286,15 @@ static bool StartRendering(void *opaque)
 
 #if VLC_WINSTORE_APP
     /* TODO read the swapchain size and call VOUT_DISPLAY_CHANGE_DISPLAY_SIZE */
-    UpdateRects(vd, sys);
+    UpdateRects(vd, &sys->area, &sys->sys);
 #else /* !VLC_WINSTORE_APP */
-    CommonManage(vd, &sys->sys);
+    CommonManage(vd, &sys->area, &sys->sys);
 #endif
 
-    if ( sys->sys.place_changed )
+    if ( sys->area.place_changed )
     {
         UpdateSize(vd);
-        sys->sys.place_changed =false;
+        sys->area.place_changed =false;
     }
 
     D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
@@ -478,7 +479,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
     }
 #endif
-    if (CommonInit(vd, &sys->sys, d3d11_ctx != NULL, cfg))
+    if (CommonInit(vd, &sys->area, &sys->sys, d3d11_ctx != NULL, cfg))
         goto error;
 
 #if VLC_WINSTORE_APP
@@ -721,7 +722,7 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
          f_fovx < -0.001f )
         return;
 
-    float f_sar = (float) sys->sys.vdcfg.display.width / sys->sys.vdcfg.display.height;
+    float f_sar = (float) sys->area.vdcfg.display.width / sys->area.vdcfg.display.height;
     float f_fovy = UpdateFOVy(f_fovx, f_sar);
     float f_z = UpdateZ(f_fovx, f_fovy);
 
@@ -743,7 +744,7 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
-    int res = CommonControl( vd, &sys->sys, query, args );
+    int res = CommonControl( vd, &sys->area, &sys->sys, query, args );
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
     {
@@ -755,10 +756,10 @@ static int Control(vout_display_t *vd, int query, va_list args)
         }
     }
 
-    if ( sys->sys.place_changed )
+    if ( sys->area.place_changed )
     {
         UpdateSize(vd);
-        sys->sys.place_changed =false;
+        sys->area.place_changed =false;
     }
 
     return res;
@@ -846,7 +847,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 sys->picQuad.i_height = texDesc.Height;
                 sys->picQuad.i_width = texDesc.Width;
 
-                UpdateRects(vd, &sys->sys);
+                UpdateRects(vd, &sys->area, &sys->sys);
                 UpdateSize(vd);
             }
         }
@@ -1364,14 +1365,14 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
 
     RECT rect_dst = {
         .left   = 0,
-        .right  = sys->sys.place.width,
+        .right  = sys->area.place.width,
         .top    = 0,
-        .bottom = sys->sys.place.height
+        .bottom = sys->area.place.height
     };
 
     D3D11_UpdateViewport( &sys->picQuad, &rect_dst, sys->display.pixelFormat );
 
-    SetQuadVSProjection(vd, &sys->picQuad, &sys->sys.vdcfg.viewpoint);
+    SetQuadVSProjection(vd, &sys->picQuad, &sys->area.vdcfg.viewpoint);
 
 #ifndef NDEBUG
     msg_Dbg( vd, "picQuad position (%.02f,%.02f) %.02fx%.02f",
@@ -1462,7 +1463,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
-    UpdateRects(vd, &sys->sys);
+    UpdateRects(vd, &sys->area, &sys->sys);
 
     video_format_t surface_fmt = *fmt;
     surface_fmt.i_width  = sys->picQuad.i_width;
@@ -1489,7 +1490,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     if ( vd->source.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
          vd->source.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
-        SetQuadVSProjection( vd, &sys->picQuad, &sys->sys.vdcfg.viewpoint );
+        SetQuadVSProjection( vd, &sys->picQuad, &sys->area.vdcfg.viewpoint );
 
     if (is_d3d11_opaque(fmt->i_chroma)) {
         ID3D10Multithread *pMultithread;
@@ -1572,7 +1573,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
-    UpdateRects(vd, &sys->sys);
+    UpdateRects(vd, &sys->area, &sys->sys);
 
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {
@@ -1811,10 +1812,10 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         d3d_quad_t *quad = (d3d_quad_t *) quad_picture->p_sys;
 
         RECT spuViewport;
-        spuViewport.left   = (FLOAT) r->i_x * sys->sys.place.width  / subpicture->i_original_picture_width;
-        spuViewport.top    = (FLOAT) r->i_y * sys->sys.place.height / subpicture->i_original_picture_height;
-        spuViewport.right  = (FLOAT) (r->i_x + r->fmt.i_visible_width)  * sys->sys.place.width  / subpicture->i_original_picture_width;
-        spuViewport.bottom = (FLOAT) (r->i_y + r->fmt.i_visible_height) * sys->sys.place.height / subpicture->i_original_picture_height;
+        spuViewport.left   = (FLOAT) r->i_x * sys->area.place.width  / subpicture->i_original_picture_width;
+        spuViewport.top    = (FLOAT) r->i_y * sys->area.place.height / subpicture->i_original_picture_height;
+        spuViewport.right  = (FLOAT) (r->i_x + r->fmt.i_visible_width)  * sys->area.place.width  / subpicture->i_original_picture_width;
+        spuViewport.bottom = (FLOAT) (r->i_y + r->fmt.i_visible_height) * sys->area.place.height / subpicture->i_original_picture_height;
 
         if (r->zoom_h.num != 0 && r->zoom_h.den != 0)
         {

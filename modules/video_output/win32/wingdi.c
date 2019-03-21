@@ -62,6 +62,7 @@ vlc_module_end ()
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
+    display_win32_area_t     area;
 
     int  i_depth;
 
@@ -100,7 +101,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
-    return CommonControl(vd, &sys->sys, query, args);
+    return CommonControl(vd, &sys->area, &sys->sys, query, args);
 }
 
 /* */
@@ -116,7 +117,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    if (CommonInit(vd, &sys->sys, false, cfg))
+    if (CommonInit(vd, &sys->area, &sys->sys, false, cfg))
         goto error;
 
     /* */
@@ -155,10 +156,10 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
     SelectObject(sys->off_dc, sys->off_bitmap);
 
-    if (sys->sys.place.width  != vd->source.i_visible_width ||
-        sys->sys.place.height != vd->source.i_visible_height) {
+    if (sys->area.place.width  != vd->source.i_visible_width ||
+        sys->area.place.height != vd->source.i_visible_height) {
         StretchBlt(hdc, 0, 0,
-                   sys->sys.place.width, sys->sys.place.height,
+                   sys->area.place.width, sys->area.place.height,
                    sys->off_dc,
                    vd->source.i_x_offset, vd->source.i_y_offset,
                    vd->source.i_x_offset + vd->source.i_visible_width,
@@ -166,7 +167,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
                    SRCCOPY);
     } else {
         BitBlt(hdc, 0, 0,
-               sys->sys.place.width, sys->sys.place.height,
+               sys->area.place.width, sys->area.place.height,
                sys->off_dc,
                vd->source.i_x_offset, vd->source.i_y_offset,
                SRCCOPY);
@@ -174,7 +175,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
     ReleaseDC(sys->sys.hvideownd, hdc);
 
-    CommonManage(vd, &sys->sys);
+    CommonManage(vd, &sys->area, &sys->sys);
 }
 
 static int Init(vout_display_t *vd, video_format_t *fmt)
@@ -262,7 +263,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     if (!sys->sys.b_windowless)
         EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (WinGDI output)");
 
-    UpdateRects(vd, &sys->sys);
+    UpdateRects(vd, &sys->area, &sys->sys);
 
     return VLC_SUCCESS;
 }
