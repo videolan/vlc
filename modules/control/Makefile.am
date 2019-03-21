@@ -4,8 +4,10 @@ libdummy_plugin_la_SOURCES = control/dummy.c control/intromsg.h
 libgestures_plugin_la_SOURCES = control/gestures.c
 libhotkeys_plugin_la_SOURCES = control/hotkeys.c
 libhotkeys_plugin_la_LIBADD = $(LIBM)
-libnetsync_plugin_la_SOURCES = control/netsync.c
-libnetsync_plugin_la_LIBADD = $(SOCKET_LIBS)
+# XXX: netsync disabled, move current code to new playlist/player and add a
+# way to control the output clock from the player
+#libnetsync_plugin_la_SOURCES = control/netsync.c
+#libnetsync_plugin_la_LIBADD = $(SOCKET_LIBS)
 liboldrc_plugin_la_SOURCES = control/oldrc.c control/intromsg.h
 liboldrc_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
 
@@ -13,7 +15,6 @@ control_LTLIBRARIES = \
 	libdummy_plugin.la \
 	libgestures_plugin.la \
 	libhotkeys_plugin.la \
-	libnetsync_plugin.la \
 	liboldrc_plugin.la
 
 liblirc_plugin_la_SOURCES = control/lirc.c

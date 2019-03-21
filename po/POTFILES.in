@@ -374,7 +374,6 @@ modules/control/globalhotkeys/xcb.c
 modules/control/hotkeys.c
 modules/control/intromsg.h
 modules/control/lirc.c
-modules/control/netsync.c
 modules/control/ntservice.c
 modules/control/oldrc.c
 modules/control/win_msg.c
