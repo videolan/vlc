@@ -116,7 +116,7 @@ public:
     bool Start();
     int Control( int query, va_list args );
     int List( int query, const vlc_ml_query_params_t* params, va_list args );
-    void* Get( int query, int64_t id );
+    void* Get( int query, va_list args );
 
 private:
     int controlMedia( int query, va_list args );

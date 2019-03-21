@@ -762,7 +762,7 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
     return VLC_SUCCESS;
 }
 
-void* MediaLibrary::Get( int query, int64_t id )
+void* MediaLibrary::Get( int query, va_list args )
 {
     if ( Start() == false )
         return nullptr;
@@ -771,36 +771,43 @@ void* MediaLibrary::Get( int query, int64_t id )
     {
         case VLC_ML_GET_MEDIA:
         {
+            auto id = va_arg( args, int64_t );
             auto media = m_ml->media( id );
             return CreateAndConvert<vlc_ml_media_t>( media.get() );
         }
         case VLC_ML_GET_INPUT_ITEM:
         {
+            auto id = va_arg( args, int64_t );
             auto media = m_ml->media( id );
             return MediaToInputItem( media.get() );
         }
         case VLC_ML_GET_ALBUM:
         {
+            auto id = va_arg( args, int64_t );
             auto album = m_ml->album( id );
             return CreateAndConvert<vlc_ml_album_t>( album.get() );
         }
         case VLC_ML_GET_ARTIST:
         {
+            auto id = va_arg( args, int64_t );
             auto artist = m_ml->artist( id );
             return CreateAndConvert<vlc_ml_artist_t>( artist.get() );
         }
         case VLC_ML_GET_GENRE:
         {
+            auto id = va_arg( args, int64_t );
             auto genre = m_ml->genre( id );
             return CreateAndConvert<vlc_ml_genre_t>( genre.get() );
         }
         case VLC_ML_GET_SHOW:
         {
+            auto id = va_arg( args, int64_t );
             auto show = m_ml->show( id );
             return CreateAndConvert<vlc_ml_show_t>( show.get() );
         }
         case VLC_ML_GET_PLAYLIST:
         {
+            auto id = va_arg( args, int64_t );
             auto playlist = m_ml->playlist( id );
             return CreateAndConvert<vlc_ml_playlist_t>( playlist.get() );
         }
@@ -1332,10 +1339,10 @@ int MediaLibrary::listPlaylist( int listQuery, const medialibrary::QueryParamete
     }
 }
 
-static void* Get( vlc_medialibrary_module_t* module, int query, int64_t id )
+static void* Get( vlc_medialibrary_module_t* module, int query, va_list args )
 {
     auto ml = static_cast<MediaLibrary*>( module->p_sys );
-    return ml->Get( query, id );
+    return ml->Get( query, args );
 }
 
 static int List( vlc_medialibrary_module_t* module, int query,

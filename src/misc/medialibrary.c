@@ -333,10 +333,14 @@ void vlc_ml_entry_point_list_release( vlc_ml_entry_point_list_t* p_list )
     free( p_list );
 }
 
-void* vlc_ml_get( vlc_medialibrary_t* p_ml, int i_query, int64_t i_id )
+void* vlc_ml_get( vlc_medialibrary_t* p_ml, int i_query, ... )
 {
     assert( p_ml != NULL );
-    return p_ml->m.pf_get( &p_ml->m, i_query, i_id );
+    va_list args;
+    va_start( args, i_query );
+    void* res = p_ml->m.pf_get( &p_ml->m, i_query, args );
+    va_end( args );
+    return res;
 }
 
 int vlc_ml_control( vlc_medialibrary_t* p_ml, int i_query, ... )

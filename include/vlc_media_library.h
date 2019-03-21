@@ -688,13 +688,13 @@ struct vlc_medialibrary_module_t
                     const vlc_ml_query_params_t* p_params, va_list args );
 
     /**
-     * Get a specific entity by its id.
+     * Get a specific entity by its id or another unique value
      *
      * \return The required entity, or a NULL pointer if couldn't be found.
      *
      * Refer to the list of queries for the specific return type
      */
-    void* (*pf_get)( struct vlc_medialibrary_module_t* p_ml, int i_query, int64_t i_id );
+    void* (*pf_get)( struct vlc_medialibrary_module_t* p_ml, int i_query, va_list args );
 
     const vlc_medialibrary_callbacks_t* cbs;
 };
@@ -705,7 +705,7 @@ void libvlc_MlRelease( vlc_medialibrary_t* p_ml );
 VLC_API vlc_medialibrary_t* vlc_ml_instance_get( vlc_object_t* p_obj ) VLC_USED;
 #define vlc_ml_instance_get(x) vlc_ml_instance_get( VLC_OBJECT(x) )
 
-VLC_API void* vlc_ml_get( vlc_medialibrary_t* p_ml, int i_query, int64_t i_id ) VLC_USED;
+VLC_API void* vlc_ml_get( vlc_medialibrary_t* p_ml, int i_query, ... ) VLC_USED;
 VLC_API int vlc_ml_control( vlc_medialibrary_t* p_ml, int i_query, ... ) VLC_USED;
 VLC_API int vlc_ml_list( vlc_medialibrary_t* p_ml, int i_query,
                              const vlc_ml_query_params_t* p_params, ... );
