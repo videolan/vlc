@@ -27,6 +27,7 @@ $(TARBALLS)/mfx-$(MFX_GITHASH).tar.xz:
 
 mfx: mfx-$(MFX_GITHASH).tar.xz .sum-mfx
 	$(UNPACK)
+	$(APPLY) $(SRC)/mfx/mfx-cpp11-fix.patch
 	cd $(UNPACK_DIR) && autoreconf -ivf
 	$(MOVE)
 
