@@ -399,6 +399,8 @@ bool Convert( const medialibrary::IFolder* input, vlc_ml_entry_point_t& output )
 
 input_item_t* MediaToInputItem( const medialibrary::IMedia* media )
 {
+    if ( media == nullptr )
+        return nullptr;
     auto files = media->files();
     const auto it = std::find_if( files.cbegin(), files.cend(),
                                   [](const medialibrary::FilePtr& f) {
