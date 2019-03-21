@@ -40,8 +40,6 @@
 #include <windowsx.h>                                        /* GET_X_LPARAM */
 #include <shellapi.h>                                         /* ExtractIcon */
 
-#define vout_display_sys_win32_t vout_display_sys_t
-
 #include "common.h"
 
 /*****************************************************************************

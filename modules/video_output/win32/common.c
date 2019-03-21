@@ -40,8 +40,6 @@
 #define COBJMACROS
 #include <shobjidl.h>
 
-#define vout_display_sys_win32_t vout_display_sys_t
-
 #include "common.h"
 #include "../video_chroma/copy.h"
 
