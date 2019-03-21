@@ -147,7 +147,9 @@ libvlc_GetMainPlaylist(libvlc_int_t *libvlc)
 vlc_playlist_t *
 vlc_intf_GetMainPlaylist(intf_thread_t *intf)
 {
-    return libvlc_GetMainPlaylist(vlc_object_instance(intf));
+    vlc_playlist_t *pl = libvlc_GetMainPlaylist(vlc_object_instance(intf));
+    assert(pl);
+    return pl;
 }
 
 /**
@@ -161,6 +163,10 @@ int intf_Create( libvlc_int_t *libvlc, const char *chain )
 {
     assert( libvlc );
     libvlc_priv_t *priv = libvlc_priv(libvlc);
+
+    /* Ensure that each interfaces can access the main playlist */
+    if (libvlc_GetMainPlaylist(libvlc) == NULL)
+        return VLC_ENOMEM;
 
     /* Allocate structure */
     intf_thread_t *p_intf = vlc_custom_create( libvlc, sizeof( *p_intf ),

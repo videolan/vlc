@@ -93,6 +93,11 @@ VLC_API void libvlc_Quit( libvlc_int_t * );
 
 VLC_API playlist_t *pl_Get( struct intf_thread_t *intf );
 
+/**
+ * Recover the main playlist from an interface module
+ *
+ * @return the main playlist (can't be NULL)
+ */
 VLC_API vlc_playlist_t *
 vlc_intf_GetMainPlaylist(intf_thread_t *intf);
 
