@@ -228,16 +228,10 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
         rect_dest.right, rect_dest.bottom);
 #endif
 
-    /* the 2 following lines are to fix a bug when clicking on the desktop */
-    if (place.width == 0 || place.height == 0) {
-        goto exit;
-    }
-
 #if !VLC_WINSTORE_APP
     CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
 #endif
 
-exit:
     /* Signal the change in size/position */
     sys->changes |= DX_POSITION_CHANGE;
 
