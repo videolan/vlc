@@ -36,16 +36,21 @@
 
 #include <Foundation/Foundation.h>
 
-static bool isBundle()
+static bool config_isBundle()
 {
     NSBundle *bundle = [NSBundle mainBundle];
     NSString *bundlePath = bundle.bundlePath;
     return [bundlePath hasSuffix:@".app"] || [bundlePath hasSuffix:@".framework"];
 }
 
-char *config_GetLibDir (void)
+static char *config_getLibraryDirReal(const char *fallback)
 {
-    if (isBundle()) {
+    const char *dir = getenv("VLC_LIB_PATH");
+    if (dir) {
+        return strdup(dir);
+    }
+
+    if (config_isBundle()) {
         NSBundle *bundle = [NSBundle mainBundle];
         NSString *path = bundle.privateFrameworksPath;
         if (!path)
@@ -54,28 +59,20 @@ char *config_GetLibDir (void)
         return strdup(path.UTF8String);
     }
 
-    /* we are not part of any Mac-style package but were installed
-     * the UNIX way. let's trick-around a bit */
-    Dl_info info;
-    if (dladdr(system_Init, &info)) {
-        char *incompletepath = strdup(dirname( (char *)info.dli_fname ));
-        char *path = NULL;
-        asprintf(&path, "%s/"PACKAGE, incompletepath);
-        free(incompletepath);
-        return path;
-    }
+    if (fallback)
+        return strdup(fallback);
 
-    /* should never happen */
-    abort ();
+    return NULL;
 }
 
-static char *config_GetDataDir(void)
+static char *config_getDataDirReal(const char *fallback)
 {
-    const char *path = getenv ("VLC_DATA_PATH");
-    if (path)
-        return strdup (path);
+    const char *dir = getenv("VLC_DATA_PATH");
+    if (dir) {
+        return strdup(dir);
+    }
 
-    if (isBundle()) {
+    if (config_isBundle()) {
         NSBundle *bundle = [NSBundle mainBundle];
         NSString *path = bundle.resourcePath;
         if (!path)
@@ -85,34 +82,54 @@ static char *config_GetDataDir(void)
         return strdup(path.UTF8String);
     }
 
-    // Fallback
-    char *vlcpath = config_GetLibDir ();
-    char *datadir;
+    if (fallback)
+        return strdup(fallback);
 
-    if (asprintf (&datadir, "%s/share", vlcpath) == -1)
-        datadir = NULL;
+    return NULL;
+}
 
-    free (vlcpath);
-    return datadir;
+char *config_GetLibDir(void)
+{
+    return config_getLibraryDirReal(LIBDIR);
 }
 
 char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
 {
     char *dir = NULL;
-
     switch (type)
     {
         case VLC_PKG_DATA_DIR:
-            dir = config_GetDataDir();
+            dir = config_getDataDirReal(PKGDATADIR);
             break;
+
         case VLC_PKG_LIB_DIR:
+            dir = config_getLibraryDirReal(PKGLIBDIR);
+            break;
+        case VLC_LIB_DIR:
+            dir = config_getLibraryDirReal(LIBDIR);
+            break;
+
+
         case VLC_PKG_LIBEXEC_DIR:
-            dir = config_GetLibDir();
+            dir = config_getLibraryDirReal(PKGLIBEXECDIR);
             break;
-        case VLC_SYSDATA_DIR:
+        case VLC_LIBEXEC_DIR:
+            dir = config_getLibraryDirReal(LIBEXECDIR);
             break;
+
         case VLC_LOCALE_DIR:
-            dir = config_GetSysPath(VLC_PKG_DATA_DIR, "locale");
+            dir = config_getDataDirReal(NULL);
+            if (dir) {
+                NSString *result = [NSString stringWithFormat:@"%s/locale", dir];
+                free(dir);
+                dir = strdup(result.UTF8String);
+                break;
+            }
+
+            dir = strdup(LOCALEDIR);
+            break;
+
+        case VLC_SYSDATA_DIR:
             break;
         default:
             vlc_assert_unreachable();
