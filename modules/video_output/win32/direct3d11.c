@@ -230,13 +230,11 @@ static void UpdateSize(vout_display_t *vd)
 static void Manage(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    RECT before_src_clipped  = sys->sys.rect_src_clipped;
-    RECT before_dest         = sys->sys.rect_dest;
+    RECT before_dest = sys->sys.rect_dest;
 
     CommonManage(vd, &sys->sys);
 
-    if (!RectEquals(&before_src_clipped, &sys->sys.rect_src_clipped) ||
-        !RectEquals(&before_dest, &sys->sys.rect_dest))
+    if (!RectEquals(&before_dest, &sys->sys.rect_dest))
     {
         UpdateSize(vd);
     }
@@ -764,8 +762,7 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
-    RECT before_src_clipped  = sys->sys.rect_src_clipped;
-    RECT before_dest         = sys->sys.rect_dest;
+    RECT before_dest = sys->sys.rect_dest;
 
     int res = CommonControl( vd, &sys->sys, query, args );
 
@@ -779,8 +776,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         }
     }
 
-    if (!RectEquals(&before_src_clipped,  &sys->sys.rect_src_clipped) ||
-        !RectEquals(&before_dest,         &sys->sys.rect_dest) )
+    if (!RectEquals(&before_dest, &sys->sys.rect_dest) )
     {
         UpdateSize(vd);
     }
