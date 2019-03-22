@@ -145,7 +145,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
 
-#define rect_src vd->sys->rect_src
 #define rect_src_clipped vd->sys->sys.rect_src_clipped
 #define rect_dest vd->sys->sys.rect_dest
 #define rect_dest_clipped vd->sys->sys.rect_dest_clipped
@@ -174,7 +173,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
     }
 
     ReleaseDC(sys->sys.hvideownd, hdc);
-#undef rect_src
 #undef rect_src_clipped
 #undef rect_dest
 #undef rect_dest_clipped
