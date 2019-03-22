@@ -186,10 +186,11 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         if( i_cmd == 0 )
         {
             module_config_t *p_conf;
-            const char *psz_name = p_longopts[i_index].name;
+            const char *psz_full_name = p_longopts[i_index].name;
+            const char *psz_name = psz_full_name;
 
             /* Check if we deal with a --nofoo or --no-foo long option */
-            if( flag ) psz_name += psz_name[2] == '-' ? 3 : 2;
+            if( flag ) psz_name += psz_full_name[2] == '-' ? 3 : 2;
 
             /* Store the configuration option */
             p_conf = config_FindConfig( psz_name );
@@ -202,7 +203,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                 {
                     fprintf(stderr,
                             "Warning: option --%s no longer exists.\n",
-                            psz_name);
+                            psz_full_name);
                     continue;
                 }
 
