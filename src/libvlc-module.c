@@ -1886,11 +1886,11 @@ vlc_module_begin ()
                 false )
     add_password("http-proxy-pwd", NULL, PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT)
 #else
-    add_obsolete_string( "http-proxy" )
-    add_obsolete_string( "http-proxy-pwd" )
+    add_obsolete_string( "http-proxy" ) /* since 4.0.0 */
+    add_obsolete_string( "http-proxy-pwd" ) /* since 4.0.0 */
 
 #endif
-    add_obsolete_bool( "http-use-IE-proxy" )
+    add_obsolete_bool( "http-use-IE-proxy" ) /* since 4.0.0 */
 
     set_section( N_( "Socks proxy") , NULL )
     add_string( "socks", NULL,

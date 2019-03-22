@@ -54,7 +54,7 @@ vlc_module_begin()
     set_description(N_("MMAL-based decoder plugin for Raspberry Pi"))
     set_capability("video decoder", 90)
     add_shortcut("mmal_decoder")
-    add_obsolete_bool("mmal-opaque")
+    add_obsolete_bool("mmal-opaque") /* since 4.0.0 */
     set_callbacks(OpenDecoder, CloseDecoder)
 vlc_module_end()
 

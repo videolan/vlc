@@ -225,8 +225,8 @@ vlc_module_begin ()
     add_bool(SOUT_CFG_PREFIX "video", true, NULL, NULL, false)
         change_private()
     add_integer(SOUT_CFG_PREFIX "http-port", HTTP_PORT, HTTP_PORT_TEXT, HTTP_PORT_LONGTEXT, false)
-    add_obsolete_string(SOUT_CFG_PREFIX "mux")
-    add_obsolete_string(SOUT_CFG_PREFIX "mime")
+    add_obsolete_string(SOUT_CFG_PREFIX "mux") /* since 4.0.0 */
+    add_obsolete_string(SOUT_CFG_PREFIX "mime") /* since 4.0.0 */
     add_renderer_opts(SOUT_CFG_PREFIX)
 
     add_submodule()

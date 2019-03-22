@@ -190,8 +190,8 @@ vlc_module_begin ()
                             CACHE_SIZE_TEXT, CACHE_SIZE_LONGTEXT, true )
         change_safe()
 
-    add_obsolete_integer( "freetype-fontsize" );
-    add_obsolete_integer( "freetype-rel-fontsize" );
+    add_obsolete_integer( "freetype-fontsize" ); /* since 4.0.0 */
+    add_obsolete_integer( "freetype-rel-fontsize" ); /* since 4.0.0 */
 
     add_bool( "freetype-yuvp", false, YUVP_TEXT,
               YUVP_LONGTEXT, true )
