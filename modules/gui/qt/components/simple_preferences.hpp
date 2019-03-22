@@ -116,7 +116,6 @@ private:
 /* Display only the options for the selected audio output */
 private slots:
     void lastfm_Changed( int );
-    void updateVideoOptions( int );
     void updateAudioOptions( int );
     void updateAudioVolume( int );
     void langChanged( int );

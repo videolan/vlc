@@ -63,7 +63,6 @@ struct event_thread_t
 
     /* */
     bool use_desktop;
-    bool use_overlay;
 
     /* Mouse */
     bool is_cursor_hidden;
@@ -441,12 +440,6 @@ void EventThreadUpdateSourceAndPlace( event_thread_t *p_event,
     vlc_mutex_unlock( &p_event->lock );
 }
 
-void EventThreadUseOverlay( event_thread_t *p_event, bool b_used )
-{
-    vlc_mutex_lock( &p_event->lock );
-    p_event->use_overlay = b_used;
-    vlc_mutex_unlock( &p_event->lock );
-}
 bool EventThreadGetAndResetHasMoved( event_thread_t *p_event )
 {
     return atomic_exchange(&p_event->has_moved, false);
@@ -501,7 +494,6 @@ void EventThreadDestroy( event_thread_t *p_event )
 int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event_cfg_t *p_cfg )
 {
     p_event->use_desktop = p_cfg->use_desktop;
-    p_event->use_overlay = p_cfg->use_overlay;
     p_event->x           = p_cfg->x;
     p_event->y           = p_cfg->y;
     p_event->width       = p_cfg->width;

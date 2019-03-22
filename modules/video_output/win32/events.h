@@ -31,7 +31,6 @@ typedef struct event_thread_t event_thread_t;
 
 typedef struct {
     bool use_desktop; /* direct3d */
-    bool use_overlay; /* directdraw */
     int x;
     int y;
     unsigned width;
@@ -58,7 +57,6 @@ void            EventThreadUpdateWindowPosition( event_thread_t *, bool *pb_move
 void            EventThreadUpdateSourceAndPlace( event_thread_t *p_event,
                                                  const video_format_t *p_source,
                                                  const vout_display_place_t *p_place );
-void            EventThreadUseOverlay( event_thread_t *, bool b_used );
 bool            EventThreadGetAndResetHasMoved( event_thread_t * );
 
 # ifdef __cplusplus

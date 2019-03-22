@@ -73,8 +73,6 @@ typedef struct vout_display_sys_win32_t
 
     bool use_desktop;     /* show video on desktop window ? */
 
-    bool use_overlay;     /* Are we using an overlay surface */
-
     bool (*pf_GetRect)(const struct vout_display_sys_win32_t *p_sys, RECT *out);
     unsigned int (*pf_GetPictureWidth) (const vout_display_t *);
     unsigned int (*pf_GetPictureHeight)(const vout_display_t *);

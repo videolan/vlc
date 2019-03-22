@@ -366,8 +366,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_BOOL( "video-deco", windowDecorations );
             CONFIG_GENERIC( "vout", StringList, ui.voutLabel, outputModule );
 
-            CONNECT( ui.outputModule, currentIndexChanged( int ),
-                     this, updateVideoOptions( int ) );
             optionWidgets["videoOutCoB"] = ui.outputModule;
 
             optionWidgets["fullscreenScreenB"] = ui.fullscreenScreenBox;
@@ -389,12 +387,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             }
 
 #ifdef _WIN32
-            CONFIG_BOOL( "directx-overlay", overlay );
             CONFIG_BOOL( "directx-hw-yuv", hwYUVBox );
-            CONNECT( ui.overlay, toggled( bool ), ui.hwYUVBox, setEnabled( bool ) );
-            optionWidgets["directxVideoB"] = ui.directXBox;
-#else
-            ui.directXBox->setVisible( false );
 #endif
 
 #ifdef __OS2__
@@ -416,8 +409,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             snapshotsSequentialNumbering );
             CONFIG_GENERIC( "snapshot-format", StringList, ui.arLabel,
                             snapshotsFormat );
-
-            updateVideoOptions( ui.outputModule->currentIndex() );
          END_SPREFS_CAT;
 
         /******************************
@@ -947,17 +938,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #undef CONFIG_GENERIC_NO_UI
 #undef CONFIG_GENERIC
 #undef CONFIG_BOOL
-}
-
-void SPrefsPanel::updateVideoOptions( int number )
-{
-    QString value = qobject_cast<QComboBox *>(optionWidgets["videoOutCoB"])
-                                            ->itemData( number ).toString();
-#ifdef _WIN32
-    if( optionWidgets["directxVideoB"] ) {
-        optionWidgets["directxVideoB"]->setVisible( ( value == "directdraw" ) );
-    }
-#endif
 }
 
 

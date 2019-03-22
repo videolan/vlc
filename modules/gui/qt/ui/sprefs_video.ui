@@ -99,17 +99,10 @@
          <string>DirectX</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
-         <item row="2" column="0">
+         <item row="1" column="0">
           <widget class="QCheckBox" name="hwYUVBox">
            <property name="text">
             <string>Use hardware YUV-&gt;RGB conversions</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="overlay">
-           <property name="text">
-            <string>Accelerated video output (Overlay)</string>
            </property>
           </widget>
          </item>
@@ -319,7 +312,6 @@
   <tabstop>windowDecorations</tabstop>
   <tabstop>outputModule</tabstop>
   <tabstop>fullscreenScreenBox</tabstop>
-  <tabstop>overlay</tabstop>
   <tabstop>hwYUVBox</tabstop>
   <tabstop>kvaFixT23</tabstop>
   <tabstop>kvaVideoMode</tabstop>
