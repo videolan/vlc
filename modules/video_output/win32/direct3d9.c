@@ -477,8 +477,13 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* */
     region->texture = sys->sceneTexture;
-    Direct3D9SetupVertices(region->vertex, &vd->sys->sys.rect_src,
-                           &copy_rect,
+    RECT rect_src = {
+        .left   = 0,
+        .right  = vd->source.i_width,
+        .top    = 0,
+        .bottom = vd->source.i_height,
+    };
+    Direct3D9SetupVertices(region->vertex, &rect_src, &copy_rect,
                            &vd->sys->sys.rect_dest, 255, vd->source.orientation);
     return VLC_SUCCESS;
 }
