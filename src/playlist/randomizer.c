@@ -186,7 +186,7 @@
  *               <------------------------>
  *                     history range
  *
- * Secondly, to avoid to select A twice in a row (as the last item of the
+ * Secondly, to avoid selecting A twice in a row (as the last item of the
  * previous cycle and the first item of the new one), the randomizer will
  * immediately determine another item in the vector (say C) to be the first of
  * the new cycle. The items that belong to the history are kept in order.
@@ -226,7 +226,7 @@
  *
  * The playlist calls _Next(), the randomizer randomly selects E. E
  * "disappears" from the history of the last cycle. This is a general property:
- * each item may not appear more than one in the "history" (both from the last
+ * each item may not appear more than once in the "history" (both from the last
  * and the new cycle). The history order is preserved.
  *
  *                                history
@@ -238,7 +238,7 @@
  *              determinated     history range
  *                 range
  *
- * The playlist then calls _Prev() 3 times, that yield C, then A, then B.
+ * The playlist then calls _Prev() 3 times, that yields C, then A, then B.
  * 'next' is decremented (modulo size) on each call.
  *
  *                                history
@@ -251,7 +251,7 @@
  *                 range
  */
 
-/* On auto-reshuffle, avoid to select the same item before at least
+/* On auto-reshuffle, avoid selecting the same item before at least
  * NOT_SAME_BEFORE other items have been selected (between the end of the
  * previous shuffle and the start of the new shuffle). */
 #define NOT_SAME_BEFORE 1
