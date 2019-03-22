@@ -68,7 +68,6 @@ typedef struct vout_display_sys_win32_t
 
     /* Coordinates of src and dest images (used when blitting to display) */
     RECT         rect_src;
-    RECT         rect_src_clipped;
     RECT         rect_dest;
 
     vout_display_cfg_t vdcfg;

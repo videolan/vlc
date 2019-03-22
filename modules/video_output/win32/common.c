@@ -137,9 +137,6 @@ int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowl
 void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forced)
 {
     const video_format_t *source = &vd->source;
-#define rect_src sys->rect_src
-#define rect_src_clipped sys->rect_src_clipped
-#define rect_dest sys->rect_dest
 
     RECT  rect;
     POINT point = { 0 };
@@ -218,6 +215,8 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
     }
 #endif
 
+#define rect_src            sys->rect_src
+#define rect_dest           sys->rect_dest
     /* Destination image position and dimensions */
 #if (defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)) && !VLC_WINSTORE_APP
     rect_dest.left = 0;
@@ -233,9 +232,6 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
 
     /* the 2 following lines are to fix a bug when clicking on the desktop */
     if (place.width == 0 || place.height == 0) {
-#if !VLC_WINSTORE_APP
-        SetRectEmpty(&rect_src_clipped);
-#endif
         goto exit;
     }
 
@@ -244,12 +240,6 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
     rect_src.top = 0;
     rect_src.right = sys->pf_GetPictureWidth(vd);
     rect_src.bottom = sys->pf_GetPictureHeight(vd);
-
-    /* Clip the source image */
-    rect_src_clipped.left   = source->i_x_offset;
-    rect_src_clipped.right  = source->i_x_offset + source->i_visible_width;
-    rect_src_clipped.top    = source->i_y_offset;
-    rect_src_clipped.bottom = source->i_y_offset + source->i_visible_height;
 
 #ifndef NDEBUG
     msg_Dbg(vd, "DirectXUpdateRects source"
@@ -275,7 +265,6 @@ exit:
     sys->changes |= DX_POSITION_CHANGE;
 
 #undef rect_src
-#undef rect_src_clipped
 #undef rect_dest
 }
 
