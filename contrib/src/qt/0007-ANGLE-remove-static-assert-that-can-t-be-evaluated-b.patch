@@ -1,0 +1,28 @@
+From 5de8d0bf9fb22d8a2f1b648bcbf9fc5b247dbf41 Mon Sep 17 00:00:00 2001
+From: Pierre Lamot <pierre@videolabs.io>
+Date: Thu, 21 Mar 2019 14:26:17 +0100
+Subject: [PATCH 2/2] ANGLE: remove static assert that can't be evaluated by
+ gcc 6.4
+
+---
+ .../angle/src/libANGLE/renderer/d3d/FramebufferD3D.cpp        | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/FramebufferD3D.cpp b/src/3rdparty/angle/src/libANGLE/renderer/d3d/FramebufferD3D.cpp
+index 3d73b2c..12a809f 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/FramebufferD3D.cpp
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/FramebufferD3D.cpp
+@@ -379,8 +379,8 @@ const gl::AttachmentList &FramebufferD3D::getColorAttachmentsForRender(const gl:
+     if (mRenderer->getWorkarounds().addDummyTextureNoRenderTarget &&
+         colorAttachmentsForRender.empty())
+     {
+-        static_assert(static_cast<size_t>(activeProgramOutputs.size()) <= 32,
+-                      "Size of active program outputs should less or equal than 32.");
++        //static_assert(static_cast<size_t>(activeProgramOutputs.size()) <= 32,
++        //"Size of active program outputs should less or equal than 32.");
+         GLenum i = static_cast<GLenum>(
+             gl::ScanForward(static_cast<uint32_t>(activeProgramOutputs.bits())));
+ 
+-- 
+2.19.1
+

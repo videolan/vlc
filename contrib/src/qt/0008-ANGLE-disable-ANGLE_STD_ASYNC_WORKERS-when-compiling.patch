@@ -1,0 +1,27 @@
+From 0b5fc908a3d8e24c28e72f61bf8c6242cb85ba3e Mon Sep 17 00:00:00 2001
+From: Pierre Lamot <pierre@videolabs.io>
+Date: Thu, 21 Mar 2019 16:39:41 +0100
+Subject: [PATCH] ANGLE: disable ANGLE_STD_ASYNC_WORKERS when compiling with
+ gcc/mingw as std::future<void> is not supported
+
+---
+ src/angle/src/config.pri | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/angle/src/config.pri b/src/angle/src/config.pri
+index 5c52128..23109cd 100644
+--- a/src/angle/src/config.pri
++++ b/src/angle/src/config.pri
+@@ -95,6 +95,9 @@ gcc {
+                             -Wno-strict-aliasing -Wno-type-limits -Wno-unused-local-typedefs
+ 
+     QMAKE_CXXFLAGS_WARN_ON = $$QMAKE_CFLAGS_WARN_ON -Wno-reorder -Wno-conversion-null -Wno-delete-non-virtual-dtor
++	!clang {
++		   DEFINES += ANGLE_STD_ASYNC_WORKERS=ANGLE_DISABLED
++	}
+ }
+ 
+ QMAKE_CXXFLAGS_DEBUG = $$QMAKE_CFLAGS_DEBUG
+-- 
+2.19.1
+

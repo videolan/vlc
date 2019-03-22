@@ -35,6 +35,8 @@ ifdef HAVE_WIN32
 ifndef HAVE_WIN64
 	$(APPLY) $(SRC)/qt/0001-disable-qt_random_cpu.patch
 endif
+	$(APPLY) $(SRC)/qt/0007-ANGLE-remove-static-assert-that-can-t-be-evaluated-b.patch
+	$(APPLY) $(SRC)/qt/0008-ANGLE-disable-ANGLE_STD_ASYNC_WORKERS-when-compiling.patch
 
 ifdef HAVE_CROSS_COMPILE
 	$(APPLY) $(SRC)/qt/0003-allow-cross-compilation-of-angle-with-wine.patch
