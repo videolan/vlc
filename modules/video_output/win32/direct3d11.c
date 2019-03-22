@@ -215,7 +215,13 @@ static void UpdateSize(vout_display_t *vd)
 
     UpdatePicQuadPosition(vd);
 
-    D3D11_UpdateQuadPosition(vd, &sys->d3d_dev, &sys->picQuad, &sys->sys.rect_src_clipped,
+    RECT source_rect = {
+        .left   = vd->source.i_x_offset,
+        .right  = vd->source.i_x_offset + vd->source.i_visible_width,
+        .top    = vd->source.i_y_offset,
+        .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
+    };
+    D3D11_UpdateQuadPosition(vd, &sys->d3d_dev, &sys->picQuad, &source_rect,
                              vd->source.orientation);
 
     d3d11_device_unlock( &sys->d3d_dev );
@@ -1485,8 +1491,15 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
        return VLC_EGENERIC;
     }
 
-    if (D3D11_SetupQuad( vd, &sys->d3d_dev, &surface_fmt, &sys->picQuad, &sys->display, &sys->sys.rect_src_clipped,
-                   vd->source.orientation ) != VLC_SUCCESS) {
+    RECT source_rect = {
+        .left   = vd->source.i_x_offset,
+        .right  = vd->source.i_x_offset + vd->source.i_visible_width,
+        .top    = vd->source.i_y_offset,
+        .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
+    };
+    if (D3D11_SetupQuad( vd, &sys->d3d_dev, &surface_fmt, &sys->picQuad, &sys->display,
+                         &source_rect,
+                         vd->source.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
         return VLC_EGENERIC;
     }
