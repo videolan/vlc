@@ -73,14 +73,19 @@ static bool GetExternalDimensions(void *opaque, UINT *width, UINT *height)
     return true;
 }
 
-/* */
-int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys,
-               bool b_windowless, const vout_display_cfg_t *vdcfg)
+static void InitArea(vout_display_t *vd, display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
 {
     area->place_changed = false;
     area->pf_GetDisplayDimensions = GetExternalDimensions;
     area->opaque_dimensions = vd;
     area->vdcfg = *vdcfg;
+}
+
+/* */
+int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys,
+               bool b_windowless, const vout_display_cfg_t *vdcfg)
+{
+    InitArea(vd, area, vdcfg);
 
     sys->hwnd      = NULL;
     sys->hvideownd = NULL;
