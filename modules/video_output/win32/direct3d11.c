@@ -227,19 +227,6 @@ static void UpdateSize(vout_display_t *vd)
     d3d11_device_unlock( &sys->d3d_dev );
 }
 
-static void Manage(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    CommonManage(vd, &sys->sys);
-
-    if ( sys->sys.rect_dest_changed )
-    {
-        UpdateSize(vd);
-        sys->sys.rect_dest_changed =false;
-    }
-}
-
 static bool Resize(void *opaque, unsigned i_width, unsigned i_height)
 {
     vout_display_t *vd = opaque;
@@ -302,7 +289,13 @@ static bool StartRendering(void *opaque)
     vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
 
-    Manage(vd);
+    CommonManage(vd, &sys->sys);
+
+    if ( sys->sys.rect_dest_changed )
+    {
+        UpdateSize(vd);
+        sys->sys.rect_dest_changed =false;
+    }
 
     D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
     return true;
