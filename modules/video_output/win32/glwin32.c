@@ -80,7 +80,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return vout_display_opengl_SetViewpoint(sys->vgl,
             &va_arg (args, const vout_display_cfg_t* )->viewpoint);
 
-    return CommonControl(vd, query, args);
+    return CommonControl(vd, &sys->sys, query, args);
 }
 
 static const struct vout_window_operations embedVideoWindow_Ops =
@@ -122,7 +122,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     /* */
-    if (CommonInit(vd, false, cfg))
+    if (CommonInit(vd, &sys->sys, false, cfg))
         goto error;
 
     if (!sys->sys.b_windowless)
@@ -193,7 +193,7 @@ static void Close(vout_display_t *vd)
         vlc_object_delete(surface);
     }
 
-    CommonClean(vd);
+    CommonClean(vd, &sys->sys);
 
     free(sys);
 }
@@ -236,14 +236,14 @@ static void Display(vout_display_t *vd, picture_t *picture)
         vlc_gl_ReleaseCurrent (sys->gl);
     }
 
-    CommonDisplay(vd);
+    CommonDisplay(&sys->sys);
 }
 
 static void Manage (vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    CommonManage(vd);
+    CommonManage(vd, &sys->sys);
 
     const int width  = RECTWidth(sys->sys.rect_dest);
     const int height = RECTHeight(sys->sys.rect_dest);

@@ -97,6 +97,12 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     picture_CopyPixels(&fake_pic, picture);
 }
 
+static int Control(vout_display_t *vd, int query, va_list args)
+{
+    vout_display_sys_t *sys = vd->sys;
+    return CommonControl(vd, &sys->sys, query, args);
+}
+
 /* */
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
@@ -110,7 +116,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    if (CommonInit(vd, false, cfg))
+    if (CommonInit(vd, &sys->sys, false, cfg))
         goto error;
 
     /* */
@@ -122,7 +128,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     vd->prepare = Prepare;
     vd->display = Display;
-    vd->control = CommonControl;
+    vd->control = Control;
     return VLC_SUCCESS;
 
 error:
@@ -135,7 +141,7 @@ static void Close(vout_display_t *vd)
 {
     Clean(vd);
 
-    CommonClean(vd);
+    CommonClean(vd, &vd->sys->sys);
 
     free(vd->sys);
 }
@@ -171,8 +177,8 @@ static void Display(vout_display_t *vd, picture_t *picture)
 #undef rect_src_clipped
 #undef rect_dest
 
-    CommonDisplay(vd);
-    CommonManage(vd);
+    CommonDisplay(&sys->sys);
+    CommonManage(vd, &sys->sys);
 }
 
 static int Init(vout_display_t *vd, video_format_t *fmt)
@@ -267,7 +273,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     if (!sys->sys.b_windowless)
         EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (WinGDI output)");
 
-    UpdateRects(vd, true);
+    UpdateRects(vd, &sys->sys, true);
 
     return VLC_SUCCESS;
 }

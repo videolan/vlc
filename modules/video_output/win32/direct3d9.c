@@ -882,7 +882,7 @@ static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
         return VLC_EGENERIC;
     }
 
-    UpdateRects(vd, true);
+    UpdateRects(vd, &sys->sys, true);
 
     /* re-create them */
     if (Direct3D9CreateResources(vd, fmtp)) {
@@ -919,7 +919,7 @@ static void Manage (vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    CommonManage(vd);
+    CommonManage(vd, &sys->sys);
 
     /* Desktop mode change */
     bool prev_desktop = sys->sys.use_desktop;
@@ -1342,7 +1342,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
     sys->swapCb(sys->outside_opaque);
 
-    CommonDisplay(vd);
+    CommonDisplay(&sys->sys);
 }
 
 /**
@@ -1496,7 +1496,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
     fmt->i_bmask  = d3dfmt->bmask;
     sys->sw_texture_fmt = d3dfmt;
 
-    UpdateRects(vd, true);
+    UpdateRects(vd, &sys->sys, true);
 
     if (Direct3D9CreateResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate resources");
@@ -1547,7 +1547,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     }
     default:
-        return CommonControl(vd, query, args);
+        return CommonControl(vd, &sys->sys, query, args);
     }
 }
 
@@ -1671,7 +1671,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->desktop_save.is_fullscreen = cfg->is_fullscreen;
     sys->desktop_save.is_on_top     = false;
 
-    if (CommonInit(vd, d3d9_device != NULL, cfg))
+    if (CommonInit(vd, &sys->sys, d3d9_device != NULL, cfg))
         goto error;
 
     /* */
@@ -1719,7 +1719,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     return VLC_SUCCESS;
 error:
     Direct3D9Close(vd);
-    CommonClean(vd);
+    CommonClean(vd, &sys->sys);
     Direct3D9Destroy(sys);
     free(vd->sys);
     return VLC_EGENERIC;
@@ -1734,7 +1734,7 @@ static void Close(vout_display_t *vd)
 
     Direct3D9Close(vd);
 
-    CommonClean(vd);
+    CommonClean(vd, &vd->sys->sys);
 
     Direct3D9Destroy(vd->sys);
 

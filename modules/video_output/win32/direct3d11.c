@@ -224,7 +224,7 @@ static void Manage(vout_display_t *vd)
     RECT before_src_clipped  = sys->sys.rect_src_clipped;
     RECT before_dest         = sys->sys.rect_dest;
 
-    CommonManage(vd);
+    CommonManage(vd, &sys->sys);
 
     if (!RectEquals(&before_src_clipped, &sys->sys.rect_src_clipped) ||
         !RectEquals(&before_dest, &sys->sys.rect_dest))
@@ -489,7 +489,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
     }
 #endif
-    if (CommonInit(vd, d3d11_ctx != NULL, cfg))
+    if (CommonInit(vd, &sys->sys, d3d11_ctx != NULL, cfg))
         goto error;
 
 #if VLC_WINSTORE_APP
@@ -549,7 +549,7 @@ error:
 static void Close(vout_display_t *vd)
 {
     Direct3D11Close(vd);
-    CommonClean(vd);
+    CommonClean(vd, &vd->sys->sys);
     Direct3D11Destroy(vd);
 }
 
@@ -752,7 +752,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
     RECT before_src_clipped  = sys->sys.rect_src_clipped;
     RECT before_dest         = sys->sys.rect_dest;
 
-    int res = CommonControl( vd, query, args );
+    int res = CommonControl( vd, &sys->sys, query, args );
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
     {
@@ -855,7 +855,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 sys->picQuad.i_height = texDesc.Height;
                 sys->picQuad.i_width = texDesc.Width;
 
-                UpdateRects(vd, true);
+                UpdateRects(vd, &sys->sys, true);
                 UpdateSize(vd);
             }
         }
@@ -957,7 +957,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
     sys->swapCb(sys->outside_opaque);
     d3d11_device_unlock( &sys->d3d_dev );
 
-    CommonDisplay(vd);
+    CommonDisplay(&sys->sys);
 }
 
 static void Direct3D11Destroy(vout_display_t *vd)
@@ -1466,7 +1466,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
-    UpdateRects(vd, true);
+    UpdateRects(vd, &sys->sys, true);
 
     video_format_t surface_fmt = *fmt;
     surface_fmt.i_width  = sys->picQuad.i_width;
@@ -1569,7 +1569,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
-    UpdateRects(vd, true);
+    UpdateRects(vd, &sys->sys, true);
 
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {

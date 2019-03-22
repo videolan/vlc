@@ -84,13 +84,13 @@ typedef struct vout_display_sys_win32_t
 /*****************************************************************************
  * Prototypes from common.c
  *****************************************************************************/
-int  CommonInit(vout_display_t *, bool b_windowless, const vout_display_cfg_t *vdcfg);
-void CommonClean(vout_display_t *);
-void CommonManage(vout_display_t *);
-int  CommonControl(vout_display_t *, int , va_list );
-void CommonDisplay(vout_display_t *);
+int  CommonInit(vout_display_t *, vout_display_sys_win32_t *, bool b_windowless, const vout_display_cfg_t *);
+void CommonClean(vout_display_t *, vout_display_sys_win32_t *);
+void CommonManage(vout_display_t *, vout_display_sys_win32_t *);
+int  CommonControl(vout_display_t *, vout_display_sys_win32_t *, int , va_list );
+void CommonDisplay(vout_display_sys_win32_t *);
 
-void UpdateRects (vout_display_t *, bool is_forced);
+void UpdateRects (vout_display_t *, vout_display_sys_win32_t *, bool is_forced);
 
 /*****************************************************************************
  * Constants

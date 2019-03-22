@@ -45,11 +45,11 @@
 #include "common.h"
 #include "../video_chroma/copy.h"
 
-static void CommonChangeThumbnailClip(vout_display_t *, bool show);
+static void CommonChangeThumbnailClip(vout_display_t *, vout_display_sys_win32_t *, bool show);
 #if !VLC_WINSTORE_APP
-static int  CommonControlSetFullscreen(vout_display_t *, bool is_fullscreen);
+static int  CommonControlSetFullscreen(vout_display_t *, vout_display_sys_win32_t *, bool is_fullscreen);
 
-static bool GetRect(const vout_display_sys_t *sys, RECT *out)
+static bool GetRect(const vout_display_sys_win32_t *sys, RECT *out)
 {
     if (sys->b_windowless)
         return false;
@@ -68,10 +68,8 @@ static unsigned int GetPictureHeight(const vout_display_t *vd)
 }
 
 /* */
-int CommonInit(vout_display_t *vd, bool b_windowless, const vout_display_cfg_t *vdcfg)
+int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowless, const vout_display_cfg_t *vdcfg)
 {
-    vout_display_sys_t *sys = vd->sys;
-
     sys->hwnd      = NULL;
     sys->hvideownd = NULL;
     sys->hparent   = NULL;
@@ -138,9 +136,8 @@ int CommonInit(vout_display_t *vd, bool b_windowless, const vout_display_cfg_t *
 * its job is to update the source and destination RECTs used to display the
 * picture.
 *****************************************************************************/
-void UpdateRects(vout_display_t *vd, bool is_forced)
+void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forced)
 {
-    vout_display_sys_t *sys = vd->sys;
     const video_format_t *source = &vd->source;
 #define rect_src sys->rect_src
 #define rect_src_clipped sys->rect_src_clipped
@@ -282,7 +279,7 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
         rect_dest.right, rect_dest.bottom);
 #endif
 
-    CommonChangeThumbnailClip(vd, true);
+    CommonChangeThumbnailClip(vd, sys, true);
 
 exit:
     /* Signal the change in size/position */
@@ -295,19 +292,17 @@ exit:
 
 #if !VLC_WINSTORE_APP
 /* */
-void CommonClean(vout_display_t *vd)
+void CommonClean(vout_display_t *vd, vout_display_sys_win32_t *sys)
 {
-    vout_display_sys_t *sys = vd->sys;
     if (sys->event) {
-        CommonChangeThumbnailClip(vd, false);
+        CommonChangeThumbnailClip(vd, sys, false);
         EventThreadStop(sys->event);
         EventThreadDestroy(sys->event);
     }
 }
 
-void CommonManage(vout_display_t *vd)
+void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys)
 {
-    vout_display_sys_t *sys = vd->sys;
     if (sys->b_windowless)
         return;
 
@@ -341,22 +336,21 @@ void CommonManage(vout_display_t *vd)
                          RECTHeight(rect_parent),
                          SWP_NOZORDER);
 
-            UpdateRects(vd, true);
+            UpdateRects(vd, sys, true);
         }
     }
 
     /* HasMoved means here resize or move */
     if (EventThreadGetAndResetHasMoved(sys->event))
-        UpdateRects(vd, false);
+        UpdateRects(vd, sys, false);
 }
 
 /**
  * It ensures that the video window is shown after the first picture
  * is displayed.
  */
-void CommonDisplay(vout_display_t *vd)
+void CommonDisplay(vout_display_sys_win32_t *sys)
 {
-    vout_display_sys_t *sys = vd->sys;
     if (!sys->is_first_display)
         return;
 
@@ -376,10 +370,8 @@ void CommonDisplay(vout_display_t *vd)
 
 #if !VLC_WINSTORE_APP
 /* */
-static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
+static void CommonChangeThumbnailClip(vout_display_t *vd, vout_display_sys_win32_t *sys, bool show)
 {
-    vout_display_sys_t *sys = vd->sys;
-
     /* Windows 7 taskbar thumbnail code */
     OSVERSIONINFO winVer;
     winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -423,10 +415,8 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
     CoUninitialize();
 }
 
-static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
+static int CommonControlSetFullscreen(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_fullscreen)
 {
-    vout_display_sys_t *sys = vd->sys;
-
 #ifdef MODULE_NAME_IS_direct3d9
     if (sys->use_desktop && is_fullscreen)
         return VLC_EGENERIC;
@@ -515,18 +505,16 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
 
 #else
 
-void CommonManage(vout_display_t *vd) {
-    UpdateRects(vd, false);
+void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys) {
+    UpdateRects(vd, sys, false);
 }
-void CommonClean(vout_display_t *vd) {}
-void CommonDisplay(vout_display_t *vd) {}
-void CommonChangeThumbnailClip(vout_display_t *vd, bool show) {}
+void CommonClean(vout_display_t *vd, vout_display_sys_win32_t *) {}
+void CommonDisplay(vout_display_sys_win32_t *) {}
+void CommonChangeThumbnailClip(vout_display_t *vd, vout_display_sys_win32_t *, bool show) {}
 #endif
 
-int CommonControl(vout_display_t *vd, int query, va_list args)
+int CommonControl(vout_display_t *vd, vout_display_sys_win32_t *sys, int query, va_list args)
 {
-    vout_display_sys_t *sys = vd->sys;
-
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED: /* const vout_display_cfg_t *p_cfg */
     case VOUT_DISPLAY_CHANGE_ZOOM:           /* const vout_display_cfg_t *p_cfg */
@@ -534,7 +522,7 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {
         const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
         sys->vdcfg = *cfg;
-        UpdateRects(vd, true);
+        UpdateRects(vd, sys, true);
         return VLC_SUCCESS;
     }
 #if !VLC_WINSTORE_APP
@@ -555,7 +543,7 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
                          RECTHeight(rect_window), SWP_NOMOVE);
         }
         sys->vdcfg = *cfg;
-        UpdateRects(vd, false);
+        UpdateRects(vd, sys, false);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_WINDOW_STATE: {       /* unsigned state */
@@ -579,9 +567,9 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
     }
     case VOUT_DISPLAY_CHANGE_FULLSCREEN: {
         bool fs = va_arg(args, int);
-        if (CommonControlSetFullscreen(vd, fs))
+        if (CommonControlSetFullscreen(vd, sys, fs))
             return VLC_EGENERIC;
-        UpdateRects(vd, false);
+        UpdateRects(vd, sys, false);
         return VLC_SUCCESS;
     }
 
