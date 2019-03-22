@@ -956,32 +956,8 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
 
     if( hwnd == p_event->hvideownd )
     {
-#ifdef MODULE_NAME_IS_directdraw
-        vlc_mutex_lock( &p_event->lock );
-        const bool use_overlay = p_event->use_overlay;
-        vlc_mutex_unlock( &p_event->lock );
-#endif
-
         switch( message )
         {
-#ifdef MODULE_NAME_IS_directdraw
-        case WM_ERASEBKGND:
-        /* For overlay, we need to erase background */
-            return !use_overlay ? 1 : DefWindowProc(hwnd, message, wParam, lParam);
-        case WM_PAINT:
-        /*
-        ** For overlay, DefWindowProc() will erase dirty regions
-        ** with colorkey.
-        ** For non-overlay, vout will paint the whole window at
-        ** regular interval, therefore dirty regions can be ignored
-        ** to minimize repaint.
-        */
-            if( !use_overlay )
-            {
-                ValidateRect(hwnd, NULL);
-            }
-            // fall through to default
-#else
         /*
         ** For OpenGL and Direct3D, vout will update the whole
         ** window at regular interval, therefore dirty region
@@ -994,7 +970,6 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
             /* nothing to repaint */
             ValidateRect(hwnd, NULL);
             // fall through
-#endif
         default:
             return DefWindowProc(hwnd, message, wParam, lParam);
         }

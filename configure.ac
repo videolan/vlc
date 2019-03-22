@@ -3550,11 +3550,6 @@ AC_ARG_ENABLE([directx],
   ])
 ])
 AS_IF([test "${enable_directx}" != "no"], [
-  dnl DirectDraw
-  AC_CHECK_HEADERS([ddraw.h], [
-    VLC_ADD_PLUGIN([directdraw])
-  ])
-
   dnl OpenGL
   AC_CHECK_HEADERS([GL/glew.h], [
     AC_CHECK_HEADERS([GL/wglew.h], [

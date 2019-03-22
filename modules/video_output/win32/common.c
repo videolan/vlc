@@ -111,9 +111,6 @@ int CommonInit(vout_display_t *vd, bool b_windowless, const vout_display_cfg_t *
 #ifdef MODULE_NAME_IS_direct3d9
     cfg.use_desktop = sys->use_desktop;
 #endif
-#ifdef MODULE_NAME_IS_directdraw
-    cfg.use_overlay = sys->use_overlay;
-#endif
     cfg.x      = var_InheritInteger(vd, "video-x");
     cfg.y      = var_InheritInteger(vd, "video-y");
     cfg.width  = vdcfg->display.width;
@@ -235,39 +232,10 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
     rect_dest.right = rect_dest.left + place.width;
     rect_dest.top = point.y + place.y;
     rect_dest.bottom = rect_dest.top + place.height;
-
-#ifdef MODULE_NAME_IS_directdraw
-    /* Apply overlay hardware constraints */
-    if (sys->use_overlay)
-        AlignRect(&rect_dest, sys->i_align_dest_boundary, sys->i_align_dest_size);
 #endif
-
-#endif
-
-#if defined(MODULE_NAME_IS_directdraw)
-    /* UpdateOverlay directdraw function doesn't automatically clip to the
-    * display size so we need to do it otherwise it will fail */
-
-    /* Clip the destination window */
-    if (!IntersectRect(&rect_dest_clipped, &rect_dest,
-        &sys->rect_display)) {
-        SetRectEmpty(&rect_src_clipped);
-        goto exit;
-    }
-
-#ifndef NDEBUG
-    msg_Dbg(vd, "DirectXUpdateRects image_dst_clipped coords:"
-        " %li,%li,%li,%li",
-        rect_dest_clipped.left, rect_dest_clipped.top,
-        rect_dest_clipped.right, rect_dest_clipped.bottom);
-#endif
-
-#else
 
     /* AFAIK, there are no clipping constraints in Direct3D, OpenGL and GDI */
     rect_dest_clipped = rect_dest;
-
-#endif
 
     /* the 2 following lines are to fix a bug when clicking on the desktop */
     if ((rect_dest_clipped.right - rect_dest_clipped.left) == 0 ||
@@ -300,12 +268,6 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
         (rect_dest.bottom - rect_dest_clipped.bottom) *
         source->i_visible_height / (rect_dest.bottom - rect_dest.top);
 
-#ifdef MODULE_NAME_IS_directdraw
-    /* Apply overlay hardware constraints */
-    if (sys->use_overlay)
-        AlignRect(&rect_src_clipped, sys->i_align_src_boundary, sys->i_align_src_size);
-#endif
-
 #ifndef NDEBUG
     msg_Dbg(vd, "DirectXUpdateRects source"
         " offset: %i,%i visible: %ix%i",
@@ -327,15 +289,6 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
         " coords: %li,%li,%li,%li",
         rect_dest_clipped.left, rect_dest_clipped.top,
         rect_dest_clipped.right, rect_dest_clipped.bottom);
-#endif
-
-#ifdef MODULE_NAME_IS_directdraw
-    /* The destination coordinates need to be relative to the current
-    * directdraw primary surface (display) */
-    rect_dest_clipped.left -= sys->rect_display.left;
-    rect_dest_clipped.right -= sys->rect_display.left;
-    rect_dest_clipped.top -= sys->rect_display.top;
-    rect_dest_clipped.bottom -= sys->rect_display.top;
 #endif
 
     CommonChangeThumbnailClip(vd, true);
@@ -392,9 +345,6 @@ void CommonManage(vout_display_t *vd)
              * For most drivers(direct3d9, gdi, opengl), move is never
              * an issue. The surface automatically gets moved together
              * with the associated window (hvideownd)
-             *
-             * For directdraw, it is still important to call UpdateRects
-             * on a move of the parent window, even if no resize occurred
              */
             SetWindowPos(sys->hwnd, 0, 0, 0,
                          rect_parent.right - rect_parent.left,
@@ -433,14 +383,6 @@ void CommonDisplay(vout_display_t *vd)
     sys->is_first_display = false;
 }
 #endif
-
-void AlignRect(RECT *r, int align_boundary, int align_size)
-{
-    if (align_boundary)
-        r->left = (r->left + align_boundary/2) & ~align_boundary;
-    if (align_size)
-        r->right = ((r->right - r->left + align_size/2) & ~align_size) + r->left;
-}
 
 #if !VLC_WINSTORE_APP
 /* */

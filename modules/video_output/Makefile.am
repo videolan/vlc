@@ -333,20 +333,6 @@ libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect3d11)
 EXTRA_LTLIBRARIES += libdirect3d11_plugin.la
 
-libdirectdraw_plugin_la_SOURCES = video_output/win32/directdraw.c \
-	video_output/win32/common.c video_output/win32/common.h \
-	video_output/win32/events.c video_output/win32/events.h \
-	video_output/win32/sensors.cpp \
-	video_output/win32/win32touch.c video_output/win32/win32touch.h
-libdirectdraw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	-DMODULE_NAME_IS_directdraw
-libdirectdraw_plugin_la_LIBADD = libchroma_copy.la -luser32 -ldxguid -lgdi32 $(LIBCOM) -luuid
-libdirectdraw_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += $(LTLIBdirectdraw)
-EXTRA_LTLIBRARIES += libdirectdraw_plugin.la
-endif
-
 libglwin32_plugin_la_SOURCES = $(OPENGL_COMMONSOURCES) \
 	video_output/win32/glwin32.c \
 	video_output/win32/common.c video_output/win32/common.h \

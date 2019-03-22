@@ -73,6 +73,10 @@ static void GLConvClose(vlc_object_t *);
 #define HW_BLENDING_TEXT N_("Use hardware blending support")
 #define HW_BLENDING_LONGTEXT N_(\
     "Try to use hardware acceleration for subtitle/OSD blending.")
+#define HW_YUV_TEXT N_("Use hardware YUV->RGB conversions")
+#define HW_YUV_LONGTEXT N_(\
+    "Try to use hardware acceleration for YUV->RGB conversions. " \
+    "This option doesn't have any effect when using overlays.")
 
 #define PIXEL_SHADER_TEXT N_("Pixel Shader")
 #define PIXEL_SHADER_LONGTEXT N_(\
@@ -94,6 +98,7 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
     add_bool("direct3d9-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT, true)
+    add_bool("directx-hw-yuv", true, HW_YUV_TEXT, HW_YUV_LONGTEXT, true)
 
     add_string("direct3d9-shader", "", PIXEL_SHADER_TEXT, PIXEL_SHADER_LONGTEXT, true)
         change_string_cb(FindShadersCallback)

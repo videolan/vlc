@@ -74,11 +74,6 @@ typedef struct vout_display_sys_win32_t
     bool use_desktop;     /* show video on desktop window ? */
 
     bool use_overlay;     /* Are we using an overlay surface */
-    /* Overlay alignment restrictions */
-    int  i_align_src_boundary;
-    int  i_align_src_size;
-    int  i_align_dest_boundary;
-    int  i_align_dest_size;
 
     bool (*pf_GetRect)(const struct vout_display_sys_win32_t *p_sys, RECT *out);
     unsigned int (*pf_GetPictureWidth) (const vout_display_t *);
@@ -96,7 +91,6 @@ int  CommonControl(vout_display_t *, int , va_list );
 void CommonDisplay(vout_display_t *);
 
 void UpdateRects (vout_display_t *, bool is_forced);
-void AlignRect(RECT *, int align_boundary, int align_size);
 
 /*****************************************************************************
  * Constants

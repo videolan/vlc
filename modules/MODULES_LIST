@@ -111,7 +111,6 @@ $Id$
  * direct3d11_filters: adjust|deinterlacer filter for Direct3D11 video decoding
  * direct3d9: video output module using the Direct3D9 API
  * direct3d9_filters: adjust|deinterlacer filter for Direct3D9 video decoding
- * directdraw: video output module using the DirectDraw API
  * directory_demux: Ouput folder contents to playlist
  * directsound: audio output module using the DirectSound API
  * dmo: a DirectMediaObject decoder that uses DirectMedia to decode video (WMV3)
