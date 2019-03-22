@@ -45,8 +45,8 @@
 #include "common.h"
 #include "../video_chroma/copy.h"
 
-static void CommonChangeThumbnailClip(vout_display_t *, vout_display_sys_win32_t *, bool show);
 #if !VLC_WINSTORE_APP
+static void CommonChangeThumbnailClip(vout_display_t *, vout_display_sys_win32_t *, bool show);
 static int  CommonControlSetFullscreen(vout_display_t *, vout_display_sys_win32_t *, bool is_fullscreen);
 
 static bool GetRect(const vout_display_sys_win32_t *sys, RECT *out)
@@ -279,7 +279,9 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
         rect_dest.right, rect_dest.bottom);
 #endif
 
+#if !VLC_WINSTORE_APP
     CommonChangeThumbnailClip(vd, sys, true);
+#endif
 
 exit:
     /* Signal the change in size/position */
@@ -366,9 +368,7 @@ void CommonDisplay(vout_display_sys_win32_t *sys)
                  SWP_NOZORDER);
     sys->is_first_display = false;
 }
-#endif
 
-#if !VLC_WINSTORE_APP
 /* */
 static void CommonChangeThumbnailClip(vout_display_t *vd, vout_display_sys_win32_t *sys, bool show)
 {
@@ -503,15 +503,14 @@ static int CommonControlSetFullscreen(vout_display_t *vd, vout_display_sys_win32
     return VLC_SUCCESS;
 }
 
-#else
+#else /* VLC_WINSTORE_APP */
 
-void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys) {
+void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys)
+{
+    /* just check the rendering size didn't change */
     UpdateRects(vd, sys, false);
 }
-void CommonClean(vout_display_t *vd, vout_display_sys_win32_t *) {}
-void CommonDisplay(vout_display_sys_win32_t *) {}
-void CommonChangeThumbnailClip(vout_display_t *vd, vout_display_sys_win32_t *, bool show) {}
-#endif
+#endif /* VLC_WINSTORE_APP */
 
 int CommonControl(vout_display_t *vd, vout_display_sys_win32_t *sys, int query, va_list args)
 {
