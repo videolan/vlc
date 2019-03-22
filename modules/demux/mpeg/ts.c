@@ -146,8 +146,6 @@ vlc_module_begin ()
         change_safe()
     add_bool( "ts-es-id-pid", true, PID_TEXT, PID_LONGTEXT, true )
         change_safe()
-    add_obsolete_string( "ts-out" ) /* since 2.2.0 */
-    add_obsolete_integer( "ts-out-mtu" ) /* since 2.2.0 */
     add_string( "ts-csa-ck", NULL, CSA_TEXT, CSA_LONGTEXT, true )
         change_safe()
     add_string( "ts-csa2-ck", NULL, CSA2_TEXT, CSA2_LONGTEXT, true )

@@ -160,7 +160,6 @@ vlc_module_begin ()
                SCALE_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "fps", NULL, FPS_TEXT,
                FPS_LONGTEXT, false )
-    add_obsolete_bool( SOUT_CFG_PREFIX "hurry-up"); /* Since 2.2.0 */
     add_bool( SOUT_CFG_PREFIX "deinterlace", false, DEINTERLACE_TEXT,
               DEINTERLACE_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "deinterlace-module", "deinterlace",
@@ -193,7 +192,6 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "samplerate", 0, ARATE_TEXT,
                  ARATE_LONGTEXT, true )
         change_integer_range( 0, 48000 )
-    add_obsolete_bool( SOUT_CFG_PREFIX "audio-sync" ) /*Since 2.2.0 */
     add_module_list(SOUT_CFG_PREFIX "afilter",  "audio filter", NULL,
                     AFILTER_TEXT, AFILTER_LONGTEXT)
 

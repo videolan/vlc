@@ -279,7 +279,6 @@ vlc_module_begin()
     set_capability("audio output", 0)
     set_callbacks (OpenAudio, CloseAudio)
     set_section(N_("DeckLink Audio Options"), NULL)
-    add_obsolete_string("audio-connection")
     add_integer(AUDIO_CFG_PREFIX "audio-rate", 48000,
                 RATE_TEXT, RATE_LONGTEXT, true)
     add_integer(AUDIO_CFG_PREFIX "audio-channels", 2,
