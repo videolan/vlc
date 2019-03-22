@@ -243,20 +243,10 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
     rect_src.bottom = sys->pf_GetPictureHeight(vd);
 
     /* Clip the source image */
-    rect_src_clipped.left = source->i_x_offset +
-        (rect_dest.left - rect_dest.left) *
-        source->i_visible_width / RECTWidth(rect_dest);
-    rect_src_clipped.right = source->i_x_offset +
-        source->i_visible_width -
-        (rect_dest.right - rect_dest.right) *
-        source->i_visible_width / RECTWidth(rect_dest);
-    rect_src_clipped.top = source->i_y_offset +
-        (rect_dest.top - rect_dest.top) *
-        source->i_visible_height / RECTHeight(rect_dest);
-    rect_src_clipped.bottom = source->i_y_offset +
-        source->i_visible_height -
-        (rect_dest.bottom - rect_dest.bottom) *
-        source->i_visible_height / RECTHeight(rect_dest);
+    rect_src_clipped.left   = source->i_x_offset;
+    rect_src_clipped.right  = source->i_x_offset + source->i_visible_width;
+    rect_src_clipped.top    = source->i_y_offset;
+    rect_src_clipped.bottom = source->i_y_offset + source->i_visible_height;
 
 #ifndef NDEBUG
     msg_Dbg(vd, "DirectXUpdateRects source"
@@ -267,10 +257,6 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
         " coords: %li,%li,%li,%li",
         rect_src.left, rect_src.top,
         rect_src.right, rect_src.bottom);
-    msg_Dbg(vd, "DirectXUpdateRects image_src_clipped"
-        " coords: %li,%li,%li,%li",
-        rect_src_clipped.left, rect_src_clipped.top,
-        rect_src_clipped.right, rect_src_clipped.bottom);
     msg_Dbg(vd, "DirectXUpdateRects image_dst"
         " coords: %li,%li,%li,%li",
         rect_dest.left, rect_dest.top,
