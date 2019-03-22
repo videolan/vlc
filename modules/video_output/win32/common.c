@@ -165,11 +165,6 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
     {
         if (!sys->pf_GetRect(sys, &rect))
             return;
-
-#if !VLC_WINSTORE_APP
-        /* Retrieve the window position */
-        ClientToScreen(sys->hwnd, &point);
-#endif
     }
 
     /* If nothing changed, we can return */
@@ -186,9 +181,14 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
         has_moved = is_resized = false;
     }
     else
-    EventThreadUpdateWindowPosition(sys->event, &has_moved, &is_resized,
-        point.x, point.y,
-        rect.right, rect.bottom);
+    {
+        /* Retrieve the window position */
+        ClientToScreen(sys->hwnd, &point);
+
+        EventThreadUpdateWindowPosition(sys->event, &has_moved, &is_resized,
+            point.x, point.y,
+            rect.right, rect.bottom);
+}
 #endif
     if (!is_forced && !has_moved && !is_resized)
         return;
