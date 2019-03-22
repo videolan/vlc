@@ -452,16 +452,6 @@ static int SetupWindowLessOutput(vout_display_t *vd)
     return VLC_SUCCESS;
 }
 
-static unsigned int GetPictureWidth(const vout_display_t *vd)
-{
-    return vd->sys->picQuad.i_width;
-}
-
-static unsigned int GetPictureHeight(const vout_display_t *vd)
-{
-    return vd->sys->picQuad.i_height;
-}
-
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
 {
@@ -502,8 +492,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 #if VLC_WINSTORE_APP
     sys->sys.pf_GetRect = GetRect;
 #endif
-    sys->sys.pf_GetPictureWidth  = GetPictureWidth;
-    sys->sys.pf_GetPictureHeight = GetPictureHeight;
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
         sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);

@@ -55,16 +55,6 @@ static bool GetRect(const vout_display_sys_win32_t *sys, RECT *out)
 }
 #endif
 
-static unsigned int GetPictureWidth(const vout_display_t *vd)
-{
-    return vd->source.i_width;
-}
-
-static unsigned int GetPictureHeight(const vout_display_t *vd)
-{
-    return vd->source.i_height;
-}
-
 /* */
 int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowless, const vout_display_cfg_t *vdcfg)
 {
@@ -76,9 +66,6 @@ int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowl
     sys->b_windowless = b_windowless;
     sys->is_first_placement = true;
     sys->is_on_top        = false;
-
-    sys->pf_GetPictureWidth  = GetPictureWidth;
-    sys->pf_GetPictureHeight = GetPictureHeight;
 
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
@@ -215,7 +202,6 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
     }
 #endif
 
-#define rect_src            sys->rect_src
 #define rect_dest           sys->rect_dest
     /* Destination image position and dimensions */
 #if (defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)) && !VLC_WINSTORE_APP
@@ -232,13 +218,10 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
 
 #ifndef NDEBUG
     msg_Dbg(vd, "DirectXUpdateRects source"
-        " offset: %i,%i visible: %ix%i",
+        " offset: %i,%i visible: %ix%i decoded: %ix%i",
         source->i_x_offset, source->i_y_offset,
-        source->i_visible_width, source->i_visible_height);
-    msg_Dbg(vd, "DirectXUpdateRects image_src"
-        " coords: %li,%li,%li,%li",
-        rect_src.left, rect_src.top,
-        rect_src.right, rect_src.bottom);
+        source->i_visible_width, source->i_visible_height,
+        source->i_width, source->i_height);
     msg_Dbg(vd, "DirectXUpdateRects image_dst"
         " coords: %li,%li,%li,%li",
         rect_dest.left, rect_dest.top,
@@ -250,12 +233,6 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
         goto exit;
     }
 
-    /* src image dimensions */
-    rect_src.left = 0;
-    rect_src.top = 0;
-    rect_src.right = sys->pf_GetPictureWidth(vd);
-    rect_src.bottom = sys->pf_GetPictureHeight(vd);
-
 #if !VLC_WINSTORE_APP
     CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
 #endif
@@ -264,7 +241,6 @@ exit:
     /* Signal the change in size/position */
     sys->changes |= DX_POSITION_CHANGE;
 
-#undef rect_src
 #undef rect_dest
 }
 
