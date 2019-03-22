@@ -230,13 +230,13 @@ static void UpdateSize(vout_display_t *vd)
 static void Manage(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    RECT before_dest = sys->sys.rect_dest;
 
     CommonManage(vd, &sys->sys);
 
-    if (!RectEquals(&before_dest, &sys->sys.rect_dest))
+    if ( sys->sys.rect_dest_changed )
     {
         UpdateSize(vd);
+        sys->sys.rect_dest_changed =false;
     }
 }
 
@@ -750,8 +750,6 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
-    RECT before_dest = sys->sys.rect_dest;
-
     int res = CommonControl( vd, &sys->sys, query, args );
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
@@ -764,9 +762,10 @@ static int Control(vout_display_t *vd, int query, va_list args)
         }
     }
 
-    if (!RectEquals(&before_dest, &sys->sys.rect_dest) )
+    if ( sys->sys.rect_dest_changed )
     {
         UpdateSize(vd);
+        sys->sys.rect_dest_changed =false;
     }
 
     return res;
