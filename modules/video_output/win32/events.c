@@ -732,18 +732,13 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
      * have. Unfortunatly these dimensions will include the borders and
      * titlebar. We use the following function to find out the size of
      * the window corresponding to the useable surface we want */
-    RECT rect_window;
-    rect_window.left   = 10;
-    rect_window.top    = 10;
-    rect_window.right  = rect_window.left + RECTWidth(p_event->window_area);
-    rect_window.bottom = rect_window.top  + RECTHeight(p_event->window_area);
-
+    RECT decorated_window = p_event->window_area;
     i_style = var_GetBool( vd, "video-deco" )
         /* Open with window decoration */
         ? WS_OVERLAPPEDWINDOW|WS_SIZEBOX
         /* No window decoration */
         : WS_POPUP;
-    AdjustWindowRect( &rect_window, i_style, 0 );
+    AdjustWindowRect( &decorated_window, i_style, 0 );
     i_style |= WS_VISIBLE|WS_CLIPCHILDREN;
 
     if( p_event->hparent )
@@ -765,12 +760,12 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
                     p_event->class_main,             /* name of window class */
                     _T(VOUT_TITLE) _T(" (VLC Video Output)"),/* window title */
                     i_style,                                 /* window style */
-                    (!p_event->window_area.left) ? (UINT)CW_USEDEFAULT :
-                        (UINT)p_event->window_area.left, /* default X coordinate */
-                    (!p_event->window_area.top) ? (UINT)CW_USEDEFAULT :
-                        (UINT)p_event->window_area.top, /* default Y coordinate */
-                    RECTWidth(rect_window),                  /* window width */
-                    RECTHeight(rect_window),                /* window height */
+                    (!p_event->window_area.left) ? CW_USEDEFAULT :
+                        p_event->window_area.left,   /* default X coordinate */
+                    (!p_event->window_area.top) ? CW_USEDEFAULT :
+                        p_event->window_area.top,    /* default Y coordinate */
+                    RECTWidth(decorated_window),             /* window width */
+                    RECTHeight(decorated_window),           /* window height */
                     p_event->hparent,                       /* parent window */
                     NULL,                          /* no menu in this window */
                     hInstance,            /* handle of this program instance */
