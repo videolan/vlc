@@ -593,6 +593,8 @@ extern NSString *VLCPlayerMuteChanged;
  */
 @property (readonly, nullable) audio_output_t *mainAudioOutput;
 
+- (int)enableAudioFilterWithName:(NSString *)name state:(BOOL)state;
+
 @end
 
 @interface VLCInputStats : NSObject

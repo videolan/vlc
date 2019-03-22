@@ -1239,6 +1239,15 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     return vlc_player_aout_Hold(_p_player);
 }
 
+- (int)enableAudioFilterWithName:(NSString *)name state:(BOOL)state
+{
+    if (name == nil || name.length == 0) {
+        return VLC_EBADVAR;
+    }
+
+    return vlc_player_aout_EnableFilter(_p_player, [name UTF8String], state);
+}
+
 @end
 
 @implementation VLCInputStats

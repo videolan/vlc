@@ -322,11 +322,6 @@
     return [names copy];
 }
 
-- (void)setAudioFilter: (char *)psz_name on:(BOOL)b_on
-{
-    playlist_EnableAudioFilter(pl_Get(getIntf()), psz_name, b_on);
-}
-
 - (void)resetProfileSelector
 {
     [_profilePopup removeAllItems];
@@ -763,7 +758,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 - (IBAction)equalizerEnable:(id)sender
 {
     [_equalizerView enableSubviews:[sender state]];
-    [self setAudioFilter: "equalizer" on:[sender state]];
+    [_playerController enableAudioFilterWithName:@"equalizer" state:[sender state]];
 }
 
 - (IBAction)equalizerBandSliderUpdated:(id)sender
@@ -970,7 +965,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 - (IBAction)compressorEnable:(id)sender
 {
     [_compressorView enableSubviews:[sender state]];
-    [self setAudioFilter:"compressor" on:[sender state]];
+    [_playerController enableAudioFilterWithName:@"compressor" state:[sender state]];
 }
 
 - (IBAction)compressorSliderUpdated:(id)sender
@@ -1050,6 +1045,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)resetSpatializerValues:(id)sender
 {
+    // FIXME: this no longer works and a fix depends on a future libvlc improvement
     playlist_t *p_playlist = pl_Get(getIntf());
     var_SetFloat(p_playlist, "spatializer-roomsize", .85);
     var_SetFloat(p_playlist, "spatializer-width", 1.);
@@ -1072,7 +1068,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 - (IBAction)spatializerEnable:(id)sender
 {
     [_spatializerView enableSubviews:[sender state]];
-    [self setAudioFilter:"spatializer" on:[sender state]];
+    [_playerController enableAudioFilterWithName:@"spatializer" state:[sender state]];
 }
 
 - (IBAction)spatializerSliderUpdated:(id)sender
@@ -1119,6 +1115,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     playlist_t *p_playlist = pl_Get(getIntf());
     BOOL bEnable_normvol = NO;
     char *psz_afilters;
+    // FIXME: this no longer works and a fix depends on a future libvlc improvement
     psz_afilters = var_InheritString(p_playlist, "audio-filter");
     if (psz_afilters) {
         [_filterHeadPhoneCheckbox setState: (NSInteger)strstr(psz_afilters, "headphone") ];
@@ -1143,14 +1140,14 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)filterEnableHeadPhoneVirt:(id)sender
 {
-    [self setAudioFilter:"headphone" on:[sender state]];
+    [_playerController enableAudioFilterWithName:@"headphone" state:[sender state]];
 }
 
 - (IBAction)filterEnableVolumeNorm:(id)sender
 {
     [_filterNormLevelSlider setEnabled:[sender state]];
     [_filterNormLevelLabel setEnabled:[sender state]];
-    [self setAudioFilter:"normvol" on:[sender state]];
+    [_playerController enableAudioFilterWithName:@"normvol" state:[sender state]];
 }
 
 - (IBAction)filterVolumeNormSliderUpdated:(id)sender
@@ -1163,22 +1160,23 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         aout_Release(p_aout);
     }
 
+    // FIXME: this no longer works and a fix depends on a future libvlc improvement
     var_SetFloat(pl_Get(getIntf()), "norm-max-level", f_value);
 }
 
 - (IBAction)filterEnableKaraoke:(id)sender
 {
-    [self setAudioFilter:"karaoke" on:[sender state]];
+    [_playerController enableAudioFilterWithName:@"karaoke" state:[sender state]];
 }
 
 - (IBAction)filterEnableScaleTempo:(id)sender
 {
-    [self setAudioFilter:"scaletempo" on:[sender state]];
+    [_playerController enableAudioFilterWithName:@"scaletempo" state:[sender state]];
 }
 
 - (IBAction)filterEnableStereoEnhancer:(id)sender
 {
-    [self setAudioFilter:"stereo_widen" on:[sender state]];
+    [_playerController enableAudioFilterWithName:@"stereo_widen" state:[sender state]];
 }
 
 @end
