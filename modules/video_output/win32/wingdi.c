@@ -147,15 +147,14 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
 #define rect_src_clipped vd->sys->sys.rect_src_clipped
 #define rect_dest vd->sys->sys.rect_dest
-#define rect_dest_clipped vd->sys->sys.rect_dest_clipped
-    RECT dst_rect = rect_dest_clipped;
+    RECT dst_rect = rect_dest;
     HDC hdc = GetDC(sys->sys.hvideownd);
 
     OffsetRect(&dst_rect, -rect_dest.left, -rect_dest.top);
     SelectObject(sys->off_dc, sys->off_bitmap);
 
-    if (RECTWidth(rect_dest_clipped) != RECTWidth(rect_src_clipped) ||
-        RECTHeight(rect_dest_clipped) != RECTHeight(rect_src_clipped)) {
+    if (RECTWidth(rect_dest) != RECTWidth(rect_src_clipped) ||
+        RECTHeight(rect_dest) != RECTHeight(rect_src_clipped)) {
         StretchBlt(hdc, dst_rect.left, dst_rect.top,
                    dst_rect.right, dst_rect.bottom,
                    sys->off_dc,
@@ -173,7 +172,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
     ReleaseDC(sys->sys.hvideownd, hdc);
 #undef rect_src_clipped
 #undef rect_dest
-#undef rect_dest_clipped
 
     CommonDisplay(vd);
     CommonManage(vd);

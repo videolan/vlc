@@ -190,7 +190,7 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
 #if VLC_WINSTORE_APP
     if (!GetRect(&sys->sys, &rect))
 #endif
-        rect = sys->sys.rect_dest_clipped;
+        rect = sys->sys.rect_dest;
     uint32_t i_width = RECTWidth(rect);
     uint32_t i_height = RECTHeight(rect);
 
@@ -203,8 +203,8 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
 static void UpdateSize(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    msg_Dbg(vd, "Detected size change %dx%d", RECTWidth(sys->sys.rect_dest_clipped),
-            RECTHeight(sys->sys.rect_dest_clipped));
+    msg_Dbg(vd, "Detected size change %dx%d", RECTWidth(sys->sys.rect_dest),
+            RECTHeight(sys->sys.rect_dest));
 
     UpdateBackBuffer(vd);
 
@@ -222,13 +222,11 @@ static void Manage(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     RECT before_src_clipped  = sys->sys.rect_src_clipped;
-    RECT before_dest_clipped = sys->sys.rect_dest_clipped;
     RECT before_dest         = sys->sys.rect_dest;
 
     CommonManage(vd);
 
     if (!RectEquals(&before_src_clipped, &sys->sys.rect_src_clipped) ||
-        !RectEquals(&before_dest_clipped, &sys->sys.rect_dest_clipped) ||
         !RectEquals(&before_dest, &sys->sys.rect_dest))
     {
         UpdateSize(vd);
@@ -752,7 +750,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
     RECT before_src_clipped  = sys->sys.rect_src_clipped;
-    RECT before_dest_clipped = sys->sys.rect_dest_clipped;
     RECT before_dest         = sys->sys.rect_dest;
 
     int res = CommonControl( vd, query, args );
@@ -768,7 +765,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     }
 
     if (!RectEquals(&before_src_clipped,  &sys->sys.rect_src_clipped) ||
-        !RectEquals(&before_dest_clipped, &sys->sys.rect_dest_clipped) ||
         !RectEquals(&before_dest,         &sys->sys.rect_dest) )
     {
         UpdateSize(vd);
@@ -1377,7 +1373,7 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    D3D11_UpdateViewport( &sys->picQuad, &sys->sys.rect_dest_clipped, sys->display.pixelFormat );
+    D3D11_UpdateViewport( &sys->picQuad, &sys->sys.rect_dest, sys->display.pixelFormat );
 
     SetQuadVSProjection(vd, &sys->picQuad, &sys->sys.vdcfg.viewpoint);
 

@@ -473,7 +473,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     /* */
     region->texture = sys->sceneTexture;
     Direct3D9SetupVertices(region->vertex, &vd->sys->sys.rect_src, &vd->sys->sys.rect_src_clipped,
-                           &vd->sys->sys.rect_dest_clipped, 255, vd->source.orientation);
+                           &vd->sys->sys.rect_dest, 255, vd->source.orientation);
     return VLC_SUCCESS;
 }
 
@@ -1320,14 +1320,13 @@ static void Swap(void *opaque)
 
     // Present the back buffer contents to the display
     // No stretching should happen here !
-    const RECT src = sys->sys.rect_dest_clipped;
-    const RECT dst = sys->sys.rect_dest_clipped;
-
+    const RECT src = sys->sys.rect_dest;
+    
     HRESULT hr;
     if (sys->hd3d.use_ex) {
-        hr = IDirect3DDevice9Ex_PresentEx(p_d3d9_dev->devex, &src, &dst, NULL, NULL, 0);
+        hr = IDirect3DDevice9Ex_PresentEx(p_d3d9_dev->devex, &src, &src, NULL, NULL, 0);
     } else {
-        hr = IDirect3DDevice9_Present(p_d3d9_dev->dev, &src, &dst, NULL, NULL);
+        hr = IDirect3DDevice9_Present(p_d3d9_dev->dev, &src, &src, NULL, NULL);
     }
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed Present: 0x%0lx", hr);

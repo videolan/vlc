@@ -145,7 +145,6 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
 #define rect_src sys->rect_src
 #define rect_src_clipped sys->rect_src_clipped
 #define rect_dest sys->rect_dest
-#define rect_dest_clipped sys->rect_dest_clipped
 
     RECT  rect;
     POINT point = { 0 };
@@ -234,9 +233,6 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
     rect_dest.bottom = rect_dest.top + place.height;
 #endif
 
-    /* AFAIK, there are no clipping constraints in Direct3D, OpenGL and GDI */
-    rect_dest_clipped = rect_dest;
-
     /* the 2 following lines are to fix a bug when clicking on the desktop */
     if (place.width == 0 || place.height == 0) {
 #if !VLC_WINSTORE_APP
@@ -253,18 +249,18 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
 
     /* Clip the source image */
     rect_src_clipped.left = source->i_x_offset +
-        (rect_dest_clipped.left - rect_dest.left) *
+        (rect_dest.left - rect_dest.left) *
         source->i_visible_width / RECTWidth(rect_dest);
     rect_src_clipped.right = source->i_x_offset +
         source->i_visible_width -
-        (rect_dest.right - rect_dest_clipped.right) *
+        (rect_dest.right - rect_dest.right) *
         source->i_visible_width / RECTWidth(rect_dest);
     rect_src_clipped.top = source->i_y_offset +
-        (rect_dest_clipped.top - rect_dest.top) *
+        (rect_dest.top - rect_dest.top) *
         source->i_visible_height / RECTHeight(rect_dest);
     rect_src_clipped.bottom = source->i_y_offset +
         source->i_visible_height -
-        (rect_dest.bottom - rect_dest_clipped.bottom) *
+        (rect_dest.bottom - rect_dest.bottom) *
         source->i_visible_height / RECTHeight(rect_dest);
 
 #ifndef NDEBUG
@@ -284,10 +280,6 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
         " coords: %li,%li,%li,%li",
         rect_dest.left, rect_dest.top,
         rect_dest.right, rect_dest.bottom);
-    msg_Dbg(vd, "DirectXUpdateRects image_dst_clipped"
-        " coords: %li,%li,%li,%li",
-        rect_dest_clipped.left, rect_dest_clipped.top,
-        rect_dest_clipped.right, rect_dest_clipped.bottom);
 #endif
 
     CommonChangeThumbnailClip(vd, true);
@@ -299,7 +291,6 @@ exit:
 #undef rect_src
 #undef rect_src_clipped
 #undef rect_dest
-#undef rect_dest_clipped
 }
 
 #if !VLC_WINSTORE_APP
