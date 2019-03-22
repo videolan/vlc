@@ -939,7 +939,7 @@ static void Manage (vout_display_t *vd)
         UpdateDesktopMode(vd);
 
     /* Position Change */
-    if (sys->sys.changes & DX_POSITION_CHANGE) {
+    if (sys->sys.rect_dest_changed) {
 #if 0 /* need that when bicubic filter is available */
         RECT rect;
         UINT width, height;
@@ -957,7 +957,7 @@ static void Manage (vout_display_t *vd)
         }
 #endif
         sys->clear_scene = true;
-        sys->sys.changes &= ~DX_POSITION_CHANGE;
+        sys->sys.rect_dest_changed = false;
     }
 }
 

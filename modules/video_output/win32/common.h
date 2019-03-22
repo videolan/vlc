@@ -60,7 +60,7 @@ typedef struct vout_display_sys_win32_t
     HINSTANCE     dxgidebug_dll;
 # endif
 
-    unsigned changes;        /* changes made to the video display */
+    bool         rect_dest_changed;
 
     /* Misc */
     bool is_first_placement;
@@ -93,4 +93,3 @@ void UpdateRects (vout_display_t *, vout_display_sys_win32_t *, bool is_forced);
  * Constants
  *****************************************************************************/
 #define IDM_TOGGLE_ON_TOP WM_USER + 1
-#define DX_POSITION_CHANGE 0x1000

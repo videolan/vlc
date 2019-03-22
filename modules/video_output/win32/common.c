@@ -53,7 +53,13 @@ static bool GetRect(const vout_display_sys_win32_t *sys, RECT *out)
         return false;
     return GetClientRect(sys->hwnd, out);
 }
-#endif
+#else /* VLC_WINSTORE_APP */
+static inline BOOL EqualRect(const RECT *r1, const RECT *r2)
+{
+    return r1->left == r2->left && r1->right == r2->right &&
+            r1->top == r2->top && r1->bottom == r2->bottom;
+}
+#endif /* VLC_WINSTORE_APP */
 
 /* */
 int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowless, const vout_display_cfg_t *vdcfg)
@@ -62,7 +68,7 @@ int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowl
     sys->hvideownd = NULL;
     sys->hparent   = NULL;
     sys->hfswnd    = NULL;
-    sys->changes   = 0;
+    sys->rect_dest_changed = false;
     sys->b_windowless = b_windowless;
     sys->is_first_placement = true;
     sys->is_on_top        = false;
@@ -203,6 +209,7 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
 #endif
 
 #define rect_dest           sys->rect_dest
+    RECT before_rect_dest = rect_dest;
     /* Destination image position and dimensions */
 #if (defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)) && !VLC_WINSTORE_APP
     rect_dest.left = 0;
@@ -216,6 +223,10 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
     rect_dest.bottom = rect_dest.top + place.height;
 #endif
 
+    /* Signal the change in size/position */
+    if (!EqualRect(&before_rect_dest, &rect_dest))
+        sys->rect_dest_changed |= true;
+
 #ifndef NDEBUG
     msg_Dbg(vd, "DirectXUpdateRects source"
         " offset: %i,%i visible: %ix%i decoded: %ix%i",
@@ -227,15 +238,11 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
         rect_dest.left, rect_dest.top,
         rect_dest.right, rect_dest.bottom);
 #endif
+#undef rect_dest
 
 #if !VLC_WINSTORE_APP
     CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
 #endif
-
-    /* Signal the change in size/position */
-    sys->changes |= DX_POSITION_CHANGE;
-
-#undef rect_dest
 }
 
 #if !VLC_WINSTORE_APP
