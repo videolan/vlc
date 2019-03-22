@@ -197,7 +197,7 @@ static char *nscdec( vlc_object_t *p_demux, char* p_encoded )
             msg_Err( p_demux, "load_byte failed" );
             return NULL;
         }
-        length |= tmp << ((i - 1) * 8);
+        length |= (unsigned int)tmp << ((i - 1) * 8);
     }
 
     if( length == 0 )
