@@ -557,7 +557,7 @@ static void Close(vout_display_t *vd)
     Direct3D11Close(vd);
     UnhookWindowsSensors(vd->sys->p_sensors);
 #if !VLC_WINSTORE_APP
-    CommonClean(vd, &vd->sys->sys);
+    CommonClean(VLC_OBJECT(vd), &vd->sys->sys);
 #endif
     Direct3D11Destroy(vd);
 }

@@ -44,8 +44,8 @@
 #include "../video_chroma/copy.h"
 
 #if !VLC_WINSTORE_APP
-static void CommonChangeThumbnailClip(vout_display_t *, vout_display_sys_win32_t *, bool show);
-static int  CommonControlSetFullscreen(vout_display_t *, vout_display_sys_win32_t *, bool is_fullscreen);
+static void CommonChangeThumbnailClip(vlc_object_t *, vout_display_sys_win32_t *, bool show);
+static int  CommonControlSetFullscreen(vlc_object_t *, vout_display_sys_win32_t *, bool is_fullscreen);
 
 static bool GetRect(const vout_display_sys_win32_t *sys, RECT *out)
 {
@@ -267,7 +267,7 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
 #endif
 
 #if !VLC_WINSTORE_APP
-    CommonChangeThumbnailClip(vd, sys, true);
+    CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
 #endif
 
 exit:
@@ -281,10 +281,10 @@ exit:
 
 #if !VLC_WINSTORE_APP
 /* */
-void CommonClean(vout_display_t *vd, vout_display_sys_win32_t *sys)
+void CommonClean(vlc_object_t *obj, vout_display_sys_win32_t *sys)
 {
     if (sys->event) {
-        CommonChangeThumbnailClip(vd, sys, false);
+        CommonChangeThumbnailClip(obj, sys, false);
         EventThreadStop(sys->event);
         EventThreadDestroy(sys->event);
     }
@@ -335,7 +335,7 @@ void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys)
 }
 
 /* */
-static void CommonChangeThumbnailClip(vout_display_t *vd, vout_display_sys_win32_t *sys, bool show)
+static void CommonChangeThumbnailClip(vlc_object_t *obj, vout_display_sys_win32_t *sys, bool show)
 {
     /* Windows 7 taskbar thumbnail code */
     OSVERSIONINFO winVer;
@@ -373,14 +373,14 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, vout_display_sys_win32
         hr = taskbl->lpVtbl->SetThumbnailClip(taskbl, hroot,
                                                  show ? &video : NULL);
         if ( hr != S_OK )
-            msg_Err(vd, "SetThumbNailClip failed: 0x%0lx", hr);
+            msg_Err(obj, "SetThumbNailClip failed: 0x%0lx", hr);
 
         taskbl->lpVtbl->Release(taskbl);
     }
     CoUninitialize();
 }
 
-static int CommonControlSetFullscreen(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_fullscreen)
+static int CommonControlSetFullscreen(vlc_object_t *obj, vout_display_sys_win32_t *sys, bool is_fullscreen)
 {
 #ifdef MODULE_NAME_IS_direct3d9
     if (sys->use_desktop && is_fullscreen)
@@ -404,7 +404,7 @@ static int CommonControlSetFullscreen(vout_display_t *vd, vout_display_sys_win32
     GetWindowPlacement(hwnd, &window_placement);
 
     if (is_fullscreen) {
-        msg_Dbg(vd, "entering fullscreen mode");
+        msg_Dbg(obj, "entering fullscreen mode");
 
         /* Change window style, no borders and no title bar */
         SetWindowLong(hwnd, GWL_STYLE, WS_CLIPCHILDREN | WS_VISIBLE);
@@ -442,7 +442,7 @@ static int CommonControlSetFullscreen(vout_display_t *vd, vout_display_sys_win32
         }
         SetForegroundWindow(hwnd);
     } else {
-        msg_Dbg(vd, "leaving fullscreen mode");
+        msg_Dbg(obj, "leaving fullscreen mode");
 
         /* Change window style, no borders and no title bar */
         SetWindowLong(hwnd, GWL_STYLE, EventThreadGetWindowStyle(sys->event));
@@ -531,7 +531,7 @@ int CommonControl(vout_display_t *vd, vout_display_sys_win32_t *sys, int query, 
     }
     case VOUT_DISPLAY_CHANGE_FULLSCREEN: {
         bool fs = va_arg(args, int);
-        if (CommonControlSetFullscreen(vd, sys, fs))
+        if (CommonControlSetFullscreen(VLC_OBJECT(vd), sys, fs))
             return VLC_EGENERIC;
         UpdateRects(vd, sys, false);
         return VLC_SUCCESS;

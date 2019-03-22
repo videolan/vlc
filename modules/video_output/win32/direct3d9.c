@@ -1717,7 +1717,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     return VLC_SUCCESS;
 error:
     Direct3D9Close(vd);
-    CommonClean(vd, &sys->sys);
+    CommonClean(VLC_OBJECT(vd), &sys->sys);
     Direct3D9Destroy(sys);
     free(vd->sys);
     return VLC_EGENERIC;
@@ -1732,7 +1732,7 @@ static void Close(vout_display_t *vd)
 
     Direct3D9Close(vd);
 
-    CommonClean(vd, &vd->sys->sys);
+    CommonClean(VLC_OBJECT(vd), &vd->sys->sys);
 
     Direct3D9Destroy(vd->sys);
 

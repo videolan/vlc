@@ -197,7 +197,7 @@ static void Close(vout_display_t *vd)
     }
 
     UnhookWindowsSensors(sys->p_sensors);
-    CommonClean(vd, &sys->sys);
+    CommonClean(VLC_OBJECT(vd), &sys->sys);
 
     free(sys);
 }

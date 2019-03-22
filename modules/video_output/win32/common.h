@@ -86,7 +86,7 @@ typedef struct vout_display_sys_win32_t
  *****************************************************************************/
 int  CommonInit(vout_display_t *, vout_display_sys_win32_t *, bool b_windowless, const vout_display_cfg_t *);
 #if !VLC_WINSTORE_APP
-void CommonClean(vout_display_t *, vout_display_sys_win32_t *);
+void CommonClean(vlc_object_t *, vout_display_sys_win32_t *);
 #endif /* !VLC_WINSTORE_APP */
 void CommonManage(vout_display_t *, vout_display_sys_win32_t *);
 int  CommonControl(vout_display_t *, vout_display_sys_win32_t *, int , va_list );
