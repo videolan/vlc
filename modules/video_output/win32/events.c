@@ -77,8 +77,7 @@ struct event_thread_t
     char *psz_title;
 
     int i_window_style;
-    int x, y;
-    unsigned width, height;
+    RECT window_area;
 
     /* */
     vout_window_t *parent_window;
@@ -410,19 +409,13 @@ int EventThreadGetWindowStyle( event_thread_t *p_event )
     return p_event->i_window_style;
 }
 
-void EventThreadUpdateWindowPosition( event_thread_t *p_event,
-                                      bool *pb_moved_or_resized,
-                                      int x, int y, unsigned w, unsigned h )
+bool EventThreadUpdateWindowPosition( event_thread_t *p_event, const RECT *area )
 {
     vlc_mutex_lock( &p_event->lock );
-    *pb_moved_or_resized   = x != p_event->x || y != p_event->y ||
-                             w != p_event->width || h != p_event->height;
-
-    p_event->x      = x;
-    p_event->y      = y;
-    p_event->width  = w;
-    p_event->height = h;
+    bool changed = !EqualRect(&p_event->window_area, area);
+    p_event->window_area = *area;
     vlc_mutex_unlock( &p_event->lock );
+    return changed;
 }
 
 void EventThreadUpdateSourceAndPlace( event_thread_t *p_event,
@@ -489,10 +482,10 @@ void EventThreadDestroy( event_thread_t *p_event )
 int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event_cfg_t *p_cfg )
 {
     p_event->use_desktop = p_cfg->use_desktop;
-    p_event->x           = p_cfg->x;
-    p_event->y           = p_cfg->y;
-    p_event->width       = p_cfg->width;
-    p_event->height      = p_cfg->height;
+    p_event->window_area.left   = p_cfg->x;
+    p_event->window_area.top    = p_cfg->y;
+    p_event->window_area.right  = p_cfg->x + p_cfg->width;
+    p_event->window_area.bottom = p_cfg->y + p_cfg->height;
 
     atomic_store(&p_event->has_moved, false);
 
@@ -663,7 +656,6 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     vout_display_t *vd = p_event->vd;
     HINSTANCE  hInstance;
     HMENU      hMenu;
-    RECT       rect_window;
     WNDCLASS   wc;                            /* window class components */
     TCHAR      vlc_path[MAX_PATH+1];
     int        i_style;
@@ -740,10 +732,11 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
      * have. Unfortunatly these dimensions will include the borders and
      * titlebar. We use the following function to find out the size of
      * the window corresponding to the useable surface we want */
+    RECT rect_window;
     rect_window.left   = 10;
     rect_window.top    = 10;
-    rect_window.right  = rect_window.left + p_event->width;
-    rect_window.bottom = rect_window.top  + p_event->height;
+    rect_window.right  = rect_window.left + RECTWidth(p_event->window_area);
+    rect_window.bottom = rect_window.top  + RECTHeight(p_event->window_area);
 
     i_style = var_GetBool( vd, "video-deco" )
         /* Open with window decoration */
@@ -772,10 +765,10 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
                     p_event->class_main,             /* name of window class */
                     _T(VOUT_TITLE) _T(" (VLC Video Output)"),/* window title */
                     i_style,                                 /* window style */
-                    (!p_event->x) ? (UINT)CW_USEDEFAULT :
-                        (UINT)p_event->x,            /* default X coordinate */
-                    (!p_event->y) ? (UINT)CW_USEDEFAULT :
-                        (UINT)p_event->y,            /* default Y coordinate */
+                    (!p_event->window_area.left) ? (UINT)CW_USEDEFAULT :
+                        (UINT)p_event->window_area.left, /* default X coordinate */
+                    (!p_event->window_area.top) ? (UINT)CW_USEDEFAULT :
+                        (UINT)p_event->window_area.top, /* default Y coordinate */
                     RECTWidth(rect_window),                  /* window width */
                     RECTHeight(rect_window),                /* window height */
                     p_event->hparent,                       /* parent window */

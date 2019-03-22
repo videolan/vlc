@@ -164,8 +164,8 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
     /* If nothing changed, we can return */
     bool moved_or_resized;
 #if VLC_WINSTORE_APP
-    moved_or_resized = rect.right  != RECTWidth(sys->rect_display) ||
-                       rect.bottom != RECTHeight(sys->rect_display);
+    moved_or_resized = RECTWidth(rect)  != RECTWidth(sys->rect_display) ||
+                       RECTHeight(rect) != RECTHeight(sys->rect_display);
     sys->rect_display = rect;
 #else
     if (sys->b_windowless)
@@ -177,9 +177,9 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
         /* Retrieve the window position */
         ClientToScreen(sys->hwnd, &point);
 
-        EventThreadUpdateWindowPosition(sys->event, &moved_or_resized,
-            point.x, point.y,
-            rect.right, rect.bottom);
+        OffsetRect(&rect, point.x, point.y);
+
+        moved_or_resized = EventThreadUpdateWindowPosition(sys->event, &rect);
     }
 #endif
     if (!is_forced && !moved_or_resized)
@@ -187,8 +187,8 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
 
     /* Update the window position and size */
     vout_display_cfg_t place_cfg = *cfg;
-    place_cfg.display.width = rect.right;
-    place_cfg.display.height = rect.bottom;
+    place_cfg.display.width = RECTWidth(rect);
+    place_cfg.display.height = RECTHeight(rect);
 
 #if (defined(MODULE_NAME_IS_glwin32))
     /* Reverse vertical alignment as the GL tex are Y inverted */
