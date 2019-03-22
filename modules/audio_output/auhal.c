@@ -61,7 +61,6 @@ vlc_module_begin ()
     add_string("auhal-audio-device", "", DEVICE_TEXT, NULL, true)
     add_string("auhal-warned-devices", "", NULL, NULL, true)
     change_private()
-    add_obsolete_integer("macosx-audio-device") /* since 2.1.0 */
 vlc_module_end ()
 
 #pragma mark -

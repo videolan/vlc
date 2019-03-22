@@ -1549,7 +1549,6 @@ vlc_module_begin ()
         change_safe ()
     add_float( "gain", 1., GAIN_TEXT, GAIN_LONGTEXT, true )
         change_float_range( 0., 8. )
-    add_obsolete_integer( "volume" ) /* since 2.1.0 */
     add_float( "volume-step", AOUT_VOLUME_STEP, VOLUME_STEP_TEXT,
                  VOLUME_STEP_LONGTEXT, true )
         change_float_range( 1., AOUT_VOLUME_DEFAULT )
@@ -2057,7 +2056,6 @@ vlc_module_begin ()
               PLUGINS_SCAN_LONGTEXT, true )
         change_volatile ()
 #endif
-    add_obsolete_string( "data-path" ) /* since 2.1.0 */
     add_string( "keystore", NULL, KEYSTORE_TEXT,
                 KEYSTORE_LONGTEXT, true )
 
@@ -2190,15 +2188,10 @@ vlc_module_begin ()
                  false )
         change_short('v')
         change_volatile ()
-    add_obsolete_string( "verbose-objects" ) /* since 2.1.0 */
 #if !defined(_WIN32) && !defined(__OS2__)
     add_obsolete_bool( "daemon" ) /* since 4.0.0 */
         change_short('d')
     add_obsolete_string( "pidfile" ) /* since 4.0.0 */
-#endif
-
-#if defined (_WIN32) || defined (__APPLE__)
-    add_obsolete_string( "language" ) /* since 2.1.0 */
 #endif
 
     add_bool( "color", true, COLOR_TEXT, COLOR_LONGTEXT, true )

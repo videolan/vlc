@@ -74,7 +74,6 @@ vlc_module_begin ()
 
     add_string( "directx-audio-device", NULL,
              DEVICE_TEXT, DEVICE_LONGTEXT, false )
-    add_obsolete_string( "directx-audio-device-name")
     add_bool( "directx-audio-float32", true, FLOAT_TEXT,
               FLOAT_LONGTEXT, true )
     add_string( "directx-audio-speaker", "Windows default",

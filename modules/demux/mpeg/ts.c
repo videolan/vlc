@@ -164,8 +164,6 @@ vlc_module_begin ()
     add_integer_with_range( "ts-generated-pcr-offset", 120, 0, 500,
                             TS_GENERATED_PCR_OFFSET_TEXT, NULL, true )
 
-    add_obsolete_bool( "ts-silent" );
-
     set_capability( "demux", 10 )
     set_callbacks( Open, Close )
     add_shortcut( "ts" )

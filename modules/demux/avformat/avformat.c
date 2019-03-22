@@ -45,7 +45,6 @@ vlc_module_begin ()
     set_callbacks( avformat_OpenDemux, avformat_CloseDemux )
     set_section( N_("Demuxer"), NULL )
     add_string( "avformat-format", NULL, FORMAT_TEXT, FORMAT_LONGTEXT, true )
-    add_obsolete_string("ffmpeg-format") /* removed since 2.1.0 */
     add_string( "avformat-options", NULL, AV_OPTIONS_TEXT, AV_OPTIONS_LONGTEXT, true )
 
 #ifdef ENABLE_SOUT
@@ -56,7 +55,6 @@ vlc_module_begin ()
     set_capability( "sout mux", 2 )
     set_section( N_("Muxer"), NULL )
     add_string( "sout-avformat-mux", NULL, MUX_TEXT, MUX_LONGTEXT, true )
-    add_obsolete_string("ffmpeg-mux") /* removed since 2.1.0 */
     add_string( "sout-avformat-options", NULL, AV_OPTIONS_TEXT, AV_OPTIONS_LONGTEXT, true )
     add_bool( "sout-avformat-reset-ts", false, AV_RESET_TS_TEXT, AV_RESET_TS_LONGTEXT, true )
     set_callbacks( avformat_OpenMux, avformat_CloseMux )

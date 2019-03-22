@@ -311,13 +311,11 @@ vlc_module_begin ()
         change_safe()
     add_string( CFG_PREFIX "fps", "60", FPS_TEXT, FPS_LONGTEXT, false )
         change_safe()
-    add_obsolete_bool( CFG_PREFIX "use-libv4l2" ) /* since 2.1.0 */
 
     set_section( N_( "Tuner" ), NULL )
     add_loadfile(CFG_PREFIX "radio-dev", "/dev/radio0",
                  RADIO_DEVICE_TEXT, RADIO_DEVICE_LONGTEXT)
         change_safe()
-    add_obsolete_integer( CFG_PREFIX "tuner" ) /* since 2.1.0 */
     add_integer( CFG_PREFIX "tuner-frequency", -1, FREQUENCY_TEXT,
                  FREQUENCY_LONGTEXT, true )
         change_integer_range( -1, 0xFFFFFFFE )

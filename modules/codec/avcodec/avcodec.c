@@ -95,45 +95,31 @@ vlc_module_begin ()
     set_capability("spu decoder", 70)
     set_callbacks(InitSubtitleDec, EndSubtitleDec)
 
-    add_obsolete_bool( "ffmpeg-dr" ) /* removed since 2.1.0 */
     add_bool( "avcodec-dr", true, DR_TEXT, NULL, true )
     add_bool( "avcodec-corrupted", true, CORRUPTED_TEXT, CORRUPTED_LONGTEXT, false )
-    add_obsolete_integer ( "ffmpeg-error-resilience" ) /* removed since 2.1.0 */
     add_integer ( "avcodec-error-resilience", 1, ERROR_TEXT,
         ERROR_LONGTEXT, true )
-    add_obsolete_integer ( "ffmpeg-workaround-bugs" ) /* removed since 2.1.0 */
     add_integer ( "avcodec-workaround-bugs", 1, BUGS_TEXT, BUGS_LONGTEXT,
         false )
-    add_obsolete_bool( "ffmpeg-hurry-up" ) /* removed since 2.1.0 */
     add_bool( "avcodec-hurry-up", true, HURRYUP_TEXT, HURRYUP_LONGTEXT,
         false )
-    add_obsolete_integer( "ffmpeg-skip-frame") /* removed since 2.1.0 */
     add_integer( "avcodec-skip-frame", 0, SKIP_FRAME_TEXT,
         SKIP_FRAME_LONGTEXT, true )
         change_integer_list( frame_skip_list, frame_skip_list_text )
-    add_obsolete_integer( "ffmpeg-skip-idct" ) /* removed since 2.1.0 */
     add_integer( "avcodec-skip-idct", 0, SKIP_IDCT_TEXT,
         SKIP_IDCT_LONGTEXT, true )
         change_integer_range( -1, 4 )
-    add_obsolete_integer( "ffmpeg-vismv" ) /* removed since 2.1.0 */
     add_obsolete_integer( "avcodec-vismv" ) /* removed since 3.0.0 */
-    add_obsolete_integer ( "ffmpeg-lowres" ) /* removed since 2.1.0 */
-    add_obsolete_bool( "ffmpeg-fast" ) /* removed since 2.1.0 */
     add_obsolete_bool( "avcodec-fast" ) /* removed since 4.0.0 */
-    add_obsolete_integer ( "ffmpeg-skiploopfilter" ) /* removed since 2.1.0 */
     add_integer ( "avcodec-skiploopfilter", 0, SKIPLOOPF_TEXT,
                   SKIPLOOPF_LONGTEXT, false)
         change_safe ()
         change_integer_list( nloopf_list, nloopf_list_text )
 
-    add_obsolete_integer( "ffmpeg-debug" ) /* removed since 2.1.0 */
     add_integer( "avcodec-debug", 0, DEBUG_TEXT, DEBUG_LONGTEXT,
                  true )
-    add_obsolete_string( "ffmpeg-codec" ) /* removed since 2.1.0 */
     add_string( "avcodec-codec", NULL, CODEC_TEXT, CODEC_LONGTEXT, true )
-    add_obsolete_bool( "ffmpeg-hw" ) /* removed since 2.1.0 */
     add_obsolete_string( "avcodec-hw" ) /* removed since 4.0.0 */
-    add_obsolete_integer( "ffmpeg-threads" ) /* removed since 2.1.0 */
     add_integer( "avcodec-threads", 0, THREADS_TEXT, THREADS_LONGTEXT, true );
     add_string( "avcodec-options", NULL, AV_OPTIONS_TEXT, AV_OPTIONS_LONGTEXT, true )
 
@@ -146,35 +132,6 @@ vlc_module_begin ()
     set_description( N_("FFmpeg audio/video encoder") )
     set_capability( "encoder", 100 )
     set_callbacks( InitVideoEnc, EndVideoEnc )
-
-    /* removed in 2.1.0 */
-    add_obsolete_string( "sout-ffmpeg-codec" )
-    add_obsolete_string( "sout-ffmpeg-hq" )
-    add_obsolete_integer( "sout-ffmpeg-keyint" )
-    add_obsolete_integer( "sout-ffmpeg-bframes" )
-    add_obsolete_bool( "sout-ffmpeg-hurry-up" )
-    add_obsolete_bool( "sout-ffmpeg-interlace" )
-    add_obsolete_bool( "sout-ffmpeg-interlace-me" )
-    add_obsolete_integer( "sout-ffmpeg-vt" )
-    add_obsolete_bool( "sout-ffmpeg-pre-me" )
-    add_obsolete_integer( "sout-ffmpeg-rc-buffer-size" )
-    add_obsolete_float( "sout-ffmpeg-rc-buffer-aggressivity" )
-    add_obsolete_float( "sout-ffmpeg-i-quant-factor" )
-    add_obsolete_integer( "sout-ffmpeg-noise-reduction" )
-    add_obsolete_bool( "sout-ffmpeg-mpeg4-matrix" )
-    add_obsolete_integer( "sout-ffmpeg-qmin" )
-    add_obsolete_integer( "sout-ffmpeg-qmax" )
-    add_obsolete_bool( "sout-ffmpeg-trellis" )
-    add_obsolete_float( "sout-ffmpeg-qscale" )
-    add_obsolete_integer( "sout-ffmpeg-strict" )
-    add_obsolete_float( "sout-ffmpeg-lumi-masking" )
-    add_obsolete_float( "sout-ffmpeg-dark-masking" )
-    add_obsolete_float( "sout-ffmpeg-p-masking" )
-    add_obsolete_float( "sout-ffmpeg-border-masking" )
-    add_obsolete_integer( "sout-ffmpeg-luma-elim-threshold" )
-    add_obsolete_integer( "sout-ffmpeg-chroma-elim-threshold" )
-    add_obsolete_string( "sout-ffmpeg-aac-profile" )
-
 
     add_string( ENC_CFG_PREFIX "codec", NULL, CODEC_TEXT, CODEC_LONGTEXT, true )
     add_string( ENC_CFG_PREFIX "hq", "rd", ENC_HQ_TEXT,

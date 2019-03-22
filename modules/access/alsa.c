@@ -60,7 +60,6 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_INPUT_ACCESS)
     set_help (HELP_TEXT)
 
-    add_obsolete_string ("alsa-format") /* since 2.1.0 */
     add_bool ("alsa-stereo", true, STEREO_TEXT, NULL, true)
     add_integer ("alsa-samplerate", 48000, RATE_TEXT, NULL, true)
         change_integer_list (rate_values, rate_names)
