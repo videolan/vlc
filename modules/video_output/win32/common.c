@@ -230,17 +230,6 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
     rect_dest.bottom = rect_dest.top + place.height;
 #endif
 
-    /* the 2 following lines are to fix a bug when clicking on the desktop */
-    if (place.width == 0 || place.height == 0) {
-        goto exit;
-    }
-
-    /* src image dimensions */
-    rect_src.left = 0;
-    rect_src.top = 0;
-    rect_src.right = sys->pf_GetPictureWidth(vd);
-    rect_src.bottom = sys->pf_GetPictureHeight(vd);
-
 #ifndef NDEBUG
     msg_Dbg(vd, "DirectXUpdateRects source"
         " offset: %i,%i visible: %ix%i",
@@ -255,6 +244,17 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
         rect_dest.left, rect_dest.top,
         rect_dest.right, rect_dest.bottom);
 #endif
+
+    /* the 2 following lines are to fix a bug when clicking on the desktop */
+    if (place.width == 0 || place.height == 0) {
+        goto exit;
+    }
+
+    /* src image dimensions */
+    rect_src.left = 0;
+    rect_src.top = 0;
+    rect_src.right = sys->pf_GetPictureWidth(vd);
+    rect_src.bottom = sys->pf_GetPictureHeight(vd);
 
 #if !VLC_WINSTORE_APP
     CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
