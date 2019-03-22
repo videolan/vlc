@@ -165,8 +165,6 @@ vlc_module_begin()
         add_bool("macosx-appleremote-prevnext", false, USE_APPLE_REMOTE_PREVNEXT_TEXT, USE_APPLE_REMOTE_PREVNEXT_LONGTEXT, false)
         add_bool("macosx-mediakeys", true, USE_MEDIAKEYS_TEXT, USE_MEDIAKEYS_LONGTEXT, false)
 
-    add_obsolete_bool("macosx-stretch") /* since 2.0.0 */
-    add_obsolete_bool("macosx-eq-keep") /* since 2.0.0 */
     add_obsolete_bool("macosx-autosave-volume") /* since 2.1.0 */
     add_obsolete_bool("macosx-show-sidebar") /* since 3.0.1 */
     add_obsolete_bool("macosx-interfacestyle") /* since 4.0.0 */

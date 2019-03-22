@@ -379,10 +379,6 @@ vlc_module_begin ()
     add_integer_with_range( "qt-fs-sensitivity", 3, 0, 4000, FULLSCREEN_CONTROL_PIXELS,
             nullptr, true)
 
-    add_obsolete_bool( "qt-adv-options" )     /* Since 2.0.0 */
-    add_obsolete_bool( "qt-volume-complete" ) /* Since 2.0.0 */
-    add_obsolete_integer( "qt-startvolume" )  /* Since 2.0.0 */
-
     add_integer( "qt-auto-raise", MainInterface::RAISE_VIDEO, AUTORAISE_ON_PLAYBACK_TEXT,
                  AUTORAISE_ON_PLAYBACK_LONGTEXT, false )
             change_integer_list( i_raise_list, psz_raise_list_text )

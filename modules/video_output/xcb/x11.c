@@ -358,6 +358,4 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_callback_display(Open, 100)
     add_shortcut("xcb-x11", "x11")
-
-    add_obsolete_bool("x11-shm") /* obsoleted since 2.0.0 */
 vlc_module_end()

@@ -1554,7 +1554,6 @@ vlc_module_begin ()
                  VOLUME_STEP_LONGTEXT, true )
         change_float_range( 1., AOUT_VOLUME_DEFAULT )
     add_bool( "volume-save", true, VOLUME_SAVE_TEXT, NULL, true )
-    add_obsolete_integer( "aout-rate" ) /* since 2.0.0 */
 #if defined(__ANDROID__) || defined(__APPLE__) || defined(_WIN32)
     add_bool( "spdif", false, SPDIF_TEXT, SPDIF_LONGTEXT, true )
 #else
@@ -1866,8 +1865,6 @@ vlc_module_begin ()
     set_section( N_( "Network settings" ), NULL )
 
     add_integer( "mtu", MTU_DEFAULT, MTU_TEXT, MTU_LONGTEXT, true )
-    add_obsolete_bool( "ipv6" ) /* since 2.0.0 */
-    add_obsolete_bool( "ipv4" ) /* since 2.0.0 */
     add_integer( "ipv4-timeout", 5 * 1000, TIMEOUT_TEXT,
                  TIMEOUT_LONGTEXT, true )
         change_integer_range( 0, INT_MAX )
@@ -1881,13 +1878,9 @@ vlc_module_begin ()
     add_integer( "rtsp-port", 554, RTSP_PORT_TEXT, RTSP_PORT_LONGTEXT, true )
         change_integer_range( 1, 65535 )
     add_loadfile("http-cert", NULL, HTTP_CERT_TEXT, CERT_LONGTEXT)
-    add_obsolete_string( "sout-http-cert" ) /* since 2.0.0 */
     add_loadfile("http-key", NULL, HTTP_KEY_TEXT, KEY_LONGTEXT)
-    add_obsolete_string( "sout-http-key" ) /* since 2.0.0 */
     add_obsolete_string( "http-ca" ) /* since 3.0.0 */
-    add_obsolete_string( "sout-http-ca" ) /* since 2.0.0 */
     add_obsolete_string( "http-crl" ) /* since 3.0.0 */
-    add_obsolete_string( "sout-http-crl" ) /* since 2.0.0 */
 
 #ifdef _WIN32
     add_string( "http-proxy", NULL, PROXY_TEXT, PROXY_LONGTEXT,
@@ -1941,46 +1934,18 @@ vlc_module_begin ()
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
-    add_obsolete_integer( "vdr-caching" ) /* 2.0.0 */
     add_integer( "live-caching", MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY),
                  CAPTURE_CACHING_TEXT, CAPTURE_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
-    add_obsolete_integer( "alsa-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "dshow-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "dv-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "dvb-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "eyetv-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "jack-input-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "linsys-hdsdi-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "linsys-sdi-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "oss-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "screen-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "v4l2-caching" ) /* 2.0.0 */
     add_integer( "disc-caching", MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY),
                  DISC_CACHING_TEXT, DISC_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
-    add_obsolete_integer( "bd-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "bluray-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "cdda-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "dvdnav-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "dvdread-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "vcd-caching" ) /* 2.0.0 */
     add_integer( "network-caching", 1000,
                  NETWORK_CACHING_TEXT, NETWORK_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
-    add_obsolete_integer( "ftp-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "http-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "mms-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "realrtsp-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "rtp-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "rtsp-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "sftp-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "smb-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "tcp-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "udp-caching" ) /* 2.0.0 */
 
     add_integer( "cr-average", 40, CR_AVERAGE_TEXT,
                  CR_AVERAGE_LONGTEXT, true )
@@ -2067,7 +2032,6 @@ vlc_module_begin ()
                ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT)
     add_integer( "ttl", -1, TTL_TEXT, TTL_LONGTEXT, true )
     add_string( "miface", NULL, MIFACE_TEXT, MIFACE_LONGTEXT, true )
-    add_obsolete_string( "miface-addr" ) /* since 2.0.0 */
     add_integer( "dscp", 0, DSCP_TEXT, DSCP_LONGTEXT, true )
 
     set_subcategory( SUBCAT_SOUT_PACKETIZER )
@@ -2076,24 +2040,8 @@ vlc_module_begin ()
 
     set_subcategory( SUBCAT_SOUT_VOD )
 
-/* CPU options */
-    set_category( CAT_ADVANCED )
-#if defined( __i386__ ) || defined( __x86_64__ )
-    add_obsolete_bool( "mmx" ) /* since 2.0.0 */
-    add_obsolete_bool( "3dn" ) /* since 2.0.0 */
-    add_obsolete_bool( "mmxext" ) /* since 2.0.0 */
-    add_obsolete_bool( "sse" ) /* since 2.0.0 */
-    add_obsolete_bool( "sse2" ) /* since 2.0.0 */
-    add_obsolete_bool( "sse3" ) /* since 2.0.0 */
-    add_obsolete_bool( "ssse3" ) /* since 2.0.0 */
-    add_obsolete_bool( "sse41" ) /* since 2.0.0 */
-    add_obsolete_bool( "sse42" ) /* since 2.0.0 */
-#endif
-#if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-    add_obsolete_bool( "altivec" ) /* since 2.0.0 */
-#endif
-
 /* Advanced options */
+    set_category( CAT_ADVANCED )
     set_subcategory( SUBCAT_ADVANCED_MISC )
     add_category_hint(N_("Advanced"), NULL)
     set_section( N_("Special modules"), NULL )
@@ -2108,7 +2056,6 @@ vlc_module_begin ()
     add_bool( "plugins-scan", true, PLUGINS_SCAN_TEXT,
               PLUGINS_SCAN_LONGTEXT, true )
         change_volatile ()
-    add_obsolete_string( "plugin-path" ) /* since 2.0.0 */
 #endif
     add_obsolete_string( "data-path" ) /* since 2.1.0 */
     add_string( "keystore", NULL, KEYSTORE_TEXT,
