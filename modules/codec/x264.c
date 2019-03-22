@@ -469,8 +469,6 @@ vlc_module_begin ()
                  SCENE_LONGTEXT, true )
         change_integer_range( -1, 100 )
 
-    add_obsolete_bool( SOUT_CFG_PREFIX "pre-scenecut" )
-
     add_integer( SOUT_CFG_PREFIX "bframes", 3, BFRAMES_TEXT,
                  BFRAMES_LONGTEXT, true )
         change_integer_range( 0, 16 )
@@ -641,15 +639,11 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "subme", 7, SUBME_TEXT,
                  SUBME_LONGTEXT, true )
 
-    add_obsolete_bool( SOUT_CFG_PREFIX "b-rdo" )
-
     add_bool( SOUT_CFG_PREFIX "mixed-refs", true, MIXED_REFS_TEXT,
               MIXED_REFS_LONGTEXT, true )
 
     add_bool( SOUT_CFG_PREFIX "chroma-me", true, CHROMA_ME_TEXT,
               CHROMA_ME_LONGTEXT, true )
-
-    add_obsolete_bool( SOUT_CFG_PREFIX "bime" )
 
     add_bool( SOUT_CFG_PREFIX "8x8dct", true, TRANSFORM_8X8DCT_TEXT,
               TRANSFORM_8X8DCT_LONGTEXT, true )

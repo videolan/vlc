@@ -981,12 +981,6 @@ vlc_module_begin ()
     set_capability ("vout window", 10)
     set_callback(Open)
 
-    /* Obsolete since 1.1.0: */
-    add_obsolete_bool ("x11-altfullscreen")
-    add_obsolete_bool ("xvideo-altfullscreen")
-    add_obsolete_bool ("xvmc-altfullscreen")
-    add_obsolete_bool ("glx-altfullscreen")
-
     add_submodule ()
     set_shortname (N_("Drawable"))
     set_description (N_("Embedded window video"))

@@ -192,7 +192,6 @@ vlc_module_begin ()
 
     add_obsolete_integer( "freetype-fontsize" );
     add_obsolete_integer( "freetype-rel-fontsize" );
-    add_obsolete_integer( "freetype-effect" );
 
     add_bool( "freetype-yuvp", false, YUVP_TEXT,
               YUVP_LONGTEXT, true )

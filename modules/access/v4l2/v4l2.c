@@ -348,7 +348,6 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "hue-auto", -1,
                  HUE_AUTO_TEXT, HUE_AUTO_LONGTEXT, true )
         change_integer_list( tristate_vlc, tristate_user )
-    add_obsolete_integer( CFG_PREFIX "black-level" ) /* since Linux 2.6.26 */
     add_integer( CFG_PREFIX "white-balance-temperature", -1,
                  WHITE_BALANCE_TEMP_TEXT, WHITE_BALANCE_TEMP_LONGTEXT, true )
         /* Ideally, the range should be 2800-6500 */
@@ -385,8 +384,6 @@ vlc_module_begin ()
     add_bool( CFG_PREFIX "vflip", false, VFLIP_TEXT, VFLIP_LONGTEXT, true )
     add_integer( CFG_PREFIX "rotate", -1, ROTATE_TEXT, ROTATE_LONGTEXT, true )
         change_integer_range( -1, 359 )
-    add_obsolete_integer( CFG_PREFIX "hcenter" ) /* since Linux 2.6.26 */
-    add_obsolete_integer( CFG_PREFIX "vcenter" ) /* since Linux 2.6.26 */
     add_integer( CFG_PREFIX"color-killer", -1,
                  COLOR_KILLER_TEXT, COLOR_KILLER_LONGTEXT, true )
         change_integer_list( tristate_vlc, tristate_user )
@@ -409,11 +406,6 @@ vlc_module_begin ()
     add_string( CFG_PREFIX "set-ctrls", NULL, S_CTRLS_TEXT,
               S_CTRLS_LONGTEXT, true )
         change_safe()
-
-    add_obsolete_string( CFG_PREFIX "adev" )
-    add_obsolete_integer( CFG_PREFIX "audio-method" )
-    add_obsolete_bool( CFG_PREFIX "stereo" )
-    add_obsolete_integer( CFG_PREFIX "samplerate" )
 
     add_shortcut( "v4l", "v4l2" )
     set_capability( "access", 2 )

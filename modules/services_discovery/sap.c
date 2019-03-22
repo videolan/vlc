@@ -649,7 +649,6 @@ vlc_module_begin()
                 SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, true)
     add_obsolete_bool("sap-parse") /* since 4.0.0 */
     add_obsolete_bool("sap-strict") /* since 4.0.0 */
-    add_obsolete_bool("sap-timeshift") /* Redundant since 1.0.0 */
 
     set_capability("services_discovery", 0)
     set_callbacks(Open, Close)

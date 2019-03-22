@@ -82,7 +82,6 @@ vlc_module_begin ()
     add_loadfile(FB_DEV_VAR, "/dev/fb0", DEVICE_TEXT, DEVICE_LONGTEXT)
     add_bool("fb-tty", true, TTY_TEXT, TTY_LONGTEXT, true)
     add_string( "fb-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
-    add_obsolete_string("fb-aspect-ratio")
     add_integer("fb-mode", 4, FB_MODE_TEXT, FB_MODE_LONGTEXT,
                  true)
     add_obsolete_bool("fb-hw-accel") /* since 4.0.0 */

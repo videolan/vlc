@@ -52,8 +52,6 @@ vlc_module_begin ()
     set_capability( "spu decoder", 50 )
     set_callbacks( DecoderOpen, DecoderClose )
 
-    add_obsolete_integer ( "svcdsub-debug" )
-
     add_submodule ()
     set_description( N_("Philips OGT (SVCD subtitle) packetizer") )
     set_capability( "packetizer", 50 )

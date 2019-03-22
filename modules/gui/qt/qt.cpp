@@ -379,9 +379,6 @@ vlc_module_begin ()
     add_integer_with_range( "qt-fs-sensitivity", 3, 0, 4000, FULLSCREEN_CONTROL_PIXELS,
             nullptr, true)
 
-    add_obsolete_bool( "qt-blingbling" )      /* Suppressed since 1.0.0 */
-    add_obsolete_integer( "qt-display-mode" ) /* Suppressed since 1.1.0 */
-
     add_obsolete_bool( "qt-adv-options" )     /* Since 2.0.0 */
     add_obsolete_bool( "qt-volume-complete" ) /* Since 2.0.0 */
     add_obsolete_integer( "qt-startvolume" )  /* Since 2.0.0 */

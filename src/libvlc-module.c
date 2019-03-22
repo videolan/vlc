@@ -1555,7 +1555,6 @@ vlc_module_begin ()
         change_float_range( 1., AOUT_VOLUME_DEFAULT )
     add_bool( "volume-save", true, VOLUME_SAVE_TEXT, NULL, true )
     add_obsolete_integer( "aout-rate" ) /* since 2.0.0 */
-    add_obsolete_bool( "hq-resampling" ) /* since 1.1.8 */
 #if defined(__ANDROID__) || defined(__APPLE__) || defined(_WIN32)
     add_bool( "spdif", false, SPDIF_TEXT, SPDIF_LONGTEXT, true )
 #else
@@ -1632,8 +1631,6 @@ vlc_module_begin ()
               KEYBOARD_EVENTS_LONGTEXT, true )
     add_bool( "mouse-events", true, MOUSE_EVENTS_TEXT,
               MOUSE_EVENTS_LONGTEXT, true )
-    add_obsolete_integer( "vout-event" ) /* deprecated since 1.1.0 */
-    add_obsolete_integer( "x11-event" ) /* renamed since 1.0.0 */
     add_bool( "video-on-top", 0, VIDEO_ON_TOP_TEXT,
               VIDEO_ON_TOP_LONGTEXT, false )
     add_bool( "video-wallpaper", false, WALLPAPER_TEXT,
@@ -2029,9 +2026,6 @@ vlc_module_begin ()
     add_module("dec-dev", "decoder device", "any", DEC_DEV_TEXT, DEC_DEV_LONGTEXT)
 
     set_subcategory( SUBCAT_INPUT_SCODEC )
-
-    add_obsolete_bool( "prefer-system-codecs" )
-
     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
 
     add_module_list("stream-filter", "stream_filter", NULL,
@@ -2084,7 +2078,6 @@ vlc_module_begin ()
 
 /* CPU options */
     set_category( CAT_ADVANCED )
-    add_obsolete_bool( "fpu" )
 #if defined( __i386__ ) || defined( __x86_64__ )
     add_obsolete_bool( "mmx" ) /* since 2.0.0 */
     add_obsolete_bool( "3dn" ) /* since 2.0.0 */
@@ -2710,7 +2703,6 @@ vlc_module_begin ()
             DEINTERLACE_MODE_KEY_TEXT, DEINTERLACE_MODE_KEY_LONGTEXT)
     add_key("key-intf-show", KEY_INTF_TOGGLE_FSC,
             INTF_TOGGLE_FSC_KEY_TEXT, INTF_TOGGLE_FSC_KEY_LONGTEXT)
-    add_obsolete_inner( "key-intf-hide", CONFIG_ITEM_KEY )
 
     add_key("key-intf-boss", KEY_INTF_BOSS,
             INTF_BOSS_KEY_TEXT, INTF_BOSS_KEY_LONGTEXT)
@@ -2875,7 +2867,6 @@ vlc_module_begin ()
         change_volatile ()
     add_bool( "ignore-config", true, IGNORE_CONFIG_TEXT, "", false )
         change_volatile ()
-    add_obsolete_bool( "save-config" )
     add_bool( "reset-config", false, RESET_CONFIG_TEXT, "", false )
         change_volatile ()
 #ifdef HAVE_DYNAMIC_PLUGINS

@@ -132,11 +132,8 @@ vlc_module_begin ()
     add_float("effect-kaiser-param", 3.0f,
             KAISER_PARAMETER_TEXT, KAISER_PARAMETER_LONGTEXT, true )
     set_section( N_("Spectrum analyser") , NULL )
-    add_obsolete_integer( "visual-nbbands" ) /* Since 1.0.0 */
     add_bool("visual-80-bands", true,
              NBBANDS_TEXT, NULL, true );
-    add_obsolete_integer( "visual-separ" ) /* Since 1.0.0 */
-    add_obsolete_integer( "visual-amp" ) /* Since 1.0.0 */
     add_bool("visual-peaks", true,
              PEAKS_TEXT, NULL, true )
     set_section( N_("Spectrometer") , NULL )
@@ -152,7 +149,6 @@ vlc_module_begin ()
              COLOR1_TEXT, COLOR1_LONGTEXT, true )
     add_bool("spect-show-bands", true,
              BANDS_TEXT, NULL, true );
-    add_obsolete_integer( "spect-nbbands" ) /* Since 1.0.0 */
     add_bool("spect-80-bands", true,
              NBBANDS_TEXT, NULL, true )
     add_integer("spect-separ", 1,
