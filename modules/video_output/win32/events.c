@@ -801,15 +801,12 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
 
     if( p_event->hparent )
     {
-        LONG i_style;
-
         /* We don't want the window owner to overwrite our client area */
-        i_style = GetWindowLong( p_event->hparent, GWL_STYLE );
-
-        if( !(i_style & WS_CLIPCHILDREN) )
+        LONG  parent_style = GetWindowLong( p_event->hparent, GWL_STYLE );
+        if( !(parent_style & WS_CLIPCHILDREN) )
             /* Hmmm, apparently this is a blocking call... */
             SetWindowLong( p_event->hparent, GWL_STYLE,
-                           i_style | WS_CLIPCHILDREN );
+                           parent_style | WS_CLIPCHILDREN );
 
         /* Create our fullscreen window */
         p_event->hfswnd =
