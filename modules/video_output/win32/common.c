@@ -177,8 +177,8 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
     bool is_resized;
 #if VLC_WINSTORE_APP
     has_moved = false;
-    is_resized = rect.right != (sys->rect_display.right - sys->rect_display.left) ||
-        rect.bottom != (sys->rect_display.bottom - sys->rect_display.top);
+    is_resized = rect.right  != RECTWidth(sys->rect_display) ||
+                 rect.bottom != RECTHeight(sys->rect_display);
     sys->rect_display = rect;
 #else
     if (sys->b_windowless)
@@ -238,8 +238,8 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
     rect_dest_clipped = rect_dest;
 
     /* the 2 following lines are to fix a bug when clicking on the desktop */
-    if ((rect_dest_clipped.right - rect_dest_clipped.left) == 0 ||
-        (rect_dest_clipped.bottom - rect_dest_clipped.top) == 0) {
+    if (RECTWidth(rect_dest_clipped) == 0 ||
+        RECTHeight(rect_dest_clipped) == 0) {
 #if !VLC_WINSTORE_APP
         SetRectEmpty(&rect_src_clipped);
 #endif
@@ -255,18 +255,18 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
     /* Clip the source image */
     rect_src_clipped.left = source->i_x_offset +
         (rect_dest_clipped.left - rect_dest.left) *
-        source->i_visible_width / (rect_dest.right - rect_dest.left);
+        source->i_visible_width / RECTWidth(rect_dest);
     rect_src_clipped.right = source->i_x_offset +
         source->i_visible_width -
         (rect_dest.right - rect_dest_clipped.right) *
-        source->i_visible_width / (rect_dest.right - rect_dest.left);
+        source->i_visible_width / RECTWidth(rect_dest);
     rect_src_clipped.top = source->i_y_offset +
         (rect_dest_clipped.top - rect_dest.top) *
-        source->i_visible_height / (rect_dest.bottom - rect_dest.top);
+        source->i_visible_height / RECTHeight(rect_dest);
     rect_src_clipped.bottom = source->i_y_offset +
         source->i_visible_height -
         (rect_dest.bottom - rect_dest_clipped.bottom) *
-        source->i_visible_height / (rect_dest.bottom - rect_dest.top);
+        source->i_visible_height / RECTHeight(rect_dest);
 
 #ifndef NDEBUG
     msg_Dbg(vd, "DirectXUpdateRects source"
@@ -347,8 +347,8 @@ void CommonManage(vout_display_t *vd)
              * with the associated window (hvideownd)
              */
             SetWindowPos(sys->hwnd, 0, 0, 0,
-                         rect_parent.right - rect_parent.left,
-                         rect_parent.bottom - rect_parent.top,
+                         RECTWidth(rect_parent),
+                         RECTHeight(rect_parent),
                          SWP_NOZORDER);
 
             UpdateRects(vd, true);
@@ -414,8 +414,8 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
             POINT client = {video.left, video.top};
             if (ScreenToClient(hroot, &client))
             {
-                unsigned int width = video.right - video.left;
-                unsigned int height = video.bottom - video.top;
+                unsigned int width = RECTWidth(video);
+                unsigned int height = RECTHeight(video);
                 video.left = client.x;
                 video.top = client.y;
                 video.right = video.left + width;
@@ -475,8 +475,8 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
                 SetWindowPos(hwnd, 0,
                              mi.rcMonitor.left,
                              mi.rcMonitor.top,
-                             mi.rcMonitor.right - mi.rcMonitor.left,
-                             mi.rcMonitor.bottom - mi.rcMonitor.top,
+                             RECTWidth(mi.rcMonitor),
+                             RECTHeight(mi.rcMonitor),
                              SWP_NOZORDER|SWP_FRAMECHANGED);
         } else {
             /* Maximize non embedded window */
@@ -561,8 +561,8 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
         if (!cfg->is_fullscreen && !sys->b_windowless) {
             AdjustWindowRect(&rect_window, EventThreadGetWindowStyle(sys->event), 0);
             SetWindowPos(sys->hwnd, 0, 0, 0,
-                         rect_window.right - rect_window.left,
-                         rect_window.bottom - rect_window.top, SWP_NOMOVE);
+                         RECTWidth(rect_window),
+                         RECTHeight(rect_window), SWP_NOMOVE);
         }
         sys->vdcfg = *cfg;
         UpdateRects(vd, false);

@@ -781,8 +781,8 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
                         (UINT)p_event->x,            /* default X coordinate */
                     (!p_event->y) ? (UINT)CW_USEDEFAULT :
                         (UINT)p_event->y,            /* default Y coordinate */
-                    rect_window.right - rect_window.left,    /* window width */
-                    rect_window.bottom - rect_window.top,   /* window height */
+                    RECTWidth(rect_window),                  /* window width */
+                    RECTHeight(rect_window),                /* window height */
                     p_event->hparent,                       /* parent window */
                     NULL,                          /* no menu in this window */
                     hInstance,            /* handle of this program instance */

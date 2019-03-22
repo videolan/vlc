@@ -127,9 +127,6 @@ struct vout_display_sys_t
     bool (*resizeCb)(void* opaque, unsigned, unsigned);
 };
 
-#define RECTWidth(r)   (int)((r).right - (r).left)
-#define RECTHeight(r)  (int)((r).bottom - (r).top)
-
 static picture_pool_t *Pool(vout_display_t *, unsigned);
 
 static void Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture, vlc_tick_t);

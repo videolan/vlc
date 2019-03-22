@@ -36,6 +36,7 @@
 #include <d3d11.h>
 
 #include "d3d11_quad.h"
+#include "common.h"
 
 #define SPHERE_SLICES 128
 #define nbLatBands SPHERE_SLICES
@@ -412,8 +413,8 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
 static void SetupQuadSphere(d3d_vertex_t *dst_data, const RECT *output,
                             const d3d_quad_t *quad, WORD *triangle_pos)
 {
-    const float scaleX = (float)(output->right  - output->left) / quad->i_width;
-    const float scaleY = (float)(output->bottom - output->top)   / quad->i_height;
+    const float scaleX = (float)(RECTWidth(*output))  / quad->i_width;
+    const float scaleY = (float)(RECTHeight(*output)) / quad->i_height;
     for (unsigned lat = 0; lat <= nbLatBands; lat++) {
         float theta = lat * (float) M_PI / nbLatBands;
         float sinTheta, cosTheta;
@@ -1067,14 +1068,10 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
 
 void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect, const d3d_format_t *display)
 {
-#define RECTWidth(r)   (LONG)((r)->right - (r)->left)
-#define RECTHeight(r)  (LONG)((r)->bottom - (r)->top)
     LONG srcAreaWidth, srcAreaHeight;
 
-    srcAreaWidth  = RECTWidth(rect);
-    srcAreaHeight = RECTHeight(rect);
-#undef RECTWidth
-#undef RECTHeight
+    srcAreaWidth  = RECTWidth(*rect);
+    srcAreaHeight = RECTHeight(*rect);
 
     quad->cropViewport[0].TopLeftX = rect->left;
     quad->cropViewport[0].TopLeftY = rect->top;

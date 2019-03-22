@@ -934,8 +934,8 @@ static void Manage (vout_display_t *vd)
         UINT width, height;
 
         GetClientRect(p_sys->sys.hvideownd, &rect);
-        width  = rect.right-rect.left;
-        height = rect.bottom-rect.top;
+        width  = RECTWidth(rect);
+        height = RECTHeight(rect);
 
         if (width != p_sys->pp.BackBufferWidth || height != p_sys->pp.BackBufferHeight)
         {
@@ -1045,8 +1045,8 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
 
         /* Map the subpicture to sys->sys.rect_dest */
         const RECT video = sys->sys.rect_dest;
-        const float scale_w = (float)(video.right  - video.left) / subpicture->i_original_picture_width;
-        const float scale_h = (float)(video.bottom - video.top)  / subpicture->i_original_picture_height;
+        const float scale_w = (float)(RECTWidth(video)) / subpicture->i_original_picture_width;
+        const float scale_h = (float)(RECTHeight(video))  / subpicture->i_original_picture_height;
 
         RECT dst;
         dst.left   = video.left + scale_w * r->i_x,
