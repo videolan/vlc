@@ -453,7 +453,12 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* Copy picture surface into texture surface
      * color space conversion happen here */
-    RECT copy_rect = sys->sys.rect_src_clipped;
+    RECT copy_rect = {
+        .left   = vd->source.i_x_offset,
+        .right  = vd->source.i_x_offset + vd->source.i_visible_width,
+        .top    = vd->source.i_y_offset,
+        .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
+    };
     // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
     // When copying the entire buffer, the margin end up being blended in the actual picture
     // on nVidia (regardless of even/odd dimensions)
@@ -472,7 +477,8 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* */
     region->texture = sys->sceneTexture;
-    Direct3D9SetupVertices(region->vertex, &vd->sys->sys.rect_src, &vd->sys->sys.rect_src_clipped,
+    Direct3D9SetupVertices(region->vertex, &vd->sys->sys.rect_src,
+                           &copy_rect,
                            &vd->sys->sys.rect_dest, 255, vd->source.orientation);
     return VLC_SUCCESS;
 }
