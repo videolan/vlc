@@ -148,23 +148,23 @@ static void Display(vout_display_t *vd, picture_t *picture)
 #define rect_src_clipped vd->sys->sys.rect_src_clipped
 #define rect_dest vd->sys->sys.rect_dest
 #define rect_dest_clipped vd->sys->sys.rect_dest_clipped
-    RECT rect_dst = rect_dest_clipped;
+    RECT dst_rect = rect_dest_clipped;
     HDC hdc = GetDC(sys->sys.hvideownd);
 
-    OffsetRect(&rect_dst, -rect_dest.left, -rect_dest.top);
+    OffsetRect(&dst_rect, -rect_dest.left, -rect_dest.top);
     SelectObject(sys->off_dc, sys->off_bitmap);
 
     if (RECTWidth(rect_dest_clipped) != RECTWidth(rect_src_clipped) ||
         RECTHeight(rect_dest_clipped) != RECTHeight(rect_src_clipped)) {
-        StretchBlt(hdc, rect_dst.left, rect_dst.top,
-                   rect_dst.right, rect_dst.bottom,
+        StretchBlt(hdc, dst_rect.left, dst_rect.top,
+                   dst_rect.right, dst_rect.bottom,
                    sys->off_dc,
                    rect_src_clipped.left,  rect_src_clipped.top,
                    rect_src_clipped.right, rect_src_clipped.bottom,
                    SRCCOPY);
     } else {
-        BitBlt(hdc, rect_dst.left, rect_dst.top,
-               rect_dst.right, rect_dst.bottom,
+        BitBlt(hdc, dst_rect.left, dst_rect.top,
+               dst_rect.right, dst_rect.bottom,
                sys->off_dc,
                rect_src_clipped.left, rect_src_clipped.top,
                SRCCOPY);
