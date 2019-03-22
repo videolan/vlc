@@ -75,7 +75,8 @@ typedef struct vout_display_sys_win32_t
 
     bool use_desktop;     /* show video on desktop window ? */
 
-    bool (*pf_GetRect)(const struct vout_display_sys_win32_t *p_sys, RECT *out);
+    bool (*pf_GetDisplayDimensions)(void *opaque, UINT *w, UINT *h);
+    void *opaque_dimensions;
 } vout_display_sys_win32_t;
 
 

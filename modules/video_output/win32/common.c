@@ -46,11 +46,16 @@
 #if !VLC_WINSTORE_APP
 static void CommonChangeThumbnailClip(vlc_object_t *, vout_display_sys_win32_t *, bool show);
 
-static bool GetRect(const vout_display_sys_win32_t *sys, RECT *out)
+static bool GetWindowDimensions(void *opaque, UINT *width, UINT *height)
 {
-    if (sys->b_windowless)
+    const vout_display_sys_win32_t *sys = opaque;
+    assert(!sys->b_windowless);
+    RECT out;
+    if (!GetClientRect(sys->hwnd, &out))
         return false;
-    return GetClientRect(sys->hwnd, out);
+    *width  = RECTWidth(out);
+    *height = RECTHeight(out);
+    return true;
 }
 #else /* VLC_WINSTORE_APP */
 static inline BOOL EqualRect(const RECT *r1, const RECT *r2)
@@ -59,6 +64,14 @@ static inline BOOL EqualRect(const RECT *r1, const RECT *r2)
             r1->top == r2->top && r1->bottom == r2->bottom;
 }
 #endif /* VLC_WINSTORE_APP */
+
+static bool GetExternalDimensions(void *opaque, UINT *width, UINT *height)
+{
+    const vout_display_t *vd = opaque;
+    *width  = vd->source.i_visible_width;
+    *height = vd->source.i_visible_height;
+    return true;
+}
 
 /* */
 int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowless, const vout_display_cfg_t *vdcfg)
@@ -72,13 +85,20 @@ int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowl
     sys->is_first_placement = true;
     sys->is_on_top        = false;
 
+    sys->pf_GetDisplayDimensions = GetExternalDimensions;
+    sys->opaque_dimensions = vd;
+
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
 #endif
 #if VLC_WINSTORE_APP
     memset(&sys->rect_display, 0, sizeof(sys->rect_display));
 #else /* !VLC_WINSTORE_APP */
-    sys->pf_GetRect = GetRect;
+    if (!b_windowless)
+    {
+        sys->pf_GetDisplayDimensions = GetWindowDimensions;
+        sys->opaque_dimensions = sys;
+    }
     SetRectEmpty(&sys->rect_parent);
 
     var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
@@ -131,32 +151,26 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
 {
     const video_format_t *source = &vd->source;
 
-    RECT  rect;
+    UINT  display_width, display_height;
     POINT point = { 0 };
 
     /* */
     const vout_display_cfg_t *cfg = &sys->vdcfg;
 
     /* Retrieve the window size */
-    if (sys->b_windowless)
+    if (!sys->pf_GetDisplayDimensions(sys->opaque_dimensions, &display_width, &display_height))
     {
-        rect.left   = 0;
-        rect.top    = 0;
-        rect.right  = vd->source.i_visible_width;
-        rect.bottom = vd->source.i_visible_height;
-    }
-    else
-    {
-        if (!sys->pf_GetRect(sys, &rect))
-            return;
+        msg_Err(vd, "could not get the window dimensions");
+        return;
     }
 
     /* If nothing changed, we can return */
     bool moved_or_resized;
 #if VLC_WINSTORE_APP
-    moved_or_resized = RECTWidth(rect)  != RECTWidth(sys->rect_display) ||
-                       RECTHeight(rect) != RECTHeight(sys->rect_display);
-    sys->rect_display = rect;
+    moved_or_resized = display_width  != RECTWidth(sys->sys.rect_display) ||
+                       display_height != RECTHeight(sys->sys.rect_display);
+    sys->sys.display_width = display_width;
+    sys->sys.display_height = display_height;
 #else
     if (sys->b_windowless)
     {
@@ -167,8 +181,12 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
         /* Retrieve the window position */
         ClientToScreen(sys->hwnd, &point);
 
-        OffsetRect(&rect, point.x, point.y);
-
+        RECT rect = {
+            .left   = point.x,
+            .right  = point.x + display_width,
+            .top    = point.y,
+            .bottom = point.y + display_height,
+        };
         moved_or_resized = EventThreadUpdateWindowPosition(sys->event, &rect);
     }
 #endif
@@ -177,8 +195,8 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
 
     /* Update the window position and size */
     vout_display_cfg_t place_cfg = *cfg;
-    place_cfg.display.width = RECTWidth(rect);
-    place_cfg.display.height = RECTHeight(rect);
+    place_cfg.display.width = display_width;
+    place_cfg.display.height = display_height;
 
 #if (defined(MODULE_NAME_IS_glwin32))
     /* Reverse vertical alignment as the GL tex are Y inverted */

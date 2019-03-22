@@ -157,11 +157,9 @@ static void UpdatePicQuadPosition(vout_display_t *);
 static int Control(vout_display_t *, int, va_list);
 
 #if VLC_WINSTORE_APP
-static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
+static bool GetExtenalSwapchainDimensions(void *opaque, UINT *width, UINT *height)
 {
-    const vout_display_sys_t *sys = (const vout_display_sys_t *)p_sys;
-    out->left   = 0;
-    out->top    = 0;
+    const vout_display_sys_t *sys = opaque;
     uint32_t i_width;
     uint32_t i_height;
     UINT dataSize = sizeof(i_width);
@@ -174,8 +172,8 @@ static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
     if (FAILED(hr)) {
         return false;
     }
-    out->right  = i_width;
-    out->bottom = i_height;
+    *width  = i_width;
+    *height = i_height;
     return true;
 }
 #endif
@@ -189,13 +187,9 @@ static inline bool RectEquals(const RECT *r1, const RECT *r2)
 static HRESULT UpdateBackBuffer(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    RECT rect;
-#if VLC_WINSTORE_APP
-    if (!GetRect(&sys->sys, &rect))
-#endif
-        rect = sys->sys.rect_dest;
-    uint32_t i_width = RECTWidth(rect);
-    uint32_t i_height = RECTHeight(rect);
+    UINT i_width, i_height;
+    i_width  = RECTWidth(sys->sys.rect_dest);
+    i_height = RECTHeight(sys->sys.rect_dest);
 
     if (!sys->resizeCb(sys->outside_opaque, i_width, i_height))
         return E_FAIL;
@@ -483,7 +477,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
 
 #if VLC_WINSTORE_APP
-    sys->sys.pf_GetRect = GetRect;
+    sys->sys.area.pf_GetDisplayDimensions = GetExtenalSwapchainDimensions;
+    sys->sys.area.opaque_dimensions = sys;
 #endif
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
