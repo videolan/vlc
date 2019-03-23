@@ -1208,6 +1208,8 @@ static const char *const psz_recursive_list_text[] = {
 #define SHOW_HIDDENFILES_LONGTEXT N_( \
         "Ignore files starting with '.'" )
 
+#define EXTRACTOR_FLATTEN N_("Flatten files listed by extractors (archive)")
+
 #define SD_TEXT N_( "Services discovery modules")
 #define SD_LONGTEXT N_( \
      "Specifies the services discovery modules to preload, separated by " \
@@ -2147,8 +2149,7 @@ vlc_module_begin ()
                 IGNORE_TEXT, IGNORE_LONGTEXT )
     add_bool( "show-hiddenfiles", false,
               SHOW_HIDDENFILES_TEXT, SHOW_HIDDENFILES_LONGTEXT )
-    add_bool( "extractor-flatten", false,
-              "Flatten files listed by extractors (archive)", NULL )
+    add_bool( "extractor-flatten", false, EXTRACTOR_FLATTEN, NULL )
         change_volatile()
 
     set_subcategory( SUBCAT_PLAYLIST_SD )
