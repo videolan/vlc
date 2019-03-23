@@ -147,8 +147,10 @@ vlc_module_begin ()
     add_string( ENC_CFG_PREFIX "chroma-fmt", "420", ENC_CHROMAFMT_TEXT,
                 ENC_CHROMAFMT_LONGTEXT, false )
     change_string_list( enc_chromafmt_list, enc_chromafmt_list_text )
+#endif
 vlc_module_end ()
 
+#ifdef ENABLE_SOUT
 static const char *const ppsz_enc_options[] = {
     "quality", "keyint", "chroma-fmt", NULL
 };
