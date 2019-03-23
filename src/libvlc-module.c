@@ -2819,11 +2819,11 @@ vlc_module_begin ()
 
 #define HELP_TEXT \
     N_("print help for VLC (can be combined with --help-verbose)")
-#define FULL_HELP_TEXT \
-    N_("Exhaustive help for VLC and its modules")
 #define LONGHELP_TEXT \
     N_("print help for VLC and all its modules (can be combined with " \
        "--help-verbose)")
+#define FULL_HELP_TEXT \
+    N_("print complete help (same as --longhelp --help-verbose)")
 #define HELP_VERBOSE_TEXT \
     N_("ask for extra verbosity when displaying help")
 #define LIST_TEXT \
@@ -2848,10 +2848,10 @@ vlc_module_begin ()
     add_bool( "help", false, HELP_TEXT, "", false )
         change_short( 'h' )
         change_volatile ()
+    add_bool( "longhelp", false, LONGHELP_TEXT, "", false )
+        change_volatile ()
     add_bool( "full-help", false, FULL_HELP_TEXT, "", false )
         change_short( 'H' )
-        change_volatile ()
-    add_bool( "longhelp", false, LONGHELP_TEXT, "", false )
         change_volatile ()
     add_bool( "help-verbose", false, HELP_VERBOSE_TEXT, "",
               false )
