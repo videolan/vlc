@@ -991,9 +991,12 @@ static void Close(vlc_object_t *obj)
 # endif
 #endif
 
+#define HELP_TEXT N_("Usage hint: [cdda:][device][@[track]]")
+
 vlc_module_begin ()
     set_shortname( N_("Audio CD") )
     set_description( N_("Audio CD input") )
+    set_help( HELP_TEXT )
     set_capability( "access", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
@@ -1001,7 +1004,6 @@ vlc_module_begin ()
 
     add_loadfile("cd-audio", CD_DEVICE, CDAUDIO_DEV_TEXT, CDAUDIO_DEV_LONGTEXT)
 
-    add_usage_hint( N_("[cdda:][device][@[track]]") )
     add_integer( "cdda-track", 0 , NULL, NULL, true )
         change_volatile ()
     add_integer( "cdda-first-sector", -1, NULL, NULL, true )
