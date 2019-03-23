@@ -1,14 +1,16 @@
 # Traditional Chinese translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # BISHAN LI <jurtobe@gmail.com>, 2015
 # BrLi <rainman59118@gmail.com>, 2013
-# Hsiu-Ming Chang <cges30901@gmail.com>, 2016
+# byStarTW (pan93412) <pan93412@gmail.com>, 2018
+# Cheng-Chia Tseng <pswo10680@gmail.com>, 2017
+# Hsiu-Ming Chang <cges30901@gmail.com>, 2016,2019
 # Ethan Chan <yunsangc207@gmail.com>, 2015
 # Ethan <ethan42411@gmail.com>, 2014
-# Frank Chao <frank0624@gmail.com>, 2013,2015,2018
+# Frank Chao <frank0624@gmail.com>, 2013,2015,2017-2018
 # jakech <jake83@gmail.com>, 2014
 # Jeff Huang <s8321414@gmail.com>, 2014
 # ljkTransifex <lingk12345@hotmail.com>, 2015
@@ -23,11 +25,11 @@
 # 洪嘉鴻 <jerry9030@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-29 12:07+0200\n"
-"Last-Translator: cges30901, 2018\n"
+"PO-Revision-Date: 2019-03-23 15:45+0100\n"
+"Last-Translator: Hsiu-Ming Chang <cges30901@gmail.com>, 2019\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/yaron/teams/16553/"
 "zh_TW/)\n"
 "Language: zh_TW\n"
@@ -3671,7 +3673,7 @@ msgstr "位置控制"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
-msgstr ""
+msgstr "反向位置控制"
 
 #: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
@@ -9274,7 +9276,7 @@ msgstr ""
 #: modules/audio_filter/stereo_widen.c:60
 #: modules/gui/qt/components/extended_panels.cpp:1338
 msgid "Feedback gain"
-msgstr ""
+msgstr "回饋增益"
 
 #: modules/audio_filter/chorus_flanger.c:89
 msgid "Gain on Feedback loop"
@@ -10055,7 +10057,7 @@ msgstr "K Audio Interface 音訊輸出"
 
 #: modules/audio_output/mmdevice.c:1451 modules/gui/qt/ui/sprefs_audio.h:419
 msgid "HDMI/SPDIF audio passthrough"
-msgstr ""
+msgstr "HDMI/SPDIF 音訊傳遞"
 
 #: modules/audio_output/mmdevice.c:1453
 msgid ""
@@ -10684,7 +10686,7 @@ msgstr "VLC 無法開啟 %4.4s %s 編碼器。"
 
 #: modules/codec/avcodec/vaapi.c:352
 msgid "VA-API video decoder via DRM"
-msgstr ""
+msgstr "VA-API 視訊解碼器經由 DRM"
 
 #: modules/codec/avcodec/vaapi.c:357
 msgid "VA-API video decoder"
@@ -15429,7 +15431,7 @@ msgstr "介面"
 #: modules/gui/qt/dialogs/plugins.cpp:392
 #: modules/gui/qt/managers/addons_manager.cpp:94
 msgid "Art and meta fetchers"
-msgstr ""
+msgstr "藝術與詮釋資料擷取器"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:113
 #: modules/gui/macosx/VLCAddonsWindowController.m:361
@@ -16215,12 +16217,12 @@ msgstr "啟用這個選項後，當視窗最小化時自動暫停播放。"
 
 #: modules/gui/macosx/macosx.m:108 modules/gui/qt/qt.cpp:182
 msgid "Allow automatic icon changes"
-msgstr ""
+msgstr "允許自動圖示變更"
 
 #: modules/gui/macosx/macosx.m:109 modules/gui/qt/qt.cpp:184
 msgid ""
 "This option allows the interface to change its icon on various occasions."
-msgstr ""
+msgstr "這個選項允許界面在各種場合更改圖示。"
 
 #: modules/gui/macosx/macosx.m:111 modules/gui/macosx/VLCMainMenu.m:1460
 msgid "Lock Aspect Ratio"
@@ -16312,7 +16314,7 @@ msgstr "永遠不會"
 
 #: modules/gui/macosx/macosx.m:145 modules/gui/qt/qt.cpp:186
 msgid "Maximum Volume displayed"
-msgstr ""
+msgstr "顯示的最大音量"
 
 #: modules/gui/macosx/macosx.m:149
 msgid "Mac OS X interface"
@@ -18256,7 +18258,7 @@ msgstr "開啟文字廣播"
 
 #: modules/gui/qt/components/controller.cpp:620
 msgid "Toggle Transparency"
-msgstr ""
+msgstr "切換透明"
 
 #: modules/gui/qt/components/controller.hpp:43
 msgid ""
@@ -18418,7 +18420,7 @@ msgstr "長寬比例"
 
 #: modules/gui/qt/components/epg/EPGWidget.cpp:65
 msgid "No EPG Data Available"
-msgstr ""
+msgstr "沒有可用的 EPG 資料"
 
 #: modules/gui/qt/components/extended_panels.cpp:380
 #: modules/gui/qt/components/extended_panels.cpp:393
@@ -18578,11 +18580,11 @@ msgstr "強制更新對話視窗中的數值"
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
-msgstr ""
+msgstr "指紋(&F)"
 
 #: modules/gui/qt/components/info_panels.cpp:133
 msgid "Find meta data using audio fingerprinting"
-msgstr ""
+msgstr "使用音訊指紋來尋找詮釋資料"
 
 #: modules/gui/qt/components/info_panels.cpp:154
 msgid "Comments"
@@ -18687,11 +18689,11 @@ msgstr "下載封面圖片"
 
 #: modules/gui/qt/components/interface_widgets.cpp:823
 msgid "Add cover art from file"
-msgstr ""
+msgstr "從檔案加入封面圖片"
 
 #: modules/gui/qt/components/interface_widgets.cpp:889
 msgid "Choose Cover Art"
-msgstr ""
+msgstr "選擇封面圖片"
 
 #: modules/gui/qt/components/interface_widgets.cpp:890
 msgid "Image Files (*.gif *.jpg *.jpeg *.png)"
@@ -18942,7 +18944,7 @@ msgstr "選擇檔案"
 msgid ""
 "Select or double click an action to change the associated hotkey. Use delete "
 "key to remove hotkeys."
-msgstr ""
+msgstr "選取或在一個動作上按兩下以改變它的相關熱鍵。使用刪除鍵刪除熱鍵。"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "in"
@@ -19273,11 +19275,11 @@ msgstr "已選取多個檔案。"
 
 #: modules/gui/qt/dialogs/convert.cpp:92
 msgid "Files will be placed in the same directory with the same name."
-msgstr ""
+msgstr "檔案會以相同的名稱放在相同的目錄。"
 
 #: modules/gui/qt/dialogs/convert.cpp:95
 msgid "Append '-converted' to filename"
-msgstr ""
+msgstr "將 '-converted' 附加到檔案名稱"
 
 #: modules/gui/qt/dialogs/convert.cpp:103
 msgid "Settings"
@@ -19289,7 +19291,7 @@ msgstr "顯示輸出"
 
 #: modules/gui/qt/dialogs/convert.cpp:119
 msgid "This display the resulting media, but can slow things down."
-msgstr ""
+msgstr "這會顯示生成的媒體，但會降低速度。"
 
 #: modules/gui/qt/dialogs/convert.cpp:136
 msgid "&Start"
@@ -19571,6 +19573,9 @@ msgid ""
 "or the path to a file on your computer,\n"
 "it will be automatically selected."
 msgstr ""
+"如果您的剪貼簿包含有效的網址\n"
+"或您的電腦中檔案的路徑，\n"
+"它會被自動選取。"
 
 #: modules/gui/qt/dialogs/plugins.cpp:79
 msgid "Plugins and extensions"
@@ -19578,7 +19583,7 @@ msgstr "外掛與擴充套件"
 
 #: modules/gui/qt/dialogs/plugins.cpp:87
 msgid "Active Extensions"
-msgstr ""
+msgstr "啟用的擴充套件"
 
 #: modules/gui/qt/dialogs/plugins.cpp:127
 msgid "Capability"
@@ -19605,7 +19610,7 @@ msgstr "重新載入擴充套件"
 msgid ""
 "Skins customize player's appearance. You can activate them through "
 "preferences."
-msgstr ""
+msgstr "面板能自訂播放器的外觀。您可以在偏好設定中啟用他們。"
 
 #: modules/gui/qt/dialogs/plugins.cpp:382
 msgid ""
@@ -19630,11 +19635,11 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:417
 msgid "Only installed"
-msgstr ""
+msgstr "只有已安裝的"
 
 #: modules/gui/qt/dialogs/plugins.cpp:523
 msgid "Retrieving addons..."
-msgstr ""
+msgstr "正在取得附加元件..."
 
 #: modules/gui/qt/dialogs/plugins.cpp:534
 msgid "No addons found"
@@ -19996,19 +20001,19 @@ msgstr "所有檔案"
 #: modules/gui/qt/extensions_manager.cpp:191
 #: modules/gui/qt/util/qmenuview.cpp:70
 msgid "Empty"
-msgstr ""
+msgstr "空的"
 
 #: modules/gui/qt/extensions_manager.cpp:197
 msgid "Deactivate"
-msgstr ""
+msgstr "停用"
 
 #: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
-msgstr ""
+msgstr "你要從上次的位置重新播放嗎？"
 
 #: modules/gui/qt/main_interface.cpp:379
 msgid "&Continue"
-msgstr ""
+msgstr "繼續(&C)"
 
 #: modules/gui/qt/main_interface.cpp:1412
 msgid "Control menu for the player"
@@ -20016,7 +20021,7 @@ msgstr "播放器的控制選單"
 
 #: modules/gui/qt/main_interface.cpp:1456
 msgid "Paused"
-msgstr ""
+msgstr "已暫停"
 
 #: modules/gui/qt/menus.cpp:331
 msgid "&Media"
@@ -20144,7 +20149,7 @@ msgstr "精簡介面(&N)"
 
 #: modules/gui/qt/menus.cpp:510
 msgid "Ctrl+H"
-msgstr ""
+msgstr "Ctrl+H"
 
 #: modules/gui/qt/menus.cpp:519
 msgid "&Fullscreen Interface"
@@ -20296,7 +20301,7 @@ msgstr "向前跳轉(&K)"
 
 #: modules/gui/qt/menus.cpp:926
 msgid "Ctrl+T"
-msgstr ""
+msgstr "Ctrl+T"
 
 #: modules/gui/qt/menus.cpp:941
 msgid "Open &Network..."
@@ -20312,15 +20317,15 @@ msgstr "播放(&P)"
 
 #: modules/gui/qt/menus.cpp:1174
 msgid "&Hide VLC media player in taskbar"
-msgstr ""
+msgstr "在工作列隱藏 VLC 媒體播放器(&H)"
 
 #: modules/gui/qt/menus.cpp:1180
 msgid "Sho&w VLC media player"
-msgstr ""
+msgstr "顯示 VLC 媒體播放器(&W)"
 
 #: modules/gui/qt/menus.cpp:1191
 msgid "&Open Media"
-msgstr ""
+msgstr "開啟媒體(&O)"
 
 #: modules/gui/qt/menus.cpp:1621
 msgid "&Clear"
@@ -20332,11 +20337,11 @@ msgstr "轉譯器(&R)"
 
 #: modules/gui/qt/menus.cpp:1633
 msgid "<Local>"
-msgstr ""
+msgstr "<Local>"
 
 #: modules/gui/qt/menus.cpp:1646
 msgid "Scanning..."
-msgstr ""
+msgstr "正在掃描..."
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -20364,7 +20369,7 @@ msgstr "啟動 VLC 時僅顯示系統列圖示"
 
 #: modules/gui/qt/qt.cpp:92
 msgid "VLC will start with just an icon in your taskbar."
-msgstr ""
+msgstr "啟動 VLC 時僅在工作列顯示圖示"
 
 #: modules/gui/qt/qt.cpp:101
 msgid "Show playing item name in window title"
@@ -20414,17 +20419,17 @@ msgstr "顯示不重要的錯誤與警告對話視窗"
 
 #: modules/gui/qt/qt.cpp:124
 msgid "Activate the updates availability notification"
-msgstr ""
+msgstr "啟用可用更新通知"
 
 #: modules/gui/qt/qt.cpp:125
 msgid ""
 "Activate the automatic notification of new versions of the software. It runs "
 "once every two weeks."
-msgstr ""
+msgstr "啟用軟體新版本的自動通知。它每兩個禮拜執行一次。"
 
 #: modules/gui/qt/qt.cpp:128
 msgid "Number of days between two update checks"
-msgstr ""
+msgstr "在兩次更新檢查之間的日數"
 
 #: modules/gui/qt/qt.cpp:130
 msgid "Ask for network policy at start"
@@ -20436,16 +20441,16 @@ msgstr "在選單中儲存最近播放過的項目"
 
 #: modules/gui/qt/qt.cpp:134
 msgid "List of words separated by | to filter"
-msgstr ""
+msgstr "要篩選的文字清單，以 | 間隔"
 
 #: modules/gui/qt/qt.cpp:135
 msgid ""
 "Regular expression used to filter the recent items played in the player."
-msgstr ""
+msgstr "用來篩選播放器最近播放的項目的正規表示法。"
 
 #: modules/gui/qt/qt.cpp:138
 msgid "Define the colors of the volume slider"
-msgstr ""
+msgstr "定義音訊滑鈕的顏色"
 
 #: modules/gui/qt/qt.cpp:139
 msgid ""
@@ -20485,7 +20490,7 @@ msgstr "定義全螢幕時使用的螢幕"
 
 #: modules/gui/qt/qt.cpp:155
 msgid "Screennumber of fullscreen, instead of same screen where interface is."
-msgstr ""
+msgstr "全螢幕的螢幕編號，而不是界面所在的螢幕。"
 
 #: modules/gui/qt/qt.cpp:158
 msgid "Load extensions on startup"
@@ -20493,7 +20498,7 @@ msgstr "啟動時載入擴充套件"
 
 #: modules/gui/qt/qt.cpp:159
 msgid "Automatically load the extensions module on startup."
-msgstr ""
+msgstr "啟動時自動載入擴充套件模組"
 
 #: modules/gui/qt/qt.cpp:162
 msgid "Start in minimal view (without menus)"
@@ -20511,11 +20516,11 @@ msgstr "非播放時顯示背景路障圖示或者目前的專輯封面。可被
 
 #: modules/gui/qt/qt.cpp:168
 msgid "Expanding background cone or art"
-msgstr ""
+msgstr "展開的背景路障圖示或專輯封面"
 
 #: modules/gui/qt/qt.cpp:169
 msgid "Background art fits window's size."
-msgstr ""
+msgstr "背景圖片符合視窗大小。"
 
 #: modules/gui/qt/qt.cpp:171
 msgid "Ignore keyboard volume buttons."
@@ -20531,7 +20536,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:188
 msgid "When to raise the interface"
-msgstr ""
+msgstr "何時自動抬升介面"
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
@@ -20578,11 +20583,11 @@ msgstr "面板檔案 |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
-msgstr ""
+msgstr "播放清單檔案 |"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
-msgstr ""
+msgstr "|所有檔案 |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -20594,7 +20599,7 @@ msgstr "儲存播放清單"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr ""
+msgstr "XSPF 播放清單 |*.xspf|M3U 檔案 |*.m3u|HTML 播放清單 |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
@@ -20606,7 +20611,7 @@ msgstr "使用面板的路徑。"
 
 #: modules/gui/skins2/src/skin_main.cpp:496
 msgid "Config of last used skin"
-msgstr ""
+msgstr "上次使用的面板的組態"
 
 #: modules/gui/skins2/src/skin_main.cpp:497
 msgid ""
@@ -20658,7 +20663,7 @@ msgstr "選擇面板"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
 msgid "Open skin..."
-msgstr ""
+msgstr "開啟面板..."
 
 #: modules/hw/d3d11/d3d11_filters.c:86 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -20813,7 +20818,7 @@ msgstr ""
 
 #: modules/hw/vdpau/avcodec.c:220
 msgid "VDPAU video decoder"
-msgstr ""
+msgstr "VDPAU 視訊解碼器"
 
 #: modules/hw/vdpau/chroma.c:883
 msgid "Temporal-spatial"
@@ -22483,9 +22488,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "H.264 視訊封包器"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -26435,7 +26439,7 @@ msgstr ""
 
 #: modules/video_output/wayland/shm.c:509
 msgid "Wayland shared memory video output"
-msgstr ""
+msgstr "Wayland 共享記憶體視訊輸出"
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -26835,7 +26839,7 @@ msgstr "glSpectrum"
 
 #: modules/visualization/glspectrum.c:63
 msgid "3D OpenGL spectrum visualization"
-msgstr ""
+msgstr "3D OpenGL 頻譜視覺效果"
 
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
@@ -27594,7 +27598,7 @@ msgstr "取樣率(&M)"
 
 #: modules/gui/qt/ui/profiles.h:766
 msgid "Profile &Name"
-msgstr ""
+msgstr "設定檔名稱(&N)"
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -27728,7 +27732,7 @@ msgstr "跳過 H.264 編碼迴路內去區塊效應濾波器"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
 msgid "x264 preset and tuning selection"
-msgstr ""
+msgstr "x264 設定樣式與調整選擇"
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
