@@ -71,7 +71,7 @@ vlc_module_begin ()
     add_file_extension("mov")
     add_file_extension("mp4")
 
-    add_category_hint("Hacks", NULL)
+    set_section("Hacks", NULL)
     add_bool( CFG_PREFIX"m4a-audioonly", false, MP4_M4A_TEXT, MP4_M4A_LONGTEXT, true )
 
     add_submodule()
