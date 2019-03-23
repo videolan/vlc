@@ -510,7 +510,7 @@
             int configType = p_configs[j].i_type;
 
             if (configType == CONFIG_CATEGORY) {
-                if( p_configs[j].value.i == -1 ) {
+                if( p_configs[j].value.i == CAT_HIDDEN ) {
                     categoryItem = nil;
                     continue;
                 }
@@ -525,7 +525,7 @@
 
             if (configType == CONFIG_SUBCATEGORY) {
                 lastsubcat = (int)p_configs[j].value.i;
-                if( lastsubcat == -1 ) {
+                if( lastsubcat == SUBCAT_HIDDEN ) {
                     subCategoryItem = nil;
                     continue;
                 }

@@ -97,7 +97,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent,
         {
         /* This is a category */
         case CONFIG_CATEGORY:
-            if( p_item->value.i == -1 ) break;
+            if( p_item->value.i == CAT_HIDDEN ) break;
 
             /* PrefsItemData Init */
             data = new PrefsItemData( this );
@@ -133,7 +133,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent,
 
         /* This is a subcategory */
         case CONFIG_SUBCATEGORY:
-            if( p_item->value.i == -1 ) break;
+            if( p_item->value.i == SUBCAT_HIDDEN ) break;
 
             /* Special cases: move the main subcategories to the parent cat*/
             if( data &&

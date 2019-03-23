@@ -2210,8 +2210,8 @@ vlc_module_begin ()
     add_string( "services-discovery", "", SD_TEXT, SD_LONGTEXT, true )
         change_short('S')
 
-    /* HACK so these don't get displayed in the GUI */
-    set_subcategory( -1 )
+    /* Not displayed in GUI, listed in help output though */
+    set_subcategory( SUBCAT_HIDDEN )
     set_section(N_("Bookmarks"), NULL)
     add_string( "bookmark1", NULL,
              BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, false )
@@ -2812,9 +2812,9 @@ vlc_module_begin ()
             SUBTEXT_SCALEDOWN_KEY_TEXT, SUBTEXT_SCALE_KEY_LONGTEXT)
 
 /* Miscellaneous */
-    /* HACK so these don't get displayed in the GUI */
-    set_category( -1 )
-    set_subcategory( -1 )
+    /* Not displayed in GUI, listed in help output though */
+    set_category( CAT_HIDDEN )
+    set_subcategory( SUBCAT_HIDDEN )
     add_category_hint(N_("Miscellaneous"), NULL)
 
 #define HELP_TEXT \

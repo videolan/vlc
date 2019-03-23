@@ -134,6 +134,12 @@ enum vlc_module_properties
 
 #define CONFIG_ITEM(x) (((x) & ~0xF) != 0)
 
+/* Hidden categories and subcategories */
+/* Any options under this will be hidden in the GUI preferences, but will be
+   listed in cmdline help output. */
+#define CAT_HIDDEN -1
+#define SUBCAT_HIDDEN -1
+
 /* Categories and subcategories */
 #define CAT_INTERFACE 1
 #define SUBCAT_INTERFACE_GENERAL 101
