@@ -109,7 +109,6 @@ enum vlc_module_properties
 
 /* Configuration hint types */
 #define CONFIG_HINT_CATEGORY                0x02  /* Start of new category */
-#define CONFIG_HINT_USAGE                   0x05  /* Usage information */
 
 #define CONFIG_CATEGORY                     0x06 /* Set category */
 #define CONFIG_SUBCATEGORY                  0x07 /* Set subcategory */
@@ -192,7 +191,7 @@ enum vlc_module_properties
 /**
  * Current plugin ABI version
  */
-#define VLC_API_VERSION_STRING "4.0.4"
+#define VLC_API_VERSION_STRING "4.0.5"
 
 /*****************************************************************************
  * Add a few defines. You do not want to read this section. Really.
@@ -377,9 +376,6 @@ VLC_METADATA_EXPORTS
 
 #define add_category_hint(text, longtext) \
     add_typedesc_inner( CONFIG_HINT_CATEGORY, text, longtext )
-
-#define add_usage_hint( text ) \
-    add_typedesc_inner( CONFIG_HINT_USAGE, text, NULL )
 
 #define add_string( name, value, text, longtext, advc ) \
     add_string_inner(CONFIG_ITEM_STRING, name, text, longtext, value)
