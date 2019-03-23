@@ -80,9 +80,6 @@ static OMX_ERRORTYPE OmxFillBufferDone( OMX_HANDLETYPE, OMX_PTR,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define DIRECTRENDERING_TEXT N_("OMX direct rendering")
-#define DIRECTRENDERING_LONGTEXT N_(\
-        "Enable OMX direct rendering.")
 
 #define CFG_PREFIX "omxil-"
 vlc_module_begin ()
