@@ -72,7 +72,7 @@ vlc_module_begin ()
 
     add_bool( "mkv-seek-percent", false,
             N_("Seek based on percent not time"),
-            N_("Seek based on percent not time."), true );
+            nullptr, true );
 
     add_bool( "mkv-use-dummy", false,
             N_("Dummy Elements"),

@@ -53,7 +53,6 @@
 
 #define MMAL_ADJUST_REFRESHRATE_NAME "mmal-adjust-refreshrate"
 #define MMAL_ADJUST_REFRESHRATE_TEXT N_("Adjust HDMI refresh rate to the video.")
-#define MMAL_ADJUST_REFRESHRATE_LONGTEXT N_("Adjust HDMI refresh rate to the video.")
 
 #define MMAL_NATIVE_INTERLACED "mmal-native-interlaced"
 #define MMAL_NATIVE_INTERLACE_TEXT N_("Force interlaced HDMI mode.")
@@ -79,7 +78,7 @@ vlc_module_begin()
 
     add_integer(MMAL_LAYER_NAME, 1, MMAL_LAYER_TEXT, MMAL_LAYER_LONGTEXT, false)
     add_bool(MMAL_ADJUST_REFRESHRATE_NAME, false, MMAL_ADJUST_REFRESHRATE_TEXT,
-                    MMAL_ADJUST_REFRESHRATE_LONGTEXT, false)
+                    NULL, false)
     add_bool(MMAL_NATIVE_INTERLACED, false, MMAL_NATIVE_INTERLACE_TEXT,
                     MMAL_NATIVE_INTERLACE_LONGTEXT, false)
     add_string(MMAL_DISPLAY_NAME, "auto", MMAL_DISPLAY_TEXT,

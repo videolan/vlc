@@ -129,7 +129,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_string( FILTER_PREFIX "color", "red",
-                BALL_COLOR_TEXT, BALL_COLOR_TEXT, false )
+                BALL_COLOR_TEXT, NULL, false )
     change_string_list( mode_list, mode_list_text )
 
     add_integer_with_range( FILTER_PREFIX "speed", 4, 1, 15,

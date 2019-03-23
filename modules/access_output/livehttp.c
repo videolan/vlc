@@ -120,7 +120,7 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "delsegs", true,
               DELSEGS_TEXT, DELSEGS_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "ratecontrol", false,
-              RATECONTROL_TEXT, RATECONTROL_TEXT, true )
+              RATECONTROL_TEXT, NULL, true )
     add_bool( SOUT_CFG_PREFIX "caching", false,
               NOCACHE_TEXT, NOCACHE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "generate-iv", false,
@@ -130,7 +130,7 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "index-url", NULL,
                 INDEXURL_TEXT, INDEXURL_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "key-uri", NULL,
-                KEYURI_TEXT, KEYURI_TEXT, true )
+                KEYURI_TEXT, NULL, true )
     add_loadfile(SOUT_CFG_PREFIX "key-file", NULL,
                  KEYFILE_TEXT, KEYFILE_LONGTEXT)
     add_loadfile(SOUT_CFG_PREFIX "key-loadfile", NULL,

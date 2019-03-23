@@ -104,8 +104,8 @@ vlc_module_begin ()
 #ifdef SCREEN_SUBSCREEN
     add_integer( "screen-top", 0, TOP_TEXT, TOP_LONGTEXT, true )
     add_integer( "screen-left", 0, LEFT_TEXT, LEFT_LONGTEXT, true )
-    add_integer( "screen-width", 0, WIDTH_TEXT, WIDTH_TEXT, true )
-    add_integer( "screen-height", 0, HEIGHT_TEXT, HEIGHT_TEXT, true )
+    add_integer( "screen-width", 0, WIDTH_TEXT, NULL, true )
+    add_integer( "screen-height", 0, HEIGHT_TEXT, NULL, true )
 
     add_bool( "screen-follow-mouse", false, FOLLOW_MOUSE_TEXT,
               FOLLOW_MOUSE_LONGTEXT, false )

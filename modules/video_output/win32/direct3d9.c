@@ -106,7 +106,7 @@ vlc_module_begin ()
     add_loadfile("direct3d9-shader-file", NULL,
                  PIXEL_SHADER_FILE_TEXT, PIXEL_SHADER_FILE_LONGTEXT)
 
-    add_bool("direct3d9-dxvahd", true, DXVAHD_TEXT, DXVAHD_LONGTEXT, true)
+    add_bool("direct3d9-dxvahd", true, DXVAHD_TEXT, NULL, true)
 
     add_shortcut("direct3d9", "direct3d")
     set_callback_display(Open, 280)

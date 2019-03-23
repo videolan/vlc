@@ -50,9 +50,7 @@
  * Module descriptor
  *****************************************************************************/
 #define ROWS_TEXT N_("Number of puzzle rows")
-#define ROWS_LONGTEXT N_("Number of puzzle rows")
 #define COLS_TEXT N_("Number of puzzle columns")
-#define COLS_LONGTEXT N_("Number of puzzle columns")
 #define MODE_TEXT N_("Game mode")
 #define MODE_LONGTEXT N_("Select game mode variation from jigsaw puzzle to sliding puzzle.")
 #define BORDER_TEXT N_("Border")
@@ -87,9 +85,9 @@ vlc_module_begin()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_integer_with_range( CFG_PREFIX "rows", 4, 2, 42,
-                            ROWS_TEXT, ROWS_LONGTEXT, false )
+                            ROWS_TEXT, NULL, false )
     add_integer_with_range( CFG_PREFIX "cols", 4, 2, 42,
-                            COLS_TEXT, COLS_LONGTEXT, false )
+                            COLS_TEXT, NULL, false )
     add_integer_with_range( CFG_PREFIX "border", 3, 0, 40,
               BORDER_TEXT, BORDER_LONGTEXT, false )
     add_bool( CFG_PREFIX "preview", false,

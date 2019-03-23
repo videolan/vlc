@@ -464,13 +464,11 @@ static void WindowClose( vout_window_t *pWnd )
 #define SKINS2_SYSTRAY      N_("Systray icon")
 #define SKINS2_SYSTRAY_LONG N_("Show a systray icon for VLC")
 #define SKINS2_TASKBAR      N_("Show VLC on the taskbar")
-#define SKINS2_TASKBAR_LONG N_("Show VLC on the taskbar")
 #define SKINS2_TRANSPARENCY      N_("Enable transparency effects")
 #define SKINS2_TRANSPARENCY_LONG N_("You can disable all transparency effects"\
     " if you want. This is mainly useful when moving windows does not behave" \
     " correctly.")
 #define SKINS2_PLAYLIST N_("Use a skinned playlist")
-#define SKINS2_PLAYLIST_LONG N_("Use a skinned playlist")
 #define SKINS2_VIDEO N_("Display video in a skinned window if any")
 #define SKINS2_VIDEO_LONG N_( \
     "When set to 'no', this parameter is intended to give old skins a chance" \
@@ -487,13 +485,13 @@ vlc_module_begin ()
     add_bool( "skins2-systray", true, SKINS2_SYSTRAY,
               SKINS2_SYSTRAY_LONG, false );
     add_bool( "skins2-taskbar", true, SKINS2_TASKBAR,
-              SKINS2_TASKBAR_LONG, false );
+              nullptr, false );
 #endif
     add_bool( "skins2-transparency", false, SKINS2_TRANSPARENCY,
               SKINS2_TRANSPARENCY_LONG, false );
 
     add_bool( "skinned-playlist", true, SKINS2_PLAYLIST,
-              SKINS2_PLAYLIST_LONG, false );
+              nullptr, false );
     add_bool( "skinned-video", true, SKINS2_VIDEO,
               SKINS2_VIDEO_LONG, false );
     set_shortname( N_("Skins"))

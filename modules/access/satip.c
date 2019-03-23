@@ -72,7 +72,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_INPUT_ACCESS)
     add_obsolete_integer("satip-buffer") /* obsolete since 4.0.0 */
     add_bool("satip-multicast", false, MULTICAST_TEXT, MULTICAST_LONGTEXT, true)
-    add_string("satip-host", "", SATIP_HOST_TEXT, SATIP_HOST_TEXT, true)
+    add_string("satip-host", "", SATIP_HOST_TEXT, NULL, true)
     change_safe()
     add_shortcut("rtsp", "satip")
 vlc_module_end()

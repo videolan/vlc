@@ -56,7 +56,7 @@
 #define PASS_LONGTEXT N_( "A single password restricts access " \
     "to this interface." )
 #define SRC_TEXT N_( "Source directory" )
-#define SRC_LONGTEXT N_( "Source directory" )
+#define SRC_LONGTEXT NULL
 #define INDEX_TEXT N_( "Directory index" )
 #define INDEX_LONGTEXT N_( "Allow to build directory index" )
 
@@ -80,7 +80,7 @@ vlc_module_begin ()
         set_category( CAT_INTERFACE )
         set_subcategory( SUBCAT_INTERFACE_MAIN )
 
-        add_bool( "lua", true, LUA_TEXT, LUA_TEXT, true );
+        add_bool( "lua", true, LUA_TEXT, NULL, true );
         add_string( "lua-intf", "dummy", INTF_TEXT, INTF_LONGTEXT, false )
         add_string( "lua-config", "", CONFIG_TEXT, CONFIG_LONGTEXT, false )
         set_capability( "interface", 0 )

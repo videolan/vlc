@@ -142,8 +142,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec, AVCodecContext *, const AVCodec * );
   "control, but will cause a delay in the stream." )
 
 #define ENC_RC_BUF_AGGR_TEXT N_( "Rate control buffer aggressiveness" )
-#define ENC_RC_BUF_AGGR_LONGTEXT N_( "Rate control "\
-  "buffer aggressiveness." )
 
 #define ENC_IQUANT_FACTOR_TEXT N_( "I quantization factor" )
 #define ENC_IQUANT_FACTOR_LONGTEXT N_(  \
@@ -174,12 +172,8 @@ int ffmpeg_OpenCodec( decoder_t *p_dec, AVCodecContext *, const AVCodec * );
   "threshold to ease the encoder's task." )
 
 #define ENC_QMIN_TEXT N_( "Minimum video quantizer scale" )
-#define ENC_QMIN_LONGTEXT N_( "Minimum video " \
-  "quantizer scale." )
 
 #define ENC_QMAX_TEXT N_( "Maximum video quantizer scale" )
-#define ENC_QMAX_LONGTEXT N_( "Maximum video " \
-  "quantizer scale." )
 
 #define ENC_TRELLIS_TEXT N_( "Trellis quantization" )
 #define ENC_TRELLIS_LONGTEXT N_( "Enable trellis " \

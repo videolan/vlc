@@ -73,15 +73,15 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_INPUT_ACODEC)
     set_callbacks (Open, Close)
     add_loadfile("soundfont", "", SOUNDFONT_TEXT, SOUNDFONT_LONGTEXT)
-    add_bool ("synth-chorus", true, CHORUS_TEXT, CHORUS_TEXT, false)
+    add_bool ("synth-chorus", true, CHORUS_TEXT, NULL, false)
     add_float ("synth-gain", .5, GAIN_TEXT, GAIN_LONGTEXT, false)
         change_float_range (0., 10.)
     add_integer ("synth-polyphony", 256,
                  POLYPHONY_TEXT, POLYPHONY_LONGTEXT, false)
         change_integer_range (1, 65535)
-    add_bool ("synth-reverb", true, REVERB_TEXT, REVERB_TEXT, true)
+    add_bool ("synth-reverb", true, REVERB_TEXT, NULL, true)
     add_integer ("synth-sample-rate", 44100,
-                 SAMPLE_RATE_TEXT, SAMPLE_RATE_TEXT, true)
+                 SAMPLE_RATE_TEXT, NULL, true)
         change_integer_range (22050, 96000)
 vlc_module_end ()
 

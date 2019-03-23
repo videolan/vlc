@@ -49,7 +49,6 @@
 #define AFDLINE_INDEX_LONGTEXT N_("VBI line on which to output Active Format Descriptor.")
 
 #define NOSIGNAL_IMAGE_TEXT N_("Picture to display on input signal loss")
-#define NOSIGNAL_IMAGE_LONGTEXT NOSIGNAL_IMAGE_TEXT
 
 #define CARD_INDEX_TEXT N_("Output card")
 #define CARD_INDEX_LONGTEXT N_(\
@@ -200,13 +199,13 @@ vlc_module_begin ()
     add_integer(CFG_PREFIX "afd-line", 16,
                 AFDLINE_INDEX_TEXT, AFDLINE_INDEX_LONGTEXT, true)
     add_integer_with_range(CFG_PREFIX "afd", 8, 0, 16,
-                AFD_INDEX_TEXT, AFD_INDEX_TEXT, true)
+                AFD_INDEX_TEXT, nullptr, true)
                 change_integer_list(rgi_afd_values, rgsz_afd_text)
     add_integer_with_range(CFG_PREFIX "ar", 1, 0, 1,
                 AR_INDEX_TEXT, AR_INDEX_LONGTEXT, true)
                 change_integer_list(rgi_ar_values, rgsz_ar_text)
     add_loadfile(CFG_PREFIX "nosignal-image", NULL,
-                 NOSIGNAL_IMAGE_TEXT, NOSIGNAL_IMAGE_LONGTEXT)
+                 NOSIGNAL_IMAGE_TEXT, nullptr)
 
     set_section(N_("DeckLink Audio Options"), NULL)
     add_integer_with_range(CFG_PREFIX "channels", 2, 0, 16,

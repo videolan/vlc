@@ -457,7 +457,7 @@ vlc_module_begin()
             SRT_DEFAULT_BANDWIDTH_OVERHEAD_LIMIT,
             N_( "SRT maximum bandwidth ceiling (bytes)" ), NULL, true )
     add_integer( SRT_PARAM_KEY_LENGTH, SRT_DEFAULT_KEY_LENGTH, SRT_KEY_LENGTH_TEXT,
-            SRT_KEY_LENGTH_TEXT, false )
+            NULL, false )
     change_integer_list( srt_key_lengths, srt_key_length_names )
     add_string(SRT_PARAM_STREAMID, "",
             N_(" SRT Stream ID"), NULL, false)

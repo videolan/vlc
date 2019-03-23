@@ -102,7 +102,7 @@ vlc_module_begin ()
                  AUDIO_CHAN_TEXT, AUDIO_CHAN_LONGTEXT, false)
         change_integer_list (channels, channels_text)
     add_integer("alsa-passthrough", PASSTHROUGH_NONE, PASSTHROUGH_TEXT,
-                PASSTHROUGH_TEXT, false)
+                NULL, false)
         change_integer_list(passthrough_modes, passthrough_modes_text)
     add_sw_gain ()
     set_capability( "audio output", 150 )

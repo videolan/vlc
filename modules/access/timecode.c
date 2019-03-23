@@ -46,7 +46,7 @@ vlc_module_begin ()
     set_capability ("access", 0)
     set_callback(Open)
 
-    add_string ("timecode-fps", "25/1", FPS_TEXT, FPS_TEXT, false)
+    add_string ("timecode-fps", "25/1", FPS_TEXT, NULL, false)
         change_string_list (fps_values, fps_texts)
         change_safe ()
 vlc_module_end ()

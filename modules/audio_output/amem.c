@@ -46,15 +46,15 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
 
     add_string ("amem-format", "S16N",
-                N_("Sample format"), N_("Sample format"), false)
+                N_("Sample format"), NULL, false)
         change_string_list( format_list, format_list )
         change_private()
     add_integer ("amem-rate", 44100,
-                 N_("Sample rate"), N_("Sample rate"), false)
+                 N_("Sample rate"), NULL, false)
         change_integer_range (1, AMEM_SAMPLE_RATE_MAX)
         change_private()
     add_integer ("amem-channels", 2,
-                 N_("Channels count"), N_("Channels count"), false)
+                 N_("Channels count"), NULL, false)
         change_integer_range (1, AMEM_CHAN_MAX)
         change_private()
 

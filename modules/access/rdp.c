@@ -95,7 +95,7 @@ vlc_module_begin()
         change_safe()
     add_float( CFG_PREFIX "fps", 5, RDP_FPS, RDP_FPS_LONGTEXT, true )
 
-    add_bool( CFG_PREFIX "encrypt", false, RDP_ENCRYPT, RDP_ENCRYPT, true )
+    add_bool( CFG_PREFIX "encrypt", false, RDP_ENCRYPT, NULL, true )
         change_safe()
 
     set_callbacks( Open, Close )

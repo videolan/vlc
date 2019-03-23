@@ -145,7 +145,6 @@ static void     Close(vlc_object_t *);
     "by the codec standard.")
 
 #define NUM_REF_FRAME_TEXT N_("Number of reference frames")
-#define NUM_REF_FRAME_LONGTEXT N_("Number of reference frames")
 
 #define ASYNC_DEPTH_TEXT N_("Number of parallel operations")
 #define ASYNC_DEPTH_LONGTEXT N_("Defines the number of parallel " \
@@ -242,7 +241,7 @@ vlc_module_begin ()
     add_integer(SOUT_CFG_PREFIX "convergence", 0, CONVERGENCE_TEXT, CONVERGENCE_LONGTEXT, true)
 
     add_integer(SOUT_CFG_PREFIX "num-slice", 0, NUM_SLICE_TEXT, NUM_SLICE_LONGTEXT, true)
-    add_integer(SOUT_CFG_PREFIX "num-ref-frame", 0, NUM_REF_FRAME_TEXT, NUM_REF_FRAME_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "num-ref-frame", 0, NUM_REF_FRAME_TEXT, NULL, true)
 
     add_integer(SOUT_CFG_PREFIX "async-depth", 4, ASYNC_DEPTH_TEXT, ASYNC_DEPTH_LONGTEXT, true)
         change_integer_range(1, 32)

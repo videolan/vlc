@@ -420,13 +420,13 @@ vlc_module_begin ()
 
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_MCBLK_SIZE, NULL,
-                ENC_MCBLK_SIZE_TEXT, ENC_MCBLK_SIZE_TEXT, true )
+                ENC_MCBLK_SIZE_TEXT, NULL, true )
     change_string_list( enc_block_size_list, enc_block_size_list_text )
 
 
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_MCBLK_OVERLAP, NULL,
-                ENC_MCBLK_OVERLAP_TEXT, ENC_MCBLK_OVERLAP_TEXT, true )
+                ENC_MCBLK_OVERLAP_TEXT, NULL, true )
     change_string_list( enc_block_overlap_list, enc_block_overlap_list_text )
 
     /* advanced option only */
@@ -436,7 +436,7 @@ vlc_module_begin ()
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_ME_HIERARCHICAL, -1,
-                 ENC_ME_HIERARCHICAL_TEXT, ENC_ME_HIERARCHICAL_TEXT, true )
+                 ENC_ME_HIERARCHICAL_TEXT, NULL, true )
     change_integer_range(-1, 1 );
 
     /* advanced option only */
@@ -446,20 +446,20 @@ vlc_module_begin ()
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_ME_GLOBAL_MOTION, -1,
-                 ENC_ME_GLOBAL_MOTION_TEXT, ENC_ME_GLOBAL_MOTION_TEXT, true )
+                 ENC_ME_GLOBAL_MOTION_TEXT, NULL, true )
     change_integer_range(-1, 1 );
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_ME_PHASECORR, -1,
-                 ENC_ME_PHASECORR_TEXT, ENC_ME_PHASECORR_TEXT, true )
+                 ENC_ME_PHASECORR_TEXT, NULL, true )
     change_integer_range(-1, 1 );
 
     add_string( ENC_CFG_PREFIX ENC_DWTINTRA, NULL,
-                ENC_DWTINTRA_TEXT, ENC_DWTINTRA_TEXT, false )
+                ENC_DWTINTRA_TEXT, NULL, false )
     change_string_list( enc_wavelet_list, enc_wavelet_list_text )
 
     add_string( ENC_CFG_PREFIX ENC_DWTINTER, NULL,
-                ENC_DWTINTER_TEXT, ENC_DWTINTER_TEXT, false )
+                ENC_DWTINTER_TEXT, NULL, false )
     change_string_list( enc_wavelet_list, enc_wavelet_list_text )
 
     add_integer( ENC_CFG_PREFIX ENC_DWTDEPTH, -1,
@@ -473,7 +473,7 @@ vlc_module_begin ()
 
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_SCBLK_SIZE, NULL,
-                ENC_SCBLK_SIZE_TEXT, ENC_SCBLK_SIZE_TEXT, true )
+                ENC_SCBLK_SIZE_TEXT, NULL, true )
     change_string_list( enc_codeblock_size_list, enc_codeblock_size_list_text )
 
     add_string( ENC_CFG_PREFIX ENC_PREFILTER, NULL,
@@ -486,12 +486,12 @@ vlc_module_begin ()
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_SCD, -1,
-                 ENC_SCD_TEXT, ENC_SCD_TEXT, true )
+                 ENC_SCD_TEXT, NULL, true )
     change_integer_range(-1, 1 );
 
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_PWT, NULL,
-                ENC_PWT_TEXT, ENC_PWT_TEXT, true )
+                ENC_PWT_TEXT, NULL, true )
     change_string_list( enc_perceptual_weighting_list, enc_perceptual_weighting_list )
 
     /* advanced option only */
@@ -516,7 +516,7 @@ vlc_module_begin ()
 
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_FORCE_PROFILE, NULL,
-                ENC_FORCE_PROFILE_TEXT, ENC_FORCE_PROFILE_TEXT, true )
+                ENC_FORCE_PROFILE_TEXT, NULL, true )
     change_string_list( enc_profile_list, enc_profile_list_text )
 
 vlc_module_end ()

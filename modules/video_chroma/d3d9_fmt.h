@@ -32,7 +32,6 @@
 #include "dxgi_fmt.h"
 
 #define DXVAHD_TEXT N_("Use DXVA-HD for color conversion")
-#define DXVAHD_LONGTEXT N_("Use DXVA-HD for color conversion")
 
 /* owned by the vout for VLC_CODEC_D3D9_OPAQUE */
 typedef struct

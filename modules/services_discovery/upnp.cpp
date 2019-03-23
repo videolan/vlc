@@ -141,10 +141,10 @@ vlc_module_begin()
     set_callbacks( SD::OpenSD, SD::CloseSD );
 
     add_string( "satip-channelist", "auto", SATIP_CHANNEL_LIST,
-                SATIP_CHANNEL_LIST, false )
+                nullptr, false )
     change_string_list( ppsz_satip_channel_lists, ppsz_readible_satip_channel_lists )
     add_string( "satip-channellist-url", NULL, SATIP_CHANNEL_LIST_URL,
-                SATIP_CHANNEL_LIST_URL, false )
+                nullptr, false )
 
     add_submodule()
         set_category( CAT_INPUT )

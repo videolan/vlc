@@ -242,7 +242,6 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define PBRATIO_LONGTEXT N_( "QP factor between P and B. Range 1.0 to 2.0.")
 
 #define CHROMA_QP_OFFSET_TEXT N_("QP difference between chroma and luma")
-#define CHROMA_QP_OFFSET_LONGTEXT N_( "QP difference between chroma and luma.")
 
 #define PASS_TEXT N_("Multipass ratecontrol")
 #define PASS_LONGTEXT N_( "Multipass ratecontrol:\n" \
@@ -273,7 +272,6 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
     "(p4x4 requires p8x8. i8x8 requires 8x8dct).")
 
 #define DIRECT_PRED_TEXT N_("Direct MV prediction mode")
-#define DIRECT_PRED_LONGTEXT DIRECT_PRED_TEXT
 
 #define DIRECT_PRED_SIZE_TEXT N_("Direct prediction size")
 #define DIRECT_PRED_SIZE_LONGTEXT N_( "Direct prediction size:\n" \
@@ -282,7 +280,6 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
     " - -1: smallest possible according to level" )
 
 #define WEIGHTB_TEXT N_("Weighted prediction for B-frames")
-#define WEIGHTB_LONGTEXT N_( "Weighted prediction for B-frames.")
 
 #define WEIGHTP_TEXT N_("Weighted prediction for P-frames")
 #define WEIGHTP_LONGTEXT N_("Weighted prediction for P-frames:\n" \
@@ -349,7 +346,6 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
     "This requires CABAC." )
 
 #define FAST_PSKIP_TEXT N_("Early SKIP detection on P-frames")
-#define FAST_PSKIP_LONGTEXT N_( "Early SKIP detection on P-frames.")
 
 #define DCT_DECIMATE_TEXT N_("Coefficient thresholding on P-frames")
 #define DCT_DECIMATE_LONGTEXT N_( "Coefficient thresholding on P-frames. " \
@@ -584,7 +580,7 @@ vlc_module_begin ()
         change_float_range( 1, 2 )
 
     add_integer( SOUT_CFG_PREFIX "chroma-qp-offset", 0, CHROMA_QP_OFFSET_TEXT,
-                 CHROMA_QP_OFFSET_LONGTEXT, true )
+                 NULL, true )
 
     add_integer( SOUT_CFG_PREFIX "pass", 0, PASS_TEXT,
                  PASS_LONGTEXT, false )
@@ -614,7 +610,7 @@ vlc_module_begin ()
         change_string_list( enc_analyse_list, enc_analyse_list_text )
 
     add_string( SOUT_CFG_PREFIX "direct", "spatial", DIRECT_PRED_TEXT,
-                DIRECT_PRED_LONGTEXT, true )
+                NULL, true )
         change_string_list( direct_pred_list, direct_pred_list_text )
 
     add_integer( SOUT_CFG_PREFIX "direct-8x8", 1, DIRECT_PRED_SIZE_TEXT,
@@ -622,7 +618,7 @@ vlc_module_begin ()
         change_integer_range( -1, 1 )
 
     add_bool( SOUT_CFG_PREFIX "weightb", true, WEIGHTB_TEXT,
-              WEIGHTB_LONGTEXT, true )
+              NULL, true )
 
     add_integer( SOUT_CFG_PREFIX "weightp", 2, WEIGHTP_TEXT,
               WEIGHTP_LONGTEXT, true )
@@ -672,7 +668,7 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "mbtree", true, MBTREE_TEXT, MBTREE_LONGTEXT, true )
 
     add_bool( SOUT_CFG_PREFIX "fast-pskip", true, FAST_PSKIP_TEXT,
-              FAST_PSKIP_LONGTEXT, true )
+              NULL, true )
 
     add_bool( SOUT_CFG_PREFIX "dct-decimate", true, DCT_DECIMATE_TEXT,
               DCT_DECIMATE_LONGTEXT, true )
@@ -706,7 +702,7 @@ vlc_module_begin ()
               SSIM_LONGTEXT, true )
 
     add_bool( SOUT_CFG_PREFIX "quiet", false, QUIET_TEXT,
-              QUIET_TEXT, true )
+              NULL, true )
 
     add_integer( SOUT_CFG_PREFIX "sps-id", 0, SPS_ID_TEXT,
                  SPS_ID_LONGTEXT, true )
@@ -720,11 +716,11 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "stats", "x264_2pass.log", STATS_TEXT,
                 STATS_LONGTEXT, true )
 
-    add_string( SOUT_CFG_PREFIX "preset", NULL , PRESET_TEXT , PRESET_TEXT, false )
+    add_string( SOUT_CFG_PREFIX "preset", NULL , PRESET_TEXT , NULL, false )
         vlc_config_set (VLC_CONFIG_LIST,
             (sizeof(x264_preset_names) / sizeof (char*)) - 1,
             x264_preset_names, x264_preset_names);
-    add_string( SOUT_CFG_PREFIX "tune", NULL , TUNE_TEXT, TUNE_TEXT, false )
+    add_string( SOUT_CFG_PREFIX "tune", NULL , TUNE_TEXT, NULL, false )
         vlc_config_set (VLC_CONFIG_LIST,
             (sizeof(x264_tune_names) / sizeof (char*)) - 1,
             x264_tune_names, x264_tune_names);

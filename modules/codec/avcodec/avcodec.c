@@ -96,7 +96,7 @@ vlc_module_begin ()
     set_callbacks(InitSubtitleDec, EndSubtitleDec)
 
     add_obsolete_bool( "ffmpeg-dr" ) /* removed since 2.1.0 */
-    add_bool( "avcodec-dr", true, DR_TEXT, DR_TEXT, true )
+    add_bool( "avcodec-dr", true, DR_TEXT, NULL, true )
     add_bool( "avcodec-corrupted", true, CORRUPTED_TEXT, CORRUPTED_LONGTEXT, false )
     add_obsolete_integer ( "ffmpeg-error-resilience" ) /* removed since 2.1.0 */
     add_integer ( "avcodec-error-resilience", 1, ERROR_TEXT,
@@ -197,7 +197,7 @@ vlc_module_begin ()
     add_integer( ENC_CFG_PREFIX "rc-buffer-size", 0,
                  ENC_RC_BUF_TEXT, ENC_RC_BUF_LONGTEXT, true )
     add_float( ENC_CFG_PREFIX "rc-buffer-aggressivity", 1.0,
-               ENC_RC_BUF_AGGR_TEXT, ENC_RC_BUF_AGGR_LONGTEXT, true )
+               ENC_RC_BUF_AGGR_TEXT, NULL, true )
     add_float( ENC_CFG_PREFIX "i-quant-factor", 0,
                ENC_IQUANT_FACTOR_TEXT, ENC_IQUANT_FACTOR_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "noise-reduction", 0,
@@ -205,9 +205,9 @@ vlc_module_begin ()
     add_bool( ENC_CFG_PREFIX "mpeg4-matrix", false,
               ENC_MPEG4_MATRIX_TEXT, ENC_MPEG4_MATRIX_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "qmin", 0,
-                 ENC_QMIN_TEXT, ENC_QMIN_LONGTEXT, true )
+                 ENC_QMIN_TEXT, NULL, true )
     add_integer( ENC_CFG_PREFIX "qmax", 0,
-                 ENC_QMAX_TEXT, ENC_QMAX_LONGTEXT, true )
+                 ENC_QMAX_TEXT, NULL, true )
     add_bool( ENC_CFG_PREFIX "trellis", false,
               ENC_TRELLIS_TEXT, ENC_TRELLIS_LONGTEXT, true )
     add_float( ENC_CFG_PREFIX "qscale", 3,

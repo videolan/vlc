@@ -323,5 +323,5 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_callback_display(vlc_vidsplit_Open, 0)
     add_module("video-splitter", "video splitter", NULL,
-               N_("Video splitter module"), N_("Video splitter module"))
+               N_("Video splitter module"), NULL)
 vlc_module_end()

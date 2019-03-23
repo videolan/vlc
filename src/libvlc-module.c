@@ -345,8 +345,6 @@ static const char *const ppsz_align_descriptions[] =
     "n milliseconds.")
 
 #define DEINTERLACE_TEXT N_("Deinterlace")
-#define DEINTERLACE_LONGTEXT N_(\
-    "Deinterlace")
 static const int pi_deinterlace[] = {
     0, -1, 1
 };
@@ -402,8 +400,6 @@ static const char *const screensaver_texts[] = {
     "Directory where the video snapshots will be stored.")
 
 #define SNAP_PREFIX_TEXT N_("Video snapshot file prefix")
-#define SNAP_PREFIX_LONGTEXT N_( \
-    "Video snapshot file prefix" )
 
 #define SNAP_FORMAT_TEXT N_("Video snapshot format")
 #define SNAP_FORMAT_LONGTEXT N_( \
@@ -1546,7 +1542,7 @@ vlc_module_begin ()
     add_float( "volume-step", AOUT_VOLUME_STEP, VOLUME_STEP_TEXT,
                  VOLUME_STEP_LONGTEXT, true )
         change_float_range( 1., AOUT_VOLUME_DEFAULT )
-    add_bool( "volume-save", true, VOLUME_SAVE_TEXT, VOLUME_SAVE_TEXT, true )
+    add_bool( "volume-save", true, VOLUME_SAVE_TEXT, NULL, true )
     add_obsolete_integer( "aout-rate" ) /* since 2.0.0 */
     add_obsolete_bool( "hq-resampling" ) /* since 1.1.8 */
 #if defined(__ANDROID__) || defined(__APPLE__) || defined(_WIN32)
@@ -1557,7 +1553,7 @@ vlc_module_begin ()
     add_integer( "force-dolby-surround", 0, FORCE_DOLBY_TEXT,
                  FORCE_DOLBY_LONGTEXT, false )
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions )
-    add_integer( "stereo-mode", 0, STEREO_MODE_TEXT, STEREO_MODE_TEXT, true )
+    add_integer( "stereo-mode", 0, STEREO_MODE_TEXT, NULL, true )
         change_integer_list( pi_stereo_mode_values, ppsz_stereo_mode_texts )
     add_integer( "audio-desync", 0, DESYNC_TEXT,
                  DESYNC_LONGTEXT, true )
@@ -1648,7 +1644,7 @@ vlc_module_begin ()
     set_section( N_("Snapshot") , NULL )
     add_directory("snapshot-path", NULL, SNAP_PATH_TEXT, SNAP_PATH_LONGTEXT)
     add_string( "snapshot-prefix", "vlcsnap-", SNAP_PREFIX_TEXT,
-                   SNAP_PREFIX_LONGTEXT, false )
+                   NULL, false )
     add_string( "snapshot-format", "png", SNAP_FORMAT_TEXT,
                    SNAP_FORMAT_LONGTEXT, false )
         change_string_list( ppsz_snap_formats, ppsz_snap_formats )
@@ -1696,7 +1692,7 @@ vlc_module_begin ()
     add_float( "zoom", 1., ZOOM_TEXT, ZOOM_LONGTEXT, true )
         change_safe()
     add_integer( "deinterlace", -1,
-                 DEINTERLACE_TEXT, DEINTERLACE_LONGTEXT, false )
+                 DEINTERLACE_TEXT, NULL, false )
         change_integer_list( pi_deinterlace, ppsz_deinterlace_text )
         change_safe()
     add_string( "deinterlace-mode", "auto",
@@ -1807,7 +1803,7 @@ vlc_module_begin ()
                  INPUT_SUBTRACK_ID_TEXT, INPUT_SUBTRACK_ID_LONGTEXT, true )
         change_safe ()
     add_integer( "captions", 608,
-                 INPUT_CAPTIONS_TEXT, INPUT_CAPTIONS_TEXT, true )
+                 INPUT_CAPTIONS_TEXT, NULL, true )
         change_integer_list( pi_captions, ppsz_captions )
         change_safe ()
     add_integer( "preferred-resolution", -1, INPUT_PREFERREDRESOLUTION_TEXT,
@@ -1848,7 +1844,7 @@ vlc_module_begin ()
         change_safe ()
 
     add_integer( "restore-playback-pos", VLC_PLAYER_RESTORE_PLAYBACK_POS_ASK,
-                 RESTORE_PLAYBACK_POS_TEXT, RESTORE_PLAYBACK_POS_TEXT, false )
+                 RESTORE_PLAYBACK_POS_TEXT, NULL, false )
     add_bool( "restore-playback-states", false,
                  RESTORE_PLAYBACK_STATE_TEXT, RESTORE_PLAYBACK_STATE_LONGTEXT, false )
 
@@ -2129,7 +2125,7 @@ vlc_module_begin ()
 #endif
 
 #ifdef _WIN32
-    add_string( "clock-source", NULL, CLOCK_SOURCE_TEXT, CLOCK_SOURCE_TEXT, true )
+    add_string( "clock-source", NULL, CLOCK_SOURCE_TEXT, NULL, true )
         change_string_list( clock_sources, clock_sources_text )
 #endif
 
@@ -2164,8 +2160,7 @@ vlc_module_begin ()
               STARTEDFROMFILE_LONGTEXT, true )
         change_volatile ()
     add_bool( "one-instance-when-started-from-file", 1,
-              ONEINSTANCEWHENSTARTEDFROMFILE_TEXT,
-              ONEINSTANCEWHENSTARTEDFROMFILE_TEXT, true )
+              ONEINSTANCEWHENSTARTEDFROMFILE_TEXT, NULL, true )
     add_bool( "playlist-enqueue", 0, PLAYLISTENQUEUE_TEXT,
               PLAYLISTENQUEUE_LONGTEXT, true )
 #endif

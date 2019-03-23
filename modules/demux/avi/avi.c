@@ -76,7 +76,7 @@ vlc_module_begin ()
     add_file_extension("avi")
 
     add_bool( "avi-interleaved", false,
-              INTERLEAVE_TEXT, INTERLEAVE_TEXT, true )
+              INTERLEAVE_TEXT, NULL, true )
     add_integer( "avi-index", 0,
               INDEX_TEXT, INDEX_LONGTEXT, false )
         change_integer_list( pi_index, ppsz_indexes )

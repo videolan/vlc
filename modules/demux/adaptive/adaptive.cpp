@@ -132,9 +132,9 @@ vlc_module_begin ()
         add_string( "adaptive-logic",  "", ADAPT_LOGIC_TEXT, nullptr, false )
             change_string_list( ppsz_logics_values, ppsz_logics )
         add_integer( "adaptive-maxwidth",  0,
-                     ADAPT_WIDTH_TEXT,  ADAPT_WIDTH_TEXT,  false )
+                     ADAPT_WIDTH_TEXT,  nullptr,  false )
         add_integer( "adaptive-maxheight", 0,
-                     ADAPT_HEIGHT_TEXT, ADAPT_HEIGHT_TEXT, false )
+                     ADAPT_HEIGHT_TEXT, nullptr, false )
         add_integer( "adaptive-bw",     250, ADAPT_BW_TEXT,     ADAPT_BW_LONGTEXT,     false )
         add_bool   ( "adaptive-use-access", false, ADAPT_ACCESS_TEXT, ADAPT_ACCESS_LONGTEXT, true );
         add_integer( "adaptive-livedelay",
