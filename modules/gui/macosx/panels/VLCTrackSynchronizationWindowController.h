@@ -2,7 +2,7 @@
  * VLCTrackSynchronizationWindowController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2011-2012 VLC authors and VideoLAN
- * Copyright (C) 2011-2015 Felix Paul Kühne
+ * Copyright (C) 2011-2019 Felix Paul Kühne
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *
@@ -46,11 +46,10 @@
 @property (readwrite, weak) IBOutlet NSTextField *sv_durTextField;
 @property (readwrite, weak) IBOutlet NSStepper *sv_durStepper;
 
-
 - (void)updateCocoaWindowLevel:(NSInteger)i_level;
+
 - (IBAction)toggleWindow:(id)sender;
 - (IBAction)resetValues:(id)sender;
-- (void)updateValues;
 
 - (IBAction)avValueChanged:(id)sender;
 

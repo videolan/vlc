@@ -2,7 +2,7 @@
  * VLCTrackSynchronizationWindowController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2011-2014 VLC authors and VideoLAN
- * Copyright (C) 2011-2015 Felix Paul Kühne
+ * Copyright (C) 2011-2019 Felix Paul Kühne
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *
@@ -23,11 +23,7 @@
 
 #import "VLCTrackSynchronizationWindowController.h"
 
-#import <vlc_common.h>
-#import <vlc_playlist_legacy.h>
-
 #import "coreinteraction/VLCVideoFilterHelper.h"
-#import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
@@ -38,17 +34,46 @@
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY   1
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT 2
 
+@interface VLCTrackSynchronizationWindowController()
+{
+    VLCPlayerController *_playerController;
+}
+@end
+
 @implementation VLCTrackSynchronizationWindowController
 
 - (id)init
 {
     self = [super initWithWindowNibName:@"SyncTracks"];
-
     return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)windowDidLoad
 {
+    _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateValues:)
+                               name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateValues:)
+                               name:VLCPlayerAudioDelayChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateValues:)
+                               name:VLCPlayerSubtitlesDelayChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateValues:)
+                               name:VLCPlayerSubtitlesFPSChanged
+                             object:nil];
+
     [self.window setTitle:_NS("Track Synchronization")];
     [_resetButton setTitle:_NS("Reset")];
     [_avLabel setStringValue:_NS("Audio/Video")];
@@ -104,7 +129,7 @@
         [self.window setLevel: [[[VLCMain sharedInstance] voutProvider] currentStatusWindowLevel]];
         [self.window makeKeyAndOrderFront:sender];
 
-        [self updateValues];
+        [self updateValues:nil];
     }
 }
 
@@ -119,27 +144,19 @@
     [_sv_speedStepper setFloatValue:1.0];
     [_sv_durStepper setFloatValue:0.0];
 
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
+    _playerController.audioDelay = 0;
+    _playerController.subtitlesDelay = 0;
+    _playerController.subtitlesFPS = 1.;
 
-    if (p_input) {
-        var_SetInteger(p_input, "audio-delay", 0);
-        var_SetInteger(p_input, "spu-delay", 0);
-        var_SetFloat(p_input, "sub-fps", 1.0);
-        [self svDurationValueChanged:nil];
-        input_Release(p_input);
-    }
+    [self svDurationValueChanged:nil];
 }
 
-- (void)updateValues
+- (void)updateValues:(NSNotification *)aNotification
 {
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
+    [_av_advanceTextField setDoubleValue: secf_from_vlc_tick(_playerController.audioDelay)];
+    [_sv_advanceTextField setDoubleValue: secf_from_vlc_tick(_playerController.subtitlesDelay)];
+    [_sv_speedTextField setFloatValue: _playerController.subtitlesFPS];
 
-    if (p_input) {
-        [_av_advanceTextField setDoubleValue: secf_from_vlc_tick(var_GetInteger(p_input, "audio-delay"))];
-        [_sv_advanceTextField setDoubleValue: secf_from_vlc_tick(var_GetInteger(p_input, "spu-delay"))];
-        [_sv_speedTextField setFloatValue: var_GetFloat(p_input, "sub-fps")];
-        input_Release(p_input);
-    }
     [_avStepper setDoubleValue: [_av_advanceTextField doubleValue]];
     [_sv_advanceStepper setDoubleValue: [_sv_advanceTextField doubleValue]];
     [_sv_speedStepper setDoubleValue: [_sv_speedTextField doubleValue]];
@@ -152,12 +169,7 @@
     else
         [_avStepper setDoubleValue: [_av_advanceTextField doubleValue]];
 
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-
-    if (p_input) {
-        var_SetInteger(p_input, "audio-delay", vlc_tick_from_sec([_av_advanceTextField doubleValue]));
-        input_Release(p_input);
-    }
+    _playerController.audioDelay = vlc_tick_from_sec([_av_advanceTextField doubleValue]);
 }
 
 - (IBAction)svAdvanceValueChanged:(id)sender
@@ -167,12 +179,7 @@
     else
         [_sv_advanceStepper setDoubleValue: [_sv_advanceTextField doubleValue]];
 
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-
-    if (p_input) {
-        var_SetInteger(p_input, "spu-delay", vlc_tick_from_sec([_sv_advanceTextField doubleValue]));
-        input_Release(p_input);
-    }
+    _playerController.subtitlesDelay = vlc_tick_from_sec([_sv_advanceTextField doubleValue]);
 }
 
 - (IBAction)svSpeedValueChanged:(id)sender
@@ -182,12 +189,7 @@
     else
         [_sv_speedStepper setFloatValue: [_sv_speedTextField floatValue]];
 
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-
-    if (p_input) {
-        var_SetFloat(p_input, "sub-fps", [_sv_speedTextField floatValue]);
-        input_Release(p_input);
-    }
+    _playerController.subtitlesFPS = [_sv_speedTextField floatValue];
 }
 
 - (IBAction)svDurationValueChanged:(id)sender
@@ -197,23 +199,18 @@
     else
         [_sv_durStepper setFloatValue: [_sv_durTextField floatValue]];
 
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
+    float f_factor = [_sv_durTextField floatValue];
+    NSArray<NSValue *> *vouts = [_playerController allVideoOutputThreads];
 
-    if (p_input) {
-        float f_factor = [_sv_durTextField floatValue];
-        NSArray<NSValue *> *vouts = [[[[VLCMain sharedInstance] playlistController] playerController] allVideoOutputThreads];
+    if (vouts) {
+        for (NSValue *ptr in vouts) {
+            vout_thread_t *p_vout = [ptr pointerValue];
 
-        if (vouts)
-            for (NSValue *ptr in vouts) {
-                vout_thread_t *p_vout = [ptr pointerValue];
-
-                var_SetFloat(p_vout, SUBSDELAY_CFG_FACTOR, f_factor);
-                vout_Release(p_vout);
-            }
-        [VLCVideoFilterHelper setVideoFilter: "subsdelay" on: f_factor > 0];
-
-        input_Release(p_input);
+            var_SetFloat(p_vout, SUBSDELAY_CFG_FACTOR, f_factor);
+            vout_Release(p_vout);
+        }
     }
+    [VLCVideoFilterHelper setVideoFilter: "subsdelay" on: f_factor > 0];
 }
 
 @end
