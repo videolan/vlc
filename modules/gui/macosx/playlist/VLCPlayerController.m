@@ -48,6 +48,7 @@ NSString *VLCPlayerTeletextPageChanged = @"VLCPlayerTeletextPageChanged";
 NSString *VLCPlayerTeletextTransparencyChanged = @"VLCPlayerTeletextTransparencyChanged";
 NSString *VLCPlayerAudioDelayChanged = @"VLCPlayerAudioDelayChanged";
 NSString *VLCPlayerSubtitlesDelayChanged = @"VLCPlayerSubtitlesDelayChanged";
+NSString *VLCPlayerSubtitlesFPSChanged = @"VLCPlayerSubtitlesFPSChanged";
 NSString *VLCPlayerSubtitleTextScalingFactorChanged = @"VLCPlayerSubtitleTextScalingFactorChanged";
 NSString *VLCPlayerRecordingChanged = @"VLCPlayerRecordingChanged";
 NSString *VLCPlayerRendererChanged = @"VLCPlayerRendererChanged";
@@ -95,6 +96,7 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 - (void)audioDelayChanged:(vlc_tick_t)audioDelay;
 - (void)rendererChanged:(vlc_renderer_item_t *)newRendererItem;
 - (void)subtitlesDelayChanged:(vlc_tick_t)subtitlesDelay;
+- (void)subtitlesFPSChanged:(float)subtitlesFPS;
 - (void)recordingChanged:(BOOL)recording;
 - (void)inputStatsUpdated:(VLCInputStats *)inputStats;
 - (void)stopActionChanged:(enum vlc_player_media_stopped_action)stoppedAction;
@@ -263,6 +265,15 @@ static void cb_player_subtitle_delay_changed(vlc_player_t *p_player, vlc_tick_t 
     });
 }
 
+static void cb_player_associated_subs_fps_changed(vlc_player_t *p_player, float subs_fps, void *p_data)
+{
+    VLC_UNUSED(p_player);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController subtitlesFPSChanged:subs_fps];
+    });
+}
+
 static void cb_player_renderer_changed(vlc_player_t *p_player,
                                        vlc_renderer_item_t *p_new_renderer,
                                        void *p_data)
@@ -375,7 +386,7 @@ static const struct vlc_player_cbs player_callbacks = {
     cb_player_teletext_transparency_changed,
     cb_player_audio_delay_changed,
     cb_player_subtitle_delay_changed,
-    NULL, //cb_player_associated_subs_fps_changed,
+    cb_player_associated_subs_fps_changed,
     cb_player_renderer_changed,
     cb_player_record_changed,
     NULL, //cb_player_signal_changed,
@@ -1041,6 +1052,20 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 {
     vlc_player_Lock(_p_player);
     vlc_player_SetSubtitleDelay(_p_player, subtitlesDelay, VLC_PLAYER_WHENCE_ABSOLUTE);
+    vlc_player_Unlock(_p_player);
+}
+
+- (void)subtitlesFPSChanged:(float)subtitlesFPS
+{
+    _subtitlesFPS = subtitlesFPS;
+    [_defaultNotificationCenter postNotificationName:VLCPlayerSubtitlesFPSChanged
+                                              object:self];
+}
+
+- (void)setSubtitlesFPS:(float)subtitlesFPS
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_SetAssociatedSubsFPS(_p_player, subtitlesFPS);
     vlc_player_Unlock(_p_player);
 }
 

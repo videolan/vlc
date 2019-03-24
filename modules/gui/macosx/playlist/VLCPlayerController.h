@@ -129,6 +129,12 @@ extern NSString *VLCPlayerAudioDelayChanged;
 extern NSString *VLCPlayerSubtitlesDelayChanged;
 
 /**
+ * Listen to VLCPlayerSubtitlesFPSChanged to be notified if the subtitles FPS of the current media changes
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerSubtitlesFPSChanged;
+
+/**
  * Listen to VLCPlayerRecordingChanged to be notified if the recording state of the current media changes
  * @note the affected player object will be the object of the notification
  */
@@ -478,6 +484,13 @@ extern NSString *VLCPlayerMuteChanged;
  * @note listen to VLCPlayerSubtitlesDelayChanged to be notified about changes to this property
  */
 @property (readwrite, nonatomic) vlc_tick_t subtitlesDelay;
+
+/**
+ * the subtitles fps to correct mismatch between video and text
+ * the default value shall be 1.0
+ * @note listen to VLCPlayerSubtitlesFPSChanged to be notified about changes to this property
+ */
+@property (readwrite, nonatomic) float subtitlesFPS;
 
 /**
  * a scale factor for text based subtitles, range 10 - 500, default 100
