@@ -437,27 +437,27 @@ int CommonControl(vout_display_t *vd, vout_display_sys_win32_t *sys, int query, 
         UpdateRects(vd, sys, true);
         return VLC_SUCCESS;
     }
-#if !VLC_WINSTORE_APP
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg */
     {   /* Update dimensions */
-        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-        RECT rect_window = {
-            .top    = 0,
-            .left   = 0,
-            .right  = cfg->display.width,
-            .bottom = cfg->display.height,
-        };
-
-        if (!cfg->is_fullscreen && !sys->b_windowless) {
+        sys->vdcfg = *va_arg(args, const vout_display_cfg_t *);
+#if !VLC_WINSTORE_APP
+        if (!sys->vdcfg.is_fullscreen && !sys->b_windowless) {
+            RECT rect_window = {
+                .top    = 0,
+                .left   = 0,
+                .right  = sys->vdcfg.display.width,
+                .bottom = sys->vdcfg.display.height,
+            };
             AdjustWindowRect(&rect_window, EventThreadGetWindowStyle(sys->event), 0);
             SetWindowPos(sys->hwnd, 0, 0, 0,
                          RECTWidth(rect_window),
                          RECTHeight(rect_window), SWP_NOMOVE);
         }
-        sys->vdcfg = *cfg;
+#endif /* !VLC_WINSTORE_APP */
         UpdateRects(vd, sys, false);
         return VLC_SUCCESS;
     }
+#if !VLC_WINSTORE_APP
     case VOUT_DISPLAY_CHANGE_WINDOW_STATE: {       /* unsigned state */
         const unsigned state = va_arg(args, unsigned);
         const bool is_on_top = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
