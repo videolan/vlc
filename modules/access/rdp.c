@@ -457,7 +457,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Parse uri params for pre-connect */
     vlc_url_t url;
-    vlc_UrlParse( &url, p_demux->psz_location );
+    vlc_UrlParse( &url, p_demux->psz_url );
 
     if ( !EMPTY_STR(url.psz_host) )
         p_sys->psz_hostname = strdup( url.psz_host );
