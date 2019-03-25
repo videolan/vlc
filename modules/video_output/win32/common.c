@@ -219,9 +219,9 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
         SetWindowPos(sys->hvideownd, 0,
             sys->place.x, sys->place.y, sys->place.width, sys->place.height,
             swpFlags);
-    }
 
-    CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
+        CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
+    }
 #endif
 }
 
