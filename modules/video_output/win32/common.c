@@ -203,26 +203,29 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
             sys->place.x, sys->place.y,
             sys->place.x + sys->place.width, sys->place.y + sys->place.height);
 #endif
-    }
 
 #if !VLC_WINSTORE_APP
-    if (!sys->b_windowless)
-    {
-        EventThreadUpdatePlace(sys->event, &sys->place);
-
-        UINT swpFlags = SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS;
-        if (sys->is_first_placement)
+        if (sys != NULL)
         {
-            swpFlags |= SWP_SHOWWINDOW;
-            sys->is_first_placement = false;
-        }
-        SetWindowPos(sys->hvideownd, 0,
-            sys->place.x, sys->place.y, sys->place.width, sys->place.height,
-            swpFlags);
+            EventThreadUpdatePlace(sys->event, &sys->place);
 
-        CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
-    }
+            if (sys->hvideownd)
+            {
+                UINT swpFlags = SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS;
+                if (sys->is_first_placement)
+                {
+                    swpFlags |= SWP_SHOWWINDOW;
+                    sys->is_first_placement = false;
+                }
+                SetWindowPos(sys->hvideownd, 0,
+                    sys->place.x, sys->place.y, sys->place.width, sys->place.height,
+                    swpFlags);
+            }
+
+            CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
+        }
 #endif
+    }
 }
 
 #if !VLC_WINSTORE_APP
