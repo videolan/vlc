@@ -52,8 +52,7 @@ void            EventThreadStop( event_thread_t * );
 
 void            EventThreadUpdateTitle( event_thread_t *, const char *psz_fallback );
 int             EventThreadGetWindowStyle( event_thread_t * );
-void            EventThreadUpdateSourceAndPlace( event_thread_t *p_event,
-                                                 const video_format_t *p_source,
+void            EventThreadUpdatePlace( event_thread_t *p_event,
                                                  const vout_display_place_t *p_place );
 bool            EventThreadGetAndResetHasMoved( event_thread_t * );
 

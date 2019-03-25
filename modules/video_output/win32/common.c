@@ -208,7 +208,7 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
 #if !VLC_WINSTORE_APP
     if (!sys->b_windowless)
     {
-        EventThreadUpdateSourceAndPlace(sys->event, source, &sys->place);
+        EventThreadUpdatePlace(sys->event, &sys->place);
 
         UINT swpFlags = SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS;
         if (sys->is_first_placement)

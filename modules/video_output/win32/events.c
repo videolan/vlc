@@ -87,7 +87,6 @@ struct event_thread_t
     HWND hwnd;
     HWND hvideownd;
     HWND hfswnd;
-    video_format_t       source;
     vout_display_place_t place;
 
     HICON vlc_icon;
@@ -408,12 +407,10 @@ int EventThreadGetWindowStyle( event_thread_t *p_event )
     return p_event->i_window_style;
 }
 
-void EventThreadUpdateSourceAndPlace( event_thread_t *p_event,
-                                      const video_format_t *p_source,
+void EventThreadUpdatePlace( event_thread_t *p_event,
                                       const vout_display_place_t *p_place )
 {
     vlc_mutex_lock( &p_event->lock );
-    p_event->source = *p_source;
     p_event->place  = *p_place;
     vlc_mutex_unlock( &p_event->lock );
 }
@@ -449,7 +446,6 @@ event_thread_t *EventThreadCreate( vout_display_t *vd, const vout_display_cfg_t 
     p_event->is_cursor_hidden = false;
     p_event->button_pressed = 0;
     p_event->psz_title = NULL;
-    p_event->source = vd->source;
     p_event->hwnd = NULL;
     atomic_init(&p_event->has_moved, false);
     vout_display_PlacePicture(&p_event->place, &vd->source, vdcfg);
