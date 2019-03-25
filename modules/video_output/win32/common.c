@@ -84,8 +84,6 @@ int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowl
     sys->b_windowless = b_windowless;
     sys->is_first_placement = true;
     sys->is_on_top        = false;
-    sys->display_width = 0;
-    sys->display_height = 0;
 
     sys->pf_GetDisplayDimensions = GetExternalDimensions;
     sys->opaque_dimensions = vd;
@@ -147,7 +145,7 @@ int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowl
 * its job is to update the source and destination RECTs used to display the
 * picture.
 *****************************************************************************/
-void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forced)
+void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys)
 {
     const video_format_t *source = &vd->source;
 
@@ -162,14 +160,6 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
         msg_Err(vd, "could not get the window dimensions");
         return;
     }
-
-    /* If nothing changed, we can return */
-    bool resized = display_width  != sys->display_width ||
-                   display_height != sys->display_height;
-    sys->display_width = display_width;
-    sys->display_height = display_height;
-    if (!is_forced && !resized)
-        return;
 
     /* Update the window position and size */
     vout_display_cfg_t place_cfg = *cfg;
@@ -271,12 +261,12 @@ void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys)
                          RECTHeight(rect_parent),
                          SWP_NOZORDER);
 
-            UpdateRects(vd, sys, false);
+            UpdateRects(vd, sys);
         }
     }
 
     if (EventThreadGetAndResetSizeChanged(sys->event))
-        UpdateRects(vd, sys, false);
+        UpdateRects(vd, sys);
 }
 
 /* */
@@ -418,7 +408,7 @@ static int CommonControlSetFullscreen(vlc_object_t *obj, vout_display_sys_win32_
 void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys)
 {
     /* just check the rendering size didn't change */
-    UpdateRects(vd, sys, false);
+    UpdateRects(vd, sys);
 }
 #endif /* VLC_WINSTORE_APP */
 
@@ -429,9 +419,8 @@ int CommonControl(vout_display_t *vd, vout_display_sys_win32_t *sys, int query, 
     case VOUT_DISPLAY_CHANGE_ZOOM:           /* const vout_display_cfg_t *p_cfg */
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {
-        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-        sys->vdcfg = *cfg;
-        UpdateRects(vd, sys, true);
+        sys->vdcfg = *va_arg(args, const vout_display_cfg_t *);
+        UpdateRects(vd, sys);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg */
@@ -451,7 +440,7 @@ int CommonControl(vout_display_t *vd, vout_display_sys_win32_t *sys, int query, 
                          RECTHeight(rect_window), SWP_NOMOVE);
         }
 #endif /* !VLC_WINSTORE_APP */
-        UpdateRects(vd, sys, false);
+        UpdateRects(vd, sys);
         return VLC_SUCCESS;
     }
 #if !VLC_WINSTORE_APP
@@ -478,7 +467,7 @@ int CommonControl(vout_display_t *vd, vout_display_sys_win32_t *sys, int query, 
         bool fs = va_arg(args, int);
         if (CommonControlSetFullscreen(VLC_OBJECT(vd), sys, fs))
             return VLC_EGENERIC;
-        UpdateRects(vd, sys, false);
+        UpdateRects(vd, sys);
         return VLC_SUCCESS;
     }
 #endif /* !VLC_WINSTORE_APP */

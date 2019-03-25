@@ -841,7 +841,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 sys->picQuad.i_height = texDesc.Height;
                 sys->picQuad.i_width = texDesc.Width;
 
-                UpdateRects(vd, &sys->sys, true);
+                UpdateRects(vd, &sys->sys);
                 UpdateSize(vd);
             }
         }
@@ -1457,7 +1457,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
-    UpdateRects(vd, &sys->sys, true);
+    UpdateRects(vd, &sys->sys);
 
     video_format_t surface_fmt = *fmt;
     surface_fmt.i_width  = sys->picQuad.i_width;
@@ -1567,7 +1567,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
-    UpdateRects(vd, &sys->sys, true);
+    UpdateRects(vd, &sys->sys);
 
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {

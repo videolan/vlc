@@ -262,7 +262,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     if (!sys->sys.b_windowless)
         EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (WinGDI output)");
 
-    UpdateRects(vd, &sys->sys, true);
+    UpdateRects(vd, &sys->sys);
 
     return VLC_SUCCESS;
 }

@@ -50,9 +50,6 @@ typedef struct vout_display_sys_win32_t
     HWND                 hparent;             /* Handle of the parent window */
     HWND                 hfswnd;          /* Handle of the fullscreen window */
 
-    /* current size of the display */
-    UINT display_width, display_height;
-
     /* size of the overall window (including black bands) */
     RECT         rect_parent;
 
@@ -88,7 +85,7 @@ void CommonClean(vlc_object_t *, vout_display_sys_win32_t *);
 void CommonManage(vout_display_t *, vout_display_sys_win32_t *);
 int  CommonControl(vout_display_t *, vout_display_sys_win32_t *, int , va_list );
 
-void UpdateRects (vout_display_t *, vout_display_sys_win32_t *, bool is_forced);
+void UpdateRects (vout_display_t *, vout_display_sys_win32_t *);
 
 /*****************************************************************************
  * Constants
