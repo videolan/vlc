@@ -252,15 +252,12 @@ void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys)
      * ourselves because the parent might not send us its events. */
     if (sys->hparent) {
         RECT rect_parent;
-        POINT point;
 
         /* Check if the parent window has resized or moved */
         GetClientRect(sys->hparent, &rect_parent);
-        point.x = point.y = 0;
-        ClientToScreen(sys->hparent, &point);
-        OffsetRect(&rect_parent, point.x, point.y);
 
-        if (!EqualRect(&rect_parent, &sys->rect_parent)) {
+        if (RECTWidth(rect_parent)  != RECTWidth(sys->rect_parent) ||
+            RECTHeight(rect_parent) != RECTHeight(sys->rect_parent)) {
             sys->rect_parent = rect_parent;
 
             /* This code deals with both resize and move
