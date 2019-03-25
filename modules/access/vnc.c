@@ -439,7 +439,11 @@ static int Open( vlc_object_t *p_this )
 
     /* Parse uri params */
     vlc_url_t url;
-    vlc_UrlParse( &url, p_demux->psz_location );
+    char *psz_url;
+    if ( asprintf( &psz_url, "%s://%s", p_demux->psz_access, p_demux->psz_location ) == -1 )
+        return VLC_ENOMEM;
+    vlc_UrlParse( &url, psz_url );
+    free(psz_url);
 
     if ( !EMPTY_STR(url.psz_host) )
         p_sys->p_client->serverHost = strdup( url.psz_host );
