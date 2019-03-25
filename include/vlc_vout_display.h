@@ -443,6 +443,13 @@ typedef struct {
     unsigned height;
 } vout_display_place_t;
 
+static inline bool vout_display_PlaceEquals(const vout_display_place_t *p1,
+                                            const vout_display_place_t *p2)
+{
+    return p1->x == p2->x && p1->width == p2->width &&
+            p1->y == p2->y && p1->height == p2->height;
+}
+
 /**
  * Computes how to place a picture inside the display to respect
  * the given parameters.
