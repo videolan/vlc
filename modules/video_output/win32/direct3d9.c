@@ -1680,7 +1680,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->desktop_save.is_fullscreen = cfg->is_fullscreen;
     sys->desktop_save.is_on_top     = false;
 
-    if (CommonInit(vd, &sys->area, &sys->sys, d3d9_device != NULL, cfg))
+    InitArea(vd, &sys->area, cfg);
+    if (CommonInit(vd, &sys->area, &sys->sys, d3d9_device != NULL))
         goto error;
 
     /* */

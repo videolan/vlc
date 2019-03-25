@@ -479,12 +479,13 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
     }
 #endif
-    if (CommonInit(vd, &sys->area, &sys->sys, d3d11_ctx != NULL, cfg))
+    InitArea(vd, &sys->area, cfg);
+    if (CommonInit(vd, &sys->area, &sys->sys, d3d11_ctx != NULL))
         goto error;
 
 #if VLC_WINSTORE_APP
-    sys->sys.area.pf_GetDisplayDimensions = GetExtenalSwapchainDimensions;
-    sys->sys.area.opaque_dimensions = sys;
+    sys->area.pf_GetDisplayDimensions = GetExtenalSwapchainDimensions;
+    sys->area.opaque_dimensions = sys;
 #endif
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)

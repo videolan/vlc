@@ -73,7 +73,7 @@ static bool GetExternalDimensions(void *opaque, UINT *width, UINT *height)
     return true;
 }
 
-static void InitArea(vout_display_t *vd, display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
+void InitArea(vout_display_t *vd, display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
 {
     area->place_changed = false;
     area->pf_GetDisplayDimensions = GetExternalDimensions;
@@ -83,10 +83,8 @@ static void InitArea(vout_display_t *vd, display_win32_area_t *area, const vout_
 
 /* */
 int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys,
-               bool b_windowless, const vout_display_cfg_t *vdcfg)
+               bool b_windowless)
 {
-    InitArea(vd, area, vdcfg);
-
     sys->hwnd      = NULL;
     sys->hvideownd = NULL;
     sys->hparent   = NULL;
@@ -114,7 +112,7 @@ int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_
     var_Create(vd, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
     /* */
-    sys->event = EventThreadCreate(vd, vdcfg);
+    sys->event = EventThreadCreate(vd, &area->vdcfg);
     if (!sys->event)
         return VLC_EGENERIC;
 
@@ -125,8 +123,8 @@ int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_
 #endif
     cfg.x      = var_InheritInteger(vd, "video-x");
     cfg.y      = var_InheritInteger(vd, "video-y");
-    cfg.width  = vdcfg->display.width;
-    cfg.height = vdcfg->display.height;
+    cfg.width  = area->vdcfg.display.width;
+    cfg.height = area->vdcfg.display.height;
 
     event_hwnd_t hwnd;
     if (EventThreadStart(sys->event, &hwnd, &cfg))
@@ -156,9 +154,6 @@ void UpdateRects(vout_display_t *vd, display_win32_area_t *area, vout_display_sy
 
     UINT  display_width, display_height;
 
-    /* */
-    const vout_display_cfg_t *cfg = &area->vdcfg;
-
     /* Retrieve the window size */
     if (!area->pf_GetDisplayDimensions(area->opaque_dimensions, &display_width, &display_height))
     {
@@ -167,7 +162,7 @@ void UpdateRects(vout_display_t *vd, display_win32_area_t *area, vout_display_sy
     }
 
     /* Update the window position and size */
-    vout_display_cfg_t place_cfg = *cfg;
+    vout_display_cfg_t place_cfg = area->vdcfg;
     place_cfg.display.width = display_width;
     place_cfg.display.height = display_height;
 

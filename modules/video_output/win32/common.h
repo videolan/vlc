@@ -80,7 +80,7 @@ typedef struct vout_display_sys_win32_t
 /*****************************************************************************
  * Prototypes from common.c
  *****************************************************************************/
-int  CommonInit(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *, bool b_windowless, const vout_display_cfg_t *);
+int  CommonInit(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *, bool b_windowless);
 #if !VLC_WINSTORE_APP
 void CommonClean(vlc_object_t *, vout_display_sys_win32_t *);
 #endif /* !VLC_WINSTORE_APP */
@@ -88,6 +88,8 @@ void CommonManage(vout_display_t *, display_win32_area_t *, vout_display_sys_win
 int  CommonControl(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *, int , va_list );
 
 void UpdateRects (vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *);
+
+void InitArea(vout_display_t *, display_win32_area_t *, const vout_display_cfg_t *);
 
 /*****************************************************************************
  * Constants

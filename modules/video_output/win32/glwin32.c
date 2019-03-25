@@ -122,7 +122,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     /* */
-    if (CommonInit(vd, &sys->area, &sys->sys, false, cfg))
+    InitArea(vd, &sys->area, cfg);
+    if (CommonInit(vd, &sys->area, &sys->sys, false))
         goto error;
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)

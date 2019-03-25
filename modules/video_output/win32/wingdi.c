@@ -117,7 +117,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    if (CommonInit(vd, &sys->area, &sys->sys, false, cfg))
+    InitArea(vd, &sys->area, cfg);
+    if (CommonInit(vd, &sys->area, &sys->sys, false))
         goto error;
 
     /* */
