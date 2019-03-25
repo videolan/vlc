@@ -247,8 +247,8 @@ static void Manage (vout_display_t *vd)
 
     CommonManage(vd, &sys->sys);
 
-    const int width  = RECTWidth(sys->sys.rect_dest);
-    const int height = RECTHeight(sys->sys.rect_dest);
+    const int width  = sys->sys.place.width;
+    const int height = sys->sys.place.height;
     vlc_gl_Resize (sys->gl, width, height);
     if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
         return;

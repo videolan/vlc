@@ -151,15 +151,14 @@ static void Display(vout_display_t *vd, picture_t *picture)
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
 
-#define rect_dest     sys->sys.rect_dest
     HDC hdc = GetDC(sys->sys.hvideownd);
 
     SelectObject(sys->off_dc, sys->off_bitmap);
 
-    if (RECTWidth(rect_dest)  != vd->source.i_visible_width ||
-        RECTHeight(rect_dest) != vd->source.i_visible_height) {
+    if (sys->sys.place.width  != vd->source.i_visible_width ||
+        sys->sys.place.height != vd->source.i_visible_height) {
         StretchBlt(hdc, 0, 0,
-                   RECTWidth(rect_dest), RECTHeight(rect_dest),
+                   sys->sys.place.width, sys->sys.place.height,
                    sys->off_dc,
                    vd->source.i_x_offset, vd->source.i_y_offset,
                    vd->source.i_x_offset + vd->source.i_visible_width,
@@ -167,14 +166,13 @@ static void Display(vout_display_t *vd, picture_t *picture)
                    SRCCOPY);
     } else {
         BitBlt(hdc, 0, 0,
-               RECTWidth(rect_dest), RECTHeight(rect_dest),
+               sys->sys.place.width, sys->sys.place.height,
                sys->off_dc,
                vd->source.i_x_offset, vd->source.i_y_offset,
                SRCCOPY);
     }
 
     ReleaseDC(sys->sys.hvideownd, hdc);
-#undef rect_dest
 
     CommonManage(vd, &sys->sys);
 }

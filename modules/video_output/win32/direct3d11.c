@@ -188,8 +188,8 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     UINT i_width, i_height;
-    i_width  = RECTWidth(sys->sys.rect_dest);
-    i_height = RECTHeight(sys->sys.rect_dest);
+    i_width  = sys->sys.place.width;
+    i_height = sys->sys.place.height;
 
     if (!sys->resizeCb(sys->outside_opaque, i_width, i_height))
         return E_FAIL;
@@ -200,8 +200,8 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
 static void UpdateSize(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    msg_Dbg(vd, "Detected size change %dx%d", RECTWidth(sys->sys.rect_dest),
-            RECTHeight(sys->sys.rect_dest));
+    msg_Dbg(vd, "Detected size change %dx%d", sys->sys.place.width,
+            sys->sys.place.height);
 
     UpdateBackBuffer(vd);
 
@@ -285,10 +285,10 @@ static bool StartRendering(void *opaque)
 
     CommonManage(vd, &sys->sys);
 
-    if ( sys->sys.rect_dest_changed )
+    if ( sys->sys.place_changed )
     {
         UpdateSize(vd);
-        sys->sys.rect_dest_changed =false;
+        sys->sys.place_changed =false;
     }
 
     D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
@@ -750,10 +750,10 @@ static int Control(vout_display_t *vd, int query, va_list args)
         }
     }
 
-    if ( sys->sys.rect_dest_changed )
+    if ( sys->sys.place_changed )
     {
         UpdateSize(vd);
-        sys->sys.rect_dest_changed =false;
+        sys->sys.place_changed =false;
     }
 
     return res;
@@ -1357,8 +1357,12 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    RECT rect_dst = sys->sys.rect_dest;
-    OffsetRect(&rect_dst, -rect_dst.left, -rect_dst.top);
+    RECT rect_dst = {
+        .left   = 0,
+        .right  = sys->sys.place.width,
+        .top    = 0,
+        .bottom = sys->sys.place.height
+    };
 
     D3D11_UpdateViewport( &sys->picQuad, &rect_dst, sys->display.pixelFormat );
 
@@ -1802,10 +1806,10 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         d3d_quad_t *quad = (d3d_quad_t *) quad_picture->p_sys;
 
         RECT spuViewport;
-        spuViewport.left   = (FLOAT) r->i_x * RECTWidth(sys->sys.rect_dest)  / subpicture->i_original_picture_width;
-        spuViewport.top    = (FLOAT) r->i_y * RECTHeight(sys->sys.rect_dest) / subpicture->i_original_picture_height;
-        spuViewport.right  = (FLOAT) (r->i_x + r->fmt.i_visible_width)  * RECTWidth(sys->sys.rect_dest)  / subpicture->i_original_picture_width;
-        spuViewport.bottom = (FLOAT) (r->i_y + r->fmt.i_visible_height) * RECTHeight(sys->sys.rect_dest) / subpicture->i_original_picture_height;
+        spuViewport.left   = (FLOAT) r->i_x * sys->sys.place.width  / subpicture->i_original_picture_width;
+        spuViewport.top    = (FLOAT) r->i_y * sys->sys.place.height / subpicture->i_original_picture_height;
+        spuViewport.right  = (FLOAT) (r->i_x + r->fmt.i_visible_width)  * sys->sys.place.width  / subpicture->i_original_picture_width;
+        spuViewport.bottom = (FLOAT) (r->i_y + r->fmt.i_visible_height) * sys->sys.place.height / subpicture->i_original_picture_height;
 
         if (r->zoom_h.num != 0 && r->zoom_h.den != 0)
         {

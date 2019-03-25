@@ -485,9 +485,9 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     };
     RECT rect_dst = {
         .left   = 0,
-        .right  = RECTWidth(sys->sys.rect_dest),
+        .right  = vd->sys->sys.place.width,
         .top    = 0,
-        .bottom = RECTHeight(sys->sys.rect_dest),
+        .bottom = vd->sys->sys.place.height,
     };
     Direct3D9SetupVertices(region->vertex, &rect_src, &copy_rect,
                            &rect_dst, 255, vd->source.orientation);
@@ -945,7 +945,7 @@ static void Manage (vout_display_t *vd)
         UpdateDesktopMode(vd);
 
     /* Position Change */
-    if (sys->sys.rect_dest_changed) {
+    if (sys->sys.place_changed) {
 #if 0 /* need that when bicubic filter is available */
         RECT rect;
         UINT width, height;
@@ -963,7 +963,7 @@ static void Manage (vout_display_t *vd)
         }
 #endif
         sys->clear_scene = true;
-        sys->sys.rect_dest_changed = false;
+        sys->sys.place_changed = false;
     }
 }
 
@@ -1060,10 +1060,9 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
             msg_Err(vd, "Failed to lock the texture");
         }
 
-        /* Map the subpicture to sys->sys.rect_dest */
-        const RECT video = sys->sys.rect_dest;
-        const float scale_w = (float)(RECTWidth(video)) / subpicture->i_original_picture_width;
-        const float scale_h = (float)(RECTHeight(video))  / subpicture->i_original_picture_height;
+        /* Map the subpicture to sys->sys.sys.place */
+        const float scale_w = (float)(sys->sys.place.width)  / subpicture->i_original_picture_width;
+        const float scale_h = (float)(sys->sys.place.height) / subpicture->i_original_picture_height;
 
         RECT dst;
         dst.left   =            scale_w * r->i_x,
@@ -1337,8 +1336,12 @@ static void Swap(void *opaque)
 
     // Present the back buffer contents to the display
     // No stretching should happen here !
-    RECT src = sys->sys.rect_dest;
-    OffsetRect(&src, -src.left, -src.top);
+    RECT src = {
+        .left   = 0,
+        .right  = sys->sys.place.width,
+        .top    = 0,
+        .bottom = sys->sys.place.height
+    };
     
     HRESULT hr;
     if (sys->hd3d.use_ex) {

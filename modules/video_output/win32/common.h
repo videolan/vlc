@@ -60,14 +60,14 @@ typedef struct vout_display_sys_win32_t
     HINSTANCE     dxgidebug_dll;
 # endif
 
-    bool         rect_dest_changed;
+    bool         place_changed;
 
     /* Misc */
     bool is_first_placement;
     bool is_on_top;
 
-    /* Coordinates of src and dest images (used when blitting to display) */
-    RECT         rect_dest;
+    /* Coordinates of dest images (used when blitting to display) */
+    vout_display_place_t  place;
 
     vout_display_cfg_t vdcfg;
 

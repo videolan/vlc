@@ -80,7 +80,7 @@ int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowl
     sys->hvideownd = NULL;
     sys->hparent   = NULL;
     sys->hfswnd    = NULL;
-    sys->rect_dest_changed = false;
+    sys->place_changed = false;
     sys->b_windowless = b_windowless;
     sys->is_first_placement = true;
     sys->is_on_top        = false;
@@ -184,13 +184,31 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
         place_cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
 #endif
 
-    vout_display_place_t place;
-    vout_display_PlacePicture(&place, source, &place_cfg);
+    vout_display_place_t before_place = sys->place;
+    vout_display_PlacePicture(&sys->place, source, &place_cfg);
+
+    /* Signal the change in size/position */
+    if (!vout_display_PlaceEquals(&before_place, &sys->place))
+    {
+        sys->place_changed |= true;
+
+#ifndef NDEBUG
+        msg_Dbg(vd, "DirectXUpdateRects source"
+            " offset: %i,%i visible: %ix%i decoded: %ix%i",
+            source->i_x_offset, source->i_y_offset,
+            source->i_visible_width, source->i_visible_height,
+            source->i_width, source->i_height);
+        msg_Dbg(vd, "DirectXUpdateRects image_dst"
+            " coords: %i,%i,%i,%i",
+            sys->place.x, sys->place.y,
+            sys->place.x + sys->place.width, sys->place.y + sys->place.height);
+#endif
+    }
 
 #if !VLC_WINSTORE_APP
     if (!sys->b_windowless)
     {
-        EventThreadUpdateSourceAndPlace(sys->event, source, &place);
+        EventThreadUpdateSourceAndPlace(sys->event, source, &sys->place);
 
         UINT swpFlags = SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS;
         if (sys->is_first_placement)
@@ -199,37 +217,10 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
             sys->is_first_placement = false;
         }
         SetWindowPos(sys->hvideownd, 0,
-            place.x, place.y, place.width, place.height,
+            sys->place.x, sys->place.y, sys->place.width, sys->place.height,
             swpFlags);
     }
-#endif
 
-#define rect_dest           sys->rect_dest
-    RECT before_rect_dest = rect_dest;
-    /* Destination image position and dimensions */
-    rect_dest.left   = place.x;
-    rect_dest.right  = place.x + place.width;
-    rect_dest.top    = place.y;
-    rect_dest.bottom = place.y + place.height;
-
-    /* Signal the change in size/position */
-    if (!EqualRect(&before_rect_dest, &rect_dest))
-        sys->rect_dest_changed |= true;
-
-#ifndef NDEBUG
-    msg_Dbg(vd, "DirectXUpdateRects source"
-        " offset: %i,%i visible: %ix%i decoded: %ix%i",
-        source->i_x_offset, source->i_y_offset,
-        source->i_visible_width, source->i_visible_height,
-        source->i_width, source->i_height);
-    msg_Dbg(vd, "DirectXUpdateRects image_dst"
-        " coords: %li,%li,%li,%li",
-        rect_dest.left, rect_dest.top,
-        rect_dest.right, rect_dest.bottom);
-#endif
-#undef rect_dest
-
-#if !VLC_WINSTORE_APP
     CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
 #endif
 }
