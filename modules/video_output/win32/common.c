@@ -482,10 +482,11 @@ int CommonControl(vout_display_t *vd, vout_display_sys_win32_t *sys, int query, 
         UpdateRects(vd, sys, false);
         return VLC_SUCCESS;
     }
+#endif /* !VLC_WINSTORE_APP */
 
     case VOUT_DISPLAY_RESET_PICTURES:
         vlc_assert_unreachable();
-#endif
+
     default:
         return VLC_EGENERIC;
     }
