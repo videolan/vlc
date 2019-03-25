@@ -137,7 +137,7 @@ typedef struct
 
 struct vout_display_sys_t
 {
-    vout_display_sys_win32_t sys;
+    vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
     display_win32_area_t     area;
 
     bool allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
@@ -900,7 +900,7 @@ static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
         return VLC_EGENERIC;
     }
 
-    UpdateRects(vd, &sys->area, &sys->sys);
+    UpdateRects(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
 
     /* re-create them */
     if (Direct3D9CreateResources(vd, fmtp)) {
@@ -1208,7 +1208,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
-    CommonManage(vd, &sys->area, &sys->sys);
+    CommonManage(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
 
     /* Desktop mode change */
     bool prev_desktop = sys->sys.use_desktop;
@@ -1505,7 +1505,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
     fmt->i_bmask  = d3dfmt->bmask;
     sys->sw_texture_fmt = d3dfmt;
 
-    UpdateRects(vd, &sys->area, &sys->sys);
+    UpdateRects(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
 
     if (Direct3D9CreateResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate resources");
@@ -1513,7 +1513,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
     }
 
     /* Change the window title bar text */
-    if (!sys->sys.b_windowless)
+    if (sys->sys.event != NULL)
         EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (Direct3D9 output)");
 
     msg_Dbg(vd, "Direct3D9 device adapter successfully initialized");
@@ -1556,7 +1556,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     }
     default:
-        return CommonControl(vd, &sys->area, &sys->sys, query, args);
+        return CommonControl(vd, &sys->area, sys->sys.event ? &sys->sys : NULL, query, args);
     }
 }
 
@@ -1681,7 +1681,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->desktop_save.is_on_top     = false;
 
     InitArea(vd, &sys->area, cfg);
-    if (CommonInit(vd, &sys->area, &sys->sys, d3d9_device != NULL))
+    if (d3d9_device == NULL && CommonInit(vd, &sys->area, &sys->sys))
         goto error;
 
     /* */

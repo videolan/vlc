@@ -123,14 +123,13 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     /* */
     InitArea(vd, &sys->area, cfg);
-    if (CommonInit(vd, &sys->area, &sys->sys, false))
+    if (CommonInit(vd, &sys->area, &sys->sys))
         goto error;
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
         sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
 
-    if (!sys->sys.b_windowless)
-        EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (OpenGL output)");
+    EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (OpenGL output)");
 
     vout_display_cfg_t embed_cfg = *cfg;
     embed_cfg.window = EmbedVideoWindow_Create(vd);

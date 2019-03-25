@@ -118,7 +118,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     InitArea(vd, &sys->area, cfg);
-    if (CommonInit(vd, &sys->area, &sys->sys, false))
+    if (CommonInit(vd, &sys->area, &sys->sys))
         goto error;
 
     /* */
@@ -261,8 +261,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     SelectObject(sys->off_dc, sys->off_bitmap);
     ReleaseDC(sys->sys.hvideownd, window_dc);
 
-    if (!sys->sys.b_windowless)
-        EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (WinGDI output)");
+    EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (WinGDI output)");
 
     UpdateRects(vd, &sys->area, &sys->sys);
 

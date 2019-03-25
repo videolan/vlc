@@ -89,7 +89,7 @@ vlc_module_end ()
 
 struct vout_display_sys_t
 {
-    vout_display_sys_win32_t sys;
+    vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
     display_win32_area_t     area;
 
     /* Sensors */
@@ -288,7 +288,7 @@ static bool StartRendering(void *opaque)
     /* TODO read the swapchain size and call VOUT_DISPLAY_CHANGE_DISPLAY_SIZE */
     UpdateRects(vd, &sys->area, &sys->sys);
 #else /* !VLC_WINSTORE_APP */
-    CommonManage(vd, &sys->area, &sys->sys);
+    CommonManage(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
 #endif
 
     if ( sys->area.place_changed )
@@ -480,13 +480,13 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 #endif
     InitArea(vd, &sys->area, cfg);
-    if (CommonInit(vd, &sys->area, &sys->sys, d3d11_ctx != NULL))
+#if !VLC_WINSTORE_APP
+    if (d3d11_ctx == NULL && CommonInit(vd, &sys->area, &sys->sys))
         goto error;
-
-#if VLC_WINSTORE_APP
+#else /* !VLC_WINSTORE_APP */
     sys->area.pf_GetDisplayDimensions = GetExtenalSwapchainDimensions;
     sys->area.opaque_dimensions = sys;
-#endif
+#endif /* !VLC_WINSTORE_APP */
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
         sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
@@ -506,7 +506,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
 #if !VLC_WINSTORE_APP
-    if (!sys->sys.b_windowless)
+    if (sys->sys.event != NULL)
         EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
 #endif
     msg_Dbg(vd, "Direct3D11 device adapter successfully initialized");
@@ -745,7 +745,7 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
-    int res = CommonControl( vd, &sys->area, &sys->sys, query, args );
+    int res = CommonControl( vd, &sys->area, sys->sys.event ? &sys->sys : NULL, query, args );
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
     {
@@ -848,7 +848,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 sys->picQuad.i_height = texDesc.Height;
                 sys->picQuad.i_width = texDesc.Width;
 
-                UpdateRects(vd, &sys->area, &sys->sys);
+                UpdateRects(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
                 UpdateSize(vd);
             }
         }
@@ -1017,7 +1017,7 @@ static void D3D11SetColorSpace(vout_display_t *vd)
     UINT support;
     IDXGISwapChain3 *dxgiswapChain3 = NULL;
     sys->display.colorspace = &color_spaces[0];
-    if (sys->sys.b_windowless)
+    if (sys->sys.event == NULL) /* TODO support external colourspace handling */
         goto done;
 
     hr = IDXGISwapChain_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain3, (void **)&dxgiswapChain3);
@@ -1192,7 +1192,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
        return VLC_EGENERIC;
     }
 
-    if (sys->sys.b_windowless)
+    if (sys->sys.event == NULL)
         ret = SetupWindowLessOutput(vd);
 #if !VLC_WINSTORE_APP
     else
@@ -1464,7 +1464,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
-    UpdateRects(vd, &sys->area, &sys->sys);
+    UpdateRects(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
 
     video_format_t surface_fmt = *fmt;
     surface_fmt.i_width  = sys->picQuad.i_width;
@@ -1574,7 +1574,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
-    UpdateRects(vd, &sys->area, &sys->sys);
+    UpdateRects(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
 
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {

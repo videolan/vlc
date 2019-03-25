@@ -43,28 +43,6 @@
 #include "common.h"
 #include "../video_chroma/copy.h"
 
-#if !VLC_WINSTORE_APP
-static void CommonChangeThumbnailClip(vlc_object_t *, vout_display_sys_win32_t *, bool show);
-
-static bool GetWindowDimensions(void *opaque, UINT *width, UINT *height)
-{
-    const vout_display_sys_win32_t *sys = opaque;
-    assert(!sys->b_windowless);
-    RECT out;
-    if (!GetClientRect(sys->hwnd, &out))
-        return false;
-    *width  = RECTWidth(out);
-    *height = RECTHeight(out);
-    return true;
-}
-#else /* VLC_WINSTORE_APP */
-static inline BOOL EqualRect(const RECT *r1, const RECT *r2)
-{
-    return r1->left == r2->left && r1->right == r2->right &&
-            r1->top == r2->top && r1->bottom == r2->bottom;
-}
-#endif /* VLC_WINSTORE_APP */
-
 static bool GetExternalDimensions(void *opaque, UINT *width, UINT *height)
 {
     const vout_display_t *vd = opaque;
@@ -79,35 +57,44 @@ void InitArea(vout_display_t *vd, display_win32_area_t *area, const vout_display
     area->pf_GetDisplayDimensions = GetExternalDimensions;
     area->opaque_dimensions = vd;
     area->vdcfg = *vdcfg;
+
+    var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+}
+
+#if !VLC_WINSTORE_APP
+static void CommonChangeThumbnailClip(vlc_object_t *, vout_display_sys_win32_t *, bool show);
+
+static bool GetWindowDimensions(void *opaque, UINT *width, UINT *height)
+{
+    const vout_display_sys_win32_t *sys = opaque;
+    assert(sys != NULL);
+    RECT out;
+    if (!GetClientRect(sys->hwnd, &out))
+        return false;
+    *width  = RECTWidth(out);
+    *height = RECTHeight(out);
+    return true;
 }
 
 /* */
-int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys,
-               bool b_windowless)
+int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys)
 {
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+    sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
+#endif
     sys->hwnd      = NULL;
     sys->hvideownd = NULL;
     sys->hparent   = NULL;
     sys->hfswnd    = NULL;
-    sys->b_windowless = b_windowless;
     sys->is_first_placement = true;
     sys->is_on_top        = false;
 
-#if !VLC_WINSTORE_APP
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
 #endif
-    if (!b_windowless)
-    {
-        area->pf_GetDisplayDimensions = GetWindowDimensions;
-        area->opaque_dimensions = sys;
-    }
+    area->pf_GetDisplayDimensions = GetWindowDimensions;
+    area->opaque_dimensions = sys;
     SetRectEmpty(&sys->rect_parent);
-
-    var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
-
-    if (b_windowless)
-        return VLC_SUCCESS;
 
     var_Create(vd, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
@@ -136,10 +123,9 @@ int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_
     sys->hvideownd     = hwnd.hvideownd;
     sys->hfswnd        = hwnd.hfswnd;
 
-#endif /* !VLC_WINSTORE_APP */
-
     return VLC_SUCCESS;
 }
+#endif /* !VLC_WINSTORE_APP */
 
 /*****************************************************************************
 * UpdateRects: update clipping rectangles
@@ -231,7 +217,7 @@ void CommonClean(vlc_object_t *obj, vout_display_sys_win32_t *sys)
 
 void CommonManage(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys)
 {
-    if (sys->b_windowless)
+    if (sys == NULL)
         return;
 
     if (EventThreadGetAndResetSizeChanged(sys->event))
@@ -294,9 +280,6 @@ static int CommonControlSetFullscreen(vlc_object_t *obj, vout_display_sys_win32_
     /* */
     if (sys->parent_window)
         return VLC_EGENERIC;
-
-    if(sys->b_windowless)
-        return VLC_SUCCESS;
 
     /* */
     HWND hwnd = sys->hparent && sys->hfswnd ? sys->hfswnd : sys->hwnd;
@@ -388,7 +371,7 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
     {   /* Update dimensions */
         area->vdcfg = *va_arg(args, const vout_display_cfg_t *);
 #if !VLC_WINSTORE_APP
-        if (!area->vdcfg.is_fullscreen && !sys->b_windowless) {
+        if (!area->vdcfg.is_fullscreen && sys != NULL) {
             RECT rect_window = {
                 .top    = 0,
                 .left   = 0,
@@ -408,6 +391,8 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
     case VOUT_DISPLAY_CHANGE_WINDOW_STATE: {       /* unsigned state */
         const unsigned state = va_arg(args, unsigned);
         const bool is_on_top = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
+        if (sys != NULL)
+        {
 #ifdef MODULE_NAME_IS_direct3d9
         if (sys->use_desktop && is_on_top)
             return VLC_EGENERIC;
@@ -422,13 +407,17 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
             SetWindowPos(sys->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE);
         }
         sys->is_on_top = is_on_top;
+        }
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_FULLSCREEN: {
         bool fs = va_arg(args, int);
+        if (sys != NULL)
+        {
         if (CommonControlSetFullscreen(VLC_OBJECT(vd), sys, fs))
             return VLC_EGENERIC;
         UpdateRects(vd, area, sys);
+        }
         return VLC_SUCCESS;
     }
 #endif /* !VLC_WINSTORE_APP */

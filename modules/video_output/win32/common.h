@@ -50,8 +50,6 @@ typedef struct display_win32_area_t
  *****************************************************************************/
 typedef struct vout_display_sys_win32_t
 {
-    bool                 b_windowless;    /* the rendering is done offscreen */
-
     /* */
     event_thread_t *event;
 
@@ -80,8 +78,8 @@ typedef struct vout_display_sys_win32_t
 /*****************************************************************************
  * Prototypes from common.c
  *****************************************************************************/
-int  CommonInit(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *, bool b_windowless);
 #if !VLC_WINSTORE_APP
+int  CommonInit(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *);
 void CommonClean(vlc_object_t *, vout_display_sys_win32_t *);
 #endif /* !VLC_WINSTORE_APP */
 void CommonManage(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *);
