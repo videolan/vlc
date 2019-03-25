@@ -1218,6 +1218,11 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     return vouts;
 }
 
+- (void)displayOSDMessage:(NSString *)message
+{
+    vlc_player_vout_OSDMessage(_p_player, [message UTF8String]);
+}
+
 #pragma mark - audio specific delegation
 
 - (void)volumeChanged:(float)volume

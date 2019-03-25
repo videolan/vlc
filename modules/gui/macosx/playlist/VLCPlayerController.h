@@ -569,6 +569,11 @@ extern NSString *VLCPlayerMuteChanged;
  */
 - (void)takeSnapshot;
 
+/**
+ * displays a OSD message format string
+ */
+- (void)displayOSDMessage:(NSString *)message;
+
 #pragma mark - audio output properties
 
 /**

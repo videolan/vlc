@@ -386,9 +386,9 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         return;
     }
     if (on) {
-        vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Random On"));
+        [_playerController displayOSDMessage:_NS("Random On")];
     } else {
-        vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Random Off"));
+        [_playerController displayOSDMessage:_NS("Random Off")];
     }
 
     vout_Release(p_vout);
@@ -397,34 +397,19 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 - (void)repeatAll
 {
     _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
-
-    vout_thread_t *p_vout = [_playerController mainVideoOutputThread];
-    if (p_vout) {
-        vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat All"));
-        vout_Release(p_vout);
-    }
+    [_playerController displayOSDMessage:_NS("Repeat All")];
 }
 
 - (void)repeatOne
 {
     _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
-
-    vout_thread_t *p_vout = [_playerController mainVideoOutputThread];
-    if (p_vout) {
-        vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat One"));
-        vout_Release(p_vout);
-    }
+    [_playerController displayOSDMessage:_NS("Repeat One")];
 }
 
 - (void)repeatOff
 {
     _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
-
-    vout_thread_t *p_vout = [_playerController mainVideoOutputThread];
-    if (p_vout) {
-        vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Repeat Off"));
-        vout_Release(p_vout);
-    }
+    [_playerController displayOSDMessage:_NS("Repeat Off")];
 }
 
 - (void)setAtoB
