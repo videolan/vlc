@@ -483,8 +483,14 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
         .top    = 0,
         .bottom = vd->source.i_height,
     };
+    RECT rect_dst = {
+        .left   = 0,
+        .right  = RECTWidth(sys->sys.rect_dest),
+        .top    = 0,
+        .bottom = RECTHeight(sys->sys.rect_dest),
+    };
     Direct3D9SetupVertices(region->vertex, &rect_src, &copy_rect,
-                           &vd->sys->sys.rect_dest, 255, vd->source.orientation);
+                           &rect_dst, 255, vd->source.orientation);
     return VLC_SUCCESS;
 }
 
@@ -1060,9 +1066,9 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         const float scale_h = (float)(RECTHeight(video))  / subpicture->i_original_picture_height;
 
         RECT dst;
-        dst.left   = video.left + scale_w * r->i_x,
+        dst.left   =            scale_w * r->i_x,
         dst.right  = dst.left + scale_w * r->fmt.i_visible_width,
-        dst.top    = video.top  + scale_h * r->i_y,
+        dst.top    =            scale_h * r->i_y,
         dst.bottom = dst.top  + scale_h * r->fmt.i_visible_height;
 
         RECT src;
@@ -1331,7 +1337,8 @@ static void Swap(void *opaque)
 
     // Present the back buffer contents to the display
     // No stretching should happen here !
-    const RECT src = sys->sys.rect_dest;
+    RECT src = sys->sys.rect_dest;
+    OffsetRect(&src, -src.left, -src.top);
     
     HRESULT hr;
     if (sys->hd3d.use_ex) {

@@ -211,7 +211,7 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
 #define rect_dest           sys->rect_dest
     RECT before_rect_dest = rect_dest;
     /* Destination image position and dimensions */
-#if (defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)) && !VLC_WINSTORE_APP
+#if defined(MODULE_NAME_IS_direct3d11) && !VLC_WINSTORE_APP
     rect_dest.left = 0;
     rect_dest.right = place.width;
     rect_dest.top = 0;
