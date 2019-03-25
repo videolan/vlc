@@ -1178,8 +1178,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
-    CommonManage(vd, &sys->area, &sys->sys);
-
     /* Position Change */
     if (sys->area.place_changed) {
 #if 0 /* need that when bicubic filter is available */

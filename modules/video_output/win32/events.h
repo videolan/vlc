@@ -49,4 +49,3 @@ void            EventThreadStop( event_thread_t * );
 
 void            EventThreadUpdatePlace( event_thread_t *p_event,
                                         const vout_display_place_t *p_place );
-bool            EventThreadGetAndResetSizeChanged( event_thread_t * );

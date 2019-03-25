@@ -175,8 +175,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
     }
 
     ReleaseDC(sys->sys.hvideownd, hdc);
-
-    CommonManage(vd, &sys->area, &sys->sys);
 }
 
 static int Init(vout_display_t *vd, video_format_t *fmt)

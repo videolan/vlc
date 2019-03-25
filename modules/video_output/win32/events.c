@@ -81,8 +81,6 @@ struct event_thread_t
     HWND hwnd;
     HWND hvideownd;
     vout_display_place_t place;
-
-    atomic_bool size_changed;
 };
 
 /***************************
@@ -342,11 +340,6 @@ void EventThreadUpdatePlace( event_thread_t *p_event,
     vlc_mutex_unlock( &p_event->lock );
 }
 
-bool EventThreadGetAndResetSizeChanged( event_thread_t *p_event )
-{
-    return atomic_exchange(&p_event->size_changed, false);
-}
-
 event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_window)
 {
     if (parent_window->type != VOUT_WINDOW_TYPE_HWND)
@@ -373,7 +366,6 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_wind
     p_event->is_cursor_hidden = false;
     p_event->button_pressed = 0;
     p_event->hwnd = NULL;
-    atomic_init(&p_event->size_changed, false);
 
     /* initialized to 0 to match the init in the display_win32_area_t */
     p_event->place.x = 0;
@@ -402,8 +394,6 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
     p_event->window_area.top    = 0;
     p_event->window_area.right  = p_cfg->width;
     p_event->window_area.bottom = p_cfg->height;
-
-    atomic_store(&p_event->size_changed, false);
 
     p_event->b_ready = false;
     atomic_store( &p_event->b_done, false);
@@ -756,11 +746,6 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
 
     switch( message )
     {
-
-    case WM_SIZE:
-        if (!p_event->hparent)
-            atomic_store(&p_event->size_changed, true);
-        return 0;
 
     case WM_CAPTURECHANGED:
         for( int button = 0; p_event->button_pressed; button++ )

@@ -209,12 +209,6 @@ void CommonClean(vlc_object_t *obj, vout_display_sys_win32_t *sys)
     }
 }
 
-void CommonManage(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys)
-{
-    if (sys->event != NULL && EventThreadGetAndResetSizeChanged(sys->event))
-        UpdateRects(vd, area, sys);
-}
-
 /* */
 static void CommonChangeThumbnailClip(vlc_object_t *obj, vout_display_sys_win32_t *sys, bool show)
 {

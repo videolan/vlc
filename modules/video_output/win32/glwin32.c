@@ -222,8 +222,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
-    CommonManage(vd, &sys->area, &sys->sys);
-
     const int width  = sys->area.place.width;
     const int height = sys->area.place.height;
     vlc_gl_Resize (sys->gl, width, height);

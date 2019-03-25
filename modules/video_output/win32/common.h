@@ -78,7 +78,6 @@ typedef struct vout_display_sys_win32_t
 int  CommonInit(vlc_object_t *, display_win32_area_t *, vout_display_sys_win32_t *, bool projection_gestures);
 void CommonClean(vlc_object_t *, vout_display_sys_win32_t *);
 #endif /* !VLC_WINSTORE_APP */
-void CommonManage(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *);
 int  CommonControl(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *, int , va_list );
 
 void UpdateRects (vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *);
