@@ -276,6 +276,10 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                                         strtoll(state.arg, NULL, 0) );
                     }
                     break;
+                case CONFIG_ITEM_FLOAT:
+                    var_Create( p_this, name, VLC_VAR_FLOAT );
+                    var_SetFloat( p_this, name, us_atof(state.arg) );
+                    break;
                 case CONFIG_ITEM_BOOL:
                     var_Create( p_this, name, VLC_VAR_BOOL );
                     var_SetBool( p_this, name, true );
