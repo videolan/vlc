@@ -53,7 +53,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 @interface VLCCoreInteraction ()
 {
     float f_currentPlaybackRate;
-    vlc_tick_t timeA, timeB;
 
     float f_maxVolume;
 
@@ -410,48 +409,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
     [_playerController displayOSDMessage:_NS("Repeat Off")];
-}
-
-- (void)setAtoB
-{
-    if (!timeA) {
-        input_thread_t * p_input = pl_CurrentInput(getIntf());
-        if (p_input) {
-            msg_Dbg(getIntf(), "Setting A value");
-
-            timeA = var_GetInteger(p_input, "time");
-            input_Release(p_input);
-        }
-    } else if (!timeB) {
-        input_thread_t * p_input = pl_CurrentInput(getIntf());
-        if (p_input) {
-            msg_Dbg(getIntf(), "Setting B value");
-
-            timeB = var_GetInteger(p_input, "time");
-            input_Release(p_input);
-        }
-    } else
-        [self resetAtoB];
-}
-
-- (void)resetAtoB
-{
-    msg_Dbg(getIntf(), "Resetting A to B values");
-    timeA = 0;
-    timeB = 0;
-}
-
-- (void)updateAtoB
-{
-    if (timeB) {
-        input_thread_t * p_input = pl_CurrentInput(getIntf());
-        if (p_input) {
-            vlc_tick_t currentTime = var_GetInteger(p_input, "time");
-            if ( currentTime >= timeB || currentTime < timeA)
-                var_SetInteger(p_input, "time", timeA);
-            input_Release(p_input);
-        }
-    }
 }
 
 - (void)jumpToTime:(vlc_tick_t)time

@@ -854,8 +854,7 @@
 
 - (IBAction)toggleAtoBloop:(id)sender
 {
-    // re-write the following using VLCPlayerController
-    [[VLCCoreInteraction sharedInstance] setAtoB];
+    [_playerController setABLoop];
 }
 
 - (IBAction)goToSpecificTime:(id)sender

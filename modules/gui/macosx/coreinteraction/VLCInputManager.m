@@ -270,7 +270,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 - (void)updateMainMenu
 {
     [[o_main mainMenu] setupMenus];
-    [[VLCCoreInteraction sharedInstance] resetAtoB];
 }
 
 - (BOOL)hasInput

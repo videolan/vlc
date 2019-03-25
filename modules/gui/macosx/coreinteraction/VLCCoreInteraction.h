@@ -60,9 +60,6 @@
 - (void)repeatAll;
 - (void)repeatOff;
 - (void)shuffle;
-- (void)setAtoB;
-- (void)resetAtoB;
-- (void)updateAtoB;
 
 - (void)volumeUp;
 - (void)volumeDown;

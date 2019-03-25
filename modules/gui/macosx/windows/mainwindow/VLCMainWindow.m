@@ -571,8 +571,6 @@ static const float f_min_window_height = 307.;
 - (void)updateTimeSlider
 {
     [self.fspanel updatePositionAndTime];
-
-    [[VLCCoreInteraction sharedInstance] updateAtoB];
 }
 
 - (void)updateName
