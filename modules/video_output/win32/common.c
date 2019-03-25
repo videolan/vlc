@@ -271,7 +271,7 @@ void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys)
                          RECTHeight(rect_parent),
                          SWP_NOZORDER);
 
-            UpdateRects(vd, sys, true);
+            UpdateRects(vd, sys, false);
         }
     }
 
