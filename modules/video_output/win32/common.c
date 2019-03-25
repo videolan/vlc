@@ -152,7 +152,6 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
     const video_format_t *source = &vd->source;
 
     UINT  display_width, display_height;
-    POINT point = { 0 };
 
     /* */
     const vout_display_cfg_t *cfg = &sys->vdcfg;
@@ -165,21 +164,6 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
     }
 
     /* If nothing changed, we can return */
-#if !VLC_WINSTORE_APP
-    if (!sys->b_windowless)
-    {
-        /* Retrieve the window position */
-        ClientToScreen(sys->hwnd, &point);
-
-        RECT rect = {
-            .left   = point.x,
-            .right  = point.x + display_width,
-            .top    = point.y,
-            .bottom = point.y + display_height,
-        };
-        EventThreadUpdateWindowPosition(sys->event, &rect);
-    }
-#endif /* !VLC_WINSTORE_APP */
     bool resized = display_width  != sys->display_width ||
                    display_height != sys->display_height;
     sys->display_width = display_width;
@@ -223,10 +207,10 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
 #define rect_dest           sys->rect_dest
     RECT before_rect_dest = rect_dest;
     /* Destination image position and dimensions */
-    rect_dest.left = point.x + place.x;
-    rect_dest.right = rect_dest.left + place.width;
-    rect_dest.top = point.y + place.y;
-    rect_dest.bottom = rect_dest.top + place.height;
+    rect_dest.left   = place.x;
+    rect_dest.right  = place.x + place.width;
+    rect_dest.top    = place.y;
+    rect_dest.bottom = place.y + place.height;
 
     /* Signal the change in size/position */
     if (!EqualRect(&before_rect_dest, &rect_dest))

@@ -408,13 +408,6 @@ int EventThreadGetWindowStyle( event_thread_t *p_event )
     return p_event->i_window_style;
 }
 
-void EventThreadUpdateWindowPosition( event_thread_t *p_event, const RECT *area )
-{
-    vlc_mutex_lock( &p_event->lock );
-    p_event->window_area = *area;
-    vlc_mutex_unlock( &p_event->lock );
-}
-
 void EventThreadUpdateSourceAndPlace( event_thread_t *p_event,
                                       const video_format_t *p_source,
                                       const vout_display_place_t *p_place )
