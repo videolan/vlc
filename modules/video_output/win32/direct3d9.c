@@ -932,41 +932,6 @@ static void UpdateDesktopMode(vout_display_t *vd)
     }
 }
 
-static void Manage (vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    CommonManage(vd, &sys->sys);
-
-    /* Desktop mode change */
-    bool prev_desktop = sys->sys.use_desktop;
-    sys->sys.use_desktop = atomic_load( &sys->new_desktop_mode );
-    if (sys->sys.use_desktop != prev_desktop)
-        UpdateDesktopMode(vd);
-
-    /* Position Change */
-    if (sys->sys.place_changed) {
-#if 0 /* need that when bicubic filter is available */
-        RECT rect;
-        UINT width, height;
-
-        GetClientRect(p_sys->sys.hvideownd, &rect);
-        width  = RECTWidth(rect);
-        height = RECTHeight(rect);
-
-        if (width != p_sys->pp.BackBufferWidth || height != p_sys->pp.BackBufferHeight)
-        {
-            msg_Dbg(vd, "resizing device back buffers to (%lux%lu)", width, height);
-            // need to reset D3D device to resize back buffer
-            if (VLC_SUCCESS != Direct3D9ResetDevice(vd, width, height))
-                return VLC_EGENERIC;
-        }
-#endif
-        sys->clear_scene = true;
-        sys->sys.place_changed = false;
-    }
-}
-
 static void Direct3D9ImportSubpicture(vout_display_t *vd,
                                      size_t *count_ptr, d3d_region_t **region,
                                      subpicture_t *subpicture)
@@ -1239,9 +1204,39 @@ static void Direct3D9RenderScene(vout_display_t *vd,
 static void Prepare(vout_display_t *vd, picture_t *picture,
                     subpicture_t *subpicture, vlc_tick_t date)
 {
-    Manage(vd);
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
+
+    CommonManage(vd, &sys->sys);
+
+    /* Desktop mode change */
+    bool prev_desktop = sys->sys.use_desktop;
+    sys->sys.use_desktop = atomic_load( &sys->new_desktop_mode );
+    if (sys->sys.use_desktop != prev_desktop)
+        UpdateDesktopMode(vd);
+
+    /* Position Change */
+    if (sys->sys.place_changed) {
+#if 0 /* need that when bicubic filter is available */
+        RECT rect;
+        UINT width, height;
+
+        GetClientRect(p_sys->sys.hvideownd, &rect);
+        width  = RECTWidth(rect);
+        height = RECTHeight(rect);
+
+        if (width != p_sys->pp.BackBufferWidth || height != p_sys->pp.BackBufferHeight)
+        {
+            msg_Dbg(vd, "resizing device back buffers to (%lux%lu)", width, height);
+            // need to reset D3D device to resize back buffer
+            if (VLC_SUCCESS != Direct3D9ResetDevice(vd, width, height))
+                return VLC_EGENERIC;
+        }
+#endif
+        sys->clear_scene = true;
+        sys->sys.place_changed = false;
+    }
+
     picture_sys_t *p_sys = picture->p_sys;
     IDirect3DSurface9 *surface = p_sys->surface;
     d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
