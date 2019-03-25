@@ -93,6 +93,12 @@ extern NSString *VLCPlayerTitleSelectionChanged;
 extern NSString *VLCPlayerTitleListChanged;
 
 /**
+ * Listen to VLCPlayerABLoopStateChanged to be notified if the A→B loop state changes
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerABLoopStateChanged;
+
+/**
  * Listen to VLCPlayerTeletextMenuAvailable to be notified if a teletext menu becomes (un-)available
  * @note the affected player object will be the object of the notification
  */
@@ -220,6 +226,27 @@ extern NSString *VLCPlayerMuteChanged;
  * Stop the current playback
  */
 - (void)stop;
+
+/**
+ * the current status of the A→B loop
+ * It will be A if A is set, B if A _and_ B are set or none if there is none
+ * @note listen to VLCPlayerABLoopStateChanged for changes to this property
+ */
+@property (readonly) enum vlc_player_abloop abLoopState;
+
+/**
+ * set the A→B loop
+ * this function will need to be called twice to set the A and the B point
+ * @note VLC core will automatically pick the current time stamp, so there is no parameter to this method
+ * @return VLC_SUCCESS or a VLC error code
+ */
+- (int)setABLoop;
+
+/**
+ * disable the A→B loop
+ * @return VLC_SUCCESS or a VLC error code
+ */
+- (int)disableABLoop;
 
 /**
  * Define the action to perform after playback of the current media stopped (for any reason)

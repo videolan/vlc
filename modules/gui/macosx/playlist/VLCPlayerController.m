@@ -42,6 +42,7 @@ NSString *VLCPlayerTimeAndPositionChanged = @"VLCPlayerTimeAndPositionChanged";
 NSString *VLCPlayerLengthChanged = @"VLCPlayerLengthChanged";
 NSString *VLCPlayerTitleSelectionChanged = @"VLCPlayerTitleSelectionChanged";
 NSString *VLCPlayerTitleListChanged = @"VLCPlayerTitleListChanged";
+NSString *VLCPlayerABLoopStateChanged = @"VLCPlayerABLoopStateChanged";
 NSString *VLCPlayerTeletextMenuAvailable = @"VLCPlayerTeletextMenuAvailable";
 NSString *VLCPlayerTeletextEnabled = @"VLCPlayerTeletextEnabled";
 NSString *VLCPlayerTeletextPageChanged = @"VLCPlayerTeletextPageChanged";
@@ -99,6 +100,7 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 - (void)subtitlesFPSChanged:(float)subtitlesFPS;
 - (void)recordingChanged:(BOOL)recording;
 - (void)inputStatsUpdated:(VLCInputStats *)inputStats;
+- (void)ABLoopStateChanged:(enum vlc_player_abloop)abLoopState;
 - (void)stopActionChanged:(enum vlc_player_media_stopped_action)stoppedAction;
 - (void)metaDataChangedForInput:(input_item_t *)inputItem;
 - (void)voutListUpdated;
@@ -328,6 +330,18 @@ static void cb_player_stats_changed(vlc_player_t *p_player,
     });
 }
 
+static void cb_player_atobloop_changed(vlc_player_t *p_player,
+                                       enum vlc_player_abloop new_state,
+                                       vlc_tick_t time, float pos,
+                                       void *p_data)
+{
+    VLC_UNUSED(p_player);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController ABLoopStateChanged:new_state];
+    });
+}
+
 static void cb_player_media_stopped_action_changed(vlc_player_t *p_player,
                                                    enum vlc_player_media_stopped_action newAction,
                                                    void *p_data)
@@ -391,7 +405,7 @@ static const struct vlc_player_cbs player_callbacks = {
     cb_player_record_changed,
     NULL, //cb_player_signal_changed,
     cb_player_stats_changed,
-    NULL, //cb_player_atobloop_changed,
+    cb_player_atobloop_changed,
     cb_player_media_stopped_action_changed,
     cb_player_item_meta_changed,
     NULL, //cb_player_item_epg_changed,
@@ -1117,6 +1131,38 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     [_defaultNotificationCenter postNotificationName:VLCPlayerStatisticsUpdated
                                               object:self
                                             userInfo:@{VLCPlayerInputStats : inputStats}];
+}
+
+- (void)ABLoopStateChanged:(enum vlc_player_abloop)abLoopState
+{
+    _abLoopState = abLoopState;
+    [_defaultNotificationCenter postNotificationName:VLCPlayerABLoopStateChanged
+                                              object:self];
+}
+
+- (int)setABLoop
+{
+    int ret = 0;
+    switch (_abLoopState) {
+        case VLC_PLAYER_ABLOOP_A:
+            ret = vlc_player_SetAtoBLoop(_p_player, VLC_PLAYER_ABLOOP_B);
+            break;
+
+        case VLC_PLAYER_ABLOOP_B:
+            ret = vlc_player_SetAtoBLoop(_p_player, VLC_PLAYER_ABLOOP_NONE);
+            break;
+
+        default:
+            ret = vlc_player_SetAtoBLoop(_p_player, VLC_PLAYER_ABLOOP_A);
+            break;
+    }
+
+    return ret;
+}
+
+- (int)disableABLoop
+{
+    return vlc_player_SetAtoBLoop(_p_player, VLC_PLAYER_ABLOOP_NONE);
 }
 
 - (void)setEnableRecording:(BOOL)enableRecording
