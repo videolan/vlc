@@ -211,17 +211,10 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
 #define rect_dest           sys->rect_dest
     RECT before_rect_dest = rect_dest;
     /* Destination image position and dimensions */
-#if defined(MODULE_NAME_IS_direct3d11) && !VLC_WINSTORE_APP
-    rect_dest.left = 0;
-    rect_dest.right = place.width;
-    rect_dest.top = 0;
-    rect_dest.bottom = place.height;
-#else
     rect_dest.left = point.x + place.x;
     rect_dest.right = rect_dest.left + place.width;
     rect_dest.top = point.y + place.y;
     rect_dest.bottom = rect_dest.top + place.height;
-#endif
 
     /* Signal the change in size/position */
     if (!EqualRect(&before_rect_dest, &rect_dest))

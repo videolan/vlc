@@ -1362,7 +1362,10 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    D3D11_UpdateViewport( &sys->picQuad, &sys->sys.rect_dest, sys->display.pixelFormat );
+    RECT rect_dst = sys->sys.rect_dest;
+    OffsetRect(&rect_dst, -rect_dst.left, -rect_dst.top);
+
+    D3D11_UpdateViewport( &sys->picQuad, &rect_dst, sys->display.pixelFormat );
 
     SetQuadVSProjection(vd, &sys->picQuad, &sys->sys.vdcfg.viewpoint);
 
@@ -1804,10 +1807,10 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         d3d_quad_t *quad = (d3d_quad_t *) quad_picture->p_sys;
 
         RECT spuViewport;
-        spuViewport.left   = sys->sys.rect_dest.left + (FLOAT) r->i_x * RECTWidth(sys->sys.rect_dest)  / subpicture->i_original_picture_width;
-        spuViewport.top    = sys->sys.rect_dest.top  + (FLOAT) r->i_y * RECTHeight(sys->sys.rect_dest) / subpicture->i_original_picture_height;
-        spuViewport.right  = sys->sys.rect_dest.left + (FLOAT) (r->i_x + r->fmt.i_visible_width)  * RECTWidth(sys->sys.rect_dest)  / subpicture->i_original_picture_width;
-        spuViewport.bottom = sys->sys.rect_dest.top  + (FLOAT) (r->i_y + r->fmt.i_visible_height) * RECTHeight(sys->sys.rect_dest) / subpicture->i_original_picture_height;
+        spuViewport.left   = (FLOAT) r->i_x * RECTWidth(sys->sys.rect_dest)  / subpicture->i_original_picture_width;
+        spuViewport.top    = (FLOAT) r->i_y * RECTHeight(sys->sys.rect_dest) / subpicture->i_original_picture_height;
+        spuViewport.right  = (FLOAT) (r->i_x + r->fmt.i_visible_width)  * RECTWidth(sys->sys.rect_dest)  / subpicture->i_original_picture_width;
+        spuViewport.bottom = (FLOAT) (r->i_y + r->fmt.i_visible_height) * RECTHeight(sys->sys.rect_dest) / subpicture->i_original_picture_height;
 
         if (r->zoom_h.num != 0 && r->zoom_h.den != 0)
         {
