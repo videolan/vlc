@@ -73,7 +73,6 @@ struct vout_display_sys_t
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
 static void           Display(vout_display_t *, picture_t *);
-static void           Manage (vout_display_t *);
 
 static int Control(vout_display_t *vd, int query, va_list args)
 {
@@ -218,15 +217,20 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture,
                     vlc_tick_t date)
 {
-    Manage(vd);
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
-    if (vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
-    {
-        vout_display_opengl_Prepare (sys->vgl, picture, subpicture);
-        vlc_gl_ReleaseCurrent (sys->gl);
-    }
+    CommonManage(vd, &sys->sys);
+
+    const int width  = sys->sys.place.width;
+    const int height = sys->sys.place.height;
+    vlc_gl_Resize (sys->gl, width, height);
+    if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
+        return;
+    vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
+    vout_display_opengl_Viewport(sys->vgl, 0, 0, width, height);
+    vout_display_opengl_Prepare (sys->vgl, picture, subpicture);
+    vlc_gl_ReleaseCurrent (sys->gl);
 }
 
 static void Display(vout_display_t *vd, picture_t *picture)
@@ -239,20 +243,4 @@ static void Display(vout_display_t *vd, picture_t *picture)
         vout_display_opengl_Display (sys->vgl, &vd->source);
         vlc_gl_ReleaseCurrent (sys->gl);
     }
-}
-
-static void Manage (vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    CommonManage(vd, &sys->sys);
-
-    const int width  = sys->sys.place.width;
-    const int height = sys->sys.place.height;
-    vlc_gl_Resize (sys->gl, width, height);
-    if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
-        return;
-    vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
-    vout_display_opengl_Viewport(sys->vgl, 0, 0, width, height);
-    vlc_gl_ReleaseCurrent (sys->gl);
 }
