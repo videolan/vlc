@@ -84,16 +84,16 @@ int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowl
     sys->b_windowless = b_windowless;
     sys->is_first_placement = true;
     sys->is_on_top        = false;
+    sys->display_width = 0;
+    sys->display_height = 0;
 
     sys->pf_GetDisplayDimensions = GetExternalDimensions;
     sys->opaque_dimensions = vd;
 
+#if !VLC_WINSTORE_APP
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
 #endif
-#if VLC_WINSTORE_APP
-    memset(&sys->rect_display, 0, sizeof(sys->rect_display));
-#else /* !VLC_WINSTORE_APP */
     if (!b_windowless)
     {
         sys->pf_GetDisplayDimensions = GetWindowDimensions;
@@ -165,18 +165,8 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
     }
 
     /* If nothing changed, we can return */
-    bool moved_or_resized;
-#if VLC_WINSTORE_APP
-    moved_or_resized = display_width  != RECTWidth(sys->sys.rect_display) ||
-                       display_height != RECTHeight(sys->sys.rect_display);
-    sys->sys.display_width = display_width;
-    sys->sys.display_height = display_height;
-#else
-    if (sys->b_windowless)
-    {
-        moved_or_resized = false;
-    }
-    else
+#if !VLC_WINSTORE_APP
+    if (!sys->b_windowless)
     {
         /* Retrieve the window position */
         ClientToScreen(sys->hwnd, &point);
@@ -187,10 +177,14 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
             .top    = point.y,
             .bottom = point.y + display_height,
         };
-        moved_or_resized = EventThreadUpdateWindowPosition(sys->event, &rect);
+        EventThreadUpdateWindowPosition(sys->event, &rect);
     }
-#endif
-    if (!is_forced && !moved_or_resized)
+#endif /* !VLC_WINSTORE_APP */
+    bool resized = display_width  != sys->display_width ||
+                   display_height != sys->display_height;
+    sys->display_width = display_width;
+    sys->display_height = display_height;
+    if (!is_forced && !resized)
         return;
 
     /* Update the window position and size */
