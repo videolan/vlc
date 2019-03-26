@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCVoutView.m: MacOS X video output module
  *****************************************************************************
- * Copyright (C) 2002-2014 VLC authors and VideoLAN
+ * Copyright (C) 2002-2019 VLC authors and VideoLAN
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *          Eric Petit <titer@m0k.org>
@@ -33,17 +33,12 @@
 
 #import <QuartzCore/QuartzCore.h>
 
-#import <stdlib.h>                                                 /* free() */
-
-#import <vlc_common.h>
 #import <vlc_actions.h>
 
-#import "coreinteraction/VLCCoreInteraction.h"
-#import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
-
-#import <vlc_playlist_legacy.h>
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 /*****************************************************************************
  * VLCVoutView implementation
@@ -59,6 +54,7 @@
     CGFloat f_cumulated_magnification;
 
     vout_thread_t *p_vout;
+    VLCPlayerController *_playerController;
 }
 @end
 
@@ -81,6 +77,7 @@
         [self registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
         i_lastScrollWheelDirection = 0;
         f_cumulated_magnification = 0.0;
+        _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
     }
 
     return self;
@@ -174,14 +171,14 @@
         if (key) {
             /* Escape should always get you out of fullscreen */
             if (key == (unichar) 0x1b) {
-                playlist_t * p_playlist = pl_Get(getIntf());
-                 if (var_GetBool(p_playlist, "fullscreen"))
-                     [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+                if (_playerController.fullscreen) {
+                    [_playerController toggleFullscreen];
+                }
             }
             /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
-            else if (key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask)
-                [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-            else if (p_vout) {
+            else if (key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask) {
+                [_playerController toggleFullscreen];
+            } else if (p_vout) {
                 val.i_int |= (int)CocoaKeyToVLC(key);
                 var_Set(vlc_object_instance(p_vout), "key-pressed", val);
             }
@@ -203,7 +200,7 @@
 {
     if (([o_event type] == NSLeftMouseDown) && (! ([o_event modifierFlags] &  NSControlKeyMask))) {
         if ([o_event clickCount] == 2)
-            [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+            [_playerController toggleFullscreen];
 
     } else if (([o_event type] == NSRightMouseDown) ||
                (([o_event type] == NSLeftMouseDown) &&
@@ -384,7 +381,7 @@
 
     if ((f_cumulated_magnification > f_threshold && !b_fullscreen) || (f_cumulated_magnification < -f_threshold && b_fullscreen)) {
         f_cumulated_magnification = 0.0;
-        [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+        [_playerController toggleFullscreen];
     }
 }
 
