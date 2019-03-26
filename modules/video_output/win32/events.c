@@ -61,6 +61,7 @@ struct event_thread_t
 
     /* */
     bool use_desktop;
+    bool is_projected;
 
     /* Mouse */
     bool is_cursor_hidden;
@@ -477,6 +478,7 @@ void EventThreadDestroy( event_thread_t *p_event )
 int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event_cfg_t *p_cfg )
 {
     p_event->use_desktop = p_cfg->use_desktop;
+    p_event->is_projected = p_cfg->is_projected;
     p_event->window_area.left   = p_cfg->x;
     p_event->window_area.top    = p_cfg->y;
     p_event->window_area.right  = p_cfg->x + p_cfg->width;
@@ -821,8 +823,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     }
     msg_Dbg( vd, "created video sub-window" );
 
-    bool b_isProjected  = (vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
-    InitGestures( p_event->hwnd, &p_event->p_gesture, b_isProjected );
+    InitGestures( p_event->hwnd, &p_event->p_gesture, p_event->is_projected );
 
     /* Now display the window */
     ShowWindow( p_event->hwnd, SW_SHOW );

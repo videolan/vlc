@@ -31,6 +31,7 @@ typedef struct event_thread_t event_thread_t;
 
 typedef struct {
     bool use_desktop; /* direct3d */
+    bool is_projected;
     int x;
     int y;
     unsigned width;

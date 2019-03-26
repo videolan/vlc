@@ -118,6 +118,7 @@ int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_
     cfg.y      = var_InheritInteger(vd, "video-y");
     cfg.width  = area->vdcfg.display.width;
     cfg.height = area->vdcfg.display.height;
+    cfg.is_projected = vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR;
 
     event_hwnd_t hwnd;
     if (EventThreadStart(sys->event, &hwnd, &cfg))
