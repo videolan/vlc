@@ -105,10 +105,7 @@ int CommonInit(vlc_object_t *obj, vout_display_t *vd, display_win32_area_t *area
     if (!sys->event)
         return VLC_EGENERIC;
 
-    vout_display_place_t original_place;
-    vout_display_PlacePicture(&original_place, &vd->source, &area->vdcfg);
-    EventThreadUpdatePlace(sys->event, &original_place);
-
+    /* */
     event_cfg_t cfg;
     memset(&cfg, 0, sizeof(cfg));
 #ifdef MODULE_NAME_IS_direct3d9
