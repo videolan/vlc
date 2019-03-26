@@ -387,28 +387,6 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
         return VLC_SUCCESS;
     }
 #if !VLC_WINSTORE_APP
-    case VOUT_DISPLAY_CHANGE_WINDOW_STATE: {       /* unsigned state */
-        const unsigned state = va_arg(args, unsigned);
-        const bool is_on_top = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
-        if (sys->event != NULL)
-        {
-#ifdef MODULE_NAME_IS_direct3d9
-            if (sys->use_desktop && is_on_top)
-                return VLC_EGENERIC;
-#endif
-            HMENU hMenu = GetSystemMenu(sys->hwnd, FALSE);
-
-            if (is_on_top && !(GetWindowLong(sys->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
-                CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_CHECKED);
-                SetWindowPos(sys->hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-            } else if (!is_on_top && (GetWindowLong(sys->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
-                CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_UNCHECKED);
-                SetWindowPos(sys->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE);
-            }
-            sys->is_on_top = is_on_top;
-        }
-        return VLC_SUCCESS;
-    }
     case VOUT_DISPLAY_CHANGE_FULLSCREEN: {
         bool fs = va_arg(args, int);
         if (sys->event != NULL)

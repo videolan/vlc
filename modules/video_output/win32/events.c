@@ -45,7 +45,8 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-#define WM_VLC_CHANGE_TEXT  (WM_APP + 1)
+#define WM_VLC_CHANGE_TEXT   (WM_APP + 1)
+#define WM_VLC_SET_TOP_STATE (WM_APP + 2)
 
 struct event_thread_t
 {
@@ -862,6 +863,18 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
     CloseGestures( p_event->p_gesture);
 }
 
+static void SetAbove( event_thread_t *p_event, bool is_on_top )
+{
+    HMENU hMenu = GetSystemMenu(p_event->hwnd, FALSE);
+    if (is_on_top && !(GetWindowLong(p_event->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
+        CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_CHECKED);
+        SetWindowPos(p_event->hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+    } else if (!is_on_top && (GetWindowLong(p_event->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
+        CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_UNCHECKED);
+        SetWindowPos(p_event->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE);
+    }
+}
+
 /*****************************************************************************
  * WinVoutEventProc: This is the window event processing function.
  *****************************************************************************
@@ -967,14 +980,22 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         {
             msg_Dbg(vd, "WinProc WM_SYSCOMMAND: IDM_TOGGLE_ON_TOP");
             HMENU hMenu = GetSystemMenu(p_event->hwnd, FALSE);
-            vout_display_SendWindowState(vd, (GetMenuState(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND) & MF_CHECKED) ?
-                    VOUT_WINDOW_STATE_NORMAL : VOUT_WINDOW_STATE_ABOVE);
+            const bool is_on_top = (GetMenuState(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND) & MF_CHECKED) == 0;
+#ifdef MODULE_NAME_IS_direct3d9
+            if (p_event->use_desktop && is_on_top)
+                return 0;
+#endif
+            SetAbove( p_event, is_on_top);
             return 0;
         }
         default:
             break;
         }
         break;
+
+    case WM_VLC_SET_TOP_STATE:
+        SetAbove( p_event, wParam != 0);
+        return 0;
 
     case WM_PAINT:
     case WM_NCPAINT:
@@ -996,6 +1017,11 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
 
     /* Let windows handle the message */
     return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
+void EventThreadSetAbove( event_thread_t *p_event, bool is_on_top )
+{
+    PostMessage( p_event->hwnd, WM_VLC_SET_TOP_STATE, is_on_top != 0, 0);
 }
 
 static struct

@@ -923,13 +923,13 @@ static void UpdateDesktopMode(vout_display_t *vd)
         if (sys->desktop_save.is_fullscreen)
             vout_display_SendEventFullscreen(vd, false);
         if (sys->desktop_save.is_on_top)
-            vout_display_SendWindowState(vd, VOUT_WINDOW_STATE_NORMAL);
+            EventThreadSetAbove( sys->sys.event, false );
     } else {
         /* Restore fullscreen/on_top */
         if (sys->desktop_save.is_fullscreen)
             vout_display_SendEventFullscreen(vd, true);
         if (sys->desktop_save.is_on_top)
-            vout_display_SendWindowState(vd, VOUT_WINDOW_STATE_ABOVE);
+            EventThreadSetAbove( sys->sys.event, true );
     }
 }
 
