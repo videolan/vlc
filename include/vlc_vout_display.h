@@ -130,6 +130,8 @@ enum {
     /* Ask the module to acknowledge/refuse the fullscreen state change after
      * being requested (externally or by VOUT_DISPLAY_EVENT_FULLSCREEN */
     VOUT_DISPLAY_CHANGE_FULLSCREEN VLC_DEPRECATED_ENUM,     /* bool fs */
+#endif
+#if defined(__OS2__)
     /* Ask the module to acknowledge/refuse the window management state change
      * after being requested externally or by VOUT_DISPLAY_WINDOW_STATE */
     VOUT_DISPLAY_CHANGE_WINDOW_STATE VLC_DEPRECATED_ENUM,   /* unsigned state */
@@ -380,12 +382,6 @@ static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
                              is_fullscreen) == VLC_SUCCESS)
         ((vout_display_cfg_t *)vd->cfg)->is_fullscreen = is_fullscreen;
-}
-
-VLC_DEPRECATED
-static inline void vout_display_SendWindowState(vout_display_t *vd, unsigned state)
-{
-    vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE, state);
 }
 #endif
 static inline void vout_display_SendEventMousePressed(vout_display_t *vd, int button)
