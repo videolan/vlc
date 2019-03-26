@@ -601,6 +601,20 @@ extern NSString *VLCPlayerMuteChanged;
  */
 - (void)displayOSDMessage:(NSString *)message;
 
+/**
+ * returns the filter chain string for the respective type
+ * @note This is a temporary API and will be gone in VLC 5.0
+ */
+- (NSString *)videoFilterChainForType:(enum vlc_vout_filter_type)filterType;
+
+/**
+ * sets the filter chain string for the respective type
+ * @param the filter chain string or NULL to disable all filters
+ * @param the filter type, @see vlc_vout_filter_type
+ * @note This is a temporary API and will be gone in VLC 5.0
+ */
+- (void)setVideoFilterChain:(nullable NSString *)filterChain forType:(enum vlc_vout_filter_type)filterType;
+
 #pragma mark - audio output properties
 
 /**
