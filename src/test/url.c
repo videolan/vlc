@@ -97,13 +97,20 @@ static inline void test_current_directory_path (const char *in, const char *cwd,
     free(expected_result);
 }
 
-static void test_url_parse(const char *in, const char *protocol,
-                           const char *user, const char *pass,
-                           const char *host, unsigned port,
-                           const char *path, const char *option)
+#define test_url_parse(in, protocol, user, pass, host, port, path, option) \
+    test_url_parse_internal(in, false, protocol, user, pass, host, port, path, option)
+
+#define test_url_parse_fixup(in, protocol, user, pass, host, port, path, option) \
+    test_url_parse_internal(in, true, protocol, user, pass, host, port, path, option)
+
+static void test_url_parse_internal(const char *in, bool fixup,
+                                    const char *protocol,
+                                    const char *user, const char *pass,
+                                    const char *host, unsigned port,
+                                    const char *path, const char *option)
 {
     vlc_url_t url;
-    int ret = vlc_UrlParse(&url, in);
+    int ret = fixup ? vlc_UrlParseFixup(&url, in) : vlc_UrlParse(&url, in);
 
     /* XXX: only checking that the port-part is parsed correctly, and
      *      equal to 0, is currently not supported due to the below. */
