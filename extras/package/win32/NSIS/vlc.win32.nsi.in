@@ -221,19 +221,12 @@ RequestExecutionLevel admin
   !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "LatvianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Indonesian"
   !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "IndonesianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
-
-; Missing upstream translations:
-;
-;  !insertmacro MUI_LANGUAGE "Sinhala"
-;  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "SinhalaExtra.nsh"
-;  !insertmacro MUI_LANGUAGE "EnglishUK"
-;  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "EnglishUKExtra.nsh"
-
-; Upstream files broken:
-;  !insertmacro MUI_LANGUAGE "Khmer"
-;  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "KhmerExtra.nsh"
-;  !insertmacro MUI_LANGUAGE "ScotsGaelic"
-;  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "ScotsGaelicExtra.nsh"
+  !insertmacro MUI_LANGUAGE "ScotsGaelic"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "ScotsGaelicExtra.nsh" ${VLC_LANGFILE_FALLBACK}
+  !insertmacro MUI_LANGUAGE "Breton"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "BretonExtra.nsh" ${VLC_LANGFILE_FALLBACK}
+  !insertmacro MUI_LANGUAGE "NorwegianNynorsk"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "NorwegianNynorskExtra.nsh" ${VLC_LANGFILE_FALLBACK}
 
 ; Reserve files for solid compression
   !insertmacro MUI_RESERVEFILE_LANGDLL
