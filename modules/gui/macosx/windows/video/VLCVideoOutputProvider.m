@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCVideoOutputProvider.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2012-2014 VLC authors and VideoLAN
+ * Copyright (C) 2012-2019 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
@@ -24,7 +24,6 @@
 #import "VLCVideoOutputProvider.h"
 
 #include <vlc_vout_display.h>
-#import <vlc_playlist_legacy.h>
 
 #import "extensions/NSScreen+VLCAdditions.h"
 
@@ -33,6 +32,8 @@
 #import "windows/mainwindow/VLCMainWindow.h"
 #import "windows/video/VLCDetachedVideoWindow.h"
 #import "windows/video/VLCVoutView.h"
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 #import "panels/dialogs/VLCResumeDialogController.h"
 #import "panels/VLCVideoEffectsWindowController.h"
@@ -178,6 +179,8 @@ int WindowOpen(vout_window_t *p_wnd)
     NSInteger currentWindowLevel;
 
     BOOL mainWindowHasVideo;
+
+    VLCPlayerController *_playerController;
 }
 @end
 
@@ -212,6 +215,7 @@ int WindowOpen(vout_window_t *p_wnd)
 
 - (VLCVoutView *)setupVoutForWindow:(vout_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition
 {
+    _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
     BOOL isEmbedded = YES;
     BOOL isNativeFullscreen = [[VLCMain sharedInstance] nativeFullscreenMode];
     BOOL windowDecorations = var_InheritBool(getIntf(), "video-deco");
@@ -360,11 +364,13 @@ int WindowOpen(vout_window_t *p_wnd)
 
     // TODO: find a cleaner way for "start in fullscreen"
     // Start in fs, because either prefs settings, or fullscreen button was pressed before
-    char *psz_splitter = var_GetString(pl_Get(getIntf()), "video-splitter");
+
+    /* detect the video-splitter and prevent starts in fullscreen if it is enabled */
+    char *psz_splitter = var_GetString(voutView.voutThread, "video-splitter");
     BOOL b_have_splitter = psz_splitter != NULL && *psz_splitter != '\0';
     free(psz_splitter);
 
-    if (!videoWallpaper && !b_have_splitter && (var_InheritBool(getIntf(), "fullscreen") || var_GetBool(pl_Get(getIntf()), "fullscreen"))) {
+    if (!videoWallpaper && !b_have_splitter && (var_InheritBool(getIntf(), "fullscreen") || _playerController.fullscreen)) {
 
         // this is not set when we start in fullscreen because of
         // fullscreen settings in video prefs the second time
@@ -474,11 +480,11 @@ int WindowOpen(vout_window_t *p_wnd)
 
     if (!p_intf || (!b_nativeFullscreenMode && !p_wnd))
         return;
-    playlist_t *p_playlist = pl_Get(p_intf);
     BOOL b_fullscreen = i_full != 0;
 
-    if (!var_GetBool(p_playlist, "fullscreen") != !b_fullscreen)
-        var_SetBool(p_playlist, "fullscreen", b_fullscreen);
+    if (!_playerController.fullscreen != !b_fullscreen) {
+        _playerController.fullscreen = b_fullscreen;
+    }
 
     VLCVideoWindowCommon *o_current_window = nil;
     if(p_wnd)
@@ -504,15 +510,11 @@ int WindowOpen(vout_window_t *p_wnd)
         assert(o_current_window);
 
         if (b_fullscreen) {
-            input_thread_t * p_input = pl_CurrentInput(p_intf);
-            if (p_input != NULL && [[VLCMain sharedInstance] activeVideoPlayback]) {
+            if (_playerController.playerState != VLC_PLAYER_STATE_STOPPED && [[VLCMain sharedInstance] activeVideoPlayback]) {
                 // activate app, as method can also be triggered from outside the app (prevents nasty window layout)
                 [NSApp activateIgnoringOtherApps:YES];
                 [o_current_window enterFullscreenWithAnimation:b_animation];
-
             }
-            if (p_input)
-                input_Release(p_input);
         } else {
             // leaving fullscreen is always allowed
             [o_current_window leaveFullscreenWithAnimation:YES];
