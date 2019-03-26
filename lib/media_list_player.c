@@ -119,7 +119,6 @@ static inline libvlc_event_manager_t * mlist_em(libvlc_media_list_player_t * p_m
 
 static inline libvlc_event_manager_t * mplayer_em(libvlc_media_list_player_t * p_mlp)
 {
-    assert_locked(p_mlp);
     return libvlc_media_player_event_manager(p_mlp->p_mi);
 }
 
