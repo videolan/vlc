@@ -183,8 +183,6 @@ static void *EventThread( void *p_this )
     /* GetMessage will sleep if there's no message in the queue */
     for( ;; )
     {
-        vout_display_place_t place;
-
         if( !GetMessage( &msg, 0, 0, 0 ) )
         {
             vlc_mutex_lock( &p_event->lock );
@@ -228,7 +226,7 @@ static void *EventThread( void *p_this )
         {
         case WM_MOUSEMOVE:
             vlc_mutex_lock( &p_event->lock );
-            place  = p_event->place;
+            vout_display_place_t place  = p_event->place;
             vlc_mutex_unlock( &p_event->lock );
 
             if( place.width > 0 && place.height > 0 )
@@ -806,13 +804,12 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     /* Create video sub-window. This sub window will always exactly match
      * the size of the video, which allows us to use crazy overlay colorkeys
      * without having them shown outside of the video area. */
-    /* FIXME vd->source.i_width/i_height seems wrong */
     p_event->hvideownd =
     CreateWindow( p_event->class_video, _T(""),   /* window class */
         WS_CHILD,                   /* window style, not visible initially */
-        0, 0,
-        vd->source.i_width,          /* default width */
-        vd->source.i_height,        /* default height */
+        p_event->place.x, p_event->place.y,
+        p_event->place.width,          /* default width */
+        p_event->place.height,        /* default height */
         p_event->hwnd,               /* parent window */
         NULL, hInstance,
         (LPVOID)p_event );    /* send vd to WM_CREATE */
