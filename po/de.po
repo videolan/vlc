@@ -1,5 +1,5 @@
 # German translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -13,18 +13,18 @@
 # Martin Böh <martin-boeh@outlook.com>, 2013
 # Mathias C. Berens | welcome-soft <berens at welcome-soft.de>, 2006
 # Michael <inactive+banescar@transifex.com>, 2013
-# Michał Trzebiatowski <michtrz@gmail.com>, 2010-2018
+# Michał Trzebiatowski <michtrz@gmail.com>, 2009-2019
 # Philipp Weissenbacher <philippweissenbacher _at_ aon.at>, 2004
 # thillux, 2013
 # Thomas Graf <tgr at reeler.org>, 2002
 # Tobias Bannert <tobannert@gmail.com>, 2014-2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-28 11:49+0200\n"
-"Last-Translator: porschm, 2018\n"
+"PO-Revision-Date: 2019-03-25 15:16+0100\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2019\n"
 "Language-Team: German (https://www.transifex.com/yaron/teams/16553/de/)\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -2722,9 +2722,9 @@ msgid ""
 "Language of the menus you want to use with DVD/BluRay (comma separated, two "
 "or three letters country code, you may use 'any' as a fallback)."
 msgstr ""
-"Sprache der Menüs die mit DVD/BluRays verwendet werden (Komma-getrennt, "
-"zwei- oder drei-Zeichen Landeskennzeichen, 'any' als möglichen Ersatz "
-"verwenden)."
+"Sprache der Menüs die mit DVD/BluRays verwendet werden (durch Kommata "
+"getrennte 2er- oder 3er-Landescodes. Sie können als Ausweichmöglichkeit "
+"'any' (beliebig) verwenden)."
 
 #: src/libvlc-module.c:604
 msgid "Audio track ID"
@@ -10019,7 +10019,7 @@ msgstr "Faktor"
 
 #: modules/audio_filter/compressor.c:168
 msgid "Set the ratio (n:1)."
-msgstr "Das Verhältnis (n:1)."
+msgstr "Einstellung des Verhältnisses (n:1)."
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:230
@@ -10898,7 +10898,7 @@ msgstr "AES3/SMPTE 302M Audiodecoder"
 
 #: modules/codec/aes3.c:52
 msgid "AES3/SMPTE 302M audio packetizer"
-msgstr "AES3/SMPTE 302M Audio packetizer"
+msgstr "AES3/SMPTE 302M Audio-Paketisierer"
 
 #: modules/codec/aom.c:52
 msgid "AOM video decoder"
@@ -11012,7 +11012,7 @@ msgstr "Direktes Rendern"
 
 #: modules/codec/avcodec/avcodec.h:59
 msgid "Show corrupted frames"
-msgstr "Korrupte Einzelbilder anzeigen"
+msgstr "Beschädigte Einzelbilder anzeigen"
 
 #: modules/codec/avcodec/avcodec.h:60
 msgid "Prefer visual artifacts instead of missing frames"
@@ -11443,14 +11443,14 @@ msgid ""
 "This is not an error inside VLC media player.\n"
 "Do not contact the VideoLAN project about this issue.\n"
 msgstr ""
-"Es scheint das Ihrer Libav/FFMPEG (libavcodec) Installation der/die "
+"Es scheint, dass Ihrer Libav/FFMPEG (libavcodec) Installation der/die "
 "folgende(n) Encoder fehlen:\n"
 "%s.\n"
-"Wenn Sie nicht wissen wie Sie dies beheben, fragen Sie nach Hilfe von Ihrer "
-"Distribution.\n"
+"Wenn Sie nicht wissen, wie Sie dieses Problem beheben können, bitten Sie den "
+"Vertrieb Ihrer Distribution um Unterstützung.\n"
 "\n"
-"Dies ist kein Fehler im VLC media player.\n"
-"Kontaktieren Sie nicht das VideoLAN-Projekt wegen dieses Problems.\n"
+"Dies ist kein Fehler im VLC Media Player.\n"
+"Wenden Sie sich wegen dieses Problems nicht an das VideoLAN-Projekt.\n"
 
 #: modules/codec/avcodec/encoder.c:892
 msgid "unknown"
@@ -11517,7 +11517,7 @@ msgstr "CVD-Untertiteldecoder"
 
 #: modules/codec/cvdsub.c:55
 msgid "Chaoji VCD subtitle packetizer"
-msgstr "Chaoji VCD-Untertitelpacketizer"
+msgstr "Chaoji VCD-Untertitelpaketisierer"
 
 #: modules/codec/daala.c:109 modules/codec/speex.c:63
 #: modules/codec/theora.c:105 modules/codec/twolame.c:54
@@ -12108,7 +12108,7 @@ msgstr "Tiger-Rendering-Standardeinstellungen"
 
 #: modules/codec/kate.c:323
 msgid "Kate text subtitles packetizer"
-msgstr "Kate-Textuntertitel-Paketisierer"
+msgstr "Kate-Textuntertitel Paketisierer"
 
 #: modules/codec/libass.c:60
 msgid "Subtitles (advanced)"
@@ -12141,7 +12141,7 @@ msgstr "Linearer PCM-Audiodecoder"
 
 #: modules/codec/lpcm.c:65
 msgid "Linear PCM audio packetizer"
-msgstr "Linearer PCM-Audiopacketizer"
+msgstr "Linearer PCM-Audiopaketisierer"
 
 #: modules/codec/lpcm.c:71
 msgid "Linear PCM audio encoder"
@@ -12461,7 +12461,7 @@ msgstr "Pseudo-Raw-Videodecoder"
 
 #: modules/codec/rawvideo.c:71
 msgid "Pseudo raw video packetizer"
-msgstr "Pseudo-Raw-Videopacketizer"
+msgstr "Pseudo-Raw Videopaketisierer"
 
 #: modules/codec/rtpvideo.c:45
 msgid "Raw video encoder for RTP"
@@ -13352,7 +13352,7 @@ msgstr "Theora-Videodecoder"
 
 #: modules/codec/theora.c:124
 msgid "Theora video packetizer"
-msgstr "Theora-Videopacketizer"
+msgstr "Theora Videopaketisierer"
 
 #: modules/codec/theora.c:131
 msgid "Theora video encoder"
@@ -13457,7 +13457,7 @@ msgstr "Vorbis-Audiodecoder"
 
 #: modules/codec/vorbis.c:200
 msgid "Vorbis audio packetizer"
-msgstr "Vorbis-Audiopacketizer"
+msgstr "Vorbis Audiopaketisierer"
 
 #: modules/codec/vorbis.c:207
 msgid "Vorbis audio encoder"
@@ -15901,7 +15901,7 @@ msgstr "Nur M4A Audiospuren"
 
 #: modules/demux/mp4/mp4.c:51
 msgid "Ignore non audio tracks from iTunes audio files"
-msgstr "Ignoriert nicht-Audiospuren von iTunes Audiodateien"
+msgstr "Nicht-Audiospuren von iTunes-Audiodateien ignorieren"
 
 #: modules/demux/mp4/mp4.c:56
 msgid "MP4 stream demuxer"
@@ -23995,16 +23995,15 @@ msgstr "LibNotify-Benachrichtigungsplugin"
 
 #: modules/packetizer/a52.c:51
 msgid "A/52 audio packetizer"
-msgstr "A/52-Audiopacketizer"
+msgstr "A/52 Audiopaketisierer"
 
 #: modules/packetizer/avparser.h:49
 msgid "avparser packetizer"
-msgstr "AVParser-Paketisierer"
+msgstr "AVParser Paketisierer"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Daala Videopaketisierer"
+msgstr "AV1-Videopaketisierer"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -24016,19 +24015,19 @@ msgstr "Dirac-Audiopaketisierer"
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
-msgstr "DTS-Audiopacketizer"
+msgstr "DTS Audiopaketisierer"
 
 #: modules/packetizer/flac.c:49
 msgid "Flac audio packetizer"
-msgstr "Flac-Audiopaketisierer"
+msgstr "FLAC Audiopaketisierer"
 
 #: modules/packetizer/h264.c:62
 msgid "H.264 video packetizer"
-msgstr "H.264-Videopaketisierer"
+msgstr "H.264 Videopaketisierer"
 
 #: modules/packetizer/hevc.c:57
 msgid "HEVC/H.265 video packetizer"
-msgstr "HEVC/H.265-Videopaketisierer"
+msgstr "HEVC/H.265 Videopaketisierer"
 
 #: modules/packetizer/mlp.c:50
 msgid "MLP/TrueHD parser"
@@ -24036,15 +24035,15 @@ msgstr "MLP/TrueHD Parser"
 
 #: modules/packetizer/mpeg4audio.c:194
 msgid "MPEG4 audio packetizer"
-msgstr "MPEG4-Audiopacketizer"
+msgstr "MPEG4 Audiopaketisierer"
 
 #: modules/packetizer/mpeg4video.c:55
 msgid "MPEG4 video packetizer"
-msgstr "MPEG4-Videopacketizer"
+msgstr "MPEG4 Videopaketisierer"
 
 #: modules/packetizer/mpegaudio.c:88
 msgid "MPEG audio layer I/II/III packetizer"
-msgstr "MPEG Audio Layer I/II/III-Paketisierer"
+msgstr "MPEG Audio Layer I/II/III Paketisierer"
 
 #: modules/packetizer/mpegvideo.c:60
 msgid "Sync on Intra Frame"
@@ -24061,7 +24060,7 @@ msgstr ""
 
 #: modules/packetizer/mpegvideo.c:74
 msgid "MPEG-I/II video packetizer"
-msgstr "MPEG-I/II-Videopacketizer"
+msgstr "MPEG-I/II Videopaketisierer"
 
 #: modules/packetizer/mpegvideo.c:75
 msgid "MPEG Video"
@@ -24069,7 +24068,7 @@ msgstr "MPEG Video"
 
 #: modules/packetizer/vc1.c:54
 msgid "VC-1 packetizer"
-msgstr "VC-1-Paketisierer"
+msgstr "VC-1 Paketisierer"
 
 #: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
@@ -28305,7 +28304,7 @@ msgstr "WL SHM"
 
 #: modules/video_output/wayland/shm.c:509
 msgid "Wayland shared memory video output"
-msgstr "Wayland-Shared Memory-Videoausgang"
+msgstr "Wayland Shared Memory-Videoausgang"
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
