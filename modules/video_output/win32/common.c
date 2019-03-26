@@ -77,7 +77,7 @@ static bool GetWindowDimensions(void *opaque, UINT *width, UINT *height)
 }
 
 /* */
-int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys)
+int CommonInit(vlc_object_t *obj, vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys)
 {
     if (unlikely(area->vdcfg.window == NULL))
         return VLC_EGENERIC;
@@ -98,10 +98,10 @@ int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_
     area->pf_GetDisplayDimensions = GetWindowDimensions;
     area->opaque_dimensions = sys;
 
-    var_Create(vd, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    var_Create(obj, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
     /* */
-    sys->event = EventThreadCreate(vd, area->vdcfg.window);
+    sys->event = EventThreadCreate(obj, area->vdcfg.window);
     if (!sys->event)
         return VLC_EGENERIC;
 
@@ -114,8 +114,8 @@ int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_
 #ifdef MODULE_NAME_IS_direct3d9
     cfg.use_desktop = sys->use_desktop;
 #endif
-    cfg.x      = var_InheritInteger(vd, "video-x");
-    cfg.y      = var_InheritInteger(vd, "video-y");
+    cfg.x      = var_InheritInteger(obj, "video-x");
+    cfg.y      = var_InheritInteger(obj, "video-y");
     cfg.width  = area->vdcfg.display.width;
     cfg.height = area->vdcfg.display.height;
     cfg.is_projected = vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR;

@@ -123,7 +123,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     /* */
     InitArea(vd, &sys->area, cfg);
-    if (CommonInit(vd, &sys->area, &sys->sys))
+    if (CommonInit(VLC_OBJECT(vd), vd, &sys->area, &sys->sys))
         goto error;
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)

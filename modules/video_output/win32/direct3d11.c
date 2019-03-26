@@ -481,7 +481,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 #endif
     InitArea(vd, &sys->area, cfg);
 #if !VLC_WINSTORE_APP
-    if (d3d11_ctx == NULL && CommonInit(vd, &sys->area, &sys->sys))
+    if (d3d11_ctx == NULL && CommonInit(VLC_OBJECT(vd), vd, &sys->area, &sys->sys))
         goto error;
 #else /* !VLC_WINSTORE_APP */
     sys->area.pf_GetDisplayDimensions = GetExtenalSwapchainDimensions;
