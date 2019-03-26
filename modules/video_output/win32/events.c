@@ -946,7 +946,8 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
     {
 
     case WM_SIZE:
-        atomic_store(&p_event->size_changed, true);
+        if (!p_event->hparent)
+            atomic_store(&p_event->size_changed, true);
         return 0;
 
     /* the user wants to close the window */
