@@ -316,6 +316,10 @@ int main (void)
     test_url_parse("http://user%/Oath", "http", NULL, NULL, NULL, 0, "/Oath",
                    NULL);
 
+    /* URIs to fixup */
+    test_url_parse("smb://SERVER:445/SHARE/My file.mp3", "smb", NULL, NULL, "SERVER", 445, NULL, NULL);
+    test_url_parse_fixup("smb://SERVER:445/SHARE/My file.mp3", "smb", NULL, NULL, "SERVER", 445, "/SHARE/My%20file.mp3", NULL);
+
     /* Reference test cases for reference URI resolution */
     static const char *rfc3986_cases[] =
     {
