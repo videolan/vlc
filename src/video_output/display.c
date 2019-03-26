@@ -269,11 +269,6 @@ void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
     video->b_double_click = window->b_double_click;
 }
 
-void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, int m_x, int m_y)
-{
-    vout_window_ReportMouseMoved(vd->cfg->window, m_x, m_y);
-}
-
 typedef struct {
     vout_display_t  display;
 

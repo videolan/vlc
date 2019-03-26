@@ -406,6 +406,19 @@ static inline void vout_display_SendEventViewpointMoved(vout_display_t *vd,
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED, vp);
 }
 
+/**
+ * Helper function that applies the necessary transforms to the mouse position
+ * and then calls vout_display_SendEventMouseMoved.
+ *
+ * \param vd vout_display_t.
+ * \param m_x Mouse x position (relative to place, origin is top left).
+ * \param m_y Mouse y position (relative to place, origin is top left).
+ */
+static inline void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, int m_x, int m_y)
+{
+    vout_window_ReportMouseMoved(vd->cfg->window, m_x, m_y);
+}
+
 static inline bool vout_display_cfg_IsWindowed(const vout_display_cfg_t *cfg)
 {
     return cfg->window->type != VOUT_WINDOW_TYPE_DUMMY;
@@ -450,16 +463,6 @@ VLC_API void vout_display_PlacePicture(vout_display_place_t *place, const video_
  */
 void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
                                       const vlc_mouse_t *window);
-
-/**
- * Helper function that applies the necessary transforms to the mouse position
- * and then calls vout_display_SendEventMouseMoved.
- *
- * \param vd vout_display_t.
- * \param m_x Mouse x position (relative to place, origin is top left).
- * \param m_y Mouse y position (relative to place, origin is top left).
- */
-VLC_API void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, int m_x, int m_y);
 
 /** @} */
 #endif /* VLC_VOUT_DISPLAY_H */

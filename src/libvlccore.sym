@@ -768,7 +768,6 @@ vout_window_Disable
 vout_display_GetDefaultDisplaySize
 vout_display_PlacePicture
 vout_display_SendEventPicturesInvalid
-vout_display_SendMouseMovedDisplayCoordinates
 vout_display_New
 vout_display_Delete
 vout_display_Prepare
