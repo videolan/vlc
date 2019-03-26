@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCConvertAndSaveWindowController.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2012 Felix Paul Kühne
+ * Copyright (C) 2012, 2019 Felix Paul Kühne
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *
@@ -26,10 +26,11 @@
 #import "main/VLCMain.h"
 #import "panels/dialogs/VLCPopupPanelController.h"
 #import "panels/dialogs/VLCTextfieldPanelController.h"
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlaylistModel.h"
+#import "windows/VLCOpenInputMetadata.h"
 
-#import <vlc_common.h>
 #import <vlc_url.h>
-#import <vlc_playlist_legacy.h>
 
 /* mini doc:
  * the used NSMatrix includes a bunch of cells referenced most easily by tags. There you go: */
@@ -278,31 +279,20 @@
         }
     }
 
-    playlist_t * p_playlist = pl_Get(getIntf());
+    VLCOpenInputMetadata *inputMetaItem = [[VLCOpenInputMetadata alloc] init];
+    inputMetaItem.MRLString = _MRL;
+    inputMetaItem.itemName = [_dropinMediaLabel stringValue];
 
-    input_item_t *p_input = input_item_New([_MRL UTF8String], [[_dropinMediaLabel stringValue] UTF8String]);
-    if (!p_input)
-        return;
-
-    input_item_AddOption(p_input, [[self composedOptions] UTF8String], VLC_INPUT_OPTION_TRUSTED);
-    if (b_streaming)
-        input_item_AddOption(p_input, [[NSString stringWithFormat:@"ttl=%@", [_streamTTLField stringValue]] UTF8String], VLC_INPUT_OPTION_TRUSTED);
-
-    int returnValue;
-    returnValue = playlist_AddInput(p_playlist, p_input, false );
-
-    if (returnValue == VLC_SUCCESS) {
-        /* let's "play" */
-        PL_LOCK;
-        playlist_item_t *p_item = playlist_ItemGetByInput(p_playlist, p_input);
-        playlist_ViewPlay(p_playlist, NULL, p_item);
-        PL_UNLOCK;
+    NSMutableArray *options = [[NSMutableArray alloc] init];
+    [options addObject:[self composedOptions]];
+    if (b_streaming) {
+        [options addObject:[NSString stringWithFormat:@"ttl=%@", [_streamTTLField stringValue]]];
     }
-    else
-        msg_Err(getIntf(), "CAS: playlist add input failed :(");
+    inputMetaItem.playbackOptions = options;
 
-    /* we're done with this input */
-    input_item_Release(p_input);
+    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+    [playlistController addPlaylistItems:@[inputMetaItem]];
+    [playlistController playItemAtIndex:(playlistController.playlistModel.numberOfPlaylistItems -1)];
 
     [self.window performClose:sender];
 }
