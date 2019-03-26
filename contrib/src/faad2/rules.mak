@@ -24,6 +24,7 @@ endif
 	$(APPLY) $(SRC)/faad2/faad2-fix-71wPCEmapping.patch
 	$(APPLY) $(SRC)/faad2/faad2-fix-cpe-reconstruction.patch
 	$(APPLY) $(SRC)/faad2/faad2-add-define.patch
+	$(APPLY) $(SRC)/faad2/faad2-fix-overflows.patch
 	cd $(UNPACK_DIR) && $(CC) -iquote . -E - </dev/null || sed -i 's/-iquote /-I/' libfaad/Makefile.am
 	$(MOVE)
 
