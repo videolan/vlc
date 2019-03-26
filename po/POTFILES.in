@@ -1231,6 +1231,7 @@ modules/video_output/win32/direct3d9.c
 modules/video_output/win32/direct3d11.c
 modules/video_output/win32/events.c
 modules/video_output/win32/glwin32.c
+modules/video_output/win32/window.c
 modules/video_output/win32/wingdi.c
 modules/video_output/win32/wgl.c
 modules/video_output/vdummy.c

@@ -386,6 +386,11 @@ if HAVE_WIN32
 vout_LTLIBRARIES += libdrawable_plugin.la
 endif
 
+libwin32_window_plugin_la_SOURCES = video_output/win32/window.c
+if HAVE_WIN32_DESKTOP
+vout_LTLIBRARIES += libwin32_window_plugin.la
+endif
+
 
 ### OS/2 ###
 if HAVE_OS2
