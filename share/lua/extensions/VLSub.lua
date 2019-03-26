@@ -1488,6 +1488,22 @@ function download_subtitles()
 
   subfileName = subfileName.."."..item.SubFormat
   local tmp_dir = vlc.config.cachedir()
+  -- create the cache directory if it doesn't already exist
+  local separator = ""
+  local current_dir = ""
+  if package.config:sub(1, 1):match("/") then
+    -- unix based systems
+    separator = "/"
+    current_dir = "/"
+  else
+    -- windows systems
+    separator = "\\"
+  end
+  for dir in tmp_dir:gmatch("[^"..separator.."]+") do
+    current_dir = current_dir..dir..separator
+    local vars = vlc.io.mkdir(current_dir, "0700")
+  end
+
   local file_target_access = true
 
   local tmpFileName = dump_zip(
