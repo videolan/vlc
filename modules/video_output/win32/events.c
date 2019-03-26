@@ -420,10 +420,10 @@ bool EventThreadGetAndResetSizeChanged( event_thread_t *p_event )
     return atomic_exchange(&p_event->size_changed, false);
 }
 
-event_thread_t *EventThreadCreate( vout_display_t *vd, const vout_display_cfg_t *vdcfg)
+event_thread_t *EventThreadCreate( vout_display_t *vd, const vout_display_cfg_t *vdcfg, vout_window_t *parent_window)
 {
-    if (vdcfg->window->type != VOUT_WINDOW_TYPE_HWND &&
-        !(vdcfg->window->type == VOUT_WINDOW_TYPE_DUMMY && vdcfg->window->handle.hwnd == 0))
+    if (parent_window->type != VOUT_WINDOW_TYPE_HWND &&
+        !(parent_window->type == VOUT_WINDOW_TYPE_DUMMY && parent_window->handle.hwnd == 0))
         return NULL;
      /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
@@ -441,7 +441,7 @@ event_thread_t *EventThreadCreate( vout_display_t *vd, const vout_display_cfg_t 
     vlc_mutex_init( &p_event->lock );
     vlc_cond_init( &p_event->wait );
 
-    p_event->parent_window = vdcfg->window;
+    p_event->parent_window = parent_window;
 
     p_event->is_cursor_hidden = false;
     p_event->button_pressed = 0;

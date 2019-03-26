@@ -98,7 +98,7 @@ int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_
     var_Create(vd, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
     /* */
-    sys->event = EventThreadCreate(vd, &area->vdcfg);
+    sys->event = EventThreadCreate(vd, &area->vdcfg, area->vdcfg.window);
     if (!sys->event)
         return VLC_EGENERIC;
 
