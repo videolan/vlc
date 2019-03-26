@@ -101,9 +101,13 @@ int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_
     var_Create(vd, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
     /* */
-    sys->event = EventThreadCreate(vd, &area->vdcfg, area->vdcfg.window);
+    sys->event = EventThreadCreate(vd, area->vdcfg.window);
     if (!sys->event)
         return VLC_EGENERIC;
+
+    vout_display_place_t original_place;
+    vout_display_PlacePicture(&original_place, &vd->source, &area->vdcfg);
+    EventThreadUpdatePlace(sys->event, &original_place);
 
     event_cfg_t cfg;
     memset(&cfg, 0, sizeof(cfg));

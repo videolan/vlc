@@ -420,7 +420,7 @@ bool EventThreadGetAndResetSizeChanged( event_thread_t *p_event )
     return atomic_exchange(&p_event->size_changed, false);
 }
 
-event_thread_t *EventThreadCreate( vout_display_t *vd, const vout_display_cfg_t *vdcfg, vout_window_t *parent_window)
+event_thread_t *EventThreadCreate( vout_display_t *vd, vout_window_t *parent_window)
 {
     if (parent_window->type != VOUT_WINDOW_TYPE_HWND &&
         !(parent_window->type == VOUT_WINDOW_TYPE_DUMMY && parent_window->handle.hwnd == 0))
@@ -448,7 +448,12 @@ event_thread_t *EventThreadCreate( vout_display_t *vd, const vout_display_cfg_t 
     p_event->psz_title = NULL;
     p_event->hwnd = NULL;
     atomic_init(&p_event->size_changed, false);
-    vout_display_PlacePicture(&p_event->place, &vd->source, vdcfg);
+
+    /* initialized to 0 to match the init in the display_win32_area_t */
+    p_event->place.x = 0;
+    p_event->place.y = 0;
+    p_event->place.width = 0;
+    p_event->place.height = 0;
 
     _sntprintf( p_event->class_main, ARRAYSIZE(p_event->class_main),
                _T("VLC video main %p"), (void *)p_event );

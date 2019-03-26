@@ -45,7 +45,7 @@ typedef struct {
     HWND hfswnd;
 } event_hwnd_t;
 
-event_thread_t *EventThreadCreate( vout_display_t *, const vout_display_cfg_t *, vout_window_t *);
+event_thread_t *EventThreadCreate( vout_display_t *, vout_window_t *);
 void            EventThreadDestroy( event_thread_t * );
 int             EventThreadStart( event_thread_t *, event_hwnd_t *, const event_cfg_t * );
 void            EventThreadStop( event_thread_t * );
