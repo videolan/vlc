@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCFSPanelController.m: macOS fullscreen controls window controller
  *****************************************************************************
- * Copyright (C) 2006-2016 VLC authors and VideoLAN
+ * Copyright (C) 2006-2019 VLC authors and VideoLAN
  *
  * Authors: Jérôme Decoodt <djc at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
@@ -26,11 +26,10 @@
 #import "VLCFSPanelController.h"
 
 #import <vlc_aout.h>
-#import <vlc_playlist_legacy.h>
 
-#import "coreinteraction/VLCCoreInteraction.h"
-#import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 @interface VLCFSPanelController () {
     BOOL _isCounting;
@@ -39,6 +38,9 @@
     NSRect _associatedVoutFrame;
     // Used to ask for current constraining rect on movement
     NSWindow *_associatedVoutWindow;
+
+    VLCPlaylistController *_playlistController;
+    VLCPlayerController *_playerController;
 }
 
 @end
@@ -68,8 +70,17 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     return self;
 }
 
+- (void)dealloc
+{
+    [self stopAutohideTimer];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)windowDidLoad
 {
+    _playlistController = [[VLCMain sharedInstance] playlistController];
+    _playerController = [_playlistController playerController];
+
     [super windowDidLoad];
 
     /* Do some window setup that is not possible in IB */
@@ -87,6 +98,14 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [self injectVisualEffectView];
 
     [self setupControls];
+
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self selector:@selector(playbackStateChanged:) name:VLCPlayerStateChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(updatePositionAndTime:) name:VLCPlayerTimeAndPositionChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(capabilitiesChanged:) name:VLCPlayerCapabilitiesChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(hasPreviousChanged:) name:VLCPlaybackHasPreviousChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(hasNextChanged:) name:VLCPlaybackHasNextChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(volumeChanged:) name:VLCPlayerVolumeChanged object:nil];
 }
 
 #define setupButton(target, title, desc)            \
@@ -123,9 +142,9 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
                 _NS("Adjust the current playback position"));
 
     /* Setup other controls */
-    [_volumeSlider setMaxValue:[[VLCCoreInteraction sharedInstance] maxVolume]];
-    [_volumeSlider setIntValue:AOUT_VOLUME_DEFAULT];
-    [_volumeSlider setDefaultValue:AOUT_VOLUME_DEFAULT];
+    [_volumeSlider setMaxValue:2.0];
+    [_volumeSlider setFloatValue:_playerController.volume];
+    [_volumeSlider setDefaultValue:1.0];
 
     /* Identifier to store the state of the remaining or total time label,
      * this is the same identifier as used for the window playback cotrols
@@ -141,7 +160,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 
 - (IBAction)togglePlayPause:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] playOrPause];
+    [_playerController togglePlayPause];
 }
 
 - (IBAction)jumpForward:(id)sender
@@ -149,7 +168,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     static NSTimeInterval last_event = 0;
     if (([NSDate timeIntervalSinceReferenceDate] - last_event) > 0.16) {
         /* We just skipped 4 "continuous" events, otherwise we are too fast */
-        [[VLCCoreInteraction sharedInstance] forwardExtraShort];
+        [_playerController jumpForwardExtraShort];
         last_event = [NSDate timeIntervalSinceReferenceDate];
     }
 }
@@ -159,31 +178,33 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     static NSTimeInterval last_event = 0;
     if (([NSDate timeIntervalSinceReferenceDate] - last_event) > 0.16) {
         /* We just skipped 4 "continuous" events, otherwise we are too fast */
-        [[VLCCoreInteraction sharedInstance] backwardExtraShort];
+        [_playerController jumpBackwardExtraShort];
         last_event = [NSDate timeIntervalSinceReferenceDate];
     }
 }
 
 - (IBAction)gotoPrevious:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] previous];
+    [_playlistController playPreviousItem];
 }
 
 - (IBAction)gotoNext:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] next];
+    [_playlistController playNextItem];
 }
 
 - (IBAction)toggleFullscreen:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+    [_playerController toggleFullscreen];
 }
 
 - (IBAction)timeSliderUpdate:(id)sender
 {
+    float f_updatedDelta;
+
     switch([[NSApp currentEvent] type]) {
         case NSLeftMouseUp:
-            /* Ignore mouse up, as this is a continuous slider and
+            /* Ignore mouse up, as this is a continous slider and
              * when the user does a single click to a position on the slider,
              * the action is called twice, once for the mouse down and once
              * for the mouse up event. This results in two short seeks one
@@ -193,30 +214,35 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
             return;
         case NSLeftMouseDown:
         case NSLeftMouseDragged:
+            f_updatedDelta = [_timeSlider floatValue];
+            break;
+        case NSScrollWheel:
+            f_updatedDelta = [_timeSlider floatValue];
             break;
 
         default:
             return;
     }
-    input_thread_t *p_input;
-    p_input = pl_CurrentInput(getIntf());
 
-    if (p_input) {
-        vlc_value_t pos;
-        pos.f_float = [_timeSlider floatValue] / 10000.;
-        var_Set(p_input, "position", pos);
-        input_Release(p_input);
-    }
-    [[[VLCMain sharedInstance] mainWindow] updateTimeSlider];
+    [_playerController setPositionFast:f_updatedDelta / 10000.];
 }
 
 - (IBAction)volumeSliderUpdate:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVolume:[sender intValue]];
+    _playerController.volume = [sender floatValue];
 }
 
 #pragma mark -
 #pragma mark Metadata and state updates
+
+- (void)playbackStateChanged:(NSNotification *)aNotification
+{
+    if (_playerController.playerState == VLC_PLAYER_STATE_PLAYING) {
+        [self setPause];
+    } else {
+        [self setPlay];
+    }
+}
 
 - (void)setPlay
 {
@@ -235,53 +261,54 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [_mediaTitle setStringValue:title];
 }
 
-- (void)updatePositionAndTime
+- (void)updatePositionAndTime:(NSNotification *)aNotification
 {
-    input_thread_t *p_input = pl_CurrentInput(getIntf());
+    VLCPlayerController *playerController = aNotification.object;
+    input_item_t *p_item = playerController.currentMedia;
 
     /* If nothing is playing, reset times and slider */
-    if (!p_input) {
+    if (!p_item) {
         [_timeSlider setFloatValue:0.0];
         [_elapsedTime setStringValue:@""];
         [_remainingOrTotalTime setHidden:YES];
         return;
     }
 
-    vlc_value_t pos;
-    char psz_time[MSTRTIME_MAX_SIZE];
+    [_timeSlider setFloatValue:(10000. * playerController.position)];
 
-    var_Get(p_input, "position", &pos);
-    float f_updated = 10000. * pos.f_float;
-    [_timeSlider setFloatValue:f_updated];
+    vlc_tick_t time =_playerController.time;
+    vlc_tick_t duration = input_item_GetDuration(p_item);
 
-
-    vlc_tick_t t = var_GetInteger(p_input, "time");
-    vlc_tick_t dur = input_item_GetDuration(input_GetItem(p_input));
-
-    /* Update total duration (right field) */
-    if (dur <= 0) {
-        [_remainingOrTotalTime setHidden:YES];
+    bool buffering = playerController.playerState == VLC_PLAYER_STATE_STARTED;
+    if (duration == -1) {
+        // No duration, disable slider
+        [_timeSlider setEnabled:NO];
+    } else if (buffering) {
+        [_timeSlider setEnabled:NO];
+        [_timeSlider setIndefinite:buffering];
     } else {
-        [_remainingOrTotalTime setHidden:NO];
-
-        NSString *totalTime;
-
-        if ([_remainingOrTotalTime timeRemaining]) {
-            vlc_tick_t remaining = 0;
-            if (dur > t)
-                remaining = dur - t;
-            totalTime = [NSString stringWithFormat:@"-%s", secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(remaining))];
-        } else {
-            totalTime = toNSStr(secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(dur)));
-        }
-        [_remainingOrTotalTime setStringValue:totalTime];
+        [_timeSlider setEnabled:playerController.seekable];
     }
 
+    /* Update total duration (right field) */
+    NSString *timeString = [NSString stringWithDuration:duration
+                                            currentTime:time
+                                               negative:_remainingOrTotalTime.timeRemaining];
+    [_remainingOrTotalTime setStringValue:timeString];
+    [_remainingOrTotalTime setNeedsDisplay:YES];
+    [_remainingOrTotalTime setHidden:duration <= 0];
+
     /* Update current position (left field) */
-    NSString *playbackPosition = toNSStr(secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(t)));
+    char psz_time[MSTRTIME_MAX_SIZE];
+    NSString *playbackPosition = toNSStr(secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(time)));
 
     [_elapsedTime setStringValue:playbackPosition];
-    input_Release(p_input);
+    input_item_Release(p_item);
+}
+
+- (void)capabilitiesChanged:(NSNotification *)aNotification
+{
+    [self setSeekable:_playerController.seekable];
 }
 
 - (void)setSeekable:(BOOL)seekable
@@ -290,10 +317,6 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     // TODO: This needs a proper fix
     [_forwardButton setEnabled:NO];
     [_backwardButton setEnabled:NO];
-    [_nextButton setEnabled:NO];
-    [_nextButton setEnabled:YES];
-    [_previousButton setEnabled:NO];
-    [_previousButton setEnabled:YES];
     [_fullscreenButton setEnabled:NO];
     [_fullscreenButton setEnabled:YES];
 
@@ -302,10 +325,25 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [_backwardButton setEnabled:seekable];
 }
 
-- (void)setVolumeLevel:(int)value
+- (void)hasPreviousChanged:(NSNotification *)aNotification
 {
-    [_volumeSlider setIntValue:value];
-    [_volumeSlider setToolTip: [NSString stringWithFormat:_NS("Volume: %i %%"), (value*200)/AOUT_VOLUME_MAX]];
+    [_previousButton setEnabled:NO];
+    [_previousButton setEnabled:YES];
+    [_previousButton setEnabled:_playlistController.hasPreviousPlaylistItem];
+}
+
+- (void)hasNextChanged:(NSNotification *)aNotification
+{
+    [_nextButton setEnabled:NO];
+    [_nextButton setEnabled:YES];
+    [_nextButton setEnabled:_playlistController.hasNextPlaylistItem];
+}
+
+- (void)volumeChanged:(NSNotification *)aNotification
+{
+    float volume = _playerController.volume;
+    [_volumeSlider setFloatValue:volume];
+    [_volumeSlider setToolTip: [NSString stringWithFormat:_NS("Volume: %i %%"), volume * 100.]];
 }
 
 #pragma mark -
@@ -489,11 +527,5 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [_controlsView setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
     [self.window.contentView addSubview:_controlsView];
 }
-
-- (void)dealloc
-{
-    [self stopAutohideTimer];
-}
-
 
 @end

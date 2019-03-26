@@ -570,7 +570,6 @@ static const float f_min_window_height = 307.;
 
 - (void)updateTimeSlider
 {
-    [self.fspanel updatePositionAndTime];
 }
 
 - (void)updateName
@@ -651,9 +650,6 @@ static const float f_min_window_height = 307.;
         input_Release(p_input);
     }
 
-    if ([self.fspanel respondsToSelector:@selector(setSeekable:)])
-        [self.fspanel setSeekable: b_seekable];
-
     [self showDropZone];
     [_sidebarView setNeedsDisplay:YES];
 
@@ -663,7 +659,6 @@ static const float f_min_window_height = 307.;
 - (void)setPause
 {
     [self.controlsBar setPause];
-    [self.fspanel setPause];
 
     [[[VLCMain sharedInstance] voutProvider] updateControlsBarsUsingBlock:^(VLCControlsBarCommon *controlsBar) {
         [controlsBar setPause];
@@ -673,7 +668,6 @@ static const float f_min_window_height = 307.;
 - (void)setPlay
 {
     [self.controlsBar setPlay];
-    [self.fspanel setPlay];
 
     [[[VLCMain sharedInstance] voutProvider] updateControlsBarsUsingBlock:^(VLCControlsBarCommon *controlsBar) {
         [controlsBar setPlay];
@@ -683,7 +677,6 @@ static const float f_min_window_height = 307.;
 - (void)updateVolumeSlider
 {
     [(VLCMainWindowControlsBar *)[self controlsBar] updateVolumeSlider];
-    [self.fspanel setVolumeLevel:[[VLCCoreInteraction sharedInstance] volume]];
 }
 
 #pragma mark -

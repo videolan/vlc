@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCFSPanelController.h: macOS fullscreen controls window controller
  *****************************************************************************
- * Copyright (C) 2006-2016 VLC authors and VideoLAN
+ * Copyright (C) 2006-2019 VLC authors and VideoLAN
  *
  * Authors: Jérôme Decoodt <djc at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
@@ -28,6 +28,7 @@
 #import "windows/video/VLCWindow.h"
 #import "views/VLCDefaultValueSlider.h"
 #import "views/VLCTimeField.h"
+#import "views/VLCSlider.h"
 
 @interface VLCFSPanelController : NSWindowController
 
@@ -43,7 +44,7 @@
 @property IBOutlet NSTextField  *mediaTitle;
 @property IBOutlet VLCTimeField *elapsedTime;
 @property IBOutlet VLCTimeField *remainingOrTotalTime;
-@property IBOutlet NSSlider     *timeSlider;
+@property IBOutlet VLCSlider    *timeSlider;
 @property IBOutlet VLCDefaultValueSlider *volumeSlider;
 
 @property (assign) IBOutlet NSLayoutConstraint *heightMaxConstraint;
@@ -63,12 +64,7 @@
 - (void)setNonActive;
 - (void)setVoutWasUpdated:(VLCWindow *)voutWindow;
 
-- (void)setSeekable:(BOOL)seekable;
-- (void)setVolumeLevel:(int)value;
-- (void)updatePositionAndTime;
 - (void)setStreamTitle:(NSString *)title;
-- (void)setPlay;
-- (void)setPause;
 
 // Constrain frame to window. Used by VLCFSPanelDraggableView.
 - (NSRect)contrainFrameToAssociatedVoutWindow:(NSRect)frame;
