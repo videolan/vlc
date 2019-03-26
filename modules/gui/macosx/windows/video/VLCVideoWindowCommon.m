@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Windows.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2012-2018 VLC authors and VideoLAN
+ * Copyright (C) 2012-2019 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
@@ -32,7 +32,7 @@
 #import "windows/video/VLCVoutView.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
-#import <vlc_playlist_legacy.h>
+//#import <vlc_playlist_legacy.h>
 
 /*****************************************************************************
  * VLCVideoWindowCommon
@@ -448,12 +448,13 @@
 
     _inFullscreenTransition = YES;
 
-    var_SetBool(pl_Get(getIntf()), "fullscreen", true);
+    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    playerController.fullscreen = YES;
 
     frameBeforeLionFullscreen = [self frame];
 
     if ([self hasActiveVideo]) {
-        vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
+        vout_thread_t *p_vout = [playerController videoOutputThreadForKeyWindow];
         if (p_vout) {
             var_SetBool(p_vout, "fullscreen", true);
             vout_Release(p_vout);
@@ -497,9 +498,10 @@
     [self setFullscreen: NO];
 
     if ([self hasActiveVideo]) {
-        var_SetBool(pl_Get(getIntf()), "fullscreen", false);
+        VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+        playerController.fullscreen = NO;
 
-        vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
+        vout_thread_t *p_vout = [playerController videoOutputThreadForKeyWindow];
         if (p_vout) {
             var_SetBool(p_vout, "fullscreen", false);
             vout_Release(p_vout);
