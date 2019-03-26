@@ -242,7 +242,7 @@ static void *EventThread( void *p_this )
                     x += place.x;
                     y += place.y;
                 }
-                vout_display_SendMouseMovedDisplayCoordinates(vd, x, y);
+                vout_window_ReportMouseMoved(p_event->parent_window, x, y);
             }
             break;
         case WM_NCMOUSEMOVE:
@@ -255,7 +255,7 @@ static void *EventThread( void *p_this )
             MouseReleased( p_event, MOUSE_BUTTON_LEFT );
             break;
         case WM_LBUTTONDBLCLK:
-            vout_display_SendEventMouseDoubleClick(vd);
+            vout_window_ReportMouseDoubleClick(p_event->parent_window, MOUSE_BUTTON_LEFT);
             break;
 
         case WM_MBUTTONDOWN:
@@ -585,7 +585,7 @@ static void MousePressed( event_thread_t *p_event, HWND hwnd, unsigned button )
     if( !p_event->button_pressed )
         SetCapture( hwnd );
     p_event->button_pressed |= 1 << button;
-    vout_display_SendEventMousePressed( p_event->vd, button );
+    vout_window_ReportMousePressed(p_event->parent_window, button);
 }
 
 static void MouseReleased( event_thread_t *p_event, unsigned button )
@@ -593,7 +593,7 @@ static void MouseReleased( event_thread_t *p_event, unsigned button )
     p_event->button_pressed &= ~(1 << button);
     if( !p_event->button_pressed )
         ReleaseCapture();
-    vout_display_SendEventMouseReleased( p_event->vd, button );
+    vout_window_ReportMouseReleased(p_event->parent_window, button);
 }
 
 #if defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)
@@ -908,7 +908,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         {
             unsigned m = 1 << button;
             if( p_event->button_pressed & m )
-                vout_display_SendEventMouseReleased( p_event->vd, button );
+                vout_window_ReportMouseReleased(p_event->parent_window, button);
             p_event->button_pressed &= ~m;
         }
         p_event->button_pressed = 0;
