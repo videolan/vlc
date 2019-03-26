@@ -202,7 +202,6 @@ EXTRA_DIST += \
 	extras/package/win32/NSIS/vlc.win32.nsi.in \
 	extras/package/win32/NSIS/spad.nsi.in \
 	extras/package/win32/NSIS/vlc_branding.bmp \
-	extras/package/win32/NSIS/languages/BengaliExtra.nsh \
 	extras/package/win32/NSIS/languages/BasqueExtra.nsh \
 	extras/package/win32/NSIS/languages/PortugueseBRExtra.nsh \
 	extras/package/win32/NSIS/languages/BulgarianExtra.nsh \
@@ -220,15 +219,12 @@ EXTRA_DIST += \
 	extras/package/win32/NSIS/languages/ItalianExtra.nsh \
 	extras/package/win32/NSIS/languages/JapaneseExtra.nsh \
 	extras/package/win32/NSIS/languages/LithuanianExtra.nsh \
-	extras/package/win32/NSIS/languages/OccitanExtra.nsh \
 	extras/package/win32/NSIS/languages/PolishExtra.nsh \
-	extras/package/win32/NSIS/languages/PunjabiExtra.nsh \
 	extras/package/win32/NSIS/languages/RussianExtra.nsh \
 	extras/package/win32/NSIS/languages/RomanianExtra.nsh \
 	extras/package/win32/NSIS/languages/SimpChineseExtra.nsh \
 	extras/package/win32/NSIS/languages/SlovakExtra.nsh \
 	extras/package/win32/NSIS/languages/SlovenianExtra.nsh \
-	extras/package/win32/NSIS/languages/SoraniExtra.nsh \
 	extras/package/win32/NSIS/languages/SpanishExtra.nsh \
 	extras/package/win32/NSIS/languages/SwedishExtra.nsh \
 	extras/package/win32/NSIS/languages/AfrikaansExtra.nsh \
