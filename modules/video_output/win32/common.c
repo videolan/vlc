@@ -77,11 +77,16 @@ static bool GetWindowDimensions(void *opaque, UINT *width, UINT *height)
 }
 
 /* */
-int CommonInit(vlc_object_t *obj, vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys)
+int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
+               vout_display_sys_win32_t *sys, bool projection_gestures)
 {
     if (unlikely(area->vdcfg.window == NULL))
         return VLC_EGENERIC;
 
+    area->pf_GetDisplayDimensions = GetWindowDimensions;
+    area->opaque_dimensions = sys;
+
+    /* */
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
 #endif
@@ -91,12 +96,6 @@ int CommonInit(vlc_object_t *obj, vout_display_t *vd, display_win32_area_t *area
     sys->hfswnd    = NULL;
     sys->is_first_placement = true;
     sys->is_on_top        = false;
-
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
-#endif
-    area->pf_GetDisplayDimensions = GetWindowDimensions;
-    area->opaque_dimensions = sys;
 
     var_Create(obj, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
@@ -115,7 +114,7 @@ int CommonInit(vlc_object_t *obj, vout_display_t *vd, display_win32_area_t *area
     cfg.y      = var_InheritInteger(obj, "video-y");
     cfg.width  = area->vdcfg.display.width;
     cfg.height = area->vdcfg.display.height;
-    cfg.is_projected = vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR;
+    cfg.is_projected = projection_gestures;
 
     event_hwnd_t hwnd;
     if (EventThreadStart(sys->event, &hwnd, &cfg))

@@ -1681,8 +1681,11 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->desktop_save.is_on_top     = false;
 
     InitArea(vd, &sys->area, cfg);
-    if (d3d9_device == NULL && CommonInit(VLC_OBJECT(vd), vd, &sys->area, &sys->sys))
-        goto error;
+    if (d3d9_device == NULL)
+    {
+        if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false))
+            goto error;
+    }
 
     /* */
     video_format_t fmt;
