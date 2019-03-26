@@ -1,0 +1,25 @@
+--- faad2/libfaad/bits.c	2007-11-01 13:33:29.000000000 +0100
++++ faad2.new/libfaad/bits.c	2019-03-25 17:29:26.134199188 +0100
+@@ -167,7 +167,10 @@
+     int words = bits >> 5;
+     int remainder = bits & 0x1F;
+ 
+-    ld->bytes_left = ld->buffer_size - words*4;
++    if (ld->buffer_size < words * 4)
++        ld->bytes_left = 0;
++    else
++        ld->bytes_left = ld->buffer_size - words*4;
+ 
+     if (ld->bytes_left >= 4)
+     {
+--- faad2/libfaad/syntax.c	2019-03-25 17:57:36.930937066 +0100
++++ faad2.new/libfaad/syntax.c	2019-03-25 17:49:26.135368525 +0100
+@@ -2292,6 +2292,8 @@
+     while ((drc->additional_excluded_chns[n-1] = faad_get1bit(ld
+         DEBUGVAR(1,104,"excluded_channels(): additional_excluded_chns"))) == 1)
+     {
++        if (i >= MAX_CHANNELS - num_excl_chan - 7)
++            return n;
+         for (i = num_excl_chan; i < num_excl_chan+7; i++)
+         {
+             drc->exclude_mask[i] = faad_get1bit(ld
