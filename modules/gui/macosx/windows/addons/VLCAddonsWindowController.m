@@ -140,7 +140,7 @@ static void addonChangedCallback( addons_manager_t *manager,
         addonChangedCallback,
     };
 
-    _manager = addons_manager_New((vlc_object_t *)getIntf(), &owner);
+    _manager = addons_manager_New(VLC_OBJECT(getIntf()), &owner);
     if (!_manager)
         return;
 
