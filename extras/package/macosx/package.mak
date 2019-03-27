@@ -50,6 +50,7 @@ endif
 	-cp -a $(CONTRIB_DIR)/share/java/libbluray*.jar $@/Contents/Frameworks/plugins/
 	## Install binary
 	cp $(prefix)/bin/vlc $@/Contents/MacOS/VLC
+	install_name_tool -rpath "$(libdir)" "@executable_path/../Frameworks/" $@/Contents/MacOS/VLC
 	## Generate plugin cache
 	bin/vlc-cache-gen $@/Contents/Frameworks/plugins
 	find $@ -type d -exec chmod ugo+rx '{}' \;
