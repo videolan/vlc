@@ -209,20 +209,17 @@ static void *EventThread( void *p_this )
         switch( msg.message )
         {
         case WM_MOUSEMOVE:
-            vlc_mutex_lock( &p_event->lock );
-            vout_display_place_t place  = p_event->place;
-            vlc_mutex_unlock( &p_event->lock );
-
-            if( place.width > 0 && place.height > 0 )
             {
                 int x = GET_X_LPARAM(msg.lParam);
                 int y = GET_Y_LPARAM(msg.lParam);
 
                 if( msg.hwnd == p_event->hvideownd )
                 {
+                    vlc_mutex_lock( &p_event->lock );
                     /* Child window */
-                    x += place.x;
-                    y += place.y;
+                    x += p_event->place.x;
+                    y += p_event->place.y;
+                    vlc_mutex_unlock( &p_event->lock );
                 }
                 vout_window_ReportMouseMoved(p_event->parent_window, x, y);
             }
