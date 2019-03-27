@@ -137,7 +137,7 @@ private:
 
     VLCStatsView *statsView;
 public slots:
-    void update( input_item_t * );
+    void update(const input_stats_t &stats );
     void clear();
 };
 

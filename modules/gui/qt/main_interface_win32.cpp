@@ -27,8 +27,7 @@
 
 #include "main_interface_win32.hpp"
 
-#include "input_manager.hpp"
-#include "actions_manager.hpp"
+#include "components/player_controller.hpp"
 #include "dialogs_provider.hpp"
 #include "components/interface_widgets.hpp"
 
@@ -181,17 +180,17 @@ void MainInterfaceWin32::createTaskBarButtons()
     thbButtons[0].dwMask = dwMask;
     thbButtons[0].iId = 0;
     thbButtons[0].iBitmap = 0;
-    thbButtons[0].dwFlags = THEPL->items.i_size > 1 ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[0].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
 
     thbButtons[1].dwMask = dwMask;
     thbButtons[1].iId = 1;
     thbButtons[1].iBitmap = 2;
-    thbButtons[1].dwFlags = THEPL->items.i_size > 0 ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[1].dwFlags = THEMPL->count() > 0 ? THBF_ENABLED : THBF_HIDDEN;
 
     thbButtons[2].dwMask = dwMask;
     thbButtons[2].iId = 2;
     thbButtons[2].iBitmap = 3;
-    thbButtons[2].dwFlags = THEPL->items.i_size > 1 ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[2].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
 
     hr = p_taskbl->ThumbBarSetImageList( WinId(this), himl );
     if( FAILED(hr) )
@@ -204,14 +203,12 @@ void MainInterfaceWin32::createTaskBarButtons()
             msg_Err( p_intf, "%s failed with error %08lx",
                      "ThumbBarAddButtons", hr );
     }
-    CONNECT( THEMIM->getIM(), playingStatusChanged( int ),
-             this, changeThumbbarButtons( int ) );
-    CONNECT( THEMIM, playlistItemAppended( int, int ),
-            this, playlistItemAppended( int, int ) );
-    CONNECT( THEMIM, playlistItemRemoved( int ),
-            this, playlistItemRemoved( int ) );
-    if( THEMIM->getIM()->playingStatus() == PLAYING_S )
-        changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
+    connect( THEMIM, &PlayerController::playingStateChanged,
+             this, &MainInterfaceWin32::changeThumbbarButtons);
+    connect( THEMPL, &vlc::playlist::PlaylistControllerModel::countChanged,
+            this, &MainInterfaceWin32::playlistItemCountChanged );
+    if( THEMIM->getPlayingState() == PlayerController::PLAYING_STATE_PLAYING )
+        changeThumbbarButtons( THEMIM->getPlayingState() );
 }
 
 bool MainInterfaceWin32::nativeEvent(const QByteArray &, void *message, long *result)
@@ -236,13 +233,13 @@ bool MainInterfaceWin32::winEvent ( MSG * msg, long * result )
                 switch(LOWORD(msg->wParam))
                 {
                     case 0:
-                        THEMIM->prev();
+                        THEMPL->prev();
                         break;
                     case 1:
-                        THEMIM->togglePlayPause();
+                        THEMPL->togglePlayPause();
                         break;
                     case 2:
-                        THEMIM->next();
+                        THEMPL->next();
                         break;
                 }
             }
@@ -263,42 +260,42 @@ bool MainInterfaceWin32::winEvent ( MSG * msg, long * result )
             switch(cmd)
             {
                 case APPCOMMAND_MEDIA_PLAY_PAUSE:
-                    THEMIM->togglePlayPause();
+                    THEMPL->togglePlayPause();
                     break;
                 case APPCOMMAND_MEDIA_PLAY:
-                    THEMIM->play();
+                    THEMPL->play();
                     break;
                 case APPCOMMAND_MEDIA_PAUSE:
-                    THEMIM->pause();
+                    THEMPL->pause();
                     break;
                 case APPCOMMAND_MEDIA_CHANNEL_DOWN:
                 case APPCOMMAND_MEDIA_PREVIOUSTRACK:
-                    THEMIM->prev();
+                    THEMPL->prev();
                     break;
                 case APPCOMMAND_MEDIA_CHANNEL_UP:
                 case APPCOMMAND_MEDIA_NEXTTRACK:
-                    THEMIM->next();
+                    THEMPL->next();
                     break;
                 case APPCOMMAND_MEDIA_STOP:
-                    THEMIM->stop();
+                    THEMPL->stop();
                     break;
                 case APPCOMMAND_MEDIA_RECORD:
-                    THEAM->record();
+                    THEMIM->toggleRecord();
                     break;
                 case APPCOMMAND_VOLUME_DOWN:
-                    THEAM->AudioDown();
+                    THEMIM->setVolumeDown();
                     break;
                 case APPCOMMAND_VOLUME_UP:
-                    THEAM->AudioUp();
+                    THEMIM->setVolumeUp();
                     break;
                 case APPCOMMAND_VOLUME_MUTE:
-                    THEAM->toggleMuteAudio();
+                    THEMIM->toggleMuted();
                     break;
                 case APPCOMMAND_MEDIA_FAST_FORWARD:
-                    THEMIM->getIM()->faster();
+                    THEMIM->faster();
                     break;
                 case APPCOMMAND_MEDIA_REWIND:
-                    THEMIM->getIM()->slower();
+                    THEMIM->slower();
                     break;
                 case APPCOMMAND_HELP:
                     THEDP->mediaInfoDialog();
@@ -321,7 +318,7 @@ void MainInterfaceWin32::setVideoFullScreen( bool fs )
 {
     MainInterface::setVideoFullScreen( fs );
     if( !fs )
-        changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
+        changeThumbbarButtons( THEMIM->getPlayingState() );
 }
 
 void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible()
@@ -394,17 +391,12 @@ void MainInterfaceWin32::reloadPrefs()
     MainInterface::reloadPrefs();
 }
 
-void MainInterfaceWin32::playlistItemAppended( int, int )
+void MainInterfaceWin32::playlistItemCountChanged( size_t  )
 {
-    changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
+    changeThumbbarButtons( THEMIM->getPlayingState() );
 }
 
-void MainInterfaceWin32::playlistItemRemoved( int )
-{
-    changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
-}
-
-void MainInterfaceWin32::changeThumbbarButtons( int i_status )
+void MainInterfaceWin32::changeThumbbarButtons( PlayerController::PlayingState i_status )
 {
     if( p_taskbl == NULL )
         return;
@@ -418,7 +410,7 @@ void MainInterfaceWin32::changeThumbbarButtons( int i_status )
     thbButtons[0].dwMask = dwMask;
     thbButtons[0].iId = 0;
     thbButtons[0].iBitmap = 0;
-    thbButtons[0].dwFlags = THEPL->items.i_size > 1 ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[0].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
 
     //play/pause
     thbButtons[1].dwMask = dwMask;
@@ -429,19 +421,19 @@ void MainInterfaceWin32::changeThumbbarButtons( int i_status )
     thbButtons[2].dwMask = dwMask;
     thbButtons[2].iId = 2;
     thbButtons[2].iBitmap = 3;
-    thbButtons[2].dwFlags = THEPL->items.i_size > 1 ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[2].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
 
     switch( i_status )
     {
-        case OPENING_S:
-        case PLAYING_S:
+        case PlayerController::PLAYING_STATE_PLAYING:
             {
                 thbButtons[1].iBitmap = 1;
                 break;
             }
-        case END_S:
-        case PAUSE_S:
-        case ERROR_S:
+        case PlayerController::PLAYING_STATE_STARTED:
+        case PlayerController::PLAYING_STATE_PAUSED:
+        case PlayerController::PLAYING_STATE_STOPPING:
+        case PlayerController::PLAYING_STATE_STOPPED:
             {
                 thbButtons[1].iBitmap = 2;
                 break;
@@ -456,10 +448,10 @@ void MainInterfaceWin32::changeThumbbarButtons( int i_status )
         msg_Err( p_intf, "ThumbBarUpdateButtons failed with error %08lx", hr );
 
     // If a video is playing, let the vout handle the thumbnail.
-    if( !videoWidget || !THEMIM->getIM()->hasVideo() )
-    {
-        hr = p_taskbl->SetThumbnailClip(WinId(this), NULL);
-        if(S_OK != hr)
-            msg_Err( p_intf, "SetThumbnailClip failed with error %08lx", hr );
-    }
+    //if( !videoWidget || !THEMIM->hasVideoOutput() )
+    //{
+    //    hr = p_taskbl->SetThumbnailClip(WinId(this), NULL);
+    //    if(S_OK != hr)
+    //        msg_Err( p_intf, "SetThumbnailClip failed with error %08lx", hr );
+    //}
 }

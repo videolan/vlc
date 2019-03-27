@@ -52,9 +52,8 @@ private:
     UINT taskbar_wmsg;
 
 private slots:
-    void changeThumbbarButtons( int );
-    void playlistItemAppended( int itemId, int parentId );
-    void playlistItemRemoved( int itemId );
+    void changeThumbbarButtons(PlayerController::PlayingState );
+    void playlistItemCountChanged( size_t itemId );
     virtual void reloadPrefs() Q_DECL_OVERRIDE;
     virtual void setVideoFullScreen( bool fs ) Q_DECL_OVERRIDE;
 };

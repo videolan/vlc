@@ -30,7 +30,7 @@
 #endif
 
 #include "main_interface.hpp" /* Interface integration */
-#include "input_manager.hpp"  /* Speed control */
+#include "components/player_controller.hpp"  /* Speed control */
 
 #include "components/controller.hpp"
 #include "components/controller_widget.hpp"
@@ -258,7 +258,7 @@ private:
     int lastValue;
 
 public slots:
-    void activateOnState();
+    void activateOnState(PlayerController::PlayingState state);
 
 private slots:
     void updateRate( int );

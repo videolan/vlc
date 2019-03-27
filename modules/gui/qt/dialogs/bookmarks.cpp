@@ -25,7 +25,7 @@
 #endif
 
 #include "dialogs/bookmarks.hpp"
-#include "input_manager.hpp"
+#include "components/player_controller.hpp"
 
 #include <QHBoxLayout>
 #include <QSpacerItem>
@@ -80,7 +80,7 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
     layout->addWidget( buttonsBox );
     layout->addWidget( bookmarksList );
 
-    CONNECT( THEMIM->getIM(), bookmarksChanged(),
+    CONNECT( THEMIM, bookmarksChanged(),
              this, update() );
 
     CONNECT( bookmarksList, activated( QModelIndex ), this,

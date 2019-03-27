@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #include "extensions_manager.hpp"
-#include "input_manager.hpp"
+#include "components/player_controller.hpp"
 #include "dialogs/extensions.hpp"
 
 #include <vlc_modules.h>
@@ -47,10 +47,10 @@ ExtensionsManager::ExtensionsManager( intf_thread_t *_p_intf, QObject *parent )
 
     menuMapper = new QSignalMapper( this );
     CONNECT( menuMapper, mapped( int ), this, triggerMenu( int ) );
-    CONNECT( THEMIM->getIM(), playingStatusChanged( int ), this, playingChanged( int ) );
+    connect( THEMIM, &PlayerController::playingStateChanged, this, &ExtensionsManager::playingChanged );
     DCONNECT( THEMIM, inputChanged( bool ),
               this, inputChanged( ) );
-    CONNECT( THEMIM->getIM(), metaChanged( input_item_t* ),
+    CONNECT( THEMIM, metaChanged( input_item_t* ),
              this, metaChanged( input_item_t* ) );
     b_unloading = false;
     b_failed = false;
@@ -264,25 +264,26 @@ void ExtensionsManager::triggerMenu( int id )
 
 void ExtensionsManager::inputChanged( )
 {
-    input_thread_t* p_input = THEMIM->getInput();
-    //This is unlikely, but can happen if no extension modules can be loaded.
-    if ( p_extensions_manager == NULL )
-        return ;
-    vlc_mutex_lock( &p_extensions_manager->lock );
-
-    extension_t *p_ext;
-    ARRAY_FOREACH( p_ext, p_extensions_manager->extensions )
-    {
-        if( extension_IsActivated( p_extensions_manager, p_ext ) )
-        {
-            extension_SetInput( p_extensions_manager, p_ext, p_input );
-        }
-    }
-
-    vlc_mutex_unlock( &p_extensions_manager->lock );
+    //FIXME unimplemented
+    //input_item_t* p_input = THEMIM->getInput();
+    ////This is unlikely, but can happen if no extension modules can be loaded.
+    //if ( p_extensions_manager == NULL )
+    //    return ;
+    //vlc_mutex_lock( &p_extensions_manager->lock );
+    //
+    //extension_t *p_ext;
+    //ARRAY_FOREACH( p_ext, p_extensions_manager->extensions )
+    //{
+    //    if( extension_IsActivated( p_extensions_manager, p_ext ) )
+    //    {
+    //        extension_SetInput( p_extensions_manager, p_ext, p_input );
+    //    }
+    //}
+    //
+    //vlc_mutex_unlock( &p_extensions_manager->lock );
 }
 
-void ExtensionsManager::playingChanged( int state )
+void ExtensionsManager::playingChanged( PlayerController::PlayingState state )
 {
     //This is unlikely, but can happen if no extension modules can be loaded.
     if ( p_extensions_manager == NULL )

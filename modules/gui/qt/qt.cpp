@@ -45,7 +45,8 @@ extern "C" char **environ;
 
 #include "qt.hpp"
 
-#include "input_manager.hpp"    /* THEMIM destruction */
+#include "components/player_controller.hpp"    /* THEMIM destruction */
+#include "components/playlist/playlist_controller.hpp" /* THEMPL creation */
 #include "dialogs_provider.hpp" /* THEDP creation */
 #ifdef _WIN32
 # include "main_interface_win32.hpp"
@@ -57,7 +58,6 @@ extern "C" char **environ;
 #include "dialogs/help.hpp"     /* Launch Update */
 #include "recents.hpp"          /* Recents Item destruction */
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
-#include "components/playlist_legacy/playlist_model.hpp" /* for ~PLModel() */
 
 #include <QVector>
 #include "components/playlist/playlist_item.hpp"
@@ -68,10 +68,21 @@ extern "C" char **environ;
 
 #ifdef QT_STATIC /* For static builds */
  #include <QtPlugin>
+ #include <QQuickWindow>
 
  #ifdef QT_STATICPLUGIN
   Q_IMPORT_PLUGIN(QSvgIconPlugin)
   Q_IMPORT_PLUGIN(QSvgPlugin)
+  Q_IMPORT_PLUGIN(QJpegPlugin)
+  Q_IMPORT_PLUGIN(QtQuick2Plugin)
+  Q_IMPORT_PLUGIN(QtQuickControls2Plugin)
+  Q_IMPORT_PLUGIN(QtQuickLayoutsPlugin)
+  Q_IMPORT_PLUGIN(QtQuick2WindowPlugin)
+  Q_IMPORT_PLUGIN(QtQuickTemplates2Plugin)
+  Q_IMPORT_PLUGIN(QtQmlModelsPlugin)
+  Q_IMPORT_PLUGIN(QtGraphicalEffectsPlugin)
+  Q_IMPORT_PLUGIN(QtGraphicalEffectsPrivatePlugin)
+
   #if !HAS_QT56
    Q_IMPORT_PLUGIN(AccessibleFactory)
   #endif
@@ -429,13 +440,10 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     intf_sys_t *p_sys = p_intf->p_sys = new intf_sys_t;
     p_sys->b_isDialogProvider = isDialogProvider;
     p_sys->p_mi = NULL;
-    p_sys->pl_model = NULL;
 
     /* set up the playlist to work on */
-    if( isDialogProvider )
-        p_sys->p_playlist_legacy = pl_Get( (intf_thread_t *)vlc_object_parent(p_intf) );
-    else
-        p_sys->p_playlist_legacy = pl_Get( p_intf );
+    p_sys->p_playlist = vlc_intf_GetMainPlaylist(p_intf);
+    p_sys->p_player = vlc_playlist_GetPlayer( p_sys->p_playlist );
 
     /* */
     vlc_sem_init (&ready, 0);
@@ -478,13 +486,6 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    if( !p_sys->b_isDialogProvider )
-    {
-        playlist_t *pl = THEPL;
-
-        playlist_Deactivate (pl); /* release window provider if needed */
-    }
-
     /* And quit */
     msg_Dbg( p_this, "requesting exit..." );
     QVLCApp::triggerQuit();
@@ -505,6 +506,7 @@ static inline void qRegisterMetaTypes()
     // register all types used by signal/slots
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<ssize_t>("ssize_t");
+    qRegisterMetaType<vlc_tick_t>("vlc_tick_t");
 }
 
 static void *Thread( void *obj )
@@ -545,8 +547,17 @@ static void *Thread( void *obj )
     QApplication::setAttribute( Qt::AA_UseHighDpiPixmaps );
 #endif
 
+    // at the moment, the vout is created in another thread than the rendering thread
+    QApplication::setAttribute( Qt::AA_DontCheckOpenGLContextThreadAffinity );
+    QQuickWindow::setDefaultAlphaBuffer(true);
+
+    //force Qt to use EGL on XCB
+    qputenv("QT_XCB_GL_INTEGRATION", "xcb_egl");
+
     /* Start the QApplication here */
     QVLCApp app( argc, argv );
+
+    //app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
     /* Set application direction to locale direction,
      * necessary for  RTL locales */
@@ -584,8 +595,8 @@ static void *Thread( void *obj )
 
     /* Initialize the Dialog Provider and the Main Input Manager */
     DialogsProvider::getInstance( p_intf );
-    MainInputManager* mim = MainInputManager::getInstance( p_intf );
-    mim->probeCurrentInput();
+    p_sys->p_mainPlayerController = new PlayerController(p_intf);
+    p_sys->p_mainPlaylistController = new vlc::playlist::PlaylistControllerModel(p_intf->p_sys->p_playlist);
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */
@@ -655,7 +666,11 @@ static void *Thread( void *obj )
 #ifdef Q_OS_MAC
     /* We took over main thread, register and start here */
     if( !p_sys->b_isDialogProvider )
-        playlist_Play( THEPL );
+    {
+        vlc_playlist_Lock( p_intf->p_sys->p_playlist );
+        vlc_playlist_Start( p_intf->p_sys->p_playlist );
+        vlc_playlist_Unlock( p_intf->p_sys->p_playlist );
+    }
 #endif
 
     /* Last settings */
@@ -711,12 +726,10 @@ static void *Thread( void *obj )
     else
         getSettings()->remove( "filedialog-path" );
 
-    /* */
-    delete p_sys->pl_model;
-
-    /* Destroy the MainInputManager */
-    MainInputManager::killInstance();
-
+    /* Destroy the main playlist controller */
+    delete p_sys->p_mainPlaylistController;
+    /* Destroy the main InputManager */
+    delete p_sys->p_mainPlayerController;
     /* Delete the configuration. Application has to be deleted after that. */
     delete p_sys->mainSettings;
 
@@ -768,4 +781,5 @@ static int WindowOpen( vout_window_t *p_wnd )
     MainInterface *p_mi = p_intf->p_sys->p_mi;
 
     return p_mi->getVideo( p_wnd ) ? VLC_SUCCESS : VLC_EGENERIC;
+
 }

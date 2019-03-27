@@ -172,7 +172,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     CONNECT( seqtot_text, textEdited( QString ), this, enterEditMode() );
 
     CONNECT( date_text, textEdited( QString ), this, enterEditMode() );
-//    CONNECT( THEMIM->getIM(), artChanged( QString ), this, enterEditMode() );
+//    CONNECT( THEMIM, artChanged( QString ), this, enterEditMode() );
 
     /* We are not yet in Edit Mode */
     b_inEditMode = false;
@@ -299,7 +299,7 @@ void MetaPanel::saveMeta()
     input_item_SetPublisher( p_input, qtu( publisher_text->text() ) );
     input_item_SetDescription( p_input, qtu( description_text->toPlainText() ) );
 
-    input_item_WriteMeta( VLC_OBJECT(THEPL), p_input );
+    input_item_WriteMeta( VLC_OBJECT(p_intf), p_input );
 
     /* Reset the status of the mode. No need to emit any signal because parent
        is the only caller */
@@ -634,14 +634,10 @@ void InputStatsPanel::hideEvent( QHideEvent * event )
 /**
  * Update the Statistics
  **/
-void InputStatsPanel::update( input_item_t *p_item )
+void InputStatsPanel::update( const input_stats_t& stats )
 {
     if ( !isVisible() ) return;
-    assert( p_item );
 
-    vlc_mutex_locker(&p_item->lock);
-    if( p_item->p_stats == NULL )
-        return;
 
 #define UPDATE_INT( widget, calc... ) \
     { widget->setText( 1, QString::number( (qulonglong)calc ) ); }
@@ -649,24 +645,24 @@ void InputStatsPanel::update( input_item_t *p_item )
 #define UPDATE_FLOAT( widget, format, calc... ) \
     { QString str; widget->setText( 1 , str.sprintf( format, ## calc ) );  }
 
-    UPDATE_INT( read_media_stat, (p_item->p_stats->i_read_bytes / 1024 ) );
-    UPDATE_FLOAT( input_bitrate_stat,  "%6.0f", (float)(p_item->p_stats->f_input_bitrate *  8000 ));
-    UPDATE_INT( demuxed_stat,    (p_item->p_stats->i_demux_read_bytes / 1024 ) );
-    UPDATE_FLOAT( stream_bitrate_stat, "%6.0f", (float)(p_item->p_stats->f_demux_bitrate *  8000 ));
-    UPDATE_INT( corrupted_stat,      p_item->p_stats->i_demux_corrupted );
-    UPDATE_INT( discontinuity_stat,  p_item->p_stats->i_demux_discontinuity );
+    UPDATE_INT( read_media_stat, (stats.i_read_bytes / 1024 ) );
+    UPDATE_FLOAT( input_bitrate_stat,  "%6.0f", (float)(stats.f_input_bitrate *  8000 ));
+    UPDATE_INT( demuxed_stat,    (stats.i_demux_read_bytes / 1024 ) );
+    UPDATE_FLOAT( stream_bitrate_stat, "%6.0f", (float)(stats.f_demux_bitrate *  8000 ));
+    UPDATE_INT( corrupted_stat,      stats.i_demux_corrupted );
+    UPDATE_INT( discontinuity_stat,  stats.i_demux_discontinuity );
 
-    statsView->addValue( p_item->p_stats->f_input_bitrate * 8000 );
+    statsView->addValue( stats.f_input_bitrate * 8000 );
 
     /* Video */
-    UPDATE_INT( vdecoded_stat,     p_item->p_stats->i_decoded_video );
-    UPDATE_INT( vdisplayed_stat,   p_item->p_stats->i_displayed_pictures );
-    UPDATE_INT( vlost_frames_stat, p_item->p_stats->i_lost_pictures );
+    UPDATE_INT( vdecoded_stat,     stats.i_decoded_video );
+    UPDATE_INT( vdisplayed_stat,   stats.i_displayed_pictures );
+    UPDATE_INT( vlost_frames_stat, stats.i_lost_pictures );
 
     /* Audio*/
-    UPDATE_INT( adecoded_stat, p_item->p_stats->i_decoded_audio );
-    UPDATE_INT( aplayed_stat,  p_item->p_stats->i_played_abuffers );
-    UPDATE_INT( alost_stat,    p_item->p_stats->i_lost_abuffers );
+    UPDATE_INT( adecoded_stat, stats.i_decoded_audio );
+    UPDATE_INT( aplayed_stat,  stats.i_played_abuffers );
+    UPDATE_INT( alost_stat,    stats.i_lost_abuffers );
 
 #undef UPDATE_INT
 #undef UPDATE_FLOAT

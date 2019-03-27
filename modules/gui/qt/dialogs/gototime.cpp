@@ -25,7 +25,7 @@
 
 #include "dialogs/gototime.hpp"
 
-#include "input_manager.hpp"
+#include "components/player_controller.hpp"
 
 #include <QTabWidget>
 #include <QLabel>
@@ -85,9 +85,9 @@ GotoTimeDialog::~GotoTimeDialog()
 void GotoTimeDialog::toggleVisible()
 {
     reset();
-    if ( !isVisible() && THEMIM->getIM()->hasInput() )
+    if ( !isVisible() && THEMIM->hasInput() )
     {
-        vlc_tick_t i_time = var_GetInteger( THEMIM->getInput(), "time" );
+        vlc_tick_t i_time = THEMIM->getTime();
         timeEdit->setTime( timeEdit->time().addSecs( SEC_FROM_VLC_TICK(i_time) ) );
     }
     QVLCDialog::toggleVisible();
@@ -103,10 +103,10 @@ void GotoTimeDialog::cancel()
 
 void GotoTimeDialog::close()
 {
-    if ( THEMIM->getIM()->hasInput() )
+    if ( THEMIM->hasInput() )
     {
         int i_time = QTime( 0, 0, 0 ).msecsTo( timeEdit->time() );
-        var_SetInteger( THEMIM->getInput(), "time", VLC_TICK_FROM_MS(i_time) );
+        THEMIM->jumpToTime( VLC_TICK_FROM_MS(i_time) );
     }
     toggleVisible();
 }

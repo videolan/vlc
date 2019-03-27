@@ -374,35 +374,32 @@ void MessagesDialog::MsgCallback( void *self, int type, const vlc_log_t *item,
 }
 
 #ifndef NDEBUG
-static QTreeWidgetItem * PLWalk( playlist_item_t *p_node )
-{
-    QTreeWidgetItem *current = new QTreeWidgetItem();
-    if(p_node->p_input)
-    {
-        current->setText( 0, qfu( p_node->p_input->psz_name ) );
-        current->setToolTip( 0, qfu( p_node->p_input->psz_uri ) );
-        current->setText( 1, QString("%1").arg( p_node->i_id ) );
-        current->setText( 2, QString("%1").arg( (uintptr_t)p_node->p_input ) );
-        current->setText( 3, QString("0x%1").arg( p_node->i_flags, 0, 16 ) );
-        current->setText( 4, QString("0x%1").arg(  p_node->p_input->i_type, 0, 16 ) );
-    }
-    for ( int i = 0; p_node->i_children > 0 && i < p_node->i_children; i++ )
-        current->addChild( PLWalk( p_node->pp_children[ i ] ) );
-    return current;
-}
 
 void MessagesDialog::updatePLTree()
 {
-    playlist_t *p_playlist = THEPL;
     pldebugTree->clear();
-
     {
-        vlc_playlist_locker pl_lock ( THEPL );
-        pldebugTree->addTopLevelItem( PLWalk( &p_playlist->root ) );
+        vlc_playlist_t* playlist = p_intf->p_sys->p_playlist;
+        vlc_playlist_Lock(playlist);
+        size_t count = vlc_playlist_Count( playlist );
+        for (size_t i = 0; i < count; i++)
+        {
+            QTreeWidgetItem *current = new QTreeWidgetItem();
+            vlc_playlist_item_t* item = vlc_playlist_Get( playlist, i );
+            input_item_t* media = vlc_playlist_item_GetMedia( item );
+            current->setText( 0, qfu( media->psz_name ) );
+            current->setToolTip( 0, qfu( media->psz_uri ) );
+            current->setText( 1, QString("%1").arg( i ) );
+            current->setText( 2, QString("%1").arg( (uintptr_t)media ) );
+            //current->setText( 3, QString("0x%1").arg( p_node->i_flags, 0, 16 ) );
+            current->setText( 3, QString("0x%1").arg( media->i_type, 0, 16 ) );
+            pldebugTree->addTopLevelItem( current );
+        }
+        vlc_playlist_Unlock(playlist);
     }
 
     pldebugTree->expandAll();
-    for ( int i=0; i< 5; i++ )
+    for ( int i=0; i< 4; i++ )
         pldebugTree->resizeColumnToContents( i );
 }
 #endif

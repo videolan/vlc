@@ -33,6 +33,7 @@
 #include "qt.hpp"
 #include "ui/equalizer.h"
 #include "ui/video_effects.h"
+#include "adapters/variables.hpp"
 
 #include <QTabWidget>
 
@@ -249,6 +250,7 @@ private:
     SyncWidget *subsSpin;
     QDoubleSpinBox *subSpeedSpin;
     QDoubleSpinBox *subDurationSpin;
+    QVLCFloat m_SubsDelayCfgFactor;
 
     bool b_userAction;
 

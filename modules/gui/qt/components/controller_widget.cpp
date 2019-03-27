@@ -27,9 +27,11 @@
 #include "controller_widget.hpp"
 #include "controller.hpp"
 
-#include "input_manager.hpp"         /* Get notification of Volume Change */
+#include "components/playlist/playlist_controller.hpp"
+#include "components/player_controller.hpp"         /* Get notification of Volume Change */
 #include "util/input_slider.hpp"     /* SoundSlider */
 #include "util/imagehelper.hpp"
+#include "vlc_player.h"
 
 #include <math.h>
 
@@ -40,6 +42,8 @@
 #include <QMouseEvent>
 
 #define VOLUME_MAX 125
+
+using namespace vlc::playlist;
 
 SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
                           bool b_shiny, bool b_special )
@@ -110,10 +114,11 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
         layout->addWidget( volumeSlider, 0, b_shiny? Qt::AlignBottom : Qt::AlignCenter );
 
     /* Set the volume from the config */
-    float volume = playlist_VolumeGet( THEPL );
+    float volume = THEMIM->getVolume();
+
     libUpdateVolume( (volume >= 0.f) ? volume : 1.f );
     /* Sync mute status */
-    if( playlist_MuteGet( THEPL ) > 0 )
+    if( THEMIM->isMuted() )
         updateMuteStatus( true );
 
     /* Volume control connection */
@@ -154,7 +159,7 @@ void SoundWidget::userUpdateVolume( int i_sliderVolume )
 {
     /* Only if volume is set by user action on slider */
     setMuted( false );
-    playlist_VolumeSet( THEPL, i_sliderVolume / 100.f );
+    THEMIM->setVolume( i_sliderVolume / 100.f );
     refreshLabels();
 }
 
@@ -198,8 +203,7 @@ void SoundWidget::showVolumeMenu( QPoint pos )
 void SoundWidget::setMuted( bool mute )
 {
     b_is_muted = mute;
-    playlist_t *p_playlist = THEPL;
-    playlist_MuteSet( p_playlist, mute );
+    THEMIM->setMuted(mute);
 }
 
 bool SoundWidget::eventFilter( QObject *obj, QEvent *e )
@@ -236,74 +240,83 @@ void PlayButton::updateButtonIcons( bool b_playing )
                           : qtr( I_PLAY_TOOLTIP ) );
 }
 
-void AtoB_Button::updateButtonIcons( bool timeA, bool timeB )
+void AtoB_Button::updateButtonIcons( PlayerController::ABLoopState state )
 {
-    if( !timeA && !timeB)
+    switch( state)
     {
+    case PlayerController::ABLOOP_STATE_NONE:
         setIcon( QIcon( ":/toolbar/atob_nob.svg" ) );
         setToolTip( qtr( "Loop from point A to point B continuously\n"
                          "Click to set point A" ) );
-    }
-    else if( timeA && !timeB )
-    {
+        break;
+    case PlayerController::ABLOOP_STATE_A:
         setIcon( QIcon( ":/toolbar/atob_noa.svg" ) );
         setToolTip( qtr( "Click to set point B" ) );
-    }
-    else if( timeA && timeB )
-    {
+        break;
+    case PlayerController::ABLOOP_STATE_B:
         setIcon( QIcon( ":/toolbar/atob.svg" ) );
         setToolTip( qtr( "Stop the A to B loop" ) );
+        break;
     }
 }
 
-void LoopButton::updateButtonIcons( int value )
+void LoopButton::updateButtonIcons( PlaylistControllerModel::PlaybackRepeat value )
 {
-    setChecked( value != NORMAL );
-    setIcon( ( value == REPEAT_ONE ) ? QIcon( ":/buttons/playlist/repeat_one.svg" )
+    setChecked( value != PlaylistControllerModel::PLAYBACK_REPEAT_NONE );
+    setIcon( ( value == PlaylistControllerModel::PLAYBACK_REPEAT_CURRENT ) ? QIcon( ":/buttons/playlist/repeat_one.svg" )
                                      : QIcon( ":/buttons/playlist/repeat_all.svg" ) );
 }
 
-void AspectRatioComboBox::updateRatios()
+void AspectRatioComboBox::onRowInserted(const QModelIndex &, int first, int last)
 {
-    /* Clear the list before updating */
+    for (int i = first; i <= last; i++)
+    {
+        QModelIndex index = m_aspectRatioModel->index(i);
+        addItem(m_aspectRatioModel->data(index, Qt::DisplayRole).toString());
+        if (m_aspectRatioModel->data(index, Qt::CheckStateRole).toBool())
+            setCurrentIndex(i);
+    }
+}
+
+void AspectRatioComboBox::onRowRemoved(const QModelIndex &, int first, int last)
+{
+    for (int i = last; i >= first; i--)
+        removeItem(i);
+}
+
+void AspectRatioComboBox::onModelAboutToReset()
+{
     clear();
-    vlc_value_t *val_list;
-    char **text_list;
-    size_t count;
+}
 
-    vout_thread_t* p_vout = THEMIM->getVout();
-
-    /* Disable if there is no vout */
-    if( p_vout == NULL )
+void AspectRatioComboBox::onModelReset()
+{
+    if (m_aspectRatioModel->rowCount() == 0)
     {
+        setEnabled(false);
         addItem( qtr("Aspect Ratio") );
-        setDisabled( true );
-        return;
     }
-
-    var_Change( p_vout, "aspect-ratio", VLC_VAR_GETCHOICES,
-                &count, &val_list, &text_list );
-    for( size_t i = 0; i < count; i++ )
+    else
     {
-        addItem( qfu( text_list[i] ),
-                 QString( val_list[i].psz_string ) );
-        free(text_list[i]);
-        free(val_list[i].psz_string);
+        setEnabled(true);
+        for (int i = 0; i < m_aspectRatioModel->rowCount(); i++)
+            addItem(m_aspectRatioModel->data(m_aspectRatioModel->index(i), Qt::DisplayRole).toString());
     }
-    setEnabled( true );
-    free(text_list);
-    free(val_list);
-    vout_Release(p_vout);
+}
+
+void AspectRatioComboBox::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &)
+{
+    for (int i = topLeft.row(); i <= bottomRight.row(); i++)
+    {
+        QModelIndex index=  m_aspectRatioModel->index(i);
+        setItemText(i, m_aspectRatioModel->data(index, Qt::DisplayRole).toString());
+        if (m_aspectRatioModel->data(index, Qt::CheckStateRole).toBool())
+            setCurrentIndex(i);
+    }
 }
 
 void AspectRatioComboBox::updateAspectRatio( int x )
 {
-    vout_thread_t* p_vout = THEMIM->getVout();
-    if( p_vout && x >= 0 )
-    {
-        var_SetString( p_vout, "aspect-ratio", qtu( itemData(x).toString() ) );
-    }
-    if( p_vout )
-        vout_Release(p_vout);
+    QModelIndex index = m_aspectRatioModel->index(x);
+    m_aspectRatioModel->setData(index, true, Qt::CheckStateRole);
 }
-

@@ -73,7 +73,7 @@ void RendererManager::StartScan()
     /* SD subnodes */
     char **ppsz_longnames;
     char **ppsz_names;
-    if( vlc_rd_get_names( THEPL, &ppsz_names, &ppsz_longnames ) != VLC_SUCCESS )
+    if( vlc_rd_get_names( p_intf, &ppsz_names, &ppsz_longnames ) != VLC_SUCCESS )
     {
         emit statusUpdated( RendererManager::RendererStatus::FAILED );
         return;
@@ -148,7 +148,8 @@ void RendererManager::RendererMenuCountdown()
 void RendererManager::SelectRenderer( vlc_renderer_item_t *p_item )
 {
     p_selected_item = p_item;
-    playlist_SetRenderer( THEPL, p_item );
+    vlc_player_locker lock{ p_intf->p_sys->p_player };
+    vlc_player_SetRenderer( p_intf->p_sys->p_player, p_item );
 }
 
 void RendererManager::renderer_event_item_added( vlc_renderer_discovery_t* p_rd,

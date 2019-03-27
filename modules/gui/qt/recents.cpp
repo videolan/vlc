@@ -26,6 +26,8 @@
 #include "dialogs_provider.hpp"
 #include "menus.hpp"
 #include "util/qt_dirs.hpp"
+#include <vlc_cxx_helpers.hpp>
+#include "components/playlist/playlist_controller.hpp"
 
 #include <QStringList>
 #include <QRegExp>
@@ -195,37 +197,14 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
                      bool b_start,
                      const char *title)
 {
-    /* Options */
-    const char **ppsz_options = NULL;
-    int i_options = 0;
+    QVector<vlc::playlist::Media> medias {
+        {mrl, qfu(title), options}
+    };
 
-    if( options != NULL && options->count() > 0 )
-    {
-        ppsz_options = new const char *[options->count()];
-        for( int j = 0; j < options->count(); j++ ) {
-            QString option = colon_unescape( options->at(j) );
-            if( !option.isEmpty() ) {
-                ppsz_options[i_options] = strdup(qtu(option));
-                i_options++;
-            }
-        }
-    }
-
-    /* Add to playlist */
-    int i_ret = playlist_AddExt( THEPL, qtu(mrl), title, b_start,
-                  i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED );
-
+    THEMPL->append(medias, b_start);
     /* Add to recent items, only if played */
-    if( i_ret == VLC_SUCCESS && b_start )
+    if( b_start )
         RecentsMRL::getInstance( p_intf )->addRecent( mrl );
 
-    /* Free options */
-    if ( ppsz_options != NULL )
-    {
-        for ( int i = 0; i < i_options; ++i )
-            free( (char*)ppsz_options[i] );
-        delete[] ppsz_options;
-    }
-    return i_ret;
+    return VLC_SUCCESS;
 }
-

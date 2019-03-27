@@ -47,19 +47,14 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/menus.cpp gui/qt/menus.hpp \
 	gui/qt/main_interface.cpp gui/qt/main_interface.hpp \
 	gui/qt/dialogs_provider.cpp gui/qt/dialogs_provider.hpp \
-	gui/qt/input_manager.cpp gui/qt/input_manager.hpp \
-	gui/qt/actions_manager.cpp gui/qt/actions_manager.hpp \
 	gui/qt/extensions_manager.cpp gui/qt/extensions_manager.hpp \
 	gui/qt/managers/addons_manager.cpp gui/qt/managers/addons_manager.hpp \
 	gui/qt/managers/renderer_manager.cpp gui/qt/managers/renderer_manager.hpp \
 	gui/qt/recents.cpp gui/qt/recents.hpp \
-	gui/qt/adapters/seekpoints.cpp gui/qt/adapters/seekpoints.hpp \
 	gui/qt/adapters/chromaprint.cpp gui/qt/adapters/chromaprint.hpp \
-	gui/qt/adapters/legacy_variables.cpp gui/qt/adapters/legacy_variables.hpp \
 	gui/qt/adapters/var_common_p.hpp \
 	gui/qt/adapters/variables.cpp gui/qt/adapters/variables.hpp \
 	gui/qt/adapters/var_choice_model.cpp  gui/qt/adapters/var_choice_model.hpp \
-	gui/qt/dialogs/playlist.cpp gui/qt/dialogs/playlist.hpp \
 	gui/qt/dialogs/bookmarks.cpp gui/qt/dialogs/bookmarks.hpp \
 	gui/qt/dialogs/preferences.cpp gui/qt/dialogs/preferences.hpp \
 	gui/qt/dialogs/mediainfo.cpp gui/qt/dialogs/mediainfo.hpp \
@@ -67,7 +62,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/extended.cpp gui/qt/dialogs/extended.hpp \
 	gui/qt/dialogs/messages.cpp gui/qt/dialogs/messages.hpp \
 	gui/qt/dialogs/errors.cpp gui/qt/dialogs/errors.hpp \
-	gui/qt/dialogs/external.cpp gui/qt/dialogs/external.hpp \
 	gui/qt/dialogs/plugins.cpp gui/qt/dialogs/plugins.hpp \
 	gui/qt/dialogs/sout.cpp gui/qt/dialogs/sout.hpp \
 	gui/qt/dialogs/convert.cpp gui/qt/dialogs/convert.hpp \
@@ -125,21 +119,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/epg/EPGView.cpp gui/qt/components/epg/EPGView.hpp \
 	gui/qt/components/epg/EPGWidget.cpp \
 	gui/qt/components/epg/EPGWidget.hpp \
-	gui/qt/components/playlist_legacy/views.cpp \
-	gui/qt/components/playlist_legacy/views.hpp \
-	gui/qt/components/playlist_legacy/vlc_model.cpp \
-	gui/qt/components/playlist_legacy/vlc_model.hpp \
-	gui/qt/components/playlist_legacy/playlist_model.cpp \
-	gui/qt/components/playlist_legacy/playlist_model.hpp \
-	gui/qt/components/playlist_legacy/playlist_item.cpp \
-	gui/qt/components/playlist_legacy/playlist_item.hpp \
-	gui/qt/components/playlist_legacy/standardpanel.cpp \
-	gui/qt/components/playlist_legacy/standardpanel.hpp \
-	gui/qt/components/playlist_legacy/playlist.cpp \
-	gui/qt/components/playlist_legacy/playlist.hpp \
-	gui/qt/components/playlist_legacy/selector.cpp \
-	gui/qt/components/playlist_legacy/selector.hpp \
-	gui/qt/components/playlist_legacy/sorting.h \
 	gui/qt/components/mediacenter/mcmedialib.cpp \
 	gui/qt/components/mediacenter/mcmedialib.hpp \
 	gui/qt/components/mediacenter/mlhelper.hpp \
@@ -191,9 +170,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/customwidgets.cpp gui/qt/util/customwidgets.hpp \
 	gui/qt/util/searchlineedit.cpp gui/qt/util/searchlineedit.hpp \
 	gui/qt/util/registry.cpp gui/qt/util/registry.hpp \
-	gui/qt/util/qmenuview.cpp gui/qt/util/qmenuview.hpp \
 	gui/qt/util/qt_dirs.cpp gui/qt/util/qt_dirs.hpp \
-	gui/qt/util/pictureflow.cpp gui/qt/util/pictureflow.hpp \
 	gui/qt/util/validators.cpp gui/qt/util/validators.hpp \
 	gui/qt/util/buttons/BrowseButton.cpp \
 	gui/qt/util/buttons/BrowseButton.hpp \
@@ -232,25 +209,19 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/main_interface.moc.cpp \
 	gui/qt/menus.moc.cpp \
 	gui/qt/dialogs_provider.moc.cpp \
-	gui/qt/input_manager.moc.cpp \
-	gui/qt/actions_manager.moc.cpp \
 	gui/qt/extensions_manager.moc.cpp \
 	gui/qt/managers/addons_manager.moc.cpp \
 	gui/qt/managers/renderer_manager.moc.cpp \
 	gui/qt/recents.moc.cpp \
-	gui/qt/adapters/seekpoints.moc.cpp \
 	gui/qt/adapters/chromaprint.moc.cpp \
-	gui/qt/adapters/legacy_variables.moc.cpp \
 	gui/qt/adapters/variables.moc.cpp \
 	gui/qt/adapters/var_choice_model.moc.cpp \
-	gui/qt/dialogs/playlist.moc.cpp \
 	gui/qt/dialogs/bookmarks.moc.cpp \
 	gui/qt/dialogs/mediainfo.moc.cpp \
 	gui/qt/dialogs/extended.moc.cpp \
 	gui/qt/dialogs/messages.moc.cpp \
 	gui/qt/dialogs/epg.moc.cpp \
 	gui/qt/dialogs/errors.moc.cpp \
-	gui/qt/dialogs/external.moc.cpp \
 	gui/qt/dialogs/plugins.moc.cpp \
 	gui/qt/dialogs/preferences.moc.cpp \
 	gui/qt/dialogs/sout.moc.cpp \
@@ -288,12 +259,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/epg/EPGRuler.moc.cpp \
 	gui/qt/components/epg/EPGView.moc.cpp \
 	gui/qt/components/epg/EPGWidget.moc.cpp \
-	gui/qt/components/playlist_legacy/views.moc.cpp \
-	gui/qt/components/playlist_legacy/vlc_model.moc.cpp \
-	gui/qt/components/playlist_legacy/playlist_model.moc.cpp \
-	gui/qt/components/playlist_legacy/playlist.moc.cpp \
-	gui/qt/components/playlist_legacy/standardpanel.moc.cpp \
-	gui/qt/components/playlist_legacy/selector.moc.cpp \
 	gui/qt/components/mediacenter/mcmedialib.moc.cpp \
 	gui/qt/components/mediacenter/mlqmltypes.moc.cpp \
 	gui/qt/components/mediacenter/mlbasemodel.moc.cpp \
@@ -321,9 +286,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/customwidgets.moc.cpp \
 	gui/qt/util/qmleventfilter.moc.cpp \
 	gui/qt/util/searchlineedit.moc.cpp \
-	gui/qt/util/qmenuview.moc.cpp \
 	gui/qt/util/qvlcapp.moc.cpp \
-	gui/qt/util/pictureflow.moc.cpp \
 	gui/qt/util/vlctick.moc.cpp \
 	gui/qt/util/validators.moc.cpp \
 	gui/qt/util/buttons/RoundButton.moc.cpp \

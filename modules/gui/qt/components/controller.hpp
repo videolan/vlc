@@ -32,6 +32,7 @@
 #include <QFrame>
 #include <QString>
 #include <QSizeGrip>
+#include "components/player_controller.hpp"
 
 #define MAIN_TB1_DEFAULT "64;39;64;38;65"
 #define MAIN_TB2_DEFAULT "0-2;64;3;1;4;64;7;9;64;10;20;19;64-4;37;65;35-4"
@@ -156,7 +157,6 @@ public:
 protected:
     intf_thread_t       *p_intf;
 
-    QSignalMapper       *toolbarActionsMapper;
     QBoxLayout          *controlLayout;
     /* Change to BoxLayout if both dir are needed */
 
@@ -176,12 +176,15 @@ private:
 
     QHBoxLayout         *buttonGroupLayout;
 protected slots:
-    virtual void setStatus( int );
+    virtual void setStatus( PlayerController::PlayingState );
+
+    void playAction();
+    void playlistAction();
+    void fullwidthAction();
 
 signals:
     void inputExists( bool ); /// This might be useful in the IM ?
     void inputPlaying( bool ); /// This might be useful in the IM ?
-    void inputIsRecordable( bool ); /// same ?
     void inputIsTrickPlayable( bool ); /// same ?
 };
 

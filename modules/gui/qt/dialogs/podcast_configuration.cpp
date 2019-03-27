@@ -71,11 +71,12 @@ void PodcastConfigDialog::accept()
     }
     config_PutPsz( "podcast-urls", qtu( urls ) );
 
-    if( playlist_IsServicesDiscoveryLoaded( THEPL, "podcast" ) )
-    {
-        var_SetString( THEPL, "podcast-urls", qtu( urls ) );
-        msg_Dbg( p_intf, "You will need to reload the podcast module to take into account deleted podcast urls" );
-    }
+    //FIXME IsServicesDiscoveryLoaded is uninplmented
+    //if( playlist_IsServicesDiscoveryLoaded( THEPL, "podcast" ) )
+    //{
+    //    var_SetString( THEPL, "podcast-urls", qtu( urls ) );
+    //    msg_Dbg( p_intf, "You will need to reload the podcast module to take into account deleted podcast urls" );
+    //}
 }
 
 void PodcastConfigDialog::add()

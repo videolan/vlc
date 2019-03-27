@@ -42,7 +42,7 @@
 #include <QDateTime>
 
 #include "qt.hpp"
-#include "input_manager.hpp"
+#include "components/player_controller.hpp"
 
 EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
@@ -77,8 +77,8 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     layout->addWidget( descBox );
 
     CONNECT( epg, itemSelectionChanged( EPGItem *), this, displayEvent( EPGItem *) );
-    CONNECT( epg, programActivated(int), THEMIM->getIM(), changeProgram(int) );
-    CONNECT( THEMIM->getIM(), epgChanged(), this, scheduleUpdate() );
+    CONNECT( epg, programActivated(int), THEMIM, changeProgram(int) );
+    CONNECT( THEMIM, epgChanged(), this, scheduleUpdate() );
     CONNECT( THEMIM, inputChanged( bool ), this, inputChanged() );
 
     QDialogButtonBox *buttonsBox = new QDialogButtonBox( this );
@@ -175,24 +175,17 @@ void EpgDialog::displayEvent( EPGItem *epgItem )
 
 void EpgDialog::updateInfos()
 {
-    input_item_t *p_input_item = NULL;
-    playlist_t *p_playlist = THEPL;
-    input_thread_t *p_input_thread = playlist_CurrentInput( p_playlist ); /* w/hold */
-    if( p_input_thread )
+    input_item_t *media = NULL;
     {
-        PL_LOCK; /* as input_GetItem still unfixed */
-        p_input_item = input_GetItem( p_input_thread );
-        if ( p_input_item ) input_item_Hold( p_input_item );
-        PL_UNLOCK;
-        input_Release( p_input_thread );
-        if ( p_input_item )
-        {
-            epg->updateEPG( p_input_item );
-            input_item_Release( p_input_item );
-        }
-        else
-        {
-            epg->reset();
-        }
+        vlc_player_locker lock{ p_intf->p_sys->p_player };
+        media = vlc_player_HoldCurrentMedia( p_intf->p_sys->p_player ); /* w/hold */
     }
+
+    if( media )
+    {
+        epg->updateEPG( media );
+        input_item_Release( media );
+    }
+    else
+        epg->reset();
 }

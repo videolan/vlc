@@ -29,8 +29,7 @@
 #include "qt.hpp"
 
 #include "main_interface.hpp"
-#include "input_manager.hpp"                    // Creation
-#include "actions_manager.hpp"                  // killInstance
+#include "components/player_controller.hpp"                    // Creation
 #include "managers/renderer_manager.hpp"
 
 #include "util/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
@@ -39,9 +38,29 @@
 
 #include "components/interface_widgets.hpp"     // bgWidget, videoWidget
 #include "components/controller.hpp"            // controllers
-#include "components/playlist_legacy/playlist.hpp"     // plWidget
 #include "dialogs/firstrun.hpp"                 // First Run
-#include "dialogs/playlist.hpp"                 // PlaylistDialog
+
+#include "components/playlist/playlist_model.hpp"
+#include <vlc_playlist.h>
+
+#include "components/mediacenter/mcmedialib.hpp"
+#include "components/mediacenter/mlqmltypes.hpp"
+#include "components/mediacenter/mlalbummodel.hpp"
+#include "components/mediacenter/mlartistmodel.hpp"
+#include "components/mediacenter/mlalbumtrackmodel.hpp"
+#include "components/mediacenter/mlgenremodel.hpp"
+#include "components/mediacenter/mlvideomodel.hpp"
+#include "components/mediacenter/mlnetworkmodel.hpp"
+
+#include "components/navigation_history.hpp"
+#include "components/aboutmodel.hpp"
+#include "components/dialogmodel.hpp"
+
+#include "components/voutwindow/qvoutwindowdummy.hpp"
+
+#include "components/qml_main_context.hpp"
+
+#include "util/qmleventfilter.hpp"
 
 #include "menus.hpp"                            // Menu creation
 #include "recents.hpp"                          // RecentItems when DnD
@@ -55,12 +74,12 @@
 #include <QMimeData>
 
 #include <QWindow>
-#include <QMenu>
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QLabel>
 #include <QStackedWidget>
 #include <QScreen>
+#include <QStackedLayout>
 #ifdef _WIN32
 #include <QFileInfo>
 #endif
@@ -71,9 +90,14 @@
 #endif
 
 #include <QTimer>
+#include <QtQml/QQmlContext>
+#include <QtQuick/QQuickItem>
+
 
 #include <vlc_actions.h>                    /* Wheel event */
 #include <vlc_vout_window.h>                /* VOUT_ events */
+
+using  namespace vlc::playlist;
 
 // #define DEBUG_INTF
 
@@ -95,28 +119,17 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf ),
     videoActive( ATOMIC_FLAG_INIT )
 {
     /* Variables initialisation */
-    bgWidget             = NULL;
-    videoWidget          = NULL;
-    playlistWidget       = NULL;
-    stackCentralOldWidget= NULL;
     lastWinScreen        = NULL;
     sysTray              = NULL;
-    fullscreenControls   = NULL;
     cryptedLabel         = NULL;
-    controls             = NULL;
-    inputC               = NULL;
 
     b_hideAfterCreation  = false; // --qt-start-minimized
     playlistVisible      = false;
-    input_name           = "";
     b_interfaceFullScreen= false;
     b_hasPausedWhenMinimized = false;
     i_kc_offset          = false;
     b_maximizedView      = false;
     b_isWindowTiled      = false;
-
-    /* Ask for Privacy */
-    FirstRun::CheckAndRun( this, p_intf );
 
     /**
      *  Configuration and settings
@@ -150,30 +163,19 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf ),
     /* Should the UI stays on top of other windows */
     b_interfaceOnTop = var_InheritBool( p_intf, "video-on-top" );
 
-#ifdef QT5_HAS_WAYLAND
-    b_hasWayland = QGuiApplication::platformName()
-        .startsWith(QLatin1String("wayland"), Qt::CaseInsensitive);
-#endif
+    b_hasMedialibrary = (vlc_ml_instance_get( p_intf ) != NULL);
+
+    QString platformName = QGuiApplication::platformName();
+
+    // TODO: handle Wayland/X11/Win32 windows
+    m_videoRenderer.reset(new QVoutWindowDummy(this));
 
     /**************************
      *  UI and Widgets design
      **************************/
     setVLCWindowsTitle();
 
-    /************
-     * Menu Bar *
-     ************/
-    VLCMenuBar::createMenuBar( this, p_intf );
-    CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
-             THEDP, destroyPopupMenu() );
-
     createMainWidget( settings );
-
-    /**************
-     * Status Bar *
-     **************/
-    createStatusBar();
-    setStatusBarVisibility( getSettings()->value( "MainWindow/status-bar-visible", false ).toBool() );
 
     /*********************************
      * Create the Systray Management *
@@ -189,69 +191,43 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf ),
      * Those connects are different because options can impeach them to trigger.
      **/
     /* Main Interface statusbar */
-    CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
-             this, setName( const QString& ) );
     /* and title of the Main Interface*/
     if( var_InheritBool( p_intf, "qt-name-in-title" ) )
     {
-        CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
-                 this, setVLCWindowsTitle( const QString& ) );
+        connect( THEMIM, &PlayerController::nameChanged, this, &MainInterface::setVLCWindowsTitle );
     }
-    CONNECT( THEMIM, inputChanged( bool ), this, onInputChanged( bool ) );
+    connect( THEMIM, &PlayerController::inputChanged, this, &MainInterface::onInputChanged );
 
     /* END CONNECTS ON IM */
 
     /* VideoWidget connects for asynchronous calls */
     b_videoFullScreen = false;
-    connect( this, SIGNAL(askGetVideo(struct vout_window_t*, unsigned, unsigned, bool)),
-             this, SLOT(getVideoSlot(struct vout_window_t*, unsigned, unsigned, bool)),
-             Qt::BlockingQueuedConnection );
-    connect( this, SIGNAL(askReleaseVideo( void )),
-             this, SLOT(releaseVideoSlot( void )),
-             Qt::BlockingQueuedConnection );
-    CONNECT( this, askVideoOnTop(bool), this, setVideoOnTop(bool));
+    connect( this, &MainInterface::askGetVideo, this, &MainInterface::getVideoSlot, Qt::BlockingQueuedConnection );
+    connect( this, &MainInterface::askReleaseVideo, this, &MainInterface::releaseVideoSlot, Qt::BlockingQueuedConnection );
+    connect( this, &MainInterface::askVideoToResize, this, &MainInterface::setVideoSize, Qt::QueuedConnection );
 
-    if( videoWidget )
-    {
-        if( b_autoresize )
-        {
-            CONNECT( videoWidget, sizeChanged( int, int ),
-                     this, videoSizeChanged( int,  int ) );
-        }
-        CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
-                 this, setVideoSize( unsigned int, unsigned int ) );
+    connect( THEDP, &DialogsProvider::toolBarConfUpdated, this, &MainInterface::toolBarConfUpdated );
 
-        CONNECT( this, askVideoSetFullScreen( bool ),
-                 this, setVideoFullScreen( bool ) );
-    }
+    connect( this, &MainInterface::askToQuit, THEDP, &DialogsProvider::quit );
+    connect( this, &MainInterface::askBoss, this, &MainInterface::setBoss );
+    connect( this, &MainInterface::askRaise, this, &MainInterface::setRaise );
 
-    CONNECT( THEDP, toolBarConfUpdated(), this, toolBarConfUpdated() );
-    installEventFilter( this );
+    connect( this, &MainInterface::askVideoSetFullScreen, this, &MainInterface::setVideoFullScreen);
 
-    CONNECT( this, askToQuit(), THEDP, quit() );
-
-    CONNECT( this, askBoss(), this, setBoss() );
-    CONNECT( this, askRaise(), this, setRaise() );
-
-
-    connect( THEDP, &DialogsProvider::releaseMouseEvents, this, &MainInterface::voutReleaseMouseEvents ) ;
     /** END of CONNECTS**/
 
 
     /************
      * Callbacks
      ************/
-    var_AddCallback( pl_Get(p_intf), "intf-toggle-fscontrol", IntfShowCB, p_intf );
-    var_AddCallback( pl_Get(p_intf), "intf-boss", IntfBossCB, p_intf );
-    var_AddCallback( pl_Get(p_intf), "intf-show", IntfRaiseMainCB, p_intf );
+    libvlc_int_t* libvlc = vlc_object_instance(p_intf);
+    var_AddCallback( libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
+    var_AddCallback( libvlc, "intf-boss", IntfBossCB, p_intf );
+    var_AddCallback( libvlc, "intf-show", IntfRaiseMainCB, p_intf );
 
     /* Register callback for the intf-popupmenu variable */
-    var_AddCallback( pl_Get(p_intf), "intf-popupmenu", PopupMenuCB, p_intf );
+    var_AddCallback( libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
-
-    /* Final Sizing, restoration and placement of the interface */
-    if( settings->value( "MainWindow/playlist-visible", false ).toBool() )
-        togglePlaylist();
 
     QVLCTools::restoreWidgetPosition( settings, this, QSize(600, 420) );
 
@@ -259,28 +235,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf ),
 
     setVisible( !b_hideAfterCreation );
 
-    /* Switch to minimal view if needed, must be called after the show() */
-    if( b_minimalView )
-        toggleMinimalView( true );
-
     computeMinimumSize();
 }
 
 MainInterface::~MainInterface()
 {
-    /* Unsure we hide the videoWidget before destroying it */
-    if( stackCentralOldWidget == videoWidget )
-        showTab( bgWidget );
-
-    if( videoWidget )
-        releaseVideoSlot();
-
-    /* Be sure to kill the actionsManager... Only used in the MI and control */
-    ActionsManager::killInstance();
-
-    /* Delete the FSC controller */
-    delete fullscreenControls;
-
     RendererManager::killInstance();
 
     /* Save states */
@@ -291,23 +250,25 @@ MainInterface::~MainInterface()
     /* Save playlist state */
     settings->setValue( "playlist-visible", playlistVisible );
 
-    settings->setValue( "adv-controls",
-                        getControlsVisibilityStatus() & CONTROLS_ADVANCED );
-    settings->setValue( "status-bar-visible", b_statusbarVisible );
-
     /* Save the stackCentralW sizes */
-    settings->setValue( "bgSize", stackWidgetsSizes[bgWidget] );
-    settings->setValue( "playlistSize", stackWidgetsSizes[playlistWidget] );
     settings->endGroup();
 
     /* Save this size */
     QVLCTools::saveWidgetPosition(settings, this);
 
     /* Unregister callbacks */
-    var_DelCallback( pl_Get(p_intf), "intf-boss", IntfBossCB, p_intf );
-    var_DelCallback( pl_Get(p_intf), "intf-show", IntfRaiseMainCB, p_intf );
-    var_DelCallback( pl_Get(p_intf), "intf-toggle-fscontrol", IntfShowCB, p_intf );
-    var_DelCallback( pl_Get(p_intf), "intf-popupmenu", PopupMenuCB, p_intf );
+    libvlc_int_t* libvlc = vlc_object_instance(p_intf);
+    var_DelCallback( libvlc, "intf-boss", IntfBossCB, p_intf );
+    var_DelCallback( libvlc, "intf-show", IntfRaiseMainCB, p_intf );
+    var_DelCallback( libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
+    var_DelCallback( libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
+
+#ifdef QT5_HAS_WAYLAND
+    if (b_hasWayland)
+    {
+        var_DecInteger( p_intf->p_sys->p_player, "egl-initialize-rc" );
+    }
+#endif
 
     p_intf->p_sys->p_mi = NULL;
 }
@@ -315,125 +276,19 @@ MainInterface::~MainInterface()
 void MainInterface::computeMinimumSize()
 {
     int minWidth = 80;
-    if( menuBar()->isVisible() )
-        minWidth += controls->sizeHint().width();
-
     setMinimumWidth( minWidth );
 }
 
 /*****************************
  *   Main UI handling        *
  *****************************/
-void MainInterface::recreateToolbars()
-{
-    bool b_adv = getControlsVisibilityStatus() & CONTROLS_ADVANCED;
-
-    delete controls;
-    delete inputC;
-
-    controls = new ControlsWidget( p_intf, b_adv, this );
-    inputC = new InputControlsWidget( p_intf, this );
-    mainLayout->insertWidget( 2, inputC );
-    mainLayout->insertWidget( settings->value( "MainWindow/ToolbarPos", false ).toBool() ? 0: 3,
-                              controls );
-
-    if( fullscreenControls )
-    {
-        delete fullscreenControls;
-        fullscreenControls = new FullscreenControllerWidget( p_intf, this );
-        CONNECT( fullscreenControls, keyPressed( QKeyEvent * ),
-                 this, handleKeyPress( QKeyEvent * ) );
-        THEMIM->requestVoutUpdate();
-    }
-
-    setMinimalView( b_minimalView );
-}
 
 void MainInterface::reloadPrefs()
 {
     i_notificationSetting = var_InheritInteger( p_intf, "qt-notification" );
     b_pauseOnMinimize = var_InheritBool( p_intf, "qt-pause-minimized" );
-    if( !var_InheritBool( p_intf, "qt-fs-controller" ) && fullscreenControls )
-    {
-        delete fullscreenControls;
-        fullscreenControls = NULL;
-    }
 }
 
-void MainInterface::createResumePanel( QWidget *w )
-{
-    resumePanel = new QWidget( w );
-    resumePanel->hide();
-    QHBoxLayout *resumePanelLayout = new QHBoxLayout( resumePanel );
-    resumePanelLayout->setSpacing( 0 ); resumePanelLayout->setMargin( 0 );
-
-    QLabel *continuePixmapLabel = new QLabel();
-    continuePixmapLabel->setPixmap( ImageHelper::loadSvgToPixmap( ":/menu/help.svg" , fontMetrics().height(), fontMetrics().height()) );
-    continuePixmapLabel->setContentsMargins( 5, 0, 5, 0 );
-
-    QLabel *continueLabel = new QLabel( qtr( "Do you want to restart the playback where left off?") );
-
-    QToolButton *cancel = new QToolButton( resumePanel );
-    cancel->setAutoRaise( true );
-    cancel->setText( "X" );
-
-    QPushButton *ok = new QPushButton( qtr( "&Continue" )  );
-
-    resumePanelLayout->addWidget( continuePixmapLabel );
-    resumePanelLayout->addWidget( continueLabel );
-    resumePanelLayout->addStretch( 1 );
-    resumePanelLayout->addWidget( ok );
-    resumePanelLayout->addWidget( cancel );
-
-    resumeTimer = new QTimer( resumePanel );
-    resumeTimer->setSingleShot( true );
-    resumeTimer->setInterval( 6000 );
-
-    CONNECT( resumeTimer, timeout(), this, hideResumePanel() );
-    CONNECT( cancel, clicked(), this, hideResumePanel() );
-    CONNECT( THEMIM->getIM(), resumePlayback(vlc_tick_t), this, showResumePanel(vlc_tick_t) );
-    BUTTONACT( ok, resumePlayback() );
-
-    w->layout()->addWidget( resumePanel );
-}
-
-void MainInterface::showResumePanel( vlc_tick_t _time ) {
-    int setting = var_InheritInteger( p_intf, "qt-continue" );
-
-    if( setting == 0 )
-        return;
-
-    i_resumeTime = _time;
-
-    if( setting == 2)
-        resumePlayback();
-    else
-    {
-        if( !isFullScreen() && !isMaximized() && !b_isWindowTiled )
-            resizeWindow( width(), height() + resumePanel->height() );
-        resumePanel->setVisible(true);
-        resumeTimer->start();
-    }
-}
-
-void MainInterface::hideResumePanel()
-{
-    if( resumePanel->isVisible() )
-    {
-        if( !isFullScreen() && !isMaximized() && !b_isWindowTiled )
-            resizeWindow( width(), height() - resumePanel->height() );
-        resumePanel->hide();
-        resumeTimer->stop();
-    }
-}
-
-void MainInterface::resumePlayback()
-{
-    if( THEMIM->getIM()->hasInput() ) {
-        var_SetInteger( THEMIM->getInput(), "time", i_resumeTime );
-    }
-    hideResumePanel();
-}
 
 void MainInterface::onInputChanged( bool hasInput )
 {
@@ -442,7 +297,7 @@ void MainInterface::onInputChanged( bool hasInput )
     int autoRaise = var_InheritInteger( p_intf, "qt-auto-raise" );
     if ( autoRaise == MainInterface::RAISE_NEVER )
         return;
-    if( THEMIM->getIM()->hasVideo() == true )
+    if( THEMIM->hasVideoOutput() == true )
     {
         if( ( autoRaise & MainInterface::RAISE_VIDEO ) == 0 )
             return;
@@ -452,80 +307,85 @@ void MainInterface::onInputChanged( bool hasInput )
     emit askRaise();
 }
 
-void MainInterface::createMainWidget( QSettings *creationSettings )
+void MainInterface::createMainWidget( QSettings * )
 {
-    /* Create the main Widget and the mainLayout */
-    QWidget *main = new QWidget;
-    setCentralWidget( main );
-    mainLayout = new QVBoxLayout( main );
-    main->setContentsMargins( 0, 0, 0, 0 );
-    mainLayout->setSpacing( 0 ); mainLayout->setMargin( 0 );
+    qRegisterMetaType<VLCTick>();
+    qmlRegisterUncreatableType<VLCTick>("org.videolan.vlc", 0, 1, "VLCTick", "");
 
-    createResumePanel( main );
-    /* */
-    stackCentralW = new QVLCStackedWidget( main );
+    qmlRegisterType<VideoSurface>("org.videolan.vlc", 0, 1, "VideoSurface");
 
-    /* Bg Cone */
-    if ( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY
-         && var_InheritBool( p_intf, "qt-icon-change" ) )
+    if (b_hasMedialibrary)
     {
-        bgWidget = new EasterEggBackgroundWidget( p_intf );
-        CONNECT( this, kc_pressed(), bgWidget, animate() );
+        qRegisterMetaType<MLParentId>();
+        qmlRegisterType<MLAlbumModel>( "org.videolan.medialib", 0, 1, "MLAlbumModel" );
+        qmlRegisterType<MLArtistModel>( "org.videolan.medialib", 0, 1, "MLArtistModel" );
+        qmlRegisterType<MLAlbumTrackModel>( "org.videolan.medialib", 0, 1, "MLAlbumTrackModel" );
+        qmlRegisterType<MLGenreModel>( "org.videolan.medialib", 0, 1, "MLGenreModel" );
+        qmlRegisterType<MLVideoModel>( "org.videolan.medialib", 0, 1, "MLVideoModel" );
+        qRegisterMetaType<NetworkTreeItem>();
+        qmlRegisterType<MLNetworkModel>( "org.videolan.medialib", 0, 1, "MLNetworkModel");
+
+        //expose base object, they aren't instanciable from QML side
+        qmlRegisterType<MLAlbum>();
+        qmlRegisterType<MLArtist>();
+        qmlRegisterType<MLAlbumTrack>();
+        qmlRegisterType<MLGenre>();
+        qmlRegisterType<MLVideo>();
+    }
+
+    qmlRegisterUncreatableType<NavigationHistory>("org.videolan.vlc", 0, 1, "History", "Type of global variable history" );
+
+    qmlRegisterUncreatableType<TrackListModel>("org.videolan.vlc", 0, 1, "TrackListModel", "available tracks of a media (audio/video/sub)" );
+    qmlRegisterUncreatableType<TitleListModel>("org.videolan.vlc", 0, 1, "TitleListModel", "available titles of a media" );
+    qmlRegisterUncreatableType<ChapterListModel>("org.videolan.vlc", 0, 1, "ChapterListModel", "available titles of a media" );
+    qmlRegisterUncreatableType<ProgramListModel>("org.videolan.vlc", 0, 1, "ProgramListModel", "available programs of a media" );
+    qmlRegisterUncreatableType<VLCVarChoiceModel>("org.videolan.vlc", 0, 1, "VLCVarChoiceModel", "generic variable with choice model" );
+    qmlRegisterUncreatableType<PlayerController>("org.videolan.vlc", 0, 1, "PlayerController", "player controller" );
+
+    qRegisterMetaType<PlaylistPtr>();
+    qRegisterMetaType<PlaylistItem>();
+    qmlRegisterUncreatableType<PlaylistItem>("org.videolan.vlc", 0, 1, "PlaylistItem", "");
+    qmlRegisterType<PlaylistListModel>( "org.videolan.vlc", 0, 1, "PlaylistListModel" );
+    qmlRegisterType<PlaylistControllerModel>( "org.videolan.vlc", 0, 1, "PlaylistControllerModel" );
+
+    qmlRegisterType<AboutModel>( "org.videolan.vlc", 0, 1, "AboutModel" );
+    qRegisterMetaType<DialogId>();
+    qmlRegisterType<DialogModel>("org.videolan.vlc", 0, 1, "DialogModel");
+
+    qmlRegisterType<QmlEventFilter>( "org.videolan.vlc", 0, 1, "EventFilter" );
+
+
+    mediacenterView = new QQuickWidget(this);
+    mediacenterView->setClearColor(Qt::transparent);
+
+    NavigationHistory* navigation_history = new NavigationHistory(mediacenterView);
+
+    QmlMainContext* mainCtx = new QmlMainContext(p_intf, this, mediacenterView);
+
+
+    QQmlContext *rootCtx = mediacenterView->rootContext();
+
+    rootCtx->setContextProperty( "history", navigation_history );
+    rootCtx->setContextProperty( "player", p_intf->p_sys->p_mainPlayerController );
+    rootCtx->setContextProperty( "mainctx", mainCtx);
+    rootCtx->setContextProperty( "rootQMLView", mediacenterView);
+    rootCtx->setContextProperty( "rootWindow", this);
+    rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
+
+    if (b_hasMedialibrary)
+    {
+        MCMediaLib *medialib = new MCMediaLib(p_intf, mediacenterView);
+        rootCtx->setContextProperty( "medialib", medialib );
     }
     else
-        bgWidget = new BackgroundWidget( p_intf );
-
-    stackCentralW->addWidget( bgWidget );
-    if ( !var_InheritBool( p_intf, "qt-bgcone" ) )
-        bgWidget->setWithArt( false );
-    else
-        if ( var_InheritBool( p_intf, "qt-bgcone-expands" ) )
-            bgWidget->setExpandstoHeight( true );
-
-    /* And video Outputs */
-    if( var_InheritBool( p_intf, "embedded-video" ) )
     {
-        videoWidget = new VideoWidget( p_intf, stackCentralW );
-        stackCentralW->addWidget( videoWidget );
+        rootCtx->setContextProperty( "medialib", nullptr );
     }
-    mainLayout->insertWidget( 1, stackCentralW );
 
-    stackWidgetsSizes[bgWidget] =
-        creationSettings->value( "MainWindow/bgSize", QSize( 600, 0 ) ).toSize();
-    /* Resize even if no-auto-resize, because we are at creation */
-    resizeStack( stackWidgetsSizes[bgWidget].width(), stackWidgetsSizes[bgWidget].height() );
+    mediacenterView->setSource( QUrl ( QStringLiteral("qrc:/qml/MainInterface.qml") ) );
+    mediacenterView->setResizeMode( QQuickWidget::SizeRootObjectToView );
 
-    /* Create the CONTROLS Widget */
-    controls = new ControlsWidget( p_intf,
-        creationSettings->value( "MainWindow/adv-controls", false ).toBool(), this );
-    inputC = new InputControlsWidget( p_intf, this );
-
-    mainLayout->insertWidget( 2, inputC );
-    mainLayout->insertWidget(
-        creationSettings->value( "MainWindow/ToolbarPos", false ).toBool() ? 0: 3,
-        controls );
-
-    /* Visualisation, disabled for now, they SUCK */
-    #if 0
-    visualSelector = new VisualSelector( p_intf );
-    mainLayout->insertWidget( 0, visualSelector );
-    visualSelector->hide();
-    #endif
-
-
-    /* Enable the popup menu in the MI */
-    main->setContextMenuPolicy( Qt::CustomContextMenu );
-    CONNECT( main, customContextMenuRequested( const QPoint& ),
-             THEDP, setPopupMenu() );
-
-    if ( depth() > 8 ) /* 8bit depth has too many issues with opacity */
-        /* Create the FULLSCREEN CONTROLS Widget */
-        if( var_InheritBool( p_intf, "qt-fs-controller" ) )
-        {
-            fullscreenControls = new FullscreenControllerWidget( p_intf, this );
-            CONNECT( fullscreenControls, keyPressed( QKeyEvent * ),
-                     this, handleKeyPress( QKeyEvent * ) );
-        }
+    setCentralWidget( mediacenterView );
 
     if ( b_interfaceOnTop )
         setWindowFlags( windowFlags() | Qt::WindowStaysOnTopHint );
@@ -551,168 +411,6 @@ inline void MainInterface::initSystray()
         createSystray();
 }
 
-inline void MainInterface::createStatusBar()
-{
-    /****************
-     *  Status Bar  *
-     ****************/
-    /* Widgets Creation*/
-    QStatusBar *statusBarr = statusBar();
-
-    TimeLabel *timeLabel = new TimeLabel( p_intf );
-    nameLabel = new ClickableQLabel();
-    nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
-                                      | Qt::TextSelectableByKeyboard );
-    SpeedLabel *speedLabel = new SpeedLabel( p_intf, this );
-
-    /* Styling those labels */
-    timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
-    speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
-    nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
-    timeLabel->setStyleSheet(
-            "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
-    speedLabel->setStyleSheet(
-            "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
-    /* pad both label and its tooltip */
-    nameLabel->setStyleSheet( "padding-left: 5px; padding-right: 5px;" );
-
-    /* and adding those */
-    statusBarr->addWidget( nameLabel, 8 );
-    statusBarr->addPermanentWidget( speedLabel, 0 );
-    statusBarr->addPermanentWidget( timeLabel, 0 );
-
-    CONNECT( nameLabel, doubleClicked(), THEDP, epgDialog() );
-    /* timeLabel behaviour:
-       - double clicking opens the goto time dialog
-       - right-clicking and clicking just toggle between remaining and
-         elapsed time.*/
-    CONNECT( timeLabel, doubleClicked(), THEDP, gotoTimeDialog() );
-
-    CONNECT( THEMIM->getIM(), encryptionChanged( bool ),
-             this, showCryptedLabel( bool ) );
-
-    /* This shouldn't be necessary, but for somehow reason, the statusBarr
-       starts at height of 20px and when a text is shown it needs more space.
-       But, as the QMainWindow policy doesn't allow statusBar to change QMW's
-       geometry, we need to force a height. If you have a better idea, please
-       tell me -- jb
-     */
-    statusBarr->setFixedHeight( statusBarr->sizeHint().height() + 2 );
-}
-
-/**********************************************************************
- * Handling of sizing of the components
- **********************************************************************/
-
-void MainInterface::debug()
-{
-#ifdef DEBUG_INTF
-    if( controls ) {
-        msg_Dbg( p_intf, "Controls size: %i - %i", controls->size().height(), controls->size().width() );
-        msg_Dbg( p_intf, "Controls minimumsize: %i - %i", controls->minimumSize().height(), controls->minimumSize().width() );
-        msg_Dbg( p_intf, "Controls sizeHint: %i - %i", controls->sizeHint().height(), controls->sizeHint().width() );
-    }
-
-    msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
-    msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
-    msg_Dbg( p_intf, "minimumsize: %i - %i", minimumSize().height(), minimumSize().width() );
-
-    msg_Dbg( p_intf, "Stack size: %i - %i", stackCentralW->size().height(), stackCentralW->size().width() );
-    msg_Dbg( p_intf, "Stack sizeHint: %i - %i", stackCentralW->sizeHint().height(), stackCentralW->sizeHint().width() );
-    msg_Dbg( p_intf, "Central size: %i - %i", centralWidget()->size().height(), centralWidget()->size().width() );
-#endif
-}
-
-inline void MainInterface::showVideo() { showTab( videoWidget ); }
-inline void MainInterface::restoreStackOldWidget( bool video_closing )
-            { showTab( stackCentralOldWidget, video_closing ); }
-
-inline void MainInterface::showTab( QWidget *widget, bool video_closing )
-{
-    if ( !widget ) widget = bgWidget; /* trying to restore a null oldwidget */
-#ifdef DEBUG_INTF
-    if ( stackCentralOldWidget )
-        msg_Dbg( p_intf, "Old stackCentralOldWidget %s at index %i",
-                 stackCentralOldWidget->metaObject()->className(),
-                 stackCentralW->indexOf( stackCentralOldWidget ) );
-    msg_Dbg( p_intf, "ShowTab request for %s", widget->metaObject()->className() );
-#endif
-    if ( stackCentralW->currentWidget() == widget )
-        return;
-
-    /* fixing when the playlist has been undocked after being hidden.
-       restoreStackOldWidget() is called when video stops but
-       stackCentralOldWidget would still be pointing to playlist */
-    if ( widget == playlistWidget && !isPlDocked() )
-        widget = bgWidget;
-
-    stackCentralOldWidget = stackCentralW->currentWidget();
-    if( !isFullScreen() )
-        stackWidgetsSizes[stackCentralOldWidget] = stackCentralW->size();
-
-    /* If we are playing video, embedded */
-    if( !video_closing && videoWidget && THEMIM->getIM()->hasVideo() )
-    {
-        /* Video -> Playlist */
-        if( videoWidget == stackCentralOldWidget && widget == playlistWidget )
-        {
-            stackCentralW->removeWidget( videoWidget );
-            videoWidget->show(); videoWidget->raise();
-        }
-
-        /* Playlist -> Video */
-        if( playlistWidget == stackCentralOldWidget && widget == videoWidget )
-        {
-            playlistWidget->artContainer->removeWidget( videoWidget );
-            videoWidget->show(); videoWidget->raise();
-            stackCentralW->addWidget( videoWidget );
-        }
-
-        /* Embedded playlist -> Non-embedded playlist */
-        if( bgWidget == stackCentralOldWidget && widget == videoWidget )
-        {
-            /* In rare case when video is started before the interface */
-            if( playlistWidget != NULL )
-                playlistWidget->artContainer->removeWidget( videoWidget );
-            videoWidget->show(); videoWidget->raise();
-            stackCentralW->addWidget( videoWidget );
-            stackCentralW->setCurrentWidget( videoWidget );
-        }
-    }
-
-    stackCentralW->setCurrentWidget( widget );
-    if( b_autoresize )
-    {
-        QSize size = stackWidgetsSizes[widget];
-        if( size.isValid() )
-            resizeStack( size.width(), size.height() );
-    }
-
-#ifdef DEBUG_INTF
-    msg_Dbg( p_intf, "Stack state changed to %s, index %i",
-              stackCentralW->currentWidget()->metaObject()->className(),
-              stackCentralW->currentIndex() );
-    msg_Dbg( p_intf, "New stackCentralOldWidget %s at index %i",
-              stackCentralOldWidget->metaObject()->className(),
-              stackCentralW->indexOf( stackCentralOldWidget ) );
-#endif
-
-    /* This part is done later, to account for the new pl size */
-    if( !video_closing && videoWidget && THEMIM->getIM()->hasVideo() &&
-        videoWidget == stackCentralOldWidget && widget == playlistWidget )
-    {
-        playlistWidget->artContainer->addWidget( videoWidget );
-        playlistWidget->artContainer->setCurrentWidget( videoWidget );
-    }
-}
-
-void MainInterface::toggleFSC()
-{
-   if( !fullscreenControls ) return;
-
-   IMEvent *eShow = new IMEvent( IMEvent::FullscreenControlToggle );
-   QApplication::postEvent( fullscreenControls, eShow );
-}
 
 /****************************************************************************
  * Video Handling
@@ -744,127 +442,12 @@ bool MainInterface::getVideo( struct vout_window_t *p_wnd )
     p_wnd->ops = &ops;
     p_wnd->info.has_double_click = true;
     p_wnd->sys = this;
+    m_videoRenderer->setupVoutWindow(p_wnd);
+
+    m_hasEmbededVideo = true;
+    emit hasEmbededVideoChanged(true);
+
     return true;
-}
-
-void MainInterface::getVideoSlot( struct vout_window_t *p_wnd,
-                                  unsigned i_width, unsigned i_height,
-                                  bool fullscreen )
-{
-    /* Hidden or minimized, activate */
-    if( isHidden() || isMinimized() )
-        toggleUpdateSystrayMenu();
-
-    /* Request the videoWidget */
-    if ( !videoWidget )
-    {
-        videoWidget = new VideoWidget( p_intf, stackCentralW );
-        stackCentralW->addWidget( videoWidget );
-    }
-
-    videoWidget->request( p_wnd );
-    if( true ) /* The videoWidget is available */
-    {
-        setVideoFullScreen( fullscreen );
-
-        /* Consider the video active now */
-        showVideo();
-
-        /* Ask videoWidget to resize correctly, if we are in normal mode */
-        if( b_autoresize ) {
-#if HAS_QT56
-            qreal factor = videoWidget->devicePixelRatioF();
-
-            i_width = qRound( (qreal) i_width / factor );
-            i_height = qRound( (qreal) i_height / factor );
-#endif
-
-            videoWidget->setSize( i_width, i_height );
-        }
-    }
-}
-
-/* Function that is CONNECTED to the previous emit */
-void MainInterface::releaseVideoSlot( void )
-{
-    /* This function is called when the embedded video window is destroyed,
-     * or in the rare case that the embedded window is still here but the
-     * Qt interface exits. */
-    assert( videoWidget );
-    videoWidget->release();
-    setVideoOnTop( false );
-    setVideoFullScreen( false );
-    hideResumePanel();
-
-    if( stackCentralW->currentWidget() == videoWidget )
-        restoreStackOldWidget( true );
-    else if( playlistWidget &&
-             playlistWidget->artContainer->currentWidget() == videoWidget )
-    {
-        playlistWidget->artContainer->setCurrentIndex( 0 );
-        stackCentralW->addWidget( videoWidget );
-    }
-
-    /* We don't want to have a blank video to popup */
-    stackCentralOldWidget = bgWidget;
-}
-
-// The provided size is in physical pixels, coming from the core.
-void MainInterface::setVideoSize( unsigned int w, unsigned int h )
-{
-    if (!isFullScreen() && !isMaximized() )
-    {
-        /* Resize video widget to video size, or keep it at the same
-         * size. Call setSize() either way so that vout_window_ReportSize
-         * will always get called.
-         * If the video size is too large for the screen, resize it
-         * to the screen size.
-         */
-        if (b_autoresize)
-        {
-            QRect screen = QApplication::desktop()->availableGeometry();
-#if HAS_QT56
-            float factor = videoWidget->devicePixelRatioF();
-#else
-            float factor = 1.0f;
-#endif
-            if( (float)h / factor > screen.height() )
-            {
-                w = screen.width();
-                h = screen.height();
-                if( !b_minimalView )
-                {
-                    if( menuBar()->isVisible() )
-                        h -= menuBar()->height();
-                    if( controls->isVisible() )
-                        h -= controls->height();
-                    if( statusBar()->isVisible() )
-                        h -= statusBar()->height();
-                    if( inputC->isVisible() )
-                        h -= inputC->height();
-                }
-                h -= style()->pixelMetric(QStyle::PM_TitleBarHeight);
-                h -= style()->pixelMetric(QStyle::PM_LayoutBottomMargin);
-                h -= 2 * style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
-            }
-            else
-            {
-                // Convert the size in logical pixels
-                w = qRound( (float)w / factor );
-                h = qRound( (float)h / factor );
-                msg_Dbg( p_intf, "Logical video size: %ux%u", w, h );
-            }
-            videoWidget->setSize( w, h );
-        }
-        else
-            videoWidget->setSize( videoWidget->width(), videoWidget->height() );
-    }
-}
-
-void MainInterface::videoSizeChanged( int w, int h )
-{
-    if( !playlistWidget || playlistWidget->artContainer->currentWidget() != videoWidget )
-        resizeStack( w, h );
 }
 
 void MainInterface::setVideoFullScreen( bool fs )
@@ -876,9 +459,6 @@ void MainInterface::setVideoFullScreen( bool fs )
 
         if ( numscreen >= 0 && numscreen < QApplication::desktop()->screenCount() )
         {
-            if( fullscreenControls )
-                fullscreenControls->setTargetScreen( numscreen );
-
             QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
             lastWinScreen = windowHandle()->screen();
 #ifdef QT5_HAS_WAYLAND
@@ -898,20 +478,11 @@ void MainInterface::setVideoFullScreen( bool fs )
             }
         }
 
-        if( playlistWidget != NULL && playlistWidget->artContainer->currentWidget() == videoWidget )
-            showTab( videoWidget );
-
-        /* we won't be able to get its windowed sized once in fullscreen, so update it now */
-        stackWidgetsSizes[stackCentralW->currentWidget()] = stackCentralW->size();
-
-        /* */
-        displayNormalView();
-        setInterfaceFullScreen( true );
+        setFullScreen( true );
     }
     else
     {
-        setMinimalView( b_minimalView );
-        setInterfaceFullScreen( b_interfaceFullScreen );
+        setFullScreen( b_interfaceFullScreen );
 #ifdef QT5_HAS_WAYLAND
         if( lastWinScreen != NULL && !b_hasWayland )
             windowHandle()->setScreen(lastWinScreen);
@@ -929,16 +500,10 @@ void MainInterface::setVideoFullScreen( bool fs )
                 lastWinSize = QSize();
             }
         }
-        if( pendingResize.isValid() )
-        {
-            /* apply resize requested while fullscreen was enabled */
-            resizeStack( pendingResize.width(), pendingResize.height() );
-            pendingResize = QSize(); // consume
-        }
 
     }
-    videoWidget->sync();
 }
+
 
 /* Slot to change the video always-on-top flag.
  * Emit askVideoOnTop() to invoke this from other thread. */
@@ -975,6 +540,7 @@ void MainInterface::setInterfaceAlwaysOnTop( bool on_top )
         setWindowFlags( newflags );
         show(); /* necessary to apply window flags */
     }
+    emit interfaceAlwaysOnTopChanged(on_top);
 }
 
 /* Asynchronous calls for video window contrlos */
@@ -984,17 +550,17 @@ int MainInterface::enableVideo( vout_window_t *p_wnd,
     MainInterface *p_mi = (MainInterface *)p_wnd->sys;
 
     msg_Dbg( p_wnd, "requesting video window..." );
+    p_mi->m_videoRenderer->enableVideo(cfg->width, cfg->height, cfg->is_fullscreen);
     /* This is a blocking call signal. Results are stored directly in the
      * vout_window_t and boolean pointers. Beware of deadlocks! */
-    emit p_mi->askGetVideo( p_wnd, cfg->width, cfg->height,
-                            cfg->is_fullscreen );
+    emit p_mi->askGetVideo( cfg->is_fullscreen );
     return VLC_SUCCESS;
 }
 
 void MainInterface::disableVideo( vout_window_t *p_wnd )
 {
     MainInterface *p_mi = (MainInterface *)p_wnd->sys;
-
+    p_mi->m_videoRenderer->disableVideo();
     msg_Dbg( p_wnd, "releasing video..." );
     emit p_mi->askReleaseVideo();
 }
@@ -1010,6 +576,7 @@ void MainInterface::resizeVideo( vout_window_t *p_wnd,
 void MainInterface::requestVideoWindowed( struct vout_window_t *wnd )
 {
    MainInterface *p_mi = (MainInterface *)wnd->sys;
+   msg_Warn( wnd, "requestVideoWindowed..." );
 
    emit p_mi->askVideoSetFullScreen( false );
 }
@@ -1017,6 +584,7 @@ void MainInterface::requestVideoWindowed( struct vout_window_t *wnd )
 void MainInterface::requestVideoFullScreen( vout_window_t *wnd, const char * )
 {
     MainInterface *p_mi = (MainInterface *)wnd->sys;
+    msg_Warn( wnd, "requestVideoFullScreen..." );
 
     emit p_mi->askVideoSetFullScreen( true );
 }
@@ -1037,60 +605,23 @@ void MainInterface::releaseVideo( vout_window_t *p_wnd )
      * The video is no longer active by this point.
      */
     p_mi->videoActive.clear();
+    p_mi->m_videoRenderer->setupVoutWindow(nullptr);
+    p_mi->m_hasEmbededVideo = false;
+    emit p_mi->hasEmbededVideoChanged(false);
 }
 
-/*****************************************************************************
- * Playlist, Visualisation and Menus handling
- *****************************************************************************/
-/**
- * Toggle the playlist widget or dialog
- **/
-void MainInterface::createPlaylist()
+QQuickWindow*MainInterface::getRootQuickWindow()
 {
-    PlaylistDialog *dialog = PlaylistDialog::getInstance( p_intf );
-
-    if( b_plDocked )
-    {
-        playlistWidget = dialog->exportPlaylistWidget();
-        stackCentralW->addWidget( playlistWidget );
-        stackWidgetsSizes[playlistWidget] = settings->value( "playlistSize", QSize( 600, 300 ) ).toSize();
-    }
-    CONNECT( dialog, visibilityChanged(bool), this, setPlaylistVisibility(bool) );
+    //FIXME, thread safety
+    QQuickItem* rootObject = mediacenterView->rootObject();
+    if (!rootObject)
+        return nullptr;
+    return rootObject->window();
 }
 
-void MainInterface::togglePlaylist()
+VideoSurfaceProvider* MainInterface::getVideoSurfaceProvider() const
 {
-    if( !playlistWidget ) createPlaylist();
-
-    PlaylistDialog *dialog = PlaylistDialog::getInstance( p_intf );
-    if( b_plDocked )
-    {
-        if ( dialog->hasPlaylistWidget() )
-            playlistWidget = dialog->exportPlaylistWidget();
-        /* Playlist is not visible, show it */
-        if( stackCentralW->currentWidget() != playlistWidget )
-        {
-            if( stackCentralW->indexOf( playlistWidget ) == -1 )
-                stackCentralW->addWidget( playlistWidget );
-            showTab( playlistWidget );
-        }
-        else /* Hide it! */
-        {
-            restoreStackOldWidget();
-        }
-        playlistVisible = ( stackCentralW->currentWidget() == playlistWidget );
-    }
-    else
-    {
-        playlistVisible = !playlistVisible;
-        if ( ! dialog->hasPlaylistWidget() )
-            dialog->importPlaylistWidget( playlistWidget );
-        if ( playlistVisible )
-            dialog->show();
-        else
-            dialog->hide();
-    }
-    debug();
+    return m_videoRenderer->getVideoSurfaceProvider();
 }
 
 const Qt::Key MainInterface::kc[10] =
@@ -1101,187 +632,6 @@ const Qt::Key MainInterface::kc[10] =
     Qt::Key_B, Qt::Key_A
 };
 
-void MainInterface::dockPlaylist( bool p_docked )
-{
-    if( b_plDocked == p_docked ) return;
-    /* some extra check */
-    if ( b_plDocked && !playlistWidget ) createPlaylist();
-
-    b_plDocked = p_docked;
-    PlaylistDialog *dialog = PlaylistDialog::getInstance( p_intf );
-
-    if( !p_docked ) /* Previously docked */
-    {
-        playlistVisible = playlistWidget->isVisible();
-
-        /* repositioning the videowidget __before__ exporting the
-           playlistwidget into the playlist dialog avoids two unneeded
-           calls to the server in the qt library to reparent the underlying
-           native window back and forth.
-           For Wayland, this is mandatory since reparenting is not implemented.
-           For X11 or Windows, this is just an optimization. */
-        if ( videoWidget && THEMIM->getIM()->hasVideo() )
-            showTab(videoWidget);
-        else
-            showTab(bgWidget);
-
-        /* playlistwidget exported into the playlist dialog */
-        stackCentralW->removeWidget( playlistWidget );
-        dialog->importPlaylistWidget( playlistWidget );
-        if ( playlistVisible ) dialog->show();
-    }
-    else /* Previously undocked */
-    {
-        playlistVisible = dialog->isVisible() && !( videoWidget && THEMIM->getIM()->hasVideo() );
-        dialog->hide();
-        playlistWidget = dialog->exportPlaylistWidget();
-        stackCentralW->addWidget( playlistWidget );
-
-        /* If playlist is invisible don't show it */
-        if( playlistVisible ) showTab( playlistWidget );
-    }
-}
-
-/*
- * displayNormalView is the private function used by
- * the SLOT setVideoFullScreen to restore the menuBar
- * if minimal view is off
- */
-void MainInterface::displayNormalView()
-{
-    menuBar()->setVisible( false );
-    controls->setVisible( false );
-    statusBar()->setVisible( false );
-    inputC->setVisible( false );
-}
-
-/*
- * setMinimalView is the private function used by
- * the SLOT toggleMinimalView
- */
-void MainInterface::setMinimalView( bool b_minimal )
-{
-    bool b_menuBarVisible = menuBar()->isVisible();
-    bool b_controlsVisible = controls->isVisible();
-    bool b_statusBarVisible = statusBar()->isVisible();
-    bool b_inputCVisible = inputC->isVisible();
-
-    if( !isFullScreen() && !isMaximized() && b_minimal && !b_isWindowTiled )
-    {
-        int i_heightChange = 0;
-
-        if( b_menuBarVisible )
-            i_heightChange += menuBar()->height();
-        if( b_controlsVisible )
-            i_heightChange += controls->height();
-        if( b_statusBarVisible )
-            i_heightChange += statusBar()->height();
-        if( b_inputCVisible )
-            i_heightChange += inputC->height();
-
-        if( i_heightChange != 0 )
-            resizeWindow( width(), height() - i_heightChange );
-    }
-
-    menuBar()->setVisible( !b_minimal );
-    controls->setVisible( !b_minimal );
-    statusBar()->setVisible( !b_minimal && b_statusbarVisible );
-    inputC->setVisible( !b_minimal );
-
-    if( !isFullScreen() && !isMaximized() && !b_minimal && !b_isWindowTiled )
-    {
-        int i_heightChange = 0;
-
-        if( !b_menuBarVisible && menuBar()->isVisible() )
-            i_heightChange += menuBar()->height();
-        if( !b_controlsVisible && controls->isVisible() )
-            i_heightChange += controls->height();
-        if( !b_statusBarVisible && statusBar()->isVisible() )
-            i_heightChange += statusBar()->height();
-        if( !b_inputCVisible && inputC->isVisible() )
-            i_heightChange += inputC->height();
-
-        if( i_heightChange != 0 )
-            resizeWindow( width(), height() + i_heightChange );
-    }
-}
-
-/*
- * This public SLOT is used for moving to minimal View Mode
- *
- * If b_minimal is false, then we are normalView
- */
-void MainInterface::toggleMinimalView( bool b_minimal )
-{
-    if( !b_minimalView && b_autoresize ) /* Normal mode */
-    {
-        if( stackCentralW->currentWidget() == bgWidget )
-        {
-            if( stackCentralW->height() < 16 )
-            {
-                resizeStack( stackCentralW->width(), 100 );
-            }
-        }
-    }
-    b_minimalView = b_minimal;
-    if( !b_videoFullScreen )
-    {
-        setMinimalView( b_minimalView );
-        computeMinimumSize();
-    }
-
-    emit minimalViewToggled( b_minimalView );
-}
-
-/* toggling advanced controls buttons */
-void MainInterface::toggleAdvancedButtons()
-{
-    controls->toggleAdvanced();
-//    if( fullscreenControls ) fullscreenControls->toggleAdvanced();
-}
-
-/* Get the visibility status of the controls (hidden or not, advanced or not) */
-int MainInterface::getControlsVisibilityStatus()
-{
-    if( !controls ) return 0;
-    return( (controls->isVisible() ? CONTROLS_VISIBLE : CONTROLS_HIDDEN )
-            + CONTROLS_ADVANCED * controls->b_advancedVisible );
-}
-
-StandardPLPanel *MainInterface::getPlaylistView()
-{
-    if( !playlistWidget ) return NULL;
-    else return playlistWidget->mainView;
-}
-
-void MainInterface::setStatusBarVisibility( bool b_visible )
-{
-    statusBar()->setVisible( b_visible );
-    b_statusbarVisible = b_visible;
-    if( controls ) controls->setGripVisible( !b_statusbarVisible );
-}
-
-
-void MainInterface::setPlaylistVisibility( bool b_visible )
-{
-    if( isPlDocked() || THEDP->isDying() || (playlistWidget && playlistWidget->isMinimized() ) )
-        return;
-
-    playlistVisible = b_visible;
-}
-
-/************************************************************************
- * Other stuff
- ************************************************************************/
-void MainInterface::setName( const QString& name )
-{
-    input_name = name; /* store it for the QSystray use */
-    /* Display it in the status bar, but also as a Tooltip in case it doesn't
-       fit in the label */
-    nameLabel->setText( name );
-    nameLabel->setToolTip( name );
-}
-
 /**
  * Give the decorations of the Main Window a correct Name.
  * If nothing is given, set it to VLC...
@@ -1291,24 +641,53 @@ void MainInterface::setVLCWindowsTitle( const QString& aTitle )
     setWindowTitle( aTitle );
 }
 
-void MainInterface::showCryptedLabel( bool b_show )
-{
-    if( cryptedLabel == NULL )
-    {
-        cryptedLabel = new QLabel;
-        // The lock icon is not the right one for DRM protection/scrambled.
-        //cryptedLabel->setPixmap( QPixmap( ":/lock.svg" ) );
-        cryptedLabel->setText( "DRM" );
-        statusBar()->addWidget( cryptedLabel );
-    }
-
-    cryptedLabel->setVisible( b_show );
-}
-
 void MainInterface::showBuffering( float f_cache )
 {
     QString amount = QString("Buffering: %1%").arg( (int)(100*f_cache) );
     statusBar()->showMessage( amount, 1000 );
+}
+
+void MainInterface::getVideoSlot(bool fullscreen)
+{
+    setVideoFullScreen(fullscreen);
+}
+
+
+void MainInterface::releaseVideoSlot( void )
+{
+    setVideoOnTop( false );
+    setVideoFullScreen( false );
+}
+
+void MainInterface::setVideoSize(unsigned int w, unsigned int h)
+{
+    if (!isFullScreen() && !isMaximized() )
+    {
+        /* Resize video widget to video size, or keep it at the same
+         * size. Call setSize() either way so that vout_window_ReportSize
+         * will always get called.
+         * If the video size is too large for the screen, resize it
+         * to the screen size.
+         */
+        if (b_autoresize)
+        {
+            QRect screen = QApplication::desktop()->availableGeometry();
+            float factor = devicePixelRatioF();
+            if( (float)h / factor > screen.height() )
+            {
+                w = screen.width();
+                h = screen.height();
+            }
+            else
+            {
+                // Convert the size in logical pixels
+                w = qRound( (float)w / factor );
+                h = qRound( (float)h / factor );
+                msg_Dbg( p_intf, "Logical video size: %ux%u", w, h );
+            }
+            resize(w, h);
+        }
+    }
 }
 
 /*****************************************************************************
@@ -1334,15 +713,15 @@ void MainInterface::createSystray()
     VLCMenuBar::updateSystrayMenu( this, p_intf, true );
     sysTray->show();
 
-    CONNECT( sysTray, activated( QSystemTrayIcon::ActivationReason ),
-             this, handleSystrayClick( QSystemTrayIcon::ActivationReason ) );
+    connect( sysTray, &QSystemTrayIcon::activated,
+             this, &MainInterface::handleSystrayClick );
 
     /* Connects on nameChanged() */
-    CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
-             this, updateSystrayTooltipName( const QString& ) );
+    connect( THEMIM, &PlayerController::nameChanged,
+             this, &MainInterface::updateSystrayTooltipName );
     /* Connect PLAY_STATUS on the systray */
-    CONNECT( THEMIM->getIM(), playingStatusChanged( int ),
-             this, updateSystrayTooltipStatus( int ) );
+    connect( THEMIM, &PlayerController::playingStateChanged,
+             this, &MainInterface::updateSystrayTooltipStatus );
 }
 
 void MainInterface::toggleUpdateSystrayMenuWhenVisible()
@@ -1473,20 +852,8 @@ void MainInterface::updateSystrayTooltipName( const QString& name )
  * Updates the status of the systray Icon tooltip.
  * Doesn't check if the systray exists, check before you call it.
  **/
-void MainInterface::updateSystrayTooltipStatus( int i_status )
+void MainInterface::updateSystrayTooltipStatus( PlayerController::PlayingState )
 {
-    switch( i_status )
-    {
-    case PLAYING_S:
-        sysTray->setToolTip( input_name );
-        break;
-    case PAUSE_S:
-        sysTray->setToolTip( input_name + " - " + qtr( "Paused") );
-        break;
-    default:
-        sysTray->setToolTip( qtr( "VLC media player" ) );
-        break;
-    }
     VLCMenuBar::updateSystrayMenu( this, p_intf );
 }
 
@@ -1523,19 +890,19 @@ void MainInterface::changeEvent(QEvent *event)
         {
             b_hasPausedWhenMinimized = false;
 
-            if( THEMIM->getIM()->playingStatus() == PLAYING_S &&
-                THEMIM->getIM()->hasVideo() && !THEMIM->getIM()->hasVisualisation() &&
+            if( THEMIM->getPlayingState() == PlayerController::PLAYING_STATE_PLAYING &&
+                THEMIM->hasVideoOutput() && !THEMIM->hasAudioVisualization() &&
                 b_pauseOnMinimize )
             {
                 b_hasPausedWhenMinimized = true;
-                THEMIM->pause();
+                THEMPL->pause();
             }
         }
         else if( oldState & Qt::WindowMinimized && !( newState & Qt::WindowMinimized ) )
         {
             if( b_hasPausedWhenMinimized )
             {
-                THEMIM->play();
+                THEMPL->play();
             }
         }
     }
@@ -1569,10 +936,9 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
     const QMimeData *mimeData = event->mimeData();
 
     /* D&D of a subtitles file, add it on the fly */
-    if( mimeData->urls().count() == 1 && THEMIM->getIM()->hasInput() )
+    if( mimeData->urls().count() == 1 && THEMIM->hasInput() )
     {
-        if( !input_AddSlave( THEMIM->getInput(), SLAVE_TYPE_SPU,
-                 qtu( mimeData->urls()[0].toString() ), true, true, true ) )
+        if( !THEMIM->AddAssociatedMedia(SPU_ES, mimeData->urls()[0].toString(), true, true, true) )
         {
             event->accept();
             return;
@@ -1637,73 +1003,34 @@ void MainInterface::dragLeaveEvent(QDragLeaveEvent *event)
 /************************************************************************
  * Events stuff
  ************************************************************************/
-void MainInterface::keyPressEvent( QKeyEvent *e )
-{
-    handleKeyPress( e );
-
-    /* easter eggs sequence handling */
-    if ( e->key() == kc[ i_kc_offset ] )
-        i_kc_offset++;
-    else
-        i_kc_offset = 0;
-
-    if ( i_kc_offset == (sizeof( kc ) / sizeof( Qt::Key )) )
-    {
-        i_kc_offset = 0;
-        emit kc_pressed();
-    }
-}
-
-void MainInterface::handleKeyPress( QKeyEvent *e )
-{
-    if( ( ( e->modifiers() & Qt::ControlModifier ) && ( e->key() == Qt::Key_H ) ) ||
-        ( b_minimalView && !b_videoFullScreen && e->key() == Qt::Key_Escape ) )
-    {
-        toggleMinimalView( !b_minimalView );
-        e->accept();
-    }
-    else if( ( e->modifiers() & Qt::ControlModifier ) && ( e->key() == Qt::Key_K ) &&
-        playlistWidget )
-    {
-        playlistWidget->setSearchFieldFocus();
-        e->accept();
-    }
-
-    int i_vlck = qtEventToVLCKey( e );
-    if( i_vlck > 0 )
-    {
-        var_SetInteger( vlc_object_instance(p_intf), "key-pressed", i_vlck );
-        e->accept();
-    }
-    else
-        e->ignore();
-}
-
-void MainInterface::wheelEvent( QWheelEvent *e )
-{
-    int i_vlckey = qtWheelEventToVLCKey( e );
-    var_SetInteger( vlc_object_instance(p_intf), "key-pressed", i_vlckey );
-    e->accept();
-}
 
 void MainInterface::closeEvent( QCloseEvent *e )
 {
-//  hide();
-    if ( b_minimalView )
-        setMinimalView( false );
-    emit askToQuit(); /* ask THEDP to quit, so we have a unique method */
-    /* Accept session quit. Otherwise we break the desktop mamager. */
-    e->accept();
-}
+    PlaylistControllerModel* playlistController = p_intf->p_sys->p_mainPlaylistController;
+    PlayerController* playerController = p_intf->p_sys->p_mainPlayerController;
 
-bool MainInterface::eventFilter( QObject *obj, QEvent *event )
-{
-    if ( event->type() == MainInterface::ToolbarsNeedRebuild ) {
-        event->accept();
-        recreateToolbars();
-        return true;
-    } else {
-        return QObject::eventFilter( obj, event );
+    if (m_videoRenderer)
+        m_videoRenderer->windowClosed();
+    //We need to make sure that noting is playing anymore otherwise the vout will be closed
+    //after the main interface, and it requires (at least with OpenGL) that the OpenGL context
+    //from the main window is still valid.
+    //vout_window_ReportClose is currently stubbed
+    if (playerController->hasVideoOutput()) {
+
+        connect(playerController, &PlayerController::playingStateChanged, [this](PlayerController::PlayingState state){
+            if (state == PlayerController::PLAYING_STATE_STOPPED) {
+                QMetaObject::invokeMethod(this, &MainInterface::close, Qt::QueuedConnection, nullptr);
+            }
+        });
+        playlistController->stop();
+
+        e->ignore();
+    }
+    else
+    {
+        emit askToQuit(); /* ask THEDP to quit, so we have a unique method */
+        /* Accept session quit. Otherwise we break the desktop mamager. */
+        e->accept();
     }
 }
 
@@ -1712,18 +1039,24 @@ void MainInterface::toolBarConfUpdated()
     QApplication::postEvent( this, new QEvent( MainInterface::ToolbarsNeedRebuild ) );
 }
 
-void MainInterface::setInterfaceFullScreen( bool fs )
+void MainInterface::setFullScreen( bool fs )
 {
     if( fs )
         setWindowState( windowState() | Qt::WindowFullScreen );
     else
         setWindowState( windowState() & ~Qt::WindowFullScreen );
 }
+
+void MainInterface::setInterfaceFullScreen( bool fs )
+{
+    b_interfaceFullScreen = fs;
+    setFullScreen(fs);
+    emit interfaceFullScreenChanged( fs );
+}
+
 void MainInterface::toggleInterfaceFullScreen()
 {
-    b_interfaceFullScreen = !b_interfaceFullScreen;
-    if( !b_videoFullScreen )
-        setInterfaceFullScreen( b_interfaceFullScreen );
+    setInterfaceFullScreen( !b_interfaceFullScreen );
     emit fullscreenInterfaceToggled( b_interfaceFullScreen );
 }
 
@@ -1733,7 +1066,7 @@ void MainInterface::emitBoss()
 }
 void MainInterface::setBoss()
 {
-    THEMIM->pause();
+    THEMPL->pause();
     if( sysTray )
     {
         hide();
@@ -1744,6 +1077,16 @@ void MainInterface::setBoss()
     }
 }
 
+void MainInterface::emitShow()
+{
+    emit askShow();
+}
+
+void MainInterface::popupMenu(bool show)
+{
+    emit askPopupMenu( show );
+}
+
 void MainInterface::emitRaise()
 {
     emit askRaise();
@@ -1752,29 +1095,6 @@ void MainInterface::setRaise()
 {
     activateWindow();
     raise();
-}
-
-void MainInterface::voutReleaseMouseEvents()
-{
-    if (videoWidget)
-    {
-        QPoint pos = QCursor::pos();
-        QPoint localpos = videoWidget->mapFromGlobal(pos);
-        int buttons = QApplication::mouseButtons();
-        int i_button = 1;
-        while (buttons != 0)
-        {
-            if ( (buttons & 1) != 0 )
-            {
-                QMouseEvent new_e( QEvent::MouseButtonRelease, localpos,
-                                   (Qt::MouseButton)i_button, (Qt::MouseButton)i_button, Qt::NoModifier );
-                QApplication::sendEvent(videoWidget, &new_e);
-            }
-            buttons >>= 1;
-            i_button <<= 1;
-        }
-
-    }
 }
 
 /*****************************************************************************
@@ -1803,10 +1123,9 @@ static int IntfShowCB( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void *param )
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
-    p_intf->p_sys->p_mi->toggleFSC();
+    p_intf->p_sys->p_mi->emitShow();
 
-    /* Show event */
-     return VLC_SUCCESS;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

@@ -22,7 +22,6 @@
 
 #include "seekstyle.hpp"
 #include "util/input_slider.hpp"
-#include "adapters/seekpoints.hpp"
 
 #include <QProxyStyle>
 #include <QStyleFactory>
