@@ -129,7 +129,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
-        sys->p_sensors = HookWindowsSensors(vd, sys->sys.hwnd);
+        sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
 
     if (!sys->sys.b_windowless)
         EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (OpenGL output)");

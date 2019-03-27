@@ -501,8 +501,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->sys.pf_GetPictureWidth  = GetPictureWidth;
     sys->sys.pf_GetPictureHeight = GetPictureHeight;
 
-    if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hwnd)
-        sys->p_sensors = HookWindowsSensors(vd, sys->sys.hwnd);
+    if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
+        sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
 
     if (!sys->swapCb || !sys->starRenderCb || !sys->endRenderCb || !sys->resizeCb)
     {
