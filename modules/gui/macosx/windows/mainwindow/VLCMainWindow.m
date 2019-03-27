@@ -48,6 +48,7 @@
 #import "windows/video/VLCDetachedVideoWindow.h"
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoOutputProvider.h"
+#import "windows/video/VLCFSPanelController.h"
 
 @interface VLCMainWindow() <PXSourceListDataSource, PXSourceListDelegate, NSOutlineViewDataSource, NSOutlineViewDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate>
 {
@@ -618,8 +619,6 @@ static const float f_min_window_height = 307.;
             [[[VLCMain sharedInstance] voutProvider] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
                 [o_window setTitle:aString];
             }];
-
-            [self.fspanel setStreamTitle: aString];
         } else {
             [self setTitle: _NS("VLC media player")];
             [self setRepresentedURL: nil];

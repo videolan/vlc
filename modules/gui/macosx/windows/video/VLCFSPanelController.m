@@ -106,6 +106,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [notificationCenter addObserver:self selector:@selector(hasPreviousChanged:) name:VLCPlaybackHasPreviousChanged object:nil];
     [notificationCenter addObserver:self selector:@selector(hasNextChanged:) name:VLCPlaybackHasNextChanged object:nil];
     [notificationCenter addObserver:self selector:@selector(volumeChanged:) name:VLCPlayerVolumeChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(inputItemChanged:) name:VLCPlayerCurrentMediaItemChanged object:nil];
 }
 
 #define setupButton(target, title, desc)            \
@@ -256,9 +257,41 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [_playPauseButton setToolTip: _NS("Pause")];
 }
 
-- (void)setStreamTitle:(NSString *)title
+- (void)inputItemChanged:(NSNotification *)aNotification
 {
-    [_mediaTitle setStringValue:title];
+    NSString *title;
+    NSString *nowPlaying;
+    input_item_t *mediaItem = _playerController.currentMedia;
+
+    if (mediaItem) {
+        /* Something is playing */
+        static char *tmp_cstr = NULL;
+
+        // Get Title
+        tmp_cstr = input_item_GetTitleFbName(mediaItem);
+        if (tmp_cstr) {
+            title = toNSStr(tmp_cstr);
+            FREENULL(tmp_cstr);
+        }
+
+        // Get Now Playing
+        tmp_cstr = input_item_GetNowPlaying(mediaItem);
+        if (tmp_cstr) {
+            nowPlaying = toNSStr(tmp_cstr);
+            FREENULL(tmp_cstr);
+        }
+
+        input_item_Release(mediaItem);
+    } else {
+        /* Nothing playing */
+        title = _NS("VLC media player");
+    }
+
+    if (nowPlaying) {
+        [_mediaTitle setStringValue:nowPlaying];
+    } else {
+        [_mediaTitle setStringValue:title];
+    }
 }
 
 - (void)updatePositionAndTime:(NSNotification *)aNotification

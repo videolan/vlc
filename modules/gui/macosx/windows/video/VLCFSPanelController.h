@@ -64,8 +64,6 @@
 - (void)setNonActive;
 - (void)setVoutWasUpdated:(VLCWindow *)voutWindow;
 
-- (void)setStreamTitle:(NSString *)title;
-
 // Constrain frame to window. Used by VLCFSPanelDraggableView.
 - (NSRect)contrainFrameToAssociatedVoutWindow:(NSRect)frame;
 
