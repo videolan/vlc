@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCControlsBarCommon.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2012-2016 VLC authors and VideoLAN
+ * Copyright (C) 2012-2019 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
@@ -62,10 +62,5 @@
 
 - (IBAction)timeSliderAction:(id)sender;
 - (IBAction)fullscreen:(id)sender;
-
-- (void)updateControls;
-- (void)setPause;
-- (void)setPlay;
-- (void)setFullscreenState:(BOOL)b_fullscreen;
 
 @end

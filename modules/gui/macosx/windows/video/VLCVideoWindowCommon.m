@@ -550,10 +550,6 @@
 
     screen_rect = [screen frame];
 
-    if (self.controlsBar)
-        [self.controlsBar setFullscreenState:YES];
-    [[[[VLCMain sharedInstance] mainWindow] controlsBar] setFullscreenState:YES];
-
     if (blackout_other_displays)
         [screen blackoutOtherScreens];
 
@@ -706,10 +702,6 @@
     NSMutableDictionary *dict1, *dict2;
     NSRect frame;
     BOOL blackout_other_displays = var_InheritBool(getIntf(), "macosx-black");
-
-    if (self.controlsBar)
-        [self.controlsBar setFullscreenState:NO];
-    [[[[VLCMain sharedInstance] mainWindow] controlsBar] setFullscreenState:NO];
 
     /* We always try to do so */
     [NSScreen unblackoutScreens];

@@ -113,9 +113,6 @@ typedef enum {
 - (void)updateTimeSlider;
 - (void)updateWindow;
 - (void)updateName;
-- (void)setPause;
-- (void)setPlay;
-- (void)updateVolumeSlider;
 
 - (void)showFullscreenController;
 

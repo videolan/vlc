@@ -241,11 +241,8 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         state = var_GetInteger(p_current_input, "state");
     }
 
-    if (state == PLAYING_S) {
-        [[o_main mainWindow] setPause];
-    } else {
+    if (state != PLAYING_S) {
         [[o_main mainMenu] setSubmenusEnabled: FALSE];
-        [[o_main mainWindow] setPlay];
 
         if (state == END_S || state == -1) {
             /* continue playback where you left off */

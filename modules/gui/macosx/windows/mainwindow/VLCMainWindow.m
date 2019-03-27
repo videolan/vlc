@@ -259,10 +259,6 @@ static const float f_min_window_height = 307.;
         [self resizeWindow];
     }
 
-    /* update fs button to reflect state for next startup */
-    if (var_InheritBool(pl_Get(getIntf()), "fullscreen"))
-        [self.controlsBar setFullscreenState:YES];
-
     /* restore split view */
     f_lastLeftSplitViewWidth = 200;
     [[[VLCMain sharedInstance] mainMenu] updateSidebarMenuItem: ![_splitView isSubviewCollapsed:_splitViewLeft]];
@@ -633,11 +629,6 @@ static const float f_min_window_height = 307.;
 
 - (void)updateWindow
 {
-    [self.controlsBar updateControls];
-    [[[VLCMain sharedInstance] voutProvider] updateControlsBarsUsingBlock:^(VLCControlsBarCommon *controlsBar) {
-        [controlsBar updateControls];
-    }];
-
     bool b_seekable = false;
 
     playlist_t *p_playlist = pl_Get(getIntf());
@@ -653,29 +644,6 @@ static const float f_min_window_height = 307.;
     [_sidebarView setNeedsDisplay:YES];
 
     [self _updatePlaylistTitle];
-}
-
-- (void)setPause
-{
-    [self.controlsBar setPause];
-
-    [[[VLCMain sharedInstance] voutProvider] updateControlsBarsUsingBlock:^(VLCControlsBarCommon *controlsBar) {
-        [controlsBar setPause];
-    }];
-}
-
-- (void)setPlay
-{
-    [self.controlsBar setPlay];
-
-    [[[VLCMain sharedInstance] voutProvider] updateControlsBarsUsingBlock:^(VLCControlsBarCommon *controlsBar) {
-        [controlsBar setPlay];
-    }];
-}
-
-- (void)updateVolumeSlider
-{
-    [(VLCMainWindowControlsBar *)[self controlsBar] updateVolumeSlider];
 }
 
 #pragma mark -
@@ -707,11 +675,6 @@ static const float f_min_window_height = 307.;
         }
 
         frameBeforePlayback = NSMakeRect(0, 0, 0, 0);
-
-        // update fs button to reflect state for next startup
-        if (var_InheritBool(getIntf(), "fullscreen") || var_GetBool(pl_Get(getIntf()), "fullscreen")) {
-            [self.controlsBar setFullscreenState:YES];
-        }
 
         [self makeFirstResponder: _playlistScrollView];
         [[[VLCMain sharedInstance] voutProvider] updateWindowLevelForHelperWindows: NSNormalWindowLevel];

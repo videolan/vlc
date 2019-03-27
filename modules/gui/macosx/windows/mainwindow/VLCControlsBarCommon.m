@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCControlsBarCommon.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2012-2016 VLC authors and VideoLAN
+ * Copyright (C) 2012-2019 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
@@ -31,8 +31,6 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
-#import <vlc_playlist_legacy.h>
-
 /*****************************************************************************
  * VLCControlsBarCommon
  *
@@ -60,7 +58,11 @@
 {
     [super awakeFromNib];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateTimeSlider:) name:VLCPlayerTimeAndPositionChanged object:nil];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self selector:@selector(updateTimeSlider:) name:VLCPlayerTimeAndPositionChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(playerStateUpdated:) name:VLCPlayerStateChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(updatePlaybackControls:) name:VLCPlaylistCurrentItemChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(fullscreenStateUpdated:) name:VLCPlayerFullscreenChanged object:nil];
 
     _nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
@@ -321,34 +323,27 @@
     input_item_Release(p_item);
 }
 
-- (void)updateControls
+- (void)playerStateUpdated:(NSNotification *)aNotification
 {
-    bool b_plmul = false;
-    bool b_seekable = false;
-    bool b_chapters = false;
-
-    playlist_t * p_playlist = pl_Get(getIntf());
-
-    PL_LOCK;
-    b_plmul = playlist_CurrentSize(p_playlist) > 1;
-    PL_UNLOCK;
-
-    input_thread_t * p_input = playlist_CurrentInput(p_playlist);
-
-    if (p_input) {
-        /* seekable streams */
-        b_seekable = var_GetBool(p_input, "can-seek");
-
-        /* chapters & titles */
-        //FIXME! b_chapters = p_input->stream.i_area_nb > 1;
-
-        input_Release(p_input);
+    VLCPlayerController *playerController = aNotification.object;
+    if (playerController.playerState == VLC_PLAYER_STATE_PLAYING) {
+        [self setPause];
+    } else {
+        [self setPlay];
     }
+}
+
+- (void)updatePlaybackControls:(NSNotification *)aNotification
+{
+    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+    bool b_seekable = playlistController.playerController.seekable;
+    // FIXME: re-add chapter navigation as needed
+    bool b_chapters = false;
 
     [self.timeSlider setEnabled: b_seekable];
 
-    [self.forwardButton setEnabled: (b_seekable || b_plmul || b_chapters)];
-    [self.backwardButton setEnabled: (b_seekable || b_plmul || b_chapters)];
+    [self.forwardButton setEnabled: (b_seekable || playlistController.hasNextPlaylistItem || b_chapters)];
+    [self.backwardButton setEnabled: (b_seekable || playlistController.hasPreviousPlaylistItem || b_chapters)];
 }
 
 - (void)setPause
@@ -367,10 +362,12 @@
     self.playButton.accessibilityLabel = self.playButton.toolTip;
 }
 
-- (void)setFullscreenState:(BOOL)b_fullscreen
+- (void)fullscreenStateUpdated:(NSNotification *)aNotification
 {
-    if (!self.nativeFullscreenMode)
-        [self.fullscreenButton setState:b_fullscreen];
+    if (!self.nativeFullscreenMode) {
+        VLCPlayerController *playerController = aNotification.object;
+        [self.fullscreenButton setState:playerController.fullscreen];
+    }
 }
 
 @end

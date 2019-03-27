@@ -30,8 +30,8 @@
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
 #import "windows/mainwindow/VLCMainWindowControlsBar.h"
-
-#import <vlc_playlist_legacy.h>
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 /*****************************************************************************
  * VLCMainWindowControlsBar
@@ -51,6 +51,8 @@
     NSImage * _pressedShuffleImage;
     NSImage * _shuffleOnImage;
     NSImage * _pressedShuffleOnImage;
+    VLCPlaylistController *_playlistController;
+    VLCPlayerController *_playerController;
 }
 
 @end
@@ -60,6 +62,15 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
+    _playlistController = [[VLCMain sharedInstance] playlistController];
+    _playerController = _playlistController.playerController;
+
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self selector:@selector(updatePlaybackControls:) name:VLCPlaylistCurrentItemChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(updateVolumeSlider:) name:VLCPlayerVolumeChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(updateVolumeSlider:) name:VLCPlayerMuteChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(playbackOrderUpdated:) name:VLCPlaybackOrderChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(playbackRepeatChanged:) name:VLCPlaybackRepeatChanged object:nil];
 
     [self.stopButton setToolTip: _NS("Stop")];
     self.stopButton.accessibilityLabel = self.stopButton.toolTip;
@@ -281,18 +292,18 @@
 
 - (IBAction)stop:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] stop];
+    [_playlistController stopPlayback];
 }
 
 // dynamically created next / prev buttons
 - (IBAction)prev:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] previous];
+    [_playlistController playPreviousItem];
 }
 
 - (IBAction)next:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] next];
+    [_playlistController playNextItem];
 }
 
 - (void)setRepeatOne
@@ -315,48 +326,60 @@
 
 - (IBAction)repeat:(id)sender
 {
-    vlc_value_t looping,repeating;
-    intf_thread_t * p_intf = getIntf();
-    playlist_t * p_playlist = pl_Get(p_intf);
+    enum vlc_playlist_playback_repeat repeatState = _playlistController.playbackRepeat;
+    switch (repeatState) {
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_NONE:
+            /* was: no repeating at all, switching to Repeat One */
+            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+            break;
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+            /* was: Repeat One, switching to Repeat All */
+            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+            break;
 
-    var_Get(p_playlist, "repeat", &repeating);
-    var_Get(p_playlist, "loop", &looping);
-
-    if (!repeating.b_bool && !looping.b_bool) {
-        /* was: no repeating at all, switching to Repeat One */
-        [[VLCCoreInteraction sharedInstance] repeatOne];
-        [self setRepeatOne];
-    }
-    else if (repeating.b_bool && !looping.b_bool) {
-        /* was: Repeat One, switching to Repeat All */
-        [[VLCCoreInteraction sharedInstance] repeatAll];
-        [self setRepeatAll];
-    } else {
-        /* was: Repeat All or bug in VLC, switching to Repeat Off */
-        [[VLCCoreInteraction sharedInstance] repeatOff];
-        [self setRepeatOff];
+        default:
+            /* was: Repeat All, switching to Repeat Off */
+            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+            break;
     }
 }
 
-- (void)setShuffle
+- (void)playbackOrderUpdated:(NSNotification *)aNotification
 {
-    bool b_value;
-    playlist_t *p_playlist = pl_Get(getIntf());
-    b_value = var_GetBool(p_playlist, "random");
-
-    if (b_value) {
-        [self.shuffleButton setImage: _shuffleOnImage];
-        [self.shuffleButton setAlternateImage: _pressedShuffleOnImage];
-    } else {
+    if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
         [self.shuffleButton setImage: _shuffleImage];
         [self.shuffleButton setAlternateImage: _pressedShuffleImage];
+    } else {
+        [self.shuffleButton setImage: _shuffleOnImage];
+        [self.shuffleButton setAlternateImage: _pressedShuffleOnImage];
+    }
+}
+
+- (void)playbackRepeatChanged:(NSNotification *)aNotification
+{
+    enum vlc_playlist_playback_repeat repeatState = _playlistController.playbackRepeat;
+    switch (repeatState) {
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+            [self setRepeatAll];
+            break;
+
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+            [self setRepeatOne];
+            break;
+
+        default:
+            [self setRepeatOff];
+            break;
     }
 }
 
 - (IBAction)shuffle:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] shuffle];
-    [self setShuffle];
+    if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
+        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+    } else {
+        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+    }
 }
 
 - (IBAction)togglePlaylist:(id)sender
@@ -382,57 +405,40 @@
 #pragma mark -
 #pragma mark Extra updaters
 
-- (void)updateVolumeSlider
+- (void)updateVolumeSlider:(NSNotification *)aNotification
 {
-    int i_volume = [[VLCCoreInteraction sharedInstance] volume];
-    BOOL b_muted = [[VLCCoreInteraction sharedInstance] mute];
+    float f_volume = _playerController.volume;
+    BOOL b_muted = _playerController.mute;
 
     if (b_muted)
-        i_volume = 0;
+        f_volume = 0.;
 
-    [self.volumeSlider setIntValue: i_volume];
-
-    i_volume = (i_volume * 200) / AOUT_VOLUME_MAX;
-    NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), i_volume];
+    [self.volumeSlider setFloatValue: f_volume];
+    NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), f_volume * 100];
     [self.volumeSlider setToolTip:volumeTooltip];
 
     [self.volumeSlider setEnabled: !b_muted];
     [self.volumeUpButton setEnabled: !b_muted];
 }
 
-- (void)updateControls
+- (void)updatePlaybackControls:(NSNotification *)aNotification
 {
-    [super updateControls];
-
     bool b_input = false;
-    bool b_seekable = false;
-    bool b_plmul = false;
-    bool b_control = false;
+    bool b_seekable = _playerController.seekable;
+    bool b_control = _playerController.rateChangable;
+    // FIXME: re-add chapter navigation as needed
     bool b_chapters = false;
 
-    playlist_t * p_playlist = pl_Get(getIntf());
-
-    PL_LOCK;
-    b_plmul = playlist_CurrentSize(p_playlist) > 1;
-    PL_UNLOCK;
-
-    input_thread_t * p_input = playlist_CurrentInput(p_playlist);
-    if ((b_input = (p_input != NULL))) {
-        /* seekable streams */
-        b_seekable = var_GetBool(p_input, "can-seek");
-
-        /* check whether slow/fast motion is possible */
-        b_control = var_GetBool(p_input, "can-rate");
-
-        /* chapters & titles */
-        //FIXME! b_chapters = p_input->stream.i_area_nb > 1;
-
-        input_Release(p_input);
+    input_item_t *p_item = _playerController.currentMedia;
+    b_input = p_item != NULL;
+    if (p_item) {
+        b_input = YES;
+        input_item_Release(p_item);
     }
 
     [self.stopButton setEnabled: b_input];
-    [self.prevButton setEnabled: (b_seekable || b_plmul || b_chapters)];
-    [self.nextButton setEnabled: (b_seekable || b_plmul || b_chapters)];
+    [self.prevButton setEnabled: (b_seekable || _playlistController.hasPreviousPlaylistItem || b_chapters)];
+    [self.nextButton setEnabled: (b_seekable || _playlistController.hasNextPlaylistItem || b_chapters)];
 
     [[[VLCMain sharedInstance] mainMenu] setRateControlsEnabled: b_control];
 }

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ControlsBar.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2012-2016 VLC authors and VideoLAN
+ * Copyright (C) 2012-2019 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
@@ -62,12 +62,7 @@
 - (IBAction)volumeAction:(id)sender;
 - (IBAction)effects:(id)sender;
 
-- (void)setRepeatOne;
-- (void)setRepeatAll;
-- (void)setRepeatOff;
 - (IBAction)repeat:(id)sender;
-
-- (void)setShuffle;
 
 - (IBAction)togglePlaylist:(id)sender;
 
@@ -75,8 +70,4 @@
 - (void)toggleJumpButtons;
 - (void)togglePlaymodeButtons;
 
-- (void)updateVolumeSlider;
-- (void)updateControls;
-
 @end
-
