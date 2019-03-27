@@ -165,7 +165,7 @@ SeekSlider::SeekSlider( intf_thread_t *p_intf, Qt::Orientation q, QWidget *_pare
     startAnimLoadingTimer->setSingleShot( true );
     startAnimLoadingTimer->setInterval( 500 );
 
-    CONNECT( MainInputManager::getInstance(), inputChanged( bool ), this , inputUpdated( bool ) );
+    connect( MainInputManager::getInstance(), &MainInputManager::inputChanged, this , &SeekSlider::inputUpdated );
     CONNECT( this, sliderMoved( int ), this, startSeekTimer() );
     CONNECT( seekLimitTimer, timeout(), this, updatePos() );
     CONNECT( hideHandleTimer, timeout(), this, hideHandle() );

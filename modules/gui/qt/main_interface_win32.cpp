@@ -206,12 +206,12 @@ void MainInterfaceWin32::createTaskBarButtons()
             msg_Err( p_intf, "%s failed with error %08lx",
                      "ThumbBarAddButtons", hr );
     }
-    CONNECT( THEMIM->getIM(), playingStatusChanged( int ),
-             this, changeThumbbarButtons( int ) );
-    CONNECT( THEMIM, playlistItemAppended( int, int ),
-            this, playlistItemAppended( int, int ) );
-    CONNECT( THEMIM, playlistItemRemoved( int ),
-            this, playlistItemRemoved( int ) );
+    connect( THEMIM->getIM(), &InputManager::playingStatusChanged,
+             this, &MainInterfaceWin32::changeThumbbarButtons);
+    connect( THEMIM, &MainInputManager::playlistItemAppended,
+            this, &MainInterfaceWin32::playlistItemAppended );
+    connect( THEMIM, &MainInputManager::playlistItemRemoved,
+            this, &MainInterfaceWin32::playlistItemRemoved );
     if( THEMIM->getIM()->playingStatus() == PLAYING_S )
         changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
 }

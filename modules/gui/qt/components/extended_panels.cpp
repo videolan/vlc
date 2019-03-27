@@ -1495,12 +1495,10 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     mainLayout->addWidget( updateButton, 0, 4, 1, 1 );
 
     /* Various Connects */
-    CONNECT( AVSpin, valueChanged ( double ), this, advanceAudio( double ) ) ;
-    CONNECT( subsSpin, valueChanged ( double ), this, advanceSubs( double ) ) ;
-    CONNECT( subSpeedSpin, valueChanged ( double ),
-             this, adjustSubsSpeed( double ) );
-    CONNECT( subDurationSpin, valueChanged ( double ),
-             this, adjustSubsDuration( double ) );
+    connect( AVSpin, &SyncWidget::valueChanged, this, &SyncControls::advanceAudio ) ;
+    connect( subsSpin, &SyncWidget::valueChanged, this, &SyncControls::advanceSubs ) ;
+    connect( subSpeedSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SyncControls::adjustSubsSpeed);
+    connect( subDurationSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SyncControls::adjustSubsDuration);
 
     CONNECT( THEMIM->getIM(), synchroChanged(), this, update() );
     BUTTON_SET_ACT_I( updateButton, "", update,

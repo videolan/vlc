@@ -110,14 +110,14 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
          * Connects on the various signals of input_Manager
          * For the currently playing element
          **/
-        DCONNECT( THEMIM->getIM(), infoChanged( input_item_t* ),
-                  IP, update( input_item_t* ) );
-        DCONNECT( THEMIM->getIM(), currentMetaChanged( input_item_t* ),
-                  MP, update( input_item_t* ) );
-        DCONNECT( THEMIM->getIM(), currentMetaChanged( input_item_t* ),
-                  EMP, update( input_item_t* ) );
-        DCONNECT( THEMIM->getIM(), statisticsUpdated( input_item_t* ),
-                  ISP, update( input_item_t* ) );
+        connect( THEMIM->getIM(), &InputManager::infoChanged,
+                 IP, &InfoPanel::update, Qt::DirectConnection  );
+        connect( THEMIM->getIM(), &InputManager::currentMetaChanged,
+                 MP, &MetaPanel::update, Qt::DirectConnection  );
+        connect( THEMIM->getIM(), &InputManager::currentMetaChanged,
+                 EMP, &ExtraMetaPanel::update, Qt::DirectConnection );
+        connect( THEMIM->getIM(), &InputManager::statisticsUpdated,
+                 ISP, &InputStatsPanel::update, Qt::DirectConnection);
 
         if( THEMIM->getInput() )
             p_item = input_GetItem( THEMIM->getInput() );

@@ -78,7 +78,7 @@ AbstractController::AbstractController( intf_thread_t * _p_i, QWidget *_parent )
     toolbarActionsMapper = new QSignalMapper( this );
     CONNECT( toolbarActionsMapper, mapped( int ),
              ActionsManager::getInstance( p_intf  ), doAction( int ) );
-    CONNECT( THEMIM->getIM(), playingStatusChanged( int ), this, setStatus( int ) );
+    connect( THEMIM->getIM(), &InputManager::playingStatusChanged, this, &AbstractController::setStatus);
 
     setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
 }
@@ -208,12 +208,6 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout_,
     }
 }
 
-
-#define CONNECT_MAP( a ) CONNECT( a, clicked(),  toolbarActionsMapper, map() )
-#define SET_MAPPING( a, b ) toolbarActionsMapper->setMapping( a , b )
-#define CONNECT_MAP_SET( a, b ) \
-    CONNECT_MAP( a ); \
-    SET_MAPPING( a, b );
 #define BUTTON_SET_BAR( a_button ) \
     a_button->setToolTip( qtr( tooltipL[button] ) ); \
     a_button->setIcon( QIcon( iconL[button] ) );
@@ -222,17 +216,18 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout_,
     button->setIcon( QIcon( ":/"#image ".svg" ) );
 
 #define ENABLE_ON_VIDEO( a ) \
-    CONNECT( THEMIM->getIM(), voutChanged( bool ), a, setEnabled( bool ) ); \
+    connect( THEMIM->getIM(), &InputManager::voutChanged, a, &QToolButton::setEnabled ); \
     a->setEnabled( THEMIM->getIM()->hasVideo() ); /* TODO: is this necessary? when input is started before the interface? */
 
 #define ENABLE_ON_INPUT( a ) \
-    CONNECT( this, inputExists( bool ), a, setEnabled( bool ) ); \
+    connect( this, &AbstractController::inputExists, a, &QToolButton::setEnabled ); \
     a->setEnabled( THEMIM->getIM()->hasInput() ); /* TODO: is this necessary? when input is started before the interface? */
 
 #define NORMAL_BUTTON( name )                           \
     QToolButton * name ## Button = new QToolButton;     \
     setupButton( name ## Button );                      \
-    CONNECT_MAP_SET( name ## Button, name ## _ACTION ); \
+    connect( name ## Button, &QToolButton::clicked, toolbarActionsMapper, QOverload<>::of(&QSignalMapper::map) ); \
+    toolbarActionsMapper->setMapping( name ## Button, name ## _ACTION ); \
     BUTTON_SET_BAR( name ## Button );                   \
     widget = name ## Button;
 
@@ -250,9 +245,9 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         PlayButton *playButton = new PlayButton;
         setupButton( playButton );
         BUTTON_SET_BAR(  playButton );
-        CONNECT_MAP_SET( playButton, PLAY_ACTION );
-        CONNECT( this, inputPlaying( bool ),
-                 playButton, updateButtonIcons( bool ));
+        connect( playButton, &PlayButton::clicked, toolbarActionsMapper, QOverload<>::of(&QSignalMapper::map) );
+        toolbarActionsMapper->setMapping( playButton, PLAY_ACTION );
+        connect( this, &AbstractController::inputPlaying, playButton, &PlayButton::updateButtonIcons );
         playButton->updateButtonIcons( THEMIM->getIM()->playingStatus() == PLAYING_S );
         widget = playButton;
         }
@@ -337,12 +332,12 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     case RECORD_BUTTON:{
         QToolButton *recordButton = new QToolButton;
         setupButton( recordButton );
-        CONNECT_MAP_SET( recordButton, RECORD_ACTION );
+        recordButton->setCheckable( true );
+        connect( recordButton, &QToolButton::toggled, toolbarActionsMapper, QOverload<>::of(&QSignalMapper::map) );
+        toolbarActionsMapper->setMapping( recordButton, RECORD_ACTION );
+        connect( THEMIM->getIM(), &InputManager::recordingStateChanged, recordButton, &QToolButton::setChecked );
         BUTTON_SET_BAR(  recordButton );
         ENABLE_ON_INPUT( recordButton );
-        recordButton->setCheckable( true );
-        CONNECT( THEMIM->getIM(), recordingStateChanged( bool ),
-                 recordButton, setChecked( bool ) );
         widget = recordButton;
         }
         break;
@@ -352,9 +347,9 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         ABButton->setShortcut( qtr("Shift+L") );
         BUTTON_SET_BAR( ABButton );
         ENABLE_ON_INPUT( ABButton );
-        CONNECT_MAP_SET( ABButton, ATOB_ACTION );
-        CONNECT( THEMIM->getIM(), AtoBchanged( bool, bool),
-                 ABButton, updateButtonIcons( bool, bool ) );
+        connect( ABButton, &AtoB_Button::clicked, toolbarActionsMapper, QOverload<>::of(&QSignalMapper::map) );
+        toolbarActionsMapper->setMapping( ABButton, ATOB_ACTION );
+        connect( THEMIM->getIM(), &InputManager::AtoBchanged, ABButton, &AtoB_Button::updateButtonIcons );
         widget = ABButton;
         }
         break;
@@ -365,16 +360,16 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         slider->setChapters( chapters );
 
         /* Update the position when the IM has changed */
-        CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
-                slider, setPosition( float, int64_t, int ) );
+        connect( THEMIM->getIM(), &InputManager::positionUpdated,
+                slider, &SeekSlider::setPosition );
         /* And update the IM, when the position has changed */
-        CONNECT( slider, sliderDragged( float ),
-                 THEMIM->getIM(), sliderUpdate( float ) );
-        CONNECT( THEMIM->getIM(), cachingChanged( float ),
-                 slider, updateBuffering( float ) );
+        connect( slider, &SeekSlider::sliderDragged,
+                 THEMIM->getIM(), &InputManager::sliderUpdate );
+        connect( THEMIM->getIM(), &InputManager::cachingChanged,
+                 slider, &SeekSlider::updateBuffering );
         /* Give hint to disable slider's interactivity when useless */
-        CONNECT( THEMIM->getIM(), inputCanSeek( bool ),
-                 slider, setSeekable( bool ) );
+        connect( THEMIM->getIM(), &InputManager::inputCanSeek,
+                 slider, &SeekSlider::setSeekable );
         widget = slider;
         }
         break;
@@ -419,12 +414,12 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     case REVERSE_BUTTON:{
         QToolButton *reverseButton = new QToolButton;
         setupButton( reverseButton );
-        CONNECT_MAP_SET( reverseButton, REVERSE_ACTION );
+        connect( reverseButton, &QToolButton::clicked, THEMIM->getIM(), &InputManager::reverse);
         BUTTON_SET_BAR(  reverseButton );
         reverseButton->setCheckable( true );
         /* You should, of COURSE change this to the correct event,
            when/if we have one, that tells us if trickplay is possible . */
-        CONNECT( this, inputIsTrickPlayable( bool ), reverseButton, setVisible( bool ) );
+        connect( this, &AbstractController::inputIsTrickPlayable, reverseButton, &QToolButton::setVisible );
         reverseButton->setVisible( false );
         widget = reverseButton;
         }
@@ -447,8 +442,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         NORMAL_BUTTON( RANDOM );
         RANDOMButton->setCheckable( true );
         RANDOMButton->setChecked( var_GetBool( THEPL, "random" ) );
-        CONNECT( THEMIM, randomChanged( bool ),
-                 RANDOMButton, setChecked( bool ) );
+        connect( THEMIM, &MainInputManager::randomChanged, RANDOMButton, &QToolButton::setChecked );
         }
         break;
     case LOOP_BUTTON:{
@@ -463,8 +457,8 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
             loopButton->updateButtonIcons( i_state );
         }
 
-        CONNECT( THEMIM, repeatLoopChanged( int ), loopButton, updateButtonIcons( int ) );
-        CONNECT( loopButton, clicked(), THEMIM, loopRepeatLoopStatus() );
+        connect( THEMIM, &MainInputManager::repeatLoopChanged, loopButton, &LoopButton::updateButtonIcons );
+        connect( loopButton, &LoopButton::clicked, THEMIM, &MainInputManager::loopRepeatLoopStatus );
         widget = loopButton;
         }
         break;
@@ -481,9 +475,12 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         layout->setBackwardButton( prev );
         layout->setForwardButton( next );
         layout->setRoundButton( play );
-        CONNECT_MAP_SET( prev, PREVIOUS_ACTION );
-        CONNECT_MAP_SET( next, NEXT_ACTION );
-        CONNECT_MAP_SET( play, PLAY_ACTION );
+        connect( prev, &BrowseButton::clicked, toolbarActionsMapper, QOverload<>::of(&QSignalMapper::map) );
+        toolbarActionsMapper->setMapping( prev, PREVIOUS_ACTION );
+        connect( next, &BrowseButton::clicked, toolbarActionsMapper, QOverload<>::of(&QSignalMapper::map) );
+        toolbarActionsMapper->setMapping( next, NEXT_ACTION );
+        connect( play, &BrowseButton::clicked, toolbarActionsMapper, QOverload<>::of(&QSignalMapper::map) );
+        toolbarActionsMapper->setMapping( play, PLAY_ACTION );
         }
         break;
     case ASPECT_RATIO_COMBOBOX:
@@ -581,17 +578,13 @@ QFrame *AbstractController::discFrame()
 
     /* Change the navigation button display when the IM
        navigation changes */
-    CONNECT( THEMIM->getIM(), chapterChanged( bool ),
-            chapFrame, setVisible( bool ) );
-    CONNECT( THEMIM->getIM(), titleChanged( bool ),
-            menuFrame, setVisible( bool ) );
+    connect( THEMIM->getIM(), &InputManager::chapterChanged, chapFrame, &QFrame::setVisible );
+    connect( THEMIM->getIM(), &InputManager::titleChanged, menuFrame, &QFrame::setVisible );
+
     /* Changes the IM navigation when triggered on the nav buttons */
-    CONNECT( prevSectionButton, clicked(), THEMIM->getIM(),
-            sectionPrev() );
-    CONNECT( nextSectionButton, clicked(), THEMIM->getIM(),
-            sectionNext() );
-    CONNECT( menuButton, clicked(), THEMIM->getIM(),
-            sectionMenu() );
+    connect( prevSectionButton, &QToolButton::clicked, THEMIM->getIM(), &InputManager::sectionPrev );
+    connect( nextSectionButton, &QToolButton::clicked, THEMIM->getIM(), &InputManager::sectionNext );
+    connect( menuButton, &QToolButton::clicked, THEMIM->getIM(), &InputManager::sectionMenu );
 
     return discFrame;
 }
@@ -604,8 +597,7 @@ QFrame *AbstractController::telexFrame()
     QFrame *telexFrame = new QFrame( this );
     QHBoxLayout *telexLayout = new QHBoxLayout( telexFrame );
     telexLayout->setSpacing( 0 ); telexLayout->setContentsMargins( 0, 0, 0, 0 );
-    CONNECT( THEMIM->getIM(), teletextPossible( bool ),
-             telexFrame, setVisible( bool ) );
+    connect( THEMIM->getIM(),  &InputManager::teletextPossible, telexFrame, &QFrame::setVisible );
 
     /* On/Off button */
     QToolButton *telexOn = new QToolButton;
@@ -617,10 +609,8 @@ QFrame *AbstractController::telexFrame()
     telexLayout->addWidget( telexOn );
 
     /* Teletext Activation and set */
-    CONNECT( telexOn, clicked( bool ),
-             THEMIM->getIM(), activateTeletext( bool ) );
-    CONNECT( THEMIM->getIM(), teletextPossible( bool ),
-             telexOn, setEnabled( bool ) );
+    connect( telexOn, &QToolButton::clicked, THEMIM->getIM(), &InputManager::activateTeletext );
+    connect( THEMIM->getIM(), &InputManager::teletextPossible , telexOn, &QToolButton::setChecked );
 
     /* Transparency button */
     QToolButton *telexTransparent = new QToolButton;
@@ -632,10 +622,8 @@ QFrame *AbstractController::telexFrame()
     telexLayout->addWidget( telexTransparent );
 
     /* Transparency change and set */
-    CONNECT( telexTransparent, clicked( bool ),
-            THEMIM->getIM(), telexSetTransparency( bool ) );
-    CONNECT( THEMIM->getIM(), teletextTransparencyActivated( bool ),
-             telexTransparent, setChecked( bool ) );
+    connect( telexTransparent, &QToolButton::clicked, THEMIM->getIM(), &InputManager::telexSetTransparency );
+    connect( THEMIM->getIM(), &InputManager::teletextTransparencyActivated, telexTransparent, &QToolButton::setChecked );
 
 
     /* Page setting */
@@ -676,10 +664,9 @@ QFrame *AbstractController::telexFrame()
     contextButton->setIcon( iconPixmap );\
     contextButton->setEnabled( false );\
     contextButtonMapper->setMapping( contextButton, key << 16 );\
-    CONNECT( contextButton, clicked(), contextButtonMapper, map() );\
-    CONNECT( contextButtonMapper, mapped( int ),\
-             THEMIM->getIM(), telexSetPage( int ) );\
-    CONNECT( THEMIM->getIM(), teletextActivated( bool ), contextButton, setEnabled( bool ) );\
+    connect( contextButton, &QToolButton::clicked, contextButtonMapper, QOverload<>::of(&QSignalMapper::map) );\
+    connect( contextButtonMapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL, THEMIM->getIM(), &InputManager::telexSetPage );\
+    connect( THEMIM->getIM(), &InputManager::teletextActivated, contextButton, &QToolButton::setEnabled );\
     telexLayout->addWidget( contextButton )
 
     CREATE_CONTEXT_BUTTON("grey", 'i'); /* index */
@@ -691,19 +678,14 @@ QFrame *AbstractController::telexFrame()
 #undef CREATE_CONTEXT_BUTTON
 
     /* Page change and set */
-    CONNECT( telexPage, valueChanged( int ),
-            THEMIM->getIM(), telexSetPage( int ) );
-    CONNECT( THEMIM->getIM(), newTelexPageSet( int ),
-            telexPage, setValue( int ) );
+    connect( telexPage, QOverload<int>::of(&QSpinBox::valueChanged), THEMIM->getIM(), &InputManager::telexSetPage );
+    connect( THEMIM->getIM(), &InputManager::newTelexPageSet, telexPage, &QSpinBox::setValue);
 
-    CONNECT( THEMIM->getIM(), teletextActivated( bool ), telexPage, setEnabled( bool ) );
-    CONNECT( THEMIM->getIM(), teletextActivated( bool ), telexTransparent, setEnabled( bool ) );
-    CONNECT( THEMIM->getIM(), teletextActivated( bool ), telexOn, setChecked( bool ) );
+    connect( THEMIM->getIM(), &InputManager::teletextActivated, telexPage, &QSpinBox::setEnabled);
+    connect( THEMIM->getIM(), &InputManager::teletextActivated, telexTransparent, &QToolButton::setEnabled );
+    CONNECT( THEMIM->getIM(), &InputManager::teletextActivated, telexOn, &QToolButton::setChecked );
     return telexFrame;
 }
-#undef CONNECT_MAP
-#undef SET_MAPPING
-#undef CONNECT_MAP_SET
 #undef BUTTON_SET_BAR
 #undef BUTTON_SET_BAR2
 #undef ENABLE_ON_VIDEO
@@ -840,12 +822,12 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
     /* hiding timer */
     p_hideTimer = new QTimer( this );
     p_hideTimer->setSingleShot( true );
-    CONNECT( p_hideTimer, timeout(), this, hideFSC() );
+    connect( p_hideTimer, &QTimer::timeout, this, &FullscreenControllerWidget::hideFSC );
 
     /* slow hiding timer */
 #if HAVE_TRANSPARENCY
     p_slowHideTimer = new QTimer( this );
-    CONNECT( p_slowHideTimer, timeout(), this, slowHideFSC() );
+    connect( p_slowHideTimer, &QTimer::timeout, this, &FullscreenControllerWidget::slowHideFSC );
     f_opacity = var_InheritFloat( p_intf, "qt-fs-opacity" );
 #endif
 
@@ -853,8 +835,8 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
 
     vlc_mutex_init_recursive( &lock );
 
-    DCONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
-              this, setVoutList( vout_thread_t **, int ) );
+    connect( THEMIM->getIM(), &InputManager::voutListChanged,
+             this, &FullscreenControllerWidget::setVoutList, Qt::DirectConnection );
 
     /* First Move */
     previousPosition = getSettings()->value( "FullScreen/pos" ).toPoint();

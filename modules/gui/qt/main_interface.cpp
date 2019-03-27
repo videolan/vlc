@@ -193,10 +193,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* and title of the Main Interface*/
     if( var_InheritBool( p_intf, "qt-name-in-title" ) )
     {
-        CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
-                 this, setVLCWindowsTitle( const QString& ) );
+        connect( THEMIM->getIM(), &InputManager::nameChanged, this, &MainInterface::setVLCWindowsTitle );
     }
-    CONNECT( THEMIM, inputChanged( bool ), this, onInputChanged( bool ) );
+    connect( THEMIM, &MainInputManager::inputChanged, this, &MainInterface::onInputChanged );
 
     /* END CONNECTS ON IM */
 
@@ -1333,15 +1332,15 @@ void MainInterface::createSystray()
     VLCMenuBar::updateSystrayMenu( this, p_intf, true );
     sysTray->show();
 
-    CONNECT( sysTray, activated( QSystemTrayIcon::ActivationReason ),
-             this, handleSystrayClick( QSystemTrayIcon::ActivationReason ) );
+    connect( sysTray, &QSystemTrayIcon::activated,
+             this, &MainInterface::handleSystrayClick );
 
     /* Connects on nameChanged() */
-    CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
-             this, updateSystrayTooltipName( const QString& ) );
+    connect( THEMIM->getIM(), &InputManager::nameChanged,
+             this, &MainInterface::updateSystrayTooltipName );
     /* Connect PLAY_STATUS on the systray */
-    CONNECT( THEMIM->getIM(), playingStatusChanged( int ),
-             this, updateSystrayTooltipStatus( int ) );
+    connect( THEMIM->getIM(), &InputManager::playingStatusChanged,
+             this, &MainInterface::updateSystrayTooltipStatus );
 }
 
 void MainInterface::toggleUpdateSystrayMenuWhenVisible()

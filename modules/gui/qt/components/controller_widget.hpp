@@ -65,7 +65,7 @@ public slots:
 class AtoB_Button : public QToolButton
 {
     Q_OBJECT
-private slots:
+public slots:
     void updateButtonIcons( bool, bool );
 };
 
