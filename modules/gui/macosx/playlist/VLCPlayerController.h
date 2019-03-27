@@ -535,6 +535,21 @@ extern NSString *VLCPlayerMuteChanged;
 - (void)toggleRecord;
 
 /**
+ * allows to add associated media to the currently playing one (previously known as input slaves)
+ * @param the URL for the media
+ * @param the media category (SPU or audio)
+ * @param defines whether the added track shall be immediately selected
+ * @param defines whether a OSD notification shall be displayed after adding the track
+ * @param defines whether the core shall verify the file extension before trying the addition
+ * @return VLC_SUCCESS or an error
+ */
+- (int)addAssociatedMediaToCurrentFromURL:(NSURL *)URL
+                               ofCategory:(enum es_format_category_e)category
+                         shallSelectTrack:(BOOL)selectTrack
+                          shallDisplayOSD:(BOOL)showOSD
+                     shallVerifyExtension:(BOOL)verifyExtension;
+
+/**
  * set / get the renderer for the current player
  * @warning the returned vlc_renderer_item_t * must be released with vlc_renderer_item_release().
  * @note listen to VLCPlayerRendererChanged to be notified about changes

@@ -1102,6 +1102,19 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     vlc_player_Unlock(_p_player);
 }
 
+- (int)addAssociatedMediaToCurrentFromURL:(NSURL *)URL
+                               ofCategory:(enum es_format_category_e)category
+                         shallSelectTrack:(BOOL)selectTrack
+                          shallDisplayOSD:(BOOL)showOSD
+                     shallVerifyExtension:(BOOL)verifyExtension
+{
+    int ret;
+    vlc_player_Lock(_p_player);
+    ret = vlc_player_AddAssociatedMedia(_p_player, category, [[URL absoluteString] UTF8String], selectTrack, showOSD, verifyExtension);
+    vlc_player_Unlock(_p_player);
+    return ret;
+}
+
 - (void)rendererChanged:(vlc_renderer_item_t *)newRenderer
 {
     _rendererItem = newRenderer;
