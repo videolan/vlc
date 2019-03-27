@@ -43,17 +43,17 @@ pluginsinclude_HEADERS = \
 	../include/vlc_cpu.h \
 	../include/vlc_cxx_helpers.hpp \
 	../include/vlc_decoder.h \
-	../include/vlc_dialog.h \
 	../include/vlc_demux.h \
+	../include/vlc_dialog.h \
 	../include/vlc_epg.h \
 	../include/vlc_es.h \
 	../include/vlc_es_out.h \
 	../include/vlc_events.h \
 	../include/vlc_filter.h \
+	../include/vlc_fingerprinter.h \
 	../include/vlc_fourcc.h \
 	../include/vlc_fs.h \
 	../include/vlc_gcrypt.h \
-	../include/vlc_opengl.h \
 	../include/vlc_hash.h \
 	../include/vlc_http.h \
 	../include/vlc_httpd.h \
@@ -62,19 +62,21 @@ pluginsinclude_HEADERS = \
 	../include/vlc_input.h \
 	../include/vlc_input_item.h \
 	../include/vlc_interface.h \
+	../include/vlc_interrupt.h \
 	../include/vlc_keystore.h \
 	../include/vlc_list.h \
+	../include/vlc_media_library.h \
 	../include/vlc_media_source.h \
+	../include/vlc_memstream.h \
 	../include/vlc_messages.h \
 	../include/vlc_meta.h \
 	../include/vlc_meta_fetcher.h \
-	../include/vlc_media_library.h \
-	../include/vlc_memstream.h \
 	../include/vlc_mime.h \
 	../include/vlc_modules.h \
 	../include/vlc_mouse.h \
 	../include/vlc_network.h \
 	../include/vlc_objects.h \
+	../include/vlc_opengl.h \
 	../include/vlc_picture.h \
 	../include/vlc_picture_fifo.h \
 	../include/vlc_picture_pool.h \
@@ -85,10 +87,8 @@ pluginsinclude_HEADERS = \
 	../include/vlc_probe.h \
 	../include/vlc_queue.h \
 	../include/vlc_rand.h \
-	../include/vlc_services_discovery.h \
-	../include/vlc_fingerprinter.h \
-	../include/vlc_interrupt.h \
 	../include/vlc_renderer_discovery.h \
+	../include/vlc_services_discovery.h \
 	../include/vlc_sort.h \
 	../include/vlc_sout.h \
 	../include/vlc_spu.h \
@@ -98,22 +98,22 @@ pluginsinclude_HEADERS = \
 	../include/vlc_subpicture.h \
 	../include/vlc_text_style.h \
 	../include/vlc_threads.h \
+	../include/vlc_thumbnailer.h \
 	../include/vlc_tick.h \
 	../include/vlc_timestamp_helper.h \
-	../include/vlc_thumbnailer.h \
 	../include/vlc_tls.h \
 	../include/vlc_url.h \
 	../include/vlc_variables.h \
 	../include/vlc_vector.h \
+	../include/vlc_video_splitter.h \
 	../include/vlc_viewpoint.h \
 	../include/vlc_vlm.h \
-	../include/vlc_video_splitter.h \
 	../include/vlc_vout.h \
 	../include/vlc_vout_display.h \
 	../include/vlc_vout_osd.h \
 	../include/vlc_vout_window.h \
-	../include/vlc_xml.h \
 	../include/vlc_xlib.h \
+	../include/vlc_xml.h \
 	$(NULL)
 nodist_pluginsinclude_HEADERS = ../include/vlc_about.h
 
