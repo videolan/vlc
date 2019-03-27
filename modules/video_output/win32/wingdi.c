@@ -261,7 +261,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     SelectObject(sys->off_dc, sys->off_bitmap);
     ReleaseDC(sys->sys.hvideownd, window_dc);
 
-    EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (WinGDI output)");
+    vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (WinGDI output)");
 
     UpdateRects(vd, &sys->area, &sys->sys);
 

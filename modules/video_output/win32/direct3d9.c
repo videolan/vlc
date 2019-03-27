@@ -1513,8 +1513,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
     }
 
     /* Change the window title bar text */
-    if (sys->sys.event != NULL)
-        EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (Direct3D9 output)");
+    vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (Direct3D9 output)");
 
     msg_Dbg(vd, "Direct3D9 device adapter successfully initialized");
     return VLC_SUCCESS;

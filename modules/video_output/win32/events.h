@@ -51,7 +51,6 @@ void            EventThreadDestroy( event_thread_t * );
 int             EventThreadStart( event_thread_t *, event_hwnd_t *, const event_cfg_t * );
 void            EventThreadStop( event_thread_t * );
 
-void            EventThreadUpdateTitle( event_thread_t *, const char *psz_fallback );
 int             EventThreadGetWindowStyle( event_thread_t * );
 void            EventThreadUpdatePlace( event_thread_t *p_event,
                                         const vout_display_place_t *p_place );

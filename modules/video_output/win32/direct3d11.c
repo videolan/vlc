@@ -509,10 +509,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
     }
 
-#if !VLC_WINSTORE_APP
-    if (sys->sys.event != NULL)
-        EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
-#endif
+    vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (Direct3D11 output)");
     msg_Dbg(vd, "Direct3D11 device adapter successfully initialized");
 
     vd->info.has_double_click     = true;

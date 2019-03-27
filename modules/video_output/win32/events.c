@@ -44,7 +44,6 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-#define WM_VLC_CHANGE_TEXT   (WM_APP + 1)
 #define WM_VLC_SET_TOP_STATE (WM_APP + 2)
 
 struct event_thread_t
@@ -73,9 +72,6 @@ struct event_thread_t
 
     /* Gestures */
     win32_gesture_sys_t *p_gesture;
-
-    /* Title */
-    char *psz_title;
 
     int i_window_style;
     RECT window_area;
@@ -327,32 +323,6 @@ static void *EventThread( void *p_this )
             break;
         }
 
-        case WM_VLC_CHANGE_TEXT:
-        {
-            vlc_mutex_lock( &p_event->lock );
-            wchar_t *pwz_title = NULL;
-            if( p_event->psz_title )
-            {
-                const size_t i_length = strlen(p_event->psz_title);
-                pwz_title = vlc_alloc( i_length + 1, 2 );
-                if( pwz_title )
-                {
-                    mbstowcs( pwz_title, p_event->psz_title, 2 * i_length );
-                    pwz_title[i_length] = 0;
-                }
-            }
-            vlc_mutex_unlock( &p_event->lock );
-
-            if( pwz_title )
-            {
-                SetWindowTextW( p_event->hwnd, pwz_title );
-                if( p_event->hfswnd )
-                    SetWindowTextW( p_event->hfswnd, pwz_title );
-                free( pwz_title );
-            }
-            break;
-        }
-
         default:
             /* Messages we don't handle directly are dispatched to the
              * window procedure */
@@ -378,21 +348,6 @@ static void *EventThread( void *p_this )
     return NULL;
 }
 
-void EventThreadUpdateTitle( event_thread_t *p_event, const char *psz_fallback )
-{
-    char *psz_title = var_InheritString( p_event->obj, "video-title" );
-    if( !psz_title )
-        psz_title = strdup( psz_fallback );
-    if( !psz_title )
-        return;
-
-    vlc_mutex_lock( &p_event->lock );
-    free( p_event->psz_title );
-    p_event->psz_title = psz_title;
-    vlc_mutex_unlock( &p_event->lock );
-
-    PostMessage( p_event->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
-}
 int EventThreadGetWindowStyle( event_thread_t *p_event )
 {
     /* No need to lock, it is serialized by EventThreadStart */
@@ -438,7 +393,6 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_wind
 
     p_event->is_cursor_hidden = false;
     p_event->button_pressed = 0;
-    p_event->psz_title = NULL;
     p_event->hwnd = NULL;
     atomic_init(&p_event->size_changed, false);
 
@@ -457,7 +411,6 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_wind
 
 void EventThreadDestroy( event_thread_t *p_event )
 {
-    free( p_event->psz_title );
     vlc_cond_destroy( &p_event->wait );
     vlc_mutex_destroy( &p_event->lock );
     free( p_event );
