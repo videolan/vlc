@@ -316,7 +316,7 @@ void input_clock_ChangeRate( input_clock_t *cl, float rate )
     {
         /* Move the reference point (as if we were playing at the new rate
          * from the start */
-        cl->ref.system = cl->last.system - (cl->last.system - cl->ref.system) / rate * cl->rate;
+        cl->ref.system = cl->last.system - (vlc_tick_t) ((cl->last.system - cl->ref.system) / rate * cl->rate);
     }
     cl->rate = rate;
 
@@ -568,7 +568,7 @@ static vlc_tick_t ClockStreamToSystem( input_clock_t *cl, vlc_tick_t i_stream )
     if( !cl->b_has_reference )
         return VLC_TICK_INVALID;
 
-    return ( i_stream - cl->ref.stream ) / cl->rate + cl->ref.system;
+    return (vlc_tick_t) (( i_stream - cl->ref.stream ) / cl->rate) + cl->ref.system;
 }
 
 /*****************************************************************************
@@ -579,7 +579,7 @@ static vlc_tick_t ClockStreamToSystem( input_clock_t *cl, vlc_tick_t i_stream )
 static vlc_tick_t ClockSystemToStream( input_clock_t *cl, vlc_tick_t i_system )
 {
     assert( cl->b_has_reference );
-    return ( i_system - cl->ref.system ) * cl->rate + cl->ref.stream;
+    return (vlc_tick_t) (( i_system - cl->ref.system ) * cl->rate) + cl->ref.stream;
 }
 
 /**
