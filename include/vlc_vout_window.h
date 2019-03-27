@@ -316,6 +316,7 @@ struct vout_window_operations {
     void (*set_state)(struct vout_window_t *, unsigned state);
     void (*unset_fullscreen)(struct vout_window_t *);
     void (*set_fullscreen)(struct vout_window_t *, const char *id);
+    void (*set_title)(struct vout_window_t *, const char *id);
 };
 
 /**
@@ -486,6 +487,18 @@ static inline void vout_window_UnsetFullScreen(vout_window_t *window)
 {
     if (window->ops->unset_fullscreen != NULL)
         window->ops->unset_fullscreen(window);
+}
+
+/**
+ * Request a new window title.
+ *
+ * \param window window to change the title.
+ * \param title window title to use.
+ */
+static inline void vout_window_SetTitle(vout_window_t *window, const char *title)
+{
+    if (window->ops->set_title != NULL)
+        window->ops->set_title(window, title);
 }
 
 /**
