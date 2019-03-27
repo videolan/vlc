@@ -22,13 +22,10 @@
 
 #import "VLCCoreInteraction.h"
 
-#import <vlc_strings.h>
 #import <vlc_url.h>
 #import <vlc_modules.h>
 #import <vlc_plugin.h>
 #import <vlc_actions.h>
-
-#import <vlc_playlist_legacy.h>
 
 #import "main/VLCMain.h"
 #import "coreinteraction/VLCClickerManager.h"
@@ -96,7 +93,8 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         _playlistController = [[VLCMain sharedInstance] playlistController];
         _playerController = [_playlistController playerController];
 
-        var_AddCallback(pl_Get(p_intf), "intf-boss", BossCallback, (__bridge void *)self);
+        // FIXME: this variable will live on the current libvlc instance now. Depends on a future patch
+        var_AddCallback(p_intf, "intf-boss", BossCallback, (__bridge void *)self);
     }
     return self;
 }
@@ -104,8 +102,8 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
     // Dealloc is never called because this is a singleton, so we should cleanup manually before termination
-    intf_thread_t *p_intf = getIntf();
-    var_DelCallback(pl_Get(p_intf), "intf-boss", BossCallback, (__bridge void *)self);
+    // FIXME: this variable will live on the current libvlc instance now. Depends on a future patch
+    var_DelCallback(getIntf(), "intf-boss", BossCallback, (__bridge void *)self);
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     _clickerManager = nil;
     _usedHotkeys = nil;
@@ -145,63 +143,38 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)faster
 {
-    var_TriggerCallback(pl_Get(getIntf()), "rate-faster");
+    [_playerController incrementPlaybackRate];
 }
 
 - (void)slower
 {
-    var_TriggerCallback(pl_Get(getIntf()), "rate-slower");
+    [_playerController decrementPlaybackRate];
 }
 
 - (void)normalSpeed
 {
-    var_SetFloat(pl_Get(getIntf()), "rate", 1.);
+    _playerController.playbackRate = 1.;
 }
 
 - (void)toggleRecord
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
-    input_thread_t * p_input;
-    p_input = pl_CurrentInput(p_intf);
-    if (p_input) {
-        var_ToggleBool(p_input, "record");
-        input_Release(p_input);
-    }
+    [_playerController toggleRecord];
 }
 
 - (void)setPlaybackRate:(int)i_value
 {
-    playlist_t * p_playlist = pl_Get(getIntf());
-
     double speed = pow(2, (double)i_value / 17);
-    if (f_currentPlaybackRate != speed)
-        var_SetFloat(p_playlist, "rate", speed);
+    if (f_currentPlaybackRate != speed) {
+        _playerController.playbackRate = speed;
+    }
     f_currentPlaybackRate = speed;
 }
 
 - (int)playbackRate
 {
-    float f_rate;
+    f_currentPlaybackRate = _playerController.playbackRate;
 
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return 0;
-
-    input_thread_t * p_input;
-    p_input = pl_CurrentInput(p_intf);
-    if (p_input) {
-        f_rate = var_GetFloat(p_input, "rate");
-        input_Release(p_input);
-    } else {
-        playlist_t * p_playlist = pl_Get(getIntf());
-        f_rate = var_GetFloat(p_playlist, "rate");
-    }
-    f_currentPlaybackRate = f_rate;
-
-    double value = 17 * log(f_rate) / log(2.);
+    double value = 17 * log(f_currentPlaybackRate) / log(2.);
     int returnValue = (int) ((value > 0) ? value + .5 : value - .5);
 
     if (returnValue < -34)
@@ -224,149 +197,110 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (NSInteger)durationOfCurrentPlaylistItem
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return 0;
+    input_item_t *p_item = _playerController.currentMedia;
 
-    input_thread_t * p_input = pl_CurrentInput(p_intf);
-    vlc_tick_t i_duration;
-    if (!p_input)
-        return -1;
+    if (!p_item) {
+         return -1;
+    }
 
-    i_duration = var_GetInteger(p_input, "length");
-    input_Release(p_input);
+    vlc_tick_t duration = input_item_GetDuration(p_item);
+    input_item_Release(p_item);
 
-    return SEC_FROM_VLC_TICK(i_duration);
+    return SEC_FROM_VLC_TICK(duration);
 }
 
 - (NSURL*)URLOfCurrentPlaylistItem
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return nil;
-
-    input_thread_t *p_input = pl_CurrentInput(p_intf);
-    if (!p_input)
-        return nil;
-
-    input_item_t *p_item = input_GetItem(p_input);
+    input_item_t *p_item = _playerController.currentMedia;
     if (!p_item) {
-        input_Release(p_input);
         return nil;
     }
 
-    char *psz_uri = input_item_GetURI(p_item);
-    if (!psz_uri) {
-        input_Release(p_input);
+    char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
+    if (!psz_url) {
         return nil;
     }
+    NSURL *url = [NSURL URLWithString:toNSStr(psz_url)];
+    free(psz_url);
+    input_item_Release(p_item);
 
-    NSURL *o_url;
-    o_url = [NSURL URLWithString:toNSStr(psz_uri)];
-    free(psz_uri);
-    input_Release(p_input);
-
-    return o_url;
+    return url;
 }
 
 - (NSString*)nameOfCurrentPlaylistItem
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return nil;
-
-    input_thread_t *p_input = pl_CurrentInput(p_intf);
-    if (!p_input)
-        return nil;
-
-    input_item_t *p_item = input_GetItem(p_input);
+    input_item_t *p_item = _playerController.currentMedia;
     if (!p_item) {
-        input_Release(p_input);
         return nil;
     }
 
-    char *psz_uri = input_item_GetURI(p_item);
-    if (!psz_uri) {
-        input_Release(p_input);
-        return nil;
+    NSString *name;
+    static char *tmp_cstr = NULL;
+
+    // Get Title
+    tmp_cstr = input_item_GetTitleFbName(p_item);
+    if (tmp_cstr) {
+        name = toNSStr(tmp_cstr);
+        FREENULL(tmp_cstr);
     }
 
-    NSString *o_name;
-    char *format = var_InheritString(getIntf(), "input-title-format");
-    if (format) {
-        char *formated = vlc_strfinput(p_input, NULL, format);
-        free(format);
-        o_name = toNSStr(formated);
-        free(formated);
-    }
+    if (!name) {
+        char *psz_uri = input_item_GetURI(p_item);
+        if (!psz_uri) {
+            input_item_Release(p_item);
+            return nil;
+        }
+        NSURL *url = [NSURL URLWithString:toNSStr(psz_uri)];
+        free(psz_uri);
 
-    NSURL * o_url = [NSURL URLWithString:toNSStr(psz_uri)];
-    free(psz_uri);
-
-    if (!o_name) {
-        if ([o_url isFileURL])
-            o_name = [[NSFileManager defaultManager] displayNameAtPath:[o_url path]];
+        if ([url isFileURL])
+            name = [[NSFileManager defaultManager] displayNameAtPath:[url path]];
         else
-            o_name = [o_url absoluteString];
+            name = [url absoluteString];
     }
-    input_Release(p_input);
-    return o_name;
-}
 
-- (void)jumpWithValue:(char *)p_value forward:(BOOL)b_value
-{
-    input_thread_t *p_input = pl_CurrentInput(getIntf());
-    if (!p_input)
-        return;
-
-    int64_t i_interval = var_InheritInteger( p_input, p_value );
-    if (i_interval > 0) {
-        vlc_tick_t val = vlc_tick_from_sec( i_interval );
-        if (!b_value)
-            val = val * -1;
-        var_SetInteger( p_input, "time-offset", val );
-    }
-    input_Release(p_input);
+    input_item_Release(p_item);
+    return name;
 }
 
 - (void)forwardExtraShort
 {
-    [self jumpWithValue:"extrashort-jump-size" forward:YES];
+    [_playerController jumpForwardExtraShort];
 }
 
 - (void)backwardExtraShort
 {
-    [self jumpWithValue:"extrashort-jump-size" forward:NO];
+    [_playerController jumpBackwardExtraShort];
 }
 
 - (void)forwardShort
 {
-    [self jumpWithValue:"short-jump-size" forward:YES];
+    [_playerController jumpForwardShort];
 }
 
 - (void)backwardShort
 {
-    [self jumpWithValue:"short-jump-size" forward:NO];
+    [_playerController jumpBackwardShort];
 }
 
 - (void)forwardMedium
 {
-    [self jumpWithValue:"medium-jump-size" forward:YES];
+    [_playerController jumpForwardMedium];
 }
 
 - (void)backwardMedium
 {
-    [self jumpWithValue:"medium-jump-size" forward:NO];
+    [_playerController jumpBackwardMedium];
 }
 
 - (void)forwardLong
 {
-    [self jumpWithValue:"long-jump-size" forward:YES];
+    [_playerController jumpForwardLong];
 }
 
 - (void)backwardLong
 {
-    [self jumpWithValue:"long-jump-size" forward:NO];
+    [_playerController jumpBackwardLong];
 }
 
 - (void)shuffle
@@ -413,75 +347,40 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)jumpToTime:(vlc_tick_t)time
 {
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-    if (p_input) {
-        var_SetInteger(p_input, "time", time);
-        input_Release(p_input);
-    }
+    [_playerController setTimePrecise:time];
 }
 
 - (void)volumeUp
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
-    playlist_VolumeUp(pl_Get(p_intf), 1, NULL);
+    [_playerController incrementVolume];
 }
 
 - (void)volumeDown
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
-    playlist_VolumeDown(pl_Get(p_intf), 1, NULL);
+    [_playerController decrementVolume];
 }
 
 - (void)toggleMute
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
-    playlist_MuteToggle(pl_Get(p_intf));
+    [_playerController toggleMute];
 }
 
 - (BOOL)mute
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return NO;
-
-    BOOL b_is_muted = NO;
-    b_is_muted = playlist_MuteGet(pl_Get(p_intf)) > 0;
-
-    return b_is_muted;
+    return _playerController.mute;
 }
 
 - (int)volume
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return 0;
-
-    float volume = playlist_VolumeGet(pl_Get(p_intf));
-
-    return (int)lroundf(volume * AOUT_VOLUME_DEFAULT);
+    return (int)lroundf(_playerController.volume * AOUT_VOLUME_DEFAULT);
 }
 
 - (void)setVolume: (int)i_value
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
     if (i_value >= self.maxVolume)
         i_value = self.maxVolume;
 
-    float f_value = i_value / (float)AOUT_VOLUME_DEFAULT;
-
-    playlist_VolumeSet(pl_Get(p_intf), f_value);
+    _playerController.volume = i_value / (float)AOUT_VOLUME_DEFAULT;
 }
 
 - (float)maxVolume
@@ -495,32 +394,20 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)addSubtitlesToCurrentInput:(NSArray *)paths
 {
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-    if (!p_input)
-        return;
-
     NSUInteger count = [paths count];
     for (int i = 0; i < count ; i++) {
-        char *mrl = vlc_path2uri([[[paths objectAtIndex:i] path] UTF8String], NULL);
-        if (!mrl)
-            continue;
-        msg_Dbg(getIntf(), "loading subs from %s", mrl);
-
-        int i_result = input_AddSlave(p_input, SLAVE_TYPE_SPU, mrl, true, true, true);
-        if (i_result != VLC_SUCCESS)
-            msg_Err(getIntf(), "unable to load subtitles from '%s'", mrl);
-        free(mrl);
+        NSURL *url = [NSURL fileURLWithPath:paths[i]];
+        [_playerController addAssociatedMediaToCurrentFromURL:url
+                                                   ofCategory:SPU_ES
+                                             shallSelectTrack:YES
+                                              shallDisplayOSD:YES
+                                         shallVerifyExtension:NO];
     }
-    input_Release(p_input);
 }
 
 - (void)showPosition
 {
-    vout_thread_t *p_vout = [_playerController mainVideoOutputThread];
-    if (p_vout != NULL) {
-        var_SetInteger(vlc_object_instance(getIntf()), "key-action", ACTIONID_POSITION);
-        vout_Release(p_vout);
-    }
+    [_playerController displayPosition];
 }
 
 #pragma mark - video output stuff
@@ -537,70 +424,37 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)toggleFullscreen
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
+    BOOL b_fs = !_playerController.fullscreen;
+    _playerController.fullscreen = b_fs;
 
-    vout_thread_t *p_vout = [[[[VLCMain sharedInstance] playlistController] playerController] videoOutputThreadForKeyWindow];
-    if (p_vout) {
-        BOOL b_fs = var_ToggleBool(p_vout, "fullscreen");
-        var_SetBool(pl_Get(p_intf), "fullscreen", b_fs);
-        vout_Release(p_vout);
-    } else { // e.g. lion fullscreen toggle
-        BOOL b_fs = var_ToggleBool(pl_Get(p_intf), "fullscreen");
-        [[[VLCMain sharedInstance] voutProvider] setFullscreen:b_fs forWindow:nil withAnimation:YES];
-    }
+    // FIXME: check whether this is still needed
+    [[[VLCMain sharedInstance] voutProvider] setFullscreen:b_fs forWindow:nil withAnimation:YES];
 }
 
 #pragma mark - menu navigation
 - (void)menuFocusActivate
 {
-    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
-    if (p_input_thread == NULL)
-        return;
-
-    input_Control(p_input_thread, INPUT_NAV_ACTIVATE, NULL );
-    input_Release(p_input_thread);
+    [_playerController navigateInInteractiveContent:VLC_PLAYER_NAV_ACTIVATE];
 }
 
 - (void)moveMenuFocusLeft
 {
-    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
-    if (p_input_thread == NULL)
-        return;
-
-    input_Control(p_input_thread, INPUT_NAV_LEFT, NULL );
-    input_Release(p_input_thread);
+    [_playerController navigateInInteractiveContent:VLC_PLAYER_NAV_LEFT];
 }
 
 - (void)moveMenuFocusRight
 {
-    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
-    if (p_input_thread == NULL)
-        return;
-
-    input_Control(p_input_thread, INPUT_NAV_RIGHT, NULL );
-    input_Release(p_input_thread);
+    [_playerController navigateInInteractiveContent:VLC_PLAYER_NAV_RIGHT];
 }
 
 - (void)moveMenuFocusUp
 {
-    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
-    if (p_input_thread == NULL)
-        return;
-
-    input_Control(p_input_thread, INPUT_NAV_UP, NULL );
-    input_Release(p_input_thread);
+    [_playerController navigateInInteractiveContent:VLC_PLAYER_NAV_UP];
 }
 
 - (void)moveMenuFocusDown
 {
-    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
-    if (p_input_thread == NULL)
-        return;
-
-    input_Control(p_input_thread, INPUT_NAV_DOWN, NULL );
-    input_Release(p_input_thread);
+    [_playerController navigateInInteractiveContent:VLC_PLAYER_NAV_DOWN];
 }
 
 #pragma mark -
