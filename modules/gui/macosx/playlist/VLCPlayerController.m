@@ -22,6 +22,8 @@
 
 #import "VLCPlayerController.h"
 
+#import <vlc_url.h>
+
 #import "main/VLCMain.h"
 #import "os-integration/VLCRemoteControlService.h"
 #import "os-integration/iTunes.h"
@@ -650,6 +652,74 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 {
     [_defaultNotificationCenter postNotificationName:VLCPlayerCurrentMediaItemChanged
                                               object:self];
+}
+
+- (vlc_tick_t)durationOfCurrentMediaItem
+{
+    input_item_t *p_item = self.currentMedia;
+
+    if (!p_item) {
+        return -1;
+    }
+
+    vlc_tick_t duration = input_item_GetDuration(p_item);
+    input_item_Release(p_item);
+
+    return duration;
+}
+
+- (NSURL *)URLOfCurrentMediaItem;
+{
+    input_item_t *p_item = self.currentMedia;
+    if (!p_item) {
+        return nil;
+    }
+
+    char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
+    if (!psz_url) {
+        return nil;
+    }
+    NSURL *url = [NSURL URLWithString:toNSStr(psz_url)];
+    free(psz_url);
+    input_item_Release(p_item);
+
+    return url;
+}
+
+- (NSString*)nameOfCurrentMediaItem;
+{
+    input_item_t *p_item = self.currentMedia;
+    if (!p_item) {
+        return nil;
+    }
+
+    NSString *name;
+    static char *tmp_cstr = NULL;
+
+    // Get Title
+    tmp_cstr = input_item_GetTitleFbName(p_item);
+    if (tmp_cstr) {
+        name = toNSStr(tmp_cstr);
+        FREENULL(tmp_cstr);
+    }
+
+    if (!name) {
+        char *psz_uri = input_item_GetURI(p_item);
+        if (!psz_uri) {
+            input_item_Release(p_item);
+            return nil;
+        }
+        NSURL *url = [NSURL URLWithString:toNSStr(psz_uri)];
+        free(psz_uri);
+
+        if ([url isFileURL])
+            name = [[NSFileManager defaultManager] displayNameAtPath:[url path]];
+        else
+            name = [url absoluteString];
+    }
+
+    input_item_Release(p_item);
+    return name;
 }
 
 - (void)stateChanged:(enum vlc_player_state)state

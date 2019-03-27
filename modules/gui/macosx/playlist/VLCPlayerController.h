@@ -273,6 +273,21 @@ extern NSString *VLCPlayerMuteChanged;
 - (int)setCurrentMedia:(input_item_t *)currentMedia;
 
 /**
+ * returns the duration of the current media in vlc ticks
+ */
+@property (readonly) vlc_tick_t durationOfCurrentMediaItem;
+
+/**
+ * returns the URL of the current media or NULL if there is none
+ */
+@property (readonly, copy, nullable) NSURL *URLOfCurrentMediaItem;
+
+/**
+ * returns the name of the current media or NULL if there is none
+ */
+@property (readonly, copy, nullable) NSString *nameOfCurrentMediaItem;
+
+/**
  * the current player state
  * @return a value according to the vlc_player_state enum
  * @note listen to VLCPlayerStateChanged to be notified about changes to this property

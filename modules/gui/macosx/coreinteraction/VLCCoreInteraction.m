@@ -197,70 +197,17 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (NSInteger)durationOfCurrentPlaylistItem
 {
-    input_item_t *p_item = _playerController.currentMedia;
-
-    if (!p_item) {
-         return -1;
-    }
-
-    vlc_tick_t duration = input_item_GetDuration(p_item);
-    input_item_Release(p_item);
-
-    return SEC_FROM_VLC_TICK(duration);
+    return SEC_FROM_VLC_TICK(_playerController.durationOfCurrentMediaItem);
 }
 
 - (NSURL*)URLOfCurrentPlaylistItem
 {
-    input_item_t *p_item = _playerController.currentMedia;
-    if (!p_item) {
-        return nil;
-    }
-
-    char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
-    if (!psz_url) {
-        return nil;
-    }
-    NSURL *url = [NSURL URLWithString:toNSStr(psz_url)];
-    free(psz_url);
-    input_item_Release(p_item);
-
-    return url;
+    return _playerController.URLOfCurrentMediaItem;
 }
 
 - (NSString*)nameOfCurrentPlaylistItem
 {
-    input_item_t *p_item = _playerController.currentMedia;
-    if (!p_item) {
-        return nil;
-    }
-
-    NSString *name;
-    static char *tmp_cstr = NULL;
-
-    // Get Title
-    tmp_cstr = input_item_GetTitleFbName(p_item);
-    if (tmp_cstr) {
-        name = toNSStr(tmp_cstr);
-        FREENULL(tmp_cstr);
-    }
-
-    if (!name) {
-        char *psz_uri = input_item_GetURI(p_item);
-        if (!psz_uri) {
-            input_item_Release(p_item);
-            return nil;
-        }
-        NSURL *url = [NSURL URLWithString:toNSStr(psz_uri)];
-        free(psz_uri);
-
-        if ([url isFileURL])
-            name = [[NSFileManager defaultManager] displayNameAtPath:[url path]];
-        else
-            name = [url absoluteString];
-    }
-
-    input_item_Release(p_item);
-    return name;
+    return _playerController.nameOfCurrentMediaItem;
 }
 
 - (void)forwardExtraShort
