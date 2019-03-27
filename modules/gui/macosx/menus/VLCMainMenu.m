@@ -215,7 +215,7 @@
     [_double_window setKeyEquivalentModifierMask: VLCModifiersToCocoa(keyString)];
     FREENULL(key);
 
-    [self setSubmenusEnabled: FALSE];
+    [self setSubmenusEnabled: YES];
 
     /* configure playback / controls menu */
     self.controlsMenu.delegate = self;
@@ -298,6 +298,8 @@
 
     [self refreshAudioDeviceList];
 
+#if 0
+#warning fix advanced subtitles styles (see #22095)
     /* setup subtitles menu */
     // Persist those variables on the playlist
     playlist_t *p_playlist = pl_Get(getIntf());
@@ -310,6 +312,7 @@
     [_subtitle_bgopacity_sld setIntegerValue: config_GetInt("freetype-background-opacity")];
     [self setupMenu: _subtitle_bgcolorMenu withIntList:"freetype-background-color" andSelector:@selector(switchSubtitleOption:)];
     [self setupMenu: _subtitle_outlinethicknessMenu withIntList:"freetype-outline-thickness" andSelector:@selector(switchSubtitleOption:)];
+#endif
 
     /* Build size menu based on different scale factors */
     struct {
@@ -665,6 +668,7 @@
     [_screen setEnabled: b_enabled];
     [_aspect_ratio setEnabled: b_enabled];
     [_crop setEnabled: b_enabled];
+    [self setSubtitleMenuEnabled: b_enabled];
 }
 
 - (void)setSubtitleMenuEnabled:(BOOL)b_enabled
@@ -693,8 +697,6 @@
     [_rate_normalLabel setTextColor:color];
     [_rate_fasterLabel setTextColor:color];
     [_rateTextField setTextColor:color];
-
-    [self setSubtitleMenuEnabled: b_enabled];
 }
 
 #pragma mark - View
@@ -967,17 +969,10 @@
 
 - (IBAction)floatOnTop:(id)sender
 {
-    // FIXME re-write using VLCPlayerController
-    input_thread_t *p_input = pl_CurrentInput(getIntf());
-    if (p_input) {
-        vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
-        if (p_vout) {
-            BOOL b_fs = var_ToggleBool(p_vout, "video-on-top");
-            var_SetBool(pl_Get(getIntf()), "video-on-top", b_fs);
-
-            vout_Release(p_vout);
-        }
-        input_Release(p_input);
+    vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
+    if (p_vout) {
+        var_ToggleBool(p_vout, "video-on-top");
+        vout_Release(p_vout);
     }
 }
 
@@ -1027,20 +1022,6 @@
 - (IBAction)addSubtitleFile:(id)sender
 {
     NSInteger i_returnValue = 0;
-    input_thread_t *p_input = pl_CurrentInput(getIntf());
-    if (!p_input)
-        return;
-
-    input_item_t *p_item = input_GetItem(p_input);
-    if (!p_item) {
-        input_Release(p_input);
-        return;
-    }
-
-    char *path = input_item_GetURI(p_item);
-
-    if (!path)
-        path = strdup("");
 
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel setCanChooseFiles: YES];
@@ -1049,15 +1030,12 @@
 
     [openPanel setAllowedFileTypes: [NSArray arrayWithObjects:@"cdg",@"idx",@"srt",@"sub",@"utf",@"ass",@"ssa",@"aqt",@"jss",@"psb",@"rt",@"smi",@"txt",@"smil",@"stl",@"usf",@"dks",@"pjs",@"mpl2",@"mks",@"vtt",@"ttml",@"dfxp",nil]];
 
-    NSURL *url = [NSURL URLWithString:[toNSStr(path) stringByExpandingTildeInPath]];
+    NSURL *url = _playerController.URLOfCurrentMediaItem;
     url = [url URLByDeletingLastPathComponent];
     [openPanel setDirectoryURL: url];
-    free(path);
-    input_Release(p_input);
 
     i_returnValue = [openPanel runModal];
 
-    // FIXME: this cannot work anymore
     if (i_returnValue == NSModalResponseOK)
         [[VLCCoreInteraction sharedInstance] addSubtitlesToCurrentInput:[openPanel URLs]];
 }
@@ -1674,7 +1652,7 @@
         [self setupMenus]; /* Make sure video menu is up to date */
 
     } else if (mi == _openSubtitleFile) {
-        enabled = [mi isEnabled];
+        enabled = YES;
         [self setupMenus]; /* Make sure subtitles menu is up to date */
     } else {
         NSMenuItem *_parent = [mi parentItem];
