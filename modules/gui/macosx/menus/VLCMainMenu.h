@@ -194,16 +194,16 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *dockMenumute;
 
 /* vout menu */
-@property (readwrite, weak) IBOutlet NSMenu *voutMenu;
-@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuplay;
-@property (readwrite, weak) IBOutlet NSMenuItem *voutMenustop;
-@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuprev;
-@property (readwrite, weak) IBOutlet NSMenuItem *voutMenunext;
-@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuvolup;
-@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuvoldown;
-@property (readwrite, weak) IBOutlet NSMenuItem *voutMenumute;
-@property (readwrite, weak) IBOutlet NSMenuItem *voutMenufullscreen;
-@property (readwrite, weak) IBOutlet NSMenuItem *voutMenusnapshot;
+@property (readwrite, strong) IBOutlet NSMenu *voutMenu;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuplay;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenustop;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuprev;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenunext;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuvolup;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuvoldown;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenumute;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenufullscreen;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenusnapshot;
 
 @property (readwrite, strong) IBOutlet NSView *playlistSaveAccessoryView;
 @property (readwrite, weak) IBOutlet NSPopUpButton *playlistSaveAccessoryPopup;
