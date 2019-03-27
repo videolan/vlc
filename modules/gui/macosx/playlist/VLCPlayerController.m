@@ -30,7 +30,6 @@
 
 #import <MediaPlayer/MediaPlayer.h>
 
-NSString *VLCPlayerCurrentMediaItem = @"VLCPlayerCurrentMediaItem";
 NSString *VLCPlayerCurrentMediaItemChanged = @"VLCPlayerCurrentMediaItemChanged";
 NSString *VLCPlayerStateChanged = @"VLCPlayerStateChanged";
 NSString *VLCPlayerErrorChanged = @"VLCPlayerErrorChanged";
@@ -650,8 +649,7 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 - (void)currentMediaItemChanged:(input_item_t *)newMediaItem
 {
     [_defaultNotificationCenter postNotificationName:VLCPlayerCurrentMediaItemChanged
-                                              object:self
-                                            userInfo:@{VLCPlayerCurrentMediaItem:[NSValue valueWithPointer:newMediaItem]}];
+                                              object:self];
 }
 
 - (void)stateChanged:(enum vlc_player_state)state

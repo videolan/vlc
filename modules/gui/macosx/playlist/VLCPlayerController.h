@@ -27,11 +27,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCInputStats;
 
-extern NSString *VLCPlayerCurrentMediaItem;
 /**
  * Listen to VLCPlayerCurrentMediaItemChanged to notified if the current media item changes for the player
  * @note the affected player object will be the object of the notification
- * @note the userInfo dictionary will have the pointer to the new input_item_t for key VLCPlayerCurrentMediaItem
  */
 extern NSString *VLCPlayerCurrentMediaItemChanged;
 
