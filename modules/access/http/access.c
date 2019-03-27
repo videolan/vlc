@@ -295,7 +295,6 @@ vlc_module_begin()
 
     add_bool("http-continuous", false, N_("Continuous stream"),
              N_("Keep reading a resource that keeps being updated."), true)
-        change_safe()
         change_volatile()
     add_bool("http-forward-cookies", true, N_("Cookies forwarding"),
              N_("Forward cookies across HTTP redirections."), true)
