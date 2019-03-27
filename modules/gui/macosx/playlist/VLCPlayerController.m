@@ -1366,7 +1366,7 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
 - (NSString *)videoFilterChainForType:(enum vlc_vout_filter_type)filterType
 {
-    NSString *ret;
+    NSString *ret = nil;
     char *psz_filterChain = vlc_player_vout_GetFilter(_p_player, filterType);
     if (psz_filterChain != NULL) {
         ret = [NSString stringWithUTF8String:psz_filterChain];
