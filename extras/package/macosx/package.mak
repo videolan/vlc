@@ -52,7 +52,7 @@ endif
 	cp $(prefix)/bin/vlc $@/Contents/MacOS/VLC
 	install_name_tool -rpath "$(libdir)" "@executable_path/../Frameworks/" $@/Contents/MacOS/VLC
 	## Generate plugin cache
-	bin/vlc-cache-gen $@/Contents/Frameworks/plugins
+	VLC_LIB_PATH="$@/Contents/Frameworks" bin/vlc-cache-gen $@/Contents/Frameworks/plugins
 	find $@ -type d -exec chmod ugo+rx '{}' \;
 	find $@ -type f -exec chmod ugo+r '{}' \;
 
