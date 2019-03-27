@@ -391,6 +391,12 @@ extern NSString *VLCPlayerMuteChanged;
 - (void)setPositionPrecise:(float)position;
 
 /**
+ * shows the current position as OSD within the video
+ * does not do anything if you do not have a vout
+ */
+- (void)displayPosition;
+
+/**
  * helper function to jump forward with the extra short interval (user configurable in preferences)
  */
 - (void)jumpForwardExtraShort;

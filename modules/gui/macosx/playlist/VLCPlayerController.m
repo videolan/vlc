@@ -880,6 +880,13 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     vlc_player_Unlock(_p_player);
 }
 
+- (void)displayPosition
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_DisplayPosition(_p_player);
+    vlc_player_Unlock(_p_player);
+}
+
 - (void)jumpWithValue:(char *)p_userDefinedJumpSize forward:(BOOL)shallJumpForward
 {
     int64_t interval = var_InheritInteger(getIntf(), p_userDefinedJumpSize);
