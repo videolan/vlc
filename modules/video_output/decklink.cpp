@@ -1075,7 +1075,7 @@ static void CloseVideo(vlc_object_t *p_this)
  * Audio
  *****************************************************************************/
 
-static void Flush (audio_output_t *aout, bool drain)
+static void Flush(audio_output_t *aout)
 {
     decklink_sys_t *sys = (decklink_sys_t *) aout->sys;
     vlc_mutex_lock(&sys->lock);
@@ -1084,13 +1084,24 @@ static void Flush (audio_output_t *aout, bool drain)
     if (!p_output)
         return;
 
-    if (drain) {
-        uint32_t samples;
-        sys->p_output->GetBufferedAudioSampleFrameCount(&samples);
-        vlc_tick_sleep(vlc_tick_from_samples(samples, sys->i_rate));
-    } else if (sys->p_output->FlushBufferedAudioSamples() == E_FAIL)
+    if (sys->p_output->FlushBufferedAudioSamples() == E_FAIL)
         msg_Err(aout, "Flush failed");
 }
+
+static void Drain(audio_output_t *aout)
+{
+    decklink_sys_t *sys = (decklink_sys_t *) aout->sys;
+    vlc_mutex_lock(&sys->lock);
+    IDeckLinkOutput *p_output = sys->p_output;
+    vlc_mutex_unlock(&sys->lock);
+    if (!p_output)
+        return;
+
+    uint32_t samples;
+    sys->p_output->GetBufferedAudioSampleFrameCount(&samples);
+    vlc_tick_sleep(vlc_tick_from_samples(samples, sys->i_rate));
+}
+
 
 static int TimeGet(audio_output_t *, vlc_tick_t* restrict)
 {
@@ -1160,6 +1171,7 @@ static int OpenAudio(vlc_object_t *p_this)
     aout->play      = PlayAudio;
     aout->start     = Start;
     aout->flush     = Flush;
+    aout->drain     = Drain;
     aout->time_get  = TimeGet;
 
     aout->pause     = aout_PauseDefault;
