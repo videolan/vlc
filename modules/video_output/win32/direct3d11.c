@@ -91,6 +91,9 @@ struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
 
+    /* Sensors */
+    void *p_sensors;
+
     display_info_t           display;
 
     d3d11_handle_t           hd3d;
@@ -498,6 +501,9 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->sys.pf_GetPictureWidth  = GetPictureWidth;
     sys->sys.pf_GetPictureHeight = GetPictureHeight;
 
+    if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hwnd)
+        sys->p_sensors = HookWindowsSensors(vd, sys->sys.hwnd);
+
     if (!sys->swapCb || !sys->starRenderCb || !sys->endRenderCb || !sys->resizeCb)
     {
         sys->outside_opaque = vd;
@@ -549,6 +555,7 @@ error:
 static void Close(vout_display_t *vd)
 {
     Direct3D11Close(vd);
+    UnhookWindowsSensors(vd->sys->p_sensors);
 #if !VLC_WINSTORE_APP
     CommonClean(vd, &vd->sys->sys);
 #endif

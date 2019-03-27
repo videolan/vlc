@@ -73,9 +73,6 @@ struct event_thread_t
     /* Gestures */
     win32_gesture_sys_t *p_gesture;
 
-    /* Sensors */
-    void *p_sensors;
-
     /* Title */
     char *psz_title;
 
@@ -795,8 +792,6 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     bool b_isProjected  = (vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
     InitGestures( p_event->hwnd, &p_event->p_gesture, b_isProjected );
 
-    p_event->p_sensors = HookWindowsSensors(vd, p_event->hwnd);
-
     if( p_event->hparent )
     {
         /* We don't want the window owner to overwrite our client area */
@@ -878,8 +873,6 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
         DestroyIcon( p_event->vlc_icon );
 
     DestroyCursor( p_event->cursor_empty );
-
-    UnhookWindowsSensors(p_event->p_sensors);
 
     CloseGestures( p_event->p_gesture);
 }

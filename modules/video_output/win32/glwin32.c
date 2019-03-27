@@ -65,6 +65,9 @@ struct vout_display_sys_t
     vlc_gl_t              *gl;
     vout_display_opengl_t *vgl;
     picture_pool_t        *pool;
+
+    /* Sensors */
+    void *p_sensors;
 };
 
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
@@ -124,6 +127,9 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     /* */
     if (CommonInit(vd, &sys->sys, false, cfg))
         goto error;
+
+    if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
+        sys->p_sensors = HookWindowsSensors(vd, sys->sys.hwnd);
 
     if (!sys->sys.b_windowless)
         EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (OpenGL output)");
@@ -193,6 +199,7 @@ static void Close(vout_display_t *vd)
         vlc_object_delete(surface);
     }
 
+    UnhookWindowsSensors(sys->p_sensors);
     CommonClean(vd, &sys->sys);
 
     free(sys);

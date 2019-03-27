@@ -300,7 +300,6 @@ endif
 libdirect3d9_plugin_la_SOURCES = video_output/win32/direct3d9.c \
 	video_output/win32/common.c video_output/win32/common.h \
 	video_output/win32/events.c video_output/win32/events.h \
-	video_output/win32/sensors.cpp \
 	video_output/win32/builtin_shaders.h \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libdirect3d9_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
@@ -361,7 +360,6 @@ endif
 libwingdi_plugin_la_SOURCES = video_output/win32/wingdi.c \
 	video_output/win32/common.c video_output/win32/common.h \
 	video_output/win32/events.c video_output/win32/events.h \
-	video_output/win32/sensors.cpp \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libwingdi_plugin_la_LIBADD = libchroma_copy.la -lgdi32 $(LIBCOM) -luuid
 if HAVE_WIN32_DESKTOP
