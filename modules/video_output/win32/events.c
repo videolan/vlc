@@ -39,6 +39,7 @@
 #include <windows.h>
 #include <windowsx.h>                                        /* GET_X_LPARAM */
 
+#include "events.h"
 #include "common.h"
 
 /*****************************************************************************

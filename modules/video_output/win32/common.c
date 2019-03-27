@@ -40,6 +40,7 @@
 #define COBJMACROS
 #include <shobjidl.h>
 
+#include "events.h"
 #include "common.h"
 #include "../video_chroma/copy.h"
 

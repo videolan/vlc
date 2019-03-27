@@ -51,13 +51,3 @@ int             EventThreadGetWindowStyle( event_thread_t * );
 void            EventThreadUpdatePlace( event_thread_t *p_event,
                                         const vout_display_place_t *p_place );
 bool            EventThreadGetAndResetSizeChanged( event_thread_t * );
-
-# ifdef __cplusplus
-extern "C" {
-# endif
-void* HookWindowsSensors(vout_display_t*, HWND);
-void UnhookWindowsSensors(void*);
-# ifdef __cplusplus
-}
-# endif
-

@@ -22,10 +22,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc_vout_display.h>
+
 /*****************************************************************************
  * event_thread_t: event thread
  *****************************************************************************/
-#include "events.h"
+
+typedef struct event_thread_t event_thread_t;
 
 typedef struct display_win32_area_t
 {
@@ -81,3 +84,12 @@ int  CommonControl(vout_display_t *, display_win32_area_t *, vout_display_sys_wi
 void UpdateRects (vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *);
 
 void InitArea(vout_display_t *, display_win32_area_t *, const vout_display_cfg_t *);
+
+# ifdef __cplusplus
+extern "C" {
+# endif
+void* HookWindowsSensors(vout_display_t*, HWND);
+void UnhookWindowsSensors(void*);
+# ifdef __cplusplus
+}
+# endif
