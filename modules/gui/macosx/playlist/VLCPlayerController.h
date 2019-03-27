@@ -542,6 +542,11 @@ extern NSString *VLCPlayerMuteChanged;
 @property (readwrite, nonatomic, nullable) vlc_renderer_item_t *rendererItem;
 
 /**
+ * navigate in interactive content such as DVD or BR menus
+ */
+- (void)navigateInInteractiveContent:(enum vlc_player_nav)navigationAction;
+
+/**
  * the latest available playback statistics
  * @return an instance of VLCInputStats holding the data
  * @note listen to VLCPlayerStatisticsUpdated to be notified about changes to this property

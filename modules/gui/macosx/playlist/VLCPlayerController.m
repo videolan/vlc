@@ -1116,6 +1116,13 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     vlc_player_Unlock(_p_player);
 }
 
+- (void)navigateInInteractiveContent:(enum vlc_player_nav)navigationAction
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_Navigate(_p_player, navigationAction);
+    vlc_player_Unlock(_p_player);
+}
+
 - (void)recordingChanged:(BOOL)recording
 {
     _enableRecording = recording;
