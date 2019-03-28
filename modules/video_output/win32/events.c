@@ -57,7 +57,7 @@ struct event_thread_t
     vlc_mutex_t  lock;
     vlc_cond_t   wait;
     bool         b_ready;
-    bool         b_done;
+    atomic_bool  b_done;
     bool         b_error;
 
     /* */
@@ -184,20 +184,10 @@ static void *EventThread( void *p_this )
     /* GetMessage will sleep if there's no message in the queue */
     for( ;; )
     {
-        if( !GetMessage( &msg, 0, 0, 0 ) )
+        if( !GetMessage( &msg, 0, 0, 0 ) || atomic_load( &p_event->b_done ) )
         {
-            vlc_mutex_lock( &p_event->lock );
-            p_event->b_done = true;
-            vlc_mutex_unlock( &p_event->lock );
             break;
         }
-
-        /* Check if we are asked to exit */
-        vlc_mutex_lock( &p_event->lock );
-        const bool b_done = p_event->b_done;
-        vlc_mutex_unlock( &p_event->lock );
-        if( b_done )
-            break;
 
         if( !b_mouse_support && isMouseEvent( msg.message ) )
             continue;
@@ -445,6 +435,7 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_wind
     p_event->obj = obj;
     vlc_mutex_init( &p_event->lock );
     vlc_cond_init( &p_event->wait );
+    atomic_init( &p_event->b_done, false );
 
     p_event->parent_window = parent_window;
 
@@ -487,7 +478,7 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
     atomic_store(&p_event->size_changed, false);
 
     p_event->b_ready = false;
-    p_event->b_done  = false;
+    atomic_store( &p_event->b_done, false);
     p_event->b_error = false;
 
     if( vlc_clone( &p_event->thread, EventThread, p_event,
@@ -525,9 +516,7 @@ void EventThreadStop( event_thread_t *p_event )
     if( !p_event->b_ready )
         return;
 
-    vlc_mutex_lock( &p_event->lock );
-    p_event->b_done = true;
-    vlc_mutex_unlock( &p_event->lock );
+    atomic_store( &p_event->b_done, true );
 
     /* we need to be sure Vout EventThread won't stay stuck in
      * GetMessage, so we send a fake message */
