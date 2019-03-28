@@ -31,6 +31,10 @@
 #include <QSystemTrayIcon>
 #include <QStackedWidget>
 
+#include "components/voutwindow/qvoutwindow.hpp"
+
+#include <QtQuick/QQuickWindow>
+
 #ifdef _WIN32
 # include <shobjidl.h>
 #endif
@@ -85,6 +89,9 @@ private:
     static void requestVideoFullScreen( struct vout_window_t *, const char * );
 
 public:
+    QQuickWindow* getRootQuickWindow() { return nullptr; }
+    VideoSurfaceProvider* getVideoSurfaceProvider() const { return nullptr; }
+
     /* Getters */
     QSystemTrayIcon *getSysTray() { return sysTray; }
     QMenu *getSysTrayMenu() { return systrayMenu; }
