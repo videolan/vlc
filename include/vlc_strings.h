@@ -116,8 +116,29 @@ VLC_API void vlc_xml_decode(char *st);
  */
 VLC_API char *vlc_xml_encode(const char *str) VLC_MALLOC;
 
-VLC_API char * vlc_b64_encode_binary( const uint8_t *, size_t );
-VLC_API char * vlc_b64_encode( const char * );
+/**
+ * Base64 encoding.
+ *
+ * Encodes a buffer into base64 as a (nul-terminated) string.
+ *
+ * \param base start address of buffer to encode
+ * \param length length in bytes of buffer to encode
+ * \return a heap-allocated nul-terminated string
+ * (or NULL on allocation error).
+ */
+VLC_API char *vlc_b64_encode_binary(const void *base, size_t length)
+VLC_USED VLC_MALLOC;
+
+/**
+ * Base64 encoding (string).
+ *
+ * Encodes a nul-terminated string into Base64.
+ *
+ * \param str nul-terminated string to encode
+ * \return a heap-allocated nul-terminated string
+ * (or NULL on allocation error).
+ */
+VLC_API char *vlc_b64_encode(const char *str) VLC_USED VLC_MALLOC;
 
 VLC_API size_t vlc_b64_decode_binary_to_buffer( uint8_t *p_dst, size_t i_dst_max, const char *psz_src );
 VLC_API size_t vlc_b64_decode_binary( uint8_t **pp_dst, const char *psz_src );
