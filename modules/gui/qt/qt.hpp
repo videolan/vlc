@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_interface.h> /* intf_thread_t */
 #include <vlc_playlist_legacy.h>  /* playlist_t */
+#include <vlc_playlist.h>  /* vlc_playlist_t */
 #include <vlc_player.h>  /* vlc_player_t */
 
 #include <qconfig.h>
@@ -63,6 +64,12 @@ enum{
     NOTIFICATION_ALWAYS = 2,
 };
 
+namespace vlc {
+namespace playlist {
+class PlaylistControllerModel;
+}
+}
+class PlayerController;
 struct intf_sys_t
 {
     vlc_thread_t thread;
@@ -77,6 +84,12 @@ struct intf_sys_t
     unsigned voutWindowType; /* Type of vout_window_t provided */
     bool b_isDialogProvider; /* Qt mode or Skins mode */
     playlist_t *p_playlist_legacy;  /* playlist */
+
+    vlc_playlist_t *p_playlist;  /* playlist */
+    vlc_player_t *p_player; /* player */
+    vlc::playlist::PlaylistControllerModel* p_mainPlaylistController;
+    PlayerController* p_mainPlayerController;
+
 #ifdef _WIN32
     bool disable_volume_keys;
 #endif
