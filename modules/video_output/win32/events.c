@@ -657,8 +657,9 @@ static long FAR PASCAL VideoEventProc( HWND hwnd, UINT message,
         return DefWindowProc(hwnd, message, wParam, lParam);
     event_thread_t *p_event = (event_thread_t *)p_user_data;
 
-    if( message == WM_CAPTURECHANGED )
+    switch( message )
     {
+    case WM_CAPTURECHANGED:
         for( int button = 0; p_event->button_pressed; button++ )
         {
             unsigned m = 1 << button;
@@ -668,10 +669,7 @@ static long FAR PASCAL VideoEventProc( HWND hwnd, UINT message,
         }
         p_event->button_pressed = 0;
         return 0;
-    }
 
-    switch( message )
-    {
     /*
     ** For OpenGL and Direct3D, vout will update the whole
     ** window at regular interval, therefore dirty region
@@ -964,8 +962,15 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         return DefWindowProc(hwnd, message, wParam, lParam);
     event_thread_t *p_event = (event_thread_t *)p_user_data;
 
-    if( message == WM_CAPTURECHANGED )
+    switch( message )
     {
+
+    case WM_SIZE:
+        if (!p_event->hparent)
+            atomic_store(&p_event->size_changed, true);
+        return 0;
+
+    case WM_CAPTURECHANGED:
         for( int button = 0; p_event->button_pressed; button++ )
         {
             unsigned m = 1 << button;
@@ -974,15 +979,6 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
             p_event->button_pressed &= ~m;
         }
         p_event->button_pressed = 0;
-        return 0;
-    }
-
-    switch( message )
-    {
-
-    case WM_SIZE:
-        if (!p_event->hparent)
-            atomic_store(&p_event->size_changed, true);
         return 0;
 
     /* the user wants to close the window */
