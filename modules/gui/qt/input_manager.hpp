@@ -32,7 +32,7 @@
 
 #include "qt.hpp"
 #include "util/singleton.hpp"
-#include "adapters/variables.hpp"
+#include "adapters/legacy_variables.hpp"
 
 #include <QObject>
 #include <QEvent>
@@ -291,9 +291,9 @@ private:
     InputManager            *im;
     input_thread_t          *p_input;
     intf_thread_t           *p_intf;
-    QVLCBool random, repeat, loop;
-    QVLCFloat volume;
-    QVLCBool mute;
+    QVLCLEGACYBool random, repeat, loop;
+    QVLCLEGACYFloat volume;
+    QVLCLEGACYBool mute;
 
 private:
     static int ItemChanged( vlc_object_t *, const char *,

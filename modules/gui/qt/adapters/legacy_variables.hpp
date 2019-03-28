@@ -1,5 +1,5 @@
 /*****************************************************************************
- * variables.hpp : Dialogs from other LibVLC core and other plugins
+ * legacy_variables.hpp : Dialogs from other LibVLC core and other plugins
  ****************************************************************************
  * Copyright (C) 2009 Rémi Denis-Courmont
  *
@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef QVLC_VARIABLES_H_
-#define QVLC_VARIABLES_H_ 1
+#ifndef QVLCLEGACY_LEGACY_VARIABLES_H_
+#define QVLCLEGACY_LEGACY_VARIABLES_H_ 1
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -30,7 +30,7 @@
 #include <QObject>
 #include <vlc_common.h>
 
-class QVLCVariable : public QObject
+class QVLCLEGACYVariable : public QObject
 {
     Q_OBJECT
 private:
@@ -41,18 +41,18 @@ private:
     virtual void trigger (vlc_value_t, vlc_value_t) = 0;
 
 public:
-    QVLCVariable (vlc_object_t *, const char *, int, bool);
-    virtual ~QVLCVariable (void);
+    QVLCLEGACYVariable (vlc_object_t *, const char *, int, bool);
+    virtual ~QVLCLEGACYVariable (void);
 };
 
-class QVLCPointer : public QVLCVariable
+class QVLCLEGACYPointer : public QVLCLEGACYVariable
 {
     Q_OBJECT
 private:
     void trigger (vlc_value_t, vlc_value_t) Q_DECL_OVERRIDE;
 
 public:
-    QVLCPointer (vlc_object_t *, const char *, bool inherit = false);
+    QVLCLEGACYPointer (vlc_object_t *, const char *, bool inherit = false);
     bool addCallback (QObject *, const char *,
                       Qt::ConnectionType type = Qt::AutoConnection);
 
@@ -60,14 +60,14 @@ signals:
     void pointerChanged (void *);
 };
 
-class QVLCInteger : public QVLCVariable
+class QVLCLEGACYInteger : public QVLCLEGACYVariable
 {
     Q_OBJECT
 private:
     void trigger (vlc_value_t, vlc_value_t) Q_DECL_OVERRIDE;
 
 public:
-    QVLCInteger (vlc_object_t *, const char *, bool inherit = false);
+    QVLCLEGACYInteger (vlc_object_t *, const char *, bool inherit = false);
     bool addCallback (QObject *, const char *,
                       Qt::ConnectionType type = Qt::AutoConnection);
 
@@ -75,14 +75,14 @@ signals:
     void integerChanged (qlonglong);
 };
 
-class QVLCBool : public QVLCVariable
+class QVLCLEGACYBool : public QVLCLEGACYVariable
 {
     Q_OBJECT
 private:
    void trigger (vlc_value_t, vlc_value_t) Q_DECL_OVERRIDE;
 
 public:
-    QVLCBool (vlc_object_t *, const char *, bool inherit = false);
+    QVLCLEGACYBool (vlc_object_t *, const char *, bool inherit = false);
     bool addCallback (QObject *, const char *,
                       Qt::ConnectionType type = Qt::AutoConnection);
 
@@ -90,14 +90,14 @@ signals:
     void boolChanged (bool);
 };
 
-class QVLCFloat : public QVLCVariable
+class QVLCLEGACYFloat : public QVLCLEGACYVariable
 {
     Q_OBJECT
 private:
     void trigger (vlc_value_t, vlc_value_t) Q_DECL_OVERRIDE;
 
 public:
-    QVLCFloat (vlc_object_t *, const char *, bool inherit = false);
+    QVLCLEGACYFloat (vlc_object_t *, const char *, bool inherit = false);
     bool addCallback (QObject *, const char *,
                       Qt::ConnectionType type = Qt::AutoConnection);
 
@@ -105,14 +105,14 @@ signals:
     void floatChanged (float);
 };
 
-class QVLCString : public QVLCVariable
+class QVLCLEGACYString : public QVLCLEGACYVariable
 {
     Q_OBJECT
 private:
     void trigger (vlc_value_t, vlc_value_t) Q_DECL_OVERRIDE;
 
 public:
-    QVLCString (vlc_object_t *, const char *, bool inherit = false);
+    QVLCLEGACYString (vlc_object_t *, const char *, bool inherit = false);
     bool addCallback (QObject *, const char *,
                       Qt::ConnectionType type = Qt::AutoConnection);
 

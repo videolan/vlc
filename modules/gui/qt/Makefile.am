@@ -52,7 +52,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/recents.cpp gui/qt/recents.hpp \
 	gui/qt/adapters/seekpoints.cpp gui/qt/adapters/seekpoints.hpp \
 	gui/qt/adapters/chromaprint.cpp gui/qt/adapters/chromaprint.hpp \
-	gui/qt/adapters/variables.cpp gui/qt/adapters/variables.hpp \
+	gui/qt/adapters/legacy_variables.cpp gui/qt/adapters/legacy_variables.hpp \
 	gui/qt/dialogs/playlist.cpp gui/qt/dialogs/playlist.hpp \
 	gui/qt/dialogs/bookmarks.cpp gui/qt/dialogs/bookmarks.hpp \
 	gui/qt/dialogs/preferences.cpp gui/qt/dialogs/preferences.hpp \
@@ -176,7 +176,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/recents.moc.cpp \
 	gui/qt/adapters/seekpoints.moc.cpp \
 	gui/qt/adapters/chromaprint.moc.cpp \
-	gui/qt/adapters/variables.moc.cpp \
+	gui/qt/adapters/legacy_variables.moc.cpp \
 	gui/qt/dialogs/playlist.moc.cpp \
 	gui/qt/dialogs/bookmarks.moc.cpp \
 	gui/qt/dialogs/mediainfo.moc.cpp \

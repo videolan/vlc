@@ -638,8 +638,8 @@ modules/gui/qt/adapters/chromaprint.cpp
 modules/gui/qt/adapters/chromaprint.hpp
 modules/gui/qt/adapters/seekpoints.cpp
 modules/gui/qt/adapters/seekpoints.hpp
-modules/gui/qt/adapters/variables.cpp
-modules/gui/qt/adapters/variables.hpp
+modules/gui/qt/adapters/legacy_variables.cpp
+modules/gui/qt/adapters/legacy_variables.hpp
 modules/gui/qt/components/complete_preferences.cpp
 modules/gui/qt/components/complete_preferences.hpp
 modules/gui/qt/components/controller.cpp
