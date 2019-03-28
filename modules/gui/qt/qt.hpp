@@ -75,13 +75,13 @@ struct intf_sys_t
 
     unsigned voutWindowType; /* Type of vout_window_t provided */
     bool b_isDialogProvider; /* Qt mode or Skins mode */
-    playlist_t *p_playlist;  /* playlist */
+    playlist_t *p_playlist_legacy;  /* playlist */
 #ifdef _WIN32
     bool disable_volume_keys;
 #endif
 };
 
-#define THEPL p_intf->p_sys->p_playlist
+#define THEPL p_intf->p_sys->p_playlist_legacy
 
 /**
  * This class may be used for scope-bound locking/unlocking

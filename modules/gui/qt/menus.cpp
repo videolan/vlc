@@ -43,8 +43,8 @@
 #include "actions_manager.hpp"                    /* Actions Management: play+volume */
 #include "extensions_manager.hpp"                 /* Extensions menu */
 #include "util/qmenuview.hpp"                     /* Simple Playlist menu */
-#include "components/playlist/playlist_model.hpp" /* PLModel getter */
-#include "components/playlist/standardpanel.hpp"  /* PLView getter */
+#include "components/playlist_legacy/playlist_model.hpp" /* PLModel getter */
+#include "components/playlist_legacy/standardpanel.hpp"  /* PLView getter */
 #include "components/extended_panels.hpp"
 
 #include <QMenu>

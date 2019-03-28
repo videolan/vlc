@@ -27,7 +27,7 @@
 #endif
 
 #include "qt.hpp"
-#include "components/playlist/playlist_model.hpp"
+#include "components/playlist_legacy/playlist_model.hpp"
 #include "input_manager.hpp"                            /* THEMIM */
 #include "util/qt_dirs.hpp"
 #include "recents.hpp"                                  /* Open:: */

@@ -46,7 +46,7 @@
 #include <QPersistentModelIndex>
 #include <QList>
 
-#include "../components/playlist/playlist_model.hpp" /* getArtPixmap etc */
+#include "../components/playlist_legacy/playlist_model.hpp" /* getArtPixmap etc */
 
 
 class PictureFlowPrivate;

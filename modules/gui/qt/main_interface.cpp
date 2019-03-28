@@ -39,7 +39,7 @@
 
 #include "components/interface_widgets.hpp"     // bgWidget, videoWidget
 #include "components/controller.hpp"            // controllers
-#include "components/playlist/playlist.hpp"     // plWidget
+#include "components/playlist_legacy/playlist.hpp"     // plWidget
 #include "dialogs/firstrun.hpp"                 // First Run
 #include "dialogs/playlist.hpp"                 // PlaylistDialog
 

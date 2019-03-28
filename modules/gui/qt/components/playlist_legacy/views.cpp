@@ -20,9 +20,9 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "components/playlist/views.hpp"
-#include "components/playlist/vlc_model.hpp"      /* VLCModel */
-#include "components/playlist/sorting.h"          /* Columns List */
+#include "components/playlist_legacy/views.hpp"
+#include "components/playlist_legacy/vlc_model.hpp"      /* VLCModel */
+#include "components/playlist_legacy/sorting.h"          /* Columns List */
 #include "input_manager.hpp"                      /* THEMIM */
 
 #include <QPainter>

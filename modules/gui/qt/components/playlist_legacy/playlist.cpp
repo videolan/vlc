@@ -25,10 +25,10 @@
 # include "config.h"
 #endif
 
-#include "components/playlist/playlist.hpp"
-#include "components/playlist/standardpanel.hpp"  /* MainView */
-#include "components/playlist/selector.hpp"       /* PLSelector */
-#include "components/playlist/playlist_model.hpp" /* PLModel */
+#include "components/playlist_legacy/playlist.hpp"
+#include "components/playlist_legacy/standardpanel.hpp"  /* MainView */
+#include "components/playlist_legacy/selector.hpp"       /* PLSelector */
+#include "components/playlist_legacy/playlist_model.hpp" /* PLModel */
 #include "components/interface_widgets.hpp"       /* CoverArtLabel */
 
 #include "util/searchlineedit.hpp"

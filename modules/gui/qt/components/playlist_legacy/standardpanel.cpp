@@ -25,12 +25,12 @@
 # include "config.h"
 #endif
 
-#include "components/playlist/standardpanel.hpp"
+#include "components/playlist_legacy/standardpanel.hpp"
 
-#include "components/playlist/vlc_model.hpp"      /* VLCModel */
-#include "components/playlist/playlist_model.hpp" /* PLModel */
-#include "components/playlist/views.hpp"          /* 3 views */
-#include "components/playlist/selector.hpp"       /* PLSelector */
+#include "components/playlist_legacy/vlc_model.hpp"      /* VLCModel */
+#include "components/playlist_legacy/playlist_model.hpp" /* PLModel */
+#include "components/playlist_legacy/views.hpp"          /* 3 views */
+#include "components/playlist_legacy/selector.hpp"       /* PLSelector */
 #include "util/animators.hpp"                     /* PixmapAnimator */
 #include "input_manager.hpp"                      /* THEMIM */
 #include "dialogs_provider.hpp"                   /* THEDP */

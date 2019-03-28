@@ -57,7 +57,7 @@ extern "C" char **environ;
 #include "dialogs/help.hpp"     /* Launch Update */
 #include "recents.hpp"          /* Recents Item destruction */
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
-#include "components/playlist/playlist_model.hpp" /* for ~PLModel() */
+#include "components/playlist_legacy/playlist_model.hpp" /* for ~PLModel() */
 
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
@@ -430,9 +430,9 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 
     /* set up the playlist to work on */
     if( isDialogProvider )
-        p_sys->p_playlist = pl_Get( (intf_thread_t *)vlc_object_parent(p_intf) );
+        p_sys->p_playlist_legacy = pl_Get( (intf_thread_t *)vlc_object_parent(p_intf) );
     else
-        p_sys->p_playlist = pl_Get( p_intf );
+        p_sys->p_playlist_legacy = pl_Get( p_intf );
 
     /* */
     vlc_sem_init (&ready, 0);

@@ -23,7 +23,7 @@
 #include "qt.hpp"
 #include "util/qmenuview.hpp"
 
-#include "components/playlist/vlc_model.hpp" /* data( IsCurrentRole ) */
+#include "components/playlist_legacy/vlc_model.hpp" /* data( IsCurrentRole ) */
 
 #include <QFont>
 #include <QVariant>

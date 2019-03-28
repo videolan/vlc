@@ -20,16 +20,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_QT_STANDARDPANEL_HPP_
-#define VLC_QT_STANDARDPANEL_HPP_
+#ifndef VLC_QT_STANDARDPANEL_LEGACY_HPP_
+#define VLC_QT_STANDARDPANEL_LEGACY_HPP_
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include "qt.hpp"
-#include "components/playlist/playlist.hpp"
-#include "components/playlist/vlc_model.hpp"
+#include "components/playlist_legacy/playlist.hpp"
+#include "components/playlist_legacy/vlc_model.hpp"
 
 #include <QWidget>
 #include <QModelIndexList>
