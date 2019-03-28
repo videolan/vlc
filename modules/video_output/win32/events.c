@@ -1017,11 +1017,6 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         SetAbove( p_event, wParam != 0);
         return 0;
 
-    case WM_PAINT:
-    case WM_NCPAINT:
-    case WM_ERASEBKGND:
-        return DefWindowProc(hwnd, message, wParam, lParam);
-
     case WM_KILLFOCUS:
         return 0;
 
