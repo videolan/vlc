@@ -623,7 +623,10 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
     int i_version;
     bool b_single_extension;
 
-    if( !p_psm || p_buffer[3] != PS_STREAM_ID_MAP )
+    // Demux() checks that we have at least 4 bytes, but we need
+    // at least 10 to read up to the info_length field
+    assert(i_buffer >= 4);
+    if( !p_psm || i_buffer < 10 || p_buffer[3] != PS_STREAM_ID_MAP)
         return VLC_EGENERIC;
 
     i_length = GetWBE(&p_buffer[4]) + 6;
