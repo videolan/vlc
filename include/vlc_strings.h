@@ -140,7 +140,7 @@ VLC_USED VLC_MALLOC;
  */
 VLC_API char *vlc_b64_encode(const char *str) VLC_USED VLC_MALLOC;
 
-VLC_API size_t vlc_b64_decode_binary_to_buffer( uint8_t *p_dst, size_t i_dst_max, const char *psz_src );
+VLC_API size_t vlc_b64_decode_binary_to_buffer(void *p_dst, size_t i_dst_max, const char *psz_src );
 VLC_API size_t vlc_b64_decode_binary( uint8_t **pp_dst, const char *psz_src );
 VLC_API char * vlc_b64_decode( const char *psz_src );
 

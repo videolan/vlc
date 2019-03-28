@@ -403,9 +403,10 @@ char *vlc_b64_encode(const char *src)
 }
 
 /* Base64 decoding */
-size_t vlc_b64_decode_binary_to_buffer( uint8_t *p_dst, size_t i_dst, const char *p_src )
+size_t vlc_b64_decode_binary_to_buffer(void *dst, size_t size,
+                                       const char *restrict src)
 {
-    static const int b64[256] = {
+    static const signed char b64[256] = {
         -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 00-0F */
         -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 10-1F */
         -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,62,-1,-1,-1,63,  /* 20-2F */
@@ -421,42 +422,32 @@ size_t vlc_b64_decode_binary_to_buffer( uint8_t *p_dst, size_t i_dst, const char
         -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* C0-CF */
         -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* D0-DF */
         -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* E0-EF */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1   /* F0-FF */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* F0-FF */
     };
-    uint8_t *p_start = p_dst;
-    uint8_t *p = (uint8_t *)p_src;
+    const unsigned char *in = (const unsigned char *)src;
+    unsigned char *out = dst;
+    signed char prev;
+    int shift = 0;
 
-    int i_level;
-    int i_last;
+    static_assert (CHAR_BIT == 8, "Oops");
 
-    for( i_level = 0, i_last = 0; (size_t)( p_dst - p_start ) < i_dst && *p != '\0'; p++ )
-    {
-        const int c = b64[(unsigned int)*p];
-        if( c == -1 )
+    while (size > 0) {
+        const signed char cur = b64[*(in++)];
+        if (cur < 0)
             break;
 
-        switch( i_level )
-        {
-            case 0:
-                i_level++;
-                break;
-            case 1:
-                *p_dst++ = ( i_last << 2 ) | ( ( c >> 4)&0x03 );
-                i_level++;
-                break;
-            case 2:
-                *p_dst++ = ( ( i_last << 4 )&0xf0 ) | ( ( c >> 2 )&0x0f );
-                i_level++;
-                break;
-            case 3:
-                *p_dst++ = ( ( i_last &0x03 ) << 6 ) | c;
-                i_level = 0;
+        if (shift != 0) {
+            *(out++) = (prev << shift) | (cur >> (6 - shift));
+            size--;
         }
-        i_last = c;
+
+        prev = cur;
+        shift = (shift + 2) & 7;
     }
 
-    return p_dst - p_start;
+    return out - (unsigned char *)dst;
 }
+
 size_t vlc_b64_decode_binary( uint8_t **pp_dst, const char *psz_src )
 {
     const int i_src = strlen( psz_src );
