@@ -73,7 +73,8 @@ static inline void test_decode (const char *in, const char *out)
 
 static inline void test_b64 (const char *in, const char *out)
 {
-    test (vlc_b64_encode, in, out);
+    test(vlc_b64_encode, in, out);
+    test(vlc_b64_decode, out, in);
 }
 
 static char *make_URI_def (const char *in)
