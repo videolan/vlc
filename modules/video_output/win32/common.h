@@ -84,8 +84,3 @@ int  CommonControl(vout_display_t *, display_win32_area_t *, vout_display_sys_wi
 void UpdateRects (vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *);
 
 void InitArea(vout_display_t *, display_win32_area_t *, const vout_display_cfg_t *);
-
-/*****************************************************************************
- * Constants
- *****************************************************************************/
-#define IDM_TOGGLE_ON_TOP  (WM_USER + 1)

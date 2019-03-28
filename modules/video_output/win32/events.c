@@ -38,7 +38,6 @@
 #include <stdatomic.h>
 #include <windows.h>
 #include <windowsx.h>                                        /* GET_X_LPARAM */
-#include <shellapi.h>                                         /* ExtractIcon */
 
 #include "common.h"
 
@@ -90,8 +89,6 @@ struct event_thread_t
     HWND hvideownd;
     HWND hfswnd;
     vout_display_place_t place;
-
-    HICON vlc_icon;
 
     atomic_bool size_changed;
 };
@@ -731,9 +728,7 @@ static int CreateVideoWindow( event_thread_t *p_event )
 static int Win32VoutCreateWindow( event_thread_t *p_event )
 {
     HINSTANCE  hInstance;
-    HMENU      hMenu;
     WNDCLASS   wc;                            /* window class components */
-    WCHAR      vlc_path[MAX_PATH];
     int        i_style;
 
     msg_Dbg( p_event->obj, "Win32VoutCreateWindow" );
@@ -758,12 +753,6 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     p_event->cursor_arrow = LoadCursor(NULL, IDC_ARROW);
     p_event->cursor_empty = EmptyCursor(hInstance);
 
-    /* Get the Icon from the main app */
-    p_event->vlc_icon = NULL;
-    if( GetModuleFileName( NULL, vlc_path, MAX_PATH ) )
-    {
-        p_event->vlc_icon = ExtractIcon( hInstance, vlc_path, 0 );
-    }
     p_event->hide_timeout = var_InheritInteger( p_event->obj, "mouse-hide-timeout" );
     UpdateCursorMoved( p_event );
 
@@ -773,7 +762,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     wc.cbClsExtra    = 0;                         /* no extra class data */
     wc.cbWndExtra    = 0;                        /* no extra window data */
     wc.hInstance     = hInstance;                            /* instance */
-    wc.hIcon         = p_event->vlc_icon;       /* load the vlc big icon */
+    wc.hIcon         = 0;
     wc.hCursor       = p_event->is_cursor_hidden ? p_event->cursor_empty :
                                                    p_event->cursor_arrow;
 #if !VLC_WINSTORE_APP
@@ -787,9 +776,6 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     /* Register the window class */
     if( !RegisterClass(&wc) )
     {
-        if( p_event->vlc_icon )
-            DestroyIcon( p_event->vlc_icon );
-
         msg_Err( p_event->obj, "Win32VoutCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
         return VLC_EGENERIC;
     }
@@ -866,12 +852,6 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         p_event->hfswnd = NULL;
     }
 
-    /* Append a "Always On Top" entry in the system menu */
-    hMenu = GetSystemMenu( p_event->hwnd, FALSE );
-    AppendMenu( hMenu, MF_SEPARATOR, 0, TEXT("") );
-    AppendMenu( hMenu, MF_STRING | MF_UNCHECKED,
-                       IDM_TOGGLE_ON_TOP, TEXT("Always on &Top") );
-
     int err = CreateVideoWindow( p_event );
     if ( err != VLC_SUCCESS )
         return err;
@@ -904,24 +884,9 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
     UnregisterClass( p_event->class_video, hInstance );
     UnregisterClass( p_event->class_main, hInstance );
 
-    if( p_event->vlc_icon )
-        DestroyIcon( p_event->vlc_icon );
-
     DestroyCursor( p_event->cursor_empty );
 
     CloseGestures( p_event->p_gesture);
-}
-
-static void SetAbove( event_thread_t *p_event, bool is_on_top )
-{
-    HMENU hMenu = GetSystemMenu(p_event->hwnd, FALSE);
-    if (is_on_top && !(GetWindowLong(p_event->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
-        CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_CHECKED);
-        SetWindowPos(p_event->hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-    } else if (!is_on_top && (GetWindowLong(p_event->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
-        CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_UNCHECKED);
-        SetWindowPos(p_event->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE);
-    }
 }
 
 /*****************************************************************************
@@ -981,26 +946,6 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         /* just destroy the window */
         PostQuitMessage( 0 );
         return 0;
-
-    case WM_SYSCOMMAND:
-        switch (wParam)
-        {
-        case IDM_TOGGLE_ON_TOP:            /* toggle the "on top" status */
-        {
-            msg_Dbg(p_event->obj, "WinProc WM_SYSCOMMAND: IDM_TOGGLE_ON_TOP");
-            HMENU hMenu = GetSystemMenu(p_event->hwnd, FALSE);
-            const bool is_on_top = (GetMenuState(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND) & MF_CHECKED) == 0;
-#ifdef MODULE_NAME_IS_direct3d9
-            if (p_event->use_desktop && is_on_top)
-                return 0;
-#endif
-            SetAbove( p_event, is_on_top);
-            return 0;
-        }
-        default:
-            break;
-        }
-        break;
 
     case WM_VLC_SET_TOP_STATE:
         SetAbove( p_event, wParam != 0);
