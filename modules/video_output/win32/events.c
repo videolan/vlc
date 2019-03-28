@@ -886,35 +886,19 @@ static void SetAbove( event_thread_t *p_event, bool is_on_top )
 static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
                                          WPARAM wParam, LPARAM lParam )
 {
-    event_thread_t *p_event;
-
     if( message == WM_CREATE )
     {
-        /* Store vd for future use */
-        p_event = (event_thread_t *)((CREATESTRUCT *)lParam)->lpCreateParams;
-        SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)p_event );
-        return TRUE;
-    }
-    else
-    {
-        LONG_PTR p_user_data = GetWindowLongPtr( hwnd, GWLP_USERDATA );
-        p_event = (event_thread_t *)p_user_data;
-        if( !p_event )
-        {
-            /* Hmmm mozilla does manage somehow to save the pointer to our
-             * windowproc and still calls it after the vout has been closed. */
-            return DefWindowProc(hwnd, message, wParam, lParam);
-        }
+        /* Store p_event for future use */
+        CREATESTRUCT *c = (CREATESTRUCT *)lParam;
+        SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)c->lpCreateParams );
+        return 0;
     }
 
-#if 0
-    if( message == WM_SETCURSOR )
-    {
-        msg_Err(p_event->obj, "WM_SETCURSOR: %d (t2)", p_event->is_cursor_hidden);
-        SetCursor( p_event->is_cursor_hidden ? p_event->cursor_empty : p_event->cursor_arrow );
-        return 1;
-    }
-#endif
+    LONG_PTR p_user_data = GetWindowLongPtr( hwnd, GWLP_USERDATA );
+    if( p_user_data == 0 ) /* messages before WM_CREATE */
+        return DefWindowProc(hwnd, message, wParam, lParam);
+    event_thread_t *p_event = (event_thread_t *)p_user_data;
+
     if( message == WM_CAPTURECHANGED )
     {
         for( int button = 0; p_event->button_pressed; button++ )
