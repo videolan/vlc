@@ -103,7 +103,11 @@ static int Enable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
         i_window_style |= WS_DISABLED;
     SetWindowLong(sys->hwnd, GWL_STYLE, i_window_style);
 
+    if (cfg->x || cfg->y)
+        MoveWindow(sys->hwnd, cfg->x, cfg->y, cfg->width, cfg->height, TRUE);
+
     Resize(wnd, cfg->width, cfg->height);
+
     ShowWindow( sys->hwnd, SW_SHOW );
     return VLC_SUCCESS;
 }

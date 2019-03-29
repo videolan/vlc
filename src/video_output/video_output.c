@@ -1853,7 +1853,7 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
             .is_fullscreen = var_GetBool(vout, "fullscreen"),
             .is_decorated = var_InheritBool(vout, "video-deco"),
         // TODO: take pixel A/R, crop and zoom into account
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(_WIN32)
             .x = var_InheritInteger(vout, "video-x"),
             .y = var_InheritInteger(vout, "video-y"),
 #endif

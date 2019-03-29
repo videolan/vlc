@@ -154,7 +154,7 @@ typedef struct vout_window_cfg_t {
      */
     bool is_decorated;
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(_WIN32)
     /* Window position hint */
     int x;
     int y;
