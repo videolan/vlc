@@ -636,7 +636,10 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     hInstance = GetModuleHandle(NULL);
 
     /* If an external window was specified, we'll draw in it. */
-    p_event->hparent = p_event->parent_window->handle.hwnd;
+    if ( p_event->parent_window->type == VOUT_WINDOW_TYPE_HWND )
+        p_event->hparent = p_event->parent_window->handle.hwnd;
+    else
+        p_event->hparent = NULL;
     p_event->cursor_arrow = LoadCursor(NULL, IDC_ARROW);
     p_event->cursor_empty = EmptyCursor(hInstance);
 
