@@ -417,12 +417,6 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
     TAB_APPEND(p_resource->i_vout, p_resource->pp_vout, vout);
     vlc_mutex_unlock(&p_resource->lock_hold);
 
-    if (p_resource->p_input != NULL)
-        input_SendEventVout(p_resource->p_input,
-            &(struct vlc_input_event_vout) {
-                .action = VLC_INPUT_EVENT_VOUT_ADDED,
-                .vout = vout,
-            });
 out:
     vlc_mutex_unlock( &p_resource->lock );
     return vout;
@@ -439,13 +433,6 @@ void input_resource_PutVout(input_resource_t *p_resource,
 
     const int active_vouts = p_resource->i_vout;
     vlc_mutex_unlock(&p_resource->lock_hold);
-
-    if (p_resource->p_input != NULL)
-        input_SendEventVout(p_resource->p_input,
-            &(struct vlc_input_event_vout) {
-                .action = VLC_INPUT_EVENT_VOUT_DELETED,
-                .vout = vout,
-            });
 
     if (p_resource->p_vout_free != NULL || active_vouts > 0) {
         msg_Dbg(p_resource->p_parent, "destroying vout (already one saved or active)");

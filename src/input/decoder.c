@@ -540,6 +540,12 @@ static int vout_update_format( decoder_t *p_dec )
                 .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
                 .mouse_event = MouseEvent, .mouse_opaque = p_dec
             } );
+        if (p_vout)
+            input_SendEventVout(p_owner->p_input,
+                &(struct vlc_input_event_vout) {
+                    .action = VLC_INPUT_EVENT_VOUT_ADDED,
+                    .vout = p_vout,
+                });
 
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_vout = p_vout;
@@ -1943,6 +1949,11 @@ static void DeleteDecoder( decoder_t * p_dec )
                  * thread */
                 vout_Cancel( p_owner->p_vout, false );
 
+                input_SendEventVout(p_owner->p_input,
+                    &(struct vlc_input_event_vout) {
+                        .action = VLC_INPUT_EVENT_VOUT_DELETED,
+                        .vout = p_owner->p_vout,
+                    });
                 input_resource_PutVout( p_owner->p_resource, p_owner->p_vout );
             }
             break;
