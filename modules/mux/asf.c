@@ -42,7 +42,6 @@
 #include "../demux/asf/libasf_guid.h"
 
 #define MAX_ASF_TRACKS 128
-#define ASF_DATA_PACKET_SIZE 4096  // deprecated -- added sout-asf-packet-size
 
 /*****************************************************************************
  * Module descriptor
