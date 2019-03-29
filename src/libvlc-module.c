@@ -1660,10 +1660,12 @@ vlc_module_begin ()
         change_safe ()
     add_integer( "height", -1, HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
         change_safe ()
+#if defined(__APPLE__) || defined(_WIN32)
     add_integer( "video-x", 0, VIDEOX_TEXT, VIDEOX_LONGTEXT, true )
         change_safe ()
     add_integer( "video-y", 0, VIDEOY_TEXT, VIDEOY_LONGTEXT, true )
         change_safe ()
+#endif
     add_string( "crop", NULL, CROP_TEXT, CROP_LONGTEXT, false )
         change_safe ()
     add_string( "custom-crop-ratios", NULL, CUSTOM_CROP_RATIOS_TEXT,
