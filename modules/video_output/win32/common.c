@@ -376,7 +376,7 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
             AdjustWindowRect(&rect_window, EventThreadGetWindowStyle(sys->event), 0);
             SetWindowPos(sys->hwnd, 0, 0, 0,
                          RECTWidth(rect_window),
-                         RECTHeight(rect_window), SWP_NOMOVE);
+                         RECTHeight(rect_window), SWP_NOZORDER|SWP_NOMOVE);
         }
 #endif /* !VLC_WINSTORE_APP */
         UpdateRects(vd, area, sys);
