@@ -491,10 +491,10 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         BOOL b_found_key = NO;
         NSUInteger numberOfUsedHotkeys = [_usedHotkeys count];
         for (NSUInteger i = 0; i < numberOfUsedHotkeys; i++) {
-            NSString *str = [_usedHotkeys objectAtIndex:i];
-            unsigned int i_keyModifiers = VLCModifiersToCocoa(str);
+            const char *str = [[_usedHotkeys objectAtIndex:i] UTF8String];
+            unsigned int i_keyModifiers = VLCModifiersToCocoa((char *)str);
 
-            if ([[characters lowercaseString] isEqualToString: VLCKeyToString(str)] &&
+            if ([[characters lowercaseString] isEqualToString:VLCKeyToString((char *)str)] &&
                 (i_keyModifiers & NSShiftKeyMask)     == (i_pressed_modifiers & NSShiftKeyMask) &&
                 (i_keyModifiers & NSControlKeyMask)   == (i_pressed_modifiers & NSControlKeyMask) &&
                 (i_keyModifiers & NSAlternateKeyMask) == (i_pressed_modifiers & NSAlternateKeyMask) &&

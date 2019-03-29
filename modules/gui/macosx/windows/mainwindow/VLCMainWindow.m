@@ -86,50 +86,46 @@ static const float f_min_window_height = 307.;
 #pragma mark -
 #pragma mark Initialization
 
-- (BOOL)isEvent:(NSEvent *)o_event forKey:(const char *)keyString
+- (BOOL)isEvent:(NSEvent *)anEvent forKey:(const char *)keyString
 {
-    char *key;
-    NSString *o_key;
-
-    key = config_GetPsz(keyString);
-    o_key = [NSString stringWithFormat:@"%s", key];
+    char *key = config_GetPsz(keyString);
+    unsigned int keyModifiers = VLCModifiersToCocoa(key);
+    NSString *vlcKeyString = VLCKeyToString(key);
     FREENULL(key);
 
-    unsigned int i_keyModifiers = VLCModifiersToCocoa(o_key);
-
-    NSString * characters = [o_event charactersIgnoringModifiers];
+    NSString *characters = [anEvent charactersIgnoringModifiers];
     if ([characters length] > 0) {
-        return [[characters lowercaseString] isEqualToString: VLCKeyToString(o_key)] &&
-                (i_keyModifiers & NSShiftKeyMask)     == ([o_event modifierFlags] & NSShiftKeyMask) &&
-                (i_keyModifiers & NSControlKeyMask)   == ([o_event modifierFlags] & NSControlKeyMask) &&
-                (i_keyModifiers & NSAlternateKeyMask) == ([o_event modifierFlags] & NSAlternateKeyMask) &&
-                (i_keyModifiers & NSCommandKeyMask)   == ([o_event modifierFlags] & NSCommandKeyMask);
+        return [[characters lowercaseString] isEqualToString: vlcKeyString] &&
+        (keyModifiers & NSShiftKeyMask)     == ([anEvent modifierFlags] & NSShiftKeyMask) &&
+        (keyModifiers & NSControlKeyMask)   == ([anEvent modifierFlags] & NSControlKeyMask) &&
+        (keyModifiers & NSAlternateKeyMask) == ([anEvent modifierFlags] & NSAlternateKeyMask) &&
+        (keyModifiers & NSCommandKeyMask)   == ([anEvent modifierFlags] & NSCommandKeyMask);
     }
     return NO;
 }
 
-- (BOOL)performKeyEquivalent:(NSEvent *)o_event
+- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
     BOOL b_force = NO;
     // these are key events which should be handled by vlc core, but are attached to a main menu item
-    if (![self isEvent: o_event forKey: "key-vol-up"] &&
-        ![self isEvent: o_event forKey: "key-vol-down"] &&
-        ![self isEvent: o_event forKey: "key-vol-mute"] &&
-        ![self isEvent: o_event forKey: "key-prev"] &&
-        ![self isEvent: o_event forKey: "key-next"] &&
-        ![self isEvent: o_event forKey: "key-jump+short"] &&
-        ![self isEvent: o_event forKey: "key-jump-short"]) {
+    if (![self isEvent: anEvent forKey: "key-vol-up"] &&
+        ![self isEvent: anEvent forKey: "key-vol-down"] &&
+        ![self isEvent: anEvent forKey: "key-vol-mute"] &&
+        ![self isEvent: anEvent forKey: "key-prev"] &&
+        ![self isEvent: anEvent forKey: "key-next"] &&
+        ![self isEvent: anEvent forKey: "key-jump+short"] &&
+        ![self isEvent: anEvent forKey: "key-jump-short"]) {
         /* We indeed want to prioritize some Cocoa key equivalent against libvlc,
          so we perform the menu equivalent now. */
-        if ([[NSApp mainMenu] performKeyEquivalent:o_event])
+        if ([[NSApp mainMenu] performKeyEquivalent:anEvent])
             return TRUE;
-    }
-    else
+    } else {
         b_force = YES;
+    }
 
     VLCCoreInteraction *coreInteraction = [VLCCoreInteraction sharedInstance];
-    return [coreInteraction hasDefinedShortcutKey:o_event force:b_force] ||
-           [coreInteraction keyEvent:o_event];
+    return [coreInteraction hasDefinedShortcutKey:anEvent force:b_force] ||
+           [coreInteraction keyEvent:anEvent];
 }
 
 - (void)dealloc

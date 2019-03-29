@@ -409,8 +409,13 @@ NSString * OSXStringKeyToString(NSString *theString)
     return theString;
 }
 
-NSString * VLCKeyToString(NSString *theString)
+NSString * VLCKeyToString(char *theChar)
 {
+    if (theChar == NULL) {
+        return @"";
+    }
+    NSString *theString = toNSStr(theChar);
+
     if (![theString isEqualToString:@""]) {
         if ([theString characterAtIndex:([theString length] - 1)] != 0x2b)
             theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
@@ -497,17 +502,18 @@ NSString * VLCKeyToString(NSString *theString)
     return theString;
 }
 
-unsigned int VLCModifiersToCocoa(NSString *theString)
+unsigned int VLCModifiersToCocoa(char *theChar)
 {
     unsigned int new = 0;
 
-    if ([theString rangeOfString:@"Command"].location != NSNotFound)
+    if (strstr(theChar, "Command") != NULL)
         new |= NSCommandKeyMask;
-    if ([theString rangeOfString:@"Alt"].location != NSNotFound)
+    if (strstr(theChar, "Alt") != NULL)
         new |= NSAlternateKeyMask;
-    if ([theString rangeOfString:@"Shift"].location != NSNotFound)
+    if (strstr(theChar, "Shift") != NULL)
         new |= NSShiftKeyMask;
-    if ([theString rangeOfString:@"Ctrl"].location != NSNotFound)
+    if (strstr(theChar, "Ctrl") != NULL)
         new |= NSControlKeyMask;
+
     return new;
 }

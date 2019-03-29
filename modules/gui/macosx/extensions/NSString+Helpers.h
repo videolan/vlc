@@ -189,9 +189,9 @@ NSString * OSXStringKeyToString(NSString *theString);
 /**
  * Converts VLC key string to cocoa modifiers which can be used as setKeyEquivalent for menu items
  */
-NSString * VLCKeyToString(NSString *theString);
+NSString * VLCKeyToString(char *theChar);
 
 /**
  * Converts VLC key to cocoa string which can be used as setKeyEquivalentModifierMask for menu items
  */
-unsigned int VLCModifiersToCocoa(NSString *theString);
+unsigned int VLCModifiersToCocoa(char *theChar);
