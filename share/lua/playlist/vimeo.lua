@@ -82,10 +82,29 @@ function parse()
         return { { path = path; name = name; artist = artist; arturl = arturl; duration = duration } }
 
     else -- Video web page
-        local path = string.gsub( vlc.path, "^vimeo%.com/channels/.-/(%d+)", "/%1" )
-        local video_id = string.match( path, "/(%d+)" )
+        local api
+        while true do
+            local line = vlc.readline()
+            if not line then break end
 
-        local api = vlc.access.."://player.vimeo.com/video/"..video_id.."/config"
+            if string.match( line, "clip_page_config = {" ) then
+                api = string.match( line, '"config_url":"(.-)"' )
+                if api then
+                    api = string.gsub( api, "\\/", "/" )
+                    break
+                end
+            end
+        end
+
+        if not api then
+            vlc.msg.warn( "Couldn't extract vimeo API URL, falling back to preprogrammed URL pattern" )
+
+            local path = string.gsub( vlc.path, "^vimeo%.com/channels/.-/(%d+)", "/%1" )
+            local video_id = string.match( path, "/(%d+)" )
+
+            api = vlc.access.."://player.vimeo.com/video/"..video_id.."/config"
+        end
+
         return { { path = api } }
     end
 end
