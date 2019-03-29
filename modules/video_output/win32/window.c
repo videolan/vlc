@@ -40,7 +40,7 @@
 #define RECTHeight(r)  (LONG)((r).bottom - (r).top)
 
 #define WM_VLC_CHANGE_TEXT   (WM_APP + 1)
-#define WM_VLC_SET_ON_TOP    (WM_APP + 2)
+#define WM_VLC_SET_TOP_STATE (WM_APP + 2)
 
 #define IDM_TOGGLE_ON_TOP  (WM_USER + 1)
 
@@ -120,17 +120,8 @@ static void Disable(struct vout_window_t *wnd)
 
 static void SetState(vout_window_t *wnd, unsigned state)
 {
-    enum vout_window_state wstate = state;
     vout_window_sys_t *sys = wnd->sys;
-    switch (wstate)
-    {
-    case VOUT_WINDOW_STATE_ABOVE:
-        PostMessage( sys->hwnd, WM_VLC_SET_ON_TOP, TRUE, 0);
-        break;
-    case VOUT_WINDOW_STATE_NORMAL:
-        PostMessage( sys->hwnd, WM_VLC_SET_ON_TOP, FALSE, 0);
-        break;
-    }
+    PostMessage( sys->hwnd, WM_VLC_SET_TOP_STATE, state, 0);
 }
 
 static void SetTitle(vout_window_t *wnd, const char *title)
@@ -192,15 +183,30 @@ static void UnsetFullscreen(vout_window_t *wnd)
     ShowWindow(sys->hwnd, SW_SHOWNORMAL);
 }
 
-static void SetAbove( HWND hwnd, bool is_on_top )
+static void SetAbove( vout_window_t *wnd, enum vout_window_state state )
 {
-    HMENU hMenu = GetSystemMenu(hwnd, FALSE);
-    if (is_on_top && !(GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
-        CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_CHECKED);
-        SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-    } else if (!is_on_top && (GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
-        CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_UNCHECKED);
-        SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE);
+    vout_window_sys_t *sys = wnd->sys;
+    switch (state) {
+    case VOUT_WINDOW_STATE_NORMAL:
+        if ((GetWindowLong(sys->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST))
+        {
+            HMENU hMenu = GetSystemMenu(sys->hwnd, FALSE);
+            CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_UNCHECKED);
+            SetWindowPos(sys->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE);
+        }
+        break;
+    case VOUT_WINDOW_STATE_ABOVE:
+        if (!(GetWindowLong(sys->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST))
+        {
+            HMENU hMenu = GetSystemMenu(sys->hwnd, FALSE);
+            CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_CHECKED);
+            SetWindowPos(sys->hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+        }
+        break;
+    case VOUT_WINDOW_STATE_BELOW:
+        SetWindowPos(sys->hwnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+        break;
+
     }
 }
 
@@ -261,8 +267,8 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         }
         break;
 
-    case WM_VLC_SET_ON_TOP:
-        SetAbove( hwnd, wParam != 0);
+    case WM_VLC_SET_TOP_STATE:
+        SetAbove( wnd, (enum vout_window_state) wParam);
         return 0;
 
     case WM_VLC_CHANGE_TEXT:
@@ -323,6 +329,44 @@ static void Close(vout_window_t *wnd)
     wnd->sys = NULL;
 }
 
+#if !VLC_WINSTORE_APP
+static int CALLBACK enumWindowsProc(HWND hwnd, LPARAM lParam)
+{
+    HWND *wnd = (HWND *)lParam;
+
+    char name[128];
+    name[0] = '\0';
+    GetClassNameA( hwnd, name, 128 );
+
+    if( !strcasecmp( name, "WorkerW" ) )
+    {
+        hwnd = FindWindowEx( hwnd, NULL, _T("SHELLDLL_DefView"), NULL );
+        if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SysListView32"), NULL );
+        if( hwnd )
+        {
+            *wnd = hwnd;
+            return false;
+        }
+    }
+    return true;
+}
+
+static HWND GetDesktopHandle(vlc_object_t *obj)
+{
+    /* Find Program Manager */
+    HWND hwnd = FindWindow( _T("Progman"), NULL );
+    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SHELLDLL_DefView"), NULL );
+    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SysListView32"), NULL );
+    if( hwnd )
+        return hwnd;
+
+    msg_Dbg( obj, "Couldn't find desktop icon window,. Trying the hard way." );
+
+    EnumWindows( enumWindowsProc, (LPARAM)&hwnd );
+    return hwnd;
+}
+#endif
+
 static void *EventThread( void *p_this )
 {
     vout_window_t *wnd = (vout_window_t *)p_this;
@@ -332,7 +376,20 @@ static void *EventThread( void *p_this )
 
     HINSTANCE hInstance = GetModuleHandle(NULL);
 
-    LONG i_window_style = WS_OVERLAPPEDWINDOW | WS_SIZEBOX | WS_CLIPCHILDREN;
+    LONG i_window_style;
+    HWND hwParent;
+#if !VLC_WINSTORE_APP
+    if (var_InheritBool( wnd, "video-wallpaper" ))
+    {
+        hwParent = GetDesktopHandle(p_this);
+        i_window_style = WS_CLIPCHILDREN|WS_CHILD;
+    }
+    else
+#endif
+    {
+        hwParent = 0;
+        i_window_style = WS_OVERLAPPEDWINDOW | WS_SIZEBOX | WS_CLIPCHILDREN;
+    }
 
     /* allow user to regain control over input events if requested */
     bool b_mouse_support = var_InheritBool( wnd, "mouse-events" );
@@ -350,7 +407,7 @@ static void *EventThread( void *p_this )
                     CW_USEDEFAULT,                   /* default Y coordinate */
                     CW_USEDEFAULT,                           /* window width */
                     CW_USEDEFAULT,                          /* window height */
-                    0,                                      /* parent window */
+                    hwParent,                               /* parent window */
                     NULL,                          /* no menu in this window */
                     hInstance,            /* handle of this program instance */
                     wnd );                           /* send vd to WM_CREATE */
@@ -401,9 +458,6 @@ static const struct vout_window_operations ops = {
 
 static int Open(vout_window_t *wnd)
 {
-    if (var_InheritBool( wnd, "video-wallpaper" ))
-        return VLC_EGENERIC;
-
     vout_window_sys_t *sys = vlc_obj_calloc(VLC_OBJECT(wnd), 1, sizeof(vout_window_sys_t));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
