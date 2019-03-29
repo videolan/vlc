@@ -191,7 +191,6 @@
 #define ANETWORK_TITLE N_( "Network" )
 #define ANETWORK_HELP N_( "Advanced network settings." )
 
-/* This function is deprecated and is kept only for compatibility */
 static const struct config_category_t categories_array[] =
 {
     /* Interface */
