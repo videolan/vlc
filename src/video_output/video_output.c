@@ -1778,6 +1778,12 @@ vout_thread_t *vout_Create(vlc_object_t *object)
 
     /* Window */
     sys->display_cfg.window = vout_display_window_New(vout);
+    if (sys->display_cfg.window == NULL) {
+        spu_Destroy(sys->spu);
+        vlc_object_delete(vout);
+        return NULL;
+    }
+
     if (sys->splitter_name != NULL)
         var_Destroy(vout, "window");
     sys->window_active = false;
@@ -1788,12 +1794,6 @@ vout_thread_t *vout_Create(vlc_object_t *object)
 
     /* */
     atomic_init(&sys->refs, 0);
-
-    if (sys->display_cfg.window == NULL) {
-        spu_Destroy(sys->spu);
-        vlc_object_delete(vout);
-        return NULL;
-    }
 
     if (var_InheritBool(vout, "video-wallpaper"))
         vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_BELOW);
