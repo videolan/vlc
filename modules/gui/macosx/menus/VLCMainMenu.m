@@ -98,8 +98,8 @@
     _playerController = _playlistController.playerController;
 
     /* check whether the user runs OSX with a RTL language */
-    NSArray* languages = [NSLocale preferredLanguages];
-    NSString* preferredLanguage = [languages firstObject];
+    NSArray *languages = [NSLocale preferredLanguages];
+    NSString *preferredLanguage = [languages firstObject];
 
     if ([NSLocale characterDirectionForLanguage:preferredLanguage] == NSLocaleLanguageDirectionRightToLeft) {
         msg_Dbg(getIntf(), "adapting interface since '%s' is a RTL language", [preferredLanguage UTF8String]);
@@ -126,6 +126,7 @@
     _rendererMenuController = [[VLCRendererMenuController alloc] init];
     _rendererMenuController.rendererNoneItem = _rendererNoneItem;
     _rendererMenuController.rendererMenu = _rendererMenu;
+    [self updateTrackHandlingMenus:nil];
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
@@ -147,11 +148,19 @@
     [notificationCenter addObserver:self
                            selector:@selector(playModeChanged:)
                                name:VLCPlaybackRepeatChanged
-                             object:self];
+                             object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(playOrderChanged:)
                                name:VLCPlaybackOrderChanged
-                             object:self];
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateTrackHandlingMenus:)
+                               name:VLCPlayerTrackListChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateTrackHandlingMenus:)
+                               name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
 
     [self setupVarMenuItem:_add_intf
                     target:VLC_OBJECT(getIntf())
@@ -560,16 +569,7 @@
                                  var:"title" selector: @selector(toggleVar:)];
 
         [self setupVarMenuItem:_chapter target: (vlc_object_t *)p_input
-                                 var:"chapter" selector: @selector(toggleVar:)];
-
-        [self setupVarMenuItem:_audiotrack target: (vlc_object_t *)p_input
-                                 var:"audio-es" selector: @selector(toggleVar:)];
-
-        [self setupVarMenuItem:_videotrack target: (vlc_object_t *)p_input
-                                 var:"video-es" selector: @selector(toggleVar:)];
-
-        [self setupVarMenuItem:_subtitle_track target: (vlc_object_t *)p_input
-                                 var:"spu-es" selector: @selector(toggleVar:)];*/
+                                 var:"chapter" selector: @selector(toggleVar:)];*/
 
         audio_output_t *p_aout = [_playerController mainAudioOutput];
         if (p_aout != NULL) {
@@ -639,10 +639,7 @@
     [_program setEnabled: b_enabled];
     [_title setEnabled: b_enabled];
     [_chapter setEnabled: b_enabled];
-    [_audiotrack setEnabled: b_enabled];
     [_visual setEnabled: b_enabled];
-    [_videotrack setEnabled: b_enabled];
-    [_subtitle_track setEnabled: b_enabled];
     [_channels setEnabled: b_enabled];
     [_deinterlace setEnabled: b_enabled];
     [_deinterlace_mode setEnabled: b_enabled];
@@ -865,6 +862,69 @@
 - (IBAction)selectRenderer:(id)sender
 {
     [_rendererMenuController selectRenderer:sender];
+}
+
+#pragma mark - track handling
+- (void)updateTrackHandlingMenus:(NSNotification *)aNotification
+{
+    size_t numberOfTracks = _playerController.numberOfAudioTracks;
+    NSMutableArray *tracks = [[NSMutableArray alloc] initWithCapacity:numberOfTracks];
+    for (size_t x = 0; x < numberOfTracks; x++) {
+        [tracks addObject:[_playerController audioTrackAtIndex:x]];
+    }
+    [self rebuildTracksMenu:_audiotrackMenu withMetadata:tracks count:numberOfTracks category:AUDIO_ES];
+    _audiotrack.enabled = numberOfTracks > 0 ? YES : NO;
+
+    numberOfTracks = _playerController.numberOfVideoTracks;
+    tracks = [[NSMutableArray alloc] initWithCapacity:numberOfTracks];
+    for (size_t x = 0; x < numberOfTracks; x++) {
+        [tracks addObject:[_playerController videoTrackAtIndex:x]];
+    }
+    [self rebuildTracksMenu:_videotrackMenu withMetadata:tracks count:numberOfTracks category:VIDEO_ES];
+    _videotrack.enabled = numberOfTracks > 0 ? YES : NO;
+
+    numberOfTracks = _playerController.numberOfSubtitleTracks;
+    tracks = [[NSMutableArray alloc] initWithCapacity:numberOfTracks];
+    for (size_t x = 0; x < numberOfTracks; x++) {
+        [tracks addObject:[_playerController subtitleTrackAtIndex:x]];
+    }
+    [self rebuildTracksMenu:_subtitle_tracksMenu withMetadata:tracks count:numberOfTracks category:SPU_ES];
+    _subtitle_track.enabled = numberOfTracks > 0 ? YES : NO;
+}
+
+- (void)rebuildTracksMenu:(NSMenu *)menu withMetadata:(NSArray *)metadataArray count:(size_t)count category:(enum es_format_category_e)category
+{
+    [menu removeAllItems];
+
+    NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:_NS("Disable")
+                                                      action:@selector(unselectTrackCategory:)
+                                               keyEquivalent:@""];
+    [menuItem setTarget:self];
+    [menuItem setTag:category];
+    [menuItem setEnabled:YES];
+    [menu addItem:menuItem];
+
+    for (NSUInteger x = 0; x < count; x++) {
+        VLCTrackMetaData *metaDataItem = metadataArray[x];
+        menuItem = [[NSMenuItem alloc] initWithTitle:metaDataItem.name
+                                              action:@selector(selectTrack:)
+                                       keyEquivalent:@""];
+        [menuItem setTarget:self];
+        [menuItem setRepresentedObject:metaDataItem];
+        [menuItem setEnabled:YES];
+        [menuItem setState:metaDataItem.selected ? NSOnState : NSOffState];
+        [menu addItem:menuItem];
+    }
+}
+
+- (void)selectTrack:(NSMenuItem *)sender
+{
+    [_playerController selectTrack:[sender representedObject]];
+}
+
+- (void)unselectTrackCategory:(NSMenuItem *)sender
+{
+    [_playerController unselectTracksFromCategory:(enum es_format_category_e)sender.tag];
 }
 
 #pragma mark - audio menu
