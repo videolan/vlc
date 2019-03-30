@@ -41,6 +41,7 @@ typedef struct
     vout_window_t wnd;
     module_t *module;
     vlc_inhibit_t *inhibit;
+    bool active;
     bool fullscreen;
 } window_t;
 
@@ -67,6 +68,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     window->sys = NULL;
     assert(owner != NULL);
     window->owner = *owner;
+    w->active = false;
     w->fullscreen = false;
 
     w->module = vlc_module_load(window, "vout window", module, false,
@@ -124,6 +126,8 @@ void vout_window_SetInhibition(vout_window_t *window, bool enabled)
 {
     window_t *w = (window_t *)window;
     unsigned flags = enabled ? VLC_INHIBIT_VIDEO : VLC_INHIBIT_NONE;
+
+    w->active = enabled;
 
     if (w->inhibit != NULL)
         vlc_inhibit_Set(w->inhibit, flags);
