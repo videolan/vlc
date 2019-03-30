@@ -127,6 +127,18 @@ void vout_window_SetInhibition(vout_window_t *window, bool enabled)
         vlc_inhibit_Set(w->inhibit, flags);
 }
 
+void vout_window_ReportWindowed(vout_window_t *window)
+{
+    if (window->owner.cbs->windowed != NULL)
+        window->owner.cbs->windowed(window);
+}
+
+void vout_window_ReportFullscreen(vout_window_t *window, const char *id)
+{
+    if (window->owner.cbs->fullscreened != NULL)
+        window->owner.cbs->fullscreened(window, id);
+}
+
 /* Video output display integration */
 #include <vlc_vout.h>
 #include <vlc_vout_display.h>

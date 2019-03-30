@@ -575,23 +575,14 @@ static inline void vout_window_ReportState(vout_window_t *window,
  * This notifies the owner of the window that the window is windowed, i.e. not
  * in full screen mode.
  */
-static inline void vout_window_ReportWindowed(vout_window_t *window)
-{
-    if (window->owner.cbs->windowed != NULL)
-        window->owner.cbs->windowed(window);
-}
+VLC_API void vout_window_ReportWindowed(vout_window_t *wnd);
 
 /**
  * Reports that the window is in full screen.
  *
  * \param id fullscreen output nul-terminated identifier, NULL for default
  */
-static inline void vout_window_ReportFullscreen(vout_window_t *window,
-                                                const char *id)
-{
-    if (window->owner.cbs->fullscreened != NULL)
-        window->owner.cbs->fullscreened(window, id);
-}
+VLC_API void vout_window_ReportFullscreen(vout_window_t *wnd, const char *id);
 
 static inline void vout_window_SendMouseEvent(vout_window_t *window,
                                               const vout_window_mouse_event_t *mouse)
