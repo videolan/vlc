@@ -1302,66 +1302,45 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     vlc_player_Unlock(_p_player);
 }
 
-- (size_t)numberOfAudioTracks
+- (NSArray<VLCTrackMetaData *> *)tracksForCategory:(enum es_format_category_e)category
 {
-    size_t ret = 0;
+    size_t numberOfTracks = 0;
+    NSMutableArray *tracks;
+
     vlc_player_Lock(_p_player);
-    ret = vlc_player_GetTrackCount(_p_player, AUDIO_ES);
+    numberOfTracks = vlc_player_GetTrackCount(_p_player, category);
+    if (numberOfTracks == 0) {
+        vlc_player_Unlock(_p_player);
+        return nil;
+    }
+
+    tracks = [[NSMutableArray alloc] initWithCapacity:numberOfTracks];
+    for (size_t x = 0; x < numberOfTracks; x++) {
+        VLCTrackMetaData *trackMetadata = [[VLCTrackMetaData alloc] init];
+        const struct vlc_player_track *track = vlc_player_GetTrackAt(_p_player, category, x);
+        trackMetadata.esID = track->es_id;
+        trackMetadata.name = toNSStr(track->name);
+        trackMetadata.selected = track->selected;
+        [tracks addObject:trackMetadata];
+    }
     vlc_player_Unlock(_p_player);
-    return ret;
-}
-- (VLCTrackMetaData *)audioTrackAtIndex:(size_t)index
-{
-    VLCTrackMetaData *trackMetadata = [[VLCTrackMetaData alloc] init];
-    vlc_player_Lock(_p_player);
-    const struct vlc_player_track *track = vlc_player_GetTrackAt(_p_player, AUDIO_ES, index);
-    trackMetadata.esID = track->es_id;
-    trackMetadata.name = toNSStr(track->name);
-    trackMetadata.selected = track->selected;
-    vlc_player_Unlock(_p_player);
-    return trackMetadata;
+
+    return [tracks copy];
 }
 
-- (size_t)numberOfVideoTracks
+- (NSArray<VLCTrackMetaData *> *)audioTracks
 {
-    size_t ret = 0;
-    vlc_player_Lock(_p_player);
-    ret = vlc_player_GetTrackCount(_p_player, VIDEO_ES);
-    vlc_player_Unlock(_p_player);
-    return ret;
+    return [self tracksForCategory:AUDIO_ES];
 }
 
-- (VLCTrackMetaData *)videoTrackAtIndex:(size_t)index
+- (NSArray<VLCTrackMetaData *> *)videoTracks
 {
-    VLCTrackMetaData *trackMetadata = [[VLCTrackMetaData alloc] init];
-    vlc_player_Lock(_p_player);
-    const struct vlc_player_track *track = vlc_player_GetTrackAt(_p_player, VIDEO_ES, index);
-    trackMetadata.esID = track->es_id;
-    trackMetadata.name = toNSStr(track->name);
-    trackMetadata.selected = track->selected;
-    vlc_player_Unlock(_p_player);
-    return trackMetadata;
+    return [self tracksForCategory:VIDEO_ES];
 }
 
-- (size_t)numberOfSubtitleTracks
+- (NSArray<VLCTrackMetaData *> *)subtitleTracks
 {
-    size_t ret = 0;
-    vlc_player_Lock(_p_player);
-    ret = vlc_player_GetTrackCount(_p_player, SPU_ES);
-    vlc_player_Unlock(_p_player);
-    return ret;
-}
-
-- (VLCTrackMetaData *)subtitleTrackAtIndex:(size_t)index
-{
-    VLCTrackMetaData *trackMetadata = [[VLCTrackMetaData alloc] init];
-    vlc_player_Lock(_p_player);
-    const struct vlc_player_track *track = vlc_player_GetTrackAt(_p_player, SPU_ES, index);
-    trackMetadata.esID = track->es_id;
-    trackMetadata.name = toNSStr(track->name);
-    trackMetadata.selected = track->selected;
-    vlc_player_Unlock(_p_player);
-    return trackMetadata;
+    return [self tracksForCategory:SPU_ES];
 }
 
 - (void)ABLoopStateChanged:(enum vlc_player_abloop)abLoopState

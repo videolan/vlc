@@ -867,27 +867,18 @@
 #pragma mark - track handling
 - (void)updateTrackHandlingMenus:(NSNotification *)aNotification
 {
-    size_t numberOfTracks = _playerController.numberOfAudioTracks;
-    NSMutableArray *tracks = [[NSMutableArray alloc] initWithCapacity:numberOfTracks];
-    for (size_t x = 0; x < numberOfTracks; x++) {
-        [tracks addObject:[_playerController audioTrackAtIndex:x]];
-    }
+    NSArray *tracks = _playerController.audioTracks;
+    NSUInteger numberOfTracks = tracks.count;
     [self rebuildTracksMenu:_audiotrackMenu withMetadata:tracks count:numberOfTracks category:AUDIO_ES];
     _audiotrack.enabled = numberOfTracks > 0 ? YES : NO;
 
-    numberOfTracks = _playerController.numberOfVideoTracks;
-    tracks = [[NSMutableArray alloc] initWithCapacity:numberOfTracks];
-    for (size_t x = 0; x < numberOfTracks; x++) {
-        [tracks addObject:[_playerController videoTrackAtIndex:x]];
-    }
+    tracks = _playerController.videoTracks;
+    numberOfTracks = tracks.count;
     [self rebuildTracksMenu:_videotrackMenu withMetadata:tracks count:numberOfTracks category:VIDEO_ES];
     _videotrack.enabled = numberOfTracks > 0 ? YES : NO;
 
-    numberOfTracks = _playerController.numberOfSubtitleTracks;
-    tracks = [[NSMutableArray alloc] initWithCapacity:numberOfTracks];
-    for (size_t x = 0; x < numberOfTracks; x++) {
-        [tracks addObject:[_playerController subtitleTrackAtIndex:x]];
-    }
+    tracks = _playerController.subtitleTracks;
+    numberOfTracks = tracks.count;
     [self rebuildTracksMenu:_subtitle_tracksMenu withMetadata:tracks count:numberOfTracks category:SPU_ES];
     _subtitle_track.enabled = numberOfTracks > 0 ? YES : NO;
 }

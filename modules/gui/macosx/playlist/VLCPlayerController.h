@@ -640,37 +640,22 @@ extern NSString *VLCPlayerMuteChanged;
 - (void)selectNextTrackForCategory:(enum es_format_category_e)category;
 
 /**
- * the number of audio tracks
- * @note listen to VLCPlayerTrackListChanged to be notified if this value changes
+ * an array holding instances of VLCTrackMetaData describing the available audio tracks for the current media
+ * @note listen to VLCPlayerTrackListChanged to be notified of changes to the list
  */
-@property (readonly) size_t numberOfAudioTracks;
+@property (readonly, nullable) NSArray<VLCTrackMetaData *>* audioTracks;
 
 /**
- * get a metadata copy of a certain audio track at @param index
+ * an array holding instances of VLCTrackMetaData describing the available video tracks for the current media
+ * @note listen to VLCPlayerTrackListChanged to be notified of changes to the list
  */
-- (VLCTrackMetaData *)audioTrackAtIndex:(size_t)index;
+@property (readonly, nullable) NSArray<VLCTrackMetaData *>* videoTracks;
 
 /**
- * the number of video tracks
- * @note listen to VLCPlayerTrackListChanged to be notified if this value changes
+ * an array holding instances of VLCTrackMetaData describing the available subtitle tracks for the current media
+ * @note listen to VLCPlayerTrackListChanged to be notified of changes to the list
  */
-@property (readonly) size_t numberOfVideoTracks;
-
-/**
- * get a metadata copy of a certain video track at @param index
- */
-- (VLCTrackMetaData *)videoTrackAtIndex:(size_t)index;
-
-/**
- * the number of subtitle tracks
- * @note listen to VLCPlayerTrackListChanged to be notified if this value changes
- */
-@property (readonly) size_t numberOfSubtitleTracks;
-
-/**
- * get a metadata copy of a certain subtitle track at @param index
- */
-- (VLCTrackMetaData *)subtitleTrackAtIndex:(size_t)index;
+@property (readonly, nullable) NSArray<VLCTrackMetaData *>* subtitleTracks;
 
 #pragma mark - video output properties
 
