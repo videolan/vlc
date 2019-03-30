@@ -85,26 +85,19 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
 int vout_window_Enable(vout_window_t *window,
                        const vout_window_cfg_t *restrict cfg)
 {
-    window_t *w = container_of(window, window_t, wnd);
-
     if (window->ops->enable != NULL) {
         int err = window->ops->enable(window, cfg);
         if (err)
             return err;
     }
 
-    if (w->inhibit != NULL)
-        vlc_inhibit_Set(w->inhibit, VLC_INHIBIT_VIDEO);
-
+    vout_window_SetInhibition(window, true);
     return VLC_SUCCESS;
 }
 
 void vout_window_Disable(vout_window_t *window)
 {
-    window_t *w = container_of(window, window_t, wnd);
-
-    if (w->inhibit != NULL)
-        vlc_inhibit_Set(w->inhibit, VLC_INHIBIT_NONE);
+    vout_window_SetInhibition(window, false);
 
     if (window->ops->disable != NULL)
         window->ops->disable(window);
