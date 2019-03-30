@@ -26,6 +26,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCInputStats;
+@class VLCTrackMetaData;
 
 /**
  * Listen to VLCPlayerCurrentMediaItemChanged to notified if the current media item changes for the player
@@ -157,6 +158,18 @@ extern NSString *VLCPlayerInputStats;
  * @note the userInfo dictionary will have an instance of VLCInputStats for key VLCPlayerInputStats representating the new state
  */
 extern NSString *VLCPlayerStatisticsUpdated;
+
+/**
+ * Listen to VLCPlayerTrackListChanged to be notified of the list of audio/video/SPU tracks changes for the current media
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerTrackListChanged;
+
+/**
+ * Listen to VLCPlayerTrackSelectionChanged to be notified if a selected audio/video/SPU track changes for the current media
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerTrackSelectionChanged;
 
 /**
  * Listen to VLCPlayerFullscreenChanged to be notified whether the fullscreen state of the video output changes
@@ -589,6 +602,76 @@ extern NSString *VLCPlayerMuteChanged;
  */
 @property (readonly) VLCInputStats *statistics;
 
+#pragma mark - track selection
+
+/**
+ * select a track
+ * @note since tracks are unique, you do not need to specify the type
+ * @note listen to VLCTrackSelectionChanged to be notified once the change occured
+ */
+- (void)selectTrack:(VLCTrackMetaData *)track;
+
+/**
+ * unselect a track
+ * @note since tracks are unique, you do not need to specify the type
+ * @note listen to VLCTrackSelectionChanged to be notified once the change occured
+ */
+- (void)unselectTrack:(VLCTrackMetaData *)track;
+
+/**
+ * unselect any track of a certain category
+ * @param the es_format_category_e category to unselect
+ * @note listen to VLCTrackSelectionChanged to be notified once the change occured
+ */
+- (void)unselectTracksFromCategory:(enum es_format_category_e)category;
+
+/**
+ * cycle to the previous track of a certain category
+ * @param the category, @see es_format_category_e
+ * @note listen to VLCTrackSelectionChanged to be notified once the change occured
+ */
+- (void)selectPreviousTrackForCategory:(enum es_format_category_e)category;
+
+/**
+ * cycle to the next track of a certain category
+ * @param the category, @see es_format_category_e
+ * @note listen to VLCTrackSelectionChanged to be notified once the change occured
+ */
+- (void)selectNextTrackForCategory:(enum es_format_category_e)category;
+
+/**
+ * the number of audio tracks
+ * @note listen to VLCPlayerTrackListChanged to be notified if this value changes
+ */
+@property (readonly) size_t numberOfAudioTracks;
+
+/**
+ * get a metadata copy of a certain audio track at @param index
+ */
+- (VLCTrackMetaData *)audioTrackAtIndex:(size_t)index;
+
+/**
+ * the number of video tracks
+ * @note listen to VLCPlayerTrackListChanged to be notified if this value changes
+ */
+@property (readonly) size_t numberOfVideoTracks;
+
+/**
+ * get a metadata copy of a certain video track at @param index
+ */
+- (VLCTrackMetaData *)videoTrackAtIndex:(size_t)index;
+
+/**
+ * the number of subtitle tracks
+ * @note listen to VLCPlayerTrackListChanged to be notified if this value changes
+ */
+@property (readonly) size_t numberOfSubtitleTracks;
+
+/**
+ * get a metadata copy of a certain subtitle track at @param index
+ */
+- (VLCTrackMetaData *)subtitleTrackAtIndex:(size_t)index;
+
 #pragma mark - video output properties
 
 /**
@@ -720,6 +803,14 @@ extern NSString *VLCPlayerMuteChanged;
 /* Aout */
 @property (readwrite) int64_t playedAudioBuffers;
 @property (readwrite) int64_t lostAudioBuffers;
+
+@end
+
+@interface VLCTrackMetaData : NSObject
+
+@property (readwrite) vlc_es_id_t *esID;
+@property (readwrite, retain) NSString *name;
+@property (readwrite) BOOL selected;
 
 @end
 
