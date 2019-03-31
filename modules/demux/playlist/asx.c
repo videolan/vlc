@@ -317,7 +317,6 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
                 input_item_AddOptions( p_entry, i_options,
                                        (const char **)ppsz_options,
                                        VLC_INPUT_OPTION_TRUSTED );
-                input_item_CopyOptions( p_entry, p_current_input );
 
                 /* Add the metadata */
                 if( psz_name )
@@ -762,7 +761,6 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                 psz_txt = strdup( psz_node );
                 vlc_xml_decode( psz_txt );
                 p_input = input_item_New( psz_txt, psz_title_asx );
-                input_item_CopyOptions( p_input, p_current_input );
                 input_item_node_AppendItem( p_subitems, p_input );
 
                 input_item_Release( p_input );
