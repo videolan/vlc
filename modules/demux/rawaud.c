@@ -43,7 +43,7 @@ static void Close( vlc_object_t * );
 #define SAMPLERATE_LONGTEXT N_("Audio sample rate in Hertz. Default is 48000 Hz.")
 
 #define CHANNELS_TEXT N_("Audio channels")
-#define CHANNELS_LONGTEXT N_("Audio channels in input stream. Numeric value >0. Default is 2.")
+#define CHANNELS_LONGTEXT N_("Audio channels in input stream. Default is 2 (stereo).")
 
 #define FOURCC_TEXT N_("FOURCC code of raw input format")
 #define FOURCC_LONGTEXT N_( \
@@ -65,9 +65,9 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_callbacks( Open, Close );
     add_shortcut( "rawaud" );
-    add_integer( "rawaud-channels", 2, CHANNELS_TEXT, CHANNELS_LONGTEXT );
+    add_integer_with_range( "rawaud-channels", 2, 1, 32, CHANNELS_TEXT, CHANNELS_LONGTEXT )
         change_safe()
-    add_integer( "rawaud-samplerate", 48000, SAMPLERATE_TEXT, SAMPLERATE_LONGTEXT );
+    add_integer_with_range( "rawaud-samplerate", 48000, 1, 384000, SAMPLERATE_TEXT, SAMPLERATE_LONGTEXT )
         change_safe()
     add_string( "rawaud-fourcc", FOURCC_DEFAULT,
                 FOURCC_TEXT, FOURCC_LONGTEXT );
@@ -163,22 +163,6 @@ static int Open( vlc_object_t * p_this )
     p_sys->fmt.psz_language = var_CreateGetString( p_demux, "rawaud-lang" );
     p_sys->fmt.audio.i_channels = var_CreateGetInteger( p_demux, "rawaud-channels" );
     p_sys->fmt.audio.i_rate = var_CreateGetInteger( p_demux, "rawaud-samplerate" );
-
-    if( p_sys->fmt.audio.i_rate == 0 || p_sys->fmt.audio.i_rate > 384000 )
-    {
-        msg_Err( p_demux, "invalid sample rate");
-        es_format_Clean( &p_sys->fmt );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-
-    if( p_sys->fmt.audio.i_channels == 0 || p_sys->fmt.audio.i_channels > 32 )
-    {
-        msg_Err( p_demux, "invalid number of channels");
-        es_format_Clean( &p_sys->fmt );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
 
     p_sys->fmt.i_bitrate = p_sys->fmt.audio.i_rate *
                            p_sys->fmt.audio.i_channels *
