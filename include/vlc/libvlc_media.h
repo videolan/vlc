@@ -563,6 +563,8 @@ LIBVLC_API libvlc_media_t *libvlc_media_duplicate( libvlc_media_t *p_md );
 /**
  * Read the meta of the media.
  *
+ * Note, you need to call libvlc_media_parse() or play the media at least once
+ * before calling this function.
  * If the media has not yet been parsed this will return NULL.
  *
  * \see libvlc_media_parse
@@ -650,6 +652,10 @@ LIBVLC_API libvlc_event_manager_t *
 
 /**
  * Get duration (in ms) of media descriptor object item.
+ *
+ * Note, you need to call libvlc_media_parse() or play the media at least once
+ * before calling this function.
+ * Not doing this will result in an undefined result.
  *
  * \param p_md media descriptor object
  * \return duration of media item or -1 on error
@@ -761,6 +767,9 @@ unsigned libvlc_media_tracks_get( libvlc_media_t *p_md,
 
 /**
  * Get codec description from media elementary stream
+ *
+ * Note, you need to call libvlc_media_parse() or play the media at least once
+ * before calling this function.
  *
  * \version LibVLC 3.0.0 and later.
  *
