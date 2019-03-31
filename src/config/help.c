@@ -472,7 +472,7 @@ static void print_item(const module_t *m, const module_config_t *item,
         }
         case CONFIG_ITEM_FLOAT:
             type = _("float");
-            if (item->min.f != FLT_MIN || item->max.f != FLT_MAX)
+            if (item->min.f != -FLT_MAX || item->max.f != FLT_MAX)
             {
                 if (asprintf(&typebuf, "%s [%f .. %f]", type,
                              item->min.f, item->max.f) >= 0)
