@@ -474,7 +474,7 @@ static void print_item(const vlc_object_t *p_this, const module_t *m, const modu
         }
         case CONFIG_ITEM_FLOAT:
             type = _("float");
-            if (item->min.f != FLT_MIN || item->max.f != FLT_MAX)
+            if (item->min.f != -FLT_MAX || item->max.f != FLT_MAX)
             {
                 if (asprintf(&typebuf, "%s [%f .. %f]", type,
                              item->min.f, item->max.f) >= 0)
