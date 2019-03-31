@@ -444,8 +444,6 @@ static bool parse_track_node COMPLEX_INTERFACE
                             track_elements, ARRAY_SIZE(track_elements));
     if(b_ret)
     {
-        input_item_CopyOptions(p_new_input, p_input_node->p_item);
-
         /* Make sure we have a URI */
         char *psz_uri = input_item_GetURI(p_new_input);
         if (!psz_uri)
