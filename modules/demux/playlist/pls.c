@@ -78,8 +78,6 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     bool ascii = true;
     bool unicode = true;
 
-    input_item_t *p_current_input = GetCurrentItem(p_demux);
-
     while( ( psz_line = vlc_stream_ReadLine( p_demux->s ) ) )
     {
         if (ascii && !IsASCII(psz_line))
