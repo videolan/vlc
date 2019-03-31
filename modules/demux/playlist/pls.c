@@ -142,7 +142,6 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
             if( psz_mrl )
             {
                 p_input = input_item_New( psz_mrl, psz_name );
-                input_item_CopyOptions( p_input, p_current_input );
                 input_item_node_AppendItem( p_subitems, p_input );
                 input_item_Release( p_input );
                 free( psz_mrl_orig );
@@ -180,7 +179,6 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     if( psz_mrl )
     {
         p_input = input_item_New( psz_mrl, psz_name );
-        input_item_CopyOptions( p_input, p_current_input );
         input_item_node_AppendItem( p_subitems, p_input );
         input_item_Release( p_input );
         free( psz_mrl_orig );
