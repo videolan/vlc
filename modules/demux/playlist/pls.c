@@ -55,7 +55,6 @@ int Import_PLS( vlc_object_t *p_this )
     }
 
     if( strncasecmp( (const char *)p_peek, "[playlist]", 10 )
-     && strncasecmp( (const char *)p_peek, "[Reference]", 10 )
      && !stream_HasExtension( p_demux, ".pls" ) )
         return VLC_EGENERIC;
 
@@ -96,8 +95,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
             psz_line = latin;
         }
 
-        if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) ||
-            !strncasecmp( psz_line, "[Reference]", sizeof("[Reference]")-1 ) )
+        if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) )
         {
             free( psz_line );
             continue;
@@ -159,18 +157,11 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
             i_item = i_new_item;
         }
 
-        if( !strncasecmp( psz_key, "file", sizeof("file") -1 ) ||
-            !strncasecmp( psz_key, "Ref", sizeof("Ref") -1 ) )
+        if( !strncasecmp( psz_key, "file", sizeof("file") -1 ) )
         {
             free( psz_mrl_orig );
             psz_mrl_orig =
             psz_mrl = ProcessMRL( psz_value, p_demux->psz_url );
-
-            if( !strncasecmp( psz_key, "Ref", sizeof("Ref") -1 ) )
-            {
-                if( !strncasecmp( psz_mrl, "http://", sizeof("http://") -1 ) )
-                    memcpy( psz_mrl, "mmsh", 4 );
-            }
         }
         else if( !strncasecmp( psz_key, "title", sizeof("title") -1 ) )
         {
