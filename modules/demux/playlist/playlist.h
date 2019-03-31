@@ -56,6 +56,8 @@ void Close_BDMV ( vlc_object_t * );
 
 int Import_iTML ( vlc_object_t * );
 
+int Import_WMS(vlc_object_t *);
+
 int Import_WPL ( vlc_object_t * );
 void Close_WPL ( vlc_object_t * );
 
