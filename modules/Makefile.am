@@ -17,8 +17,7 @@ endif
 
 TESTS =
 
-dist_noinst_SCRIPTS = list.sh module.rc.in
-dist_noinst_DATA = MODULES_LIST
+dist_noinst_SCRIPTS = module.rc.in
 EXTRA_LTLIBRARIES =
 
 include common.am
