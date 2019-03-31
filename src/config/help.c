@@ -603,13 +603,13 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
         const module_config_t *section = NULL;
         const char *objname = module_get_object(m);
 
-        if (p->conf.count == 0)
+        if (psz_search == NULL && p->conf.count == 0)
             continue; /* Ignore modules without config options */
         if (!module_match(m, psz_search, strict))
             continue;
         found = true;
 
-        if (!plugin_show(p))
+        if (psz_search == NULL && !plugin_show(p))
             continue;
 
         /* Print name of module */
@@ -618,6 +618,9 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
         if (m->psz_help != NULL)
             printf(color ? CYAN" %s\n"GRAY : " %s\n",
                    module_gettext(m, m->psz_help));
+
+        if (psz_search != NULL && p->conf.count == 0)
+            printf("  %s\n", _("This module has no options."));
 
         /* Print module options */
         for (size_t j = 0; j < p->conf.size; j++)
