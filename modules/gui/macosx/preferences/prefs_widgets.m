@@ -811,7 +811,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
                                                      withView: parentView];
             break;
         case CONFIG_ITEM_FLOAT:
-            if (_p_item->min.f > FLT_MIN && _p_item->max.f < FLT_MAX)
+            if (_p_item->min.f > -FLT_MAX && _p_item->max.f < FLT_MAX)
                 control = [[RangedFloatConfigControl alloc] initWithItem: _p_item withView: parentView];
             else
                 control = [[FloatConfigControl alloc] initWithItem: _p_item withView: parentView];
