@@ -183,13 +183,6 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    /* */
-    RECT *display = &sys->sys.rect_display;
-    display->left   = 0;
-    display->top    = 0;
-    display->right  = GetSystemMetrics(SM_CXSCREEN);;
-    display->bottom = GetSystemMetrics(SM_CYSCREEN);;
-
     /* Initialize an offscreen bitmap for direct buffer operations. */
 
     /* */

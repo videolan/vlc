@@ -76,9 +76,10 @@ int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowl
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
 #endif
-#if !VLC_WINSTORE_APP
+#if VLC_WINSTORE_APP
+    memset(&sys->rect_display, 0, sizeof(sys->rect_display));
+#else /* !VLC_WINSTORE_APP */
     sys->pf_GetRect = GetRect;
-    SetRectEmpty(&sys->rect_display);
     SetRectEmpty(&sys->rect_parent);
 
     var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);

@@ -50,8 +50,10 @@ typedef struct vout_display_sys_win32_t
     HWND                 hparent;             /* Handle of the parent window */
     HWND                 hfswnd;          /* Handle of the fullscreen window */
 
+#if VLC_WINSTORE_APP
     /* size of the display */
     RECT         rect_display;
+#endif
 
     /* size of the overall window (including black bands) */
     RECT         rect_parent;

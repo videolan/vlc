@@ -1483,12 +1483,6 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
 
     const d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
     /* */
-    RECT *display = &vd->sys->sys.rect_display;
-    display->left   = 0;
-    display->top    = 0;
-    display->right  = p_d3d9_dev->pp.BackBufferWidth;
-    display->bottom = p_d3d9_dev->pp.BackBufferHeight;
-
     *fmt = vd->source;
 
     /* Find the appropriate D3DFORMAT for the render chroma, the format will be the closest to
