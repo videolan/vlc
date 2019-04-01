@@ -45,7 +45,6 @@
 
 #if !VLC_WINSTORE_APP
 static void CommonChangeThumbnailClip(vlc_object_t *, vout_display_sys_win32_t *, bool show);
-static int  CommonControlSetFullscreen(vlc_object_t *, vout_display_sys_win32_t *, bool is_fullscreen);
 
 static bool GetRect(const vout_display_sys_win32_t *sys, RECT *out)
 {

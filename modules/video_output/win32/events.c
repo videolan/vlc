@@ -158,8 +158,8 @@ static void *EventThread( void *p_this )
     POINT old_mouse_pos = {0,0}, mouse_pos;
     int canc = vlc_savecancel ();
 
-    bool b_mouse_support = var_InheritBool( p_event->vd, "mouse-events" );
-    bool b_key_support = var_InheritBool( p_event->vd, "keyboard-events" );
+    bool b_mouse_support = var_InheritBool( vd, "mouse-events" );
+    bool b_key_support = var_InheritBool( vd, "keyboard-events" );
 
     vlc_mutex_lock( &p_event->lock );
     /* Create a window for the video */
@@ -208,8 +208,7 @@ static void *EventThread( void *p_this )
             continue;
 
         /* Handle mouse state */
-        if( msg.message == WM_MOUSEMOVE ||
-            msg.message == WM_NCMOUSEMOVE )
+        if( msg.message == WM_MOUSEMOVE || msg.message == WM_NCMOUSEMOVE )
         {
             GetCursorPos( &mouse_pos );
             /* FIXME, why this >2 limits ? */
@@ -464,9 +463,9 @@ event_thread_t *EventThreadCreate( vout_display_t *vd, const vout_display_cfg_t 
     atomic_init(&p_event->has_moved, false);
     vout_display_PlacePicture(&p_event->place, &vd->source, vdcfg);
 
-    _sntprintf( p_event->class_main, sizeof(p_event->class_main)/sizeof(*p_event->class_main),
+    _sntprintf( p_event->class_main, ARRAYSIZE(p_event->class_main),
                _T("VLC video main %p"), (void *)p_event );
-    _sntprintf( p_event->class_video, sizeof(p_event->class_video)/sizeof(*p_event->class_video),
+    _sntprintf( p_event->class_video, ARRAYSIZE(p_event->class_video),
                _T("VLC video output %p"), (void *)p_event );
     return p_event;
 }
@@ -995,7 +994,6 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         return DecodeGesture( VLC_OBJECT(vd), p_event->p_gesture, hwnd, message, wParam, lParam );
 
     default:
-        //msg_Dbg( vd, "WinProc WM Default %i", message );
         break;
     }
 

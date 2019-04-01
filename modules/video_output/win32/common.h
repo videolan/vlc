@@ -94,4 +94,4 @@ void UpdateRects (vout_display_t *, vout_display_sys_win32_t *, bool is_forced);
 /*****************************************************************************
  * Constants
  *****************************************************************************/
-#define IDM_TOGGLE_ON_TOP WM_USER + 1
+#define IDM_TOGGLE_ON_TOP  (WM_USER + 1)
