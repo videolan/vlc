@@ -320,7 +320,7 @@ static inline int ps_pkt_id( block_t *p_pkt )
     {
         uint8_t i_sub_id = 0;
         if( p_pkt->i_buffer >= 9 &&
-            p_pkt->i_buffer >= 9 + (size_t)p_pkt->p_buffer[8] )
+            p_pkt->i_buffer > 9 + (size_t)p_pkt->p_buffer[8] )
         {
             const unsigned i_start = 9 + p_pkt->p_buffer[8];
             i_sub_id = p_pkt->p_buffer[i_start];
