@@ -1013,7 +1013,16 @@ end:
 
 static int ControlVideo(vout_display_t *vd, int query, va_list args)
 {
-    (void) vd; (void) query; (void) args;
+    (void) vd; (void) args;
+
+    switch (query) {
+        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+        case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+        case VOUT_DISPLAY_CHANGE_ZOOM:
+        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+            return VLC_SUCCESS;
+    }
     return VLC_EGENERIC;
 }
 
