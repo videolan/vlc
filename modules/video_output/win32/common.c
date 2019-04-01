@@ -275,8 +275,7 @@ void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys)
         }
     }
 
-    /* HasMoved means here resize or move */
-    if (EventThreadGetAndResetHasMoved(sys->event))
+    if (EventThreadGetAndResetSizeChanged(sys->event))
         UpdateRects(vd, sys, false);
 }
 
