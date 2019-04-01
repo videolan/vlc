@@ -32,8 +32,6 @@
 #include <GL/glew.h>
 #include <GL/wglew.h>
 
-#include "common.h"
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -61,8 +59,7 @@ vlc_module_end()
 
 struct vout_display_sys_t
 {
-    vout_display_sys_win32_t sys;
-
+    HWND                  hvideownd;
     HDC                   hGLDC;
     HGLRC                 hGLRC;
     vlc_gl_t              *gl;
@@ -98,7 +95,7 @@ static void CreateGPUAffinityDC(vlc_gl_t *gl, UINT nVidiaAffinity) {
     PIXELFORMATDESCRIPTOR pfd = VLC_PFD_INITIALIZER;
 
     /* create a temporary GL context */
-    HDC winDC = GetDC(sys->sys.hvideownd);
+    HDC winDC = GetDC(sys->hvideownd);
     SetPixelFormat(winDC, ChoosePixelFormat(winDC, &pfd), &pfd);
     HGLRC hGLRC = wglCreateContext(winDC);
     wglMakeCurrent(winDC, hGLRC);
@@ -139,7 +136,7 @@ static void DestroyGPUAffinityDC(vlc_gl_t *gl) {
     PIXELFORMATDESCRIPTOR pfd = VLC_PFD_INITIALIZER;
 
     /* create a temporary GL context */
-    HDC winDC = GetDC(sys->sys.hvideownd);
+    HDC winDC = GetDC(sys->hvideownd);
     SetPixelFormat(winDC, ChoosePixelFormat(winDC, &pfd), &pfd);
     HGLRC hGLRC = wglCreateContext(winDC);
     wglMakeCurrent(winDC, hGLRC);
@@ -174,8 +171,8 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     if (wnd->type != VOUT_WINDOW_TYPE_HWND || wnd->handle.hwnd == 0)
         goto error;
 
-    sys->sys.hvideownd = wnd->handle.hwnd;
-    sys->hGLDC = GetDC(sys->sys.hvideownd);
+    sys->hvideownd = wnd->handle.hwnd;
+    sys->hGLDC = GetDC(sys->hvideownd);
     if (sys->hGLDC == NULL)
     {
         msg_Err(gl, "Could not get the device context");
@@ -257,7 +254,7 @@ static void Close(vlc_gl_t *gl)
     if (sys->hGLRC)
         wglDeleteContext(sys->hGLRC);
     if (sys->hGLDC)
-        ReleaseDC(sys->sys.hvideownd, sys->hGLDC);
+        ReleaseDC(sys->hvideownd, sys->hGLDC);
 
     DestroyGPUAffinityDC(gl);
 
