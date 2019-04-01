@@ -384,16 +384,16 @@ static inline uint32_t align(uint32_t x, uint32_t y) {
         return x + y - mod;
 }
 
-static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
-                const video_format_t *fmt)
+static void configure_display(vout_display_t *vd,
+                              const vout_display_cfg_t *cfg,
+                              const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
     vout_display_place_t place;
     MMAL_DISPLAYREGION_T display_region;
     MMAL_STATUS_T status;
 
-    if (!cfg && !fmt)
-        return -EINVAL;
+    assert(cfg != NULL || fmt != NULL);
 
     if (fmt) {
         sys->input->format->es->video.par.num = fmt->i_sar_num;
@@ -403,7 +403,7 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
         if (status != MMAL_SUCCESS) {
             msg_Err(vd, "Failed to commit format for input port %s (status=%"PRIx32" %s)",
                             sys->input->name, status, mmal_status_to_string(status));
-            return -EINVAL;
+            return;
         }
     } else {
         fmt = &vd->source;
@@ -432,7 +432,7 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (status != MMAL_SUCCESS) {
         msg_Err(vd, "Failed to set display region (status=%"PRIx32" %s)",
                         status, mmal_status_to_string(status));
-        return -EINVAL;
+        return;
     }
 
     show_background(vd, var_InheritBool(vd, MMAL_BLANK_BACKGROUND_NAME));
@@ -442,8 +442,6 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
         adjust_refresh_rate(vd, fmt);
         set_latency_target(vd, true);
     }
-
-    return 0;
 }
 
 static void pic_destroy(picture_t *pic)
@@ -620,7 +618,6 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
     vout_display_sys_t *sys = vd->sys;
     vout_display_cfg_t cfg;
     const vout_display_cfg_t *tmp_cfg;
-    int ret = VLC_EGENERIC;
 
     switch (query) {
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
@@ -630,21 +627,20 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
                 cfg = sys->last_cfg;
                 cfg.display.width = sys->display_width;
                 cfg.display.height = sys->display_height;
-                if (configure_display(vd, &cfg, NULL) >= 0)
-                    ret = VLC_SUCCESS;
+                configure_display(vd, &cfg, NULL);
             }
             break;
 
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             sys->last_cfg = *va_arg(args, const vout_display_cfg_t *);
-            if (configure_display(vd, NULL, &vd->source) >= 0)
-                ret = VLC_SUCCESS;
+            configure_display(vd, NULL, &vd->source);
             break;
 
         case VOUT_DISPLAY_RESET_PICTURES:
             vlc_assert_unreachable();
         case VOUT_DISPLAY_CHANGE_ZOOM:
+        case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
             msg_Warn(vd, "Unsupported control query %d", query);
             break;
 
@@ -653,7 +649,7 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
             break;
     }
 
-    return ret;
+    return VLC_SUCCESS;
 }
 
 static void vd_manage(vout_display_t *vd)
