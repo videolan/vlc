@@ -234,37 +234,6 @@ void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys)
     if (sys->b_windowless)
         return;
 
-    /* We used to call the Win32 PeekMessage function here to read the window
-     * messages. But since window can stay blocked into this function for a
-     * long time (for example when you move your window on the screen), I
-     * decided to isolate PeekMessage in another thread. */
-    /* If we do not control our window, we check for geometry changes
-     * ourselves because the parent might not send us its events. */
-    if (sys->hparent) {
-        RECT rect_parent;
-
-        /* Check if the parent window has resized or moved */
-        GetClientRect(sys->hparent, &rect_parent);
-
-        if (RECTWidth(rect_parent)  != RECTWidth(sys->rect_parent) ||
-            RECTHeight(rect_parent) != RECTHeight(sys->rect_parent)) {
-            sys->rect_parent = rect_parent;
-
-            /* This code deals with both resize and move
-             *
-             * For most drivers(direct3d9, gdi, opengl), move is never
-             * an issue. The surface automatically gets moved together
-             * with the associated window (hvideownd)
-             */
-            SetWindowPos(sys->hwnd, 0, 0, 0,
-                         RECTWidth(rect_parent),
-                         RECTHeight(rect_parent),
-                         SWP_NOZORDER);
-
-            UpdateRects(vd, sys);
-        }
-    }
-
     if (EventThreadGetAndResetSizeChanged(sys->event))
         UpdateRects(vd, sys);
 }
