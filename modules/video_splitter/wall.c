@@ -338,8 +338,6 @@ static int Open( vlc_object_t *p_this )
             p_cfg->fmt.i_height         = p_output->i_height;
             p_cfg->fmt.i_sar_num        = p_splitter->fmt.i_sar_num;
             p_cfg->fmt.i_sar_den        = p_splitter->fmt.i_sar_den;
-            p_cfg->window.i_x   = p_output->i_left;
-            p_cfg->window.i_y   = p_output->i_top;
             p_cfg->psz_module = NULL;
         }
     }

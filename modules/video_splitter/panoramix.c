@@ -240,9 +240,7 @@ typedef struct
     bool b_active;
     int  i_output;
 
-    /* Output position and size */
-    int i_x;
-    int i_y;
+    /* Output size */
     int i_width;
     int i_height;
 
@@ -678,9 +676,6 @@ static int Open( vlc_object_t *p_this )
             p_cfg->fmt.i_visible_height =
             p_cfg->fmt.i_height         = p_output->i_height;
 
-            p_cfg->window.i_x   = p_output->i_x;
-            p_cfg->window.i_y   = p_output->i_y;
-
             p_cfg->psz_module = NULL;
         }
     }
@@ -908,9 +903,6 @@ static int Configuration( panoramix_output_t pp_output[ROW_MAX][COL_MAX],
             p_output->filter = cfg;
 
             /* */
-            p_output->i_x = i_dst_x;
-            p_output->i_y = i_dst_y;
-
             p_output->i_width  = cfg.black.i_left + p_output->i_src_width  + cfg.black.i_right;
             p_output->i_height = cfg.black.i_top  + p_output->i_src_height + cfg.black.i_bottom;
 

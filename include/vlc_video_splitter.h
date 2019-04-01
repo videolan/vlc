@@ -44,16 +44,6 @@ typedef struct
     /* Video format of the output */
     video_format_t fmt;
 
-    /* Window hints */
-    struct
-    {
-        /* Relative position.
-         * (0,0) is equal to the default position.
-         */
-        int i_x;
-        int i_y;
-    } window;
-
     /* Video output module
      * Use NULL for default
      */
