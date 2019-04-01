@@ -1068,8 +1068,9 @@ static int Control(vout_display_t *vd, int query, va_list args)
         vlc_assert_unreachable();
     default:
         msg_Warn(vd, "Unknown request in android-display: %d", query);
+        return VLC_EGENERIC;
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
-        return VLC_EGENERIC;
+        return VLC_SUCCESS;
     }
 }
