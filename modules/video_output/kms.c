@@ -584,9 +584,16 @@ err_out:
 
 static int Control(vout_display_t *vd, int query, va_list args)
 {
-    VLC_UNUSED(vd);
-    VLC_UNUSED(query);
-    VLC_UNUSED(args);
+    (void) vd; (void) args;
+
+    switch (query) {
+        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+        case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+        case VOUT_DISPLAY_CHANGE_ZOOM:
+        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+            return VLC_SUCCESS;
+    }
     return VLC_EGENERIC;
 }
 
