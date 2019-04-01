@@ -439,9 +439,6 @@ void input_resource_PutVout(input_resource_t *p_resource,
         vout_Close(vout);
     } else {
         msg_Dbg(p_resource->p_parent, "saving a free vout");
-        vout_FlushAll(vout);
-        vout_FlushSubpictureChannel(vout, -1);
-        vout_Stop(vout);
         p_resource->p_vout_free = vout;
     }
     vlc_mutex_unlock( &p_resource->lock );

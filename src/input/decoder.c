@@ -1942,21 +1942,26 @@ static void DeleteDecoder( decoder_t * p_dec )
                 input_resource_PutAout( p_owner->p_resource, p_owner->p_aout );
             }
             break;
-        case VIDEO_ES:
-            if( p_owner->p_vout )
+        case VIDEO_ES: {
+            vout_thread_t *vout = p_owner->p_vout;
+
+            if (vout != NULL)
             {
                 /* Reset the cancel state that was set before joining the decoder
                  * thread */
-                vout_Cancel( p_owner->p_vout, false );
-
+                vout_Cancel(vout, false);
+                vout_FlushAll(vout);
+                vout_FlushSubpictureChannel(vout, -1);
+                vout_Stop(vout);
                 input_SendEventVout(p_owner->p_input,
                     &(struct vlc_input_event_vout) {
                         .action = VLC_INPUT_EVENT_VOUT_DELETED,
-                        .vout = p_owner->p_vout,
+                        .vout = vout,
                     });
-                input_resource_PutVout( p_owner->p_resource, p_owner->p_vout );
+                input_resource_PutVout(p_owner->p_resource, vout);
             }
             break;
+        }
         case SPU_ES:
         {
             if( p_owner->p_vout )
