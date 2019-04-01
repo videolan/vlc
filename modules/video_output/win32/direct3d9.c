@@ -1341,8 +1341,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
         return;
 
     sys->swapCb(sys->outside_opaque);
-
-    CommonDisplay(&sys->sys);
 }
 
 /**

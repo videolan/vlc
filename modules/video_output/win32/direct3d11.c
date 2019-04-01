@@ -965,10 +965,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
     d3d11_device_lock( &sys->d3d_dev );
     sys->swapCb(sys->outside_opaque);
     d3d11_device_unlock( &sys->d3d_dev );
-
-#if !VLC_WINSTORE_APP
-    CommonDisplay(&sys->sys);
-#endif
 }
 
 static void Direct3D11Destroy(vout_display_t *vd)

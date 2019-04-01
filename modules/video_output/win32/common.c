@@ -74,7 +74,7 @@ int CommonInit(vout_display_t *vd, vout_display_sys_win32_t *sys, bool b_windowl
     sys->hfswnd    = NULL;
     sys->changes   = 0;
     sys->b_windowless = b_windowless;
-    sys->is_first_display = true;
+    sys->is_first_placement = true;
     sys->is_on_top        = false;
 
     sys->pf_GetPictureWidth  = GetPictureWidth;
@@ -209,9 +209,17 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
         EventThreadUpdateSourceAndPlace(sys->event, source, &place);
 
         if (sys->hvideownd)
+        {
+            UINT swpFlags = SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS;
+            if (sys->is_first_placement)
+            {
+                swpFlags |= SWP_SHOWWINDOW;
+                sys->is_first_placement = false;
+            }
             SetWindowPos(sys->hvideownd, 0,
                 place.x, place.y, place.width, place.height,
-                SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS);
+                swpFlags);
+        }
     }
 #endif
 
@@ -329,28 +337,6 @@ void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys)
     /* HasMoved means here resize or move */
     if (EventThreadGetAndResetHasMoved(sys->event))
         UpdateRects(vd, sys, false);
-}
-
-/**
- * It ensures that the video window is shown after the first picture
- * is displayed.
- */
-void CommonDisplay(vout_display_sys_win32_t *sys)
-{
-    if (!sys->is_first_display)
-        return;
-
-    /* Video window is initially hidden, show it now since we got a
-     * picture to show.
-     */
-    SetWindowPos(sys->hvideownd, 0, 0, 0, 0, 0,
-                 SWP_ASYNCWINDOWPOS|
-                 SWP_FRAMECHANGED|
-                 SWP_SHOWWINDOW|
-                 SWP_NOMOVE|
-                 SWP_NOSIZE|
-                 SWP_NOZORDER);
-    sys->is_first_display = false;
 }
 
 /* */

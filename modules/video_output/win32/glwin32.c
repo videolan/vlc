@@ -242,8 +242,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
         vout_display_opengl_Display (sys->vgl, &vd->source);
         vlc_gl_ReleaseCurrent (sys->gl);
     }
-
-    CommonDisplay(&sys->sys);
 }
 
 static void Manage (vout_display_t *vd)

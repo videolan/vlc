@@ -177,7 +177,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
 #undef rect_src_clipped
 #undef rect_dest
 
-    CommonDisplay(&sys->sys);
     CommonManage(vd, &sys->sys);
 }
 
