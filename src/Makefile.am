@@ -80,6 +80,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_playlist_legacy.h \
 	../include/vlc_player.h \
 	../include/vlc_playlist.h \
+	../include/vlc_playlist_export.h \
 	../include/vlc_plugin.h \
 	../include/vlc_probe.h \
 	../include/vlc_rand.h \
@@ -237,6 +238,7 @@ libvlccore_la_SOURCES = \
 	playlist/content.h \
 	playlist/control.c \
 	playlist/control.h \
+	playlist/export.c \
 	playlist/item.c \
 	playlist/item.h \
 	playlist/notify.c \

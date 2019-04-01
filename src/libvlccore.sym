@@ -938,6 +938,8 @@ vlc_playlist_item_Hold
 vlc_playlist_item_Release
 vlc_playlist_item_GetMedia
 vlc_playlist_item_GetId
+vlc_playlist_view_Count
+vlc_playlist_view_Get
 vlc_playlist_New
 vlc_playlist_Delete
 vlc_playlist_Lock
@@ -975,6 +977,7 @@ vlc_playlist_Stop
 vlc_playlist_Pause
 vlc_playlist_Resume
 vlc_playlist_Preparse
+vlc_playlist_Export
 vlc_intf_GetMainPlaylist
 vlc_media_source_Hold
 vlc_media_source_Release
