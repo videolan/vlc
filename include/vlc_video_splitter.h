@@ -52,10 +52,6 @@ typedef struct
          */
         int i_x;
         int i_y;
-
-        /* Alignment inside the window
-         */
-        vlc_video_align_t align;
     } window;
 
     /* Video output module
