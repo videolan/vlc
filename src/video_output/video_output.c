@@ -1285,6 +1285,8 @@ void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
 {
     vout_thread_sys_t *sys = vout->p;
 
+    assert(vout->p->original.i_chroma != 0);
+
     vout_control_Hold(&sys->control);
     vout_FlushUnlocked(vout, false, date);
     vout_control_Release(&sys->control);
