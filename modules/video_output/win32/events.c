@@ -789,9 +789,6 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         return VLC_EGENERIC;
     }
 
-    bool b_isProjected  = (vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
-    InitGestures( p_event->hwnd, &p_event->p_gesture, b_isProjected );
-
     if( p_event->hparent )
     {
         /* We don't want the window owner to overwrite our client area */
@@ -836,9 +833,14 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         (LPVOID)p_event );    /* send vd to WM_CREATE */
 
     if( !p_event->hvideownd )
-        msg_Warn( vd, "can't create video sub-window" );
-    else
-        msg_Dbg( vd, "created video sub-window" );
+    {
+        msg_Err( vd, "can't create video sub-window" );
+        return VLC_EGENERIC;
+    }
+    msg_Dbg( vd, "created video sub-window" );
+
+    bool b_isProjected  = (vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
+    InitGestures( p_event->hwnd, &p_event->p_gesture, b_isProjected );
 
     /* Now display the window */
     ShowWindow( p_event->hwnd, SW_SHOW );

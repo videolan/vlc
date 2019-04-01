@@ -208,18 +208,15 @@ void UpdateRects(vout_display_t *vd, vout_display_sys_win32_t *sys, bool is_forc
     {
         EventThreadUpdateSourceAndPlace(sys->event, source, &place);
 
-        if (sys->hvideownd)
+        UINT swpFlags = SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS;
+        if (sys->is_first_placement)
         {
-            UINT swpFlags = SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS;
-            if (sys->is_first_placement)
-            {
-                swpFlags |= SWP_SHOWWINDOW;
-                sys->is_first_placement = false;
-            }
-            SetWindowPos(sys->hvideownd, 0,
-                place.x, place.y, place.width, place.height,
-                swpFlags);
+            swpFlags |= SWP_SHOWWINDOW;
+            sys->is_first_placement = false;
         }
+        SetWindowPos(sys->hvideownd, 0,
+            place.x, place.y, place.width, place.height,
+            swpFlags);
     }
 #endif
 

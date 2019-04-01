@@ -94,9 +94,6 @@ static vout_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (!sys->sys.hvideownd)
-        return NULL;
-
     vout_window_t *wnd = vlc_object_create(vd, sizeof(vout_window_t));
     if (!wnd)
         return NULL;
