@@ -2101,7 +2101,7 @@ AC_ARG_ENABLE([libcddb],
   AS_HELP_STRING([--disable-libcddb],
     [disable CDDB for Audio CD (default enabled)]))
 
-if test "${enable_vcd}" != "no" -a test "${enable_winstore_app}" != "yes"
+if test "${enable_vcd}" != "no" -a "${enable_winstore_app}" != "yes"
 then
   AC_MSG_CHECKING(for cdrom_msf0 in linux/cdrom.h)
   AC_EGREP_HEADER(cdrom_msf0,linux/cdrom.h,[
