@@ -171,11 +171,11 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     if (nVidiaAffinity >= 0) CreateGPUAffinityDC(gl, nVidiaAffinity);
 
     vout_window_t *wnd = gl->surface;
-    sys->sys.hvideownd = wnd->handle.hwnd;
-    if (wnd->type != VOUT_WINDOW_TYPE_HWND)
+    if (wnd->type != VOUT_WINDOW_TYPE_HWND || wnd->handle.hwnd == 0)
         goto error;
 
-    sys->hGLDC = GetDC(wnd->handle.hwnd);
+    sys->sys.hvideownd = wnd->handle.hwnd;
+    sys->hGLDC = GetDC(sys->sys.hvideownd);
     if (sys->hGLDC == NULL)
     {
         msg_Err(gl, "Could not get the device context");
