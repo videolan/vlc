@@ -402,15 +402,7 @@ static int CommonControlSetFullscreen(vlc_object_t *obj, vout_display_sys_win32_
     }
     return VLC_SUCCESS;
 }
-
-#else /* VLC_WINSTORE_APP */
-
-void CommonManage(vout_display_t *vd, vout_display_sys_win32_t *sys)
-{
-    /* just check the rendering size didn't change */
-    UpdateRects(vd, sys);
-}
-#endif /* VLC_WINSTORE_APP */
+#endif /* !VLC_WINSTORE_APP */
 
 int CommonControl(vout_display_t *vd, vout_display_sys_win32_t *sys, int query, va_list args)
 {

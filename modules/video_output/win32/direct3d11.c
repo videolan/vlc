@@ -283,7 +283,12 @@ static bool StartRendering(void *opaque)
     vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
 
+#if VLC_WINSTORE_APP
+    /* TODO read the swapchain size and call VOUT_DISPLAY_CHANGE_DISPLAY_SIZE */
+    UpdateRects(vd, sys);
+#else /* !VLC_WINSTORE_APP */
     CommonManage(vd, &sys->sys);
+#endif
 
     if ( sys->sys.place_changed )
     {
