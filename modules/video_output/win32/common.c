@@ -94,7 +94,6 @@ int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_
 #endif
     area->pf_GetDisplayDimensions = GetWindowDimensions;
     area->opaque_dimensions = sys;
-    SetRectEmpty(&sys->rect_parent);
 
     var_Create(vd, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 

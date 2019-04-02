@@ -60,9 +60,6 @@ typedef struct vout_display_sys_win32_t
     HWND                 hparent;             /* Handle of the parent window */
     HWND                 hfswnd;          /* Handle of the fullscreen window */
 
-    /* size of the overall window (including black bands) */
-    RECT         rect_parent;
-
 # if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HINSTANCE     dxgidebug_dll;
 # endif
