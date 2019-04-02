@@ -327,13 +327,6 @@ static void *EventThread( void *p_this )
 
     } /* End Main loop */
 
-    /* Check for WM_QUIT if we created the window */
-    if( !p_event->hparent && msg.message == WM_QUIT )
-    {
-        msg_Warn( p_event->obj, "WM_QUIT... should not happen!!" );
-        p_event->hwnd = NULL; /* Window already destroyed */
-    }
-
     msg_Dbg( p_event->obj, "Win32 Vout EventThread terminating" );
 
     Win32VoutCloseWindow( p_event );
@@ -356,8 +349,7 @@ bool EventThreadGetAndResetSizeChanged( event_thread_t *p_event )
 
 event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_window)
 {
-    if (parent_window->type != VOUT_WINDOW_TYPE_HWND &&
-        !(parent_window->type == VOUT_WINDOW_TYPE_DUMMY && parent_window->handle.hwnd == 0))
+    if (parent_window->type != VOUT_WINDOW_TYPE_HWND)
         return NULL;
      /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
@@ -636,10 +628,8 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     hInstance = GetModuleHandle(NULL);
 
     /* If an external window was specified, we'll draw in it. */
-    if ( p_event->parent_window->type == VOUT_WINDOW_TYPE_HWND )
-        p_event->hparent = p_event->parent_window->handle.hwnd;
-    else
-        p_event->hparent = NULL;
+    assert( p_event->parent_window->type == VOUT_WINDOW_TYPE_HWND );
+    p_event->hparent = p_event->parent_window->handle.hwnd;
     p_event->cursor_arrow = LoadCursor(NULL, IDC_ARROW);
     p_event->cursor_empty = EmptyCursor(hInstance);
 
@@ -666,16 +656,13 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         return VLC_EGENERIC;
     }
 
-    if( p_event->hparent )
-    {
-        i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD;
+    i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD;
 
-        /* allow user to regain control over input events if requested */
-        bool b_mouse_support = var_InheritBool( p_event->obj, "mouse-events" );
-        bool b_key_support = var_InheritBool( p_event->obj, "keyboard-events" );
-        if( !b_mouse_support && !b_key_support )
-            i_style |= WS_DISABLED;
-    }
+    /* allow user to regain control over input events if requested */
+    bool b_mouse_support = var_InheritBool( p_event->obj, "mouse-events" );
+    bool b_key_support = var_InheritBool( p_event->obj, "keyboard-events" );
+    if( !b_mouse_support && !b_key_support )
+        i_style |= WS_DISABLED;
 
     /* Create the window */
     p_event->hwnd =
@@ -698,15 +685,12 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         return VLC_EGENERIC;
     }
 
-    if( p_event->hparent )
-    {
-        /* We don't want the window owner to overwrite our client area */
-        LONG  parent_style = GetWindowLong( p_event->hparent, GWL_STYLE );
-        if( !(parent_style & WS_CLIPCHILDREN) )
-            /* Hmmm, apparently this is a blocking call... */
-            SetWindowLong( p_event->hparent, GWL_STYLE,
-                           parent_style | WS_CLIPCHILDREN );
-    }
+    /* We don't want the window owner to overwrite our client area */
+    LONG  parent_style = GetWindowLong( p_event->hparent, GWL_STYLE );
+    if( !(parent_style & WS_CLIPCHILDREN) )
+        /* Hmmm, apparently this is a blocking call... */
+        SetWindowLong( p_event->hparent, GWL_STYLE,
+                       parent_style | WS_CLIPCHILDREN );
 
     int err = CreateVideoWindow( p_event );
     if ( err != VLC_SUCCESS )
