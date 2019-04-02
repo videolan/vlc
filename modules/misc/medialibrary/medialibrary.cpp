@@ -1976,8 +1976,8 @@ static void Close( vlc_object_t* obj )
     delete p_ml;
 }
 
-#define ML_FOLDER_TEXT _( "Folders discovered by the media library" )
-#define ML_FOLDER_LONGTEXT _( "Semicolon separated list of folders to discover " \
+#define ML_FOLDER_TEXT N_( "Folders discovered by the media library" )
+#define ML_FOLDER_LONGTEXT N_( "Semicolon separated list of folders to discover " \
                               "media from" )
 
 #define ML_VERBOSE _( "Extra verbose media library logs" )
