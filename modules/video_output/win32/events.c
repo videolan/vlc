@@ -83,8 +83,8 @@ struct event_thread_t
 
     /* */
     vout_window_t *parent_window;
-    TCHAR class_main[256];
-    TCHAR class_video[256];
+    WCHAR class_main[256];
+    WCHAR class_video[256];
     HWND hparent;
     HWND hwnd;
     HWND hvideownd;
@@ -460,10 +460,10 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_wind
     p_event->place.width = 0;
     p_event->place.height = 0;
 
-    _sntprintf( p_event->class_main, ARRAYSIZE(p_event->class_main),
-               _T("VLC video main %p"), (void *)p_event );
-    _sntprintf( p_event->class_video, ARRAYSIZE(p_event->class_video),
-               _T("VLC video output %p"), (void *)p_event );
+    _snwprintf( p_event->class_main, ARRAYSIZE(p_event->class_main),
+               TEXT("VLC video main %p"), (void *)p_event );
+    _snwprintf( p_event->class_video, ARRAYSIZE(p_event->class_video),
+               TEXT("VLC video output %p"), (void *)p_event );
     return p_event;
 }
 
@@ -614,8 +614,8 @@ enumWindowsProc(HWND hwnd, LPARAM lParam)
 
     if( !strcasecmp( name, "WorkerW" ) )
     {
-        hwnd = FindWindowEx( hwnd, NULL, _T("SHELLDLL_DefView"), NULL );
-        if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SysListView32"), NULL );
+        hwnd = FindWindowEx( hwnd, NULL, TEXT("SHELLDLL_DefView"), NULL );
+        if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, TEXT("SysListView32"), NULL );
         if( hwnd )
         {
             *wnd = hwnd;
@@ -628,9 +628,9 @@ enumWindowsProc(HWND hwnd, LPARAM lParam)
 static HWND GetDesktopHandle(vlc_object_t *obj)
 {
     /* Find Program Manager */
-    HWND hwnd = FindWindow( _T("Progman"), NULL );
-    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SHELLDLL_DefView"), NULL );
-    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SysListView32"), NULL );
+    HWND hwnd = FindWindow( TEXT("Progman"), NULL );
+    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, TEXT("SHELLDLL_DefView"), NULL );
+    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, TEXT("SysListView32"), NULL );
     if( hwnd )
         return hwnd;
 
@@ -714,7 +714,7 @@ static int CreateVideoWindow( event_thread_t *p_event )
      * the size of the video, which allows us to use crazy overlay colorkeys
      * without having them shown outside of the video area. */
     p_event->hvideownd =
-        CreateWindow( p_event->class_video, _T(""),   /* window class */
+        CreateWindow( p_event->class_video, TEXT(""),   /* window class */
             WS_CHILD,                   /* window style, not visible initially */
             p_event->place.x, p_event->place.y,
             p_event->place.width,          /* default width */
@@ -744,7 +744,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     HINSTANCE  hInstance;
     HMENU      hMenu;
     WNDCLASS   wc;                            /* window class components */
-    TCHAR      vlc_path[MAX_PATH+1];
+    WCHAR      vlc_path[MAX_PATH];
     int        i_style;
 
     msg_Dbg( p_event->obj, "Win32VoutCreateWindow" );
@@ -835,7 +835,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     p_event->hwnd =
         CreateWindowEx( WS_EX_NOPARENTNOTIFY,
                     p_event->class_main,             /* name of window class */
-                    _T(VOUT_TITLE) _T(" (VLC Video Output)"),/* window title */
+                    TEXT(VOUT_TITLE) TEXT(" (VLC Video Output)"),/* window title */
                     i_style,                                 /* window style */
                     (!p_event->window_area.left) ? CW_USEDEFAULT :
                         p_event->window_area.left,   /* default X coordinate */
@@ -866,7 +866,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         /* Create our fullscreen window */
         p_event->hfswnd =
             CreateWindowEx( WS_EX_APPWINDOW, p_event->class_main,
-                            _T(VOUT_TITLE) _T(" (VLC Fullscreen Video Output)"),
+                            TEXT(VOUT_TITLE) TEXT(" (VLC Fullscreen Video Output)"),
                             WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN|WS_SIZEBOX,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             CW_USEDEFAULT, CW_USEDEFAULT,
@@ -879,9 +879,9 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
 
     /* Append a "Always On Top" entry in the system menu */
     hMenu = GetSystemMenu( p_event->hwnd, FALSE );
-    AppendMenu( hMenu, MF_SEPARATOR, 0, _T("") );
+    AppendMenu( hMenu, MF_SEPARATOR, 0, TEXT("") );
     AppendMenu( hMenu, MF_STRING | MF_UNCHECKED,
-                       IDM_TOGGLE_ON_TOP, _T("Always on &Top") );
+                       IDM_TOGGLE_ON_TOP, TEXT("Always on &Top") );
 
     int err = CreateVideoWindow( p_event );
     if ( err != VLC_SUCCESS )
