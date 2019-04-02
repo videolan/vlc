@@ -401,7 +401,7 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
 
     if (vout_Request(cfg, p_resource->p_input)) {
         vlc_mutex_unlock(&p_resource->lock);
-        input_resource_PutVout(p_resource, vout);
+        input_resource_PutVout(p_resource, cfg->vout);
         return NULL;
     }
 
