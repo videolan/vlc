@@ -40,50 +40,8 @@
 int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
                      const char *psz_type )
 {
-    playlist_export_t *p_export =
-        vlc_custom_create( p_playlist, sizeof( *p_export ), "playlist export" );
-    if( unlikely(p_export == NULL) )
-        return VLC_ENOMEM;
-
-    msg_Dbg( p_export, "saving playlist to file %s", psz_filename );
-
-    int ret = VLC_EGENERIC;
-
-    /* Prepare the playlist_export_t structure */
-    p_export->base_url = vlc_path2uri( psz_filename, NULL );
-    p_export->p_file = vlc_fopen( psz_filename, "wt" );
-    if( p_export->p_file == NULL )
-    {
-        msg_Err( p_export, "could not create playlist file %s: %s",
-                 psz_filename, vlc_strerror_c(errno) );
-        goto out;
-    }
-
-    module_t *p_module;
-
-    /* And call the module ! All work is done now */
-    playlist_Lock( p_playlist );
-    p_export->p_root = p_playlist->p_playing;
-
-    p_module = module_need( p_export, "playlist export", psz_type, true );
-    playlist_Unlock( p_playlist );
-
-    if( p_module != NULL )
-    {
-        module_unneed( p_export, p_module );
-        if( !ferror( p_export->p_file ) )
-            ret = VLC_SUCCESS;
-        else
-            msg_Err( p_playlist, "could not write playlist file: %s",
-                     vlc_strerror_c(errno) );
-    }
-    else
-        msg_Err( p_playlist, "could not export playlist" );
-   fclose( p_export->p_file );
-out:
-   free( p_export->base_url );
-   vlc_object_delete(p_export);
-   return ret;
+    (void) p_playlist; (void) psz_filename; (void) psz_type;
+    return VLC_EGENERIC;
 }
 
 int playlist_Import( playlist_t *p_playlist, const char *psz_file )
