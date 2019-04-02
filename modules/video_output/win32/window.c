@@ -39,6 +39,7 @@
 #define RECTWidth(r)   (LONG)((r).right - (r).left)
 #define RECTHeight(r)  (LONG)((r).bottom - (r).top)
 
+#define WM_VLC_CHANGE_TEXT   (WM_APP + 1)
 #define WM_VLC_SET_ON_TOP    (WM_APP + 2)
 
 #define IDM_TOGGLE_ON_TOP  (WM_USER + 1)
@@ -59,6 +60,9 @@ typedef struct vout_window_sys_t
     /* state before fullscreen */
     WINDOWPLACEMENT window_placement;
     LONG            i_window_style;
+
+    /* Title */
+    char *psz_title;
 } vout_window_sys_t;
 
 
@@ -123,6 +127,23 @@ static void SetState(vout_window_t *wnd, unsigned state)
         PostMessage( sys->hwnd, WM_VLC_SET_ON_TOP, FALSE, 0);
         break;
     }
+}
+
+static void SetTitle(vout_window_t *wnd, const char *title)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    char *psz_title = var_InheritString( wnd, "video-title" );
+    if( !psz_title )
+        psz_title = strdup( title );
+    if( !psz_title )
+        return;
+
+    vlc_mutex_lock( &sys->lock );
+    free( sys->psz_title );
+    sys->psz_title = psz_title;
+    vlc_mutex_unlock( &sys->lock );
+
+    PostMessage( sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
 }
 
 static void SetFullscreen(vout_window_t *wnd, const char *id)
@@ -239,6 +260,31 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
     case WM_VLC_SET_ON_TOP:
         SetAbove( hwnd, wParam != 0);
         return 0;
+
+    case WM_VLC_CHANGE_TEXT:
+        {
+            vout_window_sys_t *sys = wnd->sys;
+            vlc_mutex_lock( &sys->lock );
+            wchar_t *pwz_title = NULL;
+            if( sys->psz_title )
+            {
+                const size_t i_length = strlen(sys->psz_title);
+                pwz_title = vlc_alloc( i_length + 1, 2 );
+                if( pwz_title )
+                {
+                    mbstowcs( pwz_title, sys->psz_title, 2 * i_length );
+                    pwz_title[i_length] = 0;
+                }
+            }
+            vlc_mutex_unlock( &sys->lock );
+
+            if( pwz_title )
+            {
+                SetWindowTextW( hwnd, pwz_title );
+                free( pwz_title );
+            }
+            break;
+        }
     }
 
     return DefWindowProc(hwnd, message, wParam, lParam);
@@ -248,6 +294,7 @@ static void Close(vout_window_t *wnd)
 {
     vout_window_sys_t *sys = wnd->sys;
 
+    free( sys->psz_title );
     if (sys->hwnd)
     {
         PostMessage( sys->hwnd, WM_CLOSE, 0, 0 );
@@ -341,6 +388,7 @@ static const struct vout_window_operations ops = {
     .enable  = Enable,
     .disable = Disable,
     .resize = Resize,
+    .set_title = SetTitle,
     .set_state = SetState,
     .set_fullscreen = SetFullscreen,
     .unset_fullscreen = UnsetFullscreen,
