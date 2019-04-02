@@ -288,7 +288,7 @@ static bool StartRendering(void *opaque)
     /* TODO read the swapchain size and call VOUT_DISPLAY_CHANGE_DISPLAY_SIZE */
     UpdateRects(vd, &sys->area, &sys->sys);
 #else /* !VLC_WINSTORE_APP */
-    CommonManage(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
+    CommonManage(vd, &sys->area, &sys->sys);
 #endif
 
     if ( sys->area.place_changed )
@@ -745,7 +745,7 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
-    int res = CommonControl( vd, &sys->area, sys->sys.event ? &sys->sys : NULL, query, args );
+    int res = CommonControl( vd, &sys->area, &sys->sys, query, args );
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
     {
@@ -848,7 +848,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 sys->picQuad.i_height = texDesc.Height;
                 sys->picQuad.i_width = texDesc.Width;
 
-                UpdateRects(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
+                UpdateRects(vd, &sys->area, &sys->sys);
                 UpdateSize(vd);
             }
         }
@@ -1464,7 +1464,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
-    UpdateRects(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
+    UpdateRects(vd, &sys->area, &sys->sys);
 
     video_format_t surface_fmt = *fmt;
     surface_fmt.i_width  = sys->picQuad.i_width;
@@ -1574,7 +1574,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
-    UpdateRects(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
+    UpdateRects(vd, &sys->area, &sys->sys);
 
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {

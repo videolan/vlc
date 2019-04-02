@@ -900,7 +900,7 @@ static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
         return VLC_EGENERIC;
     }
 
-    UpdateRects(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
+    UpdateRects(vd, &sys->area, &sys->sys);
 
     /* re-create them */
     if (Direct3D9CreateResources(vd, fmtp)) {
@@ -1208,7 +1208,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
-    CommonManage(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
+    CommonManage(vd, &sys->area, &sys->sys);
 
     /* Desktop mode change */
     bool prev_desktop = sys->sys.use_desktop;
@@ -1505,7 +1505,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
     fmt->i_bmask  = d3dfmt->bmask;
     sys->sw_texture_fmt = d3dfmt;
 
-    UpdateRects(vd, &sys->area, sys->sys.event ? &sys->sys : NULL);
+    UpdateRects(vd, &sys->area, &sys->sys);
 
     if (Direct3D9CreateResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate resources");
@@ -1556,7 +1556,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     }
     default:
-        return CommonControl(vd, &sys->area, sys->sys.event ? &sys->sys : NULL, query, args);
+        return CommonControl(vd, &sys->area, &sys->sys, query, args);
     }
 }
 

@@ -180,7 +180,7 @@ void UpdateRects(vout_display_t *vd, display_win32_area_t *area, vout_display_sy
 #endif
 
 #if !VLC_WINSTORE_APP
-        if (sys != NULL)
+        if (sys->event != NULL)
         {
             EventThreadUpdatePlace(sys->event, &area->place);
 
@@ -216,10 +216,7 @@ void CommonClean(vlc_object_t *obj, vout_display_sys_win32_t *sys)
 
 void CommonManage(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys)
 {
-    if (sys == NULL)
-        return;
-
-    if (EventThreadGetAndResetSizeChanged(sys->event))
+    if (sys->event != NULL && EventThreadGetAndResetSizeChanged(sys->event))
         UpdateRects(vd, area, sys);
 }
 
@@ -370,7 +367,7 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
     {   /* Update dimensions */
         area->vdcfg = *va_arg(args, const vout_display_cfg_t *);
 #if !VLC_WINSTORE_APP
-        if (!area->vdcfg.is_fullscreen && sys != NULL) {
+        if (!area->vdcfg.is_fullscreen && sys->event != NULL) {
             RECT rect_window = {
                 .top    = 0,
                 .left   = 0,
@@ -390,7 +387,7 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
     case VOUT_DISPLAY_CHANGE_WINDOW_STATE: {       /* unsigned state */
         const unsigned state = va_arg(args, unsigned);
         const bool is_on_top = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
-        if (sys != NULL)
+        if (sys->event != NULL)
         {
 #ifdef MODULE_NAME_IS_direct3d9
             if (sys->use_desktop && is_on_top)
@@ -411,7 +408,7 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
     }
     case VOUT_DISPLAY_CHANGE_FULLSCREEN: {
         bool fs = va_arg(args, int);
-        if (sys != NULL)
+        if (sys->event != NULL)
         {
             if (CommonControlSetFullscreen(VLC_OBJECT(vd), sys, fs))
                 return VLC_EGENERIC;
