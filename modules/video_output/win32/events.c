@@ -641,6 +641,99 @@ static HWND GetDesktopHandle(vlc_object_t *obj)
 }
 #endif
 
+static long FAR PASCAL VideoEventProc( HWND hwnd, UINT message,
+                                       WPARAM wParam, LPARAM lParam )
+{
+    if( message == WM_CREATE )
+    {
+        /* Store p_event for future use */
+        CREATESTRUCT *c = (CREATESTRUCT *)lParam;
+        SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)c->lpCreateParams );
+        return 0;
+    }
+
+    LONG_PTR p_user_data = GetWindowLongPtr( hwnd, GWLP_USERDATA );
+    if( p_user_data == 0 ) /* messages before WM_CREATE */
+        return DefWindowProc(hwnd, message, wParam, lParam);
+    event_thread_t *p_event = (event_thread_t *)p_user_data;
+
+    if( message == WM_CAPTURECHANGED )
+    {
+        for( int button = 0; p_event->button_pressed; button++ )
+        {
+            unsigned m = 1 << button;
+            if( p_event->button_pressed & m )
+                vout_window_ReportMouseReleased(p_event->parent_window, button);
+            p_event->button_pressed &= ~m;
+        }
+        p_event->button_pressed = 0;
+        return 0;
+    }
+
+    switch( message )
+    {
+    /*
+    ** For OpenGL and Direct3D, vout will update the whole
+    ** window at regular interval, therefore dirty region
+    ** can be ignored to minimize repaint.
+    */
+    case WM_ERASEBKGND:
+        /* nothing to erase */
+        return 1;
+    case WM_PAINT:
+        /* nothing to repaint */
+        ValidateRect(hwnd, NULL);
+        // fall through
+    default:
+        return DefWindowProc(hwnd, message, wParam, lParam);
+    }
+}
+
+static int CreateVideoWindow( event_thread_t *p_event )
+{
+    HINSTANCE hInstance = GetModuleHandle(NULL);
+    WNDCLASS   wc;                            /* window class components */
+
+    /* Register the video sub-window class */
+    wc.style         = CS_OWNDC|CS_DBLCLKS;          /* style: dbl click */
+    wc.lpfnWndProc   = (WNDPROC)VideoEventProc;         /* event handler */
+    wc.cbClsExtra    = 0;                         /* no extra class data */
+    wc.cbWndExtra    = 0;                        /* no extra window data */
+    wc.hInstance     = hInstance;                            /* instance */
+    wc.hIcon         = 0;
+    wc.hCursor       = p_event->is_cursor_hidden ? p_event->cursor_empty :
+                                                   p_event->cursor_arrow;
+    wc.hbrBackground = NULL;
+    wc.lpszMenuName  = NULL;                                  /* no menu */
+    wc.lpszClassName = p_event->class_video;
+    if( !RegisterClass(&wc) )
+    {
+        msg_Err( p_event->obj, "CreateVideoWindow RegisterClass FAILED (err=%lu)", GetLastError() );
+        return VLC_EGENERIC;
+    }
+
+    /* Create video sub-window. This sub window will always exactly match
+     * the size of the video, which allows us to use crazy overlay colorkeys
+     * without having them shown outside of the video area. */
+    p_event->hvideownd =
+        CreateWindow( p_event->class_video, _T(""),   /* window class */
+            WS_CHILD,                   /* window style, not visible initially */
+            p_event->place.x, p_event->place.y,
+            p_event->place.width,          /* default width */
+            p_event->place.height,        /* default height */
+            p_event->hwnd,               /* parent window */
+            NULL, hInstance,
+            (LPVOID)p_event );    /* send vd to WM_CREATE */
+
+    if( !p_event->hvideownd )
+    {
+        msg_Err( p_event->obj, "can't create video sub-window" );
+        return VLC_EGENERIC;
+    }
+    msg_Dbg( p_event->obj, "created video sub-window" );
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Win32VoutCreateWindow: create a window for the video.
  *****************************************************************************
@@ -710,16 +803,6 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         if( p_event->vlc_icon )
             DestroyIcon( p_event->vlc_icon );
 
-        msg_Err( p_event->obj, "Win32VoutCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
-        return VLC_EGENERIC;
-    }
-
-    /* Register the video sub-window class */
-    wc.lpszClassName = p_event->class_video;
-    wc.hIcon = 0;
-    wc.hbrBackground = NULL; /* no background color */
-    if( !RegisterClass(&wc) )
-    {
         msg_Err( p_event->obj, "Win32VoutCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
         return VLC_EGENERIC;
     }
@@ -802,25 +885,9 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     AppendMenu( hMenu, MF_STRING | MF_UNCHECKED,
                        IDM_TOGGLE_ON_TOP, _T("Always on &Top") );
 
-    /* Create video sub-window. This sub window will always exactly match
-     * the size of the video, which allows us to use crazy overlay colorkeys
-     * without having them shown outside of the video area. */
-    p_event->hvideownd =
-    CreateWindow( p_event->class_video, _T(""),   /* window class */
-        WS_CHILD,                   /* window style, not visible initially */
-        p_event->place.x, p_event->place.y,
-        p_event->place.width,          /* default width */
-        p_event->place.height,        /* default height */
-        p_event->hwnd,               /* parent window */
-        NULL, hInstance,
-        (LPVOID)p_event );    /* send vd to WM_CREATE */
-
-    if( !p_event->hvideownd )
-    {
-        msg_Err( p_event->obj, "can't create video sub-window" );
-        return VLC_EGENERIC;
-    }
-    msg_Dbg( p_event->obj, "created video sub-window" );
+    int err = CreateVideoWindow( p_event );
+    if ( err != VLC_SUCCESS )
+        return err;
 
     InitGestures( p_event->hwnd, &p_event->p_gesture, p_event->is_projected );
 
@@ -910,27 +977,6 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         }
         p_event->button_pressed = 0;
         return 0;
-    }
-
-    if( hwnd == p_event->hvideownd )
-    {
-        switch( message )
-        {
-        /*
-        ** For OpenGL and Direct3D, vout will update the whole
-        ** window at regular interval, therefore dirty region
-        ** can be ignored to minimize repaint.
-        */
-        case WM_ERASEBKGND:
-            /* nothing to erase */
-            return 1;
-        case WM_PAINT:
-            /* nothing to repaint */
-            ValidateRect(hwnd, NULL);
-            // fall through
-        default:
-            return DefWindowProc(hwnd, message, wParam, lParam);
-        }
     }
 
     switch( message )
