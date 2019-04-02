@@ -202,9 +202,19 @@ public:
         return ptr == other.ptr;
     }
 
+    bool operator==(std::nullptr_t) const noexcept
+    {
+        return ptr == nullptr;
+    }
+
     bool operator!=(const vlc_shared_data_ptr &other) const
     {
         return !(*this == other);
+    }
+
+    bool operator!=(std::nullptr_t) const noexcept
+    {
+        return ptr != nullptr;
     }
 
     explicit operator bool() const
