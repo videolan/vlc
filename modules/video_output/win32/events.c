@@ -264,12 +264,18 @@ static void *EventThread( void *p_this )
         case WM_MBUTTONUP:
             MouseReleased( p_event, MOUSE_BUTTON_CENTER );
             break;
+        case WM_MBUTTONDBLCLK:
+            vout_window_ReportMouseDoubleClick(p_event->parent_window, MOUSE_BUTTON_CENTER);
+            break;
 
         case WM_RBUTTONDOWN:
             MousePressed( p_event, msg.hwnd, MOUSE_BUTTON_RIGHT );
             break;
         case WM_RBUTTONUP:
             MouseReleased( p_event, MOUSE_BUTTON_RIGHT );
+            break;
+        case WM_RBUTTONDBLCLK:
+            vout_window_ReportMouseDoubleClick(p_event->parent_window, MOUSE_BUTTON_RIGHT);
             break;
 
         case WM_KEYDOWN:
