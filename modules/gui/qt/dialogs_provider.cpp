@@ -597,23 +597,6 @@ void DialogsProvider::PLAppendDir()
 /****************
  * Playlist     *
  ****************/
-void DialogsProvider::openAPlaylist()
-{
-    QStringList urls = showSimpleOpen( qtr( "Open playlist..." ),
-                                        EXT_FILTER_PLAYLIST );
-    foreach( const QString &url, urls )
-    {
-        char* psz_path = vlc_uri2path(qtu( url ));
-        if ( !psz_path )
-        {
-            msg_Warn( p_intf, "unable to load playlist '%s'", qtu( url ) );
-            continue;
-        }
-        playlist_Import( THEPL, psz_path );
-        free( psz_path );
-    }
-}
-
 void DialogsProvider::savePlayingToPlaylist()
 {
     static const struct

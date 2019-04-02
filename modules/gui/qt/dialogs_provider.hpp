@@ -166,7 +166,6 @@ public slots:
     void openAndStreamingDialogs();
     void openAndTranscodingDialogs();
 
-    void openAPlaylist();
     void savePlayingToPlaylist();
 
     void loadSubtitlesFile();
