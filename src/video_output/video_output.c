@@ -1816,6 +1816,7 @@ vout_thread_t *vout_Hold(vout_thread_t *vout)
 int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
 {
     vout_thread_t *vout = cfg->vout;
+    vout_thread_sys_t *sys = vout->p;
 
     assert(vout != NULL);
     assert(cfg->fmt != NULL);
@@ -1830,8 +1831,8 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
     /* TODO: If dimensions are equal or slightly smaller, update the aspect
      * ratio and crop settings, instead of recreating a display.
      */
-    if (video_format_IsSimilar(&original, &vout->p->original)) {
-        if (cfg->dpb_size <= vout->p->dpb_size) {
+    if (video_format_IsSimilar(&original, &sys->original)) {
+        if (cfg->dpb_size <= sys->dpb_size) {
             video_format_Clean(&original);
             /* It is assumed that the SPU input matches input already. */
             return 0;
@@ -1839,12 +1840,10 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
         msg_Warn(vout, "DPB need to be increased");
     }
 
-    if (vout->p->original.i_chroma != 0)
+    if (sys->original.i_chroma != 0)
         vout_StopDisplay(vout);
 
     vout_ReinitInterlacingSupport(vout);
-
-    vout_thread_sys_t *sys = vout->p;
 
     sys->original = original;
 
@@ -1876,7 +1875,7 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
     sys->clock = cfg->clock;
     sys->delay = sys->spu_delay = 0;
 
-    vlc_mutex_unlock(&vout->p->window_lock);
+    vlc_mutex_unlock(&sys->window_lock);
 
     if (vout_Start(vout, cfg)
      || vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
@@ -1887,7 +1886,7 @@ error:
     }
 
     if (input != NULL)
-        spu_Attach(vout->p->spu, input);
+        spu_Attach(sys->spu, input);
     vout_IntfReinit(vout);
     return 0;
 }
