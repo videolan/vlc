@@ -1877,8 +1877,10 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
 
     vlc_mutex_unlock(&sys->window_lock);
 
-    if (vout_Start(vout, cfg)
-     || vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
+    if (vout_Start(vout, cfg))
+        goto error;
+    if (vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
+        vout_Stop(vout);
 error:
         msg_Err(vout, "video output creation failed");
         video_format_Clean(&sys->original);
