@@ -79,6 +79,9 @@ static bool GetWindowDimensions(void *opaque, UINT *width, UINT *height)
 /* */
 int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys)
 {
+    if (unlikely(area->vdcfg.window == NULL))
+        return VLC_EGENERIC;
+
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
 #endif
@@ -116,7 +119,6 @@ int CommonInit(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_
     if (EventThreadStart(sys->event, &hwnd, &cfg))
         return VLC_EGENERIC;
 
-    sys->parent_window = hwnd.parent_window;
     sys->hparent       = hwnd.hparent;
     sys->hwnd          = hwnd.hwnd;
     sys->hvideownd     = hwnd.hvideownd;
@@ -272,10 +274,6 @@ static int CommonControlSetFullscreen(vlc_object_t *obj, vout_display_sys_win32_
     if (sys->use_desktop && is_fullscreen)
         return VLC_EGENERIC;
 #endif
-
-    /* */
-    if (sys->parent_window)
-        return VLC_EGENERIC;
 
     /* */
     HWND hwnd = sys->hparent && sys->hfswnd ? sys->hfswnd : sys->hwnd;

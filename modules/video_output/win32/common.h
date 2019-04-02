@@ -56,7 +56,6 @@ typedef struct vout_display_sys_win32_t
     /* */
     HWND                 hwnd;                  /* Handle of the main window */
     HWND                 hvideownd;        /* Handle of the video sub-window */
-    struct vout_window_t *parent_window;         /* Parent window VLC object */
     HWND                 hparent;             /* Handle of the parent window */
     HWND                 hfswnd;          /* Handle of the fullscreen window */
 
