@@ -97,8 +97,6 @@ int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
     sys->is_first_placement = true;
     sys->is_on_top        = false;
 
-    var_Create(obj, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
-
     /* */
     sys->event = EventThreadCreate(obj, area->vdcfg.window);
     if (!sys->event)
@@ -279,17 +277,11 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
     {   /* Update dimensions */
         area->vdcfg = *va_arg(args, const vout_display_cfg_t *);
 #if !VLC_WINSTORE_APP
-        if (!area->vdcfg.is_fullscreen && sys->event != NULL) {
-            RECT rect_window = {
-                .top    = 0,
-                .left   = 0,
-                .right  = area->vdcfg.display.width,
-                .bottom = area->vdcfg.display.height,
-            };
-            AdjustWindowRect(&rect_window, EventThreadGetWindowStyle(sys->event), 0);
+        if (sys->event != NULL)
+        {
             SetWindowPos(sys->hwnd, 0, 0, 0,
-                         RECTWidth(rect_window),
-                         RECTHeight(rect_window), SWP_NOZORDER|SWP_NOMOVE);
+                         area->vdcfg.display.width,
+                         area->vdcfg.display.height, SWP_NOZORDER|SWP_NOMOVE);
         }
 #endif /* !VLC_WINSTORE_APP */
         UpdateRects(vd, area, sys);

@@ -71,7 +71,6 @@ struct event_thread_t
     /* Gestures */
     win32_gesture_sys_t *p_gesture;
 
-    int i_window_style;
     RECT window_area;
 
     /* */
@@ -340,12 +339,6 @@ static void *EventThread( void *p_this )
     Win32VoutCloseWindow( p_event );
     vlc_restorecancel(canc);
     return NULL;
-}
-
-int EventThreadGetWindowStyle( event_thread_t *p_event )
-{
-    /* No need to lock, it is serialized by EventThreadStart */
-    return p_event->i_window_style;
 }
 
 void EventThreadUpdatePlace( event_thread_t *p_event,
@@ -674,19 +667,6 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         return VLC_EGENERIC;
     }
 
-    /* When you create a window you give the dimensions you wish it to
-     * have. Unfortunatly these dimensions will include the borders and
-     * titlebar. We use the following function to find out the size of
-     * the window corresponding to the useable surface we want */
-    RECT decorated_window = p_event->window_area;
-    i_style = var_GetBool( p_event->obj, "video-deco" )
-        /* Open with window decoration */
-        ? WS_OVERLAPPEDWINDOW|WS_SIZEBOX
-        /* No window decoration */
-        : WS_POPUP;
-    AdjustWindowRect( &decorated_window, i_style, 0 );
-    i_style |= WS_VISIBLE|WS_CLIPCHILDREN;
-
     if( p_event->hparent )
     {
         i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD;
@@ -698,20 +678,16 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
             i_style |= WS_DISABLED;
     }
 
-    p_event->i_window_style = i_style;
-
     /* Create the window */
     p_event->hwnd =
         CreateWindowEx( WS_EX_NOPARENTNOTIFY,
                     p_event->class_main,             /* name of window class */
                     TEXT(VOUT_TITLE) TEXT(" (VLC Video Output)"),/* window title */
                     i_style,                                 /* window style */
-                    (!p_event->window_area.left) ? CW_USEDEFAULT :
-                        p_event->window_area.left,   /* default X coordinate */
-                    (!p_event->window_area.top) ? CW_USEDEFAULT :
-                        p_event->window_area.top,    /* default Y coordinate */
-                    RECTWidth(decorated_window),             /* window width */
-                    RECTHeight(decorated_window),           /* window height */
+                    CW_USEDEFAULT,                   /* default X coordinate */
+                    CW_USEDEFAULT,                   /* default Y coordinate */
+                    RECTWidth(p_event->window_area),         /* window width */
+                    RECTHeight(p_event->window_area),       /* window height */
                     p_event->hparent,                       /* parent window */
                     NULL,                          /* no menu in this window */
                     hInstance,            /* handle of this program instance */
