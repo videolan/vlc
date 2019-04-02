@@ -1288,14 +1288,7 @@ void MainInterface::setName( const QString& name )
  **/
 void MainInterface::setVLCWindowsTitle( const QString& aTitle )
 {
-    if( aTitle.isEmpty() )
-    {
-        setWindowTitle( qtr( "VLC media player" ) );
-    }
-    else
-    {
-        setWindowTitle( aTitle + " - " + qtr( "VLC media player" ) );
-    }
+    setWindowTitle( aTitle );
 }
 
 void MainInterface::showCryptedLabel( bool b_show )
