@@ -93,7 +93,6 @@ int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
     sys->hwnd      = NULL;
     sys->hvideownd = NULL;
     sys->hparent   = NULL;
-    sys->hfswnd    = NULL;
     sys->is_first_placement = true;
     sys->is_on_top        = false;
 
@@ -107,11 +106,6 @@ int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
     /* */
     event_cfg_t cfg;
     memset(&cfg, 0, sizeof(cfg));
-#ifdef MODULE_NAME_IS_direct3d9
-    cfg.use_desktop = sys->use_desktop;
-#endif
-    cfg.x      = var_InheritInteger(obj, "video-x");
-    cfg.y      = var_InheritInteger(obj, "video-y");
     cfg.width  = area->vdcfg.display.width;
     cfg.height = area->vdcfg.display.height;
     cfg.is_projected = projection_gestures;
@@ -123,7 +117,6 @@ int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
     sys->hparent       = hwnd.hparent;
     sys->hwnd          = hwnd.hwnd;
     sys->hvideownd     = hwnd.hvideownd;
-    sys->hfswnd        = hwnd.hfswnd;
 
     return VLC_SUCCESS;
 }
@@ -268,87 +261,6 @@ static void CommonChangeThumbnailClip(vlc_object_t *obj, vout_display_sys_win32_
     }
     CoUninitialize();
 }
-
-static int CommonControlSetFullscreen(vlc_object_t *obj, vout_display_sys_win32_t *sys, bool is_fullscreen)
-{
-#ifdef MODULE_NAME_IS_direct3d9
-    if (sys->use_desktop && is_fullscreen)
-        return VLC_EGENERIC;
-#endif
-
-    /* */
-    HWND hwnd = sys->hparent && sys->hfswnd ? sys->hfswnd : sys->hwnd;
-
-    /* Save the current windows placement/placement to restore
-       when fullscreen is over */
-    WINDOWPLACEMENT window_placement;
-    window_placement.length = sizeof(WINDOWPLACEMENT);
-    GetWindowPlacement(hwnd, &window_placement);
-
-    if (is_fullscreen) {
-        msg_Dbg(obj, "entering fullscreen mode");
-
-        /* Change window style, no borders and no title bar */
-        SetWindowLong(hwnd, GWL_STYLE, WS_CLIPCHILDREN | WS_VISIBLE);
-
-        if (sys->hparent) {
-            /* Retrieve current window position so fullscreen will happen
-            *on the right screen */
-            HMONITOR hmon = MonitorFromWindow(sys->hparent,
-                                              MONITOR_DEFAULTTONEAREST);
-            MONITORINFO mi;
-            mi.cbSize = sizeof(MONITORINFO);
-            if (GetMonitorInfo(hmon, &mi))
-                SetWindowPos(hwnd, 0,
-                             mi.rcMonitor.left,
-                             mi.rcMonitor.top,
-                             RECTWidth(mi.rcMonitor),
-                             RECTHeight(mi.rcMonitor),
-                             SWP_NOZORDER|SWP_FRAMECHANGED);
-        } else {
-            /* Maximize non embedded window */
-            ShowWindow(hwnd, SW_SHOWMAXIMIZED);
-        }
-
-        if (sys->hparent) {
-            /* Hide the previous window */
-            RECT rect;
-            GetClientRect(hwnd, &rect);
-            SetParent(sys->hwnd, hwnd);
-            SetWindowPos(sys->hwnd, 0, 0, 0,
-                         rect.right, rect.bottom,
-                         SWP_NOZORDER|SWP_FRAMECHANGED);
-
-            HWND topLevelParent = GetAncestor(sys->hparent, GA_ROOT);
-            ShowWindow(topLevelParent, SW_HIDE);
-        }
-        SetForegroundWindow(hwnd);
-    } else {
-        msg_Dbg(obj, "leaving fullscreen mode");
-
-        /* Change window style, no borders and no title bar */
-        SetWindowLong(hwnd, GWL_STYLE, EventThreadGetWindowStyle(sys->event));
-
-        if (sys->hparent) {
-            RECT rect;
-            GetClientRect(sys->hparent, &rect);
-            SetParent(sys->hwnd, sys->hparent);
-            SetWindowPos(sys->hwnd, 0, 0, 0,
-                         rect.right, rect.bottom,
-                         SWP_NOZORDER|SWP_FRAMECHANGED);
-
-            HWND topLevelParent = GetAncestor(sys->hparent, GA_ROOT);
-            ShowWindow(topLevelParent, SW_SHOW);
-            SetForegroundWindow(sys->hparent);
-            ShowWindow(hwnd, SW_HIDE);
-        } else {
-            /* return to normal window for non embedded vout */
-            SetWindowPlacement(hwnd, &window_placement);
-            ShowWindow(hwnd, SW_SHOWNORMAL);
-        }
-    }
-    return VLC_SUCCESS;
-}
 #endif /* !VLC_WINSTORE_APP */
 
 int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys, int query, va_list args)
@@ -382,18 +294,6 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
         UpdateRects(vd, area, sys);
         return VLC_SUCCESS;
     }
-#if !VLC_WINSTORE_APP
-    case VOUT_DISPLAY_CHANGE_FULLSCREEN: {
-        bool fs = va_arg(args, int);
-        if (sys->event != NULL)
-        {
-            if (CommonControlSetFullscreen(VLC_OBJECT(vd), sys, fs))
-                return VLC_EGENERIC;
-            UpdateRects(vd, area, sys);
-        }
-        return VLC_SUCCESS;
-    }
-#endif /* !VLC_WINSTORE_APP */
 
     case VOUT_DISPLAY_RESET_PICTURES:
         vlc_assert_unreachable();

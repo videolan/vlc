@@ -126,12 +126,10 @@ enum {
      */
     VOUT_DISPLAY_RESET_PICTURES, /* const vout_display_cfg_t *, es_format_t * */
 
-#if defined(_WIN32) || defined(__OS2__)
+#if defined(__OS2__)
     /* Ask the module to acknowledge/refuse the fullscreen state change after
      * being requested (externally or by VOUT_DISPLAY_EVENT_FULLSCREEN */
     VOUT_DISPLAY_CHANGE_FULLSCREEN VLC_DEPRECATED_ENUM,     /* bool fs */
-#endif
-#if defined(__OS2__)
     /* Ask the module to acknowledge/refuse the window management state change
      * after being requested externally or by VOUT_DISPLAY_WINDOW_STATE */
     VOUT_DISPLAY_CHANGE_WINDOW_STATE VLC_DEPRECATED_ENUM,   /* unsigned state */
@@ -375,15 +373,6 @@ static inline void vout_display_SendEvent(vout_display_t *vd, int query, ...)
 
 VLC_API void vout_display_SendEventPicturesInvalid(vout_display_t *vd);
 
-#if defined(_WIN32) || defined(__OS2__)
-VLC_DEPRECATED
-static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_fullscreen)
-{
-    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
-                             is_fullscreen) == VLC_SUCCESS)
-        ((vout_display_cfg_t *)vd->cfg)->is_fullscreen = is_fullscreen;
-}
-#endif
 static inline void vout_display_SendEventMousePressed(vout_display_t *vd, int button)
 {
     vout_window_ReportMousePressed(vd->cfg->window, button);

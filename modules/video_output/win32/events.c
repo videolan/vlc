@@ -44,8 +44,6 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-#define WM_VLC_SET_TOP_STATE (WM_APP + 2)
-
 struct event_thread_t
 {
     vlc_object_t *obj;
@@ -59,7 +57,6 @@ struct event_thread_t
     bool         b_error;
 
     /* */
-    bool use_desktop;
     bool is_projected;
 
     /* Mouse */
@@ -83,7 +80,6 @@ struct event_thread_t
     HWND hparent;
     HWND hwnd;
     HWND hvideownd;
-    HWND hfswnd;
     vout_display_place_t place;
 
     atomic_bool size_changed;
@@ -415,12 +411,11 @@ void EventThreadDestroy( event_thread_t *p_event )
 
 int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event_cfg_t *p_cfg )
 {
-    p_event->use_desktop = p_cfg->use_desktop;
     p_event->is_projected = p_cfg->is_projected;
-    p_event->window_area.left   = p_cfg->x;
-    p_event->window_area.top    = p_cfg->y;
-    p_event->window_area.right  = p_cfg->x + p_cfg->width;
-    p_event->window_area.bottom = p_cfg->y + p_cfg->height;
+    p_event->window_area.left   = 0;
+    p_event->window_area.top    = 0;
+    p_event->window_area.right  = p_cfg->width;
+    p_event->window_area.bottom = p_cfg->height;
 
     atomic_store(&p_event->size_changed, false);
 
@@ -454,7 +449,6 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
     p_hwnd->hparent       = p_event->hparent;
     p_hwnd->hwnd          = p_event->hwnd;
     p_hwnd->hvideownd     = p_event->hvideownd;
-    p_hwnd->hfswnd        = p_event->hfswnd;
     return VLC_SUCCESS;
 }
 
@@ -537,45 +531,6 @@ static void MouseReleased( event_thread_t *p_event, unsigned button )
         ReleaseCapture();
     vout_window_ReportMouseReleased(p_event->parent_window, button);
 }
-
-#if defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)
-static int CALLBACK
-enumWindowsProc(HWND hwnd, LPARAM lParam)
-{
-    HWND *wnd = (HWND *)lParam;
-
-    char name[128];
-    name[0] = '\0';
-    GetClassNameA( hwnd, name, 128 );
-
-    if( !strcasecmp( name, "WorkerW" ) )
-    {
-        hwnd = FindWindowEx( hwnd, NULL, TEXT("SHELLDLL_DefView"), NULL );
-        if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, TEXT("SysListView32"), NULL );
-        if( hwnd )
-        {
-            *wnd = hwnd;
-            return false;
-        }
-    }
-    return true;
-}
-
-static HWND GetDesktopHandle(vlc_object_t *obj)
-{
-    /* Find Program Manager */
-    HWND hwnd = FindWindow( TEXT("Progman"), NULL );
-    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, TEXT("SHELLDLL_DefView"), NULL );
-    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, TEXT("SysListView32"), NULL );
-    if( hwnd )
-        return hwnd;
-
-    msg_Dbg( obj, "Couldn't find desktop icon window,. Trying the hard way." );
-
-    EnumWindows( enumWindowsProc, (LPARAM)&hwnd );
-    return hwnd;
-}
-#endif
 
 static long FAR PASCAL VideoEventProc( HWND hwnd, UINT message,
                                        WPARAM wParam, LPARAM lParam )
@@ -686,20 +641,8 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     /* Get this module's instance */
     hInstance = GetModuleHandle(NULL);
 
-    #if defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)
-    if( !p_event->use_desktop )
-    #endif
-    {
-        /* If an external window was specified, we'll draw in it. */
-        p_event->hparent = p_event->parent_window->handle.hwnd;
-    }
-    #if defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)
-    else
-    {
-        p_event->parent_window = NULL;
-        p_event->hparent = GetDesktopHandle(p_event->obj);
-    }
-    #endif
+    /* If an external window was specified, we'll draw in it. */
+    p_event->hparent = p_event->parent_window->handle.hwnd;
     p_event->cursor_arrow = LoadCursor(NULL, IDC_ARROW);
     p_event->cursor_empty = EmptyCursor(hInstance);
 
@@ -787,19 +730,6 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
             /* Hmmm, apparently this is a blocking call... */
             SetWindowLong( p_event->hparent, GWL_STYLE,
                            parent_style | WS_CLIPCHILDREN );
-
-        /* Create our fullscreen window */
-        p_event->hfswnd =
-            CreateWindowEx( WS_EX_APPWINDOW, p_event->class_main,
-                            TEXT(VOUT_TITLE) TEXT(" (VLC Fullscreen Video Output)"),
-                            WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN|WS_SIZEBOX,
-                            CW_USEDEFAULT, CW_USEDEFAULT,
-                            CW_USEDEFAULT, CW_USEDEFAULT,
-                            NULL, NULL, hInstance, NULL );
-    }
-    else
-    {
-        p_event->hfswnd = NULL;
     }
 
     int err = CreateVideoWindow( p_event );
@@ -825,8 +755,6 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
 
     DestroyWindow( p_event->hvideownd );
     DestroyWindow( p_event->hwnd );
-    if( p_event->hfswnd )
-        DestroyWindow( p_event->hfswnd );
 
     p_event->hwnd = NULL;
 
@@ -897,10 +825,6 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         PostQuitMessage( 0 );
         return 0;
 
-    case WM_VLC_SET_TOP_STATE:
-        SetAbove( p_event, wParam != 0);
-        return 0;
-
     case WM_KILLFOCUS:
         return 0;
 
@@ -916,11 +840,6 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
 
     /* Let windows handle the message */
     return DefWindowProc(hwnd, message, wParam, lParam);
-}
-
-void EventThreadSetAbove( event_thread_t *p_event, bool is_on_top )
-{
-    PostMessage( p_event->hwnd, WM_VLC_SET_TOP_STATE, is_on_top != 0, 0);
 }
 
 static struct

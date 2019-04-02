@@ -141,10 +141,6 @@ struct vout_display_sys_t
     display_win32_area_t     area;
 
     bool allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
-    struct {
-        bool is_fullscreen;
-        bool is_on_top;
-    } desktop_save;
 
     // core objects
     d3d9_handle_t           hd3d;
@@ -167,8 +163,6 @@ struct vout_display_sys_t
     bool                    reset_device;
     bool                    lost_not_ready;
     bool                    clear_scene;
-
-    atomic_bool             new_desktop_mode;
 
     /* outside rendering */
     void *outside_opaque;
@@ -910,29 +904,6 @@ static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
     return VLC_SUCCESS;
 }
 
-static void UpdateDesktopMode(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (sys->sys.use_desktop) {
-        /* Save non-desktop state */
-        sys->desktop_save.is_fullscreen = sys->area.vdcfg.is_fullscreen;
-        sys->desktop_save.is_on_top     = sys->sys.is_on_top;
-
-        /* Disable fullscreen/on_top while using desktop */
-        if (sys->desktop_save.is_fullscreen)
-            vout_display_SendEventFullscreen(vd, false);
-        if (sys->desktop_save.is_on_top)
-            EventThreadSetAbove( sys->sys.event, false );
-    } else {
-        /* Restore fullscreen/on_top */
-        if (sys->desktop_save.is_fullscreen)
-            vout_display_SendEventFullscreen(vd, true);
-        if (sys->desktop_save.is_on_top)
-            EventThreadSetAbove( sys->sys.event, true );
-    }
-}
-
 static void Direct3D9ImportSubpicture(vout_display_t *vd,
                                      size_t *count_ptr, d3d_region_t **region,
                                      subpicture_t *subpicture)
@@ -1209,12 +1180,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     vout_display_sys_t *sys = vd->sys;
 
     CommonManage(vd, &sys->area, &sys->sys);
-
-    /* Desktop mode change */
-    bool prev_desktop = sys->sys.use_desktop;
-    sys->sys.use_desktop = atomic_load( &sys->new_desktop_mode );
-    if (sys->sys.use_desktop != prev_desktop)
-        UpdateDesktopMode(vd);
 
     /* Position Change */
     if (sys->area.place_changed) {
@@ -1559,23 +1524,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     }
 }
 
-/*****************************************************************************
- * DesktopCallback: desktop mode variable callback
- *****************************************************************************/
-static int DesktopCallback(vlc_object_t *object, char const *psz_cmd,
-                            vlc_value_t oldval, vlc_value_t newval,
-                            void *p_data)
-{
-    vout_display_t *vd = (vout_display_t *)object;
-    vout_display_sys_t *sys = vd->sys;
-    VLC_UNUSED(psz_cmd);
-    VLC_UNUSED(oldval);
-    VLC_UNUSED(p_data);
-
-    atomic_store( &sys->new_desktop_mode, newval.b_bool );
-    return VLC_SUCCESS;
-}
-
 typedef struct
 {
     char **values;
@@ -1672,12 +1620,9 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys->hxdll)
         msg_Warn(vd, "cannot load Direct3D9 Shader Library; HLSL pixel shading will be disabled.");
 
-    sys->sys.use_desktop = var_CreateGetBool(vd, "video-wallpaper");
     sys->reset_device = false;
     sys->lost_not_ready = false;
     sys->allow_hw_yuv = var_CreateGetBool(vd, "directx-hw-yuv");
-    sys->desktop_save.is_fullscreen = cfg->is_fullscreen;
-    sys->desktop_save.is_on_top     = false;
 
     InitArea(vd, &sys->area, cfg);
     if (d3d9_device == NULL)
@@ -1709,12 +1654,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     else
         vd->info.subpicture_chromas = NULL;
 
-    /* Interaction */
-    atomic_init( &sys->new_desktop_mode, sys->sys.use_desktop );
-
-    var_Change(vd, "video-wallpaper", VLC_VAR_SETTEXT, _("Desktop"));
-    var_AddCallback(vd, "video-wallpaper", DesktopCallback, NULL);
-
     video_format_Clean(fmtp);
     video_format_Copy(fmtp, &fmt);
 
@@ -1723,10 +1662,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
-
-    /* Fix state in case of desktop mode */
-    if (sys->sys.use_desktop && cfg->is_fullscreen)
-        vout_display_SendEventFullscreen(vd, false);
 
     return VLC_SUCCESS;
 error:
@@ -1742,8 +1677,6 @@ error:
  */
 static void Close(vout_display_t *vd)
 {
-    var_DelCallback(vd, "video-wallpaper", DesktopCallback, NULL);
-
     Direct3D9Close(vd);
 
     CommonClean(VLC_OBJECT(vd), &vd->sys->sys);

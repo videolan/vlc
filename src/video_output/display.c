@@ -778,15 +778,13 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     if (vd->module == NULL)
         goto error;
 
-#if defined(_WIN32) || defined(__OS2__)
+#if defined(__OS2__)
     if ((var_GetBool(parent, "fullscreen")
       || var_GetBool(parent, "video-wallpaper"))
      && vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
                              true) == VLC_SUCCESS)
         osys->cfg.is_fullscreen = true;
-#endif
 
-#if defined(__OS2__)
     if (var_InheritBool(parent, "video-on-top"))
         vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE,
                              (unsigned)VOUT_WINDOW_STATE_ABOVE);

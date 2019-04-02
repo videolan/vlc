@@ -30,10 +30,7 @@
 typedef struct event_thread_t event_thread_t;
 
 typedef struct {
-    bool use_desktop; /* direct3d */
     bool is_projected;
-    int x;
-    int y;
     unsigned width;
     unsigned height;
 } event_cfg_t;
@@ -43,7 +40,6 @@ typedef struct {
     HWND hparent;
     HWND hwnd;
     HWND hvideownd;
-    HWND hfswnd;
 } event_hwnd_t;
 
 event_thread_t *EventThreadCreate( vlc_object_t *, vout_window_t *);
@@ -54,7 +50,6 @@ void            EventThreadStop( event_thread_t * );
 int             EventThreadGetWindowStyle( event_thread_t * );
 void            EventThreadUpdatePlace( event_thread_t *p_event,
                                         const vout_display_place_t *p_place );
-void            EventThreadSetAbove( event_thread_t *, bool );
 bool            EventThreadGetAndResetSizeChanged( event_thread_t * );
 
 # ifdef __cplusplus
