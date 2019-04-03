@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
+#include <vlc_mouse.h>
 
 #include <shellapi.h>                                         /* ExtractIcon */
 
@@ -56,6 +57,9 @@ typedef struct vout_window_sys_t
 
     WCHAR class_main[256];
     HICON vlc_icon;
+
+    /* mouse */
+    unsigned button_pressed;
 
     /* cursor */
     bool       is_cursor_hidden;
@@ -217,6 +221,24 @@ static void SetAbove( vout_window_t *wnd, enum vout_window_state state )
     }
 }
 
+static void MousePressed( vout_window_t *wnd, HWND hwnd, unsigned button )
+{
+    vout_window_sys_t *sys = wnd->sys;
+    if( !sys->button_pressed )
+        SetCapture( hwnd );
+    sys->button_pressed |= 1 << button;
+    vout_window_ReportMousePressed(wnd, button);
+}
+
+static void MouseReleased( vout_window_t *wnd, unsigned button )
+{
+    vout_window_sys_t *sys = wnd->sys;
+    sys->button_pressed &= ~(1 << button);
+    if( !sys->button_pressed )
+        ReleaseCapture();
+    vout_window_ReportMouseReleased(wnd, button);
+}
+
 /*****************************************************************************
  * WinVoutEventProc: This is the window event processing function.
  *****************************************************************************
@@ -263,6 +285,50 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         break;
     case WM_NCMOUSEMOVE:
         break;
+
+    case WM_CAPTURECHANGED:
+    {
+        vout_window_sys_t *sys = wnd->sys;
+        for( int button = 0; sys->button_pressed; button++ )
+        {
+            unsigned m = 1 << button;
+            if( sys->button_pressed & m )
+                vout_window_ReportMouseReleased(wnd, button);
+            sys->button_pressed &= ~m;
+        }
+        sys->button_pressed = 0;
+        break;
+    }
+
+    case WM_LBUTTONDOWN:
+        MousePressed( wnd, hwnd, MOUSE_BUTTON_LEFT );
+        return 0;
+    case WM_LBUTTONUP:
+        MouseReleased( wnd, MOUSE_BUTTON_LEFT );
+        return 0;
+    case WM_LBUTTONDBLCLK:
+        vout_window_ReportMouseDoubleClick(wnd, MOUSE_BUTTON_LEFT);
+        return 0;
+
+    case WM_MBUTTONDOWN:
+        MousePressed( wnd, hwnd, MOUSE_BUTTON_CENTER );
+        return 0;
+    case WM_MBUTTONUP:
+        MouseReleased( wnd, MOUSE_BUTTON_CENTER );
+        return 0;
+    case WM_MBUTTONDBLCLK:
+        vout_window_ReportMouseDoubleClick(wnd, MOUSE_BUTTON_CENTER);
+        return 0;
+
+    case WM_RBUTTONDOWN:
+        MousePressed( wnd, hwnd, MOUSE_BUTTON_RIGHT );
+        return 0;
+    case WM_RBUTTONUP:
+        MouseReleased( wnd, MOUSE_BUTTON_RIGHT );
+        return 0;
+    case WM_RBUTTONDBLCLK:
+        vout_window_ReportMouseDoubleClick(wnd, MOUSE_BUTTON_RIGHT);
+        return 0;
 
     case WM_SYSCOMMAND:
         switch (wParam)
@@ -557,6 +623,7 @@ static int Open(vout_window_t *wnd)
     if( GetModuleFileName( NULL, app_path, MAX_PATH ) )
         sys->vlc_icon = ExtractIcon( hInstance, app_path    , 0 );
 
+    sys->button_pressed = 0;
     sys->is_cursor_hidden = false;
     sys->hide_timeout = var_InheritInteger( wnd, "mouse-hide-timeout" );
     sys->cursor_arrow = LoadCursor(NULL, IDC_ARROW);
