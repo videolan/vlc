@@ -375,10 +375,13 @@ vlc_module_end ()
 /*****************************************/
 
 /* Ugly, but the Qt interface assumes single instance anyway */
-static vlc_sem_t ready;
-static QMutex lock;
+static vlc_cond_t wait_ready = VLC_STATIC_COND;
+static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 static bool busy = false;
-static bool active = false;
+static enum {
+    OPEN_STATE_INIT,
+    OPEN_STATE_OPENED,
+} open_state = OPEN_STATE_INIT;
 
 /*****************************************************************************
  * Module callbacks
@@ -429,7 +432,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     }
 #endif
 
-    QMutexLocker locker (&lock);
+    vlc_mutex_locker locker (&lock);
     if (busy)
     {
         msg_Err (p_this, "cannot start Qt multiple times");
@@ -446,7 +449,6 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     p_sys->p_player = vlc_playlist_GetPlayer( p_sys->p_playlist );
 
     /* */
-    vlc_sem_init (&ready, 0);
 #ifdef Q_OS_MAC
     /* Run mainloop on the main thread as Cocoa requires */
     libvlc_SetExitHandler( vlc_object_instance(p_intf), Abort, p_intf );
@@ -462,9 +464,9 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     /* Wait for the interface to be ready. This prevents the main
      * LibVLC thread from starting video playback before we can create
      * an embedded video window. */
-    vlc_sem_wait (&ready);
-    vlc_sem_destroy (&ready);
-    busy = active = true;
+    while (open_state == OPEN_STATE_INIT)
+        vlc_cond_wait(&wait_ready, &lock);
+    busy = true;
 
     return VLC_SUCCESS;
 }
@@ -496,8 +498,9 @@ static void Close( vlc_object_t *p_this )
 #endif
     delete p_sys;
 
-    QMutexLocker locker (&lock);
+    vlc_mutex_locker locker (&lock);
     assert (busy);
+    assert (open_state == OPEN_STATE_INIT);
     busy = false;
 }
 
@@ -661,7 +664,11 @@ static void *Thread( void *obj )
     p_intf->pf_show_dialog = ShowDialog;
 
     /* Tell the main LibVLC thread we are ready */
-    vlc_sem_post (&ready);
+    {
+        vlc_mutex_locker locker (&lock);
+        open_state = OPEN_STATE_OPENED;
+        vlc_cond_signal(&wait_ready);
+    }
 
 #ifdef Q_OS_MAC
     /* We took over main thread, register and start here */
@@ -697,8 +704,8 @@ static void *Thread( void *obj )
         var_Destroy( libvlc, "window" );
         var_Destroy( libvlc, "qt4-iface" );
 
-        QMutexLocker locker (&lock);
-        active = false;
+        vlc_mutex_locker locker (&lock);
+        open_state = OPEN_STATE_INIT;
 
         p_sys->p_mi = NULL;
         /* Destroy first the main interface because it is connected to some
@@ -774,8 +781,8 @@ static int WindowOpen( vout_window_t *p_wnd )
             break;
     }
 
-    QMutexLocker locker (&lock);
-    if (unlikely(!active))
+    vlc_mutex_locker locker (&lock);
+    if (unlikely(open_state != OPEN_STATE_OPENED))
         return VLC_EGENERIC;
 
     MainInterface *p_mi = p_intf->p_sys->p_mi;
