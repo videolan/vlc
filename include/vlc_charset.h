@@ -266,13 +266,6 @@ static inline char *ToANSI (const char *utf8)
     return ToCodePage (GetACP (), utf8);
 }
 
-# ifdef UNICODE
-#  define FromT FromWide
-#  define ToT   ToWide
-# else
-#  define FromT FromANSI
-#  define ToT   ToANSI
-# endif
 # define FromLocale    FromANSI
 # define ToLocale      ToANSI
 # define LocaleFree(s) free((char *)(s))

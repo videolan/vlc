@@ -1109,8 +1109,6 @@ static inline void SetQWLE (void *p, uint64_t qw)
 #   ifndef O_NONBLOCK
 #       define O_NONBLOCK 0
 #   endif
-
-#   include <tchar.h>
 #endif /* _WIN32 */
 
 typedef struct {

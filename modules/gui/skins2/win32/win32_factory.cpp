@@ -30,7 +30,6 @@
 #include <windows.h>
 #include <winuser.h>
 #include <wingdi.h>
-#include <tchar.h>
 #include <shellapi.h>
 
 #include "win32_factory.hpp"
