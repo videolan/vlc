@@ -785,18 +785,6 @@ static int DeviceSelect(audio_output_t *aout, const char *id)
 }
 
 /*** Initialization / deinitialization **/
-static wchar_t *var_InheritWide(vlc_object_t *obj, const char *name)
-{
-    char *v8 = var_InheritString(obj, name);
-    if (v8 == NULL)
-        return NULL;
-
-    wchar_t *v16 = ToWide(v8);
-    free(v8);
-    return v16;
-}
-#define var_InheritWide(o,n) var_InheritWide(VLC_OBJECT(o),n)
-
 /** MMDevice audio output thread.
  * This thread takes cares of the audio session control. Inconveniently enough,
  * the audio session control interface must:
@@ -896,9 +884,17 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
                                                          &control);
         if (SUCCEEDED(hr))
         {
-            wchar_t *ua = var_InheritWide(aout, "user-agent");
-            IAudioSessionControl_SetDisplayName(control, ua, NULL);
-            free(ua);
+            char *ua = var_InheritString(aout, "user-agent");
+            if (ua != NULL)
+            {
+                wchar_t *wua = ToWide(ua);
+                if (likely(wua != NULL))
+                {
+                    IAudioSessionControl_SetDisplayName(control, wua, NULL);
+                    free(wua);
+                }
+                free(ua);
+            }
 
             IAudioSessionControl_RegisterAudioSessionNotification(control,
                                                          &sys->session_events);
