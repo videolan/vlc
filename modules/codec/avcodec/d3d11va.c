@@ -486,15 +486,10 @@ static char *DxDescribe(vlc_va_sys_t *sys)
     char *description = NULL;
     DXGI_ADAPTER_DESC adapterDesc;
     if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc))) {
-        char *utfdesc = FromWide(adapterDesc.Description);
-        if (likely(utfdesc!=NULL))
-        {
-            if (asprintf(&description, "D3D11VA (%s, vendor %x(%s), device %x, revision %x)",
-                         utfdesc,
-                         adapterDesc.VendorId, DxgiVendorStr(adapterDesc.VendorId), adapterDesc.DeviceId, adapterDesc.Revision) < 0)
-                description = NULL;
-            free(utfdesc);
-        }
+        if (asprintf(&description, "D3D11VA (%ls, vendor %x(%s), device %x, revision %x)",
+                     adapterDesc.Description,
+                     adapterDesc.VendorId, DxgiVendorStr(adapterDesc.VendorId), adapterDesc.DeviceId, adapterDesc.Revision) < 0)
+            description = NULL;
     }
 
     IDXGIAdapter_Release(p_adapter);
