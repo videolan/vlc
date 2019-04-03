@@ -756,7 +756,7 @@ static int DeviceSelectLocked(audio_output_t *aout, const char *id)
 
     if (id != NULL && strcmp(id, default_device_b) != 0)
     {
-        sys->requested_device = ToWide(id);
+        sys->requested_device = ToWide(id); /* FIXME leak */
         if (unlikely(sys->requested_device == NULL))
             return -1;
     }
@@ -1282,7 +1282,7 @@ static int Open(vlc_object_t *obj)
     char *saved_device_b = var_InheritString(aout, "mmdevice-audio-device");
     if (saved_device_b != NULL && strcmp(saved_device_b, default_device_b) != 0)
     {
-        sys->requested_device = ToWide(saved_device_b);
+        sys->requested_device = ToWide(saved_device_b); /* FIXME leak */
         free(saved_device_b);
 
         if (unlikely(sys->requested_device == NULL))
