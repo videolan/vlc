@@ -60,14 +60,6 @@ struct event_thread_t
     /* */
     bool is_projected;
 
-    /* Mouse */
-    bool is_cursor_hidden;
-    HCURSOR cursor_arrow;
-    HCURSOR cursor_empty;
-    unsigned button_pressed;
-    int64_t hide_timeout;
-    vlc_tick_t last_moved;
-
     /* Gestures */
     win32_gesture_sys_t *p_gesture;
 
@@ -90,37 +82,17 @@ static int  Win32VoutCreateWindow( event_thread_t * );
 static void Win32VoutCloseWindow ( event_thread_t * );
 static long FAR PASCAL WinVoutEventProc( HWND, UINT, WPARAM, LPARAM );
 
-/* Display/Hide Cursor */
-static void UpdateCursor( event_thread_t *p_event, bool b_show );
-static HCURSOR EmptyCursor( HINSTANCE instance );
-
-/* Mouse events sending functions */
-static void MouseReleased( event_thread_t *p_event, unsigned button );
-static void MousePressed( event_thread_t *p_event, HWND hwnd, unsigned button );
-
-static void CALLBACK HideMouse(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
-{
-    VLC_UNUSED(uMsg); VLC_UNUSED(dwTime);
-    if (hwnd)
-    {
-        event_thread_t *p_event = (event_thread_t *)idEvent;
-        UpdateCursor( p_event, false );
-    }
-}
-
-static void UpdateCursorMoved( event_thread_t *p_event )
-{
-    UpdateCursor( p_event, true );
-    p_event->last_moved = vlc_tick_now();
-    if( p_event->hwnd )
-        SetTimer( p_event->hwnd, (UINT_PTR)p_event, p_event->hide_timeout, HideMouse );
-}
-
 /* Local helpers */
 static inline bool isMouseEvent( WPARAM type )
 {
     return type >= WM_MOUSEFIRST &&
            type <= WM_MOUSELAST;
+}
+
+static inline bool isNonClientMouseEvent( WPARAM type )
+{
+    return type >= WM_NCMOUSEMOVE &&
+           type <= WM_NCXBUTTONDBLCLK;
 }
 
 /*****************************************************************************
@@ -135,10 +107,8 @@ static void *EventThread( void *p_this )
 {
     event_thread_t *p_event = (event_thread_t *)p_this;
     MSG msg;
-    POINT old_mouse_pos = {0,0}, mouse_pos;
     int canc = vlc_savecancel ();
 
-    bool b_mouse_support = var_InheritBool( p_event->obj, "mouse-events" );
 
     vlc_mutex_lock( &p_event->lock );
     /* Create a window for the video */
@@ -168,108 +138,10 @@ static void *EventThread( void *p_this )
             break;
         }
 
-        if( !b_mouse_support && isMouseEvent( msg.message ) )
-            continue;
-
-        /* Handle mouse state */
-        if( msg.message == WM_MOUSEMOVE || msg.message == WM_NCMOUSEMOVE )
-        {
-            GetCursorPos( &mouse_pos );
-            /* FIXME, why this >2 limits ? */
-            if( (abs(mouse_pos.x - old_mouse_pos.x) > 2 ||
-                (abs(mouse_pos.y - old_mouse_pos.y)) > 2 ) )
-            {
-                old_mouse_pos = mouse_pos;
-                UpdateCursorMoved( p_event );
-            }
-        }
-        else if( isMouseEvent( msg.message ) )
-        {
-            UpdateCursorMoved( p_event );
-        }
-
-        /* */
-        switch( msg.message )
-        {
-        case WM_MOUSEMOVE:
-            {
-                int x = GET_X_LPARAM(msg.lParam);
-                int y = GET_Y_LPARAM(msg.lParam);
-                vout_window_ReportMouseMoved(p_event->parent_window, x, y);
-            }
-            break;
-        case WM_NCMOUSEMOVE:
-            break;
-
-        case WM_LBUTTONDOWN:
-            MousePressed( p_event, msg.hwnd, MOUSE_BUTTON_LEFT );
-            break;
-        case WM_LBUTTONUP:
-            MouseReleased( p_event, MOUSE_BUTTON_LEFT );
-            break;
-        case WM_LBUTTONDBLCLK:
-            vout_window_ReportMouseDoubleClick(p_event->parent_window, MOUSE_BUTTON_LEFT);
-            break;
-
-        case WM_MBUTTONDOWN:
-            MousePressed( p_event, msg.hwnd, MOUSE_BUTTON_CENTER );
-            break;
-        case WM_MBUTTONUP:
-            MouseReleased( p_event, MOUSE_BUTTON_CENTER );
-            break;
-        case WM_MBUTTONDBLCLK:
-            vout_window_ReportMouseDoubleClick(p_event->parent_window, MOUSE_BUTTON_CENTER);
-            break;
-
-        case WM_RBUTTONDOWN:
-            MousePressed( p_event, msg.hwnd, MOUSE_BUTTON_RIGHT );
-            break;
-        case WM_RBUTTONUP:
-            MouseReleased( p_event, MOUSE_BUTTON_RIGHT );
-            break;
-        case WM_RBUTTONDBLCLK:
-            vout_window_ReportMouseDoubleClick(p_event->parent_window, MOUSE_BUTTON_RIGHT);
-            break;
-
-
-        case WM_MOUSEWHEEL:
-        {
-            int i_key;
-            if( GET_WHEEL_DELTA_WPARAM( msg.wParam ) > 0 )
-            {
-                i_key = KEY_MOUSEWHEELUP;
-            }
-            else
-            {
-                i_key = KEY_MOUSEWHEELDOWN;
-            }
-            if( i_key )
-            {
-                if( GetKeyState(VK_CONTROL) & 0x8000 )
-                {
-                    i_key |= KEY_MODIFIER_CTRL;
-                }
-                if( GetKeyState(VK_SHIFT) & 0x8000 )
-                {
-                    i_key |= KEY_MODIFIER_SHIFT;
-                }
-                if( GetKeyState(VK_MENU) & 0x8000 )
-                {
-                    i_key |= KEY_MODIFIER_ALT;
-                }
-                vout_window_ReportKeyPress(p_event->parent_window, i_key);
-            }
-            break;
-        }
-
-        default:
-            /* Messages we don't handle directly are dispatched to the
-             * window procedure */
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-            break;
-
-        } /* End Switch */
+        /* Messages we don't handle directly are dispatched to the
+         * window procedure */
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
 
     } /* End Main loop */
 
@@ -303,8 +175,6 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_wind
 
     p_event->parent_window = parent_window;
 
-    p_event->is_cursor_hidden = false;
-    p_event->button_pressed = 0;
     p_event->hwnd = NULL;
 
     _snwprintf( p_event->class_main, ARRAYSIZE(p_event->class_main),
@@ -382,64 +252,6 @@ void EventThreadStop( event_thread_t *p_event )
 /***********************************
  * Local functions implementations *
  ***********************************/
-static void UpdateCursor( event_thread_t *p_event, bool b_show )
-{
-    if( p_event->is_cursor_hidden == !b_show )
-        return;
-    p_event->is_cursor_hidden = !b_show;
-
-#if 1
-    HCURSOR cursor = b_show ? p_event->cursor_arrow : p_event->cursor_empty;
-    if( p_event->hwnd )
-        SetClassLongPtr( p_event->hwnd, GCLP_HCURSOR, (LONG_PTR)cursor );
-#endif
-
-    /* FIXME I failed to find a cleaner way to force a redraw of the cursor */
-    POINT p;
-    GetCursorPos(&p);
-    HWND hwnd = WindowFromPoint(p);
-    if( hwnd == p_event->hwnd )
-    {
-        SetCursor( cursor );
-    }
-}
-
-static HCURSOR EmptyCursor( HINSTANCE instance )
-{
-    const int cw = GetSystemMetrics(SM_CXCURSOR);
-    const int ch = GetSystemMetrics(SM_CYCURSOR);
-
-    HCURSOR cursor = NULL;
-    uint8_t *and = malloc(cw * ch);
-    uint8_t *xor = malloc(cw * ch);
-    if( and && xor )
-    {
-        memset(and, 0xff, cw * ch );
-        memset(xor, 0x00, cw * ch );
-        cursor = CreateCursor( instance, 0, 0, cw, ch, and, xor);
-    }
-    free( and );
-    free( xor );
-
-    return cursor;
-}
-
-static void MousePressed( event_thread_t *p_event, HWND hwnd, unsigned button )
-{
-    if( !p_event->button_pressed )
-        SetCapture( hwnd );
-    p_event->button_pressed |= 1 << button;
-    vout_window_ReportMousePressed(p_event->parent_window, button);
-}
-
-static void MouseReleased( event_thread_t *p_event, unsigned button )
-{
-    p_event->button_pressed &= ~(1 << button);
-    if( !p_event->button_pressed )
-        ReleaseCapture();
-    vout_window_ReportMouseReleased(p_event->parent_window, button);
-}
-
 static long FAR PASCAL VideoEventProc( HWND hwnd, UINT message,
                                        WPARAM wParam, LPARAM lParam )
 {
@@ -474,8 +286,7 @@ static int CreateVideoWindow( event_thread_t *p_event )
     wc.cbWndExtra    = 0;                        /* no extra window data */
     wc.hInstance     = hInstance;                            /* instance */
     wc.hIcon         = 0;
-    wc.hCursor       = p_event->is_cursor_hidden ? p_event->cursor_empty :
-                                                   p_event->cursor_arrow;
+    wc.hCursor       = 0;
     wc.hbrBackground = NULL;
     wc.lpszMenuName  = NULL;                                  /* no menu */
     wc.lpszClassName = p_event->class_video;
@@ -528,11 +339,6 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     /* If an external window was specified, we'll draw in it. */
     assert( p_event->parent_window->type == VOUT_WINDOW_TYPE_HWND );
     p_event->hparent = p_event->parent_window->handle.hwnd;
-    p_event->cursor_arrow = LoadCursor(NULL, IDC_ARROW);
-    p_event->cursor_empty = EmptyCursor(hInstance);
-
-    p_event->hide_timeout = var_InheritInteger( p_event->obj, "mouse-hide-timeout" );
-    UpdateCursorMoved( p_event );
 
     /* Fill in the window class structure */
     wc.style         = CS_OWNDC|CS_DBLCLKS;          /* style: dbl click */
@@ -541,8 +347,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     wc.cbWndExtra    = 0;                        /* no extra window data */
     wc.hInstance     = hInstance;                            /* instance */
     wc.hIcon         = 0;
-    wc.hCursor       = p_event->is_cursor_hidden ? p_event->cursor_empty :
-                                                   p_event->cursor_arrow;
+    wc.hCursor       = 0;
     wc.hbrBackground = GetStockObject(BLACK_BRUSH);  /* background color */
     wc.lpszMenuName  = NULL;                                  /* no menu */
     wc.lpszClassName = p_event->class_main;       /* use a special class */
@@ -619,8 +424,6 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
     UnregisterClass( p_event->class_video, hInstance );
     UnregisterClass( p_event->class_main, hInstance );
 
-    DestroyCursor( p_event->cursor_empty );
-
     CloseGestures( p_event->p_gesture);
 }
 
@@ -651,20 +454,18 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         return DefWindowProc(hwnd, message, wParam, lParam);
     event_thread_t *p_event = (event_thread_t *)p_user_data;
 
+    if ( isMouseEvent( message ) || isNonClientMouseEvent( message ))
+    {
+        /* forward to the parent */
+        POINT mouse_pos = *(POINT*)(&lParam);
+        MapWindowPoints(hwnd, GetParent(hwnd), &mouse_pos, 1);
+        LPARAM translatedParam = MAKELONG(mouse_pos.x, mouse_pos.y);
+        PostMessage(GetParent(hwnd), message, wParam, translatedParam);
+        return 0; /* pretend we didn't handle it */
+    }
+
     switch( message )
     {
-
-    case WM_CAPTURECHANGED:
-        for( int button = 0; p_event->button_pressed; button++ )
-        {
-            unsigned m = 1 << button;
-            if( p_event->button_pressed & m )
-                vout_window_ReportMouseReleased(p_event->parent_window, button);
-            p_event->button_pressed &= ~m;
-        }
-        p_event->button_pressed = 0;
-        return 0;
-
     /* the user wants to close the window */
     case WM_CLOSE:
         vout_window_ReportClose(p_event->parent_window);
