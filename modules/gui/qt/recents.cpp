@@ -91,8 +91,11 @@ void RecentsMRL::addRecent( const QString &mrl )
     if( path )
     {
         wchar_t *wmrl = ToWide( path );
-        SHAddToRecentDocs( SHARD_PATHW, wmrl );
-        free( wmrl );
+        if (wmrl != NULL)
+        {
+            SHAddToRecentDocs( SHARD_PATHW, wmrl );
+            free( wmrl );
+        }
         free( path );
     }
 #endif
