@@ -641,6 +641,21 @@ static void *Thread( void *obj )
 #endif
         p_sys->p_mi = p_mi;
 
+        QList<QQmlError> qmlErrors = p_sys->p_mi->qmlErrors();
+        if( !qmlErrors.isEmpty() )
+        {
+            msg_Err( p_intf, "Missing qml modules: " );
+
+            for( QQmlError &qmlError : qmlErrors )
+                msg_Err( p_intf, "%s", qtu(qmlError.description()) );
+#ifdef QT_STATICPLUGIN
+            assert( !"Missing qml modules from qt contribs." );
+#else
+            msg_Err( p_intf, "Install missing modules using your packaging tool" );
+#endif
+            return ThreadCleanup( p_intf, true );
+        }
+
         /* Check window type from the Qt platform back-end */
         bool known_type = true;
 
