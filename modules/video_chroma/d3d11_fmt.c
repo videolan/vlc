@@ -26,6 +26,7 @@
 
 #include <vlc_common.h>
 #include <vlc_picture.h>
+#include <vlc_charset.h>
 
 #define COBJMACROS
 #include <d3d11.h>
@@ -210,7 +211,7 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
     /* see https://docs.microsoft.com/en-us/windows-hardware/drivers/display/wddm-2-1-features#driver-versioning */
     if (_stscanf(szData, TEXT("%d.%d.%d.%d"), &wddm, &d3d_features, &revision, &build) != 4)
     {
-        msg_Warn(obj, "the adapter DriverVersion '%s' doesn't match the expected format", szData);
+        msg_Warn(obj, "the adapter DriverVersion '%ls' doesn't match the expected format", szData);
         return;
     }
     d3d_dev->WDDM.wddm         = wddm;
