@@ -188,6 +188,7 @@ static const struct vout_window_operations ops = {
     WindowSetState,
     WindowUnsetFullscreen,
     WindowSetFullscreen,
+    NULL,
 };
 
 int WindowOpen(vout_window_t *p_wnd)

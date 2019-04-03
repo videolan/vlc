@@ -735,6 +735,7 @@ bool MainInterface::getVideo( struct vout_window_t *p_wnd )
         MainInterface::requestVideoState,
         MainInterface::requestVideoWindowed,
         MainInterface::requestVideoFullScreen,
+        NULL,
     };
 
     if( videoActive.test_and_set() )
