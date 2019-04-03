@@ -113,6 +113,7 @@ public:
     bool isInterfaceFullScreen() { return b_interfaceFullScreen; }
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
     bool hasEmbededVideo() { return m_hasEmbededVideo; }
+    QList<QQmlError> qmlErrors() const;
 
 protected:
     void dropEventPlay( QDropEvent* event, bool b_play );

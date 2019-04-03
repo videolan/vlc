@@ -282,6 +282,11 @@ void MainInterface::computeMinimumSize()
     setMinimumWidth( minWidth );
 }
 
+QList<QQmlError> MainInterface::qmlErrors() const
+{
+    return mediacenterView->errors();
+}
+
 /*****************************
  *   Main UI handling        *
  *****************************/
