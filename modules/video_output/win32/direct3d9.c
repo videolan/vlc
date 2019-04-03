@@ -42,7 +42,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_charset.h> /* ToT function */
 
 #include <windows.h>
 #include <d3d9.h>
