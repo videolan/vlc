@@ -709,7 +709,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             if( RegOpenKeyEx( HKEY_CURRENT_USER, TEXT("Software\\VideoLAN\\VLC\\"), 0, KEY_READ, &h_key )
                     == ERROR_SUCCESS )
             {
-                TCHAR szData[256];
+                WCHAR szData[256];
                 DWORD len = 256;
                 if( RegQueryValueEx( h_key, TEXT("Lang"), NULL, NULL, (LPBYTE) &szData, &len ) == ERROR_SUCCESS ) {
                     langReg = FromWide( szData );
