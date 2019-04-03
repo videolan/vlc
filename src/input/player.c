@@ -2410,7 +2410,7 @@ vlc_player_assert_seek_params(enum vlc_player_seek_speed speed,
     (void) speed; (void) whence;
 }
 
-static inline void
+static void
 vlc_player_vout_OSDPosition(vlc_player_t *player,
                             struct vlc_player_input *input, vlc_tick_t time,
                             float position, enum vlc_player_whence whence)
