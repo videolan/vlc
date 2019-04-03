@@ -388,6 +388,7 @@ static enum {
  *****************************************************************************/
 
 static void *Thread( void * );
+static void *ThreadCleanup( intf_thread_t *p_intf );
 
 #ifdef Q_OS_MAC
 /* Used to abort the app.exec() on OSX after libvlc_Quit is called */
@@ -703,10 +704,20 @@ static void *Thread( void *obj )
         libvlc_int_t *libvlc = vlc_object_instance( p_intf );
         var_Destroy( libvlc, "window" );
         var_Destroy( libvlc, "qt4-iface" );
+    }
+    return ThreadCleanup( p_intf );
+}
 
+static void *ThreadCleanup( intf_thread_t *p_intf )
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+
+    if( p_sys->p_mi != NULL)
+    {
         vlc_mutex_locker locker (&lock);
         open_state = OPEN_STATE_INIT;
 
+        MainInterface *p_mi = p_sys->p_mi;
         p_sys->p_mi = NULL;
         /* Destroy first the main interface because it is connected to some
            slots in the MainInputManager */
