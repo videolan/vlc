@@ -126,12 +126,12 @@ static int intf_Eject( vlc_object_t *p_this, const char *psz_device )
 #if defined(_WIN32)
     MCI_OPEN_PARMS op;
     DWORD i_flags;
-    TCHAR psz_drive[4];
+    WCHAR psz_drive[4];
 
     memset( &op, 0, sizeof(MCI_OPEN_PARMS) );
     op.lpstrDeviceType = (LPCTSTR)MCI_DEVTYPE_CD_AUDIO;
 
-    _tcscpy( psz_drive, TEXT("X:") );
+    wcscpy( psz_drive, TEXT("X:") );
     psz_drive[0] = psz_device[0];
     op.lpstrElementName = psz_drive;
 
