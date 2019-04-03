@@ -57,6 +57,13 @@ typedef struct vout_window_sys_t
     WCHAR class_main[256];
     HICON vlc_icon;
 
+    /* cursor */
+    bool       is_cursor_hidden;
+    HCURSOR    cursor_arrow;
+    HCURSOR    cursor_empty;
+    int64_t    hide_timeout; /* mouse hiding timeout in ms */
+    vlc_tick_t last_moved;
+
     /* state before fullscreen */
     WINDOWPLACEMENT window_placement;
     LONG            i_window_style;
@@ -251,6 +258,12 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         vout_window_ReportSize(wnd, LOWORD(lParam), HIWORD(lParam));
         return 0;
 
+    case WM_MOUSEMOVE:
+        vout_window_ReportMouseMoved(wnd, LOWORD(lParam), HIWORD(lParam));
+        break;
+    case WM_NCMOUSEMOVE:
+        break;
+
     case WM_SYSCOMMAND:
         switch (wParam)
         {
@@ -323,6 +336,7 @@ static void Close(vout_window_t *wnd)
 
     HINSTANCE hInstance = GetModuleHandle(NULL);
     UnregisterClass( sys->class_main, hInstance );
+    DestroyCursor( sys->cursor_empty );
     if( sys->vlc_icon )
         DestroyIcon( sys->vlc_icon );
     wnd->sys = NULL;
@@ -362,6 +376,64 @@ static HWND GetDesktopHandle(vlc_object_t *obj)
 
     EnumWindows( enumWindowsProc, (LPARAM)&hwnd );
     return hwnd;
+}
+
+static void UpdateCursor( vout_window_t *wnd, bool b_show )
+{
+    vout_window_sys_t *sys = wnd->sys;
+    if( sys->is_cursor_hidden == !b_show )
+        return;
+    sys->is_cursor_hidden = !b_show;
+
+    HCURSOR cursor = b_show ? sys->cursor_arrow : sys->cursor_empty;
+    SetClassLongPtr( sys->hwnd, GCLP_HCURSOR, (LONG_PTR)cursor );
+
+    /* FIXME I failed to find a cleaner way to force a redraw of the cursor */
+    SetCursor( cursor );
+}
+
+static void CALLBACK HideMouse(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+{
+    VLC_UNUSED(uMsg); VLC_UNUSED(dwTime);
+    if (hwnd)
+    {
+        vout_window_t *wnd = (vout_window_t *)idEvent;
+        UpdateCursor( wnd, false );
+    }
+}
+
+static void UpdateCursorMoved( vout_window_t *wnd )
+{
+    vout_window_sys_t *sys = wnd->sys;
+    UpdateCursor( wnd, true );
+    sys->last_moved = vlc_tick_now();
+    SetTimer( sys->hwnd, (UINT_PTR)wnd, sys->hide_timeout, HideMouse );
+}
+
+static HCURSOR EmptyCursor( HINSTANCE instance )
+{
+    const int cw = GetSystemMetrics(SM_CXCURSOR);
+    const int ch = GetSystemMetrics(SM_CYCURSOR);
+
+    HCURSOR cursor = NULL;
+    uint8_t *and = malloc(cw * ch);
+    uint8_t *xor = malloc(cw * ch);
+    if( and && xor )
+    {
+        memset(and, 0xff, cw * ch );
+        memset(xor, 0x00, cw * ch );
+        cursor = CreateCursor( instance, 0, 0, cw, ch, and, xor);
+    }
+    free( and );
+    free( xor );
+
+    return cursor;
+}
+
+static inline bool isMouseEvent( WPARAM type )
+{
+    return type >= WM_MOUSEFIRST &&
+           type <= WM_MOUSELAST;
 }
 
 static void *EventThread( void *p_this )
@@ -424,6 +496,7 @@ static void *EventThread( void *p_this )
     AppendMenu( hMenu, MF_STRING | MF_UNCHECKED,
                        IDM_TOGGLE_ON_TOP, TEXT("Always on &Top") );
 
+    POINT mouse_pos = {0}, old_mouse_pos = {0};
     for( ;; )
     {
         MSG msg;
@@ -431,6 +504,24 @@ static void *EventThread( void *p_this )
         {
             break;
         }
+
+        /* cursor handling */
+        if( msg.message == WM_MOUSEMOVE || msg.message == WM_NCMOUSEMOVE )
+        {
+            GetCursorPos( &mouse_pos );
+            /* FIXME, why this >2 limits ? */
+            if( (abs(mouse_pos.x - old_mouse_pos.x) > 2 ||
+                (abs(mouse_pos.y - old_mouse_pos.y)) > 2 ) )
+            {
+                old_mouse_pos = mouse_pos;
+                UpdateCursorMoved( wnd );
+            }
+        }
+        else if( isMouseEvent( msg.message ) )
+        {
+            UpdateCursorMoved( wnd );
+        }
+
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
@@ -466,6 +557,11 @@ static int Open(vout_window_t *wnd)
     if( GetModuleFileName( NULL, app_path, MAX_PATH ) )
         sys->vlc_icon = ExtractIcon( hInstance, app_path    , 0 );
 
+    sys->is_cursor_hidden = false;
+    sys->hide_timeout = var_InheritInteger( wnd, "mouse-hide-timeout" );
+    sys->cursor_arrow = LoadCursor(NULL, IDC_ARROW);
+    sys->cursor_empty = EmptyCursor(hInstance);
+
     WNDCLASS wc = { 0 };
     /* Fill in the window class structure */
     wc.style         = CS_OWNDC|CS_DBLCLKS;           /* style: dbl click */
@@ -473,6 +569,7 @@ static int Open(vout_window_t *wnd)
     wc.hInstance     = hInstance;                             /* instance */
     wc.hIcon         = sys->vlc_icon;            /* load the vlc big icon */
     wc.lpszClassName = sys->class_main;            /* use a special class */
+    wc.hCursor       = sys->cursor_arrow;
 
     /* Register the window class */
     if( !RegisterClass(&wc) )
