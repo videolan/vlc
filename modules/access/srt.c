@@ -174,7 +174,7 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
                 SRTO_PBKEYLEN, &i_key_length, sizeof(i_key_length) );
 
         srt_set_socket_option( strm_obj, SRT_PARAM_PASSPHRASE, p_sys->sock,
-                SRTO_PASSPHRASE, &psz_passphrase, sizeof(psz_passphrase) );
+                SRTO_PASSPHRASE, psz_passphrase, strlen(psz_passphrase) );
     }
 
     /* set maximum payload size */
