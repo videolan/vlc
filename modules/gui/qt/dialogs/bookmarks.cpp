@@ -120,150 +120,27 @@ void BookmarksDialog::updateButtons()
 
 void BookmarksDialog::update()
 {
-    if ( b_ignore_updates ) return;
-    input_thread_t *p_input = THEMIM->getInput();
-    if( !p_input ) return;
-
-    seekpoint_t **pp_bookmarks;
-    int i_bookmarks = 0;
-
-    if( bookmarksList->topLevelItemCount() > 0 )
-    {
-        bookmarksList->model()->removeRows( 0, bookmarksList->topLevelItemCount() );
-    }
-
-    if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
-                       &i_bookmarks ) != VLC_SUCCESS )
-        return;
-
-    for( int i = 0; i < i_bookmarks; i++ )
-    {
-        vlc_tick_t total = pp_bookmarks[i]->i_time_offset;
-        unsigned hours   = ( total / VLC_TICK_FROM_SEC(3600) );
-        unsigned minutes = ( total % VLC_TICK_FROM_SEC(3600) ) / VLC_TICK_FROM_SEC(60);
-        float    seconds = secf_from_vlc_tick( total % VLC_TICK_FROM_SEC(60) );
-
-        QStringList row;
-        row << QString( qfu( pp_bookmarks[i]->psz_name ) );
-        row << qfu("-");
-        row << QString().sprintf( "%02u:%02u:%06.3f", hours, minutes, seconds );
-
-        QTreeWidgetItem *item = new QTreeWidgetItem( bookmarksList, row );
-        item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEditable |
-                        Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        bookmarksList->insertTopLevelItem( i, item );
-        vlc_seekpoint_Delete( pp_bookmarks[i] );
-    }
-    free( pp_bookmarks );
+    //FIXME unimplemented
 }
 
 void BookmarksDialog::add()
 {
-    input_thread_t *p_input = THEMIM->getInput();
-    if( !p_input ) return;
-
-    seekpoint_t bookmark;
-
-    if( !input_Control( p_input, INPUT_GET_BOOKMARK, &bookmark ) )
-    {
-        QString name = THEMIM->getIM()->getName() + " #"
-                     + QString::number( bookmarksList->topLevelItemCount() );
-        QByteArray raw = name.toUtf8();
-        bookmark.psz_name = raw.data();
-
-        input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
-    }
+    //FIXME unimplemented
 }
 
 void BookmarksDialog::del()
 {
-    input_thread_t *p_input = THEMIM->getInput();
-    if( !p_input ) return;
-
-    QModelIndexList selected = bookmarksList->selectionModel()->selectedRows();
-    if ( !selected.empty() )
-    {
-        b_ignore_updates = true;
-        /* Sort needed to make sure that selected elements are deleted in descending
-           order, otherwise the indexes might change and wrong bookmarks are deleted. */
-        qSort( selected.begin(), selected.end() );
-        QModelIndexList::Iterator it = selected.end();
-        for( --it; it != selected.begin(); it-- )
-        {
-            input_Control( p_input, INPUT_DEL_BOOKMARK, (*it).row() );
-        }
-        input_Control( p_input, INPUT_DEL_BOOKMARK, (*it).row() );
-        b_ignore_updates = false;
-        update();
-    }
+    //FIXME unimplemented
 }
 
 void BookmarksDialog::clear()
 {
-    input_thread_t *p_input = THEMIM->getInput();
-    if( !p_input ) return;
-
-    input_Control( p_input, INPUT_CLEAR_BOOKMARKS );
+    //FIXME unimplemented
 }
 
-void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
+void BookmarksDialog::edit( QTreeWidgetItem *, int )
 {
-    QStringList fields;
-    // We can only edit a item if it is the last item selected
-    if( bookmarksList->selectedItems().isEmpty() ||
-        bookmarksList->selectedItems().last() != item )
-        return;
-
-    input_thread_t *p_input = THEMIM->getInput();
-    if( !p_input )
-        return;
-
-    // We get the row number of the item
-    int i_edit = bookmarksList->indexOfTopLevelItem( item );
-
-    // We get the bookmarks list
-    seekpoint_t** pp_bookmarks;
-    seekpoint_t*  p_seekpoint = NULL;
-    int i_bookmarks;
-
-    if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
-                       &i_bookmarks ) != VLC_SUCCESS )
-        return;
-
-    if( i_edit >= i_bookmarks )
-        goto clear;
-
-    // We modify the seekpoint
-    p_seekpoint = pp_bookmarks[i_edit];
-    if( column == 0 )
-    {
-        free( p_seekpoint->psz_name );
-        p_seekpoint->psz_name = strdup( qtu( item->text( column ) ) );
-    }
-    else if( column == 2 )
-    {
-        fields = item->text( column ).split( ":", QString::SkipEmptyParts );
-        if( fields.count() == 1 )
-            p_seekpoint->i_time_offset = vlc_tick_from_sec( fields[0].toFloat() );
-        else if( fields.count() == 2 )
-            p_seekpoint->i_time_offset = vlc_tick_from_sec( fields[0].toInt() * 60 + fields[1].toInt() );
-        else if( fields.count() == 3 )
-            p_seekpoint->i_time_offset = vlc_tick_from_sec( fields[0].toInt() * 3600 + fields[1].toInt() * 60 + fields[2].toFloat() );
-        else
-        {
-            msg_Err( p_intf, "Invalid string format for time" );
-            goto clear;
-        }
-    }
-
-    // Send the modification
-    input_Control( p_input, INPUT_CHANGE_BOOKMARK, p_seekpoint, i_edit );
-
-clear:
-    // Clear the bookmark list
-    for( int i = 0; i < i_bookmarks; i++)
-        vlc_seekpoint_Delete( pp_bookmarks[i] );
-    free( pp_bookmarks );
+    //FIXME unimplemented
 }
 
 void BookmarksDialog::extract()
@@ -271,12 +148,9 @@ void BookmarksDialog::extract()
     // TODO
 }
 
-void BookmarksDialog::activateItem( QModelIndex index )
+void BookmarksDialog::activateItem( QModelIndex )
 {
-    input_thread_t *p_input = THEMIM->getInput();
-    if( !p_input ) return;
-
-    input_Control( p_input, INPUT_SET_BOOKMARK, index.row() );
+    //FIXME unimplemented
 }
 
 void BookmarksDialog::toggleVisible()
