@@ -381,6 +381,7 @@ static bool busy = false;
 static enum {
     OPEN_STATE_INIT,
     OPEN_STATE_OPENED,
+    OPEN_STATE_ERROR,
 } open_state = OPEN_STATE_INIT;
 
 /*****************************************************************************
@@ -388,7 +389,7 @@ static enum {
  *****************************************************************************/
 
 static void *Thread( void * );
-static void *ThreadCleanup( intf_thread_t *p_intf );
+static void *ThreadCleanup( intf_thread_t *p_intf, bool error );
 
 #ifdef Q_OS_MAC
 /* Used to abort the app.exec() on OSX after libvlc_Quit is called */
@@ -434,9 +435,10 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 #endif
 
     vlc_mutex_locker locker (&lock);
-    if (busy)
+    if (busy || open_state == OPEN_STATE_ERROR)
     {
-        msg_Err (p_this, "cannot start Qt multiple times");
+        if (busy)
+            msg_Err (p_this, "cannot start Qt multiple times");
         return VLC_EGENERIC;
     }
 
@@ -467,8 +469,17 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
      * an embedded video window. */
     while (open_state == OPEN_STATE_INIT)
         vlc_cond_wait(&wait_ready, &lock);
-    busy = true;
 
+    if (open_state == OPEN_STATE_ERROR)
+    {
+#ifndef Q_OS_MAC
+        vlc_join (p_sys->thread, NULL);
+#endif
+        delete p_sys;
+        return VLC_EGENERIC;
+    }
+
+    busy = true;
     return VLC_SUCCESS;
 }
 
@@ -705,23 +716,31 @@ static void *Thread( void *obj )
         var_Destroy( libvlc, "window" );
         var_Destroy( libvlc, "qt4-iface" );
     }
-    return ThreadCleanup( p_intf );
+    return ThreadCleanup( p_intf, false );
 }
 
-static void *ThreadCleanup( intf_thread_t *p_intf )
+static void *ThreadCleanup( intf_thread_t *p_intf, bool error )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    if( p_sys->p_mi != NULL)
     {
         vlc_mutex_locker locker (&lock);
-        open_state = OPEN_STATE_INIT;
+        if( error )
+        {
+            open_state = OPEN_STATE_ERROR;
+            vlc_cond_signal( &wait_ready );
+        }
+        else
+            open_state = OPEN_STATE_INIT;
 
-        MainInterface *p_mi = p_sys->p_mi;
-        p_sys->p_mi = NULL;
-        /* Destroy first the main interface because it is connected to some
-           slots in the MainInputManager */
-        delete p_mi;
+        if( p_sys->p_mi != NULL)
+        {
+            MainInterface *p_mi = p_sys->p_mi;
+            p_sys->p_mi = NULL;
+            /* Destroy first the main interface because it is connected to some
+               slots in the MainInputManager */
+            delete p_mi;
+        }
     }
 
     /* */
