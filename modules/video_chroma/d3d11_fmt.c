@@ -137,15 +137,15 @@ int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
 static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc)
 {
     HKEY hKey;
-    TCHAR key[128];
-    TCHAR szData[256], lookup[256];
+    WCHAR key[128];
+    WCHAR szData[256], lookup[256];
     DWORD len = 256;
     LSTATUS ret;
 
-    _sntprintf(lookup, 256, TEXT("pci\\ven_%04x&dev_%04x"), adapterDesc->VendorId, adapterDesc->DeviceId);
+    _snwprintf(lookup, 256, TEXT("pci\\ven_%04x&dev_%04x"), adapterDesc->VendorId, adapterDesc->DeviceId);
     for (int i=0;;i++)
     {
-        _sntprintf(key, 128, TEXT("SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\%04d"), i);
+        _snwprintf(key, 128, TEXT("SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\%04d"), i);
         ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey);
         if ( ret != ERROR_SUCCESS )
         {
@@ -156,7 +156,7 @@ static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc
         len = sizeof(szData);
         ret = RegQueryValueEx( hKey, TEXT("MatchingDeviceId"), NULL, NULL, (LPBYTE) &szData, &len );
         if ( ret == ERROR_SUCCESS ) {
-            if (_tcsncmp(lookup, szData, _tcslen(lookup)) == 0)
+            if (wcsncmp(lookup, szData, wcslen(lookup)) == 0)
                 return hKey;
             msg_Dbg(obj, "different %d device %s vs %s", i, lookup, szData);
         }
@@ -189,8 +189,8 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
     }
 
     LONG err = ERROR_ACCESS_DENIED;
-    TCHAR szData[256];
-    DWORD len = 256;
+    WCHAR szData[256];
+    DWORD len = sizeof(szData);
     HKEY hKey = GetAdapterRegistry(obj, &adapterDesc);
     if (hKey == NULL)
     {
@@ -209,7 +209,7 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 
     int wddm, d3d_features, revision, build;
     /* see https://docs.microsoft.com/en-us/windows-hardware/drivers/display/wddm-2-1-features#driver-versioning */
-    if (_stscanf(szData, TEXT("%d.%d.%d.%d"), &wddm, &d3d_features, &revision, &build) != 4)
+    if (swscanf(szData, TEXT("%d.%d.%d.%d"), &wddm, &d3d_features, &revision, &build) != 4)
     {
         msg_Warn(obj, "the adapter DriverVersion '%ls' doesn't match the expected format", szData);
         return;
@@ -699,8 +699,8 @@ static HINSTANCE Direct3D11LoadShaderLibrary(void)
     HINSTANCE instance = NULL;
     /* d3dcompiler_47 is the latest on windows 8.1 */
     for (int i = 47; i > 41; --i) {
-        TCHAR filename[19];
-        _sntprintf(filename, 19, TEXT("D3DCOMPILER_%d.dll"), i);
+        WCHAR filename[19];
+        _snwprintf(filename, 19, TEXT("D3DCOMPILER_%d.dll"), i);
         instance = LoadLibrary(filename);
         if (instance) break;
     }

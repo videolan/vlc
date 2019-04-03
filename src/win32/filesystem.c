@@ -355,12 +355,12 @@ int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
 #if !VLC_WINSTORE_APP
 FILE *vlc_win32_tmpfile(void)
 {
-    TCHAR tmp_path[MAX_PATH-14];
+    WCHAR tmp_path[MAX_PATH-14];
     int i_ret = GetTempPath (MAX_PATH-14, tmp_path);
     if (i_ret == 0)
         return NULL;
 
-    TCHAR tmp_name[MAX_PATH];
+    WCHAR tmp_name[MAX_PATH];
     i_ret = GetTempFileName(tmp_path, TEXT("VLC"), 0, tmp_name);
     if (i_ret == 0)
         return NULL;

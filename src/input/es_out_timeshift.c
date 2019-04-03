@@ -337,12 +337,12 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
         const DWORD count = GetTempPath( 0, NULL );
         if( count > 0 )
         {
-            TCHAR *path = vlc_alloc( count + 1, sizeof(TCHAR) );
+            WCHAR *path = vlc_alloc( count + 1, sizeof(WCHAR) );
             if( path != NULL )
             {
                 DWORD ret = GetTempPath( count + 1, path );
                 if( ret != 0 && ret <= count )
-                    p_sys->psz_tmp_path = FromT( path );
+                    p_sys->psz_tmp_path = FromWide( path );
                 free( path );
             }
         }

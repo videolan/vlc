@@ -182,7 +182,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     intf_sys_t *p_sys  = p_intf->p_sys;
     char *psz_extra;
     struct vlc_memstream path_stream;
-    TCHAR psz_pathtmp[MAX_PATH];
+    WCHAR psz_pathtmp[MAX_PATH];
 
     SC_HANDLE handle = OpenSCManager( NULL, NULL, SC_MANAGER_ALL_ACCESS );
     if( handle == NULL )
@@ -201,7 +201,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     /* Find out the filename of ourselves so we can install it to the
      * service control manager */
     GetModuleFileName( NULL, psz_pathtmp, MAX_PATH );
-    psz_extra = FromT( psz_pathtmp );
+    psz_extra = FromWide( psz_pathtmp );
     if ( !psz_extra )
     {
         CloseServiceHandle( handle );
