@@ -340,8 +340,8 @@ static int CALLBACK enumWindowsProc(HWND hwnd, LPARAM lParam)
 
     if( !strcasecmp( name, "WorkerW" ) )
     {
-        hwnd = FindWindowEx( hwnd, NULL, _T("SHELLDLL_DefView"), NULL );
-        if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SysListView32"), NULL );
+        hwnd = FindWindowEx( hwnd, NULL, TEXT("SHELLDLL_DefView"), NULL );
+        if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, TEXT("SysListView32"), NULL );
         if( hwnd )
         {
             *wnd = hwnd;
@@ -354,9 +354,9 @@ static int CALLBACK enumWindowsProc(HWND hwnd, LPARAM lParam)
 static HWND GetDesktopHandle(vlc_object_t *obj)
 {
     /* Find Program Manager */
-    HWND hwnd = FindWindow( _T("Progman"), NULL );
-    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SHELLDLL_DefView"), NULL );
-    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SysListView32"), NULL );
+    HWND hwnd = FindWindow( TEXT("Progman"), NULL );
+    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, TEXT("SHELLDLL_DefView"), NULL );
+    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, TEXT("SysListView32"), NULL );
     if( hwnd )
         return hwnd;
 
@@ -401,7 +401,7 @@ static void *EventThread( void *p_this )
     sys->hwnd =
         CreateWindowEx( WS_EX_NOPARENTNOTIFY,
                     sys->class_main,                 /* name of window class */
-                    _T(VOUT_TITLE) _T(" (VLC Video Output)"),/* window title */
+                    TEXT(VOUT_TITLE) TEXT(" (VLC Video Output)"),/* window title */
                     i_window_style,                          /* window style */
                     CW_USEDEFAULT,                   /* default X coordinate */
                     CW_USEDEFAULT,                   /* default Y coordinate */
@@ -425,9 +425,9 @@ static void *EventThread( void *p_this )
 
     /* Append a "Always On Top" entry in the system menu */
     HMENU hMenu = GetSystemMenu( sys->hwnd, FALSE );
-    AppendMenu( hMenu, MF_SEPARATOR, 0, _T("") );
+    AppendMenu( hMenu, MF_SEPARATOR, 0, TEXT("") );
     AppendMenu( hMenu, MF_STRING | MF_UNCHECKED,
-                       IDM_TOGGLE_ON_TOP, _T("Always on &Top") );
+                       IDM_TOGGLE_ON_TOP, TEXT("Always on &Top") );
 
     for( ;; )
     {
