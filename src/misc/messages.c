@@ -174,8 +174,11 @@ static void Win32DebugOutputMsg (void* d, int type, const vlc_log_t *p_item,
         if (asprintf(&psz_msg, "%s %s%s: %s", p_item->psz_module,
                     p_item->psz_object_type, msg_type[type], msg) > 0) {
             wchar_t* wmsg = ToWide(psz_msg);
-            OutputDebugStringW(wmsg);
-            free(wmsg);
+            if (likely(wmsg != NULL))
+            {
+                OutputDebugStringW(wmsg);
+                free(wmsg);
+            }
             free(psz_msg);
         }
     }
