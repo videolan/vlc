@@ -201,14 +201,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     /* Find out the filename of ourselves so we can install it to the
      * service control manager */
     GetModuleFileName( NULL, psz_pathtmp, MAX_PATH );
-    psz_extra = FromWide( psz_pathtmp );
-    if ( !psz_extra )
-    {
-        CloseServiceHandle( handle );
-        return VLC_ENOMEM;
-    }
-    vlc_memstream_printf( &path_stream, "\"%s\" -I ntservice", psz_extra );
-    free(psz_extra);
+    vlc_memstream_printf( &path_stream, "\"%ls\" -I ntservice", psz_pathtmp );
 
     psz_extra = var_InheritString( p_intf, "ntservice-extraintf" );
     if( psz_extra && *psz_extra )
