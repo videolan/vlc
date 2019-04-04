@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 #include <vlc_mouse.h>
+#include <vlc_actions.h>
 
 #include <shellapi.h>                                         /* ExtractIcon */
 
@@ -239,6 +240,71 @@ static void MouseReleased( vout_window_t *wnd, unsigned button )
     vout_window_ReportMouseReleased(wnd, button);
 }
 
+
+static struct
+{
+    int i_dxkey;
+    int i_vlckey;
+
+} dxkeys_to_vlckeys[] =
+{
+    { VK_F1, KEY_F1 }, { VK_F2, KEY_F2 }, { VK_F3, KEY_F3 }, { VK_F4, KEY_F4 },
+    { VK_F5, KEY_F5 }, { VK_F6, KEY_F6 }, { VK_F7, KEY_F7 }, { VK_F8, KEY_F8 },
+    { VK_F9, KEY_F9 }, { VK_F10, KEY_F10 }, { VK_F11, KEY_F11 },
+    { VK_F12, KEY_F12 },
+
+    { VK_RETURN, KEY_ENTER },
+    { VK_SPACE, ' ' },
+    { VK_ESCAPE, KEY_ESC },
+
+    { VK_LEFT, KEY_LEFT },
+    { VK_RIGHT, KEY_RIGHT },
+    { VK_UP, KEY_UP },
+    { VK_DOWN, KEY_DOWN },
+
+    { VK_HOME, KEY_HOME },
+    { VK_END, KEY_END },
+    { VK_PRIOR, KEY_PAGEUP },
+    { VK_NEXT, KEY_PAGEDOWN },
+
+    { VK_INSERT, KEY_INSERT },
+    { VK_DELETE, KEY_DELETE },
+
+    { VK_CONTROL, 0 },
+    { VK_SHIFT, 0 },
+    { VK_MENU, 0 },
+
+    { VK_BROWSER_BACK, KEY_BROWSER_BACK },
+    { VK_BROWSER_FORWARD, KEY_BROWSER_FORWARD },
+    { VK_BROWSER_REFRESH, KEY_BROWSER_REFRESH },
+    { VK_BROWSER_STOP, KEY_BROWSER_STOP },
+    { VK_BROWSER_SEARCH, KEY_BROWSER_SEARCH },
+    { VK_BROWSER_FAVORITES, KEY_BROWSER_FAVORITES },
+    { VK_BROWSER_HOME, KEY_BROWSER_HOME },
+    { VK_VOLUME_MUTE, KEY_VOLUME_MUTE },
+    { VK_VOLUME_DOWN, KEY_VOLUME_DOWN },
+    { VK_VOLUME_UP, KEY_VOLUME_UP },
+    { VK_MEDIA_NEXT_TRACK, KEY_MEDIA_NEXT_TRACK },
+    { VK_MEDIA_PREV_TRACK, KEY_MEDIA_PREV_TRACK },
+    { VK_MEDIA_STOP, KEY_MEDIA_STOP },
+    { VK_MEDIA_PLAY_PAUSE, KEY_MEDIA_PLAY_PAUSE },
+
+    { 0, 0 }
+};
+
+static int Win32VoutConvertKey( int i_key )
+{
+    for( int i = 0; dxkeys_to_vlckeys[i].i_dxkey != 0; i++ )
+    {
+        if( dxkeys_to_vlckeys[i].i_dxkey == i_key )
+        {
+            return dxkeys_to_vlckeys[i].i_vlckey;
+        }
+    }
+
+    return 0;
+}
+
 /*****************************************************************************
  * WinVoutEventProc: This is the window event processing function.
  *****************************************************************************
@@ -329,6 +395,39 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
     case WM_RBUTTONDBLCLK:
         vout_window_ReportMouseDoubleClick(wnd, MOUSE_BUTTON_RIGHT);
         return 0;
+
+    case WM_KEYDOWN:
+    case WM_SYSKEYDOWN:
+    {
+        /* The key events are first processed here and not translated
+         * into WM_CHAR events because we need to know the status of the
+         * modifier keys. */
+        int i_key = Win32VoutConvertKey( wParam );
+        if( !i_key )
+        {
+            /* This appears to be a "normal" (ascii) key */
+            i_key = tolower( (unsigned char)MapVirtualKey( wParam, 2 ) );
+        }
+
+        if( i_key )
+        {
+            if( GetKeyState(VK_CONTROL) & KF_UP )
+            {
+                i_key |= KEY_MODIFIER_CTRL;
+            }
+            if( GetKeyState(VK_SHIFT) & KF_UP )
+            {
+                i_key |= KEY_MODIFIER_SHIFT;
+            }
+            if( GetKeyState(VK_MENU) & KF_UP )
+            {
+                i_key |= KEY_MODIFIER_ALT;
+            }
+
+            vout_window_ReportKeyPress(wnd, i_key);
+        }
+        break;
+    }
 
     case WM_SYSCOMMAND:
         switch (wParam)
