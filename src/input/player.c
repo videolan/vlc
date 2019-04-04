@@ -3594,3 +3594,9 @@ error:
     vlc_object_delete(player);
     return NULL;
 }
+
+vlc_object_t *
+vlc_player_GetObject(vlc_player_t *player)
+{
+    return VLC_OBJECT(player);
+}

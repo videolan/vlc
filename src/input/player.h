@@ -32,4 +32,7 @@
 void
 vlc_player_assert_locked(vlc_player_t *player);
 
+vlc_object_t *
+vlc_player_GetObject(vlc_player_t *player);
+
 #endif
