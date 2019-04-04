@@ -28,8 +28,8 @@ extern "C" {
 # endif
 
 /**
- * \defgroup playlist playlist
- * \ingroup playlist
+ * \defgroup playlist VLC playlist
+ * \ingroup interface
  *
  * A VLC playlist contains a list of "playlist items".
  *
