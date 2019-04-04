@@ -227,7 +227,7 @@ static void CommonChangeThumbnailClip(vlc_object_t *obj, vout_display_sys_win32_
         ITaskbarList3 *taskbl = ptr;
         taskbl->lpVtbl->HrInit(taskbl);
 
-        HWND hroot = GetAncestor(sys->hwnd,GA_ROOT);
+        HWND hroot = GetAncestor(sys->hvideownd, GA_ROOT);
         RECT video;
         if (show) {
             GetWindowRect(sys->hparent, &video);
