@@ -64,7 +64,6 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
                         unsigned flags, const char *name)
 {
     vout_window_t *wnd = cfg->window;
-    vlc_object_t *parent = (vlc_object_t *)wnd;
     struct vlc_gl_priv_t *glpriv;
     const char *type;
 
@@ -80,7 +79,7 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
             return NULL;
     }
 
-    glpriv = vlc_custom_create(parent, sizeof (*glpriv), "gl");
+    glpriv = vlc_custom_create(VLC_OBJECT(wnd), sizeof (*glpriv), "gl");
     if (unlikely(glpriv == NULL))
         return NULL;
 
