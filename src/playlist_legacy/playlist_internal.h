@@ -26,7 +26,7 @@
 
 /**
  * \defgroup playlist_internals VLC playlist internals
- * \ingroup playlist
+ * \ingroup playlist_legacy
  *
  * @{
  * \file

@@ -34,7 +34,7 @@ TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t)
 struct intf_thread_t;
 
 /**
- * \defgroup playlist VLC playlist
+ * \defgroup playlist_legacy VLC playlist legacy
  * \ingroup interface
  * VLC playlist controls
  * @{
