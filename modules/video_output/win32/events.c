@@ -456,8 +456,6 @@ static void UpdateCursor( event_thread_t *p_event, bool b_show )
 
 #if 1
     HCURSOR cursor = b_show ? p_event->cursor_arrow : p_event->cursor_empty;
-    if( p_event->hvideownd )
-        SetClassLongPtr( p_event->hvideownd, GCLP_HCURSOR, (LONG_PTR)cursor );
     if( p_event->hwnd )
         SetClassLongPtr( p_event->hwnd, GCLP_HCURSOR, (LONG_PTR)cursor );
 #endif
@@ -466,7 +464,7 @@ static void UpdateCursor( event_thread_t *p_event, bool b_show )
     POINT p;
     GetCursorPos(&p);
     HWND hwnd = WindowFromPoint(p);
-    if( hwnd == p_event->hvideownd || hwnd == p_event->hwnd )
+    if( hwnd == p_event->hwnd )
     {
         SetCursor( cursor );
     }
@@ -511,32 +509,8 @@ static void MouseReleased( event_thread_t *p_event, unsigned button )
 static long FAR PASCAL VideoEventProc( HWND hwnd, UINT message,
                                        WPARAM wParam, LPARAM lParam )
 {
-    if( message == WM_CREATE )
-    {
-        /* Store p_event for future use */
-        CREATESTRUCT *c = (CREATESTRUCT *)lParam;
-        SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)c->lpCreateParams );
-        return 0;
-    }
-
-    LONG_PTR p_user_data = GetWindowLongPtr( hwnd, GWLP_USERDATA );
-    if( p_user_data == 0 ) /* messages before WM_CREATE */
-        return DefWindowProc(hwnd, message, wParam, lParam);
-    event_thread_t *p_event = (event_thread_t *)p_user_data;
-
     switch( message )
     {
-    case WM_CAPTURECHANGED:
-        for( int button = 0; p_event->button_pressed; button++ )
-        {
-            unsigned m = 1 << button;
-            if( p_event->button_pressed & m )
-                vout_window_ReportMouseReleased(p_event->parent_window, button);
-            p_event->button_pressed &= ~m;
-        }
-        p_event->button_pressed = 0;
-        return 0;
-
     /*
     ** For OpenGL and Direct3D, vout will update the whole
     ** window at regular interval, therefore dirty region
@@ -582,7 +556,7 @@ static int CreateVideoWindow( event_thread_t *p_event )
      * without having them shown outside of the video area. */
     p_event->hvideownd =
         CreateWindow( p_event->class_video, TEXT(""),   /* window class */
-            WS_CHILD,                   /* window style, not visible initially */
+            WS_CHILD|WS_DISABLED,  /* window style, not visible initially */
             p_event->place.x, p_event->place.y,
             p_event->place.width,          /* default width */
             p_event->place.height,        /* default height */
