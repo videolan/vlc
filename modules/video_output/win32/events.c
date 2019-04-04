@@ -655,11 +655,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     wc.hIcon         = 0;
     wc.hCursor       = p_event->is_cursor_hidden ? p_event->cursor_empty :
                                                    p_event->cursor_arrow;
-#if !VLC_WINSTORE_APP
     wc.hbrBackground = GetStockObject(BLACK_BRUSH);  /* background color */
-#else
-    wc.hbrBackground = NULL;
-#endif
     wc.lpszMenuName  = NULL;                                  /* no menu */
     wc.lpszClassName = p_event->class_main;       /* use a special class */
 

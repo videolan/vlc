@@ -256,7 +256,6 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         {
         case IDM_TOGGLE_ON_TOP:            /* toggle the "on top" status */
         {
-            msg_Dbg(wnd, "WinProc WM_SYSCOMMAND: IDM_TOGGLE_ON_TOP");
             HMENU hMenu = GetSystemMenu(hwnd, FALSE);
             const bool is_on_top = (GetMenuState(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND) & MF_CHECKED) == 0;
             SetAbove( wnd, is_on_top ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL );
@@ -329,7 +328,6 @@ static void Close(vout_window_t *wnd)
     wnd->sys = NULL;
 }
 
-#if !VLC_WINSTORE_APP
 static int CALLBACK enumWindowsProc(HWND hwnd, LPARAM lParam)
 {
     HWND *wnd = (HWND *)lParam;
@@ -365,7 +363,6 @@ static HWND GetDesktopHandle(vlc_object_t *obj)
     EnumWindows( enumWindowsProc, (LPARAM)&hwnd );
     return hwnd;
 }
-#endif
 
 static void *EventThread( void *p_this )
 {
@@ -378,14 +375,12 @@ static void *EventThread( void *p_this )
 
     LONG i_window_style;
     HWND hwParent;
-#if !VLC_WINSTORE_APP
     if (var_InheritBool( wnd, "video-wallpaper" ))
     {
         hwParent = GetDesktopHandle(p_this);
         i_window_style = WS_CLIPCHILDREN|WS_CHILD;
     }
     else
-#endif
     {
         hwParent = 0;
         i_window_style = WS_OVERLAPPEDWINDOW | WS_SIZEBOX | WS_CLIPCHILDREN;
