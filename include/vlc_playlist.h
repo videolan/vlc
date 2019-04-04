@@ -30,10 +30,7 @@ extern "C" {
 /**
  * \defgroup playlist playlist
  * \ingroup playlist
- * @{
- */
-
-/**
+ *
  * A VLC playlist contains a list of "playlist items".
  *
  * Each playlist item contains exactly one media (input item). In the future,
@@ -102,6 +99,8 @@ extern "C" {
  * may have changed the list. Therefore, vlc_playlist_Request*() functions are
  * exposed to resolve potential conflicts and apply the changes. The actual
  * changes applied are notified through the callbacks
+ *
+ * @{
  */
 
 /* forward declarations */
