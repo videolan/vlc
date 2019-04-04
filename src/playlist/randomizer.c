@@ -32,7 +32,11 @@
 #include <vlc_rand.h>
 #include "randomizer.h"
 
-/* Playlist helper to manage random playback.
+/**
+ * \addtogroup playlist_randomizer Playlist randomizer helper
+ * \ingroup playlist
+ *
+ * Playlist helper to manage random playback.
  *
  * The purpose is to guarantee the following rules:
  *  - an item must never be selected twice
@@ -550,6 +554,7 @@ randomizer_Clear(struct randomizer *r)
     r->history = 0;
 }
 
+#ifndef DOC
 #ifdef TEST_RANDOMIZER
 
 /* fake structure to simplify tests */
@@ -1121,4 +1126,5 @@ int main(void)
     test_has_prev_next_empty();
 }
 
+#endif
 #endif

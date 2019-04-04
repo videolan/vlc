@@ -27,6 +27,11 @@
 typedef struct vlc_playlist_item vlc_playlist_item_t;
 
 /**
+ * \defgroup playlist_randomizer Playlist randomizer helper
+ * \ingroup playlist
+ *  @{ */
+
+/**
  * Playlist helper to manage random playback.
  *
  * See randomizer.c for implementation details.
@@ -144,5 +149,7 @@ randomizer_Remove(struct randomizer *randomizer,
  */
 void
 randomizer_Clear(struct randomizer *randomizer);
+
+/** @} */
 
 #endif
