@@ -46,6 +46,3 @@ event_thread_t *EventThreadCreate( vlc_object_t *, vout_window_t *);
 void            EventThreadDestroy( event_thread_t * );
 int             EventThreadStart( event_thread_t *, event_hwnd_t *, const event_cfg_t * );
 void            EventThreadStop( event_thread_t * );
-
-void            EventThreadUpdatePlace( event_thread_t *p_event,
-                                        const vout_display_place_t *p_place );

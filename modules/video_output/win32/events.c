@@ -80,7 +80,6 @@ struct event_thread_t
     HWND hparent;
     HWND hwnd;
     HWND hvideownd;
-    vout_display_place_t place;
 };
 
 /***************************
@@ -196,15 +195,6 @@ static void *EventThread( void *p_this )
             {
                 int x = GET_X_LPARAM(msg.lParam);
                 int y = GET_Y_LPARAM(msg.lParam);
-
-                if( msg.hwnd == p_event->hvideownd )
-                {
-                    vlc_mutex_lock( &p_event->lock );
-                    /* Child window */
-                    x += p_event->place.x;
-                    y += p_event->place.y;
-                    vlc_mutex_unlock( &p_event->lock );
-                }
                 vout_window_ReportMouseMoved(p_event->parent_window, x, y);
             }
             break;
@@ -290,14 +280,6 @@ static void *EventThread( void *p_this )
     return NULL;
 }
 
-void EventThreadUpdatePlace( event_thread_t *p_event,
-                                      const vout_display_place_t *p_place )
-{
-    vlc_mutex_lock( &p_event->lock );
-    p_event->place  = *p_place;
-    vlc_mutex_unlock( &p_event->lock );
-}
-
 event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_window)
 {
     if (parent_window->type != VOUT_WINDOW_TYPE_HWND)
@@ -324,12 +306,6 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_wind
     p_event->is_cursor_hidden = false;
     p_event->button_pressed = 0;
     p_event->hwnd = NULL;
-
-    /* initialized to 0 to match the init in the display_win32_area_t */
-    p_event->place.x = 0;
-    p_event->place.y = 0;
-    p_event->place.width = 0;
-    p_event->place.height = 0;
 
     _snwprintf( p_event->class_main, ARRAYSIZE(p_event->class_main),
                TEXT("VLC video main %p"), (void *)p_event );

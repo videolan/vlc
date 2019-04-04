@@ -177,8 +177,6 @@ void UpdateRects(vout_display_t *vd, display_win32_area_t *area, vout_display_sy
 #if !VLC_WINSTORE_APP
         if (sys->event != NULL)
         {
-            EventThreadUpdatePlace(sys->event, &area->place);
-
             if (sys->hvideownd)
             {
                 UINT swpFlags = SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS;
