@@ -633,13 +633,16 @@ static void *Thread( void *obj )
             known_type = false;
         }
 
-        var_Create( THEPL, "qt4-iface", VLC_VAR_ADDRESS );
-        var_Create( THEPL, "window", VLC_VAR_STRING );
+        /* FIXME: Temporary, while waiting for a proper window provider API */
+        libvlc_int_t *libvlc = vlc_object_instance( p_intf );
+
+        var_Create( libvlc, "qt4-iface", VLC_VAR_ADDRESS );
+        var_Create( libvlc, "window", VLC_VAR_STRING );
 
         if( known_type )
         {
-            var_SetAddress( THEPL, "qt4-iface", p_intf );
-            var_SetString( THEPL, "window", "qt,any" );
+            var_SetAddress( libvlc, "qt4-iface", p_intf );
+            var_SetString( libvlc, "window", "qt,any" );
         }
     }
 
@@ -675,8 +678,9 @@ static void *Thread( void *obj )
     msg_Dbg( p_intf, "QApp exec() finished" );
     if (p_mi != NULL)
     {
-        var_Destroy( THEPL, "window" );
-        var_Destroy( THEPL, "qt4-iface" );
+        libvlc_int_t *libvlc = vlc_object_instance( p_intf );
+        var_Destroy( libvlc, "window" );
+        var_Destroy( libvlc, "qt4-iface" );
 
         QMutexLocker locker (&lock);
         active = false;
@@ -739,8 +743,9 @@ static int WindowOpen( vout_window_t *p_wnd )
     if( !var_InheritBool( p_wnd, "embedded-video" ) )
         return VLC_EGENERIC;
 
+    libvlc_int_t *libvlc = vlc_object_instance( p_wnd );
     intf_thread_t *p_intf =
-        (intf_thread_t *)var_InheritAddress( p_wnd, "qt4-iface" );
+        (intf_thread_t *)var_InheritAddress( libvlc, "qt4-iface" );
     if( !p_intf )
     {   /* If another interface is used, this plugin cannot work */
         msg_Dbg( p_wnd, "Qt interface not found" );
