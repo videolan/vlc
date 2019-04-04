@@ -515,9 +515,9 @@ static int CreateVideoWindow( event_thread_t *p_event )
     p_event->hvideownd =
         CreateWindow( p_event->class_video, TEXT(""),   /* window class */
             WS_CHILD|WS_DISABLED,  /* window style, not visible initially */
-            p_event->place.x, p_event->place.y,
-            p_event->place.width,          /* default width */
-            p_event->place.height,        /* default height */
+            0, 0,
+            CW_USEDEFAULT,               /* default width */
+            CW_USEDEFAULT,              /* default height */
             p_event->hwnd,               /* parent window */
             NULL, hInstance,
             (LPVOID)p_event );    /* send vd to WM_CREATE */
