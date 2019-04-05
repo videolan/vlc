@@ -104,6 +104,8 @@ typedef struct
     PS_CONSTANT_BUFFER        shaderConstants;
 } d3d_quad_t;
 
+#define D3D11_MAX_RENDER_TARGET    2
+
 ID3DBlob* D3D11_CompileShader(vlc_object_t *, const d3d11_handle_t *, const d3d11_device_t *,
                               const char *psz_shader, bool pixel);
 #define D3D11_CompileShader(a,b,c,d,e)  D3D11_CompileShader(VLC_OBJECT(a),b,c,d,e)
@@ -129,10 +131,10 @@ float GetFormatLuminance(vlc_object_t *, const video_format_t *);
 #define GetFormatLuminance(a,b)  GetFormatLuminance(VLC_OBJECT(a),b)
 
 HRESULT D3D11_CreateRenderTargets(d3d11_device_t *, ID3D11Resource *, const d3d_format_t *,
-                                  ID3D11RenderTargetView *output[D3D11_MAX_SHADER_VIEW]);
+                                  ID3D11RenderTargetView *output[D3D11_MAX_RENDER_TARGET]);
 
 void D3D11_ClearRenderTargets(d3d11_device_t *, const d3d_format_t *,
-                              ID3D11RenderTargetView *targets[D3D11_MAX_SHADER_VIEW]);
+                              ID3D11RenderTargetView *targets[D3D11_MAX_RENDER_TARGET]);
 
 void D3D11_SetVertexShader(d3d_vshader_t *dst, d3d_vshader_t *src);
 void D3D11_ReleaseVertexShader(d3d_vshader_t *);

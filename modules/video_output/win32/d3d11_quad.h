@@ -47,7 +47,7 @@ typedef struct d3d_vertex_t {
 
 void D3D11_RenderQuad(d3d11_device_t *, d3d_quad_t *, d3d_vshader_t *,
                       ID3D11ShaderResourceView *resourceViews[D3D11_MAX_SHADER_VIEW],
-                      ID3D11RenderTargetView *renderTarget[D3D11_MAX_SHADER_VIEW]);
+                      ID3D11RenderTargetView *renderTarget[D3D11_MAX_RENDER_TARGET]);
 
 int D3D11_AllocateQuad(vlc_object_t *, d3d11_device_t *, video_projection_mode_t, d3d_quad_t *);
 #define D3D11_AllocateQuad(a,b,c,d)  D3D11_AllocateQuad(VLC_OBJECT(a),b,c,d)

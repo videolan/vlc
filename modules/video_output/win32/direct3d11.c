@@ -108,7 +108,7 @@ struct vout_display_sys_t
     picture_sys_t            stagingSys;
     picture_pool_t           *pool; /* hardware decoding pool */
 
-    ID3D11RenderTargetView   *swapchainTargetView[D3D11_MAX_SHADER_VIEW];
+    ID3D11RenderTargetView   *swapchainTargetView[D3D11_MAX_RENDER_TARGET];
 
     d3d_vshader_t            projectionVShader;
     d3d_vshader_t            flatVShader;
@@ -238,7 +238,7 @@ static bool Resize(void *opaque, unsigned i_width, unsigned i_height)
     if (dsc.Width == i_width && dsc.Height == i_height)
         return true; /* nothing changed */
 
-    for (size_t i=0; i < D3D11_MAX_SHADER_VIEW; i++)
+    for (size_t i=0; i < ARRAY_SIZE(sys->swapchainTargetView); i++)
     {
         if (sys->swapchainTargetView[i]) {
             ID3D11RenderTargetView_Release(sys->swapchainTargetView[i]);
@@ -1627,7 +1627,7 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     D3D11_ReleaseVertexShader(&sys->projectionVShader);
 
     D3D11_ReleasePixelShader(&sys->regionQuad);
-    for (size_t i=0; i < D3D11_MAX_SHADER_VIEW; i++)
+    for (size_t i=0; i < ARRAY_SIZE(sys->swapchainTargetView); i++)
     {
         if (sys->swapchainTargetView[i]) {
             ID3D11RenderTargetView_Release(sys->swapchainTargetView[i]);

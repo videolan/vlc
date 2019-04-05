@@ -44,7 +44,7 @@
 
 void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad, d3d_vshader_t *vsshader,
                       ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW],
-                      ID3D11RenderTargetView *d3drenderTargetView[D3D11_MAX_SHADER_VIEW])
+                      ID3D11RenderTargetView *d3drenderTargetView[D3D11_MAX_RENDER_TARGET])
 {
     UINT offset = 0;
 

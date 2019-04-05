@@ -689,7 +689,7 @@ float GetFormatLuminance(vlc_object_t *o, const video_format_t *fmt)
 }
 
 HRESULT D3D11_CreateRenderTargets( d3d11_device_t *d3d_dev, ID3D11Resource *texture,
-                                   const d3d_format_t *cfg, ID3D11RenderTargetView *output[D3D11_MAX_SHADER_VIEW] )
+                                   const d3d_format_t *cfg, ID3D11RenderTargetView *output[D3D11_MAX_RENDER_TARGET] )
 {
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
     renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
@@ -712,13 +712,15 @@ HRESULT D3D11_CreateRenderTargets( d3d11_device_t *d3d_dev, ID3D11Resource *text
 }
 
 void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
-                              ID3D11RenderTargetView *targets[D3D11_MAX_SHADER_VIEW])
+                              ID3D11RenderTargetView *targets[D3D11_MAX_RENDER_TARGET])
 {
     static const FLOAT blackY[1] = {0.0f};
     static const FLOAT blackUV[2] = {0.5f, 0.5f};
     static const FLOAT blackRGBA[4] = {0.0f, 0.0f, 0.0f, 1.0f};
     static const FLOAT blackYUY2[4] = {0.0f, 0.5f, 0.0f, 0.5f};
     static const FLOAT blackVUYA[4] = {0.5f, 0.5f, 0.0f, 1.0f};
+
+    static_assert(D3D11_MAX_RENDER_TARGET >= 2, "we need at least 2 RenderTargetView for NV12/P010");
 
     switch (cfg->formatTexture)
     {
