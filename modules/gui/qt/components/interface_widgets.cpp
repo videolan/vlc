@@ -142,6 +142,8 @@ void VideoWidget::request( struct vout_window_t *p_wnd )
     stable->setAttribute( Qt::WA_PaintOnScreen, true );
     stable->setMouseTracking( true );
     setMouseTracking( true );
+    stable->setWindowFlags( Qt::Tool | Qt::FramelessWindowHint | Qt::WindowDoesNotAcceptFocus );
+    stable->setAttribute( Qt::WA_ShowWithoutActivating );
 #else
     stable->setAttribute( Qt::WA_PaintOnScreen, true );
 #endif
