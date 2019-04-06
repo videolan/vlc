@@ -82,19 +82,6 @@ static int  Win32VoutCreateWindow( event_thread_t * );
 static void Win32VoutCloseWindow ( event_thread_t * );
 static long FAR PASCAL WinVoutEventProc( HWND, UINT, WPARAM, LPARAM );
 
-/* Local helpers */
-static inline bool isMouseEvent( WPARAM type )
-{
-    return type >= WM_MOUSEFIRST &&
-           type <= WM_MOUSELAST;
-}
-
-static inline bool isNonClientMouseEvent( WPARAM type )
-{
-    return type >= WM_NCMOUSEMOVE &&
-           type <= WM_NCXBUTTONDBLCLK;
-}
-
 /*****************************************************************************
  * EventThread: Create video window & handle its messages
  *****************************************************************************
@@ -359,12 +346,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         return VLC_EGENERIC;
     }
 
-    i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD;
-
-    /* allow user to regain control over input events if requested */
-    bool b_mouse_support = var_InheritBool( p_event->obj, "mouse-events" );
-    if( !b_mouse_support )
-        i_style |= WS_DISABLED;
+    i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD|WS_DISABLED;
 
     /* Create the window */
     p_event->hwnd =
@@ -453,16 +435,6 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
     if( p_user_data == 0 ) /* messages before WM_CREATE */
         return DefWindowProc(hwnd, message, wParam, lParam);
     event_thread_t *p_event = (event_thread_t *)p_user_data;
-
-    if ( isMouseEvent( message ) || isNonClientMouseEvent( message ))
-    {
-        /* forward to the parent */
-        POINT mouse_pos = *(POINT*)(&lParam);
-        MapWindowPoints(hwnd, GetParent(hwnd), &mouse_pos, 1);
-        LPARAM translatedParam = MAKELONG(mouse_pos.x, mouse_pos.y);
-        PostMessage(GetParent(hwnd), message, wParam, translatedParam);
-        return 0; /* pretend we didn't handle it */
-    }
 
     switch( message )
     {
