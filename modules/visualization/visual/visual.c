@@ -204,7 +204,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     int width = var_InheritInteger( p_filter , "effect-width");
-    int height = var_InheritInteger( p_filter , "effect-width");
+    int height = var_InheritInteger( p_filter , "effect-height");
     /* No resolution under 400x532 and no odd dimension */
     if( width < 532 )
         width  = 532;
