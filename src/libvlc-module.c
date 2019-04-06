@@ -1603,6 +1603,7 @@ vlc_module_begin ()
     add_module("audio-resampler", "audio resampler", NULL,
                AUDIO_RESAMPLER_TEXT, AUDIO_RESAMPLER_LONGTEXT)
 
+    set_subcategory( SUBCAT_AUDIO_MISC )
 
 /* Video options */
     set_category( CAT_VIDEO )
@@ -1719,6 +1720,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     add_module_list("video-filter", "video filter", NULL,
                     VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT)
+
+    set_subcategory( SUBCAT_VIDEO_SPLITTER )
 
 #if 0
     add_string( "pixel-ratio", "1", PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT )
@@ -2140,6 +2143,8 @@ vlc_module_begin ()
     add_string( "clock-source", NULL, CLOCK_SOURCE_TEXT, CLOCK_SOURCE_TEXT, true )
         change_string_list( clock_sources, clock_sources_text )
 #endif
+
+    set_subcategory( SUBCAT_ADVANCED_NETWORK )
 
 /* Playlist options */
     set_category( CAT_PLAYLIST )
