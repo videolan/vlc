@@ -65,9 +65,6 @@
 #define AOUT_TITLE N_( "Output modules" )
 #define AOUT_HELP N_("General settings for audio output modules.")
 
-#define AMISC_TITLE N_("Miscellaneous")
-#define AMISC_HELP N_( "Miscellaneous audio settings and modules." )
-
 /* Video */
 #define VIDEO_TITLE N_("Video")
 #define VIDEO_HELP N_("Video settings")
@@ -210,7 +207,6 @@ static const struct config_category_t categories_array[] =
     { SUBCAT_AUDIO_AFILTER, AFILTER_TITLE, AFILTER_HELP },
     { SUBCAT_AUDIO_RESAMPLER, ARESAMPLER_TITLE, AFILTER_HELP },
     { SUBCAT_AUDIO_VISUAL, AVISUAL_TITLE, AVISUAL_HELP },
-    { SUBCAT_AUDIO_MISC, AMISC_TITLE, AMISC_HELP },
 
     { CAT_VIDEO, VIDEO_TITLE, VIDEO_HELP },
     { SUBCAT_VIDEO_GENERAL, VIDEO_TITLE, VIDEO_GENERAL_HELP },

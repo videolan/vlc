@@ -44,7 +44,7 @@ static int Create( vlc_object_t * );
  *****************************************************************************/
 vlc_module_begin ()
     set_category( CAT_AUDIO )
-    set_subcategory( SUBCAT_AUDIO_MISC )
+    set_subcategory( SUBCAT_AUDIO_AFILTER )
     set_description( N_("Single precision audio volume") )
     set_capability( "audio volume", 10 )
     set_callback( Create )

@@ -146,7 +146,6 @@ enum vlc_module_properties
 #define SUBCAT_AUDIO_AOUT 202
 #define SUBCAT_AUDIO_AFILTER 203
 #define SUBCAT_AUDIO_VISUAL 204
-#define SUBCAT_AUDIO_MISC 205
 #define SUBCAT_AUDIO_RESAMPLER 206
 
 #define CAT_VIDEO 3
