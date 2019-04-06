@@ -179,7 +179,7 @@ void UpdateRects(vout_display_t *vd, display_win32_area_t *area, vout_display_sy
         {
             if (sys->hvideownd)
             {
-                UINT swpFlags = SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS;
+                UINT swpFlags = SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE;
                 if (sys->is_first_placement)
                 {
                     swpFlags |= SWP_SHOWWINDOW;
@@ -273,7 +273,7 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
         {
             SetWindowPos(sys->hwnd, 0, 0, 0,
                          area->vdcfg.display.width,
-                         area->vdcfg.display.height, SWP_NOZORDER|SWP_NOMOVE);
+                         area->vdcfg.display.height, SWP_NOZORDER|SWP_NOMOVE|SWP_NOACTIVATE);
         }
 #endif /* !VLC_WINSTORE_APP */
         UpdateRects(vd, area, sys);

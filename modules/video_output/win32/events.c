@@ -368,7 +368,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
 
     /* Create the window */
     p_event->hwnd =
-        CreateWindowEx( WS_EX_NOPARENTNOTIFY,
+        CreateWindowEx( WS_EX_NOPARENTNOTIFY | WS_EX_NOACTIVATE,
                     p_event->class_main,             /* name of window class */
                     TEXT(VOUT_TITLE) TEXT(" (VLC Video Output)"),/* window title */
                     i_style,                                 /* window style */
@@ -401,7 +401,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     InitGestures( p_event->hwnd, &p_event->p_gesture, p_event->is_projected );
 
     /* Now display the window */
-    ShowWindow( p_event->hwnd, SW_SHOW );
+    ShowWindow( p_event->hwnd, SW_SHOWNOACTIVATE );
 
     return VLC_SUCCESS;
 }
