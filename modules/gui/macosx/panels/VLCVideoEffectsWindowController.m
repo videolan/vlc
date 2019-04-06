@@ -168,7 +168,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
     [VLCVideoFilterHelper setVideoFilterProperty: "sepia-intensity" forFilter: "sepia" withValue: getWidgetIntValue([items objectAtIndex:17])];
     [VLCVideoFilterHelper setVideoFilterProperty: "gradient-mode" forFilter: "gradient" withValue: (vlc_value_t){ .psz_string = (char *)[B64DecNSStr([items objectAtIndex:18]) UTF8String] }];
     [VLCVideoFilterHelper setVideoFilterProperty: "gradient-cartoon" forFilter: "gradient" withValue: (vlc_value_t){ .b_bool = [[items objectAtIndex:19] intValue] }];
-    [VLCVideoFilterHelper setVideoFilterProperty: "gradient-type" forFilter: "gradient" withValue: getWidgetIntValue([items objectAtIndex:20])];
+    [VLCVideoFilterHelper setVideoFilterProperty: "gradient-color" forFilter: "gradient" withValue: (vlc_value_t){ .b_bool = [[items objectAtIndex:20] intValue] }];
     [VLCVideoFilterHelper setVideoFilterProperty: "extract-component" forFilter: "extract" withValue: getWidgetIntValue([items objectAtIndex:21])];
     [VLCVideoFilterHelper setVideoFilterProperty: "posterize-level" forFilter: "posterize" withValue: getWidgetIntValue([items objectAtIndex:22])];
     [VLCVideoFilterHelper setVideoFilterProperty: "blur-factor" forFilter: "motionblur" withValue: getWidgetIntValue([items objectAtIndex:23])];
@@ -634,7 +634,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
     b_state = [_gradientCheckbox state];
     [self setWidgetValue: _gradientModePopup forOption: "gradient-mode" enabled: b_state];
     [self setWidgetValue: _gradientCartoonCheckbox forOption: "gradient-cartoon" enabled: b_state];
-    [self setWidgetValue: _gradientColorCheckbox forOption: "gradient-type" enabled: b_state];
+    [self setWidgetValue: _gradientColorCheckbox forOption: "gradient-color" enabled: b_state];
     [_gradientModeLabel setEnabled: b_state];
 
     [self setWidgetValue: _extractTextField forOption: "extract-component" enabled: [_extractCheckbox state]];
@@ -690,7 +690,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
                      var_InheritInteger(vout, "sepia-intensity"),
                      B64EncAndFree(var_InheritString(vout, "gradient-mode")),
                      (int64_t)var_InheritBool(vout, "gradient-cartoon"),
-                     var_InheritInteger(vout, "gradient-type"),
+                     (int64_t)var_InheritBool(vout, "gradient-color"),
                      var_InheritInteger(vout, "extract-component"),
                      var_InheritInteger(vout, "posterize-level"),
                      var_InheritInteger(vout, "blur-factor"),
@@ -1187,7 +1187,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
         vlc_value_t value = { .psz_string = (char *)[[[sender selectedItem] representedObject] UTF8String] };
         [VLCVideoFilterHelper setVideoFilterProperty: "gradient-mode" forFilter: "gradient" withValue: value];
     } else if (sender == _gradientColorCheckbox)
-        [VLCVideoFilterHelper setVideoFilterProperty: "gradient-type" forFilter: "gradient" withValue: getWidgetBoolValue(sender)];
+        [VLCVideoFilterHelper setVideoFilterProperty: "gradient-color" forFilter: "gradient" withValue: getWidgetBoolValue(sender)];
     else
         [VLCVideoFilterHelper setVideoFilterProperty: "gradient-cartoon" forFilter: "gradient" withValue: getWidgetBoolValue(sender)];
 }

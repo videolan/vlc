@@ -60,9 +60,8 @@ static void FilterHough   ( filter_t *, picture_t *, picture_t * );
 #define MODE_TEXT N_("Distort mode")
 #define MODE_LONGTEXT N_("Distort mode, one of \"gradient\", \"edge\" and \"hough\".")
 
-#define GRADIENT_TEXT N_("Gradient image type")
-#define GRADIENT_LONGTEXT N_("Gradient image type (0 or 1). 0 will " \
-        "turn the image to white while 1 will keep colors." )
+#define COLOR_TEXT N_("Keep color")
+#define COLOR_LONGTEXT N_("This will keep the colors, otherwise the image will be turned white." )
 
 #define CARTOON_TEXT N_("Apply cartoon effect")
 #define CARTOON_LONGTEXT N_("Apply cartoon effect. It is only used by " \
@@ -85,8 +84,9 @@ vlc_module_begin ()
                 MODE_TEXT, MODE_LONGTEXT )
         change_string_list( mode_list, mode_list_text )
 
-    add_integer_with_range( FILTER_PREFIX "type", 0, 0, 1,
-                GRADIENT_TEXT, GRADIENT_LONGTEXT )
+    add_obsolete_integer( "gradient-type" ) /* since 4.0.0 */
+    add_bool( FILTER_PREFIX "color", false,
+                COLOR_TEXT, COLOR_LONGTEXT )
     add_bool( FILTER_PREFIX "cartoon", true,
                 CARTOON_TEXT, CARTOON_LONGTEXT )
 
@@ -95,7 +95,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
-    "mode", "type", "cartoon", NULL
+    "mode", "color", "cartoon", NULL
 };
 
 /*****************************************************************************
@@ -110,7 +110,7 @@ typedef struct
     int i_mode;
 
     /* For the gradient mode */
-    int i_gradient_type;
+    int color;
     bool b_cartoon;
 
     uint32_t *p_buf32;
@@ -183,15 +183,15 @@ static int Create( filter_t *p_filter )
     }
     free( psz_method );
 
-    p_sys->i_gradient_type =
-        var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "type" );
+    p_sys->color =
+        var_CreateGetBoolCommand( p_filter, FILTER_PREFIX "color" );
     p_sys->b_cartoon =
         var_CreateGetBoolCommand( p_filter, FILTER_PREFIX "cartoon" );
 
     vlc_mutex_init( &p_sys->lock );
     var_AddCallback( p_filter, FILTER_PREFIX "mode",
                      GradientCallback, p_sys );
-    var_AddCallback( p_filter, FILTER_PREFIX "type",
+    var_AddCallback( p_filter, FILTER_PREFIX "color",
                      GradientCallback, p_sys );
     var_AddCallback( p_filter, FILTER_PREFIX "cartoon",
                      GradientCallback, p_sys );
@@ -214,7 +214,7 @@ static void Destroy( filter_t *p_filter )
 
     var_DelCallback( p_filter, FILTER_PREFIX "mode",
                      GradientCallback, p_sys );
-    var_DelCallback( p_filter, FILTER_PREFIX "type",
+    var_DelCallback( p_filter, FILTER_PREFIX "color",
                      GradientCallback, p_sys );
     var_DelCallback( p_filter, FILTER_PREFIX "cartoon",
                      GradientCallback, p_sys );
@@ -381,7 +381,7 @@ static void FilterGradient( filter_t *p_filter, picture_t *p_inpic,
                     + ((int)p_smooth[(y + 1) * i_src_visible + x - 1] \
                      - (int)p_smooth[(y + 1) * i_src_visible + x + 1]));
 
-    if( p_sys->i_gradient_type )
+    if( p_sys->color )
     {
         if( p_sys->b_cartoon )
         {
@@ -751,9 +751,9 @@ static int GradientCallback( vlc_object_t *p_this, char const *psz_var,
             p_sys->i_mode = GRADIENT;
         }
     }
-    else if( !strcmp( psz_var, FILTER_PREFIX "type" ) )
+    else if( !strcmp( psz_var, FILTER_PREFIX "color" ) )
     {
-        p_sys->i_gradient_type = newval.i_int;
+        p_sys->color = newval.b_bool;
     }
     else if( !strcmp( psz_var, FILTER_PREFIX "cartoon" ) )
     {

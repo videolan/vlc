@@ -558,7 +558,7 @@
         </widget>
        </item>
        <item row="1" column="0" colspan="2">
-        <widget class="QCheckBox" name="gradientTypeCheck">
+        <widget class="QCheckBox" name="gradientColorCheck">
          <property name="text">
           <string>Color</string>
          </property>
