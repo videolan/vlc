@@ -105,6 +105,7 @@ static const int rgi_afd_values[] = {
     0, 2, 3, 4, 8, 9, 10, 11, 13, 14, 15,
 };
 static const char * const rgsz_afd_text[] = {
+    /* Note: Skip further translation - too technical */
     N_("Undefined"),
     "Box 16:9 (top aligned)",
     "Box 14:9 (top aligned)",

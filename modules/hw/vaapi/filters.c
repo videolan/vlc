@@ -1140,6 +1140,7 @@ vlc_module_begin()
 
     add_submodule()
     set_callback_video_filter(OpenDenoiseFilter)
+    /* Note: Skip label translation - too technical */
     add_float_with_range("denoise-sigma", 1.f, .0f, 2.f,
                          "Denoise strength",
                          "Set the Denoise strength. (Defaults to 1).")

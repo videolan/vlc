@@ -108,6 +108,7 @@ vlc_module_begin ()
         set_capability("video encoder", 101)
         set_description(N_("AOM video encoder"))
         set_callback(OpenEncoder)
+        /* Note: Skip label translation for these - too technical */
         add_integer( SOUT_CFG_PREFIX "profile", 0, "Profile", PROFILE_LONGTEXT )
             change_integer_range( 0, 2 )
             change_integer_list( pi_profile_values_list, ppsz_profile_text )

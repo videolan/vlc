@@ -49,6 +49,8 @@ typedef enum filter_resizer_e {
 
 #ifndef NDEBUG
 #define MMAL_CONVERTER_TYPE_NAME "mmal-hw-converter"
+
+/* Note: Skip translation of these - too technical */
 #define MMAL_CONVERTER_TYPE_TEXT "Hardware used for MMAL conversions"
 #define MMAL_CONVERTER_TYPE_LONGTEXT "Hardware component used for MMAL conversions. Hardware Video Scaler"\
         " (default) gives the best result and allows blending, Resizer is slower but uses less memory."

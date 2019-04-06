@@ -133,6 +133,7 @@
     "between decoder/encoder threads when threads > 0" )
 
 
+/* Note: Skip adding translated accompanying labels - too technical, not worth it */
 static const char *const ppsz_deinterlace_type[] =
 {
     "deinterlace", "ffmpeg-deinterlace"

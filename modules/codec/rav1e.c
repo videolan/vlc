@@ -301,6 +301,7 @@ vlc_module_begin()
     set_capability("video encoder", 105)
     set_callback(OpenEncoder)
     set_subcategory(SUBCAT_INPUT_VCODEC)
+    /* Note: Skip label translation for these - too technical */
     add_integer(SOUT_CFG_PREFIX "profile", 0, "Profile", NULL)
         change_integer_range(0, 3)
     add_integer(SOUT_CFG_PREFIX "bitdepth", 8, "Bit Depth", NULL)
