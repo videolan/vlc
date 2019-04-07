@@ -44,7 +44,7 @@ static int  OpenFilter( vlc_object_t * );
 /* wg4 channel indices in the order of channel_name */
 static const uint8_t channel_wg4idx[] = { 0, 7, 1, 4, 6, 5, 2, 3, 8 };
 
-static const unsigned channel_idx[]    = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+static const int channel_idx[]    = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 
 static const char *const channel_name[] =
 {
