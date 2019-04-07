@@ -204,7 +204,7 @@ vlc_module_begin ()
                 SCODEC_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "soverlay", false, SCODEC_TEXT,
                SCODEC_LONGTEXT, false )
-    add_module_list(SOUT_CFG_PREFIX "sfilter", "spu source", NULL,
+    add_module_list(SOUT_CFG_PREFIX "sfilter", "sub source", NULL,
                     SFILTER_TEXT, SFILTER_LONGTEXT)
 
     set_section( N_("Miscellaneous"), NULL )
