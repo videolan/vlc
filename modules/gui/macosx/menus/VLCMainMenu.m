@@ -127,6 +127,7 @@
     _rendererMenuController.rendererNoneItem = _rendererNoneItem;
     _rendererMenuController.rendererMenu = _rendererMenu;
     [self updateTrackHandlingMenus:nil];
+    [self updateTitleAndChapterMenus:nil];
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
@@ -160,6 +161,18 @@
     [notificationCenter addObserver:self
                            selector:@selector(updateTrackHandlingMenus:)
                                name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateTitleAndChapterMenus:)
+                               name:VLCPlayerTitleListChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateTitleAndChapterMenus:)
+                               name:VLCPlayerTitleSelectionChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateTitleAndChapterMenus:)
+                               name:VLCPlayerChapterSelectionChanged
                              object:nil];
 
     [self setupVarMenuItem:_add_intf
@@ -563,13 +576,7 @@
 
     if (p_mediaItem != NULL) {
 /*        [self setupVarMenuItem:_program target: (vlc_object_t *)p_input
-                                 var:"program" selector: @selector(toggleVar:)];
-
-        [self setupVarMenuItem:_title target: (vlc_object_t *)p_input
-                                 var:"title" selector: @selector(toggleVar:)];
-
-        [self setupVarMenuItem:_chapter target: (vlc_object_t *)p_input
-                                 var:"chapter" selector: @selector(toggleVar:)];*/
+                                 var:"program" selector: @selector(toggleVar:)];*/
 
         audio_output_t *p_aout = [_playerController mainAudioOutput];
         if (p_aout != NULL) {
@@ -637,8 +644,6 @@
 - (void)setSubmenusEnabled:(BOOL)b_enabled
 {
     [_program setEnabled: b_enabled];
-    [_title setEnabled: b_enabled];
-    [_chapter setEnabled: b_enabled];
     [_visual setEnabled: b_enabled];
     [_channels setEnabled: b_enabled];
     [_deinterlace setEnabled: b_enabled];
@@ -916,6 +921,59 @@
 - (void)unselectTrackCategory:(NSMenuItem *)sender
 {
     [_playerController unselectTracksFromCategory:(enum es_format_category_e)sender.tag];
+}
+
+#pragma mark - title and chapter handling
+- (void)updateTitleAndChapterMenus:(NSNotification *)aNotification
+{
+    [_titleMenu removeAllItems];
+    [_chapterMenu removeAllItems];
+
+    size_t count = [_playerController numberOfTitlesOfCurrentMedia];
+    size_t selectedIndex = [_playerController selectedTitleIndex];
+    for (size_t x = 0; x < count; x++) {
+        const struct vlc_player_title *p_title = [_playerController titleAtIndexForCurrentMedia:x];
+        if (p_title == NULL) {
+            break;
+        }
+        NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:toNSStr(p_title->name)
+                                                          action:@selector(selectTitle:)
+                                                   keyEquivalent:@""];
+        [menuItem setTarget:self];
+        [menuItem setTag:x];
+        [menuItem setEnabled:YES];
+        [menuItem setState: x == selectedIndex ? NSOnState : NSOffState];
+        [_titleMenu addItem:menuItem];
+    }
+    _title.enabled = count > 0 ? YES : NO;
+
+    count = [_playerController numberOfChaptersForCurrentTitle];
+    selectedIndex = [_playerController selectedChapterIndex];
+    for (size_t x = 0; x < count; x++) {
+        const struct vlc_player_chapter *p_chapter = [_playerController chapterAtIndexForCurrentTitle:x];
+        if (p_chapter == NULL) {
+            break;
+        }
+        NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:toNSStr(p_chapter->name)
+                                                          action:@selector(selectChapter:)
+                                                   keyEquivalent:@""];
+        [menuItem setTarget:self];
+        [menuItem setTag:x];
+        [menuItem setEnabled:YES];
+        [menuItem setState: x == selectedIndex ? NSOnState : NSOffState];
+        [_chapterMenu addItem:menuItem];
+    }
+    _chapter.enabled = count > 0 ? YES : NO;
+}
+
+- (void)selectTitle:(NSMenuItem *)sender
+{
+    _playerController.selectedTitleIndex = [sender tag];
+}
+
+- (void)selectChapter:(NSMenuItem *)sender
+{
+    _playerController.selectedChapterIndex = [sender tag];
 }
 
 #pragma mark - audio menu
