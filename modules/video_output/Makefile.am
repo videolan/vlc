@@ -302,8 +302,6 @@ libdirect3d9_plugin_la_SOURCES = video_output/win32/direct3d9.c \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/builtin_shaders.h \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
-libdirect3d9_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	-DMODULE_NAME_IS_direct3d9
 libdirect3d9_plugin_la_LIBADD = libchroma_copy.la libd3d9_common.la -lgdi32 $(LIBCOM) -luuid
 libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 if HAVE_WIN32_DESKTOP
@@ -315,8 +313,6 @@ libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.c \
  video_output/win32/d3d11_quad.c video_output/win32/d3d11_quad.h \
  video_output/win32/d3d11_shaders.c video_output/win32/d3d11_shaders.h \
  video_output/win32/common.c video_output/win32/common.h
-libdirect3d11_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
- -DMODULE_NAME_IS_direct3d11
 libdirect3d11_plugin_la_LIBADD = libchroma_copy.la libd3d11_common.la $(LIBCOM) -luuid
 if !HAVE_WINSTORE
 libdirect3d11_plugin_la_SOURCES += video_output/win32/events.c \
