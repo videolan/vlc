@@ -92,6 +92,12 @@ extern NSString *VLCPlayerTitleSelectionChanged;
 extern NSString *VLCPlayerTitleListChanged;
 
 /**
+ * Listen to VLCPlayerChapterSelectionChanged to be notified if the selected chapter of the current title changes
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerChapterSelectionChanged;
+
+/**
  * Listen to VLCPlayerABLoopStateChanged to be notified if the A→B loop state changes
  * @note the affected player object will be the object of the notification
  */
@@ -496,6 +502,32 @@ extern NSString *VLCPlayerMuteChanged;
  * @note listen to VLCPlayerTitleListChanged in case the list changes so previous indexes will no longer be valid anymore
  */
 - (const struct vlc_player_title *)titleAtIndexForCurrentMedia:(size_t)index;
+
+/**
+ * the index of the currently selected chapter within the current title
+ * @note listen to VLCPlayerChapterSelectionChanged to be notified about changes to this property
+ */
+@property (readwrite, nonatomic) size_t selectedChapterIndex;
+
+/**
+ * select the next chapter of the current title
+ */
+- (void)selectNextChapter;
+
+/**
+ * select the previous chapter of the current title
+ */
+- (void)selectPreviousChapter;
+
+/**
+ * returns the number of chapters for the current title
+ */
+@property (readonly) size_t numberOfChaptersForCurrentTitle;
+
+/**
+ * returns the chapter for the index within the current title
+ */
+- (nullable const struct vlc_player_chapter *)chapterAtIndexForCurrentTitle:(size_t)index;
 
 /**
  * exposes whether a teletext menu is available or not

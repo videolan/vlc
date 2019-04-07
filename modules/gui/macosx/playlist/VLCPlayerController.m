@@ -43,6 +43,7 @@ NSString *VLCPlayerTimeAndPositionChanged = @"VLCPlayerTimeAndPositionChanged";
 NSString *VLCPlayerLengthChanged = @"VLCPlayerLengthChanged";
 NSString *VLCPlayerTitleSelectionChanged = @"VLCPlayerTitleSelectionChanged";
 NSString *VLCPlayerTitleListChanged = @"VLCPlayerTitleListChanged";
+NSString *VLCPlayerChapterSelectionChanged = @"VLCPlayerChapterSelectionChanged";
 NSString *VLCPlayerABLoopStateChanged = @"VLCPlayerABLoopStateChanged";
 NSString *VLCPlayerTeletextMenuAvailable = @"VLCPlayerTeletextMenuAvailable";
 NSString *VLCPlayerTeletextEnabled = @"VLCPlayerTeletextEnabled";
@@ -93,6 +94,7 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 - (void)lengthChanged:(vlc_tick_t)length;
 - (void)titleListChanged:(vlc_player_title_list *)p_titles;
 - (void)selectedTitleChanged:(size_t)selectedTitle;
+- (void)selectedChapterChanged:(size_t)chapterIndex;
 - (void)teletextAvailibilityChanged:(BOOL)hasTeletextMenu;
 - (void)teletextEnabledChanged:(BOOL)teletextOn;
 - (void)teletextPageChanged:(unsigned int)page;
@@ -215,6 +217,21 @@ static void cb_player_title_selection_changed(vlc_player_t *p_player,
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
         [playerController selectedTitleChanged:selectedIndex];
+    });
+}
+
+static void cb_player_chapter_selection_changed(vlc_player_t *p_player,
+                                                const struct vlc_player_title *p_title, size_t title_idx,
+                                                const struct vlc_player_chapter *p_new_chapter, size_t new_chapter_idx,
+                                                void *p_data)
+{
+    VLC_UNUSED(p_player);
+    VLC_UNUSED(p_title);
+    VLC_UNUSED(title_idx);
+    VLC_UNUSED(p_new_chapter);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController selectedChapterChanged:new_chapter_idx];
     });
 }
 
@@ -422,7 +439,7 @@ static const struct vlc_player_cbs player_callbacks = {
     NULL, //cb_player_program_selection_changed,
     cb_player_titles_changed,
     cb_player_title_selection_changed,
-    NULL, //cb_player_chapter_selection_changed,
+    cb_player_chapter_selection_changed,
     cb_player_teletext_menu_availability_changed,
     cb_player_teletext_enabled_changed,
     cb_player_teletext_page_changed,
@@ -1093,6 +1110,54 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
         return 0;
     }
     return vlc_player_title_list_GetCount(_currentTitleList);
+}
+
+- (void)selectedChapterChanged:(size_t)chapterIndex
+{
+    _selectedChapterIndex = chapterIndex;
+    [_defaultNotificationCenter postNotificationName:VLCPlayerChapterSelectionChanged
+                                              object:self];
+}
+
+- (void)setSelectedChapterIndex:(size_t)selectedChapterIndex
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_SelectChapterIdx(_p_player, selectedChapterIndex);
+    vlc_player_Unlock(_p_player);
+}
+
+- (void)selectNextChapter
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_SelectNextChapter(_p_player);
+    vlc_player_Unlock(_p_player);
+}
+
+- (void)selectPreviousChapter
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_SelectPrevChapter(_p_player);
+    vlc_player_Unlock(_p_player);
+}
+
+- (size_t)numberOfChaptersForCurrentTitle
+{
+    const struct vlc_player_title *p_current_title = [self selectedTitle];
+    if (p_current_title == NULL) {
+        return 0;
+    }
+
+    return p_current_title->chapter_count;
+}
+
+- (const struct vlc_player_chapter *)chapterAtIndexForCurrentTitle:(size_t)index
+{
+    const struct vlc_player_title *p_current_title = [self selectedTitle];
+    if (p_current_title == NULL || !p_current_title->chapter_count) {
+        return NULL;
+    }
+
+    return &p_current_title->chapters[index];
 }
 
 - (void)teletextAvailibilityChanged:(BOOL)hasTeletextMenu
