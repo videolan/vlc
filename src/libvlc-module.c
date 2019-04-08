@@ -1544,7 +1544,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_GENERAL )
     add_category_hint(N_("Audio"), AOUT_CAT_LONGTEXT)
 
-    add_bool( "audio", 1, AUDIO_TEXT, AUDIO_LONGTEXT, false )
+    add_bool( "audio", true, AUDIO_TEXT, AUDIO_LONGTEXT, false )
         change_safe ()
     add_float( "gain", 1., GAIN_TEXT, GAIN_LONGTEXT, true )
         change_float_range( 0., 8. )
@@ -1606,36 +1606,36 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_GENERAL )
     add_category_hint(N_("Video"), VOUT_CAT_LONGTEXT)
 
-    add_bool( "video", 1, VIDEO_TEXT, VIDEO_LONGTEXT, true )
+    add_bool( "video", true, VIDEO_TEXT, VIDEO_LONGTEXT, true )
         change_safe ()
-    add_bool( "grayscale", 0, GRAYSCALE_TEXT,
+    add_bool( "grayscale", false, GRAYSCALE_TEXT,
               GRAYSCALE_LONGTEXT, true )
     add_bool( "fullscreen", false, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT, false )
         change_short('f')
         change_safe ()
-    add_bool( "embedded-video", 1, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
+    add_bool( "embedded-video", true, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
               true )
     add_bool( "xlib", true, "", "", true )
         change_private ()
-    add_bool( "drop-late-frames", 1, DROP_LATE_FRAMES_TEXT,
+    add_bool( "drop-late-frames", true, DROP_LATE_FRAMES_TEXT,
               DROP_LATE_FRAMES_LONGTEXT, true )
     /* Used in vout_synchro */
-    add_bool( "skip-frames", 1, SKIP_FRAMES_TEXT,
+    add_bool( "skip-frames", true, SKIP_FRAMES_TEXT,
               SKIP_FRAMES_LONGTEXT, true )
-    add_bool( "quiet-synchro", 0, QUIET_SYNCHRO_TEXT,
+    add_bool( "quiet-synchro", false, QUIET_SYNCHRO_TEXT,
               QUIET_SYNCHRO_LONGTEXT, true )
     add_bool( "keyboard-events", true, KEYBOARD_EVENTS_TEXT,
               KEYBOARD_EVENTS_LONGTEXT, true )
     add_bool( "mouse-events", true, MOUSE_EVENTS_TEXT,
               MOUSE_EVENTS_LONGTEXT, true )
-    add_bool( "video-on-top", 0, VIDEO_ON_TOP_TEXT,
+    add_bool( "video-on-top", false, VIDEO_ON_TOP_TEXT,
               VIDEO_ON_TOP_LONGTEXT, false )
     add_bool( "video-wallpaper", false, WALLPAPER_TEXT,
               WALLPAPER_LONGTEXT, false )
     add_integer("disable-screensaver", 1, SS_TEXT, SS_LONGTEXT, true)
         change_integer_list(screensaver_values, screensaver_texts)
 
-    add_bool( "video-title-show", 1, VIDEO_TITLE_SHOW_TEXT,
+    add_bool( "video-title-show", true, VIDEO_TITLE_SHOW_TEXT,
               VIDEO_TITLE_SHOW_LONGTEXT, false )
         change_safe()
     add_integer( "video-title-timeout", 5000, VIDEO_TITLE_TIMEOUT_TEXT,
@@ -1689,8 +1689,8 @@ vlc_module_begin ()
                 MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT, true )
     add_string( "custom-aspect-ratios", NULL, CUSTOM_ASPECT_RATIOS_TEXT,
                 CUSTOM_ASPECT_RATIOS_LONGTEXT, false )
-    add_bool( "hdtv-fix", 1, HDTV_FIX_TEXT, HDTV_FIX_LONGTEXT, true )
-    add_bool( "video-deco", 1, VIDEO_DECO_TEXT,
+    add_bool( "hdtv-fix", true, HDTV_FIX_TEXT, HDTV_FIX_LONGTEXT, true )
+    add_bool( "video-deco", true, VIDEO_DECO_TEXT,
               VIDEO_DECO_LONGTEXT, true )
     add_string( "video-title", NULL, VIDEO_TITLE_TEXT,
                  VIDEO_TITLE_LONGTEXT, true )
@@ -1726,9 +1726,9 @@ vlc_module_begin ()
     set_section( N_("On Screen Display") , NULL )
     add_category_hint(N_("Subpictures"), SUB_CAT_LONGTEXT)
 
-    add_bool( "spu", 1, SPU_TEXT, SPU_LONGTEXT, false )
+    add_bool( "spu", true, SPU_TEXT, SPU_LONGTEXT, false )
         change_safe ()
-    add_bool( "osd", 1, OSD_TEXT, OSD_LONGTEXT, false )
+    add_bool( "osd", true, OSD_TEXT, OSD_LONGTEXT, false )
     add_module("text-renderer", "text renderer", NULL,
                TEXTRENDERER_TEXT, TEXTRENDERER_LONGTEXT)
 
@@ -1817,7 +1817,7 @@ vlc_module_begin ()
                  INPUT_PREFERREDRESOLUTION_LONGTEXT, false )
         change_safe ()
         change_integer_list( pi_prefres, ppsz_prefres )
-    add_bool( "low-delay", 0, INPUT_LOWDELAY_TEXT,
+    add_bool( "low-delay", false, INPUT_LOWDELAY_TEXT,
               INPUT_LOWDELAY_LONGTEXT, true )
         change_safe ()
 
@@ -2006,11 +2006,11 @@ vlc_module_begin ()
                                 SOUT_KEEP_LONGTEXT, true )
     add_bool( "sout-all", true, SOUT_ALL_TEXT,
                                 SOUT_ALL_LONGTEXT, true )
-    add_bool( "sout-audio", 1, SOUT_AUDIO_TEXT,
+    add_bool( "sout-audio", true, SOUT_AUDIO_TEXT,
                                 SOUT_AUDIO_LONGTEXT, true )
-    add_bool( "sout-video", 1, SOUT_VIDEO_TEXT,
+    add_bool( "sout-video", true, SOUT_VIDEO_TEXT,
                                 SOUT_VIDEO_LONGTEXT, true )
-    add_bool( "sout-spu", 1, SOUT_SPU_TEXT,
+    add_bool( "sout-spu", true, SOUT_SPU_TEXT,
                                 SOUT_SPU_LONGTEXT, true )
     add_integer( "sout-mux-caching", 1500, SOUT_MUX_CACHING_TEXT,
                                 SOUT_MUX_CACHING_LONGTEXT, true )
@@ -2070,7 +2070,7 @@ vlc_module_begin ()
 #endif
 
 #if defined(_WIN32) || defined(__OS2__)
-    add_bool( "high-priority", 0, HPRIORITY_TEXT,
+    add_bool( "high-priority", false, HPRIORITY_TEXT,
               HPRIORITY_LONGTEXT, false )
 #endif
 
@@ -2085,40 +2085,40 @@ vlc_module_begin ()
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_GENERAL )
     add_category_hint(N_("Playlist"), PLAYLIST_CAT_LONGTEXT)
-    add_bool( "random", 0, RANDOM_TEXT, RANDOM_LONGTEXT, false )
+    add_bool( "random", false, RANDOM_TEXT, RANDOM_LONGTEXT, false )
         change_short('Z')
         change_safe()
-    add_bool( "loop", 0, LOOP_TEXT, LOOP_LONGTEXT, false )
+    add_bool( "loop", false, LOOP_TEXT, LOOP_LONGTEXT, false )
         change_short('L')
         change_safe()
-    add_bool( "repeat", 0, REPEAT_TEXT, REPEAT_LONGTEXT, false )
+    add_bool( "repeat", false, REPEAT_TEXT, REPEAT_LONGTEXT, false )
         change_short('R')
         change_safe()
-    add_bool( "play-and-exit", 0, PAE_TEXT, PAE_LONGTEXT, false )
-    add_bool( "play-and-stop", 0, PAS_TEXT, PAS_LONGTEXT, false )
+    add_bool( "play-and-exit", false, PAE_TEXT, PAE_LONGTEXT, false )
+    add_bool( "play-and-stop", false, PAS_TEXT, PAS_LONGTEXT, false )
         change_safe()
-    add_bool( "play-and-pause", 0, PAP_TEXT, PAP_LONGTEXT, true )
+    add_bool( "play-and-pause", false, PAP_TEXT, PAP_LONGTEXT, true )
         change_safe()
-    add_bool( "start-paused", 0, SP_TEXT, SP_LONGTEXT, false )
+    add_bool( "start-paused", false, SP_TEXT, SP_LONGTEXT, false )
     add_bool( "playlist-autostart", true,
               AUTOSTART_TEXT, AUTOSTART_LONGTEXT, false )
     add_bool( "playlist-cork", true, CORK_TEXT, CORK_LONGTEXT, false )
 #if defined(_WIN32) || defined(HAVE_DBUS) || defined(__OS2__)
-    add_bool( "one-instance", 0, ONEINSTANCE_TEXT,
+    add_bool( "one-instance", false, ONEINSTANCE_TEXT,
               ONEINSTANCE_LONGTEXT, true )
-    add_bool( "started-from-file", 0, STARTEDFROMFILE_TEXT,
+    add_bool( "started-from-file", false, STARTEDFROMFILE_TEXT,
               STARTEDFROMFILE_LONGTEXT, true )
         change_volatile ()
-    add_bool( "one-instance-when-started-from-file", 1,
+    add_bool( "one-instance-when-started-from-file", true,
               ONEINSTANCEWHENSTARTEDFROMFILE_TEXT, NULL, true )
-    add_bool( "playlist-enqueue", 0, PLAYLISTENQUEUE_TEXT,
+    add_bool( "playlist-enqueue", false, PLAYLISTENQUEUE_TEXT,
               PLAYLISTENQUEUE_LONGTEXT, true )
 #endif
 #ifdef HAVE_DBUS
     add_bool( "dbus", false, DBUS_TEXT, DBUS_LONGTEXT, true )
 #endif
-    add_bool( "media-library", 0, ML_TEXT, ML_LONGTEXT, false )
-    add_bool( "playlist-tree", 0, PLTREE_TEXT, PLTREE_LONGTEXT, false )
+    add_bool( "media-library", false, ML_TEXT, ML_LONGTEXT, false )
+    add_bool( "playlist-tree", false, PLTREE_TEXT, PLTREE_LONGTEXT, false )
 
     add_string( "open", "", OPEN_TEXT, OPEN_LONGTEXT, false )
 
