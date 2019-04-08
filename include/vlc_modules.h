@@ -125,21 +125,24 @@ VLC_API void module_unneed( vlc_object_t *, module_t * );
 #define module_unneed(a,b) module_unneed(VLC_OBJECT(a),b)
 
 /**
- * Checks if a module exists.
- *
- * \param name name of the module
- * \retval true if the module exists
- * \retval false if the module does not exist (in the running installation)
- */
-VLC_API bool module_exists(const char *) VLC_USED;
-
-/**
  * Get a pointer to a module_t given it's name.
  *
  * \param name the name of the module
  * \return a pointer to the module or NULL in case of a failure
  */
 VLC_API module_t *module_find(const char *name) VLC_USED;
+
+/**
+ * Checks if a module exists.
+ *
+ * \param name name of the module
+ * \retval true if the module exists
+ * \retval false if the module does not exist (in the running installation)
+ */
+VLC_USED static inline bool module_exists(const char * name)
+{
+    return module_find(name) != NULL;
+}
 
 /**
  * Gets the table of module configuration items.

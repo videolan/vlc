@@ -252,7 +252,6 @@ vlc_uri_fixup
 vlc_tick_now
 module_config_free
 module_config_get
-module_exists
 module_find
 module_get_capability
 module_get_help
