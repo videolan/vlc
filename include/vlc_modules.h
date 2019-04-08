@@ -157,13 +157,26 @@ VLC_API module_config_t *module_config_get(const module_t *module,
                                            unsigned *restrict psize) VLC_USED;
 
 /**
- * Releases the configuration items table.
+ * Releases a configuration items table.
  *
  * \param tab base address of a table returned by module_config_get()
  */
 VLC_API void module_config_free( module_config_t *tab);
 
+/**
+ * Frees a flat list of VLC modules.
+ *
+ * \param list list obtained by module_list_get()
+ */
 VLC_API void module_list_free(module_t **);
+
+/**
+ * Gets the flat list of VLC modules.
+ *
+ * \param n [OUT] pointer to the number of modules
+ * \return table of module pointers (release with module_list_free()),
+ *         or NULL in case of error (in that case, *n is zeroed).
+ */
 VLC_API module_t ** module_list_get(size_t *n) VLC_USED;
 
 /**

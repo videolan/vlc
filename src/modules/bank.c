@@ -811,23 +811,11 @@ void module_LoadPlugins(vlc_object_t *obj)
     msg_Dbg (obj, "plug-ins loaded: %zu modules", count);
 }
 
-/**
- * Frees the flat list of VLC modules.
- * @param list list obtained by module_list_get()
- * @param length number of items on the list
- * @return nothing.
- */
 void module_list_free (module_t **list)
 {
     free (list);
 }
 
-/**
- * Gets the flat list of VLC modules.
- * @param n [OUT] pointer to the number of modules
- * @return table of module pointers (release with module_list_free()),
- *         or NULL in case of error (in that case, *n is zeroed).
- */
 module_t **module_list_get (size_t *n)
 {
     module_t **tab = NULL;
