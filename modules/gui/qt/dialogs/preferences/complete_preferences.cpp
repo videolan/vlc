@@ -491,88 +491,99 @@ PrefsItemData::PrefsItemData( QObject *_parent ) : QObject( _parent )
  * also search the module name and head */
 bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
 {
-    /* Find our module */
-    module_t *p_module = NULL;
     if( this->i_type == TYPE_CATEGORY )
         return false;
-    else if( this->i_type == TYPE_MODULE )
+
+    bool is_core = this->i_type != TYPE_MODULE;
+    int id = 0;
+
+    /* find our module */
+    module_t *p_module;
+    if( !is_core )
         p_module = this->p_module;
     else
     {
         p_module = module_get_main();
         assert( p_module );
+
+        if( this->i_type == TYPE_SUBCATEGORY )
+            id = this->i_object_id;
+        else // TYPE_CATSUBCAT
+            id = this->i_subcat_id;
     }
+
+    /* check the node itself (its name/longname/helptext) */
 
     QString head;
-
-    if( this->i_type == TYPE_SUBCATEGORY || this->i_type == TYPE_CATSUBCAT )
-    {
+    if( is_core )
         head.clear();
-    }
     else
-    {
         head = QString( qfut( module_GetLongName( p_module ) ) );
-    }
 
-    if (name.contains( text, cs ) || head.contains( text, cs ) || help.contains( text, cs ))
+    if ( name.contains( text, cs )
+         || (!is_core && head.contains( text, cs ))
+         || help.contains( text, cs )
+       )
     {
         return true;
     }
+
+    /* check options belonging to this subcat or module */
 
     unsigned confsize;
     module_config_t *const p_config = module_config_get (p_module, &confsize),
                     *p_item = p_config,
                     *p_end = p_config + confsize;
 
-    if( this->i_type == TYPE_SUBCATEGORY || this->i_type ==  TYPE_CATSUBCAT )
+    if( !p_config )
+        return false;
+
+    bool ret = false;
+
+    if( is_core )
     {
+        /* find start of relevant option block */
         while ( p_item < p_end )
         {
             if( p_item->i_type == CONFIG_SUBCATEGORY &&
-                (
-                    ( this->i_type == TYPE_SUBCATEGORY &&
-                              p_item->value.i == this->i_object_id )
-                    ||
-                    ( this->i_type == TYPE_CATSUBCAT &&
-                              p_item->value.i == this->i_subcat_id )
-                )
+                p_item->value.i == id
               )
                 break;
             p_item++;
         }
-        p_item++; // Why that ? +1
+        if( ++p_item >= p_end )
+        {
+            ret = false;
+            goto end;
+        }
     }
 
-    if( p_item ) do
+    do
     {
-        if (
-            (
-                ( this->i_type == TYPE_SUBCATEGORY && p_item->value.i != this->i_object_id )
-                ||
-                ( this->i_type == TYPE_CATSUBCAT && p_item->value.i != this->i_subcat_id )
-            ) &&
-            ( p_item->i_type == CONFIG_CATEGORY || p_item->i_type == CONFIG_SUBCATEGORY )
-           ) break;
+        if ( p_item->i_type == CONFIG_CATEGORY || p_item->i_type == CONFIG_SUBCATEGORY )
+        {
+            /* for core, if we hit a cat or subcat, stop */
+            if ( is_core )
+                break;
+            /* a module's options are grouped under one node; we can/should
+               ignore all cat/subcat entries. */
+            continue;
+        }
 
+        /* private options (hidden from GUI but not help output) are not relevant */
         if( p_item->b_internal ) continue;
 
         if ( p_item->psz_text && qfut( p_item->psz_text ).contains( text, cs ) )
         {
-            module_config_free( p_config );
-            return true;
+            ret = true;
+            goto end;
         }
     }
-    while (
-            !(
-                ( this->i_type == TYPE_SUBCATEGORY || this->i_type == TYPE_CATSUBCAT )
-                &&
-                ( p_item->i_type == CONFIG_CATEGORY || p_item->i_type == CONFIG_SUBCATEGORY )
-             )
-             && ( ++p_item < p_end )
-          );
+    while ( ++p_item < p_end );
 
+end:
     module_config_free( p_config );
-    return false;
+    return ret;
 }
 
 /*********************************************************************
