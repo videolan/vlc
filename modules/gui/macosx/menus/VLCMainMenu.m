@@ -174,6 +174,14 @@
                            selector:@selector(updateTitleAndChapterMenus:)
                                name:VLCPlayerChapterSelectionChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateProgramMenu:)
+                               name:VLCPlayerProgramListChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateProgramMenu:)
+                               name:VLCPlayerProgramSelectionChanged
+                             object:nil];
 
     [self setupVarMenuItem:_add_intf
                     target:VLC_OBJECT(getIntf())
@@ -575,9 +583,6 @@
     input_item_t *p_mediaItem = _playerController.currentMedia;
 
     if (p_mediaItem != NULL) {
-/*        [self setupVarMenuItem:_program target: (vlc_object_t *)p_input
-                                 var:"program" selector: @selector(toggleVar:)];*/
-
         audio_output_t *p_aout = [_playerController mainAudioOutput];
         if (p_aout != NULL) {
             [self setupVarMenuItem:_channels target:VLC_OBJECT(p_aout)
@@ -643,7 +648,6 @@
 
 - (void)setSubmenusEnabled:(BOOL)b_enabled
 {
-    [_program setEnabled: b_enabled];
     [_visual setEnabled: b_enabled];
     [_channels setEnabled: b_enabled];
     [_deinterlace setEnabled: b_enabled];
@@ -974,6 +978,34 @@
 - (void)selectChapter:(NSMenuItem *)sender
 {
     _playerController.selectedChapterIndex = [sender tag];
+}
+
+#pragma mark - program handling
+- (void)updateProgramMenu:(NSNotification *)notification
+{
+    [_programMenu removeAllItems];
+
+    size_t count = [_playerController numberOfPrograms];
+    for (size_t x = 0; x < count; x++) {
+        VLCProgramMetaData *program = [_playerController programAtIndex:x];
+        if (program == nil) {
+            break;
+        }
+        NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:program.name
+                                                          action:@selector(selectProgram:)
+                                                   keyEquivalent:@""];
+        [menuItem setTarget:self];
+        [menuItem setRepresentedObject:program];
+        [menuItem setEnabled:YES];
+        [menuItem setState:program.selected ? NSOnState : NSOffState];
+        [_programMenu addItem:menuItem];
+    }
+    _program.enabled = count > 0 ? YES : NO;
+}
+
+- (void)selectProgram:(NSMenuItem *)sender
+{
+    [_playerController selectProgram:[sender representedObject]];
 }
 
 #pragma mark - audio menu
