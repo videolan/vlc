@@ -503,6 +503,22 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
         assert( p_module );
     }
 
+    QString head;
+
+    if( this->i_type == TYPE_SUBCATEGORY || this->i_type == TYPE_CATSUBCAT )
+    {
+        head.clear();
+    }
+    else
+    {
+        head = QString( qfut( module_GetLongName( p_module ) ) );
+    }
+
+    if (name.contains( text, cs ) || head.contains( text, cs ) || help.contains( text, cs ))
+    {
+        return true;
+    }
+
     unsigned confsize;
     module_config_t *const p_config = module_config_get (p_module, &confsize),
                     *p_item = p_config,
@@ -524,24 +540,7 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
                 break;
             p_item++;
         }
-    }
-
-    QString head;
-
-    if( this->i_type == TYPE_SUBCATEGORY || this->i_type ==  TYPE_CATSUBCAT )
-    {
-        head.clear();
         p_item++; // Why that ? +1
-    }
-    else
-    {
-        head = QString( qfut( module_GetLongName( p_module ) ) );
-    }
-
-    if (name.contains( text, cs ) || head.contains( text, cs ) || help.contains( text, cs ))
-    {
-        module_config_free( p_config );
-        return true;
     }
 
     if( p_item ) do
