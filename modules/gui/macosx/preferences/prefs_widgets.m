@@ -1248,7 +1248,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             module_config_t *p_cfg = p_config + i;
             /* Hack: required subcategory is stored in i_min */
             if (p_cfg->i_type == CONFIG_SUBCATEGORY &&
-                p_cfg->value.i == p_cfg->min.i) {
+                p_cfg->value.i == self.p_item->min.i) {
                 NSString *o_description = _NS(module_get_name(p_parser, TRUE));
                 if ([newval isEqualToString: o_description]) {
                     returnval = strdup(module_get_object(p_parser));
