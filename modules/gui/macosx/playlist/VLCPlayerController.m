@@ -329,26 +329,7 @@ static void cb_player_stats_changed(vlc_player_t *p_player,
     VLC_UNUSED(p_player);
 
     /* the provided structure is valid in this context only, so copy all data to our own */
-    VLCInputStats *inputStats = [[VLCInputStats alloc] init];
-
-    inputStats.inputReadPackets = p_stats->i_read_packets;
-    inputStats.inputReadBytes = p_stats->i_read_bytes;
-    inputStats.inputBitrate = p_stats->f_input_bitrate;
-
-    inputStats.demuxReadPackets = p_stats->i_demux_read_packets;
-    inputStats.demuxReadBytes = p_stats->i_demux_read_bytes;
-    inputStats.demuxBitrate = p_stats->f_demux_bitrate;
-    inputStats.demuxCorrupted = p_stats->i_demux_corrupted;
-    inputStats.demuxDiscontinuity = p_stats->i_demux_discontinuity;
-
-    inputStats.decodedAudio = p_stats->i_decoded_audio;
-    inputStats.decodedVideo = p_stats->i_decoded_video;
-
-    inputStats.displayedPictures = p_stats->i_displayed_pictures;
-    inputStats.lostPictures = p_stats->i_lost_pictures;
-
-    inputStats.playedAudioBuffers = p_stats->i_played_abuffers;
-    inputStats.lostAudioBuffers = p_stats->i_lost_abuffers;
+    VLCInputStats *inputStats = [[VLCInputStats alloc] initWithStatsStructure:p_stats];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
@@ -1409,11 +1390,8 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
     tracks = [[NSMutableArray alloc] initWithCapacity:numberOfTracks];
     for (size_t x = 0; x < numberOfTracks; x++) {
-        VLCTrackMetaData *trackMetadata = [[VLCTrackMetaData alloc] init];
-        const struct vlc_player_track *track = vlc_player_GetTrackAt(_p_player, category, x);
-        trackMetadata.esID = track->es_id;
-        trackMetadata.name = toNSStr(track->name);
-        trackMetadata.selected = track->selected;
+        const struct vlc_player_track *p_track = vlc_player_GetTrackAt(_p_player, category, x);
+        VLCTrackMetaData *trackMetadata = [[VLCTrackMetaData alloc] initWithTrackStructure:p_track];
         [tracks addObject:trackMetadata];
     }
     vlc_player_Unlock(_p_player);
@@ -1469,9 +1447,9 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 {
     VLCProgramMetaData *programMetaData = nil;
     vlc_player_Lock(_p_player);
-    const struct vlc_player_program *program = vlc_player_GetProgramAt(_p_player, index);
-    if (program != NULL) {
-        programMetaData = [[VLCProgramMetaData alloc] initWithProgramStructure:program];
+    const struct vlc_player_program *p_program = vlc_player_GetProgramAt(_p_player, index);
+    if (p_program != NULL) {
+        programMetaData = [[VLCProgramMetaData alloc] initWithProgramStructure:p_program];
     }
     vlc_player_Unlock(_p_player);
     return programMetaData;
@@ -1481,9 +1459,9 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 {
     VLCProgramMetaData *programMetaData = nil;
     vlc_player_Lock(_p_player);
-    const struct vlc_player_program *program = vlc_player_GetProgram(_p_player, programID);
-    if (program != NULL) {
-        programMetaData = [[VLCProgramMetaData alloc] initWithProgramStructure:program];
+    const struct vlc_player_program *p_program = vlc_player_GetProgram(_p_player, programID);
+    if (p_program != NULL) {
+        programMetaData = [[VLCProgramMetaData alloc] initWithProgramStructure:p_program];
     }
     vlc_player_Unlock(_p_player);
     return programMetaData;
@@ -1700,9 +1678,46 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
 @implementation VLCInputStats
 
+- (instancetype)initWithStatsStructure:(const struct input_stats_t *)p_stats
+{
+    self = [super init];
+    if (p_stats != NULL) {
+        _inputReadPackets = p_stats->i_read_packets;
+        _inputReadBytes = p_stats->i_read_bytes;
+        _inputBitrate = p_stats->f_input_bitrate;
+
+        _demuxReadPackets = p_stats->i_demux_read_packets;
+        _demuxReadBytes = p_stats->i_demux_read_bytes;
+        _demuxBitrate = p_stats->f_demux_bitrate;
+        _demuxCorrupted = p_stats->i_demux_corrupted;
+        _demuxDiscontinuity = p_stats->i_demux_discontinuity;
+
+        _decodedAudio = p_stats->i_decoded_audio;
+        _decodedVideo = p_stats->i_decoded_video;
+
+        _displayedPictures = p_stats->i_displayed_pictures;
+        _lostPictures = p_stats->i_lost_pictures;
+
+        _playedAudioBuffers = p_stats->i_played_abuffers;
+        _lostAudioBuffers = p_stats->i_lost_abuffers;
+    }
+    return self;
+}
+
 @end
 
 @implementation VLCTrackMetaData
+
+- (instancetype)initWithTrackStructure:(const struct vlc_player_track *)p_track
+{
+    self = [super init];
+    if (p_track != NULL) {
+        _esID = p_track->es_id;
+        _name = toNSStr(p_track->name);
+        _selected = p_track->selected;
+    }
+    return self;
+}
 
 - (NSString *)description
 {
@@ -1713,14 +1728,14 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
 @implementation VLCProgramMetaData
 
-- (instancetype)initWithProgramStructure:(const struct vlc_player_program *)structure
+- (instancetype)initWithProgramStructure:(const struct vlc_player_program *)p_program
 {
     self = [super init];
-    if (structure != NULL) {
-        _group_id = structure->group_id;
-        _name = toNSStr(structure->name);
-        _selected = structure->selected;
-        _scrambled = structure->scrambled;
+    if (p_program != NULL) {
+        _group_id = p_program->group_id;
+        _name = toNSStr(p_program->name);
+        _selected = p_program->selected;
+        _scrambled = p_program->scrambled;
     }
     return self;
 }

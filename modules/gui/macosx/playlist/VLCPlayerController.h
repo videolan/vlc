@@ -839,37 +839,41 @@ extern NSString *VLCPlayerMuteChanged;
 
 @interface VLCInputStats : NSObject
 
+- (instancetype)initWithStatsStructure:(const struct input_stats_t *)stats;
+
 /* Input */
-@property (readwrite) int64_t inputReadPackets;
-@property (readwrite) int64_t inputReadBytes;
-@property (readwrite) float inputBitrate;
+@property (readonly) int64_t inputReadPackets;
+@property (readonly) int64_t inputReadBytes;
+@property (readonly) float inputBitrate;
 
 /* Demux */
-@property (readwrite) int64_t demuxReadPackets;
-@property (readwrite) int64_t demuxReadBytes;
-@property (readwrite) float demuxBitrate;
-@property (readwrite) int64_t demuxCorrupted;
-@property (readwrite) int64_t demuxDiscontinuity;
+@property (readonly) int64_t demuxReadPackets;
+@property (readonly) int64_t demuxReadBytes;
+@property (readonly) float demuxBitrate;
+@property (readonly) int64_t demuxCorrupted;
+@property (readonly) int64_t demuxDiscontinuity;
 
 /* Decoders */
-@property (readwrite) int64_t decodedAudio;
-@property (readwrite) int64_t decodedVideo;
+@property (readonly) int64_t decodedAudio;
+@property (readonly) int64_t decodedVideo;
 
 /* Vout */
-@property (readwrite) int64_t displayedPictures;
-@property (readwrite) int64_t lostPictures;
+@property (readonly) int64_t displayedPictures;
+@property (readonly) int64_t lostPictures;
 
 /* Aout */
-@property (readwrite) int64_t playedAudioBuffers;
-@property (readwrite) int64_t lostAudioBuffers;
+@property (readonly) int64_t playedAudioBuffers;
+@property (readonly) int64_t lostAudioBuffers;
 
 @end
 
 @interface VLCTrackMetaData : NSObject
 
-@property (readwrite) vlc_es_id_t *esID;
-@property (readwrite, retain) NSString *name;
-@property (readwrite) BOOL selected;
+- (instancetype)initWithTrackStructure:(const struct vlc_player_track *)track;
+
+@property (readonly) vlc_es_id_t *esID;
+@property (readonly) NSString *name;
+@property (readonly) BOOL selected;
 
 @end
 
