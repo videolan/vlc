@@ -44,6 +44,8 @@ NSString *VLCPlayerLengthChanged = @"VLCPlayerLengthChanged";
 NSString *VLCPlayerTitleSelectionChanged = @"VLCPlayerTitleSelectionChanged";
 NSString *VLCPlayerTitleListChanged = @"VLCPlayerTitleListChanged";
 NSString *VLCPlayerChapterSelectionChanged = @"VLCPlayerChapterSelectionChanged";
+NSString *VLCPlayerProgramSelectionChanged = @"VLCPlayerProgramSelectionChanged";
+NSString *VLCPlayerProgramListChanged = @"VLCPlayerProgramListChanged";
 NSString *VLCPlayerABLoopStateChanged = @"VLCPlayerABLoopStateChanged";
 NSString *VLCPlayerTeletextMenuAvailable = @"VLCPlayerTeletextMenuAvailable";
 NSString *VLCPlayerTeletextEnabled = @"VLCPlayerTeletextEnabled";
@@ -107,6 +109,8 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 - (void)inputStatsUpdated:(VLCInputStats *)inputStats;
 - (void)trackSelectionChanged;
 - (void)trackListChanged;
+- (void)programListChanged;
+- (void)programSelectionChanged:(int)selectedID;
 - (void)ABLoopStateChanged:(enum vlc_player_abloop)abLoopState;
 - (void)stopActionChanged:(enum vlc_player_media_stopped_action)stoppedAction;
 - (void)metaDataChangedForInput:(input_item_t *)inputItem;
@@ -376,6 +380,30 @@ static void cb_player_track_selection_changed(vlc_player_t *p_player,
     });
 }
 
+static void cb_player_program_list_changed(vlc_player_t *p_player,
+                                           enum vlc_player_list_action action,
+                                           const struct vlc_player_program *prgm,
+                                           void *p_data)
+{
+    VLC_UNUSED(p_player); VLC_UNUSED(action); VLC_UNUSED(prgm);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController programListChanged];
+    });
+}
+
+static void cb_player_program_selection_changed(vlc_player_t *p_player,
+                                                int unselected_id,
+                                                int selected_id,
+                                                void *p_data)
+{
+    VLC_UNUSED(p_player); VLC_UNUSED(unselected_id);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController programSelectionChanged:selected_id];
+    });
+}
+
 static void cb_player_atobloop_changed(vlc_player_t *p_player,
                                        enum vlc_player_abloop new_state,
                                        vlc_tick_t time, float pos,
@@ -435,8 +463,8 @@ static const struct vlc_player_cbs player_callbacks = {
     cb_player_length_changed,
     cb_player_track_list_changed,
     cb_player_track_selection_changed,
-    NULL, //cb_player_program_list_changed,
-    NULL, //cb_player_program_selection_changed,
+    cb_player_program_list_changed,
+    cb_player_program_selection_changed,
     cb_player_titles_changed,
     cb_player_title_selection_changed,
     cb_player_chapter_selection_changed,
@@ -1408,6 +1436,59 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     return [self tracksForCategory:SPU_ES];
 }
 
+- (void)programListChanged
+{
+    [_defaultNotificationCenter postNotificationName:VLCPlayerProgramListChanged
+                                              object:self];
+}
+
+- (void)programSelectionChanged:(int)selectedID
+{
+    _selectedProgramID = selectedID;
+    [_defaultNotificationCenter postNotificationName:VLCPlayerProgramSelectionChanged
+                                              object:self];
+}
+
+- (void)selectProgram:(VLCProgramMetaData *)program
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_SelectProgram(_p_player, program.group_id);
+    vlc_player_Unlock(_p_player);
+}
+
+- (size_t)numberOfPrograms
+{
+    size_t ret = 0;
+    vlc_player_Lock(_p_player);
+    ret = vlc_player_GetProgramCount(_p_player);
+    vlc_player_Unlock(_p_player);
+    return ret;
+}
+
+- (nullable VLCProgramMetaData *)programAtIndex:(size_t)index
+{
+    VLCProgramMetaData *programMetaData = nil;
+    vlc_player_Lock(_p_player);
+    const struct vlc_player_program *program = vlc_player_GetProgramAt(_p_player, index);
+    if (program != NULL) {
+        programMetaData = [[VLCProgramMetaData alloc] initWithProgramStructure:program];
+    }
+    vlc_player_Unlock(_p_player);
+    return programMetaData;
+}
+
+- (nullable VLCProgramMetaData *)programForID:(int)programID
+{
+    VLCProgramMetaData *programMetaData = nil;
+    vlc_player_Lock(_p_player);
+    const struct vlc_player_program *program = vlc_player_GetProgram(_p_player, programID);
+    if (program != NULL) {
+        programMetaData = [[VLCProgramMetaData alloc] initWithProgramStructure:program];
+    }
+    vlc_player_Unlock(_p_player);
+    return programMetaData;
+}
+
 - (void)ABLoopStateChanged:(enum vlc_player_abloop)abLoopState
 {
     _abLoopState = abLoopState;
@@ -1626,6 +1707,27 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"%@: name: %@", [VLCTrackMetaData className], self.name];
+}
+
+@end
+
+@implementation VLCProgramMetaData
+
+- (instancetype)initWithProgramStructure:(const struct vlc_player_program *)structure
+{
+    self = [super init];
+    if (structure != NULL) {
+        _group_id = structure->group_id;
+        _name = toNSStr(structure->name);
+        _selected = structure->selected;
+        _scrambled = structure->scrambled;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@: name: %@", [VLCProgramMetaData className], self.name];
 }
 
 @end

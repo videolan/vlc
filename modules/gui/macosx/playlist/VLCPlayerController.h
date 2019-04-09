@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCInputStats;
 @class VLCTrackMetaData;
+@class VLCProgramMetaData;
 
 /**
  * Listen to VLCPlayerCurrentMediaItemChanged to notified if the current media item changes for the player
@@ -96,6 +97,18 @@ extern NSString *VLCPlayerTitleListChanged;
  * @note the affected player object will be the object of the notification
  */
 extern NSString *VLCPlayerChapterSelectionChanged;
+
+/**
+ * Listen to VLCPlayerProgramSelectionChanged to be notified if the selected program of the current media changes
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerProgramSelectionChanged;
+
+/**
+ * Listen to VLCPlayerProgramListChanged to be notified if the list of available programs of the current media changes
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerProgramListChanged;
 
 /**
  * Listen to VLCPlayerABLoopStateChanged to be notified if the A→B loop state changes
@@ -530,6 +543,35 @@ extern NSString *VLCPlayerMuteChanged;
 - (nullable const struct vlc_player_chapter *)chapterAtIndexForCurrentTitle:(size_t)index;
 
 /**
+ * returns the selected program ID, typically in the range 0 to 32,000
+ * @warning the counter does not necessarily start at 0 nor are programs numbered consecutively
+ * @note listen to VLCPlayerProgramSelectionChanged to be notified about changes to this property
+ */
+@property (readonly) int selectedProgramID;
+
+/**
+ * select the program defined by the provided VLCProgramMetaData instance
+ * @note listen to VLCPlayerProgramSelectionChanged to be notified once the change takes effect
+ */
+- (void)selectProgram:(VLCProgramMetaData *)program;
+
+/**
+ * returns the number of programs available for the current media
+ * @note listen to VLCPlayerProgramListChanged to be notified about changes to this property
+ */
+@property (readonly) size_t numberOfPrograms;
+
+/**
+ * returns an instance of VLCProgramMetaData with details about the program at the specified index
+ */
+- (nullable VLCProgramMetaData *)programAtIndex:(size_t)index;
+
+/**
+ * returns an instance of VLCProgramMetaData with details about the program with the specified ID
+ */
+- (nullable VLCProgramMetaData *)programForID:(int)programID;
+
+/**
  * exposes whether a teletext menu is available or not
  * @note listen to VLCPlayerTeletextMenuAvailable to be notified about changes to this property
  */
@@ -828,6 +870,17 @@ extern NSString *VLCPlayerMuteChanged;
 @property (readwrite) vlc_es_id_t *esID;
 @property (readwrite, retain) NSString *name;
 @property (readwrite) BOOL selected;
+
+@end
+
+@interface VLCProgramMetaData : NSObject
+
+- (instancetype)initWithProgramStructure:(const struct vlc_player_program *)structure;
+
+@property (readonly) int group_id;
+@property (readonly) NSString *name;
+@property (readonly) BOOL selected;
+@property (readonly) BOOL scrambled;
 
 @end
 
