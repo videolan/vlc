@@ -550,11 +550,14 @@ void ModuleConfigControl::finish( )
             const module_config_t *p_cfg = p_config + i;
             if( p_cfg->i_type == CONFIG_SUBCATEGORY &&
                 p_cfg->value.i == p_item->min.i )
+            {
                 combo->addItem( qfut( module_GetLongName( p_parser )),
                                 QVariant( module_get_object( p_parser ) ) );
-            if( p_item->value.psz && !strcmp( p_item->value.psz,
-                                              module_get_object( p_parser ) ) )
-                combo->setCurrentIndex( combo->count() - 1 );
+                if( p_item->value.psz && !strcmp( p_item->value.psz,
+                                                  module_get_object( p_parser ) ) )
+                    combo->setCurrentIndex( combo->count() - 1 );
+                break;
+            }
         }
         module_config_free (p_config);
     }
