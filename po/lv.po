@@ -8,7 +8,7 @@
 # Arnis Lupiks, 2014
 # Baiba Bērziņa <baibabeerzinnaa@gmail.com>, 2015
 # Dāvis Mosāns, 2014
-# Ingmārs Dīriņš <melhiors14@gmail.com>, 2016-2018
+# Ingmārs Dīriņš <melhiors14@gmail.com>, 2016-2019
 # Jānis-Marks Gailis <jeanmarc.gailis@gmail.com>, 2013-2014
 # Kristaps Ancāns <kristaps.ancans@gmail.com>, 2013
 # Ojārs Spriņķis <ojars.sprinkis@inbox.lv>, 2014
@@ -18,8 +18,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-12-20 08:34+0100\n"
-"Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2018\n"
+"PO-Revision-Date: 2019-04-09 15:59+0200\n"
+"Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2019\n"
 "Language-Team: Latvian (https://www.transifex.com/yaron/teams/16553/lv/)\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
@@ -314,7 +314,7 @@ msgstr ""
 "saliktu kopā visas elementārās straumes (video, audio, ...). Šis iestatījums "
 "atļauj jums vienmēr piespiest specifisku multipleksoru. Jums, iespējams, "
 "nevajadzētu to darīt.\n"
-"Jūs varat arī iestatīt noklusētos parametrus katram multipleksoram."
+"Jūs varat arī iestatīt noklusējuma parametrus katram multipleksoram."
 
 #: include/vlc_config_cat.h:147
 msgid "Access output"
@@ -330,7 +330,7 @@ msgstr ""
 "Piekļuves izvades moduļi kontrolē veidus, kādos multipleksētās straumes tiek "
 "nosūtītas. Šis iestatījums atļauj jums vienmēr piespiest specifisku "
 "piekļuves izvades metodi. Jums, iespējams, nevajadzētu to darīt.\n"
-"Jūs varat arī iestatīt noklusētos parametrus katrai piekļuves izvadei."
+"Jūs varat arī iestatīt noklusējuma parametrus katrai piekļuves izvadei."
 
 #: include/vlc_config_cat.h:154
 msgid "Packetizers"
@@ -346,7 +346,7 @@ msgstr ""
 "Paketizētāji tiek lietoti, lai \"priekšapstrādātu\" elementāras straumes "
 "pirms multipleksēšanas. Šis iestatījums atļauj jums vienmēr piespiest "
 "paketizētāju. Jums, iespējams, nevajadzētu to darīt.\n"
-"Jūs varat arī iestatīt noklusētos parametrus katram paketizētājam."
+"Jūs varat arī iestatīt noklusējuma parametrus katram paketizētājam."
 
 #: include/vlc_config_cat.h:162
 msgid "Sout stream"
@@ -360,7 +360,7 @@ msgid ""
 msgstr ""
 "Sout straumju moduļi atļauj būvēt sout apstrādes ķēdi. Lūdzu, atsaucieties "
 "uz straumēšanas pamācību, lai iegūtu vairāk informācijas. Jūs šeit varat "
-"konfigurēt noklusētās opcijas katram sout straumju modulim."
+"konfigurēt noklusējuma opcijas katram sout straumju modulim."
 
 #: include/vlc_config_cat.h:168
 msgid "VOD"
@@ -848,11 +848,11 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr "(noklusētais ieslēgts)"
+msgstr "(noklusējuma ieslēgts)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr "(noklusētais izslēgts)"
+msgstr "(noklusējuma izslēgts)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -1500,7 +1500,7 @@ msgid ""
 "Running vlc with the default interface. Use 'cvlc' to use vlc without "
 "interface."
 msgstr ""
-"Palaiž VLC ar noklusēto saskarni. Lietojiet 'cvlc', lai lietotu VLC bez "
+"Palaiž VLC ar noklusējuma saskarni. Lietojiet 'cvlc', lai lietotu VLC bez "
 "saskarnes."
 
 #. xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
@@ -1548,7 +1548,7 @@ msgid ""
 "This is the main interface used by VLC. The default behavior is to "
 "automatically select the best module available."
 msgstr ""
-"Šī ir galvenā VLC lietotā saskarne. Noklusētā izturēšanās ir automātiski "
+"Šī ir galvenā VLC lietotā saskarne. Noklusējuma izturēšanās ir automātiski "
 "atlasīt labāko pieejamo moduli."
 
 #: src/libvlc-module.c:74 modules/control/ntservice.c:60
@@ -1563,9 +1563,9 @@ msgid ""
 "\", \"gestures\" ...)"
 msgstr ""
 "Jūs varat atlasīt \"papildu saskarnes\" priekš VLC. Tās tiks palaistas fonā "
-"papildus noklusētajai saskarnei. Lietojiet kolu atdalītu sarakstu ar "
-"saskarņu moduļiem. (parastās vērtības ir \"rc\" (tālvadība), \"http\", "
-"\"gestures\" ...)"
+"papildus noklusējuma saskarnei. Lietojiet kolu atdalītu sarakstu ar saskarņu "
+"moduļiem. (parastās vērtības ir \"rc\" (tālvadība), \"http\", \"gestures"
+"\" ...)"
 
 #: src/libvlc-module.c:83
 msgid "You can select control interfaces for VLC."
@@ -1585,7 +1585,7 @@ msgstr ""
 
 #: src/libvlc-module.c:90
 msgid "Default stream"
-msgstr "Noklusētā straume"
+msgstr "Noklusējuma straume"
 
 #: src/libvlc-module.c:92
 msgid "This stream will always be opened at VLC startup."
@@ -1649,8 +1649,8 @@ msgid ""
 "This is the audio output method used by VLC. The default behavior is to "
 "automatically select the best method available."
 msgstr ""
-"Šī ir VLC lietotā audio izvades metode. Noklusētā izturēšanās ir automātiski "
-"atlasīt labāko pieejamo metodi."
+"Šī ir VLC lietotā audio izvades metode. Noklusējuma izturēšanās ir "
+"automātiski atlasīt labāko pieejamo metodi."
 
 #: src/libvlc-module.c:129
 msgid "Media role"
@@ -1846,7 +1846,7 @@ msgid ""
 "This allows you to change the default target level (89 dB) for stream with "
 "replay gain information"
 msgstr ""
-"Šis atļauj jums mainīt noklusēto mērķa līmeni (89 dB) straumei ar skaļuma "
+"Šis atļauj jums mainīt noklusējuma mērķa līmeni (89 dB) straumei ar skaļuma "
 "izlīdzināšanas informāciju"
 
 #: src/libvlc-module.c:221
@@ -1917,8 +1917,8 @@ msgid ""
 "This is the the video output method used by VLC. The default behavior is to "
 "automatically select the best method available."
 msgstr ""
-"Šī ir VLC lietotā video izvades metode. Noklusētā izturēšanās ir automātiski "
-"atlasīt labāko pieejamo metodi."
+"Šī ir VLC lietotā video izvades metode. Noklusējuma izturēšanās ir "
+"automātiski atlasīt labāko pieejamo metodi."
 
 #: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:353
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:314
