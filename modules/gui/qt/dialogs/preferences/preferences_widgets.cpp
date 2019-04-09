@@ -693,15 +693,6 @@ void ModuleListConfigControl::finish( bool bycat )
         }
     }
     module_list_free( p_list );
-
-    if( p_item->psz_longtext )
-    {
-        QString tipText = qtr(p_item->psz_longtext);
-
-        text->setToolTip( formatTooltip(tipText) );
-        assert( groupBox );
-        groupBox->setToolTip( formatTooltip(tipText) );
-   }
 }
 
 QString ModuleListConfigControl::getValue() const
