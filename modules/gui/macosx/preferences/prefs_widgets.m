@@ -1255,8 +1255,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
                     break;
                 }
             }
-            module_config_free(p_config);
         }
+        module_config_free(p_config);
     }
     module_list_free(p_list);
 
