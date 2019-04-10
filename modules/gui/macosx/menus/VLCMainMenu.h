@@ -211,8 +211,6 @@
 
 - (void)releaseRepresentedObjects:(NSMenu *)the_menu;
 
-- (void)setupMenus;
-- (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)setRateControlsEnabled:(BOOL)b_enabled;
 - (void)updateSidebarMenuItem:(BOOL)show;
 

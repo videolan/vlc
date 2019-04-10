@@ -118,16 +118,16 @@
     [self initStrings];
     [self setupKeyboardShortcuts];
 
-    [self setSubmenusEnabled: YES];
-
     /* configure playback / controls menu */
     self.controlsMenu.delegate = self;
     [_rendererNoneItem setState:NSOnState];
     _rendererMenuController = [[VLCRendererMenuController alloc] init];
     _rendererMenuController.rendererNoneItem = _rendererNoneItem;
     _rendererMenuController.rendererMenu = _rendererMenu;
-    [self updateTrackHandlingMenus:nil];
+
+    [self mediaItemChanged:nil];
     [self updateTitleAndChapterMenus:nil];
+    [self updateProgramMenu:nil];
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
@@ -159,10 +159,6 @@
                                name:VLCPlayerTrackListChanged
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(updateTrackHandlingMenus:)
-                               name:VLCPlayerCurrentMediaItemChanged
-                             object:nil];
-    [notificationCenter addObserver:self
                            selector:@selector(updateTitleAndChapterMenus:)
                                name:VLCPlayerTitleListChanged
                              object:nil];
@@ -181,6 +177,10 @@
     [notificationCenter addObserver:self
                            selector:@selector(updateProgramMenu:)
                                name:VLCPlayerProgramSelectionChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(mediaItemChanged:)
+                               name:VLCPlaylistCurrentItemChanged
                              object:nil];
 
     [self setupVarMenuItem:_add_intf
@@ -578,8 +578,10 @@
 
 #pragma mark - Interface update
 
-- (void)setupMenus
+- (void)mediaItemChanged:(NSNotification *)aNotification
 {
+    [self updateTrackHandlingMenus:aNotification];
+
     input_item_t *p_mediaItem = _playerController.currentMedia;
 
     if (p_mediaItem != NULL) {
@@ -612,9 +614,11 @@
             [self refreshVoutDeviceMenu:nil];
         }
         [_postprocessing setEnabled:YES];
+        [self setSubmenusEnabled:YES];
         input_item_Release(p_mediaItem);
     } else {
         [_postprocessing setEnabled:NO];
+        [self setSubmenusEnabled:NO];
     }
 }
 
@@ -1725,7 +1729,6 @@
     if (mi == _stop || mi == _voutMenustop || mi == _dockMenustop) {
         if (!inputItem)
             enabled = NO;
-        [self setupMenus]; /* Make sure input menu is up to date */
     } else if (mi == _previous          ||
                mi == _voutMenuprev      ||
                mi == _dockMenuprevious) {
@@ -1753,7 +1756,6 @@
         enabled = _playerController.seekable;
     } else if (mi == _mute || mi == _dockMenumute || mi == _voutMenumute) {
         [mi setState: _playerController.mute ? NSOnState : NSOffState];
-        [self setupMenus]; /* Make sure audio menu is up to date */
         [self refreshAudioDeviceList];
     } else if (mi == _half_window           ||
                mi == _normal_window         ||
@@ -1779,11 +1781,8 @@
             vout_Release(p_vout);
         }
 
-        [self setupMenus]; /* Make sure video menu is up to date */
-
     } else if (mi == _openSubtitleFile) {
         enabled = YES;
-        [self setupMenus]; /* Make sure subtitles menu is up to date */
     } else {
         NSMenuItem *_parent = [mi parentItem];
         if (_parent == _subtitle_size || mi == _subtitle_size           ||

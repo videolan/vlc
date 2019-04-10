@@ -242,8 +242,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     }
 
     if (state != PLAYING_S) {
-        [[o_main mainMenu] setSubmenusEnabled: FALSE];
-
         if (state == END_S || state == -1) {
             /* continue playback where you left off */
             if (p_current_input)
@@ -266,7 +264,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)updateMainMenu
 {
-    [[o_main mainMenu] setupMenus];
 }
 
 - (BOOL)hasInput
