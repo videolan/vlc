@@ -92,7 +92,6 @@ static void exchange(char **argv, vlc_getopt_t *restrict state)
     state->last_nonopt = state->ind;
 }
 
-
 /* Scan elements of ARGV (whose length is ARGC) for option characters
    given in OPTSTRING.
 
