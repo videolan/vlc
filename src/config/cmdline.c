@@ -63,7 +63,8 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
 #define b_ignore_errors (pindex == NULL)
 
     /* Short options */
-    const module_config_t *pp_shortopts[256];
+    i_shortopts = 0;
+    const module_config_t *pp_shortopts[256] = { NULL };
     char *psz_shortopts;
 
     /*
@@ -102,12 +103,6 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         }
         memcpy( argv_copy, ppsz_argv, i_argc * sizeof(char *) );
         ppsz_argv = argv_copy;
-    }
-
-    i_shortopts = 0;
-    for( i_index = 0; i_index < 256; i_index++ )
-    {
-        pp_shortopts[i_index] = NULL;
     }
 
     /* Fill the p_longopts and psz_shortopts structures */
