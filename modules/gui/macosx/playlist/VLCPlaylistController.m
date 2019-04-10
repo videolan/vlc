@@ -40,6 +40,8 @@ NSString *VLCPlaylistCurrentItemChanged = @"VLCPlaylistCurrentItemChanged";
 
 @interface VLCPlaylistController ()
 {
+    NSNotificationCenter *_defaultNotificationCenter;
+
     vlc_playlist_t *_p_playlist;
     vlc_playlist_listener_id *_playlistListenerID;
 }
@@ -196,6 +198,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 {
     self = [super init];
     if (self) {
+        _defaultNotificationCenter = [NSNotificationCenter defaultCenter];
         _p_playlist = playlist;
 
         /* set initial values, further updates through callbacks */
@@ -265,32 +268,32 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 - (void)playlistPlaybackRepeatUpdated:(enum vlc_playlist_playback_repeat)currentRepeatMode
 {
     _playbackRepeat = currentRepeatMode;
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCPlaybackRepeatChanged object:nil];
+    [_defaultNotificationCenter postNotificationName:VLCPlaybackRepeatChanged object:self];
 }
 
 - (void)playlistPlaybackOrderUpdated:(enum vlc_playlist_playback_order)currentOrder
 {
     _playbackOrder = currentOrder;
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCPlaybackOrderChanged object:nil];
+    [_defaultNotificationCenter postNotificationName:VLCPlaybackOrderChanged object:self];
 }
 
 - (void)currentPlaylistItemChanged:(size_t)index
 {
     _currentPlaylistIndex = index;
     [_playlistDataSource playlistUpdated];
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCPlaylistCurrentItemChanged object:nil];
+    [_defaultNotificationCenter postNotificationName:VLCPlaylistCurrentItemChanged object:self];
 }
 
 - (void)playlistHasPreviousItem:(BOOL)hasPrevious
 {
     _hasPreviousPlaylistItem = hasPrevious;
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCPlaybackHasPreviousChanged object:nil];
+    [_defaultNotificationCenter postNotificationName:VLCPlaybackHasPreviousChanged object:self];
 }
 
 - (void)playlistHasNextItem:(BOOL)hasNext
 {
     _hasNextPlaylistItem = hasNext;
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCPlaybackHasNextChanged object:nil];
+    [_defaultNotificationCenter postNotificationName:VLCPlaybackHasNextChanged object:self];
 }
 
 #pragma mark - controller functions for use within the UI
