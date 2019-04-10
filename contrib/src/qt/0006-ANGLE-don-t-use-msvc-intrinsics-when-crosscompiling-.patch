@@ -1,0 +1,35 @@
+From 209447aba5fa2e6f0b60ce9baa11a2fd23b5ee8f Mon Sep 17 00:00:00 2001
+From: Pierre Lamot <pierre@videolabs.io>
+Date: Thu, 21 Mar 2019 15:46:27 +0100
+Subject: [PATCH 1/2] ANGLE: don't use msvc intrinsics when crosscompiling with
+ GCC
+
+---
+ src/3rdparty/angle/src/common/mathutil.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/3rdparty/angle/src/common/mathutil.h b/src/3rdparty/angle/src/common/mathutil.h
+index 372e432..7e8cdfe 100644
+--- a/src/3rdparty/angle/src/common/mathutil.h
++++ b/src/3rdparty/angle/src/common/mathutil.h
+@@ -883,7 +883,7 @@
+ }
+ 
+ // Count the 1 bits.
+-#if defined(ANGLE_PLATFORM_WINDOWS)
++#if defined(_MSC_VER)
+ #if defined(_M_ARM) || defined(_M_ARM64)
+ inline int BitCount(uint32_t bits)
+ {
+@@ -905,7 +905,7 @@
+ #endif  // defined(ANGLE_IS_64_BIT_CPU)
+ #endif  // defined(ANGLE_PLATFORM_WINDOWS)
+ 
+-#if defined(ANGLE_PLATFORM_POSIX)
++#if defined(__GNUC__) || defined(__clang__)
+ inline int BitCount(uint32_t bits)
+ {
+     return __builtin_popcount(bits);
+-- 
+2.19.1
+
