@@ -42,7 +42,7 @@ typedef struct vlc_plugin_t
         module_config_t *items; /**< Table of configuration parameters */
         size_t size; /**< Size of items table */
         size_t count; /**< Number of configuration items */
-        size_t booleans; /**< Number of booleal config items */
+        size_t booleans; /**< Number of boolean config items */
     } conf;
 
 #ifdef HAVE_DYNAMIC_PLUGINS
