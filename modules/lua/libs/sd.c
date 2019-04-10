@@ -36,7 +36,6 @@
 #include <math.h>
 #include <vlc_common.h>
 #include <vlc_services_discovery.h>
-#include <vlc_playlist_legacy.h>
 #include <vlc_charset.h>
 #include <vlc_md5.h>
 
