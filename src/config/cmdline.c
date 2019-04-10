@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 
 #include "vlc_getopt.h"
+#include "vlc_jaro_winkler.h"
 
 #include "ansi_term.h"
 #include "configuration.h"
@@ -302,7 +303,27 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                 if( state.opt )
                     fprintf( stderr, _( "Unknown option `-%c'\n" ), state.opt );
                 else
+                {
                     fprintf( stderr, _( "Unknown option `%s'\n" ), ppsz_argv[state.ind-1] );
+
+                    /* suggestion matching */
+                    float jw_filter = 0.8, best_metric = jw_filter, metric;
+                    const char *best = NULL;
+                    const char *jw_a = ppsz_argv[state.ind-1] + 2;
+                    for (size_t i = 0; i < (size_t)i_opts; i++) {
+                        if (p_longopts[i].is_obsolete)
+                            continue;
+                        const char *jw_b = p_longopts[i].name;
+                        if (vlc_jaro_winkler(jw_a, jw_b, &metric) == 0) { //ignore failed malloc calls
+                            if (metric > best_metric || (!best && metric >= jw_filter)) {
+                                best = jw_b;
+                                best_metric = metric;
+                            }
+                        }
+                    }
+                    if (best)
+                        fprintf( stderr, _( "       Did you mean `--%s'?\n" ), best );
+                }
             }
             fputs( _( "Try `vlc --help' for more information.\n" ), stderr );
             goto out;
