@@ -409,7 +409,9 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
         {
             struct vlc_param *param = tgt;
 
-            param->shortname = va_arg(ap, int);
+            char c = va_arg(ap, int);
+            assert(c != '\0' && c != '?' && c != ':');
+            param->shortname = c;
             break;
         }
 
