@@ -47,24 +47,27 @@ typedef struct
 
 /* Build an SMB URI
  * smb://[[[domain;]user[:password@]]server[/share[/path[/file]]]] */
-static int smb_get_uri(char **ppsz_uri,
+static char *smb_get_uri(
                        const char *psz_domain,
                        const char *psz_user, const char *psz_pwd,
                        const char *psz_server, const char *psz_share_path,
                        const char *psz_name)
 {
+    char *uri;
+
     assert(psz_server);
 #define PSZ_SHARE_PATH_OR_NULL psz_share_path ? psz_share_path : ""
 #define PSZ_NAME_OR_NULL psz_name ? "/" : "", psz_name ? psz_name : ""
-    if( psz_user )
-        return asprintf( ppsz_uri, "smb://%s%s%s%s%s@%s%s%s%s",
+    if( (psz_user
+        ? asprintf( &uri, "smb://%s%s%s%s%s@%s%s%s%s",
                          psz_domain ? psz_domain : "", psz_domain ? ";" : "",
                          psz_user, psz_pwd ? ":" : "",
                          psz_pwd ? psz_pwd : "", psz_server,
-                         PSZ_SHARE_PATH_OR_NULL, PSZ_NAME_OR_NULL );
-    else
-        return asprintf( ppsz_uri, "smb://%s%s%s%s", psz_server,
-                         PSZ_SHARE_PATH_OR_NULL, PSZ_NAME_OR_NULL );
+                         PSZ_SHARE_PATH_OR_NULL, PSZ_NAME_OR_NULL )
+        : asprintf( &uri, "smb://%s%s%s%s", psz_server,
+                         PSZ_SHARE_PATH_OR_NULL, PSZ_NAME_OR_NULL )) == -1 )
+        uri = NULL;
+    return uri;
 }
 
 /*****************************************************************************
@@ -123,7 +126,6 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
 
     while( i_ret == VLC_SUCCESS && ( p_entry = smbc_readdir( p_sys->i_smb ) ) )
     {
-        char *psz_uri;
         const char *psz_server = p_sys->url.psz_host;
         const char *psz_path = p_sys->url.psz_path;
         const char *psz_name = p_entry->name;
@@ -159,17 +161,18 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
             i_ret = VLC_ENOMEM;
             break;
         }
-        if( smb_get_uri(&psz_uri, NULL, NULL, NULL,
-                        psz_server, psz_path, psz_encoded_name) < 0 )
-        {
+
+        char *uri = smb_get_uri(NULL, NULL, NULL,
+                                psz_server, psz_path, psz_encoded_name);
+        if (uri == NULL) {
             free(psz_encoded_name);
             i_ret = VLC_ENOMEM;
             break;
         }
         free(psz_encoded_name);
-        i_ret = vlc_readdir_helper_additem( &rdh, psz_uri, NULL, p_entry->name,
-                                            i_type, ITEM_NET );
-        free( psz_uri );
+        i_ret = vlc_readdir_helper_additem(&rdh, uri, NULL, p_entry->name,
+                                           i_type, ITEM_NET);
+        free(uri);
     }
 
     vlc_readdir_helper_finish( &rdh, i_ret == VLC_SUCCESS );
@@ -237,7 +240,7 @@ static int Open(vlc_object_t *obj)
     stream_t *access = (stream_t *)obj;
     vlc_url_t url;
     vlc_credential credential;
-    char *psz_decoded_path = NULL, *psz_uri = NULL, *psz_var_domain = NULL;
+    char *psz_decoded_path = NULL, *uri, *psz_var_domain = NULL;
     int fd;
     uint64_t size;
     bool is_dir;
@@ -270,9 +273,10 @@ static int Open(vlc_object_t *obj)
     {
         struct stat st;
 
-        if (smb_get_uri(&psz_uri, credential.psz_realm,
-                        credential.psz_username, credential.psz_password,
-                        url.psz_host, psz_decoded_path, NULL) == -1 )
+        uri = smb_get_uri(credential.psz_realm, credential.psz_username,
+                          credential.psz_password, url.psz_host,
+                          psz_decoded_path, NULL);
+        if (uri == NULL)
         {
             vlc_credential_clean(&credential);
             free(psz_var_domain);
@@ -281,7 +285,7 @@ static int Open(vlc_object_t *obj)
             return VLC_ENOMEM;
         }
 
-        if (smbc_stat(psz_uri, &st) == 0)
+        if (smbc_stat(uri, &st) == 0)
         {
             is_dir = S_ISDIR(st.st_mode) != 0;
             size = st.st_size;
@@ -311,7 +315,7 @@ static int Open(vlc_object_t *obj)
     access_sys_t *sys = vlc_obj_calloc(obj, 1, sizeof (*sys));
     if (unlikely(sys == NULL))
     {
-        free(psz_uri);
+        free(uri);
         vlc_UrlClean(&url);
         return VLC_ENOMEM;
     }
@@ -323,7 +327,7 @@ static int Open(vlc_object_t *obj)
         sys->url = url;
         access->pf_readdir = DirRead;
         access->pf_control = access_vaDirectoryControlHelper;
-        fd = smbc_opendir(psz_uri);
+        fd = smbc_opendir(uri);
         if (fd < 0)
             vlc_UrlClean(&sys->url);
     }
@@ -332,10 +336,10 @@ static int Open(vlc_object_t *obj)
         access->pf_read = Read;
         access->pf_control = Control;
         access->pf_seek = Seek;
-        fd = smbc_open(psz_uri, O_RDONLY, 0);
+        fd = smbc_open(uri, O_RDONLY, 0);
         vlc_UrlClean(&url);
     }
-    free(psz_uri);
+    free(uri);
 
     if (fd < 0)
     {
