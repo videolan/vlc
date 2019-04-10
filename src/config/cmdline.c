@@ -238,7 +238,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         }
 
         /* A short option has been recognized */
-        if( pp_shortopts[i_cmd] != NULL )
+        if( i_cmd != '?' && i_cmd != ':' && pp_shortopts[i_cmd] != NULL )
         {
             const char *name = pp_shortopts[i_cmd]->psz_name;
             switch( CONFIG_CLASS(pp_shortopts[i_cmd]->i_type) )
