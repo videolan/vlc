@@ -47,16 +47,15 @@ typedef struct
 
 /* Build an SMB URI
  * smb://[[[domain;]user[:password@]]server[/share[/path[/file]]]] */
-static int smb_get_uri( stream_t *p_access, char **ppsz_uri,
-                        const char *psz_domain,
-                        const char *psz_user, const char *psz_pwd,
-                        const char *psz_server, const char *psz_share_path,
-                        const char *psz_name )
+static int smb_get_uri(char **ppsz_uri,
+                       const char *psz_domain,
+                       const char *psz_user, const char *psz_pwd,
+                       const char *psz_server, const char *psz_share_path,
+                       const char *psz_name)
 {
     assert(psz_server);
 #define PSZ_SHARE_PATH_OR_NULL psz_share_path ? psz_share_path : ""
 #define PSZ_NAME_OR_NULL psz_name ? "/" : "", psz_name ? psz_name : ""
-    (void) p_access;
     if( psz_user )
         return asprintf( ppsz_uri, "smb://%s%s%s%s%s@%s%s%s%s",
                          psz_domain ? psz_domain : "", psz_domain ? ";" : "",
@@ -160,8 +159,8 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
             i_ret = VLC_ENOMEM;
             break;
         }
-        if( smb_get_uri( p_access, &psz_uri, NULL, NULL, NULL,
-                         psz_server, psz_path, psz_encoded_name ) < 0 )
+        if( smb_get_uri(&psz_uri, NULL, NULL, NULL,
+                        psz_server, psz_path, psz_encoded_name) < 0 )
         {
             free(psz_encoded_name);
             i_ret = VLC_ENOMEM;
@@ -271,9 +270,9 @@ static int Open(vlc_object_t *obj)
     {
         struct stat st;
 
-        if (smb_get_uri(access, &psz_uri, credential.psz_realm,
+        if (smb_get_uri(&psz_uri, credential.psz_realm,
                         credential.psz_username, credential.psz_password,
-                        url.psz_host, psz_decoded_path, NULL ) == -1 )
+                        url.psz_host, psz_decoded_path, NULL) == -1 )
         {
             vlc_credential_clean(&credential);
             free(psz_var_domain);
