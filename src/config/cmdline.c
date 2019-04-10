@@ -105,6 +105,11 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         ppsz_argv = argv_copy;
     }
 
+    /* Indicate that we want to know the difference between unknown option and
+       missing option value issues */
+    psz_shortopts[0] = ':';
+    i_shortopts = 1;
+
     /* Fill the p_longopts and psz_shortopts structures */
     i_index = 0;
     for (const vlc_plugin_t *p = vlc_plugins; p != NULL; p = p->next)
@@ -269,11 +274,13 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
             continue;
         }
 
-        /* Internal error: unknown option */
+        /* Internal error: unknown option or missing option value */
         if( !b_ignore_errors )
         {
-            fputs( "Error: Unknown option"
-                     " or missing mandatory value for option ", stderr );
+            if (i_cmd == ':')
+                fputs( "Error: Missing mandatory value for option ", stderr );
+            else
+                fputs( "Error: Unknown option ", stderr );
             if( state.opt )
             {
                 fprintf( stderr, "`-%c'\n", state.opt );
