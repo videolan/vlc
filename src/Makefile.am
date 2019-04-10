@@ -213,6 +213,8 @@ libvlccore_la_SOURCES = \
 	config/cmdline.c \
 	config/getopt.c \
 	config/vlc_getopt.h \
+	config/jaro_winkler.c \
+	config/vlc_jaro_winkler.h \
 	extras/libc.c \
 	media_source/media_source.c \
 	media_source/media_source.h \
@@ -596,6 +598,7 @@ check_PROGRAMS = \
 	test_executor \
 	test_i18n_atof \
 	test_interrupt \
+	test_jaro_winkler \
 	test_list \
 	test_md5 \
 	test_picture_pool \
@@ -626,6 +629,7 @@ test_executor_SOURCES = test/executor.c
 test_i18n_atof_SOURCES = test/i18n_atof.c
 test_interrupt_SOURCES = test/interrupt.c
 test_interrupt_LDADD = $(LDADD) $(LIBS_libvlccore)
+test_jaro_winkler_SOURCES = test/jaro_winkler.c config/jaro_winkler.c
 test_list_SOURCES = test/list.c
 test_md5_SOURCES = test/md5.c
 test_picture_pool_SOURCES = test/picture_pool.c
