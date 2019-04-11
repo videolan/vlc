@@ -1082,6 +1082,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 pkt.size = p_block->i_buffer;
                 pkt.pts = p_block->i_pts != VLC_TICK_INVALID ? TO_AV_TS(p_block->i_pts) : AV_NOPTS_VALUE;
                 pkt.dts = p_block->i_dts != VLC_TICK_INVALID ? TO_AV_TS(p_block->i_dts) : AV_NOPTS_VALUE;
+                if (p_block->i_flags & BLOCK_FLAG_TYPE_I)
+                    pkt.flags |= AV_PKT_FLAG_KEY;
             }
             else
             {
