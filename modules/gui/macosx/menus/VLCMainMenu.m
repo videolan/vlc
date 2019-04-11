@@ -23,10 +23,6 @@
 #import "VLCMainMenu.h"
 #import "main/VLCMain.h"
 
-#import <vlc_common.h>
-#import <vlc_input.h>
-#import <vlc_playlist_legacy.h>
-
 #import "coreinteraction/VLCCoreInteraction.h"
 #import "coreinteraction/VLCVideoFilterHelper.h"
 
@@ -1184,7 +1180,7 @@
     NSInteger intValue = [sender tag];
     NSString *representedObject = [sender representedObject];
 
-    var_SetInteger(pl_Get(getIntf()), [representedObject UTF8String], intValue);
+    var_SetInteger(VLC_OBJECT(getIntf()), [representedObject UTF8String], intValue);
 
     NSMenu *menu = [sender menu];
     NSUInteger count = (NSUInteger) [menu numberOfItems];
@@ -1195,7 +1191,7 @@
 
 - (IBAction)switchSubtitleBackgroundOpacity:(id)sender
 {
-    var_SetInteger(pl_Get(getIntf()), "freetype-background-opacity", [sender intValue]);
+    var_SetInteger(VLC_OBJECT(getIntf()), "freetype-background-opacity", [sender intValue]);
 }
 
 - (IBAction)telxTransparent:(id)sender
@@ -1252,54 +1248,40 @@
 
 - (IBAction)savePlaylist:(id)sender
 {
-    playlist_t *p_playlist = pl_Get(getIntf());
-
-    NSSavePanel *savePanel = [NSSavePanel savePanel];
-    NSString * name = [NSString stringWithFormat: @"%@", _NS("Untitled")];
-
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         [[NSBundle mainBundle] loadNibNamed:@"PlaylistAccessoryView" owner:self topLevelObjects:nil];
     });
 
     [_playlistSaveAccessoryText setStringValue: _NS("File Format:")];
-    [[_playlistSaveAccessoryPopup itemAtIndex:0] setTitle: _NS("Extended M3U")];
-    [[_playlistSaveAccessoryPopup itemAtIndex:1] setTitle: _NS("XML Shareable Playlist Format (XSPF)")];
-    [[_playlistSaveAccessoryPopup itemAtIndex:2] setTitle: _NS("HTML playlist")];
+    [_playlistSaveAccessoryPopup removeAllItems];
 
+    NSArray *availableExportModules = _playlistController.availablePlaylistExportModules;
+    NSUInteger count = availableExportModules.count;
+    NSMutableArray *allowedFileTypes = [NSMutableArray arrayWithCapacity:count];
+    for (NSUInteger x = 0; x < count; x++) {
+        VLCPlaylistExportModuleDescription *exportModule = availableExportModules[x];
+        [_playlistSaveAccessoryPopup addItemWithTitle:exportModule.humanReadableName];
+        [allowedFileTypes addObject:exportModule.fileExtension];
+    }
+
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
     [savePanel setTitle: _NS("Save Playlist")];
     [savePanel setPrompt: _NS("Save")];
     [savePanel setAccessoryView: _playlistSaveAccessoryView];
-    [savePanel setNameFieldStringValue: name];
+    [savePanel setNameFieldStringValue: _NS("Untitled")];
+    [savePanel setAllowedFileTypes:allowedFileTypes];
+    [savePanel setCanSelectHiddenExtension:YES];
 
     if ([savePanel runModal] == NSFileHandlingPanelOKButton) {
         NSString *filename = [[savePanel URL] path];
-        NSString *ext;
-        char const* psz_module;
+        VLCPlaylistExportModuleDescription *exportModule = availableExportModules[[_playlistSaveAccessoryPopup indexOfSelectedItem]];
 
-        switch ([_playlistSaveAccessoryPopup indexOfSelectedItem]) {
-            case 0: psz_module = "export-m3u";
-                    ext = @"m3u";
-                    break;
-            case 1: psz_module = "export-xspf";
-                    ext = @"xspf";
-                    break;
-            case 2: psz_module = "export-html";
-                    ext = @"html";
-                    break;
-            default:
-                    return;
+        if ([[filename pathExtension] caseInsensitiveCompare:exportModule.fileExtension] != NSOrderedSame) {
+            filename = [filename stringByAppendingPathExtension:exportModule.fileExtension];
         }
 
-        NSString *actualFilename = filename;
-
-        if ([[filename pathExtension] caseInsensitiveCompare:ext] != NSOrderedSame)
-            actualFilename = [NSString stringWithFormat: @"%@.%@", filename, ext];
-
-        // FIXME: This will always export an empty playlist unless we do something about it
-        playlist_Export(p_playlist,
-                        [actualFilename fileSystemRepresentation],
-                        psz_module);
+        [_playlistController exportPlaylistToPath:filename exportModule:exportModule];
     }
 }
 
