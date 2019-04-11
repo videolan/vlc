@@ -14,7 +14,7 @@ WINE_IDL_HEADERS = \
 	d3d11_1.idl d3d11_2.idl d3d11_3.idl \
 	dxgicommon.idl dxgitype.idl dxgiformat.idl \
 	dxgidebug.idl \
-	dxgi1_2.idl dxgi1_3.idl dxgi1_4.idl dxgi1_5.idl dxgi1_6.idl
+	dxgi.idl dxgi1_2.idl dxgi1_3.idl dxgi1_4.idl dxgi1_5.idl dxgi1_6.idl
 
 ifndef HAVE_VISUALSTUDIO
 WINE_EXTRA_HEADERS += d3d9caps.h d3d9.h
