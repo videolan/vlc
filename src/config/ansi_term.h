@@ -89,13 +89,34 @@
  *   - White:   107
  */
 
-#define RED     term_seq(31;1)
-#define GREEN   term_seq(32;1)
-#define YELLOW  term_seq(33;1)
-#define BLUE    term_seq(34;1)
-#define MAGENTA term_seq(35;1)
-#define CYAN    term_seq(36;1)
-#define WHITE   term_seq(0;1)
-#define GRAY    term_seq(0)
+#define TS_RESET term_seq(0)
+
+#define TS_RESET_BOLD term_seq(0;1)
+
+#define TS_BOLD       term_seq(1)
+#define TS_DIM        term_seq(2)
+#define TS_ITALIC     term_seq(3)
+#define TS_UNDERSCORE term_seq(4)
+#define TS_REVERSE    term_seq(7)
+#define TS_INVISIBLE  term_seq(8)
+#define TS_STRIKE     term_seq(9)
+
+#define TS_BLACK   term_seq(30)
+#define TS_RED     term_seq(31)
+#define TS_GREEN   term_seq(32)
+#define TS_YELLOW  term_seq(33)
+#define TS_BLUE    term_seq(34)
+#define TS_MAGENTA term_seq(35)
+#define TS_CYAN    term_seq(36)
+#define TS_WHITE   term_seq(37)
+
+#define TS_BLACK_BOLD   term_seq(30;1)
+#define TS_RED_BOLD     term_seq(31;1)
+#define TS_GREEN_BOLD   term_seq(32;1)
+#define TS_YELLOW_BOLD  term_seq(33;1)
+#define TS_BLUE_BOLD    term_seq(34;1)
+#define TS_MAGENTA_BOLD term_seq(35;1)
+#define TS_CYAN_BOLD    term_seq(36;1)
+#define TS_WHITE_BOLD   term_seq(37;1)
 
 #endif

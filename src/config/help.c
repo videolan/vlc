@@ -242,10 +242,10 @@ static void print_section(const module_t *m, const module_config_t **sect,
         return;
     *sect = NULL;
 
-    printf(color ? RED"   %s:\n"GRAY : "   %s:\n",
+    printf(color ? TS_RED_BOLD "   %s:\n" TS_RESET : "   %s:\n",
            module_gettext(m, item->psz_text));
     if (desc && item->psz_longtext != NULL)
-        printf(color ? MAGENTA"   %s\n"GRAY : "   %s\n",
+        printf(color ? TS_MAGENTA_BOLD "   %s\n" TS_RESET : "   %s\n",
                module_gettext(m, item->psz_longtext));
 }
 
@@ -254,7 +254,7 @@ static void print_desc(const char *str, unsigned margin, bool color)
     unsigned width = ConsoleWidth() - margin;
 
     if (color)
-        fputs(BLUE, stdout);
+        fputs(TS_BLUE_BOLD, stdout);
 
     const char *word = str;
     int wordlen = 0, wordwidth = 0;
@@ -311,7 +311,7 @@ static void print_desc(const char *str, unsigned margin, bool color)
 
     if (!newline)
         putchar(' ');
-    printf(color ? "%s\n"GRAY : "%s\n", word);
+    printf(color ? "%s\n" TS_RESET : "%s\n", word);
 }
 
 static int vlc_swidth(const char *str)
@@ -353,11 +353,11 @@ static void print_item(const module_t *m, const struct vlc_param *param,
             switch (item->i_type)
             {
                 case CONFIG_HINT_CATEGORY:
-                    printf(color ? GREEN "\n %s\n" GRAY : "\n %s\n",
+                    printf(color ? TS_GREEN_BOLD "\n %s\n" TS_RESET : "\n %s\n",
                            module_gettext(m, item->psz_text));
 
                     if (desc && item->psz_longtext != NULL)
-                        printf(color ? CYAN " %s\n" GRAY : " %s\n",
+                        printf(color ? TS_CYAN_BOLD " %s\n" TS_RESET : " %s\n",
                                module_gettext(m, item->psz_longtext));
                     break;
 
@@ -493,11 +493,11 @@ static void print_item(const module_t *m, const struct vlc_param *param,
         strcpy(shortopt, "   ");
 
     if (CONFIG_CLASS(item->i_type) == CONFIG_ITEM_BOOL)
-        printf(color ? WHITE"  %s --%s"      "%s%s%s%s%s "GRAY
+        printf(color ? TS_RESET_BOLD"  %s --%s"      "%s%s%s%s%s " TS_RESET
                      : "  %s --%s%s%s%s%s%s ", shortopt, item->psz_name,
                prefix, item->psz_name, bra, type, ket);
     else
-        printf(color ? WHITE"  %s --%s"YELLOW"%s%s%s%s%s "GRAY
+        printf(color ? TS_RESET_BOLD "  %s --%s" TS_YELLOW_BOLD "%s%s%s%s%s " TS_RESET
                      : "  %s --%s%s%s%s%s%s ", shortopt, item->psz_name,
                "", "",  /* XXX */      bra, type, ket);
 
@@ -605,10 +605,10 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
             continue;
 
         /* Print name of module */
-        printf(color ? "\n " GREEN "%s" GRAY " (%s)\n" : "\n %s (%s)\n",
+        printf(color ? "\n " TS_GREEN_BOLD "%s" TS_RESET " (%s)\n" : "\n %s (%s)\n",
                module_gettext(m, m->psz_longname), objname);
         if (m->psz_help != NULL)
-            printf(color ? CYAN" %s\n"GRAY : " %s\n",
+            printf(color ? TS_CYAN_BOLD" %s\n" TS_RESET : " %s\n",
                    module_gettext(m, m->psz_help));
 
         if (psz_search != NULL && p->conf.count == 0)
@@ -627,7 +627,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
     }
 
     if (!found)
-        printf(color ? "\n" WHITE "%s" GRAY "\n" : "\n%s\n",
+        printf(color ? "\n" TS_RESET_BOLD "%s" TS_RESET "\n" : "\n%s\n",
                _("No matching module found. Use --list or "
                  "--list-verbose to list available modules."));
 }
@@ -659,7 +659,7 @@ static void ListModules (vlc_object_t *p_this, bool b_verbose)
     {
         module_t *p_parser = list[j];
         const char *objname = module_get_object (p_parser);
-        printf(color ? GREEN"  %-22s "WHITE"%s\n"GRAY : "  %-22s %s\n",
+        printf(color ? TS_GREEN_BOLD "  %-22s " TS_RESET_BOLD "%s\n" TS_RESET : "  %-22s %s\n",
                objname, module_gettext(p_parser, p_parser->psz_longname));
 
         if( b_verbose )
@@ -667,10 +667,10 @@ static void ListModules (vlc_object_t *p_this, bool b_verbose)
             const char *const *pp_shortcuts = p_parser->pp_shortcuts;
             for( unsigned i = 0; i < p_parser->i_shortcuts; i++ )
                 if( strcmp( pp_shortcuts[i], objname ) )
-                    printf(color ? CYAN"   s %s\n"GRAY : "   s %s\n",
+                    printf(color ? TS_CYAN_BOLD "   s %s\n" TS_RESET : "   s %s\n",
                            pp_shortcuts[i]);
             if (p_parser->psz_capability != NULL)
-                printf(color ? MAGENTA"   c %s (%d)\n"GRAY : "   c %s (%d)\n",
+                printf(color ? TS_MAGENTA_BOLD "   c %s (%d)\n" TS_RESET : "   c %s (%d)\n",
                        p_parser->psz_capability, p_parser->i_score);
         }
     }
