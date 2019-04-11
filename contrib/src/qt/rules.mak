@@ -85,6 +85,10 @@ QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
 
 QT_CONFIG += -release
 
+ifdef HAVE_MINGW_W64
+QT_CONFIG += -no-direct2d
+endif
+
 ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
 
 .qt: qt
