@@ -33,6 +33,7 @@
 
 #include "vlc_getopt.h"
 
+#include "ansi_term.h"
 #include "configuration.h"
 #include "modules/modules.h"
 
@@ -177,6 +178,10 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
     psz_shortopts[i_shortopts] = '\0';
 
     int ret = -1;
+    bool color = false;
+#ifndef _WIN32
+    color = (isatty(STDERR_FILENO));
+#endif
 
     /*
      * Parse the command line options
@@ -207,7 +212,9 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                 if (param->obsolete)
                 {
                     fprintf(stderr,
-                            _( "Warning: Option --%s no longer exists.\n" ),
+                            _( "%sWarning:%s Option --%s no longer exists.\n" ),
+                            color ? TS_YELLOW_BOLD : "",
+                            color ? TS_RESET : "",
                             psz_full_name);
                     continue;
                 }
@@ -277,7 +284,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         /* Internal error: unknown option or missing option value */
         if( !b_ignore_errors )
         {
-            fputs( _( "Error: " ), stderr );
+            fprintf( stderr, _( "%sError:%s " ), color ? TS_RED_BOLD : "", color ? TS_RESET : "");
             if (i_cmd == ':')
             {
                 if( state.opt )
