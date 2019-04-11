@@ -203,6 +203,7 @@ libvlccore_la_SOURCES = \
 	missing.c \
 	revision.c \
 	version.c \
+	config/ansi_term.h \
 	config/configuration.h \
 	config/core.c \
 	config/chain.c \

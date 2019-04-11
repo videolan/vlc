@@ -35,6 +35,7 @@
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 #include <vlc_charset.h>
+#include "ansi_term.h"
 #include "modules/modules.h"
 #include "config/configuration.h"
 #include "libvlc.h"
@@ -44,8 +45,6 @@
 # define wcwidth(cp) ((void)(cp), 1) /* LOL */
 #else
 # include <unistd.h>
-# include <termios.h>
-# include <sys/ioctl.h>
 #endif
 
 #if defined( _WIN32 ) && !defined( VLC_WINSTORE_APP )
@@ -231,15 +230,6 @@ static void Help (vlc_object_t *p_this, char const *psz_help_name)
  *****************************************************************************
  * Print a short inline help. Message interface is initialized at this stage.
  *****************************************************************************/
-#   define COL(x)  "\033[" #x ";1m"
-#   define RED     COL(31)
-#   define GREEN   COL(32)
-#   define YELLOW  COL(33)
-#   define BLUE    COL(34)
-#   define MAGENTA COL(35)
-#   define CYAN    COL(36)
-#   define WHITE   COL(0)
-#   define GRAY    "\033[0m"
 #   define LINE_START      8
 #   define PADDING_SPACES 25
 
