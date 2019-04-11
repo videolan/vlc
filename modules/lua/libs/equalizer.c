@@ -270,7 +270,7 @@ static int vlclua_equalizer_enable(lua_State *L)
     if (aout)
     {
         aout_EnableFilter(aout, "equalizer", state);
-        vlc_object_release (aout);
+        aout_Release (aout);
     }
     return 0;
 }
