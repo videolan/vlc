@@ -41,7 +41,6 @@
 #include "libvlc.h"
 
 #if defined( _WIN32 )
-# include <vlc_charset.h>
 # define wcwidth(cp) ((void)(cp), 1) /* LOL */
 #else
 # include <unistd.h>
