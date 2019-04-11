@@ -127,7 +127,7 @@ static int vlclua_aout_release(lua_State *L)
     vlc_object_t **pp = luaL_checkudata(L, 1, "vlc_object");
 
     lua_pop(L, 1);
-    aout_Release((vout_thread_t *)*pp);
+    aout_Release((audio_output_t *)*pp);
     return 0;
 }
 
