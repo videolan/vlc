@@ -1208,6 +1208,16 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_D3D11_OPAQUE_BGRA, "BGRA D3D11 opaque"),
         A("DAGR"),
+
+    B(VLC_CODEC_AGM, "AmuseGraphics Movie"),
+        A("AGM0"),
+        A("AGM1"),
+        A("AGM2"),
+        A("AGM3"),
+        A("AGM4"),
+        A("AGM5"),
+        A("AGM6"),
+        A("AGM7"),
 };
 
 static const staticentry_t p_list_audio[] = {
