@@ -42,6 +42,7 @@ extern "C" char **environ;
 #include <QApplication>
 #include <QDate>
 #include <QMutex>
+#include <QtQuickControls2/QQuickStyle>
 
 #include "qt.hpp"
 
@@ -565,6 +566,8 @@ static void *Thread( void *obj )
     // at the moment, the vout is created in another thread than the rendering thread
     QApplication::setAttribute( Qt::AA_DontCheckOpenGLContextThreadAffinity );
     QQuickWindow::setDefaultAlphaBuffer(true);
+
+    QQuickStyle::setStyle("fusion");
 
     /* Start the QApplication here */
     QVLCApp app( argc, argv );
