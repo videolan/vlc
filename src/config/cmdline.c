@@ -207,7 +207,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                 if (param->obsolete)
                 {
                     fprintf(stderr,
-                            "Warning: Option --%s no longer exists.\n",
+                            _( "Warning: Option --%s no longer exists.\n" ),
                             psz_full_name);
                     continue;
                 }
@@ -277,24 +277,24 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         /* Internal error: unknown option or missing option value */
         if( !b_ignore_errors )
         {
-            fputs( "Error: ", stderr );
+            fputs( _( "Error: " ), stderr );
             if (i_cmd == ':')
             {
                 if( state.opt )
-                    fprintf( stderr, "Missing mandatory value for option `-%c'\n",
+                    fprintf( stderr, _( "Missing mandatory value for option `-%c'\n" ),
                              state.opt );
                 else
-                    fprintf( stderr, "Missing mandatory value for option `%s'\n",
+                    fprintf( stderr, _( "Missing mandatory value for option `%s'\n" ),
                              ppsz_argv[state.ind-1] );
             }
             else
             {
                 if( state.opt )
-                    fprintf( stderr, "Unknown option `-%c'\n", state.opt );
+                    fprintf( stderr, _( "Unknown option `-%c'\n" ), state.opt );
                 else
-                    fprintf( stderr, "Unknown option `%s'\n", ppsz_argv[state.ind-1] );
+                    fprintf( stderr, _( "Unknown option `%s'\n" ), ppsz_argv[state.ind-1] );
             }
-            fputs( "Try `vlc --help' for more information.\n", stderr );
+            fputs( _( "Try `vlc --help' for more information.\n" ), stderr );
             goto out;
         }
     }
