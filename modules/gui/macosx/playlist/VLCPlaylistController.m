@@ -529,4 +529,43 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     return p_input;
 }
 
+- (NSArray<VLCPlaylistExportModuleDescription *> *)availablePlaylistExportModules
+{
+    VLCPlaylistExportModuleDescription *xspf = [[VLCPlaylistExportModuleDescription alloc] init];
+    xspf.humanReadableName = _NS("XSPF playlist");
+    xspf.fileExtension = @"xspf";
+    xspf.moduleName = @"export-xspf";
+
+    VLCPlaylistExportModuleDescription *m3u = [[VLCPlaylistExportModuleDescription alloc] init];
+    m3u.humanReadableName = _NS("M3U playlist");
+    m3u.fileExtension = @"m3u";
+    m3u.moduleName = @"export-m3u";
+
+    VLCPlaylistExportModuleDescription *m3u8 = [[VLCPlaylistExportModuleDescription alloc] init];
+    m3u8.humanReadableName = _NS("M3U8 playlist");
+    m3u8.fileExtension = @"m3u8";
+    m3u8.moduleName = @"export-m3u8";
+
+    VLCPlaylistExportModuleDescription *html = [[VLCPlaylistExportModuleDescription alloc] init];
+    html.humanReadableName = _NS("HTML playlist");
+    html.fileExtension = @"html";
+    html.moduleName = @"export-html";
+
+    return @[xspf, m3u, m3u8, html];
+}
+
+- (int)exportPlaylistToPath:(NSString *)path exportModule:(VLCPlaylistExportModuleDescription *)exportModule
+{
+    vlc_playlist_Lock(_p_playlist);
+    int ret = vlc_playlist_Export(_p_playlist,
+                                  path.fileSystemRepresentation,
+                                  exportModule.moduleName.UTF8String);
+    vlc_playlist_Unlock(_p_playlist);
+    return ret;
+}
+
+@end
+
+@implementation VLCPlaylistExportModuleDescription
+
 @end

@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCPlaylistModel;
 @class VLCPlaylistDataSource;
 @class VLCPlayerController;
+@class VLCPlaylistExportModuleDescription;
 
 extern NSString *VLCPlaybackOrderChanged;
 extern NSString *VLCPlaybackRepeatChanged;
@@ -167,6 +168,27 @@ extern NSString *VLCPlaylistCurrentItemChanged;
  * Resume playback of the playlist if it was paused
  */
 - (void)resumePlayback;
+
+/**
+ * returns an array of module descriptions available for export a playlist. Content may vary
+ */
+@property (readonly) NSArray <VLCPlaylistExportModuleDescription *> *availablePlaylistExportModules;
+
+/**
+ * exports the playlist owned by the controller to a given file using the provided module
+ * @param path the file path to store the file in
+ * @param exportModule the VLCPlaylistExportModuleDescription for the respective export module
+ * @return VLC_SUCCESS or an error
+ */
+- (int)exportPlaylistToPath:(NSString *)path exportModule:(VLCPlaylistExportModuleDescription *)exportModule;
+
+@end
+
+@interface VLCPlaylistExportModuleDescription : NSObject
+
+@property (readwrite, retain) NSString *humanReadableName;
+@property (readwrite, retain) NSString *fileExtension;
+@property (readwrite, retain) NSString *moduleName;
 
 @end
 
