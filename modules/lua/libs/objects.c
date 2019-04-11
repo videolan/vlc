@@ -68,14 +68,6 @@ static int vlclua_push_vlc_object(lua_State *L, vlc_object_t *p_obj,
     return 1;
 }
 
-static int vlclua_input_release(lua_State *L)
-{
-    vlc_object_t **pp = luaL_checkudata( L, 1, "vlc_object" );
-    lua_pop(L, 1);
-    input_Release((input_thread_t *)*pp);
-    return 0;
-}
-
 static int vlclua_get_libvlc( lua_State *L )
 {
     libvlc_int_t *p_libvlc = vlc_object_instance(vlclua_get_this( L ));
