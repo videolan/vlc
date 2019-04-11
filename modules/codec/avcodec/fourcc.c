@@ -309,6 +309,10 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 58, 24, 100 )
     { VLC_CODEC_IMM4, AV_CODEC_ID_IMM4 },
 #endif
+
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 58, 49, 100 )
+    { VLC_CODEC_AGM, AV_CODEC_ID_AGM },
+#endif
 #endif /* FFmpeg only */
 };
 

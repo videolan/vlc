@@ -33,6 +33,7 @@ Codecs:
  * Support for 16-bit greyscale
  * Support IMM4 decoder
  * Improve 708 decoder
+ * Support AGM decoder
 
 Access:
  * Enable SMB2 / SMB3 support on mobile ports with libsmb2
