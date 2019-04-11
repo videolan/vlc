@@ -566,9 +566,6 @@ static void *Thread( void *obj )
     QApplication::setAttribute( Qt::AA_DontCheckOpenGLContextThreadAffinity );
     QQuickWindow::setDefaultAlphaBuffer(true);
 
-    //force Qt to use EGL on XCB
-    qputenv("QT_XCB_GL_INTEGRATION", "xcb_egl");
-
     /* Start the QApplication here */
     QVLCApp app( argc, argv );
 
