@@ -25,7 +25,6 @@
 #include <vlc_common.h>
 #include <vlc_actions.h>
 
-#import "coreinteraction/VLCInputManager.h"
 #import "coreinteraction/VLCCoreInteraction.h"
 #import "extensions/NSSound+VLCAdditions.h"
 #import "imported/SPMediaKeyTap/SPMediaKeyTap.h"
@@ -111,8 +110,7 @@
         _mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
 
     VLCMain *main = [VLCMain sharedInstance];
-    if (b_mediaKeySupport && ([[[main playlistController] playlistModel] numberOfPlaylistItems] > 0 ||
-                              [[main inputManager] hasInput])) {
+    if (b_mediaKeySupport && ([[[main playlistController] playlistModel] numberOfPlaylistItems] > 0)) {
         if (!b_mediaKeyTrapEnabled) {
             msg_Dbg(p_intf, "Enabling media key support");
             if ([_mediaKeyController startWatchingMediaKeys]) {

@@ -239,6 +239,7 @@
 
 - (void)inputChanged:(input_thread_t *)p_input
 {
+    // FIXME: this is never called!
     //This is unlikely, but can happen if no extension modules can be loaded.
     if (p_extensions_manager == NULL)
         return;

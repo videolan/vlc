@@ -30,8 +30,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/coreinteraction/VLCClickerManager.m \
 	gui/macosx/coreinteraction/VLCCoreInteraction.h \
 	gui/macosx/coreinteraction/VLCCoreInteraction.m \
-	gui/macosx/coreinteraction/VLCInputManager.h \
-	gui/macosx/coreinteraction/VLCInputManager.m \
 	gui/macosx/coreinteraction/VLCVideoFilterHelper.h \
 	gui/macosx/coreinteraction/VLCVideoFilterHelper.m \
 	gui/macosx/extensions/NSScreen+VLCAdditions.h \
@@ -118,6 +116,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/panels/dialogs/VLCResumeDialogController.m \
 	gui/macosx/panels/dialogs/VLCTextfieldPanelController.h \
 	gui/macosx/panels/dialogs/VLCTextfieldPanelController.m \
+	gui/macosx/playlist/VLCPlaybackContinuityController.h \
+	gui/macosx/playlist/VLCPlaybackContinuityController.m \
 	gui/macosx/playlist/VLCPlayerController.h \
 	gui/macosx/playlist/VLCPlayerController.m \
 	gui/macosx/playlist/VLCPlaylistController.h \

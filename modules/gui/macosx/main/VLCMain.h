@@ -60,7 +60,6 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 @class AppleRemote;
 @class VLCInformationWindowController;
 @class VLCMainMenu;
-@class VLCInputManager;
 @class VLCResumeDialogController;
 @class VLCSimplePrefsController;
 @class VLCPrefs;
@@ -96,7 +95,6 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 - (VLCPrefs *)preferences;
 - (VLCCoreDialogProvider *)coreDialogProvider;
 - (VLCResumeDialogController *)resumeDialog;
-- (VLCInputManager *)inputManager;
 - (VLCExtensionsManager *)extensionsManager;
 - (VLCStatusBarIcon *)statusBarIcon;
 

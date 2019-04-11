@@ -43,7 +43,6 @@
 #include <vlc_variables.h>
 
 #import "coreinteraction/VLCCoreInteraction.h"
-#import "coreinteraction/VLCInputManager.h"
 
 #import "library/VLCLibraryWindow.h"
 
@@ -64,6 +63,7 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistModel.h"
+#import "playlist/VLCPlaybackContinuityController.h"
 
 #import "preferences/prefs.h"
 #import "preferences/VLCSimplePrefsController.h"
@@ -178,7 +178,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCCoreDialogProvider *_coredialogs;
     VLCBookmarksWindowController *_bookmarks;
     VLCResumeDialogController *_resume_dialog;
-    VLCInputManager *_input_manager;
+    VLCPlaybackContinuityController *_continuityController;
     VLCLogWindowController *_messagePanelController;
     VLCStatusBarIcon *_statusBarIcon;
     VLCTrackSynchronizationWindowController *_trackSyncPanel;
@@ -228,7 +228,7 @@ static VLCMain *sharedInstance = nil;
         [VLCApplication sharedApplication].delegate = self;
 
         _playlistController = [[VLCPlaylistController alloc] initWithPlaylist:vlc_intf_GetMainPlaylist(p_intf)];
-        _input_manager = [[VLCInputManager alloc] initWithMain:self];
+        _continuityController = [[VLCPlaybackContinuityController alloc] init];
 
         // first initalize extensions dialog provider, then core dialog
         // provider which will register both at the core
@@ -331,7 +331,7 @@ static VLCMain *sharedInstance = nil;
         return;
     b_intf_terminating = true;
 
-    [_input_manager deinit];
+    _continuityController = nil;
 
     if (notification == nil)
         [[NSNotificationCenter defaultCenter] postNotificationName: NSApplicationWillTerminateNotification object: nil];
@@ -443,9 +443,6 @@ static VLCMain *sharedInstance = nil;
     if ([self mainWindow]) {
         [[self mainWindow] setVideoplayEnabled];
     }
-
-    // update sleep blockers
-    [_input_manager playbackStatusUpdated];
 }
 
 #pragma mark -
@@ -469,11 +466,6 @@ static VLCMain *sharedInstance = nil;
 - (VLCLibraryWindowController *)libraryWindowController
 {
     return _libraryWindowController;
-}
-
-- (VLCInputManager *)inputManager
-{
-    return _input_manager;
 }
 
 - (VLCExtensionsManager *)extensionsManager

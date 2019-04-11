@@ -1,7 +1,10 @@
 /*****************************************************************************
- * VLCInputManager.h: MacOS X interface module
+ * VLCPlaybackContinuityController.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2015 VLC authors and VideoLAN
+ * Copyright (C) 2015-2019 VLC authors and VideoLAN
+ *
+ * Authors: Felix Paul Kühne <fkuehne # videolan.org>
+ *          David Fuhrmann <dfuhrmann # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,22 +23,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include <vlc_common.h>
-#import <vlc_interface.h>
-
-
-
-@class VLCMain;
-
-@interface VLCInputManager : NSObject
-
-- (id)initWithMain:(VLCMain *)o_mainObj;
-- (void)deinit;
-
-- (void)inputThreadChanged;
-
-- (void)playbackStatusUpdated;
-
-- (BOOL)hasInput;
+@interface VLCPlaybackContinuityController : NSObject
 
 @end

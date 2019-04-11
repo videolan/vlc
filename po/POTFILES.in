@@ -452,8 +452,6 @@ modules/gui/macosx/coreinteraction/VLCClickerManager.h
 modules/gui/macosx/coreinteraction/VLCClickerManager.m
 modules/gui/macosx/coreinteraction/VLCCoreInteraction.h
 modules/gui/macosx/coreinteraction/VLCCoreInteraction.m
-modules/gui/macosx/coreinteraction/VLCInputManager.h
-modules/gui/macosx/coreinteraction/VLCInputManager.m
 modules/gui/macosx/coreinteraction/VLCVideoFilterHelper.h
 modules/gui/macosx/coreinteraction/VLCVideoFilterHelper.m
 modules/gui/macosx/extensions/NSScreen+VLCAdditions.h
@@ -519,6 +517,8 @@ modules/gui/macosx/panels/dialogs/VLCResumeDialogController.h
 modules/gui/macosx/panels/dialogs/VLCResumeDialogController.m
 modules/gui/macosx/panels/dialogs/VLCTextfieldPanelController.h
 modules/gui/macosx/panels/dialogs/VLCTextfieldPanelController.m
+modules/gui/macosx/playlist/VLCPlaybackContinuityController.h
+modules/gui/macosx/playlist/VLCPlaybackContinuityController.m
 modules/gui/macosx/playlist/VLCPlaylistController.h
 modules/gui/macosx/playlist/VLCPlaylistController.m
 modules/gui/macosx/playlist/VLCPlaylistDataSource.h
