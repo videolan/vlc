@@ -272,7 +272,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         /* Internal error: unknown option */
         if( !b_ignore_errors )
         {
-            fputs( "Error: vlc: unknown option"
+            fputs( "Error: unknown option"
                      " or missing mandatory argument ", stderr );
             if( state.opt )
             {
