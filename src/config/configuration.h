@@ -40,15 +40,6 @@ bool config_PrintHelp (vlc_object_t *);
 int config_SortConfig (void);
 void config_UnsortConfig (void);
 
-#define CONFIG_CLASS(x) ((x) & ~0x1F)
-
-#define IsConfigStringType(type) \
-    (((type) & CONFIG_ITEM_STRING) != 0)
-#define IsConfigIntegerType(type) \
-    (((type) & CONFIG_ITEM_INTEGER) != 0)
-#define IsConfigFloatType(type) \
-    ((type) == CONFIG_ITEM_FLOAT)
-
 extern vlc_rwlock_t config_lock;
 extern bool config_dirty;
 
