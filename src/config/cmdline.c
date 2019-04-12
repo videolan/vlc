@@ -273,7 +273,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         if( !b_ignore_errors )
         {
             fputs( "Error: Unknown option"
-                     " or missing mandatory argument ", stderr );
+                     " or missing mandatory value for option ", stderr );
             if( state.opt )
             {
                 fprintf( stderr, "`-%c'\n", state.opt );
