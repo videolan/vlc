@@ -23,11 +23,8 @@
 
 #import "VLCControlsBarCommon.h"
 
-#import "coreinteraction/VLCCoreInteraction.h"
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
-#import "main/CompatibilityFixes.h"
-#import "menus/VLCMainMenu.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
@@ -40,15 +37,18 @@
 
 @interface VLCControlsBarCommon ()
 {
-    NSImage * _pauseImage;
-    NSImage * _pressedPauseImage;
-    NSImage * _playImage;
-    NSImage * _pressedPlayImage;
+    NSImage *_pauseImage;
+    NSImage *_pressedPauseImage;
+    NSImage *_playImage;
+    NSImage *_pressedPlayImage;
 
     NSTimeInterval last_fwd_event;
     NSTimeInterval last_bwd_event;
     BOOL just_triggered_next;
     BOOL just_triggered_previous;
+
+    VLCPlaylistController *_playlistController;
+    VLCPlayerController *_playerController;
 }
 @end
 
@@ -57,6 +57,9 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
+
+    _playlistController = [[VLCMain sharedInstance] playlistController];
+    _playerController = _playlistController.playerController;
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self selector:@selector(updateTimeSlider:) name:VLCPlayerTimeAndPositionChanged object:nil];
@@ -116,6 +119,8 @@
 
     if (config_GetInt("macosx-show-playback-buttons"))
         [self toggleForwardBackwardMode: YES];
+
+    [self playerStateUpdated:nil];
 }
 
 - (void)dealloc
@@ -159,14 +164,14 @@
 
 - (IBAction)play:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] playOrPause];
+    [_playerController togglePlayPause];
 }
 
 - (void)resetPreviousButton
 {
     if (([NSDate timeIntervalSinceReferenceDate] - last_bwd_event) >= 0.35) {
         // seems like no further event occurred, so let's switch the playback item
-        [[VLCCoreInteraction sharedInstance] previous];
+        [_playlistController playPreviousItem];
         just_triggered_previous = NO;
     }
 }
@@ -188,7 +193,7 @@
     } else {
         if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.16) {
             // we just skipped 4 "continous" events, otherwise we are too fast
-            [[VLCCoreInteraction sharedInstance] backwardExtraShort];
+            [_playerController jumpBackwardExtraShort];
             last_bwd_event = [NSDate timeIntervalSinceReferenceDate];
             [self performSelector:@selector(resetBackwardSkip)
                        withObject: NULL
@@ -201,7 +206,7 @@
 {
     if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) >= 0.35) {
         // seems like no further event occurred, so let's switch the playback item
-        [[VLCCoreInteraction sharedInstance] next];
+        [_playlistController playNextItem];
         just_triggered_next = NO;
     }
 }
@@ -223,7 +228,7 @@
     } else {
         if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.16) {
             // we just skipped 4 "continous" events, otherwise we are too fast
-            [[VLCCoreInteraction sharedInstance] forwardExtraShort];
+            [_playerController jumpForwardExtraShort];
             last_fwd_event = [NSDate timeIntervalSinceReferenceDate];
             [self performSelector:@selector(resetForwardSkip)
                        withObject: NULL
@@ -235,12 +240,12 @@
 // alternative actions for forward / backward buttons when next / prev are activated
 - (IBAction)alternateForward:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] forwardExtraShort];
+    [_playerController jumpForwardExtraShort];
 }
 
 - (IBAction)alternateBackward:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] backwardExtraShort];
+    [_playerController jumpBackwardExtraShort];
 }
 
 - (IBAction)timeSliderAction:(id)sender
@@ -269,14 +274,13 @@
             return;
     }
 
-    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
-    [playerController setPositionFast:f_updatedDelta / 10000.];
+    [_playerController setPositionFast:f_updatedDelta / 10000.];
     [self.timeSlider setFloatValue:f_updatedDelta];
 }
 
 - (IBAction)fullscreen:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+    [_playerController toggleFullscreen];
 }
 
 #pragma mark -
@@ -284,8 +288,7 @@
 
 - (void)updateTimeSlider:(NSNotification *)aNotification;
 {
-    VLCPlayerController *playerController = aNotification.object;
-    input_item_t *p_item = playerController.currentMedia;
+    input_item_t *p_item = _playerController.currentMedia;
 
     [self.timeSlider setHidden:NO];
 
@@ -300,10 +303,10 @@
     }
 
     [self.timeSlider setKnobHidden:NO];
-    [self.timeSlider setFloatValue:(10000. * playerController.position)];
+    [self.timeSlider setFloatValue:(10000. * _playerController.position)];
 
     vlc_tick_t duration = input_item_GetDuration(p_item);
-    bool buffering = playerController.playerState == VLC_PLAYER_STATE_STARTED;
+    bool buffering = _playerController.playerState == VLC_PLAYER_STATE_STARTED;
     if (duration == -1) {
         // No duration, disable slider
         [self.timeSlider setEnabled:NO];
@@ -311,11 +314,11 @@
         [self.timeSlider setEnabled:NO];
         [self.timeSlider setIndefinite:buffering];
     } else {
-        [self.timeSlider setEnabled:playerController.seekable];
+        [self.timeSlider setEnabled:_playerController.seekable];
     }
 
     NSString *time = [NSString stringWithDuration:duration
-                                      currentTime:playerController.time
+                                      currentTime:_playerController.time
                                          negative:self.timeField.timeRemaining];
     [self.timeField setStringValue:time];
     [self.timeField setNeedsDisplay:YES];
@@ -325,8 +328,7 @@
 
 - (void)playerStateUpdated:(NSNotification *)aNotification
 {
-    VLCPlayerController *playerController = aNotification.object;
-    if (playerController.playerState == VLC_PLAYER_STATE_PLAYING) {
+    if (_playerController.playerState == VLC_PLAYER_STATE_PLAYING) {
         [self setPause];
     } else {
         [self setPlay];
@@ -335,15 +337,13 @@
 
 - (void)updatePlaybackControls:(NSNotification *)aNotification
 {
-    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
-    bool b_seekable = playlistController.playerController.seekable;
-    // FIXME: re-add chapter navigation as needed
-    bool b_chapters = false;
+    bool b_seekable = _playerController.seekable;
+    bool b_chapters = [_playerController numberOfChaptersForCurrentTitle] > 0;
 
     [self.timeSlider setEnabled: b_seekable];
 
-    [self.forwardButton setEnabled: (b_seekable || playlistController.hasNextPlaylistItem || b_chapters)];
-    [self.backwardButton setEnabled: (b_seekable || playlistController.hasPreviousPlaylistItem || b_chapters)];
+    [self.forwardButton setEnabled: (b_seekable || _playlistController.hasNextPlaylistItem || b_chapters)];
+    [self.backwardButton setEnabled: (b_seekable || _playlistController.hasPreviousPlaylistItem || b_chapters)];
 }
 
 - (void)setPause
@@ -365,8 +365,7 @@
 - (void)fullscreenStateUpdated:(NSNotification *)aNotification
 {
     if (!self.nativeFullscreenMode) {
-        VLCPlayerController *playerController = aNotification.object;
-        [self.fullscreenButton setState:playerController.fullscreen];
+        [self.fullscreenButton setState:_playerController.fullscreen];
     }
 }
 
