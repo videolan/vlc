@@ -28,7 +28,6 @@
 
 #import <vlc_interface.h>
 
-#import "coreinteraction/VLCCoreInteraction.h"
 #import "extensions/NSString+Helpers.h"
 #import "preferences/VLCSimplePrefsController.h"
 

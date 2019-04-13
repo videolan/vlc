@@ -26,7 +26,6 @@
 #import <vlc_common.h>
 #import <vlc_actions.h>
 
-#import "coreinteraction/VLCCoreInteraction.h"
 #import "extensions/NSString+Helpers.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"

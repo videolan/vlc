@@ -19,7 +19,6 @@
 		1C31139F1E508C6900D4DD76 /* VLCMainWindowControlsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D5678EF1D5BA397002698F3 /* VLCMainWindowControlsBar.m */; };
 		1C3113A11E508C6900D4DD76 /* VLCConvertAndSaveWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0663351566C34C003A411C /* VLCConvertAndSaveWindowController.m */; };
 		1C3113A31E508C6900D4DD76 /* VLCCoreDialogProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33210F8CB017000FC4A7 /* VLCCoreDialogProvider.m */; };
-		1C3113A51E508C6900D4DD76 /* VLCCoreInteraction.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6113B68A0B009F72E0 /* VLCCoreInteraction.m */; };
 		1C3113A71E508C6900D4DD76 /* VLCLogWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B418302AC000FAE9B7 /* VLCLogWindowController.m */; };
 		1C3113A91E508C6900D4DD76 /* VLCDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C39ABBD1DA9AB9B00FE052A /* VLCDocumentController.m */; };
 		1C3113AB1E508C6900D4DD76 /* VLCExtensionsDialogProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71114C0D4A90057F8D1 /* VLCExtensionsDialogProvider.m */; };
@@ -559,8 +558,6 @@
 		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
 		CC426FD01020D44F00A32659 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../../../contrib/Sparkle.framework; sourceTree = SOURCE_ROOT; };
-		CC448A6013B68A0B009F72E0 /* VLCCoreInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCCoreInteraction.h; sourceTree = "<group>"; };
-		CC448A6113B68A0B009F72E0 /* VLCCoreInteraction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCCoreInteraction.m; sourceTree = "<group>"; };
 		CC448A6213B68A0B009F72E0 /* VLCMainWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCMainWindow.h; sourceTree = "<group>"; };
 		CC448A6313B68A0B009F72E0 /* VLCMainWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCMainWindow.m; sourceTree = "<group>"; };
 		CC461F6C160078340022423C /* VLCTextfieldPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = VLCTextfieldPanelController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -850,10 +847,6 @@
 		1C1ED50A2204AFA900811EC0 /* coreinteraction */ = {
 			isa = PBXGroup;
 			children = (
-				7D66D4342200BC340040D04A /* VLCClickerManager.h */,
-				7D66D4352200BC340040D04A /* VLCClickerManager.m */,
-				CC448A6013B68A0B009F72E0 /* VLCCoreInteraction.h */,
-				CC448A6113B68A0B009F72E0 /* VLCCoreInteraction.m */,
 				7D66D4372200C5B80040D04A /* VLCVideoFilterHelper.h */,
 				7D66D4382200C5B80040D04A /* VLCVideoFilterHelper.m */,
 			);
@@ -873,6 +866,8 @@
 				7DF812F01B555C8E0052293C /* VLCKeyboardBacklightControl.m */,
 				7DD2F5C32081B73B007EE187 /* VLCRemoteControlService.h */,
 				7DD2F5C42081B73B007EE187 /* VLCRemoteControlService.m */,
+				7D66D4342200BC340040D04A /* VLCClickerManager.h */,
+				7D66D4352200BC340040D04A /* VLCClickerManager.m */,
 			);
 			path = "os-integration";
 			sourceTree = "<group>";
@@ -1633,7 +1628,6 @@
 				1C3113A11E508C6900D4DD76 /* VLCConvertAndSaveWindowController.m in Sources */,
 				1C3113A31E508C6900D4DD76 /* VLCCoreDialogProvider.m in Sources */,
 				6B2EFC631F281A0900F3C0EA /* VLCVolumeSliderCell.m in Sources */,
-				1C3113A51E508C6900D4DD76 /* VLCCoreInteraction.m in Sources */,
 				1C3113A71E508C6900D4DD76 /* VLCLogWindowController.m in Sources */,
 				1C3113A91E508C6900D4DD76 /* VLCDocumentController.m in Sources */,
 				1C3113AB1E508C6900D4DD76 /* VLCExtensionsDialogProvider.m in Sources */,

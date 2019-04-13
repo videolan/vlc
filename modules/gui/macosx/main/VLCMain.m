@@ -42,8 +42,6 @@
 #include <vlc_url.h>
 #include <vlc_variables.h>
 
-#import "coreinteraction/VLCCoreInteraction.h"
-
 #import "library/VLCLibraryWindow.h"
 
 #import "main/CompatibilityFixes.h"
@@ -51,6 +49,8 @@
 #import "main/VLCApplication.h"
 
 #import "menus/VLCMainMenu.h"
+
+#import "os-integration/VLCClickerManager.h"
 
 #import "panels/dialogs/VLCResumeDialogController.h"
 #import "panels/dialogs/VLCCoreDialogProvider.h"
@@ -157,6 +157,19 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     }
 }
 
+static int BossCallback(vlc_object_t *p_this, const char *psz_var,
+                        vlc_value_t oldval, vlc_value_t new_val, void *param)
+{
+    @autoreleasepool {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[[VLCMain sharedInstance] playlistController] pausePlayback];
+            [[NSApplication sharedApplication] hide:nil];
+        });
+
+        return VLC_SUCCESS;
+    }
+}
+
 #pragma mark -
 #pragma mark Private
 
@@ -188,6 +201,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCExtensionsManager *_extensionsManager;
     VLCInformationWindowController *_currentMediaInfoPanel;
     VLCLibraryWindowController *_libraryWindowController;
+    VLCClickerManager *_clickerManager;
 
     bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
 }
@@ -246,6 +260,7 @@ static VLCMain *sharedInstance = nil;
         libvlc_int_t *libvlc = vlc_object_instance(p_intf);
         var_AddCallback(libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
         var_AddCallback(libvlc, "intf-show", ShowController, (__bridge void *)self);
+        var_AddCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
 
         // Load them here already to apply stored profiles
         _videoEffectsPanel = [[VLCVideoEffectsWindowController alloc] init];
@@ -285,6 +300,8 @@ static VLCMain *sharedInstance = nil;
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
+    _clickerManager = [[VLCClickerManager alloc] init];
+
 #ifdef HAVE_SPARKLE
     [[SUUpdater sharedUpdater] setDelegate:self];
 #endif
@@ -296,8 +313,6 @@ static VLCMain *sharedInstance = nil;
 
     if (!p_intf)
         return;
-
-    [[VLCCoreInteraction sharedInstance] updateCurrentlyUsedHotkeys];
 
     [self migrateOldPreferences];
 
@@ -340,6 +355,7 @@ static VLCMain *sharedInstance = nil;
     libvlc_int_t *libvlc = vlc_object_instance(p_intf);
     var_DelCallback(libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
     var_DelCallback(libvlc, "intf-show", ShowController, (__bridge void *)self);
+    var_DelCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
 
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
@@ -358,7 +374,7 @@ static VLCMain *sharedInstance = nil;
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update
 {
     [NSApp activateIgnoringOtherApps:YES];
-    [[VLCCoreInteraction sharedInstance] stop];
+    [_playlistController stopPlayback];
 }
 
 /* don't be enthusiastic about an update if we currently play a video */
@@ -377,7 +393,7 @@ static VLCMain *sharedInstance = nil;
 /* Triggered when the computer goes to sleep */
 - (void)computerWillSleep: (NSNotification *)notification
 {
-    [[VLCCoreInteraction sharedInstance] pause];
+    [_playlistController pausePlayback];
 }
 
 #pragma mark -

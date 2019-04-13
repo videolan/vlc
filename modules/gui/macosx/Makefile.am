@@ -26,10 +26,6 @@ libmacosx_plugin_la_LDFLAGS += -Wl,-framework,Sparkle
 endif
 
 libmacosx_plugin_la_SOURCES = \
-	gui/macosx/coreinteraction/VLCClickerManager.h \
-	gui/macosx/coreinteraction/VLCClickerManager.m \
-	gui/macosx/coreinteraction/VLCCoreInteraction.h \
-	gui/macosx/coreinteraction/VLCCoreInteraction.m \
 	gui/macosx/coreinteraction/VLCVideoFilterHelper.h \
 	gui/macosx/coreinteraction/VLCVideoFilterHelper.m \
 	gui/macosx/extensions/NSScreen+VLCAdditions.h \
@@ -87,6 +83,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/menus/renderers/VLCRendererMenuController.h \
 	gui/macosx/menus/renderers/VLCRendererMenuController.m \
 	gui/macosx/os-integration/Spotify.h \
+	gui/macosx/os-integration/VLCClickerManager.h \
+	gui/macosx/os-integration/VLCClickerManager.m \
 	gui/macosx/os-integration/VLCDocumentController.h \
 	gui/macosx/os-integration/VLCDocumentController.m \
 	gui/macosx/os-integration/VLCKeyboardBacklightControl.h \

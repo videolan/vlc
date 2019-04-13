@@ -448,10 +448,6 @@ modules/demux/xa.c
 modules/demux/xiph.h
 modules/demux/xiph_metadata.c
 modules/demux/xiph_metadata.h
-modules/gui/macosx/coreinteraction/VLCClickerManager.h
-modules/gui/macosx/coreinteraction/VLCClickerManager.m
-modules/gui/macosx/coreinteraction/VLCCoreInteraction.h
-modules/gui/macosx/coreinteraction/VLCCoreInteraction.m
 modules/gui/macosx/coreinteraction/VLCVideoFilterHelper.h
 modules/gui/macosx/coreinteraction/VLCVideoFilterHelper.m
 modules/gui/macosx/extensions/NSScreen+VLCAdditions.h
@@ -488,6 +484,8 @@ modules/gui/macosx/menus/renderers/VLCRendererItem.m
 modules/gui/macosx/menus/renderers/VLCRendererMenuController.h
 modules/gui/macosx/menus/renderers/VLCRendererMenuController.m
 modules/gui/macosx/os-integration/Spotify.h
+modules/gui/macosx/os-integration/VLCClickerManager.h
+modules/gui/macosx/os-integration/VLCClickerManager.m
 modules/gui/macosx/os-integration/VLCDocumentController.h
 modules/gui/macosx/os-integration/VLCDocumentController.m
 modules/gui/macosx/os-integration/VLCKeyboardBacklightControl.h
