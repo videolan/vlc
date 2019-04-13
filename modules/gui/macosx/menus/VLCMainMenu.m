@@ -23,7 +23,6 @@
 #import "VLCMainMenu.h"
 #import "main/VLCMain.h"
 
-#import "coreinteraction/VLCCoreInteraction.h"
 #import "coreinteraction/VLCVideoFilterHelper.h"
 
 #import "extensions/NSScreen+VLCAdditions.h"
@@ -804,8 +803,8 @@
 - (void)lockVideosAspectRatio:(id)sender
 {
     // FIXME: re-write the following using VLCPlayerController
-    [[VLCCoreInteraction sharedInstance] setAspectRatioIsLocked: ![sender state]];
-    [sender setState: [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]];
+    [_playerController setAspectRatioIsLocked: ![sender state]];
+    [sender setState: [_playerController aspectRatioIsLocked]];
 }
 
 - (IBAction)quitAfterPlayback:(id)sender
@@ -1166,8 +1165,18 @@
 
     i_returnValue = [openPanel runModal];
 
-    if (i_returnValue == NSModalResponseOK)
-        [[VLCCoreInteraction sharedInstance] addSubtitlesToCurrentInput:[openPanel URLs]];
+    if (i_returnValue == NSModalResponseOK) {
+        NSArray *URLs = [openPanel URLs];
+        NSUInteger count = [URLs count];
+        for (int i = 0; i < count ; i++) {
+            NSURL *url = URLs[i];
+            [_playerController addAssociatedMediaToCurrentFromURL:url
+                                                       ofCategory:SPU_ES
+                                                 shallSelectTrack:YES
+                                                  shallDisplayOSD:YES
+                                             shallVerifyExtension:NO];
+        }
+    }
 }
 
 - (void)switchSubtitleSize:(id)sender
@@ -1559,7 +1568,7 @@
         lmi_tmp2 = [menu addItemWithTitle: _NS("Lock Aspect Ratio") action: @selector(lockVideosAspectRatio:) keyEquivalent: @""];
         [lmi_tmp2 setTarget: self];
         [lmi_tmp2 setEnabled: YES];
-        [lmi_tmp2 setState: [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]];
+        [lmi_tmp2 setState: [_playerController aspectRatioIsLocked]];
         [parent setEnabled: YES];
         [menu addItem: [NSMenuItem separatorItem]];
     }

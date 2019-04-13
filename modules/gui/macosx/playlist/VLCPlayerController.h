@@ -803,6 +803,11 @@ extern NSString *VLCPlayerMuteChanged;
  */
 - (void)setVideoFilterChain:(nullable NSString *)filterChain forType:(enum vlc_vout_filter_type)filterType;
 
+/**
+ * defines whether the vout windows lock on the video's AR or can be resized arbitrarily
+ */
+@property (nonatomic, readwrite) BOOL aspectRatioIsLocked;
+
 #pragma mark - audio output properties
 
 /**
