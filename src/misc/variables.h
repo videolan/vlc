@@ -51,8 +51,6 @@ struct vlc_object_internals
 # define vlc_internals( obj ) (((vlc_object_internals_t*)(VLC_OBJECT(obj)))-1)
 # define vlc_externals( priv ) ((vlc_object_t *)((priv) + 1))
 
-void DumpVariables(vlc_object_t *obj);
-
 extern void var_DestroyAll( vlc_object_t * );
 
 /**
