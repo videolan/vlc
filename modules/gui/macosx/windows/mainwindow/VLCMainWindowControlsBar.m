@@ -25,7 +25,6 @@
 
 #import <vlc_aout.h>
 
-#import "coreinteraction/VLCCoreInteraction.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
@@ -138,9 +137,9 @@
     [self.shuffleButton setImage: _shuffleImage];
     [self.shuffleButton setAlternateImage: _pressedShuffleImage];
 
-    BOOL b_mute = ![[VLCCoreInteraction sharedInstance] mute];
+    BOOL b_mute = ![_playerController mute];
     [self.volumeSlider setEnabled: b_mute];
-    [self.volumeSlider setMaxValue: [[VLCCoreInteraction sharedInstance] maxVolume]];
+    [self.volumeSlider setMaxValue: AOUT_VOLUME_MAX];
     [self.volumeSlider setDefaultValue: AOUT_VOLUME_DEFAULT];
     [self.volumeUpButton setEnabled: b_mute];
 
@@ -390,11 +389,11 @@
 - (IBAction)volumeAction:(id)sender
 {
     if (sender == self.volumeSlider)
-        [[VLCCoreInteraction sharedInstance] setVolume: [sender intValue]];
+        [_playerController setVolume: [sender floatValue]];
     else if (sender == self.volumeDownButton)
-        [[VLCCoreInteraction sharedInstance] toggleMute];
+        [_playerController toggleMute];
     else
-        [[VLCCoreInteraction sharedInstance] setVolume: AOUT_VOLUME_MAX];
+        [_playerController setVolume: AOUT_VOLUME_MAX];
 }
 
 - (IBAction)effects:(id)sender
