@@ -22,19 +22,19 @@
 
 #import "VLCClickerManager.h"
 
-#include <vlc_common.h>
-#include <vlc_actions.h>
-
-#import "coreinteraction/VLCCoreInteraction.h"
 #import "extensions/NSSound+VLCAdditions.h"
 #import "imported/SPMediaKeyTap/SPMediaKeyTap.h"
 #import "imported/AppleRemote/AppleRemote.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistModel.h"
+#import "playlist/VLCPlayerController.h"
 
 @interface VLCClickerManager()
 {
+    VLCPlaylistController *_playlistController;
+    VLCPlayerController *_playerController;
+
     /* media key support */
     BOOL b_mediaKeySupport;
     BOOL b_mediakeyJustJumped;
@@ -52,12 +52,15 @@
 {
     self = [super init];
     if (self) {
+        _playlistController = [[VLCMain sharedInstance] playlistController];
+        _playerController = [_playlistController playerController];
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+
         /* init media key support */
         b_mediaKeySupport = var_InheritBool(getIntf(), "macosx-mediakeys");
         if (b_mediaKeySupport) {
             _mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
         }
-        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
                                selector:@selector(coreChangedMediaKeySupportSetting:)
                                    name:VLCMediaKeySupportSettingChangedNotification
@@ -66,6 +69,12 @@
                                selector:@selector(coreChangedAppleRemoteSetting:)
                                    name:VLCAppleRemoteSettingChangedNotification
                                  object:nil];
+
+
+        /* init Apple Remote support */
+        _remote = [[AppleRemote alloc] init];
+        [_remote setClickCountEnabledButtons: kRemoteButtonPlay];
+        [_remote setDelegate: self];
         [notificationCenter addObserver:self
                                selector:@selector(startListeningWithAppleRemote)
                                    name:NSApplicationDidBecomeActiveNotification
@@ -74,11 +83,6 @@
                                selector:@selector(stopListeningWithAppleRemote)
                                    name:NSApplicationDidResignActiveNotification
                                  object:nil];
-
-        /* init Apple Remote support */
-        _remote = [[AppleRemote alloc] init];
-        [_remote setClickCountEnabledButtons: kRemoteButtonPlay];
-        [_remote setDelegate: self];
     }
     return self;
 }
@@ -98,7 +102,7 @@
     b_mediakeyJustJumped = NO;
 }
 
-- (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification
+- (void)coreChangedMediaKeySupportSetting:(NSNotification *)o_notification
 {
     intf_thread_t *p_intf = getIntf();
     if (!p_intf)
@@ -138,14 +142,15 @@
         int keyState = (((keyFlags & 0xFF00) >> 8)) == 0xA;
         int keyRepeat = (keyFlags & 0x1);
 
-        if (keyCode == NX_KEYTYPE_PLAY && keyState == 0)
-            [[VLCCoreInteraction sharedInstance] playOrPause];
+        if (keyCode == NX_KEYTYPE_PLAY && keyState == 0) {
+            [_playerController togglePlayPause];
+        }
 
         if ((keyCode == NX_KEYTYPE_FAST || keyCode == NX_KEYTYPE_NEXT) && !b_mediakeyJustJumped) {
-            if (keyState == 0 && keyRepeat == 0)
-                [[VLCCoreInteraction sharedInstance] next];
-            else if (keyRepeat == 1) {
-                [[VLCCoreInteraction sharedInstance] forwardShort];
+            if (keyState == 0 && keyRepeat == 0) {
+                [_playlistController playNextItem];
+            } else if (keyRepeat == 1) {
+                [_playerController jumpForwardShort];
                 b_mediakeyJustJumped = YES;
                 [self performSelector:@selector(resetMediaKeyJump)
                            withObject: NULL
@@ -154,10 +159,10 @@
         }
 
         if ((keyCode == NX_KEYTYPE_REWIND || keyCode == NX_KEYTYPE_PREVIOUS) && !b_mediakeyJustJumped) {
-            if (keyState == 0 && keyRepeat == 0)
-                [[VLCCoreInteraction sharedInstance] previous];
-            else if (keyRepeat == 1) {
-                [[VLCCoreInteraction sharedInstance] backwardShort];
+            if (keyState == 0 && keyRepeat == 0) {
+                [_playlistController playPreviousItem];
+            } else if (keyRepeat == 1) {
+                [_playerController jumpBackwardShort];
                 b_mediakeyJustJumped = YES;
                 [self performSelector:@selector(resetMediaKeyJump)
                            withObject: NULL
@@ -170,7 +175,7 @@
 #pragma mark -
 #pragma mark Apple Remote Control
 
-- (void)coreChangedAppleRemoteSetting: (NSNotification *)notification
+- (void)coreChangedAppleRemoteSetting:(NSNotification *)notification
 {
     if (var_InheritBool(getIntf(), "macosx-appleremote") == YES) {
         [_remote startListening: self];
@@ -192,27 +197,21 @@
 
 /* Helper method for the remote control interface in order to trigger forward/backward and volume
  increase/decrease as long as the user holds the left/right, plus/minus button */
-- (void) executeHoldActionForRemoteButton: (NSNumber*) buttonIdentifierNumber
+- (void)executeHoldActionForRemoteButton:(NSNumber *)buttonIdentifierNumber
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
     if (b_remote_button_hold) {
         switch([buttonIdentifierNumber intValue]) {
             case kRemoteButtonRight_Hold:
-                [[VLCCoreInteraction sharedInstance] forwardShort];
+                [_playerController jumpForwardShort];
                 break;
             case kRemoteButtonLeft_Hold:
-                [[VLCCoreInteraction sharedInstance] backwardShort];
+                [_playerController jumpBackwardShort];
                 break;
             case kRemoteButtonVolume_Plus_Hold:
-                if (p_intf)
-                    var_SetInteger(vlc_object_instance(p_intf), "key-action", ACTIONID_VOL_UP);
+                [_playerController incrementVolume];
                 break;
             case kRemoteButtonVolume_Minus_Hold:
-                if (p_intf)
-                    var_SetInteger(vlc_object_instance(p_intf), "key-action", ACTIONID_VOL_DOWN);
+                [_playerController decrementVolume];
                 break;
         }
         if (b_remote_button_hold) {
@@ -225,52 +224,48 @@
 }
 
 /* Apple Remote callback */
-- (void) appleRemoteButton: (AppleRemoteEventIdentifier)buttonIdentifier
-               pressedDown: (BOOL) pressedDown
-                clickCount: (unsigned int) count
+- (void)appleRemoteButton:(AppleRemoteEventIdentifier)buttonIdentifier
+              pressedDown:(BOOL)pressedDown
+               clickCount:(unsigned int)count
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
     switch(buttonIdentifier) {
         case k2009RemoteButtonFullscreen:
-            [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+            [_playerController toggleFullscreen];
             break;
         case k2009RemoteButtonPlay:
-            [[VLCCoreInteraction sharedInstance] playOrPause];
+            [_playerController togglePlayPause];
             break;
         case kRemoteButtonPlay:
             if (count >= 2)
-                [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+                [_playerController toggleFullscreen];
             else
-                [[VLCCoreInteraction sharedInstance] playOrPause];
+                [_playerController togglePlayPause];
             break;
         case kRemoteButtonVolume_Plus:
-            if (config_GetInt("macosx-appleremote-sysvol"))
+            if (config_GetInt("macosx-appleremote-sysvol")) {
                 [NSSound increaseSystemVolume];
-            else
-                if (p_intf)
-                    var_SetInteger(vlc_object_instance(p_intf), "key-action", ACTIONID_VOL_UP);
+            } else {
+                [_playerController incrementVolume];
+            }
             break;
         case kRemoteButtonVolume_Minus:
-            if (config_GetInt("macosx-appleremote-sysvol"))
+            if (config_GetInt("macosx-appleremote-sysvol")) {
                 [NSSound decreaseSystemVolume];
-            else
-                if (p_intf)
-                    var_SetInteger(vlc_object_instance(p_intf), "key-action", ACTIONID_VOL_DOWN);
+            } else {
+                [_playerController decrementVolume];
+            }
             break;
         case kRemoteButtonRight:
             if (config_GetInt("macosx-appleremote-prevnext"))
-                [[VLCCoreInteraction sharedInstance] forwardShort];
+                [_playerController jumpForwardShort];
             else
-                [[VLCCoreInteraction sharedInstance] next];
+                [_playlistController playNextItem];
             break;
         case kRemoteButtonLeft:
             if (config_GetInt("macosx-appleremote-prevnext"))
-                [[VLCCoreInteraction sharedInstance] backwardShort];
+                [_playerController jumpBackwardShort];
             else
-                [[VLCCoreInteraction sharedInstance] previous];
+                [_playlistController playPreviousItem];
             break;
         case kRemoteButtonRight_Hold:
         case kRemoteButtonLeft_Hold:
@@ -285,7 +280,7 @@
             }
             break;
         case kRemoteButtonMenu:
-            [[VLCCoreInteraction sharedInstance] showPosition];
+            [_playerController displayPosition];
             break;
         case kRemoteButtonPlay_Sleep:
         {
