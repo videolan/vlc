@@ -31,7 +31,6 @@
 #import <vlc_url.h>
 
 #import "main/VLCMain.h"
-#import "coreinteraction/VLCCoreInteraction.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 #import "windows/VLCOpenInputMetadata.h"
@@ -59,7 +58,6 @@
 
 @end
 
-
 /*****************************************************************************
  * VLControlScriptCommand implementation
  *****************************************************************************/
@@ -67,86 +65,84 @@
  * This entire control command needs a better design. more object oriented.
  * Applescript developers would be very welcome (hartman)
  */
+
 @implementation VLControlScriptCommand
 
 - (id)performDefaultImplementation
 {
+    VLCPlaylistController *playlistController;
+    VLCPlayerController *playerController;
+
     NSString *commandString = [[self commandDescription] commandName];
     NSString *parameterString = [self directParameter];
-    VLCCoreInteraction *coreInteractionInstance = [VLCCoreInteraction sharedInstance];
 
-    if ([commandString isEqualToString:@"play"])
-        [coreInteractionInstance playOrPause];
-    else if ([commandString isEqualToString:@"stop"])
-        [coreInteractionInstance stop];
-    else if ([commandString isEqualToString:@"previous"])
-        [coreInteractionInstance previous];
-    else if ([commandString isEqualToString:@"next"])
-        [coreInteractionInstance next];
-    else if ([commandString isEqualToString:@"fullscreen"])
-        [coreInteractionInstance toggleFullscreen];
-    else if ([commandString isEqualToString:@"mute"])
-        [coreInteractionInstance toggleMute];
-    else if ([commandString isEqualToString:@"volumeUp"])
-        [coreInteractionInstance volumeUp];
-    else if ([commandString isEqualToString:@"volumeDown"])
-        [coreInteractionInstance volumeDown];
-    else if ([commandString isEqualToString:@"moveMenuFocusUp"])
-        [coreInteractionInstance moveMenuFocusUp];
-    else if ([commandString isEqualToString:@"moveMenuFocusDown"])
-        [coreInteractionInstance moveMenuFocusDown];
-    else if ([commandString isEqualToString:@"moveMenuFocusLeft"])
-        [coreInteractionInstance moveMenuFocusLeft];
-    else if ([commandString isEqualToString:@"moveMenuFocusRight"])
-        [coreInteractionInstance moveMenuFocusRight];
-    else if ([commandString isEqualToString:@"menuFocusActivate"])
-        [coreInteractionInstance menuFocusActivate];
-    else if ([commandString isEqualToString:@"stepForward"]) {
-        //default: forwardShort
+    if ([commandString isEqualToString:@"play"]) {
+        [playerController togglePlayPause];
+    } else if ([commandString isEqualToString:@"stop"]) {
+        [playerController stop];
+    } else if ([commandString isEqualToString:@"previous"]) {
+        [playlistController playPreviousItem];
+    } else if ([commandString isEqualToString:@"next"]) {
+        [playlistController playNextItem];
+    } else if ([commandString isEqualToString:@"fullscreen"]) {
+        [playerController toggleFullscreen];
+    } else if ([commandString isEqualToString:@"mute"]) {
+        [playerController toggleMute];
+    } else if ([commandString isEqualToString:@"volumeUp"]) {
+        [playerController incrementVolume];
+    } else if ([commandString isEqualToString:@"volumeDown"]) {
+        [playerController decrementVolume];
+    } else if ([commandString isEqualToString:@"moveMenuFocusUp"]) {
+        [playerController navigateInInteractiveContent:VLC_PLAYER_NAV_UP];
+    } else if ([commandString isEqualToString:@"moveMenuFocusDown"]) {
+        [playerController navigateInInteractiveContent:VLC_PLAYER_NAV_DOWN];
+    } else if ([commandString isEqualToString:@"moveMenuFocusLeft"]) {
+        [playerController navigateInInteractiveContent:VLC_PLAYER_NAV_LEFT];
+    } else if ([commandString isEqualToString:@"moveMenuFocusRight"]) {
+        [playerController navigateInInteractiveContent:VLC_PLAYER_NAV_RIGHT];
+    } else if ([commandString isEqualToString:@"menuFocusActivate"]) {
+        [playerController navigateInInteractiveContent:VLC_PLAYER_NAV_ACTIVATE];
+    } else if ([commandString isEqualToString:@"stepForward"]) {
         if (parameterString) {
             int parameterInt = [parameterString intValue];
             switch (parameterInt) {
                 case 1:
-                    [coreInteractionInstance forwardExtraShort];
-                    break;
-                case 2:
-                    [coreInteractionInstance forwardShort];
+                    [playerController jumpForwardExtraShort];
                     break;
                 case 3:
-                    [coreInteractionInstance forwardMedium];
+                    [playerController jumpForwardMedium];
                     break;
                 case 4:
-                    [coreInteractionInstance forwardLong];
+                    [playerController jumpForwardLong];
                     break;
+                case 2:
                 default:
-                    [coreInteractionInstance forwardShort];
+                    [playerController jumpForwardShort];
                     break;
             }
         } else
-            [coreInteractionInstance forwardShort];
+            [playerController jumpForwardShort];
     } else if ([commandString isEqualToString:@"stepBackward"]) {
         //default: backwardShort
         if (parameterString) {
             int parameterInt = [parameterString intValue];
             switch (parameterInt) {
                 case 1:
-                    [coreInteractionInstance backwardExtraShort];
-                    break;
-                case 2:
-                    [coreInteractionInstance backwardShort];
+                    [playerController jumpBackwardExtraShort];
                     break;
                 case 3:
-                    [coreInteractionInstance backwardMedium];
+                    [playerController jumpBackwardMedium];
                     break;
                 case 4:
-                    [coreInteractionInstance backwardLong];
+                    [playerController jumpBackwardLong];
                     break;
+                case 2:
                 default:
-                    [coreInteractionInstance backwardShort];
+                    [playerController jumpBackwardShort];
                     break;
             }
         } else
-            [coreInteractionInstance backwardShort];
+            [playerController jumpBackwardShort];
     }
    return nil;
 }
@@ -170,7 +166,7 @@
 
 - (BOOL)muted
 {
-    return [[VLCCoreInteraction sharedInstance] mute];
+    return [[[[VLCMain sharedInstance] playlistController] playerController] mute];
 }
 
 - (BOOL)playing
@@ -184,14 +180,14 @@
     return NO;
 }
 
-- (int)audioVolume
+- (float)audioVolume
 {
-    return [[VLCCoreInteraction sharedInstance] volume];
+    return [[[[VLCMain sharedInstance] playlistController] playerController] volume];
 }
 
-- (void)setAudioVolume:(int)volume
+- (void)setAudioVolume:(float)volume
 {
-    [[VLCCoreInteraction sharedInstance] setVolume:volume];
+    [[[[VLCMain sharedInstance] playlistController] playerController] setVolume:volume];
 }
 
 - (long long)audioDesync
@@ -216,17 +212,17 @@
 
 - (NSInteger)durationOfCurrentItem
 {
-    return [[VLCCoreInteraction sharedInstance] durationOfCurrentPlaylistItem];
+    return SEC_FROM_VLC_TICK([[[VLCMain sharedInstance] playlistController] playerController].durationOfCurrentMediaItem);
 }
 
 - (NSString *)pathOfCurrentItem
 {
-    return [[[VLCCoreInteraction sharedInstance] URLOfCurrentPlaylistItem] path];
+    return [[[[VLCMain sharedInstance] playlistController] playerController].URLOfCurrentMediaItem path];
 }
 
 - (NSString *)nameOfCurrentItem
 {
-    return [[VLCCoreInteraction sharedInstance] nameOfCurrentPlaylistItem];
+    return [[[[VLCMain sharedInstance] playlistController] playerController] nameOfCurrentMediaItem];
 }
 
 - (BOOL)playbackShowsMenu
