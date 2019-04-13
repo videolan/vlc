@@ -41,8 +41,10 @@ typedef struct
     vout_window_t wnd;
     module_t *module;
     vlc_inhibit_t *inhibit;
+    bool inhibit_windowed;
     bool active;
     bool fullscreen;
+    vlc_mutex_t lock;
 } window_t;
 
 static int vout_window_start(void *func, bool forced, va_list ap)
@@ -68,21 +70,31 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     window->sys = NULL;
     assert(owner != NULL);
     window->owner = *owner;
+
+    int dss = var_InheritInteger(obj, "disable-screensaver");
+
+    w->inhibit = NULL;
+    w->inhibit_windowed = dss == 1;
     w->active = false;
     w->fullscreen = false;
+    vlc_mutex_init(&w->lock);
 
     w->module = vlc_module_load(window, "vout window", module, false,
                                 vout_window_start, window);
     if (!w->module) {
+        vlc_mutex_destroy(&w->lock);
         vlc_object_delete(window);
         return NULL;
     }
 
     /* Hook for screensaver inhibition */
-    if (var_InheritInteger(obj, "disable-screensaver"))
-        w->inhibit = vlc_inhibit_Create(VLC_OBJECT(window));
-    else
-        w->inhibit = NULL;
+    if (dss > 0) {
+        vlc_inhibit_t *inh = vlc_inhibit_Create(VLC_OBJECT(window));
+
+        vlc_mutex_lock(&w->lock);
+        w->inhibit = inh;
+        vlc_mutex_unlock(&w->lock);
+    }
     return window;
 }
 
@@ -114,30 +126,60 @@ void vout_window_Delete(vout_window_t *window)
 
     window_t *w = container_of(window, window_t, wnd);
 
-    if (w->inhibit != NULL)
-        vlc_inhibit_Destroy(w->inhibit);
+    if (w->inhibit != NULL) {
+        vlc_inhibit_t *inh = w->inhibit;
+
+        assert(!w->active);
+        vlc_mutex_lock(&w->lock);
+        w->inhibit = NULL;
+        vlc_mutex_unlock(&w->lock);
+
+        vlc_inhibit_Destroy(inh);
+    }
+
     if (window->ops->destroy != NULL)
         window->ops->destroy(window);
+
     vlc_objres_clear(VLC_OBJECT(window));
+    vlc_mutex_destroy(&w->lock);
     vlc_object_delete(window);
+}
+
+static void vout_window_UpdateInhibitionUnlocked(vout_window_t *window)
+{
+    window_t *w = container_of(window, window_t, wnd);
+    unsigned flags = VLC_INHIBIT_NONE;
+
+    vlc_mutex_assert(&w->lock);
+
+    if (w->active && (w->inhibit_windowed || w->fullscreen))
+        flags = VLC_INHIBIT_VIDEO;
+    if (w->inhibit != NULL)
+        vlc_inhibit_Set(w->inhibit, flags);
 }
 
 void vout_window_SetInhibition(vout_window_t *window, bool enabled)
 {
-    window_t *w = (window_t *)window;
-    unsigned flags = enabled ? VLC_INHIBIT_VIDEO : VLC_INHIBIT_NONE;
+    window_t *w = container_of(window, window_t, wnd);
 
+    vlc_mutex_lock(&w->lock);
     w->active = enabled;
 
-    if (w->inhibit != NULL)
-        vlc_inhibit_Set(w->inhibit, flags);
+    vout_window_UpdateInhibitionUnlocked(window);
+    vlc_mutex_unlock(&w->lock);
 }
 
 void vout_window_ReportWindowed(vout_window_t *window)
 {
     window_t *w = container_of(window, window_t, wnd);
 
-    w->fullscreen = false;
+    if (!w->inhibit_windowed) {
+        vlc_mutex_lock(&w->lock);
+        w->fullscreen = false;
+
+        vout_window_UpdateInhibitionUnlocked(window);
+        vlc_mutex_unlock(&w->lock);
+    }
 
     if (window->owner.cbs->windowed != NULL)
         window->owner.cbs->windowed(window);
@@ -147,7 +189,12 @@ void vout_window_ReportFullscreen(vout_window_t *window, const char *id)
 {
     window_t *w = container_of(window, window_t, wnd);
 
-    w->fullscreen = true;
+    if (!w->inhibit_windowed) {
+        vlc_mutex_lock(&w->lock);
+        w->fullscreen = true;
+        vout_window_UpdateInhibitionUnlocked(window);
+        vlc_mutex_unlock(&w->lock);
+    }
 
     if (window->owner.cbs->fullscreened != NULL)
         window->owner.cbs->fullscreened(window, id);
