@@ -242,14 +242,14 @@ ifeq ($(shell git --version >/dev/null 2>&1 || echo FAIL),)
 GIT = git
 endif
 endif
-GIT ?= $(error git not found!)
+GIT ?= $(error git not found)
 
 ifndef SVN
 ifeq ($(shell svn --version >/dev/null 2>&1 || echo FAIL),)
 SVN = svn
 endif
 endif
-SVN ?= $(error subversion client (svn) not found!)
+SVN ?= $(error subversion client (svn) not found)
 
 ifeq ($(shell curl --version >/dev/null 2>&1 || echo FAIL),)
 download = curl -f -L -- "$(1)" > "$@"
@@ -264,7 +264,7 @@ download = (rm -f $@.tmp && \
 	touch $@.tmp && \
 	mv $@.tmp $@)
 else
-download = $(error Neither curl nor wget found!)
+download = $(error Neither curl nor wget found)
 endif
 
 download_pkg = $(call download,$(CONTRIB_VIDEOLAN)/$(2)/$(lastword $(subst /, ,$(@)))) || \
@@ -273,7 +273,7 @@ download_pkg = $(call download,$(CONTRIB_VIDEOLAN)/$(2)/$(lastword $(subst /, ,$
 ifeq ($(shell which xz >/dev/null 2>&1 || echo FAIL),)
 XZ = xz
 else
-XZ ?= $(error XZ (LZMA) compressor not found!)
+XZ ?= $(error XZ (LZMA) compressor not found)
 endif
 
 ifeq ($(shell sha512sum --version >/dev/null 2>&1 || echo FAIL),)
@@ -283,13 +283,13 @@ SHA512SUM = shasum -a 512 --check
 else ifeq ($(shell openssl version >/dev/null 2>&1 || echo FAIL),)
 SHA512SUM = openssl dgst -sha512
 else
-SHA512SUM = $(error SHA-512 checksumming not found!)
+SHA512SUM = $(error SHA-512 checksumming not found)
 endif
 
 ifeq ($(shell protoc --version >/dev/null 2>&1 || echo FAIL),)
 PROTOC = protoc
 else
-PROTOC ?= $(error Protobuf compiler (protoc) not found!)
+PROTOC ?= $(error Protobuf compiler (protoc) not found)
 endif
 
 #
