@@ -95,6 +95,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     }
     else
     {
+        obj->obj.logger = NULL;
         obj->obj.no_interact = false;
     }
 
