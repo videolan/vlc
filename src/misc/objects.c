@@ -131,26 +131,6 @@ void DumpStructureLocked(vlc_object_t *obj, FILE *output, unsigned level)
         DumpStructureLocked(vlc_externals(priv), output, level + 1);
 }
 
-/**
- * Prints the VLC object tree
- *
- * This function prints either an ASCII tree showing the connections between
- * vlc objects, and additional information such as their refcount, thread ID,
- * etc. (command "tree"), or the same data as a simple list (command "list").
- */
-static int TreeCommand (vlc_object_t *obj, char const *cmd,
-                        vlc_value_t oldval, vlc_value_t newval, void *data)
-{
-    (void) cmd; (void) oldval; (void) newval; (void) data;
-
-    flockfile(stdout);
-    vlc_mutex_lock(&tree_lock);
-    DumpStructureLocked(obj, stdout, 0);
-    vlc_mutex_unlock(&tree_lock);
-    funlockfile(stdout);
-    return VLC_SUCCESS;
-}
-
 #undef vlc_custom_create
 void *vlc_custom_create (vlc_object_t *parent, size_t length,
                          const char *typename)
@@ -194,12 +174,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     else
     {
         obj->obj.no_interact = false;
-
-        /* TODO: should be in src/libvlc.c */
-        int canc = vlc_savecancel ();
-        var_Create (obj, "tree", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
-        var_AddCallback (obj, "tree", TreeCommand, NULL);
-        vlc_restorecancel (canc);
     }
 
     return obj;
@@ -226,14 +200,7 @@ void (vlc_object_delete)(vlc_object_t *obj)
 
     assert(priv->resources == NULL);
 
-    int canc = vlc_savecancel();
-
-    if (unlikely(priv->parent == NULL))
-    {
-        /* TODO: should be in src/libvlc.c */
-        var_DelCallback(obj, "tree", TreeCommand, NULL);
-    }
-    else
+    if (likely(priv->parent != NULL))
     {
         vlc_mutex_lock(&tree_lock);
         vlc_list_remove(&priv->list);
@@ -241,6 +208,7 @@ void (vlc_object_delete)(vlc_object_t *obj)
     }
 
     /* Destroy the associated variables. */
+    int canc = vlc_savecancel();
     var_DestroyAll(obj);
     vlc_restorecancel(canc);
 
