@@ -677,7 +677,6 @@ vlc_mutex_marked
 vlc_global_mutex
 vlc_object_create
 vlc_object_delete
-vlc_object_find_name
 vlc_object_typename
 vlc_object_parent
 vlc_object_Log
