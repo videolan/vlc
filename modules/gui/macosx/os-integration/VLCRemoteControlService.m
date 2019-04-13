@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCRemoteControlService.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2017, 2018 VLC authors and VideoLAN
+ * Copyright (C) 2017-2019 VLC authors and VideoLAN
  *
  * Authors: Carola Nitz <nitz.carola # gmail.com>
  *          Felix Paul Kühne <fkuehne # videolan.org>
@@ -24,9 +24,10 @@
 #import <MediaPlayer/MediaPlayer.h>
 
 #import "VLCRemoteControlService.h"
-#import "coreinteraction/VLCCoreInteraction.h"
 #import "main/VLCMain.h"
 #import "main/CompatibilityFixes.h"
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 #define kVLCSettingPlaybackForwardSkipLength @(60)
 #define kVLCSettingPlaybackBackwardSkipLength @(60)
@@ -88,43 +89,41 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
 - (MPRemoteCommandHandlerStatus )remoteCommandEvent:(MPRemoteCommandEvent *)event
 {
     MPRemoteCommandCenter *cc = [MPRemoteCommandCenter sharedCommandCenter];
-    VLCCoreInteraction *coreInteraction = [VLCCoreInteraction sharedInstance];
+    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+    VLCPlayerController *playerController = [playlistController playerController];
 
     if (event.command == cc.playCommand) {
-        [coreInteraction play];
-        return MPRemoteCommandHandlerStatusSuccess;
+        return [playlistController startPlaylist] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusNoActionableNowPlayingItem;
     }
     if (event.command == cc.pauseCommand) {
-        [coreInteraction pause];
+        [playlistController pausePlayback];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.stopCommand) {
-        [coreInteraction stop];
+        [playlistController stopPlayback];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.togglePlayPauseCommand) {
-        [coreInteraction playOrPause];
+        [playerController togglePlayPause];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.nextTrackCommand) {
-        [coreInteraction next];
-        return MPRemoteCommandHandlerStatusSuccess;
+        return [playlistController playNextItem] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusCommandFailed;
     }
     if (event.command == cc.previousTrackCommand) {
-        [coreInteraction previous];
-        return MPRemoteCommandHandlerStatusSuccess;
+        return [playlistController playPreviousItem] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusCommandFailed;
     }
     if (event.command == cc.skipForwardCommand) {
-        [coreInteraction forwardMedium];
+        [playerController jumpForwardMedium];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.skipBackwardCommand) {
-        [coreInteraction backwardMedium];
+        [playerController jumpBackwardMedium];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.changePlaybackPositionCommand) {
         MPChangePlaybackPositionCommandEvent *positionEvent = (MPChangePlaybackPositionCommandEvent *)event;
-        [coreInteraction jumpToTime: vlc_tick_from_sec( positionEvent.positionTime )];
+        [playerController setTimeFast:vlc_tick_from_sec( positionEvent.positionTime )];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.changeRepeatModeCommand) {
@@ -132,21 +131,21 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
         MPRepeatType repeatType = repeatEvent.repeatType;
         switch (repeatType) {
             case MPRepeatTypeAll:
-                [coreInteraction repeatAll];
+                [playlistController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_ALL];
                  break;
 
             case MPRepeatTypeOne:
-                [coreInteraction repeatOne];
+                [playlistController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT];
                 break;
 
             default:
-                [coreInteraction repeatOff];
+                [playlistController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_NONE];;
                 break;
         }
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.changeShuffleModeCommand) {
-        [coreInteraction shuffle];
+        [playlistController setPlaybackOrder:[playlistController playbackOrder] == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL];
         return MPRemoteCommandHandlerStatusSuccess;
     }
 
