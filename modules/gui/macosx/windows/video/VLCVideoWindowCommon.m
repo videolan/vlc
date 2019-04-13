@@ -28,7 +28,6 @@
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "windows/mainwindow/VLCControlsBarCommon.h"
-#import "windows/mainwindow/VLCMainWindow.h"
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCFSPanelController.h"
 #import "playlist/VLCPlaylistController.h"
@@ -82,8 +81,24 @@
     return self;
 }
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)awakeFromNib
 {
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(mediaMetadataChanged:)
+                               name:VLCPlayerMetadataChangedForCurrentMedia
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(mediaMetadataChanged:)
+                               name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
+    [self mediaMetadataChanged:nil];
+
     BOOL b_nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
     if (b_nativeFullscreenMode) {
@@ -94,6 +109,46 @@
     }
 
     [super awakeFromNib];
+}
+
+- (void)mediaMetadataChanged:(NSNotification *)aNotification
+{
+    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+    input_item_t *mediaItem = [playlistController currentlyPlayingInputItem];
+    if (mediaItem == NULL || playlistController.playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
+        [self setTitle:_NS("VLC media player")];
+        self.representedURL = nil;
+        return;
+    }
+
+    NSString *title, *nowPlaying = nil;
+    char *tmp_cstr = NULL;
+
+    tmp_cstr = input_item_GetTitleFbName(mediaItem);
+    if (tmp_cstr) {
+        title = toNSStr(tmp_cstr);
+        FREENULL(tmp_cstr);
+    }
+
+    tmp_cstr = input_item_GetNowPlaying(mediaItem);
+    if (tmp_cstr) {
+        nowPlaying = toNSStr(tmp_cstr);
+        FREENULL(tmp_cstr);
+    }
+
+    if (nowPlaying) {
+        [self setTitle:[NSString stringWithFormat:@"%@ — %@", title, nowPlaying]];
+    } else {
+        [self setTitle:title];
+    }
+
+    tmp_cstr = input_item_GetURI(mediaItem);
+    if (tmp_cstr) {
+        self.representedURL = [NSURL URLWithString:toNSStr(tmp_cstr)];
+        FREENULL(tmp_cstr);
+    }
+
+    input_item_Release(mediaItem);
 }
 
 - (void)setTitle:(NSString *)title
