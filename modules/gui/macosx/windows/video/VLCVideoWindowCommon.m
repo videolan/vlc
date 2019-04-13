@@ -23,7 +23,6 @@
 
 #import "VLCVideoWindowCommon.h"
 
-#import "coreinteraction/VLCCoreInteraction.h"
 #import "extensions/NSScreen+VLCAdditions.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
@@ -390,7 +389,7 @@
     if ([_videoView isHidden])
         return proposedFrameSize;
 
-    if ([[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]) {
+    if ([[[[VLCMain sharedInstance] playlistController] playerController] aspectRatioIsLocked]) {
         NSRect videoWindowFrame = [self frame];
         NSRect viewRect = [_videoView convertRect:[_videoView bounds] toView: nil];
         NSRect contentRect = [self contentRectForFrameRect:videoWindowFrame];

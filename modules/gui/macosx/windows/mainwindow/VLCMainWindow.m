@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCMainWindow.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2013 VLC authors and VideoLAN
+ * Copyright (C) 2002-2019 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -26,14 +26,15 @@
 
 #import "VLCMainWindow.h"
 
-
 #import <math.h>
 
 #import <vlc_url.h>
 #import <vlc_strings.h>
 #import <vlc_services_discovery.h>
+#import <vlc_actions.h>
+#import <vlc_plugin.h>
+#import <vlc_modules.h>
 
-#import "coreinteraction/VLCCoreInteraction.h"
 #import "main/VLCMain.h"
 #import "main/CompatibilityFixes.h"
 #import "menus/VLCMainMenu.h"
@@ -46,6 +47,8 @@
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoOutputProvider.h"
 #import "windows/video/VLCFSPanelController.h"
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 @interface VLCMainWindow() <NSOutlineViewDataSource, NSOutlineViewDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate>
 {
@@ -63,6 +66,7 @@
     CGFloat f_lastLeftSplitViewWidth;
 
     NSRect frameBeforePlayback;
+    NSArray *_usedHotkeys;
 }
 - (void)makeSplitViewVisible;
 - (void)makeSplitViewHidden;
@@ -112,9 +116,135 @@ static const float f_min_window_height = 307.;
         b_force = YES;
     }
 
-    VLCCoreInteraction *coreInteraction = [VLCCoreInteraction sharedInstance];
-    return [coreInteraction hasDefinedShortcutKey:anEvent force:b_force] ||
-           [coreInteraction keyEvent:anEvent];
+    return [self hasDefinedShortcutKey:anEvent force:b_force] ||
+           [self keyEvent:anEvent];
+}
+
+- (BOOL)keyEvent:(NSEvent *)o_event
+{
+    BOOL eventHandled = NO;
+    NSString * characters = [o_event charactersIgnoringModifiers];
+    if ([characters length] > 0) {
+        unichar key = [characters characterAtIndex: 0];
+
+        if (key) {
+            VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+            vout_thread_t *p_vout = [playerController mainVideoOutputThread];
+            if (p_vout != NULL) {
+                /* Escape */
+                if (key == (unichar) 0x1b) {
+                    if (var_GetBool(p_vout, "fullscreen")) {
+                        [playerController toggleFullscreen];
+                        eventHandled = YES;
+                    }
+                }
+                vout_Release(p_vout);
+            }
+        }
+    }
+    return eventHandled;
+}
+
+- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force
+{
+    intf_thread_t *p_intf = getIntf();
+    if (!p_intf)
+        return NO;
+
+    unichar key = 0;
+    vlc_value_t val;
+    unsigned int i_pressed_modifiers = 0;
+
+    val.i_int = 0;
+    i_pressed_modifiers = [o_event modifierFlags];
+
+    if (i_pressed_modifiers & NSControlKeyMask)
+        val.i_int |= KEY_MODIFIER_CTRL;
+
+    if (i_pressed_modifiers & NSAlternateKeyMask)
+        val.i_int |= KEY_MODIFIER_ALT;
+
+    if (i_pressed_modifiers & NSShiftKeyMask)
+        val.i_int |= KEY_MODIFIER_SHIFT;
+
+    if (i_pressed_modifiers & NSCommandKeyMask)
+        val.i_int |= KEY_MODIFIER_COMMAND;
+
+    NSString * characters = [o_event charactersIgnoringModifiers];
+    if ([characters length] > 0) {
+        key = [[characters lowercaseString] characterAtIndex: 0];
+
+        /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
+        if (key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask) {
+            [[[[VLCMain sharedInstance] playlistController] playerController] toggleFullscreen];
+            return YES;
+        }
+
+        if (!b_force) {
+            switch(key) {
+                case NSDeleteCharacter:
+                case NSDeleteFunctionKey:
+                case NSDeleteCharFunctionKey:
+                case NSBackspaceCharacter:
+                case NSUpArrowFunctionKey:
+                case NSDownArrowFunctionKey:
+                case NSEnterCharacter:
+                case NSCarriageReturnCharacter:
+                    return NO;
+            }
+        }
+
+        val.i_int |= CocoaKeyToVLC(key);
+
+        BOOL b_found_key = NO;
+        NSUInteger numberOfUsedHotkeys = [_usedHotkeys count];
+        for (NSUInteger i = 0; i < numberOfUsedHotkeys; i++) {
+            const char *str = [[_usedHotkeys objectAtIndex:i] UTF8String];
+            unsigned int i_keyModifiers = VLCModifiersToCocoa((char *)str);
+
+            if ([[characters lowercaseString] isEqualToString:VLCKeyToString((char *)str)] &&
+                (i_keyModifiers & NSShiftKeyMask)     == (i_pressed_modifiers & NSShiftKeyMask) &&
+                (i_keyModifiers & NSControlKeyMask)   == (i_pressed_modifiers & NSControlKeyMask) &&
+                (i_keyModifiers & NSAlternateKeyMask) == (i_pressed_modifiers & NSAlternateKeyMask) &&
+                (i_keyModifiers & NSCommandKeyMask)   == (i_pressed_modifiers & NSCommandKeyMask)) {
+                b_found_key = YES;
+                break;
+            }
+        }
+
+        if (b_found_key) {
+            var_SetInteger(vlc_object_instance(p_intf), "key-pressed", val.i_int);
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+- (void)updateCurrentlyUsedHotkeys
+{
+    NSMutableArray *mutArray = [[NSMutableArray alloc] init];
+    /* Get the main Module */
+    module_t *p_main = module_get_main();
+    assert(p_main);
+    unsigned confsize;
+    module_config_t *p_config;
+
+    p_config = module_config_get (p_main, &confsize);
+
+    for (size_t i = 0; i < confsize; i++) {
+        module_config_t *p_item = p_config + i;
+
+        if (CONFIG_ITEM(p_item->i_type) && p_item->psz_name != NULL
+            && !strncmp(p_item->psz_name , "key-", 4)
+            && !EMPTY_STR(p_item->psz_text)) {
+            if (p_item->value.psz)
+                [mutArray addObject:toNSStr(p_item->value.psz)];
+        }
+    }
+    module_config_free (p_config);
+
+    _usedHotkeys = [[NSArray alloc] initWithArray:mutArray copyItems:YES];
 }
 
 - (void)dealloc
@@ -240,6 +370,8 @@ static const float f_min_window_height = 307.;
     /* restore split view */
     f_lastLeftSplitViewWidth = 200;
     [[[VLCMain sharedInstance] mainMenu] updateSidebarMenuItem: ![_splitView isSubviewCollapsed:_splitViewLeft]];
+
+    [self updateCurrentlyUsedHotkeys];
 }
 
 #pragma mark -
@@ -377,7 +509,7 @@ static const float f_min_window_height = 307.;
     // hasActiveVideo is defined for VLCVideoWindowCommon and subclasses
     if ([obj respondsToSelector:@selector(hasActiveVideo)] && [obj hasActiveVideo]) {
         if ([[VLCMain sharedInstance] activeVideoPlayback])
-            [[VLCCoreInteraction sharedInstance] stop];
+            [[[VLCMain sharedInstance] playlistController] stopPlayback];
     }
 }
 
@@ -388,7 +520,7 @@ static const float f_min_window_height = 307.;
 
         if ([obj class] == [VLCVideoWindowCommon class] || [obj class] == [VLCDetachedVideoWindow class] || ([obj class] == [VLCMainWindow class] && !self.nonembedded)) {
             if ([[VLCMain sharedInstance] activeVideoPlayback])
-                [[VLCCoreInteraction sharedInstance] pause];
+                [[[VLCMain sharedInstance] playlistController] pausePlayback];
         }
     }
 }
