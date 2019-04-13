@@ -32,7 +32,6 @@
 
 @interface VLCPlaybackContinuityController()
 {
-    __weak VLCMain *_mainInstance;
     input_item_t *p_current_input;
 }
 @end
@@ -53,7 +52,6 @@
 {
     self = [super init];
     if (self) {
-        _mainInstance = [VLCMain sharedInstance];
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
                                selector:@selector(inputItemChanged:)
@@ -75,17 +73,18 @@
 
     if (p_current_input) {
         /* continue playback where you left off */
-        [self storePlaybackPositionForItem:p_current_input player:_mainInstance.playlistController.playerController];
+        [self storePlaybackPositionForItem:p_current_input player:[VLCMain sharedInstance].playlistController.playerController];
     }
 }
 
 - (void)inputItemChanged:(NSNotification *)aNotification
 {
+    VLCMain *mainInstance = [VLCMain sharedInstance];
     // Cancel pending resume dialogs
-    [[_mainInstance resumeDialog] cancel];
+    [[mainInstance resumeDialog] cancel];
 
     // object is hold here and released then it is dead
-    p_current_input = [[_mainInstance playlistController] currentlyPlayingInputItem];
+    p_current_input = [[mainInstance playlistController] currentlyPlayingInputItem];
     if (p_current_input) {
         VLCPlaylistController *playlistController = aNotification.object;
         [self continuePlaybackWhereYouLeftOff:p_current_input player:playlistController.playerController];
@@ -96,7 +95,7 @@
 {
     // On shutdown, input might not be dead yet. Cleanup actions like itunes playback
     // and playback positon are done in different code paths (dealloc and appWillTerminate:).
-    if ([_mainInstance isTerminating]) {
+    if ([[VLCMain sharedInstance] isTerminating]) {
         return;
     }
 
@@ -187,7 +186,7 @@
         return;
     }
 
-    [[_mainInstance resumeDialog] showWindowWithItem:p_input_item
+    [[[VLCMain sharedInstance] resumeDialog] showWindowWithItem:p_input_item
                                     withLastPosition:lastPosition.intValue
                                      completionBlock:completionBlock];
 
