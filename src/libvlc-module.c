@@ -374,6 +374,11 @@ static const char *const ppsz_pos_descriptions[] =
 #define SS_TEXT N_("Disable screensaver")
 #define SS_LONGTEXT N_("Disable the screensaver during video playback." )
 
+static const int screensaver_values[] = { 0, 2, 1, };
+static const char *const screensaver_texts[] = {
+    N_("Never"), N_("When fullscreen"), N_("Always"),
+};
+
 #define VIDEO_DECO_TEXT N_("Window decorations")
 #define VIDEO_DECO_LONGTEXT N_( \
     "VLC can avoid creating window caption, frames, etc... around the video" \
@@ -1623,8 +1628,8 @@ vlc_module_begin ()
               VIDEO_ON_TOP_LONGTEXT, false )
     add_bool( "video-wallpaper", false, WALLPAPER_TEXT,
               WALLPAPER_LONGTEXT, false )
-    add_bool( "disable-screensaver", true, SS_TEXT, SS_LONGTEXT,
-              true )
+    add_integer("disable-screensaver", 1, SS_TEXT, SS_LONGTEXT, true)
+        change_integer_list(screensaver_values, screensaver_texts)
 
     add_bool( "video-title-show", 1, VIDEO_TITLE_SHOW_TEXT,
               VIDEO_TITLE_SHOW_LONGTEXT, false )
