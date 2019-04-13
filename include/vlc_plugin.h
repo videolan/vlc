@@ -374,8 +374,10 @@ VLC_METADATA_EXPORTS
 #define set_section( text, longtext ) \
     add_typedesc_inner( CONFIG_SECTION, text, longtext )
 
+#ifndef __PLUGIN__
 #define add_category_hint(text, longtext) \
     add_typedesc_inner( CONFIG_HINT_CATEGORY, text, longtext )
+#endif
 
 #define add_string( name, value, text, longtext, advc ) \
     add_string_inner(CONFIG_ITEM_STRING, name, text, longtext, value)
