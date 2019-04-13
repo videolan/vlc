@@ -1,6 +1,6 @@
 # opus
 
-OPUS_VERSION := 1.3
+OPUS_VERSION := 1.3.1
 
 OPUS_URL := https://archive.mozilla.org/pub/opus/opus-$(OPUS_VERSION).tar.gz
 
