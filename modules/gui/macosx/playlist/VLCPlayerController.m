@@ -33,6 +33,7 @@
 #import <MediaPlayer/MediaPlayer.h>
 
 NSString *VLCPlayerCurrentMediaItemChanged = @"VLCPlayerCurrentMediaItemChanged";
+NSString *VLCPlayerMetadataChangedForCurrentMedia = @"VLCPlayerMetadataChangedForCurrentMedia";
 NSString *VLCPlayerStateChanged = @"VLCPlayerStateChanged";
 NSString *VLCPlayerErrorChanged = @"VLCPlayerErrorChanged";
 NSString *VLCPlayerBufferFill = @"VLCPlayerBufferFill";
@@ -668,6 +669,9 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     }
 
     input_item_Release(inputItem);
+
+    [_defaultNotificationCenter postNotificationName:VLCPlayerMetadataChangedForCurrentMedia
+                                              object:self];
 }
 
 - (void)nextVideoFrame
