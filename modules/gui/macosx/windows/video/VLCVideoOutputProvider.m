@@ -357,12 +357,6 @@ int WindowOpen(vout_window_t *p_wnd)
     if ([newVideoWindow class] == [VLCMainWindow class])
         [[mainInstance mainWindow] changePlaylistState: psVideoStartedOrStoppedEvent];
 
-    if (!isEmbedded) {
-        // events might be posted before window is created, so call them again
-        [[mainInstance mainWindow] updateName];
-        [[mainInstance mainWindow] updateWindow]; // update controls bar
-    }
-
     // TODO: find a cleaner way for "start in fullscreen"
     // Start in fs, because either prefs settings, or fullscreen button was pressed before
 

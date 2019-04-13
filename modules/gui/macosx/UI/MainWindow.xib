@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -174,9 +174,6 @@
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </searchFieldCell>
-                                                        <connections>
-                                                            <action selector="searchItem:" target="21" id="sT4-O5-9TC"/>
-                                                        </connections>
                                                     </searchField>
                                                 </subviews>
                                                 <constraints>
@@ -291,9 +288,6 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
-                                                        <connections>
-                                                            <action selector="addPodcast:" target="21" id="5299"/>
-                                                        </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5302">
                                                         <rect key="frame" x="392" y="3" width="81" height="17"/>
@@ -301,9 +295,6 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
-                                                        <connections>
-                                                            <action selector="removePodcast:" target="21" id="5334"/>
-                                                        </connections>
                                                     </button>
                                                 </subviews>
                                                 <constraints>
@@ -766,9 +757,6 @@
 DQ
 </string>
                         </buttonCell>
-                        <connections>
-                            <action selector="addPodcastWindowAction:" target="21" id="5301"/>
-                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5268">
                         <rect key="frame" x="415" y="13" width="82" height="32"/>
@@ -779,9 +767,6 @@ DQ
 Gw
 </string>
                         </buttonCell>
-                        <connections>
-                            <action selector="addPodcastWindowAction:" target="21" id="5300"/>
-                        </connections>
                     </button>
                 </subviews>
                 <constraints>
@@ -852,9 +837,6 @@ Gw
 DQ
 </string>
                         </buttonCell>
-                        <connections>
-                            <action selector="removePodcastWindowAction:" target="21" id="5332"/>
-                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5307">
                         <rect key="frame" x="399" y="13" width="82" height="32"/>
@@ -865,9 +847,6 @@ DQ
 Gw
 </string>
                         </buttonCell>
-                        <connections>
-                            <action selector="removePodcastWindowAction:" target="21" id="5333"/>
-                        </connections>
                     </button>
                 </subviews>
                 <constraints>

@@ -95,24 +95,11 @@ typedef enum {
 
 - (IBAction)dropzoneButtonAction:(id)sender;
 
-- (IBAction)addPodcast:(id)sender;
-- (IBAction)addPodcastWindowAction:(id)sender;
-- (IBAction)removePodcast:(id)sender;
-- (IBAction)removePodcastWindowAction:(id)sender;
-
-- (IBAction)searchItem:(id)sender;
-- (IBAction)highlightSearchField:(id)sender;
-
 - (void)windowResizedOrMoved:(NSNotification *)notification;
-
-- (void)reloadSidebar;
 
 - (void)toggleLeftSubSplitView;
 - (void)showDropZone;
 - (void)hideDropZone;
-- (void)updateTimeSlider;
-- (void)updateWindow;
-- (void)updateName;
 
 - (void)showFullscreenController;
 

@@ -305,9 +305,6 @@ static VLCMain *sharedInstance = nil;
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
            name:NSWorkspaceWillSleepNotification object:nil];
 
-    /* update the main window */
-    [[self mainWindow] updateWindow];
-
     // respect playlist-autostart
     if (var_GetBool(p_intf, "playlist-autostart")) {
         if ([_playlistController.playlistModel numberOfPlaylistItems] > 0) {

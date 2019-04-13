@@ -29,14 +29,11 @@
 
 #import <math.h>
 
-#import <vlc_playlist_legacy.h>
 #import <vlc_url.h>
 #import <vlc_strings.h>
 #import <vlc_services_discovery.h>
 
 #import "coreinteraction/VLCCoreInteraction.h"
-#import "imported/PXSourceList/PXSourceList.h"
-#import "imported/PXSourceList/PXSourceListDataSource.h"
 #import "main/VLCMain.h"
 #import "main/CompatibilityFixes.h"
 #import "menus/VLCMainMenu.h"
@@ -50,7 +47,7 @@
 #import "windows/video/VLCVideoOutputProvider.h"
 #import "windows/video/VLCFSPanelController.h"
 
-@interface VLCMainWindow() <PXSourceListDataSource, PXSourceListDelegate, NSOutlineViewDataSource, NSOutlineViewDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate>
+@interface VLCMainWindow() <NSOutlineViewDataSource, NSOutlineViewDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate>
 {
     BOOL videoPlaybackEnabled;
     BOOL dropzoneActive;
@@ -65,18 +62,10 @@
     CGFloat f_lastSplitViewHeight;
     CGFloat f_lastLeftSplitViewWidth;
 
-    NSMutableArray *o_sidebaritems;
-
-    /* this is only true, when we have NO video playing inside the main window */
-
-    BOOL b_podcastView_displayed;
-
     NSRect frameBeforePlayback;
 }
 - (void)makeSplitViewVisible;
 - (void)makeSplitViewHidden;
-- (void)showPodcastControls;
-- (void)hidePodcastControls;
 @end
 
 static const float f_min_window_height = 307.;
@@ -152,11 +141,6 @@ static const float f_min_window_height = 307.;
     _nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
     b_dropzone_active = YES;
 
-    // (Re)load sidebar for the first time and select first item
-    [self reloadSidebar];
-    [_sidebarView selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
-
-
     /*
      * Set up translatable strings for the UI elements
      */
@@ -207,8 +191,6 @@ static const float f_min_window_height = 307.;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     if (![defaults objectForKey:@"VLCFirstRun"]) {
         [defaults setObject:[NSDate date] forKey:@"VLCFirstRun"];
-
-        [_sidebarView expandItem:nil expandChildren:YES];
 
         NSAlert *albumArtAlert = [[NSAlert alloc] init];
         [albumArtAlert setMessageText:_NS("Check for album art and metadata?")];
@@ -262,107 +244,6 @@ static const float f_min_window_height = 307.;
 
 #pragma mark -
 #pragma mark appearance management
-
-- (void)reloadSidebar
-{
-    BOOL isAReload = NO;
-    if (o_sidebaritems)
-        isAReload = YES;
-
-    o_sidebaritems = [[NSMutableArray alloc] init];
-    VLCSourceListItem *libraryItem = [VLCSourceListItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
-    VLCSourceListItem *playlistItem = [VLCSourceListItem itemWithTitle:_NS("Playlist") identifier:@"playlist"];
-    [playlistItem setIcon: imageFromRes(@"sidebar-playlist")];
-    VLCSourceListItem *mycompItem = [VLCSourceListItem itemWithTitle:_NS("MY COMPUTER") identifier:@"mycomputer"];
-    VLCSourceListItem *devicesItem = [VLCSourceListItem itemWithTitle:_NS("DEVICES") identifier:@"devices"];
-    VLCSourceListItem *lanItem = [VLCSourceListItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
-    VLCSourceListItem *internetItem = [VLCSourceListItem itemWithTitle:_NS("INTERNET") identifier:@"internet"];
-
-    /* SD subnodes, inspired by the Qt intf */
-    char **ppsz_longnames = NULL;
-    int *p_categories = NULL;
-    char **ppsz_names = vlc_sd_GetNames(pl_Get(getIntf()), &ppsz_longnames, &p_categories);
-    if (!ppsz_names)
-        msg_Err(getIntf(), "no sd item found"); //TODO
-    char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
-    int *p_category = p_categories;
-    NSMutableArray *internetItems = [[NSMutableArray alloc] init];
-    NSMutableArray *devicesItems = [[NSMutableArray alloc] init];
-    NSMutableArray *lanItems = [[NSMutableArray alloc] init];
-    NSMutableArray *mycompItems = [[NSMutableArray alloc] init];
-    NSString *o_identifier;
-    for (; ppsz_name && *ppsz_name; ppsz_name++, ppsz_longname++, p_category++) {
-        o_identifier = toNSStr(*ppsz_name);
-        switch (*p_category) {
-            case SD_CAT_INTERNET:
-                [internetItems addObject: [VLCSourceListItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                [[internetItems lastObject] setIcon: imageFromRes(@"sidebar-podcast")];
-                [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
-                break;
-            case SD_CAT_DEVICES:
-                [devicesItems addObject: [VLCSourceListItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                [[devicesItems lastObject] setIcon: imageFromRes(@"sidebar-local")];
-                [[devicesItems lastObject] setSdtype: SD_CAT_DEVICES];
-                break;
-            case SD_CAT_LAN:
-                [lanItems addObject: [VLCSourceListItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                [[lanItems lastObject] setIcon: imageFromRes(@"sidebar-local")];
-                [[lanItems lastObject] setSdtype: SD_CAT_LAN];
-                break;
-            case SD_CAT_MYCOMPUTER:
-                [mycompItems addObject: [VLCSourceListItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                if (!strncmp(*ppsz_name, "video_dir", 9))
-                    [[mycompItems lastObject] setIcon: imageFromRes(@"sidebar-movie")];
-                else if (!strncmp(*ppsz_name, "audio_dir", 9))
-                    [[mycompItems lastObject] setIcon: imageFromRes(@"sidebar-music")];
-                else if (!strncmp(*ppsz_name, "picture_dir", 11))
-                    [[mycompItems lastObject] setIcon: imageFromRes(@"sidebar-pictures")];
-                else
-                    [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
-                [[mycompItems lastObject] setSdtype: SD_CAT_MYCOMPUTER];
-                break;
-            default:
-                msg_Warn(getIntf(), "unknown SD type found, skipping (%s)", *ppsz_name);
-                break;
-        }
-
-        free(*ppsz_name);
-        free(*ppsz_longname);
-    }
-    [mycompItem setChildren: [NSArray arrayWithArray: mycompItems]];
-    [devicesItem setChildren: [NSArray arrayWithArray: devicesItems]];
-    [lanItem setChildren: [NSArray arrayWithArray: lanItems]];
-    [internetItem setChildren: [NSArray arrayWithArray: internetItems]];
-    free(ppsz_names);
-    free(ppsz_longnames);
-    free(p_categories);
-
-    [libraryItem setChildren: [NSArray arrayWithObjects:playlistItem, nil]];
-    [o_sidebaritems addObject: libraryItem];
-    if ([mycompItem hasChildren])
-        [o_sidebaritems addObject: mycompItem];
-    if ([devicesItem hasChildren])
-        [o_sidebaritems addObject: devicesItem];
-    if ([lanItem hasChildren])
-        [o_sidebaritems addObject: lanItem];
-    if ([internetItem hasChildren])
-        [o_sidebaritems addObject: internetItem];
-
-    [_sidebarView reloadData];
-    [_sidebarView setDropItem:playlistItem dropChildIndex:NSOutlineViewDropOnItemIndex];
-    [_sidebarView registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
-
-    [_sidebarView setAutosaveName:@"mainwindow-sidebar"];
-    [_sidebarView setDataSource:self];
-    [_sidebarView setDelegate:self];
-    [_sidebarView setAutosaveExpandedItems:YES];
-
-    [_sidebarView expandItem:libraryItem expandChildren:YES];
-
-    if (isAReload) {
-        [_sidebarView expandItem:nil expandChildren:YES];
-    }
-}
 
 // Show split view and hide the video view
 - (void)makeSplitViewVisible
@@ -546,7 +427,6 @@ static const float f_min_window_height = 307.;
 
 - (void)showSplitView:(BOOL)resize
 {
-    [self updateWindow];
     [self setContentMinSize:NSMakeSize(604., f_min_window_height)];
     [self setContentMaxSize: NSMakeSize(FLT_MAX, FLT_MAX)];
 
@@ -559,87 +439,6 @@ static const float f_min_window_height = 307.;
     }
 
     b_splitview_removed = NO;
-}
-
-- (void)updateTimeSlider
-{
-}
-
-- (void)updateName
-{
-    input_thread_t *p_input;
-    p_input = pl_CurrentInput(getIntf());
-    if (p_input) {
-        NSString *aString = @"";
-
-        if (!config_GetPsz("video-title")) {
-            char *format = var_InheritString(getIntf(), "input-title-format");
-            if (format) {
-                char *formated = vlc_strfinput(p_input, NULL, format);
-                free(format);
-                aString = toNSStr(formated);
-                free(formated);
-            }
-        } else
-            aString = toNSStr(config_GetPsz("video-title"));
-
-        char *uri = input_item_GetURI(input_GetItem(p_input));
-
-        NSURL * o_url = [NSURL URLWithString:toNSStr(uri)];
-        if ([o_url isFileURL]) {
-            [self setRepresentedURL: o_url];
-            [[[VLCMain sharedInstance] voutProvider] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
-                [o_window setRepresentedURL:o_url];
-            }];
-        } else {
-            [self setRepresentedURL: nil];
-            [[[VLCMain sharedInstance] voutProvider] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
-                [o_window setRepresentedURL:nil];
-            }];
-        }
-        free(uri);
-
-        if ([aString isEqualToString:@""]) {
-            if ([o_url isFileURL])
-                aString = [[NSFileManager defaultManager] displayNameAtPath: [o_url path]];
-            else
-                aString = [o_url absoluteString];
-        }
-
-        if ([aString length] > 0) {
-            [self setTitle: aString];
-            [[[VLCMain sharedInstance] voutProvider] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
-                [o_window setTitle:aString];
-            }];
-        } else {
-            [self setTitle: _NS("VLC media player")];
-            [self setRepresentedURL: nil];
-        }
-
-        input_Release(p_input);
-    } else {
-        [self setTitle: _NS("VLC media player")];
-        [self setRepresentedURL: nil];
-    }
-}
-
-- (void)updateWindow
-{
-    bool b_seekable = false;
-
-    playlist_t *p_playlist = pl_Get(getIntf());
-    input_thread_t *p_input = playlist_CurrentInput(p_playlist);
-    if (p_input) {
-        /* seekable streams */
-        b_seekable = var_GetBool(p_input, "can-seek");
-
-        input_Release(p_input);
-    }
-
-    [self showDropZone];
-    [_sidebarView setNeedsDisplay:YES];
-
-    [self _updatePlaylistTitle];
 }
 
 #pragma mark -
@@ -749,298 +548,6 @@ static const float f_min_window_height = 307.;
         [_splitView setPosition:[_splitView minPossiblePositionOfDividerAtIndex:0] ofDividerAtIndex:0];
 
     [[[VLCMain sharedInstance] mainMenu] updateSidebarMenuItem: ![_splitView isSubviewCollapsed:_splitViewLeft]];
-}
-
-#pragma mark -
-#pragma mark private playlist magic
-- (void)_updatePlaylistTitle
-{
-}
-
-- (NSString *)_playbackDurationOfNode:(playlist_item_t*)node
-{
-    if (!node)
-        return @"";
-
-    vlc_tick_t mt_duration = playlist_GetNodeDuration( node );
-
-    if (mt_duration < 1)
-        return @"";
-
-    NSDateComponentsFormatter *formatter = [[NSDateComponentsFormatter alloc] init];
-    formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleAbbreviated;
-
-    NSString* outputString = [formatter stringFromTimeInterval:SEC_FROM_VLC_TICK(mt_duration)];
-
-    return [NSString stringWithFormat:@" — %@", outputString];
-}
-
-- (IBAction)searchItem:(id)sender
-{
-}
-
-- (IBAction)highlightSearchField:(id)sender
-{
-    [_searchField selectText:sender];
-}
-
-#pragma mark -
-#pragma mark Side Bar Data handling
-/* taken under BSD-new from the PXSourceList sample project, adapted for VLC */
-- (NSUInteger)sourceList:(PXSourceList*)sourceList numberOfChildrenOfItem:(id)item
-{
-    //Works the same way as the NSOutlineView data source: `nil` means a parent item
-    if (item==nil)
-        return [o_sidebaritems count];
-    else
-        return [[item children] count];
-}
-
-
-- (id)sourceList:(PXSourceList*)aSourceList child:(NSUInteger)index ofItem:(id)item
-{
-    //Works the same way as the NSOutlineView data source: `nil` means a parent item
-    if (item==nil)
-        return [o_sidebaritems objectAtIndex:index];
-    else
-        return [[item children] objectAtIndex:index];
-}
-
-- (BOOL)sourceList:(PXSourceList*)aSourceList isItemExpandable:(id)item
-{
-    return [item hasChildren];
-}
-
-- (NSMenu*)sourceList:(PXSourceList*)aSourceList menuForEvent:(NSEvent*)theEvent item:(id)item
-{
-    if ([theEvent type] == NSRightMouseDown || ([theEvent type] == NSLeftMouseDown && ([theEvent modifierFlags] & NSControlKeyMask) == NSControlKeyMask)) {
-        if (item != nil) {
-            if ([item sdtype] > 0)
-            {
-                NSMenu *m = [[NSMenu alloc] init];
-                playlist_t * p_playlist = pl_Get(getIntf());
-                BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded(p_playlist, [[item identifier] UTF8String]);
-                if (!sd_loaded)
-                    [m addItemWithTitle:_NS("Enable") action:@selector(sdmenuhandler:) keyEquivalent:@""];
-                else
-                    [m addItemWithTitle:_NS("Disable") action:@selector(sdmenuhandler:) keyEquivalent:@""];
-                [[m itemAtIndex:0] setRepresentedObject: [item identifier]];
-                return m;
-            }
-        }
-    }
-
-    return nil;
-}
-
-- (IBAction)sdmenuhandler:(id)sender
-{
-    NSString * identifier = [sender representedObject];
-    if ([identifier length] > 0 && ![identifier isEqualToString:@"lua{sd='freebox',longname='Freebox TV'}"]) {
-        playlist_t * p_playlist = pl_Get(getIntf());
-        BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded(p_playlist, [identifier UTF8String]);
-
-        if (!sd_loaded)
-            playlist_ServicesDiscoveryAdd(p_playlist, [identifier UTF8String]);
-        else
-            playlist_ServicesDiscoveryRemove(p_playlist, [identifier UTF8String]);
-    }
-}
-
-#pragma mark -
-#pragma mark Side Bar Delegate Methods
-/* taken under BSD-new from the PXSourceList sample project, adapted for VLC */
-- (BOOL)sourceList:(PXSourceList*)aSourceList isGroupAlwaysExpanded:(id)group
-{
-    if ([[group identifier] isEqualToString:@"library"])
-        return YES;
-
-    return NO;
-}
-
-- (void)sourceListSelectionDidChange:(NSNotification *)notification
-{
-    playlist_t * p_playlist = pl_Get(getIntf());
-
-    NSIndexSet *selectedIndexes = [_sidebarView selectedRowIndexes];
-
-    if (selectedIndexes.count == 0)
-        return;
-
-    id item = [_sidebarView itemAtRow:[selectedIndexes firstIndex]];
-
-    //Set the label text to represent the new selection
-    if ([item sdtype] > -1 && [[item identifier] length] > 0) {
-        BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded(p_playlist, [[item identifier] UTF8String]);
-        if (!sd_loaded)
-            playlist_ServicesDiscoveryAdd(p_playlist, [[item identifier] UTF8String]);
-    }
-
-    [_categoryLabel setStringValue:[item title]];
-
-    if ([[item identifier] isEqualToString:@"playlist"]) {
-        [self _updatePlaylistTitle];
-    }
-
-    // Note the order: first hide the podcast controls, then show the drop zone
-    if ([[item identifier] isEqualToString:@"podcast"])
-        [self showPodcastControls];
-    else
-        [self hidePodcastControls];
-
-    [self showDropZone];
-
-    [[NSNotificationCenter defaultCenter] postNotificationName: VLCMediaKeySupportSettingChangedNotification
-                                                        object: nil
-                                                      userInfo: nil];
-}
-
-- (NSView *)sourceList:(PXSourceList *)aSourceList viewForItem:(id)item
-{
-    VLCSourceListTableCellView *cellView = nil;
-    if ([aSourceList levelForItem:item] == 0)
-        cellView = [aSourceList makeViewWithIdentifier:@"HeaderCell" owner:nil];
-    else
-        cellView = [aSourceList makeViewWithIdentifier:@"DataCell" owner:nil];
-
-    PXSourceListItem *sourceListItem = item;
-
-    cellView.textField.editable = NO;
-    cellView.textField.selectable = NO;
-
-    cellView.textField.stringValue = sourceListItem.title ? sourceListItem.title : @"";
-    cellView.imageView.image = [item icon];
-
-    // Badge count
-    if ([[item identifier] isEqualToString: @"playlist"]) {
-        playlist_t * p_playlist = pl_Get(getIntf());
-        NSInteger i_playlist_size = 0;
-
-        PL_LOCK;
-        i_playlist_size = p_playlist->p_playing->i_children;
-        PL_UNLOCK;
-
-        cellView.badgeView.integerValue = i_playlist_size;
-    } else {
-        cellView.badgeView.integerValue = sourceListItem.badgeValue.integerValue;
-    }
-
-    return cellView;
-}
-
-- (NSDragOperation)sourceList:(PXSourceList *)aSourceList validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
-{
-    if ([[item identifier] isEqualToString:@"playlist"]) {
-        NSPasteboard *o_pasteboard = [info draggingPasteboard];
-        if ([[o_pasteboard types] containsObject: NSFilenamesPboardType])
-            return NSDragOperationGeneric;
-    }
-    return NSDragOperationNone;
-}
-
-- (BOOL)sourceList:(PXSourceList *)aSourceList acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index
-{
-    return NO;
-}
-
-- (id)sourceList:(PXSourceList *)aSourceList persistentObjectForItem:(id)item
-{
-    return [item identifier];
-}
-
-- (id)sourceList:(PXSourceList *)aSourceList itemForPersistentObject:(id)object
-{
-    /* the following code assumes for sakes of simplicity that only the top level
-     * items are allowed to have children */
-
-    NSArray * array = [NSArray arrayWithArray: o_sidebaritems]; // read-only arrays are noticebly faster
-    NSUInteger count = [array count];
-    if (count < 1)
-        return nil;
-
-    for (NSUInteger x = 0; x < count; x++) {
-        id item = [array objectAtIndex:x]; // save one objc selector call
-        if ([[item identifier] isEqualToString:object])
-            return item;
-    }
-
-    return nil;
-}
-
-#pragma mark -
-#pragma mark Podcast
-
-- (IBAction)addPodcast:(id)sender
-{
-    [NSApp beginSheet:_podcastSubscribeWindow modalForWindow:self modalDelegate:self didEndSelector:NULL contextInfo:nil];
-}
-
-- (IBAction)addPodcastWindowAction:(id)sender
-{
-    [_podcastSubscribeWindow orderOut:sender];
-    [NSApp endSheet:_podcastSubscribeWindow];
-
-    if (sender == _podcastSubscribeOkButton && [[_podcastSubscribeUrlField stringValue] length] > 0) {
-        NSMutableString *podcastConf = [[NSMutableString alloc] init];
-        if (config_GetPsz("podcast-urls") != NULL)
-            [podcastConf appendFormat:@"%s|", config_GetPsz("podcast-urls")];
-
-        [podcastConf appendString: [_podcastSubscribeUrlField stringValue]];
-        config_PutPsz("podcast-urls", [podcastConf UTF8String]);
-        var_SetString(pl_Get(getIntf()), "podcast-urls", [podcastConf UTF8String]);
-    }
-}
-
-- (IBAction)removePodcast:(id)sender
-{
-    char *psz_urls = var_InheritString(pl_Get(getIntf()), "podcast-urls");
-    if (psz_urls != NULL) {
-        [_podcastUnsubscribePopUpButton removeAllItems];
-        [_podcastUnsubscribePopUpButton addItemsWithTitles:[toNSStr(psz_urls) componentsSeparatedByString:@"|"]];
-        [NSApp beginSheet:_podcastUnsubscribeWindow modalForWindow:self modalDelegate:self didEndSelector:NULL contextInfo:nil];
-    }
-    free(psz_urls);
-}
-
-- (IBAction)removePodcastWindowAction:(id)sender
-{
-    [_podcastUnsubscribeWindow orderOut:sender];
-    [NSApp endSheet:_podcastUnsubscribeWindow];
-
-    if (sender == _podcastUnsubscribeOkButton) {
-        playlist_t * p_playlist = pl_Get(getIntf());
-        char *psz_urls = var_InheritString(p_playlist, "podcast-urls");
-
-        NSMutableArray * urls = [[NSMutableArray alloc] initWithArray:[toNSStr(config_GetPsz("podcast-urls")) componentsSeparatedByString:@"|"]];
-        [urls removeObjectAtIndex: [_podcastUnsubscribePopUpButton indexOfSelectedItem]];
-        const char *psz_new_urls = [[urls componentsJoinedByString:@"|"] UTF8String];
-        var_SetString(pl_Get(getIntf()), "podcast-urls", psz_new_urls);
-        config_PutPsz("podcast-urls", psz_new_urls);
-
-        free(psz_urls);
-
-        /* update playlist table */
-        if (playlist_IsServicesDiscoveryLoaded(p_playlist, "podcast")) {
-        }
-    }
-}
-
-- (void)showPodcastControls
-{
-    _tableViewToPodcastConstraint.priority = 999;
-    _podcastView.hidden = NO;
-
-    b_podcastView_displayed = YES;
-}
-
-- (void)hidePodcastControls
-{
-    if (b_podcastView_displayed) {
-        _tableViewToPodcastConstraint.priority = 1;
-        _podcastView.hidden = YES;
-
-        b_podcastView_displayed = NO;
-    }
 }
 
 @end
