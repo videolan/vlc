@@ -243,9 +243,9 @@ static VLCMain *sharedInstance = nil;
         _mainWindowController = [[NSWindowController alloc] initWithWindowNibName:@"MainWindow"];
         _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
 
-        // FIXME: those variables will live on the current libvlc instance now. Depends on a future patch
-        var_AddCallback(p_intf, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
-        var_AddCallback(p_intf, "intf-show", ShowController, (__bridge void *)self);
+        libvlc_int_t *libvlc = vlc_object_instance(p_intf);
+        var_AddCallback(libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
+        var_AddCallback(libvlc, "intf-show", ShowController, (__bridge void *)self);
 
         // Load them here already to apply stored profiles
         _videoEffectsPanel = [[VLCVideoEffectsWindowController alloc] init];
@@ -337,8 +337,9 @@ static VLCMain *sharedInstance = nil;
     [[self videoEffectsPanel] saveCurrentProfileAtTerminate];
     [[self audioEffectsPanel] saveCurrentProfileAtTerminate];
 
-    var_DelCallback(p_intf, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
-    var_DelCallback(p_intf, "intf-show", ShowController, (__bridge void *)self);
+    libvlc_int_t *libvlc = vlc_object_instance(p_intf);
+    var_DelCallback(libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
+    var_DelCallback(libvlc, "intf-show", ShowController, (__bridge void *)self);
 
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 

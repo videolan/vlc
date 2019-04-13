@@ -81,20 +81,19 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     self = [super init];
     if (self) {
-        intf_thread_t *p_intf = getIntf();
-
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
-                          selector:@selector(applicationWillTerminate:)
-                              name:NSApplicationWillTerminateNotification
-                            object:nil];
+                               selector:@selector(applicationWillTerminate:)
+                                   name:NSApplicationWillTerminateNotification
+                                 object:nil];
 
         _clickerManager = [[VLCClickerManager alloc] init];
         _playlistController = [[VLCMain sharedInstance] playlistController];
         _playerController = [_playlistController playerController];
 
-        // FIXME: this variable will live on the current libvlc instance now. Depends on a future patch
-        var_AddCallback(p_intf, "intf-boss", BossCallback, (__bridge void *)self);
+        intf_thread_t *p_intf = getIntf();
+        libvlc_int_t* libvlc = vlc_object_instance(p_intf);
+        var_AddCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
     }
     return self;
 }
@@ -102,8 +101,9 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
     // Dealloc is never called because this is a singleton, so we should cleanup manually before termination
-    // FIXME: this variable will live on the current libvlc instance now. Depends on a future patch
-    var_DelCallback(getIntf(), "intf-boss", BossCallback, (__bridge void *)self);
+    intf_thread_t *p_intf = getIntf();
+    libvlc_int_t* libvlc = vlc_object_instance(p_intf);
+    var_DelCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     _clickerManager = nil;
     _usedHotkeys = nil;

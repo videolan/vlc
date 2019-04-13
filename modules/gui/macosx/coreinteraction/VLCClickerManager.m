@@ -66,15 +66,14 @@
                                selector:@selector(coreChangedAppleRemoteSetting:)
                                    name:VLCAppleRemoteSettingChangedNotification
                                  object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(startListeningWithAppleRemote)
-                                                     name:NSApplicationDidBecomeActiveNotification
-                                                   object:nil];
-
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(stopListeningWithAppleRemote)
-                                                     name:NSApplicationDidResignActiveNotification
-                                                   object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(startListeningWithAppleRemote)
+                                   name:NSApplicationDidBecomeActiveNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(stopListeningWithAppleRemote)
+                                   name:NSApplicationDidResignActiveNotification
+                                 object:nil];
 
         /* init Apple Remote support */
         _remote = [[AppleRemote alloc] init];
