@@ -748,7 +748,7 @@ ac_cv_type_socklen_t,
 ac_cv_type_socklen_t=yes,
 ac_cv_type_socklen_t=no)])
 AS_IF([test "$ac_cv_type_socklen_t" = no],
- [AC_DEFINE(socklen_t, int)])
+ [AC_DEFINE(socklen_t, unsigned int)])
 
 dnl Check for struct sockaddr_storage
 AH_TEMPLATE(sockaddr_storage, [Define to `sockaddr' if <sys/socket.h> does not define.]) dnl ` (fix VIM syntax highlight
