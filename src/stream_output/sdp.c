@@ -38,7 +38,7 @@
 #define MAXSDPADDRESS 47
 
 static
-char *AddressToSDP (const struct sockaddr *addr, socklen_t addrlen, char *buf)
+char *AddressToSDP (const struct sockaddr *addr, size_t addrlen, char *buf)
 {
     if (addrlen < offsetof (struct sockaddr, sa_family)
                  + sizeof (addr->sa_family))
