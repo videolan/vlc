@@ -405,6 +405,8 @@ block_t *block_File(int fd, bool write)
         if (addr != MAP_FAILED)
             return block_mmap_Alloc (addr, length);
     }
+#else
+    (void) write;
 #endif
 
     /* If mmap() is not implemented by the OS _or_ the filesystem... */
