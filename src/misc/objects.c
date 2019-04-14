@@ -58,24 +58,12 @@
 #define vlc_children_foreach(pos, priv) \
     while (((void)(pos), (void)(priv), 0))
 
-#undef vlc_custom_create
-void *vlc_custom_create (vlc_object_t *parent, size_t length,
-                         const char *typename)
+int vlc_object_init(vlc_object_t *restrict obj, vlc_object_t *parent,
+                    const char *typename)
 {
-    /* NOTE:
-     * VLC objects are laid out as follow:
-     * - first the LibVLC-private per-object data,
-     * - then VLC_COMMON members from vlc_object_t,
-     * - finally, the type-specific data (if any).
-     *
-     * This function initializes the LibVLC and common data,
-     * and zeroes the rest.
-     */
-    assert (length >= sizeof (vlc_object_t));
-
-    vlc_object_internals_t *priv = malloc (sizeof (*priv) + length);
+    vlc_object_internals_t *priv = malloc(sizeof (*priv));
     if (unlikely(priv == NULL))
-        return NULL;
+        return -1;
 
     priv->parent = parent;
     priv->typename = typename;
@@ -84,11 +72,8 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     vlc_cond_init (&priv->var_wait);
     priv->resources = NULL;
 
-    vlc_object_t *obj = (vlc_object_t *)(priv + 1);
-
     obj->obj.priv = priv;
     obj->obj.force = false;
-    memset (obj + 1, 0, length - sizeof (*obj)); /* type-specific stuff */
 
     if (likely(parent != NULL))
     {
@@ -101,6 +86,19 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         obj->obj.no_interact = false;
     }
 
+    return 0;
+}
+
+void *(vlc_custom_create)(vlc_object_t *parent, size_t length,
+                          const char *typename)
+{
+    assert(length >= sizeof (vlc_object_t));
+
+    vlc_object_t *obj = calloc(length, 1);
+    if (unlikely(obj == NULL || vlc_object_init(obj, parent, typename))) {
+        free(obj);
+        obj = NULL;
+    }
     return obj;
 }
 
@@ -119,7 +117,7 @@ vlc_object_t *(vlc_object_parent)(vlc_object_t *obj)
     return vlc_internals(obj)->parent;
 }
 
-void (vlc_object_delete)(vlc_object_t *obj)
+void vlc_object_deinit(vlc_object_t *obj)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
 
@@ -133,6 +131,12 @@ void (vlc_object_delete)(vlc_object_t *obj)
     vlc_cond_destroy(&priv->var_wait);
     vlc_mutex_destroy(&priv->var_lock);
     free(priv);
+}
+
+void (vlc_object_delete)(vlc_object_t *obj)
+{
+    vlc_object_deinit(obj);
+    free(obj);
 }
 
 void vlc_object_vaLog(vlc_object_t *obj, int prio, const char *module,

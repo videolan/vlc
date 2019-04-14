@@ -23,7 +23,6 @@
 #ifndef LIBVLC_VARIABLES_H
 # define LIBVLC_VARIABLES_H 1
 
-# include <stdalign.h>
 # include <vlc_list.h>
 
 struct vlc_res;
@@ -35,7 +34,6 @@ typedef struct vlc_object_internals vlc_object_internals_t;
 
 struct vlc_object_internals
 {
-    alignas (max_align_t) /* ensure vlc_externals() is maximally aligned */
     vlc_object_t *parent; /**< Parent object (or NULL) */
     const char *typename; /**< Object type human-readable name */
 
@@ -49,7 +47,7 @@ struct vlc_object_internals
 };
 
 # define vlc_internals(o) ((o)->obj.priv)
-# define vlc_externals( priv ) ((vlc_object_t *)((priv) + 1))
+# define vlc_externals(priv) (abort(), (void *)(priv))
 
 extern void var_DestroyAll( vlc_object_t * );
 
