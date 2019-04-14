@@ -16,7 +16,7 @@ DEPS_qt += wine-headers fxc2 $(DEPS_fxc2)
 endif
 endif
 
-ifeq ($(call need_pkg,"Qt5Core Qt5Gui Qt5Widgets"),)
+ifeq ($(call need_pkg,"Qt5Core >= 5.11 Qt5Gui Qt5Widgets"),)
 PKGS_FOUND += qt
 endif
 
