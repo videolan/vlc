@@ -1114,7 +1114,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             if (idx < 0)
                 goto out;
             size_t track_count = vlc_player_GetTrackCount(player, cat);
-            if (idx >= track_count )
+            if ((unsigned)idx >= track_count)
                 goto out;
             struct vlc_player_track const *track =
                 vlc_player_GetTrackAt(player, cat, (size_t)idx);
