@@ -1,12 +1,9 @@
 --- gnutls/lib/x509/ip.c.ntop_win32	2019-03-05 11:21:25.250954200 +0100
 +++ gnutls/lib/x509/ip.c	2019-03-05 11:21:31.651380300 +0100
-@@ -26,8 +26,10 @@
+@@ -26,5 +26,7 @@
  #include <gnutls/x509.h>
- 
- #ifdef HAVE_INET_NTOP
 +#ifndef _WIN32
- # include <arpa/inet.h>
- #endif
+ #include <arpa/inet.h>
 +#endif
  
  /*-
