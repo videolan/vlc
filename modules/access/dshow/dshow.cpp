@@ -2219,7 +2219,6 @@ static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
 {
     int i_channel, i_country, i_input, i_amtuner_mode;
     long l_modes = 0;
-    unsigned i_frequency;
     ComPtr<IAMTVTuner> p_TV;
     HRESULT hr;
 
