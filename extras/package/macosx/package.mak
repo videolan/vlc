@@ -42,7 +42,7 @@ endif
 	-cp -a "$(prefix)/share/locale" $@/Contents/Resources/share/
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
 	## Copy libs
-	find $(prefix)/lib -name 'libvlc*.dylib' -maxdepth 1 -exec cp -a {} $@/Contents/Frameworks \;
+	cp -a "$(libdir)"/libvlc*.dylib $@/Contents/Frameworks/
 	## Copy plugins
 	mkdir -p $@/Contents/Frameworks/plugins
 	find $(prefix)/lib/vlc/plugins -name 'lib*_plugin.dylib' -maxdepth 2 -exec cp -a {} $@/Contents/Frameworks/plugins \;
