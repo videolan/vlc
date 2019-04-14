@@ -86,8 +86,8 @@ static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk,
 
     if( p_father && AVI_ChunkEnd( p_chk ) > AVI_ChunkEnd( p_father ) )
     {
-        msg_Warn( s, "chunk %4.4s does not fit into parent %ld",
-                     (char*)&p_chk->common.i_chunk_fourcc, AVI_ChunkEnd( p_father ) );
+        msg_Warn( s, "chunk %4.4s does not fit into parent %"PRIu64,
+                  (char*)&p_chk->common.i_chunk_fourcc, AVI_ChunkEnd( p_father ) );
 
         /* How hard is to produce files with the correct declared size ? */
         if( p_father->common.i_chunk_fourcc != AVIFOURCC_RIFF ||
