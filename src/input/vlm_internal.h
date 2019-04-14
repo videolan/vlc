@@ -74,7 +74,7 @@ typedef struct
     time_t date;
 
     /* if != 0, repeat period in seconds */
-    unsigned period;
+    time_t period;
     /* number of times you have to repeat
        i_repeat < 0 : endless repeat     */
     int i_repeat;
