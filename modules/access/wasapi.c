@@ -313,13 +313,13 @@ static unsigned __stdcall Thread(void *data)
     while (WaitForMultipleObjects(2, sys->events, FALSE, INFINITE)
             != WAIT_OBJECT_0)
     {
-        BYTE *data;
+        BYTE *buf;
         UINT32 frames;
         DWORD flags;
         UINT64 qpc;
         vlc_tick_t pts;
 
-        hr = IAudioCaptureClient_GetBuffer(capture, &data, &frames, &flags,
+        hr = IAudioCaptureClient_GetBuffer(capture, &buf, &frames, &flags,
                                            NULL, &qpc);
         if (hr != S_OK)
             continue;
@@ -332,7 +332,7 @@ static unsigned __stdcall Thread(void *data)
         block_t *block = block_Alloc(bytes);
 
         if (likely(block != NULL)) {
-            memcpy(block->p_buffer, data, bytes);
+            memcpy(block->p_buffer, buf, bytes);
             block->i_nb_samples = frames;
             block->i_pts = block->i_dts = pts;
             es_out_Send(demux->out, sys->es, block);
