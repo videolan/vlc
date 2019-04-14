@@ -149,7 +149,7 @@ static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc
         ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey);
         if ( ret != ERROR_SUCCESS )
         {
-            msg_Warn(obj, "failed to read the %d Display Adapter registry key (%d)", i, ret);
+            msg_Warn(obj, "failed to read the %d Display Adapter registry key (%ld)", i, ret);
             return NULL;
         }
 
@@ -158,10 +158,10 @@ static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc
         if ( ret == ERROR_SUCCESS ) {
             if (wcsncmp(lookup, szData, wcslen(lookup)) == 0)
                 return hKey;
-            msg_Dbg(obj, "different %d device %s vs %s", i, lookup, szData);
+            msg_Dbg(obj, "different %d device %ls vs %ls", i, lookup, szData);
         }
         else
-            msg_Warn(obj, "failed to get the %d MatchingDeviceId (%d)", i, ret);
+            msg_Warn(obj, "failed to get the %d MatchingDeviceId (%ld)", i, ret);
 
         RegCloseKey(hKey);
     }
