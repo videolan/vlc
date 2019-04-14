@@ -29,6 +29,7 @@
  */
 
 struct vlc_logger;
+struct vlc_object_internals;
 
 /**
  * VLC object common members
@@ -40,6 +41,7 @@ struct vlc_logger;
 struct vlc_common_members
 {
     struct vlc_logger *logger;
+    struct vlc_object_internals *priv;
 
     bool no_interact;
 

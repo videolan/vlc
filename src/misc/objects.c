@@ -85,6 +85,8 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     priv->resources = NULL;
 
     vlc_object_t *obj = (vlc_object_t *)(priv + 1);
+
+    obj->obj.priv = priv;
     obj->obj.force = false;
     memset (obj + 1, 0, length - sizeof (*obj)); /* type-specific stuff */
 
