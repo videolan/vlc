@@ -202,6 +202,22 @@ VLC_API int vlc_close(int);
 
 /** @} */
 
+#ifdef _WIN32
+static inline int vlc_getsockopt(int s, int level, int name,
+                                 void *val, socklen_t *len)
+{
+    return getsockopt(s, level, name, (char *)val, len);
+}
+#define getsockopt vlc_getsockopt
+
+static inline int vlc_setsockopt(int s, int level, int name,
+                                 const void *val, socklen_t len)
+{
+    return setsockopt(s, level, name, (const char *)val, len);
+}
+#define setsockopt vlc_setsockopt
+#endif
+
 /* Portable network names/addresses resolution layer */
 
 #define NI_MAXNUMERICHOST 64
