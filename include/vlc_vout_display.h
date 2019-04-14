@@ -217,7 +217,7 @@ typedef int (*vout_display_open_cb)(vout_display_t *vd,
 typedef int (*vout_display_close_cb)(vout_display_t *vd);
 
 struct vout_display_t {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     /* Module */
     module_t *module;

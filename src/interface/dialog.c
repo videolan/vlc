@@ -122,7 +122,7 @@ struct dialog_i11e_context
 static inline vlc_dialog_provider *
 get_dialog_provider(vlc_object_t *p_obj, bool b_check_interact)
 {
-    if (b_check_interact && p_obj->obj.no_interact)
+    if (b_check_interact && p_obj->no_interact)
         return NULL;
 
     vlc_dialog_provider *p_provider =

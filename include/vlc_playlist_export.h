@@ -61,7 +61,7 @@ vlc_playlist_view_Get(struct vlc_playlist_view *view, size_t index);
  */
 struct vlc_playlist_export
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     char *base_url;
     FILE *file;
     struct vlc_playlist_view *playlist_view;

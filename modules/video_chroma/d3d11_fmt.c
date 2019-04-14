@@ -311,7 +311,7 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
     HRESULT hr = E_NOTIMPL;
     UINT creationFlags = 0;
 
-    if (hw_decoding || !obj->obj.force)
+    if (hw_decoding || !obj->force)
         creationFlags |= D3D11_CREATE_DEVICE_VIDEO_SUPPORT;
 
 #if !defined(NDEBUG)
@@ -350,7 +350,7 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
                     driverAttempts[driver], out->feature_level);
             D3D11_GetDriverVersion( obj, out );
             /* we can work with legacy levels but only if forced */
-            if ( obj->obj.force || out->feature_level >= D3D_FEATURE_LEVEL_11_0 )
+            if ( obj->force || out->feature_level >= D3D_FEATURE_LEVEL_11_0 )
                 break;
             msg_Dbg(obj, "Incompatible feature level %x", out->feature_level);
             ID3D11DeviceContext_Release(out->d3dcontext);

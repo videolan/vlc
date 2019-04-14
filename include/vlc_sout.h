@@ -46,7 +46,7 @@ extern "C" {
  * invalid unsynchronized access) */
 struct sout_instance_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     char *psz_sout;
 
@@ -67,7 +67,7 @@ struct sout_instance_t
 /** Stream output access_output */
 struct sout_access_out_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     module_t                *p_module;
     char                    *psz_access;
@@ -115,7 +115,7 @@ static inline bool sout_AccessOutCanControlPace( sout_access_out_t *p_ao )
 /** Muxer structure */
 struct  sout_mux_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     module_t            *p_module;
 
     sout_instance_t     *p_sout;
@@ -193,7 +193,7 @@ enum sout_stream_query_e {
 
 struct sout_stream_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     module_t          *p_module;
     sout_instance_t   *p_sout;

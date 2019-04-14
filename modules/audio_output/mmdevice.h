@@ -33,7 +33,7 @@ typedef struct aout_stream aout_stream_t;
  */
 struct aout_stream
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     void *sys;
 
     HRESULT (*time_get)(aout_stream_t *, vlc_tick_t *);

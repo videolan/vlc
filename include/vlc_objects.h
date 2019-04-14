@@ -30,6 +30,7 @@
 
 struct vlc_logger;
 struct vlc_object_internals;
+struct vlc_object_marker;
 
 /**
  * VLC object common members
@@ -38,10 +39,13 @@ struct vlc_object_internals;
  * Object also have private properties maintained by the core, see
  * \ref vlc_object_internals_t
  */
-struct vlc_common_members
+struct vlc_object_t
 {
     struct vlc_logger *logger;
-    struct vlc_object_internals *priv;
+    union {
+        struct vlc_object_internals *priv;
+        struct vlc_object_marker *obj;
+    };
 
     bool no_interact;
 
@@ -64,10 +68,16 @@ struct vlc_common_members
 #if !defined(__cplusplus)
 # define VLC_OBJECT(x) \
     _Generic((x)->obj, \
-        struct vlc_common_members: (vlc_object_t *)(x) \
+        struct vlc_object_marker *: (x), \
+        default: (&((x)->obj)) \
     )
 # define vlc_object_cast(t)
 #else
+static inline vlc_object_t *VLC_OBJECT(vlc_object_t *o)
+{
+    return o;
+}
+
 # define vlc_object_cast(t) \
 struct t; \
 static inline struct vlc_object_t *VLC_OBJECT(struct t *d) \
@@ -76,7 +86,6 @@ static inline struct vlc_object_t *VLC_OBJECT(struct t *d) \
 }
 #endif
 
-vlc_object_cast(vlc_object_t)
 vlc_object_cast(libvlc_int_t)
 vlc_object_cast(intf_thread_t)
 vlc_object_cast(vlc_player_t)
@@ -100,19 +109,10 @@ vlc_object_cast(services_discovery_t)
 vlc_object_cast(vlc_renderer_discovery_t)
 vlc_object_cast(vlc_medialibrary_module_t)
 
-/*****************************************************************************
- * The vlc_object_t type. Yes, it's that simple :-)
- *****************************************************************************/
-/** The main vlc_object_t structure */
-struct vlc_object_t
-{
-    struct vlc_common_members obj;
-};
-
 /* The root object */
 struct libvlc_int_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 };
 
 /**
@@ -158,7 +158,7 @@ VLC_API vlc_object_t *vlc_object_parent(vlc_object_t *obj) VLC_USED;
 
 static inline struct vlc_logger *vlc_object_logger(vlc_object_t *obj)
 {
-    return obj->obj.logger;
+    return obj->logger;
 }
 #define vlc_object_logger(o) vlc_object_logger(VLC_OBJECT(o))
 

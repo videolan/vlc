@@ -333,7 +333,7 @@ struct vout_window_operations {
  * Finally, it must support some control requests such as for fullscreen mode.
  */
 typedef struct vout_window_t {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
      /**
       * Window handle type

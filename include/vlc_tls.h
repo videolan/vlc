@@ -138,7 +138,7 @@ struct vlc_tls_operations
  */
 typedef struct vlc_tls_client
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     const struct vlc_tls_client_operations *ops;
     void *sys;
 } vlc_tls_client_t;
@@ -216,7 +216,7 @@ VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_client_t *creds,
  */
 typedef struct vlc_tls_server
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     const struct vlc_tls_server_operations *ops;
     void *sys;
 

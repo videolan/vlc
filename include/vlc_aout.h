@@ -137,7 +137,7 @@ struct vlc_audio_output_events {
  **/
 struct audio_output
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     void *sys; /**< Private data for callbacks */
 

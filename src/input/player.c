@@ -143,7 +143,7 @@ struct vlc_player_input
 
 struct vlc_player_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     vlc_mutex_t lock;
     vlc_mutex_t aout_listeners_lock;
     vlc_mutex_t vout_listeners_lock;

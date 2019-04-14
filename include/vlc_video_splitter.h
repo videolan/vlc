@@ -55,7 +55,7 @@ typedef struct
  */
 struct video_splitter_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     /* Module properties */
     module_t        *p_module;

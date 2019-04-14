@@ -42,7 +42,7 @@ enum vlc_inhibit_flags
 
 struct vlc_inhibit
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     vlc_inhibit_sys_t *p_sys;
     void (*inhibit) (vlc_inhibit_t *, unsigned flags);

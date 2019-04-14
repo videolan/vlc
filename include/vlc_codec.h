@@ -98,7 +98,7 @@ struct decoder_owner_callbacks
  */
 struct decoder_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     /* Module properties */
     module_t *          p_module;
@@ -220,7 +220,7 @@ struct decoder_cc_desc_t
 
 struct encoder_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     /* Module properties */
     module_t *          p_module;
@@ -498,7 +498,7 @@ enum vlc_decoder_device_type
  */
 typedef struct vlc_decoder_device
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     /** Private context that could be used by the "decoder device" module
      * implementation */

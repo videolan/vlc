@@ -44,7 +44,7 @@ extern "C" {
 
 struct stream_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     char        *psz_name;
     char        *psz_url; /**< Full URL or MRL (can be NULL) */

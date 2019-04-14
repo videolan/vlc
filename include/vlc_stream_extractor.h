@@ -48,7 +48,7 @@ extern "C" {
  **/
 
 typedef struct stream_extractor_t {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     /**
      * \name Callbacks for entity extraction
@@ -71,7 +71,7 @@ typedef struct stream_extractor_t {
 } stream_extractor_t;
 
 typedef struct stream_directory_t {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     /**
      * \name Callbacks for stream directories

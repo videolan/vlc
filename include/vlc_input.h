@@ -224,7 +224,7 @@ typedef struct input_resource_t input_resource_t;
  */
 struct input_thread_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 };
 
 /**

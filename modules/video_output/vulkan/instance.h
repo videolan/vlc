@@ -35,7 +35,7 @@ struct vout_window_cfg_t;
 typedef struct vlc_vk_t
 {
     // fields internal to instance.c, should not be touched
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     module_t *module;
     vlc_atomic_rc_t ref_count;
     void *platform_sys;

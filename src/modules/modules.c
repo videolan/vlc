@@ -254,7 +254,7 @@ static int generic_start(void *func, bool forced, va_list ap)
     int (*activate)(vlc_object_t *) = func;
     int ret;
 
-    obj->obj.force = forced;
+    obj->force = forced;
     ret = activate(obj);
     if (ret != VLC_SUCCESS)
         vlc_objres_clear(obj);
@@ -273,15 +273,15 @@ static void generic_stop(void *func, va_list ap)
 module_t *module_need(vlc_object_t *obj, const char *cap, const char *name,
                       bool strict)
 {
-    const bool b_force_backup = obj->obj.force; /* FIXME: remove this */
-    module_t *module = vlc_module_load(obj->obj.logger, cap, name, strict,
+    const bool b_force_backup = obj->force; /* FIXME: remove this */
+    module_t *module = vlc_module_load(obj->logger, cap, name, strict,
                                        generic_start, obj);
     if (module != NULL) {
         var_Create(obj, "module-name", VLC_VAR_STRING);
         var_SetString(obj, "module-name", module_get_object(module));
     }
 
-    obj->obj.force = b_force_backup;
+    obj->force = b_force_backup;
     return module;
 }
 

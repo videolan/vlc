@@ -30,7 +30,7 @@ typedef enum meta_fetcher_scope_t
 
 typedef struct meta_fetcher_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     input_item_t *p_item;
     meta_fetcher_scope_t e_scope;
 } meta_fetcher_t;

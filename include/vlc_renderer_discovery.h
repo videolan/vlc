@@ -163,7 +163,7 @@ struct vlc_renderer_discovery_owner
 
 struct vlc_renderer_discovery_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     module_t *          p_module;
 
     struct vlc_renderer_discovery_owner owner;

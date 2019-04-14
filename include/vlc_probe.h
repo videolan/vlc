@@ -38,7 +38,7 @@ void *vlc_probe (vlc_object_t *, const char *, size_t *);
 
 struct vlc_probe_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     void  *list;
     size_t count;

@@ -377,7 +377,7 @@ static struct vlc_logger *vlc_LogSwitchCreate(void)
  * Module-based message log.
  */
 struct vlc_logger_module {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     struct vlc_logger frontend;
     const struct vlc_logger_operations *ops;
     void *opaque;

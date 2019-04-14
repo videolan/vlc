@@ -664,7 +664,7 @@ typedef struct vlc_medialibrary_callbacks_t
 
 struct vlc_medialibrary_module_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     module_t *p_module;
 

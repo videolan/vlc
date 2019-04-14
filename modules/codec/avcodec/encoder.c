@@ -70,7 +70,7 @@ struct thread_context_t;
  *****************************************************************************/
 struct thread_context_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     AVCodecContext  *p_context;
     int             (* pf_func)(AVCodecContext *c, void *arg);

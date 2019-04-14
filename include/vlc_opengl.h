@@ -40,7 +40,7 @@ typedef struct vlc_gl_t vlc_gl_t;
 
 struct vlc_gl_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     struct vout_window_t *surface;
     module_t *module;

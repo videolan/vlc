@@ -132,7 +132,7 @@ typedef struct public_key_t public_key_t;
  */
 typedef struct
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     vlc_thread_t thread;
     atomic_bool aborted;

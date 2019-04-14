@@ -46,9 +46,9 @@
  * (see src/misc/variables.c).
  *
  * It has the following advantages over Variable based Callback:
- * - No need to implement the whole vlc_common_members in the object,
+ * - No need to implement the whole vlc_object_t in the object,
  * thus it reduce it size. This is especially true for input_item_t which
- * doesn't have vlc_common_members. This is the first reason of existence of
+ * doesn't have vlc_object_t. This is the first reason of existence of
  * this implementation.
  * - Libvlc can easily be based upon that.
  * - Existing event are clearly declared (in include/vlc_events.h)
@@ -56,7 +56,7 @@
  *
  **** Example usage
  *
- * (vlc_cool_object_t doesn't need to have the vlc_common_members.)
+ * (vlc_cool_object_t doesn't need to have the vlc_object_t.)
  *
  * struct vlc_cool_object_t
  * {

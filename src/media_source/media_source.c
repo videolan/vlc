@@ -51,7 +51,7 @@ typedef struct
 
 struct vlc_media_source_provider_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     vlc_mutex_t lock;
     struct vlc_list media_sources;
 };

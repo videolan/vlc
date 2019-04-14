@@ -72,18 +72,18 @@ int vlc_object_init(vlc_object_t *restrict obj, vlc_object_t *parent,
     vlc_cond_init (&priv->var_wait);
     priv->resources = NULL;
 
-    obj->obj.priv = priv;
-    obj->obj.force = false;
+    obj->priv = priv;
+    obj->force = false;
 
     if (likely(parent != NULL))
     {
-        obj->obj.logger = parent->obj.logger;
-        obj->obj.no_interact = parent->obj.no_interact;
+        obj->logger = parent->logger;
+        obj->no_interact = parent->no_interact;
     }
     else
     {
-        obj->obj.logger = NULL;
-        obj->obj.no_interact = false;
+        obj->logger = NULL;
+        obj->no_interact = false;
     }
 
     return 0;
@@ -151,7 +151,7 @@ void vlc_object_vaLog(vlc_object_t *obj, int prio, const char *module,
     if (typename == NULL)
         typename = "generic";
 
-    vlc_vaLog(&obj->obj.logger, prio, typename, module, file, line, func,
+    vlc_vaLog(&obj->logger, prio, typename, module, file, line, func,
               format, ap);
 }
 

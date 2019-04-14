@@ -57,7 +57,7 @@ typedef struct vout_thread_sys_t vout_thread_sys_t;
  * structure.
  */
 struct vout_thread_t {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     /* Private vout_thread data */
     vout_thread_sys_t *p;

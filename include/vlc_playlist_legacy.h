@@ -111,7 +111,7 @@ struct intf_thread_t;
 /** Helper structure to export to file part of the playlist */
 typedef struct playlist_export_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     char *base_url;
     FILE *p_file;
     playlist_item_t *p_root;
@@ -145,7 +145,7 @@ typedef enum
 /** Structure containing information about the playlist */
 struct playlist_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     playlist_item_array_t items; /**< Arrays of items */
 

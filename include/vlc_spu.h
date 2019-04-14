@@ -45,7 +45,7 @@ typedef struct spu_private_t spu_private_t;
  */
 struct spu_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     spu_private_t *p;
 };

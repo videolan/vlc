@@ -74,7 +74,7 @@ static void httpd_AppendData(httpd_stream_t *stream, uint8_t *p_data, int i_data
 /* each host run in his own thread */
 struct httpd_host_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     struct vlc_list node;
 
     /* ref count */

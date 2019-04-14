@@ -29,7 +29,7 @@ typedef struct vlc_va_t vlc_va_t;
 typedef struct vlc_va_sys_t vlc_va_sys_t;
 
 struct vlc_va_t {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     vlc_va_sys_t *sys;
     int  (*get)(vlc_va_t *, picture_t *pic, uint8_t **surface);

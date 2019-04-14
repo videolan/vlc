@@ -47,7 +47,7 @@ typedef struct
 
 typedef struct
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
     vlm_media_t cfg;
 
     struct
@@ -83,7 +83,7 @@ typedef struct
 
 struct vlm_t
 {
-    struct vlc_common_members obj;
+    struct vlc_object_t obj;
 
     vlc_mutex_t  lock;
     vlc_thread_t thread;

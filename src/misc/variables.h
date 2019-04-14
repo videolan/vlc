@@ -46,7 +46,7 @@ struct vlc_object_internals
     struct vlc_res *resources;
 };
 
-# define vlc_internals(o) ((o)->obj.priv)
+# define vlc_internals(o) ((o)->priv)
 # define vlc_externals(priv) (abort(), (void *)(priv))
 
 extern void var_DestroyAll( vlc_object_t * );

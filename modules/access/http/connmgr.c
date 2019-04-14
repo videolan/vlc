@@ -275,7 +275,7 @@ struct vlc_http_mgr *vlc_http_mgr_create(vlc_object_t *obj,
     if (unlikely(mgr == NULL))
         return NULL;
 
-    mgr->logger = obj->obj.logger;
+    mgr->logger = obj->logger;
     mgr->obj = obj;
     mgr->creds = NULL;
     mgr->jar = jar;
