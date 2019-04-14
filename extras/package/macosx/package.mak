@@ -15,19 +15,19 @@ pseudo-bundle:
 VLC.app: install
 	rm -Rf $@
 	## Copy Contents
-	cp -R $(prefix)/share/macosx/ $@
+	cp -R "$(datadir)/macosx/" $@
 	## Copy .strings file and .nib files
-	cp -R $(top_builddir)/modules/gui/macosx/UI $@/Contents/Resources/Base.lproj
+	cp -R "$(top_builddir)/modules/gui/macosx/UI" $@/Contents/Resources/Base.lproj
 	## Copy Info.plist and convert to binary
-	cp -R $(top_builddir)/share/macosx/Info.plist $@/Contents/
+	cp -R "$(top_builddir)/share/macosx/Info.plist" $@/Contents/
 	xcrun plutil -convert binary1 $@/Contents/Info.plist
 	## Create Frameworks dir and copy required ones
 	mkdir -p $@/Contents/Frameworks
 if HAVE_SPARKLE
-	cp -R $(CONTRIB_DIR)/Frameworks/Sparkle.framework $@/Contents/Frameworks
+	cp -R "$(CONTRIB_DIR)/Frameworks/Sparkle.framework" $@/Contents/Frameworks
 endif
 if HAVE_BREAKPAD
-	cp -R $(CONTRIB_DIR)/Frameworks/Breakpad.framework $@/Contents/Frameworks
+	cp -R "$(CONTRIB_DIR)/Frameworks/Breakpad.framework" $@/Contents/Frameworks
 endif
 	mkdir -p $@/Contents/Resources/share/
 	mkdir -p $@/Contents/MacOS/
@@ -37,19 +37,19 @@ if BUILD_LUA
 	cp -r "$(pkglibexecdir)/lua" $@/Contents/Frameworks/
 endif
 	## HRTFs
-	cp -r $(srcdir)/share/hrtfs $@/Contents/Resources/share/
+	cp -r "$(srcdir)/share/hrtfs" $@/Contents/Resources/share/
 	## Copy translations
-	-cp -a "$(prefix)/share/locale" $@/Contents/Resources/share/
+	-cp -a "$(datadir)/locale" $@/Contents/Resources/share/
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
 	## Copy libs
 	cp -a "$(libdir)"/libvlc*.dylib $@/Contents/Frameworks/
 	## Copy plugins
 	mkdir -p $@/Contents/Frameworks/plugins
-	find $(prefix)/lib/vlc/plugins -name 'lib*_plugin.dylib' -maxdepth 2 -exec cp -a {} $@/Contents/Frameworks/plugins \;
+	find "$(pkglibdir)/plugins" -name 'lib*_plugin.dylib' -maxdepth 2 -exec cp -a {} $@/Contents/Frameworks/plugins \;
 	## Copy libbluray jar
-	-cp -a $(CONTRIB_DIR)/share/java/libbluray*.jar $@/Contents/Frameworks/plugins/
+	-cp -a "$(CONTRIB_DIR)"/share/java/libbluray*.jar $@/Contents/Frameworks/plugins/
 	## Install binary
-	cp $(prefix)/bin/vlc $@/Contents/MacOS/VLC
+	cp "$(prefix)/bin/vlc" $@/Contents/MacOS/VLC
 	install_name_tool -rpath "$(libdir)" "@executable_path/../Frameworks/" $@/Contents/MacOS/VLC
 	## Generate plugin cache
 	VLC_LIB_PATH="$@/Contents/Frameworks" bin/vlc-cache-gen $@/Contents/Frameworks/plugins
