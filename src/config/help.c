@@ -40,7 +40,7 @@
 
 #if defined( _WIN32 )
 # include <vlc_charset.h>
-# define wcwidth(cp) (cp, 1) /* LOL */
+# define wcwidth(cp) ((void)(cp), 1) /* LOL */
 #else
 # include <unistd.h>
 # include <termios.h>
