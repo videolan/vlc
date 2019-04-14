@@ -233,10 +233,7 @@ static vlc_tls_gnutls_t *gnutls_SessionOpen(vlc_object_t *obj, int type,
     const char *errp;
     int val;
 
-    type |= GNUTLS_NONBLOCK;
-#if (GNUTLS_VERSION_NUMBER >= 0x030500)
-    type |= GNUTLS_ENABLE_FALSE_START;
-#endif
+    type |= GNUTLS_NONBLOCK | GNUTLS_ENABLE_FALSE_START;
 
     val = gnutls_init(&session, type);
     if (val != 0)
@@ -344,8 +341,6 @@ static int gnutls_Handshake(vlc_tls_t *tls, char **restrict alp)
     }
 
     msg_Dbg(obj, "TLS handshake complete");
-#if (GNUTLS_VERSION_NUMBER >= 0x030500)
-    /* intentionally left blank */;
 
     unsigned flags = gnutls_session_get_flags(session);
 
@@ -357,7 +352,6 @@ static int gnutls_Handshake(vlc_tls_t *tls, char **restrict alp)
         msg_Dbg(obj, " - encrypt then MAC (RFC7366) enabled");
     if (flags & GNUTLS_SFLAGS_FALSE_START)
         msg_Dbg(obj, " - false start (RFC7918) enabled");
-#endif
 
     if (alp != NULL)
     {

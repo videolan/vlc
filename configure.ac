@@ -4285,7 +4285,7 @@ dnl
 AC_ARG_ENABLE([gnutls],
   AS_HELP_STRING([--enable-gnutls], [GNU TLS TLS/SSL support (default enabled)]))
 AS_IF([test "${enable_gnutls}" != "no"], [
-  PKG_CHECK_MODULES(GNUTLS, [gnutls >= 3.3.6], [
+  PKG_CHECK_MODULES(GNUTLS, [gnutls >= 3.5.0], [
     VLC_ADD_PLUGIN([gnutls])
   ], [
     AS_IF([test -n "${enable_gnutls}"], [
