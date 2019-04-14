@@ -291,6 +291,7 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
 }
 
 
+#ifdef MCAST_JOIN_GROUP
 static unsigned var_GetIfIndex (vlc_object_t *obj)
 {
     char *ifname = var_InheritString (obj, "miface");
@@ -303,6 +304,7 @@ static unsigned var_GetIfIndex (vlc_object_t *obj)
     free (ifname);
     return ifindex;
 }
+#endif
 
 
 /**
