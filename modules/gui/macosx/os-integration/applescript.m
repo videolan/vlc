@@ -70,8 +70,8 @@
 
 - (id)performDefaultImplementation
 {
-    VLCPlaylistController *playlistController;
-    VLCPlayerController *playerController;
+    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+    VLCPlayerController *playerController = [playlistController playerController];
 
     NSString *commandString = [[self commandDescription] commandName];
     NSString *parameterString = [self directParameter];
