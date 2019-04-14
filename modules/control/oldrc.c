@@ -1051,7 +1051,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
                 if (title != NULL)
                     chapter = vlc_player_GetSelectedChapterIdx(player);
                 if (chapter != -1)
-                    msg_rc("Currently playing chapter %ld/%ld.",
+                    msg_rc("Currently playing chapter %zd/%zu.",
                            chapter, title->chapter_count);
                 else
                     msg_rc("No chapter selected.");
@@ -1086,7 +1086,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
                 if (titles != NULL)
                     count = vlc_player_title_list_GetCount(titles);
                 if (title != -1 && count != 0)
-                    msg_rc("Currently playing title %ld/%ld.", title, count);
+                    msg_rc("Currently playing title %zd/%zu.", title, count);
                 else
                     msg_rc("No title selected.");
             }
@@ -1133,7 +1133,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             {
                 struct vlc_player_track const *track =
                     vlc_player_GetTrackAt(player, cat, i);
-                msg_rc("| %"PRId64" - %s%s",
+                msg_rc("| %zu - %s%s",
                        i, track->name, track == cur_track ? " *" : "");
             }
             msg_rc("+----[ end of %s ]", name);
@@ -1284,8 +1284,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         else if (index < count)
             ret = vlc_playlist_PlayAt(playlist, index);
         else
-            msg_rc(vlc_ngettext("Playlist has only %lu element",
-                                "Playlist has only %lu elements", count),
+            msg_rc(vlc_ngettext("Playlist has only %zu element",
+                                "Playlist has only %zu elements", count),
                    count);
     }
     else if( !strcmp( psz_cmd, "stop" ) )
