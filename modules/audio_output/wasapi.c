@@ -350,12 +350,14 @@ static void vlc_ToWave(WAVEFORMATEXTENSIBLE *restrict wf,
     {
         case VLC_CODEC_FL64:
             audio->i_format = VLC_CODEC_FL32;
+            /* fall through */
         case VLC_CODEC_FL32:
             wf->SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
             break;
 
         case VLC_CODEC_U8:
             audio->i_format = VLC_CODEC_S16N;
+            /* fall through */
         case VLC_CODEC_S16N:
             wf->SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
             break;
