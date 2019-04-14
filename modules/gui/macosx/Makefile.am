@@ -40,23 +40,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/misc.m \
 	gui/macosx/imported/AppleRemote/AppleRemote.h \
 	gui/macosx/imported/AppleRemote/AppleRemote.m \
-	gui/macosx/imported/PXSourceList/Internal/PXSourceListDelegateDataSourceProxy.h \
-	gui/macosx/imported/PXSourceList/Internal/PXSourceListDelegateDataSourceProxy.m \
-	gui/macosx/imported/PXSourceList/Internal/PXSourceListPrivateConstants.h \
-	gui/macosx/imported/PXSourceList/Internal/PXSourceListRuntimeAdditions.h \
-	gui/macosx/imported/PXSourceList/Internal/PXSourceListRuntimeAdditions.m \
-	gui/macosx/imported/PXSourceList/PXSourceList.h \
-	gui/macosx/imported/PXSourceList/PXSourceList.m \
-	gui/macosx/imported/PXSourceList/PXSourceListBadgeCell.h \
-	gui/macosx/imported/PXSourceList/PXSourceListBadgeCell.m \
-	gui/macosx/imported/PXSourceList/PXSourceListBadgeView.h \
-	gui/macosx/imported/PXSourceList/PXSourceListBadgeView.m \
-	gui/macosx/imported/PXSourceList/PXSourceListDataSource.h \
-	gui/macosx/imported/PXSourceList/PXSourceListDelegate.h \
-	gui/macosx/imported/PXSourceList/PXSourceListItem.h \
-	gui/macosx/imported/PXSourceList/PXSourceListItem.m \
-	gui/macosx/imported/PXSourceList/PXSourceListTableCellView.h \
-	gui/macosx/imported/PXSourceList/PXSourceListTableCellView.m \
 	gui/macosx/imported/SPMediaKeyTap/SPMediaKeyTap.h \
 	gui/macosx/imported/SPMediaKeyTap/SPMediaKeyTap.m \
 	gui/macosx/library/VLCLibraryCollectionViewItem.h \
@@ -202,16 +185,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/windows/logging/VLCLogWindowController.m \
 	gui/macosx/windows/mainwindow/VLCControlsBarCommon.h \
 	gui/macosx/windows/mainwindow/VLCControlsBarCommon.m \
-	gui/macosx/windows/mainwindow/VLCMainWindow.h \
-	gui/macosx/windows/mainwindow/VLCMainWindow.m \
 	gui/macosx/windows/mainwindow/VLCMainWindowControlsBar.h \
 	gui/macosx/windows/mainwindow/VLCMainWindowControlsBar.m \
-	gui/macosx/windows/mainwindow/VLCSourceListBadgeButton.h \
-	gui/macosx/windows/mainwindow/VLCSourceListBadgeButton.m \
-	gui/macosx/windows/mainwindow/VLCSourceListItem.h \
-	gui/macosx/windows/mainwindow/VLCSourceListItem.m \
-	gui/macosx/windows/mainwindow/VLCSourceListTableCellView.h \
-	gui/macosx/windows/mainwindow/VLCSourceListTableCellView.m \
 	gui/macosx/windows/video/VLCDetachedVideoWindow.h \
 	gui/macosx/windows/video/VLCDetachedVideoWindow.m \
 	gui/macosx/windows/video/VLCFSPanelController.h \
@@ -240,7 +215,6 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/Help.xib \
 	gui/macosx/UI/LogMessageWindow.xib \
 	gui/macosx/UI/MainMenu.xib \
-	gui/macosx/UI/MainWindow.xib \
 	gui/macosx/UI/VLCLibraryWindow.xib \
 	gui/macosx/UI/VLCPlaylistMenu.xib \
 	gui/macosx/UI/VLCPlaylistTableCellView.xib \

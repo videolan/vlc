@@ -23,7 +23,7 @@
 
 #import "NSScreen+VLCAdditions.h"
 #import "main/CompatibilityFixes.h"
-#import "windows/mainwindow/VLCMainWindow.h"
+#import "windows/video/VLCWindow.h"
 
 @implementation NSScreen (VLCAdditions)
 

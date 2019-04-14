@@ -40,7 +40,6 @@
 #import "extensions/misc.h"
 #import "extensions/NSString+Helpers.h"
 #import "menus/VLCStatusBarIcon.h"
-#import "windows/mainwindow/VLCMainWindow.h"
 #import "windows/video/VLCVideoOutputProvider.h"
 
 /*****************************************************************************
@@ -67,6 +66,7 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 @class VLCBookmarksWindowController;
 @class VLCOpenWindowController;
 @class VLCLogWindowController;
+@class VLCLibraryWindow;
 @class VLCLibraryWindowController;
 @class VLCTrackSynchronizationWindowController;
 @class VLCAudioEffectsWindowController;
@@ -88,7 +88,7 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 + (void)killInstance;
 
 - (VLCMainMenu *)mainMenu;
-- (VLCMainWindow *)mainWindow;
+- (VLCLibraryWindow *)libraryWindow;
 - (VLCBookmarksWindowController *)bookmarks;
 - (VLCOpenWindowController *)open;
 - (VLCSimplePrefsController *)simplePreferences;

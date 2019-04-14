@@ -39,6 +39,7 @@
 #import "menus/VLCMainMenu.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "windows/video/VLCVideoWindowCommon.h"
 
 /*****************************************************************************
  * VLCVoutView implementation
@@ -193,7 +194,8 @@
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
 {
-    return [[[VLCMain sharedInstance] mainWindow] performKeyEquivalent: o_event];
+    // FIXME: this hack is gross and wrong on many levels
+    return NO; //[[[VLCMain sharedInstance] mainWindow] performKeyEquivalent: o_event];
 }
 
 - (void)mouseDown:(NSEvent *)o_event

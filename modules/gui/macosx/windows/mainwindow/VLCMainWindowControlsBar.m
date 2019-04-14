@@ -31,6 +31,7 @@
 #import "windows/mainwindow/VLCMainWindowControlsBar.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "library/VLCLibraryWindow.h"
 
 /*****************************************************************************
  * VLCMainWindowControlsBar
@@ -383,7 +384,8 @@
 
 - (IBAction)togglePlaylist:(id)sender
 {
-    [[[VLCMain sharedInstance] mainWindow] changePlaylistState: psUserEvent];
+    // FIXME: this is a NO-OP
+    [[[VLCMain sharedInstance] libraryWindow] changePlaylistState: 0];
 }
 
 - (IBAction)volumeAction:(id)sender

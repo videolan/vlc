@@ -24,9 +24,14 @@
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "main/VLCMain.h"
+
 #import "playlist/VLCPlaylistTableCellView.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistDataSource.h"
+
+#import "windows/mainwindow/VLCControlsBarCommon.h"
+#import "windows/video/VLCFSPanelController.h"
+#import "windows/video/VLCVoutView.h"
 
 static const float f_min_window_width = 604.;
 static const float f_min_window_height = 307.;
@@ -38,6 +43,8 @@ static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 {
     VLCPlaylistDataSource *_playlistDataSource;
     VLCLibraryDataSource *_libraryDataSource;
+
+    NSRect _windowFrameBeforePlayback;
 }
 @end
 
@@ -45,6 +52,9 @@ static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 
 - (void)awakeFromNib
 {
+    _fspanel = [[VLCFSPanelController alloc] init];
+    [_fspanel showWindow:self];
+
     _segmentedTitleControl.segmentCount = 3;
     [_segmentedTitleControl setTarget:self];
     [_segmentedTitleControl setAction:@selector(segmentedControlAction)];
@@ -82,6 +92,73 @@ static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
         return;
 
     [[[VLCMain sharedInstance] playlistController] playItemAtIndex:selectedRow];
+}
+
+- (void)changePlaylistState:(int)event
+{
+}
+
+- (void)videoplayWillBeStarted
+{
+    if (!self.fullscreen)
+        _windowFrameBeforePlayback = [self frame];
+}
+
+- (void)setVideoplayEnabled
+{
+    BOOL b_videoPlayback = [[VLCMain sharedInstance] activeVideoPlayback];
+
+    if (!b_videoPlayback) {
+        if (!self.nonembedded && (!self.nativeFullscreenMode || (self.nativeFullscreenMode && !self.fullscreen)) && _windowFrameBeforePlayback.size.width > 0 && _windowFrameBeforePlayback.size.height > 0) {
+
+            // only resize back to minimum view of this is still desired final state
+            CGFloat f_threshold_height = f_min_video_height + [self.controlsBar height];
+            if (_windowFrameBeforePlayback.size.height > f_threshold_height) {
+                if ([[VLCMain sharedInstance] isTerminating])
+                    [self setFrame:_windowFrameBeforePlayback display:YES];
+                else
+                    [[self animator] setFrame:_windowFrameBeforePlayback display:YES];
+
+            }
+        }
+
+        _windowFrameBeforePlayback = NSMakeRect(0, 0, 0, 0);
+
+        [self makeFirstResponder: _playlistTableView];
+        [[[VLCMain sharedInstance] voutProvider] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
+
+        // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
+        [self setAlphaValue:1.0];
+        [self.videoView setHidden:YES];
+    } else {
+        [self.videoView setHidden:NO];
+    }
+
+    if (self.nativeFullscreenMode) {
+        if ([self hasActiveVideo] && [self fullscreen] && b_videoPlayback) {
+            [self hideControlsBar];
+            [self.fspanel setActive];
+        } else {
+            [self showControlsBar];
+            [self.fspanel setNonActive];
+        }
+    }
+}
+
+#pragma mark -
+#pragma mark Fullscreen support
+
+- (void)showFullscreenController
+{
+    id currentWindow = [NSApp keyWindow];
+    if ([currentWindow respondsToSelector:@selector(hasActiveVideo)] && [currentWindow hasActiveVideo]) {
+        if ([currentWindow respondsToSelector:@selector(fullscreen)] && [currentWindow fullscreen] && ![[currentWindow videoView] isHidden]) {
+
+            if ([[VLCMain sharedInstance] activeVideoPlayback])
+                [self.fspanel fadeIn];
+        }
+    }
+
 }
 
 @end

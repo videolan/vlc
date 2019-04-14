@@ -25,7 +25,6 @@
 #import <vlc_addons.h>
 
 #import "main/VLCMain.h"
-#import "windows/mainwindow/VLCMainWindow.h"
 #import "windows/addons/VLCAddonListItem.h"
 
 @interface VLCAddonsWindowController() <NSTableViewDataSource, NSTableViewDelegate>

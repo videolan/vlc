@@ -28,7 +28,9 @@
 #import "os-integration/VLCRemoteControlService.h"
 #import "os-integration/iTunes.h"
 #import "os-integration/Spotify.h"
+
 #import "windows/video/VLCVoutView.h"
+#import "windows/video/VLCVideoWindowCommon.h"
 
 #import <MediaPlayer/MediaPlayer.h>
 
@@ -1570,7 +1572,7 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
     id currentWindow = [NSApp keyWindow];
     if ([currentWindow respondsToSelector:@selector(videoView)]) {
-        VLCVoutView *videoView = [currentWindow videoView];
+        VLCVoutView *videoView = [(VLCVideoWindowCommon *)currentWindow videoView];
         if (videoView) {
             p_vout = [videoView voutThread];
         }

@@ -31,6 +31,7 @@
 #import "windows/video/VLCFSPanelController.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "library/VLCLibraryWindow.h"
 
 /*****************************************************************************
  * VLCVideoWindowCommon
@@ -436,16 +437,16 @@
 
     // change fspanel state for the case when multiple windows are in fullscreen
     if ([self hasActiveVideo] && [self fullscreen])
-        [[[[VLCMain sharedInstance] mainWindow] fspanel] setActive];
+        [[[[VLCMain sharedInstance] libraryWindow] fspanel] setActive];
     else
-        [[[[VLCMain sharedInstance] mainWindow] fspanel] setNonActive];
+        [[[[VLCMain sharedInstance] libraryWindow] fspanel] setNonActive];
 }
 
 - (void)resignKeyWindow
 {
     [super resignKeyWindow];
 
-    [[[[VLCMain sharedInstance] mainWindow] fspanel] setNonActive];
+    [[[[VLCMain sharedInstance] libraryWindow] fspanel] setNonActive];
 }
 
 -(NSArray*)customWindowsToEnterFullScreenForWindow:(NSWindow *)window
@@ -532,9 +533,9 @@
     _inFullscreenTransition = NO;
 
     if ([self hasActiveVideo]) {
-        [[[[VLCMain sharedInstance] mainWindow] fspanel] setVoutWasUpdated:self];
+        [[[[VLCMain sharedInstance] libraryWindow] fspanel] setVoutWasUpdated:self];
         if (![_videoView isHidden])
-            [[[[VLCMain sharedInstance] mainWindow] fspanel] setActive];
+            [[[[VLCMain sharedInstance] libraryWindow] fspanel] setActive];
     }
 
     NSArray *subviews = [[self videoView] subviews];
@@ -563,7 +564,7 @@
     }
 
     [NSCursor setHiddenUntilMouseMoves: NO];
-    [[[[VLCMain sharedInstance] mainWindow] fspanel] setNonActive];
+    [[[[VLCMain sharedInstance] libraryWindow] fspanel] setNonActive];
 
     if (![_videoView isHidden]) {
         [self showControlsBar];
@@ -741,8 +742,8 @@
     [o_fullscreen_window setAcceptsMouseMovedEvents: YES];
 
     /* tell the fspanel to move itself to front next time it's triggered */
-    [[[[VLCMain sharedInstance] mainWindow] fspanel] setVoutWasUpdated:o_fullscreen_window];
-    [[[[VLCMain sharedInstance] mainWindow] fspanel] setActive];
+    [[[[VLCMain sharedInstance] libraryWindow] fspanel] setVoutWasUpdated:o_fullscreen_window];
+    [[[[VLCMain sharedInstance] libraryWindow] fspanel] setActive];
 
     if ([self isVisible])
         [self orderOut: self];
@@ -767,7 +768,7 @@
         return;
     }
 
-    [[[[VLCMain sharedInstance] mainWindow] fspanel] setNonActive];
+    [[[[VLCMain sharedInstance] libraryWindow] fspanel] setNonActive];
     [[o_fullscreen_window screen] setNonFullscreenPresentationOptions];
 
     if (o_fullscreen_anim1) {

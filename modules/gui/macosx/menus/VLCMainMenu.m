@@ -46,7 +46,6 @@
 #import "windows/VLCOpenWindowController.h"
 #import "windows/VLCErrorWindowController.h"
 #import "windows/VLCHelpWindowController.h"
-#import "windows/mainwindow/VLCMainWindow.h"
 #import "windows/mainwindow/VLCMainWindowControlsBar.h"
 #import "windows/extensions/VLCExtensionsManager.h"
 #import "windows/video/VLCVoutView.h"
@@ -691,7 +690,7 @@
 {
     BOOL b_value = !var_InheritBool(getIntf(), "macosx-show-effects-button");
     config_PutInt("macosx-show-effects-button", b_value);
-    [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleEffectsButton];
+    [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] libraryWindow] controlsBar] toggleEffectsButton];
     [_toggleEffectsButton setState: b_value];
 }
 
@@ -700,7 +699,7 @@
     BOOL b_value = !var_InheritBool(getIntf(), "macosx-show-playback-buttons");
     config_PutInt("macosx-show-playback-buttons", b_value);
 
-    [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleJumpButtons];
+    [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] libraryWindow] controlsBar] toggleJumpButtons];
     [[[VLCMain sharedInstance] voutProvider] updateWindowsUsingBlock:^(VLCVideoWindowCommon *window) {
         [[window controlsBar] toggleForwardBackwardMode: b_value];
     }];
@@ -712,13 +711,13 @@
 {
     BOOL b_value = !var_InheritBool(getIntf(), "macosx-show-playmode-buttons");
     config_PutInt("macosx-show-playmode-buttons", b_value);
-    [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] togglePlaymodeButtons];
+    [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] libraryWindow] controlsBar] togglePlaymodeButtons];
     [_togglePlaymodeButtons setState: b_value];
 }
 
 - (IBAction)toggleSidebar:(id)sender
 {
-    [[[VLCMain sharedInstance] mainWindow] toggleLeftSubSplitView];
+    // FIXME: remove this method as it is no longer needed
 }
 
 - (void)updateSidebarMenuItem:(BOOL)show;
@@ -1345,7 +1344,7 @@
 
 - (IBAction)showMainWindow:(id)sender
 {
-    [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:sender];
+    [[[VLCMain sharedInstance] libraryWindow] makeKeyAndOrderFront:sender];
 }
 
 - (IBAction)showPlaylist:(id)sender

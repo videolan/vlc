@@ -30,7 +30,6 @@
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
-#import "windows/mainwindow/VLCMainWindow.h"
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 
 /*****************************************************************************

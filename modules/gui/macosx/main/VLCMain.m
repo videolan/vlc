@@ -105,7 +105,7 @@ int OpenIntf (vlc_object_t *p_this)
             [VLCMain sharedInstance];
 
             [[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:[[VLCMain sharedInstance] mainMenu] topLevelObjects:nil];
-            [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
+            [[[VLCMain sharedInstance] libraryWindow] makeKeyAndOrderFront:nil];
 
             msg_Dbg(p_intf, "Finished loading macosx interface");
             return VLC_SUCCESS;
@@ -148,7 +148,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
                     [mainInstance showFullscreenController];
 
                 else if (!strcmp(psz_variable, "intf-show"))
-                    [[mainInstance mainWindow] makeKeyAndOrderFront:nil];
+                    [[mainInstance libraryWindow] makeKeyAndOrderFront:nil];
             }
 
         });
@@ -183,7 +183,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     BOOL b_active_videoplayback;
 
-    NSWindowController *_mainWindowController;
     VLCMainMenu *_mainmenu;
     VLCPrefs *_prefs;
     VLCSimplePrefsController *_sprefs;
@@ -254,7 +253,6 @@ static VLCMain *sharedInstance = nil;
 
         _voutProvider = [[VLCVideoOutputProvider alloc] init];
 
-        _mainWindowController = [[NSWindowController alloc] initWithWindowNibName:@"MainWindow"];
         _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
 
         libvlc_int_t *libvlc = vlc_object_instance(p_intf);
@@ -437,7 +435,7 @@ static VLCMain *sharedInstance = nil;
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication hasVisibleWindows:(BOOL)hasVisibleWindows
 {
     if (!hasVisibleWindows)
-        [[self mainWindow] makeKeyAndOrderFront:self];
+        [[self libraryWindow] makeKeyAndOrderFront:self];
 
     return YES;
 }
@@ -446,7 +444,7 @@ static VLCMain *sharedInstance = nil;
 {
     // defer selector here (possibly another time) to ensure that keyWindow is set properly
     // (needed for NSApplicationDidBecomeActiveNotification)
-    [[self mainWindow] performSelectorOnMainThread:@selector(showFullscreenController) withObject:nil waitUntilDone:NO];
+    [[self libraryWindow] performSelectorOnMainThread:@selector(showFullscreenController) withObject:nil waitUntilDone:NO];
 }
 
 - (void)setActiveVideoPlayback:(BOOL)b_value
@@ -454,8 +452,8 @@ static VLCMain *sharedInstance = nil;
     assert([NSThread isMainThread]);
 
     b_active_videoplayback = b_value;
-    if ([self mainWindow]) {
-        [[self mainWindow] setVideoplayEnabled];
+    if ([self libraryWindow]) {
+        [[self libraryWindow] setVideoplayEnabled];
     }
 }
 
@@ -472,14 +470,14 @@ static VLCMain *sharedInstance = nil;
     return _statusBarIcon;
 }
 
-- (VLCMainWindow *)mainWindow
-{
-    return (VLCMainWindow *)[_mainWindowController window];
-}
-
 - (VLCLibraryWindowController *)libraryWindowController
 {
     return _libraryWindowController;
+}
+
+- (VLCLibraryWindow *)libraryWindow
+{
+    return (VLCLibraryWindow *)_libraryWindowController.window;
 }
 
 - (VLCExtensionsManager *)extensionsManager

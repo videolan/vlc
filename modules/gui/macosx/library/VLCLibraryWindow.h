@@ -24,6 +24,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCFSPanelController;
+
 @interface VLCLibraryWindowController : NSWindowController
 
 - (instancetype)initWithLibraryWindow;
@@ -35,6 +37,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
 @property (readwrite, weak) IBOutlet NSCollectionView *libraryCollectionView;
 @property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
+
+@property (readonly) BOOL nativeFullscreenMode;
+@property (readwrite) BOOL nonembedded;
+@property (readonly) VLCFSPanelController* fspanel;
+
+- (void)showFullscreenController;
+- (void)changePlaylistState:(int)event;
+- (void)videoplayWillBeStarted;
+- (void)setVideoplayEnabled;
 
 - (IBAction)playlistDoubleClickAction:(id)sender;
 

@@ -489,7 +489,7 @@
 - (IBAction)restoreMainWindow:(id)sender
 {
     [[NSApp sharedApplication] activateIgnoringOtherApps:YES];
-    [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:sender];
+    [(NSWindow *)[[VLCMain sharedInstance] libraryWindow] makeKeyAndOrderFront:sender];
 }
 
 // Action: Toggle Play / Pause
