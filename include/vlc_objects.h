@@ -64,9 +64,39 @@ struct vlc_common_members
     _Generic((x)->obj, \
         struct vlc_common_members: (vlc_object_t *)(x) \
     )
+# define vlc_object_cast(t)
 #else
-# define VLC_OBJECT(x) ((vlc_object_t *)(x))
+# define vlc_object_cast(t) \
+struct t; \
+static inline struct vlc_object_t *VLC_OBJECT(struct t *d) \
+{ \
+    return (struct vlc_object_t *)d; \
+}
 #endif
+
+vlc_object_cast(vlc_object_t)
+vlc_object_cast(libvlc_int_t)
+vlc_object_cast(intf_thread_t)
+vlc_object_cast(vlc_player_t)
+vlc_object_cast(playlist_t)
+vlc_object_cast(input_thread_t)
+vlc_object_cast(stream_t)
+vlc_object_cast(decoder_t)
+vlc_object_cast(filter_t)
+vlc_object_cast(audio_output)
+vlc_object_cast(vout_thread_t)
+vlc_object_cast(vout_display_t)
+vlc_object_cast(vout_window_t)
+vlc_object_cast(sout_instance_t)
+vlc_object_cast(sout_stream_t)
+vlc_object_cast(sout_access_out_t)
+vlc_object_cast(extensions_manager_t)
+vlc_object_cast(fingerprinter_thread_t)
+vlc_object_cast(demux_meta_t)
+vlc_object_cast(xml_t)
+vlc_object_cast(services_discovery_t)
+vlc_object_cast(vlc_renderer_discovery_t)
+vlc_object_cast(vlc_medialibrary_module_t)
 
 /*****************************************************************************
  * The vlc_object_t type. Yes, it's that simple :-)
