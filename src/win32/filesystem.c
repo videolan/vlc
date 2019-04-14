@@ -321,6 +321,7 @@ ssize_t vlc_write(int fd, const void *buf, size_t len)
 
 ssize_t vlc_writev(int fd, const struct iovec *iov, int count)
 {
+    (void) fd; (void) iov; (void) count;
     vlc_assert_unreachable();
 }
 
