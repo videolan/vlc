@@ -1696,6 +1696,52 @@ test_delete_while_playback(vlc_object_t *obj, bool start)
     vlc_player_Delete(player);
 }
 
+static void
+test_outputs(struct ctx *ctx)
+{
+    vlc_player_t *player = ctx->player;
+
+    /* Test that the player has a valid aout and vout, even before first
+     * playback */
+    audio_output_t *aout = vlc_player_aout_Hold(player);
+    assert(aout);
+
+    vout_thread_t *vout = vlc_player_vout_Hold(player);
+    assert(vout);
+
+    size_t vout_count;
+    vout_thread_t **vout_list = vlc_player_vout_HoldAll(player, &vout_count);
+    assert(vout_count == 1 && vout_list[0] == vout);
+    vout_Release(vout_list[0]);
+    free(vout_list);
+    vout_Release(vout);
+
+    /* Test that the player keep the same aout and vout during playback */
+    struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_MS(10));
+
+    player_set_current_mock_media(ctx, "media1", &params, false);
+    player_start(ctx);
+
+    wait_state(ctx, VLC_PLAYER_STATE_STOPPING);
+
+    {
+        vec_on_vout_changed *vec = &ctx->report.on_vout_changed;
+        assert(vec->size >= 1);
+        assert(vec->data[0].action == VLC_PLAYER_VOUT_STARTED);
+
+        vout_thread_t *same_vout = vlc_player_vout_Hold(player);
+        assert(vec->data[0].vout == same_vout);
+        vout_Release(same_vout);
+    }
+
+    audio_output_t *same_aout = vlc_player_aout_Hold(player);
+    assert(same_aout == aout);
+    aout_Release(same_aout);
+
+    aout_Release(aout);
+    test_end(ctx);
+}
+
 int
 main(void)
 {
@@ -1749,6 +1795,8 @@ REPORT_LIST
     vlc_player_listener_id *listener =
         vlc_player_AddListener(player, &cbs, &ctx);
     assert(listener);
+
+    test_outputs(&ctx); /* Must be the first test */
 
     test_set_current_media(&ctx);
     test_next_media(&ctx);
