@@ -3339,30 +3339,6 @@ vlc_player_GetV4l2Object(vlc_player_t *player)
 }
 
 void
-vlc_player_SetVideoSplitter(vlc_player_t *player, const char *splitter)
-{
-    if (config_GetType("video-splitter") == 0)
-        return;
-    struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    if (!input)
-        return;
-
-    vout_thread_t *vout = vlc_player_vout_Hold(player);
-    var_SetString(vout, "video-splitter", splitter);
-    vout_Release(vout);
-
-    /* FIXME vout cannot handle live video splitter change, restart the main
-     * vout manually by restarting the first video es */
-    struct vlc_player_track *track;
-    vlc_vector_foreach(track, &input->video_track_vector)
-        if (track->selected)
-        {
-            vlc_player_RestartTrack(player, track->es_id);
-            break;
-        }
-}
-
-void
 vlc_player_vout_SetFullscreen(vlc_player_t *player, bool enabled)
 {
     vlc_player_vout_SetVar(player, "fullscreen", VLC_VAR_BOOL,
@@ -3497,8 +3473,6 @@ vlc_player_New(vlc_object_t *parent,
     VAR_CREATE("demux-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
     /* vout variables */
-    if (config_GetType("video-splitter"))
-        VAR_CREATE("video-splitter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     VAR_CREATE("fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     VAR_CREATE("video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     VAR_CREATE("video-wallpaper", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);

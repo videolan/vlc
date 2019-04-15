@@ -2461,15 +2461,6 @@ VLC_API vlc_object_t *
 vlc_player_GetV4l2Object(vlc_player_t *player) VLC_DEPRECATED;
 
 /**
- * Set a video splitter to the main vout
- *
- * @param player locked instance
- * @param splitter a video splitter name or NULL
- */
-VLC_API void
-vlc_player_SetVideoSplitter(vlc_player_t *player, const char *splitter);
-
-/**
  * Get the audio output
  *
  * @warning The returned pointer must be released with aout_Release().
