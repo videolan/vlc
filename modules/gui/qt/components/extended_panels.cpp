@@ -309,16 +309,12 @@ static QString ChangeFiltersString( struct intf_thread_t *p_intf, const char *ps
 static void UpdateVFiltersString( struct intf_thread_t *p_intf,
                                   const char *psz_filter_type, const char *value )
 {
-    var_SetString( p_intf, psz_filter_type, value );
-
     /* Try to set non splitter filters on the fly */
     if( strcmp( psz_filter_type, "video-splitter" ) )
     {
-        PlayerController::VoutPtrList p_vouts = THEMIM->getVouts();
-        for( auto p_vout: p_vouts )
-        {
+        auto p_vout = THEMIM->getVout();
+        if( p_vout )
             var_SetString( p_vout.get(), psz_filter_type, value );
-        }
     }
 }
 
@@ -498,15 +494,13 @@ void ExtVideo::setWidgetValue( QObject *widget )
 void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
         int i_int, double f_float, const char *psz_string )
 {
-    PlayerController::VoutPtrList p_vouts = THEMIM->getVouts();
+    auto p_vout = THEMIM->getVout();
     int i_type = 0;
-    bool b_is_command = false;
 
-    if( !p_vouts.isEmpty() )
-    {
-        i_type = var_Type( p_vouts.at(0).get(), psz_option );
-        b_is_command = ( i_type & VLC_VAR_ISCOMMAND );
-    }
+    if( !p_vout )
+        return;
+
+    i_type = var_Type( p_vout.get(), psz_option );
     if( i_type == 0 )
         i_type = config_GetType( psz_option );
 
@@ -516,20 +510,13 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
     {
         emit configChanged( qfu( psz_option ), QVariant( i_int ) );
         if( i_type == VLC_VAR_INTEGER )
-        {
             val.i_int = i_int;
-            var_SetInteger( p_intf, psz_option, i_int );
-        }
         else
-        {
-            var_SetBool( p_intf, psz_option, i_int );
             val.b_bool = i_int;
-        }
     }
     else if( i_type == VLC_VAR_FLOAT )
     {
         emit configChanged( qfu( psz_option ), QVariant( f_float ) );
-        var_SetFloat( p_intf, psz_option, f_float );
         val.f_float = f_float;
     }
     else if( i_type == VLC_VAR_STRING )
@@ -537,7 +524,6 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
         if( psz_string == NULL )
             psz_string = "";
         emit configChanged( qfu( psz_option ), QVariant( psz_string ) );
-        var_SetString( p_intf, psz_option, psz_string );
         val.psz_string = (char *) psz_string;
     }
     else
@@ -547,21 +533,10 @@ void ExtVideo::setFilterOption( const char *psz_module, const char *psz_option,
                  psz_module,
                  psz_option,
                  i_type );
-        b_is_command = false;
+        return;
     }
 
-    if( b_is_command )
-    {
-        for( auto p_vout: p_vouts )
-        {
-            var_SetChecked( p_vout.get(), psz_option, i_type, val );
-#ifndef NDEBUG
-            int i_cur_type = var_Type( p_vout.get(), psz_option );
-            assert( ( i_cur_type & VLC_VAR_CLASS ) == i_type );
-            assert( !!( i_cur_type & VLC_VAR_ISCOMMAND ) == b_is_command );
-#endif
-        }
-    }
+    var_SetChecked( p_vout.get(), psz_option, i_type, val );
 }
 
 void ExtVideo::updateFilterOptions()
