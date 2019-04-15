@@ -154,6 +154,12 @@ parts:
       - bison
       - flex
       - libvulkan-dev
+      - qtdeclarative5-dev
+      - qtquickcontrols2-5-dev
+      - qml-module-qtquick-controls2
+      - qml-module-qtquick-layouts
+      - qml-module-qtquick-templates2
+      - qml-module-qtgraphicaleffects
     stage-packages:
       - fonts-freefont-ttf
       - dbus-x11
@@ -212,6 +218,10 @@ parts:
       - mesa-vulkan-drivers
       - libvulkan-dev
       - openjdk-8-jdk
+      - qml-module-qtquick-controls2
+      - qml-module-qtquick-layouts
+      - qml-module-qtquick-templates2
+      - qml-module-qtgraphicaleffects
     filesets:
       exclusion:
       - "-usr/lib/*/cmake/*"
