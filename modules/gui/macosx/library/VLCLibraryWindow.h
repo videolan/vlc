@@ -24,8 +24,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCFSPanelController;
-
 @interface VLCLibraryWindowController : NSWindowController
 
 - (instancetype)initWithLibraryWindow;
@@ -40,12 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) BOOL nativeFullscreenMode;
 @property (readwrite) BOOL nonembedded;
-@property (readonly) VLCFSPanelController* fspanel;
 
-- (void)showFullscreenController;
-- (void)changePlaylistState:(int)event;
-- (void)videoplayWillBeStarted;
-- (void)setVideoplayEnabled;
+- (void)videoPlaybackWillBeStarted;
+- (void)toggleVideoPlaybackAppearance;
 
 - (IBAction)playlistDoubleClickAction:(id)sender;
 

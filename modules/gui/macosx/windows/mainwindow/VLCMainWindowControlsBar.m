@@ -385,7 +385,6 @@
 - (IBAction)togglePlaylist:(id)sender
 {
     // FIXME: this is a NO-OP
-    [[[VLCMain sharedInstance] libraryWindow] changePlaylistState: 0];
 }
 
 - (IBAction)volumeAction:(id)sender

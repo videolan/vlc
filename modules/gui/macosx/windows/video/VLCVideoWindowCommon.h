@@ -25,6 +25,9 @@
 
 #import "windows/video/VLCWindow.h"
 
+extern NSString *VLCVideoWindowShouldShowFullscreenController;
+extern NSString *VLCVideoWindowDidEnterFullscreen;
+
 @class VLCVoutView;
 
 @class VLCControlsBarCommon;

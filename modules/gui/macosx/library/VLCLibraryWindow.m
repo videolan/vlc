@@ -45,6 +45,8 @@ static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
     VLCLibraryDataSource *_libraryDataSource;
 
     NSRect _windowFrameBeforePlayback;
+
+    VLCFSPanelController *_fspanel;
 }
 @end
 
@@ -52,6 +54,12 @@ static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 
 - (void)awakeFromNib
 {
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(shouldShowFullscreenController:)
+                               name:VLCVideoWindowShouldShowFullscreenController
+                             object:nil];
+
     _fspanel = [[VLCFSPanelController alloc] init];
     [_fspanel showWindow:self];
 
@@ -81,6 +89,11 @@ static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
     [_libraryCollectionView reloadData];
 }
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)segmentedControlAction
 {
 }
@@ -94,17 +107,13 @@ static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
     [[[VLCMain sharedInstance] playlistController] playItemAtIndex:selectedRow];
 }
 
-- (void)changePlaylistState:(int)event
-{
-}
-
-- (void)videoplayWillBeStarted
+- (void)videoPlaybackWillBeStarted
 {
     if (!self.fullscreen)
         _windowFrameBeforePlayback = [self frame];
 }
 
-- (void)setVideoplayEnabled
+- (void)toggleVideoPlaybackAppearance
 {
     BOOL b_videoPlayback = [[VLCMain sharedInstance] activeVideoPlayback];
 
@@ -137,10 +146,10 @@ static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
     if (self.nativeFullscreenMode) {
         if ([self hasActiveVideo] && [self fullscreen] && b_videoPlayback) {
             [self hideControlsBar];
-            [self.fspanel setActive];
+            [_fspanel shouldBecomeActive:nil];
         } else {
             [self showControlsBar];
-            [self.fspanel setNonActive];
+            [_fspanel shouldBecomeInactive:nil];
         }
     }
 }
@@ -148,14 +157,14 @@ static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 #pragma mark -
 #pragma mark Fullscreen support
 
-- (void)showFullscreenController
+- (void)shouldShowFullscreenController:(NSNotification *)aNotification
 {
     id currentWindow = [NSApp keyWindow];
     if ([currentWindow respondsToSelector:@selector(hasActiveVideo)] && [currentWindow hasActiveVideo]) {
         if ([currentWindow respondsToSelector:@selector(fullscreen)] && [currentWindow fullscreen] && ![[currentWindow videoView] isHidden]) {
-
-            if ([[VLCMain sharedInstance] activeVideoPlayback])
-                [self.fspanel fadeIn];
+            if ([[VLCMain sharedInstance] activeVideoPlayback]) {
+                [_fspanel fadeIn];
+            }
         }
     }
 

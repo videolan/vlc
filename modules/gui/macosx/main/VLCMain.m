@@ -143,14 +143,15 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     @autoreleasepool {
         dispatch_async(dispatch_get_main_queue(), ^{
 
-            intf_thread_t * p_intf = getIntf();
+            intf_thread_t *p_intf = getIntf();
             if (p_intf) {
                 VLCMain *mainInstance = [VLCMain sharedInstance];
-                if ([[[mainInstance playlistController] playerController] fullscreen])
-                    [mainInstance showFullscreenController];
-
-                else if (!strcmp(psz_variable, "intf-show"))
+                if ([[[mainInstance playlistController] playerController] fullscreen]) {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:VLCVideoWindowShouldShowFullscreenController
+                                                                        object:mainInstance];
+                } else if (!strcmp(psz_variable, "intf-show")) {
                     [[mainInstance libraryWindow] makeKeyAndOrderFront:nil];
+                }
             }
 
         });
@@ -444,20 +445,13 @@ static VLCMain *sharedInstance = nil;
     return YES;
 }
 
-- (void)showFullscreenController
-{
-    // defer selector here (possibly another time) to ensure that keyWindow is set properly
-    // (needed for NSApplicationDidBecomeActiveNotification)
-    [[self libraryWindow] performSelectorOnMainThread:@selector(showFullscreenController) withObject:nil waitUntilDone:NO];
-}
-
 - (void)setActiveVideoPlayback:(BOOL)b_value
 {
     assert([NSThread isMainThread]);
 
     b_active_videoplayback = b_value;
     if ([self libraryWindow]) {
-        [[self libraryWindow] setVideoplayEnabled];
+        [[self libraryWindow] toggleVideoPlaybackAppearance];
     }
 }
 

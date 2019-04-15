@@ -114,8 +114,6 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 - (BOOL)activeVideoPlayback;
 - (void)applicationWillTerminate:(NSNotification *)notification;
 
-- (void)showFullscreenController;
-
 - (BOOL)isTerminating;
 
 @end

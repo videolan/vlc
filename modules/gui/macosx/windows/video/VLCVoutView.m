@@ -196,8 +196,10 @@
 - (void)mouseMoved:(NSEvent *)o_event
 {
     NSPoint ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
-    if ([self mouse: ml inRect: [self bounds]])
-        [[VLCMain sharedInstance] showFullscreenController];
+    if ([self mouse: ml inRect: [self bounds]]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:VLCVideoWindowShouldShowFullscreenController
+                                                            object:self];
+    }
 
     [super mouseMoved: o_event];
 }

@@ -30,6 +30,10 @@
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "windows/video/VLCVideoWindowCommon.h"
+
+NSString *VLCFSPanelShouldBecomeActive = @"VLCFSPanelShouldBecomeActive";
+NSString *VLCFSPanelShouldBecomeInactive = @"VLCFSPanelShouldBecomeInactive";
 
 @interface VLCFSPanelController () {
     BOOL _isCounting;
@@ -55,7 +59,6 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 
     [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
 }
-
 
 #pragma mark -
 #pragma mark Initialization
@@ -107,6 +110,9 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [notificationCenter addObserver:self selector:@selector(hasNextChanged:) name:VLCPlaybackHasNextChanged object:nil];
     [notificationCenter addObserver:self selector:@selector(volumeChanged:) name:VLCPlayerVolumeChanged object:nil];
     [notificationCenter addObserver:self selector:@selector(inputItemChanged:) name:VLCPlayerCurrentMediaItemChanged object:nil];
+    [notificationCenter addObserver:self selector:@selector(shouldBecomeActive:) name:VLCFSPanelShouldBecomeActive object:nil];
+    [notificationCenter addObserver:self selector:@selector(shouldBecomeInactive:) name:VLCFSPanelShouldBecomeInactive object:nil];
+    [notificationCenter addObserver:self selector:@selector(voutWasUpdated:) name:VLCVideoWindowDidEnterFullscreen object:nil];
 }
 
 #define setupButton(target, title, desc)            \
@@ -440,12 +446,12 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     return frame;
 }
 
-- (void)setNonActive
+- (void)shouldBecomeInactive:(NSNotification *)aNotification
 {
     [self.window orderOut:self];
 }
 
-- (void)setActive
+- (void)shouldBecomeActive:(NSNotification *)aNotification
 {
     [self.window orderFront:self];
     [self fadeIn];
@@ -459,8 +465,9 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [NSCursor setHiddenUntilMouseMoves:YES];
 }
 
-- (void)setVoutWasUpdated:(VLCWindow *)voutWindow
+- (void)voutWasUpdated:(NSNotification *)aNotification
 {
+    VLCWindow *voutWindow = aNotification.object;
     _associatedVoutWindow = voutWindow;
 
     NSRect voutRect = voutWindow.frame;
@@ -470,7 +477,6 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 
         [self centerPanel];
     }
-
 }
 
 #pragma mark -

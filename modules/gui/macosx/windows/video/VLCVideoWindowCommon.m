@@ -33,6 +33,9 @@
 #import "playlist/VLCPlayerController.h"
 #import "library/VLCLibraryWindow.h"
 
+NSString *VLCVideoWindowShouldShowFullscreenController = @"VLCVideoWindowShouldShowFullscreenController";
+NSString *VLCVideoWindowDidEnterFullscreen = @"VLCVideoWindowDidEnterFullscreen";
+
 /*****************************************************************************
  * VLCVideoWindowCommon
  *
@@ -436,17 +439,18 @@
     [super becomeKeyWindow];
 
     // change fspanel state for the case when multiple windows are in fullscreen
-    if ([self hasActiveVideo] && [self fullscreen])
-        [[[[VLCMain sharedInstance] libraryWindow] fspanel] setActive];
-    else
-        [[[[VLCMain sharedInstance] libraryWindow] fspanel] setNonActive];
+    if ([self hasActiveVideo] && [self fullscreen]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:VLCFSPanelShouldBecomeActive object:self];
+    } else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:VLCFSPanelShouldBecomeInactive object:self];
+    }
 }
 
 - (void)resignKeyWindow
 {
     [super resignKeyWindow];
 
-    [[[[VLCMain sharedInstance] libraryWindow] fspanel] setNonActive];
+    [[NSNotificationCenter defaultCenter] postNotificationName:VLCFSPanelShouldBecomeInactive object:self];
 }
 
 -(NSArray*)customWindowsToEnterFullScreenForWindow:(NSWindow *)window
@@ -533,9 +537,11 @@
     _inFullscreenTransition = NO;
 
     if ([self hasActiveVideo]) {
-        [[[[VLCMain sharedInstance] libraryWindow] fspanel] setVoutWasUpdated:self];
-        if (![_videoView isHidden])
-            [[[[VLCMain sharedInstance] libraryWindow] fspanel] setActive];
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter postNotificationName:VLCVideoWindowDidEnterFullscreen object:self];
+        if (![_videoView isHidden]) {
+            [notificationCenter postNotificationName:VLCFSPanelShouldBecomeActive object:self];
+        }
     }
 
     NSArray *subviews = [[self videoView] subviews];
@@ -564,7 +570,7 @@
     }
 
     [NSCursor setHiddenUntilMouseMoves: NO];
-    [[[[VLCMain sharedInstance] libraryWindow] fspanel] setNonActive];
+    [[NSNotificationCenter defaultCenter] postNotificationName:VLCFSPanelShouldBecomeInactive object:self];
 
     if (![_videoView isHidden]) {
         [self showControlsBar];
@@ -742,8 +748,9 @@
     [o_fullscreen_window setAcceptsMouseMovedEvents: YES];
 
     /* tell the fspanel to move itself to front next time it's triggered */
-    [[[[VLCMain sharedInstance] libraryWindow] fspanel] setVoutWasUpdated:o_fullscreen_window];
-    [[[[VLCMain sharedInstance] libraryWindow] fspanel] setActive];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter postNotificationName:VLCVideoWindowDidEnterFullscreen object:self];
+    [notificationCenter postNotificationName:VLCFSPanelShouldBecomeActive object:self];
 
     if ([self isVisible])
         [self orderOut: self];
@@ -768,7 +775,7 @@
         return;
     }
 
-    [[[[VLCMain sharedInstance] libraryWindow] fspanel] setNonActive];
+    [[NSNotificationCenter defaultCenter] postNotificationName:VLCFSPanelShouldBecomeInactive object:self];
     [[o_fullscreen_window screen] setNonFullscreenPresentationOptions];
 
     if (o_fullscreen_anim1) {

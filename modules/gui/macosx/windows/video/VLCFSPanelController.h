@@ -30,6 +30,9 @@
 #import "views/VLCTimeField.h"
 #import "views/VLCSlider.h"
 
+extern NSString *VLCFSPanelShouldBecomeActive;
+extern NSString *VLCFSPanelShouldBecomeInactive;
+
 @interface VLCFSPanelController : NSWindowController
 
 @property (readwrite, weak) NSTimer   *hideTimer;
@@ -58,11 +61,10 @@
 - (IBAction)timeSliderUpdate:(id)sender;
 - (IBAction)volumeSliderUpdate:(id)sender;
 
+- (void)shouldBecomeInactive:(NSNotification *)aNotification;
+- (void)shouldBecomeActive:(NSNotification *)aNotification;
 - (void)fadeIn;
 - (void)fadeOut;
-- (void)setActive;
-- (void)setNonActive;
-- (void)setVoutWasUpdated:(VLCWindow *)voutWindow;
 
 // Constrain frame to window. Used by VLCFSPanelDraggableView.
 - (NSRect)contrainFrameToAssociatedVoutWindow:(NSRect)frame;

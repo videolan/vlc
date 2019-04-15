@@ -227,7 +227,7 @@ int WindowOpen(vout_window_t *p_wnd)
 
     // should be called before any window resizing occurs
     if (!multipleVoutWindows)
-        [[mainInstance libraryWindow] videoplayWillBeStarted];
+        [[mainInstance libraryWindow] videoPlaybackWillBeStarted];
 
     if (multipleVoutWindows && videoWallpaper)
         videoWallpaper = false;
@@ -353,10 +353,6 @@ int WindowOpen(vout_window_t *p_wnd)
     [mainInstance setActiveVideoPlayback: YES];
     [[mainInstance libraryWindow] setNonembedded:!b_mainWindowHasVideo];
 
-    // beware of order, setActiveVideoPlayback:, setHasActiveVideo: and setNonembedded: must be called before
-    if ([newVideoWindow class] == [VLCLibraryWindow class])
-        [[mainInstance libraryWindow] changePlaylistState: 0]; // FIXME: this is a NO-OP
-
     // TODO: find a cleaner way for "start in fullscreen"
     // Start in fs, because either prefs settings, or fullscreen button was pressed before
 
@@ -425,9 +421,6 @@ int WindowOpen(vout_window_t *p_wnd)
         // video in main window might get stopped while another vout is open
         if ([_voutWindows count] > 0)
             [[mainInstance libraryWindow] setNonembedded:YES];
-
-        // beware of order, setActiveVideoPlayback:, setHasActiveVideo: and setNonembedded: must be called before
-        [[mainInstance libraryWindow] changePlaylistState: 0]; // FIXME: this is a NO-OP
     }
 }
 
