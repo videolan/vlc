@@ -280,7 +280,7 @@ static bool StartRendering(void *opaque)
 
 #if VLC_WINSTORE_APP
     /* TODO read the swapchain size and call VOUT_DISPLAY_CHANGE_DISPLAY_SIZE */
-    UpdateRects(vd, &sys->area, &sys->sys);
+    UpdateRects(VLC_OBJECT(vd), &sys->area, &sys->sys);
 #endif
 
     if ( sys->area.place_changed )
@@ -554,10 +554,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if (sys->pool)
         return sys->pool;
 
-    video_format_t surface_fmt = vd->fmt;
-    surface_fmt.i_width  = sys->picQuad.i_width;
-    surface_fmt.i_height = sys->picQuad.i_height;
-
     ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
     memset(textures, 0, sizeof(textures));
     unsigned slices = pool_size;
@@ -565,7 +561,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         /* only provide enough for the filters, we can still do direct rendering */
         slices = __MIN(slices, 6);
 
-    if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &surface_fmt, slices, textures))
+    if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &sys->area.texture_source, slices, textures))
         goto error;
 
     pictures = calloc(pool_size, sizeof(*pictures));
@@ -585,7 +581,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             .pf_destroy = DestroyDisplayPoolPicture,
         };
 
-        picture = picture_NewFromResource(&surface_fmt, &resource);
+        picture = picture_NewFromResource(&sys->area.texture_source, &resource);
         if (unlikely(picture == NULL)) {
             free(picsys);
             msg_Err( vd, "Failed to create picture %d in the pool.", picture_count );
@@ -630,7 +626,7 @@ error:
         sys->pool = picture_pool_New( 0, NULL );
     } else {
         msg_Dbg(vd, "D3D11 pool succeed with %d surfaces (%dx%d) context 0x%p",
-                pool_size, surface_fmt.i_width, surface_fmt.i_height, sys->d3d_dev.d3dcontext);
+                pool_size, sys->area.texture_source.i_width, sys->area.texture_source.i_height, sys->d3d_dev.d3dcontext);
     }
     return sys->pool;
 }
@@ -837,10 +833,10 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             {
                 /* the decoder produced different sizes than the vout, we need to
                  * adjust the vertex */
-                sys->picQuad.i_height = texDesc.Height;
-                sys->picQuad.i_width = texDesc.Width;
+                sys->area.texture_source.i_width  = sys->picQuad.i_height = texDesc.Height;
+                sys->area.texture_source.i_height = sys->picQuad.i_width = texDesc.Width;
 
-                UpdateRects(vd, &sys->area, &sys->sys);
+                UpdateRects(VLC_OBJECT(vd), &sys->area, &sys->sys);
                 UpdateSize(vd);
             }
         }
@@ -1456,11 +1452,10 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
-    UpdateRects(vd, &sys->area, &sys->sys);
+    sys->area.texture_source.i_width  = sys->picQuad.i_width;
+    sys->area.texture_source.i_height = sys->picQuad.i_height;
 
-    video_format_t surface_fmt = *fmt;
-    surface_fmt.i_width  = sys->picQuad.i_width;
-    surface_fmt.i_height = sys->picQuad.i_height;
+    UpdateRects(VLC_OBJECT(vd), &sys->area, &sys->sys);
 
     if (D3D11_AllocateQuad(vd, &sys->d3d_dev, vd->source.projection_mode, &sys->picQuad) != VLC_SUCCESS)
     {
@@ -1474,7 +1469,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         .top    = vd->source.i_y_offset,
         .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
     };
-    if (D3D11_SetupQuad( vd, &sys->d3d_dev, &surface_fmt, &sys->picQuad, &sys->display,
+    if (D3D11_SetupQuad( vd, &sys->d3d_dev, &sys->area.texture_source, &sys->picQuad, &sys->display,
                          &source_rect,
                          vd->source.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
@@ -1500,7 +1495,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         /* we need a staging texture */
         ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
 
-        if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &surface_fmt, 1, textures))
+        if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &sys->area.texture_source, 1, textures))
         {
             msg_Err(vd, "Failed to allocate the staging texture");
             return VLC_EGENERIC;
@@ -1566,7 +1561,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
-    UpdateRects(vd, &sys->area, &sys->sys);
+    UpdateRects(VLC_OBJECT(vd), &sys->area, &sys->sys);
 
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {
