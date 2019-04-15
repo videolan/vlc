@@ -46,9 +46,9 @@
 
 static bool GetExternalDimensions(void *opaque, UINT *width, UINT *height)
 {
-    const vout_display_t *vd = opaque;
-    *width  = vd->source.i_visible_width;
-    *height = vd->source.i_visible_height;
+    const display_win32_area_t *area = opaque;
+    *width  = area->vdcfg.display.width;
+    *height = area->vdcfg.display.height;
     return true;
 }
 
@@ -56,7 +56,7 @@ void InitArea(vout_display_t *vd, display_win32_area_t *area, const vout_display
 {
     area->place_changed = false;
     area->pf_GetDisplayDimensions = GetExternalDimensions;
-    area->opaque_dimensions = vd;
+    area->opaque_dimensions = area;
     area->vdcfg = *vdcfg;
 
     area->texture_source = vd->source;
