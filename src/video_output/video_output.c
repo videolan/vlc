@@ -1669,7 +1669,7 @@ void vout_Stop(vout_thread_t *vout)
     vout_StopDisplay(vout);
 
     vlc_mutex_lock(&sys->window_lock);
-    if (!sys->window_active) {
+    if (sys->window_active) {
         vout_window_Disable(sys->display_cfg.window);
         sys->window_active = false;
     }
