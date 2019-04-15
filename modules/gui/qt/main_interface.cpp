@@ -170,6 +170,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf ),
 
     QString platformName = QGuiApplication::platformName();
 
+#ifdef QT5_HAS_WAYLAND
+    b_hasWayland = platformName.startsWith(QLatin1String("wayland"), Qt::CaseInsensitive);
+#endif
+
     // TODO: handle Wayland/X11/Win32 windows
     m_videoRenderer.reset(new QVoutWindowDummy(this));
 
