@@ -36,7 +36,6 @@
 #import "VLCBookmarksWindowController.h"
 
 #import "main/CompatibilityFixes.h"
-#import <vlc_playlist_legacy.h>
 
 @interface VLCBookmarksWindowController() <NSTableViewDataSource, NSTableViewDelegate>
 {
@@ -120,6 +119,7 @@
 
 - (IBAction)add:(id)sender
 {
+#if 0
     /* add item to list */
     input_thread_t * p_input = pl_CurrentInput(getIntf());
 
@@ -136,10 +136,12 @@
     input_Release(p_input);
 
     [_dataTable reloadData];
+#endif
 }
 
 - (IBAction)clear:(id)sender
 {
+#if 0
     /* clear table */
     input_thread_t * p_input = pl_CurrentInput(getIntf());
 
@@ -151,10 +153,12 @@
     input_Release(p_input);
 
     [_dataTable reloadData];
+#endif
 }
 
 - (IBAction)edit:(id)sender
 {
+#if 0
     /* put values to the sheet's fields and show sheet */
     /* we take the values from the core and not the table, because we cannot
      * really trust it */
@@ -191,6 +195,7 @@
     for (int i = 0; i < i_bookmarks; i++)
         vlc_seekpoint_Delete(pp_bookmarks[i]);
     free(pp_bookmarks);
+#endif
 }
 
 - (IBAction)edit_cancel:(id)sender
@@ -202,6 +207,7 @@
 
 - (IBAction)edit_ok:(id)sender
 {
+#if 0
     /* save field contents and close sheet */
      seekpoint_t **pp_bookmarks;
     int i_bookmarks;
@@ -268,11 +274,13 @@ clear:
     for (int i = 0; i < i_bookmarks; i++)
         vlc_seekpoint_Delete(pp_bookmarks[i]);
     free(pp_bookmarks);
+#endif
 }
 
 
 - (IBAction)goToBookmark:(id)sender
 {
+#if 0
     input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (!p_input)
@@ -281,10 +289,12 @@ clear:
     input_Control(p_input, INPUT_SET_BOOKMARK, [_dataTable selectedRow]);
 
     input_Release(p_input);
+#endif
 }
 
 - (IBAction)remove:(id)sender
 {
+#if 0
     input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (!p_input)
@@ -298,6 +308,7 @@ clear:
     input_Release(p_input);
 
     [_dataTable reloadData];
+#endif
 }
 
 - (NSString *)timeStringForBookmark:(seekpoint_t *)bookmark
@@ -318,6 +329,7 @@ clear:
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)theDataTable
 {
+#if 0
     /* return the number of bookmarks */
     input_thread_t * p_input = pl_CurrentInput(getIntf());
     seekpoint_t **pp_bookmarks;
@@ -337,10 +349,13 @@ clear:
     free(pp_bookmarks);
 
     return i_bookmarks;
+#endif
+    return 0;
 }
 
 - (id)tableView:(NSTableView *)theDataTable objectValueForTableColumn: (NSTableColumn *)theTableColumn row: (NSInteger)row
 {
+#if 0
     /* return the corresponding data as NSString */
     input_thread_t * p_input = pl_CurrentInput(getIntf());
     seekpoint_t **pp_bookmarks;
@@ -368,6 +383,8 @@ clear:
     }
     input_Release(p_input);
     return ret;
+#endif
+    return @"";
 }
 
 /*****************************************************************************
@@ -391,6 +408,7 @@ clear:
 /* Called when the user hits CMD + C or copy is clicked in the edit menu
  */
 - (void) copy:(id)sender {
+#if 0
     NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
     NSIndexSet *selectionIndices = [_dataTable selectedRowIndexes];
 
@@ -423,6 +441,7 @@ clear:
     for (int i = 0; i < i_bookmarks; i++)
         vlc_seekpoint_Delete(pp_bookmarks[i]);
     free(pp_bookmarks);
+#endif
 }
 
 #pragma mark -
