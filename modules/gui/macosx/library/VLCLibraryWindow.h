@@ -40,7 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite) BOOL nonembedded;
 
 - (void)videoPlaybackWillBeStarted;
-- (void)toggleVideoPlaybackAppearance;
+- (void)enableVideoPlaybackAppearance;
+- (void)disableVideoPlaybackAppearance;
 
 - (IBAction)playlistDoubleClickAction:(id)sender;
 

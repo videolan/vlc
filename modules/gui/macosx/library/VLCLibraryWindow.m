@@ -113,44 +113,48 @@ static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
         _windowFrameBeforePlayback = [self frame];
 }
 
-- (void)toggleVideoPlaybackAppearance
+- (void)enableVideoPlaybackAppearance
 {
-    BOOL b_videoPlayback = [[VLCMain sharedInstance] activeVideoPlayback];
-
-    if (!b_videoPlayback) {
-        if (!self.nonembedded && (!self.nativeFullscreenMode || (self.nativeFullscreenMode && !self.fullscreen)) && _windowFrameBeforePlayback.size.width > 0 && _windowFrameBeforePlayback.size.height > 0) {
-
-            // only resize back to minimum view of this is still desired final state
-            CGFloat f_threshold_height = f_min_video_height + [self.controlsBar height];
-            if (_windowFrameBeforePlayback.size.height > f_threshold_height) {
-                if ([[VLCMain sharedInstance] isTerminating])
-                    [self setFrame:_windowFrameBeforePlayback display:YES];
-                else
-                    [[self animator] setFrame:_windowFrameBeforePlayback display:YES];
-
-            }
-        }
-
-        _windowFrameBeforePlayback = NSMakeRect(0, 0, 0, 0);
-
-        [self makeFirstResponder: _playlistTableView];
-        [[[VLCMain sharedInstance] voutProvider] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
-
-        // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
-        [self setAlphaValue:1.0];
-        [self.videoView setHidden:YES];
-    } else {
-        [self.videoView setHidden:NO];
-    }
+    [self.videoView setHidden:NO];
 
     if (self.nativeFullscreenMode) {
-        if ([self hasActiveVideo] && [self fullscreen] && b_videoPlayback) {
+        if ([self hasActiveVideo] && [self fullscreen]) {
             [self hideControlsBar];
             [_fspanel shouldBecomeActive:nil];
-        } else {
-            [self showControlsBar];
-            [_fspanel shouldBecomeInactive:nil];
         }
+    }
+}
+
+- (void)disableVideoPlaybackAppearance
+{
+    if (!self.nonembedded
+        && (!self.nativeFullscreenMode || (self.nativeFullscreenMode && !self.fullscreen))
+        && _windowFrameBeforePlayback.size.width > 0
+        && _windowFrameBeforePlayback.size.height > 0) {
+
+        // only resize back to minimum view of this is still desired final state
+        CGFloat f_threshold_height = f_min_video_height + [self.controlsBar height];
+        if (_windowFrameBeforePlayback.size.height > f_threshold_height) {
+            if ([[VLCMain sharedInstance] isTerminating]) {
+                [self setFrame:_windowFrameBeforePlayback display:YES];
+            } else {
+                [[self animator] setFrame:_windowFrameBeforePlayback display:YES];
+            }
+        }
+    }
+
+    _windowFrameBeforePlayback = NSMakeRect(0, 0, 0, 0);
+
+    [self makeFirstResponder: _playlistTableView];
+    [[[VLCMain sharedInstance] voutProvider] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
+
+    // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
+    [self setAlphaValue:1.0];
+    [self.videoView setHidden:YES];
+
+    if (self.nativeFullscreenMode) {
+        [self showControlsBar];
+        [_fspanel shouldBecomeInactive:nil];
     }
 }
 

@@ -291,6 +291,7 @@ int WindowOpen(vout_window_t *p_wnd)
             voutView = [newVideoWindow videoView];
             b_mainWindowHasVideo = YES;
             isEmbedded = YES;
+            [(VLCLibraryWindow *)newVideoWindow enableVideoPlaybackAppearance];
         } else {
             // setup detached window with controls
             NSWindowController *o_controller = [[NSWindowController alloc] initWithWindowNibName:@"DetachedVideoWindow"];
@@ -375,47 +376,49 @@ int WindowOpen(vout_window_t *p_wnd)
     return voutView;
 }
 
-- (void)removeVoutForDisplay:(NSValue *)o_key
+- (void)removeVoutForDisplay:(NSValue *)key
 {
     VLCMain *mainInstance = [VLCMain sharedInstance];
-    VLCVideoWindowCommon *o_window = [_voutWindows objectForKey:o_key];
-    if (!o_window) {
+    VLCVideoWindowCommon *videoWindow = [_voutWindows objectForKey:key];
+    if (!videoWindow) {
         msg_Err(getIntf(), "Cannot close nonexisting window");
         return;
     }
 
-    [[o_window videoView] releaseVoutThread];
+    [[videoWindow videoView] releaseVoutThread];
 
     // set active video to no BEFORE closing the window and exiting fullscreen
     // (avoid stopping playback due to NSWindowWillCloseNotification, preserving fullscreen state)
-    [o_window setHasActiveVideo: NO];
+    [videoWindow setHasActiveVideo: NO];
 
     // prevent visible extra window if in fullscreen
     NSDisableScreenUpdates();
     BOOL b_native = [[mainInstance libraryWindow] nativeFullscreenMode];
 
     // close fullscreen, without changing fullscreen vars
-    if (!b_native && ([o_window fullscreen] || [o_window inFullscreenTransition]))
-        [o_window leaveFullscreenWithAnimation:NO];
+    if (!b_native && ([videoWindow fullscreen] || [videoWindow inFullscreenTransition]))
+        [videoWindow leaveFullscreenWithAnimation:NO];
 
     // native fullscreen window will not be closed if
     // fullscreen was triggered without video
-    if ((b_native && [o_window class] == [VLCLibraryWindow class] && [o_window fullscreen] && [o_window windowShouldExitFullscreenWhenFinished])) {
-        [o_window toggleFullScreen:self];
+    if ((b_native && [videoWindow class] == [VLCLibraryWindow class] && [videoWindow fullscreen] && [videoWindow windowShouldExitFullscreenWhenFinished])) {
+        [videoWindow toggleFullScreen:self];
     }
 
-    if ([o_window class] != [VLCLibraryWindow class]) {
-        [o_window close];
+    if ([videoWindow class] != [VLCLibraryWindow class]) {
+        [videoWindow close];
+    } else {
+        [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
     }
     NSEnableScreenUpdates();
 
-    [_voutWindows removeObjectForKey:o_key];
+    [_voutWindows removeObjectForKey:key];
     if ([_voutWindows count] == 0) {
         [mainInstance setActiveVideoPlayback:NO];
         _statusLevelWindowCounter = 0;
     }
 
-    if ([o_window class] == [VLCLibraryWindow class]) {
+    if ([videoWindow class] == [VLCLibraryWindow class]) {
         b_mainWindowHasVideo = NO;
 
         // video in main window might get stopped while another vout is open

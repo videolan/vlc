@@ -451,7 +451,7 @@ static VLCMain *sharedInstance = nil;
 
     b_active_videoplayback = b_value;
     if ([self libraryWindow]) {
-        [[self libraryWindow] toggleVideoPlaybackAppearance];
+//        [[self libraryWindow] toggleVideoPlaybackAppearance];
     }
 }
 
