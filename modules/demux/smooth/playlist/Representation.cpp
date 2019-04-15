@@ -61,8 +61,12 @@ std::string Representation::contextualize(size_t number, const std::string &comp
         {
             std::stringstream ss;
             ss.imbue(std::locale("C"));
-            ss << templ->segmentTimeline.Get()->getScaledPlaybackTimeByElementNumber(number);
-            ret.replace(pos, std::string("{start_time}").length(), ss.str());
+            const SegmentTimeline *tl = templ->inheritSegmentTimeline();
+            if(tl)
+            {
+                ss << tl->getScaledPlaybackTimeByElementNumber(number);
+                ret.replace(pos, std::string("{start_time}").length(), ss.str());
+            }
         }
     }
 

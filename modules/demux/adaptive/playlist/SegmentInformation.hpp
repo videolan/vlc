@@ -43,6 +43,7 @@ namespace adaptive
                                    public TimescaleAble,
                                    public Unique
         {
+            friend class MediaSegmentTemplate;
             public:
                 SegmentInformation( SegmentInformation * = 0 );
                 explicit SegmentInformation( AbstractPlaylist * );

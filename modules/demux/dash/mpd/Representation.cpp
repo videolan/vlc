@@ -177,9 +177,10 @@ std::string Representation::contextualize(size_t number, const std::string &comp
 mtime_t Representation::getScaledTimeBySegmentNumber(uint64_t index, const MediaSegmentTemplate *templ) const
 {
     mtime_t time = 0;
-    if(templ->segmentTimeline.Get())
+    const SegmentTimeline *tl = templ->inheritSegmentTimeline();
+    if(tl)
     {
-        time = templ->segmentTimeline.Get()->getScaledPlaybackTimeByElementNumber(index);
+        time = tl->getScaledPlaybackTimeByElementNumber(index);
     }
     else if(templ->duration.Get())
     {
