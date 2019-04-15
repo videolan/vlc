@@ -37,14 +37,20 @@ BaseSegmentTemplate::BaseSegmentTemplate( ICanonicalUrl *parent ) :
 
 
 MediaSegmentTemplate::MediaSegmentTemplate( SegmentInformation *parent ) :
-    BaseSegmentTemplate( parent ), Timelineable(), TimescaleAble( parent )
+    BaseSegmentTemplate( parent ), TimescaleAble( parent )
 {
     debugName = "SegmentTemplate";
     classId = Segment::CLASSID_SEGMENT;
     startNumber.Set( 1 );
+    segmentTimeline.Set( NULL );
     initialisationSegment.Set( NULL );
     templated = true;
     parentSegmentInformation = parent;
+}
+
+MediaSegmentTemplate::~MediaSegmentTemplate()
+{
+    delete segmentTimeline.Get();
 }
 
 void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, vlc_tick_t prunebarrier)

@@ -34,6 +34,7 @@ namespace adaptive
         class ICanonicalUrl;
         class InitSegmentTemplate;
         class SegmentInformation;
+        class SegmentTimeline;
 
         class BaseSegmentTemplate : public Segment
         {
@@ -43,11 +44,11 @@ namespace adaptive
 
         class MediaSegmentTemplate : public BaseSegmentTemplate,
                                      public Initializable<InitSegmentTemplate>,
-                                     public Timelineable,
                                      public TimescaleAble
         {
             public:
                 MediaSegmentTemplate( SegmentInformation * = NULL );
+                virtual ~MediaSegmentTemplate();
                 virtual void setSourceUrl( const std::string &url ); /* reimpl */
                 void mergeWith( MediaSegmentTemplate *, vlc_tick_t );
                 virtual uint64_t getSequenceNumber() const; /* reimpl */
@@ -57,6 +58,7 @@ namespace adaptive
                 size_t pruneBySequenceNumber(uint64_t);
                 virtual void debug(vlc_object_t *, int = 0) const; /* reimpl */
                 Property<size_t>        startNumber;
+                Property<SegmentTimeline *> segmentTimeline;
 
             protected:
                 SegmentInformation *parentSegmentInformation;
