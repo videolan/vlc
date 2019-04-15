@@ -1193,16 +1193,10 @@ PlayerController::VoutPtr PlayerController::getVout()
 {
     Q_D(PlayerController);
     vlc_player_locker lock{ d->m_player };
-    size_t count = 0;
-    vout_thread_t** vouts = vlc_player_vout_HoldAll( d->m_player, &count );
-    if( count == 0 || vouts == NULL )
+    vout_thread_t* vout = vlc_player_vout_Hold( d->m_player );
+    if( vout == NULL )
         return VoutPtr{};
-    //add a reference
-    VoutPtr first_vout{vouts[0], true};
-    for( size_t i = 0; i < count; i++ )
-        vout_Release(vouts[i]);
-    free( vouts );
-    return first_vout;
+    return VoutPtr{vout, false};
 }
 
 void PlayerController::setFullscreen( bool new_val )
