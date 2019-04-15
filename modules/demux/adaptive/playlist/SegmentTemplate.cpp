@@ -27,6 +27,7 @@
 #include "SegmentTimeline.h"
 #include "SegmentInformation.hpp"
 #include "AbstractPlaylist.hpp"
+#include <limits>
 
 using namespace adaptive::playlist;
 
@@ -37,12 +38,13 @@ BaseSegmentTemplate::BaseSegmentTemplate( ICanonicalUrl *parent ) :
 
 
 MediaSegmentTemplate::MediaSegmentTemplate( SegmentInformation *parent ) :
-    BaseSegmentTemplate( parent ), TimescaleAble( parent )
+    BaseSegmentTemplate( parent ),
+    TimescaleAble( NULL ) /* we don't want auto inherit */
 {
     debugName = "SegmentTemplate";
     classId = Segment::CLASSID_SEGMENT;
-    startNumber.Set( 1 );
-    segmentTimeline.Set( NULL );
+    startNumber = std::numeric_limits<uint64_t>::max();
+    segmentTimeline = NULL;
     initialisationSegment.Set( NULL );
     templated = true;
     parentSegmentInformation = parent;
@@ -50,15 +52,15 @@ MediaSegmentTemplate::MediaSegmentTemplate( SegmentInformation *parent ) :
 
 MediaSegmentTemplate::~MediaSegmentTemplate()
 {
-    delete segmentTimeline.Get();
+    delete segmentTimeline;
 }
 
 void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, vlc_tick_t prunebarrier)
 {
-    SegmentTimeline *timeline = segmentTimeline.Get();
-    if(timeline && updated->segmentTimeline.Get())
+    SegmentTimeline *timeline = segmentTimeline;
+    if(timeline && updated->segmentTimeline)
     {
-        timeline->mergeWith(*updated->segmentTimeline.Get());
+        timeline->mergeWith(*updated->segmentTimeline);
         if(prunebarrier)
         {
             const Timescale timescale = timeline->inheritTimescale();
@@ -71,22 +73,77 @@ void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, vlc_tick_t p
 
 void MediaSegmentTemplate::pruneByPlaybackTime(vlc_tick_t time)
 {
-    if(segmentTimeline.Get())
-        return segmentTimeline.Get()->pruneByPlaybackTime(time);
+    if(segmentTimeline)
+        return segmentTimeline->pruneByPlaybackTime(time);
 }
 
 size_t MediaSegmentTemplate::pruneBySequenceNumber(uint64_t number)
 {
-    if(segmentTimeline.Get())
-        return segmentTimeline.Get()->pruneBySequenceNumber(number);
+    if(segmentTimeline)
+        return segmentTimeline->pruneBySequenceNumber(number);
     return 0;
+}
+
+uint64_t MediaSegmentTemplate::inheritStartNumber() const
+{
+    const SegmentInformation *ulevel = parentSegmentInformation ? parentSegmentInformation
+                                                                : NULL;
+    for( ; ulevel ; ulevel = ulevel->parent )
+    {
+        if( ulevel->mediaSegmentTemplate &&
+            ulevel->mediaSegmentTemplate->startNumber !=
+                std::numeric_limits<uint64_t>::max() )
+            return ulevel->mediaSegmentTemplate->startNumber;
+    }
+    return 1;
+}
+
+Timescale MediaSegmentTemplate::inheritTimescale() const
+{
+    const SegmentInformation *ulevel = parentSegmentInformation ? parentSegmentInformation
+                                                                : NULL;
+    for( ; ulevel ; ulevel = ulevel->parent )
+    {
+        if( ulevel->mediaSegmentTemplate &&
+            ulevel->mediaSegmentTemplate->getTimescale().isValid() )
+            return ulevel->mediaSegmentTemplate->getTimescale();
+        if( ulevel->getTimescale().isValid() )
+            return ulevel->mediaSegmentTemplate->getTimescale();
+    }
+    return Timescale(1);
+}
+
+stime_t MediaSegmentTemplate::inheritDuration() const
+{
+    const SegmentInformation *ulevel = parentSegmentInformation ? parentSegmentInformation
+                                                                : NULL;
+    for( ; ulevel ; ulevel = ulevel->parent )
+    {
+        if( ulevel->mediaSegmentTemplate &&
+            ulevel->mediaSegmentTemplate->duration.Get() > 0 )
+            return ulevel->mediaSegmentTemplate->duration.Get();
+    }
+    return 0;
+}
+
+SegmentTimeline * MediaSegmentTemplate::inheritSegmentTimeline() const
+{
+    const SegmentInformation *ulevel = parentSegmentInformation ? parentSegmentInformation
+                                                          : NULL;
+    for( ; ulevel ; ulevel = ulevel->parent )
+    {
+        if( ulevel->mediaSegmentTemplate &&
+            ulevel->mediaSegmentTemplate->segmentTimeline )
+            return ulevel->mediaSegmentTemplate->segmentTimeline;
+    }
+    return NULL;
 }
 
 uint64_t MediaSegmentTemplate::getCurrentLiveTemplateNumber() const
 {
-    uint64_t number = startNumber.Get();
+    uint64_t number = inheritStartNumber();
     /* live streams / templated */
-    const stime_t dur = duration.Get();
+    const stime_t dur = inheritDuration();
     if(dur)
     {
         /* compute, based on current time */
@@ -103,16 +160,16 @@ uint64_t MediaSegmentTemplate::getCurrentLiveTemplateNumber() const
 
 stime_t MediaSegmentTemplate::getMinAheadScaledTime(uint64_t number) const
 {
-    if( segmentTimeline.Get() )
-        return segmentTimeline.Get()->getMinAheadScaledTime(number);
+    if( segmentTimeline )
+        return segmentTimeline->getMinAheadScaledTime(number);
 
     uint64_t current = getCurrentLiveTemplateNumber();
-    return (current - number) * duration.Get();
+    return (current - number) * inheritDuration();
 }
 
 uint64_t MediaSegmentTemplate::getSequenceNumber() const
 {
-    return startNumber.Get();
+    return inheritStartNumber();
 }
 
 void MediaSegmentTemplate::setSourceUrl(const std::string &url)
@@ -120,11 +177,22 @@ void MediaSegmentTemplate::setSourceUrl(const std::string &url)
     sourceUrl = Url(Url::Component(url, this));
 }
 
+void MediaSegmentTemplate::setStartNumber( uint64_t v )
+{
+    startNumber = v;
+}
+
+void MediaSegmentTemplate::setSegmentTimeline( SegmentTimeline *v )
+{
+    delete segmentTimeline;
+    segmentTimeline = v;
+}
+
 void MediaSegmentTemplate::debug(vlc_object_t *obj, int indent) const
 {
     Segment::debug(obj, indent);
-    if(segmentTimeline.Get())
-        segmentTimeline.Get()->debug(obj, indent + 1);
+    if(segmentTimeline)
+        segmentTimeline->debug(obj, indent + 1);
 }
 
 InitSegmentTemplate::InitSegmentTemplate( ICanonicalUrl *parent ) :

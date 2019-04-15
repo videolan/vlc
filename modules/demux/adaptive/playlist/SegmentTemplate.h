@@ -50,17 +50,23 @@ namespace adaptive
                 MediaSegmentTemplate( SegmentInformation * = NULL );
                 virtual ~MediaSegmentTemplate();
                 virtual void setSourceUrl( const std::string &url ); /* reimpl */
+                void setStartNumber( uint64_t );
+                void setSegmentTimeline( SegmentTimeline * );
                 void mergeWith( MediaSegmentTemplate *, vlc_tick_t );
                 virtual uint64_t getSequenceNumber() const; /* reimpl */
                 uint64_t getCurrentLiveTemplateNumber() const;
                 stime_t getMinAheadScaledTime(uint64_t) const;
                 void pruneByPlaybackTime(vlc_tick_t);
                 size_t pruneBySequenceNumber(uint64_t);
+                virtual Timescale inheritTimescale() const; /* reimpl */
+                virtual uint64_t inheritStartNumber() const;
+                stime_t inheritDuration() const;
+                SegmentTimeline * inheritSegmentTimeline() const;
                 virtual void debug(vlc_object_t *, int = 0) const; /* reimpl */
-                Property<size_t>        startNumber;
-                Property<SegmentTimeline *> segmentTimeline;
 
             protected:
+                uint64_t startNumber;
+                SegmentTimeline *segmentTimeline;
                 SegmentInformation *parentSegmentInformation;
         };
 

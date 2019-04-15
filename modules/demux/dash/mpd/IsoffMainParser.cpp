@@ -161,17 +161,20 @@ void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)
 size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformation *info)
 {
     size_t total = 0;
-    if (templateNode == NULL || !templateNode->hasAttribute("media"))
+    if (templateNode == NULL)
         return total;
 
-    std::string mediaurl = templateNode->getAttributeValue("media");
+    std::string mediaurl;
+    if(templateNode->hasAttribute("media"))
+        mediaurl = templateNode->getAttributeValue("media");
+
     MediaSegmentTemplate *mediaTemplate = NULL;
-    if(mediaurl.empty() || !(mediaTemplate = new (std::nothrow) MediaSegmentTemplate(info)) )
+    if( !(mediaTemplate = new (std::nothrow) MediaSegmentTemplate(info)) )
         return total;
     mediaTemplate->setSourceUrl(mediaurl);
 
     if(templateNode->hasAttribute("startNumber"))
-        mediaTemplate->startNumber.Set(Integer<uint64_t>(templateNode->getAttributeValue("startNumber")));
+        mediaTemplate->setStartNumber(Integer<uint64_t>(templateNode->getAttributeValue("startNumber")));
 
     if(templateNode->hasAttribute("timescale"))
         mediaTemplate->setTimescale(Integer<uint64_t>(templateNode->getAttributeValue("timescale")));
@@ -193,7 +196,7 @@ size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformat
 
     info->setSegmentTemplate(mediaTemplate);
 
-    return ++total;
+    return mediaurl.empty() ? ++total : 0;
 }
 
 size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *info, uint64_t *nextid)
@@ -452,8 +455,8 @@ void IsoffMainParser::parseTimeline(Node *node, MediaSegmentTemplate *templ)
     uint64_t number = 0;
     if(node->hasAttribute("startNumber"))
         number = Integer<uint64_t>(node->getAttributeValue("startNumber"));
-    else if(templ->startNumber.Get())
-        number = templ->startNumber.Get();
+    else if(templ->inheritStartNumber())
+        number = templ->inheritStartNumber();
 
     SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline(templ);
     if(timeline)
@@ -483,7 +486,7 @@ void IsoffMainParser::parseTimeline(Node *node, MediaSegmentTemplate *templ)
 
             number += (1 + r);
         }
-        templ->segmentTimeline.Set(timeline);
+        templ->setSegmentTimeline(timeline);
     }
 }
 

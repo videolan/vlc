@@ -176,7 +176,7 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
         uint64_t end = 0;
         const Timescale timescale = mediaSegmentTemplate->inheritTimescale();
 
-        SegmentTimeline *timeline = mediaSegmentTemplate->segmentTimeline.Get();
+        const SegmentTimeline *timeline = mediaSegmentTemplate->inheritSegmentTimeline();
         if( timeline )
         {
             start = timeline->minElementNumber();
@@ -206,7 +206,7 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
             if( i_delay < getPlaylist()->getMinBuffering() )
                 i_delay = getPlaylist()->getMinBuffering();
 
-            const uint64_t startnumber = mediaSegmentTemplate->startNumber.Get();
+            const uint64_t startnumber = mediaSegmentTemplate->inheritStartNumber();
             end = mediaSegmentTemplate->getCurrentLiveTemplateNumber();
 
             const uint64_t count = timescale.ToScaled( i_delay ) / mediaSegmentTemplate->duration.Get();
@@ -283,7 +283,7 @@ ISegment * SegmentInformation::getNextSegment(SegmentInfoType type, uint64_t i_p
             {
                 /* Check if we don't exceed timeline */
                 MediaSegmentTemplate *templ = dynamic_cast<MediaSegmentTemplate*>(retSegments[0]);
-                SegmentTimeline *timeline = (templ) ? templ->segmentTimeline.Get() : NULL;
+                const SegmentTimeline *timeline = (templ) ? templ->inheritSegmentTimeline() : NULL;
                 if(timeline)
                 {
                     *pi_newpos = std::max(timeline->minElementNumber(), i_pos);
@@ -294,7 +294,7 @@ ISegment * SegmentInformation::getNextSegment(SegmentInfoType type, uint64_t i_p
                 {
                     *pi_newpos = i_pos;
                     /* start number */
-                    *pi_newpos = std::max((uint64_t)templ->startNumber.Get(), i_pos);
+                    *pi_newpos = std::max(templ->inheritStartNumber(), i_pos);
                 }
                 return seg;
             }
@@ -319,8 +319,8 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
         if(size == 1 && retSegments[0]->isTemplate())
         {
             MediaSegmentTemplate *templ = dynamic_cast<MediaSegmentTemplate*>(retSegments[0]);
-            if(!templ || templ->segmentTimeline.Get() == NULL ||
-               templ->segmentTimeline.Get()->maxElementNumber() > pos)
+            const SegmentTimeline *tl = templ->inheritSegmentTimeline();
+            if(!templ || tl == NULL || tl->maxElementNumber() > pos)
                 return templ;
         }
         else
@@ -349,7 +349,7 @@ bool SegmentInformation::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) 
     {
         const Timescale timescale = mediaSegmentTemplate->inheritTimescale();
 
-        SegmentTimeline *timeline = mediaSegmentTemplate->segmentTimeline.Get();
+        const SegmentTimeline *timeline = mediaSegmentTemplate->inheritSegmentTimeline();
         if(timeline)
         {
             stime_t st = timescale.ToScaled(time);
@@ -362,11 +362,11 @@ bool SegmentInformation::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) 
         {
             if( getPlaylist()->isLive() )
             {
-                *ret = getLiveStartSegmentNumber( mediaSegmentTemplate->startNumber.Get() );
+                *ret = getLiveStartSegmentNumber( mediaSegmentTemplate->inheritStartNumber() );
             }
             else
             {
-                *ret = mediaSegmentTemplate->startNumber.Get();
+                *ret = mediaSegmentTemplate->inheritStartNumber();
                 *ret += timescale.ToScaled(time) / duration;
             }
             return true;
@@ -402,12 +402,12 @@ bool SegmentInformation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     if( (mediaTemplate = inheritSegmentTemplate()) )
     {
         const Timescale timescale = mediaTemplate->inheritTimescale();
+        const SegmentTimeline * timeline = mediaTemplate->inheritSegmentTimeline();
 
         stime_t stime, sduration;
-        if(mediaTemplate->segmentTimeline.Get())
+        if(timeline)
         {
-            mediaTemplate->segmentTimeline.Get()->
-                getScaledPlaybackTimeDurationBySegmentNumber(number, &stime, &sduration);
+            timeline->getScaledPlaybackTimeDurationBySegmentNumber(number, &stime, &sduration);
         }
         else
         {
@@ -473,7 +473,7 @@ void SegmentInformation::mergeWithTimeline(SegmentTimeline *updated)
     MediaSegmentTemplate *templ = inheritSegmentTemplate();
     if(templ)
     {
-        SegmentTimeline *timeline = templ->segmentTimeline.Get();
+        SegmentTimeline *timeline = templ->inheritSegmentTimeline();
         if(timeline)
             timeline->mergeWith(*updated);
     }
