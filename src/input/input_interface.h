@@ -43,11 +43,4 @@ void input_item_SetEpgOffline( input_item_t * );
  */
 void input_resource_TerminateSout( input_resource_t *p_resource );
 
-/**
- * This function return true if there is at least one vout in the resources.
- *
- * It can only be called on detached resources.
- */
-bool input_resource_HasVout( input_resource_t *p_resource );
-
 #endif

@@ -517,14 +517,6 @@ static void *Thread ( void *data )
             msg_Info( p_playlist, "end of playlist, exiting" );
             libvlc_Quit( vlc_object_instance(p_playlist) );
         }
-
-        /* Destroy any video display now (XXX: ugly hack) */
-        if( input_resource_HasVout( p_sys->p_input_resource ) )
-        {
-            PL_UNLOCK; /* Mind: NO LOCKS while manipulating input resources! */
-            input_resource_TerminateVout( p_sys->p_input_resource );
-            PL_LOCK;
-        }
     }
     PL_UNLOCK;
 
