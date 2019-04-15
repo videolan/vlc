@@ -207,7 +207,9 @@ static void cb_player_titles_changed(vlc_player_t *p_player,
                                      void *p_data)
 {
     VLC_UNUSED(p_player);
-    vlc_player_title_list_Hold(p_titles);
+    if (p_titles)
+        vlc_player_title_list_Hold(p_titles);
+
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
         [playerController titleListChanged:p_titles];
