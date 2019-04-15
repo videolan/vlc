@@ -30,16 +30,6 @@ namespace adaptive
 {
     namespace playlist
     {
-        class SegmentTimeline;
-
-        class Timelineable
-        {
-            public:
-                Timelineable();
-                ~Timelineable();
-                Property<SegmentTimeline *> segmentTimeline;
-        };
-
         class TimescaleAble
         {
             public:
