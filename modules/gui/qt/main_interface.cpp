@@ -270,13 +270,6 @@ MainInterface::~MainInterface()
     var_DelCallback( libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
     var_DelCallback( libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
-#ifdef QT5_HAS_WAYLAND
-    if (b_hasWayland)
-    {
-        var_DecInteger( p_intf->p_sys->p_player, "egl-initialize-rc" );
-    }
-#endif
-
     p_intf->p_sys->p_mi = NULL;
 }
 
