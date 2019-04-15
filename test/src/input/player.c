@@ -108,7 +108,7 @@ struct report_media_subitems
     X(bool, on_recording_changed) \
     X(struct report_signal, on_signal_changed) \
     X(struct input_stats_t, on_statistics_changed) \
-    X(struct report_vout_list, on_vout_list_changed) \
+    X(struct report_vout_list, on_vout_changed) \
     X(input_item_t *, on_media_meta_changed) \
     X(input_item_t *, on_media_epg_changed) \
     X(struct report_media_subitems, on_media_subitems_changed) \
@@ -438,7 +438,7 @@ player_on_statistics_changed(vlc_player_t *player,
 }
 
 static void
-player_on_vout_list_changed(vlc_player_t *player,
+player_on_vout_changed(vlc_player_t *player,
                             enum vlc_player_list_action action,
                             vout_thread_t *vout, void *data)
 {
@@ -448,7 +448,7 @@ player_on_vout_list_changed(vlc_player_t *player,
         .vout = vout,
     };
     vout_Hold(vout);
-    VEC_PUSH(on_vout_list_changed, report);
+    VEC_PUSH(on_vout_changed, report);
 }
 
 static void
@@ -575,7 +575,7 @@ ctx_reset(struct ctx *ctx)
 
     {
         struct report_vout_list report;
-        FOREACH_VEC(report, on_vout_list_changed)
+        FOREACH_VEC(report, on_vout_changed)
             vout_Release(report.vout);
     }
 
@@ -872,21 +872,21 @@ test_end_poststop_titles(struct ctx *ctx)
 static void
 test_end_poststop_vouts(struct ctx *ctx)
 {
-    vec_on_vout_list_changed *vec = &ctx->report.on_vout_list_changed;
+    vec_on_vout_changed *vec = &ctx->report.on_vout_changed;
 
-    size_t vout_added = 0, vout_removed = 0;
+    size_t vout_started = 0, vout_stopped = 0;
 
     struct report_vout_list report;
     vlc_vector_foreach(report, vec)
     {
-        if (report.action == VLC_PLAYER_LIST_ADDED)
-            vout_added++;
-        else if (report.action == VLC_PLAYER_LIST_REMOVED)
-            vout_removed++;
+        if (report.action == VLC_PLAYER_VOUT_STARTED)
+            vout_started++;
+        else if (report.action == VLC_PLAYER_VOUT_STOPPED)
+            vout_stopped++;
         else
             vlc_assert_unreachable();
     }
-    assert(vout_added == vout_removed);
+    assert(vout_started == vout_stopped);
 }
 
 static void

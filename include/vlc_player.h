@@ -179,14 +179,22 @@ enum vlc_player_nav
 
 /**
  * Action of vlc_player_cbs.on_track_list_changed,
- * vlc_player_cbs.on_program_list_changed, and
- * vlc_player_cbs.on_vout_list_changed callbacks
+ * vlc_player_cbs.on_program_list_changed callbacks
  */
 enum vlc_player_list_action
 {
     VLC_PLAYER_LIST_ADDED,
     VLC_PLAYER_LIST_REMOVED,
     VLC_PLAYER_LIST_UPDATED,
+};
+
+/**
+ * action of vlc_player_cbs.on_vout_changed callback
+ */
+enum vlc_player_vout_action
+{
+    VLC_PLAYER_VOUT_STARTED,
+    VLC_PLAYER_VOUT_STOPPED,
 };
 
 /**
@@ -796,15 +804,19 @@ struct vlc_player_cbs
         input_item_t *media, input_item_node_t *new_subitems, void *data);
 
     /**
-     * Called when a new vout is added or removed
+     * Called when a vout is started or stopped
+     *
+     * @note In case, several media with only one video track are played
+     * successively, the same vout instance will be started and stopped several
+     * time.
      *
      * @param player locked player instance
-     * @param action added or removed
-     * @param vout new vout
+     * @param action started or stopped
+     * @param vout vout (can't be NULL)
      * @param data opaque pointer set by vlc_player_AddListener()
      */
-    void (*on_vout_list_changed)(vlc_player_t *player,
-        enum vlc_player_list_action action, vout_thread_t *vout, void *data);
+    void (*on_vout_changed)(vlc_player_t *player,
+        enum vlc_player_vout_action action, vout_thread_t *vout, void *data);
 
     /**
      * Called when the player is corked
@@ -2607,7 +2619,7 @@ vlc_player_aout_EnableFilter(vlc_player_t *player, const char *name, bool add);
  * Get and hold the main video output
  *
  * @warning the returned vout_thread_t * must be released with vout_Release().
- * @see vlc_players_cbs.on_vout_list_changed
+ * @see vlc_players_cbs.on_vout_changed
  *
  * @note The player is guaranteed to always hold one valid vout. Only vout
  * variables can be changed from this instance. The vout returned before
@@ -2625,7 +2637,7 @@ vlc_player_vout_Hold(vlc_player_t *player);
  * @warning All vout_thread_t * element of the array must be released with
  * vout_Release(). The returned array must be freed.
  *
- * @see vlc_players_cbs.on_vout_list_changed
+ * @see vlc_players_cbs.on_vout_changed
  *
  * @param player player instance
  * @param count valid pointer to store the array count

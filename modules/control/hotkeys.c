@@ -1014,30 +1014,30 @@ ViewpointMovedCallback(vlc_object_t *obj, char const *var,
 }
 
 static void
-player_on_vout_list_changed(vlc_player_t *player,
-                            enum vlc_player_list_action action,
-                            vout_thread_t *vout,
-                            void *data)
+player_on_vout_changed(vlc_player_t *player,
+                       enum vlc_player_vout_action action, vout_thread_t *vout,
+                       void *data)
 {
-    if (action == VLC_PLAYER_LIST_UPDATED)
-        return;
     intf_thread_t *intf = data;
     bool vrnav = var_GetBool(vout, "viewpoint-changeable");
-    if (action == VLC_PLAYER_LIST_ADDED)
+    switch (action)
     {
+    case VLC_PLAYER_VOUT_STARTED:
         var_AddCallback(vout, "mouse-button-down", MouseButtonCallback, intf);
         var_AddCallback(vout, "mouse-moved", MouseMovedCallback, intf->p_sys);
         if (vrnav)
             var_AddCallback(vout, "viewpoint-moved",
                             ViewpointMovedCallback, player);
-    }
-    else
-    {
+        break;
+    case VLC_PLAYER_VOUT_STOPPED:
         var_DelCallback(vout, "mouse-button-down", MouseButtonCallback, intf);
         var_DelCallback(vout, "mouse-moved", MouseMovedCallback, intf->p_sys);
         if (vrnav)
             var_DelCallback(vout, "viewpoint-moved",
                             ViewpointMovedCallback, player);
+        break;
+    default:
+        vlc_assert_unreachable();
     }
 }
 
@@ -1065,7 +1065,7 @@ Open(vlc_object_t *this)
     sys->playlist = vlc_intf_GetMainPlaylist(intf);
     static struct vlc_player_cbs const player_cbs =
     {
-        .on_vout_list_changed = player_on_vout_list_changed,
+        .on_vout_changed = player_on_vout_changed,
     };
     vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
     vlc_player_Lock(player);

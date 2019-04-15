@@ -706,7 +706,7 @@ static void on_player_subitems_changed(vlc_player_t *, input_item_t *, input_ite
 }
 
 
-static void on_player_vout_list_changed(vlc_player_t *player, enum vlc_player_list_action, vout_thread_t *, void *data)
+static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_action, vout_thread_t *, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_vout_list_changed");
@@ -827,7 +827,7 @@ static const struct vlc_player_cbs player_cbs = {
     on_player_media_meta_changed,
     on_player_media_epg_changed,
     on_player_subitems_changed,
-    on_player_vout_list_changed,
+    on_player_vout_changed,
     on_player_corks_changed
 };
 

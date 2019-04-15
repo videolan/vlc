@@ -102,9 +102,9 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
-static void player_on_vout_list_changed(vlc_player_t *player,
-                                        enum vlc_player_list_action action,
-                                        vout_thread_t *vout, void *data);
+static void player_on_vout_changed(vlc_player_t *player,
+                                   enum vlc_player_vout_action action,
+                                   vout_thread_t *vout, void *data);
 static int MovedEvent( vlc_object_t *, char const *,
                        vlc_value_t, vlc_value_t, void * );
 static int ButtonEvent( vlc_object_t *, char const *,
@@ -129,7 +129,7 @@ static int Open ( vlc_object_t *p_this )
 
     static const struct vlc_player_cbs cbs =
     {
-        .on_vout_list_changed = player_on_vout_list_changed,
+        .on_vout_changed = player_on_vout_changed,
     };
     vlc_player_t *player = vlc_playlist_GetPlayer(p_sys->playlist);
     vlc_player_Lock(player);
@@ -387,16 +387,16 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
 }
 
 static void
-player_on_vout_list_changed(vlc_player_t *player,
-                            enum vlc_player_list_action action,
-                            vout_thread_t *vout, void *data)
+player_on_vout_changed(vlc_player_t *player,
+                       enum vlc_player_vout_action action,
+                       vout_thread_t *vout, void *data)
 {
     VLC_UNUSED(player);
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
     switch (action)
     {
-        case VLC_PLAYER_LIST_ADDED:
+        case VLC_PLAYER_VOUT_STARTED:
             if (vlc_vector_push(&sys->vout_vector, vout))
             {
                 vout_Hold(vout);
@@ -404,7 +404,7 @@ player_on_vout_list_changed(vlc_player_t *player,
                 var_AddCallback(vout, "mouse-button-down", ButtonEvent, intf);
             }
             break;
-        case VLC_PLAYER_LIST_REMOVED:
+        case VLC_PLAYER_VOUT_STOPPED:
             for (size_t i = 0; i < sys->vout_vector.size; ++i)
             {
                 vout_thread_t *it = sys->vout_vector.data[i];
@@ -419,6 +419,6 @@ player_on_vout_list_changed(vlc_player_t *player,
             }
             break;
         default:
-            break;
+            vlc_assert_unreachable();
     }
 }

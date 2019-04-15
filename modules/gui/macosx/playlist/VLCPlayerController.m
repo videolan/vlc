@@ -426,10 +426,10 @@ static void cb_player_item_meta_changed(vlc_player_t *p_player,
     });
 }
 
-static void cb_player_vout_list_changed(vlc_player_t *p_player,
-                                        enum vlc_player_list_action action,
-                                        vout_thread_t *p_vout,
-                                        void *p_data)
+static void cb_player_vout_changed(vlc_player_t *p_player,
+                                   enum vlc_player_vout_action action,
+                                   vout_thread_t *p_vout,
+                                   void *p_data)
 {
     VLC_UNUSED(p_player);
     VLC_UNUSED(p_vout);
@@ -471,7 +471,7 @@ static const struct vlc_player_cbs player_callbacks = {
     cb_player_item_meta_changed,
     NULL, //cb_player_item_epg_changed,
     NULL, //cb_player_subitems_changed,
-    cb_player_vout_list_changed,
+    cb_player_vout_changed,
     NULL, //on_cork_changed
 };
 

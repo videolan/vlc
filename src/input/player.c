@@ -1803,8 +1803,8 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
     switch (ev->action)
     {
         case VLC_INPUT_EVENT_VOUT_ADDED:
-            vlc_player_SendEvent(player, on_vout_list_changed,
-                                 VLC_PLAYER_LIST_ADDED, ev->vout);
+            vlc_player_SendEvent(player, on_vout_changed,
+                                 VLC_PLAYER_VOUT_STARTED, ev->vout);
 
             /* Register vout callbacks after the vout list event */
             var_AddCallback(ev->vout, "fullscreen",
@@ -1825,8 +1825,8 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
                 var_DelCallback(ev->vout, osd_vars[i],
                                 vlc_player_VoutOSDCallback, player);
 
-            vlc_player_SendEvent(player, on_vout_list_changed,
-                                 VLC_PLAYER_LIST_REMOVED, ev->vout);
+            vlc_player_SendEvent(player, on_vout_changed,
+                                 VLC_PLAYER_VOUT_STOPPED, ev->vout);
             break;
         default:
             vlc_assert_unreachable();
