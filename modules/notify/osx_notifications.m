@@ -263,6 +263,8 @@ static inline NSString* CharsToNSString(char * _Nullable cStr)
     
     // Notify!
     [self notifyWithTitle:title description:desc imagePath:artPath];
+
+    input_item_Release(inputItem);
 }
 
 /*
