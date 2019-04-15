@@ -323,20 +323,6 @@ enum vlc_player_subtitle_sync
     VLC_PLAYER_SUBTITLE_SYNC_APPLY,
 };
 
-/**
- * Vout filter type
- *
- * @warning Temporary enum, waiting for a refined vout filter API
- *
- * @see vlc_player_vout_SetFilter()
- */
-enum vlc_vout_filter_type
-{
-    VLC_VOUT_FILTER_VIDEO_FILTER,
-    VLC_VOUT_FILTER_SUB_SOURCE,
-    VLC_VOUT_FILTER_SUB_FILTER,
-};
-
 /** Player capability: can seek */
 #define VLC_PLAYER_CAP_SEEK (1<<0)
 /** Player capability: can pause */
@@ -2770,34 +2756,6 @@ vlc_player_vout_ToggleWallpaperMode(vlc_player_t *player)
     vlc_player_vout_SetWallpaperModeEnabled(player,
         !vlc_player_vout_IsWallpaperModeEnabled(player));
 }
-
-/**
- * Set a filter chain to all vouts and all future vouts
- *
- * @warning This is a temporary function, waiting for a refined vout filter
- * API.
- *
- * @param player instance
- * @param type filter type
- * @param value a valid chain of filter (separated with ',') or NULL
- */
-VLC_API void
-vlc_player_vout_SetFilter(vlc_player_t *player, enum vlc_vout_filter_type type,
-                          const char *value);
-
-/**
- * Get the filter chain value applied to all vouts
- *
- * @warning This is a temporary function, waiting for a refined vout filter
- * API.
- *
- * @param player instance
- * @param type filter type
- * @return an allocated string representing the filter chain, free it with
- * free(), can be NULL
- */
-VLC_API char *
-vlc_player_vout_GetFilter(vlc_player_t *player, enum vlc_vout_filter_type type);
 
 /**
  * Take a snapshot on all vouts

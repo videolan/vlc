@@ -1631,22 +1631,6 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     vlc_player_vout_OSDMessage(_p_player, [message UTF8String]);
 }
 
-- (NSString *)videoFilterChainForType:(enum vlc_vout_filter_type)filterType
-{
-    NSString *ret = nil;
-    char *psz_filterChain = vlc_player_vout_GetFilter(_p_player, filterType);
-    if (psz_filterChain != NULL) {
-        ret = [NSString stringWithUTF8String:psz_filterChain];
-        free(psz_filterChain);
-    }
-    return ret;
-}
-
-- (void)setVideoFilterChain:(NSString *)filterChain forType:(enum vlc_vout_filter_type)filterType
-{
-    vlc_player_vout_SetFilter(_p_player, filterType, filterChain != nil ? [filterChain UTF8String] : NULL);
-}
-
 - (void)setAspectRatioIsLocked:(BOOL)b_value
 {
     config_PutInt("macosx-lock-aspect-ratio", b_value);

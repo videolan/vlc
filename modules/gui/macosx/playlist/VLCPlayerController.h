@@ -789,20 +789,6 @@ extern NSString *VLCPlayerMuteChanged;
 - (void)displayOSDMessage:(NSString *)message;
 
 /**
- * returns the filter chain string for the respective type
- * @note This is a temporary API and will be gone in VLC 5.0
- */
-- (nullable NSString *)videoFilterChainForType:(enum vlc_vout_filter_type)filterType;
-
-/**
- * sets the filter chain string for the respective type
- * @param the filter chain string or NULL to disable all filters
- * @param the filter type, @see vlc_vout_filter_type
- * @note This is a temporary API and will be gone in VLC 5.0
- */
-- (void)setVideoFilterChain:(nullable NSString *)filterChain forType:(enum vlc_vout_filter_type)filterType;
-
-/**
  * defines whether the vout windows lock on the video's AR or can be resized arbitrarily
  */
 @property (nonatomic, readwrite) BOOL aspectRatioIsLocked;
