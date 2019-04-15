@@ -31,4 +31,7 @@ export KDE_FORK_SLAVES=1
 ## Neon PATCH! make KIO look for slaves in a dynamic location depending on $SNAP
 export KF5_LIBEXEC_DIR=$SNAP/usr/lib/$ARCH/libexec/kf5
 
+# set QML2 import path for Qt UI
+export QML2_IMPORT_PATH="$QML2_IMPORT_PATH:$SNAP/usr/lib/x86_64-linux-gnu/qt5/qml/"
+
 exec $SNAP/usr/bin/vlc --config=$SNAP_USER_COMMON/vlcrc "$@"
