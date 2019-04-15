@@ -50,8 +50,8 @@
     /* the playlist reference */
     vlc_playlist_t *_p_playlist;
 
-    /* the listener ID for playlist notifications */
-    vlc_playlist_listener_id *_playlistListenerID;
+    /* the listener ID for player notifications */
+    vlc_player_listener_id *_playerListenerID;
 }
 
 /**
@@ -60,9 +60,9 @@
 - (instancetype)initWithInterfaceThread:(intf_thread_t * _Nonnull)intf_thread;
 
 /**
- * Delegate method called when the current playlist item changed
+ * Delegate method called when the current input item changed
  */
-- (void)currentPlaylistItemChanged:(size_t)index;
+- (void)currentInputItemChanged:(input_item_t *)inputItem;
 
 @end
 
@@ -74,29 +74,18 @@ struct intf_sys_t
 #pragma mark -
 #pragma mark callback
 
-static void
-cb_playlist_current_item_changed(vlc_playlist_t *playlist,
-                                 ssize_t index,
-                                 void *p_data)
+static void on_current_media_changed(vlc_player_t *player,
+                                     input_item_t *p_input_item, void *data)
 {
+
+    if (p_input_item)
+        input_item_Hold(p_input_item);
+
     dispatch_async(dispatch_get_main_queue(), ^{
-        VLCNotificationDelegate *notificationDelegate = (__bridge VLCNotificationDelegate *)p_data;
-        [notificationDelegate currentPlaylistItemChanged:index];
+        VLCNotificationDelegate *notificationDelegate = (__bridge VLCNotificationDelegate *)data;
+        [notificationDelegate currentInputItemChanged:p_input_item];
     });
 }
-
-static const struct vlc_playlist_callbacks playlist_callbacks = {
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    cb_playlist_current_item_changed,
-    NULL,
-    NULL,
-};
 
 #pragma mark -
 #pragma mark C module functions
@@ -181,13 +170,16 @@ static inline NSString* CharsToNSString(char * _Nullable cStr)
     self = [super init];
     
     if (self) {
+
         _p_playlist = vlc_intf_GetMainPlaylist(intf_thread);
-        vlc_playlist_Lock(_p_playlist);
-        _playlistListenerID = vlc_playlist_AddListener(_p_playlist,
-                                                       &playlist_callbacks,
-                                                       (__bridge void *)self,
-                                                       YES);
-        vlc_playlist_Unlock(_p_playlist);
+        vlc_player_t *player = vlc_playlist_GetPlayer(_p_playlist);
+        static const struct vlc_player_cbs player_cbs =
+        {
+            .on_current_media_changed = on_current_media_changed
+        };
+        vlc_player_Lock(player);
+        _playerListenerID = vlc_player_AddListener(player, &player_cbs, (__bridge void *)self);
+        vlc_player_Unlock(player);
 
         [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
     }
@@ -207,20 +199,17 @@ static inline NSString* CharsToNSString(char * _Nullable cStr)
     }
 
     if (_p_playlist) {
-        if (_playlistListenerID) {
-            vlc_playlist_Lock(_p_playlist);
-            vlc_playlist_RemoveListener(_p_playlist, _playlistListenerID);
-            vlc_playlist_Unlock(_p_playlist);
+        if (_playerListenerID) {
+            vlc_player_t *player = vlc_playlist_GetPlayer(_p_playlist);
+            vlc_player_Lock(player);
+            vlc_player_RemoveListener(player, _playerListenerID);
+            vlc_player_Unlock(player);
         }
     }
 }
 
-- (void)currentPlaylistItemChanged:(size_t)index
+- (void)currentInputItemChanged:(input_item_t *)inputItem
 {
-    vlc_player_t *player = vlc_playlist_GetPlayer(_p_playlist);
-    vlc_player_Lock(player);
-    input_item_t *inputItem = vlc_player_HoldCurrentMedia(player);
-    vlc_player_Unlock(player);
     if (inputItem == NULL) {
         return;
     }
