@@ -28,8 +28,6 @@ $(TARBALLS)/wine-$(WINE_VERSION).tar.xz:
 
 wine-headers: wine-$(WINE_VERSION).tar.xz .sum-wine-headers
 	$(UNPACK)
-	$(APPLY) $(SRC)/wine-headers/d3d9caps.patch
-	$(APPLY) $(SRC)/wine-headers/d3d9.patch
 	$(APPLY) $(SRC)/wine-headers/dxva2api.patch
 	$(APPLY) $(SRC)/wine-headers/dxgidebug.patch
 	$(APPLY) $(SRC)/wine-headers/processor_format.patch
