@@ -471,6 +471,7 @@ static const struct vlc_player_cbs player_callbacks = {
     NULL, //cb_player_item_epg_changed,
     NULL, //cb_player_subitems_changed,
     cb_player_vout_list_changed,
+    NULL, //on_cork_changed
 };
 
 #pragma mark - video specific callback implementations
