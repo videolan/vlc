@@ -1027,12 +1027,14 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
         if (!shallJumpForward)
             jumptime = jumptime * -1;
 
+        vlc_player_Lock(_p_player);
         /* No fask seek for jumps. Indeed, jumps can seek to the current position
          * if not precise enough or if the jump value is too small. */
         vlc_player_SeekByTime(_p_player,
                               jumptime,
                               VLC_PLAYER_SEEK_PRECISE,
                               VLC_PLAYER_WHENCE_RELATIVE);
+        vlc_player_Unlock(_p_player);
     }
 }
 
