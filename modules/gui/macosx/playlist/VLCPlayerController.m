@@ -1022,20 +1022,21 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 - (void)jumpWithValue:(char *)p_userDefinedJumpSize forward:(BOOL)shallJumpForward
 {
     int64_t interval = var_InheritInteger(getIntf(), p_userDefinedJumpSize);
-    if (interval > 0) {
-        vlc_tick_t jumptime = vlc_tick_from_sec( interval );
-        if (!shallJumpForward)
-            jumptime = jumptime * -1;
+    if (interval <= 0)
+        return;
 
-        vlc_player_Lock(_p_player);
-        /* No fask seek for jumps. Indeed, jumps can seek to the current position
-         * if not precise enough or if the jump value is too small. */
-        vlc_player_SeekByTime(_p_player,
-                              jumptime,
-                              VLC_PLAYER_SEEK_PRECISE,
-                              VLC_PLAYER_WHENCE_RELATIVE);
-        vlc_player_Unlock(_p_player);
-    }
+    vlc_tick_t jumptime = vlc_tick_from_sec(interval);
+    if (!shallJumpForward)
+        jumptime = jumptime * -1;
+
+    vlc_player_Lock(_p_player);
+    /* No fask seek for jumps. Indeed, jumps can seek to the current position
+     * if not precise enough or if the jump value is too small. */
+    vlc_player_SeekByTime(_p_player,
+                          jumptime,
+                          VLC_PLAYER_SEEK_PRECISE,
+                          VLC_PLAYER_WHENCE_RELATIVE);
+    vlc_player_Unlock(_p_player);
 }
 
 - (void)jumpForwardExtraShort
