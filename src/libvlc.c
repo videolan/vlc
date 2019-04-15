@@ -463,16 +463,6 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 
     vlc_ExitDestroy( &priv->exit );
 
-#if 0
-    {
-        vlc_object_internals_t *internal = vlc_internals(p_libvlc);
-        if (atomic_load(&internal->refs) != 1)
-        {
-            fprintf(stderr, "=== vlc_object LEAKS detected ===\n");
-            DumpStructureLocked(VLC_OBJECT(p_libvlc), stderr, 0);
-        }
-    }
-#endif
     vlc_mutex_destroy(&priv->lock);
     vlc_object_delete(p_libvlc);
 }
