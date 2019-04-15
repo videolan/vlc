@@ -42,6 +42,8 @@
 #include <vlc_url.h>
 #include <vlc_variables.h>
 
+#import "coreinteraction/VLCHotkeysController.h"
+
 #import "library/VLCLibraryWindow.h"
 
 #import "main/CompatibilityFixes.h"
@@ -239,6 +241,8 @@ static VLCMain *sharedInstance = nil;
         p_intf = getIntf();
 
         [VLCApplication sharedApplication].delegate = self;
+
+        _hotkeysController = [[VLCHotkeysController alloc] init];
 
         _playlistController = [[VLCPlaylistController alloc] initWithPlaylist:vlc_intf_GetMainPlaylist(p_intf)];
         _continuityController = [[VLCPlaybackContinuityController alloc] init];

@@ -75,6 +75,7 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 @class VLCExtensionsManager;
 @class VLCStatusBarIcon;
 @class VLCPlaylistController;
+@class VLCHotkeysController;
 
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 
@@ -83,6 +84,7 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 @property (nonatomic, readwrite) BOOL playlistUpdatedSelectorInQueue;
 @property (readonly) VLCLibraryWindowController *libraryWindowController;
 @property (readonly) VLCPlaylistController *playlistController;
+@property (readonly) VLCHotkeysController *hotkeysController;
 
 + (VLCMain *)sharedInstance;
 + (void)killInstance;

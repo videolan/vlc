@@ -33,13 +33,14 @@
 
 #import <QuartzCore/QuartzCore.h>
 
-#import <vlc_actions.h>
-
+#import "coreinteraction/VLCHotkeysController.h"
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 #import "windows/video/VLCVideoWindowCommon.h"
+
+#import <vlc_actions.h>
 
 /*****************************************************************************
  * VLCVoutView implementation
@@ -56,6 +57,7 @@
 
     vout_thread_t *p_vout;
     VLCPlayerController *_playerController;
+    VLCHotkeysController *_hotkeysController;
 }
 @end
 
@@ -78,7 +80,9 @@
         [self registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
         i_lastScrollWheelDirection = 0;
         f_cumulated_magnification = 0.0;
-        _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+        VLCMain *mainInstance = [VLCMain sharedInstance];
+        _playerController = [[mainInstance playlistController] playerController];
+        _hotkeysController = [mainInstance hotkeysController];
     }
 
     return self;
@@ -149,53 +153,14 @@
 
 - (void)keyDown:(NSEvent *)o_event
 {
-    unichar key = 0;
-    vlc_value_t val;
-    unsigned int i_pressed_modifiers = 0;
-    val.i_int = 0;
-
-    i_pressed_modifiers = [o_event modifierFlags];
-
-    if (i_pressed_modifiers & NSShiftKeyMask)
-        val.i_int |= KEY_MODIFIER_SHIFT;
-    if (i_pressed_modifiers & NSControlKeyMask)
-        val.i_int |= KEY_MODIFIER_CTRL;
-    if (i_pressed_modifiers & NSAlternateKeyMask)
-        val.i_int |= KEY_MODIFIER_ALT;
-    if (i_pressed_modifiers & NSCommandKeyMask)
-        val.i_int |= KEY_MODIFIER_COMMAND;
-
-    NSString * characters = [o_event charactersIgnoringModifiers];
-    if ([characters length] > 0) {
-        key = [[characters lowercaseString] characterAtIndex: 0];
-
-        if (key) {
-            /* Escape should always get you out of fullscreen */
-            if (key == (unichar) 0x1b) {
-                if (_playerController.fullscreen) {
-                    [_playerController toggleFullscreen];
-                }
-            }
-            /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
-            else if (key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask) {
-                [_playerController toggleFullscreen];
-            } else if (p_vout) {
-                val.i_int |= (int)CocoaKeyToVLC(key);
-                var_Set(vlc_object_instance(p_vout), "key-pressed", val);
-            }
-            else
-                msg_Dbg(getIntf(), "could not send keyevent to VLC core");
-
-            return;
-        }
+    if (![_hotkeysController handleVideoOutputKeyDown:o_event forVideoOutput:p_vout]) {
+        [super keyDown: o_event];
     }
-    [super keyDown: o_event];
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
 {
-    // FIXME: this hack is gross and wrong on many levels
-    return NO; //[[[VLCMain sharedInstance] mainWindow] performKeyEquivalent: o_event];
+    return [_hotkeysController performKeyEquivalent:o_event];
 }
 
 - (void)mouseDown:(NSEvent *)o_event
