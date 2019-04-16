@@ -29,7 +29,6 @@
 
 #import <vlc_common.h>
 #import <math.h>
-#import <vlc_playlist_legacy.h>
 
 #import "../../../audio_filter/equalizer_presets.h"
 
@@ -142,16 +141,18 @@
     intf_thread_t *p_intf = getIntf();
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSInteger profileIndex = [self currentProfileIndex];
-    playlist_t *p_playlist = pl_Get(p_intf);
+    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    if (!p_aout)
+        return;
 
     /* disable existing filters */
-    playlist_EnableAudioFilter(p_playlist, "equalizer", false);
-    playlist_EnableAudioFilter(p_playlist, "compressor", false);
-    playlist_EnableAudioFilter(p_playlist, "spatializer", false);
-    playlist_EnableAudioFilter(p_playlist, "compressor", false);
-    playlist_EnableAudioFilter(p_playlist, "headphone", false);
-    playlist_EnableAudioFilter(p_playlist, "normvol", false);
-    playlist_EnableAudioFilter(p_playlist, "karaoke", false);
+    aout_EnableFilter(p_aout, "equalizer", false);
+    aout_EnableFilter(p_aout, "compressor", false);
+    aout_EnableFilter(p_aout, "spatializer", false);
+    aout_EnableFilter(p_aout, "compressor", false);
+    aout_EnableFilter(p_aout, "headphone", false);
+    aout_EnableFilter(p_aout, "normvol", false);
+    aout_EnableFilter(p_aout, "karaoke", false);
 
     /* fetch preset */
     NSString *profileString;
@@ -164,61 +165,34 @@
 
     /* eq preset */
     char const *psz_eq_preset = [B64DecNSStr([items firstObject]) UTF8String];
-    audio_output_t *p_aout = [_playerController mainAudioOutput];
-    if (p_aout)
-        var_SetString(p_aout, "equalizer-preset", psz_eq_preset);
-    var_SetString(p_playlist, "equalizer-preset", psz_eq_preset);
+    var_SetString(p_aout, "equalizer-preset", psz_eq_preset);
 
     /* filter handling */
     NSString *audioFilters = B64DecNSStr([items objectAtIndex:1]);
-    if (p_aout)
-        var_SetString(p_aout, "audio-filter", audioFilters.UTF8String);
-    var_SetString(p_playlist, "audio-filter", audioFilters.UTF8String);
+    var_SetString(p_aout, "audio-filter", audioFilters.UTF8String);
 
     NSInteger presetIndex = [self getPresetIndexForProfile:profileIndex];
 
     /* values */
-    var_SetFloat(p_playlist, "compressor-rms-peak",[[items objectAtIndex:2] floatValue]);
-    var_SetFloat(p_playlist, "compressor-attack",[[items objectAtIndex:3] floatValue]);
-    var_SetFloat(p_playlist, "compressor-release",[[items objectAtIndex:4] floatValue]);
-    var_SetFloat(p_playlist, "compressor-threshold",[[items objectAtIndex:5] floatValue]);
-    var_SetFloat(p_playlist, "compressor-ratio",[[items objectAtIndex:6] floatValue]);
-    var_SetFloat(p_playlist, "compressor-knee",[[items objectAtIndex:7] floatValue]);
-    var_SetFloat(p_playlist, "compressor-makeup-gain",[[items objectAtIndex:8] floatValue]);
-    var_SetFloat(p_playlist, "spatializer-roomsize",[[items objectAtIndex:9] floatValue]);
-    var_SetFloat(p_playlist, "spatializer-width",[[items objectAtIndex:10] floatValue]);
-    var_SetFloat(p_playlist, "spatializer-wet",[[items objectAtIndex:11] floatValue]);
-    var_SetFloat(p_playlist, "spatializer-dry",[[items objectAtIndex:12] floatValue]);
-    var_SetFloat(p_playlist, "spatializer-damp",[[items objectAtIndex:13] floatValue]);
-    var_SetFloat(p_playlist, "norm-max-level",[[items objectAtIndex:14] floatValue]);
-    var_SetBool(p_playlist, "equalizer-2pass",(BOOL)[[items objectAtIndex:15] intValue]);
-    var_SetString(p_playlist, "equalizer-bands", [[[defaults objectForKey:@"EQValues"] objectAtIndex:presetIndex] UTF8String]);
-    var_SetFloat(p_playlist, "equalizer-preamp", [[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:presetIndex] floatValue]);
-    var_SetString(p_playlist, "equalizer-preset", [[[defaults objectForKey:@"EQNames"] objectAtIndex:presetIndex] UTF8String]);
+    var_SetFloat(p_aout, "compressor-rms-peak", [[items objectAtIndex:2] floatValue]);
+    var_SetFloat(p_aout, "compressor-attack", [[items objectAtIndex:3] floatValue]);
+    var_SetFloat(p_aout, "compressor-release", [[items objectAtIndex:4] floatValue]);
+    var_SetFloat(p_aout, "compressor-threshold", [[items objectAtIndex:5] floatValue]);
+    var_SetFloat(p_aout, "compressor-ratio", [[items objectAtIndex:6] floatValue]);
+    var_SetFloat(p_aout, "compressor-knee", [[items objectAtIndex:7] floatValue]);
+    var_SetFloat(p_aout, "compressor-makeup-gain", [[items objectAtIndex:8] floatValue]);
+    var_SetFloat(p_aout, "spatializer-roomsize", [[items objectAtIndex:9] floatValue]);
+    var_SetFloat(p_aout, "spatializer-width", [[items objectAtIndex:10] floatValue]);
+    var_SetFloat(p_aout, "spatializer-wet", [[items objectAtIndex:11] floatValue]);
+    var_SetFloat(p_aout, "spatializer-dry", [[items objectAtIndex:12] floatValue]);
+    var_SetFloat(p_aout, "spatializer-damp", [[items objectAtIndex:13] floatValue]);
+    var_SetFloat(p_aout, "norm-max-level", [[items objectAtIndex:14] floatValue]);
+    var_SetBool(p_aout, "equalizer-2pass", (BOOL)[[items objectAtIndex:15] intValue]);
+    var_SetString(p_aout, "equalizer-bands", [[[defaults objectForKey:@"EQValues"] objectAtIndex:presetIndex] UTF8String]);
+    var_SetFloat(p_aout, "equalizer-preamp", [[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:presetIndex] floatValue]);
+    var_SetString(p_aout, "equalizer-preset", [[[defaults objectForKey:@"EQNames"] objectAtIndex:presetIndex] UTF8String]);
 
-    /* set values on-the-fly if we have an aout */
-    if (p_aout) {
-        var_SetFloat(p_aout, "compressor-rms-peak", [[items objectAtIndex:2] floatValue]);
-        var_SetFloat(p_aout, "compressor-attack", [[items objectAtIndex:3] floatValue]);
-        var_SetFloat(p_aout, "compressor-release", [[items objectAtIndex:4] floatValue]);
-        var_SetFloat(p_aout, "compressor-threshold", [[items objectAtIndex:5] floatValue]);
-        var_SetFloat(p_aout, "compressor-ratio", [[items objectAtIndex:6] floatValue]);
-        var_SetFloat(p_aout, "compressor-knee", [[items objectAtIndex:7] floatValue]);
-        var_SetFloat(p_aout, "compressor-makeup-gain", [[items objectAtIndex:8] floatValue]);
-        var_SetFloat(p_aout, "spatializer-roomsize", [[items objectAtIndex:9] floatValue]);
-        var_SetFloat(p_aout, "spatializer-width", [[items objectAtIndex:10] floatValue]);
-        var_SetFloat(p_aout, "spatializer-wet", [[items objectAtIndex:11] floatValue]);
-        var_SetFloat(p_aout, "spatializer-dry", [[items objectAtIndex:12] floatValue]);
-        var_SetFloat(p_aout, "spatializer-damp", [[items objectAtIndex:13] floatValue]);
-        var_SetFloat(p_aout, "norm-max-level", [[items objectAtIndex:14] floatValue]);
-        var_SetBool(p_aout, "equalizer-2pass", (BOOL)[[items objectAtIndex:15] intValue]);
-        var_SetString(p_aout, "equalizer-bands", [[[defaults objectForKey:@"EQValues"] objectAtIndex:presetIndex] UTF8String]);
-        var_SetFloat(p_aout, "equalizer-preamp", [[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:presetIndex] floatValue]);
-        var_SetString(p_aout, "equalizer-preset", [[[defaults objectForKey:@"EQNames"] objectAtIndex:presetIndex] UTF8String]);
-    }
-
-    if (p_aout)
-        aout_Release(p_aout);
+    aout_Release(p_aout);
 }
 
 - (void)windowDidLoad
@@ -370,25 +344,27 @@
 
 - (NSString *)generateProfileString
 {
-    playlist_t *p_playlist = pl_Get(getIntf());
+    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    if (!p_aout)
+        return nil;
 
     return [NSString stringWithFormat:@"%@;%@;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%i",
-                     B64EncAndFree(var_GetNonEmptyString(p_playlist, "equalizer-preset")),
-                     B64EncAndFree(var_InheritString(p_playlist, "audio-filter")),
-                     var_InheritFloat(p_playlist, "compressor-rms-peak"),
-                     var_InheritFloat(p_playlist, "compressor-attack"),
-                     var_InheritFloat(p_playlist, "compressor-release"),
-                     var_InheritFloat(p_playlist, "compressor-threshold"),
-                     var_InheritFloat(p_playlist, "compressor-ratio"),
-                     var_InheritFloat(p_playlist, "compressor-knee"),
-                     var_InheritFloat(p_playlist, "compressor-makeup-gain"),
-                     var_InheritFloat(p_playlist, "spatializer-roomsize"),
-                     var_InheritFloat(p_playlist, "spatializer-width"),
-                     var_InheritFloat(p_playlist, "spatializer-wet"),
-                     var_InheritFloat(p_playlist, "spatializer-dry"),
-                     var_InheritFloat(p_playlist, "spatializer-damp"),
-                     var_InheritFloat(p_playlist, "norm-max-level"),
-                     var_InheritBool(p_playlist,"equalizer-2pass")];
+                     B64EncAndFree(var_GetNonEmptyString(p_aout, "equalizer-preset")),
+                     B64EncAndFree(var_InheritString(p_aout, "audio-filter")),
+                     var_InheritFloat(p_aout, "compressor-rms-peak"),
+                     var_InheritFloat(p_aout, "compressor-attack"),
+                     var_InheritFloat(p_aout, "compressor-release"),
+                     var_InheritFloat(p_aout, "compressor-threshold"),
+                     var_InheritFloat(p_aout, "compressor-ratio"),
+                     var_InheritFloat(p_aout, "compressor-knee"),
+                     var_InheritFloat(p_aout, "compressor-makeup-gain"),
+                     var_InheritFloat(p_aout, "spatializer-roomsize"),
+                     var_InheritFloat(p_aout, "spatializer-width"),
+                     var_InheritFloat(p_aout, "spatializer-wet"),
+                     var_InheritFloat(p_aout, "spatializer-dry"),
+                     var_InheritFloat(p_aout, "spatializer-damp"),
+                     var_InheritFloat(p_aout, "norm-max-level"),
+                     var_InheritBool(p_aout,"equalizer-2pass")];
 }
 
 - (void)saveCurrentProfile
@@ -623,10 +599,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     if (!p_aout)
         return false;
 
-    psz_string = var_InheritString(pl_Get(p_custom_intf), "audio-filter");
-
-    if (!psz_string)
-        psz_string = var_GetNonEmptyString(p_aout, "audio-filter");
+    psz_string = var_InheritString(p_aout, "audio-filter");
 
     aout_Release(p_aout);
 
@@ -689,16 +662,18 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 - (void)equalizerUpdated
 {
     intf_thread_t *p_intf = getIntf();
-    playlist_t *p_playlist = pl_Get(p_intf);
-    bool b_2p = var_CreateGetBool(p_playlist, "equalizer-2pass");
+    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    if (!p_aout)
+        return;
+    bool b_2p = var_CreateGetBool(p_aout, "equalizer-2pass");
     bool bEnabled = GetEqualizerStatus(p_intf, _playerController, (char *)"equalizer");
 
     /* Setup sliders */
-    var_Create(p_playlist, "equalizer-preset",
+    var_Create(p_aout, "equalizer-preset",
                VLC_VAR_STRING | VLC_VAR_DOINHERIT);
-    var_Create(p_playlist, "equalizer-bands",
+    var_Create(p_aout, "equalizer-bands",
                VLC_VAR_STRING | VLC_VAR_DOINHERIT);
-    var_Create(p_playlist, "equalizer-preamp",
+    var_Create(p_aout, "equalizer-preamp",
                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
     [self updatePresetSelector];
 
@@ -766,12 +741,11 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 - (IBAction)equalizerBandSliderUpdated:(id)sender
 {
     audio_output_t *p_aout = [_playerController mainAudioOutput];
+    if (!p_aout)
+        return;
     char const *psz_preset_values = [[self generatePresetString] UTF8String];
-    if (p_aout) {
-        var_SetString(p_aout, "equalizer-bands", psz_preset_values);
-        aout_Release(p_aout);
-    }
-    var_SetString(pl_Get(getIntf()), "equalizer-bands", psz_preset_values);
+    var_SetString(p_aout, "equalizer-bands", psz_preset_values);
+    aout_Release(p_aout);
 }
 
 - (IBAction)equalizerChangePreset:(id)sender
@@ -793,10 +767,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
     [_equalizerPreampSlider setFloatValue: f_eq_preamp];
     [self setBandSliderValuesForPreset:numberOfChosenPreset];
-
-    var_SetString(pl_Get(getIntf()), "equalizer-bands", psz_eq_bands);
-    var_SetFloat(pl_Get(getIntf()), "equalizer-preamp", f_eq_preamp);
-    var_SetString(pl_Get(getIntf()), "equalizer-preset", psz_eq_preset);
 }
 
 - (IBAction)equalizerPreAmpSliderUpdated:(id)sender
@@ -808,7 +778,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetFloat(p_aout, "equalizer-preamp", fPreamp);
         aout_Release(p_aout);
     }
-    var_SetFloat(pl_Get(getIntf()), "equalizer-preamp", fPreamp);
 }
 
 - (IBAction)equalizerTwoPass:(id)sender
@@ -820,8 +789,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetBool(p_aout, "equalizer-2pass", b_2p);
         aout_Release(p_aout);
     }
-
-    var_SetBool(pl_Get(getIntf()), "equalizer-2pass", b_2p);
 }
 
 - (IBAction)addPresetAction:(id)sender
@@ -862,8 +829,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
             var_SetString(p_aout, "equalizer-preset", psz_eq_preset);
             aout_Release(p_aout);
         }
-
-        var_SetString(pl_Get(getIntf()), "equalizer-preset", psz_eq_preset);
 
         /* update UI */
         [_self updatePresetSelector];
@@ -910,10 +875,13 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 - (void)resetCompressor
 {
     intf_thread_t *p_intf = getIntf();
-    playlist_t *p_playlist = pl_Get(p_intf);
+    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    if (!p_aout)
+        return;
     BOOL bEnable_compressor = NO;
     char *psz_afilters;
-    psz_afilters = var_InheritString(p_playlist, "audio-filter");
+
+    psz_afilters = var_InheritString(p_aout, "audio-filter");
     if (psz_afilters) {
         bEnable_compressor = strstr(psz_afilters, "compressor") != NULL;
         [_compressorEnableCheckbox setState: (NSInteger)strstr(psz_afilters, "compressor") ];
@@ -923,33 +891,26 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [_compressorView enableSubviews:bEnable_compressor];
     [_compressorEnableCheckbox setState:(bEnable_compressor ? NSOnState : NSOffState)];
 
-    [_compressorBand1Slider setFloatValue: var_CreateGetFloat(p_playlist, "compressor-rms-peak")];
+    [_compressorBand1Slider setFloatValue: var_CreateGetFloat(p_aout, "compressor-rms-peak")];
     [_compressorBand1TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [_compressorBand1Slider floatValue]]];
-    [_compressorBand2Slider setFloatValue: var_CreateGetFloat(p_playlist, "compressor-attack")];
+    [_compressorBand2Slider setFloatValue: var_CreateGetFloat(p_aout, "compressor-attack")];
     [_compressorBand2TextField setStringValue:[NSString localizedStringWithFormat:@"%2.1f ms", [_compressorBand2Slider floatValue]]];
-    [_compressorBand3Slider setFloatValue: var_CreateGetFloat(p_playlist, "compressor-release")];
+    [_compressorBand3Slider setFloatValue: var_CreateGetFloat(p_aout, "compressor-release")];
     [_compressorBand3TextField setStringValue:[NSString localizedStringWithFormat:@"%3.1f ms", [_compressorBand3Slider floatValue]]];
-    [_compressorBand4Slider setFloatValue: var_CreateGetFloat(p_playlist, "compressor-threshold")];
+    [_compressorBand4Slider setFloatValue: var_CreateGetFloat(p_aout, "compressor-threshold")];
     [_compressorBand4TextField setStringValue:[NSString localizedStringWithFormat:@"%2.1f dB", [_compressorBand4Slider floatValue]]];
-    [_compressorBand5Slider setFloatValue: var_CreateGetFloat(p_playlist, "compressor-ratio")];
+    [_compressorBand5Slider setFloatValue: var_CreateGetFloat(p_aout, "compressor-ratio")];
     [_compressorBand5TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f:1", [_compressorBand5Slider floatValue]]];
-    [_compressorBand6Slider setFloatValue: var_CreateGetFloat(p_playlist, "compressor-knee")];
+    [_compressorBand6Slider setFloatValue: var_CreateGetFloat(p_aout, "compressor-knee")];
     [_compressorBand6TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [_compressorBand6Slider floatValue]]];
-    [_compressorBand7Slider setFloatValue: var_CreateGetFloat(p_playlist, "compressor-makeup-gain")];
+    [_compressorBand7Slider setFloatValue: var_CreateGetFloat(p_aout, "compressor-makeup-gain")];
     [_compressorBand7TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [_compressorBand7Slider floatValue]]];
+
+    aout_Release(p_aout);
 }
 
 - (IBAction)resetCompressorValues:(id)sender
 {
-    playlist_t *p_playlist = pl_Get(getIntf());
-    var_SetFloat(p_playlist, "compressor-rms-peak", 0.000000);
-    var_SetFloat(p_playlist, "compressor-attack", 25.000000);
-    var_SetFloat(p_playlist, "compressor-release", 100.000000);
-    var_SetFloat(p_playlist, "compressor-threshold", -11.000000);
-    var_SetFloat(p_playlist, "compressor-ratio", 8.000000);
-    var_SetFloat(p_playlist, "compressor-knee", 2.500000);
-    var_SetFloat(p_playlist, "compressor-makeup-gain", 7.000000);
-
     audio_output_t *p_aout = [_playerController mainAudioOutput];
     if (p_aout) {
         var_SetFloat(p_aout, "compressor-rms-peak", 0.000000);
@@ -997,7 +958,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetFloat(p_aout, psz_property, f_value);
         aout_Release(p_aout);
     }
-    var_SetFloat(pl_Get(getIntf()), psz_property, f_value);
 
     if (sender == _compressorBand1Slider)
         [_compressorBand1TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", f_value]];
@@ -1019,10 +979,13 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 #pragma mark Spatializer
 - (void)resetSpatializer
 {
-    playlist_t *p_playlist = pl_Get(getIntf());
     BOOL bEnable_spatializer = NO;
-    char *psz_afilters;
-    psz_afilters = var_InheritString(p_playlist, "audio-filter");
+    char *psz_afilters = NULL;
+    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    if (!p_aout)
+        return;
+
+    psz_afilters = var_InheritString(p_aout, "audio-filter");
     if (psz_afilters) {
         bEnable_spatializer = strstr(psz_afilters, "spatializer") != NULL;
         free(psz_afilters);
@@ -1033,7 +996,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 
 #define setSlider(bandsld, bandfld, var) \
-[bandsld setFloatValue: var_CreateGetFloat(p_playlist, var) * 10.]; \
+[bandsld setFloatValue: var_CreateGetFloat(p_aout, var) * 10.]; \
 [bandfld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [bandsld floatValue]]]
 
     setSlider(_spatializerBand1Slider, _spatializerBand1TextField, "spatializer-roomsize");
@@ -1043,18 +1006,12 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     setSlider(_spatializerBand5Slider, _spatializerBand5TextField, "spatializer-damp");
 
 #undef setSlider
+
+    aout_Release(p_aout);
 }
 
 - (IBAction)resetSpatializerValues:(id)sender
 {
-    // FIXME: this no longer works and a fix depends on a future libvlc improvement
-    playlist_t *p_playlist = pl_Get(getIntf());
-    var_SetFloat(p_playlist, "spatializer-roomsize", .85);
-    var_SetFloat(p_playlist, "spatializer-width", 1.);
-    var_SetFloat(p_playlist, "spatializer-wet", .4);
-    var_SetFloat(p_playlist, "spatializer-dry", .5);
-    var_SetFloat(p_playlist, "spatializer-damp", .5);
-
     audio_output_t *p_aout = [_playerController mainAudioOutput];
     if (p_aout) {
         var_SetFloat(p_aout, "spatializer-roomsize", .85);
@@ -1096,7 +1053,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetFloat(p_aout, psz_property, f_value / 10.f);
         aout_Release(p_aout);
     }
-    var_SetFloat(pl_Get(getIntf()), psz_property, f_value / 10.f);
 
     if (sender == _spatializerBand1Slider)
         [_spatializerBand1TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", f_value]];
@@ -1114,11 +1070,12 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 #pragma mark Filter
 - (void)resetAudioFilters
 {
-    playlist_t *p_playlist = pl_Get(getIntf());
     BOOL bEnable_normvol = NO;
     char *psz_afilters;
-    // FIXME: this no longer works and a fix depends on a future libvlc improvement
-    psz_afilters = var_InheritString(p_playlist, "audio-filter");
+    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    if (!p_aout)
+        return;
+    psz_afilters = var_InheritString(p_aout, "audio-filter");
     if (psz_afilters) {
         [_filterHeadPhoneCheckbox setState: (NSInteger)strstr(psz_afilters, "headphone") ];
         [_filterKaraokeCheckbox setState: (NSInteger)strstr(psz_afilters, "karaoke") ];
@@ -1137,7 +1094,8 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [_filterNormLevelLabel setEnabled:bEnable_normvol];
     [_filterNormLevelCheckbox setState:(bEnable_normvol ? NSOnState : NSOffState)];
 
-    [_filterNormLevelSlider setFloatValue: var_CreateGetFloat(p_playlist, "norm-max-level")];
+    [_filterNormLevelSlider setFloatValue: var_CreateGetFloat(p_aout, "norm-max-level")];
+    aout_Release(p_aout);
 }
 
 - (IBAction)filterEnableHeadPhoneVirt:(id)sender
@@ -1161,9 +1119,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         var_SetFloat(p_aout, "norm-max-level", f_value);
         aout_Release(p_aout);
     }
-
-    // FIXME: this no longer works and a fix depends on a future libvlc improvement
-    var_SetFloat(pl_Get(getIntf()), "norm-max-level", f_value);
 }
 
 - (IBAction)filterEnableKaraoke:(id)sender
