@@ -217,30 +217,38 @@ void MessagesDialog::sinkMessage( const MsgEvent *msg )
     if( !messages->document()->isEmpty() )
         messages->textCursor().insertBlock();
 
-    QString buf = QString( "<i><font color='darkblue'>%1</font>" ).arg( msg->module );
+    /* Insert the prefix */
+    QTextCharFormat format;
+    format.setProperty( QTextFormat::FontItalic, true );
+    format.setForeground( Qt::darkBlue );
+
+    messages->textCursor().insertText( msg->module, format );
 
     switch ( msg->priority )
     {
         case VLC_MSG_INFO:
-            buf += "<font color='blue'> info: </font>";
+            format.setForeground( Qt::darkBlue );
+            messages->textCursor().insertText( " info: ", format );
             break;
         case VLC_MSG_ERR:
-            buf += "<font color='red'> error: </font>";
+            format.setForeground( Qt::darkRed );
+            messages->textCursor().insertText( " error: ", format );
             break;
         case VLC_MSG_WARN:
-            buf += "<font color='green'> warning: </font>";
+            format.setForeground( Qt::darkGreen );
+            messages->textCursor().insertText( " warning: ", format );
             break;
         case VLC_MSG_DBG:
         default:
-            buf += "<font color='grey'> debug: </font>";
+            format.setForeground( Qt::darkGray );
+            messages->textCursor().insertText( " debug: ", format );
             break;
     }
 
-    /* Insert the prefix */
-    messages->textCursor().insertHtml( buf /* + "</i>" */ );
-
     /* Insert the message */
-    messages->textCursor().insertHtml( msg->text );
+    format.setProperty( QTextFormat::FontItalic, false );
+    format.setForeground( messages->palette().foreground() );
+    messages->textCursor().insertText( msg->text, format );
 
     /* Pass the new message thru the filter */
     QTextBlock b = messages->document()->lastBlock();
