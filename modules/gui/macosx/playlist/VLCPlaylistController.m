@@ -37,6 +37,8 @@ NSString *VLCPlaybackRepeatChanged = @"VLCPlaybackRepeatChanged";
 NSString *VLCPlaybackHasPreviousChanged = @"VLCPlaybackHasPreviousChanged";
 NSString *VLCPlaybackHasNextChanged = @"VLCPlaybackHasNextChanged";
 NSString *VLCPlaylistCurrentItemChanged = @"VLCPlaylistCurrentItemChanged";
+NSString *VLCPlaylistItemsAdded = @"VLCPlaylistItemsAdded";
+NSString *VLCPlaylistItemsRemoved = @"VLCPlaylistItemsRemoved";
 
 @interface VLCPlaylistController ()
 {
@@ -246,6 +248,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     [_playlistModel addItems:items atIndex:insertionIndex count:numberOfItems];
 
     [_playlistDataSource playlistUpdated];
+    [_defaultNotificationCenter postNotificationName:VLCPlaylistItemsAdded object:self];
 }
 
 - (void)playlistRemovedItemsAtIndex:(size_t)index count:(size_t)numberOfItems
@@ -254,6 +257,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     [_playlistModel removeItemsInRange:range];
 
     [_playlistDataSource playlistUpdated];
+    [_defaultNotificationCenter postNotificationName:VLCPlaylistItemsRemoved object:self];
 }
 
 - (void)playlistUpdatedForIndex:(size_t)firstUpdatedIndex items:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems

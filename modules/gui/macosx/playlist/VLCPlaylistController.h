@@ -35,6 +35,8 @@ extern NSString *VLCPlaybackRepeatChanged;
 extern NSString *VLCPlaybackHasPreviousChanged;
 extern NSString *VLCPlaybackHasNextChanged;
 extern NSString *VLCPlaylistCurrentItemChanged;
+extern NSString *VLCPlaylistItemsAdded;
+extern NSString *VLCPlaylistItemsRemoved;
 
 @interface VLCPlaylistController : NSObject
 
