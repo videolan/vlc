@@ -10,6 +10,7 @@ Audio output:
 Video Output:
  * Fix 12 bits sources playback with Direct3D11
  * Fix crash on iOS
+ * Fix midstream aspect-ratio changes when Windows hardware decoding is on
 
 Stream Output:
  * Improve Chromecast support with new ChromeCast apps

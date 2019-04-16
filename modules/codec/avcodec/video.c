@@ -1557,8 +1557,11 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
      for (size_t i = 0; pi_fmt[i] != AV_PIX_FMT_NONE; i++)
         if (pi_fmt[i] == p_sys->pix_fmt)
         {
-            msg_Dbg(p_dec, "reusing decoder output format %d", pi_fmt[i]);
-            return p_sys->pix_fmt;
+            if (lavc_UpdateVideoFormat(p_dec, p_context, p_sys->pix_fmt, swfmt) == 0)
+            {
+                msg_Dbg(p_dec, "reusing decoder output format %d", pi_fmt[i]);
+                return p_sys->pix_fmt;
+            }
         }
 
 no_reuse:
