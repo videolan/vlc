@@ -3032,10 +3032,12 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
 
         /* TODO do not use vlc_tick_now() but proper stream acquisition date */
         bool b_late;
+        bool b_extra_buffering_allowed = !input_priv(p_sys->p_input)->b_low_delay &&
+                                         EsOutIsExtraBufferingAllowed( out );
         input_clock_Update( p_pgrm->p_input_clock, VLC_OBJECT(p_sys->p_input),
                             &b_late,
                             input_priv(p_sys->p_input)->b_can_pace_control || p_sys->b_buffering,
-                            EsOutIsExtraBufferingAllowed( out ),
+                            b_extra_buffering_allowed,
                             i_pcr, vlc_tick_now() );
 
         if( !p_sys->p_pgrm )

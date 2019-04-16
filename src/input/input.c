@@ -390,6 +390,8 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     /* Create Object Variables for private use only */
     input_ConfigVarInit( p_input );
 
+    priv->b_low_delay = var_InheritBool( p_input, "low-delay" );
+
     /* Remove 'Now playing' info as it is probably outdated */
     input_item_SetNowPlaying( p_item, NULL );
     input_item_SetESNowPlaying( p_item, NULL );
