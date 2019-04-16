@@ -66,6 +66,14 @@
                                    name:VLCMediaKeySupportSettingChangedNotification
                                  object:nil];
         [notificationCenter addObserver:self
+                               selector:@selector(playlistUpdated:)
+                                   name:VLCPlaylistItemsAdded
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(playlistUpdated:)
+                                   name:VLCPlaylistItemsRemoved
+                                 object:nil];
+        [notificationCenter addObserver:self
                                selector:@selector(coreChangedAppleRemoteSetting:)
                                    name:VLCAppleRemoteSettingChangedNotification
                                  object:nil];
@@ -115,24 +123,51 @@
     VLCMain *main = [VLCMain sharedInstance];
     if (b_mediaKeySupport && ([[[main playlistController] playlistModel] numberOfPlaylistItems] > 0)) {
         if (!b_mediaKeyTrapEnabled) {
-            msg_Dbg(p_intf, "Enabling media key support");
-            if ([_mediaKeyController startWatchingMediaKeys]) {
-                b_mediaKeyTrapEnabled = YES;
-            } else {
-                msg_Warn(p_intf, "Failed to enable media key support, likely "
-                         "app needs to be whitelisted in Security Settings.");
-            }
+            [self enableMediaKeySupport];
         }
     } else {
         if (b_mediaKeyTrapEnabled) {
-            b_mediaKeyTrapEnabled = NO;
-            msg_Dbg(p_intf, "Disabling media key support");
-            [_mediaKeyController stopWatchingMediaKeys];
+            [self disableMediaKeySupport];
         }
+        _mediaKeyController = nil;
     }
 }
 
--(void)mediaKeyTap:(SPMediaKeyTap*)keyTap receivedMediaKeyEvent:(NSEvent*)event
+- (void)enableMediaKeySupport
+{
+    intf_thread_t *p_intf = getIntf();
+    msg_Dbg(p_intf, "Enabling media key support");
+    if ([_mediaKeyController startWatchingMediaKeys]) {
+        b_mediaKeyTrapEnabled = YES;
+    } else {
+        msg_Warn(p_intf, "Failed to enable media key support, likely "
+                 "app needs to be whitelisted in Security Settings.");
+    }
+}
+
+- (void)disableMediaKeySupport
+{
+    b_mediaKeyTrapEnabled = NO;
+    msg_Dbg(getIntf(), "Disabling media key support");
+    [_mediaKeyController stopWatchingMediaKeys];
+}
+
+- (void)playlistUpdated:(NSNotification *)aNotification
+{
+    if (!_mediaKeyController) {
+        return;
+    }
+
+    BOOL numberOfMediaLargerThanZero = [[[[VLCMain sharedInstance] playlistController] playlistModel] numberOfPlaylistItems] > 0;
+
+    if (b_mediaKeyTrapEnabled && !numberOfMediaLargerThanZero) {
+        [self disableMediaKeySupport];
+    } else if (!b_mediaKeyTrapEnabled && numberOfMediaLargerThanZero) {
+        [self enableMediaKeySupport];
+    }
+}
+
+- (void)mediaKeyTap:(SPMediaKeyTap*)keyTap receivedMediaKeyEvent:(NSEvent*)event
 {
     if (b_mediaKeySupport) {
         assert([event type] == NSSystemDefined && [event subtype] == SPSystemDefinedEventMediaKeys);
