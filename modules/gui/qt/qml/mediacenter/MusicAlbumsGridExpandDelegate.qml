@@ -180,8 +180,8 @@ Utils.NavigableFocusScope {
                 parentId : root.model.id
                 sortModel: ListModel {
                     ListElement{ criteria: "track_number";  width:0.10; visible: true; text: qsTr("#"); showSection: "" }
-                    ListElement{ criteria: "title";         width:0.70; visible: true; text: qsTr("TITLE"); showSection: "" }
-                    ListElement{ criteria: "duration";      width:0.20; visible: true; text: qsTr("DURATION"); showSection: "" }
+                    ListElement{ criteria: "title";         width:0.70; visible: true; text: qsTr("Title"); showSection: "" }
+                    ListElement{ criteria: "duration";      width:0.20; visible: true; text: qsTr("Duration"); showSection: "" }
                 }
                 focus: true
 

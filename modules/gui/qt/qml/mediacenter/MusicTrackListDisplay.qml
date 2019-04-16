@@ -29,12 +29,12 @@ Utils.KeyNavigableTableView {
     id: root
 
     sortModel: ListModel {
-        ListElement{ criteria: "title";       width:0.44; text: qsTr("TITLE");    showSection: "title" }
-        ListElement{ criteria: "album_title"; width:0.25; text: qsTr("ALBUM");    showSection: "album_title" }
-        ListElement{ criteria: "main_artist"; width:0.15; text: qsTr("ARTIST");   showSection: "main_artist" }
-        ListElement{ criteria: "duration";    width:0.06; text: qsTr("DURATION"); showSection: "" }
-        ListElement{ criteria: "track_number";width:0.05; text: qsTr("TRACK"); showSection: "" }
-        ListElement{ criteria: "disc_number"; width:0.05; text: qsTr("DISC");  showSection: "" }
+        ListElement{ criteria: "title";       width:0.44; text: qsTr("Title");    showSection: "title" }
+        ListElement{ criteria: "album_title"; width:0.25; text: qsTr("Album");    showSection: "album_title" }
+        ListElement{ criteria: "main_artist"; width:0.15; text: qsTr("Artist");   showSection: "main_artist" }
+        ListElement{ criteria: "duration";    width:0.06; text: qsTr("Duration"); showSection: "" }
+        ListElement{ criteria: "track_number";width:0.05; text: qsTr("Track"); showSection: "" }
+        ListElement{ criteria: "disc_number"; width:0.05; text: qsTr("Disc");  showSection: "" }
     }
 
     model: MLAlbumTrackModel {
