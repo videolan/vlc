@@ -1683,10 +1683,25 @@ subpicture_t *spu_Render(spu_t *spu,
 
     /* Updates the subpictures */
     for (size_t i = 0; i < subpicture_count; i++) {
-        subpicture_t *subpic = subpicture_array[i].subpicture;
+        spu_render_entry_t *entry = &subpicture_array[i];
+        subpicture_t *subpic = entry->subpicture;
+        if (!subpic->updater.pf_validate)
+            continue;
+
+        const vlc_tick_t i_original_start = subpic->i_start;
+        const vlc_tick_t i_original_stop = subpic->i_stop;
+
+        /* The subpicture_updater_t API expect display date */
+        subpic->i_start = entry->start;
+        subpic->i_stop = entry->stop;
         subpicture_Update(subpic,
                           fmt_src, fmt_dst,
                           subpic->b_subtitle ? render_subtitle_date : system_now);
+
+        /* Restore original dates, otherwise, the next call to
+         * SpuSelectSubpictures() won't be able to select this subtitle */
+        subpic->i_start = i_original_start;
+        subpic->i_stop = i_original_stop;
     }
 
     /* Now order the subpicture array
