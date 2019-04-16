@@ -91,8 +91,6 @@ VLC_API int intf_Create( libvlc_int_t *, const char * );
 
 VLC_API void libvlc_Quit( libvlc_int_t * );
 
-VLC_API playlist_t *pl_Get( struct intf_thread_t *intf );
-
 /**
  * Recover the main playlist from an interface module
  *
@@ -100,12 +98,6 @@ VLC_API playlist_t *pl_Get( struct intf_thread_t *intf );
  */
 VLC_API vlc_playlist_t *
 vlc_intf_GetMainPlaylist(intf_thread_t *intf);
-
-/**
- * Retrieves the current input thread from the playlist.
- * @note The returned object must be released with input_Release().
- */
-#define pl_CurrentInput(intf) (playlist_CurrentInput(pl_Get(intf)))
 
 /**
  * @ingroup messages

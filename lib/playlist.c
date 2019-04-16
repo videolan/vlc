@@ -29,8 +29,6 @@
 
 #include <vlc/vlc.h>
 
-#include <vlc_playlist_legacy.h>
-
 #include <assert.h>
 
 void libvlc_playlist_play( libvlc_instance_t *p_instance )

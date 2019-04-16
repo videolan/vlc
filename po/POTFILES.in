@@ -35,7 +35,6 @@ include/vlc_tick.h
 include/vlc_network.h
 include/vlc_objects.h
 include/vlc_pgpkey.h
-include/vlc_playlist_legacy.h
 include/vlc_plugin.h
 include/vlc_rand.h
 include/vlc_services_discovery.h
@@ -123,15 +122,6 @@ src/network/rootbind.c
 src/network/tcp.c
 src/network/tls.c
 src/network/udp.c
-src/playlist_legacy/control.c
-src/playlist_legacy/engine.c
-src/playlist_legacy/item.c
-src/playlist_legacy/loadsave.c
-src/playlist_legacy/playlist_internal.h
-src/playlist_legacy/search.c
-src/playlist_legacy/sort.c
-src/playlist_legacy/thread.c
-src/playlist_legacy/tree.c
 src/stream_output/sap.c
 src/stream_output/sdp.c
 src/stream_output/stream_output.c

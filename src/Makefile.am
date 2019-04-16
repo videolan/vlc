@@ -77,7 +77,6 @@ pluginsinclude_HEADERS = \
 	../include/vlc_picture.h \
 	../include/vlc_picture_fifo.h \
 	../include/vlc_picture_pool.h \
-	../include/vlc_playlist_legacy.h \
 	../include/vlc_player.h \
 	../include/vlc_playlist.h \
 	../include/vlc_playlist_export.h \
@@ -222,18 +221,6 @@ libvlccore_la_SOURCES = \
 	modules/textdomain.c \
 	interface/dialog.c \
 	interface/interface.c \
-	playlist_legacy/playlist_internal.h \
-	playlist_legacy/aout.c \
-	playlist_legacy/thread.c \
-	playlist_legacy/control.c \
-	playlist_legacy/engine.c \
-	playlist_legacy/sort.c \
-	playlist_legacy/loadsave.c \
-	playlist_legacy/tree.c \
-	playlist_legacy/item.c \
-	playlist_legacy/search.c \
-	playlist_legacy/services_discovery.c \
-	playlist_legacy/renderer.c \
 	playlist/content.c \
 	playlist/content.h \
 	playlist/control.c \

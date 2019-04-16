@@ -15,7 +15,7 @@ cat libvlccore.sym | grep -v \
 	-e '^image_' -e '^block_' -e '^picture_' -e '^subpicture_' \
 	-e '^es_format' -e '^[asv]out_' -e '^spu_' -e '^filter_' \
 	-e '^video_format_' \
-	-e '^playlist_' -e '^services_discovery_' -e '^intf_' \
+	-e '^services_discovery_' -e '^intf_' \
 	-e '^dialog_' -e '^update_' -e '^addons\?_' -e '^fingerprinter_' \
 	-e '^text_style_' -e '^text_segment_' \
 	-e '^net_' -e '^httpd_' \
@@ -24,7 +24,6 @@ cat libvlccore.sym | grep -v \
 	-e '^us_' -e '^utf8_' -e '^xml_' -e '^GetLang_' \
 	-e '^m\(date\|sleep\|wait\)$' -e '^[A-Z][a-z]*Charset$' -e 'MD5$' \
 	-e '^NTPtime64$' -e '^secstotimestr$' \
-	-e '^pl_Get' \
 		&& exit 1
 
 echo "None found."

@@ -41,44 +41,13 @@
 #include <vlc_common.h>
 #include <vlc_modules.h>
 #include <vlc_interface.h>
-#include <vlc_playlist_legacy.h>
 #include <vlc_playlist.h>
 #include "libvlc.h"
-#include "playlist_legacy/playlist_internal.h"
 #include "../lib/libvlc_internal.h"
 #include "input/player.h"
 
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
-
-/* This lock ensures that the playlist is created only once (per instance). It
- * also protects the list of running interfaces against concurrent access,
- * either to add or remove an interface.
- *
- * However, it does NOT protect from destruction of the playlist by
- * intf_DestroyAll(). Instead, care must be taken that intf_Create() and any
- * other function that depends on the playlist is only called BEFORE
- * intf_DestroyAll() has the possibility to destroy all interfaces.
- */
-static vlc_mutex_t old_playlist_lock = VLC_STATIC_MUTEX;
-static playlist_t *old_playlist = NULL;
-
-/**
- * Creates the playlist if necessary, and return a pointer to it.
- * @note The playlist is not reference-counted. So the pointer is only valid
- * until intf_DestroyAll() destroys interfaces.
- */
-playlist_t *pl_Get( struct intf_thread_t *intf )
-{
-    assert( intf );
-
-    vlc_mutex_lock(&old_playlist_lock);
-    if (old_playlist == NULL)
-        old_playlist = playlist_Create(VLC_OBJECT(intf));
-    vlc_mutex_unlock(&old_playlist_lock);
-
-    return old_playlist;
-}
 
 static void
 PlaylistConfigureFromVariables(vlc_playlist_t *playlist, vlc_object_t *obj)
@@ -325,11 +294,6 @@ void intf_DestroyAll(libvlc_int_t *libvlc)
         vlc_mutex_lock(&priv->lock);
     }
     vlc_mutex_unlock(&priv->lock);
-
-    vlc_mutex_lock(&old_playlist_lock);
-    if (old_playlist)
-        playlist_Destroy(old_playlist);
-    vlc_mutex_unlock(&old_playlist_lock);
 }
 
 /* Following functions are local */

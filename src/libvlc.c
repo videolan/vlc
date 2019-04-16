@@ -51,7 +51,6 @@
 
 #include "config/vlc_getopt.h"
 
-#include <vlc_playlist_legacy.h>
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 
@@ -67,7 +66,6 @@
 #include <vlc_thumbnailer.h>
 
 #include "libvlc.h"
-#include "playlist_legacy/playlist_internal.h"
 
 #include <vlc_vlm.h>
 
