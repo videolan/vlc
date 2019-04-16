@@ -53,6 +53,8 @@
 #import "windows/logging/VLCLogWindowController.h"
 #import "windows/addons/VLCAddonsWindowController.h"
 
+#import <vlc_interface.h>
+
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>
 #endif
@@ -1201,7 +1203,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [openPanel setCanChooseDirectories: NO];
     [openPanel setAllowsMultipleSelection: YES];
 
-    [openPanel setAllowedFileTypes: [NSArray arrayWithObjects:@"cdg",@"idx",@"srt",@"sub",@"utf",@"ass",@"ssa",@"aqt",@"jss",@"psb",@"rt",@"smi",@"txt",@"smil",@"stl",@"usf",@"dks",@"pjs",@"mpl2",@"mks",@"vtt",@"ttml",@"dfxp",nil]];
+    NSMutableString *subtitleExtensionsString = [toNSStr(EXTENSIONS_SUBTITLE) mutableCopy];
+    [subtitleExtensionsString replaceOccurrencesOfString:@"*." withString:@"" options:NSLiteralSearch range:NSMakeRange(0, subtitleExtensionsString.length)];
+    [openPanel setAllowedFileTypes:[subtitleExtensionsString componentsSeparatedByString:@";"]];
 
     NSURL *url = _playerController.URLOfCurrentMediaItem;
     url = [url URLByDeletingLastPathComponent];
