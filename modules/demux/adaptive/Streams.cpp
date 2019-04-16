@@ -84,6 +84,7 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, 
                     segmentTracker->registerListener(this);
                     segmentTracker->notifyBufferingState(true);
                     connManager = conn;
+                    setTimeOffset(segmentTracker->getPlaybackTime());
                     return true;
                 }
                 delete commandsqueue;
