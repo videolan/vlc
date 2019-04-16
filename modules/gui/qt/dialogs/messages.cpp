@@ -213,8 +213,9 @@ void MessagesDialog::sinkMessage( const MsgEvent *msg )
          messages->textCursor().anchor() != messages->textCursor().position() )
          messages->moveCursor( QTextCursor::End );
 
-    /* Start a new logic block so we can hide it on-demand */
-    messages->textCursor().insertBlock();
+    /* Start a new logic block */
+    if( !messages->document()->isEmpty() )
+        messages->textCursor().insertBlock();
 
     QString buf = QString( "<i><font color='darkblue'>%1</font>" ).arg( msg->module );
 
