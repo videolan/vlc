@@ -24,7 +24,6 @@
 
 #import <vlc_modules.h>
 #import <vlc_charset.h>
-#import <vlc_playlist_legacy.h>
 
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
@@ -58,7 +57,6 @@
     intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
-    playlist_t *p_playlist = pl_Get(p_intf);
     char *psz_string, *psz_parser;
 
     const char *psz_filter_type = [self getFilterType:psz_name];
@@ -67,9 +65,14 @@
         return;
     }
 
+    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    vout_thread_t *vout = [playerController mainVideoOutputThread];
+    if (!vout)
+        return;
+
     msg_Dbg(p_intf, "will turn filter '%s' %s", psz_name, b_on ? "on" : "off");
 
-    psz_string = var_InheritString(p_playlist, psz_filter_type);
+    psz_string = var_InheritString(vout, psz_filter_type);
 
     if (b_on) {
         if (psz_string == NULL) {
@@ -81,7 +84,10 @@
         }
     } else {
         if (!psz_string)
+        {
+            vout_Release(vout);
             return;
+        }
 
         psz_parser = strstr(psz_string, psz_name);
         if (psz_parser) {
@@ -97,22 +103,12 @@
                 *(psz_string + strlen(psz_string) -1) = '\0';
         } else {
             free(psz_string);
+            vout_Release(vout);
             return;
         }
     }
-    var_SetString(p_playlist, psz_filter_type, psz_string);
-
-    /* Try to set non splitter filters on the fly */
-    if (strcmp(psz_filter_type, "video-splitter")) {
-        NSArray<NSValue *> *vouts = [[[[VLCMain sharedInstance] playlistController] playerController] allVideoOutputThreads];
-        if (vouts)
-            for (NSValue * val in vouts) {
-                vout_thread_t *p_vout = [val pointerValue];
-                var_SetString(p_vout, psz_filter_type, psz_string);
-                vout_Release(p_vout);
-            }
-    }
-
+    var_SetString(vout, psz_filter_type, psz_string);
+    vout_Release(vout);
     free(psz_string);
 }
 
@@ -120,12 +116,9 @@
                      forFilter: (char const *)psz_filter
                      withValue: (vlc_value_t)value
 {
-    NSArray<NSValue *> *vouts = [[[[VLCMain sharedInstance] playlistController] playerController] allVideoOutputThreads];
     intf_thread_t *p_intf = getIntf();
     if (!p_intf)
         return;
-
-    playlist_t *p_playlist = pl_Get(p_intf);
 
     int i_type = 0;
     bool b_is_command = false;
@@ -135,47 +128,18 @@
         return;
     }
 
-    if (vouts && [vouts count])
-    {
-        i_type = var_Type((vout_thread_t *)[[vouts firstObject] pointerValue], psz_property);
-        b_is_command = i_type & VLC_VAR_ISCOMMAND;
-    }
+    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    vout_thread_t *vout = [playerController mainVideoOutputThread];
+    if (!vout)
+        return;
+
+    i_type = var_Type(vout, psz_property);
     if (!i_type)
         i_type = config_GetType(psz_property);
 
     i_type &= VLC_VAR_CLASS;
-    if (i_type == VLC_VAR_BOOL)
-        var_SetBool(p_playlist, psz_property, value.b_bool);
-    else if (i_type == VLC_VAR_INTEGER)
-        var_SetInteger(p_playlist, psz_property, value.i_int);
-    else if (i_type == VLC_VAR_FLOAT)
-        var_SetFloat(p_playlist, psz_property, value.f_float);
-    else if (i_type == VLC_VAR_STRING)
-        var_SetString(p_playlist, psz_property, EnsureUTF8(value.psz_string));
-    else
-    {
-        msg_Err(p_intf,
-                "Module %s's %s variable is of an unsupported type ( %d )",
-                psz_filter, psz_property, i_type);
-        b_is_command = false;
-    }
-
-    if (b_is_command)
-        if (vouts)
-            for (NSValue *ptr in vouts)
-            {
-                vout_thread_t *p_vout = [ptr pointerValue];
-                var_SetChecked(p_vout, psz_property, i_type, value);
-#ifndef NDEBUG
-                int i_cur_type = var_Type(p_vout, psz_property);
-                assert((i_cur_type & VLC_VAR_CLASS) == i_type);
-                assert(i_cur_type & VLC_VAR_ISCOMMAND);
-#endif
-            }
-
-    if (vouts)
-        for (NSValue *ptr in vouts)
-            vout_Release((vout_thread_t *)[ptr pointerValue]);
+    var_SetChecked(vout, psz_property, i_type, value);
+    vout_Release(vout);
 }
 
 

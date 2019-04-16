@@ -33,8 +33,6 @@
 #import "playlist/VLCPlayerController.h"
 #import "windows/video/VLCVideoOutputProvider.h"
 
-#import <vlc_playlist_legacy.h>
-
 #define getWidgetBoolValue(w)   ((vlc_value_t){ .b_bool = [w state] })
 #define getWidgetIntValue(w)    ((vlc_value_t){ .i_int = [w intValue] })
 #define getWidgetFloatValue(w)  ((vlc_value_t){ .f_float = [w floatValue] })
@@ -92,7 +90,6 @@
 - (void)loadProfile
 {
     intf_thread_t *p_intf = getIntf();
-    playlist_t *p_playlist = pl_Get(p_intf);
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSInteger profileIndex = [self currentProfileIndex];
 
@@ -112,36 +109,27 @@
 
     /* filter handling */
     NSString *tempString = B64DecNSStr([items firstObject]);
-    NSArray<NSValue *> *vouts = [[[[VLCMain sharedInstance] playlistController] playerController] allVideoOutputThreads];
+    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    vout_thread_t *vout = [playerController mainVideoOutputThread];
 
     /* enable the new filters */
-    var_SetString(p_playlist, "video-filter", [tempString UTF8String]);
-    if (vouts) {
-        for (NSValue *ptr in vouts) {
-            vout_thread_t *p_vout = [ptr pointerValue];
-            var_SetString(p_vout, "video-filter", [tempString UTF8String]);
-        }
-    }
+    if (vout)
+        var_SetString(vout, "video-filter", [tempString UTF8String]);
 
     tempString = B64DecNSStr([items objectAtIndex:1]);
     /* enable another round of new filters */
-    var_SetString(p_playlist, "sub-source", [tempString UTF8String]);
-    if (vouts) {
-        for (NSValue *ptr in vouts) {
-            vout_thread_t *p_vout = [ptr pointerValue];
-            var_SetString(p_vout, "sub-source", [tempString UTF8String]);
-            vout_Release(p_vout);
-        }
-    }
+    if (vout)
+        var_SetString(vout, "sub-source", [tempString UTF8String]);
 
     tempString = B64DecNSStr([items objectAtIndex:2]);
     /* enable another round of new filters */
-    char *psz_current_splitter = var_GetString(p_playlist, "video-splitter");
-    bool b_filter_changed = ![tempString isEqualToString:toNSStr(psz_current_splitter)];
+    char *psz_current_splitter = vout ? var_GetString(vout, "video-splitter") : NULL;
+    bool b_filter_changed = psz_current_splitter && ![tempString isEqualToString:toNSStr(psz_current_splitter)];
     free(psz_current_splitter);
 
     if (b_filter_changed)
-        var_SetString(p_playlist, "video-splitter", [tempString UTF8String]);
+        var_SetString(vout, "video-splitter", [tempString UTF8String]);
+    vout_Release(vout);
 
     /* try to set filter values on-the-fly and store them appropriately */
     // index 3 is deprecated
@@ -409,7 +397,6 @@
 - (void)setWidgetValue: (id)widget forOption: (char *)psz_option enabled: (bool)b_state
 {
     intf_thread_t *p_intf = getIntf();
-    playlist_t *p_playlist = pl_Get(p_intf);
 
     vlc_value_t val;
     int i_type = config_GetType(psz_option) & VLC_VAR_CLASS;
@@ -425,10 +412,17 @@
         return;
     }
 
-    if (var_Create(p_playlist, psz_option, i_type | VLC_VAR_DOINHERIT) ||
-        var_GetChecked(p_playlist, psz_option, i_type, &val)) {
+    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    vout_thread_t *vout = [playerController mainVideoOutputThread];
+    if (!vout)
+        return;
+
+    if (var_Create(vout, psz_option, i_type | VLC_VAR_DOINHERIT) ||
+        var_GetChecked(vout, psz_option, i_type, &val)) {
+        vout_Release(vout);
         return;
     }
+    vout_Release(vout);
 
     if (i_type == VLC_VAR_BOOL || i_type == VLC_VAR_INTEGER)
     {
@@ -478,12 +472,15 @@
 - (void)resetValues
 {
     intf_thread_t *p_intf = getIntf();
-    playlist_t *p_playlist = pl_Get(p_intf);
+    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    vout_thread_t *vout = [playerController mainVideoOutputThread];
+    if (!vout)
+        return;
     BOOL b_state;
 
     /* do we have any filter enabled? if yes, show it. */
     char * psz_vfilters;
-    psz_vfilters = var_InheritString(p_playlist, "video-filter");
+    psz_vfilters = var_InheritString(vout, "video-filter");
     if (psz_vfilters) {
         [_adjustCheckbox setState: (NSInteger)strstr(psz_vfilters, "adjust")];
         [_sharpenCheckbox setState: (NSInteger)strstr(psz_vfilters, "sharpen")];
@@ -527,7 +524,7 @@
         [_anaglyphCheckbox setState: NSOffState];
     }
 
-    psz_vfilters = var_InheritString(p_playlist, "sub-source");
+    psz_vfilters = var_InheritString(vout, "sub-source");
     if (psz_vfilters) {
         [_addTextCheckbox setState: (NSInteger)strstr(psz_vfilters, "marq")];
         [_addLogoCheckbox setState: (NSInteger)strstr(psz_vfilters, "logo")];
@@ -537,7 +534,7 @@
         [_addLogoCheckbox setState: NSOffState];
     }
 
-    psz_vfilters = var_InheritString(p_playlist, "video-splitter");
+    psz_vfilters = var_InheritString(vout, "video-splitter");
     if (psz_vfilters) {
         [_cloneCheckbox setState: (NSInteger)strstr(psz_vfilters, "clone")];
         [_wallCheckbox setState: (NSInteger)strstr(psz_vfilters, "wall")];
@@ -546,6 +543,8 @@
         [_cloneCheckbox setState: NSOffState];
         [_wallCheckbox setState: NSOffState];
     }
+
+    vout_Release(vout);
 
     /* fetch and show the various values */
     b_state = [_adjustCheckbox state];
@@ -649,45 +648,50 @@
 - (NSString *)generateProfileString
 {
     intf_thread_t *p_intf = getIntf();
-    playlist_t *p_playlist = pl_Get(p_intf);
-    return [NSString stringWithFormat:@"%@;%@;%@;%lli;%f;%f;%f;%f;%f;%lli;%f;%@;%lli;%lli;%lli;%lli;%lli;%lli;%@;%lli;%lli;%lli;%lli;%lli;%@;%lli;%@;%lli;%lli;%lli;%lli;%lli;%lli;%f",
-                     B64EncAndFree(var_InheritString(p_playlist, "video-filter")),
-                     B64EncAndFree(var_InheritString(p_playlist, "sub-source")),
-                     B64EncAndFree(var_InheritString(p_playlist, "video-splitter")),
+    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    vout_thread_t *vout = [playerController mainVideoOutputThread];
+    if (!vout)
+        return nil;
+    NSString *string = [NSString stringWithFormat:@"%@;%@;%@;%lli;%f;%f;%f;%f;%f;%lli;%f;%@;%lli;%lli;%lli;%lli;%lli;%lli;%@;%lli;%lli;%lli;%lli;%lli;%@;%lli;%@;%lli;%lli;%lli;%lli;%lli;%lli;%f",
+                     B64EncAndFree(var_InheritString(vout, "video-filter")),
+                     B64EncAndFree(var_InheritString(vout, "sub-source")),
+                     B64EncAndFree(var_InheritString(vout, "video-splitter")),
                      0LL, // former "hue" value, deprecated since 3.0.0
-                     var_InheritFloat(p_playlist, "contrast"),
-                     var_InheritFloat(p_playlist, "brightness"),
-                     var_InheritFloat(p_playlist, "saturation"),
-                     var_InheritFloat(p_playlist, "gamma"),
-                     var_InheritFloat(p_playlist, "sharpen-sigma"),
-                     var_InheritInteger(p_playlist, "gradfun-radius"),
-                     var_InheritFloat(p_playlist, "grain-variance"),
-                     B64EncAndFree(var_InheritString(p_playlist, "transform-type")),
-                     var_InheritInteger(p_playlist, "puzzle-rows"),
-                     var_InheritInteger(p_playlist, "puzzle-cols"),
-                     var_InheritInteger(p_playlist, "colorthres-color"),
-                     var_InheritInteger(p_playlist, "colorthres-saturationthres"),
-                     var_InheritInteger(p_playlist, "colorthres-similaritythres"),
-                     var_InheritInteger(p_playlist, "sepia-intensity"),
-                     B64EncAndFree(var_InheritString(p_playlist, "gradient-mode")),
-                     (int64_t)var_InheritBool(p_playlist, "gradient-cartoon"),
-                     var_InheritInteger(p_playlist, "gradient-type"),
-                     var_InheritInteger(p_playlist, "extract-component"),
-                     var_InheritInteger(p_playlist, "posterize-level"),
-                     var_InheritInteger(p_playlist, "blur-factor"),
-                     B64EncAndFree(var_InheritString(p_playlist, "marq-marquee")),
-                     var_InheritInteger(p_playlist, "marq-position"),
-                     B64EncAndFree(var_InheritString(p_playlist, "logo-file")),
-                     var_InheritInteger(p_playlist, "logo-position"),
-                     var_InheritInteger(p_playlist, "logo-opacity"),
-                     var_InheritInteger(p_playlist, "clone-count"),
-                     var_InheritInteger(p_playlist, "wall-rows"),
-                     var_InheritInteger(p_playlist, "wall-cols"),
+                     var_InheritFloat(vout, "contrast"),
+                     var_InheritFloat(vout, "brightness"),
+                     var_InheritFloat(vout, "saturation"),
+                     var_InheritFloat(vout, "gamma"),
+                     var_InheritFloat(vout, "sharpen-sigma"),
+                     var_InheritInteger(vout, "gradfun-radius"),
+                     var_InheritFloat(vout, "grain-variance"),
+                     B64EncAndFree(var_InheritString(vout, "transform-type")),
+                     var_InheritInteger(vout, "puzzle-rows"),
+                     var_InheritInteger(vout, "puzzle-cols"),
+                     var_InheritInteger(vout, "colorthres-color"),
+                     var_InheritInteger(vout, "colorthres-saturationthres"),
+                     var_InheritInteger(vout, "colorthres-similaritythres"),
+                     var_InheritInteger(vout, "sepia-intensity"),
+                     B64EncAndFree(var_InheritString(vout, "gradient-mode")),
+                     (int64_t)var_InheritBool(vout, "gradient-cartoon"),
+                     var_InheritInteger(vout, "gradient-type"),
+                     var_InheritInteger(vout, "extract-component"),
+                     var_InheritInteger(vout, "posterize-level"),
+                     var_InheritInteger(vout, "blur-factor"),
+                     B64EncAndFree(var_InheritString(vout, "marq-marquee")),
+                     var_InheritInteger(vout, "marq-position"),
+                     B64EncAndFree(var_InheritString(vout, "logo-file")),
+                     var_InheritInteger(vout, "logo-position"),
+                     var_InheritInteger(vout, "logo-opacity"),
+                     var_InheritInteger(vout, "clone-count"),
+                     var_InheritInteger(vout, "wall-rows"),
+                     var_InheritInteger(vout, "wall-cols"),
                      // version 2 of profile string:
-                     (int64_t)var_InheritBool(p_playlist, "brightness-threshold"), // index: 32
+                     (int64_t)var_InheritBool(vout, "brightness-threshold"), // index: 32
                      // version 3 of profile string: (vlc-3.0.0)
-                     var_InheritFloat(p_playlist, "hue") // index: 33
+                     var_InheritFloat(vout, "hue") // index: 33
             ];
+    vout_Release(vout);
+    return string;
 }
 
 #pragma mark -
@@ -1016,16 +1020,15 @@
             [self setCropRightValue: [self cropLeftValue]];
     }
 
-    NSArray<NSValue *> *vouts = [[[[VLCMain sharedInstance] playlistController] playerController] allVideoOutputThreads];
-    if (vouts)
-        for (NSValue *ptr in vouts) {
-            vout_thread_t *p_vout = [ptr pointerValue];
-            var_SetInteger(p_vout, "crop-top", [_cropTopTextField intValue]);
-            var_SetInteger(p_vout, "crop-bottom", [_cropBottomTextField intValue]);
-            var_SetInteger(p_vout, "crop-left", [_cropLeftTextField intValue]);
-            var_SetInteger(p_vout, "crop-right", [_cropRightTextField intValue]);
-            vout_Release(p_vout);
-        }
+    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    vout_thread_t *p_vout = [playerController mainVideoOutputThread];
+    if (p_vout) {
+        var_SetInteger(p_vout, "crop-top", [_cropTopTextField intValue]);
+        var_SetInteger(p_vout, "crop-bottom", [_cropBottomTextField intValue]);
+        var_SetInteger(p_vout, "crop-left", [_cropLeftTextField intValue]);
+        var_SetInteger(p_vout, "crop-right", [_cropRightTextField intValue]);
+        vout_Release(p_vout);
+    }
 }
 
 #pragma mark -
