@@ -79,7 +79,8 @@ static bool GetWindowDimensions(void *opaque, UINT *width, UINT *height)
 
 /* */
 int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
-               vout_display_sys_win32_t *sys, bool projection_gestures)
+               vout_display_sys_win32_t *sys,
+               bool projection_gestures, bool full_size_video)
 {
     if (unlikely(area->vdcfg.window == NULL))
         return VLC_EGENERIC;
@@ -95,6 +96,7 @@ int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
     sys->hvideownd = NULL;
     sys->hparent   = NULL;
     sys->is_first_placement = true;
+    sys->full_size_video = full_size_video;
 
     /* */
     sys->event = EventThreadCreate(obj, area->vdcfg.window);
@@ -184,9 +186,14 @@ void UpdateRects(vout_display_t *vd, display_win32_area_t *area, vout_display_sy
                     swpFlags |= SWP_SHOWWINDOW;
                     sys->is_first_placement = false;
                 }
-                SetWindowPos(sys->hvideownd, 0,
-                    area->place.x, area->place.y, area->place.width, area->place.height,
-                    swpFlags);
+                if (sys->full_size_video)
+                    SetWindowPos(sys->hvideownd, 0,
+                        0, 0, display_width, display_height,
+                        swpFlags);
+                else
+                    SetWindowPos(sys->hvideownd, 0,
+                        area->place.x, area->place.y, area->place.width, area->place.height,
+                        swpFlags);
             }
 
             CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);

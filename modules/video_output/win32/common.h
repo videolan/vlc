@@ -67,6 +67,7 @@ typedef struct vout_display_sys_win32_t
 
     /* Misc */
     bool is_first_placement;
+    bool full_size_video; /* true if hvideownd should have the same size as hwnd */
 } vout_display_sys_win32_t;
 
 
@@ -74,7 +75,8 @@ typedef struct vout_display_sys_win32_t
  * Prototypes from common.c
  *****************************************************************************/
 #if !VLC_WINSTORE_APP
-int  CommonInit(vlc_object_t *, display_win32_area_t *, vout_display_sys_win32_t *, bool projection_gestures);
+int  CommonInit(vlc_object_t *, display_win32_area_t *, vout_display_sys_win32_t *,
+                bool projection_gestures, bool full_size_video);
 void CommonClean(vlc_object_t *, vout_display_sys_win32_t *);
 #endif /* !VLC_WINSTORE_APP */
 int  CommonControl(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *, int , va_list );
