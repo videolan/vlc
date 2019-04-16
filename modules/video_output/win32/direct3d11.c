@@ -179,12 +179,6 @@ static bool GetExtenalSwapchainDimensions(void *opaque, UINT *width, UINT *heigh
 }
 #endif
 
-static inline bool RectEquals(const RECT *r1, const RECT *r2)
-{
-    return r1->bottom == r2->bottom && r1->top == r2->top &&
-           r1->left == r2->left && r1->right == r2->right;
-}
-
 static HRESULT UpdateBackBuffer(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;

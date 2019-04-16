@@ -95,7 +95,6 @@ int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
     sys->hvideownd = NULL;
     sys->hparent   = NULL;
     sys->is_first_placement = true;
-    sys->is_on_top        = false;
 
     /* */
     sys->event = EventThreadCreate(obj, area->vdcfg.window);

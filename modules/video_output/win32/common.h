@@ -67,7 +67,6 @@ typedef struct vout_display_sys_win32_t
 
     /* Misc */
     bool is_first_placement;
-    bool is_on_top;
 } vout_display_sys_win32_t;
 
 
