@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-04-09 15:59+0200\n"
+"PO-Revision-Date: 2019-04-16 11:43+0200\n"
 "Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2019\n"
 "Language-Team: Latvian (https://www.transifex.com/yaron/teams/16553/lv/)\n"
 "Language: lv\n"
@@ -2137,7 +2137,7 @@ msgstr "Rādīt video virsrakstu x milisekundes"
 
 #: src/libvlc-module.c:330
 msgid "Show the video title for n milliseconds, default is 5000 ms (5 sec.)"
-msgstr "Rādīt video virsrakstu n milisekundes, noklusētais ir 5000 ms (5 sek.)"
+msgstr "Rādīt video virsrakstu n milisekundes, noklusējums ir 5000 ms (5 sek.)"
 
 #: src/libvlc-module.c:332
 msgid "Position of video title"
@@ -2356,7 +2356,7 @@ msgid ""
 msgstr ""
 "Mērogošanas koeficients, kurš lietots, kad automātiskā mērogošana ir "
 "izslēgta.\n"
-"Noklusētā vērtība ir 1.0 (sākotnējais video izmērs)."
+"Noklusējuma vērtība ir 1.0 (sākotnējais video izmērs)."
 
 #: src/libvlc-module.c:445
 msgid "Custom crop ratios list"
@@ -2613,7 +2613,7 @@ msgstr "Multiraides izvades saskarne"
 
 #: src/libvlc-module.c:557
 msgid "Default multicast interface. This overrides the routing table."
-msgstr "Noklusētā multiraides saskarne. Šis pārraksta maršrutēšanas tabulu."
+msgstr "Noklusējuma multiraides saskarne. Šis pārraksta maršrutēšanas tabulu."
 
 #: src/libvlc-module.c:559
 msgid "DiffServ Code Point"
@@ -3075,36 +3075,36 @@ msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
-"Šī ir noklusētais DVD dzinis (vai datne), kuru lietot. Neaizmirstiet kolu "
-"pēc dziņa burta (piem., D:)"
+"Šis ir noklusējuma DVD diskdzinis (vai datne), kuru lietot. Neaizmirstiet "
+"kolu pēc diskdziņa burta (piem., D:)"
 
 #: src/libvlc-module.c:771
 msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
-"Šī ir noklusētais VCD dzinis (vai datne), kuru lietot. Neaizmirstiet kolu "
-"pēc dziņa burta (piem., D:)"
+"Šis ir noklusējuma VCD diskdzinis (vai datne), kuru lietot. Neaizmirstiet "
+"kolu pēc diskdziņa burta (piem., D:)"
 
 #: src/libvlc-module.c:774 modules/access/cdda.c:704
 msgid ""
 "This is the default Audio CD drive (or file) to use. Don't forget the colon "
 "after the drive letter (e.g. D:)"
 msgstr ""
-"Šī ir noklusētais Audio CD dzinis (vai datne), kuru lietot. Neaizmirstiet "
-"kolu pēc dziņa burta (piem., D:)"
+"Šis ir noklusējuma Audio CD diskdzinis (vai datne), kuru lietot. "
+"Neaizmirstiet kolu pēc diskdziņa burta (piem., D:)"
 
 #: src/libvlc-module.c:781
 msgid "This is the default DVD device to use."
-msgstr "Šī ir noklusētā DVD ierīce, kuru lietot."
+msgstr "Šī ir noklusējuma DVD ierīce, kuru lietot."
 
 #: src/libvlc-module.c:783
 msgid "This is the default VCD device to use."
-msgstr "Šī ir noklusētā VCD ierīce, kuru lietot."
+msgstr "Šī ir noklusējuma VCD ierīce, kuru lietot."
 
 #: src/libvlc-module.c:785 modules/access/cdda.c:709
 msgid "This is the default Audio CD device to use."
-msgstr "Šī ir noklusētā Audio CD ierīce, kuru lietot."
+msgstr "Šī ir noklusējuma Audio CD ierīce, kuru lietot."
 
 #: src/libvlc-module.c:799
 msgid "TCP connection timeout"
@@ -3112,7 +3112,7 @@ msgstr "TCP savienojuma noildze"
 
 #: src/libvlc-module.c:801
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr "Noklusētā TCP savienojuma noildze (milisekundēs)."
+msgstr "Noklusējuma TCP savienojuma noildze (milisekundēs)."
 
 #: src/libvlc-module.c:803
 msgid "HTTP server address"
