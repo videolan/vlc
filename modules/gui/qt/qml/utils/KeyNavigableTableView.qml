@@ -52,7 +52,7 @@ NavigableFocusScope {
                 id: lineView
 
                 width: parent.width
-                height: VLCStyle.fontHeight_normal + VLCStyle.margin_xxsmall
+                height: VLCStyle.fontHeight_normal + VLCStyle.margin_large
 
                 color:  VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, hoverArea.containsMouse, this.activeFocus)
 
@@ -77,8 +77,9 @@ NavigableFocusScope {
                             model: sortModel
 
                             Item {
-                                height: VLCStyle.fontHeight_normal
+                                height: parent.height
                                 width: model.width * view.width
+                                Layout.alignment: Qt.AlignVCenter
 
                                 Text {
                                     text: rowModel[model.criteria]
@@ -88,8 +89,8 @@ NavigableFocusScope {
 
                                     anchors {
                                         fill: parent
-                                        leftMargin: VLCStyle.margin_xxsmall
-                                        rightMargin: VLCStyle.margin_xxsmall
+                                        leftMargin: VLCStyle.margin_xsmall
+                                        rightMargin: VLCStyle.margin_xsmall
                                     }
                                     verticalAlignment: Text.AlignVCenter
                                     horizontalAlignment: Text.AlignLeft
@@ -97,17 +98,6 @@ NavigableFocusScope {
                             }
                         }
                     }
-                }
-
-                Rectangle {
-                    color: VLCStyle.colors.buttonBorder
-                    antialiasing: true
-                    anchors{
-                        right: parent.right
-                        bottom: parent.bottom
-                        left: parent    .left
-                    }
-                    height: 1
                 }
             }
         }
@@ -174,14 +164,6 @@ NavigableFocusScope {
                         }
                     }
                 }
-            }
-
-            //line below
-            Rectangle {
-                color: VLCStyle.colors.buttonBorder
-                height: 1
-                width: parent.width
-                anchors.bottom: parent.bottom
             }
         }
 
