@@ -44,19 +44,9 @@
 #include "common.h"
 #include "../video_chroma/copy.h"
 
-static bool GetExternalDimensions(void *opaque, UINT *width, UINT *height)
-{
-    const display_win32_area_t *area = opaque;
-    *width  = area->vdcfg.display.width;
-    *height = area->vdcfg.display.height;
-    return true;
-}
-
 void InitArea(vout_display_t *vd, display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
 {
     area->place_changed = false;
-    area->pf_GetDisplayDimensions = GetExternalDimensions;
-    area->opaque_dimensions = area;
     area->vdcfg = *vdcfg;
 
     area->texture_source = vd->source;
@@ -67,27 +57,12 @@ void InitArea(vout_display_t *vd, display_win32_area_t *area, const vout_display
 #if !VLC_WINSTORE_APP
 static void CommonChangeThumbnailClip(vlc_object_t *, vout_display_sys_win32_t *, bool show);
 
-static bool GetWindowDimensions(void *opaque, UINT *width, UINT *height)
-{
-    const vout_display_sys_win32_t *sys = opaque;
-    assert(sys != NULL);
-    RECT out;
-    if (!GetClientRect(sys->hvideownd, &out))
-        return false;
-    *width  = RECTWidth(out);
-    *height = RECTHeight(out);
-    return true;
-}
-
 /* */
 int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
                vout_display_sys_win32_t *sys, bool projection_gestures)
 {
     if (unlikely(area->vdcfg.window == NULL))
         return VLC_EGENERIC;
-
-    area->pf_GetDisplayDimensions = GetWindowDimensions;
-    area->opaque_dimensions = sys;
 
     /* */
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
@@ -128,19 +103,8 @@ int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
 *****************************************************************************/
 void UpdateRects(vlc_object_t *obj, display_win32_area_t *area, vout_display_sys_win32_t *sys)
 {
-    UINT  display_width, display_height;
-
-    /* Retrieve the window size */
-    if (!area->pf_GetDisplayDimensions(area->opaque_dimensions, &display_width, &display_height))
-    {
-        msg_Err(obj, "could not get the window dimensions");
-        return;
-    }
-
     /* Update the window position and size */
     vout_display_cfg_t place_cfg = area->vdcfg;
-    place_cfg.display.width = display_width;
-    place_cfg.display.height = display_height;
 
 #if (defined(MODULE_NAME_IS_glwin32))
     /* Reverse vertical alignment as the GL tex are Y inverted */

@@ -39,9 +39,6 @@ typedef struct display_win32_area_t
     video_format_t        texture_source;
 
     vout_display_cfg_t    vdcfg;
-
-    bool (*pf_GetDisplayDimensions)(void *opaque, UINT *w, UINT *h);
-    void *opaque_dimensions;
 } display_win32_area_t;
 
 #define RECTWidth(r)   (LONG)((r).right - (r).left)
