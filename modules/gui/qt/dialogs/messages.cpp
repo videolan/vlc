@@ -254,9 +254,6 @@ void MessagesDialog::sinkMessage( const MsgEvent *msg )
     QTextBlock b = messages->document()->lastBlock();
     b.setVisible( matchFilter( b.text() ) );
 
-    /* Tell the QTextDocument to recompute the size of the given area */
-    messages->document()->markContentsDirty( b.position(), b.length() );
-
     if ( b_autoscroll ) messages->ensureCursorVisible();
 }
 
