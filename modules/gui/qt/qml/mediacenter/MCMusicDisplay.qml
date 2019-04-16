@@ -72,6 +72,7 @@ Utils.NavigableFocusScope {
 
     ColumnLayout {
         anchors.fill : parent
+        spacing: 0
 
         Utils.NavigableFocusScope {
             id: toobar
