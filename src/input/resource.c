@@ -194,50 +194,6 @@ static void DisplayVoutTitle( input_resource_t *p_resource,
     free( psz_nowplaying );
 }
 
-static vout_thread_t *HoldVout( input_resource_t *p_resource )
-{
-    /* TODO FIXME: p_resource->pp_vout order is NOT stable */
-    vlc_mutex_lock( &p_resource->lock_hold );
-
-    vout_thread_t *p_vout = p_resource->i_vout > 0 ? p_resource->pp_vout[0] : NULL;
-    if( p_vout )
-        vout_Hold(p_vout);
-
-    vlc_mutex_unlock( &p_resource->lock_hold );
-
-    return p_vout;
-}
-
-static void HoldVouts( input_resource_t *p_resource, vout_thread_t ***ppp_vout,
-                       size_t *pi_vout )
-{
-    vout_thread_t **pp_vout;
-
-    *pi_vout = 0;
-    *ppp_vout = NULL;
-
-    vlc_mutex_lock( &p_resource->lock_hold );
-
-    if( p_resource->i_vout <= 0 )
-        goto exit;
-
-    pp_vout = vlc_alloc( p_resource->i_vout, sizeof(*pp_vout) );
-    if( !pp_vout )
-        goto exit;
-
-    *ppp_vout = pp_vout;
-    *pi_vout = p_resource->i_vout;
-
-    for( int i = 0; i < p_resource->i_vout; i++ )
-    {
-        pp_vout[i] = p_resource->pp_vout[i];
-        vout_Hold(pp_vout[i]);
-    }
-
-exit:
-    vlc_mutex_unlock( &p_resource->lock_hold );
-}
-
 /* Audio output */
 audio_output_t *input_resource_GetAout( input_resource_t *p_resource )
 {
@@ -446,13 +402,46 @@ void input_resource_PutVout(input_resource_t *p_resource,
 
 vout_thread_t *input_resource_HoldVout( input_resource_t *p_resource )
 {
-    return HoldVout( p_resource );
+    /* TODO FIXME: p_resource->pp_vout order is NOT stable */
+    vlc_mutex_lock( &p_resource->lock_hold );
+
+    vout_thread_t *p_vout = p_resource->i_vout > 0 ? p_resource->pp_vout[0] : NULL;
+    if( p_vout )
+        vout_Hold(p_vout);
+
+    vlc_mutex_unlock( &p_resource->lock_hold );
+
+    return p_vout;
 }
 
 void input_resource_HoldVouts( input_resource_t *p_resource, vout_thread_t ***ppp_vout,
                                size_t *pi_vout )
 {
-    HoldVouts( p_resource, ppp_vout, pi_vout );
+    vout_thread_t **pp_vout;
+
+    *pi_vout = 0;
+    *ppp_vout = NULL;
+
+    vlc_mutex_lock( &p_resource->lock_hold );
+
+    if( p_resource->i_vout <= 0 )
+        goto exit;
+
+    pp_vout = vlc_alloc( p_resource->i_vout, sizeof(*pp_vout) );
+    if( !pp_vout )
+        goto exit;
+
+    *ppp_vout = pp_vout;
+    *pi_vout = p_resource->i_vout;
+
+    for( int i = 0; i < p_resource->i_vout; i++ )
+    {
+        pp_vout[i] = p_resource->pp_vout[i];
+        vout_Hold(pp_vout[i]);
+    }
+
+exit:
+    vlc_mutex_unlock( &p_resource->lock_hold );
 }
 
 void input_resource_TerminateVout( input_resource_t *p_resource )
