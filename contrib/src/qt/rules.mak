@@ -20,14 +20,13 @@ ifeq ($(call need_pkg,"Qt5Core >= 5.11 Qt5Gui Qt5Widgets"),)
 PKGS_FOUND += qt
 endif
 
-$(TARBALLS)/qt-$(QT_VERSION_FULL).tar.xz:
+$(TARBALLS)/qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz:
 	$(call download_pkg,$(QT_URL),qt)
 
-.sum-qt: qt-$(QT_VERSION_FULL).tar.xz
+.sum-qt: qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz
 
-qt: qt-$(QT_VERSION_FULL).tar.xz .sum-qt
+qt: qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz .sum-qt
 	$(UNPACK)
-	mv qtbase-everywhere-src-$(QT_VERSION_FULL) qt-$(QT_VERSION_FULL)
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/qt/0001-Windows-QPA-prefer-lower-value-when-rounding-fractio.patch
 	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Disable-systray-notification-sounds.patch

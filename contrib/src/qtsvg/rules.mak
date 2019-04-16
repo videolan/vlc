@@ -14,14 +14,13 @@ ifeq ($(call need_pkg,"Qt5Svg"),)
 PKGS_FOUND += qtsvg
 endif
 
-$(TARBALLS)/qtsvg-$(QTSVG_VERSION).tar.xz:
+$(TARBALLS)/qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz:
 	$(call download_pkg,$(QTSVG_URL),qt)
 
-.sum-qtsvg: qtsvg-$(QTSVG_VERSION).tar.xz
+.sum-qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz
 
-qtsvg: qtsvg-$(QTSVG_VERSION).tar.xz .sum-qtsvg
+qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	$(UNPACK)
-	mv qtsvg-everywhere-src-$(QTSVG_VERSION) qtsvg-$(QTSVG_VERSION)
 	$(APPLY) $(SRC)/qtsvg/0001-Force-the-usage-of-QtZlib-header.patch
 	$(MOVE)
 

@@ -14,14 +14,13 @@ ifeq ($(call need_pkg,"Qt5Quick"),)
 PKGS_FOUND += qtdeclarative
 endif
 
-$(TARBALLS)/qtdeclarative-$(QTDECLARATIVE_VERSION).tar.xz:
+$(TARBALLS)/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz:
 	$(call download_pkg,$(QTDECLARATIVE_URL),qt)
 
-.sum-qtdeclarative: qtdeclarative-$(QTDECLARATIVE_VERSION).tar.xz
+.sum-qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz
 
-qtdeclarative: qtdeclarative-$(QTDECLARATIVE_VERSION).tar.xz .sum-qtdeclarative
+qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum-qtdeclarative
 	$(UNPACK)
-	mv qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION) qtdeclarative-$(QTDECLARATIVE_VERSION)
 	$(MOVE)
 
 .qtdeclarative: qtdeclarative

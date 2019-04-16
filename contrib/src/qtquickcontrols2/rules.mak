@@ -15,14 +15,13 @@ endif
 
 DEPS_qtquickcontrols2 = qtdeclarative $(DEPS_qtdeclarative)
 
-$(TARBALLS)/qtquickcontrols2-$(QTQC2_VERSION).tar.xz:
+$(TARBALLS)/qtquickcontrols2-everywhere-src-$(QTQC2_VERSION).tar.xz:
 	$(call download_pkg,$(QTQC2_URL),qt)
 
-.sum-qtquickcontrols2: qtquickcontrols2-$(QTQC2_VERSION).tar.xz
+.sum-qtquickcontrols2: qtquickcontrols2-everywhere-src-$(QTQC2_VERSION).tar.xz
 
-qtquickcontrols2: qtquickcontrols2-$(QTQC2_VERSION).tar.xz .sum-qtquickcontrols2
+qtquickcontrols2: qtquickcontrols2-everywhere-src-$(QTQC2_VERSION).tar.xz .sum-qtquickcontrols2
 	$(UNPACK)
-	mv qtquickcontrols2-everywhere-src-$(QTQC2_VERSION) qtquickcontrols2-$(QTQC2_VERSION)
 	$(MOVE)
 
 .qtquickcontrols2: qtquickcontrols2

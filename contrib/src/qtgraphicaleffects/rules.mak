@@ -14,14 +14,13 @@ ifeq ($(call need_pkg,"Qt5QuickControls2"),)
 PKGS_FOUND += qtgraphicaleffects
 endif
 
-$(TARBALLS)/qtgraphicaleffects-$(QTGE_VERSION).tar.xz:
+$(TARBALLS)/qtgraphicaleffects-everywhere-src-$(QTGE_VERSION).tar.xz:
 	$(call download_pkg,$(QTGE_URL),qt)
 
-.sum-qtgraphicaleffects: qtgraphicaleffects-$(QTGE_VERSION).tar.xz
+.sum-qtgraphicaleffects: qtgraphicaleffects-everywhere-src-$(QTGE_VERSION).tar.xz
 
-qtgraphicaleffects: qtgraphicaleffects-$(QTGE_VERSION).tar.xz .sum-qtgraphicaleffects
+qtgraphicaleffects: qtgraphicaleffects-everywhere-src-$(QTGE_VERSION).tar.xz .sum-qtgraphicaleffects
 	$(UNPACK)
-	mv qtgraphicaleffects-everywhere-src-$(QTGE_VERSION) qtgraphicaleffects-$(QTGE_VERSION)
 	$(MOVE)
 
 .qtgraphicaleffects: qtgraphicaleffects
