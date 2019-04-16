@@ -157,28 +157,6 @@ static void UpdatePicQuadPosition(vout_display_t *);
 
 static int Control(vout_display_t *, int, va_list);
 
-#if VLC_WINSTORE_APP
-static bool GetExtenalSwapchainDimensions(void *opaque, UINT *width, UINT *height)
-{
-    const vout_display_sys_t *sys = opaque;
-    uint32_t i_width;
-    uint32_t i_height;
-    UINT dataSize = sizeof(i_width);
-    HRESULT hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, &i_width);
-    if (FAILED(hr)) {
-        return false;
-    }
-    dataSize = sizeof(i_height);
-    hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, &i_height);
-    if (FAILED(hr)) {
-        return false;
-    }
-    *width  = i_width;
-    *height = i_height;
-    return true;
-}
-#endif
-
 static HRESULT UpdateBackBuffer(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -468,9 +446,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                        vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
             goto error;
     }
-#else /* !VLC_WINSTORE_APP */
-    sys->area.pf_GetDisplayDimensions = GetExtenalSwapchainDimensions;
-    sys->area.opaque_dimensions = sys;
 #endif /* !VLC_WINSTORE_APP */
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
@@ -909,15 +884,22 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
     VLC_UNUSED(date);
 #if VLC_WINSTORE_APP
-    /* TODO read the swapchain size and call VOUT_DISPLAY_CHANGE_DISPLAY_SIZE */
-    UpdateRects(VLC_OBJECT(vd), &sys->area, &sys->sys);
-#endif
-
-    if ( sys->area.place_changed )
-    {
-        UpdateSize(vd);
-        sys->area.place_changed =false;
+    /* legacy UWP mode, the width/height was set in GUID_SWAPCHAIN_WIDTH/HEIGHT */
+    uint32_t i_width;
+    uint32_t i_height;
+    UINT dataSize = sizeof(i_width);
+    HRESULT hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, &i_width);
+    if (SUCCEEDED(hr)) {
+        dataSize = sizeof(i_height);
+        hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, &i_height);
+        if (SUCCEEDED(hr)) {
+            if (i_width != sys->area.vdcfg.display.width || i_height != sys->area.vdcfg.display.height)
+            {
+                vout_display_SetSize(vd, i_width, i_height);
+            }
+        }
     }
+#endif
 
     if (sys->starRenderCb(sys->outside_opaque))
     {
