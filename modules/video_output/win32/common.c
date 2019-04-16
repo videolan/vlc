@@ -234,7 +234,7 @@ static void CommonChangeThumbnailClip(vlc_object_t *obj, vout_display_sys_win32_
 }
 #endif /* !VLC_WINSTORE_APP */
 
-int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys, int query, va_list args)
+int CommonControl(vlc_object_t *obj, display_win32_area_t *area, vout_display_sys_win32_t *sys, int query, va_list args)
 {
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED: /* const vout_display_cfg_t *p_cfg */
@@ -242,7 +242,7 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {
         area->vdcfg = *va_arg(args, const vout_display_cfg_t *);
-        UpdateRects(VLC_OBJECT(vd), area, sys);
+        UpdateRects(obj, area, sys);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg */
@@ -256,7 +256,7 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
                          area->vdcfg.display.height, SWP_NOZORDER|SWP_NOMOVE|SWP_NOACTIVATE);
         }
 #endif /* !VLC_WINSTORE_APP */
-        UpdateRects(VLC_OBJECT(vd), area, sys);
+        UpdateRects(obj, area, sys);
         return VLC_SUCCESS;
     }
 

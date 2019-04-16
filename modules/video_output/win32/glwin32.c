@@ -83,7 +83,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return vout_display_opengl_SetViewpoint(sys->vgl,
             &va_arg (args, const vout_display_cfg_t* )->viewpoint);
 
-    return CommonControl(vd, &sys->area, &sys->sys, query, args);
+    return CommonControl(VLC_OBJECT(vd), &sys->area, &sys->sys, query, args);
 }
 
 static const struct vout_window_operations embedVideoWindow_Ops =

@@ -101,7 +101,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
-    return CommonControl(vd, &sys->area, &sys->sys, query, args);
+    return CommonControl(VLC_OBJECT(vd), &sys->area, &sys->sys, query, args);
 }
 
 /* */

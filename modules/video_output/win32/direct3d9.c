@@ -1544,7 +1544,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     }
     default:
-        return CommonControl(vd, &sys->area, &sys->sys, query, args);
+        return CommonControl(VLC_OBJECT(vd), &sys->area, &sys->sys, query, args);
     }
 }
 
