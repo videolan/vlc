@@ -203,6 +203,9 @@ static void vout_UpdateWindowSize(vout_thread_t *vout)
 
     vlc_mutex_assert(&vout->p->window_lock);
 
+    if (vout->p->original.i_chroma == 0)
+        return;
+
     vout_SizeWindow(vout, &width, &height);
     msg_Dbg(vout, "requested window size: %ux%u", width, height);
     vout_window_SetSize(vout->p->display_cfg.window, width, height);
