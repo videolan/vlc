@@ -29,6 +29,7 @@ enum Role {
     TRACK_DURATION,
     TRACK_ALBUM,
     TRACK_ARTIST,
+    TRACK_FIRST_SYMBOL,
 };
 
 }
@@ -76,6 +77,8 @@ QVariant MLAlbumTrackModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue( ml_track->getAlbumTitle() );
     case TRACK_ARTIST:
         return QVariant::fromValue( ml_track->getArtist() );
+    case TRACK_FIRST_SYMBOL:
+        return QVariant::fromValue( getFirstSymbol( ml_track->getTitle() ) );
     default :
         return QVariant();
     }
@@ -92,6 +95,7 @@ QHash<int, QByteArray> MLAlbumTrackModel::roleNames() const
         { TRACK_DURATION, "duration" },
         { TRACK_ALBUM, "album_title"},
         { TRACK_ARTIST, "main_artist"},
+        { TRACK_FIRST_SYMBOL, "first_symbol"},
     };
 }
 
@@ -176,4 +180,12 @@ void MLAlbumTrackModel::onVlcMlEvent(const vlc_ml_event_t* event)
             break;
     }
     MLBaseModel::onVlcMlEvent( event );
+}
+
+QString MLAlbumTrackModel::getFirstSymbol( const QString& str )
+{
+    QString ret("#");
+    if ( str.length() > 0 && str[0].isLetter() )
+        ret = str[0].toUpper();
+    return ret;
 }

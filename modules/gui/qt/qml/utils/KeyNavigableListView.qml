@@ -18,6 +18,8 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
+import "qrc:///style/"
+
 NavigableFocusScope {
     id: listview_id
 
@@ -52,6 +54,32 @@ NavigableFocusScope {
 
     property alias highlightMoveVelocity: view.highlightMoveVelocity
 
+    property alias section: view.section
+
+    Component {
+        id: sectionHeading
+        Rectangle {
+            width: parent.width
+            height: childrenRect.height
+
+            Column {
+                width: parent.width
+
+                Text {
+                    text: section
+                    font.pixelSize: 20
+                    color: VLCStyle.colors.accent
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: VLCStyle.colors.textInactive
+                }
+            }
+        }
+    }
+
     ListView {
         id: view
         anchors.fill: parent
@@ -65,6 +93,10 @@ NavigableFocusScope {
 
         highlightMoveDuration: 300 //ms
         highlightMoveVelocity: 1000 //px/s
+
+        section.property: ""
+        section.criteria: ViewSection.FullString
+        section.delegate: sectionHeading
 
         Connections {
             target: view.currentItem

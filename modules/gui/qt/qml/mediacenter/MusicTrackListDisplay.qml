@@ -37,6 +37,8 @@ Utils.KeyNavigableTableView {
         ListElement{ criteria: "disc_number"; width:0.05; text: qsTr("Disc");  showSection: "" }
     }
 
+    section.property: "first_symbol"
+
     model: MLAlbumTrackModel {
         id: rootmodel
         ml: medialib

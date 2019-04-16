@@ -165,6 +165,8 @@ Utils.NavigableFocusScope {
             MusicTrackListDisplay {
                 id: expand_track_id
 
+                section.property: ""
+
                 height: expand_track_id.contentHeight
                 anchors {
                     left: parent.left
