@@ -87,7 +87,7 @@ static void CloseEncoder ( vlc_object_t * );
 
 static const int pi_enc_mode_values[] = { 0, 1, 2 };
 static const char * const ppsz_enc_mode_descriptions[] = {
-    N_("Narrow-band (8kHz)"), N_("Wide-band (16kHz)"), N_("Ultra-wideband (32kHz)"), NULL
+    N_("Narrow-band (8kHz)"), N_("Wide-band (16kHz)"), N_("Ultra-wideband (32kHz)")
 };
 
 vlc_module_begin ()
