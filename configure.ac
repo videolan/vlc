@@ -3994,6 +3994,12 @@ AS_IF([test "${enable_skins2}" != "no"], [
     enable_skins2="yes"
   ])
 ])
+
+AS_IF([test "${enable_skins2}" = "yes"], [
+  AC_MSG_WARN([Skins2 interface disabled, it need to ported to the new player and playlist.])
+  enable_skins2="0"
+], [])
+
 AM_CONDITIONAL([BUILD_SKINS], [test "${enable_skins2}" = "yes"])
 
 AC_ARG_ENABLE([libtar],
