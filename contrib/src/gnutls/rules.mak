@@ -1,6 +1,6 @@
 # GnuTLS
 
-GNUTLS_VERSION := 3.6.7
+GNUTLS_VERSION := 3.6.7.1
 GNUTLS_URL := https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-$(GNUTLS_VERSION).tar.xz
 
 ifdef BUILD_NETWORK
@@ -17,12 +17,13 @@ $(TARBALLS)/gnutls-$(GNUTLS_VERSION).tar.xz:
 
 .sum-gnutls: gnutls-$(GNUTLS_VERSION).tar.xz
 
+# gnutls 3.6.7.1 unpacks into a dir named 3.6.7
+gnutls: UNPACK_DIR=gnutls-3.6.7
 gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	$(UNPACK)
 	$(APPLY) $(SRC)/gnutls/gnutls-pkgconfig-static.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gnutls/gnutls-win32.patch
-	$(APPLY) $(SRC)/gnutls/gnutls-winstore-ntop.patch
 endif
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/gnutls/no-create-time-h.patch
