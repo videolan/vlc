@@ -21,8 +21,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_HELP_H
-#define VLC_HELP_H 1
+#ifndef VLC_CONFIG_CAT_H
+#define VLC_CONFIG_CAT_H
+
 # include <vlc_plugin.h>
 
 /*
@@ -307,4 +308,4 @@ static inline bool vlc_config_subcat_IsGeneral( int subcat )
     }
 }
 
-#endif /* VLC_HELP_H */
+#endif /* VLC_CONFIG_CAT_H */
