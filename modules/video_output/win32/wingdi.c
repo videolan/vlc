@@ -170,6 +170,8 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
     if (sys->area.place.width  != vd->source.i_visible_width ||
         sys->area.place.height != vd->source.i_visible_height) {
+        SetStretchBltMode(hdc, COLORONCOLOR);
+
         StretchBlt(hdc, sys->area.place.x, sys->area.place.y,
                    sys->area.place.width, sys->area.place.height,
                    sys->off_dc,
