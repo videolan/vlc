@@ -174,7 +174,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
     bool discontinuity = false;
     std::size_t prevbyterangeoffset = 0;
     const SingleValueTag *ctx_byterange = NULL;
-    SegmentEncryption encryption;
+    CommonEncryption encryption;
     const ValuesListTag *ctx_extinf = NULL;
 
     std::list<Tag *>::const_iterator it;
@@ -250,7 +250,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                     discontinuity = false;
                 }
 
-                if(encryption.method != SegmentEncryption::NONE)
+                if(encryption.method != CommonEncryption::Method::NONE)
                     segment->setEncryption(encryption);
             }
             break;
@@ -280,7 +280,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                     keytag->getAttributeByName("METHOD")->value == "AES-128" &&
                     keytag->getAttributeByName("URI") )
                 {
-                    encryption.method = SegmentEncryption::AES_128;
+                    encryption.method = CommonEncryption::Method::AES_128;
                     encryption.key.clear();
 
                     Url keyurl(keytag->getAttributeByName("URI")->quotedString());
@@ -301,7 +301,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                 else
                 {
                     /* unsupported or invalid */
-                    encryption.method = SegmentEncryption::NONE;
+                    encryption.method = CommonEncryption::Method::NONE;
                     encryption.key.clear();
                     encryption.iv.clear();
                 }
