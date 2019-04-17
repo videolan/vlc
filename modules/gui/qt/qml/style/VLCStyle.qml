@@ -104,6 +104,7 @@ Item {
 
     //default arts
     property url noArtCover: "qrc:///noart.png";
+    property url noArtAlbum: "qrc:///noart_album.svg";
 
 
 }

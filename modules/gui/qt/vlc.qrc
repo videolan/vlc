@@ -97,6 +97,7 @@
         <file alias="valid.svg">pixmaps/valid.svg</file>
         <file alias="menu.svg">pixmaps/menu.svg</file>
         <file alias="VLCIcons.ttf">pixmaps/VLCIcons.ttf</file>
+        <file alias="noart_album.svg">pixmaps/noart_album.svg</file>
     </qresource>
     <qresource prefix="/prefsmenu">
         <file alias="cone_audio_64.png">pixmaps/prefs/spref_cone_Audio_64.png</file>

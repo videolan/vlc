@@ -53,7 +53,7 @@ Utils.NavigableFocusScope {
 
             Utils.GridItem {
                 Package.name: "gridTop"
-                image: model.cover || VLCStyle.noArtCover
+                image: model.cover || VLCStyle.noArtAlbum
                 title: model.title || qsTr("Unknown title")
                 subtitle: model.main_artist || qsTr("Unknown artist")
                 selected: element.DelegateModel.inSelected || view.currentItem.currentIndex === index
@@ -72,7 +72,7 @@ Utils.NavigableFocusScope {
 
             Utils.GridItem {
                 Package.name: "gridBottom"
-                image: model.cover || VLCStyle.noArtCover
+                image: model.cover || VLCStyle.noArtAlbum
                 title: model.title || qsTr("Unknown title")
                 subtitle: model.main_artist || qsTr("Unknown artist")
                 selected: element.DelegateModel.inSelected || view.currentItem.currentIndex === index
@@ -98,7 +98,8 @@ Utils.NavigableFocusScope {
                 cover: Image {
                     id: cover_obj
                     fillMode: Image.PreserveAspectFit
-                    source: model.cover || VLCStyle.noArtCover
+                    source: model.cover || VLCStyle.noArtAlbum
+                    sourceSize: Qt.size(width, height)
                 }
                 line1: (model.title || qsTr("Unknown title"))+" ["+model.duration+"]"
                 line2: model.main_artist || qsTr("Unknown artist")
