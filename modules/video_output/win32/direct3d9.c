@@ -490,10 +490,10 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
         .bottom = vd->source.i_height,
     };
     RECT rect_in_display = {
-        .left   = 0,
-        .right  = vd->sys->area.place.width,
-        .top    = 0,
-        .bottom = vd->sys->area.place.height,
+        .left   = sys->area.place.x,
+        .right  = sys->area.place.x + sys->area.place.width,
+        .top    = sys->area.place.y,
+        .bottom = sys->area.place.y + sys->area.place.height,
     };
     texture_visible_rect.right  = vd->source.i_visible_width;
     texture_visible_rect.bottom = vd->source.i_visible_height;
@@ -1028,6 +1028,11 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         rect_in_display.top    =            scale_h * r->i_y,
         rect_in_display.bottom = rect_in_display.top  + scale_h * r->fmt.i_visible_height;
 
+        rect_in_display.left   += sys->area.place.x;
+        rect_in_display.right  += sys->area.place.x;
+        rect_in_display.top    += sys->area.place.y;
+        rect_in_display.bottom += sys->area.place.y;
+
         RECT texture_rect;
         texture_rect.left   = 0;
         texture_rect.right  = r->fmt.i_width;
@@ -1318,11 +1323,11 @@ static void Swap(void *opaque)
     // No stretching should happen here !
     RECT src = {
         .left   = 0,
-        .right  = sys->area.place.width,
+        .right  = sys->area.vdcfg.display.width,
         .top    = 0,
-        .bottom = sys->area.place.height
+        .bottom = sys->area.vdcfg.display.height
     };
-    
+
     HRESULT hr;
     if (sys->hd3d.use_ex) {
         hr = IDirect3DDevice9Ex_PresentEx(p_d3d9_dev->devex, &src, &src, NULL, NULL, 0);
@@ -1646,7 +1651,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     InitArea(vd, &sys->area, cfg);
     if (d3d9_device == NULL)
     {
-        if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false, false))
+        if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false, true))
             goto error;
     }
 
