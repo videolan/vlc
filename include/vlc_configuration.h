@@ -49,13 +49,6 @@
 extern "C" {
 # endif
 
-struct config_category_t
-{
-    int         i_id;
-    const char *psz_name;
-    const char *psz_help;
-};
-
 typedef union
 {
     char       *psz;

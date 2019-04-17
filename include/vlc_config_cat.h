@@ -192,6 +192,13 @@
 #define ANETWORK_TITLE N_( "Network" )
 #define ANETWORK_HELP N_( "Advanced network settings." )
 
+struct config_category_t
+{
+    int         i_id;
+    const char *psz_name;
+    const char *psz_help;
+};
+
 static const struct config_category_t categories_array[] =
 {
     /* Interface */
