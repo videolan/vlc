@@ -124,7 +124,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     /* */
     InitArea(vd, &sys->area, cfg);
     if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
-                   vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR, false))
+                   vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR, true))
         goto error;
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
@@ -227,7 +227,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
         return;
     vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
-    vout_display_opengl_Viewport(sys->vgl, 0, 0, width, height);
+    vout_display_opengl_Viewport(sys->vgl, sys->area.place.x, sys->area.place.y, width, height);
     vout_display_opengl_Prepare (sys->vgl, picture, subpicture);
     vlc_gl_ReleaseCurrent (sys->gl);
 }
