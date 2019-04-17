@@ -445,21 +445,35 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* Copy picture surface into texture surface
      * color space conversion happen here */
-    RECT texture_visible_rect = {
+    RECT source_visible_rect = {
         .left   = vd->source.i_x_offset,
         .right  = vd->source.i_x_offset + vd->source.i_visible_width,
         .top    = vd->source.i_y_offset,
         .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
     };
+    RECT texture_visible_rect = {
+        .left   = 0,
+        .right  = vd->source.i_visible_width,
+        .top    = 0,
+        .bottom = vd->source.i_visible_height,
+    };
     // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
     // When copying the entire buffer, the margin end up being blended in the actual picture
     // on nVidia (regardless of even/odd dimensions)
-    if ( texture_visible_rect.right & 1 ) texture_visible_rect.right++;
-    if ( texture_visible_rect.left & 1 ) texture_visible_rect.left--;
-    if ( texture_visible_rect.bottom & 1 ) texture_visible_rect.bottom++;
-    if ( texture_visible_rect.top & 1 ) texture_visible_rect.top--;
-    hr = IDirect3DDevice9_StretchRect(sys->d3d_dev.dev, source, &texture_visible_rect, destination,
-                                      &texture_visible_rect, D3DTEXF_NONE);
+    if (texture_visible_rect.right & 1)
+    {
+        texture_visible_rect.right++;
+        source_visible_rect.right++;
+    }
+    if (texture_visible_rect.bottom & 1)
+    {
+        texture_visible_rect.bottom++;
+        source_visible_rect.bottom++;
+    }
+
+    hr = IDirect3DDevice9_StretchRect(sys->d3d_dev.dev, source, &source_visible_rect,
+                                      destination, &texture_visible_rect,
+                                      D3DTEXF_NONE);
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed StretchRect: source 0x%p 0x%0lx",
@@ -481,6 +495,8 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
         .top    = 0,
         .bottom = vd->sys->area.place.height,
     };
+    texture_visible_rect.right  = vd->source.i_visible_width;
+    texture_visible_rect.bottom = vd->source.i_visible_height;
     Direct3D9SetupVertices(region->vertex, &texture_rect, &texture_visible_rect,
                            &rect_in_display, 255, vd->source.orientation);
     return VLC_SUCCESS;
@@ -568,14 +584,22 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
         return VLC_EGENERIC;
     }
 
+    // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
+    // When copying the entire buffer, the margin end up being blended in the actual picture
+    // on nVidia (regardless of even/odd dimensions)
+    UINT texture_width  = fmt->i_visible_width;
+    UINT texture_height = fmt->i_visible_height;
+    if (texture_width  & 1) texture_width++;
+    if (texture_height & 1) texture_height++;
+
     /*
      * Create a texture for use when rendering a scene
      * for performance reason, texture format is identical to backbuffer
      * which would usually be a RGB format
      */
     hr = IDirect3DDevice9_CreateTexture(d3ddev,
-                                        fmt->i_width,
-                                        fmt->i_height,
+                                        texture_width,
+                                        texture_height,
                                         1,
                                         D3DUSAGE_RENDERTARGET,
                                         p_d3d9_dev->pp.BackBufferFormat,
