@@ -253,6 +253,16 @@ static HINSTANCE Direct3D9LoadShaderLibrary(void)
     return instance;
 }
 
+static unsigned int GetPictureWidth(const vout_display_t *vd)
+{
+    return vd->source.i_visible_width;
+}
+
+static unsigned int GetPictureHeight(const vout_display_t *vd)
+{
+    return vd->source.i_visible_height;
+}
+
 /**
  * It creates a Direct3D vout display.
  */
@@ -309,6 +319,9 @@ static int Open(vlc_object_t *object)
 
     if (CommonInit(vd))
         goto error;
+
+    sys->sys.pf_GetPictureWidth  = GetPictureWidth;
+    sys->sys.pf_GetPictureHeight = GetPictureHeight;
 
     /* */
     video_format_t fmt;
@@ -1246,6 +1259,14 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     LPDIRECT3DDEVICE9       d3ddev = p_d3d9_dev->dev;
     HRESULT hr;
 
+    // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
+    // When copying the entire buffer, the margin end up being blended in the actual picture
+    // on nVidia (regardless of even/odd dimensions)
+    UINT texture_width  = fmt->i_visible_width;
+    UINT texture_height = fmt->i_visible_height;
+    if (texture_width  & 1) texture_width++;
+    if (texture_height & 1) texture_height++;
+
     /*
      * Create a texture for use when rendering a scene
      * for performance reason, texture format is identical to backbuffer
@@ -1253,8 +1274,8 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
      */
     LPDIRECT3DTEXTURE9 d3dtex;
     hr = IDirect3DDevice9_CreateTexture(d3ddev,
-                                        fmt->i_width,
-                                        fmt->i_height,
+                                        texture_width,
+                                        texture_height,
                                         1,
                                         D3DUSAGE_RENDERTARGET,
                                         p_d3d9_dev->pp.BackBufferFormat,
