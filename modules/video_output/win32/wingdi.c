@@ -118,7 +118,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     InitArea(vd, &sys->area, cfg);
-    if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false, false))
+    if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false, true))
         goto error;
 
     /* */
@@ -153,11 +153,24 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
     HDC hdc = GetDC(sys->sys.hvideownd);
 
+    if (sys->area.place_changed)
+    {
+        /* clear the background */
+        RECT display = {
+            .left   = 0,
+            .right  = sys->area.vdcfg.display.width,
+            .top    = 0,
+            .bottom = sys->area.vdcfg.display.height,
+        };
+        FillRect(hdc, &display, GetStockObject(BLACK_BRUSH));
+        sys->area.place_changed = false;
+    }
+
     SelectObject(sys->off_dc, sys->off_bitmap);
 
     if (sys->area.place.width  != vd->source.i_visible_width ||
         sys->area.place.height != vd->source.i_visible_height) {
-        StretchBlt(hdc, 0, 0,
+        StretchBlt(hdc, sys->area.place.x, sys->area.place.y,
                    sys->area.place.width, sys->area.place.height,
                    sys->off_dc,
                    vd->source.i_x_offset, vd->source.i_y_offset,
@@ -165,7 +178,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
                    vd->source.i_y_offset + vd->source.i_visible_height,
                    SRCCOPY);
     } else {
-        BitBlt(hdc, 0, 0,
+        BitBlt(hdc, sys->area.place.x, sys->area.place.y,
                sys->area.place.width, sys->area.place.height,
                sys->off_dc,
                vd->source.i_x_offset, vd->source.i_y_offset,
