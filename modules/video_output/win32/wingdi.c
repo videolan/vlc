@@ -164,6 +164,8 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         rect_src_clipped.right - rect_src_clipped.left ||
         rect_dest_clipped.bottom - rect_dest_clipped.top !=
         rect_src_clipped.bottom - rect_src_clipped.top) {
+        SetStretchBltMode(hdc, COLORONCOLOR);
+
         StretchBlt(hdc, rect_dst.left, rect_dst.top,
                    rect_dst.right, rect_dst.bottom,
                    sys->off_dc,
