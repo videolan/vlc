@@ -510,7 +510,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (Direct3D11 output)");
     msg_Dbg(vd, "Direct3D11 device adapter successfully initialized");
 
-    vd->info.has_double_click     = true;
     vd->info.can_scale_spu        = true;
 
     if (var_InheritBool(vd, "direct3d11-hw-blending") &&

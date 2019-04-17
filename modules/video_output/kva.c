@@ -272,8 +272,6 @@ static void PMThread( void *arg )
     /* Setup vout_display now that everything is fine */
     *fmtp       = fmt;
 
-    vd->info.has_double_click = true;
-
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;

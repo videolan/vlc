@@ -126,8 +126,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
 
     /* */
-    vd->info.has_double_click     = true;
-
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;

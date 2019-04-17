@@ -159,7 +159,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
 
     /* Setup vout_display now that everything is fine */
-    vd->info.has_double_click = true;
     vd->info.subpicture_chromas = subpicture_chromas;
 
     *fmtp    = fmt;
