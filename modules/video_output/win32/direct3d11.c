@@ -183,8 +183,8 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     UINT i_width, i_height;
-    i_width  = sys->area.place.width;
-    i_height = sys->area.place.height;
+    i_width  = sys->area.vdcfg.display.width;
+    i_height = sys->area.vdcfg.display.height;
 
     if (!sys->resizeCb(sys->outside_opaque, i_width, i_height))
         return E_FAIL;
@@ -476,7 +476,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (d3d11_ctx == NULL)
     {
         if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
-                       vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR, false))
+                       vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR, true))
             goto error;
     }
 #else /* !VLC_WINSTORE_APP */
@@ -1357,10 +1357,10 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     RECT rect_dst = {
-        .left   = 0,
-        .right  = sys->area.place.width,
-        .top    = 0,
-        .bottom = sys->area.place.height
+        .left   = sys->area.place.x,
+        .right  = sys->area.place.x + sys->area.place.width,
+        .top    = sys->area.place.y,
+        .bottom = sys->area.place.y + sys->area.place.height
     };
 
     D3D11_UpdateViewport( &sys->picQuad, &rect_dst, sys->display.pixelFormat );
@@ -1820,6 +1820,12 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             spuViewport.top    = (FLOAT) spuViewport.top    * r->zoom_v.num / r->zoom_v.den;
             spuViewport.bottom = (FLOAT) spuViewport.bottom * r->zoom_v.num / r->zoom_v.den;
         }
+
+        /* move the SPU inside the video area */
+        spuViewport.left   += sys->area.place.x;
+        spuViewport.right  += sys->area.place.x;
+        spuViewport.top    += sys->area.place.y;
+        spuViewport.bottom += sys->area.place.y;
 
         D3D11_UpdateViewport( quad, &spuViewport, sys->display.pixelFormat );
 
