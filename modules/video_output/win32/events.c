@@ -67,10 +67,8 @@ struct event_thread_t
 
     /* */
     vout_window_t *parent_window;
-    WCHAR class_main[256];
     WCHAR class_video[256];
     HWND hparent;
-    HWND hwnd;
     HWND hvideownd;
 };
 
@@ -80,7 +78,6 @@ struct event_thread_t
 /* Window Creation */
 static int  Win32VoutCreateWindow( event_thread_t * );
 static void Win32VoutCloseWindow ( event_thread_t * );
-static long FAR PASCAL WinVoutEventProc( HWND, UINT, WPARAM, LPARAM );
 
 /*****************************************************************************
  * EventThread: Create video window & handle its messages
@@ -162,10 +159,6 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_wind
 
     p_event->parent_window = parent_window;
 
-    p_event->hwnd = NULL;
-
-    _snwprintf( p_event->class_main, ARRAYSIZE(p_event->class_main),
-               TEXT("VLC video main %p"), (void *)p_event );
     _snwprintf( p_event->class_video, ARRAYSIZE(p_event->class_video),
                TEXT("VLC video output %p"), (void *)p_event );
     return p_event;
@@ -214,7 +207,6 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
     /* */
     p_hwnd->parent_window = p_event->parent_window;
     p_hwnd->hparent       = p_event->hparent;
-    p_hwnd->hwnd          = p_event->hwnd;
     p_hwnd->hvideownd     = p_event->hvideownd;
     return VLC_SUCCESS;
 }
@@ -228,8 +220,8 @@ void EventThreadStop( event_thread_t *p_event )
 
     /* we need to be sure Vout EventThread won't stay stuck in
      * GetMessage, so we send a fake message */
-    if( p_event->hwnd )
-        PostMessage( p_event->hwnd, WM_NULL, 0, 0);
+    if( p_event->hvideownd )
+        PostMessage( p_event->hvideownd, WM_NULL, 0, 0);
 
     vlc_join( p_event->thread, NULL );
     p_event->b_ready = false;
@@ -242,8 +234,38 @@ void EventThreadStop( event_thread_t *p_event )
 static long FAR PASCAL VideoEventProc( HWND hwnd, UINT message,
                                        WPARAM wParam, LPARAM lParam )
 {
+    if( message == WM_CREATE )
+    {
+        /* Store p_event for future use */
+        CREATESTRUCT *c = (CREATESTRUCT *)lParam;
+        SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)c->lpCreateParams );
+        return 0;
+    }
+
+    LONG_PTR p_user_data = GetWindowLongPtr( hwnd, GWLP_USERDATA );
+    if( p_user_data == 0 ) /* messages before WM_CREATE */
+        return DefWindowProc(hwnd, message, wParam, lParam);
+    event_thread_t *p_event = (event_thread_t *)p_user_data;
+
+    /* Let windows handle the message */
+    return DefWindowProc(hwnd, message, wParam, lParam);
     switch( message )
     {
+    /* the user wants to close the window */
+    case WM_CLOSE:
+        vout_window_ReportClose(p_event->parent_window);
+        return 0;
+
+    /* the window has been closed so shut down everything now */
+    case WM_DESTROY:
+        msg_Dbg( p_event->obj, "WinProc WM_DESTROY" );
+        /* just destroy the window */
+        PostQuitMessage( 0 );
+        return 0;
+
+    case WM_GESTURE:
+        return DecodeGesture( p_event->obj, p_event->p_gesture, hwnd, message, wParam, lParam );
+
     /*
     ** For OpenGL and Direct3D, vout will update the whole
     ** window at regular interval, therefore dirty region
@@ -259,50 +281,6 @@ static long FAR PASCAL VideoEventProc( HWND hwnd, UINT message,
     default:
         return DefWindowProc(hwnd, message, wParam, lParam);
     }
-}
-
-static int CreateVideoWindow( event_thread_t *p_event )
-{
-    HINSTANCE hInstance = GetModuleHandle(NULL);
-    WNDCLASS   wc;                            /* window class components */
-
-    /* Register the video sub-window class */
-    wc.style         = CS_OWNDC|CS_DBLCLKS;          /* style: dbl click */
-    wc.lpfnWndProc   = (WNDPROC)VideoEventProc;         /* event handler */
-    wc.cbClsExtra    = 0;                         /* no extra class data */
-    wc.cbWndExtra    = 0;                        /* no extra window data */
-    wc.hInstance     = hInstance;                            /* instance */
-    wc.hIcon         = 0;
-    wc.hCursor       = 0;
-    wc.hbrBackground = NULL;
-    wc.lpszMenuName  = NULL;                                  /* no menu */
-    wc.lpszClassName = p_event->class_video;
-    if( !RegisterClass(&wc) )
-    {
-        msg_Err( p_event->obj, "CreateVideoWindow RegisterClass FAILED (err=%lu)", GetLastError() );
-        return VLC_EGENERIC;
-    }
-
-    /* Create video sub-window. This sub window will always exactly match
-     * the size of the video, which allows us to use crazy overlay colorkeys
-     * without having them shown outside of the video area. */
-    p_event->hvideownd =
-        CreateWindow( p_event->class_video, TEXT(""),   /* window class */
-            WS_CHILD|WS_DISABLED,  /* window style, not visible initially */
-            0, 0,
-            CW_USEDEFAULT,               /* default width */
-            CW_USEDEFAULT,              /* default height */
-            p_event->hwnd,               /* parent window */
-            NULL, hInstance,
-            (LPVOID)p_event );    /* send vd to WM_CREATE */
-
-    if( !p_event->hvideownd )
-    {
-        msg_Err( p_event->obj, "can't create video sub-window" );
-        return VLC_EGENERIC;
-    }
-    msg_Dbg( p_event->obj, "created video sub-window" );
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -329,7 +307,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
 
     /* Fill in the window class structure */
     wc.style         = CS_OWNDC|CS_DBLCLKS;          /* style: dbl click */
-    wc.lpfnWndProc   = (WNDPROC)WinVoutEventProc;       /* event handler */
+    wc.lpfnWndProc   = (WNDPROC)VideoEventProc;         /* event handler */
     wc.cbClsExtra    = 0;                         /* no extra class data */
     wc.cbWndExtra    = 0;                        /* no extra window data */
     wc.hInstance     = hInstance;                            /* instance */
@@ -337,7 +315,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     wc.hCursor       = 0;
     wc.hbrBackground = GetStockObject(BLACK_BRUSH);  /* background color */
     wc.lpszMenuName  = NULL;                                  /* no menu */
-    wc.lpszClassName = p_event->class_main;       /* use a special class */
+    wc.lpszClassName = p_event->class_video;      /* use a special class */
 
     /* Register the window class */
     if( !RegisterClass(&wc) )
@@ -349,9 +327,9 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD|WS_DISABLED;
 
     /* Create the window */
-    p_event->hwnd =
+    p_event->hvideownd =
         CreateWindowEx( WS_EX_NOPARENTNOTIFY | WS_EX_NOACTIVATE,
-                    p_event->class_main,             /* name of window class */
+                    p_event->class_video,            /* name of window class */
                     TEXT(VOUT_TITLE) TEXT(" (VLC Video Output)"),/* window title */
                     i_style,                                 /* window style */
                     CW_USEDEFAULT,                   /* default X coordinate */
@@ -363,11 +341,12 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
                     hInstance,            /* handle of this program instance */
                     (LPVOID)p_event );           /* send vd to WM_CREATE */
 
-    if( !p_event->hwnd )
+    if( !p_event->hvideownd )
     {
         msg_Warn( p_event->obj, "Win32VoutCreateWindow create window FAILED (err=%lu)", GetLastError() );
         return VLC_EGENERIC;
     }
+    msg_Dbg( p_event->obj, "created video window" );
 
     /* We don't want the window owner to overwrite our client area */
     LONG  parent_style = GetWindowLong( p_event->hparent, GWL_STYLE );
@@ -376,14 +355,10 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         SetWindowLong( p_event->hparent, GWL_STYLE,
                        parent_style | WS_CLIPCHILDREN );
 
-    int err = CreateVideoWindow( p_event );
-    if ( err != VLC_SUCCESS )
-        return err;
-
-    InitGestures( p_event->hwnd, &p_event->p_gesture, p_event->is_projected );
+    InitGestures( p_event->hvideownd, &p_event->p_gesture, p_event->is_projected );
 
     /* Now display the window */
-    ShowWindow( p_event->hwnd, SW_SHOWNOACTIVATE );
+    ShowWindow( p_event->hvideownd, SW_SHOWNOACTIVATE );
 
     return VLC_SUCCESS;
 }
@@ -398,65 +373,9 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
     msg_Dbg( p_event->obj, "Win32VoutCloseWindow" );
 
     DestroyWindow( p_event->hvideownd );
-    DestroyWindow( p_event->hwnd );
-
-    p_event->hwnd = NULL;
 
     HINSTANCE hInstance = GetModuleHandle(NULL);
     UnregisterClass( p_event->class_video, hInstance );
-    UnregisterClass( p_event->class_main, hInstance );
 
     CloseGestures( p_event->p_gesture);
-}
-
-/*****************************************************************************
- * WinVoutEventProc: This is the window event processing function.
- *****************************************************************************
- * On Windows, when you create a window you have to attach an event processing
- * function to it. The aim of this function is to manage "Queued Messages" and
- * "Nonqueued Messages".
- * Queued Messages are those picked up and retransmitted by vout_Manage
- * (using the GetMessage and DispatchMessage functions).
- * Nonqueued Messages are those that Windows will send directly to this
- * procedure (like WM_DESTROY, WM_WINDOWPOSCHANGED...)
- *****************************************************************************/
-static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
-                                         WPARAM wParam, LPARAM lParam )
-{
-    if( message == WM_CREATE )
-    {
-        /* Store p_event for future use */
-        CREATESTRUCT *c = (CREATESTRUCT *)lParam;
-        SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)c->lpCreateParams );
-        return 0;
-    }
-
-    LONG_PTR p_user_data = GetWindowLongPtr( hwnd, GWLP_USERDATA );
-    if( p_user_data == 0 ) /* messages before WM_CREATE */
-        return DefWindowProc(hwnd, message, wParam, lParam);
-    event_thread_t *p_event = (event_thread_t *)p_user_data;
-
-    switch( message )
-    {
-    /* the user wants to close the window */
-    case WM_CLOSE:
-        vout_window_ReportClose(p_event->parent_window);
-        return 0;
-
-    /* the window has been closed so shut down everything now */
-    case WM_DESTROY:
-        msg_Dbg( p_event->obj, "WinProc WM_DESTROY" );
-        /* just destroy the window */
-        PostQuitMessage( 0 );
-        return 0;
-
-    case WM_GESTURE:
-        return DecodeGesture( p_event->obj, p_event->p_gesture, hwnd, message, wParam, lParam );
-
-    default:
-        break;
-    }
-
-    /* Let windows handle the message */
-    return DefWindowProc(hwnd, message, wParam, lParam);
 }

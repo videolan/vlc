@@ -38,7 +38,6 @@ typedef struct {
 typedef struct {
     vout_window_t *parent_window;
     HWND hparent;
-    HWND hwnd;
     HWND hvideownd;
 } event_hwnd_t;
 

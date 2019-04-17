@@ -70,7 +70,7 @@ static bool GetWindowDimensions(void *opaque, UINT *width, UINT *height)
     const vout_display_sys_win32_t *sys = opaque;
     assert(sys != NULL);
     RECT out;
-    if (!GetClientRect(sys->hwnd, &out))
+    if (!GetClientRect(sys->hvideownd, &out))
         return false;
     *width  = RECTWidth(out);
     *height = RECTHeight(out);
@@ -91,10 +91,8 @@ int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
 #endif
-    sys->hwnd      = NULL;
     sys->hvideownd = NULL;
     sys->hparent   = NULL;
-    sys->is_first_placement = true;
 
     /* */
     sys->event = EventThreadCreate(obj, area->vdcfg.window);
@@ -113,7 +111,6 @@ int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
         return VLC_EGENERIC;
 
     sys->hparent       = hwnd.hparent;
-    sys->hwnd          = hwnd.hwnd;
     sys->hvideownd     = hwnd.hvideownd;
 
     return VLC_SUCCESS;
@@ -176,19 +173,6 @@ void UpdateRects(vout_display_t *vd, display_win32_area_t *area, vout_display_sy
 #if !VLC_WINSTORE_APP
         if (sys->event != NULL)
         {
-            if (sys->hvideownd)
-            {
-                UINT swpFlags = SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE | SWP_NOMOVE;
-                if (sys->is_first_placement)
-                {
-                    swpFlags |= SWP_SHOWWINDOW;
-                    sys->is_first_placement = false;
-                }
-                SetWindowPos(sys->hvideownd, 0,
-                    0, 0, display_width, display_height,
-                    swpFlags);
-            }
-
             CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
         }
 #endif
@@ -270,7 +254,7 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
 #if !VLC_WINSTORE_APP
         if (sys->event != NULL)
         {
-            SetWindowPos(sys->hwnd, 0, 0, 0,
+            SetWindowPos(sys->hvideownd, 0, 0, 0,
                          area->vdcfg.display.width,
                          area->vdcfg.display.height, SWP_NOZORDER|SWP_NOMOVE|SWP_NOACTIVATE);
         }
