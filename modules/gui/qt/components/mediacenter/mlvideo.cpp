@@ -37,7 +37,7 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
 {
     assert( data->i_type == VLC_ML_MEDIA_TYPE_VIDEO );
 
-    int t_sec = data->i_duration / 1000000;
+    int t_sec = data->i_duration / 1000;
     int sec = t_sec % 60;
     int min = (t_sec / 60) % 60;
     int hour = t_sec / 3600;

@@ -32,7 +32,7 @@ MLAlbum::MLAlbum(vlc_medialibrary_t* _ml, const vlc_ml_album_t *_data, QObject *
     assert( _data );
     assert( _ml );
 
-    int t_sec = _data->i_duration / 1000000;
+    int t_sec = _data->i_duration / 1000;
     int sec = t_sec % 60;
     int min = (t_sec / 60) % 60;
     int hour = t_sec / 3600;

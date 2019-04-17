@@ -30,7 +30,7 @@ MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data,
     assert( _data );
     assert( _data->i_type == VLC_ML_MEDIA_TYPE_AUDIO );
 
-    int t_sec = _data->i_duration / 1000000;
+    int t_sec = _data->i_duration / 1000;
     int sec = t_sec % 60;
     int min = (t_sec / 60) % 60;
     int hour = t_sec / 3600;
