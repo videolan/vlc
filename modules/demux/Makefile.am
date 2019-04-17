@@ -319,6 +319,8 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/playlist/Url.cpp \
     demux/adaptive/playlist/Url.hpp \
     demux/adaptive/playlist/Templates.hpp \
+    demux/adaptive/encryption/CommonEncryption.cpp \
+    demux/adaptive/encryption/CommonEncryption.hpp \
     demux/adaptive/logic/AbstractAdaptationLogic.cpp \
     demux/adaptive/logic/AbstractAdaptationLogic.h \
     demux/adaptive/logic/AlwaysBestAdaptationLogic.cpp \
