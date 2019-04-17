@@ -476,7 +476,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (d3d11_ctx == NULL)
     {
         if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
-                       vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR, true))
+                       vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
             goto error;
     }
 #else /* !VLC_WINSTORE_APP */
