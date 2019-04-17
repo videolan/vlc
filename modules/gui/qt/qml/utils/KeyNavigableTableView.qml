@@ -73,7 +73,11 @@ NavigableFocusScope {
                     }
 
                     Row {
-                        anchors.fill: parent
+                        anchors {
+                            fill: parent
+                            leftMargin: VLCStyle.margin_normal
+                            rightMargin: VLCStyle.margin_normal
+                        }
 
                         Repeater {
                             model: sortModel
