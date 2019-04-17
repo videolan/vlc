@@ -371,17 +371,17 @@ static void orientationVertexOrder(video_orientation_t orientation, int vertex_o
 }
 
 static void  Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
-                                  const RECT *src, const RECT *src_clipped,
-                                  const RECT *dst,
+                                  const RECT *full_texture, const RECT *visible_texture,
+                                  const RECT *rect_in_display,
                                   int alpha,
                                   video_orientation_t orientation)
 {
     /* Vertices of the dst rectangle in the unrotated (clockwise) order. */
     const int vertices_coords[4][2] = {
-        { dst->left,  dst->top    },
-        { dst->right, dst->top    },
-        { dst->right, dst->bottom },
-        { dst->left,  dst->bottom },
+        { rect_in_display->left,  rect_in_display->top    },
+        { rect_in_display->right, rect_in_display->top    },
+        { rect_in_display->right, rect_in_display->bottom },
+        { rect_in_display->left,  rect_in_display->bottom },
     };
 
     /* Compute index remapping necessary to implement the rotation. */
@@ -393,22 +393,22 @@ static void  Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
         vertices[i].y  = vertices_coords[vertex_order[i]][1];
     }
 
-    float right = (float)src_clipped->right / (float)src->right;
-    float left = (float)src_clipped->left / (float)src->right;
-    float top = (float)src_clipped->top / (float)src->bottom;
-    float bottom = (float)src_clipped->bottom / (float)src->bottom;
+    float texture_right  = (float)visible_texture->right / (float)full_texture->right;
+    float texture_left   = (float)visible_texture->left  / (float)full_texture->right;
+    float texture_top    = (float)visible_texture->top    / (float)full_texture->bottom;
+    float texture_bottom = (float)visible_texture->bottom / (float)full_texture->bottom;
 
-    vertices[0].tu = left;
-    vertices[0].tv = top;
+    vertices[0].tu = texture_left;
+    vertices[0].tv = texture_top;
 
-    vertices[1].tu = right;
-    vertices[1].tv = top;
+    vertices[1].tu = texture_right;
+    vertices[1].tv = texture_top;
 
-    vertices[2].tu = right;
-    vertices[2].tv = bottom;
+    vertices[2].tu = texture_right;
+    vertices[2].tv = texture_bottom;
 
-    vertices[3].tu = left;
-    vertices[3].tv = bottom;
+    vertices[3].tu = texture_left;
+    vertices[3].tv = texture_bottom;
 
     for (int i = 0; i < 4; i++) {
         /* -0.5f is a "feature" of DirectX and it seems to apply to Direct3d also */
@@ -447,7 +447,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* Copy picture surface into texture surface
      * color space conversion happen here */
-    RECT copy_rect = {
+    RECT texture_visible_rect = {
         .left   = vd->source.i_x_offset,
         .right  = vd->source.i_x_offset + vd->source.i_visible_width,
         .top    = vd->source.i_y_offset,
@@ -456,12 +456,12 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
     // When copying the entire buffer, the margin end up being blended in the actual picture
     // on nVidia (regardless of even/odd dimensions)
-    if ( copy_rect.right & 1 ) copy_rect.right++;
-    if ( copy_rect.left & 1 ) copy_rect.left--;
-    if ( copy_rect.bottom & 1 ) copy_rect.bottom++;
-    if ( copy_rect.top & 1 ) copy_rect.top--;
-    hr = IDirect3DDevice9_StretchRect(sys->d3d_dev.dev, source, &copy_rect, destination,
-                                      &copy_rect, D3DTEXF_NONE);
+    if ( texture_visible_rect.right & 1 ) texture_visible_rect.right++;
+    if ( texture_visible_rect.left & 1 ) texture_visible_rect.left--;
+    if ( texture_visible_rect.bottom & 1 ) texture_visible_rect.bottom++;
+    if ( texture_visible_rect.top & 1 ) texture_visible_rect.top--;
+    hr = IDirect3DDevice9_StretchRect(sys->d3d_dev.dev, source, &texture_visible_rect, destination,
+                                      &texture_visible_rect, D3DTEXF_NONE);
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed StretchRect: source 0x%p 0x%0lx",
@@ -471,20 +471,20 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* */
     region->texture = sys->sceneTexture;
-    RECT rect_src = {
+    RECT texture_rect = {
         .left   = 0,
         .right  = vd->source.i_width,
         .top    = 0,
         .bottom = vd->source.i_height,
     };
-    RECT rect_dst = {
+    RECT rect_in_display = {
         .left   = 0,
         .right  = vd->sys->area.place.width,
         .top    = 0,
         .bottom = vd->sys->area.place.height,
     };
-    Direct3D9SetupVertices(region->vertex, &rect_src, &copy_rect,
-                           &rect_dst, 255, vd->source.orientation);
+    Direct3D9SetupVertices(region->vertex, &texture_rect, &texture_visible_rect,
+                           &rect_in_display, 255, vd->source.orientation);
     return VLC_SUCCESS;
 }
 
@@ -1000,26 +1000,26 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         const float scale_w = (float)(sys->area.place.width)  / subpicture->i_original_picture_width;
         const float scale_h = (float)(sys->area.place.height) / subpicture->i_original_picture_height;
 
-        RECT dst;
-        dst.left   =            scale_w * r->i_x,
-        dst.right  = dst.left + scale_w * r->fmt.i_visible_width,
-        dst.top    =            scale_h * r->i_y,
-        dst.bottom = dst.top  + scale_h * r->fmt.i_visible_height;
+        RECT rect_in_display;
+        rect_in_display.left   =            scale_w * r->i_x,
+        rect_in_display.right  = rect_in_display.left + scale_w * r->fmt.i_visible_width,
+        rect_in_display.top    =            scale_h * r->i_y,
+        rect_in_display.bottom = rect_in_display.top  + scale_h * r->fmt.i_visible_height;
 
-        RECT src;
-        src.left = 0;
-        src.right = r->fmt.i_width;
-        src.top = 0;
-        src.bottom = r->fmt.i_height;
+        RECT texture_rect;
+        texture_rect.left   = 0;
+        texture_rect.right  = r->fmt.i_width;
+        texture_rect.top    = 0;
+        texture_rect.bottom = r->fmt.i_height;
 
-        RECT src_clipped;
-        src_clipped.left = r->fmt.i_x_offset;
-        src_clipped.right = r->fmt.i_x_offset + r->fmt.i_visible_width;
-        src_clipped.top = r->fmt.i_y_offset;
-        src_clipped.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
+        RECT texture_visible_rect;
+        texture_visible_rect.left   = r->fmt.i_x_offset;
+        texture_visible_rect.right  = r->fmt.i_x_offset + r->fmt.i_visible_width;
+        texture_visible_rect.top    = r->fmt.i_y_offset;
+        texture_visible_rect.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
 
-        Direct3D9SetupVertices(d3dr->vertex, &src, &src_clipped,
-                              &dst, subpicture->i_alpha * r->i_alpha / 255, ORIENT_NORMAL);
+        Direct3D9SetupVertices(d3dr->vertex, &texture_rect, &texture_visible_rect,
+                              &rect_in_display, subpicture->i_alpha * r->i_alpha / 255, ORIENT_NORMAL);
     }
 }
 
