@@ -410,13 +410,13 @@ int config_SortConfig (void)
     size_t nconf = 0;
 
     for (p = vlc_plugins; p != NULL; p = p->next)
-         nconf += p->conf.size;
+        nconf += p->conf.count;
 
     module_config_t **clist = vlc_alloc (nconf, sizeof (*clist));
     if (unlikely(clist == NULL))
         return VLC_ENOMEM;
 
-    nconf = 0;
+    size_t index = 0;
     for (p = vlc_plugins; p != NULL; p = p->next)
     {
         module_config_t *item, *end;
@@ -427,7 +427,8 @@ int config_SortConfig (void)
         {
             if (!CONFIG_ITEM(item->i_type))
                 continue; /* ignore hints */
-            clist[nconf++] = item;
+            assert(index < nconf);
+            clist[index++] = item;
         }
     }
 
