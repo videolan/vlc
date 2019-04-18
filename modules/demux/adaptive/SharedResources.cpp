@@ -23,6 +23,7 @@
 
 #include "SharedResources.hpp"
 #include "http/AuthStorage.hpp"
+#include "encryption/Keyring.hpp"
 
 #include <vlc_common.h>
 
@@ -31,14 +32,21 @@ using namespace adaptive;
 SharedResources::SharedResources(vlc_object_t *obj)
 {
     authStorage = new AuthStorage(obj);
+    encryptionKeyring = new Keyring(obj);
 }
 
 SharedResources::~SharedResources()
 {
+    delete encryptionKeyring;
     delete authStorage;
 }
 
 AuthStorage * SharedResources::getAuthStorage()
 {
     return authStorage;
+}
+
+Keyring * SharedResources::getKeyring()
+{
+    return encryptionKeyring;
 }

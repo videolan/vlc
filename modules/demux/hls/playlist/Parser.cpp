@@ -28,6 +28,7 @@
 #include "../adaptive/playlist/BasePeriod.h"
 #include "../adaptive/playlist/BaseAdaptationSet.h"
 #include "../adaptive/playlist/SegmentList.h"
+#include "../adaptive/encryption/Keyring.hpp"
 #include "../adaptive/tools/Retrieve.hpp"
 #include "../adaptive/tools/Helper.h"
 #include "../adaptive/tools/Conversions.hpp"
@@ -325,8 +326,9 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
 
                     M3U8 *m3u8 = dynamic_cast<M3U8 *>(rep->getPlaylist());
                     if(likely(m3u8))
-                        encryption.key = m3u8->getEncryptionKey(resources->getAuthStorage(),
-                                                                keyurl.toString());
+                        encryption.key = resources->getKeyring()->getKey(
+                                            resources->getAuthStorage(),
+                                            keyurl.toString());
                     if(keytag->getAttributeByName("IV"))
                     {
                         encryption.iv.clear();

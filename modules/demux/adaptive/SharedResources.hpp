@@ -29,7 +29,13 @@ namespace adaptive
         class AuthStorage;
     }
 
+    namespace encryption
+    {
+        class Keyring;
+    }
+
     using namespace http;
+    using namespace encryption;
 
     class SharedResources
     {
@@ -37,9 +43,11 @@ namespace adaptive
             SharedResources(vlc_object_t *);
             ~SharedResources();
             AuthStorage *getAuthStorage();
+            Keyring     *getKeyring();
 
         private:
             AuthStorage *authStorage;
+            Keyring *encryptionKeyring;
     };
 }
 
