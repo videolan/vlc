@@ -30,6 +30,7 @@ namespace smooth
 {
     namespace playlist
     {
+        using namespace adaptive;
         using namespace adaptive::playlist;
         using namespace adaptive::http;
 
@@ -40,7 +41,8 @@ namespace smooth
                 ForgedInitSegment(ICanonicalUrl *parent, const std::string &,
                                   uint64_t, vlc_tick_t);
                 virtual ~ForgedInitSegment();
-                virtual SegmentChunk* toChunk(size_t, BaseRepresentation *, AbstractConnectionManager *); /* reimpl */
+                virtual SegmentChunk* toChunk(SharedResources *, AbstractConnectionManager *,
+                                              size_t, BaseRepresentation *); /* reimpl */
                 void setWaveFormatEx(const std::string &);
                 void setCodecPrivateData(const std::string &);
                 void setChannels(uint16_t);

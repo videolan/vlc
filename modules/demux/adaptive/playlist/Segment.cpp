@@ -67,7 +67,8 @@ void ISegment::onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *)
 
 }
 
-SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *rep, AbstractConnectionManager *connManager)
+SegmentChunk* ISegment::toChunk(SharedResources *, AbstractConnectionManager *connManager,
+                                size_t index, BaseRepresentation *rep)
 {
     const std::string url = getUrlSegment().toString(index, rep);
     HTTPChunkBufferedSource *source = new (std::nothrow) HTTPChunkBufferedSource(url, connManager,

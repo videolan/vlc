@@ -223,7 +223,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
         init_sent = true;
         segment = rep->getSegment(BaseRepresentation::INFOTYPE_INIT);
         if(segment)
-            return segment->toChunk(next, rep, connManager);
+            return segment->toChunk(resources, connManager, next, rep);
     }
 
     if(!index_sent)
@@ -231,7 +231,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
         index_sent = true;
         segment = rep->getSegment(BaseRepresentation::INFOTYPE_INDEX);
         if(segment)
-            return segment->toChunk(next, rep, connManager);
+            return segment->toChunk(resources, connManager, next, rep);
     }
 
     bool b_gap = false;
@@ -248,7 +248,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
         initializing = false;
     }
 
-    SegmentChunk *chunk = segment->toChunk(next, rep, connManager);
+    SegmentChunk *chunk = segment->toChunk(resources, connManager, next, rep);
 
     /* Notify new segment length for stats / logic */
     if(chunk)
