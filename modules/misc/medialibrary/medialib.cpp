@@ -299,7 +299,8 @@ bool MediaLibrary::Start()
     std::unique_ptr<medialibrary::IMediaLibrary> ml( NewMediaLibrary() );
 
     m_logger.reset( new Logger( VLC_OBJECT( m_vlc_ml ) ) );
-    ml->setVerbosity( medialibrary::LogLevel::Info );
+    ml->setVerbosity( var_InheritInteger( VLC_OBJECT( m_vlc_ml ), "verbose" ) >= 4 ?
+                          medialibrary::LogLevel::Debug : medialibrary::LogLevel::Info );
     ml->setLogger( m_logger.get() );
 
     auto userDir = vlc::wrap_cptr( config_GetUserDir( VLC_USERDATA_DIR ) );
