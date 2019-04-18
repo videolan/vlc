@@ -29,18 +29,15 @@ import "qrc:///style/"
 
 Item {
     id: root
-    width: VLCStyle.cover_normal
-    height: VLCStyle.cover_normal
-            + VLCStyle.fontHeight_normal
-            + VLCStyle.fontHeight_small
-            + VLCStyle.margin_xsmall
 
-    property url image: VLCStyle.noArtCover
+    property url image
     property string title: ""
     property string subtitle: ""
     property bool selected: false
     property int shiftX: 0
     property bool noActionButtons: false
+
+    property alias sourceSize: cover.sourceSize
 
     signal playClicked
     signal addToPlaylistClicked
@@ -49,206 +46,167 @@ Item {
 
     Item {
         x: shiftX
-        width: parent.width
-        height: parent.height
 
         MouseArea {
-
             id: mouseArea
-            anchors.fill: parent
             hoverEnabled: true
-            onClicked:  root.itemClicked(mouse.buttons, mouse.modifiers)
+            onClicked:  {
+                root.itemClicked(mouse.buttons, mouse.modifiers)
+            }
             onDoubleClicked: root.itemDoubleClicked(mouse.buttons, mouse.modifiers);
+            width: childrenRect.width
+            height: childrenRect.height
 
-            Item {
-                anchors.fill: parent
+            Column {
                 Item {
                     id: picture
 
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-
                     width: VLCStyle.cover_normal
-                    height: VLCStyle.cover_normal
-                    property bool highlighted: selected || mouseArea.containsMouse
+                    height: VLCStyle.cover_normal - VLCStyle.margin_small
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    property bool highlighted: selected || root.activeFocus
 
-                    RectangularGlow {
-                        visible: picture.highlighted
-                        anchors.fill: cover
-                        cornerRadius: 25
-                        spread: 0.5
-                        glowRadius: VLCStyle.margin_xsmall
-                        color: VLCStyle.colors.getBgColor( selected, mouseArea.containsMouse, root.activeFocus )
-                    }
-
-                    /*
-                    Item {
-                        id: coverPlaceHolder
-                        x: cover.x + (cover.width - cover.paintedWidth) / 2
-                        y: cover.y +(cover.height - cover.paintedHeight) / 2
-                        width: cover.paintedWidth
-                        height: cover.paintedHeight
-                    }
-                    */
-
-                    Image {
-                        id: cover
+                    Rectangle {
+                        id: cover_bg
                         width: VLCStyle.cover_small
                         height: VLCStyle.cover_small
                         Behavior on width  { SmoothedAnimation { velocity: 100 } }
                         Behavior on height { SmoothedAnimation { velocity: 100 } }
                         anchors.centerIn: parent
-                        source: image
-                        fillMode: Image.PreserveAspectCrop
+                        color: VLCStyle.colors.banner
+
+                        Image {
+                            id: cover
+                            anchors.fill: parent
+                            source: image
+                            fillMode: Image.PreserveAspectCrop
+                            sourceSize: Qt.size(width, height)
+
+                            Rectangle {
+                                id: overlay
+                                anchors.fill: parent
+                                color: "black" //darken the image below
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    visible: !noActionButtons
+                                    Item {
+                                        Layout.fillHeight: true
+                                        Layout.fillWidth: true
+                                        /* A addToPlaylist button visible when hovered */
+                                        Text {
+                                            property int iconSize: VLCStyle.icon_large
+                                            Behavior on iconSize  { SmoothedAnimation { velocity: 100 } }
+                                            Binding on iconSize {
+                                                value: VLCStyle.icon_large * 1.2
+                                                when: mouseAreaAdd.containsMouse
+                                            }
+
+                                            //Layout.alignment: Qt.AlignCenter
+                                            anchors.centerIn: parent
+                                            text: VLCIcons.add
+                                            font.family: VLCIcons.fontFamily
+                                            horizontalAlignment: Text.AlignHCenter
+                                            color: mouseAreaAdd.containsMouse ? "white" : "lightgray"
+                                            font.pixelSize: iconSize
+
+                                            MouseArea {
+                                                id: mouseAreaAdd
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                propagateComposedEvents: true
+                                                onClicked: root.addToPlaylistClicked()
+                                            }
+                                        }
+                                    }
+
+                                    /* A play button visible when hovered */
+                                    Item {
+                                        Layout.fillHeight: true
+                                        Layout.fillWidth: true
+
+                                        Text {
+                                            property int iconSize: VLCStyle.icon_large
+                                            Behavior on iconSize  {
+                                                SmoothedAnimation { velocity: 100 }
+                                            }
+                                            Binding on iconSize {
+                                                value: VLCStyle.icon_large * 1.2
+                                                when: mouseAreaPlay.containsMouse
+                                            }
+
+                                            anchors.centerIn: parent
+                                            text: VLCIcons.play
+                                            font.family: VLCIcons.fontFamily
+                                            horizontalAlignment: Text.AlignHCenter
+                                            color: mouseAreaPlay.containsMouse ? "white" : "lightgray"
+                                            font.pixelSize: iconSize
+
+                                            MouseArea {
+                                                id: mouseAreaPlay
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                onClicked: root.playClicked()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            states: [
+                                State {
+                                    name: "visible"
+                                    PropertyChanges { target: overlay; visible: true }
+                                    when: mouseArea.containsMouse
+                                },
+                                State {
+                                    name: "hidden"
+                                    PropertyChanges { target: overlay; visible: false }
+                                    when: !mouseArea.containsMouse
+                                }
+                            ]
+                            transitions: [
+                                Transition {
+                                    from: "hidden";  to: "visible"
+                                    NumberAnimation  {
+                                        target: overlay
+                                        properties: "opacity"
+                                        from: 0; to: 0.8; duration: 300
+                                    }
+                                }
+                            ]
+                        }
 
                         Rectangle {
-                            id: overlay
+                            visible: picture.highlighted
                             anchors.fill: parent
-                            visible: mouseArea.containsMouse
-                            color: "black" //darken the image below
-
-                            RowLayout {
-                                anchors.fill: parent
-                                visible: !noActionButtons
-                                Item {
-                                    Layout.fillHeight: true
-                                    Layout.fillWidth: true
-                                    /* A addToPlaylist button visible when hovered */
-                                    Text {
-                                        property int iconSize: VLCStyle.icon_large
-                                        Behavior on iconSize  { SmoothedAnimation { velocity: 100 } }
-                                        Binding on iconSize {
-                                            value: VLCStyle.icon_large * 1.2
-                                            when: mouseAreaAdd.containsMouse
-                                        }
-
-                                        //Layout.alignment: Qt.AlignCenter
-                                        anchors.centerIn: parent
-                                        text: VLCIcons.add
-                                        font.family: VLCIcons.fontFamily
-                                        horizontalAlignment: Text.AlignHCenter
-                                        color: mouseAreaAdd.containsMouse ? "white" : "lightgray"
-                                        font.pixelSize: iconSize
-
-                                        MouseArea {
-                                            id: mouseAreaAdd
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            propagateComposedEvents: true
-                                            onClicked: root.addToPlaylistClicked()
-                                        }
-                                    }
-                                }
-
-                                /* A play button visible when hovered */
-                                Item {
-                                    Layout.fillHeight: true
-                                    Layout.fillWidth: true
-
-                                    Text {
-                                        property int iconSize: VLCStyle.icon_large
-                                        Behavior on iconSize  {
-                                            SmoothedAnimation { velocity: 100 }
-                                        }
-                                        Binding on iconSize {
-                                            value: VLCStyle.icon_large * 1.2
-                                            when: mouseAreaPlay.containsMouse
-                                        }
-
-                                        anchors.centerIn: parent
-                                        text: VLCIcons.play
-                                        font.family: VLCIcons.fontFamily
-                                        horizontalAlignment: Text.AlignHCenter
-                                        color: mouseAreaPlay.containsMouse ? "white" : "lightgray"
-                                        font.pixelSize: iconSize
-
-                                        MouseArea {
-                                            id: mouseAreaPlay
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            onClicked: root.playClicked()
-                                        }
-                                    }
-                                }
-                            }
+                            color: "transparent"
+                            border.width: VLCStyle.selectedBorder
+                            border.color: VLCStyle.colors.accent
                         }
-                        states: [
-                            State {
-                                name: "visible"
-                                PropertyChanges { target: overlay; visible: true }
-                                when: mouseArea.containsMouse
-                            },
-                            State {
-                                name: "hidden"
-                                PropertyChanges { target: overlay; visible: false }
-                                when: !mouseArea.containsMouse
-                            }
-                        ]
-                        transitions: [
-                            Transition {
-                                from: "hidden";  to: "visible"
-                                NumberAnimation  {
-                                    target: overlay
-                                    properties: "opacity"
-                                    from: 0; to: 0.8; duration: 300
-                                }
-                            }
-                        ]
                     }
-
-                    states: [
-                        State {
-                            name: "big"
-                            when: picture.highlighted
-                            PropertyChanges {
-                                target: cover
-                                width:  VLCStyle.cover_normal - 2 * VLCStyle.margin_xsmall
-                                height: VLCStyle.cover_normal - 2 * VLCStyle.margin_xsmall
-                            }
-                        },
-                        State {
-                            name: "small"
-                            when: !picture.highlighted
-                            PropertyChanges {
-                                target: cover
-                                width:  VLCStyle.cover_normal - 2 * VLCStyle.margin_small
-                                height: VLCStyle.cover_normal - 2 * VLCStyle.margin_small
-                            }
-                        }
-                    ]
                 }
                 Text {
                     id: textTitle
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: picture.bottom
-                        rightMargin: VLCStyle.margin_small
-                        leftMargin: VLCStyle.margin_small
-                    }
+                    width: cover_bg.width
+                    anchors.horizontalCenter: parent.horizontalCenter
 
                     text: root.title
 
                     elide: Text.ElideRight
                     font.pixelSize: VLCStyle.fontSize_normal
-                    font.bold: true
                     color: VLCStyle.colors.text
+                    horizontalAlignment: Qt.AlignHCenter
                 }
                 Text {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: textTitle.bottom
-                        rightMargin: VLCStyle.margin_small
-                        leftMargin: VLCStyle.margin_small
-                    }
+                    width: cover_bg.width
+                    anchors.horizontalCenter: parent.horizontalCenter
 
                     text : root.subtitle
 
                     elide: Text.ElideRight
                     font.pixelSize: VLCStyle.fontSize_small
-                    color: VLCStyle.colors.text
+                    color: VLCStyle.colors.lightText
+                    horizontalAlignment: Qt.AlignHCenter
                 }
             }
         }

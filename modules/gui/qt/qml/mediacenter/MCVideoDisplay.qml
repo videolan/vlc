@@ -42,7 +42,7 @@ Utils.NavigableFocusScope {
                 focus: true
                 image: model.thumbnail || VLCStyle.noArtCover
                 title: model.title || qsTr("Unknown title")
-                selected: element.DelegateModel.inSelected || view.currentItem.currentIndex === index
+                selected: element.DelegateModel.inSelected
                 shiftX: view.currentItem.shiftX(model.index)
 
                 onItemClicked : {
@@ -113,7 +113,7 @@ Utils.NavigableFocusScope {
             focus: true
 
             cellWidth: VLCStyle.cover_normal + VLCStyle.margin_small
-            cellHeight: VLCStyle.cover_normal + VLCStyle.fontHeight_normal + VLCStyle.margin_small
+            cellHeight: VLCStyle.cover_normal + VLCStyle.fontHeight_normal
 
             onSelectAll: delegateModel.selectAll()
             onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )

@@ -114,7 +114,7 @@ Utils.NavigableFocusScope {
             activeFocusOnTab:true
 
             cellWidth: VLCStyle.cover_normal + VLCStyle.margin_small
-            cellHeight: VLCStyle.cover_normal + VLCStyle.fontHeight_normal * 2 + VLCStyle.margin_small
+            cellHeight: VLCStyle.cover_normal + VLCStyle.fontHeight_normal * 2
 
             gridDelegate: Utils.GridItem {
                 property variant delegateModelItem: ({
