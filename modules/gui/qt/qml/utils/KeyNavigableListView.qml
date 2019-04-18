@@ -51,6 +51,7 @@ NavigableFocusScope {
     property alias headerItem: view.headerItem
 
     property alias currentIndex: view.currentIndex
+    property alias currentItem: view.currentItem
 
     property alias highlightMoveVelocity: view.highlightMoveVelocity
 

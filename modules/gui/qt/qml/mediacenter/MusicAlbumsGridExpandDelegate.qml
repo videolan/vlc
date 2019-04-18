@@ -26,9 +26,15 @@ import "qrc:///style/"
 
 Utils.NavigableFocusScope {
     id: root
-    property var model: []
+    property variant model: MLAlbumModel{}
     //color: VLCStyle.colors.bg
     implicitHeight: layout.height
+    clip: true
+
+    width: parent.width
+
+    property int currentItemY
+    property int currentItemHeight
 
     Row {
         id: layout
@@ -181,6 +187,18 @@ Utils.NavigableFocusScope {
                 interactive: false
 
                 parentId : root.model.id
+                onParentIdChanged: {
+                    currentIndex = 0
+                    focus = true
+                }
+
+                onCurrentItemChanged: {
+                    if (currentItem != undefined) {
+                        root.currentItemY = expand_infos_id.y + expand_track_id.y + currentItem.y
+                        root.currentItemHeight = currentItem.height
+                    }
+                }
+
                 sortModel: ListModel {
                     ListElement{ criteria: "track_number";  width:0.10; visible: true; text: qsTr("#"); showSection: "" }
                     ListElement{ criteria: "title";         width:0.70; visible: true; text: qsTr("Title"); showSection: "" }

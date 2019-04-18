@@ -48,45 +48,9 @@ Utils.NavigableFocusScope {
             ml: medialib
         }
 
+
         delegate: Package {
             id: element
-
-            Utils.GridItem {
-                Package.name: "gridTop"
-                image: model.cover || VLCStyle.noArtAlbum
-                title: model.title || qsTr("Unknown title")
-                subtitle: model.main_artist || qsTr("Unknown artist")
-                selected: element.DelegateModel.inSelected || view.currentItem.currentIndex === index
-                shiftX: view.currentItem.shiftX(model.index)
-
-                onItemClicked : {
-                    view._switchExpandItem( index )
-                    delegateModel.updateSelection( modifier , view.currentItem.currentIndex, index)
-                    view.currentItem.currentIndex = index
-                    view.currentItem.forceActiveFocus()
-
-                }
-                onPlayClicked: medialib.addAndPlay( model.id )
-                onAddToPlaylistClicked : medialib.addToPlaylist( model.id )
-            }
-
-            Utils.GridItem {
-                Package.name: "gridBottom"
-                image: model.cover || VLCStyle.noArtAlbum
-                title: model.title || qsTr("Unknown title")
-                subtitle: model.main_artist || qsTr("Unknown artist")
-                selected: element.DelegateModel.inSelected || view.currentItem.currentIndex === index
-                shiftX: view.currentItem.shiftX(model.index)
-
-                onItemClicked : {
-                    view._switchExpandItem( index )
-                    delegateModel.updateSelection( modifier , view.currentItem.currentIndex, index)
-                    view.currentItem.currentIndex = index
-                    view.currentItem.forceActiveFocus()
-                }
-                onPlayClicked: medialib.addAndPlay( model.id )
-                onAddToPlaylistClicked : medialib.addToPlaylist( model.id )
-            }
 
             Utils.ListItem {
                 Package.name: "list"
@@ -152,40 +116,57 @@ Utils.NavigableFocusScope {
             cellWidth: VLCStyle.cover_normal + VLCStyle.margin_small
             cellHeight: VLCStyle.cover_normal + VLCStyle.fontHeight_normal * 2 + VLCStyle.margin_small
 
+            gridDelegate: Utils.GridItem {
+                property variant delegateModelItem: ({
+                    model: ({}),
+                    itemsIndex: 0,
+                    inSelected: false
+                })
+
+                shiftX: view.currentItem.shiftX(delegateModelItem.itemsIndex)
+                image: delegateModelItem.model.cover || VLCStyle.noArtAlbum
+                title: delegateModelItem.model.title || qsTr("Unknown title")
+                subtitle: delegateModelItem.model.main_artist || qsTr("Unknown artist")
+                selected: delegateModelItem.inSelected
+                onItemClicked : {
+                    delegateModel.updateSelection( modifier , view.currentItem.currentIndex, delegateModelItem.itemsIndex)
+                    view.currentItem.currentIndex = delegateModelItem.itemsIndex
+                    //view.currentItem.forceActiveFocus()
+                    view._switchExpandItem( delegateModelItem.itemsIndex )
+
+                }
+                onPlayClicked: medialib.addAndPlay( delegateModelItem.model.id )
+                onAddToPlaylistClicked : medialib.addToPlaylist( delegateModelItem.model.id )
+            }
+
             expandDelegate:  Rectangle {
                 id: expandDelegateId
-                height: albumDetail.implicitHeight
+                implicitHeight: albumDetail.implicitHeight
                 width: root.width
                 color: VLCStyle.colors.bgAlt
                 property int currentId: -1
                 property alias model : albumDetail.model
+                property alias currentItemY: albumDetail.currentItemY
+                property alias currentItemHeight: albumDetail.currentItemHeight
+
+                onActiveFocusChanged: {
+                    if (activeFocus)
+                        albumDetail.forceActiveFocus()
+                }
 
                 MusicAlbumsGridExpandDelegate {
                     id: albumDetail
                     anchors.fill: parent
-                    visible: true
-                    focus: true
-                    model: delegateModel.items.get(gridView_id.expandIndex).model
-                    onActionCancel:  gridView_id.expandIndex = -1
-                    onActionUp:  gridView_id.expandIndex = -1
-                    onActionDown: gridView_id.expandIndex = -1
+                    onActionCancel:  gridView_id.retract()
+                    onActionUp:  gridView_id.retract()
+                    onActionDown: gridView_id.retract()
                     onActionLeft: root.actionLeft(index)
                     onActionRight: root.actionRight(index)
                 }
-
-                Connections {
-                    target: gridView_id
-                    onExpandIndexChanged: {
-                        if (gridView_id.expandIndex !== -1)
-                        {
-                            expandDelegateId.model = delegateModel.items.get(gridView_id.expandIndex).model
-                        }
-                    }
-                }
             }
 
+            model: delegateModel
             modelTop: delegateModel.parts.gridTop
-            modelBottom: delegateModel.parts.gridBottom
             modelCount: delegateModel.items.count
 
             onActionAtIndex: {
@@ -250,10 +231,12 @@ Utils.NavigableFocusScope {
         }
 
         function _switchExpandItem(index) {
-            if (view.currentItem.expandIndex === index)
+            view.currentItem.switchExpandItem(index)
+
+            /*if (view.currentItem.expandIndex === index)
                 view.currentItem.expandIndex = -1
             else
-                view.currentItem.expandIndex = index
+                view.currentItem.expandIndex = index*/
         }
     }
 
