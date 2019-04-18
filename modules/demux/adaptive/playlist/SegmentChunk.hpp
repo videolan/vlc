@@ -40,11 +40,11 @@ namespace adaptive
         public:
             SegmentChunk(ISegment *segment, AbstractChunkSource *, BaseRepresentation *);
             virtual ~SegmentChunk();
-            virtual void onDownload(block_t **); // reimpl
             StreamFormat getStreamFormat() const;
             bool discontinuity;
 
         protected:
+            virtual void onDownload(block_t **); // reimpl
             ISegment *segment;
             BaseRepresentation *rep;
         };
