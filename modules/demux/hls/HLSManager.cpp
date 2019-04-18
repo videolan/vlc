@@ -36,11 +36,11 @@ using namespace hls;
 using namespace hls::playlist;
 
 HLSManager::HLSManager(demux_t *demux_,
-                       AuthStorage *auth,
+                       SharedResources *res,
                        M3U8 *playlist,
                        AbstractStreamFactory *factory,
                        AbstractAdaptationLogic::LogicType type) :
-             PlaylistManager(demux_, auth, playlist, factory, type)
+             PlaylistManager(demux_, res, playlist, factory, type)
 {
 }
 

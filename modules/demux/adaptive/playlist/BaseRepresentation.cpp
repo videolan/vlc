@@ -83,7 +83,8 @@ bool BaseRepresentation::needsUpdate() const
     return false;
 }
 
-bool BaseRepresentation::runLocalUpdates(mtime_t, uint64_t, bool)
+bool BaseRepresentation::runLocalUpdates(SharedResources *,
+                                         mtime_t, uint64_t, bool)
 {
     return false;
 }
