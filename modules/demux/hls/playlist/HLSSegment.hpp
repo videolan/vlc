@@ -27,6 +27,7 @@ namespace hls
 {
     namespace playlist
     {
+        using namespace adaptive;
         using namespace adaptive::playlist;
         using namespace adaptive::encryption;
 
@@ -37,16 +38,13 @@ namespace hls
             public:
                 HLSSegment( ICanonicalUrl *parent, uint64_t sequence );
                 virtual ~HLSSegment();
-                void setEncryption(CommonEncryption &);
                 mtime_t getUTCTime() const;
                 virtual int compare(ISegment *) const; /* reimpl */
 
             protected:
                 mtime_t utcTime;
-                virtual void onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *); /* reimpl */
-
-                CommonEncryption encryption;
-                CommonEncryptionSession encryptSession;
+                virtual bool prepareChunk(SharedResources *, SegmentChunk *,
+                                          BaseRepresentation *); /* reimpl */
         };
     }
 }

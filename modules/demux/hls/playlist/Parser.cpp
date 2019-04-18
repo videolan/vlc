@@ -284,7 +284,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                     keytag->getAttributeByName("URI") )
                 {
                     encryption.method = CommonEncryption::Method::AES_128;
-                    encryption.key.clear();
+                    encryption.uri.clear();
 
                     Url keyurl(keytag->getAttributeByName("URI")->quotedString());
                     if(!keyurl.hasScheme())
@@ -292,11 +292,8 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                         keyurl.prepend(Helper::getDirectoryPath(rep->getPlaylistUrl().toString()).append("/"));
                     }
 
-                    M3U8 *m3u8 = dynamic_cast<M3U8 *>(rep->getPlaylist());
-                    if(likely(m3u8))
-                        encryption.key = resources->getKeyring()->getKey(
-                                            resources->getAuthStorage(),
-                                            keyurl.toString());
+                    encryption.uri = keyurl.toString();
+
                     if(keytag->getAttributeByName("IV"))
                     {
                         encryption.iv.clear();
@@ -307,7 +304,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                 {
                     /* unsupported or invalid */
                     encryption.method = CommonEncryption::Method::NONE;
-                    encryption.key.clear();
+                    encryption.uri.clear();
                     encryption.iv.clear();
                 }
             }

@@ -24,9 +24,14 @@
 #include "SegmentChunk.hpp"
 #include "Segment.h"
 #include "BaseRepresentation.h"
+#include "../encryption/CommonEncryption.hpp"
+
+#include <vlc_block.h>
+
 #include <cassert>
 
 using namespace adaptive::playlist;
+using namespace adaptive::encryption;
 using namespace adaptive;
 
 SegmentChunk::SegmentChunk(ISegment *segment_, AbstractChunkSource *source,
@@ -37,16 +42,35 @@ SegmentChunk::SegmentChunk(ISegment *segment_, AbstractChunkSource *source,
     segment->chunksuse.Set(segment->chunksuse.Get() + 1);
     rep = rep_;
     discontinuity = segment_->discontinuity;
+    encryptionSession = NULL;
 }
 
 SegmentChunk::~SegmentChunk()
 {
     assert(segment->chunksuse.Get() > 0);
     segment->chunksuse.Set(segment->chunksuse.Get() - 1);
+    delete encryptionSession;
+}
+
+bool SegmentChunk::decrypt(block_t **pp_block)
+{
+    block_t *p_block = *pp_block;
+
+    if(encryptionSession)
+    {
+        bool b_last = isEmpty();
+        p_block->i_buffer = encryptionSession->decrypt(p_block->p_buffer,
+                                                       p_block->i_buffer, b_last);
+        if(b_last)
+            encryptionSession->close();
+    }
+
+    return true;
 }
 
 void SegmentChunk::onDownload(block_t **pp_block)
 {
+    decrypt(pp_block);
     segment->onChunkDownload(pp_block, this, rep);
 }
 
@@ -58,3 +82,8 @@ StreamFormat SegmentChunk::getStreamFormat() const
         return StreamFormat();
 }
 
+void SegmentChunk::setEncryptionSession(CommonEncryptionSession *s)
+{
+    delete encryptionSession;
+    encryptionSession = s;
+}

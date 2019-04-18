@@ -23,6 +23,8 @@
 #endif
 
 #include "CommonEncryption.hpp"
+#include "Keyring.hpp"
+#include "../SharedResources.hpp"
 
 #include <vlc_common.h>
 
@@ -44,12 +46,13 @@ CommonEncryptionSession::CommonEncryptionSession()
     ctx = NULL;
 }
 
+
 CommonEncryptionSession::~CommonEncryptionSession()
 {
     close();
 }
 
-bool CommonEncryptionSession::start(const CommonEncryption &enc)
+bool CommonEncryptionSession::start(SharedResources *res, const CommonEncryption &enc)
 {
     if(ctx)
         close();
@@ -57,11 +60,18 @@ bool CommonEncryptionSession::start(const CommonEncryption &enc)
 #ifdef HAVE_GCRYPT
     if(encryption.method == CommonEncryption::Method::AES_128)
     {
+        if(key.empty())
+        {
+            if(!encryption.uri.empty())
+                key = res->getKeyring()->getKey(res->getAuthStorage(), encryption.uri);
+            if(key.size() != 16)
+                return false;
+        }
+
         vlc_gcrypt_init();
         gcry_cipher_hd_t handle;
         if( gcry_cipher_open(&handle, GCRY_CIPHER_AES, GCRY_CIPHER_MODE_CBC, 0) ||
-                encryption.key.size() != 16 ||
-                gcry_cipher_setkey(handle, &encryption.key[0], 16) ||
+                gcry_cipher_setkey(handle, &key[0], 16) ||
                 gcry_cipher_setiv(handle, &encryption.iv[0], 16) )
         {
             gcry_cipher_close(handle);

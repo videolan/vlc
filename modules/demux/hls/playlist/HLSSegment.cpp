@@ -24,10 +24,7 @@
 #include "HLSSegment.hpp"
 #include "../adaptive/playlist/SegmentChunk.hpp"
 #include "../adaptive/playlist/BaseRepresentation.h"
-#include "../adaptive/encryption/CommonEncryption.hpp"
 
-#include <vlc_common.h>
-#include <vlc_block.h>
 
 using namespace hls::playlist;
 
@@ -42,57 +39,28 @@ HLSSegment::~HLSSegment()
 {
 }
 
-void HLSSegment::onChunkDownload(block_t **pp_block, SegmentChunk *chunk, BaseRepresentation *)
+bool HLSSegment::prepareChunk(SharedResources *res, SegmentChunk *chunk, BaseRepresentation *rep)
 {
-    block_t *p_block = *pp_block;
-
-#ifndef HAVE_GCRYPT
-    (void)chunk;
-#else
     if(encryption.method == CommonEncryption::Method::AES_128)
     {
         if (encryption.iv.size() != 16)
         {
+            uint64_t sequence = getSequenceNumber() - Segment::SEQUENCE_FIRST;
             encryption.iv.clear();
             encryption.iv.resize(16);
-            encryption.iv[15] = (getSequenceNumber() - Segment::SEQUENCE_FIRST) & 0xff;
-            encryption.iv[14] = ((getSequenceNumber() - Segment::SEQUENCE_FIRST) >> 8)& 0xff;
-            encryption.iv[13] = ((getSequenceNumber() - Segment::SEQUENCE_FIRST) >> 16)& 0xff;
-            encryption.iv[12] = ((getSequenceNumber() - Segment::SEQUENCE_FIRST) >> 24)& 0xff;
+            encryption.iv[15] = (sequence >> 0) & 0xff;
+            encryption.iv[14] = (sequence >> 8) & 0xff;
+            encryption.iv[13] = (sequence >> 16) & 0xff;
+            encryption.iv[12] = (sequence >> 24) & 0xff;
         }
-
-        block_t *p_block = *pp_block;
-        /* first bytes */
-        if(chunk->getBytesRead() == p_block->i_buffer)
-        {
-            if(!encryptSession.start(encryption))
-            {
-                p_block->i_buffer = 0;
-                return;
-            }
-        }
-
-        bool b_last = chunk->isEmpty();
-        p_block->i_buffer = encryptSession.decrypt(p_block->p_buffer, p_block->i_buffer, b_last);
-        if(b_last)
-            encryptSession.close();
     }
-    else
-#endif
-    if(encryption.method != CommonEncryption::Method::NONE)
-    {
-        p_block->i_buffer = 0;
-    }
+
+    return Segment::prepareChunk(res, chunk, rep);
 }
 
 mtime_t HLSSegment::getUTCTime() const
 {
     return utcTime;
-}
-
-void HLSSegment::setEncryption(CommonEncryption &enc)
-{
-    encryption = enc;
 }
 
 int HLSSegment::compare(ISegment *segment) const

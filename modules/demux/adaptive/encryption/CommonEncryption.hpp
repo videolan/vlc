@@ -21,9 +21,12 @@
 #define COMMONENCRYPTION_H
 
 #include <vector>
+#include <string>
 
 namespace adaptive
 {
+    class SharedResources;
+
     namespace encryption
     {
         class CommonEncryption
@@ -36,7 +39,7 @@ namespace adaptive
                     AES_128,
                     AES_SAMPLE,
                 } method;
-                std::vector<unsigned char> key;
+                std::string uri;
                 std::vector<unsigned char> iv;
         };
 
@@ -46,11 +49,12 @@ namespace adaptive
                 CommonEncryptionSession();
                 ~CommonEncryptionSession();
 
-                bool start(const CommonEncryption &);
+                bool start(SharedResources *, const CommonEncryption &);
                 void close();
                 size_t decrypt(void *, size_t, bool);
 
             private:
+                std::vector<unsigned char> key;
                 CommonEncryption encryption;
                 void *ctx;
         };
