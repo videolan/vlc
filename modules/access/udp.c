@@ -236,7 +236,6 @@ static void Close( vlc_object_t *p_this )
 vlc_module_begin()
     set_shortname(N_("UDP"))
     set_description(N_("UDP input"))
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
 
     add_obsolete_integer("udp-buffer") /* since 3.0.0 */

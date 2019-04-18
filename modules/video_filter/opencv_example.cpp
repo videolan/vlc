@@ -79,7 +79,6 @@ vlc_module_begin ()
     set_capability( "opencv internal filter", 1 )
     add_shortcut( "opencv_example" )
 
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_callback( OpenFilter )
 

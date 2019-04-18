@@ -100,7 +100,6 @@ vlc_module_begin ()
     set_shortname( N_("projectM"))
     set_description( N_("libprojectM effect") )
     set_capability( "visualization", 0 )
-    set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
 #ifndef HAVE_PROJECTM2
     add_loadfile("projectm-config", "/usr/share/projectM/config.inp",

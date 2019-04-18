@@ -112,7 +112,6 @@ static int Open (filter_t *p_filter)
 vlc_module_begin()
     set_shortname ( N_("Stereo Pan") )
     set_description ( N_("Perform Stereo Panning") )
-    set_category ( CAT_AUDIO )
     set_subcategory ( SUBCAT_AUDIO_AFILTER )
     add_float_with_range( "pan-control", 0.5, 0, 1,
             PAN_CONTROL_TEXT, PAN_CONTROL_LONGTEXT )

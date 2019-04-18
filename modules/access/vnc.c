@@ -77,7 +77,6 @@ static void Close( vlc_object_t * );
 vlc_module_begin()
     set_shortname( N_("VNC") )
     add_shortcut( "vnc" )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_description( N_("VNC client access") )
     set_capability( "access", 0 )

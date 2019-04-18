@@ -69,7 +69,6 @@ vlc_module_begin ()
     set_description( N_("Audio part of the BarGraph function") )
     set_shortname( N_("Audiobar Graph") )
     set_capability( "audio filter", 0 )
-    set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
     add_integer( CFG_PREFIX "bargraph", 1, BARGRAPH_TEXT, BARGRAPH_LONGTEXT ) // FIXME: this is a bool

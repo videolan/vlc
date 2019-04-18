@@ -99,7 +99,6 @@ vlc_module_begin ()
     set_shortname( "JACK" )
     set_description( N_("JACK audio output") )
     set_capability( "audio output", 100 )
-    set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_bool( AUTO_CONNECT_OPTION, true, AUTO_CONNECT_TEXT,
               AUTO_CONNECT_LONGTEXT )

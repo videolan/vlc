@@ -270,7 +270,6 @@ vlc_module_begin()
 
     set_shortname( N_("RIST") )
     set_description( N_("RIST stream output") )
-    set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
 
     add_integer( RIST_CFG_PREFIX RIST_CFG_MAX_PACKET_SIZE, RIST_DEFAULT_TARGET_PAYLOAD_SIZE,

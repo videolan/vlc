@@ -69,7 +69,6 @@ static int Import_Dir( vlc_object_t *p_this )
 }
 
 vlc_module_begin()
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_shortname( N_("Directory") )
     set_description( N_("Directory import") )

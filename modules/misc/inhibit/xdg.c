@@ -35,7 +35,6 @@ vlc_module_begin ()
     set_description (N_("XDG screen saver inhibition") )
     set_capability ("inhibit", 10 )
     set_callbacks (Open, Close)
-    set_category (CAT_ADVANCED)
     set_subcategory (SUBCAT_ADVANCED_MISC)
 vlc_module_end ()
 

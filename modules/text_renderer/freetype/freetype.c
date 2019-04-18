@@ -125,7 +125,6 @@ static const char *const ppsz_text_direction[] = {
 vlc_module_begin ()
     set_shortname( N_("Text renderer"))
     set_description( N_("Freetype2 font renderer") )
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
 #ifdef HAVE_GET_FONT_BY_FAMILY_NAME

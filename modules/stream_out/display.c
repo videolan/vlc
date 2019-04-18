@@ -54,7 +54,6 @@ vlc_module_begin ()
     set_description( N_("Display stream output") )
     set_capability( "sout output", 50 )
     add_shortcut( "display" )
-    set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
 
     add_bool( SOUT_CFG_PREFIX "audio", true, AUDIO_TEXT,

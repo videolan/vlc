@@ -129,7 +129,6 @@ static void *Run            (void *);
 #define CLIENT_VERSION  VERSION
 
 vlc_module_begin ()
-    set_category(CAT_INTERFACE)
     set_subcategory(SUBCAT_INTERFACE_CONTROL)
     set_shortname(N_("Audioscrobbler"))
     set_description(N_("Submission of played songs to last.fm"))

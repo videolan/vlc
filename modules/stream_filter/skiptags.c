@@ -234,7 +234,6 @@ static void Close(vlc_object_t *obj)
 }
 
 vlc_module_begin()
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_STREAM_FILTER)
     set_capability("stream_filter", 330)
 

@@ -50,7 +50,6 @@ VIDEO_FILTER_WRAPPER(Filter)
 vlc_module_begin ()
     set_description( N_("Ripple video filter") )
     set_shortname( N_( "Ripple" ))
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_shortcut( "ripple" )

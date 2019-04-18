@@ -669,7 +669,6 @@ error:
 vlc_module_begin()
     set_shortname(N_("RTP"))
     set_description(N_("Real-Time Protocol (RTP) input"))
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_DEMUX)
     set_capability("demux", 55)
     set_callbacks(OpenSDP, Close)

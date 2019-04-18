@@ -42,7 +42,6 @@ static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin ()
-    set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_PACKETIZER )
     set_description( N_("DTS audio packetizer") )
     set_capability( "packetizer", 10 )

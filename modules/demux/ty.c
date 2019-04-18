@@ -61,7 +61,6 @@ static void Close( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( N_("TY") )
     set_description(N_("TY Stream audio/video demux"))
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_capability("demux", 6)
     /* FIXME: there seems to be a segfault when using PVR access

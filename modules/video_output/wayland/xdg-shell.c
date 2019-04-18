@@ -806,7 +806,6 @@ vlc_module_begin()
     set_shortname(N_("WL shell"))
     set_description(N_("Wayland shell surface"))
 #endif
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 #ifdef XDG_SHELL
     set_capability("vout window", 20)

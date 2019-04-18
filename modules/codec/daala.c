@@ -114,7 +114,6 @@ static const char *const enc_chromafmt_list_text[] = {
   "Enforce a keyframe interval between 1 and 1000." )
 
 vlc_module_begin ()
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_shortname( "Daala" )
     set_description( N_("Daala video decoder") )

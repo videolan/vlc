@@ -47,7 +47,6 @@ static int  Open (vout_display_t *,
 static void Close(vout_display_t *);
 
 vlc_module_begin()
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_shortname("OpenGL")
     set_description(N_("OpenGL video output for Windows"))

@@ -358,7 +358,6 @@ static const char *const ppsz_enc_options[] = {
 /* Module declaration */
 
 vlc_module_begin ()
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_shortname( "Schroedinger" )
     set_description( N_("Dirac video decoder using libschroedinger") )

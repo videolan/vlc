@@ -70,7 +70,6 @@ vlc_module_begin ()
     set_description( EDGE_DETECTION_DESCRIPTION )
     set_shortname( EDGE_DETECTION_TEXT )
     set_help( EDGE_DETECTION_LONGTEXT )
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_callback_video_filter( Open )
 

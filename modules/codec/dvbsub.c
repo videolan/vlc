@@ -120,7 +120,6 @@ vlc_module_begin ()
     set_description( N_("DVB subtitles decoder") )
     set_shortname( N_("DVB subtitles") )
     set_capability( "spu decoder", 80 )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
     set_callbacks( Open, Close )
 

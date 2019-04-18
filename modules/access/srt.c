@@ -420,7 +420,6 @@ static void Close(vlc_object_t *p_this)
 vlc_module_begin ()
     set_shortname( N_( "SRT" ) )
     set_description( N_( "SRT input" ) )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_obsolete_integer( SRT_PARAM_CHUNK_SIZE )

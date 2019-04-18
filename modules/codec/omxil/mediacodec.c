@@ -197,7 +197,6 @@ static void ReleaseAllPictureContexts(decoder_sys_t *);
 
 vlc_module_begin ()
     set_description("Video decoder using Android MediaCodec via NDK")
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
     set_section(N_("Decoding"), NULL)
     set_capability("video decoder", 800)

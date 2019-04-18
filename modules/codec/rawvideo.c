@@ -61,7 +61,6 @@ static int  OpenPacketizer( vlc_object_t * );
 vlc_module_begin ()
     set_description( N_("Pseudo raw video decoder") )
     set_capability( "video decoder", 50 )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_callback( OpenDecoder )
 

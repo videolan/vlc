@@ -214,7 +214,6 @@ vlc_module_begin ()
     set_description(N_("Chromecast stream output"))
     set_capability("sout output", 0)
     add_shortcut("chromecast")
-    set_category(CAT_SOUT)
     set_subcategory(SUBCAT_SOUT_STREAM)
     set_callbacks(Open, Close)
 

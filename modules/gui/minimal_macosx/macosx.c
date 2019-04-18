@@ -55,7 +55,6 @@ vlc_module_begin ()
     set_description( N_("Minimal Mac OS X interface") )
     set_capability( "interface", 50 )
     set_callbacks( OpenIntf, CloseIntf )
-    set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
 
     add_submodule ()

@@ -507,7 +507,6 @@ vlc_module_begin()
     set_shortname(N_("WASAPI"))
     set_description(N_("Windows Audio Session API input"))
     set_capability("access", 0)
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
 
     add_bool("wasapi-loopback", false, LOOPBACK_TEXT, LOOPBACK_LONGTEXT)

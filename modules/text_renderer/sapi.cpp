@@ -54,7 +54,6 @@ static int RenderText(filter_t *,
 vlc_module_begin ()
  set_description(N_("Speech synthesis for Windows"))
 
- set_category(CAT_VIDEO)
  set_subcategory(SUBCAT_VIDEO_SUBPIC)
 
  set_callback_text_renderer(Create, 0)

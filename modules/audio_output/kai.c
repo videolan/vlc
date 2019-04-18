@@ -109,7 +109,6 @@ vlc_module_begin ()
     set_shortname( "KAI" )
     set_description( N_("K Audio Interface audio output") )
     set_capability( "audio output", 100 )
-    set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_string( "kai-audio-device", ppsz_kai_audio_device[0],
                 KAI_AUDIO_DEVICE_TEXT, KAI_AUDIO_DEVICE_LONGTEXT )

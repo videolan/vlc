@@ -565,7 +565,6 @@ error:
 
 vlc_module_begin()
     set_description(N_("Direct3D11 adjust filter"))
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_callback_video_filter(D3D11OpenAdjust)
     add_shortcut( "adjust" )

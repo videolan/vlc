@@ -96,7 +96,6 @@ vlc_module_begin ()
     set_shortname("Direct3D9")
     set_description(N_("Direct3D9 video output"))
     set_help(D3D9_HELP)
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
     add_bool("direct3d9-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT)

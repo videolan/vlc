@@ -169,7 +169,6 @@ static const char * const present_text[] = {
 vlc_module_begin()
     set_shortname("libplacebo Vulkan")
     set_description(N_("Vulkan-based GPU instance"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_capability("libplacebo gpu", 50)
     set_callback(InitInstance)

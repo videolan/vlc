@@ -1039,7 +1039,6 @@ static void Deactivate( vlc_object_t *p_this )
 
 vlc_module_begin()
     set_shortname(N_("RC"))
-    set_category(CAT_INTERFACE)
     set_subcategory(SUBCAT_INTERFACE_MAIN)
     set_description(N_("Remote control interface"))
     add_bool("rc-show-pos", false, POS_TEXT, POS_LONGTEXT)

@@ -61,7 +61,6 @@ vlc_module_begin ()
     set_description(N_("NVDEC video decoder"))
     set_shortname("nvdec")
     set_capability("video decoder", 60)
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
     add_integer( "nvdec-deint", cudaVideoDeinterlaceMode_Bob,
                  DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT )

@@ -475,7 +475,6 @@ static void WindowClose( vout_window_t *pWnd )
     " to play back video even though no video tag is implemented")
 
 vlc_module_begin ()
-    set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     add_loadfile("skins2-last", "", SKINS2_LAST, SKINS2_LAST_LONG)
     add_string( "skins2-config", "", SKINS2_CONFIG, SKINS2_CONFIG_LONG )

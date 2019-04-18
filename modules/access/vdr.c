@@ -80,7 +80,6 @@ static void Close( vlc_object_t * );
     "Default frame rate for chapter import." )
 
 vlc_module_begin ()
-    set_category( CAT_INPUT )
     set_shortname( N_("VDR") )
     set_help( HELP_TEXT )
     set_subcategory( SUBCAT_INPUT_ACCESS )

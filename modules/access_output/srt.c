@@ -452,7 +452,6 @@ static void Close( vlc_object_t * p_this )
 vlc_module_begin()
     set_shortname( N_( "SRT" ) )
     set_description( N_( "SRT stream output" ) )
-    set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
 
     add_obsolete_integer( SRT_PARAM_CHUNK_SIZE )

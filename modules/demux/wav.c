@@ -718,7 +718,6 @@ error:
 
 vlc_module_begin ()
     set_description( N_("WAV demuxer") )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_capability( "demux", 142 )
     set_callbacks( Open, Close )

@@ -94,7 +94,6 @@ static const char *const passthrough_modes_text[] = {
 vlc_module_begin ()
     set_shortname( "ALSA" )
     set_description( N_("ALSA audio output") )
-    set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_string ("alsa-audio-device", "default",
                 AUDIO_DEV_TEXT, AUDIO_DEV_LONGTEXT)

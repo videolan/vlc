@@ -180,7 +180,6 @@ vlc_module_begin()
     set_description(N_("Video cropping filter"))
     set_callback_video_filter(Open)
 
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER);
 
     add_integer_with_range(CFG_PREFIX "top", 0, 0, INT_MAX,

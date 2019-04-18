@@ -55,7 +55,6 @@ vlc_module_begin ()
     set_description( N_("Matroska stream demuxer" ) )
     set_capability( "demux", 50 )
     set_callbacks( Open, Close )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
     add_bool( "mkv-use-ordered-chapters", true,

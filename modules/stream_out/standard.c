@@ -71,7 +71,6 @@ vlc_module_begin ()
     set_description( N_("Standard stream output") )
     set_capability( "sout output", 50 )
     add_shortcut( "standard", "std", "file", "http", SRT_SHORTCUT )
-    set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
 
     add_string( SOUT_CFG_PREFIX "access", "", ACCESS_TEXT, ACCESS_LONGTEXT )

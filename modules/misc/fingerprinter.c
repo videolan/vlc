@@ -73,7 +73,6 @@ static void *Run(void *);
  * Module descriptor
  ****************************************************************************/
 vlc_module_begin ()
-    set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
     set_shortname(N_("acoustid"))
     set_description(N_("Track fingerprinter (based on Acoustid)"))

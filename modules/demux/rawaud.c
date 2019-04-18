@@ -62,7 +62,6 @@ vlc_module_begin();
     set_shortname( "Raw Audio" );
     set_description( N_("Raw audio demuxer") );
     set_capability( "demux", 0 );
-    set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_callbacks( Open, Close );
     add_shortcut( "rawaud" );

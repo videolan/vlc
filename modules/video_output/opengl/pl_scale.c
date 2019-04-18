@@ -352,7 +352,6 @@ error_free_sys:
 vlc_module_begin()
     set_shortname("pl_scale")
     set_description("OpenGL scaler")
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_capability("opengl filter", 0)
     set_callback(Open)

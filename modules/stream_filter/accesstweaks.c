@@ -34,7 +34,6 @@ static int  Open(vlc_object_t *);
 
 vlc_module_begin ()
     set_shortname("accesstweaks")
-    set_category (CAT_INPUT)
     set_subcategory (SUBCAT_INPUT_STREAM_FILTER)
     set_capability ("stream_filter", 301)
     /* Developers only module, no translation please */

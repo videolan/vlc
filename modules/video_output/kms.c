@@ -755,7 +755,6 @@ static int Open(vout_display_t *vd,
  *****************************************************************************/
 vlc_module_begin ()
     set_shortname("kms")
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_loadfile(KMS_VAR, "/dev/dri/card0", DEVICE_TEXT, DEVICE_LONGTEXT)
 

@@ -72,7 +72,6 @@ vlc_module_begin()
     set_shortname(N_("MMAL vout"))
     set_description(N_("MMAL-based vout plugin for Raspberry Pi"))
     add_shortcut("mmal_vout")
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
 
     add_integer(MMAL_LAYER_NAME, 1, MMAL_LAYER_TEXT, MMAL_LAYER_LONGTEXT)

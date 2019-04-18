@@ -147,7 +147,6 @@ vlc_module_begin ()
     set_capability( "sout filter", 50 )
     add_shortcut( "transcode" )
     set_callbacks( Open, Close )
-    set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
     set_section( N_("Video"), NULL )
     add_module(SOUT_CFG_PREFIX "venc", "video encoder", NULL,

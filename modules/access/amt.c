@@ -253,7 +253,6 @@ static void make_ip_header( amt_ip_alert_t *p_ipHead );
 vlc_module_begin ()
     set_shortname( N_("AMT" ) )
     set_description( N_("AMT input") )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "amt-native-timeout", 5, TIMEOUT_TEXT, NULL )

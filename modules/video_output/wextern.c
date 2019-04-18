@@ -41,7 +41,6 @@ static int Open(vout_window_t *);
 vlc_module_begin()
     set_shortname(N_("Callback window"))
     set_description(N_("External callback window"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_capability("vout window", 0)
     set_callback(Open)

@@ -66,7 +66,6 @@ vlc_module_begin ()
     set_capability( "sout access", 0 )
     set_shortname( "HTTP" )
     add_shortcut( "http", "https", "mmsh" )
-    set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
     add_string( SOUT_CFG_PREFIX "user", "",
                 USER_TEXT, USER_LONGTEXT )

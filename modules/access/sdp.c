@@ -104,7 +104,6 @@ static int Open (vlc_object_t *obj)
 vlc_module_begin()
     set_shortname(N_("SDP"))
     set_description(N_("Session Description Protocol"))
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
 
     set_capability("access", 0)

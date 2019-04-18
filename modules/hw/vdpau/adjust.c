@@ -203,7 +203,6 @@ static int Open(filter_t *filter)
 
 vlc_module_begin()
     set_description(N_("VDPAU adjust video filter"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     add_shortcut("adjust")
     set_callback_video_filter(Open)

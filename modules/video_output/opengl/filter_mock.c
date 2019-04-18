@@ -614,7 +614,6 @@ error:
 vlc_module_begin()
     set_shortname("mock")
     set_description("mock OpenGL filter")
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_capability("opengl filter", 0)
     set_callback_opengl_filter(Open)

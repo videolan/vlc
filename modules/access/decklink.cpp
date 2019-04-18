@@ -111,7 +111,6 @@ static const char *const ppsz_audioconns_text[] = {
 vlc_module_begin ()
     set_shortname(N_("DeckLink"))
     set_description(N_("Blackmagic DeckLink SDI input"))
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
 
     add_integer("decklink-card-index", 0,

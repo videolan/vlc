@@ -48,7 +48,6 @@ static int OpenDecDevice(vlc_decoder_device *device, vout_window_t *window);
 vlc_module_begin()
     set_shortname(N_("Android Window"))
     set_description(N_("Android native window"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_capability("vout window", 10)
     set_callback(Open)

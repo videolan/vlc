@@ -53,7 +53,6 @@
 
 vlc_module_begin ()
     add_shortcut( "playlist" )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
     add_bool( "playlist-skip-ads", true,

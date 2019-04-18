@@ -42,7 +42,6 @@
 static int  Open( vlc_object_t * );
 
 vlc_module_begin ()
-    set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
     set_description( N_("Audio filter for A/52/DTS->S/PDIF encapsulation") )
     set_capability( "audio converter", 10 )

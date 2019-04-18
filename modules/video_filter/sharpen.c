@@ -65,7 +65,6 @@ vlc_module_begin ()
     set_description( N_("Sharpen video filter") )
     set_shortname( N_("Sharpen") )
     set_help(SHARPEN_HELP)
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     add_float_with_range( FILTER_PREFIX "sigma", 0.05, 0.0, 2.0,
         SIG_TEXT, SIG_LONGTEXT )

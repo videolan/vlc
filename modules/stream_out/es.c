@@ -372,7 +372,6 @@ vlc_module_begin()
     set_description(N_("Elementary stream output"))
     set_capability("sout output", 50)
     add_shortcut("es")
-    set_category(CAT_SOUT)
     set_subcategory(SUBCAT_SOUT_STREAM)
 
     set_section(N_("Generic"), NULL)

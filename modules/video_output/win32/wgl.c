@@ -43,7 +43,6 @@ static void Close(vlc_gl_t *);
 vlc_module_begin()
     set_shortname("WGL")
     set_description(N_("WGL extension for OpenGL"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
     add_integer("gpu-affinity", -1, HW_GPU_AFFINITY_TEXT, NULL)

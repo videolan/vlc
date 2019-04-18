@@ -242,7 +242,6 @@ static void Close (vlc_object_t *);
 vlc_module_begin ()
     set_shortname (N_("DTV"))
     set_description (N_("Digital Television and Radio"))
-    set_category (CAT_INPUT)
     set_subcategory (SUBCAT_INPUT_ACCESS)
     set_capability ("access", 0)
     set_callbacks (Open, Close)

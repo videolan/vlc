@@ -261,7 +261,6 @@ static const struct vlc_tracer_operations *Open(vlc_object_t *obj,
 vlc_module_begin()
     set_shortname(N_("Tracer"))
     set_description(N_("JSON tracer"))
-    set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
     set_capability("tracer", 0)
     set_callback(Open)

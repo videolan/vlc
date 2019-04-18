@@ -58,7 +58,6 @@ VLC_SD_PROBE_HELPER("podcast", N_("Podcasts"), SD_CAT_INTERNET)
 vlc_module_begin ()
     set_shortname( "Podcast")
     set_description( N_("Podcasts") )
-    set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_SD )
 
     add_string( "podcast-urls", NULL,

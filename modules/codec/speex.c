@@ -91,7 +91,6 @@ static const char * const ppsz_enc_mode_descriptions[] = {
 };
 
 vlc_module_begin ()
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACODEC )
 
     set_description( N_("Speex audio decoder") )

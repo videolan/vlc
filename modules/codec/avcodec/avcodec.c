@@ -73,7 +73,6 @@ static const char *const enc_hq_list_text[] = {
 
 vlc_module_begin ()
     set_shortname( "FFmpeg")
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     /* decoder main module */
     set_description( N_("FFmpeg audio/video decoder") )

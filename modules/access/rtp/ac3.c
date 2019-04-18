@@ -245,7 +245,6 @@ static int rtp_ac3_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
 vlc_module_begin()
     set_shortname(N_("RTP AC3"))
     set_description(N_("RTP AC-3 payload parser"))
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_DEMUX)
     set_rtp_parser_callback(rtp_ac3_open)
     add_shortcut("audio/ac3", "audio/eac3")

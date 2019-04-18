@@ -50,7 +50,6 @@ static void ReleaseCurrent(vlc_placebo_t *pl);
 #define SWAP_DEPTH_LONGTEXT "Attempt limiting the maximum frame latency. The true frame latency may be lower than this setting, depending on OpenGL driver internals and the VLC clock settings."
 
 vlc_module_begin()
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_capability("libplacebo gpu", 40)
     set_callback(InitInstance)

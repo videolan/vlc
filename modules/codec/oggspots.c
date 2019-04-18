@@ -79,7 +79,6 @@ static picture_t* DecodePacket (decoder_t*, block_t*);
  *****************************************************************************/
 
 vlc_module_begin ()
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
     set_shortname("OggSpots")
     set_description(N_("OggSpots video decoder"))

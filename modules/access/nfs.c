@@ -56,7 +56,6 @@ static void Close(vlc_object_t *);
 vlc_module_begin()
     set_shortname(N_("NFS"))
     set_description(N_("NFS input"))
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
     add_bool("nfs-auto-guid", true, AUTO_GUID_TEXT, AUTO_GUID_LONGTEXT)
     set_capability("access", 0)

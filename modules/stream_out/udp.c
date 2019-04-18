@@ -352,7 +352,6 @@ vlc_module_begin()
     set_description(N_("UDP stream output"))
     set_capability("sout output", 40)
     add_shortcut("standard", "std", "udp")
-    set_category(CAT_SOUT)
     set_subcategory(SUBCAT_SOUT_STREAM)
 
     add_bool(SOUT_CFG_PREFIX "avformat", false, AVF_TEXT, AVF_LONGTEXT)

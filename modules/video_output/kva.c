@@ -63,7 +63,6 @@ static const char *const ppsz_kva_video_mode_text[] = {
 
 vlc_module_begin ()
     set_shortname( "KVA" )
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
     add_string( "kva-video-mode", ppsz_kva_video_mode[0], KVA_VIDEO_MODE_TEXT,
                 KVA_VIDEO_MODE_LONGTEXT )

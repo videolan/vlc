@@ -52,7 +52,6 @@ vlc_module_begin ()
     set_shortname("auhal")
     set_description(N_("HAL AudioUnit output"))
     set_capability("audio output", 101)
-    set_category(CAT_AUDIO)
     set_subcategory(SUBCAT_AUDIO_AOUT)
     set_callbacks(Open, Close)
     add_integer("auhal-volume", AOUT_VOLUME_DEFAULT,

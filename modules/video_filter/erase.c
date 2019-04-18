@@ -65,7 +65,6 @@ vlc_module_begin ()
     set_description( N_("Erase video filter") )
     set_shortname( N_( "Erase" ))
     set_help(ERASE_HELP)
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_loadfile(CFG_PREFIX "mask", NULL, MASK_TEXT, MASK_LONGTEXT)

@@ -65,7 +65,6 @@ static void Close( filter_t * );
 
 vlc_module_begin ()
     set_shortname( N_("SoX Resampler") )
-    set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_RESAMPLER )
     add_integer( "soxr-resampler-quality", 2,
                 SOXR_QUALITY_TEXT, NULL )

@@ -308,7 +308,6 @@ vlc_module_begin ()
 
     set_shortname( N_("RIST") )
     set_description( N_("RIST input") )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( RIST_CFG_PREFIX "maximum-jitter", 5,

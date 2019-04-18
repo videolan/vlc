@@ -36,7 +36,6 @@ static int Open( vlc_object_t * );
 
 vlc_module_begin()
     set_shortname( "adf" )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
     set_capability( "stream_filter", 330 )
     set_description( N_( "ADF stream filter" ) )

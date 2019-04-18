@@ -175,7 +175,6 @@ vlc_module_begin ()
     set_shortname( N_("RSS / Atom") )
     set_help(RSS_HELP)
     set_callback_sub_source( CreateFilter, 1 )
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
     add_string( CFG_PREFIX "urls", NULL, MSG_TEXT, MSG_LONGTEXT )
 

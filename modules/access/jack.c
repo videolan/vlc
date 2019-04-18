@@ -73,7 +73,6 @@ vlc_module_begin ()
      set_description( N_("JACK audio input") )
      set_capability( "access", 0 )
      set_shortname( N_( "JACK Input" ) )
-     set_category( CAT_INPUT )
      set_subcategory( SUBCAT_INPUT_ACCESS )
 
      add_bool( "jack-input-use-vlc-pace", false,

@@ -65,7 +65,6 @@ static int OpenMmalDeinterlace(filter_t *);
 vlc_module_begin()
     set_shortname(N_("MMAL deinterlace"))
     set_description(N_("MMAL-based deinterlace filter plugin"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_deinterlace_callback(OpenMmalDeinterlace)
     add_bool(MMAL_DEINTERLACE_NO_QPU, false, MMAL_DEINTERLACE_NO_QPU_TEXT,

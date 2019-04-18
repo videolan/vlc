@@ -63,7 +63,6 @@ vlc_module_begin ()
     set_shortname( N_("Subtitles"))
     set_description( N_("Text subtitle parser") )
     set_capability( "demux", 0 )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     add_string( "sub-type", "auto", N_("Subtitle format"),
                 SUB_TYPE_LONGTEXT )

@@ -47,7 +47,6 @@ static block_t *DoWork( filter_t *, block_t * );
 vlc_module_begin ()
     set_description( N_("Nearest-neighbor audio resampler") )
     set_capability( "audio converter", 2 )
-    set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_RESAMPLER )
     set_callback( Create )
 

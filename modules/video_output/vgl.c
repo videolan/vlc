@@ -172,7 +172,6 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 vlc_module_begin()
     set_shortname("GL texture")
     set_description("GL texture output")
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
     set_capability("opengl", 0)

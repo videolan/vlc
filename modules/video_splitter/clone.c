@@ -55,7 +55,6 @@ vlc_module_begin ()
     set_capability( "video splitter", 0 )
     set_shortname( N_("Clone" ))
     set_help(CLONE_HELP)
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SPLITTER )
 
     add_integer( CFG_PREFIX "count", 2, COUNT_TEXT, COUNT_LONGTEXT )

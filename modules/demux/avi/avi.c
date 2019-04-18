@@ -71,7 +71,6 @@ vlc_module_begin ()
     set_shortname( "AVI" )
     set_description( N_("AVI demuxer") )
     set_capability( "demux", 212 )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     add_file_extension("avi")
 

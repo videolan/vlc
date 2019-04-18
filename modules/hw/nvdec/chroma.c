@@ -36,7 +36,6 @@ static int OpenCUDAToCPU( filter_t * );
 vlc_module_begin()
     set_shortname(N_("CUDA converter"))
     set_description(N_("CUDA/NVDEC Chroma Converter filter"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_callback_video_converter(OpenCUDAToCPU, 10)
 vlc_module_end()

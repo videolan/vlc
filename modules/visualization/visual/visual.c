@@ -116,7 +116,6 @@ static void Close        ( filter_t * );
 
 vlc_module_begin ()
     set_shortname( N_("Visualizer"))
-    set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
     set_description( N_("Visualizer filter") )
     set_section( N_( "General") , NULL )

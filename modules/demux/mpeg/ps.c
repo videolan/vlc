@@ -60,7 +60,6 @@ static void Close  ( vlc_object_t * );
 vlc_module_begin ()
     set_description( N_("MPEG-PS demuxer") )
     set_shortname( N_("PS") )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_capability( "demux", 1 )
     set_callbacks( OpenForce, Close )

@@ -37,7 +37,6 @@ static void Close (vlc_object_t *);
 vlc_module_begin ()
     set_shortname ("sndio")
     set_description (N_("OpenBSD sndio audio output"))
-    set_category (CAT_AUDIO)
     set_subcategory (SUBCAT_AUDIO_AOUT)
     set_capability ("audio output", 120)
     set_callbacks (Open, Close)

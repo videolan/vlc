@@ -639,7 +639,6 @@ VLC_SD_PROBE_HELPER("sap", N_("Network streams (SAP)"), SD_CAT_LAN)
 vlc_module_begin()
     set_shortname(N_("SAP"))
     set_description(N_("Network streams (SAP)") )
-    set_category(CAT_PLAYLIST)
     set_subcategory(SUBCAT_PLAYLIST_SD)
 
     add_string("sap-addr", NULL, SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT)

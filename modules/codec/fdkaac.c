@@ -107,7 +107,6 @@ vlc_module_begin ()
     set_capability("audio encoder", 150)
     set_callbacks(OpenEncoder, CloseEncoder)
     add_shortcut("fdkaac")
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACODEC)
     add_integer(ENC_CFG_PREFIX "profile", PROFILE_AAC_LC, AOT_TEXT,
              AOT_LONGTEXT)

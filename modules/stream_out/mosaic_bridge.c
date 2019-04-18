@@ -143,7 +143,6 @@ vlc_module_begin ()
     set_capability( "sout output", 0 )
     add_shortcut( "mosaic-bridge" )
 
-    set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
 
     add_string( CFG_PREFIX "id", "Id", ID_TEXT, ID_LONGTEXT )

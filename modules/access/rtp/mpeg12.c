@@ -407,7 +407,6 @@ static int rtp_mpeg12_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
 vlc_module_begin()
     set_shortname(N_("RTP MPEG"))
     set_description(N_("RTP MPEG-1/2 payload parser"))
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_DEMUX)
     set_rtp_parser_callback(rtp_mpeg12_open)
     add_shortcut("audio/MPA", "video/MPV", "video/MP1S", "video/MP2P",

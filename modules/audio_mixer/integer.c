@@ -33,7 +33,6 @@
 static int Activate (vlc_object_t *);
 
 vlc_module_begin ()
-    set_category (CAT_AUDIO)
     set_subcategory (SUBCAT_AUDIO_AFILTER)
     set_description (N_("Integer audio volume"))
     set_capability ("audio volume", 9)

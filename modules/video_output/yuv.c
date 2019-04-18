@@ -56,7 +56,6 @@ static void Close(vout_display_t *vd);
 vlc_module_begin()
     set_shortname(N_("YUV output"))
     set_description(N_("YUV video output"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
     add_string(CFG_PREFIX "file", "stream.yuv",

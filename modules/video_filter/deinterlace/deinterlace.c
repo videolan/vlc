@@ -290,7 +290,6 @@ static int Mouse( filter_t *p_filter,
 vlc_module_begin ()
     set_description( N_("Deinterlacing video filter") )
     set_shortname( N_("Deinterlace" ))
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_string( FILTER_CFG_PREFIX "mode", "blend", SOUT_MODE_TEXT,

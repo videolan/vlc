@@ -43,7 +43,6 @@ static void Close ( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( "TTA" )
     set_description( N_("TTA demuxer") )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_capability( "demux", 145 )
 

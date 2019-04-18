@@ -77,7 +77,6 @@ static void Close( vlc_object_t *p_this );
 vlc_module_begin ()
     set_shortname( N_("DVB") )
     set_description( N_("DVB input with v4l2 support") )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_bool( "dvb-probe", true, PROBE_TEXT, PROBE_LONGTEXT )

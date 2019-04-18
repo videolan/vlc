@@ -193,7 +193,6 @@ static const char *const ts_standards_list_text[] =
 vlc_module_begin ()
     set_description( N_("TS muxer (libdvbpsi)") )
     set_shortname( "MPEG-TS")
-    set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_MUX )
     set_capability( "sout mux", 120 )
     add_shortcut( "ts" )

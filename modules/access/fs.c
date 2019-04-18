@@ -33,7 +33,6 @@
 vlc_module_begin ()
     set_description( N_("File input") )
     set_shortname( N_("File") )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_capability( "access", 50 )
     add_shortcut( "file", "fd", "stream" )

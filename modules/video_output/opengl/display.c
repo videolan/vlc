@@ -46,7 +46,6 @@ static void Close(vout_display_t *vd);
     "Extension through which to use the Open Graphics Library (OpenGL).")
 
 vlc_module_begin ()
-    set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
 #if defined (USE_OPENGL_ES2)
 # define API VLC_OPENGL_ES2

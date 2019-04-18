@@ -63,7 +63,6 @@ vlc_module_begin ()
     set_description( N_("Sepia video filter") )
     set_shortname( N_("Sepia" ) )
     set_help( N_("Gives video a warmer tone by applying sepia effect") )
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     add_integer_with_range( CFG_PREFIX "intensity", 120, 0, 255,
                            SEPIA_INTENSITY_TEXT, SEPIA_INTENSITY_LONGTEXT )

@@ -61,7 +61,6 @@ vlc_module_begin ()
     set_shortname( "MMS" )
     set_description( N_("Microsoft Media Server (MMS) input") )
     set_capability( "access", -1 )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "mms-timeout", 5000, TIMEOUT_TEXT, TIMEOUT_LONGTEXT )

@@ -48,7 +48,6 @@ static int  Create    ( filter_t * );
 vlc_module_begin ()
     set_description( N_("Wave video filter") )
     set_shortname( N_( "Wave" ))
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_shortcut( "wave" )

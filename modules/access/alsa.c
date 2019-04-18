@@ -56,7 +56,6 @@ vlc_module_begin ()
     set_shortname (N_("ALSA"))
     set_description (N_("ALSA audio capture"))
     set_capability ("access", 0)
-    set_category (CAT_INPUT)
     set_subcategory (SUBCAT_INPUT_ACCESS)
     set_help (HELP_TEXT)
 

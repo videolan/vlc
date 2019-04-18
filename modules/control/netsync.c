@@ -78,7 +78,6 @@ static void AutoRun(libvlc_int_t *libvlc)
 vlc_module_begin()
     set_shortname(N_("Network Sync"))
     set_description(N_("Network synchronization"))
-    set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
 
     add_bool("network-synchronisation", false, NETSYNC_TEXT, NETSYNC_LONGTEXT)

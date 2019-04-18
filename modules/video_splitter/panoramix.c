@@ -79,7 +79,6 @@ vlc_module_begin()
     set_shortname( N_("Panoramix" ))
     set_help(PANORAMIX_HELP)
     set_capability( "video splitter", 0 )
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SPLITTER )
 
     add_integer( CFG_PREFIX "cols", -1, COLS_TEXT, COLS_LONGTEXT )

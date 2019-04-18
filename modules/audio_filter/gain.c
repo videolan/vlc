@@ -61,7 +61,6 @@ typedef struct
 vlc_module_begin()
     set_shortname( N_("Gain") )
     set_description( N_("Gain control filter") )
-    set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
     add_float( "gain-value", 1.0, GAIN_VALUE_TEXT,

@@ -135,7 +135,6 @@ vlc_module_begin()
     set_description(N_("Mac OS X interface"))
     set_capability("interface", 200)
     set_callbacks(OpenIntf, CloseIntf)
-    set_category(CAT_INTERFACE)
     set_subcategory(SUBCAT_INTERFACE_MAIN)
     cannot_unload_broken_library()
 

@@ -88,7 +88,6 @@ static int CreateSurface(vlc_vk_platform_t *vk, VkInstance vkinst, VkSurfaceKHR 
 vlc_module_begin()
     set_shortname("Vulkan XCB")
     set_description(N_("XCB/X11 platform support for Vulkan"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_capability("vulkan platform", 50)
     set_callback(InitPlatform)

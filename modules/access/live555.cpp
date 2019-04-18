@@ -101,7 +101,6 @@ vlc_module_begin ()
     set_shortname( "RTP/RTSP")
     set_callbacks( Open, Close )
     add_shortcut( "live", "livedotcom" )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
     add_submodule ()

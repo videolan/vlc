@@ -142,7 +142,6 @@ static int Open(filter_t *filter)
 
 vlc_module_begin()
     set_description(N_("VDPAU deinterlacing filter"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_deinterlace_callback(Open)
 vlc_module_end()

@@ -166,7 +166,6 @@ vlc_module_begin ()
     set_description(N_("SDI stream output"))
     set_capability("sout output", 0)
     add_shortcut("sdiout")
-    set_category(CAT_SOUT)
     set_subcategory(SUBCAT_SOUT_STREAM)
     set_callbacks(OpenSDIOutput, CloseSDIOutput)
 

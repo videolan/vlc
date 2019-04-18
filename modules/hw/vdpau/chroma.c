@@ -934,7 +934,6 @@ static const char *const algo_names[] = {
 vlc_module_begin()
     set_shortname(N_("VDPAU"))
     set_description(N_("VDPAU surface conversions"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_callback_video_converter(OutputOpen, 10)
 

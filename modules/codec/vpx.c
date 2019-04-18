@@ -67,7 +67,6 @@ vlc_module_begin ()
     set_description(N_("WebM video decoder"))
     set_capability("video decoder", 60)
     set_callbacks(OpenDecoder, CloseDecoder)
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
 #ifdef ENABLE_SOUT
     add_submodule()

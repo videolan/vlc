@@ -59,7 +59,6 @@ vlc_module_begin()
     set_description(N_("Video memory output"))
     set_shortname(N_("Video memory"))
 
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
     add_integer("vmem-width", 320, T_WIDTH, LT_WIDTH)

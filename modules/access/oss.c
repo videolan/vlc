@@ -74,7 +74,6 @@ static void DemuxClose( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( N_("OSS") )
     set_description( N_("OSS input") )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_shortcut( "oss" )

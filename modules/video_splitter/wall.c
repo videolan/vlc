@@ -61,7 +61,6 @@ vlc_module_begin()
     set_description( N_("Wall video filter") )
     set_shortname( N_("Image wall" ))
     set_capability( "video splitter", 0 )
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SPLITTER )
 
     add_integer( CFG_PREFIX "cols", 3, COLS_TEXT, COLS_LONGTEXT )

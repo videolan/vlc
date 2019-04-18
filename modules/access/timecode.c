@@ -41,7 +41,6 @@ static const char *const fps_texts[] = { "24", "25", "29.97", "30" };
 vlc_module_begin ()
     set_shortname (N_("Time code"))
     set_description (N_("Time code subpicture elementary stream generator"))
-    set_category (CAT_INPUT)
     set_subcategory (SUBCAT_INPUT_ACCESS)
     set_capability ("access", 0)
     set_callback(Open)

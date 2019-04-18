@@ -231,7 +231,6 @@ static const char *const verbosity_text[] = { N_("Default"), N_("Info"), N_("Err
 vlc_module_begin()
     set_shortname(N_("Logger"))
     set_description(N_("File logger"))
-    set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
     set_capability("logger", 15)
     set_callback(Open)

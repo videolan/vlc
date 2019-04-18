@@ -43,7 +43,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture);
 vlc_module_begin ()
     set_description( N_("FPS conversion video filter") )
     set_shortname( N_("FPS Converter" ))
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_shortcut( "fps" )

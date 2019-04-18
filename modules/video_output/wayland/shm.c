@@ -359,7 +359,6 @@ error:
 vlc_module_begin()
     set_shortname(N_("WL SHM"))
     set_description(N_("Wayland shared memory video output"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_callback_display(Open, 170)
     add_shortcut("wl")

@@ -106,7 +106,6 @@ static block_t *EncodeBlock(encoder_t *, picture_t *);
  * Module descriptor
  */
 vlc_module_begin()
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
     /* decoder main module */
     set_description(N_("JPEG image decoder"))

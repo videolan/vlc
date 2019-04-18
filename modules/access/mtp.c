@@ -55,7 +55,6 @@ static void Close( vlc_object_t * );
 vlc_module_begin()
     set_description( N_("MTP input") )
     set_shortname( N_("MTP") )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_capability( "access", 0 )
     add_shortcut( "mtp" )

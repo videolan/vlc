@@ -1129,7 +1129,6 @@ error:
 vlc_module_begin()
     set_shortname(N_("VAAPI filters"))
     set_description(N_("Video Accelerated API filters"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
 
     add_submodule()

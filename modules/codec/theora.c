@@ -109,7 +109,6 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
 #define ENC_POSTPROCESS_TEXT N_("Post processing quality")
 
 vlc_module_begin ()
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_shortname( "Theora" )
     set_description( N_("Theora video decoder") )

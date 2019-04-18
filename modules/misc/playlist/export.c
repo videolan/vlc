@@ -44,7 +44,6 @@ int xspf_export_playlist( vlc_object_t *p_intf );
  *****************************************************************************/
 vlc_module_begin ()
 
-    set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_EXPORT )
     add_submodule ()
         set_description( N_("M3U playlist export") )

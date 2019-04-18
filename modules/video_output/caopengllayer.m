@@ -53,7 +53,6 @@ static void Close(vout_display_t *vd);
 
 vlc_module_begin()
     set_description(N_("Core Animation OpenGL Layer (Mac OS X)"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_callback_display(Open, 0)
 

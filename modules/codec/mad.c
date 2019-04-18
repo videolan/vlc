@@ -72,7 +72,6 @@ typedef struct
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACODEC )
     set_description( N_("MPEG audio layer I/II/III decoder") )
     set_capability( "audio decoder", 99 )

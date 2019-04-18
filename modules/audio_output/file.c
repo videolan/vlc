@@ -111,7 +111,6 @@ static const int format_int[] = {
 vlc_module_begin ()
     set_description( N_("File audio output") )
     set_shortname( N_("File") )
-    set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
 
     add_savefile("audiofile-file", "audiofile.wav", FILE_TEXT, FILE_LONGTEXT)

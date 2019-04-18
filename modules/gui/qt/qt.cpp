@@ -290,7 +290,6 @@ static const char *const compositor_user[] = {
 vlc_module_begin ()
     set_shortname( "Qt" )
     set_description( N_("Qt interface") )
-    set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     set_capability( "interface", 151 )
     set_callbacks( OpenIntf, Close )

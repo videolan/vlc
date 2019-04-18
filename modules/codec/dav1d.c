@@ -62,7 +62,6 @@ vlc_module_begin ()
     set_description(N_("Dav1d video decoder"))
     set_capability("video decoder", 10000)
     set_callbacks(OpenDecoder, CloseDecoder)
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
 
     add_integer_with_range("dav1d-thread-frames", 0, 0, DAV1D_MAX_FRAME_THREADS,

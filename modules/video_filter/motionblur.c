@@ -59,7 +59,6 @@ VIDEO_FILTER_WRAPPER_CLOSE(Filter, Destroy)
 vlc_module_begin ()
     set_shortname( N_("Motion blur") )
     set_description( N_("Motion blur filter") )
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_integer_with_range( FILTER_PREFIX "factor", 80, 1, 127,

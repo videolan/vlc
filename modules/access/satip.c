@@ -68,7 +68,6 @@ vlc_module_begin()
     set_description( N_("SAT>IP Receiver Plugin") )
     set_capability("access", 201)
     set_callbacks(satip_open, satip_close)
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
     add_obsolete_integer("satip-buffer") /* obsolete since 4.0.0 */
     add_bool("satip-multicast", false, MULTICAST_TEXT, MULTICAST_LONGTEXT)

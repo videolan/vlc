@@ -78,7 +78,6 @@ vlc_module_begin ()
     set_description( N_("Mirror video filter") )
     set_shortname( N_("Mirror video" ))
     set_help( N_("Splits video in two same parts, like in a mirror") )
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     add_integer( CFG_PREFIX "split", 0, ORIENTATION_TEXT,
                 ORIENTATION_LONGTEXT )

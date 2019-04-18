@@ -57,7 +57,6 @@ vlc_module_begin()
     set_description(N_("Video transformation filter"))
     set_shortname(N_("Transformation"))
     set_help(N_("Rotate or flip the video"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
 
     add_string(CFG_PREFIX "type", "90", TYPE_TEXT, NULL)

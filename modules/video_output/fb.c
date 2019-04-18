@@ -77,7 +77,6 @@ static void Close(vout_display_t *vd);
 
 vlc_module_begin ()
     set_shortname("Framebuffer")
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_loadfile(FB_DEV_VAR, "/dev/fb0", DEVICE_TEXT, DEVICE_LONGTEXT)
     add_bool("fb-tty", true, TTY_TEXT, TTY_LONGTEXT)

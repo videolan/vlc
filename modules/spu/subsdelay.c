@@ -266,7 +266,6 @@ vlc_module_begin()
         set_description( N_("Subtitle delay") )
         set_help( SUBSDELAY_HELP )
         set_callback_sub_filter( SubsdelayCreate )
-        set_category( CAT_VIDEO )
         set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
         add_integer( CFG_MODE, 1, MODE_TEXT, MODE_LONGTEXT )

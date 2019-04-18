@@ -45,7 +45,6 @@ static int Open( vout_window_t *wnd );
 vlc_module_begin ()
     set_shortname( N_("OS/2 window"))
     set_description( N_("OS/2 non-embeded window video"))
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
     set_capability ("vout window", 30 )
     set_callback( Open )

@@ -84,7 +84,6 @@ static void Close( vlc_object_t * );
 vlc_module_begin()
     set_shortname( N_("RDP") )
     add_shortcut( "rdp" )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_description( N_("RDP Remote Desktop") )
     set_capability( "access", 0 )

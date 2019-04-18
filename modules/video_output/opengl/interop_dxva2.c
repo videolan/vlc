@@ -61,7 +61,6 @@ static void GLConvClose(vlc_object_t *);
 
 vlc_module_begin ()
     set_shortname("dxva2")
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_description("DXVA2 surface converter")
     set_capability("glinterop", 1)

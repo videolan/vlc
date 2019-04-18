@@ -66,7 +66,6 @@ vlc_module_begin ()
     set_description( N_("Posterize video filter") )
     set_shortname( N_("Posterize" ) )
     set_help( N_("Posterize video by lowering the number of colors") )
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     add_integer_with_range( CFG_PREFIX "level", 6, 2, 256,
                            POSTERIZE_LEVEL_TEXT, POSTERIZE_LEVEL_LONGTEXT )

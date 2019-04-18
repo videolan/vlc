@@ -161,7 +161,6 @@ static void player_timer_on_update(const struct vlc_player_timer_point *, void *
  *****************************************************************************/
 vlc_module_begin ()
     set_shortname( N_("DBus"))
-    set_category( CAT_INTERFACE )
     set_description( N_("D-Bus control interface") )
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )

@@ -61,7 +61,6 @@ static int DenoiseCallback( vlc_object_t *p_this, char const *psz_var,
 vlc_module_begin()
     set_shortname(N_("HQ Denoiser 3D"))
     set_description(N_("High Quality 3D Denoiser filter"))
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
 
     add_float_with_range(FILTER_PREFIX "luma-spat", 4.0, 0.0, 254.0,

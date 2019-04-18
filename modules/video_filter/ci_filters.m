@@ -779,7 +779,6 @@ OpenCustom(filter_t *filter)
     "Example: 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'")
 
 vlc_module_begin()
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_description(N_("Mac OS X hardware video filters"))
 

@@ -189,7 +189,6 @@ using namespace dshow;
 vlc_module_begin ()
     set_shortname( N_("DirectShow") )
     set_description( N_("DirectShow input") )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_string( "dshow-vdev", NULL, VDEV_TEXT, VDEV_LONGTEXT)
 

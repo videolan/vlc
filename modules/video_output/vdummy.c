@@ -49,7 +49,6 @@ vlc_module_begin ()
     set_callback_display( OpenDummy, 0 )
     add_shortcut( "dummy" )
 
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
     add_string( "dummy-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
 

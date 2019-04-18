@@ -72,7 +72,6 @@ static const char *const accessibility_list_text[] = {
 vlc_module_begin()
     set_shortname(N_("Keychain keystore"))
     set_description(N_("Keystore for iOS, macOS and tvOS"))
-    set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
     add_integer("keychain-synchronize", 1, SYNC_ITEMS_TEXT, SYNC_ITEMS_LONGTEXT)
     change_integer_list(sync_list, sync_list_text)

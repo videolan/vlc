@@ -84,7 +84,6 @@ static OMX_ERRORTYPE OmxFillBufferDone( OMX_HANDLETYPE, OMX_PTR,
 #define CFG_PREFIX "omxil-"
 vlc_module_begin ()
     set_description( N_("Audio/Video decoder (using OpenMAX IL)") )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_section( N_("Decoding") , NULL )
     set_capability( "video decoder", 80 )

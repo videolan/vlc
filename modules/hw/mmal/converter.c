@@ -64,7 +64,6 @@ static const char * const  ppsz_converter_text[] = {
 static int OpenConverter(filter_t *);
 
 vlc_module_begin()
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_shortname(N_("MMAL resizer"))
     set_description(N_("MMAL resizing conversion filter"))

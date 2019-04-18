@@ -56,7 +56,6 @@ static void Close    (filter_t *);
 
 vlc_module_begin ()
 
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_SUBPIC)
 
     set_callback_sub_source(OpenSub, 0)

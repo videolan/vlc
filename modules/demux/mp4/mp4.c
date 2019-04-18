@@ -61,7 +61,6 @@ static void Close( vlc_object_t * );
     "A negative value means an unlimited play time.")
 
 vlc_module_begin ()
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("MP4 stream demuxer") )
     set_shortname( N_("MP4") )
@@ -78,7 +77,6 @@ vlc_module_begin ()
     add_bool( CFG_PREFIX"editlist", true, MP4_ELST_TEXT, MP4_ELST_TEXT )
 
     add_submodule()
-        set_category( CAT_INPUT )
         set_subcategory( SUBCAT_INPUT_DEMUX )
         set_description( N_("HEIF demuxer") )
         set_shortname( "heif" )

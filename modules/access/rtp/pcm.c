@@ -301,7 +301,6 @@ static int rtp_pcm_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
 vlc_module_begin()
     set_shortname(N_("RTP PCM"))
     set_description(N_("RTP PCM payload parser"))
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_DEMUX)
     set_rtp_parser_callback(rtp_pcm_open)
     add_shortcut("audio/L8", "audio/L16", "audio/L20", "audio/L24",

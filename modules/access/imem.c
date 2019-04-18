@@ -116,7 +116,6 @@ static const char *cat_texts[] = {
 vlc_module_begin()
     set_shortname(N_("Memory input"))
     set_description(N_("Memory input"))
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
 
     add_string ("imem-get", "0", GET_TEXT, GET_LONGTEXT)

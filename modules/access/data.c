@@ -159,7 +159,6 @@ static void Close(vlc_object_t *obj)
 vlc_module_begin()
     set_shortname(N_("data"))
     set_description(N_("data URI scheme"))
-    set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
 
     set_capability("access", 0)

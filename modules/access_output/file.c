@@ -388,7 +388,6 @@ vlc_module_begin ()
     set_description( N_("File stream output") )
     set_shortname( N_("File" ))
     set_capability( "sout access", 50 )
-    set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
     add_shortcut( "file", "stream", "fd" )
     add_bool( SOUT_CFG_PREFIX "overwrite", true, OVERWRITE_TEXT,

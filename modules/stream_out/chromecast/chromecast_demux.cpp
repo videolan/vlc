@@ -491,7 +491,6 @@ void Close(vlc_object_t *p_this)
 
 vlc_module_begin ()
     set_shortname( "cc_demux" )
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_( "Chromecast demux wrapper" ) )
     set_capability( "demux_filter", 0 )

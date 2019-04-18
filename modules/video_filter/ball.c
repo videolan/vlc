@@ -124,7 +124,6 @@ vlc_module_begin ()
     set_description( N_("Ball video filter") )
     set_shortname( N_( "Ball" ))
     set_help(BALL_HELP)
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_string( FILTER_PREFIX "color", "red",

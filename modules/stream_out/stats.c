@@ -297,7 +297,6 @@ vlc_module_begin()
     set_description( N_("Writes statistic info about stream"))
     set_capability( "sout output", 0 )
     add_shortcut( "stats" )
-    set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
     set_callbacks( OutputOpen, Close )
     add_string( SOUT_CFG_PREFIX "output", "", OUTPUT_TEXT,OUTPUT_LONGTEXT );

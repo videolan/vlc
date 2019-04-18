@@ -77,7 +77,6 @@ static int vlc_sd_probe_Open( vlc_object_t * );
 vlc_module_begin ()
         set_shortname( N_("Lua") )
         set_description( N_("Lua interpreter") )
-        set_category( CAT_INTERFACE )
         set_subcategory( SUBCAT_INTERFACE_MAIN )
 
         add_bool( "lua", true, LUA_TEXT, NULL );
