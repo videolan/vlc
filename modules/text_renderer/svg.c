@@ -72,7 +72,7 @@ typedef struct
 
 vlc_module_begin ()
     set_category( CAT_INPUT )
-    set_category( SUBCAT_INPUT_SCODEC )
+    set_subcategory( SUBCAT_INPUT_SCODEC )
     set_capability( "text renderer", 99 )
     add_shortcut( "svg" )
     add_string( "svg-template-file", "", TEMPLATE_TEXT, TEMPLATE_LONGTEXT, true )
