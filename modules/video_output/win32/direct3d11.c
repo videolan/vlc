@@ -91,6 +91,7 @@ struct d3d11_local_swapchain
 {
     vlc_object_t           *obj;
 
+    HWND                   swapchainHwnd;
     IDXGISwapChain1        *dxgiswapChain;   /* DXGI 1.2 swap chain */
     IDXGISwapChain4        *dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
 
@@ -320,6 +321,13 @@ static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
 static int SetupWindowedOutput(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
+
+    if (sys->internal_swapchain.swapchainHwnd == NULL)
+    {
+        msg_Err(vd, "missing a HWND to create the swapchain");
+        return VLC_EGENERIC;
+    }
+
     DXGI_SWAP_CHAIN_DESC1 scd;
     HRESULT hr;
 
@@ -338,9 +346,6 @@ static int SetupWindowedOutput(vout_display_t *vd)
         return VLC_EGENERIC;
     }
 
-    if (sys->sys.hvideownd == 0)
-        return VLC_EGENERIC;
-
     FillSwapChainDesc(vd, &scd);
 
     IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
@@ -357,13 +362,15 @@ static int SetupWindowedOutput(vout_display_t *vd)
     }
 
     hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
-                                              sys->sys.hvideownd, &scd, NULL, NULL, &sys->internal_swapchain.dxgiswapChain);
+                                              sys->internal_swapchain.swapchainHwnd, &scd,
+                                              NULL, NULL, &sys->internal_swapchain.dxgiswapChain);
     if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
     {
         msg_Warn(vd, "10 bits swapchain failed, try 8 bits");
         scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
-                                                  sys->sys.hvideownd, &scd, NULL, NULL, &sys->internal_swapchain.dxgiswapChain);
+                                                  sys->internal_swapchain.swapchainHwnd, &scd,
+                                                  NULL, NULL, &sys->internal_swapchain.dxgiswapChain);
     }
     IDXGIFactory2_Release(dxgifactory);
     if (FAILED(hr)) {
@@ -462,6 +469,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
                        vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
             goto error;
+        sys->internal_swapchain.swapchainHwnd = sys->sys.hvideownd;
 #endif /* !VLC_WINSTORE_APP */
     }
 
