@@ -193,20 +193,24 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
             const module_config_t *p_item = p_config + i;
 
             if( p_item->i_type == CONFIG_CATEGORY )
-                i_category = p_item->value.i;
-            else if( p_item->i_type == CONFIG_SUBCATEGORY )
+                continue; /* ignore */
+
+            if( p_item->i_type == CONFIG_SUBCATEGORY )
+            {
                 i_subcategory = p_item->value.i;
+                i_category = vlc_config_cat_FromSubcat( i_subcategory );
+            }
 
             if( CONFIG_ITEM(p_item->i_type) )
                 b_options = true;
 
-            if( b_options && i_category != CAT_UNKNOWN && i_subcategory != SUBCAT_UNKNOWN )
+            if( b_options && i_category != CAT_UNKNOWN )
                 break;
         }
         module_config_free (p_config);
 
         /* Dummy item, please proceed */
-        if( !b_options || i_category == CAT_UNKNOWN || i_subcategory == SUBCAT_UNKNOWN )
+        if( !b_options || i_category == CAT_UNKNOWN )
             continue;
 
         // Locate the category item;

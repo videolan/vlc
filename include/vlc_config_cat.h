@@ -202,6 +202,7 @@ struct config_category_t
 struct config_subcategory_t
 {
     int         id;
+    int         cat;
     const char *name;
     const char *help;
 };
@@ -219,45 +220,47 @@ static const struct config_category_t categories_array[] =
 
 static const struct config_subcategory_t subcategories_array[] =
 {
-    { SUBCAT_INTERFACE_GENERAL, INTF_TITLE, INTF_GENERAL_HELP },
-    { SUBCAT_INTERFACE_MAIN, INTF_MAIN_TITLE, INTF_MAIN_HELP },
-    { SUBCAT_INTERFACE_CONTROL, INTF_CONTROL_TITLE, INTF_CONTROL_HELP },
-    { SUBCAT_INTERFACE_HOTKEYS, INTF_HOTKEYS_TITLE, INTF_HOTKEYS_HELP },
+    { SUBCAT_INTERFACE_GENERAL,    CAT_INTERFACE,  INTF_TITLE,           INTF_GENERAL_HELP  },
+    { SUBCAT_INTERFACE_MAIN,       CAT_INTERFACE,  INTF_MAIN_TITLE,      INTF_MAIN_HELP     },
+    { SUBCAT_INTERFACE_CONTROL,    CAT_INTERFACE,  INTF_CONTROL_TITLE,   INTF_CONTROL_HELP  },
+    { SUBCAT_INTERFACE_HOTKEYS,    CAT_INTERFACE,  INTF_HOTKEYS_TITLE,   INTF_HOTKEYS_HELP  },
 
-    { SUBCAT_AUDIO_GENERAL, AUDIO_TITLE, AUDIO_GENERAL_HELP },
-    { SUBCAT_AUDIO_AOUT, AOUT_TITLE, AOUT_HELP },
-    { SUBCAT_AUDIO_AFILTER, AFILTER_TITLE, AFILTER_HELP },
-    { SUBCAT_AUDIO_RESAMPLER, ARESAMPLER_TITLE, AFILTER_HELP },
-    { SUBCAT_AUDIO_VISUAL, AVISUAL_TITLE, AVISUAL_HELP },
+    { SUBCAT_AUDIO_GENERAL,        CAT_AUDIO,      AUDIO_TITLE,          AUDIO_GENERAL_HELP },
+    { SUBCAT_AUDIO_AOUT,           CAT_AUDIO,      AOUT_TITLE,           AOUT_HELP          },
+    { SUBCAT_AUDIO_AFILTER,        CAT_AUDIO,      AFILTER_TITLE,        AFILTER_HELP       },
+    { SUBCAT_AUDIO_RESAMPLER,      CAT_AUDIO,      ARESAMPLER_TITLE,     AFILTER_HELP       },
+    { SUBCAT_AUDIO_VISUAL,         CAT_AUDIO,      AVISUAL_TITLE,        AVISUAL_HELP       },
 
-    { SUBCAT_VIDEO_GENERAL, VIDEO_TITLE, VIDEO_GENERAL_HELP },
-    { SUBCAT_VIDEO_VOUT, _VOUT_TITLE, VOUT_HELP },
-    { SUBCAT_VIDEO_VFILTER, VFILTER_TITLE, VFILTER_HELP },
-    { SUBCAT_VIDEO_SUBPIC, SUBPIC_TITLE, SUBPIC_HELP },
-    { SUBCAT_VIDEO_SPLITTER, SPLITTER_TITLE, SPLITTER_HELP },
+    { SUBCAT_VIDEO_GENERAL,        CAT_VIDEO,      VIDEO_TITLE,          VIDEO_GENERAL_HELP },
+    { SUBCAT_VIDEO_VOUT,           CAT_VIDEO,      _VOUT_TITLE,          VOUT_HELP          },
+    { SUBCAT_VIDEO_VFILTER,        CAT_VIDEO,      VFILTER_TITLE,        VFILTER_HELP       },
+    { SUBCAT_VIDEO_SUBPIC,         CAT_VIDEO,      SUBPIC_TITLE,         SUBPIC_HELP        },
+    { SUBCAT_VIDEO_SPLITTER,       CAT_VIDEO,      SPLITTER_TITLE,       SPLITTER_HELP      },
 
-    { SUBCAT_INPUT_GENERAL, INPUT_TITLE, INPUT_HELP },
-    { SUBCAT_INPUT_ACCESS, ACCESS_TITLE, ACCESS_HELP },
-    { SUBCAT_INPUT_DEMUX, DEMUX_TITLE, DEMUX_HELP },
-    { SUBCAT_INPUT_VCODEC, VDEC_TITLE, VDEC_HELP },
-    { SUBCAT_INPUT_ACODEC, ADEC_TITLE, ADEC_HELP },
-    { SUBCAT_INPUT_SCODEC, SDEC_TITLE, SDEC_HELP },
-    { SUBCAT_INPUT_STREAM_FILTER, STREAM_FILTER_TITLE, STREAM_FILTER_HELP },
+    { SUBCAT_INPUT_GENERAL,        CAT_INPUT,      INPUT_TITLE,          INPUT_HELP         },
+    { SUBCAT_INPUT_ACCESS,         CAT_INPUT,      ACCESS_TITLE,         ACCESS_HELP        },
+    { SUBCAT_INPUT_DEMUX,          CAT_INPUT,      DEMUX_TITLE,          DEMUX_HELP         },
+    { SUBCAT_INPUT_VCODEC,         CAT_INPUT,      VDEC_TITLE,           VDEC_HELP          },
+    { SUBCAT_INPUT_ACODEC,         CAT_INPUT,      ADEC_TITLE,           ADEC_HELP          },
+    { SUBCAT_INPUT_SCODEC,         CAT_INPUT,      SDEC_TITLE,           SDEC_HELP          },
+    { SUBCAT_INPUT_STREAM_FILTER,  CAT_INPUT,      STREAM_FILTER_TITLE,  STREAM_FILTER_HELP },
 
-    { SUBCAT_SOUT_GENERAL, SOUT_TITLE, SOUT_GENERAL_HELP },
-    { SUBCAT_SOUT_STREAM, SOUT_STREAM_TITLE, SOUT_STREAM_HELP },
-    { SUBCAT_SOUT_MUX, SOUT_MUX_TITLE, SOUT_MUX_HELP },
-    { SUBCAT_SOUT_ACO, SOUT_ACO_TITLE, SOUT_ACO_HELP },
-    { SUBCAT_SOUT_PACKETIZER, SOUT_PACKET_TITLE, SOUT_PACKET_HELP },
-    { SUBCAT_SOUT_RENDERER, SOUT_RENDER_TITLE, SOUT_RENDER_HELP },
-    { SUBCAT_SOUT_VOD, SOUT_VOD_TITLE, SOUT_VOD_HELP },
+    { SUBCAT_SOUT_GENERAL,         CAT_SOUT,       SOUT_TITLE,           SOUT_GENERAL_HELP  },
+    { SUBCAT_SOUT_STREAM,          CAT_SOUT,       SOUT_STREAM_TITLE,    SOUT_STREAM_HELP   },
+    { SUBCAT_SOUT_MUX,             CAT_SOUT,       SOUT_MUX_TITLE,       SOUT_MUX_HELP      },
+    { SUBCAT_SOUT_ACO,             CAT_SOUT,       SOUT_ACO_TITLE,       SOUT_ACO_HELP      },
+    { SUBCAT_SOUT_PACKETIZER,      CAT_SOUT,       SOUT_PACKET_TITLE,    SOUT_PACKET_HELP   },
+    { SUBCAT_SOUT_RENDERER,        CAT_SOUT,       SOUT_RENDER_TITLE,    SOUT_RENDER_HELP   },
+    { SUBCAT_SOUT_VOD,             CAT_SOUT,       SOUT_VOD_TITLE,       SOUT_VOD_HELP      },
 
-    { SUBCAT_PLAYLIST_GENERAL, PLAYLIST_TITLE, PGENERAL_HELP },
-    { SUBCAT_PLAYLIST_EXPORT, PEXPORT_TITLE, PEXPORT_HELP },
-    { SUBCAT_PLAYLIST_SD, SD_TITLE, SD_HELP },
+    { SUBCAT_PLAYLIST_GENERAL,     CAT_PLAYLIST,   PLAYLIST_TITLE,       PGENERAL_HELP      },
+    { SUBCAT_PLAYLIST_EXPORT,      CAT_PLAYLIST,   PEXPORT_TITLE,        PEXPORT_HELP       },
+    { SUBCAT_PLAYLIST_SD,          CAT_PLAYLIST,   SD_TITLE,             SD_HELP            },
 
-    { SUBCAT_ADVANCED_MISC, MISC_TITLE, AADVANCED_HELP },
-    { SUBCAT_ADVANCED_NETWORK, ANETWORK_TITLE, ANETWORK_HELP },
+    { SUBCAT_ADVANCED_MISC,        CAT_ADVANCED,   MISC_TITLE,           AADVANCED_HELP     },
+    { SUBCAT_ADVANCED_NETWORK,     CAT_ADVANCED,   ANETWORK_TITLE,       ANETWORK_HELP      },
+
+    { SUBCAT_HIDDEN,               CAT_HIDDEN,     NULL,                 NULL               },
 };
 
 /** Get the table index for the given category entry. */
@@ -322,6 +325,14 @@ static inline const char *vlc_config_subcat_GetHelp( int subcat )
 {
     int i = vlc_config_subcat_IndexOf( subcat );
     return (i != -1) ? vlc_gettext(subcategories_array[i].help) : NULL;
+}
+
+/** Get the parent category for the given subcategory. */
+VLC_USED
+static inline int vlc_config_cat_FromSubcat( int subcat )
+{
+    int i = vlc_config_subcat_IndexOf( subcat );
+    return (i != -1) ? subcategories_array[i].cat : CAT_UNKNOWN;
 }
 
 /** Check if the given subcategory is a "general" one.
