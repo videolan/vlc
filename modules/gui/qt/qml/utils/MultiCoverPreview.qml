@@ -62,6 +62,7 @@ Item {
                 Layout.fillWidth: true
                 source: albums.get(index).cover || VLCStyle.noArtCover
                 fillMode: Image.PreserveAspectCrop
+                sourceSize: Qt.size(width, height)
             }
         }
     }
