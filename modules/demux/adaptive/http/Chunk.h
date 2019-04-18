@@ -74,11 +74,11 @@ namespace adaptive
 
                 virtual block_t *   readBlock       ();
                 virtual block_t *   read            (size_t);
-                virtual void        onDownload      (block_t **) = 0;
 
             protected:
                 AbstractChunk(AbstractChunkSource *);
                 AbstractChunkSource *source;
+                virtual void        onDownload      (block_t **) = 0;
 
             private:
                 size_t              bytesRead;
@@ -152,6 +152,7 @@ namespace adaptive
                           const ID &, bool = false);
                 virtual ~HTTPChunk();
 
+            protected:
                 virtual void        onDownload      (block_t **) {} /* impl */
         };
     }
