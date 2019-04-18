@@ -87,6 +87,16 @@ vlc_module_begin ()
     set_callbacks(Open, Close)
 vlc_module_end ()
 
+struct d3d11_local_swapchain
+{
+    vlc_object_t           *obj;
+
+    IDXGISwapChain1        *dxgiswapChain;   /* DXGI 1.2 swap chain */
+    IDXGISwapChain4        *dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
+
+    ID3D11RenderTargetView *swapchainTargetView[D3D11_MAX_RENDER_TARGET];
+};
+
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
@@ -98,8 +108,6 @@ struct vout_display_sys_t
     display_info_t           display;
 
     d3d11_handle_t           hd3d;
-    IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.2 swap chain */
-    IDXGISwapChain4          *dxgiswapChain4;  /* DXGI 1.5 for HDR */
     d3d11_device_t           d3d_dev;
     d3d_quad_t               picQuad;
 
@@ -108,7 +116,7 @@ struct vout_display_sys_t
     picture_sys_t            stagingSys;
     picture_pool_t           *pool; /* hardware decoding pool */
 
-    ID3D11RenderTargetView   *swapchainTargetView[D3D11_MAX_RENDER_TARGET];
+    struct d3d11_local_swapchain internal_swapchain; /* TODO do not access fields directly */
 
     d3d_vshader_t            projectionVShader;
     d3d_vshader_t            flatVShader;
@@ -203,9 +211,9 @@ static bool Resize(void *opaque, unsigned i_width, unsigned i_height)
 
     D3D11_TEXTURE2D_DESC dsc = { 0 };
 
-    if (sys->swapchainTargetView[0]) {
+    if (sys->internal_swapchain.swapchainTargetView[0]) {
         ID3D11Resource *res = NULL;
-        ID3D11RenderTargetView_GetResource(sys->swapchainTargetView[0], &res);
+        ID3D11RenderTargetView_GetResource(sys->internal_swapchain.swapchainTargetView[0], &res);
         if (res)
         {
             ID3D11Texture2D_GetDesc((ID3D11Texture2D*) res, &dsc);
@@ -216,37 +224,37 @@ static bool Resize(void *opaque, unsigned i_width, unsigned i_height)
     if (dsc.Width == i_width && dsc.Height == i_height)
         return true; /* nothing changed */
 
-    for (size_t i=0; i < ARRAY_SIZE(sys->swapchainTargetView); i++)
+    for (size_t i=0; i < ARRAY_SIZE(sys->internal_swapchain.swapchainTargetView); i++)
     {
-        if (sys->swapchainTargetView[i]) {
-            ID3D11RenderTargetView_Release(sys->swapchainTargetView[i]);
-            sys->swapchainTargetView[i] = NULL;
+        if (sys->internal_swapchain.swapchainTargetView[i]) {
+            ID3D11RenderTargetView_Release(sys->internal_swapchain.swapchainTargetView[i]);
+            sys->internal_swapchain.swapchainTargetView[i] = NULL;
         }
     }
 
     /* TODO detect is the size is the same as the output and switch to fullscreen mode */
-    hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 0, i_width, i_height,
+    hr = IDXGISwapChain_ResizeBuffers(sys->internal_swapchain.dxgiswapChain, 0, i_width, i_height,
         DXGI_FORMAT_UNKNOWN, 0);
     if (FAILED(hr)) {
        msg_Err(vd, "Failed to resize the backbuffer. (hr=0x%lX)", hr);
        return false;
     }
 
-    hr = IDXGISwapChain_GetBuffer(sys->dxgiswapChain, 0, &IID_ID3D11Texture2D, (LPVOID *)&pBackBuffer);
+    hr = IDXGISwapChain_GetBuffer(sys->internal_swapchain.dxgiswapChain, 0, &IID_ID3D11Texture2D, (LPVOID *)&pBackBuffer);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not get the backbuffer for the Swapchain. (hr=0x%lX)", hr);
        return false;
     }
 
     hr = D3D11_CreateRenderTargets( &sys->d3d_dev, (ID3D11Resource *)pBackBuffer,
-                                    sys->display.pixelFormat, sys->swapchainTargetView );
+                                    sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
     ID3D11Texture2D_Release(pBackBuffer);
     if (FAILED(hr)) {
         msg_Err(vd, "Failed to create the target view. (hr=0x%lX)", hr);
         return false;
     }
 
-    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
+    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
 
     return true;
 }
@@ -256,7 +264,7 @@ static bool StartRendering(void *opaque)
     vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
 
-    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
+    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
     return true;
 }
 
@@ -267,7 +275,7 @@ static void Swap(void *opaque)
 
     DXGI_PRESENT_PARAMETERS presentParams = { 0 };
 
-    HRESULT hr = IDXGISwapChain1_Present1(sys->dxgiswapChain, 0, 0, &presentParams);
+    HRESULT hr = IDXGISwapChain1_Present1(sys->internal_swapchain.dxgiswapChain, 0, 0, &presentParams);
     if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
     {
         /* TODO device lost */
@@ -349,13 +357,13 @@ static int SetupWindowedOutput(vout_display_t *vd)
     }
 
     hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
-                                              sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
+                                              sys->sys.hvideownd, &scd, NULL, NULL, &sys->internal_swapchain.dxgiswapChain);
     if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
     {
         msg_Warn(vd, "10 bits swapchain failed, try 8 bits");
         scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
-                                                  sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
+                                                  sys->sys.hvideownd, &scd, NULL, NULL, &sys->internal_swapchain.dxgiswapChain);
     }
     IDXGIFactory2_Release(dxgifactory);
     if (FAILED(hr)) {
@@ -363,7 +371,7 @@ static int SetupWindowedOutput(vout_display_t *vd)
        return VLC_EGENERIC;
     }
 
-    IDXGISwapChain_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain4, (void **)&sys->dxgiswapChain4);
+    IDXGISwapChain_QueryInterface( sys->internal_swapchain.dxgiswapChain, &IID_IDXGISwapChain4, (void **)&sys->internal_swapchain.dxgiswapChain4);
     return VLC_SUCCESS;
 }
 #endif /* !VLC_WINSTORE_APP */
@@ -379,8 +387,8 @@ static int SetupWindowLessOutput(vout_display_t *vd)
     if (!dxgiswapChain)
         return VLC_EGENERIC;
 
-    sys->dxgiswapChain = dxgiswapChain;
-    IDXGISwapChain_AddRef(sys->dxgiswapChain);
+    sys->internal_swapchain.dxgiswapChain = dxgiswapChain;
+    IDXGISwapChain_AddRef(sys->internal_swapchain.dxgiswapChain);
 
     if (FAILED(IDXGISwapChain1_GetDesc(dxgiswapChain, &scd)))
         return VLC_EGENERIC;
@@ -431,6 +439,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     bool uses_external_callbacks = true;
     if (!sys->swapCb || !sys->starRenderCb || !sys->endRenderCb || !sys->resizeCb)
     {
+        sys->internal_swapchain.obj = VLC_OBJECT(vd);
         sys->outside_opaque = vd;
         sys->swapCb       = Swap;
         sys->starRenderCb = StartRendering;
@@ -818,7 +827,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     {
         D3D11_UpdateQuadLuminanceScale(vd, &sys->d3d_dev, &sys->picQuad, GetFormatLuminance(VLC_OBJECT(vd), &picture->format) / (float)sys->display.luminance_peak);
 
-        if (sys->dxgiswapChain4)
+        if (sys->internal_swapchain.dxgiswapChain4)
         {
             DXGI_HDR_METADATA_HDR10 hdr10 = {0};
             hdr10.GreenPrimary[0] = picture->format.mastering.primaries[0];
@@ -833,7 +842,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
             hdr10.MaxContentLightLevel = picture->format.lighting.MaxCLL;
             hdr10.MaxFrameAverageLightLevel = picture->format.lighting.MaxFALL;
-            IDXGISwapChain4_SetHDRMetaData(sys->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
+            IDXGISwapChain4_SetHDRMetaData(sys->internal_swapchain.dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
         }
     }
 
@@ -847,7 +856,8 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     }
     D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad,
                      vd->source.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
-                     renderSrc, sys->swapchainTargetView);
+                     renderSrc,
+                     sys->internal_swapchain.swapchainTargetView); /* NULL with external rendering */
 
     if (subpicture) {
         // draw the additional vertices
@@ -856,7 +866,8 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             {
                 d3d_quad_t *quad = (d3d_quad_t *) sys->d3dregions[i]->p_sys;
                 D3D11_RenderQuad(&sys->d3d_dev, quad, &sys->flatVShader,
-                                 quad->picSys.renderSrc, sys->swapchainTargetView);
+                                 quad->picSys.renderSrc,
+                                 sys->internal_swapchain.swapchainTargetView); /* NULL with external rendering */
             }
         }
     }
@@ -887,10 +898,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     uint32_t i_width;
     uint32_t i_height;
     UINT dataSize = sizeof(i_width);
-    HRESULT hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, &i_width);
+    HRESULT hr = IDXGISwapChain_GetPrivateData(sys->internal_swapchain.dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, &i_width);
     if (SUCCEEDED(hr)) {
         dataSize = sizeof(i_height);
-        hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, &i_height);
+        hr = IDXGISwapChain_GetPrivateData(sys->internal_swapchain.dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, &i_height);
         if (SUCCEEDED(hr)) {
             if (i_width != sys->area.vdcfg.display.width || i_height != sys->area.vdcfg.display.height)
             {
@@ -988,7 +999,7 @@ static void D3D11SetColorSpace(vout_display_t *vd)
     if (sys->sys.event == NULL) /* TODO support external colourspace handling */
         goto done;
 
-    hr = IDXGISwapChain_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain3, (void **)&dxgiswapChain3);
+    hr = IDXGISwapChain_QueryInterface( sys->internal_swapchain.dxgiswapChain, &IID_IDXGISwapChain3, (void **)&dxgiswapChain3);
     if (FAILED(hr)) {
         msg_Warn(vd, "could not get a IDXGISwapChain3");
         goto done;
@@ -1033,7 +1044,7 @@ static void D3D11SetColorSpace(vout_display_t *vd)
 #ifdef HAVE_DXGI1_6_H
     IDXGIOutput *dxgiOutput = NULL;
 
-    if (SUCCEEDED(IDXGISwapChain_GetContainingOutput( sys->dxgiswapChain, &dxgiOutput )))
+    if (SUCCEEDED(IDXGISwapChain_GetContainingOutput( sys->internal_swapchain.dxgiswapChain, &dxgiOutput )))
     {
         IDXGIOutput6 *dxgiOutput6 = NULL;
         if (SUCCEEDED(IDXGIOutput_QueryInterface( dxgiOutput, &IID_IDXGIOutput6, (void **)&dxgiOutput6 )))
@@ -1312,15 +1323,16 @@ static void Direct3D11Close(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     Direct3D11DestroyResources(vd);
-    if (sys->dxgiswapChain4)
+
+    if (sys->internal_swapchain.dxgiswapChain4)
     {
-        IDXGISwapChain_Release(sys->dxgiswapChain4);
-        sys->dxgiswapChain4 = NULL;
+        IDXGISwapChain4_Release(sys->internal_swapchain.dxgiswapChain4);
+        sys->internal_swapchain.dxgiswapChain4 = NULL;
     }
-    if (sys->dxgiswapChain)
+    if (sys->internal_swapchain.dxgiswapChain)
     {
-        IDXGISwapChain_Release(sys->dxgiswapChain);
-        sys->dxgiswapChain = NULL;
+        IDXGISwapChain_Release(sys->internal_swapchain.dxgiswapChain);
+        sys->internal_swapchain.dxgiswapChain = NULL;
     }
 
     D3D11_ReleaseDevice( &sys->d3d_dev );
@@ -1607,11 +1619,11 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     D3D11_ReleaseVertexShader(&sys->projectionVShader);
 
     D3D11_ReleasePixelShader(&sys->regionQuad);
-    for (size_t i=0; i < ARRAY_SIZE(sys->swapchainTargetView); i++)
+    for (size_t i=0; i < ARRAY_SIZE(sys->internal_swapchain.swapchainTargetView); i++)
     {
-        if (sys->swapchainTargetView[i]) {
-            ID3D11RenderTargetView_Release(sys->swapchainTargetView[i]);
-            sys->swapchainTargetView[i] = NULL;
+        if (sys->internal_swapchain.swapchainTargetView[i]) {
+            ID3D11RenderTargetView_Release(sys->internal_swapchain.swapchainTargetView[i]);
+            sys->internal_swapchain.swapchainTargetView[i] = NULL;
         }
     }
     if (sys->prepareWait)
