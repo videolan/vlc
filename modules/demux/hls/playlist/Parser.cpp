@@ -24,6 +24,7 @@
 #include "Parser.hpp"
 #include "HLSSegment.hpp"
 #include "Representation.hpp"
+#include "../adaptive/SharedResources.hpp"
 #include "../adaptive/playlist/BasePeriod.h"
 #include "../adaptive/playlist/BaseAdaptationSet.h"
 #include "../adaptive/playlist/SegmentList.h"
@@ -45,9 +46,9 @@ using namespace adaptive;
 using namespace adaptive::playlist;
 using namespace hls::playlist;
 
-M3U8Parser::M3U8Parser( AuthStorage *auth_ )
+M3U8Parser::M3U8Parser(SharedResources *res)
 {
-    auth = auth_;
+    resources = res;
 }
 
 M3U8Parser::~M3U8Parser   ()
@@ -171,7 +172,8 @@ void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptation
 
 bool M3U8Parser::appendSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representation *rep)
 {
-    block_t *p_block = Retrieve::HTTP(p_obj, auth, rep->getPlaylistUrl().toString());
+    block_t *p_block = Retrieve::HTTP(p_obj, resources->getAuthStorage(),
+                                      rep->getPlaylistUrl().toString());
     if(p_block)
     {
         stream_t *substream = vlc_stream_MemoryNew(p_obj, p_block->p_buffer, p_block->i_buffer, true);
@@ -323,7 +325,8 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
 
                     M3U8 *m3u8 = dynamic_cast<M3U8 *>(rep->getPlaylist());
                     if(likely(m3u8))
-                        encryption.key = m3u8->getEncryptionKey(keyurl.toString());
+                        encryption.key = m3u8->getEncryptionKey(resources->getAuthStorage(),
+                                                                keyurl.toString());
                     if(keytag->getAttributeByName("IV"))
                     {
                         encryption.iv.clear();
@@ -395,7 +398,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
     }
     free(psz_line);
 
-    M3U8 *playlist = new (std::nothrow) M3U8(p_object, auth);
+    M3U8 *playlist = new (std::nothrow) M3U8(p_object);
     if(!playlist)
         return NULL;
 

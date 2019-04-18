@@ -136,16 +136,14 @@ bool Representation::needsUpdate() const
     return !b_loaded || (isLive() && nextUpdateTime < time(NULL));
 }
 
-bool Representation::runLocalUpdates(vlc_tick_t, uint64_t number, bool prune)
+bool Representation::runLocalUpdates(SharedResources *res,
+                                     vlc_tick_t, uint64_t number, bool prune)
 {
     const time_t now = time(NULL);
     AbstractPlaylist *playlist = getPlaylist();
     if(!b_loaded || (isLive() && nextUpdateTime < now))
     {
-        /* ugly hack */
-        M3U8 *m3u = dynamic_cast<M3U8 *>(playlist);
-        M3U8Parser parser((m3u) ? m3u->getAuth() : NULL);
-        /* !ugly hack */
+        M3U8Parser parser(res);
         parser.appendSegmentsFromPlaylistURI(playlist->getVLCObject(), this);
         b_loaded = true;
 

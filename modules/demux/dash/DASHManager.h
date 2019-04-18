@@ -45,7 +45,7 @@ namespace dash
     {
         public:
             DASHManager( demux_t *,
-                         AuthStorage *,
+                         SharedResources *,
                          mpd::MPD *mpd,
                          AbstractStreamFactory *,
                          logic::AbstractAdaptationLogic::LogicType type);

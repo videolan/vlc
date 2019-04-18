@@ -26,6 +26,7 @@
 
 #include "SmoothManager.hpp"
 
+#include "../adaptive/SharedResources.hpp"
 #include "../adaptive/tools/Retrieve.hpp"
 #include "playlist/Parser.hpp"
 #include "../adaptive/xml/DOMParser.h"
@@ -40,11 +41,11 @@ using namespace smooth;
 using namespace smooth::playlist;
 
 SmoothManager::SmoothManager(demux_t *demux_,
-                             AuthStorage *auth,
+                             SharedResources *res,
                              Manifest *playlist,
                        AbstractStreamFactory *factory,
                        AbstractAdaptationLogic::LogicType type) :
-             PlaylistManager(demux_, auth, playlist, factory, type)
+             PlaylistManager(demux_, res, playlist, factory, type)
 {
 }
 
@@ -56,7 +57,8 @@ Manifest * SmoothManager::fetchManifest()
 {
     std::string playlisturl(p_demux->psz_url);
 
-    block_t *p_block = Retrieve::HTTP(VLC_OBJECT(p_demux), authStorage, playlisturl);
+    block_t *p_block = Retrieve::HTTP(VLC_OBJECT(p_demux),
+                                      resources->getAuthStorage(), playlisturl);
     if(!p_block)
         return NULL;
 

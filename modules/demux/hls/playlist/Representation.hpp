@@ -50,7 +50,8 @@ namespace hls
                 virtual void scheduleNextUpdate(uint64_t); /* reimpl */
                 virtual bool needsUpdate() const;  /* reimpl */
                 virtual void debug(vlc_object_t *, int) const;  /* reimpl */
-                virtual bool runLocalUpdates(vlc_tick_t, uint64_t, bool); /* reimpl */
+                virtual bool runLocalUpdates(SharedResources *,
+                                             vlc_tick_t, uint64_t, bool); /* reimpl */
                 virtual uint64_t translateSegmentNumber(uint64_t, const SegmentInformation *) const; /* reimpl */
 
             private:

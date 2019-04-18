@@ -25,12 +25,12 @@
 
 #include "PlaylistManager.h"
 #include "SegmentTracker.hpp"
+#include "SharedResources.hpp"
 #include "playlist/AbstractPlaylist.hpp"
 #include "playlist/BasePeriod.h"
 #include "playlist/BaseAdaptationSet.h"
 #include "playlist/BaseRepresentation.h"
 #include "http/HTTPConnectionManager.h"
-#include "http/AuthStorage.hpp"
 #include "logic/AlwaysBestAdaptationLogic.h"
 #include "logic/RateBasedAdaptationLogic.h"
 #include "logic/AlwaysLowestAdaptationLogic.hpp"
@@ -49,7 +49,7 @@ using namespace adaptive::logic;
 using namespace adaptive;
 
 PlaylistManager::PlaylistManager( demux_t *p_demux_,
-                                  AuthStorage *auth,
+                                  SharedResources *res,
                                   AbstractPlaylist *pl,
                                   AbstractStreamFactory *factory,
                                   AbstractAdaptationLogic::LogicType type ) :
@@ -61,7 +61,7 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
              p_demux        ( p_demux_ )
 {
     currentPeriod = playlist->getFirstPeriod();
-    authStorage = auth;
+    resources = res;
     failedupdates = 0;
     b_thread = false;
     b_buffering = false;
@@ -86,7 +86,7 @@ PlaylistManager::~PlaylistManager   ()
     delete playlist;
     delete conManager;
     delete logic;
-    delete authStorage;
+    delete resources;
     vlc_cond_destroy(&waitcond);
     vlc_mutex_destroy(&lock);
     vlc_mutex_destroy(&demux.lock);
@@ -117,7 +117,7 @@ bool PlaylistManager::setupPeriod()
         BaseAdaptationSet *set = *it;
         if(set && streamFactory)
         {
-            SegmentTracker *tracker = new (std::nothrow) SegmentTracker(logic, set);
+            SegmentTracker *tracker = new SegmentTracker(resources, logic, set);
             if(!tracker)
                 continue;
 
@@ -156,7 +156,8 @@ bool PlaylistManager::start()
 {
     if(!conManager &&
        !(conManager =
-         new (std::nothrow) HTTPConnectionManager(VLC_OBJECT(p_demux->s), authStorage))
+         new (std::nothrow) HTTPConnectionManager(VLC_OBJECT(p_demux->s),
+                                                  resources->getAuthStorage()))
       )
         return false;
 

@@ -371,6 +371,8 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/PlaylistManager.h \
     demux/adaptive/SegmentTracker.cpp \
     demux/adaptive/SegmentTracker.hpp \
+    demux/adaptive/SharedResources.cpp \
+    demux/adaptive/SharedResources.hpp \
     demux/adaptive/StreamFormat.cpp \
     demux/adaptive/StreamFormat.hpp \
     demux/adaptive/Streams.cpp \

@@ -1,7 +1,7 @@
 /*
- * HLSManager.hpp
+ * SharedResources.h
  *****************************************************************************
- * Copyright © 2015 - VideoLAN and VLC authors
+ * Copyright © 2019 VideoLabs, VideoLAN and VLC Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,32 +17,30 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef HLSMANAGER_HPP
-#define HLSMANAGER_HPP
+#ifndef SHAREDRESOURCES_H_
+#define SHAREDRESOURCES_H_
 
-#include "../adaptive/PlaylistManager.h"
-#include "../adaptive/logic/AbstractAdaptationLogic.h"
-#include "playlist/M3U8.hpp"
+#include <vlc_common.h>
 
-namespace hls
+namespace adaptive
 {
-    using namespace adaptive;
+    namespace http
+    {
+        class AuthStorage;
+    }
 
-    class HLSManager : public PlaylistManager
+    using namespace http;
+
+    class SharedResources
     {
         public:
-            HLSManager( demux_t *,
-                        SharedResources *,
-                        playlist::M3U8 *,
-                        AbstractStreamFactory *,
-                        logic::AbstractAdaptationLogic::LogicType type );
-            virtual ~HLSManager();
-            static bool isHTTPLiveStreaming(stream_t *);
+            SharedResources(vlc_object_t *);
+            ~SharedResources();
+            AuthStorage *getAuthStorage();
 
-        protected:
-            virtual vlc_tick_t getFirstPlaybackTime() const;
+        private:
+            AuthStorage *authStorage;
     };
-
 }
 
-#endif // HLSMANAGER_HPP
+#endif

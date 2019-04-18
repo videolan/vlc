@@ -83,7 +83,8 @@ bool BaseRepresentation::needsUpdate() const
     return false;
 }
 
-bool BaseRepresentation::runLocalUpdates(vlc_tick_t, uint64_t, bool)
+bool BaseRepresentation::runLocalUpdates(SharedResources *,
+                                         vlc_tick_t, uint64_t, bool)
 {
     return false;
 }

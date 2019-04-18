@@ -76,8 +76,10 @@ SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, vlc_tick_t duration)
     u.segment.id = &id;
 }
 
-SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSet *adaptSet)
+SegmentTracker::SegmentTracker(SharedResources *res,
+        AbstractAdaptationLogic *logic_, BaseAdaptationSet *adaptSet)
 {
+    resources = res;
     first = true;
     curNumber = next = 0;
     initializing = true;
@@ -109,7 +111,7 @@ StreamFormat SegmentTracker::getCurrentFormat() const
     {
         /* Ensure ephemere content is updated/loaded */
         if(rep->needsUpdate())
-            (void) rep->runLocalUpdates(0, curNumber, false);
+            (void) rep->runLocalUpdates(resources, 0, curNumber, false);
         return rep->getStreamFormat();
     }
     return StreamFormat();
@@ -176,7 +178,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     bool b_updated = false;
     /* Ensure ephemere content is updated/loaded */
     if(rep->needsUpdate())
-        b_updated = rep->runLocalUpdates(getPlaybackTime(), curNumber, false);
+        b_updated = rep->runLocalUpdates(resources, getPlaybackTime(), curNumber, false);
 
     if(prevRep && !rep->consistentSegmentNumber())
     {
@@ -351,7 +353,7 @@ void SegmentTracker::updateSelected()
 {
     if(curRepresentation && curRepresentation->needsUpdate())
     {
-        curRepresentation->runLocalUpdates(getPlaybackTime(), curNumber, true);
+        curRepresentation->runLocalUpdates(resources, getPlaybackTime(), curNumber, true);
         curRepresentation->scheduleNextUpdate(curNumber);
     }
 }
