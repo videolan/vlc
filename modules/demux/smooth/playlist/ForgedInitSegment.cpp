@@ -35,6 +35,7 @@ extern "C"
     #include "../../demux/mp4/libmp4.h" /* majors */
 }
 
+using namespace adaptive;
 using namespace adaptive::playlist;
 using namespace smooth::playlist;
 using namespace smooth::http;
@@ -304,7 +305,8 @@ block_t * ForgedInitSegment::buildMoovBox()
     return moov;
 }
 
-SegmentChunk* ForgedInitSegment::toChunk(size_t, BaseRepresentation *rep, AbstractConnectionManager *)
+SegmentChunk* ForgedInitSegment::toChunk(SharedResources *, AbstractConnectionManager *,
+                                         size_t, BaseRepresentation *rep)
 {
     block_t *moov = buildMoovBox();
     if(moov)

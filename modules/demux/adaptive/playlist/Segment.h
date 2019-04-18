@@ -35,6 +35,8 @@
 
 namespace adaptive
 {
+    class SharedResources;
+
     namespace http
     {
         class AbstractConnectionManager;
@@ -58,7 +60,8 @@ namespace adaptive
                  *          That is basically true when using an Url, and false
                  *          when using an UrlTemplate
                  */
-                virtual SegmentChunk*                   toChunk         (size_t, BaseRepresentation *, AbstractConnectionManager *);
+                virtual SegmentChunk*                   toChunk         (SharedResources *, AbstractConnectionManager *,
+                                                                         size_t, BaseRepresentation *);
                 virtual void                            setByteRange    (size_t start, size_t end);
                 virtual void                            setSequenceNumber(uint64_t);
                 virtual uint64_t                        getSequenceNumber() const;
