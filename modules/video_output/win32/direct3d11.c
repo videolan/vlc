@@ -278,17 +278,6 @@ static bool StartRendering(void *opaque)
     vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
 
-#if VLC_WINSTORE_APP
-    /* TODO read the swapchain size and call VOUT_DISPLAY_CHANGE_DISPLAY_SIZE */
-    UpdateRects(VLC_OBJECT(vd), &sys->area, &sys->sys);
-#endif
-
-    if ( sys->area.place_changed )
-    {
-        UpdateSize(vd);
-        sys->area.place_changed =false;
-    }
-
     D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
     return true;
 }
@@ -919,6 +908,16 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     vout_display_sys_t *sys = vd->sys;
 
     VLC_UNUSED(date);
+#if VLC_WINSTORE_APP
+    /* TODO read the swapchain size and call VOUT_DISPLAY_CHANGE_DISPLAY_SIZE */
+    UpdateRects(VLC_OBJECT(vd), &sys->area, &sys->sys);
+#endif
+
+    if ( sys->area.place_changed )
+    {
+        UpdateSize(vd);
+        sys->area.place_changed =false;
+    }
 
     if (sys->starRenderCb(sys->outside_opaque))
     {
