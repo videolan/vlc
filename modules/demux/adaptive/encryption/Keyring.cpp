@@ -53,6 +53,7 @@ KeyringKey Keyring::getKey(AuthStorage *auth, const std::string &uri)
     if(it == keys.end())
     {
         /* Pretty bad inside the lock */
+        msg_Dbg(obj, "Retrieving AES key %s", uri.c_str());
         block_t *p_block = Retrieve::HTTP(obj, auth, uri);
         if(p_block)
         {

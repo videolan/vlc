@@ -67,7 +67,22 @@ void ISegment::onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *)
 
 }
 
-SegmentChunk* ISegment::toChunk(SharedResources *, AbstractConnectionManager *connManager,
+bool ISegment::prepareChunk(SharedResources *res, SegmentChunk *chunk, BaseRepresentation *)
+{
+    if(encryption.method != CommonEncryption::Method::NONE)
+    {
+        CommonEncryptionSession *encryptionSession = new CommonEncryptionSession();
+        if(!encryptionSession->start(res, encryption))
+        {
+            delete encryptionSession;
+            return false;
+        }
+        chunk->setEncryptionSession(encryptionSession);
+    }
+    return true;
+}
+
+SegmentChunk* ISegment::toChunk(SharedResources *res, AbstractConnectionManager *connManager,
                                 size_t index, BaseRepresentation *rep)
 {
     const std::string url = getUrlSegment().toString(index, rep);
@@ -79,8 +94,13 @@ SegmentChunk* ISegment::toChunk(SharedResources *, AbstractConnectionManager *co
             source->setBytesRange(BytesRange(startByte, endByte));
 
         SegmentChunk *chunk = new (std::nothrow) SegmentChunk(this, source, rep);
-        if( chunk )
+        if(chunk)
         {
+            if(!prepareChunk(res, chunk, rep))
+            {
+                delete chunk;
+                return NULL;
+            }
             connManager->start(source);
             return chunk;
         }
@@ -161,6 +181,11 @@ int ISegment::compare(ISegment *other) const
         return -1;
 
     return 0;
+}
+
+void ISegment::setEncryption(CommonEncryption &e)
+{
+    encryption = e;
 }
 
 int ISegment::getClassId() const

@@ -27,10 +27,15 @@
 
 namespace adaptive
 {
+    namespace encryption
+    {
+        class CommonEncryptionSession;
+    }
 
     namespace playlist
     {
         using namespace http;
+        using namespace encryption;
 
         class BaseRepresentation;
         class ISegment;
@@ -40,13 +45,16 @@ namespace adaptive
         public:
             SegmentChunk(ISegment *segment, AbstractChunkSource *, BaseRepresentation *);
             virtual ~SegmentChunk();
+            void         setEncryptionSession(CommonEncryptionSession *);
             StreamFormat getStreamFormat() const;
             bool discontinuity;
 
         protected:
+            bool         decrypt(block_t **);
             virtual void onDownload(block_t **); // reimpl
             ISegment *segment;
             BaseRepresentation *rep;
+            CommonEncryptionSession *encryptionSession;
         };
 
     }
