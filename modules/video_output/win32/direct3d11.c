@@ -285,15 +285,15 @@ static void Swap(void *opaque)
 }
 
 #if !VLC_WINSTORE_APP
-static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
+static void FillSwapChainDesc(vout_display_t *vd, UINT width, UINT height, DXGI_SWAP_CHAIN_DESC1 *out)
 {
     ZeroMemory(out, sizeof(*out));
     out->BufferCount = 3;
     out->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     out->SampleDesc.Count = 1;
     out->SampleDesc.Quality = 0;
-    out->Width = vd->source.i_visible_width;
-    out->Height = vd->source.i_visible_height;
+    out->Width = width;
+    out->Height = height;
     out->Format = vd->sys->display.pixelFormat->formatTexture;
     //out->Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
 
@@ -318,7 +318,7 @@ static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
     }
 }
 
-static int SetupWindowedOutput(vout_display_t *vd)
+static int SetupWindowedOutput(vout_display_t *vd, UINT width, UINT height)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -346,7 +346,7 @@ static int SetupWindowedOutput(vout_display_t *vd)
         return VLC_EGENERIC;
     }
 
-    FillSwapChainDesc(vd, &scd);
+    FillSwapChainDesc(vd, width, height, &scd);
 
     IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
     if (unlikely(dxgiadapter==NULL)) {
@@ -1183,7 +1183,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
         ret = SetupWindowLessOutput(vd);
 #if !VLC_WINSTORE_APP
     else
-        ret = SetupWindowedOutput(vd);
+        ret = SetupWindowedOutput(vd, sys->area.vdcfg.display.width, sys->area.vdcfg.display.height);
 #endif /* !VLC_WINSTORE_APP */
     if (ret != VLC_SUCCESS)
         return ret;
