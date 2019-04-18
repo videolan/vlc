@@ -33,7 +33,7 @@ ListView {
         cover: Image {
             id: cover_obj
             fillMode: Image.PreserveAspectFit
-            source: model.cover || VLCStyle.noArtCover
+            source: model.cover || VLCStyle.noArtArtist
         }
         line1: model.name || qsTr("Unknown artist")
 

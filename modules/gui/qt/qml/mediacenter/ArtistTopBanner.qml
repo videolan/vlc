@@ -35,7 +35,7 @@ Rectangle {
 
     Image {
         id: artistImage
-        source: artist.cover || VLCStyle.noArtCover
+        source: artist.cover || VLCStyle.noArtArtist
         fillMode: Image.PreserveAspectCrop
         height: VLCStyle.cover_small
         width: VLCStyle.cover_small

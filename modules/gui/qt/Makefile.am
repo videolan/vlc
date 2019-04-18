@@ -406,6 +406,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/noart-64.png \
 	gui/qt/pixmaps/noart.png \
 	gui/qt/pixmaps/noart_album.svg \
+	gui/qt/pixmaps/noart_artist.svg \
 	gui/qt/pixmaps/pause.svg \
 	gui/qt/pixmaps/play.svg \
 	gui/qt/pixmaps/playlist/add.svg \

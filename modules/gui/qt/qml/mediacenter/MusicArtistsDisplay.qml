@@ -58,7 +58,7 @@ Utils.NavigableFocusScope {
                 cover: Image {
                     id: cover_obj
                     fillMode: Image.PreserveAspectFit
-                    source: model.cover || VLCStyle.noArtCover
+                    source: model.cover || VLCStyle.noArtArtist
                 }
                 line1: model.name || qsTr("Unknown artist")
 
@@ -88,7 +88,6 @@ Utils.NavigableFocusScope {
                 Package.name: "grid"
                 id: gridItem
 
-                image: VLCStyle.noArtCover
                 title: model.name || "Unknown Artist"
                 selected: element.DelegateModel.inSelected
 
@@ -127,6 +126,7 @@ Utils.NavigableFocusScope {
                 }
                 Component.onCompleted: {
                     multicover.grabToImage(function(result) {
+                        gridItem.sourceSize = undefined
                         gridItem.image = result.url
                         //multicover.destroy()
                     })
