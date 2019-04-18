@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-01-08 22:07+0100\n"
+"PO-Revision-Date: 2019-04-18 18:06+0200\n"
 "Last-Translator: picodotdev <pico.dev@gmail.com>, 2019\n"
 "Language-Team: Spanish (https://www.transifex.com/yaron/teams/16553/es/)\n"
 "Language: es\n"
@@ -1329,7 +1329,7 @@ msgstr "Álbum"
 
 #: src/input/meta.c:60
 msgid "Track number"
-msgstr "Nº de pista"
+msgstr "Número de pista"
 
 #: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
@@ -9974,7 +9974,7 @@ msgstr "Defina el tiempo de ataque en milisegundos."
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
-msgstr "Tiempo de liberación"
+msgstr "Tiempo de publicación"
 
 #: modules/audio_filter/compressor.c:162
 msgid "Set the release time in milliseconds."
@@ -16680,7 +16680,7 @@ msgstr "Ataque"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:227
 #: modules/gui/qt/components/extended_panels.cpp:1297
 msgid "Release"
-msgstr "Liberación"
+msgstr "Publicación"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:228
 #: modules/gui/qt/components/extended_panels.cpp:1298
