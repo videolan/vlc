@@ -428,29 +428,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (ret != VLC_SUCCESS)
         return ret;
 
-    ID3D11DeviceContext *d3d11_ctx = NULL;
-#if VLC_WINSTORE_APP
-    if (d3d11_ctx == NULL)
-        d3d11_ctx = var_InheritInteger(vd, "winrt-d3dcontext");
-    if (d3d11_ctx == NULL)
-    {
-        msg_Err(vd, "missing direct3d context for winstore");
-        goto error;
-    }
-#endif
-    InitArea(vd, &sys->area, cfg);
-#if !VLC_WINSTORE_APP
-    if (d3d11_ctx == NULL)
-    {
-        if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
-                       vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
-            goto error;
-    }
-#endif /* !VLC_WINSTORE_APP */
-
-    if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
-        sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
-
+    bool uses_external_callbacks = true;
     if (!sys->swapCb || !sys->starRenderCb || !sys->endRenderCb || !sys->resizeCb)
     {
         sys->outside_opaque = vd;
@@ -458,7 +436,28 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->starRenderCb = StartRendering;
         sys->endRenderCb  = NULL;
         sys->resizeCb     = Resize;
+        uses_external_callbacks = false;
     }
+
+    InitArea(vd, &sys->area, cfg);
+    if ( !uses_external_callbacks )
+    {
+#if VLC_WINSTORE_APP
+        /* LEGACY, the d3dcontext and swapchain were given by the host app */
+        if (var_InheritInteger(vd, "winrt-d3dcontext") == 0)
+        {
+            msg_Err(vd, "missing direct3d context for winstore");
+            goto error;
+        }
+#else /* !VLC_WINSTORE_APP */
+        if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
+                       vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
+            goto error;
+#endif /* !VLC_WINSTORE_APP */
+    }
+
+    if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
+        sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
 
     if (Direct3D11Open(vd, fmtp)) {
         msg_Err(vd, "Direct3D11 could not be opened");
