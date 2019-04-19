@@ -193,6 +193,41 @@ bool M3U8Parser::appendSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representati
     return false;
 }
 
+static bool parseEncryption(const AttributesTag *keytag, const Url &playlistUrl,
+                            CommonEncryption &encryption)
+{
+    if( keytag->getAttributeByName("METHOD") &&
+        keytag->getAttributeByName("METHOD")->value == "AES-128" &&
+        keytag->getAttributeByName("URI") )
+    {
+        encryption.method = CommonEncryption::Method::AES_128;
+        encryption.uri.clear();
+
+        Url keyurl(keytag->getAttributeByName("URI")->quotedString());
+        if(!keyurl.hasScheme())
+        {
+            keyurl.prepend(Helper::getDirectoryPath(playlistUrl.toString()).append("/"));
+        }
+
+        encryption.uri = keyurl.toString();
+
+        if(keytag->getAttributeByName("IV"))
+        {
+            encryption.iv.clear();
+            encryption.iv = keytag->getAttributeByName("IV")->hexSequence();
+        }
+        return true;
+    }
+    else
+    {
+        /* unsupported or invalid */
+        encryption.method = CommonEncryption::Method::NONE;
+        encryption.uri.clear();
+        encryption.iv.clear();
+        return false;
+    }
+}
+
 void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::list<Tag *> &tagslist)
 {
     SegmentList *segmentList = new (std::nothrow) SegmentList(rep);
@@ -309,37 +344,8 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                 break;
 
             case AttributesTag::EXTXKEY:
-            {
-                const AttributesTag *keytag = static_cast<const AttributesTag *>(tag);
-                if( keytag->getAttributeByName("METHOD") &&
-                    keytag->getAttributeByName("METHOD")->value == "AES-128" &&
-                    keytag->getAttributeByName("URI") )
-                {
-                    encryption.method = CommonEncryption::Method::AES_128;
-                    encryption.uri.clear();
-
-                    Url keyurl(keytag->getAttributeByName("URI")->quotedString());
-                    if(!keyurl.hasScheme())
-                    {
-                        keyurl.prepend(Helper::getDirectoryPath(rep->getPlaylistUrl().toString()).append("/"));
-                    }
-
-                    encryption.uri = keyurl.toString();
-
-                    if(keytag->getAttributeByName("IV"))
-                    {
-                        encryption.iv.clear();
-                        encryption.iv = keytag->getAttributeByName("IV")->hexSequence();
-                    }
-                }
-                else
-                {
-                    /* unsupported or invalid */
-                    encryption.method = CommonEncryption::Method::NONE;
-                    encryption.uri.clear();
-                    encryption.iv.clear();
-                }
-            }
+                parseEncryption(static_cast<const AttributesTag *>(tag),
+                                rep->getPlaylistUrl(), encryption);
             break;
 
             case AttributesTag::EXTXMAP:
