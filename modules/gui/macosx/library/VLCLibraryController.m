@@ -41,7 +41,7 @@
     self = [super init];
     if (self) {
         _p_libraryInstance = vlc_ml_instance_get(getIntf());
-        _libraryModel = [[VLCLibraryModel alloc] init];
+        _libraryModel = [[VLCLibraryModel alloc] initWithLibrary:_p_libraryInstance];
 
         NSNotificationCenter *defaultNotificationCenter = [NSNotificationCenter defaultCenter];
         [defaultNotificationCenter addObserver:self

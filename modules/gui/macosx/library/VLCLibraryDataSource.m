@@ -23,20 +23,35 @@
 #import "VLCLibraryDataSource.h"
 
 #import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryModel.h"
+
+#import "extensions/NSString+Helpers.h"
 
 @implementation VLCLibraryDataSource
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return 2;
+    return [_libraryModel numberOfVideoMedia];
 }
 
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
     VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
 
-    viewItem.mediaTitleTextField.stringValue = @"Custom Cell Label Text";
-    viewItem.mediaImageView.image = [NSImage imageNamed: @"noart.png"];
+    NSArray *videoMedia = [_libraryModel listOfVideoMedia];
+    VLCMediaLibraryMediaItem *mediaItem = videoMedia[indexPath.item];
+
+    viewItem.mediaTitleTextField.stringValue = mediaItem.title;
+    viewItem.durationTextField.stringValue = [NSString stringWithTime:mediaItem.duration];
+
+    NSImage *image;
+    if (mediaItem.artworkGenerated) {
+        image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:mediaItem.artworkMRL]];
+    }
+    if (!image) {
+        image = [NSImage imageNamed: @"noart.png"];
+    }
+    viewItem.mediaImageView.image = image;
 
     return viewItem;
 }

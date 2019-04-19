@@ -28,8 +28,10 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistDataSource.h"
 
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataSource.h"
 #import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryModel.h"
 
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 #import "windows/video/VLCFSPanelController.h"
@@ -59,6 +61,10 @@ static const float f_playlist_row_height = 72.;
                            selector:@selector(shouldShowFullscreenController:)
                                name:VLCVideoWindowShouldShowFullscreenController
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateLibraryRepresentation:)
+                               name:VLCLibraryModelVideoMediaListUpdated
+                             object:nil];
 
     _fspanel = [[VLCFSPanelController alloc] init];
     [_fspanel showWindow:self];
@@ -71,7 +77,9 @@ static const float f_playlist_row_height = 72.;
     [_segmentedTitleControl setLabel:_NS("Network") forSegment:2];
     [_segmentedTitleControl sizeToFit];
 
-    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+    VLCMain *mainInstance = [VLCMain sharedInstance];
+
+    VLCPlaylistController *playlistController = [mainInstance playlistController];
     _playlistDataSource = [[VLCPlaylistDataSource alloc] init];
     _playlistDataSource.playlistController = playlistController;
     _playlistDataSource.tableView = _playlistTableView;
@@ -83,6 +91,7 @@ static const float f_playlist_row_height = 72.;
     [_playlistTableView reloadData];
 
     _libraryDataSource = [[VLCLibraryDataSource alloc] init];
+    _libraryDataSource.libraryModel = mainInstance.libraryController.libraryModel;
     _libraryCollectionView.dataSource = _libraryDataSource;
     _libraryCollectionView.delegate = _libraryDataSource;
     [_libraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
@@ -156,6 +165,12 @@ static const float f_playlist_row_height = 72.;
         [self showControlsBar];
         [_fspanel shouldBecomeInactive:nil];
     }
+}
+
+#pragma mark - library representation and interaction
+- (void)updateLibraryRepresentation:(NSNotification *)aNotification
+{
+    [_libraryCollectionView reloadData];
 }
 
 #pragma mark -
