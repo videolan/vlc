@@ -496,7 +496,7 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
     if( this->i_type == TYPE_CATEGORY )
         return false;
     else if( this->i_type == TYPE_MODULE )
-        p_module = module_find( this->psz_shortcut );
+        p_module = this->p_module;
     else
     {
         p_module = module_get_main();
