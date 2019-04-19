@@ -47,8 +47,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface VLCLibraryDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
-
-@end
-
 NS_ASSUME_NONNULL_END

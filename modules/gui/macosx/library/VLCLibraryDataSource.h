@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewItem.h: MacOS X interface module
+ * VLCLibraryDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -24,12 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString *VLCLibraryCellIdentifier;
-
-@interface VLCLibraryCollectionViewItem : NSCollectionViewItem
-
-@property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
-@property (readwrite, assign) IBOutlet NSImageView *mediaImageView;
+@interface VLCLibraryDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
 
 @end
 

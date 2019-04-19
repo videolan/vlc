@@ -22,12 +22,14 @@
 
 #import "VLCLibraryWindow.h"
 #import "extensions/NSString+Helpers.h"
-#import "library/VLCLibraryCollectionViewItem.h"
 #import "main/VLCMain.h"
 
 #import "playlist/VLCPlaylistTableCellView.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistDataSource.h"
+
+#import "library/VLCLibraryDataSource.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 #import "windows/video/VLCFSPanelController.h"
@@ -36,8 +38,6 @@
 static const float f_min_window_width = 604.;
 static const float f_min_window_height = 307.;
 static const float f_playlist_row_height = 72.;
-
-static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 
 @interface VLCLibraryWindow ()
 {
@@ -172,30 +172,6 @@ static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
         }
     }
 
-}
-
-@end
-
-@implementation VLCLibraryDataSource
-
-- (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
-    return 2;
-}
-
-- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
-{
-    VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
-
-    viewItem.mediaTitleTextField.stringValue = @"Custom Cell Label Text";
-    viewItem.mediaImageView.image = [NSImage imageNamed: @"noart.png"];
-
-    return viewItem;
-}
-
-- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
-{
-    NSLog(@"library selection changed: %@", indexPaths);
 }
 
 @end

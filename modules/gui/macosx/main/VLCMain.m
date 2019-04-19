@@ -62,6 +62,7 @@
 #import "panels/VLCVideoEffectsWindowController.h"
 #import "panels/VLCTrackSynchronizationWindowController.h"
 
+#import "library/VLCLibraryController.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistModel.h"
@@ -246,6 +247,7 @@ static VLCMain *sharedInstance = nil;
         _hotkeysController = [[VLCHotkeysController alloc] init];
 
         _playlistController = [[VLCPlaylistController alloc] initWithPlaylist:vlc_intf_GetMainPlaylist(p_intf)];
+        _libraryController = [[VLCLibraryController alloc] init];
         _continuityController = [[VLCPlaybackContinuityController alloc] init];
 
         // first initalize extensions dialog provider, then core dialog

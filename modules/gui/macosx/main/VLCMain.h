@@ -74,6 +74,7 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 @class VLCConvertAndSaveWindowController;
 @class VLCExtensionsManager;
 @class VLCStatusBarIcon;
+@class VLCLibraryController;
 @class VLCPlaylistController;
 @class VLCHotkeysController;
 
@@ -83,6 +84,7 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 @property (readonly) BOOL nativeFullscreenMode;
 @property (nonatomic, readwrite) BOOL playlistUpdatedSelectorInQueue;
 @property (readonly) VLCLibraryWindowController *libraryWindowController;
+@property (readonly) VLCLibraryController *libraryController;
 @property (readonly) VLCPlaylistController *playlistController;
 @property (readonly) VLCHotkeysController *hotkeysController;
 

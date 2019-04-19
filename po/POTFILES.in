@@ -464,6 +464,12 @@ modules/gui/macosx/extensions/misc.h
 modules/gui/macosx/extensions/misc.m
 modules/gui/macosx/library/VLCLibraryCollectionViewItem.h
 modules/gui/macosx/library/VLCLibraryCollectionViewItem.m
+modules/gui/macosx/library/VLCLibraryController.h
+modules/gui/macosx/library/VLCLibraryController.m
+modules/gui/macosx/library/VLCLibraryDataSource.h
+modules/gui/macosx/library/VLCLibraryDataSource.m
+modules/gui/macosx/library/VLCLibraryModel.h
+modules/gui/macosx/library/VLCLibraryModel.m
 modules/gui/macosx/library/VLCLibraryWindow.h
 modules/gui/macosx/library/VLCLibraryWindow.m
 modules/gui/macosx/main/CompatibilityFixes.h

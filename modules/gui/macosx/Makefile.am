@@ -46,6 +46,12 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/imported/SPMediaKeyTap/SPMediaKeyTap.m \
 	gui/macosx/library/VLCLibraryCollectionViewItem.h \
 	gui/macosx/library/VLCLibraryCollectionViewItem.m \
+	gui/macosx/library/VLCLibraryController.h \
+	gui/macosx/library/VLCLibraryController.m \
+	gui/macosx/library/VLCLibraryDataSource.h \
+	gui/macosx/library/VLCLibraryDataSource.m \
+	gui/macosx/library/VLCLibraryModel.h \
+	gui/macosx/library/VLCLibraryModel.m \
 	gui/macosx/library/VLCLibraryWindow.h \
 	gui/macosx/library/VLCLibraryWindow.m \
 	gui/macosx/main/CompatibilityFixes.h \

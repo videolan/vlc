@@ -22,6 +22,8 @@
 
 #import "VLCLibraryCollectionViewItem.h"
 
+NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
+
 @implementation VLCLibraryCollectionViewItem
 
 @end

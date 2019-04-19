@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewItem.h: MacOS X interface module
+ * VLCLibraryDataSource.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,17 +20,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "VLCLibraryDataSource.h"
 
-NS_ASSUME_NONNULL_BEGIN
+#import "library/VLCLibraryCollectionViewItem.h"
 
-extern NSString *VLCLibraryCellIdentifier;
+@implementation VLCLibraryDataSource
 
-@interface VLCLibraryCollectionViewItem : NSCollectionViewItem
+- (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
+    return 2;
+}
 
-@property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
-@property (readwrite, assign) IBOutlet NSImageView *mediaImageView;
+- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
+{
+    VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+
+    viewItem.mediaTitleTextField.stringValue = @"Custom Cell Label Text";
+    viewItem.mediaImageView.image = [NSImage imageNamed: @"noart.png"];
+
+    return viewItem;
+}
+
+- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+{
+    NSLog(@"library selection changed: %@", indexPaths);
+}
 
 @end
-
-NS_ASSUME_NONNULL_END
