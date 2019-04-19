@@ -116,6 +116,8 @@ struct d3d11_local_swapchain
     IDXGISwapChain4        *dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
 
     ID3D11RenderTargetView *swapchainTargetView[D3D11_MAX_RENDER_TARGET];
+
+    bool                   logged_capabilities;
 };
 
 struct vout_display_sys_t
@@ -461,6 +463,7 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const struct
         // the pixel format changed, we need a new swapchain
         IDXGISwapChain_Release(display->dxgiswapChain);
         display->dxgiswapChain = NULL;
+        display->logged_capabilities = false;
     }
 
     if ( display->dxgiswapChain == NULL )
@@ -1180,7 +1183,8 @@ static void SelectSwapchainColorspace(struct d3d11_local_swapchain *display, con
     {
         hr = IDXGISwapChain3_CheckColorSpaceSupport(dxgiswapChain3, color_spaces[i].dxgi, &support);
         if (SUCCEEDED(hr) && support) {
-            msg_Dbg(display->obj, "supports colorspace %s", color_spaces[i].name);
+            if (!display->logged_capabilities)
+                msg_Dbg(display->obj, "supports colorspace %s", color_spaces[i].name);
             score = 0;
             if (color_spaces[i].primaries == cfg->primaries)
                 score++;
@@ -1198,6 +1202,7 @@ static void SelectSwapchainColorspace(struct d3d11_local_swapchain *display, con
             }
         }
     }
+    display->logged_capabilities = true;
 
     if (best == -1)
     {
