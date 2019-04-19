@@ -22,6 +22,7 @@
 
 #include "ICanonicalUrl.hpp"
 #include "../tools/Properties.hpp"
+#include "../encryption/CommonEncryption.hpp"
 #include "SegmentInfoCommon.h"
 #include <vlc_common.h>
 #include <vector>
@@ -86,6 +87,8 @@ namespace adaptive
                 virtual void pruneBySegmentNumber(uint64_t);
                 virtual void pruneByPlaybackTime(mtime_t);
                 virtual uint64_t translateSegmentNumber(uint64_t, const SegmentInformation *) const;
+                void setEncryption(const CommonEncryption &);
+                const CommonEncryption & intheritEncryption() const;
 
             protected:
                 std::size_t getAllSegments(std::vector<ISegment *> &) const;
@@ -110,6 +113,7 @@ namespace adaptive
                 SegmentBase     *segmentBase;
                 SegmentList     *segmentList;
                 MediaSegmentTemplate *mediaSegmentTemplate;
+                CommonEncryption commonEncryption;
         };
     }
 }
