@@ -144,6 +144,19 @@ std::string ChunksSourceStream::getContentType()
     return source->getContentType();
 }
 
+size_t ChunksSourceStream::Peek(const uint8_t **pp, size_t sz)
+{
+    if(!b_eof && !p_block)
+    {
+        p_block = source->readNextBlock();
+        b_eof = !p_block;
+    }
+    if(!p_block)
+        return 0;
+    *pp = p_block->p_buffer;
+    return std::min(p_block->i_buffer, sz);
+}
+
 ssize_t ChunksSourceStream::Read(uint8_t *buf, size_t size)
 {
     size_t i_copied = 0;

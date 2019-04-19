@@ -35,6 +35,7 @@ namespace adaptive
             virtual ~AbstractSourceStream() {}
             virtual stream_t *makeStream() = 0;
             virtual void Reset() = 0;
+            virtual size_t Peek(const uint8_t **, size_t) = 0;
     };
 
     class AbstractChunksSourceStream : public AbstractSourceStream
@@ -70,6 +71,7 @@ namespace adaptive
         protected:
             virtual ssize_t Read(uint8_t *, size_t); /* impl */
             virtual int     Seek(uint64_t); /* impl */
+            virtual size_t  Peek(const uint8_t **, size_t); /* impl */
             virtual std::string getContentType(); /* impl */
 
         private:
