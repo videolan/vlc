@@ -33,6 +33,7 @@ namespace adaptive
         {
             public:
                 CommonEncryption();
+                void mergeWith(const CommonEncryption &);
                 enum Method
                 {
                     NONE,

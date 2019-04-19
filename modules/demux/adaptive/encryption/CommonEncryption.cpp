@@ -41,6 +41,17 @@ CommonEncryption::CommonEncryption()
     method = CommonEncryption::Method::NONE;
 }
 
+void CommonEncryption::mergeWith(const CommonEncryption &other)
+{
+    if(method == CommonEncryption::Method::NONE &&
+       other.method != CommonEncryption::Method::NONE)
+        method = other.method;
+    if(uri.empty() && !other.uri.empty())
+        uri = other.uri;
+    if(iv.empty() && !other.iv.empty())
+        iv = other.iv;
+}
+
 CommonEncryptionSession::CommonEncryptionSession()
 {
     ctx = NULL;

@@ -67,12 +67,15 @@ void ISegment::onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *)
 
 }
 
-bool ISegment::prepareChunk(SharedResources *res, SegmentChunk *chunk, BaseRepresentation *)
+bool ISegment::prepareChunk(SharedResources *res, SegmentChunk *chunk, BaseRepresentation *rep)
 {
-    if(encryption.method != CommonEncryption::Method::NONE)
+    CommonEncryption enc = encryption;
+    enc.mergeWith(rep->intheritEncryption());
+
+    if(enc.method != CommonEncryption::Method::NONE)
     {
         CommonEncryptionSession *encryptionSession = new CommonEncryptionSession();
-        if(!encryptionSession->start(res, encryption))
+        if(!encryptionSession->start(res, enc))
         {
             delete encryptionSession;
             return false;

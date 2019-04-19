@@ -30,6 +30,7 @@
 #include "SegmentTimeline.h"
 #include "AbstractPlaylist.hpp"
 #include "BaseRepresentation.h"
+#include "../encryption/CommonEncryption.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -508,6 +509,18 @@ uint64_t SegmentInformation::translateSegmentNumber(uint64_t num, const SegmentI
     if( from->getPlaybackTimeDurationBySegmentNumber(num, &time, &duration) )
         getSegmentNumberByTime(time, &num);
     return num;
+}
+
+const CommonEncryption & SegmentInformation::intheritEncryption() const
+{
+    if(parent && commonEncryption.method == CommonEncryption::Method::NONE)
+        return parent->intheritEncryption();
+    return commonEncryption;
+}
+
+void SegmentInformation::setEncryption(const CommonEncryption &enc)
+{
+    commonEncryption = enc;
 }
 
 vlc_tick_t SegmentInformation::getPeriodStart() const
