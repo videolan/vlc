@@ -68,6 +68,17 @@ static std::list<Tag *> getTagsFromList(std::list<Tag *> &list, int tag)
     return ret;
 }
 
+static Tag * getTagFromList(std::list<Tag *> &list, int tag)
+{
+    std::list<Tag *>::const_iterator it;
+    for(it = list.begin(); it != list.end(); ++it)
+    {
+        if( (*it)->getType() == tag )
+            return *it;
+    }
+    return NULL;
+}
+
 static void releaseTagsList(std::list<Tag *> &list)
 {
     std::list<Tag *>::const_iterator it;
@@ -388,6 +399,14 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
     {
         std::list<Tag *>::const_iterator it;
         std::map<std::string, AttributesTag *> groupsmap;
+
+        Tag *sessionKey = getTagFromList(tagslist, AttributesTag::EXTXSESSIONKEY);
+        if(sessionKey)
+        {
+            CommonEncryption sessionEncryption;
+            parseEncryption(static_cast<const AttributesTag *>(sessionKey),
+                            playlist->getUrlSegment(), sessionEncryption);
+        }
 
         /* We'll need to create an adaptation set for each media group / alternative rendering
          * we create a list of playlist being and alternative/group */
