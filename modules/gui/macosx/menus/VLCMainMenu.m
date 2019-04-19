@@ -1430,28 +1430,28 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)openDocumentation:(id)sender
 {
-    NSURL *url = [NSURL URLWithString: @"http://www.videolan.org/doc/"];
+    NSURL *url = [NSURL URLWithString: @"https://www.videolan.org/doc/"];
 
     [[NSWorkspace sharedWorkspace] openURL: url];
 }
 
 - (IBAction)openWebsite:(id)sender
 {
-    NSURL *url = [NSURL URLWithString: @"http://www.videolan.org/"];
+    NSURL *url = [NSURL URLWithString: @"https://www.videolan.org/"];
 
     [[NSWorkspace sharedWorkspace] openURL: url];
 }
 
 - (IBAction)openForum:(id)sender
 {
-    NSURL *url = [NSURL URLWithString: @"http://forum.videolan.org/"];
+    NSURL *url = [NSURL URLWithString: @"https://forum.videolan.org/"];
 
     [[NSWorkspace sharedWorkspace] openURL: url];
 }
 
 - (IBAction)openDonate:(id)sender
 {
-    NSURL *url = [NSURL URLWithString: @"http://www.videolan.org/contribute.html#paypal"];
+    NSURL *url = [NSURL URLWithString: @"https://www.videolan.org/contribute.html#paypal"];
 
     [[NSWorkspace sharedWorkspace] openURL: url];
 }

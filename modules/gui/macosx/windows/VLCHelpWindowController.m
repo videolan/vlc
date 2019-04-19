@@ -63,7 +63,7 @@
                                _NS(I_LONGHELP)];
 
     [[helpWebView mainFrame] loadHTMLString:htmlWithStyle
-                                    baseURL:[NSURL URLWithString:@"http://videolan.org"]];
+                                    baseURL:[NSURL URLWithString:@"https://videolan.org"]];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
