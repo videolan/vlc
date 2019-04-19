@@ -63,7 +63,7 @@
                                ((OSX_YOSEMITE_AND_HIGHER) ? @"Helvetica Neue" : @"Lucida Grande"), _NS(I_LONGHELP)];
 
     [[helpWebView mainFrame] loadHTMLString:htmlWithStyle
-                                    baseURL:[NSURL URLWithString:@"http://videolan.org"]];
+                                    baseURL:[NSURL URLWithString:@"https://videolan.org"]];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
