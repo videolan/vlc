@@ -32,6 +32,7 @@
 #import "library/VLCLibraryDataSource.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryMenuController.h"
 
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 #import "windows/video/VLCFSPanelController.h"
@@ -206,6 +207,39 @@ static const float f_playlist_row_height = 72.;
     [window setExcludedFromWindowsMenu:YES];
     [window setAcceptsMouseMovedEvents:YES];
     [window setContentMinSize:NSMakeSize(f_min_window_width, f_min_window_height)];
+}
+
+@end
+
+@interface VLCLibraryCollectionView()
+{
+    VLCLibraryMenuController *_menuController;
+}
+
+@end
+
+@implementation VLCLibraryCollectionView
+
+-(void)mouseDown:(NSEvent *)theEvent
+{
+    if (theEvent.modifierFlags & NSControlKeyMask) {
+        if (!_menuController) {
+            _menuController = [[VLCLibraryMenuController alloc] init];
+        }
+        [_menuController popupMenuWithEvent:theEvent forView:self];
+    }
+
+    [super mouseDown:theEvent];
+}
+
+- (void)rightMouseDown:(NSEvent *)theEvent
+{
+    if (!_menuController) {
+        _menuController = [[VLCLibraryMenuController alloc] init];
+    }
+    [_menuController popupMenuWithEvent:theEvent forView:self];
+
+    [super rightMouseDown:theEvent];
 }
 
 @end

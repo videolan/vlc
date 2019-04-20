@@ -49,7 +49,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="242" height="291"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <collectionView selectable="YES" id="B8x-e8-7zp">
+                                                <collectionView selectable="YES" id="B8x-e8-7zp" customClass="VLCLibraryCollectionView">
                                                     <rect key="frame" x="0.0" y="0.0" width="242" height="291"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="Rag-cM-k1g">

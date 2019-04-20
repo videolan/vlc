@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryWindow.h: MacOS X interface module
+ * VLCLibraryMenuController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,33 +20,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "windows/video/VLCVideoWindowCommon.h"
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryWindowController : NSWindowController
+@interface VLCLibraryMenuController : NSObject
 
-- (instancetype)initWithLibraryWindow;
+@property (readwrite, weak) NSCollectionView *libraryCollectionView;
 
-@end
-
-@interface VLCLibraryCollectionView : NSCollectionView
-@end
-
-@interface VLCLibraryWindow : VLCVideoWindowCommon
-
-@property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
-@property (readwrite, weak) IBOutlet NSCollectionView *libraryCollectionView;
-@property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
-
-@property (readonly) BOOL nativeFullscreenMode;
-@property (readwrite) BOOL nonembedded;
-
-- (void)videoPlaybackWillBeStarted;
-- (void)enableVideoPlaybackAppearance;
-- (void)disableVideoPlaybackAppearance;
-
-- (IBAction)playlistDoubleClickAction:(id)sender;
+- (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView;
 
 @end
 

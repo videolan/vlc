@@ -468,6 +468,8 @@ modules/gui/macosx/library/VLCLibraryController.h
 modules/gui/macosx/library/VLCLibraryController.m
 modules/gui/macosx/library/VLCLibraryDataSource.h
 modules/gui/macosx/library/VLCLibraryDataSource.m
+modules/gui/macosx/library/VLCLibraryMenuController.h
+modules/gui/macosx/library/VLCLibraryMenuController.m
 modules/gui/macosx/library/VLCLibraryModel.h
 modules/gui/macosx/library/VLCLibraryModel.m
 modules/gui/macosx/library/VLCLibraryWindow.h

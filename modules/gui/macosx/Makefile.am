@@ -50,6 +50,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryController.m \
 	gui/macosx/library/VLCLibraryDataSource.h \
 	gui/macosx/library/VLCLibraryDataSource.m \
+	gui/macosx/library/VLCLibraryMenuController.h \
+	gui/macosx/library/VLCLibraryMenuController.m \
 	gui/macosx/library/VLCLibraryModel.h \
 	gui/macosx/library/VLCLibraryModel.m \
 	gui/macosx/library/VLCLibraryWindow.h \
