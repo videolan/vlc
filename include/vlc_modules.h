@@ -244,7 +244,6 @@ VLC_USED static inline module_t *module_get_main (void)
 {
     return module_find ("core");
 }
-#define module_get_main(a) module_get_main()
 
 VLC_USED static inline bool module_is_main( const module_t * p_module )
 {
