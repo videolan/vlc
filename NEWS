@@ -64,6 +64,7 @@ Service discovery:
 
 macOS:
  * Remove Growl notification support
+ * Improved AppleScript API with support for playback modes, recording, rate
 
 appleOS:
  * Improved proxy configuration handling

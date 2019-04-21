@@ -76,6 +76,10 @@
     NSString *commandString = [[self commandDescription] commandName];
     NSString *parameterString = [self directParameter];
 
+    if (commandString == nil || commandString.length == 0) {
+        return nil;
+    }
+
     if ([commandString isEqualToString:@"play"]) {
         [playerController togglePlayPause];
     } else if ([commandString isEqualToString:@"stop"]) {
@@ -102,6 +106,10 @@
         [playerController navigateInInteractiveContent:VLC_PLAYER_NAV_RIGHT];
     } else if ([commandString isEqualToString:@"menuFocusActivate"]) {
         [playerController navigateInInteractiveContent:VLC_PLAYER_NAV_ACTIVATE];
+    } else if ([commandString isEqualToString:@"menuActivatePopupMenu"]) {
+        [playerController navigateInInteractiveContent:VLC_PLAYER_NAV_POPUP];
+    } else if ([commandString isEqualToString:@"menuActivateDiscRootMenu"]) {
+        [playerController navigateInInteractiveContent:VLC_PLAYER_NAV_MENU];
     } else if ([commandString isEqualToString:@"stepForward"]) {
         if (parameterString) {
             int parameterInt = [parameterString intValue];
@@ -143,8 +151,15 @@
             }
         } else
             [playerController jumpBackwardShort];
+    } else if ([commandString isEqualToString:@"incrementPlaybackRate"]) {
+        [[[[VLCMain sharedInstance] playlistController] playerController] incrementPlaybackRate];
+    } else if ([commandString isEqualToString:@"decrementPlaybackRate"]) {
+        [[[[VLCMain sharedInstance] playlistController] playerController] decrementPlaybackRate];
+    } else {
+        msg_Err(getIntf(), "Unhandled AppleScript command '%s'", [commandString UTF8String]);
     }
-   return nil;
+
+    return nil;
 }
 
 @end
@@ -210,6 +225,16 @@
     [[[[VLCMain sharedInstance] playlistController] playerController] setTimeFast: VLC_TICK_FROM_SEC(currentTime)];
 }
 
+- (float)playbackRate
+{
+    return [[[[VLCMain sharedInstance] playlistController] playerController] playbackRate];
+}
+
+- (void)setPlaybackRate:(float)playbackRate
+{
+    [[[[VLCMain sharedInstance] playlistController] playerController] setPlaybackRate:playbackRate];
+}
+
 - (NSInteger)durationOfCurrentItem
 {
     return SEC_FROM_VLC_TICK([[[VLCMain sharedInstance] playlistController] playerController].durationOfCurrentMediaItem);
@@ -237,6 +262,54 @@
     }
 
     return NO;
+}
+
+- (BOOL)recordable
+{
+    return [[[[VLCMain sharedInstance] playlistController] playerController] recordable];
+}
+
+- (BOOL)recordingEnabled
+{
+    return [[[[VLCMain sharedInstance] playlistController] playerController] enableRecording];
+}
+
+- (void)setRecordingEnabled:(BOOL)recordingEnabled
+{
+    [[[[VLCMain sharedInstance] playlistController] playerController] setEnableRecording:recordingEnabled];
+}
+
+- (BOOL)shuffledPlayback
+{
+    enum vlc_playlist_playback_order playbackOrder = [[[VLCMain sharedInstance] playlistController] playbackOrder];
+    return playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? YES : NO;
+}
+
+- (void)setShuffledPlayback:(BOOL)shuffledPlayback
+{
+    [[[VLCMain sharedInstance] playlistController] setPlaybackOrder: shuffledPlayback ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL];
+}
+
+- (BOOL)repeatOne
+{
+    enum vlc_playlist_playback_repeat repeatMode = [[[VLCMain sharedInstance] playlistController] playbackRepeat];
+    return repeatMode == VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT ? YES : NO;
+}
+
+- (void)setRepeatOne:(BOOL)repeatOne
+{
+    [[[VLCMain sharedInstance] playlistController] setPlaybackRepeat: repeatOne == YES ? VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT : VLC_PLAYLIST_PLAYBACK_REPEAT_NONE];
+}
+
+- (BOOL)repeatAll
+{
+    enum vlc_playlist_playback_repeat repeatMode = [[[VLCMain sharedInstance] playlistController] playbackRepeat];
+    return repeatMode == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL ? YES : NO;
+}
+
+- (void)setRepeatAll:(BOOL)repeatAll
+{
+    [[[VLCMain sharedInstance] playlistController] setPlaybackRepeat: repeatAll == YES ? VLC_PLAYLIST_PLAYBACK_REPEAT_ALL : VLC_PLAYLIST_PLAYBACK_REPEAT_NONE];
 }
 
 @end
