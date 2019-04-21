@@ -126,6 +126,10 @@ PrefsDialog::PrefsDialog( QWidget *parent, qt_intf_t *_p_intf )
     advanced_split_widget->addWidget( advanced_tree_panel );
     advanced_split_widget->addWidget( advanced_panels_stack );
 
+    advanced_split_widget->setSizes(QList<int>() << 300 << 550);
+    advanced_tree_panel->sizePolicy().setHorizontalStretch(1);
+    advanced_panels_stack->sizePolicy().setHorizontalStretch(2);
+
     stack->insertWidget( ADVANCED, advanced_split_widget );
 
     /* Layout  */
@@ -147,7 +151,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, qt_intf_t *_p_intf )
     BUTTONACT( simple, setSimple() );
     BUTTONACT( all, setAdvanced() );
 
-    QVLCTools::restoreWidgetPosition( p_intf, "Preferences", this, QSize( 800 , 700 ) );
+    QVLCTools::restoreWidgetPosition( p_intf, "Preferences", this, QSize( 850, 700 ) );
 }
 
 PrefsDialog::~PrefsDialog()
