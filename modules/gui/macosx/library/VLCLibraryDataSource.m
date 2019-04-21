@@ -24,6 +24,7 @@
 
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryDataTypes.h"
 
 #import "extensions/NSString+Helpers.h"
 
