@@ -38,8 +38,8 @@
 /**
  * Notes:
  *
- * 1) Core's use of set_category()/set_subcategory() defines the base tree,
- *    with its options spread across it.
+ * 1) Core's use of set_subcategory() defines the base tree, with its options
+ *    spread across it.
  * 2) Certain subcats ('general' type) are not given a node under their cat,
  *    they represent the top level cat's option panel itself (otherwise cat
  *    entries would just have empty panels).
