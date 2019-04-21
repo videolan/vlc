@@ -44,6 +44,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/imported/AppleRemote/AppleRemote.m \
 	gui/macosx/imported/SPMediaKeyTap/SPMediaKeyTap.h \
 	gui/macosx/imported/SPMediaKeyTap/SPMediaKeyTap.m \
+	gui/macosx/library/VLCInputItem.h \
+	gui/macosx/library/VLCInputItem.m \
 	gui/macosx/library/VLCLibraryCollectionViewItem.h \
 	gui/macosx/library/VLCLibraryCollectionViewItem.m \
 	gui/macosx/library/VLCLibraryController.h \
@@ -137,6 +139,10 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/preferences/prefs.m \
 	gui/macosx/preferences/prefs_widgets.h \
 	gui/macosx/preferences/prefs_widgets.m \
+	gui/macosx/media-source/VLCMediaSource.h \
+	gui/macosx/media-source/VLCMediaSource.m \
+	gui/macosx/media-source/VLCMediaSourceProvider.h \
+	gui/macosx/media-source/VLCMediaSourceProvider.m \
 	gui/macosx/views/VLCBottomBarView.h \
 	gui/macosx/views/VLCBottomBarView.m \
 	gui/macosx/views/VLCDefaultValueSlider.h \

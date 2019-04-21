@@ -462,6 +462,8 @@ modules/gui/macosx/extensions/VLCHexNumberFormatter.h
 modules/gui/macosx/extensions/VLCHexNumberFormatter.m
 modules/gui/macosx/extensions/misc.h
 modules/gui/macosx/extensions/misc.m
+modules/gui/macosx/library/VLCInputItem.h
+modules/gui/macosx/library/VLCInputItem.m
 modules/gui/macosx/library/VLCLibraryCollectionViewItem.h
 modules/gui/macosx/library/VLCLibraryCollectionViewItem.m
 modules/gui/macosx/library/VLCLibraryController.h
@@ -553,6 +555,10 @@ modules/gui/macosx/preferences/prefs.h
 modules/gui/macosx/preferences/prefs.m
 modules/gui/macosx/preferences/prefs_widgets.h
 modules/gui/macosx/preferences/prefs_widgets.m
+modules/gui/macosx/media-source/VLCMediaSource.h
+modules/gui/macosx/media-source/VLCMediaSource.m
+modules/gui/macosx/media-source/VLCMediaSourceProvider.h
+modules/gui/macosx/media-source/VLCMediaSourceProvider.m
 modules/gui/macosx/views/VLCBottomBarView.h
 modules/gui/macosx/views/VLCBottomBarView.m
 modules/gui/macosx/views/VLCDefaultValueSlider.h
