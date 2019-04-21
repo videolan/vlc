@@ -399,6 +399,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
 #ifdef _WIN32
             CONFIG_BOOL( "directx-hw-yuv", hwYUVBox );
+#else
+            ui.directXBox->setVisible( false );
 #endif
 
 #ifdef __OS2__
