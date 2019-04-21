@@ -694,13 +694,14 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         if( p_item->i_type == CONFIG_SECTION )
         {
-            if( box )
+            if( box && i_boxline > 0 )
             {
                 box->setLayout( boxlayout );
                 box->show();
                 layout->addWidget( box, i_line, 0, 1, -1 );
                 i_line++;
             }
+            i_boxline = 0;
             box = new QGroupBox( qtr( p_item->psz_text ), this );
             box->hide();
             boxlayout = new QGridLayout();
