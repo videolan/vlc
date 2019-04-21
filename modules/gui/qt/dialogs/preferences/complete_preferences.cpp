@@ -192,9 +192,6 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
         {
             const module_config_t *p_item = p_config + i;
 
-            if( p_item->i_type == CONFIG_CATEGORY )
-                continue; /* ignore */
-
             if( p_item->i_type == CONFIG_SUBCATEGORY )
             {
                 i_subcategory = p_item->value.i;
@@ -557,9 +554,6 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
 
     do
     {
-        if ( p_item->i_type == CONFIG_CATEGORY )
-            continue; /* ignore */
-
         if ( p_item->i_type == CONFIG_SUBCATEGORY )
         {
             /* for core, if we hit a subcat, stop */

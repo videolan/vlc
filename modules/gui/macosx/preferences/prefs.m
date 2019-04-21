@@ -497,9 +497,6 @@
         for (unsigned int j = 0; j < confsize; j++) {
             int configType = p_configs[j].i_type;
 
-            if (configType == CONFIG_CATEGORY)
-                continue; /* ignore */
-
             if (configType == CONFIG_SUBCATEGORY) {
                 lastsubcat = (int)p_configs[j].value.i;
                 if( lastsubcat == SUBCAT_HIDDEN ) {
