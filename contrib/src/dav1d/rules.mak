@@ -1,8 +1,8 @@
 # libdav1d
 
-DAV1D_VERSION := 0.2.1
+DAV1D_VERSION := 0.2.2
 DAV1D_URL := $(VIDEOLAN)/dav1d/$(DAV1D_VERSION)/dav1d-$(DAV1D_VERSION).tar.xz
-#~ DAV1D_HASH := 408d0486889f4f6d92f73abdeaef250659a10bc7
+#~ DAV1D_HASH := 1f7a7e8a6af739a05b320151d04f0f7509ae7579
 #~ DAV1D_VERSION := git-$(DAV1D_HASH)
 #~ DAV1D_GITURL := https://code.videolan.org/videolan/dav1d.git
 
