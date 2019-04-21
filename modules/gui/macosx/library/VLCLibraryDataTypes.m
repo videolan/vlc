@@ -26,15 +26,15 @@
 
 @implementation VLCMediaLibraryFile
 
-- (instancetype)initWithFile:(struct vlc_ml_file_t *)file
+- (instancetype)initWithFile:(struct vlc_ml_file_t *)p_file
 {
     self = [super init];
-    if (self && file != NULL) {
-        _MRL = toNSStr(file->psz_mrl);
-        _fileType = file->i_type;
-        _external = file->b_external;
-        _removable = file->b_removable;
-        _present = file->b_present;
+    if (self && p_file != NULL) {
+        _MRL = toNSStr(p_file->psz_mrl);
+        _fileType = p_file->i_type;
+        _external = p_file->b_external;
+        _removable = p_file->b_removable;
+        _present = p_file->b_present;
     }
     return self;
 }
@@ -48,25 +48,25 @@
 
 @implementation VLCMediaLibraryTrack
 
-- (instancetype)initWithTrack:(struct vlc_ml_media_track_t *)track
+- (instancetype)initWithTrack:(struct vlc_ml_media_track_t *)p_track
 {
     self = [super init];
-    if (self && track != NULL) {
-        _codec = toNSStr(track->psz_codec);
-        _language = toNSStr(track->psz_language);
-        _trackDescription = toNSStr(track->psz_description);
-        _trackType = track->i_type;
-        _bitrate = track->i_bitrate;
+    if (self && p_track != NULL) {
+        _codec = toNSStr(p_track->psz_codec);
+        _language = toNSStr(p_track->psz_language);
+        _trackDescription = toNSStr(p_track->psz_description);
+        _trackType = p_track->i_type;
+        _bitrate = p_track->i_bitrate;
 
-        _numberOfAudioChannels = track->a.i_nbChannels;
-        _audioSampleRate = track->a.i_sampleRate;
+        _numberOfAudioChannels = p_track->a.i_nbChannels;
+        _audioSampleRate = p_track->a.i_sampleRate;
 
-        _videoHeight = track->v.i_height;
-        _videoWidth = track->v.i_width;
-        _sourceAspectRatio = track->v.i_sarNum;
-        _sourceAspectRatioDenominator = track->v.i_sarDen;
-        _frameRate = track->v.i_fpsNum;
-        _frameRateDenominator = track->v.i_fpsDen;
+        _videoHeight = p_track->v.i_height;
+        _videoWidth = p_track->v.i_width;
+        _sourceAspectRatio = p_track->v.i_sarNum;
+        _sourceAspectRatioDenominator = p_track->v.i_sarDen;
+        _frameRate = p_track->v.i_fpsNum;
+        _frameRateDenominator = p_track->v.i_fpsDen;
     }
     return self;
 }
@@ -74,6 +74,54 @@
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"%@ — type: %i, codec %@", NSStringFromClass([self class]), _trackType, _codec];
+}
+
+@end
+
+@implementation VLCMediaLibraryMovie
+
+- (instancetype)initWithMovie:(struct vlc_ml_movie_t *)p_movie
+{
+    self = [super init];
+    if (self && p_movie != NULL) {
+        _summary = toNSStr(p_movie->psz_summary);
+        _imdbID = toNSStr(p_movie->psz_imdb_id);
+    }
+    return self;
+}
+
+@end
+
+@implementation VLCMediaLibraryShowEpisode
+
+- (instancetype)initWithShowEpisode:(struct vlc_ml_show_episode_t *)p_showEpisode
+{
+    self = [super init];
+    if (self && p_showEpisode != NULL) {
+        _summary = toNSStr(p_showEpisode->psz_summary);
+        _tvdbID = toNSStr(p_showEpisode->psz_tvdb_id);
+        _episodeNumber = p_showEpisode->i_episode_nb;
+        _seasonNumber = p_showEpisode->i_season_number;
+    }
+    return self;
+}
+
+@end
+
+@implementation VLCMediaLibraryAlbumTrack
+
+- (instancetype)initWithAlbumTrack:(struct vlc_ml_album_track_t *)p_albumTrack
+{
+    self = [super init];
+    if (self && p_albumTrack != NULL) {
+        _artistID = p_albumTrack->i_artist_id;
+        _albumID = p_albumTrack->i_album_id;
+        _genreID = p_albumTrack->i_genre_id;
+
+        _trackNumber = p_albumTrack->i_track_nb;
+        _discNumber = p_albumTrack->i_disc_nb;
+    }
+    return self;
 }
 
 @end
@@ -111,9 +159,23 @@
         _artworkMRL = toNSStr(p_mediaItem->psz_artwork_mrl);
         _artworkGenerated = p_mediaItem->b_artwork_generated;
         _favorited = p_mediaItem->b_is_favorite;
-        _showEpisode = p_mediaItem->show_episode;
-        _movie = p_mediaItem->movie;
-        _albumTrack = p_mediaItem->album_track;
+
+        switch (p_mediaItem->i_subtype) {
+            case VLC_ML_MEDIA_SUBTYPE_MOVIE:
+                _movie = [[VLCMediaLibraryMovie alloc] initWithMovie:&p_mediaItem->movie];
+                break;
+
+            case VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE:
+                _showEpisode = [[VLCMediaLibraryShowEpisode alloc] initWithShowEpisode:&p_mediaItem->show_episode];
+                break;
+
+            case VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK:
+                _albumTrack = [[VLCMediaLibraryAlbumTrack alloc] initWithAlbumTrack:&p_mediaItem->album_track];
+                break;
+
+            default:
+                break;
+        }
     }
     return self;
 }

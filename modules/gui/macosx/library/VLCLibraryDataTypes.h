@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMediaLibraryFile : NSObject
 
-- (instancetype)initWithFile:(struct vlc_ml_file_t *)file;
+- (instancetype)initWithFile:(struct vlc_ml_file_t *)p_file;
 
 @property (readonly) NSString *MRL;
 @property (readonly) vlc_ml_file_type_t fileType;
@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMediaLibraryTrack : NSObject
 
-- (instancetype)initWithTrack:(struct vlc_ml_media_track_t *)track;
+- (instancetype)initWithTrack:(struct vlc_ml_media_track_t *)p_track;
 
 @property (readonly) NSString *codec;
 @property (readonly) NSString *language;
@@ -56,6 +56,39 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) uint32_t sourceAspectRatioDenominator;
 @property (readonly) uint32_t frameRate;
 @property (readonly) uint32_t frameRateDenominator;
+
+@end
+
+@interface VLCMediaLibraryMovie : NSObject
+
+- (instancetype)initWithMovie:(struct vlc_ml_movie_t *)p_movie;
+
+@property (readonly) NSString *summary;
+@property (readonly) NSString *imdbID;
+
+@end
+
+@interface VLCMediaLibraryShowEpisode : NSObject
+
+- (instancetype)initWithShowEpisode:(struct vlc_ml_show_episode_t *)p_showEpisode;
+
+@property (readonly) NSString *summary;
+@property (readonly) NSString *tvdbID;
+@property (readonly) uint32_t episodeNumber;
+@property (readonly) uint32_t seasonNumber;
+
+@end
+
+@interface VLCMediaLibraryAlbumTrack : NSObject
+
+- (instancetype)initWithAlbumTrack:(struct vlc_ml_album_track_t *)p_albumTrack;
+
+@property (readonly) int64_t artistID;
+@property (readonly) int64_t albumID;
+@property (readonly) int64_t genreID;
+
+@property (readonly) int trackNumber;
+@property (readonly) int discNumber;
 
 @end
 
@@ -81,9 +114,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL artworkGenerated;
 @property (readonly) BOOL favorited;
 
-@property (readonly) vlc_ml_show_episode_t showEpisode;
-@property (readonly) vlc_ml_movie_t movie;
-@property (readonly) vlc_ml_album_track_t albumTrack;
+@property (readonly, nullable) VLCMediaLibraryShowEpisode *showEpisode;
+@property (readonly, nullable) VLCMediaLibraryMovie *movie;
+@property (readonly, nullable) VLCMediaLibraryAlbumTrack *albumTrack;
 
 @end
 
