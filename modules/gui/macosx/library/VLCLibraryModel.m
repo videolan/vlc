@@ -24,6 +24,7 @@
 
 #import "library/VLCLibraryDataTypes.h"
 
+NSString *VLCLibraryModelAudioMediaListUpdated = @"VLCLibraryModelAudioMediaListUpdated";
 NSString *VLCLibraryModelVideoMediaListUpdated = @"VLCLibraryModelVideoMediaListUpdated";
 
 @interface VLCLibraryModel ()
@@ -31,10 +32,12 @@ NSString *VLCLibraryModelVideoMediaListUpdated = @"VLCLibraryModelVideoMediaList
     vlc_medialibrary_t *_p_mediaLibrary;
     vlc_ml_event_callback_t *_p_eventCallback;
 
+    NSArray *_cachedAudioMedia;
     NSArray *_cachedVideoMedia;
     NSNotificationCenter *_defaultNotificationCenter;
 }
 
+- (void)updateCachedListOfAudioMedia;
 - (void)updateCachedListOfVideoMedia;
 
 @end
@@ -48,7 +51,19 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         case VLC_ML_EVENT_MEDIA_DELETED:
             dispatch_async(dispatch_get_main_queue(), ^{
                 VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                [libraryModel updateCachedListOfVideoMedia];
+                switch (libraryModel.libraryMode) {
+                    case VLCLibraryModeAudio:
+                        [libraryModel updateCachedListOfAudioMedia];
+                        break;
+
+                    case VLCLibraryModeVideo:
+                        [libraryModel updateCachedListOfVideoMedia];
+                        break;
+
+                    default:
+                        break;
+                }
+
             });
             break;
         default:
@@ -74,6 +89,37 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     if (_p_eventCallback) {
         vlc_ml_event_unregister_callback(_p_mediaLibrary, _p_eventCallback);
     }
+}
+
+- (size_t)numberOfAudioMedia
+{
+    if (_cachedAudioMedia) {
+        [self updateCachedListOfAudioMedia];
+    }
+
+    return _cachedAudioMedia.count;
+}
+
+- (void)updateCachedListOfAudioMedia
+{
+    vlc_ml_media_list_t *p_media_list = vlc_ml_list_audio_media(_p_mediaLibrary, NULL);
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_media_list->i_nb_items];
+    for (size_t x = 0; x < p_media_list->i_nb_items; x++) {
+        VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_media_list->p_items[x]];
+        [mutableArray addObject:mediaItem];
+    }
+    _cachedAudioMedia = [mutableArray copy];
+    vlc_ml_media_list_release(p_media_list);
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaListUpdated object:self];
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)listOfAudioMedia
+{
+    if (!_cachedAudioMedia) {
+        [self updateCachedListOfAudioMedia];
+    }
+
+    return _cachedAudioMedia;
 }
 
 - (size_t)numberOfVideoMedia

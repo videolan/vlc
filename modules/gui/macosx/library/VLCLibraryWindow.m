@@ -64,6 +64,10 @@ static const float f_playlist_row_height = 72.;
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(updateLibraryRepresentation:)
+                               name:VLCLibraryModelAudioMediaListUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateLibraryRepresentation:)
                                name:VLCLibraryModelVideoMediaListUpdated
                              object:nil];
 
@@ -72,7 +76,7 @@ static const float f_playlist_row_height = 72.;
 
     _segmentedTitleControl.segmentCount = 3;
     [_segmentedTitleControl setTarget:self];
-    [_segmentedTitleControl setAction:@selector(segmentedControlAction)];
+    [_segmentedTitleControl setAction:@selector(segmentedControlAction:)];
     [_segmentedTitleControl setLabel:_NS("Music") forSegment:0];
     [_segmentedTitleControl setLabel:_NS("Video") forSegment:1];
     [_segmentedTitleControl setLabel:_NS("Network") forSegment:2];
@@ -96,7 +100,8 @@ static const float f_playlist_row_height = 72.;
     _libraryCollectionView.dataSource = _libraryDataSource;
     _libraryCollectionView.delegate = _libraryDataSource;
     [_libraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
-    [_libraryCollectionView reloadData];
+
+    [self segmentedControlAction:nil];
 }
 
 - (void)dealloc
@@ -104,8 +109,22 @@ static const float f_playlist_row_height = 72.;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)segmentedControlAction
+- (void)segmentedControlAction:(id)sender
 {
+    switch (_segmentedTitleControl.selectedSegment) {
+        case 0:
+            _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeAudio;
+            break;
+
+        case 1:
+            _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeVideo;
+            break;
+
+        default:
+            _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeNetwork;
+            break;
+    }
+    [_libraryCollectionView reloadData];
 }
 
 - (void)playlistDoubleClickAction:(id)sender

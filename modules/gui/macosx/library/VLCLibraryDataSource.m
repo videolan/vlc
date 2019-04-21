@@ -30,20 +30,48 @@
 
 @implementation VLCLibraryDataSource
 
-- (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+- (NSInteger)collectionView:(NSCollectionView *)collectionView
+     numberOfItemsInSection:(NSInteger)section
 {
-    return [_libraryModel numberOfVideoMedia];
+    switch (_libraryModel.libraryMode) {
+        case VLCLibraryModeAudio:
+            return [_libraryModel numberOfAudioMedia];
+            break;
+
+        case VLCLibraryModeVideo:
+            return [_libraryModel numberOfVideoMedia];
+
+        default:
+            return 0;
+            break;
+    }
 }
 
-- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
+- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
+     itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
     VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
 
-    NSArray *videoMedia = [_libraryModel listOfVideoMedia];
-    VLCMediaLibraryMediaItem *mediaItem = videoMedia[indexPath.item];
+    NSArray *mediaArray;
+    switch (_libraryModel.libraryMode) {
+        case VLCLibraryModeAudio:
+            mediaArray = [_libraryModel listOfAudioMedia];
+            break;
+
+        case VLCLibraryModeVideo:
+            mediaArray = [_libraryModel listOfVideoMedia];
+            break;
+
+        default:
+            NSAssert(1, @"no representation for selected library mode");
+            mediaArray = @[];
+            break;
+    }
+
+    VLCMediaLibraryMediaItem *mediaItem = mediaArray[indexPath.item];
 
     viewItem.mediaTitleTextField.stringValue = mediaItem.title;
-    viewItem.durationTextField.stringValue = [NSString stringWithTime:mediaItem.duration];
+    viewItem.durationTextField.stringValue = [NSString stringWithTime:mediaItem.duration / 1000];
 
     NSImage *image;
     if (mediaItem.artworkGenerated) {
