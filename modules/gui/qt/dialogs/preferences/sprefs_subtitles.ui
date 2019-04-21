@@ -426,6 +426,7 @@
   <tabstop>OSDBox</tabstop>
   <tabstop>OSDTitleBox</tabstop>
   <tabstop>OSDTitlePos</tabstop>
+  <tabstop>spuActiveBox</tabstop>
   <tabstop>preferredLanguage</tabstop>
   <tabstop>encoding</tabstop>
   <tabstop>font</tabstop>
@@ -434,6 +435,7 @@
   <tabstop>effect</tabstop>
   <tabstop>outlineColor</tabstop>
   <tabstop>shadowCheck</tabstop>
+  <tabstop>backgroundCheck</tabstop>
   <tabstop>subsPosition</tabstop>
  </tabstops>
  <resources/>
