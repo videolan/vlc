@@ -153,6 +153,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCHUDTableView.m \
 	gui/macosx/views/VLCImageButton.h \
 	gui/macosx/views/VLCImageButton.m \
+	gui/macosx/views/VLCImageView.h \
+	gui/macosx/views/VLCImageView.m \
 	gui/macosx/views/VLCScrollingClipView.h \
 	gui/macosx/views/VLCScrollingClipView.m \
 	gui/macosx/views/VLCSlider.h \
