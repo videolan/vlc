@@ -28,6 +28,8 @@
 
 #import "extensions/NSString+Helpers.h"
 
+#import "views/VLCImageView.h"
+
 @implementation VLCLibraryDataSource
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView

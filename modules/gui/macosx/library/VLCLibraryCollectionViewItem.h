@@ -26,11 +26,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *VLCLibraryCellIdentifier;
 
+@class VLCImageView;
+
 @interface VLCLibraryCollectionViewItem : NSCollectionViewItem
 
 @property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
 @property (readwrite, assign) IBOutlet NSTextField *durationTextField;
-@property (readwrite, assign) IBOutlet NSImageView *mediaImageView;
+@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
 
 @end
 

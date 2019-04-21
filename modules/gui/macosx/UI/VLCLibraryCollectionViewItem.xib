@@ -8,7 +8,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryCollectionViewItem">
             <connections>
                 <outlet property="durationTextField" destination="VAn-gF-QiZ" id="U8T-Cs-HaL"/>
-                <outlet property="mediaImageView" destination="vP5-5j-rVa" id="YJb-5w-9sW"/>
+                <outlet property="mediaImageView" destination="2aB-sB-hfY" id="Sv0-G1-KNm"/>
                 <outlet property="mediaTitleTextField" destination="OBS-Eh-1mT" id="h1n-PU-IAx"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
             </connections>
@@ -19,11 +19,9 @@
             <rect key="frame" x="0.0" y="0.0" width="480" height="272"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vP5-5j-rVa">
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="2aB-sB-hfY" customClass="VLCImageView">
                     <rect key="frame" x="0.0" y="0.0" width="480" height="272"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="hY9-UD-hSk"/>
-                </imageView>
+                </customView>
                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="A5y-ue-y7t">
                     <rect key="frame" x="0.0" y="0.0" width="480" height="272"/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="libraryCellGradient" id="kbU-NG-wPM"/>
@@ -47,11 +45,15 @@
             </subviews>
             <constraints>
                 <constraint firstItem="VAn-gF-QiZ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="OBS-Eh-1mT" secondAttribute="trailing" constant="20" id="2di-oZ-tsC"/>
+                <constraint firstAttribute="bottom" secondItem="2aB-sB-hfY" secondAttribute="bottom" id="C2H-Jc-A9V"/>
                 <constraint firstItem="A5y-ue-y7t" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="NpD-8l-D5s"/>
                 <constraint firstAttribute="trailing" secondItem="VAn-gF-QiZ" secondAttribute="trailing" constant="20" id="Ol6-wf-2dJ"/>
+                <constraint firstItem="2aB-sB-hfY" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="YP6-lv-ECe"/>
                 <constraint firstAttribute="bottom" secondItem="A5y-ue-y7t" secondAttribute="bottom" id="cnQ-bx-Fmn"/>
                 <constraint firstAttribute="bottom" secondItem="OBS-Eh-1mT" secondAttribute="bottom" constant="20" id="dy4-gP-Sdi"/>
+                <constraint firstAttribute="trailing" secondItem="2aB-sB-hfY" secondAttribute="trailing" id="oZw-Ab-83p"/>
                 <constraint firstAttribute="trailing" secondItem="A5y-ue-y7t" secondAttribute="trailing" id="rKQ-WW-oC6"/>
+                <constraint firstItem="2aB-sB-hfY" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="t9g-tX-AQX"/>
                 <constraint firstItem="VAn-gF-QiZ" firstAttribute="bottom" secondItem="OBS-Eh-1mT" secondAttribute="bottom" id="ukj-ba-ask"/>
                 <constraint firstItem="A5y-ue-y7t" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="x7v-58-kKz"/>
                 <constraint firstItem="OBS-Eh-1mT" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="20" id="yvp-xr-geN"/>
