@@ -1559,7 +1559,6 @@ vlc_module_begin ()
     set_description( N_("core program") )
 
 /* Audio options */
-    set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_GENERAL )
     add_category_hint(N_("Audio"), AOUT_CAT_LONGTEXT)
 
@@ -1621,7 +1620,6 @@ vlc_module_begin ()
                AUDIO_RESAMPLER_TEXT, AUDIO_RESAMPLER_LONGTEXT)
 
 /* Video options */
-    set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_GENERAL )
     add_category_hint(N_("Video"), VOUT_CAT_LONGTEXT)
 
@@ -1789,7 +1787,6 @@ vlc_module_begin ()
                  SECONDARY_SUB_MARGIN_LONGTEXT )
 
 /* Input options */
-    set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_GENERAL )
     add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT )
 
@@ -2016,7 +2013,6 @@ vlc_module_begin ()
                     STREAM_FILTER_TEXT, STREAM_FILTER_LONGTEXT)
 
 /* Stream output options */
-    set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_GENERAL )
     add_category_hint(N_("Stream output"), SOUT_CAT_LONGTEXT)
 
@@ -2060,7 +2056,6 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_VOD )
 
 /* Advanced options */
-    set_category( CAT_ADVANCED )
     set_subcategory( SUBCAT_ADVANCED_MISC )
     add_category_hint(N_("Advanced"), NULL)
     set_section( N_("Special modules"), NULL )
@@ -2105,7 +2100,6 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_ADVANCED_NETWORK )
 
 /* Playlist options */
-    set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_GENERAL )
     add_category_hint(N_("Playlist"), PLAYLIST_CAT_LONGTEXT)
     add_bool( "random", false, RANDOM_TEXT, RANDOM_LONGTEXT )
@@ -2202,7 +2196,6 @@ vlc_module_begin ()
               BOOKMARK10_TEXT, BOOKMARK_LONGTEXT )
 
 /* Interface options */
-    set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_GENERAL )
     add_category_hint( N_("Interface"), INTF_CAT_LONGTEXT )
     add_integer( "verbose", 0, VERBOSE_TEXT, VERBOSE_LONGTEXT )
@@ -2773,7 +2766,6 @@ vlc_module_begin ()
 
 /* Miscellaneous */
     /* Not displayed in GUI, listed in help output though */
-    set_category( CAT_HIDDEN )
     set_subcategory( SUBCAT_HIDDEN )
     add_category_hint(N_("Miscellaneous"), NULL)
 
