@@ -63,8 +63,8 @@ public:
     virtual ~PrefsItemData() { free( psz_shortcut ); }
     bool contains( const QString &text, Qt::CaseSensitivity cs );
     AdvPrefsPanel *panel;
-    int i_object_id;
-    int i_subcat_id;
+    int cat_id;
+    int subcat_id;
     enum prefsType
     {
         TYPE_CATEGORY,

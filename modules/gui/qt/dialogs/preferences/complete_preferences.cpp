@@ -112,7 +112,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
             data->name = qfu( vlc_config_cat_GetName( cat ) );
             data->help = qfu( vlc_config_cat_GetHelp( cat ) );
             data->i_type = PrefsItemData::TYPE_CATEGORY;
-            data->i_object_id = cat;
+            data->cat_id = cat;
 
             /* This is a category, put a nice icon */
             switch( cat )
@@ -144,7 +144,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
         {
             /* Data still contains the correct thing */
             data->i_type = PrefsItemData::TYPE_CATSUBCAT;
-            data->i_subcat_id = subcat;
+            data->subcat_id = subcat;
             data->name = qfu( vlc_config_subcat_GetName( subcat ) );
             data->help = qfu( vlc_config_subcat_GetHelp( subcat ) );
             current_item->setData( 0, Qt::UserRole,
@@ -159,7 +159,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
         data_sub->name = qfu( vlc_config_subcat_GetName( subcat ) );
         data_sub->help = qfu( vlc_config_subcat_GetHelp( subcat ) );
         data_sub->i_type = PrefsItemData::TYPE_SUBCATEGORY;
-        data_sub->i_object_id = subcat;
+        data_sub->subcat_id = subcat;
 
         /* Create a new TreeWidget */
         QTreeWidgetItem *subcat_item = new QTreeWidgetItem();
@@ -223,7 +223,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
                                              value<PrefsItemData *>();
 
             /* If we match the good category */
-            if( data->i_object_id == i_category )
+            if( data->cat_id == i_category )
             {
                 for( int i_sc_index = 0; i_sc_index < cat_item->childCount();
                          i_sc_index++ )
@@ -231,7 +231,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
                     subcat_item = cat_item->child( i_sc_index );
                     PrefsItemData *sc_data = subcat_item->data(0, Qt::UserRole).
                                                 value<PrefsItemData *>();
-                    if( sc_data && sc_data->i_object_id == i_subcategory )
+                    if( sc_data && sc_data->subcat_id == i_subcategory )
                     {
                         b_found = true;
                         break;
@@ -475,8 +475,8 @@ void PrefsTree::resizeColumns()
 PrefsItemData::PrefsItemData( QObject *_parent ) : QObject( _parent )
 {
     panel = NULL;
-    i_object_id = 0;
-    i_subcat_id = SUBCAT_UNKNOWN;
+    cat_id = CAT_UNKNOWN;
+    subcat_id = SUBCAT_UNKNOWN;
     psz_shortcut = NULL;
     b_loaded = false;
 }
@@ -489,7 +489,7 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
         return false;
 
     bool is_core = this->i_type != TYPE_MODULE;
-    int id = SUBCAT_UNKNOWN;
+    int id = this->subcat_id;
 
     /* find our module */
     module_t *p_module;
@@ -499,11 +499,6 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
     {
         p_module = module_get_main();
         assert( p_module );
-
-        if( this->i_type == TYPE_SUBCATEGORY )
-            id = this->i_object_id;
-        else // TYPE_CATSUBCAT
-            id = this->i_subcat_id;
     }
 
     /* check the node itself (its name/longname/helptext) */
@@ -612,10 +607,7 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         while (p_item < p_end)
         {
             if(  p_item->i_type == CONFIG_SUBCATEGORY &&
-                 ( ( data->i_type == PrefsItemData::TYPE_SUBCATEGORY &&
-                     p_item->value.i == data->i_object_id ) ||
-                   ( data->i_type == PrefsItemData::TYPE_CATSUBCAT &&
-                     p_item->value.i == data->i_subcat_id ) ) )
+                 p_item->value.i == data->subcat_id )
                 break;
             p_item++;
         }
@@ -670,11 +662,10 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
     if( p_item ) do
     {
-        if( ( ( data->i_type == PrefsItemData::TYPE_SUBCATEGORY &&
-                p_item->value.i != data->i_object_id ) ||
-              ( data->i_type == PrefsItemData::TYPE_CATSUBCAT  &&
-                p_item->value.i != data->i_subcat_id ) ) &&
-            p_item->i_type == CONFIG_SUBCATEGORY )
+        if( p_item->i_type == CONFIG_SUBCATEGORY &&
+            ( data->i_type == PrefsItemData::TYPE_SUBCATEGORY ||
+              data->i_type == PrefsItemData::TYPE_CATSUBCAT ) &&
+            p_item->value.i != data->subcat_id )
             break;
 
         if( p_item->i_type == CONFIG_SECTION )
