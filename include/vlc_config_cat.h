@@ -192,15 +192,15 @@
 
 struct config_category_t
 {
-    int         id;
-    int         general_subcat;
+    enum vlc_config_cat id;
+    enum vlc_config_subcat general_subcat;
     const char *help;
 };
 
 struct config_subcategory_t
 {
-    int         id;
-    int         cat;
+    enum vlc_config_subcat id;
+    enum vlc_config_cat cat;
     const char *name;
     const char *help;
 };
@@ -263,7 +263,7 @@ static const struct config_subcategory_t subcategories_array[] =
 
 /** Get the table index for the given category entry. */
 VLC_USED
-static inline int vlc_config_cat_IndexOf( int cat )
+static inline int vlc_config_cat_IndexOf( enum vlc_config_cat cat )
 {
     int index = -1;
     for( unsigned i = 0; i < ARRAY_SIZE(categories_array); i++ )
@@ -279,7 +279,7 @@ static inline int vlc_config_cat_IndexOf( int cat )
 
 /** Get the table index for the given subcategory entry. */
 VLC_USED
-static inline int vlc_config_subcat_IndexOf( int subcat )
+static inline int vlc_config_subcat_IndexOf( enum vlc_config_subcat subcat )
 {
     int index = -1;
     for( unsigned i = 0; i < ARRAY_SIZE(subcategories_array); i++ )
@@ -309,7 +309,7 @@ static inline int vlc_config_subcat_IndexOf( int subcat )
  * a child node of a subcategory node.
  */
 VLC_USED
-static inline int vlc_config_cat_GetGeneralSubcat( int cat )
+static inline enum vlc_config_subcat vlc_config_cat_GetGeneralSubcat( enum vlc_config_cat cat )
 {
     int i = vlc_config_cat_IndexOf( cat );
     return (i != -1) ? categories_array[i].general_subcat : SUBCAT_UNKNOWN;
@@ -317,7 +317,7 @@ static inline int vlc_config_cat_GetGeneralSubcat( int cat )
 
 /** Get the name for a subcategory. */
 VLC_USED
-static inline const char *vlc_config_subcat_GetName( int subcat )
+static inline const char *vlc_config_subcat_GetName( enum vlc_config_subcat subcat )
 {
     int i = vlc_config_subcat_IndexOf( subcat );
     return (i != -1) ? vlc_gettext(subcategories_array[i].name) : NULL;
@@ -325,7 +325,7 @@ static inline const char *vlc_config_subcat_GetName( int subcat )
 
 /** Get the help text for a subcategory. */
 VLC_USED
-static inline const char *vlc_config_subcat_GetHelp( int subcat )
+static inline const char *vlc_config_subcat_GetHelp( enum vlc_config_subcat subcat )
 {
     int i = vlc_config_subcat_IndexOf( subcat );
     return (i != -1) ? vlc_gettext(subcategories_array[i].help) : NULL;
@@ -333,15 +333,15 @@ static inline const char *vlc_config_subcat_GetHelp( int subcat )
 
 /** Get the name for a category. */
 VLC_USED
-static inline const char *vlc_config_cat_GetName( int cat )
+static inline const char *vlc_config_cat_GetName( enum vlc_config_cat cat )
 {
-    int subcat = vlc_config_cat_GetGeneralSubcat( cat );
+    enum vlc_config_subcat subcat = vlc_config_cat_GetGeneralSubcat( cat );
     return vlc_config_subcat_GetName( subcat );
 }
 
 /** Get the help text for a category. */
 VLC_USED
-static inline const char *vlc_config_cat_GetHelp( int cat )
+static inline const char *vlc_config_cat_GetHelp( enum vlc_config_cat cat )
 {
     int i = vlc_config_cat_IndexOf( cat );
     return (i != -1) ? vlc_gettext(categories_array[i].help) : NULL;
@@ -349,7 +349,7 @@ static inline const char *vlc_config_cat_GetHelp( int cat )
 
 /** Get the parent category for the given subcategory. */
 VLC_USED
-static inline int vlc_config_cat_FromSubcat( int subcat )
+static inline enum vlc_config_cat vlc_config_cat_FromSubcat( enum vlc_config_subcat subcat )
 {
     int i = vlc_config_subcat_IndexOf( subcat );
     return (i != -1) ? subcategories_array[i].cat : CAT_UNKNOWN;
@@ -357,11 +357,11 @@ static inline int vlc_config_cat_FromSubcat( int subcat )
 
 /** Check if the given subcategory is a "general" one. */
 VLC_USED
-static inline bool vlc_config_subcat_IsGeneral( int subcat )
+static inline bool vlc_config_subcat_IsGeneral( enum vlc_config_subcat subcat )
 {
     if( subcat == SUBCAT_UNKNOWN )
         return false;
-    int cat = vlc_config_cat_FromSubcat( subcat );
+    enum vlc_config_cat cat = vlc_config_cat_FromSubcat( subcat );
     return (subcat == vlc_config_cat_GetGeneralSubcat( cat ));
 }
 

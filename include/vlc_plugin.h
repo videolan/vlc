@@ -143,64 +143,75 @@ enum vlc_module_properties
 #define IsConfigFloatType(type) \
     ((type) == CONFIG_ITEM_FLOAT)
 
-/* Hidden categories and subcategories */
-/* Any options under this will be hidden in the GUI preferences, but will be
-   listed in cmdline help output. */
-#define CAT_HIDDEN -1
-#define SUBCAT_HIDDEN -1
+/* Config category */
+enum vlc_config_cat
+{
+    /* Hidden category.
+       Any options under this will be hidden in the GUI preferences, but will
+       be listed in cmdline help output. */
+    CAT_HIDDEN    = -1,
 
-/* Unknown/unset/invalid */
-#define CAT_UNKNOWN 0
-#define SUBCAT_UNKNOWN 0
+    CAT_UNKNOWN   = 0,
 
-/* Categories and subcategories */
-#define CAT_INTERFACE 1
-#define SUBCAT_INTERFACE_GENERAL 101
-#define SUBCAT_INTERFACE_MAIN 102
-#define SUBCAT_INTERFACE_CONTROL 103
-#define SUBCAT_INTERFACE_HOTKEYS 104
+    CAT_INTERFACE = 1,
+    CAT_AUDIO     = 2,
+    CAT_VIDEO     = 3,
+    CAT_INPUT     = 4,
+    CAT_SOUT      = 5,
+    CAT_ADVANCED  = 6,
+    CAT_PLAYLIST  = 7,
+};
 
-#define CAT_AUDIO 2
-#define SUBCAT_AUDIO_GENERAL 201
-#define SUBCAT_AUDIO_AOUT 202
-#define SUBCAT_AUDIO_AFILTER 203
-#define SUBCAT_AUDIO_VISUAL 204
-#define SUBCAT_AUDIO_RESAMPLER 206
+/* Config subcategory */
+enum vlc_config_subcat
+{
+    /* Hidden subcategory.
+       Any options under this will be hidden in the GUI preferences, but will
+       be listed in cmdline help output. */
+    SUBCAT_HIDDEN              = -1,
 
-#define CAT_VIDEO 3
-#define SUBCAT_VIDEO_GENERAL 301
-#define SUBCAT_VIDEO_VOUT 302
-#define SUBCAT_VIDEO_VFILTER 303
-#define SUBCAT_VIDEO_SUBPIC 305
-#define SUBCAT_VIDEO_SPLITTER 306
+    SUBCAT_UNKNOWN             = 0,
 
-#define CAT_INPUT 4
-#define SUBCAT_INPUT_GENERAL 401
-#define SUBCAT_INPUT_ACCESS 402
-#define SUBCAT_INPUT_DEMUX 403
-#define SUBCAT_INPUT_VCODEC 404
-#define SUBCAT_INPUT_ACODEC 405
-#define SUBCAT_INPUT_SCODEC 406
-#define SUBCAT_INPUT_STREAM_FILTER 407
+    SUBCAT_INTERFACE_GENERAL   = 101,
+    SUBCAT_INTERFACE_MAIN      = 102,
+    SUBCAT_INTERFACE_CONTROL   = 103,
+    SUBCAT_INTERFACE_HOTKEYS   = 104,
 
-#define CAT_SOUT 5
-#define SUBCAT_SOUT_GENERAL 501
-#define SUBCAT_SOUT_STREAM 502
-#define SUBCAT_SOUT_MUX 503
-#define SUBCAT_SOUT_ACO 504
-#define SUBCAT_SOUT_PACKETIZER 505
-#define SUBCAT_SOUT_VOD 507
-#define SUBCAT_SOUT_RENDERER 508
+    SUBCAT_AUDIO_GENERAL       = 201,
+    SUBCAT_AUDIO_AOUT          = 202,
+    SUBCAT_AUDIO_AFILTER       = 203,
+    SUBCAT_AUDIO_VISUAL        = 204,
+    SUBCAT_AUDIO_RESAMPLER     = 206,
 
-#define CAT_ADVANCED 6
-#define SUBCAT_ADVANCED_MISC 602
-#define SUBCAT_ADVANCED_NETWORK 603
+    SUBCAT_VIDEO_GENERAL       = 301,
+    SUBCAT_VIDEO_VOUT          = 302,
+    SUBCAT_VIDEO_VFILTER       = 303,
+    SUBCAT_VIDEO_SUBPIC        = 305,
+    SUBCAT_VIDEO_SPLITTER      = 306,
 
-#define CAT_PLAYLIST 7
-#define SUBCAT_PLAYLIST_GENERAL 701
-#define SUBCAT_PLAYLIST_SD 702
-#define SUBCAT_PLAYLIST_EXPORT 703
+    SUBCAT_INPUT_GENERAL       = 401,
+    SUBCAT_INPUT_ACCESS        = 402,
+    SUBCAT_INPUT_DEMUX         = 403,
+    SUBCAT_INPUT_VCODEC        = 404,
+    SUBCAT_INPUT_ACODEC        = 405,
+    SUBCAT_INPUT_SCODEC        = 406,
+    SUBCAT_INPUT_STREAM_FILTER = 407,
 
+    SUBCAT_SOUT_GENERAL        = 501,
+    SUBCAT_SOUT_STREAM         = 502,
+    SUBCAT_SOUT_MUX            = 503,
+    SUBCAT_SOUT_ACO            = 504,
+    SUBCAT_SOUT_PACKETIZER     = 505,
+    SUBCAT_SOUT_VOD            = 507,
+    SUBCAT_SOUT_RENDERER       = 508,
+
+    SUBCAT_ADVANCED_MISC       = 602,
+    SUBCAT_ADVANCED_NETWORK    = 603,
+
+    SUBCAT_PLAYLIST_GENERAL    = 701,
+    SUBCAT_PLAYLIST_SD         = 702,
+    SUBCAT_PLAYLIST_EXPORT     = 703,
+};
 
 /**
  * Current plugin ABI version

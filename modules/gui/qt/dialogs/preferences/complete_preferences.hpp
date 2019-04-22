@@ -78,8 +78,8 @@ public:
     AdvPrefsPanel *panel;
     QString name;
     QString help;
-    int cat_id;
-    int subcat_id;
+    enum vlc_config_cat cat_id;
+    enum vlc_config_subcat subcat_id;
     module_t *p_module;
     char *module_name;
     bool module_is_loaded;
@@ -101,11 +101,11 @@ public:
     }
 
 private:
-    QTreeWidgetItem *createCatNode( int cat );
-    QTreeWidgetItem *createSubcatNode( QTreeWidgetItem * cat, int subcat );
+    QTreeWidgetItem *createCatNode( enum vlc_config_cat cat );
+    QTreeWidgetItem *createSubcatNode( QTreeWidgetItem * cat, enum vlc_config_subcat subcat );
     void createPluginNode( QTreeWidgetItem * parent, module_t *mod );
-    QTreeWidgetItem *findCatItem( int cat );
-    QTreeWidgetItem *findSubcatItem( int subcat );
+    QTreeWidgetItem *findCatItem( enum vlc_config_cat cat );
+    QTreeWidgetItem *findSubcatItem( enum vlc_config_subcat subcat );
     bool filterItems( PrefsTreeItem *item, const QString &text, Qt::CaseSensitivity cs );
     bool collapseUnselectedItems( PrefsTreeItem *item );
     void updateLoadedStatus( PrefsTreeItem *item , QSet<QString> *loaded );

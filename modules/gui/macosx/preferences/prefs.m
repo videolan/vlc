@@ -111,25 +111,25 @@ enum VLCTreeBranchType {
 @interface VLCTreeBranchItem : VLCTreeItem
 {
     enum VLCTreeBranchType _branchType;
-    int _category;
-    int _subcategory;
+    enum vlc_config_cat _category;
+    enum vlc_config_subcat _subcategory;
     /* for plugin type */
     module_config_t * _configItems;
     unsigned int _configSize;
 }
-+ (VLCTreeBranchItem *)newCategoryTreeBranch:(int)category;
-+ (VLCTreeBranchItem *)newSubcategoryTreeBranch:(int)subcategory;
++ (VLCTreeBranchItem *)newCategoryTreeBranch:(enum vlc_config_cat)category;
++ (VLCTreeBranchItem *)newSubcategoryTreeBranch:(enum vlc_config_subcat)subcategory;
 + (VLCTreeBranchItem *)newPluginTreeBranch:(module_t *)plugin;
 
-- (id)initWithCategory:(int)category;
-- (id)initWithSubcategory:(int)subcategory;
+- (id)initWithCategory:(enum vlc_config_cat)category;
+- (id)initWithSubcategory:(enum vlc_config_subcat)subcategory;
 - (id)initWithPlugin:(module_t *)plugin;
 
-- (VLCTreeBranchItem *)childRepresentingSubcategory:(int)category;
+- (VLCTreeBranchItem *)childRepresentingSubcategory:(enum vlc_config_cat)category;
 
 - (enum VLCTreeBranchType)branchType;
-- (int)category;
-- (int)subcategory;
+- (enum vlc_config_cat)category;
+- (enum vlc_config_subcat)subcategory;
 - (module_config_t *)configItems;
 - (unsigned int)configSize;
 @end
@@ -148,7 +148,7 @@ enum VLCTreeBranchType {
 {
     module_config_t * _configItems;
 }
-- (VLCTreeBranchItem *)childRepresentingCategory:(int)category;
+- (VLCTreeBranchItem *)childRepresentingCategory:(enum vlc_config_cat)category;
 @end
 
 #pragma mark -
@@ -446,7 +446,7 @@ enum VLCTreeBranchType {
 #pragma mark -
 @implementation VLCTreeMainItem
 
-- (VLCTreeBranchItem *)childRepresentingCategory:(int)category
+- (VLCTreeBranchItem *)childRepresentingCategory:(enum vlc_config_cat)category
 {
     NSUInteger childrenCount = [[self children] count];
     for (int i = 0; i < childrenCount; i++) {
@@ -476,8 +476,8 @@ enum VLCTreeBranchType {
         VLCTreeBranchItem * subcategoryItem = nil;
         VLCTreeBranchItem * pluginItem = nil;
         module_config_t *p_configs = NULL;
-        int cat = CAT_UNKNOWN;
-        int subcat = SUBCAT_UNKNOWN;
+        enum vlc_config_cat cat = CAT_UNKNOWN;
+        enum vlc_config_subcat subcat = SUBCAT_UNKNOWN;
         bool subcat_is_general = false;
         bool plugin_node_added = false;
         bool pending_tree_node_creation = false;
@@ -503,7 +503,7 @@ enum VLCTreeBranchType {
             int configType = p_configs[j].i_type;
 
             if (configType == CONFIG_SUBCATEGORY) {
-                subcat = (int) p_configs[j].value.i;
+                subcat = (enum vlc_config_subcat) p_configs[j].value.i;
                 cat = vlc_config_cat_FromSubcat(subcat);
                 subcat_is_general = vlc_config_subcat_IsGeneral(subcat);
                 pending_tree_node_creation = true;
@@ -603,16 +603,16 @@ enum VLCTreeBranchType {
 
 #pragma mark -
 @implementation VLCTreeBranchItem
-+ (VLCTreeBranchItem *)newCategoryTreeBranch:(int)category
++ (VLCTreeBranchItem *)newCategoryTreeBranch:(enum vlc_config_cat)category
 {
     if (!vlc_config_cat_GetName(category)) {
-        msg_Err(getIntf(), "failed to get name for category %i", category);
+        msg_Err(getIntf(), "failed to get name for category %i", (int)category);
         return nil;
     }
     return [[[self class] alloc] initWithCategory:category];
 }
 
-+ (VLCTreeBranchItem *)newSubcategoryTreeBranch:(int)subcategory
++ (VLCTreeBranchItem *)newSubcategoryTreeBranch:(enum vlc_config_subcat)subcategory
 {
     if (!vlc_config_subcat_GetName(subcategory))
         return nil;
@@ -624,7 +624,7 @@ enum VLCTreeBranchType {
     return [[[self class] alloc] initWithPlugin:plugin];
 }
 
-- (id)initWithCategory:(int)category
+- (id)initWithCategory:(enum vlc_config_cat)category
 {
     NSString * name = _NS(vlc_config_cat_GetName(category));
     if (self = [super initWithName:name]) {
@@ -638,7 +638,7 @@ enum VLCTreeBranchType {
     return self;
 }
 
-- (id)initWithSubcategory:(int)subcategory
+- (id)initWithSubcategory:(enum vlc_config_subcat)subcategory
 {
     NSString * name = _NS(vlc_config_subcat_GetName(subcategory));
     if (self = [super initWithName:name]) {
@@ -672,7 +672,7 @@ enum VLCTreeBranchType {
         module_config_free(_configItems);
 }
 
-- (VLCTreeBranchItem *)childRepresentingSubcategory:(int)subcategory
+- (VLCTreeBranchItem *)childRepresentingSubcategory:(enum vlc_config_subcat)subcategory
 {
     assert([self isKindOfClass:[VLCTreeBranchItem class]]);
     NSUInteger childrenCount = [[self children] count];
@@ -689,12 +689,12 @@ enum VLCTreeBranchType {
     return _branchType;
 }
 
-- (int)category
+- (enum vlc_config_cat)category
 {
     return _category;
 }
 
-- (int)subcategory
+- (enum vlc_config_subcat)subcategory
 {
     return _subcategory;
 }
