@@ -34,6 +34,8 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryMenuController.h"
 
+#import "media-source/VLCMediaSourceDataSource.h"
+
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 #import "windows/video/VLCFSPanelController.h"
 #import "windows/video/VLCVoutView.h"
@@ -46,6 +48,7 @@ static const float f_playlist_row_height = 72.;
 {
     VLCPlaylistDataSource *_playlistDataSource;
     VLCLibraryDataSource *_libraryDataSource;
+    VLCMediaSourceDataSource *_mediaSourceDataSource;
 
     NSRect _windowFrameBeforePlayback;
 
@@ -101,8 +104,9 @@ static const float f_playlist_row_height = 72.;
     _libraryCollectionView.delegate = _libraryDataSource;
     [_libraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
 
-    _mediaSourceTableView.dataSource = _libraryDataSource;
-    _mediaSourceTableView.delegate = _libraryDataSource;
+    _mediaSourceDataSource = [[VLCMediaSourceDataSource alloc] init];
+    _mediaSourceTableView.dataSource = _mediaSourceDataSource;
+    _mediaSourceTableView.delegate = _mediaSourceDataSource;
     _mediaSourceTableView.rowHeight = f_playlist_row_height;
 
     [self segmentedControlAction:nil];

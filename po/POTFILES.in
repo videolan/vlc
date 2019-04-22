@@ -487,6 +487,12 @@ modules/gui/macosx/main/VLCMain+OldPrefs.m
 modules/gui/macosx/main/VLCMain.h
 modules/gui/macosx/main/VLCMain.m
 modules/gui/macosx/main/macosx.m
+modules/gui/macosx/media-source/VLCMediaSource.h
+modules/gui/macosx/media-source/VLCMediaSource.m
+modules/gui/macosx/media-source/VLCMediaSourceDataSource.h
+modules/gui/macosx/media-source/VLCMediaSourceDataSource.m
+modules/gui/macosx/media-source/VLCMediaSourceProvider.h
+modules/gui/macosx/media-source/VLCMediaSourceProvider.m
 modules/gui/macosx/menus/VLCMainMenu.h
 modules/gui/macosx/menus/VLCMainMenu.m
 modules/gui/macosx/menus/VLCStatusBarIcon.h
@@ -555,10 +561,6 @@ modules/gui/macosx/preferences/prefs.h
 modules/gui/macosx/preferences/prefs.m
 modules/gui/macosx/preferences/prefs_widgets.h
 modules/gui/macosx/preferences/prefs_widgets.m
-modules/gui/macosx/media-source/VLCMediaSource.h
-modules/gui/macosx/media-source/VLCMediaSource.m
-modules/gui/macosx/media-source/VLCMediaSourceProvider.h
-modules/gui/macosx/media-source/VLCMediaSourceProvider.m
 modules/gui/macosx/views/VLCBottomBarView.h
 modules/gui/macosx/views/VLCBottomBarView.m
 modules/gui/macosx/views/VLCDefaultValueSlider.h

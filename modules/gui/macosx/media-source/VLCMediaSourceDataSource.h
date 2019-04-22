@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryDataSource.h: MacOS X interface module
+ * VLCMediaSourceDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -24,11 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCLibraryModel;
-
-@interface VLCLibraryDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
-
-@property (readwrite, assign) VLCLibraryModel *libraryModel;
+@interface VLCMediaSourceDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
 
 @end
 

@@ -69,6 +69,12 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/main/VLCMain.h \
 	gui/macosx/main/VLCMain.m \
 	gui/macosx/main/macosx.m \
+	gui/macosx/media-source/VLCMediaSource.h \
+	gui/macosx/media-source/VLCMediaSource.m \
+	gui/macosx/media-source/VLCMediaSourceDataSource.h \
+	gui/macosx/media-source/VLCMediaSourceDataSource.m \
+	gui/macosx/media-source/VLCMediaSourceProvider.h \
+	gui/macosx/media-source/VLCMediaSourceProvider.m \
 	gui/macosx/menus/VLCMainMenu.h \
 	gui/macosx/menus/VLCMainMenu.m \
 	gui/macosx/menus/VLCStatusBarIcon.h \
@@ -139,10 +145,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/preferences/prefs.m \
 	gui/macosx/preferences/prefs_widgets.h \
 	gui/macosx/preferences/prefs_widgets.m \
-	gui/macosx/media-source/VLCMediaSource.h \
-	gui/macosx/media-source/VLCMediaSource.m \
-	gui/macosx/media-source/VLCMediaSourceProvider.h \
-	gui/macosx/media-source/VLCMediaSourceProvider.m \
 	gui/macosx/views/VLCBottomBarView.h \
 	gui/macosx/views/VLCBottomBarView.m \
 	gui/macosx/views/VLCDefaultValueSlider.h \
