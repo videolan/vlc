@@ -52,7 +52,7 @@
             continue;
         }
 
-        VLCMediaSource *mediaSource = [[VLCMediaSource alloc] initWithMediaSource:p_mediaSource];
+        VLCMediaSource *mediaSource = [[VLCMediaSource alloc] initWithMediaSource:p_mediaSource andLibVLCInstance:p_libvlcInstance];
         [mutableArray addObject:mediaSource];
     }
 

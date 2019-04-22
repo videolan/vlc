@@ -24,6 +24,7 @@
 
 #import <vlc_media_source.h>
 
+@class VLCInputItem;
 @class VLCInputNode;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -34,7 +35,9 @@ extern NSString *VLCMediaSourceChildrenRemoved;
 
 @interface VLCMediaSource : NSObject
 
-- (instancetype)initWithMediaSource:(vlc_media_source_t *)p_mediaSource;
+- (instancetype)initWithMediaSource:(vlc_media_source_t *)p_mediaSource andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance;
+
+- (void)preparseInputItemWithinTree:(VLCInputItem *)inputItem;
 
 @property (readonly) NSString *mediaSourceDescription;
 @property (readonly) VLCInputNode *rootNode;

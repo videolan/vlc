@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithInputItem:(struct input_item_t *)p_inputItem;
 
+@property (readonly) struct input_item_t *vlcInputItem;
 @property (readonly) NSString *name;
 @property (readonly) NSString *MRL;
 @property (readonly) vlc_tick_t duration;

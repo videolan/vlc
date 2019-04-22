@@ -28,6 +28,7 @@
 
 @interface VLCMediaSource ()
 {
+    libvlc_int_t *_p_libvlcInstance;
     vlc_media_source_t *_p_mediaSource;
     vlc_media_tree_listener_id *_p_treeListenerID;
 }
@@ -79,10 +80,11 @@ static const struct vlc_media_tree_callbacks treeCallbacks = {
 
 @implementation VLCMediaSource
 
-- (instancetype)initWithMediaSource:(vlc_media_source_t *)p_mediaSource
+- (instancetype)initWithMediaSource:(vlc_media_source_t *)p_mediaSource andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance
 {
     self = [super init];
     if (self && p_mediaSource != NULL) {
+        _p_libvlcInstance = p_libvlcInstance;
         _p_mediaSource = p_mediaSource;
         vlc_media_source_Hold(_p_mediaSource);
         _p_treeListenerID = vlc_media_tree_AddListener(_p_mediaSource->tree,
@@ -102,6 +104,11 @@ static const struct vlc_media_tree_callbacks treeCallbacks = {
         }
         vlc_media_source_Release(_p_mediaSource);
     }
+}
+
+- (void)preparseInputItemWithinTree:(VLCInputItem *)inputItem
+{
+    vlc_media_tree_Preparse(_p_mediaSource->tree, _p_libvlcInstance, inputItem.vlcInputItem);
 }
 
 - (NSString *)mediaSourceDescription

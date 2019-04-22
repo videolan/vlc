@@ -24,57 +24,51 @@
 
 #import "extensions/NSString+Helpers.h"
 
-@interface VLCInputItem()
-{
-    struct input_item_t *_p_inputItem;
-}
-@end
-
 @implementation VLCInputItem
 
 - (instancetype)initWithInputItem:(struct input_item_t *)p_inputItem
 {
     self = [super init];
     if (self && p_inputItem != NULL) {
-        _p_inputItem = p_inputItem;
-        input_item_Hold(_p_inputItem);
+        _vlcInputItem = p_inputItem;
+        input_item_Hold(_vlcInputItem);
     }
     return self;
 }
 
 - (void)dealloc
 {
-    input_item_Release(_p_inputItem);
+    input_item_Release(_vlcInputItem);
 }
 
 - (NSString *)name
 {
-    if (_p_inputItem) {
-        return toNSStr(_p_inputItem->psz_name);
+    if (_vlcInputItem) {
+        return toNSStr(_vlcInputItem->psz_name);
     }
     return @"";
 }
 
 - (NSString *)MRL
 {
-    if (_p_inputItem) {
-        return toNSStr(_p_inputItem->psz_uri);
+    if (_vlcInputItem) {
+        return toNSStr(_vlcInputItem->psz_uri);
     }
     return @"";
 }
 
 - (vlc_tick_t)duration
 {
-    if (_p_inputItem) {
-        return _p_inputItem->i_duration;
+    if (_vlcInputItem) {
+        return _vlcInputItem->i_duration;
     }
     return -1;
 }
 
 - (enum input_item_type_e)inputType
 {
-    if (_p_inputItem) {
-        return _p_inputItem->i_type;
+    if (_vlcInputItem) {
+        return _vlcInputItem->i_type;
     }
     return ITEM_TYPE_UNKNOWN;
 }
