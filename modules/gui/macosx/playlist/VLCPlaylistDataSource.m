@@ -28,6 +28,7 @@
 #import "playlist/VLCPlaylistTableCellView.h"
 #import "playlist/VLCPlaylistItem.h"
 #import "playlist/VLCPlaylistModel.h"
+#import "views/VLCImageView.h"
 
 static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 

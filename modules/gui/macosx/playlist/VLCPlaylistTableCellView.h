@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class VLCImageView;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCPlaylistTableCellView : NSTableCellView
@@ -31,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) IBOutlet NSTextField *secondaryMediaTitleTextField;
 @property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
 @property (readwrite, assign) IBOutlet NSTextField *durationTextField;
-@property (readwrite, assign) IBOutlet NSImageView *mediaImageView;
+@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
 
 @end
 

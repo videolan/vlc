@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -28,13 +28,12 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Hnm-OH-KKY">
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ydb-7n-5Cd" customClass="VLCImageView">
                     <rect key="frame" x="0.0" y="3" width="104" height="65"/>
                     <constraints>
-                        <constraint firstAttribute="width" secondItem="Hnm-OH-KKY" secondAttribute="height" multiplier="16:10" id="4tH-UG-Xdn"/>
+                        <constraint firstAttribute="width" secondItem="Ydb-7n-5Cd" secondAttribute="height" multiplier="16:10" id="4aB-rs-m22"/>
                     </constraints>
-                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="AB8-xJ-YJC"/>
-                </imageView>
+                </customView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Ha-ZH-fa9">
                     <rect key="frame" x="349" y="27" width="37" height="17"/>
                     <constraints>
@@ -56,25 +55,25 @@
                 </textField>
             </subviews>
             <constraints>
+                <constraint firstItem="ohB-P0-nCv" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" constant="10" id="3wD-FP-vka"/>
                 <constraint firstItem="TPv-k2-6XS" firstAttribute="leading" secondItem="ohB-P0-nCv" secondAttribute="leading" id="4qb-9H-TVg"/>
+                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="8hv-Qt-uAI"/>
                 <constraint firstItem="xJW-ps-ycn" firstAttribute="leading" secondItem="ohB-P0-nCv" secondAttribute="leading" id="DYk-9g-adD"/>
                 <constraint firstItem="ohB-P0-nCv" firstAttribute="top" secondItem="xJW-ps-ycn" secondAttribute="bottom" constant="-3" id="Epo-on-wpL"/>
                 <constraint firstItem="3Ha-ZH-fa9" firstAttribute="centerY" secondItem="ohB-P0-nCv" secondAttribute="centerY" id="Flo-4k-Vaz"/>
-                <constraint firstAttribute="bottom" secondItem="Hnm-OH-KKY" secondAttribute="bottom" constant="3" id="KCN-ec-D7a"/>
-                <constraint firstItem="ohB-P0-nCv" firstAttribute="leading" secondItem="Hnm-OH-KKY" secondAttribute="trailing" constant="10" id="L6s-Ro-Qtx"/>
                 <constraint firstItem="3Ha-ZH-fa9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="xJW-ps-ycn" secondAttribute="trailing" constant="10" id="NxZ-be-5y0"/>
                 <constraint firstAttribute="trailing" secondItem="3Ha-ZH-fa9" secondAttribute="trailing" constant="14" id="SVJ-UL-O5m"/>
+                <constraint firstAttribute="bottom" secondItem="Ydb-7n-5Cd" secondAttribute="bottom" constant="3" id="aVd-Ld-lUH"/>
                 <constraint firstItem="3Ha-ZH-fa9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="TPv-k2-6XS" secondAttribute="trailing" constant="10" id="feB-7H-8HN"/>
+                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="3" id="iPZ-zR-jTv"/>
                 <constraint firstItem="ohB-P0-nCv" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="mGo-gc-dR6"/>
-                <constraint firstItem="Hnm-OH-KKY" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="3" id="owl-FT-tZX"/>
-                <constraint firstItem="Hnm-OH-KKY" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="vEf-1U-gh4"/>
                 <constraint firstItem="TPv-k2-6XS" firstAttribute="top" secondItem="ohB-P0-nCv" secondAttribute="bottom" constant="-3" id="vSW-bd-8ac"/>
                 <constraint firstItem="3Ha-ZH-fa9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ohB-P0-nCv" secondAttribute="trailing" constant="10" id="wQv-VX-Hhb"/>
             </constraints>
             <connections>
                 <outlet property="artistTextField" destination="TPv-k2-6XS" id="jJV-4C-USY"/>
                 <outlet property="durationTextField" destination="3Ha-ZH-fa9" id="vbh-oE-Afj"/>
-                <outlet property="mediaImageView" destination="Hnm-OH-KKY" id="SzS-Oe-Ghh"/>
+                <outlet property="mediaImageView" destination="Ydb-7n-5Cd" id="MlE-WQ-VB9"/>
                 <outlet property="mediaTitleTextField" destination="ohB-P0-nCv" id="iS6-q4-h8I"/>
                 <outlet property="secondaryMediaTitleTextField" destination="xJW-ps-ycn" id="KpP-ao-QlW"/>
             </connections>
