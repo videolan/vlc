@@ -104,7 +104,6 @@ vlc_plugin_t *vlc_plugin_create(void)
     plugin->conf.count = 0;
     plugin->conf.booleans = 0;
 #ifdef HAVE_DYNAMIC_PLUGINS
-    plugin->abspath = NULL;
     plugin->unloadable = true;
     atomic_init(&plugin->handle, 0);
     plugin->abspath = NULL;
