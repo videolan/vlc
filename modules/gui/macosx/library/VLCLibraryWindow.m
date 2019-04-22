@@ -101,6 +101,10 @@ static const float f_playlist_row_height = 72.;
     _libraryCollectionView.delegate = _libraryDataSource;
     [_libraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
 
+    _mediaSourceTableView.dataSource = _libraryDataSource;
+    _mediaSourceTableView.delegate = _libraryDataSource;
+    _mediaSourceTableView.rowHeight = f_playlist_row_height;
+
     [self segmentedControlAction:nil];
 }
 
@@ -114,17 +118,25 @@ static const float f_playlist_row_height = 72.;
     switch (_segmentedTitleControl.selectedSegment) {
         case 0:
             _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeAudio;
+            _mediaSourceScrollView.hidden = YES;
+            _libraryCollectionView.hidden = NO;
+            [_libraryCollectionView reloadData];
             break;
 
         case 1:
             _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeVideo;
+            _mediaSourceScrollView.hidden = YES;
+            _libraryCollectionView.hidden = NO;
+            [_libraryCollectionView reloadData];
             break;
 
         default:
             _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeNetwork;
+            _mediaSourceScrollView.hidden = NO;
+            _libraryCollectionView.hidden = YES;
+            [_mediaSourceTableView reloadData];
             break;
     }
-    [_libraryCollectionView reloadData];
 }
 
 - (void)playlistDoubleClickAction:(id)sender
