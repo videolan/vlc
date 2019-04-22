@@ -101,8 +101,8 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
 
             /* PrefsItemData Init */
             data = new PrefsItemData( this );
-            data->name = qfu( config_CategoryNameGet( p_item->value.i ) );
-            data->help = qfu( config_CategoryHelpGet( p_item->value.i ) );
+            data->name = qfu( vlc_config_cat_GetName( p_item->value.i ) );
+            data->help = qfu( vlc_config_cat_GetHelp( p_item->value.i ) );
             data->i_type = PrefsItemData::TYPE_CATEGORY;
             data->i_object_id = p_item->value.i;
 
@@ -141,8 +141,8 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
                 /* Data still contains the correct thing */
                 data->i_type = PrefsItemData::TYPE_CATSUBCAT;
                 data->i_subcat_id = p_item->value.i;
-                data->name = qfu( config_CategoryNameGet( p_item->value.i ) );
-                data->help = qfu( config_CategoryHelpGet( p_item->value.i ) );
+                data->name = qfu( vlc_config_subcat_GetName( p_item->value.i ) );
+                data->help = qfu( vlc_config_subcat_GetHelp( p_item->value.i ) );
                 current_item->setData( 0, Qt::UserRole,
                                        QVariant::fromValue( data ) );
                 continue;
@@ -152,8 +152,8 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
 
             /* Process the Data */
             data_sub = new PrefsItemData( this );
-            data_sub->name = qfu( config_CategoryNameGet( p_item->value.i) );
-            data_sub->help = qfu( config_CategoryHelpGet( p_item->value.i ) );
+            data_sub->name = qfu( vlc_config_subcat_GetName( p_item->value.i) );
+            data_sub->help = qfu( vlc_config_subcat_GetHelp( p_item->value.i ) );
             data_sub->i_type = PrefsItemData::TYPE_SUBCATEGORY;
             data_sub->i_object_id = p_item->value.i;
 

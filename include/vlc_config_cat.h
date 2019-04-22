@@ -194,35 +194,50 @@
 
 struct config_category_t
 {
-    int         i_id;
-    const char *psz_name;
-    const char *psz_help;
+    int         id;
+    const char *name;
+    const char *help;
+};
+
+struct config_subcategory_t
+{
+    int         id;
+    const char *name;
+    const char *help;
 };
 
 static const struct config_category_t categories_array[] =
 {
-    /* Interface */
-    { CAT_INTERFACE, INTF_TITLE, INTF_HELP },
+    { CAT_INTERFACE,  INTF_TITLE,       INTF_HELP      },
+    { CAT_AUDIO,      AUDIO_TITLE,      AUDIO_HELP     },
+    { CAT_VIDEO,      VIDEO_TITLE,      VIDEO_HELP     },
+    { CAT_INPUT,      INPUT_TITLE,      INPUT_HELP     },
+    { CAT_SOUT,       SOUT_TITLE,       SOUT_HELP      },
+    { CAT_PLAYLIST,   PLAYLIST_TITLE,   PLAYLIST_HELP  },
+    { CAT_ADVANCED,   AADVANCED_TITLE,  AADVANCED_HELP },
+
+    { -1, NULL, NULL }
+};
+
+static const struct config_subcategory_t subcategories_array[] =
+{
     { SUBCAT_INTERFACE_GENERAL, INTF_TITLE, INTF_GENERAL_HELP },
     { SUBCAT_INTERFACE_MAIN, INTF_MAIN_TITLE, INTF_MAIN_HELP },
     { SUBCAT_INTERFACE_CONTROL, INTF_CONTROL_TITLE, INTF_CONTROL_HELP },
     { SUBCAT_INTERFACE_HOTKEYS, INTF_HOTKEYS_TITLE, INTF_HOTKEYS_HELP },
 
-    { CAT_AUDIO, AUDIO_TITLE, AUDIO_HELP },
     { SUBCAT_AUDIO_GENERAL, AUDIO_TITLE, AUDIO_GENERAL_HELP },
     { SUBCAT_AUDIO_AOUT, AOUT_TITLE, AOUT_HELP },
     { SUBCAT_AUDIO_AFILTER, AFILTER_TITLE, AFILTER_HELP },
     { SUBCAT_AUDIO_RESAMPLER, ARESAMPLER_TITLE, AFILTER_HELP },
     { SUBCAT_AUDIO_VISUAL, AVISUAL_TITLE, AVISUAL_HELP },
 
-    { CAT_VIDEO, VIDEO_TITLE, VIDEO_HELP },
     { SUBCAT_VIDEO_GENERAL, VIDEO_TITLE, VIDEO_GENERAL_HELP },
     { SUBCAT_VIDEO_VOUT, _VOUT_TITLE, VOUT_HELP },
     { SUBCAT_VIDEO_VFILTER, VFILTER_TITLE, VFILTER_HELP },
     { SUBCAT_VIDEO_SUBPIC, SUBPIC_TITLE, SUBPIC_HELP },
     { SUBCAT_VIDEO_SPLITTER, SPLITTER_TITLE, SPLITTER_HELP },
 
-    { CAT_INPUT, INPUT_TITLE, INPUT_HELP },
     { SUBCAT_INPUT_GENERAL, INPUT_TITLE, INPUT_HELP },
     { SUBCAT_INPUT_ACCESS, ACCESS_TITLE, ACCESS_HELP },
     { SUBCAT_INPUT_DEMUX, DEMUX_TITLE, DEMUX_HELP },
@@ -231,7 +246,6 @@ static const struct config_category_t categories_array[] =
     { SUBCAT_INPUT_SCODEC, SDEC_TITLE, SDEC_HELP },
     { SUBCAT_INPUT_STREAM_FILTER, STREAM_FILTER_TITLE, STREAM_FILTER_HELP },
 
-    { CAT_SOUT, SOUT_TITLE, SOUT_HELP },
     { SUBCAT_SOUT_GENERAL, SOUT_TITLE, SOUT_GENERAL_HELP },
     { SUBCAT_SOUT_STREAM, SOUT_STREAM_TITLE, SOUT_STREAM_HELP },
     { SUBCAT_SOUT_MUX, SOUT_MUX_TITLE, SOUT_MUX_HELP },
@@ -240,42 +254,74 @@ static const struct config_category_t categories_array[] =
     { SUBCAT_SOUT_RENDERER, SOUT_RENDER_TITLE, SOUT_RENDER_HELP },
     { SUBCAT_SOUT_VOD, SOUT_VOD_TITLE, SOUT_VOD_HELP },
 
-    { CAT_PLAYLIST, PLAYLIST_TITLE , PLAYLIST_HELP },
     { SUBCAT_PLAYLIST_GENERAL, PLAYLIST_TITLE, PGENERAL_HELP },
     { SUBCAT_PLAYLIST_EXPORT, PEXPORT_TITLE, PEXPORT_HELP },
     { SUBCAT_PLAYLIST_SD, SD_TITLE, SD_HELP },
 
-    { CAT_ADVANCED, AADVANCED_TITLE, AADVANCED_HELP },
     { SUBCAT_ADVANCED_MISC, MISC_TITLE, AADVANCED_HELP },
     { SUBCAT_ADVANCED_NETWORK, ANETWORK_TITLE, ANETWORK_HELP },
 
     { -1, NULL, NULL }
 };
 
+/** Get the name for a category. */
 VLC_USED
-static inline const char *config_CategoryNameGet( int i_value )
+static inline const char *vlc_config_cat_GetName( int cat )
 {
     int i = 0;
-    while( categories_array[i].psz_name != NULL )
+    while( categories_array[i].name != NULL )
     {
-        if( categories_array[i].i_id == i_value )
+        if( categories_array[i].id == cat )
         {
-            return vlc_gettext(categories_array[i].psz_name);
+            return vlc_gettext(categories_array[i].name);
         }
         i++;
     }
     return NULL;
 }
 
+/** Get the help text for a category. */
 VLC_USED
-static inline const char *config_CategoryHelpGet( int i_value )
+static inline const char *vlc_config_cat_GetHelp( int cat )
 {
     int i = 0;
-    while( categories_array[i].psz_help != NULL )
+    while( categories_array[i].help != NULL )
     {
-        if( categories_array[i].i_id == i_value )
+        if( categories_array[i].id == cat )
         {
-            return vlc_gettext(categories_array[i].psz_help);
+            return vlc_gettext(categories_array[i].help);
+        }
+        i++;
+    }
+    return NULL;
+}
+
+/** Get the name for a subcategory. */
+VLC_USED
+static inline const char *vlc_config_subcat_GetName( int subcat )
+{
+    int i = 0;
+    while( subcategories_array[i].name != NULL )
+    {
+        if( subcategories_array[i].id == subcat )
+        {
+            return vlc_gettext(subcategories_array[i].name);
+        }
+        i++;
+    }
+    return NULL;
+}
+
+/** Get the help text for a subcategory. */
+VLC_USED
+static inline const char *vlc_config_subcat_GetHelp( int subcat )
+{
+    int i = 0;
+    while( subcategories_array[i].help != NULL )
+    {
+        if( subcategories_array[i].id == subcat )
+        {
+            return vlc_gettext(subcategories_array[i].help);
         }
         i++;
     }

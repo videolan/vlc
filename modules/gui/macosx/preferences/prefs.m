@@ -557,7 +557,7 @@
 @implementation VLCTreeCategoryItem
 + (VLCTreeCategoryItem *)categoryTreeItemWithCategory:(int)category
 {
-    if (!config_CategoryNameGet(category)) {
+    if (!vlc_config_cat_GetName(category)) {
         msg_Err(getIntf(), "failed to get name for category %i", category);
         return nil;
     }
@@ -566,10 +566,10 @@
 
 - (id)initWithCategory:(int)category
 {
-    NSString * name = _NS(config_CategoryNameGet(category));
+    NSString * name = _NS(vlc_config_cat_GetName(category));
     if (self = [super initWithName:name]) {
         _category = category;
-        //_help = [_NS(config_CategoryHelpGet(category)) retain];
+        //_help = [_NS(vlc_config_cat_GetHelp(category)) retain];
     }
     return self;
 }
@@ -597,17 +597,17 @@
 @implementation VLCTreeSubCategoryItem
 - (id)initWithSubCategory:(int)subCategory
 {
-    NSString * name = _NS(config_CategoryNameGet(subCategory));
+    NSString * name = _NS(vlc_config_subcat_GetName(subCategory));
     if (self = [super initWithName:name]) {
         _subCategory = subCategory;
-        //_help = [_NS(config_CategoryHelpGet(subCategory)) retain];
+        //_help = [_NS(vlc_config_subcat_GetHelp(subCategory)) retain];
     }
     return self;
 }
 
 + (VLCTreeSubCategoryItem *)subCategoryTreeItemWithSubCategory:(int)subCategory
 {
-    if (!config_CategoryNameGet(subCategory))
+    if (!vlc_config_subcat_GetName(subCategory))
         return nil;
     return [[[self class] alloc] initWithSubCategory:subCategory];
 }
@@ -627,7 +627,7 @@
     if (self = [super initWithName:name]) {
         _configItems = module_config_get(plugin, &_configSize);
         //_plugin = plugin;
-        //_help = [_NS(config_CategoryHelpGet(subCategory)) retain];
+        //_help = [_NS(vlc_config_subcat_GetHelp(subCategory)) retain];
     }
     return self;
 }
