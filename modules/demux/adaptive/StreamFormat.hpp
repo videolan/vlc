@@ -36,9 +36,11 @@ namespace adaptive
             static const unsigned PACKEDAAC   = 5;
             static const unsigned WEBM        = 6;
             static const unsigned UNKNOWN     = 0xFF; /* will probe */
+            static const unsigned PEEK_SIZE   = 189;
 
             StreamFormat( unsigned = UNSUPPORTED );
             explicit StreamFormat( const std::string &mime );
+            StreamFormat( const void *, size_t );
             ~StreamFormat();
             operator unsigned() const;
             std::string str() const;
