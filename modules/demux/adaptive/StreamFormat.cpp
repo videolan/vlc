@@ -23,6 +23,8 @@
 #endif
 
 #include "StreamFormat.hpp"
+
+#include <vlc_common.h>
 #include <algorithm>
 
 using namespace adaptive;
@@ -64,7 +66,7 @@ StreamFormat::StreamFormat( const std::string &mimetype )
     std::string mime = mimetype;
     std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
     std::string::size_type pos = mime.find("/");
-    formatid = UNSUPPORTED;
+    formatid = UNKNOWN;
     if(pos != std::string::npos)
     {
         std::string tail = mime.substr(pos + 1);
@@ -77,6 +79,26 @@ StreamFormat::StreamFormat( const std::string &mimetype )
         else if (tail == "ttml+xml")
             formatid = StreamFormat::TTML;
     }
+}
+
+StreamFormat::StreamFormat(const void *data_, size_t sz)
+{
+    const uint8_t *data = reinterpret_cast<const uint8_t *>(data_);
+    formatid = UNKNOWN;
+    const char moov[] = "ftypmoovmoof";
+
+    if(sz > 188 && data[0] == 0x47 && data[188] == 0x47)
+        formatid = StreamFormat::MPEG2TS;
+    else if(sz > 8 && (!memcmp(&moov,    &data[4], 4) ||
+                       !memcmp(&moov[4], &data[4], 4) ||
+                       !memcmp(&moov[8], &data[4], 4)))
+        formatid = StreamFormat::MP4;
+    else if(sz > 7 && !memcmp("WEBVTT", data, 6) &&
+            std::isspace(static_cast<unsigned char>(data[7])))
+        formatid = StreamFormat::WEBVTT;
+    else if(sz > 3 && (!memcmp("\xFF\xF1", data, 2)||
+                       !memcmp("\xFF\xF9", data, 2)))
+        formatid = StreamFormat::PACKEDAAC;
 }
 
 StreamFormat::~StreamFormat()

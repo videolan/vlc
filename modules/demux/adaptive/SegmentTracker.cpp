@@ -86,7 +86,7 @@ SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSe
     curRepresentation = NULL;
     setAdaptationLogic(logic_);
     adaptationSet = adaptSet;
-    format = StreamFormat::UNSUPPORTED;
+    format = StreamFormat::UNKNOWN;
 }
 
 SegmentTracker::~SegmentTracker()
@@ -132,7 +132,7 @@ void SegmentTracker::reset()
     init_sent = false;
     index_sent = false;
     initializing = true;
-    format = StreamFormat::UNSUPPORTED;
+    format = StreamFormat::UNKNOWN;
 }
 
 SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
@@ -199,7 +199,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     if(rep->getStreamFormat() != format)
     {
         /* Initial format ? */
-        if(format == StreamFormat(StreamFormat::UNSUPPORTED))
+        if(format == StreamFormat(StreamFormat::UNKNOWN))
         {
             format = rep->getStreamFormat();
         }
