@@ -400,12 +400,18 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
         std::list<Tag *>::const_iterator it;
         std::map<std::string, AttributesTag *> groupsmap;
 
+        /* Preload Session Key */
         Tag *sessionKey = getTagFromList(tagslist, AttributesTag::EXTXSESSIONKEY);
         if(sessionKey)
         {
             CommonEncryption sessionEncryption;
-            parseEncryption(static_cast<const AttributesTag *>(sessionKey),
-                            playlist->getUrlSegment(), sessionEncryption);
+            if(parseEncryption(static_cast<const AttributesTag *>(sessionKey),
+                                playlist->getUrlSegment(), sessionEncryption) &&
+               !sessionEncryption.uri.empty())
+            {
+                resources->getKeyring()->getKey(resources->getAuthStorage(),
+                                                sessionEncryption.uri);
+            }
         }
 
         /* We'll need to create an adaptation set for each media group / alternative rendering
