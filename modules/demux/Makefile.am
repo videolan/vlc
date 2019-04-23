@@ -385,6 +385,10 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/xml/DOMParser.h \
     demux/adaptive/xml/Node.cpp \
     demux/adaptive/xml/Node.h
+libadaptive_plugin_la_SOURCES += \
+     demux/mp4/libmp4.c \
+     demux/mp4/libmp4.h \
+     meta_engine/ID3Tag.h
 
 libadaptive_dash_SOURCES = \
     demux/dash/mpd/AdaptationSet.cpp \
@@ -460,7 +464,6 @@ libadaptive_plugin_la_SOURCES += $(libadaptive_hls_SOURCES)
 libadaptive_plugin_la_SOURCES += $(libadaptive_dash_SOURCES)
 libadaptive_plugin_la_SOURCES += $(libadaptive_smooth_SOURCES)
 libadaptive_plugin_la_SOURCES += demux/adaptive/adaptive.cpp
-libadaptive_plugin_la_SOURCES += demux/mp4/libmp4.c demux/mp4/libmp4.h
 libadaptive_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) -I$(srcdir)/demux/adaptive
 libadaptive_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
 if HAVE_ZLIB
