@@ -37,6 +37,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
+#include <vlc_timestamp_helper.h>
 
 #include <schroedinger/schro.h>
 
@@ -902,7 +903,7 @@ typedef struct
     bool b_auto_field_coding;
 
     uint32_t i_input_picnum;
-    block_fifo_t *p_dts_fifo;
+    timestamp_fifo_t *p_dts_fifo;
 
     block_t *p_chain;
 
@@ -1096,7 +1097,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->fmt_out.i_codec = VLC_CODEC_DIRAC;
     p_enc->fmt_out.i_cat = VIDEO_ES;
 
-    if( ( p_sys->p_dts_fifo = block_FifoNew() ) == NULL )
+    if( ( p_sys->p_dts_fifo = timestamp_FifoNew(32) ) == NULL )
     {
         CloseEncoder( p_this );
         return VLC_ENOMEM;
@@ -1493,12 +1494,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
 
         /* store dts in a queue, so that they appear in order in
          * coded order */
-        p_block = block_Alloc( 1 );
-        if( !p_block )
-            return NULL;
-        p_block->i_dts = p_pic->date - p_sys->i_pts_offset;
-        block_FifoPut( p_sys->p_dts_fifo, p_block );
-        p_block = NULL;
+        timestamp_FifoPut( p_sys->p_dts_fifo, p_pic->date - p_sys->i_pts_offset );
 
         /* for field coding mode, insert an extra value into both the
          * pts lookaside buffer and dts queue, offset to correspond
@@ -1507,12 +1503,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
             StorePicturePTS( p_enc, p_sys->i_input_picnum, p_pic->date + p_sys->i_field_duration );
             p_sys->i_input_picnum++;
 
-            p_block = block_Alloc( 1 );
-            if( !p_block )
-                return NULL;
-            p_block->i_dts = p_pic->date - p_sys->i_pts_offset + p_sys->i_field_duration;
-            block_FifoPut( p_sys->p_dts_fifo, p_block );
-            p_block = NULL;
+            timestamp_FifoPut( p_sys->p_dts_fifo, p_pic->date - p_sys->i_pts_offset + p_sys->i_field_duration );
         }
     }
 
@@ -1573,10 +1564,8 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
             }
 
             if( ReadDiracPictureNumber( &u_pic_num, p_block ) ) {
-                block_t *p_dts_block = block_FifoGet( p_sys->p_dts_fifo );
-                p_block->i_dts = p_dts_block->i_dts;
+                p_block->i_dts = timestamp_FifoGet( p_sys->p_dts_fifo );
                 p_block->i_pts = GetPicturePTS( p_enc, u_pic_num );
-                block_Release( p_dts_block );
                 block_ChainAppend( &p_output_chain, p_block );
             } else {
                 /* End of sequence */
@@ -1607,7 +1596,7 @@ static void CloseEncoder( vlc_object_t *p_this )
     free( p_sys->p_format );
 
     if( p_sys->p_dts_fifo )
-        block_FifoRelease( p_sys->p_dts_fifo );
+        timestamp_FifoRelease( p_sys->p_dts_fifo );
 
     block_ChainRelease( p_sys->p_chain );
 
