@@ -97,7 +97,7 @@ public:
 
 private:
     QTreeWidgetItem *createCatNode( int cat );
-    void createSubcatNode( QTreeWidgetItem * cat, int subcat );
+    QTreeWidgetItem *createSubcatNode( QTreeWidgetItem * cat, int subcat );
     void createPluginNode( QTreeWidgetItem * parent, module_t *mod );
     void setCatGeneralSubcat( QTreeWidgetItem *cat, int subcat );
     QTreeWidgetItem *findCatItem( int cat );

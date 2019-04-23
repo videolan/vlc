@@ -141,12 +141,23 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
         if( !has_options || cat == CAT_UNKNOWN || cat == CAT_HIDDEN )
             continue;
 
-        /* Locate the node */
+        /* Locate the category item */
+        /* If not found (very unlikely), we will create it */
         cat_item = findCatItem( cat );
-        QTreeWidgetItem *subcat_item = findSubcatItem( cat_item, subcat );
+        if ( !cat_item )
+        {
+            cat_item = createCatNode( cat );
+            // Merge general subcat properties
+            setCatGeneralSubcat( cat_item, vlc_config_cat_GetGeneralSubcat( cat ) );
+        }
 
-        if( subcat_item )
-            createPluginNode( subcat_item, p_module );
+        /* Locate the subcategory item */
+        /* If not found (was not used in the core option set - quite possible), we will create it */
+        QTreeWidgetItem *subcat_item = findSubcatItem( cat_item, subcat );
+        if( !subcat_item )
+            subcat_item = createSubcatNode( cat_item, subcat );
+
+        createPluginNode( subcat_item, p_module );
     }
 
     /* We got everything, just sort a bit */
@@ -192,7 +203,7 @@ QTreeWidgetItem *PrefsTree::createCatNode( int cat )
     return item;
 }
 
-void PrefsTree::createSubcatNode( QTreeWidgetItem * cat, int subcat )
+QTreeWidgetItem *PrefsTree::createSubcatNode( QTreeWidgetItem * cat, int subcat )
 {
     assert( cat );
 
@@ -210,6 +221,8 @@ void PrefsTree::createSubcatNode( QTreeWidgetItem * cat, int subcat )
     //item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
 
     cat->addChild( item );
+
+    return item;
 }
 
 void PrefsTree::createPluginNode( QTreeWidgetItem * parent, module_t *mod )
