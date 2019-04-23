@@ -54,16 +54,16 @@ class RecentsMRL : public QObject, public Singleton<RecentsMRL>
     friend class Singleton<RecentsMRL>;
 
 public:
+    
     void addRecent( const QString & );
-    QStringList recentList();
     QSignalMapper *signalMapper;
 
     vlc_tick_t time( const QString &mrl );
     void setTime( const QString &mrl, const vlc_tick_t time );
+    virtual ~RecentsMRL();
 
 private:
     RecentsMRL( intf_thread_t* _p_intf );
-    virtual ~RecentsMRL();
 
     intf_thread_t *p_intf;
 
@@ -74,8 +74,11 @@ private:
 
     void load();
     void save();
-
+     
+signals:
+       void saved();
 public slots:
+    QStringList recentList();
     void clear();
     void playMRL( const QString & );
 };

@@ -51,6 +51,7 @@
 #include "components/mediacenter/mlgenremodel.hpp"
 #include "components/mediacenter/mlvideomodel.hpp"
 #include "components/mediacenter/mlnetworkmodel.hpp"
+#include "components/recent_media_model.hpp"
 
 #include "components/navigation_history.hpp"
 #include "components/aboutmodel.hpp"
@@ -63,7 +64,6 @@
 #include "util/qmleventfilter.hpp"
 
 #include "menus.hpp"                            // Menu creation
-#include "recents.hpp"                          // RecentItems when DnD
 
 #include <QCloseEvent>
 #include <QKeyEvent>
@@ -376,6 +376,7 @@ void MainInterface::createMainWidget( QSettings * )
     rootCtx->setContextProperty( "rootQMLView", mediacenterView);
     rootCtx->setContextProperty( "rootWindow", this);
     rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
+    rootCtx->setContextProperty( "recentsMedias",  new VLCRecentMediaModel( p_intf, this ));
 
     if (b_hasMedialibrary)
     {

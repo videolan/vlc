@@ -30,7 +30,41 @@ Utils.MenuExt {
     Action { text: qsTr("Open &Capture Device...");       onTriggered: dialogProvider.openCaptureDialog();         icon.source:"qrc:/type/capture-card.svg"; shortcut: "Ctrl+C" }
     Action { text: qsTr("Open &Location from clipboard"); onTriggered: dialogProvider.openUrlDialog();                                                       shortcut: "Ctrl+V" }
 
-    /* FIXME recent */
+
+    Utils.MenuExt {
+        id: recentsMenu
+        title: qsTr("Open &Recent Media")
+        property bool hasData: true
+        onAboutToShow:{
+            recentsMenu.hasData = Boolean(recentsMedias.rowCount())
+        }
+        Instantiator {
+            model: recentsMedias
+            Utils.MenuItemExt {
+                text: mrl
+                onTriggered:{
+                    mainDropdownMenu.close() //needed since menuItem isn't a direct child of a menu
+                    mainPlaylistController.append([mrl], true)
+                }
+
+                Shortcut {
+                    sequence: "Ctrl+" + (index + 1)
+                    onActivated:  mainPlaylistController.append([mrl], true)
+                    context: Qt.ApplicationShortcut
+                }
+            }
+            onObjectAdded: recentsMenu.insertItem(recentsMenu.count - 2, object)
+            onObjectRemoved: recentsMenu.removeItem(object)
+        }
+
+        MenuSeparator{}
+
+        Utils.MenuItemExt {
+            text: qsTr("Clear")
+            enabled: recentsMenu.hasData
+            onTriggered:recentsMedias.clear()
+        }
+    }
 
     Action { text: qsTr("Save Playlist to &File...");     onTriggered: dialogProvider.savePlayingToPlaylist();     icon.source: "";                      shortcut: "Ctrl+Y" }
     Action { text: qsTr("Conve&rt / Save..." );           onTriggered: dialogProvider.openAndTranscodingDialogs(); icon.source: "";                      shortcut: "Ctrl+R" }

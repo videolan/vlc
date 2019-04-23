@@ -158,6 +158,7 @@ void RecentsMRL::save()
 {
     getSettings()->setValue( "RecentsMRL/list", recents );
     getSettings()->setValue( "RecentsMRL/times", times );
+    emit saved();
 }
 
 void RecentsMRL::playMRL( const QString &mrl )

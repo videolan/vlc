@@ -202,6 +202,9 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
         that->UpdateName( newMediaPtr.get() );
         that->UpdateArt( newMediaPtr.get() );
         that->UpdateMeta( newMediaPtr.get() );
+
+        RecentsMRL::getInstance( that->p_intf )->addRecent( newMediaPtr.get()->psz_uri );
+
         emit q->inputChanged( newMediaPtr != nullptr );
     });
 }

@@ -566,8 +566,6 @@ QString DialogsProvider::getDirectoryDialog( intf_thread_t *p_intf )
     dir = qfu( uri );
     free( uri );
 
-    RecentsMRL::getInstance( p_intf )->addRecent( dir );
-
     return dir;
 }
 
