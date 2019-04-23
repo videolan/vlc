@@ -31,6 +31,7 @@
 #include <vlc_interface.h>
 
 #include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <QSet>
 
 #include "qt.hpp"
@@ -95,6 +96,13 @@ public:
     void setLoadedOnly( bool );
 
 private:
+    QTreeWidgetItem *createCatNode( int cat );
+    void createSubcatNode( QTreeWidgetItem * cat, int subcat );
+    void createPluginNode( QTreeWidgetItem * parent, module_t *mod );
+    void setCatGeneralSubcat( QTreeWidgetItem *cat, int subcat );
+    QTreeWidgetItem *findCatItem( int cat );
+    QTreeWidgetItem *findSubcatItem( int subcat );
+    QTreeWidgetItem *findSubcatItem( QTreeWidgetItem *cat, int subcat );
     void doAll( bool );
     bool filterItems( QTreeWidgetItem *item, const QString &text, Qt::CaseSensitivity cs );
     bool collapseUnselectedItems( QTreeWidgetItem *item );
