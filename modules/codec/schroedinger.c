@@ -998,7 +998,7 @@ static vlc_tick_t GetPicturePTS( encoder_t *p_enc, uint32_t u_pnum )
     return VLC_TICK_INVALID;
 }
 
-static inline bool SchroSetEnum( const encoder_t *p_enc, int i_list_size, const char *list[],
+static inline bool SchroSetEnum( encoder_t *p_enc, int i_list_size, const char *list[],
                   const char *psz_name,  const char *psz_name_text,  const char *psz_value)
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
