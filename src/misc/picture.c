@@ -114,7 +114,7 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
 
     /* Store default values */
     p_picture->i_planes = 0;
-    for( unsigned i = 0; i < VOUT_MAX_PLANES; i++ )
+    for( unsigned i = 0; i < ARRAY_SIZE(p_picture->p); i++ )
     {
         plane_t *p = &p_picture->p[i];
         p->p_pixels = NULL;
