@@ -196,13 +196,15 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
             {
                 i_subcategory = p_item->value.i;
                 i_category = vlc_config_cat_FromSubcat( i_subcategory );
+                continue;
             }
 
             if( CONFIG_ITEM(p_item->i_type) )
+            {
                 b_options = true;
-
-            if( b_options && i_category != CAT_UNKNOWN )
-                break;
+                if( i_category != CAT_UNKNOWN )
+                    break;
+            }
         }
         module_config_free (p_config);
 
