@@ -1734,8 +1734,6 @@ vlc_module_begin ()
     add_module_list("video-filter", "video filter", NULL,
                     VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT)
 
-    set_subcategory( SUBCAT_VIDEO_SPLITTER )
-
 #if 0
     add_string( "pixel-ratio", "1", PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT )
 #endif
@@ -1998,7 +1996,7 @@ vlc_module_begin ()
     add_module("demux", "demux", "any", DEMUX_TEXT, DEMUX_LONGTEXT)
     add_string( "demux-filter", NULL, DEMUX_FILTER_TEXT, DEMUX_FILTER_LONGTEXT )
 
-    set_subcategory( SUBCAT_INPUT_ACODEC )
+    //set_subcategory( SUBCAT_INPUT_ACODEC )
     set_subcategory( SUBCAT_INPUT_VCODEC )
 
     add_string( "codec", NULL, CODEC_TEXT, CODEC_LONGTEXT )
@@ -2006,7 +2004,7 @@ vlc_module_begin ()
     add_obsolete_string( "encoder" ) /* since 4.0.0 */
     add_module("dec-dev", "decoder device", "any", DEC_DEV_TEXT, DEC_DEV_LONGTEXT)
 
-    set_subcategory( SUBCAT_INPUT_SCODEC )
+    //set_subcategory( SUBCAT_INPUT_SCODEC )
     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
 
     add_module_list("stream-filter", "stream_filter", NULL,
@@ -2053,8 +2051,6 @@ vlc_module_begin ()
     add_module("packetizer", "packetizer", NULL,
                PACKETIZER_TEXT, PACKETIZER_LONGTEXT)
 
-    set_subcategory( SUBCAT_SOUT_VOD )
-
 /* Advanced options */
     set_subcategory( SUBCAT_ADVANCED_MISC )
     add_category_hint(N_("Advanced"), NULL)
@@ -2096,8 +2092,6 @@ vlc_module_begin ()
     add_string( "clock-source", NULL, CLOCK_SOURCE_TEXT, NULL )
         change_string_list( clock_sources, clock_sources_text )
 #endif
-
-    set_subcategory( SUBCAT_ADVANCED_NETWORK )
 
 /* Playlist options */
     set_subcategory( SUBCAT_PLAYLIST_GENERAL )
