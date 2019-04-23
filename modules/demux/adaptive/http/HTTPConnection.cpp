@@ -70,7 +70,12 @@ HTTPConnection::HTTPConnection(vlc_object_t *p_object_, AuthStorage *auth,
     : AbstractConnection( p_object_ )
 {
     transport = socket_;
-    psz_useragent = var_InheritString(p_object_, "http-user-agent");
+    char *psz_useragent = var_InheritString(p_object_, "http-user-agent");
+    useragent = psz_useragent ? std::string(psz_useragent) : std::string("");
+    free(psz_useragent);
+    for(std::string::iterator it = useragent.begin(); it != useragent.end(); ++it)
+        if(!std::isprint(*it))
+            *it = ' ';
     queryOk = false;
     retries = 0;
     authStorage = auth;
@@ -83,7 +88,6 @@ HTTPConnection::HTTPConnection(vlc_object_t *p_object_, AuthStorage *auth,
 
 HTTPConnection::~HTTPConnection()
 {
-    free(psz_useragent);
     delete transport;
 }
 
@@ -435,7 +439,7 @@ std::string HTTPConnection::buildRequestHeader(const std::string &path) const
             req << "Cookie: " << cookie << "\r\n";
     }
     req << "Cache-Control: no-cache" << "\r\n" <<
-           "User-Agent: " << std::string(psz_useragent) << "\r\n";
+           "User-Agent: " << useragent << "\r\n";
     req << extraRequestHeaders();
     return req.str();
 }
