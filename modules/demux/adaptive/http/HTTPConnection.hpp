@@ -93,7 +93,7 @@ namespace adaptive
                 ssize_t         readChunk   (void *p_buffer, size_t len);
                 int parseReply();
                 std::string readLine();
-                char * psz_useragent;
+                std::string useragent;
 
                 AuthStorage        *authStorage;
                 ConnectionParams    locationparams;
