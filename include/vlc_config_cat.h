@@ -195,6 +195,7 @@
 struct config_category_t
 {
     int         id;
+    int         general_subcat;
     const char *name;
     const char *help;
 };
@@ -209,13 +210,13 @@ struct config_subcategory_t
 
 static const struct config_category_t categories_array[] =
 {
-    { CAT_INTERFACE,  INTF_TITLE,       INTF_HELP      },
-    { CAT_AUDIO,      AUDIO_TITLE,      AUDIO_HELP     },
-    { CAT_VIDEO,      VIDEO_TITLE,      VIDEO_HELP     },
-    { CAT_INPUT,      INPUT_TITLE,      INPUT_HELP     },
-    { CAT_SOUT,       SOUT_TITLE,       SOUT_HELP      },
-    { CAT_PLAYLIST,   PLAYLIST_TITLE,   PLAYLIST_HELP  },
-    { CAT_ADVANCED,   AADVANCED_TITLE,  AADVANCED_HELP },
+    { CAT_INTERFACE,  SUBCAT_INTERFACE_GENERAL,  INTF_TITLE,       INTF_HELP      },
+    { CAT_AUDIO,      SUBCAT_AUDIO_GENERAL,      AUDIO_TITLE,      AUDIO_HELP     },
+    { CAT_VIDEO,      SUBCAT_VIDEO_GENERAL,      VIDEO_TITLE,      VIDEO_HELP     },
+    { CAT_INPUT,      SUBCAT_INPUT_GENERAL,      INPUT_TITLE,      INPUT_HELP     },
+    { CAT_SOUT,       SUBCAT_SOUT_GENERAL,       SOUT_TITLE,       SOUT_HELP      },
+    { CAT_PLAYLIST,   SUBCAT_PLAYLIST_GENERAL,   PLAYLIST_TITLE,   PLAYLIST_HELP  },
+    { CAT_ADVANCED,   SUBCAT_ADVANCED_MISC,      AADVANCED_TITLE,  AADVANCED_HELP },
 };
 
 static const struct config_subcategory_t subcategories_array[] =
@@ -295,6 +296,28 @@ static inline int vlc_config_subcat_IndexOf( int subcat )
     return index;
 }
 
+/** Get the "general" subcategory for a given category.
+ *
+ * In a cat/subcat preference tree, subcategories typically appear as child
+ * nodes under their respective parent category node. Core config items, which
+ * are always associated with a particular subcategory, are shown when that
+ * subcategory node is selected. Each category however has a "general"
+ * subcategory which is not shown as a child node, instead the options for
+ * this are shown when the category node itself is selected in the tree.
+ *
+ * One or more nodes are also created in the tree per plugin, with the
+ * location relating to the subcategory association of its config items. Plugin
+ * nodes associated with general subcategories naturally appear as child nodes
+ * of the category node (as a sibling to its subcategory nodes), rather than as
+ * a child node of a subcategory node.
+ */
+VLC_USED
+static inline int vlc_config_cat_GetGeneralSubcat( int cat )
+{
+    int i = vlc_config_cat_IndexOf( cat );
+    return (i != -1) ? categories_array[i].general_subcat : SUBCAT_UNKNOWN;
+}
+
 /** Get the name for a category. */
 VLC_USED
 static inline const char *vlc_config_cat_GetName( int cat )
@@ -335,37 +358,14 @@ static inline int vlc_config_cat_FromSubcat( int subcat )
     return (i != -1) ? subcategories_array[i].cat : CAT_UNKNOWN;
 }
 
-/** Check if the given subcategory is a "general" one.
- *
- * In a cat/subcat preference tree, subcategories typically appear as child
- * nodes under their respective parent category node. Core config items, which
- * are always associated with a particular subcategory, are shown when that
- * subcategory node is selected. Each category however has a "general"
- * subcategory which is not shown as a child node, instead the options for
- * this are shown when the category node itself is selected in the tree.
- *
- * One or more nodes are also created in the tree per plugin, with the
- * location relating to the subcategory association of its config items. Plugin
- * nodes associated with general subcategories naturally appear as child nodes
- * of the category node (as a sibling to its subcategory nodes), rather than as
- * a child node of a subcategory node.
- */
+/** Check if the given subcategory is a "general" one. */
 VLC_USED
 static inline bool vlc_config_subcat_IsGeneral( int subcat )
 {
-    switch (subcat)
-    {
-        case SUBCAT_INTERFACE_GENERAL:
-        case SUBCAT_AUDIO_GENERAL:
-        case SUBCAT_VIDEO_GENERAL:
-        case SUBCAT_INPUT_GENERAL:
-        case SUBCAT_SOUT_GENERAL:
-        case SUBCAT_ADVANCED_MISC:
-        case SUBCAT_PLAYLIST_GENERAL:
-            return true;
-        default:
-            return false;
-    }
+    if( subcat == SUBCAT_UNKNOWN )
+        return false;
+    int cat = vlc_config_cat_FromSubcat( subcat );
+    return (subcat == vlc_config_cat_GetGeneralSubcat( cat ));
 }
 
 #endif /* VLC_CONFIG_CAT_H */
