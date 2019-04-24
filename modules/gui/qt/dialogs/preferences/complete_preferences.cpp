@@ -158,8 +158,24 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
         createPluginNode( subcat_item, p_module );
     }
 
-    /* We got everything, just sort a bit */
+    // We got everything, just sort a bit.
+    // We allow the subcat and plugin nodes to be alphabetical, but we force
+    // the top-level cat nodes into a preferred order.
     sortItems( 0, Qt::AscendingOrder );
+    unsigned index = 0;
+    for (unsigned i = 0; i < ARRAY_SIZE(categories_array); i++)
+    {
+        cat_item = findCatItem( categories_array[i].id );
+        if ( cat_item == NULL )
+            continue;
+        unsigned cur_index = (unsigned)indexOfTopLevelItem( cat_item );
+        if (cur_index != index)
+        {
+            insertTopLevelItem( index, takeTopLevelItem( cur_index ) );
+            expandItem( cat_item );
+        }
+        ++index;
+    }
 
     resizeColumnToContents( 0 );
 }
