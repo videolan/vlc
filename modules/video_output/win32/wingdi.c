@@ -274,8 +274,6 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
 
     vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (WinGDI output)");
 
-    CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
-
     return VLC_SUCCESS;
 }
 

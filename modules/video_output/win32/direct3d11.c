@@ -472,6 +472,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->internal_swapchain.swapchainHwnd = sys->sys.hvideownd;
 #endif /* !VLC_WINSTORE_APP */
     }
+    else
+    {
+        CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
+    }
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
         sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
@@ -1560,8 +1564,6 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DeviceContext_OMSetDepthStencilState(sys->d3d_dev.d3dcontext, pDepthStencilState, 0);
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
-
-    CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
 
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {

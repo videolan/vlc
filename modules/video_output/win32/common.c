@@ -90,6 +90,8 @@ int CommonWindowInit(vlc_object_t *obj, display_win32_area_t *area,
     sys->hparent       = hwnd.hparent;
     sys->hvideownd     = hwnd.hvideownd;
 
+    CommonPlacePicture(obj, area, sys);
+
     return VLC_SUCCESS;
 }
 #endif /* !VLC_WINSTORE_APP */

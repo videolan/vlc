@@ -1494,8 +1494,6 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
     fmt->i_bmask  = d3dfmt->bmask;
     sys->sw_texture_fmt = d3dfmt;
 
-    CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
-
     if (Direct3D9CreateResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate resources");
         goto error;
@@ -1653,6 +1651,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     {
         if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false))
             goto error;
+    }
+    else
+    {
+        CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
     }
 
     /* */
