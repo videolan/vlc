@@ -139,6 +139,7 @@ enum VLCTreeBranchType {
 {
     module_config_t * _configItem;
 }
++ (VLCTreeLeafItem *)newTreeLeaf:(module_config_t *)configItem;
 - (id)initWithConfigItem:(module_config_t *)configItem;
 - (module_config_t *)configItem;
 @end
@@ -531,9 +532,9 @@ enum VLCTreeBranchType {
 
             if (mod_is_main) {
                 if (categoryItem && subcat_is_general) {
-                    [[categoryItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
+                    [[categoryItem options] addObject:[VLCTreeLeafItem newTreeLeaf:&p_configs[j]]];
                 } else if (subcategoryItem && !subcat_is_general) {
-                    [[subcategoryItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
+                    [[subcategoryItem options] addObject:[VLCTreeLeafItem newTreeLeaf:&p_configs[j]]];
                 }
             }
             else {
@@ -549,7 +550,7 @@ enum VLCTreeBranchType {
                 }
 
                 if (pluginItem) {
-                    [[pluginItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
+                    [[pluginItem options] addObject:[VLCTreeLeafItem newTreeLeaf:&p_configs[j]]];
                 }
             }
         }
@@ -677,6 +678,10 @@ enum VLCTreeBranchType {
 
 #pragma mark -
 @implementation VLCTreeLeafItem
++ (VLCTreeLeafItem *)newTreeLeaf:(module_config_t *)configItem
+{
+    return [[[self class] alloc] initWithConfigItem:configItem];
+}
 
 - (id)initWithConfigItem: (module_config_t *) configItem
 {
