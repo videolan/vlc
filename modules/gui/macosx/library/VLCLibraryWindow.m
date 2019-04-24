@@ -34,6 +34,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryMenuController.h"
 
+#import "media-source/VLCMediaSourceCollectionViewItem.h"
 #import "media-source/VLCMediaSourceDataSource.h"
 
 #import "windows/mainwindow/VLCControlsBarCommon.h"
@@ -77,12 +78,13 @@ static const float f_playlist_row_height = 72.;
     _fspanel = [[VLCFSPanelController alloc] init];
     [_fspanel showWindow:self];
 
-    _segmentedTitleControl.segmentCount = 3;
+    _segmentedTitleControl.segmentCount = 4;
     [_segmentedTitleControl setTarget:self];
     [_segmentedTitleControl setAction:@selector(segmentedControlAction:)];
     [_segmentedTitleControl setLabel:_NS("Music") forSegment:0];
     [_segmentedTitleControl setLabel:_NS("Video") forSegment:1];
-    [_segmentedTitleControl setLabel:_NS("Network") forSegment:2];
+    [_segmentedTitleControl setLabel:_NS("Local Network") forSegment:2];
+    [_segmentedTitleControl setLabel:_NS("Internet") forSegment:3];
     [_segmentedTitleControl sizeToFit];
 
     VLCMain *mainInstance = [VLCMain sharedInstance];
@@ -105,9 +107,9 @@ static const float f_playlist_row_height = 72.;
     [_libraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
 
     _mediaSourceDataSource = [[VLCMediaSourceDataSource alloc] init];
-    _mediaSourceTableView.dataSource = _mediaSourceDataSource;
-    _mediaSourceTableView.delegate = _mediaSourceDataSource;
-    _mediaSourceTableView.rowHeight = f_playlist_row_height;
+    _mediaSourceCollectionView.dataSource = _mediaSourceDataSource;
+    _mediaSourceCollectionView.delegate = _mediaSourceDataSource;
+    [_mediaSourceCollectionView registerClass:[VLCMediaSourceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceCellIdentifier];
 
     [self segmentedControlAction:nil];
 }
@@ -135,10 +137,9 @@ static const float f_playlist_row_height = 72.;
             break;
 
         default:
-            _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeNetwork;
             _mediaSourceScrollView.hidden = NO;
             _libraryCollectionView.hidden = YES;
-            [_mediaSourceTableView reloadData];
+            [_mediaSourceCollectionView reloadData];
             break;
     }
 }

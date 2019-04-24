@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryWindow.h: MacOS X interface module
+ * VLCMediaSourceCollectionViewItem.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,35 +20,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "windows/video/VLCVideoWindowCommon.h"
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryWindowController : NSWindowController
+@class VLCImageView;
 
-- (instancetype)initWithLibraryWindow;
+extern NSString *VLCMediaSourceCellIdentifier;
 
-@end
+@interface VLCMediaSourceCollectionViewItem : NSCollectionViewItem
 
-@interface VLCLibraryCollectionView : NSCollectionView
-@end
-
-@interface VLCLibraryWindow : VLCVideoWindowCommon
-
-@property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
-@property (readwrite, weak) IBOutlet VLCLibraryCollectionView *libraryCollectionView;
-@property (readwrite, weak) IBOutlet NSCollectionView *mediaSourceCollectionView;
-@property (readwrite, weak) IBOutlet NSScrollView *mediaSourceScrollView;
-@property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
-
-@property (readonly) BOOL nativeFullscreenMode;
-@property (readwrite) BOOL nonembedded;
-
-- (void)videoPlaybackWillBeStarted;
-- (void)enableVideoPlaybackAppearance;
-- (void)disableVideoPlaybackAppearance;
-
-- (IBAction)playlistDoubleClickAction:(id)sender;
+@property (readwrite, assign) IBOutlet NSTextField *titleTextField;
+@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
 
 @end
 

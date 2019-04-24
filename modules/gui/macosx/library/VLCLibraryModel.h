@@ -29,7 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSInteger, VLCLibraryMode) {
     VLCLibraryModeAudio,
     VLCLibraryModeVideo,
-    VLCLibraryModeNetwork,
 };
 
 @class VLCMediaLibraryMediaItem;

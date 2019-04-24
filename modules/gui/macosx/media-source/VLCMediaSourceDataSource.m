@@ -24,13 +24,11 @@
 
 #import "media-source/VLCMediaSourceProvider.h"
 #import "media-source/VLCMediaSource.h"
-#import "playlist/VLCPlaylistTableCellView.h"
+#import "media-source/VLCMediaSourceCollectionViewItem.h"
 
 #import "main/VLCMain.h"
 #import "library/VLCInputItem.h"
 #import "extensions/NSString+Helpers.h"
-
-static NSString *VLCMediaSourceCellIdentifier = @"VLCMediaSourceCellIdentifier";
 
 @interface VLCMediaSourceDataSource ()
 {
@@ -53,94 +51,60 @@ static NSString *VLCMediaSourceCellIdentifier = @"VLCMediaSourceCellIdentifier";
 
 - (void)lazyLoadMediaSources
 {
-    NSMutableArray *mutableArray = [[NSMutableArray alloc] init];
-    NSArray *mediaDiscoveryForDevices = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_DEVICES];
-    if (mediaDiscoveryForDevices.count > 0) {
-        [mutableArray addObject:_NS("Devices")];
-        [mutableArray addObjectsFromArray:mediaDiscoveryForDevices];
-    }
-
     NSArray *mediaDiscoveryForLAN = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_LAN];
-    if (mediaDiscoveryForLAN.count > 0) {
-        [mutableArray addObject:_NS("Local Network")];
-        [mutableArray addObjectsFromArray:mediaDiscoveryForLAN];
-    }
-
-    NSArray *mediaDiscoveryForInternet = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_INTERNET];
-    if (mediaDiscoveryForInternet.count > 0) {
-        [mutableArray addObject:_NS("Internet")];
-        [mutableArray addObjectsFromArray:mediaDiscoveryForInternet];
-    }
-
-    NSArray *mediaDiscoveryForMyComputer = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_MYCOMPUTER];
-    if (mediaDiscoveryForMyComputer.count > 0) {
-        [mutableArray addObject:_NS("My Computer")];
-        [mutableArray addObjectsFromArray:mediaDiscoveryForMyComputer];
-    }
-
-    _mediaDiscovery = [mutableArray copy];
-}
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
-{
-    return _mediaDiscovery.count;
-}
-
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-    VLCPlaylistTableCellView *cellView = [tableView makeViewWithIdentifier:VLCMediaSourceCellIdentifier owner:self];
-
-    if (cellView == nil) {
-        /* the following code saves us an instance of NSViewController which we don't need */
-        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCPlaylistTableCellView" bundle:nil];
-        NSArray *topLevelObjects;
-        if (![nib instantiateWithOwner:self topLevelObjects:&topLevelObjects]) {
-            msg_Err(getIntf(), "Failed to load nib file to show playlist items");
-            return nil;
-        }
-
-        for (id topLevelObject in topLevelObjects) {
-            if ([topLevelObject isKindOfClass:[VLCPlaylistTableCellView class]]) {
-                cellView = topLevelObject;
-                break;
-            }
-        }
-        cellView.identifier = VLCMediaSourceCellIdentifier;
-    }
-
-    if ([self tableView:tableView isGroupRow:row]) {
-        NSString *labelString = _mediaDiscovery[row];
-        cellView.mediaTitleTextField.hidden = NO;
-        cellView.secondaryMediaTitleTextField.hidden = YES;
-        cellView.artistTextField.hidden = YES;
-        cellView.mediaTitleTextField.stringValue = labelString;
-        cellView.durationTextField.stringValue = @"";
-    } else {
-        VLCMediaSource *mediaSource = _mediaDiscovery[row];
-
-        VLCInputItem *inputItem = mediaSource.rootNode.inputItem;
-        if (inputItem) {
-            cellView.mediaTitleTextField.hidden = YES;
-            cellView.secondaryMediaTitleTextField.hidden = NO;
-            cellView.artistTextField.hidden = NO;
-            cellView.secondaryMediaTitleTextField.stringValue = mediaSource.mediaSourceDescription;
-            cellView.artistTextField.stringValue = inputItem.name;
-            cellView.durationTextField.stringValue = [NSString stringWithTimeFromTicks:inputItem.duration];
-        } else {
-            cellView.mediaTitleTextField.hidden = NO;
-            cellView.secondaryMediaTitleTextField.hidden = YES;
-            cellView.artistTextField.hidden = YES;
-            cellView.mediaTitleTextField.stringValue = mediaSource.mediaSourceDescription;
-            cellView.durationTextField.stringValue = @"";
+    NSUInteger count = mediaDiscoveryForLAN.count;
+    if (count > 0) {
+        for (NSUInteger x = 0; x < count; x++) {
+            VLCMediaSource *mediaSource = mediaDiscoveryForLAN[x];
+            VLCInputNode *rootNode = [mediaSource rootNode];
+            [mediaSource preparseInputItemWithinTree:rootNode.inputItem];
         }
     }
-
-    return cellView;
+    _mediaDiscovery = mediaDiscoveryForLAN;
 }
 
-- (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row
+- (NSInteger)collectionView:(NSCollectionView *)collectionView
+     numberOfItemsInSection:(NSInteger)section
 {
-    return [_mediaDiscovery[row] isKindOfClass:[NSString class]];
+    switch (self.mediaSourceMode) {
+        case VLCMediaSourceModeLAN:
+            return _mediaDiscovery.count;
+            break;
+
+        case VLCMediaSourceModeInternet:
+        default:
+            return 0;
+            break;
+    }
+}
+
+- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
+     itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
+{
+    VLCMediaSourceCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCMediaSourceCellIdentifier forIndexPath:indexPath];
+
+    NSArray *mediaArray;
+    switch (self.mediaSourceMode) {
+        case VLCMediaSourceModeLAN:
+            mediaArray = _mediaDiscovery;
+            break;
+
+        case VLCMediaSourceModeInternet:
+        default:
+            NSAssert(1, @"no representation for selected media source mode %li", (long)self.mediaSourceMode);
+            mediaArray = @[];
+            break;
+    }
+
+    VLCMediaSource *mediaSource = mediaArray[indexPath.item];
+    viewItem.titleTextField.stringValue = mediaSource.mediaSourceDescription;
+
+    return viewItem;
+}
+
+- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+{
+    NSLog(@"media source selection changed: %@", indexPaths);
 }
 
 @end
