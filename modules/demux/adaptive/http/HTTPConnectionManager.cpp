@@ -58,14 +58,6 @@ void AbstractConnectionManager::setDownloadRateObserver(IDownloadRateObserver *o
     rateObserver = obs;
 }
 
-HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *p_object_, AbstractConnectionFactory *factory_)
-    : AbstractConnectionManager( p_object_ )
-{
-    vlc_mutex_init(&lock);
-    downloader = new (std::nothrow) Downloader();
-    downloader->start();
-    factory = factory_;
-}
 
 HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *p_object_, AuthStorage *storage)
     : AbstractConnectionManager( p_object_ )
