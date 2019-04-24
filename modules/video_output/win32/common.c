@@ -215,6 +215,11 @@ int CommonControl(vlc_object_t *obj, display_win32_area_t *area, vout_display_sy
 #if !VLC_WINSTORE_APP
         if (sys->event != NULL)
         {
+            RECT clientRect;
+            GetClientRect(sys->hparent, &clientRect);
+            area->vdcfg.display.width  = RECTWidth(clientRect);
+            area->vdcfg.display.height = RECTHeight(clientRect);
+
             SetWindowPos(sys->hvideownd, 0, 0, 0,
                          area->vdcfg.display.width,
                          area->vdcfg.display.height, SWP_NOZORDER|SWP_NOMOVE|SWP_NOACTIVATE);
