@@ -100,7 +100,6 @@ private:
     QTreeWidgetItem *createCatNode( int cat );
     QTreeWidgetItem *createSubcatNode( QTreeWidgetItem * cat, int subcat );
     void createPluginNode( QTreeWidgetItem * parent, module_t *mod );
-    void setCatGeneralSubcat( QTreeWidgetItem *cat, int subcat );
     QTreeWidgetItem *findCatItem( int cat );
     QTreeWidgetItem *findSubcatItem( int subcat );
     void doAll( bool );
