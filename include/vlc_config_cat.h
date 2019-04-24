@@ -187,8 +187,6 @@
 #define AADVANCED_TITLE N_( "Advanced" )
 #define AADVANCED_HELP N_( "Advanced settings. Use with care...")
 
-#define MISC_TITLE N_( "Advanced settings" )
-
 #define ANETWORK_TITLE N_( "Network" )
 #define ANETWORK_HELP N_( "Advanced network settings." )
 
@@ -196,7 +194,6 @@ struct config_category_t
 {
     int         id;
     int         general_subcat;
-    const char *name;
     const char *help;
 };
 
@@ -210,13 +207,13 @@ struct config_subcategory_t
 
 static const struct config_category_t categories_array[] =
 {
-    { CAT_INTERFACE,  SUBCAT_INTERFACE_GENERAL,  INTF_TITLE,       INTF_HELP      },
-    { CAT_AUDIO,      SUBCAT_AUDIO_GENERAL,      AUDIO_TITLE,      AUDIO_HELP     },
-    { CAT_VIDEO,      SUBCAT_VIDEO_GENERAL,      VIDEO_TITLE,      VIDEO_HELP     },
-    { CAT_INPUT,      SUBCAT_INPUT_GENERAL,      INPUT_TITLE,      INPUT_HELP     },
-    { CAT_SOUT,       SUBCAT_SOUT_GENERAL,       SOUT_TITLE,       SOUT_HELP      },
-    { CAT_PLAYLIST,   SUBCAT_PLAYLIST_GENERAL,   PLAYLIST_TITLE,   PLAYLIST_HELP  },
-    { CAT_ADVANCED,   SUBCAT_ADVANCED_MISC,      AADVANCED_TITLE,  AADVANCED_HELP },
+    { CAT_INTERFACE,  SUBCAT_INTERFACE_GENERAL,  INTF_HELP      },
+    { CAT_AUDIO,      SUBCAT_AUDIO_GENERAL,      AUDIO_HELP     },
+    { CAT_VIDEO,      SUBCAT_VIDEO_GENERAL,      VIDEO_HELP     },
+    { CAT_INPUT,      SUBCAT_INPUT_GENERAL,      INPUT_HELP     },
+    { CAT_SOUT,       SUBCAT_SOUT_GENERAL,       SOUT_HELP      },
+    { CAT_PLAYLIST,   SUBCAT_PLAYLIST_GENERAL,   PLAYLIST_HELP  },
+    { CAT_ADVANCED,   SUBCAT_ADVANCED_MISC,      AADVANCED_HELP },
 };
 
 static const struct config_subcategory_t subcategories_array[] =
@@ -258,7 +255,7 @@ static const struct config_subcategory_t subcategories_array[] =
     { SUBCAT_PLAYLIST_EXPORT,      CAT_PLAYLIST,   PEXPORT_TITLE,        PEXPORT_HELP       },
     { SUBCAT_PLAYLIST_SD,          CAT_PLAYLIST,   SD_TITLE,             SD_HELP            },
 
-    { SUBCAT_ADVANCED_MISC,        CAT_ADVANCED,   MISC_TITLE,           AADVANCED_HELP     },
+    { SUBCAT_ADVANCED_MISC,        CAT_ADVANCED,   AADVANCED_TITLE,      AADVANCED_HELP     },
     { SUBCAT_ADVANCED_NETWORK,     CAT_ADVANCED,   ANETWORK_TITLE,       ANETWORK_HELP      },
 
     { SUBCAT_HIDDEN,               CAT_HIDDEN,     NULL,                 NULL               },
@@ -318,22 +315,6 @@ static inline int vlc_config_cat_GetGeneralSubcat( int cat )
     return (i != -1) ? categories_array[i].general_subcat : SUBCAT_UNKNOWN;
 }
 
-/** Get the name for a category. */
-VLC_USED
-static inline const char *vlc_config_cat_GetName( int cat )
-{
-    int i = vlc_config_cat_IndexOf( cat );
-    return (i != -1) ? vlc_gettext(categories_array[i].name) : NULL;
-}
-
-/** Get the help text for a category. */
-VLC_USED
-static inline const char *vlc_config_cat_GetHelp( int cat )
-{
-    int i = vlc_config_cat_IndexOf( cat );
-    return (i != -1) ? vlc_gettext(categories_array[i].help) : NULL;
-}
-
 /** Get the name for a subcategory. */
 VLC_USED
 static inline const char *vlc_config_subcat_GetName( int subcat )
@@ -348,6 +329,22 @@ static inline const char *vlc_config_subcat_GetHelp( int subcat )
 {
     int i = vlc_config_subcat_IndexOf( subcat );
     return (i != -1) ? vlc_gettext(subcategories_array[i].help) : NULL;
+}
+
+/** Get the name for a category. */
+VLC_USED
+static inline const char *vlc_config_cat_GetName( int cat )
+{
+    int subcat = vlc_config_cat_GetGeneralSubcat( cat );
+    return vlc_config_subcat_GetName( subcat );
+}
+
+/** Get the help text for a category. */
+VLC_USED
+static inline const char *vlc_config_cat_GetHelp( int cat )
+{
+    int i = vlc_config_cat_IndexOf( cat );
+    return (i != -1) ? vlc_gettext(categories_array[i].help) : NULL;
 }
 
 /** Get the parent category for the given subcategory. */
