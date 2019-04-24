@@ -455,7 +455,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         uses_external_callbacks = false;
     }
 
-    InitArea(vd, &sys->area, cfg);
+    CommonInit(vd, &sys->area, cfg);
     if ( !uses_external_callbacks )
     {
 #if VLC_WINSTORE_APP
@@ -466,7 +466,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
             goto error;
         }
 #else /* !VLC_WINSTORE_APP */
-        if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
+        if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
                        vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
             goto error;
         sys->internal_swapchain.swapchainHwnd = sys->sys.hvideownd;
@@ -516,7 +516,7 @@ static void Close(vout_display_t *vd)
     Direct3D11Close(vd);
     UnhookWindowsSensors(vd->sys->p_sensors);
 #if !VLC_WINSTORE_APP
-    CommonClean(VLC_OBJECT(vd), &vd->sys->sys);
+    CommonWindowClean(VLC_OBJECT(vd), &vd->sys->sys);
 #endif
     Direct3D11Destroy(vd);
 }

@@ -69,15 +69,15 @@ typedef struct vout_display_sys_win32_t
  * Prototypes from common.c
  *****************************************************************************/
 #if !VLC_WINSTORE_APP
-int  CommonInit(vlc_object_t *, display_win32_area_t *, vout_display_sys_win32_t *,
-                bool projection_gestures);
-void CommonClean(vlc_object_t *, vout_display_sys_win32_t *);
+int  CommonWindowInit(vlc_object_t *, display_win32_area_t *, vout_display_sys_win32_t *,
+                      bool projection_gestures);
+void CommonWindowClean(vlc_object_t *, vout_display_sys_win32_t *);
 #endif /* !VLC_WINSTORE_APP */
 int  CommonControl(vlc_object_t *, display_win32_area_t *, vout_display_sys_win32_t *, int , va_list );
 
 void CommonPlacePicture (vlc_object_t *, display_win32_area_t *, vout_display_sys_win32_t *);
 
-void InitArea(vout_display_t *, display_win32_area_t *, const vout_display_cfg_t *);
+void CommonInit(vout_display_t *, display_win32_area_t *, const vout_display_cfg_t *);
 
 # ifdef __cplusplus
 extern "C" {

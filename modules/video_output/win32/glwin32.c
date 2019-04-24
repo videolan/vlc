@@ -122,8 +122,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     /* */
-    InitArea(vd, &sys->area, cfg);
-    if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
+    CommonInit(vd, &sys->area, cfg);
+    if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
                    vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
         goto error;
 
@@ -197,7 +197,7 @@ static void Close(vout_display_t *vd)
     }
 
     UnhookWindowsSensors(sys->p_sensors);
-    CommonClean(VLC_OBJECT(vd), &sys->sys);
+    CommonWindowClean(VLC_OBJECT(vd), &sys->sys);
 
     free(sys);
 }

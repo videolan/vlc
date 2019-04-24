@@ -117,8 +117,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    InitArea(vd, &sys->area, cfg);
-    if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false))
+    CommonInit(vd, &sys->area, cfg);
+    if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false))
         goto error;
 
     /* */
@@ -141,7 +141,7 @@ static void Close(vout_display_t *vd)
 {
     Clean(vd);
 
-    CommonClean(VLC_OBJECT(vd), &vd->sys->sys);
+    CommonWindowClean(VLC_OBJECT(vd), &vd->sys->sys);
 
     free(vd->sys);
 }

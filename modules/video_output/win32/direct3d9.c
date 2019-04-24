@@ -1648,10 +1648,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->lost_not_ready = false;
     sys->allow_hw_yuv = var_CreateGetBool(vd, "directx-hw-yuv");
 
-    InitArea(vd, &sys->area, cfg);
+    CommonInit(vd, &sys->area, cfg);
     if (d3d9_device == NULL)
     {
-        if (CommonInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false))
+        if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false))
             goto error;
     }
 
@@ -1689,7 +1689,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     return VLC_SUCCESS;
 error:
     Direct3D9Close(vd);
-    CommonClean(VLC_OBJECT(vd), &sys->sys);
+    CommonWindowClean(VLC_OBJECT(vd), &sys->sys);
     Direct3D9Destroy(sys);
     free(vd->sys);
     return VLC_EGENERIC;
@@ -1702,7 +1702,7 @@ static void Close(vout_display_t *vd)
 {
     Direct3D9Close(vd);
 
-    CommonClean(VLC_OBJECT(vd), &vd->sys->sys);
+    CommonWindowClean(VLC_OBJECT(vd), &vd->sys->sys);
 
     Direct3D9Destroy(vd->sys);
 

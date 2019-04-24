@@ -44,7 +44,7 @@
 #include "common.h"
 #include "../video_chroma/copy.h"
 
-void InitArea(vout_display_t *vd, display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
+void CommonInit(vout_display_t *vd, display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
 {
     area->place_changed = false;
     area->vdcfg = *vdcfg;
@@ -58,8 +58,8 @@ void InitArea(vout_display_t *vd, display_win32_area_t *area, const vout_display
 static void CommonChangeThumbnailClip(vlc_object_t *, vout_display_sys_win32_t *, bool show);
 
 /* */
-int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
-               vout_display_sys_win32_t *sys, bool projection_gestures)
+int CommonWindowInit(vlc_object_t *obj, display_win32_area_t *area,
+                     vout_display_sys_win32_t *sys, bool projection_gestures)
 {
     if (unlikely(area->vdcfg.window == NULL))
         return VLC_EGENERIC;
@@ -142,7 +142,7 @@ void CommonPlacePicture(vlc_object_t *obj, display_win32_area_t *area, vout_disp
 
 #if !VLC_WINSTORE_APP
 /* */
-void CommonClean(vlc_object_t *obj, vout_display_sys_win32_t *sys)
+void CommonWindowClean(vlc_object_t *obj, vout_display_sys_win32_t *sys)
 {
     if (sys->event) {
         CommonChangeThumbnailClip(obj, sys, false);
