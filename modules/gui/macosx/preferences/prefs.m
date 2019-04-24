@@ -476,10 +476,11 @@ enum VLCTreeBranchType {
         VLCTreeBranchItem * subcategoryItem = nil;
         VLCTreeBranchItem * pluginItem = nil;
         module_config_t *p_configs = NULL;
-        int lastcat = CAT_UNKNOWN;
-        int lastsubcat = SUBCAT_UNKNOWN;
+        int cat = CAT_UNKNOWN;
+        int subcat = SUBCAT_UNKNOWN;
         bool subcat_is_general = false;
         bool plugin_node_added = false;
+        bool pending_tree_node_creation = false;
         unsigned int confsize;
 
         module_t * p_module = modules[i];
@@ -502,63 +503,60 @@ enum VLCTreeBranchType {
             int configType = p_configs[j].i_type;
 
             if (configType == CONFIG_SUBCATEGORY) {
-                lastsubcat = (int)p_configs[j].value.i;
-                if( lastsubcat == SUBCAT_HIDDEN ) {
-                    categoryItem = nil;
-                    subcategoryItem = nil;
-                    continue;
-                }
-                lastcat = vlc_config_cat_FromSubcat(lastsubcat);
-                subcat_is_general = vlc_config_subcat_IsGeneral(lastsubcat);
-
-                categoryItem = [self childRepresentingCategory:lastcat];
-                if (!categoryItem) {
-                    categoryItem = [VLCTreeBranchItem newCategoryTreeBranch:lastcat];
-                    if (categoryItem)
-                        [[self children] addObject:categoryItem];
-                }
-
-                if (categoryItem && !subcat_is_general) {
-                    subcategoryItem = [categoryItem childRepresentingSubcategory:lastsubcat];
-                    if (!subcategoryItem) {
-                        subcategoryItem = [VLCTreeBranchItem newSubcategoryTreeBranch:lastsubcat];
-                        if (subcategoryItem)
-                            [[categoryItem children] addObject:subcategoryItem];
-                    }
-                }
+                subcat = (int) p_configs[j].value.i;
+                cat = vlc_config_cat_FromSubcat(subcat);
+                subcat_is_general = vlc_config_subcat_IsGeneral(subcat);
+                pending_tree_node_creation = true;
                 continue;
             }
+
+            if (cat == CAT_HIDDEN || cat == CAT_UNKNOWN)
+                continue;
 
             if (!CONFIG_ITEM(configType) && configType != CONFIG_SECTION)
                 continue;
 
             VLCTreeLeafItem *new_leaf = [VLCTreeLeafItem newTreeLeaf:&p_configs[j]];
-            if (!new_leaf)
-                continue;
+            if (!new_leaf) continue;
 
-            if (mod_is_main) {
-                if (categoryItem && subcat_is_general) {
-                    [[categoryItem options] addObject:new_leaf];
-                } else if (subcategoryItem && !subcat_is_general) {
-                    [[subcategoryItem options] addObject:new_leaf];
+            if (!plugin_node_added && pending_tree_node_creation) {
+                categoryItem = [self childRepresentingCategory:cat];
+                if (!categoryItem) {
+                    categoryItem = [VLCTreeBranchItem newCategoryTreeBranch:cat];
+                    if (categoryItem)
+                        [[self children] addObject:categoryItem];
+                    else
+                        continue;
                 }
-            }
-            else {
-                if (!plugin_node_added) {
-                    if (categoryItem && subcat_is_general) {
+
+                if (!subcat_is_general) {
+                    subcategoryItem = [categoryItem childRepresentingSubcategory:subcat];
+                    if (!subcategoryItem) {
+                        subcategoryItem = [VLCTreeBranchItem newSubcategoryTreeBranch:subcat];
+                        if (subcategoryItem)
+                            [[categoryItem children] addObject:subcategoryItem];
+                        else
+                            continue;
+                    }
+                }
+
+                if (!mod_is_main) {
+                    if (subcat_is_general)
                         [[categoryItem children] addObject:pluginItem];
-                        plugin_node_added = true;
-                    }
-                    else if (subcategoryItem && !subcat_is_general) {
+                    else
                         [[subcategoryItem children] addObject:pluginItem];
-                        plugin_node_added = true;
-                    }
+                    plugin_node_added = true;
                 }
 
-                if (pluginItem) {
-                    [[pluginItem options] addObject:new_leaf];
-                }
+                pending_tree_node_creation = false;
             }
+
+            if (mod_is_main && subcat_is_general)
+                [[categoryItem options] addObject:new_leaf];
+            else if (mod_is_main)
+                [[subcategoryItem options] addObject:new_leaf];
+            else
+                [[pluginItem options] addObject:new_leaf];
         }
     }
     module_list_free(modules);
