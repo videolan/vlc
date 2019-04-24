@@ -207,17 +207,21 @@ struct config_subcategory_t
 
 static const struct config_category_t categories_array[] =
 {
+    { CAT_PLAYLIST,   SUBCAT_PLAYLIST_GENERAL,   PLAYLIST_HELP  },
     { CAT_INTERFACE,  SUBCAT_INTERFACE_GENERAL,  INTF_HELP      },
     { CAT_AUDIO,      SUBCAT_AUDIO_GENERAL,      AUDIO_HELP     },
     { CAT_VIDEO,      SUBCAT_VIDEO_GENERAL,      VIDEO_HELP     },
     { CAT_INPUT,      SUBCAT_INPUT_GENERAL,      INPUT_HELP     },
     { CAT_SOUT,       SUBCAT_SOUT_GENERAL,       SOUT_HELP      },
-    { CAT_PLAYLIST,   SUBCAT_PLAYLIST_GENERAL,   PLAYLIST_HELP  },
     { CAT_ADVANCED,   SUBCAT_ADVANCED_MISC,      AADVANCED_HELP },
 };
 
 static const struct config_subcategory_t subcategories_array[] =
 {
+    { SUBCAT_PLAYLIST_GENERAL,     CAT_PLAYLIST,   PLAYLIST_TITLE,       PGENERAL_HELP      },
+    { SUBCAT_PLAYLIST_EXPORT,      CAT_PLAYLIST,   PEXPORT_TITLE,        PEXPORT_HELP       },
+    { SUBCAT_PLAYLIST_SD,          CAT_PLAYLIST,   SD_TITLE,             SD_HELP            },
+
     { SUBCAT_INTERFACE_GENERAL,    CAT_INTERFACE,  INTF_TITLE,           INTF_GENERAL_HELP  },
     { SUBCAT_INTERFACE_MAIN,       CAT_INTERFACE,  INTF_MAIN_TITLE,      INTF_MAIN_HELP     },
     { SUBCAT_INTERFACE_CONTROL,    CAT_INTERFACE,  INTF_CONTROL_TITLE,   INTF_CONTROL_HELP  },
@@ -250,10 +254,6 @@ static const struct config_subcategory_t subcategories_array[] =
     { SUBCAT_SOUT_PACKETIZER,      CAT_SOUT,       SOUT_PACKET_TITLE,    SOUT_PACKET_HELP   },
     { SUBCAT_SOUT_RENDERER,        CAT_SOUT,       SOUT_RENDER_TITLE,    SOUT_RENDER_HELP   },
     { SUBCAT_SOUT_VOD,             CAT_SOUT,       SOUT_VOD_TITLE,       SOUT_VOD_HELP      },
-
-    { SUBCAT_PLAYLIST_GENERAL,     CAT_PLAYLIST,   PLAYLIST_TITLE,       PGENERAL_HELP      },
-    { SUBCAT_PLAYLIST_EXPORT,      CAT_PLAYLIST,   PEXPORT_TITLE,        PEXPORT_HELP       },
-    { SUBCAT_PLAYLIST_SD,          CAT_PLAYLIST,   SD_TITLE,             SD_HELP            },
 
     { SUBCAT_ADVANCED_MISC,        CAT_ADVANCED,   AADVANCED_TITLE,      AADVANCED_HELP     },
     { SUBCAT_ADVANCED_NETWORK,     CAT_ADVANCED,   ANETWORK_TITLE,       ANETWORK_HELP      },
