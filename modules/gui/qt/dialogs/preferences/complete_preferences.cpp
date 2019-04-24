@@ -238,7 +238,7 @@ void PrefsTree::createPluginNode( QTreeWidgetItem * parent, module_t *mod )
     QTreeWidgetItem *item = new QTreeWidgetItem();
 
     PrefsItemData *data = new PrefsItemData( this );
-    data->i_type = PrefsItemData::TYPE_MODULE;
+    data->i_type = PrefsItemData::TYPE_PLUGIN;
     data->cat_id = CAT_UNKNOWN;
     data->subcat_id = SUBCAT_UNKNOWN;
     data->p_module = mod;
@@ -483,7 +483,7 @@ PrefsItemData::PrefsItemData( QObject *_parent ) : QObject( _parent )
  * also search the node name and head */
 bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
 {
-    bool is_core = this->i_type != TYPE_MODULE;
+    bool is_core = this->i_type != TYPE_PLUGIN;
     int id = this->subcat_id;
 
     /* find our module */
@@ -581,7 +581,7 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
     /* Find our module */
     module_t *p_module = NULL;
     p_config = NULL;
-    if( data->i_type == PrefsItemData::TYPE_MODULE )
+    if( data->i_type == PrefsItemData::TYPE_PLUGIN )
         p_module = data->p_module;
     else
     {
