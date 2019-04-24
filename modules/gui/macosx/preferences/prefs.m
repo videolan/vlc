@@ -492,6 +492,8 @@ enum VLCTreeBranchType {
             p_configs = _configItems;
         } else {
             pluginItem = [VLCTreeBranchItem newPluginTreeBranch: p_module];
+            if (!pluginItem)
+                continue;
             confsize = [pluginItem configSize];
             p_configs = [pluginItem configItems];
         }
@@ -530,11 +532,15 @@ enum VLCTreeBranchType {
             if (!CONFIG_ITEM(configType) && configType != CONFIG_SECTION)
                 continue;
 
+            VLCTreeLeafItem *new_leaf = [VLCTreeLeafItem newTreeLeaf:&p_configs[j]];
+            if (!new_leaf)
+                continue;
+
             if (mod_is_main) {
                 if (categoryItem && subcat_is_general) {
-                    [[categoryItem options] addObject:[VLCTreeLeafItem newTreeLeaf:&p_configs[j]]];
+                    [[categoryItem options] addObject:new_leaf];
                 } else if (subcategoryItem && !subcat_is_general) {
-                    [[subcategoryItem options] addObject:[VLCTreeLeafItem newTreeLeaf:&p_configs[j]]];
+                    [[subcategoryItem options] addObject:new_leaf];
                 }
             }
             else {
@@ -550,7 +556,7 @@ enum VLCTreeBranchType {
                 }
 
                 if (pluginItem) {
-                    [[pluginItem options] addObject:[VLCTreeLeafItem newTreeLeaf:&p_configs[j]]];
+                    [[pluginItem options] addObject:new_leaf];
                 }
             }
         }
