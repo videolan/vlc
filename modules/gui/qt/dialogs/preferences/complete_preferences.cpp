@@ -62,7 +62,6 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
     setUniformRowHeights( true );
     CONNECT( this, itemExpanded(QTreeWidgetItem*), this, resizeColumns() );
 
-    int last_cat = CAT_UNKNOWN;
     int cat = CAT_UNKNOWN;
     int subcat = SUBCAT_UNKNOWN;
     QTreeWidgetItem *cat_item = nullptr;
@@ -85,15 +84,20 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
             continue;
 
         /* Create parent cat node? */
-        if( cat != last_cat )
+        if( findCatItem(cat) == nullptr )
         {
             cat_item = createCatNode( cat );
-            last_cat = cat;
             /* Merge general subcat properties */
             setCatGeneralSubcat( cat_item, vlc_config_cat_GetGeneralSubcat( cat ) );
         }
 
-        if( !vlc_config_subcat_IsGeneral(subcat) )
+        // Create subcat node
+        // Note that this is done conditionally, primarily because we must take
+        // no action here for 'general' subcats (which are merged into the
+        // parent category node), but also just out of caution should a mistake
+        // result in more than one instance of a subcat to be present within the
+        // core option set.
+        if( findSubcatItem( subcat ) == nullptr )
             createSubcatNode( cat_item, subcat );
     }
     module_config_free( p_config );
