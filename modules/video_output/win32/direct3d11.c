@@ -816,7 +816,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 sys->area.texture_source.i_width  = sys->picQuad.i_height = texDesc.Height;
                 sys->area.texture_source.i_height = sys->picQuad.i_width = texDesc.Width;
 
-                UpdateRects(VLC_OBJECT(vd), &sys->area, &sys->sys);
+                CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
                 UpdateSize(vd);
             }
         }
@@ -1455,7 +1455,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     sys->area.texture_source.i_width  = sys->picQuad.i_width;
     sys->area.texture_source.i_height = sys->picQuad.i_height;
 
-    UpdateRects(VLC_OBJECT(vd), &sys->area, &sys->sys);
+    CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
 
     if (D3D11_AllocateQuad(vd, &sys->d3d_dev, vd->source.projection_mode, &sys->picQuad) != VLC_SUCCESS)
     {
@@ -1561,7 +1561,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
-    UpdateRects(VLC_OBJECT(vd), &sys->area, &sys->sys);
+    CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
 
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {

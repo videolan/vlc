@@ -101,7 +101,7 @@ int CommonInit(vlc_object_t *obj, display_win32_area_t *area,
 * its job is to update the source and destination RECTs used to display the
 * picture.
 *****************************************************************************/
-void UpdateRects(vlc_object_t *obj, display_win32_area_t *area, vout_display_sys_win32_t *sys)
+void CommonPlacePicture(vlc_object_t *obj, display_win32_area_t *area, vout_display_sys_win32_t *sys)
 {
     /* Update the window position and size */
     vout_display_cfg_t place_cfg = area->vdcfg;
@@ -206,7 +206,7 @@ int CommonControl(vlc_object_t *obj, display_win32_area_t *area, vout_display_sy
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {
         area->vdcfg = *va_arg(args, const vout_display_cfg_t *);
-        UpdateRects(obj, area, sys);
+        CommonPlacePicture(obj, area, sys);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg */
@@ -225,7 +225,7 @@ int CommonControl(vlc_object_t *obj, display_win32_area_t *area, vout_display_sy
                          area->vdcfg.display.height, SWP_NOZORDER|SWP_NOMOVE|SWP_NOACTIVATE);
         }
 #endif /* !VLC_WINSTORE_APP */
-        UpdateRects(obj, area, sys);
+        CommonPlacePicture(obj, area, sys);
         return VLC_SUCCESS;
     }
 
