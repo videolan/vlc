@@ -70,7 +70,6 @@ public:
     enum prefsType
     {
         TYPE_CATEGORY,
-        TYPE_CATSUBCAT,
         TYPE_SUBCATEGORY,
         TYPE_MODULE
     };

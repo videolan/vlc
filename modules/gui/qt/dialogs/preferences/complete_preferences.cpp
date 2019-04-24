@@ -169,7 +169,7 @@ QTreeWidgetItem *PrefsTree::createCatNode( int cat )
     QTreeWidgetItem *item = new QTreeWidgetItem();
 
     PrefsItemData *data = new PrefsItemData( this );
-    data->i_type = PrefsItemData::TYPE_CATSUBCAT;
+    data->i_type = PrefsItemData::TYPE_CATEGORY;
     data->cat_id = cat;
     data->subcat_id = general_subcat;
     data->name = qfu( vlc_config_subcat_GetName( general_subcat ) );
@@ -483,9 +483,6 @@ PrefsItemData::PrefsItemData( QObject *_parent ) : QObject( _parent )
  * also search the node name and head */
 bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
 {
-    if( this->i_type == TYPE_CATEGORY )
-        return false;
-
     bool is_core = this->i_type != TYPE_MODULE;
     int id = this->subcat_id;
 
@@ -584,9 +581,7 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
     /* Find our module */
     module_t *p_module = NULL;
     p_config = NULL;
-    if( data->i_type == PrefsItemData::TYPE_CATEGORY )
-        return;
-    else if( data->i_type == PrefsItemData::TYPE_MODULE )
+    if( data->i_type == PrefsItemData::TYPE_MODULE )
         p_module = data->p_module;
     else
     {
@@ -600,7 +595,7 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                     *p_end = p_config + confsize;
 
     if( data->i_type == PrefsItemData::TYPE_SUBCATEGORY ||
-        data->i_type == PrefsItemData::TYPE_CATSUBCAT )
+        data->i_type == PrefsItemData::TYPE_CATEGORY )
     {
         while (p_item < p_end)
         {
@@ -620,7 +615,7 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
     help = QString( data->help );
 
     if( data->i_type == PrefsItemData::TYPE_SUBCATEGORY ||
-        data->i_type == PrefsItemData::TYPE_CATSUBCAT )
+        data->i_type == PrefsItemData::TYPE_CATEGORY )
     {
         head = QString( data->name );
         p_item++; // Why that ?
@@ -662,7 +657,7 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
     {
         if( p_item->i_type == CONFIG_SUBCATEGORY &&
             ( data->i_type == PrefsItemData::TYPE_SUBCATEGORY ||
-              data->i_type == PrefsItemData::TYPE_CATSUBCAT ) &&
+              data->i_type == PrefsItemData::TYPE_CATEGORY ) &&
             p_item->value.i != data->subcat_id )
             break;
 
@@ -703,7 +698,7 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         controls.append( control );
     }
     while( !( ( data->i_type == PrefsItemData::TYPE_SUBCATEGORY ||
-               data->i_type == PrefsItemData::TYPE_CATSUBCAT ) &&
+               data->i_type == PrefsItemData::TYPE_CATEGORY ) &&
              p_item->i_type == CONFIG_SUBCATEGORY )
         && ( ++p_item < p_end ) );
 
