@@ -915,8 +915,6 @@ static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
         return VLC_EGENERIC;
     }
 
-    CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
-
     /* re-create them */
     if (Direct3D9CreateResources(vd, fmtp)) {
         msg_Dbg(vd, "Direct3D9CreateResources failed !");
