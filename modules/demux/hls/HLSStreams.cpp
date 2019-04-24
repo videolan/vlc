@@ -142,11 +142,13 @@ AbstractDemuxer *HLSStream::newDemux(demux_t *p_realdemux, const StreamFormat &f
             ret = AbstractStream::newDemux(p_realdemux, format, out, source);
             break;
 
+/* Disabled until we can handle empty segments/cue and absolute time
         case StreamFormat::WEBVTT:
             ret = new Demuxer(p_realdemux, "webvttstream", out, source);
             if(ret)
                 ret->setRestartsOnEachSegment(true);
             break;
+*/
 
         default:
         case StreamFormat::UNSUPPORTED:
