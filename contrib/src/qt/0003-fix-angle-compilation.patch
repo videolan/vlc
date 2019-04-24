@@ -1,0 +1,76 @@
+From 5b0815cdbdc729da3135d3a9c41d7579883f739d Mon Sep 17 00:00:00 2001
+From: Pierre Lamot <pierre@videolabs.io>
+Date: Tue, 9 Apr 2019 16:39:23 +0200
+Subject: [PATCH] allow cross-compilation of angle with wine
+
+---
+ src/angle/src/common/common.pri |  2 +-
+ src/gui/configure.json          |  2 +-
+ src/gui/configure.pri           | 24 ++----------------------
+ 3 files changed, 4 insertions(+), 24 deletions(-)
+
+diff --git a/src/angle/src/common/common.pri b/src/angle/src/common/common.pri
+index df29269..b6bde4d 100644
+--- a/src/angle/src/common/common.pri
++++ b/src/angle/src/common/common.pri
+@@ -22,7 +22,7 @@ lib_replace.replace = \$\$\$\$[QT_INSTALL_LIBS]
+ lib_replace.CONFIG = path
+ QMAKE_PRL_INSTALL_REPLACE += lib_replace
+ 
+-FXC = $$shell_quote($$shell_path($$QMAKE_FXC_LOCATION))
++FXC = $$shell_path($$QMAKE_FXC_LOCATION)
+ 
+ win32 {
+     VERSION = $$MODULE_VERSION
+diff --git a/src/gui/configure.json b/src/gui/configure.json
+index 44140bc..53f4984 100644
+--- a/src/gui/configure.json
++++ b/src/gui/configure.json
+@@ -1106,7 +1106,7 @@
+         "angle": {
+             "label": "ANGLE",
+             "autoDetect": "features.opengles2 || features.opengl-dynamic",
+-            "condition": "features.dxguid && tests.fxc && (features.direct3d9 || (config.winrt && features.direct3d11 && libs.d3dcompiler))",
++            "condition": "features.dxguid && tests.fxc && (features.direct3d9 || (features.direct3d11 && libs.d3dcompiler))",
+             "output": [
+                 "publicFeature",
+                 { "type": "define", "name": "QT_OPENGL_ES_2_ANGLE" },
+diff --git a/src/gui/configure.pri b/src/gui/configure.pri
+index 1b95449..875e890 100644
+--- a/src/gui/configure.pri
++++ b/src/gui/configure.pri
+@@ -20,29 +20,9 @@ defineTest(qtConfLibrary_freetype) {
+ # DXSDK_DIR variable. Starting with Windows Kit 8, it is included in
+ # the Windows SDK.
+ defineTest(qtConfTest_fxc) {
+-    !mingw {
+-        fxc = $$qtConfFindInPath("fxc.exe")
+-    } else {
+-        equals(QMAKE_HOST.arch, x86_64): \
+-            fns = x64/fxc.exe
+-        else: \
+-            fns = x86/fxc.exe
+-        dxdir = $$(DXSDK_DIR)
+-        !isEmpty(dxdir) {
+-            fxc = $$dxdir/Utilities/bin/$$fns
+-        } else {
+-            winkitbindir = $$(WindowsSdkVerBinPath)
+-            !isEmpty(winkitbindir) {
+-                fxc = $$winkitbindir/$$fns
+-            } else {
+-                winkitdir = $$(WindowsSdkDir)
+-                !isEmpty(winkitdir): \
+-                    fxc = $$winkitdir/bin/$$fns
+-            }
+-        }
+-    }
++	fxc = "$$(DXSDK_DIR)/fxc2.exe"
+ 
+-    !isEmpty(fxc):exists($$fxc) {
++    !isEmpty(fxc) {
+         $${1}.value = $$clean_path($$fxc)
+         export($${1}.value)
+         $${1}.cache += value
+-- 
+2.19.1
+

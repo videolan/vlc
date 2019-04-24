@@ -42,6 +42,7 @@ endif
 ifdef HAVE_CROSS_COMPILE
 	$(APPLY) $(SRC)/qt/0003-allow-cross-compilation-of-angle-with-wine.patch
 else
+	$(APPLY) $(SRC)/qt/0003-fix-angle-compilation.patch
 	cd $(UNPACK_DIR); for i in QtFontDatabaseSupport QtWindowsUIAutomationSupport QtEventDispatcherSupport QtCore; do \
 		sed -i -e 's,"../../../../../src,"../src,g' include/$$i/$(QT_VERSION)/$$i/private/*.h; done
 endif
