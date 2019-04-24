@@ -37,7 +37,6 @@
 #include "dialogs/preferences/complete_preferences.hpp"
 #include "dialogs/preferences/preferences_widgets.hpp"
 
-#include <vlc_config_cat.h>
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
@@ -153,7 +152,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
 
         /* Locate the subcategory item */
         /* If not found (was not used in the core option set - quite possible), we will create it */
-        QTreeWidgetItem *subcat_item = findSubcatItem( cat_item, subcat );
+        QTreeWidgetItem *subcat_item = findSubcatItem( subcat );
         if( !subcat_item )
             subcat_item = createSubcatNode( cat_item, subcat );
 
@@ -197,6 +196,9 @@ QTreeWidgetItem *PrefsTree::createCatNode( int cat )
     item->setData( 0, Qt::UserRole, QVariant::fromValue( data ) );
     //current_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
 
+    int cat_index = vlc_config_cat_IndexOf( cat );
+    this->catMap[cat_index] = item;
+
     addTopLevelItem( item );
     expandItem( item );
 
@@ -219,6 +221,9 @@ QTreeWidgetItem *PrefsTree::createSubcatNode( QTreeWidgetItem * cat, int subcat 
     item->setText( 0, data->name );
     item->setData( 0, Qt::UserRole, QVariant::fromValue( data ) );
     //item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
+
+    int subcat_index = vlc_config_subcat_IndexOf( subcat );
+    this->subcatMap[subcat_index] = item;
 
     cat->addChild( item );
 
@@ -261,46 +266,21 @@ void PrefsTree::setCatGeneralSubcat( QTreeWidgetItem *cat, int subcat )
     data->subcat_id = subcat;
     data->name = qfu( vlc_config_subcat_GetName( subcat ) );
     data->help = qfu( vlc_config_subcat_GetHelp( subcat ) );
+
+    int subcat_index = vlc_config_subcat_IndexOf( subcat );
+    this->subcatMap[subcat_index] = cat;
 }
 
 QTreeWidgetItem *PrefsTree::findCatItem( int cat )
 {
-    for( int i = 0; i < topLevelItemCount(); i++ )
-    {
-        QTreeWidgetItem *item = topLevelItem( i );
-        PrefsItemData *data = item->data( 0, Qt::UserRole ).value<PrefsItemData *>();
-
-        if( data->cat_id == cat )
-            return item;
-    }
-    return nullptr;
+    int cat_index = vlc_config_cat_IndexOf( cat );
+    return this->catMap[cat_index];
 }
 
 QTreeWidgetItem *PrefsTree::findSubcatItem( int subcat )
 {
-    int cat = vlc_config_cat_FromSubcat( subcat );
-    QTreeWidgetItem *cat_item = findCatItem( cat );
-    return findSubcatItem( cat_item, subcat );
-}
-
-QTreeWidgetItem *PrefsTree::findSubcatItem( QTreeWidgetItem *cat, int subcat )
-{
-    if( !cat )
-        return nullptr;
-
-    // If is general subcat, return the cat node itself, otherwise hunt through children
-    PrefsItemData *data = cat->data(0, Qt::UserRole).value<PrefsItemData *>();
-    if (subcat == data->subcat_id)
-        return cat;
-
-    for( int i = 0; i < cat->childCount(); i++ )
-    {
-        QTreeWidgetItem *item = cat->child( i );
-        data = item->data(0, Qt::UserRole).value<PrefsItemData *>();
-        if( data->subcat_id == subcat )
-            return item;
-    }
-    return nullptr;
+    int subcat_index = vlc_config_subcat_IndexOf( subcat );
+    return this->subcatMap[subcat_index];
 }
 
 void PrefsTree::applyAll()

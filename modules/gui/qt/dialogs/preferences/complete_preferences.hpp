@@ -29,6 +29,7 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
+#include <vlc_config_cat.h>
 
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
@@ -102,13 +103,14 @@ private:
     void setCatGeneralSubcat( QTreeWidgetItem *cat, int subcat );
     QTreeWidgetItem *findCatItem( int cat );
     QTreeWidgetItem *findSubcatItem( int subcat );
-    QTreeWidgetItem *findSubcatItem( QTreeWidgetItem *cat, int subcat );
     void doAll( bool );
     bool filterItems( QTreeWidgetItem *item, const QString &text, Qt::CaseSensitivity cs );
     bool collapseUnselectedItems( QTreeWidgetItem *item );
     void updateLoadedStatus( QTreeWidgetItem *item , QSet<QString> *loaded );
     qt_intf_t *p_intf;
     bool b_show_only_loaded;
+    QTreeWidgetItem *catMap[ARRAY_SIZE(categories_array)] = { nullptr };
+    QTreeWidgetItem *subcatMap[ARRAY_SIZE(subcategories_array)] = { nullptr };
 
 private slots:
     void resizeColumns();
