@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-02-10 15:25+0100\n"
+"PO-Revision-Date: 2019-04-24 07:41+0200\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2019\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/16553/he/)\n"
 "Language: he\n"
@@ -22637,7 +22637,7 @@ msgstr "גילוי רשת Bonjour"
 
 #: modules/services_discovery/bonjour.m:70
 msgid "Bonjour Renderer Discovery"
-msgstr ""
+msgstr "איתור מפענחים דרך Bonjour"
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -22669,7 +22669,7 @@ msgstr "גילוי רשת mDNS"
 
 #: modules/services_discovery/microdns.c:65
 msgid "mDNS Renderer Discovery"
-msgstr ""
+msgstr "איתור מפענחים דרך mDNS"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -22706,7 +22706,7 @@ msgstr "רשימת כתובות הפודקאסטים"
 
 #: modules/services_discovery/podcast.c:57
 msgid "Enter the list of podcasts to retrieve, separated by '|' (pipe)."
-msgstr ""
+msgstr "נא להקליד את רשימת הפודקאסטים להורדה, מופרדים בקו אנכי ‚|’."
 
 #: modules/services_discovery/pulse.c:41 modules/services_discovery/pulse.c:44
 #: modules/services_discovery/pulse.c:84 modules/services_discovery/udev.c:67
@@ -22716,7 +22716,7 @@ msgstr "לכידת שמע"
 
 #: modules/services_discovery/pulse.c:45
 msgid "Audio capture (PulseAudio)"
-msgstr ""
+msgstr "לכידת שמע (PulseAudio)"
 
 #: modules/services_discovery/pulse.c:187 modules/stream_out/es.c:86
 msgid "Generic"
@@ -22724,7 +22724,7 @@ msgstr "כללי"
 
 #: modules/services_discovery/sap.c:82
 msgid "SAP multicast address"
-msgstr ""
+msgstr "כתובת הפצה של SAP"
 
 #: modules/services_discovery/sap.c:83
 msgid ""
@@ -22951,7 +22951,7 @@ msgstr ""
 #: share/lua/http/dialogs/create_stream.html:245
 #: modules/gui/qt/ui/video_effects.h:1288
 msgid "Overlay"
-msgstr ""
+msgstr "שכבה"
 
 #: modules/spu/logo.c:50
 msgid ""
@@ -22959,6 +22959,9 @@ msgid ""
 "<alpha>]][;<image>[,<delay>[,<alpha>]]][;...]. If you only have one file, "
 "simply enter its filename."
 msgstr ""
+"נתיב מלא של קובצי התמונות לשימוש. הצורה היא ‎<image>[,<delay in ms>[,<alpha>]]"
+"[;<image>[,<delay>[,<alpha>]]][;...].‎ אם יש לך רק קובץ אחד, עליך פשוט להקליד "
+"את שמו."
 
 #: modules/spu/logo.c:53
 msgid "Logo animation # of loops"
@@ -23037,21 +23040,21 @@ msgstr ""
 #: modules/stream_out/mosaic_bridge.c:128
 #: share/lua/http/dialogs/mosaic_window.html:100
 msgid "X offset"
-msgstr ""
+msgstr "היסט ב־X"
 
 #: modules/spu/marq.c:97 modules/spu/rss.c:141
 msgid "X offset, from the left screen edge."
-msgstr ""
+msgstr "היסט ב־X, מהשול השמאלי."
 
 #: modules/spu/marq.c:98 modules/spu/rss.c:142
 #: modules/stream_out/mosaic_bridge.c:132
 #: share/lua/http/dialogs/mosaic_window.html:118
 msgid "Y offset"
-msgstr ""
+msgstr "היסט ב־Y"
 
 #: modules/spu/marq.c:99 modules/spu/rss.c:143
 msgid "Y offset, down from the top."
-msgstr ""
+msgstr "היסט ב־Y, מהגבול העליון."
 
 #: modules/spu/marq.c:100
 msgid "Timeout"
@@ -23345,7 +23348,7 @@ msgstr ""
 
 #: modules/spu/remoteosd.c:116
 msgid "Remote-OSD over VNC"
-msgstr ""
+msgstr "חיווי מרוחק על גבי המסך דרך VNC"
 
 #: modules/spu/remoteosd.c:118
 msgid "Remote-OSD"
@@ -23357,11 +23360,11 @@ msgstr "כתובות ההזנה"
 
 #: modules/spu/rss.c:128
 msgid "RSS/Atom feed '|' (pipe) separated URLs."
-msgstr ""
+msgstr "כתובות של הזנות RSS/Atom מופרדות בקו אנכי ‚|’."
 
 #: modules/spu/rss.c:129
 msgid "Speed of feeds"
-msgstr ""
+msgstr "מהירות ההזנות"
 
 #: modules/spu/rss.c:130
 msgid "Speed of the RSS/Atom feeds in microseconds (bigger is slower)."
@@ -23853,11 +23856,11 @@ msgstr ""
 
 #: modules/stream_out/display.c:41
 msgid "Enable/disable audio rendering."
-msgstr ""
+msgstr "הפעלה/השבתה של עיבוד שמע."
 
 #: modules/stream_out/display.c:43
 msgid "Enable/disable video rendering."
-msgstr ""
+msgstr "הפעלה/השבתה של עיבוד וידאו."
 
 #: modules/stream_out/display.c:44
 msgid "Delay (ms)"
@@ -24286,13 +24289,15 @@ msgstr ""
 
 #: modules/stream_out/smem.c:83
 msgid "Time Synchronized output"
-msgstr ""
+msgstr "פלט עם סנכרון זמן"
 
 #: modules/stream_out/smem.c:84
 msgid ""
 "Time Synchronisation option for output. If true, stream will render as "
 "usual, else it will be rendered as fast as possible."
 msgstr ""
+"אפשרות סנכרון הזמן לפלט. אם אמת, התזרים יעובד כרגיל, אם לא הוא יעובד במהירות "
+"האפשרות."
 
 #: modules/stream_out/smem.c:96
 msgid "Smem"
@@ -24326,7 +24331,7 @@ msgstr ""
 #: share/lua/http/dialogs/create_stream.html:334
 #: share/lua/http/dialogs/create_stream.html:378
 msgid "Output destination"
-msgstr ""
+msgstr "יעד פלט"
 
 #: modules/stream_out/standard.c:50
 msgid ""
@@ -24472,11 +24477,11 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:99
 msgid "This is the language of the audio stream."
-msgstr ""
+msgstr "זאת שפת תזרים השמע."
 
 #: modules/stream_out/transcode/transcode.c:102
 msgid "Number of audio channels in the transcoded streams."
-msgstr ""
+msgstr "מספר ערוצי השמע בתזרימים המותמרים."
 
 #: modules/stream_out/transcode/transcode.c:103
 msgid "Audio filter"
@@ -24565,7 +24570,7 @@ msgstr "גופן ברוחב אחיד"
 
 #: modules/text_renderer/freetype/freetype.c:83
 msgid "Font family for the font you want to use"
-msgstr ""
+msgstr "משפחת גופנים לגופן בו ברצונך להשתמש"
 
 #: modules/text_renderer/freetype/freetype.c:84
 msgid "Font file for the font you want to use"
@@ -24670,11 +24675,11 @@ msgstr "עבה"
 
 #: modules/text_renderer/freetype/freetype.c:151
 msgid "Left to right"
-msgstr ""
+msgstr "שמאל לימין"
 
 #: modules/text_renderer/freetype/freetype.c:151
 msgid "Right to left"
-msgstr ""
+msgstr "ימין לשמאל"
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
