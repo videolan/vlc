@@ -48,6 +48,7 @@ else
 endif
 
 endif
+	$(APPLY) $(SRC)/qt/0001-qmake-Always-split-QMAKE_DEFAULT_LIBDIRS-using-with-.patch
 	$(MOVE)
 
 

@@ -1,0 +1,46 @@
+From d6854fe5fc456cedfa40f91e9a8b62ae18ad19c8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Thu, 25 Apr 2019 12:13:13 +0300
+Subject: [PATCH] qmake: Always split QMAKE_DEFAULT_LIBDIRS using ; with clang
+ on windows
+
+When building in a unix style build system (i.e. msys), QMAKE_DIRLIST_SEP
+is a colon, not a semicolon. Thus, always split the incoming string
+(after the fixup regex) using semicolons on windows.
+
+This matches the code for gcc, further up, which does:
+
+    equals(QMAKE_HOST.os, Windows): \
+        paths = $$split(line, ;)
+    else: \
+        paths = $$split(line, $$QMAKE_DIRLIST_SEP)
+
+Change-Id: I6a0175f9d14ae9ca188553483b7868f0549c784a
+---
+ mkspecs/features/toolchain.prf | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/mkspecs/features/toolchain.prf b/mkspecs/features/toolchain.prf
+index 9c3a64aa8b..03612e5689 100644
+--- a/mkspecs/features/toolchain.prf
++++ b/mkspecs/features/toolchain.prf
+@@ -267,9 +267,13 @@ isEmpty($${target_prefix}.INCDIRS) {
+             for (line, output) {
+                 contains(line, "^libraries: .*") {
+                     line ~= s,^libraries: ,,
+-                    # clang (7.x) on Windows uses the wrong path list separator ...
+-                    equals(QMAKE_HOST.os, Windows): line ~= s,:(?![/\\\\]),;,
+-                    paths = $$split(line, $$QMAKE_DIRLIST_SEP)
++                    equals(QMAKE_HOST.os, Windows) {
++                        # clang (7.x) on Windows uses the wrong path list separator ...
++                        line ~= s,:(?![/\\\\]),;,
++                        paths = $$split(line, ;)
++                    } else {
++                        paths = $$split(line, $$QMAKE_DIRLIST_SEP)
++                    }
+                     for (path, paths): \
+                         QMAKE_DEFAULT_LIBDIRS += $$clean_path($$replace(path, ^=, $$[SYSROOT]))
+                 }
+-- 
+2.20.1 (Apple Git-117)
+
