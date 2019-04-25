@@ -430,6 +430,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
         BaseAdaptationSet *adaptSet = new (std::nothrow) BaseAdaptationSet(period);
         if(adaptSet)
         {
+            /* adaptSet->setSegmentAligned(true); FIXME: based on streamformat */
             std::list<Tag *> streaminfotags = getTagsFromList(tagslist, AttributesTag::EXTXSTREAMINF);
             for(it = streaminfotags.begin(); it != streaminfotags.end(); ++it)
             {

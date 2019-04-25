@@ -37,6 +37,13 @@ namespace adaptive
         class AbstractPlaylist;
         class ISegment;
 
+        enum Tribool
+        {
+            TRIBOOL_UNKNOWN,
+            TRIBOOL_FALSE,
+            TRIBOOL_TRUE,
+        };
+
         /* common segment elements for period/adaptset/rep 5.3.9.1,
          * with properties inheritance */
         class SegmentInformation : public ICanonicalUrl,
@@ -48,14 +55,7 @@ namespace adaptive
                 SegmentInformation( SegmentInformation * = 0 );
                 explicit SegmentInformation( AbstractPlaylist * );
                 virtual ~SegmentInformation();
-                typedef enum SwitchPolicy
-                {
-                    SWITCH_UNKNOWN,
-                    SWITCH_UNAVAILABLE,
-                    SWITCH_SEGMENT_ALIGNED,
-                    SWITCH_BITSWITCHEABLE
-                } SwitchPolicy;
-                SwitchPolicy getSwitchPolicy() const;
+
                 virtual vlc_tick_t getPeriodStart() const;
                 virtual AbstractPlaylist *getPlaylist() const;
 
@@ -93,13 +93,11 @@ namespace adaptive
                 std::vector<SegmentInformation *> childs;
                 SegmentInformation * getChildByID( const ID & );
                 SegmentInformation *parent;
-                SwitchPolicy switchpolicy;
 
             public:
                 void appendSegmentList(SegmentList *, bool = false);
                 void setSegmentBase(SegmentBase *);
                 void setSegmentTemplate(MediaSegmentTemplate *);
-                void setSwitchPolicy(SwitchPolicy);
                 virtual Url getUrlSegment() const; /* impl */
                 Property<Url *> baseUrl;
 

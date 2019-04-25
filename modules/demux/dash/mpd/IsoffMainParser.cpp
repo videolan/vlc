@@ -205,17 +205,6 @@ size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *
     total += parseSegmentBase(DOMHelper::getFirstChildElementByName(node, "SegmentBase"), info);
     total += parseSegmentList(DOMHelper::getFirstChildElementByName(node, "SegmentList"), info);
     total += parseSegmentTemplate(DOMHelper::getFirstChildElementByName(node, "SegmentTemplate" ), info);
-    if(node->hasAttribute("bitstreamSwitching") && node->getAttributeValue("bitstreamSwitching") == "true")
-    {
-        info->setSwitchPolicy(SegmentInformation::SWITCH_BITSWITCHEABLE);
-    }
-    else if(node->hasAttribute("segmentAlignment"))
-    {
-        if( node->getAttributeValue("segmentAlignment") == "true" )
-            info->setSwitchPolicy(SegmentInformation::SWITCH_SEGMENT_ALIGNED);
-        else
-            info->setSwitchPolicy(SegmentInformation::SWITCH_UNAVAILABLE);
-    }
     if(node->hasAttribute("timescale"))
         info->setTimescale(Integer<uint64_t>(node->getAttributeValue("timescale")));
 
@@ -250,6 +239,12 @@ void    IsoffMainParser::parseAdaptationSets  (Node *periodNode, Period *period)
             else if (lang.size() < 4)
                 adaptationSet->addLang(lang);
         }
+
+        if((*it)->hasAttribute("bitstreamSwitching"))
+            adaptationSet->setBitswitchAble((*it)->getAttributeValue("bitstreamSwitching") == "true");
+
+        if((*it)->hasAttribute("segmentAlignment"))
+            adaptationSet->setSegmentAligned((*it)->getAttributeValue("segmentAlignment") == "true");
 
         Node *baseUrl = DOMHelper::getFirstChildElementByName((*it), "BaseURL");
         if(baseUrl)

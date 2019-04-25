@@ -58,7 +58,6 @@ void SegmentInformation::init()
     segmentBase = NULL;
     segmentList = NULL;
     mediaSegmentTemplate = NULL;
-    switchpolicy = SWITCH_UNKNOWN;
 }
 
 SegmentInformation::~SegmentInformation()
@@ -511,14 +510,6 @@ uint64_t SegmentInformation::translateSegmentNumber(uint64_t num, const SegmentI
     return num;
 }
 
-SegmentInformation::SwitchPolicy SegmentInformation::getSwitchPolicy() const
-{
-    if(switchpolicy == SWITCH_UNKNOWN)
-        return (parent) ? parent->getSwitchPolicy() : SWITCH_UNAVAILABLE;
-    else
-        return switchpolicy;
-}
-
 vlc_tick_t SegmentInformation::getPeriodStart() const
 {
     if(parent)
@@ -610,11 +601,6 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
         const stime_t duration = timescale.ToScaled(split.duration);
         insertIntoSegment(seglist, prevstart, split.offset - 1, prevtime, duration);
     }
-}
-
-void SegmentInformation::setSwitchPolicy(SegmentInformation::SwitchPolicy policy)
-{
-    switchpolicy = policy;
 }
 
 Url SegmentInformation::getUrlSegment() const

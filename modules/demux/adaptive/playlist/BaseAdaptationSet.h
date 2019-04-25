@@ -51,15 +51,18 @@ namespace adaptive
                 virtual StreamFormat            getStreamFormat() const; /*reimpl*/
                 std::vector<BaseRepresentation *>&  getRepresentations      ();
                 BaseRepresentation *            getRepresentationByID(const ID &);
-                void                            setSwitchPolicy(bool value);
-                bool                            getBitstreamSwitching() const;
+                void                            setSegmentAligned(bool);
+                bool                            isSegmentAligned() const;
+                void                            setBitswitchAble(bool);
+                bool                            isBitSwitchable() const;
                 void                            addRepresentation( BaseRepresentation *rep );
                 void                            debug(vlc_object_t *,int = 0) const;
                 Property<std::string>           description;
 
             protected:
                 std::vector<BaseRepresentation *>   representations;
-                bool                            isBitstreamSwitching;
+                Tribool                         segmentAligned;
+                Tribool                         bitswitchAble;
         };
     }
 }
