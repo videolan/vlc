@@ -26,6 +26,7 @@
 #include "logic/AbstractAdaptationLogic.h"
 #include "http/HTTPConnection.hpp"
 #include "http/HTTPConnectionManager.h"
+#include "playlist/BaseAdaptationSet.h"
 #include "playlist/BaseRepresentation.h"
 #include "playlist/SegmentChunk.hpp"
 #include "plumbing/SourceStream.hpp"
@@ -636,9 +637,12 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
             break;
 
         case SegmentTrackerEvent::SWITCHING:
-            if(demuxer && demuxer->needsRestartOnSwitch() && !inrestart)
+            if(demuxer && !inrestart)
             {
-                needrestart = true;
+                if(!demuxer->bitstreamSwitchCompatible() ||
+                   (event.u.switching.next &&
+                   !event.u.switching.next->getAdaptationSet()->isBitSwitchable()))
+                    needrestart = true;
             }
             break;
 

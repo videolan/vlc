@@ -137,7 +137,7 @@ AbstractDemuxer *HLSStream::newDemux(demux_t *p_realdemux, const StreamFormat &f
         case StreamFormat::MPEG2TS:
             ret = new Demuxer(p_realdemux, "ts", out, source);
             if(ret)
-                ret->setCanDetectSwitches(false); /* HLS and unique PAT/PMT versions */
+                ret->setBitstreamSwitchCompatible(false); /* HLS and unique PAT/PMT versions */
             break;
 
         case StreamFormat::MP4:

@@ -51,9 +51,9 @@ bool AbstractDemuxer::alwaysStartsFromZero() const
     return b_startsfromzero;
 }
 
-bool AbstractDemuxer::needsRestartOnSwitch() const
+bool AbstractDemuxer::bitstreamSwitchCompatible() const
 {
-    return !b_candetectswitches;
+    return b_candetectswitches;
 }
 
 bool AbstractDemuxer::needsRestartOnEachSegment() const
@@ -61,7 +61,7 @@ bool AbstractDemuxer::needsRestartOnEachSegment() const
     return b_alwaysrestarts;
 }
 
-void AbstractDemuxer::setCanDetectSwitches( bool b )
+void AbstractDemuxer::setBitstreamSwitchCompatible( bool b )
 {
     b_candetectswitches = b;
 }
