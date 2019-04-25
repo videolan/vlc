@@ -128,12 +128,12 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static PlaylistManager * HandleDash(demux_t *,
-                                    SharedResources *, DOMParser &,
+static PlaylistManager * HandleDash(demux_t *, DOMParser &,
                                     const std::string &, AbstractAdaptationLogic::LogicType);
-static PlaylistManager * HandleSmooth(demux_t *,
-                                      SharedResources *, DOMParser &,
+static PlaylistManager * HandleSmooth(demux_t *, DOMParser &,
                                       const std::string &, AbstractAdaptationLogic::LogicType);
+static PlaylistManager * HandleHLS(demux_t *,
+                                   const std::string &, AbstractAdaptationLogic::LogicType);
 
 /*****************************************************************************
  * Open:
@@ -155,7 +155,6 @@ static int Open(vlc_object_t *p_obj)
     }
 
     PlaylistManager *p_manager = NULL;
-    SharedResources *resources = new SharedResources(p_obj);
 
     char *psz_logic = var_InheritString(p_obj, "adaptive-logic");
     AbstractAdaptationLogic::LogicType logic = AbstractAdaptationLogic::Default;
@@ -179,17 +178,7 @@ static int Open(vlc_object_t *p_obj)
 
     if(!dashmime && !smoothmime && HLSManager::isHTTPLiveStreaming(p_demux->s))
     {
-        M3U8Parser parser(resources);
-        M3U8 *p_playlist = parser.parse(VLC_OBJECT(p_demux),p_demux->s, playlisturl);
-        if(!p_playlist)
-        {
-            msg_Err( p_demux, "Could not parse playlist" );
-            delete resources;
-            return VLC_EGENERIC;
-        }
-
-        p_manager = new (std::nothrow) HLSManager(p_demux, resources, p_playlist,
-                                                  new (std::nothrow) HLSStreamFactory, logic);
+        p_manager = HandleHLS(p_demux, playlisturl, logic);
     }
     else
     {
@@ -197,13 +186,11 @@ static int Open(vlc_object_t *p_obj)
         DOMParser xmlParser; /* Share that xml reader */
         if(dashmime)
         {
-            p_manager = HandleDash(p_demux, resources,
-                                   xmlParser, playlisturl, logic);
+            p_manager = HandleDash(p_demux, xmlParser, playlisturl, logic);
         }
         else if(smoothmime)
         {
-            p_manager = HandleSmooth(p_demux, resources,
-                                     xmlParser, playlisturl, logic);
+            p_manager = HandleSmooth(p_demux, xmlParser, playlisturl, logic);
         }
         else
         {
@@ -219,13 +206,11 @@ static int Open(vlc_object_t *p_obj)
                     {
                         if(DASHManager::isDASH(xmlParser.getRootNode()))
                         {
-                            p_manager = HandleDash(p_demux, resources,
-                                                   xmlParser, playlisturl, logic);
+                            p_manager = HandleDash(p_demux, xmlParser, playlisturl, logic);
                         }
                         else if(SmoothManager::isSmoothStreaming(xmlParser.getRootNode()))
                         {
-                            p_manager = HandleSmooth(p_demux, resources,
-                                                     xmlParser, playlisturl, logic);
+                            p_manager = HandleSmooth(p_demux, xmlParser, playlisturl, logic);
                         }
                     }
                     vlc_stream_Delete(peekstream);
@@ -234,12 +219,7 @@ static int Open(vlc_object_t *p_obj)
         }
     }
 
-    if(!p_manager)
-    {
-        delete resources;
-        return VLC_EGENERIC;
-    }
-    else if(!p_manager->start())
+    if(!p_manager || !p_manager->start())
     {
         delete p_manager;
         return VLC_EGENERIC;
@@ -269,8 +249,7 @@ static void Close(vlc_object_t *p_obj)
 /*****************************************************************************
  *
  *****************************************************************************/
-static PlaylistManager * HandleDash(demux_t *p_demux,
-                                    SharedResources *res, DOMParser &xmlParser,
+static PlaylistManager * HandleDash(demux_t *p_demux, DOMParser &xmlParser,
                                     const std::string & playlisturl,
                                     AbstractAdaptationLogic::LogicType logic)
 {
@@ -288,13 +267,21 @@ static PlaylistManager * HandleDash(demux_t *p_demux,
         return NULL;
     }
 
-    return new (std::nothrow) DASHManager( p_demux, res, p_playlist,
-                                 new (std::nothrow) DASHStreamFactory,
-                                 logic );
+    SharedResources *resources = new (std::nothrow) SharedResources(VLC_OBJECT(p_demux));
+    DASHStreamFactory *factory = new (std::nothrow) DASHStreamFactory;
+    DASHManager *manager = NULL;
+    if(!resources || !factory ||
+       !(manager = new (std::nothrow) DASHManager(p_demux, resources,
+                                                  p_playlist, factory, logic)))
+    {
+        delete resources;
+        delete factory;
+        delete p_playlist;
+    }
+    return manager;
 }
 
-static PlaylistManager * HandleSmooth(demux_t *p_demux,
-                                      SharedResources *res, DOMParser &xmlParser,
+static PlaylistManager * HandleSmooth(demux_t *p_demux, DOMParser &xmlParser,
                                     const std::string & playlisturl,
                                     AbstractAdaptationLogic::LogicType logic)
 {
@@ -312,7 +299,46 @@ static PlaylistManager * HandleSmooth(demux_t *p_demux,
         return NULL;
     }
 
-    return new (std::nothrow) SmoothManager( p_demux, res, p_playlist,
-                                 new (std::nothrow) SmoothStreamFactory,
-                                 logic );
+    SharedResources *resources = new (std::nothrow) SharedResources(VLC_OBJECT(p_demux));
+    SmoothStreamFactory *factory = new (std::nothrow) SmoothStreamFactory;
+    SmoothManager *manager = NULL;
+    if(!resources || !factory ||
+       !(manager = new (std::nothrow) SmoothManager(p_demux, resources,
+                                                    p_playlist, factory, logic)))
+    {
+        delete resources;
+        delete factory;
+        delete p_playlist;
+    }
+    return manager;
+}
+
+static PlaylistManager * HandleHLS(demux_t *p_demux,
+                                   const std::string & playlisturl,
+                                   AbstractAdaptationLogic::LogicType logic)
+{
+    SharedResources *resources = new SharedResources(VLC_OBJECT(p_demux));
+    if(!resources)
+        return NULL;
+
+    M3U8Parser parser(resources);
+    M3U8 *p_playlist = parser.parse(VLC_OBJECT(p_demux),p_demux->s, playlisturl);
+    if(!p_playlist)
+    {
+        msg_Err( p_demux, "Could not parse playlist" );
+        delete resources;
+        return NULL;
+    }
+
+    HLSStreamFactory *factory = new (std::nothrow) HLSStreamFactory;
+    HLSManager *manager = NULL;
+    if(!factory ||
+       !(manager = new (std::nothrow) HLSManager(p_demux, resources,
+                                                 p_playlist, factory, logic)))
+    {
+        delete p_playlist;
+        delete factory;
+        delete resources;
+    }
+    return manager;
 }
