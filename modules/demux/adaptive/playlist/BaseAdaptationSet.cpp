@@ -43,9 +43,10 @@ using namespace adaptive::playlist;
 
 BaseAdaptationSet::BaseAdaptationSet(BasePeriod *period) :
     CommonAttributesElements(),
-    SegmentInformation( period ),
-    isBitstreamSwitching( false )
+    SegmentInformation( period )
 {
+    segmentAligned = TRIBOOL_UNKNOWN;
+    bitswitchAble = TRIBOOL_UNKNOWN;
 }
 
 BaseAdaptationSet::~BaseAdaptationSet   ()
@@ -88,14 +89,24 @@ void BaseAdaptationSet::addRepresentation(BaseRepresentation *rep)
     childs.push_back(rep);
 }
 
-void BaseAdaptationSet::setSwitchPolicy  (bool value)
+void BaseAdaptationSet::setSegmentAligned(bool b)
 {
-    this->isBitstreamSwitching = value;
+    segmentAligned = b ? TRIBOOL_TRUE : TRIBOOL_FALSE;
 }
 
-bool BaseAdaptationSet::getBitstreamSwitching  () const
+void BaseAdaptationSet::setBitswitchAble(bool b)
 {
-    return this->isBitstreamSwitching;
+    bitswitchAble = b ? TRIBOOL_TRUE : TRIBOOL_FALSE;
+}
+
+bool BaseAdaptationSet::isSegmentAligned() const
+{
+    return segmentAligned != TRIBOOL_FALSE;
+}
+
+bool BaseAdaptationSet::isBitSwitchable() const
+{
+    return bitswitchAble == TRIBOOL_TRUE;
 }
 
 void BaseAdaptationSet::debug(vlc_object_t *obj, int indent) const

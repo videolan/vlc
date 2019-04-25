@@ -154,7 +154,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     }
 
     if( !switch_allowed ||
-       (curRepresentation && curRepresentation->getSwitchPolicy() == SegmentInformation::SWITCH_UNAVAILABLE) )
+       (curRepresentation && !curRepresentation->getAdaptationSet()->isSegmentAligned()) )
         rep = curRepresentation;
     else
         rep = logic->getNextRepresentation(adaptationSet, curRepresentation);

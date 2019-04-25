@@ -32,7 +32,6 @@ using namespace smooth::playlist;
 Representation::Representation  ( BaseAdaptationSet *set ) :
                 BaseRepresentation( set )
 {
-    switchpolicy = SegmentInformation::SWITCH_SEGMENT_ALIGNED;
 }
 
 Representation::~Representation ()
