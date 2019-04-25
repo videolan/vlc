@@ -51,9 +51,9 @@ bool AbstractDemuxer::alwaysStartsFromZero() const
     return b_startsfromzero;
 }
 
-bool AbstractDemuxer::needsRestartOnSwitch() const
+bool AbstractDemuxer::bitstreamSwitchCompatible() const
 {
-    return !b_candetectswitches;
+    return b_candetectswitches;
 }
 
 bool AbstractDemuxer::needsRestartOnEachSegment() const
@@ -61,7 +61,7 @@ bool AbstractDemuxer::needsRestartOnEachSegment() const
     return b_alwaysrestarts;
 }
 
-void AbstractDemuxer::setCanDetectSwitches( bool b )
+void AbstractDemuxer::setBitstreamSwitchCompatible( bool b )
 {
     b_candetectswitches = b;
 }
@@ -126,7 +126,7 @@ bool MimeDemuxer::create()
     b_startsfromzero = demuxer->alwaysStartsFromZero();
     b_reinitsonseek = demuxer->needsRestartOnSeek();
     b_alwaysrestarts = demuxer->needsRestartOnEachSegment();
-    b_candetectswitches = !demuxer->needsRestartOnSwitch();
+    b_candetectswitches = demuxer->bitstreamSwitchCompatible();
 
     return true;
 }

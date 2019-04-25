@@ -40,9 +40,9 @@ namespace adaptive
             virtual void destroy() = 0;
             bool alwaysStartsFromZero() const;
             bool needsRestartOnSeek() const;
-            bool needsRestartOnSwitch() const;
+            bool bitstreamSwitchCompatible() const;
             bool needsRestartOnEachSegment() const;
-            void setCanDetectSwitches(bool);
+            void setBitstreamSwitchCompatible(bool);
             void setRestartsOnEachSegment(bool);
 
         protected:
