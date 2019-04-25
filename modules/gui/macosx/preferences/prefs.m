@@ -536,7 +536,14 @@ enum VLCTreeBranchType {
                 }
             }
             else {
-                if (subcategoryItem && ![[subcategoryItem children] containsObject: pluginItem]) {
+                if (categoryItem && subcat_is_general &&
+                    ![[categoryItem children] containsObject: pluginItem])
+                {
+                    [[categoryItem children] addObject:pluginItem];
+                }
+                else if (subcategoryItem && !subcat_is_general &&
+                    ![[subcategoryItem children] containsObject: pluginItem])
+                {
                     [[subcategoryItem children] addObject:pluginItem];
                 }
 
