@@ -535,7 +535,7 @@
                 }
             }
             else if (!module_is_main(p_module) && (CONFIG_ITEM(configType) || configType == CONFIG_SECTION)) {
-                if (![[subCategoryItem children] containsObject: pluginItem]) {
+                if (subCategoryItem && ![[subCategoryItem children] containsObject: pluginItem]) {
                     [[subCategoryItem children] addObject:pluginItem];
                 }
 
