@@ -478,6 +478,7 @@ enum VLCTreeBranchType {
         int lastcat = CAT_UNKNOWN;
         int lastsubcat = SUBCAT_UNKNOWN;
         bool subcat_is_general = false;
+        bool plugin_node_added = false;
         unsigned int confsize;
 
         module_t * p_module = modules[i];
@@ -536,15 +537,15 @@ enum VLCTreeBranchType {
                 }
             }
             else {
-                if (categoryItem && subcat_is_general &&
-                    ![[categoryItem children] containsObject: pluginItem])
-                {
-                    [[categoryItem children] addObject:pluginItem];
-                }
-                else if (subcategoryItem && !subcat_is_general &&
-                    ![[subcategoryItem children] containsObject: pluginItem])
-                {
-                    [[subcategoryItem children] addObject:pluginItem];
+                if (!plugin_node_added) {
+                    if (categoryItem && subcat_is_general) {
+                        [[categoryItem children] addObject:pluginItem];
+                        plugin_node_added = true;
+                    }
+                    else if (subcategoryItem && !subcat_is_general) {
+                        [[subcategoryItem children] addObject:pluginItem];
+                        plugin_node_added = true;
+                    }
                 }
 
                 if (pluginItem) {
