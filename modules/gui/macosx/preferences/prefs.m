@@ -532,7 +532,7 @@
             if (mod_is_main) {
                 if (categoryItem && subcat_is_general) {
                     [[categoryItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
-                } else if (subCategoryItem) {
+                } else if (subCategoryItem && !subcat_is_general) {
                     [[subCategoryItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
                 }
             }
