@@ -522,7 +522,9 @@ static int ReadDerivationData( demux_t *p_demux, vlc_fourcc_t type,
     return i_ret;
 }
 
-static int LoadGridImage( demux_t *p_demux, uint32_t i_pic_item_id,
+static int LoadGridImage( demux_t *p_demux,
+                          image_handler_t *handler,
+                          uint32_t i_pic_item_id,
                                uint8_t *p_buffer,
                                unsigned tile, unsigned gridcols,
                                unsigned imagewidth, unsigned imageheight )
@@ -553,21 +555,12 @@ static int LoadGridImage( demux_t *p_demux, uint32_t i_pic_item_id,
         return VLC_EGENERIC;
     }
 
-    image_handler_t *handler = image_HandlerCreate( p_demux );
-    if (!handler)
-    {
-        block_Release( p_sample );
-        es_format_Clean( &fmt );
-        return VLC_EGENERIC;
-    }
-
     video_format_t decoded;
     video_format_Init( &decoded, VLC_CODEC_RGBA );
 
     fmt.video.i_chroma = fmt.i_codec;
 
     picture_t *p_picture = image_Read( handler, p_sample, &fmt, &decoded );
-    image_HandlerDelete( handler );
 
     es_format_Clean( &fmt );
 
@@ -638,6 +631,10 @@ static int DerivedImageAssembleGrid( demux_t *p_demux, uint32_t i_grid_item_id,
             derivation_data.ImageGrid.columns_minus_one + 1,
             derivation_data.ImageGrid.columns_minus_one + 1);
 
+    image_handler_t *handler = image_HandlerCreate( p_demux );
+    if( !handler )
+        return VLC_EGENERIC;
+
     block_t *p_block = block_Alloc( derivation_data.ImageGrid.output_width *
                                     derivation_data.ImageGrid.output_height * 4 );
     if( !p_block )
@@ -657,7 +654,7 @@ static int DerivedImageAssembleGrid( demux_t *p_demux, uint32_t i_grid_item_id,
         msg_Dbg( p_demux, "Loading tile %d/%d", i,
                  (derivation_data.ImageGrid.rows_minus_one + 1) *
                  (derivation_data.ImageGrid.columns_minus_one + 1) );
-        LoadGridImage( p_demux,
+        LoadGridImage( p_demux, handler,
                        BOXDATA(p_refbox)->p_references[i].i_to_item_id,
                        p_block->p_buffer, i,
                        derivation_data.ImageGrid.columns_minus_one + 1,
@@ -666,6 +663,8 @@ static int DerivedImageAssembleGrid( demux_t *p_demux, uint32_t i_grid_item_id,
     }
 
     SetPictureProperties( p_demux, i_grid_item_id, fmt, NULL );
+
+    image_HandlerDelete( handler );
 
     return VLC_SUCCESS;
 }
