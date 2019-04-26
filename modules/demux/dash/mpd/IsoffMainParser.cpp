@@ -300,18 +300,7 @@ void    IsoffMainParser::parseRepresentations (Node *adaptationSetNode, Adaptati
             currentRepresentation->setMimeType(repNode->getAttributeValue("mimeType"));
 
         if(repNode->hasAttribute("codecs"))
-        {
-            std::list<std::string> list = Helper::tokenize(repNode->getAttributeValue("codecs"), ',');
-            std::list<std::string>::const_iterator it;
-            for(it=list.begin(); it!=list.end(); ++it)
-            {
-                std::size_t pos = (*it).find_first_of('.', 0);
-                if(pos != std::string::npos)
-                    currentRepresentation->addCodec((*it).substr(0, pos));
-                else
-                    currentRepresentation->addCodec(*it);
-            }
-        }
+            currentRepresentation->addCodecs(repNode->getAttributeValue("codecs"));
 
         size_t i_total = parseSegmentInformation(repNode, currentRepresentation, &nextid);
         /* Empty Representation with just baseurl (ex: subtitles) */
