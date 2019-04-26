@@ -219,7 +219,7 @@ int CreateComponentsList(vlc_object_t *p_this, const char *psz_role,
 
         msg_Dbg(p_this, "component %s", psz_name);
 
-        for( unsigned int j = 0; role_mappings[j].psz_role; j++ ) {
+        for( j = 0; role_mappings[j].psz_role; j++ ) {
             if( !strcmp( psz_role, role_mappings[j].psz_role ) &&
                 !strcmp( psz_name, role_mappings[j].psz_name ) ) {
                 goto found;
