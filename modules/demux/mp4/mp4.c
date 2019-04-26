@@ -1169,6 +1169,27 @@ static block_t * MP4_RTPHint_Convert( demux_t *p_demux, block_t *p_block, vlc_fo
     return p_converted;
 }
 
+static uint64_t OverflowCheck( demux_t *p_demux, mp4_track_t *tk,
+                               uint64_t i_readpos, uint64_t i_samplessize )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    if( !p_sys->b_seekable && p_sys->b_fragmented &&
+         p_sys->context.i_post_mdat_offset )
+    {
+        /* avoid breaking non seekable demux */
+        if( i_readpos + i_samplessize > p_sys->context.i_post_mdat_offset )
+        {
+            msg_Err(p_demux, "Broken file. track[0x%x] "
+                             "Sample @%" PRIu64 " overflowing "
+                             "parent mdat by %" PRIu64,
+                    tk->i_track_ID, i_readpos,
+                    i_readpos + i_samplessize - p_sys->context.i_post_mdat_offset );
+            i_samplessize = p_sys->context.i_post_mdat_offset - i_readpos;
+        }
+    }
+    return i_samplessize;
+}
+
 /*****************************************************************************
  * Demux: read packet and send them to decoders
  *****************************************************************************
@@ -1220,6 +1241,8 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
                     goto end;
                 }
             }
+
+            i_samplessize = OverflowCheck( p_demux, tk, i_readpos, i_samplessize );
 
             /* now read pes */
             if( !(p_block = vlc_stream_Block( p_demux->s, i_samplessize )) )
@@ -4330,6 +4353,8 @@ static int FragDemuxTrack( demux_t *p_demux, mp4_track_t *p_track,
 
         if( !len )
             msg_Warn(p_demux, "Zero length sample in trun.");
+
+        len = OverflowCheck( p_demux, p_track, vlc_stream_Tell(p_demux->s), len );
 
         block_t *p_block = vlc_stream_Block( p_demux->s, len );
         uint32_t i_read = ( p_block ) ? p_block->i_buffer : 0;
