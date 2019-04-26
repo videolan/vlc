@@ -120,6 +120,9 @@ Representation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet, c
         if(bwAttr)
             rep->setBandwidth(bwAttr->decimal());
 
+        if(tag->getAttributeByName("CODECS"))
+            rep->addCodecs(tag->getAttributeByName("CODECS")->quotedString());
+
         if(resAttr)
         {
             std::pair<int, int> res = resAttr->getResolution();
@@ -482,6 +485,9 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                         desc += " ";
                     desc += pair.second->getAttributeByName("NAME")->quotedString();
                 }
+
+                if(pair.second->getAttributeByName("CODECS"))
+                    rep->addCodecs(pair.second->getAttributeByName("CODECS")->quotedString());
 
                 if(!desc.empty())
                 {
