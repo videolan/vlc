@@ -1142,10 +1142,10 @@ typedef struct MP4_Box_data_mfhd_s
 
 typedef struct MP4_Box_sidx_item_s
 {
-    bool     b_reference_type;
     uint32_t i_referenced_size;
     uint32_t i_subsegment_duration;
-    bool     b_starts_with_SAP;
+    uint8_t  b_reference_type;
+    uint8_t  b_starts_with_SAP;
     uint8_t  i_SAP_type;
     uint32_t i_SAP_delta_time;
 
