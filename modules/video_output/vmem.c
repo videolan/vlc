@@ -144,13 +144,22 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         memset(sys->pitches, 0, sizeof(sys->pitches));
         memset(sys->lines, 0, sizeof(sys->lines));
 
-        if (setup(&sys->opaque, chroma, &fmt.i_width, &fmt.i_height,
+        unsigned widths[2], heights[2];
+        widths[0] = fmt.i_width;
+        widths[1] = fmt.i_visible_width;
+
+        heights[0] = fmt.i_height;
+        heights[1] = fmt.i_visible_height;
+
+        if (setup(&sys->opaque, chroma, widths, heights,
                            sys->pitches, sys->lines) == 0) {
             msg_Err(vd, "video format setup failure (no pictures)");
             free(sys);
             return VLC_EGENERIC;
         }
         fmt.i_chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, chroma);
+        fmt.i_width = widths[0];
+        fmt.i_height = heights[0];
 
     } else {
         char *chroma = var_InheritString(vd, "vmem-chroma");

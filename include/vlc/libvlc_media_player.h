@@ -346,12 +346,16 @@ typedef void (*libvlc_video_display_cb)(void *opaque, void *picture);
  * \param opaque pointer to the private pointer passed to
  *               libvlc_video_set_callbacks() [IN/OUT]
  * \param chroma pointer to the 4 bytes video format identifier [IN/OUT]
- * \param width pointer to the pixel width [IN/OUT]
- * \param height pointer to the pixel height [IN/OUT]
+ * \param width pointer to the buffer width in pixels[IN/OUT]
+ * \param height pointer to the buffer height in pixels[IN/OUT]
  * \param pitches table of scanline pitches in bytes for each pixel plane
  *                (the table is allocated by LibVLC) [OUT]
  * \param lines table of scanlines count for each plane [OUT]
  * \return the number of picture buffers allocated, 0 indicates failure
+ *
+ * \version LibVLC 4.0.0 and later.
+ * \param (width+1) - pointer to display width in pixels[IN]
+ * \param (height+1) - pointer to display height in pixels[IN]
  *
  * \note
  * For each pixels plane, the scanline pitch must be bigger than or equal to
