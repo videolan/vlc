@@ -631,12 +631,12 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
                                      OMX_StateIdle, 0 );
         CHECK_ERROR(omx_error, "OMX_CommandStateSet Idle failed (%x)", omx_error );
         while (1) {
-            OMX_U32 cmd, state;
-            omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, &cmd, &state, 0);
+            OMX_U32 cmd, waitstate;
+            omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, &cmd, &waitstate, 0);
             CHECK_ERROR(omx_error, "Wait for Idle failed (%x)", omx_error );
             // The event queue can contain other OMX_EventCmdComplete items,
             // such as for OMX_CommandFlush
-            if (cmd == OMX_CommandStateSet && state == OMX_StateIdle)
+            if (cmd == OMX_CommandStateSet && waitstate == OMX_StateIdle)
                 break;
         }
     }
