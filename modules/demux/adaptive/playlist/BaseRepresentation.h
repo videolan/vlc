@@ -60,7 +60,7 @@ namespace adaptive
                 uint64_t            getBandwidth            () const;
                 void                setBandwidth            ( uint64_t bandwidth );
                 const std::list<std::string> & getCodecs    () const;
-                void                addCodec                (const std::string &);
+                void                addCodecs               (const std::string &);
                 bool                consistentSegmentNumber () const;
                 virtual void        pruneByPlaybackTime     (vlc_tick_t);
 

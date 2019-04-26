@@ -32,6 +32,7 @@
 #include "SegmentTemplate.h"
 #include "SegmentTimeline.h"
 #include "../ID.hpp"
+#include "../tools/Helper.h"
 
 using namespace adaptive;
 using namespace adaptive::playlist;
@@ -73,9 +74,18 @@ const std::list<std::string> & BaseRepresentation::getCodecs() const
     return codecs;
 }
 
-void BaseRepresentation::addCodec(const std::string &codec)
+void BaseRepresentation::addCodecs(const std::string &s)
 {
-    codecs.push_back(codec);
+    std::list<std::string> list = Helper::tokenize(s, ',');
+    std::list<std::string>::const_iterator it;
+    for(it=list.begin(); it!=list.end(); ++it)
+    {
+        std::size_t pos = (*it).find_first_of('.', 0);
+        if(pos != std::string::npos)
+            codecs.push_back((*it).substr(0, pos));
+        else
+            codecs.push_back(*it);
+    }
 }
 
 bool BaseRepresentation::needsUpdate() const
