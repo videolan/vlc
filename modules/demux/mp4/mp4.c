@@ -4831,6 +4831,8 @@ static int FragGetMoofBySidxIndex( demux_t *p_demux, vlc_tick_t target_time,
     stime_t i_time = 0;
     for( uint16_t i=0; i<p_data->i_reference_count; i++ )
     {
+        if(p_data->p_items[i].b_reference_type != 0)
+            continue;
         if( i_time + p_data->p_items[i].i_subsegment_duration > i_target_time )
         {
             *pi_sampletime = MP4_rescale_mtime( i_time, p_data->i_timescale );
