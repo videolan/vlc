@@ -165,6 +165,9 @@ static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const
             else if(qualNode->hasAttribute("Height"))
                 rep->setHeight(Integer<uint64_t>(qualNode->getAttributeValue("Height")));
 
+            if(qualNode->hasAttribute("FourCC"))
+                rep->addCodecs(qualNode->getAttributeValue("FourCC"));
+
             ForgedInitSegment *initSegment = new (std::nothrow)
                     ForgedInitSegment(segmentList, type,
                                       adaptSet->inheritTimescale(),
