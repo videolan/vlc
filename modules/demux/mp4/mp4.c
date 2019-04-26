@@ -4820,29 +4820,34 @@ static int FragGetMoofBySidxIndex( demux_t *p_demux, vlc_tick_t target_time,
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const MP4_Box_t *p_sidx = MP4_BoxGet( p_sys->p_root, "sidx" );
-    const MP4_Box_data_sidx_t *p_data;
-    if( !p_sidx || !((p_data = BOXDATA(p_sidx))) || !p_data->i_timescale )
-        return VLC_EGENERIC;
-
-    stime_t i_target_time = MP4_rescale_qtime( target_time, p_data->i_timescale );
-
-    /* sidx refers to offsets from end of sidx pos in the file + first offset */
-    uint64_t i_pos = p_data->i_first_offset + p_sidx->i_pos + p_sidx->i_size;
-    stime_t i_time = 0;
-    for( uint16_t i=0; i<p_data->i_reference_count; i++ )
+    for( ; p_sidx ; p_sidx = p_sidx->p_next )
     {
-        if(p_data->p_items[i].b_reference_type != 0)
+        if( p_sidx->i_type != ATOM_sidx )
             continue;
-        if( i_time + p_data->p_items[i].i_subsegment_duration > i_target_time )
-        {
-            *pi_sampletime = MP4_rescale_mtime( i_time, p_data->i_timescale );
-            *pi_moof_pos = i_pos;
-            return VLC_SUCCESS;
-        }
-        i_pos += p_data->p_items[i].i_referenced_size;
-        i_time += p_data->p_items[i].i_subsegment_duration;
-    }
 
+        const MP4_Box_data_sidx_t *p_data = BOXDATA(p_sidx);
+        if( !p_data || !p_data->i_timescale )
+            break;
+
+        stime_t i_target_time = MP4_rescale_qtime( target_time, p_data->i_timescale );
+
+        /* sidx refers to offsets from end of sidx pos in the file + first offset */
+        uint64_t i_pos = p_data->i_first_offset + p_sidx->i_pos + p_sidx->i_size;
+        stime_t i_time = 0;
+        for( uint16_t i=0; i<p_data->i_reference_count; i++ )
+        {
+            if(p_data->p_items[i].b_reference_type != 0)
+                continue;
+            if( i_time + p_data->p_items[i].i_subsegment_duration > i_target_time )
+            {
+                *pi_sampletime = MP4_rescale_mtime( i_time, p_data->i_timescale );
+                *pi_moof_pos = i_pos;
+                return VLC_SUCCESS;
+            }
+            i_pos += p_data->p_items[i].i_referenced_size;
+            i_time += p_data->p_items[i].i_subsegment_duration;
+        }
+    }
     return VLC_EGENERIC;
 }
 
