@@ -121,6 +121,17 @@ extern NSString *VLCPlaylistItemsRemoved;
            startPlayback:(BOOL)startPlayback;
 
 /**
+ * Add new item to the playlist if you already have an input item
+ * @param p_inputItem the input item you already from somewhere
+ * @param insertionIndex index for new item, -1 for appending at end
+ * @param startPlayback starts playback of the item if true
+ * @return returns VLC_SUCCESS or an error
+ */
+- (int)addInputItem:(input_item_t *)p_inputItem
+         atPosition:(size_t)insertionIndex
+      startPlayback:(BOOL)startPlayback;
+
+/**
  * Remove the item at the given index (if any)
  * @param index the index to remove
  */

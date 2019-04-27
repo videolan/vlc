@@ -363,6 +363,29 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     }
 }
 
+- (int)addInputItem:(input_item_t *)p_inputItem atPosition:(size_t)insertionIndex startPlayback:(BOOL)startPlayback
+{
+    if (p_inputItem == NULL) {
+        return VLC_EBADVAR;
+    }
+    int ret = 0;
+
+    vlc_playlist_Lock(_p_playlist);
+    if (insertionIndex == -1) {
+        insertionIndex = vlc_playlist_Count(_p_playlist);
+    }
+    ret = vlc_playlist_InsertOne(_p_playlist, insertionIndex, p_inputItem);
+    if (ret != VLC_SUCCESS) {
+        vlc_playlist_Unlock(_p_playlist);
+        return ret;
+    }
+    if (startPlayback) {
+        ret = vlc_playlist_PlayAt(_p_playlist, insertionIndex);
+    }
+    vlc_playlist_Unlock(_p_playlist);
+    return ret;
+}
+
 - (void)removeItemAtIndex:(size_t)index
 {
     /* note: we don't remove the cached data from the model here
