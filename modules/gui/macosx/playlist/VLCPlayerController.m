@@ -533,6 +533,10 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     self = [super init];
     if (self) {
         _defaultNotificationCenter = [NSNotificationCenter defaultCenter];
+        [_defaultNotificationCenter addObserver:self
+                                       selector:@selector(applicationWillTerminate:)
+                                           name:NSApplicationWillTerminateNotification
+                                         object:nil];
         _position = -1.f;
         _time = VLC_TICK_INVALID;
         _p_player = player;
@@ -557,7 +561,7 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     return self;
 }
 
-- (void)deinitialize
+- (void)applicationWillTerminate:(NSNotification *)aNotification
 {
     [self onPlaybackHasTruelyEnded:nil];
     if (@available(macOS 10.12.2, *)) {
@@ -579,6 +583,11 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
             vlc_player_vout_RemoveListener(_p_player, _playerVoutListenerID);
         }
     }
+}
+
+- (void)dealloc
+{
+    [_defaultNotificationCenter removeObserver:self];
 }
 
 #pragma mark - playback control methods

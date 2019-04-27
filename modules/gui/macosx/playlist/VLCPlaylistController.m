@@ -201,6 +201,10 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     self = [super init];
     if (self) {
         _defaultNotificationCenter = [NSNotificationCenter defaultCenter];
+        [_defaultNotificationCenter addObserver:self
+                                       selector:@selector(applicationWillTerminate:)
+                                           name:NSApplicationWillTerminateNotification
+                                         object:nil];
         _p_playlist = playlist;
 
         /* set initial values, further updates through callbacks */
@@ -219,12 +223,8 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     return self;
 }
 
-- (void)deinitialize
+- (void)applicationWillTerminate:(NSNotification *)aNotification
 {
-    if (_playerController) {
-        [_playerController deinitialize];
-    }
-
     if (_p_playlist) {
         if (_playlistListenerID) {
             vlc_playlist_Lock(_p_playlist);
@@ -232,6 +232,11 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
             vlc_playlist_Unlock(_p_playlist);
         }
     }
+}
+
+- (void)dealloc
+{
+    [_defaultNotificationCenter removeObserver:self];
 }
 
 #pragma mark - callback forwarders

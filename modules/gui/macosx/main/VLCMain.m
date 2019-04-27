@@ -295,14 +295,6 @@ static VLCMain *sharedInstance = nil;
     return self;
 }
 
-- (void)dealloc
-{
-    msg_Dbg(getIntf(), "Deinitializing VLCMain object");
-
-    /* have the playlist controller explicitly unsubscribe from events prior to its deallocation */
-    [_playlistController deinitialize];
-}
-
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
     _clickerManager = [[VLCClickerManager alloc] init];
