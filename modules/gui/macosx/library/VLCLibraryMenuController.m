@@ -24,8 +24,6 @@
 
 #import "main/VLCMain.h"
 #import "library/VLCLibraryController.h"
-#import "library/VLCLibraryModel.h"
-#import "library/VLCLibraryDataTypes.h"
 
 #import "extensions/NSString+Helpers.h"
 
@@ -45,10 +43,12 @@
         _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
         [_libraryMenu addItemWithTitle:_NS("Play") action:@selector(play:) keyEquivalent:@""];
         [[_libraryMenu itemAtIndex:0] setTarget:self];
-        [_libraryMenu addItemWithTitle:_NS("Add Media...") action:@selector(addMedia:) keyEquivalent:@""];
+        [_libraryMenu addItemWithTitle:_NS("Append to Playlist") action:@selector(appendToPlaylist:) keyEquivalent:@""];
         [[_libraryMenu itemAtIndex:1] setTarget:self];
-        [_libraryMenu addItemWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
+        [_libraryMenu addItemWithTitle:_NS("Add Media...") action:@selector(addMedia:) keyEquivalent:@""];
         [[_libraryMenu itemAtIndex:2] setTarget:self];
+        [_libraryMenu addItemWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
+        [[_libraryMenu itemAtIndex:3] setTarget:self];
     }
     return self;
 }
@@ -64,7 +64,12 @@
 
 - (void)play:(id)sender
 {
+    [[[VLCMain sharedInstance] libraryController] appendItemAtIndexPathToPlaylist:_actionIndexPath playImmediately:YES];
+}
 
+- (void)appendToPlaylist:(id)sender
+{
+    [[[VLCMain sharedInstance] libraryController] appendItemAtIndexPathToPlaylist:_actionIndexPath playImmediately:NO];
 }
 
 - (void)addMedia:(id)sender
@@ -74,18 +79,7 @@
 
 - (void)revealInFinder:(id)sender
 {
-    VLCMediaLibraryMediaItem *mediaItem = [[[[VLCMain sharedInstance] libraryController] libraryModel] mediaItemAtIndexPath:_actionIndexPath];
-    if (mediaItem == nil) {
-        return;
-    }
-    VLCMediaLibraryFile *firstFile = mediaItem.files.firstObject;
-
-    if (firstFile) {
-        NSURL *URL = [NSURL URLWithString:firstFile.MRL];
-        if (URL) {
-            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:@[URL]];
-        }
-    }
+    [[[VLCMain sharedInstance] libraryController] showItemAtIndexPathInFinder:_actionIndexPath];
 }
 
 @end

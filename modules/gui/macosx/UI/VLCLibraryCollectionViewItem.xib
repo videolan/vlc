@@ -7,9 +7,11 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryCollectionViewItem">
             <connections>
+                <outlet property="addToPlaylistButton" destination="Ubz-8I-W2F" id="k0q-b1-PZi"/>
                 <outlet property="durationTextField" destination="VAn-gF-QiZ" id="U8T-Cs-HaL"/>
                 <outlet property="mediaImageView" destination="2aB-sB-hfY" id="Sv0-G1-KNm"/>
                 <outlet property="mediaTitleTextField" destination="OBS-Eh-1mT" id="h1n-PU-IAx"/>
+                <outlet property="playInstantlyButton" destination="S3I-5Z-qgS" id="JlC-bE-i5Y"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
             </connections>
         </customObject>
@@ -42,15 +44,39 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ubz-8I-W2F">
+                    <rect key="frame" x="417" y="224" width="49" height="32"/>
+                    <buttonCell key="cell" type="push" title="+" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6ko-MM-ds0">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="addToPlaylist:" target="-2" id="2C9-Rn-VAb"/>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S3I-5Z-qgS">
+                    <rect key="frame" x="368" y="224" width="49" height="32"/>
+                    <buttonCell key="cell" type="push" title="P" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="IHP-p1-d0R">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="playInstantly:" target="-2" id="E2B-oj-rx3"/>
+                    </connections>
+                </button>
             </subviews>
             <constraints>
                 <constraint firstItem="VAn-gF-QiZ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="OBS-Eh-1mT" secondAttribute="trailing" constant="20" id="2di-oZ-tsC"/>
+                <constraint firstItem="Ubz-8I-W2F" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="20" id="8Qf-Un-Gdl"/>
                 <constraint firstAttribute="bottom" secondItem="2aB-sB-hfY" secondAttribute="bottom" id="C2H-Jc-A9V"/>
+                <constraint firstItem="Ubz-8I-W2F" firstAttribute="leading" secondItem="S3I-5Z-qgS" secondAttribute="trailing" constant="12" id="DZe-x4-j0v"/>
                 <constraint firstItem="A5y-ue-y7t" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="NpD-8l-D5s"/>
                 <constraint firstAttribute="trailing" secondItem="VAn-gF-QiZ" secondAttribute="trailing" constant="20" id="Ol6-wf-2dJ"/>
                 <constraint firstItem="2aB-sB-hfY" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="YP6-lv-ECe"/>
+                <constraint firstAttribute="trailing" secondItem="Ubz-8I-W2F" secondAttribute="trailing" constant="20" id="ZVz-SL-rxZ"/>
                 <constraint firstAttribute="bottom" secondItem="A5y-ue-y7t" secondAttribute="bottom" id="cnQ-bx-Fmn"/>
                 <constraint firstAttribute="bottom" secondItem="OBS-Eh-1mT" secondAttribute="bottom" constant="20" id="dy4-gP-Sdi"/>
+                <constraint firstItem="Ubz-8I-W2F" firstAttribute="centerY" secondItem="S3I-5Z-qgS" secondAttribute="centerY" id="fTo-dl-S2N"/>
                 <constraint firstAttribute="trailing" secondItem="2aB-sB-hfY" secondAttribute="trailing" id="oZw-Ab-83p"/>
                 <constraint firstAttribute="trailing" secondItem="A5y-ue-y7t" secondAttribute="trailing" id="rKQ-WW-oC6"/>
                 <constraint firstItem="2aB-sB-hfY" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="t9g-tX-AQX"/>

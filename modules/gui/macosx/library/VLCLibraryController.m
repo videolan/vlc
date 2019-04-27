@@ -23,8 +23,10 @@
 #import "VLCLibraryController.h"
 
 #import "main/VLCMain.h"
+#import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryDataTypes.h"
 
 #import <vlc_media_library.h>
 
@@ -83,6 +85,30 @@
         vlc_ml_pause_background(_p_libraryInstance);
     } else {
         vlc_ml_resume_background(_p_libraryInstance);
+    }
+}
+
+- (void)appendItemAtIndexPathToPlaylist:(NSIndexPath *)indexPath playImmediately:(BOOL)playImmediately
+{
+    VLCMediaLibraryMediaItem *mediaItem = [self.libraryModel mediaItemAtIndexPath:indexPath];
+    input_item_t *p_inputItem = vlc_ml_get_input_item(_p_libraryInstance, mediaItem.libraryID);
+    [[[VLCMain sharedInstance] playlistController] addInputItem:p_inputItem atPosition:-1 startPlayback:playImmediately];
+    input_item_Release(p_inputItem);
+}
+
+- (void)showItemAtIndexPathInFinder:(NSIndexPath *)indexPath
+{
+    VLCMediaLibraryMediaItem *mediaItem = [self.libraryModel mediaItemAtIndexPath:indexPath];
+    if (mediaItem == nil) {
+        return;
+    }
+    VLCMediaLibraryFile *firstFile = mediaItem.files.firstObject;
+
+    if (firstFile) {
+        NSURL *URL = [NSURL URLWithString:firstFile.MRL];
+        if (URL) {
+            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:@[URL]];
+        }
     }
 }
 

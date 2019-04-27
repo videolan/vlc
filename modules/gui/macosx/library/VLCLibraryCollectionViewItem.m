@@ -22,8 +22,37 @@
 
 #import "VLCLibraryCollectionViewItem.h"
 
+#import "main/VLCMain.h"
+#import "library/VLCLibraryController.h"
+
 NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 
+@interface VLCLibraryCollectionViewItem()
+{
+    VLCLibraryController *_libraryController;
+}
+@end
+
 @implementation VLCLibraryCollectionViewItem
+
+- (IBAction)playInstantly:(id)sender
+{
+    if (!_libraryController) {
+        _libraryController = [[VLCMain sharedInstance] libraryController];
+    }
+
+    NSIndexPath *indexPath = [[self collectionView] indexPathForItem:self];
+    [_libraryController appendItemAtIndexPathToPlaylist:indexPath playImmediately:YES];
+}
+
+- (IBAction)addToPlaylist:(id)sender
+{
+    if (!_libraryController) {
+        _libraryController = [[VLCMain sharedInstance] libraryController];
+    }
+
+    NSIndexPath *indexPath = [[self collectionView] indexPathForItem:self];
+    [_libraryController appendItemAtIndexPathToPlaylist:indexPath playImmediately:NO];
+}
 
 @end

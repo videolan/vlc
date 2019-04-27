@@ -33,6 +33,11 @@ extern NSString *VLCLibraryCellIdentifier;
 @property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
 @property (readwrite, assign) IBOutlet NSTextField *durationTextField;
 @property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
+@property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
+@property (readwrite, assign) IBOutlet NSButton *addToPlaylistButton;
+
+- (IBAction)playInstantly:(id)sender;
+- (IBAction)addToPlaylist:(id)sender;
 
 @end
 
