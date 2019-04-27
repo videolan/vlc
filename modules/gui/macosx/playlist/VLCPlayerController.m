@@ -1498,6 +1498,8 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 - (int)setABLoop
 {
     int ret = 0;
+
+    vlc_player_Lock(_p_player);
     switch (_abLoopState) {
         case VLC_PLAYER_ABLOOP_A:
             ret = vlc_player_SetAtoBLoop(_p_player, VLC_PLAYER_ABLOOP_B);
@@ -1511,13 +1513,17 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
             ret = vlc_player_SetAtoBLoop(_p_player, VLC_PLAYER_ABLOOP_A);
             break;
     }
+    vlc_player_Unlock(_p_player);
 
     return ret;
 }
 
 - (int)disableABLoop
 {
-    return vlc_player_SetAtoBLoop(_p_player, VLC_PLAYER_ABLOOP_NONE);
+    vlc_player_Lock(_p_player);
+    int ret = vlc_player_SetAtoBLoop(_p_player, VLC_PLAYER_ABLOOP_NONE);
+    vlc_player_Unlock(_p_player);
+    return ret;
 }
 
 - (void)setEnableRecording:(BOOL)enableRecording
