@@ -187,3 +187,24 @@
 }
 
 @end
+
+@implementation VLCMediaLibraryEntryPoint
+
+- (instancetype)initWithEntryPoint:(struct vlc_ml_entry_point_t *)p_entryPoint
+{
+    self = [super init];
+    if (self && p_entryPoint != NULL) {
+        _MRL = toNSStr(p_entryPoint->psz_mrl);
+        _isPresent = p_entryPoint->b_present;
+        _isBanned = p_entryPoint->b_banned;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@ — MRL: %@, present: %i, banned: %i",
+            NSStringFromClass([self class]), _MRL, _isPresent, _isBanned];
+}
+
+@end
