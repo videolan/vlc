@@ -38,7 +38,7 @@
 #include <vlc_picture.h>
 #include <vlc_rand.h>
 
-#include "filter_picture.h"
+#include "../filter_picture.h"
 
 #include "puzzle.h"
 #include "puzzle_bezier.h"

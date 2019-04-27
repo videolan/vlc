@@ -1252,7 +1252,7 @@ modules/video_filter/opencv_wrapper.c
 modules/video_filter/posterize.c
 modules/video_filter/postproc.c
 modules/video_filter/psychedelic.c
-modules/video_filter/puzzle.c
+modules/video_filter/puzzle/puzzle.c
 modules/video_filter/ripple.c
 modules/video_filter/rotate.c
 modules/video_filter/scale.c

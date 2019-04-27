@@ -43,11 +43,11 @@ libposterize_plugin_la_SOURCES = video_filter/posterize.c
 libpsychedelic_plugin_la_SOURCES = video_filter/psychedelic.c
 libpsychedelic_plugin_la_LIBADD = $(LIBM)
 libpuzzle_plugin_la_SOURCES = \
-	video_filter/puzzle.c video_filter/puzzle.h \
-	video_filter/puzzle_bezier.c video_filter/puzzle_bezier.h \
-	video_filter/puzzle_lib.c video_filter/puzzle_lib.h \
-	video_filter/puzzle_mgt.c video_filter/puzzle_mgt.h \
-	video_filter/puzzle_pce.c video_filter/puzzle_pce.h
+	video_filter/puzzle/puzzle.c video_filter/puzzle/puzzle.h \
+	video_filter/puzzle/puzzle_bezier.c video_filter/puzzle/puzzle_bezier.h \
+	video_filter/puzzle/puzzle_lib.c video_filter/puzzle/puzzle_lib.h \
+	video_filter/puzzle/puzzle_mgt.c video_filter/puzzle/puzzle_mgt.h \
+	video_filter/puzzle/puzzle_pce.c video_filter/puzzle/puzzle_pce.h
 libpuzzle_plugin_la_LIBADD = $(LIBM)
 libripple_plugin_la_SOURCES = video_filter/ripple.c
 libripple_plugin_la_LIBADD = $(LIBM)
