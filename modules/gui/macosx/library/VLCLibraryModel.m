@@ -22,6 +22,7 @@
 
 #import "VLCLibraryModel.h"
 
+#import "main/VLCMain.h"
 #import "library/VLCLibraryDataTypes.h"
 
 NSString *VLCLibraryModelAudioMediaListUpdated = @"VLCLibraryModelAudioMediaListUpdated";
@@ -188,6 +189,27 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 
     return _cachedVideoMedia;
+}
+
+- (NSArray<VLCMediaLibraryEntryPoint *> *)listOfMonitoredFolders
+{
+    vlc_ml_entry_point_list_t *pp_entrypoints;
+    int ret = vlc_ml_list_folder(_p_mediaLibrary, &pp_entrypoints);
+    if (ret != VLC_SUCCESS) {
+        msg_Err(getIntf(), "failed to retrieve list of monitored library folders (%i)", ret);
+        return @[];
+    }
+
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:pp_entrypoints->i_nb_items];
+    for (size_t x = 0; x < pp_entrypoints->i_nb_items; x++) {
+        VLCMediaLibraryEntryPoint *entryPoint = [[VLCMediaLibraryEntryPoint alloc] initWithEntryPoint:&pp_entrypoints->p_items[x]];
+        if (entryPoint) {
+            [mutableArray addObject:entryPoint];
+        }
+    }
+
+    vlc_ml_entry_point_list_release(pp_entrypoints);
+    return [mutableArray copy];
 }
 
 @end

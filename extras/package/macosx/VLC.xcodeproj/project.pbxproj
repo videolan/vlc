@@ -126,6 +126,7 @@
 		7D903EAF224392B400917358 /* timespec_get.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EAE224392B400917358 /* timespec_get.c */; };
 		7D903EB6224394BE00917358 /* specific.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EB5224394BE00917358 /* specific.c */; };
 		7D903EB92243952100917358 /* threads.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EB82243952100917358 /* threads.c */; };
+		7D94E28D2274D2140008057F /* VLCLibraryFolderManagementWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D94E28B2274D2140008057F /* VLCLibraryFolderManagementWindow.m */; };
 		7DB40D2A20CBCEB500F63173 /* VLCMainMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB40D2920CBCEB500F63173 /* VLCMainMenu.m */; };
 		7DB40D2D20CBCEC200F63173 /* VLCStatusBarIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB40D2B20CBCEC200F63173 /* VLCStatusBarIcon.m */; };
 		7DB7F1EC20CC036D00C2CAED /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DB7F1EB20CC036D00C2CAED /* AudioUnit.framework */; };
@@ -478,6 +479,9 @@
 		7D903EAE224392B400917358 /* timespec_get.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = timespec_get.c; path = ../../../../compat/timespec_get.c; sourceTree = "<group>"; };
 		7D903EB5224394BE00917358 /* specific.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = specific.c; path = ../../../src/darwin/specific.c; sourceTree = "<group>"; };
 		7D903EB82243952100917358 /* threads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = threads.c; path = ../../../../src/misc/threads.c; sourceTree = "<group>"; };
+		7D94E28A2274D2140008057F /* VLCLibraryFolderManagementWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryFolderManagementWindow.h; sourceTree = "<group>"; };
+		7D94E28B2274D2140008057F /* VLCLibraryFolderManagementWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryFolderManagementWindow.m; sourceTree = "<group>"; };
+		7D94E28C2274D2140008057F /* VLCLibraryFolderManagementWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCLibraryFolderManagementWindow.xib; sourceTree = "<group>"; };
 		7DB40D2820CBCEB500F63173 /* VLCMainMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCMainMenu.h; sourceTree = "<group>"; };
 		7DB40D2920CBCEB500F63173 /* VLCMainMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCMainMenu.m; sourceTree = "<group>"; };
 		7DB40D2B20CBCEC200F63173 /* VLCStatusBarIcon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCStatusBarIcon.m; sourceTree = "<group>"; };
@@ -956,6 +960,8 @@
 				7DFBDCAD2269ED0C00B700A5 /* VLCLibraryDataSource.m */,
 				7DFBDCAF226A518400B700A5 /* VLCLibraryMenuController.h */,
 				7DFBDCB0226A518400B700A5 /* VLCLibraryMenuController.m */,
+				7D94E28A2274D2140008057F /* VLCLibraryFolderManagementWindow.h */,
+				7D94E28B2274D2140008057F /* VLCLibraryFolderManagementWindow.m */,
 				7DFBDCBF226DC16200B700A5 /* VLCInputItem.h */,
 				7DFBDCC0226DC16200B700A5 /* VLCInputItem.m */,
 			);
@@ -1435,6 +1441,7 @@
 			children = (
 				6B8224091E4D2A9000833BE1 /* MainMenu.xib */,
 				7D713D332201BB130042BEB7 /* VLCLibraryWindow.xib */,
+				7D94E28C2274D2140008057F /* VLCLibraryFolderManagementWindow.xib */,
 				7D0F64002201F66D00FDB91F /* VLCPlaylistTableCellView.xib */,
 				7D445D8F220339D400263D34 /* VLCPlaylistMenu.xib */,
 				7D0F64052202047900FDB91F /* VLCLibraryCollectionViewItem.xib */,
@@ -1576,6 +1583,7 @@
 				1CCC89012078A3D500E5626F /* Preferences.xib in Sources */,
 				7DC21A7422049A6600F98A02 /* VLCOpenInputMetadata.m in Sources */,
 				1CCC89022078A3D500E5626F /* ResumeDialog.xib in Sources */,
+				7D94E28D2274D2140008057F /* VLCLibraryFolderManagementWindow.m in Sources */,
 				1CCC89032078A3D500E5626F /* SimplePreferences.xib in Sources */,
 				1CCC89042078A3D500E5626F /* StreamOutput.xib in Sources */,
 				1CCC89052078A3D500E5626F /* TextfieldPanel.xib in Sources */,

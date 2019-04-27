@@ -126,4 +126,26 @@
     return vlc_ml_media_generate_thumbnail(_p_libraryInstance, mediaItem.libraryID);
 }
 
+#pragma mark - folder management
+
+- (int)addFolderWithFileURL:(NSURL *)fileURL
+{
+    return vlc_ml_add_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
+}
+
+- (int)banFolderWithFileURL:(NSURL *)fileURL
+{
+    return vlc_ml_ban_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
+}
+
+- (int)unbanFolderWithFileURL:(NSURL *)fileURL
+{
+    return vlc_ml_unban_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
+}
+
+- (int)removeFolderWithFileURL:(NSURL *)fileURL
+{
+    return vlc_ml_remove_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
+}
+
 @end

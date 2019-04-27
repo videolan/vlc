@@ -68,6 +68,9 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 - (void)mediaItemUpdated:(NSNotification *)aNotification
 {
     VLCMediaLibraryMediaItem *updatedMediaItem = aNotification.object;
+    if (updatedMediaItem == nil || _representedMediaItem == nil) {
+        return;
+    }
     if (updatedMediaItem.libraryID == _representedMediaItem.libraryID) {
         [self updateRepresentation];
     }

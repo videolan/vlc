@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="17E139j" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCMainMenu">
@@ -115,6 +116,7 @@
                 <outlet property="screenMenu" destination="1015" id="l5t-0E-DfG"/>
                 <outlet property="select_all" destination="198" id="Is0-ct-CbR"/>
                 <outlet property="services" destination="1996" id="X3H-XI-xFK"/>
+                <outlet property="showLibraryFolders" destination="5413" id="Yfe-WM-WVa"/>
                 <outlet property="show_all" destination="150" id="XQ2-CW-0PI"/>
                 <outlet property="snapshot" destination="2249" id="6bO-HY-I3I"/>
                 <outlet property="stop" destination="5156" id="irh-Cr-vBT"/>
@@ -146,7 +148,6 @@
                 <outlet property="toggleEffectsButton" destination="5537" id="Gg8-nl-gzx"/>
                 <outlet property="toggleJumpButtons" destination="5240" id="53V-UC-536"/>
                 <outlet property="togglePlaymodeButtons" destination="5242" id="9TB-F7-ttT"/>
-                <outlet property="toggleSidebar" destination="5413" id="cz7-Zr-1lC"/>
                 <outlet property="trackSynchronization" destination="4412" id="BHW-NJ-jbd"/>
                 <outlet property="videoMenu" destination="334" id="7Ri-Tc-yej"/>
                 <outlet property="videoeffects" destination="2390" id="fXe-JA-9GI"/>
@@ -386,10 +387,10 @@
                                     <action selector="toggleEffectsButton:" target="-2" id="QSm-2E-Nlo"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Sidebar" id="5413">
+                            <menuItem title="Show Library Folders..." id="5413">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="toggleSidebar:" target="-2" id="e7y-3l-ZUS"/>
+                                    <action selector="showLibraryFolders:" target="-2" id="7L9-pf-bP7"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="5250"/>

@@ -32,6 +32,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryMode) {
 };
 
 @class VLCMediaLibraryMediaItem;
+@class VLCMediaLibraryEntryPoint;
 
 extern NSString *VLCLibraryModelAudioMediaListUpdated;
 extern NSString *VLCLibraryModelVideoMediaListUpdated;
@@ -50,6 +51,8 @@ extern NSString *VLCLibraryModelMediaItemUpdated;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfVideoMedia;
 
 - (nullable VLCMediaLibraryMediaItem *)mediaItemAtIndexPath:(NSIndexPath *)index;
+
+@property (readonly) NSArray <VLCMediaLibraryEntryPoint *> *listOfMonitoredFolders;
 
 @end
 

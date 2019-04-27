@@ -27,6 +27,7 @@
 
 #import "extensions/NSScreen+VLCAdditions.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryFolderManagementWindow.h"
 
 #import "menus/renderers/VLCRendererMenuController.h"
 
@@ -91,6 +92,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     VLCRendererMenuController *_rendererMenuController;
     VLCPlaylistController *_playlistController;
     VLCPlayerController *_playerController;
+    VLCLibraryFolderManagementWindowController *_libraryFoldersController;
     NSTimer *_cancelRendererDiscoveryTimer;
 
     NSMenu *_playlistTableColumnsContextMenu;
@@ -366,7 +368,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_togglePlaymodeButtons setState: var_InheritBool(getIntf(), "macosx-show-playmode-buttons")];
     [_toggleEffectsButton setTitle: _NS("Show Audio Effects Button")];
     [_toggleEffectsButton setState: var_InheritBool(getIntf(), "macosx-show-effects-button")];
-    [_toggleSidebar setTitle: _NS("Show Sidebar")];
+    [_showLibraryFolders setTitle: _NS("Show Library Folders...")];
     [_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
 
     [_controlsMenu setTitle: _NS("Playback")];
@@ -760,14 +762,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_togglePlaymodeButtons setState: b_value];
 }
 
-- (IBAction)toggleSidebar:(id)sender
+- (IBAction)showLibraryFolders:(id)sender
 {
-    // FIXME: remove this method as it is no longer needed
-}
-
-- (void)updateSidebarMenuItem:(BOOL)show;
-{
-    [_toggleSidebar setState:show];
+    if (!_libraryFoldersController) {
+        _libraryFoldersController = [[VLCLibraryFolderManagementWindowController alloc] initWithWindowNibName:@"VLCLibraryFolderManagementWindow"];
+    }
+    [_libraryFoldersController showWindow:sender];
 }
 
 #pragma mark - Playback

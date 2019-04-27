@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryController.h: MacOS X interface module
+ * VLCLibraryFolderManagementWindow.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,25 +20,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Foundation/Foundation.h>
-
-@class VLCLibraryModel;
-@class VLCMediaLibraryMediaItem;
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryController : NSObject
+@interface VLCLibraryFolderManagementWindowController : NSWindowController
 
-@property (readonly) VLCLibraryModel *libraryModel;
+@end
 
-- (int)appendItemAtIndexPathToPlaylist:(NSIndexPath *)indexPath playImmediately:(BOOL)playImmediately;
-- (void)showItemAtIndexPathInFinder:(NSIndexPath *)indexPath;
-- (int)attemptToGenerateThumbnailForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem;
+@interface VLCLibraryFolderManagementWindow : NSWindow <NSTableViewDelegate, NSTableViewDataSource>
 
-- (int)addFolderWithFileURL:(NSURL *)fileURL;
-- (int)banFolderWithFileURL:(NSURL *)fileURL;
-- (int)unbanFolderWithFileURL:(NSURL *)fileURL;
-- (int)removeFolderWithFileURL:(NSURL *)fileURL;
+@property (readwrite, weak) IBOutlet NSTableView *libraryFolderTableView;
+@property (readwrite, weak) IBOutlet NSTableColumn *nameTableColumn;
+@property (readwrite, weak) IBOutlet NSTableColumn *pathTableColumn;
+@property (readwrite, weak) IBOutlet NSTableColumn *presentTableColumn;
+@property (readwrite, weak) IBOutlet NSTableColumn *bannedTableColumn;
+@property (readwrite, weak) IBOutlet NSButton *addFolderButton;
+@property (readwrite, weak) IBOutlet NSButton *removeFolderButton;
+@property (readwrite, weak) IBOutlet NSButton *banFolderButton;
+
+- (IBAction)addFolder:(id)sender;
+- (IBAction)removeFolder:(id)sender;
+- (IBAction)banFolder:(id)sender;
 
 @end
 
