@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString *VLCLibraryCellIdentifier;
 
 @class VLCImageView;
+@class VLCMediaLibraryMediaItem;
 
 @interface VLCLibraryCollectionViewItem : NSCollectionViewItem
 
@@ -35,6 +36,8 @@ extern NSString *VLCLibraryCellIdentifier;
 @property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
 @property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
 @property (readwrite, assign) IBOutlet NSButton *addToPlaylistButton;
+
+@property (readwrite, assign, nonatomic) VLCMediaLibraryMediaItem *representedMediaItem;
 
 - (IBAction)playInstantly:(id)sender;
 - (IBAction)addToPlaylist:(id)sender;

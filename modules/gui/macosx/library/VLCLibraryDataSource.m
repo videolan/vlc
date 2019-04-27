@@ -24,10 +24,6 @@
 
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryModel.h"
-#import "library/VLCLibraryDataTypes.h"
-
-#import "views/VLCImageView.h"
-#import "extensions/NSString+Helpers.h"
 
 @implementation VLCLibraryDataSource
 
@@ -69,19 +65,7 @@
             break;
     }
 
-    VLCMediaLibraryMediaItem *mediaItem = mediaArray[indexPath.item];
-
-    viewItem.mediaTitleTextField.stringValue = mediaItem.title;
-    viewItem.durationTextField.stringValue = [NSString stringWithTime:mediaItem.duration / 1000];
-
-    NSImage *image;
-    if (mediaItem.artworkGenerated) {
-        image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:mediaItem.artworkMRL]];
-    }
-    if (!image) {
-        image = [NSImage imageNamed: @"noart.png"];
-    }
-    viewItem.mediaImageView.image = image;
+    viewItem.representedMediaItem = mediaArray[indexPath.item];
 
     return viewItem;
 }

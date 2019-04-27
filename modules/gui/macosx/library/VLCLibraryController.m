@@ -58,6 +58,9 @@
                                       selector:@selector(playbackStateChanged:)
                                           name:VLCPlayerStateChanged
                                         object:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self lazyLoad];
+        });
     }
     return self;
 }
@@ -66,6 +69,11 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     _p_libraryInstance = NULL;
+}
+
+- (void)lazyLoad
+{
+    [self applicationWillEnterBackground:nil];
 }
 
 - (void)applicationWillEnterBackground:(NSNotification *)aNotification
@@ -88,12 +96,13 @@
     }
 }
 
-- (void)appendItemAtIndexPathToPlaylist:(NSIndexPath *)indexPath playImmediately:(BOOL)playImmediately
+- (int)appendItemAtIndexPathToPlaylist:(NSIndexPath *)indexPath playImmediately:(BOOL)playImmediately
 {
     VLCMediaLibraryMediaItem *mediaItem = [self.libraryModel mediaItemAtIndexPath:indexPath];
     input_item_t *p_inputItem = vlc_ml_get_input_item(_p_libraryInstance, mediaItem.libraryID);
-    [[[VLCMain sharedInstance] playlistController] addInputItem:p_inputItem atPosition:-1 startPlayback:playImmediately];
+    int ret = [[[VLCMain sharedInstance] playlistController] addInputItem:p_inputItem atPosition:-1 startPlayback:playImmediately];
     input_item_Release(p_inputItem);
+    return ret;
 }
 
 - (void)showItemAtIndexPathInFinder:(NSIndexPath *)indexPath
@@ -110,6 +119,11 @@
             [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:@[URL]];
         }
     }
+}
+
+- (int)attemptToGenerateThumbnailForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
+{
+    return vlc_ml_media_generate_thumbnail(_p_libraryInstance, mediaItem.libraryID);
 }
 
 @end

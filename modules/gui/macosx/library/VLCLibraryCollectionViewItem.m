@@ -24,6 +24,10 @@
 
 #import "main/VLCMain.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryDataTypes.h"
+#import "views/VLCImageView.h"
+#import "extensions/NSString+Helpers.h"
 
 NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 
@@ -34,6 +38,66 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 @end
 
 @implementation VLCLibraryCollectionViewItem
+
+- (instancetype)initWithNibName:(NSNibName)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mediaItemUpdated:) name:VLCLibraryModelMediaItemUpdated object:nil];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+#pragma mark - view representation
+
+- (void)setRepresentedMediaItem:(VLCMediaLibraryMediaItem *)representedMediaItem
+{
+    if (!_libraryController) {
+        _libraryController = [[VLCMain sharedInstance] libraryController];
+    }
+
+    _representedMediaItem = representedMediaItem;
+    [self updateRepresentation];
+}
+
+- (void)mediaItemUpdated:(NSNotification *)aNotification
+{
+    VLCMediaLibraryMediaItem *updatedMediaItem = aNotification.object;
+    if (updatedMediaItem.libraryID == _representedMediaItem.libraryID) {
+        [self updateRepresentation];
+    }
+}
+
+- (void)updateRepresentation
+{
+    if (_representedMediaItem == nil) {
+        _mediaTitleTextField.stringValue = @"";
+        _durationTextField.stringValue = [NSString stringWithTime:0];
+        _mediaImageView.image = [NSImage imageNamed: @"noart.png"];
+        return;
+    }
+
+    _mediaTitleTextField.stringValue = _representedMediaItem.title;
+    _durationTextField.stringValue = [NSString stringWithTime:_representedMediaItem.duration / 1000];
+
+    NSImage *image;
+    if (_representedMediaItem.artworkGenerated) {
+        image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:_representedMediaItem.artworkMRL]];
+    } else {
+        [_libraryController attemptToGenerateThumbnailForMediaItem:_representedMediaItem];
+    }
+    if (!image) {
+        image = [NSImage imageNamed: @"noart.png"];
+    }
+    _mediaImageView.image = image;
+}
+
+#pragma mark - actions
 
 - (IBAction)playInstantly:(id)sender
 {

@@ -23,6 +23,7 @@
 #import <Foundation/Foundation.h>
 
 @class VLCLibraryModel;
+@class VLCMediaLibraryMediaItem;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,8 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) VLCLibraryModel *libraryModel;
 
-- (void)appendItemAtIndexPathToPlaylist:(NSIndexPath *)indexPath playImmediately:(BOOL)playImmediately;
+- (int)appendItemAtIndexPathToPlaylist:(NSIndexPath *)indexPath playImmediately:(BOOL)playImmediately;
 - (void)showItemAtIndexPathInFinder:(NSIndexPath *)indexPath;
+- (int)attemptToGenerateThumbnailForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem;
 
 @end
 
