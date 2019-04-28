@@ -28,6 +28,8 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "views/VLCImageView.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSColor+VLCAdditions.h"
 
 NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 
@@ -51,6 +53,48 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    if (@available(macOS 10_14, *)) {
+        [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
+    }
+}
+
+- (void)awakeFromNib
+{
+    self.playInstantlyButton.hidden = YES;
+    [(VLCLibraryCollectionViewTrackingView *)self.view setButtonToHide:self.playInstantlyButton];
+    self.mediaTitleTextField.font = [NSFont VLClibraryCellTitleFont];
+    self.durationTextField.font = [NSFont VLClibraryCellSubtitleFont];
+    self.durationTextField.textColor = [NSColor VLClibrarySubtitleColor];
+
+    if (@available(macOS 10_14, *)) {
+        [[NSApplication sharedApplication] addObserver:self
+                                            forKeyPath:@"effectiveAppearance"
+                                               options:0
+                                               context:nil];
+    }
+
+    [self updateColoredAppearance];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary<NSKeyValueChangeKey,id> *)change
+                       context:(void *)context
+{
+    [self updateColoredAppearance];
+}
+
+- (void)updateColoredAppearance
+{
+    if (@available(macOS 10_14, *)) {
+        if ([self.view.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua]) {
+            self.mediaTitleTextField.textColor = [NSColor VLClibraryDarkTitleColor];
+        } else {
+            self.mediaTitleTextField.textColor = [NSColor VLClibraryLightTitleColor];
+        }
+    } else {
+        self.mediaTitleTextField.textColor = [NSColor VLClibraryLightTitleColor];
+    }
 }
 
 #pragma mark - view representation
@@ -120,6 +164,41 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 
     NSIndexPath *indexPath = [[self collectionView] indexPathForItem:self];
     [_libraryController appendItemAtIndexPathToPlaylist:indexPath playImmediately:NO];
+}
+
+@end
+
+@interface VLCLibraryCollectionViewTrackingView ()
+{
+    NSTrackingArea *_trackingArea;
+}
+@end
+
+@implementation VLCLibraryCollectionViewTrackingView
+
+- (void)mouseExited:(NSEvent *)event
+{
+    self.buttonToHide.hidden = YES;
+}
+
+- (void)mouseEntered:(NSEvent *)event
+{
+    self.buttonToHide.hidden = NO;
+}
+
+- (void)updateTrackingAreas
+{
+    [super updateTrackingAreas];
+    if(_trackingArea != nil) {
+        [self removeTrackingArea:_trackingArea];
+    }
+
+    NSTrackingAreaOptions trackingAreaOptions = (NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways);
+    _trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds]
+                                                 options:trackingAreaOptions
+                                                   owner:self
+                                                userInfo:nil];
+    [self addTrackingArea:_trackingArea];
 }
 
 @end

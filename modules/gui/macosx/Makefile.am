@@ -297,8 +297,10 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/File-Icons/wav.icns \
 	gui/macosx/Resources/File-Icons/wma.icns \
 	gui/macosx/Resources/File-Icons/wmv.icns \
-	gui/macosx/Resources/librarywindow/libraryCellGradient@1x.png \
-	gui/macosx/Resources/librarywindow/libraryCellGradient@2x.png \
+	gui/macosx/Resources/librarywindow/ellipsis.png \
+	gui/macosx/Resources/librarywindow/ellipsis@2x.png \
+	gui/macosx/Resources/librarywindow/libraryPlay.png \
+	gui/macosx/Resources/librarywindow/libraryPlay@2x.png \
 	gui/macosx/Resources/mainwindow/backward-3btns-pressed.png \
 	gui/macosx/Resources/mainwindow/backward-3btns-pressed@2x.png \
 	gui/macosx/Resources/mainwindow/backward-3btns.png \

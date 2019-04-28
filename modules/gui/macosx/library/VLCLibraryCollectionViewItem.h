@@ -44,4 +44,10 @@ extern NSString *VLCLibraryCellIdentifier;
 
 @end
 
+@interface VLCLibraryCollectionViewTrackingView : NSView
+
+@property (readwrite, assign) NSButton *buttonToHide;
+
+@end
+
 NS_ASSUME_NONNULL_END

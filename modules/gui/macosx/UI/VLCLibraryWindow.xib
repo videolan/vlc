@@ -52,8 +52,9 @@
                                                 <collectionView selectable="YES" id="B8x-e8-7zp" customClass="VLCLibraryCollectionView">
                                                     <rect key="frame" x="0.0" y="0.0" width="242" height="291"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                                                    <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="Rag-cM-k1g">
-                                                        <size key="itemSize" width="240" height="120"/>
+                                                    <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="20" minimumLineSpacing="20" id="Rag-cM-k1g">
+                                                        <size key="itemSize" width="256" height="214"/>
+                                                        <edgeInsets key="sectionInset" left="20" right="20" top="0.0" bottom="0.0"/>
                                                     </collectionViewFlowLayout>
                                                     <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="secondaryBackgroundColor" name="controlAlternatingRowColor" catalog="System" colorSpace="catalog"/>
