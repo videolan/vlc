@@ -1902,8 +1902,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         _variableName = strdup(name);
         _variableType = type;
         _variableValue = value;
-        if ((type & VLC_VAR_TYPE) == VLC_VAR_STRING)
+        if ((type & VLC_VAR_TYPE) == VLC_VAR_STRING) {
             _variableValue.psz_string = strdup(value.psz_string);
+        }
     }
 
     return(self);
@@ -1911,10 +1912,23 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)dealloc
 {
-    if (_vlcObject && _objectType != VLCObjectTypeInterface)
-        vlc_object_release(_vlcObject);
-    if ((_variableType & VLC_VAR_TYPE) == VLC_VAR_STRING)
+    if (_vlcObject) {
+        switch (_objectType) {
+            case VLCObjectTypeAout:
+                aout_Release((audio_output_t *)_vlcObject);
+                break;
+            case VLCObjectTypeVout:
+                vout_Release((vout_thread_t *)_vlcObject);
+                break;
+
+            default:
+                // the interface will be released by the core shortly
+                break;
+        }
+    }
+    if ((_variableType & VLC_VAR_TYPE) == VLC_VAR_STRING) {
         free(_variableValue.psz_string);
+    }
     free(_variableName);
 }
 
