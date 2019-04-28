@@ -510,6 +510,10 @@
             int configType = p_configs[j].i_type;
 
             if (configType == CONFIG_CATEGORY) {
+                if( p_configs[j].value.i == -1 ) {
+                    categoryItem = nil;
+                    continue;
+                }
                 categoryItem = [self itemRepresentingCategory:(int)p_configs[j].value.i];
                 if (!categoryItem) {
                     categoryItem = [VLCTreeCategoryItem categoryTreeItemWithCategory:(int)p_configs[j].value.i];
@@ -521,6 +525,10 @@
 
             if (configType == CONFIG_SUBCATEGORY) {
                 lastsubcat = (int)p_configs[j].value.i;
+                if( lastsubcat == -1 ) {
+                    subCategoryItem = nil;
+                    continue;
+                }
                 if (categoryItem && ![self isSubCategoryGeneral:lastsubcat]) {
                     subCategoryItem = [categoryItem itemRepresentingSubCategory:lastsubcat];
                     if (!subCategoryItem) {
