@@ -452,6 +452,10 @@ modules/gui/macosx/coreinteraction/VLCHotkeysController.h
 modules/gui/macosx/coreinteraction/VLCHotkeysController.m
 modules/gui/macosx/coreinteraction/VLCVideoFilterHelper.h
 modules/gui/macosx/coreinteraction/VLCVideoFilterHelper.m
+modules/gui/macosx/extensions/NSColor+VLCAdditions.h
+modules/gui/macosx/extensions/NSColor+VLCAdditions.m
+modules/gui/macosx/extensions/NSFont+VLCAdditions.h
+modules/gui/macosx/extensions/NSFont+VLCAdditions.m
 modules/gui/macosx/extensions/NSScreen+VLCAdditions.h
 modules/gui/macosx/extensions/NSScreen+VLCAdditions.m
 modules/gui/macosx/extensions/NSSound+VLCAdditions.h
