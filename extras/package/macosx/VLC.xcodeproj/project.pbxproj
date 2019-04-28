@@ -449,6 +449,12 @@
 		7D28E63E2275C8660098D30E /* ellipsis@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "ellipsis@2x.png"; path = "librarywindow/ellipsis@2x.png"; sourceTree = "<group>"; };
 		7D28E63F2275C9C70098D30E /* libraryPlay@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "libraryPlay@2x.png"; path = "librarywindow/libraryPlay@2x.png"; sourceTree = "<group>"; };
 		7D28E6402275C9C70098D30E /* libraryPlay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = libraryPlay.png; path = librarywindow/libraryPlay.png; sourceTree = "<group>"; };
+		7D28E6442275F2840098D30E /* repeatOff@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "repeatOff@2x.png"; path = "librarywindow/repeatOff@2x.png"; sourceTree = "<group>"; };
+		7D28E6452275F2840098D30E /* shuffleOn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "shuffleOn@2x.png"; path = "librarywindow/shuffleOn@2x.png"; sourceTree = "<group>"; };
+		7D28E6462275F2850098D30E /* repeatOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeatOff.png; path = librarywindow/repeatOff.png; sourceTree = "<group>"; };
+		7D28E6472275F2850098D30E /* repeatOne@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "repeatOne@2x.png"; path = "librarywindow/repeatOne@2x.png"; sourceTree = "<group>"; };
+		7D28E6482275F2850098D30E /* repeatOne.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeatOne.png; path = librarywindow/repeatOne.png; sourceTree = "<group>"; };
+		7D28E6492275F2850098D30E /* shuffleOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = shuffleOn.png; path = librarywindow/shuffleOn.png; sourceTree = "<group>"; };
 		7D2E0ED920CD204D0033A221 /* VLCWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCWindow.m; sourceTree = "<group>"; };
 		7D2E0EDA20CD204D0033A221 /* VLCWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCWindow.h; sourceTree = "<group>"; };
 		7D2E0EDC20CD206F0033A221 /* VLCVideoWindowCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCVideoWindowCommon.h; sourceTree = "<group>"; };
@@ -1300,6 +1306,12 @@
 				7D28E63E2275C8660098D30E /* ellipsis@2x.png */,
 				7D28E6402275C9C70098D30E /* libraryPlay.png */,
 				7D28E63F2275C9C70098D30E /* libraryPlay@2x.png */,
+				7D28E6462275F2850098D30E /* repeatOff.png */,
+				7D28E6442275F2840098D30E /* repeatOff@2x.png */,
+				7D28E6482275F2850098D30E /* repeatOne.png */,
+				7D28E6472275F2850098D30E /* repeatOne@2x.png */,
+				7D28E6492275F2850098D30E /* shuffleOn.png */,
+				7D28E6452275F2840098D30E /* shuffleOn@2x.png */,
 			);
 			name = "Library Window";
 			sourceTree = "<group>";

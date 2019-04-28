@@ -301,6 +301,16 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/librarywindow/ellipsis@2x.png \
 	gui/macosx/Resources/librarywindow/libraryPlay.png \
 	gui/macosx/Resources/librarywindow/libraryPlay@2x.png \
+	gui/macosx/Resources/librarywindow/repeatAll.png \
+	gui/macosx/Resources/librarywindow/repeatAll@2x.png \
+	gui/macosx/Resources/librarywindow/repeatOff.png \
+	gui/macosx/Resources/librarywindow/repeatOff@2x.png \
+	gui/macosx/Resources/librarywindow/repeatOne.png \
+	gui/macosx/Resources/librarywindow/repeatOne@2x.png \
+	gui/macosx/Resources/librarywindow/shuffleOff.png \
+	gui/macosx/Resources/librarywindow/shuffleOff@2x.png \
+	gui/macosx/Resources/librarywindow/shuffleOn.png \
+	gui/macosx/Resources/librarywindow/shuffleOn@2x.png \
 	gui/macosx/Resources/mainwindow/backward-3btns-pressed.png \
 	gui/macosx/Resources/mainwindow/backward-3btns-pressed@2x.png \
 	gui/macosx/Resources/mainwindow/backward-3btns.png \

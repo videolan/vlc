@@ -22,6 +22,8 @@
 
 #import "VLCLibraryWindow.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSColor+VLCAdditions.h"
 #import "main/VLCMain.h"
 
 #import "playlist/VLCPlaylistTableCellView.h"
@@ -74,6 +76,12 @@ static const float f_playlist_row_height = 72.;
                            selector:@selector(updateLibraryRepresentation:)
                                name:VLCLibraryModelVideoMediaListUpdated
                              object:nil];
+    if (@available(macOS 10_14, *)) {
+        [[NSApplication sharedApplication] addObserver:self
+                                            forKeyPath:@"effectiveAppearance"
+                                               options:0
+                                               context:nil];
+    }
 
     _fspanel = [[VLCFSPanelController alloc] init];
     [_fspanel showWindow:self];
@@ -111,12 +119,51 @@ static const float f_playlist_row_height = 72.;
     _mediaSourceCollectionView.delegate = _mediaSourceDataSource;
     [_mediaSourceCollectionView registerClass:[VLCMediaSourceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceCellIdentifier];
 
+    self.upNextLabel.font = [NSFont VLClibrarySectionHeaderFont];
+    self.upNextLabel.stringValue = _NS("Up next");
+    NSAttributedString *attributedTitle = [[NSAttributedString alloc] initWithString:_NS("Clear queue")
+                                                                          attributes:@{NSFontAttributeName : [NSFont VLClibraryButtonFont],
+                                                                                       NSForegroundColorAttributeName : [NSColor VLClibraryHighlightColor]}];
+    self.clearPlaylistButton.attributedTitle = attributedTitle;
+    [self updateColorsBasedOnAppearance];
+
     [self segmentedControlAction:nil];
 }
 
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    if (@available(macOS 10_14, *)) {
+        [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
+    }
+}
+
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary<NSKeyValueChangeKey,id> *)change
+                       context:(void *)context
+{
+    [self updateColorsBasedOnAppearance];
+}
+
+- (void)updateColorsBasedOnAppearance
+{
+    if (@available(macOS 10_14, *)) {
+        if ([self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua]) {
+            self.upNextLabel.textColor = [NSColor VLClibraryDarkTitleColor];
+            self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
+            self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
+        } else {
+            self.upNextLabel.textColor = [NSColor VLClibraryLightTitleColor];
+            self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
+            self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
+        }
+    } else {
+        self.upNextLabel.textColor = [NSColor VLClibraryLightTitleColor];
+        self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
+        self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
+    }
 }
 
 - (void)segmentedControlAction:(id)sender

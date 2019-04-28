@@ -59,4 +59,9 @@
     return [NSFont systemFontOfSize:15. weight:NSFontWeightBold];
 }
 
++ (instancetype)VLClibraryButtonFont
+{
+    return [NSFont systemFontOfSize:15. weight:NSFontWeightBold];
+}
+
 @end

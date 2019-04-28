@@ -68,8 +68,6 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
     self.annotationTextField.font = [NSFont VLClibraryCellAnnotationFont];
     self.annotationTextField.textColor = [NSColor VLClibraryAnnotationColor];
     self.annotationTextField.backgroundColor = [NSColor VLClibraryAnnotationBackgroundColor];
-    self.annotationTextField.bezeled = YES;
-    self.annotationTextField.bezelStyle = NSTextFieldRoundedBezel;
 
     if (@available(macOS 10_14, *)) {
         [[NSApplication sharedApplication] addObserver:self
