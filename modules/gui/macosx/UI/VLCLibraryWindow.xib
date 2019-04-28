@@ -195,6 +195,9 @@
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
+                                        <connections>
+                                            <action selector="shuffleAction:" target="QvC-M9-y7g" id="IPl-lr-hFA"/>
+                                        </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8zF-Wo-H79">
                                         <rect key="frame" x="64" y="15" width="24" height="24"/>
@@ -202,6 +205,9 @@
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
+                                        <connections>
+                                            <action selector="repeatAction:" target="QvC-M9-y7g" id="zpd-jv-1v1"/>
+                                        </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cih-xp-HmY">
                                         <rect key="frame" x="133" y="15" width="84" height="17"/>
@@ -209,6 +215,9 @@
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
+                                        <connections>
+                                            <action selector="clearPlaylist:" target="QvC-M9-y7g" id="tzd-mR-sDu"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                                 <constraints>

@@ -53,6 +53,8 @@ static const float f_playlist_row_height = 72.;
     VLCLibraryDataSource *_libraryDataSource;
     VLCMediaSourceDataSource *_mediaSourceDataSource;
 
+    VLCPlaylistController *_playlistController;
+
     NSRect _windowFrameBeforePlayback;
 
     VLCFSPanelController *_fspanel;
@@ -63,6 +65,9 @@ static const float f_playlist_row_height = 72.;
 
 - (void)awakeFromNib
 {
+    VLCMain *mainInstance = [VLCMain sharedInstance];
+    _playlistController = [mainInstance playlistController];
+
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
                            selector:@selector(shouldShowFullscreenController:)
@@ -76,6 +81,15 @@ static const float f_playlist_row_height = 72.;
                            selector:@selector(updateLibraryRepresentation:)
                                name:VLCLibraryModelVideoMediaListUpdated
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(shuffleStateUpdated:)
+                               name:VLCPlaybackOrderChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(repeatStateUpdated:)
+                               name:VLCPlaybackRepeatChanged
+                             object:nil];
+
     if (@available(macOS 10_14, *)) {
         [[NSApplication sharedApplication] addObserver:self
                                             forKeyPath:@"effectiveAppearance"
@@ -95,13 +109,10 @@ static const float f_playlist_row_height = 72.;
     [_segmentedTitleControl setLabel:_NS("Internet") forSegment:3];
     [_segmentedTitleControl sizeToFit];
 
-    VLCMain *mainInstance = [VLCMain sharedInstance];
-
-    VLCPlaylistController *playlistController = [mainInstance playlistController];
     _playlistDataSource = [[VLCPlaylistDataSource alloc] init];
-    _playlistDataSource.playlistController = playlistController;
+    _playlistDataSource.playlistController = _playlistController;
     _playlistDataSource.tableView = _playlistTableView;
-    playlistController.playlistDataSource = _playlistDataSource;
+    _playlistController.playlistDataSource = _playlistDataSource;
 
     _playlistTableView.dataSource = _playlistDataSource;
     _playlistTableView.delegate = _playlistDataSource;
@@ -128,6 +139,8 @@ static const float f_playlist_row_height = 72.;
     [self updateColorsBasedOnAppearance];
 
     [self segmentedControlAction:nil];
+    [self repeatStateUpdated:nil];
+    [self shuffleStateUpdated:nil];
 }
 
 - (void)dealloc
@@ -137,7 +150,6 @@ static const float f_playlist_row_height = 72.;
         [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
     }
 }
-
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
@@ -166,6 +178,62 @@ static const float f_playlist_row_height = 72.;
     }
 }
 
+#pragma mark - playmode state display and interaction
+
+- (IBAction)shuffleAction:(id)sender
+{
+    if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
+        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+    } else {
+        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+    }
+}
+
+- (void)shuffleStateUpdated:(NSNotification *)aNotification
+{
+    if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
+        self.shufflePlaylistButton.image = [NSImage imageNamed:@"shuffleOff"];
+    } else {
+        self.shufflePlaylistButton.image = [NSImage imageNamed:@"shuffleOn"];
+    }
+}
+
+- (IBAction)repeatAction:(id)sender
+{
+    enum vlc_playlist_playback_repeat currentRepeatState = _playlistController.playbackRepeat;
+    switch (currentRepeatState) {
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+            break;
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+            break;
+
+        default:
+            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+            break;
+    }
+}
+
+- (void)repeatStateUpdated:(NSNotification *)aNotification
+{
+    enum vlc_playlist_playback_repeat currentRepeatState = _playlistController.playbackRepeat;
+    switch (currentRepeatState) {
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+            self.repeatPlaylistButton.image = [NSImage imageNamed:@"repeatAll"];
+            break;
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+            self.repeatPlaylistButton.image = [NSImage imageNamed:@"repeatOne"];
+            break;
+
+        default:
+            self.repeatPlaylistButton.image = [NSImage imageNamed:@"repeatOff"];
+            break;
+    }
+}
+
+#pragma mark - misc. user interactions
+
 - (void)segmentedControlAction:(id)sender
 {
     switch (_segmentedTitleControl.selectedSegment) {
@@ -191,7 +259,7 @@ static const float f_playlist_row_height = 72.;
     }
 }
 
-- (void)playlistDoubleClickAction:(id)sender
+- (IBAction)playlistDoubleClickAction:(id)sender
 {
     NSInteger selectedRow = self.playlistTableView.selectedRow;
     if (selectedRow == -1)
@@ -199,6 +267,13 @@ static const float f_playlist_row_height = 72.;
 
     [[[VLCMain sharedInstance] playlistController] playItemAtIndex:selectedRow];
 }
+
+- (IBAction)clearPlaylist:(id)sender
+{
+    [_playlistController clearPlaylist];
+}
+
+#pragma mark - video output controlling
 
 - (void)videoPlaybackWillBeStarted
 {
