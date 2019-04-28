@@ -214,6 +214,13 @@ VStringConfigControl::doApply()
     config_PutPsz( getName(), qtu( getValue() ) );
 }
 
+void VStringConfigControl::storeValue()
+{
+    /* Note, this modifies our local copy of the item only */
+    free( p_item->value.psz );
+    p_item->value.psz = strdup( qtu( getValue() ) );
+}
+
 /*********** String **************/
 StringConfigControl::StringConfigControl( module_config_t *_p_item,
                                           QWidget *_parent ) :
@@ -851,6 +858,12 @@ VIntConfigControl::doApply()
     config_PutInt( getName(), getValue() );
 }
 
+void VIntConfigControl::storeValue()
+{
+    /* Note, this modifies our local copy of the item only */
+    p_item->value.i = getValue();
+}
+
 /*********** Integer **************/
 IntegerConfigControl::IntegerConfigControl( module_config_t *_p_item,
                                             QWidget *p ) :
@@ -1177,6 +1190,12 @@ void
 VFloatConfigControl::doApply()
 {
     config_PutFloat( getName(), getValue() );
+}
+
+void VFloatConfigControl::storeValue()
+{
+    /* Note, this modifies our local copy of the item only */
+    p_item->value.f = getValue();
 }
 
 /*********** Float **************/

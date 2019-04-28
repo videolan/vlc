@@ -29,6 +29,7 @@
 #include "widgets/native/qvlcframe.hpp"
 #include "dialogs/errors/errors.hpp"
 
+#include "expert_view.hpp"
 #include "dialogs/preferences/complete_preferences.hpp"
 #include "dialogs/preferences/simple_preferences.hpp"
 #include "widgets/native/searchlineedit.hpp"
@@ -73,8 +74,11 @@ PrefsDialog::PrefsDialog( QWindow *parent, qt_intf_t *_p_intf )
     simple->setToolTip( qtr( "Switch to simple preferences view" ) );
     all = new QRadioButton( qtr("All"), types );
     all->setToolTip( qtr( "Switch to full preferences view" ) );
+    expert = new QRadioButton( qtr("Expert"), types );
+    expert->setToolTip( qtr( "Switch to expert preferences view" ) );
     types_l->addWidget( simple );
     types_l->addWidget( all );
+    types_l->addWidget( expert );
     types->setLayout( types_l );
     simple->setChecked( true );
 
@@ -131,6 +135,30 @@ PrefsDialog::PrefsDialog( QWindow *parent, qt_intf_t *_p_intf )
 
     stack->insertWidget( ADVANCED, advanced_split_widget );
 
+    /* Expert view (panel) */
+    expert_widget = new QWidget;
+    expert_widget_layout = new QGridLayout;
+    expert_widget->setLayout( expert_widget_layout );
+
+    expert_table_filter = nullptr;
+    expert_table = nullptr;
+
+    expert_text = new QLabel;
+    expert_longtext = new QLabel;
+
+    expert_text->setWordWrap(true);
+    expert_longtext->setWordWrap(true);
+
+    QFont textFont = QApplication::font();
+    textFont.setPointSize( textFont.pointSize() + 2 );
+    textFont.setUnderline( true );
+    expert_text->setFont( textFont );
+
+    expert_widget_layout->addWidget( expert_text, 2, 0, 1, 2 );
+    expert_widget_layout->addWidget( expert_longtext, 3, 0, 1, 2 );
+
+    stack->insertWidget( EXPERT, expert_widget );
+
     /* Layout  */
     main_layout->addWidget( stack, 0, 0, 3, 3 );
     main_layout->addWidget( types, 3, 0, 2, 1 );
@@ -149,6 +177,7 @@ PrefsDialog::PrefsDialog( QWindow *parent, qt_intf_t *_p_intf )
 
     BUTTONACT( simple, &PrefsDialog::setSimple );
     BUTTONACT( all, &PrefsDialog::setAdvanced );
+    BUTTONACT( expert, &PrefsDialog::setExpert );
 
     QVLCTools::restoreWidgetPosition( p_intf, "Preferences", this, QSize( 850, 700 ) );
 }
@@ -158,12 +187,55 @@ PrefsDialog::~PrefsDialog()
     module_list_free( p_list );
 }
 
+void PrefsDialog::setExpert()
+{
+    /* Lazy creation */
+    if( !expert_table )
+    {
+        if ( !p_list )
+            p_list = module_list_get( &count );
+
+        expert_table_filter = new SearchLineEdit( expert_widget );
+        expert_table_filter->setMinimumHeight( 26 );
+        expert_table_filter_modified = new QCheckBox( qtr( "Modified only" ), expert_widget );
+
+        QShortcut *search = new QShortcut( QKeySequence( QKeySequence::Find ), expert_table_filter );
+
+        ExpertPrefsTableModel *table_model = new ExpertPrefsTableModel( p_list, count, this );
+        expert_table = new ExpertPrefsTable( expert_widget );
+        expert_table->setModel( table_model );
+        expert_table->resizeColumnToContents( ExpertPrefsTableModel::NameField );
+
+        expert_widget_layout->addWidget( expert_table_filter, 0, 0 );
+        expert_widget_layout->addWidget( expert_table_filter_modified, 0, 1 );
+        expert_widget_layout->addWidget( expert_table, 1, 0, 1, 2 );
+
+        connect( expert_table->selectionModel(), &QItemSelectionModel::currentChanged,
+                 this, &PrefsDialog::changeExpertDesc );
+        connect( expert_table_filter, &SearchLineEdit::textChanged,
+                 this, &PrefsDialog::expertTableFilterChanged );
+        connect( expert_table_filter_modified, &QCheckBox::toggled,
+                 this, &PrefsDialog::expertTableFilterModifiedToggled );
+        connect( search, &QShortcut::activated,
+                 expert_table_filter, QOverload<>::of(&SearchLineEdit::setFocus) );
+
+        /* Set initial selection */
+        expert_table->setCurrentIndex(
+                expert_table->model()->index( 0, 0, QModelIndex() ) );
+    }
+
+    expert->setChecked( true );
+    stack->setCurrentIndex( EXPERT );
+    setWindowTitle( qtr( "Expert Preferences" ) );
+}
+
 void PrefsDialog::setAdvanced()
 {
     /* Lazy creation */
     if( !advanced_tree )
     {
-        p_list = module_list_get( &count );
+        if ( !p_list )
+            p_list = module_list_get( &count );
 
         advanced_tree = new PrefsTree( p_intf, advanced_tree_panel, p_list, count );
 
@@ -237,10 +309,21 @@ void PrefsDialog::changeAdvPanel( QTreeWidgetItem *item )
     if( !node->panel )
     {
         node->panel = new AdvPrefsPanel( p_intf, advanced_panels_stack, node );
-        advanced_panels_stack->insertWidget( advanced_panels_stack->count(),
-                                             node->panel );
+        advanced_panels_stack->addWidget( node->panel );
     }
     advanced_panels_stack->setCurrentWidget( node->panel );
+}
+
+/* Changing from one Expert item description to another */
+void PrefsDialog::changeExpertDesc( const QModelIndex &current, const QModelIndex &previous )
+{
+    Q_UNUSED( previous );
+    if( !current.isValid() )
+       return;
+    ExpertPrefsTableItem *item = expert_table->myModel()->itemAt( current );
+
+    expert_text->setText( item->getTitle() );
+    expert_longtext->setText( item->getDescription() );
 }
 
 /* Actual apply and save for the preferences */
@@ -258,6 +341,11 @@ void PrefsDialog::save()
     {
         msg_Dbg( p_intf, "Saving the advanced preferences" );
         advanced_tree->applyAll();
+    }
+    else if( expert->isChecked() && expert_table->isVisible() )
+    {
+        msg_Dbg( p_intf, "Saving the expert preferences" );
+        expert_table->applyAll();
     }
 
     /* Save to file */
@@ -307,6 +395,16 @@ void PrefsDialog::reset()
 
         accept();
     }
+}
+
+void PrefsDialog::expertTableFilterModifiedToggled( bool checked )
+{
+    expert_table->filter( expert_table_filter->text(), checked );
+}
+
+void PrefsDialog::expertTableFilterChanged( const QString & text )
+{
+    expert_table->filter( text, expert_table_filter_modified->isChecked() );
 }
 
 void PrefsDialog::advancedTreeFilterChanged( const QString & text )

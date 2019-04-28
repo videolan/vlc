@@ -681,6 +681,10 @@ modules/gui/qt/dialogs/fingerprint/chromaprint.cpp
 modules/gui/qt/dialogs/fingerprint/chromaprint.hpp
 modules/gui/qt/dialogs/preferences/complete_preferences.cpp
 modules/gui/qt/dialogs/preferences/complete_preferences.hpp
+modules/gui/qt/dialogs/preferences/expert_model.cpp
+modules/gui/qt/dialogs/preferences/expert_model.hpp
+modules/gui/qt/dialogs/preferences/expert_view.cpp
+modules/gui/qt/dialogs/preferences/expert_view.hpp
 modules/gui/qt/menus/custom_menus.cpp
 modules/gui/qt/menus/custom_menus.hpp
 modules/gui/qt/menus/qml_menu_wrapper.cpp

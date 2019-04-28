@@ -95,6 +95,7 @@ public:
     /** Inserts control into an existing box layout */
     virtual void insertInto( QBoxLayout*, int index = 0 ) { Q_UNUSED( index ); }
     virtual void doApply() = 0;
+    virtual void storeValue() = 0;
 protected:
     ConfigControl( module_config_t *_p_conf ) : p_item( _p_conf ) {}
     virtual void changeVisibility( bool ) { }
@@ -112,6 +113,7 @@ class VIntConfigControl : public ConfigControl
 public:
     virtual int getValue() const = 0;
     virtual void doApply() Q_DECL_OVERRIDE;
+    virtual void storeValue() Q_DECL_OVERRIDE;
 protected:
     VIntConfigControl( module_config_t *i ) : ConfigControl(i) {}
 };
@@ -222,6 +224,7 @@ class VFloatConfigControl : public ConfigControl
 public:
     virtual float getValue() const = 0;
     void doApply() Q_DECL_OVERRIDE;
+    void storeValue() Q_DECL_OVERRIDE;
 protected:
     VFloatConfigControl( module_config_t *i ) : ConfigControl(i) {}
 };
@@ -264,6 +267,7 @@ class VStringConfigControl : public ConfigControl
 public:
     virtual QString getValue() const = 0;
     void doApply() Q_DECL_OVERRIDE;
+    void storeValue() Q_DECL_OVERRIDE;
 protected:
     VStringConfigControl( module_config_t *i ) : ConfigControl(i) {}
 };
@@ -418,6 +422,7 @@ public:
     KeySelectorControl( QWidget * );
     void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     void doApply() Q_DECL_OVERRIDE;
+    void storeValue() {};
     enum ColumnIndex
     {
         ACTION_COL = 0,

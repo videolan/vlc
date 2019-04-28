@@ -110,6 +110,10 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/podcast/podcast_configuration.hpp \
 	gui/qt/dialogs/preferences/complete_preferences.cpp \
 	gui/qt/dialogs/preferences/complete_preferences.hpp \
+	gui/qt/dialogs/preferences/expert_model.cpp \
+	gui/qt/dialogs/preferences/expert_model.hpp \
+	gui/qt/dialogs/preferences/expert_view.cpp \
+	gui/qt/dialogs/preferences/expert_view.hpp \
 	gui/qt/dialogs/preferences/preferences.cpp \
 	gui/qt/dialogs/preferences/preferences.hpp \
 	gui/qt/dialogs/preferences/preferences_widgets.cpp \
@@ -368,6 +372,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/plugins/plugins.moc.cpp \
 	gui/qt/dialogs/podcast/podcast_configuration.moc.cpp \
 	gui/qt/dialogs/preferences/complete_preferences.moc.cpp \
+	gui/qt/dialogs/preferences/expert_model.moc.cpp \
+	gui/qt/dialogs/preferences/expert_view.moc.cpp \
 	gui/qt/dialogs/preferences/preferences.moc.cpp \
 	gui/qt/dialogs/preferences/preferences_widgets.moc.cpp \
 	gui/qt/dialogs/preferences/simple_preferences.moc.cpp \
