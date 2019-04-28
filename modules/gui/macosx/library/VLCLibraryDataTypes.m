@@ -150,6 +150,9 @@
             VLCMediaLibraryTrack *track = [[VLCMediaLibraryTrack alloc] initWithTrack:&p_mediaItem->p_tracks->p_items[x]];
             if (track) {
                 [mutArray addObject:track];
+                if (track.trackType == VLC_ML_TRACK_TYPE_VIDEO && _firstVideoTrack == nil) {
+                    _firstVideoTrack = track;
+                }
             }
         }
         _tracks = [mutArray copy];

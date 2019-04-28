@@ -44,6 +44,16 @@
     return [NSColor colorWithRed:0.52 green:0.57 blue:0.61 alpha:1.];
 }
 
++ (instancetype)VLClibraryAnnotationColor
+{
+    return [NSColor whiteColor];
+}
+
++ (instancetype)VLClibraryAnnotationBackgroundColor
+{
+    return [NSColor colorWithRed:0. green:0. blue:0. alpha:.4];
+}
+
 + (instancetype)VLClibrarySeparatorLightColor
 {
     return [NSColor colorWithRed:0.89 green:0.91 blue:0.93 alpha:1.];

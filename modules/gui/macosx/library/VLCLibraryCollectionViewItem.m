@@ -65,6 +65,11 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
     self.mediaTitleTextField.font = [NSFont VLClibraryCellTitleFont];
     self.durationTextField.font = [NSFont VLClibraryCellSubtitleFont];
     self.durationTextField.textColor = [NSColor VLClibrarySubtitleColor];
+    self.annotationTextField.font = [NSFont VLClibraryCellAnnotationFont];
+    self.annotationTextField.textColor = [NSColor VLClibraryAnnotationColor];
+    self.annotationTextField.backgroundColor = [NSColor VLClibraryAnnotationBackgroundColor];
+    self.annotationTextField.bezeled = YES;
+    self.annotationTextField.bezelStyle = NSTextFieldRoundedBezel;
 
     if (@available(macOS 10_14, *)) {
         [[NSApplication sharedApplication] addObserver:self
@@ -142,6 +147,19 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
         image = [NSImage imageNamed: @"noart.png"];
     }
     _mediaImageView.image = image;
+
+    VLCMediaLibraryTrack *videoTrack = _representedMediaItem.firstVideoTrack;
+    CGFloat width = videoTrack.videoWidth;
+    CGFloat height = videoTrack.videoHeight;
+    if (width >= 3840. || height >= 2160.) {
+        _annotationTextField.stringValue = @" 4K ";
+        _annotationTextField.hidden = NO;
+    } else if (width >= 1280. || height >= 720.) {
+        _annotationTextField.stringValue = @" HD ";
+        _annotationTextField.hidden = NO;
+    } else {
+        _annotationTextField.hidden = YES;
+    }
 }
 
 #pragma mark - actions

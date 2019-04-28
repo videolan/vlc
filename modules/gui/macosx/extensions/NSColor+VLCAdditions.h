@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)VLClibraryLightTitleColor;
 + (instancetype)VLClibraryDarkTitleColor;
 + (instancetype)VLClibrarySubtitleColor;
++ (instancetype)VLClibraryAnnotationColor;
++ (instancetype)VLClibraryAnnotationBackgroundColor;
 + (instancetype)VLClibrarySeparatorLightColor;
 + (instancetype)VLClibrarySeparatorDarkColor;
 

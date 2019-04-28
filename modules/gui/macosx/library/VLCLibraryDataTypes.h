@@ -102,6 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) NSArray <VLCMediaLibraryFile *> *files;
 @property (readonly) NSArray <VLCMediaLibraryTrack *> *tracks;
+@property (readonly, nullable) VLCMediaLibraryTrack *firstVideoTrack;
 
 @property (readonly) int32_t year;
 @property (readonly) int64_t duration; /* Duration in milliseconds */

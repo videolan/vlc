@@ -32,6 +32,7 @@ extern NSString *VLCLibraryCellIdentifier;
 @interface VLCLibraryCollectionViewItem : NSCollectionViewItem
 
 @property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
+@property (readwrite, assign) IBOutlet NSTextField *annotationTextField;
 @property (readwrite, assign) IBOutlet NSTextField *durationTextField;
 @property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
 @property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
