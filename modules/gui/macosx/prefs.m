@@ -508,6 +508,10 @@
         for (unsigned int j = 0; j < confsize; j++) {
             int configType = p_configs[j].i_type;
             if (configType == CONFIG_CATEGORY) {
+                if( p_configs[j].value.i == -1 ) {
+                    categoryItem = nil;
+                    continue;
+                }
                 categoryItem = [self itemRepresentingCategory:p_configs[j].value.i];
                 if (!categoryItem) {
                     categoryItem = [VLCTreeCategoryItem categoryTreeItemWithCategory:p_configs[j].value.i];
@@ -517,6 +521,10 @@
             }
             else if (configType == CONFIG_SUBCATEGORY) {
                 lastsubcat = p_configs[j].value.i;
+                if( lastsubcat == -1 ) {
+                    subCategoryItem = nil;
+                    continue;
+                }
                 if (categoryItem && ![self isSubCategoryGeneral:lastsubcat]) {
                     subCategoryItem = [categoryItem itemRepresentingSubCategory:lastsubcat];
                     if (!subCategoryItem) {
