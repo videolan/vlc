@@ -125,6 +125,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithEntryPoint:(struct vlc_ml_entry_point_t *)p_entryPoint;
 
 @property (readonly) NSString *MRL;
+@property (readonly) NSString *decodedMRL;
 @property (readonly) BOOL isPresent;
 @property (readonly) BOOL isBanned;
 

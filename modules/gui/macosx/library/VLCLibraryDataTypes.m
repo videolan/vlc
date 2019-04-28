@@ -24,6 +24,8 @@
 
 #import "extensions/NSString+Helpers.h"
 
+#import <vlc_url.h>
+
 @implementation VLCMediaLibraryFile
 
 - (instancetype)initWithFile:(struct vlc_ml_file_t *)p_file
@@ -194,7 +196,9 @@
 {
     self = [super init];
     if (self && p_entryPoint != NULL) {
+
         _MRL = toNSStr(p_entryPoint->psz_mrl);
+        _decodedMRL = toNSStr(vlc_uri_decode(p_entryPoint->psz_mrl));
         _isPresent = p_entryPoint->b_present;
         _isBanned = p_entryPoint->b_banned;
     }

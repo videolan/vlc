@@ -24,11 +24,11 @@
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cN4-CV-0ZY">
                         <rect key="frame" x="0.0" y="40" width="638" height="335"/>
                         <clipView key="contentView" id="iBY-dM-gpy">
-                            <rect key="frame" x="1" y="0.0" width="636" height="334"/>
+                            <rect key="frame" x="1" y="0.0" width="636" height="319"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="qUX-xV-r50" id="yXW-Oh-c8y">
-                                    <rect key="frame" x="0.0" y="0.0" width="874" height="309"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="874" height="294"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -95,7 +95,7 @@
                             </subviews>
                         </clipView>
                         <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="AbQ-Qa-KFB">
-                            <rect key="frame" x="1" y="318" width="636" height="16"/>
+                            <rect key="frame" x="1" y="319" width="636" height="15"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="wbF-0g-t3S">

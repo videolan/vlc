@@ -93,6 +93,7 @@
             [_libraryController addFolderWithFileURL:url];
         }
 
+        _cachedFolderList = nil;
         [self.libraryFolderTableView reloadData];
     }
 }
@@ -106,6 +107,7 @@
         [_libraryController banFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
     }
 
+    _cachedFolderList = nil;
     [self.libraryFolderTableView reloadData];
 }
 
@@ -114,6 +116,7 @@
     VLCMediaLibraryEntryPoint *entryPoint = _cachedFolderList[self.libraryFolderTableView.selectedRow];
     [_libraryController removeFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
 
+    _cachedFolderList = nil;
     [self.libraryFolderTableView reloadData];
 }
 
@@ -129,13 +132,13 @@
 {
     VLCMediaLibraryEntryPoint *entryPoint = _cachedFolderList[row];
     if (tableColumn == self.nameTableColumn) {
-        return [entryPoint.MRL lastPathComponent];
+        return [entryPoint.decodedMRL lastPathComponent];
     } else if (tableColumn == self.presentTableColumn) {
         return entryPoint.isPresent ? @"✔" : @"✘";
     } else if (tableColumn == self.bannedTableColumn) {
         return entryPoint.isBanned ? @"✔" : @"✘";
     } else {
-        return entryPoint.MRL;
+        return entryPoint.decodedMRL;
     }
 }
 
