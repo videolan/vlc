@@ -135,6 +135,7 @@ namespace adaptive
         vlc_mutex_t lock; /* lock for everything accessed by dequeuing */
 
     private:
+        void declaredCodecs();
         buffering_status doBufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t);
         buffering_status last_buffer_status;
         bool valid;

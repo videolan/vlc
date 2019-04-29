@@ -119,6 +119,9 @@ namespace adaptive
             ~SegmentTracker();
 
             StreamFormat getCurrentFormat() const;
+            std::list<std::string> getCurrentCodecs() const;
+            const std::string & getStreamDescription() const;
+            const std::string & getStreamLanguage() const;
             const Role & getStreamRole() const;
             bool segmentsListReady() const;
             void reset();

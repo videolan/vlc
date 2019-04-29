@@ -31,6 +31,7 @@
 #include "playlist/SegmentChunk.hpp"
 #include "plumbing/SourceStream.hpp"
 #include "plumbing/CommandsQueue.hpp"
+#include "tools/FormatNamespace.hpp"
 #include "tools/Debug.hpp"
 #include <vlc_demux.h>
 
@@ -90,6 +91,7 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, 
                     segmentTracker->notifyBufferingState(true);
                     connManager = conn;
                     setTimeOffset(segmentTracker->getPlaybackTime());
+                    declaredCodecs();
                     return true;
                 }
                 delete commandsqueue;
@@ -193,7 +195,7 @@ bool AbstractStream::seekAble() const
             "discontinuity %d, commandsqueue draining %d, commandsqueue eof %d",
             static_cast<void *>(demuxer), restarting, discontinuity, draining, eof);
 
-    if(!demuxer || restarting || discontinuity || (!eof && draining))
+    if(!valid || restarting || discontinuity || (!eof && draining))
     {
         msg_Warn(p_realdemux, "not seekable");
         return false;
@@ -242,6 +244,7 @@ bool AbstractStream::restartDemux()
     bool b_ret = true;
     if(!demuxer)
     {
+        fakeesout->recycleAll();
         b_ret = startDemux();
     }
     else if(demuxer->needsRestartOnSeek())
@@ -514,13 +517,14 @@ bool AbstractStream::setPosition(vlc_tick_t time, bool tryonly)
     if(!seekAble())
         return false;
 
-    bool ret = segmentTracker->setPositionByTime(time, demuxer->needsRestartOnSeek(), tryonly);
+    bool b_needs_restart = demuxer ? demuxer->needsRestartOnSeek() : true;
+    bool ret = segmentTracker->setPositionByTime(time, b_needs_restart, tryonly);
     if(!tryonly && ret)
     {
         // clear eof flag before restartDemux() to prevent readNextBlock() fail
         eof = false;
         notfound_sequence = 0;
-        if(demuxer->needsRestartOnSeek())
+        if(b_needs_restart)
         {
             if(currentChunk)
                 delete currentChunk;
@@ -577,7 +581,7 @@ void AbstractStream::setTimeOffset(vlc_tick_t i_offset)
     {
         fakeEsOut()->setExpectedTimestampOffset(0);
     }
-    else if(demuxer)
+    else
     {
         fakeEsOut()->setExpectedTimestampOffset(i_offset);
     }
@@ -659,6 +663,31 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
 
         default:
             break;
+    }
+}
+
+void AbstractStream::declaredCodecs()
+{
+    const std::string & streamDesc = segmentTracker->getStreamDescription();
+    const std::string & streamLang = segmentTracker->getStreamLanguage();
+    std::list<std::string> codecs =  segmentTracker->getCurrentCodecs();
+    for(std::list<std::string>::const_iterator it = codecs.begin();
+                                               it != codecs.end(); ++it)
+    {
+        FormatNamespace fnsp(*it);
+
+        es_format_t fmt;
+        es_format_Init(&fmt, fnsp.getFmt()->i_cat, fnsp.getFmt()->i_codec);
+        es_format_Copy(&fmt, fnsp.getFmt());
+
+        if(!streamLang.empty())
+            fmt.psz_language = strdup(streamLang.c_str());
+        if(!streamDesc.empty())
+            fmt.psz_description = strdup(streamDesc.c_str());
+
+        fakeEsOut()->declareEs( &fmt );
+
+        es_format_Clean(&fmt);
     }
 }
 
