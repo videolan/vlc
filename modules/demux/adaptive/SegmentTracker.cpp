@@ -117,6 +117,26 @@ StreamFormat SegmentTracker::getCurrentFormat() const
     return StreamFormat();
 }
 
+std::list<std::string> SegmentTracker::getCurrentCodecs() const
+{
+    BaseRepresentation *rep = curRepresentation;
+    if(!rep)
+        rep = logic->getNextRepresentation(adaptationSet, NULL);
+    if(rep)
+        return rep->getCodecs();
+    return std::list<std::string>();
+}
+
+const std::string & SegmentTracker::getStreamDescription() const
+{
+    return adaptationSet->description.Get();
+}
+
+const std::string & SegmentTracker::getStreamLanguage() const
+{
+    return adaptationSet->getLang();
+}
+
 const Role & SegmentTracker::getStreamRole() const
 {
     return adaptationSet->getRole();
@@ -298,6 +318,15 @@ bool SegmentTracker::setPositionByTime(mtime_t time, bool restarted, bool tryonl
     BaseRepresentation *rep = curRepresentation;
     if(!rep)
         rep = logic->getNextRepresentation(adaptationSet, NULL);
+
+    /* Stream might not have been loaded at all (HLS) or expired */
+    if(rep && rep->needsUpdate() &&
+       !rep->runLocalUpdates(resources, time, curNumber, false))
+    {
+        msg_Err(rep->getAdaptationSet()->getPlaylist()->getVLCObject(),
+                "Failed to update Representation %s", rep->getID().str().c_str());
+        return false;
+    }
 
     if(rep &&
        rep->getSegmentNumberByTime(time, &segnumber))

@@ -243,9 +243,16 @@ AbstractStream::buffering_status PlaylistManager::bufferize(mtime_t i_nzdeadline
         if(!st->isValid())
             continue;
 
-        if (st->isDisabled() &&
-            (!st->isSelected() || !reactivateStream(st)))
-                continue;
+        if(st->esCount())
+        {
+            if (st->isDisabled() &&
+                (!st->isSelected() || !reactivateStream(st)))
+                  continue;
+        }
+        else
+        {
+            /* initial */
+        }
 
         AbstractStream::buffering_status i_ret = st->bufferize(i_nzdeadline, i_min_buffering, i_extra_buffering);
         if(i_return != AbstractStream::buffering_ongoing) /* Buffering streams need to keep going */
