@@ -51,6 +51,7 @@ endif
 	$(APPLY) $(SRC)/qt/0001-qmake-Always-split-QMAKE_DEFAULT_LIBDIRS-using-with-.patch
 	
 	$(APPLY) $(SRC)/qt/0001-generate-different-pkg-config-files-for-debug-and-re.patch
+	$(APPLY) $(SRC)/qt/0001-include-MODULE_AUX_INCLUDES-in-the-generated-.pc-fil.patch
 	$(MOVE)
 
 
@@ -127,8 +128,7 @@ ifdef HAVE_WIN32
 	# Fix Qt5Widget.pc file to include qwindowsvistastyle before Qt5Widget, as it depends on it
 	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/ -lQt5Widget/ -lqwindowsvistastyle -lQt5Widget/' Qt5Widgets.pc
 	# Use ANGLE OpenGL provided by Qt
-	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e '/^Cflags:/ s#$$# -I$${includedir}/QtANGLE#' \
-		-e 's/-llibGLESv2/-llibGLESv2 -ld3d9 -ltranslator -lpreprocessor/g' Qt5Gui.pc
+	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/-llibGLESv2/-llibGLESv2 -ld3d9 -ltranslator -lpreprocessor/g' Qt5Gui.pc
 endif
 	# Install a qmake with correct paths set
 	cd $<; $(MAKE) sub-qmake-qmake-aux-pro-install_subtargets install_mkspecs
