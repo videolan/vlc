@@ -37,31 +37,46 @@ namespace adaptive
             virtual void Reset() = 0;
     };
 
-    class ChunksSourceStream : public AbstractSourceStream
+    class AbstractChunksSourceStream : public AbstractSourceStream
     {
         public:
-            ChunksSourceStream(vlc_object_t *, ChunksSource *);
-            virtual ~ChunksSourceStream();
-            virtual stream_t *makeStream(); /* impl */
+            AbstractChunksSourceStream(vlc_object_t *, ChunksSource *);
+            virtual ~AbstractChunksSourceStream();
             virtual void Reset(); /* impl */
+            virtual stream_t *makeStream(); /* impl */
 
         protected:
-            std::string getContentType();
-            virtual ssize_t Read(uint8_t *, size_t);
-            virtual int     Seek(uint64_t);
+            virtual ssize_t Read(uint8_t *, size_t) = 0;
+            virtual int     Seek(uint64_t) = 0;
+            virtual std::string getContentType() = 0;
             bool b_eof;
             vlc_object_t *p_obj;
             ChunksSource *source;
 
         private:
-            block_t *p_block;
             static ssize_t read_Callback(stream_t *, void *, size_t);
             static int seek_Callback(stream_t *, uint64_t);
             static int control_Callback( stream_t *, int i_query, va_list );
             static void delete_Callback( stream_t * );
     };
 
-    class BufferedChunksSourceStream : public ChunksSourceStream
+    class ChunksSourceStream : public AbstractChunksSourceStream
+    {
+        public:
+            ChunksSourceStream(vlc_object_t *, ChunksSource *);
+            virtual ~ChunksSourceStream();
+            virtual void Reset(); /* reimpl */
+
+        protected:
+            virtual ssize_t Read(uint8_t *, size_t); /* impl */
+            virtual int     Seek(uint64_t); /* impl */
+            virtual std::string getContentType(); /* impl */
+
+        private:
+            block_t *p_block;
+    };
+
+    class BufferedChunksSourceStream : public AbstractChunksSourceStream
     {
         public:
             BufferedChunksSourceStream(vlc_object_t *, ChunksSource *);
@@ -69,10 +84,13 @@ namespace adaptive
             virtual void Reset(); /* reimpl */
 
         protected:
-            virtual ssize_t Read(uint8_t *, size_t); /* reimpl */
-            virtual int     Seek(uint64_t); /* reimpl */
+            virtual ssize_t Read(uint8_t *, size_t); /* impl */
+            virtual int     Seek(uint64_t); /* impl */
+            virtual size_t  Peek(const uint8_t **, size_t); /* impl */
+            virtual std::string getContentType(); /* impl */
 
         private:
+            void fillByteStream();
             static const int MAX_BACKEND = 5 * 1024 * 1024;
             static const int MIN_BACKEND_CLEANUP = 50 * 1024;
             uint64_t i_global_offset;
