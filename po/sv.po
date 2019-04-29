@@ -39,7 +39,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-03-13 11:22+0100\n"
+"PO-Revision-Date: 2019-04-29 11:36+0200\n"
 "Last-Translator: Anton Regnander <anton_r_3@hotmail.com>, 2019\n"
 "Language-Team: Swedish (https://www.transifex.com/yaron/teams/16553/sv/)\n"
 "Language: sv\n"
@@ -25676,7 +25676,7 @@ msgstr "Bildens färgton (-180..180)"
 
 #: modules/video_filter/adjust.c:68
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
-msgstr ""
+msgstr "Ändra bildens nyans, mellan -180 och 180. Standard är 0."
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
