@@ -28,9 +28,6 @@ qtgraphicaleffects: qtgraphicaleffects-everywhere-src-$(QTGE_VERSION).tar.xz .su
 	# Make && Install libraries
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) -C src sub-effects-install_subtargets
-	cd $(PREFIX)/qml/QtGraphicalEffects/ && cp libqtgraphicaleffectsplugin.a private/libqtgraphicaleffectsprivate.a $(PREFIX)/lib/
-	rm -rf $(PREFIX)/qml
-	cd $(PREFIX)/lib/pkgconfig; sed -i.orig \
-		-e 's/ -lQt5QuickWidgets/ -lqtgraphicaleffectsplugin -lqtgraphicaleffectsprivate -lQt5QuickWidgets/' \
-		Qt5QuickWidgets.pc
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5QuickWidgets qml/QtGraphicalEffects qtgraphicaleffectsplugin
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5QuickWidgets qml/QtGraphicalEffects/private qtgraphicaleffectsprivate
 	touch $@

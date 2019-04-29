@@ -29,10 +29,6 @@ qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	# Make && Install libraries
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) -C src sub-plugins-install_subtargets sub-svg-install_subtargets
-	mv $(PREFIX)/plugins/iconengines/libqsvgicon.a $(PREFIX)/lib/
-	mv $(PREFIX)/plugins/imageformats/libqsvg.a $(PREFIX)/lib/
-	$(SRC)/qt/FixQtPcFiles.sh $(PREFIX)/lib/Qt5Svg.prl $(PREFIX)/lib/pkgconfig/Qt5Svg.pc
-	cd $(PREFIX)/lib/pkgconfig; sed -i.orig \
-		-e '/Libs:/  s/-lQt5Svg/-lqsvg -lqsvgicon -lQt5Svg/ ' \
-		Qt5Svg.pc
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Svg plugins/iconengines qsvgicon
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Svg plugins/imageformats qsvg
 	touch $@

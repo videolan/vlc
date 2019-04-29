@@ -108,27 +108,14 @@ ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
 	# Install tools
 	cd $< && $(MAKE) -C src sub-moc-install_subtargets sub-rcc-install_subtargets sub-uic-install_subtargets sub-qlalr-install_subtargets
 	# Install plugins
-	cd $< && $(MAKE) -C src/plugins sub-platforms-install_subtargets
+	cd $< && $(MAKE) -C src -C plugins sub-imageformats-install_subtargets sub-platforms-install_subtargets sub-styles-install_subtargets
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Gui plugins/imageformats qjpeg
 ifdef HAVE_WIN32
-	cd $< && $(MAKE) -C src/plugins sub-imageformats-install_subtargets
-	mv $(PREFIX)/plugins/imageformats/libqjpeg.a $(PREFIX)/lib/
-	mv $(PREFIX)/plugins/platforms/libqwindows.a $(PREFIX)/lib/ && rm -rf $(PREFIX)/plugins
+	# Add the private include to our project (similar to using "gui-private" in a qmake project)
+	sed -i.orig -e 's#-I$${includedir}/QtGui#-I$${includedir}/QtGui -I$${includedir}/QtGui/$(QT_VERSION)/QtGui#' $(PREFIX)/lib/pkgconfig/Qt5Gui.pc
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Gui plugins/platforms qwindows
 	# Vista styling
-	cd $< && $(MAKE) -C src -C plugins sub-styles-install_subtargets
-	mv $(PREFIX)/plugins/styles/libqwindowsvistastyle.a $(PREFIX)/lib/ && rm -rf $(PREFIX)/plugins
-	# Move includes to match what VLC expects
-	mkdir -p $(PREFIX)/include/QtGui/qpa
-	cp $(PREFIX)/include/QtGui/$(QT_VERSION)/QtGui/qpa/qplatformnativeinterface.h $(PREFIX)/include/QtGui/qpa
-	# Clean Qt mess
-	rm -rf $(PREFIX)/lib/libQt5Bootstrap* $</lib/libQt5Bootstrap*
-	# Fix .pc files
-	for i in Qt5Core Qt5Gui Qt5Widgets Qt5Test Qt5Network ; do $(SRC)/qt/FixQtPcFiles.sh $(PREFIX)/lib/$$i.prl $(PREFIX)/lib/pkgconfig/$$i.pc; done
-	# Fix Qt5Gui.pc file to include qwindows (QWindowsIntegrationPlugin) and platform support libraries
-	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/ -lQt5Gui/ -lqwindows -lqjpeg -luxtheme -ldwmapi -lwtsapi32 -lQt5ThemeSupport -lQt5FontDatabaseSupport -lQt5EventDispatcherSupport -lQt5WindowsUIAutomationSupport -lqtfreetype -lQt5Gui/g' Qt5Gui.pc
-	# Fix Qt5Widget.pc file to include qwindowsvistastyle before Qt5Widget, as it depends on it
-	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/ -lQt5Widget/ -lqwindowsvistastyle -lQt5Widget/' Qt5Widgets.pc
-	# Use ANGLE OpenGL provided by Qt
-	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/-llibGLESv2/-llibGLESv2 -ld3d9 -ltranslator -lpreprocessor/g' Qt5Gui.pc
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Widgets plugins/styles qwindowsvistastyle
 endif
 	# Install a qmake with correct paths set
 	cd $< && $(MAKE) sub-qmake-qmake-aux-pro-install_subtargets install_mkspecs

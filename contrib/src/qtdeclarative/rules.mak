@@ -36,15 +36,9 @@ qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum
 	# the particle module to be built
 	cd $< && $(MAKE) -C src sub-particles-make_first-ordered
 	cd $< && $(MAKE) -C src sub-qmltest-install_subtargets sub-quick-install_subtargets sub-qml-install_subtargets sub-quickwidgets-install_subtargets sub-imports-install_subtargets
-	cp $(PREFIX)/qml/QtQuick.2/libqtquick2plugin.a $(PREFIX)/lib/
-	cd $(PREFIX)/qml/QtQuick/ && cp Layouts/libqquicklayoutsplugin.a Window.2/libwindowplugin.a $(PREFIX)/lib/
-	cp $(PREFIX)/qml/QtQml/Models.2/libmodelsplugin.a $(PREFIX)/lib/
-	rm -rf $(PREFIX)/qml
-	for i in Qt5Quick Qt5Qml Qt5QuickWidgets; do \
-		$(SRC)/qt/FixQtPcFiles.sh $(PREFIX)/lib/$$i.prl $(PREFIX)/lib/pkgconfig/$$i.pc; \
-	done
-	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/ -lQt5Quick/ -lqtquick2plugin -lqquicklayoutsplugin -lwindowplugin -lQt5Quick/' Qt5Quick.pc
-	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/ -lQt5Qml/ -lmodelsplugin -lQt5Qml/' Qt5Qml.pc
-
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick.2 qtquick2plugin
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick/Layouts qquicklayoutsplugin
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick/Window.2 windowplugin
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Qml qml/QtQml/Models.2 modelsplugin
 
 	touch $@
