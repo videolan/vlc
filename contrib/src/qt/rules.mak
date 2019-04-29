@@ -49,6 +49,8 @@ endif
 
 endif
 	$(APPLY) $(SRC)/qt/0001-qmake-Always-split-QMAKE_DEFAULT_LIBDIRS-using-with-.patch
+	
+	$(APPLY) $(SRC)/qt/0001-generate-different-pkg-config-files-for-debug-and-re.patch
 	$(MOVE)
 
 

@@ -1,0 +1,34 @@
+From 533641dced8e5a630940490a30812ee299ef880f Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 29 Apr 2019 08:16:39 +0200
+Subject: [PATCH] generate different pkg-config files for debug and release
+ targets
+
+When generating a release-only build the release and debug makefiles are
+generated, in that order. So the debug .pc file overwrites the release one,
+making pkg-config using debug targets that are not even built.
+
+This is only needed on Windows targets where debug and release builds have
+different suffixes.
+
+Fixes QTBUG-75468
+---
+ qmake/generators/makefile.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/qmake/generators/makefile.cpp b/qmake/generators/makefile.cpp
+index b634ec622b..761212ebec 100644
+--- a/qmake/generators/makefile.cpp
++++ b/qmake/generators/makefile.cpp
+@@ -3244,6 +3244,8 @@ MakefileGenerator::pkgConfigFileName(bool fixify)
+         if (dot != -1)
+             ret = ret.left(dot);
+     }
++    if (project->isActiveConfig("debug") && project->isActiveConfig("win32"))
++        ret += "d";
+     ret += Option::pkgcfg_ext;
+     QString subdir = project->first("QMAKE_PKGCONFIG_DESTDIR").toQString();
+     if(!subdir.isEmpty()) {
+-- 
+2.19.1.windows.1
+
