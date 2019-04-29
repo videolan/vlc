@@ -23,6 +23,7 @@
 #import "VLCLibraryCollectionViewItem.h"
 
 #import "main/VLCMain.h"
+#import "main/CompatibilityFixes.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryDataTypes.h"

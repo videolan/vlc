@@ -25,6 +25,7 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "main/VLCMain.h"
+#import "main/CompatibilityFixes.h"
 
 #import "playlist/VLCPlaylistTableCellView.h"
 #import "playlist/VLCPlaylistController.h"
