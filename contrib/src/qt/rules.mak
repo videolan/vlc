@@ -86,7 +86,7 @@ endif
 QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl $(QT_OPENGL) -no-dbus \
 	-no-vulkan -no-sql-odbc -no-pch \
-	-no-compile-examples -nomake examples -qt-zlib
+	-no-compile-examples -nomake examples -nomake tests -qt-zlib
 
 QT_CONFIG += -release
 
@@ -131,5 +131,5 @@ ifdef HAVE_WIN32
 	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/-llibGLESv2/-llibGLESv2 -ld3d9 -ltranslator -lpreprocessor/g' Qt5Gui.pc
 endif
 	# Install a qmake with correct paths set
-	cd $<; $(MAKE) sub-qmake-qmake-aux-pro-install_subtargets install_mkspecs
+	cd $< && $(MAKE) sub-qmake-qmake-aux-pro-install_subtargets install_mkspecs
 	touch $@
