@@ -1036,7 +1036,7 @@ static int Demux_Seekable( demux_t *p_demux )
         {
             for( i = 0; i < p_sys->i_track; i++ )
             {
-                if( toread[i].b_ok )
+                if( toread[i].b_ok && toread[i].i_toread >= 0 )
                     return VLC_DEMUXER_SUCCESS;
             }
             msg_Warn( p_demux, "all tracks have failed, exiting..." );
