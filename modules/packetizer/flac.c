@@ -484,7 +484,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                 p_sys->crc = flac_crc16( p_sys->crc, p_sys->p_buf[p_sys->i_offset - 2] );
                 p_sys->crc = flac_crc16( p_sys->crc, p_sys->p_buf[p_sys->i_offset - 1] );
                 p_sys->i_offset += 1;
-                p_sys->i_state = STATE_NEXT_SYNC;
+                p_sys->i_state = !pp_block ? STATE_NOSYNC : STATE_NEXT_SYNC;
                 break; /* continue */
             }
 
