@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-03-13 12:59+0100\n"
+"PO-Revision-Date: 2019-04-30 07:59+0200\n"
 "Last-Translator: Thomas De Rocker <thomasderocker at outlook dot com>, 2019\n"
 "Language-Team: Dutch (https://www.transifex.com/yaron/teams/16553/nl/)\n"
 "Language: nl\n"
@@ -2416,7 +2416,7 @@ msgid ""
 "order to keep proportions."
 msgstr ""
 "Dit forceert de monitor-beeldverhouding. De meeste monitors hebben vierkante "
-"pixels (1:1). Als u een 16:9 scherm heeft, moet u wellicht dit naar 4:3 "
+"pixels (1:1). Als u een 16:9 scherm hebt, moet u wellicht dit naar 4:3 "
 "veranderen om de juiste verhouding te behouden."
 
 #: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:301
@@ -2745,7 +2745,7 @@ msgstr ""
 "Wanneer verschillende videoformaten beschikbaar zijn, selecteert u een "
 "resolutie het dichtst bij (maar niet hoger dan) deze instelling zit, in "
 "aantal lijnen. Gebruik deze optie als u niet genoeg rekenkracht of "
-"netwerkbandbreedte heeft om hogere resoluties af te spelen."
+"netwerkbandbreedte hebt om hogere resoluties af te spelen."
 
 #: src/libvlc-module.c:624
 msgid "Best available"
@@ -10726,8 +10726,8 @@ msgid ""
 "Change this value if you have issue with HD codecs when using a HDMI "
 "receiver."
 msgstr ""
-"Wijzig deze waarde als u problemen heeft met hd-codecs bij gebruik van een "
-"hdmi-ontvanger"
+"Wijzig deze waarde als u problemen hebt met hd-codecs bij gebruik van een "
+"HDMI-ontvanger."
 
 #: modules/audio_output/mmdevice.c:1460
 msgid "Disabled"
@@ -14703,7 +14703,7 @@ msgid ""
 msgstr ""
 "\n"
 "Waarschuwing: als u de GUI niet meer kunt bereiken, opent u een "
-"opdrachtregelvenster en start u in de map waar u VLC geïnstalleerd heeft "
+"opdrachtregelvenster en start u in de map waar u VLC geïnstalleerd hebt "
 "\"vlc -l qt\".\n"
 
 #: modules/control/lirc.c:47
@@ -15145,7 +15145,7 @@ msgstr "Fout: `goto' heeft een argument groter dan nul nodig."
 msgid "Playlist has only %u element"
 msgid_plural "Playlist has only %u elements"
 msgstr[0] "Afspeellijst heeft slechts %u element"
-msgstr[1] "Afspeellijst heeft slechts %u elementen"
+msgstr[1] "Afspeellijst bevat slechts %u elementen"
 
 #: modules/control/oldrc.c:1738 modules/gui/ncurses.c:808
 msgid "+-[Incoming]"
@@ -20684,7 +20684,7 @@ msgstr "Er is een nieuwe versie van VLC (%1.%2.%3%4) beschikbaar."
 
 #: modules/gui/qt/dialogs/help.cpp:319
 msgid "You have the latest version of VLC media player."
-msgstr "U heeft de nieuwste versie van VLC Media Player."
+msgstr "U hebt de nieuwste versie van VLC Media Player."
 
 #: modules/gui/qt/dialogs/help.cpp:326
 msgid "An error occurred while checking for updates..."
@@ -24317,7 +24317,7 @@ msgid ""
 msgstr ""
 "Volledig pad voor de afbeeldingsbestanden. Formaat is <afbeelding>[,"
 "<vertraging in ms>[,<alpha>]][;<afbeelding> [,<vertraging>[,<alpha>]]]"
-"[;...]. Als u slechts een bestand heeft, geef dan gewoon de bestandsnaam in."
+"[;...]. Als u slechts een bestand hebt, geef dan gewoon de bestandsnaam in."
 
 #: modules/spu/logo.c:53
 msgid "Logo animation # of loops"
@@ -29402,8 +29402,8 @@ msgid ""
 "Add destinations following the streaming methods you need. Be sure to check "
 "with transcoding that the format is compatible with the method used."
 msgstr ""
-"Voeg doelen na de streamingmethoden die u nodig heeft toe. Controleer bij "
-"transcoderen dat het formaat en de gebruikte methoden compatibel zijn."
+"Voeg bestemmingen toe na de streamingmethoden die u nodig hebt. Controleer "
+"bij transcoderen dat het formaat en de gebruikte methoden compatibel zijn."
 
 #: modules/gui/qt/ui/sout.h:208
 msgid "New destination"
