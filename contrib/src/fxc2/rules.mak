@@ -19,12 +19,27 @@ fxc2: fxc2-$(FXC2_VERSION).tar.xz .sum-fxc2
 	tar xvf "$<" --strip-components=1 -C $@-$(FXC2_VERSION)
 	$(APPLY) $(SRC)/fxc2/0001-make-Vn-argument-as-optional-and-provide-default-var.patch
 	$(APPLY) $(SRC)/fxc2/0002-accept-windows-style-flags-and-splitted-argument-val.patch
-	$(APPLY) $(SRC)/fxc2/0003-Use-meson-as-a-build-system.patch
 	$(APPLY) $(SRC)/fxc2/0004-Revert-Fix-narrowing-conversion-from-int-to-BYTE.patch
 	$(MOVE)
 
+ifeq ($(ARCH),x86_64)
+FXC2_CXX=$(CXX)
+FXC2_DLL=dll/d3dcompiler_47.dll
+else ifeq ($(ARCH),i386)
+FXC2_CXX=$(CXX)
+FXC2_DLL=dll/d3dcompiler_47_32.dll
+else ifeq ($(shell which x86_64-w64-mingw32-g++ >/dev/null 2>&1 || echo FAIL),)
+FXC2_CXX=x86_64-w64-mingw32-g++
+FXC2_DLL=dll/d3dcompiler_47.dll
+else ifeq ($(shell which i686-w64-mingw32-g++ >/dev/null 2>&1 || echo FAIL),)
+FXC2_CXX=i686-w64-mingw32-g++
+FXC2_DLL=dll/d3dcompiler_47_32.dll
+else
+$(error No x86 (cross) compiler found for fxc2)
+endif
+
+
 .fxc2: fxc2 crossfile.meson
-	cd $< && rm -rf ./build
-	cd $< && $(HOSTVARS_MESON) $(MESON) build
-	cd $< && cd build && ninja install
+	cd $< && $(FXC2_CXX) -static fxc2.cpp -o fxc2.exe
+	cd $< && mkdir -p $(PREFIX)/bin && cp fxc2.exe $(PREFIX)/bin && cp $(FXC2_DLL) $(PREFIX)/bin/d3dcompiler_47.dll
 	touch $@
