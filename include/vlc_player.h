@@ -1966,6 +1966,24 @@ VLC_API void
 vlc_player_SelectPrevProgram(vlc_player_t *player);
 
 /**
+ * Helper to get the current selected program
+ */
+static inline const struct vlc_player_program *
+vlc_player_GetSelectedProgram(vlc_player_t *player)
+{
+    size_t count = vlc_player_GetProgramCount(player);
+    for (size_t i = 0; i < count; ++i)
+    {
+        const struct vlc_player_program *program =
+            vlc_player_GetProgramAt(player, i);
+        assert(program);
+        if (program->selected)
+            return program;
+    }
+    return NULL;
+}
+
+/**
  * Check if the media has a teletext menu
  *
  * @see vlc_player_cbs.on_teletext_menu_changed
