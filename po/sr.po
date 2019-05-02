@@ -9,15 +9,15 @@
 # Gorana Milicevic <gorana.milicevic@gmail.com>, 2008
 # Marko Uskokovic <uskokovic@etf.bg.ac.yu>, 2007-2008
 # Milan Tair <milan.tair@gmail.com>, 2014
-# Предраг Љубеновић <predragljubenovic@gmail.com>, 2010,2013-2018
+# Предраг Љубеновић <predragljubenovic@gmail.com>, 2010,2013-2019
 # Serbian linux distribution cp6Linux
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-05-02 11:30+0200\n"
+"Last-Translator: Предраг Љубеновић <predragljubenovic@gmail.com>, 2019\n"
 "Language-Team: Serbian (https://www.transifex.com/yaron/teams/16553/sr/)\n"
 "Language: sr\n"
 "MIME-Version: 1.0\n"
@@ -790,11 +790,11 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr ""
+msgstr " (подразумевано омогућено)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr ""
+msgstr " (подразумевано онемогућено)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -1028,7 +1028,7 @@ msgstr "%.2f dB"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr "Видео резолуција"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
@@ -1082,7 +1082,7 @@ msgstr ""
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
-msgstr ""
+msgstr "Оријентација"
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
@@ -1383,7 +1383,7 @@ msgstr "Претходни наслов"
 
 #: src/input/var.c:278
 msgid "Menu title"
-msgstr ""
+msgstr "Наслов менија"
 
 #: src/input/var.c:285
 msgid "Menu popup"
@@ -1611,7 +1611,7 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "Музика"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
@@ -1627,11 +1627,11 @@ msgstr ""
 
 #: src/libvlc-module.c:143
 msgid "Animation"
-msgstr ""
+msgstr "Анимација"
 
 #: src/libvlc-module.c:143
 msgid "Production"
-msgstr ""
+msgstr "Продукција"
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
@@ -1639,7 +1639,7 @@ msgstr ""
 
 #: src/libvlc-module.c:144
 msgid "Test"
-msgstr ""
+msgstr "Тест"
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
@@ -15739,7 +15739,7 @@ msgstr "Екстензије"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:116
 msgid "Show Installed Only"
-msgstr ""
+msgstr "Прикажи инсталиране само"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:118
 #: modules/gui/qt/dialogs/plugins.cpp:423
@@ -15755,7 +15755,7 @@ msgstr ""
 #: modules/gui/qt/dialogs/plugins.cpp:1165
 #: modules/gui/qt/dialogs/plugins.cpp:1178
 msgid "Installed"
-msgstr ""
+msgstr "Инсталирано"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
 #: modules/gui/macosx/VLCBookmarksWindowController.m:90
@@ -17395,11 +17395,11 @@ msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:230
 msgid "Expand All"
-msgstr ""
+msgstr "Прошири све"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 msgid "Collapse All"
-msgstr ""
+msgstr "Скупи све"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:58
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -18091,7 +18091,7 @@ msgstr "Број копирања"
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:247
 #: modules/gui/qt/ui/video_effects.h:1258
 msgid "Wall"
-msgstr ""
+msgstr "Зид"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:251
 #: modules/video_filter/colorthres.c:71 modules/gui/qt/ui/video_effects.h:1249
@@ -18621,10 +18621,12 @@ msgstr "Отвори датотеку"
 #: modules/gui/qt/components/controller.hpp:117
 msgid "Previous media in the playlist, skip backward when held"
 msgstr ""
+"Претходни медиј у плејлисти; премотава уназад ако држите дугме притиснутим"
 
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Next media in the playlist, skip forward when held"
 msgstr ""
+"Следећи медиј у плејлисти; премотава унапред ако држите дугме притиснутим"
 
 #: modules/gui/qt/components/controller.hpp:119
 msgid "Toggle the video in fullscreen"
@@ -18640,7 +18642,7 @@ msgstr "Прикажи напредне опције"
 
 #: modules/gui/qt/components/controller.hpp:120
 msgid "Toggle playlist"
-msgstr ""
+msgstr "Прикажи листу за пуштање"
 
 #: modules/gui/qt/components/controller.hpp:121
 msgid "Take a snapshot"
@@ -19200,13 +19202,15 @@ msgstr "Утишај"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:406
 msgid "Playlist View Mode"
-msgstr ""
+msgstr "Визулени мод листе за пуштање"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:585
 msgid ""
 "Playlist is currently empty.\n"
 "Drop a file here or select a media source from the left."
 msgstr ""
+"Листа за пуштање је тренутно празна\n"
+"Убаците фајл овде или изаберите извор са леве стране."
 
 #: modules/gui/qt/components/playlist/standardpanel.hpp:143
 msgid "Icons"
@@ -19214,7 +19218,7 @@ msgstr "Иконице"
 
 #: modules/gui/qt/components/playlist/standardpanel.hpp:144
 msgid "Detailed List"
-msgstr ""
+msgstr "Детаљна листа"
 
 #: modules/gui/qt/components/playlist/standardpanel.hpp:145
 msgid "List"
@@ -19222,7 +19226,7 @@ msgstr "Листа"
 
 #: modules/gui/qt/components/playlist/standardpanel.hpp:146
 msgid "PictureFlow"
-msgstr ""
+msgstr "Проток сличица"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:305
 msgid "Select File"
@@ -19946,7 +19950,7 @@ msgstr "&Деинсталирај"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1296
 msgid "&Install"
-msgstr ""
+msgstr "&Инсталирај"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1391
 #: modules/gui/qt/dialogs/plugins.cpp:1494
@@ -20421,7 +20425,7 @@ msgstr "Закачена листа за пуштање"
 
 #: modules/gui/qt/menus.cpp:501
 msgid "Always on &top"
-msgstr ""
+msgstr "Увек &на врху"
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
@@ -20613,7 +20617,7 @@ msgstr "&Очисти"
 
 #: modules/gui/qt/menus.cpp:1629
 msgid "&Renderer"
-msgstr ""
+msgstr "&Исцртавач"
 
 #: modules/gui/qt/menus.cpp:1633
 msgid "<Local>"
@@ -20621,7 +20625,7 @@ msgstr ""
 
 #: modules/gui/qt/menus.cpp:1646
 msgid "Scanning..."
-msgstr ""
+msgstr "Скенирање..."
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -28004,7 +28008,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sout.h:210
 msgid "Display locally"
-msgstr ""
+msgstr "Прикажи локално"
 
 #: modules/gui/qt/ui/sout.h:212
 msgid "Transcoding Options"
@@ -28470,7 +28474,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
-msgstr ""
+msgstr "VLM подешавач"
 
 #: modules/gui/qt/ui/vlm.h:287
 msgid "Media Manager Edition"
