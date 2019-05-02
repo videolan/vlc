@@ -104,11 +104,12 @@ static const float f_playlist_row_height = 72.;
     _segmentedTitleControl.segmentCount = 4;
     [_segmentedTitleControl setTarget:self];
     [_segmentedTitleControl setAction:@selector(segmentedControlAction:)];
-    [_segmentedTitleControl setLabel:_NS("Music") forSegment:0];
-    [_segmentedTitleControl setLabel:_NS("Video") forSegment:1];
+    [_segmentedTitleControl setLabel:_NS("Video") forSegment:0];
+    [_segmentedTitleControl setLabel:_NS("Music") forSegment:1];
     [_segmentedTitleControl setLabel:_NS("Local Network") forSegment:2];
     [_segmentedTitleControl setLabel:_NS("Internet") forSegment:3];
     [_segmentedTitleControl sizeToFit];
+    [_segmentedTitleControl setSelectedSegment:0];
 
     _playlistDataSource = [[VLCPlaylistDataSource alloc] init];
     _playlistDataSource.playlistController = _playlistController;
@@ -239,14 +240,14 @@ static const float f_playlist_row_height = 72.;
 {
     switch (_segmentedTitleControl.selectedSegment) {
         case 0:
-            _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeAudio;
+            _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeVideo;
             _mediaSourceScrollView.hidden = YES;
             _libraryCollectionView.hidden = NO;
             [_libraryCollectionView reloadData];
             break;
 
         case 1:
-            _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeVideo;
+            _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeAudio;
             _mediaSourceScrollView.hidden = YES;
             _libraryCollectionView.hidden = NO;
             [_libraryCollectionView reloadData];

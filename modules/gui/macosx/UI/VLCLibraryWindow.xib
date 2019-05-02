@@ -54,7 +54,7 @@
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="20" minimumLineSpacing="20" id="Rag-cM-k1g">
                                                         <size key="itemSize" width="256" height="214"/>
-                                                        <edgeInsets key="sectionInset" left="20" right="20" top="0.0" bottom="0.0"/>
+                                                        <edgeInsets key="sectionInset" left="20" right="20" top="20" bottom="20"/>
                                                     </collectionViewFlowLayout>
                                                     <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="secondaryBackgroundColor" name="controlAlternatingRowColor" catalog="System" colorSpace="catalog"/>
