@@ -587,6 +587,8 @@ modules/gui/macosx/views/VLCImageButton.h
 modules/gui/macosx/views/VLCImageButton.m
 modules/gui/macosx/views/VLCImageView.h
 modules/gui/macosx/views/VLCImageView.m
+modules/gui/macosx/views/VLCLinearProgressIndicator.h
+modules/gui/macosx/views/VLCLinearProgressIndicator.m
 modules/gui/macosx/views/VLCScrollingClipView.h
 modules/gui/macosx/views/VLCScrollingClipView.m
 modules/gui/macosx/views/VLCSlider.h
