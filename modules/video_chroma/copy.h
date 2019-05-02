@@ -29,6 +29,8 @@ typedef struct {
 # ifdef CAN_COMPILE_SSE2
     uint8_t *buffer;
     size_t  size;
+# else
+    char dummy;
 # endif
 } copy_cache_t;
 
