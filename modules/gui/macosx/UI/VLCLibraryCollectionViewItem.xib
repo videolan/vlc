@@ -13,6 +13,7 @@
                 <outlet property="mediaImageView" destination="2aB-sB-hfY" id="Sv0-G1-KNm"/>
                 <outlet property="mediaTitleTextField" destination="OBS-Eh-1mT" id="h1n-PU-IAx"/>
                 <outlet property="playInstantlyButton" destination="S3I-5Z-qgS" id="JlC-bE-i5Y"/>
+                <outlet property="progressIndicator" destination="dFt-oZ-h9P" id="JC6-gk-Mid"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
             </connections>
         </customObject>
@@ -25,6 +26,12 @@
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="2aB-sB-hfY" customClass="VLCImageView">
                     <rect key="frame" x="0.0" y="46" width="256" height="168"/>
                     <subviews>
+                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="dFt-oZ-h9P" customClass="VLCLinearProgressIndicator">
+                            <rect key="frame" x="0.0" y="0.0" width="256" height="10"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="10" id="lyQ-kl-gVk"/>
+                            </constraints>
+                        </customView>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S3I-5Z-qgS">
                             <rect key="frame" x="96" y="52" width="64" height="64"/>
                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="libraryPlay" imagePosition="only" alignment="center" inset="2" id="IHP-p1-d0R">
@@ -45,9 +52,12 @@
                         </textField>
                     </subviews>
                     <constraints>
+                        <constraint firstAttribute="bottom" secondItem="dFt-oZ-h9P" secondAttribute="bottom" id="4q3-3S-7PA"/>
                         <constraint firstItem="S3I-5Z-qgS" firstAttribute="centerX" secondItem="2aB-sB-hfY" secondAttribute="centerX" id="Seo-tS-piW"/>
                         <constraint firstAttribute="height" constant="168" id="Vrp-AD-scC"/>
                         <constraint firstItem="S3I-5Z-qgS" firstAttribute="centerY" secondItem="2aB-sB-hfY" secondAttribute="centerY" id="ZWU-oW-OVa"/>
+                        <constraint firstItem="dFt-oZ-h9P" firstAttribute="leading" secondItem="2aB-sB-hfY" secondAttribute="leading" id="gTe-sx-hdP"/>
+                        <constraint firstAttribute="trailing" secondItem="dFt-oZ-h9P" secondAttribute="trailing" id="kBI-UU-vnc"/>
                     </constraints>
                 </customView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OBS-Eh-1mT">

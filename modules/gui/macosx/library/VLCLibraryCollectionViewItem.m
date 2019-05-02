@@ -28,6 +28,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "views/VLCImageView.h"
+#import "views/VLCLinearProgressIndicator.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
@@ -158,6 +159,14 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
         _annotationTextField.hidden = NO;
     } else {
         _annotationTextField.hidden = YES;
+    }
+
+    CGFloat position = _representedMediaItem.lastPlaybackPosition;
+    if (position > .05 && position < .95) {
+        _progressIndicator.progress = position;
+        _progressIndicator.hidden = NO;
+    } else {
+        _progressIndicator.hidden = YES;
     }
 }
 
