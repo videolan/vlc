@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-04-16 11:43+0200\n"
+"PO-Revision-Date: 2019-05-02 05:18+0200\n"
 "Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2019\n"
 "Language-Team: Latvian (https://www.transifex.com/yaron/teams/16553/lv/)\n"
 "Language: lv\n"
@@ -3366,12 +3366,12 @@ msgid ""
 "These options allow you to set default global options for the stream output "
 "subsystem."
 msgstr ""
-"Šīs opcijas atļauj jums iestatīt noklusētās globālās opcijas straumju "
+"Šīs opcijas atļauj jums iestatīt noklusējuma globālās opcijas straumju "
 "izvades apakšsistēmai."
 
 #: src/libvlc-module.c:929
 msgid "Default stream output chain"
-msgstr "Noklusētā straumju izvades ķēde"
+msgstr "Noklusējuma straumju izvades ķēde"
 
 #: src/libvlc-module.c:931
 msgid ""
@@ -3379,7 +3379,7 @@ msgid ""
 "to learn how to build such chains. Warning: this chain will be enabled for "
 "all streams."
 msgstr ""
-"Jūs šeit varat ievadīt noklusēto straumju izvades ķēdi. Atsaucieties uz "
+"Jūs šeit varat ievadīt noklusējuma straumju izvades ķēdi. Atsaucieties uz "
 "dokumentāciju, lai uzzinātu, kā būvēt šādas ķēdes. Brīdinājums: šī ķēde tiks "
 "ieslēgta visām straumēm."
 
@@ -3514,7 +3514,7 @@ msgid ""
 "These options allow you to select default modules. Leave these alone unless "
 "you really know what you are doing."
 msgstr ""
-"Šīs opcijas atļauj jums atlasīt noklusētos moduļus. Lieciet šīs mierā, ja "
+"Šīs opcijas atļauj jums atlasīt noklusējuma moduļus. Lieciet šīs mierā, ja "
 "vien jūs tiešām zināt, ko jūs darāt."
 
 #: src/libvlc-module.c:1001
@@ -3604,7 +3604,7 @@ msgid ""
 "You can use it to tune VLC priority against other programs, or against other "
 "VLC instances."
 msgstr ""
-"Šī opcija VLC noklusētajām prioritātēm pievieno nobīdi (pozitīvu vai "
+"Šī opcija VLC noklusējuma prioritātēm pievieno nobīdi (pozitīvu vai "
 "negatīvu). Jūs varat lietot to, lai noskaņotu VLC prioritāti pret citām "
 "programmām vai pret citām VLC instancēm."
 
@@ -4874,7 +4874,7 @@ msgstr "Atskaņošanas vadība"
 
 #: src/libvlc-module.c:1782
 msgid "Default devices"
-msgstr "Noklusētās ierīces"
+msgstr "Noklusējuma ierīces"
 
 #: src/libvlc-module.c:1789
 msgid "Network settings"
@@ -4971,7 +4971,7 @@ msgstr ""
 
 #: src/libvlc-module.c:2773
 msgid "reset the current config to the default values"
-msgstr "atiestatīt pašreizējo konfigurāciju uz noklusētajām vērtībām"
+msgstr "atiestatīt pašreizējo konfigurāciju uz noklusējuma vērtībām"
 
 #: src/libvlc-module.c:2775
 msgid "use alternate config file"
@@ -6102,7 +6102,7 @@ msgid ""
 "Pass alsa:// to open the default ALSA capture device, or alsa://SOURCE to "
 "open a specific device named SOURCE."
 msgstr ""
-"Nododiet alsa://, lai atvērtu noklusēto ALSA tveršanas ierīci, vai alsa://"
+"Nododiet alsa://, lai atvērtu noklusējuma ALSA tveršanas ierīci, vai alsa://"
 "AVOTS, lai atvērtu specifisku ierīci ar nosaukumu AVOTS."
 
 #: modules/access/alsa.c:49
@@ -6434,7 +6434,7 @@ msgid ""
 "aesebu, analog. Leave blank for card default."
 msgstr ""
 "Audio savienojums, kuru lietot DeckLink tveršanām. Derīgās izvēles: "
-"embedded, aesebu, analog. Atstāt tukšu kartes noklusētajam."
+"embedded, aesebu, analog. Atstāt tukšu kartes noklusējumam."
 
 #: modules/access/decklink.cpp:61 modules/demux/rawaud.c:43
 #: modules/video_output/decklink.cpp:100
@@ -6472,7 +6472,7 @@ msgid ""
 msgstr ""
 "Video savienojums, kuru lietot DeckLink tveršanām. Derīgās izvēles: sdi, "
 "hdmi, opticalsdi, component, composite, svideo. Atstāt tukšu kartes "
-"noklusētajam."
+"noklusējumam."
 
 #: modules/access/decklink.cpp:82 modules/access/linsys/linsys_sdi.c:94
 msgid "SDI"
@@ -6513,7 +6513,7 @@ msgstr "Analogais"
 #: modules/access/decklink.cpp:94 modules/demux/rawvid.c:60
 msgid "Aspect ratio (4:3, 16:9). Default assumes square pixels."
 msgstr ""
-"Malu attiecības (4:3, 16:9). Noklusējumā pieņem, ka ir kvadrātveida pikseļi."
+"Malu attiecības (4:3, 16:9). Noklusējums pieņem, ka ir kvadrātveida pikseļi."
 
 #: modules/access/decklink.cpp:97
 msgid "DeckLink"
@@ -6566,7 +6566,7 @@ msgid ""
 "don't specify anything, the default device will be used."
 msgstr ""
 "Video ierīces, kuru lietos DirectShow spraudnis, nosaukums. Ja jūs "
-"nenorādīsiet neko, tiks lietota noklusētā ierīce."
+"nenorādīsiet neko, tiks lietota noklusējuma ierīce."
 
 #: modules/access/dshow/dshow.cpp:135
 #: modules/gui/qt/components/open_panels.cpp:831
@@ -6580,7 +6580,7 @@ msgid ""
 "don't specify anything, the default device will be used."
 msgstr ""
 "Audio ierīces, kuru lietos DirectShow spraudnis, nosaukums. Ja jūs "
-"nenorādīsiet neko, tiks lietota noklusētā ierīce."
+"nenorādīsiet neko, tiks lietota noklusējuma ierīce."
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:798
@@ -6594,7 +6594,7 @@ msgid ""
 "can specify a standard size (cif, d1, ...) or <width>x<height>."
 msgstr ""
 "Izmērs video, kurš tiks attēlots ar DirectShow spraudni. Ja jūs nenorādīsiet "
-"neko, tiks lietots noklusētais izmērs jūsu ierīcei. Jūs varat norādīt "
+"neko, tiks lietots noklusējuma izmērs jūsu ierīcei. Jūs varat norādīt "
 "standarta izmēru (cif, d1, ...) vai <platums>x<augstums>."
 
 #: modules/access/dshow/dshow.cpp:145 modules/access/v4l2/v4l2.c:196
@@ -6604,7 +6604,7 @@ msgstr "Bildes malu proporcijas n:m"
 #: modules/access/dshow/dshow.cpp:146 modules/access/v4l2/v4l2.c:197
 msgid "Define input picture aspect-ratio to use. Default is 4:3"
 msgstr ""
-"Definēt ievades bildes malu proporcijas, kuras lietot. Noklusētās ir 4:3"
+"Definēt ievades bildes malu proporcijas, kuras lietot. Noklusējuma ir 4:3"
 
 #: modules/access/dshow/dshow.cpp:147 modules/access/v4l2/v4l2.c:53
 msgid "Video input chroma format"
@@ -6616,7 +6616,7 @@ msgid ""
 "(default), RV24, etc.)"
 msgstr ""
 "Piespiest DirectShow video ievadei lietot specifisku krāsainības formātu "
-"(piemēram, I420 (noklusētais), RV24 utt.)"
+"(piemēram, I420 (noklusējuma), RV24 utt.)"
 
 #: modules/access/dshow/dshow.cpp:151
 msgid "Video input frame rate"
@@ -6628,7 +6628,7 @@ msgid ""
 "default, 25, 29.97, 50, 59.94, etc.)"
 msgstr ""
 "Piespiest DirectShow video ievadei lietot specifisku kadru nomaiņas ātrumu "
-"(piemēram, 0 nozīmē noklusētais, 25, 29.97, 50, 59.94 utt.)"
+"(piemēram, 0 nozīmē noklusējuma, 25, 29.97, 50, 59.94 utt.)"
 
 #: modules/access/dshow/dshow.cpp:155
 msgid "Device properties"
@@ -6654,7 +6654,7 @@ msgstr "Uztvērēja TV kanāls"
 #: modules/access/dshow/dshow.cpp:164
 msgid "Set the TV channel the tuner will set to (0 means default)."
 msgstr ""
-"Iestatīt TV kanālu, uz kuru iestatīties uztvērējs (0 nozīmē noklusētais)."
+"Iestatīt TV kanālu, uz kuru iestatīsies uztvērējs (0 nozīmē noklusējuma)."
 
 #: modules/access/dshow/dshow.cpp:166
 msgid "Tuner Frequency"
@@ -6680,7 +6680,7 @@ msgid ""
 "mapping (0 means default)."
 msgstr ""
 "Iestatīt uztvērēja valsts kodu, kurš nodibina pašreizējo kanāla-uz-frekvenci "
-"kartēšanu (0 nozīmē noklusētais)."
+"kartēšanu (0 nozīmē noklusējuma)."
 
 #: modules/access/dshow/dshow.cpp:173
 msgid "Tuner input type"
@@ -6739,7 +6739,7 @@ msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
-"AM uztvērēja režīms. Var būt viens no Noklusētais (0), TV (1), AM radio (2), "
+"AM uztvērēja režīms. Var būt viens no Noklusējuma (0), TV (1), AM radio (2), "
 "FM radio (3) vai DSS (4)."
 
 #: modules/access/dshow/dshow.cpp:199
@@ -7352,7 +7352,7 @@ msgstr "DVD leņķis"
 
 #: modules/access/dvdnav.c:71 modules/access/dvdread.c:70
 msgid "Default DVD angle."
-msgstr "Noklusētais DVD leņķis."
+msgstr "Noklusējuma DVD leņķis."
 
 #: modules/access/dvdnav.c:73
 msgid "Start directly in menu"
@@ -8073,7 +8073,7 @@ msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
 "open a specific source named SOURCE."
 msgstr ""
-"Nododiet pulse://, lai atvērtu noklusēto PulseAudio avotu, vai pulse://"
+"Nododiet pulse://, lai atvērtu noklusējuma PulseAudio avotu, vai pulse://"
 "AVOTS, lai atvērtu specifisku avotu ar nosaukumu AVOTS."
 
 #: modules/access/pulse.c:42
@@ -8577,7 +8577,7 @@ msgstr "UDP ievade"
 
 #: modules/access/v4l2/controls.c:770
 msgid "Reset defaults"
-msgstr "Atiestatīt noklusētos"
+msgstr "Atiestatīt noklusējumus"
 
 #: modules/access/v4l2/v4l2.c:44
 msgid "Video capture device"
@@ -8602,7 +8602,7 @@ msgstr "Standarta"
 
 #: modules/access/v4l2/v4l2.c:52
 msgid "Video standard (Default, SECAM, PAL, or NTSC)."
-msgstr "Video standarts (Noklusētais, SECAM, PAL vai NTSC)."
+msgstr "Video standarts (Noklusējuma, SECAM, PAL vai NTSC)."
 
 #: modules/access/v4l2/v4l2.c:55
 msgid ""
@@ -9098,7 +9098,7 @@ msgstr ""
 
 #: modules/access/vdr.c:80
 msgid "Default frame rate for chapter import."
-msgstr "Noklusētais kadru nomaiņas ātrums nodaļu importam."
+msgstr "Noklusējuma kadru nomaiņas ātrums nodaļu importam."
 
 #: modules/access/vdr.c:84
 msgid "VDR"
@@ -9528,8 +9528,8 @@ msgid ""
 "Default caching value for outbound UDP streams. This value should be set in "
 "milliseconds."
 msgstr ""
-"Noklusētā kešdarbes vērtība izejošajām UDP straumēm. Šai vērtībai vajadzētu "
-"būt iestatītai milisekundēs."
+"Noklusējuma kešdarbes vērtība izejošajām UDP straumēm. Šai vērtībai "
+"vajadzētu būt iestatītai milisekundēs."
 
 #: modules/access_output/udp.c:67
 msgid "Group packets"
@@ -9571,7 +9571,7 @@ msgid ""
 "be sent, 0 otherwise (default 1)."
 msgstr ""
 "Definē, vai joslu grafika informācijai vajadzētu tikt nosūtītai. 1, ja "
-"informācijai vajadzētu tikt nosūtītai, 0 citādi (noklusētais 1)."
+"informācijai vajadzētu tikt nosūtītai, 0 citādi (noklusējuma 1)."
 
 #: modules/audio_filter/audiobargraph_a.c:42
 msgid "Sends the barGraph information every n audio packets"
@@ -9583,7 +9583,7 @@ msgid ""
 "barGraph information every n audio packets (default 4)."
 msgstr ""
 "Definē, cik bieži joslu grafika informācijai vajadzētu tikt nosūtītai. Sūta "
-"joslu grafika informāciju ik pēc n audio paketēm (noklusētais 4)."
+"joslu grafika informāciju ik pēc n audio paketēm (noklusējuma 4)."
 
 #: modules/audio_filter/audiobargraph_a.c:45
 msgid "Defines if silence alarm information should be sent"
@@ -9595,7 +9595,7 @@ msgid ""
 "should be sent, 0 otherwise (default 1)."
 msgstr ""
 "Definē, vai klusuma trauksmes informācijai vajadzētu tikt nosūtītai. 1, ja "
-"informācijai vajadzētu tikt nosūtītai, 0 citādi (noklusētais 1)."
+"informācijai vajadzētu tikt nosūtītai, 0 citādi (noklusējuma 1)."
 
 #: modules/audio_filter/audiobargraph_a.c:48
 msgid "Time window to use in ms"
@@ -9609,7 +9609,7 @@ msgid ""
 msgstr ""
 "Laika logs milisekundēs, kurā klusuma noteikšanai tiek mērīts audio līmenis. "
 "Ja audio līmenis šajā laikā ir zem sliekšņa, tiek nosūtīta trauksme "
-"(noklusētais 5000)."
+"(noklusējuma 5000)."
 
 #: modules/audio_filter/audiobargraph_a.c:52
 msgid "Minimum Audio level to raise the alarm"
@@ -9621,7 +9621,7 @@ msgid ""
 "threshold during this time, an alarm is sent (default 0.1)."
 msgstr ""
 "Slieksnis, kas jāsasniedz, lai celtu trauksmi. Ja audio līmenis ir zem "
-"sliekšņa šajā laikā, trauksme tiek nosūtīta (noklusētais 0.1)."
+"sliekšņa šajā laikā, trauksme tiek nosūtīta (noklusējuma 0.1)."
 
 #: modules/audio_filter/audiobargraph_a.c:56
 msgid "Time between two alarm messages in ms"
@@ -10093,7 +10093,7 @@ msgstr "Ieguvuma reizinātājs"
 
 #: modules/audio_filter/gain.c:59
 msgid "Increase or decrease the gain (default 1.0)"
-msgstr "Palielināt vai samazināt ieguvumu (noklusētais 1.0)"
+msgstr "Palielināt vai samazināt ieguvumu (noklusējuma 1.0)"
 
 #: modules/audio_filter/gain.c:63
 msgid "Gain control filter"
@@ -10734,7 +10734,7 @@ msgid ""
 "Select special Audio device, or let windows decide (default), change needs "
 "VLC restart to apply."
 msgstr ""
-"Atlasiet speciālu Audio ierīci vai ļaujiet windows izlemt (noklusētais), "
+"Atlasiet speciālu Audio ierīci vai ļaujiet windows izlemt (noklusējuma), "
 "izmaiņai vajadzīga VLC atkārtota palaišana, lai pielietotos."
 
 #: modules/audio_output/waveout.c:149
@@ -10979,7 +10979,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:92
 msgid "Skip frame (default=0)"
-msgstr "Izlaist kadru (noklusētais=0)"
+msgstr "Izlaist kadru (noklusējuma=0)"
 
 #: modules/codec/avcodec/avcodec.h:94
 msgid ""
@@ -10987,11 +10987,11 @@ msgid ""
 "frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
 "Piespiest kadru izlaišanu, lai paātrinātu atkodēšanu (-1=Nekāds, "
-"0=Noklusētais, 1=B-kadri, 2=P-kadri, 3=B+P kadri, 4=visi kadri)."
+"0=Noklusējuma, 1=B-kadri, 2=P-kadri, 3=B+P kadri, 4=visi kadri)."
 
 #: modules/codec/avcodec/avcodec.h:97
 msgid "Skip idct (default=0)"
-msgstr "Izlaist inverso diskrētā kosinusa transformāciju (noklusētais=0)"
+msgstr "Izlaist inverso diskrētā kosinusa transformāciju (noklusējuma=0)"
 
 #: modules/codec/avcodec/avcodec.h:99
 msgid ""
@@ -10999,7 +10999,7 @@ msgid ""
 "0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
 "Piespiest inversās diskrētās kosinusa transformācijas izlaišanu, lai "
-"paātrinātu atkodēšanu kadru tipiem (-1=Nekāds, 0=Noklusētais, 1=B-kadri, 2=P-"
+"paātrinātu atkodēšanu kadru tipiem (-1=Nekāds, 0=Noklusējuma, 1=B-kadri, 2=P-"
 "kadri, 3=B+P kadri, 4=visi kadri)."
 
 #: modules/codec/avcodec/avcodec.h:102
@@ -11235,7 +11235,7 @@ msgstr "Spilgtuma maskēšana"
 
 #: modules/codec/avcodec/avcodec.h:205
 msgid "Raise the quantizer for very bright macroblocks (default: 0.0)."
-msgstr "Paaugstināt kvantizētāju ļoti spožiem makroblokiem (noklusētais: 0.0)."
+msgstr "Paaugstināt kvantizētāju ļoti spožiem makroblokiem (noklusējuma: 0.0)."
 
 #: modules/codec/avcodec/avcodec.h:208
 msgid "Darkness masking"
@@ -11243,7 +11243,7 @@ msgstr "Tumšuma maskēšana"
 
 #: modules/codec/avcodec/avcodec.h:209
 msgid "Raise the quantizer for very dark macroblocks (default: 0.0)."
-msgstr "Paaugstināt kvantizētāju ļoti tumšiem makroblokiem (noklusētais: 0.0)."
+msgstr "Paaugstināt kvantizētāju ļoti tumšiem makroblokiem (noklusējuma: 0.0)."
 
 #: modules/codec/avcodec/avcodec.h:212
 msgid "Motion masking"
@@ -11255,7 +11255,7 @@ msgid ""
 "(default: 0.0)."
 msgstr ""
 "Paaugstināt kvantizētāju makroblokiem ar augstu īslaicīgo sarežģītību "
-"(noklusētais: 0.0)."
+"(noklusējuma: 0.0)."
 
 #: modules/codec/avcodec/avcodec.h:216
 msgid "Border masking"
@@ -11266,7 +11266,7 @@ msgid ""
 "Raise the quantizer for macroblocks at the border of the frame (default: "
 "0.0)."
 msgstr ""
-"Paaugstināt kvantizētāju makroblokiem pie kadra robežas (noklusētais: 0.0)."
+"Paaugstināt kvantizētāju makroblokiem pie kadra robežas (noklusējuma: 0.0)."
 
 #: modules/codec/avcodec/avcodec.h:220
 msgid "Luminance elimination"
@@ -11277,7 +11277,7 @@ msgid ""
 "Eliminates luminance blocks when the PSNR isn't much changed (default: 0.0). "
 "The H264 specification recommends -4."
 msgstr ""
-"Likvidē spilgtuma blokus, kad PSNR nav daudz mainījies (noklusētais: 0.0). "
+"Likvidē spilgtuma blokus, kad PSNR nav daudz mainījies (noklusējuma: 0.0). "
 "H264 specifikācija iesaka -4."
 
 #: modules/codec/avcodec/avcodec.h:225
@@ -11289,7 +11289,7 @@ msgid ""
 "Eliminates chrominance blocks when the PSNR isn't much changed (default: "
 "0.0). The H264 specification recommends 7."
 msgstr ""
-"Likvidē krāsainības blokus, kad PSNR nav daudz mainījies (noklusētais: 0.0). "
+"Likvidē krāsainības blokus, kad PSNR nav daudz mainījies (noklusējuma: 0.0). "
 "H264 specifikācija iesaka 7."
 
 #: modules/codec/avcodec/avcodec.h:230
@@ -11305,7 +11305,7 @@ msgid ""
 msgstr ""
 "Norādiet AAC audio profilu, kuru lietot audio bitplūsmas iekodēšanai. Tas "
 "pieņem sekojošas opcijas: main, low, ssr (nav atbalstīts),ltp, hev1, hev2 "
-"(noklusētais: low). hev1 un hev2 tiek šobrīd atbalstīti tikai ar libfdk-aac "
+"(noklusējuma: low). hev1 un hev2 tiek šobrīd atbalstīti tikai ar libfdk-aac "
 "ieslēgtu libavcodec"
 
 #: modules/codec/avcodec/d3d11va.c:63
@@ -11587,7 +11587,7 @@ msgid ""
 "CPU usage (default is enabled)."
 msgstr ""
 "Šī bibliotēka radīs augstākas kvalitātes audio uz papildu centrālā procesora "
-"lietošanas izmaksām (noklusētais ir ieslēgts)."
+"lietošanas izmaksām (noklusējums ir ieslēgts)."
 
 #: modules/codec/fdkaac.c:79
 msgid "Signaling mode of the extension AOT"
@@ -11599,7 +11599,7 @@ msgid ""
 "hierarchical."
 msgstr ""
 "1 ir atklāti izteikti priekš SBR un netieši izteikti priekš PS "
-"(noklusētais), 2 ir atklāti izteikti hierarhisks."
+"(noklusējuma), 2 ir atklāti izteikti hierarhisks."
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-LC"
@@ -11879,7 +11879,7 @@ msgstr ""
 
 #: modules/codec/kate.c:221
 msgid "Default font effect"
-msgstr "Noklusētais fonta efekts"
+msgstr "Noklusējuma fonta efekts"
 
 #: modules/codec/kate.c:222
 msgid ""
@@ -11889,7 +11889,7 @@ msgstr "Pievienot fonta efektu, lai uzlabotu lasāmību pret dažādiem foniem."
 
 #: modules/codec/kate.c:226
 msgid "Default font effect strength"
-msgstr "Noklusētā fonta efekta stiprums"
+msgstr "Noklusējuma fonta efekta stiprums"
 
 #: modules/codec/kate.c:227
 msgid "How pronounced to make the chosen font effect (effect dependent)."
@@ -11897,7 +11897,7 @@ msgstr "Kā izteikts, lai veiktu izvēlēto fonta efektu (atkarībā no efekta).
 
 #: modules/codec/kate.c:231
 msgid "Default font description"
-msgstr "Noklusētā fonta apraksts"
+msgstr "Noklusējuma fonta apraksts"
 
 #: modules/codec/kate.c:232
 msgid ""
@@ -11911,50 +11911,50 @@ msgstr ""
 
 #: modules/codec/kate.c:237
 msgid "Default font color"
-msgstr "Noklusētā fonta krāsa"
+msgstr "Noklusējuma fonta krāsa"
 
 #: modules/codec/kate.c:238
 msgid ""
 "Default font color to use if the Kate stream does not specify a particular "
 "font color to use."
 msgstr ""
-"Noklusētā fonta krāsa, kuru lietot, ja Kate straume nenorāda noteiktu fonta "
-"krāsu, kuru lietot."
+"Noklusējuma fonta krāsa, kuru lietot, ja Kate straume nenorāda noteiktu "
+"fonta krāsu, kuru lietot."
 
 #: modules/codec/kate.c:242
 msgid "Default font alpha"
-msgstr "Noklusētā fonta alfa"
+msgstr "Noklusējuma fonta alfa"
 
 #: modules/codec/kate.c:243
 msgid ""
 "Transparency of the default font color if the Kate stream does not specify a "
 "particular font color to use."
 msgstr ""
-"Noklusētās fonta krāsas caurspīdīgums, ja Kate straume nenorāda noteiktu "
+"Noklusējuma fonta krāsas caurspīdīgums, ja Kate straume nenorāda noteiktu "
 "fonta krāsu, kuru lietot."
 
 #: modules/codec/kate.c:247
 msgid "Default background color"
-msgstr "Noklusētā fona krāsa"
+msgstr "Noklusējuma fona krāsa"
 
 #: modules/codec/kate.c:248
 msgid ""
 "Default background color if the Kate stream does not specify a background "
 "color to use."
 msgstr ""
-"Noklusētā fona krāsa, ja Kate straume nenorāda fona krāsu, kuru lietot."
+"Noklusējuma fona krāsa, ja Kate straume nenorāda fona krāsu, kuru lietot."
 
 #: modules/codec/kate.c:252
 msgid "Default background alpha"
-msgstr "Noklusētā fona alfa"
+msgstr "Noklusējuma fona alfa"
 
 #: modules/codec/kate.c:253
 msgid ""
 "Transparency of the default background color if the Kate stream does not "
 "specify a particular background color to use."
 msgstr ""
-"Noklusētās fona krāsas caurspīdīgums, ja Kate straume nenorāda noteiktu fona "
-"krāsu, kuru lietot."
+"Noklusējuma fona krāsas caurspīdīgums, ja Kate straume nenorāda noteiktu "
+"fona krāsu, kuru lietot."
 
 #: modules/codec/kate.c:259
 msgid ""
@@ -12180,7 +12180,7 @@ msgstr ""
 "IdrInterval=0, tad katrs I-kadrs ir IDR-kadrs. Ja IdrInterval=1, tad katrs "
 "cits I-kadrs ir IDR-kadrs utt. Priekš MPEG2, IdrInterval definē secības "
 "galveņu intervālu I-kadru ziņā. Ja IdrInterval=N, SDK ievieto secības "
-"galveni pirms katra N-tā I-kadra. Ja IdrInterval=0 (noklusētais), SDK "
+"galveni pirms katra N-tā I-kadra. Ja IdrInterval=0 (noklusējuma), SDK "
 "ievieto secības galveni vienreiz straumes sākumā."
 
 #: modules/codec/qsv.c:100
@@ -12799,7 +12799,7 @@ msgid ""
 "Enforce a constant bitrate encoding (CBR) instead of default variable "
 "bitrate encoding (VBR)."
 msgstr ""
-"Uzspiest konstanta bitu pārraides ātruma iekodējumu (CBR), nevis noklusēto "
+"Uzspiest konstanta bitu pārraides ātruma iekodējumu (CBR), nevis noklusējuma "
 "mainīga bitu pārraides ātruma iekodējumu (VBR)."
 
 #: modules/codec/speex.c:80
@@ -13271,7 +13271,7 @@ msgstr "VBR režims"
 #: modules/codec/twolame.c:63
 msgid "Use Variable BitRate. Default is to use Constant BitRate (CBR)."
 msgstr ""
-"Lietot mainīgu bitu pārraides ātrumu (VBR). Noklusētais ir lietot konstantu "
+"Lietot mainīgu bitu pārraides ātrumu (VBR). Noklusējums ir lietot konstantu "
 "bitu pārraides ātrumu (CBR)."
 
 #: modules/codec/twolame.c:64
@@ -13678,7 +13678,7 @@ msgid ""
 "but higher bitrates. 26 is a good default value. Range 0 (lossless) to 51."
 msgstr ""
 "Šis atlasa kvantizētāju, kuru lietot. Zemākas vērtības rezultēsies labākā "
-"precizitātē, bet augstākos bitu pārraides ātrumos. 26 ir laba noklusētā "
+"precizitātē, bet augstākos bitu pārraides ātrumos. 26 ir laba noklusējuma "
 "vērtība. Diapazonā 0 (bezzudumu) līdz 51."
 
 #: modules/codec/x264.c:197
@@ -13763,7 +13763,7 @@ msgid ""
 " - 2: uses log(var)^2 instead of log(var) and attempts to adapt strength per "
 "frame"
 msgstr ""
-"Definē bitsadalījuma režīmu adaptīvajai kvantizācijai, noklusētais 1\n"
+"Definē bitsadalījuma režīmu adaptīvajai kvantizācijai, noklusējuma 1\n"
 " - 0: Izslēgts\n"
 " - 1: Pašreizējais x264 noklusējuma režīms\n"
 " - 2: lieto log(var)^2 , nevis log(var) un mēģina piemērot stiprumu uz kadru"
@@ -13780,7 +13780,7 @@ msgid ""
 " - 1.5: strong AQ"
 msgstr ""
 "Stiprums, lai samazinātu blokošanu un aizmiglošanos plakanā virsmā\n"
-"un teksturētos apgabalos, noklusētais 1.0, ieteicams būt starp 0..2\n"
+"un teksturētos apgabalos, noklusējuma 1.0, ieteicams būt starp 0..2\n"
 " - 0.5: vāja adaptīvā kvantizācija\n"
 " - 1.5: stipra adaptīvā kvantizācija"
 
@@ -13949,7 +13949,7 @@ msgid ""
 "may benefit from settings between 24 and 32. Range 0 to 64."
 msgstr ""
 "Maksimālais attālums, kurā meklēt pēc kustības novērtējuma, nomērīts no "
-"paredzētās(-ajām) pozīcijas(-ām). Noklusētais 16 ir labs vairumam filmēšanas "
+"paredzētās(-ajām) pozīcijas(-ām). Noklusējuma 16 ir labs vairumam filmēšanas "
 "materiālu, augstas kustības secības var gūt labumu no iestatījumiem starp 24 "
 "un 32. Diapazonā 0 līdz 64."
 
@@ -13978,7 +13978,7 @@ msgstr ""
 
 #: modules/codec/x264.c:316
 msgid "Strength of psychovisual optimization, default is \"1.0:0.0\""
-msgstr "Psihovizuālās optimizācijas stiprums, noklusētais ir \"1.0:0.0\""
+msgstr "Psihovizuālās optimizācijas stiprums, noklusējuma ir \"1.0:0.0\""
 
 #: modules/codec/x264.c:317
 msgid ""
@@ -13988,7 +13988,7 @@ msgid ""
 msgstr ""
 "Pirmais parametrs kontrolē, vai RD ir ieslēgts (subme>=6) vai izslēgts.\n"
 "Otrais parametrs kontrolē, vai režģis tiek lietots pie psihovizuālās "
-"optimizācijas, noklusētais izslēgts"
+"optimizācijas, pēc noklusējuma izslēgts"
 
 #: modules/codec/x264.c:321
 msgid "Subpixel motion estimation and partition decision quality"
@@ -14212,7 +14212,7 @@ msgid ""
 "issues on unmuxable output, like rtsp-output without ts-mux"
 msgstr ""
 "Kadru skaits, kuru lietot uz kadra tipu raudzīšanos uz priekšu. Patlaban "
-"noklusētais var izraisīt sinhronizācijas problēmas uz nemultipleksējamas "
+"noklusējums var izraisīt sinhronizācijas problēmas uz nemultipleksējamas "
 "izvades, kā rtsp-output bez ts-mux"
 
 #: modules/codec/x264.c:411
@@ -14221,11 +14221,11 @@ msgstr "HRD-taimingu informācija"
 
 #: modules/codec/x264.c:412
 msgid "Default tune setting used"
-msgstr "Lietots noklusētais skaņojuma iestatījums"
+msgstr "Lietots noklusējuma skaņojuma iestatījums"
 
 #: modules/codec/x264.c:413
 msgid "Default preset setting used"
-msgstr "Lietots noklusētais priekšiestatījuma iestatījums"
+msgstr "Lietots noklusējuma priekšiestatījuma iestatījums"
 
 #: modules/codec/x264.c:415
 msgid "x264 advanced options"
@@ -14334,7 +14334,7 @@ msgstr "Teleteksta lapa"
 
 #: modules/codec/zvbi.c:62
 msgid "Open the indicated Teletext page. Default page is index 100."
-msgstr "Atvērt norādīto Teleteksta lapu. Noklusētā lapa ir indekss 100."
+msgstr "Atvērt norādīto Teleteksta lapu. Noklusējuma lapa ir indekss 100."
 
 #: modules/codec/zvbi.c:69
 msgid "Teletext alignment"
@@ -15470,7 +15470,7 @@ msgid ""
 "is the default value) for a live stream (from a camera)."
 msgstr ""
 "Šis ir vēlamais kadru nomaiņas ātrums, kad atskaņo MJPEG no datnes. Lietot 0 "
-"(šī ir noklusētā vērtība) dzīvajai straumei (no kameras)."
+"(šī ir noklusējuma vērtība) dzīvajai straumei (no kameras)."
 
 #: modules/demux/mjpeg.c:53
 msgid "M-JPEG camera demuxer"
@@ -15545,7 +15545,7 @@ msgstr "Ieslēgt atbalsošanos"
 
 #: modules/demux/mod.c:57
 msgid "Reverberation level (from 0 to 100, default value is 0)."
-msgstr "Atbalsošanās līmenis (no 0 līdz 100, noklusētā vērtība ir 0)."
+msgstr "Atbalsošanās līmenis (no 0 līdz 100, noklusējuma vērtība ir 0)."
 
 #: modules/demux/mod.c:59
 msgid "Reverberation delay, in ms. Usual values are from 40 to 200ms."
@@ -15558,7 +15558,7 @@ msgstr "Ieslēgt megabasa režīmu"
 
 #: modules/demux/mod.c:62
 msgid "Megabass mode level (from 0 to 100, default value is 0)."
-msgstr "Megabasa režīma līmenis (no 0 līdz 100, noklusētā vērtība ir 0)."
+msgstr "Megabasa režīma līmenis (no 0 līdz 100, noklusējuma vērtība ir 0)."
 
 #: modules/demux/mod.c:64
 msgid ""
@@ -15571,7 +15571,7 @@ msgstr ""
 
 #: modules/demux/mod.c:67
 msgid "Surround effect level (from 0 to 100, default value is 0)."
-msgstr "Ieskaujošā efekta līmenis (no 0 līdz 100, noklusētā vērtība ir 0)."
+msgstr "Ieskaujošā efekta līmenis (no 0 līdz 100, noklusējuma vērtība ir 0)."
 
 #: modules/demux/mod.c:69
 msgid "Surround delay, in ms. Usual values are from 5 to 40 ms."
@@ -16181,7 +16181,7 @@ msgstr "PVA demultipleksors"
 
 #: modules/demux/rawaud.c:44
 msgid "Audio sample rate in Hertz. Default is 48000 Hz."
-msgstr "Audio diskretizācijas frekvence hercos. Noklusētā ir 48000 Hz."
+msgstr "Audio diskretizācijas frekvence hercos. Noklusējums ir 48000 Hz."
 
 #: modules/demux/rawaud.c:46 modules/stream_out/transcode/transcode.c:100
 #: share/lua/http/dialogs/create_stream.html:316
@@ -16190,7 +16190,7 @@ msgstr "Audio kanāli"
 
 #: modules/demux/rawaud.c:47
 msgid "Audio channels in input stream. Numeric value >0. Default is 2."
-msgstr "Audio kanāli ievades straumē. Skaitliskā vērtība >0. Noklusētā ir 2."
+msgstr "Audio kanāli ievades straumē. Skaitliskā vērtība >0. Noklusējums ir 2."
 
 #: modules/demux/rawaud.c:49
 msgid "FOURCC code of raw input format"
@@ -16211,7 +16211,7 @@ msgid ""
 "Default is 'eng'."
 msgstr ""
 "Piespiež audio valodu izvades multipleksēšanai. Trīs burtu ISO639 kods. "
-"Noklusētais ir 'eng'. "
+"Noklusējums ir 'eng'. "
 
 #: modules/demux/rawaud.c:64
 msgid "Raw audio demuxer"
@@ -16294,7 +16294,7 @@ msgstr ""
 
 #: modules/demux/subtitle.c:60
 msgid "Override the default track description."
-msgstr "Pārrakstīt noklusēto celiņa aprakstu."
+msgstr "Pārrakstīt noklusējuma celiņa aprakstu."
 
 #: modules/demux/subtitle.c:72
 msgid "Text subtitle parser"
@@ -17139,8 +17139,8 @@ msgid ""
 "Set the transparency of the video output. 1 is non-transparent (default) 0 "
 "is fully transparent."
 msgstr ""
-"Iestatīt video izvades caurspīdīgumu. 1 ir ne-caurspīdīgs (noklusētais) 0 ir "
-"pilnībā caurspīdīgs."
+"Iestatīt video izvades caurspīdīgumu. 1 ir ne-caurspīdīgs (noklusējuma), 0 "
+"ir pilnībā caurspīdīgs."
 
 #: modules/gui/macosx/macosx.m:60
 msgid "Black screens in fullscreen"
@@ -18386,7 +18386,7 @@ msgstr "Salabot AVI datnes"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:292
 msgid "Default Caching Level"
-msgstr "Noklusētais kešdarbes līmenis"
+msgstr "Noklusējuma kešdarbes līmenis"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:293
 #: modules/gui/qt/ui/open.h:266
@@ -18411,7 +18411,7 @@ msgstr "Pēcapstrādes kvalitāte"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:300
 msgid "Edit default application settings for network protocols"
-msgstr "Rediģēt noklusēto lietotņu iestatījumus tīkla protokoliem"
+msgstr "Rediģēt noklusējuma lietotņu iestatījumus tīkla protokoliem"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:304
 msgid "Open network streams using the following protocols"
@@ -18468,7 +18468,7 @@ msgstr "Ieslēgt HTTP Tīmekļa saskarni"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:337
 msgid "Default Encoding"
-msgstr "Noklusētais kodējums"
+msgstr "Noklusējuma kodējums"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:338
 msgid "Display Settings"
@@ -20204,7 +20204,7 @@ msgstr "VLC ādiņu tīmekļa vietnes"
 
 #: modules/gui/qt/components/simple_preferences.cpp:764
 msgid "System's default"
-msgstr "Sistēmas noklusētais"
+msgstr "Sistēmas noklusējums"
 
 #: modules/gui/qt/components/simple_preferences.cpp:1302
 msgid "File associations"
@@ -21649,7 +21649,7 @@ msgid ""
 msgstr ""
 "Definēt skaļuma slīdņa krāsas\n"
 "Norādot 12 skaitļus, atdalītus ar ';'\n"
-"Noklusētais ir '255;255;255;20;226;20;255;176;15;235;30;20'\n"
+"Noklusējums ir '255;255;255;20;226;20;255;176;15;235;30;20'\n"
 "Alternatīvais var būt '30;30;50;40;40;100;50;50;160;150;150;255'"
 
 #: modules/gui/qt/qt.cpp:144
@@ -22117,7 +22117,7 @@ msgstr "Jebkurš"
 
 #: modules/keystore/keychain.m:47
 msgid "System default"
-msgstr "Sistēmas noklusētais"
+msgstr "Sistēmas noklusējums"
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock"
@@ -29417,7 +29417,7 @@ msgstr "Live555 straumes transports"
 
 #: modules/gui/qt/ui/sprefs_input.h:376
 msgid "Default caching policy"
-msgstr "Noklusētā kešdarbes politika"
+msgstr "Noklusējuma kešdarbes politika"
 
 #: modules/gui/qt/ui/sprefs_interface.h:531
 msgid "Menus language:"
