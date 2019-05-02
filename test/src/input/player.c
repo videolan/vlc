@@ -27,6 +27,12 @@
 #include <vlc_player.h>
 #include <vlc_vector.h>
 
+struct report_capabilities
+{
+    int old_caps;
+    int new_caps;
+};
+
 struct report_position
 {
     vlc_tick_t time;
@@ -87,7 +93,7 @@ struct report_media_subitems
     X(enum vlc_player_error, on_error_changed) \
     X(float, on_buffering_changed) \
     X(float, on_rate_changed) \
-    X(int, on_capabilities_changed) \
+    X(struct report_capabilities, on_capabilities_changed) \
     X(struct report_position, on_position_changed) \
     X(vlc_tick_t, on_length_changed) \
     X(struct report_track_list, on_track_list_changed) \
@@ -261,11 +267,15 @@ player_on_rate_changed(vlc_player_t *player, float new_rate, void *data)
 }
 
 static void
-player_on_capabilities_changed(vlc_player_t *player, int new_caps,
+player_on_capabilities_changed(vlc_player_t *player, int old_caps, int new_caps,
                                void *data)
 {
     struct ctx *ctx = get_ctx(player, data);
-    VEC_PUSH(on_capabilities_changed, new_caps);
+    struct report_capabilities report = {
+        .old_caps = old_caps,
+        .new_caps = new_caps,
+    };
+    VEC_PUSH(on_capabilities_changed, report);
 }
 
 static void
@@ -731,10 +741,11 @@ test_end_prestop_capabilities(struct ctx *ctx)
     vec_on_capabilities_changed *vec = &ctx->report.on_capabilities_changed;
     while (vec->size == 0)
         vlc_player_CondWait(ctx->player, &ctx->wait);
+    int new_caps = VEC_LAST(vec).new_caps;
     assert(vlc_player_CanSeek(player) == ctx->params.can_seek
-        && !!(VEC_LAST(vec) & VLC_PLAYER_CAP_SEEK) == ctx->params.can_seek);
+        && !!(new_caps & VLC_PLAYER_CAP_SEEK) == ctx->params.can_seek);
     assert(vlc_player_CanPause(player) == ctx->params.can_pause
-        && !!(VEC_LAST(vec) & VLC_PLAYER_CAP_PAUSE) == ctx->params.can_pause);
+        && !!(new_caps & VLC_PLAYER_CAP_PAUSE) == ctx->params.can_pause);
 }
 
 static void

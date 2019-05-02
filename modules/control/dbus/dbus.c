@@ -145,7 +145,7 @@ static void player_on_state_changed(vlc_player_t *,
 static void player_on_error_changed(vlc_player_t *,
                                     enum vlc_player_error, void *);
 static void player_on_rate_changed(vlc_player_t *, float, void *);
-static void player_on_capabilities_changed(vlc_player_t *, int, void *);
+static void player_on_capabilities_changed(vlc_player_t *, int, int, void *);
 static void player_on_position_changed(vlc_player_t *,
                                        vlc_tick_t, float, void *);
 static void player_on_media_meta_changed(vlc_player_t *,
@@ -1080,7 +1080,8 @@ player_on_rate_changed(vlc_player_t *player, float new_rate, void *data)
 }
 
 static void
-player_on_capabilities_changed(vlc_player_t *player, int new_caps, void *data)
+player_on_capabilities_changed(vlc_player_t *player, int old_caps, int new_caps,
+                               void *data)
 {
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
@@ -1093,7 +1094,7 @@ player_on_capabilities_changed(vlc_player_t *player, int new_caps, void *data)
     vlc_mutex_unlock(&sys->lock);
     if (ok1 || ok2)
         wakeup_main_loop(intf);
-    (void) player; (void) new_caps;
+    (void) player; (void) old_caps; (void) new_caps;
 }
 
 static void

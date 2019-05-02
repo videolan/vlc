@@ -1904,10 +1904,13 @@ input_thread_Events(input_thread_t *input_thread,
             vlc_player_SendEvent(player, on_rate_changed, input->rate);
             break;
         case INPUT_EVENT_CAPABILITIES:
+        {
+            int old_caps = input->capabilities;
             input->capabilities = event->capabilities;
             vlc_player_SendEvent(player, on_capabilities_changed,
-                                 input->capabilities);
+                                 old_caps, input->capabilities);
             break;
+        }
         case INPUT_EVENT_POSITION:
             if (input->time != event->position.ms ||
                 input->position != event->position.percentage)

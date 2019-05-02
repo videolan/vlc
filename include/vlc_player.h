@@ -473,11 +473,12 @@ struct vlc_player_cbs
      * Always called when the media is opening. Can be called during playback.
      *
      * @param player locked player instance
-     * @param new_caps player capabilities
+     * @param old_caps old player capabilities
+     * @param new_caps new player capabilities
      * @param data opaque pointer set by vlc_player_AddListener()
      */
     void (*on_capabilities_changed)(vlc_player_t *player,
-        int new_caps, void *data);
+        int old_caps, int new_caps, void *data);
 
     /**
      * Called when the player position has changed

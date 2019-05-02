@@ -323,8 +323,9 @@ static void on_player_rate_changed(vlc_player_t *, float new_rate, void *data)
     });
 }
 
-static void on_player_capabilities_changed(vlc_player_t *, int new_caps, void *data)
+static void on_player_capabilities_changed(vlc_player_t *, int old_caps, int new_caps, void *data)
 {
+    Q_UNUSED(old_caps);
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_capabilities_changed");
     that->callAsync([that,new_caps](){
