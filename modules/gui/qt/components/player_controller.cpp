@@ -325,17 +325,36 @@ static void on_player_rate_changed(vlc_player_t *, float new_rate, void *data)
 
 static void on_player_capabilities_changed(vlc_player_t *, int old_caps, int new_caps, void *data)
 {
-    Q_UNUSED(old_caps);
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_capabilities_changed");
-    that->callAsync([that,new_caps](){
+    that->callAsync([that, old_caps, new_caps]() {
         PlayerController* q = that->q_func();
         that->m_capabilities = new_caps;
-        emit q->seekableChanged( (new_caps & VLC_INPUT_CAPABILITIES_SEEKABLE) != 0 );
-        emit q->rewindableChanged( (new_caps & VLC_INPUT_CAPABILITIES_REWINDABLE) != 0 );
-        emit q->pausableChanged( (new_caps & VLC_INPUT_CAPABILITIES_PAUSEABLE) != 0 );
-        emit q->recordableChanged( (new_caps & VLC_INPUT_CAPABILITIES_RECORDABLE) != 0 );
-        emit q->rateChangableChanged( (new_caps & VLC_INPUT_CAPABILITIES_CHANGE_RATE) != 0 );
+
+        bool oldSeekable = old_caps & VLC_INPUT_CAPABILITIES_SEEKABLE;
+        bool newSeekable = new_caps & VLC_INPUT_CAPABILITIES_SEEKABLE;
+        if (newSeekable != oldSeekable)
+            emit q->seekableChanged( newSeekable );
+
+        bool oldRewindable = old_caps & VLC_INPUT_CAPABILITIES_REWINDABLE;
+        bool newRewindable = new_caps & VLC_INPUT_CAPABILITIES_REWINDABLE;
+        if (newRewindable != oldRewindable)
+            emit q->rewindableChanged( newRewindable );
+
+        bool oldPauseable = old_caps & VLC_INPUT_CAPABILITIES_PAUSEABLE;
+        bool newPauseable = new_caps & VLC_INPUT_CAPABILITIES_PAUSEABLE;
+        if (newPauseable != oldPauseable)
+            emit q->pausableChanged( newPauseable );
+
+        bool oldRecordable = old_caps & VLC_INPUT_CAPABILITIES_RECORDABLE;
+        bool newRecordable = new_caps & VLC_INPUT_CAPABILITIES_RECORDABLE;
+        if (newRecordable != oldRecordable)
+            emit q->recordableChanged( newRecordable);
+
+        bool oldChangeRate = old_caps & VLC_INPUT_CAPABILITIES_CHANGE_RATE;
+        bool newChangeRate = new_caps & VLC_INPUT_CAPABILITIES_CHANGE_RATE;
+        if (newChangeRate != oldChangeRate)
+            emit q->rateChangableChanged( newChangeRate );
     });
 
     //FIXME other events?
