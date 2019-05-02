@@ -117,8 +117,7 @@ static int vlclua_player_get_titles_count(lua_State *L)
     vlc_player_t *player = vlclua_get_player_internal(L);
 
     vlc_player_Lock(player);
-    const struct vlc_player_title_list *titles =
-            vlc_player_GetTitleList(player);
+    struct vlc_player_title_list *titles = vlc_player_GetTitleList(player);
     size_t count = titles ? vlc_player_title_list_GetCount(titles) : 0;
     vlc_player_Unlock(player);
 
