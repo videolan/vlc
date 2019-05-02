@@ -22,6 +22,7 @@
 
 #import "VLCLibraryDataTypes.h"
 
+#import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
 
 #import <vlc_url.h>
@@ -128,12 +129,38 @@
 
 @end
 
+@interface VLCMediaLibraryMediaItem ()
+
+@property (readwrite, assign) vlc_medialibrary_t *p_mediaLibrary;
+
+@end
+
 @implementation VLCMediaLibraryMediaItem
+
+#pragma mark - initialization
+
++ (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID
+{
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    vlc_ml_media_t *p_mediaItem = vlc_ml_get(p_mediaLibrary, VLC_ML_GET_MEDIA, libraryID);
+    VLCMediaLibraryMediaItem *returnValue = nil;
+    if (p_mediaItem) {
+        returnValue = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:p_mediaItem library:p_mediaLibrary];
+    }
+    return returnValue;
+}
 
 - (instancetype)initWithMediaItem:(struct vlc_ml_media_t *)p_mediaItem
 {
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    return [self initWithMediaItem:p_mediaItem library:p_mediaLibrary];
+}
+
+- (instancetype)initWithMediaItem:(struct vlc_ml_media_t *)p_mediaItem library:(vlc_medialibrary_t *)p_mediaLibrary
+{
     self = [super init];
     if (self) {
+        _p_mediaLibrary = p_mediaLibrary;
         _libraryID = p_mediaItem->i_id;
         _mediaType = p_mediaItem->i_type;
         _mediaSubType = p_mediaItem->i_subtype;
@@ -189,6 +216,249 @@
 {
     return [NSString stringWithFormat:@"%@ — title: %@, ID: %lli, type: %i, artwork: %@",
             NSStringFromClass([self class]), _title, _libraryID, _mediaType, _artworkMRL];
+}
+
+#pragma mark - preference setters / getters
+
+- (int)setIntegerPreference:(int)value forKey:(enum vlc_ml_playback_pref)key
+{
+    return vlc_ml_media_set_playback_pref(_p_mediaLibrary, _libraryID, key, [[[NSNumber numberWithInt:value] stringValue] UTF8String]);
+}
+
+- (int)integerPreferenceForKey:(enum vlc_ml_playback_pref)key
+{
+    int ret = 0;
+    char *psz_value;
+
+    if (vlc_ml_media_get_playback_pref(_p_mediaLibrary, _libraryID, key, &psz_value) == VLC_SUCCESS && psz_value != NULL) {
+        ret = atoi(psz_value);
+        free(psz_value);
+    }
+
+    return ret;
+}
+
+- (int)setFloatPreference:(float)value forKey:(enum vlc_ml_playback_pref)key
+{
+    return vlc_ml_media_set_playback_pref(_p_mediaLibrary, _libraryID, key, [[[NSNumber numberWithFloat:value] stringValue] UTF8String]);
+}
+
+- (float)floatPreferenceForKey:(enum vlc_ml_playback_pref)key
+{
+    float ret = .0;
+    char *psz_value;
+
+    if (vlc_ml_media_get_playback_pref(_p_mediaLibrary, _libraryID, key, &psz_value) == VLC_SUCCESS && psz_value != NULL) {
+        ret = atof(psz_value);
+        free(psz_value);
+    }
+
+    return ret;
+}
+
+- (int)setStringPreference:(NSString *)value forKey:(enum vlc_ml_playback_pref)key
+{
+    return vlc_ml_media_set_playback_pref(_p_mediaLibrary, _libraryID, key, [value UTF8String]);
+}
+
+- (NSString *)stringPreferenceForKey:(enum vlc_ml_playback_pref)key
+{
+    NSString *ret = @"";
+    char *psz_value;
+
+    if (vlc_ml_media_get_playback_pref(_p_mediaLibrary, _libraryID, key, &psz_value) == VLC_SUCCESS && psz_value != NULL) {
+        ret = toNSStr(psz_value);
+        free(psz_value);
+    }
+
+    return ret;
+}
+
+#pragma mark - preference properties
+
+- (int)rating
+{
+    return [self integerPreferenceForKey:VLC_ML_PLAYBACK_PREF_RATING];
+}
+
+- (void)setRating:(int)rating
+{
+    [self setIntegerPreference:rating forKey:VLC_ML_PLAYBACK_PREF_RATING];
+}
+
+- (float)lastPlaybackPosition
+{
+    return [self floatPreferenceForKey:VLC_ML_PLAYBACK_PREF_PROGRESS];
+}
+
+- (void)setLastPlaybackPosition:(float)lastPlaybackPosition
+{
+    [self setFloatPreference:lastPlaybackPosition forKey:VLC_ML_PLAYBACK_PREF_PROGRESS];
+}
+
+- (float)lastPlaybackRate
+{
+    return [self floatPreferenceForKey:VLC_ML_PLAYBACK_PREF_SPEED];
+}
+
+- (void)setLastPlaybackRate:(float)lastPlaybackRate
+{
+    [self setFloatPreference:lastPlaybackRate forKey:VLC_ML_PLAYBACK_PREF_SPEED];
+}
+
+- (int)lastTitle
+{
+    return [self integerPreferenceForKey:VLC_ML_PLAYBACK_PREF_TITLE];
+}
+
+- (void)setLastTitle:(int)lastTitle
+{
+    [self setIntegerPreference:lastTitle forKey:VLC_ML_PLAYBACK_PREF_TITLE];
+}
+
+- (int)lastChapter
+{
+    return [self integerPreferenceForKey:VLC_ML_PLAYBACK_PREF_CHAPTER];
+}
+
+- (void)setLastChapter:(int)lastChapter
+{
+    [self setIntegerPreference:lastChapter forKey:VLC_ML_PLAYBACK_PREF_CHAPTER];
+}
+
+- (int)lastProgram
+{
+    return [self integerPreferenceForKey:VLC_ML_PLAYBACK_PREF_PROGRAM];
+}
+
+- (void)setLastProgram:(int)lastProgram
+{
+    [self setIntegerPreference:lastProgram forKey:VLC_ML_PLAYBACK_PREF_PROGRAM];
+}
+
+- (BOOL)seen
+{
+    return [self integerPreferenceForKey:VLC_ML_PLAYBACK_PREF_SEEN] > 0 ? YES : NO;
+}
+
+- (void)setSeen:(BOOL)seen
+{
+    [self setIntegerPreference:seen forKey:VLC_ML_PLAYBACK_PREF_SEEN];
+}
+
+- (int)lastVideoTrack
+{
+    return [self integerPreferenceForKey:VLC_ML_PLAYBACK_PREF_VIDEO_TRACK];
+}
+
+- (void)setLastVideoTrack:(int)lastVideoTrack
+{
+    [self setIntegerPreference:lastVideoTrack forKey:VLC_ML_PLAYBACK_PREF_VIDEO_TRACK];
+}
+
+- (NSString *)lastAspectRatio
+{
+    return [self stringPreferenceForKey:VLC_ML_PLAYBACK_PREF_ASPECT_RATIO];
+}
+
+- (void)setLastAspectRatio:(NSString *)lastAspectRatio
+{
+    [self setStringPreference:lastAspectRatio forKey:VLC_ML_PLAYBACK_PREF_ASPECT_RATIO];
+}
+
+- (NSString *)lastZoom
+{
+    return [self stringPreferenceForKey:VLC_ML_PLAYBACK_PREF_ZOOM];
+}
+
+- (void)setLastZoom:(NSString *)lastZoom
+{
+    [self setStringPreference:lastZoom forKey:VLC_ML_PLAYBACK_PREF_ZOOM];
+}
+
+- (NSString *)lastCrop
+{
+    return [self stringPreferenceForKey:VLC_ML_PLAYBACK_PREF_CROP];
+}
+
+- (void)setLastCrop:(NSString *)lastCrop
+{
+    [self setStringPreference:lastCrop forKey:VLC_ML_PLAYBACK_PREF_CROP];
+}
+
+- (NSString *)lastDeinterlaceFilter
+{
+    return [self stringPreferenceForKey:VLC_ML_PLAYBACK_PREF_DEINTERLACE];
+}
+
+- (void)setLastDeinterlaceFilter:(NSString *)lastDeinterlaceFilter
+{
+    [self setStringPreference:lastDeinterlaceFilter forKey:VLC_ML_PLAYBACK_PREF_DEINTERLACE];
+}
+
+- (NSString *)lastVideoFilters
+{
+    return [self stringPreferenceForKey:VLC_ML_PLAYBACK_PREF_VIDEO_FILTER];
+}
+
+- (void)setLastVideoFilters:(NSString *)lastVideoFilters
+{
+    [self setStringPreference:lastVideoFilters forKey:VLC_ML_PLAYBACK_PREF_VIDEO_FILTER];
+}
+
+- (int)lastAudioTrack
+{
+    return [self integerPreferenceForKey:VLC_ML_PLAYBACK_PREF_AUDIO_TRACK];
+}
+
+- (void)setLastAudioTrack:(int)lastAudioTrack
+{
+    [self setIntegerPreference:lastAudioTrack forKey:VLC_ML_PLAYBACK_PREF_AUDIO_TRACK];
+}
+
+- (float)lastGain
+{
+    return [self floatPreferenceForKey:VLC_ML_PLAYBACK_PREF_GAIN];
+}
+
+- (void)setLastGain:(float)lastGain
+{
+    [self setFloatPreference:lastGain forKey:VLC_ML_PLAYBACK_PREF_GAIN];
+}
+
+- (int)lastAudioDelay
+{
+    return [self integerPreferenceForKey:VLC_ML_PLAYBACK_PREF_AUDIO_DELAY];
+}
+
+- (void)setLastAudioDelay:(int)lastAudioDelay
+{
+    [self setIntegerPreference:lastAudioDelay forKey:VLC_ML_PLAYBACK_PREF_AUDIO_DELAY];
+}
+
+- (int)lastSubtitleTrack
+{
+    return [self integerPreferenceForKey:VLC_ML_PLAYBACK_PREF_SUBTITLE_TRACK];
+}
+
+- (void)setLastSubtitleTrack:(int)lastSubtitleTrack
+{
+    [self setIntegerPreference:lastSubtitleTrack forKey:VLC_ML_PLAYBACK_PREF_SUBTITLE_TRACK];
+}
+
+- (int)lastSubtitleDelay
+{
+    return [self integerPreferenceForKey:VLC_ML_PLAYBACK_PREF_SUBTITLE_DELAY];
+}
+
+- (void)setLastSubtitleDelay:(int)lastSubtitleDelay
+{
+    [self setIntegerPreference:lastSubtitleDelay forKey:VLC_ML_PLAYBACK_PREF_SUBTITLE_DELAY];
+}
+
+- (int)increasePlayCount
+{
+    return vlc_ml_media_increase_playcount(_p_mediaLibrary, _libraryID);
 }
 
 @end

@@ -94,6 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMediaLibraryMediaItem : NSObject
 
++ (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID;
 - (instancetype)initWithMediaItem:(struct vlc_ml_media_t *)mediaItem;
 
 @property (readonly) int64_t libraryID;
@@ -118,6 +119,27 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) VLCMediaLibraryShowEpisode *showEpisode;
 @property (readonly, nullable) VLCMediaLibraryMovie *movie;
 @property (readonly, nullable) VLCMediaLibraryAlbumTrack *albumTrack;
+
+@property (readwrite) int rating;
+@property (readwrite) float lastPlaybackPosition;
+@property (readwrite) float lastPlaybackRate;
+@property (readwrite) int lastTitle;
+@property (readwrite) int lastChapter;
+@property (readwrite) int lastProgram;
+@property (readwrite) BOOL seen;
+@property (readwrite) int lastVideoTrack;
+@property (readwrite) NSString *lastAspectRatio;
+@property (readwrite) NSString *lastZoom;
+@property (readwrite) NSString *lastCrop;
+@property (readwrite) NSString *lastDeinterlaceFilter;
+@property (readwrite) NSString *lastVideoFilters;
+@property (readwrite) int lastAudioTrack;
+@property (readwrite) float lastGain;
+@property (readwrite) int lastAudioDelay;
+@property (readwrite) int lastSubtitleTrack;
+@property (readwrite) int lastSubtitleDelay;
+
+- (int)increasePlayCount;
 
 @end
 

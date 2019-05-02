@@ -148,4 +148,9 @@
     return vlc_ml_remove_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
 
+- (int)clearHistory
+{
+    return vlc_ml_clear_history(_p_libraryInstance);
+}
+
 @end

@@ -40,6 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (int)unbanFolderWithFileURL:(NSURL *)fileURL;
 - (int)removeFolderWithFileURL:(NSURL *)fileURL;
 
+- (int)clearHistory;
+
 @end
 
 NS_ASSUME_NONNULL_END
