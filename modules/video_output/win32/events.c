@@ -159,8 +159,8 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_wind
 
     p_event->parent_window = parent_window;
 
-    _snwprintf( p_event->class_video, ARRAYSIZE(p_event->class_video),
-               TEXT("VLC video output %p"), (void *)p_event );
+    _snwprintf( p_event->class_video, ARRAY_SIZE(p_event->class_video),
+                TEXT("VLC video output %p"), (void *)p_event );
     return p_event;
 }
 
