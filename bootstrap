@@ -20,8 +20,12 @@ fi
 ACLOCAL_ARGS="-I m4 ${ACLOCAL_ARGS}"
 
 # Check for tools directory
-if test -d extras/tools/build/bin; then
-  PATH="`pwd`/extras/tools/build/bin:$PATH"
+if test -z ${VLC_TOOLS}; then
+  VLC_TOOLS=extras/tools/build
+fi
+if test -d ${VLC_TOOLS}/bin; then
+  VLC_TOOLS_PATH="$( cd "${VLC_TOOLS}/bin" ; pwd -P )"
+  PATH="$VLC_TOOLS_PATH:$PATH"
 fi
 
 ###
