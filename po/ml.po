@@ -6,15 +6,15 @@
 # akkuvijay <akkuvijay@aol.com>, 2014
 # Mujeeb Rahman <mujeebcpy@gmail.com>, 2018
 # Sajeer P <sajeerforyou@gmail.com>, 2016
-# Sreejith <sreejithpro@gmail.com>, 2009
+# Sreejith <sreejithpro@gmail.com>, 2009,2019
 # Hrishikesh <hrishi.kb@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-05-03 03:16+0200\n"
+"Last-Translator: Sreejith <sreejithpro@gmail.com>, 2019\n"
 "Language-Team: Malayalam (https://www.transifex.com/yaron/teams/16553/ml/)\n"
 "Language: ml\n"
 "MIME-Version: 1.0\n"
@@ -40,7 +40,7 @@ msgstr "വിഎല്‍സി മുന്‍ഗണനകള്‍"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
-msgstr "എല്ലാ താല്പര്യങ്ങളുടം കാണാനായി \"നൂതനമായ താല്പര്യങ്ങള്‍\" തിരഞ്ഞെടുക്കുക"
+msgstr "എല്ലാ ഓപ്ഷനുകളും കാണുന്നതിനു അട്വാന്‍സ്‌ട്‌ ഓപ്ഷന്‍ ക്ലിക്ക്‌ ചെയ്യുക"
 
 #: include/vlc_config_cat.h:38
 #: modules/gui/macosx/VLCSimplePrefsController.m:227
