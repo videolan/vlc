@@ -1838,6 +1838,8 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                 p_tk->fmt.audio.i_bitspersample = GetWLE( &p_wf->wBitsPerSample );
 
                 p_tk->fmt.i_extra            = GetWLE( &p_wf->cbSize );
+                if ( (size_t)p_tk->fmt.i_extra > p_tk->i_extra_data - sizeof( WAVEFORMATEX ) )
+                    p_tk->fmt.i_extra = 0;
                 if( p_tk->fmt.i_extra != 0 )
                 {
                     p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
