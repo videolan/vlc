@@ -12,8 +12,8 @@ set -e
 cd "$(dirname "$0")"
 
 if test "$#" != "0"; then
-  echo "Usage: $0"
-  echo "  Calls autoreconf to generate m4 macros and prepare Makefiles."
+  echo "Usage: $0" >&2
+  echo "  Calls autoreconf to generate m4 macros and prepare Makefiles." >&2
   exit 1
 fi
 
