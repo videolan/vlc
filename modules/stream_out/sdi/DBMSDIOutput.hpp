@@ -36,6 +36,7 @@ namespace sdi_sout
             virtual AbstractStream *Add(const es_format_t *); /* reimpl */
             virtual int Open(); /* impl */
             virtual int Process(); /* impl */
+            virtual int Send(AbstractStream *, block_t *); /* reimpl */
 
         protected:
             int ProcessVideo(picture_t *, block_t *);
@@ -51,14 +52,20 @@ namespace sdi_sout
             BMDTimeValue frameduration;
             vlc_tick_t lasttimestamp;
             /* XXX: workaround card clock drift */
-            vlc_tick_t offset;
+            struct
+            {
+                vlc_tick_t offset; /* > 0 if clock card is slower */
+                vlc_tick_t system_reference;
+                BMDTimeValue hardware_reference;
+            } clock;
             bool b_running;
-            int Start();
+            int Start(vlc_tick_t);
             const char *ErrorToString(long i_code);
             IDeckLinkDisplayMode * MatchDisplayMode(const video_format_t *,
                                                     BMDDisplayMode = bmdDisplayModeNotSupported);
             int doProcessVideo(picture_t *, block_t *);
             picture_t * CreateNoSignalPicture(const char*, const video_format_t *);
+            void checkClockDrift();
     };
 }
 
