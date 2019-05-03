@@ -365,7 +365,6 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 
     /* Flip, unless already flipped */
     if (p_track->i_flip == 1 && (int)p_track->f_rotation != 180) {
-    fprintf(stderr, "p_track->f_rotation %f flip %d\n", p_track->f_rotation, p_track->i_flip);
         video_transform_t transform = (video_transform_t)p_track->fmt.video.orientation;
         /* Flip first then rotate */
         p_track->fmt.video.orientation = ORIENT_HFLIPPED;
