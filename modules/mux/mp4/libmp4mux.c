@@ -972,8 +972,8 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     for (int i = 0; i < 3; i++)
         bo_add_32be(vide, 0);     // predefined;
 
-    bo_add_16be(vide, p_track->fmt.video.i_width);  // i_width
-    bo_add_16be(vide, p_track->fmt.video.i_height); // i_height
+    bo_add_16be(vide, p_track->fmt.video.i_visible_width);  // i_width
+    bo_add_16be(vide, p_track->fmt.video.i_visible_height); // i_height
 
     bo_add_32be(vide, 0x00480000);                // h 72dpi
     bo_add_32be(vide, 0x00480000);                // v 72dpi
