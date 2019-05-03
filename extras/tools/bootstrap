@@ -19,12 +19,6 @@ export LC_ALL=
 NEEDED=
 FOUND=
 
-if [ ! -f tools.mak ]
-then
-	echo "You must run me in ./extras/tools !"
-	exit 1
-fi
-
 check_version() {
     gotver=$2
     gotmajor=`echo $gotver|cut -d. -f1`
@@ -176,7 +170,10 @@ case `uname` in
      ;;
 esac
 
+BOOTSTRAP_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
+
 cat > Makefile << EOF
+TOOLS = $BOOTSTRAP_PATH
 MAKEFLAGS += -j$CPUS
 CMAKEFLAGS += --parallel=$CPUS
 PREFIX=\$(abspath ./build)
@@ -204,5 +201,5 @@ cat >> Makefile << EOF
 all: $TARGETS
 	@echo "You are ready to build VLC and its contribs"
 
-include tools.mak
+include \$(TOOLS)/tools.mak
 EOF

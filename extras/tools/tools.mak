@@ -2,7 +2,8 @@
 #
 # This file is under the same license as the vlc package.
 
-include packages.mak
+include $(TOOLS)/packages.mak
+TARBALLS := $(TOOLS)
 
 #
 # common rules
@@ -36,7 +37,7 @@ endif
 
 download_pkg = $(call download,$(VIDEOLAN)/$(2)/$(lastword $(subst /, ,$(@)))) || \
 	( $(call download,$(1)) && echo "Please upload package $(lastword $(subst /, ,$(@))) to our FTP" )  \
-	&& grep $(@) SHA512SUMS| $(SHA512SUM)
+	&& grep $(@) $(TOOLS)/SHA512SUMS| $(SHA512SUM)
 
 UNPACK = $(RM) -R $@ \
     $(foreach f,$(filter %.tar.gz %.tgz,$^), && tar xvzfo $(f)) \
@@ -91,7 +92,7 @@ cmake-$(CMAKE_VERSION).tar.gz:
 
 cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(UNPACK)
-	$(APPLY) cmake-msys-FindPkg.patch
+	$(APPLY) $(TOOLS)/cmake-msys-FindPkg.patch
 	$(MOVE)
 
 .buildcmake: cmake
@@ -126,10 +127,10 @@ libtool-$(LIBTOOL_VERSION).tar.gz:
 libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(UNPACK)
 	(cd $(UNPACK_DIR) && chmod u+w build-aux/ltmain.sh)
-	$(APPLY) libtool-2.4.6-bitcode.patch
-	$(APPLY) libtool-2.4.6-san.patch
-	$(APPLY) libtool-2.4.6-clang-libs.patch
-	$(APPLY) libtool-2.4.6-response-files.patch
+	$(APPLY) $(TOOLS)/libtool-2.4.6-bitcode.patch
+	$(APPLY) $(TOOLS)/libtool-2.4.6-san.patch
+	$(APPLY) $(TOOLS)/libtool-2.4.6-clang-libs.patch
+	$(APPLY) $(TOOLS)/libtool-2.4.6-response-files.patch
 	(cd $(UNPACK_DIR) && autoreconf)
 	$(MOVE)
 
@@ -201,7 +202,7 @@ automake-$(AUTOMAKE_VERSION).tar.gz:
 
 automake: automake-$(AUTOMAKE_VERSION).tar.gz
 	$(UNPACK)
-	$(APPLY) automake-clang.patch
+	$(APPLY) $(TOOLS)/automake-clang.patch
 	$(MOVE)
 
 .buildautomake: automake .autoconf
@@ -219,8 +220,8 @@ m4-$(M4_VERSION).tar.gz:
 
 m4: m4-$(M4_VERSION).tar.gz
 	$(UNPACK)
-	$(APPLY) bison-macOS-c41f233c.patch
-	$(APPLY) bison-macOS-7df04f9.patch
+	$(APPLY) $(TOOLS)/bison-macOS-c41f233c.patch
+	$(APPLY) $(TOOLS)/bison-macOS-7df04f9.patch
 	$(MOVE)
 
 .buildm4: m4
@@ -272,7 +273,7 @@ ragel-$(RAGEL_VERSION).tar.gz:
 
 ragel: ragel-$(RAGEL_VERSION).tar.gz
 	$(UNPACK)
-	$(APPLY) ragel-6.8-javacodegen.patch
+	$(APPLY) $(TOOLS)/ragel-6.8-javacodegen.patch
 	$(MOVE)
 
 
@@ -347,8 +348,8 @@ bison-$(BISON_VERSION).tar.xz:
 
 bison: bison-$(BISON_VERSION).tar.xz
 	$(UNPACK)
-	$(APPLY) bison-macOS-c41f233c.patch
-	$(APPLY) bison-macOS-7df04f9.patch
+	$(APPLY) $(TOOLS)/bison-macOS-c41f233c.patch
+	$(APPLY) $(TOOLS)/bison-macOS-7df04f9.patch
 	$(MOVE)
 
 .buildbison: bison
