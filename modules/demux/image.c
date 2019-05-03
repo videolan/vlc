@@ -673,6 +673,7 @@ static vlc_fourcc_t Detect(stream_t *s)
             ssize_t val = vlc_stream_Peek(s, &peek, img->marker_size);
             if (val < 0)
                 continue;
+            peek_size = val;
         }
 
         assert(img->marker_size > 0); /* ensure peek is a valid pointer */
