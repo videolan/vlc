@@ -36,11 +36,22 @@
 
 int vlc_memfd(void)
 {
+    int fd;
 #ifdef HAVE_MEMFD_CREATE
-    int fd = memfd_create(PACKAGE_NAME"-memfd",
-                          MFD_CLOEXEC | MFD_ALLOW_SEALING);
+    fd = memfd_create(PACKAGE_NAME"-memfd", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd != -1 || errno != ENOSYS)
         return fd;
 #endif
-    return open("/tmp", O_RDWR | O_CLOEXEC | O_TMPFILE, S_IRUSR | S_IWUSR);
+
+    /* Fallback to open with O_TMPFILE, */
+    fd = open("/tmp", O_RDWR | O_CLOEXEC | O_TMPFILE, S_IRUSR | S_IWUSR);
+    if (fd != -1 || (errno != EISDIR && errno != ENOENT))
+        return fd;
+
+    /* Fallback to POSIX implementation if O_TMPFILE is not supported */
+    char bufpath[] = "/tmp/"PACKAGE_NAME"XXXXXX";
+    fd = vlc_mkstemp(bufpath);
+    if (fd != -1)
+        unlink(bufpath);
+    return fd;
 }
