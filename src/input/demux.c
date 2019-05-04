@@ -503,8 +503,8 @@ static bool demux_filter_enable_disable(demux_t *p_demux,
     struct vlc_demux_private *priv = vlc_stream_Private(p_demux);
 
     if ( psz_demux &&
-        (strcmp(module_get_name(priv->module, false), psz_demux) == 0
-      || strcmp(module_get_name(priv->module, true), psz_demux) == 0) )
+        (strcmp(module_GetShortName(priv->module), psz_demux) == 0
+      || strcmp(module_GetLongName(priv->module), psz_demux) == 0) )
     {
         demux_Control( p_demux,
                        b_enable ? DEMUX_FILTER_ENABLE : DEMUX_FILTER_DISABLE );

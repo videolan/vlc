@@ -249,7 +249,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
         PrefsItemData *module_data = new PrefsItemData( this );
         module_data->i_type = PrefsItemData::TYPE_MODULE;
         module_data->psz_shortcut = strdup( module_get_object( p_module ) );
-        module_data->name = qfut( module_get_name( p_module, false ) );
+        module_data->name = qfut( module_GetShortName( p_module ) );
         module_data->help.clear();
         module_data->p_module = p_module;
         const char *psz_help = module_get_help( p_module );

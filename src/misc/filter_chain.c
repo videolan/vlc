@@ -277,7 +277,7 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     vlc_picture_chain_Init( &chained->pending );
 
     msg_Dbg( chain->obj, "Filter '%s' (%p) appended to chain",
-             (name != NULL) ? name : module_get_name(filter->p_module, false),
+             (name != NULL) ? name : module_GetShortName(filter->p_module),
              (void *)filter );
     return filter;
 

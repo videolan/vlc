@@ -504,7 +504,7 @@ inline void VLCProfileEditor::registerFilters()
 
         if ( !listWidget ) continue;
 
-        item = new QListWidgetItem( module_get_name( p_module, true ) );
+        item = new QListWidgetItem( module_GetLongName( p_module ) );
         item->setCheckState( Qt::Unchecked );
         item->setToolTip( QString( module_get_help( p_module ) ) );
         item->setData( Qt::UserRole, QString( module_get_object( p_module ) ) );

@@ -623,7 +623,7 @@
 @implementation VLCTreePluginItem
 - (id)initWithPlugin:(module_t *)plugin
 {
-    NSString * name = _NS(module_get_name(plugin, false));
+    NSString * name = _NS(module_GetShortName(plugin));
     if (self = [super initWithName:name]) {
         _configItems = module_config_get(plugin, &_configSize);
         //_plugin = plugin;

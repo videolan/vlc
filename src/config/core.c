@@ -282,7 +282,7 @@ static ssize_t config_ListModules (const char *cap, char ***restrict values,
     {
         vals[i] = strdup (module_get_object (list[i - 1]));
         txts[i] = strdup (module_gettext (list[i - 1],
-                               module_get_name (list[i - 1], true)));
+                               module_GetLongName (list[i - 1])));
         if( !vals[i] || !txts[i])
             goto error;
     }
