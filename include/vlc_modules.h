@@ -205,6 +205,7 @@ VLC_API const char * module_get_object(const module_t *m) VLC_USED;
  * \return the short or long name of the module
  */
 VLC_API const char *module_get_name(const module_t *m, bool longname) VLC_USED;
+#define module_GetShortName( m ) module_get_name( m, false )
 #define module_GetLongName( m ) module_get_name( m, true )
 
 /**
