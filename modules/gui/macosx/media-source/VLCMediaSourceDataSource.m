@@ -42,14 +42,12 @@
 {
     self = [super init];
     if (self) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self lazyLoadMediaSources];
-        });
+        _mediaDiscovery = @[];
     }
     return self;
 }
 
-- (void)lazyLoadMediaSources
+- (void)loadMediaSources
 {
     NSArray *mediaDiscoveryForLAN = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_LAN];
     NSUInteger count = mediaDiscoveryForLAN.count;
@@ -61,6 +59,7 @@
         }
     }
     _mediaDiscovery = mediaDiscoveryForLAN;
+    [self.collectionView reloadData];
 }
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView

@@ -128,6 +128,7 @@ static const float f_playlist_row_height = 72.;
     [_libraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
 
     _mediaSourceDataSource = [[VLCMediaSourceDataSource alloc] init];
+    _mediaSourceDataSource.collectionView = _mediaSourceCollectionView;
     _mediaSourceCollectionView.dataSource = _mediaSourceDataSource;
     _mediaSourceCollectionView.delegate = _mediaSourceDataSource;
     [_mediaSourceCollectionView registerClass:[VLCMediaSourceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceCellIdentifier];
@@ -256,6 +257,7 @@ static const float f_playlist_row_height = 72.;
         default:
             _mediaSourceScrollView.hidden = NO;
             _libraryCollectionView.hidden = YES;
+            [_mediaSourceDataSource loadMediaSources];
             [_mediaSourceCollectionView reloadData];
             break;
     }

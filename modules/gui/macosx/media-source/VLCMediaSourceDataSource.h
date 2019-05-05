@@ -32,6 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCMediaSourceDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
 
 @property (readwrite) VLCMediaSourceMode mediaSourceMode;
+@property (readwrite) NSCollectionView *collectionView;
+
+- (void)loadMediaSources;
 
 @end
 
