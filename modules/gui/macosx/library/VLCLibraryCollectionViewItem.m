@@ -70,6 +70,9 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
     self.annotationTextField.font = [NSFont VLClibraryCellAnnotationFont];
     self.annotationTextField.textColor = [NSColor VLClibraryAnnotationColor];
     self.annotationTextField.backgroundColor = [NSColor VLClibraryAnnotationBackgroundColor];
+    self.unplayedIndicatorTextField.stringValue = _NS("NEW");
+    self.unplayedIndicatorTextField.font = [NSFont VLClibraryHighlightCellHighlightLabelFont];
+    self.unplayedIndicatorTextField.textColor = [NSColor VLClibraryHighlightColor];
 
     if (@available(macOS 10_14, *)) {
         [[NSApplication sharedApplication] addObserver:self
@@ -168,6 +171,8 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
     } else {
         _progressIndicator.hidden = YES;
     }
+
+    _unplayedIndicatorTextField.hidden = _representedMediaItem.playCount > 0 ? YES : NO;
 }
 
 #pragma mark - actions

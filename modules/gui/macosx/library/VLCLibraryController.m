@@ -102,6 +102,9 @@
     input_item_t *p_inputItem = vlc_ml_get_input_item(_p_libraryInstance, mediaItem.libraryID);
     int ret = [[[VLCMain sharedInstance] playlistController] addInputItem:p_inputItem atPosition:-1 startPlayback:playImmediately];
     input_item_Release(p_inputItem);
+    if (ret == VLC_SUCCESS) {
+        [mediaItem increasePlayCount];
+    }
     return ret;
 }
 
