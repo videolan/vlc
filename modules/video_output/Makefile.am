@@ -16,6 +16,8 @@ OPENGL_COMMONLIBS = $(LIBPLACEBO_LIBS)
 
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp \
+                                      stream_out/sdi/Ancillary.cpp \
+                                      stream_out/sdi/Ancillary.hpp \
                                       stream_out/sdi/V210.cpp \
                                       stream_out/sdi/V210.hpp
 libdecklinkoutput_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_decklinkoutput)

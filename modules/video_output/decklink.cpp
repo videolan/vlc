@@ -49,6 +49,7 @@
 
 #include "../access/vlc_decklink.h"
 #include "../stream_out/sdi/V210.hpp"
+#include "../stream_out/sdi/Ancillary.hpp"
 #include <DeckLinkAPIDispatch.cpp>
 
 #define FRAME_SIZE 1920
@@ -771,66 +772,6 @@ error:
 /*****************************************************************************
  * Video
  *****************************************************************************/
-
-static inline void put_le32(uint8_t **p, uint32_t d)
-{
-    SetDWLE(*p, d);
-    (*p) += 4;
-}
-
-static void send_AFD(uint8_t afdcode, uint8_t ar, uint8_t *buf)
-{
-    const size_t len = 6 /* vanc header */ + 8 /* AFD data */ + 1 /* csum */;
-    const size_t s = ((len + 5) / 6) * 6; // align for v210
-
-    uint16_t afd[s];
-
-    afd[0] = 0x000;
-    afd[1] = 0x3ff;
-    afd[2] = 0x3ff;
-    afd[3] = 0x41; // DID
-    afd[4] = 0x05; // SDID
-    afd[5] = 8; // Data Count
-
-    int bar_data_flags = 0;
-    int bar_data_val1 = 0;
-    int bar_data_val2 = 0;
-
-    afd[ 6] = ((afdcode & 0x0F) << 3) | ((ar & 0x01) << 2); /* SMPTE 2016-1 */
-    afd[ 7] = 0; // reserved
-    afd[ 8] = 0; // reserved
-    afd[ 9] = bar_data_flags << 4;
-    afd[10] = bar_data_val1 << 8;
-    afd[11] = bar_data_val1 & 0xff;
-    afd[12] = bar_data_val2 << 8;
-    afd[13] = bar_data_val2 & 0xff;
-
-    /* parity bit */
-    for (size_t i = 3; i < len - 1; i++)
-        afd[i] |= vlc_parity((unsigned)afd[i]) ? 0x100 : 0x200;
-
-    /* vanc checksum */
-    uint16_t vanc_sum = 0;
-    for (size_t i = 3; i < len - 1; i++) {
-        vanc_sum += afd[i];
-        vanc_sum &= 0x1ff;
-    }
-
-    afd[len - 1] = vanc_sum | ((~vanc_sum & 0x100) << 1);
-
-    /* pad */
-    for (size_t i = len; i < s; i++)
-        afd[i] = 0x040;
-
-    /* convert to v210 and write into VANC */
-    for (size_t w = 0; w < s / 6 ; w++) {
-        put_le32(&buf, afd[w*6+0] << 10);
-        put_le32(&buf, afd[w*6+1] | (afd[w*6+2] << 20));
-        put_le32(&buf, afd[w*6+3] << 10);
-        put_le32(&buf, afd[w*6+4] | (afd[w*6+5] << 20));
-    }
-}
-
 static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
                          vlc_tick_t date)
 {
@@ -904,7 +845,9 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
             msg_Err(vd, "Failed to get VBI line %d: %d", line, result);
             goto end;
         }
-        send_AFD(sys->video.afd, sys->video.ar, (uint8_t*)buf);
+
+        sdi::AFD afd(sys->video.afd, sys->video.ar);
+        afd.FillBuffer(reinterpret_cast<uint8_t*>(buf), stride);
 
         sdi::V210::Convert(picture, stride, frame_bytes);
 
