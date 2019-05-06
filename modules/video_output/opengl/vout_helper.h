@@ -34,6 +34,22 @@
 #ifdef HAVE_LIBPLACEBO
 #include "../placebo_utils.h"
 
+
+#if PL_API_VER >= 10
+#define add_desat_params() \
+    add_float("desat-strength", pl_color_map_default_params.desaturation_strength, \
+              DESAT_STRENGTH_TEXT, DESAT_STRENGTH_LONGTEXT, false) \
+    add_float("desat-exponent", pl_color_map_default_params.desaturation_exponent, \
+              DESAT_EXPONENT_TEXT, DESAT_EXPONENT_LONGTEXT, false) \
+    add_float("desat-base", pl_color_map_default_params.desaturation_base, \
+              DESAT_BASE_TEXT, DESAT_BASE_LONGTEXT, false) \
+    add_obsolete_string("tone-mapping-desat")
+#else
+#define add_desat_params() \
+    add_float("tone-mapping-desat", pl_color_map_default_params.tone_mapping_desaturate, \
+              TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT, false)
+#endif
+
 #define add_glopts_placebo() \
     set_section(N_("Colorspace conversion"), NULL) \
     add_integer("rendering-intent", pl_color_map_default_params.intent, \
@@ -47,10 +63,9 @@
     add_integer("tone-mapping", PL_TONE_MAPPING_HABLE, \
                 TONEMAPPING_TEXT, TONEMAPPING_LONGTEXT, false) \
             change_integer_list(tone_values, tone_text) \
+    add_desat_params() \
     add_float("tone-mapping-param", pl_color_map_default_params.tone_mapping_param, \
               TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT, true) \
-    add_float("tone-mapping-desat", pl_color_map_default_params.tone_mapping_desaturate, \
-              TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT, false) \
     add_bool("tone-mapping-warn", false, GAMUT_WARN_TEXT, GAMUT_WARN_LONGTEXT, false) \
     set_section(N_("Dithering"), NULL) \
     add_integer("dither-algo", -1, DITHER_TEXT, DITHER_LONGTEXT, false) \

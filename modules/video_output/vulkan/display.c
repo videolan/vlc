@@ -603,8 +603,19 @@ vlc_module_begin () set_shortname ("Vulkan")
             change_integer_list(tone_values, tone_text)
     add_float("tone-mapping-param", pl_color_map_default_params.tone_mapping_param,
             TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT, true)
+#if PL_API_VER >= 10
+    add_float("desat-strength", pl_color_map_default_params.desaturation_strength,
+            DESAT_STRENGTH_TEXT, DESAT_STRENGTH_LONGTEXT, false)
+    add_float("desat-exponent", pl_color_map_default_params.desaturation_exponent,
+            DESAT_EXPONENT_TEXT, DESAT_EXPONENT_LONGTEXT, false)
+    add_float("desat-base", pl_color_map_default_params.desaturation_base,
+            DESAT_BASE_TEXT, DESAT_BASE_LONGTEXT, false)
+    add_float("max-boost", pl_color_map_default_params.max_boost,
+            MAX_BOOST_TEXT, MAX_BOOST_LONGTEXT, false)
+#else
     add_float("tone-mapping-desat", pl_color_map_default_params.tone_mapping_desaturate,
             TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT, false)
+#endif
     add_bool("gamut-warning", false, GAMUT_WARN_TEXT, GAMUT_WARN_LONGTEXT, true)
     add_integer_with_range("peak-frames", pl_color_map_default_params.peak_detect_frames,
             0, 255, PEAK_FRAMES_TEXT, PEAK_FRAMES_LONGTEXT, false)
@@ -691,7 +702,14 @@ static void UpdateParams(vout_display_t *vd)
     sys->color_map.intent = var_InheritInteger(vd, "intent");
     sys->color_map.tone_mapping_algo = var_InheritInteger(vd, "tone-mapping");
     sys->color_map.tone_mapping_param = var_InheritFloat(vd, "tone-mapping-param");
+#if PL_API_VER >= 10
+    sys->color_map.desaturation_strength = var_InheritFloat(vd, "desat-strength");
+    sys->color_map.desaturation_exponent = var_InheritFloat(vd, "desat-exponent");
+    sys->color_map.desaturation_base = var_InheritFloat(vd, "desat-base");
+    sys->color_map.max_boost = var_InheritFloat(vd, "max-boost");
+#else
     sys->color_map.tone_mapping_desaturate = var_InheritFloat(vd, "tone-mapping-desat");
+#endif
     sys->color_map.gamut_warning = var_InheritBool(vd, "gamut-warning");
     sys->color_map.peak_detect_frames = var_InheritInteger(vd, "peak-frames");
     sys->color_map.scene_threshold = var_InheritFloat(vd, "scene-threshold");

@@ -165,6 +165,18 @@ static const char * const tone_text[] = {
 #define TONEMAP_DESAT_TEXT "Tone-mapping desaturation coefficient"
 #define TONEMAP_DESAT_LONGTEXT "How strongly to desaturate bright spectral colors towards white. 0.0 disables this behavior."
 
+#define DESAT_STRENGTH_TEXT "Desaturation strength"
+#define DESAT_STRENGTH_LONGTEXT "How strongly to desaturate bright spectral colors towards white. 0.0 disables this behavior, 1.0 enables full desaturation (hollywood-style)"
+
+#define DESAT_EXPONENT_TEXT "Desaturation exponent"
+#define DESAT_EXPONENT_LONGTEXT "Controls the steepness of the desaturation curve. If you set this to 0.0, the curve will be flat, i.e. desaturation always enabled (hollywood-style)."
+
+#define DESAT_BASE_TEXT "Desaturation base"
+#define DESAT_BASE_LONGTEXT "Controls the starting offset of the desaturation curve. Brightness values below this base will always be colorimetrically tone mapped (never desaturated)."
+
+#define MAX_BOOST_TEXT "Maximum brightness boost"
+#define MAX_BOOST_LONGTEXT "Maximum allowed brightness boost to compensate for dark scenes. A value of 1.0 means no brightness boost is allowed."
+
 #define GAMUT_WARN_TEXT "Highlight clipped pixels"
 #define GAMUT_WARN_LONGTEXT "Debugging tool to indicate which pixels were clipped as part of the tone mapping process."
 
