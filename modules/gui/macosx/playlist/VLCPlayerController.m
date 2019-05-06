@@ -175,9 +175,9 @@ static void cb_player_rate_changed(vlc_player_t *p_player, float newRateValue, v
     });
 }
 
-static void cb_player_capabilities_changed(vlc_player_t *p_player, int newCapabilities, void *p_data)
+static void cb_player_capabilities_changed(vlc_player_t *p_player, int oldCapabilities, int newCapabilities, void *p_data)
 {
-    VLC_UNUSED(p_player);
+    VLC_UNUSED(p_player); VLC_UNUSED(oldCapabilities);
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
         [playerController capabilitiesChanged:newCapabilities];
