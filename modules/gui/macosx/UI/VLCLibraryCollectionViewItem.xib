@@ -55,7 +55,6 @@
                     <constraints>
                         <constraint firstAttribute="bottom" secondItem="dFt-oZ-h9P" secondAttribute="bottom" id="4q3-3S-7PA"/>
                         <constraint firstItem="S3I-5Z-qgS" firstAttribute="centerX" secondItem="2aB-sB-hfY" secondAttribute="centerX" id="Seo-tS-piW"/>
-                        <constraint firstAttribute="height" constant="168" id="Vrp-AD-scC"/>
                         <constraint firstItem="S3I-5Z-qgS" firstAttribute="centerY" secondItem="2aB-sB-hfY" secondAttribute="centerY" id="ZWU-oW-OVa"/>
                         <constraint firstItem="dFt-oZ-h9P" firstAttribute="leading" secondItem="2aB-sB-hfY" secondAttribute="leading" id="gTe-sx-hdP"/>
                         <constraint firstAttribute="trailing" secondItem="dFt-oZ-h9P" secondAttribute="trailing" id="kBI-UU-vnc"/>
@@ -101,13 +100,14 @@
                 </textField>
             </subviews>
             <constraints>
+                <constraint firstItem="2aB-sB-hfY" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="3Ah-0T-rA9"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="OBS-Eh-1mT" secondAttribute="trailing" id="457-oy-EbD"/>
                 <constraint firstItem="Ubz-8I-W2F" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="7" id="8Qf-Un-Gdl"/>
+                <constraint firstItem="VAn-gF-QiZ" firstAttribute="top" secondItem="OBS-Eh-1mT" secondAttribute="bottom" constant="-1" id="ALi-0z-Mza"/>
                 <constraint firstAttribute="trailing" secondItem="u2r-zy-XEW" secondAttribute="trailing" id="Dd7-va-0UJ"/>
                 <constraint firstItem="u2r-zy-XEW" firstAttribute="centerY" secondItem="VAn-gF-QiZ" secondAttribute="centerY" id="H5N-j9-THf"/>
                 <constraint firstAttribute="bottom" secondItem="VAn-gF-QiZ" secondAttribute="bottom" id="Kp0-Hx-3Ek"/>
                 <constraint firstItem="VAn-gF-QiZ" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="QUW-dn-Fbc"/>
-                <constraint firstItem="2aB-sB-hfY" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="YP6-lv-ECe"/>
                 <constraint firstAttribute="trailing" secondItem="Ubz-8I-W2F" secondAttribute="trailing" constant="20" id="ZVz-SL-rxZ"/>
                 <constraint firstItem="tm2-NW-WsZ" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="7" id="cvk-A5-enS"/>
                 <constraint firstItem="tm2-NW-WsZ" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="12" id="fH0-Om-7gV"/>

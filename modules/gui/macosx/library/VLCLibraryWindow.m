@@ -128,13 +128,18 @@ static const float f_playlist_row_height = 72.;
 
     _libraryDataSource = [[VLCLibraryDataSource alloc] init];
     _libraryDataSource.libraryModel = mainInstance.libraryController.libraryModel;
-    _libraryCollectionView.dataSource = _libraryDataSource;
-    _libraryCollectionView.delegate = _libraryDataSource;
-    [_libraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
-    [_libraryCollectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
+    _libraryDataSource.recentMediaCollectionView = _recentVideoLibraryCollectionView;
+    _libraryDataSource.libraryMediaCollectionView = _videoLibraryCollectionView;
+    _videoLibraryCollectionView.dataSource = _libraryDataSource;
+    _videoLibraryCollectionView.delegate = _libraryDataSource;
+    [_videoLibraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [_videoLibraryCollectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
                forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
                            withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
-    [(NSCollectionViewFlowLayout *)_libraryCollectionView.collectionViewLayout setHeaderReferenceSize:[VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize]];
+    [(NSCollectionViewFlowLayout *)_videoLibraryCollectionView.collectionViewLayout setHeaderReferenceSize:[VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize]];
+    _recentVideoLibraryCollectionView.dataSource = _libraryDataSource;
+    _recentVideoLibraryCollectionView.delegate = _libraryDataSource;
+    [_recentVideoLibraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
 
     _mediaSourceDataSource = [[VLCMediaSourceDataSource alloc] init];
     _mediaSourceDataSource.collectionView = _mediaSourceCollectionView;
@@ -252,20 +257,22 @@ static const float f_playlist_row_height = 72.;
         case 0:
             _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeVideo;
             _mediaSourceScrollView.hidden = YES;
-            _libraryCollectionView.hidden = NO;
-            [_libraryCollectionView reloadData];
+            _videoLibraryStackView.hidden = NO;
+            [_videoLibraryCollectionView reloadData];
+            [_recentVideoLibraryCollectionView reloadData];
             break;
 
         case 1:
             _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeAudio;
             _mediaSourceScrollView.hidden = YES;
-            _libraryCollectionView.hidden = NO;
-            [_libraryCollectionView reloadData];
+            _videoLibraryStackView.hidden = NO;
+            [_videoLibraryCollectionView reloadData];
+            [_recentVideoLibraryCollectionView reloadData];
             break;
 
         default:
             _mediaSourceScrollView.hidden = NO;
-            _libraryCollectionView.hidden = YES;
+            _videoLibraryStackView.hidden = YES;
             [_mediaSourceDataSource loadMediaSources];
             [_mediaSourceCollectionView reloadData];
             break;
@@ -342,7 +349,8 @@ static const float f_playlist_row_height = 72.;
 #pragma mark - library representation and interaction
 - (void)updateLibraryRepresentation:(NSNotification *)aNotification
 {
-    [_libraryCollectionView reloadData];
+    [_videoLibraryCollectionView reloadData];
+    [_recentVideoLibraryCollectionView reloadData];
 }
 
 #pragma mark -

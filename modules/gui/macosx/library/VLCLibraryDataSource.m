@@ -34,7 +34,7 @@
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
 {
-    if (_libraryModel.numberOfRecentMedia && section == 0) {
+    if (collectionView == self.recentMediaCollectionView) {
         return [_libraryModel numberOfRecentMedia];
     }
 
@@ -55,7 +55,7 @@
 
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
 {
-    return _libraryModel.numberOfRecentMedia > 0 ? 2 : 1;
+    return 1;
 }
 
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
@@ -64,7 +64,7 @@
     VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
 
     NSArray *mediaArray;
-    if (indexPath.section == 0 && _libraryModel.numberOfRecentMedia > 0) {
+    if (collectionView == self.recentMediaCollectionView) {
         mediaArray = [_libraryModel listOfRecentMedia];
     } else {
         switch (_libraryModel.libraryMode) {
@@ -95,7 +95,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     VLCLibraryCollectionViewSupplementaryElementView *view = [collectionView makeSupplementaryViewOfKind:kind
                                                                                           withIdentifier:VLCLibrarySupplementaryElementViewIdentifier
                                                                                             forIndexPath:indexPath];
-    if (indexPath.section == 0 && _libraryModel.numberOfRecentMedia > 0) {
+    if (collectionView == self.recentMediaCollectionView) {
         view.stringValue = _NS("Recent");
     } else {
         view.stringValue = _NS("Library");
