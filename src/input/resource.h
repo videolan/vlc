@@ -60,6 +60,8 @@ void input_resource_HoldVouts( input_resource_t *, vout_thread_t ***, size_t * )
  */
 void input_resource_Terminate( input_resource_t * );
 
+void input_resource_StopFreeVout( input_resource_t * );
+
 /**
  * This function holds the input_resource_t itself
  */

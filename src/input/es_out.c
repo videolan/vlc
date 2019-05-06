@@ -46,6 +46,7 @@
 #include "decoder.h"
 #include "es_out.h"
 #include "event.h"
+#include "resource.h"
 #include "info.h"
 #include "item.h"
 
@@ -748,10 +749,9 @@ static void EsOutStopFreeVout( es_out_t *out )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
 
-    /* Clean up vout after user action (in active mode only).
-     * FIXME it does not work well with multiple video windows */
+    /* Clean up vout after user action (in active mode only). */
     if( p_sys->b_active )
-        input_resource_TerminateVout( input_priv(p_sys->p_input)->p_resource );
+        input_resource_StopFreeVout( input_priv(p_sys->p_input)->p_resource );
 }
 
 static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )

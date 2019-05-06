@@ -1950,9 +1950,6 @@ static void DeleteDecoder( decoder_t * p_dec )
                 /* Reset the cancel state that was set before joining the decoder
                  * thread */
                 vout_Cancel(vout, false);
-                vout_FlushAll(vout);
-                vout_FlushSubpictureChannel(vout, -1);
-                vout_Stop(vout);
                 input_SendEventVout(p_owner->p_input,
                     &(struct vlc_input_event_vout) {
                         .action = VLC_INPUT_EVENT_VOUT_DELETED,
