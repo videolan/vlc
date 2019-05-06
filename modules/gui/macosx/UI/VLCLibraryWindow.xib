@@ -17,7 +17,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="480" height="363"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="800"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="363"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -158,6 +158,7 @@
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="Vry-OZ-ySI" firstAttribute="leading" secondItem="dus-WQ-AmE" secondAttribute="leading" constant="20" id="6iz-2G-xXO"/>
+                                    <constraint firstItem="cih-xp-HmY" firstAttribute="leading" secondItem="8zF-Wo-H79" secondAttribute="trailing" constant="45" id="8Dc-DN-myV"/>
                                     <constraint firstItem="qmL-Ar-cj1" firstAttribute="top" secondItem="Vry-OZ-ySI" secondAttribute="bottom" constant="24" id="De2-Wf-QsC"/>
                                     <constraint firstItem="nAW-KH-ipk" firstAttribute="leading" secondItem="dus-WQ-AmE" secondAttribute="leading" constant="20" id="EUp-9J-Fid"/>
                                     <constraint firstItem="Z7y-D0-11Q" firstAttribute="top" secondItem="qmL-Ar-cj1" secondAttribute="bottom" constant="8" id="GIh-g3-rqJ"/>
@@ -361,7 +362,7 @@
                         <subviews>
                             <collectionView selectable="YES" id="hnE-Hj-MZo">
                                 <rect key="frame" x="0.0" y="0.0" width="242" height="444"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="20" minimumLineSpacing="20" scrollDirection="horizontal" id="N2a-bI-WQc">
                                     <size key="itemSize" width="532" height="404"/>
                                     <edgeInsets key="sectionInset" left="20" right="20" top="20" bottom="20"/>
