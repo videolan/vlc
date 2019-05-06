@@ -165,6 +165,7 @@ struct vout_display_sys_t
 
     /* outside rendering */
     void *outside_opaque;
+    void (*cleanupDeviceCb)(void* opaque);
     void (*swapCb)(void* opaque);
     void (*endRenderCb)(void* opaque);
     bool (*starRenderCb)(void* opaque);
@@ -1359,6 +1360,9 @@ static void Direct3D9Destroy(vout_display_sys_t *sys)
         FreeLibrary(sys->hxdll);
         sys->hxdll = NULL;
     }
+
+    if ( sys->cleanupDeviceCb )
+        sys->cleanupDeviceCb( sys->outside_opaque );
 }
 
 /**
@@ -1611,29 +1615,23 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    IDirect3DDevice9 *d3d9_device = var_InheritAddress(vd, "vout-engine-ctx");
-    if (d3d9_device != NULL)
-    {
-        if (D3D9_CreateExternal(vd, &sys->hd3d, d3d9_device)) {
-            msg_Err(vd, "External Direct3D9 could not be used");
-            free(sys);
-            return VLC_EGENERIC;
-        }
-    }
-    else if (D3D9_Create(vd, &sys->hd3d)) {
-        msg_Err(vd, "Direct3D9 could not be initialized");
-        free(sys);
-        return VLC_EGENERIC;
-    }
-
     if (!sys->swapCb || !sys->starRenderCb || !sys->endRenderCb)
     {
         /* use our own callbacks, since there isn't any external ones */
         sys->outside_opaque = vd;
-        sys->swapCb         = Swap;
-        sys->starRenderCb   = StartRendering;
-        sys->endRenderCb    = EndRendering;
-        sys->resizeCb       = NULL;
+        sys->cleanupDeviceCb     = NULL;
+        sys->swapCb              = Swap;
+        sys->starRenderCb        = StartRendering;
+        sys->endRenderCb         = EndRendering;
+        sys->resizeCb            = NULL;
+    }
+
+    if ( D3D9_Create( vd, &sys->hd3d ) ) {
+        msg_Err( vd, "Direct3D9 could not be initialized" );
+        if ( sys->cleanupDeviceCb )
+            sys->cleanupDeviceCb( sys->outside_opaque );
+        free( sys );
+        return VLC_EGENERIC;
     }
 
     sys->hxdll = Direct3D9LoadShaderLibrary();
