@@ -36,6 +36,7 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryMenuController.h"
+#import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 
 #import "media-source/VLCMediaSourceCollectionViewItem.h"
 #import "media-source/VLCMediaSourceDataSource.h"
@@ -83,6 +84,10 @@ static const float f_playlist_row_height = 72.;
                                name:VLCLibraryModelVideoMediaListUpdated
                              object:nil];
     [notificationCenter addObserver:self
+                           selector:@selector(updateLibraryRepresentation:)
+                               name:VLCLibraryModelRecentMediaListUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
                            selector:@selector(shuffleStateUpdated:)
                                name:VLCPlaybackOrderChanged
                              object:nil];
@@ -126,6 +131,10 @@ static const float f_playlist_row_height = 72.;
     _libraryCollectionView.dataSource = _libraryDataSource;
     _libraryCollectionView.delegate = _libraryDataSource;
     [_libraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [_libraryCollectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
+               forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
+                           withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
+    [(NSCollectionViewFlowLayout *)_libraryCollectionView.collectionViewLayout setHeaderReferenceSize:[VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize]];
 
     _mediaSourceDataSource = [[VLCMediaSourceDataSource alloc] init];
     _mediaSourceDataSource.collectionView = _mediaSourceCollectionView;

@@ -470,6 +470,8 @@ modules/gui/macosx/library/VLCInputItem.h
 modules/gui/macosx/library/VLCInputItem.m
 modules/gui/macosx/library/VLCLibraryCollectionViewItem.h
 modules/gui/macosx/library/VLCLibraryCollectionViewItem.m
+modules/gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.h
+modules/gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.m
 modules/gui/macosx/library/VLCLibraryController.h
 modules/gui/macosx/library/VLCLibraryController.m
 modules/gui/macosx/library/VLCLibraryDataSource.h

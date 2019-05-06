@@ -52,6 +52,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCInputItem.m \
 	gui/macosx/library/VLCLibraryCollectionViewItem.h \
 	gui/macosx/library/VLCLibraryCollectionViewItem.m \
+	gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.h \
+	gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.m \
 	gui/macosx/library/VLCLibraryController.h \
 	gui/macosx/library/VLCLibraryController.m \
 	gui/macosx/library/VLCLibraryDataSource.h \

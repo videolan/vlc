@@ -23,13 +23,21 @@
 #import "VLCLibraryDataSource.h"
 
 #import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryModel.h"
+
+#import "main/CompatibilityFixes.h"
+#import "extensions/NSString+Helpers.h"
 
 @implementation VLCLibraryDataSource
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
 {
+    if (_libraryModel.numberOfRecentMedia && section == 0) {
+        return [_libraryModel numberOfRecentMedia];
+    }
+
     switch (_libraryModel.libraryMode) {
         case VLCLibraryModeAudio:
             return [_libraryModel numberOfAudioMedia];
@@ -37,11 +45,17 @@
 
         case VLCLibraryModeVideo:
             return [_libraryModel numberOfVideoMedia];
+            break;
 
         default:
             return 0;
             break;
     }
+}
+
+- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
+{
+    return _libraryModel.numberOfRecentMedia > 0 ? 2 : 1;
 }
 
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
@@ -50,24 +64,43 @@
     VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
 
     NSArray *mediaArray;
-    switch (_libraryModel.libraryMode) {
-        case VLCLibraryModeAudio:
-            mediaArray = [_libraryModel listOfAudioMedia];
-            break;
+    if (indexPath.section == 0 && _libraryModel.numberOfRecentMedia > 0) {
+        mediaArray = [_libraryModel listOfRecentMedia];
+    } else {
+        switch (_libraryModel.libraryMode) {
+            case VLCLibraryModeAudio:
+                mediaArray = [_libraryModel listOfAudioMedia];
+                break;
 
-        case VLCLibraryModeVideo:
-            mediaArray = [_libraryModel listOfVideoMedia];
-            break;
+            case VLCLibraryModeVideo:
+                mediaArray = [_libraryModel listOfVideoMedia];
+                break;
 
-        default:
-            NSAssert(1, @"no representation for selected library mode");
-            mediaArray = @[];
-            break;
+            default:
+                NSAssert(1, @"no representation for selected library mode");
+                mediaArray = @[];
+                break;
+        }
     }
 
     viewItem.representedMediaItem = mediaArray[indexPath.item];
 
     return viewItem;
+}
+
+- (NSView *)collectionView:(NSCollectionView *)collectionView
+viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
+               atIndexPath:(NSIndexPath *)indexPath
+{
+    VLCLibraryCollectionViewSupplementaryElementView *view = [collectionView makeSupplementaryViewOfKind:kind
+                                                                                          withIdentifier:VLCLibrarySupplementaryElementViewIdentifier
+                                                                                            forIndexPath:indexPath];
+    if (indexPath.section == 0 && _libraryModel.numberOfRecentMedia > 0) {
+        view.stringValue = _NS("Recent");
+    } else {
+        view.stringValue = _NS("Library");
+    }
+    return view;
 }
 
 - (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths

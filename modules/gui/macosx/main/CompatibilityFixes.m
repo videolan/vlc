@@ -48,3 +48,9 @@ void swapoutOverride(Class cls, SEL selector)
 NSString *const NSAppearanceNameDarkAqua = @"NSAppearanceNameDarkAqua";
 
 #endif
+
+#ifndef MAC_OS_X_VERSION_10_13
+
+NSString *const NSCollectionViewSupplementaryElementKind = @"NSCollectionViewSupplementaryElementKind";
+
+#endif
