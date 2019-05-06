@@ -3044,6 +3044,15 @@ vlc_player_AoutCallback(vlc_object_t *this, const char *var,
             vlc_player_vout_OSDVolume(player, true);
         }
     }
+    else if (strcmp(var, "device") == 0)
+    {
+        const char *old = oldval.psz_string;
+        const char *new = newval.psz_string;
+        /* support NULL values for string comparison */
+        if (old != new && (!old || !new || strcmp(old, new)))
+            vlc_player_aout_SendEvent(player, on_device_changed,
+                                      newval.psz_string);
+    }
     else
         vlc_assert_unreachable();
 
@@ -3513,6 +3522,7 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     {
         var_AddCallback(aout, "volume", vlc_player_AoutCallback, player);
         var_AddCallback(aout, "mute", vlc_player_AoutCallback, player);
+        var_AddCallback(aout, "device", vlc_player_AoutCallback, player);
         var_AddCallback(player, "corks", vlc_player_CorkCallback, NULL);
         input_resource_PutAout(player->resource, aout);
     }
@@ -3534,6 +3544,7 @@ error:
     {
         var_DelCallback(aout, "volume", vlc_player_AoutCallback, player);
         var_DelCallback(aout, "mute", vlc_player_AoutCallback, player);
+        var_DelCallback(aout, "device", vlc_player_AoutCallback, player);
         var_DelCallback(player, "corks", vlc_player_AoutCallback, NULL);
     }
     if (player->resource)

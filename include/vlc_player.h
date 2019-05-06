@@ -944,6 +944,15 @@ struct vlc_player_aout_cbs
      */
     void (*on_mute_changed)(vlc_player_t *player,
         bool new_muted, void *data);
+
+    /**
+     * Called when the audio device has changed
+     *
+     * @param player unlocked player instance
+     * @param device the device name
+     */
+    void (*on_device_changed)(vlc_player_t *player, const char *device,
+                              void *data);
 };
 
 /**
