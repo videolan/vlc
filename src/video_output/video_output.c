@@ -1274,8 +1274,11 @@ static void vout_FlushUnlocked(vout_thread_t *vout, bool below,
     picture_fifo_Flush(vout->p->decoder_fifo, date, below);
     vout_FilterFlush(vout->p->display);
 
-    vlc_clock_Reset(vout->p->clock);
-    vlc_clock_SetDelay(vout->p->clock, vout->p->delay);
+    if (vout->p->clock)
+    {
+        vlc_clock_Reset(vout->p->clock);
+        vlc_clock_SetDelay(vout->p->clock, vout->p->delay);
+    }
 
     vlc_mutex_lock(&vout->p->spu_lock);
     if (vout->p->spu)
@@ -1606,10 +1609,14 @@ noreturn static void *Thread(void *object)
         } else {
             deadline = VLC_TICK_INVALID;
         }
-        while (!vout_control_Pop(&sys->control, &cmd, deadline)) {
+
+        while (!vout_control_Pop(&sys->control, &cmd, deadline) || sys->paused)
+        {
             int canc = vlc_savecancel();
             ThreadControl(vout, cmd);
             vlc_restorecancel(canc);
+            if (sys->paused)
+                deadline = INT64_MAX;
         }
 
         int canc = vlc_savecancel();
@@ -1658,7 +1665,43 @@ static void vout_StopDisplay(vout_thread_t *vout)
     spu_Detach(sys->spu);
     sys->mouse_event = NULL;
     sys->clock = NULL;
+    sys->paused = false;
     video_format_Clean(&sys->original);
+}
+
+static void vout_Resume(vout_thread_t *vout, const vout_configuration_t *cfg,
+                        input_thread_t *input)
+{
+    vout_thread_sys_t *sys = vout->p;
+
+    vout_control_Hold(&sys->control);
+    assert(sys->paused);
+
+    sys->clock = cfg->clock;
+    if (input != NULL)
+        spu_Attach(sys->spu, input);
+    sys->mouse_event = cfg->mouse_event;
+    sys->mouse_opaque = cfg->mouse_opaque;
+
+    sys->delay = sys->spu_delay = 0;
+    sys->rate = sys->spu_rate = 1.f;
+    sys->delay = sys->spu_delay = 0;
+
+    sys->paused = false;
+    vout_control_Release(&sys->control);
+}
+
+void vout_Pause(vout_thread_t *vout)
+{
+    vout_thread_sys_t *sys = vout->p;
+
+    vout_control_Hold(&sys->control);
+    vout_FlushUnlocked(vout, true, INT64_MAX);
+    vout_FlushSubpictureChannel(vout, -1);
+    sys->mouse_event = NULL;
+    sys->clock = NULL;
+    sys->paused = true;
+    vout_control_Release(&sys->control);
 }
 
 void vout_Stop(vout_thread_t *vout)
@@ -1766,6 +1809,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     vlc_mutex_init(&sys->spu_lock);
     sys->spu = spu_Create(vout, vout);
 
+    sys->paused = false;
     vout_control_Init(&sys->control);
 
     sys->title.show     = var_InheritBool(vout, "video-title-show");
@@ -1834,7 +1878,8 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
     if (video_format_IsSimilar(&original, &sys->original)) {
         if (cfg->dpb_size <= sys->dpb_size) {
             video_format_Clean(&original);
-            /* It is assumed that the SPU input matches input already. */
+
+            vout_Resume(vout, cfg, input);
             return 0;
         }
         msg_Warn(vout, "DPB need to be increased");
