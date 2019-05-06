@@ -65,6 +65,8 @@ libstream_out_sdi_plugin_la_SOURCES = stream_out/sdi/sdiout.cpp \
         stream_out/sdi/DBMSDIOutput.hpp \
         stream_out/sdi/SDIAudioMultiplex.cpp \
         stream_out/sdi/SDIAudioMultiplex.hpp \
+        stream_out/sdi/SDIGenerator.cpp \
+        stream_out/sdi/SDIGenerator.hpp \
         stream_out/sdi/SDIOutput.cpp \
         stream_out/sdi/SDIOutput.hpp \
         stream_out/sdi/SDIStream.cpp \

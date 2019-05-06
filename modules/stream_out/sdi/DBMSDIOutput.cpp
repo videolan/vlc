@@ -26,13 +26,13 @@
 #include <vlc_es.h>
 #include <vlc_picture.h>
 #include <vlc_interrupt.h>
-#include <vlc_image.h>
 #include <vlc_decklink.h>
 
 #include "DBMHelper.hpp"
 #include "DBMSDIOutput.hpp"
 #include "SDIStream.hpp"
 #include "SDIAudioMultiplex.hpp"
+#include "SDIGenerator.hpp"
 #include "Ancillary.hpp"
 #include "V210.hpp"
 
@@ -377,7 +377,7 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
         char *psz_file = var_InheritString(p_stream, CFG_PREFIX "nosignal-image");
         if(psz_file)
         {
-            video.pic_nosignal = CreateNoSignalPicture(psz_file, fmt);
+            video.pic_nosignal = sdi::Generator::Picture(VLC_OBJECT(p_stream), psz_file, fmt);
             if (!video.pic_nosignal)
                 msg_Err(p_stream, "Could not create no signal picture");
             free(psz_file);
@@ -645,36 +645,4 @@ void DBMSDIOutput::checkClockDrift()
             }
         }
     }
-}
-
-picture_t * DBMSDIOutput::CreateNoSignalPicture(const char *psz_file, const video_format_t *fmt)
-{
-    picture_t *p_pic = NULL;
-    image_handler_t *img = image_HandlerCreate(p_stream);
-    if (img)
-    {
-        video_format_t in;
-        video_format_Init(&in, 0);
-        video_format_Setup(&in, 0,
-                           fmt->i_width, fmt->i_height,
-                           fmt->i_width, fmt->i_height, 1, 1);
-
-        picture_t *png = image_ReadUrl(img, psz_file, &in);
-        if (png)
-        {
-            video_format_t dummy;
-            video_format_Copy(&dummy, fmt);
-            p_pic = image_Convert(img, png, &in, &dummy);
-            if(!video_format_IsSimilar(&dummy, fmt))
-            {
-                picture_Release(p_pic);
-                p_pic = NULL;
-            }
-            picture_Release(png);
-            video_format_Clean(&dummy);
-        }
-        image_HandlerDelete(img);
-        video_format_Clean(&in);
-    }
-    return p_pic;
 }

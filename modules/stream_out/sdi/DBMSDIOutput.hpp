@@ -61,7 +61,6 @@ namespace sdi_sout
             bool b_running;
             int Start(vlc_tick_t);
             int doProcessVideo(picture_t *, block_t *);
-            picture_t * CreateNoSignalPicture(const char*, const video_format_t *);
             void checkClockDrift();
     };
 }
