@@ -48,6 +48,7 @@
 #endif
 
 #include "../access/vlc_decklink.h"
+#include "../stream_out/sdi/V210.hpp"
 #include <DeckLinkAPIDispatch.cpp>
 
 #define FRAME_SIZE 1920
@@ -777,66 +778,6 @@ static inline void put_le32(uint8_t **p, uint32_t d)
     (*p) += 4;
 }
 
-static inline int clip(int a)
-{
-    if      (a < 4) return 4;
-    else if (a > 1019) return 1019;
-    else               return a;
-}
-
-static void v210_convert(void *frame_bytes, picture_t *pic, int dst_stride)
-{
-    int width = pic->format.i_width;
-    int height = pic->format.i_height;
-    int line_padding = dst_stride - ((width * 8 + 11) / 12) * 4;
-    int h, w;
-    uint8_t *data = (uint8_t*)frame_bytes;
-
-    const uint16_t *y = (const uint16_t*)pic->p[0].p_pixels;
-    const uint16_t *u = (const uint16_t*)pic->p[1].p_pixels;
-    const uint16_t *v = (const uint16_t*)pic->p[2].p_pixels;
-
-#define WRITE_PIXELS(a, b, c)           \
-    do {                                \
-        val =   clip(*a++);             \
-        val |= (clip(*b++) << 10) |     \
-               (clip(*c++) << 20);      \
-        put_le32(&data, val);           \
-    } while (0)
-
-    for (h = 0; h < height; h++) {
-        uint32_t val = 0;
-        for (w = 0; w < width - 5; w += 6) {
-            WRITE_PIXELS(u, y, v);
-            WRITE_PIXELS(y, u, y);
-            WRITE_PIXELS(v, y, u);
-            WRITE_PIXELS(y, v, y);
-        }
-        if (w < width - 1) {
-            WRITE_PIXELS(u, y, v);
-
-            val = clip(*y++);
-            if (w == width - 2)
-                put_le32(&data, val);
-#undef WRITE_PIXELS
-        }
-        if (w < width - 3) {
-            val |= (clip(*u++) << 10) | (clip(*y++) << 20);
-            put_le32(&data, val);
-
-            val = clip(*v++) | (clip(*y++) << 10);
-            put_le32(&data, val);
-        }
-
-        memset(data, 0, line_padding);
-        data += line_padding;
-
-        y += pic->p[0].i_pitch / 2 - width;
-        u += pic->p[1].i_pitch / 2 - width / 2;
-        v += pic->p[2].i_pitch / 2 - width / 2;
-    }
-}
-
 static void send_AFD(uint8_t afdcode, uint8_t ar, uint8_t *buf)
 {
     const size_t len = 6 /* vanc header */ + 8 /* AFD data */ + 1 /* csum */;
@@ -965,7 +906,7 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
         }
         send_AFD(sys->video.afd, sys->video.ar, (uint8_t*)buf);
 
-        v210_convert(frame_bytes, picture, stride);
+        sdi::V210::Convert(picture, stride, frame_bytes);
 
         result = pDLVideoFrame->SetAncillaryData(vanc);
         vanc->Release();
