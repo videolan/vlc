@@ -28,6 +28,36 @@
 
 using namespace sdi;
 
+static inline uint16_t withparitybit(uint16_t v)
+{
+    return v | (vlc_parity(v) ? 0x100 : 0x200);
+}
+
+Ancillary::Data10bitPacket::Data10bitPacket(uint8_t did, uint8_t sdid,
+                                            const AbstractPacket<uint8_t> &other)
+{
+    payload.reserve(6 + 1 + other.size());
+    payload.resize(6);
+    payload[0] = 0x000;
+    payload[1] = 0x3ff;
+    payload[2] = 0x3ff;
+    payload[3] = withparitybit(did);
+    payload[4] = withparitybit(sdid);
+    payload[5] = withparitybit(other.size());
+    for(std::size_t i = 0; i<other.size(); i++)
+        payload.push_back(withparitybit(other.data()[i]));
+    uint16_t sum = 0;
+    for(std::size_t i = 3; i<payload.size(); i++)
+        sum = (sum + payload[i]) & 0x1ff;
+    payload.push_back(sum | ((~sum & 0x100) << 1));
+}
+
+void Ancillary::Data10bitPacket::pad()
+{
+    while(payload.size() % V210::ALIGNMENT_U16)
+        payload.push_back(0x40); /* padding */
+}
+
 AFD::AFD(uint8_t afdcode, uint8_t ar)
 {
     this->afdcode = afdcode;
@@ -45,60 +75,70 @@ static inline void put_le32(uint8_t **p, uint32_t d)
     (*p) += 4;
 }
 
-void AFD::FillBuffer(uint8_t *p_buf, size_t i_buf)
+AFD::AFDData::AFDData(uint8_t code, uint8_t ar)
 {
-    const size_t len = 6 /* vanc header */ + 8 /* AFD data */ + 1 /* csum */;
-    const size_t s = ((len + 5) / 6) * 6; // align for v210
-
-    if(s * 6 >= i_buf / 16)
-        return;
-
-    uint16_t afd[s];
-
-    afd[0] = 0x000;
-    afd[1] = 0x3ff;
-    afd[2] = 0x3ff;
-    afd[3] = 0x41; // DID
-    afd[4] = 0x05; // SDID
-    afd[5] = 8; // Data Count
+    payload.resize(8);
 
     int bar_data_flags = 0;
     int bar_data_val1 = 0;
     int bar_data_val2 = 0;
 
-    afd[ 6] = ((afdcode & 0x0F) << 3) | ((ar & 0x01) << 2); /* SMPTE 2016-1 */
-    afd[ 7] = 0; // reserved
-    afd[ 8] = 0; // reserved
-    afd[ 9] = bar_data_flags << 4;
-    afd[10] = bar_data_val1 << 8;
-    afd[11] = bar_data_val1 & 0xff;
-    afd[12] = bar_data_val2 << 8;
-    afd[13] = bar_data_val2 & 0xff;
+    payload[0] = ((code & 0x0F) << 3) | ((ar & 0x01) << 2); /* SMPTE 2016-1 */
+    payload[1] = 0; // reserved
+    payload[2] = 0; // reserved
+    payload[3] = bar_data_flags << 4;
+    payload[4] = bar_data_val1 << 8;
+    payload[5] = bar_data_val1 & 0xff;
+    payload[6] = bar_data_val2 << 8;
+    payload[7] = bar_data_val2 & 0xff;
+}
 
-    /* parity bit */
-    for (size_t i = 3; i < len - 1; i++)
-        afd[i] |= vlc_parity((unsigned)afd[i]) ? 0x100 : 0x200;
+void AFD::FillBuffer(uint8_t *p_buf, size_t i_buf)
+{
+    AFDData afd(afdcode, ar);
 
-    /* vanc checksum */
-    uint16_t vanc_sum = 0;
-    for (size_t i = 3; i < len - 1; i++) {
-        vanc_sum += afd[i];
-        vanc_sum &= 0x1ff;
-    }
+    Data10bitPacket packet(0x41, 0x05, afd);
+    packet.pad();
 
-    afd[len - 1] = vanc_sum | ((~vanc_sum & 0x100) << 1);
-
-    /* pad */
-    for (size_t i = len; i < s; i++)
-        afd[i] = 0x040;
+    if(packet.size() > i_buf)
+        return;
 
     /* convert to v210 and write into VANC */
-    V210::Convert(afd, s, p_buf);
+    V210::Convert((uint16_t *)packet.data(), packet.size() / 2, p_buf);
+}
+
+Captions::CDP::CDP(const uint8_t * buf, std::size_t bufsize,
+                   uint8_t rate, uint16_t cdp_counter)
+{
+    std::size_t cc_count = bufsize / 3;
+    payload.reserve(9 + cc_count * 3 + 3 + 1);
+    payload.resize(9);
+    payload[0] = 0x96; // header id
+    payload[1] = 0x69;
+    payload[2] = 9 + 3 + 1 + cc_count * 3; // len
+    payload[3] = ((rate << 4) | 0x0f);
+    payload[4] = 0x43; // cc_data_present | caption_service_active | reserved
+    payload[5] = cdp_counter >> 8;
+    payload[6] = cdp_counter & 0xff;
+    payload[7] = 0x72; // ccdata_id
+    payload[8] = 0xe0 | cc_count; // cc_count
+    // cc data
+    for(std::size_t i=0; i<cc_count * 3; i++)
+        payload.push_back(buf[i]);
+    // cdp footer
+    payload.push_back(0x74); // footer id
+    payload.push_back(cdp_counter >> 8);
+    payload.push_back(cdp_counter & 0xff);
+    uint16_t sum = 0;
+    for(std::size_t i=0; i<payload.size(); i++)
+        sum = (sum + payload[i]) & 0xff;
+    payload.push_back(sum ? 256 - sum : sum); /* cdpsum */
 }
 
 Captions::Captions(const uint8_t *p, size_t s,
                    unsigned num, unsigned den)
 {
+    cdp_counter = 0;
     p_data = p;
     i_data = s;
     vlc_ureduce(&num, &den, num, den, 0);
@@ -134,82 +174,14 @@ void Captions::FillBuffer(uint8_t *p_buf, size_t i_buf)
     if (cc_count == 0)
         return;
 
-    uint16_t len = 6 /* vanc header */ + 9 /* cdp header */ + 3 * cc_count +/* cc_data */
-        4 /* cdp footer */ + 1 /* vanc checksum */;
+    CDP cdp(p_data, i_data, rate, cdp_counter++);
 
-    static uint16_t hdr = 0; /* cdp counter */
-    size_t s = ((len + 5) / 6) * 6; /* align to 6 for v210 conversion */
+    Data10bitPacket packet(0x61, 0x01, cdp);
+    packet.pad();
 
-    if(i_buf < s / 6 * 16)
+    if(packet.size() > i_buf)
         return;
 
-    uint16_t *cdp = new uint16_t[s];
-
-    uint16_t cdp_header[6+9] = {
-        /* VANC header = 6 words */
-        0x000, 0x3ff, 0x3ff, /* Ancillary Data Flag */
-
-        /* following words need parity bits */
-
-        0x61, /* Data ID */
-        0x01, /* Secondary Data I D= CEA-708 */
-        (uint16_t)(len - 6 - 1), /* Data Count (not including VANC header) */
-
-        /* cdp header */
-
-        0x96, // header id
-        0x69,
-        (uint16_t)(len - 6 - 1),
-        (uint16_t)((rate << 4) | 0x0f),
-        0x43, // cc_data_present | caption_service_active | reserved
-        (uint16_t)(hdr >> 8),
-        (uint16_t)(hdr & 0xff),
-        0x72, // ccdata_id
-        (uint16_t)(0xe0 | cc_count), // cc_count
-    };
-
-    /* cdp header */
-    memcpy(cdp, cdp_header, sizeof(cdp_header));
-
-    /* cdp data */
-    for (size_t i = 0; i < cc_count; i++) { // copy cc_data
-        cdp[6+9+3*i+0] = p_data[3*i+0] /*| 0xfc*/; // marker bits + cc_valid
-        cdp[6+9+3*i+1] = p_data[3*i+1];
-        cdp[6+9+3*i+2] = p_data[3*i+2];
-    }
-
-    /* cdp footer */
-    cdp[len-5] = 0x74; // footer id
-    cdp[len-4] = hdr >> 8;
-    cdp[len-3] = hdr & 0xff;
-    hdr++;
-
-    /* cdp checksum */
-    uint8_t sum = 0;
-    for (uint16_t i = 6; i < len - 2; i++) {
-        sum += cdp[i];
-        sum &= 0xff;
-    }
-    cdp[len-2] = sum ? 256 - sum : 0;
-
-    /* parity bit */
-    for (uint16_t i = 3; i < len - 1; i++)
-        cdp[i] |= vlc_parity(cdp[i]) ? 0x100 : 0x200;
-
-    /* vanc checksum */
-    uint16_t vanc_sum = 0;
-    for (uint16_t i = 3; i < len - 1; i++) {
-        vanc_sum += cdp[i];
-        vanc_sum &= 0x1ff;
-    }
-    cdp[len - 1] = vanc_sum | ((~vanc_sum & 0x100) << 1);
-
-    /* pad */
-    for (size_t i = len; i < s; i++)
-        cdp[i] = 0x040;
-
     /* convert to v210 and write into VBI line 15 of VANC */
-    V210::Convert(cdp, s, p_buf);
-
-    delete[] cdp;
+    V210::Convert((uint16_t *)packet.data(), packet.size() / 2, p_buf);
 }
