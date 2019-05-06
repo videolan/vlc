@@ -551,7 +551,9 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
     {
         tc->pl_ctx = vlc_placebo_Create(VLC_OBJECT(tc));
         if (tc->pl_ctx) {
-#   if PL_API_VER >= 6
+#   if PL_API_VER >= 20
+            tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL);
+#   elif PL_API_VER >= 6
             tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0);
 #   else
             tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0, 0);
