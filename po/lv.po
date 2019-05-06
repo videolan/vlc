@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-05-02 05:18+0200\n"
+"PO-Revision-Date: 2019-05-06 12:53+0200\n"
 "Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2019\n"
 "Language-Team: Latvian (https://www.transifex.com/yaron/teams/16553/lv/)\n"
 "Language: lv\n"
@@ -23324,7 +23324,7 @@ msgstr ""
 "Definē, kuru noildzes opciju pievienot RTSP sesijas ID virknei. Tās "
 "iestatīšana uz negatīvu skaitli noņem noildzes opciju pavisam. Šis ir "
 "vajadzīgs ar dažiem IPTV STB (tādiem kā tie, kurus izgatavojis HansunTech), "
-"kuri apmulst ar to. Noklusētais ir 5."
+"kuri apmulst ar to. Noklusējums ir 5."
 
 #: modules/misc/rtsp.c:77 modules/stream_out/rtp.c:244
 msgid "RTSP VoD"
@@ -23421,7 +23421,7 @@ msgstr "Paketes izmērs"
 
 #: modules/mux/asf.c:67
 msgid "ASF packet size -- default is 4096 bytes"
-msgstr "ASF paketes izmērs -- noklusētais ir 4096 baiti"
+msgstr "ASF paketes izmērs -- noklusējums ir 4096 baiti"
 
 #: modules/mux/asf.c:68
 msgid "Bitrate override"
@@ -23661,7 +23661,7 @@ msgid ""
 "milliseconds). This value should be below 100ms. (default is 70ms)."
 msgstr ""
 "Iestatīt, kādā intervālā tiks nosūtīti PCR (Program Clock Reference) "
-"(milisekundēs). Šai vērtībai vajadzētu būt zem 100ms. (noklusētais ir 70ms)."
+"(milisekundēs). Šai vērtībai vajadzētu būt zem 100ms. (noklusējums ir 70ms)."
 
 #: modules/mux/mpeg/ts.c:156
 msgid "Minimum B (deprecated)"
@@ -23710,7 +23710,7 @@ msgid ""
 "CSA encryption key used. It can be the odd/first/1 (default) or the even/"
 "second/2 one."
 msgstr ""
-"Lietotā CSA šifrēšanas atslēga. Tā var būt nepāra/pirmā/1 (noklusētā) vai "
+"Lietotā CSA šifrēšanas atslēga. Tā var būt nepāra/pirmā/1 (noklusējuma) vai "
 "pāra/otrā/2 atslēga."
 
 #: modules/mux/mpeg/ts.c:185
@@ -23751,7 +23751,7 @@ msgstr "Indeksa izmēra attiecība"
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
 msgstr ""
-"Iestatīt indeksa izmēra attiecību. Izmaina noklusēto (60 min. satura) vai "
+"Iestatīt indeksa izmēra attiecību. Izmaina noklusējuma (60 min. satura) vai "
 "novērtēto izmēru."
 
 #: modules/mux/ogg.c:60
@@ -24336,8 +24336,8 @@ msgid ""
 "Number of milliseconds the marquee must remain displayed. Default value is 0 "
 "(remains forever)."
 msgstr ""
-"Milisekunžu skaits, kurās afišai jāpaliek attēlotai. Noklusētā vērtība ir 0 "
-"(jāpaliek vienmēr)."
+"Milisekunžu skaits, kurās afišai jāpaliek attēlotai. Noklusējuma vērtība ir "
+"0 (jāpaliek vienmēr)."
 
 #: modules/spu/marq.c:104
 msgid "Refresh period in ms"
@@ -24366,7 +24366,7 @@ msgstr "Fonta izmērs, pikseļi"
 #: modules/spu/marq.c:112 modules/spu/rss.c:149
 msgid "Font size, in pixels. Default is 0 (use default font size)."
 msgstr ""
-"Fonta izmērs, pikseļos. Noklusētais ir 0 (lietot noklusēto fonta izmēru)."
+"Fonta izmērs, pikseļos. Noklusējums ir 0 (lietot noklusējuma fonta izmēru)."
 
 #: modules/spu/marq.c:116 modules/spu/rss.c:153
 msgid ""
@@ -24416,7 +24416,7 @@ msgid ""
 "opaque (default)."
 msgstr ""
 "Mozaīkas priekšplāna bilžu caurspīdīgums. 0 nozīmē caurspīdīgs, 255 "
-"necaurspīdīgs (noklusētais)."
+"necaurspīdīgs (noklusējums)."
 
 #: modules/spu/mosaic.c:93
 msgid "Total height of the mosaic, in pixels."
@@ -24617,7 +24617,8 @@ msgstr "VNC aptaujāšanas intervāls"
 #: modules/spu/remoteosd.c:85
 msgid "In this interval an update from VNC is requested, default every 300 ms."
 msgstr ""
-"Šajā intervālā tiek pieprasīts atjauninājums no VNC, noklusēti katras 300 ms."
+"Šajā intervālā tiek pieprasīts atjauninājums no VNC, noklusējums katras 300 "
+"ms."
 
 #: modules/spu/remoteosd.c:87
 msgid "VNC polling"
@@ -24646,7 +24647,7 @@ msgstr "Sūtīt atslēgas notikumus uz VNC resursdatoru."
 
 #: modules/spu/remoteosd.c:99
 msgid "Alpha transparency value (default 255)"
-msgstr "Alfa caurspīdīguma vērtība (noklusētā 255)"
+msgstr "Alfa caurspīdīguma vērtība (noklusējums 255)"
 
 #: modules/spu/remoteosd.c:101
 msgid ""
@@ -24657,8 +24658,8 @@ msgid ""
 msgstr ""
 "Ekrānattēlojuma (OSD) VNC caurspīdīgums var tikt mainīts, sniedzot vērtību "
 "starp 0 un 255. Zemāka vērtība norāda vairāk caurspīdīguma, augstāka nozīmē "
-"mazāk caurspīdīguma. Noklusētais ir būt necaurspīdīgam (vērtība 255), "
-"Minimālā ir pilnībā caurspīdīgs (vērtība 0)."
+"mazāk caurspīdīguma. Noklusējums ir būt necaurspīdīgam (vērtība 255), "
+"minimums ir pilnībā caurspīdīgs (vērtība 0)."
 
 #: modules/spu/remoteosd.c:116
 msgid "Remote-OSD over VNC"
@@ -24743,7 +24744,7 @@ msgid ""
 "Title display mode. Default is 0 (hidden) if the feed has an image and feed "
 "images are enabled, 1 otherwise."
 msgstr ""
-"Virsraksta attēlošanas režīms. Noklusētais ir 0 (slēpts), ja barotnei ir "
+"Virsraksta attēlošanas režīms. Noklusējums ir 0 (slēpts), ja barotnei ir "
 "attēls un barotnes attēli ir ieslēgti, 1 citādi."
 
 #: modules/spu/rss.c:167
@@ -25245,7 +25246,7 @@ msgstr "Izvades piekļuves metode"
 
 #: modules/stream_out/es.c:44
 msgid "This is the default output access method that will be used."
-msgstr "Šī ir noklusētā izvades piekļuves metode, kura tiks lietota."
+msgstr "Šī ir noklusējuma izvades piekļuves metode, kura tiks lietota."
 
 #: modules/stream_out/es.c:46
 msgid "Audio output access method"
@@ -25269,7 +25270,7 @@ msgstr "Izvades multipleksors"
 
 #: modules/stream_out/es.c:55
 msgid "This is the default muxer method that will be used."
-msgstr "Šī ir noklusētā multipleksora metode, kura tiks lietota."
+msgstr "Šī ir noklusējuma multipleksora metode, kura tiks lietota."
 
 #: modules/stream_out/es.c:56
 msgid "Audio output muxer"
@@ -25293,7 +25294,7 @@ msgstr "Izvades vietrādis URL"
 
 #: modules/stream_out/es.c:65
 msgid "This is the default output URI."
-msgstr "Šis ir noklusētais izvades URI."
+msgstr "Šis ir noklusējuma izvades URI."
 
 #: modules/stream_out/es.c:66
 msgid "Audio output URL"
@@ -25429,8 +25430,8 @@ msgid ""
 "This allows you to specify the muxer used for the streaming output. Default "
 "is to use no muxer (standard RTP stream)."
 msgstr ""
-"Šis atļauj jums norādīt multipleksoru, lietotu priekš straumēšanas izvades. "
-"Noklusētais ir nelietot multipleksoru (standarta RTP straume)."
+"Šis atļauj jums norādīt straumēšanas izvadei lietoto multipleksoru. "
+"Noklusējums ir nelietot multipleksoru (standarta RTP straume)."
 
 #: modules/stream_out/rtp.c:92 modules/stream_out/standard.c:59
 msgid "Session name"
@@ -25504,7 +25505,7 @@ msgstr "Audio ports"
 #: modules/stream_out/rtp.c:119
 msgid ""
 "This allows you to specify the default audio port for the RTP streaming."
-msgstr "Šis ļauj jums norādīt noklusēto audio portu priekš RTP straumēšanas."
+msgstr "Šis ļauj jums norādīt noklusējuma audio portu RTP straumēšanai."
 
 #: modules/stream_out/rtp.c:120
 msgid "Video port"
@@ -25513,7 +25514,7 @@ msgstr "Video ports"
 #: modules/stream_out/rtp.c:122
 msgid ""
 "This allows you to specify the default video port for the RTP streaming."
-msgstr "Šis ļauj jums norādīt noklusēto video portu priekš RTP straumēšanas."
+msgstr "Šis ļauj jums norādīt noklusējuma video portu RTP straumēšanai."
 
 #: modules/stream_out/rtp.c:130
 msgid "RTP/RTCP multiplexing"
@@ -25532,8 +25533,8 @@ msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
 "milliseconds."
 msgstr ""
-"Noklusētā kešdarbes vērtība izejošajām RTP straumēm. Šai vērtībai vajadzētu "
-"būt iestatītai milisekundēs."
+"Noklusējuma kešdarbes vērtība izejošajām RTP straumēm. Šai vērtībai "
+"vajadzētu būt iestatītai milisekundēs."
 
 #: modules/stream_out/rtp.c:140
 msgid "Transport protocol"
@@ -25572,8 +25573,8 @@ msgid ""
 "is 60 (one minute)."
 msgstr ""
 "RTSP sesijas tiks aizvērtas pēc jebkādu RTSP pieprasījumu nesaņemšanas šajā "
-"ilgumā. Tā iestatīšana uz negatīvas vērtības vai nulles izslēdz noildzes. "
-"Noklusētais ir 60 (viena minūte)."
+"ilgumā. Tā iestatīšana uz negatīvu vērtību vai nulli izslēdz noildzes. "
+"Noklusējums ir 60 (viena minūte)."
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
@@ -26012,7 +26013,7 @@ msgid ""
 "set to something different than 0 this option will override the relative "
 "font size."
 msgstr ""
-"Šis ir noklusētais izmērs fontiem, kuri tiks renderēti uz video. Ja "
+"Šis ir noklusējuma izmērs fontiem, kuri tiks renderēti uz video. Ja "
 "iestatīts uz kaut ko atšķirīgu nekā 0, šī opcija pārrakstīs relatīvo fonta "
 "izmēru."
 
@@ -26030,7 +26031,7 @@ msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:95
 msgid "Text default color"
-msgstr "Teksta noklusētā krāsa"
+msgstr "Teksta noklusējuma krāsa"
 
 #: modules/text_renderer/freetype/freetype.c:96
 msgid ""
@@ -26053,7 +26054,7 @@ msgid ""
 "This is the relative default size of the fonts that will be rendered on the "
 "video. If absolute font size is set, relative size will be overridden."
 msgstr ""
-"Šis ir relatīvais noklusētais izmērs fontiem, kuri tiks renderēti uz video. "
+"Šis ir relatīvais noklusējuma izmērs fontiem, kuri tiks renderēti uz video. "
 "Ja absolūtais fonta izmērs ir iestatīts, relatīvais izmērs tiks pārlabots."
 
 #: modules/text_renderer/freetype/freetype.c:106
@@ -26760,7 +26761,7 @@ msgstr ""
 "AltLine: ņemt krāsainības līniju 1 no augšējā lauka, līniju 2 no apakšējā "
 "lauka utt. \n"
 "\n"
-"Noklusētais, labs NTSC telekino ievadēm (anime DVD, utt.) \n"
+"Noklusējums, labs NTSC telekino ievadēm (anime DVD, utt.) \n"
 "\n"
 "Samaisīt: vidējas ievades lauku krāsainības. Varētu sagrozīt krāsas arī "
 "jaunajam (košajam) laukam. \n"
@@ -26781,7 +26782,7 @@ msgid ""
 msgstr ""
 "Šis vada aptumšojuma filtra stiprumu, kurš simulē CRT TV fosfora gaismas "
 "norimšanu vecajam laukam Fosfora kadru nomaiņas ātruma divkāršotājā. "
-"Noklusētais: Zems."
+"Noklusējums: Zems."
 
 #: modules/video_filter/deinterlace/deinterlace.c:299
 msgid "Deinterlacing video filter"
@@ -27199,7 +27200,7 @@ msgstr ""
 "(augstākais)\n"
 "Augstākie līmeņi pieprasa vairāk centrālā procesora jaudas, bet rada "
 "augstākas kvalitātes bildes.\n"
-"Ar noklusēto filtra ķēdi, vērtības kartē uz sekojošiem filtriem:\n"
+"Ar noklusējuma filtra ķēdi, vērtības kartē uz sekojošiem filtriem:\n"
 "1: hb, 2-4: hb+vb, 5-6: hb+vb+dr"
 
 #: modules/video_filter/postproc.c:76
@@ -27706,7 +27707,7 @@ msgid ""
 "0=QCIF 1=CIF 2=NTSC 3=PAL, 4=auto (default 4=auto)"
 msgstr ""
 "Atlasiet izšķirtspēju priekš kadru bufera. Patlaban tas atbalsta vērtības "
-"0=QCIF 1=CIF 2=NTSC 3=PAL, 4=automātiski (noklusētais 4=automātiski)"
+"0=QCIF 1=CIF 2=NTSC 3=PAL, 4=automātiski (noklusējums 4=automātiski)"
 
 #: modules/video_output/fb.c:70
 msgid "Framebuffer uses hw acceleration"
@@ -27718,14 +27719,14 @@ msgstr "Izslēgt priekš divkāršās buferizācijas programmatūrā."
 
 #: modules/video_output/fb.c:73
 msgid "Image format (default RGB)"
-msgstr "Attēla formāts (noklusētais RGB)"
+msgstr "Attēla formāts (noklusējums RGB)"
 
 #: modules/video_output/fb.c:74
 msgid ""
 "Chroma fourcc used by the framebuffer. Default is RGB since the fb device "
 "has no way to report its chroma."
 msgstr ""
-"Krāsainības fourcc, ko lieto kadru buferis. Noklusētais ir RGB, tā kā kadru "
+"Krāsainības fourcc, ko lieto kadru buferis. Noklusējums ir RGB, tā kā kadru "
 "bufera ierīcei nav veida, kādā ziņot par tās krāsainību."
 
 #: modules/video_output/fb.c:92
@@ -28038,7 +28039,7 @@ msgid ""
 "display will be used."
 msgstr ""
 "Video tiks renderēts ar šo Wayland displeju. Ja tukšs, tiks lietots "
-"noklusētais displejs."
+"noklusējuma displejs."
 
 #: modules/video_output/wayland/shell.c:411
 msgid "WL shell"
@@ -28094,7 +28095,7 @@ msgid ""
 "Video will be rendered with this X11 display. If empty, the default display "
 "will be used."
 msgstr ""
-"Video tiks renderēts ar šo X11 displeju. Ja tukšs, tiks lietots noklusētais "
+"Video tiks renderēts ar šo X11 displeju. Ja tukšs, tiks lietots noklusējuma "
 "displejs."
 
 #: modules/video_output/xcb/window.c:705
@@ -28903,9 +28904,9 @@ msgid ""
 "configuration, or to modify the default settings, select the button to the "
 "right: <i>Manage Streams</i>"
 msgstr ""
-"Straume tiks izveidota, lietojot noklusētos iestatījumus, priekš "
-"paplašinātākas konfigurācijas vai lai izmainītu noklusētos iestatījumus, "
-"atlasiet pogu pa labi: <i>Pārvaldīt straumes</i>"
+"Straume tiks izveidota, lietojot noklusējuma iestatījumus, paplašinātākai "
+"konfigurācijai vai lai izmainītu noklusējuma iestatījumus, atlasiet pogu pa "
+"labi: <i>Pārvaldīt straumes</i>"
 
 #: share/lua/http/index.html:268
 msgid ""
@@ -29433,7 +29434,7 @@ msgstr "Lietot pielāgotu ādiņu"
 
 #: modules/gui/qt/ui/sprefs_interface.h:535
 msgid "This is VLC's default interface, with a native look and feel."
-msgstr "Šī ir VLC noklusētā saskarne ar dzimto izskatu un sajūtām."
+msgstr "Šī ir VLC noklusējuma saskarne ar dzimto izskatu un sajūtām."
 
 #: modules/gui/qt/ui/sprefs_interface.h:537
 msgid "Use native style"
@@ -29537,7 +29538,7 @@ msgstr "Subtitru valoda"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Default encoding"
-msgstr "Noklusētais kodējums"
+msgstr "Noklusējuma kodējums"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
 msgid "Subtitle effects"
