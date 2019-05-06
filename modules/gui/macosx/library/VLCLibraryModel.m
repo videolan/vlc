@@ -125,7 +125,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (size_t)numberOfAudioMedia
 {
-    if (_cachedAudioMedia) {
+    if (!_cachedAudioMedia) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateCachedListOfAudioMedia];
         });

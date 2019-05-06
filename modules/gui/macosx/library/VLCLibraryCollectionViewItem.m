@@ -144,7 +144,9 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
     if (_representedMediaItem.artworkGenerated) {
         image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:_representedMediaItem.artworkMRL]];
     } else {
-        [_libraryController attemptToGenerateThumbnailForMediaItem:_representedMediaItem];
+        if (_representedMediaItem.mediaType != VLC_ML_MEDIA_TYPE_AUDIO) {
+            [_libraryController attemptToGenerateThumbnailForMediaItem:_representedMediaItem];
+        }
     }
     if (!image) {
         image = [NSImage imageNamed: @"noart.png"];
