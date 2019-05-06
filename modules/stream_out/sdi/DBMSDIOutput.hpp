@@ -60,9 +60,6 @@ namespace sdi_sout
             } clock;
             bool b_running;
             int Start(vlc_tick_t);
-            const char *ErrorToString(long i_code);
-            IDeckLinkDisplayMode * MatchDisplayMode(const video_format_t *,
-                                                    BMDDisplayMode = bmdDisplayModeNotSupported);
             int doProcessVideo(picture_t *, block_t *);
             picture_t * CreateNoSignalPicture(const char*, const video_format_t *);
             void checkClockDrift();

@@ -22,6 +22,14 @@
 # include "config.h"
 #endif
 
+#include <vlc_common.h>
+#include <vlc_es.h>
+#include <vlc_picture.h>
+#include <vlc_interrupt.h>
+#include <vlc_image.h>
+#include <vlc_decklink.h>
+
+#include "DBMHelper.hpp"
 #include "DBMSDIOutput.hpp"
 #include "SDIStream.hpp"
 #include "SDIAudioMultiplex.hpp"
@@ -29,12 +37,9 @@
 #include "V210.hpp"
 
 #include <DeckLinkAPIDispatch.cpp>
+
 #include "sdiout.hpp"
 
-#include <vlc_es.h>
-#include <vlc_picture.h>
-#include <vlc_interrupt.h>
-#include <vlc_image.h>
 #include <arpa/inet.h>
 
 using namespace sdi_sout;
@@ -92,125 +97,10 @@ int DBMSDIOutput::Send(AbstractStream *s, block_t *b)
     return SDIOutput::Send(s, b);
 }
 
-IDeckLinkDisplayMode * DBMSDIOutput::MatchDisplayMode(const video_format_t *fmt, BMDDisplayMode forcedmode)
-{
-    HRESULT result;
-    IDeckLinkDisplayMode *p_selected = NULL;
-    IDeckLinkDisplayModeIterator *p_iterator = NULL;
-
-    for(int i=0; i<4 && p_selected==NULL; i++)
-    {
-        int i_width = (i % 2 == 0) ? fmt->i_width : fmt->i_visible_width;
-        int i_height = (i % 2 == 0) ? fmt->i_height : fmt->i_visible_height;
-        int i_div = (i > 2) ? 4 : 0;
-
-        result = p_output->GetDisplayModeIterator(&p_iterator);
-        if(result == S_OK)
-        {
-            IDeckLinkDisplayMode *p_mode = NULL;
-            while(p_iterator->Next(&p_mode) == S_OK)
-            {
-                BMDDisplayMode mode_id = p_mode->GetDisplayMode();
-                BMDTimeValue frameduration;
-                BMDTimeScale timescale;
-                const char *psz_mode_name;
-                decklink_str_t tmp_name;
-
-                if(p_mode->GetFrameRate(&frameduration, &timescale) == S_OK &&
-                        p_mode->GetName(&tmp_name) == S_OK)
-                {
-                    BMDDisplayMode modenl = htonl(mode_id);
-                    psz_mode_name = DECKLINK_STRDUP(tmp_name);
-                    DECKLINK_FREE(tmp_name);
-
-                    if(i==0)
-                    {
-                        BMDFieldDominance field = htonl(p_mode->GetFieldDominance());
-                        msg_Dbg(p_stream, "Found mode '%4.4s': %s (%ldx%ld, %4.4s, %.3f fps, scale %ld dur %ld)",
-                                (const char*)&modenl, psz_mode_name,
-                                p_mode->GetWidth(), p_mode->GetHeight(),
-                                (const char *)&field,
-                                double(timescale) / frameduration,
-                                timescale, frameduration);
-                    }
-                }
-                else
-                {
-                    p_mode->Release();
-                    continue;
-                }
-
-                if(forcedmode != bmdDisplayModeNotSupported && unlikely(!p_selected))
-                {
-                    BMDDisplayMode modenl = htonl(forcedmode);
-                    msg_Dbg(p_stream, "Forced mode '%4.4s'", (char *)&modenl);
-                    if(forcedmode == mode_id)
-                        p_selected = p_mode;
-                    else
-                        p_mode->Release();
-                    continue;
-                }
-
-                if(p_selected == NULL && forcedmode == bmdDisplayModeNotSupported)
-                {
-                    if(i_width >> i_div == p_mode->GetWidth() >> i_div &&
-                       i_height >> i_div == p_mode->GetHeight() >> i_div)
-                    {
-                        unsigned int num_deck, den_deck;
-                        unsigned int num_stream, den_stream;
-                        vlc_ureduce(&num_deck, &den_deck, timescale, frameduration, 0);
-                        vlc_ureduce(&num_stream, &den_stream,
-                                    fmt->i_frame_rate, fmt->i_frame_rate_base, 0);
-
-                        if (num_deck == num_stream && den_deck == den_stream)
-                        {
-                            msg_Info(p_stream, "Matches incoming stream");
-                            p_selected = p_mode;
-                            continue;
-                        }
-                    }
-                }
-
-                p_mode->Release();
-            }
-            p_iterator->Release();
-        }
-    }
-    return p_selected;
-}
-
-
-const char * DBMSDIOutput::ErrorToString(long i_code)
-{
-    static struct
-    {
-        long i_return_code;
-        const char * const psz_string;
-    } const errors_to_string[] = {
-        { E_UNEXPECTED,  "Unexpected error" },
-        { E_NOTIMPL,     "Not implemented" },
-        { E_OUTOFMEMORY, "Out of memory" },
-        { E_INVALIDARG,  "Invalid argument" },
-        { E_NOINTERFACE, "No interface" },
-        { E_POINTER,     "Invalid pointer" },
-        { E_HANDLE,      "Invalid handle" },
-        { E_ABORT,       "Aborted" },
-        { E_FAIL,        "Failed" },
-        { E_ACCESSDENIED,"Access denied" }
-    };
-
-    for(size_t i=0; i<ARRAY_SIZE(errors_to_string); i++)
-    {
-        if(errors_to_string[i].i_return_code == i_code)
-            return errors_to_string[i].psz_string;
-    }
-    return NULL;
-}
-
 #define CHECK(message) do { \
     if (result != S_OK) \
     { \
-    const char *psz_err = ErrorToString(result); \
+    const char *psz_err = Decklink::Helper::ErrorToString(result); \
     if(psz_err)\
     msg_Err(p_stream, message ": %s", psz_err); \
     else \
@@ -425,7 +315,8 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
     result = p_config->SetInt(bmdDeckLinkConfigVideoOutputConnection, vconn);
     CHECK("Could not set video output connection");
 
-    p_display_mode = MatchDisplayMode(vfmt, wanted_mode_id);
+    p_display_mode = Decklink::Helper::MatchDisplayMode(VLC_OBJECT(p_stream),
+                                                        p_output, vfmt, wanted_mode_id);
     if(p_display_mode == NULL)
     {
         msg_Err(p_stream, "Could not negociate a compatible display mode");
