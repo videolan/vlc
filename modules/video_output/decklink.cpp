@@ -40,7 +40,6 @@
 #include <vlc_vout_display.h>
 
 #include <vlc_block.h>
-#include <vlc_image.h>
 #include <vlc_aout.h>
 
 #ifdef HAVE_ARPA_INET_H
@@ -51,6 +50,7 @@
 #include "../stream_out/sdi/V210.hpp"
 #include "../stream_out/sdi/Ancillary.hpp"
 #include "../stream_out/sdi/DBMHelper.hpp"
+#include "../stream_out/sdi/SDIGenerator.hpp"
 #include <DeckLinkAPIDispatch.cpp>
 
 #define FRAME_SIZE 1920
@@ -400,43 +400,6 @@ static BMDVideoConnection getVConn(vout_display_t *vd, BMDVideoConnection mask)
 /*****************************************************************************
  *
  *****************************************************************************/
-static picture_t * CreateNoSignalPicture(vlc_object_t *p_this, const video_format_t *fmt,
-                                         const char *psz_file)
-{
-    picture_t *p_pic = NULL;
-    image_handler_t *img = image_HandlerCreate(p_this);
-    if (!img)
-    {
-        msg_Err(p_this, "Could not create image converter");
-        return NULL;
-    }
-
-    video_format_t in;
-    video_format_Init(&in, 0);
-    video_format_Setup(&in, 0,
-                       fmt->i_width, fmt->i_height,
-                       fmt->i_width, fmt->i_height, 1, 1);
-
-    picture_t *png = image_ReadUrl(img, psz_file, &in);
-    if (png)
-    {
-        video_format_t dummy;
-        video_format_Copy(&dummy, fmt);
-        p_pic = image_Convert(img, png, &in, &dummy);
-        if(!video_format_IsSimilar(&dummy, fmt))
-        {
-            picture_Release(p_pic);
-            p_pic = NULL;
-        }
-        picture_Release(png);
-        video_format_Clean(&dummy);
-    }
-    image_HandlerDelete(img);
-    video_format_Clean(&in);
-
-    return p_pic;
-}
-
 static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
 {
 #define CHECK(message) do { \
@@ -823,7 +786,7 @@ static int OpenVideo(vlc_object_t *p_this)
         char *pic_file = var_InheritString(p_this, VIDEO_CFG_PREFIX "nosignal-image");
         if (pic_file)
         {
-            sys->video.pic_nosignal = CreateNoSignalPicture(p_this, &vd->fmt, pic_file);
+            sys->video.pic_nosignal = sdi::Generator::Picture(p_this, pic_file, &vd->fmt);
             if (!sys->video.pic_nosignal)
                 msg_Err(p_this, "Could not create no signal picture");
             free(pic_file);

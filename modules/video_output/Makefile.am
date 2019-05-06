@@ -20,6 +20,8 @@ libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp \
                                       stream_out/sdi/Ancillary.hpp \
                                       stream_out/sdi/DBMHelper.cpp \
                                       stream_out/sdi/DBMHelper.hpp \
+                                      stream_out/sdi/SDIGenerator.cpp \
+                                      stream_out/sdi/SDIGenerator.hpp \
                                       stream_out/sdi/V210.cpp \
                                       stream_out/sdi/V210.hpp
 libdecklinkoutput_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_decklinkoutput)
