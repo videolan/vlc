@@ -29,6 +29,12 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 
+#include <vlc/libvlc.h>
+#include <vlc/libvlc_picture.h>
+#include <vlc/libvlc_media.h>
+#include <vlc/libvlc_renderer_discoverer.h>
+#include <vlc/libvlc_media_player.h>
+
 #include <assert.h>
 #include <math.h>
 
@@ -52,7 +58,6 @@
 #include "../../video_chroma/d3d11_fmt.h"
 #include "d3d11_quad.h"
 #include "d3d11_shaders.h"
-#include "d3d_render.h"
 
 #include "common.h"
 #include "../video_chroma/copy.h"
@@ -159,11 +164,11 @@ struct vout_display_sys_t
 
     /* outside rendering */
     void *outside_opaque;
-    d3d_device_setup_cb    setupDeviceCb;
-    d3d_device_cleanup_cb  cleanupDeviceCb;
-    d3d_update_output_cb   updateOutputCb;
-    d3d_swap_cb            swapCb;
-    d3d_start_end_rendering_cb startEndRenderingCb;
+    libvlc_video_direct3d_device_setup_cb    setupDeviceCb;
+    libvlc_video_direct3d_device_cleanup_cb  cleanupDeviceCb;
+    libvlc_video_direct3d_update_output_cb   updateOutputCb;
+    libvlc_video_swap_cb                     swapCb;
+    libvlc_video_direct3d_start_end_rendering_cb startEndRenderingCb;
 };
 
 static picture_pool_t *Pool(vout_display_t *, unsigned);
@@ -192,9 +197,9 @@ static void UpdatePicQuadPosition(vout_display_t *);
 
 static int Control(vout_display_t *, int, va_list);
 
-static void SelectSwapchainColorspace(struct d3d11_local_swapchain *, const struct direct3d_cfg_t *);
+static void SelectSwapchainColorspace(struct d3d11_local_swapchain *, const libvlc_video_direct3d_cfg_t *);
 
-static int UpdateDisplayFormat(vout_display_t *vd, struct output_cfg_t *out,
+static int UpdateDisplayFormat(vout_display_t *vd, libvlc_video_output_cfg_t *out,
                                const video_format_t *input_fmt)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -258,7 +263,7 @@ static int UpdateDisplayFormat(vout_display_t *vd, struct output_cfg_t *out,
 static int QueryDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
-    struct direct3d_cfg_t cfg;
+    libvlc_video_direct3d_cfg_t cfg;
 
     cfg.width  = sys->area.vdcfg.display.width;
     cfg.height = sys->area.vdcfg.display.height;
@@ -298,7 +303,7 @@ static int QueryDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
     cfg.colorspace = fmt->space;
     cfg.transfer   = fmt->transfer;
 
-    struct output_cfg_t out;
+    libvlc_video_output_cfg_t out;
     if (!sys->updateOutputCb( sys->outside_opaque, &cfg, &out ))
     {
         msg_Err(vd, "Failed to set format %dx%d %d bits on output", cfg.width, cfg.height, cfg.bitdepth);
@@ -409,7 +414,7 @@ static void CreateSwapchain(struct d3d11_local_swapchain *display, UINT width, U
 }
 #endif /* !VLC_WINSTORE_APP */
 
-static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const struct direct3d_cfg_t *cfg )
+static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc_video_direct3d_cfg_t *cfg )
 {
     ID3D11Texture2D* pBackBuffer;
     HRESULT hr;
@@ -528,7 +533,7 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const struct
     return true;
 }
 
-static bool LocalSwapchainSetupDevice( void **opaque, const struct device_cfg_t *cfg, struct device_setup_t *out )
+static bool LocalSwapchainSetupDevice( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
 {
     struct d3d11_local_swapchain *display = *opaque;
     HRESULT hr;
@@ -589,7 +594,7 @@ static void LocalSwapchainSwap( void *opaque )
     }
 }
 
-static bool LocalSwapchainUpdateOutput( void *opaque, const struct direct3d_cfg_t *cfg, struct output_cfg_t *out )
+static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
 {
     struct d3d11_local_swapchain *display = opaque;
     if ( !UpdateSwapchain( display, cfg ) )
@@ -638,6 +643,13 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return ret;
 
     CommonInit(vd, &sys->area, cfg);
+
+    sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
+    sys->setupDeviceCb       = var_InheritAddress( vd, "vout-cb-setup" );
+    sys->cleanupDeviceCb     = var_InheritAddress( vd, "vout-cb-cleanup" );
+    sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
+    sys->swapCb              = var_InheritAddress( vd, "vout-cb-swap" );
+    sys->startEndRenderingCb = var_InheritAddress( vd, "vout-cb-make-current" );
 
     if ( sys->setupDeviceCb == NULL || sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
@@ -1188,7 +1200,7 @@ static bool canHandleConversion(const dxgi_color_space *src, const dxgi_color_sp
 }
 #endif
 
-static void SelectSwapchainColorspace(struct d3d11_local_swapchain *display, const struct direct3d_cfg_t *cfg)
+static void SelectSwapchainColorspace(struct d3d11_local_swapchain *display, const libvlc_video_direct3d_cfg_t *cfg)
 {
     HRESULT hr;
     int best = 0;
@@ -1323,10 +1335,10 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr = E_FAIL;
 
-    struct device_cfg_t cfg = {
+    libvlc_video_direct3d_device_cfg_t cfg = {
         .hardware_decoding = is_d3d11_opaque( vd->source.i_chroma ) 
     };
-    struct device_setup_t out;
+    libvlc_video_direct3d_device_setup_t out;
     ID3D11DeviceContext *d3d11_ctx = NULL;
     if ( sys->setupDeviceCb( &sys->outside_opaque, &cfg, &out ) )
         d3d11_ctx = out.device_context;
