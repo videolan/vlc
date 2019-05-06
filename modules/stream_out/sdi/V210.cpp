@@ -94,3 +94,15 @@ void V210::Convert(const picture_t *pic, unsigned dst_stride, void *frame_bytes)
         v += pic->p[2].i_pitch / 2 - width / 2;
     }
 }
+
+void V210::Convert(const uint16_t *src, size_t srccount, void *out)
+{
+    uint8_t *dst = reinterpret_cast<uint8_t *>(out);
+    for (size_t i = 0; i < srccount / 6; i++)
+    {
+        put_le32(&dst, src[i*6+0] << 10);
+        put_le32(&dst, src[i*6+1] | (src[i*6+2] << 20));
+        put_le32(&dst, src[i*6+3] << 10);
+        put_le32(&dst, src[i*6+4] | (src[i*6+5] << 20));
+    }
+}

@@ -29,7 +29,9 @@ namespace sdi
     class V210
     {
         public:
+            static const int ALIGNMENT_U16 = 6;
             static void Convert(const picture_t *, unsigned, void *);
+            static void Convert(const uint16_t *, size_t, void *);
     };
 
 }

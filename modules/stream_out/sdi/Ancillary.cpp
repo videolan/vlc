@@ -23,6 +23,7 @@
 #endif
 
 #include "Ancillary.hpp"
+#include "V210.hpp"
 #include <cassert>
 
 using namespace sdi;
@@ -92,12 +93,7 @@ void AFD::FillBuffer(uint8_t *p_buf, size_t i_buf)
         afd[i] = 0x040;
 
     /* convert to v210 and write into VANC */
-    for (size_t w = 0; w < s / 6 ; w++) {
-        put_le32(&p_buf, afd[w*6+0] << 10);
-        put_le32(&p_buf, afd[w*6+1] | (afd[w*6+2] << 20));
-        put_le32(&p_buf, afd[w*6+3] << 10);
-        put_le32(&p_buf, afd[w*6+4] | (afd[w*6+5] << 20));
-    }
+    V210::Convert(afd, s, p_buf);
 }
 
 Captions::Captions(const uint8_t *p, size_t s,
@@ -213,12 +209,7 @@ void Captions::FillBuffer(uint8_t *p_buf, size_t i_buf)
         cdp[i] = 0x040;
 
     /* convert to v210 and write into VBI line 15 of VANC */
-    for (size_t w = 0; w < s / 6 ; w++) {
-        put_le32(&p_buf, cdp[w*6+0] << 10);
-        put_le32(&p_buf, cdp[w*6+1] | (cdp[w*6+2] << 20));
-        put_le32(&p_buf, cdp[w*6+3] << 10);
-        put_le32(&p_buf, cdp[w*6+4] | (cdp[w*6+5] << 20));
-    }
+    V210::Convert(cdp, s, p_buf);
 
     delete[] cdp;
 }
