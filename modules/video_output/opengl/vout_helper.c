@@ -628,7 +628,9 @@ opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
             .log_level = PL_LOG_INFO,
         });
         if (tc->pl_ctx) {
-#   if PL_API_VER >= 6
+#   if PL_API_VER >= 20
+            tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL);
+#   elif PL_API_VER >= 6
             tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0);
 #   else
             tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0, 0);
