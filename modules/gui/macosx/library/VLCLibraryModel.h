@@ -54,8 +54,6 @@ extern NSString *VLCLibraryModelMediaItemUpdated;
 @property (readonly) size_t numberOfRecentMedia;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfRecentMedia;
 
-- (nullable VLCMediaLibraryMediaItem *)mediaItemAtIndexPath:(NSIndexPath *)index;
-
 @property (readonly) NSArray <VLCMediaLibraryEntryPoint *> *listOfMonitoredFolders;
 
 @end

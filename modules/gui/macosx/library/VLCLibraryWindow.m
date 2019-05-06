@@ -35,7 +35,6 @@
 #import "library/VLCLibraryDataSource.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryModel.h"
-#import "library/VLCLibraryMenuController.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 
 #import "media-source/VLCMediaSourceCollectionViewItem.h"
@@ -256,23 +255,47 @@ static const float f_playlist_row_height = 72.;
     switch (_segmentedTitleControl.selectedSegment) {
         case 0:
             _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeVideo;
-            _mediaSourceScrollView.hidden = YES;
-            _videoLibraryStackView.hidden = NO;
+            if (_mediaSourceScrollView.superview != nil) {
+                [_mediaSourceScrollView removeFromSuperview];
+            }
+            if (_videoLibraryStackView.superview == nil) {
+                _videoLibraryStackView.translatesAutoresizingMaskIntoConstraints = NO;
+                [_libraryTargetView addSubview:_videoLibraryStackView];
+                NSDictionary *dict = NSDictionaryOfVariableBindings(_videoLibraryStackView);
+                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryStackView(>=572.)]|" options:0 metrics:0 views:dict]];
+                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryStackView(>=444.)]|" options:0 metrics:0 views:dict]];
+            }
             [_videoLibraryCollectionView reloadData];
             [_recentVideoLibraryCollectionView reloadData];
             break;
 
         case 1:
             _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeAudio;
-            _mediaSourceScrollView.hidden = YES;
-            _videoLibraryStackView.hidden = NO;
+            if (_mediaSourceScrollView.superview != nil) {
+                [_mediaSourceScrollView removeFromSuperview];
+            }
+            if (_videoLibraryStackView.superview == nil) {
+                _videoLibraryStackView.translatesAutoresizingMaskIntoConstraints = NO;
+                [_libraryTargetView addSubview:_videoLibraryStackView];
+                NSDictionary *dict = NSDictionaryOfVariableBindings(_videoLibraryStackView);
+                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryStackView(>=572.)]|" options:0 metrics:0 views:dict]];
+                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryStackView(>=444.)]|" options:0 metrics:0 views:dict]];
+            }
             [_videoLibraryCollectionView reloadData];
             [_recentVideoLibraryCollectionView reloadData];
             break;
 
         default:
-            _mediaSourceScrollView.hidden = NO;
-            _videoLibraryStackView.hidden = YES;
+            if (_videoLibraryStackView.superview != nil) {
+                [_videoLibraryStackView removeFromSuperview];
+            }
+            if (_mediaSourceScrollView.superview == nil) {
+                _mediaSourceScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+                [_libraryTargetView addSubview:_mediaSourceScrollView];
+                NSDictionary *dict = NSDictionaryOfVariableBindings(_mediaSourceScrollView);
+                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_mediaSourceScrollView(>=572.)]|" options:0 metrics:0 views:dict]];
+                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_mediaSourceScrollView(>=444.)]|" options:0 metrics:0 views:dict]];
+            }
             [_mediaSourceDataSource loadMediaSources];
             [_mediaSourceCollectionView reloadData];
             break;
@@ -386,39 +409,6 @@ static const float f_playlist_row_height = 72.;
     [window setExcludedFromWindowsMenu:YES];
     [window setAcceptsMouseMovedEvents:YES];
     [window setContentMinSize:NSMakeSize(f_min_window_width, f_min_window_height)];
-}
-
-@end
-
-@interface VLCLibraryCollectionView()
-{
-    VLCLibraryMenuController *_menuController;
-}
-
-@end
-
-@implementation VLCLibraryCollectionView
-
--(void)mouseDown:(NSEvent *)theEvent
-{
-    if (theEvent.modifierFlags & NSControlKeyMask) {
-        if (!_menuController) {
-            _menuController = [[VLCLibraryMenuController alloc] init];
-        }
-        [_menuController popupMenuWithEvent:theEvent forView:self];
-    }
-
-    [super mouseDown:theEvent];
-}
-
-- (void)rightMouseDown:(NSEvent *)theEvent
-{
-    if (!_menuController) {
-        _menuController = [[VLCLibraryMenuController alloc] init];
-    }
-    [_menuController popupMenuWithEvent:theEvent forView:self];
-
-    [super rightMouseDown:theEvent];
 }
 
 @end

@@ -25,8 +25,9 @@
 #import "main/VLCMain.h"
 #import "main/CompatibilityFixes.h"
 #import "library/VLCLibraryController.h"
-#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryMenuController.h"
 #import "views/VLCImageView.h"
 #import "views/VLCLinearProgressIndicator.h"
 #import "extensions/NSString+Helpers.h"
@@ -38,6 +39,7 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 @interface VLCLibraryCollectionViewItem()
 {
     VLCLibraryController *_libraryController;
+    VLCLibraryMenuController *_menuController;
 }
 @end
 
@@ -185,8 +187,7 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
         _libraryController = [[VLCMain sharedInstance] libraryController];
     }
 
-    NSIndexPath *indexPath = [[self collectionView] indexPathForItem:self];
-    [_libraryController appendItemAtIndexPathToPlaylist:indexPath playImmediately:YES];
+    [_libraryController appendItemToPlaylist:_representedMediaItem playImmediately:YES];
 }
 
 - (IBAction)addToPlaylist:(id)sender
@@ -195,8 +196,31 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
         _libraryController = [[VLCMain sharedInstance] libraryController];
     }
 
-    NSIndexPath *indexPath = [[self collectionView] indexPathForItem:self];
-    [_libraryController appendItemAtIndexPathToPlaylist:indexPath playImmediately:NO];
+    [_libraryController appendItemToPlaylist:_representedMediaItem playImmediately:NO];
+}
+
+-(void)mouseDown:(NSEvent *)theEvent
+{
+    if (theEvent.modifierFlags & NSControlKeyMask) {
+        if (!_menuController) {
+            _menuController = [[VLCLibraryMenuController alloc] init];
+        }
+        _menuController.representedMediaItem = self.representedMediaItem;
+        [_menuController popupMenuWithEvent:theEvent forView:self.view];
+    }
+
+    [super mouseDown:theEvent];
+}
+
+- (void)rightMouseDown:(NSEvent *)theEvent
+{
+    if (!_menuController) {
+        _menuController = [[VLCLibraryMenuController alloc] init];
+    }
+    _menuController.representedMediaItem = self.representedMediaItem;
+    [_menuController popupMenuWithEvent:theEvent forView:self.view];
+
+    [super rightMouseDown:theEvent];
 }
 
 @end

@@ -185,19 +185,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaListUpdated object:self];
 }
 
-- (nullable VLCMediaLibraryMediaItem *)mediaItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (_cachedRecentMedia.count > 0 && indexPath.section == 0) {
-        return _cachedRecentMedia[indexPath.item];
-    }
-
-    // FIXME: the scope needs be larger than just the video list
-    if (!_cachedVideoMedia) {
-        return nil;
-    }
-    return _cachedVideoMedia[indexPath.item];
-}
-
 - (NSArray<VLCMediaLibraryMediaItem *> *)listOfVideoMedia
 {
     if (!_cachedVideoMedia) {

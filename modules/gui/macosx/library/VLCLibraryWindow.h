@@ -30,17 +30,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface VLCLibraryCollectionView : NSCollectionView
-@end
-
 @interface VLCLibraryWindow : VLCVideoWindowCommon
 
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
 @property (readwrite, weak) IBOutlet NSStackView *videoLibraryStackView;
-@property (readwrite, weak) IBOutlet VLCLibraryCollectionView *videoLibraryCollectionView;
+@property (readwrite, weak) IBOutlet NSCollectionView *videoLibraryCollectionView;
 @property (readwrite, weak) IBOutlet NSCollectionView *recentVideoLibraryCollectionView;
 @property (readwrite, weak) IBOutlet NSCollectionView *mediaSourceCollectionView;
 @property (readwrite, weak) IBOutlet NSScrollView *mediaSourceScrollView;
+@property (readwrite, weak) IBOutlet NSView *libraryTargetView;
 @property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
 @property (readwrite, weak) IBOutlet NSTextField *upNextLabel;
 @property (readwrite, weak) IBOutlet NSBox *upNextSeparator;

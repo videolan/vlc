@@ -24,13 +24,13 @@
 
 #import "main/VLCMain.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryDataTypes.h"
 
 #import "extensions/NSString+Helpers.h"
 
 @interface VLCLibraryMenuController ()
 {
     NSMenu *_libraryMenu;
-    NSIndexPath *_actionIndexPath;
 }
 @end
 
@@ -55,8 +55,6 @@
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
 {
-    _actionIndexPath = [self.libraryCollectionView indexPathForItemAtPoint:[NSEvent mouseLocation]];
-
     [NSMenu popUpContextMenu:_libraryMenu withEvent:theEvent forView:theView];
 }
 
@@ -64,12 +62,12 @@
 
 - (void)play:(id)sender
 {
-    [[[VLCMain sharedInstance] libraryController] appendItemAtIndexPathToPlaylist:_actionIndexPath playImmediately:YES];
+    [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:self.representedMediaItem playImmediately:YES];
 }
 
 - (void)appendToPlaylist:(id)sender
 {
-    [[[VLCMain sharedInstance] libraryController] appendItemAtIndexPathToPlaylist:_actionIndexPath playImmediately:NO];
+    [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:self.representedMediaItem playImmediately:NO];
 }
 
 - (void)addMedia:(id)sender
@@ -79,7 +77,7 @@
 
 - (void)revealInFinder:(id)sender
 {
-    [[[VLCMain sharedInstance] libraryController] showItemAtIndexPathInFinder:_actionIndexPath];
+    [[[VLCMain sharedInstance] libraryController] showItemInFinder:self.representedMediaItem];
 }
 
 @end
