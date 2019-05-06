@@ -134,6 +134,14 @@ typedef struct
     uint32_t     bmask;
 } d3d9_format_t;
 
+struct device_cfg_t {
+    bool hardware_decoding;
+};
+
+struct device_setup_t {
+    IDirect3DDevice9 *device_context;
+};
+
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
@@ -165,6 +173,7 @@ struct vout_display_sys_t
 
     /* outside rendering */
     void *outside_opaque;
+    bool (*setupDeviceCb)(void *opaque, const struct device_cfg_t*, struct device_setup_t* );
     void (*cleanupDeviceCb)(void* opaque);
     void (*swapCb)(void* opaque);
     void (*endRenderCb)(void* opaque);
@@ -1585,6 +1594,11 @@ static int FindShadersCallback(const char *name, char ***values, char ***descs)
 
 }
 
+static bool LocalSwapchainSetupDevice( void *opaque, const struct device_cfg_t *cfg, struct device_setup_t *out )
+{
+    return false; /* don't use an "external" D3D9 device */
+}
+
 /**
  * It creates a Direct3D vout display.
  */
@@ -1619,6 +1633,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     {
         /* use our own callbacks, since there isn't any external ones */
         sys->outside_opaque = vd;
+        sys->setupDeviceCb       = LocalSwapchainSetupDevice;
         sys->cleanupDeviceCb     = NULL;
         sys->swapCb              = Swap;
         sys->starRenderCb        = StartRendering;
@@ -1626,7 +1641,29 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->resizeCb            = NULL;
     }
 
-    if ( D3D9_Create( vd, &sys->hd3d ) ) {
+    struct device_cfg_t surface_cfg = {
+        .hardware_decoding = is_d3d9_opaque( vd->source.i_chroma )
+    };
+    struct device_setup_t device_setup;
+    IDirect3DDevice9 *d3d9_device = NULL;
+    if ( sys->setupDeviceCb( sys->outside_opaque, &surface_cfg, &device_setup ) )
+        d3d9_device = device_setup.device_context;
+    if ( d3d9_device == NULL && sys->setupDeviceCb != LocalSwapchainSetupDevice )
+    {
+        msg_Err(vd, "Missing external IDirect3DDevice9");
+        return VLC_EGENERIC;
+    }
+    if (d3d9_device != NULL)
+    {
+        if (D3D9_CreateExternal(vd, &sys->hd3d, d3d9_device)) {
+            msg_Err(vd, "External Direct3D9 could not be used");
+            if ( sys->cleanupDeviceCb )
+                sys->cleanupDeviceCb( sys->outside_opaque );
+            free(sys);
+            return VLC_EGENERIC;
+        }
+    }
+    else if (D3D9_Create(vd, &sys->hd3d)) {
         msg_Err( vd, "Direct3D9 could not be initialized" );
         if ( sys->cleanupDeviceCb )
             sys->cleanupDeviceCb( sys->outside_opaque );
