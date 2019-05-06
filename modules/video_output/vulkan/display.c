@@ -71,6 +71,9 @@ struct vout_display_sys_t
     struct pl_dither_params dither;
     struct pl_render_params params;
     struct pl_color_space target;
+#if PL_API_VER >= 13
+    struct pl_peak_detect_params peak_detect;
+#endif
     enum pl_chroma_location yuv_chroma_loc;
     int dither_depth;
 };
@@ -617,12 +620,25 @@ vlc_module_begin () set_shortname ("Vulkan")
             TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT, false)
 #endif
     add_bool("gamut-warning", false, GAMUT_WARN_TEXT, GAMUT_WARN_LONGTEXT, true)
+
+#if PL_API_VER < 12
     add_integer_with_range("peak-frames", pl_color_map_default_params.peak_detect_frames,
             0, 255, PEAK_FRAMES_TEXT, PEAK_FRAMES_LONGTEXT, false)
-    add_float_with_range("target-avg", 0.25,
-            0.0, 1.0, TARGET_AVG_TEXT, TARGET_AVG_LONGTEXT, false)
     add_float_with_range("scene-threshold", pl_color_map_default_params.scene_threshold,
             0., 10., SCENE_THRESHOLD_TEXT, SCENE_THRESHOLD_LONGTEXT, false)
+#endif
+
+#if PL_API_VER >= 13
+    add_float_with_range("peak-period", pl_peak_detect_default_params.smoothing_period,
+            0., 1000., PEAK_PERIOD_TEXT, PEAK_PERIOD_LONGTEXT, false)
+    add_float("scene-threshold-low", pl_peak_detect_default_params.scene_threshold_low,
+            SCENE_THRESHOLD_LOW_TEXT, SCENE_THRESHOLD_LOW_LONGTEXT, false)
+    add_float("scene-threshold-high", pl_peak_detect_default_params.scene_threshold_high,
+            SCENE_THRESHOLD_HIGH_TEXT, SCENE_THRESHOLD_HIGH_LONGTEXT, false)
+#endif
+
+    add_float_with_range("target-avg", 0.25,
+            0.0, 1.0, TARGET_AVG_TEXT, TARGET_AVG_LONGTEXT, false)
 
     set_section("Dithering", NULL)
     add_integer("dither", -1,
@@ -673,6 +689,9 @@ vlc_module_begin () set_shortname ("Vulkan")
     add_bool("overlay-direct", false, OVERLAY_DIRECT_TEXT, OVERLAY_DIRECT_LONGTEXT, false)
     add_bool("disable-linear", false, DISABLE_LINEAR_TEXT, DISABLE_LINEAR_LONGTEXT, false)
     add_bool("force-general", false, FORCE_GENERAL_TEXT, FORCE_GENERAL_LONGTEXT, false)
+#if PL_API_VER >= 13
+    add_bool("delayed-peak", false, DELAYED_PEAK_TEXT, DELAYED_PEAK_LONGTEXT, false)
+#endif
 
 vlc_module_end ()
 
@@ -711,8 +730,10 @@ static void UpdateParams(vout_display_t *vd)
     sys->color_map.tone_mapping_desaturate = var_InheritFloat(vd, "tone-mapping-desat");
 #endif
     sys->color_map.gamut_warning = var_InheritBool(vd, "gamut-warning");
+#if PL_API_VER < 12
     sys->color_map.peak_detect_frames = var_InheritInteger(vd, "peak-frames");
     sys->color_map.scene_threshold = var_InheritFloat(vd, "scene-threshold");
+#endif
 
     sys->dither = pl_dither_default_params;
     int method = var_InheritInteger(vd, "dither");
@@ -733,6 +754,16 @@ static void UpdateParams(vout_display_t *vd)
     sys->params.disable_overlay_sampling = var_InheritBool(vd, "overlay-direct");
     sys->params.disable_linear_scaling = var_InheritBool(vd, "disable-linear");
     sys->params.disable_builtin_scalers = var_InheritBool(vd, "force-general");
+
+#if PL_API_VER >= 13
+    sys->peak_detect.smoothing_period = var_InheritFloat(vd, "peak-period");
+    sys->peak_detect.scene_threshold_low = var_InheritFloat(vd, "scene-threshold-low");
+    sys->peak_detect.scene_threshold_high = var_InheritFloat(vd, "scene-threshold-high");
+    if (sys->peak_detect.smoothing_period > 0.0) {
+        sys->params.peak_detect_params = &sys->peak_detect;
+        sys->params.allow_delayed_peak_detect = var_InheritBool(vd, "delayed-peak");
+    }
+#endif
 
     int preset = var_InheritInteger(vd, "upscaler-preset");
     sys->params.upscaler = scale_config[preset];

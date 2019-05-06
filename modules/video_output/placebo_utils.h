@@ -183,11 +183,20 @@ static const char * const tone_text[] = {
 #define PEAK_FRAMES_TEXT "HDR peak detection buffer size"
 #define PEAK_FRAMES_LONGTEXT "How many input frames to consider when determining the brightness of HDR signals. Higher values result in a slower/smoother response to brightness level changes. Setting this to 0 disables peak detection entirely."
 
+#define PEAK_PERIOD_TEXT "HDR peak detection period"
+#define PEAK_PERIOD_LONGTEXT "This option enables peak detection with the specified smoothing period. A value of 0.0 disables peak detection. Higher values result in a larger smoothing period which means the detected values will be stable over a longer number of frames, at the cost of responding more slowly to changes in scene brightness"
+
 #define TARGET_AVG_TEXT "Target peak brightness average"
 #define TARGET_AVG_LONGTEXT "If the source frame has an average brightness exceeding this number, the frame will be automatically darkened to compensate. This feature only works when peak detection is enabled."
 
 #define SCENE_THRESHOLD_TEXT "HDR peak scene change threshold"
 #define SCENE_THRESHOLD_LONGTEXT "When using HDR peak detection, this sets a threshold for sudden brightness changes that should be considered as scene changes. This will result in the detected peak being immediately updated to the new value, rather than gradually being adjusted. Setting this to 0 disables this feature."
+
+#define SCENE_THRESHOLD_LOW_TEXT "Scene change lower threshold"
+#define SCENE_THRESHOLD_LOW_LONGTEXT "When using HDR peak detection, this sets the lower boundary of a brightness change indicating a scene change. Brightness changes between frames that exceed this threshold will begin to be mixed into the detected peak more strongly, bypassing the peak smoothing. Setting this to a negative number disables this logic."
+
+#define SCENE_THRESHOLD_HIGH_TEXT "Scene change upper threshold"
+#define SCENE_THRESHOLD_HIGH_LONGTEXT "This sets the upper boundary of a brightness change indicating a scene change. Brightness changes that exceed this value will instantly replace the detected peak, bypassing all smoothing. Setting this to a negative number disables this logic."
 
 #define DITHER_TEXT "Dithering algorithm"
 #define DITHER_LONGTEXT "The algorithm to use when dithering to a lower bit depth."
@@ -483,5 +492,8 @@ static const struct pl_filter_function *const filter_fun[] = {
 
 #define FORCE_GENERAL_TEXT "Force the use of general-purpose scalers"
 #define FORCE_GENERAL_LONGTEXT "Normally, certain special scalers will be replaced by faster versions instead of going through the general scaler architecture. Enabling this option disables these optimizations."
+
+#define DELAYED_PEAK_TEXT "Allow delaying peak detection by up to one frame"
+#define DELAYED_PEAK_LONGTEXT "In some cases, peak detection may be more convenient to compute if the results are delayed by a frame. When this option is disabled, libplacebo will use an indirect buffer simply to force peak detection results to be up-to-date. Enabling it allows skipping this indirection in order to improve performance at the cost of some potentially noticeable brightness flickering immediately after a scene change."
 
 #endif // VLC_PLACEBO_UTILS_H
