@@ -284,12 +284,12 @@ static int SetupWindowedOutput(vout_display_t *vd, UINT width, UINT height)
     HRESULT hr;
 
     IDXGIFactory2 *dxgifactory;
-    sys->display.pixelFormat = FindD3D11Format( vd, &sys->d3d_dev, 0, true,
+    sys->display.pixelFormat = FindD3D11Format( vd, &sys->internal_swapchain.d3d_dev, 0, true,
                                                 vd->source.i_chroma==VLC_CODEC_D3D11_OPAQUE_10B ? 10 : 8,
                                                 0, 0,
                                                 false, D3D11_FORMAT_SUPPORT_DISPLAY );
     if (unlikely(sys->display.pixelFormat == NULL))
-        sys->display.pixelFormat = FindD3D11Format( vd, &sys->d3d_dev, 0, false,
+        sys->display.pixelFormat = FindD3D11Format( vd, &sys->internal_swapchain.d3d_dev, 0, false,
                                                     vd->source.i_chroma==VLC_CODEC_D3D11_OPAQUE_10B ? 10 : 8,
                                                     0, 0,
                                                     false, D3D11_FORMAT_SUPPORT_DISPLAY );
@@ -300,7 +300,7 @@ static int SetupWindowedOutput(vout_display_t *vd, UINT width, UINT height)
 
     FillSwapChainDesc(vd, width, height, &scd);
 
-    IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
+    IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->internal_swapchain.d3d_dev.d3ddevice);
     if (unlikely(dxgiadapter==NULL)) {
        msg_Err(vd, "Could not get the DXGI Adapter");
        return VLC_EGENERIC;
@@ -313,14 +313,14 @@ static int SetupWindowedOutput(vout_display_t *vd, UINT width, UINT height)
        return VLC_EGENERIC;
     }
 
-    hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
+    hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->internal_swapchain.d3d_dev.d3ddevice,
                                               sys->internal_swapchain.swapchainHwnd, &scd,
                                               NULL, NULL, &sys->internal_swapchain.dxgiswapChain);
     if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
     {
         msg_Warn(vd, "10 bits swapchain failed, try 8 bits");
         scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
+        hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->internal_swapchain.d3d_dev.d3ddevice,
                                                   sys->internal_swapchain.swapchainHwnd, &scd,
                                                   NULL, NULL, &sys->internal_swapchain.dxgiswapChain);
     }
@@ -383,7 +383,7 @@ static bool UpdateSwapchain( void *opaque, const struct direct3d_cfg_t *cfg )
         return false;
     }
 
-    hr = D3D11_CreateRenderTargets( &sys->d3d_dev, (ID3D11Resource *) pBackBuffer,
+    hr = D3D11_CreateRenderTargets( &sys->internal_swapchain.d3d_dev, (ID3D11Resource *) pBackBuffer,
                                     sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
     ID3D11Texture2D_Release( pBackBuffer );
     if ( FAILED( hr ) ) {
@@ -391,7 +391,7 @@ static bool UpdateSwapchain( void *opaque, const struct direct3d_cfg_t *cfg )
         return false;
     }
 
-    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
+    D3D11_ClearRenderTargets( &sys->internal_swapchain.d3d_dev, sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
 
     return true;
 }
@@ -496,7 +496,7 @@ static bool LocalSwapchainStartEndRendering( void *opaque, bool enter )
     {
         vout_display_sys_t *sys = vd->sys;
 
-        D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
+        D3D11_ClearRenderTargets( &sys->internal_swapchain.d3d_dev, sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
     }
     return true;
 }
