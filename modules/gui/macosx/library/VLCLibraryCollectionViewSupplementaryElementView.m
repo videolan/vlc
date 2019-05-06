@@ -23,6 +23,7 @@
 #import "VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
+#import "main/CompatibilityFixes.h"
 
 NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementaryElementViewIdentifier";
 
@@ -51,7 +52,9 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
 
 - (void)viewDidChangeEffectiveAppearance
 {
-    self.textColor = [self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua] ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
+    if (@available(macOS 10_14, *)) {
+        self.textColor = [self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua] ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
+    }
 }
 
 @end
