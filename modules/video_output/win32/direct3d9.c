@@ -1250,6 +1250,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
                 return VLC_EGENERIC;
         }
 #endif
+        UpdateOutput(vd, &vd->fmt);
+
         sys->clear_scene = true;
         sys->area.place_changed = false;
     }
