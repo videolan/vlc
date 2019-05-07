@@ -146,8 +146,7 @@ struct vout_display_sys_t
     bool (*setupDeviceCb)(void* opaque, const struct device_cfg_t*, struct device_setup_t* );
     void (*cleanupDeviceCb)(void* opaque);
     void (*swapCb)(void* opaque);
-    void (*endRenderCb)(void* opaque);
-    bool (*starRenderCb)(void* opaque);
+    bool (*startEndRenderingCb)(void* opaque, bool enter);
     bool (*resizeCb)(void* opaque, unsigned, unsigned);
 };
 
@@ -370,12 +369,16 @@ static bool Resize( void *opaque, unsigned i_width, unsigned i_height )
     return true;
 }
 
-static bool StartRendering( void *opaque )
+static bool LocalSwapchainStartEndRendering( void *opaque, bool enter )
 {
     vout_display_t *vd = opaque;
-    vout_display_sys_t *sys = vd->sys;
 
-    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
+    if ( enter )
+    {
+        vout_display_sys_t *sys = vd->sys;
+
+        D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
+    }
     return true;
 }
 
@@ -487,15 +490,14 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return ret;
 
     bool uses_external_callbacks = true;
-    if (!sys->swapCb || !sys->starRenderCb || !sys->endRenderCb || !sys->resizeCb)
+    if (sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->resizeCb == NULL)
     {
         sys->internal_swapchain.obj = VLC_OBJECT(vd);
         sys->outside_opaque = vd;
         sys->setupDeviceCb       = LocalSwapchainSetupDevice;
         sys->cleanupDeviceCb     = LocalSwapchainCleanupDevice;
         sys->swapCb              = Swap;
-        sys->starRenderCb        = StartRendering;
-        sys->endRenderCb         = NULL;
+        sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
         sys->resizeCb            = Resize;
         uses_external_callbacks = false;
     }
@@ -968,12 +970,11 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     }
 #endif
 
-    if (sys->starRenderCb(sys->outside_opaque))
+    if (sys->startEndRenderingCb(sys->outside_opaque, true))
     {
         PreparePicture(vd, picture, subpicture);
 
-        if (sys->endRenderCb)
-            sys->endRenderCb(sys->outside_opaque);
+        sys->startEndRenderingCb(sys->outside_opaque, false);
     }
 }
 
