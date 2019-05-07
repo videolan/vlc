@@ -23,7 +23,7 @@
 
 #import "VLCBottomBarView.h"
 
-#import "main/CompatibilityFixes.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 @interface VLCBottomBarView () {
     NSBezierPath *_rectanglePath;
@@ -141,14 +141,8 @@
 
 - (void)viewDidChangeEffectiveAppearance
 {
-    if (@available(macOS 10_14, *)) {
-        if ([self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua])
-            [self setDark:YES];
-        else
-            [self setDark:NO];
-
-        [self setNeedsDisplay:YES];
-    }
+    [self setDark:self.shouldShowDarkAppearance];
+    [self setNeedsDisplay:YES];
 }
 
 @end

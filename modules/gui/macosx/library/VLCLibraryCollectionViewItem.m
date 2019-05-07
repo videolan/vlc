@@ -23,7 +23,6 @@
 #import "VLCLibraryCollectionViewItem.h"
 
 #import "main/VLCMain.h"
-#import "main/CompatibilityFixes.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
@@ -33,6 +32,7 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 
@@ -96,15 +96,7 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 
 - (void)updateColoredAppearance
 {
-    if (@available(macOS 10_14, *)) {
-        if ([self.view.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua]) {
-            self.mediaTitleTextField.textColor = [NSColor VLClibraryDarkTitleColor];
-        } else {
-            self.mediaTitleTextField.textColor = [NSColor VLClibraryLightTitleColor];
-        }
-    } else {
-        self.mediaTitleTextField.textColor = [NSColor VLClibraryLightTitleColor];
-    }
+    self.mediaTitleTextField.textColor = self.view.shouldShowDarkAppearance ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
 }
 
 #pragma mark - view representation

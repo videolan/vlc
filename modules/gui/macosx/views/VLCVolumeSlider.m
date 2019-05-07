@@ -22,7 +22,7 @@
 
 #import "VLCVolumeSlider.h"
 
-#import "main/CompatibilityFixes.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "views/VLCVolumeSliderCell.h"
 
 @implementation VLCVolumeSlider
@@ -56,12 +56,10 @@
 
 - (void)viewDidChangeEffectiveAppearance
 {
-    if (@available(macOS 10_14, *)) {
-        if ([self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua]) {
-            [(VLCVolumeSliderCell*)self.cell setSliderStyleDark];
-        } else {
-            [(VLCVolumeSliderCell*)self.cell setSliderStyleLight];
-        }
+    if (self.shouldShowDarkAppearance) {
+        [(VLCVolumeSliderCell*)self.cell setSliderStyleDark];
+    } else {
+        [(VLCVolumeSliderCell*)self.cell setSliderStyleLight];
     }
 }
 

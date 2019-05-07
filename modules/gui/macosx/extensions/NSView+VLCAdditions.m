@@ -23,7 +23,20 @@
 
 #import "NSView+VLCAdditions.h"
 
+#import "main/CompatibilityFixes.h"
+
 @implementation NSView (VLCAdditions)
+
+- (BOOL)shouldShowDarkAppearance
+{
+    if (@available(macOS 10_14, *)) {
+        if ([self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua]) {
+            return YES;
+        }
+    }
+
+    return NO;
+}
 
 - (void)enableSubviews:(BOOL)enabled
 {

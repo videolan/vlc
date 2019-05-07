@@ -23,7 +23,7 @@
 #import "VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
-#import "main/CompatibilityFixes.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementaryElementViewIdentifier";
 
@@ -39,11 +39,7 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
     self = [super initWithFrame:frameRect];
     if (self) {
         self.font = [NSFont VLClibrarySectionHeaderFont];
-        if (@available(macOS 10_14, *)) {
-            self.textColor = [self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua] ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
-        } else {
-            self.textColor = [NSColor VLClibraryLightTitleColor];
-        }
+        self.textColor = self.shouldShowDarkAppearance ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
         self.editable = NO;
         self.selectable = NO;
     }
@@ -52,9 +48,7 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
 
 - (void)viewDidChangeEffectiveAppearance
 {
-    if (@available(macOS 10_14, *)) {
-        self.textColor = [self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua] ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
-    }
+    self.textColor = self.shouldShowDarkAppearance ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
 }
 
 @end

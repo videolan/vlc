@@ -24,8 +24,8 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "main/VLCMain.h"
-#import "main/CompatibilityFixes.h"
 
 #import "playlist/VLCPlaylistTableCellView.h"
 #import "playlist/VLCPlaylistController.h"
@@ -187,16 +187,10 @@ static const float f_playlist_row_height = 72.;
 
 - (void)updateColorsBasedOnAppearance
 {
-    if (@available(macOS 10_14, *)) {
-        if ([self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua]) {
-            self.upNextLabel.textColor = [NSColor VLClibraryDarkTitleColor];
-            self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
-            self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
-        } else {
-            self.upNextLabel.textColor = [NSColor VLClibraryLightTitleColor];
-            self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
-            self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
-        }
+    if (self.contentView.shouldShowDarkAppearance) {
+        self.upNextLabel.textColor = [NSColor VLClibraryDarkTitleColor];
+        self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
+        self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
     } else {
         self.upNextLabel.textColor = [NSColor VLClibraryLightTitleColor];
         self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];

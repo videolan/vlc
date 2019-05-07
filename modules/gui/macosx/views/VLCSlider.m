@@ -22,7 +22,7 @@
 
 #import "VLCSlider.h"
 
-#import "main/CompatibilityFixes.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "views/VLCSliderCell.h"
 
 @implementation VLCSlider
@@ -117,11 +117,10 @@
 
 - (void)viewDidChangeEffectiveAppearance
 {
-    if (@available(macOS 10_14, *)) {
-        if ([self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua])
-            [self setSliderStyleDark];
-        else
-            [self setSliderStyleLight];
+    if (self.shouldShowDarkAppearance) {
+        [self setSliderStyleDark];
+    } else {
+        [self setSliderStyleLight];
     }
 }
 

@@ -34,4 +34,10 @@ extern NSString *const NSAppearanceNameDarkAqua;
 
 #endif
 
+#ifndef MAC_OS_X_VERSION_10_13
+
+extern NSString *const NSCollectionViewSupplementaryElementKind;
+
+#endif
+
 NS_ASSUME_NONNULL_END
