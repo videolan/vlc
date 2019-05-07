@@ -435,6 +435,9 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     }
 #endif
 
+    /* Get the playlist before the lock to avoid a lock-order-inversion */
+    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(p_intf);
+
     vlc_mutex_locker locker (&lock);
     if (busy || open_state == OPEN_STATE_ERROR)
     {
@@ -449,7 +452,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     p_sys->p_mi = NULL;
 
     /* set up the playlist to work on */
-    p_sys->p_playlist = vlc_intf_GetMainPlaylist(p_intf);
+    p_sys->p_playlist = playlist;
     p_sys->p_player = vlc_playlist_GetPlayer( p_sys->p_playlist );
 
     /* */
