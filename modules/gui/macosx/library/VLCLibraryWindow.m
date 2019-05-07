@@ -69,6 +69,15 @@ static const float f_playlist_row_height = 72.;
     VLCMain *mainInstance = [VLCMain sharedInstance];
     _playlistController = [mainInstance playlistController];
 
+    self.videoView = [[VLCVoutView alloc] initWithFrame:self.mainSplitView.frame];
+    self.videoView.hidden = YES;
+    self.videoView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.contentView addSubview:self.videoView];
+    [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.mainSplitView attribute:NSLayoutAttributeWidth multiplier:1. constant:1.]];
+    [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:self.mainSplitView attribute:NSLayoutAttributeHeight multiplier:1. constant:1.]];
+    [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.mainSplitView attribute:NSLayoutAttributeCenterX multiplier:1. constant:1.]];
+    [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.mainSplitView attribute:NSLayoutAttributeCenterY multiplier:1. constant:1.]];
+
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
                            selector:@selector(shouldShowFullscreenController:)
