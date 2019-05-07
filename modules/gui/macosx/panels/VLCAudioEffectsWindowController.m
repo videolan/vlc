@@ -34,6 +34,7 @@
 #import "../../../audio_filter/equalizer_presets.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "main/VLCMain.h"
 #import "main/CompatibilityFixes.h"
 #import "panels/dialogs/VLCPopupPanelController.h"

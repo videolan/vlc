@@ -40,6 +40,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/NSSound+VLCAdditions.m \
 	gui/macosx/extensions/NSString+Helpers.h \
 	gui/macosx/extensions/NSString+Helpers.m \
+	gui/macosx/extensions/NSView+VLCAdditions.h \
+	gui/macosx/extensions/NSView+VLCAdditions.m \
 	gui/macosx/extensions/VLCHexNumberFormatter.h \
 	gui/macosx/extensions/VLCHexNumberFormatter.m \
 	gui/macosx/extensions/misc.h \

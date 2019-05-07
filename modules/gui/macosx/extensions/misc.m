@@ -195,31 +195,6 @@
 
 @end
 
-@implementation NSView (EnableSubviews)
-
-- (void)enableSubviews:(BOOL)b_enable
-{
-    for (NSView *o_view in [self subviews]) {
-        [o_view enableSubviews:b_enable];
-
-        // enable NSControl
-        if ([o_view respondsToSelector:@selector(setEnabled:)]) {
-            [(NSControl *)o_view setEnabled:b_enable];
-        }
-        // also "enable / disable" text views
-        if ([o_view respondsToSelector:@selector(setTextColor:)]) {
-            if (b_enable == NO) {
-                [(NSTextField *)o_view setTextColor:[NSColor disabledControlTextColor]];
-            } else {
-                [(NSTextField *)o_view setTextColor:[NSColor controlTextColor]];
-            }
-        }
-
-    }
-}
-
-@end
-
 /*****************************************************************************
  * VLCByteCountFormatter addition
  *****************************************************************************/

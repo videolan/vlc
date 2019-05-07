@@ -462,6 +462,8 @@ modules/gui/macosx/extensions/NSSound+VLCAdditions.h
 modules/gui/macosx/extensions/NSSound+VLCAdditions.m
 modules/gui/macosx/extensions/NSString+Helpers.h
 modules/gui/macosx/extensions/NSString+Helpers.m
+modules/gui/macosx/extensions/NSView+VLCAdditions.h
+modules/gui/macosx/extensions/NSView+VLCAdditions.m
 modules/gui/macosx/extensions/VLCHexNumberFormatter.h
 modules/gui/macosx/extensions/VLCHexNumberFormatter.m
 modules/gui/macosx/extensions/misc.h
