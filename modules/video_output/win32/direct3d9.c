@@ -176,8 +176,7 @@ struct vout_display_sys_t
     bool (*setupDeviceCb)(void *opaque, const struct device_cfg_t*, struct device_setup_t* );
     void (*cleanupDeviceCb)(void* opaque);
     void (*swapCb)(void* opaque);
-    void (*endRenderCb)(void* opaque);
-    bool (*starRenderCb)(void* opaque);
+    bool (*startEndRenderingCb)(void* opaque, bool enter);
     bool (*resizeCb)(void* opaque, unsigned, unsigned);
 };
 
@@ -1134,9 +1133,8 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     return 0;
 }
 
-static bool StartRendering(void *opaque)
+static bool StartRendering(vout_display_t *vd)
 {
-    vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
     IDirect3DDevice9 *d3ddev = sys->d3d_dev.dev;
     HRESULT hr;
@@ -1161,9 +1159,8 @@ static bool StartRendering(void *opaque)
     return true;
 }
 
-static void EndRendering(void *opaque)
+static void EndRendering(vout_display_t *vd)
 {
-    vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
     IDirect3DDevice9 *d3ddev = sys->d3d_dev.dev;
     HRESULT hr;
@@ -1188,7 +1185,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
     vout_display_sys_t *sys = vd->sys;
     IDirect3DDevice9 *d3ddev = sys->d3d_dev.dev;
 
-    if (!sys->starRenderCb(sys->outside_opaque))
+    if (!sys->startEndRenderingCb( sys->outside_opaque, true ))
         return;
 
     Direct3D9RenderRegion(vd, picture, true);
@@ -1204,7 +1201,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHABLENDENABLE, FALSE);
     }
 
-    sys->endRenderCb(sys->outside_opaque);
+    sys->startEndRenderingCb( sys->outside_opaque, false );
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
@@ -1599,6 +1596,18 @@ static bool LocalSwapchainSetupDevice( void *opaque, const struct device_cfg_t *
     return false; /* don't use an "external" D3D9 device */
 }
 
+static bool LocalSwapchainStartEndRendering( void *opaque, bool enter )
+{
+    vout_display_t *vd = opaque;
+    if ( enter )
+    {
+        return StartRendering( vd );
+    }
+
+    EndRendering( vd );
+    return true;
+}
+
 /**
  * It creates a Direct3D vout display.
  */
@@ -1629,15 +1638,14 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    if (!sys->swapCb || !sys->starRenderCb || !sys->endRenderCb)
+    if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL )
     {
         /* use our own callbacks, since there isn't any external ones */
         sys->outside_opaque = vd;
         sys->setupDeviceCb       = LocalSwapchainSetupDevice;
         sys->cleanupDeviceCb     = NULL;
         sys->swapCb              = Swap;
-        sys->starRenderCb        = StartRendering;
-        sys->endRenderCb         = EndRendering;
+        sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
         sys->resizeCb            = NULL;
     }
 
