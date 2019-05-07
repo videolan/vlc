@@ -107,6 +107,15 @@ struct device_setup_t {
     ID3D11DeviceContext *device_context;
 };
 
+struct direct3d_cfg_t {
+    unsigned width;
+    unsigned height;
+};
+
+struct output_cfg_t {
+    DXGI_FORMAT surface_format;
+};
+
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
@@ -145,9 +154,9 @@ struct vout_display_sys_t
     void *outside_opaque;
     bool (*setupDeviceCb)(void* opaque, const struct device_cfg_t*, struct device_setup_t* );
     void (*cleanupDeviceCb)(void* opaque);
+    bool (*updateOutputCb)(void* opaque, const struct direct3d_cfg_t *cfg, struct output_cfg_t *out);
     void (*swapCb)(void* opaque);
     bool (*startEndRenderingCb)(void* opaque, bool enter);
-    bool (*resizeCb)(void* opaque, unsigned, unsigned);
 };
 
 static picture_pool_t *Pool(vout_display_t *, unsigned);
@@ -179,11 +188,13 @@ static int Control(vout_display_t *, int, va_list);
 static HRESULT UpdateBackBuffer(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    UINT i_width, i_height;
-    i_width  = sys->area.vdcfg.display.width;
-    i_height = sys->area.vdcfg.display.height;
 
-    if (!sys->resizeCb(sys->outside_opaque, i_width, i_height))
+    const struct direct3d_cfg_t cfg = {
+        .width  = sys->area.vdcfg.display.width,
+        .height = sys->area.vdcfg.display.height
+    };
+    struct output_cfg_t out;
+    if (!sys->updateOutputCb( sys->outside_opaque, &cfg, &out ))
         return E_FAIL;
 
     return S_OK;
@@ -312,7 +323,7 @@ static int SetupWindowedOutput(vout_display_t *vd, UINT width, UINT height)
 }
 #endif /* !VLC_WINSTORE_APP */
 
-static bool Resize( void *opaque, unsigned i_width, unsigned i_height )
+static bool UpdateSwapchain( void *opaque, const struct direct3d_cfg_t *cfg )
 {
     vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
@@ -331,7 +342,7 @@ static bool Resize( void *opaque, unsigned i_width, unsigned i_height )
         }
     }
 
-    if ( dsc.Width == i_width && dsc.Height == i_height )
+    if ( dsc.Width == cfg->width && dsc.Height == cfg->height )
         return true; /* nothing changed */
 
     for ( size_t i = 0; i < ARRAY_SIZE( sys->internal_swapchain.swapchainTargetView ); i++ )
@@ -343,7 +354,7 @@ static bool Resize( void *opaque, unsigned i_width, unsigned i_height )
     }
 
     /* TODO detect is the size is the same as the output and switch to fullscreen mode */
-    hr = IDXGISwapChain_ResizeBuffers( sys->internal_swapchain.dxgiswapChain, 0, i_width, i_height,
+    hr = IDXGISwapChain_ResizeBuffers( sys->internal_swapchain.dxgiswapChain, 0, cfg->width, cfg->height,
                                        DXGI_FORMAT_UNKNOWN, 0 );
     if ( FAILED( hr ) ) {
         msg_Err( vd, "Failed to resize the backbuffer. (hr=0x%lX)", hr );
@@ -366,19 +377,6 @@ static bool Resize( void *opaque, unsigned i_width, unsigned i_height )
 
     D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
 
-    return true;
-}
-
-static bool LocalSwapchainStartEndRendering( void *opaque, bool enter )
-{
-    vout_display_t *vd = opaque;
-
-    if ( enter )
-    {
-        vout_display_sys_t *sys = vd->sys;
-
-        D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
-    }
     return true;
 }
 
@@ -414,7 +412,7 @@ static void LocalSwapchainCleanupDevice( void *opaque )
     D3D11_ReleaseDevice( &sys->internal_swapchain.d3d_dev );
 }
 
-static void Swap( void *opaque )
+static void LocalSwapchainSwap( void *opaque )
 {
     vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
@@ -465,6 +463,28 @@ static int SetupWindowLessOutput(vout_display_t *vd)
     return VLC_SUCCESS;
 }
 
+static bool LocalSwapchainUpdateOutput( void *opaque, const struct direct3d_cfg_t *cfg, struct output_cfg_t *out )
+{
+    vout_display_t *vd = opaque;
+    if ( !UpdateSwapchain( vd, cfg ) )
+        return -1;
+    out->surface_format = vd->sys->display.pixelFormat->formatTexture;
+    return true;
+}
+
+static bool LocalSwapchainStartEndRendering( void *opaque, bool enter )
+{
+    vout_display_t *vd = opaque;
+
+    if ( enter )
+    {
+        vout_display_sys_t *sys = vd->sys;
+
+        D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
+    }
+    return true;
+}
+
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
 {
@@ -490,15 +510,15 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return ret;
 
     bool uses_external_callbacks = true;
-    if (sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->resizeCb == NULL)
+    if (sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL)
     {
         sys->internal_swapchain.obj = VLC_OBJECT(vd);
         sys->outside_opaque = vd;
         sys->setupDeviceCb       = LocalSwapchainSetupDevice;
         sys->cleanupDeviceCb     = LocalSwapchainCleanupDevice;
-        sys->swapCb              = Swap;
+        sys->updateOutputCb      = LocalSwapchainUpdateOutput;
+        sys->swapCb              = LocalSwapchainSwap;
         sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
-        sys->resizeCb            = Resize;
         uses_external_callbacks = false;
     }
 
