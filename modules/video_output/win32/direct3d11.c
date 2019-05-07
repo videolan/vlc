@@ -52,6 +52,7 @@
 #include "../../video_chroma/d3d11_fmt.h"
 #include "d3d11_quad.h"
 #include "d3d11_shaders.h"
+#include "d3d_render.h"
 
 #include "common.h"
 #include "../video_chroma/copy.h"
@@ -99,23 +100,6 @@ struct d3d11_local_swapchain
     ID3D11RenderTargetView *swapchainTargetView[D3D11_MAX_RENDER_TARGET];
 };
 
-struct device_cfg_t {
-    bool hardware_decoding;
-};
-
-struct device_setup_t {
-    ID3D11DeviceContext *device_context;
-};
-
-struct direct3d_cfg_t {
-    unsigned width;
-    unsigned height;
-};
-
-struct output_cfg_t {
-    DXGI_FORMAT surface_format;
-};
-
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
@@ -152,11 +136,11 @@ struct vout_display_sys_t
 
     /* outside rendering */
     void *outside_opaque;
-    bool (*setupDeviceCb)(void* opaque, const struct device_cfg_t*, struct device_setup_t* );
-    void (*cleanupDeviceCb)(void* opaque);
-    bool (*updateOutputCb)(void* opaque, const struct direct3d_cfg_t *cfg, struct output_cfg_t *out);
-    void (*swapCb)(void* opaque);
-    bool (*startEndRenderingCb)(void* opaque, bool enter);
+    d3d_device_setup_cb    setupDeviceCb;
+    d3d_device_cleanup_cb  cleanupDeviceCb;
+    d3d_update_output_cb   updateOutputCb;
+    d3d_swap_cb            swapCb;
+    d3d_start_end_rendering_cb startEndRenderingCb;
 };
 
 static picture_pool_t *Pool(vout_display_t *, unsigned);
