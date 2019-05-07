@@ -90,12 +90,21 @@ vlc_module_end ()
 struct d3d11_local_swapchain
 {
     vlc_object_t           *obj;
+    d3d11_device_t         d3d_dev;
 
     HWND                   swapchainHwnd;
     IDXGISwapChain1        *dxgiswapChain;   /* DXGI 1.2 swap chain */
     IDXGISwapChain4        *dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
 
     ID3D11RenderTargetView *swapchainTargetView[D3D11_MAX_RENDER_TARGET];
+};
+
+struct device_cfg_t {
+    bool hardware_decoding;
+};
+
+struct device_setup_t {
+    ID3D11DeviceContext *device_context;
 };
 
 struct vout_display_sys_t
@@ -134,6 +143,8 @@ struct vout_display_sys_t
 
     /* outside rendering */
     void *outside_opaque;
+    bool (*setupDeviceCb)(void* opaque, const struct device_cfg_t*, struct device_setup_t* );
+    void (*cleanupDeviceCb)(void* opaque);
     void (*swapCb)(void* opaque);
     void (*endRenderCb)(void* opaque);
     bool (*starRenderCb)(void* opaque);
@@ -368,6 +379,38 @@ static bool StartRendering( void *opaque )
     return true;
 }
 
+static bool LocalSwapchainSetupDevice( void *opaque, const struct device_cfg_t *cfg, struct device_setup_t *out )
+{
+    vout_display_t *vd = opaque;
+    HRESULT hr;
+#if VLC_WINSTORE_APP
+    ID3D11DeviceContext *legacy_ctx = var_InheritInteger( vd, "winrt-d3dcontext" ); /* LEGACY */
+    if ( legacy_ctx == NULL )
+        hr = E_FAIL;
+    else
+        hr = D3D11_CreateDeviceExternal( vd,
+                                         legacy_ctx,
+                                         cfg->hardware_decoding,
+                                         &sys->internal_swapchain.d3d_dev );
+#else /* !VLC_WINSTORE_APP */
+    vout_display_sys_t *sys = vd->sys;
+    hr = D3D11_CreateDevice( vd, &sys->hd3d, NULL,
+                             cfg->hardware_decoding,
+                             &sys->internal_swapchain.d3d_dev );
+#endif /* !VLC_WINSTORE_APP */
+    if ( FAILED( hr ) )
+        return false;
+    out->device_context = sys->internal_swapchain.d3d_dev.d3dcontext;
+    return true;
+}
+
+static void LocalSwapchainCleanupDevice( void *opaque )
+{
+    vout_display_t *vd = opaque;
+    vout_display_sys_t *sys = vd->sys;
+    D3D11_ReleaseDevice( &sys->internal_swapchain.d3d_dev );
+}
+
 static void Swap( void *opaque )
 {
     vout_display_t *vd = opaque;
@@ -448,10 +491,12 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     {
         sys->internal_swapchain.obj = VLC_OBJECT(vd);
         sys->outside_opaque = vd;
-        sys->swapCb       = Swap;
-        sys->starRenderCb = StartRendering;
-        sys->endRenderCb  = NULL;
-        sys->resizeCb     = Resize;
+        sys->setupDeviceCb       = LocalSwapchainSetupDevice;
+        sys->cleanupDeviceCb     = LocalSwapchainCleanupDevice;
+        sys->swapCb              = Swap;
+        sys->starRenderCb        = StartRendering;
+        sys->endRenderCb         = NULL;
+        sys->resizeCb            = Resize;
         uses_external_callbacks = false;
     }
 
@@ -1157,30 +1202,26 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
     HRESULT hr = E_FAIL;
     int ret = VLC_EGENERIC;
 
+    struct device_cfg_t cfg = {
+        .hardware_decoding = is_d3d11_opaque( vd->source.i_chroma ) 
+    };
+    struct device_setup_t out;
     ID3D11DeviceContext *d3d11_ctx = NULL;
-#if VLC_WINSTORE_APP
-    if (d3d11_ctx == NULL)
-        d3d11_ctx = var_InheritInteger(vd, "winrt-d3dcontext");
-    if (d3d11_ctx == NULL)
+    if ( sys->setupDeviceCb( sys->outside_opaque, &cfg, &out ) )
+        d3d11_ctx = out.device_context;
+    if ( d3d11_ctx == NULL )
+    {
+        msg_Err(vd, "Missing external ID3D11DeviceContext");
         return VLC_EGENERIC;
-#endif /* VLC_WINSTORE_APP */
-    if (d3d11_ctx != NULL)
-    {
-        hr = D3D11_CreateDeviceExternal(vd, d3d11_ctx,
-                                        is_d3d11_opaque(vd->source.i_chroma),
-                                        &sys->d3d_dev);
     }
-#if !VLC_WINSTORE_APP
-    else
-    {
-        hr = D3D11_CreateDevice(vd, &sys->hd3d, NULL,
-                                is_d3d11_opaque(vd->source.i_chroma),
-                                &sys->d3d_dev);
-    }
-#endif /* !VLC_WINSTORE_APP */
+    hr = D3D11_CreateDeviceExternal(vd, d3d11_ctx,
+                                    is_d3d11_opaque(vd->source.i_chroma),
+                                    &sys->d3d_dev);
     if (FAILED(hr)) {
-       msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
+        msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
+        if ( sys->cleanupDeviceCb )
+            sys->cleanupDeviceCb( sys->outside_opaque );
+        return VLC_EGENERIC;
     }
 
     if (sys->sys.event == NULL)
@@ -1218,11 +1259,17 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
             }
         }
         if (err != VLC_SUCCESS)
+        {
+            if ( sys->cleanupDeviceCb )
+                sys->cleanupDeviceCb( sys->outside_opaque );
             return err;
+        }
     }
 
     if (Direct3D11CreateGenericResources(vd)) {
         msg_Err(vd, "Failed to allocate resources");
+        if ( sys->cleanupDeviceCb )
+            sys->cleanupDeviceCb( sys->outside_opaque );
         return VLC_EGENERIC;
     }
 
@@ -1348,6 +1395,9 @@ static void Direct3D11Close(vout_display_t *vd)
     }
 
     D3D11_ReleaseDevice( &sys->d3d_dev );
+
+    if ( sys->cleanupDeviceCb )
+        sys->cleanupDeviceCb( sys->outside_opaque );
 
     msg_Dbg(vd, "Direct3D11 device adapter closed");
 }
