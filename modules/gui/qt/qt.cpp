@@ -750,15 +750,15 @@ static void *ThreadCleanup( intf_thread_t *p_intf, bool error )
         }
         else
             open_state = OPEN_STATE_INIT;
+    }
 
-        if( p_sys->p_mi != NULL)
-        {
-            MainInterface *p_mi = p_sys->p_mi;
-            p_sys->p_mi = NULL;
-            /* Destroy first the main interface because it is connected to some
-               slots in the MainInputManager */
-            delete p_mi;
-        }
+    if( p_sys->p_mi != NULL)
+    {
+        MainInterface *p_mi = p_sys->p_mi;
+        p_sys->p_mi = NULL;
+        /* Destroy first the main interface because it is connected to some
+           slots in the MainInputManager */
+        delete p_mi;
     }
 
     /* */
