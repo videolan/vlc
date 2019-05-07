@@ -377,7 +377,6 @@ void vout_display_window_Delete(vout_window_t *window)
     vout_thread_t *vout = (vout_thread_t *)vlc_object_parent(window);
     vout_display_window_t *state = window->owner.sys;
 
-    vout_window_Disable(window);
     vout_window_Delete(window);
     var_Destroy(vout, "window-fullscreen-output");
     var_Destroy(vout, "window-fullscreen");
