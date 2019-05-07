@@ -2209,9 +2209,10 @@ vlc_player_Start(vlc_player_t *player)
 
     int ret = vlc_player_input_Start(player->input);
     if (ret == VLC_SUCCESS)
+    {
         player->started = true;
-
-    vlc_player_vout_OSDIcon(player, OSD_PLAY_ICON);
+        vlc_player_vout_OSDIcon(player, OSD_PLAY_ICON);
+    }
     return ret;
 }
 
