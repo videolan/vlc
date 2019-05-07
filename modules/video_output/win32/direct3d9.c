@@ -142,6 +142,15 @@ struct device_setup_t {
     IDirect3DDevice9 *device_context;
 };
 
+struct direct3d_cfg_t {
+    unsigned width;
+    unsigned height;
+};
+
+struct output_cfg_t {
+    int surface_format;
+};
+
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
@@ -175,9 +184,9 @@ struct vout_display_sys_t
     void *outside_opaque;
     bool (*setupDeviceCb)(void *opaque, const struct device_cfg_t*, struct device_setup_t* );
     void (*cleanupDeviceCb)(void* opaque);
+    bool (*updateOutputCb)(void* opaque, const struct direct3d_cfg_t *, struct output_cfg_t *out);
     void (*swapCb)(void* opaque);
     bool (*startEndRenderingCb)(void* opaque, bool enter);
-    bool (*resizeCb)(void* opaque, unsigned, unsigned);
 };
 
 /* */
@@ -575,6 +584,24 @@ static void Direct3D9DestroyResources(vout_display_t *vd)
     Direct3D9DestroyShaders(vd);
 }
 
+static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt)
+{
+    vout_display_sys_t *sys = vd->sys;
+    struct direct3d_cfg_t cfg;
+    cfg.width  = sys->area.vdcfg.display.width;
+    cfg.height = sys->area.vdcfg.display.height;
+
+
+    struct output_cfg_t out;
+    if (!sys->updateOutputCb( sys->outside_opaque, &cfg, &out ))
+    {
+        msg_Err(vd, "Failed to set the external render size");
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
 /**
  * It allocates and initializes the resources needed to render the scene.
  */
@@ -585,21 +612,16 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     IDirect3DDevice9        *d3ddev = p_d3d9_dev->dev;
     HRESULT hr;
 
-    if (sys->resizeCb && !sys->resizeCb( sys->outside_opaque,
-                                         fmt->i_visible_width,
-                                         fmt->i_visible_height ))
-    {
-        msg_Err(vd, "Failed to set the external render size");
+    if (UpdateOutput(vd, fmt) != VLC_SUCCESS)
         return VLC_EGENERIC;
-    }
 
+    UINT width  = fmt->i_visible_width;
+    UINT height = fmt->i_visible_height;
     // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
     // When copying the entire buffer, the margin end up being blended in the actual picture
     // on nVidia (regardless of even/odd dimensions)
-    UINT texture_width  = fmt->i_visible_width;
-    UINT texture_height = fmt->i_visible_height;
-    if (texture_width  & 1) texture_width++;
-    if (texture_height & 1) texture_height++;
+    if (height & 1) height++;
+    if (width  & 1) width++;
 
     /*
      * Create a texture for use when rendering a scene
@@ -607,8 +629,8 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
      * which would usually be a RGB format
      */
     hr = IDirect3DDevice9_CreateTexture(d3ddev,
-                                        texture_width,
-                                        texture_height,
+                                        width,
+                                        height,
                                         1,
                                         D3DUSAGE_RENDERTARGET,
                                         p_d3d9_dev->pp.BackBufferFormat,
@@ -1318,9 +1340,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     }
 }
 
-static void Swap(void *opaque)
+static void Swap(vout_display_t *vd)
 {
-    vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
     const d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
 
@@ -1351,7 +1372,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
     if (sys->lost_not_ready)
         return;
 
-    sys->swapCb(sys->outside_opaque);
+    sys->swapCb( sys->outside_opaque );
 }
 
 /**
@@ -1596,6 +1617,19 @@ static bool LocalSwapchainSetupDevice( void *opaque, const struct device_cfg_t *
     return false; /* don't use an "external" D3D9 device */
 }
 
+static bool LocalSwapchainUpdateOutput( void *opaque, const struct direct3d_cfg_t *cfg, struct output_cfg_t *out )
+{
+    vout_display_t *vd = opaque;
+    out->surface_format = vd->sys->d3d_dev.pp.BackBufferFormat;
+    return true;
+}
+
+static void LocalSwapchainSwap( void *opaque )
+{
+    vout_display_t *vd = opaque;
+    Swap( vd );
+}
+
 static bool LocalSwapchainStartEndRendering( void *opaque, bool enter )
 {
     vout_display_t *vd = opaque;
@@ -1638,15 +1672,15 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL )
+    if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
         /* use our own callbacks, since there isn't any external ones */
         sys->outside_opaque = vd;
         sys->setupDeviceCb       = LocalSwapchainSetupDevice;
         sys->cleanupDeviceCb     = NULL;
-        sys->swapCb              = Swap;
+        sys->updateOutputCb      = LocalSwapchainUpdateOutput;
+        sys->swapCb              = LocalSwapchainSwap;
         sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
-        sys->resizeCb            = NULL;
     }
 
     struct device_cfg_t surface_cfg = {
