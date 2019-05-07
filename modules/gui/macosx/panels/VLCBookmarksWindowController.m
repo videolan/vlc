@@ -35,7 +35,9 @@
 
 #import "VLCBookmarksWindowController.h"
 
+#import "extensions/NSString+Helpers.h"
 #import "main/CompatibilityFixes.h"
+#import "windows/video/VLCVideoOutputProvider.h"
 
 @interface VLCBookmarksWindowController() <NSTableViewDataSource, NSTableViewDelegate>
 {
@@ -89,11 +91,6 @@
     [_editCancelButton setTitle: _NS("Cancel")];
     [_editNameLabel setStringValue: _NS("Name")];
     [_editTimeLabel setStringValue: _NS("Time")];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(inputChangedEvent:)
-                                                 name:VLCInputChangedNotification
-                                               object:nil];
 }
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level

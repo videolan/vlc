@@ -26,6 +26,7 @@
 #import <vlc_intf_strings.h>
 #import <vlc_about.h>
 
+#import "extensions/NSString+Helpers.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "views/VLCScrollingClipView.h"

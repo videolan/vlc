@@ -31,16 +31,6 @@
 
 #import <vlc_common.h>
 #import <vlc_interface.h>
-#import <vlc_vout.h>
-#import <vlc_aout.h>
-#import <vlc_input.h>
-#import <vlc_vout_window.h>
-#import <stdatomic.h>
-
-#import "extensions/misc.h"
-#import "extensions/NSString+Helpers.h"
-#import "menus/VLCStatusBarIcon.h"
-#import "windows/video/VLCVideoOutputProvider.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -48,15 +38,12 @@
 
 intf_thread_t *getIntf(void);
 
-static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
-static NSString * VLCConfigurationChangedNotification = @"VLCConfigurationChangedNotification";
-static NSString * VLCMediaKeySupportSettingChangedNotification = @"VLCMediaKeySupportSettingChangedNotification";
-static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSettingChangedNotification";
+extern NSString *VLCConfigurationChangedNotification;
 
 /*****************************************************************************
  * VLCMain interface
  *****************************************************************************/
-@class AppleRemote;
+@class VLCExtensionsManager;
 @class VLCInformationWindowController;
 @class VLCMainMenu;
 @class VLCResumeDialogController;
@@ -72,50 +59,35 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 @class VLCAudioEffectsWindowController;
 @class VLCVideoEffectsWindowController;
 @class VLCConvertAndSaveWindowController;
-@class VLCExtensionsManager;
-@class VLCStatusBarIcon;
 @class VLCLibraryController;
 @class VLCPlaylistController;
-@class VLCHotkeysController;
+@class VLCVideoOutputProvider;
 
-@interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
-
-@property (readonly) VLCVideoOutputProvider* voutProvider;
-@property (readonly) BOOL nativeFullscreenMode;
-@property (nonatomic, readwrite) BOOL playlistUpdatedSelectorInQueue;
-@property (readonly) VLCLibraryWindowController *libraryWindowController;
-@property (readonly) VLCLibraryController *libraryController;
-@property (readonly) VLCPlaylistController *playlistController;
-@property (readonly) VLCHotkeysController *hotkeysController;
+@interface VLCMain : NSObject
 
 + (VLCMain *)sharedInstance;
-+ (void)killInstance;
 
-- (VLCMainMenu *)mainMenu;
-- (VLCLibraryWindow *)libraryWindow;
-- (VLCBookmarksWindowController *)bookmarks;
-- (VLCOpenWindowController *)open;
-- (VLCSimplePrefsController *)simplePreferences;
-- (VLCPrefs *)preferences;
-- (VLCCoreDialogProvider *)coreDialogProvider;
-- (VLCResumeDialogController *)resumeDialog;
-- (VLCExtensionsManager *)extensionsManager;
-- (VLCStatusBarIcon *)statusBarIcon;
+@property (readwrite) BOOL activeVideoPlayback;
+@property (readonly) BOOL isTerminating;
 
-- (VLCLogWindowController *)debugMsgPanel;
-
-- (VLCTrackSynchronizationWindowController *)trackSyncPanel;
-- (VLCAudioEffectsWindowController *)audioEffectsPanel;
-- (VLCVideoEffectsWindowController *)videoEffectsPanel;
-
-- (VLCInformationWindowController *)currentMediaInfoPanel;
-
-- (VLCConvertAndSaveWindowController *)convertAndSaveWindow;
-
-- (void)setActiveVideoPlayback:(BOOL)b_value;
-- (BOOL)activeVideoPlayback;
-- (void)applicationWillTerminate:(NSNotification *)notification;
-
-- (BOOL)isTerminating;
+@property (readonly) VLCAudioEffectsWindowController *audioEffectsPanel;
+@property (readonly) VLCBookmarksWindowController *bookmarks;
+@property (readonly) VLCConvertAndSaveWindowController *convertAndSaveWindow;
+@property (readonly) VLCCoreDialogProvider *coreDialogProvider;
+@property (readonly) VLCExtensionsManager *extensionsManager;
+@property (readonly) VLCInformationWindowController *currentMediaInfoPanel;
+@property (readonly) VLCLogWindowController *debugMsgPanel;
+@property (readonly) VLCLibraryController *libraryController;
+@property (readonly) VLCLibraryWindow *libraryWindow;
+@property (readonly) VLCLibraryWindowController *libraryWindowController;
+@property (readonly) VLCMainMenu *mainMenu;
+@property (readonly) VLCOpenWindowController *open;
+@property (readonly) VLCPlaylistController *playlistController;
+@property (readonly) VLCPrefs *preferences;
+@property (readonly) VLCResumeDialogController *resumeDialog;
+@property (readonly) VLCSimplePrefsController *simplePreferences;
+@property (readonly) VLCTrackSynchronizationWindowController *trackSyncPanel;
+@property (readonly) VLCVideoEffectsWindowController *videoEffectsPanel;
+@property (readonly) VLCVideoOutputProvider *voutProvider;
 
 @end

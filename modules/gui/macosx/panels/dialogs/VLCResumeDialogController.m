@@ -26,7 +26,7 @@
 
 #import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
-#import "extensions/NSString+Helpers.h"
+#import "windows/video/VLCVideoOutputProvider.h"
 
 @interface VLCResumeDialogController()
 {

@@ -32,11 +32,12 @@
 #import <vlc_common.h>
 #import <vlc_url.h>
 
+#import "extensions/misc.h"
+#import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "windows/convertandsave/VLCOutput.h"
 #import "windows/VLCOpenInputMetadata.h"
-
 
 NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 

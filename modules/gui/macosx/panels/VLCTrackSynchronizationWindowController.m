@@ -23,10 +23,12 @@
 
 #import "VLCTrackSynchronizationWindowController.h"
 
+#import "extensions/NSString+Helpers.h"
 #import "coreinteraction/VLCVideoFilterHelper.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "windows/video/VLCVideoOutputProvider.h"
 
 #define SUBSDELAY_CFG_MODE                     "subsdelay-mode"
 #define SUBSDELAY_CFG_FACTOR                   "subsdelay-factor"

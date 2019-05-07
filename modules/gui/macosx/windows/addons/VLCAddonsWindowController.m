@@ -24,6 +24,7 @@
 #import <vlc_common.h>
 #import <vlc_addons.h>
 
+#import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "windows/addons/VLCAddonListItem.h"
 

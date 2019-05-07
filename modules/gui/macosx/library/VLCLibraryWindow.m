@@ -43,6 +43,7 @@
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 #import "windows/video/VLCFSPanelController.h"
 #import "windows/video/VLCVoutView.h"
+#import "windows/video/VLCVideoOutputProvider.h"
 
 static const float f_min_window_width = 604.;
 static const float f_min_window_height = 307.;

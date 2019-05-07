@@ -22,6 +22,9 @@
 
 #import <Foundation/Foundation.h>
 
+extern NSString *VLCMediaKeySupportSettingChangedNotification;
+extern NSString *VLCAppleRemoteSettingChangedNotification;
+
 @interface VLCClickerManager : NSObject
 
 @end

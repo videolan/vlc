@@ -26,6 +26,8 @@
 #import "coreinteraction/VLCVideoFilterHelper.h"
 
 #import "extensions/NSScreen+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryFolderManagementWindow.h"
 
@@ -49,10 +51,11 @@
 #import "windows/VLCHelpWindowController.h"
 #import "windows/mainwindow/VLCMainWindowControlsBar.h"
 #import "windows/extensions/VLCExtensionsManager.h"
-#import "windows/video/VLCVoutView.h"
 #import "windows/convertandsave/VLCConvertAndSaveWindowController.h"
 #import "windows/logging/VLCLogWindowController.h"
 #import "windows/addons/VLCAddonsWindowController.h"
+#import "windows/video/VLCVoutView.h"
+#import "windows/video/VLCVideoOutputProvider.h"
 
 #import <vlc_interface.h>
 

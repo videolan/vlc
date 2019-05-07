@@ -27,6 +27,7 @@
 
 #import <vlc_aout.h>
 
+#import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"

@@ -24,6 +24,7 @@
 
 #import <vlc_url.h>
 
+#import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "os-integration/VLCRemoteControlService.h"
 #import "os-integration/iTunes.h"

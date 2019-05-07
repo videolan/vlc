@@ -26,6 +26,7 @@
 
 #import "VLCOutput.h"
 
+#import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 
 @interface VLCOutput()

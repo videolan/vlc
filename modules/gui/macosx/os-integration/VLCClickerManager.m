@@ -30,6 +30,9 @@
 #import "playlist/VLCPlaylistModel.h"
 #import "playlist/VLCPlayerController.h"
 
+NSString *VLCMediaKeySupportSettingChangedNotification = @"VLCMediaKeySupportSettingChangedNotification";
+NSString *VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSettingChangedNotification";
+
 @interface VLCClickerManager()
 {
     VLCPlaylistController *_playlistController;

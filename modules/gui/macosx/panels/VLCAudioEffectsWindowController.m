@@ -41,6 +41,7 @@
 #import "panels/dialogs/VLCTextfieldPanelController.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "windows/video/VLCVideoOutputProvider.h"
 
 @interface VLCAudioEffectsWindowController ()
 {

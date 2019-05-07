@@ -26,6 +26,7 @@
 
 #import <vlc_common.h>
 
+#import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "windows/logging/VLCLogMessage.h"
 

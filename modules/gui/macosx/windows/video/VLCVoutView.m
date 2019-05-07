@@ -82,7 +82,7 @@
         f_cumulated_magnification = 0.0;
         VLCMain *mainInstance = [VLCMain sharedInstance];
         _playerController = [[mainInstance playlistController] playerController];
-        _hotkeysController = [mainInstance hotkeysController];
+        _hotkeysController = [[VLCHotkeysController alloc] init];
     }
 
     return self;

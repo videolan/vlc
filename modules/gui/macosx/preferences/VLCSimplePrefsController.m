@@ -35,14 +35,16 @@
 #import <vlc_modules.h>
 #import <vlc_plugin.h>
 #import <vlc_config_cat.h>
+#import <vlc_aout.h>
 
 #import "extensions/misc.h"
 #import "extensions/NSScreen+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "main/VLCMain+OldPrefs.h"
+#import "os-integration/VLCClickerManager.h"
 #import "preferences/prefs.h"
-
 
 static struct {
     const char iso[6];

@@ -25,6 +25,7 @@
 
 #import <vlc_aout.h>
 
+#import "extensions/NSString+Helpers.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"

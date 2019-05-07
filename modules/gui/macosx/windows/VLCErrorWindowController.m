@@ -25,7 +25,6 @@
 
 #import "extensions/NSString+Helpers.h"
 
-
 @interface VLCErrorWindowController()
 {
     NSMutableArray *_errors;

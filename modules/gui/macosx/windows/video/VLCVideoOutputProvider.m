@@ -220,7 +220,7 @@ int WindowOpen(vout_window_t *p_wnd)
     VLCVoutView *voutView;
     VLCVideoWindowCommon *newVideoWindow;
     BOOL isEmbedded = YES;
-    BOOL isNativeFullscreen = [mainInstance nativeFullscreenMode];
+    BOOL isNativeFullscreen = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
     BOOL windowDecorations = var_InheritBool(getIntf(), "video-deco");
     BOOL videoWallpaper = var_InheritBool(getIntf(), "video-wallpaper");
     BOOL multipleVoutWindows = [_voutWindows count] > 0;
@@ -393,7 +393,7 @@ int WindowOpen(vout_window_t *p_wnd)
 
     // prevent visible extra window if in fullscreen
     NSDisableScreenUpdates();
-    BOOL b_native = [[mainInstance libraryWindow] nativeFullscreenMode];
+    BOOL b_native = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
     // close fullscreen, without changing fullscreen vars
     if (!b_native && ([videoWindow fullscreen] || [videoWindow inFullscreenTransition]))
@@ -468,7 +468,7 @@ int WindowOpen(vout_window_t *p_wnd)
 - (void)setFullscreen:(int)i_full forWindow:(vout_window_t *)p_wnd withAnimation:(BOOL)b_animation
 {
     intf_thread_t *p_intf = getIntf();
-    BOOL b_nativeFullscreenMode = [[VLCMain sharedInstance] nativeFullscreenMode];
+    BOOL b_nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
     if (!p_intf || (!b_nativeFullscreenMode && !p_wnd))
         return;

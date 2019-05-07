@@ -31,6 +31,7 @@
 #import "panels/dialogs/VLCTextfieldPanelController.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "windows/video/VLCVideoOutputProvider.h"
 
 #import <vlc_playlist_legacy.h>
 
@@ -332,11 +333,6 @@
     [_addLogoPositionPopup addItemWithTitle: _NS("Bottom-Right")];
     [[_addLogoPositionPopup lastItem] setTag: 10];
     [_addLogoTransparencyLabel setStringValue:_NS("Transparency")];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(inputChangedEvent:)
-                                                 name:VLCInputChangedNotification
-                                               object:nil];
 
     [self resetValues];
 }

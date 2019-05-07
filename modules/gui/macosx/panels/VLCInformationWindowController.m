@@ -23,10 +23,12 @@
 
 #import "VLCInformationWindowController.h"
 
+#import "extensions/NSString+Helpers.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "windows/video/VLCVideoOutputProvider.h"
 
 #import <vlc_url.h>
 

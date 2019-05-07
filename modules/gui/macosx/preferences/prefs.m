@@ -43,19 +43,20 @@
  *****************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+# import "config.h"
 #endif
 
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/param.h>                                    /* for MAXPATHLEN */
-#include <string.h>
+#import <stdlib.h>                                      /* malloc(), free() */
+#import <sys/param.h>                                    /* for MAXPATHLEN */
+#import <string.h>
 
-#include <vlc_common.h>
+#import <vlc_common.h>
 #import <vlc_actions.h>
-#include <vlc_config_cat.h>
+#import <vlc_config_cat.h>
 #import <vlc_modules.h>
 #import <vlc_plugin.h>
 
+#import "extensions/NSString+Helpers.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "preferences/prefs.h"

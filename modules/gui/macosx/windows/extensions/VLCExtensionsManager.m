@@ -28,8 +28,8 @@
 #import <vlc_modules.h>
 #import <vlc_extensions.h>
 
+#import "extensions/NSString+Helpers.h"
 #import "windows/extensions/VLCExtensionsDialogProvider.h"
-
 
 #define MENU_MAP(a,e) ((uint32_t)((((uint16_t)a) << 16) | ((uint16_t)e)))
 #define MENU_GET_ACTION(a) ((uint16_t)(((uint32_t)a) >> 16))

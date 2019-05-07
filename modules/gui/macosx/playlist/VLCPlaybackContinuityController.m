@@ -23,6 +23,7 @@
 
 #import "VLCPlaybackContinuityController.h"
 
+#import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "panels/dialogs/VLCResumeDialogController.h"
 #import "playlist/VLCPlaylistController.h"

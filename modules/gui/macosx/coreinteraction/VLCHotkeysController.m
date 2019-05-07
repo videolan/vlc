@@ -25,6 +25,7 @@
 #import "VLCHotkeysController.h"
 
 #import "main/VLCMain.h"
+#import "extensions/NSString+Helpers.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
