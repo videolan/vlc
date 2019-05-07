@@ -43,6 +43,12 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 
+#include <vlc/libvlc.h>
+#include <vlc/libvlc_picture.h>
+#include <vlc/libvlc_media.h>
+#include <vlc/libvlc_renderer_discoverer.h>
+#include <vlc/libvlc_media_player.h>
+
 #include <windows.h>
 #include <d3d9.h>
 #ifdef HAVE_D3DX9EFFECT_H
@@ -53,7 +59,6 @@
 #include "common.h"
 #include "builtin_shaders.h"
 #include "../video_chroma/copy.h"
-#include "d3d_render.h"
 
 #include <assert.h>
 
@@ -166,11 +171,11 @@ struct vout_display_sys_t
 
     /* outside rendering */
     void *outside_opaque;
-    d3d_device_setup_cb    setupDeviceCb;
-    d3d_device_cleanup_cb  cleanupDeviceCb;
-    d3d_update_output_cb   updateOutputCb;
-    d3d_swap_cb            swapCb;
-    d3d_start_end_rendering_cb startEndRenderingCb;
+    libvlc_video_direct3d_device_setup_cb    setupDeviceCb;
+    libvlc_video_direct3d_device_cleanup_cb  cleanupDeviceCb;
+    libvlc_video_direct3d_update_output_cb   updateOutputCb;
+    libvlc_video_swap_cb                     swapCb;
+    libvlc_video_direct3d_start_end_rendering_cb startEndRenderingCb;
 };
 
 /* */
@@ -571,7 +576,7 @@ static void Direct3D9DestroyResources(vout_display_t *vd)
 static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
-    struct direct3d_cfg_t cfg;
+    libvlc_video_direct3d_cfg_t cfg;
     cfg.width  = sys->area.vdcfg.display.width;
     cfg.height = sys->area.vdcfg.display.height;
 
@@ -604,7 +609,7 @@ static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt)
     cfg.colorspace = fmt->space;
     cfg.transfer   = fmt->transfer;
 
-    struct output_cfg_t out;
+    libvlc_video_output_cfg_t out;
     if (!sys->updateOutputCb( sys->outside_opaque, &cfg, &out ))
     {
         msg_Err(vd, "Failed to set the external render size");
@@ -1626,12 +1631,12 @@ static int FindShadersCallback(const char *name, char ***values, char ***descs)
 
 }
 
-static bool LocalSwapchainSetupDevice( void **opaque, const struct device_cfg_t *cfg, struct device_setup_t *out )
+static bool LocalSwapchainSetupDevice( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
 {
     return false; /* don't use an "external" D3D9 device */
 }
 
-static bool LocalSwapchainUpdateOutput( void *opaque, const struct direct3d_cfg_t *cfg, struct output_cfg_t *out )
+static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
 {
     vout_display_t *vd = opaque;
     out->surface_format = vd->sys->d3d_dev.pp.BackBufferFormat;
@@ -1686,6 +1691,13 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
+    sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
+    sys->setupDeviceCb       = var_InheritAddress( vd, "vout-cb-setup" );
+    sys->cleanupDeviceCb     = var_InheritAddress( vd, "vout-cb-cleanup" );
+    sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
+    sys->swapCb              = var_InheritAddress( vd, "vout-cb-swap" );
+    sys->startEndRenderingCb = var_InheritAddress( vd, "vout-cb-make-current" );
+
     if ( sys->setupDeviceCb == NULL || sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
         /* use our own callbacks, since there isn't any external ones */
@@ -1697,10 +1709,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
     }
 
-    struct device_cfg_t surface_cfg = {
+    libvlc_video_direct3d_device_cfg_t surface_cfg = {
         .hardware_decoding = is_d3d9_opaque( vd->source.i_chroma )
     };
-    struct device_setup_t device_setup;
+    libvlc_video_direct3d_device_setup_t device_setup;
     IDirect3DDevice9 *d3d9_device = NULL;
     if ( sys->setupDeviceCb( &sys->outside_opaque, &surface_cfg, &device_setup ) )
         d3d9_device = device_setup.device_context;
