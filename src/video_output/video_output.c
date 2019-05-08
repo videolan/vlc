@@ -1715,8 +1715,7 @@ void vout_Release(vout_thread_t *vout)
     vlc_mutex_destroy(&vout->p->spu_lock);
     vlc_mutex_destroy(&vout->p->filter.lock);
 
-    if (sys->window_active)
-        vout_window_Disable(sys->display_cfg.window);
+    assert(!sys->window_active);
     vout_display_window_Delete(sys->display_cfg.window);
 
     vout_control_Clean(&vout->p->control);
