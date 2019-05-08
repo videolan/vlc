@@ -127,9 +127,10 @@ namespace adaptive
         std::string language;
         std::string description;
 
-        CommandsQueue *commandsqueue;
         AbstractDemuxer *demuxer;
         AbstractSourceStream *demuxersource;
+        FakeESOut::LockedFakeEsOut fakeEsOut();
+        FakeESOut::LockedFakeEsOut fakeEsOut() const;
         FakeESOut *fakeesout; /* to intercept/proxy what is sent from demuxstream */
         vlc_mutex_t lock; /* lock for everything accessed by dequeuing */
 

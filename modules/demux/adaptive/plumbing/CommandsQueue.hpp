@@ -171,7 +171,6 @@ namespace adaptive
 
         private:
             CommandsFactory *commandsFactory;
-            vlc_mutex_t lock;
             void LockedCommit();
             void LockedSetDraining();
             std::list<AbstractCommand *> incoming;
