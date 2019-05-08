@@ -32,7 +32,7 @@
 #import "playlist/VLCPlaylistDataSource.h"
 
 #import "library/VLCLibraryController.h"
-#import "library/VLCLibraryDataSource.h"
+#import "library/VLCLibraryVideoDataSource.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
@@ -52,7 +52,7 @@ static const float f_playlist_row_height = 72.;
 @interface VLCLibraryWindow ()
 {
     VLCPlaylistDataSource *_playlistDataSource;
-    VLCLibraryDataSource *_libraryDataSource;
+    VLCLibraryVideoDataSource *_libraryVideoDataSource;
     VLCMediaSourceDataSource *_mediaSourceDataSource;
 
     VLCPlaylistController *_playlistController;
@@ -135,19 +135,19 @@ static const float f_playlist_row_height = 72.;
     _playlistTableView.rowHeight = f_playlist_row_height;
     [_playlistTableView reloadData];
 
-    _libraryDataSource = [[VLCLibraryDataSource alloc] init];
-    _libraryDataSource.libraryModel = mainInstance.libraryController.libraryModel;
-    _libraryDataSource.recentMediaCollectionView = _recentVideoLibraryCollectionView;
-    _libraryDataSource.libraryMediaCollectionView = _videoLibraryCollectionView;
-    _videoLibraryCollectionView.dataSource = _libraryDataSource;
-    _videoLibraryCollectionView.delegate = _libraryDataSource;
+    _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
+    _libraryVideoDataSource.libraryModel = mainInstance.libraryController.libraryModel;
+    _libraryVideoDataSource.recentMediaCollectionView = _recentVideoLibraryCollectionView;
+    _libraryVideoDataSource.libraryMediaCollectionView = _videoLibraryCollectionView;
+    _videoLibraryCollectionView.dataSource = _libraryVideoDataSource;
+    _videoLibraryCollectionView.delegate = _libraryVideoDataSource;
     [_videoLibraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
     [_videoLibraryCollectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
                forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
                            withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
     [(NSCollectionViewFlowLayout *)_videoLibraryCollectionView.collectionViewLayout setHeaderReferenceSize:[VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize]];
-    _recentVideoLibraryCollectionView.dataSource = _libraryDataSource;
-    _recentVideoLibraryCollectionView.delegate = _libraryDataSource;
+    _recentVideoLibraryCollectionView.dataSource = _libraryVideoDataSource;
+    _recentVideoLibraryCollectionView.delegate = _libraryVideoDataSource;
     [_recentVideoLibraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
 
     _mediaSourceDataSource = [[VLCMediaSourceDataSource alloc] init];
@@ -258,7 +258,7 @@ static const float f_playlist_row_height = 72.;
 {
     switch (_segmentedTitleControl.selectedSegment) {
         case 0:
-            _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeVideo;
+            _libraryVideoDataSource.libraryModel.libraryMode = VLCLibraryModeVideo;
             if (_mediaSourceScrollView.superview != nil) {
                 [_mediaSourceScrollView removeFromSuperview];
             }
@@ -274,7 +274,7 @@ static const float f_playlist_row_height = 72.;
             break;
 
         case 1:
-            _libraryDataSource.libraryModel.libraryMode = VLCLibraryModeAudio;
+            _libraryVideoDataSource.libraryModel.libraryMode = VLCLibraryModeAudio;
             if (_mediaSourceScrollView.superview != nil) {
                 [_mediaSourceScrollView removeFromSuperview];
             }

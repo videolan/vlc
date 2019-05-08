@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryDataSource.m: MacOS X interface module
+ * VLCLibraryVideoDataSource.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryDataSource.h"
+#import "VLCLibraryVideoDataSource.h"
 
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
@@ -29,7 +29,7 @@
 #import "main/CompatibilityFixes.h"
 #import "extensions/NSString+Helpers.h"
 
-@implementation VLCLibraryDataSource
+@implementation VLCLibraryVideoDataSource
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section

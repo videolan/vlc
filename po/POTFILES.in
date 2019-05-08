@@ -466,8 +466,8 @@ modules/gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.h
 modules/gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.m
 modules/gui/macosx/library/VLCLibraryController.h
 modules/gui/macosx/library/VLCLibraryController.m
-modules/gui/macosx/library/VLCLibraryDataSource.h
-modules/gui/macosx/library/VLCLibraryDataSource.m
+modules/gui/macosx/library/VLCLibraryVideoDataSource.h
+modules/gui/macosx/library/VLCLibraryVideoDataSource.m
 modules/gui/macosx/library/VLCLibraryDataTypes.h
 modules/gui/macosx/library/VLCLibraryDataTypes.m
 modules/gui/macosx/library/VLCLibraryFolderManagementWindow.h
