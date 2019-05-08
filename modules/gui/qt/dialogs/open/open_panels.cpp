@@ -1410,10 +1410,6 @@ void CaptureOpenPanel::advancedDialog()
             switch( control->getType() )
             {
                 case CONFIG_ITEM_STRING:
-                case CONFIG_ITEM_LOADFILE:
-                case CONFIG_ITEM_SAVEFILE:
-                case CONFIG_ITEM_DIRECTORY:
-                case CONFIG_ITEM_MODULE:
                     tempMRL += colon_escape( QString("=%1").arg( qobject_cast<VStringConfigControl *>(control)->getValue() ) );
                     break;
                 case CONFIG_ITEM_INTEGER:
