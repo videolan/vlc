@@ -1,6 +1,6 @@
---- libvpx/build/make/configure.sh.orig	2018-07-09 18:57:29.774826691 -0400
-+++ libvpx/build/make/configure.sh	2018-07-09 19:00:34.427868074 -0400
-@@ -818,84 +818,6 @@
+--- libvpx/build/make/configure.sh.orig	2019-05-08 15:33:05.038238914 -0400
++++ libvpx/build/make/configure.sh	2019-05-08 15:34:46.909711375 -0400
+@@ -863,88 +863,6 @@
    # PIC is probably what we want when building shared libs
    enabled shared && soft_enable pic
  
@@ -11,7 +11,7 @@
 -    IOS_VERSION_MIN="8.0"
 -  else
 -    IOS_VERSION_OPTIONS=""
--    IOS_VERSION_MIN="6.0"
+-    IOS_VERSION_MIN="7.0"
 -  fi
 -
 -  # Handle darwin variants. Newer SDKs allow targeting older
@@ -71,6 +71,10 @@
 -      add_cflags  "-mmacosx-version-min=10.12"
 -      add_ldflags "-mmacosx-version-min=10.12"
 -      ;;
+-    *-darwin17-*)
+-      add_cflags  "-mmacosx-version-min=10.13"
+-      add_ldflags "-mmacosx-version-min=10.13"
+-      ;;
 -    *-iphonesimulator-*)
 -      add_cflags  "-miphoneos-version-min=${IOS_VERSION_MIN}"
 -      add_ldflags "-miphoneos-version-min=${IOS_VERSION_MIN}"
@@ -85,7 +89,7 @@
    # Handle Solaris variants. Solaris 10 needs -lposix4
    case ${toolchain} in
      sparc-solaris-*)
-@@ -1086,12 +1012,6 @@
+@@ -1177,12 +1095,6 @@
              add_cflags -isysroot ${alt_libc}
            fi
  
@@ -98,7 +102,7 @@
            for d in lib usr/lib usr/lib/system; do
              try_dir="${alt_libc}/${d}"
              [ -d "${try_dir}" ] && add_ldflags -L"${try_dir}"
-@@ -1264,6 +1184,13 @@
+@@ -1372,6 +1284,13 @@
        case ${tgt_cc} in
          gcc*)
            add_cflags -m${bits}

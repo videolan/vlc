@@ -1,6 +1,6 @@
 # libvpx
 
-VPX_VERSION := 1.7.0
+VPX_VERSION := 1.8.0
 VPX_URL := http://github.com/webmproject/libvpx/archive/v${VPX_VERSION}.tar.gz
 
 PKGS += vpx
@@ -21,9 +21,6 @@ ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/vpx/libvpx-android.patch
 	$(APPLY) $(SRC)/vpx/libvpx-android-toolchain_path.patch
 endif
-	$(APPLY) $(SRC)/vpx/0001-ads2gas-Add-a-noelf-option.patch
-	$(APPLY) $(SRC)/vpx/0002-configure-Add-an-armv7-win32-gcc-target.patch
-	$(APPLY) $(SRC)/vpx/0003-configure-Add-an-arm64-win64-gcc-target.patch
 	$(MOVE)
 
 DEPS_vpx =

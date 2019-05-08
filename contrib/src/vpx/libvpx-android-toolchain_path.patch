@@ -1,8 +1,6 @@
-diff --git a/build/make/configure.sh b/build/make/configure.sh
-index 2e0b239..8853d18 100644
---- a/build/make/configure.sh
-+++ b/build/make/configure.sh
-@@ -951,9 +951,14 @@ EOF
+--- libvpx-1.8.0/build/make/configure.sh.orig	2019-05-09 08:39:28.062680326 -0400
++++ libvpx-1.8.0/build/make/configure.sh	2019-05-09 08:40:19.974415124 -0400
+@@ -1031,9 +1031,14 @@
          android*)
            if [ -n "${sdk_path}" ]; then
              SDK_PATH=${sdk_path}
@@ -18,4 +16,4 @@ index 2e0b239..8853d18 100644
 +            TOOLCHAIN_PATH=${COMPILER_LOCATION%/*}/${tools_prefix}
              CC=clang
              CXX=clang++
-             AR=${TOOLCHAIN_PATH}ar
+             AR=llvm-ar
