@@ -51,7 +51,6 @@ AbstractStream::AbstractStream(demux_t * demux_)
     inrestart = false;
     segmentTracker = NULL;
     demuxersource = NULL;
-    commandsqueue = NULL;
     demuxer = NULL;
     fakeesout = NULL;
     last_buffer_status = buffering_lessthanmin;
@@ -70,7 +69,7 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, 
         CommandsFactory *factory = new (std::nothrow) CommandsFactory();
         if(factory)
         {
-            commandsqueue = new (std::nothrow) CommandsQueue(factory);
+            CommandsQueue *commandsqueue = new (std::nothrow) CommandsQueue(factory);
             if(commandsqueue)
             {
                 fakeesout = new (std::nothrow) FakeESOut(p_realdemux->out, commandsqueue);
@@ -109,7 +108,6 @@ AbstractStream::~AbstractStream()
     delete demuxer;
     delete demuxersource;
     delete fakeesout;
-    delete commandsqueue;
 
     vlc_mutex_destroy(&lock);
 }
@@ -122,14 +120,14 @@ void AbstractStream::prepareRestart(bool b_discontinuity)
         demuxer->drain();
         setTimeOffset(true);
         /* Enqueue Del Commands for all current ES */
-        fakeesout->scheduleAllForDeletion();
+        fakeEsOut()->scheduleAllForDeletion();
         if(b_discontinuity)
-            fakeesout->schedulePCRReset();
-        commandsqueue->Commit();
+            fakeEsOut()->schedulePCRReset();
+        fakeEsOut()->commandsQueue()->Commit();
         /* ignoring demuxer's own Del commands */
-        commandsqueue->setDrop(true);
+        fakeEsOut()->commandsQueue()->setDrop(true);
         delete demuxer;
-        commandsqueue->setDrop(false);
+        fakeEsOut()->commandsQueue()->setDrop(false);
         demuxer = NULL;
     }
 }
@@ -147,7 +145,7 @@ void AbstractStream::setDescription(const std::string &desc)
 mtime_t AbstractStream::getPCR() const
 {
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
-    mtime_t pcr = isDisabled() ? VLC_TS_INVALID : commandsqueue->getPCR();
+    mtime_t pcr = isDisabled() ? VLC_TS_INVALID : fakeEsOut()->commandsQueue()->getPCR();
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return pcr;
 }
@@ -169,9 +167,9 @@ mtime_t AbstractStream::getFirstDTS() const
     }
     else
     {
-        dts = commandsqueue->getFirstDTS();
+        dts = fakeEsOut()->commandsQueue()->getFirstDTS();
         if(dts == VLC_TS_INVALID)
-            dts = commandsqueue->getPCR();
+            dts = fakeEsOut()->commandsQueue()->getPCR();
     }
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return dts;
@@ -179,14 +177,14 @@ mtime_t AbstractStream::getFirstDTS() const
 
 int AbstractStream::esCount() const
 {
-    return fakeesout->esCount();
+    return fakeEsOut()->esCount();
 }
 
 bool AbstractStream::seekAble() const
 {
-    bool restarting = fakeesout->restarting();
-    bool draining = commandsqueue->isDraining();
-    bool eof = commandsqueue->isEOF();
+    bool restarting = fakeEsOut()->restarting();
+    bool draining = fakeEsOut()->commandsQueue()->isDraining();
+    bool eof = fakeEsOut()->commandsQueue()->isEOF();
 
     msg_Dbg(p_realdemux, "demuxer %p, fakeesout restarting %d, "
             "discontinuity %d, commandsqueue draining %d, commandsqueue eof %d",
@@ -205,7 +203,7 @@ bool AbstractStream::seekAble() const
 
 bool AbstractStream::isSelected() const
 {
-    return fakeesout->hasSelectedEs();
+    return fakeEsOut()->hasSelectedEs();
 }
 
 bool AbstractStream::reactivate(mtime_t basetime)
@@ -247,17 +245,17 @@ bool AbstractStream::restartDemux()
     {
         inrestart = true;
         /* Push all ES as recycling candidates */
-        fakeesout->recycleAll();
+        fakeEsOut()->recycleAll();
         /* Restart with ignoring es_Del pushes to queue when terminating demux */
-        commandsqueue->setDrop(true);
+        fakeEsOut()->commandsQueue()->setDrop(true);
         demuxer->destroy();
-        commandsqueue->setDrop(false);
+        fakeEsOut()->commandsQueue()->setDrop(false);
         b_ret = demuxer->create();
         inrestart = false;
     }
     else
     {
-        commandsqueue->Commit();
+        fakeEsOut()->commandsQueue()->Commit();
     }
     return b_ret;
 }
@@ -281,7 +279,7 @@ bool AbstractStream::canActivate() const
 
 bool AbstractStream::decodersDrained()
 {
-    return fakeesout->decodersDrained();
+    return fakeEsOut()->decodersDrained();
 }
 
 AbstractStream::buffering_status AbstractStream::getLastBufferStatus() const
@@ -291,7 +289,7 @@ AbstractStream::buffering_status AbstractStream::getLastBufferStatus() const
 
 mtime_t AbstractStream::getDemuxedAmount() const
 {
-    return commandsqueue->getDemuxedAmount();
+    return fakeEsOut()->commandsQueue()->getDemuxedAmount();
 }
 
 AbstractStream::buffering_status AbstractStream::bufferize(mtime_t nz_deadline,
@@ -314,18 +312,18 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
     }
 
     /* Disable streams that are not selected (alternate streams) */
-    if(esCount() && !isSelected() && !fakeesout->restarting())
+    if(esCount() && !isSelected() && !fakeEsOut()->restarting())
     {
         setDisabled(true);
         segmentTracker->reset();
-        commandsqueue->Abort(false);
+        fakeEsOut()->commandsQueue()->Abort(false);
         msg_Dbg(p_realdemux, "deactivating %s stream %s",
                 format.str().c_str(), description.c_str());
         vlc_mutex_unlock(&lock);
         return AbstractStream::buffering_end;
     }
 
-    if(commandsqueue->isDraining())
+    if(fakeEsOut()->commandsQueue()->isDraining())
     {
         vlc_mutex_unlock(&lock);
         return AbstractStream::buffering_suspended;
@@ -342,12 +340,12 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
                 msg_Dbg( p_realdemux, "Draining on format change" );
                 prepareRestart();
                 discontinuity = false;
-                commandsqueue->setDraining();
+                fakeEsOut()->commandsQueue()->setDraining();
                 vlc_mutex_unlock(&lock);
                 return AbstractStream::buffering_ongoing;
             }
             dead = true; /* Prevent further retries */
-            commandsqueue->setEOF(true);
+            fakeEsOut()->commandsQueue()->setEOF(true);
             vlc_mutex_unlock(&lock);
             return AbstractStream::buffering_end;
         }
@@ -355,7 +353,7 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
 
     const int64_t i_total_buffering = i_min_buffering + i_extra_buffering;
 
-    mtime_t i_demuxed = commandsqueue->getDemuxedAmount();
+    mtime_t i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount();
     segmentTracker->notifyBufferingLevel(i_min_buffering, i_demuxed, i_total_buffering);
     if(i_demuxed < i_total_buffering) /* not already demuxed */
     {
@@ -365,8 +363,8 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
             return AbstractStream::buffering_suspended;
         }
 
-        mtime_t nz_extdeadline = commandsqueue->getBufferingLevel() +
-                                (i_total_buffering - commandsqueue->getDemuxedAmount()) / 4;
+        mtime_t nz_extdeadline = fakeEsOut()->commandsQueue()->getBufferingLevel() +
+                                    (i_total_buffering - i_demuxed) / 4;
         nz_deadline = std::max(nz_deadline, nz_extdeadline);
 
         /* need to read, demuxer still buffering, ... */
@@ -382,18 +380,18 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
                 if(discontinuity)
                 {
                     msg_Dbg(p_realdemux, "Draining on discontinuity");
-                    commandsqueue->setDraining();
+                    fakeEsOut()->commandsQueue()->setDraining();
                     discontinuity = false;
                 }
                 needrestart = false;
                 vlc_mutex_unlock(&lock);
                 return AbstractStream::buffering_ongoing;
             }
-            commandsqueue->setEOF(true);
+            fakeEsOut()->commandsQueue()->setEOF(true);
             vlc_mutex_unlock(&lock);
             return AbstractStream::buffering_end;
         }
-        i_demuxed = commandsqueue->getDemuxedAmount();
+        i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount();
         segmentTracker->notifyBufferingLevel(i_min_buffering, i_demuxed, i_total_buffering);
     }
     vlc_mutex_unlock(&lock);
@@ -413,36 +411,40 @@ AbstractStream::status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
 
     *pi_pcr = nz_deadline;
 
-    if(commandsqueue->isDraining())
+    if(fakeEsOut()->commandsQueue()->isDraining())
     {
-        AdvDebug(msg_Dbg(p_realdemux, "Stream %s pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " [DRAINING]",
-                         description.c_str(), commandsqueue->getPCR(), commandsqueue->getFirstDTS(),
-                         nz_deadline));
+        AdvDebug(vlc_tick_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR();
+                 vlc_tick_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstDTS();
+                 msg_Dbg(p_realdemux, "Stream %s pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " [DRAINING]",
+                         description.c_str(), pcrvalue, dtsvalue, nz_deadline));
 
-        *pi_pcr = commandsqueue->Process(p_realdemux->out, VLC_TS_0 + nz_deadline);
-        if(!commandsqueue->isEmpty())
+        *pi_pcr = fakeEsOut()->commandsQueue()->Process(p_realdemux->out, VLC_TS_0 + nz_deadline);
+        if(!fakeEsOut()->commandsQueue()->isEmpty())
             return AbstractStream::status_demuxed;
 
-        if(!commandsqueue->isEOF())
+        if(!fakeEsOut()->commandsQueue()->isEOF())
         {
-            commandsqueue->Abort(true); /* reset buffering level and flags */
+            fakeEsOut()->commandsQueue()->Abort(true); /* reset buffering level and flags */
             return AbstractStream::status_discontinuity;
         }
     }
 
-    if(isDisabled() || commandsqueue->isEOF())
+    if(isDisabled() || fakeEsOut()->commandsQueue()->isEOF())
     {
         *pi_pcr = nz_deadline;
         return AbstractStream::status_eof;
     }
 
-    AdvDebug(msg_Dbg(p_realdemux, "Stream %s pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " buflevel %" PRId64,
-                     description.c_str(), commandsqueue->getPCR(), commandsqueue->getFirstDTS(),
-                     nz_deadline, commandsqueue->getBufferingLevel()));
+    mtime_t bufferingLevel = fakeEsOut()->commandsQueue()->getBufferingLevel();
 
-    if(nz_deadline + VLC_TS_0 <= commandsqueue->getBufferingLevel()) /* demuxed */
+    AdvDebug(mtime_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR();
+             mtime_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstDTS();
+             msg_Dbg(p_realdemux, "Stream %s pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " buflevel %" PRId64,
+                     description.c_str(), pcrvalue, dtsvalue, nz_deadline, bufferingLevel));
+
+    if(nz_deadline + VLC_TS_0 <= bufferingLevel) /* demuxed */
     {
-        *pi_pcr = commandsqueue->Process( p_realdemux->out, VLC_TS_0 + nz_deadline );
+        *pi_pcr = fakeEsOut()->commandsQueue()->Process( p_realdemux->out, VLC_TS_0 + nz_deadline );
         return AbstractStream::status_demuxed;
     }
 
@@ -452,7 +454,7 @@ AbstractStream::status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
 std::string AbstractStream::getContentType()
 {
     if (currentChunk == NULL && !eof)
-        currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting(), connManager);
+        currentChunk = segmentTracker->getNextChunk(!fakeEsOut()->restarting(), connManager);
     if(currentChunk)
         return currentChunk->getContentType();
     else
@@ -462,7 +464,7 @@ std::string AbstractStream::getContentType()
 block_t * AbstractStream::readNextBlock()
 {
     if (currentChunk == NULL && !eof)
-        currentChunk = segmentTracker->getNextChunk(!fakeesout->restarting(), connManager);
+        currentChunk = segmentTracker->getNextChunk(!fakeEsOut()->restarting(), connManager);
 
     if(discontinuity || needrestart)
     {
@@ -527,10 +529,10 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
             }
             else
             {
-                commandsqueue->setEOF(false);
+                fakeEsOut()->commandsQueue()->setEOF(false);
             }
         }
-        else commandsqueue->Abort( true );
+        else fakeEsOut()->commandsQueue()->Abort( true );
 
         es_out_Control(p_realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                        VLC_TS_0 + time);
@@ -563,24 +565,24 @@ void AbstractStream::setTimeOffset(mtime_t i_offset)
      * will start from zero from seek point */
     if(i_offset < 0) /* reset */
     {
-        fakeesout->setExpectedTimestampOffset(0);
+        fakeEsOut()->setExpectedTimestampOffset(0);
     }
     else if(demuxer)
     {
-        fakeesout->setExpectedTimestampOffset(i_offset);
+        fakeEsOut()->setExpectedTimestampOffset(i_offset);
     }
 }
 
 AbstractDemuxer * AbstractStream::createDemux(const StreamFormat &format)
 {
     AbstractDemuxer *ret = newDemux( p_realdemux, format,
-                                     fakeesout->getEsOut(), demuxersource );
+                                     fakeEsOut()->getEsOut(), demuxersource );
     if(ret && !ret->create())
     {
         delete ret;
         ret = NULL;
     }
-    else commandsqueue->Commit();
+    else fakeEsOut()->commandsQueue()->Commit();
 
     return ret;
 }
@@ -645,4 +647,14 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
         default:
             break;
     }
+}
+
+FakeESOut::LockedFakeEsOut AbstractStream::fakeEsOut()
+{
+    return fakeesout->WithLock();
+}
+
+FakeESOut::LockedFakeEsOut AbstractStream::fakeEsOut() const
+{
+    return fakeesout->WithLock();
 }

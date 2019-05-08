@@ -237,14 +237,12 @@ CommandsQueue::CommandsQueue( CommandsFactory *f )
     b_draining = false;
     b_eof = false;
     commandsFactory = f;
-    vlc_mutex_init(&lock);
 }
 
 CommandsQueue::~CommandsQueue()
 {
     Abort( false );
     delete commandsFactory;
-    vlc_mutex_destroy(&lock);
 }
 
 static bool compareCommands( AbstractCommand *a, AbstractCommand *b )
@@ -254,7 +252,6 @@ static bool compareCommands( AbstractCommand *a, AbstractCommand *b )
 
 void CommandsQueue::Schedule( AbstractCommand *command )
 {
-    vlc_mutex_lock(&lock);
     if( b_drop )
     {
         delete command;
@@ -269,7 +266,6 @@ void CommandsQueue::Schedule( AbstractCommand *command )
     {
         incoming.push_back( command );
     }
-    vlc_mutex_unlock(&lock);
 }
 
 const CommandsFactory * CommandsQueue::factory() const
@@ -293,7 +289,6 @@ mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
     std::list<AbstractCommand *> output;
     std::list<AbstractCommand *> in;
 
-    vlc_mutex_lock(&lock);
 
     in.splice( in.end(), commands );
 
@@ -366,7 +361,6 @@ mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
     }
     pcr = lastdts; /* Warn! no PCR update/lock release until execution */
 
-    vlc_mutex_unlock(&lock);
 
     return lastdts;
 }
@@ -380,14 +374,11 @@ void CommandsQueue::LockedCommit()
 
 void CommandsQueue::Commit()
 {
-    vlc_mutex_lock(&lock);
     LockedCommit();
-    vlc_mutex_unlock(&lock);
 }
 
 void CommandsQueue::Abort( bool b_reset )
 {
-    vlc_mutex_lock(&lock);
     commands.splice( commands.end(), incoming );
     while( !commands.empty() )
     {
@@ -402,55 +393,42 @@ void CommandsQueue::Abort( bool b_reset )
         b_draining = false;
         b_eof = false;
     }
-    vlc_mutex_unlock(&lock);
 }
 
 bool CommandsQueue::isEmpty() const
 {
-    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     bool b_empty = commands.empty() && incoming.empty();
-    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return b_empty;
 }
 
 void CommandsQueue::setDrop( bool b )
 {
-    vlc_mutex_lock(&lock);
     b_drop = b;
-    vlc_mutex_unlock(&lock);
 }
 
 void CommandsQueue::setDraining()
 {
-    vlc_mutex_lock(&lock);
     LockedSetDraining();
-    vlc_mutex_unlock(&lock);
 }
 
 bool CommandsQueue::isDraining() const
 {
-    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     bool b = b_draining;
-    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return b;
 }
 
 void CommandsQueue::setEOF( bool b )
 {
-    vlc_mutex_lock(&lock);
     b_eof = b;
     if( b_eof )
         LockedSetDraining();
     else
         b_draining = false;
-    vlc_mutex_unlock(&lock);
 }
 
 bool CommandsQueue::isEOF() const
 {
-    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     bool b = b_eof;
-    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return b;
 }
 
@@ -462,16 +440,13 @@ mtime_t CommandsQueue::getDemuxedAmount() const
 mtime_t CommandsQueue::getBufferingLevel() const
 {
     mtime_t i_buffer;
-    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     i_buffer = bufferinglevel;
-    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return i_buffer;
 }
 
 mtime_t CommandsQueue::getFirstDTS() const
 {
     std::list<AbstractCommand *>::const_iterator it;
-    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     mtime_t i_firstdts = pcr;
     for( it = commands.begin(); it != commands.end(); ++it )
     {
@@ -483,7 +458,6 @@ mtime_t CommandsQueue::getFirstDTS() const
             break;
         }
     }
-    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return i_firstdts;
 }
 
@@ -495,8 +469,6 @@ void CommandsQueue::LockedSetDraining()
 
 mtime_t CommandsQueue::getPCR() const
 {
-    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     mtime_t i_pcr = pcr;
-    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return i_pcr;
 }

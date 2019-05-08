@@ -37,9 +37,22 @@ namespace adaptive
     class FakeESOut
     {
         public:
+            class LockedFakeEsOut
+            {
+                friend class FakeESOut;
+                public:
+                    ~LockedFakeEsOut();
+                    FakeESOut & operator*();
+                    FakeESOut * operator->();
+                private:
+                    FakeESOut *p;
+                    LockedFakeEsOut(FakeESOut &q);
+            };
             FakeESOut( es_out_t *, CommandsQueue * );
             ~FakeESOut();
             es_out_t * getEsOut();
+            LockedFakeEsOut WithLock();
+            CommandsQueue * commandsQueue();
             void setTimestampOffset( mtime_t );
             void setExpectedTimestampOffset(mtime_t);
             size_t esCount() const;
@@ -67,6 +80,7 @@ namespace adaptive
             static void esOutDestroy_Callback( es_out_t * );
 
         private:
+            friend class LockedFakeESOut;
             vlc_mutex_t lock;
             es_out_t *real_es_out;
             FakeESOutID * createNewID( const es_format_t * );

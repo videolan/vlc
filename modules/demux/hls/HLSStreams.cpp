@@ -55,7 +55,7 @@ void HLSStream::setTimeOffset(mtime_t i_offset)
         {
             if(!b_id3_timestamps_offset_set)
             {
-                fakeesout->setTimestampOffset(i_offset);
+                fakeEsOut()->setTimestampOffset(i_offset);
             }
             return;
         }
@@ -114,9 +114,9 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
     if( b_meta_updated )
     {
         b_meta_updated = false;
-        AbstractCommand *command = commandsqueue->factory()->createEsOutMetaCommand( -1, p_meta );
+        AbstractCommand *command = fakeEsOut()->commandsQueue()->factory()->createEsOutMetaCommand( -1, p_meta );
         if( command )
-            commandsqueue->Schedule( command );
+            fakeEsOut()->commandsQueue()->Schedule( command );
     }
 
     return p_block;
