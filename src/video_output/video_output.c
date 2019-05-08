@@ -1517,33 +1517,6 @@ error:
     return VLC_EGENERIC;
 }
 
-static void ThreadStop(vout_thread_t *vout)
-{
-    if (vout->p->spu_blend)
-        filter_DeleteBlend(vout->p->spu_blend);
-
-    /* Destroy translation tables */
-    if (vout->p->display) {
-        if (vout->p->decoder_pool)
-            vout_FlushUnlocked(vout, true, INT64_MAX);
-        vout_CloseWrapper(vout);
-    }
-
-    /* Destroy the video filters */
-    ThreadDelAllFilterCallbacks(vout);
-    filter_chain_Delete(vout->p->filter.chain_interactive);
-    filter_chain_Delete(vout->p->filter.chain_static);
-    video_format_Clean(&vout->p->filter.format);
-    free(vout->p->filter.configuration);
-
-    if (vout->p->decoder_fifo)
-        picture_fifo_Delete(vout->p->decoder_fifo);
-    assert(!vout->p->decoder_pool);
-
-    if (vout->p->mouse_event)
-        vout->p->mouse_event(NULL, vout->p->mouse_opaque);
-}
-
 void vout_Cancel(vout_thread_t *vout, bool canceled)
 {
     vout_thread_sys_t *sys = vout->p;
@@ -1558,7 +1531,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
 {
     switch(cmd.type) {
     case VOUT_CONTROL_CLEAN:
-        ThreadStop(vout);
         return 1;
     case VOUT_CONTROL_CHANGE_FILTERS:
         ThreadChangeFilters(vout, NULL,
@@ -1658,6 +1630,30 @@ static void vout_StopDisplay(vout_thread_t *vout)
     assert(sys->original.i_chroma != 0);
     vout_control_PushVoid(&sys->control, VOUT_CONTROL_CLEAN);
     vlc_join(sys->thread, NULL);
+
+    if (sys->spu_blend != NULL)
+        filter_DeleteBlend(sys->spu_blend);
+
+    /* Destroy translation tables */
+    if (sys->display != NULL) {
+        if (sys->decoder_pool != NULL)
+            vout_FlushUnlocked(vout, true, INT64_MAX);
+        vout_CloseWrapper(vout);
+    }
+
+    /* Destroy the video filters */
+    ThreadDelAllFilterCallbacks(vout);
+    filter_chain_Delete(sys->filter.chain_interactive);
+    filter_chain_Delete(sys->filter.chain_static);
+    video_format_Clean(&sys->filter.format);
+    free(sys->filter.configuration);
+
+    if (sys->decoder_fifo != NULL)
+        picture_fifo_Delete(sys->decoder_fifo);
+    assert(sys->decoder_pool == NULL);
+
+    if (sys->mouse_event)
+        sys->mouse_event(NULL, sys->mouse_opaque);
 
     spu_Detach(sys->spu);
     sys->mouse_event = NULL;
