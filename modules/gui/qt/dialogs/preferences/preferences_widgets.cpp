@@ -236,8 +236,6 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
     finish( );
 }
 
-int VStringConfigControl::getType() const { return CONFIG_ITEM_STRING; }
-
 void StringConfigControl::finish()
 {
     text->setText( qfu(p_item->value.psz) );
@@ -793,8 +791,6 @@ int IntegerConfigControl::getValue() const
     return spin->value();
 }
 
-int VIntConfigControl::getType() const { return CONFIG_ITEM_INTEGER; }
-
 /********* Integer range **********/
 IntegerRangeConfigControl::IntegerRangeConfigControl( vlc_object_t *_p_this,
                                             module_config_t *_p_item, QWidget *p ) :
@@ -937,8 +933,6 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
     finish();
 }
 
-int BoolConfigControl::getType() const { return CONFIG_ITEM_BOOL; }
-
 void BoolConfigControl::finish()
 {
     checkbox->setChecked( p_item->value.i );
@@ -1042,8 +1036,6 @@ void FloatConfigControl::fillGrid( QGridLayout *l, int line )
     l->addWidget( label, line, 0 );
     l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
 }
-
-int VFloatConfigControl::getType() const { return CONFIG_ITEM_FLOAT; }
 
 FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
                                         module_config_t *_p_item,
@@ -1160,8 +1152,6 @@ void KeySelectorControl::fillGrid( QGridLayout *l, int line )
     gLayout->addWidget( table, 2, 0, 1, 4 );
     l->addLayout( gLayout, line, 0, 1, -1 );
 }
-
-int KeySelectorControl::getType() const { return CONFIG_ITEM_KEY; }
 
 void KeySelectorControl::buildAppHotkeysList( QWidget *rootWidget )
 {

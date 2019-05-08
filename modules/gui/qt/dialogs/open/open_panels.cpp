@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include "qt.hpp"
 #include "maininterface/main_interface.hpp"
 #include "open_panels.hpp"
@@ -1401,13 +1403,18 @@ void CaptureOpenPanel::advancedDialog()
 
             tempMRL += (i ? " :" : ":");
 
-            if( control->getType() == CONFIG_ITEM_BOOL )
+            int ctrl_type = control->getType();
+            assert(ctrl_type != -1);
+
+            ctrl_type = CONFIG_CLASS(ctrl_type);
+
+            if( ctrl_type == CONFIG_ITEM_BOOL )
                 if( !(qobject_cast<VIntConfigControl *>(control)->getValue() ) )
                     tempMRL += "no-";
 
             tempMRL += control->getName();
 
-            switch( control->getType() )
+            switch( ctrl_type )
             {
                 case CONFIG_ITEM_STRING:
                     tempMRL += colon_escape( QString("=%1").arg( qobject_cast<VStringConfigControl *>(control)->getValue() ) );

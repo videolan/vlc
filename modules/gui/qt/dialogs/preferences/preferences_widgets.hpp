@@ -78,7 +78,7 @@ class ConfigControl : public QObject
 {
     Q_OBJECT
 public:
-    virtual int getType() const = 0;
+    int getType() const { return (p_item) ? p_item->i_type : -1; }
     const char * getName() const { return  p_item->psz_name; }
     void hide() { changeVisibility( false ); }
     void show() { changeVisibility( true ); }
@@ -110,7 +110,6 @@ class VIntConfigControl : public ConfigControl
 Q_OBJECT
 public:
     virtual int getValue() const = 0;
-    virtual int getType() const Q_DECL_OVERRIDE;
     virtual void doApply() Q_DECL_OVERRIDE;
 protected:
     VIntConfigControl( vlc_object_t *a, module_config_t *b ) :
@@ -199,7 +198,6 @@ public:
     BoolConfigControl( vlc_object_t *, module_config_t *,
                        QLabel *, QAbstractButton* );
     int getValue() const Q_DECL_OVERRIDE;
-    int getType() const Q_DECL_OVERRIDE;
 protected:
     void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
@@ -245,7 +243,6 @@ class VFloatConfigControl : public ConfigControl
     Q_OBJECT
 public:
     virtual float getValue() const = 0;
-    int getType() const Q_DECL_OVERRIDE;
     void doApply() Q_DECL_OVERRIDE;
 protected:
     VFloatConfigControl( vlc_object_t *a, module_config_t *b ) :
@@ -294,7 +291,6 @@ class VStringConfigControl : public ConfigControl
     Q_OBJECT
 public:
     virtual QString getValue() const = 0;
-    int getType() const Q_DECL_OVERRIDE;
     void doApply() Q_DECL_OVERRIDE;
 protected:
     VStringConfigControl( vlc_object_t *a, module_config_t *b ) :
@@ -461,7 +457,6 @@ class KeySelectorControl : public ConfigControl
 
 public:
     KeySelectorControl( vlc_object_t *, QWidget * );
-    int getType() const Q_DECL_OVERRIDE;
     void doApply() Q_DECL_OVERRIDE;
     enum ColumnIndex
     {
