@@ -33,6 +33,8 @@
 # include "config.h"
 #endif
 
+#include <stdnoreturn.h>
+
 #include <vlc_common.h>
 
 #include <math.h>
@@ -1527,11 +1529,9 @@ void vout_Cancel(vout_thread_t *vout, bool canceled)
     vout_control_Release(&sys->control);
 }
 
-static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
+static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
 {
     switch(cmd.type) {
-    case VOUT_CONTROL_CLEAN:
-        return 1;
     case VOUT_CONTROL_CHANGE_FILTERS:
         ThreadChangeFilters(vout, NULL,
                             cmd.string != NULL ?
@@ -1579,7 +1579,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         break;
     }
     vout_control_cmd_Clean(&cmd);
-    return 0;
 }
 
 /*****************************************************************************
@@ -1589,7 +1588,7 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
  * terminated. It handles the pictures arriving in the video heap and the
  * display device events.
  *****************************************************************************/
-static void *Thread(void *object)
+noreturn static void *Thread(void *object)
 {
     vout_thread_t *vout = object;
     vout_thread_sys_t *sys = vout->p;
@@ -1607,20 +1606,21 @@ static void *Thread(void *object)
         } else {
             deadline = VLC_TICK_INVALID;
         }
-        while (!vout_control_Pop(&sys->control, &cmd, deadline))
-            if (ThreadControl(vout, cmd))
-                goto out;
+        while (!vout_control_Pop(&sys->control, &cmd, deadline)) {
+            int canc = vlc_savecancel();
+            ThreadControl(vout, cmd);
+            vlc_restorecancel(canc);
+        }
 
+        int canc = vlc_savecancel();
         deadline = VLC_TICK_INVALID;
         wait = ThreadDisplayPicture(vout, &deadline) != VLC_SUCCESS;
 
         const bool picture_interlaced = sys->displayed.is_interlaced;
 
         vout_SetInterlacingState(vout, picture_interlaced);
+        vlc_restorecancel(canc);
     }
-
-out:
-    return NULL;
 }
 
 static void vout_StopDisplay(vout_thread_t *vout)
@@ -1628,7 +1628,7 @@ static void vout_StopDisplay(vout_thread_t *vout)
     vout_thread_sys_t *sys = vout->p;
 
     assert(sys->original.i_chroma != 0);
-    vout_control_PushVoid(&sys->control, VOUT_CONTROL_CLEAN);
+    vlc_cancel(sys->thread);
     vlc_join(sys->thread, NULL);
 
     if (sys->spu_blend != NULL)

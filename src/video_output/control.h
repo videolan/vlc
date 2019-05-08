@@ -27,13 +27,6 @@
 
 /* */
 enum {
-    VOUT_CONTROL_CLEAN,
-
-#if 0
-    /* */
-    VOUT_CONTROL_START,
-    VOUT_CONTROL_STOP,
-#endif
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
 
