@@ -111,6 +111,46 @@
 
 @end
 
+@implementation VLCMediaLibraryArtist
+
+- (instancetype)initWithArtist:(struct vlc_ml_artist_t *)p_artist;
+{
+    self = [super init];
+    if (self && p_artist != NULL) {
+        _artistID = p_artist->i_id;
+        _name = toNSStr(p_artist->psz_name);
+        _shortBiography = toNSStr(p_artist->psz_shortbio);
+        _artworkMRL = toNSStr(p_artist->psz_artwork_mrl);
+        _musicBrainzID = toNSStr(p_artist->psz_mb_id);
+        _numberOfAlbums = p_artist->i_nb_album;
+        _numberOfTracks = p_artist->i_nb_tracks;
+    }
+    return self;
+}
+
+@end
+
+@implementation VLCMediaLibraryAlbum
+
+- (instancetype)initWithAlbum:(struct vlc_ml_album_t *)p_album
+{
+    self = [super init];
+    if (self && p_album != NULL) {
+        _albumID = p_album->i_id;
+        _title = toNSStr(p_album->psz_title);
+        _summary = toNSStr(p_album->psz_summary);
+        _artworkMRL = toNSStr(p_album->psz_artwork_mrl);
+        _artistName = toNSStr(p_album->psz_artist);
+        _artistID = p_album->i_artist_id;
+        _numberOfTracks = p_album->i_nb_tracks;
+        _duration = p_album->i_duration;
+        _year = p_album->i_year;
+    }
+    return self;
+}
+
+@end
+
 @implementation VLCMediaLibraryAlbumTrack
 
 - (instancetype)initWithAlbumTrack:(struct vlc_ml_album_track_t *)p_albumTrack
@@ -123,6 +163,21 @@
 
         _trackNumber = p_albumTrack->i_track_nb;
         _discNumber = p_albumTrack->i_disc_nb;
+    }
+    return self;
+}
+
+@end
+
+@implementation VLCMediaLibraryGenre
+
+- (instancetype)initWithGenre:(struct vlc_ml_genre_t *)p_genre
+{
+    self = [super init];
+    if (self && p_genre != NULL) {
+        _genreID = p_genre->i_id;
+        _name = toNSStr(p_genre->psz_name);
+        _numberOfTracks = p_genre->i_nb_tracks;
     }
     return self;
 }

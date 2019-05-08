@@ -79,6 +79,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface VLCMediaLibraryArtist : NSObject
+
+- (instancetype)initWithArtist:(struct vlc_ml_artist_t *)p_artist;
+
+@property (readonly) int64_t artistID;
+@property (readonly) NSString *name;
+@property (readonly) NSString *shortBiography;
+@property (readonly) NSString *artworkMRL;
+@property (readonly) NSString *musicBrainzID;
+@property (readonly) unsigned int numberOfAlbums;
+@property (readonly) unsigned int numberOfTracks;
+
+@end
+
+@interface VLCMediaLibraryAlbum : NSObject
+
+- (instancetype)initWithAlbum:(struct vlc_ml_album_t *)p_album;
+
+@property (readonly) int64_t albumID;
+@property (readonly) NSString *title;
+@property (readonly) NSString *summary;
+@property (readonly) NSString *artworkMRL;
+@property (readonly) NSString *artistName;
+@property (readonly) int64_t artistID;
+@property (readonly) size_t numberOfTracks;
+@property (readonly) unsigned int duration;
+@property (readonly) unsigned int year;
+
+@end
+
 @interface VLCMediaLibraryAlbumTrack : NSObject
 
 - (instancetype)initWithAlbumTrack:(struct vlc_ml_album_track_t *)p_albumTrack;
@@ -89,6 +119,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) int trackNumber;
 @property (readonly) int discNumber;
+
+@end
+
+@interface VLCMediaLibraryGenre : NSObject
+
+- (instancetype)initWithGenre:(struct vlc_ml_genre_t *)p_genre;
+
+@property (readonly) int64_t genreID;
+@property (readonly) NSString *name;
+@property (readonly) size_t numberOfTracks;
 
 @end
 
