@@ -100,10 +100,6 @@ protected:
     virtual void fillGrid( QGridLayout*, int ) {}
 signals:
     void changed();
-#if 0
-/* You shouldn't use that now..*/
-    void Updated();
-#endif
 };
 
 /*******************************************************
@@ -457,28 +453,6 @@ private slots:
 };
 
 void setfillVLCConfigCombo(const char *configname, QComboBox *combo );
-
-#if 0
-struct ModuleCheckBox {
-    QCheckBox *checkbox;
-    QString module;
-};
-
-class ModuleListConfigControl : public ConfigControl
-{
-    Q_OBJECT
-public:
-    StringConfigControl( vlc_object_t *, module_config_t *, QWidget *, bool
-                         bycat );
-    virtual ~StringConfigControl();
-    QString getValue() Q_DECL_OVERRIDE;
-private:
-    QVector<ModuleCheckBox> checkboxes;
-    QLineEdit *text;
-private slot:
-    void OnUpdate();
-};
-#endif
 
 /**********************************************************************
  * Key selector widget

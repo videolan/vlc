@@ -44,10 +44,6 @@ class PrefsDialog : public QVLCDialog
 public:
     PrefsDialog( QWidget *, qt_intf_t * );
     virtual ~PrefsDialog();
-#if 0
-    /*Called from extended settings, is not used anymore, but could be useful one day*/
-    void showModulePrefs( char* );
-#endif
 
 private:
     enum { SIMPLE, ADVANCED };
