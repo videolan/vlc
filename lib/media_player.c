@@ -646,6 +646,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create( mp, "vout-cb-swap", VLC_VAR_ADDRESS );
     var_Create( mp, "vout-cb-get-proc-address", VLC_VAR_ADDRESS );
     var_Create( mp, "vout-cb-make-current", VLC_VAR_ADDRESS );
+    var_Create( mp, "vout-cb-select-plane", VLC_VAR_ADDRESS );
 
     var_Create (mp, "avcodec-hw", VLC_VAR_STRING);
     var_Create (mp, "drawable-xid", VLC_VAR_INTEGER);
@@ -1209,6 +1210,7 @@ int libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_direct3d_update_output_cb update_output_cb,
                                         libvlc_video_swap_cb swap_cb,
                                         libvlc_video_direct3d_start_end_rendering_cb makeCurrent_cb,
+                                        libvlc_video_direct3d_select_plane_cb select_plane_cb,
                                         void* opaque )
 {
     var_SetString( mp, "window", "wdummy");
@@ -1232,6 +1234,7 @@ int libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
     var_SetAddress( mp, "vout-cb-update-output", update_output_cb );
     var_SetAddress( mp, "vout-cb-swap", swap_cb );
     var_SetAddress( mp, "vout-cb-make-current", makeCurrent_cb );
+    var_SetAddress( mp, "vout-cb-select-plane", select_plane_cb );
     return 1;
 }
 

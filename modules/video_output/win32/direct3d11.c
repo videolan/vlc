@@ -169,6 +169,7 @@ struct vout_display_sys_t
     libvlc_video_direct3d_update_output_cb   updateOutputCb;
     libvlc_video_swap_cb                     swapCb;
     libvlc_video_direct3d_start_end_rendering_cb startEndRenderingCb;
+    libvlc_video_direct3d_select_plane_cb    selectPlaneCb;
 };
 
 static picture_pool_t *Pool(vout_display_t *, unsigned);
@@ -636,6 +637,16 @@ static bool LocalSwapchainStartEndRendering( void *opaque, bool enter, const lib
     return true;
 }
 
+static bool LocalSwapchainSelectPlane( void *opaque, size_t plane )
+{
+    struct d3d11_local_swapchain *display = opaque;
+    if (!display->swapchainTargetView[plane])
+        return false;
+    ID3D11DeviceContext_OMSetRenderTargets(display->d3d_dev.d3dcontext, 1,
+                                            &display->swapchainTargetView[plane], NULL);
+    return true;
+}
+
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
 {
@@ -668,6 +679,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
     sys->swapCb              = var_InheritAddress( vd, "vout-cb-swap" );
     sys->startEndRenderingCb = var_InheritAddress( vd, "vout-cb-make-current" );
+    sys->selectPlaneCb       = var_InheritAddress( vd, "vout-cb-select-plane" );
 
     if ( sys->setupDeviceCb == NULL || sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
@@ -680,6 +692,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;
         sys->swapCb              = LocalSwapchainSwap;
         sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
+        sys->selectPlaneCb       = LocalSwapchainSelectPlane;
 
 #if VLC_WINSTORE_APP
         /* LEGACY, the d3dcontext and swapchain were given by the host app */
@@ -957,6 +970,12 @@ static int Control(vout_display_t *vd, int query, va_list args)
     return res;
 }
 
+static bool SelectRenderPlane(void *opaque, size_t plane)
+{
+    vout_display_sys_t *sys = opaque;
+    return sys->selectPlaneCb(sys->outside_opaque, plane);
+}
+
 static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1069,8 +1088,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     }
     D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad,
                      vd->source.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
-                     renderSrc,
-                     sys->internal_swapchain.swapchainTargetView); /* NULL with external rendering */
+                     renderSrc, SelectRenderPlane, sys);
 
     if (subpicture) {
         // draw the additional vertices
@@ -1079,8 +1097,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             {
                 d3d_quad_t *quad = (d3d_quad_t *) sys->d3dregions[i]->p_sys;
                 D3D11_RenderQuad(&sys->d3d_dev, quad, &sys->flatVShader,
-                                 quad->picSys.renderSrc,
-                                 sys->internal_swapchain.swapchainTargetView); /* NULL with external rendering */
+                                 quad->picSys.renderSrc, SelectRenderPlane, sys);
             }
         }
     }

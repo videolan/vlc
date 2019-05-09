@@ -172,6 +172,15 @@ static bool StartRendering_cb( void *opaque, bool enter, const libvlc_video_dire
     return true;
 }
 
+static bool SelectPlane_cb( void *opaque, size_t plane )
+{
+    struct render_context *ctx = static_cast<struct render_context *>( opaque );
+    if ( plane != 0 ) // we only support one packed RGBA plane (DXGI_FORMAT_R8G8B8A8_UNORM)
+        return false;
+    ctx->d3dctx->OMSetRenderTargets( 1, &ctx->textureRenderTarget, NULL );
+    return true;
+}
+
 static bool Setup_cb( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
 {
     struct render_context *ctx = static_cast<struct render_context *>(*opaque);
@@ -442,7 +451,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     /* Tell VLC to render into our D3D11 environment */
     libvlc_video_direct3d_set_callbacks( p_mp, libvlc_video_direct3d_engine_d3d11,
-                                        Setup_cb, Cleanup_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb,
+                                        Setup_cb, Cleanup_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb, SelectPlane_cb,
                                         &Context );
 
     libvlc_media_player_play( p_mp );
