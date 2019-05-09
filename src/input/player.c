@@ -251,7 +251,8 @@ vlc_player_get_input_locked(vlc_player_t *player)
 static vout_thread_t **
 vlc_player_vout_OSDHoldAll(vlc_player_t *player, size_t *count)
 {
-    vout_thread_t **vouts = vlc_player_vout_HoldAll(player, count);
+    vout_thread_t **vouts;
+    input_resource_HoldVouts(player->resource, &vouts, count);
 
     for (size_t i = 0; i < *count; ++i)
     {
@@ -3126,7 +3127,8 @@ vlc_player_aout_EnableFilter(vlc_player_t *player, const char *name, bool add)
 vout_thread_t *
 vlc_player_vout_Hold(vlc_player_t *player)
 {
-    return input_resource_HoldVout(player->resource);
+    vout_thread_t *vout = input_resource_HoldVout(player->resource);
+    return vout ? vout : input_resource_HoldDummyVout(player->resource);
 }
 
 vout_thread_t **
@@ -3134,6 +3136,16 @@ vlc_player_vout_HoldAll(vlc_player_t *player, size_t *count)
 {
     vout_thread_t **vouts;
     input_resource_HoldVouts(player->resource, &vouts, count);
+
+    if (*count == 0)
+    {
+        vouts = vlc_alloc(1, sizeof(*vouts));
+        if (vouts)
+        {
+            *count = 1;
+            vouts[0] = input_resource_HoldDummyVout(player->resource);
+        }
+    }
     return vouts;
 }
 
@@ -3302,30 +3314,20 @@ static void
 vlc_player_vout_SetVar(vlc_player_t *player, const char *name, int type,
                        vlc_value_t val)
 {
-    var_SetChecked(player, name, type, val);
-
-    size_t count;
-    vout_thread_t **vouts = vlc_player_vout_HoldAll(player, &count);
-    for (size_t i = 0; i < count; i++)
-    {
-        var_SetChecked(vouts[i], name, type, val);
-        vout_Release(vouts[i]);
-    }
-    free(vouts);
+    vout_thread_t *vout = vlc_player_vout_Hold(player);
+    var_SetChecked(vout, name, type, val);
+    vout_Release(vout);
 }
 
 
 static void
 vlc_player_vout_TriggerOption(vlc_player_t *player, const char *option)
 {
-    size_t count;
-    vout_thread_t **vouts = vlc_player_vout_HoldAll(player, &count);
-    for (size_t i = 0; i < count; ++i)
-    {
-        var_TriggerCallback(vouts[i], option);
-        vout_Release(vouts[i]);
-    }
-    free(vouts);
+    /* Don't use vlc_player_vout_Hold() since there is nothing to trigger if it
+     * returns a dummy vout */
+    vout_thread_t *vout = input_resource_HoldVout(player->resource);
+    var_TriggerCallback(vout, option);
+    vout_Release(vout);
 }
 
 vlc_object_t *

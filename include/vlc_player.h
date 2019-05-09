@@ -2632,6 +2632,10 @@ vlc_player_aout_EnableFilter(vlc_player_t *player, const char *name, bool add);
  * @warning the returned vout_thread_t * must be released with vout_Release().
  * @see vlc_players_cbs.on_vout_list_changed
  *
+ * @note The player is guaranteed to always hold one valid vout. Only vout
+ * variables can be changed from this instance. The vout returned before
+ * playback is not necessarily the same one that will be used for playback.
+ *
  * @param player player instance
  * @return a valid vout_thread_t * or NULL, cf. warning
  */
