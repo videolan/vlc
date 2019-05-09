@@ -510,8 +510,7 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const struct
 
 static bool LocalSwapchainSetupDevice( void *opaque, const struct device_cfg_t *cfg, struct device_setup_t *out )
 {
-    vout_display_t *vd = opaque;
-    struct d3d11_local_swapchain *display = &vd->sys->internal_swapchain;
+    struct d3d11_local_swapchain *display = opaque;
     HRESULT hr;
 #if VLC_WINSTORE_APP
     ID3D11DeviceContext *legacy_ctx = var_InheritInteger( display->obj, "winrt-d3dcontext" ); /* LEGACY */
@@ -535,15 +534,13 @@ static bool LocalSwapchainSetupDevice( void *opaque, const struct device_cfg_t *
 
 static void LocalSwapchainCleanupDevice( void *opaque )
 {
-    vout_display_t *vd = opaque;
-    struct d3d11_local_swapchain *display = &vd->sys->internal_swapchain;
+    struct d3d11_local_swapchain *display = opaque;
     D3D11_ReleaseDevice( &display->d3d_dev );
 }
 
 static void LocalSwapchainSwap( void *opaque )
 {
-    vout_display_t *vd = opaque;
-    struct d3d11_local_swapchain *display = &vd->sys->internal_swapchain;
+    struct d3d11_local_swapchain *display = opaque;
 
     DXGI_PRESENT_PARAMETERS presentParams = { 0 };
 
@@ -557,8 +554,7 @@ static void LocalSwapchainSwap( void *opaque )
 
 static bool LocalSwapchainUpdateOutput( void *opaque, const struct direct3d_cfg_t *cfg, struct output_cfg_t *out )
 {
-    vout_display_t *vd = opaque;
-    struct d3d11_local_swapchain *display = &vd->sys->internal_swapchain;
+    struct d3d11_local_swapchain *display = opaque;
     if ( !UpdateSwapchain( display, cfg ) )
         return false;
     out->surface_format = display->pixelFormat->formatTexture;
@@ -571,12 +567,10 @@ static bool LocalSwapchainUpdateOutput( void *opaque, const struct direct3d_cfg_
 
 static bool LocalSwapchainStartEndRendering( void *opaque, bool enter )
 {
-    vout_display_t *vd = opaque;
+    struct d3d11_local_swapchain *display = opaque;
 
     if ( enter )
     {
-        struct d3d11_local_swapchain *display = &vd->sys->internal_swapchain;
-
         D3D11_ClearRenderTargets( &display->d3d_dev, display->pixelFormat, display->swapchainTargetView );
     }
     return true;
@@ -611,7 +605,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     {
         sys->internal_swapchain.obj = VLC_OBJECT(vd);
         sys->internal_swapchain.hd3d =  &sys->hd3d;
-        sys->outside_opaque = vd;
+        sys->outside_opaque = &sys->internal_swapchain;
         sys->setupDeviceCb       = LocalSwapchainSetupDevice;
         sys->cleanupDeviceCb     = LocalSwapchainCleanupDevice;
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;
