@@ -82,6 +82,7 @@ Utils.NavigableFocusScope {
 
                 Component.onCompleted: {
                     multicover.grabToImage(function(result) {
+                        gridItem.sourceSize = undefined
                         gridItem.image = result.url
                         //multicover.destroy()
                     })
