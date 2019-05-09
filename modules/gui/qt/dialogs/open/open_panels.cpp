@@ -803,14 +803,12 @@ void CaptureOpenPanel::initialize()
     /* dshow Main */
     int line = 0;
     module_config_t *p_config = config_FindConfig( "dshow-vdev" );
-    vdevDshowW = new StringListConfigControl(
-        VLC_OBJECT(p_intf), p_config, this );
+    vdevDshowW = new StringListConfigControl( p_config, this );
     vdevDshowW->insertIntoExistingGrid( dshowDevLayout, line );
     line++;
 
     p_config = config_FindConfig( "dshow-adev" );
-    adevDshowW = new StringListConfigControl(
-        VLC_OBJECT(p_intf), p_config, this );
+    adevDshowW = new StringListConfigControl( p_config, this );
     adevDshowW->insertIntoExistingGrid( dshowDevLayout, line );
     line++;
 
@@ -1375,7 +1373,7 @@ void CaptureOpenPanel::advancedDialog()
 
         msg_Dbg( p_intf, "item %s", p_item->psz_name);
         ConfigControl *config = ConfigControl::createControl(
-                        VLC_OBJECT( p_intf ), p_item, advFrame, gLayout, n );
+                                    p_item, advFrame, gLayout, n );
         if( config )
             controls.append( config );
     }

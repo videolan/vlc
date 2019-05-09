@@ -76,8 +76,7 @@ QString formatTooltip(const QString & tooltip)
     return formatted;
 }
 
-ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
-                                             module_config_t *p_item,
+ConfigControl *ConfigControl::createControl( module_config_t *p_item,
                                              QWidget *parent,
                                              QGridLayout *l, int line )
 {
@@ -86,53 +85,53 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
     switch( p_item->i_type )
     {
     case CONFIG_ITEM_MODULE:
-        p_control = new StringListConfigControl( p_this, p_item, parent );
+        p_control = new StringListConfigControl( p_item, parent );
         break;
     case CONFIG_ITEM_MODULE_CAT:
-        p_control = new ModuleConfigControl( p_this, p_item, parent );
+        p_control = new ModuleConfigControl( p_item, parent );
         break;
     case CONFIG_ITEM_MODULE_LIST:
-        p_control = new ModuleListConfigControl( p_this, p_item, parent, false );
+        p_control = new ModuleListConfigControl( p_item, parent, false );
         break;
     case CONFIG_ITEM_MODULE_LIST_CAT:
-        p_control = new ModuleListConfigControl( p_this, p_item, parent, true );
+        p_control = new ModuleListConfigControl( p_item, parent, true );
         break;
     case CONFIG_ITEM_STRING:
         if( p_item->list_count )
-            p_control = new StringListConfigControl( p_this, p_item, parent );
+            p_control = new StringListConfigControl( p_item, parent );
         else
-            p_control = new StringConfigControl( p_this, p_item, parent, false );
+            p_control = new StringConfigControl( p_item, parent, false );
         break;
     case CONFIG_ITEM_PASSWORD:
-        p_control = new StringConfigControl( p_this, p_item, parent, true );
+        p_control = new StringConfigControl( p_item, parent, true );
         break;
     case CONFIG_ITEM_RGB:
-        p_control = new ColorConfigControl( p_this, p_item, parent );
+        p_control = new ColorConfigControl( p_item, parent );
         break;
     case CONFIG_ITEM_INTEGER:
         if( p_item->list_count )
-            p_control = new IntegerListConfigControl( p_this, p_item, parent, false );
+            p_control = new IntegerListConfigControl( p_item, parent, false );
         else
-            p_control = new IntegerRangeConfigControl( p_this, p_item, parent );
+            p_control = new IntegerRangeConfigControl( p_item, parent );
         break;
     case CONFIG_ITEM_LOADFILE:
     case CONFIG_ITEM_SAVEFILE:
-        p_control = new FileConfigControl( p_this, p_item, parent );
+        p_control = new FileConfigControl( p_item, parent );
         break;
     case CONFIG_ITEM_DIRECTORY:
-        p_control = new DirectoryConfigControl( p_this, p_item, parent );
+        p_control = new DirectoryConfigControl( p_item, parent );
         break;
     case CONFIG_ITEM_FONT:
-        p_control = new FontConfigControl( p_this, p_item, parent );
+        p_control = new FontConfigControl( p_item, parent );
         break;
     case CONFIG_ITEM_KEY:
-        p_control = new KeySelectorControl( p_this, parent );
+        p_control = new KeySelectorControl( parent );
         break;
     case CONFIG_ITEM_BOOL:
-        p_control = new BoolConfigControl( p_this, p_item, parent );
+        p_control = new BoolConfigControl( p_item, parent );
         break;
     case CONFIG_ITEM_FLOAT:
-        p_control = new FloatRangeConfigControl( p_this, p_item, parent );
+        p_control = new FloatRangeConfigControl( p_item, parent );
         break;
     default:
         break;
@@ -206,11 +205,10 @@ VStringConfigControl::doApply()
 }
 
 /*********** String **************/
-StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
-                                          module_config_t *_p_item,
+StringConfigControl::StringConfigControl( module_config_t *_p_item,
                                           QWidget *_parent,
                                           bool pwd ) :
-                           VStringConfigControl( _p_this, _p_item )
+    VStringConfigControl( _p_item )
 {
     label = new QLabel( p_item->psz_text ? qfut(p_item->psz_text) : "", _parent );
     text = new QLineEdit( p_item->value.psz ? qfu(p_item->value.psz) : "", _parent );
@@ -225,10 +223,10 @@ void StringConfigControl::fillGrid( QGridLayout *l, int line )
     l->addWidget( text, line, LAST_COLUMN, Qt::AlignRight );
 }
 
-StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
-                                   module_config_t *_p_item,
-                                   QLabel *_label, QLineEdit *_text, bool pwd ):
-                           VStringConfigControl( _p_this, _p_item )
+StringConfigControl::StringConfigControl( module_config_t *_p_item,
+                                          QLabel *_label, QLineEdit *_text,
+                                          bool pwd ) :
+    VStringConfigControl( _p_item )
 {
     text = _text;
     if( pwd ) text->setEchoMode( QLineEdit::Password );
@@ -251,9 +249,8 @@ void StringConfigControl::finish()
 }
 
 /*********** File **************/
-FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
-                                      module_config_t *_p_item, QWidget *p ) :
-                           VStringConfigControl( _p_this, _p_item )
+FileConfigControl::FileConfigControl( module_config_t *_p_item, QWidget *p ) :
+    VStringConfigControl( _p_item )
 {
     label = new QLabel( qfut(p_item->psz_text), p );
     text = new QLineEdit( qfu(p_item->value.psz), p );
@@ -275,11 +272,10 @@ void FileConfigControl::fillGrid( QGridLayout *l, int line )
     l->addLayout( textAndButton, line, LAST_COLUMN );
 }
 
-FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
-                                   module_config_t *_p_item,
-                                   QLabel *_label, QLineEdit *_text,
-                                   QPushButton *_button ):
-                           VStringConfigControl( _p_this, _p_item )
+FileConfigControl::FileConfigControl( module_config_t *_p_item,
+                                      QLabel *_label, QLineEdit *_text,
+                                      QPushButton *_button ) :
+    VStringConfigControl( _p_item )
 {
     browse = _button;
     text = _text;
@@ -320,15 +316,16 @@ void FileConfigControl::finish()
 }
 
 /********* String / Directory **********/
-DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
-                        module_config_t *_p_item, QWidget *p ) :
-     FileConfigControl( _p_this, _p_item, p )
+DirectoryConfigControl::DirectoryConfigControl( module_config_t *_p_item,
+                                                QWidget *p ) :
+    FileConfigControl( _p_item, p )
 {}
 
-DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
-                        module_config_t *_p_item, QLabel *_p_label,
-                        QLineEdit *_p_line, QPushButton *_p_button ):
-     FileConfigControl( _p_this, _p_item, _p_label, _p_line, _p_button)
+DirectoryConfigControl::DirectoryConfigControl( module_config_t *_p_item,
+                                                QLabel *_p_label,
+                                                QLineEdit *_p_line,
+                                                QPushButton *_p_button ) :
+    FileConfigControl( _p_item, _p_label, _p_line, _p_button)
 {}
 
 void DirectoryConfigControl::updateField()
@@ -344,9 +341,8 @@ void DirectoryConfigControl::updateField()
 }
 
 /********* String / Font **********/
-FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
-                        module_config_t *_p_item, QWidget *p ) :
-     VStringConfigControl( _p_this, _p_item )
+FontConfigControl::FontConfigControl( module_config_t *_p_item, QWidget *p ) :
+    VStringConfigControl( _p_item )
 {
     label = new QLabel( qfut(p_item->psz_text), p );
     font = new QFontComboBox( p );
@@ -364,10 +360,10 @@ void FontConfigControl::fillGrid( QGridLayout *l, int line )
     l->addWidget( font, line, 1, 1, -1 );
 }
 
-FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
-                        module_config_t *_p_item, QLabel *_p_label,
-                        QFontComboBox *_p_font):
-     VStringConfigControl( _p_this, _p_item)
+FontConfigControl::FontConfigControl( module_config_t *_p_item,
+                                      QLabel *_p_label,
+                                      QFontComboBox *_p_font) :
+    VStringConfigControl( _p_item)
 {
     label = _p_label;
     font = _p_font;
@@ -380,9 +376,9 @@ FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
 }
 
 /********* String / choice list **********/
-StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
-               module_config_t *_p_item, QWidget *p ) :
-               VStringConfigControl( _p_this, _p_item )
+StringListConfigControl::StringListConfigControl( module_config_t *_p_item,
+                                                  QWidget *p ) :
+    VStringConfigControl( _p_item )
 {
     label = new QLabel( qfut(p_item->psz_text), p );
     combo = new QComboBox( p );
@@ -407,9 +403,10 @@ void StringListConfigControl::comboIndexChanged( int i_index )
     emit changed();
 }
 
-StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
-                module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
-                bool ) : VStringConfigControl( _p_this, _p_item )
+StringListConfigControl::StringListConfigControl( module_config_t *_p_item,
+                                                  QLabel *_label,
+                                                  QComboBox *_combo, bool ) :
+    VStringConfigControl( _p_item )
 {
     combo = _combo;
     label = _label;
@@ -501,9 +498,9 @@ void setfillVLCConfigCombo( const char *configname, QComboBox *combo )
 }
 
 /********* Module **********/
-ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
-               module_config_t *_p_item, QWidget *p ) :
-               VStringConfigControl( _p_this, _p_item )
+ModuleConfigControl::ModuleConfigControl( module_config_t *_p_item,
+                                          QWidget *p ) :
+    VStringConfigControl( _p_item )
 {
     label = new QLabel( qfut(p_item->psz_text), p );
     combo = new QComboBox( p );
@@ -517,9 +514,9 @@ void ModuleConfigControl::fillGrid( QGridLayout *l, int line )
     l->addWidget( combo, line, LAST_COLUMN );
 }
 
-ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
-                module_config_t *_p_item, QLabel *_label, QComboBox *_combo )
-                : VStringConfigControl( _p_this, _p_item )
+ModuleConfigControl::ModuleConfigControl( module_config_t *_p_item,
+                                          QLabel *_label, QComboBox *_combo ) :
+    VStringConfigControl( _p_item )
 {
     combo = _combo;
     label = _label;
@@ -580,9 +577,9 @@ QString ModuleConfigControl::getValue() const
 }
 
 /********* Module list **********/
-ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
-        module_config_t *_p_item, QWidget *p, bool bycat ) :
-    VStringConfigControl( _p_this, _p_item )
+ModuleListConfigControl::ModuleListConfigControl( module_config_t *_p_item,
+                                                  QWidget *p, bool bycat ) :
+    VStringConfigControl( _p_item )
 {
     groupBox = NULL;
 
@@ -744,9 +741,9 @@ VIntConfigControl::doApply()
 }
 
 /*********** Integer **************/
-IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
-                                            module_config_t *_p_item, QWidget *p ) :
-                           VIntConfigControl( _p_this, _p_item )
+IntegerConfigControl::IntegerConfigControl( module_config_t *_p_item,
+                                            QWidget *p ) :
+    VIntConfigControl( _p_item )
 {
     label = new QLabel( qfut(p_item->psz_text), p );
     spin = new QSpinBox( p );
@@ -756,10 +753,9 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
     finish();
 }
 
-IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
-                                            module_config_t *_p_item,
+IntegerConfigControl::IntegerConfigControl( module_config_t *_p_item,
                                             QLabel *_label, QSpinBox *_spin ) :
-                                      VIntConfigControl( _p_this, _p_item )
+    VIntConfigControl( _p_item )
 {
     spin = _spin;
     label = _label;
@@ -795,17 +791,17 @@ int IntegerConfigControl::getValue() const
 }
 
 /********* Integer range **********/
-IntegerRangeConfigControl::IntegerRangeConfigControl( vlc_object_t *_p_this,
-                                            module_config_t *_p_item, QWidget *p ) :
-            IntegerConfigControl( _p_this, _p_item, p )
+IntegerRangeConfigControl::IntegerRangeConfigControl( module_config_t *_p_item,
+                                                      QWidget *p ) :
+    IntegerConfigControl( _p_item, p )
 {
     finish();
 }
 
-IntegerRangeConfigControl::IntegerRangeConfigControl( vlc_object_t *_p_this,
-                                            module_config_t *_p_item,
-                                            QLabel *_label, QSpinBox *_spin ) :
-            IntegerConfigControl( _p_this, _p_item, _label, _spin )
+IntegerRangeConfigControl::IntegerRangeConfigControl( module_config_t *_p_item,
+                                                      QLabel *_label,
+                                                      QSpinBox *_spin ) :
+    IntegerConfigControl( _p_item, _label, _spin )
 {
     finish();
 }
@@ -817,10 +813,9 @@ void IntegerRangeConfigControl::finish()
 }
 
 IntegerRangeSliderConfigControl::IntegerRangeSliderConfigControl(
-                                            vlc_object_t *_p_this,
                                             module_config_t *_p_item,
-                                            QLabel *_label, QSlider *_slider ):
-                    VIntConfigControl( _p_this, _p_item )
+                                            QLabel *_label, QSlider *_slider ) :
+    VIntConfigControl( _p_item )
 {
     slider = _slider;
     label = _label;
@@ -845,9 +840,9 @@ int IntegerRangeSliderConfigControl::getValue() const
 
 
 /********* Integer / choice list **********/
-IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
-               module_config_t *_p_item, QWidget *p, bool ) :
-               VIntConfigControl( _p_this, _p_item )
+IntegerListConfigControl::IntegerListConfigControl( module_config_t *_p_item,
+                                                    QWidget *p, bool ) :
+    VIntConfigControl( _p_item )
 {
     label = new QLabel( qfut(p_item->psz_text), p );
     combo = new QComboBox( p );
@@ -865,9 +860,10 @@ void IntegerListConfigControl::fillGrid( QGridLayout *l, int line )
     l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
 }
 
-IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
-                module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
-                bool ) : VIntConfigControl( _p_this, _p_item )
+IntegerListConfigControl::IntegerListConfigControl( module_config_t *_p_item,
+                                                    QLabel *_label,
+                                                    QComboBox *_combo, bool ) :
+    VIntConfigControl( _p_item )
 {
     combo = _combo;
     label = _label;
@@ -914,9 +910,8 @@ int IntegerListConfigControl::getValue() const
 }
 
 /*********** Boolean **************/
-BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
-                                      module_config_t *_p_item, QWidget *p ) :
-                    VIntConfigControl( _p_this, _p_item )
+BoolConfigControl::BoolConfigControl( module_config_t *_p_item, QWidget *p ) :
+    VIntConfigControl( _p_item )
 {
     checkbox = new QCheckBox( qfut(p_item->psz_text), p );
     finish();
@@ -927,11 +922,10 @@ void BoolConfigControl::fillGrid( QGridLayout *l, int line )
     l->addWidget( checkbox, line, 0, 1, -1 );
 }
 
-BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
-                                      module_config_t *_p_item,
+BoolConfigControl::BoolConfigControl( module_config_t *_p_item,
                                       QLabel *_label,
                                       QAbstractButton *_checkbox ) :
-                   VIntConfigControl( _p_this, _p_item )
+    VIntConfigControl( _p_item )
 {
     checkbox = _checkbox;
     VLC_UNUSED( _label );
@@ -951,9 +945,9 @@ int BoolConfigControl::getValue() const
 }
 
 /************* Color *************/
-ColorConfigControl::ColorConfigControl( vlc_object_t *_p_this,
-                                        module_config_t *_p_item, QWidget *p ) :
-                           VIntConfigControl( _p_this, _p_item )
+ColorConfigControl::ColorConfigControl( module_config_t *_p_item,
+                                        QWidget *p ) :
+    VIntConfigControl( _p_item )
 {
     label = new QLabel( p );
     color_but = new QToolButton( p );
@@ -966,10 +960,10 @@ void ColorConfigControl::fillGrid( QGridLayout *l, int line )
     l->addWidget( color_but, line, LAST_COLUMN, Qt::AlignRight );
 }
 
-ColorConfigControl::ColorConfigControl( vlc_object_t *_p_this,
-                                            module_config_t *_p_item,
-                                            QLabel *_label, QAbstractButton *_color ):
-                                      VIntConfigControl( _p_this, _p_item )
+ColorConfigControl::ColorConfigControl( module_config_t *_p_item,
+                                        QLabel *_label,
+                                        QAbstractButton *_color ) :
+    VIntConfigControl( _p_item )
 {
     label = _label;
     color_but = _color;
@@ -1024,9 +1018,9 @@ VFloatConfigControl::doApply()
 }
 
 /*********** Float **************/
-FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
-                                        module_config_t *_p_item, QWidget *p ) :
-                    VFloatConfigControl( _p_this, _p_item )
+FloatConfigControl::FloatConfigControl( module_config_t *_p_item,
+                                        QWidget *p ) :
+    VFloatConfigControl( _p_item )
 {
     label = new QLabel( qfut(p_item->psz_text), p );
     spin = new QDoubleSpinBox( p );
@@ -1042,11 +1036,10 @@ void FloatConfigControl::fillGrid( QGridLayout *l, int line )
     l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
 }
 
-FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
-                                        module_config_t *_p_item,
+FloatConfigControl::FloatConfigControl( module_config_t *_p_item,
                                         QLabel *_label,
                                         QDoubleSpinBox *_spin ) :
-                    VFloatConfigControl( _p_this, _p_item )
+    VFloatConfigControl( _p_item )
 {
     spin = _spin;
     label = _label;
@@ -1076,18 +1069,17 @@ float FloatConfigControl::getValue() const
 }
 
 /*********** Float with range **************/
-FloatRangeConfigControl::FloatRangeConfigControl( vlc_object_t *_p_this,
-                                        module_config_t *_p_item, QWidget *p ) :
-                FloatConfigControl( _p_this, _p_item, p )
+FloatRangeConfigControl::FloatRangeConfigControl( module_config_t *_p_item,
+                                                  QWidget *p ) :
+    FloatConfigControl( _p_item, p )
 {
     finish();
 }
 
-FloatRangeConfigControl::FloatRangeConfigControl( vlc_object_t *_p_this,
-                                        module_config_t *_p_item,
-                                        QLabel *_label,
-                                        QDoubleSpinBox *_spin ) :
-                FloatConfigControl( _p_this, _p_item, _label, _spin )
+FloatRangeConfigControl::FloatRangeConfigControl( module_config_t *_p_item,
+                                                  QLabel *_label,
+                                                  QDoubleSpinBox *_spin ) :
+    FloatConfigControl( _p_item, _label, _spin )
 {
     finish();
 }
@@ -1102,8 +1094,7 @@ void FloatRangeConfigControl::finish()
 /**********************************************************************
  * Key selector widget
  **********************************************************************/
-KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this, QWidget *p ) :
-                                ConfigControl( _p_this, nullptr )
+KeySelectorControl::KeySelectorControl( QWidget *p ) : ConfigControl( nullptr )
 {
     label = new QLabel(
         qtr( "Action hotkey mappings. Double-click (or select and press Enter) "
