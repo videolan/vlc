@@ -64,6 +64,8 @@ enum vout_crop_mode {
 /* */
 struct vout_thread_sys_t
 {
+    bool dummy;
+
     /* Splitter module if used */
     char            *splitter_name;
 
@@ -192,6 +194,8 @@ struct vout_thread_sys_t
  * Creates a video output.
  */
 vout_thread_t *vout_Create(vlc_object_t *obj) VLC_USED;
+
+vout_thread_t *vout_CreateDummy(vlc_object_t *obj) VLC_USED;
 
 /**
  * Returns a suitable vout or release the given one.
