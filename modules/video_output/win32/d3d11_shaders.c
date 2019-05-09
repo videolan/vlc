@@ -423,7 +423,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
 
     video_transfer_func_t src_transfer;
 
-    if (transfer != display->colorspace->transfer)
+    if (transfer != display->transfer)
     {
         /* we need to go in linear mode */
         switch (transfer)
@@ -466,7 +466,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                 break;
         }
 
-        switch (display->colorspace->transfer)
+        switch (display->transfer)
         {
             case TRANSFER_FUNC_SRGB:
                 if (src_transfer == TRANSFER_FUNC_LINEAR)
@@ -502,12 +502,12 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                     msg_Warn(o, "don't know how to transfer from %d to SMPTE ST 2084", src_transfer);
                 break;
             default:
-                msg_Warn(o, "don't know how to transfer from %d to %d", src_transfer, display->colorspace->transfer);
+                msg_Warn(o, "don't know how to transfer from %d to %d", src_transfer, display->transfer);
                 break;
         }
     }
 
-    if (display->colorspace->primaries != primaries)
+    if (display->primaries != primaries)
     {
         switch (primaries)
         {
@@ -526,7 +526,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     }
 
     int range_adjust = 0;
-    if (display->colorspace->b_full_range) {
+    if (display->b_full_range) {
         if (!src_full_range)
             range_adjust = 1; /* raise the source to full range */
     } else {

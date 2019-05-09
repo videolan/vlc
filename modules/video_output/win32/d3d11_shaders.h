@@ -30,23 +30,11 @@
 #define DEFAULT_SRGB_BRIGHTNESS    100
 #define MAX_PQ_BRIGHTNESS        10000
 
-typedef enum video_color_axis {
-    COLOR_AXIS_RGB,
-    COLOR_AXIS_YCBCR,
-} video_color_axis;
-
 typedef struct {
-    DXGI_COLOR_SPACE_TYPE   dxgi;
-    const char              *name;
-    video_color_axis        axis;
-    video_color_primaries_t primaries;
-    video_transfer_func_t   transfer;
-    video_color_space_t     color;
-    bool                    b_full_range;
-} dxgi_color_space;
-
-typedef struct {
-    const dxgi_color_space   *colorspace;
+    video_color_primaries_t  primaries;
+    video_transfer_func_t    transfer;
+    video_color_space_t      color;
+    bool                     b_full_range;
     unsigned                 luminance_peak;
     const d3d_format_t       *pixelFormat;
 } display_info_t;

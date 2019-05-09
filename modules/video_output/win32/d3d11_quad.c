@@ -1040,10 +1040,10 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
 
     memcpy(colorspace.Colorspace, ppColorspace, sizeof(colorspace.Colorspace));
 
-    if (fmt->primaries != displayFormat->colorspace->primaries)
+    if (fmt->primaries != displayFormat->primaries)
     {
         GetPrimariesTransform(colorspace.Primaries, fmt->primaries,
-                              displayFormat->colorspace->primaries);
+                              displayFormat->primaries);
     }
 
     ShaderUpdateConstants(o, d3d_dev, quad, PS_CONST_COLORSPACE, &colorspace);

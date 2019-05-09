@@ -88,10 +88,27 @@ vlc_module_begin ()
     set_callbacks(Open, Close)
 vlc_module_end ()
 
+typedef enum video_color_axis {
+    COLOR_AXIS_RGB,
+    COLOR_AXIS_YCBCR,
+} video_color_axis;
+
+typedef struct {
+    DXGI_COLOR_SPACE_TYPE   dxgi;
+    const char              *name;
+    video_color_axis        axis;
+    video_color_primaries_t primaries;
+    video_transfer_func_t   transfer;
+    video_color_space_t     color;
+    bool                    b_full_range;
+} dxgi_color_space;
+
 struct d3d11_local_swapchain
 {
     vlc_object_t           *obj;
     d3d11_device_t         d3d_dev;
+
+    const dxgi_color_space *colorspace;
 
     HWND                   swapchainHwnd;
     IDXGISwapChain1        *dxgiswapChain;   /* DXGI 1.2 swap chain */
@@ -171,6 +188,18 @@ static int Control(vout_display_t *, int, va_list);
 
 static void SelectSwapchainColorspace(vout_display_t *vd, const struct direct3d_cfg_t *cfg);
 
+static int UpdateDisplayFormat(vout_display_t *vd, struct output_cfg_t *out)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    sys->display.color = out->colorspace;
+    sys->display.transfer = out->transfer;
+    sys->display.primaries = out->primaries;
+    sys->display.b_full_range = out->full_range;
+
+    return VLC_SUCCESS;
+}
+
 static int QueryDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -221,7 +250,7 @@ static int QueryDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
         return VLC_EGENERIC;
     }
 
-    return VLC_SUCCESS;
+    return UpdateDisplayFormat(vd, &out);
 }
 
 static void UpdateSize(vout_display_t *vd)
@@ -499,13 +528,14 @@ static int SetupWindowLessOutput(vout_display_t *vd)
 static bool LocalSwapchainUpdateOutput( void *opaque, const struct direct3d_cfg_t *cfg, struct output_cfg_t *out )
 {
     vout_display_t *vd = opaque;
+    struct d3d11_local_swapchain *display = &vd->sys->internal_swapchain;
     if ( !UpdateSwapchain( vd, cfg ) )
         return false;
     out->surface_format = vd->sys->display.pixelFormat->formatTexture;
-    out->full_range     = vd->sys->display.colorspace->b_full_range;
-    out->colorspace     = vd->sys->display.colorspace->color;
-    out->primaries      = vd->sys->display.colorspace->primaries;
-    out->transfer       = vd->sys->display.colorspace->transfer;
+    out->full_range     = display->colorspace->b_full_range;
+    out->colorspace     = display->colorspace->color;
+    out->primaries      = display->colorspace->primaries;
+    out->transfer       = display->colorspace->transfer;
     return true;
 }
 
@@ -1113,7 +1143,7 @@ static void SelectSwapchainColorspace(vout_display_t *vd, const struct direct3d_
     int score, best_score = 0;
     UINT support;
     IDXGISwapChain3 *dxgiswapChain3 = NULL;
-    sys->display.colorspace = &color_spaces[0];
+    display->colorspace = &color_spaces[0];
 
     hr = IDXGISwapChain_QueryInterface( display->dxgiswapChain, &IID_IDXGISwapChain3, (void **)&dxgiswapChain3);
     if (FAILED(hr)) {
@@ -1193,14 +1223,14 @@ static void SelectSwapchainColorspace(vout_display_t *vd, const struct direct3d_
     hr = IDXGISwapChain3_SetColorSpace1(dxgiswapChain3, color_spaces[best].dxgi);
     if (SUCCEEDED(hr))
     {
-        sys->display.colorspace = &color_spaces[best];
-        msg_Dbg(display->obj, "using colorspace %s", sys->display.colorspace->name);
+        display->colorspace = &color_spaces[best];
+        msg_Dbg(display->obj, "using colorspace %s", display->colorspace->name);
     }
     else
-        msg_Err(display->obj, "Failed to set colorspace %s. (hr=0x%lX)", sys->display.colorspace->name, hr);
+        msg_Err(display->obj, "Failed to set colorspace %s. (hr=0x%lX)", display->colorspace->name, hr);
 done:
     /* guestimate the display peak luminance */
-    switch (sys->display.colorspace->transfer)
+    switch (display->colorspace->transfer)
     {
     case TRANSFER_FUNC_LINEAR:
     case TRANSFER_FUNC_SRGB:
