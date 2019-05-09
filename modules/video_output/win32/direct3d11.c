@@ -106,6 +106,7 @@ typedef struct {
 struct d3d11_local_swapchain
 {
     vlc_object_t           *obj;
+    d3d11_handle_t         *hd3d;
     d3d11_device_t         d3d_dev;
 
     const d3d_format_t     *pixelFormat;
@@ -522,8 +523,7 @@ static bool LocalSwapchainSetupDevice( void *opaque, const struct device_cfg_t *
                                          cfg->hardware_decoding,
                                          &display->d3d_dev );
 #else /* !VLC_WINSTORE_APP */
-    vout_display_sys_t *sys = vd->sys;
-    hr = D3D11_CreateDevice( display->obj, &sys->hd3d, NULL,
+    hr = D3D11_CreateDevice( display->obj, display->hd3d, NULL,
                              cfg->hardware_decoding,
                              &display->d3d_dev );
 #endif /* !VLC_WINSTORE_APP */
@@ -610,6 +610,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL)
     {
         sys->internal_swapchain.obj = VLC_OBJECT(vd);
+        sys->internal_swapchain.hd3d =  &sys->hd3d;
         sys->outside_opaque = vd;
         sys->setupDeviceCb       = LocalSwapchainSetupDevice;
         sys->cleanupDeviceCb     = LocalSwapchainCleanupDevice;
