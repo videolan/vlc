@@ -19,7 +19,6 @@ libvpx: libvpx-$(VPX_VERSION).tar.gz .sum-vpx
 	$(APPLY) $(SRC)/vpx/libvpx-ios.patch
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/vpx/libvpx-android.patch
-	$(APPLY) $(SRC)/vpx/libvpx-android-fix_cortex_a8-flag.patch
 	$(APPLY) $(SRC)/vpx/libvpx-android-toolchain_path.patch
 endif
 	$(APPLY) $(SRC)/vpx/0001-ads2gas-Add-a-noelf-option.patch
