@@ -535,13 +535,30 @@ static bool LocalSwapchainSetupDevice( void *opaque, const struct device_cfg_t *
 static void LocalSwapchainCleanupDevice( void *opaque )
 {
     struct d3d11_local_swapchain *display = opaque;
+    for (size_t i=0; i < ARRAY_SIZE(display->swapchainTargetView); i++)
+    {
+        if (display->swapchainTargetView[i]) {
+            ID3D11RenderTargetView_Release(display->swapchainTargetView[i]);
+            display->swapchainTargetView[i] = NULL;
+        }
+    }
+    if (display->dxgiswapChain4)
+    {
+        IDXGISwapChain4_Release(display->dxgiswapChain4);
+        display->dxgiswapChain4 = NULL;
+    }
+    if (display->dxgiswapChain)
+    {
+        IDXGISwapChain_Release(display->dxgiswapChain);
+        display->dxgiswapChain = NULL;
+    }
+
     D3D11_ReleaseDevice( &display->d3d_dev );
 }
 
 static void LocalSwapchainSwap( void *opaque )
 {
     struct d3d11_local_swapchain *display = opaque;
-
     DXGI_PRESENT_PARAMETERS presentParams = { 0 };
 
     HRESULT hr = IDXGISwapChain1_Present1( display->dxgiswapChain, 0, 0, &presentParams );
@@ -1469,18 +1486,6 @@ static void Direct3D11Close(vout_display_t *vd)
 
     Direct3D11DestroyResources(vd);
 
-    struct d3d11_local_swapchain *display = &vd->sys->internal_swapchain;
-    if (display->dxgiswapChain4)
-    {
-        IDXGISwapChain4_Release(display->dxgiswapChain4);
-        display->dxgiswapChain4 = NULL;
-    }
-    if (display->dxgiswapChain)
-    {
-        IDXGISwapChain_Release(display->dxgiswapChain);
-        display->dxgiswapChain = NULL;
-    }
-
     D3D11_ReleaseDevice( &sys->d3d_dev );
 
     if ( sys->cleanupDeviceCb )
@@ -1760,14 +1765,6 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     D3D11_ReleaseVertexShader(&sys->projectionVShader);
 
     D3D11_ReleasePixelShader(&sys->regionQuad);
-    struct d3d11_local_swapchain *display = &vd->sys->internal_swapchain;
-    for (size_t i=0; i < ARRAY_SIZE(display->swapchainTargetView); i++)
-    {
-        if (display->swapchainTargetView[i]) {
-            ID3D11RenderTargetView_Release(display->swapchainTargetView[i]);
-            display->swapchainTargetView[i] = NULL;
-        }
-    }
     if (sys->prepareWait)
     {
         ID3D11Query_Release(sys->prepareWait);
