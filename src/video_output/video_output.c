@@ -1878,7 +1878,13 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
     vlc_mutex_unlock(&sys->window_lock);
 
     if (vout_Start(vout, cfg))
+    {
+        vlc_mutex_lock(&sys->window_lock);
+        vout_window_Disable(sys->display_cfg.window);
+        sys->window_active = false;
+        vlc_mutex_unlock(&sys->window_lock);
         goto error;
+    }
     if (vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
         vout_Stop(vout);
 error:
