@@ -607,12 +607,30 @@ static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_direct3
     return true;
 }
 
-static bool LocalSwapchainStartEndRendering( void *opaque, bool enter )
+static bool LocalSwapchainStartEndRendering( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *p_hdr10 )
 {
     struct d3d11_local_swapchain *display = opaque;
 
     if ( enter )
     {
+        if ( display->dxgiswapChain4 && p_hdr10 != NULL )
+        {
+            DXGI_HDR_METADATA_HDR10 hdr10 = { 0 };
+            hdr10.GreenPrimary[0] = p_hdr10->GreenPrimary[0];
+            hdr10.GreenPrimary[1] = p_hdr10->GreenPrimary[1];
+            hdr10.BluePrimary[0] = p_hdr10->BluePrimary[2];
+            hdr10.BluePrimary[1] = p_hdr10->BluePrimary[3];
+            hdr10.RedPrimary[0] = p_hdr10->RedPrimary[4];
+            hdr10.RedPrimary[1] = p_hdr10->RedPrimary[5];
+            hdr10.WhitePoint[0] = p_hdr10->WhitePoint[0];
+            hdr10.WhitePoint[1] = p_hdr10->WhitePoint[1];
+            hdr10.MinMasteringLuminance = p_hdr10->MinMasteringLuminance;
+            hdr10.MaxMasteringLuminance = p_hdr10->MaxMasteringLuminance;
+            hdr10.MaxContentLightLevel = p_hdr10->MaxContentLightLevel;
+            hdr10.MaxFrameAverageLightLevel = p_hdr10->MaxFrameAverageLightLevel;
+            IDXGISwapChain4_SetHDRMetaData( display->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof( hdr10 ), &hdr10 );
+        }
+
         D3D11_ClearRenderTargets( &display->d3d_dev, display->pixelFormat, display->swapchainTargetView );
     }
     return true;
@@ -1039,25 +1057,6 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     if (picture->format.mastering.max_luminance)
     {
         D3D11_UpdateQuadLuminanceScale(vd, &sys->d3d_dev, &sys->picQuad, GetFormatLuminance(VLC_OBJECT(vd), &picture->format) / (float)sys->display.luminance_peak);
-
-        struct d3d11_local_swapchain *display = &vd->sys->internal_swapchain;
-        if (display->dxgiswapChain4)
-        {
-            DXGI_HDR_METADATA_HDR10 hdr10 = {0};
-            hdr10.GreenPrimary[0] = picture->format.mastering.primaries[0];
-            hdr10.GreenPrimary[1] = picture->format.mastering.primaries[1];
-            hdr10.BluePrimary[0]  = picture->format.mastering.primaries[2];
-            hdr10.BluePrimary[1]  = picture->format.mastering.primaries[3];
-            hdr10.RedPrimary[0]   = picture->format.mastering.primaries[4];
-            hdr10.RedPrimary[1]   = picture->format.mastering.primaries[5];
-            hdr10.WhitePoint[0] = picture->format.mastering.white_point[0];
-            hdr10.WhitePoint[1] = picture->format.mastering.white_point[1];
-            hdr10.MinMasteringLuminance = picture->format.mastering.min_luminance;
-            hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
-            hdr10.MaxContentLightLevel = picture->format.lighting.MaxCLL;
-            hdr10.MaxFrameAverageLightLevel = picture->format.lighting.MaxFALL;
-            IDXGISwapChain4_SetHDRMetaData(display->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
-        }
     }
 
     /* Render the quad */
@@ -1125,11 +1124,29 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     }
 #endif
 
-    if (sys->startEndRenderingCb(sys->outside_opaque, true))
+    libvlc_video_direct3d_hdr10_metadata_t hdr10;
+    if (picture->format.mastering.max_luminance)
+    {
+        hdr10.GreenPrimary[0] = picture->format.mastering.primaries[0];
+        hdr10.GreenPrimary[1] = picture->format.mastering.primaries[1];
+        hdr10.BluePrimary[0]  = picture->format.mastering.primaries[2];
+        hdr10.BluePrimary[1]  = picture->format.mastering.primaries[3];
+        hdr10.RedPrimary[0]   = picture->format.mastering.primaries[4];
+        hdr10.RedPrimary[1]   = picture->format.mastering.primaries[5];
+        hdr10.WhitePoint[0]   = picture->format.mastering.white_point[0];
+        hdr10.WhitePoint[1]   = picture->format.mastering.white_point[1];
+        hdr10.MinMasteringLuminance = picture->format.mastering.min_luminance;
+        hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
+        hdr10.MaxContentLightLevel = picture->format.lighting.MaxCLL;
+        hdr10.MaxFrameAverageLightLevel = picture->format.lighting.MaxFALL;
+    }
+
+    if ( sys->startEndRenderingCb( sys->outside_opaque, true,
+                                   picture->format.mastering.max_luminance ? &hdr10 : NULL))
     {
         PreparePicture(vd, picture, subpicture);
 
-        sys->startEndRenderingCb(sys->outside_opaque, false);
+        sys->startEndRenderingCb( sys->outside_opaque, false, NULL );
     }
 }
 

@@ -151,7 +151,7 @@ static void EndRender(struct render_context *ctx)
     ctx->d3dctx->DrawIndexed(ctx->quadIndexCount, 0, 0);
 }
 
-static bool StartRendering_cb( void *opaque, bool enter )
+static bool StartRendering_cb( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *hdr10 )
 {
     struct render_context *ctx = static_cast<struct render_context *>( opaque );
     if ( enter )

@@ -679,10 +679,24 @@ typedef bool( *libvlc_video_direct3d_update_output_cb )( void *opaque,
                                                          const libvlc_video_direct3d_cfg_t *cfg,
                                                          libvlc_video_output_cfg_t *output );
 
+typedef struct
+{
+    /* similar to SMPTE ST 2086 mastering display color volume */
+    uint16_t RedPrimary[2];
+    uint16_t GreenPrimary[2];
+    uint16_t BluePrimary[2];
+    uint16_t WhitePoint[2];
+    unsigned int MaxMasteringLuminance;
+    unsigned int MinMasteringLuminance;
+    uint16_t MaxContentLightLevel;
+    uint16_t MaxFrameAverageLightLevel;
+} libvlc_video_direct3d_hdr10_metadata_t;
+
 /** Tell the host the rendering is about to start/has finished.
  *
  * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
  * \param enter true if the rendering is about to start, false if it's finished
+ * \param hdr10 libvlc_video_direct3d_hdr10_metadata_t* or NULL [IN]
  * \return true on success
  * \version LibVLC 4.0.0 or later
  *
@@ -726,7 +740,7 @@ typedef bool( *libvlc_video_direct3d_update_output_cb )( void *opaque,
  * - RSSetViewports()
  * - DrawIndexed()
  */
-typedef bool( *libvlc_video_direct3d_start_end_rendering_cb )( void *opaque, bool enter );
+typedef bool( *libvlc_video_direct3d_start_end_rendering_cb )( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *hdr10 );
 
 
 /**

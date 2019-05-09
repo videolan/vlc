@@ -259,7 +259,7 @@ static void Swap_cb( void* opaque )
     Swap( ctx );
 }
 
-static bool StartRendering_cb( void *opaque, bool enter )
+static bool StartRendering_cb( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *hdr10 )
 {
     struct render_context *ctx = opaque;
     if ( enter )

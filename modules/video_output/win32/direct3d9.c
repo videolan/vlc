@@ -1224,7 +1224,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
     vout_display_sys_t *sys = vd->sys;
     IDirect3DDevice9 *d3ddev = sys->d3d_dev.dev;
 
-    if (!sys->startEndRenderingCb( sys->outside_opaque, true ))
+    if (!sys->startEndRenderingCb( sys->outside_opaque, true, NULL ))
         return;
 
     Direct3D9RenderRegion(vd, picture, true);
@@ -1240,7 +1240,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHABLENDENABLE, FALSE);
     }
 
-    sys->startEndRenderingCb( sys->outside_opaque, false );
+    sys->startEndRenderingCb( sys->outside_opaque, false, NULL );
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
@@ -1649,8 +1649,9 @@ static void LocalSwapchainSwap( void *opaque )
     Swap( vd );
 }
 
-static bool LocalSwapchainStartEndRendering( void *opaque, bool enter )
+static bool LocalSwapchainStartEndRendering( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *p_hdr10 )
 {
+    VLC_UNUSED(p_hdr10);
     vout_display_t *vd = opaque;
     if ( enter )
     {
