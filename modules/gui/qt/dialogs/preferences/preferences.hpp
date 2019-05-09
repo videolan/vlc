@@ -67,7 +67,7 @@ private:
     QCheckBox *current_filter;
 
     QGroupBox *types;
-    QRadioButton *simple,*all;
+    QRadioButton *simple, *all;
 
 private slots:
     void setAdvanced();
@@ -81,7 +81,7 @@ private slots:
     void save();
     void cancel();
     void reset();
-    void close() { save(); };
+    void close() { save(); }
 };
 
 #endif

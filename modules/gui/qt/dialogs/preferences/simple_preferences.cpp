@@ -409,7 +409,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         /******************************
          * VIDEO Panel Implementation *
          ******************************/
-        START_SPREFS_CAT( Video , qtr("Video Settings") );
+        START_SPREFS_CAT( Video, qtr("Video Settings") );
             CONFIG_BOOL( "video", enableVideo );
             ui.videoZone->setEnabled( ui.enableVideo->isChecked() );
             CONNECT( ui.enableVideo, toggled( bool ),
@@ -429,7 +429,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 ui.fullscreenScreenBox->addItem( screen->name(), i_screenCount );
                 i_screenCount++;
             }
-            p_config =  config_FindConfig( "qt-fullscreen-screennumber" );
+            p_config = config_FindConfig( "qt-fullscreen-screennumber" );
             if( p_config )
             {
                 int i_defaultScreen = p_config->value.i + 1;
@@ -702,8 +702,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "avi-index", IntegerList, ui.aviLabel, AviRepair );
 
             /* live555 module prefs */
-            CONFIG_BOOL( "rtsp-tcp",
-                                live555TransportRTSP_TCPRadio );
+            CONFIG_BOOL( "rtsp-tcp", live555TransportRTSP_TCPRadio );
             if ( !module_exists( "live555" ) )
             {
                 ui.live555TransportRTSP_TCPRadio->hide();
@@ -745,7 +744,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             TestCaC( "live-caching", 1 );
             if( b_cache_equal == 1 )
                 ui.cachingCombo->setCurrentIndex(
-                ui.cachingCombo->findData( QVariant( i_cache ) ) );
+                    ui.cachingCombo->findData( QVariant( i_cache ) ) );
 #undef TestCaC
 
         END_SPREFS_CAT;
@@ -915,8 +914,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             {
                 CONFIG_BOOL( "one-instance", OneInterfaceMode );
                 CONFIG_BOOL( "playlist-enqueue", EnqueueOneInterfaceMode );
-                ui.EnqueueOneInterfaceMode->setEnabled(
-                                                       ui.OneInterfaceMode->isChecked() );
+                ui.EnqueueOneInterfaceMode->setEnabled( ui.OneInterfaceMode->isChecked() );
                 CONNECT( ui.OneInterfaceMode, toggled( bool ),
                          ui.EnqueueOneInterfaceMode, setEnabled( bool ) );
                 CONFIG_BOOL( "one-instance-when-started-from-file", oneInstanceFromFile );
@@ -1067,7 +1065,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 }
 
 
-void SPrefsPanel::updateAudioOptions( int number)
+void SPrefsPanel::updateAudioOptions( int number )
 {
     QString value = qobject_cast<QComboBox *>(optionWidgets["audioOutCoB"])
                                             ->itemData( number ).toString();

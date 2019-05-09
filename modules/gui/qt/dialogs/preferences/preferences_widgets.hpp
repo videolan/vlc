@@ -84,7 +84,7 @@ public:
     void show() { changeVisibility( true ); }
     /* ConfigControl factory */
     static ConfigControl * createControl( vlc_object_t*,
-                                          module_config_t*,QWidget*,
+                                          module_config_t*, QWidget*,
                                           QGridLayout *, int line = 0 );
     /* Inserts control into another layout block, using a sublayout */
     void insertInto( QBoxLayout * );
@@ -107,7 +107,7 @@ signals:
  *******************************************************/
 class VIntConfigControl : public ConfigControl
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     virtual int getValue() const = 0;
     virtual void doApply() Q_DECL_OVERRIDE;
@@ -118,7 +118,7 @@ protected:
 
 class IntegerConfigControl : public VIntConfigControl
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     IntegerConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     IntegerConfigControl( vlc_object_t *, module_config_t *,
@@ -126,7 +126,7 @@ public:
     int getValue() const Q_DECL_OVERRIDE;
 protected:
     QSpinBox *spin;
-     void changeVisibility( bool b ) Q_DECL_OVERRIDE
+    void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
         spin->setVisible( b );
         if ( label ) label->setVisible( b );
@@ -211,7 +211,7 @@ private:
 
 class ColorConfigControl : public VIntConfigControl
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     ColorConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     ColorConfigControl( vlc_object_t *, module_config_t *,
@@ -304,8 +304,8 @@ public:
     StringConfigControl( vlc_object_t *, module_config_t *,
                          QWidget *, bool pwd );
     StringConfigControl( vlc_object_t *, module_config_t *, QLabel *,
-                         QLineEdit*,  bool pwd );
-    QString getValue() const Q_DECL_OVERRIDE { return text->text(); };
+                         QLineEdit*, bool pwd );
+    QString getValue() const Q_DECL_OVERRIDE { return text->text(); }
 protected:
     void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {
@@ -326,7 +326,7 @@ public:
     FileConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     FileConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                        QLineEdit *, QPushButton * );
-    QString getValue() const Q_DECL_OVERRIDE { return text->text(); };
+    QString getValue() const Q_DECL_OVERRIDE { return text->text(); }
 public slots:
     virtual void updateField();
 protected:
@@ -361,7 +361,7 @@ public:
     FontConfigControl( vlc_object_t *, module_config_t *, QWidget * );
     FontConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                        QFontComboBox *);
-    QString getValue() const Q_DECL_OVERRIDE  { return font->currentFont().family(); }
+    QString getValue() const Q_DECL_OVERRIDE { return font->currentFont().family(); }
 protected:
     void changeVisibility( bool b ) Q_DECL_OVERRIDE
     {

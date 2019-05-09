@@ -58,7 +58,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
     setAlternatingRowColors( true );
     setHeaderHidden( true );
 
-    setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
+    setIconSize( QSize( ITEM_HEIGHT, ITEM_HEIGHT ) );
     setTextElideMode( Qt::ElideNone );
 
     setUniformRowHeights( true );
@@ -741,7 +741,7 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         layout->addWidget( box, i_line, 0, 1, -1 );
     }
 
-    scrolled_area->setSizePolicy( QSizePolicy::Preferred,QSizePolicy::Fixed );
+    scrolled_area->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
     scrolled_area->setLayout( layout );
     scroller->setWidget( scrolled_area );
     scroller->setWidgetResizable( true );
@@ -760,6 +760,7 @@ void AdvPrefsPanel::clean()
 
 AdvPrefsPanel::~AdvPrefsPanel()
 {
-    qDeleteAll( controls ); controls.clear();
+    qDeleteAll( controls );
+    controls.clear();
     module_config_free( p_config );
 }

@@ -71,11 +71,13 @@ PrefsDialog::PrefsDialog( QWidget *parent, qt_intf_t *_p_intf )
     types = new QGroupBox( qtr("Show settings") );
     types->setAlignment( Qt::AlignHCenter );
     QHBoxLayout *types_l = new QHBoxLayout;
-    types_l->setSpacing( 3 ); types_l->setMargin( 3 );
+    types_l->setSpacing( 3 );
+    types_l->setMargin( 3 );
     simple = new QRadioButton( qtr( "Simple" ), types );
     simple->setToolTip( qtr( "Switch to simple preferences view" ) );
     types_l->addWidget( simple );
-    all = new QRadioButton( qtr("All"), types ); types_l->addWidget( all );
+    all = new QRadioButton( qtr("All"), types );
+    types_l->addWidget( all );
     all->setToolTip( qtr( "Switch to full preferences view" ) );
     types->setLayout( types_l );
     simple->setChecked( true );
@@ -158,7 +160,7 @@ void PrefsDialog::setAdvanced()
         tree_filter->setMinimumHeight( 26 );
 
         CONNECT( tree_filter, textChanged( const QString &  ),
-                this, advancedTreeFilterChanged( const QString & ) );
+                 this, advancedTreeFilterChanged( const QString & ) );
 
         advanced_tree_panel->layout()->addWidget( tree_filter );
 
@@ -212,7 +214,7 @@ void PrefsDialog::setSimple()
          simple_tree = new SPrefsCatList( p_intf, simple_tree_panel );
          CONNECT( simple_tree,
                   currentItemChanged( int ),
-                  this,  changeSimplePanel( int ) );
+                  this, changeSimplePanel( int ) );
         simple_tree_panel->layout()->addWidget( simple_tree );
         simple_tree_panel->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
     }

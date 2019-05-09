@@ -423,7 +423,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
 void StringListConfigControl::finish(module_config_t *p_module_config )
 {
     combo->setEditable( false );
-    CONNECT( combo, currentIndexChanged ( int ), this, comboIndexChanged( int ) );
+    CONNECT( combo, currentIndexChanged( int ), this, comboIndexChanged( int ) );
 
     if(!p_module_config) return;
 
@@ -443,7 +443,7 @@ void StringListConfigControl::finish(module_config_t *p_module_config )
     free( texts );
     free( values );
 
-    if( p_module_config->psz_longtext  )
+    if( p_module_config->psz_longtext )
     {
         QString tipText = qfut(p_module_config->psz_longtext);
         combo->setToolTip( formatTooltip(tipText) );
@@ -589,7 +589,7 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
     /* Special Hack */
     if( !p_item->psz_text ) return;
 
-    groupBox = new QGroupBox ( qfut(p_item->psz_text), p );
+    groupBox = new QGroupBox( qfut(p_item->psz_text), p );
     text = new QLineEdit( p );
     QGridLayout *layoutGroupBox = new QGridLayout( groupBox );
 
@@ -749,7 +749,8 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
                            VIntConfigControl( _p_this, _p_item )
 {
     label = new QLabel( qfut(p_item->psz_text), p );
-    spin = new QSpinBox( p ); spin->setMinimumWidth( MINWIDTH_BOX );
+    spin = new QSpinBox( p );
+    spin->setMinimumWidth( MINWIDTH_BOX );
     spin->setAlignment( Qt::AlignRight );
     spin->setMaximumWidth( MINWIDTH_BOX );
     finish();
@@ -839,7 +840,7 @@ IntegerRangeSliderConfigControl::IntegerRangeSliderConfigControl(
 
 int IntegerRangeSliderConfigControl::getValue() const
 {
-        return slider->value();
+    return slider->value();
 }
 
 
@@ -1505,4 +1506,4 @@ void KeyInputDialog::wheelEvent( QWheelEvent *e )
     checkForConflicts( QString() );
 }
 
-void KeyInputDialog::unsetAction() { done( 2 ); };
+void KeyInputDialog::unsetAction() { done( 2 ); }
