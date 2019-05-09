@@ -35,6 +35,11 @@
 
 #include <DeckLinkAPI.h>
 #include <DeckLinkAPIDispatch.cpp>
+#include <DeckLinkAPIVersion.h>
+#if BLACKMAGIC_DECKLINK_API_VERSION < 0x0b010000
+ #define IID_IDeckLinkProfileAttributes IID_IDeckLinkAttributes
+ #define IDeckLinkProfileAttributes IDeckLinkAttributes
+#endif
 
 #include "sdi.h"
 
@@ -135,7 +140,7 @@ struct demux_sys_t
     /* We need to hold onto the IDeckLinkConfiguration object, or our settings will not apply.
        See section 2.4.15 of the Blackmagic DeckLink SDK documentation. */
     IDeckLinkConfiguration *config;
-    IDeckLinkAttributes *attributes;
+    IDeckLinkProfileAttributes *attributes;
 
     bool autodetect;
 
@@ -542,7 +547,7 @@ static int Open(vlc_object_t *p_this)
         goto finish;
     }
 
-    if (sys->card->QueryInterface(IID_IDeckLinkAttributes, (void**)&sys->attributes) != S_OK) {
+    if (sys->card->QueryInterface(IID_IDeckLinkProfileAttributes, (void**)&sys->attributes) != S_OK) {
         msg_Err(demux, "Failed to get attributes interface");
         goto finish;
     }
