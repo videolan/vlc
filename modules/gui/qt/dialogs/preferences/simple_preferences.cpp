@@ -464,7 +464,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                             snapshotsSequentialNumbering );
             CONFIG_GENERIC( "snapshot-format", StringList, ui.arLabel,
                             snapshotsFormat );
-         END_SPREFS_CAT;
+        END_SPREFS_CAT;
 
         /******************************
          * AUDIO Panel Implementation *
@@ -657,7 +657,9 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
         END_SPREFS_CAT;
 
-        /* Input and Codecs Panel Implementation */
+        /*****************************************
+         * INPUT AND CODECS Panel Implementation *
+         *****************************************/
         START_SPREFS_CAT( InputAndCodecs, qtr("Input & Codecs Settings") );
 
             /* Disk Devices */
@@ -747,9 +749,10 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 #undef TestCaC
 
         END_SPREFS_CAT;
-        /*******************
-         * Interface Panel *
-         *******************/
+
+        /**********************************
+         * INTERFACE Panel Implementation *
+         **********************************/
         START_SPREFS_CAT( Interface, qtr("Interface Settings") );
 
 #ifndef _WIN32
@@ -931,6 +934,9 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
         END_SPREFS_CAT;
 
+        /**********************************
+         * SUBTITLES Panel Implementation *
+         **********************************/
         START_SPREFS_CAT( Subtitles,
                             qtr("Subtitle & On Screen Display Settings") );
             CONFIG_BOOL( "osd", OSDBox);
@@ -971,6 +977,9 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC_NO_BOOL( "secondary-sub-margin", Integer, ui.secondarySubsPosLabel, secondarySubsPosition );
         END_SPREFS_CAT;
 
+        /********************************
+         * HOTKEYS Panel Implementation *
+         ********************************/
         case SPrefsHotkeys:
         {
             QGridLayout *gLayout = new QGridLayout;
@@ -1009,6 +1018,9 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             break;
         }
 
+        /**************************************
+         * MEDIA LIBRARY Panel Implementation *
+         **************************************/
         START_SPREFS_CAT( MediaLibrary , qtr("Media Library Settings") );
 
             if ( vlc_ml_instance_get( p_intf ) != NULL )
