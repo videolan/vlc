@@ -1776,19 +1776,6 @@ void libvlc_media_player_previous_chapter( libvlc_media_player_t *p_mi )
     input_Release(p_input_thread);
 }
 
-int libvlc_media_player_will_play( libvlc_media_player_t *p_mi )
-{
-    input_thread_t *p_input_thread =
-                            libvlc_get_input_thread ( p_mi );
-    if ( !p_input_thread )
-        return false;
-
-    int state = var_GetInteger( p_input_thread, "state" );
-    input_Release(p_input_thread);
-
-    return state != END_S && state != ERROR_S;
-}
-
 int libvlc_media_player_set_rate( libvlc_media_player_t *p_mi, float rate )
 {
     var_SetFloat (p_mi, "rate", rate);

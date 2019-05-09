@@ -178,7 +178,6 @@ libvlc_media_player_set_time
 libvlc_media_player_set_title
 libvlc_media_player_set_xwindow
 libvlc_media_player_stop
-libvlc_media_player_will_play
 libvlc_media_player_navigate
 libvlc_media_player_set_video_title_display
 libvlc_media_release

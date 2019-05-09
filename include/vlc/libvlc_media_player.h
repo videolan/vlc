@@ -1177,14 +1177,6 @@ LIBVLC_API int libvlc_media_player_get_chapter( libvlc_media_player_t *p_mi );
 LIBVLC_API int libvlc_media_player_get_chapter_count( libvlc_media_player_t *p_mi );
 
 /**
- * Is the player able to play
- *
- * \param p_mi the Media Player
- * \retval boolean
- */
-LIBVLC_API int libvlc_media_player_will_play( libvlc_media_player_t *p_mi );
-
-/**
  * Get title chapter count
  *
  * \param p_mi the Media Player
