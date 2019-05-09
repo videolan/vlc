@@ -1784,6 +1784,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
      * visible and callbacks not triggerable before this function returns the
      * fully initialized object to its caller.
      */
+    vout_CreateVars(vout);
     vout_IntfInit(vout);
 
     vout_thread_sys_t *sys = (vout_thread_sys_t *)&vout[1];

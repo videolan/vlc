@@ -148,7 +148,7 @@ static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
     }
 }
 
-void vout_IntfInit( vout_thread_t *p_vout )
+void vout_CreateVars( vout_thread_t *p_vout )
 {
     vlc_value_t val;
     char *psz_buf;
@@ -168,12 +168,10 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "autoscale", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
                 | VLC_VAR_ISCOMMAND );
     var_Change( p_vout, "autoscale", VLC_VAR_SETTEXT, _("Autoscale video") );
-    var_AddCallback( p_vout, "autoscale", AutoScaleCallback, NULL );
 
     var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_ISCOMMAND |
                 VLC_VAR_DOINHERIT );
     var_Change( p_vout, "zoom", VLC_VAR_SETTEXT, _("Zoom") );
-
     for( size_t i = 0; i < ARRAY_SIZE(p_zoom_values); i++ )
     {
         val.f_float = p_zoom_values[i].f_value;
@@ -181,18 +179,11 @@ void vout_IntfInit( vout_thread_t *p_vout )
                     vlc_gettext( p_zoom_values[i].psz_label ) );
     }
 
-    var_AddCallback( p_vout, "zoom", ZoomCallback, NULL );
-
     /* Crop offset vars */
     var_Create( p_vout, "crop-left", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_Create( p_vout, "crop-top", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_Create( p_vout, "crop-right", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_Create( p_vout, "crop-bottom", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-
-    var_AddCallback( p_vout, "crop-left", CropBorderCallback, NULL );
-    var_AddCallback( p_vout, "crop-top", CropBorderCallback, NULL );
-    var_AddCallback( p_vout, "crop-right", CropBorderCallback, NULL );
-    var_AddCallback( p_vout, "crop-bottom", CropBorderCallback, NULL );
 
     /* Crop object var */
     var_Create( p_vout, "crop", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
@@ -213,8 +204,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
         AddCustomRatios( p_vout, "crop", psz_buf );
         free( psz_buf );
     }
-
-    var_AddCallback( p_vout, "crop", CropCallback, NULL );
 
     /* Monitor pixel aspect-ratio */
     var_Create( p_vout, "monitor-par", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -239,18 +228,14 @@ void vout_IntfInit( vout_thread_t *p_vout )
         free( psz_buf );
     }
 
-    var_AddCallback( p_vout, "aspect-ratio", AspectCallback, NULL );
-
     /* Add a variable to indicate if the window should be on top of others */
     var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
                 | VLC_VAR_ISCOMMAND );
     var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT,
                 _("Always on top") );
-    var_AddCallback( p_vout, "video-on-top", AboveCallback, NULL );
 
     /* Add a variable to indicate if the window should be below all others */
     var_Create( p_vout, "video-wallpaper", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_AddCallback( p_vout, "video-wallpaper", WallPaperCallback, NULL );
 
     /* Add a variable to indicate whether we want window decoration or not */
     var_Create( p_vout, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -259,32 +244,26 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "fullscreen",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, _("Fullscreen") );
-    var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
 
     /* Add a snapshot variable */
     var_Create( p_vout, "video-snapshot", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_Change( p_vout, "video-snapshot", VLC_VAR_SETTEXT, _("Snapshot") );
-    var_AddCallback( p_vout, "video-snapshot", SnapshotCallback, NULL );
 
     /* Add a video-filter variable */
     var_Create( p_vout, "video-filter",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_vout, "video-filter", VideoFilterCallback, NULL );
 
     /* Add a sub-source variable */
     var_Create( p_vout, "sub-source",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_vout, "sub-source", SubSourceCallback, NULL );
 
     /* Add a sub-filter variable */
     var_Create( p_vout, "sub-filter",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_vout, "sub-filter", SubFilterCallback, NULL );
 
     /* Add sub-margin variable */
     var_Create( p_vout, "sub-margin",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_vout, "sub-margin", SubMarginCallback, NULL );
 
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
@@ -296,8 +275,28 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     /* Viewpoint */
     var_Create( p_vout, "viewpoint", VLC_VAR_ADDRESS  );
-    var_AddCallback( p_vout, "viewpoint", ViewpointCallback, NULL );
     var_Create( p_vout, "viewpoint-changeable", VLC_VAR_BOOL );
+}
+
+void vout_IntfInit( vout_thread_t *p_vout )
+{
+    var_AddCallback( p_vout, "autoscale", AutoScaleCallback, NULL );
+    var_AddCallback( p_vout, "zoom", ZoomCallback, NULL );
+    var_AddCallback( p_vout, "crop-left", CropBorderCallback, NULL );
+    var_AddCallback( p_vout, "crop-top", CropBorderCallback, NULL );
+    var_AddCallback( p_vout, "crop-right", CropBorderCallback, NULL );
+    var_AddCallback( p_vout, "crop-bottom", CropBorderCallback, NULL );
+    var_AddCallback( p_vout, "crop", CropCallback, NULL );
+    var_AddCallback( p_vout, "aspect-ratio", AspectCallback, NULL );
+    var_AddCallback( p_vout, "video-on-top", AboveCallback, NULL );
+    var_AddCallback( p_vout, "video-wallpaper", WallPaperCallback, NULL );
+    var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
+    var_AddCallback( p_vout, "video-snapshot", SnapshotCallback, NULL );
+    var_AddCallback( p_vout, "video-filter", VideoFilterCallback, NULL );
+    var_AddCallback( p_vout, "sub-source", SubSourceCallback, NULL );
+    var_AddCallback( p_vout, "sub-filter", SubFilterCallback, NULL );
+    var_AddCallback( p_vout, "sub-margin", SubMarginCallback, NULL );
+    var_AddCallback( p_vout, "viewpoint", ViewpointCallback, NULL );
 }
 
 void vout_IntfReinit( vout_thread_t *p_vout )

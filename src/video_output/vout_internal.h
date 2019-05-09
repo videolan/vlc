@@ -245,6 +245,7 @@ void vout_ChangeSubMargin(vout_thread_t *, int);
 void vout_ChangeViewpoint( vout_thread_t *, const vlc_viewpoint_t *);
 
 /* */
+void vout_CreateVars( vout_thread_t * );
 void vout_IntfInit( vout_thread_t * );
 void vout_IntfReinit( vout_thread_t * );
 void vout_IntfDeinit(vlc_object_t *);
