@@ -169,6 +169,8 @@ static void UpdatePicQuadPosition(vout_display_t *);
 
 static int Control(vout_display_t *, int, va_list);
 
+static void SelectSwapchainColorspace(vout_display_t *vd, const struct direct3d_cfg_t *cfg);
+
 static HRESULT UpdateBackBuffer(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -337,7 +339,6 @@ static int SetupWindowedOutput(vout_display_t *vd, UINT width, UINT height)
        return VLC_EGENERIC;
     }
 
-    IDXGISwapChain_QueryInterface( sys->internal_swapchain.dxgiswapChain, &IID_IDXGISwapChain4, (void **)&sys->internal_swapchain.dxgiswapChain4);
     return VLC_SUCCESS;
 }
 #endif /* !VLC_WINSTORE_APP */
@@ -399,6 +400,8 @@ static bool UpdateSwapchain( void *opaque, const struct direct3d_cfg_t *cfg )
     }
 
     D3D11_ClearRenderTargets( &sys->internal_swapchain.d3d_dev, sys->display.pixelFormat, sys->internal_swapchain.swapchainTargetView );
+
+    SelectSwapchainColorspace(vd, cfg);
 
     return true;
 }
@@ -1092,28 +1095,22 @@ static bool canHandleConversion(const dxgi_color_space *src, const dxgi_color_sp
 }
 #endif
 
-static void D3D11SetColorSpace(vout_display_t *vd)
+static void SelectSwapchainColorspace(vout_display_t *vd, const struct direct3d_cfg_t *cfg)
 {
     vout_display_sys_t *sys = vd->sys;
+    struct d3d11_local_swapchain *display = &sys->internal_swapchain;
     HRESULT hr;
     int best = -1;
     int score, best_score = 0;
     UINT support;
     IDXGISwapChain3 *dxgiswapChain3 = NULL;
     sys->display.colorspace = &color_spaces[0];
-    if (sys->sys.event == NULL) /* TODO support external colourspace handling */
-        goto done;
 
-    hr = IDXGISwapChain_QueryInterface( sys->internal_swapchain.dxgiswapChain, &IID_IDXGISwapChain3, (void **)&dxgiswapChain3);
+    hr = IDXGISwapChain_QueryInterface( display->dxgiswapChain, &IID_IDXGISwapChain3, (void **)&dxgiswapChain3);
     if (FAILED(hr)) {
-        msg_Warn(vd, "could not get a IDXGISwapChain3");
+        msg_Warn(display->obj, "could not get a IDXGISwapChain3");
         goto done;
     }
-
-    bool src_full_range = vd->source.color_range == COLOR_RANGE_FULL ||
-                          /* the YUV->RGB conversion already output full range */
-                          is_d3d11_opaque(vd->source.i_chroma) ||
-                          vlc_fourcc_IsYUV(vd->source.i_chroma);
 
     /* pick the best output based on color support and transfer */
     /* TODO support YUV output later */
@@ -1121,17 +1118,17 @@ static void D3D11SetColorSpace(vout_display_t *vd)
     {
         hr = IDXGISwapChain3_CheckColorSpaceSupport(dxgiswapChain3, color_spaces[i].dxgi, &support);
         if (SUCCEEDED(hr) && support) {
-            msg_Dbg(vd, "supports colorspace %s", color_spaces[i].name);
+            msg_Dbg(display->obj, "supports colorspace %s", color_spaces[i].name);
             score = 0;
-            if (color_spaces[i].primaries == vd->source.primaries)
+            if (color_spaces[i].primaries == cfg->primaries)
                 score++;
-            if (color_spaces[i].color == vd->source.space)
+            if (color_spaces[i].color == cfg->colorspace)
                 score += 2; /* we don't want to translate color spaces */
-            if (color_spaces[i].transfer == vd->source.transfer ||
+            if (color_spaces[i].transfer == cfg->transfer ||
                 /* favor 2084 output for HLG source */
-                (color_spaces[i].transfer == TRANSFER_FUNC_SMPTE_ST2084 && vd->source.transfer == TRANSFER_FUNC_HLG))
+                (color_spaces[i].transfer == TRANSFER_FUNC_SMPTE_ST2084 && cfg->transfer == TRANSFER_FUNC_HLG))
                 score++;
-            if (color_spaces[i].b_full_range == src_full_range)
+            if (color_spaces[i].b_full_range == cfg->full_range)
                 score++;
             if (score > best_score || (score && best == -1)) {
                 best = i;
@@ -1143,13 +1140,15 @@ static void D3D11SetColorSpace(vout_display_t *vd)
     if (best == -1)
     {
         best = 0;
-        msg_Warn(vd, "no matching colorspace found force %s", color_spaces[best].name);
+        msg_Warn(display->obj, "no matching colorspace found force %s", color_spaces[best].name);
     }
+
+    IDXGISwapChain_QueryInterface( display->dxgiswapChain, &IID_IDXGISwapChain4, (void **)&display->dxgiswapChain4);
 
 #ifdef HAVE_DXGI1_6_H
     IDXGIOutput *dxgiOutput = NULL;
 
-    if (SUCCEEDED(IDXGISwapChain_GetContainingOutput( sys->internal_swapchain.dxgiswapChain, &dxgiOutput )))
+    if (SUCCEEDED(IDXGISwapChain_GetContainingOutput( display->dxgiswapChain, &dxgiOutput )))
     {
         IDXGIOutput6 *dxgiOutput6 = NULL;
         if (SUCCEEDED(IDXGIOutput_QueryInterface( dxgiOutput, &IID_IDXGIOutput6, (void **)&dxgiOutput6 )))
@@ -1163,7 +1162,7 @@ static void D3D11SetColorSpace(vout_display_t *vd)
                     if (color_spaces[i].dxgi == desc1.ColorSpace)
                     {
                         if (!canHandleConversion(&color_spaces[best], &color_spaces[i]))
-                            msg_Warn(vd, "Can't handle conversion to screen format %s", color_spaces[i].name);
+                            msg_Warn(display->obj, "Can't handle conversion to screen format %s", color_spaces[i].name);
                         else
                         {
                             best = i;
@@ -1173,7 +1172,7 @@ static void D3D11SetColorSpace(vout_display_t *vd)
                     }
                 }
 
-                msg_Dbg(vd, "Output max luminance: %.1f, colorspace %s, bits per pixel %d", desc1.MaxFullFrameLuminance, csp?csp->name:"unknown", desc1.BitsPerColor);
+                msg_Dbg(display->obj, "Output max luminance: %.1f, colorspace %s, bits per pixel %d", desc1.MaxFullFrameLuminance, csp?csp->name:"unknown", desc1.BitsPerColor);
                 //sys->display.luminance_peak = desc1.MaxFullFrameLuminance;
             }
             IDXGIOutput6_Release( dxgiOutput6 );
@@ -1186,10 +1185,10 @@ static void D3D11SetColorSpace(vout_display_t *vd)
     if (SUCCEEDED(hr))
     {
         sys->display.colorspace = &color_spaces[best];
-        msg_Dbg(vd, "using colorspace %s", sys->display.colorspace->name);
+        msg_Dbg(display->obj, "using colorspace %s", sys->display.colorspace->name);
     }
     else
-        msg_Err(vd, "Failed to set colorspace %s. (hr=0x%lX)", sys->display.colorspace->name, hr);
+        msg_Err(display->obj, "Failed to set colorspace %s. (hr=0x%lX)", sys->display.colorspace->name, hr);
 done:
     /* guestimate the display peak luminance */
     switch (sys->display.colorspace->transfer)
@@ -1281,8 +1280,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
     if (ret != VLC_SUCCESS)
         return ret;
 
-    D3D11SetColorSpace(vd);
-
     video_format_t fmt;
     video_format_Copy(&fmt, &vd->source);
     int err = SetupOutputFormat(vd, &fmt);
@@ -1318,6 +1315,11 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
     if (FAILED(hr)) {
        msg_Err(vd, "Could not update the backbuffer. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
+    }
+
+    if (Direct3D11CreateFormatResources(vd, &fmt)) {
+        msg_Err(vd, "Failed to allocate format resources");
+        return VLC_EGENERIC;
     }
 
     if (Direct3D11CreateGenericResources(vd)) {
@@ -1422,11 +1424,6 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
     sys->regionQuad.textureFormat = GetBlendableFormat(vd, VLC_CODEC_RGBA);
     if (!sys->regionQuad.textureFormat)
         sys->regionQuad.textureFormat = GetBlendableFormat(vd, VLC_CODEC_BGRA);
-
-    if (Direct3D11CreateFormatResources(vd, fmt)) {
-        msg_Err(vd, "Failed to allocate format resources");
-        return VLC_EGENERIC;
-    }
 
     return VLC_SUCCESS;
 }
