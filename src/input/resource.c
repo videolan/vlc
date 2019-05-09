@@ -357,9 +357,9 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
 
     if (vout_Request(cfg, p_resource->p_input)) {
         if (p_resource->p_vout_free == NULL && p_resource->i_vout == 0)
-            p_resource->p_vout_free = vout;
+            p_resource->p_vout_free = cfg->vout;
         else
-            vout_Close(vout);
+            vout_Close(cfg->vout);
         vlc_mutex_unlock(&p_resource->lock);
         return NULL;
     }
