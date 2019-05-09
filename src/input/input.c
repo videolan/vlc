@@ -2381,7 +2381,6 @@ static bool Control( input_thread_t *p_input,
                     ControlInsertDemuxFilter( p_input,
                                         vlc_renderer_item_demux_filter( p_item ) );
                 }
-                input_resource_TerminateVout( p_priv->p_resource );
             }
             es_out_Control( priv->p_es_out_display, ES_OUT_START_ALL_ES,
                             context );

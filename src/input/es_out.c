@@ -744,7 +744,15 @@ static void EsOutChangePosition( es_out_t *out, bool b_flush )
     p_sys->i_prev_stream_level = -1;
 }
 
+static void EsOutStopFreeVout( es_out_t *out )
+{
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
 
+    /* Clean up vout after user action (in active mode only).
+     * FIXME it does not work well with multiple video windows */
+    if( p_sys->b_active )
+        input_resource_TerminateVout( input_priv(p_sys->p_input)->p_resource );
+}
 
 static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 {
@@ -814,8 +822,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
               (int)MS_FROM_VLC_TICK(vlc_tick_now() - i_decoder_buffering_start) );
 
     /* Here is a good place to destroy unused vout with every demuxer */
-    input_resource_TerminateVout( input_priv(p_sys->p_input)->p_resource );
-
+    EsOutStopFreeVout( out );
 
     /* */
     const vlc_tick_t i_wakeup_delay = VLC_TICK_FROM_MS(10); /* FIXME CLEANUP thread wake up time*/
@@ -2510,7 +2517,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
                 }
 
             if (!found)
-                input_resource_TerminateVout( input_priv(p_sys->p_input)->p_resource );
+                EsOutStopFreeVout( out );
         }
         p_sys->b_active = i_mode != ES_OUT_MODE_NONE;
         p_sys->i_mode = i_mode;
@@ -2591,6 +2598,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
             }
         }
 
+        EsOutStopFreeVout( out );
         return VLC_SUCCESS;
     }
     case ES_OUT_UNSET_ES:
@@ -2605,6 +2613,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
                 if (EsIsSelected(other))
                 {
                     EsOutUnselectEs(out, other, other->p_pgrm == p_sys->p_pgrm);
+                    EsOutStopFreeVout( out );
                     return VLC_SUCCESS;
                 }
                 break;
@@ -2653,6 +2662,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
             }
         }
         free(selected_es);
+        EsOutStopFreeVout( out );
         return VLC_SUCCESS;
     }
 
@@ -2931,10 +2941,6 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         }
         int i_ret = EsOutControlLocked( out, i_new_query, p_es );
 
-        /* Clean up vout after user action (in active mode only).
-         * FIXME it does not work well with multiple video windows */
-        if( p_sys->b_active )
-            input_resource_TerminateVout( input_priv(p_sys->p_input)->p_resource );
         return i_ret;
     }
 
