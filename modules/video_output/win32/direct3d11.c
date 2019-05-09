@@ -186,7 +186,7 @@ static void UpdatePicQuadPosition(vout_display_t *);
 
 static int Control(vout_display_t *, int, va_list);
 
-static void SelectSwapchainColorspace(vout_display_t *vd, const struct direct3d_cfg_t *cfg);
+static void SelectSwapchainColorspace(struct d3d11_local_swapchain *, const struct direct3d_cfg_t *);
 
 static int UpdateDisplayFormat(vout_display_t *vd, struct output_cfg_t *out)
 {
@@ -196,6 +196,21 @@ static int UpdateDisplayFormat(vout_display_t *vd, struct output_cfg_t *out)
     sys->display.transfer = out->transfer;
     sys->display.primaries = out->primaries;
     sys->display.b_full_range = out->full_range;
+
+    /* guestimate the display peak luminance */
+    switch (sys->display.transfer)
+    {
+    case TRANSFER_FUNC_LINEAR:
+    case TRANSFER_FUNC_SRGB:
+        sys->display.luminance_peak = DEFAULT_SRGB_BRIGHTNESS;
+        break;
+    case TRANSFER_FUNC_SMPTE_ST2084:
+        sys->display.luminance_peak = MAX_PQ_BRIGHTNESS;
+        break;
+    default:
+        sys->display.luminance_peak = DEFAULT_SRGB_BRIGHTNESS;
+        break;
+    }
 
     return VLC_SUCCESS;
 }
@@ -435,7 +450,7 @@ static bool UpdateSwapchain( void *opaque, const struct direct3d_cfg_t *cfg )
 
     D3D11_ClearRenderTargets( &display->d3d_dev, sys->display.pixelFormat, display->swapchainTargetView );
 
-    SelectSwapchainColorspace(vd, cfg);
+    SelectSwapchainColorspace(display, cfg);
 
     return true;
 }
@@ -1134,10 +1149,8 @@ static bool canHandleConversion(const dxgi_color_space *src, const dxgi_color_sp
 }
 #endif
 
-static void SelectSwapchainColorspace(vout_display_t *vd, const struct direct3d_cfg_t *cfg)
+static void SelectSwapchainColorspace(struct d3d11_local_swapchain *display, const struct direct3d_cfg_t *cfg)
 {
-    vout_display_sys_t *sys = vd->sys;
-    struct d3d11_local_swapchain *display = &sys->internal_swapchain;
     HRESULT hr;
     int best = -1;
     int score, best_score = 0;
@@ -1229,21 +1242,6 @@ static void SelectSwapchainColorspace(vout_display_t *vd, const struct direct3d_
     else
         msg_Err(display->obj, "Failed to set colorspace %s. (hr=0x%lX)", display->colorspace->name, hr);
 done:
-    /* guestimate the display peak luminance */
-    switch (display->colorspace->transfer)
-    {
-    case TRANSFER_FUNC_LINEAR:
-    case TRANSFER_FUNC_SRGB:
-        sys->display.luminance_peak = DEFAULT_SRGB_BRIGHTNESS;
-        break;
-    case TRANSFER_FUNC_SMPTE_ST2084:
-        sys->display.luminance_peak = MAX_PQ_BRIGHTNESS;
-        break;
-    /* there is no other output transfer on Windows */
-    default:
-        vlc_assert_unreachable();
-    }
-
     if (dxgiswapChain3)
         IDXGISwapChain3_Release(dxgiswapChain3);
 }
