@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewItem.h: MacOS X interface module
+ * VLCLibraryAudioDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -24,27 +24,23 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString *VLCLibraryCellIdentifier;
+@class VLCLibraryModel;
+@class VLCLibraryGroupDataSource;
+@class VLCMediaLibraryAlbum;
 
-@class VLCImageView;
-@class VLCLinearProgressIndicator;
-@class VLCMediaLibraryMediaItem;
+@interface VLCLibraryAudioDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
 
-@interface VLCLibraryCollectionViewItem : NSCollectionViewItem
+@property (readwrite, assign) VLCLibraryModel *libraryModel;
+@property (readwrite, assign) VLCLibraryGroupDataSource *groupDataSource;
+@property (readwrite, assign) NSTableView *categorySelectionTableView;
+@property (readwrite, assign) NSTableView *collectionSelectionTableView;
+@property (readwrite, assign) NSTableView *groupSelectionTableView;
 
-@property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
-@property (readwrite, assign) IBOutlet NSTextField *annotationTextField;
-@property (readwrite, assign) IBOutlet NSTextField *unplayedIndicatorTextField;
-@property (readwrite, assign) IBOutlet NSTextField *durationTextField;
-@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
-@property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
-@property (readwrite, assign) IBOutlet NSButton *addToPlaylistButton;
-@property (readwrite, assign) IBOutlet VLCLinearProgressIndicator *progressIndicator;
+@end
 
-@property (readwrite, assign, nonatomic) VLCMediaLibraryMediaItem *representedMediaItem;
+@interface VLCLibraryGroupDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
 
-- (IBAction)playInstantly:(id)sender;
-- (IBAction)addToPlaylist:(id)sender;
+@property (readwrite, retain, nullable) NSArray <VLCMediaLibraryAlbum *> *representedListOfAlbums;
 
 @end
 

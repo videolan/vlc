@@ -32,9 +32,14 @@ typedef NS_ENUM(NSInteger, VLCLibraryMode) {
 };
 
 @class VLCMediaLibraryMediaItem;
+@class VLCMediaLibraryArtist;
+@class VLCMediaLibraryAlbum;
+@class VLCMediaLibraryGenre;
 @class VLCMediaLibraryEntryPoint;
 
 extern NSString *VLCLibraryModelAudioMediaListUpdated;
+extern NSString *VLCLibraryModelArtistListUpdated;
+extern NSString *VLCLibraryModelAlbumListUpdated;
 extern NSString *VLCLibraryModelVideoMediaListUpdated;
 extern NSString *VLCLibraryModelRecentMediaListUpdated;
 extern NSString *VLCLibraryModelMediaItemUpdated;
@@ -48,6 +53,15 @@ extern NSString *VLCLibraryModelMediaItemUpdated;
 @property (readonly) size_t numberOfAudioMedia;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfAudioMedia;
 
+@property (readonly) size_t numberOfArtists;
+@property (readonly) NSArray <VLCMediaLibraryArtist *> *listOfArtists;
+
+@property (readonly) size_t numberOfAlbums;
+@property (readonly) NSArray <VLCMediaLibraryAlbum *> *listOfAlbums;
+
+@property (readonly) size_t numberOfGenres;
+@property (readonly) NSArray <VLCMediaLibraryGenre *> *listOfGenres;
+
 @property (readonly) size_t numberOfVideoMedia;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfVideoMedia;
 
@@ -55,6 +69,8 @@ extern NSString *VLCLibraryModelMediaItemUpdated;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfRecentMedia;
 
 @property (readonly) NSArray <VLCMediaLibraryEntryPoint *> *listOfMonitoredFolders;
+
+- (nullable NSArray <VLCMediaLibraryAlbum *>*)listAlbumsOfParentType:(enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
 
 @end
 

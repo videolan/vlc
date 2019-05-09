@@ -52,14 +52,16 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/imported/SPMediaKeyTap/SPMediaKeyTap.m \
 	gui/macosx/library/VLCInputItem.h \
 	gui/macosx/library/VLCInputItem.m \
+	gui/macosx/library/VLCLibraryAlbumTableCellView.h \
+	gui/macosx/library/VLCLibraryAlbumTableCellView.m \
+	gui/macosx/library/VLCLibraryAudioDataSource.h \
+	gui/macosx/library/VLCLibraryAudioDataSource.m \
 	gui/macosx/library/VLCLibraryCollectionViewItem.h \
 	gui/macosx/library/VLCLibraryCollectionViewItem.m \
 	gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.h \
 	gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.m \
 	gui/macosx/library/VLCLibraryController.h \
 	gui/macosx/library/VLCLibraryController.m \
-	gui/macosx/library/VLCLibraryVideoDataSource.h \
-	gui/macosx/library/VLCLibraryVideoDataSource.m \
 	gui/macosx/library/VLCLibraryDataTypes.h \
 	gui/macosx/library/VLCLibraryDataTypes.m \
 	gui/macosx/library/VLCLibraryFolderManagementWindow.h \
@@ -68,6 +70,10 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryMenuController.m \
 	gui/macosx/library/VLCLibraryModel.h \
 	gui/macosx/library/VLCLibraryModel.m \
+	gui/macosx/library/VLCLibraryTableCellView.h \
+	gui/macosx/library/VLCLibraryTableCellView.m \
+	gui/macosx/library/VLCLibraryVideoDataSource.h \
+	gui/macosx/library/VLCLibraryVideoDataSource.m \
 	gui/macosx/library/VLCLibraryWindow.h \
 	gui/macosx/library/VLCLibraryWindow.m \
 	gui/macosx/main/CompatibilityFixes.h \
@@ -185,6 +191,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCSliderCell.m \
 	gui/macosx/views/VLCTimeField.h \
 	gui/macosx/views/VLCTimeField.m \
+	gui/macosx/views/VLCTrackingView.h \
+	gui/macosx/views/VLCTrackingView.m \
 	gui/macosx/views/VLCVolumeSlider.h \
 	gui/macosx/views/VLCVolumeSlider.m \
 	gui/macosx/views/VLCVolumeSliderCell.h \
@@ -251,8 +259,10 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/Help.xib \
 	gui/macosx/UI/LogMessageWindow.xib \
 	gui/macosx/UI/MainMenu.xib \
+	gui/macosx/UI/VLCLibraryAlbumTableCellView.xib \
 	gui/macosx/UI/VLCLibraryWindow.xib \
 	gui/macosx/UI/VLCLibraryFolderManagementWindow.xib \
+	gui/macosx/UI/VLCLibraryTableCellView.xib \
 	gui/macosx/UI/VLCPlaylistMenu.xib \
 	gui/macosx/UI/VLCPlaylistTableCellView.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewItem.xib \

@@ -113,6 +113,17 @@
 
 @implementation VLCMediaLibraryArtist
 
++ (instancetype)artistWithID:(int64_t)artistID
+{
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    vlc_ml_artist_t *p_artist = vlc_ml_get_artist(p_mediaLibrary, artistID);
+    VLCMediaLibraryArtist *artist = nil;
+    if (p_artist) {
+        artist = [[VLCMediaLibraryArtist alloc] initWithArtist:p_artist];
+    }
+    return artist;
+}
+
 - (instancetype)initWithArtist:(struct vlc_ml_artist_t *)p_artist;
 {
     self = [super init];
@@ -147,6 +158,19 @@
         _year = p_album->i_year;
     }
     return self;
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
+{
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    vlc_ml_media_list_t *p_mediaList = vlc_ml_list_album_tracks(p_mediaLibrary, NULL, _albumID);
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_mediaList->i_nb_items];
+    for (size_t x = 0; x < p_mediaList->i_nb_items; x++) {
+        VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_mediaList->p_items[x]];
+        [mutableArray addObject:mediaItem];
+    }
+    vlc_ml_media_list_release(p_mediaList);
+    return [mutableArray copy];
 }
 
 @end

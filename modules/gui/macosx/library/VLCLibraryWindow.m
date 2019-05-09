@@ -27,11 +27,11 @@
 #import "extensions/NSView+VLCAdditions.h"
 #import "main/VLCMain.h"
 
-#import "playlist/VLCPlaylistTableCellView.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistDataSource.h"
 
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryAudioDataSource.h"
 #import "library/VLCLibraryVideoDataSource.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryModel.h"
@@ -48,11 +48,15 @@
 static const float f_min_window_width = 604.;
 static const float f_min_window_height = 307.;
 static const float f_playlist_row_height = 72.;
+static const float f_library_small_row_height = 24.;
+static const float f_library_large_row_height = 50.;
 
 @interface VLCLibraryWindow ()
 {
     VLCPlaylistDataSource *_playlistDataSource;
     VLCLibraryVideoDataSource *_libraryVideoDataSource;
+    VLCLibraryAudioDataSource *_libraryAudioDataSource;
+    VLCLibraryGroupDataSource *_libraryAudioGroupDataSource;
     VLCMediaSourceDataSource *_mediaSourceDataSource;
 
     VLCPlaylistController *_playlistController;
@@ -149,6 +153,23 @@ static const float f_playlist_row_height = 72.;
     _recentVideoLibraryCollectionView.dataSource = _libraryVideoDataSource;
     _recentVideoLibraryCollectionView.delegate = _libraryVideoDataSource;
     [_recentVideoLibraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
+
+    _libraryAudioDataSource = [[VLCLibraryAudioDataSource alloc] init];
+    _libraryAudioDataSource.libraryModel = mainInstance.libraryController.libraryModel;
+    _libraryAudioDataSource.categorySelectionTableView = _audioCategorySelectionTableView;
+    _libraryAudioDataSource.collectionSelectionTableView = _audioCollectionSelectionTableView;
+    _libraryAudioDataSource.groupSelectionTableView = _audioGroupSelectionTableView;
+    _audioCategorySelectionTableView.dataSource = _libraryAudioDataSource;
+    _audioCategorySelectionTableView.delegate = _libraryAudioDataSource;
+    _audioCategorySelectionTableView.rowHeight = f_library_small_row_height;
+    _audioCollectionSelectionTableView.dataSource = _libraryAudioDataSource;
+    _audioCollectionSelectionTableView.delegate = _libraryAudioDataSource;
+    _audioCollectionSelectionTableView.rowHeight = f_library_large_row_height;
+    _libraryAudioGroupDataSource = [[VLCLibraryGroupDataSource alloc] init];
+    _libraryAudioDataSource.groupDataSource = _libraryAudioGroupDataSource;
+    _audioGroupSelectionTableView.dataSource = _libraryAudioGroupDataSource;
+    _audioGroupSelectionTableView.delegate = _libraryAudioGroupDataSource;
+    _audioGroupSelectionTableView.rowHeight = 450.;
 
     _mediaSourceDataSource = [[VLCMediaSourceDataSource alloc] init];
     _mediaSourceDataSource.collectionView = _mediaSourceCollectionView;
@@ -262,6 +283,9 @@ static const float f_playlist_row_height = 72.;
             if (_mediaSourceScrollView.superview != nil) {
                 [_mediaSourceScrollView removeFromSuperview];
             }
+            if (_audioLibrarySplitView.superview != nil) {
+                [_audioLibrarySplitView removeFromSuperview];
+            }
             if (_videoLibraryStackView.superview == nil) {
                 _videoLibraryStackView.translatesAutoresizingMaskIntoConstraints = NO;
                 [_libraryTargetView addSubview:_videoLibraryStackView];
@@ -278,20 +302,26 @@ static const float f_playlist_row_height = 72.;
             if (_mediaSourceScrollView.superview != nil) {
                 [_mediaSourceScrollView removeFromSuperview];
             }
-            if (_videoLibraryStackView.superview == nil) {
-                _videoLibraryStackView.translatesAutoresizingMaskIntoConstraints = NO;
-                [_libraryTargetView addSubview:_videoLibraryStackView];
-                NSDictionary *dict = NSDictionaryOfVariableBindings(_videoLibraryStackView);
-                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryStackView(>=572.)]|" options:0 metrics:0 views:dict]];
-                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryStackView(>=444.)]|" options:0 metrics:0 views:dict]];
+            if (_videoLibraryStackView.superview != nil) {
+                [_videoLibraryStackView removeFromSuperview];
             }
-            [_videoLibraryCollectionView reloadData];
-            [_recentVideoLibraryCollectionView reloadData];
+            if (_audioLibrarySplitView.superview == nil) {
+                _audioLibrarySplitView.translatesAutoresizingMaskIntoConstraints = NO;
+                [_libraryTargetView addSubview:_audioLibrarySplitView];
+                NSDictionary *dict = NSDictionaryOfVariableBindings(_audioLibrarySplitView);
+                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_audioLibrarySplitView(>=572.)]|" options:0 metrics:0 views:dict]];
+                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibrarySplitView(>=444.)]|" options:0 metrics:0 views:dict]];
+            }
+            [_audioCategorySelectionTableView reloadData];
+            [_audioCollectionSelectionTableView reloadData];
             break;
 
         default:
             if (_videoLibraryStackView.superview != nil) {
                 [_videoLibraryStackView removeFromSuperview];
+            }
+            if (_audioLibrarySplitView.superview != nil) {
+                [_audioLibrarySplitView removeFromSuperview];
             }
             if (_mediaSourceScrollView.superview == nil) {
                 _mediaSourceScrollView.translatesAutoresizingMaskIntoConstraints = NO;

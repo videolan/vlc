@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewItem.h: MacOS X interface module
+ * VLCLibraryTableCellView.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -24,27 +24,21 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString *VLCLibraryCellIdentifier;
-
 @class VLCImageView;
-@class VLCLinearProgressIndicator;
+@class VLCTrackingView;
 @class VLCMediaLibraryMediaItem;
 
-@interface VLCLibraryCollectionViewItem : NSCollectionViewItem
+@interface VLCLibraryTableCellView : NSTableCellView
 
-@property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
-@property (readwrite, assign) IBOutlet NSTextField *annotationTextField;
-@property (readwrite, assign) IBOutlet NSTextField *unplayedIndicatorTextField;
-@property (readwrite, assign) IBOutlet NSTextField *durationTextField;
-@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
+@property (readwrite, assign) IBOutlet VLCTrackingView *trackingView;
+@property (readwrite, assign) IBOutlet NSTextField *singlePrimaryTitleTextField;
+@property (readwrite, assign) IBOutlet NSTextField *secondaryTitleTextField;
+@property (readwrite, assign) IBOutlet NSTextField *primaryTitleTextField;
+@property (readwrite, assign) IBOutlet VLCImageView *representedImageView;
 @property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
-@property (readwrite, assign) IBOutlet NSButton *addToPlaylistButton;
-@property (readwrite, assign) IBOutlet VLCLinearProgressIndicator *progressIndicator;
-
 @property (readwrite, assign, nonatomic) VLCMediaLibraryMediaItem *representedMediaItem;
 
 - (IBAction)playInstantly:(id)sender;
-- (IBAction)addToPlaylist:(id)sender;
 
 @end
 

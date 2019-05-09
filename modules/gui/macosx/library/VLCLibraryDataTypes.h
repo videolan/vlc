@@ -25,6 +25,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCMediaLibraryMediaItem;
+
 @interface VLCMediaLibraryFile : NSObject
 
 - (instancetype)initWithFile:(struct vlc_ml_file_t *)p_file;
@@ -81,6 +83,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMediaLibraryArtist : NSObject
 
++ (nullable instancetype)artistWithID:(int64_t)artistID;
 - (instancetype)initWithArtist:(struct vlc_ml_artist_t *)p_artist;
 
 @property (readonly) int64_t artistID;
@@ -106,6 +109,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) size_t numberOfTracks;
 @property (readonly) unsigned int duration;
 @property (readonly) unsigned int year;
+@property (readonly) NSArray <VLCMediaLibraryMediaItem *> *tracksAsMediaItems;
 
 @end
 

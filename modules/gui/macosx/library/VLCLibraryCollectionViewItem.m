@@ -29,6 +29,7 @@
 #import "library/VLCLibraryMenuController.h"
 #import "views/VLCImageView.h"
 #import "views/VLCLinearProgressIndicator.h"
+#import "views/VLCTrackingView.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
@@ -65,7 +66,7 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 - (void)awakeFromNib
 {
     self.playInstantlyButton.hidden = YES;
-    [(VLCLibraryCollectionViewTrackingView *)self.view setButtonToHide:self.playInstantlyButton];
+    [(VLCTrackingView *)self.view setViewToHide:self.playInstantlyButton];
     self.mediaTitleTextField.font = [NSFont VLClibraryCellTitleFont];
     self.durationTextField.font = [NSFont VLClibraryCellSubtitleFont];
     self.durationTextField.textColor = [NSColor VLClibrarySubtitleColor];
@@ -213,41 +214,6 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
     [_menuController popupMenuWithEvent:theEvent forView:self.view];
 
     [super rightMouseDown:theEvent];
-}
-
-@end
-
-@interface VLCLibraryCollectionViewTrackingView ()
-{
-    NSTrackingArea *_trackingArea;
-}
-@end
-
-@implementation VLCLibraryCollectionViewTrackingView
-
-- (void)mouseExited:(NSEvent *)event
-{
-    self.buttonToHide.hidden = YES;
-}
-
-- (void)mouseEntered:(NSEvent *)event
-{
-    self.buttonToHide.hidden = NO;
-}
-
-- (void)updateTrackingAreas
-{
-    [super updateTrackingAreas];
-    if(_trackingArea != nil) {
-        [self removeTrackingArea:_trackingArea];
-    }
-
-    NSTrackingAreaOptions trackingAreaOptions = (NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways);
-    _trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds]
-                                                 options:trackingAreaOptions
-                                                   owner:self
-                                                userInfo:nil];
-    [self addTrackingArea:_trackingArea];
 }
 
 @end

@@ -26,6 +26,8 @@
 #import "library/VLCLibraryDataTypes.h"
 
 NSString *VLCLibraryModelAudioMediaListUpdated = @"VLCLibraryModelAudioMediaListUpdated";
+NSString *VLCLibraryModelArtistListUpdated = @"VLCLibraryModelArtistListUpdated";
+NSString *VLCLibraryModelAlbumListUpdated = @"VLCLibraryModelAlbumListUpdated";
 NSString *VLCLibraryModelVideoMediaListUpdated = @"VLCLibraryModelVideoMediaListUpdated";
 NSString *VLCLibraryModelRecentMediaListUpdated = @"VLCLibraryModelRecentMediaListUpdated";
 NSString *VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
@@ -36,6 +38,9 @@ NSString *VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
     vlc_ml_event_callback_t *_p_eventCallback;
 
     NSArray *_cachedAudioMedia;
+    NSArray *_cachedArtists;
+    NSArray *_cachedAlbums;
+    NSArray *_cachedGenres;
     NSArray *_cachedVideoMedia;
     NSArray *_cachedRecentMedia;
     NSNotificationCenter *_defaultNotificationCenter;
@@ -126,11 +131,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (size_t)numberOfAudioMedia
 {
     if (!_cachedAudioMedia) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self updateCachedListOfAudioMedia];
-        });
+        [self updateCachedListOfAudioMedia];
     }
-
     return _cachedAudioMedia.count;
 }
 
@@ -150,12 +152,96 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (NSArray<VLCMediaLibraryMediaItem *> *)listOfAudioMedia
 {
     if (!_cachedAudioMedia) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self updateCachedListOfAudioMedia];
-        });
+        [self updateCachedListOfAudioMedia];
     }
-
     return _cachedAudioMedia;
+}
+
+- (size_t)numberOfArtists
+{
+    if (!_cachedArtists) {
+        [self updateCachedListOfArtists];
+    }
+    return _cachedArtists.count;
+}
+
+- (void)updateCachedListOfArtists
+{
+    vlc_ml_artist_list_t *p_artist_list = vlc_ml_list_artists(_p_mediaLibrary, NULL, NO);
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_artist_list->i_nb_items];
+    for (size_t x = 0; x < p_artist_list->i_nb_items; x++) {
+        VLCMediaLibraryArtist *artist = [[VLCMediaLibraryArtist alloc] initWithArtist:&p_artist_list->p_items[x]];
+        [mutableArray addObject:artist];
+    }
+    _cachedArtists = [mutableArray copy];
+    vlc_ml_artist_list_release(p_artist_list);
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListUpdated object:self];
+}
+
+- (NSArray<VLCMediaLibraryArtist *> *)listOfArtists
+{
+    if (!_cachedArtists) {
+        [self updateCachedListOfArtists];
+    }
+    return _cachedArtists;
+}
+
+- (size_t)numberOfAlbums
+{
+    if (!_cachedAlbums) {
+        [self updateCachedListOfAlbums];
+    }
+    return _cachedAlbums.count;
+}
+
+- (void)updateCachedListOfAlbums
+{
+    vlc_ml_album_list_t *p_album_list = vlc_ml_list_albums(_p_mediaLibrary, NULL);
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_album_list->i_nb_items];
+    for (size_t x = 0; x < p_album_list->i_nb_items; x++) {
+        VLCMediaLibraryAlbum *album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:&p_album_list->p_items[x]];
+        [mutableArray addObject:album];
+    }
+    _cachedAlbums = [mutableArray copy];
+    vlc_ml_album_list_release(p_album_list);
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListUpdated object:self];
+}
+
+- (NSArray<VLCMediaLibraryAlbum *> *)listOfAlbums
+{
+    if (!_cachedAlbums) {
+        [self updateCachedListOfAlbums];
+    }
+    return _cachedAlbums;
+}
+
+- (size_t)numberOfGenres
+{
+    if (!_cachedGenres) {
+        [self updateCachedListOfGenres];
+    }
+    return _cachedGenres.count;
+}
+
+- (void)updateCachedListOfGenres
+{
+    vlc_ml_genre_list_t *p_genre_list = vlc_ml_list_genres(_p_mediaLibrary, NULL);
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_genre_list->i_nb_items];
+    for (size_t x = 0; x < p_genre_list->i_nb_items; x++) {
+        VLCMediaLibraryGenre *genre = [[VLCMediaLibraryGenre alloc] initWithGenre:&p_genre_list->p_items[x]];
+        [mutableArray addObject:genre];
+    }
+    _cachedGenres = [mutableArray copy];
+    vlc_ml_genre_list_release(p_genre_list);
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListUpdated object:self];
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)listOfGenres
+{
+    if (!_cachedGenres) {
+        [self updateCachedListOfGenres];
+    }
+    return _cachedGenres;
 }
 
 - (size_t)numberOfVideoMedia
@@ -165,7 +251,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [self updateCachedListOfVideoMedia];
         });
     }
-
     return _cachedVideoMedia.count;
 }
 
@@ -192,7 +277,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [self updateCachedListOfVideoMedia];
         });
     }
-
     return _cachedVideoMedia;
 }
 
@@ -222,7 +306,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [self updateCachedListOfRecentMedia];
         });
     }
-
     return _cachedRecentMedia.count;
 }
 
@@ -233,7 +316,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [self updateCachedListOfRecentMedia];
         });
     }
-
     return _cachedRecentMedia;
 }
 
@@ -255,6 +337,21 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 
     vlc_ml_entry_point_list_release(pp_entrypoints);
+    return [mutableArray copy];
+}
+
+- (nullable NSArray <VLCMediaLibraryAlbum *>*)listAlbumsOfParentType:(enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
+{
+    vlc_ml_album_list_t *p_albumList = vlc_ml_list_albums_of(_p_mediaLibrary, NULL, parentType, ID);
+    if (p_albumList == NULL) {
+        return nil;
+    }
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_albumList->i_nb_items];
+    for (size_t x = 0; x < p_albumList->i_nb_items; x++) {
+        VLCMediaLibraryAlbum *album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:&p_albumList->p_items[x]];
+        [mutableArray addObject:album];
+    }
+    vlc_ml_album_list_release(p_albumList);
     return [mutableArray copy];
 }
 
