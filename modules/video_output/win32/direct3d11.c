@@ -1163,12 +1163,10 @@ static bool canHandleConversion(const dxgi_color_space *src, const dxgi_color_sp
 static void SelectSwapchainColorspace(struct d3d11_local_swapchain *display, const struct direct3d_cfg_t *cfg)
 {
     HRESULT hr;
-    int best = -1;
+    int best = 0;
     int score, best_score = 0;
     UINT support;
     IDXGISwapChain3 *dxgiswapChain3 = NULL;
-    display->colorspace = &color_spaces[0];
-
     hr = IDXGISwapChain_QueryInterface( display->dxgiswapChain, &IID_IDXGISwapChain3, (void **)&dxgiswapChain3);
     if (FAILED(hr)) {
         msg_Warn(display->obj, "could not get a IDXGISwapChain3");
@@ -1177,6 +1175,7 @@ static void SelectSwapchainColorspace(struct d3d11_local_swapchain *display, con
 
     /* pick the best output based on color support and transfer */
     /* TODO support YUV output later */
+    best = -1;
     for (int i=0; color_spaces[i].name; ++i)
     {
         hr = IDXGISwapChain3_CheckColorSpaceSupport(dxgiswapChain3, color_spaces[i].dxgi, &support);
@@ -1246,13 +1245,11 @@ static void SelectSwapchainColorspace(struct d3d11_local_swapchain *display, con
 
     hr = IDXGISwapChain3_SetColorSpace1(dxgiswapChain3, color_spaces[best].dxgi);
     if (SUCCEEDED(hr))
-    {
-        display->colorspace = &color_spaces[best];
-        msg_Dbg(display->obj, "using colorspace %s", display->colorspace->name);
-    }
+        msg_Dbg(display->obj, "using colorspace %s", color_spaces[best].name);
     else
-        msg_Err(display->obj, "Failed to set colorspace %s. (hr=0x%lX)", display->colorspace->name, hr);
+        msg_Err(display->obj, "Failed to set colorspace %s. (hr=0x%lX)", color_spaces[best].name, hr);
 done:
+    display->colorspace = &color_spaces[best];
     if (dxgiswapChain3)
         IDXGISwapChain3_Release(dxgiswapChain3);
 }
