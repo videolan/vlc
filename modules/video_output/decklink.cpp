@@ -52,6 +52,11 @@
 #include "../stream_out/sdi/DBMHelper.hpp"
 #include "../stream_out/sdi/SDIGenerator.hpp"
 #include <DeckLinkAPIDispatch.cpp>
+#include <DeckLinkAPIVersion.h>
+#if BLACKMAGIC_DECKLINK_API_VERSION < 0x0b010000
+ #define IID_IDeckLinkProfileAttributes IID_IDeckLinkAttributes
+ #define IDeckLinkProfileAttributes IDeckLinkAttributes
+#endif
 
 #define FRAME_SIZE 1920
 #define CHANNELS_MAX 6
@@ -418,9 +423,9 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
     IDeckLinkIterator *decklink_iterator = NULL;
     IDeckLinkDisplayMode *p_display_mode = NULL;
     IDeckLinkConfiguration *p_config = NULL;
-    IDeckLinkAttributes *p_attributes = NULL;
+    IDeckLinkProfileAttributes *p_attributes = NULL;
     IDeckLink *p_card = NULL;
-    BMDDisplayMode wanted_mode_id = bmdDisplayModeNotSupported;
+    BMDDisplayMode wanted_mode_id = bmdModeUnknown;
 
     vlc_mutex_lock(&sys->lock);
 
@@ -480,7 +485,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
 
     /* Read attributes */
 
-    result = p_card->QueryInterface(IID_IDeckLinkAttributes, (void**)&p_attributes);
+    result = p_card->QueryInterface(IID_IDeckLinkProfileAttributes, (void**)&p_attributes);
     CHECK("Could not get IDeckLinkAttributes");
 
     int64_t vconn;
@@ -520,6 +525,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
         BMDDisplayMode modenl = htonl(mode_id);
         msg_Dbg(vd, "Selected mode '%4.4s'", (char *) &modenl);
 
+        BMDPixelFormat pixelFormat = sys->video.tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV;
         BMDVideoOutputFlags flags = bmdVideoOutputVANC;
         if (mode_id == bmdModeNTSC ||
             mode_id == bmdModeNTSC2398 ||
@@ -527,15 +533,25 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
         {
             flags = bmdVideoOutputVITC;
         }
-
-        BMDDisplayModeSupport support;
-        IDeckLinkDisplayMode *resultMode;
-
+        bool supported;
+#if BLACKMAGIC_DECKLINK_API_VERSION < 0x0b010000
+        BMDDisplayModeSupport support = bmdDisplayModeNotSupported;
         result = sys->p_output->DoesSupportVideoMode(mode_id,
-                                                              sys->video.tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV,
-                                                              flags, &support, &resultMode);
+                                                pixelFormat,
+                                                flags,
+                                                &support,
+                                                NULL);
+        supported = (support != bmdDisplayModeNotSupported);
+#else
+        result = sys->p_output->DoesSupportVideoMode(vconn,
+                                                mode_id,
+                                                pixelFormat,
+                                                bmdSupportedVideoModeDefault,
+                                                NULL,
+                                                &supported);
+#endif
         CHECK("Does not support video mode");
-        if (support == bmdDisplayModeNotSupported)
+        if (!supported)
         {
             msg_Err(vd, "Video mode not supported");
             goto error;

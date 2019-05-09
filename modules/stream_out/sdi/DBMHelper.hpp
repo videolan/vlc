@@ -29,7 +29,7 @@ namespace Decklink
             static IDeckLinkDisplayMode * MatchDisplayMode(vlc_object_t *,
                                                            IDeckLinkOutput *,
                                                            const video_format_t *,
-                                                           BMDDisplayMode = bmdDisplayModeNotSupported);
+                                                           BMDDisplayMode = bmdModeUnknown);
             static const char *ErrorToString(long i_code);
     };
 }

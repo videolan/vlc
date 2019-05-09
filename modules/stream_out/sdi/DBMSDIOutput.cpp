@@ -37,6 +37,11 @@
 #include "V210.hpp"
 
 #include <DeckLinkAPIDispatch.cpp>
+#include <DeckLinkAPIVersion.h>
+#if BLACKMAGIC_DECKLINK_API_VERSION < 0x0b010000
+ #define IID_IDeckLinkProfileAttributes IID_IDeckLinkAttributes
+ #define IDeckLinkProfileAttributes IDeckLinkAttributes
+#endif
 
 #include "sdiout.hpp"
 
@@ -176,7 +181,7 @@ error:
 int DBMSDIOutput::ConfigureAudio(const audio_format_t *)
 {
     HRESULT result;
-    IDeckLinkAttributes *p_attributes = NULL;
+    IDeckLinkProfileAttributes *p_attributes = NULL;
 
     if(FAKE_DRIVER)
         return VLC_SUCCESS;
@@ -191,7 +196,7 @@ int DBMSDIOutput::ConfigureAudio(const audio_format_t *)
     {
         uint8_t maxchannels = audioMultiplex->config.getMultiplexedFramesCount() * 2;
 
-        result = p_card->QueryInterface(IID_IDeckLinkAttributes, (void**)&p_attributes);
+        result = p_card->QueryInterface(IID_IDeckLinkProfileAttributes, (void**)&p_attributes);
         CHECK("Could not get IDeckLinkAttributes");
 
         int64_t i64;
@@ -249,9 +254,9 @@ static BMDVideoConnection getVConn(const char *psz)
 int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
 {
     HRESULT result;
-    BMDDisplayMode wanted_mode_id = bmdDisplayModeNotSupported;
+    BMDDisplayMode wanted_mode_id = bmdModeUnknown;
     IDeckLinkConfiguration *p_config = NULL;
-    IDeckLinkAttributes *p_attributes = NULL;
+    IDeckLinkProfileAttributes *p_attributes = NULL;
     IDeckLinkDisplayMode *p_display_mode = NULL;
     char *psz_string = NULL;
     video_format_t *fmt = &video.configuredfmt.video;
@@ -296,7 +301,7 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
     }
 
     /* Read attributes */
-    result = p_card->QueryInterface(IID_IDeckLinkAttributes, (void**)&p_attributes);
+    result = p_card->QueryInterface(IID_IDeckLinkProfileAttributes, (void**)&p_attributes);
     CHECK("Could not get IDeckLinkAttributes");
 
     int64_t vconn;
@@ -328,22 +333,33 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
         BMDDisplayMode modenl = htonl(mode_id);
         msg_Dbg(p_stream, "Selected mode '%4.4s'", (char *) &modenl);
 
+        BMDPixelFormat pixelFormat = video.tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV;
         BMDVideoOutputFlags flags = bmdVideoOutputVANC;
         if (mode_id == bmdModeNTSC ||
-                mode_id == bmdModeNTSC2398 ||
-                mode_id == bmdModePAL)
+            mode_id == bmdModeNTSC2398 ||
+            mode_id == bmdModePAL)
         {
             flags = bmdVideoOutputVITC;
         }
-
-        BMDDisplayModeSupport support;
-        IDeckLinkDisplayMode *resultMode;
-
+        bool supported;
+#if BLACKMAGIC_DECKLINK_API_VERSION < 0x0b010000
+        BMDDisplayModeSupport support = bmdDisplayModeNotSupported;
         result = p_output->DoesSupportVideoMode(mode_id,
-                                                video.tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV,
-                                                flags, &support, &resultMode);
+                                                pixelFormat,
+                                                flags,
+                                                &support,
+                                                NULL);
+        supported = (support != bmdDisplayModeNotSupported);
+#else
+        result = p_output->DoesSupportVideoMode(vconn,
+                                                mode_id,
+                                                pixelFormat,
+                                                bmdSupportedVideoModeDefault,
+                                                NULL,
+                                                &supported);
+#endif
         CHECK("Does not support video mode");
-        if (support == bmdDisplayModeNotSupported)
+        if (!supported)
         {
             msg_Err(p_stream, "Video mode not supported");
             goto error;

@@ -83,7 +83,7 @@ IDeckLinkDisplayMode * Helper::MatchDisplayMode(vlc_object_t *p_obj,
                     continue;
                 }
 
-                if(forcedmode != bmdDisplayModeNotSupported && unlikely(!p_selected))
+                if(forcedmode != bmdModeUnknown && unlikely(!p_selected))
                 {
                     BMDDisplayMode modenl = htonl(forcedmode);
                     msg_Dbg(p_obj, "Forced mode '%4.4s'", (char *)&modenl);
@@ -94,7 +94,7 @@ IDeckLinkDisplayMode * Helper::MatchDisplayMode(vlc_object_t *p_obj,
                     continue;
                 }
 
-                if(p_selected == NULL && forcedmode == bmdDisplayModeNotSupported)
+                if(p_selected == NULL && forcedmode == bmdModeUnknown)
                 {
                     if(i_width >> i_div == p_mode->GetWidth() >> i_div &&
                        i_height >> i_div == p_mode->GetHeight() >> i_div)
