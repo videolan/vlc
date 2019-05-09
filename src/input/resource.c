@@ -58,6 +58,7 @@ struct input_resource_t
 
     sout_instance_t *p_sout;
     vout_thread_t   *p_vout_free;
+    vout_thread_t   *p_vout_dummy;
     bool             b_vout_free_paused;
 
     /* This lock is used to protect vout resources access (for hold)
@@ -293,6 +294,13 @@ input_resource_t *input_resource_New( vlc_object_t *p_parent )
     if( !p_resource )
         return NULL;
 
+    p_resource->p_vout_dummy = vout_CreateDummy(p_parent);
+    if( !p_resource->p_vout_dummy )
+    {
+        free( p_resource );
+        return NULL;
+    }
+
     vlc_atomic_rc_init( &p_resource->rc );
     p_resource->p_parent = p_parent;
     vlc_mutex_init( &p_resource->lock );
@@ -312,6 +320,7 @@ void input_resource_Release( input_resource_t *p_resource )
 
     vlc_mutex_destroy( &p_resource->lock_hold );
     vlc_mutex_destroy( &p_resource->lock );
+    vout_Release( p_resource->p_vout_dummy );
     free( p_resource );
 }
 
@@ -395,7 +404,12 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
         cfg = &cfg_buf;
 
         if (cfg_buf.vout == NULL) {
-            cfg_buf.vout = vout = vout_Create(p_resource->p_parent);
+            /* Use the dummy vout as the parent of the future main vout. This
+             * will allow the future vout to inherit all parameters
+             * pre-configured on this dummy vout. */
+            vlc_object_t *parent = p_resource->i_vout == 0 ?
+                VLC_OBJECT(p_resource->p_vout_dummy) : p_resource->p_parent;
+            cfg_buf.vout = vout = vout_Create(parent);
             if (vout == NULL)
                 goto out;
 
@@ -408,12 +422,10 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
 
 #ifndef NDEBUG
     {
-        vlc_mutex_lock(&p_resource->lock_hold);
         int index;
         TAB_FIND(p_resource->i_vout, p_resource->pp_vout, cfg->vout, index );
         assert(index >= 0);
         assert(p_resource->p_vout_free == NULL);
-        vlc_mutex_unlock(&p_resource->lock_hold);
     }
 #endif
 
@@ -447,6 +459,11 @@ vout_thread_t *input_resource_HoldVout( input_resource_t *p_resource )
     vlc_mutex_unlock( &p_resource->lock_hold );
 
     return p_vout;
+}
+
+vout_thread_t *input_resource_HoldDummyVout( input_resource_t *p_resource )
+{
+    return vout_Hold(p_resource->p_vout_dummy);
 }
 
 void input_resource_HoldVouts( input_resource_t *p_resource, vout_thread_t ***ppp_vout,
