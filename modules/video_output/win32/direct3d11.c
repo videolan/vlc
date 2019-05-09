@@ -192,9 +192,11 @@ static int Control(vout_display_t *, int, va_list);
 
 static void SelectSwapchainColorspace(struct d3d11_local_swapchain *, const struct direct3d_cfg_t *);
 
-static int UpdateDisplayFormat(vout_display_t *vd, struct output_cfg_t *out)
+static int UpdateDisplayFormat(vout_display_t *vd, struct output_cfg_t *out,
+                               const video_format_t *input_fmt)
 {
     vout_display_sys_t *sys = vd->sys;
+    display_info_t new_display = { 0 };
 
     for (const d3d_format_t *output_format = GetRenderFormatList();
          output_format->name != NULL; ++output_format)
@@ -202,34 +204,50 @@ static int UpdateDisplayFormat(vout_display_t *vd, struct output_cfg_t *out)
         if (output_format->formatTexture == (DXGI_FORMAT)out->surface_format &&
             !is_d3d11_opaque(output_format->fourcc))
         {
-            sys->display.pixelFormat = output_format;
+            new_display.pixelFormat = output_format;
             break;
         }
     }
-    if (unlikely(sys->display.pixelFormat == NULL))
+    if (unlikely(new_display.pixelFormat == NULL))
     {
         msg_Err(vd, "Could not find the output format.");
         return VLC_EGENERIC;
     }
 
-    sys->display.color = out->colorspace;
-    sys->display.transfer = out->transfer;
-    sys->display.primaries = out->primaries;
-    sys->display.b_full_range = out->full_range;
+    new_display.color = out->colorspace;
+    new_display.transfer = out->transfer;
+    new_display.primaries = out->primaries;
+    new_display.b_full_range = out->full_range;
 
     /* guestimate the display peak luminance */
-    switch (sys->display.transfer)
+    switch (out->transfer)
     {
     case TRANSFER_FUNC_LINEAR:
     case TRANSFER_FUNC_SRGB:
-        sys->display.luminance_peak = DEFAULT_SRGB_BRIGHTNESS;
+        new_display.luminance_peak = DEFAULT_SRGB_BRIGHTNESS;
         break;
     case TRANSFER_FUNC_SMPTE_ST2084:
-        sys->display.luminance_peak = MAX_PQ_BRIGHTNESS;
+        new_display.luminance_peak = MAX_PQ_BRIGHTNESS;
         break;
     default:
-        sys->display.luminance_peak = DEFAULT_SRGB_BRIGHTNESS;
+        new_display.luminance_peak = DEFAULT_SRGB_BRIGHTNESS;
         break;
+    }
+
+    if ( sys->display.pixelFormat == NULL ||
+         ( sys->display.pixelFormat    != new_display.pixelFormat ||
+           sys->display.luminance_peak != new_display.luminance_peak ||
+           sys->display.color          != new_display.color ||
+           sys->display.transfer       != new_display.transfer ||
+           sys->display.primaries      != new_display.primaries ||
+           sys->display.b_full_range   != new_display.b_full_range ))
+    {
+        sys->display = new_display;
+        /* TODO release the pixel shaders if the format changed */
+        if (Direct3D11CreateFormatResources(vd, input_fmt)) {
+            msg_Err(vd, "Failed to allocate format resources");
+            return VLC_EGENERIC;
+        }
     }
 
     return VLC_SUCCESS;
@@ -285,7 +303,7 @@ static int QueryDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
         return VLC_EGENERIC;
     }
 
-    return UpdateDisplayFormat(vd, &out);
+    return UpdateDisplayFormat(vd, &out, fmt);
 }
 
 static void UpdateSize(vout_display_t *vd)
@@ -647,10 +665,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
             goto error;
         sys->internal_swapchain.swapchainHwnd = sys->sys.hvideownd;
 #endif /* !VLC_WINSTORE_APP */
-    }
-    else
-    {
-        CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
     }
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
@@ -1363,15 +1377,31 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
         }
     }
 
+    /* adjust the decoder sizes to have proper padding */
+    sys->picQuad.i_width  = fmt.i_width;
+    sys->picQuad.i_height = fmt.i_height;
+    if (!sys->legacy_shader && is_d3d11_opaque(fmt.i_chroma))
+    {
+        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x7F) & ~0x7F;
+        sys->picQuad.i_height = (sys->picQuad.i_height + 0x7F) & ~0x7F;
+    }
+    else
+    if ( sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
+         sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
+    {
+        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
+        sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
+    }
+
+    sys->area.texture_source.i_width  = sys->picQuad.i_width;
+    sys->area.texture_source.i_height = sys->picQuad.i_height;
+
+    CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
+
     err = QueryDisplayFormat(vd, &fmt);
     if (err != VLC_SUCCESS) {
         msg_Err(vd, "Could not update the backbuffer");
         return err;
-    }
-
-    if (Direct3D11CreateFormatResources(vd, &fmt)) {
-        msg_Err(vd, "Failed to allocate format resources");
-        return VLC_EGENERIC;
     }
 
     if (Direct3D11CreateGenericResources(vd)) {
@@ -1582,26 +1612,6 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
-
-    sys->picQuad.i_width  = fmt->i_width;
-    sys->picQuad.i_height = fmt->i_height;
-    if (!sys->legacy_shader && is_d3d11_opaque(fmt->i_chroma))
-    {
-        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x7F) & ~0x7F;
-        sys->picQuad.i_height = (sys->picQuad.i_height + 0x7F) & ~0x7F;
-    }
-    else
-    if ( sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
-         sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
-    {
-        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
-        sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
-    }
-
-    sys->area.texture_source.i_width  = sys->picQuad.i_width;
-    sys->area.texture_source.i_height = sys->picQuad.i_height;
-
-    CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
 
     if (D3D11_AllocateQuad(vd, &sys->d3d_dev, vd->source.projection_mode, &sys->picQuad) != VLC_SUCCESS)
     {
