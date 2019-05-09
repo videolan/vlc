@@ -204,6 +204,13 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd, const video_format_t *fmt)
         }
         break;
     }
+    cfg.full_range = fmt->color_range == COLOR_RANGE_FULL ||
+                     /* the YUV->RGB conversion already output full range */
+                     is_d3d11_opaque(fmt->i_chroma) ||
+                     vlc_fourcc_IsYUV(fmt->i_chroma);
+    cfg.primaries  = fmt->primaries;
+    cfg.colorspace = fmt->space;
+    cfg.transfer   = fmt->transfer;
 
     struct output_cfg_t out;
     if (!sys->updateOutputCb( sys->outside_opaque, &cfg, &out ))
@@ -485,6 +492,10 @@ static bool LocalSwapchainUpdateOutput( void *opaque, const struct direct3d_cfg_
     if ( !UpdateSwapchain( vd, cfg ) )
         return -1;
     out->surface_format = vd->sys->display.pixelFormat->formatTexture;
+    out->full_range     = vd->sys->display.colorspace->b_full_range;
+    out->colorspace     = vd->sys->display.colorspace->color;
+    out->primaries      = vd->sys->display.colorspace->primaries;
+    out->transfer       = vd->sys->display.colorspace->transfer;
     return true;
 }
 

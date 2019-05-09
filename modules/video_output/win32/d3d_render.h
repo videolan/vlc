@@ -35,10 +35,18 @@ struct direct3d_cfg_t {
     unsigned width;
     unsigned height;
     unsigned bitdepth;
+    bool full_range;          /** video is full range or studio/limited range */
+    video_color_space_t colorspace;                     /** video color space */
+    video_color_primaries_t        primaries;       /** video color primaries */
+    video_transfer_func_t        transfer;        /** video transfer function */
 };
 
 struct output_cfg_t {
     int surface_format;
+    bool full_range;          /** video is full range or studio/limited range */
+    video_color_space_t colorspace;                     /** video color space */
+    video_color_primaries_t        primaries;       /** video color primaries */
+    video_transfer_func_t        transfer;        /** video transfer function */
 };
 
 typedef bool (*d3d_device_setup_cb)(void* opaque, const struct device_cfg_t*, struct device_setup_t* );

@@ -599,6 +599,11 @@ static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt)
         break;
     }
 
+    cfg.full_range = fmt->color_range == COLOR_RANGE_FULL;
+    cfg.primaries  = fmt->primaries;
+    cfg.colorspace = fmt->space;
+    cfg.transfer   = fmt->transfer;
+
     struct output_cfg_t out;
     if (!sys->updateOutputCb( sys->outside_opaque, &cfg, &out ))
     {
