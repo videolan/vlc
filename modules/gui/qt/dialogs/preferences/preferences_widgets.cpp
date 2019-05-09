@@ -389,6 +389,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
     combo->setMinimumWidth( MINWIDTH_BOX );
     combo->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
 
+    /* needed to see update from getting choice list where callback used */
     module_config_t *p_module_config = config_FindConfig( p_item->psz_name );
 
     finish( p_module_config );
@@ -413,6 +414,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
     combo = _combo;
     label = _label;
 
+    /* needed to see update from getting choice list where callback used */
     module_config_t *p_module_config = config_FindConfig( getName() );
 
     finish( p_module_config );
@@ -850,6 +852,7 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
     combo = new QComboBox( p );
     combo->setMinimumWidth( MINWIDTH_BOX );
 
+    /* needed to see update from getting choice list where callback used */
     module_config_t *p_module_config = config_FindConfig( p_item->psz_name );
 
     finish( p_module_config );
@@ -868,6 +871,7 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
     combo = _combo;
     label = _label;
 
+    /* needed to see update from getting choice list where callback used */
     module_config_t *p_module_config = config_FindConfig( getName() );
 
     finish( p_module_config );
