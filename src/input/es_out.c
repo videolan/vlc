@@ -2944,17 +2944,6 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         return i_ret;
     }
 
-    case ES_OUT_GET_ES_OBJECTS_BY_ID:
-    {
-        const int i_id = va_arg( args, int );
-        es_out_id_t *p_es = EsOutGetFromID( out, i_id );
-        if( !p_es )
-            return VLC_EGENERIC;
-
-        *va_arg( args, vlc_object_t ** ) = VLC_OBJECT(p_es->p_dec);
-        return VLC_SUCCESS;
-    }
-
     case ES_OUT_GET_BUFFERING:
     {
         bool *pb = va_arg( args, bool* );
