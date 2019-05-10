@@ -2006,7 +2006,8 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, stime_t i_scaled
     if( !b_found )
     {
         msg_Dbg( p_demux, "Seek():cannot find a time position." );
-        vlc_stream_Seek( p_sys->stream, i_initial_pos );
+        if( vlc_stream_Seek( p_sys->stream, i_initial_pos ) != VLC_SUCCESS )
+            msg_Err( p_demux, "Can't seek back to %" PRIu64, i_initial_pos );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
