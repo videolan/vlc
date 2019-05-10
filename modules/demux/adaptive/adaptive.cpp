@@ -160,6 +160,7 @@ static int Open(vlc_object_t *p_obj)
     AbstractAdaptationLogic::LogicType logic = AbstractAdaptationLogic::Default;
     if( psz_logic )
     {
+        bool b_found = false;
         for(size_t i=0;i<ARRAY_SIZE(pi_logics); i++)
         {
             if(!strcmp(psz_logic, ppsz_logics_values[i]))
@@ -168,6 +169,8 @@ static int Open(vlc_object_t *p_obj)
                 break;
             }
         }
+        if(!b_found)
+            msg_Err(p_demux, "Unknown adaptive-logic value '%s'", psz_logic);
         free( psz_logic );
     }
 
