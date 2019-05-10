@@ -529,6 +529,7 @@ static int write_meta(struct vlc_memstream *stream, input_item_t *item,
     return 0;
 }
 
+/* FIXME: replace input_thread_t by vlc_player_t */
 char *vlc_strfinput(input_thread_t *input, input_item_t *item, const char *s)
 {
     struct vlc_memstream stream[1];
@@ -759,12 +760,14 @@ char *vlc_strfinput(input_thread_t *input, input_item_t *item, const char *s)
 
                 if (input != NULL)
                 {
+#if 0 /* cf. FIXME */
                     audio_output_t *aout = input_GetAout(input);
                     if (aout != NULL)
                     {
                         vol = aout_VolumeGet(aout);
                         aout_Release(aout);
                     }
+#endif
                 }
                 if (vol >= 0.f)
                     vlc_memstream_printf(stream, "%ld", lroundf(vol * 256.f));
