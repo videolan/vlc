@@ -552,15 +552,6 @@ enum input_query_e
     /** Activate disc Root Menu. res=can fail */
     INPUT_NAV_MENU,
 
-    /* bookmarks */
-    INPUT_GET_BOOKMARK,    /* arg1= seekpoint_t *               res=can fail */
-    INPUT_GET_BOOKMARKS,   /* arg1= seekpoint_t *** arg2= int * res=can fail */
-    INPUT_CLEAR_BOOKMARKS, /* res=can fail */
-    INPUT_ADD_BOOKMARK,    /* arg1= seekpoint_t *  res=can fail   */
-    INPUT_CHANGE_BOOKMARK, /* arg1= seekpoint_t * arg2= int * res=can fail   */
-    INPUT_DEL_BOOKMARK,    /* arg1= seekpoint_t *  res=can fail   */
-    INPUT_SET_BOOKMARK,    /* arg1= int  res=can fail    */
-
     /* On the fly input slave */
     INPUT_ADD_SLAVE,       /* arg1= enum slave_type, arg2= const char *,
                             * arg3= bool forced, arg4= bool notify,

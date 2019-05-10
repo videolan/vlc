@@ -330,8 +330,6 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     priv->is_stopped = false;
     priv->b_recording = false;
     priv->rate = 1.f;
-    memset( &priv->bookmark, 0, sizeof(priv->bookmark) );
-    TAB_INIT( priv->i_bookmark, priv->pp_bookmark );
     TAB_INIT( priv->i_attachment, priv->attachment );
     priv->attachment_demux = NULL;
     priv->p_sout   = NULL;
@@ -425,58 +423,6 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     priv->i_audio_delay =
         VLC_TICK_FROM_MS( var_GetInteger( p_input, "audio-desync" ) );
     priv->i_spu_delay = 0;
-
-    /* */
-    if( !priv->b_preparsing )
-    {
-        char *psz_bookmarks = var_GetNonEmptyString( p_input, "bookmarks" );
-        if( psz_bookmarks )
-        {
-            /* FIXME: have a common cfg parsing routine used by sout and others */
-            char *psz_parser, *psz_start, *psz_end;
-            psz_parser = psz_bookmarks;
-            while( (psz_start = strchr( psz_parser, '{' ) ) )
-            {
-                 seekpoint_t *p_seekpoint;
-                 char backup;
-                 psz_start++;
-                 psz_end = strchr( psz_start, '}' );
-                 if( !psz_end ) break;
-                 psz_parser = psz_end + 1;
-                 backup = *psz_parser;
-                 *psz_parser = 0;
-                 *psz_end = ',';
-
-                 p_seekpoint = vlc_seekpoint_New();
-
-                 if( unlikely( p_seekpoint == NULL ) )
-                     break;
-
-                 while( (psz_end = strchr( psz_start, ',' ) ) )
-                 {
-                     *psz_end = 0;
-                     if( !strncmp( psz_start, "name=", 5 ) )
-                     {
-                         free( p_seekpoint->psz_name );
-
-                         p_seekpoint->psz_name = strdup(psz_start + 5);
-                     }
-                     else if( !strncmp( psz_start, "time=", 5 ) )
-                     {
-                         p_seekpoint->i_time_offset = vlc_tick_from_sec(atof(psz_start + 5));
-                     }
-                     psz_start = psz_end + 1;
-                }
-                msg_Dbg( p_input, "adding bookmark: %s, time=%"PRId64,
-                                  p_seekpoint->psz_name,
-                                  p_seekpoint->i_time_offset );
-                input_Control( p_input, INPUT_ADD_BOOKMARK, p_seekpoint );
-                vlc_seekpoint_Delete( p_seekpoint );
-                *psz_parser = backup;
-            }
-            free( psz_bookmarks );
-        }
-    }
 
     /* Remove 'Now playing' info as it is probably outdated */
     input_item_SetNowPlaying( p_item, NULL );
@@ -737,9 +683,7 @@ static void MainLoopStatistics( input_thread_t *p_input )
     if( priv->stats != NULL )
         input_stats_Compute( priv->stats, &new_stats );
 
-    /* update current bookmark */
     vlc_mutex_lock( &priv->p_item->lock );
-    priv->bookmark.i_time_offset = i_time;
     if( priv->stats != NULL )
         *priv->p_item->p_stats = new_stats;
     vlc_mutex_unlock( &priv->p_item->lock );
@@ -1521,11 +1465,6 @@ static void End( input_thread_t * p_input )
         priv->attachment_demux = NULL;
     }
 
-    /* clean bookmarks */
-    for( int i = 0; i < priv->i_bookmark; ++i )
-        vlc_seekpoint_Delete( priv->pp_bookmark[i] );
-    TAB_CLEAN( priv->i_bookmark, priv->pp_bookmark );
-
     vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
 
     /* */
@@ -1587,8 +1526,7 @@ static size_t ControlGetReducedIndexLocked( input_thread_t *p_input )
               i_ct == INPUT_CONTROL_SET_TIME ||
               i_ct == INPUT_CONTROL_SET_PROGRAM ||
               i_ct == INPUT_CONTROL_SET_TITLE ||
-              i_ct == INPUT_CONTROL_SET_SEEKPOINT ||
-              i_ct == INPUT_CONTROL_SET_BOOKMARK ) )
+              i_ct == INPUT_CONTROL_SET_SEEKPOINT ) )
         {
             continue;
         }
@@ -1671,7 +1609,6 @@ static bool ControlIsSeekRequest( int i_type )
     case INPUT_CONTROL_SET_SEEKPOINT:
     case INPUT_CONTROL_SET_SEEKPOINT_NEXT:
     case INPUT_CONTROL_SET_SEEKPOINT_PREV:
-    case INPUT_CONTROL_SET_BOOKMARK:
     case INPUT_CONTROL_NAV_ACTIVATE:
     case INPUT_CONTROL_NAV_UP:
     case INPUT_CONTROL_NAV_DOWN:
@@ -2317,31 +2254,6 @@ static bool Control( input_thread_t *p_input,
             b_force_update = true;
             break;
 
-        case INPUT_CONTROL_SET_BOOKMARK:
-        {
-            vlc_tick_t time_offset = -1;
-            int bookmark = param.val.i_int;
-
-            vlc_mutex_lock( &priv->p_item->lock );
-            if( bookmark >= 0 && bookmark < priv->i_bookmark )
-            {
-                const seekpoint_t *p_bookmark = priv->pp_bookmark[bookmark];
-                time_offset = p_bookmark->i_time_offset;
-            }
-            vlc_mutex_unlock( &priv->p_item->lock );
-
-            if( time_offset < 0 )
-            {
-                msg_Err( p_input, "invalid bookmark %d", bookmark );
-                break;
-            }
-
-            b_force_update =
-                Control( p_input, INPUT_CONTROL_SET_TIME,
-                         (input_control_param_t) { .time.i_val = time_offset,
-                                                   .time.b_fast_seek = false } );
-            break;
-        }
         case INPUT_CONTROL_SET_RENDERER:
         {
 #ifdef ENABLE_SOUT
