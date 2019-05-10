@@ -84,10 +84,6 @@ enum {
 
 typedef struct
 {
-    /* playlist node */
-    input_thread_t **pp_input;
-    int i_input;
-
     char **ppsz_urls;
     int i_urls;
 
@@ -130,8 +126,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_urls = 0;
     p_sys->ppsz_urls = NULL;
-    p_sys->i_input = 0;
-    p_sys->pp_input = NULL;
     p_sys->pp_items = NULL;
     p_sys->i_items = 0;
     vlc_mutex_init( &p_sys->lock );
@@ -181,19 +175,6 @@ static void Close( vlc_object_t *p_this )
     vlc_cond_destroy( &p_sys->wait );
     vlc_mutex_destroy( &p_sys->lock );
 
-    for( int i = 0; i < p_sys->i_input; i++ )
-    {
-        input_thread_t *p_input = p_sys->pp_input[i];
-        if( !p_input )
-            continue;
-
-        input_Stop( p_input );
-        input_Close( p_input );
-
-        p_sys->pp_input[i] = NULL;
-    }
-    free( p_sys->pp_input );
-
     for( int i = 0; i < p_sys->i_urls; i++ )
          free( p_sys->ppsz_urls[i] );
     free( p_sys->ppsz_urls );
@@ -209,19 +190,6 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Run: main thread
  *****************************************************************************/
-static input_thread_t *InputCreateAndStart( services_discovery_t *sd,
-                                            input_item_t *item )
-{
-    input_thread_t *input = input_Create( sd, input_LegacyEvents, NULL, item, NULL, NULL );
-    if( input != NULL && input_Start( input ) )
-    {
-        input_LegacyVarInit( input );
-        input_Close(input);
-        input = NULL;
-    }
-    return input;
-}
-
 noreturn static void *Run( void *data )
 {
     services_discovery_t *p_sd = data;
@@ -249,21 +217,6 @@ noreturn static void *Run( void *data )
 
         p_sys->b_update = false;
 
-        for( int i = 0; i < p_sys->i_input; i++ )
-        {
-            input_thread_t *p_input = p_sys->pp_input[i];
-            int state = var_GetInteger( p_input, "state" );
-
-            if( state == END_S || state == ERROR_S )
-            {
-                input_Stop( p_input );
-                input_Close( p_input );
-
-                p_sys->pp_input[i] = NULL;
-                TAB_ERASE(p_sys->i_input, p_sys->pp_input, i);
-                i--;
-            }
-        }
         vlc_restorecancel (canc);
     }
     vlc_cleanup_pop();
@@ -339,9 +292,6 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
 
             TAB_APPEND( i_new_items, pp_new_items, p_input );
             services_discovery_AddItem( p_sd, p_input );
-
-            TAB_APPEND( p_sys->i_input, p_sys->pp_input,
-                         InputCreateAndStart( p_sd, p_input ) );
         }
         else
         {
@@ -417,8 +367,6 @@ static void ParseRequest( services_discovery_t *p_sd )
             TAB_APPEND( p_sys->i_items, p_sys->pp_items, p_input );
             services_discovery_AddItem( p_sd, p_input );
 
-            TAB_APPEND( p_sys->i_input, p_sys->pp_input,
-                        InputCreateAndStart( p_sd, p_input ) );
             SaveUrls( p_sd );
         }
     }
