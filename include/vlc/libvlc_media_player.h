@@ -820,7 +820,7 @@ void libvlc_audio_set_volume_callback( libvlc_media_player_t *mp,
  * \param channels channels count [IN/OUT]
  * \return 0 on success, anything else to skip audio playback
  */
-typedef int (*libvlc_audio_setup_cb)(void **data, char *format, unsigned *rate,
+typedef int (*libvlc_audio_setup_cb)(void **opaque, char *format, unsigned *rate,
                                      unsigned *channels);
 
 /**
