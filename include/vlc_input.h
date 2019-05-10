@@ -552,11 +552,6 @@ enum input_query_e
     /** Activate disc Root Menu. res=can fail */
     INPUT_NAV_MENU,
 
-    /* On the fly input slave */
-    INPUT_ADD_SLAVE,       /* arg1= enum slave_type, arg2= const char *,
-                            * arg3= bool forced, arg4= bool notify,
-                            * arg5= bool check_extension */
-
     /* Viewpoint */
     INPUT_UPDATE_VIEWPOINT, /* arg1=(const vlc_viewpoint_t*), arg2=bool b_absolute */
     INPUT_SET_INITIAL_VIEWPOINT, /* arg1=(const vlc_viewpoint_t*) */
@@ -651,14 +646,6 @@ static inline vout_thread_t *input_GetVout( input_thread_t *p_input )
      p_vout = (i_vout >= 1) ? pp_vout[0] : NULL;
      free( pp_vout );
      return p_vout;
-}
-
-static inline int input_AddSlave( input_thread_t *p_input, enum slave_type type,
-                                  const char *psz_uri, bool b_forced,
-                                  bool b_notify, bool b_check_ext )
-{
-    return input_Control( p_input, INPUT_ADD_SLAVE, type, psz_uri, b_forced,
-                          b_notify, b_check_ext );
 }
 
 /**

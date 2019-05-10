@@ -2118,7 +2118,7 @@ vlc_player_AddAssociatedMedia(vlc_player_t *player,
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
 
-    if (!input)
+    if (!input || !uri)
         return VLC_EGENERIC;
 
     enum slave_type type;
@@ -2133,7 +2133,33 @@ vlc_player_AddAssociatedMedia(vlc_player_t *player,
         default:
             return VLC_EGENERIC;
     }
-    return input_AddSlave(input->thread, type, uri, select, notify, check_ext);
+
+    if (check_ext && type == SLAVE_TYPE_SPU && !subtitles_Filter(uri))
+        return VLC_EGENERIC;
+
+    input_item_slave_t *slave =
+        input_item_slave_New(uri, type, SLAVE_PRIORITY_USER);
+    if (!slave)
+        return VLC_ENOMEM;
+    slave->b_forced = select;
+
+    vlc_value_t val = { .p_address = slave };
+    input_ControlPushHelper(input->thread, INPUT_CONTROL_ADD_SLAVE, &val);
+    if (notify)
+    {
+        switch( type )
+        {
+            case SLAVE_TYPE_AUDIO:
+                vlc_player_vout_OSDMessage(player, "%s",
+                                           vlc_gettext("Audio track added"));
+                break;
+            case SLAVE_TYPE_SPU:
+                vlc_player_vout_OSDMessage(player, "%s",
+                                vlc_gettext("Subtitle track added"));
+                break;
+        }
+    }
+    return VLC_SUCCESS;
 }
 
 void

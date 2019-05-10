@@ -81,50 +81,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                                + INPUT_CONTROL_NAV_ACTIVATE, NULL );
             return VLC_SUCCESS;
 
-        case INPUT_ADD_SLAVE:
-        {
-            enum slave_type type =  va_arg( args, enum slave_type );
-            psz = va_arg( args, char * );
-            b_bool = va_arg( args, int );
-            bool b_notify = va_arg( args, int );
-            bool b_check_ext = va_arg( args, int );
-
-            if( !psz || ( type != SLAVE_TYPE_SPU && type != SLAVE_TYPE_AUDIO ) )
-                return VLC_EGENERIC;
-            if( b_check_ext && type == SLAVE_TYPE_SPU &&
-                !subtitles_Filter( psz ) )
-                return VLC_EGENERIC;
-
-            input_item_slave_t *p_slave =
-                input_item_slave_New( psz, type, SLAVE_PRIORITY_USER );
-            if( !p_slave )
-                return VLC_ENOMEM;
-            p_slave->b_forced = b_bool;
-
-            val.p_address = p_slave;
-            input_ControlPushHelper( p_input, INPUT_CONTROL_ADD_SLAVE, &val );
-            if( b_notify )
-            {
-                vout_thread_t *p_vout = input_GetVout( p_input );
-                if( p_vout )
-                {
-                    switch( type )
-                    {
-                        case SLAVE_TYPE_AUDIO:
-                            vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s",
-                                            vlc_gettext("Audio track added"));
-                            break;
-                        case SLAVE_TYPE_SPU:
-                            vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s",
-                                            vlc_gettext("Subtitle track added"));
-                            break;
-                    }
-                    vout_Release(p_vout);
-                }
-            }
-            return VLC_SUCCESS;
-        }
-
         case INPUT_UPDATE_VIEWPOINT:
         case INPUT_SET_INITIAL_VIEWPOINT:
         {
