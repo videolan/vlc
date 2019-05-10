@@ -1750,9 +1750,9 @@ REPORT_LIST
 }
 
 static void
-ctx_init(struct ctx *ctx)
+ctx_init(struct ctx *ctx, bool use_outputs)
 {
-    static const char * argv[] = {
+    const char * argv[] = {
         "-v",
         "--ignore-config",
         "-Idummy",
@@ -1760,8 +1760,8 @@ ctx_init(struct ctx *ctx)
         /* Avoid leaks from various dlopen... */
         "--codec=araw,rawvideo,subsdec,none",
         "--dec-dev=none",
-        "--vout=dummy",
-        "--aout=dummy",
+        use_outputs ? "--vout=dummy" : "--vout=none",
+        use_outputs ? "--aout=dummy" : "--aout=none",
     };
     libvlc_instance_t *vlc = libvlc_new(ARRAY_SIZE(argv), argv);
     assert(vlc);
@@ -1809,7 +1809,7 @@ main(void)
 
     struct ctx ctx;
 
-    ctx_init(&ctx);
+    ctx_init(&ctx, true);
 
     test_outputs(&ctx); /* Must be the first test */
 
