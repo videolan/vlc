@@ -252,7 +252,6 @@ libvlccore_la_SOURCES = \
 	clock/clock_internal.c \
 	clock/input_clock.c \
 	clock/clock.c \
-	input/control.c \
 	input/decoder.c \
 	input/decoder_helpers.c \
 	input/demux.c \

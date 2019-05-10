@@ -159,7 +159,6 @@ image_HandlerDelete
 image_Mime2Fourcc
 image_Type2Fourcc
 InitMD5
-input_Control
 input_Create
 input_CreateFilename
 input_CreatePreparser
@@ -221,7 +220,6 @@ input_Start
 input_Stop
 input_Hold
 input_Release
-input_vaControl
 input_SetTime
 input_SetPosition
 vlc_readdir_helper_init

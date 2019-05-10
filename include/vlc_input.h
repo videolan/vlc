@@ -531,14 +531,6 @@ typedef void (*input_thread_events_cb)( input_thread_t *input,
                                         const struct vlc_input_event *event,
                                         void *userdata);
 
-/**
- * Input queries
- */
-enum input_query_e
-{
-    INPUT_DUMMY,
-};
-
 /** @}*/
 
 /*****************************************************************************
@@ -579,10 +571,6 @@ VLC_API void input_Stop( input_thread_t * );
 VLC_API int input_Read( vlc_object_t *, input_item_t *,
                         input_thread_events_cb, void * );
 #define input_Read(a,b,c,d) input_Read(VLC_OBJECT(a),b,c,d)
-
-VLC_API int input_vaControl( input_thread_t *, int i_query, va_list  );
-
-VLC_API int input_Control( input_thread_t *, int i_query, ...  );
 
 VLC_API void input_Close( input_thread_t * );
 

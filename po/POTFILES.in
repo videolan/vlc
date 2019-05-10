@@ -67,7 +67,6 @@ src/config/intf.c
 src/darwin/error.c
 src/extras/libc.c
 src/input/access.c
-src/input/control.c
 src/input/decoder.c
 src/input/decoder.h
 src/input/demux.c
