@@ -435,7 +435,7 @@ static const char *const direct_pred_list_text[] =
 static const int framepacking_list[] =
   { -1, 0, 1, 2, 3, 4, 5, 6 };
 static const char *const framepacking_list_text[] =
-  { "", N_("checkerboard"), N_("column alternation"), N_("row alternation"), N_("side by side"), N_("top bottom"), N_("frame alternation"), N_("2D") };
+  { N_("Unset"), N_("Checkerboard"), N_("Column alternation"), N_("Row alternation"), N_("Side by side"), N_("Top bottom"), N_("Frame alternation"), N_("2D") };
 
 vlc_module_begin ()
 #ifdef MODULE_NAME_IS_x26410b
