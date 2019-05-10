@@ -1626,7 +1626,7 @@ static int FindShadersCallback(const char *name, char ***values, char ***descs)
 
 }
 
-static bool LocalSwapchainSetupDevice( void *opaque, const struct device_cfg_t *cfg, struct device_setup_t *out )
+static bool LocalSwapchainSetupDevice( void **opaque, const struct device_cfg_t *cfg, struct device_setup_t *out )
 {
     return false; /* don't use an "external" D3D9 device */
 }
@@ -1702,7 +1702,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     };
     struct device_setup_t device_setup;
     IDirect3DDevice9 *d3d9_device = NULL;
-    if ( sys->setupDeviceCb( sys->outside_opaque, &surface_cfg, &device_setup ) )
+    if ( sys->setupDeviceCb( &sys->outside_opaque, &surface_cfg, &device_setup ) )
         d3d9_device = device_setup.device_context;
     if ( d3d9_device == NULL && sys->setupDeviceCb != LocalSwapchainSetupDevice )
     {

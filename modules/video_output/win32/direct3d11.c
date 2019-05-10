@@ -528,9 +528,9 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const struct
     return true;
 }
 
-static bool LocalSwapchainSetupDevice( void *opaque, const struct device_cfg_t *cfg, struct device_setup_t *out )
+static bool LocalSwapchainSetupDevice( void **opaque, const struct device_cfg_t *cfg, struct device_setup_t *out )
 {
-    struct d3d11_local_swapchain *display = opaque;
+    struct d3d11_local_swapchain *display = *opaque;
     HRESULT hr;
 #if VLC_WINSTORE_APP
     ID3D11DeviceContext *legacy_ctx = var_InheritInteger( display->obj, "winrt-d3dcontext" ); /* LEGACY */
@@ -1328,7 +1328,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
     };
     struct device_setup_t out;
     ID3D11DeviceContext *d3d11_ctx = NULL;
-    if ( sys->setupDeviceCb( sys->outside_opaque, &cfg, &out ) )
+    if ( sys->setupDeviceCb( &sys->outside_opaque, &cfg, &out ) )
         d3d11_ctx = out.device_context;
     if ( d3d11_ctx == NULL )
     {

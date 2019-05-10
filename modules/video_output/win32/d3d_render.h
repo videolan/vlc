@@ -49,7 +49,7 @@ struct output_cfg_t {
     video_transfer_func_t        transfer;        /** video transfer function */
 };
 
-typedef bool (*d3d_device_setup_cb)(void* opaque, const struct device_cfg_t*, struct device_setup_t* );
+typedef bool (*d3d_device_setup_cb)(void** opaque, const struct device_cfg_t*, struct device_setup_t* );
 typedef void (*d3d_device_cleanup_cb)(void* opaque);
 typedef bool (*d3d_update_output_cb)(void* opaque, const struct direct3d_cfg_t *cfg, struct output_cfg_t *out);
 typedef void (*d3d_swap_cb)(void* opaque);
