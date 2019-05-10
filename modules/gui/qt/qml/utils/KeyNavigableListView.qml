@@ -59,24 +59,20 @@ NavigableFocusScope {
 
     Component {
         id: sectionHeading
-        Rectangle {
+
+        Column {
             width: parent.width
-            height: childrenRect.height
 
-            Column {
+            Text {
+                text: section
+                font.pixelSize: VLCStyle.fontSize_xlarge
+                color: VLCStyle.colors.accent
+            }
+
+            Rectangle {
                 width: parent.width
-
-                Text {
-                    text: section
-                    font.pixelSize: 20
-                    color: VLCStyle.colors.accent
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: VLCStyle.colors.textInactive
-                }
+                height: 1
+                color: VLCStyle.colors.textInactive
             }
         }
     }
