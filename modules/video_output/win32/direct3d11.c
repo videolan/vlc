@@ -112,7 +112,9 @@ struct d3d11_local_swapchain
     const d3d_format_t     *pixelFormat;
     const dxgi_color_space *colorspace;
 
+#if !VLC_WINSTORE_APP
     HWND                   swapchainHwnd;
+#endif /* !VLC_WINSTORE_APP */
     IDXGISwapChain1        *dxgiswapChain;   /* DXGI 1.2 swap chain */
     IDXGISwapChain4        *dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
 
