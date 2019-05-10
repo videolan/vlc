@@ -552,10 +552,6 @@ enum input_query_e
     /** Activate disc Root Menu. res=can fail */
     INPUT_NAV_MENU,
 
-    /* Viewpoint */
-    INPUT_UPDATE_VIEWPOINT, /* arg1=(const vlc_viewpoint_t*), arg2=bool b_absolute */
-    INPUT_SET_INITIAL_VIEWPOINT, /* arg1=(const vlc_viewpoint_t*) */
-
     /* External clock managments */
     INPUT_GET_PCR_SYSTEM,   /* arg1=vlc_tick_t *, arg2=vlc_tick_t *       res=can fail */
     INPUT_MODIFY_PCR_SYSTEM,/* arg1=int absolute, arg2=vlc_tick_t   res=can fail */
@@ -619,24 +615,6 @@ VLC_API void input_SetPosition( input_thread_t *, float f_position, bool b_fast 
  * you do not need it anymore.
  */
 VLC_API input_item_t* input_GetItem( input_thread_t * ) VLC_USED;
-
-/**
- * Update the viewpoint of the input thread. The viewpoint will be applied to
- * all vouts and aouts.
- *
- * @param p_input an input thread
- * @param p_viewpoint the viewpoint value
- * @param b_absolute if true replace the old viewpoint with the new one. If
- * false, increase/decrease it.
- * @return VLC_SUCCESS or a VLC error code
- */
-static inline int input_UpdateViewpoint( input_thread_t *p_input,
-                                         const vlc_viewpoint_t *p_viewpoint,
-                                         bool b_absolute )
-{
-    return input_Control( p_input, INPUT_UPDATE_VIEWPOINT, p_viewpoint,
-                          b_absolute );
-}
 
 /**
  * \see input_clock_GetSystemOrigin

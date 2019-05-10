@@ -81,21 +81,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                                + INPUT_CONTROL_NAV_ACTIVATE, NULL );
             return VLC_SUCCESS;
 
-        case INPUT_UPDATE_VIEWPOINT:
-        case INPUT_SET_INITIAL_VIEWPOINT:
-        {
-            input_control_param_t param;
-            param.viewpoint = *va_arg( args, const vlc_viewpoint_t* );
-            if ( i_query == INPUT_SET_INITIAL_VIEWPOINT )
-                input_ControlPush( p_input, INPUT_CONTROL_SET_INITIAL_VIEWPOINT,
-                                   &param );
-            else if ( va_arg( args, int ) )
-                input_ControlPush( p_input, INPUT_CONTROL_SET_VIEWPOINT, &param);
-            else
-                input_ControlPush( p_input, INPUT_CONTROL_UPDATE_VIEWPOINT, &param );
-            return VLC_SUCCESS;
-        }
-
         case INPUT_GET_PCR_SYSTEM:
         {
             vlc_tick_t *pi_system = va_arg( args, vlc_tick_t * );
