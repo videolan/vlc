@@ -290,16 +290,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
-        case INPUT_GET_ES_OBJECTS:
-        {
-            const int i_id = va_arg( args, int );
-            vlc_object_t **pp_decoder = va_arg( args, vlc_object_t ** );
-
-            return es_out_Control( priv->p_es_out_display,
-                                   ES_OUT_GET_ES_OBJECTS_BY_ID, i_id,
-                                   pp_decoder );
-        }
-
         case INPUT_GET_PCR_SYSTEM:
         {
             vlc_tick_t *pi_system = va_arg( args, vlc_tick_t * );
