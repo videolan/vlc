@@ -639,7 +639,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     CommonInit(vd, &sys->area, cfg);
 
-    if (sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL)
+    if ( sys->setupDeviceCb == NULL || sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
         /* use our internal swapchain callbacks */
         sys->internal_swapchain.obj = VLC_OBJECT(vd);
