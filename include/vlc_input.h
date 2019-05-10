@@ -551,10 +551,6 @@ enum input_query_e
     INPUT_NAV_POPUP,
     /** Activate disc Root Menu. res=can fail */
     INPUT_NAV_MENU,
-
-    /* External clock managments */
-    INPUT_GET_PCR_SYSTEM,   /* arg1=vlc_tick_t *, arg2=vlc_tick_t *       res=can fail */
-    INPUT_MODIFY_PCR_SYSTEM,/* arg1=int absolute, arg2=vlc_tick_t   res=can fail */
 };
 
 /** @}*/
@@ -615,21 +611,6 @@ VLC_API void input_SetPosition( input_thread_t *, float f_position, bool b_fast 
  * you do not need it anymore.
  */
 VLC_API input_item_t* input_GetItem( input_thread_t * ) VLC_USED;
-
-/**
- * \see input_clock_GetSystemOrigin
- */
-static inline int input_GetPcrSystem( input_thread_t *p_input, vlc_tick_t *pi_system, vlc_tick_t *pi_delay )
-{
-    return input_Control( p_input, INPUT_GET_PCR_SYSTEM, pi_system, pi_delay );
-}
-/**
- * \see input_clock_ChangeSystemOrigin
- */
-static inline int input_ModifyPcrSystem( input_thread_t *p_input, bool b_absolute, vlc_tick_t i_system )
-{
-    return input_Control( p_input, INPUT_MODIFY_PCR_SYSTEM, b_absolute, i_system );
-}
 
 /* */
 VLC_API decoder_t * input_DecoderCreate( vlc_object_t *, const es_format_t *, input_resource_t * ) VLC_USED;
