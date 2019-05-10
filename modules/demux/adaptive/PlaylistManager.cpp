@@ -716,25 +716,26 @@ void PlaylistManager::updateControlsContentType()
 
 AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::LogicType type, AbstractConnectionManager *conn)
 {
+    vlc_object_t *obj = VLC_OBJECT(p_demux);
     AbstractAdaptationLogic *logic = NULL;
     switch(type)
     {
         case AbstractAdaptationLogic::FixedRate:
         {
             size_t bps = var_InheritInteger(p_demux, "adaptive-bw") * 8192;
-            logic = new (std::nothrow) FixedRateAdaptationLogic(bps);
+            logic = new (std::nothrow) FixedRateAdaptationLogic(obj, bps);
             break;
         }
         case AbstractAdaptationLogic::AlwaysLowest:
-            logic = new (std::nothrow) AlwaysLowestAdaptationLogic();
+            logic = new (std::nothrow) AlwaysLowestAdaptationLogic(obj);
             break;
         case AbstractAdaptationLogic::AlwaysBest:
-            logic = new (std::nothrow) AlwaysBestAdaptationLogic();
+            logic = new (std::nothrow) AlwaysBestAdaptationLogic(obj);
             break;
         case AbstractAdaptationLogic::RateBased:
         {
             RateBasedAdaptationLogic *ratelogic =
-                    new (std::nothrow) RateBasedAdaptationLogic(VLC_OBJECT(p_demux));
+                    new (std::nothrow) RateBasedAdaptationLogic(obj);
             if(ratelogic)
                 conn->setDownloadRateObserver(ratelogic);
             logic = ratelogic;
@@ -744,7 +745,7 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
         case AbstractAdaptationLogic::NearOptimal:
         {
             NearOptimalAdaptationLogic *noplogic =
-                    new (std::nothrow) NearOptimalAdaptationLogic();
+                    new (std::nothrow) NearOptimalAdaptationLogic(obj);
             if(noplogic)
                 conn->setDownloadRateObserver(noplogic);
             logic = noplogic;
@@ -753,7 +754,7 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
         case AbstractAdaptationLogic::Predictive:
         {
             AbstractAdaptationLogic *predictivelogic =
-                    new (std::nothrow) PredictiveAdaptationLogic(VLC_OBJECT(p_demux));
+                    new (std::nothrow) PredictiveAdaptationLogic(obj);
             if(predictivelogic)
                 conn->setDownloadRateObserver(predictivelogic);
             logic = predictivelogic;

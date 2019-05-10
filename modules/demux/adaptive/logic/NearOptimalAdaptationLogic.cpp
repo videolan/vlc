@@ -50,8 +50,8 @@ NearOptimalContext::NearOptimalContext()
     , last_download_rate( 0 )
 { }
 
-NearOptimalAdaptationLogic::NearOptimalAdaptationLogic()
-    : AbstractAdaptationLogic()
+NearOptimalAdaptationLogic::NearOptimalAdaptationLogic(vlc_object_t *obj)
+    : AbstractAdaptationLogic(obj)
     , currentBps( 0 )
     , usedBps( 0 )
 {

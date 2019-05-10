@@ -47,7 +47,7 @@ namespace adaptive
         class NearOptimalAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                NearOptimalAdaptationLogic();
+                NearOptimalAdaptationLogic(vlc_object_t *);
                 virtual ~NearOptimalAdaptationLogic();
 
                 virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *);

@@ -31,8 +31,9 @@
 
 using namespace adaptive::logic;
 
-AbstractAdaptationLogic::AbstractAdaptationLogic    ()
+AbstractAdaptationLogic::AbstractAdaptationLogic    (vlc_object_t *obj)
 {
+    p_obj = obj;
     maxwidth = std::numeric_limits<int>::max();
     maxheight = std::numeric_limits<int>::max();
 }

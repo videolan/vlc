@@ -44,7 +44,7 @@ namespace adaptive
                                         public SegmentTrackerListenerInterface
         {
             public:
-                AbstractAdaptationLogic             ();
+                AbstractAdaptationLogic             (vlc_object_t *);
                 virtual ~AbstractAdaptationLogic    ();
 
                 virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) = 0;
@@ -64,6 +64,7 @@ namespace adaptive
                 };
 
             protected:
+                vlc_object_t *p_obj;
                 int maxwidth;
                 int maxheight;
         };

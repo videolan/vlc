@@ -59,7 +59,6 @@ namespace adaptive
                 unsigned                    getAvailableBw(unsigned, const BaseRepresentation *) const;
                 std::map<adaptive::ID, PredictiveStats> streams;
                 unsigned                    usedBps;
-                vlc_object_t *              p_obj;
                 vlc_mutex_t                 lock;
         };
     }
