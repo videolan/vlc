@@ -96,28 +96,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
-        case INPUT_GET_AOUT:
-        {
-            audio_output_t *p_aout = input_resource_HoldAout( priv->p_resource );
-            if( !p_aout )
-                return VLC_EGENERIC;
-
-            audio_output_t **pp_aout = va_arg( args, audio_output_t** );
-            *pp_aout = p_aout;
-            return VLC_SUCCESS;
-        }
-
-        case INPUT_GET_VOUTS:
-        {
-            vout_thread_t ***ppp_vout = va_arg( args, vout_thread_t*** );
-            size_t *pi_vout = va_arg( args, size_t * );
-
-            input_resource_HoldVouts( priv->p_resource, ppp_vout, pi_vout );
-            if( *pi_vout == 0 )
-                return VLC_EGENERIC;
-            return VLC_SUCCESS;
-        }
-
         case INPUT_GET_PCR_SYSTEM:
         {
             vlc_tick_t *pi_system = va_arg( args, vlc_tick_t * );

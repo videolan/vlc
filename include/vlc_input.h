@@ -556,11 +556,6 @@ enum input_query_e
     INPUT_UPDATE_VIEWPOINT, /* arg1=(const vlc_viewpoint_t*), arg2=bool b_absolute */
     INPUT_SET_INITIAL_VIEWPOINT, /* arg1=(const vlc_viewpoint_t*) */
 
-    /* Input ressources
-     * XXX You must release as soon as possible */
-    INPUT_GET_AOUT,         /* arg1=audio_output_t **              res=can fail */
-    INPUT_GET_VOUTS,        /* arg1=vout_thread_t ***, size_t *        res=can fail */
-
     /* External clock managments */
     INPUT_GET_PCR_SYSTEM,   /* arg1=vlc_tick_t *, arg2=vlc_tick_t *       res=can fail */
     INPUT_MODIFY_PCR_SYSTEM,/* arg1=int absolute, arg2=vlc_tick_t   res=can fail */
@@ -626,29 +621,6 @@ VLC_API void input_SetPosition( input_thread_t *, float f_position, bool b_fast 
 VLC_API input_item_t* input_GetItem( input_thread_t * ) VLC_USED;
 
 /**
- * Return one of the video output (if any). If possible, you should use
- * INPUT_GET_VOUTS directly and process _all_ video outputs instead.
- * @param p_input an input thread from which to get a video output
- * @return NULL on error, or a video output thread pointer (which needs to be
- * released with vout_Release()).
- */
-static inline vout_thread_t *input_GetVout( input_thread_t *p_input )
-{
-     vout_thread_t **pp_vout, *p_vout;
-     size_t i_vout;
-
-     if( input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
-         return NULL;
-
-     for( size_t i = 1; i < i_vout; i++ )
-         vout_Release(pp_vout[i]);
-
-     p_vout = (i_vout >= 1) ? pp_vout[0] : NULL;
-     free( pp_vout );
-     return p_vout;
-}
-
-/**
  * Update the viewpoint of the input thread. The viewpoint will be applied to
  * all vouts and aouts.
  *
@@ -664,18 +636,6 @@ static inline int input_UpdateViewpoint( input_thread_t *p_input,
 {
     return input_Control( p_input, INPUT_UPDATE_VIEWPOINT, p_viewpoint,
                           b_absolute );
-}
-
-/**
- * Return the audio output (if any) associated with an input.
- * @param p_input an input thread
- * @return NULL on error, or the audio output (which needs to be
- * released with aout_Release()).
- */
-static inline audio_output_t *input_GetAout( input_thread_t *p_input )
-{
-     audio_output_t *p_aout;
-     return input_Control( p_input, INPUT_GET_AOUT, &p_aout ) ? NULL : p_aout;
 }
 
 /**
