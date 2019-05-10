@@ -2700,8 +2700,15 @@ vlc_player_UpdateViewpoint(vlc_player_t *player,
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (input)
-        input_UpdateViewpoint(input->thread, viewpoint,
-                              whence == VLC_PLAYER_WHENCE_ABSOLUTE);
+    {
+        input_control_param_t param = { .viewpoint = *viewpoint };
+        if (whence == VLC_PLAYER_WHENCE_ABSOLUTE)
+            input_ControlPush(input->thread, INPUT_CONTROL_SET_VIEWPOINT,
+                              &param);
+        else
+            input_ControlPush(input->thread, INPUT_CONTROL_UPDATE_VIEWPOINT,
+                              &param);
+    }
 }
 
 bool
