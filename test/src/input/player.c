@@ -192,14 +192,6 @@ get_ctx(vlc_player_t *player, void *data)
     return ctx;
 }
 
-static void
-ctx_destroy(struct ctx *ctx)
-{
-#define X(type, name) vlc_vector_destroy(&ctx->report.name);
-REPORT_LIST
-#undef X
-}
-
 static input_item_t *
 player_get_next(vlc_player_t *player, void *data)
 {
@@ -1740,6 +1732,14 @@ test_outputs(struct ctx *ctx)
 
     aout_Release(aout);
     test_end(ctx);
+}
+
+static void
+ctx_destroy(struct ctx *ctx)
+{
+#define X(type, name) vlc_vector_destroy(&ctx->report.name);
+REPORT_LIST
+#undef X
 }
 
 int
