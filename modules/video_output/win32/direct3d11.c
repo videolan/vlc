@@ -635,9 +635,11 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (ret != VLC_SUCCESS)
         return ret;
 
-    bool uses_external_callbacks = true;
+    CommonInit(vd, &sys->area, cfg);
+
     if (sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL)
     {
+        /* use our internal swapchain callbacks */
         sys->internal_swapchain.obj = VLC_OBJECT(vd);
         sys->internal_swapchain.hd3d =  &sys->hd3d;
         sys->outside_opaque = &sys->internal_swapchain;
@@ -646,12 +648,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;
         sys->swapCb              = LocalSwapchainSwap;
         sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
-        uses_external_callbacks = false;
-    }
 
-    CommonInit(vd, &sys->area, cfg);
-    if ( !uses_external_callbacks )
-    {
 #if VLC_WINSTORE_APP
         /* LEGACY, the d3dcontext and swapchain were given by the host app */
         if (var_InheritInteger(vd, "winrt-d3dcontext") == 0)
