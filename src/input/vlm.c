@@ -40,7 +40,7 @@
 #include <vlc_vlm.h>
 #include <vlc_modules.h>
 
-#include <vlc_input.h>
+#include <vlc_player.h>
 #include <vlc_stream.h>
 #include "vlm_internal.h"
 #include "vlm_event.h"
@@ -63,49 +63,71 @@ typedef struct preparse_data_t
     bool b_mux;
 } preparse_data_t;
 
-static int InputEventPreparse( vlc_object_t *p_this, char const *psz_cmd,
-                               vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static void preparse_on_state_changed(vlc_player_t *player,
+                                      enum vlc_player_state new_state, void *data)
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
-    preparse_data_t *p_pre = p_data;
+    VLC_UNUSED(player);
+    preparse_data_t *p_pre = data;
 
-    if( newval.i_int == INPUT_EVENT_DEAD ||
-        ( p_pre->b_mux && newval.i_int == INPUT_EVENT_ITEM_META ) )
-        vlc_sem_post( p_pre->p_sem );
-
-    return VLC_SUCCESS;
+    if (new_state == VLC_PLAYER_STATE_STOPPING)
+        vlc_sem_post(p_pre->p_sem);
 }
 
-static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
-                       vlc_value_t oldval, vlc_value_t newval,
-                       void *p_data )
+static void preparse_on_media_meta_changed(vlc_player_t *player,
+                                           input_item_t *media, void *data)
 {
-    VLC_UNUSED(psz_cmd);
-    VLC_UNUSED(oldval);
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    vlm_t *p_vlm = libvlc_priv( vlc_object_instance(p_input) )->p_vlm;
+    VLC_UNUSED(player); VLC_UNUSED(media);
+    preparse_data_t *p_pre = data;
+
+    if (p_pre->b_mux)
+        vlc_sem_post(p_pre->p_sem);
+}
+
+
+static void player_on_state_changed(vlc_player_t *player,
+                                    enum vlc_player_state new_state, void *data)
+{
+    vlm_media_sys_t *p_media = data;
+    vlm_t *p_vlm = libvlc_priv( vlc_object_instance(p_media) )->p_vlm;
     assert( p_vlm );
-    vlm_media_sys_t *p_media = p_data;
     const char *psz_instance_name = NULL;
 
-    if( newval.i_int == INPUT_EVENT_STATE )
+    for( int i = 0; i < p_media->i_instance; i++ )
     {
-        for( int i = 0; i < p_media->i_instance; i++ )
+        if( p_media->instance[i]->player == player )
         {
-            if( p_media->instance[i]->p_input == p_input )
-            {
-                psz_instance_name = p_media->instance[i]->psz_name;
-                break;
-            }
+            psz_instance_name = p_media->instance[i]->psz_name;
+            break;
         }
-        vlm_SendEventMediaInstanceState( p_vlm, p_media->cfg.id, p_media->cfg.psz_name, psz_instance_name, var_GetInteger( p_input, "state" ) );
-
-        vlc_mutex_lock( &p_vlm->lock_manage );
-        p_vlm->input_state_changed = true;
-        vlc_cond_signal( &p_vlm->wait_manage );
-        vlc_mutex_unlock( &p_vlm->lock_manage );
     }
-    return VLC_SUCCESS;
+    assert(psz_instance_name);
+    enum input_state_e legacy_state;
+    switch (new_state)
+    {
+        case VLC_PLAYER_STATE_STOPPED:
+            legacy_state = vlc_player_GetError(player) ? ERROR_S : INIT_S;
+            break;
+        case VLC_PLAYER_STATE_STARTED:
+            legacy_state = OPENING_S;
+            break;
+        case VLC_PLAYER_STATE_PLAYING:
+            legacy_state = PLAYING_S;
+            break;
+        case VLC_PLAYER_STATE_PAUSED:
+            legacy_state = PAUSE_S;
+            break;
+        case VLC_PLAYER_STATE_STOPPING:
+            legacy_state = vlc_player_GetError(player) ? ERROR_S : END_S;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+    vlm_SendEventMediaInstanceState( p_vlm, p_media->cfg.id, p_media->cfg.psz_name, psz_instance_name, legacy_state );
+
+    vlc_mutex_lock( &p_vlm->lock_manage );
+    p_vlm->input_state_changed = true;
+    vlc_cond_signal( &p_vlm->wait_manage );
+    vlc_mutex_unlock( &p_vlm->lock_manage );
 }
 
 static vlc_mutex_t vlm_mutex = VLC_STATIC_MUTEX;
@@ -406,12 +428,11 @@ static void* Manage( void* p_object )
             for( int j = 0; j < p_media->i_instance; )
             {
                 vlm_media_instance_sys_t *p_instance = p_media->instance[j];
-                int state = INIT_S;
 
-                if( p_instance->p_input != NULL )
-                    state = var_GetInteger( p_instance->p_input, "state" );
-                if( state == END_S || state == ERROR_S )
+                vlc_player_Lock(p_instance->player);
+                if (!vlc_player_IsStarted(p_instance->player))
                 {
+                    vlc_player_Unlock(p_instance->player);
                     int i_new_input_index;
 
                     /* */
@@ -429,6 +450,7 @@ static void* Manage( void* p_object )
                 }
                 else
                 {
+                    vlc_player_Unlock(p_instance->player);
                     j++;
                 }
             }
@@ -578,7 +600,6 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
         else if( p_cfg->b_enabled && !p_media->vod.p_media && p_cfg->i_input )
         {
             /* Pre-parse the input */
-            input_thread_t *p_input;
             char *psz_output;
             char *psz_dup;
 
@@ -617,32 +638,45 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             sout_description_data_t data;
             TAB_INIT(data.i_es, data.es);
 
-            p_input = input_Create( p_media, input_LegacyEvents, NULL,
-                                    p_media->vod.p_item, NULL, NULL );
-            if( p_input )
+            vlc_player_t *player = vlc_player_New(VLC_OBJECT(p_media),
+                                                  VLC_PLAYER_LOCK_NORMAL,
+                                                  NULL, NULL);
+            if (player)
             {
+                vlc_player_Lock(player);
+
                 vlc_sem_t sem_preparse;
                 vlc_sem_init( &sem_preparse, 0 );
 
                 preparse_data_t preparse = { .p_sem = &sem_preparse,
                                     .b_mux = (p_cfg->vod.psz_mux != NULL) };
-                input_LegacyVarInit( p_input );
-                var_AddCallback( p_input, "intf-event", InputEventPreparse,
-                                 &preparse );
 
                 data.sem = &sem_preparse;
-                var_Create( p_input, "sout-description-data", VLC_VAR_ADDRESS );
-                var_SetAddress( p_input, "sout-description-data", &data );
+                var_Create( p_media, "sout-description-data", VLC_VAR_ADDRESS );
+                var_SetAddress( p_media, "sout-description-data", &data );
 
-                if( !input_Start( p_input ) )
-                    vlc_sem_wait( &sem_preparse );
-
-                var_DelCallback( p_input, "intf-event", InputEventPreparse,
-                                 &preparse );
-
-                input_Stop( p_input );
-                input_Close( p_input );
+                static struct vlc_player_cbs cbs = {
+                    .on_state_changed = preparse_on_state_changed,
+                    .on_media_meta_changed = preparse_on_media_meta_changed,
+                };
+                vlc_player_listener_id *listener =
+                    vlc_player_AddListener(player, &cbs, &preparse);
+                if (listener)
+                {
+                    vlc_player_SetCurrentMedia(player, p_media->vod.p_item);
+                    if (vlc_player_Start(player) == VLC_SUCCESS)
+                    {
+                        vlc_player_Unlock(player);
+                        vlc_sem_wait(&sem_preparse);
+                        vlc_player_Lock(player);
+                        vlc_player_Stop(player);
+                    }
+                    vlc_player_RemoveListener(player, listener);
+                }
+                vlc_player_Unlock(player);
+                vlc_player_Delete(player);
                 vlc_sem_destroy( &sem_preparse );
+
             }
 
             /* XXX: Don't do it that way, but properly use a new input item ref. */
@@ -883,27 +917,55 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_media_sys_t *p_media,
         p_instance->psz_name = strdup( psz_name );
 
     p_instance->p_item = input_item_New( NULL, NULL );
+    if (!p_instance->p_item)
+        goto error;
 
     p_instance->i_index = 0;
-    p_instance->b_sout_keep = false;
     p_instance->p_parent = vlc_object_create( p_media, sizeof (vlc_object_t) );
-    p_instance->p_input = NULL;
-    p_instance->p_input_resource = input_resource_New( p_instance->p_parent );
+    if (!p_instance->p_parent)
+        goto error;
 
+    p_instance->player = vlc_player_New(p_instance->p_parent,
+                                        VLC_PLAYER_LOCK_NORMAL, NULL, NULL);
+    if (!p_instance->player)
+        goto error;
+
+    static struct vlc_player_cbs cbs = {
+        .on_state_changed = player_on_state_changed,
+    };
+    vlc_player_Lock(p_instance->player);
+    p_instance->listener =
+        vlc_player_AddListener(p_instance->player, &cbs, p_media);
+    vlc_player_Unlock(p_instance->player);
+
+    if (!p_instance->listener)
+        goto error;
     return p_instance;
+
+error:
+    if (p_instance->player)
+        vlc_player_Delete(p_instance->player);
+    if (p_instance->p_parent)
+        vlc_object_delete(p_instance->p_parent);
+    if (p_instance->p_item)
+        input_item_Release(p_instance->p_item);
+    free(p_instance->psz_name);
+    free(p_instance);
+    return NULL;
 }
 static void vlm_MediaInstanceDelete( vlm_t *p_vlm, int64_t id, vlm_media_instance_sys_t *p_instance, vlm_media_sys_t *p_media )
 {
-    input_thread_t *p_input = p_instance->p_input;
-    if( p_input )
-    {
-        input_Stop( p_input );
-        input_Close( p_input );
+    vlc_player_t *player = p_instance->player;
 
+    vlc_player_Lock(player);
+    vlc_player_RemoveListener(player, p_instance->listener);
+    vlc_player_Stop(player);
+    bool had_media = vlc_player_GetCurrentMedia(player);
+    vlc_player_Unlock(player);
+    vlc_player_Delete(player);
+
+    if (had_media)
         vlm_SendEventMediaInstanceStopped( p_vlm, id, p_media->cfg.psz_name );
-    }
-    input_resource_Terminate( p_instance->p_input_resource );
-    input_resource_Release( p_instance->p_input_resource );
     vlc_object_delete(p_instance->p_parent);
 
     TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
@@ -961,37 +1023,26 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         }
 
         for( int i = 0; i < p_cfg->i_option; i++ )
-        {
-            if( !strcmp( p_cfg->ppsz_option[i], "sout-keep" ) )
-                p_instance->b_sout_keep = true;
-            else if( !strcmp( p_cfg->ppsz_option[i], "nosout-keep" ) || !strcmp( p_cfg->ppsz_option[i], "no-sout-keep" ) )
-                p_instance->b_sout_keep = false;
-            else
-                input_item_AddOption( p_instance->p_item, p_cfg->ppsz_option[i], VLC_INPUT_OPTION_TRUSTED );
-        }
+            input_item_AddOption( p_instance->p_item, p_cfg->ppsz_option[i], VLC_INPUT_OPTION_TRUSTED );
         TAB_APPEND( p_media->i_instance, p_media->instance, p_instance );
     }
 
     /* Stop old instance */
-    input_thread_t *p_input = p_instance->p_input;
-    if( p_input )
+    vlc_player_t *player = p_instance->player;
+    vlc_player_Lock(player);
+    if (vlc_player_GetCurrentMedia(player))
     {
         if( p_instance->i_index == i_input_index )
         {
-            int state = var_GetInteger( p_input, "state" );
-            if( state == PAUSE_S )
-                var_SetInteger( p_input, "state",  PLAYING_S );
+            if (vlc_player_IsPaused(player))
+                vlc_player_Resume(player);
             return VLC_SUCCESS;
         }
 
-        input_Stop( p_input );
-        input_Close( p_input );
-
-        if( !p_instance->b_sout_keep )
-            input_resource_TerminateSout( p_instance->p_input_resource );
-        input_resource_TerminateVout( p_instance->p_input_resource );
-
+        vlc_player_Stop(player);
+        vlc_player_Unlock(player);
         vlm_SendEventMediaInstanceStopped( p_vlm, id, p_media->cfg.psz_name );
+        vlc_player_Lock(player);
     }
 
     /* Start new one */
@@ -1006,31 +1057,11 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     else
         input_item_SetURI( p_instance->p_item, p_media->cfg.ppsz_input[p_instance->i_index] ) ;
 
-    p_instance->p_input = input_Create( p_instance->p_parent,
-                                        input_LegacyEvents, NULL,
-                                        p_instance->p_item,
-                                        p_instance->p_input_resource, NULL );
-    if( p_instance->p_input )
-    {
-        input_LegacyVarInit( p_instance->p_input );
-        var_AddCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
+    vlc_player_SetCurrentMedia(player, p_instance->p_item);
+    vlc_player_Start(player);
+    vlc_player_Unlock(player);
 
-        if( input_Start( p_instance->p_input ) != VLC_SUCCESS )
-        {
-            var_DelCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
-            input_Close( p_instance->p_input );
-            p_instance->p_input = NULL;
-        }
-    }
-
-    if( !p_instance->p_input )
-    {
-        vlm_MediaInstanceDelete( p_vlm, id, p_instance, p_media );
-    }
-    else
-    {
-        vlm_SendEventMediaInstanceStarted( p_vlm, id, p_media->cfg.psz_name );
-    }
+    vlm_SendEventMediaInstanceStarted( p_vlm, id, p_media->cfg.psz_name );
 
     return VLC_SUCCESS;
 }
@@ -1055,21 +1086,17 @@ static int vlm_ControlMediaInstancePause( vlm_t *p_vlm, int64_t id, const char *
 {
     vlm_media_sys_t *p_media = vlm_ControlMediaGetById( p_vlm, id );
     vlm_media_instance_sys_t *p_instance;
-    int i_state;
-
     if( !p_media )
         return VLC_EGENERIC;
 
     p_instance = vlm_ControlMediaInstanceGetByName( p_media, psz_id );
-    if( !p_instance || !p_instance->p_input )
+    if( !p_instance )
         return VLC_EGENERIC;
 
-    /* Toggle pause state */
-    i_state = var_GetInteger( p_instance->p_input, "state" );
-    if( i_state == PAUSE_S && !p_media->cfg.b_vod )
-        var_SetInteger( p_instance->p_input, "state", PLAYING_S );
-    else if( i_state == PLAYING_S )
-        var_SetInteger( p_instance->p_input, "state", PAUSE_S );
+    vlc_player_Lock(p_instance->player);
+    vlc_player_TogglePause(p_instance->player);
+    vlc_player_Unlock(p_instance->player);
+
     return VLC_SUCCESS;
 }
 static int vlm_ControlMediaInstanceGetTimePosition( vlm_t *p_vlm, int64_t id, const char *psz_id, int64_t *pi_time, double *pd_position )
@@ -1081,13 +1108,15 @@ static int vlm_ControlMediaInstanceGetTimePosition( vlm_t *p_vlm, int64_t id, co
         return VLC_EGENERIC;
 
     p_instance = vlm_ControlMediaInstanceGetByName( p_media, psz_id );
-    if( !p_instance || !p_instance->p_input )
+    if( !p_instance )
         return VLC_EGENERIC;
 
+    vlc_player_Lock(p_instance->player);
     if( pi_time )
-        *pi_time = US_FROM_VLC_TICK(var_GetInteger( p_instance->p_input, "time" ));
+        *pi_time = US_FROM_VLC_TICK(vlc_player_GetTime(p_instance->player)); 
     if( pd_position )
-        *pd_position = var_GetFloat( p_instance->p_input, "position" );
+        *pd_position = vlc_player_GetPosition(p_instance->player);
+    vlc_player_Unlock(p_instance->player);
     return VLC_SUCCESS;
 }
 static int vlm_ControlMediaInstanceSetTimePosition( vlm_t *p_vlm, int64_t id, const char *psz_id, int64_t i_time, double d_position )
@@ -1099,14 +1128,16 @@ static int vlm_ControlMediaInstanceSetTimePosition( vlm_t *p_vlm, int64_t id, co
         return VLC_EGENERIC;
 
     p_instance = vlm_ControlMediaInstanceGetByName( p_media, psz_id );
-    if( !p_instance || !p_instance->p_input )
+    if( !p_instance )
         return VLC_EGENERIC;
 
+    vlc_player_Lock(p_instance->player);
     if( i_time >= 0 )
-        return var_SetInteger( p_instance->p_input, "time", VLC_TICK_FROM_US(i_time) );
+        vlc_player_SetTime(p_instance->player, VLC_TICK_FROM_US(i_time));
     else if( d_position >= 0 && d_position <= 100 )
-        return var_SetFloat( p_instance->p_input, "position", d_position );
-    return VLC_EGENERIC;
+        vlc_player_SetPosition(p_instance->player, d_position);
+    vlc_player_Unlock(p_instance->player);
+    return VLC_SUCCESS;
 }
 
 static int vlm_ControlMediaInstanceGets( vlm_t *p_vlm, int64_t id, vlm_media_instance_t ***ppp_idsc, int *pi_instance )
@@ -1123,18 +1154,15 @@ static int vlm_ControlMediaInstanceGets( vlm_t *p_vlm, int64_t id, vlm_media_ins
     {
         vlm_media_instance_sys_t *p_instance = p_media->instance[i];
         vlm_media_instance_t *p_idsc = vlm_media_instance_New();
-
         if( p_instance->psz_name )
             p_idsc->psz_name = strdup( p_instance->psz_name );
-        if( p_instance->p_input )
-        {
-            p_idsc->i_time = US_FROM_VLC_TICK(var_GetInteger( p_instance->p_input, "time" ));
-            p_idsc->i_length = US_FROM_VLC_TICK(var_GetInteger( p_instance->p_input, "length" ));
-            p_idsc->d_position = var_GetFloat( p_instance->p_input, "position" );
-            if( var_GetInteger( p_instance->p_input, "state" ) == PAUSE_S )
-                p_idsc->b_paused = true;
-            p_idsc->f_rate = var_GetFloat( p_instance->p_input, "rate" );
-        }
+        vlc_player_Lock(p_instance->player);
+        p_idsc->i_time = US_FROM_VLC_TICK(vlc_player_GetTime(p_instance->player));
+        p_idsc->i_length = US_FROM_VLC_TICK(vlc_player_GetLength(p_instance->player));
+        p_idsc->d_position = vlc_player_GetPosition(p_instance->player);
+        p_idsc->b_paused = vlc_player_IsPaused(p_instance->player);
+        p_idsc->f_rate = vlc_player_GetRate(p_instance->player);
+        vlc_player_Unlock(p_instance->player);
 
         TAB_APPEND( i_idsc, pp_idsc, p_idsc );
     }

@@ -1324,12 +1324,18 @@ static vlm_message_t *vlm_ShowMedia( vlm_media_sys_t *p_media )
     for( i = 0; i < p_media->i_instance; i++ )
     {
         vlm_media_instance_sys_t *p_instance = p_media->instance[i];
-        vlc_value_t val;
         vlm_message_t *p_msg_instance;
 
-        val.i_int = END_S;
-        if( p_instance->p_input )
-            var_Get( p_instance->p_input, "state", &val );
+        vlc_player_Lock(p_instance->player);
+        enum vlc_player_state state = vlc_player_GetState(p_instance->player);
+        float position = vlc_player_GetPosition(p_instance->player);
+        vlc_tick_t time = vlc_player_GetTime(p_instance->player);
+        vlc_tick_t length = vlc_player_GetLength(p_instance->player);
+        float rate = vlc_player_GetRate(p_instance->player);
+        ssize_t title = vlc_player_GetSelectedTitleIdx(p_instance->player);
+        ssize_t chapter = vlc_player_GetSelectedChapterIdx(p_instance->player);
+        bool can_seek = vlc_player_CanSeek(p_instance->player);
+        vlc_player_Unlock(p_instance->player);
 
         p_msg_instance = vlm_MessageAdd( p_msg_sub, vlm_MessageSimpleNew( "instance" ) );
 
@@ -1337,24 +1343,20 @@ static vlm_message_t *vlm_ShowMedia( vlm_media_sys_t *p_media )
                         vlm_MessageNew( "name" , "%s", p_instance->psz_name ? p_instance->psz_name : "default" ) );
         vlm_MessageAdd( p_msg_instance,
                         vlm_MessageNew( "state",
-                            val.i_int == PLAYING_S ? "playing" :
-                            val.i_int == PAUSE_S ? "paused" :
+                            state == VLC_PLAYER_STATE_PLAYING ? "playing" :
+                            state == VLC_PLAYER_STATE_PAUSED ? "paused" :
                             "stopped" ) );
 
         /* FIXME should not do that this way */
-        if( p_instance->p_input )
-        {
-#define APPEND_INPUT_INFO( key, format, type ) \
-            vlm_MessageAdd( p_msg_instance, vlm_MessageNew( key, format, \
-                            var_Get ## type( p_instance->p_input, key ) ) )
-            APPEND_INPUT_INFO( "position", "%f", Float );
-            APPEND_INPUT_INFO( "time", "%"PRId64, Integer );
-            APPEND_INPUT_INFO( "length", "%"PRId64, Integer );
-            APPEND_INPUT_INFO( "rate", "%f", Float );
-            APPEND_INPUT_INFO( "title", "%"PRId64, Integer );
-            APPEND_INPUT_INFO( "chapter", "%"PRId64, Integer );
-            APPEND_INPUT_INFO( "can-seek", "%d", Bool );
-        }
+#define APPEND_INPUT_INFO( key, format, value ) \
+        vlm_MessageAdd( p_msg_instance, vlm_MessageNew( key, format, value ) )
+        APPEND_INPUT_INFO( "position", "%f", position );
+        APPEND_INPUT_INFO( "time", "%"PRId64, time );
+        APPEND_INPUT_INFO( "length", "%"PRId64, length );
+        APPEND_INPUT_INFO( "rate", "%f", rate );
+        APPEND_INPUT_INFO( "title", "%"PRId64, title );
+        APPEND_INPUT_INFO( "chapter", "%"PRId64, chapter );
+        APPEND_INPUT_INFO( "can-seek", "%d", can_seek );
 #undef APPEND_INPUT_INFO
         vlm_MessageAdd( p_msg_instance, vlm_MessageNew( "playlistindex",
                         "%d", p_instance->i_index + 1 ) );

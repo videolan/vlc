@@ -24,6 +24,7 @@
 #define LIBVLC_VLM_INTERNAL_H 1
 
 #include <vlc_vlm.h>
+#include <vlc_player.h>
 #include "input_interface.h"
 
 /* Private */
@@ -35,12 +36,10 @@ typedef struct
     /* "playlist" index */
     int i_index;
 
-    bool      b_sout_keep;
-
     vlc_object_t *p_parent;
     input_item_t      *p_item;
-    input_thread_t    *p_input;
-    input_resource_t *p_input_resource;
+    vlc_player_t *player;
+    vlc_player_listener_id *listener;
 
 } vlm_media_instance_sys_t;
 
