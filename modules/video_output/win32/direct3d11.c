@@ -441,11 +441,11 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const struct
 
     const d3d_format_t *newPixelFormat = NULL;
 #if VLC_WINSTORE_APP
-    IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(display->obj, "winrt-swapchain");
-    if (dxgiswapChain != NULL)
+    display->dxgiswapChain = var_InheritInteger(display->obj, "winrt-swapchain");
+    if (display->dxgiswapChain != NULL)
     {
         DXGI_SWAP_CHAIN_DESC1 scd;
-        if (SUCCEEDED(IDXGISwapChain1_GetDesc(dxgiswapChain, &scd)))
+        if (SUCCEEDED(IDXGISwapChain1_GetDesc(display->dxgiswapChain, &scd)))
         {
             for (const d3d_format_t *output_format = GetRenderFormatList();
                  output_format->name != NULL; ++output_format)
