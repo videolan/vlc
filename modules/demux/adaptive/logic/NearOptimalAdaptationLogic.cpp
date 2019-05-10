@@ -50,11 +50,11 @@ NearOptimalContext::NearOptimalContext()
     , last_download_rate( 0 )
 { }
 
-NearOptimalAdaptationLogic::NearOptimalAdaptationLogic( vlc_object_t *p_obj )
-    : AbstractAdaptationLogic()
+NearOptimalAdaptationLogic::NearOptimalAdaptationLogic( vlc_object_t *obj )
+    : AbstractAdaptationLogic(obj)
     , currentBps( 0 )
     , usedBps( 0 )
-    , p_obj( p_obj )
+    , p_obj( obj )
 {
     vlc_mutex_init(&lock);
 }
