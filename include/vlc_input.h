@@ -566,9 +566,6 @@ enum input_query_e
                             * arg3= bool forced, arg4= bool notify,
                             * arg5= bool check_extension */
 
-    /* ES */
-    INPUT_RESTART_ES_BY_ID,/* arg1=int (-AUDIO/VIDEO/SPU_ES for the whole category) */
-
     /* Viewpoint */
     INPUT_UPDATE_VIEWPOINT, /* arg1=(const vlc_viewpoint_t*), arg2=bool b_absolute */
     INPUT_SET_INITIAL_VIEWPOINT, /* arg1=(const vlc_viewpoint_t*) */
