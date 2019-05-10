@@ -578,9 +578,6 @@ enum input_query_e
     INPUT_GET_AOUT,         /* arg1=audio_output_t **              res=can fail */
     INPUT_GET_VOUTS,        /* arg1=vout_thread_t ***, size_t *        res=can fail */
 
-    /* Renderers */
-    INPUT_SET_RENDERER,     /* arg1=vlc_renderer_item_t* */
-
     /* External clock managments */
     INPUT_GET_PCR_SYSTEM,   /* arg1=vlc_tick_t *, arg2=vlc_tick_t *       res=can fail */
     INPUT_MODIFY_PCR_SYSTEM,/* arg1=int absolute, arg2=vlc_tick_t   res=can fail */
