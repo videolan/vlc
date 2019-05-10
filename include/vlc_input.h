@@ -536,21 +536,7 @@ typedef void (*input_thread_events_cb)( input_thread_t *input,
  */
 enum input_query_e
 {
-    /* Menu (VCD/DVD/BD) Navigation */
-    /** Activate the navigation item selected. res=can fail */
-    INPUT_NAV_ACTIVATE,
-    /** Use the up arrow to select a navigation item above. res=can fail */
-    INPUT_NAV_UP,
-    /** Use the down arrow to select a navigation item under. res=can fail */
-    INPUT_NAV_DOWN,
-    /** Use the left arrow to select a navigation item on the left. res=can fail */
-    INPUT_NAV_LEFT,
-    /** Use the right arrow to select a navigation item on the right. res=can fail */
-    INPUT_NAV_RIGHT,
-    /** Activate the popup Menu (for BD). res=can fail */
-    INPUT_NAV_POPUP,
-    /** Activate disc Root Menu. res=can fail */
-    INPUT_NAV_MENU,
+    INPUT_DUMMY,
 };
 
 /** @}*/
