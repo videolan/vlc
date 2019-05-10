@@ -1691,8 +1691,31 @@ test_delete_while_playback(vlc_object_t *obj, bool start)
 }
 
 static void
+test_no_outputs(struct ctx *ctx)
+{
+    test_log("test_no_outputs\n");
+    vlc_player_t *player = ctx->player;
+
+    struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_MS(10));
+    player_set_current_mock_media(ctx, "media1", &params, false);
+    player_start(ctx);
+
+    wait_state(ctx, VLC_PLAYER_STATE_STOPPING);
+    {
+        vec_on_vout_changed *vec = &ctx->report.on_vout_changed;
+        assert(vec->size == 0);
+    }
+
+    audio_output_t *aout = vlc_player_aout_Hold(player);
+    assert(!aout);
+
+    test_end(ctx);
+}
+
+static void
 test_outputs(struct ctx *ctx)
 {
+    test_log("test_outputs\n");
     vlc_player_t *player = ctx->player;
 
     /* Test that the player has a valid aout and vout, even before first
@@ -1808,6 +1831,11 @@ main(void)
     test_init();
 
     struct ctx ctx;
+
+    /* Test with --aout=none --vout=none */
+    ctx_init(&ctx, false);
+    test_no_outputs(&ctx);
+    ctx_destroy(&ctx);
 
     ctx_init(&ctx, true);
 
