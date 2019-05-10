@@ -206,6 +206,8 @@ static void PCRFixHandle( demux_t *, ts_pmt_t *, block_t * );
 #define PROBE_CHUNK_COUNT 500
 #define PROBE_MAX         (PROBE_CHUNK_COUNT * 10)
 
+#define BLOCK_FLAG_SOURCE_RANDOM_ACCESS (1 << BLOCK_FLAG_PRIVATE_SHIFT)
+
 static int DetectPacketSize( demux_t *p_demux, unsigned *pi_header_size, int i_offset )
 {
     const uint8_t *p_peek;
@@ -1407,6 +1409,9 @@ static void SendDataChain( demux_t *p_demux, ts_es_t *p_es, block_t *p_chain )
         p_chain = p_block->p_next;
         p_block->p_next = NULL;
 
+        /* clean up any private flag */
+        p_block->i_flags &= ~BLOCK_FLAG_PRIVATE_MASK;
+
         if( b_lowdelay )
             p_block->i_flags |= BLOCK_FLAG_AU_END;
 
@@ -2503,7 +2508,7 @@ static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pk
 
                 /* ... or don't ignore for our Bluray still frames and seek hacks */
                 if(p[5] == 0x82 && !strncmp((const char *)&p[7], "VLC_DISCONTINU", 14))
-                    p_pkt->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+                    p_pkt->i_flags |= BLOCK_FLAG_SOURCE_RANDOM_ACCESS;
             }
 #if 0
             if( p[5]&0x40 )
@@ -2674,10 +2679,9 @@ static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, size
         return PushPESBlock( p_demux, pid, NULL, true );
     }
 
-    /* Data discontinuity, we need to drop or output currently
-     * gathered data as it can't match the target size or can
-     * have dropped next sync code */
-    if( p_pkt->i_flags & BLOCK_FLAG_DISCONTINUITY )
+    /* Seek discontinuity, we need to drop or output currently
+     * gathered data */
+    if( p_pkt->i_flags & BLOCK_FLAG_SOURCE_RANDOM_ACCESS )
     {
         p_pes->gather.i_saved = 0;
         /* Flush/output current */
@@ -2685,6 +2689,17 @@ static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, size
         /* Propagate to output block to notify packetizers/decoders */
         if( p_pes->p_es )
             p_pes->p_es->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
+    }
+    /* On dropped blocks discontinuity */
+    else if( p_pkt->i_flags & BLOCK_FLAG_DISCONTINUITY )
+    {
+        /* it can't match the target size and need to resync on sync code */
+        p_pes->gather.i_data_size = 0;
+        /* can't reuse prev bytes to lookup sync code */
+        p_pes->gather.i_saved = 0;
+        /* Propagate to output block to notify packetizers/decoders */
+        if( p_pes->p_es )
+            p_pes->p_es->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED;
     }
 
     if ( unlikely(p_pes->gather.i_saved > 0) )
