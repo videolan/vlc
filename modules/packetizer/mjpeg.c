@@ -80,9 +80,9 @@ static void PacketizeFlush( decoder_t *p_dec )
 /*****************************************************************************
  * Helpers:
  *****************************************************************************/
-static void PacketizeReset( void *p_private, bool b_broken )
+static void PacketizeReset( void *p_private, bool b_flush )
 {
-    VLC_UNUSED(b_broken);
+    VLC_UNUSED(b_flush);
     decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
 

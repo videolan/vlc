@@ -540,12 +540,12 @@ static void ResetOutputVariables( decoder_sys_t *p_sys )
     p_sys->i_recovery_frame_cnt = UINT_MAX;
 }
 
-static void PacketizeReset( void *p_private, bool b_broken )
+static void PacketizeReset( void *p_private, bool b_flush )
 {
     decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( b_broken || !p_sys->b_slice )
+    if( b_flush || !p_sys->b_slice )
     {
         DropStoredNAL( p_sys );
         ResetOutputVariables( p_sys );

@@ -348,10 +348,8 @@ static block_t *GetCc( decoder_t *p_dec, decoder_cc_desc_t *p_desc )
 /****************************************************************************
  * Packetizer Helpers
  ****************************************************************************/
-static void PacketizeReset(void *p_private, bool b_broken)
+static void PacketizeReset(void *p_private, bool b_flush)
 {
-    VLC_UNUSED(b_broken);
-
     decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -359,8 +357,11 @@ static void PacketizeReset(void *p_private, bool b_broken)
     if(p_out)
         block_ChainRelease(p_out);
 
-    p_sys->sets = MISSING;
-    p_sys->b_recovery_point = false;
+    if(b_flush)
+    {
+        p_sys->sets = MISSING;
+        p_sys->b_recovery_point = false;
+    }
     p_sys->b_need_ts = true;
     date_Set(&p_sys->dts, VLC_TICK_INVALID);
 }

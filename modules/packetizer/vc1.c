@@ -272,12 +272,12 @@ static void Flush( decoder_t *p_dec )
     packetizer_Flush( &p_sys->packetizer );
 }
 
-static void PacketizeReset( void *p_private, bool b_broken )
+static void PacketizeReset( void *p_private, bool b_flush )
 {
     decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( b_broken )
+    if( b_flush )
     {
         if( p_sys->p_frame )
             block_ChainRelease( p_sys->p_frame );

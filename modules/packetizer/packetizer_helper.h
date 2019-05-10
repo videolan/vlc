@@ -36,7 +36,7 @@ enum
     STATE_CUSTOM_FIRST,
 };
 
-typedef void (*packetizer_reset_t)( void *p_private, bool b_broken );
+typedef void (*packetizer_reset_t)( void *p_private, bool b_flush );
 typedef block_t *(*packetizer_parse_t)( void *p_private, bool *pb_ts_used, block_t * );
 typedef int (*packetizer_validate_t)( void *p_private, block_t * );
 
@@ -115,16 +115,10 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
         if( p_drained )
             return p_drained;
 
-        const bool b_broken = !!( p_block->i_flags&BLOCK_FLAG_CORRUPTED );
         p_pack->i_state = STATE_NOSYNC;
         block_BytestreamEmpty( &p_pack->bytestream );
         p_pack->i_offset = 0;
-        p_pack->pf_reset( p_pack->p_private, b_broken );
-        if( b_broken )
-        {
-            block_Release( p_block );
-            return NULL;
-        }
+        p_pack->pf_reset( p_pack->p_private, false );
     }
 
     if( p_block )
