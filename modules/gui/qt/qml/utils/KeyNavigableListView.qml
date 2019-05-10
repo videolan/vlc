@@ -49,6 +49,7 @@ NavigableFocusScope {
     property alias footerItem: view.footerItem
     property alias header: view.header
     property alias headerItem: view.headerItem
+    property alias headerPositioning: view.headerPositioning
 
     property alias currentIndex: view.currentIndex
     property alias currentItem: view.currentItem

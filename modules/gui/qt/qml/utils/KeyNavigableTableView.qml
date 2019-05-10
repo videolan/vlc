@@ -43,6 +43,9 @@ NavigableFocusScope {
     property alias currentIndex: view.currentIndex
     property alias currentItem: view.currentItem
 
+    property alias headerItem: view.headerItem
+    property color headerColor
+
     Utils.SelectableDelegateModel {
         id: delegateModel
 
@@ -123,55 +126,71 @@ NavigableFocusScope {
         model : delegateModel.parts.list
         modelCount: delegateModel.items.count
 
+        headerPositioning: ListView.OverlayHeader
+
         header: Rectangle {
-            height: VLCStyle.fontHeight_normal
             width: parent.width
-            color: VLCStyle.colors.button
+            height: childrenRect.height
+            color: headerColor
+            z: 3
 
-            Row {
-                anchors.fill: parent
-                Repeater {
-                    model: sortModel
-                    MouseArea {
-                        height: VLCStyle.fontHeight_normal
-                        width: model.width * view.width
-                        //Layout.alignment: Qt.AlignVCenter
+            Column {
+                width: parent.width
+                height: childrenRect.height
 
-                        Text {
-                            text: model.text
-                            elide: Text.ElideRight
-                            font {
-                                bold: true
-                                pixelSize: VLCStyle.fontSize_normal
+                Row {
+                    x: VLCStyle.margin_normal
+                    width: childrenRect.width - 2 * VLCStyle.margin_normal
+                    height: childrenRect.height + VLCStyle.margin_xxsmall
 
+                    Repeater {
+                        model: sortModel
+                        MouseArea {
+                            height: VLCStyle.fontHeight_normal
+                            width: model.width * view.width
+                            //Layout.alignment: Qt.AlignVCenter
+
+                            Text {
+                                text: model.text
+                                elide: Text.ElideRight
+                                font {
+                                    pixelSize: VLCStyle.fontSize_normal
+
+                                }
+                                color: VLCStyle.colors.buttonText
+                                horizontalAlignment: Text.AlignLeft
+                                anchors {
+                                    fill: parent
+                                    leftMargin: VLCStyle.margin_xsmall
+                                    rightMargin: VLCStyle.margin_xsmall
+                                }
                             }
-                            color: VLCStyle.colors.buttonText
-                            horizontalAlignment: Text.AlignLeft
-                            anchors {
-                                fill: parent
-                                leftMargin: VLCStyle.margin_xxsmall
-                                rightMargin: VLCStyle.margin_xxsmall
-                            }
-                        }
 
-                        Text {
-                            text: (root.model.sortOrder === Qt.AscendingOrder) ? "▼" : "▲"
-                            visible: root.model.sortCriteria === model.criteria
-                            font.pixelSize: VLCStyle.fontSize_normal
-                            color: VLCStyle.colors.accent
-                            anchors {
-                                right: parent.right
-                                leftMargin: VLCStyle.margin_xxsmall
-                                rightMargin: VLCStyle.margin_xxsmall
+                            Text {
+                                text: (root.model.sortOrder === Qt.AscendingOrder) ? "▼" : "▲"
+                                visible: root.model.sortCriteria === model.criteria
+                                font.pixelSize: VLCStyle.fontSize_normal
+                                color: VLCStyle.colors.accent
+                                anchors {
+                                    right: parent.right
+                                    leftMargin: VLCStyle.margin_xsmall
+                                    rightMargin: VLCStyle.margin_xsmall
+                                }
                             }
-                        }
-                        onClicked: {
-                            if (root.model.sortCriteria !== model.criteria)
-                                root.model.sortCriteria = model.criteria
-                            else
-                                root.model.sortOrder = (root.model.sortOrder === Qt.AscendingOrder) ? Qt.DescendingOrder : Qt.AscendingOrder
+                            onClicked: {
+                                if (root.model.sortCriteria !== model.criteria)
+                                    root.model.sortCriteria = model.criteria
+                                else
+                                    root.model.sortOrder = (root.model.sortOrder === Qt.AscendingOrder) ? Qt.DescendingOrder : Qt.AscendingOrder
+                            }
                         }
                     }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: VLCStyle.colors.textInactive
                 }
             }
         }

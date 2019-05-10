@@ -39,6 +39,8 @@ Utils.KeyNavigableTableView {
 
     section.property: "first_symbol"
 
+    headerColor: VLCStyle.colors.bg
+
     model: MLAlbumTrackModel {
         id: rootmodel
         ml: medialib

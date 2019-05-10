@@ -186,6 +186,8 @@ Utils.NavigableFocusScope {
 
                 interactive: false
 
+                headerColor: VLCStyle.colors.bgAlt
+
                 parentId : root.model.id
                 onParentIdChanged: {
                     currentIndex = 0
@@ -194,7 +196,7 @@ Utils.NavigableFocusScope {
 
                 onCurrentItemChanged: {
                     if (currentItem != undefined) {
-                        root.currentItemY = expand_infos_id.y + expand_track_id.y + currentItem.y
+                        root.currentItemY = expand_infos_id.y + expand_track_id.y + headerItem.height + currentItem.y
                         root.currentItemHeight = currentItem.height
                     }
                 }
