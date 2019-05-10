@@ -75,9 +75,9 @@ struct report_signal
     float strength;
 };
 
-struct report_vout_list
+struct report_vout
 {
-    enum vlc_player_list_action action;
+    enum vlc_player_vout_action action;
     vout_thread_t *vout;
 };
 
@@ -108,7 +108,7 @@ struct report_media_subitems
     X(bool, on_recording_changed) \
     X(struct report_signal, on_signal_changed) \
     X(struct input_stats_t, on_statistics_changed) \
-    X(struct report_vout_list, on_vout_changed) \
+    X(struct report_vout, on_vout_changed) \
     X(input_item_t *, on_media_meta_changed) \
     X(input_item_t *, on_media_epg_changed) \
     X(struct report_media_subitems, on_media_subitems_changed) \
@@ -439,11 +439,11 @@ player_on_statistics_changed(vlc_player_t *player,
 
 static void
 player_on_vout_changed(vlc_player_t *player,
-                            enum vlc_player_list_action action,
+                            enum vlc_player_vout_action action,
                             vout_thread_t *vout, void *data)
 {
     struct ctx *ctx = get_ctx(player, data);
-    struct report_vout_list report = {
+    struct report_vout report = {
         .action = action,
         .vout = vout,
     };
@@ -574,7 +574,7 @@ ctx_reset(struct ctx *ctx)
     }
 
     {
-        struct report_vout_list report;
+        struct report_vout report;
         FOREACH_VEC(report, on_vout_changed)
             vout_Release(report.vout);
     }
@@ -876,7 +876,7 @@ test_end_poststop_vouts(struct ctx *ctx)
 
     size_t vout_started = 0, vout_stopped = 0;
 
-    struct report_vout_list report;
+    struct report_vout report;
     vlc_vector_foreach(report, vec)
     {
         if (report.action == VLC_PLAYER_VOUT_STARTED)
