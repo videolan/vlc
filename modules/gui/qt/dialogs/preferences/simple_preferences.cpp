@@ -154,47 +154,43 @@ static int getDefaultAudioVolume(const char *aout)
 #else
         return -1;
 #endif
-    else
+
     /* Note: For hysterical raisins, this is sorted by decreasing priority
      * order (then alphabetical order). */
     if (!strcmp(aout, "pulse"))
         return -1;
-    else
+
 #ifdef __linux__
     if (!strcmp(aout, "alsa") && module_exists("alsa"))
         return cbrtf(config_GetFloat("alsa-gain")) * 100.f + .5f;
-    else
 #endif
 #ifdef _WIN32
     if (!strcmp(aout, "mmdevice"))
         return config_GetFloat("mmdevice-volume") * 100.f + .5f;
-    else
 #endif
 #ifdef __APPLE__
     if (!strcmp(aout, "auhal") && module_exists("auhal"))
         return (config_GetFloat("auhal-volume") * 100.f + .5f)
                  / AOUT_VOLUME_DEFAULT;
-    else
 #endif
 #ifdef _WIN32
     if (!strcmp(aout, "directsound") && module_exists("directsound"))
         return config_GetFloat("directx-volume") * 100.f + .5f;
-    else
 #endif
+
     if (!strcmp(aout, "jack"))
         return cbrtf(config_GetFloat("jack-gain")) * 100.f + 0.5f;
-    else
+
 #ifdef __OS2__
     if (!strcmp(aout, "kai"))
         return cbrtf(config_GetFloat("kai-gain")) * 100.f + .5f;
-    else
 #endif
 #ifdef _WIN32
     if (!strcmp(aout, "waveout"))
         return config_GetFloat("waveout-volume") * 100.f + .5f;
-    else
 #endif
-        return -1;
+
+    return -1;
 }
 
 namespace
