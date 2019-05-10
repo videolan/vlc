@@ -216,13 +216,6 @@ StringConfigControl::StringConfigControl( module_config_t *_p_item,
     finish();
 }
 
-void StringConfigControl::fillGrid( QGridLayout *l, int line )
-{
-    l->addWidget( label, line, 0 );
-    l->setColumnMinimumWidth( 1, 10 );
-    l->addWidget( text, line, LAST_COLUMN, Qt::AlignRight );
-}
-
 StringConfigControl::StringConfigControl( module_config_t *_p_item,
                                           QLabel *_label, QLineEdit *_text,
                                           bool pwd ) :
@@ -232,6 +225,13 @@ StringConfigControl::StringConfigControl( module_config_t *_p_item,
     if( pwd ) text->setEchoMode( QLineEdit::Password );
     label = _label;
     finish( );
+}
+
+void StringConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->setColumnMinimumWidth( 1, 10 );
+    l->addWidget( text, line, LAST_COLUMN, Qt::AlignRight );
 }
 
 void StringConfigControl::finish()
@@ -261,17 +261,6 @@ FileConfigControl::FileConfigControl( module_config_t *_p_item, QWidget *p ) :
     finish();
 }
 
-void FileConfigControl::fillGrid( QGridLayout *l, int line )
-{
-    l->addWidget( label, line, 0 );
-    l->setColumnMinimumWidth( 1, 10 );
-    QHBoxLayout *textAndButton = new QHBoxLayout();
-    textAndButton->setMargin( 0 );
-    textAndButton->addWidget( text, 2 );
-    textAndButton->addWidget( browse, 0 );
-    l->addLayout( textAndButton, line, LAST_COLUMN );
-}
-
 FileConfigControl::FileConfigControl( module_config_t *_p_item,
                                       QLabel *_label, QLineEdit *_text,
                                       QPushButton *_button ) :
@@ -284,6 +273,17 @@ FileConfigControl::FileConfigControl( module_config_t *_p_item,
     BUTTONACT( browse, updateField() );
 
     finish( );
+}
+
+void FileConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->setColumnMinimumWidth( 1, 10 );
+    QHBoxLayout *textAndButton = new QHBoxLayout();
+    textAndButton->setMargin( 0 );
+    textAndButton->addWidget( text, 2 );
+    textAndButton->addWidget( browse, 0 );
+    l->addLayout( textAndButton, line, LAST_COLUMN );
 }
 
 void FileConfigControl::updateField()
@@ -354,12 +354,6 @@ FontConfigControl::FontConfigControl( module_config_t *_p_item, QWidget *p ) :
     }
 }
 
-void FontConfigControl::fillGrid( QGridLayout *l, int line )
-{
-    l->addWidget( label, line, 0 );
-    l->addWidget( font, line, 1, 1, -1 );
-}
-
 FontConfigControl::FontConfigControl( module_config_t *_p_item,
                                       QLabel *_p_label,
                                       QFontComboBox *_p_font) :
@@ -373,6 +367,12 @@ FontConfigControl::FontConfigControl( module_config_t *_p_item,
     {
         label->setToolTip( formatTooltip( qfut(p_item->psz_longtext) ) );
     }
+}
+
+void FontConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( font, line, 1, 1, -1 );
 }
 
 /********* String / choice list **********/
@@ -391,18 +391,6 @@ StringListConfigControl::StringListConfigControl( module_config_t *_p_item,
     finish( p_module_config );
 }
 
-void StringListConfigControl::fillGrid( QGridLayout *l, int line )
-{
-    l->addWidget( label, line, 0 );
-    l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
-}
-
-void StringListConfigControl::comboIndexChanged( int i_index )
-{
-    Q_UNUSED( i_index );
-    emit changed();
-}
-
 StringListConfigControl::StringListConfigControl( module_config_t *_p_item,
                                                   QLabel *_label,
                                                   QComboBox *_combo, bool ) :
@@ -415,6 +403,18 @@ StringListConfigControl::StringListConfigControl( module_config_t *_p_item,
     module_config_t *p_module_config = config_FindConfig( getName() );
 
     finish( p_module_config );
+}
+
+void StringListConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
+}
+
+void StringListConfigControl::comboIndexChanged( int i_index )
+{
+    Q_UNUSED( i_index );
+    emit changed();
 }
 
 void StringListConfigControl::finish(module_config_t *p_module_config )
@@ -508,12 +508,6 @@ ModuleConfigControl::ModuleConfigControl( module_config_t *_p_item,
     finish( );
 }
 
-void ModuleConfigControl::fillGrid( QGridLayout *l, int line )
-{
-    l->addWidget( label, line, 0 );
-    l->addWidget( combo, line, LAST_COLUMN );
-}
-
 ModuleConfigControl::ModuleConfigControl( module_config_t *_p_item,
                                           QLabel *_label, QComboBox *_combo ) :
     VStringConfigControl( _p_item )
@@ -521,6 +515,12 @@ ModuleConfigControl::ModuleConfigControl( module_config_t *_p_item,
     combo = _combo;
     label = _label;
     finish( );
+}
+
+void ModuleConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( combo, line, LAST_COLUMN );
 }
 
 void ModuleConfigControl::finish( )
@@ -854,12 +854,6 @@ IntegerListConfigControl::IntegerListConfigControl( module_config_t *_p_item,
     finish( p_module_config );
 }
 
-void IntegerListConfigControl::fillGrid( QGridLayout *l, int line )
-{
-    l->addWidget( label, line, 0 );
-    l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
-}
-
 IntegerListConfigControl::IntegerListConfigControl( module_config_t *_p_item,
                                                     QLabel *_label,
                                                     QComboBox *_combo, bool ) :
@@ -872,6 +866,12 @@ IntegerListConfigControl::IntegerListConfigControl( module_config_t *_p_item,
     module_config_t *p_module_config = config_FindConfig( getName() );
 
     finish( p_module_config );
+}
+
+void IntegerListConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
 }
 
 void IntegerListConfigControl::finish(module_config_t *p_module_config )
@@ -917,11 +917,6 @@ BoolConfigControl::BoolConfigControl( module_config_t *_p_item, QWidget *p ) :
     finish();
 }
 
-void BoolConfigControl::fillGrid( QGridLayout *l, int line )
-{
-    l->addWidget( checkbox, line, 0, 1, -1 );
-}
-
 BoolConfigControl::BoolConfigControl( module_config_t *_p_item,
                                       QLabel *_label,
                                       QAbstractButton *_checkbox ) :
@@ -930,6 +925,11 @@ BoolConfigControl::BoolConfigControl( module_config_t *_p_item,
     checkbox = _checkbox;
     VLC_UNUSED( _label );
     finish();
+}
+
+void BoolConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( checkbox, line, 0, 1, -1 );
 }
 
 void BoolConfigControl::finish()
@@ -954,12 +954,6 @@ ColorConfigControl::ColorConfigControl( module_config_t *_p_item,
     finish();
 }
 
-void ColorConfigControl::fillGrid( QGridLayout *l, int line )
-{
-    l->addWidget( label, line, 0 );
-    l->addWidget( color_but, line, LAST_COLUMN, Qt::AlignRight );
-}
-
 ColorConfigControl::ColorConfigControl( module_config_t *_p_item,
                                         QLabel *_label,
                                         QAbstractButton *_color ) :
@@ -968,6 +962,12 @@ ColorConfigControl::ColorConfigControl( module_config_t *_p_item,
     label = _label;
     color_but = _color;
     finish();
+}
+
+void ColorConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( color_but, line, LAST_COLUMN, Qt::AlignRight );
 }
 
 void ColorConfigControl::finish()
@@ -1030,12 +1030,6 @@ FloatConfigControl::FloatConfigControl( module_config_t *_p_item,
     finish();
 }
 
-void FloatConfigControl::fillGrid( QGridLayout *l, int line )
-{
-    l->addWidget( label, line, 0 );
-    l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
-}
-
 FloatConfigControl::FloatConfigControl( module_config_t *_p_item,
                                         QLabel *_label,
                                         QDoubleSpinBox *_spin ) :
@@ -1044,6 +1038,12 @@ FloatConfigControl::FloatConfigControl( module_config_t *_p_item,
     spin = _spin;
     label = _label;
     finish();
+}
+
+void FloatConfigControl::fillGrid( QGridLayout *l, int line )
+{
+    l->addWidget( label, line, 0 );
+    l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
 }
 
 void FloatConfigControl::finish()
