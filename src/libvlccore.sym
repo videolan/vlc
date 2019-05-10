@@ -224,8 +224,6 @@ input_Release
 input_vaControl
 input_SetTime
 input_SetPosition
-input_LegacyVarInit
-input_LegacyEvents
 vlc_readdir_helper_init
 vlc_readdir_helper_finish
 vlc_readdir_helper_additem
