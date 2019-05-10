@@ -551,13 +551,13 @@ static void PacketizeReset( void *p_private, bool b_flush )
         ResetOutputVariables( p_sys );
         p_sys->p_active_pps = NULL;
         p_sys->p_active_sps = NULL;
+        p_sys->b_recovered = false;
+        p_sys->i_recoveryfnum = UINT_MAX;
         /* POC */
         h264_poc_context_init( &p_sys->pocctx );
         p_sys->prevdatedpoc.pts = VLC_TICK_INVALID;
     }
     p_sys->i_next_block_flags = BLOCK_FLAG_DISCONTINUITY;
-    p_sys->b_recovered = false;
-    p_sys->i_recoveryfnum = UINT_MAX;
     date_Set( &p_sys->dts, VLC_TICK_INVALID );
 }
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
