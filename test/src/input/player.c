@@ -168,7 +168,9 @@ struct media_params
 
 struct ctx
 {
+    libvlc_instance_t *vlc;
     vlc_player_t *player;
+    vlc_player_listener_id *listener;
     struct VLC_VECTOR(input_item_t *) next_medias;
     struct VLC_VECTOR(input_item_t *) played_medias;
 
@@ -1740,13 +1742,16 @@ ctx_destroy(struct ctx *ctx)
 #define X(type, name) vlc_vector_destroy(&ctx->report.name);
 REPORT_LIST
 #undef X
+    vlc_player_RemoveListener(ctx->player, ctx->listener);
+    vlc_player_Unlock(ctx->player);
+    vlc_player_Delete(ctx->player);
+
+    libvlc_release(ctx->vlc);
 }
 
-int
-main(void)
+static void
+ctx_init(struct ctx *ctx)
 {
-    test_init();
-
     static const char * argv[] = {
         "-v",
         "--ignore-config",
@@ -1771,7 +1776,8 @@ REPORT_LIST
     };
 #undef X
 
-    struct ctx ctx = {
+    *ctx = (struct ctx) {
+        .vlc = vlc,
         .next_medias = VLC_VECTOR_INITIALIZER,
         .played_medias = VLC_VECTOR_INITIALIZER,
         .program_switch_count = 1,
@@ -1779,7 +1785,7 @@ REPORT_LIST
         .rate = 1.f,
         .wait = VLC_STATIC_COND,
     };
-    reports_init(&ctx.report);
+    reports_init(&ctx->report);
 
     /* Force wdummy window */
     int ret = var_Create(vlc->p_libvlc_int, "window", VLC_VAR_STRING);
@@ -1787,14 +1793,23 @@ REPORT_LIST
     ret = var_SetString(vlc->p_libvlc_int, "window", "wdummy");
     assert(ret == VLC_SUCCESS);
 
-    ctx.player = vlc_player_New(VLC_OBJECT(vlc->p_libvlc_int), &provider, &ctx);
-    vlc_player_t *player = ctx.player;
-    assert(player);
+    ctx->player = vlc_player_New(VLC_OBJECT(vlc->p_libvlc_int), &provider, ctx);
+    assert(ctx->player);
 
-    vlc_player_Lock(player);
-    vlc_player_listener_id *listener =
-        vlc_player_AddListener(player, &cbs, &ctx);
-    assert(listener);
+    vlc_player_Lock(ctx->player);
+    ctx->listener = vlc_player_AddListener(ctx->player, &cbs, ctx);
+    assert(ctx->listener);
+}
+
+
+int
+main(void)
+{
+    test_init();
+
+    struct ctx ctx;
+
+    ctx_init(&ctx);
 
     test_outputs(&ctx); /* Must be the first test */
 
@@ -1812,15 +1827,8 @@ REPORT_LIST
     test_tracks(&ctx, false);
     test_programs(&ctx);
 
-    vlc_player_RemoveListener(player, listener);
-    vlc_player_Unlock(player);
-
-    vlc_player_Delete(player);
-
-    test_delete_while_playback(VLC_OBJECT(vlc->p_libvlc_int), true);
-    test_delete_while_playback(VLC_OBJECT(vlc->p_libvlc_int), false);
-
-    libvlc_release(vlc);
+    test_delete_while_playback(VLC_OBJECT(ctx.vlc->p_libvlc_int), true);
+    test_delete_while_playback(VLC_OBJECT(ctx.vlc->p_libvlc_int), false);
 
     ctx_destroy(&ctx);
     return 0;
