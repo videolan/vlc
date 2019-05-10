@@ -152,9 +152,6 @@ typedef struct input_thread_private_t
     bool            viewpoint_changed;
     vlc_renderer_item_t *p_renderer;
 
-    /* Title infos FIXME multi-input (not easy) ? */
-    int          i_title;
-    input_title_t *const *title;
 
     int i_title_offset;
     int i_seekpoint_offset;

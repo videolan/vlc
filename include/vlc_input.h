@@ -561,9 +561,6 @@ enum input_query_e
     INPUT_DEL_BOOKMARK,    /* arg1= seekpoint_t *  res=can fail   */
     INPUT_SET_BOOKMARK,    /* arg1= int  res=can fail    */
 
-    /* titles */
-    INPUT_GET_FULL_TITLE_INFO,     /* arg1=input_title_t*** arg2= int * res=can fail */
-
     /* On the fly input slave */
     INPUT_ADD_SLAVE,       /* arg1= enum slave_type, arg2= const char *,
                             * arg3= bool forced, arg4= bool notify,

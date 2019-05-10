@@ -204,28 +204,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             vlc_mutex_unlock( &priv->p_item->lock );
             return VLC_SUCCESS;
 
-        case INPUT_GET_FULL_TITLE_INFO:
-        {
-            vlc_mutex_lock( &priv->p_item->lock );
-            unsigned count = priv->i_title;
-            input_title_t **array = vlc_alloc( count, sizeof (*array) );
-
-            if( count > 0 && unlikely(array == NULL) )
-            {
-                vlc_mutex_unlock( &priv->p_item->lock );
-                return VLC_ENOMEM;
-            }
-
-            for( unsigned i = 0; i < count; i++ )
-                array[i] = vlc_input_title_Duplicate( priv->title[i] );
-
-            vlc_mutex_unlock( &priv->p_item->lock );
-
-            *va_arg( args, input_title_t *** ) = array;
-            *va_arg( args, int * ) = count;
-            return VLC_SUCCESS;
-        }
-
         case INPUT_ADD_SLAVE:
         {
             enum slave_type type =  va_arg( args, enum slave_type );
