@@ -945,7 +945,7 @@ static int  Open ( vlc_object_t *p_this )
 
     f_val = var_GetFloat( p_enc, SOUT_CFG_PREFIX "qcomp" );
     if( fabs(f_val - 0.60) > 0.005 )
-       p_sys->param.rc.f_qcompress = f_val;
+        p_sys->param.rc.f_qcompress = f_val;
 
     /* transcode-default bitrate is 0,
      * set more to ABR if user specifies bitrate */
@@ -1020,9 +1020,9 @@ static int  Open ( vlc_object_t *p_this )
     {
         if( atoi( psz_val ) != 0 )
         {
-           char *p = strchr( psz_val, ':' );
-           p_sys->param.i_deblocking_filter_alphac0 = atoi( psz_val );
-           p_sys->param.i_deblocking_filter_beta = p ?
+            char *p = strchr( psz_val, ':' );
+            p_sys->param.i_deblocking_filter_alphac0 = atoi( psz_val );
+            p_sys->param.i_deblocking_filter_beta = p ?
                     atoi( p+1 ) : p_sys->param.i_deblocking_filter_alphac0;
         }
         free( psz_val );
@@ -1033,9 +1033,9 @@ static int  Open ( vlc_object_t *p_this )
     {
         if( us_atof( psz_val ) != 1.0 )
         {
-           char *p = strchr( psz_val, ':' );
-           p_sys->param.analyse.f_psy_rd = us_atof( psz_val );
-           p_sys->param.analyse.f_psy_trellis = p ? us_atof( p+1 ) : 0;
+            char *p = strchr( psz_val, ':' );
+            p_sys->param.analyse.f_psy_rd = us_atof( psz_val );
+            p_sys->param.analyse.f_psy_trellis = p ? us_atof( p+1 ) : 0;
         }
         free( psz_val );
     }
@@ -1144,22 +1144,22 @@ static int  Open ( vlc_object_t *p_this )
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "me" );
     if( psz_val && strcmp( psz_val, "hex" ) )
     {
-       if( !strcmp( psz_val, "dia" ) )
-       {
+        if( !strcmp( psz_val, "dia" ) )
+        {
             p_sys->param.analyse.i_me_method = X264_ME_DIA;
-       }
-       else if( !strcmp( psz_val, "umh" ) )
-       {
+        }
+        else if( !strcmp( psz_val, "umh" ) )
+        {
             p_sys->param.analyse.i_me_method = X264_ME_UMH;
         }
-       else if( !strcmp( psz_val, "esa" ) )
-       {
-           p_sys->param.analyse.i_me_method = X264_ME_ESA;
-       }
-       else if( !strcmp( psz_val, "tesa" ) )
-       {
-           p_sys->param.analyse.i_me_method = X264_ME_TESA;
-       }
+        else if( !strcmp( psz_val, "esa" ) )
+        {
+            p_sys->param.analyse.i_me_method = X264_ME_ESA;
+        }
+        else if( !strcmp( psz_val, "tesa" ) )
+        {
+            p_sys->param.analyse.i_me_method = X264_ME_TESA;
+        }
     }
     free( psz_val );
 
@@ -1201,7 +1201,7 @@ static int  Open ( vlc_object_t *p_this )
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "b-adapt" );
     if( i_val != 1 )
-       p_sys->param.i_bframe_adaptive = i_val;
+        p_sys->param.i_bframe_adaptive = i_val;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "b-bias" );
     if( i_val >= -100 && i_val <= 100 && i_val != 0)
@@ -1494,20 +1494,20 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     /* init pic */
     x264_picture_init( &pic );
     if( likely(p_pict) ) {
-       pic.i_pts = p_pict->date;
-       pic.img.i_csp = p_sys->i_colorspace;
-       pic.img.i_plane = p_pict->i_planes;
-       for( i = 0; i < p_pict->i_planes; i++ )
-       {
-           pic.img.plane[i] = p_pict->p[i].p_pixels;
-           pic.img.i_stride[i] = p_pict->p[i].i_pitch;
-       }
+        pic.i_pts = p_pict->date;
+        pic.img.i_csp = p_sys->i_colorspace;
+        pic.img.i_plane = p_pict->i_planes;
+        for( i = 0; i < p_pict->i_planes; i++ )
+        {
+            pic.img.plane[i] = p_pict->p[i].p_pixels;
+            pic.img.i_stride[i] = p_pict->p[i].i_pitch;
+        }
 
-       x264_encoder_encode( p_sys->h, &nal, &i_nal, &pic, &pic );
+        x264_encoder_encode( p_sys->h, &nal, &i_nal, &pic, &pic );
     } else {
-       while( x264_encoder_delayed_frames( p_sys->h ) && i_nal == 0 ) {
-           x264_encoder_encode( p_sys->h, &nal, &i_nal, NULL, &pic );
-       }
+        while( x264_encoder_delayed_frames( p_sys->h ) && i_nal == 0 ) {
+            x264_encoder_encode( p_sys->h, &nal, &i_nal, NULL, &pic );
+        }
     }
 
     if( !i_nal ) return NULL;
@@ -1524,11 +1524,11 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     if( unlikely( p_sys->i_sei_size ) )
     {
        /* insert x264 headers SEI nal into the first picture block at the start */
-       memcpy( p_block->p_buffer, p_sys->p_sei, p_sys->i_sei_size );
-       i_offset = p_sys->i_sei_size;
-       p_sys->i_sei_size = 0;
-       free( p_sys->p_sei );
-       p_sys->p_sei = NULL;
+        memcpy( p_block->p_buffer, p_sys->p_sei, p_sys->i_sei_size );
+        i_offset = p_sys->i_sei_size;
+        p_sys->i_sei_size = 0;
+        free( p_sys->p_sei );
+        p_sys->p_sei = NULL;
     }
     /* copy encoded data directly to block */
     memcpy( p_block->p_buffer + i_offset, nal[0].p_payload, i_out );
