@@ -157,32 +157,32 @@ void PrefsDialog::setAdvanced()
     /* Lazy creation */
     if( !advanced_tree )
     {
+        p_list = module_list_get( &count );
+
+        advanced_tree = new PrefsTree( p_intf, advanced_tree_panel, p_list, count );
+
         tree_filter = new SearchLineEdit( advanced_tree_panel );
         tree_filter->setMinimumHeight( 26 );
-
-        CONNECT( tree_filter, textChanged( const QString &  ),
-                 this, advancedTreeFilterChanged( const QString & ) );
-
-        advanced_tree_panel->layout()->addWidget( tree_filter );
 
         current_filter = new QCheckBox( qtr("Only show current") );
         current_filter->setToolTip(
                     qtr("Only show modules related to current playback") );
-        CONNECT( current_filter, stateChanged(int),
-                 this, onlyLoadedToggled() );
-        advanced_tree_panel->layout()->addWidget( current_filter );
 
         QShortcut *search = new QShortcut( QKeySequence( QKeySequence::Find ), tree_filter );
-        CONNECT( search, activated(), tree_filter, setFocus() );
 
-        p_list = module_list_get( &count );
-        advanced_tree = new PrefsTree( p_intf, advanced_tree_panel, p_list, count );
+        advanced_tree_panel->layout()->addWidget( tree_filter );
+        advanced_tree_panel->layout()->addWidget( current_filter );
+        advanced_tree_panel->layout()->addWidget( advanced_tree );
+        advanced_tree_panel->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
 
         CONNECT( advanced_tree,
                  currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ),
                  this, changeAdvPanel( QTreeWidgetItem * ) );
-        advanced_tree_panel->layout()->addWidget( advanced_tree );
-        advanced_tree_panel->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
+        CONNECT( tree_filter, textChanged( const QString &  ),
+                 this, advancedTreeFilterChanged( const QString & ) );
+        CONNECT( current_filter, stateChanged(int),
+                 this, onlyLoadedToggled() );
+        CONNECT( search, activated(), tree_filter, setFocus() );
     }
 
     /* Create empty, dummy, controls panel, if needed */
