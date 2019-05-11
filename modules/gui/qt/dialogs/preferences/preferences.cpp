@@ -188,13 +188,6 @@ void PrefsDialog::setAdvanced()
         CONNECT( search, activated(), tree_filter, setFocus() );
     }
 
-    /* Create empty, dummy, controls panel, if needed */
-    if( advanced_panels_stack->count() < 1 )
-    {
-        AdvPrefsPanel *insert = new AdvPrefsPanel( advanced_panels_stack );
-        advanced_panels_stack->insertWidget( 0, insert );
-    }
-
     /* Select the first Item of the preferences. Maybe you want to select a specified
        category... */
     advanced_tree->setCurrentIndex(

@@ -592,10 +592,6 @@ end:
 /*********************************************************************
  * The Panel
  *********************************************************************/
-AdvPrefsPanel::AdvPrefsPanel( QWidget *_parent ) : QWidget( _parent )
-{
-    p_config = NULL;
-}
 
 AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                         PrefsItemData * data ) :

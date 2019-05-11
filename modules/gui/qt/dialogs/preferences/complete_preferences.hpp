@@ -114,7 +114,6 @@ class AdvPrefsPanel : public QWidget
     Q_OBJECT
 public:
     AdvPrefsPanel( qt_intf_t *, QWidget *, PrefsItemData * );
-    AdvPrefsPanel( QWidget * );
     virtual ~AdvPrefsPanel();
     void apply();
     void clean();
