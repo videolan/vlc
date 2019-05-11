@@ -441,7 +441,7 @@ StringListConfigControl::StringListConfigControl( module_config_t *_p_item,
     label = new QLabel( qfut(p_item->psz_text), p );
     combo = new QComboBox( p );
     combo->setMinimumWidth( MINWIDTH_BOX );
-    combo->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
+    combo->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
 
     /* needed to see update from getting choice list where callback used */
     module_config_t *p_module_config = config_FindConfig( p_item->psz_name );
