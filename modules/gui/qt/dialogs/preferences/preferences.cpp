@@ -154,7 +154,8 @@ PrefsDialog::~PrefsDialog()
 
 void PrefsDialog::setAdvanced()
 {
-    if ( !tree_filter )
+    /* Lazy creation */
+    if( !advanced_tree )
     {
         tree_filter = new SearchLineEdit( advanced_tree_panel );
         tree_filter->setMinimumHeight( 26 );
@@ -173,15 +174,10 @@ void PrefsDialog::setAdvanced()
 
         QShortcut *search = new QShortcut( QKeySequence( QKeySequence::Find ), tree_filter );
         CONNECT( search, activated(), tree_filter, setFocus() );
-    }
 
-    /* If don't have already and advanced TREE, then create it */
-    if( !advanced_tree )
-    {
-        /* Creation */
         p_list = module_list_get( &count );
         advanced_tree = new PrefsTree( p_intf, advanced_tree_panel, p_list, count );
-        /* and connections */
+
         CONNECT( advanced_tree,
                  currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ),
                  this, changeAdvPanel( QTreeWidgetItem * ) );
@@ -189,7 +185,7 @@ void PrefsDialog::setAdvanced()
         advanced_tree_panel->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
     }
 
-    /* If no advanced Panel exist, create one, attach it and show it*/
+    /* Create empty, dummy, controls panel, if needed */
     if( advanced_panels_stack->count() < 1 )
     {
         AdvPrefsPanel *insert = new AdvPrefsPanel( advanced_panels_stack );
