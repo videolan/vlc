@@ -190,12 +190,11 @@ void PrefsDialog::setAdvanced()
         CONNECT( current_filter, stateChanged(int),
                  this, onlyLoadedToggled() );
         CONNECT( search, activated(), tree_filter, setFocus() );
-    }
 
-    /* Select the first Item of the preferences. Maybe you want to select a specified
-       category... */
-    advanced_tree->setCurrentIndex(
-            advanced_tree->model()->index( 0, 0, QModelIndex() ) );
+        /* Set initial selection */
+        advanced_tree->setCurrentIndex(
+                advanced_tree->model()->index( 0, 0, QModelIndex() ) );
+    }
 
     all->setChecked( true );
     stack->setCurrentIndex( ADVANCED );
