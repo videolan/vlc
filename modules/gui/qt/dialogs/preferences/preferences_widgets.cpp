@@ -85,8 +85,7 @@ QString formatTooltip(const QString & tooltip)
 }
 
 ConfigControl *ConfigControl::createControl( module_config_t *p_item,
-                                             QWidget *parent,
-                                             QGridLayout *l, int line )
+                                             QWidget *parent )
 {
     ConfigControl *p_control = NULL;
 
@@ -144,8 +143,27 @@ ConfigControl *ConfigControl::createControl( module_config_t *p_item,
     default:
         break;
     }
-    if ( p_control ) p_control->insertInto( l, line );
     return p_control;
+}
+
+ConfigControl *ConfigControl::createControl( module_config_t *item,
+                                             QWidget *parent,
+                                             QGridLayout *l, int line )
+{
+    ConfigControl *control = createControl( item, parent );
+    if ( control )
+        control->insertInto( l, line );
+    return control;
+}
+
+ConfigControl *ConfigControl::createControl( module_config_t *item,
+                                             QWidget *parent,
+                                             QBoxLayout *l, int index )
+{
+    ConfigControl *control = createControl( item, parent );
+    if ( control )
+        control->insertInto( l, index );
+    return control;
 }
 
 /*******************************************************
@@ -220,6 +238,12 @@ void StringConfigControl::insertInto( QGridLayout *l, int line )
     l->addWidget( label, line, 0 );
     l->setColumnMinimumWidth( 1, 10 );
     l->addWidget( text, line, LAST_COLUMN, Qt::AlignRight );
+}
+
+void StringConfigControl::insertInto( QBoxLayout *l, int index )
+{
+    l->insertWidget( index, label );
+    l->insertWidget( index + 1, text );
 }
 
 void StringConfigControl::finish()
@@ -303,6 +327,16 @@ void FileConfigControl::insertInto( QGridLayout *l, int line )
     textAndButton->addWidget( text, 2 );
     textAndButton->addWidget( browse, 0 );
     l->addLayout( textAndButton, line, LAST_COLUMN );
+}
+
+void FileConfigControl::insertInto( QBoxLayout *l, int index )
+{
+    l->insertWidget( index, label );
+    QHBoxLayout *textAndButton = new QHBoxLayout();
+    textAndButton->setMargin( 0 );
+    textAndButton->addWidget( text, 2 );
+    textAndButton->addWidget( browse, 0 );
+    l->insertLayout( index + 1, textAndButton );
 }
 
 void FileConfigControl::updateField()
@@ -406,6 +440,12 @@ void FontConfigControl::insertInto( QGridLayout *l, int line )
     l->addWidget( font, line, 1, 1, -1 );
 }
 
+void FontConfigControl::insertInto( QBoxLayout *l, int index )
+{
+    l->insertWidget( index, label );
+    l->insertWidget( index + 1, font );
+}
+
 void FontConfigControl::changeVisibility( bool visible )
 {
     font->setVisible( visible );
@@ -451,6 +491,12 @@ void StringListConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
+}
+
+void StringListConfigControl::insertInto( QBoxLayout *l, int index )
+{
+    l->insertWidget( index, label );
+    l->insertWidget( index + 1, combo );
 }
 
 void StringListConfigControl::comboIndexChanged( int i_index )
@@ -572,6 +618,12 @@ void ModuleConfigControl::insertInto( QGridLayout *l, int line )
     l->addWidget( combo, line, LAST_COLUMN );
 }
 
+void ModuleConfigControl::insertInto( QBoxLayout *l, int index )
+{
+    l->insertWidget( index, label );
+    l->insertWidget( index + 1, combo );
+}
+
 void ModuleConfigControl::finish( )
 {
     combo->setEditable( false );
@@ -663,6 +715,11 @@ ModuleListConfigControl::ModuleListConfigControl( module_config_t *_p_item,
 void ModuleListConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( groupBox, line, 0, 1, -1 );
+}
+
+void ModuleListConfigControl::insertInto( QBoxLayout *l, int index )
+{
+    l->insertWidget( index, groupBox );
 }
 
 ModuleListConfigControl::~ModuleListConfigControl()
@@ -822,6 +879,12 @@ void IntegerConfigControl::insertInto( QGridLayout *l, int line )
     l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
 }
 
+void IntegerConfigControl::insertInto( QBoxLayout *l, int index )
+{
+    l->insertWidget( index, label );
+    l->insertWidget( index + 1, spin );
+}
+
 void IntegerConfigControl::finish()
 {
     spin->setMaximum( 2000000000 );
@@ -904,7 +967,6 @@ int IntegerRangeSliderConfigControl::getValue() const
     return slider->value();
 }
 
-
 /********* Integer / choice list **********/
 IntegerListConfigControl::IntegerListConfigControl( module_config_t *_p_item,
                                                     QWidget *p ) :
@@ -940,7 +1002,13 @@ void IntegerListConfigControl::insertInto( QGridLayout *l, int line )
     l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
 }
 
-void IntegerListConfigControl::finish(module_config_t *p_module_config )
+void IntegerListConfigControl::insertInto( QBoxLayout *l, int index )
+{
+    l->insertWidget( index, label );
+    l->insertWidget( index + 1, combo );
+}
+
+void IntegerListConfigControl::finish( module_config_t *p_module_config )
 {
     combo->setEditable( false );
 
@@ -1004,6 +1072,11 @@ void BoolConfigControl::insertInto( QGridLayout *l, int line )
     l->addWidget( checkbox, line, 0, 1, -1 );
 }
 
+void BoolConfigControl::insertInto( QBoxLayout *l, int index )
+{
+    l->insertWidget( index, checkbox );
+}
+
 void BoolConfigControl::finish()
 {
     checkbox->setChecked( p_item->value.i );
@@ -1045,6 +1118,12 @@ void ColorConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( color_but, line, LAST_COLUMN, Qt::AlignRight );
+}
+
+void ColorConfigControl::insertInto( QBoxLayout *l, int index )
+{
+    l->insertWidget( index, label );
+    l->insertWidget( index + 1, color_but );
 }
 
 void ColorConfigControl::finish()
@@ -1127,6 +1206,12 @@ void FloatConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
+}
+
+void FloatConfigControl::insertInto( QBoxLayout *l, int index )
+{
+    l->insertWidget( index, label );
+    l->insertWidget( index + 1, spin );
 }
 
 void FloatConfigControl::finish()
