@@ -780,9 +780,10 @@ static int  Open ( vlc_object_t *p_this )
     encoder_t     *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
     int i_val;
+    float f_val;
     char *psz_val;
     int i_qmin = 0, i_qmax = 0;
-    x264_nal_t    *nal;
+    x264_nal_t *nal;
     int i, i_nal;
     bool fullrange = false;
 
@@ -942,9 +943,9 @@ static int  Open ( vlc_object_t *p_this )
             break;
     }
 
-
-    if( fabs(var_GetFloat( p_enc, SOUT_CFG_PREFIX "qcomp" ) - 0.60) > 0.005 )
-       p_sys->param.rc.f_qcompress = var_GetFloat( p_enc, SOUT_CFG_PREFIX "qcomp" );
+    f_val = var_GetFloat( p_enc, SOUT_CFG_PREFIX "qcomp" );
+    if( fabs(f_val - 0.60) > 0.005 )
+       p_sys->param.rc.f_qcompress = f_val;
 
     /* transcode-default bitrate is 0,
      * set more to ABR if user specifies bitrate */
@@ -1005,14 +1006,14 @@ static int  Open ( vlc_object_t *p_this )
 
 
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" ) )
-       p_sys->param.rc.b_mb_tree = var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" );
+        p_sys->param.rc.b_mb_tree = false;
 
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "cabac" ) )
-        p_sys->param.b_cabac = var_GetBool( p_enc, SOUT_CFG_PREFIX "cabac" );
+        p_sys->param.b_cabac = false;
 
     /* disable deblocking when nf (no loop filter) is enabled */
     if( var_GetBool( p_enc, SOUT_CFG_PREFIX "nf" ) )
-       p_sys->param.b_deblocking_filter = !var_GetBool( p_enc, SOUT_CFG_PREFIX "nf" );
+        p_sys->param.b_deblocking_filter = false;
 
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "deblock" );
     if( psz_val )
@@ -1040,7 +1041,7 @@ static int  Open ( vlc_object_t *p_this )
     }
 
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "psy" ) )
-       p_sys->param.analyse.b_psy = var_GetBool( p_enc, SOUT_CFG_PREFIX "psy" );
+        p_sys->param.analyse.b_psy = false;
 
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "level" );
     if( psz_val )
@@ -1054,19 +1055,24 @@ static int  Open ( vlc_object_t *p_this )
     }
 
     p_sys->param.b_interlaced = var_GetBool( p_enc, SOUT_CFG_PREFIX "interlaced" );
-    if( fabs(var_GetFloat( p_enc, SOUT_CFG_PREFIX "ipratio" ) - 1.4) > 0.005 )
-       p_sys->param.rc.f_ip_factor = var_GetFloat( p_enc, SOUT_CFG_PREFIX "ipratio" );
-    if( fabs(var_GetFloat( p_enc, SOUT_CFG_PREFIX "pbratio" ) - 1.3 ) > 0.005 )
-       p_sys->param.rc.f_pb_factor = var_GetFloat( p_enc, SOUT_CFG_PREFIX "pbratio" );
+    f_val = var_GetFloat( p_enc, SOUT_CFG_PREFIX "ipratio" );
+    if( fabs(f_val - 1.4) > 0.005 )
+        p_sys->param.rc.f_ip_factor = f_val;
+    f_val = var_GetFloat( p_enc, SOUT_CFG_PREFIX "pbratio" );
+    if( fabs(f_val - 1.3 ) > 0.005 )
+        p_sys->param.rc.f_pb_factor = f_val;
     p_sys->param.rc.f_complexity_blur = var_GetFloat( p_enc, SOUT_CFG_PREFIX "cplxblur" );
     p_sys->param.rc.f_qblur = var_GetFloat( p_enc, SOUT_CFG_PREFIX "qblur" );
-    if( var_GetInteger( p_enc, SOUT_CFG_PREFIX "aq-mode" ) != X264_AQ_VARIANCE )
-       p_sys->param.rc.i_aq_mode = var_GetInteger( p_enc, SOUT_CFG_PREFIX "aq-mode" );
-    if( fabs( var_GetFloat( p_enc, SOUT_CFG_PREFIX "aq-strength" ) - 1.0) > 0.005 )
-       p_sys->param.rc.f_aq_strength = var_GetFloat( p_enc, SOUT_CFG_PREFIX "aq-strength" );
+    i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "aq-mode" );
+    if( i_val != X264_AQ_VARIANCE )
+        p_sys->param.rc.i_aq_mode = i_val;
+    f_val = var_GetFloat( p_enc, SOUT_CFG_PREFIX "aq-strength" );
+    if( fabs( f_val - 1.0 ) > 0.005 )
+        p_sys->param.rc.f_aq_strength = f_val;
 
-    if( var_GetInteger( p_enc, SOUT_CFG_PREFIX "frame-packing" ) > -1 )
-       p_sys->param.i_frame_packing = var_GetInteger( p_enc, SOUT_CFG_PREFIX "frame-packing" );
+    i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "frame-packing" );
+    if( i_val > -1 )
+        p_sys->param.i_frame_packing = i_val;
 
     if( var_GetBool( p_enc, SOUT_CFG_PREFIX "verbose" ) )
         p_sys->param.i_log_level = X264_LOG_DEBUG;
@@ -1188,10 +1194,10 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->param.analyse.b_psnr = var_GetBool( p_enc, SOUT_CFG_PREFIX "psnr" );
     p_sys->param.analyse.b_ssim = var_GetBool( p_enc, SOUT_CFG_PREFIX "ssim" );
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "weightb" ) )
-       p_sys->param.analyse.b_weighted_bipred = var_GetBool( p_enc,
-                                    SOUT_CFG_PREFIX "weightb" );
-    if( var_GetInteger( p_enc, SOUT_CFG_PREFIX "weightp" ) != 2 )
-       p_sys->param.analyse.i_weighted_pred = var_GetInteger( p_enc, SOUT_CFG_PREFIX "weightp" );
+        p_sys->param.analyse.b_weighted_bipred = false;
+    i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "weightp" );
+    if( i_val != 2 )
+        p_sys->param.analyse.i_weighted_pred = i_val;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "b-adapt" );
     if( i_val != 1 )
@@ -1206,24 +1212,21 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->param.analyse.i_chroma_qp_offset = var_GetInteger( p_enc,
                                     SOUT_CFG_PREFIX "chroma-qp-offset" );
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "mixed-refs" ) )
-       p_sys->param.analyse.b_mixed_references = var_GetBool( p_enc,
-                                    SOUT_CFG_PREFIX "mixed-refs" );
+        p_sys->param.analyse.b_mixed_references = false;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "trellis" );
     if( i_val >= 0 && i_val <= 2 && i_val != 1 )
         p_sys->param.analyse.i_trellis = i_val;
 
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "fast-pskip" ) )
-       p_sys->param.analyse.b_fast_pskip = var_GetBool( p_enc,
-                                    SOUT_CFG_PREFIX "fast-pskip" );
+        p_sys->param.analyse.b_fast_pskip = false;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "nr" );
     if( i_val > 0 && i_val <= 1000 )
         p_sys->param.analyse.i_noise_reduction = i_val;
 
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "dct-decimate" ) )
-       p_sys->param.analyse.b_dct_decimate = var_GetBool( p_enc,
-                                    SOUT_CFG_PREFIX "dct-decimate" );
+        p_sys->param.analyse.b_dct_decimate = false;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "deadzone-inter" );
     if( i_val >= 0 && i_val <= 32 && i_val != 21 )
@@ -1274,8 +1277,7 @@ static int  Open ( vlc_object_t *p_this )
     free( psz_val );
 
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "8x8dct" ) )
-       p_sys->param.analyse.b_transform_8x8 = var_GetBool( p_enc,
-                                    SOUT_CFG_PREFIX "8x8dct" );
+        p_sys->param.analyse.b_transform_8x8 = false;
 
     if( p_enc->fmt_in.video.i_sar_num > 0 &&
         p_enc->fmt_in.video.i_sar_den > 0 )
@@ -1372,10 +1374,9 @@ static int  Open ( vlc_object_t *p_this )
     vlc_mutex_unlock( &pthread_win32_mutex );
 #endif
 
-    if( var_GetInteger( p_enc, SOUT_CFG_PREFIX "lookahead" ) != 40 )
-    {
-       p_sys->param.rc.i_lookahead = var_GetInteger( p_enc, SOUT_CFG_PREFIX "lookahead" );
-    }
+    i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "lookahead" );
+    if( i_val != 40 )
+        p_sys->param.rc.i_lookahead = i_val;
 
     /* We don't want repeated headers, we repeat p_extra ourself if needed */
     p_sys->param.b_repeat_headers = 0;
