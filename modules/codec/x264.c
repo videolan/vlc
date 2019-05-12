@@ -121,7 +121,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
     "as a reference, and reorders frame appropriately.\n" \
     " - none: Disabled\n" \
     " - strict: Strictly hierarchical pyramid\n" \
-    " - normal: Non-strict (not Blu-ray compatible)\n"\
+    " - normal: Non-strict (not Blu-ray compatible)"\
     )
 
 #define FULLRANGE_TEXT N_("Use fullrange instead of TV colorrange")
@@ -248,7 +248,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define PASS_LONGTEXT N_( "Multipass ratecontrol:\n" \
     " - 1: First pass, creates stats file\n" \
     " - 2: Last pass, does not overwrite stats file\n" \
-    " - 3: Nth pass, overwrites stats file\n" )
+    " - 3: Nth pass, overwrites stats file" )
 
 #define QCOMP_TEXT N_("QP curve compression")
 #define QCOMP_LONGTEXT N_( "QP curve compression. Range 0.0 (CBR) to 1.0 (QCP).")
@@ -279,7 +279,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define DIRECT_PRED_SIZE_LONGTEXT N_( "Direct prediction size:\n" \
     " -  0: 4x4\n" \
     " -  1: 8x8\n" \
-    " - -1: smallest possible according to level\n" )
+    " - -1: smallest possible according to level" )
 
 #define WEIGHTB_TEXT N_("Weighted prediction for B-frames")
 #define WEIGHTB_LONGTEXT N_( "Weighted prediction for B-frames.")
@@ -288,7 +288,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define WEIGHTP_LONGTEXT N_("Weighted prediction for P-frames:\n" \
     " - 0: Disabled\n"\
     " - 1: Blind offset\n"\
-    " - 2: Smart analysis\n" )
+    " - 2: Smart analysis" )
 
 #define ME_TEXT N_("Integer pixel motion estimation method")
 #define ME_LONGTEXT N_( "Selects the motion estimation algorithm:\n"\
@@ -296,7 +296,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
     " - hex: hexagonal search, radius 2\n" \
     " - umh: uneven multi-hexagon search (better but slower)\n" \
     " - esa: exhaustive search (extremely slow, primarily for testing)\n" \
-    " - tesa: hadamard exhaustive search (extremely slow, primarily for testing)\n" )
+    " - tesa: hadamard exhaustive search (extremely slow, primarily for testing)" )
 
 #define MERANGE_TEXT N_("Maximum motion vector search range")
 #define MERANGE_LONGTEXT N_( "Maximum distance to search for " \
