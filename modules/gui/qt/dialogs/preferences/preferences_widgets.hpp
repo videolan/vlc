@@ -189,7 +189,6 @@ private:
     void finish(module_config_t * );
     QLabel *label;
     QComboBox *combo;
-    QList<QPushButton *> buttons;
 };
 
 class BoolConfigControl : public VIntConfigControl
@@ -447,7 +446,6 @@ protected:
 private:
     void finish(module_config_t * );
     QLabel *label;
-    QList<QPushButton *> buttons;
 private slots:
     void comboIndexChanged( int );
 };

@@ -400,10 +400,6 @@ void StringListConfigControl::fillGrid( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
-    int i = 0;
-    foreach( QPushButton *button, buttons )
-        l->addWidget( button, line, LAST_COLUMN + i++,
-                      Qt::AlignRight );
 }
 
 void StringListConfigControl::comboIndexChanged( int i_index )
@@ -867,10 +863,6 @@ void IntegerListConfigControl::fillGrid( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
-    int i = 0;
-    foreach( QPushButton *button, buttons )
-        l->addWidget( button, line, LAST_COLUMN + i++,
-                      Qt::AlignRight );
 }
 
 IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
