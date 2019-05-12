@@ -1829,7 +1829,7 @@ vlc_module_begin ()
                  SOCKS_SERVER_TEXT, SOCKS_SERVER_LONGTEXT, true )
     add_string( "socks-user", NULL,
                  SOCKS_USER_TEXT, SOCKS_USER_LONGTEXT, true )
-    add_string( "socks-pwd", NULL,
+    add_password( "socks-pwd", NULL,
                  SOCKS_PASS_TEXT, SOCKS_PASS_LONGTEXT, true )
 
 
