@@ -181,7 +181,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     i_format_list_size = (int)ARRAY_SIZE(format_list);
     for (i = 0; i < i_format_list_size; i++)
     {
-        if ( !strncmp( format_list[i], psz_format, strlen(format_list[i]) ) )
+        if ( !strcmp( format_list[i], psz_format ) )
         {
             break;
         }
