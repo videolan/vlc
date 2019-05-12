@@ -97,8 +97,8 @@ bool CommonEncryptionSession::start(SharedResources *res, const CommonEncryption
 
 void CommonEncryptionSession::close()
 {
-    gcry_cipher_hd_t handle = reinterpret_cast<gcry_cipher_hd_t>(ctx);
 #ifdef HAVE_GCRYPT
+    gcry_cipher_hd_t handle = reinterpret_cast<gcry_cipher_hd_t>(ctx);
     if(ctx)
         gcry_cipher_close(handle);
     ctx = NULL;
@@ -107,12 +107,12 @@ void CommonEncryptionSession::close()
 
 size_t CommonEncryptionSession::decrypt(void *inputdata, size_t inputbytes, bool last)
 {
-    gcry_cipher_hd_t handle = reinterpret_cast<gcry_cipher_hd_t>(ctx);
 #ifndef HAVE_GCRYPT
     (void)data;
     (void)bytes;
     (void)last;
 #else
+    gcry_cipher_hd_t handle = reinterpret_cast<gcry_cipher_hd_t>(ctx);
     if(encryption.method == CommonEncryption::Method::AES_128 && ctx)
     {
         if ((inputbytes % 16) != 0 || inputbytes < 16 ||
