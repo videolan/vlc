@@ -87,36 +87,6 @@ static void releaseTagsList(std::list<Tag *> &list)
     list.clear();
 }
 
-void M3U8Parser::setFormatFromExtension(Representation *rep, const std::string &filename)
-{
-    std::size_t pos = filename.find_last_of('.');
-    if(pos != std::string::npos)
-    {
-        std::string extension = Helper::getFileExtension(filename);
-        transform(extension.begin(), extension.end(), extension.begin(), (int (*)(int))std::tolower);
-        if(extension == "aac")
-        {
-            rep->streamFormat = StreamFormat(StreamFormat::PACKEDAAC);
-        }
-        else if(extension == "ts" || extension == "mp2t" || extension == "mpeg" || extension == "m2ts")
-        {
-            rep->streamFormat = StreamFormat(StreamFormat::MPEG2TS);
-        }
-        else if(extension == "mp4" || extension == "m4s" || extension == "mov" || extension == "m4v")
-        {
-            rep->streamFormat = StreamFormat(StreamFormat::MP4);
-        }
-        else if(extension == "vtt" || extension == "wvtt" || extension == "webvtt")
-        {
-            rep->streamFormat = StreamFormat(StreamFormat::WEBVTT);
-        }
-        else
-        {
-            rep->streamFormat = StreamFormat(StreamFormat::UNKNOWN);
-        }
-    }
-}
-
 Representation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet, const AttributesTag * tag)
 {
     const Attribute *uriAttr = tag->getAttributeByName("URI");
@@ -293,8 +263,6 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                     break;
 
                 segment->setSourceUrl(uritag->getValue().value);
-                if((unsigned)rep->getStreamFormat() == StreamFormat::UNKNOWN)
-                    setFormatFromExtension(rep, uritag->getValue().value);
 
                 /* Need to use EXTXTARGETDURATION as default as some can't properly set segment one */
                 double duration = rep->targetDuration;

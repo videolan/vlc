@@ -42,7 +42,7 @@ using namespace adaptive::http;
 AbstractStream::AbstractStream(demux_t * demux_)
 {
     p_realdemux = demux_;
-    format = StreamFormat::UNSUPPORTED;
+    format = StreamFormat::UNKNOWN;
     currentChunk = NULL;
     eof = false;
     valid = true;
