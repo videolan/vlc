@@ -356,7 +356,7 @@ static const int pi_deinterlace[] = {
     0, -1, 1
 };
 static const char * const  ppsz_deinterlace_text[] = {
-    "Off", "Automatic", "On"
+    N_("Off"), N_("Automatic"), N_("On")
 };
 
 #define DEINTERLACE_MODE_TEXT N_("Deinterlace mode")
