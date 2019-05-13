@@ -217,7 +217,7 @@ static bool BDJO_IsBlacklisted(demux_t *p_demux, const char *psz_bd_path)
 static const char *const ppsz_region_code[] = {
     "A", "B", "C" };
 static const char *const ppsz_region_code_text[] = {
-    "Region A", "Region B", "Region C" };
+    N_("Region A"), N_("Region B"), N_("Region C") };
 
 #define REGION_DEFAULT   1   /* Index to region list. Actual region code is (1<<REGION_DEFAULT) */
 #define LANGUAGE_DEFAULT ("eng")
