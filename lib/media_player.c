@@ -2090,26 +2090,31 @@ int libvlc_media_player_get_role(libvlc_media_player_t *mp)
 
 /* make sure surface structures from libvlc can be passed as such to vlc
    otherwise we will need wrappers between what libvlc understands and what vlc uses */
-
-static_assert(libvlc_video_colorspace_BT601  == COLOR_SPACE_BT601 &&
-              libvlc_video_colorspace_BT709  == COLOR_SPACE_BT709 &&
-              libvlc_video_colorspace_BT2020 == COLOR_SPACE_BT2020
+#define cast_  libvlc_video_color_space_t
+static_assert(libvlc_video_colorspace_BT601  == (cast_)COLOR_SPACE_BT601 &&
+              libvlc_video_colorspace_BT709  == (cast_)COLOR_SPACE_BT709 &&
+              libvlc_video_colorspace_BT2020 == (cast_)COLOR_SPACE_BT2020
               , "libvlc video colorspace mismatch");
+#undef cast_
 
-static_assert(libvlc_video_transfer_func_LINEAR       == TRANSFER_FUNC_LINEAR &&
-              libvlc_video_transfer_func_SRGB         == TRANSFER_FUNC_SRGB &&
-              libvlc_video_transfer_func_BT470_BG     == TRANSFER_FUNC_BT470_BG &&
-              libvlc_video_transfer_func_BT470_M      == TRANSFER_FUNC_BT470_M &&
-              libvlc_video_transfer_func_BT709        == TRANSFER_FUNC_BT709 &&
-              libvlc_video_transfer_func_PQ           == TRANSFER_FUNC_SMPTE_ST2084 &&
-              libvlc_video_transfer_func_SMPTE_240    == TRANSFER_FUNC_SMPTE_240 &&
-              libvlc_video_transfer_func_HLG          == TRANSFER_FUNC_HLG
+#define cast_  libvlc_video_transfer_func_t
+static_assert(libvlc_video_transfer_func_LINEAR       == (cast_)TRANSFER_FUNC_LINEAR &&
+              libvlc_video_transfer_func_SRGB         == (cast_)TRANSFER_FUNC_SRGB &&
+              libvlc_video_transfer_func_BT470_BG     == (cast_)TRANSFER_FUNC_BT470_BG &&
+              libvlc_video_transfer_func_BT470_M      == (cast_)TRANSFER_FUNC_BT470_M &&
+              libvlc_video_transfer_func_BT709        == (cast_)TRANSFER_FUNC_BT709 &&
+              libvlc_video_transfer_func_PQ           == (cast_)TRANSFER_FUNC_SMPTE_ST2084 &&
+              libvlc_video_transfer_func_SMPTE_240    == (cast_)TRANSFER_FUNC_SMPTE_240 &&
+              libvlc_video_transfer_func_HLG          == (cast_)TRANSFER_FUNC_HLG
               , "libvlc video transfer function mismatch");
+#undef cast_
 
-static_assert(libvlc_video_primaries_BT601_525 == COLOR_PRIMARIES_BT601_525 &&
-              libvlc_video_primaries_BT601_625 == COLOR_PRIMARIES_BT601_625 &&
-              libvlc_video_primaries_BT709     == COLOR_PRIMARIES_BT709 &&
-              libvlc_video_primaries_BT2020    == COLOR_PRIMARIES_BT2020 &&
-              libvlc_video_primaries_DCI_P3    == COLOR_PRIMARIES_DCI_P3 &&
-              libvlc_video_primaries_BT470_M   == COLOR_PRIMARIES_BT470_M
+#define cast_  libvlc_video_color_primaries_t
+static_assert(libvlc_video_primaries_BT601_525 == (cast_)COLOR_PRIMARIES_BT601_525 &&
+              libvlc_video_primaries_BT601_625 == (cast_)COLOR_PRIMARIES_BT601_625 &&
+              libvlc_video_primaries_BT709     == (cast_)COLOR_PRIMARIES_BT709 &&
+              libvlc_video_primaries_BT2020    == (cast_)COLOR_PRIMARIES_BT2020 &&
+              libvlc_video_primaries_DCI_P3    == (cast_)COLOR_PRIMARIES_DCI_P3 &&
+              libvlc_video_primaries_BT470_M   == (cast_)COLOR_PRIMARIES_BT470_M
               , "libvlc video color primaries mismatch");
+#undef cast_
