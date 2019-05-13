@@ -48,8 +48,8 @@ static HRESULT StreamStart( aout_stream_t *, audio_sample_format_t *,
                             const GUID * );
 static void * PlayedDataEraser( void * );
 /* Speaker setup override options list */
-static const char *const speaker_list[] = { "Windows default", "Mono", "Stereo",
-                                            "Quad", "5.1", "7.1" };
+static const char *const speaker_list[] = { N_("Windows default"), N_("Mono"), N_("Stereo"),
+                                            N_("Quad"), N_("5.1"), N_("7.1") };
 
 /*****************************************************************************
  * Module descriptor
