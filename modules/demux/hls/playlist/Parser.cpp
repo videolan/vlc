@@ -483,6 +483,12 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                         }
                     }
                 }
+
+                if(adaptSet->description.Get().empty() &&
+                   tag && tag->getAttributeByName("NAME"))
+                {
+                    adaptSet->description.Set(tag->getAttributeByName("NAME")->quotedString());
+                }
             }
             if(!adaptSet->getRepresentations().empty())
                 period->addAdaptationSet(adaptSet);
