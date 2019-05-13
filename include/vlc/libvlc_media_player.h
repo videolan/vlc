@@ -611,6 +611,14 @@ typedef enum libvlc_video_direct3d_engine_t {
 typedef struct
 {
     bool hardware_decoding; /** set if D3D11_CREATE_DEVICE_VIDEO_SUPPORT is needed for D3D11 */
+
+    /** Callback to call when the size of the host changes
+     *
+     * \note This may be called from any thread as long as it's not after
+     *    \ref libvlc_video_direct3d_device_cleanup_cb has been called.
+     */
+    void (*report_size_change)(void *report_opaque, unsigned width, unsigned height);
+    void *report_opaque;
 } libvlc_video_direct3d_device_cfg_t;
 
 typedef struct

@@ -1711,7 +1711,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     libvlc_video_direct3d_device_cfg_t surface_cfg = {
-        .hardware_decoding = is_d3d9_opaque( vd->source.i_chroma )
+        .hardware_decoding = is_d3d9_opaque( vd->source.i_chroma ),
+        /* bypass the size handling as the window doesn't handle the size */
+        .report_size_change = vd->cfg->window->ops->resize ? NULL: vout_window_ReportSize,
+        .report_opaque     = vd->cfg->window->ops->resize ? NULL: vd->cfg->window,
     };
     libvlc_video_direct3d_device_setup_t device_setup;
     IDirect3DDevice9 *d3d9_device = NULL;

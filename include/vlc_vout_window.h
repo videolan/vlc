@@ -375,7 +375,8 @@ typedef struct vout_window_t {
         struct wl_display *wl; /**< Wayland display (client pointer) */
     } display;
 
-    const struct vout_window_operations *ops;
+    const struct vout_window_operations *ops; /**< operations handled by the
+                             window. Once this is set it MUST NOT be changed */
 
     struct {
         bool has_double_click; /**< Whether double click events are sent,
@@ -427,7 +428,7 @@ void vout_window_SetInhibition(vout_window_t *window, bool enabled);
 /**
  * Requests a new window state.
  *
- * This requests a change of the state of a window from the windowing system. 
+ * This requests a change of the state of a window from the windowing system.
  * See \ref vout_window_state for possible states.
  *
  * @param window window whose state to change

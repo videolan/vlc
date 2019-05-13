@@ -1074,7 +1074,7 @@ bool libvlc_video_direct3d_set_callbacks(libvlc_media_player_t *mp,
                                          libvlc_video_direct3d_select_plane_cb select_plane_cb,
                                          void *opaque)
 {
-    var_SetString( mp, "window", "wdummy");
+    var_SetString( mp, "window", "wextern");
 
     if ( engine == libvlc_video_direct3d_engine_d3d11 )
     {
