@@ -29,7 +29,10 @@ enum Role {
     TRACK_DURATION,
     TRACK_ALBUM,
     TRACK_ARTIST,
-    TRACK_FIRST_SYMBOL,
+
+    TRACK_TITLE_FIRST_SYMBOL,
+    TRACK_ALBUM_FIRST_SYMBOL,
+    TRACK_ARTIST_FIRST_SYMBOL,
 };
 
 }
@@ -77,8 +80,12 @@ QVariant MLAlbumTrackModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue( ml_track->getAlbumTitle() );
     case TRACK_ARTIST:
         return QVariant::fromValue( ml_track->getArtist() );
-    case TRACK_FIRST_SYMBOL:
+    case TRACK_TITLE_FIRST_SYMBOL:
         return QVariant::fromValue( getFirstSymbol( ml_track->getTitle() ) );
+    case TRACK_ALBUM_FIRST_SYMBOL:
+        return QVariant::fromValue( getFirstSymbol( ml_track->getAlbumTitle() ) );
+    case TRACK_ARTIST_FIRST_SYMBOL:
+        return QVariant::fromValue( getFirstSymbol( ml_track->getArtist() ) );
     default :
         return QVariant();
     }
@@ -95,7 +102,9 @@ QHash<int, QByteArray> MLAlbumTrackModel::roleNames() const
         { TRACK_DURATION, "duration" },
         { TRACK_ALBUM, "album_title"},
         { TRACK_ARTIST, "main_artist"},
-        { TRACK_FIRST_SYMBOL, "first_symbol"},
+        { TRACK_TITLE_FIRST_SYMBOL, "title_first_symbol"},
+        { TRACK_ALBUM_FIRST_SYMBOL, "album_title_first_symbol"},
+        { TRACK_ARTIST_FIRST_SYMBOL, "main_artist_first_symbol"},
     };
 }
 

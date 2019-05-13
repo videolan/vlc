@@ -37,13 +37,24 @@ Utils.KeyNavigableTableView {
         ListElement{ criteria: "disc_number"; width:0.05; text: qsTr("Disc");  showSection: "" }
     }
 
-    section.property: "first_symbol"
+    section.property: "title_first_symbol"
 
     headerColor: VLCStyle.colors.bg
 
     model: MLAlbumTrackModel {
         id: rootmodel
         ml: medialib
+        onSortCriteriaChanged: {
+            switch (rootmodel.sortCriteria) {
+            case "title":
+            case "album_title":
+            case "main_artist":
+                section.property = rootmodel.sortCriteria + "_first_symbol"
+                break;
+            default:
+                section.property = ""
+            }
+        }
     }
 
     property alias parentId: rootmodel.parentId
