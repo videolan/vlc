@@ -228,6 +228,10 @@ static int Open(vlc_object_t *p_obj)
         return VLC_EGENERIC;
     }
 
+    /* disable annoying stuff */
+    if(VLC_SUCCESS == var_Create( p_demux, "lua", VLC_VAR_BOOL))
+        var_SetBool(p_demux, "lua", false);
+
     p_demux->p_sys         = p_manager;
     p_demux->pf_demux      = p_manager->demux_callback;
     p_demux->pf_control    = p_manager->control_callback;
