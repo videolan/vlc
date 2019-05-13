@@ -1667,7 +1667,7 @@ noreturn static void *Thread(void *object)
     }
 }
 
-static void vout_StopDisplay(vout_thread_t *vout)
+void vout_StopDisplay(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
 
@@ -1746,7 +1746,8 @@ void vout_Stop(vout_thread_t *vout)
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
 
-    vout_StopDisplay(vout);
+    if (sys->original.i_chroma != 0)
+        vout_StopDisplay(vout);
 
     vlc_mutex_lock(&sys->window_lock);
     if (sys->window_active) {

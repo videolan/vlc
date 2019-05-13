@@ -223,6 +223,11 @@ void vout_Stop(vout_thread_t *);
 void vout_Pause(vout_thread_t *vout);
 
 /**
+ * Stop the display plugin, but keep its window plugin for later reuse.
+ */
+void vout_StopDisplay(vout_thread_t *);
+
+/**
  * Destroys a vout.
  *
  * This function closes and releases a vout created by vout_Request().
