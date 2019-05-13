@@ -3367,9 +3367,13 @@ vlc_player_vout_Snapshot(vlc_player_t *player)
 }
 
 static void
-vlc_player_InitLocks(vlc_player_t *player)
+vlc_player_InitLocks(vlc_player_t *player, enum vlc_player_lock_type lock_type)
 {
-    vlc_mutex_init(&player->lock);
+    if (lock_type == VLC_PLAYER_LOCK_REENTRANT)
+        vlc_mutex_init_recursive(&player->lock);
+    else
+        vlc_mutex_init(&player->lock);
+
     vlc_mutex_init(&player->vout_listeners_lock);
     vlc_mutex_init(&player->aout_listeners_lock);
     vlc_cond_init(&player->start_delay_cond);
@@ -3426,7 +3430,7 @@ vlc_player_Delete(vlc_player_t *player)
 }
 
 vlc_player_t *
-vlc_player_New(vlc_object_t *parent,
+vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
                const struct vlc_player_media_provider *media_provider,
                void *media_provider_data)
 {
@@ -3514,7 +3518,7 @@ vlc_player_New(vlc_object_t *parent,
     }
 
     player->deleting = false;
-    vlc_player_InitLocks(player);
+    vlc_player_InitLocks(player, lock_type);
 
     if (vlc_clone(&player->destructor.thread, vlc_player_destructor_Thread,
                   player, VLC_THREAD_PRIORITY_LOW) != 0)

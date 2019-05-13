@@ -1668,7 +1668,8 @@ static void
 test_delete_while_playback(vlc_object_t *obj, bool start)
 {
     test_log("delete_while_playback (start: %d)\n", start);
-    vlc_player_t *player = vlc_player_New(obj, NULL, NULL);
+    vlc_player_t *player = vlc_player_New(obj, VLC_PLAYER_LOCK_NORMAL,
+                                          NULL, NULL);
 
     struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_SEC(10));
     input_item_t *media = create_mock_media("media1", &params);
@@ -1816,7 +1817,8 @@ REPORT_LIST
     ret = var_SetString(vlc->p_libvlc_int, "window", "wdummy");
     assert(ret == VLC_SUCCESS);
 
-    ctx->player = vlc_player_New(VLC_OBJECT(vlc->p_libvlc_int), &provider, ctx);
+    ctx->player = vlc_player_New(VLC_OBJECT(vlc->p_libvlc_int),
+                                 VLC_PLAYER_LOCK_NORMAL, &provider, ctx);
     assert(ctx->player);
 
     vlc_player_Lock(ctx->player);

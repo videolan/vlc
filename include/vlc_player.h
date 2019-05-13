@@ -331,6 +331,29 @@ enum vlc_player_subtitle_sync
     VLC_PLAYER_SUBTITLE_SYNC_APPLY,
 };
 
+/**
+ * Player lock type (normal or reentrant)
+ */
+enum vlc_player_lock_type
+{
+    /**
+     * Normal lock
+     *
+     * If the player is already locked, subsequent calls to vlc_player_Lock()
+     * will deadlock.
+     */
+    VLC_PLAYER_LOCK_NORMAL,
+
+    /**
+     * Reentrant lock
+     *
+     * If the player is already locked, subsequent calls to vlc_player_Lock()
+     * will still succeed. To unlock the player, one call to
+     * vlc_player_Unlock() per vlc_player_Lock() is necessary.
+     */
+    VLC_PLAYER_LOCK_REENTRANT,
+};
+
 /** Player capability: can seek */
 #define VLC_PLAYER_CAP_SEEK (1<<0)
 /** Player capability: can pause */
@@ -1005,7 +1028,7 @@ vlc_player_title_list_GetAt(vlc_player_title_list *titles, size_t idx);
  * @return a pointer to a valid player instance or NULL in case of error
  */
 VLC_API vlc_player_t *
-vlc_player_New(vlc_object_t *parent,
+vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
                const struct vlc_player_media_provider *media_provider,
                void *media_provider_data);
 

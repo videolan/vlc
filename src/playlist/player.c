@@ -134,7 +134,8 @@ static const struct vlc_player_cbs player_callbacks = {
 bool
 vlc_playlist_PlayerInit(vlc_playlist_t *playlist, vlc_object_t *parent)
 {
-    playlist->player = vlc_player_New(parent, &player_media_provider, playlist);
+    playlist->player = vlc_player_New(parent, VLC_PLAYER_LOCK_NORMAL,
+                                      &player_media_provider, playlist);
     if (unlikely(!playlist->player))
         return false;
 
