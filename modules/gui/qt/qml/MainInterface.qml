@@ -78,7 +78,7 @@ Rectangle {
     Component.onCompleted: {
         //set the initial view
         if (medialib)
-            history.push(["mc", "music", "albums"], History.Go)
+            history.push(["mc", "video"], History.Go)
         else
             history.push(["playlist"], History.Go)
     }
