@@ -57,7 +57,7 @@ static void get_custom_from_packedyuv422( picture_t *, picture_t *, int * );
 
 static const int pi_component_values[] = { 0xFF0000, 0x00FF00, 0x0000FF };
 static const char *const ppsz_component_descriptions[] = {
-    "Red", "Green", "Blue" };
+    N_("Red"), N_("Green"), N_("Blue") };
 
 /*****************************************************************************
  * Module descriptor
