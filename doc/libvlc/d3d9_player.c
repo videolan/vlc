@@ -34,6 +34,11 @@ struct render_context
     IDirect3DSurface9 *backBuffer;
 
     IDirect3DVertexBuffer9 *rectangleFVFVertexBuf;
+
+    CRITICAL_SECTION sizeLock; // the ReportSize callback cannot be called during/after the Cleanup_cb is called
+    unsigned width, height;
+    void (*ReportSize)(void *ReportOpaque, unsigned width, unsigned height);
+    void *ReportOpaque;
 };
 
 struct CUSTOMVERTEX {FLOAT X, Y, Z, RHW; DWORD COLOR;
@@ -238,6 +243,17 @@ static bool Setup_cb( void **opaque, const libvlc_video_direct3d_device_cfg_t *c
 {
     struct render_context *ctx = *opaque;
     out->device_context = ctx->libvlc_d3d;
+
+    EnterCriticalSection(&ctx->sizeLock);
+    ctx->ReportSize = cfg->report_size_change;
+    ctx->ReportOpaque = cfg->report_opaque;
+
+    if (ctx->ReportSize != NULL)
+    {
+        /* report our initial size */
+        ctx->ReportSize(ctx->ReportOpaque, ctx->width, ctx->height);
+    }
+    LeaveCriticalSection(&ctx->sizeLock);
     return true;
 }
 
@@ -245,6 +261,9 @@ static void Cleanup_cb( void *opaque )
 {
     /* here we can release all things Direct3D9 for good  (if playing only one file) */
     struct render_context *ctx = opaque;
+    EnterCriticalSection(&ctx->sizeLock);
+    ctx->ReportSize = NULL;
+    LeaveCriticalSection(&ctx->sizeLock);
 }
 
 static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
@@ -273,8 +292,33 @@ static bool StartRendering_cb( void *opaque, bool enter, const libvlc_video_dire
 
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    if( message == WM_CREATE )
+    {
+        /* Store p_mp for future use */
+        CREATESTRUCT *c = (CREATESTRUCT *)lParam;
+        SetWindowLongPtr( hWnd, GWLP_USERDATA, (LONG_PTR)c->lpCreateParams );
+        return 0;
+    }
+
+    LONG_PTR p_user_data = GetWindowLongPtr( hWnd, GWLP_USERDATA );
+    if( p_user_data == 0 )
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    struct render_context *ctx = (struct render_context *)p_user_data;
+
     switch(message)
     {
+        case WM_SIZE:
+        {
+            /* tell libvlc that our size has changed */
+            ctx->width  = (BORDER_RIGHT - BORDER_LEFT) * LOWORD(lParam) / SCREEN_WIDTH; /* remove the orange part ! */
+            ctx->height = (BORDER_BOTTOM - BORDER_TOP) * HIWORD(lParam) / SCREEN_HEIGHT;
+            EnterCriticalSection(&ctx->sizeLock);
+            if (ctx->ReportSize != NULL)
+                ctx->ReportSize(ctx->ReportOpaque, ctx->width, ctx->height);
+            LeaveCriticalSection(&ctx->sizeLock);
+        }
+        break;
+
         case WM_DESTROY:
             {
                 PostQuitMessage(0);
@@ -314,6 +358,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
     free( file_path );
     p_mp = libvlc_media_player_new_from_media( p_media );
 
+    InitializeCriticalSection(&Context.sizeLock);
+
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
 
     wc.cbSize = sizeof(WNDCLASSEX);
@@ -339,7 +385,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
                           NULL,
                           NULL,
                           hInstance,
-                          p_mp);
+                          &Context);
 
     ShowWindow(hWnd, nCmdShow);
 
@@ -349,7 +395,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     /* Tell VLC to render into our D3D9 environment */
     libvlc_video_direct3d_set_callbacks( p_mp, libvlc_video_direct3d_engine_d3d9,
-                                        Setup_cb, Cleanup_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb, NULL, 
+                                        Setup_cb, Cleanup_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb, NULL,
                                         &Context );
 
     libvlc_media_player_play( p_mp );
@@ -374,6 +420,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     libvlc_media_release( p_media );
     libvlc_release( p_libvlc );
 
+    DeleteCriticalSection(&Context.sizeLock);
     release_direct3d(&Context);
 
     return msg.wParam;
