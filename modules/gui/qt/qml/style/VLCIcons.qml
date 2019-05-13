@@ -148,5 +148,7 @@ Item {
     property string valid : "\ue073"
     property string search_clear : "\ue074"
     property string menu : "\ue075"
-
+    property string topbar_video: "\ue076"
+    property string topbar_music: "\ue077"
+    property string topbar_network: "\ue078"
 }

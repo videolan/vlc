@@ -72,6 +72,8 @@ Item {
     property int icon_large: 64 * scale;
     property int icon_xlarge: 128 * scale;
 
+    property int icon_topbar: 38 * scale
+
     property int cover_xxsmall: 32 * scale;
     property int cover_xsmall: 64 * scale;
     property int cover_small: 96 * scale;

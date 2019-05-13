@@ -121,6 +121,9 @@
 		{"key":"stream", "path": "./menus/stream_16px.svg"},
 		{"key":"valid", "path": "./valid.svg"},
 		{"key":"search_clear", "path": "./search_clear.svg"},
-		{"key":"menu", "path": "./menu.svg"}
+		{"key":"menu", "path": "./menu.svg"},
+		{"key":"topbar_video", "path": "./topbar/video.svg"},
+		{"key":"topbar_music", "path": "./topbar/music.svg"},
+		{"key":"topbar_network", "path": "./topbar/network.svg"}
 	]
 }

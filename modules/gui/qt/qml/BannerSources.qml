@@ -29,7 +29,8 @@ import "qrc:///menus/" as Menus
 
 Utils.NavigableFocusScope {
     id: root
-    height: VLCStyle.icon_normal + VLCStyle.margin_small
+
+    height: pLBannerSources.height
 
     property int selectedIndex: 0
     property alias model: pLBannerSources.model
@@ -43,37 +44,42 @@ Utils.NavigableFocusScope {
     Rectangle {
         id: pLBannerSources
 
-        anchors.fill: parent
+        anchors {
+            left: parent.left
+            right: parent.right
+        }
+        height: col.height
 
         color: VLCStyle.colors.banner
         property alias model: buttonView.model
 
-        RowLayout {
-            anchors.fill: parent
-
-            Utils.IconToolButton {
-                id: history_back
-                size: VLCStyle.icon_normal
-                text: VLCIcons.dvd_prev
-
-                focus: true
-                KeyNavigation.right: buttonView
-                onClicked: history.pop(History.Go)
+        Column
+        {
+            id: col
+            anchors {
+                left: parent.left
+                right: parent.right
             }
 
             /* Button for the sources */
             TabBar {
                 id: buttonView
 
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                }
+
                 focusPolicy: Qt.StrongFocus
 
                 Layout.preferredHeight: VLCStyle.icon_normal
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
+                spacing: VLCStyle.margin_small
+
                 KeyNavigation.left: history_back
 
                 Component.onCompleted: {
-                    buttonView.contentItem.focus= true
+                    buttonView.contentItem.focus = true
                 }
 
                 background: Rectangle {
@@ -101,10 +107,10 @@ Utils.NavigableFocusScope {
                             }
                         }
 
-                        checkable: true
                         padding: 0
+                        width: contentItem.implicitWidth
+
                         onClicked: {
-                            checked =  !control.checked;
                             root.selectedIndex = model.index
                         }
 
@@ -117,84 +123,106 @@ Utils.NavigableFocusScope {
                             color: VLCStyle.colors.banner
                         }
 
-                        contentItem: Row {
-                            Image {
-                                id: icon
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    rightMargin: VLCStyle.margin_xsmall
-                                    leftMargin: VLCStyle.margin_small
-                                }
-                                height: VLCStyle.icon_normal
-                                width: VLCStyle.icon_normal
-                                source: model.pic
-                                fillMode: Image.PreserveAspectFit
-                            }
+                        contentItem: Item {
+                            implicitWidth: tabRow.width
+                            implicitHeight: tabRow.height
+                            Row {
+                                id: tabRow
+                                padding: VLCStyle.margin_xxsmall
+                                spacing: VLCStyle.margin_xxsmall
 
-                            Label {
-                                text: control.text
-                                font: control.font
-                                color: control.hovered ?  VLCStyle.colors.textActiveSource : VLCStyle.colors.text
-                                verticalAlignment: Text.AlignVCenter
-                                horizontalAlignment: Text.AlignHCenter
-
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    rightMargin: VLCStyle.margin_xsmall
-                                    leftMargin: VLCStyle.margin_small
-                                }
-
-                                Rectangle {
+                                Label {
+                                    id: icon
                                     anchors {
-                                        left: parent.left
-                                        right: parent.right
+                                        verticalCenter: parent.verticalCenter
+                                    }
+                                    color: VLCStyle.colors.buttonText
+
+                                    font.pixelSize: VLCStyle.icon_topbar
+                                    font.family: VLCIcons.fontFamily
+                                    horizontalAlignment: Text.AlignHCenter
+                                    leftPadding: VLCStyle.margin_xsmall
+                                    rightPadding: VLCStyle.margin_xsmall
+
+                                    text: model.icon
+                                }
+
+                                Label {
+                                    text: control.text
+                                    font: control.font
+                                    color: VLCStyle.colors.text
+                                    padding: VLCStyle.margin_xxsmall
+
+                                    anchors {
                                         bottom: parent.bottom
                                     }
-                                    height: 2
-                                    visible: control.activeFocus || control.checked
-                                    color: control.activeFocus ? VLCStyle.colors.accent  : VLCStyle.colors.bgHover
                                 }
+                            }
+
+                            Rectangle {
+                                anchors {
+                                    left: tabRow.left
+                                    right: tabRow.right
+                                    bottom: tabRow.bottom
+                                }
+                                height: 2
+                                visible: root.selectedIndex === model.index || control.activeFocus || control.hovered
+                                color: "transparent"
+                                border.color: VLCStyle.colors.accent
                             }
                         }
                     }
                 }
             }
 
+            RowLayout {
+                width: parent.width
 
-            ToolBar {
-                Layout.preferredHeight: VLCStyle.icon_normal
-                //Layout.preferredWidth: VLCStyle.icon_normal * 3
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-                background: Item{
-                    width: parent.implicitWidth
-                    height: parent.implicitHeight
+                Utils.IconToolButton {
+                    id: history_back
+                    size: VLCStyle.icon_normal
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                    text: VLCIcons.dvd_prev
+                    focus: true
+                    KeyNavigation.right: buttonView
+                    onClicked: history.pop(History.Go)
                 }
 
-                Row {
-                    Utils.IconToolButton {
-                        id: playlist_btn
-
-                        size: VLCStyle.icon_normal
-                        text: VLCIcons.playlist
-
-                        KeyNavigation.left: buttonView
-
-                        onClicked: root.toogleMenu()
+                ToolBar {
+                    Layout.preferredHeight: VLCStyle.icon_normal
+                    //Layout.preferredWidth: VLCStyle.icon_normal * 3
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+                    background: Item{
+                        width: parent.implicitWidth
+                        height: parent.implicitHeight
                     }
 
-                    Utils.IconToolButton {
-                        id: menu_selector
+                    Row {
+                        Utils.IconToolButton {
+                            id: playlist_btn
 
-                        size: VLCStyle.icon_normal
-                        text: VLCIcons.menu
+                            size: VLCStyle.icon_normal
+                            text: VLCIcons.playlist
 
-                        KeyNavigation.left: playlist_btn
+                            KeyNavigation.left: buttonView
 
-                        onClicked: mainMenu.openBelow(this)
+                            onClicked: root.toogleMenu()
+                        }
 
-                        Menus.MainDropdownMenu {
-                            id: mainMenu
-                            onClosed: menu_selector.forceActiveFocus()
+                        Utils.IconToolButton {
+                            id: menu_selector
+
+                            size: VLCStyle.icon_normal
+                            text: VLCIcons.menu
+
+                            KeyNavigation.left: playlist_btn
+
+                            onClicked: mainMenu.openBelow(this)
+
+                            Menus.MainDropdownMenu {
+                                id: mainMenu
+                                onClosed: menu_selector.forceActiveFocus()
+                            }
                         }
                     }
                 }
