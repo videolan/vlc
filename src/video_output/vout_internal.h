@@ -76,7 +76,6 @@ struct vout_thread_sys_t
     vlc_tick_t      spu_delay;
 
     /* */
-    bool            paused;
     video_format_t  original;   /* Original format ie coming from the decoder */
     struct {
         struct {
@@ -219,8 +218,6 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input);
  * This disables a vout, but keeps it for later reuse.
  */
 void vout_Stop(vout_thread_t *);
-
-void vout_Pause(vout_thread_t *vout);
 
 /**
  * Stop the display plugin, but keep its window plugin for later reuse.
