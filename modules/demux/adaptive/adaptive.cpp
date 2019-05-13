@@ -166,6 +166,7 @@ static int Open(vlc_object_t *p_obj)
             if(!strcmp(psz_logic, ppsz_logics_values[i]))
             {
                 logic = pi_logics[i];
+                b_found = true;
                 break;
             }
         }
