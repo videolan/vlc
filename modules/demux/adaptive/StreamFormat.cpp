@@ -99,8 +99,11 @@ StreamFormat::StreamFormat(const void *data_, size_t sz)
     else if(sz > 7 && !memcmp("WEBVTT", data, 6) &&
             std::isspace(static_cast<unsigned char>(data[7])))
         formatid = StreamFormat::WEBVTT;
-    else if(sz > 4 && !memcmp(".Eß£", data, 4))
+    else if(sz > 4 && !memcmp("\x1A\x45\xDF\xA3", data, 4))
         formatid = StreamFormat::WEBM;
+    else if(sz > 3 && (!memcmp("\xFF\xF1", data, 2)||
+                       !memcmp("\xFF\xF9", data, 2)))
+        formatid = StreamFormat::PACKEDAAC;
 }
 
 StreamFormat::~StreamFormat()
