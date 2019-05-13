@@ -166,7 +166,7 @@ enum {
  * Only the transition will be retained and acted upon.
  */
 enum {
-    /* VR navigation */
+    /* VR navigation, vlc_viewpoint_t* */
     VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED,
 };
 

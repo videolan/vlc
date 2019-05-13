@@ -82,7 +82,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
     else
         modlist = "splitter,none";
 
-    vd = vout_display_New(VLC_OBJECT(vout), &vout->p->original, cfg, modlist,
+    vd = vout_display_New(VLC_OBJECT(vout), &sys->original, cfg, modlist,
                           &owner);
     free(modlistbuf);
 
@@ -149,7 +149,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
     var_AddCallback(vout, "video-wallpaper", Forward, NULL);
 #endif
     var_SetBool(VLC_OBJECT(vout), "viewpoint-changeable",
-        vout->p->display->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
+        sys->display->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
     return VLC_SUCCESS;
 
 error:
