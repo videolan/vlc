@@ -59,7 +59,6 @@ struct input_resource_t
     sout_instance_t *p_sout;
     vout_thread_t   *p_vout_free;
     vout_thread_t   *p_vout_dummy;
-    bool             b_vout_free_paused;
 
     /* This lock is used to protect vout resources access (for hold)
      * It is a special case because of embed video (possible deadlock
@@ -154,7 +153,6 @@ static void DestroyVout( input_resource_t *p_resource )
 
         vout_Close( p_resource->p_vout_free );
         p_resource->p_vout_free = NULL;
-        p_resource->b_vout_free_paused = false;
     }
 
     p_resource->p_vout_free = NULL;
@@ -355,14 +353,10 @@ static void input_resource_PutVoutLocked(input_resource_t *p_resource,
         vlc_mutex_unlock(&p_resource->lock_hold);
 
         assert(p_resource->p_vout_free == NULL);
-        assert(!p_resource->b_vout_free_paused);
         msg_Dbg(p_resource->p_parent, "saving a free vout");
         p_resource->p_vout_free = vout;
         if (started)
-        {
-            vout_Pause(vout);
-            p_resource->b_vout_free_paused = true;
-        }
+            vout_StopDisplay(vout);
     }
     else
     {
@@ -403,7 +397,6 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
         cfg_buf = *cfg;
         cfg_buf.vout = p_resource->p_vout_free;
         p_resource->p_vout_free = NULL;
-        p_resource->b_vout_free_paused = false;
         cfg = &cfg_buf;
 
         if (cfg_buf.vout == NULL) {
@@ -513,11 +506,10 @@ void input_resource_TerminateVout( input_resource_t *p_resource )
 void input_resource_StopFreeVout(input_resource_t *p_resource)
 {
     vlc_mutex_lock(&p_resource->lock);
-    if (p_resource->p_vout_free != NULL && p_resource->b_vout_free_paused)
+    if (p_resource->p_vout_free != NULL)
     {
         msg_Dbg(p_resource->p_vout_free, "stop free vout");
         vout_Stop(p_resource->p_vout_free);
-        p_resource->b_vout_free_paused = false;
     }
     vlc_mutex_unlock(&p_resource->lock);
 }
