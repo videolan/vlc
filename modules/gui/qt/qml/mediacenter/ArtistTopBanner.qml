@@ -27,16 +27,28 @@ import "qrc:///style/"
 
 Rectangle {
     id: root
-    property var artist: null
+    property var artist: undefined
+    onArtistChanged: {
+        if (artist != undefined) {
+            artistImage.source = artist.cover || VLCStyle.noArtArtist
+            artistName.text = artist.name
+        }
+        else {
+            artistImage.source = VLCStyle.noArtArtist
+            artistName.text = ""
+        }
+    }
+
     color: VLCStyle.colors.bg
 
     property int contentY: 0
     height: VLCStyle.heightBar_xlarge
 
-    Image {
-        id: artistImage
-        source: artist.cover || VLCStyle.noArtArtist
-        fillMode: Image.PreserveAspectCrop
+
+    Rectangle {
+        id: artistImageContainer
+        color: VLCStyle.colors.banner
+
         height: VLCStyle.cover_small
         width: VLCStyle.cover_small
 
@@ -45,6 +57,13 @@ Rectangle {
             left: parent.left
             leftMargin: VLCStyle.margin_small
 
+        }
+
+        Image {
+            id: artistImage
+            source: VLCStyle.noArtArtist
+            fillMode: Image.PreserveAspectCrop
+            anchors.fill: parent
         }
 
         layer.enabled: true
@@ -58,17 +77,18 @@ Rectangle {
     }
 
     Text {
-        id: main_artist
-        text: artist.name
+        id: artistName
+        text: ""
 
         anchors {
             verticalCenter: parent.verticalCenter
-            left: artistImage.right
+            left: artistImageContainer.right
+            right: parent.right
             leftMargin: VLCStyle.margin_small
+            rightMargin: VLCStyle.margin_small
         }
 
-        font.pixelSize: VLCStyle.fontSize_xxxlarge
-        font.bold: true
+        font.pixelSize: VLCStyle.fontSize_xxlarge
         wrapMode: Text.WordWrap
         maximumLineCount: 2
         elide: Text.ElideRight
@@ -80,12 +100,12 @@ Rectangle {
         State {
             name: "full"
             PropertyChanges {
-                target: artistImage
+                target: artistImageContainer
                 width: VLCStyle.cover_small
                 height: VLCStyle.cover_small
             }
             PropertyChanges {
-                target: main_artist
+                target: artistName
                 font.pixelSize: VLCStyle.fontSize_xxxlarge
             }
             when: contentY < VLCStyle.heightBar_large
@@ -93,12 +113,12 @@ Rectangle {
         State {
             name: "small"
             PropertyChanges {
-                target: artistImage
+                target: artistImageContainer
                 width: VLCStyle.icon_normal
                 height: VLCStyle.icon_normal
             }
             PropertyChanges {
-                target: main_artist
+                target: artistName
                 font.pixelSize: VLCStyle.fontSize_large
                 anchors.leftMargin: VLCStyle.margin_small
             }
