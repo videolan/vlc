@@ -210,7 +210,9 @@ libmp4_plugin_la_SOURCES = demux/mp4/mp4.c demux/mp4/mp4.h \
                            demux/mp4/languages.h \
                            demux/mp4/heif.c demux/mp4/heif.h \
                            demux/mp4/avci.h \
-                           demux/mp4/essetup.c demux/mp4/meta.c \
+                           demux/mp4/essetup.c \
+                           demux/mp4/meta.c \
+                           demux/mp4/mpeg4.h \
                            demux/mp4/coreaudio.h \
                            demux/av1_unpack.h \
                            demux/asf/asfpacket.c demux/asf/asfpacket.h \
