@@ -174,7 +174,7 @@ static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const
                 initSegment->setTrackID(trackid);
 
                 if(!adaptSet->getLang().empty())
-                    initSegment->setLanguage(adaptSet->getLang().front());
+                    initSegment->setLanguage(adaptSet->getLang());
 
                 if(rep->getWidth() > 0 && rep->getHeight() > 0)
                     initSegment->setVideoSize(rep->getWidth(), rep->getHeight());
@@ -220,7 +220,7 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
     {
         adaptSet->setID(ID(id));
         if(streamIndexNode->hasAttribute("Language"))
-            adaptSet->addLang(streamIndexNode->getAttributeValue("Language"));
+            adaptSet->setLang(streamIndexNode->getAttributeValue("Language"));
 
         if(streamIndexNode->hasAttribute("Name"))
             adaptSet->description.Set(streamIndexNode->getAttributeValue("Name"));

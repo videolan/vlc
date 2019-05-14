@@ -24,7 +24,6 @@
 #ifndef COMMONATTRIBUTESELEMENTS_H
 #define COMMONATTRIBUTESELEMENTS_H
 
-#include <list>
 #include <string>
 
 namespace adaptive
@@ -42,14 +41,11 @@ namespace adaptive
                 void                            setWidth( int width );
                 int                             getHeight() const;
                 void                            setHeight( int height );
-                const std::list<std::string>&   getLang() const;
-                void                            addLang( const std::string &lang );
 
             protected:
                 std::string                         mimeType;
                 int                                 width;
                 int                                 height;
-                std::list<std::string>              lang;
         };
     }
 }

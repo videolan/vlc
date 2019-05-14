@@ -133,18 +133,8 @@ bool PlaylistManager::setupPeriod()
             streams.push_back(st);
 
             /* Generate stream description */
-            std::list<std::string> languages;
             if(!set->getLang().empty())
-            {
-                languages = set->getLang();
-            }
-            else if(!set->getRepresentations().empty())
-            {
-                languages = set->getRepresentations().front()->getLang();
-            }
-
-            if(!languages.empty())
-                st->setLanguage(languages.front());
+                st->setLanguage(set->getLang());
 
             if(!set->description.Get().empty())
                 st->setDescription(set->description.Get());
