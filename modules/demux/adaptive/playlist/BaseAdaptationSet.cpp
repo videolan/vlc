@@ -123,6 +123,16 @@ bool BaseAdaptationSet::isBitSwitchable() const
     return bitswitchAble == TRIBOOL_TRUE;
 }
 
+void BaseAdaptationSet::setRole(const Role &r)
+{
+    role = r;
+}
+
+const Role & BaseAdaptationSet::getRole() const
+{
+    return role;
+}
+
 void BaseAdaptationSet::debug(vlc_object_t *obj, int indent) const
 {
     std::string text(indent, ' ');

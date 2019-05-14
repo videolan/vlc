@@ -300,6 +300,8 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/playlist/ICanonicalUrl.hpp \
     demux/adaptive/playlist/Inheritables.hpp \
     demux/adaptive/playlist/Inheritables.cpp \
+    demux/adaptive/playlist/Role.hpp \
+    demux/adaptive/playlist/Role.cpp \
     demux/adaptive/playlist/Segment.cpp \
     demux/adaptive/playlist/Segment.h \
     demux/adaptive/playlist/SegmentBase.cpp \

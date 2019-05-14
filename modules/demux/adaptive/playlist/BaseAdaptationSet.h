@@ -30,6 +30,7 @@
 
 #include "CommonAttributesElements.h"
 #include "SegmentInformation.hpp"
+#include "Role.hpp"
 #include "../StreamFormat.hpp"
 
 namespace adaptive
@@ -55,6 +56,8 @@ namespace adaptive
                 bool                            isSegmentAligned() const;
                 void                            setBitswitchAble(bool);
                 bool                            isBitSwitchable() const;
+                void                            setRole(const Role &);
+                const Role &                    getRole() const;
                 void                            addRepresentation( BaseRepresentation *rep );
                 const std::string&              getLang() const;
                 void                            setLang( const std::string &lang );
@@ -62,6 +65,7 @@ namespace adaptive
                 Property<std::string>           description;
 
             protected:
+                Role                            role;
                 std::vector<BaseRepresentation *>   representations;
                 std::string                     lang;
                 Tribool                         segmentAligned;
