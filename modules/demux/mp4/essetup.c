@@ -27,8 +27,8 @@
 #include "mp4.h"
 #include "avci.h"
 #include "../xiph.h"
-#include "../../packetizer/dts_header.h"
 #include "../../packetizer/iso_color_tables.h"
+#include "mpeg4.h"
 
 #include <vlc_demux.h>
 #include <vlc_aout.h>
@@ -54,78 +54,6 @@ static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descrip
     /* First update information based on i_objectTypeIndication */
     switch( p_decconfig->i_objectProfileIndication )
     {
-    case( 0x20 ): /* MPEG4 VIDEO */
-        p_track->fmt.i_codec = VLC_CODEC_MP4V;
-        break;
-    case( 0x21 ): /* H.264 */
-        p_track->fmt.i_codec = VLC_CODEC_H264;
-        break;
-    case( 0x40):
-    case( 0x41):
-        p_track->fmt.i_codec = VLC_CODEC_MP4A;
-        if( p_decconfig->i_decoder_specific_info_len >= 2 &&
-                p_decconfig->p_decoder_specific_info[0]       == 0xF8 &&
-                (p_decconfig->p_decoder_specific_info[1]&0xE0) == 0x80 )
-        {
-            p_track->fmt.i_codec = VLC_CODEC_ALS;
-        }
-        break;
-    case( 0x60):
-    case( 0x61):
-    case( 0x62):
-    case( 0x63):
-    case( 0x64):
-    case( 0x65): /* MPEG2 video */
-        p_track->fmt.i_codec = VLC_CODEC_MPGV;
-        break;
-        /* Theses are MPEG2-AAC */
-    case( 0x66): /* main profile */
-    case( 0x67): /* Low complexity profile */
-    case( 0x68): /* Scaleable Sampling rate profile */
-        p_track->fmt.i_codec = VLC_CODEC_MP4A;
-        break;
-        /* True MPEG 2 audio */
-    case( 0x69):
-        p_track->fmt.i_codec = VLC_CODEC_MPGA;
-        break;
-    case( 0x6a): /* MPEG1 video */
-        p_track->fmt.i_codec = VLC_CODEC_MPGV;
-        break;
-    case( 0x6b): /* MPEG1 audio */
-        p_track->fmt.i_codec = VLC_CODEC_MPGA;
-        break;
-    case( 0x6c ): /* jpeg */
-        p_track->fmt.i_codec = VLC_CODEC_JPEG;
-        break;
-    case( 0x6d ): /* png */
-        p_track->fmt.i_codec = VLC_CODEC_PNG;
-        break;
-    case( 0x6e ): /* jpeg2000 */
-        p_track->fmt.i_codec = VLC_FOURCC( 'M','J','2','C' );
-        break;
-    case( 0xa3 ): /* vc1 */
-        p_track->fmt.i_codec = VLC_CODEC_VC1;
-        break;
-    case( 0xa4 ):
-        p_track->fmt.i_codec = VLC_CODEC_DIRAC;
-        break;
-    case( 0xa5 ):
-        p_track->fmt.i_codec = VLC_CODEC_A52;
-        break;
-    case( 0xa6 ):
-        p_track->fmt.i_codec = VLC_CODEC_EAC3;
-        break;
-    case( 0xaa ): /* DTS-HD HRA */
-    case( 0xab ): /* DTS-HD Master Audio */
-        p_track->fmt.i_profile = PROFILE_DTS_HD;
-        /* fallthrough */
-    case( 0xa9 ): /* dts */
-        p_track->fmt.i_codec = VLC_CODEC_DTS;
-        break;
-    case( 0xDD ):
-        p_track->fmt.i_codec = VLC_CODEC_VORBIS;
-        break;
-
         /* Private ID */
     case( 0xe0 ): /* NeroDigital: dvd subs */
         if( p_track->fmt.i_cat == SPU_ES )
@@ -146,6 +74,12 @@ static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descrip
 
         /* Fallback */
     default:
+        if( MPEG4_Codec_By_ObjectType( p_decconfig->i_objectProfileIndication,
+                                       p_decconfig->p_decoder_specific_info,
+                                       p_decconfig->i_decoder_specific_info_len,
+                                       &p_track->fmt.i_codec,
+                                       &p_track->fmt.i_profile ) )
+            break;
         /* Unknown entry, but don't touch i_fourcc */
         msg_Warn( p_demux,
                   "unknown objectProfileIndication(0x%x) (Track[ID 0x%x])",
