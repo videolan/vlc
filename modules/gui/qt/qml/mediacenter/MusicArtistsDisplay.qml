@@ -32,119 +32,69 @@ Utils.NavigableFocusScope {
         ListElement { text: qsTr("Alphabetic");  criteria: "title" }
     }
 
-    property int currentArtistIndex: -1
-    onCurrentArtistIndexChanged: {
-        if (currentArtistIndex == -1)
-            view.replace(artistGridComponent)
-        else
-            view.replace(albumComponent)
-    }
-    property var artistId: null
+    property var artistId
 
     Utils.SelectableDelegateModel {
         id: delegateModel
         model: MLArtistModel {
             ml: medialib
         }
-        delegate: Package {
-            id: element
-            Utils.ListItem {
-                Package.name: "list"
-                height: VLCStyle.icon_normal
-                width: parent.width
 
-                color: VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, this.hovered, this.activeFocus)
+        Component.onCompleted: {
+            artistId = items.get(0).model.id
+        }
 
-                cover: Image {
+        delegate: Utils.ListItem {
+            height: VLCStyle.icon_normal
+            width: parent.width
+
+            color: VLCStyle.colors.getBgColor(delegateModel.inSelected, this.hovered, this.activeFocus)
+
+            cover: Rectangle {
+                color: VLCStyle.colors.banner
+                width: cover_obj.width
+
+                Image {
                     id: cover_obj
+                    anchors.fill: parent
+
                     fillMode: Image.PreserveAspectFit
-                    source: model.cover || VLCStyle.noArtArtist
-                }
-                line1: model.name || qsTr("Unknown artist")
-
-                onItemClicked: {
-                    currentArtistIndex = index
-                    artistId = model.id
-                    delegateModel.updateSelection( modifier , artistList.currentIndex, index)
-                    artistList.currentIndex = index
-                    artistList.forceActiveFocus()
-                }
-
-                onItemDoubleClicked: {
-                    delegateModel.actionAtIndex(index)
-                }
-
-                onPlayClicked: {
-                    console.log('Clicked on play : '+model.name);
-                    medialib.addAndPlay( model.id )
-                }
-                onAddToPlaylistClicked: {
-                    console.log('Clicked on addToPlaylist : '+model.name);
-                    medialib.addToPlaylist( model.id );
+                    source: model.cover || VLCStyle.noArtArtistSmall
                 }
             }
+            line1: model.name || qsTr("Unknown artist")
 
-            Utils.GridItem {
-                Package.name: "grid"
-                id: gridItem
+            onItemClicked: {
+                artistId = model.id
+                delegateModel.updateSelection( modifier , artistList.currentIndex, index)
+                artistList.currentIndex = index
+                artistList.forceActiveFocus()
+            }
 
-                title: model.name || "Unknown Artist"
-                selected: element.DelegateModel.inSelected
+            onItemDoubleClicked: {
+                delegateModel.actionAtIndex(index)
+            }
 
-                //shiftX: view.currentItem.shiftX(index)
-
-                onItemClicked: {
-                    delegateModel.updateSelection( modifier , artistList.currentIndex, index)
-                    artistList.currentIndex = index
-                    artistList.forceActiveFocus()
-                }
-
-                onItemDoubleClicked: {
-                    delegateModel.actionAtIndex(index)
-                }
-
-                onPlayClicked: {
-                    medialib.addAndPlay( model.id )
-                }
-                onAddToPlaylistClicked: {
-                    console.log('Clicked on addToPlaylist : '+model.name);
-                    medialib.addToPlaylist( model.id );
-                }
-
-                //replace image with a mutlicovers preview
-                Utils.MultiCoverPreview {
-                    id: multicover
-                    visible: false
-                    width: VLCStyle.cover_normal
-                    height: VLCStyle.cover_normal
-
-                    albums: MLAlbumModel {
-                        ml: medialib
-                        parentId: model.id
-                        maxItems: 4
-                    }
-                }
-                Component.onCompleted: {
-                    multicover.grabToImage(function(result) {
-                        gridItem.sourceSize = undefined
-                        gridItem.image = result.url
-                        //multicover.destroy()
-                    })
-                }
+            onPlayClicked: {
+                console.log('Clicked on play : '+model.name);
+                medialib.addAndPlay( model.id )
+            }
+            onAddToPlaylistClicked: {
+                console.log('Clicked on addToPlaylist : '+model.name);
+                medialib.addToPlaylist( model.id );
             }
         }
 
         function actionAtIndex(index) {
             console.log("actionAtIndex", index)
+            artistBanner.artist = delegateModel.items.get(index).model
             if (delegateModel.selectedGroup.count > 1) {
                 var list = []
                 for (var i = 0; i < delegateModel.selectedGroup.count; i++)
                     list.push(delegateModel.selectedGroup.get(i).model.id)
                 medialib.addAndPlay( list )
             } else if (delegateModel.selectedGroup.count === 1) {
-                root.artistId =  delegateModel.selectedGroup.get(0).model.id
-                root.currentArtistIndex = index
-                artistList.currentIndex = index
+                root.artistId = delegateModel.items.get(artistList.currentIndex).model.id
             }
         }
     }
@@ -157,39 +107,42 @@ Utils.NavigableFocusScope {
     onActiveFocusChanged: {
         if (activeFocus && delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
             var initialIndex = 0
-            if (view.currentItem.currentIndex !== -1)
-                initialIndex = view.currentItem.currentIndex
+            if (view.currentIndex !== -1)
+                initialIndex = view.currentIndex
             delegateModel.items.get(initialIndex).inSelected = true
-            view.currentItem.currentIndex = initialIndex
+            view.currentIndex = initialIndex
         }
     }
 
-    Component {
-        id: artistGridComponent
-        Utils.KeyNavigableGridView {
-            cellWidth: (VLCStyle.cover_normal) + VLCStyle.margin_small
-            cellHeight: (VLCStyle.cover_normal + VLCStyle.fontHeight_normal)  + VLCStyle.margin_small
+    Row {
+        anchors.fill: parent
+        Utils.KeyNavigableListView {
+            width: parent.width * 0.25
+            height: parent.height
 
-            model: delegateModel.parts.grid
+            id: artistList
+            spacing: 4
+            model: delegateModel
             modelCount: delegateModel.items.count
 
-            onSelectAll: delegateModel.selectAll()
-            onActionAtIndex: delegateModel.actionAtIndex(index)
-            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+            focus: true
 
-            onActionLeft: artistList.focus = true
-            onActionRight: root.actionRight(index)
+            onSelectAll: delegateModel.selectAll()
+            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+            onCurrentIndexChanged: delegateModel.actionAtIndex(currentIndex)
+
+            onActionRight: view.focus = true
+            onActionLeft: root.actionLeft(index)
             onActionUp: root.actionUp(index)
             onActionDown: root.actionDown(index)
             onActionCancel: root.actionCancel(index)
         }
-    }
-
-    Component {
-        id: albumComponent
-        // Display selected artist albums
 
         FocusScope {
+            id: view
+            width: parent.width * 0.75
+            height: parent.height
+
             property alias currentIndex: albumSubView.currentIndex
             ColumnLayout {
                 anchors.fill: parent
@@ -199,7 +152,7 @@ Utils.NavigableFocusScope {
                     focus: false
                     //contentY: albumsView.contentY
                     contentY: 0
-                    artist: delegateModel.items.get(currentArtistIndex).model
+                    artist: undefined
                 }
                 MusicAlbumsDisplay {
                     id: albumSubView
@@ -215,38 +168,6 @@ Utils.NavigableFocusScope {
                     onActionCancel: root.actionCancel(index)
                 }
             }
-        }
-    }
-
-    Row {
-        anchors.fill: parent
-        Utils.KeyNavigableListView {
-            width: parent.width * 0.25
-            height: parent.height
-
-            id: artistList
-            spacing: 2
-            model: delegateModel.parts.list
-            modelCount: delegateModel.items.count
-
-            onSelectAll: delegateModel.selectAll()
-            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: delegateModel.actionAtIndex(index)
-
-            onActionRight:  view.focus = true
-            onActionLeft: root.actionLeft(index)
-            onActionUp: root.actionUp(index)
-            onActionDown: root.actionDown(index)
-            onActionCancel: root.actionCancel(index)
-        }
-
-        Utils.StackViewExt {
-            id: view
-            width: parent.width * 0.75
-            height: parent.height
-            focus: true
-
-            initialItem: artistGridComponent
         }
     }
 

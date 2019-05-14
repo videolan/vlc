@@ -46,6 +46,8 @@ NavigableFocusScope {
     property alias headerItem: view.headerItem
     property color headerColor
 
+    property alias delegateModel: delegateModel
+
     Utils.SelectableDelegateModel {
         id: delegateModel
 
@@ -132,6 +134,7 @@ NavigableFocusScope {
             width: parent.width
             height: childrenRect.height
             color: headerColor
+            visible: view.modelCount > 0
             z: 3
 
             Column {

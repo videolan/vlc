@@ -106,6 +106,7 @@ Item {
     property url noArtCover: "qrc:///noart.png";
     property url noArtAlbum: "qrc:///noart_album.svg";
     property url noArtArtist: "qrc:///noart_artist.svg";
+    property url noArtArtistSmall: "qrc:///noart_artist_small.svg";
 
 
 }
