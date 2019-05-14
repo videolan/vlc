@@ -100,17 +100,17 @@ ConfigControl *ConfigControl::createControl( module_config_t *p_item,
         if( p_item->list_count )
             p_control = new StringListConfigControl( p_item, parent );
         else
-            p_control = new StringConfigControl( p_item, parent, false );
+            p_control = new StringConfigControl( p_item, parent );
         break;
     case CONFIG_ITEM_PASSWORD:
-        p_control = new StringConfigControl( p_item, parent, true );
+        p_control = new PasswordConfigControl( p_item, parent );
         break;
     case CONFIG_ITEM_RGB:
         p_control = new ColorConfigControl( p_item, parent );
         break;
     case CONFIG_ITEM_INTEGER:
         if( p_item->list_count )
-            p_control = new IntegerListConfigControl( p_item, parent, false );
+            p_control = new IntegerListConfigControl( p_item, parent );
         else
             p_control = new IntegerRangeConfigControl( p_item, parent );
         break;
@@ -206,23 +206,19 @@ VStringConfigControl::doApply()
 
 /*********** String **************/
 StringConfigControl::StringConfigControl( module_config_t *_p_item,
-                                          QWidget *_parent,
-                                          bool pwd ) :
+                                          QWidget *_parent ) :
     VStringConfigControl( _p_item )
 {
     label = new QLabel( p_item->psz_text ? qfut(p_item->psz_text) : "", _parent );
     text = new QLineEdit( p_item->value.psz ? qfu(p_item->value.psz) : "", _parent );
-    if( pwd ) text->setEchoMode( QLineEdit::Password );
     finish();
 }
 
 StringConfigControl::StringConfigControl( module_config_t *_p_item,
-                                          QLabel *_label, QLineEdit *_text,
-                                          bool pwd ) :
+                                          QLabel *_label, QLineEdit *_text ) :
     VStringConfigControl( _p_item )
 {
     text = _text;
-    if( pwd ) text->setEchoMode( QLineEdit::Password );
     label = _label;
     finish( );
 }
@@ -246,6 +242,26 @@ void StringConfigControl::finish()
     }
     if( label )
         label->setBuddy( text );
+}
+
+/********* String / Password **********/
+PasswordConfigControl::PasswordConfigControl( module_config_t *_p_item,
+                                              QWidget *_parent ) :
+    StringConfigControl( _p_item, _parent )
+{
+    finish();
+}
+
+PasswordConfigControl::PasswordConfigControl( module_config_t *_p_item,
+                                              QLabel *_label, QLineEdit *_text ) :
+    StringConfigControl( _p_item, _label, _text )
+{
+    finish();
+}
+
+void PasswordConfigControl::finish()
+{
+    text->setEchoMode( QLineEdit::Password );
 }
 
 /*********** File **************/
@@ -393,7 +409,7 @@ StringListConfigControl::StringListConfigControl( module_config_t *_p_item,
 
 StringListConfigControl::StringListConfigControl( module_config_t *_p_item,
                                                   QLabel *_label,
-                                                  QComboBox *_combo, bool ) :
+                                                  QComboBox *_combo ) :
     VStringConfigControl( _p_item )
 {
     combo = _combo;
@@ -841,7 +857,7 @@ int IntegerRangeSliderConfigControl::getValue() const
 
 /********* Integer / choice list **********/
 IntegerListConfigControl::IntegerListConfigControl( module_config_t *_p_item,
-                                                    QWidget *p, bool ) :
+                                                    QWidget *p ) :
     VIntConfigControl( _p_item )
 {
     label = new QLabel( qfut(p_item->psz_text), p );
@@ -856,7 +872,7 @@ IntegerListConfigControl::IntegerListConfigControl( module_config_t *_p_item,
 
 IntegerListConfigControl::IntegerListConfigControl( module_config_t *_p_item,
                                                     QLabel *_label,
-                                                    QComboBox *_combo, bool ) :
+                                                    QComboBox *_combo ) :
     VIntConfigControl( _p_item )
 {
     combo = _combo;

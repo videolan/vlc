@@ -323,7 +323,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             if( p_config )                                                \
             {                                                             \
                 control =  new type ## ConfigControl(                     \
-                           p_config, label, ui.qcontrol, false );         \
+                           p_config, label, ui.qcontrol );                \
                 controls.append( control );                               \
             }                                                             \
             else {                                                        \
@@ -347,7 +347,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             if( p_config )                                                \
             {                                                             \
                 control =  new type ## ConfigControl(                     \
-                           p_config, label, qcontrol, false );            \
+                           p_config, label, qcontrol );                   \
                 controls.append( control );                               \
             }                                                             \
             else {                                                        \
@@ -992,14 +992,14 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             line++;
 
             p_config = config_FindConfig( "hotkeys-y-wheel-mode" );
-            control = new IntegerListConfigControl( p_config, this, false );
+            control = new IntegerListConfigControl( p_config, this );
             control->insertIntoExistingGrid( gLayout, line );
             controls.append( control );
 
             line++;
 
             p_config = config_FindConfig( "hotkeys-x-wheel-mode" );
-            control = new IntegerListConfigControl( p_config, this, false );
+            control = new IntegerListConfigControl( p_config, this );
             control->insertIntoExistingGrid( gLayout, line );
             controls.append( control );
 
