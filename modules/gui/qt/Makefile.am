@@ -559,8 +559,6 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/menus/ToolsMenu.qml \
 	gui/qt/qml/menus/ViewMenu.qml \
 	gui/qt/qml/menus/VideoMenu.qml \
-	gui/qt/qml/mediacenter/ArtistListView.qml \
-	gui/qt/qml/mediacenter/ArtistGridView.qml \
 	gui/qt/qml/mediacenter/ArtistTopBanner.qml \
 	gui/qt/qml/mediacenter/MCMainDisplay.qml \
 	gui/qt/qml/mediacenter/MCMusicDisplay.qml \

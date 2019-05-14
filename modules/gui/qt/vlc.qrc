@@ -195,8 +195,6 @@
         <file alias="MusicArtistsDisplay.qml">qml/mediacenter/MusicArtistsDisplay.qml</file>
         <file alias="MusicGenresDisplay.qml">qml/mediacenter/MusicGenresDisplay.qml</file>
         <file alias="MusicTracksDisplay.qml">qml/mediacenter/MusicTracksDisplay.qml</file>
-        <file alias="ArtistGridView.qml">qml/mediacenter/ArtistGridView.qml</file>
-        <file alias="ArtistListView.qml">qml/mediacenter/ArtistListView.qml</file>
         <file alias="MusicTrackListDisplay.qml">qml/mediacenter/MusicTrackListDisplay.qml</file>
         <file alias="ArtistTopBanner.qml">qml/mediacenter/ArtistTopBanner.qml</file>
         <file alias="MCMainDisplay.qml">qml/mediacenter/MCMainDisplay.qml</file>
