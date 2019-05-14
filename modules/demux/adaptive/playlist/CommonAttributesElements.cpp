@@ -73,14 +73,3 @@ void    CommonAttributesElements::setHeight( int height )
     if ( height > 0 )
         this->height = height;
 }
-
-const std::list<std::string>& CommonAttributesElements::getLang() const
-{
-    return lang;
-}
-
-void    CommonAttributesElements::addLang( const std::string &lang )
-{
-    if ( lang.empty() == false )
-        this->lang.push_back( lang );
-}

@@ -537,14 +537,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                 }
 
                 if(pair.second->getAttributeByName("LANGUAGE"))
-                {
-                    std::string lang = pair.second->getAttributeByName("LANGUAGE")->quotedString();
-                    std::size_t pos = lang.find_first_of('-');
-                    if(pos != std::string::npos && pos > 0)
-                        altAdaptSet->addLang(lang.substr(0, pos));
-                    else if (lang.size() < 4)
-                        altAdaptSet->addLang(lang);
-                }
+                    altAdaptSet->setLang(pair.second->getAttributeByName("LANGUAGE")->quotedString());
 
                 if(!altAdaptSet->getRepresentations().empty())
                     period->addAdaptationSet(altAdaptSet);

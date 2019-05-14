@@ -56,11 +56,14 @@ namespace adaptive
                 void                            setBitswitchAble(bool);
                 bool                            isBitSwitchable() const;
                 void                            addRepresentation( BaseRepresentation *rep );
+                const std::string&              getLang() const;
+                void                            setLang( const std::string &lang );
                 void                            debug(vlc_object_t *,int = 0) const;
                 Property<std::string>           description;
 
             protected:
                 std::vector<BaseRepresentation *>   representations;
+                std::string                     lang;
                 Tribool                         segmentAligned;
                 Tribool                         bitswitchAble;
         };

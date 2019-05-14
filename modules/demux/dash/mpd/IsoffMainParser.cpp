@@ -231,14 +231,7 @@ void    IsoffMainParser::parseAdaptationSets  (Node *periodNode, Period *period)
             adaptationSet->setMimeType((*it)->getAttributeValue("mimeType"));
 
         if((*it)->hasAttribute("lang"))
-        {
-            std::string lang = (*it)->getAttributeValue("lang");
-            std::size_t pos = lang.find_first_of('-');
-            if(pos != std::string::npos && pos > 0)
-                adaptationSet->addLang(lang.substr(0, pos));
-            else if (lang.size() < 4)
-                adaptationSet->addLang(lang);
-        }
+            adaptationSet->setLang((*it)->getAttributeValue("lang"));
 
         if((*it)->hasAttribute("bitstreamSwitching"))
             adaptationSet->setBitswitchAble((*it)->getAttributeValue("bitstreamSwitching") == "true");

@@ -89,6 +89,20 @@ void BaseAdaptationSet::addRepresentation(BaseRepresentation *rep)
     childs.push_back(rep);
 }
 
+const std::string & BaseAdaptationSet::getLang() const
+{
+    return lang;
+}
+
+void BaseAdaptationSet::setLang( const std::string &lang_ )
+{
+    std::size_t pos = lang.find_first_of('-');
+    if(pos != std::string::npos && pos > 0)
+        lang = lang_.substr(0, pos);
+    else if(lang_.size() < 4)
+        lang = lang_;
+}
+
 void BaseAdaptationSet::setSegmentAligned(bool b)
 {
     segmentAligned = b ? TRIBOOL_TRUE : TRIBOOL_FALSE;
