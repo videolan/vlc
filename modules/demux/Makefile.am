@@ -381,6 +381,8 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/tools/Conversions.hpp \
     demux/adaptive/tools/Conversions.cpp \
     demux/adaptive/tools/Debug.hpp \
+    demux/adaptive/tools/FormatNamespace.cpp \
+    demux/adaptive/tools/FormatNamespace.hpp \
     demux/adaptive/tools/Helper.cpp \
     demux/adaptive/tools/Helper.h \
     demux/adaptive/tools/MovingAverage.hpp \
