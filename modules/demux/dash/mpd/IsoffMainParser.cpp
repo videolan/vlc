@@ -248,7 +248,24 @@ void    IsoffMainParser::parseAdaptationSets  (Node *periodNode, Period *period)
         {
             std::string uri = role->getAttributeValue("schemeIdUri");
             if(uri == "urn:mpeg:dash:role:2011")
-                adaptationSet->description.Set(role->getAttributeValue("value"));
+            {
+                const std::string &rolevalue = role->getAttributeValue("value");
+                adaptationSet->description.Set(rolevalue);
+                if(rolevalue == "main")
+                    adaptationSet->setRole(Role::MAIN);
+                else if(rolevalue == "alternate")
+                    adaptationSet->setRole(Role::ALTERNATE);
+                else if(rolevalue == "supplementary")
+                    adaptationSet->setRole(Role::SUPPLEMENTARY);
+                else if(rolevalue == "commentary")
+                    adaptationSet->setRole(Role::COMMENTARY);
+                else if(rolevalue == "dub")
+                    adaptationSet->setRole(Role::DUB);
+                else if(rolevalue == "caption")
+                    adaptationSet->setRole(Role::CAPTION);
+                else if(rolevalue == "subtitle")
+                    adaptationSet->setRole(Role::SUBTITLE);
+            }
         }
 #ifdef ADAPTATIVE_ADVANCED_DEBUG
         if(adaptationSet->description.Get().empty())
