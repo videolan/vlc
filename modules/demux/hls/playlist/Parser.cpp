@@ -458,10 +458,13 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
         std::map<std::string, AttributesTag *>::const_iterator groupsit;
         for(groupsit = groupsmap.begin(); groupsit != groupsmap.end(); ++groupsit)
         {
+            std::pair<std::string, AttributesTag *> pair = *groupsit;
+            if(!pair.second->getAttributeByName("TYPE"))
+                continue;
+
             BaseAdaptationSet *altAdaptSet = new (std::nothrow) BaseAdaptationSet(period);
             if(altAdaptSet)
             {
-                std::pair<std::string, AttributesTag *> pair = *groupsit;
                 Representation *rep  = createRepresentation(altAdaptSet, pair.second);
                 if(rep)
                 {
