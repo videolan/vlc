@@ -575,7 +575,7 @@ PLAYER_ACTION_HANDLER(Navigate)
 PLAYER_ACTION_HANDLER(Viewpoint)
 {
     VLC_UNUSED(intf);
-    vlc_viewpoint_t viewpoint;
+    vlc_viewpoint_t viewpoint = { .fov = 0.f };
     switch (action_id)
     {
         case ACTIONID_VIEWPOINT_FOV_IN:
@@ -585,10 +585,12 @@ PLAYER_ACTION_HANDLER(Viewpoint)
             viewpoint.fov = +1.f;
             break;
         case ACTIONID_VIEWPOINT_ROLL_CLOCK:
-            viewpoint.roll = -1.f;
+            vlc_viewpoint_from_euler(&viewpoint,
+                                     0.f, 0.f, -1.f);
             break;
         case ACTIONID_VIEWPOINT_ROLL_ANTICLOCK:
-            viewpoint.roll = +1.f;
+            vlc_viewpoint_from_euler(&viewpoint,
+                                     0.f, 0.f, 1.f);
             break;
         default:
             vlc_assert_unreachable();
@@ -1109,11 +1111,11 @@ MouseMovedCallback(vlc_object_t *obj, char const *var,
     {
         int i_horizontal = newval.coords.x - sys->vrnav.x;
         int i_vertical   = newval.coords.y - sys->vrnav.y;
-        vlc_viewpoint_t viewpoint =
-        {
-            .yaw   = -i_horizontal * 0.05f,
-            .pitch = -i_vertical   * 0.05f,
-        };
+        vlc_viewpoint_t viewpoint = { .fov = 0.f };
+        vlc_viewpoint_from_euler(&viewpoint,
+            -i_horizontal * 0.05f, /* yaw */
+            -i_vertical   * 0.05f, /* pitch */
+            0);                    /* roll */
         vlc_player_Lock(player);
         vlc_player_UpdateViewpoint(player, &viewpoint,
                                    VLC_PLAYER_WHENCE_RELATIVE);
