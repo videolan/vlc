@@ -27,6 +27,11 @@
 
 #import <vlc_url.h>
 
+const CGFloat VLCMediaLibrary4KWidth = 3840.;
+const CGFloat VLCMediaLibrary4KHeight = 2160.;
+const CGFloat VLCMediaLibrary720pWidth = 1280.;
+const CGFloat VLCMediaLibrary720pHeight = 720.;
+
 @implementation VLCMediaLibraryFile
 
 - (instancetype)initWithFile:(struct vlc_ml_file_t *)p_file

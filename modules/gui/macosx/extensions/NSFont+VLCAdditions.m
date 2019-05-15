@@ -64,4 +64,14 @@
     return [NSFont systemFontOfSize:15. weight:NSFontWeightBold];
 }
 
++ (instancetype)VLCplaylistLabelFont
+{
+    return [NSFont systemFontOfSize:13. weight:NSFontWeightRegular];
+}
+
++ (instancetype)VLCplaylistSelectedItemLabelFont
+{
+    return [NSFont systemFontOfSize:13. weight:NSFontWeightBold];
+}
+
 @end

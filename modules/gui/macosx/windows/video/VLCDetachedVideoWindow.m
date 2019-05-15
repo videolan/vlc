@@ -33,7 +33,7 @@
     [super awakeFromNib];
     [self setAcceptsMouseMovedEvents: YES];
 
-    [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height])];
+    [self setContentMinSize: NSMakeSize(363., VLCVideoWindowCommonMinimalHeight + [[self controlsBar] height])];
 }
 
 @end

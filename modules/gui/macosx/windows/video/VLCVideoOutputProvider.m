@@ -280,7 +280,7 @@ int WindowOpen(vout_window_t *p_wnd)
                 [newVideoWindow setFrameAutosaveName:@"extra-videowindow"];
             }
 
-            [newVideoWindow setContentMinSize: NSMakeSize(f_min_video_height, f_min_video_height)];
+            [newVideoWindow setContentMinSize: NSMakeSize(VLCVideoWindowCommonMinimalHeight, VLCVideoWindowCommonMinimalHeight)];
         }
 
         isEmbedded = NO;

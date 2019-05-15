@@ -36,6 +36,8 @@
 #import "extensions/NSView+VLCAdditions.h"
 
 NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
+const CGFloat VLCLibraryCollectionViewItemMinimalDisplayedProgress = 0.05;
+const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 @interface VLCLibraryCollectionViewItem()
 {
@@ -151,10 +153,10 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
     VLCMediaLibraryTrack *videoTrack = _representedMediaItem.firstVideoTrack;
     CGFloat width = videoTrack.videoWidth;
     CGFloat height = videoTrack.videoHeight;
-    if (width >= 3840. || height >= 2160.) {
+    if (width >= VLCMediaLibrary4KWidth || height >= VLCMediaLibrary4KHeight) {
         _annotationTextField.stringValue = @" 4K ";
         _annotationTextField.hidden = NO;
-    } else if (width >= 1280. || height >= 720.) {
+    } else if (width >= VLCMediaLibrary720pWidth || height >= VLCMediaLibrary720pHeight) {
         _annotationTextField.stringValue = @" HD ";
         _annotationTextField.hidden = NO;
     } else {
@@ -162,7 +164,7 @@ NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
     }
 
     CGFloat position = _representedMediaItem.lastPlaybackPosition;
-    if (position > .05 && position < .95) {
+    if (position > VLCLibraryCollectionViewItemMinimalDisplayedProgress && position < VLCLibraryCollectionViewItemMaximumDisplayedProgress) {
         _progressIndicator.progress = position;
         _progressIndicator.hidden = NO;
     } else {

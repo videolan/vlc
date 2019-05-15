@@ -45,11 +45,11 @@
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoOutputProvider.h"
 
-static const float f_min_window_width = 604.;
-static const float f_min_window_height = 307.;
-static const float f_playlist_row_height = 72.;
-static const float f_library_small_row_height = 24.;
-static const float f_library_large_row_height = 50.;
+const CGFloat VLCLibraryWindowMinimalWidth = 604.;
+const CGFloat VLCLibraryWindowMinimalHeight = 307.;
+const CGFloat VLCLibraryWindowPlaylistRowHeight = 72.;
+const CGFloat VLCLibraryWindowSmallRowHeight = 24.;
+const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
 
 @interface VLCLibraryWindow ()
 {
@@ -136,7 +136,7 @@ static const float f_library_large_row_height = 50.;
 
     _playlistTableView.dataSource = _playlistDataSource;
     _playlistTableView.delegate = _playlistDataSource;
-    _playlistTableView.rowHeight = f_playlist_row_height;
+    _playlistTableView.rowHeight = VLCLibraryWindowPlaylistRowHeight;
     [_playlistTableView reloadData];
 
     _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
@@ -161,10 +161,10 @@ static const float f_library_large_row_height = 50.;
     _libraryAudioDataSource.groupSelectionTableView = _audioGroupSelectionTableView;
     _audioCategorySelectionTableView.dataSource = _libraryAudioDataSource;
     _audioCategorySelectionTableView.delegate = _libraryAudioDataSource;
-    _audioCategorySelectionTableView.rowHeight = f_library_small_row_height;
+    _audioCategorySelectionTableView.rowHeight = VLCLibraryWindowSmallRowHeight;
     _audioCollectionSelectionTableView.dataSource = _libraryAudioDataSource;
     _audioCollectionSelectionTableView.delegate = _libraryAudioDataSource;
-    _audioCollectionSelectionTableView.rowHeight = f_library_large_row_height;
+    _audioCollectionSelectionTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
     _libraryAudioGroupDataSource = [[VLCLibraryGroupDataSource alloc] init];
     _libraryAudioDataSource.groupDataSource = _libraryAudioGroupDataSource;
     _audioGroupSelectionTableView.dataSource = _libraryAudioGroupDataSource;
@@ -378,7 +378,7 @@ static const float f_library_large_row_height = 50.;
         && _windowFrameBeforePlayback.size.height > 0) {
 
         // only resize back to minimum view of this is still desired final state
-        CGFloat f_threshold_height = f_min_video_height + [self.controlsBar height];
+        CGFloat f_threshold_height = VLCVideoWindowCommonMinimalHeight + [self.controlsBar height];
         if (_windowFrameBeforePlayback.size.height > f_threshold_height) {
             if ([[VLCMain sharedInstance] isTerminating]) {
                 [self setFrame:_windowFrameBeforePlayback display:YES];
@@ -442,7 +442,7 @@ static const float f_library_large_row_height = 50.;
     [window setRestorable:NO];
     [window setExcludedFromWindowsMenu:YES];
     [window setAcceptsMouseMovedEvents:YES];
-    [window setContentMinSize:NSMakeSize(f_min_window_width, f_min_window_height)];
+    [window setContentMinSize:NSMakeSize(VLCLibraryWindowMinimalWidth, VLCLibraryWindowMinimalHeight)];
 }
 
 @end

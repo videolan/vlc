@@ -34,6 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)VLClibraryCellSubtitleFont;
 + (instancetype)VLClibraryCellAnnotationFont;
 + (instancetype)VLClibraryButtonFont;
++ (instancetype)VLCplaylistLabelFont;
++ (instancetype)VLCplaylistSelectedItemLabelFont;
 
 @end
 

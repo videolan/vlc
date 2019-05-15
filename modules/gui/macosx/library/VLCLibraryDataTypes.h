@@ -27,6 +27,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCMediaLibraryMediaItem;
 
+extern const CGFloat VLCMediaLibrary4KWidth;
+extern const CGFloat VLCMediaLibrary4KHeight;
+extern const CGFloat VLCMediaLibrary720pWidth;
+extern const CGFloat VLCMediaLibrary720pHeight;
+
 @interface VLCMediaLibraryFile : NSObject
 
 - (instancetype)initWithFile:(struct vlc_ml_file_t *)p_file;

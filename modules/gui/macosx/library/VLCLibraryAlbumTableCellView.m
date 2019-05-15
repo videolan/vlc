@@ -30,7 +30,8 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
 
-static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
+NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
+const CGFloat VLCLibraryTracksRowHeight = 50.;
 
 @interface VLCLibraryTracksDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
 
@@ -87,7 +88,9 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
 {
     _representedAlbum = representedAlbum;
     self.albumNameTextField.stringValue = _representedAlbum.title;
-    self.yearTextField.intValue = _representedAlbum.year;
+    if (_representedAlbum.year > 0) {
+        self.yearTextField.intValue = _representedAlbum.year;
+    }
     self.summaryTextField.stringValue = _representedAlbum.summary;
 
     NSImage *image;
@@ -99,7 +102,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     }
     self.representedImageView.image = image;
 
-    self.tracksTableView.rowHeight = 50.;
+    self.tracksTableView.rowHeight = VLCLibraryTracksRowHeight;
     _tracksDataSource = [[VLCLibraryTracksDataSource alloc] init];
     _tracksDataSource.representedAlbum = _representedAlbum;
     self.tracksTableView.dataSource = _tracksDataSource;

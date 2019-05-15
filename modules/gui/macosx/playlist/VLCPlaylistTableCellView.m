@@ -21,20 +21,14 @@
  *****************************************************************************/
 
 #import "VLCPlaylistTableCellView.h"
-
-static const float fontSizeForMediaTitle = 13.;
+#import "extensions/NSFont+VLCAdditions.h"
 
 @implementation VLCPlaylistTableCellView
 
 - (void)setRepresentsCurrentPlaylistItem:(BOOL)representsCurrentPlaylistItem
 {
     _representsCurrentPlaylistItem = representsCurrentPlaylistItem;
-    NSFont *displayedFont;
-    if (_representsCurrentPlaylistItem) {
-        displayedFont = [NSFont boldSystemFontOfSize:fontSizeForMediaTitle];
-    } else {
-        displayedFont = [NSFont systemFontOfSize:fontSizeForMediaTitle];
-    }
+    NSFont *displayedFont = _representsCurrentPlaylistItem ? [NSFont VLCplaylistSelectedItemLabelFont] : [NSFont VLCplaylistLabelFont];
     self.mediaTitleTextField.font = displayedFont;
     self.secondaryMediaTitleTextField.font = displayedFont;
 }

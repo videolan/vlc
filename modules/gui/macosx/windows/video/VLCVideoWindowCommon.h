@@ -32,7 +32,7 @@ extern NSString *VLCVideoWindowDidEnterFullscreen;
 
 @class VLCControlsBarCommon;
 
-static const float f_min_video_height = 70.0;
+extern const CGFloat VLCVideoWindowCommonMinimalHeight;
 
 /*****************************************************************************
  * VLCVideoWindowCommon
