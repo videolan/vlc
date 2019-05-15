@@ -78,6 +78,11 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, 
                 {
                     /* All successfull */
                     fakeesout->setExtraInfoProvider( this );
+                    const Role & streamRole = tracker->getStreamRole();
+                    if(streamRole.isDefault() && streamRole.autoSelectable())
+                        fakeesout->setPriority(ES_PRIORITY_MIN + 10);
+                    else if(!streamRole.autoSelectable())
+                        fakeesout->setPriority(ES_PRIORITY_NOT_DEFAULTABLE);
                     format = format_;
                     segmentTracker = tracker;
                     segmentTracker->registerListener(this);
