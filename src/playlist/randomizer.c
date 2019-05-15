@@ -423,18 +423,13 @@ randomizer_Next(struct randomizer *r)
 bool
 randomizer_Add(struct randomizer *r, vlc_playlist_item_t *items[], size_t count)
 {
-    if (r->history)
-    {
-        if (!vlc_vector_insert_all(&r->items, r->history, items, count))
-            return false;
-        /* the insertion shifted history (and possibly next) */
-        if (r->next > r->history)
-            r->next += count;
-        r->history += count;
-        return true;
-    }
-
-    return vlc_vector_push_all(&r->items, items, count);
+    if (!vlc_vector_insert_all(&r->items, r->history, items, count))
+        return false;
+    /* the insertion shifted history (and possibly next) */
+    if (r->next > r->history)
+        r->next += count;
+    r->history += count;
+    return true;
 }
 
 static void
