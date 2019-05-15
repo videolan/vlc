@@ -66,6 +66,7 @@ namespace adaptive
             /* Used by FakeES ID */
             void recycle( FakeESOutID *id );
             void createOrRecycleRealEsID( FakeESOutID * );
+            void setPriority(int);
 
             /**/
             void schedulePCRReset();
@@ -92,6 +93,7 @@ namespace adaptive
             vlc_tick_t timestamps_offset;
             vlc_tick_t timestamps_expected;
             bool timestamps_check_done;
+            int priority;
             std::list<FakeESOutID *> fakeesidlist;
             std::list<FakeESOutID *> recycle_candidates;
     };
