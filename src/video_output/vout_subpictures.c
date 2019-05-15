@@ -94,7 +94,6 @@ struct spu_private_t {
     /* Subpiture filters */
     char           *source_chain_current;
     char           *source_chain_update;
-    vlc_mutex_t    source_chain_lock;
     filter_chain_t *source_chain;
     char           *filter_chain_current;
     char           *filter_chain_update;
@@ -1392,7 +1391,6 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
 
     sys->source_chain_update = NULL;
     sys->filter_chain_update = NULL;
-    vlc_mutex_init(&sys->source_chain_lock);
     vlc_mutex_init(&sys->filter_chain_lock);
     sys->source_chain = filter_chain_New(spu, "sub source", SPU_ES);
     sys->filter_chain = filter_chain_New(spu, "sub filter", SPU_ES);
@@ -1446,7 +1444,6 @@ void spu_Destroy(spu_t *spu)
                              SubFilterDelProxyCallbacks, sys->vout);
     filter_chain_Delete(sys->filter_chain);
     free(sys->filter_chain_current);
-    vlc_mutex_destroy(&sys->source_chain_lock);
     vlc_mutex_destroy(&sys->filter_chain_lock);
     free(sys->source_chain_update);
     free(sys->filter_chain_update);
@@ -1610,7 +1607,6 @@ subpicture_t *spu_Render(spu_t *spu,
     sys->source_chain_update = NULL;
     vlc_mutex_unlock(&sys->lock);
 
-    vlc_mutex_lock(&sys->source_chain_lock);
     if (chain_update) {
         filter_chain_ForEach(sys->source_chain, SubSourceClean, spu);
             if (sys->vout)
@@ -1629,7 +1625,6 @@ subpicture_t *spu_Render(spu_t *spu,
     }
     /* Run subpicture sources */
     filter_chain_SubSource(sys->source_chain, spu, system_now);
-    vlc_mutex_unlock(&sys->source_chain_lock);
 
     static const vlc_fourcc_t chroma_list_default_yuv[] = {
         VLC_CODEC_YUVA,
