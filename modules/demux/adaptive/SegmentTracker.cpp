@@ -117,6 +117,11 @@ StreamFormat SegmentTracker::getCurrentFormat() const
     return StreamFormat();
 }
 
+const Role & SegmentTracker::getStreamRole() const
+{
+    return adaptationSet->getRole();
+}
+
 bool SegmentTracker::segmentsListReady() const
 {
     BaseRepresentation *rep = curRepresentation;

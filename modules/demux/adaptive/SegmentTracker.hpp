@@ -21,6 +21,7 @@
 #define SEGMENTTRACKER_HPP
 
 #include "StreamFormat.hpp"
+#include "playlist/Role.hpp"
 
 #include <vlc_common.h>
 #include <list>
@@ -118,6 +119,7 @@ namespace adaptive
             ~SegmentTracker();
 
             StreamFormat getCurrentFormat() const;
+            const Role & getStreamRole() const;
             bool segmentsListReady() const;
             void reset();
             SegmentChunk* getNextChunk(bool, AbstractConnectionManager *);
