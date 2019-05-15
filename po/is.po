@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-01-11 11:44+0100\n"
+"PO-Revision-Date: 2019-05-15 10:11+0200\n"
 "Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2019\n"
 "Language-Team: Icelandic (https://www.transifex.com/yaron/teams/16553/is/)\n"
 "Language: is\n"
@@ -446,7 +446,7 @@ msgstr "&Skilaboð"
 
 #: include/vlc_intf_strings.h:58
 msgid "Jump to Specific &Time"
-msgstr "Hoppa í ákveðinn &tíma"
+msgstr "Hoppa á ákveðinn &tíma"
 
 #: include/vlc_intf_strings.h:59
 msgid "Custom &Bookmarks"
@@ -2461,11 +2461,13 @@ msgstr ""
 
 #: src/libvlc-module.c:555
 msgid "Multicast output interface"
-msgstr ""
+msgstr "Viðmót fjölvörpunar (multicast)"
 
 #: src/libvlc-module.c:557
 msgid "Default multicast interface. This overrides the routing table."
 msgstr ""
+"Sjálfgefið viðmót fjölvörpunar. Þetta hefur forgang fram yfir "
+"beiningatöfluna."
 
 #: src/libvlc-module.c:559
 msgid "DiffServ Code Point"
@@ -2991,6 +2993,7 @@ msgstr "Einkalykill HTTP/TLS-þjóns"
 #: src/libvlc-module.c:845
 msgid "This private key file (PEM format) is used for server-side TLS."
 msgstr ""
+"Þessi einkalykilskrá (PEM-snið) er notuð fyrir TLS á þjóni (server-side)."
 
 #: src/libvlc-module.c:847
 msgid "HTTP proxy"
@@ -3287,7 +3290,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1011
 msgid "Demux filter module"
-msgstr ""
+msgstr "Affléttunarsíueining (demux)"
 
 #: src/libvlc-module.c:1013
 msgid "Demux filters are used to modify/control the stream that is being read."
@@ -5945,7 +5948,7 @@ msgstr ""
 
 #: modules/access/bluray.c:870
 msgid "AACS Host certificate revoked."
-msgstr ""
+msgstr "Skilríki AACS-vélar afturkallað."
 
 #: modules/access/bluray.c:872
 msgid "AACS MMC failed."
@@ -6538,7 +6541,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:83
 msgid "Symbol rate (bauds)"
-msgstr ""
+msgstr "Táknahraði (baud)"
 
 #: modules/access/dtv/access.c:85
 msgid ""
@@ -6759,7 +6762,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:201
 msgid "DiSEqC LNB number"
-msgstr ""
+msgstr "DiSEqC LNB-númer"
 
 #: modules/access/dtv/access.c:203
 msgid ""
@@ -7480,7 +7483,7 @@ msgstr ""
 
 #: modules/access/live555.cpp:90
 msgid "RTSP frame buffer size"
-msgstr ""
+msgstr "Stærð RTSP-rammabiðminnis"
 
 #: modules/access/live555.cpp:91
 msgid ""
@@ -8183,7 +8186,7 @@ msgstr "Tíðni"
 
 #: modules/access/v4l2/v4l2.c:77
 msgid "Tuner frequency in Hz or kHz (see debug output)."
-msgstr ""
+msgstr "Tíðni móttakara í Hz eða kHz (sjá aflúsunarúttak)."
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
@@ -8199,7 +8202,7 @@ msgstr "Frumstilla stýringar"
 
 #: modules/access/v4l2/v4l2.c:83
 msgid "Reset controls to defaults."
-msgstr ""
+msgstr "Frumstilla stýringar á sjálfgefin gildi."
 
 #: modules/access/v4l2/v4l2.c:84
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:206
@@ -8209,7 +8212,7 @@ msgstr "Birtustig"
 
 #: modules/access/v4l2/v4l2.c:85
 msgid "Picture brightness or black level."
-msgstr ""
+msgstr "Birtustig myndmerkis eða svertustig"
 
 #: modules/access/v4l2/v4l2.c:86
 msgid "Automatic brightness"
@@ -9034,7 +9037,7 @@ msgstr ""
 
 #: modules/access_output/udp.c:67
 msgid "Group packets"
-msgstr ""
+msgstr "Hópa pakka"
 
 #: modules/access_output/udp.c:68
 msgid ""
@@ -9045,7 +9048,7 @@ msgstr ""
 
 #: modules/access_output/udp.c:75
 msgid "UDP stream output"
-msgstr ""
+msgstr "UDP-streymisúttak"
 
 #: modules/arm_neon/chroma_yuv.c:35
 msgid "ARM NEON video chroma conversions"
@@ -9348,7 +9351,7 @@ msgstr "RMS/toppur"
 
 #: modules/audio_filter/compressor.c:156
 msgid "Set the RMS/peak."
-msgstr ""
+msgstr "Setja RMS/topp."
 
 #: modules/audio_filter/compressor.c:158
 msgid "Attack time"
@@ -9356,7 +9359,7 @@ msgstr "Upphafstími"
 
 #: modules/audio_filter/compressor.c:159
 msgid "Set the attack time in milliseconds."
-msgstr ""
+msgstr "Stilla upphafstíma virkni (attack time) í millísekúndum."
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
@@ -9364,7 +9367,7 @@ msgstr "Sleppitími"
 
 #: modules/audio_filter/compressor.c:162
 msgid "Set the release time in milliseconds."
-msgstr ""
+msgstr "Stilla sleppitíma virkni (release time) í millísekúndum."
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
@@ -9372,7 +9375,7 @@ msgstr "Hljóðmörk (threshold)"
 
 #: modules/audio_filter/compressor.c:165
 msgid "Set the threshold level in dB."
-msgstr ""
+msgstr "Stilla hljóðmörk (threshold level) í dB."
 
 #: modules/audio_filter/compressor.c:167
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
@@ -9382,7 +9385,7 @@ msgstr "Hlutfall"
 
 #: modules/audio_filter/compressor.c:168
 msgid "Set the ratio (n:1)."
-msgstr ""
+msgstr "Stilla hlutfallið (n:1)."
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:230
@@ -9391,7 +9394,7 @@ msgstr "Mýkiradíus"
 
 #: modules/audio_filter/compressor.c:171
 msgid "Set the knee radius in dB."
-msgstr ""
+msgstr "Stilla radíus mýkingar (knee radius) í dB."
 
 #: modules/audio_filter/compressor.c:173
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:231
@@ -10066,7 +10069,7 @@ msgstr ""
 
 #: modules/audio_output/jack.c:94
 msgid "JACK client name"
-msgstr ""
+msgstr "Nafn JACK-biðlara"
 
 #: modules/audio_output/jack.c:101
 msgid "JACK audio output"
@@ -10214,11 +10217,11 @@ msgstr "AES3/SMPTE 302M hljóðbitari"
 
 #: modules/codec/aom.c:52
 msgid "AOM video decoder"
-msgstr ""
+msgstr "AOM-myndmerkisafkóðari"
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
-msgstr ""
+msgstr "Raw/Log hljóðafkóðari"
 
 #: modules/codec/araw.c:60
 msgid "Raw audio encoder"
@@ -10454,7 +10457,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:128
 msgid "Ratio of B frames"
-msgstr ""
+msgstr "Hlutfall B-ramma"
 
 #: modules/codec/avcodec/avcodec.h:129
 msgid "Number of B frames that will be coded between two reference frames."
@@ -12563,7 +12566,7 @@ msgstr "Vorbis hljóðkóðari"
 
 #: modules/codec/vpx.c:53
 msgid "Quality mode"
-msgstr ""
+msgstr "Gæðahamur"
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -15591,7 +15594,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:332
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1062
 msgid "Organize Profiles..."
-msgstr ""
+msgstr "Skipuleggja snið..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:511
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:789
@@ -15659,11 +15662,11 @@ msgstr "Skipuleggja forstillingar..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:823
 msgid "Save current selection as new preset"
-msgstr ""
+msgstr "Vista núverandi val sem nýja forstillingu"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:824
 msgid "Enter a name for the new preset:"
-msgstr ""
+msgstr "Settu inn heiti fyrir nýju forstillinguna:"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:77
 msgid "Bookmarks"
@@ -15994,7 +15997,7 @@ msgstr "Fjarlægja snið"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:337
 msgid "Select the profile you would like to remove:"
-msgstr "Veldu þau sniðið sem þú vilt eyða:"
+msgstr "Veldu sniðið sem þú vilt eyða:"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:486
 msgid "Save as new profile"
@@ -22090,7 +22093,7 @@ msgstr "Flytja út HTML spilunarlista"
 
 #: modules/misc/rtsp.c:63
 msgid "Maximum number of connections"
-msgstr ""
+msgstr "Hámarksfjöldi tenginga"
 
 #: modules/misc/rtsp.c:64
 msgid ""
@@ -22155,19 +22158,19 @@ msgstr ""
 
 #: modules/misc/stats.c:222 modules/misc/stats.c:228 modules/misc/stats.c:234
 msgid "Stats decoder"
-msgstr ""
+msgstr "Tölfræði afkóðara"
 
 #: modules/misc/stats.c:223 modules/misc/stats.c:229 modules/misc/stats.c:235
 msgid "Stats decoder function"
-msgstr ""
+msgstr "Tölfræði aðgerða afkóðara"
 
 #: modules/misc/stats.c:240
 msgid "Stats demux"
-msgstr ""
+msgstr "Tölfræði affléttara"
 
 #: modules/misc/stats.c:241
 msgid "Stats demux function"
-msgstr ""
+msgstr "Tölfræði aðgerða affléttara"
 
 #: modules/misc/xml/libxml.c:49
 msgid "XML Parser (using libxml2)"
@@ -22272,7 +22275,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ps.c:54
 msgid "PES maximum size"
-msgstr ""
+msgstr "Hámarksstærð PES"
 
 #: modules/mux/mpeg/ps.c:55
 msgid "Set the maximum allowed PES size when producing the MPEG PS streams."
@@ -22395,7 +22398,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:143
 msgid "Use keyframes"
-msgstr ""
+msgstr "Nota lykilramma"
 
 #: modules/mux/mpeg/ts.c:144
 msgid ""
@@ -22437,23 +22440,23 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:168
 msgid "Crypt audio"
-msgstr ""
+msgstr "Dulkóða hljóð"
 
 #: modules/mux/mpeg/ts.c:169
 msgid "Crypt audio using CSA"
-msgstr ""
+msgstr "Dulkóða hljóð með CSA"
 
 #: modules/mux/mpeg/ts.c:170
 msgid "Crypt video"
-msgstr ""
+msgstr "Dulkóða myndmerki"
 
 #: modules/mux/mpeg/ts.c:171
 msgid "Crypt video using CSA"
-msgstr ""
+msgstr "Dulkóða myndmerki með CSA"
 
 #: modules/mux/mpeg/ts.c:181
 msgid "CSA Key in use"
-msgstr ""
+msgstr "CSA-lykill í notkun"
 
 #: modules/mux/mpeg/ts.c:182
 msgid ""
@@ -22463,7 +22466,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:185
 msgid "Packet size in bytes to encrypt"
-msgstr ""
+msgstr "Pakkastærð í bætum sem á að dulkóða."
 
 #: modules/mux/mpeg/ts.c:186
 msgid ""
@@ -22713,7 +22716,7 @@ msgstr "Algengt"
 
 #: modules/services_discovery/sap.c:82
 msgid "SAP multicast address"
-msgstr ""
+msgstr "Vistfang SAP-fjölvörpunar"
 
 #: modules/services_discovery/sap.c:83
 msgid ""
@@ -23788,7 +23791,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:226
 msgid "Chromecast port"
-msgstr ""
+msgstr "Chromecast gátt"
 
 #: modules/stream_out/chromecast/cast.cpp:227
 msgid "The port used to talk to the Chromecast."
@@ -23804,7 +23807,7 @@ msgstr "Chromecast straumúttak"
 
 #: modules/stream_out/chromecast/cast.cpp:1199
 msgid "Ok, Don't warn me again"
-msgstr ""
+msgstr "Ókey, ekki vara mig við aftur"
 
 #: modules/stream_out/chromecast/cast.cpp:1201
 msgid ""
@@ -24060,7 +24063,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:92 modules/stream_out/standard.c:59
 msgid "Session name"
-msgstr ""
+msgstr "Nafn á setu"
 
 #: modules/stream_out/rtp.c:94 modules/stream_out/standard.c:61
 msgid ""
@@ -24070,7 +24073,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:96
 msgid "Session category"
-msgstr ""
+msgstr "Flokkur setu"
 
 #: modules/stream_out/rtp.c:98
 msgid ""
@@ -24080,7 +24083,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:100 modules/stream_out/standard.c:63
 msgid "Session description"
-msgstr ""
+msgstr "Lýsing á setu"
 
 #: modules/stream_out/rtp.c:102 modules/stream_out/standard.c:65
 msgid ""
@@ -24090,7 +24093,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:104 modules/stream_out/standard.c:67
 msgid "Session URL"
-msgstr ""
+msgstr "Slóð á setu"
 
 #: modules/stream_out/rtp.c:106 modules/stream_out/standard.c:69
 msgid ""
@@ -24101,7 +24104,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:109 modules/stream_out/standard.c:72
 msgid "Session email"
-msgstr ""
+msgstr "Tölvupóstur í setu"
 
 #: modules/stream_out/rtp.c:111 modules/stream_out/standard.c:74
 msgid ""
@@ -24203,7 +24206,7 @@ msgstr "Tiltaktu ISO-639 kóða (þrjá stafi) fyrir þennan gagnastraum"
 
 #: modules/stream_out/setid.c:61
 msgid "Set ID"
-msgstr ""
+msgstr "Setja auðkenni"
 
 #: modules/stream_out/setid.c:62
 msgid "Set ES id"
@@ -27018,7 +27021,7 @@ msgstr "Hæðin á áhrifaglugga, í mynddílum."
 
 #: modules/visualization/visual/visual.c:61
 msgid "FFT window"
-msgstr ""
+msgstr "FFT-gluggi"
 
 #: modules/visualization/visual/visual.c:63
 msgid "The type of FFT window to use for spectrum-based visualizations."
@@ -27084,7 +27087,7 @@ msgstr ""
 
 #: modules/visualization/visual/visual.c:94
 msgid "Spectral sections"
-msgstr ""
+msgstr "Hlutar tíðnirófs"
 
 #: modules/visualization/visual/visual.c:96
 msgid "Determines how many sections of spectrum will exist."
