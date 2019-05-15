@@ -66,10 +66,10 @@ namespace adaptive
         mtime_t getFirstDTS() const;
         int esCount() const;
         bool isSelected() const;
-        bool canActivate() const;
         virtual bool reactivate(mtime_t);
         void setDisabled(bool);
         bool isDisabled() const;
+        bool isValid() const;
         typedef enum {
             status_eof = 0, /* prioritized */
             status_discontinuity,
@@ -137,7 +137,7 @@ namespace adaptive
     private:
         buffering_status doBufferize(mtime_t, unsigned, unsigned);
         buffering_status last_buffer_status;
-        bool dead;
+        bool valid;
         bool disabled;
     };
 

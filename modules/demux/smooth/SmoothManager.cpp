@@ -105,7 +105,7 @@ bool SmoothManager::updatePlaylist()
     {
         const AbstractStream *st = *it;
         const mtime_t m = st->getMinAheadTime();
-        if(st->isDisabled() || !st->isSelected())
+        if(!st->isValid() || st->isDisabled() || !st->isSelected())
         {
             continue;
         }
@@ -127,7 +127,7 @@ void SmoothManager::scheduleNextUpdate()
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
         const AbstractStream *st = *it;
-        if(st->isDisabled() || !st->isSelected())
+        if(!st->isValid() || st->isDisabled() || !st->isSelected())
             continue;
         const mtime_t m = st->getMinAheadTime();
         if(m > 0 && (m < minbuffer || minbuffer == 0))

@@ -45,7 +45,7 @@ AbstractStream::AbstractStream(demux_t * demux_)
     format = StreamFormat::UNKNOWN;
     currentChunk = NULL;
     eof = false;
-    dead = false;
+    valid = true;
     disabled = false;
     discontinuity = false;
     needrestart = false;
@@ -145,10 +145,10 @@ void AbstractStream::setDescription(const std::string &desc)
 
 mtime_t AbstractStream::getPCR() const
 {
-    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
-    mtime_t pcr = isDisabled() ? VLC_TS_INVALID : fakeEsOut()->commandsQueue()->getPCR();
-    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
-    return pcr;
+    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&lock));
+    if(!valid || disabled)
+        return VLC_TS_INVALID;
+    return fakeEsOut()->commandsQueue()->getPCR();
 }
 
 mtime_t AbstractStream::getMinAheadTime() const
@@ -160,19 +160,14 @@ mtime_t AbstractStream::getMinAheadTime() const
 
 mtime_t AbstractStream::getFirstDTS() const
 {
-    mtime_t dts;
-    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
-    if(isDisabled())
-    {
-        dts = VLC_TS_INVALID;
-    }
-    else
-    {
-        dts = fakeEsOut()->commandsQueue()->getFirstDTS();
-        if(dts == VLC_TS_INVALID)
-            dts = fakeEsOut()->commandsQueue()->getPCR();
-    }
-    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&lock));
+
+    if(!valid || disabled)
+        return VLC_TS_INVALID;
+
+    mtime_t dts = fakeEsOut()->commandsQueue()->getFirstDTS();
+    if(dts == VLC_TS_INVALID)
+        dts = fakeEsOut()->commandsQueue()->getPCR();
     return dts;
 }
 
@@ -268,14 +263,14 @@ void AbstractStream::setDisabled(bool b)
     disabled = b;
 }
 
-bool AbstractStream::isDisabled() const
+bool AbstractStream::isValid() const
 {
-    return dead || disabled;
+    return valid;
 }
 
-bool AbstractStream::canActivate() const
+bool AbstractStream::isDisabled() const
 {
-    return !dead;
+    return disabled;
 }
 
 bool AbstractStream::decodersDrained()
@@ -306,7 +301,7 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
     vlc_mutex_lock(&lock);
 
     /* Ensure it is configured */
-    if(!segmentTracker || !connManager || dead)
+    if(!segmentTracker || !connManager || !valid)
     {
         vlc_mutex_unlock(&lock);
         return AbstractStream::buffering_end;
@@ -345,7 +340,7 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
                 vlc_mutex_unlock(&lock);
                 return AbstractStream::buffering_ongoing;
             }
-            dead = true; /* Prevent further retries */
+            valid = false; /* Prevent further retries */
             fakeEsOut()->commandsQueue()->setEOF(true);
             vlc_mutex_unlock(&lock);
             return AbstractStream::buffering_end;
@@ -430,7 +425,7 @@ AbstractStream::status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
         }
     }
 
-    if(isDisabled() || fakeEsOut()->commandsQueue()->isEOF())
+    if(!valid || disabled || fakeEsOut()->commandsQueue()->isEOF())
     {
         *pi_pcr = nz_deadline;
         return AbstractStream::status_eof;
@@ -525,7 +520,7 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
             {
                 msg_Info(p_realdemux, "Restart demux failed");
                 eof = true;
-                dead = true;
+                valid = false;
                 ret = false;
             }
             else
@@ -548,7 +543,7 @@ mtime_t AbstractStream::getPlaybackTime() const
 
 void AbstractStream::runUpdates()
 {
-    if(!isDisabled())
+    if(valid && !disabled)
         segmentTracker->updateSelected();
 }
 

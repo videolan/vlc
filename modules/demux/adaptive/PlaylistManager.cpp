@@ -240,8 +240,11 @@ AbstractStream::buffering_status PlaylistManager::bufferize(mtime_t i_nzdeadline
     {
         AbstractStream *st = (*it).st;
 
+        if(!st->isValid())
+            continue;
+
         if (st->isDisabled() &&
-            (!st->isSelected() || !st->canActivate() || !reactivateStream(st)))
+            (!st->isSelected() || !reactivateStream(st)))
                 continue;
 
         AbstractStream::buffering_status i_ret = st->bufferize(i_nzdeadline, i_min_buffering, i_extra_buffering);
@@ -300,7 +303,7 @@ void PlaylistManager::drain()
         {
             AbstractStream *st = *it;
 
-            if (st->isDisabled())
+            if (!st->isValid() || st->isDisabled())
                 continue;
 
             b_drained &= st->decodersDrained();
@@ -363,7 +366,7 @@ bool PlaylistManager::setPosition(mtime_t time)
         for(it=streams.begin(); it!=streams.end(); ++it)
         {
             AbstractStream *st = *it;
-            if(!st->isDisabled())
+            if(st->isValid() && !st->isDisabled())
             {
                 hasValidStream = true;
                 ret &= st->setPosition(time, !real);
@@ -451,7 +454,7 @@ int PlaylistManager::doDemux(int64_t increment)
         bool b_dead = true;
         std::vector<AbstractStream *>::const_iterator it;
         for(it=streams.begin(); it!=streams.end(); ++it)
-            b_dead &= !(*it)->canActivate();
+            b_dead &= !(*it)->isValid();
         if(!b_dead)
             vlc_cond_timedwait(&demux.cond, &demux.lock, mdate() + CLOCK_FREQ / 20);
         vlc_mutex_unlock(&demux.lock);
