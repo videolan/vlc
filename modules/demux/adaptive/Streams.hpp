@@ -66,10 +66,10 @@ namespace adaptive
         vlc_tick_t getFirstDTS() const;
         int esCount() const;
         bool isSelected() const;
-        bool canActivate() const;
         virtual bool reactivate(vlc_tick_t);
         void setDisabled(bool);
         bool isDisabled() const;
+        bool isValid() const;
         typedef enum {
             status_eof = 0, /* prioritized */
             status_discontinuity,
@@ -137,7 +137,7 @@ namespace adaptive
     private:
         buffering_status doBufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t);
         buffering_status last_buffer_status;
-        bool dead;
+        bool valid;
         bool disabled;
         unsigned notfound_sequence;
     };
