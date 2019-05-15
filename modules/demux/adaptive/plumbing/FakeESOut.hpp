@@ -65,6 +65,7 @@ namespace adaptive
             /* Used by FakeES ID */
             void recycle( FakeESOutID *id );
             void createOrRecycleRealEsID( FakeESOutID * );
+            void setPriority(int);
 
             /**/
             void schedulePCRReset();
@@ -91,6 +92,7 @@ namespace adaptive
             mtime_t timestamps_offset;
             mtime_t timestamps_expected;
             bool timestamps_check_done;
+            int priority;
             std::list<FakeESOutID *> fakeesidlist;
             std::list<FakeESOutID *> recycle_candidates;
     };

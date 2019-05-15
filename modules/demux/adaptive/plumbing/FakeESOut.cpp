@@ -67,6 +67,7 @@ FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
     fakeesout->pf_destroy = esOutDestroy_Callback;
     fakeesout->pf_send = esOutSend_Callback;
     fakeesout->p_sys = (es_out_sys_t*) this;
+    priority = ES_PRIORITY_SELECTABLE_MIN;
 
     vlc_mutex_init(&lock);
 }
@@ -122,6 +123,8 @@ FakeESOutID * FakeESOut::createNewID( const es_format_t *p_fmt )
     fmtcopy.i_group = 0; /* Always ignore group for adaptive */
     fmtcopy.i_id = -1;
 
+    fmtcopy.i_priority = priority;
+
     if( extrainfo )
         extrainfo->fillExtraFMTInfo( &fmtcopy );
 
@@ -162,12 +165,23 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
 
     if( !realid )
     {
-        realid = es_out_Add( real_es_out, es_id->getFmt() );
-        if( b_select )
+        es_format_t fmt;
+        es_format_Copy( &fmt, es_id->getFmt() );
+        if( b_preexisting && !b_select ) /* was not previously selected on other format */
+            fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
+        else
+            fmt.i_priority = priority;//ES_PRIORITY_SELECTABLE_MIN;
+        realid = es_out_Add( real_es_out, &fmt );
+        if( b_preexisting && b_select ) /* was previously selected on other format */
             es_out_Control( real_es_out, ES_OUT_SET_ES, realid );
     }
 
     es_id->setRealESID( realid );
+}
+
+void FakeESOut::setPriority(int p)
+{
+    priority = p;
 }
 
 mtime_t FakeESOut::getTimestampOffset() const
