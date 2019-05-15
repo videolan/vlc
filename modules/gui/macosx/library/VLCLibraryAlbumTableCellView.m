@@ -58,6 +58,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
 
 - (void)prepareForReuse
 {
+    [super prepareForReuse];
     self.representedImageView.image = nil;
     self.albumNameTextField.stringValue = @"";
     self.yearTextField.stringValue = @"";

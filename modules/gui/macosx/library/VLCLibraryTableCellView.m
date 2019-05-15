@@ -46,6 +46,7 @@
 
 - (void)prepareForReuse
 {
+    [super prepareForReuse];
     self.representedImageView.image = nil;
     self.primaryTitleTextField.hidden = YES;
     self.secondaryTitleTextField.hidden = YES;
