@@ -196,6 +196,11 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_current_media_changed");
+
+    if (!new_media)
+        emit that->q_func()->inputChanged(false);
+    return;
+
     InputItemPtr newMediaPtr = InputItemPtr( new_media );
     that->callAsync([that,newMediaPtr] () {
         PlayerController* q = that->q_func();
@@ -205,7 +210,7 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
 
         RecentsMRL::getInstance( that->p_intf )->addRecent( newMediaPtr.get()->psz_uri );
 
-        emit q->inputChanged( newMediaPtr != nullptr );
+        emit q->inputChanged(true);
     });
 }
 
