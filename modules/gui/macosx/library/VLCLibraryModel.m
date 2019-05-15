@@ -63,22 +63,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         case VLC_ML_EVENT_MEDIA_DELETED:
             dispatch_async(dispatch_get_main_queue(), ^{
                 VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                switch (libraryModel.libraryMode) {
-                    case VLCLibraryModeAudio:
-                        [libraryModel updateCachedListOfRecentMedia];
-                        [libraryModel updateCachedListOfAudioMedia];
-                        break;
-
-                    case VLCLibraryModeVideo:
-                        [libraryModel updateCachedListOfRecentMedia];
-                        [libraryModel updateCachedListOfVideoMedia];
-                        break;
-
-                    default:
-                        [libraryModel updateCachedListOfRecentMedia];
-                        break;
-                }
-
+                [libraryModel updateCachedListOfRecentMedia];
+                [libraryModel updateCachedListOfAudioMedia];
+                [libraryModel updateCachedListOfVideoMedia];
             });
             break;
         case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:

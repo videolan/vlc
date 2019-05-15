@@ -288,7 +288,6 @@ const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
 {
     switch (_segmentedTitleControl.selectedSegment) {
         case 0:
-            _libraryVideoDataSource.libraryModel.libraryMode = VLCLibraryModeVideo;
             if (_mediaSourceScrollView.superview != nil) {
                 [_mediaSourceScrollView removeFromSuperview];
             }
@@ -310,7 +309,6 @@ const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
             break;
 
         case 1:
-            _libraryVideoDataSource.libraryModel.libraryMode = VLCLibraryModeAudio;
             if (_mediaSourceScrollView.superview != nil) {
                 [_mediaSourceScrollView removeFromSuperview];
             }
@@ -332,7 +330,6 @@ const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
             break;
 
         case 2:
-            _libraryVideoDataSource.libraryModel.libraryMode = VLCLibraryModeAudio;
             if (_mediaSourceScrollView.superview != nil) {
                 [_mediaSourceScrollView removeFromSuperview];
             }

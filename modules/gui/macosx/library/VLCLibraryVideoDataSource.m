@@ -38,19 +38,7 @@
         return [_libraryModel numberOfRecentMedia];
     }
 
-    switch (_libraryModel.libraryMode) {
-        case VLCLibraryModeAudio:
-            return [_libraryModel numberOfAudioMedia];
-            break;
-
-        case VLCLibraryModeVideo:
-            return [_libraryModel numberOfVideoMedia];
-            break;
-
-        default:
-            return 0;
-            break;
-    }
+    return [_libraryModel numberOfVideoMedia];
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
@@ -67,20 +55,7 @@
     if (collectionView == self.recentMediaCollectionView) {
         mediaArray = [_libraryModel listOfRecentMedia];
     } else {
-        switch (_libraryModel.libraryMode) {
-            case VLCLibraryModeAudio:
-                mediaArray = [_libraryModel listOfAudioMedia];
-                break;
-
-            case VLCLibraryModeVideo:
-                mediaArray = [_libraryModel listOfVideoMedia];
-                break;
-
-            default:
-                NSAssert(1, @"no representation for selected library mode");
-                mediaArray = @[];
-                break;
-        }
+        mediaArray = [_libraryModel listOfVideoMedia];
     }
 
     viewItem.representedMediaItem = mediaArray[indexPath.item];

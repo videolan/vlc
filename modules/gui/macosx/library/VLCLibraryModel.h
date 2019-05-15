@@ -26,11 +26,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, VLCLibraryMode) {
-    VLCLibraryModeAudio,
-    VLCLibraryModeVideo,
-};
-
 @class VLCMediaLibraryMediaItem;
 @class VLCMediaLibraryArtist;
 @class VLCMediaLibraryAlbum;
@@ -49,8 +44,6 @@ extern NSString *VLCLibraryModelMediaItemUpdated;
 + (NSArray *)availableAudioCollections;
 
 - (instancetype)initWithLibrary:(vlc_medialibrary_t *)library;
-
-@property (readwrite) VLCLibraryMode libraryMode;
 
 @property (readonly) size_t numberOfAudioMedia;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfAudioMedia;
