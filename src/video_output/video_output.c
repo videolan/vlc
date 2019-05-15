@@ -1396,11 +1396,6 @@ static void ThreadProcessMouseState(vout_thread_t *vout,
     /* Translate window coordinates to video coordinates */
     vout_display_TranslateMouseState(vout->p->display, &vid_mouse, win_mouse);
 
-    /* Let SPU handle the mouse */
-    if (likely(vout->p->spu != NULL)
-     && spu_ProcessMouse(vout->p->spu, &vid_mouse, &vout->p->display->source))
-        return;
-
     /* Then pass up the filter chains. */
     m = &vid_mouse;
     vlc_mutex_lock(&vout->p->filter.lock);

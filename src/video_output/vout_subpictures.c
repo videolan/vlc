@@ -1505,16 +1505,6 @@ void spu_clock_SetDelay(spu_t *spu, vlc_tick_t delay)
 }
 
 /**
- * Inform the SPU filters of mouse event
- */
-int spu_ProcessMouse(spu_t *spu,
-                     const vlc_mouse_t *mouse,
-                     const video_format_t *fmt)
-{
-    return VLC_SUCCESS;
-}
-
-/**
  * Display a subpicture
  *
  * Remove the reservation flag of a subpicture, which will cause it to be
