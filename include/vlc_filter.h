@@ -139,9 +139,6 @@ struct filter_t
         int (*pf_video_mouse)( filter_t *, struct vlc_mouse_t *,
                                const struct vlc_mouse_t *p_old,
                                const struct vlc_mouse_t *p_new );
-        int (*pf_sub_mouse)( filter_t *, const struct vlc_mouse_t *p_old,
-                             const struct vlc_mouse_t *p_new,
-                             const video_format_t * );
     };
 
     /* Input attachments
