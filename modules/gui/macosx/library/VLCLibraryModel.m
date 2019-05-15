@@ -24,6 +24,7 @@
 
 #import "main/VLCMain.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "extensions/NSString+Helpers.h"
 
 NSString *VLCLibraryModelAudioMediaListUpdated = @"VLCLibraryModelAudioMediaListUpdated";
 NSString *VLCLibraryModelArtistListUpdated = @"VLCLibraryModelArtistListUpdated";
@@ -121,6 +122,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (void)dealloc
 {
     [_defaultNotificationCenter removeObserver:self];
+}
+
++ (NSArray *)availableAudioCollections
+{
+    return @[_NS("Artists"), _NS("Albums"), _NS("Songs"), _NS("Genres")];
 }
 
 - (void)mediaItemWasUpdated:(VLCMediaLibraryMediaItem *)mediaItem

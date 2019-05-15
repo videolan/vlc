@@ -312,6 +312,9 @@
                 </constraints>
             </view>
             <connections>
+                <outlet property="alternativeAudioCollectionView" destination="QAt-jP-zE7" id="269-UN-dfM"/>
+                <outlet property="alternativeAudioSegmentedControl" destination="nzi-H5-fyv" id="AmI-6s-ALm"/>
+                <outlet property="alternativeAudioView" destination="k7f-ic-LrF" id="8Cp-d2-3UJ"/>
                 <outlet property="audioCategorySelectionTableView" destination="dNP-8u-8iI" id="KiD-PX-T2p"/>
                 <outlet property="audioCollectionSelectionTableView" destination="LNt-ot-2wU" id="eJS-WZ-Ri7"/>
                 <outlet property="audioGroupSelectionTableView" destination="4ll-T2-J16" id="bjS-a8-ePC"/>
@@ -646,6 +649,59 @@
             </holdingPriorities>
             <point key="canvasLocation" x="109" y="-224.5"/>
         </splitView>
+        <customView id="k7f-ic-LrF">
+            <rect key="frame" x="0.0" y="0.0" width="500" height="302"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nzi-H5-fyv">
+                    <rect key="frame" x="10" y="280" width="52" height="23"/>
+                    <segmentedCell key="cell" borderStyle="border" alignment="left" style="smallSquare" trackingMode="selectOne" id="ic1-QN-Oy2">
+                        <font key="font" metaFont="system"/>
+                        <segments>
+                            <segment/>
+                            <segment selected="YES" tag="1"/>
+                            <segment>
+                                <nil key="label"/>
+                            </segment>
+                        </segments>
+                    </segmentedCell>
+                </segmentedControl>
+                <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AYf-gS-P66">
+                    <rect key="frame" x="0.0" y="0.0" width="500" height="271"/>
+                    <clipView key="contentView" id="2oa-WL-dxA">
+                        <rect key="frame" x="0.0" y="0.0" width="500" height="271"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView id="QAt-jP-zE7">
+                                <rect key="frame" x="0.0" y="0.0" width="500" height="158"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="oKT-Ic-UdV">
+                                    <size key="itemSize" width="50" height="50"/>
+                                </collectionViewFlowLayout>
+                                <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </collectionView>
+                        </subviews>
+                    </clipView>
+                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="Wb8-r8-xfF">
+                        <rect key="frame" x="1" y="144" width="233" height="15"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="Lae-xQ-39f">
+                        <rect key="frame" x="234" y="1" width="15" height="143"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                </scrollView>
+            </subviews>
+            <constraints>
+                <constraint firstItem="nzi-H5-fyv" firstAttribute="top" secondItem="k7f-ic-LrF" secondAttribute="top" id="Hub-0d-koP"/>
+                <constraint firstItem="AYf-gS-P66" firstAttribute="top" secondItem="nzi-H5-fyv" secondAttribute="bottom" constant="10" id="IpM-PQ-9Lk"/>
+                <constraint firstAttribute="trailing" secondItem="AYf-gS-P66" secondAttribute="trailing" id="KEG-os-Mk9"/>
+                <constraint firstAttribute="bottom" secondItem="AYf-gS-P66" secondAttribute="bottom" id="Wkc-LW-FiO"/>
+                <constraint firstItem="nzi-H5-fyv" firstAttribute="leading" secondItem="k7f-ic-LrF" secondAttribute="leading" constant="10" id="thF-Jr-QPO"/>
+                <constraint firstItem="AYf-gS-P66" firstAttribute="leading" secondItem="k7f-ic-LrF" secondAttribute="leading" id="tqb-gA-coA"/>
+            </constraints>
+            <point key="canvasLocation" x="247" y="771"/>
+        </customView>
     </objects>
     <resources>
         <image name="backward-3btns" width="29" height="23"/>

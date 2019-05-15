@@ -44,7 +44,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
 {
     self = [super init];
     if (self) {
-        _availableCollectionsArray = @[_NS("Artists"), _NS("Albums"), _NS("Songs"), _NS("Genres")];
+        _availableCollectionsArray = [VLCLibraryModel availableAudioCollections];
     }
     return self;
 }

@@ -462,6 +462,8 @@ modules/gui/macosx/library/VLCInputItem.h
 modules/gui/macosx/library/VLCInputItem.m
 modules/gui/macosx/library/VLCLibraryAlbumTableCellView.h
 modules/gui/macosx/library/VLCLibraryAlbumTableCellView.m
+modules/gui/macosx/library/VLCLibraryAlternativeAudioViewController.h
+modules/gui/macosx/library/VLCLibraryAlternativeAudioViewController.m
 modules/gui/macosx/library/VLCLibraryAudioDataSource.h
 modules/gui/macosx/library/VLCLibraryAudioDataSource.m
 modules/gui/macosx/library/VLCLibraryCollectionViewItem.h
