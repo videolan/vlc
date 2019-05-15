@@ -160,7 +160,7 @@
  *                determinated range
  *
  * The playlist calls _Next(), the randomizer selects the last item (it has no
- * choice). 'next' and 'head' now points one item past the end (their value is
+ * choice). 'next' and 'head' now point one item past the end (their value is
  * the vector size).
  *
  *                                          history
