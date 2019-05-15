@@ -501,13 +501,6 @@ int filter_chain_MouseFilter( filter_chain_t *p_chain, vlc_mouse_t *p_dst, const
     return VLC_SUCCESS;
 }
 
-int filter_chain_MouseEvent( filter_chain_t *p_chain,
-                             const vlc_mouse_t *p_mouse,
-                             const video_format_t *p_fmt )
-{
-    return VLC_SUCCESS;
-}
-
 /* Helpers */
 static void FilterDeletePictures( picture_t *picture )
 {

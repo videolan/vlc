@@ -452,15 +452,6 @@ VLC_API subpicture_t *filter_chain_SubFilter(filter_chain_t *chain,
 VLC_API int filter_chain_MouseFilter( filter_chain_t *, struct vlc_mouse_t *,
                                       const struct vlc_mouse_t * );
 
-/**
- * Inform the filter chain of mouse state.
- *
- * It makes sense only for a sub source chain.
- */
-VLC_API int filter_chain_MouseEvent( filter_chain_t *,
-                                     const struct vlc_mouse_t *,
-                                     const video_format_t * );
-
 int filter_chain_ForEach( filter_chain_t *chain,
                           int (*cb)( filter_t *, void * ), void *opaque );
 
