@@ -704,7 +704,7 @@ test_all_items_selected_exactly_once_with_removals(void)
     vlc_playlist_item_t *items[SIZE];
     ArrayInit(items, SIZE);
 
-    bool ok = randomizer_Add(&randomizer, items, 100);
+    bool ok = randomizer_Add(&randomizer, items, SIZE);
     assert(ok);
 
     bool selected[SIZE] = {0};
