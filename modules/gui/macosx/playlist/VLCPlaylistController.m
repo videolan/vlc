@@ -244,6 +244,9 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 - (void)playlistResetWithItems:(NSArray *)items
 {
+    // Clear all items (reset)
+    [_playlistModel dropExistingData];
+
     [_playlistModel addItems:items];
 
     [_playlistDataSource playlistUpdated];
