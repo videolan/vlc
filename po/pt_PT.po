@@ -28,7 +28,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-04-30 17:20+0200\n"
+"PO-Revision-Date: 2019-05-15 14:27+0200\n"
 "Last-Translator: Rui <xymarior@yandex.com>, 2019\n"
 "Language-Team: Portuguese (Portugal) (https://www.transifex.com/yaron/"
 "teams/16553/pt_PT/)\n"
@@ -459,7 +459,7 @@ msgstr "Selecione um ou mais ficheiros para abrir"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Directory"
-msgstr "Selecionar diretoria"
+msgstr "Selecionar pasta"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Folder"
@@ -508,7 +508,7 @@ msgstr "Reproduzir"
 
 #: include/vlc_intf_strings.h:66
 msgid "Remove Selected"
-msgstr "Remover seleção"
+msgstr "Remover selecionados da lista de reprodução"
 
 #: include/vlc_intf_strings.h:67
 msgid "Information..."
@@ -516,7 +516,7 @@ msgstr "Informação…"
 
 #: include/vlc_intf_strings.h:68
 msgid "Create Directory..."
-msgstr "Criar diretoria..."
+msgstr "Criar pasta..."
 
 #: include/vlc_intf_strings.h:69
 msgid "Create Folder..."
@@ -524,7 +524,7 @@ msgstr "Criar pasta…"
 
 #: include/vlc_intf_strings.h:70
 msgid "Rename Directory..."
-msgstr "Renomear diretoria..."
+msgstr "Alterar nome da pasta..."
 
 #: include/vlc_intf_strings.h:71
 msgid "Rename Folder..."
@@ -532,7 +532,7 @@ msgstr "Renomear pasta…"
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
-msgstr "Mostrar diretoria respetiva…"
+msgstr "Mostrar pasta respetiva…"
 
 #: include/vlc_intf_strings.h:73
 msgid "Show Containing Folder..."
@@ -554,7 +554,7 @@ msgstr "Repetir tudo"
 #: include/vlc_intf_strings.h:80 modules/gui/macosx/VLCCoreInteraction.m:467
 #: modules/gui/macosx/VLCMainMenu.m:398
 msgid "Repeat One"
-msgstr "Repetir uma"
+msgstr "Repetir atual"
 
 #: include/vlc_intf_strings.h:81 src/libvlc-module.c:1429
 #: modules/gui/macosx/VLCMainMenu.m:397
@@ -577,7 +577,7 @@ msgstr "Adicionar ficheiro…"
 
 #: include/vlc_intf_strings.h:86
 msgid "Add Directory..."
-msgstr "Adicionar diretoria..."
+msgstr "Adicionar pasta..."
 
 #: include/vlc_intf_strings.h:87
 msgid "Add Folder..."
@@ -858,11 +858,11 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr "(ativado por predefinição)"
+msgstr "(ativado por padrão)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr "(desativado por predefinição)"
+msgstr "(desativado por padrão)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -1299,12 +1299,14 @@ msgstr "Volume %ld%%"
 
 #: src/input/input.c:2719
 msgid "Your input can't be opened"
-msgstr "A sua entrada não pode ser aberta"
+msgstr "Não foi possível abrir o média"
 
 #: src/input/input.c:2720
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
-msgstr "O VLC não consegue abrir MRL '%s'. Verifique o registo para detalhes."
+msgstr ""
+"O VLC não consegue abrir a localização '%s'. Veja o registo em Windows: menu "
+"Ferramentas > Mensagens... ou em Mac OSX: menu Janela > Mensagens."
 
 #: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:409
 #: modules/gui/macosx/VLCMainMenu.m:410
@@ -1517,7 +1519,7 @@ msgstr "pt_PT"
 #: src/libvlc.h:166 src/libvlc-module.c:1432 src/libvlc-module.c:1433
 #: src/video_output/vout_intf.c:176 modules/gui/macosx/VLCMainMenu.m:475
 msgid "Zoom"
-msgstr "Zoom"
+msgstr "Aumentar / reduzir"
 
 #: src/libvlc.h:167 src/libvlc-module.c:1346 src/video_output/vout_intf.c:87
 msgid "1:4 Quarter"
@@ -1761,7 +1763,7 @@ msgid ""
 "hardware and the audio stream are compatible."
 msgstr ""
 "Isto define o modo dos canais de saída de áudio que será utilizado por "
-"predefinição se o seu hardware e a transmissão de áudio forem compatíveis ."
+"padrão se o seu hardware e a transmissão de áudio forem compatíveis."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -1957,7 +1959,7 @@ msgid ""
 "You can enforce the video width. By default (-1) VLC will adapt to the video "
 "characteristics."
 msgstr ""
-"Pode forçar a largura do vídeo. Por predefinição (-1) VLC irá adaptar as "
+"Pode forçar a largura do vídeo. Por padrão (-1) VLC irá adaptar as "
 "caraterísticas do vídeo."
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
@@ -1972,7 +1974,7 @@ msgid ""
 "You can enforce the video height. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"Pode forçar a altura do vídeo. Por predefinição (-1) o VLC irá adaptar as "
+"Pode forçar a altura do vídeo. Por padrão (-1) o VLC irá adaptar as "
 "caraterísticas do vídeo."
 
 #: src/libvlc-module.c:273
@@ -2155,8 +2157,8 @@ msgstr "Mostrar título do vídeo durante x milissegundos"
 #: src/libvlc-module.c:330
 msgid "Show the video title for n milliseconds, default is 5000 ms (5 sec.)"
 msgstr ""
-"Mostrar o título do vídeo durante n milissegundos, a predefinição é 5.000 ms "
-"(5 segundos)."
+"Mostrar o título do vídeo durante n milissegundos, o padrão é 5.000 ms (5 "
+"segundos)."
 
 #: src/libvlc-module.c:332
 msgid "Position of video title"
@@ -2244,8 +2246,9 @@ msgid ""
 "VLC can avoid creating window caption, frames, etc... around the video, "
 "giving a \"minimal\" window."
 msgstr ""
-"O VLC pode evitar a criação de legenda de janela, frames, etc... à volta do "
-"vídeo, com uma janela \"mínima\"."
+"Se desativado, a janela principal do vídeo em reprodução é mostrada "
+"minimalista, sem nenhum botão do sistema operativo para controlar a janela, "
+"sem barra de título nem qualquer tipo de moldura."
 
 #: src/libvlc-module.c:379
 msgid "Video splitter module"
@@ -2706,8 +2709,9 @@ msgid ""
 "language)."
 msgstr ""
 "Idioma da faixa de áudio que quer utilizar (código do país de duas ou três "
-"letras, separados por vírgula. Pode utilizar 'none' para evitar uma "
-"alternativa para outro idioma)."
+"letras, separados por vírgula conforme a prioridade. Por exemplo 'por,bra,"
+"eng' para a sequência Português, Português do Brasil, Inglês. Pode utilizar "
+"'none' para evitar uma alternativa para outro idioma)."
 
 #: src/libvlc-module.c:593
 msgid "Subtitle language"
@@ -2719,8 +2723,9 @@ msgid ""
 "three letters country code, you may use 'any' as a fallback)."
 msgstr ""
 "Idioma da faixa de legendas que pretende utilizar (código do país de duas ou "
-"três letras, separados por vírgula. Poderá utilizar 'any' como uma "
-"alternativa)."
+"três letras, separados por vírgula conforme a prioridade. Por exemplo 'por,"
+"bra,eng' para a sequência Português, Português do Brasil, Inglês. Poderá "
+"utilizar 'any' como uma alternativa)."
 
 #: src/libvlc-module.c:598
 msgid "Menu language"
@@ -2732,8 +2737,9 @@ msgid ""
 "or three letters country code, you may use 'any' as a fallback)."
 msgstr ""
 "Idioma dos menus que deseja utilizar com o DVD/BluRay (código do país de "
-"duas ou três letras, separados por vírgula. Pode utilizar 'any' como último "
-"recurso)."
+"duas ou três letras, separados por vírgula conforme a prioridade. Por "
+"exemplo 'por,bra,eng' para a sequência Português, Português do Brasil, "
+"Inglês. Pode utilizar 'any' como último recurso)."
 
 #: src/libvlc-module.c:604
 msgid "Audio track ID"
@@ -2805,7 +2811,7 @@ msgstr "Número de vezes a repetir a mesma entrada"
 
 #: src/libvlc-module.c:634 modules/gui/macosx/VLCOpenWindowController.m:159
 msgid "Start time"
-msgstr "Tempo de início"
+msgstr "Tempo onde iniciar"
 
 #: src/libvlc-module.c:636
 msgid "The stream will start at this position (in seconds)."
@@ -2813,7 +2819,7 @@ msgstr "A transmissão irá começar nesta posição (em segundos)."
 
 #: src/libvlc-module.c:638 modules/gui/macosx/VLCOpenWindowController.m:161
 msgid "Stop time"
-msgstr "Tempo de paragem"
+msgstr "Tempo onde parar"
 
 #: src/libvlc-module.c:640
 msgid "The stream will stop at this position (in seconds)."
@@ -2885,11 +2891,11 @@ msgstr ""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
-msgstr "Diretoria de gravação"
+msgstr "Pasta de gravação"
 
 #: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
-msgstr "Diretoria onde serão armazenados os registos"
+msgstr "Pasta onde serão armazenados os registos"
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
@@ -3112,7 +3118,7 @@ msgid ""
 "the drive letter (e.g. D:)"
 msgstr ""
 "Este é o leitor padrão de DVD (ou ficheiro) a ser usado. Não esqueça de usar "
-"os dois pontos depois da letra de unidade (D:)"
+"os dois pontos depois da letra de unidade (por exemplo D:)"
 
 #: src/libvlc-module.c:771
 msgid ""
@@ -3120,7 +3126,7 @@ msgid ""
 "the drive letter (e.g. D:)"
 msgstr ""
 "Este é o leitor padrão de VCD (ou ficheiro) a ser usado. Não esqueça de usar "
-"os dois-pontos depois da letra de unidade (D:)"
+"os dois-pontos depois da letra de unidade (por exemplo D:)"
 
 #: src/libvlc-module.c:774 modules/access/cdda.c:704
 msgid ""
@@ -3680,8 +3686,8 @@ msgid ""
 "Scan plugin directories for new plugins at startup. This increases the "
 "startup time of VLC."
 msgstr ""
-"Procurar nas diretorias de plug-ins por novos plug-ins no arranque. Isto "
-"aumenta o tempo de arranque do VLC."
+"Procurar nas pastas de plug-ins por novos plug-ins no arranque. Isto aumenta "
+"o tempo de arranque do VLC."
 
 #: src/libvlc-module.c:1058
 msgid "Preferred keystore list"
@@ -3827,7 +3833,7 @@ msgstr "Permitir acesso à Internet (para obter capas, nomes de músicas, etc.)"
 
 #: src/libvlc-module.c:1131
 msgid "Collapse"
-msgstr "Juntar"
+msgstr "Contrair"
 
 #: src/libvlc-module.c:1131
 msgid "Expand"
@@ -3846,7 +3852,8 @@ msgid ""
 msgstr ""
 "Selecione se as sub-pastas devem ser expandidas.\n"
 "nenhum: as sub-pastas não aparecem na lista de reprodução.\n"
-"colapso: as sub-pastas aparecem, mas são expandidas na primeira reprodução.\n"
+"contrair: as sub-pastas aparecem, mas são expandidas na primeira "
+"reprodução.\n"
 "expandir: todas as sub-pastas são expandidas.\n"
 
 #: src/libvlc-module.c:1140
@@ -5070,7 +5077,7 @@ msgstr "Parar do navegador"
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
-msgstr "Del"
+msgstr "Remover"
 
 #: src/misc/actions.c:63
 msgid "Down"
@@ -6737,7 +6744,7 @@ msgstr "Selecione o tipo de entrada do sintonizador (cabo / antena)."
 
 #: modules/access/dshow/dshow.cpp:176
 msgid "Video input pin"
-msgstr "Pin de entrada vídeo"
+msgstr "Ficha de entrada de vídeo"
 
 #: modules/access/dshow/dshow.cpp:178
 msgid ""
@@ -6754,7 +6761,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:182
 msgid "Audio input pin"
-msgstr "Pin de entrada áudio"
+msgstr "Ficha de entrada de áudio"
 
 #: modules/access/dshow/dshow.cpp:184
 msgid "Select the audio input source. See the \"video input\" option."
@@ -6762,7 +6769,7 @@ msgstr "Seleciona a entrada de áudio. Veja a opção \"entrada de vídeo\"."
 
 #: modules/access/dshow/dshow.cpp:185
 msgid "Video output pin"
-msgstr "Pin de saída vídeo"
+msgstr "Ficha de saída de vídeo"
 
 #: modules/access/dshow/dshow.cpp:187
 msgid "Select the video output type. See the \"video input\" option."
@@ -6770,7 +6777,7 @@ msgstr "Seleciona a entrada de vídeo. Veja a opção \"entrada de vídeo\"."
 
 #: modules/access/dshow/dshow.cpp:188
 msgid "Audio output pin"
-msgstr "Pin de saída áudio"
+msgstr "Ficha de saída de áudio"
 
 #: modules/access/dshow/dshow.cpp:190
 msgid "Select the audio output type. See the \"video input\" option."
@@ -7633,7 +7640,7 @@ msgstr "Continuar a ler um recurso que continua a ser atualizado."
 
 #: modules/access/http/access.c:300
 msgid "Cookies forwarding"
-msgstr "Reenvio de cookies"
+msgstr "Reenviar cookies"
 
 #: modules/access/http/access.c:301
 msgid "Forward cookies across HTTP redirections."
@@ -10748,7 +10755,7 @@ msgstr ""
 
 #: modules/audio_output/kai.c:110
 msgid "K Audio Interface audio output"
-msgstr "Saída de áudio K Audio Interface"
+msgstr "Saída de interface de áudio K (KAI)"
 
 #: modules/audio_output/mmdevice.c:1451 modules/gui/qt/ui/sprefs_audio.h:419
 msgid "HDMI/SPDIF audio passthrough"
@@ -10824,7 +10831,7 @@ msgid ""
 "VLC restart to apply."
 msgstr ""
 "Selecione o dispositivo de áudio especial, ou deixe o Windows decidir "
-"(predefinição). Tem que reiniciar o VLC para a aplicar."
+"(padrão). Tem que reiniciar o VLC para a aplicar."
 
 #: modules/audio_output/waveout.c:149
 msgid "WaveOut audio output"
@@ -12979,7 +12986,7 @@ msgstr "Descodificador de legendas EBU STL"
 #. languages using the Latin alphabet.
 #: modules/codec/subsdec.c:100
 msgid "Default (Windows-1252)"
-msgstr "Predefinição (Windows-1252)"
+msgstr "Padrão (Windows-1252)"
 
 #: modules/codec/subsdec.c:101
 msgid "System codeset"
@@ -14527,9 +14534,9 @@ msgid ""
 "the quiet mode will not bring this command box but can also be pretty "
 "annoying when you want to stop VLC and no video window is open."
 msgstr ""
-"Por predefinição, o plug-in da interface simplificada irá iniciar uma janela "
-"de comando de DOS. Se ativar o modo silencioso, esta janela não aparecerá, "
-"mas também pode ser desagradável quando quiser parar o VLC e não ser aberta "
+"Por padrão, o plug-in da interface simplificada irá iniciar uma janela de "
+"comando de DOS. Se ativar o modo silencioso, esta janela não aparecerá, mas "
+"também pode ser desagradável quando quiser parar o VLC e não ser aberta "
 "nenhuma janela de vídeo."
 
 #: modules/control/dummy.c:50
@@ -14920,10 +14927,10 @@ msgid ""
 "the quiet mode will not bring this command box but can also be pretty "
 "annoying when you want to stop VLC and no video window is open."
 msgstr ""
-"Por predefinição, o plug-in da interface rc irá iniciar uma janela de "
-"comando de DOS. Se ativar o modo silencioso, esta janela não aparecerá, mas "
-"também pode ser muito desagradável quando quiser parar o VLC e não ser "
-"aberta uma janela de vídeo."
+"Por padrão, o plug-in da interface rc irá iniciar uma janela de comando de "
+"DOS. Se ativar o modo silencioso, esta janela não aparecerá, mas também pode "
+"ser muito desagradável quando quiser parar o VLC e não ser aberta uma janela "
+"de vídeo."
 
 #: modules/control/oldrc.c:188
 msgid "RC"
@@ -16760,13 +16767,13 @@ msgstr "Não são permitidos vários perfis com o mesmo nome."
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:868
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:857
 msgid "Remove a preset"
-msgstr "Remover pré-ajuste"
+msgstr "Remover predefinição"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:569
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:869
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:858
 msgid "Select the preset you would like to remove:"
-msgstr "Selecione o pré-ajuste que quer remover:"
+msgstr "Selecione a predefinição que quer remover:"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:570
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:870
@@ -16779,19 +16786,19 @@ msgstr "Remover"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:647
 msgid "Add new Preset..."
-msgstr "Adicionar pré-ajuste..."
+msgstr "Adicionar predefinição..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:652
 msgid "Organize Presets..."
-msgstr "Organizar pré-ajustes..."
+msgstr "Organizar predefinição..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:823
 msgid "Save current selection as new preset"
-msgstr "Guardar a seleção atual como novo pré-ajuste"
+msgstr "Guardar a seleção atual como novo predefinição"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:824
 msgid "Enter a name for the new preset:"
-msgstr "Introduza um nome para o novo pré-ajuste:"
+msgstr "Introduza um nome para o novo predefinição:"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:77
 msgid "Bookmarks"
@@ -17178,7 +17185,7 @@ msgstr "Memorizar"
 
 #: modules/gui/macosx/VLCCoreInteraction.m:417
 msgid "Random On"
-msgstr "Aleatório: Sim"
+msgstr "Aleatório: ativado"
 
 #: modules/gui/macosx/VLCCoreInteraction.m:487
 msgid "Repeat Off"
@@ -17262,7 +17269,7 @@ msgstr "No modo de ecrã inteiro, mostra a preto a área em que não há imagem"
 
 #: modules/gui/macosx/macosx.m:64
 msgid "Show Fullscreen controller"
-msgstr "Mostrar controlador de Ecrã Completo"
+msgstr "Mostrar painel de controlos em ecrã completo"
 
 #: modules/gui/macosx/macosx.m:65
 msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
@@ -17313,15 +17320,17 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:82
 #: modules/gui/macosx/VLCSimplePrefsController.m:321
 msgid "Display VLC status menu icon"
-msgstr "Mostrar o ícone do estado do VLC no menu"
+msgstr "Mostrar o VLC barra de menus"
 
 #: modules/gui/macosx/macosx.m:83
 msgid ""
 "By default, VLC will show the statusbar icon menu. However, you can choose "
 "to disable it (restart required)."
 msgstr ""
-"Por norma, o VLC irá mostrar o ícone do menu da barra de estado. No entanto, "
-"pode desativá-lo se quiser (necessário reiniciar)."
+"Por norma, o VLC mostra um ícone na barra de estado (lado direito da barra "
+"de menus em Mac OS X) onde se pode ver um menu instantâneo com os comandos "
+"básicos e informações básicas da média em reprodução. Pode desativá-lo se "
+"quiser (necessário reiniciar)."
 
 #: modules/gui/macosx/macosx.m:85
 msgid "Control playlist items with the Apple Remote"
@@ -17371,9 +17380,8 @@ msgid ""
 "releases. It can also use the native fullscreen mode on Mac OS X 10.7 and "
 "later."
 msgstr ""
-"Por predefinição, o VLC utiliza o modo de ecrã inteiro das versões "
-"anteriores do Mac OS X. Pode também utilizar o modo nativo do Mac OS X 10.7 "
-"e posterior."
+"Por padrão, o VLC utiliza o modo de ecrã inteiro das versões anteriores do "
+"Mac OS X. Pode também utilizar o modo nativo do Mac OS X 10.7 e posterior."
 
 #: modules/gui/macosx/macosx.m:98 modules/gui/qt/qt.cpp:95
 msgid "Resize interface to the native video size"
@@ -17416,12 +17424,12 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:111 modules/gui/macosx/VLCMainMenu.m:1460
 msgid "Lock Aspect Ratio"
-msgstr "Bloquear proporções"
+msgstr "Bloquear proporção"
 
 #: modules/gui/macosx/macosx.m:113
 msgid "Dim keyboard backlight during fullscreen playback"
 msgstr ""
-"Atenuar retroiluminação de teclado durante a reprodução em ecrã completo"
+"Desligar retroiluminação do teclado durante a reprodução em ecrã completo"
 
 #: modules/gui/macosx/macosx.m:114
 msgid ""
@@ -17574,7 +17582,7 @@ msgstr "Maior"
 
 #: modules/gui/macosx/VLCMainMenu.m:341
 msgid "Check for Update..."
-msgstr "Procurar por atualizações..."
+msgstr "Procurar atualizações..."
 
 #: modules/gui/macosx/VLCMainMenu.m:342
 msgid "Preferences..."
@@ -17688,7 +17696,7 @@ msgstr "Velocidade de reprodução"
 #: modules/gui/macosx/VLCMainMenu.m:394
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:48
 msgid "Track Synchronization"
-msgstr "Sincronização de faixa"
+msgstr "Sincronização de faixas"
 
 #: modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/qt/components/controller.hpp:110
@@ -18015,7 +18023,7 @@ msgstr "Abrir fonte"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:131
 msgid "Media Resource Locator (MRL)"
-msgstr "Localizador de recursos multimédia (MRL)"
+msgstr "Localização do recurso de multimédia"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:133
 #: modules/gui/macosx/VLCOpenWindowController.m:193
@@ -18069,7 +18077,7 @@ msgstr "Tratar como canal em vez de ficheiro"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:151
 msgid "Play another media synchronously"
-msgstr "Reproduzir outra média de forma síncrona"
+msgstr "Reproduzir outra média simultaneamente"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:152
 #: modules/gui/macosx/VLCOpenWindowController.m:347
@@ -18171,11 +18179,11 @@ msgstr "Dispositivos de entrada"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:210
 msgid "Subscreen left"
-msgstr "Sub-ecrã esquerdo"
+msgstr "Esquerda do sub-ecrã"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:211
 msgid "Subscreen top"
-msgstr "Sub-ecrã topo"
+msgstr "Cima do sub-ecrã"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:212
 msgid "Subscreen Width"
@@ -18191,7 +18199,7 @@ msgstr "Capturar áudio"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:343
 msgid "Add Subtitle File:"
-msgstr "Adicionar ficheiro de legendas:"
+msgstr "Adicionar ficheiro de legendas"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:348
 msgid "Setup subtitle playback details"
@@ -18315,7 +18323,7 @@ msgstr "Expandir tudo"
 
 #: modules/gui/macosx/VLCPlaylist.m:231
 msgid "Collapse All"
-msgstr "Juntar tudo"
+msgstr "Contrair tudo"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:58
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -18398,7 +18406,7 @@ msgstr "Continuar"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
 msgid "Always continue media playback"
-msgstr "Continuar sempre a reprodução do áudio"
+msgstr "Continuar sempre a reprodução do média"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
@@ -18461,7 +18469,7 @@ msgstr "Manter nível de áudio entre sessões"
 #: modules/gui/macosx/VLCSimplePrefsController.m:275
 #: modules/gui/qt/ui/sprefs_audio.h:413
 msgid "Always reset audio start level to:"
-msgstr "Restaurar sempre o nível de áudio inicial para:"
+msgstr "Repor sempre o nível de áudio inicial para:"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:278
 #: modules/gui/qt/dialogs/vlm.cpp:492
@@ -18553,7 +18561,7 @@ msgstr "Claro"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:317
 msgid "Continue playback"
-msgstr "Continuar reprodução"
+msgstr "Continuar última reprodução"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:323
 msgid "Playback behaviour"
@@ -18570,7 +18578,7 @@ msgstr "Privacidade e interação na rede"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:329
 msgid "Automatically check for updates"
-msgstr "Procurar automaticamente por atualizações"
+msgstr "Procurar atualizações automaticamente"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:332
 msgid "HTTP web interface"
@@ -18690,7 +18698,8 @@ msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
 msgstr ""
 "Os ficheiros de média não podem ser retomados porque a opção \"Manter itens "
-"recentes\" está desativada."
+"recentes\" está desativada. Para a ativar aceda a \"Menu VLC > Preferências… "
+"> Mostrar tudo > Interface > Interfaces principais > Mac OS X\"."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:574
 msgid "Last check on: %@"
@@ -18808,7 +18817,7 @@ msgstr "Nada em reprodução"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:413
 msgid "Select File In Finder"
-msgstr "Selecionar ficheiro no finder"
+msgstr "Selecionar ficheiro no Finder"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
 msgid "Copy URL to clipboard"
@@ -20589,7 +20598,7 @@ msgstr "R&emover"
 
 #: modules/gui/qt/dialogs/errors.cpp:54
 msgid "Hide future errors"
-msgstr "Ocultar erros futuros"
+msgstr "Ocultar próximos erros"
 
 #: modules/gui/qt/dialogs/extended.cpp:51
 msgid "Adjustments and Effects"
@@ -21787,7 +21796,9 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:151
 msgid "Show a controller in fullscreen mode"
-msgstr "Mostrar um controlador no modo de ecrã completo"
+msgstr ""
+"Quando em ecrã completo, mostra um painel com botões para controlar a "
+"reprodução"
 
 #: modules/gui/qt/qt.cpp:152
 msgid "Embed the file browser in open dialog"
@@ -22016,7 +22027,7 @@ msgstr "Contraste da imagem (0-2)"
 #: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:73
 #: modules/video_filter/adjust.c:66
 msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr "Definir o contraste da imagem, entre 0 e 2. Predefinição é 1."
+msgstr "Definir o contraste da imagem, entre 0 e 2. O padrão é 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:74
 msgid "Image hue (0-360)"
@@ -22557,11 +22568,11 @@ msgstr "HTTP Lua"
 
 #: modules/lua/vlc.c:107
 msgid "Lua CLI"
-msgstr "Lua CLI"
+msgstr "CLI Lua"
 
 #: modules/lua/vlc.c:111
 msgid "Command-line interface"
-msgstr "Interface linha de comandos"
+msgstr "Interface de linha de comandos"
 
 #: modules/lua/vlc.c:120 modules/lua/vlc.c:131
 msgid "Lua Telnet"
@@ -22569,19 +22580,19 @@ msgstr "Lua Telnet"
 
 #: modules/lua/vlc.c:135
 msgid "Lua Meta Fetcher"
-msgstr "Meta processador Lua"
+msgstr "Buscador de metadados Lua"
 
 #: modules/lua/vlc.c:136
 msgid "Fetch meta data using lua scripts"
-msgstr "Obter metadados usando scripts lua"
+msgstr "Obter metadados usando scripts Lua"
 
 #: modules/lua/vlc.c:141
 msgid "Lua Meta Reader"
-msgstr "Meta leitor Lua"
+msgstr "Leitor de metadados Lua"
 
 #: modules/lua/vlc.c:142
 msgid "Read meta data using lua scripts"
-msgstr "Ler metadados utilizando scripts lua"
+msgstr "Ler metadados utilizando scripts Lua"
 
 #: modules/lua/vlc.c:148
 msgid "Lua Playlist"
@@ -22589,15 +22600,15 @@ msgstr "Lista de reprodução Lua"
 
 #: modules/lua/vlc.c:149
 msgid "Lua Playlist Parser Interface"
-msgstr "Interface Lua Playlist Parser"
+msgstr "Interface do analisador de lista de reprodução Lua"
 
 #: modules/lua/vlc.c:154
 msgid "Lua Art"
-msgstr "Lua Art"
+msgstr "Arte Lua"
 
 #: modules/lua/vlc.c:155
 msgid "Fetch artwork using lua scripts"
-msgstr "Obter capas usando scripts lua"
+msgstr "Obter capas usando scripts Lua"
 
 #: modules/lua/vlc.c:160 modules/lua/vlc.c:161
 msgid "Lua Extension"
@@ -22609,7 +22620,7 @@ msgstr "Módulo SD Lua"
 
 #: modules/meta_engine/folder.c:71
 msgid "Folder meta data"
-msgstr "Metadados da pasta"
+msgstr "Pasta de metadados"
 
 #: modules/meta_engine/folder.c:73
 msgid "Album art filename"
@@ -24017,7 +24028,7 @@ msgstr "Serviços Zeroconf"
 #: modules/services_discovery/bonjour.m:62
 #: modules/services_discovery/bonjour.m:398
 msgid "Bonjour Network Discovery"
-msgstr "Serviços de descoberta de rede Bonjour"
+msgstr "Descoberta de rede Bonjour"
 
 #: modules/services_discovery/bonjour.m:70
 msgid "Bonjour Renderer Discovery"
@@ -24049,7 +24060,7 @@ msgstr "Minhas imagens"
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:644
 msgid "mDNS Network Discovery"
-msgstr "Serviços de descoberta de rede mDNS"
+msgstr "Descoberta de rede mDNS"
 
 #: modules/services_discovery/microdns.c:65
 msgid "mDNS Renderer Discovery"
@@ -26611,7 +26622,7 @@ msgstr "Misturar imagem"
 
 #: modules/video_filter/blend.cpp:44
 msgid "Video pictures blending"
-msgstr "Imagens de vídeo a juntarem-se"
+msgstr "Imagens de vídeo a fundirem-se"
 
 #: modules/video_filter/bluescreen.c:38
 msgid ""
@@ -26623,7 +26634,7 @@ msgstr ""
 "Este efeito, também conhecido como \"tela verde\" ou \" chroma key\" que "
 "mistura com as \"partes azuis\" de uma imagem em primeiro plano com o "
 "mosaico em segundo plano (tal como nas previsões do tempo). Pode escolher a "
-"cor \"chave\" para a mistura (azul por predefinição)."
+"cor \"chave\" para a mistura (azul por padrão)."
 
 #: modules/video_filter/bluescreen.c:43
 msgid "Bluescreen U value"
@@ -27785,7 +27796,7 @@ msgstr "Conexão de vídeo para a saída DeckLink."
 
 #: modules/video_output/decklink.cpp:116
 msgid "Use 10 bits per pixel for video frames."
-msgstr "Utilizar 10 bits por píxel para os fotogramas do video."
+msgstr "Utilizar 10 bits por píxel para os fotogramas do vídeo."
 
 #: modules/video_output/decklink.cpp:234
 msgid "DecklinkOutput"
@@ -27940,7 +27951,7 @@ msgstr "DIVE"
 
 #: modules/video_output/kva.c:72
 msgid "K Video Acceleration video output"
-msgstr "Saída de vídeo K Video Acceleration"
+msgstr "Saída de acelerador de vídeo K (KVA)"
 
 #: modules/video_output/macosx.m:75
 msgid "Mac OS X OpenGL video output"
@@ -28061,7 +28072,7 @@ msgid ""
 msgstr ""
 "Sobreposição é a capacidade de aceleração do hardware da sua placa de vídeo "
 "(capacidade de mostrar o vídeo diretamente). O VLC tentará usar esta "
-"capacidade por predefinição."
+"capacidade por padrão."
 
 #: modules/video_output/win32/directdraw.c:75
 msgid "Use video buffers in system memory"
@@ -28146,7 +28157,7 @@ msgid ""
 "Force the dummy video output to create images using a specific chroma format "
 "instead of trying to improve performances by using the most efficient one."
 msgstr ""
-"Impõe a saída simplificada de video a criar imagens utilizando um formato "
+"Impõe a saída simplificada de vídeo a criar imagens utilizando um formato "
 "cromático específico em vez de tentar melhorar o desempenho ao utilizar o "
 "formato mais eficiente."
 
@@ -28304,9 +28315,9 @@ msgid ""
 "XVideo image format id to use. By default, VLC will try to use the best "
 "match for the video being played."
 msgstr ""
-"ID do formato de imagem a ser utilizado no XVideo. Por predefinição, o VLC "
-"tentará utilizar a melhor configuração para o vídeo que está a ser "
-"reproduzido."
+"Identificador (ID) do formato de imagem a ser utilizado no XVideo. Por "
+"padrão, o VLC tentará utilizar a melhor configuração para o vídeo que está a "
+"ser reproduzido."
 
 #: modules/video_output/xcb/xvideo.c:62
 msgid "XVideo"
@@ -28471,7 +28482,7 @@ msgstr ""
 
 #: modules/video_splitter/panoramix.c:118
 msgid "middle position (in %)"
-msgstr "posição intermédia (em %)"
+msgstr "Posição intermédia (em %)"
 
 #: modules/video_splitter/panoramix.c:119
 msgid ""
@@ -28700,7 +28711,7 @@ msgstr "Caminho predefinido do projectM"
 
 #: modules/visualization/projectm.cpp:57
 msgid "Path to the projectM preset directory"
-msgstr "Caminho para a pasta de predefinição projectM"
+msgstr "Caminho para a pasta predefinida do projectM"
 
 #: modules/visualization/projectm.cpp:59
 msgid "Title font"
@@ -29034,7 +29045,7 @@ msgstr "Gerir transmissões"
 
 #: share/lua/http/index.html:218
 msgid "Track Synchronisation"
-msgstr "Sincronização de faixa"
+msgstr "Sincronização de faixas"
 
 #: share/lua/http/index.html:220
 msgid "VLM Batch Commands"
@@ -29139,7 +29150,7 @@ msgstr "Formulário"
 
 #: modules/gui/qt/ui/equalizer.h:135
 msgid "Preset"
-msgstr "Predefinição"
+msgstr "Predefinido"
 
 #: modules/gui/qt/ui/equalizer.h:137
 msgid "0.00 dB"
@@ -29179,15 +29190,15 @@ msgstr " ms"
 
 #: modules/gui/qt/ui/open.h:271
 msgid "MRL"
-msgstr "MRL"
+msgstr "Localização"
 
 #: modules/gui/qt/ui/open.h:272
 msgid "Start Time"
-msgstr "Tempo inicial"
+msgstr "Tempo onde iniciar"
 
 #: modules/gui/qt/ui/open.h:273
 msgid "Stop Time"
-msgstr "Tempo de paragem"
+msgstr "Tempo onde parar"
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -29199,7 +29210,7 @@ msgstr "Multimédia extra"
 
 #: modules/gui/qt/ui/open.h:277
 msgid "Complete MRL for VLC internal"
-msgstr "Completar o MRL para o VLC internamente"
+msgstr "Localização completa do recurso de multimédia para o VLC internamente"
 
 #: modules/gui/qt/ui/open.h:280
 msgid "Select the file"
@@ -29207,7 +29218,7 @@ msgstr "Selecionar o ficheiro"
 
 #: modules/gui/qt/ui/open.h:284
 msgid "Change the start time for the media"
-msgstr "Altera o momento de início para o média"
+msgstr "Altera o tempo onde o média deve começar"
 
 #: modules/gui/qt/ui/open.h:286 modules/gui/qt/ui/open.h:290
 msgid "HH'H':mm'm':ss's'.zzz"
@@ -29215,12 +29226,11 @@ msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
 msgid "Change the stop time for the media"
-msgstr "Altera o tempo de paragem para o média"
+msgstr "Altera o tempo onde o média deve parar"
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
-msgstr ""
-"Reproduzir outro ficheiro sincronizadamente (ficheiro extra de áudio, ...)"
+msgstr "Reproduzir outro ficheiro simultaneamente (ficheiro extra de áudio...)"
 
 #: modules/gui/qt/ui/open_capture.h:97
 msgid "Capture mode"
@@ -29854,7 +29864,7 @@ msgstr "Cores"
 
 #: modules/gui/qt/ui/video_effects.h:1257
 msgid "Interactive Zoom"
-msgstr "Zoom Interativo"
+msgstr "Ampliação interativa"
 
 #: modules/gui/qt/ui/video_effects.h:1263
 msgid "Angle"
