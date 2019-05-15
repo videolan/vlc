@@ -53,6 +53,7 @@ Video output:
 
 Video filter:
  * Update yadif
+ * Remove remote OSD plugin
 
 Stream output:
  * New SDI output with improved audio and ancillary support.

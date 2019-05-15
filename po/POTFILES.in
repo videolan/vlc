@@ -1090,7 +1090,6 @@ modules/spu/dynamicoverlay/dynamicoverlay.c
 modules/spu/logo.c
 modules/spu/marq.c
 modules/spu/mosaic.c
-modules/spu/remoteosd.c
 modules/spu/rss.c
 modules/spu/subsdelay.c
 modules/stream_extractor/archive.c

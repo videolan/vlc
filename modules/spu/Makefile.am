@@ -29,10 +29,3 @@ libdynamicoverlay_plugin_la_SOURCES = \
 if !HAVE_WIN32
 spu_LTLIBRARIES += libdynamicoverlay_plugin.la
 endif
-
-libremoteosd_plugin_la_SOURCES = spu/remoteosd.c spu/remoteosd_rfbproto.h
-libremoteosd_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
-libremoteosd_plugin_la_LIBADD = $(GCRYPT_LIBS) $(SOCKET_LIBS)
-if HAVE_GCRYPT
-spu_LTLIBRARIES += libremoteosd_plugin.la
-endif
