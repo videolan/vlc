@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-03-04 04:07+0100\n"
+"PO-Revision-Date: 2019-05-15 19:31+0200\n"
 "Last-Translator: Alexander Lakhin <exclusion@gmail.com>, 2019\n"
 "Language-Team: Russian (https://www.transifex.com/yaron/teams/16553/ru/)\n"
 "Language: ru\n"
@@ -17598,11 +17598,11 @@ msgstr "Перейти ко времени"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
-msgstr "Визуализатор"
+msgstr "Воспроизводитель"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
-msgstr "Без визуализатора"
+msgstr "Нет воспроизводителя"
 
 #: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
@@ -21493,7 +21493,7 @@ msgstr "&Очистить"
 
 #: modules/gui/qt/menus.cpp:1629
 msgid "&Renderer"
-msgstr "&Визуализатор"
+msgstr "&Воспроизводитель"
 
 #: modules/gui/qt/menus.cpp:1633
 msgid "<Local>"
