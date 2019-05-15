@@ -744,6 +744,37 @@ test_all_items_selected_exactly_once_with_removals(void)
 }
 
 static void
+test_cycle_after_manual_selection(void)
+{
+    struct randomizer randomizer;
+    randomizer_Init(&randomizer);
+    randomizer_SetLoop(&randomizer, true);
+
+    #define SIZE 100
+    vlc_playlist_item_t *items[SIZE];
+    ArrayInit(items, SIZE);
+
+    bool ok = randomizer_Add(&randomizer, items, 100);
+    assert(ok);
+
+    /* force selection of the first item */
+    randomizer_Select(&randomizer, randomizer.items.data[0]);
+
+    for (int i = 0; i < 2 * SIZE; ++i)
+    {
+        assert(randomizer_HasNext(&randomizer));
+        vlc_playlist_item_t *item = randomizer_Next(&randomizer);
+        assert(item);
+    }
+
+    assert(randomizer_HasNext(&randomizer)); /* still has items in loop */
+
+    ArrayDestroy(items, SIZE);
+    randomizer_Destroy(&randomizer);
+    #undef SIZE
+}
+
+static void
 test_force_select_new_item(void)
 {
     struct randomizer randomizer;
@@ -1111,6 +1142,7 @@ int main(void)
     test_all_items_selected_exactly_once_per_cycle();
     test_all_items_selected_exactly_once_with_additions();
     test_all_items_selected_exactly_once_with_removals();
+    test_cycle_after_manual_selection();
     test_force_select_new_item();
     test_force_select_item_already_selected();
     test_prev();
