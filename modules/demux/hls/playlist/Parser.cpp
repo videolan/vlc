@@ -493,7 +493,18 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                 }
 
                 if(pair.second->getAttributeByName("CODECS"))
+                {
                     rep->addCodecs(pair.second->getAttributeByName("CODECS")->quotedString());
+                }
+                else
+                {
+                    if(pair.second->getAttributeByName("TYPE")->value == "AUDIO")
+                        rep->addCodecs("mp4a");
+                    else if(pair.second->getAttributeByName("TYPE")->value == "VIDEO")
+                        rep->addCodecs("avc1");
+                    else if(pair.second->getAttributeByName("TYPE")->value == "SUBTITLES")
+                        rep->addCodecs("wvtt");
+                }
 
                 if(!desc.empty())
                 {
@@ -522,6 +533,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                 if(typeattr->value == "SUBTITLES")
                 {
                     altAdaptSet->setRole(Role(Role::ROLE_SUBTITLE));
+                    rep->streamFormat = StreamFormat(StreamFormat::UNSUPPORTED);
                 }
                 else if(typeattr->value != "AUDIO" && typeattr->value != "VIDEO")
                 {
