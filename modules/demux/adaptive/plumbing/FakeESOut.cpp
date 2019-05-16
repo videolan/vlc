@@ -140,6 +140,10 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
     std::list<FakeESOutID *>::iterator it;
     es_out_id_t *realid = NULL;
 
+    /* declared ES must are temporary until real ES decl */
+    recycle_candidates.insert(recycle_candidates.begin(), declared.begin(), declared.end());
+    declared.clear();
+
     bool b_preexisting = false;
     bool b_select = false;
     for( it=recycle_candidates.begin(); it!=recycle_candidates.end(); ++it )
@@ -192,6 +196,9 @@ mtime_t FakeESOut::getTimestampOffset() const
 
 size_t FakeESOut::esCount() const
 {
+    if(!declared.empty())
+        return declared.size();
+
     size_t i_count = 0;
     std::list<FakeESOutID *>::const_iterator it;
     for( it=fakeesidlist.begin(); it!=fakeesidlist.end(); ++it )
@@ -235,6 +242,9 @@ void FakeESOut::recycleAll()
 
 void FakeESOut::gc()
 {
+    recycle_candidates.insert(recycle_candidates.begin(), declared.begin(), declared.end());
+    declared.clear();
+
     if( recycle_candidates.empty() )
     {
         return;
@@ -256,12 +266,16 @@ void FakeESOut::gc()
 bool FakeESOut::hasSelectedEs() const
 {
     bool b_selected = false;
+    std::list<FakeESOutID *> const * lists[2] = {&declared, &fakeesidlist};
     std::list<FakeESOutID *>::const_iterator it;
-    for( it=fakeesidlist.begin(); it!=fakeesidlist.end() && !b_selected; ++it )
+    for(int i=0; i<2; i++)
     {
-        FakeESOutID *esID = *it;
-        if( esID->realESID() )
-            es_out_Control( real_es_out, ES_OUT_GET_ES_STATE, esID->realESID(), &b_selected );
+        for( it=lists[i]->begin(); it!=lists[i]->end() && !b_selected; ++it )
+        {
+            FakeESOutID *esID = *it;
+            if( esID->realESID() )
+                es_out_Control( real_es_out, ES_OUT_GET_ES_STATE, esID->realESID(), &b_selected );
+        }
     }
     return b_selected;
 }
@@ -295,6 +309,30 @@ void FakeESOut::checkTimestampsStart(mtime_t i_start)
         if( i_start < CLOCK_FREQ ) /* Starts 0 */
             timestamps_offset = timestamps_expected;
         timestamps_check_done = true;
+    }
+}
+
+void FakeESOut::declareEs(const es_format_t *fmt)
+{
+    /* Declared ES are only visible until stream data flows.
+       They are then recycled to create the real ES. */
+    if(!recycle_candidates.empty() || !fakeesidlist.empty())
+    {
+        assert(recycle_candidates.empty());
+        assert(fakeesidlist.empty());
+        return;
+    }
+
+    FakeESOutID *fakeid = createNewID(fmt);
+    if( likely(fakeid) )
+    {
+        es_out_id_t *realid = es_out_Add( real_es_out, fakeid->getFmt() );
+        if( likely(realid) )
+        {
+            fakeid->setRealESID(realid);
+            declared.push_front(fakeid);
+        }
+        else delete fakeid;
     }
 }
 
