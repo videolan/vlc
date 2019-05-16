@@ -40,6 +40,11 @@ package-win-sdk: package-win-install
 package-win-common: package-win-install package-win-sdk
 # Executables, major libs
 	find $(prefix) -maxdepth 4 \( -name "*$(LIBEXT)" -o -name "*$(EXEEXT)" \) -exec cp {} "$(win32_destdir)/" \;
+if ENABLE_PDB
+	for dir in bin lib src; do \
+	  cp $$dir/.libs/*.pdb $(win32_destdir); \
+	done
+endif
 
 # Text files, clean them from mail addresses
 	for file in AUTHORS THANKS ; \
@@ -55,6 +60,12 @@ package-win-common: package-win-install package-win-sdk
 		mkdir -p "$$plugin_destdir"; \
 		find "$$plugindir" -type f \( -not -name '*.la' -and -not -name '*.a' \) -exec cp -v "{}" "$$plugin_destdir" \; ;\
 	done
+if ENABLE_PDB
+	for plugindir in $(prefix)/lib/vlc/plugins/*/; do \
+		plugin_destdir="$(win32_destdir)/plugins/`basename $$plugindir`"; \
+		for plugin in $$(find "$$plugindir" -type f \( -not -name '*.la' -and -not -name '*.a' \)); do cp modules/.libs/$$(basename "$$plugin" | sed s/dll/pdb/) "$$plugin_destdir"; done; \
+	done
+endif
 	-cp -r $(prefix)/share/locale $(win32_destdir)
 
 # BD-J JAR
