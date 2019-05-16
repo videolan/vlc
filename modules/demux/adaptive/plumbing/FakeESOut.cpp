@@ -137,8 +137,6 @@ FakeESOutID * FakeESOut::createNewID( const es_format_t *p_fmt )
         extrainfo->fillExtraFMTInfo( &fmtcopy );
 
     FakeESOutID *es_id = new (std::nothrow) FakeESOutID( this, &fmtcopy );
-    if(likely(es_id))
-        fakeesidlist.push_back( es_id );
 
     es_format_Clean( &fmtcopy );
 
@@ -324,6 +322,7 @@ es_out_id_t * FakeESOut::esOutAdd_Callback(es_out_t *fakees, const es_format_t *
         AbstractCommand *command = me->commandsqueue->factory()->createEsOutAddCommand( es_id );
         if( likely(command) )
         {
+            me->fakeesidlist.push_back(es_id);
             me->commandsqueue->Schedule( command );
             return reinterpret_cast<es_out_id_t *>(es_id);
         }
