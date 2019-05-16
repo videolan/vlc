@@ -62,6 +62,7 @@ namespace adaptive
             bool restarting() const;
             void setExtraInfoProvider( ExtraFMTInfoInterface * );
             void checkTimestampsStart(vlc_tick_t);
+            void declareEs( const es_format_t * );
 
             /* Used by FakeES ID */
             void recycle( FakeESOutID *id );
@@ -96,6 +97,7 @@ namespace adaptive
             int priority;
             std::list<FakeESOutID *> fakeesidlist;
             std::list<FakeESOutID *> recycle_candidates;
+            std::list<FakeESOutID *> declared;
     };
 
 }
