@@ -75,11 +75,20 @@ bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
     if( p_other->fmt.i_cat != fmt.i_cat )
         return false;
 
+    if(fmt.i_original_fourcc != p_other->fmt.i_original_fourcc)
+        return false;
+    if((fmt.i_extra > 0) ^ (p_other->fmt.i_extra > 0))
+        return false;
+
     switch(fmt.i_codec)
     {
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
         case VLC_CODEC_VC1:
+            if(fmt.i_extra && p_other->fmt.i_extra) /* AnnexB vs DCR */
+               return reinterpret_cast<uint8_t*>(fmt.p_extra)[0] !=
+                      reinterpret_cast<uint8_t*>(p_other->fmt.p_extra)[0];
+            else
                 return true;
 
         default:
@@ -90,8 +99,7 @@ bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
                     return false;
             }
 
-            return es_format_IsSimilar( &p_other->fmt, &fmt ) &&
-                   !p_other->fmt.i_extra && !fmt.i_extra;
+            return es_format_IsSimilar( &p_other->fmt, &fmt );
     }
 }
 
