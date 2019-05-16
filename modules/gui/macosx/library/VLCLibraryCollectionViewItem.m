@@ -52,7 +52,9 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mediaItemUpdated:) name:VLCLibraryModelMediaItemUpdated object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(mediaItemUpdated:)
+                                                     name:VLCLibraryModelMediaItemUpdated object:nil];
     }
     return self;
 }
@@ -67,7 +69,6 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 - (void)awakeFromNib
 {
-    self.playInstantlyButton.hidden = YES;
     [(VLCTrackingView *)self.view setViewToHide:self.playInstantlyButton];
     self.mediaTitleTextField.font = [NSFont VLClibraryCellTitleFont];
     self.durationTextField.font = [NSFont VLClibraryCellSubtitleFont];
@@ -87,6 +88,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     }
 
     [self updateColoredAppearance];
+    [self prepareForReuse];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -103,6 +105,18 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 }
 
 #pragma mark - view representation
+
+- (void)prepareForReuse
+{
+    [super prepareForReuse];
+    _playInstantlyButton.hidden = YES;
+    _mediaTitleTextField.stringValue = @"";
+    _durationTextField.stringValue = [NSString stringWithTime:0];
+    _mediaImageView.image = nil;
+    _annotationTextField.hidden = YES;
+    _progressIndicator.hidden = YES;
+    _unplayedIndicatorTextField.hidden = YES;
+}
 
 - (void)setRepresentedMediaItem:(VLCMediaLibraryMediaItem *)representedMediaItem
 {
@@ -128,9 +142,6 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (void)updateRepresentation
 {
     if (_representedMediaItem == nil) {
-        _mediaTitleTextField.stringValue = @"";
-        _durationTextField.stringValue = [NSString stringWithTime:0];
-        _mediaImageView.image = [NSImage imageNamed: @"noart.png"];
         return;
     }
 
@@ -159,19 +170,17 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     } else if (width >= VLCMediaLibrary720pWidth || height >= VLCMediaLibrary720pHeight) {
         _annotationTextField.stringValue = @" HD ";
         _annotationTextField.hidden = NO;
-    } else {
-        _annotationTextField.hidden = YES;
     }
 
     CGFloat position = _representedMediaItem.lastPlaybackPosition;
     if (position > VLCLibraryCollectionViewItemMinimalDisplayedProgress && position < VLCLibraryCollectionViewItemMaximumDisplayedProgress) {
         _progressIndicator.progress = position;
         _progressIndicator.hidden = NO;
-    } else {
-        _progressIndicator.hidden = YES;
     }
 
-    _unplayedIndicatorTextField.hidden = _representedMediaItem.playCount > 0 ? YES : NO;
+    if (_representedMediaItem.playCount == 0) {
+        _unplayedIndicatorTextField.hidden = NO;
+    }
 }
 
 #pragma mark - actions
