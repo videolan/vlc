@@ -483,7 +483,7 @@ randomizer_RemoveAt(struct randomizer *r, size_t index)
      *    ordered            order irrelevant               ordered
      */
 
-    /* update next before may be updated */
+    /* update next before index may be updated */
     if (index < r->next)
         r->next--;
 
@@ -497,26 +497,20 @@ randomizer_RemoveAt(struct randomizer *r, size_t index)
         index = r->head; /* the new index to remove */
     }
 
-    if (!r->history || index < r->history)
+    if (index < r->history)
     {
-        size_t swap = (r->history + r->items.size - 1) % r->items.size;
-        r->items.data[index] = r->items.data[swap];
-        index = swap;
+        /* this part is unordered, no need to shift all items */
+        r->items.data[index] = r->items.data[r->history - 1];
+        index = r->history - 1;
+        r->history--;
     }
 
-    if (r->history)
+    if (index < r->items.size - 1)
     {
+        /* shift the ordered history part by one */
         memmove(&r->items.data[index],
                 &r->items.data[index + 1],
                 (r->items.size - index - 1) * sizeof(*r->items.data));
-
-        if (index < r->history)
-            r->history--;
-        else if (r->history == r->items.size)
-            r->history = 0;
-
-        if (r->next == r->items.size)
-            r->next = 0;
     }
 
     r->items.size--;
