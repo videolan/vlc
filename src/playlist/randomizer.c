@@ -769,6 +769,85 @@ test_cycle_after_manual_selection(void)
 }
 
 static void
+test_cycle_with_additions_and_removals(void)
+{
+    struct randomizer randomizer;
+    randomizer_Init(&randomizer);
+    randomizer_SetLoop(&randomizer, true);
+
+    #define SIZE 100
+    vlc_playlist_item_t *items[SIZE];
+    ArrayInit(items, SIZE);
+
+    bool ok = randomizer_Add(&randomizer, items, 80);
+    assert(ok);
+
+    for (int i = 0; i < 30; ++i)
+    {
+        assert(randomizer_HasNext(&randomizer));
+        vlc_playlist_item_t *item = randomizer_Next(&randomizer);
+        assert(item);
+    }
+
+    vlc_playlist_item_t *to_remove[20];
+    /* copy 10 items already selected */
+    memcpy(to_remove, &randomizer.items.data[15], 10 * sizeof(*to_remove));
+    /* copy 10 items not already selected */
+    memcpy(&to_remove[10], &randomizer.items.data[60], 10 * sizeof(*to_remove));
+
+    randomizer_Remove(&randomizer, to_remove, 20);
+
+    /* it remains 40 items in the first cycle (30 already selected, and 10
+     * removed from the 50 remaining) */
+    for (int i = 0; i < 40; ++i)
+    {
+        assert(randomizer_HasNext(&randomizer));
+        vlc_playlist_item_t *item = randomizer_Next(&randomizer);
+        assert(item);
+    }
+
+    /* the first cycle is complete */
+    assert(randomizer_HasNext(&randomizer));
+    /* force the determination of the first item of the next cycle */
+    vlc_playlist_item_t *item = randomizer_PeekNext(&randomizer);
+    assert(item);
+
+    assert(randomizer.items.size == 60);
+    assert(randomizer.history == 1);
+
+    /* save current history */
+    vlc_playlist_item_t *history[59];
+    memcpy(history, &randomizer.items.data[1], 59 * sizeof(*history));
+
+    /* insert 20 new items */
+    ok = randomizer_Add(&randomizer, &items[80], 20);
+    assert(ok);
+
+    assert(randomizer.items.size == 80);
+    assert(randomizer.history == 21);
+
+    for (int i = 0; i < 59; ++i)
+        assert(history[i] == randomizer.items.data[21 + i]);
+
+    /* remove 10 items in the history part */
+    memcpy(to_remove, &randomizer.items.data[30], 10 * sizeof(*to_remove));
+    randomizer_Remove(&randomizer, to_remove, 10);
+
+    assert(randomizer.items.size == 70);
+    assert(randomizer.history == 21);
+
+    /* the other items in the history must be kept in order */
+    for (int i = 0; i < 9; ++i)
+        assert(history[i] == randomizer.items.data[21 + i]);
+    for (int i = 0; i < 40; ++i)
+        assert(history[i + 19] == randomizer.items.data[30 + i]);
+
+    ArrayDestroy(items, SIZE);
+    randomizer_Destroy(&randomizer);
+    #undef SIZE
+}
+
+static void
 test_force_select_new_item(void)
 {
     struct randomizer randomizer;
@@ -1137,6 +1216,7 @@ int main(void)
     test_all_items_selected_exactly_once_with_additions();
     test_all_items_selected_exactly_once_with_removals();
     test_cycle_after_manual_selection();
+    test_cycle_with_additions_and_removals();
     test_force_select_new_item();
     test_force_select_item_already_selected();
     test_prev();
