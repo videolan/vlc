@@ -1,0 +1,30 @@
+From 41833ff2e8918cf776b7849fd4ab1eab03dd6592 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 29 Apr 2019 10:49:01 +0200
+Subject: [PATCH] include MODULE_AUX_INCLUDES in the generated .pc files
+
+QtANGLE is set on MODULE_AUX_INCLUDES so the headers can be found when building
+with angle (gui.pro) but the pkg-config file is missing this header and the Qt
+headers cannot be compiled with the path from this config.
+
+Fixes QTBUG-75495
+---
+ mkspecs/features/qt_module.prf | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/mkspecs/features/qt_module.prf b/mkspecs/features/qt_module.prf
+index 8bd2d92421..7963356c82 100644
+--- a/mkspecs/features/qt_module.prf
++++ b/mkspecs/features/qt_module.prf
+@@ -278,6 +278,8 @@ load(qt_targets)
+         QMAKE_PKGCONFIG_INCDIR = $$[QT_INSTALL_HEADERS/raw]
+         QMAKE_PKGCONFIG_CFLAGS = -D$$MODULE_DEFINE -I${includedir}/$$MODULE_INCNAME
+     }
++    !isEmpty(MODULE_AUX_INCLUDES): \
++        QMAKE_PKGCONFIG_CFLAGS += -I${includedir}/$$section(MODULE_AUX_INCLUDES, /, 1, 1)
+     QMAKE_PKGCONFIG_NAME = $$replace(TARGET, ^Qt, "Qt$$QT_MAJOR_VERSION ")
+     QMAKE_PKGCONFIG_FILE = $$replace(TARGET, ^Qt, Qt$$QT_MAJOR_VERSION)
+     for(i, MODULE_DEPENDS): \
+-- 
+2.19.1.windows.1
+

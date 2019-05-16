@@ -51,7 +51,7 @@ endif
 	$(APPLY) $(SRC)/qt/0001-qmake-Always-split-QMAKE_DEFAULT_LIBDIRS-using-with-.patch
 	
 	$(APPLY) $(SRC)/qt/0001-generate-different-pkg-config-files-for-debug-and-re.patch
-	$(APPLY) $(SRC)/qt/0001-Fix-framework-include-paths-in-.pc-files.patch
+	$(APPLY) $(SRC)/qt/0001-include-MODULE_AUX_INCLUDES-in-the-generated-.pc-fil.patch
 	$(MOVE)
 
 
