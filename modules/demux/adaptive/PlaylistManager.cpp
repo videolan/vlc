@@ -428,13 +428,17 @@ int PlaylistManager::doDemux(vlc_tick_t increment)
     if(demux.i_nzpcr == VLC_TICK_INVALID)
     {
         bool b_dead = true;
+        bool b_all_disabled = true;
         std::vector<AbstractStream *>::const_iterator it;
         for(it=streams.begin(); it!=streams.end(); ++it)
+        {
             b_dead &= !(*it)->isValid();
+            b_all_disabled &= (*it)->isDisabled();
+        }
         if(!b_dead)
             vlc_cond_timedwait(&demux.cond, &demux.lock, vlc_tick_now() + VLC_TICK_FROM_MS(50));
         vlc_mutex_unlock(&demux.lock);
-        return (b_dead) ? AbstractStream::status_eof : AbstractStream::status_buffering;
+        return (b_dead || b_all_disabled) ? AbstractStream::status_eof : AbstractStream::status_buffering;
     }
 
     if(demux.i_firstpcr == VLC_TICK_INVALID)
