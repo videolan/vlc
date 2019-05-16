@@ -288,12 +288,14 @@ block_t * ForgedInitSegment::buildMoovBox()
         }
 
         box = mp4mux_GetMoov(muxh, NULL, trackTimescale.ToTime(duration.Get()));
-        mp4mux_Delete(muxh);
     }
     es_format_Clean(&fmt);
 
     if(!box)
+    {
+        mp4mux_Delete(muxh);
         return NULL;
+    }
 
     block_t *moov = box->b;
     free(box);
@@ -312,6 +314,7 @@ block_t * ForgedInitSegment::buildMoovBox()
         free(box);
     }
 
+    mp4mux_Delete(muxh);
     return moov;
 }
 
