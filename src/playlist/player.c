@@ -48,8 +48,19 @@ player_on_current_media_changed(vlc_player_t *player, input_item_t *new_media,
         /* nothing to do */
         return;
 
-    ssize_t index = new_media ? vlc_playlist_IndexOfMedia(playlist, new_media)
-                              : -1;
+    ssize_t index;
+    if (new_media)
+    {
+        index = vlc_playlist_IndexOfMedia(playlist, new_media);
+        if (index != -1)
+        {
+            vlc_playlist_item_t *item = playlist->items.data[index];
+            if (playlist->order == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
+                randomizer_Select(&playlist->randomizer, item);
+        }
+    }
+    else
+        index = -1;
 
     struct vlc_playlist_state state;
     vlc_playlist_state_Save(playlist, &state);
