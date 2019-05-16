@@ -66,10 +66,10 @@ vlc_module_begin ()
     add_shortcut( "svg" )
 
     /* svg options */
-    add_integer_with_range( "svg-width", -1, 1, 65535,
+    add_integer_with_range( "svg-width", -1, -1, 65535,
                             TEXT_WIDTH, LONG_TEXT_WIDTH )
         change_safe()
-    add_integer_with_range( "svg-height", -1, 1, 65535,
+    add_integer_with_range( "svg-height", -1, -1, 65535,
                             TEXT_HEIGHT, LONG_TEXT_HEIGHT )
         change_safe()
 
