@@ -271,11 +271,25 @@ void FakeESOut::recycle( FakeESOutID *id )
     recycle_candidates.push_back( id );
 }
 
+void FakeESOut::checkTimestampsStart(mtime_t i_start)
+{
+    if( i_start == VLC_TS_INVALID )
+        return;
+
+    if( !timestamps_check_done )
+    {
+        if( i_start < CLOCK_FREQ ) /* Starts 0 */
+            timestamps_offset = timestamps_expected;
+        timestamps_check_done = true;
+    }
+}
+
 /* Static callbacks */
 /* Always pass Fake ES ID to slave demuxes, it is just an opaque struct to them */
 es_out_id_t * FakeESOut::esOutAdd_Callback(es_out_t *fakees, const es_format_t *p_fmt)
 {
     FakeESOut *me = (FakeESOut *) fakees->p_sys;
+    vlc_mutex_locker locker(&me->lock);
 
     if( p_fmt->i_cat != VIDEO_ES && p_fmt->i_cat != AUDIO_ES && p_fmt->i_cat != SPU_ES )
         return NULL;
@@ -299,19 +313,6 @@ es_out_id_t * FakeESOut::esOutAdd_Callback(es_out_t *fakees, const es_format_t *
         }
     }
     return NULL;
-}
-
-void FakeESOut::checkTimestampsStart(mtime_t i_start)
-{
-    if( i_start == VLC_TS_INVALID )
-        return;
-
-    if( !timestamps_check_done )
-    {
-        if( i_start < CLOCK_FREQ ) /* Starts 0 */
-            timestamps_offset = timestamps_expected;
-        timestamps_check_done = true;
-    }
 }
 
 int FakeESOut::esOutSend_Callback(es_out_t *fakees, es_out_id_t *p_es, block_t *p_block)
