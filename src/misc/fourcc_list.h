@@ -271,6 +271,7 @@ static const staticentry_t p_list_video[] = {
         E("GAVC", "GeoVision MPEG-4 AVC"),
         E("Q264", "QNAP H.264/MPEG-4 AVC"),
         E("q264", "QNAP H.264/MPEG-4 AVC"),
+        E("w264", "QNAP H.264/MPEG-4 AVC"),
         A("UMSV"),
         A("SMV2"),
         A("tshd"),
