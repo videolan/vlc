@@ -120,6 +120,7 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(APPLY) libtool-2.4.6-san.patch
 	$(APPLY) libtool-2.4.6-clang-libs.patch
 	$(APPLY) libtool-2.4.6-response-files.patch
+	(cd $(UNPACK_DIR) && autoreconf)
 	$(MOVE)
 
 .buildlibtool: libtool .automake .help2man
