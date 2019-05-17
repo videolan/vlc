@@ -222,7 +222,7 @@ void MainWindow::pause() {
 
 void MainWindow::stop() {
     pause();
-    libvlc_media_player_stop(media_player);
+    libvlc_media_player_stop_async(media_player);
     stop_button->Enable(false);
     setTimeline(0.0);
     timeline->Enable(false);

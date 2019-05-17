@@ -144,7 +144,7 @@ static void test_media_player_set_media(const char** argv, int argc)
 
     play_and_wait(mp);
 
-    libvlc_media_player_stop (mp);
+    libvlc_media_player_stop_async (mp);
     libvlc_media_player_release (mp);
     libvlc_release (vlc);
 }
@@ -171,7 +171,7 @@ static void test_media_player_play_stop(const char** argv, int argc)
 
     play_and_wait(mi);
 
-    libvlc_media_player_stop (mi);
+    libvlc_media_player_stop_async (mi);
     libvlc_media_player_release (mi);
     libvlc_release (vlc);
 }
@@ -205,7 +205,7 @@ static void test_media_player_pause_stop(const char** argv, int argc)
     pause_and_wait(mi);
     test_audio_video(mi);
 
-    libvlc_media_player_stop (mi);
+    libvlc_media_player_stop_async (mi);
     test_audio_video(mi);
 
     libvlc_media_player_release (mi);

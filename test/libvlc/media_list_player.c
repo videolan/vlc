@@ -78,7 +78,7 @@ static inline void wait_stopped(libvlc_media_list_player_t *mlp)
 
 static inline void stop_and_wait(libvlc_media_list_player_t *mlp)
 {
-    libvlc_media_list_player_stop (mlp);
+    libvlc_media_list_player_stop_async (mlp);
     wait_stopped (mlp);
 }
 
@@ -484,7 +484,7 @@ static void test_media_list_player_playback_options (const char** argv, int argc
     libvlc_media_release (md4);
     libvlc_media_release (md5);
 
-    libvlc_media_list_player_stop (mlp);
+    libvlc_media_list_player_stop_async (mlp);
 
     while (libvlc_media_list_player_is_playing (mlp))
         sched_yield();

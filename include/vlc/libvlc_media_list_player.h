@@ -197,7 +197,7 @@ int libvlc_media_list_player_play_item(libvlc_media_list_player_t * p_mlp,
  * \param p_mlp media list player instance
  */
 LIBVLC_API void
-    libvlc_media_list_player_stop( libvlc_media_list_player_t * p_mlp);
+    libvlc_media_list_player_stop_async( libvlc_media_list_player_t * p_mlp);
 
 /**
  * Play next item from media list

@@ -270,7 +270,7 @@ LIBVLC_API void libvlc_media_player_pause ( libvlc_media_player_t *p_mi );
  *
  * \param p_mi the Media Player
  */
-LIBVLC_API void libvlc_media_player_stop ( libvlc_media_player_t *p_mi );
+LIBVLC_API void libvlc_media_player_stop_async ( libvlc_media_player_t *p_mi );
 
 /**
  * Set a renderer to the media player

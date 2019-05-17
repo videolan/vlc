@@ -201,7 +201,7 @@ void Mwindow::updateInterface() { //Update interface and check if song is finish
 void Mwindow::stop() {
     if(vlcPlayer) {
         /* stop the media player */
-        libvlc_media_player_stop(vlcPlayer);
+        libvlc_media_player_stop_async(vlcPlayer);
 
         /* release the media player */
         libvlc_media_player_release(vlcPlayer);

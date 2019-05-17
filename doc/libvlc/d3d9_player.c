@@ -368,7 +368,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
             break;
     }
 
-    libvlc_media_player_stop( p_mp );
+    libvlc_media_player_stop_async( p_mp );
 
     libvlc_media_player_release( p_mp );
     libvlc_media_release( p_media );

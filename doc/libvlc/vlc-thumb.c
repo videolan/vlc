@@ -217,7 +217,7 @@ int main(int argc, const char **argv)
     set_position(mp);
     snapshot(mp, width, out_with_ext);
 
-    libvlc_media_player_stop(mp);
+    libvlc_media_player_stop_async(mp);
 
     /* clean up */
     if (out != out_with_ext) {

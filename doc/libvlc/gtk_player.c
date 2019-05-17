@@ -62,7 +62,7 @@ void on_playpause(GtkWidget *widget, gpointer data) {
 
 void on_stop(GtkWidget *widget, gpointer data) {
     pause_player();
-    libvlc_media_player_stop(media_player);
+    libvlc_media_player_stop_async(media_player);
 }
 
 void play(void) {
