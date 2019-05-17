@@ -815,7 +815,7 @@ static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
         p_frame->i_buffer--;
     }
 
-    if( i_header >= p_frame->i_buffer )
+    if( i_header >= p_frame->i_buffer || tk->bihprops.i_stride > INT32_MAX - 3 )
     {
         p_frame->i_buffer = 0;
         return p_frame;
@@ -825,7 +825,7 @@ static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
     p_frame->p_buffer += i_header;
     p_frame->i_buffer -= i_header;
 
-    const unsigned int i_stride_bytes = ((( (tk->bihprops.i_stride << 3) + 31) & ~31) >> 3);
+    const unsigned int i_stride_bytes = (tk->bihprops.i_stride + 3) & ~3;
 
     if ( !tk->bihprops.i_stride || !i_stride_bytes )
         return p_frame;
