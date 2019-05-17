@@ -347,13 +347,14 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
 {
     if( mediaSegmentTemplate )
     {
-        const Timescale timescale = mediaSegmentTemplate->inheritTimescale();
-
         const SegmentTimeline *timeline = mediaSegmentTemplate->inheritSegmentTimeline();
         if(timeline)
         {
-            time = timescale.ToScaled(time);
-            *ret = timeline->getElementNumberByScaledPlaybackTime(time);
+            const Timescale timescale = timeline->getTimescale().isValid()
+                                      ? timeline->getTimescale()
+                                      : mediaSegmentTemplate->inheritTimescale();
+            stime_t st = timescale.ToScaled(time);
+            *ret = timeline->getElementNumberByScaledPlaybackTime(st);
             return true;
         }
 
@@ -366,6 +367,7 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
             }
             else
             {
+                const Timescale timescale = mediaSegmentTemplate->inheritTimescale();
                 *ret = mediaSegmentTemplate->inheritStartNumber();
                 *ret += timescale.ToScaled(time) / duration;
             }
