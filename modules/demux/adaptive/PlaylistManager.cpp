@@ -143,7 +143,7 @@ bool PlaylistManager::setupPeriod()
     return true;
 }
 
-bool PlaylistManager::start()
+bool PlaylistManager::init()
 {
     if(!conManager &&
        !(conManager =
@@ -161,6 +161,14 @@ bool PlaylistManager::start()
     updateControlsContentType();
     updateControlsPosition();
 
+    return true;
+}
+
+bool PlaylistManager::start()
+{
+    if(b_thread || !conManager)
+        return false;
+
     b_thread = !vlc_clone(&thread, managerThread,
                           static_cast<void *>(this), VLC_THREAD_PRIORITY_INPUT);
     if(!b_thread)
@@ -169,6 +177,11 @@ bool PlaylistManager::start()
     setBufferingRunState(true);
 
     return true;
+}
+
+bool PlaylistManager::started() const
+{
+    return b_thread;
 }
 
 void PlaylistManager::stop()
@@ -425,6 +438,8 @@ bool PlaylistManager::reactivateStream(AbstractStream *stream)
 int PlaylistManager::demux_callback(demux_t *p_demux)
 {
     PlaylistManager *manager = reinterpret_cast<PlaylistManager *>(p_demux->p_sys);
+    if(!manager->started() && !manager->start())
+        return VLC_DEMUXER_EOF;
     return manager->doDemux(DEMUX_INCREMENT);
 }
 
