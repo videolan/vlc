@@ -52,7 +52,9 @@ namespace adaptive
                              AbstractAdaptationLogic::LogicType type );
             virtual ~PlaylistManager    ();
 
+            bool    init();
             bool    start();
+            bool    started() const;
             void    stop();
 
             AbstractStream::buffering_status bufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t);

@@ -223,7 +223,7 @@ static int Open(vlc_object_t *p_obj)
         }
     }
 
-    if(!p_manager || !p_manager->start())
+    if(!p_manager || !p_manager->init())
     {
         delete p_manager;
         return VLC_EGENERIC;
