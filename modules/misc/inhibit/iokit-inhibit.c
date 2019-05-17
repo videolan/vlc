@@ -53,6 +53,7 @@ static void UpdateInhibit(vlc_inhibit_t *ih, unsigned mask)
             msg_Err(ih, "Failed releasing previous IOPMAssertion, "
                 "not acquiring new one!");
         }
+        sys->inh_assertion_id = kIOPMNullAssertionID;
     }
 
     // Order is important here, if we prevent display sleep, it means
@@ -92,9 +93,12 @@ static void UpdateInhibit(vlc_inhibit_t *ih, unsigned mask)
                                           activity_reason,
                                           &(sys->inh_assertion_id));
 
-    } else {
-        msg_Warn(ih, "Unhandled inhibiton mask (%i)", mask);
+    } else if ((mask & VLC_INHIBIT_NONE) == VLC_INHIBIT_NONE) {
+        msg_Dbg(ih, "Removed previous inhibition");
         return;
+    } else {
+         msg_Warn(ih, "Unhandled inhibiton mask (%i)", mask);
+         return;
     }
 
     if (ret != kIOReturnSuccess) {
