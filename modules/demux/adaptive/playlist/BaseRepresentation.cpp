@@ -153,6 +153,14 @@ void BaseRepresentation::debug(vlc_object_t *obj, int indent) const
     std::string text(indent, ' ');
     text.append("Representation ");
     text.append(id.str());
+    if(!codecs.empty())
+    {
+        std::list<std::string>::const_iterator c = codecs.begin();
+        text.append(" [" + *c++);
+        while(c != codecs.end())
+            text.append("," + *c++);
+        text.append("]");
+    }
     msg_Dbg(obj, "%s", text.c_str());
     std::vector<ISegment *> list;
     getAllSegments(list);
