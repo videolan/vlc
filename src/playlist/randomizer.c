@@ -58,7 +58,7 @@
  * To achieve these goals, a "randomizer" stores a single vector containing all
  * the items of the playlist, along with 3 indexes.
  *
- * The whole vector is not shuffled at once: instead, steps of the Fish-Yates
+ * The whole vector is not shuffled at once: instead, steps of the Fisher-Yates
  * algorithm are executed one-by-one on demand. This has several advantages:
  *  - on insertions and removals, there is no need to reshuffle or shift the
  *    whole array;
@@ -118,7 +118,7 @@
  *            determinated range
  *
  * The playlist calls _Next() one more time. The randomizer selects C (already
- * in place). _Next() returns E.
+ * in place). _Next() returns C.
  *
  *                                          history
  *                                next      |
@@ -129,7 +129,7 @@
  *             determinated range
  *
  * The playlist then calls _Prev(). Since the "current" item is C, the previous
- * one is E, so  _Prev() returns E, and 'next' moves back.
+ * one is E, so _Prev() returns E, and 'next' moves back.
  *
  *                                          history
  *                           next           |
@@ -172,8 +172,8 @@
  *                  determinated range
  *
  * At this point, if loop is disabled, it is not possible to call _Next()
- * anymore (_HasNext() returns false). So let's enable it by _SetLoop(), and
- * call _Next() again.
+ * anymore (_HasNext() returns false). So let's enable it by calling
+ * _SetLoop(), then let's call _Next() again.
  *
  * This will start a new loop cycle. Firstly, 'next' and 'head' are reset, and
  * the whole vector belongs to the last cycle history.
