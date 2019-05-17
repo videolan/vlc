@@ -239,7 +239,7 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
             if(templ)
             {
                 templ->setSourceUrl(url);
-                SegmentTimeline *timeline = createTimeline(streamIndexNode, period->inheritTimescale());
+                SegmentTimeline *timeline = createTimeline(streamIndexNode, adaptSet->inheritTimescale());
                 templ->setSegmentTimeline(timeline);
                 adaptSet->setSegmentTemplate(templ);
             }
