@@ -915,6 +915,8 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
     }
 }
 
+#undef ONLY_FMT
+
 /*****************************************************************************
  * ParseTracks:
  *****************************************************************************/
@@ -1493,6 +1495,8 @@ bool matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
     return true;
 }
 
+#define ONLY_FMT(t) if(vars.p_tk->fmt.i_cat != t ## _ES) \
+    throw std::runtime_error( "Mismatching track type" );
 
 bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
 {
@@ -1524,6 +1528,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             }
             else
             {
+                ONLY_FMT(VIDEO);
                 VLC_BITMAPINFOHEADER *p_bih = (VLC_BITMAPINFOHEADER*)vars.p_tk->p_extra_data;
 
                 vars.p_fmt->video.i_width = GetDWLE( &p_bih->biWidth );
@@ -1577,6 +1582,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             if (
                 vars.p_tk->i_extra_data >= 26 && !memcmp(p+4, "VIDORV", 6) && strchr("34", p[10]) && p[11] == '0')
             {
+                ONLY_FMT(VIDEO);
                 vars.p_tk->fmt.video.i_frame_rate      = p[22] << 24 | p[23] << 16 | p[24] << 8 | p[25] << 0;
                 vars.p_tk->fmt.video.i_frame_rate_base = 65536;
             }
@@ -1638,6 +1644,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             fill_extra_data( vars.p_tk, 0 );
         }
         S_CASE("V_QUICKTIME") {
+            ONLY_FMT(VIDEO);
             if( vars.p_tk->i_extra_data > 4 )
             {
                 MP4_Box_t *p_box = MP4_BoxNew(ATOM_root);
@@ -1701,6 +1708,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             }
             else
             {
+                ONLY_FMT(AUDIO);
                 WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_tk->p_extra_data;
 
                 p_tk->fmt.audio.i_channels   = GetWLE( &p_wf->nChannels );
@@ -1775,6 +1783,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         S_CASE("A_MPEG/L2") { A_MPEG_helper_(vars); }
         S_CASE("A_MPEG/L1") { A_MPEG_helper_(vars); }
         S_CASE("A_AC3") {
+            ONLY_FMT(AUDIO);
             // the AC-3 default duration cannot be trusted, see #8512
             if ( vars.p_tk->fmt.audio.i_rate == 8000 )
             {
@@ -1807,6 +1816,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             fill_extra_data( vars.p_tk, 0 );
         }
         static void A_OPUS__helper(HandlerPayload& vars) {
+            ONLY_FMT(AUDIO);
             vars.p_fmt->i_codec = VLC_CODEC_OPUS;
             vars.p_tk->b_no_duration = true;
             if( !vars.p_tk->fmt.audio.i_rate )
@@ -1828,6 +1838,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         S_CASE("A_OPUS")                { A_OPUS__helper( vars ); }
         S_CASE("A_OPUS/EXPERIMENTAL")   { A_OPUS__helper( vars ); }
         static void A_AAC_MPEG__helper(HandlerPayload& vars, int i_profile, bool sbr = false) {
+            ONLY_FMT(AUDIO);
             int i_srate;
 
             mkv_track_t * p_tk = vars.p_tk;
@@ -1889,6 +1900,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             fill_extra_data( vars.p_tk, 0);
         }
         S_CASE("A_TTA1") {
+            ONLY_FMT(AUDIO);
             mkv_track_t * p_tk  = vars.p_tk;
             es_format_t * p_fmt = vars.p_fmt;
 
@@ -1912,6 +1924,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             }
         }
         static void A_PCM__helper (HandlerPayload& vars, uint32_t i_codec) {
+            ONLY_FMT(AUDIO);
             vars.p_fmt->i_codec = i_codec;
             vars.p_fmt->audio.i_blockalign = ( vars.p_fmt->audio.i_bitspersample + 7 ) / 8 * vars.p_fmt->audio.i_channels;
 
@@ -1920,12 +1933,14 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         S_CASE("A_PCM/INT/LIT")    { A_PCM__helper ( vars, VLC_FOURCC( 'a','r','a','w' ) ); }
         S_CASE("A_PCM/FLOAT/IEEE") { A_PCM__helper ( vars, VLC_FOURCC( 'a','f','l','t' ) ) ;}
         S_CASE("A_REAL/14_4") {
+            ONLY_FMT(AUDIO);
             vars.p_fmt->i_codec = VLC_CODEC_RA_144;
             vars.p_fmt->audio.i_channels = 1;
             vars.p_fmt->audio.i_rate = 8000;
             vars.p_fmt->audio.i_blockalign = 0x14;
         }
         static bool A_REAL__is_valid (HandlerPayload& vars) {
+            ONLY_FMT(AUDIO);
             uint8_t *p = vars.p_tk->p_extra_data;
 
             if (vars.p_tk->i_extra_data <= sizeof(real_audio_private))
@@ -2024,25 +2039,30 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             fill_extra_data( vars.p_tk, 0 );
         }
         S_CASE("S_KATE") {
+            ONLY_FMT(SPU);
             vars.p_fmt->i_codec = VLC_CODEC_KATE;
             vars.p_fmt->subs.psz_encoding = strdup( "UTF-8" );
 
             fill_extra_data( vars.p_tk, 0 );
         }
         S_CASE("S_TEXT/ASCII") {
+            ONLY_FMT(SPU);
             vars.p_fmt->i_codec = VLC_CODEC_SUBT;
             vars.p_fmt->subs.psz_encoding = strdup( "ASCII" );
         }
         S_CASE("S_TEXT/UTF8") {
+            ONLY_FMT(SPU);
             vars.p_tk->fmt.i_codec = VLC_CODEC_SUBT;
             vars.p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
         }
         S_CASE("S_TEXT/USF") {
+            ONLY_FMT(SPU);
             vars.p_tk->fmt.i_codec = VLC_FOURCC( 'u', 's', 'f', ' ' );
             vars.p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
             fill_extra_data( vars.p_tk, 0 );
         }
         static void SSA__helper (HandlerPayload& vars) {
+            ONLY_FMT(SPU);
             vars.p_tk->fmt.i_codec = VLC_CODEC_SSA;
             vars.p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
             fill_extra_data( vars.p_tk, 0 );
@@ -2052,6 +2072,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         S_CASE("S_SSA")      { SSA__helper( vars ); }
         S_CASE("S_ASS")      { SSA__helper( vars ); }
         S_CASE("S_VOBSUB") {
+            ONLY_FMT(SPU);
             mkv_track_t * p_tk = vars.p_tk;
 
             p_tk->fmt.i_codec = VLC_CODEC_SPU;
@@ -2105,10 +2126,12 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             vars.p_fmt->i_codec = VLC_CODEC_BD_TEXT;
         }
         S_CASE("D_WEBVTT/SUBTITLES") {
+            ONLY_FMT(SPU);
             vars.p_fmt->i_codec = VLC_CODEC_SUBT;
             vars.p_fmt->subs.psz_encoding = strdup( "UTF-8");
         }
         S_CASE("S_TEXT/WEBVTT") {
+            ONLY_FMT(SPU);
             vars.p_fmt->i_codec = VLC_CODEC_WEBVTT;
             vars.p_fmt->subs.psz_encoding = strdup( "UTF-8");
         }
