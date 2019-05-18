@@ -334,11 +334,39 @@ done:
 
 #ifdef UPNP_ENABLE_IPV6
 
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#endif
+
+#if defined(TARGET_OS_MAC) && TARGET_OS_MAC
+#include <SystemConfiguration/SystemConfiguration.h>
+#include "vlc_charset.h"
+
 inline char *getPreferedAdapter()
+{
+    SCDynamicStoreRef session = SCDynamicStoreCreate(NULL, CFSTR("session"), NULL, NULL);
+    CFDictionaryRef q = (CFDictionaryRef) SCDynamicStoreCopyValue(session, CFSTR("State:/Network/Global/IPv4"));
+    char *returnValue = NULL;
+
+    if (q != NULL) {
+        const void *val;
+        if (CFDictionaryGetValueIfPresent(q, CFSTR("PrimaryInterface"), &val)) {
+            returnValue = FromCFString((CFStringRef)val, kCFStringEncodingUTF8);
+        }
+    }
+    CFRelease(q);
+    CFRelease(session);
+
+    return returnValue;
+}
+#else
+
+inline char *getIpv4ForMulticast()
 {
     return NULL;
 }
 
+#endif
 #else
 
 inline char *getIpv4ForMulticast()
