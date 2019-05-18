@@ -33,6 +33,9 @@ libupnp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)'
 libupnp_plugin_la_LIBADD = $(UPNP_LIBS)
 EXTRA_LTLIBRARIES += libupnp_plugin.la
 sd_LTLIBRARIES += $(LTLIBupnp)
+if HAVE_OSX
+libupnp_plugin_la_LDFLAGS += -Wl,-framework,CoreFoundation,-framework,SystemConfiguration
+endif
 
 libpulselist_plugin_la_SOURCES = services_discovery/pulse.c
 libpulselist_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
