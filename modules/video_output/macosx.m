@@ -339,6 +339,14 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *su
     [sys->glView setVoutFlushing:YES];
     if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {
+        if (@available(macOS 10.14, *)) {
+            vout_display_place_t place;
+            vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
+            vout_display_opengl_Viewport(vd->sys->vgl, place.x,
+                                         vd->cfg->display.height - (place.y + place.height),
+                                         place.width, place.height);
+        }
+
         vout_display_opengl_Display (sys->vgl, &vd->source);
         vlc_gl_ReleaseCurrent(sys->gl);
     }
