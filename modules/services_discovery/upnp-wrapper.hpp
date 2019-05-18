@@ -359,9 +359,10 @@ inline char *getPreferedAdapter()
 
     return returnValue;
 }
+
 #else
 
-inline char *getIpv4ForMulticast()
+inline char *getPreferedAdapter()
 {
     return NULL;
 }
