@@ -191,7 +191,7 @@ VLC_API void config_PutFloat(const char *name, float val);
  * thread.
  *
  * \warning The behaviour is undefined if the configuration item exists but is
- * not of floating point type.
+ * not of string type.
  *
  * \param name Configuration item name
  * \return Normally, a heap-allocated copy of the configuration item value.
