@@ -49,12 +49,18 @@
 # include <sys/uio.h>
 #endif
 
-typedef struct
-{
+/* Buufer can be max theoretical datagram content minus anticipated MTU.
+ * IPv6 headers are larger than IPv4, ignore IPv6 jumbograms.
+ */
+#define MRU 65507u
+
+typedef struct {
     int fd;
     int timeout;
-    size_t mtu;
-    block_t *overflow_block;
+
+    size_t length;
+    char *offset;
+    char buf[MRU];
 } access_sys_t;
 
 static int Control(stream_t *access, int query, va_list args)
@@ -78,30 +84,19 @@ static int Control(stream_t *access, int query, va_list args)
     return VLC_SUCCESS;
 }
 
-static block_t *BlockUDP(stream_t *access, bool *restrict eof)
+static ssize_t Read(stream_t *access, void *buf, size_t len)
 {
     access_sys_t *sys = access->p_sys;
 
-    block_t *pkt = block_Alloc(sys->mtu);
-    if (unlikely(pkt == NULL)) {
-        /* OOM - dequeue and discard one packet */
-        char dummy;
-        recv(sys->fd, &dummy, 1, 0);
-        return NULL;
+    if (sys->length > 0) {
+        if (len > sys->length)
+            len = sys->length;
+
+        memcpy(buf, sys->offset, len);
+        sys->offset += len;
+        sys->length -= len;
+        return len;
     }
-
-
-    struct iovec iov[] = {{
-        .iov_base = pkt->p_buffer,
-        .iov_len = sys->mtu,
-    },{
-        .iov_base = sys->overflow_block->p_buffer,
-        .iov_len = sys->overflow_block->i_buffer,
-    }};
-    struct msghdr msg = {
-        .msg_iov = iov,
-        .msg_iovlen = 2,
-    };
 
     struct pollfd ufd[1];
 
@@ -111,40 +106,31 @@ static block_t *BlockUDP(stream_t *access, bool *restrict eof)
     switch (vlc_poll_i11e(ufd, 1, sys->timeout)) {
         case 0:
             msg_Err(access, "receive time-out");
-            *eof = true;
-            /* fall through */
+            return 0;
         case -1:
-            goto skip;
+            return -1;
     }
 
-    ssize_t len = recvmsg(sys->fd, &msg, 0);
+    struct iovec iov[] = {
+        { .iov_base = buf,      .iov_len = len, },
+        { .iov_base = sys->buf, .iov_len = MRU, },
+    };
+    struct msghdr msg = {
+        .msg_iov = iov,
+        .msg_iovlen = ARRAY_SIZE(iov),
+    };
+    ssize_t val = recvmsg(sys->fd, &msg, 0);
 
-    if (len < 0) {
-skip:
-        block_Release(pkt);
-        return NULL;
+    if (val <= 0) /* empty (0 bytes) payload does *not* mean EOF here */
+        return -1;
+
+    if (unlikely((size_t)val > len)) {
+        sys->offset = sys->buf;
+        sys->length = val - len;
+        val = len;
     }
 
-    /* Received more than mtu amount,
-     * we should gather blocks and increase mtu
-     * and allocate new overflow block.  See Open()
-     */
-    if (unlikely((size_t)len > sys->mtu)) {
-        msg_Warn(access, "%zd bytes packet received (MTU was %zu), adjusting mtu",
-                len, sys->mtu);
-        block_t *gather_block = sys->overflow_block;
-
-        sys->overflow_block = block_Alloc(65507 - len);
-
-        gather_block->i_buffer = len - sys->mtu;
-        pkt->p_next = gather_block;
-        pkt = block_ChainGather(pkt);
-
-        sys->mtu = len;
-    }else
-        pkt->i_buffer = len;
-
-    return pkt;
+    return val;
 }
 
 /*****************************************************************************
@@ -162,19 +148,12 @@ static int Open( vlc_object_t *p_this )
     if( unlikely( sys == NULL ) )
         return VLC_ENOMEM;
 
-    sys->mtu = 7 * 188;
-
-    /* Overflow can be max theoretical datagram content less anticipated MTU,
-     *  IPv6 headers are larger than IPv4, ignore IPv6 jumbograms
-     */
-    sys->overflow_block = block_Alloc(65507 - sys->mtu);
-    if( unlikely( sys->overflow_block == NULL ) )
-        return VLC_ENOMEM;
-
+    sys->length = 0;
     p_access->p_sys = sys;
-
-    /* Set up p_access */
-    ACCESS_SET_CALLBACKS( NULL, BlockUDP, Control, NULL );
+    p_access->pf_read = Read;
+    p_access->pf_block = NULL;
+    p_access->pf_control = Control;
+    p_access->pf_seek = NULL;
 
     char *psz_name = strdup( p_access->psz_location );
     char *psz_parser;
@@ -249,8 +228,6 @@ static void Close( vlc_object_t *p_this )
 {
     stream_t     *p_access = (stream_t*)p_this;
     access_sys_t *sys = p_access->p_sys;
-    if( sys->overflow_block )
-        block_Release( sys->overflow_block );
 
     net_Close( sys->fd );
 }
