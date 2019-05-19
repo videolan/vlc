@@ -369,7 +369,6 @@ libvlccore_la_SOURCES = \
 	misc/objres.c \
 	misc/variables.h \
 	misc/variables.c \
-	misc/error.c \
 	misc/xml.c \
 	misc/addons.c \
 	misc/filter.c \

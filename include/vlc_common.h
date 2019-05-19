@@ -945,8 +945,6 @@ static inline bool mul_overflow(unsigned long long a, unsigned long long b,
 
 #define EMPTY_STR(str) (!str || !*str)
 
-VLC_API const char *vlc_error_string(int) VLC_USED;
-
 #include <vlc_arrays.h>
 
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
