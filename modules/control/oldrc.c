@@ -86,9 +86,7 @@ static int  VolumeMove   ( vlc_object_t *, char const *, vlc_value_t );
 static int  VideoConfig  ( vlc_object_t *, char const *, vlc_value_t );
 static int  AudioDevice  ( vlc_object_t *, char const *, vlc_value_t );
 static int  AudioChannel ( vlc_object_t *, char const *, vlc_value_t );
-static int  Statistics   ( vlc_object_t *, char const *, vlc_value_t );
-
-static int updateStatistics( intf_thread_t *, input_item_t *);
+static void Statistics(intf_thread_t *);
 
 static void player_on_state_changed(vlc_player_t *,
                                     enum vlc_player_state, void *);
@@ -648,13 +646,13 @@ static void *Run( void *data )
         STRING("adev", AudioDevice)
         STRING("achan", AudioChannel)
 
-        /* misc menu commands */
-        VOID("stats", Statistics)
-
 #undef STRING
 #undef VOID
 
-        if( !strcmp( psz_cmd, "logout" ) )
+        /* misc menu commands */
+        if( !strcmp( psz_cmd, "stats" ) )
+            Statistics( p_intf );
+        else if( !strcmp( psz_cmd, "logout" ) )
         {
             /* Close connection */
             if( p_sys->i_socket != -1 )
@@ -1611,25 +1609,15 @@ out:
     return ret;
 }
 
-static int Statistics ( vlc_object_t *p_this, char const *psz_cmd,
-                        vlc_value_t newval )
+static void Statistics( intf_thread_t *p_intf )
 {
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(newval);
-
-    intf_thread_t *p_intf = (intf_thread_t*)p_this;
     vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
     vlc_player_Lock(player);
-    input_item_t *item = vlc_player_GetCurrentMedia(player);
+    input_item_t *p_item = vlc_player_GetCurrentMedia(player);
     vlc_player_Unlock(player);
-    if(!item)
-        return VLC_ENOOBJ;
-    updateStatistics(p_intf, item);
-    return VLC_SUCCESS;
-}
 
-static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
-{
-    if( !p_item ) return VLC_EGENERIC;
+    if (p_item == NULL)
+        return;
 
     vlc_mutex_lock( &p_item->lock );
     msg_rc( "+----[ begin of statistical info ]" );
@@ -1669,8 +1657,6 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
     msg_rc("|");
     msg_rc( "+----[ end of statistical info ]" );
     vlc_mutex_unlock( &p_item->lock );
-
-    return VLC_SUCCESS;
 }
 
 #if defined(_WIN32) && !VLC_WINSTORE_APP
