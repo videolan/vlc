@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-05-19 18:00+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2019\n"
 "Language-Team: Kashmiri (India) (https://www.transifex.com/yaron/teams/16553/"
 "ks_IN/)\n"
 "Language: ks_IN\n"
@@ -21503,15 +21503,15 @@ msgstr "اکھ سیکین فایل کْریو اوپْن "
 
 #: modules/gui/skins2/src/dialogs.cpp:213
 msgid "Skin files |*.vlt;*.wsz;*.xml"
-msgstr "سیکین فایلہ|*.vlt;*.wsz;*.xml "
+msgstr "سیکین فایلہ |*.vlt;*.wsz;*.xml "
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
-msgstr ""
+msgstr "پْلے لِسٹْہ فایلْہ |"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
-msgstr ""
+msgstr "|تمام فایلْہ |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
