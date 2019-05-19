@@ -8,15 +8,17 @@ PKGS_FOUND += protobuf
 else
 ifeq ($(findstring protobuf,$(PKGS_DISABLE)),)
 # check we have a matching protoc to use
-PROTOC = $(shell PATH="$(PATH)" which protoc)
-ifeq ($(PROTOC),)
+PROTOC_ABSPATH = $(shell PATH="$(PATH)" which protoc)
+ifeq ($(PROTOC_ABSPATH),)
 PROTOC = $(error protoc not found (search path: $(PATH)))
 else
 # make sure the installed protoc is compatible with the version we want to build
-SYS_PROTOC_VER = $(shell $(PROTOC) --version)
-SYS_PROTOC = $(word $(words $(SYS_PROTOC_VER)) , $(SYS_PROTOC_VER))
-ifneq ($(PROTOBUF_VERSION),$(SYS_PROTOC))
-PROTOC = $(error $(PROTOC) version $(SYS_PROTOC) doesn't match the protobuf $(PROTOBUF_VERSION) we're building)
+SYS_PROTOC_VER = $(shell $(PROTOC_ABSPATH) --version)
+SYS_PROTOC_VERSION = $(word $(words $(SYS_PROTOC_VER)) , $(SYS_PROTOC_VER))
+ifneq ($(PROTOBUF_VERSION),$(SYS_PROTOC_VERSION))
+PROTOC = $(error protoc system version $(SYS_PROTOC_VERSION) and required version $(PROTOBUF_VERSION) do not match)
+else
+PROTOC = $(PROTOC_ABSPATH)
 endif
 endif
 endif
