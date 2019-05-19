@@ -1516,7 +1516,7 @@ LIBVLC_API void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi, cons
  * \version LibVLC 3.0.0 and later
  *
  * \return video viewpoint or NULL
- *         (the result must be released with free() or libvlc_free()).
+ *         (the result must be released with free()).
  */
 LIBVLC_API libvlc_video_viewpoint_t *libvlc_video_new_viewpoint(void);
 
@@ -2084,7 +2084,7 @@ LIBVLC_API void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
  * \param mp media player
  * \return the current audio output device identifier
  *         NULL if no device is selected or in case of error
- *         (the result must be released with free() or libvlc_free()).
+ *         (the result must be released with free()).
  * \version LibVLC 3.0.0 or later.
  */
 LIBVLC_API char *libvlc_audio_output_device_get( libvlc_media_player_t *mp );
