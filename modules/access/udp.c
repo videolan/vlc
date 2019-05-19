@@ -49,31 +49,8 @@
 # include <sys/uio.h>
 #endif
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-static int  Open( vlc_object_t * );
-static void Close( vlc_object_t * );
-
 #define BUFFER_TEXT N_("Receive buffer")
 #define BUFFER_LONGTEXT N_("UDP receive buffer size (bytes)" )
-#define TIMEOUT_TEXT N_("UDP Source timeout (sec)")
-
-vlc_module_begin ()
-    set_shortname( N_("UDP" ) )
-    set_description( N_("UDP input") )
-    set_category( CAT_INPUT )
-    set_subcategory( SUBCAT_INPUT_ACCESS )
-
-    add_obsolete_integer( "server-port" ) /* since 2.0.0 */
-    add_obsolete_integer( "udp-buffer" ) /* since 3.0.0 */
-    add_integer( "udp-timeout", -1, TIMEOUT_TEXT, NULL, true )
-
-    set_capability( "access", 0 )
-    add_shortcut( "udp", "udpstream", "udp4", "udp6" )
-
-    set_callbacks( Open, Close )
-vlc_module_end ()
 
 typedef struct
 {
@@ -83,11 +60,95 @@ typedef struct
     block_t *overflow_block;
 } access_sys_t;
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static block_t *BlockUDP( stream_t *, bool * );
-static int Control( stream_t *, int, va_list );
+static int Control(stream_t *access, int query, va_list args)
+{
+    switch (query) {
+        case STREAM_CAN_SEEK:
+        case STREAM_CAN_FASTSEEK:
+        case STREAM_CAN_PAUSE:
+        case STREAM_CAN_CONTROL_PACE:
+            *va_arg(args, bool *) = false;
+            break;
+
+        case STREAM_GET_PTS_DELAY:
+            *va_arg(args, vlc_tick_t *) =
+                VLC_TICK_FROM_MS(var_InheritInteger(access, "network-caching"));
+            break;
+
+        default:
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
+static block_t *BlockUDP(stream_t *access, bool *restrict eof)
+{
+    access_sys_t *sys = access->p_sys;
+
+    block_t *pkt = block_Alloc(sys->mtu);
+    if (unlikely(pkt == NULL)) {
+        /* OOM - dequeue and discard one packet */
+        char dummy;
+        recv(sys->fd, &dummy, 1, 0);
+        return NULL;
+    }
+
+
+    struct iovec iov[] = {{
+        .iov_base = pkt->p_buffer,
+        .iov_len = sys->mtu,
+    },{
+        .iov_base = sys->overflow_block->p_buffer,
+        .iov_len = sys->overflow_block->i_buffer,
+    }};
+    struct msghdr msg = {
+        .msg_iov = iov,
+        .msg_iovlen = 2,
+    };
+
+    struct pollfd ufd[1];
+
+    ufd[0].fd = sys->fd;
+    ufd[0].events = POLLIN;
+
+    switch (vlc_poll_i11e(ufd, 1, sys->timeout)) {
+        case 0:
+            msg_Err(access, "receive time-out");
+            *eof = true;
+            /* fall through */
+        case -1:
+            goto skip;
+    }
+
+    ssize_t len = recvmsg(sys->fd, &msg, 0);
+
+    if (len < 0) {
+skip:
+        block_Release(pkt);
+        return NULL;
+    }
+
+    /* Received more than mtu amount,
+     * we should gather blocks and increase mtu
+     * and allocate new overflow block.  See Open()
+     */
+    if (unlikely((size_t)len > sys->mtu)) {
+        msg_Warn(access, "%zd bytes packet received (MTU was %zu), adjusting mtu",
+                len, sys->mtu);
+        block_t *gather_block = sys->overflow_block;
+
+        sys->overflow_block = block_Alloc(65507 - len);
+
+        gather_block->i_buffer = len - sys->mtu;
+        pkt->p_next = gather_block;
+        pkt = block_ChainGather(pkt);
+
+        sys->mtu = len;
+    }else
+        pkt->i_buffer = len;
+
+    return pkt;
+}
 
 /*****************************************************************************
  * Open: open the socket
@@ -197,106 +258,20 @@ static void Close( vlc_object_t *p_this )
     net_Close( sys->fd );
 }
 
-/*****************************************************************************
- * Control:
- *****************************************************************************/
-static int Control( stream_t *p_access, int i_query, va_list args )
-{
-    bool    *pb_bool;
+#define TIMEOUT_TEXT N_("UDP Source timeout (sec)")
 
-    switch( i_query )
-    {
-        case STREAM_CAN_SEEK:
-        case STREAM_CAN_FASTSEEK:
-        case STREAM_CAN_PAUSE:
-        case STREAM_CAN_CONTROL_PACE:
-            pb_bool = va_arg( args, bool * );
-            *pb_bool = false;
-            break;
+vlc_module_begin()
+    set_shortname(N_("UDP"))
+    set_description(N_("UDP input"))
+    set_category(CAT_INPUT)
+    set_subcategory(SUBCAT_INPUT_ACCESS)
 
-        case STREAM_GET_PTS_DELAY:
-            *va_arg( args, vlc_tick_t * ) =
-                VLC_TICK_FROM_MS(var_InheritInteger(p_access, "network-caching"));
-            break;
+    add_obsolete_integer("server-port") /* since 2.0.0 */
+    add_obsolete_integer("udp-buffer") /* since 3.0.0 */
+    add_integer("udp-timeout", -1, TIMEOUT_TEXT, NULL, true)
 
-        default:
-            return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
+    set_capability("access", 0)
+    add_shortcut("udp", "udpstream", "udp4", "udp6")
 
-/*****************************************************************************
- * BlockUDP:
- *****************************************************************************/
-static block_t *BlockUDP(stream_t *access, bool *restrict eof)
-{
-    access_sys_t *sys = access->p_sys;
-
-    block_t *pkt = block_Alloc(sys->mtu);
-    if (unlikely(pkt == NULL))
-    {   /* OOM - dequeue and discard one packet */
-        char dummy;
-        recv(sys->fd, &dummy, 1, 0);
-        return NULL;
-    }
-
-
-    struct iovec iov[] = {{
-        .iov_base = pkt->p_buffer,
-        .iov_len = sys->mtu,
-    },{
-        .iov_base = sys->overflow_block->p_buffer,
-        .iov_len = sys->overflow_block->i_buffer,
-    }};
-    struct msghdr msg = {
-        .msg_iov = iov,
-        .msg_iovlen = 2,
-    };
-
-    struct pollfd ufd[1];
-
-    ufd[0].fd = sys->fd;
-    ufd[0].events = POLLIN;
-
-    switch (vlc_poll_i11e(ufd, 1, sys->timeout))
-    {
-        case 0:
-            msg_Err(access, "receive time-out");
-            *eof = true;
-            /* fall through */
-        case -1:
-            goto skip;
-     }
-
-    ssize_t len = recvmsg(sys->fd, &msg, 0);
-
-    if (len < 0)
-    {
-skip:
-        block_Release(pkt);
-        return NULL;
-    }
-
-    /* Received more than mtu amount,
-     * we should gather blocks and increase mtu
-     * and allocate new overflow block.  See Open()
-     */
-    if (unlikely((size_t)len > sys->mtu))
-    {
-        msg_Warn(access, "%zd bytes packet received (MTU was %zu), adjusting mtu",
-                len, sys->mtu);
-        block_t *gather_block = sys->overflow_block;
-
-        sys->overflow_block = block_Alloc(65507 - len);
-
-        gather_block->i_buffer = len - sys->mtu;
-        pkt->p_next = gather_block;
-        pkt = block_ChainGather( pkt );
-
-        sys->mtu = len;
-    }
-    else
-        pkt->i_buffer = len;
-
-    return pkt;
-}
+    set_callbacks(Open, Close)
+vlc_module_end()
