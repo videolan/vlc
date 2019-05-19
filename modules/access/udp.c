@@ -49,9 +49,6 @@
 # include <sys/uio.h>
 #endif
 
-#define BUFFER_TEXT N_("Receive buffer")
-#define BUFFER_LONGTEXT N_("UDP receive buffer size (bytes)" )
-
 typedef struct
 {
     int fd;
