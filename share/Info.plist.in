@@ -1373,8 +1373,6 @@
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>VLC</string>
-	<key>CFBundleGetInfoString</key>
-	<string>@COPYRIGHT_MESSAGE@</string>
 	<key>CFBundleIconFile</key>
 	<string>VLC.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -1385,10 +1383,10 @@
 	<string>VLC media player</string>
 	<key>CFBundleDisplayName</key>
 	<string>VLC</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>@VERSION@</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>VLC#</string>
 	<key>BreakpadProduct</key>
@@ -1399,6 +1397,14 @@
 	<string>1</string>
 	<key>BreakpadURL</key>
 	<string>@BREAKPAD_URL@/reports</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright (c) @COPYRIGHT_YEARS@ VLC authors and VideoLAN</string>
+	<key>NSCameraUsageDescription</key>
+	<string>VLC uses the camera to record some video.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>VLC uses the microphone to record some audio.</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>VLC uses apple events to control external media players.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

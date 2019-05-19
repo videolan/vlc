@@ -1,9 +1,5 @@
 /* Localized versions of Info.plist keys */
 
-"CFBundleName" = "VLC";
-"CFBundleDisplayName" = "VLC";
-"CFBundleShortVersionString" = "@VERSION@";
-"CFBundleGetInfoString" = "@COPYRIGHT_MESSAGE@";
 "NSHumanReadableCopyright" = "Copyright (c) @COPYRIGHT_YEARS@ VLC authors and VideoLAN";
 
 "NSCameraUsageDescription" = "VLC uses the camera to record some video.";
