@@ -77,26 +77,16 @@ static bool ReadCommand( intf_thread_t *, char *, int * );
 
 static input_item_t *parse_MRL( const char * );
 
-static int  Input        ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
-static int  Playlist     ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
-static int  Quit         ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
-static int  Intf         ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
-static int  Volume       ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
-static int  VolumeMove   ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
-static int  VideoConfig  ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
-static int  AudioDevice  ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
-static int  AudioChannel ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
-static int  Statistics   ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
+static int  Input        ( vlc_object_t *, char const *, vlc_value_t );
+static int  Playlist     ( vlc_object_t *, char const *, vlc_value_t );
+static int  Quit         ( vlc_object_t *, char const *, vlc_value_t );
+static int  Intf         ( vlc_object_t *, char const *, vlc_value_t );
+static int  Volume       ( vlc_object_t *, char const *, vlc_value_t );
+static int  VolumeMove   ( vlc_object_t *, char const *, vlc_value_t );
+static int  VideoConfig  ( vlc_object_t *, char const *, vlc_value_t );
+static int  AudioDevice  ( vlc_object_t *, char const *, vlc_value_t );
+static int  AudioChannel ( vlc_object_t *, char const *, vlc_value_t );
+static int  Statistics   ( vlc_object_t *, char const *, vlc_value_t );
 
 static int updateStatistics( intf_thread_t *, input_item_t *);
 
@@ -596,15 +586,14 @@ static void *Run( void *data )
 
 #define VOID(name, func) \
         if (strcmp(psz_cmd, name) == 0) { \
-            vlc_value_t o, n; \
-            func(VLC_OBJECT(p_intf), psz_cmd, o, n, NULL); \
+            vlc_value_t n; \
+            func(VLC_OBJECT(p_intf), psz_cmd, n); \
         } else
 
 #define STRING(name, func) \
         if (strcmp(psz_cmd, name) == 0) { \
-            vlc_value_t o = { .psz_string = psz_arg }; \
             vlc_value_t n = { .psz_string = psz_arg }; \
-            func(VLC_OBJECT(p_intf), psz_cmd, o, n, NULL); \
+            func(VLC_OBJECT(p_intf), psz_cmd, n); \
         } else
 
         VOID("quit", Quit)
@@ -924,9 +913,8 @@ player_aout_on_volume_changed(vlc_player_t *player, float volume, void *data)
  * Command routines
  ********************************************************************/
 static int Input( vlc_object_t *p_this, char const *psz_cmd,
-                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                  vlc_value_t newval )
 {
-    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
     int i_error = VLC_EGENERIC;
@@ -1137,10 +1125,8 @@ static void print_playlist(intf_thread_t *p_intf, vlc_playlist_t *playlist)
 }
 
 static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
-                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                     vlc_value_t newval )
 {
-    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
-
     int ret = VLC_SUCCESS;
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     vlc_playlist_t *playlist = p_intf->p_sys->playlist;
@@ -1356,25 +1342,26 @@ end:
 }
 
 static int Quit( vlc_object_t *p_this, char const *psz_cmd,
-                 vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                 vlc_value_t newval )
 {
-    VLC_UNUSED(p_data); VLC_UNUSED(psz_cmd);
-    VLC_UNUSED(oldval); VLC_UNUSED(newval);
+    VLC_UNUSED(psz_cmd);
+    VLC_UNUSED(newval);
 
     libvlc_Quit( vlc_object_instance(p_this) );
     return VLC_SUCCESS;
 }
 
 static int Intf( vlc_object_t *p_this, char const *psz_cmd,
-                 vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                 vlc_value_t newval )
 {
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+    VLC_UNUSED(psz_cmd);
     return intf_Create(vlc_object_instance(p_this), newval.psz_string);
 }
 
 static int Volume( vlc_object_t *p_this, char const *psz_cmd,
-                   vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{ VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+                   vlc_value_t newval )
+{
+    VLC_UNUSED(psz_cmd);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
     vlc_player_Lock(player);
@@ -1396,10 +1383,8 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
 }
 
 static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                       vlc_value_t newval )
 {
-    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
-
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
 
@@ -1416,9 +1401,8 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
 }
 
 static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
-                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                        vlc_value_t newval )
 {
-    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
     vout_thread_t *p_vout = vlc_player_vout_Hold(player);
@@ -1528,8 +1512,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
     return i_error;
 }
 
-static int AudioDevice( vlc_object_t *obj, char const *cmd,
-                        vlc_value_t old, vlc_value_t cur, void *dummy )
+static int AudioDevice( vlc_object_t *obj, char const *cmd, vlc_value_t cur )
 {
     intf_thread_t *p_intf = (intf_thread_t *)obj;
     vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
@@ -1581,12 +1564,10 @@ static int AudioDevice( vlc_object_t *obj, char const *cmd,
     free(names);
 out:
     aout_Release(aout);
-    (void) old; (void) dummy;
     return VLC_SUCCESS;
 }
 
-static int AudioChannel( vlc_object_t *obj, char const *cmd,
-                         vlc_value_t old, vlc_value_t cur, void *dummy )
+static int AudioChannel( vlc_object_t *obj, char const *cmd, vlc_value_t cur )
 {
     intf_thread_t *p_intf = (intf_thread_t*)obj;
     vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
@@ -1627,14 +1608,13 @@ static int AudioChannel( vlc_object_t *obj, char const *cmd,
         ret = var_SetInteger( p_aout, "stereo-mode", atoi( cur.psz_string ) );
 out:
     aout_Release(p_aout);
-    (void) old; (void) dummy;
     return ret;
 }
 
 static int Statistics ( vlc_object_t *p_this, char const *psz_cmd,
-    vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                        vlc_value_t newval )
 {
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(newval); VLC_UNUSED(p_data);
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(newval);
 
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
