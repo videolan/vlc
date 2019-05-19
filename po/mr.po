@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-05-19 18:12+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2019\n"
 "Language-Team: Marathi (https://www.transifex.com/yaron/teams/16553/mr/)\n"
 "Language: mr\n"
 "MIME-Version: 1.0\n"
@@ -21364,15 +21364,15 @@ msgstr "आवरण धारिका उघडा"
 
 #: modules/gui/skins2/src/dialogs.cpp:213
 msgid "Skin files |*.vlt;*.wsz;*.xml"
-msgstr "आवरण धारिका|*.व्हीएलटी;*.डब्ल्यूएसझेड;*.एक्सएमएल"
+msgstr "आवरण धारिका |*.व्हीएलटी;*.डब्ल्यूएसझेड;*.एक्सएमएल"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
-msgstr ""
+msgstr "चालविण्याची यादी धारिका |"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
-msgstr ""
+msgstr "|सर्व फाईल्स |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -21385,6 +21385,8 @@ msgstr "चालविण्याचीयादी साठवा"
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
 msgstr ""
+"एक्सएसपीएफ चालविण्याची यादी |*.एक्सएसपीएफ|एम३यू धारिका |*.एम३यू|एचटीएमएल "
+"चालविण्याची यादी |*.एचटीएमएल"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
