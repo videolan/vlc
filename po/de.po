@@ -23,7 +23,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-03-25 15:16+0100\n"
+"PO-Revision-Date: 2019-05-19 17:06+0200\n"
 "Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2019\n"
 "Language-Team: German (https://www.transifex.com/yaron/teams/16553/de/)\n"
 "Language: de\n"
@@ -21482,7 +21482,7 @@ msgstr "&Wiedergabeliste"
 
 #: modules/gui/qt/menus.cpp:488
 msgid "Ctrl+L"
-msgstr "Ctrl+L"
+msgstr "Strg+L"
 
 #: modules/gui/qt/menus.cpp:491
 msgid "Docked Playlist"
@@ -21498,7 +21498,7 @@ msgstr "&Minimale Ansicht"
 
 #: modules/gui/qt/menus.cpp:510
 msgid "Ctrl+H"
-msgstr "Ctrl+H"
+msgstr "Strg+H"
 
 #: modules/gui/qt/menus.cpp:519
 msgid "&Fullscreen Interface"
@@ -21650,7 +21650,7 @@ msgstr "&Rückwärts springen"
 
 #: modules/gui/qt/menus.cpp:926
 msgid "Ctrl+T"
-msgstr "Ctrl+T"
+msgstr "Strg+T"
 
 #: modules/gui/qt/menus.cpp:941
 msgid "Open &Network..."
@@ -21982,7 +21982,7 @@ msgstr "Wiedergabeliste speichern"
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
 msgstr ""
-"XSPF Wiedergabeliste |*.xspf|M3U Datei|*.m3u|HTML Wiedergabeliste |*.html"
+"XSPF Wiedergabeliste |*.xspf|M3U Datei |*.m3u|HTML Wiedergabeliste |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
