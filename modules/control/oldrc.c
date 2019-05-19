@@ -675,23 +675,6 @@ static void *Run( void *data )
             msg_rc( "%s: returned %i (%s)",
                     psz_cmd, i_ret, vlc_error_string( i_ret ) );
         }
-        /* Or maybe it's a global command */
-        else if( var_Type( vlc, psz_cmd ) & VLC_VAR_ISCOMMAND )
-        {
-            int i_ret = VLC_SUCCESS;
-
-            /* FIXME: it's a global command, but we should pass the
-             * local object as an argument, not vlc_object_instance(p_intf). */
-            if ((var_Type( vlc, psz_cmd) & VLC_VAR_CLASS) == VLC_VAR_VOID)
-                var_TriggerCallback( p_intf, psz_cmd );
-            else
-                i_ret = var_SetString( vlc, psz_cmd, psz_arg );
-            if( i_ret != 0 )
-            {
-                msg_rc( "%s: returned %i (%s)",
-                         psz_cmd, i_ret, vlc_error_string( i_ret ) );
-            }
-        }
         else if( !strcmp( psz_cmd, "logout" ) )
         {
             /* Close connection */
