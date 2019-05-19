@@ -49,7 +49,7 @@
 # include <sys/uio.h>
 #endif
 
-/* Buufer can be max theoretical datagram content minus anticipated MTU.
+/* Buffer can be max theoretical datagram content minus anticipated MTU.
  * IPv6 headers are larger than IPv4, ignore IPv6 jumbograms.
  */
 #define MRU 65507u
