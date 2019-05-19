@@ -79,7 +79,6 @@ static input_item_t *parse_MRL( const char * );
 
 static int  Input        ( vlc_object_t *, char const *, vlc_value_t );
 static int  Playlist     ( vlc_object_t *, char const *, vlc_value_t );
-static int  Quit         ( vlc_object_t *, char const *, vlc_value_t );
 static int  Intf         ( vlc_object_t *, char const *, vlc_value_t );
 static int  Volume       ( vlc_object_t *, char const *, vlc_value_t );
 static int  VolumeMove   ( vlc_object_t *, char const *, vlc_value_t );
@@ -582,6 +581,9 @@ static void *Run( void *data )
             psz_arg = (char*)"";
         }
 
+        if( !strcmp( psz_cmd, "quit" ) )
+            libvlc_Quit( vlc_object_instance(p_intf) );
+
 #define VOID(name, func) \
         if (strcmp(psz_cmd, name) == 0) { \
             vlc_value_t n; \
@@ -594,7 +596,7 @@ static void *Run( void *data )
             func(VLC_OBJECT(p_intf), psz_cmd, n); \
         } else
 
-        VOID("quit", Quit)
+
         STRING("intf", Intf)
 
         STRING("add", Playlist)
@@ -1337,16 +1339,6 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
 end:
     vlc_playlist_Unlock(playlist);
     return ret;
-}
-
-static int Quit( vlc_object_t *p_this, char const *psz_cmd,
-                 vlc_value_t newval )
-{
-    VLC_UNUSED(psz_cmd);
-    VLC_UNUSED(newval);
-
-    libvlc_Quit( vlc_object_instance(p_this) );
-    return VLC_SUCCESS;
 }
 
 static int Intf( vlc_object_t *p_this, char const *psz_cmd,
