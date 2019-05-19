@@ -33,6 +33,7 @@
 # include "config.h"
 #endif
 
+#include <errno.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -84,7 +85,27 @@ vlc_object_t * vlclua_get_this( lua_State *L )
 int vlclua_push_ret( lua_State *L, int i_error )
 {
     lua_pushnumber( L, i_error );
-    lua_pushstring( L, vlc_error_string( i_error ) );
+
+    int err;
+
+    switch( i_error )
+    {
+        case VLC_SUCCESS:   err = 0;         break;
+        case VLC_ENOMEM:    err = ENOMEM;    break;
+        case VLC_ETIMEOUT:  err = ETIMEDOUT; break;
+        case VLC_EBADVAR:   err = EINVAL;    break;
+        case VLC_ENOMOD:    err = ENOENT;    break;
+        case VLC_ENOOBJ:    err = ENOENT;    break;
+        case VLC_ENOVAR:    err = ENOENT;    break;
+        case VLC_EGENERIC:
+            lua_pushstring( L, "generic error" );
+            return 2;
+        default:
+            lua_pushstring( L, "unknown error" );
+            return 2;
+    }
+
+    lua_pushstring( L, vlc_strerror_c(err) );
     return 2;
 }
 
