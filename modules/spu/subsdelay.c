@@ -482,8 +482,7 @@ static int SubsdelayCallback( vlc_object_t *p_this, char const *psz_var, vlc_val
     }
     else
     {
-        SubsdelayHeapUnlock( &p_sys->heap );
-        return VLC_ENOVAR;
+        vlc_assert_unreachable();
     }
 
     SubsdelayRecalculateDelays( (filter_t *) p_this );
