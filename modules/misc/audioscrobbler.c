@@ -494,7 +494,7 @@ static int Handshake(intf_thread_t *p_this)
     {
         free(psz_username);
         free(psz_password);
-        return VLC_ENOVAR;
+        return VLC_EBADVAR;
     }
 
     time(&timestamp);
@@ -725,7 +725,7 @@ static void *Run(void *data)
                 case VLC_ENOMEM:
                     goto out;
 
-                case VLC_ENOVAR:
+                case VLC_EBADVAR:
                     /* username not set */
                     vlc_dialog_display_error(p_intf,
                         _("Last.fm username not set"),
