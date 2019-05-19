@@ -10,7 +10,7 @@ ifeq ($(findstring protobuf,$(PKGS_DISABLE)),)
 # check we have a matching protoc to use
 PROTOC = $(shell PATH="$(PATH)" which protoc)
 ifeq ($(PROTOC),)
-PROTOC = $(error protoc not found in PATH $(PATH) - $(SYS_PROTOC) - $(PROTOC))
+PROTOC = $(error protoc not found (search path: $(PATH)))
 else
 # make sure the installed protoc is compatible with the version we want to build
 SYS_PROTOC_VER = $(shell $(PROTOC) --version)
