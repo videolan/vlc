@@ -251,8 +251,7 @@ libvlc_media_discoverer_media_list( libvlc_media_discoverer_t * p_mdis )
 /**************************************************************************
  * running (Public)
  **************************************************************************/
-int
-libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis )
+bool libvlc_media_discoverer_is_running(libvlc_media_discoverer_t * p_mdis)
 {
     return p_mdis->p_sd != NULL;
 }

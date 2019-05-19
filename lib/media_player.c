@@ -1081,7 +1081,7 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi )
 /**************************************************************************
  * Tells whether the media player is currently playing.
  **************************************************************************/
-int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi )
+bool libvlc_media_player_is_playing(libvlc_media_player_t *p_mi)
 {
     libvlc_state_t state = libvlc_media_player_get_state( p_mi );
     return libvlc_Playing == state;
@@ -1162,15 +1162,15 @@ void libvlc_video_set_format( libvlc_media_player_t *mp, const char *chroma,
     var_SetInteger( mp, "vmem-pitch", pitch );
 }
 
-int libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
-                                        libvlc_video_engine_t engine,
-                                        libvlc_video_setup_cb setup_cb,
-                                        libvlc_video_cleanup_cb cleanup_cb,
-                                        libvlc_video_update_output_cb update_output_cb,
-                                        libvlc_video_swap_cb swap_cb,
-                                        libvlc_video_makeCurrent_cb makeCurrent_cb,
-                                        libvlc_video_getProcAddress_cb getProcAddress_cb,
-                                        void* opaque )
+bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
+                                       libvlc_video_engine_t engine,
+                                       libvlc_video_setup_cb setup_cb,
+                                       libvlc_video_cleanup_cb cleanup_cb,
+                                       libvlc_video_update_output_cb update_output_cb,
+                                       libvlc_video_swap_cb swap_cb,
+                                       libvlc_video_makeCurrent_cb makeCurrent_cb,
+                                       libvlc_video_getProcAddress_cb getProcAddress_cb,
+                                       void *opaque)
 {
 #ifdef __ANDROID__
     //use the default android window
@@ -1190,7 +1190,7 @@ int libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
         var_SetString ( mp, "gl", "vgl");
     }
     else
-        return 0;
+        return false;
 
     var_SetAddress( mp, "vout-cb-opaque", opaque );
     var_SetAddress( mp, "vout-cb-setup", setup_cb );
@@ -1199,19 +1199,19 @@ int libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
     var_SetAddress( mp, "vout-cb-swap", swap_cb );
     var_SetAddress( mp, "vout-cb-get-proc-address", getProcAddress_cb );
     var_SetAddress( mp, "vout-cb-make-current", makeCurrent_cb );
-    return 1;
+    return true;
 }
 
 
-int libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
-                                        libvlc_video_direct3d_engine_t engine,
-                                        libvlc_video_direct3d_device_setup_cb setup_cb,
-                                        libvlc_video_direct3d_device_cleanup_cb cleanup_cb,
-                                        libvlc_video_direct3d_update_output_cb update_output_cb,
-                                        libvlc_video_swap_cb swap_cb,
-                                        libvlc_video_direct3d_start_end_rendering_cb makeCurrent_cb,
-                                        libvlc_video_direct3d_select_plane_cb select_plane_cb,
-                                        void* opaque )
+bool libvlc_video_direct3d_set_callbacks(libvlc_media_player_t *mp,
+                                         libvlc_video_direct3d_engine_t engine,
+                                         libvlc_video_direct3d_device_setup_cb setup_cb,
+                                         libvlc_video_direct3d_device_cleanup_cb cleanup_cb,
+                                         libvlc_video_direct3d_update_output_cb update_output_cb,
+                                         libvlc_video_swap_cb swap_cb,
+                                         libvlc_video_direct3d_start_end_rendering_cb makeCurrent_cb,
+                                         libvlc_video_direct3d_select_plane_cb select_plane_cb,
+                                         void *opaque)
 {
     var_SetString( mp, "window", "wdummy");
 
@@ -1226,7 +1226,7 @@ int libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
         var_SetString ( mp, "avcodec-hw", "dxva2");
     }
     else
-        return 0;
+        return false;
 
     var_SetAddress( mp, "vout-cb-opaque", opaque );
     var_SetAddress( mp, "vout-cb-setup", setup_cb );
@@ -1235,7 +1235,7 @@ int libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
     var_SetAddress( mp, "vout-cb-swap", swap_cb );
     var_SetAddress( mp, "vout-cb-make-current", makeCurrent_cb );
     var_SetAddress( mp, "vout-cb-select-plane", select_plane_cb );
-    return 1;
+    return true;
 }
 
 /**************************************************************************
@@ -1814,7 +1814,7 @@ libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *p_mi )
     return state;
 }
 
-int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi )
+bool libvlc_media_player_is_seekable(libvlc_media_player_t *p_mi)
 {
     input_thread_t *p_input_thread;
     bool b_seekable;
@@ -1905,7 +1905,7 @@ void libvlc_track_description_list_release( libvlc_track_description_t *p_td )
     }
 }
 
-int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi )
+bool libvlc_media_player_can_pause(libvlc_media_player_t *p_mi)
 {
     input_thread_t *p_input_thread;
     bool b_can_pause;
@@ -1919,7 +1919,7 @@ int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi )
     return b_can_pause;
 }
 
-int libvlc_media_player_program_scrambled( libvlc_media_player_t *p_mi )
+bool libvlc_media_player_program_scrambled(libvlc_media_player_t *p_mi)
 {
     input_thread_t *p_input_thread;
     bool b_program_scrambled;

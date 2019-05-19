@@ -697,8 +697,8 @@ libvlc_media_subitems( libvlc_media_t * p_md )
 /**************************************************************************
  * Getter for statistics information
  **************************************************************************/
-int libvlc_media_get_stats( libvlc_media_t *p_md,
-                            libvlc_media_stats_t *p_stats )
+bool libvlc_media_get_stats(libvlc_media_t *p_md,
+                            libvlc_media_stats_t *p_stats)
 {
     input_item_t *item = p_md->p_input_item;
 
@@ -864,8 +864,7 @@ libvlc_media_parse_stop( libvlc_media_t *media )
 /**************************************************************************
  * Get parsed status for media object.
  **************************************************************************/
-int
-libvlc_media_is_parsed(libvlc_media_t *media)
+bool libvlc_media_is_parsed(libvlc_media_t *media)
 {
     bool parsed;
 

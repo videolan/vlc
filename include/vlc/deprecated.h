@@ -82,11 +82,10 @@ libvlc_media_parse_async( libvlc_media_t *p_md );
  * \see libvlc_MediaParsedChanged
  *
  * \param p_md media descriptor object
- * \return true if media object has been parsed otherwise it returns false
- *
- * \libvlc_return_bool
+ * \retval true media object has been parsed
+ * \retval false otherwise
  */
-LIBVLC_DEPRECATED LIBVLC_API int
+LIBVLC_DEPRECATED LIBVLC_API bool
    libvlc_media_is_parsed( libvlc_media_t *p_md );
 
 /** @}*/

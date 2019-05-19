@@ -235,11 +235,10 @@ LIBVLC_API libvlc_event_manager_t * libvlc_media_player_event_manager ( libvlc_m
  * is_playing
  *
  * \param p_mi the Media Player
- * \return 1 if the media player is playing, 0 otherwise
- *
- * \libvlc_return_bool
+ * \retval true media player is playing
+ * \retval false media player is not playing
  */
-LIBVLC_API int libvlc_media_player_is_playing ( libvlc_media_player_t *p_mi );
+LIBVLC_API bool libvlc_media_player_is_playing(libvlc_media_player_t *p_mi);
 
 /**
  * Play
@@ -579,11 +578,13 @@ typedef enum libvlc_video_engine_t {
  * \param makeCurrent_cb callback called to enter/leave the opengl context (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
  * \param getProcAddress_cb opengl function loading callback (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
  * \param opaque private pointer passed to callbacks
- * \libvlc_return_bool
+ *
+ * \retval true engine selected and callbacks set
+ * \retval false engine type unknown, callbacks not set
  * \version LibVLC 4.0.0 or later
  */
 LIBVLC_API
-int libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
+bool libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_engine_t engine,
                                         libvlc_video_setup_cb setup_cb,
                                         libvlc_video_cleanup_cb cleanup_cb,
@@ -778,11 +779,13 @@ typedef bool( *libvlc_video_direct3d_select_plane_cb )( void *opaque, size_t pla
  * \param makeCurrent_cb callback to tell the host the rendering is starting/ended (cannot be NULL)
  * \param select_plane_cb callback to select different D3D11 rendering targets
  * \param opaque private pointer passed to the \ref cleanup_cb callback
- * \libvlc_return_bool
+ *
+ * \retval true Direct3D selected and callbacks set
+ * \retval false Direct3D version, callbacks not set
  * \version LibVLC 4.0.0 or later
  */
 LIBVLC_API
-int libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
+bool libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
                                          libvlc_video_direct3d_engine_t engine,
                                          libvlc_video_direct3d_device_setup_cb setup_cb,
                                          libvlc_video_direct3d_device_cleanup_cb cleanup_cb,
@@ -1177,9 +1180,7 @@ LIBVLC_API int libvlc_media_player_get_chapter_count( libvlc_media_player_t *p_m
  * Is the player able to play
  *
  * \param p_mi the Media Player
- * \return boolean
- *
- * \libvlc_return_bool
+ * \retval boolean
  */
 LIBVLC_API int libvlc_media_player_will_play( libvlc_media_player_t *p_mi );
 
@@ -1271,32 +1272,30 @@ LIBVLC_API unsigned libvlc_media_player_has_vout( libvlc_media_player_t *p_mi );
  * Is this media player seekable?
  *
  * \param p_mi the media player
- * \return true if the media player can seek
- *
- * \libvlc_return_bool
+ * \retval true media player can seek
+ * \retval false media player cannot seek
  */
-LIBVLC_API int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi );
+LIBVLC_API bool libvlc_media_player_is_seekable(libvlc_media_player_t *p_mi);
 
 /**
  * Can this media player be paused?
  *
  * \param p_mi the media player
- * \return true if the media player can pause
- *
- * \libvlc_return_bool
+ * \retval true media player can be paused
+ * \retval false media player cannot be paused
  */
-LIBVLC_API int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi );
+LIBVLC_API bool libvlc_media_player_can_pause(libvlc_media_player_t *p_mi);
 
 /**
  * Check if the current program is scrambled
  *
  * \param p_mi the media player
- * \return true if the current program is scrambled
+ * \retval true current program is scrambled
+ * \retval false current program is not scrambled
  *
- * \libvlc_return_bool
  * \version LibVLC 2.2.0 or later
  */
-LIBVLC_API int libvlc_media_player_program_scrambled( libvlc_media_player_t *p_mi );
+LIBVLC_API bool libvlc_media_player_program_scrambled( libvlc_media_player_t *p_mi );
 
 /**
  * Display the next frame (if supported)
@@ -1393,9 +1392,10 @@ LIBVLC_API void libvlc_set_fullscreen(libvlc_media_player_t *p_mi, bool b_fullsc
  * \param p_mi the media player
  * \return the fullscreen status (boolean)
  *
- * \libvlc_return_bool
+ * \retval false media player is windowed
+ * \retval true media player is in fullscreen mode
  */
-LIBVLC_API int libvlc_get_fullscreen( libvlc_media_player_t *p_mi );
+LIBVLC_API bool libvlc_get_fullscreen( libvlc_media_player_t *p_mi );
 
 /**
  * Enable or disable key press events handling, according to the LibVLC hotkeys

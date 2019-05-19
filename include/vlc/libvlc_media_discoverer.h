@@ -139,12 +139,12 @@ libvlc_media_discoverer_media_list( libvlc_media_discoverer_t * p_mdis );
  * Query if media service discover object is running.
  *
  * \param p_mdis media service discover object
- * \return true if running, false if not
  *
- * \libvlc_return_bool
+ * \retval true running
+ * \retval false not running
  */
-LIBVLC_API int
-libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );
+LIBVLC_API bool
+libvlc_media_discoverer_is_running(libvlc_media_discoverer_t *p_mdis);
 
 /**
  * Get media discoverer services by category

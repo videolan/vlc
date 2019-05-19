@@ -109,7 +109,7 @@ void libvlc_set_fullscreen(libvlc_media_player_t *p_mi, bool b_fullscreen)
     free (pp_vouts);
 }
 
-int libvlc_get_fullscreen( libvlc_media_player_t *p_mi )
+bool libvlc_get_fullscreen( libvlc_media_player_t *p_mi )
 {
     return var_GetBool (p_mi, "fullscreen");
 }
