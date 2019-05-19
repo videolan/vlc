@@ -72,7 +72,6 @@ static void Deactivate   ( vlc_object_t * );
 static void *Run         ( void * );
 
 static void Help         ( intf_thread_t * );
-static void RegisterCallbacks( intf_thread_t * );
 
 static bool ReadCommand( intf_thread_t *, char *, int * );
 
@@ -447,73 +446,6 @@ static void Deactivate( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * RegisterCallbacks: Register callbacks to dynamic variables
- *****************************************************************************/
-static void RegisterCallbacks( intf_thread_t *p_intf )
-{
-    /* Register commands that will be cleaned up upon object destruction */
-#define ADD( name, type, target )                                   \
-    var_Create( p_intf, name, VLC_VAR_ ## type | VLC_VAR_ISCOMMAND ); \
-    var_AddCallback( p_intf, name, target, NULL );
-    ADD( "quit", VOID, Quit )
-    ADD( "intf", STRING, Intf )
-
-    ADD( "add", STRING, Playlist )
-    ADD( "repeat", STRING, Playlist )
-    ADD( "loop", STRING, Playlist )
-    ADD( "random", STRING, Playlist )
-    ADD( "enqueue", STRING, Playlist )
-    ADD( "playlist", VOID, Playlist )
-    ADD( "sort", VOID, Playlist )
-    ADD( "play", VOID, Playlist )
-    ADD( "stop", VOID, Playlist )
-    ADD( "clear", VOID, Playlist )
-    ADD( "prev", VOID, Playlist )
-    ADD( "next", VOID, Playlist )
-    ADD( "goto", STRING, Playlist )
-    ADD( "status", STRING, Playlist )
-
-    /* DVD commands */
-    ADD( "pause", VOID, Input )
-    ADD( "seek", STRING, Input )
-    ADD( "title", STRING, Input )
-    ADD( "title_n", VOID, Input )
-    ADD( "title_p", VOID, Input )
-    ADD( "chapter", STRING, Input )
-    ADD( "chapter_n", VOID, Input )
-    ADD( "chapter_p", VOID, Input )
-
-    ADD( "fastforward", VOID, Input )
-    ADD( "rewind", VOID, Input )
-    ADD( "faster", VOID, Input )
-    ADD( "slower", VOID, Input )
-    ADD( "normal", VOID, Input )
-    ADD( "frame", VOID, Input )
-
-    ADD( "atrack", STRING, Input )
-    ADD( "vtrack", STRING, Input )
-    ADD( "strack", STRING, Input )
-
-    /* video commands */
-    ADD( "vratio", STRING, VideoConfig )
-    ADD( "vcrop", STRING, VideoConfig )
-    ADD( "vzoom", STRING, VideoConfig )
-    ADD( "snapshot", VOID, VideoConfig )
-
-    /* audio commands */
-    ADD( "volume", STRING, Volume )
-    ADD( "volup", STRING, VolumeMove )
-    ADD( "voldown", STRING, VolumeMove )
-    ADD( "adev", STRING, AudioDevice )
-    ADD( "achan", STRING, AudioChannel )
-
-    /* misc menu commands */
-    ADD( "stats", VOID, Statistics )
-
-#undef ADD
-}
-
-/*****************************************************************************
  * Run: rc thread
  *****************************************************************************
  * This part of the interface is in a separate thread so that we can call
@@ -546,7 +478,6 @@ static void *Run( void *data )
 #endif
 
     /* Register commands that will be cleaned up upon object destruction */
-    RegisterCallbacks( p_intf );
     vlc_player_t *player = vlc_playlist_GetPlayer(p_sys->playlist);
     input_item_t *item = NULL;
 
@@ -663,19 +594,78 @@ static void *Run( void *data )
             psz_arg = (char*)"";
         }
 
-        /* If the user typed a registered local command, try it */
-        if( var_Type( p_intf, psz_cmd ) & VLC_VAR_ISCOMMAND )
-        {
-            int i_ret = VLC_SUCCESS;
+#define VOID(name, func) \
+        if (strcmp(psz_cmd, name) == 0) { \
+            vlc_value_t o, n; \
+            func(VLC_OBJECT(p_intf), psz_cmd, o, n, NULL); \
+        } else
 
-            if ((var_Type( p_intf, psz_cmd) & VLC_VAR_CLASS) == VLC_VAR_VOID)
-                var_TriggerCallback( p_intf, psz_cmd );
-            else
-                i_ret = var_SetString( p_intf, psz_cmd, psz_arg );
-            msg_rc( "%s: returned %i (%s)",
-                    psz_cmd, i_ret, vlc_error_string( i_ret ) );
-        }
-        else if( !strcmp( psz_cmd, "logout" ) )
+#define STRING(name, func) \
+        if (strcmp(psz_cmd, name) == 0) { \
+            vlc_value_t o = { .psz_string = psz_arg }; \
+            vlc_value_t n = { .psz_string = psz_arg }; \
+            func(VLC_OBJECT(p_intf), psz_cmd, o, n, NULL); \
+        } else
+
+        VOID("quit", Quit)
+        STRING("intf", Intf)
+
+        STRING("add", Playlist)
+        STRING("repeat", Playlist)
+        STRING("loop", Playlist)
+        STRING("random", Playlist)
+        STRING("enqueue", Playlist)
+        VOID("playlist", Playlist)
+        VOID("sort", Playlist)
+        VOID("play", Playlist)
+        VOID("stop", Playlist)
+        VOID("clear", Playlist)
+        VOID("prev", Playlist)
+        VOID("next", Playlist)
+        STRING("goto", Playlist)
+        STRING("status", Playlist)
+
+        /* DVD commands */
+        VOID("pause", Input)
+        STRING("seek", Input)
+        STRING("title", Input)
+        VOID("title_n", Input)
+        VOID("title_p", Input)
+        STRING("chapter", Input)
+        VOID("chapter_n", Input)
+        VOID("chapter_p", Input)
+
+        VOID("fastforward", Input)
+        VOID("rewind", Input)
+        VOID("faster", Input)
+        VOID("slower", Input)
+        VOID("normal", Input)
+        VOID("frame", Input)
+
+        STRING("atrack", Input)
+        STRING("vtrack", Input)
+        STRING("strack", Input)
+
+        /* video commands */
+        STRING("vratio", VideoConfig)
+        STRING("vcrop", VideoConfig)
+        STRING("vzoom", VideoConfig)
+        VOID("snapshot", VideoConfig)
+
+        /* audio commands */
+        STRING("volume", Volume)
+        STRING("volup", VolumeMove)
+        STRING("voldown", VolumeMove)
+        STRING("adev", AudioDevice)
+        STRING("achan", AudioChannel)
+
+        /* misc menu commands */
+        VOID("stats", Statistics)
+
+#undef STRING
+#undef VOID
+
+        if( !strcmp( psz_cmd, "logout" ) )
         {
             /* Close connection */
             if( p_sys->i_socket != -1 )
