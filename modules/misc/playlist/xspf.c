@@ -157,7 +157,7 @@ xspfexportitem_end:
  * \brief Prints the XSPF header to file, writes each item by xspf_export_item()
  * and closes the open xml elements
  * \param p_this the VLC playlist object
- * \return VLC_SUCCESS if some memory is available, otherwise VLC_ENONMEM
+ * \return VLC_SUCCESS if some memory is available, otherwise VLC_ENOMEM
  */
 int xspf_export_playlist( vlc_object_t *p_this )
 {
