@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Marián Hikaník <podnety@mojepreklady.net>, 2014-2018
+# Marián Hikaník <podnety@mojepreklady.net>, 2014-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-12-20 10:24+0100\n"
-"Last-Translator: Marián Hikaník <podnety@mojepreklady.net>, 2018\n"
+"PO-Revision-Date: 2019-05-19 19:29+0200\n"
+"Last-Translator: Marián Hikaník <podnety@mojepreklady.net>, 2019\n"
 "Language-Team: Slovak (https://www.transifex.com/yaron/teams/16553/sk/)\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
@@ -21934,7 +21934,7 @@ msgstr "Otvoriť súbor so vzhľadom"
 
 #: modules/gui/skins2/src/dialogs.cpp:213
 msgid "Skin files |*.vlt;*.wsz;*.xml"
-msgstr "Súbory so vzhľadom programu|*.vlt;*.wsz;*.xml"
+msgstr "Súbory so vzhľadom programu |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
@@ -21954,7 +21954,7 @@ msgstr "Uložiť playlist"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr "XSPF playlist |súbor *.xspf|M3U |playlist *.m3u|HTML|*.html"
+msgstr "playlist XSPF |súbor *.xspf|M3U |playlist *.m3u|HTML |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
