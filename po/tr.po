@@ -20,7 +20,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-05-01 17:48+0200\n"
+"PO-Revision-Date: 2019-05-19 15:56+0200\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2019\n"
 "Language-Team: Turkish (https://www.transifex.com/yaron/teams/16553/tr/)\n"
 "Language: tr\n"
@@ -4677,11 +4677,11 @@ msgstr "Var olan ses kayıtları (diller) arasında dolaşır."
 
 #: src/libvlc-module.c:1391
 msgid "Cycle subtitle track in reverse order"
-msgstr "Alt yazı izlerini ters sırada değiştir"
+msgstr "Alt yazı kayıtlarını ters sırada değiştir"
 
 #: src/libvlc-module.c:1392
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr "Kullanılabilecek alt yazı izlerini ters sıra ile değiştirir."
+msgstr "Kullanılabilecek alt yazı kayıtlarını ters sıra ile değiştirir."
 
 #: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
@@ -6380,7 +6380,7 @@ msgstr "İlk Oynatım"
 #: modules/access/cdda.c:480
 #, c-format
 msgid "Audio CD - Track %02i"
-msgstr "Ses CDsi - Kayıt %02i"
+msgstr "Ses CD - Kayıt %02i"
 
 #: modules/access/cdda.c:720 modules/gui/macosx/VLCOpenWindowController.m:169
 #: modules/gui/qt/ui/open_disk.h:300
@@ -15865,7 +15865,7 @@ msgstr "Yalnız M4A Sesi"
 
 #: modules/demux/mp4/mp4.c:51
 msgid "Ignore non audio tracks from iTunes audio files"
-msgstr "iTunes Ses Dosyalarındaki Ses Olmayan İzler Yok Sayılsın"
+msgstr "iTunes Ses Dosyalarındaki Ses Olmayan Kayıtlar Yok Sayılsın"
 
 #: modules/demux/mp4/mp4.c:56
 msgid "MP4 stream demuxer"
