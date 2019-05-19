@@ -1378,10 +1378,14 @@ LIBVLC_API void libvlc_toggle_fullscreen( libvlc_media_player_t *p_mi );
  * to the root window <b>before</b> fullscreen mode is enabled. You will want
  * to reparent it back to its normal parent when disabling fullscreen.
  *
+ * \note This setting applies to any and all current or future active video
+ * tracks and windows for the given media player. The choice of fullscreen
+ * output for each window is left to the operating system.
+ *
  * \param p_mi the media player
  * \param b_fullscreen boolean for fullscreen status
  */
-LIBVLC_API void libvlc_set_fullscreen( libvlc_media_player_t *p_mi, int b_fullscreen );
+LIBVLC_API void libvlc_set_fullscreen(libvlc_media_player_t *p_mi, bool b_fullscreen);
 
 /**
  * Get current fullscreen status.

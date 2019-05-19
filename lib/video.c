@@ -93,10 +93,10 @@ err:
  * Exported functions
  **********************************************************************/
 
-void libvlc_set_fullscreen( libvlc_media_player_t *p_mi, int b_fullscreen )
+void libvlc_set_fullscreen(libvlc_media_player_t *p_mi, bool b_fullscreen)
 {
     /* This will work even if the video is not currently active */
-    var_SetBool (p_mi, "fullscreen", !!b_fullscreen);
+    var_SetBool(p_mi, "fullscreen", b_fullscreen);
 
     /* Apply to current video outputs (if any) */
     size_t n;
