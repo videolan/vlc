@@ -6,7 +6,6 @@ PKGS += protobuf
 ifeq ($(call need_pkg, "protobuf-lite >= 3.1.0 protobuf-lite < 3.2.0"),)
 PKGS_FOUND += protobuf
 else
-ifeq ($(findstring protobuf,$(PKGS_DISABLE)),)
 # check we have a matching protoc to use
 PROTOC_ABSPATH = $(shell PATH="$(PATH)" which protoc)
 ifeq ($(PROTOC_ABSPATH),)
@@ -19,7 +18,6 @@ ifneq ($(PROTOBUF_VERSION),$(SYS_PROTOC_VERSION))
 PROTOC = $(error protoc system version $(SYS_PROTOC_VERSION) and required version $(PROTOBUF_VERSION) do not match)
 else
 PROTOC = $(PROTOC_ABSPATH)
-endif
 endif
 endif
 endif
