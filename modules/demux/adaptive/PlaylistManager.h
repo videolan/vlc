@@ -75,7 +75,6 @@ namespace adaptive
             virtual int doDemux(vlc_tick_t);
 
             virtual bool    setPosition(vlc_tick_t);
-            virtual vlc_tick_t getDuration() const;
             vlc_tick_t getResumeTime() const;
             vlc_tick_t getFirstDTS() const;
 

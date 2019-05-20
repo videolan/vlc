@@ -340,14 +340,6 @@ vlc_tick_t PlaylistManager::getFirstDTS() const
     return mindts;
 }
 
-vlc_tick_t PlaylistManager::getDuration() const
-{
-    if (playlist->isLive())
-        return 0;
-    else
-        return playlist->duration.Get();
-}
-
 bool PlaylistManager::setPosition(vlc_tick_t time)
 {
     bool ret = true;
@@ -576,8 +568,8 @@ int PlaylistManager::doControl(int i_query, va_list args)
         {
             setBufferingRunState(false); /* stop downloader first */
 
-            const vlc_tick_t i_duration = getDuration();
-            if(i_duration == 0) /* == playlist->isLive() */
+            const vlc_tick_t i_duration = playlist->duration.Get();
+            if(i_duration == 0 || playlist->isLive())
             {
                 setBufferingRunState(true);
                 return VLC_EGENERIC;
@@ -730,7 +722,7 @@ void PlaylistManager::updateControlsContentType()
     else
     {
         cached.b_live = false;
-        cached.i_length = getDuration();
+        cached.i_length = playlist->duration.Get();
     }
 }
 
