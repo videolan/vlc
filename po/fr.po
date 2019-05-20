@@ -4,11 +4,7 @@
 #
 # Translators:
 # Anaïs V. <anais.vidal1@gmail.com>, 2014
-# BobSynfig, 2015
 # Paul Caranton <caranton.paul@gmail.com>, 2015
-# Calixte, 2013
-# Alex <chioubaca@gmail.com>, 2014
-# Frigory33 <chironsylvain@orange.fr>, 2017
 # Christophe Lherieau <skimpax@gmail.com>, 2013
 # Emmanuel Simond <emmanuel.simond@gmail.com>, 2013
 # Damien Erambert <damien.erambert@me.com>, 2013
@@ -16,33 +12,21 @@
 # Pierre Ynard <linkfanel@yahoo.fr>, 2018-2019
 # Freddydelanuit Dec <fred.dec@free.fr>, 2014
 # Rafaël Carré <funman@videolan.org>, 2014
-# chouquette <hugo@beauzee.fr>, 2015
-# jipux, 2017
-# Cristallix <jordi55@hotmail.fr>, 2014
-# Jack Ruertnevel, 2015
-# Louis Boucherie, 2015
-# Loys, 2013
-# sebasthug <sebhug@free.fr>, 2013
-# lemiaou, 2014
-# Thierry Yves Gaston Stein, 2014
-# Tubuntu <tubuntu@testimonium.be>, 2013-2014
-# ryann, 2015-2018
+# Hugo Beauzée-Luyssen <hugo@beauzee.fr>, 2015
+# ryann, 2015-2019
 # Benoit Andrieu <benoit.andrieu@gmail.com>, 2017
-# jb78180 <jblum66@gmail.com>, 2017
 # Mortimer <doug.mortimer@netcourrier.com>, 2017
-# Romain CONSTANTIN <romzer2330@gmail.com>, 2018
-# Aestan <anthony.margerand@protonmail.com>, 2018
-# Lionel HANNEQUIN <lionel.hannequin@free.fr>, 2018
-# alpha ratz <alpharatz@live.fr>, 2018
-# tmtisfree <tmtisfree@free.fr>, 2018
+# Romain Constantin <romzer2330@gmail.com>, 2018
+# Lionel Hannequin <lionel.hannequin@free.fr>, 2018
+# Alpha Ratz <alpharatz@live.fr>, 2018
 # Irriep Nala Novram <allannkorh@yahoo.fr>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-03-17 09:22+0100\n"
-"Last-Translator: Pierre Ynard <linkfanel@yahoo.fr>, 2019\n"
+"PO-Revision-Date: 2019-05-20 17:49+0200\n"
+"Last-Translator: ryann, 2019\n"
 "Language-Team: French (https://www.transifex.com/yaron/teams/16553/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -16592,11 +16576,11 @@ msgstr ""
 "multimédia libre et gratuit réalisé par des volontaires de la communauté <a "
 "href=\"https://www.videolan.org/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">VideoLAN</span></a>.</p><p>VLC utilise ses "
-"propres codecs et fonctionne sur quasiment toutes les plateformes, il peut "
-"lire quasiment tous les fichiers, CDs, DVDs, flux réseau, cartes de capture "
+"propres codecs, fonctionne sur quasiment toutes les plate-formes, et peut "
+"lire quasiment tous les fichiers, CD, DVD, flux réseau, cartes d'acquisition "
 "et autres formats de médias !</p><p><a href=\"https://www.videolan.org/"
 "contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
-"\">Aidez nous et rejoignez nous !</span></a>"
+"\">Aidez-nous et rejoignez-nous !</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
