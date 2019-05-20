@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Dian Li <xslidian@gmail.com>, 2009-2018
+# Dian Li <xslidian@gmail.com>, 2009-2019
 # pingplug <pingplug@foxmail.com>, 2016-2017
 # SnowOnion Lee <snowonionlee@gmail.com>, 2016
 # Sophia Meifang Wang <sophiatiger121@hotmail.com>, 2015
@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-12-27 16:54+0100\n"
-"Last-Translator: Dian Li <xslidian@gmail.com>, 2018\n"
+"PO-Revision-Date: 2019-05-20 16:49+0200\n"
+"Last-Translator: Dian Li <xslidian@gmail.com>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/yaron/teams/16553/"
 "zh_CN/)\n"
 "Language: zh_CN\n"
@@ -20996,7 +20996,7 @@ msgstr "清除"
 
 #: modules/gui/skins2/src/dialogs.cpp:212
 msgid "Open a skin file"
-msgstr "打开一个皮肤文件"
+msgstr "打开皮肤文件"
 
 #: modules/gui/skins2/src/dialogs.cpp:213
 msgid "Skin files |*.vlt;*.wsz;*.xml"
