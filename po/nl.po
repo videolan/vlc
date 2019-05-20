@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-04-30 07:59+0200\n"
+"PO-Revision-Date: 2019-05-20 15:52+0200\n"
 "Last-Translator: Thomas De Rocker <thomasderocker at outlook dot com>, 2019\n"
 "Language-Team: Dutch (https://www.transifex.com/yaron/teams/16553/nl/)\n"
 "Language: nl\n"
@@ -21888,7 +21888,7 @@ msgstr "Afspeellijst opslaan"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr "XSPF afspeellijst |*.xspf|M3U-bestand |*.m3u|HTML-afspeellijst|*.html"
+msgstr "XSPF afspeellijst |*.xspf|M3U-bestand |*.m3u|HTML-afspeellijst |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
