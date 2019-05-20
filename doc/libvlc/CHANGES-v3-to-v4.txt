@@ -1,0 +1,8 @@
+Breaking changes between libvlc 3 and libvlc 4:
+- libvlc_media_player_will_play() is removed (it is meaningless with the
+  new player)
+- libvlc_media_player callbacks are called with the same (recursive)
+  mutex as libvlc_media_player functions
+- libvlc_media_player_stop() is now asynchronous
+- libvlc_media_player_set_pause() and libvlc_media_player_set_media(), which
+  could possibly stop, are now asynchronous too
