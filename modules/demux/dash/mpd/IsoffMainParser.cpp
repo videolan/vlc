@@ -252,19 +252,19 @@ void    IsoffMainParser::parseAdaptationSets  (Node *periodNode, Period *period)
                 const std::string &rolevalue = role->getAttributeValue("value");
                 adaptationSet->description.Set(rolevalue);
                 if(rolevalue == "main")
-                    adaptationSet->setRole(Role::MAIN);
+                    adaptationSet->setRole(Role::ROLE_MAIN);
                 else if(rolevalue == "alternate")
-                    adaptationSet->setRole(Role::ALTERNATE);
+                    adaptationSet->setRole(Role::ROLE_ALTERNATE);
                 else if(rolevalue == "supplementary")
-                    adaptationSet->setRole(Role::SUPPLEMENTARY);
+                    adaptationSet->setRole(Role::ROLE_SUPPLEMENTARY);
                 else if(rolevalue == "commentary")
-                    adaptationSet->setRole(Role::COMMENTARY);
+                    adaptationSet->setRole(Role::ROLE_COMMENTARY);
                 else if(rolevalue == "dub")
-                    adaptationSet->setRole(Role::DUB);
+                    adaptationSet->setRole(Role::ROLE_DUB);
                 else if(rolevalue == "caption")
-                    adaptationSet->setRole(Role::CAPTION);
+                    adaptationSet->setRole(Role::ROLE_CAPTION);
                 else if(rolevalue == "subtitle")
-                    adaptationSet->setRole(Role::SUBTITLE);
+                    adaptationSet->setRole(Role::ROLE_SUBTITLE);
             }
         }
 #ifdef ADAPTATIVE_ADVANCED_DEBUG

@@ -38,13 +38,13 @@ bool Role::operator ==(const Role &other) const
 
 bool Role::isDefault() const
 {
-    return value == MAIN;
+    return value == ROLE_MAIN;
 }
 
 bool Role::autoSelectable() const
 {
-    return value == MAIN ||
-           value == ALTERNATE ||
-           value == SUBTITLE ||
-           value == CAPTION;
+    return value == ROLE_MAIN ||
+           value == ROLE_ALTERNATE ||
+           value == ROLE_SUBTITLE ||
+           value == ROLE_CAPTION;
 }

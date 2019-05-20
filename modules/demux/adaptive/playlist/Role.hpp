@@ -27,14 +27,14 @@ namespace adaptive
         class Role
         {
             public:
-                static const unsigned MAIN           = 0;
-                static const unsigned ALTERNATE      = 1;
-                static const unsigned SUPPLEMENTARY  = 2;
-                static const unsigned COMMENTARY     = 3;
-                static const unsigned DUB            = 4;
-                static const unsigned CAPTION        = 5;
-                static const unsigned SUBTITLE       = 6;
-                Role(unsigned = ALTERNATE);
+                static const unsigned ROLE_MAIN           = 0;
+                static const unsigned ROLE_ALTERNATE      = 1;
+                static const unsigned ROLE_SUPPLEMENTARY  = 2;
+                static const unsigned ROLE_COMMENTARY     = 3;
+                static const unsigned ROLE_DUB            = 4;
+                static const unsigned ROLE_CAPTION        = 5;
+                static const unsigned ROLE_SUBTITLE       = 6;
+                Role(unsigned = ROLE_ALTERNATE);
                 bool operator==(const Role &) const;
                 bool isDefault() const;
                 bool autoSelectable() const;

@@ -505,23 +505,23 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                 if(pair.second->getAttributeByName("DEFAULT"))
                 {
                     if(pair.second->getAttributeByName("DEFAULT")->value == "YES")
-                        altAdaptSet->setRole(Role(Role::MAIN));
+                        altAdaptSet->setRole(Role(Role::ROLE_MAIN));
                     else
-                        altAdaptSet->setRole(Role(Role::ALTERNATE));
+                        altAdaptSet->setRole(Role(Role::ROLE_ALTERNATE));
                 }
 
                 if(pair.second->getAttributeByName("AUTOSELECT"))
                 {
                     if(pair.second->getAttributeByName("AUTOSELECT")->value == "NO" &&
                        !pair.second->getAttributeByName("DEFAULT"))
-                        altAdaptSet->setRole(Role(Role::SUPPLEMENTARY));
+                        altAdaptSet->setRole(Role(Role::ROLE_SUPPLEMENTARY));
                 }
 
                 /* Subtitles unsupported for now */
                 const Attribute *typeattr = pair.second->getAttributeByName("TYPE");
                 if(typeattr->value == "SUBTITLES")
                 {
-                    altAdaptSet->setRole(Role(Role::SUBTITLE));
+                    altAdaptSet->setRole(Role(Role::ROLE_SUBTITLE));
                 }
                 else if(typeattr->value != "AUDIO" && typeattr->value != "VIDEO")
                 {
