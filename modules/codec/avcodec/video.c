@@ -415,8 +415,9 @@ static int lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
                 sys->p_context->pix_fmt, (name != NULL) ? name : "unknown");
         return VLC_EGENERIC;
     } else if (!chroma_compatible(fourcc, pic->format.i_chroma)
-     || frame->width > (int) pic->format.i_width
-     || frame->height > (int) pic->format.i_height)
+     /* ensure we never read more than dst lines/pixels from src */
+     || frame->width != (int) pic->format.i_visible_width
+     || frame->height < (int) pic->format.i_visible_height)
     {
         msg_Warn(dec, "dropping frame because the vout changed");
         return VLC_EGENERIC;
