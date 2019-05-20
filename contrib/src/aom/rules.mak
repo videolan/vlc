@@ -95,6 +95,6 @@ endif
 	cd $< && mkdir -p aom_build
 	cd $</aom_build && LDFLAGS="$(AOM_LDFLAGS)" $(HOSTVARS) CFLAGS="$(AOM_CFLAGS)" CXXFLAGS="$(AOM_CXXFLAGS)" $(CMAKE) ../ $(AOM_CONF)
 	cd $< && $(MAKE) -C aom_build
-	cd $</aom_build && $(SRC)/pkg-static.sh aom.pc
+	$(call pkg_static,"aom_build/aom.pc")
 	cd $</aom_build && $(MAKE) install
 	touch $@
