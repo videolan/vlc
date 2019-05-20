@@ -20,7 +20,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-02-19 14:08+0100\n"
+"PO-Revision-Date: 2019-05-20 11:46+0200\n"
 "Last-Translator: Eduard Pintilie <eduard.pintilie@gmail.com>, 2019\n"
 "Language-Team: Romanian (https://www.transifex.com/yaron/teams/16553/ro/)\n"
 "Language: ro\n"
@@ -21500,15 +21500,15 @@ msgstr "Deschide un fișier de tematică"
 
 #: modules/gui/skins2/src/dialogs.cpp:213
 msgid "Skin files |*.vlt;*.wsz;*.xml"
-msgstr "Fișiere tematică|*.vlt;*.wsz;*.xml"
+msgstr "Fișiere tematică |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
-msgstr ""
+msgstr "Fișiere de listă de redare |"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
-msgstr ""
+msgstr "|Toate fișierele |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -21521,6 +21521,7 @@ msgstr "Salvează lista de redare"
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
 msgstr ""
+"listă de redare XSPF |*.xspf|fișier M3U |*.m3u|listă de redare HTML |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
