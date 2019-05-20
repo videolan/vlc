@@ -108,9 +108,8 @@ void CommonEncryptionSession::close()
 size_t CommonEncryptionSession::decrypt(void *inputdata, size_t inputbytes, bool last)
 {
 #ifndef HAVE_GCRYPT
-    (void)data;
-    (void)bytes;
-    (void)last;
+    VLC_UNUSED(inputdata);
+    VLC_UNUSED(last);
 #else
     gcry_cipher_hd_t handle = reinterpret_cast<gcry_cipher_hd_t>(ctx);
     if(encryption.method == CommonEncryption::Method::AES_128 && ctx)
