@@ -212,6 +212,7 @@ bool AbstractStream::isSelected() const
 
 bool AbstractStream::reactivate(mtime_t basetime)
 {
+    vlc_mutex_locker locker(&lock);
     if(setPosition(basetime, false))
     {
         setDisabled(false);
@@ -274,11 +275,13 @@ void AbstractStream::setDisabled(bool b)
 
 bool AbstractStream::isValid() const
 {
+    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&lock));
     return valid;
 }
 
 bool AbstractStream::isDisabled() const
 {
+    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&lock));
     return disabled;
 }
 
@@ -549,6 +552,12 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
 mtime_t AbstractStream::getPlaybackTime() const
 {
     return segmentTracker->getPlaybackTime();
+}
+
+bool AbstractStream::getMediaPlaybackRange(mtime_t *start, mtime_t *end,
+                                           mtime_t *length) const
+{
+    return segmentTracker->getMediaPlaybackRange(start, end, length);
 }
 
 void AbstractStream::runUpdates()

@@ -217,11 +217,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     }
 
     if(b_updated)
-    {
-        if(!rep->consistentSegmentNumber())
-            curRepresentation->pruneBySegmentNumber(curNumber);
         curRepresentation->scheduleNextUpdate(next);
-    }
 
     if(rep->getStreamFormat() != format)
     {
@@ -363,6 +359,14 @@ mtime_t SegmentTracker::getPlaybackTime() const
         return time;
     }
     return 0;
+}
+
+bool SegmentTracker::getMediaPlaybackRange(mtime_t *start, mtime_t *end,
+                                           mtime_t *length) const
+{
+    if(!curRepresentation)
+        return false;
+    return curRepresentation->getMediaPlaybackRange(start, end, length);
 }
 
 mtime_t SegmentTracker::getMinAheadTime() const

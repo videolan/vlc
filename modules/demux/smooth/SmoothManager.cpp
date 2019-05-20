@@ -177,8 +177,6 @@ bool SmoothManager::updatePlaylist(bool forcemanifest)
         else return false;
     }
 
-    pruneLiveStream();
-
     return true;
 }
 

@@ -149,7 +149,7 @@ SegmentTimeline * MediaSegmentTemplate::inheritSegmentTimeline() const
     return NULL;
 }
 
-uint64_t MediaSegmentTemplate::getCurrentLiveTemplateNumber() const
+uint64_t MediaSegmentTemplate::getLiveTemplateNumber(mtime_t playbacktime) const
 {
     uint64_t number = inheritStartNumber();
     /* live streams / templated */
@@ -157,11 +157,10 @@ uint64_t MediaSegmentTemplate::getCurrentLiveTemplateNumber() const
     if(dur)
     {
         /* compute, based on current time */
-        const time_t playbacktime = time(NULL);
         const Timescale timescale = inheritTimescale();
         time_t streamstart = parentSegmentInformation->getPlaylist()->availabilityStartTime.Get();
         streamstart += parentSegmentInformation->getPeriodStart();
-        stime_t elapsed = timescale.ToScaled(CLOCK_FREQ * (playbacktime - streamstart));
+        stime_t elapsed = timescale.ToScaled(playbacktime - streamstart * CLOCK_FREQ);
         number += elapsed / dur;
     }
 
@@ -173,7 +172,7 @@ stime_t MediaSegmentTemplate::getMinAheadScaledTime(uint64_t number) const
     if( segmentTimeline )
         return segmentTimeline->getMinAheadScaledTime(number);
 
-    uint64_t current = getCurrentLiveTemplateNumber();
+    uint64_t current = getLiveTemplateNumber(CLOCK_FREQ * time(NULL));
     return (current - number) * inheritDuration();
 }
 

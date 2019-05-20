@@ -162,6 +162,22 @@ std::size_t SegmentInformation::getAllSegments(std::vector<ISegment *> &retSegme
     return retSegments.size();
 }
 
+uint64_t SegmentInformation::getLiveSegmentNumberByTime(uint64_t def, mtime_t t) const
+{
+    if( mediaSegmentTemplate )
+    {
+        if( mediaSegmentTemplate->duration.Get() )
+        {
+            return mediaSegmentTemplate->getLiveTemplateNumber(t);
+        }
+    }
+
+    if(parent)
+        return parent->getLiveStartSegmentNumber(def);
+    else
+        return def;
+}
+
 uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
 {
     const mtime_t i_max_buffering = getPlaylist()->getMaxBuffering() +
@@ -213,7 +229,7 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
                 i_delay = getPlaylist()->getMinBuffering();
 
             const uint64_t startnumber = mediaSegmentTemplate->inheritStartNumber();
-            end = mediaSegmentTemplate->getCurrentLiveTemplateNumber();
+            end = mediaSegmentTemplate->getLiveTemplateNumber(CLOCK_FREQ * time(NULL));
 
             const uint64_t count = timescale.ToScaled( i_delay ) / mediaSegmentTemplate->duration.Get();
             if( startnumber + count >= end )
@@ -269,6 +285,72 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
         return parent->getLiveStartSegmentNumber(def);
     else
         return def;
+}
+
+bool SegmentInformation::getMediaPlaybackRange(mtime_t *rangeBegin,
+                                               mtime_t *rangeEnd,
+                                               mtime_t *rangeLength) const
+{
+    if( mediaSegmentTemplate )
+    {
+        const Timescale timescale = mediaSegmentTemplate->inheritTimescale();
+        const SegmentTimeline *timeline = mediaSegmentTemplate->inheritSegmentTimeline();
+        if( timeline )
+        {
+            stime_t startTime, endTime, duration;
+            if(!timeline->getScaledPlaybackTimeDurationBySegmentNumber(timeline->minElementNumber(),
+                                                                       &startTime, &duration) ||
+               !timeline->getScaledPlaybackTimeDurationBySegmentNumber(timeline->maxElementNumber(),
+                                                                       &endTime, &duration))
+                return false;
+
+            *rangeBegin = timescale.ToTime(startTime);
+            *rangeEnd = timescale.ToTime(endTime+duration);
+            *rangeLength = timescale.ToTime(timeline->getTotalLength());
+            return true;
+        }
+        /* Else compute, current time and timeshiftdepth based */
+        else if( mediaSegmentTemplate->duration.Get() )
+        {
+            *rangeEnd = 0;
+            *rangeBegin = -1 * getPlaylist()->timeShiftBufferDepth.Get();
+            *rangeLength = getPlaylist()->timeShiftBufferDepth.Get();
+            return true;
+        }
+    }
+    else if ( segmentList && !segmentList->getSegments().empty() )
+    {
+        const Timescale timescale = segmentList->inheritTimescale();
+        const std::vector<ISegment *> list = segmentList->getSegments();
+
+        const ISegment *back = list.back();
+        const stime_t startTime = list.front()->startTime.Get();
+        const stime_t endTime = back->startTime.Get() + back->duration.Get();
+        *rangeBegin = timescale.ToTime(startTime);
+        *rangeEnd = timescale.ToTime(endTime);
+        *rangeLength = timescale.ToTime(segmentList->getTotalLength());
+        return true;
+    }
+    else if( segmentBase )
+    {
+        const std::vector<ISegment *> list = segmentBase->subSegments();
+        if(list.empty())
+            return false;
+
+        const Timescale timescale = inheritTimescale();
+        const ISegment *back = list.back();
+        const stime_t startTime = list.front()->startTime.Get();
+        const stime_t endTime = back->startTime.Get() + back->duration.Get();
+        *rangeBegin = timescale.ToTime(startTime);
+        *rangeEnd = timescale.ToTime(endTime);
+        *rangeLength = 0;
+        return true;
+    }
+
+    if(parent)
+        return parent->getMediaPlaybackRange(rangeBegin, rangeEnd, rangeLength);
+    else
+        return false;
 }
 
 /* Returns wanted segment, or next in sequence if not found */
@@ -372,7 +454,7 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
         {
             if( getPlaylist()->isLive() )
             {
-                *ret = getLiveStartSegmentNumber( mediaSegmentTemplate->inheritStartNumber() );
+                *ret = getLiveSegmentNumberByTime( mediaSegmentTemplate->inheritStartNumber(), time );
             }
             else
             {

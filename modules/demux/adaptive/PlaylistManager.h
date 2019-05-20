@@ -81,7 +81,6 @@ namespace adaptive
             virtual mtime_t getFirstPlaybackTime() const;
             mtime_t getCurrentPlaybackTime() const;
 
-            void pruneLiveStream();
             virtual bool reactivateStream(AbstractStream *);
             bool setupPeriod();
             void unsetPeriod();
@@ -123,6 +122,10 @@ namespace adaptive
                 mtime_t     i_time;
                 double      f_position;
                 vlc_mutex_t lock;
+                mtime_t     rangeStart;
+                mtime_t     rangeEnd;
+                mtime_t     rangeLength;
+                time_t      lastupdate;
             } cached;
 
         private:

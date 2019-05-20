@@ -129,6 +129,7 @@ namespace adaptive
             bool setPositionByTime(mtime_t, bool, bool);
             void setPositionByNumber(uint64_t, bool);
             mtime_t getPlaybackTime() const; /* Current segment start time if selected */
+            bool getMediaPlaybackRange(mtime_t *, mtime_t *, mtime_t *) const;
             mtime_t getMinAheadTime() const;
             void notifyBufferingState(bool) const;
             void notifyBufferingLevel(mtime_t, mtime_t, mtime_t) const;
