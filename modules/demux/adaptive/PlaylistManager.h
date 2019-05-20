@@ -75,7 +75,6 @@ namespace adaptive
             virtual int doDemux(int64_t);
 
             virtual bool    setPosition(mtime_t);
-            virtual mtime_t getDuration() const;
             mtime_t getPCR() const;
             mtime_t getFirstDTS() const;
 
