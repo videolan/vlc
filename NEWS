@@ -15,8 +15,16 @@ Video Output:
 Stream Output:
  * Improve Chromecast support with new ChromeCast apps
 
+macOS:
+ * Fix UPNP service discovery, services are discovered on the highest priority
+   active network interface now
+ * Fix video distortion on macOS Mojave
+
 Misc:
  * Update Youtube, Dailymotion, Vimeo scripts
+
+Translations:
+ * Update of most translations
 
 
 Changes between 3.0.5 and 3.0.6:
