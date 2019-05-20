@@ -88,6 +88,7 @@ int32_t zlib_decompress_extra( demux_t * p_demux, mkv_track_t & tk )
         msg_Err( p_demux, "Couldn't allocate buffer to inflate data, ignore track %u",
                  tk.i_number );
         inflateEnd( &d_stream );
+        tk.p_extra_data = NULL;
         return 1;
     }
 
