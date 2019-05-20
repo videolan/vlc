@@ -129,6 +129,7 @@ namespace adaptive
             bool setPositionByTime(vlc_tick_t, bool, bool);
             void setPositionByNumber(uint64_t, bool);
             vlc_tick_t getPlaybackTime() const; /* Current segment start time if selected */
+            bool getMediaPlaybackRange(vlc_tick_t *, vlc_tick_t *, vlc_tick_t *) const;
             vlc_tick_t getMinAheadTime() const;
             void notifyBufferingState(bool) const;
             void notifyBufferingLevel(vlc_tick_t, vlc_tick_t, vlc_tick_t) const;

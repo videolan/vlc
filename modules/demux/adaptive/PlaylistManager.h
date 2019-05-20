@@ -81,7 +81,6 @@ namespace adaptive
             virtual vlc_tick_t getFirstPlaybackTime() const;
             vlc_tick_t getCurrentPlaybackTime() const;
 
-            void pruneLiveStream();
             virtual bool reactivateStream(AbstractStream *);
             bool setupPeriod();
             void unsetPeriod();
@@ -123,6 +122,10 @@ namespace adaptive
                 vlc_tick_t  i_time;
                 double      f_position;
                 mutable vlc_mutex_t lock;
+                vlc_tick_t  rangeStart;
+                vlc_tick_t  rangeEnd;
+                vlc_tick_t  rangeLength;
+                time_t      lastupdate;
             } cached;
 
         private:

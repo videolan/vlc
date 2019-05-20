@@ -217,11 +217,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     }
 
     if(b_updated)
-    {
-        if(!rep->consistentSegmentNumber())
-            curRepresentation->pruneBySegmentNumber(curNumber);
         curRepresentation->scheduleNextUpdate(next);
-    }
 
     if(rep->getStreamFormat() != format)
     {
@@ -356,6 +352,14 @@ vlc_tick_t SegmentTracker::getPlaybackTime() const
         return time;
     }
     return 0;
+}
+
+bool SegmentTracker::getMediaPlaybackRange(vlc_tick_t *start, vlc_tick_t *end,
+                                           vlc_tick_t *length) const
+{
+    if(!curRepresentation)
+        return false;
+    return curRepresentation->getMediaPlaybackRange(start, end, length);
 }
 
 vlc_tick_t SegmentTracker::getMinAheadTime() const
