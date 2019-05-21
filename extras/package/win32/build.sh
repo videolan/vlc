@@ -27,11 +27,12 @@ OPTIONS:
    -i <n|r|u>    Create an Installer (n: nightly, r: release, u: unsigned release archive)
    -s            Interactive shell (get correct environment variables for build)
    -b <url>      Enable breakpad support and send crash reports to this URL
+   -d            Create PDB files during the build
 EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:sb:" OPTION
+while getopts "hra:pcli:sb:d" OPTION
 do
      case $OPTION in
          h)
@@ -62,6 +63,9 @@ do
          ;;
          b)
              BREAKPAD=$OPTARG
+         ;;
+         d)
+             WITH_PDB="yes"
          ;;
      esac
 done
@@ -118,6 +122,9 @@ info "Building contribs"
 echo $PATH
 
 mkdir -p contrib/contrib-$SHORTARCH && cd contrib/contrib-$SHORTARCH
+if [ ! -z "$WITH_PDB" ]; then
+    CONTRIBFLAGS="$CONTRIBFLAGS --enable-pdb"
+fi
 if [ ! -z "$BREAKPAD" ]; then
      CONTRIBFLAGS="$CONTRIBFLAGS --enable-breakpad"
 fi
@@ -157,6 +164,9 @@ if [ "$I18N" != "yes" ]; then
 fi
 if [ ! -z "$BREAKPAD" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --with-breakpad=$BREAKPAD"
+fi
+if [ ! -z "$WITH_PDB" ]; then
+    CONFIGFLAGS="$CONFIGFLAGS --enable-pdb"
 fi
 
 ../extras/package/win32/configure.sh --host=$TRIPLET $CONFIGFLAGS
