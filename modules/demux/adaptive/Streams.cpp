@@ -189,7 +189,7 @@ mtime_t AbstractStream::getMinAheadTime() const
 
 Times AbstractStream::getFirstTimes() const
 {
-    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&lock));
+    vlc_mutex_locker locker(&lock);
 
     if(!valid || disabled)
         return Times();
@@ -307,13 +307,13 @@ void AbstractStream::setDisabled(bool b)
 
 bool AbstractStream::isValid() const
 {
-    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&lock));
+    vlc_mutex_locker locker(&lock);
     return valid;
 }
 
 bool AbstractStream::isDisabled() const
 {
-    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&lock));
+    vlc_mutex_locker locker(&lock);
     return disabled;
 }
 
