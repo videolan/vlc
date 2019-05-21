@@ -248,6 +248,7 @@ private:
     intf_thread_t *p_intf;
     SyncWidget *AVSpin;
     SyncWidget *subsSpin;
+    SyncWidget *secondarySubsSpin;
     QDoubleSpinBox *subSpeedSpin;
     QDoubleSpinBox *subDurationSpin;
     QVLCFloat m_SubsDelayCfgFactor;
@@ -265,6 +266,7 @@ public slots:
 private slots:
     void advanceAudio( double );
     void advanceSubs( double );
+    void advanceSecondarySubs( double );
     void adjustSubsSpeed( double );
     void adjustSubsDuration( double );
 };

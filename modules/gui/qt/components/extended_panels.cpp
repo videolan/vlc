@@ -1374,16 +1374,25 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent )
     subsBox = new QGroupBox( qtr( "Subtitles/Video" ) );
     QGridLayout *subsLayout = new QGridLayout( subsBox );
 
-    QLabel *subsLabel = new QLabel;
-    subsLabel->setText( qtr( "Subtitle track synchronization:" ) );
-    subsLayout->addWidget( subsLabel, 0, 0, 1, 1 );
+    QGroupBox *subsTrackSyncBox = new QGroupBox( qtr( "Subtitle track synchronization" ) );
+    QGridLayout *synchronizationLayout = new QGridLayout( subsTrackSyncBox );
 
-    subsSpin = new SyncWidget( this );
-    subsLayout->addWidget( subsSpin, 0, 2, 1, 1 );
+    for( int i = 0; i < 2; i++ )
+    {
+        QLabel *subsLabel = new QLabel;
+        subsLabel->setText( i == 0 ? qtr("Primary subtitle track:") : qtr("Secondary subtitle track:") );
+        synchronizationLayout->addWidget( subsLabel, i, 0, 1, 1 );
+        SyncWidget **p_subsSpin = i == 0 ? &subsSpin : &secondarySubsSpin;
+
+        *p_subsSpin = new SyncWidget( this );
+        synchronizationLayout->addWidget( *p_subsSpin, i, 2, 1, 1 );
+    }
+
+    subsLayout->addWidget( subsTrackSyncBox, 0, 0, 2, 5 );
 
     QLabel *subSpeedLabel = new QLabel;
     subSpeedLabel->setText( qtr( "Subtitle speed:" ) );
-    subsLayout->addWidget( subSpeedLabel, 1, 0, 1, 1 );
+    subsLayout->addWidget( subSpeedLabel, 2, 0, 1, 1 );
 
     subSpeedSpin = new QDoubleSpinBox;
     subSpeedSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
@@ -1393,11 +1402,11 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent )
     subSpeedSpin->setSingleStep( 0.2 );
     subSpeedSpin->setSuffix( " fps" );
     subSpeedSpin->setButtonSymbols( QDoubleSpinBox::PlusMinus );
-    subsLayout->addWidget( subSpeedSpin, 1, 2, 1, 1 );
+    subsLayout->addWidget( subSpeedSpin, 2, 2, 1, 1 );
 
     QLabel *subDurationLabel = new QLabel;
     subDurationLabel->setText( qtr( "Subtitle duration factor:" ) );
-    subsLayout->addWidget( subDurationLabel, 2, 0, 1, 1 );
+    subsLayout->addWidget( subDurationLabel, 3, 0, 1, 1 );
 
     subDurationSpin = new QDoubleSpinBox;
     subDurationSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
@@ -1406,7 +1415,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent )
     subDurationSpin->setMaximum( 20 );
     subDurationSpin->setSingleStep( 0.2 );
     subDurationSpin->setButtonSymbols( QDoubleSpinBox::PlusMinus );
-    subsLayout->addWidget( subDurationSpin, 2, 2, 1, 1 );
+    subsLayout->addWidget( subDurationSpin, 3, 2, 1, 1 );
 
     mainLayout->addWidget( subsBox, 2, 0, 2, 5 );
 
@@ -1417,12 +1426,18 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent )
     /* Various Connects */
     connect( AVSpin, &SyncWidget::valueChanged, this, &SyncControls::advanceAudio ) ;
     connect( subsSpin, &SyncWidget::valueChanged, this, &SyncControls::advanceSubs ) ;
+    connect( secondarySubsSpin, &SyncWidget::valueChanged, this, &SyncControls::advanceSecondarySubs ) ;
     connect( subSpeedSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SyncControls::adjustSubsSpeed);
     connect( subDurationSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SyncControls::adjustSubsDuration);
 
     connect( THEMIM, &PlayerController::subtitleDelayChanged, [this](vlc_tick_t value) {
         b_userAction = false;
         subsSpin->setValue(secf_from_vlc_tick(value));
+        b_userAction = true;
+    });
+    connect( THEMIM, &PlayerController::secondarySubtitleDelayChanged, [this](vlc_tick_t value) {
+        b_userAction = false;
+        secondarySubsSpin->setValue(secf_from_vlc_tick(value));
         b_userAction = true;
     });
     connect( THEMIM, &PlayerController::audioDelayChanged, [this](vlc_tick_t value) {
@@ -1452,6 +1467,7 @@ void SyncControls::clean()
     b_userAction = false;
     AVSpin->setValue( 0.0 );
     subsSpin->setValue( 0.0 );
+    secondarySubsSpin->setValue( 0.0 );
     subSpeedSpin->setValue( 1.0 );
     subsdelayClean();
     b_userAction = true;
@@ -1463,6 +1479,7 @@ void SyncControls::update()
     if( THEMIM->getInput() )
     {
         subsSpin->setValue(secf_from_vlc_tick(THEMIM->getSubtitleDelay()));
+        secondarySubsSpin->setValue(secf_from_vlc_tick(THEMIM->getSecondarySubtitleDelay()));
         AVSpin->setValue(secf_from_vlc_tick(THEMIM->getAudioDelay()));
         subSpeedSpin->setValue(THEMIM->getSubtitleFPS());
         subDurationSpin->setValue(m_SubsDelayCfgFactor.getValue());
@@ -1485,6 +1502,15 @@ void SyncControls::advanceSubs( double f_advance )
     {
         vlc_tick_t i_delay = vlc_tick_from_sec( f_advance );
         THEMIM->setSubtitleDelay( i_delay );
+    }
+}
+
+void SyncControls::advanceSecondarySubs( double f_advance )
+{
+    if( THEMIM->getInput() && b_userAction )
+    {
+        vlc_tick_t i_delay = vlc_tick_from_sec( f_advance );
+        THEMIM->setSecondarySubtitleDelay( i_delay );
     }
 }
 

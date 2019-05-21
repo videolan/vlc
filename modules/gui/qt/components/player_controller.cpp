@@ -190,6 +190,29 @@ void PlayerControllerPrivate::UpdateVouts(vout_thread_t **vouts, size_t i_vouts)
         emit q->hasVideoOutputChanged(m_hasVideo);
 }
 
+void PlayerControllerPrivate::UpdateSpuOrder(vlc_es_id_t *es_id, enum vlc_vout_order order)
+{
+    switch (order)
+    {
+        case VLC_VOUT_ORDER_NONE:
+            if (es_id == m_secondarySpuEsId.get())
+                m_secondarySpuEsId.reset(NULL, false);
+            break;
+        case VLC_VOUT_ORDER_SECONDARY:
+            m_secondarySpuEsId.reset(es_id, true);
+            if (m_secondarySubtitleDelay != 0)
+            {
+                vlc_player_locker lock{ m_player };
+                vlc_player_SetEsIdDelay(m_player, es_id,
+                                        m_secondarySubtitleDelay,
+                                        VLC_PLAYER_WHENCE_ABSOLUTE);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 extern "C" {
 
 //player callbacks
@@ -601,6 +624,22 @@ static void on_player_category_delay_changed(vlc_player_t *,
     });
 }
 
+static void on_player_track_delay_changed(vlc_player_t *,
+                                vlc_es_id_t *es_id, vlc_tick_t new_delay,
+                                void *data)
+{
+    PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
+    EsIdPtr esIdPtr = EsIdPtr(es_id);
+
+    that->callAsync([that,esIdPtr,new_delay] (){
+        if (that->m_secondarySpuEsId == esIdPtr)
+        {
+            that->m_secondarySubtitleDelay = new_delay;
+            emit that->q_func()->secondarySubtitleDelayChanged( new_delay );
+        }
+    });
+}
+
 static void on_player_associated_subs_fps_changed(vlc_player_t *, float subs_fps, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
@@ -711,7 +750,7 @@ static void on_player_subitems_changed(vlc_player_t *, input_item_t *, input_ite
 
 
 static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_action,
-    vout_thread_t *, enum vlc_vout_order, vlc_es_id_t *es_id, void *data)
+    vout_thread_t *, enum vlc_vout_order order, vlc_es_id_t *es_id, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_vout_list_changed");
@@ -733,6 +772,14 @@ static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_ac
             //call on object thread
             that->callAsync([that,voutsPtr,i_vout] () {
                 that->UpdateVouts(voutsPtr.get(), i_vout);
+            });
+            break;
+        }
+        case SPU_ES:
+        {
+            EsIdPtr esIdPtr = EsIdPtr(es_id);
+            that->callAsync([that,esIdPtr,order] () {
+                that->UpdateSpuOrder(esIdPtr.get(), order);
             });
             break;
         }
@@ -820,7 +867,7 @@ static const struct vlc_player_cbs player_cbs = {
     on_player_length_changed,
     on_player_track_list_changed,
     on_player_track_selection_changed,
-    NULL /* on_player_track_delay_changed */,
+    on_player_track_delay_changed,
     on_player_program_list_changed,
     on_player_program_selection_changed,
     on_player_titles_changed,
@@ -1063,6 +1110,15 @@ void PlayerController::setSubtitleDelay(VLCTick delay)
     Q_D(PlayerController);
     vlc_player_locker lock{ d->m_player };
     vlc_player_SetSubtitleDelay( d->m_player, delay, VLC_PLAYER_WHENCE_ABSOLUTE );
+}
+
+void PlayerController::setSecondarySubtitleDelay(VLCTick delay)
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    if (d->m_secondarySpuEsId.get() != NULL)
+        vlc_player_SetEsIdDelay(d->m_player, d->m_secondarySpuEsId.get(),
+                                delay, VLC_PLAYER_WHENCE_ABSOLUTE);
 }
 
 void PlayerController::setSubtitleFPS(float fps)
@@ -1494,6 +1550,7 @@ PRIMITIVETYPE_GETTER(float, getPosition, m_position)
 PRIMITIVETYPE_GETTER(VLCTick, getLength, m_length)
 PRIMITIVETYPE_GETTER(VLCTick, getAudioDelay, m_audioDelay)
 PRIMITIVETYPE_GETTER(VLCTick, getSubtitleDelay, m_subtitleDelay)
+PRIMITIVETYPE_GETTER(VLCTick, getSecondarySubtitleDelay, m_secondarySubtitleDelay)
 PRIMITIVETYPE_GETTER(bool, isSeekable, m_capabilities & VLC_PLAYER_CAP_SEEK)
 PRIMITIVETYPE_GETTER(bool, isRewindable, m_capabilities & VLC_PLAYER_CAP_REWIND)
 PRIMITIVETYPE_GETTER(bool, isPausable, m_capabilities & VLC_PLAYER_CAP_PAUSE)

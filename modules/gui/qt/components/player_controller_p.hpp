@@ -43,6 +43,7 @@ public:
     void UpdateProgram(vlc_player_list_action action, const vlc_player_program *prgm);
     void UpdateVouts(vout_thread_t **vouts, size_t i_vouts);
     void UpdateTrackSelection(vlc_es_id_t *trackid, bool selected);
+    void UpdateSpuOrder(vlc_es_id_t *es_id, enum vlc_vout_order spu_order);
 
     ///call function @a fun on object thread
     template <typename Fun>
@@ -89,9 +90,12 @@ public:
     TrackListModel m_audioTracks;
     TrackListModel m_subtitleTracks;
 
+    vlc_shared_data_ptr_type(vlc_es_id_t, vlc_es_id_Hold, vlc_es_id_Release) m_secondarySpuEsId;
+
     VLCTick      m_audioDelay = 0;
     VLCTick      m_subtitleDelay = 0;
-    float           m_subtitleFPS = 1.0;
+    VLCTick      m_secondarySubtitleDelay = 0;
+    float        m_subtitleFPS = 1.0;
 
     //title/chapters/menu
     TitleListModel m_titleList;

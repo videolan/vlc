@@ -121,6 +121,7 @@ public:
 
     Q_PROPERTY(VLCTick audioDelay READ getAudioDelay WRITE setAudioDelay NOTIFY audioDelayChanged)
     Q_PROPERTY(VLCTick subtitleDelay READ getSubtitleDelay WRITE setSubtitleDelay NOTIFY subtitleDelayChanged)
+    Q_PROPERTY(VLCTick secondarySubtitleDelay READ getSecondarySubtitleDelay WRITE setSecondarySubtitleDelay NOTIFY secondarySubtitleDelayChanged)
     Q_PROPERTY(float subtitleFPS READ getSubtitleFPS WRITE setSubtitleFPS NOTIFY subtitleFPSChanged)
 
     //title/chapters/menu
@@ -264,7 +265,9 @@ public slots:
     VLCTick getAudioDelay() const;
     void setAudioDelay( VLCTick );
     VLCTick getSubtitleDelay() const;
+    VLCTick getSecondarySubtitleDelay() const;
     void setSubtitleDelay( VLCTick );
+    void setSecondarySubtitleDelay( VLCTick );
     float getSubtitleFPS( ) const;
     void setSubtitleFPS( float );
 
@@ -348,6 +351,7 @@ signals:
     //tracks
     void audioDelayChanged(VLCTick);
     void subtitleDelayChanged(VLCTick);
+    void secondarySubtitleDelayChanged(VLCTick);
     void subtitleFPSChanged(float);
 
     //title/chapters/menu
