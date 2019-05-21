@@ -3,23 +3,14 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# BISHAN LI <jurtobe@gmail.com>, 2015
-# BrLi <rainman59118@gmail.com>, 2013
-# byStarTW (pan93412) <pan93412@gmail.com>, 2018
 # Cheng-Chia Tseng <pswo10680@gmail.com>, 2017
 # Hsiu-Ming Chang <cges30901@gmail.com>, 2016,2019
 # Ethan Chan <yunsangc207@gmail.com>, 2015
-# Ethan <ethan42411@gmail.com>, 2014
 # Frank Chao <frank0624@gmail.com>, 2013,2015,2017-2018
-# jakech <jake83@gmail.com>, 2014
 # Jeff Huang <s8321414@gmail.com>, 2014
-# ljkTransifex <lingk12345@hotmail.com>, 2015
-# TWNateLo <mmartin20tw@gmail.com>, 2017
-# taijuin lee <taijuin@gmail.com>, 2013
+# Taijuin Lee <taijuin@gmail.com>, 2013
 # Timo Liu <timoliu@gmail.com>, 2016
 # Chen Wang <iwangce@gmail.com>, 2013
-# x4r <xatierlike@gmail.com>, 2014
-# Zakk <zakk0610@gmail.com>, 2017
 # Jeff Huang <s8321414@gmail.com>, 2014
 # 盧瑞元（ryuanlu） <rueiyuan.lu@gmail.com>, 2012,2017
 # 洪嘉鴻 <jerry9030@gmail.com>, 2018
