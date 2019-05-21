@@ -11,7 +11,7 @@ PLUGIN_PATH="$3"
 PLUGIN_NAME="$4"
 
 PC_DEST="${PREFIX}/lib/pkgconfig/${2}.pc"
-PRL_SOURCE=${PREFIX}/${PLUGIN_PATH}/${PLUGIN_NAME}.prl
+PRL_SOURCE=${PREFIX}/${PLUGIN_PATH}/lib${PLUGIN_NAME}.prl
 
 if [ ! -f $PC_DEST ]; then
     echo "destination ${PC_DEST} doesn't exists" >&2
@@ -19,8 +19,11 @@ if [ ! -f $PC_DEST ]; then
 fi
 
 if [ ! -f $PRL_SOURCE ]; then
-    echo "source ${PRL_SOURCE} doesn't exists" >&2
-    exit 1
+    PRL_SOURCE=${PREFIX}/${PLUGIN_PATH}/${PLUGIN_NAME}.prl
+    if [ ! -f $PRL_SOURCE ]; then
+        echo "source ${PRL_SOURCE} doesn't exists" >&2
+        exit 1
+    fi
 fi
 
 # Get the links flags necessary to use the plugin from the installed PRL file of the plugin
