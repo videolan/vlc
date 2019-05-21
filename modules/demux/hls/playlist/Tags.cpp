@@ -277,13 +277,20 @@ ValuesListTag::~ValuesListTag()
 void ValuesListTag::parseAttributes(const std::string &field)
 {
     std::size_t pos = field.find(',');
+    Attribute *attr;
     if(pos != std::string::npos)
     {
-        Attribute *attr = new (std::nothrow) Attribute("DURATION", field.substr(0, pos));
+        attr = new (std::nothrow) Attribute("DURATION", field.substr(0, pos));
         if(attr)
             addAttribute(attr);
 
         attr = new (std::nothrow) Attribute("TITLE", field.substr(pos));
+        if(attr)
+            addAttribute(attr);
+    }
+    else /* broken EXTINF without mandatory comma */
+    {
+        attr = new (std::nothrow) Attribute("DURATION", field);
         if(attr)
             addAttribute(attr);
     }
