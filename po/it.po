@@ -6,49 +6,40 @@
 # Alessandro Felicetti <aleminecraft98@gmail.com>, 2014
 # Alessandro Forte <a.forte1010@gmail.com>, 2016
 # Alfonso Maria Marzano <marzanoalfonso@gmail.com>, 2014
-# Alixir, 2014
 # Andrea Martini <andrea@anmartini.it>, 2014
 # Antonino Murabito <antoninomurabito@gmail.com>, 2015
 # Ludolf <biagio.consalvo@libero.it>, 2014
 # Claudio Diana <carbonis@rocketmail.com>, 2016
 # Davide Beatrici <davidebeatrici@gmail.com>, 2014
-# elisa.garufi <garufi.elisa@gmail.com>, 2014
-# franzes melis <gamesonicstaff@gmail.com>, 2014
+# Eisa Garufi <garufi.elisa@gmail.com>, 2014
+# Franzes Melis <gamesonicstaff@gmail.com>, 2014
 # Francesco Marinucci <framari@posteo.org>, 2013
-# ghina90 <inactive+ghina90@transifex.com>, 2013
 # Gianmario Salvetti <gianmario.salvetti@gmail.com>, 2015
-# Guybrush88 <erpizzo@alice.it>, 2014
 # Illuminato Luca Costantino <lucacostantino88@gmail.com>, 2015
 # Jacopo Tumminello <tummarellox@gmail.com>, 2015
-# lorenzo facca <lorenzo.facca@gmail.com>, 2013-2014
-# Lorenzo Porta, 2013
-# thegladiator <justthegladiator@gmail.com>, 2014
-# Marco91, 2013
+# Lorenzo Facca <lorenzo.facca@gmail.com>, 2013-2014
 # Marco Ciotola <848222@stud.unive.it>, 2015
 # Marco Lazzaro <conrad_mc_claud@yahoo.it>, 2016
 # Mary Piconese <meryjoearmstrong@gmail.com>, 2014
 # Md Ariful <md.ariful@email.com>, 2014
 # Mirko Moreschi <mirkomito000@gmail.com>, 2014
-# Monica <momocat19@gmail.com>, 2014
-# mrk2006 <mrk2005@libero.it>, 2014
-# n.patriarchi <niccolo@cyber.it>, 2014
 # Paolo Ringegni <pasport98@hotmail.it>, 2015
 # Paolo Velati <paolo.velati@gmail.com>, 2013
 # Angelo Prandelli <prangel85@gmail.com>, 2013
 # Roberto91 <robh91@hotmail.it>, 2014
 # Rosario <oirasor@inventati.org>, 2014
-# sara.nocentini <sara.nocentini@gmail.com>, 2014
+# Sara Nocentini <sara.nocentini@gmail.com>, 2014
 # Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, 2017-2018
 # Marco Esposito <antani125@yahoo.it>, 2013
 # Veronica Di Giorgio <verodigiorgio@gmail.com>, 2013
-# Vincenzo Reale <smart2128@baslug.org>, 2014-2018
+# Vincenzo Reale <smart2128@baslug.org>, 2014-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-12-20 06:38+0100\n"
-"Last-Translator: Vincenzo Reale <smart2128@baslug.org>, 2018\n"
+"PO-Revision-Date: 2019-05-21 06:17+0200\n"
+"Last-Translator: Vincenzo Reale <smart2128@baslug.org>, 2019\n"
 "Language-Team: Italian (https://www.transifex.com/yaron/teams/16553/it/)\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -22016,7 +22007,7 @@ msgstr "Salva scaletta"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr "Scaletta XSPF|*.xspf|File M3U|*.m3u|Scaletta HTML|*.html"
+msgstr "Scaletta XSPF |*.xspf|File M3U |*.m3u|Scaletta HTML |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
