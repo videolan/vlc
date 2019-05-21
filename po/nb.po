@@ -6,9 +6,7 @@
 # Alexander Mackinnon Jansen <bornxlo@gmail.com>, 2013-2019
 # Allan Nordhøy <epost@anotheragency.no>, 2014-2017
 # Andreas Dreyer Hysing <andreashysing@gmail.com>, 2016
-# asd, 2014
 # bobbaluba <bobbaluba@gmail.com>, 2013-2014
-# Christian, 2015
 # Erlend Østlie <erlendandreas12368@gmail.com>, 2018
 # Harald H. <haarektrans@gmail.com>, 2014-2015
 # Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2018
@@ -17,14 +15,11 @@
 # Kurt-Håkon Eilertsen <kurt@kheds.com>, 2014,2016
 # Mathias Stang <mathias.stang@gmail.com>, 2015
 # Olav Dahlum <odahlum@gmail.com>, 2011
-# Ridder7 <ridder7no@gmail.com>, 2015
 # Sigmund Augdal <sigmunau@idi.ntnu.no>, 2002
 # Stian Jørgensrud <stianahj@gmail.com>, 2012-2014
-# thomhov, 2014
 # Torstein Husebø <torstein.huseboe@gmail.com>, 2017
 # Tronn Dyrstad <translate@dyrstad.no>, 2016
-# tyler moss <tls@tutanota.com>, 2015-2016
-# Yomawaru, 2016
+# Tyler Moss <tls@tutanota.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
