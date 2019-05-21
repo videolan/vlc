@@ -132,7 +132,7 @@ namespace adaptive
         FakeESOut::LockedFakeEsOut fakeEsOut();
         FakeESOut::LockedFakeEsOut fakeEsOut() const;
         FakeESOut *fakeesout; /* to intercept/proxy what is sent from demuxstream */
-        vlc_mutex_t lock; /* lock for everything accessed by dequeuing */
+        mutable vlc_mutex_t lock; /* lock for everything accessed by dequeuing */
 
     private:
         void declaredCodecs();

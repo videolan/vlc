@@ -321,7 +321,7 @@ void PlaylistManager::drain()
 
 vlc_tick_t PlaylistManager::getResumeTime() const
 {
-    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&demux.lock));
+    vlc_mutex_locker locker(&demux.lock);
     return demux.i_nzpcr;
 }
 

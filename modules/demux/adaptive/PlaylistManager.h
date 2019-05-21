@@ -109,7 +109,7 @@ namespace adaptive
             {
                 vlc_tick_t  i_nzpcr;
                 vlc_tick_t  i_firstpcr;
-                vlc_mutex_t lock;
+                mutable vlc_mutex_t lock;
                 vlc_cond_t  cond;
             } demux;
 
@@ -124,7 +124,7 @@ namespace adaptive
                 vlc_tick_t  i_length;
                 vlc_tick_t  i_time;
                 double      f_position;
-                vlc_mutex_t lock;
+                mutable vlc_mutex_t lock;
             } cached;
 
         private:

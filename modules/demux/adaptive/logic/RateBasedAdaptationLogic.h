@@ -53,7 +53,7 @@ namespace adaptive
                 size_t                  dlsize;
                 vlc_tick_t              dllength;
 
-                vlc_mutex_t             lock;
+                mutable vlc_mutex_t     lock;
         };
 
         class FixedRateAdaptationLogic : public AbstractAdaptationLogic

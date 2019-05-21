@@ -57,9 +57,9 @@ BaseRepresentation *RateBasedAdaptationLogic::getNextRepresentation(BaseAdaptati
     if(adaptSet == NULL)
         return NULL;
 
-    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    vlc_mutex_lock(&lock);
     size_t availBps = currentBps + ((currep) ? currep->getBandwidth() : 0);
-    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    vlc_mutex_unlock(&lock);
     if(availBps > usedBps)
         availBps -= usedBps;
     else

@@ -154,7 +154,7 @@ void AbstractStream::setDescription(const std::string &desc)
 
 vlc_tick_t AbstractStream::getPCR() const
 {
-    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&lock));
+    vlc_mutex_locker locker(&lock);
     if(!valid || disabled)
         return VLC_TICK_INVALID;
     return fakeEsOut()->commandsQueue()->getPCR();
@@ -169,7 +169,7 @@ vlc_tick_t AbstractStream::getMinAheadTime() const
 
 vlc_tick_t AbstractStream::getFirstDTS() const
 {
-    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&lock));
+    vlc_mutex_locker locker(&lock);
 
     if(!valid || disabled)
         return VLC_TICK_INVALID;
