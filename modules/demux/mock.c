@@ -287,6 +287,8 @@ Control(demux_t *demux, int query, va_list args)
             return VLC_EGENERIC;
         case DEMUX_SET_ES:
             return VLC_EGENERIC;
+        case DEMUX_SET_ES_LIST:
+            return VLC_EGENERIC;
         case DEMUX_SET_NEXT_DEMUX_TIME:
             return VLC_EGENERIC;
         case DEMUX_GET_FPS:

@@ -490,6 +490,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         return i_ret;
     }
 
+    case DEMUX_SET_ES_LIST:
+        return VLC_EGENERIC; /* TODO */
+
     case DEMUX_GET_POSITION:
         if( p_sys->i_time == VLC_TICK_INVALID ) return VLC_EGENERIC;
         if( p_sys->i_length != 0 )

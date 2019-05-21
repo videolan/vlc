@@ -2414,6 +2414,8 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         blurayOnUserStreamSelection(p_demux, i_id);
         break;
     }
+    case DEMUX_SET_ES_LIST:
+        return VLC_EGENERIC; /* TODO */
     case DEMUX_SET_TITLE:
     {
         int i_title = va_arg(args, int);

@@ -197,7 +197,8 @@ enum demux_query_e
     DEMUX_SET_GROUP_DEFAULT,
     DEMUX_SET_GROUP_ALL,
     DEMUX_SET_GROUP_LIST,       /* arg1= size_t, arg2= const int *, can fail */
-    DEMUX_SET_ES,               /* arg1= int                            can fail */
+    DEMUX_SET_ES,               /* arg1= int                        can fail */
+    DEMUX_SET_ES_LIST,          /* arg1= size_t, arg2= const int * (can be NULL) can fail */
 
     /* Ask the demux to demux until the given date at the next pf_demux call
      * but not more (and not less, at the precision available of course).

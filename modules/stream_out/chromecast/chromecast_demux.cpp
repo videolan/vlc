@@ -378,6 +378,7 @@ struct demux_cc
             break;
         }
         case DEMUX_SET_ES:
+        case DEMUX_SET_ES_LIST:
             /* Seek back to the last known pos when changing tracks. This will
              * flush sout streams, make sout del/add called right away and
              * clear CC buffers. */

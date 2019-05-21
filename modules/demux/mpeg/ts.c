@@ -1109,9 +1109,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
 
     case DEMUX_SET_ES:
+    case DEMUX_SET_ES_LIST:
     {
-        i_int = va_arg( args, int );
-        msg_Dbg( p_demux, "DEMUX_SET_ES %d", i_int );
+        if( i_query == DEMUX_SET_ES )
+        {
+            i_int = va_arg( args, int );
+            msg_Dbg( p_demux, "DEMUX_SET_ES %d", i_int );
+        }
+        else
+            msg_Dbg( p_demux, "DEMUX_SET_ES_LIST" );
 
         if( p_sys->seltype != PROGRAM_ALL ) /* Won't change anything */
             UpdatePESFilters( p_demux, false );
