@@ -35,7 +35,7 @@ else ifeq ($(shell which i686-w64-mingw32-g++ >/dev/null 2>&1 || echo FAIL),)
 FXC2_CXX=i686-w64-mingw32-g++
 FXC2_DLL=dll/d3dcompiler_47_32.dll
 else
-$(error No x86 (cross) compiler found for fxc2)
+FXC2_CXX=$(error No x86 (cross) compiler found for fxc2)
 endif
 
 
