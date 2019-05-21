@@ -405,6 +405,7 @@ vlc_tick_t PlaylistManager::getFirstPlaybackTime() const
 
 vlc_tick_t PlaylistManager::getCurrentPlaybackTime() const
 {
+    vlc_mutex_locker locker(&demux.lock);
     return demux.i_nzpcr;
 }
 
