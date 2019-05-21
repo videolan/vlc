@@ -99,12 +99,12 @@ if [ "$INTERACTIVE" != "yes" ] || [ ! -f ./Makefile ]; then
     ./bootstrap
 fi
 make -j$JOBS
-export PATH=$PWD/build/bin:$PATH
+export PATH="$PWD/build/bin":"$PATH"
 cd ../../
 
 export USE_FFMPEG=1
 export PKG_CONFIG_LIBDIR=$PWD/contrib/$TRIPLET/lib/pkgconfig
-export PATH=$PWD/contrib/$TRIPLET/bin:$PATH
+export PATH="$PWD/contrib/$TRIPLET/bin":"$PATH"
 
 if [ "$INTERACTIVE" = "yes" ]; then
 if [ "x$SHELL" != "x" ]; then
