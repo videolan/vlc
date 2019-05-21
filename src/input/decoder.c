@@ -637,7 +637,8 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
         }
 
         p_owner->i_spu_channel =
-            vout_RegisterSubpictureChannelInternal(p_vout, p_owner->p_clock);
+            vout_RegisterSubpictureChannelInternal(p_vout, p_owner->p_clock,
+                                                   NULL);
         p_owner->i_spu_order = 0;
 
         if (p_owner->i_spu_channel == VOUT_SPU_CHANNEL_INVALID)

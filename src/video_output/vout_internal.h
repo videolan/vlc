@@ -261,8 +261,10 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *, const char *,
 void vout_CloseWrapper(vout_thread_t *, vout_display_t *vd);
 
 /* */
-ssize_t vout_RegisterSubpictureChannelInternal( vout_thread_t *, vlc_clock_t *clock );
-ssize_t spu_RegisterChannelInternal( spu_t *, vlc_clock_t * );
+ssize_t vout_RegisterSubpictureChannelInternal( vout_thread_t *,
+                                                vlc_clock_t *clock,
+                                                enum vlc_vout_order *out_order );
+ssize_t spu_RegisterChannelInternal( spu_t *, vlc_clock_t *, enum vlc_vout_order * );
 void spu_Attach( spu_t *, input_thread_t *input );
 void spu_Detach( spu_t * );
 void spu_SetClockDelay(spu_t *spu, size_t channel_id, vlc_tick_t delay);

@@ -71,6 +71,28 @@ struct vout_thread_t {
 #define VOUT_ALIGN_BOTTOM       0x0008
 #define VOUT_ALIGN_VMASK        0x000C
 
+/**
+ * vout or spu_channel order
+ */
+enum vlc_vout_order
+{
+    VLC_VOUT_ORDER_NONE,
+    /**
+     * There is only one primary vout/spu_channel
+     * For vouts: this is the first vout, probably embedded in the UI.
+     * For spu channels: main and first SPU channel.
+     */
+    VLC_VOUT_ORDER_PRIMARY,
+    /**
+     * There can be several secondary vouts or spu_channels
+     * For vouts: a secondary vout using its own window.
+     * For spu channels: a secondary spu channel that is placed in function of
+     * the primary one. See "secondary-sub-margin" and
+     * "secondary-sub-alignment".
+     */
+    VLC_VOUT_ORDER_SECONDARY,
+};
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/

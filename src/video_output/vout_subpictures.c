@@ -54,6 +54,7 @@ typedef struct {
     vlc_tick_t start;
     vlc_tick_t stop;
     bool is_late;
+    enum vlc_vout_order channel_order;
 } spu_render_entry_t;
 
 typedef struct VLC_VECTOR(spu_render_entry_t) spu_render_vector;
@@ -61,6 +62,7 @@ typedef struct VLC_VECTOR(spu_render_entry_t) spu_render_vector;
 struct spu_channel {
     spu_render_vector entries;
     size_t id;
+    enum vlc_vout_order order;
     vlc_clock_t *clock;
     vlc_tick_t delay;
     float rate;
@@ -87,6 +89,13 @@ struct spu_private_t {
     } crop;                                                  /**< cropping */
 
     int margin;                        /**< force position of a subpicture */
+    /**
+     * Move the secondary subtites vertically.
+     * Note: Primary sub margin is applied to all sub tracks and is absolute.
+     * Secondary sub margin is not absolute to enable overlap detection.
+     */
+    int secondary_margin;
+    int secondary_alignment;       /**< Force alignment for secondary subs */
     video_palette_t palette;              /**< force palette of subpicture */
 
     /* Subpiture filters */
@@ -104,12 +113,13 @@ struct spu_private_t {
 };
 
 static void spu_channel_Init(struct spu_channel *channel, size_t id,
-                             vlc_clock_t *clock)
+                             enum vlc_vout_order order, vlc_clock_t *clock)
 {
     channel->id = id;
     channel->clock = clock;
     channel->delay = 0;
     channel->rate = 1.f;
+    channel->order = order;
 
     vlc_vector_init(&channel->entries);
 }
@@ -167,7 +177,7 @@ static struct spu_channel *spu_GetChannel(spu_t *spu, size_t channel_id)
     vlc_assert_unreachable();
 }
 
-static ssize_t spu_GetFreeChannelId(spu_t *spu)
+static ssize_t spu_GetFreeChannelId(spu_t *spu, enum vlc_vout_order *order)
 {
     spu_private_t *sys = spu->p;
 
@@ -175,6 +185,8 @@ static ssize_t spu_GetFreeChannelId(spu_t *spu)
         return VOUT_SPU_CHANNEL_INVALID;
 
     size_t id;
+    if (order)
+        *order = VLC_VOUT_ORDER_PRIMARY;
     for (id = VOUT_SPU_CHANNEL_OSD_COUNT; id < sys->channels.size + 1; ++id)
     {
         bool used = false;
@@ -183,6 +195,8 @@ static ssize_t spu_GetFreeChannelId(spu_t *spu)
             if (sys->channels.data[i].id == id)
             {
                 used = true;
+                if (order)
+                    *order = VLC_VOUT_ORDER_SECONDARY;
                 break;
             }
         }
@@ -500,23 +514,24 @@ static void SpuAreaFitInside(spu_area_t *area, const spu_area_t *boundary)
  */
 static void SpuRegionPlace(int *x, int *y,
                            const subpicture_t *subpic,
-                           const subpicture_region_t *region)
+                           const subpicture_region_t *region,
+                           int i_align)
 {
     assert(region->i_x != INT_MAX && region->i_y != INT_MAX);
     if (subpic->b_absolute) {
         *x = region->i_x;
         *y = region->i_y;
     } else {
-        if (region->i_align & SUBPICTURE_ALIGN_TOP)
-            *y = region->i_y;
-        else if (region->i_align & SUBPICTURE_ALIGN_BOTTOM)
+        if (i_align & SUBPICTURE_ALIGN_TOP)
+            *y = region->i_y + ( subpic->b_subtitle ? region->fmt.i_visible_height : 0 );
+        else if (i_align & SUBPICTURE_ALIGN_BOTTOM)
             *y = subpic->i_original_picture_height - region->fmt.i_visible_height - region->i_y;
         else
             *y = subpic->i_original_picture_height / 2 - region->fmt.i_visible_height / 2;
 
-        if (region->i_align & SUBPICTURE_ALIGN_LEFT)
+        if (i_align & SUBPICTURE_ALIGN_LEFT)
             *x = region->i_x;
-        else if (region->i_align & SUBPICTURE_ALIGN_RIGHT)
+        else if (i_align & SUBPICTURE_ALIGN_RIGHT)
             *x = subpic->i_original_picture_width - region->fmt.i_visible_width - region->i_x;
         else
             *x = subpic->i_original_picture_width / 2 - region->fmt.i_visible_width / 2;
@@ -743,7 +758,10 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             if (is_rejeted)
                 spu_channel_DeleteSubpicture(channel, current);
             else
+            {
+                render_entry->channel_order = channel->order;
                 subpicture_array[(*subpicture_count)++] = *render_entry;
+            }
         }
     }
 
@@ -815,15 +833,41 @@ static void SpuRenderRegion(spu_t *spu,
 
     /* Compute the margin which is expressed in destination pixel unit
      * The margin is applied only to subtitle and when no forced crop is
-     * requested (dvd menu) */
+     * requested (dvd menu).
+     * Note: Margin will also be applied to secondary subtitles if they exist
+     * to ensure that overlap does not occur. */
     int y_margin = 0;
     if (!crop_requested && subpic->b_subtitle)
         y_margin = spu_invscale_h(sys->margin, scale_size);
 
     /* Place the picture
      * We compute the position in the rendered size */
+
+    int i_align = region->i_align;
+    if (entry->channel_order == VLC_VOUT_ORDER_SECONDARY)
+        i_align = sys->secondary_alignment >= 0 ? sys->secondary_alignment : i_align;
+
     SpuRegionPlace(&x_offset, &y_offset,
-                   subpic, region);
+                   subpic, region, i_align);
+
+    if (entry->channel_order == VLC_VOUT_ORDER_SECONDARY)
+    {
+        int secondary_margin =
+            spu_invscale_h(sys->secondary_margin, scale_size);
+        if (!subpic->b_absolute)
+        {
+            /* Move the secondary subtitles by the secondary margin before
+             * overlap detection. This way, overlaps will be resolved if they
+             * still exist.  */
+            y_offset -= secondary_margin;
+        }
+        else
+        {
+            /* Use an absolute margin for secondary subpictures that have
+             * already been placed but have been moved by the user */
+            y_margin += secondary_margin;
+        }
+    }
 
     /* Save this position for subtitle overlap support
      * it is really important that there are given without scale_size applied */
@@ -835,7 +879,7 @@ static void SpuRenderRegion(spu_t *spu,
     /* Handle overlapping subtitles when possible */
     if (subpic->b_subtitle && !subpic->b_absolute)
         SpuAreaFixOverlap(dst_area, subtitle_area, subtitle_area_count,
-                          region->i_align);
+                          i_align);
 
     /* we copy the area: for the subtitle overlap support we want
      * to only save the area without margin applied */
@@ -1415,7 +1459,7 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
     for (size_t i = 0; i < VOUT_SPU_CHANNEL_OSD_COUNT; ++i)
     {
         struct spu_channel channel;
-        spu_channel_Init(&channel, i, NULL);
+        spu_channel_Init(&channel, i, VLC_VOUT_ORDER_PRIMARY, NULL);
         vlc_vector_push(&sys->channels, channel);
     }
 
@@ -1423,6 +1467,10 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
     vlc_mutex_init(&sys->lock);
 
     sys->margin = var_InheritInteger(spu, "sub-margin");
+    sys->secondary_margin = var_InheritInteger(spu, "secondary-sub-margin");
+
+    sys->secondary_alignment = var_InheritInteger(spu,
+                                                  "secondary-sub-alignment");
 
     sys->source_chain_update = NULL;
     sys->filter_chain_update = NULL;
@@ -1761,18 +1809,20 @@ subpicture_t *spu_Render(spu_t *spu,
     return render;
 }
 
-ssize_t spu_RegisterChannelInternal(spu_t *spu, vlc_clock_t *clock)
+ssize_t spu_RegisterChannelInternal(spu_t *spu, vlc_clock_t *clock,
+                                    enum vlc_vout_order *order)
 {
     spu_private_t *sys = spu->p;
 
     vlc_mutex_lock(&sys->lock);
 
-    ssize_t channel_id = spu_GetFreeChannelId(spu);
+    ssize_t channel_id = spu_GetFreeChannelId(spu, order);
 
     if (channel_id != VOUT_SPU_CHANNEL_INVALID)
     {
         struct spu_channel channel;
-        spu_channel_Init(&channel, channel_id, clock);
+        spu_channel_Init(&channel, channel_id,
+                         order ? *order : VLC_VOUT_ORDER_PRIMARY, clock);
         if (vlc_vector_push(&sys->channels, channel))
         {
             vlc_mutex_unlock(&sys->lock);
@@ -1787,7 +1837,8 @@ ssize_t spu_RegisterChannelInternal(spu_t *spu, vlc_clock_t *clock)
 
 ssize_t spu_RegisterChannel(spu_t *spu)
 {
-    return spu_RegisterChannelInternal(spu, NULL);
+    /* Public call, order is always primary (used for OSD or dvd/bluray spus) */
+    return spu_RegisterChannelInternal(spu, NULL, NULL);
 }
 
 static void spu_channel_Clear(struct spu_channel *channel)

@@ -276,13 +276,14 @@ ssize_t vout_RegisterSubpictureChannel( vout_thread_t *vout )
 }
 
 ssize_t vout_RegisterSubpictureChannelInternal(vout_thread_t *vout,
-                                               vlc_clock_t *clock)
+                                               vlc_clock_t *clock,
+                                               enum vlc_vout_order *out_order)
 {
     assert(!vout->p->dummy);
     ssize_t channel = VOUT_SPU_CHANNEL_INVALID;
 
     if (vout->p->spu)
-        channel = spu_RegisterChannelInternal(vout->p->spu, clock);
+        channel = spu_RegisterChannelInternal(vout->p->spu, clock, out_order);
 
     return channel;
 }
