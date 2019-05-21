@@ -87,7 +87,6 @@ namespace adaptive
             void unsetPeriod();
 
             void updateControlsPosition();
-            void updateControlsContentType();
 
             /* local factories */
             virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType,
