@@ -4,24 +4,18 @@
 #
 # Translators:
 # Alvaro Sáez <asaez@asaez.eu>, 2013
-# Chema <jomarg@telefonica.net>, 2014
-# alberto <cyko666@gmail.com>, 2013
-# estebande <estebandeleo91@hotmail.com>, 2013
-# Chema <jomarg@telefonica.net>, 2013
 # Javier Contreras <j.contrerasferrada@gmail.com>, 2013
 # Juan Diego Fernández Rosado <juandiegofernandezrosado@gmail.com>, 2014
 # Konrad Iturbe <mail@chernowii.com>, 2013
 # Marc Sokolovitch <sokolovitch@yahoo.com>, 2013
 # picodotdev <pico.dev@gmail.com>, 2014-2019
 # Sam Askari <saskarip@gmail.com>, 2013
-# saulortega <saulortega.co@gmail.com>, 2013
-# Yllelder, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2019-04-18 18:06+0200\n"
+"PO-Revision-Date: 2019-05-21 07:33+0200\n"
 "Last-Translator: picodotdev <pico.dev@gmail.com>, 2019\n"
 "Language-Team: Spanish (https://www.transifex.com/yaron/teams/16553/es/)\n"
 "Language: es\n"
@@ -21925,8 +21919,7 @@ msgstr "Abrir un archivo de pieles"
 
 #: modules/gui/skins2/src/dialogs.cpp:213
 msgid "Skin files |*.vlt;*.wsz;*.xml"
-msgstr ""
-"Archivos de piel (*.vlt;*.wsz)|*.vlt;wsz|Archivos de piel (*.xml)|*.xml"
+msgstr "Archivos de piel |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
@@ -21948,7 +21941,7 @@ msgstr "Guardar lista de reproducción"
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
 msgstr ""
 "Lista de reproducción XSPF |*.xspf|Archivo M3U |*.m3u|Lista de reproducción "
-"HTML |*.htmlu"
+"HTML |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
