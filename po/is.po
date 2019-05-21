@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-15 10:11+0200\n"
+"PO-Revision-Date: 2019-05-21 23:10+0200\n"
 "Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2019\n"
 "Language-Team: Icelandic (https://www.transifex.com/yaron/teams/16553/is/)\n"
 "Language: is\n"
@@ -13526,7 +13526,7 @@ msgstr "Bendingar"
 
 #: modules/control/gestures.c:96
 msgid "Mouse gestures control interface"
-msgstr "Stýriviðmjót fyrir músabendingar"
+msgstr "Stýriviðmót fyrir músabendingar"
 
 #: modules/control/globalhotkeys/win32.c:47
 #: modules/control/globalhotkeys/xcb.c:50
@@ -14122,12 +14122,12 @@ msgstr "+-[Á innleið]"
 #: modules/control/oldrc.c:1739 modules/gui/ncurses.c:810
 #, c-format
 msgid "| input bytes read : %8.0f KiB"
-msgstr ""
+msgstr "| lesin inntaksbæti : %8.0f KiB"
 
 #: modules/control/oldrc.c:1741 modules/gui/ncurses.c:812
 #, c-format
 msgid "| input bitrate    :   %6.0f kb/s"
-msgstr ""
+msgstr "| bitahraði inntaks    :   %6.0f kb/s"
 
 #: modules/control/oldrc.c:1743 modules/gui/ncurses.c:814
 #, c-format
@@ -14156,17 +14156,17 @@ msgstr "+-[Afkóðun myndmerkis]"
 #: modules/control/oldrc.c:1754 modules/gui/ncurses.c:824
 #, c-format
 msgid "| video decoded    :    %5<PRIi64>"
-msgstr ""
+msgstr "| myndmerki afkóðað    :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1756 modules/gui/ncurses.c:826
 #, c-format
 msgid "| frames displayed :    %5<PRIi64>"
-msgstr ""
+msgstr "| birtir rammar :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1758 modules/gui/ncurses.c:828
 #, c-format
 msgid "| frames lost      :    %5<PRIi64>"
-msgstr ""
+msgstr "| tapðaðir rammar      :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1762 modules/gui/ncurses.c:834
 msgid "+-[Audio Decoding]"
@@ -14175,17 +14175,17 @@ msgstr "+-[Hljóðafkóðun]"
 #: modules/control/oldrc.c:1763 modules/gui/ncurses.c:836
 #, c-format
 msgid "| audio decoded    :    %5<PRIi64>"
-msgstr ""
+msgstr "| hljóð afkóðað    :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1765 modules/gui/ncurses.c:838
 #, c-format
 msgid "| buffers played   :    %5<PRIi64>"
-msgstr ""
+msgstr "| biðminni spilað   :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1767 modules/gui/ncurses.c:840
 #, c-format
 msgid "| buffers lost     :    %5<PRIi64>"
-msgstr ""
+msgstr "| biðminni tapað     :    %5<PRIi64>"
 
 #: modules/control/win_msg.c:192
 msgid "WinMsg"
