@@ -158,7 +158,6 @@ bool PlaylistManager::init()
     playlist->playbackStart.Set(time(NULL));
     nextPlaylistupdate = playlist->playbackStart.Get();
 
-    updateControlsContentType();
     updateControlsPosition();
 
     return true;
@@ -398,7 +397,6 @@ bool PlaylistManager::updatePlaylist()
     for(it=streams.begin(); it!=streams.end(); ++it)
         (*it)->runUpdates();
 
-    updateControlsContentType();
     updateControlsPosition();
     return true;
 }
@@ -473,7 +471,6 @@ int PlaylistManager::doDemux(int64_t increment)
 
     AbstractStream::status status = dequeue(demux.i_nzpcr, &i_nzbarrier);
 
-    updateControlsContentType();
     updateControlsPosition();
 
     switch(status)
@@ -718,26 +715,7 @@ void * PlaylistManager::managerThread(void *opaque)
 void PlaylistManager::updateControlsPosition()
 {
     vlc_mutex_locker locker(&cached.lock);
-    const mtime_t i_duration = cached.i_length;
-    if(i_duration == 0)
-    {
-        cached.f_position = 0.0;
-    }
-    else
-    {
-        const mtime_t i_length = getCurrentPlaybackTime() - getFirstPlaybackTime();
-        cached.f_position = (double) i_length / i_duration;
-    }
 
-    mtime_t i_time = getCurrentPlaybackTime();
-    if(!playlist->isLive())
-        i_time -= getFirstPlaybackTime();
-    cached.i_time = i_time;
-}
-
-void PlaylistManager::updateControlsContentType()
-{
-    vlc_mutex_locker locker(&cached.lock);
     if(playlist->isLive())
     {
         cached.b_live = true;
@@ -748,6 +726,21 @@ void PlaylistManager::updateControlsContentType()
         cached.b_live = false;
         cached.i_length = playlist->duration.Get();
     }
+
+    if(cached.i_length == 0)
+    {
+        cached.f_position = 0.0;
+    }
+    else
+    {
+        const mtime_t i_length = getCurrentPlaybackTime() - getFirstPlaybackTime();
+        cached.f_position = (double) i_length / cached.i_length;
+    }
+
+    mtime_t i_time = getCurrentPlaybackTime();
+    if(!playlist->isLive())
+        i_time -= getFirstPlaybackTime();
+    cached.i_time = i_time;
 }
 
 AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::LogicType type, AbstractConnectionManager *conn)
