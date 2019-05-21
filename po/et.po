@@ -3,12 +3,10 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Eero <eerove gmail com> 2009
 # Ildar Kamaev <thetechnorat@gmail.com>, 2014
 # Ivar Smolin <okul@linux.ee>, 2012-2013
-# Mattias Põldaru <mahfiaz gmail com> 2010
+# Mattias Põldaru <mahfiaz@gmail.com> 2010,2019
 # Joel Limberg <joel@stuudium.com>, 2014
-# robertzon, 2014
 # Mihkel Vain <turakas@gmail.com>, 2010-2014
 # Mihkel Tõnnov <mihhkel@gmail.com>, 2018
 msgid ""
@@ -16,8 +14,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-05-21 05:06+0200\n"
+"Last-Translator: Mattias Põldaru <mahfiaz@gmail.com>, 2019\n"
 "Language-Team: Estonian (https://www.transifex.com/yaron/teams/16553/et/)\n"
 "Language: et\n"
 "MIME-Version: 1.0\n"
@@ -79,7 +77,7 @@ msgstr "Seaded VLC kasutajaliideste kontrolliks"
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
 #: modules/gui/macosx/VLCSimplePrefsController.m:237
 msgid "Hotkeys settings"
-msgstr "Kiirklahvide seadeid"
+msgstr "Kiirklahvide seaded"
 
 #: include/vlc_config_cat.h:53 src/input/es_out.c:3120 src/libvlc-module.c:1492
 #: modules/access/imem.c:64
@@ -133,7 +131,7 @@ msgstr "Väljundmoodulid"
 
 #: include/vlc_config_cat.h:67
 msgid "General settings for audio output modules."
-msgstr "Audio väljundmoodulite üldised sätted."
+msgstr "Audio väljundmoodulite üldsätted."
 
 #: include/vlc_config_cat.h:69 src/libvlc-module.c:2027
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:196
@@ -176,7 +174,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
-msgstr "Video filtreid kasutatakse videovoogude töötlemiseks."
+msgstr "Videofiltreid kasutatakse videovoogude töötlemiseks."
 
 #: include/vlc_config_cat.h:84
 msgid "Subtitles / OSD"
@@ -241,7 +239,7 @@ msgstr "Videokoodekid"
 
 #: include/vlc_config_cat.h:116
 msgid "Settings for the video, images or video+audio decoders and encoders."
-msgstr "Seaded video, pildi või video+audio dekoorditele ja enkoodritele."
+msgstr "Seaded video, pildi või video+audio dekoodritele ja koodritele."
 
 #: include/vlc_config_cat.h:118
 msgid "Audio codecs"
@@ -249,7 +247,7 @@ msgstr "Audiokoodekid"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
-msgstr "Ainult audio dekoodrite ja enkoodrite seaded."
+msgstr "Ainult audio dekoodrite ja koodrite seaded."
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
@@ -257,7 +255,7 @@ msgstr "Subtiitrite koodekid"
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
-msgstr "Alapealkirjade, subtiitrite, CC dekooderite ja kooderite seadistused"
+msgstr "Alapealkirjade, subtiitrite, CC dekoodrite ja koodrite seadistused"
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
@@ -318,7 +316,7 @@ msgid ""
 "should probably not do that.\n"
 "You can also set default parameters for each access output."
 msgstr ""
-"Juuredepääsu väljundi moodulid kontrollivad viise, kuidas liidetud voogusid "
+"Juurdepääsu väljundi moodulid kontrollivad viise, kuidas liidetud voogusid "
 "saadetakse. Need sätted lubavad sul jõuga määrata üht spetsiifilist "
 "meetodit. Tõenäoliselt ei peaks sa seda tegema.\n"
 "Sa saad määrata vaikimisi parameetreid igale juurdepääsu väljundile."
@@ -350,7 +348,7 @@ msgid ""
 "for each sout stream module here."
 msgstr ""
 "Sout voo moodulid lubavad sul ehitada sout töötlemise ahela. Rohkem infot "
-"saab \"Streamig Howto-st\". Siin saad seadistada vaikimisi valikuid igale "
+"saab \"Streaming Howto-st\". Siin saad seadistada vaikimisi valikuid igale "
 "sout voo moodulile."
 
 #: include/vlc_config_cat.h:168
@@ -652,7 +650,7 @@ msgstr "Skoop"
 
 #: src/audio_output/output.c:272
 msgid "Spectrum"
-msgstr "Spektrum"
+msgstr "Spekter"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
@@ -1614,8 +1612,8 @@ msgid ""
 msgstr ""
 "Need valikud lubavad sul muuta audio alamsüsteemi käitumist ja lisada audio "
 "filtreid, mida saa järeltöötluses kasutada või visuaalseid efekte (spektri "
-"analüsaator, jne.). Lülita siin need filtrid sisse ja seadaista neid \"audio "
-"filtriete\" moodulite sektsioonis."
+"analüsaator, jne.). Lülita siin need filtrid sisse ja seadista neid \"audio "
+"filtrite\" moodulite sektsioonis."
 
 #: src/libvlc-module.c:123
 msgid "Audio output module"
@@ -1709,7 +1707,7 @@ msgstr ""
 
 #: src/libvlc-module.c:161
 msgid "Audio desynchronization compensation"
-msgstr "Audio sünkroonist väljumise kompensatsioon"
+msgstr "Audio mittesünkroonsuse kompensaator"
 
 #: src/libvlc-module.c:163
 msgid ""
@@ -2138,7 +2136,7 @@ msgstr "Peida kursor ja täisekraani kontrollpaneel peale n millisekundit"
 #: modules/video_filter/deinterlace/deinterlace.c:300
 #: share/lua/http/dialogs/create_stream.html:346
 msgid "Deinterlace"
-msgstr "Ülerealaotuse eemldamine"
+msgstr "Ülerealaotuse eemaldamine"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
 #: modules/gui/macosx/VLCMainMenu.m:445 modules/gui/macosx/VLCMainMenu.m:446
@@ -2149,7 +2147,7 @@ msgstr "Ülerealaotuse eemaldamise režiim"
 
 #: src/libvlc-module.c:354
 msgid "Deinterlace method to use for video processing."
-msgstr "Kasutatav ülerealaotuse eemamldamise meetod video töötlemisel."
+msgstr "Kasutatav ülerealaotuse eemaldamise meetod video töötlemisel."
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Discard"
@@ -2253,7 +2251,7 @@ msgstr "Ajatemplite asemel kasutatakse järjestikuseid numbreid"
 #: src/libvlc-module.c:407
 msgid "Use sequential numbers instead of timestamps for snapshot numbering"
 msgstr ""
-"Kaadripiltide nummerdamisel ajatemplite asemel järjestikuste numbrte "
+"Kaadripiltide nummerdamisel ajatemplite asemel järjestikuste numbrite "
 "kasutamine"
 
 #: src/libvlc-module.c:409
@@ -2381,7 +2379,7 @@ msgid ""
 "(1:1). If you have a 16:9 screen, you might need to change this to 4:3 in "
 "order to keep proportions."
 msgstr ""
-"Määrab jõuga monitori külgede suhte. Enamiksel monitoridel on ruudukujulised "
+"Määrab jõuga monitori külgede suhte. Enamikul monitoridel on ruudukujulised "
 "pikslid (1:1). Kui sul on 16:9 ekraan, siis võid muuta selle siin 4:3-ks, et "
 "säilitada proportsioone."
 
@@ -2476,7 +2474,7 @@ msgstr "Võrgupuhvri suurus (ms)"
 
 #: src/libvlc-module.c:515
 msgid "Caching value for network resources, in milliseconds."
-msgstr "Võrguresursside puhvri suurus millisekundites."
+msgstr "Võrguressursside puhvri suurus millisekundites."
 
 #: src/libvlc-module.c:517
 msgid "Clock reference average counter"
@@ -2511,7 +2509,7 @@ msgid ""
 "This defines the maximum input delay jitter that the synchronization "
 "algorithms should try to compensate (in milliseconds)."
 msgstr ""
-"See määrab maksimaalse sisendihälbe, mida sünkronistatsiooni algoritm peaks "
+"See määrab maksimaalse sisendihälbe, mida sünkronisatsiooni algoritm peaks "
 "üritama korvata (millisekundites)."
 
 #: src/libvlc-module.c:533
@@ -2830,7 +2828,7 @@ msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
 msgstr ""
-"Võimalusel salvestatakse sisendi voog, selle asemel et kasutadavoo väljundi "
+"Võimalusel salvestatakse sisendi voog, selle asemel et kasutada voo väljundi "
 "moodulit"
 
 #: src/libvlc-module.c:680
@@ -3160,7 +3158,7 @@ msgid ""
 msgstr ""
 "Proksi HTTP-ühenduste jaoks. Peab esinema kujul http://[kasutaja@]minuproksi."
 "minudomeen:port/. Väärtuse puudumise korral üritatakse kasutada http_proxy "
-"keskonnamuutujat."
+"keskkonnamuutujat."
 
 #: src/libvlc-module.c:853
 msgid "HTTP proxy password"
@@ -3282,7 +3280,7 @@ msgid ""
 "try the dummy and a52 codecs before trying the other ones. Only advanced "
 "users should alter this option as it can break playback of all your streams."
 msgstr ""
-"Eelisnimekiri koodekidest, mida VLC kasutada üritab. Näiteks, 'dummy,a52', "
+"Eelisnimekiri koodekitest, mida VLC kasutada üritab. Näiteks, 'dummy,a52', "
 "proovib kõigepealt dummy ja siis a52 koodekeid, enne, kui proovib teisi. "
 "Ainult teadjamad kasutajad võiksid seda valikut muuta, kuna see võib rikkuda "
 "kõikide voogude taasesitamise."
@@ -3634,11 +3632,11 @@ msgid ""
 "render the whole system unresponsive which might require a reboot of your "
 "machine."
 msgstr ""
-"Prostsessi prioriteedi suurendamine parandab tõenäoliselt esitamise "
-"kogemist, kuna ei luba teistel rakendustel, mis võivad nõuda palju "
-"protsessori võimsust, VLC-d segada. Siiski tuleks meeles pidada, et "
-"mõningatel juhtudel (vead) võib VLC nõuda nii palju protsessori võimsust, et "
-"sinu arvutisüsteem muutub kasutamatuks ning nõuda masina taaskäivitamist."
+"Protsessi prioriteedi suurendamine parandab tõenäoliselt esitamise kogemist, "
+"kuna ei luba teistel rakendustel, mis võivad nõuda palju protsessori "
+"võimsust, VLC-d segada. Siiski tuleks meeles pidada, et mõningatel juhtudel "
+"(vead) võib VLC nõuda nii palju protsessori võimsust, et sinu arvutisüsteem "
+"muutub kasutamatuks ning nõuda masina taaskäivitamist."
 
 #: src/libvlc-module.c:1099 modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Enqueue items into playlist in one instance mode"
@@ -4631,7 +4629,7 @@ msgstr "Tavaline/Kordus/Tsükkel"
 
 #: src/libvlc-module.c:1427
 msgid "Toggle Normal/Loop/Repeat playlist modes"
-msgstr "Režiimide Tavaline/Kordus/Tsükkuel vahel vahetamine"
+msgstr "Režiimide Tavaline/Kordus/Tsükkel vahel vahetamine"
 
 #: src/libvlc-module.c:1430
 msgid "Toggle random playlist playback"
@@ -4838,7 +4836,7 @@ msgstr ""
 #: src/libvlc-module.c:2771
 msgid "no configuration option will be loaded nor saved to config file"
 msgstr ""
-"ühtegi seadistuste valikut ei laaditud ega salvestatud seadistutste faili"
+"ühtegi seadistuste valikut ei laaditud ega salvestatud seadistuste faili"
 
 #: src/libvlc-module.c:2773
 msgid "reset the current config to the default values"
@@ -5729,7 +5727,7 @@ msgstr "Poola"
 
 #: src/text/iso-639_def.h:151
 msgid "Portuguese"
-msgstr "Portugaalia"
+msgstr "Portugali"
 
 #: src/text/iso-639_def.h:152
 msgid "Pushto"
@@ -6095,7 +6093,7 @@ msgid ""
 "Blu-Ray player region code. Some discs can be played only with a correct "
 "region code."
 msgstr ""
-"Blu-Ray regiooonikood. Mõned kettad on esitatavad ainult õige regiooni "
+"Blu-Ray regioonikood. Mõned kettad on esitatavad ainult õige regiooni "
 "koodiga."
 
 #: modules/access/bluray.c:103 modules/services_discovery/udev.c:603
@@ -6284,7 +6282,7 @@ msgid ""
 "FOURCC code in textual form, e.g. \"ntsc\"."
 msgstr ""
 "Soovitud DeckLink-i hõive sisendi videorežiim. See väärtus peab olema FOURCC "
-"kood teksit kujul nt. \"ntsc\"."
+"kood teksti kujul nt. \"ntsc\"."
 
 #: modules/access/decklink.cpp:55 modules/video_output/decklink.cpp:95
 msgid "Audio connection"
@@ -6727,7 +6725,7 @@ msgstr "Kihi A modulatsioon"
 
 #: modules/access/dtv/access.c:65
 msgid "Layer B modulation"
-msgstr "Kihi B mmodulatsioon"
+msgstr "Kihi B modulatsioon"
 
 #: modules/access/dtv/access.c:66
 msgid "Layer C modulation"
@@ -7016,7 +7014,7 @@ msgstr "Satelliidi pikkuskraad"
 
 #: modules/access/dtv/access.c:229
 msgid "Satellite longitude in tenths of degree. West is negative."
-msgstr "Sateliidi pikkuskraad kümnendikkraadides. Lääs on negatiivne."
+msgstr "Satelliidi pikkuskraad kümnendikkraadides. Lääs on negatiivne."
 
 #: modules/access/dtv/access.c:231
 msgid "Satellite range code"
@@ -7056,7 +7054,7 @@ msgstr "DVB-T edastusrežiimi parameetrid"
 
 #: modules/access/dtv/access.c:311
 msgid "ISDB-T reception parameters"
-msgstr "ISDB-T edastusrrežiimi parameetrid"
+msgstr "ISDB-T edastusrežiimi parameetrid"
 
 #: modules/access/dtv/access.c:352
 msgid "Cable and satellite reception parameters"
@@ -7068,7 +7066,7 @@ msgstr "DVB-S2 parameetrid"
 
 #: modules/access/dtv/access.c:375
 msgid "ISDB-S parameters"
-msgstr "ISDB-S parameeetrid"
+msgstr "ISDB-S parameetrid"
 
 #: modules/access/dtv/access.c:380
 msgid "Satellite equipment control"
@@ -8974,7 +8972,7 @@ msgstr "Failile lisamine"
 
 #: modules/access_output/file.c:379
 msgid "Append to file if it exists instead of replacing it."
-msgstr "Lisa olemasolvevale failile juurde, asendamise asemel."
+msgstr "Lisa olemasolevale failile juurde, asendamise asemel."
 
 #: modules/access_output/file.c:381
 msgid "Format time and date"
@@ -9038,7 +9036,7 @@ msgstr "TS voogude segmentide pikkus"
 
 #: modules/access_output/livehttp.c:70
 msgid "Split segments anywhere"
-msgstr "Poolita segmente igalpool"
+msgstr "Poolita segmente igal pool"
 
 #: modules/access_output/livehttp.c:71
 msgid ""
@@ -9313,7 +9311,7 @@ msgid ""
 "barGraph information every n audio packets (default 4)."
 msgstr ""
 "Määrab, kui tihti tuleks barGraph informatsiooni saata. Saadab barGraph "
-"informatsiooni iga n audio paketi taganat (vaikimisi 4)."
+"informatsiooni iga n audio paketi tagant (vaikimisi 4)."
 
 #: modules/audio_filter/audiobargraph_a.c:45
 msgid "Defines if silence alarm information should be sent"
@@ -9372,7 +9370,7 @@ msgstr "Audiobar Graph"
 
 #: modules/audio_filter/channel_mixer/dolby.c:50
 msgid "Simple decoder for Dolby Surround encoded streams"
-msgstr "Lihtne dekooder Dolby Surround enkooditud voogudele"
+msgstr "Lihtne dekooder Dolby Surround kodeeringus voogudele"
 
 #: modules/audio_filter/channel_mixer/dolby.c:51
 msgid "Dolby Surround decoder"
@@ -10259,7 +10257,7 @@ msgid ""
 "Select speaker configuration you want to use. This option doesn't upmix! So "
 "NO e.g. Stereo -> 5.1 conversion."
 msgstr ""
-"Vali kasutatav kõlarite häälestus. See valik ei kasuta upmix-i! Niiet EI nt. "
+"Vali kasutatav kõlarite häälestus. See valik ei kasuta upmix-i! Seega EI nt. "
 "Stereo -> 5.1 teisendustele."
 
 #: modules/audio_output/directsound.c:70 modules/audio_output/mmdevice.c:1469
@@ -10465,9 +10463,9 @@ msgid ""
 "playback will be more adapted to a movie theater or a listening room."
 msgstr ""
 "Dünaamilise tiheduse vahemik muudab valjud helid pehmemaks ja pehmed helid "
-"valjemaks, niiet võid kerge vaevaga kuulata voogu mürarikkas keskkonnas ilma "
-"teisi segamata. Kui keelad dünaamilise tiheduse vahemiku, siis kohandatakse "
-"taasesitus pigem kino või kuulamisruumi jaoks."
+"valjemaks, nii et võid kerge vaevaga kuulata voogu mürarikkas keskkonnas "
+"ilma teisi segamata. Kui keelad dünaamilise tiheduse vahemiku, siis "
+"kohandatakse taasesitus pigem kino või kuulamisruumi jaoks."
 
 #: modules/codec/a52.c:80
 msgid "ATSC A/52 (AC-3) audio decoder"
@@ -10881,7 +10879,7 @@ msgstr "Trellise kvantimine"
 
 #: modules/codec/avcodec/avcodec.h:193
 msgid "Enable trellis quantization (rate distortion for block coefficients)."
-msgstr "Luba trellise kvantimine (bloki koefitsentide kiiruse moonutus)."
+msgstr "Luba trellise kvantimine (bloki koefitsientide kiiruse moonutus)."
 
 #: modules/codec/avcodec/avcodec.h:196
 msgid "Fixed quantizer scale"
@@ -11218,7 +11216,7 @@ msgstr "AAC laiendus"
 
 #: modules/codec/fdkaac.c:67
 msgid "Encoder Profile"
-msgstr "Enkoodri profiil"
+msgstr "Koodri profiil"
 
 #: modules/codec/fdkaac.c:68
 msgid "Encoder Algorithm to use."
@@ -11287,7 +11285,7 @@ msgstr "FDKAAC"
 
 #: modules/codec/fdkaac.c:101
 msgid "FDK-AAC Audio encoder"
-msgstr "FDK-AAC audio enkooder"
+msgstr "FDK-AAC audio kooder"
 
 #: modules/codec/flac.c:164
 msgid "Flac audio decoder"
@@ -11353,7 +11351,7 @@ msgstr "G.711 dekooder"
 
 #: modules/codec/g711.c:54
 msgid "G.711 encoder"
-msgstr "G.711 enkooder"
+msgstr "G.711 kooder"
 
 #: modules/codec/gstreamer/gstdecode.c:76
 msgid "Uses GStreamer framework's plugins to decode the media codecs"
@@ -11386,7 +11384,7 @@ msgstr "JPEG pildi dekooder"
 
 #: modules/codec/jpeg.c:120
 msgid "JPEG image encoder"
-msgstr "JPEG pildi enkooder"
+msgstr "JPEG pildi kooder"
 
 #: modules/codec/kate.c:191 modules/codec/subsusf.c:44
 msgid "Formatted Subtitles"
@@ -11720,7 +11718,7 @@ msgstr "Opus"
 
 #: modules/codec/opus.c:69
 msgid "Opus audio encoder"
-msgstr "Opus audio enkooder"
+msgstr "Opus audio kooder"
 
 #: modules/codec/png.c:91
 msgid "PNG video decoder"
@@ -11728,7 +11726,7 @@ msgstr "PNG video dekooder"
 
 #: modules/codec/png.c:100
 msgid "PNG video encoder"
-msgstr "PNG video enkooder"
+msgstr "PNG video kooder"
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
@@ -11819,7 +11817,7 @@ msgstr ""
 
 #: modules/codec/qsv.c:105
 msgid "Quantization parameter"
-msgstr "Kvantimise paramtter"
+msgstr "Kvantimise parameeter"
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -12030,8 +12028,7 @@ msgstr "CBR bitikiirus (kbps)"
 #: modules/codec/schroedinger.c:118
 msgid "Target bitrate in kbps when encoding in constant bitrate mode"
 msgstr ""
-"Sihtmaärgi bitikiirus kbps-des, kui kodeeritakse konstantse bitikiiruse "
-"režiimis"
+"Sihtbitikiirus kbps-des, kui kodeeritakse konstantse bitikiiruse režiimis"
 
 #: modules/codec/schroedinger.c:121
 msgid "Maximum bitrate (kbps)"
@@ -12039,7 +12036,7 @@ msgstr "Maksimaalne bitikiirus (kbps)"
 
 #: modules/codec/schroedinger.c:122
 msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-msgstr "Konstantse bitikiiruse režiimis maksimaaalne bitikiirus kbps-des"
+msgstr "Konstantse bitikiiruse režiimis maksimaalne bitikiirus kbps-des"
 
 #: modules/codec/schroedinger.c:125
 msgid "Minimum bitrate (kbps)"
@@ -12113,7 +12110,7 @@ msgstr ""
 
 #: modules/codec/schroedinger.c:166
 msgid "auto - let encoder decide based upon input (Best)"
-msgstr "auto - lase enkoodril otsustada baseerudes sisendil (Parim) "
+msgstr "auto - lase koodril otsustada baseerudes sisendil (parim) "
 
 #: modules/codec/schroedinger.c:167
 msgid "force coding frame as single picture"
@@ -12158,7 +12155,7 @@ msgstr "osaline - liikumise kompensatsiooniblokid kattuvad osaliselt üle"
 
 #: modules/codec/schroedinger.c:202
 msgid "full - Motion compensation blocks fully overlap"
-msgstr "täielik - liikumise kompensatsioonniblokid kattuvad täielikult üle"
+msgstr "täielik - liikumise kompensatsiooniblokid kattuvad täielikult"
 
 #: modules/codec/schroedinger.c:207
 msgid "Motion Vector precision"
@@ -12212,15 +12209,15 @@ msgstr ""
 
 #: modules/codec/schroedinger.c:261
 msgid "perceptual weighting method"
-msgstr "Perseptuaalne kaalumise meetod"
+msgstr "Pertseptuaalne kaalumise meetod"
 
 #: modules/codec/schroedinger.c:272
 msgid "perceptual distance"
-msgstr "perseptuaalne disdants"
+msgstr "pertseptuaalne distants"
 
 #: modules/codec/schroedinger.c:273
 msgid "perceptual distance to calculate perceptual weight"
-msgstr "perseptuaalne disdants arvutamaks perseptuaalset kõrgust"
+msgstr "pertseptuaalne distants arvutamaks pertseptuaalset kõrgust"
 
 #: modules/codec/schroedinger.c:277
 msgid "Horizontal slices per frame"
@@ -12355,7 +12352,7 @@ msgstr "Režiim"
 
 #: modules/codec/speex.c:61
 msgid "Enforce the mode of the encoder."
-msgstr "Määra jõuga kooderi režiim."
+msgstr "Määra jõuga koodri režiim."
 
 #: modules/codec/speex.c:65
 msgid "Enforce a quality between 0 (low) and 10 (high)."
@@ -12399,7 +12396,7 @@ msgid ""
 "mode."
 msgstr ""
 "Võimalda hääle aktiivsuse tuvastamine (VAD). See on VBR režiimis "
-"automaatselt akitveeritud."
+"automaatselt aktiveeritud."
 
 #: modules/codec/speex.c:85
 msgid "Discontinuous Transmission"
@@ -12894,7 +12891,7 @@ msgstr "Maksimaalne enkoodimise bitikiirus"
 #: modules/codec/vorbis.c:179
 msgid "Maximum bitrate in kbps. This is useful for streaming applications."
 msgstr ""
-"Maksimaaalne bitikiirus kbps-des. See on kasulik voogedastatavatele "
+"Maksimaalne bitikiirus kbps-des. See on kasulik voogedastatavatele "
 "rakendustele."
 
 #: modules/codec/vorbis.c:180
@@ -13068,7 +13065,7 @@ msgid ""
 " - normal: Non-strict (not Blu-ray compatible)\n"
 msgstr ""
 "Lubab kasutada B-kaadreid viitena ennustamaks teisi kaadreid. Hoiab\n"
-"järjestikused keskmised 2+ kaadrit viitena ja korrladab vastavalt kaadri "
+"järjestikused keskmised 2+ kaadrit viitena ja korraldab vastavalt kaadri "
 "ümber.\n"
 " - none: Keelatud\n"
 " - strict: Rangelt hierarhiline püramiid\n"
@@ -13223,9 +13220,9 @@ msgid ""
 "This selects the quantizer to use. Lower values result in better fidelity, "
 "but higher bitrates. 26 is a good default value. Range 0 (lossless) to 51."
 msgstr ""
-"See valib kasutatava kvantija. Väiksemad väärtused tagavad täpsuse, "
-"agaannavad suurema bitikiiruse. 26 on hea vaikeväärtus. Vahemikus 0 "
-"(kadudeta) kuni 51."
+"See valib kasutatava kvantija. Väiksemad väärtused tagavad täpsuse, aga "
+"annavad suurema bitikiiruse. 26 on hea vaikeväärtus. Vahemikus 0 (kadudeta) "
+"kuni 51."
 
 #: modules/codec/x264.c:197
 msgid "Quality-based VBR"
@@ -13801,19 +13798,19 @@ msgstr ""
 
 #: modules/codec/x264.c:443
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
-msgstr "H.264/MPEG-4 Part 10/AVC enkooder (x264 10-bit)"
+msgstr "H.264/MPEG-4 Part 10/AVC kooder (x264 10-bit)"
 
 #: modules/codec/x264.c:447
 msgid "H.262/MPEG-2 encoder (x262)"
-msgstr "H.262/MPEG-2 enkooder (x262)"
+msgstr "H.262/MPEG-2 kooder (x262)"
 
 #: modules/codec/x264.c:451
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264)"
-msgstr "H.264/MPEG-4 Part 10/AVC enkooder (x264)"
+msgstr "H.264/MPEG-4 Part 10/AVC kooder (x264)"
 
 #: modules/codec/x265.c:46
 msgid "H.265/HEVC encoder (x265)"
-msgstr "H.265/HEVC enkooder (x265)"
+msgstr "H.265/HEVC kooder (x265)"
 
 #: modules/codec/xwd.c:36
 msgid "XWD image decoder"
@@ -14152,7 +14149,7 @@ msgstr "liikumise kontrolli liides"
 msgid ""
 "Use HDAPS, AMS, APPLESMC or UNIMOTION motion sensors to rotate the video"
 msgstr ""
-"Kasuta HDAPS, AMS, APPLESMC või UNIMOTION liikumise seonsoreid video "
+"Kasuta HDAPS, AMS, APPLESMC või UNIMOTION liikumise sensoreid video "
 "pööramiseks"
 
 #: modules/control/netsync.c:56
@@ -14178,7 +14175,7 @@ msgstr "Sünkroniseerimiseks kasutatav esmase võrgu kella IP aadress."
 
 #: modules/control/netsync.c:65
 msgid "UDP timeout (in ms)"
-msgstr "UDP aegmine (ms-des)"
+msgstr "UDP aegumine (ms-des)"
 
 #: modules/control/netsync.c:66
 msgid "Length of time (in ms) until aborting data reception."
@@ -15319,7 +15316,7 @@ msgid ""
 "value as the PID in the TS stream, instead of 1, 2, 3, etc. Useful to do "
 "'#duplicate{..., select=\"es=<pid>\"}'."
 msgstr ""
-"Määra iga VLC poolt käsitletava elementaarvoo sisemise ID väärtus samakskui "
+"Määra iga VLC poolt käsitletava elementaarvoo sisemise ID väärtus samaks kui "
 "PID TS voos, mitte 1, 2, 3, jne. Kasulik, et teha '#duplicate{..., select="
 "\"es=<pid>\"}'"
 
@@ -15363,8 +15360,8 @@ msgid ""
 "Separate teletex/dvbs pages into independent ES. It can be useful to turn "
 "off this option when using stream output."
 msgstr ""
-"Eralda teletex/dvbs lehed iseseisvateks ES-ks. On kaulik see valik välja "
-"lülitada, kui kasutadvoo väljundit."
+"Eralda teletex/dvbs lehed iseseisvateks ES-ks. On kauslik see valik välja "
+"lülitada, kui kasutad voo väljundit."
 
 #: modules/demux/mpeg/ts.c:111
 msgid ""
@@ -15429,7 +15426,7 @@ msgstr "Teletekst: programmi ajakava"
 
 #: modules/demux/mpeg/ts_psi.c:611
 msgid "Teletext subtitles: hearing impaired"
-msgstr "Teleteksi subtiitrid: kuulmispuudega"
+msgstr "Teleteksti subtiitrid: kuulmispuudega"
 
 #: modules/demux/mpeg/ts_psi.c:828
 msgid "DVB subtitles: hearing impaired"
@@ -16002,7 +15999,7 @@ msgstr "Võimalda ruumiheli"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:246
 msgid "Headphone virtualization"
-msgstr "Kõrvaklapide virtualisatsioon"
+msgstr "Kõrvaklappide virtualisatsioon"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:253
 msgid "Volume normalization"
@@ -16164,7 +16161,7 @@ msgstr "Sisend puudub"
 msgid ""
 "No input found. A stream must be playing or paused for bookmarks to work."
 msgstr ""
-"Sisendit ei leitud. Voo peab mängima või olema pausitud, et järjehoidad "
+"Sisendit ei leitud. Voo peab mängima või olema pausitud, et järjehoidjad "
 "töötaksid."
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:215
@@ -16300,7 +16297,7 @@ msgstr "Rakenda"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:154
 msgid "Save as new Profile..."
-msgstr "Uue profiiline salvestamine..."
+msgstr "Uue profiilina salvestamine..."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:155
 #: modules/gui/qt/ui/profiles.h:725
@@ -16589,8 +16586,7 @@ msgid ""
 "By default, VLC keeps a list of the last 10 items. This feature can be "
 "disabled here."
 msgstr ""
-"Vaikimisi hoiab VLC meeles viimaset 10 kirjet. Selle saab siin välja "
-"lülitada."
+"Vaikimisi hoiab VLC meeles viimast 10 kirjet. Selle saab siin välja lülitada."
 
 #: modules/gui/macosx/macosx.m:76
 #: modules/gui/macosx/VLCSimplePrefsController.m:318
@@ -17162,7 +17158,7 @@ msgstr "Faili vorming:"
 
 #: modules/gui/macosx/VLCMainMenu.m:1159
 msgid "Extended M3U"
-msgstr "Laiendatid M3U"
+msgstr "Laiendatud M3U"
 
 #: modules/gui/macosx/VLCMainMenu.m:1160
 msgid "XML Shareable Playlist Format (XSPF)"
@@ -17389,7 +17385,7 @@ msgid ""
 "enter the URL in the field above. If you want to open a RTP or UDP stream, "
 "press the button below."
 msgstr ""
-"Avamaks tavalist võrgu voodu (HTTP, RTSP, RTMP, MMS, FTP, jne.), lihtsalt "
+"Avamaks tavalist võrgu voogu (HTTP, RTSP, RTMP, MMS, FTP, jne.), lihtsalt "
 "sisesta URL kasti. Kui soovid avada RTP või UDP voogu, klõpsa all olevat "
 "nuppu."
 
@@ -17403,7 +17399,7 @@ msgid ""
 "sheet."
 msgstr ""
 "Kui soovid avada multiedastusvoogu, sisesta vastav IP aadress. Unicast "
-"režiimis kasutab VLC sinu masinaIP-d automaatselt.\n"
+"režiimis kasutab VLC sinu masina IP-d automaatselt.\n"
 "\n"
 "Avamaks erineva protokolliga voogu, klõpsa Loobu, et see aken sulgeda."
 
@@ -17789,7 +17785,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:295
 msgid "Codecs / Muxers"
-msgstr "Enkoodrid / mukserid"
+msgstr "Koodrid / mukserid"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:298
 msgid "Post-Processing Quality"
@@ -17945,7 +17941,7 @@ msgstr "Eesliide"
 #: modules/gui/macosx/VLCSimplePrefsController.m:371
 #: modules/gui/qt/ui/sprefs_video.h:335
 msgid "Sequential numbering"
-msgstr "Järjestnumbrid"
+msgstr "Järjest numbrid"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:379
 #: modules/gui/macosx/prefs.m:190
@@ -22620,11 +22616,11 @@ msgstr "Koodri funktsiooni statistika"
 
 #: modules/misc/stats.c:222 modules/misc/stats.c:228 modules/misc/stats.c:234
 msgid "Stats decoder"
-msgstr "Dekooderi statistika"
+msgstr "Dekoodri statistika"
 
 #: modules/misc/stats.c:223 modules/misc/stats.c:229 modules/misc/stats.c:235
 msgid "Stats decoder function"
-msgstr "Dekooderi funktsiooni statistika"
+msgstr "Dekoodri funktsiooni statistika"
 
 #: modules/misc/stats.c:240
 msgid "Stats demux"
@@ -22698,7 +22694,7 @@ msgstr ""
 
 #: modules/mux/avi.c:56
 msgid "Encoder"
-msgstr "Enkooder"
+msgstr "Kooder"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -24321,7 +24317,7 @@ msgstr "Elementaarvoo ID"
 
 #: modules/stream_out/delay.c:41 modules/stream_out/setid.c:43
 msgid "Specify an identifier integer for this elementary stream"
-msgstr "Määra sellele pildipealdisele indetifitseeriv string"
+msgstr "Määra sellele elementaarvoole identifitseeriv number"
 
 #: modules/stream_out/delay.c:43
 msgid "Delay of the ES (ms)"
@@ -24452,7 +24448,7 @@ msgstr "Voo väljundi kogumine"
 
 #: modules/stream_out/mosaic_bridge.c:103
 msgid "Specify an identifier string for this subpicture"
-msgstr "Määra sellele pildipealdisele indetifitseeriv string"
+msgstr "Määra sellele alampildile identifitseeriv sõne"
 
 #: modules/stream_out/mosaic_bridge.c:107
 #: modules/stream_out/transcode/transcode.c:69
@@ -24668,7 +24664,7 @@ msgid ""
 msgstr ""
 "RDP paketid on terviklikkuse kontrolliga ja krüpteeritud selle turvalise RTP "
 "primaarse jagatud salajase võtmega. Ta peab olema 32-märgiline "
-"kuueteistkümnendsüteemis olev string."
+"kuueteistkümnendsüsteemis olev string."
 
 #: modules/stream_out/rtp.c:163
 msgid "MP4A LATM"
@@ -24799,7 +24795,7 @@ msgstr "Audio väljakutse funktsiooni andmed."
 
 #: modules/stream_out/smem.c:83
 msgid "Time Synchronized output"
-msgstr "Aja süknroniseerimise väljund"
+msgstr "Aegsünkroniseeritud väljund"
 
 #: modules/stream_out/smem.c:84
 msgid ""
@@ -24881,7 +24877,7 @@ msgstr "Videokooder"
 msgid ""
 "This is the video encoder module that will be used (and its associated "
 "options)."
-msgstr "See on kasutatav videokoodri moodul (ja temaga seotud valikud)."
+msgstr "See on kasutatav videokoodri moodul (ja seotud valikud)."
 
 #: modules/stream_out/transcode/transcode.c:49
 msgid "Destination video codec"
@@ -24942,7 +24938,7 @@ msgstr "Maksimaalne väljundvideo laius."
 
 #: modules/stream_out/transcode/transcode.c:76
 msgid "Maximum video height"
-msgstr "Maksimaale video kõrgus"
+msgstr "Maksimaalne video kõrgus"
 
 #: modules/stream_out/transcode/transcode.c:78
 msgid "Maximum output video height."
@@ -24953,8 +24949,8 @@ msgid ""
 "Video filters will be applied to the video streams (after overlays are "
 "applied). You can enter a colon-separated list of filters."
 msgstr ""
-"Videofiltrid rakendatakse videovoole (peale ülekatete rakendamist). Võid "
-"sisestada kooloniga eraldatud nimekirja filtridest."
+"Videofiltrid rakendatakse videovoole (pärast ülekatete rakendamist). Võid "
+"sisestada kooloniga eraldatud nimekirja filtritest."
 
 #: modules/stream_out/transcode/transcode.c:84
 msgid "Audio encoder"
@@ -24964,7 +24960,7 @@ msgstr "Audiokooder"
 msgid ""
 "This is the audio encoder module that will be used (and its associated "
 "options)."
-msgstr "See on kasutatav audiokoodri moodul (ja temaga seotud valikud)."
+msgstr "See on kasutatav audiokoodri moodul (ja seotud valikud)."
 
 #: modules/stream_out/transcode/transcode.c:88
 msgid "Destination audio codec"
@@ -25006,12 +25002,12 @@ msgid ""
 "Audio filters will be applied to the audio streams (after conversion filters "
 "are applied). You can enter a colon-separated list of filters."
 msgstr ""
-"Audiofiltrid rakendatakse audiovoogudele (peale teisenduste filtrite "
-"rakendamist). Võid sisestada kooloniga eraldatud nimekirja filtridest."
+"Audiofiltrid rakendatakse audiovoogudele (pärast teisendusfiltrite "
+"rakendamist). Võid sisestada kooloniga eraldatud nimekirja filtritest."
 
 #: modules/stream_out/transcode/transcode.c:108
 msgid "Subtitle encoder"
-msgstr "Subtiitrite enkooder"
+msgstr "Subtiitrite kooder"
 
 #: modules/stream_out/transcode/transcode.c:110
 msgid ""
@@ -25142,7 +25138,7 @@ msgid ""
 "This is the relative default size of the fonts that will be rendered on the "
 "video. If absolute font size is set, relative size will be overridden."
 msgstr ""
-"See on videol rendertatava teksti fondi suhteline suurus. Kui absoluutne "
+"See on videol renderdatava teksti fondi suhteline suurus. Kui absoluutne "
 "fondi suurus on määratud, siis suhteline suurus tühistatakse."
 
 #: modules/text_renderer/freetype/freetype.c:106
@@ -25370,7 +25366,7 @@ msgstr "Pildi kohendamine"
 
 #: modules/video_filter/alphamask.c:41
 msgid "Use an image's alpha channel as a transparency mask."
-msgstr "Kasuta pildi alfaknalit, kui läbipaistvuse maski."
+msgstr "Kasuta pildi alfakanalit läbipaistvuse maskina."
 
 #: modules/video_filter/alphamask.c:43
 msgid "Transparency mask"
@@ -25378,7 +25374,7 @@ msgstr "Läbipaistvuse mask"
 
 #: modules/video_filter/alphamask.c:45
 msgid "Alpha blending transparency mask. Uses a png alpha channel."
-msgstr "Alfakanali suldandumise mask. Kasutab png alfakanalit."
+msgstr "Alfakanali sulandumise mask. Kasutab png alfakanalit."
 
 #: modules/video_filter/alphamask.c:64
 msgid "Alpha mask video filter"
@@ -25514,7 +25510,7 @@ msgstr "Pilt, mis sulandatakse baaspilti"
 
 #: modules/video_filter/blendbench.c:68
 msgid "Chroma for the blend image"
-msgstr "Suldandatud pildi värviformaat"
+msgstr "Sulandatud pildi värviformaat"
 
 #: modules/video_filter/blendbench.c:69
 msgid "Chroma which the blend image will be loaded in"
@@ -25640,7 +25636,7 @@ msgstr ""
 
 #: modules/video_filter/canvas.c:97
 msgid "Automatically resize and pad a video"
-msgstr "Automatselt muuda suurust ja täida videoga"
+msgstr "Automaatselt muuda suurust ja täida videoga"
 
 #: modules/video_filter/canvas.c:105
 msgid "Canvas"
@@ -25745,7 +25741,7 @@ msgstr "Vasakule polsterdatavate pikslite arv peale pildi kärpimist."
 
 #: modules/video_filter/croppadd.c:69
 msgid "Pixels to padd to right"
-msgstr "Paremale polstedatavad pikslid"
+msgstr "Paremale polsterdatavad pikslid"
 
 #: modules/video_filter/croppadd.c:71
 msgid "Number of pixels to padd to the right of the image after cropping."
@@ -26438,7 +26434,7 @@ msgstr "Salvestamise suhe"
 msgid ""
 "Ratio of images to record. 3 means that one image out of three is recorded."
 msgstr ""
-"Salvestatavate piltide suhe. 3 tähendab, et iga komas pilt salvetatakse."
+"Salvestatavate piltide suhe. 3 tähendab, et iga kolmas pilt salvestatakse."
 
 #: modules/video_filter/scene.c:76
 msgid "Filename prefix"
@@ -26449,7 +26445,7 @@ msgid ""
 "Prefix of the output images filenames. Output filenames will have the "
 "\"prefixNUMBER.format\" form if replace is not true."
 msgstr ""
-"Piltide falinimede eesliide. Tulemuseks saab olema \"eesliideNUMBER.vorming"
+"Piltide failinimede eesliide. Tulemuseks saab olema \"eesliideNUMBER.vorming"
 "\"."
 
 #: modules/video_filter/scene.c:81
@@ -26748,7 +26744,7 @@ msgid ""
 "Chroma fourcc used by the framebuffer. Default is RGB since the fb device "
 "has no way to report its chroma."
 msgstr ""
-"Kaadripuhvri poolt kasutatav värviformaadi fourcc. Vaikimis ion kasutuses "
+"Kaadripuhvri poolt kasutatav värviformaadi fourcc. Vaikimisi on kasutuses "
 "RGB, kuna kp seade ei oska teatada oma värviformaati."
 
 #: modules/video_output/fb.c:92
@@ -26901,8 +26897,8 @@ msgid ""
 "Try to use hardware acceleration for YUV->RGB conversions. This option "
 "doesn't have any effect when using overlays."
 msgstr ""
-"Ürita kasutada riistvaralist YUB->RGB teisendamist. Ülektatete kasutamisel "
-"ei ole sellel valikul mingit efekti."
+"Ürita kasutada riistvaralist YUB->RGB teisendamist. Ülekatete kasutamisel ei "
+"ole sellel valikul mingit efekti."
 
 #: modules/video_output/win32/directdraw.c:70
 msgid "Overlay video output"
@@ -26929,7 +26925,7 @@ msgid ""
 msgstr ""
 "Loo videopuhvrid süsteemimällu, mitte videomällu. See ei ole soovitatav, "
 "kuna videomälu kasutamine tähendab rohkem riistvaralist kiirendamist "
-"(näiteks YUV->RGB teisenduste suuruse muutmine). Ülektatete kasutamisel ei "
+"(näiteks YUV->RGB teisenduste suuruse muutmine). Ülekatete kasutamisel ei "
 "ole sellel valikul mingit efekti."
 
 #: modules/video_output/win32/directdraw.c:82
@@ -27022,7 +27018,7 @@ msgstr "Kõrgus"
 
 #: modules/video_output/vmem.c:49
 msgid "Video memory buffer pitch in bytes."
-msgstr "Videmälu puhvri kõrgus baitides."
+msgstr "Videomälu puhvri kõrgus baitides."
 
 #: modules/video_output/vmem.c:51
 msgid "Chroma"
@@ -27208,7 +27204,7 @@ msgstr ""
 
 #: modules/video_splitter/clone.c:47
 msgid "Duplicate your video to multiple windows and/or video output modules"
-msgstr "Klooni video mitmele aknale ja/või videoväljuni moodulile"
+msgstr "Klooni video mitmele aknale ja/või videoväljundi moodulile"
 
 #: modules/video_splitter/clone.c:55
 msgid "Clone video filter"
@@ -27278,7 +27274,7 @@ msgstr "Nõrgenemine, algus (%)"
 #: modules/video_splitter/panoramix.c:107
 msgid ""
 "Select in percent the Lagrange coefficient of the beginning blended zone"
-msgstr "Vali ühistsooni alguse Lagrange koefitsent protsentides"
+msgstr "Vali ühistsooni alguse Lagrange'i koefitsient protsentides"
 
 #: modules/video_splitter/panoramix.c:110
 msgid "Attenuation, middle (in %)"
@@ -27287,7 +27283,7 @@ msgstr "Nõrgenemise, keskel (%)"
 #: modules/video_splitter/panoramix.c:111
 msgid ""
 "Select in percent the Lagrange coefficient of the middle of blended zone"
-msgstr "Vali ühistsooni keskosa Lagrange koefitsent protsentides"
+msgstr "Vali ühistsooni keskosa Lagrange'i koefitsient protsentides"
 
 #: modules/video_splitter/panoramix.c:114
 msgid "Attenuation, end (in %)"
@@ -27295,7 +27291,7 @@ msgstr "Nõrgenemine, lõpp (%)"
 
 #: modules/video_splitter/panoramix.c:115
 msgid "Select in percent the Lagrange coefficient of the end of blended zone"
-msgstr "Vali ühistsooni lõpu Lagrange koefitsent protsentides"
+msgstr "Vali ühistsooni lõpu Lagrange'i koefitsient protsentides"
 
 #: modules/video_splitter/panoramix.c:118
 msgid "middle position (in %)"
@@ -27361,7 +27357,7 @@ msgstr "Vali ühistsooni mustpunkti adaptimisviis (sinine või V komponent)"
 
 #: modules/video_splitter/panoramix.c:140
 msgid "White Crush for Red"
-msgstr "Punase kanali adaptiive valgepunkt"
+msgstr "Punase kanali adaptiivne valgepunkt"
 
 #: modules/video_splitter/panoramix.c:141
 msgid "Select the White Crush of blended zone (Red or Y component)"
@@ -27587,7 +27583,7 @@ msgid ""
 "Current effects include: dummy, scope, spectrum, spectrometer and vuMeter."
 msgstr ""
 "Visuaalefektide nimekiri, eraldatud komaga.\n"
-"Aktiivsed efektid on: liba, skoop, spektrum, spektromeeter ja vuMeter."
+"Aktiivsed efektid on: liba, skoop, spekter, spektromeeter ja vuMeter."
 
 #: modules/visualization/visual/visual.c:55
 msgid "The width of the effects video window, in pixels."
@@ -27633,7 +27629,7 @@ msgstr "Võimendus"
 
 #: modules/visualization/visual/visual.c:78
 msgid "This is a coefficient that modifies the height of the bands."
-msgstr "See koefitsent muudab sageduste kõrgust."
+msgstr "See koefitsient muudab sageduste kõrgust."
 
 #: modules/visualization/visual/visual.c:80
 msgid "Draw peaks in the analyzer"
@@ -27641,7 +27637,7 @@ msgstr "Analüsaatorile joonistatakse \"tipud\" "
 
 #: modules/visualization/visual/visual.c:82
 msgid "Enable original graphic spectrum"
-msgstr "Algse graafilise spektrumi lubamine"
+msgstr "Algse graafilise spektri lubamine"
 
 #: modules/visualization/visual/visual.c:84
 msgid "Enable the \"flat\" spectrum analyzer in the spectrometer."
@@ -27669,7 +27665,7 @@ msgstr "Spektri sektsioonid"
 
 #: modules/visualization/visual/visual.c:96
 msgid "Determines how many sections of spectrum will exist."
-msgstr "Määrab, mitu spektrumi sektsiooni on olemas."
+msgstr "Määrab, mitu spektri sektsiooni on olemas."
 
 #: modules/visualization/visual/visual.c:98
 msgid "Peak height"
