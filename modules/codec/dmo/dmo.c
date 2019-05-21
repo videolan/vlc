@@ -868,6 +868,7 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
                        (IMediaBuffer *)p_in, DMO_INPUT_DATA_BUFFERF_SYNCPOINT,
                        0, 0 );
 
+        *pp_block = NULL;
         p_in->vt->Release( (IUnknown *)p_in );
 
         if( i_result == S_FALSE )
@@ -893,7 +894,6 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
 #ifdef DMO_DEBUG
             msg_Dbg( p_dec, "ProcessInput(): successful" );
 #endif
-            *pp_block = NULL;
         }
     }
 
