@@ -406,6 +406,7 @@ esac
 # Results output
 #
 echo TOPSRC = .. >> Makefile
+echo TOPSRC_BUILT = .. >> Makefile
 echo TOPDST = . >> Makefile
 echo include $\(TOPSRC\)/src/main.mak >> Makefile
 echo "Bootstrap completed."

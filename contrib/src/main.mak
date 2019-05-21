@@ -6,6 +6,7 @@
 all: install
 
 SRC := $(TOPSRC)/src
+SRC_BUILT := $(TOPSRC_BUILT)/src
 TARBALLS := $(TOPSRC)/tarballs
 VLC_TOOLS ?= $(TOPSRC)/../extras/tools/build
 
@@ -359,7 +360,7 @@ UNPACK = $(RM) -R $@ \
 	$(foreach f,$(filter %.zip,$^), && unzip $(f))
 UNPACK_DIR = $(patsubst %.tar,%,$(basename $(notdir $<)))
 APPLY = (cd $(UNPACK_DIR) && patch -fp1) <
-pkg_static = (cd $(UNPACK_DIR) && $(SRC)/pkg-static.sh $(1))
+pkg_static = (cd $(UNPACK_DIR) && $(SRC_BUILT)/pkg-static.sh $(1))
 MOVE = mv $(UNPACK_DIR) $@ && touch $@
 
 AUTOMAKE_DATA_DIRS=$(foreach n,$(foreach n,$(subst :, ,$(shell echo $$PATH)),$(abspath $(n)/../share)),$(wildcard $(n)/automake*))
