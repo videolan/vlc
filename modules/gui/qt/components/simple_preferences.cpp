@@ -870,6 +870,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets["shadowCB"] = ui.shadowCheck;
             optionWidgets["backgroundCB"] = ui.backgroundCheck;
 
+            CONFIG_GENERIC( "secondary-sub-alignment", IntegerList,
+                            ui.secondarySubsAlignmentLabel, secondarySubsAlignment );
+            CONFIG_GENERIC_NO_BOOL( "secondary-sub-margin", Integer, ui.secondarySubsPosLabel, secondarySubsPosition );
         END_SPREFS_CAT;
 
         case SPrefsHotkeys:
