@@ -7,10 +7,14 @@ Access:
 Audio output:
  * Fix pass-through on Android-23
 
+Demux:
+ * Improve MP4 support
+
 Video Output:
  * Fix 12 bits sources playback with Direct3D11
  * Fix crash on iOS
  * Fix midstream aspect-ratio changes when Windows hardware decoding is on
+ * Fix HLG display with Direct3D11
 
 Stream Output:
  * Improve Chromecast support with new ChromeCast apps
@@ -26,6 +30,32 @@ Misc:
 Translations:
  * Update of most translations
 
+Security:
+ * Fix multiple buffer overflows in the ps demuxer
+ * Fix a buffer overflow when copying a biplanar YUV image
+ * Fix multiple buffer overflows in the faad decoder
+ * Fix buffer overflow in the svcdsub decoder
+ * Fix buffer overflows in the ogg muxer & demuxer
+ * Fix buffer overflows in libavformat demuxer
+ * Fix multiple buffer overflows in the MKV demuxer
+ * Fix a buffer overflow in the MP4 demuxer
+ * Fix a buffer overflow in the textst decoder
+ * Fix a buffer overflow in the webvtt decoder
+ * Fix a buffer overflow in the ASF demux
+ * Fix a buffer overflow in the UPNP SD
+ * Fix use after free in the ogg demuxer
+ * Fix multiple use after free in the MKV demuxer
+ * Fix multiple use after free in the DMO decoder
+ * Fix integer underflow in the MKV demuxer
+ * Fix an updater NULL pointer dereference on invalid signing keys
+ * Fix NULL pointer dereference in the MKV demuxer
+ * Fix an integer overflow in the spudec decoder
+ * Fix an integer overflow in the nsc demuxer
+ * Fix an integer overflow in the avi demuxer
+ * Fix reads of uninitialized pointers in the MKV demuxer
+ * Fix a floating point exception in the MKV demuxer
+ * Fix an infinite loop in the flac packetizer
+ 
 
 Changes between 3.0.5 and 3.0.6:
 --------------------------------
