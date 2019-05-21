@@ -418,6 +418,7 @@ mtime_t PlaylistManager::getFirstPlaybackTime() const
 
 mtime_t PlaylistManager::getCurrentPlaybackTime() const
 {
+    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&demux.lock));
     return demux.i_nzpcr;
 }
 
