@@ -992,15 +992,34 @@ static int Open( vlc_object_t * p_this )
     {
         MP4_Box_t *p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%d]", i );
 
-
+        /* Enabled check as explained above */
         MP4_Box_t *p_tkhd = MP4_BoxGet( p_trak, "tkhd" );
         if( p_tkhd && BOXDATA(p_tkhd) && (BOXDATA(p_tkhd)->i_flags&MP4_TRACK_ENABLED) )
             b_enabled_es = true;
 
-        MP4_Box_t *p_chap = MP4_BoxGet( p_trak, "tref/chap", i );
-        if( p_chap && p_chap->data.p_track_reference &&
-            p_chap->data.p_track_reference->i_entry_count > 0 && !p_sys->p_tref_chap )
-            p_sys->p_tref_chap = p_chap;
+        /* Referenced tracks checks */
+        MP4_Box_t *p_tref = MP4_BoxGet( p_trak, "tref" );
+        if(!p_tref)
+            continue;
+
+        for( MP4_Box_t *p_refbox = p_tref->p_first; p_refbox; p_refbox = p_refbox->p_next )
+        {
+            const MP4_Box_data_trak_reference_t *refdata = p_refbox->data.p_track_reference;
+            if(unlikely(!refdata))
+                continue;
+
+            /* Assign reference types */
+            for( uint32_t j = 0; j < refdata->i_entry_count; j++ )
+            {
+                mp4_track_t *reftk = MP4_GetTrackByTrackID(p_demux, refdata->i_track_ID[j]);
+                if(reftk)
+                    reftk->as_reftype = p_refbox->i_type;
+            }
+
+            /* Point chapter shortcut */
+            if( p_refbox->i_type == ATOM_chap && !p_sys->p_tref_chap )
+                p_sys->p_tref_chap = p_refbox;
+        }
     }
 
     /* Set and store metadata */
