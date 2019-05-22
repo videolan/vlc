@@ -160,10 +160,10 @@ VLC_API void config_PutInt(const char *name, int64_t val);
 VLC_API float config_GetFloat(const char *name) VLC_USED;
 
 /**
- * Sets an integer configuration item.
+ * Sets an floating point configuration item.
  *
  * This function changes the current value of a configuration item of
- * integral type (\ref CONFIG_ITEM_FLOAT).
+ * floating point type (\ref CONFIG_ITEM_FLOAT).
  *
  * \warning The behaviour is undefined if the configuration item exists but is
  * not of floating point type.
