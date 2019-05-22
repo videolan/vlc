@@ -153,9 +153,6 @@ endif
 ifndef HAVE_CROSS_COMPILE
 LN_S = cp -R
 endif
-ifneq ($(findstring clang, $(shell $(CC) --version)),)
-HAVE_CLANG := 1
-endif
 endif
 
 ifdef HAVE_SOLARIS
@@ -166,6 +163,10 @@ else
 EXTRA_CFLAGS += -m32
 EXTRA_LDFLAGS += -m32
 endif
+endif
+
+ifneq ($(findstring clang, $(shell $(CC) --version)),)
+HAVE_CLANG := 1
 endif
 
 cppcheck = $(shell $(CC) $(CFLAGS) -E -dM - < /dev/null | grep -E $(1))
