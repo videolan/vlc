@@ -60,7 +60,7 @@ Item {
                 Layout.columnSpan: albums.rowCount() === 1 ? 2 : 1
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                source: albums.get(index).cover || VLCStyle.noArtCover
+                source: albums.get(index).cover || VLCStyle.noArtAlbum
                 fillMode: Image.PreserveAspectCrop
                 sourceSize: Qt.size(width, height)
             }

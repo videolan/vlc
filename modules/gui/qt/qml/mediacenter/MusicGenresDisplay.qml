@@ -46,7 +46,7 @@ Utils.NavigableFocusScope {
             Utils.GridItem {
                 Package.name: "grid"
                 id: gridItem
-                image: VLCStyle.noArtCover
+                image: VLCStyle.noArtAlbum
                 title: model.name || "Unknown genre"
                 selected: element.DelegateModel.inSelected
 
