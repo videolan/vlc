@@ -990,8 +990,8 @@ static int Open( vlc_object_t * p_this )
             b_enabled_es = true;
 
         MP4_Box_t *p_chap = MP4_BoxGet( p_trak, "tref/chap", i );
-        if( p_chap && p_chap->data.p_tref_generic &&
-            p_chap->data.p_tref_generic->i_entry_count > 0 && !p_sys->p_tref_chap )
+        if( p_chap && p_chap->data.p_track_reference &&
+            p_chap->data.p_track_reference->i_entry_count > 0 && !p_sys->p_tref_chap )
             p_sys->p_tref_chap = p_chap;
     }
 
@@ -2384,7 +2384,7 @@ static void LoadChapter( demux_t  *p_demux )
     }
     else if( p_sys->p_tref_chap )
     {
-        MP4_Box_data_tref_generic_t *p_chap = p_sys->p_tref_chap->data.p_tref_generic;
+        MP4_Box_data_trak_reference_t *p_chap = p_sys->p_tref_chap->data.p_track_reference;
         unsigned int i, j;
 
         /* Load the first subtitle track like quicktime */
@@ -3534,7 +3534,7 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
     /* Mark chapter only track */
     if( p_sys->p_tref_chap )
     {
-        MP4_Box_data_tref_generic_t *p_chap = p_sys->p_tref_chap->data.p_tref_generic;
+        MP4_Box_data_trak_reference_t *p_chap = p_sys->p_tref_chap->data.p_track_reference;
         unsigned int i;
 
         for( i = 0; i < p_chap->i_entry_count; i++ )

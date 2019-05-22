@@ -3741,35 +3741,60 @@ static int MP4_ReadBox_HMMT( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-static void MP4_FreeBox_tref_generic( MP4_Box_t *p_box )
+static void MP4_FreeBox_TrackReference( MP4_Box_t *p_box )
 {
-    free( p_box->data.p_tref_generic->i_track_ID );
+    free( p_box->data.p_track_reference->i_track_ID );
 }
 
-static int MP4_ReadBox_tref_generic( stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_TrackReference( stream_t *p_stream, MP4_Box_t *p_box )
 {
     uint32_t count;
 
-    MP4_READBOX_ENTER( MP4_Box_data_tref_generic_t, MP4_FreeBox_tref_generic );
+    MP4_READBOX_ENTER( MP4_Box_data_trak_reference_t, MP4_FreeBox_TrackReference );
 
-    p_box->data.p_tref_generic->i_track_ID = NULL;
+    p_box->data.p_track_reference->i_track_ID = NULL;
     count = i_read / sizeof(uint32_t);
-    p_box->data.p_tref_generic->i_entry_count = count;
-    p_box->data.p_tref_generic->i_track_ID = vlc_alloc( count,
+    p_box->data.p_track_reference->i_entry_count = count;
+    p_box->data.p_track_reference->i_track_ID = vlc_alloc( count,
                                                         sizeof(uint32_t) );
-    if( p_box->data.p_tref_generic->i_track_ID == NULL )
+    if( p_box->data.p_track_reference->i_track_ID == NULL )
         MP4_READBOX_EXIT( 0 );
 
     for( unsigned i = 0; i < count; i++ )
     {
-        MP4_GET4BYTES( p_box->data.p_tref_generic->i_track_ID[i] );
+        MP4_GET4BYTES( p_box->data.p_track_reference->i_track_ID[i] );
     }
 #ifdef MP4_VERBOSE
         msg_Dbg( p_stream, "read box: \"chap\" %d references",
-                 p_box->data.p_tref_generic->i_entry_count );
+                 p_box->data.p_track_reference->i_entry_count );
 #endif
 
     MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_tref( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    /* skip header */
+    ssize_t i_header = mp4_box_headersize( p_box );
+    if( vlc_stream_Read( p_stream, NULL, i_header ) != i_header )
+        return 0;
+    /* read each reference atom with forced handler */
+    uint64_t i_remain = p_box->i_size - 8;
+    while ( i_remain > 8 )
+    {
+        MP4_Box_t *p_childbox = MP4_ReadBoxUsing( p_stream, p_box,
+                                                  MP4_ReadBox_TrackReference );
+        if( !p_childbox || i_remain < p_childbox->i_size )
+        {
+            MP4_BoxFree( p_childbox );
+            break;
+        }
+
+        MP4_BoxAddChild( p_box, p_childbox );
+        i_remain -= p_childbox->i_size;
+    }
+
+    return MP4_Seek( p_stream, p_box->i_pos + p_box->i_size ) ? 0 : 1;
 }
 
 static void MP4_FreeBox_keys( MP4_Box_t *p_box )
@@ -4760,7 +4785,7 @@ static const struct
     { ATOM_hnti,    MP4_ReadBoxContainer,     ATOM_udta },
     { ATOM_rmra,    MP4_ReadBoxContainer,     ATOM_moov },
     { ATOM_rmda,    MP4_ReadBoxContainer,     ATOM_rmra },
-    { ATOM_tref,    MP4_ReadBoxContainer,     ATOM_trak },
+    { ATOM_tref,    MP4_ReadBox_tref,         ATOM_trak },
     { ATOM_gmhd,    MP4_ReadBoxContainer,     ATOM_minf },
     { ATOM_wave,    MP4_ReadBoxContainer,     ATOM_stsd },
     { ATOM_wave,    MP4_ReadBoxContainer,     ATOM_mp4a }, /* some quicktime mp4a/wave/mp4a.. */
@@ -4974,15 +4999,7 @@ static const struct
 
     { ATOM_mp4s,    MP4_ReadBox_sample_mp4s,  ATOM_stsd },
 
-    /* XXX there is 2 box where we could find this entry stbl and tref*/
-    { ATOM_hint,    MP4_ReadBox_default,      ATOM_tref },
     { ATOM_hint,    MP4_ReadBox_default,      ATOM_stbl },
-
-    /* found in tref box */
-    { ATOM_dpnd,    MP4_ReadBox_default,      ATOM_tref },
-    { ATOM_ipir,    MP4_ReadBox_default,      ATOM_tref },
-    { ATOM_mpod,    MP4_ReadBox_default,      ATOM_tref },
-    { ATOM_chap,    MP4_ReadBox_tref_generic, ATOM_tref },
 
     /* found in hnti */
     { ATOM_rtp,     MP4_ReadBox_rtp,          ATOM_hnti },

@@ -156,10 +156,6 @@ typedef int64_t stime_t;
 #define ATOM_hdv2 VLC_FOURCC( 'h', 'd', 'v', '2' )
 #define ATOM_rrtp VLC_FOURCC( 'r', 'r', 't', 'p' )
 
-#define ATOM_dpnd VLC_FOURCC( 'd', 'p', 'n', 'd' )
-#define ATOM_cdsc VLC_FOURCC( 'c', 'd', 's', 'c' )
-#define ATOM_ipir VLC_FOURCC( 'i', 'p', 'i', 'r' )
-#define ATOM_mpod VLC_FOURCC( 'm', 'p', 'o', 'd' )
 #define ATOM_hnti VLC_FOURCC( 'h', 'n', 't', 'i' )
 #define ATOM_rtp  VLC_FOURCC( 'r', 't', 'p', ' ' )
 #define ATOM_btrt VLC_FOURCC( 'b', 't', 'r', 't' )
@@ -415,7 +411,6 @@ typedef int64_t stime_t;
 
 #define ATOM_0x40PRM VLC_FOURCC( '@', 'P', 'R', 'M' )
 #define ATOM_0x40PRQ VLC_FOURCC( '@', 'P', 'R', 'Q' )
-#define ATOM_chap VLC_FOURCC( 'c', 'h', 'a', 'p' )
 #define ATOM_MCPS VLC_FOURCC( 'M', 'C', 'P', 'S' )
 #define ATOM_SDLN VLC_FOURCC( 'S', 'D', 'L', 'N' )
 #define ATOM_vndr VLC_FOURCC( 'v', 'n', 'd', 'r' )
@@ -440,6 +435,14 @@ typedef int64_t stime_t;
 #define HANDLER_ID32 ATOM_ID32
 
 #define SAMPLEGROUP_rap  VLC_FOURCC('r', 'a', 'p', ' ')
+
+/* tref reference type boxes */
+#define ATOM_chap VLC_FOURCC( 'c', 'h', 'a', 'p' )
+#define ATOM_dpnd VLC_FOURCC( 'd', 'p', 'n', 'd' )
+#define ATOM_hint VLC_FOURCC( 'h', 'i', 'n', 't' )
+#define ATOM_ipir VLC_FOURCC( 'i', 'p', 'i', 'r' )
+#define ATOM_mpod VLC_FOURCC( 'm', 'p', 'o', 'd' )
+#define ATOM_cdsc VLC_FOURCC( 'c', 'd', 's', 'c' )
 
 /* HEIF Specific */
 #define HANDLER_pict VLC_FOURCC('p', 'i', 'c', 't')
@@ -1254,7 +1257,7 @@ typedef struct
     uint32_t i_entry_count;
     uint32_t *i_track_ID;
 
-} MP4_Box_data_tref_generic_t;
+} MP4_Box_data_trak_reference_t;
 
 typedef struct
 {
@@ -1790,7 +1793,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_pnot_t *p_pnot;
     MP4_Box_data_chpl_t *p_chpl;
     MP4_Box_data_HMMT_t *p_hmmt;
-    MP4_Box_data_tref_generic_t *p_tref_generic;
+    MP4_Box_data_trak_reference_t *p_track_reference;
 
     MP4_Box_data_tfrf_t *p_tfrf;
     MP4_Box_data_tfxd_t *p_tfxd;
