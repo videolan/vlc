@@ -249,9 +249,9 @@ static uint32_t stream_ReadU32( stream_t *s, void *p_read, uint32_t i_toread )
     return i_return;
 }
 
-static inline bool MP4_isChapter(const mp4_track_t *tk)
+static inline bool MP4_isMetadata(const mp4_track_t *tk)
 {
-    return tk->as_reftype == ATOM_chap;
+    return tk->as_reftype != 0;
 }
 
 static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id )
@@ -1419,7 +1419,7 @@ static int DemuxMoov( demux_t *p_demux )
         mp4_track_t *tk = &p_sys->track[i_track];
         bool b = true;
 
-        if( !tk->b_ok || MP4_isChapter( tk ) ||
+        if( !tk->b_ok || MP4_isMetadata( tk ) ||
             ( tk->b_selected && tk->i_sample >= tk->i_sample_count ) )
         {
             continue;
@@ -1447,7 +1447,7 @@ static int DemuxMoov( demux_t *p_demux )
         for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
         {
             mp4_track_t *tk = &p_sys->track[i_track];
-            if( !tk->b_ok || MP4_isChapter( tk ) || tk->i_sample >= tk->i_sample_count )
+            if( !tk->b_ok || MP4_isMetadata( tk ) || tk->i_sample >= tk->i_sample_count )
                 continue;
             /* Test for EOF on each track (samples count, edit list) */
             b_eof &= ( i_nztime > MP4_TrackGetDTS( p_demux, tk ) );
@@ -1468,7 +1468,7 @@ static int DemuxMoov( demux_t *p_demux )
         for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
         {
             mp4_track_t *tk_tmp = &p_sys->track[i_track];
-            if( !tk_tmp->b_ok || MP4_isChapter( tk_tmp ) ||
+            if( !tk_tmp->b_ok || MP4_isMetadata( tk_tmp ) ||
                 tk_tmp->i_sample >= tk_tmp->i_sample_count ||
                 (!tk_tmp->b_selected && p_sys->b_seekable) )
                 continue;
@@ -1492,7 +1492,7 @@ static int DemuxMoov( demux_t *p_demux )
             {
                 mp4_track_t *tk_tmp = &p_sys->track[i_track];
                 if( tk_tmp == tk ||
-                    !tk_tmp->b_ok || MP4_isChapter( tk_tmp ) ||
+                    !tk_tmp->b_ok || MP4_isMetadata( tk_tmp ) ||
                    (!tk_tmp->b_selected && p_sys->b_seekable) ||
                     tk_tmp->i_sample >= tk_tmp->i_sample_count )
                     continue;
@@ -1579,7 +1579,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, bool b_accurate )
         mp4_track_t *tk = &p_sys->track[i_track];
         /* FIXME: we should find the lowest time from tracks with indexes.
            considering only video for now */
-        if( tk->fmt.i_cat != VIDEO_ES || MP4_isChapter( tk ) || !tk->b_ok )
+        if( tk->fmt.i_cat != VIDEO_ES || MP4_isMetadata( tk ) || !tk->b_ok )
             continue;
         if( MP4_TrackSeek( p_demux, tk, i_date ) == VLC_SUCCESS )
         {
@@ -3605,7 +3605,7 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
 
     if( TrackCreateES( p_demux,
                        p_track, p_track->i_chunk,
-                      (MP4_isChapter( p_track ) || !b_create_es) ? NULL : &p_track->p_es ) )
+                      (MP4_isMetadata( p_track ) || !b_create_es) ? NULL : &p_track->p_es ) )
     {
         msg_Err( p_demux, "cannot create es for track[Id 0x%x]",
                  p_track->i_track_ID );
@@ -3665,7 +3665,7 @@ static void MP4_TrackInit( mp4_track_t *p_track, const MP4_Box_t *p_trackbox )
 
 static void MP4_TrackSelect( demux_t *p_demux, mp4_track_t *p_track, bool b_select )
 {
-    if( !p_track->b_ok || MP4_isChapter(p_track) )
+    if( !p_track->b_ok || MP4_isMetadata(p_track) )
         return;
 
     if( b_select == p_track->b_selected )
@@ -3686,7 +3686,7 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
     uint32_t i_chunk;
     uint32_t i_sample;
 
-    if( !p_track->b_ok || MP4_isChapter( p_track ) )
+    if( !p_track->b_ok || MP4_isMetadata( p_track ) )
         return VLC_EGENERIC;
 
     p_track->b_selected = false;
@@ -4555,7 +4555,7 @@ static int DemuxMoof( demux_t *p_demux )
         {
             mp4_track_t *tk_tmp = &p_sys->track[i];
 
-            if( !tk_tmp->b_ok || MP4_isChapter( tk_tmp ) ||
+            if( !tk_tmp->b_ok || MP4_isMetadata( tk_tmp ) ||
                (!tk_tmp->b_selected && !p_sys->b_seekable) ||
                 tk_tmp->context.runs.i_current >= tk_tmp->context.runs.i_count )
                 continue;
@@ -4579,7 +4579,7 @@ static int DemuxMoof( demux_t *p_demux )
             {
                 mp4_track_t *tk_tmp = &p_sys->track[i];
                 if( tk_tmp == tk ||
-                    !tk_tmp->b_ok || MP4_isChapter( tk_tmp ) ||
+                    !tk_tmp->b_ok || MP4_isMetadata( tk_tmp ) ||
                    (!tk_tmp->b_selected && !p_sys->b_seekable) ||
                     tk_tmp->context.runs.i_current >= tk_tmp->context.runs.i_count )
                     continue;
@@ -4618,7 +4618,7 @@ static int DemuxMoof( demux_t *p_demux )
         for( unsigned i = 0; i < p_sys->i_tracks; i++ )
         {
             mp4_track_t *tk = &p_sys->track[i];
-            if( tk->b_ok || MP4_isChapter( tk ) ||
+            if( tk->b_ok || MP4_isMetadata( tk ) ||
                (!tk->b_selected && !p_sys->b_seekable) )
                 continue;
             vlc_tick_t i_track_end = MP4_rescale_mtime( tk->i_time, tk->i_timescale );
@@ -4996,7 +4996,7 @@ static int DemuxFrag( demux_t *p_demux )
         mp4_track_t *tk = &p_sys->track[i_track];
         bool b = true;
 
-        if( !tk->b_ok || MP4_isChapter( tk ) )
+        if( !tk->b_ok || MP4_isMetadata( tk ) )
             continue;
 
         if( p_sys->b_seekable )
