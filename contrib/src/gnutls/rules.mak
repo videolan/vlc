@@ -65,10 +65,9 @@ endif
 endif
 ifdef HAVE_WIN32
 	GNUTLS_CONF += --without-idn
-ifdef HAVE_CLANG
 ifeq ($(ARCH),aarch64)
+	# Gnutls' aarch64 assembly unconditionally uses ELF specific directives
 	GNUTLS_CONF += --disable-hardware-acceleration
-endif
 endif
 endif
 
