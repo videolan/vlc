@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-01-26 16:03+0100\n"
+"PO-Revision-Date: 2019-05-23 00:57+0200\n"
 "Last-Translator: abuyop <abuyop@gmail.com>, 2019\n"
 "Language-Team: Malay (https://www.transifex.com/yaron/teams/16553/ms/)\n"
 "Language: ms\n"
@@ -21728,7 +21728,7 @@ msgstr "Simpan senarai main"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr "Senarai main XSPF |Fail *.xspf|M3U | Senarai main *.m3u|HTML |*.html"
+msgstr "Senarai main XSPF |Fail *.xspf|M3U |Senarai main *.m3u|HTML |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
