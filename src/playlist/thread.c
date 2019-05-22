@@ -421,7 +421,7 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
     return p_new;
 }
 
-static void LoopInput( playlist_t *p_playlist )
+static bool LoopInput( playlist_t *p_playlist )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
     input_thread_t *p_input = p_sys->p_input;
@@ -439,6 +439,10 @@ static void LoopInput( playlist_t *p_playlist )
         vlc_cond_wait( &p_sys->signal, &p_sys->lock );
     }
 
+    input_item_t *item = input_GetItem(p_input);
+    assert(item);
+    bool ok = !input_item_HasErrorWhenReading(item);
+
     /* This input is dead. Remove it ! */
     PL_DEBUG( "dead input" );
     p_sys->p_input = NULL;
@@ -455,6 +459,8 @@ static void LoopInput( playlist_t *p_playlist )
 
     input_Close( p_input );
     PL_LOCK;
+
+    return ok;
 }
 
 static bool Next( playlist_t *p_playlist )
@@ -492,7 +498,19 @@ static void *Thread ( void *data )
         /* Playlist in running state */
         while( !p_sys->killed && Next( p_playlist ) )
         {
-            LoopInput( p_playlist );
+            bool ok = LoopInput( p_playlist );
+            if (ok)
+                p_sys->i_consecutive_errors = 0;
+            else
+            {
+                if (p_sys->i_consecutive_errors < 6)
+                    p_sys->i_consecutive_errors++;
+
+                int slowdown = 1 << p_sys->i_consecutive_errors;
+                /* 100ms, 200ms, 400ms, 800ms, 1.6s, 3.2s */
+                mtime_t deadline = mdate() + slowdown * 100000L; /* usecs */
+                vlc_cond_timedwait(&p_sys->signal, &p_sys->lock, deadline);
+            }
             played = true;
         }
 

@@ -87,6 +87,7 @@ typedef struct playlist_private_t
 
     int      i_last_playlist_id; /**< Last id to an item */
     bool     b_reset_currently_playing; /** Reset current item array */
+    unsigned i_consecutive_errors; /**< Number of consecutive items in error */
 
     bool     b_tree; /**< Display as a tree */
     bool     b_preparse; /**< Preparse items */
