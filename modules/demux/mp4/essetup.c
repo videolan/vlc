@@ -1309,7 +1309,7 @@ int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             else
                 p_track->fmt.i_codec = VLC_CODEC_TX3G;
 
-            if( GetDWBE(p_text->p_data) & 0xC0000000 )
+            if( p_text->i_data > 4 && GetDWBE(p_text->p_data) & 0xC0000000 )
             {
                 p_track->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1;
                 p_track->b_forced_spu = true;
