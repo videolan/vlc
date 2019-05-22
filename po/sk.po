@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-19 19:29+0200\n"
+"PO-Revision-Date: 2019-05-22 19:46+0200\n"
 "Last-Translator: Marián Hikaník <podnety@mojepreklady.net>, 2019\n"
 "Language-Team: Slovak (https://www.transifex.com/yaron/teams/16553/sk/)\n"
 "Language: sk\n"
@@ -22031,7 +22031,7 @@ msgstr "Otvoriť súbor so vzhľadom...."
 #: modules/hw/d3d11/d3d11_filters.c:86 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
 msgid "Brightness threshold"
-msgstr "Dodržiavať hranicu jasu"
+msgstr "Hranica jasu"
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:69
 #: modules/video_filter/adjust.c:62
