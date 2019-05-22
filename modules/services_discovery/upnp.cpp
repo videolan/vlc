@@ -1546,7 +1546,7 @@ done:
 #include <TargetConditionals.h>
 #endif
 
-#if defined(TARGET_OS_MAC) && TARGET_OS_MAC
+#if defined(TARGET_OS_OSX) && TARGET_OS_OSX
 #include <CoreFoundation/CoreFoundation.h>
 #include <SystemConfiguration/SystemConfiguration.h>
 #include "vlc_charset.h"
