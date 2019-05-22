@@ -165,7 +165,7 @@ const char *psz_meta_roots[] = { "/moov/udta/meta/ilst",
  * Declaration of local function
  *****************************************************************************/
 static void MP4_TrackSetup( demux_t *, mp4_track_t *, MP4_Box_t  *, bool, bool );
-static void MP4_TrackInit( mp4_track_t * );
+static void MP4_TrackInit( mp4_track_t *, const MP4_Box_t * );
 static void MP4_TrackClean( es_out_t *, mp4_track_t * );
 
 static void MP4_Block_Send( demux_t *, mp4_track_t *, block_t * );
@@ -491,7 +491,10 @@ static int CreateTracks( demux_t *p_demux, unsigned i_tracks )
     p_sys->i_tracks = i_tracks;
 
     for( unsigned i=0; i<i_tracks; i++ )
-        MP4_TrackInit( &p_sys->track[i] );
+    {
+        MP4_TrackInit( &p_sys->track[i],
+                       MP4_BoxGet( p_sys->p_root, "/moov/trak[%d]", i ) );
+    }
 
     return VLC_SUCCESS;
 }
@@ -3362,8 +3365,6 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
     p_track->b_enable =
         ( ( BOXDATA(p_tkhd)->i_flags&MP4_TRACK_ENABLED ) != 0 );
 
-    p_track->i_track_ID = BOXDATA(p_tkhd)->i_track_ID;
-
     p_track->i_width = BOXDATA(p_tkhd)->i_width / BLOCK16x16;
     p_track->i_height = BOXDATA(p_tkhd)->i_height / BLOCK16x16;
     p_track->f_rotation = BOXDATA(p_tkhd)->f_rotation;
@@ -3656,11 +3657,15 @@ static void MP4_TrackClean( es_out_t *out, mp4_track_t *p_track )
     free( p_track->context.runs.p_array );
 }
 
-static void MP4_TrackInit( mp4_track_t *p_track )
+static void MP4_TrackInit( mp4_track_t *p_track, const MP4_Box_t *p_trackbox )
 {
     memset( p_track, 0, sizeof(mp4_track_t) );
     es_format_Init( &p_track->fmt, UNKNOWN_ES, 0 );
     p_track->i_timescale = 1;
+    p_track->p_track = p_trackbox;
+    const MP4_Box_t *p_tkhd = MP4_BoxGet( p_trackbox, "tkhd" );
+    if(likely(p_tkhd) && BOXDATA(p_tkhd))
+        p_track->i_track_ID = BOXDATA(p_tkhd)->i_track_ID;
 }
 
 static void MP4_TrackSelect( demux_t *p_demux, mp4_track_t *p_track, bool b_select )
