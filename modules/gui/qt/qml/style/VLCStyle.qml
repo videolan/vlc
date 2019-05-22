@@ -43,7 +43,7 @@ Item {
     property double margin_large: 24 * scale;
     property double margin_xlarge: 32 * scale;
 
-    property int fontSize_xsmall: fontMetrics_xxsmall.font.pixelSize
+    property int fontSize_xsmall: fontMetrics_xsmall.font.pixelSize
     property int fontSize_small:  fontMetrics_small.font.pixelSize
     property int fontSize_normal: fontMetrics_normal.font.pixelSize
     property int fontSize_large:  fontMetrics_large.font.pixelSize
@@ -51,7 +51,7 @@ Item {
     property int fontSize_xxlarge: fontMetrics_xxlarge.font.pixelSize
     property int fontSize_xxxlarge: fontMetrics_xxxlarge.font.pixelSize
 
-    property int fontHeight_xsmall: Math.ceil(fontMetrics_xxsmall.height)
+    property int fontHeight_xsmall: Math.ceil(fontMetrics_xsmall.height)
     property int fontHeight_small:  Math.ceil(fontMetrics_small.height)
     property int fontHeight_normal: Math.ceil(fontMetrics_normal.height)
     property int fontHeight_large:  Math.ceil(fontMetrics_large.height)

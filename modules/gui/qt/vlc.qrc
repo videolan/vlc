@@ -84,6 +84,8 @@
         <file alias="stream.svg">pixmaps/types/type_stream.svg</file>
         <file alias="node.svg">pixmaps/types/type_node.svg</file>
         <file alias="playlist.svg">pixmaps/types/type_playlist.svg</file>
+        <file alias="directory_black.svg">pixmaps/types/type_directory_black.svg</file>
+        <file alias="file_black.svg">pixmaps/types/file_black.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="update.svg">pixmaps/update.svg</file>

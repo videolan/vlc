@@ -491,12 +491,14 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/types/disc_16px.svg \
 	gui/qt/pixmaps/types/file-asym_16px.svg \
 	gui/qt/pixmaps/types/file-wide_16px.svg \
+	gui/qt/pixmaps/types/file_black.svg \
 	gui/qt/pixmaps/types/folder-blue_16px.svg \
 	gui/qt/pixmaps/types/folder-grey_16px.svg \
 	gui/qt/pixmaps/types/harddisk_16px.svg \
 	gui/qt/pixmaps/types/network_16px.svg \
 	gui/qt/pixmaps/types/tape_16px.svg \
 	gui/qt/pixmaps/types/type_directory.svg \
+	gui/qt/pixmaps/types/type_directory_black.svg \
 	gui/qt/pixmaps/types/type_file.svg \
 	gui/qt/pixmaps/types/type_stream.svg \
 	gui/qt/pixmaps/types/type_node.svg \

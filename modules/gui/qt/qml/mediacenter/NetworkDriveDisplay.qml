@@ -38,11 +38,11 @@ Utils.ListItem {
     cover: Image {
         id: cover_obj
         fillMode: Image.PreserveAspectFit
-        source: model.type == MLNetworkModel.TYPE_SHARE ?
-            "qrc:///type/network.svg" : "qrc:///type/directory.svg";
+        source: "qrc:///type/directory_black.svg";
     }
     line1: model.name || qsTr("Unknown share")
     line2: model.mrl
+    imageText: model.type === MLNetworkModel.TYPE_SHARE ? model.protocol : ""
 
     onItemClicked : {
         delegateModel.updateSelection( modifier, view.currentIndex, index )

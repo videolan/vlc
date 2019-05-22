@@ -35,7 +35,7 @@ Utils.ListItem {
     cover: Image {
         id: cover_obj
         fillMode: Image.PreserveAspectFit
-        source: "qrc:///type/file-asym.svg"
+        source: "qrc:///type/file_black.svg"
     }
     line1: model.name || qsTr("Unknown share")
     line2: model.mrl

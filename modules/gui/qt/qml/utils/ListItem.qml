@@ -33,6 +33,7 @@ NavigableFocusScope {
     property Component cover: Item {}
     property alias line1: line1_text.text
     property alias line2: line2_text.text
+    property alias imageText: cover_text.text
 
     property alias color: linerect.color
 
@@ -89,10 +90,19 @@ NavigableFocusScope {
         RowLayout {
             anchors.fill: parent
 
-            Loader {
+            Item {
                 Layout.preferredWidth: VLCStyle.icon_normal
                 Layout.preferredHeight: VLCStyle.icon_normal
-                sourceComponent: root.cover
+                Loader {
+                    anchors.fill: parent
+                    sourceComponent: root.cover
+                }
+                Text {
+                    id: cover_text
+                    anchors.centerIn: parent
+                    color: VLCStyle.colors.lightText
+                    font.pixelSize: VLCStyle.fontSize_xsmall
+                }
             }
             FocusScope {
                 id: presentation
@@ -107,7 +117,7 @@ NavigableFocusScope {
                         verticalCenter: parent.verticalCenter
                     }
 
-                    Text{
+                    Text {
                         id: line1_text
                         width: parent.width
 
@@ -116,12 +126,11 @@ NavigableFocusScope {
                         font.pixelSize: VLCStyle.fontSize_normal
                         enabled: text !== ""
                     }
-                    Text{
+                    Text {
                         id: line2_text
                         width: parent.width
-                        text: ""
                         elide: Text.ElideRight
-                        color: VLCStyle.colors.text
+                        color: VLCStyle.colors.lightText
                         font.pixelSize: VLCStyle.fontSize_small
                         visible: text !== ""
                         enabled: text !== ""
