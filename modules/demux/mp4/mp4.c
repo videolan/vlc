@@ -251,7 +251,7 @@ static uint32_t stream_ReadU32( stream_t *s, void *p_read, uint32_t i_toread )
 
 static inline bool MP4_isMetadata(const mp4_track_t *tk)
 {
-    return tk->as_reftype != 0;
+    return tk->as_reftype != 0 && tk->as_reftype != ATOM_subt;
 }
 
 static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id )
