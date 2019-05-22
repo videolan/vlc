@@ -123,9 +123,6 @@ typedef struct
     } context;
 
     /* */
-    MP4_Box_t    *p_tref_chap;
-
-    /* */
     bool seekpoint_changed;
     int          i_seekpoint;
     input_title_t *p_title;
@@ -984,9 +981,8 @@ static int Open( vlc_object_t * p_this )
     if( CreateTracks( p_demux, i_tracks ) != VLC_SUCCESS )
         goto error;
 
-    /* Search the first chap reference (like quicktime) and
+    /* set referenced tracks and
      * check that at least 1 stream is enabled */
-    p_sys->p_tref_chap = NULL;
     b_enabled_es = false;
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
@@ -1015,10 +1011,6 @@ static int Open( vlc_object_t * p_this )
                 if(reftk)
                     reftk->as_reftype = p_refbox->i_type;
             }
-
-            /* Point chapter shortcut */
-            if( p_refbox->i_type == ATOM_chap && !p_sys->p_tref_chap )
-                p_sys->p_tref_chap = p_refbox;
         }
     }
 
@@ -2409,24 +2401,16 @@ static void LoadChapter( demux_t  *p_demux )
     {
         LoadChapterGoPro( p_demux, p_hmmt );
     }
-    else if( p_sys->p_tref_chap )
+    else
     {
-        MP4_Box_data_trak_reference_t *p_chap = p_sys->p_tref_chap->data.p_track_reference;
-        unsigned int i, j;
-
         /* Load the first subtitle track like quicktime */
-        for( i = 0; i < p_chap->i_entry_count; i++ )
+        for( unsigned i = 0; i < p_sys->i_tracks; i++ )
         {
-            for( j = 0; j < p_sys->i_tracks; j++ )
+            mp4_track_t *tk = &p_sys->track[i];
+            if(tk->b_ok && tk->as_reftype == ATOM_chap &&
+               tk->fmt.i_cat == SPU_ES && tk->fmt.i_codec == VLC_CODEC_TX3G)
             {
-                mp4_track_t *tk = &p_sys->track[j];
-                if( tk->b_ok && tk->i_track_ID == p_chap->i_track_ID[i] &&
-                    tk->fmt.i_cat == SPU_ES && tk->fmt.i_codec == VLC_CODEC_TX3G )
-                    break;
-            }
-            if( j < p_sys->i_tracks )
-            {
-                LoadChapterApple( p_demux, &p_sys->track[j] );
+                LoadChapterApple( p_demux, tk );
                 break;
             }
         }
@@ -3556,23 +3540,10 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
     p_track->i_chunk  = 0;
     p_track->i_sample = 0;
 
-    /* Mark chapter only track */
-    if( p_sys->p_tref_chap )
-    {
-        MP4_Box_data_trak_reference_t *p_chap = p_sys->p_tref_chap->data.p_track_reference;
-        unsigned int i;
-
-        for( i = 0; i < p_chap->i_entry_count; i++ )
-        {
-            if( p_track->i_track_ID == p_chap->i_track_ID[i] &&
-                p_track->fmt.i_cat == UNKNOWN_ES )
-            {
-                p_track->as_reftype = ATOM_chap;
-                p_track->b_enable = false;
-                break;
-            }
-        }
-    }
+    /* Disable chapter only track */
+    if( p_track->fmt.i_cat == UNKNOWN_ES &&
+        p_track->as_reftype == ATOM_chap )
+        p_track->b_enable = false;
 
     const MP4_Box_t *p_tsel;
     /* now create es */
