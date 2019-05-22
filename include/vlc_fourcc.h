@@ -460,6 +460,7 @@
 #define VLC_CODEC_ALS                        VLC_FOURCC('a','l','s',' ')
 #define VLC_CODEC_A52                        VLC_FOURCC('a','5','2',' ')
 #define VLC_CODEC_EAC3                       VLC_FOURCC('e','a','c','3')
+#define VLC_CODEC_AC4                        VLC_FOURCC('a','c','-','4')
 #define VLC_CODEC_DTS                        VLC_FOURCC('d','t','s',' ')
 /* Only used by outputs and filters */
 #define VLC_CODEC_DTSHD                      VLC_FOURCC('d','t','s','h')
