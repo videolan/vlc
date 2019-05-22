@@ -644,6 +644,7 @@ static block_t * MP4_Block_Convert( demux_t *p_demux, const mp4_track_t *p_track
         {
             case VLC_CODEC_WEBVTT:
             case VLC_CODEC_TTML:
+            case VLC_CODEC_QTXT:
             case VLC_CODEC_TX3G:
             case VLC_CODEC_SPU:
             case VLC_CODEC_SUBT:
