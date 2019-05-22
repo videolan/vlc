@@ -651,6 +651,7 @@ static block_t * MP4_Block_Convert( demux_t *p_demux, const mp4_track_t *p_track
             /* accept as-is */
             break;
             case VLC_CODEC_CEA608:
+            case VLC_CODEC_CEA708:
                 p_block = MP4_EIA608_Convert( p_block );
             break;
         default:
