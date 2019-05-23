@@ -76,7 +76,6 @@ ifdef HAVE_NACL
 endif
 
 .gnutls: gnutls
-	$(RECONF)
 	cd $< && $(GNUTLS_ENV) ./configure $(GNUTLS_CONF)
 	cd $< && $(MAKE) -C gl install
 	cd $< && $(MAKE) -C lib install
