@@ -123,7 +123,7 @@ static struct {
     { "sk",    "Slovensky" },
     { "sl",    "slovenščina" },
     { "es",    "Español" },
-    { "es",    "Español Mexicano" },
+    { "es_MX", "Español Mexicano" },
     { "sv",    "Svenska" },
     { "th",    "ภาษาไทย" },
     { "tr",    "Türkçe" },
