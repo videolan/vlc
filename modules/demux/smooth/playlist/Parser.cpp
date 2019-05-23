@@ -272,6 +272,12 @@ Manifest * ManifestParser::parse()
         manifest->duration.Set(manifest->getTimescale().ToTime(time));
     }
 
+    if(root->hasAttribute("DVRWindowLength"))
+    {
+        stime_t time = Integer<stime_t>(root->getAttributeValue("DVRWindowLength"));
+        manifest->timeShiftBufferDepth.Set(manifest->getTimescale().ToTime(time));
+    }
+
     if(root->hasAttribute("IsLive") && root->getAttributeValue("IsLive") == "TRUE")
         manifest->b_live = true;
 
