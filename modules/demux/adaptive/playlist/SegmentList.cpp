@@ -118,9 +118,6 @@ void SegmentList::pruneBySegmentNumber(uint64_t tobelownum)
         if(seg->getSequenceNumber() >= tobelownum)
             break;
 
-        if(seg->chunksuse.Get()) /* can't prune from here, still in use */
-            break;
-
         delete *it;
         it = segments.erase(it);
     }
