@@ -123,9 +123,9 @@ void CloseIntf (vlc_object_t *p_this)
         msg_Dbg(p_this, "Closing macosx interface");
         [[VLCMain sharedInstance] applicationWillTerminate:nil];
         [VLCMain killInstance];
-
-        p_interface_thread = nil;
     }
+
+    p_interface_thread = nil;
 }
 
 #pragma mark -
