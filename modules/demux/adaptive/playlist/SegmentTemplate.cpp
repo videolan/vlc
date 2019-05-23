@@ -109,7 +109,7 @@ Timescale MediaSegmentTemplate::inheritTimescale() const
             ulevel->mediaSegmentTemplate->getTimescale().isValid() )
             return ulevel->mediaSegmentTemplate->getTimescale();
         if( ulevel->getTimescale().isValid() )
-            return ulevel->mediaSegmentTemplate->getTimescale();
+            return ulevel->getTimescale();
     }
     return Timescale(1);
 }
