@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-21 05:06+0200\n"
+"PO-Revision-Date: 2019-05-23 14:55+0200\n"
 "Last-Translator: Mattias Põldaru <mahfiaz@gmail.com>, 2019\n"
 "Language-Team: Estonian (https://www.transifex.com/yaron/teams/16553/et/)\n"
 "Language: et\n"
@@ -17162,7 +17162,7 @@ msgstr "Laiendatud M3U"
 
 #: modules/gui/macosx/VLCMainMenu.m:1160
 msgid "XML Shareable Playlist Format (XSPF)"
-msgstr "XML Shareable Playlist Format (XSPF)"
+msgstr "XML jagatav esitusloend (XSPF)"
 
 #: modules/gui/macosx/VLCMainMenu.m:1161
 #: modules/gui/qt/dialogs_provider.cpp:655
@@ -21085,11 +21085,11 @@ msgstr "Rüü failid |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
-msgstr ""
+msgstr "Esitusloendi failid |"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
-msgstr ""
+msgstr "|Kõik failid |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -21101,7 +21101,7 @@ msgstr "Salvesta esitusloend"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr ""
+msgstr "XSPF esitusloend |*.xspf|M3U fail |*.m3u|HTML esitusloend |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
