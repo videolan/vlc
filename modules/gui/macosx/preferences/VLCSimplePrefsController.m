@@ -110,7 +110,7 @@ static struct {
     { "sk",    "Slovensky",             NO },
     { "sl",    "slovenščina",           NO },
     { "es",    "Español",               NO },
-    { "es",    "Español Mexicano",      NO },
+    { "es_MX", "Español Mexicano",      NO },
     { "sv",    "Svenska",               NO },
     { "th",    "ภาษาไทย",               NO },
     { "tr",    "Türkçe",                NO },
