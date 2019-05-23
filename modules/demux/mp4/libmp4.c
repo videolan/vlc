@@ -5061,6 +5061,7 @@ static const struct
     { ATOM_gsst,    MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_gstd,    MP4_ReadBox_Metadata,    ATOM_ilst },
     { ATOM_ITUN,    MP4_ReadBox_Metadata,    ATOM_ilst }, /* iTunesInfo */
+    { ATOM_purl,    MP4_ReadBox_Metadata,    ATOM_ilst },
 
     /* udta */
     { ATOM_0x40PRM, MP4_ReadBox_Binary,    ATOM_udta },

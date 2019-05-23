@@ -408,6 +408,7 @@ typedef int64_t stime_t;
 #define ATOM_CoLL VLC_FOURCC( 'C', 'o', 'L', 'L' )
 #define ATOM_mdcv VLC_FOURCC( 'm', 'd', 'c', 'v' )
 #define ATOM_clli VLC_FOURCC( 'c', 'l', 'l', 'i' )
+#define ATOM_purl VLC_FOURCC( 'p', 'u', 'r', 'l' )
 
 #define ATOM_0x40PRM VLC_FOURCC( '@', 'P', 'R', 'M' )
 #define ATOM_0x40PRQ VLC_FOURCC( '@', 'P', 'R', 'Q' )

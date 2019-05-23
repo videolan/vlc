@@ -108,6 +108,7 @@ static const struct
     { ATOM_gssd,    "YouTube Source Data" },
     { ATOM_gsst,    "YouTube Start Time" },
     { ATOM_gstd,    "YouTube Track Duration" },
+    { ATOM_purl,    "Podcast URL" },
 };
 
 static const struct
