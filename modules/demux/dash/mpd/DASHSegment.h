@@ -26,6 +26,7 @@
 #define DASHSEGMENT_H_
 
 #include "../adaptive/playlist/Segment.h"
+#include "../adaptive/playlist/SegmentChunk.hpp"
 
 namespace dash
 {
@@ -34,13 +35,20 @@ namespace dash
         using namespace adaptive::playlist;
         using namespace adaptive::http;
 
+        class DashIndexChunk : public SegmentChunk
+        {
+            public:
+                DashIndexChunk(AbstractChunkSource *, BaseRepresentation *);
+                ~DashIndexChunk();
+                virtual void onDownload(block_t **); /* reimpl */
+        };
+
         class DashIndexSegment : public IndexSegment
         {
             public:
                 DashIndexSegment( ICanonicalUrl *parent );
-
-            protected:
-                virtual void onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *); //reimpl
+                ~DashIndexSegment();
+                virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *); /* reimpl */
         };
 
     }

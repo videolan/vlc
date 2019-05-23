@@ -30,17 +30,41 @@
 using namespace smooth::playlist;
 using namespace smooth::mp4;
 
+SmoothSegmentChunk::SmoothSegmentChunk(AbstractChunkSource *source, BaseRepresentation *rep)
+    : SegmentChunk(source, rep)
+{
+
+}
+
+SmoothSegmentChunk::~SmoothSegmentChunk()
+{
+
+}
+
+void SmoothSegmentChunk::onDownload(block_t **pp_block)
+{
+    decrypt(pp_block);
+
+    if(!rep || ((*pp_block)->i_flags & BLOCK_FLAG_HEADER) == 0)
+        return;
+
+    IndexReader br(rep->getPlaylist()->getVLCObject());
+    br.parseIndex(*pp_block, rep);
+}
+
 SmoothSegment::SmoothSegment(SegmentInformation *parent) :
     MediaSegmentTemplate( parent )
 {
 
 }
 
-void SmoothSegment::onChunkDownload(block_t **pp_block, SegmentChunk *, BaseRepresentation *rep)
+SmoothSegment::~SmoothSegment()
 {
-    if(!rep || ((*pp_block)->i_flags & BLOCK_FLAG_HEADER) == 0)
-        return;
 
-    IndexReader br(rep->getPlaylist()->getVLCObject());
-    br.parseIndex(*pp_block, rep);
+}
+
+SegmentChunk* SmoothSegment::createChunk(AbstractChunkSource *source, BaseRepresentation *rep)
+{
+     /* act as factory */
+    return new (std::nothrow) SmoothSegmentChunk(source, rep);
 }

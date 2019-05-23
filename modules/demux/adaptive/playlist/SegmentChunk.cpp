@@ -34,21 +34,15 @@ using namespace adaptive::playlist;
 using namespace adaptive::encryption;
 using namespace adaptive;
 
-SegmentChunk::SegmentChunk(ISegment *segment_, AbstractChunkSource *source,
-                           BaseRepresentation *rep_) :
+SegmentChunk::SegmentChunk(AbstractChunkSource *source, BaseRepresentation *rep_) :
     AbstractChunk(source)
 {
-    segment = segment_;
-    segment->chunksuse.Set(segment->chunksuse.Get() + 1);
     rep = rep_;
-    discontinuity = segment_->discontinuity;
     encryptionSession = NULL;
 }
 
 SegmentChunk::~SegmentChunk()
 {
-    assert(segment->chunksuse.Get() > 0);
-    segment->chunksuse.Set(segment->chunksuse.Get() - 1);
     delete encryptionSession;
 }
 
@@ -71,7 +65,6 @@ bool SegmentChunk::decrypt(block_t **pp_block)
 void SegmentChunk::onDownload(block_t **pp_block)
 {
     decrypt(pp_block);
-    segment->onChunkDownload(pp_block, this, rep);
 }
 
 StreamFormat SegmentChunk::getStreamFormat() const

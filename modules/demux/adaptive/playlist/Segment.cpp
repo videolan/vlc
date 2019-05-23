@@ -51,7 +51,6 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     classId = CLASSID_ISEGMENT;
     startTime.Set(0);
     duration.Set(0);
-    chunksuse.Set(0);
     sequence = SEQUENCE_INVALID;
     templated = false;
     discontinuity = false;
@@ -59,12 +58,6 @@ ISegment::ISegment(const ICanonicalUrl *parent):
 
 ISegment::~ISegment()
 {
-    assert(chunksuse.Get() == 0);
-}
-
-void ISegment::onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *)
-{
-
 }
 
 bool ISegment::prepareChunk(SharedResources *res, SegmentChunk *chunk, BaseRepresentation *rep)
@@ -96,9 +89,10 @@ SegmentChunk* ISegment::toChunk(SharedResources *res, AbstractConnectionManager 
         if(startByte != endByte)
             source->setBytesRange(BytesRange(startByte, endByte));
 
-        SegmentChunk *chunk = new (std::nothrow) SegmentChunk(this, source, rep);
+        SegmentChunk *chunk = createChunk(source, rep);
         if(chunk)
         {
+            chunk->discontinuity = discontinuity;
             if(!prepareChunk(res, chunk, rep))
             {
                 delete chunk;
@@ -203,6 +197,12 @@ Segment::Segment(ICanonicalUrl *parent) :
     classId = CLASSID_SEGMENT;
 }
 
+SegmentChunk* Segment::createChunk(AbstractChunkSource *source, BaseRepresentation *rep)
+{
+     /* act as factory */
+    return new (std::nothrow) SegmentChunk(source, rep);
+}
+
 void Segment::addSubSegment(SubSegment *subsegment)
 {
     if(!subsegments.empty())
@@ -296,6 +296,12 @@ SubSegment::SubSegment(ISegment *main, size_t start, size_t end) :
     setByteRange(start, end);
     debugName = "SubSegment";
     classId = CLASSID_SUBSEGMENT;
+}
+
+SegmentChunk* SubSegment::createChunk(AbstractChunkSource *source, BaseRepresentation *rep)
+{
+     /* act as factory */
+    return new (std::nothrow) SegmentChunk(source, rep);
 }
 
 Url SubSegment::getUrlSegment() const

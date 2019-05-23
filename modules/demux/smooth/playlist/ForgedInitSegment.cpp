@@ -327,7 +327,7 @@ SegmentChunk* ForgedInitSegment::toChunk(SharedResources *, AbstractConnectionMa
         MemoryChunkSource *source = new (std::nothrow) MemoryChunkSource(moov);
         if( source )
         {
-            SegmentChunk *chunk = new (std::nothrow) SegmentChunk(this, source, rep);
+            SegmentChunk *chunk = new (std::nothrow) SegmentChunk(source, rep);
             if( chunk )
                 return chunk;
             else

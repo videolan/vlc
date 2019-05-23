@@ -64,6 +64,7 @@ namespace adaptive
                  */
                 virtual SegmentChunk*                   toChunk         (SharedResources *, AbstractConnectionManager *,
                                                                          size_t, BaseRepresentation *);
+                virtual SegmentChunk*                   createChunk     (AbstractChunkSource *, BaseRepresentation *) = 0;
                 virtual void                            setByteRange    (size_t start, size_t end);
                 virtual void                            setSequenceNumber(uint64_t);
                 virtual uint64_t                        getSequenceNumber() const;
@@ -78,14 +79,9 @@ namespace adaptive
                 int                                     getClassId      () const;
                 Property<stime_t>       startTime;
                 Property<stime_t>       duration;
-                Property<unsigned>      chunksuse;
                 bool                    discontinuity;
 
                 static const int CLASSID_ISEGMENT = 0;
-                /* callbacks */
-                virtual void                            onChunkDownload (block_t **,
-                                                                         SegmentChunk *,
-                                                                         BaseRepresentation *);
 
             protected:
                 virtual bool                            prepareChunk    (SharedResources *,
@@ -107,6 +103,7 @@ namespace adaptive
             public:
                 Segment( ICanonicalUrl *parent );
                 ~Segment();
+                virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *); /* impl */
                 virtual void setSourceUrl( const std::string &url );
                 virtual Url getUrlSegment() const; /* impl */
                 virtual std::vector<ISegment*> subSegments();
@@ -138,6 +135,7 @@ namespace adaptive
         {
             public:
                 SubSegment(ISegment *, size_t start, size_t end);
+                virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *); /* impl */
                 virtual Url getUrlSegment() const; /* impl */
                 virtual std::vector<ISegment*> subSegments();
                 virtual void addSubSegment(SubSegment *);

@@ -30,22 +30,45 @@
 #include "../adaptive/playlist/BaseRepresentation.h"
 #include "../mp4/IndexReader.hpp"
 #include "../adaptive/playlist/AbstractPlaylist.hpp"
-#include "../adaptive/playlist/SegmentChunk.hpp"
 
 using namespace adaptive::playlist;
 using namespace dash::mpd;
 using namespace dash::mp4;
+
+DashIndexChunk::DashIndexChunk(AbstractChunkSource *source, BaseRepresentation *rep)
+    : SegmentChunk(source, rep)
+{
+
+}
+
+DashIndexChunk::~DashIndexChunk()
+{
+
+}
+
+void DashIndexChunk::onDownload(block_t **pp_block)
+{
+    decrypt(pp_block);
+
+    if(!rep || ((*pp_block)->i_flags & BLOCK_FLAG_HEADER) == 0 )
+        return;
+
+    IndexReader br(rep->getPlaylist()->getVLCObject());
+    br.parseIndex(*pp_block, rep, getStartByteInFile());
+}
 
 DashIndexSegment::DashIndexSegment(ICanonicalUrl *parent) :
     IndexSegment(parent)
 {
 }
 
-void DashIndexSegment::onChunkDownload(block_t **pp_block, SegmentChunk *p_chunk, BaseRepresentation *rep)
+DashIndexSegment::~DashIndexSegment()
 {
-    if(!rep || ((*pp_block)->i_flags & BLOCK_FLAG_HEADER) == 0 )
-        return;
 
-    IndexReader br(rep->getPlaylist()->getVLCObject());
-    br.parseIndex(*pp_block, rep, p_chunk->getStartByteInFile());
+}
+
+SegmentChunk* DashIndexSegment::createChunk(AbstractChunkSource *source, BaseRepresentation *rep)
+{
+     /* act as factory */
+    return new (std::nothrow) DashIndexChunk(source, rep);
 }

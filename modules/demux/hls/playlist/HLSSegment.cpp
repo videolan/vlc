@@ -22,7 +22,6 @@
 #endif
 
 #include "HLSSegment.hpp"
-#include "../adaptive/playlist/SegmentChunk.hpp"
 #include "../adaptive/playlist/BaseRepresentation.h"
 
 
