@@ -49,9 +49,11 @@ namespace adaptive
                 void                    pruneByPlaybackTime(vlc_tick_t);
                 bool                    getSegmentNumberByScaledTime(stime_t, uint64_t *) const;
                 bool                    getPlaybackTimeDurationBySegmentNumber(uint64_t, vlc_tick_t *, vlc_tick_t *) const;
+                stime_t                 getTotalLength() const;
 
             private:
                 std::vector<ISegment *>  segments;
+                stime_t totalLength;
         };
     }
 }

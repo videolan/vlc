@@ -34,6 +34,7 @@ using namespace adaptive::playlist;
 SegmentList::SegmentList( SegmentInformation *parent ):
     SegmentInfoCommon( parent ), TimescaleAble( parent )
 {
+    totalLength = 0;
 }
 SegmentList::~SegmentList()
 {
@@ -69,6 +70,7 @@ void SegmentList::addSegment(ISegment *seg)
 {
     seg->setParent(this);
     segments.push_back(seg);
+    totalLength += seg->duration.Get();
 }
 
 void SegmentList::mergeWith(SegmentList *updated, bool b_restamp)
@@ -118,6 +120,7 @@ void SegmentList::pruneBySegmentNumber(uint64_t tobelownum)
         if(seg->getSequenceNumber() >= tobelownum)
             break;
 
+        totalLength -= (*it)->duration.Get();
         delete *it;
         it = segments.erase(it);
     }
@@ -178,4 +181,9 @@ bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     *time = VLC_TICK_0 + timescale.ToTime(seg_start);
     *dur = VLC_TICK_0 + timescale.ToTime(seg_dura);
     return true;
+}
+
+stime_t SegmentList::getTotalLength() const
+{
+    return totalLength;
 }

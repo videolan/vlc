@@ -44,6 +44,7 @@ namespace adaptive
                 bool    getScaledPlaybackTimeDurationBySegmentNumber(uint64_t, stime_t *, stime_t *) const;
                 stime_t getScaledPlaybackTimeByElementNumber(uint64_t) const;
                 stime_t getMinAheadScaledTime(uint64_t) const;
+                stime_t getTotalLength() const;
                 uint64_t maxElementNumber() const;
                 uint64_t minElementNumber() const;
                 void pruneByPlaybackTime(vlc_tick_t);
@@ -53,6 +54,7 @@ namespace adaptive
 
             private:
                 std::list<Element *> elements;
+                stime_t totalLength;
 
                 class Element
                 {
