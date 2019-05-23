@@ -33,6 +33,7 @@ using namespace adaptive::playlist;
 SegmentTimeline::SegmentTimeline(TimescaleAble *parent)
     :TimescaleAble(parent)
 {
+    totalLength = 0;
 }
 
 SegmentTimeline::SegmentTimeline(uint64_t scale)
@@ -59,6 +60,7 @@ void SegmentTimeline::addElement(uint64_t number, stime_t d, uint64_t r, stime_t
             element->t = el->t + (el->d * (el->r + 1));
         }
         elements.push_back(element);
+        totalLength += (d * (r + 1));
     }
 }
 
@@ -158,6 +160,11 @@ stime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) c
     return time;
 }
 
+stime_t SegmentTimeline::getTotalLength() const
+{
+    return totalLength;
+}
+
 uint64_t SegmentTimeline::maxElementNumber() const
 {
     if(elements.empty())
@@ -204,6 +211,7 @@ size_t SegmentTimeline::pruneBySequenceNumber(uint64_t number)
         {
             prunednow += el->r + 1;
             elements.pop_front();
+            totalLength -= (el->d * (el->r + 1));
             delete el;
         }
     }
@@ -232,7 +240,9 @@ void SegmentTimeline::mergeWith(SegmentTimeline &other)
         if(last->contains(el->t)) /* Same element, but prev could have been middle of repeat */
         {
             const uint64_t count = (el->t - last->t) / last->d;
+            totalLength -= (last->d * (last->r + 1));
             last->r = std::max(last->r, el->r + count);
+            totalLength += (last->d * (last->r + 1));
             delete el;
         }
         else if(el->t < last->t)
@@ -241,6 +251,7 @@ void SegmentTimeline::mergeWith(SegmentTimeline &other)
         }
         else /* Did not exist in previous list */
         {
+            totalLength += (el->d * (el->r + 1));
             elements.push_back(el);
             el->number = last->number + last->r + 1;
             last = el;
