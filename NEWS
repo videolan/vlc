@@ -3,9 +3,11 @@ Changes between 3.0.6 and 3.0.7:
 
 Access:
  * Improve Blu-ray support
+ * Fix sftp module build with libssh >= 1.8.1
 
 Audio output:
  * Fix pass-through on Android-23
+ * Fix DirectSound drain
 
 Demux:
  * Improve MP4 support
@@ -25,7 +27,8 @@ macOS:
  * Fix video distortion on macOS Mojave
 
 Misc:
- * Update Youtube, Dailymotion, Vimeo scripts
+ * Update Youtube, Dailymotion, Vimeo, Soundcloud scripts
+ * Work around busy looping when playing an invalid item with loop enabled
 
 Translations:
  * Update of most translations
