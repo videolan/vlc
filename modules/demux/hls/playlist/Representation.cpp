@@ -137,7 +137,7 @@ bool Representation::needsUpdate() const
 }
 
 bool Representation::runLocalUpdates(SharedResources *res,
-                                     vlc_tick_t, uint64_t number, bool prune)
+                                     vlc_tick_t, uint64_t, bool)
 {
     const time_t now = time(NULL);
     AbstractPlaylist *playlist = getPlaylist();
@@ -146,9 +146,6 @@ bool Representation::runLocalUpdates(SharedResources *res,
         M3U8Parser parser(res);
         parser.appendSegmentsFromPlaylistURI(playlist->getVLCObject(), this);
         b_loaded = true;
-
-        if(prune)
-            pruneBySegmentNumber(number);
 
         return true;
     }

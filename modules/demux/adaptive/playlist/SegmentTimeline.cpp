@@ -204,7 +204,7 @@ size_t SegmentTimeline::pruneBySequenceNumber(uint64_t number)
     return prunednow;
 }
 
-void SegmentTimeline::mergeWith(SegmentTimeline &other)
+void SegmentTimeline::updateWith(SegmentTimeline &other)
 {
     if(elements.empty())
     {

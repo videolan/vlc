@@ -44,7 +44,7 @@ namespace adaptive
                 const std::vector<ISegment *>&   getSegments() const;
                 ISegment *              getSegmentByNumber(uint64_t);
                 void                    addSegment(ISegment *seg);
-                void                    mergeWith(SegmentList *, bool = false);
+                void                    updateWith(SegmentList *, bool = false);
                 void                    pruneBySegmentNumber(uint64_t);
                 void                    pruneByPlaybackTime(vlc_tick_t);
                 bool                    getSegmentNumberByScaledTime(stime_t, uint64_t *) const;

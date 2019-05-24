@@ -85,7 +85,7 @@ namespace adaptive
                 uint64_t getLiveSegmentNumberByTime(uint64_t, vlc_tick_t) const;
                 uint64_t getLiveStartSegmentNumber(uint64_t) const;
                 bool     getMediaPlaybackRange(vlc_tick_t *, vlc_tick_t *, vlc_tick_t *) const;
-                virtual void mergeWith(SegmentInformation *, vlc_tick_t);
+                virtual void updateWith(SegmentInformation *);
                 virtual void mergeWithTimeline(SegmentTimeline *); /* ! don't use with global merge */
                 virtual void pruneBySegmentNumber(uint64_t);
                 virtual void pruneByPlaybackTime(vlc_tick_t);
@@ -101,7 +101,7 @@ namespace adaptive
                 SegmentInformation *parent;
 
             public:
-                void appendSegmentList(SegmentList *, bool = false);
+                void updateSegmentList(SegmentList *, bool = false);
                 void setSegmentBase(SegmentBase *);
                 void setSegmentTemplate(MediaSegmentTemplate *);
                 virtual Url getUrlSegment() const; /* impl */

@@ -142,17 +142,12 @@ bool AbstractPlaylist::needsUpdates() const
     return b_needsUpdates;
 }
 
-void AbstractPlaylist::mergeWith(AbstractPlaylist *updatedAbstractPlaylist, vlc_tick_t prunebarrier)
+void AbstractPlaylist::updateWith(AbstractPlaylist *updatedAbstractPlaylist)
 {
     availabilityEndTime.Set(updatedAbstractPlaylist->availabilityEndTime.Get());
 
     for(size_t i = 0; i < periods.size() && i < updatedAbstractPlaylist->periods.size(); i++)
-        periods.at(i)->mergeWith(updatedAbstractPlaylist->periods.at(i), prunebarrier);
+        periods.at(i)->updateWith(updatedAbstractPlaylist->periods.at(i));
 }
 
-void AbstractPlaylist::pruneByPlaybackTime(vlc_tick_t time)
-{
-    for(size_t i = 0; i < periods.size(); i++)
-        periods.at(i)->pruneByPlaybackTime(time);
-}
 

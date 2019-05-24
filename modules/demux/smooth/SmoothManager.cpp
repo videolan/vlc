@@ -164,7 +164,7 @@ bool SmoothManager::updatePlaylist(bool forcemanifest)
         Manifest *newManifest = fetchManifest();
         if(newManifest)
         {
-            playlist->mergeWith(newManifest, 0);
+            playlist->updateWith(newManifest);
             delete newManifest;
 
 #ifdef NDEBUG

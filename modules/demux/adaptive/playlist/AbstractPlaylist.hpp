@@ -59,8 +59,7 @@ namespace adaptive
                 virtual BasePeriod*                      getNextPeriod(BasePeriod *period);
 
                 bool                needsUpdates() const;
-                void                mergeWith(AbstractPlaylist *, vlc_tick_t = 0);
-                void                pruneByPlaybackTime(vlc_tick_t);
+                void                updateWith(AbstractPlaylist *);
 
                 Property<vlc_tick_t>                   duration;
                 Property<time_t>                    playbackStart;

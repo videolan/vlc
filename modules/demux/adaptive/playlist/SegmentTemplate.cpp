@@ -64,19 +64,19 @@ MediaSegmentTemplate::~MediaSegmentTemplate()
     delete segmentTimeline;
 }
 
-void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, vlc_tick_t prunebarrier)
+void MediaSegmentTemplate::updateWith(MediaSegmentTemplate *updated)
 {
     SegmentTimeline *timeline = segmentTimeline;
     if(timeline && updated->segmentTimeline)
     {
-        timeline->mergeWith(*updated->segmentTimeline);
-        if(prunebarrier)
+        timeline->updateWith(*updated->segmentTimeline);
+        /*if(prunebarrier)
         {
             const Timescale timescale = timeline->inheritTimescale();
             const uint64_t number =
                     timeline->getElementNumberByScaledPlaybackTime(timescale.ToScaled(prunebarrier));
             timeline->pruneBySequenceNumber(number);
-        }
+        }*/
     }
 }
 

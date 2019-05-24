@@ -372,7 +372,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
         rep->getPlaylist()->duration.Set(totalduration);
     }
 
-    rep->appendSegmentList(segmentList, true);
+    rep->updateSegmentList(segmentList, true);
 }
 M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::string &playlisturl)
 {

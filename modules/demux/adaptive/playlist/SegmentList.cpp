@@ -73,10 +73,15 @@ void SegmentList::addSegment(ISegment *seg)
     totalLength += seg->duration.Get();
 }
 
-void SegmentList::mergeWith(SegmentList *updated, bool b_restamp)
+void SegmentList::updateWith(SegmentList *updated, bool b_restamp)
 {
     const ISegment * lastSegment = (segments.empty()) ? NULL : segments.back();
     const ISegment * prevSegment = lastSegment;
+
+    if(updated->segments.empty())
+        return;
+
+    uint64_t firstnumber = updated->segments.front()->getSequenceNumber();
 
     std::vector<ISegment *>::iterator it;
     for(it = updated->segments.begin(); it != updated->segments.end(); ++it)
@@ -100,6 +105,8 @@ void SegmentList::mergeWith(SegmentList *updated, bool b_restamp)
             delete cur;
     }
     updated->segments.clear();
+
+    pruneBySegmentNumber(firstnumber);
 }
 
 void SegmentList::pruneByPlaybackTime(vlc_tick_t time)
