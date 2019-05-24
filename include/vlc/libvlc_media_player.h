@@ -1758,7 +1758,7 @@ LIBVLC_API void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi,
  * Get an integer marquee option value
  *
  * \param p_mi libvlc media player
- * \param option marq option to get \see libvlc_video_marquee_int_option_t
+ * \param option marq option to get \see libvlc_video_marquee_option_t
  */
 LIBVLC_API int libvlc_video_get_marquee_int( libvlc_media_player_t *p_mi,
                                                  unsigned option );
@@ -1770,7 +1770,7 @@ LIBVLC_API int libvlc_video_get_marquee_int( libvlc_media_player_t *p_mi,
  * or disabling (arg 0) the marq filter.
  *
  * \param p_mi libvlc media player
- * \param option marq option to set \see libvlc_video_marquee_int_option_t
+ * \param option marq option to set \see libvlc_video_marquee_option_t
  * \param i_val marq option value
  */
 LIBVLC_API void libvlc_video_set_marquee_int( libvlc_media_player_t *p_mi,
@@ -1780,7 +1780,7 @@ LIBVLC_API void libvlc_video_set_marquee_int( libvlc_media_player_t *p_mi,
  * Set a marquee string option
  *
  * \param p_mi libvlc media player
- * \param option marq option to set \see libvlc_video_marquee_string_option_t
+ * \param option marq option to set \see libvlc_video_marquee_option_t
  * \param psz_text marq option value
  */
 LIBVLC_API void libvlc_video_set_marquee_string( libvlc_media_player_t *p_mi,
