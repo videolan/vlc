@@ -477,6 +477,7 @@ libvdummy_plugin_la_SOURCES = video_output/vdummy.c
 libvideo_splitter_plugin_la_SOURCES = video_output/splitter.c
 libvmem_plugin_la_SOURCES = video_output/vmem.c
 libwdummy_plugin_la_SOURCES = video_output/wdummy.c
+libwextern_plugin_la_SOURCES = video_output/wextern.c
 libyuv_plugin_la_SOURCES = video_output/yuv.c
 libvgl_plugin_la_SOURCES = video_output/vgl.c
 
@@ -486,5 +487,6 @@ vout_LTLIBRARIES += \
 	libvideo_splitter_plugin.la \
 	libvmem_plugin.la \
 	libwdummy_plugin.la \
+	libwextern_plugin.la \
 	libvgl_plugin.la \
 	libyuv_plugin.la
