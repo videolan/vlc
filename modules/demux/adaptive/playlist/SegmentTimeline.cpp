@@ -205,7 +205,7 @@ size_t SegmentTimeline::pruneBySequenceNumber(uint64_t number)
     return prunednow;
 }
 
-void SegmentTimeline::mergeWith(SegmentTimeline &other)
+void SegmentTimeline::updateWith(SegmentTimeline &other)
 {
     if(elements.empty())
     {
@@ -243,22 +243,6 @@ void SegmentTimeline::mergeWith(SegmentTimeline &other)
             last = el;
         }
     }
-}
-
-mtime_t SegmentTimeline::start() const
-{
-    if(elements.empty())
-        return 0;
-    return inheritTimescale().ToTime(elements.front()->t);
-}
-
-mtime_t SegmentTimeline::end() const
-{
-    if(elements.empty())
-        return 0;
-    const Element *last = elements.back();
-    stime_t scaled = last->t + last->d * (last->r + 1);
-    return inheritTimescale().ToTime(scaled);
 }
 
 void SegmentTimeline::debug(vlc_object_t *obj, int indent) const

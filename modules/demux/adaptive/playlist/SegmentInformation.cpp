@@ -542,14 +542,14 @@ SegmentInformation * SegmentInformation::getChildByID(const adaptive::ID &id)
     return NULL;
 }
 
-void SegmentInformation::mergeWith(SegmentInformation *updated, mtime_t prunetime)
+void SegmentInformation::updateWith(SegmentInformation *updated)
 {
     /* Support Segment List for now */
     if(segmentList && updated->segmentList)
-        segmentList->mergeWith(updated->segmentList);
+        segmentList->updateWith(updated->segmentList);
 
     if(mediaSegmentTemplate && updated->mediaSegmentTemplate)
-        mediaSegmentTemplate->mergeWith(updated->mediaSegmentTemplate, prunetime);
+        mediaSegmentTemplate->updateWith(updated->mediaSegmentTemplate);
 
     std::vector<SegmentInformation *>::const_iterator it;
     for(it=childs.begin(); it!=childs.end(); ++it)
@@ -557,7 +557,7 @@ void SegmentInformation::mergeWith(SegmentInformation *updated, mtime_t prunetim
         SegmentInformation *child = *it;
         SegmentInformation *updatedChild = updated->getChildByID(child->getID());
         if(updatedChild)
-            child->mergeWith(updatedChild, prunetime);
+            child->updateWith(updatedChild);
     }
     /* FIXME: handle difference */
 }
@@ -569,7 +569,7 @@ void SegmentInformation::mergeWithTimeline(SegmentTimeline *updated)
     {
         SegmentTimeline *timeline = templ->inheritSegmentTimeline();
         if(timeline)
-            timeline->mergeWith(*updated);
+            timeline->updateWith(*updated);
     }
 }
 
@@ -625,15 +625,16 @@ mtime_t SegmentInformation::getPeriodStart() const
         return 0;
 }
 
-void SegmentInformation::appendSegmentList(SegmentList *list, bool restamp)
+void SegmentInformation::updateSegmentList(SegmentList *list, bool restamp)
 {
-    if(segmentList)
+    if(segmentList && restamp)
     {
-        segmentList->mergeWith(list, restamp);
+        segmentList->updateWith(list, restamp);
         delete list;
     }
     else
     {
+        delete segmentList;
         segmentList = list;
     }
 }
@@ -649,7 +650,7 @@ void SegmentInformation::setSegmentTemplate(MediaSegmentTemplate *templ)
 {
     if(mediaSegmentTemplate)
     {
-        mediaSegmentTemplate->mergeWith(templ, 0);
+        mediaSegmentTemplate->updateWith(templ);
         delete templ;
     }
     else

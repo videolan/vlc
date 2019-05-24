@@ -126,21 +126,12 @@ bool DASHManager::updatePlaylist()
             return false;
         }
 
-        mtime_t minsegmentTime = 0;
-        std::vector<AbstractStream *>::iterator it;
-        for(it=streams.begin(); it!=streams.end(); it++)
-        {
-            mtime_t segmentTime = (*it)->getPlaybackTime();
-            if(!minsegmentTime || segmentTime < minsegmentTime)
-                minsegmentTime = segmentTime;
-        }
-
         IsoffMainParser mpdparser(parser.getRootNode(), VLC_OBJECT(p_demux),
                                   mpdstream, Helper::getDirectoryPath(url).append("/"));
         MPD *newmpd = mpdparser.parse();
         if(newmpd)
         {
-            playlist->mergeWith(newmpd, minsegmentTime);
+            playlist->updateWith(newmpd);
             delete newmpd;
         }
         vlc_stream_Delete(mpdstream);

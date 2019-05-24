@@ -50,9 +50,7 @@ namespace adaptive
                 uint64_t minElementNumber() const;
                 void pruneByPlaybackTime(mtime_t);
                 size_t pruneBySequenceNumber(uint64_t);
-                void mergeWith(SegmentTimeline &);
-                mtime_t start() const;
-                mtime_t end() const;
+                void updateWith(SegmentTimeline &);
                 void debug(vlc_object_t *, int = 0) const;
 
             private:

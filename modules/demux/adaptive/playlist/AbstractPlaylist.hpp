@@ -58,8 +58,8 @@ namespace adaptive
                 virtual BasePeriod*                      getFirstPeriod();
                 virtual BasePeriod*                      getNextPeriod(BasePeriod *period);
 
-                void                mergeWith(AbstractPlaylist *, mtime_t = 0);
-                void                pruneByPlaybackTime(mtime_t);
+                bool                needsUpdates() const;
+                void                updateWith(AbstractPlaylist *);
 
                 Property<mtime_t>                   duration;
                 Property<time_t>                    playbackStart;
@@ -77,6 +77,7 @@ namespace adaptive
                 std::string                         playlistUrl;
                 std::string                         type;
                 mtime_t                             minBufferTime;
+                bool                                b_needsUpdates;
         };
     }
 }

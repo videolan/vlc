@@ -54,7 +54,7 @@ namespace adaptive
                 virtual ~MediaSegmentTemplate();
                 void setStartNumber( uint64_t );
                 void setSegmentTimeline( SegmentTimeline * );
-                void mergeWith( MediaSegmentTemplate *, mtime_t );
+                void updateWith( MediaSegmentTemplate * );
                 virtual uint64_t getSequenceNumber() const; /* reimpl */
                 uint64_t getLiveTemplateNumber(mtime_t) const;
                 stime_t getMinAheadScaledTime(uint64_t) const;

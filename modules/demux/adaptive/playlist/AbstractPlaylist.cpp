@@ -46,6 +46,7 @@ AbstractPlaylist::AbstractPlaylist (vlc_object_t *p_object_) :
     minBufferTime = 0;
     timeShiftBufferDepth.Set( 0 );
     suggestedPresentationDelay.Set( 0 );
+    b_needsUpdates = true;
 }
 
 AbstractPlaylist::~AbstractPlaylist()
@@ -136,17 +137,16 @@ BasePeriod* AbstractPlaylist::getNextPeriod(BasePeriod *period)
     return NULL;
 }
 
-void AbstractPlaylist::mergeWith(AbstractPlaylist *updatedAbstractPlaylist, mtime_t prunebarrier)
+bool AbstractPlaylist::needsUpdates() const
+{
+    return b_needsUpdates;
+}
+
+void AbstractPlaylist::updateWith(AbstractPlaylist *updatedAbstractPlaylist)
 {
     availabilityEndTime.Set(updatedAbstractPlaylist->availabilityEndTime.Get());
 
     for(size_t i = 0; i < periods.size() && i < updatedAbstractPlaylist->periods.size(); i++)
-        periods.at(i)->mergeWith(updatedAbstractPlaylist->periods.at(i), prunebarrier);
-}
-
-void AbstractPlaylist::pruneByPlaybackTime(mtime_t time)
-{
-    for(size_t i = 0; i < periods.size(); i++)
-        periods.at(i)->pruneByPlaybackTime(time);
+        periods.at(i)->updateWith(updatedAbstractPlaylist->periods.at(i));
 }
 
