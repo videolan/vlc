@@ -28,7 +28,7 @@ namespace adaptive
 {
     namespace playlist
     {
-        class MediaSegmentTemplate;
+        class BaseSegmentTemplate;
         class BaseRepresentation;
 
         class Url
@@ -38,11 +38,11 @@ namespace adaptive
                 {
                     friend class Url;
                     public:
-                        Component(const std::string &, const MediaSegmentTemplate * = NULL);
+                        Component(const std::string &, const BaseSegmentTemplate * = NULL);
 
                     protected:
                         std::string component;
-                        const MediaSegmentTemplate *templ;
+                        const BaseSegmentTemplate *templ;
 
                     private:
                         bool b_scheme;
