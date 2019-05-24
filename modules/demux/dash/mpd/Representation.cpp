@@ -57,6 +57,8 @@ std::string Representation::contextualize(size_t number, const std::string &comp
                                           const BaseSegmentTemplate *basetempl) const
 {
     std::string str(component);
+    if(!basetempl)
+        return str;
 
     const MediaSegmentTemplate *templ = dynamic_cast<const MediaSegmentTemplate *>(basetempl);
 

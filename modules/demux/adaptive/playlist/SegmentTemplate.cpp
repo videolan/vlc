@@ -36,6 +36,15 @@ BaseSegmentTemplate::BaseSegmentTemplate( ICanonicalUrl *parent ) :
 {
 }
 
+BaseSegmentTemplate::~BaseSegmentTemplate()
+{
+
+}
+
+void BaseSegmentTemplate::setSourceUrl(const std::string &url)
+{
+    sourceUrl = Url(Url::Component(url, this));
+}
 
 MediaSegmentTemplate::MediaSegmentTemplate( SegmentInformation *parent ) :
     BaseSegmentTemplate( parent ),
@@ -170,11 +179,6 @@ stime_t MediaSegmentTemplate::getMinAheadScaledTime(uint64_t number) const
 uint64_t MediaSegmentTemplate::getSequenceNumber() const
 {
     return inheritStartNumber();
-}
-
-void MediaSegmentTemplate::setSourceUrl(const std::string &url)
-{
-    sourceUrl = Url(Url::Component(url, this));
 }
 
 void MediaSegmentTemplate::setStartNumber( uint64_t v )

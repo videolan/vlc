@@ -35,6 +35,7 @@ namespace adaptive
         class SegmentList;
         class SegmentTimeline;
         class SegmentTemplate;
+        class MediaSegmentTemplate;
         class AbstractPlaylist;
         class ISegment;
 

@@ -40,6 +40,8 @@ namespace adaptive
         {
             public:
                 BaseSegmentTemplate( ICanonicalUrl * = NULL );
+                virtual ~BaseSegmentTemplate();
+                virtual void setSourceUrl( const std::string &url ); /* reimpl */
         };
 
         class MediaSegmentTemplate : public BaseSegmentTemplate,
@@ -49,7 +51,6 @@ namespace adaptive
             public:
                 MediaSegmentTemplate( SegmentInformation * = NULL );
                 virtual ~MediaSegmentTemplate();
-                virtual void setSourceUrl( const std::string &url ); /* reimpl */
                 void setStartNumber( uint64_t );
                 void setSegmentTimeline( SegmentTimeline * );
                 void mergeWith( MediaSegmentTemplate *, vlc_tick_t );
