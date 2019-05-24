@@ -155,6 +155,8 @@ Utils.NavigableFocusScope {
         id: view
 
         anchors.fill: parent
+        anchors.margins: VLCStyle.margin_normal
+
         focus: true
 
         initialItem: medialib.gridView ? gridComponent : listComponent
