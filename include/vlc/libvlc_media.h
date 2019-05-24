@@ -833,6 +833,7 @@ typedef enum libvlc_thumbnailer_seek_speed_t
  * \param timeout A timeout value in ms, or 0 to disable timeout
  *
  * \return A valid opaque request object, or NULL in case of failure.
+ * It must be released by libvlc_media_thumbnail_cancel().
  *
  * \version libvlc 4.0 or later
  *
@@ -862,6 +863,7 @@ libvlc_media_thumbnail_request_by_time( libvlc_media_t *md,
  * \param timeout A timeout value in ms, or 0 to disable timeout
  *
  * \return A valid opaque request object, or NULL in case of failure.
+ * It must be released by libvlc_media_thumbnail_cancel().
  *
  * \version libvlc 4.0 or later
  *

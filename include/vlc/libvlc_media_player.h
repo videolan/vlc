@@ -172,6 +172,7 @@ typedef struct libvlc_equalizer_t libvlc_equalizer_t;
  * \param p_libvlc_instance the libvlc instance in which the Media Player
  *        should be created.
  * \return a new media player object, or NULL on error.
+ * It must be released by libvlc_media_player_release().
  */
 LIBVLC_API libvlc_media_player_t * libvlc_media_player_new( libvlc_instance_t *p_libvlc_instance );
 
@@ -181,6 +182,7 @@ LIBVLC_API libvlc_media_player_t * libvlc_media_player_new( libvlc_instance_t *p
  * \param p_md the media. Afterwards the p_md can be safely
  *        destroyed.
  * \return a new media player object, or NULL on error.
+ * It must be released by libvlc_media_player_release().
  */
 LIBVLC_API libvlc_media_player_t * libvlc_media_player_new_from_media( libvlc_media_t *p_md );
 
@@ -2269,6 +2271,7 @@ LIBVLC_API libvlc_equalizer_t *libvlc_audio_equalizer_new( void );
  *
  * \param u_index index of the preset, counting from zero
  * \return opaque equalizer handle, or NULL on error
+ *         (it must be released with libvlc_audio_equalizer_release())
  * \version LibVLC 2.2.0 or later
  */
 LIBVLC_API libvlc_equalizer_t *libvlc_audio_equalizer_new_from_preset( unsigned u_index );

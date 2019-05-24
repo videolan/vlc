@@ -56,6 +56,7 @@ typedef enum libvlc_playback_mode_t
  *
  * \param p_instance libvlc instance
  * \return media list player instance or NULL on error
+ *         (it must be released by libvlc_media_list_player_release())
  */
 LIBVLC_API libvlc_media_list_player_t *
     libvlc_media_list_player_new( libvlc_instance_t * p_instance );
@@ -107,6 +108,7 @@ LIBVLC_API void
  * \param p_mlp media list player instance
  * \return media player instance
  * \note the caller is responsible for releasing the returned instance
+         with libvlc_media_list_player_set_media_player().
  */
 LIBVLC_API libvlc_media_player_t *
     libvlc_media_list_player_get_media_player(libvlc_media_list_player_t * p_mlp);

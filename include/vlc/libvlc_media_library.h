@@ -43,6 +43,7 @@ typedef struct libvlc_media_library_t libvlc_media_library_t;
  *
  * \param p_instance the libvlc instance
  * \return a new object or NULL on error
+ *         (it must be released by libvlc_media_library_release())
  */
 LIBVLC_API libvlc_media_library_t *
     libvlc_media_library_new( libvlc_instance_t * p_instance );
