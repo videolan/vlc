@@ -22,9 +22,9 @@ import "qrc:///style/"
 
 ToolButton {
     id: control
-    property color color: control.checked
-                        ? (control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.bgHover )
-                        : VLCStyle.colors.buttonText
+    property color color: control.enabled ?
+                    VLCStyle.colors.buttonText : VLCStyle.colors.lightText
+
     property int size: VLCStyle.icon_normal
 
     property color highlightColor: VLCStyle.colors.accent
@@ -40,6 +40,7 @@ ToolButton {
         }
 
         Label {
+            id: text
             text: control.text
             color: control.color
 

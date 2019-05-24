@@ -10,7 +10,8 @@ class NavigationHistory : public QObject
     Q_OBJECT
 public:
     Q_PROPERTY(QVariant current READ getCurrent NOTIFY currentChanged)
-    Q_PROPERTY(bool empty READ isEmpty NOTIFY emptyChanged)
+    Q_PROPERTY(bool previousEmpty READ isPreviousEmpty NOTIFY previousEmptyChanged)
+    Q_PROPERTY(bool nextEmpty READ isNextEmpty NOTIFY nextEmptyChanged)
 
     enum class PostAction{
         Stay,
@@ -22,11 +23,13 @@ public:
     explicit NavigationHistory(QObject *parent = nullptr);
 
     QVariant getCurrent();
-    bool isEmpty();
+    bool isPreviousEmpty();
+    bool isNextEmpty();
 
 signals:
     void currentChanged(QVariant current);
-    void emptyChanged(bool empty);
+    void previousEmptyChanged(bool empty);
+    void nextEmptyChanged(bool empty);
 
 public slots:
     /**
@@ -62,11 +65,16 @@ public slots:
      * \endcode
      */
     Q_INVOKABLE void push(QVariantList itemList, PostAction = PostAction::Stay );
-    //pop the last page
-    void pop( PostAction = PostAction::Stay );
+
+    // Go to previous page
+    void previous( PostAction = PostAction::Stay );
+
+    // Go to next page
+    void next( PostAction = PostAction::Stay );
 
 private:
     QVariantList m_history;
+    int m_position;
 };
 
 #endif // NAVIGATION_HISTORY_HPP

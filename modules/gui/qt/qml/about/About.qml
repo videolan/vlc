@@ -97,7 +97,7 @@ Utils.NavigableFocusScope {
                     KeyNavigation.right: textScroll
 
                     onClicked: {
-                        history.pop(History.Go)
+                        history.previous(History.Go)
                     }
                 }
             }

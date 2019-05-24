@@ -50,7 +50,7 @@ Rectangle {
             focus: true
             onActionCancel: {
                 console.log("onActionCancel")
-                history.pop(History.Go)
+                history.previous(History.Go)
             }
         }
     }

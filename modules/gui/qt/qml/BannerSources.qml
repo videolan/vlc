@@ -220,7 +220,8 @@ Utils.NavigableFocusScope {
                     Layout.minimumWidth: width
                     text: VLCIcons.topbar_previous
                     KeyNavigation.right: history_next
-                    onClicked: history.pop(History.Go)
+                    onClicked: history.previous(History.Go)
+                    enabled: !history.previousEmpty
                 }
 
                 Utils.IconToolButton {
@@ -230,6 +231,8 @@ Utils.NavigableFocusScope {
                     text: VLCIcons.topbar_next
                     KeyNavigation.right: bar
                     KeyNavigation.up: buttonView
+                    onClicked: history.next(History.Go)
+                    enabled: !history.nextEmpty
                 }
 
                 TabBar {
