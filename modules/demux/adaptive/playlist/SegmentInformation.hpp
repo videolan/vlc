@@ -93,7 +93,7 @@ namespace adaptive
 
             protected:
                 std::size_t getAllSegments(std::vector<ISegment *> &) const;
-                std::size_t getSegments(SegmentInfoType, std::vector<ISegment *>&) const;
+                virtual std::size_t getSegments(SegmentInfoType, std::vector<ISegment *>&) const;
                 std::vector<SegmentInformation *> childs;
                 SegmentInformation * getChildByID( const ID & );
                 SegmentInformation *parent;
