@@ -523,6 +523,7 @@ static void cb_player_aout_mute_changed(vlc_player_t *p_player, bool muted, void
 static const struct vlc_player_aout_cbs player_aout_callbacks = {
     cb_player_aout_volume_changed,
     cb_player_aout_mute_changed,
+    NULL,
 };
 
 #pragma mark - controller initialization
