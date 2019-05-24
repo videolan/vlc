@@ -176,7 +176,7 @@ libvlc_dialog_set_context(libvlc_dialog_id *p_id, void *p_context);
 
 /**
  * Return the opaque pointer associated with the dialog id
- *
+ * \see libvlc_dialog_set_context
  * @version LibVLC 3.0.0 and later.
  */
 LIBVLC_API void *
