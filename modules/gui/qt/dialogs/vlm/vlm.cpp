@@ -468,7 +468,7 @@ VLMAWidget::VLMAWidget( VLMWrapper *_vlm, const QString& _name,
 
     QToolButton *deleteButton = new QToolButton;
     deleteButton->setIcon( QIcon( ":/toolbar/clear.svg" ) );
-    deleteButton->setToolTip("Delete");
+    deleteButton->setToolTip( qtr("Delete") );
     objLayout->addWidget( deleteButton, 0, 6 );
 
     BUTTONACT( modifyButton, modify() );
