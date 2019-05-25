@@ -88,7 +88,6 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent,
     /* Go through the list of conf */
     for( size_t i = 0; i < confsize; i++ )
     {
-        const char *psz_help;
         QIcon icon;
 
         /* Work on a new item */
@@ -102,12 +101,8 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent,
 
             /* PrefsItemData Init */
             data = new PrefsItemData( this );
-            data->name = qtr( config_CategoryNameGet( p_item->value.i ) );
-            psz_help = config_CategoryHelpGet( p_item->value.i );
-            if( psz_help )
-                data->help = qtr( psz_help );
-            else
-                data->help.clear();
+            data->name = qfu( config_CategoryNameGet( p_item->value.i ) );
+            data->help = qfu( config_CategoryHelpGet( p_item->value.i ) );
             data->i_type = PrefsItemData::TYPE_CATEGORY;
             data->i_object_id = p_item->value.i;
 
@@ -153,12 +148,8 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent,
                 /* Data still contains the correct thing */
                 data->i_type = PrefsItemData::TYPE_CATSUBCAT;
                 data->i_subcat_id = p_item->value.i;
-                data->name = qtr( config_CategoryNameGet( p_item->value.i ) );
-                psz_help = config_CategoryHelpGet( p_item->value.i );
-                if( psz_help )
-                    data->help = qtr( psz_help );
-                else
-                    data->help.clear();
+                data->name = qfu( config_CategoryNameGet( p_item->value.i ) );
+                data->help = qfu( config_CategoryHelpGet( p_item->value.i ) );
                 current_item->setData( 0, Qt::UserRole,
                                        QVariant::fromValue( data ) );
                 continue;
@@ -168,12 +159,8 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent,
 
             /* Process the Data */
             data_sub = new PrefsItemData( this );
-            data_sub->name = qtr( config_CategoryNameGet( p_item->value.i) );
-            psz_help = config_CategoryHelpGet( p_item->value.i );
-            if( psz_help )
-                data_sub->help = qtr( psz_help );
-            else
-                data_sub->help.clear();
+            data_sub->name = qfu( config_CategoryNameGet( p_item->value.i) );
+            data_sub->help = qfu( config_CategoryHelpGet( p_item->value.i ) );
             data_sub->i_type = PrefsItemData::TYPE_SUBCATEGORY;
             data_sub->i_object_id = p_item->value.i;
 
