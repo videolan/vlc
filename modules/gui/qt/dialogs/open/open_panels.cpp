@@ -906,7 +906,7 @@ void CaptureOpenPanel::initialize()
     QLabel *jackPortsLabel = new QLabel( qtr( "Selected ports:" ) );
     jackDevLayout->addWidget( jackPortsLabel, 0 , 0 );
 
-    jackPortsSelected = new QLineEdit( qtr( ".*") );
+    jackPortsSelected = new QLineEdit( qfu( ".*" ) );
     jackPortsSelected->setAlignment( Qt::AlignRight );
     jackDevLayout->addWidget( jackPortsSelected, 0, 1 );
 
