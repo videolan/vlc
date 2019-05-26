@@ -184,13 +184,19 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
             /* Try to never buffer up to really end */
             end = end - std::min(end - start, OFFSET_FROM_END);
             stime_t endtime, duration;
-            timeline->getScaledPlaybackTimeDurationBySegmentNumber( end, &endtime, &duration );
 
-            if( endtime + duration <= timescale.ToScaled( i_max_buffering ) )
+            bool b_ret = timeline->getScaledPlaybackTimeDurationBySegmentNumber( end, &endtime, &duration );
+            if(unlikely(!b_ret)) /* should never happen */
+            {
+                assert(b_ret);
+                return 0;
+            }
+
+            mtime_t fromend = std::max( i_max_buffering, getPlaylist()->suggestedPresentationDelay.Get() );
+            if( endtime + duration <= timescale.ToScaled( fromend ) )
                 return start;
 
-            uint64_t number = timeline->getElementNumberByScaledPlaybackTime(
-                                        endtime + duration - timescale.ToScaled( i_max_buffering ) );
+            uint64_t number = timeline->getElementNumberByScaledPlaybackTime(endtime - timescale.ToScaled( fromend ));
             if( number < start )
                 number = start;
             return number;
@@ -230,7 +236,9 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
         const std::vector<ISegment *> list = segmentList->getSegments();
 
         const ISegment *back = list.back();
-        const stime_t bufferingstart = back->startTime.Get() + back->duration.Get() - timescale.ToScaled( i_max_buffering );
+        mtime_t fromend = std::max( i_max_buffering, getPlaylist()->suggestedPresentationDelay.Get() );
+        stime_t bufferingstart = back->startTime.Get() + back->duration.Get() - timescale.ToScaled( fromend );
+
         uint64_t number;
         if( !segmentList->getSegmentNumberByScaledTime( bufferingstart, &number ) )
             return list.front()->getSequenceNumber();
@@ -248,8 +256,9 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
 
         const Timescale timescale = inheritTimescale();
         const ISegment *back = list.back();
+        mtime_t fromend = std::max( i_max_buffering, getPlaylist()->suggestedPresentationDelay.Get() );
         const stime_t bufferingstart = back->startTime.Get() -
-                (OFFSET_FROM_END * back->duration.Get())- timescale.ToScaled( i_max_buffering );
+                (OFFSET_FROM_END * back->duration.Get())- timescale.ToScaled( fromend );
         uint64_t number;
         if( !SegmentInfoCommon::getSegmentNumberByScaledTime( list, bufferingstart, &number ) )
             return list.front()->getSequenceNumber();
@@ -409,7 +418,8 @@ bool SegmentInformation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
         stime_t stime, sduration;
         if(timeline)
         {
-            timeline->getScaledPlaybackTimeDurationBySegmentNumber(number, &stime, &sduration);
+            if(!timeline->getScaledPlaybackTimeDurationBySegmentNumber(number, &stime, &sduration))
+                return false;
         }
         else
         {
