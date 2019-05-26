@@ -89,72 +89,58 @@ stime_t SegmentTimeline::getMinAheadScaledTime(uint64_t number) const
 
 uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) const
 {
-    uint64_t prevnumber = 0;
+    const Element *prevel = NULL;
     std::list<Element *>::const_iterator it;
+
+    if(!elements.size())
+        return 0;
+
     for(it = elements.begin(); it != elements.end(); ++it)
     {
         const Element *el = *it;
-        if(it == elements.begin())
+        if(scaled >= el->t)
         {
-            scaled -= el->t;
-            prevnumber = el->number;
+            if((uint64_t)scaled < el->t + (el->d * el->r))
+                return el->number + (scaled - el->t) / el->d;
         }
-
-        for(uint64_t repeat = 1 + el->r; repeat; repeat--)
-        {
-            if(el->d >= scaled)
-                return prevnumber;
-
-            scaled -= el->d;
-            prevnumber++;
-        }
-
         /* might have been discontinuity */
-        prevnumber = el->number;
+        else
+        {
+            if(prevel) /* > prev but < current */
+                return prevel->number + prevel->r;
+            else /* << first of the list */
+                return el->number;
+        }
+        prevel = el;
     }
 
-    return prevnumber;
+    /* time is >> any of the list */
+    return prevel->number + prevel->r;
 }
 
 bool SegmentTimeline::getScaledPlaybackTimeDurationBySegmentNumber(uint64_t number,
                                                                    stime_t *time, stime_t *duration) const
 {
-    stime_t totalscaledtime = 0;
-    stime_t lastduration = 0;
-
     std::list<Element *>::const_iterator it;
     for(it = elements.begin(); it != elements.end(); ++it)
     {
         const Element *el = *it;
-
-        /* set start time, or from discontinuity */
-        if(it == elements.begin() || el->t)
+        if(number >= el->number)
         {
-            totalscaledtime = el->t;
+            if(number <= el->number + el->r)
+            {
+                *time = el->t + el->d * (number - el->number);
+                *duration = el->d;
+                return true;
+            }
         }
-
-        lastduration = el->d;
-
-        if(number <= el->number)
-            break;
-
-        if(number <= el->number + el->r)
-        {
-            totalscaledtime += el->d * (number - el->number);
-            break;
-        }
-
-        totalscaledtime += (el->d * (el->r + 1));
     }
-
-    *time = totalscaledtime;
-    *duration = lastduration;
-    return true;
+    return false;
 }
 
 stime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) const
 {
-    stime_t time, duration;
+    stime_t time = 0, duration = 0;
     (void) getScaledPlaybackTimeDurationBySegmentNumber(number, &time, &duration);
     return time;
 }
