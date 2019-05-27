@@ -1035,6 +1035,212 @@ static void Statistics( intf_thread_t *p_intf )
     vlc_mutex_unlock( &p_item->lock );
 }
 
+static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
+{
+    intf_thread_t *const p_intf = intf;
+    intf_sys_t *sys = intf->p_sys;
+
+    if (strcmp(cmd, "quit") == 0)
+        libvlc_Quit(vlc_object_instance(intf));
+
+#define VOID(name, func) \
+    if (strcmp(cmd, name) == 0) { \
+        vlc_value_t n; \
+        func(VLC_OBJECT(intf), cmd, n); \
+    } else
+
+#define STRING(name, func) \
+    if (strcmp(cmd, name) == 0) { \
+        vlc_value_t n = { .psz_string = (char *)arg }; \
+        func(VLC_OBJECT(intf), cmd, n); \
+    } else
+
+    STRING("intf", Intf)
+
+    STRING("add", Playlist)
+    STRING("repeat", Playlist)
+    STRING("loop", Playlist)
+    STRING("random", Playlist)
+    STRING("enqueue", Playlist)
+    VOID("playlist", Playlist)
+    VOID("sort", Playlist)
+    VOID("play", Playlist)
+    VOID("stop", Playlist)
+    VOID("clear", Playlist)
+    VOID("prev", Playlist)
+    VOID("next", Playlist)
+    STRING("goto", Playlist)
+    STRING("status", Playlist)
+
+    /* DVD commands */
+    VOID("pause", Input)
+    STRING("seek", Input)
+    STRING("title", Input)
+    VOID("title_n", Input)
+    VOID("title_p", Input)
+    STRING("chapter", Input)
+    VOID("chapter_n", Input)
+    VOID("chapter_p", Input)
+
+    VOID("fastforward", Input)
+    VOID("rewind", Input)
+    VOID("faster", Input)
+    VOID("slower", Input)
+    VOID("normal", Input)
+    VOID("frame", Input)
+
+    STRING("atrack", Input)
+    STRING("vtrack", Input)
+    STRING("strack", Input)
+
+    /* video commands */
+    STRING("vratio", VideoConfig)
+    STRING("vcrop", VideoConfig)
+    STRING("vzoom", VideoConfig)
+    VOID("snapshot", VideoConfig)
+
+    /* audio commands */
+    STRING("volume", Volume)
+    STRING("volup", VolumeMove)
+    STRING("voldown", VolumeMove)
+    STRING("adev", AudioDevice)
+    STRING("achan", AudioChannel)
+
+#undef STRING
+#undef VOID
+
+    /* misc menu commands */
+    if (strcmp(cmd, "stats") == 0)
+        Statistics(intf);
+    else if (strcmp(cmd, "logout") == 0)
+    {
+        /* Close connection */
+        if (sys->i_socket != -1)
+        {
+            net_Close(sys->i_socket);
+            sys->i_socket = -1;
+        }
+    }
+    else if (strcmp(cmd, "info" ) == 0)
+    {
+        vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
+        input_item_t *item;
+
+        vlc_player_Lock(player);
+        item = vlc_player_HoldCurrentMedia(player);
+        vlc_player_Unlock(player);
+
+        if (item != NULL)
+        {
+            vlc_mutex_lock(&item->lock);
+            for (int i = 0; i < item->i_categories; i++)
+            {
+                info_category_t *category = item->pp_categories[i];
+                info_t *info;
+
+                msg_rc( "+----[ %s ]", category->psz_name );
+                msg_rc( "| " );
+                info_foreach(info, &category->infos)
+                    msg_rc("| %s: %s", info->psz_name, info->psz_value);
+                msg_rc("| ");
+            }
+            msg_rc("+----[ end of stream info ]");
+            vlc_mutex_unlock(&item->lock);
+            input_item_Release(item);
+        }
+        else
+        {
+            msg_rc( "no input" );
+        }
+    }
+    else if (strcmp(cmd, "is_playing") == 0)
+    {
+        if (sys->last_state != VLC_PLAYER_STATE_PLAYING &&
+            sys->last_state != VLC_PLAYER_STATE_PAUSED)
+        {
+            msg_rc("0");
+        }
+        else
+        {
+            msg_rc("1");
+        }
+    }
+    else if (strcmp(cmd, "get_time") == 0)
+    {
+        vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
+
+        vlc_player_Lock(player);
+        vlc_tick_t t = vlc_player_GetTime(player);
+        vlc_player_Unlock(player);
+        if (t != VLC_TICK_INVALID)
+            msg_rc("%"PRIu64, SEC_FROM_VLC_TICK(t));
+    }
+    else if (strcmp(cmd, "get_length") == 0)
+    {
+        vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
+
+        vlc_player_Lock(player);
+        vlc_tick_t l = vlc_player_GetLength(player);
+        vlc_player_Unlock(player);
+        if (l != VLC_TICK_INVALID)
+            msg_rc("%"PRIu64, SEC_FROM_VLC_TICK(l));
+    }
+    else if(strcmp(cmd, "get_title") == 0)
+    {
+        vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
+
+        vlc_player_Lock(player);
+        struct vlc_player_title const *title =
+            vlc_player_GetSelectedTitle(player);
+        vlc_player_Unlock(player);
+        msg_rc("%s", title ? title->name : "");
+    }
+    else if (strcmp(cmd, "longhelp") == 0)
+    {
+        Help(intf);
+    }
+    else if (strcmp(cmd, "key") == 0 || strcmp(cmd, "hotkey") == 0)
+    {
+       vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_intf));
+       var_SetInteger(vlc, "key-action", vlc_actions_get_id(arg));
+    }
+    else
+        switch (cmd[0])
+        {
+            case 'f':
+            case 'F':
+            {
+                vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
+                bool fs;
+
+                if (strncasecmp(arg, "on", 2) == 0)
+                    fs = true;
+                else if (strncasecmp(arg, "off", 3) == 0)
+                    fs = false;
+                else
+                    fs = !vlc_player_vout_IsFullscreen(player);
+                vlc_player_vout_SetFullscreen(player, fs);
+                break;
+            }
+
+            case 'h':
+            case 'H':
+            case '?':
+                Help(intf);
+                break;
+
+            case 's':
+            case 'S':
+            case '\0': /* Ignore empty lines */
+                break;
+
+            default:
+                msg_rc(_("Unknown command `%s'. Type `help' for help."), cmd);
+                break;
+        }
+}
+
+
 #if defined(_WIN32) && !VLC_WINSTORE_APP
 static bool ReadWin32( intf_thread_t *p_intf, unsigned char *p_buffer, int *pi_size )
 {
@@ -1182,7 +1388,6 @@ static void *Run( void *data )
 {
     intf_thread_t *p_intf = data;
     intf_sys_t *p_sys = p_intf->p_sys;
-    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_intf));
 
     char p_buffer[ MAX_LINE_LENGTH + 1 ];
     bool b_showpos = var_InheritBool( p_intf, "rc-show-pos" );
@@ -1321,187 +1526,7 @@ static void *Run( void *data )
             psz_arg = (char*)"";
         }
 
-        if( !strcmp( psz_cmd, "quit" ) )
-            libvlc_Quit( vlc_object_instance(p_intf) );
-
-#define VOID(name, func) \
-        if (strcmp(psz_cmd, name) == 0) { \
-            vlc_value_t n; \
-            func(VLC_OBJECT(p_intf), psz_cmd, n); \
-        } else
-
-#define STRING(name, func) \
-        if (strcmp(psz_cmd, name) == 0) { \
-            vlc_value_t n = { .psz_string = psz_arg }; \
-            func(VLC_OBJECT(p_intf), psz_cmd, n); \
-        } else
-
-
-        STRING("intf", Intf)
-
-        STRING("add", Playlist)
-        STRING("repeat", Playlist)
-        STRING("loop", Playlist)
-        STRING("random", Playlist)
-        STRING("enqueue", Playlist)
-        VOID("playlist", Playlist)
-        VOID("sort", Playlist)
-        VOID("play", Playlist)
-        VOID("stop", Playlist)
-        VOID("clear", Playlist)
-        VOID("prev", Playlist)
-        VOID("next", Playlist)
-        STRING("goto", Playlist)
-        STRING("status", Playlist)
-
-        /* DVD commands */
-        VOID("pause", Input)
-        STRING("seek", Input)
-        STRING("title", Input)
-        VOID("title_n", Input)
-        VOID("title_p", Input)
-        STRING("chapter", Input)
-        VOID("chapter_n", Input)
-        VOID("chapter_p", Input)
-
-        VOID("fastforward", Input)
-        VOID("rewind", Input)
-        VOID("faster", Input)
-        VOID("slower", Input)
-        VOID("normal", Input)
-        VOID("frame", Input)
-
-        STRING("atrack", Input)
-        STRING("vtrack", Input)
-        STRING("strack", Input)
-
-        /* video commands */
-        STRING("vratio", VideoConfig)
-        STRING("vcrop", VideoConfig)
-        STRING("vzoom", VideoConfig)
-        VOID("snapshot", VideoConfig)
-
-        /* audio commands */
-        STRING("volume", Volume)
-        STRING("volup", VolumeMove)
-        STRING("voldown", VolumeMove)
-        STRING("adev", AudioDevice)
-        STRING("achan", AudioChannel)
-
-#undef STRING
-#undef VOID
-
-        /* misc menu commands */
-        if( !strcmp( psz_cmd, "stats" ) )
-            Statistics( p_intf );
-        else if( !strcmp( psz_cmd, "logout" ) )
-        {
-            /* Close connection */
-            if( p_sys->i_socket != -1 )
-            {
-                net_Close( p_sys->i_socket );
-                p_sys->i_socket = -1;
-            }
-        }
-        else if( !strcmp( psz_cmd, "info" ) )
-        {
-            if( item )
-            {
-                int i;
-                vlc_mutex_lock( &item->lock );
-                for ( i = 0; i < item->i_categories; i++ )
-                {
-                    info_category_t *p_category = item->pp_categories[i];
-                    info_t *p_info;
-
-                    msg_rc( "+----[ %s ]", p_category->psz_name );
-                    msg_rc( "| " );
-                    info_foreach(p_info, &p_category->infos)
-                        msg_rc( "| %s: %s", p_info->psz_name,
-                                p_info->psz_value );
-                    msg_rc( "| " );
-                }
-                msg_rc( "+----[ end of stream info ]" );
-                vlc_mutex_unlock( &item->lock );
-            }
-            else
-            {
-                msg_rc( "no input" );
-            }
-        }
-        else if( !strcmp( psz_cmd, "is_playing" ) )
-        {
-            if (p_sys->last_state != VLC_PLAYER_STATE_PLAYING &&
-                p_sys->last_state != VLC_PLAYER_STATE_PAUSED)
-            {
-                msg_rc( "0" );
-            }
-            else
-            {
-                msg_rc( "1" );
-            }
-        }
-        else if( !strcmp( psz_cmd, "get_time" ) )
-        {
-            vlc_player_Lock(player);
-            vlc_tick_t t = vlc_player_GetTime(player);
-            vlc_player_Unlock(player);
-            if (t != VLC_TICK_INVALID)
-                msg_rc("%"PRIu64, SEC_FROM_VLC_TICK(t));
-        }
-        else if( !strcmp( psz_cmd, "get_length" ) )
-        {
-            vlc_player_Lock(player);
-            vlc_tick_t l = vlc_player_GetLength(player);
-            vlc_player_Unlock(player);
-            if (l != VLC_TICK_INVALID)
-                msg_rc("%"PRIu64, SEC_FROM_VLC_TICK(l));
-        }
-        else if( !strcmp( psz_cmd, "get_title" ) )
-        {
-            vlc_player_Lock(player);
-            struct vlc_player_title const *title =
-                vlc_player_GetSelectedTitle(player);
-            vlc_player_Unlock(player);
-            msg_rc("%s", title ? title->name : "");
-        }
-        else if( !strcmp( psz_cmd, "longhelp" ) || !strncmp( psz_cmd, "h", 1 )
-                 || !strncmp( psz_cmd, "H", 1 ) || !strncmp( psz_cmd, "?", 1 ) )
-        {
-            Help( p_intf );
-        }
-        else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
-        {
-            var_SetInteger( vlc, "key-action", vlc_actions_get_id( psz_arg ) );
-        }
-        else switch( psz_cmd[0] )
-        {
-        case 'f':
-        case 'F':
-        {
-            bool fs;
-            if( !strncasecmp( psz_arg, "on", 2 ) )
-                fs = true;
-            else if( !strncasecmp( psz_arg, "off", 3 ) )
-                fs = false;
-            else
-                fs = !vlc_player_vout_IsFullscreen(player);
-            vlc_player_vout_SetFullscreen(player, fs);
-            break;
-        }
-        case 's':
-        case 'S':
-            ;
-            break;
-
-        case '\0':
-            /* Ignore empty lines */
-            break;
-
-        default:
-            msg_rc(_("Unknown command `%s'. Type `help' for help."), psz_cmd);
-            break;
-        }
+        Process(p_intf, psz_cmd, psz_arg);
 
         /* Command processed */
         i_size = 0; p_buffer[0] = 0;
