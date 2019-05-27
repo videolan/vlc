@@ -358,6 +358,112 @@ player_aout_on_volume_changed(vlc_player_t *player, float volume, void *data)
     vlc_mutex_unlock(&p_intf->p_sys->status_lock);
 }
 
+static void PlayerDoVoid(intf_thread_t *intf, void (*cb)(vlc_player_t *))
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+
+    vlc_player_Lock(player);
+    cb(player);
+    vlc_player_Unlock(player);
+}
+
+static void PlayerPause(intf_thread_t *intf, char const *psz_cmd,
+                        vlc_value_t newval)
+{
+    PlayerDoVoid(intf, vlc_player_TogglePause);
+}
+
+static void PlayerFastForward(intf_thread_t *intf, const char *psz_cmd,
+                              vlc_value_t newval)
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+
+    vlc_player_Lock(player);
+    if (vlc_player_CanChangeRate(player))
+    {
+        float rate = vlc_player_GetRate(player);
+        vlc_player_ChangeRate(player,
+                              isgreater(rate, 0.f) ? rate * 2.f : -rate);
+    }
+    else
+        var_SetInteger(vlc_object_instance(intf), "key-action",
+                       ACTIONID_JUMP_FORWARD_EXTRASHORT);
+    vlc_player_Unlock(player);
+}
+
+static void PlayerRewind(intf_thread_t *intf, const char *psz_cmd,
+                         vlc_value_t newval)
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+
+    vlc_player_Lock(player);
+    if (vlc_player_CanRewind(player))
+    {
+        float rate = vlc_player_GetRate(player);
+        vlc_player_ChangeRate(player, isless(rate, 0.f) ? rate * 2.f : -rate);
+    }
+    else
+        var_SetInteger(vlc_object_instance(intf), "key-action",
+                       ACTIONID_JUMP_BACKWARD_EXTRASHORT);
+    vlc_player_Unlock(player);
+}
+
+static void PlayerFaster(intf_thread_t *intf, char const *psz_cmd,
+                         vlc_value_t newval)
+{
+    PlayerDoVoid(intf, vlc_player_IncrementRate);
+}
+
+static void PlayerSlower(intf_thread_t *intf, char const *psz_cmd,
+                         vlc_value_t newval)
+{
+    PlayerDoVoid(intf, vlc_player_DecrementRate);
+}
+
+static void PlayerDoNormal(vlc_player_t *player)
+{
+    vlc_player_ChangeRate(player, 1.f);
+}
+
+static void PlayerNormal(intf_thread_t *intf, char const *psz_cmd,
+                         vlc_value_t newval)
+{
+    PlayerDoVoid(intf, PlayerDoNormal);
+}
+
+static void PlayerFrame(intf_thread_t *intf, char const *psz_cmd,
+                        vlc_value_t newval)
+{
+    PlayerDoVoid(intf, vlc_player_NextVideoFrame);
+}
+
+static void PlayerChapterPrev(intf_thread_t *intf, char const *psz_cmd,
+                              vlc_value_t newval)
+{
+    PlayerDoVoid(intf, vlc_player_SelectPrevChapter);
+}
+
+static void PlayerChapterNext(intf_thread_t *intf, char const *psz_cmd,
+                              vlc_value_t newval)
+{
+    PlayerDoVoid(intf, vlc_player_SelectNextChapter);
+}
+
+static void PlayerTitlePrev(intf_thread_t *intf, char const *psz_cmd,
+                            vlc_value_t newval)
+{
+    PlayerDoVoid(intf, vlc_player_SelectPrevTitle);
+}
+
+static void PlayerTitleNext(intf_thread_t *intf, char const *psz_cmd,
+                            vlc_value_t newval)
+{
+    PlayerDoVoid(intf, vlc_player_SelectNextTitle);
+}
+
 /********************************************************************
  * Command routines
  ********************************************************************/
@@ -368,9 +474,7 @@ static void Input(intf_thread_t *intf, char const *psz_cmd,
 
     vlc_player_Lock(player);
     /* Parse commands that only require an input */
-    if( !strcmp( psz_cmd, "pause" ) )
-        vlc_player_TogglePause(player);
-    else if( !strcmp( psz_cmd, "seek" ) )
+    if( !strcmp( psz_cmd, "seek" ) )
     {
         if( strlen( newval.psz_string ) > 0 &&
             newval.psz_string[strlen( newval.psz_string ) - 1] == '%' )
@@ -384,40 +488,8 @@ static void Input(intf_thread_t *intf, char const *psz_cmd,
             vlc_player_SetTime(player, vlc_tick_from_sec(t));
         }
     }
-    else if ( !strcmp( psz_cmd, "fastforward" ) )
+    else if( !strcmp( psz_cmd, "chapter" ) )
     {
-        if (vlc_player_CanChangeRate(player))
-        {
-            float rate = vlc_player_GetRate(player);
-            vlc_player_ChangeRate(player, rate > 0 ? rate * 2.f : -rate);
-        }
-        else
-            var_SetInteger(vlc_object_instance(intf), "key-action", ACTIONID_JUMP_FORWARD_EXTRASHORT);
-    }
-    else if ( !strcmp( psz_cmd, "rewind" ) )
-    {
-        if (vlc_player_CanRewind(player))
-        {
-            float rate = vlc_player_GetRate(player);
-            vlc_player_ChangeRate(player, rate < 0 ? rate * 2.f : -rate);
-        }
-        else
-            var_SetInteger(vlc_object_instance(intf), "key-action", ACTIONID_JUMP_BACKWARD_EXTRASHORT);
-    }
-    else if ( !strcmp( psz_cmd, "faster" ) )
-        vlc_player_IncrementRate(player);
-    else if ( !strcmp( psz_cmd, "slower" ) )
-        vlc_player_DecrementRate(player);
-    else if ( !strcmp( psz_cmd, "normal" ) )
-        vlc_player_ChangeRate(player, 1.f);
-    else if ( !strcmp( psz_cmd, "frame" ) )
-        vlc_player_NextVideoFrame(player);
-    else if( !strcmp( psz_cmd, "chapter" ) ||
-             !strcmp( psz_cmd, "chapter_n" ) ||
-             !strcmp( psz_cmd, "chapter_p" ) )
-    {
-        if( !strcmp( psz_cmd, "chapter" ) )
-        {
             if ( *newval.psz_string )
             {
                 /* Set. */
@@ -436,18 +508,9 @@ static void Input(intf_thread_t *intf, char const *psz_cmd,
                 else
                     msg_print(intf, "No chapter selected.");
             }
-        }
-        else if( !strcmp( psz_cmd, "chapter_n" ) )
-            vlc_player_SelectNextChapter(player);
-        else if( !strcmp( psz_cmd, "chapter_p" ) )
-            vlc_player_SelectPrevChapter(player);
     }
-    else if( !strcmp( psz_cmd, "title" ) ||
-             !strcmp( psz_cmd, "title_n" ) ||
-             !strcmp( psz_cmd, "title_p" ) )
+    else if( !strcmp( psz_cmd, "title" ) )
     {
-        if( !strcmp( psz_cmd, "title" ) )
-        {
             if ( *newval.psz_string )
             {
                 /* Set. */
@@ -470,11 +533,6 @@ static void Input(intf_thread_t *intf, char const *psz_cmd,
                 else
                     msg_print(intf, "No title selected.");
             }
-        }
-        else if( !strcmp( psz_cmd, "title_n" ) )
-            vlc_player_SelectNextTitle(player);
-        else if( !strcmp( psz_cmd, "title_p" ) )
-            vlc_player_SelectPrevTitle(player);
     }
     else if(    !strcmp( psz_cmd, "atrack" )
              || !strcmp( psz_cmd, "vtrack" )
@@ -1113,17 +1171,17 @@ static const struct
     { "prev", PlaylistPrev },
     { "next", PlaylistNext },
     { "status", PlaylistStatus },
-    { "pause", Input },
-    { "title_n", Input },
-    { "title_p", Input },
-    { "chapter_n", Input },
-    { "chapter_p", Input },
-    { "fastforward", Input },
-    { "rewind", Input },
-    { "faster", Input },
-    { "slower", Input },
-    { "normal", Input },
-    { "frame", Input },
+    { "pause", PlayerPause },
+    { "title_n", PlayerTitleNext },
+    { "title_p", PlayerTitlePrev },
+    { "chapter_n", PlayerChapterNext },
+    { "chapter_p", PlayerChapterPrev },
+    { "fastforward", PlayerFastForward },
+    { "rewind", PlayerRewind },
+    { "faster", PlayerFaster },
+    { "slower", PlayerSlower },
+    { "normal", PlayerNormal },
+    { "frame", PlayerFrame },
     { "snapshot", VideoConfig },
 };
 
