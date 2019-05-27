@@ -1121,7 +1121,7 @@ static bool ReadWin32( intf_thread_t *p_intf, unsigned char *p_buffer, int *pi_s
 }
 #endif
 
-bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
+static bool ReadCommand(intf_thread_t *p_intf, char *p_buffer, int *pi_size)
 {
 #if defined(_WIN32) && !VLC_WINSTORE_APP
     if( p_intf->p_sys->i_socket == -1 && !p_intf->p_sys->b_quiet )
