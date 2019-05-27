@@ -368,10 +368,6 @@ static void Input( vlc_object_t *p_this, char const *psz_cmd,
     vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
 
     vlc_player_Lock(player);
-    if( vlc_player_IsPaused(player) &&
-        ( strcmp( psz_cmd, "pause" ) != 0 ) && (strcmp( psz_cmd,"frame") != 0 ) )
-        msg_rc( "%s", _("Press pause to continue.") );
-    else
     /* Parse commands that only require an input */
     if( !strcmp( psz_cmd, "pause" ) )
         vlc_player_TogglePause(player);
@@ -553,13 +549,6 @@ static void Playlist( vlc_object_t *p_this, char const *psz_cmd,
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
 
     vlc_playlist_Lock(playlist);
-
-    if (vlc_playlist_GetCurrentIndex(playlist) != -1 &&
-        vlc_player_IsPaused(player))
-    {
-        msg_rc("%s", _("Type 'pause' to continue."));
-        goto end;
-    }
 
     /* Parse commands that require a playlist */
     if( !strcmp( psz_cmd, "prev" ) )
