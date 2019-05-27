@@ -1200,9 +1200,12 @@ void KeySelectorControl::finish()
     {
         module_config_t *p_config_item = p_config + i;
 
+        if( p_config_item->i_type != CONFIG_ITEM_KEY )
+            continue;
+
         /* If we are a (non-global) key option not empty */
-        if( CONFIG_ITEM(p_config_item->i_type) && p_config_item->psz_name != NULL
-         && !strncmp( p_config_item->psz_name , "key-", 4 )
+        if( p_config_item->psz_name != NULL
+         && strncmp( p_config_item->psz_name, "global-", 7 ) != 0
          && !EMPTY_STR( p_config_item->psz_text ) )
         {
             /*
@@ -1225,8 +1228,8 @@ void KeySelectorControl::finish()
             continue;
         }
 
-        if( CONFIG_ITEM(p_config_item->i_type) && p_config_item->psz_name != NULL
-         && !strncmp( p_config_item->psz_name , "global-key", 10 )
+        if( p_config_item->psz_name != NULL
+         && strncmp( p_config_item->psz_name, "global-", 7 ) == 0
          && !EMPTY_STR( p_config_item->psz_text )
          && !EMPTY_STR( p_config_item->value.psz ) )
         {
