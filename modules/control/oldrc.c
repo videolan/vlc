@@ -64,37 +64,6 @@
 #define MAX_LINE_LENGTH 1024
 #define STATUS_CHANGE "status change: "
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  Activate     ( vlc_object_t * );
-static void Deactivate   ( vlc_object_t * );
-static void *Run         ( void * );
-
-static void Help         ( intf_thread_t * );
-
-static bool ReadCommand( intf_thread_t *, char *, int * );
-
-static input_item_t *parse_MRL( const char * );
-
-static void Input        ( vlc_object_t *, char const *, vlc_value_t );
-static void Playlist     ( vlc_object_t *, char const *, vlc_value_t );
-static void Intf         ( vlc_object_t *, char const *, vlc_value_t );
-static void Volume       ( vlc_object_t *, char const *, vlc_value_t );
-static void VolumeMove   ( vlc_object_t *, char const *, vlc_value_t );
-static void VideoConfig  ( vlc_object_t *, char const *, vlc_value_t );
-static void AudioDevice  ( vlc_object_t *, char const *, vlc_value_t );
-static void AudioChannel ( vlc_object_t *, char const *, vlc_value_t );
-static void Statistics(intf_thread_t *);
-
-static void player_on_state_changed(vlc_player_t *,
-                                    enum vlc_player_state, void *);
-static void player_on_buffering_changed(vlc_player_t *, float, void *);
-static void player_on_rate_changed(vlc_player_t *, float, void *);
-static void player_on_position_changed(vlc_player_t *,
-                                       vlc_tick_t, float, void*);
-static void player_aout_on_volume_changed(vlc_player_t *, float, void *);
-
 struct intf_sys_t
 {
     int *pi_socket_listen;
@@ -146,633 +115,113 @@ static void msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 }
 #define msg_rc( ... ) msg_rc( p_intf, __VA_ARGS__ )
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-#define POS_TEXT N_("Show stream position")
-#define POS_LONGTEXT N_("Show the current position in seconds within the " \
-                        "stream from time to time." )
-
-#define TTY_TEXT N_("Fake TTY")
-#define TTY_LONGTEXT N_("Force the rc module to use stdin as if it was a TTY.")
-
-#define UNIX_TEXT N_("UNIX socket command input")
-#define UNIX_LONGTEXT N_("Accept commands over a Unix socket rather than " \
-                         "stdin." )
-
-#define HOST_TEXT N_("TCP command input")
-#define HOST_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
-            "You can set the address and port the interface will bind to." )
-
-#ifdef _WIN32
-#define QUIET_TEXT N_("Do not open a DOS command box interface")
-#define QUIET_LONGTEXT N_( \
-    "By default the rc interface plugin will start a DOS command box. " \
-    "Enabling the quiet mode will not bring this command box but can also " \
-    "be pretty annoying when you want to stop VLC and no video window is " \
-    "open." )
-#if !VLC_WINSTORE_APP
-#include "intromsg.h"
-#endif
+#if defined (_WIN32) && !VLC_WINSTORE_APP
+# include "intromsg.h"
 #endif
 
-vlc_module_begin ()
-    set_shortname( N_("RC"))
-    set_category( CAT_INTERFACE )
-    set_subcategory( SUBCAT_INTERFACE_MAIN )
-    set_description( N_("Remote control interface") )
-    add_bool( "rc-show-pos", false, POS_TEXT, POS_LONGTEXT, true )
-
-#ifdef _WIN32
-    add_bool( "rc-quiet", false, QUIET_TEXT, QUIET_LONGTEXT, false )
-#else
-#if defined (HAVE_ISATTY)
-    add_bool( "rc-fake-tty", false, TTY_TEXT, TTY_LONGTEXT, true )
-#endif
-    add_string( "rc-unix", NULL, UNIX_TEXT, UNIX_LONGTEXT, true )
-#endif
-    add_string( "rc-host", NULL, HOST_TEXT, HOST_LONGTEXT, true )
-
-    set_capability( "interface", 20 )
-
-    set_callbacks( Activate, Deactivate )
-#ifdef _WIN32
-    add_shortcut( "rc" )
-#endif
-vlc_module_end ()
 
 /*****************************************************************************
- * Activate: initialize and create stuff
- *****************************************************************************/
-static int Activate( vlc_object_t *p_this )
-{
-    /* FIXME: This function is full of memory leaks and bugs in error paths. */
-    intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    char *psz_host, *psz_unix_path = NULL;
-    int  *pi_socket = NULL;
-
-#ifndef _WIN32
-#if defined(HAVE_ISATTY)
-    /* Check that stdin is a TTY */
-    if( !var_InheritBool( p_intf, "rc-fake-tty" ) && !isatty( 0 ) )
-    {
-        msg_Warn( p_intf, "fd 0 is not a TTY" );
-        return VLC_EGENERIC;
-    }
-#endif
-
-    psz_unix_path = var_InheritString( p_intf, "rc-unix" );
-    if( psz_unix_path )
-    {
-        int i_socket;
-
-#ifndef AF_LOCAL
-        msg_Warn( p_intf, "your OS doesn't support filesystem sockets" );
-        free( psz_unix_path );
-        return VLC_EGENERIC;
-#else
-        struct sockaddr_un addr;
-
-        memset( &addr, 0, sizeof(struct sockaddr_un) );
-
-        msg_Dbg( p_intf, "trying UNIX socket" );
-
-        if( (i_socket = vlc_socket( PF_LOCAL, SOCK_STREAM, 0, false ) ) < 0 )
-        {
-            msg_Warn( p_intf, "can't open socket: %s", vlc_strerror_c(errno) );
-            free( psz_unix_path );
-            return VLC_EGENERIC;
-        }
-
-        addr.sun_family = AF_LOCAL;
-        strncpy( addr.sun_path, psz_unix_path, sizeof( addr.sun_path ) );
-        addr.sun_path[sizeof( addr.sun_path ) - 1] = '\0';
-
-        if (bind (i_socket, (struct sockaddr *)&addr, sizeof (addr))
-         && (errno == EADDRINUSE)
-         && connect (i_socket, (struct sockaddr *)&addr, sizeof (addr))
-         && (errno == ECONNREFUSED))
-        {
-            msg_Info (p_intf, "Removing dead UNIX socket: %s", psz_unix_path);
-            unlink (psz_unix_path);
-
-            if (bind (i_socket, (struct sockaddr *)&addr, sizeof (addr)))
-            {
-                msg_Err (p_intf, "cannot bind UNIX socket at %s: %s",
-                         psz_unix_path, vlc_strerror_c(errno));
-                free (psz_unix_path);
-                net_Close (i_socket);
-                return VLC_EGENERIC;
-            }
-        }
-
-        if( listen( i_socket, 1 ) )
-        {
-            msg_Warn (p_intf, "can't listen on socket: %s",
-                      vlc_strerror_c(errno));
-            free( psz_unix_path );
-            net_Close( i_socket );
-            return VLC_EGENERIC;
-        }
-
-        /* FIXME: we need a core function to merge listening sockets sets */
-        pi_socket = calloc( 2, sizeof( int ) );
-        if( pi_socket == NULL )
-        {
-            free( psz_unix_path );
-            net_Close( i_socket );
-            return VLC_ENOMEM;
-        }
-        pi_socket[0] = i_socket;
-        pi_socket[1] = -1;
-#endif /* AF_LOCAL */
-    }
-#endif /* !_WIN32 */
-
-    if( ( pi_socket == NULL ) &&
-        ( psz_host = var_InheritString( p_intf, "rc-host" ) ) != NULL )
-    {
-        vlc_url_t url;
-
-        vlc_UrlParse( &url, psz_host );
-        if( url.psz_host == NULL )
-        {
-            vlc_UrlClean( &url );
-            char *psz_backward_compat_host;
-            if( asprintf( &psz_backward_compat_host, "//%s", psz_host ) < 0 )
-            {
-                free( psz_host );
-                return VLC_EGENERIC;
-            }
-            free( psz_host );
-            psz_host = psz_backward_compat_host;
-            vlc_UrlParse( &url, psz_host );
-        }
-
-        msg_Dbg( p_intf, "base: %s, port: %d", url.psz_host, url.i_port );
-
-        pi_socket = net_ListenTCP(p_this, url.psz_host, url.i_port);
-        if( pi_socket == NULL )
-        {
-            msg_Warn( p_intf, "can't listen to %s port %i",
-                      url.psz_host, url.i_port );
-            vlc_UrlClean( &url );
-            free( psz_host );
-            return VLC_EGENERIC;
-        }
-
-        vlc_UrlClean( &url );
-        free( psz_host );
-    }
-
-    intf_sys_t *p_sys = malloc( sizeof( *p_sys ) );
-    if( unlikely(p_sys == NULL) )
-    {
-        net_ListenClose( pi_socket );
-        free( psz_unix_path );
-        return VLC_ENOMEM;
-    }
-
-    p_intf->p_sys = p_sys;
-    p_sys->pi_socket_listen = pi_socket;
-    p_sys->i_socket = -1;
-    p_sys->psz_unix_path = psz_unix_path;
-    vlc_mutex_init( &p_sys->status_lock );
-    p_sys->last_state = VLC_PLAYER_STATE_STOPPED;
-    p_sys->b_input_buffering = false;
-    p_sys->playlist = vlc_intf_GetMainPlaylist(p_intf);;
-    vlc_player_t *player = vlc_playlist_GetPlayer(p_sys->playlist);
-
-    /* Non-buffered stdout */
-    setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
-
-#if VLC_WINSTORE_APP
-    p_sys->b_quiet = true;
-#elif defined(_WIN32)
-    p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
-    if( !p_sys->b_quiet )
-        intf_consoleIntroMsg( p_intf );
-#endif
-
-    if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
-        goto error;
-
-    msg_rc( "%s", _("Remote control interface initialized. Type `help' for help.") );
-
-    static struct vlc_player_cbs const player_cbs =
-    {
-        .on_state_changed = player_on_state_changed,
-        .on_buffering_changed = player_on_buffering_changed,
-        .on_rate_changed = player_on_rate_changed,
-        .on_position_changed = player_on_position_changed,
-    };
-    vlc_player_Lock(player);
-    p_sys->player_listener =
-        vlc_player_AddListener(player, &player_cbs, p_intf);
-    if (!p_sys->player_listener)
-    {
-        vlc_player_Unlock(player);
-        goto error;
-    }
-
-    static struct vlc_player_aout_cbs const player_aout_cbs =
-    {
-        .on_volume_changed = player_aout_on_volume_changed,
-    };
-    p_sys->player_aout_listener =
-        vlc_player_aout_AddListener(player, &player_aout_cbs, p_intf);
-    vlc_player_Unlock(player);
-    if (!p_sys->player_aout_listener)
-        goto error;
-
-    return VLC_SUCCESS;
-
-error:
-    if (p_sys->player_listener)
-    {
-        vlc_player_Lock(player);
-        vlc_player_RemoveListener(player, p_sys->player_listener);
-        vlc_player_Unlock(player);
-    }
-    net_ListenClose( pi_socket );
-    free( psz_unix_path );
-    vlc_mutex_destroy( &p_sys->status_lock );
-    free( p_sys );
-    return VLC_EGENERIC;
-}
-
-/*****************************************************************************
- * Deactivate: uninitialize and cleanup
- *****************************************************************************/
-static void Deactivate( vlc_object_t *p_this )
-{
-    intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    intf_sys_t *p_sys = p_intf->p_sys;
-
-    vlc_player_t *player = vlc_playlist_GetPlayer(p_sys->playlist);
-    vlc_player_Lock(player);
-    vlc_player_aout_RemoveListener(player, p_sys->player_aout_listener);
-    vlc_player_RemoveListener(player, p_sys->player_listener);
-    vlc_player_Unlock(player);
-
-    vlc_cancel( p_sys->thread );
-    vlc_join( p_sys->thread, NULL );
-
-    net_ListenClose( p_sys->pi_socket_listen );
-    if( p_sys->i_socket != -1 )
-        net_Close( p_sys->i_socket );
-    if( p_sys->psz_unix_path != NULL )
-    {
-#if defined(AF_LOCAL) && !defined(_WIN32)
-        unlink( p_sys->psz_unix_path );
-#endif
-        free( p_sys->psz_unix_path );
-    }
-    vlc_mutex_destroy( &p_sys->status_lock );
-    free( p_sys );
-}
-
-/*****************************************************************************
- * Run: rc thread
+ * parse_MRL: build a input item from a full mrl
  *****************************************************************************
- * This part of the interface is in a separate thread so that we can call
- * exec() from within it without annoying the rest of the program.
+ * MRL format: "simplified-mrl [:option-name[=option-value]]"
+ * We don't check for '"' or '\'', we just assume that a ':' that follows a
+ * space is a new option. Should be good enough for our purpose.
  *****************************************************************************/
-static void *Run( void *data )
+static input_item_t *parse_MRL(const char *mrl)
 {
-    intf_thread_t *p_intf = data;
-    intf_sys_t *p_sys = p_intf->p_sys;
-    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_intf));
+#define SKIPSPACE( p ) { while( *p == ' ' || *p == '\t' ) p++; }
+#define SKIPTRAILINGSPACE( p, d ) \
+    { char *e = d; while (e > p && (*(e-1)==' ' || *(e-1)=='\t')) {e--; *e=0 ;} }
 
-    char p_buffer[ MAX_LINE_LENGTH + 1 ];
-    bool b_showpos = var_InheritBool( p_intf, "rc-show-pos" );
+    input_item_t *p_item = NULL;
+    char *psz_item = NULL, *psz_item_mrl = NULL, *psz_orig, *psz_mrl;
+    char **ppsz_options = NULL;
+    int i_options = 0;
 
-    int  i_size = 0;
-    int  i_oldpos = 0;
-    int  i_newpos;
-    int  canc = vlc_savecancel( );
+    if (mrl == NULL)
+        return 0;
 
-    p_buffer[0] = 0;
-
-#if defined(_WIN32) && !VLC_WINSTORE_APP
-    /* Get the file descriptor of the console input */
-    p_intf->p_sys->hConsoleIn = GetStdHandle(STD_INPUT_HANDLE);
-    if( p_intf->p_sys->hConsoleIn == INVALID_HANDLE_VALUE )
-    {
-        msg_Err( p_intf, "couldn't find user input handle" );
+    psz_mrl = psz_orig = strdup( mrl );
+    if (psz_mrl == NULL)
         return NULL;
-    }
-#endif
 
-    /* Register commands that will be cleaned up upon object destruction */
-    vlc_player_t *player = vlc_playlist_GetPlayer(p_sys->playlist);
-    input_item_t *item = NULL;
-
-    /* status callbacks */
-
-    for( ;; )
+    while (*psz_mrl)
     {
-        char *psz_cmd, *psz_arg;
-        bool b_complete;
+        SKIPSPACE(psz_mrl);
+        psz_item = psz_mrl;
 
-        vlc_restorecancel( canc );
-
-        if( p_sys->pi_socket_listen != NULL && p_sys->i_socket == -1 )
+        for (; *psz_mrl; psz_mrl++)
         {
-            p_sys->i_socket =
-                net_Accept( p_intf, p_sys->pi_socket_listen );
-            if( p_sys->i_socket == -1 ) continue;
-        }
-
-        b_complete = ReadCommand( p_intf, p_buffer, &i_size );
-        canc = vlc_savecancel( );
-
-        /* Manage the input part */
-        if( item == NULL )
-        {
-            vlc_player_Lock(player);
-            item = vlc_player_HoldCurrentMedia(player);
-            vlc_player_Unlock(player);
-            /* New input has been registered */
-            if( item )
+            if ((*psz_mrl == ' ' || *psz_mrl == '\t') && psz_mrl[1] == ':')
             {
-                char *psz_uri = input_item_GetURI( item );
-                msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
-                free( psz_uri );
+                /* We have a complete item */
+                break;
+            }
+            if ((*psz_mrl == ' ' || *psz_mrl == '\t') &&
+                (psz_mrl[1] == '"' || psz_mrl[1] == '\'') && psz_mrl[2] == ':')
+            {
+                /* We have a complete item */
+                break;
             }
         }
 
-        vlc_player_Lock(player);
-        if( !vlc_player_IsStarted( player ) )
+        if (*psz_mrl)
         {
-            if (item)
-            {
-                input_item_Release( item );
-                item = NULL;
-            }
-
-            p_sys->last_state = VLC_PLAYER_STATE_STOPPED;
-            msg_rc( STATUS_CHANGE "( stop state: 0 )" );
+            *psz_mrl = 0;
+            psz_mrl++;
         }
-        vlc_player_Unlock(player);
+        SKIPTRAILINGSPACE(psz_item, psz_item + strlen(psz_item));
 
-        if( item != NULL )
+        /* Remove '"' and '\'' if necessary */
+        if (*psz_item == '"' && psz_item[strlen(psz_item)-1] == '"')
         {
-            vlc_player_Lock(player);
-            enum vlc_player_state state = vlc_player_GetState(player);
-            vlc_player_Unlock(player);
-
-            if (p_sys->last_state != state)
-            {
-                switch (state)
-                {
-                    case VLC_PLAYER_STATE_STOPPING:
-                    case VLC_PLAYER_STATE_STOPPED:
-                        msg_rc(STATUS_CHANGE "( stop state: 5 )");
-                        break;
-                    case VLC_PLAYER_STATE_PLAYING:
-                        msg_rc(STATUS_CHANGE "( play state: 3 )");
-                        break;
-                    case VLC_PLAYER_STATE_PAUSED:
-                        msg_rc(STATUS_CHANGE "( pause state: 4 )");
-                        break;
-                    default:
-                        break;
-                }
-                p_sys->last_state = state;
-            }
+            psz_item++;
+            psz_item[strlen(psz_item) - 1] = 0;
+        }
+        if (*psz_item == '\'' && psz_item[strlen(psz_item)-1] == '\'')
+        {
+            psz_item++;
+            psz_item[strlen(psz_item)-1] = 0;
         }
 
-        if( item && b_showpos )
+        if (psz_item_mrl == NULL)
         {
-            vlc_player_Lock(player);
-            i_newpos = 100 * vlc_player_GetPosition( player );
-            vlc_player_Unlock(player);
-            if( i_oldpos != i_newpos )
-            {
-                i_oldpos = i_newpos;
-                msg_rc( "pos: %d%%", i_newpos );
-            }
-        }
-
-        /* Is there something to do? */
-        if( !b_complete ) continue;
-
-        /* Skip heading spaces */
-        psz_cmd = p_buffer;
-        while( *psz_cmd == ' ' )
-        {
-            psz_cmd++;
-        }
-
-        /* Split psz_cmd at the first space and make sure that
-         * psz_arg is valid */
-        psz_arg = strchr( psz_cmd, ' ' );
-        if( psz_arg )
-        {
-            *psz_arg++ = 0;
-            while( *psz_arg == ' ' )
-            {
-                psz_arg++;
-            }
-        }
-        else
-        {
-            psz_arg = (char*)"";
-        }
-
-        if( !strcmp( psz_cmd, "quit" ) )
-            libvlc_Quit( vlc_object_instance(p_intf) );
-
-#define VOID(name, func) \
-        if (strcmp(psz_cmd, name) == 0) { \
-            vlc_value_t n; \
-            func(VLC_OBJECT(p_intf), psz_cmd, n); \
-        } else
-
-#define STRING(name, func) \
-        if (strcmp(psz_cmd, name) == 0) { \
-            vlc_value_t n = { .psz_string = psz_arg }; \
-            func(VLC_OBJECT(p_intf), psz_cmd, n); \
-        } else
-
-
-        STRING("intf", Intf)
-
-        STRING("add", Playlist)
-        STRING("repeat", Playlist)
-        STRING("loop", Playlist)
-        STRING("random", Playlist)
-        STRING("enqueue", Playlist)
-        VOID("playlist", Playlist)
-        VOID("sort", Playlist)
-        VOID("play", Playlist)
-        VOID("stop", Playlist)
-        VOID("clear", Playlist)
-        VOID("prev", Playlist)
-        VOID("next", Playlist)
-        STRING("goto", Playlist)
-        STRING("status", Playlist)
-
-        /* DVD commands */
-        VOID("pause", Input)
-        STRING("seek", Input)
-        STRING("title", Input)
-        VOID("title_n", Input)
-        VOID("title_p", Input)
-        STRING("chapter", Input)
-        VOID("chapter_n", Input)
-        VOID("chapter_p", Input)
-
-        VOID("fastforward", Input)
-        VOID("rewind", Input)
-        VOID("faster", Input)
-        VOID("slower", Input)
-        VOID("normal", Input)
-        VOID("frame", Input)
-
-        STRING("atrack", Input)
-        STRING("vtrack", Input)
-        STRING("strack", Input)
-
-        /* video commands */
-        STRING("vratio", VideoConfig)
-        STRING("vcrop", VideoConfig)
-        STRING("vzoom", VideoConfig)
-        VOID("snapshot", VideoConfig)
-
-        /* audio commands */
-        STRING("volume", Volume)
-        STRING("volup", VolumeMove)
-        STRING("voldown", VolumeMove)
-        STRING("adev", AudioDevice)
-        STRING("achan", AudioChannel)
-
-#undef STRING
-#undef VOID
-
-        /* misc menu commands */
-        if( !strcmp( psz_cmd, "stats" ) )
-            Statistics( p_intf );
-        else if( !strcmp( psz_cmd, "logout" ) )
-        {
-            /* Close connection */
-            if( p_sys->i_socket != -1 )
-            {
-                net_Close( p_sys->i_socket );
-                p_sys->i_socket = -1;
-            }
-        }
-        else if( !strcmp( psz_cmd, "info" ) )
-        {
-            if( item )
-            {
-                int i;
-                vlc_mutex_lock( &item->lock );
-                for ( i = 0; i < item->i_categories; i++ )
-                {
-                    info_category_t *p_category = item->pp_categories[i];
-                    info_t *p_info;
-
-                    msg_rc( "+----[ %s ]", p_category->psz_name );
-                    msg_rc( "| " );
-                    info_foreach(p_info, &p_category->infos)
-                        msg_rc( "| %s: %s", p_info->psz_name,
-                                p_info->psz_value );
-                    msg_rc( "| " );
-                }
-                msg_rc( "+----[ end of stream info ]" );
-                vlc_mutex_unlock( &item->lock );
-            }
+            if (strstr( psz_item, "://" ) != NULL)
+                psz_item_mrl = strdup(psz_item);
             else
+                psz_item_mrl = vlc_path2uri(psz_item, NULL);
+            if (psz_item_mrl == NULL)
             {
-                msg_rc( "no input" );
+                free(psz_orig);
+                return NULL;
             }
         }
-        else if( !strcmp( psz_cmd, "is_playing" ) )
+        else if (*psz_item)
         {
-            if (p_sys->last_state != VLC_PLAYER_STATE_PLAYING &&
-                p_sys->last_state != VLC_PLAYER_STATE_PAUSED)
-            {
-                msg_rc( "0" );
-            }
-            else
-            {
-                msg_rc( "1" );
-            }
-        }
-        else if( !strcmp( psz_cmd, "get_time" ) )
-        {
-            vlc_player_Lock(player);
-            vlc_tick_t t = vlc_player_GetTime(player);
-            vlc_player_Unlock(player);
-            if (t != VLC_TICK_INVALID)
-                msg_rc("%"PRIu64, SEC_FROM_VLC_TICK(t));
-        }
-        else if( !strcmp( psz_cmd, "get_length" ) )
-        {
-            vlc_player_Lock(player);
-            vlc_tick_t l = vlc_player_GetLength(player);
-            vlc_player_Unlock(player);
-            if (l != VLC_TICK_INVALID)
-                msg_rc("%"PRIu64, SEC_FROM_VLC_TICK(l));
-        }
-        else if( !strcmp( psz_cmd, "get_title" ) )
-        {
-            vlc_player_Lock(player);
-            struct vlc_player_title const *title =
-                vlc_player_GetSelectedTitle(player);
-            vlc_player_Unlock(player);
-            msg_rc("%s", title ? title->name : "");
-        }
-        else if( !strcmp( psz_cmd, "longhelp" ) || !strncmp( psz_cmd, "h", 1 )
-                 || !strncmp( psz_cmd, "H", 1 ) || !strncmp( psz_cmd, "?", 1 ) )
-        {
-            Help( p_intf );
-        }
-        else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
-        {
-            var_SetInteger( vlc, "key-action", vlc_actions_get_id( psz_arg ) );
-        }
-        else switch( psz_cmd[0] )
-        {
-        case 'f':
-        case 'F':
-        {
-            bool fs;
-            if( !strncasecmp( psz_arg, "on", 2 ) )
-                fs = true;
-            else if( !strncasecmp( psz_arg, "off", 3 ) )
-                fs = false;
-            else
-                fs = !vlc_player_vout_IsFullscreen(player);
-            vlc_player_vout_SetFullscreen(player, fs);
-            break;
-        }
-        case 's':
-        case 'S':
-            ;
-            break;
-
-        case '\0':
-            /* Ignore empty lines */
-            break;
-
-        default:
-            msg_rc(_("Unknown command `%s'. Type `help' for help."), psz_cmd);
-            break;
+            i_options++;
+            ppsz_options = xrealloc(ppsz_options, i_options * sizeof(char *));
+            ppsz_options[i_options - 1] = &psz_item[1];
         }
 
-        /* Command processed */
-        i_size = 0; p_buffer[0] = 0;
+        if (*psz_mrl)
+            SKIPSPACE(psz_mrl);
     }
 
-    msg_rc( STATUS_CHANGE "( stop state: 0 )" );
-    msg_rc( STATUS_CHANGE "( quit )" );
+    /* Now create a playlist item */
+    if (psz_item_mrl != NULL)
+    {
+        p_item = input_item_New(psz_item_mrl, NULL);
+        for (int i = 0; i < i_options; i++)
+            input_item_AddOption(p_item, ppsz_options[i],
+                                 VLC_INPUT_OPTION_TRUSTED);
+        free(psz_item_mrl);
+    }
 
-    vlc_restorecancel( canc );
+    if (i_options)
+        free(ppsz_options);
+    free(psz_orig);
 
-    return NULL;
+    return p_item;
 }
 
 static void Help( intf_thread_t *p_intf)
@@ -1724,92 +1173,627 @@ bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 }
 
 /*****************************************************************************
- * parse_MRL: build a input item from a full mrl
+ * Run: rc thread
  *****************************************************************************
- * MRL format: "simplified-mrl [:option-name[=option-value]]"
- * We don't check for '"' or '\'', we just assume that a ':' that follows a
- * space is a new option. Should be good enough for our purpose.
+ * This part of the interface is in a separate thread so that we can call
+ * exec() from within it without annoying the rest of the program.
  *****************************************************************************/
-static input_item_t *parse_MRL( const char *mrl )
+static void *Run( void *data )
 {
-#define SKIPSPACE( p ) { while( *p == ' ' || *p == '\t' ) p++; }
-#define SKIPTRAILINGSPACE( p, d ) \
-    { char *e=d; while( e > p && (*(e-1)==' ' || *(e-1)=='\t') ){e--;*e=0;} }
+    intf_thread_t *p_intf = data;
+    intf_sys_t *p_sys = p_intf->p_sys;
+    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_intf));
 
-    input_item_t *p_item = NULL;
-    char *psz_item = NULL, *psz_item_mrl = NULL, *psz_orig, *psz_mrl;
-    char **ppsz_options = NULL;
-    int i_options = 0;
+    char p_buffer[ MAX_LINE_LENGTH + 1 ];
+    bool b_showpos = var_InheritBool( p_intf, "rc-show-pos" );
 
-    if( !mrl ) return 0;
+    int  i_size = 0;
+    int  i_oldpos = 0;
+    int  i_newpos;
+    int  canc = vlc_savecancel( );
 
-    psz_mrl = psz_orig = strdup( mrl );
-    if( !psz_mrl )
+    p_buffer[0] = 0;
+
+#if defined(_WIN32) && !VLC_WINSTORE_APP
+    /* Get the file descriptor of the console input */
+    p_intf->p_sys->hConsoleIn = GetStdHandle(STD_INPUT_HANDLE);
+    if( p_intf->p_sys->hConsoleIn == INVALID_HANDLE_VALUE )
+    {
+        msg_Err( p_intf, "couldn't find user input handle" );
         return NULL;
-    while( *psz_mrl )
-    {
-        SKIPSPACE( psz_mrl );
-        psz_item = psz_mrl;
+    }
+#endif
 
-        for( ; *psz_mrl; psz_mrl++ )
+    /* Register commands that will be cleaned up upon object destruction */
+    vlc_player_t *player = vlc_playlist_GetPlayer(p_sys->playlist);
+    input_item_t *item = NULL;
+
+    /* status callbacks */
+
+    for( ;; )
+    {
+        char *psz_cmd, *psz_arg;
+        bool b_complete;
+
+        vlc_restorecancel( canc );
+
+        if( p_sys->pi_socket_listen != NULL && p_sys->i_socket == -1 )
         {
-            if( (*psz_mrl == ' ' || *psz_mrl == '\t') && psz_mrl[1] == ':' )
+            p_sys->i_socket =
+                net_Accept( p_intf, p_sys->pi_socket_listen );
+            if( p_sys->i_socket == -1 ) continue;
+        }
+
+        b_complete = ReadCommand( p_intf, p_buffer, &i_size );
+        canc = vlc_savecancel( );
+
+        /* Manage the input part */
+        if( item == NULL )
+        {
+            vlc_player_Lock(player);
+            item = vlc_player_HoldCurrentMedia(player);
+            vlc_player_Unlock(player);
+            /* New input has been registered */
+            if( item )
             {
-                /* We have a complete item */
-                break;
-            }
-            if( (*psz_mrl == ' ' || *psz_mrl == '\t') &&
-                (psz_mrl[1] == '"' || psz_mrl[1] == '\'') && psz_mrl[2] == ':')
-            {
-                /* We have a complete item */
-                break;
+                char *psz_uri = input_item_GetURI( item );
+                msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
+                free( psz_uri );
             }
         }
 
-        if( *psz_mrl ) { *psz_mrl = 0; psz_mrl++; }
-        SKIPTRAILINGSPACE( psz_item, psz_item + strlen( psz_item ) );
-
-        /* Remove '"' and '\'' if necessary */
-        if( *psz_item == '"' && psz_item[strlen(psz_item)-1] == '"' )
-        { psz_item++; psz_item[strlen(psz_item)-1] = 0; }
-        if( *psz_item == '\'' && psz_item[strlen(psz_item)-1] == '\'' )
-        { psz_item++; psz_item[strlen(psz_item)-1] = 0; }
-
-        if( !psz_item_mrl )
+        vlc_player_Lock(player);
+        if( !vlc_player_IsStarted( player ) )
         {
-            if( strstr( psz_item, "://" ) != NULL )
-                psz_item_mrl = strdup( psz_item );
+            if (item)
+            {
+                input_item_Release( item );
+                item = NULL;
+            }
+
+            p_sys->last_state = VLC_PLAYER_STATE_STOPPED;
+            msg_rc( STATUS_CHANGE "( stop state: 0 )" );
+        }
+        vlc_player_Unlock(player);
+
+        if( item != NULL )
+        {
+            vlc_player_Lock(player);
+            enum vlc_player_state state = vlc_player_GetState(player);
+            vlc_player_Unlock(player);
+
+            if (p_sys->last_state != state)
+            {
+                switch (state)
+                {
+                    case VLC_PLAYER_STATE_STOPPING:
+                    case VLC_PLAYER_STATE_STOPPED:
+                        msg_rc(STATUS_CHANGE "( stop state: 5 )");
+                        break;
+                    case VLC_PLAYER_STATE_PLAYING:
+                        msg_rc(STATUS_CHANGE "( play state: 3 )");
+                        break;
+                    case VLC_PLAYER_STATE_PAUSED:
+                        msg_rc(STATUS_CHANGE "( pause state: 4 )");
+                        break;
+                    default:
+                        break;
+                }
+                p_sys->last_state = state;
+            }
+        }
+
+        if( item && b_showpos )
+        {
+            vlc_player_Lock(player);
+            i_newpos = 100 * vlc_player_GetPosition( player );
+            vlc_player_Unlock(player);
+            if( i_oldpos != i_newpos )
+            {
+                i_oldpos = i_newpos;
+                msg_rc( "pos: %d%%", i_newpos );
+            }
+        }
+
+        /* Is there something to do? */
+        if( !b_complete ) continue;
+
+        /* Skip heading spaces */
+        psz_cmd = p_buffer;
+        while( *psz_cmd == ' ' )
+        {
+            psz_cmd++;
+        }
+
+        /* Split psz_cmd at the first space and make sure that
+         * psz_arg is valid */
+        psz_arg = strchr( psz_cmd, ' ' );
+        if( psz_arg )
+        {
+            *psz_arg++ = 0;
+            while( *psz_arg == ' ' )
+            {
+                psz_arg++;
+            }
+        }
+        else
+        {
+            psz_arg = (char*)"";
+        }
+
+        if( !strcmp( psz_cmd, "quit" ) )
+            libvlc_Quit( vlc_object_instance(p_intf) );
+
+#define VOID(name, func) \
+        if (strcmp(psz_cmd, name) == 0) { \
+            vlc_value_t n; \
+            func(VLC_OBJECT(p_intf), psz_cmd, n); \
+        } else
+
+#define STRING(name, func) \
+        if (strcmp(psz_cmd, name) == 0) { \
+            vlc_value_t n = { .psz_string = psz_arg }; \
+            func(VLC_OBJECT(p_intf), psz_cmd, n); \
+        } else
+
+
+        STRING("intf", Intf)
+
+        STRING("add", Playlist)
+        STRING("repeat", Playlist)
+        STRING("loop", Playlist)
+        STRING("random", Playlist)
+        STRING("enqueue", Playlist)
+        VOID("playlist", Playlist)
+        VOID("sort", Playlist)
+        VOID("play", Playlist)
+        VOID("stop", Playlist)
+        VOID("clear", Playlist)
+        VOID("prev", Playlist)
+        VOID("next", Playlist)
+        STRING("goto", Playlist)
+        STRING("status", Playlist)
+
+        /* DVD commands */
+        VOID("pause", Input)
+        STRING("seek", Input)
+        STRING("title", Input)
+        VOID("title_n", Input)
+        VOID("title_p", Input)
+        STRING("chapter", Input)
+        VOID("chapter_n", Input)
+        VOID("chapter_p", Input)
+
+        VOID("fastforward", Input)
+        VOID("rewind", Input)
+        VOID("faster", Input)
+        VOID("slower", Input)
+        VOID("normal", Input)
+        VOID("frame", Input)
+
+        STRING("atrack", Input)
+        STRING("vtrack", Input)
+        STRING("strack", Input)
+
+        /* video commands */
+        STRING("vratio", VideoConfig)
+        STRING("vcrop", VideoConfig)
+        STRING("vzoom", VideoConfig)
+        VOID("snapshot", VideoConfig)
+
+        /* audio commands */
+        STRING("volume", Volume)
+        STRING("volup", VolumeMove)
+        STRING("voldown", VolumeMove)
+        STRING("adev", AudioDevice)
+        STRING("achan", AudioChannel)
+
+#undef STRING
+#undef VOID
+
+        /* misc menu commands */
+        if( !strcmp( psz_cmd, "stats" ) )
+            Statistics( p_intf );
+        else if( !strcmp( psz_cmd, "logout" ) )
+        {
+            /* Close connection */
+            if( p_sys->i_socket != -1 )
+            {
+                net_Close( p_sys->i_socket );
+                p_sys->i_socket = -1;
+            }
+        }
+        else if( !strcmp( psz_cmd, "info" ) )
+        {
+            if( item )
+            {
+                int i;
+                vlc_mutex_lock( &item->lock );
+                for ( i = 0; i < item->i_categories; i++ )
+                {
+                    info_category_t *p_category = item->pp_categories[i];
+                    info_t *p_info;
+
+                    msg_rc( "+----[ %s ]", p_category->psz_name );
+                    msg_rc( "| " );
+                    info_foreach(p_info, &p_category->infos)
+                        msg_rc( "| %s: %s", p_info->psz_name,
+                                p_info->psz_value );
+                    msg_rc( "| " );
+                }
+                msg_rc( "+----[ end of stream info ]" );
+                vlc_mutex_unlock( &item->lock );
+            }
             else
-                psz_item_mrl = vlc_path2uri( psz_item, NULL );
-            if( psz_item_mrl == NULL )
             {
-                free( psz_orig );
-                return NULL;
+                msg_rc( "no input" );
             }
         }
-        else if( *psz_item )
+        else if( !strcmp( psz_cmd, "is_playing" ) )
         {
-            i_options++;
-            ppsz_options = xrealloc( ppsz_options, i_options * sizeof(char *) );
-            ppsz_options[i_options - 1] = &psz_item[1];
+            if (p_sys->last_state != VLC_PLAYER_STATE_PLAYING &&
+                p_sys->last_state != VLC_PLAYER_STATE_PAUSED)
+            {
+                msg_rc( "0" );
+            }
+            else
+            {
+                msg_rc( "1" );
+            }
+        }
+        else if( !strcmp( psz_cmd, "get_time" ) )
+        {
+            vlc_player_Lock(player);
+            vlc_tick_t t = vlc_player_GetTime(player);
+            vlc_player_Unlock(player);
+            if (t != VLC_TICK_INVALID)
+                msg_rc("%"PRIu64, SEC_FROM_VLC_TICK(t));
+        }
+        else if( !strcmp( psz_cmd, "get_length" ) )
+        {
+            vlc_player_Lock(player);
+            vlc_tick_t l = vlc_player_GetLength(player);
+            vlc_player_Unlock(player);
+            if (l != VLC_TICK_INVALID)
+                msg_rc("%"PRIu64, SEC_FROM_VLC_TICK(l));
+        }
+        else if( !strcmp( psz_cmd, "get_title" ) )
+        {
+            vlc_player_Lock(player);
+            struct vlc_player_title const *title =
+                vlc_player_GetSelectedTitle(player);
+            vlc_player_Unlock(player);
+            msg_rc("%s", title ? title->name : "");
+        }
+        else if( !strcmp( psz_cmd, "longhelp" ) || !strncmp( psz_cmd, "h", 1 )
+                 || !strncmp( psz_cmd, "H", 1 ) || !strncmp( psz_cmd, "?", 1 ) )
+        {
+            Help( p_intf );
+        }
+        else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
+        {
+            var_SetInteger( vlc, "key-action", vlc_actions_get_id( psz_arg ) );
+        }
+        else switch( psz_cmd[0] )
+        {
+        case 'f':
+        case 'F':
+        {
+            bool fs;
+            if( !strncasecmp( psz_arg, "on", 2 ) )
+                fs = true;
+            else if( !strncasecmp( psz_arg, "off", 3 ) )
+                fs = false;
+            else
+                fs = !vlc_player_vout_IsFullscreen(player);
+            vlc_player_vout_SetFullscreen(player, fs);
+            break;
+        }
+        case 's':
+        case 'S':
+            ;
+            break;
+
+        case '\0':
+            /* Ignore empty lines */
+            break;
+
+        default:
+            msg_rc(_("Unknown command `%s'. Type `help' for help."), psz_cmd);
+            break;
         }
 
-        if( *psz_mrl ) SKIPSPACE( psz_mrl );
+        /* Command processed */
+        i_size = 0; p_buffer[0] = 0;
     }
 
-    /* Now create a playlist item */
-    if( psz_item_mrl )
-    {
-        p_item = input_item_New( psz_item_mrl, NULL );
-        for( int i = 0; i < i_options; i++ )
-        {
-            input_item_AddOption( p_item, ppsz_options[i], VLC_INPUT_OPTION_TRUSTED );
-        }
-        free( psz_item_mrl );
-    }
+    msg_rc( STATUS_CHANGE "( stop state: 0 )" );
+    msg_rc( STATUS_CHANGE "( quit )" );
 
-    if( i_options ) free( ppsz_options );
-    free( psz_orig );
+    vlc_restorecancel( canc );
 
-    return p_item;
+    return NULL;
 }
+
+/*****************************************************************************
+ * Activate: initialize and create stuff
+ *****************************************************************************/
+static int Activate( vlc_object_t *p_this )
+{
+    /* FIXME: This function is full of memory leaks and bugs in error paths. */
+    intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    char *psz_host, *psz_unix_path = NULL;
+    int  *pi_socket = NULL;
+
+#ifndef _WIN32
+#if defined(HAVE_ISATTY)
+    /* Check that stdin is a TTY */
+    if( !var_InheritBool( p_intf, "rc-fake-tty" ) && !isatty( 0 ) )
+    {
+        msg_Warn( p_intf, "fd 0 is not a TTY" );
+        return VLC_EGENERIC;
+    }
+#endif
+
+    psz_unix_path = var_InheritString( p_intf, "rc-unix" );
+    if( psz_unix_path )
+    {
+        int i_socket;
+
+#ifndef AF_LOCAL
+        msg_Warn( p_intf, "your OS doesn't support filesystem sockets" );
+        free( psz_unix_path );
+        return VLC_EGENERIC;
+#else
+        struct sockaddr_un addr;
+
+        memset( &addr, 0, sizeof(struct sockaddr_un) );
+
+        msg_Dbg( p_intf, "trying UNIX socket" );
+
+        if( (i_socket = vlc_socket( PF_LOCAL, SOCK_STREAM, 0, false ) ) < 0 )
+        {
+            msg_Warn( p_intf, "can't open socket: %s", vlc_strerror_c(errno) );
+            free( psz_unix_path );
+            return VLC_EGENERIC;
+        }
+
+        addr.sun_family = AF_LOCAL;
+        strncpy( addr.sun_path, psz_unix_path, sizeof( addr.sun_path ) );
+        addr.sun_path[sizeof( addr.sun_path ) - 1] = '\0';
+
+        if (bind (i_socket, (struct sockaddr *)&addr, sizeof (addr))
+         && (errno == EADDRINUSE)
+         && connect (i_socket, (struct sockaddr *)&addr, sizeof (addr))
+         && (errno == ECONNREFUSED))
+        {
+            msg_Info (p_intf, "Removing dead UNIX socket: %s", psz_unix_path);
+            unlink (psz_unix_path);
+
+            if (bind (i_socket, (struct sockaddr *)&addr, sizeof (addr)))
+            {
+                msg_Err (p_intf, "cannot bind UNIX socket at %s: %s",
+                         psz_unix_path, vlc_strerror_c(errno));
+                free (psz_unix_path);
+                net_Close (i_socket);
+                return VLC_EGENERIC;
+            }
+        }
+
+        if( listen( i_socket, 1 ) )
+        {
+            msg_Warn (p_intf, "can't listen on socket: %s",
+                      vlc_strerror_c(errno));
+            free( psz_unix_path );
+            net_Close( i_socket );
+            return VLC_EGENERIC;
+        }
+
+        /* FIXME: we need a core function to merge listening sockets sets */
+        pi_socket = calloc( 2, sizeof( int ) );
+        if( pi_socket == NULL )
+        {
+            free( psz_unix_path );
+            net_Close( i_socket );
+            return VLC_ENOMEM;
+        }
+        pi_socket[0] = i_socket;
+        pi_socket[1] = -1;
+#endif /* AF_LOCAL */
+    }
+#endif /* !_WIN32 */
+
+    if( ( pi_socket == NULL ) &&
+        ( psz_host = var_InheritString( p_intf, "rc-host" ) ) != NULL )
+    {
+        vlc_url_t url;
+
+        vlc_UrlParse( &url, psz_host );
+        if( url.psz_host == NULL )
+        {
+            vlc_UrlClean( &url );
+            char *psz_backward_compat_host;
+            if( asprintf( &psz_backward_compat_host, "//%s", psz_host ) < 0 )
+            {
+                free( psz_host );
+                return VLC_EGENERIC;
+            }
+            free( psz_host );
+            psz_host = psz_backward_compat_host;
+            vlc_UrlParse( &url, psz_host );
+        }
+
+        msg_Dbg( p_intf, "base: %s, port: %d", url.psz_host, url.i_port );
+
+        pi_socket = net_ListenTCP(p_this, url.psz_host, url.i_port);
+        if( pi_socket == NULL )
+        {
+            msg_Warn( p_intf, "can't listen to %s port %i",
+                      url.psz_host, url.i_port );
+            vlc_UrlClean( &url );
+            free( psz_host );
+            return VLC_EGENERIC;
+        }
+
+        vlc_UrlClean( &url );
+        free( psz_host );
+    }
+
+    intf_sys_t *p_sys = malloc( sizeof( *p_sys ) );
+    if( unlikely(p_sys == NULL) )
+    {
+        net_ListenClose( pi_socket );
+        free( psz_unix_path );
+        return VLC_ENOMEM;
+    }
+
+    p_intf->p_sys = p_sys;
+    p_sys->pi_socket_listen = pi_socket;
+    p_sys->i_socket = -1;
+    p_sys->psz_unix_path = psz_unix_path;
+    vlc_mutex_init( &p_sys->status_lock );
+    p_sys->last_state = VLC_PLAYER_STATE_STOPPED;
+    p_sys->b_input_buffering = false;
+    p_sys->playlist = vlc_intf_GetMainPlaylist(p_intf);;
+    vlc_player_t *player = vlc_playlist_GetPlayer(p_sys->playlist);
+
+    /* Non-buffered stdout */
+    setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
+
+#if VLC_WINSTORE_APP
+    p_sys->b_quiet = true;
+#elif defined(_WIN32)
+    p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
+    if( !p_sys->b_quiet )
+        intf_consoleIntroMsg( p_intf );
+#endif
+
+    if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+        goto error;
+
+    msg_rc( "%s", _("Remote control interface initialized. Type `help' for help.") );
+
+    static struct vlc_player_cbs const player_cbs =
+    {
+        .on_state_changed = player_on_state_changed,
+        .on_buffering_changed = player_on_buffering_changed,
+        .on_rate_changed = player_on_rate_changed,
+        .on_position_changed = player_on_position_changed,
+    };
+    vlc_player_Lock(player);
+    p_sys->player_listener =
+        vlc_player_AddListener(player, &player_cbs, p_intf);
+    if (!p_sys->player_listener)
+    {
+        vlc_player_Unlock(player);
+        goto error;
+    }
+
+    static struct vlc_player_aout_cbs const player_aout_cbs =
+    {
+        .on_volume_changed = player_aout_on_volume_changed,
+    };
+    p_sys->player_aout_listener =
+        vlc_player_aout_AddListener(player, &player_aout_cbs, p_intf);
+    vlc_player_Unlock(player);
+    if (!p_sys->player_aout_listener)
+        goto error;
+
+    return VLC_SUCCESS;
+
+error:
+    if (p_sys->player_listener)
+    {
+        vlc_player_Lock(player);
+        vlc_player_RemoveListener(player, p_sys->player_listener);
+        vlc_player_Unlock(player);
+    }
+    net_ListenClose( pi_socket );
+    free( psz_unix_path );
+    vlc_mutex_destroy( &p_sys->status_lock );
+    free( p_sys );
+    return VLC_EGENERIC;
+}
+
+/*****************************************************************************
+ * Deactivate: uninitialize and cleanup
+ *****************************************************************************/
+static void Deactivate( vlc_object_t *p_this )
+{
+    intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    intf_sys_t *p_sys = p_intf->p_sys;
+
+    vlc_player_t *player = vlc_playlist_GetPlayer(p_sys->playlist);
+    vlc_player_Lock(player);
+    vlc_player_aout_RemoveListener(player, p_sys->player_aout_listener);
+    vlc_player_RemoveListener(player, p_sys->player_listener);
+    vlc_player_Unlock(player);
+
+    vlc_cancel( p_sys->thread );
+    vlc_join( p_sys->thread, NULL );
+
+    net_ListenClose( p_sys->pi_socket_listen );
+    if( p_sys->i_socket != -1 )
+        net_Close( p_sys->i_socket );
+    if( p_sys->psz_unix_path != NULL )
+    {
+#if defined(AF_LOCAL) && !defined(_WIN32)
+        unlink( p_sys->psz_unix_path );
+#endif
+        free( p_sys->psz_unix_path );
+    }
+    vlc_mutex_destroy( &p_sys->status_lock );
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+#define POS_TEXT N_("Show stream position")
+#define POS_LONGTEXT N_("Show the current position in seconds within the " \
+                        "stream from time to time." )
+
+#define TTY_TEXT N_("Fake TTY")
+#define TTY_LONGTEXT N_("Force the rc module to use stdin as if it was a TTY.")
+
+#define UNIX_TEXT N_("UNIX socket command input")
+#define UNIX_LONGTEXT N_("Accept commands over a Unix socket rather than " \
+                         "stdin." )
+
+#define HOST_TEXT N_("TCP command input")
+#define HOST_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
+            "You can set the address and port the interface will bind to." )
+
+#ifdef _WIN32
+#define QUIET_TEXT N_("Do not open a DOS command box interface")
+#define QUIET_LONGTEXT N_( \
+    "By default the rc interface plugin will start a DOS command box. " \
+    "Enabling the quiet mode will not bring this command box but can also " \
+    "be pretty annoying when you want to stop VLC and no video window is " \
+    "open." )
+#endif
+
+vlc_module_begin()
+    set_shortname(N_("RC"))
+    set_category(CAT_INTERFACE)
+    set_subcategory(SUBCAT_INTERFACE_MAIN)
+    set_description(N_("Remote control interface"))
+    add_bool("rc-show-pos", false, POS_TEXT, POS_LONGTEXT, true)
+
+#ifdef _WIN32
+    add_bool("rc-quiet", false, QUIET_TEXT, QUIET_LONGTEXT, false)
+#else
+#if defined (HAVE_ISATTY)
+    add_bool("rc-fake-tty", false, TTY_TEXT, TTY_LONGTEXT, true)
+#endif
+    add_string("rc-unix", NULL, UNIX_TEXT, UNIX_LONGTEXT, true)
+#endif
+    add_string("rc-host", NULL, HOST_TEXT, HOST_LONGTEXT, true)
+
+    set_capability("interface", 20)
+
+    set_callbacks(Activate, Deactivate)
+#ifdef _WIN32
+    add_shortcut("rc")
+#endif
+vlc_module_end()
