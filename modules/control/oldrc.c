@@ -1035,19 +1035,52 @@ static void Statistics( intf_thread_t *p_intf )
     vlc_mutex_unlock( &p_item->lock );
 }
 
+static const struct
+{
+    const char *name;
+    void (*handler)(vlc_object_t *, const char *, vlc_value_t);
+} void_cmds[] =
+{
+    { "playlist", Playlist },
+    { "sort", Playlist },
+    { "play", Playlist },
+    { "stop", Playlist },
+    { "clear", Playlist },
+    { "prev", Playlist },
+    { "next", Playlist },
+    { "pause", Input },
+    { "title_n", Input },
+    { "title_p", Input },
+    { "chapter_n", Input },
+    { "chapter_p", Input },
+    { "fastforward", Input },
+    { "rewind", Input },
+    { "faster", Input },
+    { "slower", Input },
+    { "normal", Input },
+    { "frame", Input },
+    { "snapshot", VideoConfig },
+};
+
 static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
 {
     intf_thread_t *const p_intf = intf;
     intf_sys_t *sys = intf->p_sys;
 
     if (strcmp(cmd, "quit") == 0)
+    {
         libvlc_Quit(vlc_object_instance(intf));
+        return;
+    }
 
-#define VOID(name, func) \
-    if (strcmp(cmd, name) == 0) { \
-        vlc_value_t n; \
-        func(VLC_OBJECT(intf), cmd, n); \
-    } else
+    for (size_t i = 0; i < ARRAY_SIZE(void_cmds); i++)
+        if (strcmp(cmd, void_cmds[i].name) == 0)
+        {
+            vlc_value_t n;
+
+            void_cmds[i].handler(VLC_OBJECT(intf), cmd, n);
+            return;
+        }
 
 #define STRING(name, func) \
     if (strcmp(cmd, name) == 0) { \
@@ -1062,32 +1095,13 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
     STRING("loop", Playlist)
     STRING("random", Playlist)
     STRING("enqueue", Playlist)
-    VOID("playlist", Playlist)
-    VOID("sort", Playlist)
-    VOID("play", Playlist)
-    VOID("stop", Playlist)
-    VOID("clear", Playlist)
-    VOID("prev", Playlist)
-    VOID("next", Playlist)
     STRING("goto", Playlist)
     STRING("status", Playlist)
 
     /* DVD commands */
-    VOID("pause", Input)
     STRING("seek", Input)
     STRING("title", Input)
-    VOID("title_n", Input)
-    VOID("title_p", Input)
     STRING("chapter", Input)
-    VOID("chapter_n", Input)
-    VOID("chapter_p", Input)
-
-    VOID("fastforward", Input)
-    VOID("rewind", Input)
-    VOID("faster", Input)
-    VOID("slower", Input)
-    VOID("normal", Input)
-    VOID("frame", Input)
 
     STRING("atrack", Input)
     STRING("vtrack", Input)
@@ -1097,7 +1111,6 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
     STRING("vratio", VideoConfig)
     STRING("vcrop", VideoConfig)
     STRING("vzoom", VideoConfig)
-    VOID("snapshot", VideoConfig)
 
     /* audio commands */
     STRING("volume", Volume)
@@ -1107,7 +1120,6 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
     STRING("achan", AudioChannel)
 
 #undef STRING
-#undef VOID
 
     /* misc menu commands */
     if (strcmp(cmd, "stats") == 0)
