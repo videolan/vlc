@@ -1,6 +1,6 @@
 # matroska
 
-MATROSKA_VERSION := 1.4.9
+MATROSKA_VERSION := 1.5.1
 MATROSKA_URL := http://dl.matroska.org/downloads/libmatroska/libmatroska-$(MATROSKA_VERSION).tar.xz
 
 PKGS += matroska
@@ -18,8 +18,6 @@ $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.xz:
 
 libmatroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
 	$(UNPACK)
-	$(APPLY) $(SRC)/matroska/0001-KaxBlock-don-t-reset-potentially-unallocated-memory.patch
-	$(APPLY) $(SRC)/matroska/0001-KaxBlock-do-not-attempt-to-use-laced-sizes-that-are-.patch
 	$(call pkg_static,"libmatroska.pc.in")
 	$(MOVE)
 
