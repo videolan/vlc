@@ -230,19 +230,19 @@ static int DemuxOpen(vlc_object_t *obj, vcddev_t *dev, unsigned track)
     /* Track number in input item */
     if (sys->start == (unsigned)-1 || sys->length == (unsigned)-1)
     {
-        int *sectors = NULL; /* Track sectors */
-        unsigned titles = ioctl_GetTracksMap(obj, dev, &sectors);
-
-        if (track > titles)
+        vcddev_toc_t *p_toc = ioctl_GetTOC(obj, dev, true);
+        if(p_toc == NULL)
+            goto error;
+        if (track > (unsigned)p_toc->i_tracks)
         {
-            msg_Err(obj, "invalid track number: %u/%u", track, titles);
-            free(sectors);
+            msg_Err(obj, "invalid track number: %u/%i", track, p_toc->i_tracks);
+            vcddev_toc_Free(p_toc);
             goto error;
         }
 
-        sys->start = sectors[track - 1];
-        sys->length = sectors[track] - sys->start;
-        free(sectors);
+        sys->start = p_toc->p_sectors[track - 1].i_lba;
+        sys->length = p_toc->p_sectors[track].i_lba - sys->start;
+        vcddev_toc_Free(p_toc);
     }
 
     es_format_t fmt;
@@ -271,8 +271,7 @@ error:
 typedef struct
 {
     vcddev_t    *vcddev;                            /* vcd device descriptor */
-    int         *p_sectors;                                 /* Track sectors */
-    int          titles;
+    vcddev_toc_t *p_toc;                            /* Tracks TOC */
     int          cdtextc;
     vlc_meta_t **cdtextv;
 #ifdef HAVE_LIBCDDB
@@ -281,7 +280,7 @@ typedef struct
 } access_sys_t;
 
 #ifdef HAVE_LIBCDDB
-static cddb_disc_t *GetCDDBInfo( vlc_object_t *obj, int i_titles, int *p_sectors )
+static cddb_disc_t *GetCDDBInfo( vlc_object_t *obj, const vcddev_toc_t *p_toc )
 {
     if( !var_InheritBool( obj, "metadata-network-access" ) )
     {
@@ -337,17 +336,17 @@ static cddb_disc_t *GetCDDBInfo( vlc_object_t *obj, int i_titles, int *p_sectors
     }
 
     int64_t i_length = 2000000; /* PreGap */
-    for( int i = 0; i < i_titles; i++ )
+    for( int i = 0; i < p_toc->i_tracks; i++ )
     {
         cddb_track_t *t = cddb_track_new();
-        cddb_track_set_frame_offset( t, p_sectors[i] + 150 );  /* Pregap offset */
+        cddb_track_set_frame_offset( t, p_toc->p_sectors[i].i_lba + 150 );  /* Pregap offset */
 
         cddb_disc_add_track( p_disc, t );
-        const int64_t i_size = ( p_sectors[i+1] - p_sectors[i] ) *
+        const int64_t i_size = ( p_toc->p_sectors[i+1].i_lba - p_toc->p_sectors[i].i_lba ) *
                                (int64_t)CDDA_DATA_SIZE;
         i_length += INT64_C(1000000) * i_size / 44100 / 4  ;
 
-        msg_Dbg( obj, "Track %i offset: %i", i, p_sectors[i] + 150 );
+        msg_Dbg( obj, "Track %i offset: %i", i, p_toc->p_sectors[i].i_lba + 150 );
     }
 
     msg_Dbg( obj, "Total length: %i", (int)(i_length/1000000) );
@@ -426,7 +425,7 @@ static void AccessGetMeta(stream_t *access, vlc_meta_t *meta)
         str = cddb_disc_get_artist(sys->cddb);
         if (NONEMPTY(str))
         {
-            for (int i = 0; i < sys->titles; i++)
+            for (int i = 0; i < sys->p_toc->i_tracks; i++)
             {
                 cddb_track_t *t = cddb_disc_get_track(sys->cddb, i);
                 if (t == NULL)
@@ -453,11 +452,12 @@ static void AccessGetMeta(stream_t *access, vlc_meta_t *meta)
 static int ReadDir(stream_t *access, input_item_node_t *node)
 {
     access_sys_t *sys = access->p_sys;
+    const vcddev_toc_t *p_toc = sys->p_toc;
 
     /* Build title table */
-    for (int i = 0; i < sys->titles; i++)
+    for (int i = 0; i < p_toc->i_tracks; i++)
     {
-        msg_Dbg(access, "track[%d] start=%d", i, sys->p_sectors[i]);
+        msg_Dbg(access, "track[%d] start=%d", i, p_toc->p_sectors[i].i_lba);
 
         /* Initial/default name */
         char *name;
@@ -467,7 +467,7 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
 
         /* Create playlist items */
         const vlc_tick_t duration =
-            (vlc_tick_t)(sys->p_sectors[i + 1] - sys->p_sectors[i])
+            (vlc_tick_t)(p_toc->p_sectors[i + 1].i_lba - p_toc->p_sectors[i].i_lba)
             * CDDA_DATA_SIZE * CLOCK_FREQ / 44100 / 2 / 2;
 
         input_item_t *item = input_item_NewDisc(access->psz_url,
@@ -486,14 +486,14 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
         }
 
         if (likely(asprintf(&opt, "cdda-first-sector=%i",
-                            sys->p_sectors[i]) != -1))
+                            p_toc->p_sectors[i].i_lba) != -1))
         {
             input_item_AddOption(item, opt, VLC_INPUT_OPTION_TRUSTED);
             free(opt);
         }
 
         if (likely(asprintf(&opt, "cdda-last-sector=%i",
-                            sys->p_sectors[i + 1]) != -1))
+                            p_toc->p_sectors[i + 1].i_lba) != -1))
         {
             input_item_AddOption(item, opt, VLC_INPUT_OPTION_TRUSTED);
             free(opt);
@@ -600,25 +600,24 @@ static int AccessOpen(vlc_object_t *obj, vcddev_t *dev)
     }
 
     sys->vcddev = dev;
-    sys->p_sectors = NULL;
-
-    sys->titles = ioctl_GetTracksMap(obj, dev, &sys->p_sectors);
-    if (sys->titles < 0)
+    sys->p_toc = ioctl_GetTOC(obj, dev, true);
+    if (sys->p_toc == NULL)
     {
         msg_Err(obj, "cannot count tracks");
         goto error;
     }
 
-    if (sys->titles == 0)
+    if (sys->p_toc->i_tracks == 0)
     {
         msg_Err(obj, "no audio tracks found");
+        vcddev_toc_Free(sys->p_toc);
         goto error;
     }
 
 #ifdef HAVE_LIBCDDB
     msg_Dbg(obj, "retrieving metadata with CDDB");
 
-    sys->cddb = GetCDDBInfo(obj, sys->titles, sys->p_sectors);
+    sys->cddb = GetCDDBInfo(obj, sys->p_toc);
     if (sys->cddb != NULL)
         msg_Dbg(obj, "disc ID: 0x%08x", cddb_disc_get_discid(sys->cddb));
     else
@@ -641,7 +640,6 @@ static int AccessOpen(vlc_object_t *obj, vcddev_t *dev)
     return VLC_SUCCESS;
 
 error:
-    free(sys->p_sectors);
     ioctl_Close(obj, dev);
     return VLC_EGENERIC;
 }
@@ -661,7 +659,7 @@ static void AccessClose(access_sys_t *sys)
         cddb_disc_destroy(sys->cddb);
 #endif
 
-    free(sys->p_sectors);
+    vcddev_toc_Free(sys->p_toc);
 }
 
 static int Open(vlc_object_t *obj)

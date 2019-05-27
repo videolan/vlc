@@ -30,8 +30,7 @@ struct vcddev_s
 
     /* Section used in vcd image mode */
     int    i_vcdimage_handle;                   /* vcd image file descriptor */
-    int    i_tracks;                          /* number of tracks of the vcd */
-    int    *p_sectors;                           /* tracks layout on the vcd */
+    vcddev_toc_t toc;                           /* tracks layout on the vcd */
 
     /* Section used in vcd device mode */
 
@@ -180,7 +179,7 @@ static void   CloseVCDImage( vlc_object_t *, struct vcddev_s * );
 
 #if defined( __APPLE__ )
 static CDTOC *darwin_getTOC( vlc_object_t *, const struct vcddev_s * );
-static int    darwin_getNumberOfTracks( CDTOC *, int );
+static int    darwin_getNumberOfTracks( CDTOC *, int, int *, int * );
 
 #elif defined( _WIN32 )
 static int    win32_vcd_open( vlc_object_t *, const char *, struct vcddev_s *);

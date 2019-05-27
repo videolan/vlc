@@ -73,6 +73,36 @@ static inline int MSF_TO_LBA2(uint8_t min, uint8_t sec, uint8_t frame)
     (uint8_t)((uint8_t)(0xf & (uint8_t)i)+((uint8_t)10*((uint8_t)i >> 4)))
 
 typedef struct vcddev_s vcddev_t;
+typedef struct
+{
+    int i_lba;
+    int i_control;
+} vcddev_sector_t;
+
+typedef struct
+{
+    int i_tracks;
+    vcddev_sector_t *p_sectors;
+    int i_first_track;
+    int i_last_track;
+} vcddev_toc_t;
+
+static inline vcddev_toc_t * vcddev_toc_New( void )
+{
+    return calloc(1, sizeof(vcddev_toc_t));
+}
+
+static inline void vcddev_toc_Reset( vcddev_toc_t *toc )
+{
+    free(toc->p_sectors);
+    memset(toc, 0, sizeof(*toc));
+}
+
+static inline void vcddev_toc_Free( vcddev_toc_t *toc )
+{
+    free(toc->p_sectors);
+    free(toc);
+}
 
 /*****************************************************************************
  * structure to store minute/second/frame locations
@@ -110,7 +140,7 @@ typedef struct entries_sect_s
  *****************************************************************************/
 vcddev_t *ioctl_Open         ( vlc_object_t *, const char * );
 void      ioctl_Close        ( vlc_object_t *, vcddev_t * );
-int       ioctl_GetTracksMap ( vlc_object_t *, const vcddev_t *, int ** );
+vcddev_toc_t * ioctl_GetTOC  ( vlc_object_t *, const vcddev_t *, bool );
 int       ioctl_ReadSectors  ( vlc_object_t *, const vcddev_t *,
                                int, uint8_t *, int, int );
 
