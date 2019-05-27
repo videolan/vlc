@@ -1062,6 +1062,43 @@ static const struct
     { "snapshot", VideoConfig },
 };
 
+static const struct
+{
+    const char *name;
+    void (*handler)(vlc_object_t *, const char *, vlc_value_t);
+} string_cmds[] =
+{
+    { "intf", Intf },
+    { "add", Playlist },
+    { "repeat", Playlist },
+    { "loop", Playlist },
+    { "random", Playlist },
+    { "enqueue", Playlist },
+    { "goto", Playlist },
+    { "status", Playlist },
+
+    /* DVD commands */
+    { "seek", Input },
+    { "title", Input },
+    { "chapter", Input },
+
+    { "atrack", Input },
+    { "vtrack", Input },
+    { "strack", Input },
+
+    /* video commands */
+    { "vratio", VideoConfig },
+    { "vcrop", VideoConfig },
+    { "vzoom", VideoConfig },
+
+    /* audio commands */
+    { "volume", Volume },
+    { "volup", VolumeMove },
+    { "voldown", VolumeMove },
+    { "adev", AudioDevice },
+    { "achan", AudioChannel },
+};
+
 static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
 {
     intf_thread_t *const p_intf = intf;
@@ -1082,44 +1119,15 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
             return;
         }
 
-#define STRING(name, func) \
-    if (strcmp(cmd, name) == 0) { \
-        vlc_value_t n = { .psz_string = (char *)arg }; \
-        func(VLC_OBJECT(intf), cmd, n); \
-    } else
+    for (size_t i = 0; i < ARRAY_SIZE(string_cmds); i++)
+        if (strcmp(cmd, string_cmds[i].name) == 0)
+        {
+            vlc_value_t n = { .psz_string = (char *)arg };
 
-    STRING("intf", Intf)
+            string_cmds[i].handler(VLC_OBJECT(intf), cmd, n);
+            return;
+        }
 
-    STRING("add", Playlist)
-    STRING("repeat", Playlist)
-    STRING("loop", Playlist)
-    STRING("random", Playlist)
-    STRING("enqueue", Playlist)
-    STRING("goto", Playlist)
-    STRING("status", Playlist)
-
-    /* DVD commands */
-    STRING("seek", Input)
-    STRING("title", Input)
-    STRING("chapter", Input)
-
-    STRING("atrack", Input)
-    STRING("vtrack", Input)
-    STRING("strack", Input)
-
-    /* video commands */
-    STRING("vratio", VideoConfig)
-    STRING("vcrop", VideoConfig)
-    STRING("vzoom", VideoConfig)
-
-    /* audio commands */
-    STRING("volume", Volume)
-    STRING("volup", VolumeMove)
-    STRING("voldown", VolumeMove)
-    STRING("adev", AudioDevice)
-    STRING("achan", AudioChannel)
-
-#undef STRING
 
     /* misc menu commands */
     if (strcmp(cmd, "stats") == 0)
