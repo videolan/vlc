@@ -541,22 +541,149 @@ static void print_playlist(intf_thread_t *p_intf, vlc_playlist_t *playlist)
     }
 }
 
-static void Playlist(intf_thread_t *intf, char const *psz_cmd,
-                     vlc_value_t newval)
+static void PlaylistDoVoid(intf_thread_t *intf, int (*cb)(vlc_playlist_t *))
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+
+    vlc_playlist_Lock(playlist);
+    cb(playlist);
+    vlc_playlist_Unlock(playlist);
+}
+
+static void PlaylistPrev(intf_thread_t *intf, char const *cmd,
+                         vlc_value_t newval)
+{
+    PlaylistDoVoid(intf, vlc_playlist_Prev);
+}
+
+static void PlaylistNext(intf_thread_t *intf, char const *cmd,
+                         vlc_value_t newval)
+{
+    PlaylistDoVoid(intf, vlc_playlist_Next);
+}
+
+static void PlaylistPlay(intf_thread_t *intf, char const *cmd,
+                         vlc_value_t newval)
+{
+    PlaylistDoVoid(intf, vlc_playlist_Start);
+}
+
+static int PlaylistDoStop(vlc_playlist_t *playlist)
+{
+    vlc_playlist_Stop(playlist);
+    return 0;
+}
+
+static void PlaylistStop(intf_thread_t *intf, char const *cmd,
+                         vlc_value_t newval)
+{
+    PlaylistDoVoid(intf, PlaylistDoStop);
+}
+
+static int PlaylistDoClear(vlc_playlist_t *playlist)
+{
+    PlaylistDoStop(playlist);
+    vlc_playlist_Clear(playlist);
+    return 0;
+}
+
+static void PlaylistClear(intf_thread_t *intf, char const *cmd,
+                          vlc_value_t newval)
+{
+    PlaylistDoVoid(intf, PlaylistDoClear);
+}
+
+static int PlaylistDoSort(vlc_playlist_t *playlist)
+{
+    struct vlc_playlist_sort_criterion criteria =
+    {
+        .key = VLC_PLAYLIST_SORT_KEY_ARTIST,
+        .order = VLC_PLAYLIST_SORT_ORDER_ASCENDING
+    };
+
+    return vlc_playlist_Sort(playlist, &criteria, 1);
+}
+
+static void PlaylistSort(intf_thread_t *intf, char const *cmd,
+                         vlc_value_t newval)
+{
+    PlaylistDoVoid(intf, PlaylistDoSort);
+}
+
+static void PlaylistList(intf_thread_t *intf, char const *psz_cmd,
+                         vlc_value_t newval)
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+
+    msg_print(intf, "+----[ Playlist ]");
+    vlc_playlist_Lock(playlist);
+    print_playlist(intf, playlist);
+    vlc_playlist_Unlock(playlist);
+    msg_print(intf, "+----[ End of playlist ]");
+}
+
+static void PlaylistStatus(intf_thread_t *intf, char const *psz_cmd,
+                           vlc_value_t newval)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
 
     vlc_playlist_Lock(playlist);
 
+    input_item_t *item = vlc_player_GetCurrentMedia(player);
+    if (item != NULL)
+    {
+        char *uri = input_item_GetURI(item);
+        if (likely(uri != NULL))
+        {
+            msg_print(intf, STATUS_CHANGE "( new input: %s )", uri);
+            free(uri);
+        }
+    }
+
+    float volume = vlc_player_aout_GetVolume(player);
+    if (isgreaterequal(volume, 0.f))
+        msg_print(intf, STATUS_CHANGE "( audio volume: %ld )",
+                  lroundf(volume * 100.f));
+
+    enum vlc_player_state state = vlc_player_GetState(player);
+
+    vlc_playlist_Unlock(playlist);
+
+    int stnum = -1;
+    const char *stname = "unknown";
+
+    switch (state)
+    {
+        case VLC_PLAYER_STATE_STOPPING:
+        case VLC_PLAYER_STATE_STOPPED:
+            stnum = 5;
+            stname = "stop";
+            break;
+        case VLC_PLAYER_STATE_PLAYING:
+            stnum = 3;
+            stname = "play";
+            break;
+        case VLC_PLAYER_STATE_PAUSED:
+            stnum = 4;
+            stname = "pause";
+            break;
+        default:
+            break;
+    }
+
+    msg_print(intf, STATUS_CHANGE "( %s state: %u )", stname, stnum);
+}
+
+static void Playlist(intf_thread_t *intf, char const *psz_cmd,
+                     vlc_value_t newval)
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+
+    vlc_playlist_Lock(playlist);
+
     /* Parse commands that require a playlist */
-    if( !strcmp( psz_cmd, "prev" ) )
-        vlc_playlist_Prev(playlist);
-    else if( !strcmp( psz_cmd, "next" ) )
-        vlc_playlist_Next(playlist);
-    else if( !strcmp( psz_cmd, "play" ) )
-        vlc_playlist_Start(playlist);
-    else if( !strcmp( psz_cmd, "repeat" ) )
+    if( !strcmp( psz_cmd, "repeat" ) )
     {
         bool b_update = true;
         enum vlc_playlist_playback_repeat repeat_mode =
@@ -649,13 +776,6 @@ static void Playlist(intf_thread_t *intf, char const *psz_cmd,
                                    "Playlist has only %zu elements", count),
                       count);
     }
-    else if( !strcmp( psz_cmd, "stop" ) )
-        vlc_playlist_Stop(playlist);
-    else if( !strcmp( psz_cmd, "clear" ) )
-    {
-        vlc_playlist_Stop(playlist);
-        vlc_playlist_Clear(playlist);
-    }
     else if ((!strcmp(psz_cmd, "add") || !strcmp(psz_cmd, "enqueue")) &&
              newval.psz_string && *newval.psz_string)
     {
@@ -676,65 +796,6 @@ static void Playlist(intf_thread_t *intf, char const *psz_cmd,
                 vlc_playlist_PlayAt(playlist, count);
         }
     }
-    else if( !strcmp( psz_cmd, "playlist" ) )
-    {
-        msg_print(intf, "+----[ Playlist ]");
-        print_playlist(intf, playlist);
-        msg_print(intf, "+----[ End of playlist ]" );
-    }
-
-    else if( !strcmp( psz_cmd, "sort" ))
-    {
-        struct vlc_playlist_sort_criterion criteria =
-        {
-            .key = VLC_PLAYLIST_SORT_KEY_ARTIST,
-            .order = VLC_PLAYLIST_SORT_ORDER_ASCENDING
-        };
-        vlc_playlist_Sort(playlist, &criteria, 1);
-    }
-    else if( !strcmp( psz_cmd, "status" ) )
-    {
-        input_item_t *item = vlc_player_GetCurrentMedia(player);
-        if (item)
-        {
-            char *psz_uri = input_item_GetURI(item);
-            if( likely(psz_uri != NULL) )
-            {
-                msg_print(intf, STATUS_CHANGE "( new input: %s )", psz_uri);
-                free( psz_uri );
-            }
-        }
-
-        float volume = vlc_player_aout_GetVolume(player);
-        if( volume >= 0.f )
-            msg_print(intf, STATUS_CHANGE "( audio volume: %ld )",
-                      lroundf(volume * 100.f));
-
-        enum vlc_player_state state = vlc_player_GetState(player);
-        int stnum = -1;
-        const char *stname = "unknown";
-
-        switch (state)
-        {
-            case VLC_PLAYER_STATE_STOPPING:
-            case VLC_PLAYER_STATE_STOPPED:
-                stnum = 5;
-                stname = "stop";
-                break;
-            case VLC_PLAYER_STATE_PLAYING:
-                stnum = 3;
-                stname = "play";
-                break;
-            case VLC_PLAYER_STATE_PAUSED:
-                stnum = 4;
-                stname = "pause";
-                break;
-            default:
-                break;
-        }
-        msg_print(intf, STATUS_CHANGE "( %s state: %u )", stname, stnum);
-    }
-
     /*
      * sanity check
      */
@@ -1044,13 +1105,14 @@ static const struct
     void (*handler)(intf_thread_t *, const char *, vlc_value_t);
 } void_cmds[] =
 {
-    { "playlist", Playlist },
-    { "sort", Playlist },
-    { "play", Playlist },
-    { "stop", Playlist },
-    { "clear", Playlist },
-    { "prev", Playlist },
-    { "next", Playlist },
+    { "playlist", PlaylistList },
+    { "sort", PlaylistSort },
+    { "play", PlaylistPlay },
+    { "stop", PlaylistStop },
+    { "clear", PlaylistClear },
+    { "prev", PlaylistPrev },
+    { "next", PlaylistNext },
+    { "status", PlaylistStatus },
     { "pause", Input },
     { "title_n", Input },
     { "title_p", Input },
@@ -1078,7 +1140,6 @@ static const struct
     { "random", Playlist },
     { "enqueue", Playlist },
     { "goto", Playlist },
-    { "status", Playlist },
 
     /* DVD commands */
     { "seek", Input },
