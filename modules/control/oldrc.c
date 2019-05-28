@@ -580,6 +580,12 @@ out:
     vlc_player_Unlock(player);
 }
 
+static void PlayerVoutSnapshot(intf_thread_t *intf, char const *psz_cmd,
+                               vlc_value_t newval)
+{
+    PlayerDoVoid(intf, vlc_player_vout_Snapshot);
+}
+
 static void print_playlist(intf_thread_t *p_intf, vlc_playlist_t *playlist)
 {
     size_t count = vlc_playlist_Count(playlist);
@@ -921,8 +927,6 @@ static void VideoConfig(intf_thread_t *intf, char const *psz_cmd,
         psz_variable = "aspect-ratio";
     else if( !strcmp( psz_cmd, "vzoom" ) )
         psz_variable = "zoom";
-    else if( !strcmp( psz_cmd, "snapshot" ) )
-        psz_variable = "video-snapshot";
     else
         /* This case can't happen */
         vlc_assert_unreachable();
@@ -938,8 +942,6 @@ static void VideoConfig(intf_thread_t *intf, char const *psz_cmd,
         else
             var_SetString( p_vout, psz_variable, newval.psz_string );
     }
-    else if( !strcmp( psz_cmd, "snapshot" ) )
-        vlc_player_vout_Snapshot(player);
     else
     {
         /* get */
@@ -1182,7 +1184,7 @@ static const struct
     { "slower", PlayerSlower },
     { "normal", PlayerNormal },
     { "frame", PlayerFrame },
-    { "snapshot", VideoConfig },
+    { "snapshot", PlayerVoutSnapshot },
 };
 
 static const struct
