@@ -634,8 +634,8 @@ static void PlayerGetTitle(intf_thread_t *intf)
 
     vlc_player_Lock(player);
     title = vlc_player_GetSelectedTitle(player);
-    vlc_player_Unlock(player);
     msg_print(intf, "%s", (title != NULL) ? title->name : "");
+    vlc_player_Unlock(player);
 }
 
 static void PlayerVoutSnapshot(intf_thread_t *intf)
