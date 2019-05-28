@@ -368,14 +368,12 @@ static void PlayerDoVoid(intf_thread_t *intf, void (*cb)(vlc_player_t *))
     vlc_player_Unlock(player);
 }
 
-static void PlayerPause(intf_thread_t *intf, char const *psz_cmd,
-                        vlc_value_t newval)
+static void PlayerPause(intf_thread_t *intf)
 {
     PlayerDoVoid(intf, vlc_player_TogglePause);
 }
 
-static void PlayerFastForward(intf_thread_t *intf, const char *psz_cmd,
-                              vlc_value_t newval)
+static void PlayerFastForward(intf_thread_t *intf)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
@@ -393,8 +391,7 @@ static void PlayerFastForward(intf_thread_t *intf, const char *psz_cmd,
     vlc_player_Unlock(player);
 }
 
-static void PlayerRewind(intf_thread_t *intf, const char *psz_cmd,
-                         vlc_value_t newval)
+static void PlayerRewind(intf_thread_t *intf)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
@@ -411,14 +408,12 @@ static void PlayerRewind(intf_thread_t *intf, const char *psz_cmd,
     vlc_player_Unlock(player);
 }
 
-static void PlayerFaster(intf_thread_t *intf, char const *psz_cmd,
-                         vlc_value_t newval)
+static void PlayerFaster(intf_thread_t *intf)
 {
     PlayerDoVoid(intf, vlc_player_IncrementRate);
 }
 
-static void PlayerSlower(intf_thread_t *intf, char const *psz_cmd,
-                         vlc_value_t newval)
+static void PlayerSlower(intf_thread_t *intf)
 {
     PlayerDoVoid(intf, vlc_player_DecrementRate);
 }
@@ -428,38 +423,32 @@ static void PlayerDoNormal(vlc_player_t *player)
     vlc_player_ChangeRate(player, 1.f);
 }
 
-static void PlayerNormal(intf_thread_t *intf, char const *psz_cmd,
-                         vlc_value_t newval)
+static void PlayerNormal(intf_thread_t *intf)
 {
     PlayerDoVoid(intf, PlayerDoNormal);
 }
 
-static void PlayerFrame(intf_thread_t *intf, char const *psz_cmd,
-                        vlc_value_t newval)
+static void PlayerFrame(intf_thread_t *intf)
 {
     PlayerDoVoid(intf, vlc_player_NextVideoFrame);
 }
 
-static void PlayerChapterPrev(intf_thread_t *intf, char const *psz_cmd,
-                              vlc_value_t newval)
+static void PlayerChapterPrev(intf_thread_t *intf)
 {
     PlayerDoVoid(intf, vlc_player_SelectPrevChapter);
 }
 
-static void PlayerChapterNext(intf_thread_t *intf, char const *psz_cmd,
-                              vlc_value_t newval)
+static void PlayerChapterNext(intf_thread_t *intf)
 {
     PlayerDoVoid(intf, vlc_player_SelectNextChapter);
 }
 
-static void PlayerTitlePrev(intf_thread_t *intf, char const *psz_cmd,
-                            vlc_value_t newval)
+static void PlayerTitlePrev(intf_thread_t *intf)
 {
     PlayerDoVoid(intf, vlc_player_SelectPrevTitle);
 }
 
-static void PlayerTitleNext(intf_thread_t *intf, char const *psz_cmd,
-                            vlc_value_t newval)
+static void PlayerTitleNext(intf_thread_t *intf)
 {
     PlayerDoVoid(intf, vlc_player_SelectNextTitle);
 }
@@ -580,8 +569,7 @@ out:
     vlc_player_Unlock(player);
 }
 
-static void PlayerVoutSnapshot(intf_thread_t *intf, char const *psz_cmd,
-                               vlc_value_t newval)
+static void PlayerVoutSnapshot(intf_thread_t *intf)
 {
     PlayerDoVoid(intf, vlc_player_vout_Snapshot);
 }
@@ -614,20 +602,17 @@ static void PlaylistDoVoid(intf_thread_t *intf, int (*cb)(vlc_playlist_t *))
     vlc_playlist_Unlock(playlist);
 }
 
-static void PlaylistPrev(intf_thread_t *intf, char const *cmd,
-                         vlc_value_t newval)
+static void PlaylistPrev(intf_thread_t *intf)
 {
     PlaylistDoVoid(intf, vlc_playlist_Prev);
 }
 
-static void PlaylistNext(intf_thread_t *intf, char const *cmd,
-                         vlc_value_t newval)
+static void PlaylistNext(intf_thread_t *intf)
 {
     PlaylistDoVoid(intf, vlc_playlist_Next);
 }
 
-static void PlaylistPlay(intf_thread_t *intf, char const *cmd,
-                         vlc_value_t newval)
+static void PlaylistPlay(intf_thread_t *intf)
 {
     PlaylistDoVoid(intf, vlc_playlist_Start);
 }
@@ -638,8 +623,7 @@ static int PlaylistDoStop(vlc_playlist_t *playlist)
     return 0;
 }
 
-static void PlaylistStop(intf_thread_t *intf, char const *cmd,
-                         vlc_value_t newval)
+static void PlaylistStop(intf_thread_t *intf)
 {
     PlaylistDoVoid(intf, PlaylistDoStop);
 }
@@ -651,8 +635,7 @@ static int PlaylistDoClear(vlc_playlist_t *playlist)
     return 0;
 }
 
-static void PlaylistClear(intf_thread_t *intf, char const *cmd,
-                          vlc_value_t newval)
+static void PlaylistClear(intf_thread_t *intf)
 {
     PlaylistDoVoid(intf, PlaylistDoClear);
 }
@@ -668,14 +651,12 @@ static int PlaylistDoSort(vlc_playlist_t *playlist)
     return vlc_playlist_Sort(playlist, &criteria, 1);
 }
 
-static void PlaylistSort(intf_thread_t *intf, char const *cmd,
-                         vlc_value_t newval)
+static void PlaylistSort(intf_thread_t *intf)
 {
     PlaylistDoVoid(intf, PlaylistDoSort);
 }
 
-static void PlaylistList(intf_thread_t *intf, char const *psz_cmd,
-                         vlc_value_t newval)
+static void PlaylistList(intf_thread_t *intf)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
 
@@ -686,8 +667,7 @@ static void PlaylistList(intf_thread_t *intf, char const *psz_cmd,
     msg_print(intf, "+----[ End of playlist ]");
 }
 
-static void PlaylistStatus(intf_thread_t *intf, char const *psz_cmd,
-                           vlc_value_t newval)
+static void PlaylistStatus(intf_thread_t *intf)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
@@ -1162,7 +1142,7 @@ static void Statistics( intf_thread_t *p_intf )
 static const struct
 {
     const char *name;
-    void (*handler)(intf_thread_t *, const char *, vlc_value_t);
+    void (*handler)(intf_thread_t *);
 } void_cmds[] =
 {
     { "playlist", PlaylistList },
@@ -1236,9 +1216,7 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
     for (size_t i = 0; i < ARRAY_SIZE(void_cmds); i++)
         if (strcmp(cmd, void_cmds[i].name) == 0)
         {
-            vlc_value_t n;
-
-            void_cmds[i].handler(intf, cmd, n);
+            void_cmds[i].handler(intf);
             return;
         }
 
