@@ -28,6 +28,7 @@
 
 #define DEFAULT_BRIGHTNESS         100
 #define DEFAULT_SRGB_BRIGHTNESS    100
+#define MAX_HLG_BRIGHTNESS        1000
 #define MAX_PQ_BRIGHTNESS        10000
 
 typedef enum video_color_axis {
