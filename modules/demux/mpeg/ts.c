@@ -207,6 +207,7 @@ static void PCRFixHandle( demux_t *, ts_pmt_t *, block_t * );
 #define PROBE_MAX         (PROBE_CHUNK_COUNT * 10)
 
 #define BLOCK_FLAG_SOURCE_RANDOM_ACCESS (1 << BLOCK_FLAG_PRIVATE_SHIFT)
+#define GENERATED_PCR_DPB_OFFSET VLC_TICK_FROM_MS(120)
 
 static int DetectPacketSize( demux_t *p_demux, unsigned *pi_header_size, int i_offset )
 {
@@ -1672,8 +1673,8 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                 if ( p_pmt->pcr.b_disable && p_block->i_dts != VLC_TICK_INVALID &&
                      ( p_pmt->i_pid_pcr == pid->i_pid || p_pmt->i_pid_pcr == 0x1FFF ) )
                 {
-                    stime_t i_pcr = ( p_block->i_dts > VLC_TICK_FROM_MS(120) )
-                                  ? TO_SCALE(p_block->i_dts - VLC_TICK_FROM_MS(120))
+                    stime_t i_pcr = ( p_block->i_dts > GENERATED_PCR_DPB_OFFSET )
+                                  ? TO_SCALE(p_block->i_dts - GENERATED_PCR_DPB_OFFSET)
                                   : TO_SCALE(p_block->i_dts);
                     ProgramSetPCR( p_demux, p_pmt, i_pcr );
                 }
