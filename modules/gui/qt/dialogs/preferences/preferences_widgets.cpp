@@ -1290,8 +1290,7 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
     bool b_global = ( column == GLOBAL_HOTKEY_COL );
 
     /* Launch a small dialog to ask for a new key */
-    KeyInputDialog *d = new KeyInputDialog( table, keyItem->text( ACTION_COL ),
-                                            table, b_global );
+    KeyInputDialog *d = new KeyInputDialog( table, keyItem, table, b_global );
     d->setExistingkeysSet( &existingkeys );
     d->exec();
 
@@ -1378,10 +1377,10 @@ bool KeySelectorControl::eventFilter( QObject *obj, QEvent *e )
  * Class KeyInputDialog
  **/
 KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
-                                const QString& keyToChange,
+                                QTreeWidgetItem * _keyItem,
                                 QWidget *_parent,
                                 bool b_global ) :
-                                QDialog( _parent ), keyValue(0)
+                                QDialog( _parent ), keyValue(0), keyItem( _keyItem )
 {
     setModal( true );
     conflicts = false;
@@ -1397,7 +1396,8 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
 
     QVBoxLayout *vLayout = new QVBoxLayout( this );
     selected = new QLabel( qtr( "Press the new key or combination for " )
-                           + QString("<b>%1</b>").arg( keyToChange ) );
+                           + QString("<b>%1</b>")
+                           .arg( keyItem->text( KeySelectorControl::ACTION_COL ) ) );
     vLayout->addWidget( selected , Qt::AlignCenter );
 
     warning = new QLabel;

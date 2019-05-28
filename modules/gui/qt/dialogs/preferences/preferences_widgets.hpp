@@ -530,7 +530,7 @@ class KeyInputDialog : public QDialog
     Q_OBJECT
 
 public:
-    KeyInputDialog( QTreeWidget *, const QString&, QWidget *, bool b_global = false );
+    KeyInputDialog( QTreeWidget *, QTreeWidgetItem *, QWidget *, bool b_global = false );
     int keyValue;
     bool conflicts;
     void setExistingkeysSet( const QSet<QString> *keyset = NULL );
@@ -539,6 +539,7 @@ private:
     QTreeWidget *table;
     QLabel *selected, *warning;
     QPushButton *ok, *unset;
+    QTreeWidgetItem *keyItem;
     enum KeySelectorControl::ColumnIndex column;
 
     void checkForConflicts( int i_vlckey, const QString &sequence );
