@@ -277,6 +277,15 @@ LIBVLC_API const char * libvlc_get_compiler(void);
  */
 LIBVLC_API const char * libvlc_get_changeset(void);
 
+/**
+ * Frees an heap allocation returned by a LibVLC function.
+ * If you know you're using the same underlying C run-time as the LibVLC
+ * implementation, then you can call ANSI C free() directly instead.
+ *
+ * \param ptr the pointer
+ */
+LIBVLC_API void libvlc_free( void *ptr );
+
 /** \defgroup libvlc_event LibVLC asynchronous events
  * LibVLC emits asynchronous events.
  *
