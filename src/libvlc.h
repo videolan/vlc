@@ -159,12 +159,6 @@ void vlc_objres_clear(vlc_object_t *obj);
 void vlc_objres_remove(vlc_object_t *obj, void *data,
                        bool (*match)(void *, void *));
 
-#define ZOOM_SECTION N_("Zoom")
-#define ZOOM_QUARTER_KEY_TEXT N_("1:4 Quarter")
-#define ZOOM_HALF_KEY_TEXT N_("1:2 Half")
-#define ZOOM_ORIGINAL_KEY_TEXT N_("1:1 Original")
-#define ZOOM_DOUBLE_KEY_TEXT N_("2:1 Double")
-
 /**
  * Private LibVLC instance data.
  */
