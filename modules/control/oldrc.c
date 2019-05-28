@@ -569,6 +569,75 @@ out:
     vlc_player_Unlock(player);
 }
 
+static void PlayerItemInfo(intf_thread_t *intf)
+{
+    vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
+    input_item_t *item;
+
+    vlc_player_Lock(player);
+    item = vlc_player_GetCurrentMedia(player);
+
+    if (item != NULL)
+    {
+        vlc_mutex_lock(&item->lock);
+        for (int i = 0; i < item->i_categories; i++)
+        {
+            info_category_t *category = item->pp_categories[i];
+            info_t *info;
+
+            msg_print(intf, "+----[ %s ]", category->psz_name);
+            msg_print(intf, "| ");
+            info_foreach(info, &category->infos)
+                msg_print(intf, "| %s: %s", info->psz_name,
+                          info->psz_value);
+            msg_print(intf, "| ");
+        }
+        msg_print(intf, "+----[ end of stream info ]");
+        vlc_mutex_unlock(&item->lock);
+    }
+    else
+    {
+        msg_print(intf, "no input");
+    }
+    vlc_player_Unlock(player);
+}
+
+static void PlayerGetTime(intf_thread_t *intf)
+{
+    vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
+    vlc_tick_t t;
+
+    vlc_player_Lock(player);
+    t = vlc_player_GetTime(player);
+    vlc_player_Unlock(player);
+    if (t != VLC_TICK_INVALID)
+        msg_print(intf, "%"PRIu64, SEC_FROM_VLC_TICK(t));
+}
+
+static void PlayerGetLength(intf_thread_t *intf)
+{
+    vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
+    vlc_tick_t l;
+
+    vlc_player_Lock(player);
+    l = vlc_player_GetLength(player);
+    vlc_player_Unlock(player);
+
+    if (l != VLC_TICK_INVALID)
+        msg_print(intf, "%"PRIu64, SEC_FROM_VLC_TICK(l));
+}
+
+static void PlayerGetTitle(intf_thread_t *intf)
+{
+    vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
+    const struct vlc_player_title *title;
+
+    vlc_player_Lock(player);
+    title = vlc_player_GetSelectedTitle(player);
+    vlc_player_Unlock(player);
+    msg_print(intf, "%s", (title != NULL) ? title->name : "");
+}
+
 static void PlayerVoutSnapshot(intf_thread_t *intf)
 {
     PlayerDoVoid(intf, vlc_player_vout_Snapshot);
@@ -1139,6 +1208,32 @@ static void Statistics( intf_thread_t *p_intf )
     vlc_mutex_unlock( &p_item->lock );
 }
 
+static void Quit(intf_thread_t *intf)
+{
+    libvlc_Quit(vlc_object_instance(intf));
+}
+
+static void LogOut(intf_thread_t *intf)
+{
+    intf_sys_t *sys = intf->p_sys;
+
+    /* Close connection */
+    if (sys->i_socket != -1)
+    {
+        net_Close(sys->i_socket);
+        sys->i_socket = -1;
+    }
+}
+
+static void IsPlaying(intf_thread_t *intf)
+{
+    intf_sys_t *sys = intf->p_sys;
+
+    msg_print(intf, "%d",
+              sys->last_state == VLC_PLAYER_STATE_PLAYING ||
+              sys->last_state == VLC_PLAYER_STATE_PAUSED);
+}
+
 static const struct
 {
     const char *name;
@@ -1164,7 +1259,17 @@ static const struct
     { "slower", PlayerSlower },
     { "normal", PlayerNormal },
     { "frame", PlayerFrame },
+    { "info", PlayerItemInfo },
+    { "get_time", PlayerGetTime },
+    { "get_length", PlayerGetLength },
+    { "get_title", PlayerGetTitle },
     { "snapshot", PlayerVoutSnapshot },
+
+    { "is_player", IsPlaying },
+    { "stats", Statistics },
+    { "longhelp", Help },
+    { "logout", LogOut },
+    { "quit", Quit },
 };
 
 static const struct
@@ -1207,12 +1312,6 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
 {
     intf_sys_t *sys = intf->p_sys;
 
-    if (strcmp(cmd, "quit") == 0)
-    {
-        libvlc_Quit(vlc_object_instance(intf));
-        return;
-    }
-
     for (size_t i = 0; i < ARRAY_SIZE(void_cmds); i++)
         if (strcmp(cmd, void_cmds[i].name) == 0)
         {
@@ -1229,93 +1328,8 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
             return;
         }
 
-
     /* misc menu commands */
-    if (strcmp(cmd, "stats") == 0)
-        Statistics(intf);
-    else if (strcmp(cmd, "logout") == 0)
-    {
-        /* Close connection */
-        if (sys->i_socket != -1)
-        {
-            net_Close(sys->i_socket);
-            sys->i_socket = -1;
-        }
-    }
-    else if (strcmp(cmd, "info" ) == 0)
-    {
-        vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
-        input_item_t *item;
-
-        vlc_player_Lock(player);
-        item = vlc_player_HoldCurrentMedia(player);
-        vlc_player_Unlock(player);
-
-        if (item != NULL)
-        {
-            vlc_mutex_lock(&item->lock);
-            for (int i = 0; i < item->i_categories; i++)
-            {
-                info_category_t *category = item->pp_categories[i];
-                info_t *info;
-
-                msg_print(intf, "+----[ %s ]", category->psz_name);
-                msg_print(intf, "| ");
-                info_foreach(info, &category->infos)
-                    msg_print(intf, "| %s: %s", info->psz_name,
-                              info->psz_value);
-                msg_print(intf, "| ");
-            }
-            msg_print(intf, "+----[ end of stream info ]");
-            vlc_mutex_unlock(&item->lock);
-            input_item_Release(item);
-        }
-        else
-        {
-            msg_print(intf, "no input");
-        }
-    }
-    else if (strcmp(cmd, "is_playing") == 0)
-    {
-        msg_print(intf, "%d",
-                  sys->last_state == VLC_PLAYER_STATE_PLAYING ||
-                  sys->last_state == VLC_PLAYER_STATE_PAUSED);
-    }
-    else if (strcmp(cmd, "get_time") == 0)
-    {
-        vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
-
-        vlc_player_Lock(player);
-        vlc_tick_t t = vlc_player_GetTime(player);
-        vlc_player_Unlock(player);
-        if (t != VLC_TICK_INVALID)
-            msg_print(intf, "%"PRIu64, SEC_FROM_VLC_TICK(t));
-    }
-    else if (strcmp(cmd, "get_length") == 0)
-    {
-        vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
-
-        vlc_player_Lock(player);
-        vlc_tick_t l = vlc_player_GetLength(player);
-        vlc_player_Unlock(player);
-        if (l != VLC_TICK_INVALID)
-            msg_print(intf, "%"PRIu64, SEC_FROM_VLC_TICK(l));
-    }
-    else if(strcmp(cmd, "get_title") == 0)
-    {
-        vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
-
-        vlc_player_Lock(player);
-        struct vlc_player_title const *title =
-            vlc_player_GetSelectedTitle(player);
-        vlc_player_Unlock(player);
-        msg_print(intf, "%s", (title != NULL) ? title->name : "");
-    }
-    else if (strcmp(cmd, "longhelp") == 0)
-    {
-        Help(intf);
-    }
-    else if (strcmp(cmd, "key") == 0 || strcmp(cmd, "hotkey") == 0)
+    if (strcmp(cmd, "key") == 0 || strcmp(cmd, "hotkey") == 0)
     {
        vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(intf));
        var_SetInteger(vlc, "key-action", vlc_actions_get_id(arg));
