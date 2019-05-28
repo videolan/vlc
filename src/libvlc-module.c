@@ -1246,6 +1246,17 @@ static const char *const psz_recursive_list_text[] = {
     "The playlist can use a tree to categorize some items, like the " \
     "contents of a directory." )
 
+#define BOOKMARK1_TEXT N_("Playlist bookmark 1")
+#define BOOKMARK2_TEXT N_("Playlist bookmark 2")
+#define BOOKMARK3_TEXT N_("Playlist bookmark 3")
+#define BOOKMARK4_TEXT N_("Playlist bookmark 4")
+#define BOOKMARK5_TEXT N_("Playlist bookmark 5")
+#define BOOKMARK6_TEXT N_("Playlist bookmark 6")
+#define BOOKMARK7_TEXT N_("Playlist bookmark 7")
+#define BOOKMARK8_TEXT N_("Playlist bookmark 8")
+#define BOOKMARK9_TEXT N_("Playlist bookmark 9")
+#define BOOKMARK10_TEXT N_("Playlist bookmark 10")
+#define BOOKMARK_LONGTEXT N_("This allows you to define playlist bookmarks.")
 
 /*****************************************************************************
  * Hotkeys
@@ -1418,19 +1429,6 @@ static const char *const mouse_wheel_texts[] = {
 #define SET_BOOKMARK_KEY_LONGTEXT N_("Select the key to set this playlist bookmark.")
 #define PLAY_CLEAR_KEY_TEXT N_("Clear the playlist")
 #define PLAY_CLEAR_KEY_LONGTEXT N_("Select the key to clear the current playlist.")
-
-#define BOOKMARK1_TEXT N_("Playlist bookmark 1")
-#define BOOKMARK2_TEXT N_("Playlist bookmark 2")
-#define BOOKMARK3_TEXT N_("Playlist bookmark 3")
-#define BOOKMARK4_TEXT N_("Playlist bookmark 4")
-#define BOOKMARK5_TEXT N_("Playlist bookmark 5")
-#define BOOKMARK6_TEXT N_("Playlist bookmark 6")
-#define BOOKMARK7_TEXT N_("Playlist bookmark 7")
-#define BOOKMARK8_TEXT N_("Playlist bookmark 8")
-#define BOOKMARK9_TEXT N_("Playlist bookmark 9")
-#define BOOKMARK10_TEXT N_("Playlist bookmark 10")
-#define BOOKMARK_LONGTEXT N_( \
-      "This allows you to define playlist bookmarks.")
 
 #define AUDIO_TRACK_KEY_TEXT N_("Cycle audio track")
 #define AUDIO_TRACK_KEY_LONGTEXT N_("Cycle through the available audio tracks(languages).")
