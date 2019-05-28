@@ -195,6 +195,9 @@ VS_OUTPUT main( VS_INPUT In )\n\
 }\n\
 ";
 
+static ID3DBlob* D3D11_CompileShader(vlc_object_t *, const d3d11_handle_t *, const d3d11_device_t *,
+                              const char *psz_shader, bool pixel);
+
 bool IsRGBShader(const d3d_format_t *cfg)
 {
     return cfg->resourceFormat[0] != DXGI_FORMAT_R8_UNORM &&
@@ -630,9 +633,9 @@ void D3D11_ReleasePixelShader(d3d_quad_t *quad)
     }
 }
 
-#undef D3D11_CompileShader
-ID3DBlob* D3D11_CompileShader(vlc_object_t *obj, const d3d11_handle_t *hd3d, const d3d11_device_t *d3d_dev,
-                              const char *psz_shader, bool pixel)
+static ID3DBlob* D3D11_CompileShader(vlc_object_t *obj, const d3d11_handle_t *hd3d,
+                                     const d3d11_device_t *d3d_dev,
+                                     const char *psz_shader, bool pixel)
 {
     ID3DBlob* pShaderBlob = NULL, *pErrBlob;
     const char *target;

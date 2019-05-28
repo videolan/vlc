@@ -95,10 +95,6 @@ typedef struct
 
 #define D3D11_MAX_RENDER_TARGET    2
 
-ID3DBlob* D3D11_CompileShader(vlc_object_t *, const d3d11_handle_t *, const d3d11_device_t *,
-                              const char *psz_shader, bool pixel);
-#define D3D11_CompileShader(a,b,c,d,e)  D3D11_CompileShader(VLC_OBJECT(a),b,c,d,e)
-
 bool IsRGBShader(const d3d_format_t *);
 
 HRESULT D3D11_CompilePixelShader(vlc_object_t *, d3d11_handle_t *, bool legacy_shader,
