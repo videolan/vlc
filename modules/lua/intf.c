@@ -125,21 +125,6 @@ static char *MakeConfig( intf_thread_t *p_intf, const char *name )
         free( psz_passwd );
         free( psz_host );
     }
-    else if( !strcmp( name, "cli" ) )
-    {
-        char *psz_rc_host = var_InheritString( p_intf, "rc-host" );
-        if( !psz_rc_host )
-            psz_rc_host = var_InheritString( p_intf, "cli-host" );
-        if( psz_rc_host )
-        {
-            char *psz_esc_host = config_StringEscape( psz_rc_host );
-
-            if( asprintf( &psz_config, "cli={host='%s'}", psz_esc_host ) == -1 )
-                psz_config = NULL;
-            free( psz_esc_host );
-            free( psz_rc_host );
-        }
-    }
 
     return psz_config;
 }
