@@ -1,0 +1,11 @@
+--- lame/libmp3lame/quantize.c.msvc	2017-08-15 15:40:45.000000000 +0200
++++ lame/libmp3lame/quantize.c	2019-05-29 07:55:46.658315100 +0200
+@@ -1137,7 +1137,7 @@ outer_loop(lame_internal_flags * gfc, gr
+             /* save data so we can restore this quantization later */
+             if (better) {
+                 best_part2_3_length = cod_info->part2_3_length;
+-                best_noise_info = noise_info;
++                memcpy(&best_noise_info, &noise_info, sizeof(best_noise_info));
+                 *cod_info = cod_info_w;
+                 age = 0;
+                 /* save data so we can restore this quantization later */
