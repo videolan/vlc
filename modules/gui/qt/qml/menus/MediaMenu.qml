@@ -38,8 +38,19 @@ Utils.MenuExt {
         onAboutToShow:{
             recentsMenu.hasData = Boolean(recentsMedias.rowCount())
         }
-        Instantiator {
+
+        function moveItemToPos(item, pos)  {
+            for ( var i = 0; i < recentsMenu.count; i++ ) {
+                if (recentsMenu.itemAt(i) == item) {
+                    recentsMenu.moveItem(i, pos)
+                    return;
+                }
+            }
+        }
+
+        Repeater {
             model: recentsMedias
+
             Utils.MenuItemExt {
                 text: mrl
                 onTriggered:{
@@ -53,13 +64,26 @@ Utils.MenuExt {
                     context: Qt.ApplicationShortcut
                 }
             }
-            onObjectAdded: recentsMenu.insertItem(recentsMenu.count - 2, object)
-            onObjectRemoved: recentsMenu.removeItem(object)
+
+            //replace last elements as the repeater won't keep the original
+            //order of the menu when updated
+            onItemAdded: {
+                recentsMenu.moveItemToPos(clearAction, recentsMenu.count - 1)
+                recentsMenu.moveItemToPos(clearSepId,  recentsMenu.count - 2)
+            }
+
+            onItemRemoved: {
+                recentsMenu.moveItemToPos(clearAction, recentsMenu.count - 1)
+                recentsMenu.moveItemToPos(clearSepId,  recentsMenu.count - 2)
+            }
         }
 
-        MenuSeparator{}
+        MenuSeparator {
+            id: clearSepId
+        }
 
         Utils.MenuItemExt {
+            id: clearAction
             text: qsTr("Clear")
             enabled: recentsMenu.hasData
             onTriggered:recentsMedias.clear()
