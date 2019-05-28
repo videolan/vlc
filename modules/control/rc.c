@@ -1158,54 +1158,59 @@ out:
     aout_Release(p_aout);
 }
 
-static void Statistics( intf_thread_t *p_intf )
+static void Statistics(intf_thread_t *intf)
 {
-    vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
+    vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
+    input_item_t *item;
+
     vlc_player_Lock(player);
-    input_item_t *p_item = vlc_player_GetCurrentMedia(player);
+    item = vlc_player_GetCurrentMedia(player);
+
+    if (item != NULL)
+    {
+        msg_print(intf, "+----[ begin of statistical info ]");
+        vlc_mutex_lock(&item->lock);
+
+        /* Input */
+        msg_print(intf, _("+-[Incoming]"));
+        msg_print(intf, _("| input bytes read : %8.0f KiB"),
+                  (float)(item->p_stats->i_read_bytes) / 1024.f);
+        msg_print(intf, _("| input bitrate    :   %6.0f kb/s"),
+                  (float)(item->p_stats->f_input_bitrate) * 8000.f);
+        msg_print(intf, _("| demux bytes read : %8.0f KiB"),
+                  (float)(item->p_stats->i_demux_read_bytes) / 1024.f);
+        msg_print(intf, _("| demux bitrate    :   %6.0f kb/s"),
+                  (float)(item->p_stats->f_demux_bitrate) * 8000.f);
+        msg_print(intf, _("| demux corrupted  :    %5"PRIi64),
+                  item->p_stats->i_demux_corrupted);
+        msg_print(intf, _("| discontinuities  :    %5"PRIi64),
+                  item->p_stats->i_demux_discontinuity);
+        msg_print(intf, "|");
+
+        /* Video */
+        msg_print(intf, _("+-[Video Decoding]"));
+        msg_print(intf, _("| video decoded    :    %5"PRIi64),
+                  item->p_stats->i_decoded_video);
+        msg_print(intf, _("| frames displayed :    %5"PRIi64),
+                  item->p_stats->i_displayed_pictures);
+        msg_print(intf, _("| frames lost      :    %5"PRIi64),
+                  item->p_stats->i_lost_pictures);
+        msg_print(intf, "|");
+
+        /* Audio*/
+        msg_print(intf, "%s", _("+-[Audio Decoding]"));
+        msg_print(intf, _("| audio decoded    :    %5"PRIi64),
+                  item->p_stats->i_decoded_audio);
+        msg_print(intf, _("| buffers played   :    %5"PRIi64),
+                  item->p_stats->i_played_abuffers);
+        msg_print(intf, _("| buffers lost     :    %5"PRIi64),
+                  item->p_stats->i_lost_abuffers);
+        msg_print(intf, "|");
+
+        vlc_mutex_unlock(&item->lock);
+        msg_print(intf,  "+----[ end of statistical info ]" );
+    }
     vlc_player_Unlock(player);
-
-    if (p_item == NULL)
-        return;
-
-    vlc_mutex_lock( &p_item->lock );
-    msg_rc( "+----[ begin of statistical info ]" );
-
-    /* Input */
-    msg_rc("%s", _("+-[Incoming]"));
-    msg_rc(_("| input bytes read : %8.0f KiB"),
-            (float)(p_item->p_stats->i_read_bytes)/1024 );
-    msg_rc(_("| input bitrate    :   %6.0f kb/s"),
-            (float)(p_item->p_stats->f_input_bitrate)*8000 );
-    msg_rc(_("| demux bytes read : %8.0f KiB"),
-            (float)(p_item->p_stats->i_demux_read_bytes)/1024 );
-    msg_rc(_("| demux bitrate    :   %6.0f kb/s"),
-            (float)(p_item->p_stats->f_demux_bitrate)*8000 );
-    msg_rc(_("| demux corrupted  :    %5"PRIi64),
-            p_item->p_stats->i_demux_corrupted );
-    msg_rc(_("| discontinuities  :    %5"PRIi64),
-            p_item->p_stats->i_demux_discontinuity );
-    msg_rc("|");
-    /* Video */
-    msg_rc("%s", _("+-[Video Decoding]"));
-    msg_rc(_("| video decoded    :    %5"PRIi64),
-            p_item->p_stats->i_decoded_video );
-    msg_rc(_("| frames displayed :    %5"PRIi64),
-            p_item->p_stats->i_displayed_pictures );
-    msg_rc(_("| frames lost      :    %5"PRIi64),
-            p_item->p_stats->i_lost_pictures );
-    msg_rc("|");
-    /* Audio*/
-    msg_rc("%s", _("+-[Audio Decoding]"));
-    msg_rc(_("| audio decoded    :    %5"PRIi64),
-            p_item->p_stats->i_decoded_audio );
-    msg_rc(_("| buffers played   :    %5"PRIi64),
-            p_item->p_stats->i_played_abuffers );
-    msg_rc(_("| buffers lost     :    %5"PRIi64),
-            p_item->p_stats->i_lost_abuffers );
-    msg_rc("|");
-    msg_rc( "+----[ end of statistical info ]" );
-    vlc_mutex_unlock( &p_item->lock );
 }
 
 static void Quit(intf_thread_t *intf)
