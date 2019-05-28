@@ -1573,7 +1573,7 @@ static void *Run( void *data )
         /* Manage the input part */
         if( item == NULL )
         {
-            item = vlc_player_HoldCurrentMedia(player);
+            item = vlc_player_GetCurrentMedia(player);
             /* New input has been registered */
             if( item )
             {
@@ -1586,10 +1586,7 @@ static void *Run( void *data )
         if( !vlc_player_IsStarted( player ) )
         {
             if (item)
-            {
-                input_item_Release( item );
                 item = NULL;
-            }
 
             p_sys->last_state = VLC_PLAYER_STATE_STOPPED;
             msg_rc( STATUS_CHANGE "( stop state: 0 )" );
