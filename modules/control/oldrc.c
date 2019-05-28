@@ -88,7 +88,7 @@ struct intf_sys_t
 };
 
 VLC_FORMAT(2, 3)
-static void msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
+static void msg_print(intf_thread_t *p_intf, const char *psz_fmt, ...)
 {
     va_list args;
     char fmt_eol[strlen (psz_fmt) + 3], *msg;
@@ -113,7 +113,7 @@ static void msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 
     free( msg );
 }
-#define msg_rc( ... ) msg_rc( p_intf, __VA_ARGS__ )
+#define msg_rc(...) msg_print(p_intf, __VA_ARGS__)
 
 #if defined (_WIN32) && !VLC_WINSTORE_APP
 # include "intromsg.h"
@@ -1090,7 +1090,6 @@ static const struct
 
 static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
 {
-    intf_thread_t *const p_intf = intf;
     intf_sys_t *sys = intf->p_sys;
 
     if (strcmp(cmd, "quit") == 0)
@@ -1147,32 +1146,27 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
                 info_category_t *category = item->pp_categories[i];
                 info_t *info;
 
-                msg_rc( "+----[ %s ]", category->psz_name );
-                msg_rc( "| " );
+                msg_print(intf, "+----[ %s ]", category->psz_name);
+                msg_print(intf, "| ");
                 info_foreach(info, &category->infos)
-                    msg_rc("| %s: %s", info->psz_name, info->psz_value);
-                msg_rc("| ");
+                    msg_print(intf, "| %s: %s", info->psz_name,
+                              info->psz_value);
+                msg_print(intf, "| ");
             }
-            msg_rc("+----[ end of stream info ]");
+            msg_print(intf, "+----[ end of stream info ]");
             vlc_mutex_unlock(&item->lock);
             input_item_Release(item);
         }
         else
         {
-            msg_rc( "no input" );
+            msg_print(intf, "no input");
         }
     }
     else if (strcmp(cmd, "is_playing") == 0)
     {
-        if (sys->last_state != VLC_PLAYER_STATE_PLAYING &&
-            sys->last_state != VLC_PLAYER_STATE_PAUSED)
-        {
-            msg_rc("0");
-        }
-        else
-        {
-            msg_rc("1");
-        }
+        msg_print(intf, "%d",
+                  sys->last_state == VLC_PLAYER_STATE_PLAYING ||
+                  sys->last_state == VLC_PLAYER_STATE_PAUSED);
     }
     else if (strcmp(cmd, "get_time") == 0)
     {
@@ -1182,7 +1176,7 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
         vlc_tick_t t = vlc_player_GetTime(player);
         vlc_player_Unlock(player);
         if (t != VLC_TICK_INVALID)
-            msg_rc("%"PRIu64, SEC_FROM_VLC_TICK(t));
+            msg_print(intf, "%"PRIu64, SEC_FROM_VLC_TICK(t));
     }
     else if (strcmp(cmd, "get_length") == 0)
     {
@@ -1192,7 +1186,7 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
         vlc_tick_t l = vlc_player_GetLength(player);
         vlc_player_Unlock(player);
         if (l != VLC_TICK_INVALID)
-            msg_rc("%"PRIu64, SEC_FROM_VLC_TICK(l));
+            msg_print(intf, "%"PRIu64, SEC_FROM_VLC_TICK(l));
     }
     else if(strcmp(cmd, "get_title") == 0)
     {
@@ -1202,7 +1196,7 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
         struct vlc_player_title const *title =
             vlc_player_GetSelectedTitle(player);
         vlc_player_Unlock(player);
-        msg_rc("%s", title ? title->name : "");
+        msg_print(intf, "%s", (title != NULL) ? title->name : "");
     }
     else if (strcmp(cmd, "longhelp") == 0)
     {
@@ -1210,7 +1204,7 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
     }
     else if (strcmp(cmd, "key") == 0 || strcmp(cmd, "hotkey") == 0)
     {
-       vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_intf));
+       vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(intf));
        var_SetInteger(vlc, "key-action", vlc_actions_get_id(arg));
     }
     else
@@ -1244,7 +1238,9 @@ static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
                 break;
 
             default:
-                msg_rc(_("Unknown command `%s'. Type `help' for help."), cmd);
+                msg_print(intf,
+                          _("Unknown command `%s'. Type `help' for help."),
+                          cmd);
                 break;
         }
 }
