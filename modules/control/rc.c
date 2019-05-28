@@ -1569,12 +1569,11 @@ static void *Run( void *data )
         b_complete = ReadCommand( p_intf, p_buffer, &i_size );
         canc = vlc_savecancel( );
 
+        vlc_player_Lock(player);
         /* Manage the input part */
         if( item == NULL )
         {
-            vlc_player_Lock(player);
             item = vlc_player_HoldCurrentMedia(player);
-            vlc_player_Unlock(player);
             /* New input has been registered */
             if( item )
             {
@@ -1584,7 +1583,6 @@ static void *Run( void *data )
             }
         }
 
-        vlc_player_Lock(player);
         if( !vlc_player_IsStarted( player ) )
         {
             if (item)
@@ -1596,13 +1594,10 @@ static void *Run( void *data )
             p_sys->last_state = VLC_PLAYER_STATE_STOPPED;
             msg_rc( STATUS_CHANGE "( stop state: 0 )" );
         }
-        vlc_player_Unlock(player);
 
         if( item != NULL )
         {
-            vlc_player_Lock(player);
             enum vlc_player_state state = vlc_player_GetState(player);
-            vlc_player_Unlock(player);
 
             if (p_sys->last_state != state)
             {
@@ -1627,15 +1622,14 @@ static void *Run( void *data )
 
         if( item && b_showpos )
         {
-            vlc_player_Lock(player);
             i_newpos = 100 * vlc_player_GetPosition( player );
-            vlc_player_Unlock(player);
             if( i_oldpos != i_newpos )
             {
                 i_oldpos = i_newpos;
                 msg_rc( "pos: %d%%", i_newpos );
             }
         }
+        vlc_player_Unlock(player);
 
         /* Is there something to do? */
         if( !b_complete ) continue;
