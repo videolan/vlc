@@ -1442,6 +1442,7 @@ void KeyInputDialog::checkForConflicts( int i_vlckey, const QString &sequence )
 
     QList<QTreeWidgetItem *> conflictList =
         table->findItems( vlckey, Qt::MatchExactly, column );
+    conflictList.removeAll(keyItem);
 
     if( conflictList.count() )
     {
