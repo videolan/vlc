@@ -1,5 +1,5 @@
 /*****************************************************************************
- * oldrc.c : remote control stdin/stdout module for vlc
+ * rc.c : remote control stdin/stdout module for vlc
  *****************************************************************************
  * Copyright (C) 2004-2009 the VideoLAN team
  *

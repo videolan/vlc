@@ -8,14 +8,14 @@ libhotkeys_plugin_la_LIBADD = $(LIBM)
 # way to control the output clock from the player
 #libnetsync_plugin_la_SOURCES = control/netsync.c
 #libnetsync_plugin_la_LIBADD = $(SOCKET_LIBS)
-liboldrc_plugin_la_SOURCES = control/oldrc.c control/intromsg.h
-liboldrc_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
+librc_plugin_la_SOURCES = control/rc.c control/intromsg.h
+librc_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
 
 control_LTLIBRARIES = \
 	libdummy_plugin.la \
 	libgestures_plugin.la \
 	libhotkeys_plugin.la \
-	liboldrc_plugin.la
+	librc_plugin.la
 
 liblirc_plugin_la_SOURCES = control/lirc.c
 liblirc_plugin_la_LIBADD = -llirc_client
