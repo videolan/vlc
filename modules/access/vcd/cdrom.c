@@ -828,6 +828,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
                 msg_Dbg( p_this, "the cue file says the data file is %s", type );
                 if( strcasecmp( type, "BINARY" ) )
                     goto error; /* Error if not binary, otherwise treat as case 1 */
+                /* fallthrough */
             case 1:
                 if( p_vcddev->i_vcdimage_handle == -1 )
                 {
