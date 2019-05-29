@@ -491,6 +491,13 @@ public:
     KeySelectorControl( vlc_object_t *, module_config_t *, QWidget * );
     int getType() const Q_DECL_OVERRIDE;
     void doApply() Q_DECL_OVERRIDE;
+    enum ColumnIndex
+    {
+        ACTION_COL = 0,
+        HOTKEY_COL = 1,
+        GLOBAL_HOTKEY_COL = 2,
+        ANY_COL = 3 // == count()
+    };
 
 protected:
     bool eventFilter( QObject *, QEvent * ) Q_DECL_OVERRIDE;
@@ -512,13 +519,6 @@ private:
     QTreeWidget *table;
     QList<module_config_t *> values;
     QSet<QString> existingkeys;
-    enum
-    {
-        ACTION_COL = 0,
-        HOTKEY_COL = 1,
-        GLOBAL_HOTKEY_COL = 2,
-        ANY_COL = 3 // == count()
-    };
 
 private slots:
     void selectKey( QTreeWidgetItem * = NULL, int column = 1 );
