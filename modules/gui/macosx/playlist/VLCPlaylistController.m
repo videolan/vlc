@@ -311,13 +311,13 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 #pragma mark - controller functions for use within the UI
 
-- (void)addPlaylistItems:(NSArray*)array
+- (void)addPlaylistItems:(NSArray <VLCOpenInputMetadata *> *)array
 {
     BOOL b_autoplay = var_InheritBool(getIntf(), "macosx-autoplay");
     [self addPlaylistItems:array atPosition:-1 startPlayback:b_autoplay];
 }
 
-- (void)addPlaylistItems:(NSArray*)itemArray
+- (void)addPlaylistItems:(NSArray <VLCOpenInputMetadata *> *)itemArray
               atPosition:(size_t)insertionIndex
            startPlayback:(BOOL)startPlayback;
 {

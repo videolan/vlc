@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCPlaylistDataSource;
 @class VLCPlayerController;
 @class VLCPlaylistExportModuleDescription;
+@class VLCOpenInputMetadata;
 
 extern NSString *VLCPlaybackOrderChanged;
 extern NSString *VLCPlaybackRepeatChanged;
@@ -105,17 +106,17 @@ extern NSString *VLCPlaylistItemsRemoved;
 
 /**
  * Simplified version to add new items to the end of the current playlist
- * @param array array of items. Each item is a Dictionary with meta info.
+ * @param array array of items. Each item is an instance of VLCOpenInputMetadata.
  */
-- (void)addPlaylistItems:(NSArray*)array;
+- (void)addPlaylistItems:(NSArray <VLCOpenInputMetadata *> *)array;
 
 /**
  * Add new items to the playlist, at specified index.
- * @param itemArray array of items. Each item is a Dictionary with meta info.
+ * @param itemArray array of items. Each item is an instance of VLCOpenInputMetadata.
  * @param insertionIndex index for new items, -1 for appending at end
  * @param startPlayback starts playback of first item if true
  */
-- (void)addPlaylistItems:(NSArray*)itemArray
+- (void)addPlaylistItems:(NSArray <VLCOpenInputMetadata *> *)itemArray
               atPosition:(size_t)insertionIndex
            startPlayback:(BOOL)startPlayback;
 
