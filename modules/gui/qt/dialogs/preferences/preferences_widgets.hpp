@@ -488,7 +488,7 @@ class KeySelectorControl : public ConfigControl
     Q_OBJECT
 
 public:
-    KeySelectorControl( vlc_object_t *, module_config_t *, QWidget * );
+    KeySelectorControl( vlc_object_t *, QWidget * );
     int getType() const Q_DECL_OVERRIDE;
     void doApply() Q_DECL_OVERRIDE;
     enum ColumnIndex

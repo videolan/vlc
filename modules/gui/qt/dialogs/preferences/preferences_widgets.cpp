@@ -122,7 +122,7 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         p_control = new FontConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_KEY:
-        p_control = new KeySelectorControl( p_this, p_item, parent );
+        p_control = new KeySelectorControl( p_this, parent );
         break;
     case CONFIG_ITEM_BOOL:
         p_control = new BoolConfigControl( p_this, p_item, parent );
@@ -1109,10 +1109,8 @@ void FloatRangeConfigControl::finish()
 /**********************************************************************
  * Key selector widget
  **********************************************************************/
-KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
-                                      module_config_t *_p_item, QWidget *p ) :
-                                ConfigControl( _p_this, _p_item )
-
+KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this, QWidget *p ) :
+                                ConfigControl( _p_this, nullptr )
 {
     label = new QLabel(
         qtr( "Select or double click an action to change the associated "
