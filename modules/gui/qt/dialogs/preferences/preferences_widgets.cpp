@@ -46,6 +46,7 @@
 #include <QFileDialog>
 #include <QGroupBox>
 #include <QTreeWidgetItem>
+#include <QTreeWidgetItemIterator>
 #include <QSignalMapper>
 #include <QDialogButtonBox>
 #include <QKeyEvent>
@@ -1440,23 +1441,26 @@ void KeyInputDialog::checkForConflicts( int i_vlckey, const QString &sequence )
         return;
     }
 
-    QList<QTreeWidgetItem *> conflictList =
-        table->findItems( vlckey, Qt::MatchExactly, column );
-    conflictList.removeAll(keyItem);
-
-    if( conflictList.count() )
+    for (QTreeWidgetItemIterator iter(table); *iter; ++iter)
     {
+        QTreeWidgetItem *item = *iter;
+
+        if( item == keyItem || vlckey.compare( item->text( column ) ) != 0 )
+            continue;
+
         warning->setText( qtr("Warning: this key or combination is already assigned to ") +
                 QString( "\"<b>%1</b>\"" )
-                .arg( conflictList[0]->text( KeySelectorControl::ACTION_COL ) ) );
+                .arg( item->text( KeySelectorControl::ACTION_COL ) ) );
         warning->show();
         ok->show();
         unset->hide();
 
         conflicts = true;
+        return;
     }
-    else if( existingkeys && !sequence.isEmpty()
-             && existingkeys->contains( sequence ) )
+
+    if( existingkeys && !sequence.isEmpty()
+        && existingkeys->contains( sequence ) )
     {
         warning->setText(
             qtr( "Warning: <b>%1</b> is already an application menu shortcut" )
