@@ -28,6 +28,11 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
+#import "views/VLCBottomBarView.h"
+#import "views/VLCDragDropView.h"
+#import "views/VLCTimeField.h"
+#import "views/VLCSlider.h"
+
 /*****************************************************************************
  * VLCControlsBarCommon
  *

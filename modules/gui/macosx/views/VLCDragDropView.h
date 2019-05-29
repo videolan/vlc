@@ -1,10 +1,11 @@
 /*****************************************************************************
- * misc.h: code not specific to vlc
+ * VLCDragDropView.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2003-2014 VLC authors and VideoLAN
+ * Copyright (C) 2003 - 2019 VLC authors and VideoLAN
  *
- * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Felix Paul Kühne <fkuehne at videolan dot org>
+ * Authors: Derk-Jan Hartman <hartman # videolan dot org>
+ *          Felix Paul Kühne <fkuehne # videolan dot org>
+ *          David Fuhrmann <dfuhrmann # videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,29 +24,23 @@
 
 #import <Cocoa/Cocoa.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*****************************************************************************
- * PositionFormatter interface
- *
- * Formats a text field to only accept decimals and :
+ * Disables default drag / drop behaviour of an NSImageView.
+ * set it for all sub image views withing an VLCDragDropView.
  *****************************************************************************/
-@interface PositionFormatter : NSFormatter
-
-- (NSString*)stringForObjectValue:(id)obj;
-
-- (BOOL)getObjectValue:(id*)obj
-             forString:(NSString*)string
-      errorDescription:(NSString**)error;
-
-- (BOOL)isPartialStringValid:(NSString*)partialString
-            newEditingString:(NSString**)newString
-            errorDescription:(NSString**)error;
+@interface VLCDropDisabledImageView : NSImageView
 
 @end
 
-/*****************************************************************************
- * VLCByteCountFormatter addition
- *****************************************************************************/
+@interface VLCDragDropView : NSView
 
-@interface VLCByteCountFormatter : NSFormatter
-+ (NSString *)stringFromByteCount:(long long)byteCount countStyle:(NSByteCountFormatterCountStyle)countStyle;
+@property (nonatomic, assign) id dropHandler;
+@property (nonatomic, assign) BOOL drawBorder;
+
+- (void)enablePlaylistItems;
+
 @end
+
+NS_ASSUME_NONNULL_END

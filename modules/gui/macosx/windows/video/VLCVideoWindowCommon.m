@@ -34,6 +34,7 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 #import "library/VLCLibraryWindow.h"
+#import "views/VLCBottomBarView.h"
 
 const CGFloat VLCVideoWindowCommonMinimalHeight = 70.;
 NSString *VLCVideoWindowShouldShowFullscreenController = @"VLCVideoWindowShouldShowFullscreenController";

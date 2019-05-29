@@ -171,6 +171,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCDefaultValueSlider.m \
 	gui/macosx/views/VLCDefaultValueSliderCell.h \
 	gui/macosx/views/VLCDefaultValueSliderCell.m \
+	gui/macosx/views/VLCDragDropView.h \
+	gui/macosx/views/VLCDragDropView.m \
 	gui/macosx/views/VLCFSPanelDraggableView.h \
 	gui/macosx/views/VLCFSPanelDraggableView.m \
 	gui/macosx/views/VLCHUDOutlineView.h \

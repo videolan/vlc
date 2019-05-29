@@ -23,10 +23,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "extensions/misc.h"
-#import "views/VLCBottomBarView.h"
-#import "views/VLCTimeField.h"
-#import "views/VLCSlider.h"
+@class VLCDragDropView;
+@class VLCSlider;
+@class VLCTimeField;
+@class VLCBottomBarView;
 
 /*****************************************************************************
  * VLCControlsBarCommon
