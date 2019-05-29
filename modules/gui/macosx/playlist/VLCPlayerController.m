@@ -71,6 +71,9 @@ NSString *VLCPlayerListOfVideoOutputThreadsChanged = @"VLCPlayerListOfVideoOutpu
 NSString *VLCPlayerVolumeChanged = @"VLCPlayerVolumeChanged";
 NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 
+const CGFloat VLCVolumeMaximum = 2.;
+const CGFloat VLCVolumeDefault = 1.;
+
 @interface VLCPlayerController ()
 {
     vlc_player_t *_p_player;

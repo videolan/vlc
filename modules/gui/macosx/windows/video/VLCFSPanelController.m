@@ -25,8 +25,6 @@
 
 #import "VLCFSPanelController.h"
 
-#import <vlc_aout.h>
-
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
@@ -150,9 +148,9 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
                 _NS("Adjust the current playback position"));
 
     /* Setup other controls */
-    [_volumeSlider setMaxValue:2.0];
+    [_volumeSlider setMaxValue:VLCVolumeMaximum];
     [_volumeSlider setFloatValue:_playerController.volume];
-    [_volumeSlider setDefaultValue:1.0];
+    [_volumeSlider setDefaultValue:VLCVolumeDefault];
 
     /* Identifier to store the state of the remaining or total time label,
      * this is the same identifier as used for the window playback cotrols

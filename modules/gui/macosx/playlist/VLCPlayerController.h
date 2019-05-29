@@ -227,6 +227,9 @@ extern NSString *VLCPlayerVolumeChanged;
  */
 extern NSString *VLCPlayerMuteChanged;
 
+extern const CGFloat VLCVolumeMaximum;
+extern const CGFloat VLCVolumeDefault;
+
 @interface VLCPlayerController : NSObject
 
 - (instancetype)initWithPlayer:(vlc_player_t *)player;

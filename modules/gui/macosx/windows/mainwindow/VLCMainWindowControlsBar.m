@@ -29,9 +29,6 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
-CGFloat VLCVolumeMaximum = 2.;
-CGFloat VLCVolumeDefault = 1.;
-
 /*****************************************************************************
  * VLCMainWindowControlsBar
  *
