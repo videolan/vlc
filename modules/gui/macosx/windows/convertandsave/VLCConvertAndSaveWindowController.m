@@ -51,7 +51,7 @@
 #define ASF 12
 /* 13-15 are present, but not set */
 
-@interface VLCConvertAndSaveWindowController()
+@interface VLCConvertAndSaveWindowController() <VLCDragDropTarget>
 {
     NSArray *_videoCodecs;
     NSArray *_audioCodecs;
@@ -255,7 +255,7 @@
 
     // setup drop view
     [_dropBox enablePlaylistItems];
-    [_dropBox setDropHandler: self];
+    [_dropBox setDropTarget:self];
 
     [self resetCustomizationSheetBasedOnProfile:[self.profileValueList firstObject]];
 }
@@ -615,9 +615,8 @@
 #pragma mark -
 #pragma mark User interaction - misc
 
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+- (BOOL)handlePasteBoardFromDragSession:(NSPasteboard *)paste
 {
-    NSPasteboard *paste = [sender draggingPasteboard];
     NSArray *types = [NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil];
     NSString *desired_type = [paste availableTypeFromArray: types];
     NSData *carried_data = [paste dataForType: desired_type];

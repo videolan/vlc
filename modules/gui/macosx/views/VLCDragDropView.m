@@ -33,12 +33,6 @@
 
 @end
 
-@interface VLCDragDropView()
-{
-    bool b_activeDragAndDrop;
-}
-@end
-
 @implementation VLCDragDropView
 
 - (id)initWithFrame:(NSRect)frame
@@ -48,7 +42,6 @@
         // default value
         [self setDrawBorder:YES];
     }
-
     return self;
 }
 
@@ -70,30 +63,36 @@
 - (void)awakeFromNib
 {
     [self registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
+    self.wantsLayer = YES;
+    self.layer.cornerRadius = 5.;
+    [self updateBorderColor];
+}
+
+- (void)updateBorderColor
+{
+    self.layer.borderColor = [NSColor selectedControlColor].CGColor;
 }
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
     if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric) {
-        b_activeDragAndDrop = YES;
-        [self setNeedsDisplay:YES];
-
+        if (self.drawBorder) {
+            self.layer.borderWidth = 5.;
+        }
         return NSDragOperationCopy;
     }
 
     return NSDragOperationNone;
 }
 
-- (void)draggingEnded:(id < NSDraggingInfo >)sender
+- (void)draggingEnded:(id <NSDraggingInfo>)sender
 {
-    b_activeDragAndDrop = NO;
-    [self setNeedsDisplay:YES];
+    self.layer.borderWidth = 0.;
 }
 
-- (void)draggingExited:(id < NSDraggingInfo >)sender
+- (void)draggingExited:(id <NSDraggingInfo>)sender
 {
-    b_activeDragAndDrop = NO;
-    [self setNeedsDisplay:YES];
+    self.layer.borderWidth = 0.;
 }
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
@@ -103,33 +102,28 @@
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
-    BOOL b_returned = NO;
+    BOOL returnValue = NO;
+    NSPasteboard *pasteBoard = [sender draggingPasteboard];
+    if (!pasteBoard) {
+        return NO;
+    }
 
-    if (_dropHandler && [_dropHandler respondsToSelector:@selector(performDragOperation:)])
-        b_returned = [_dropHandler performDragOperation:sender];
-    // default
-    // FIXME: implement drag and drop _on_ new playlist
-    //        b_returned = [[[VLCMain sharedInstance] playlist] performDragOperation:sender];
+    if (_dropTarget) {
+        returnValue = [_dropTarget handlePasteBoardFromDragSession:pasteBoard];
+    }
 
     [self setNeedsDisplay:YES];
-    return b_returned;
+    return returnValue;
 }
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender
 {
-    [self setNeedsDisplay:YES];
+    self.layer.borderWidth = 0.;
 }
 
-- (void)drawRect:(NSRect)dirtyRect
+- (void)viewDidChangeEffectiveAppearance
 {
-    if ([self drawBorder] && b_activeDragAndDrop) {
-        NSRect frameRect = [self bounds];
-
-        [[NSColor selectedControlColor] set];
-        NSFrameRectWithWidthUsingOperation(frameRect, 2., NSCompositeSourceOver);
-    }
-
-    [super drawRect:dirtyRect];
+    [self updateBorderColor];
 }
 
 @end

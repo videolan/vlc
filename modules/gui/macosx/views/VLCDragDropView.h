@@ -34,9 +34,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@protocol VLCDragDropTarget
+@required
+- (BOOL)handlePasteBoardFromDragSession:(NSPasteboard *)aPasteboard;
+@end
+
 @interface VLCDragDropView : NSView
 
-@property (nonatomic, assign) id dropHandler;
+@property (nonatomic, assign) id<VLCDragDropTarget> dropTarget;
 @property (nonatomic, assign) BOOL drawBorder;
 
 - (void)enablePlaylistItems;
