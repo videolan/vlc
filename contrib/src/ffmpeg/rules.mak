@@ -246,6 +246,7 @@ ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/h264_early_SAR.patch
 	$(APPLY) $(SRC)/ffmpeg/ffmpeg-mkv-overshoot.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-hevcdec-set-the-SEI-parameters-early-on-the-.patch
+	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-h264_slice-set-the-SEI-parameters-early-on-t.patch
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch
