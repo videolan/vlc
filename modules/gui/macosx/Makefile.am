@@ -319,6 +319,8 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/File-Icons/wmv.icns \
 	gui/macosx/Resources/librarywindow/ellipsis.png \
 	gui/macosx/Resources/librarywindow/ellipsis@2x.png \
+	gui/macosx/Resources/librarywindow/note.png \
+	gui/macosx/Resources/librarywindow/note@2x.png \
 	gui/macosx/Resources/librarywindow/libraryPlay.png \
 	gui/macosx/Resources/librarywindow/libraryPlay@2x.png \
 	gui/macosx/Resources/librarywindow/repeatAll.png \

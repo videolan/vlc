@@ -500,6 +500,8 @@
 		7D713D302201AE350042BEB7 /* VLCLibraryWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryWindow.h; sourceTree = "<group>"; };
 		7D713D312201AE350042BEB7 /* VLCLibraryWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryWindow.m; sourceTree = "<group>"; };
 		7D713D332201BB130042BEB7 /* VLCLibraryWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCLibraryWindow.xib; sourceTree = "<group>"; };
+		7D71B88C229EF61200D919E7 /* note.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = note.png; path = librarywindow/note.png; sourceTree = "<group>"; };
+		7D71B88D229EF61300D919E7 /* note@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "note@2x.png"; path = "librarywindow/note@2x.png"; sourceTree = "<group>"; };
 		7D871D371B5E6844000B56C0 /* VLCMain+OldPrefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VLCMain+OldPrefs.h"; sourceTree = "<group>"; };
 		7D871D381B5E6844000B56C0 /* VLCMain+OldPrefs.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "VLCMain+OldPrefs.m"; sourceTree = "<group>"; };
 		7D8BB0B318302AC000FAE9B7 /* VLCLogWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLogWindowController.h; sourceTree = "<group>"; };
@@ -1353,6 +1355,8 @@
 				7D28E63E2275C8660098D30E /* ellipsis@2x.png */,
 				7D28E6402275C9C70098D30E /* libraryPlay.png */,
 				7D28E63F2275C9C70098D30E /* libraryPlay@2x.png */,
+				7D71B88C229EF61200D919E7 /* note.png */,
+				7D71B88D229EF61300D919E7 /* note@2x.png */,
 				7D28E6462275F2850098D30E /* repeatOff.png */,
 				7D28E6442275F2840098D30E /* repeatOff@2x.png */,
 				7D28E6482275F2850098D30E /* repeatOne.png */,

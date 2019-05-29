@@ -22,14 +22,12 @@
 
 #import "VLCPlaylistDataSource.h"
 
-#import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistTableCellView.h"
 #import "playlist/VLCPlaylistItem.h"
 #import "playlist/VLCPlaylistModel.h"
 #import "views/VLCDragDropView.h"
-#import "views/VLCImageView.h"
 
 static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
@@ -80,22 +78,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
         return cellView;
     }
 
-    NSString *artist = item.artistName;
-    if (artist && artist.length > 0) {
-        cellView.mediaTitleTextField.hidden = YES;
-        cellView.secondaryMediaTitleTextField.hidden = NO;
-        cellView.artistTextField.hidden = NO;
-        cellView.secondaryMediaTitleTextField.stringValue = item.title;
-        cellView.artistTextField.stringValue = artist;
-    } else {
-        cellView.mediaTitleTextField.hidden = NO;
-        cellView.secondaryMediaTitleTextField.hidden = YES;
-        cellView.artistTextField.hidden = YES;
-        cellView.mediaTitleTextField.stringValue = item.title;
-    }
-
-    cellView.durationTextField.stringValue = [NSString stringWithTimeFromTicks:item.duration];
-    cellView.mediaImageView.image = item.artworkImage;
+    cellView.representedPlaylistItem = item;
     cellView.representsCurrentPlaylistItem = _playlistController.currentPlaylistIndex == row;
 
     return cellView;

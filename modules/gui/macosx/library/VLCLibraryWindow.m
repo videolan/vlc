@@ -190,7 +190,7 @@ const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
     [_mediaSourceCollectionView registerClass:[VLCMediaSourceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceCellIdentifier];
 
     self.upNextLabel.font = [NSFont VLClibrarySectionHeaderFont];
-    self.upNextLabel.stringValue = _NS("Up next");
+    self.upNextLabel.stringValue = _NS("Playlist");
     NSAttributedString *attributedTitle = [[NSAttributedString alloc] initWithString:_NS("Clear queue")
                                                                           attributes:@{NSFontAttributeName : [NSFont VLClibraryButtonFont],
                                                                                        NSForegroundColorAttributeName : [NSColor VLClibraryHighlightColor]}];
