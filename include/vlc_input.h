@@ -475,6 +475,7 @@ struct vlc_input_event_vout
         VLC_INPUT_EVENT_VOUT_DELETED,
     } action;
     vout_thread_t *vout;
+    vlc_es_id_t *id;
 };
 
 struct vlc_input_event

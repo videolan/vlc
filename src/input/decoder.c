@@ -546,6 +546,7 @@ static int vout_update_format( decoder_t *p_dec )
                 &(struct vlc_input_event_vout) {
                     .action = VLC_INPUT_EVENT_VOUT_ADDED,
                     .vout = p_vout,
+                    .id = p_owner->id,
                 });
 
         vlc_mutex_lock( &p_owner->lock );
@@ -1958,6 +1959,7 @@ static void DeleteDecoder( decoder_t * p_dec )
                         &(struct vlc_input_event_vout) {
                             .action = VLC_INPUT_EVENT_VOUT_DELETED,
                             .vout = vout,
+                            .id = p_owner->id,
                         });
                 input_resource_PutVout(p_owner->p_resource, vout);
             }
