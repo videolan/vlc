@@ -1254,7 +1254,7 @@ void KeySelectorControl::finish()
 
     module_config_free (p_config);
 
-    table->resizeColumnToContents( 0 );
+    table->resizeColumnToContents( ACTION_COL );
 
     CONNECT( table, itemActivated( QTreeWidgetItem *, int ),
              this, selectKey( QTreeWidgetItem *, int ) );
@@ -1443,7 +1443,8 @@ void KeyInputDialog::checkForConflicts( int i_vlckey, const QString &sequence )
          conflictList[0]->data( b_global ? 2 : 1, Qt::UserRole ).toString() != "Unset" )
     {
         warning->setText( qtr("Warning: this key or combination is already assigned to ") +
-                QString( "\"<b>%1</b>\"" ).arg( conflictList[0]->text( 0 ) ) );
+                QString( "\"<b>%1</b>\"" )
+                .arg( conflictList[0]->text( KeySelectorControl::ACTION_COL ) ) );
         warning->show();
         ok->show();
         unset->hide();
