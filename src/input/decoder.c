@@ -540,7 +540,7 @@ static int vout_update_format( decoder_t *p_dec )
                 .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
                 .mouse_event = MouseEvent, .mouse_opaque = p_dec
             } );
-        if (p_vout)
+        if (p_vout && p_owner->p_input)
             input_SendEventVout(p_owner->p_input,
                 &(struct vlc_input_event_vout) {
                     .action = VLC_INPUT_EVENT_VOUT_ADDED,
@@ -1108,6 +1108,7 @@ static void DecoderQueueThumbnail( decoder_t *p_dec, picture_t *p_pic )
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     if( p_owner->b_first )
     {
+        assert(p_owner->p_input);
         input_SendEvent(p_owner->p_input, &(struct vlc_input_event) {
             .type = INPUT_EVENT_THUMBNAIL_READY,
             .thumbnail = p_pic
@@ -1950,11 +1951,12 @@ static void DeleteDecoder( decoder_t * p_dec )
                 /* Reset the cancel state that was set before joining the decoder
                  * thread */
                 vout_Cancel(vout, false);
-                input_SendEventVout(p_owner->p_input,
-                    &(struct vlc_input_event_vout) {
-                        .action = VLC_INPUT_EVENT_VOUT_DELETED,
-                        .vout = vout,
-                    });
+                if (p_owner->p_input)
+                    input_SendEventVout(p_owner->p_input,
+                        &(struct vlc_input_event_vout) {
+                            .action = VLC_INPUT_EVENT_VOUT_DELETED,
+                            .vout = vout,
+                        });
                 input_resource_PutVout(p_owner->p_resource, vout);
             }
             break;
@@ -2085,6 +2087,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
                              es_format_t *fmt, vlc_clock_t *p_clock,
                              sout_instance_t *p_sout  )
 {
+    assert(p_input);
     return decoder_New( VLC_OBJECT(p_input), p_input, fmt, p_clock,
                         input_priv(p_input)->p_resource, p_sout );
 }
