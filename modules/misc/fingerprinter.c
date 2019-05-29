@@ -300,7 +300,7 @@ static void fill_metas_with_results( fingerprint_request_t *p_r, acoustid_finger
         acoustid_result_t *p_result = & p_f->results.p_results[ i ];
         for ( unsigned int j=0 ; j < p_result->recordings.count; j++ )
         {
-            musicbrainz_recording_t *p_record = & p_result->recordings.p_recordings[ j ];
+            acoustid_mb_result_t *p_record = & p_result->recordings.p_recordings[ j ];
             vlc_meta_t *p_meta = vlc_meta_New();
             if ( p_meta )
             {

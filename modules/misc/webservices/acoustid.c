@@ -52,7 +52,7 @@ static json_value * jsongetbyname( json_value *object, const char *psz_name )
     return NULL;
 }
 
-static void parse_artists( json_value *node, musicbrainz_recording_t *record )
+static void parse_artists( json_value *node, acoustid_mb_result_t *record )
 {
     /* take only main */
     if ( !node || node->type != json_array || node->u.array.length < 1 ) return;
@@ -65,13 +65,13 @@ static void parse_artists( json_value *node, musicbrainz_recording_t *record )
 static void parse_recordings( vlc_object_t *p_obj, json_value *node, acoustid_result_t *p_result )
 {
     if ( !node || node->type != json_array ) return;
-    p_result->recordings.p_recordings = calloc( node->u.array.length, sizeof(musicbrainz_recording_t) );
+    p_result->recordings.p_recordings = calloc( node->u.array.length, sizeof(acoustid_mb_result_t) );
     if ( ! p_result->recordings.p_recordings ) return;
     p_result->recordings.count = node->u.array.length;
 
     for( unsigned int i=0; i<node->u.array.length; i++ )
     {
-        musicbrainz_recording_t *record = & p_result->recordings.p_recordings[ i ];
+        acoustid_mb_result_t *record = & p_result->recordings.p_recordings[ i ];
         json_value *recordnode = node->u.array.values[ i ];
         if ( !recordnode || recordnode->type != json_object ) break;
         json_value *value = jsongetbyname( recordnode, "title" );
