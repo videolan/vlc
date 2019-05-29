@@ -633,7 +633,8 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
             if( !p_es->p_dec )
                 continue;
 
-            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, NULL, p_sys->p_sout_record );
+            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->id, &p_es->fmt,
+                                                   NULL, p_sys->p_sout_record );
             if( p_es->p_dec_record && p_sys->b_buffering )
                 input_DecoderStartWait( p_es->p_dec_record );
         }
@@ -1828,7 +1829,7 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     if( !p_es->p_clock )
         return;
 
-    dec = input_DecoderNew( p_input, &p_es->fmt, p_es->p_clock,
+    dec = input_DecoderNew( p_input, &p_es->id, &p_es->fmt, p_es->p_clock,
                             input_priv(p_input)->p_sout );
     if( dec != NULL )
     {
@@ -1839,7 +1840,8 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
 
         if( !p_es->p_master && p_sys->p_sout_record )
         {
-            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, NULL, p_sys->p_sout_record );
+            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->id, &p_es->fmt,
+                                                   NULL, p_sys->p_sout_record );
             if( p_es->p_dec_record && p_sys->b_buffering )
                 input_DecoderStartWait( p_es->p_dec_record );
         }
