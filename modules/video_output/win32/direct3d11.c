@@ -1075,7 +1075,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
 
     if (picture->format.mastering.max_luminance)
     {
-        D3D11_UpdateQuadLuminanceScale(vd, &sys->d3d_dev, &sys->picQuad, GetFormatLuminance(VLC_OBJECT(vd), &picture->format) / (float)sys->display.luminance_peak);
+        D3D11_UpdateQuadLuminanceScale(vd, &sys->d3d_dev, &sys->picQuad, (float)sys->display.luminance_peak / GetFormatLuminance(VLC_OBJECT(vd), &picture->format));
     }
 
     /* Render the quad */
