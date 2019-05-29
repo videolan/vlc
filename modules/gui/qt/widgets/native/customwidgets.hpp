@@ -76,20 +76,6 @@ signals:
     void longClicked();
 };
 
-class QElidingLabel : public QLabel
-{
-public:
-    QElidingLabel( const QString &s = QString(),
-                      Qt::TextElideMode mode = Qt::ElideRight,
-                      QWidget * parent = NULL );
-    void setElideMode( Qt::TextElideMode );
-protected:
-    void paintEvent( QPaintEvent * event ) Q_DECL_OVERRIDE;
-private:
-    Qt::TextElideMode elideMode;
-};
-
-
 class QVLCStackedWidget : public QStackedWidget
 {
 public:

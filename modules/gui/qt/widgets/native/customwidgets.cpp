@@ -54,24 +54,6 @@ void QFramelessButton::paintEvent( QPaintEvent * )
 
 }
 
-QElidingLabel::QElidingLabel( const QString &s, Qt::TextElideMode mode, QWidget * parent )
-                 : QLabel( s, parent ), elideMode( mode )
-{ }
-
-void QElidingLabel::setElideMode( Qt::TextElideMode mode )
-{
-    elideMode = mode;
-    repaint();
-}
-
-void QElidingLabel::paintEvent( QPaintEvent * )
-{
-    QPainter p( this );
-    int space = frameWidth() + margin();
-    QRect r = rect().adjusted( space, space, -space, -space );
-    p.drawText( r, fontMetrics().elidedText( text(), elideMode, r.width() ), alignment() );
-}
-
 QString QVLCDebugLevelSpinBox::textFromValue( int v ) const
 {
     QString const texts[] = {
