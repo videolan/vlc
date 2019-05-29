@@ -24,6 +24,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCDragDropView;
+
 @interface VLCLibraryWindowController : NSWindowController
 
 - (instancetype)initWithLibraryWindow;
@@ -46,6 +48,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSView *libraryTargetView;
 @property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
 @property (readwrite, weak) IBOutlet NSTextField *upNextLabel;
+@property (readwrite, weak) IBOutlet VLCDragDropView *playlistDragDropView;
+@property (readwrite, weak) IBOutlet NSButton *openMediaButton;
 @property (readwrite, weak) IBOutlet NSBox *upNextSeparator;
 @property (readwrite, weak) IBOutlet NSButton *clearPlaylistButton;
 @property (readwrite, weak) IBOutlet NSBox *clearPlaylistSeparator;
@@ -66,6 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)shuffleAction:(id)sender;
 - (IBAction)repeatAction:(id)sender;
 - (IBAction)clearPlaylist:(id)sender;
+- (IBAction)openMedia:(id)sender;
 
 @end
 

@@ -41,10 +41,16 @@
 #import "media-source/VLCMediaSourceCollectionViewItem.h"
 #import "media-source/VLCMediaSourceDataSource.h"
 
+#import "views/VLCDragDropView.h"
+
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 #import "windows/video/VLCFSPanelController.h"
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoOutputProvider.h"
+#import "windows/VLCOpenWindowController.h"
+#import "windows/VLCOpenInputMetadata.h"
+
+#import <vlc_url.h>
 
 const CGFloat VLCLibraryWindowMinimalWidth = 604.;
 const CGFloat VLCLibraryWindowMinimalHeight = 307.;
@@ -52,7 +58,7 @@ const CGFloat VLCLibraryWindowPlaylistRowHeight = 72.;
 const CGFloat VLCLibraryWindowSmallRowHeight = 24.;
 const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
 
-@interface VLCLibraryWindow ()
+@interface VLCLibraryWindow () <VLCDragDropTarget>
 {
     VLCPlaylistDataSource *_playlistDataSource;
     VLCLibraryVideoDataSource *_libraryVideoDataSource;
@@ -132,9 +138,12 @@ const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
     [_segmentedTitleControl sizeToFit];
     [_segmentedTitleControl setSelectedSegment:0];
 
+    _playlistDragDropView.dropTarget = self;
+
     _playlistDataSource = [[VLCPlaylistDataSource alloc] init];
     _playlistDataSource.playlistController = _playlistController;
     _playlistDataSource.tableView = _playlistTableView;
+    _playlistDataSource.dragDropView = _playlistDragDropView;
     _playlistController.playlistDataSource = _playlistDataSource;
 
     _playlistTableView.dataSource = _playlistDataSource;
@@ -187,6 +196,7 @@ const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
                                                                                        NSForegroundColorAttributeName : [NSColor VLClibraryHighlightColor]}];
     self.clearPlaylistButton.attributedTitle = attributedTitle;
     [self updateColorsBasedOnAppearance];
+    self.openMediaButton.title = _NS("Open media...");
 
     _alternativeAudioViewController = [[VLCLibraryAlternativeAudioViewController alloc] init];
     _alternativeAudioViewController.collectionView = self.alternativeAudioCollectionView;
@@ -384,6 +394,41 @@ const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
 - (IBAction)clearPlaylist:(id)sender
 {
     [_playlistController clearPlaylist];
+}
+
+- (IBAction)openMedia:(id)sender
+{
+    [[[VLCMain sharedInstance] open] openFileGeneric];
+}
+
+- (BOOL)handlePasteBoardFromDragSession:(NSPasteboard *)paste
+{
+    id propertyList = [paste propertyListForType:NSFilenamesPboardType];
+    if (propertyList == nil) {
+        return NO;
+    }
+
+    NSArray *values = [propertyList sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+    NSUInteger valueCount = [values count];
+    if (valueCount > 0) {
+        NSMutableArray *metadataArray = [NSMutableArray arrayWithCapacity:valueCount];
+
+        for (NSUInteger i = 0; i < valueCount; i++) {
+            VLCOpenInputMetadata *inputMetadata;
+            char *psz_uri = vlc_path2uri([values[i] UTF8String], "file");
+            if (!psz_uri)
+                continue;
+            inputMetadata = [[VLCOpenInputMetadata alloc] init];
+            inputMetadata.MRLString = toNSStr(psz_uri);
+            free(psz_uri);
+            [metadataArray addObject:inputMetadata];
+        }
+        [_playlistController addPlaylistItems:metadataArray];
+
+        return YES;
+    }
+
+    return NO;
 }
 
 #pragma mark - video output controlling

@@ -28,6 +28,7 @@
 #import "playlist/VLCPlaylistTableCellView.h"
 #import "playlist/VLCPlaylistItem.h"
 #import "playlist/VLCPlaylistModel.h"
+#import "views/VLCDragDropView.h"
 #import "views/VLCImageView.h"
 
 static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
@@ -102,6 +103,8 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
 - (void)playlistUpdated
 {
+    self.dragDropView.hidden = _playlistModel.numberOfPlaylistItems > 0 ? YES : NO;
+
     [_tableView reloadData];
 }
 

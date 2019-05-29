@@ -23,6 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class VLCPlaylistController;
+@class VLCDragDropView;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, assign, nonatomic) VLCPlaylistController *playlistController;
 @property (readwrite, assign) NSTableView *tableView;
+@property (readwrite, assign) VLCDragDropView *dragDropView;
 
 - (void)playlistUpdated;
 

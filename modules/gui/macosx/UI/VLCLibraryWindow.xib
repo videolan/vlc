@@ -155,6 +155,35 @@
                                             <action selector="clearPlaylist:" target="QvC-M9-y7g" id="tzd-mR-sDu"/>
                                         </connections>
                                     </button>
+                                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VFI-oW-dMZ" customClass="VLCDragDropView">
+                                        <rect key="frame" x="0.0" y="55" width="237" height="195"/>
+                                        <subviews>
+                                            <imageView translatesAutoresizingMaskIntoConstraints="NO" id="cTV-Wf-TfJ" customClass="VLCDropDisabledImageView">
+                                                <rect key="frame" x="63" y="42" width="112" height="112"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="112" id="IvG-i0-rbs"/>
+                                                    <constraint firstAttribute="height" constant="112" id="dO8-Iv-pDk"/>
+                                                </constraints>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="dropzone" id="sHO-XQ-hCU"/>
+                                            </imageView>
+                                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SWh-4E-Qtf">
+                                                <rect key="frame" x="56" y="4" width="125" height="32"/>
+                                                <buttonCell key="cell" type="push" title="Open media..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="UUH-HF-Iqc">
+                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <connections>
+                                                    <action selector="openMedia:" target="QvC-M9-y7g" id="Px5-M7-DSb"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="cTV-Wf-TfJ" firstAttribute="centerY" secondItem="VFI-oW-dMZ" secondAttribute="centerY" id="OHT-tO-cJy"/>
+                                            <constraint firstItem="SWh-4E-Qtf" firstAttribute="top" secondItem="cTV-Wf-TfJ" secondAttribute="bottom" constant="10" id="eok-CR-lus"/>
+                                            <constraint firstItem="cTV-Wf-TfJ" firstAttribute="centerX" secondItem="VFI-oW-dMZ" secondAttribute="centerX" id="sOt-js-AM3"/>
+                                            <constraint firstItem="SWh-4E-Qtf" firstAttribute="centerX" secondItem="cTV-Wf-TfJ" secondAttribute="centerX" id="xrf-SM-XAK"/>
+                                        </constraints>
+                                    </customView>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="Vry-OZ-ySI" firstAttribute="leading" secondItem="dus-WQ-AmE" secondAttribute="leading" constant="20" id="6iz-2G-xXO"/>
@@ -163,8 +192,10 @@
                                     <constraint firstItem="nAW-KH-ipk" firstAttribute="leading" secondItem="dus-WQ-AmE" secondAttribute="leading" constant="20" id="EUp-9J-Fid"/>
                                     <constraint firstItem="Z7y-D0-11Q" firstAttribute="top" secondItem="qmL-Ar-cj1" secondAttribute="bottom" constant="8" id="GIh-g3-rqJ"/>
                                     <constraint firstItem="Z7y-D0-11Q" firstAttribute="leading" secondItem="dus-WQ-AmE" secondAttribute="leading" constant="20" id="J3s-se-6bL"/>
+                                    <constraint firstItem="VFI-oW-dMZ" firstAttribute="top" secondItem="qmL-Ar-cj1" secondAttribute="bottom" id="JzJ-oS-dIb"/>
                                     <constraint firstItem="Vry-OZ-ySI" firstAttribute="top" secondItem="dus-WQ-AmE" secondAttribute="top" id="K80-Vw-FfD"/>
                                     <constraint firstItem="8zF-Wo-H79" firstAttribute="centerY" secondItem="jg5-33-vH0" secondAttribute="centerY" id="Qdp-7K-RkD"/>
+                                    <constraint firstAttribute="trailing" secondItem="VFI-oW-dMZ" secondAttribute="trailing" id="YeE-gw-hV0"/>
                                     <constraint firstItem="Z7y-D0-11Q" firstAttribute="baseline" secondItem="nAW-KH-ipk" secondAttribute="firstBaseline" constant="-8" id="ZIg-X2-w2p"/>
                                     <constraint firstAttribute="trailing" secondItem="cih-xp-HmY" secondAttribute="trailing" constant="20" id="ZmV-zc-4a0"/>
                                     <constraint firstItem="8zF-Wo-H79" firstAttribute="leading" secondItem="jg5-33-vH0" secondAttribute="trailing" constant="20" id="aAn-lh-NcZ"/>
@@ -174,6 +205,8 @@
                                     <constraint firstItem="qmL-Ar-cj1" firstAttribute="leading" secondItem="dus-WQ-AmE" secondAttribute="leading" constant="20" id="st7-tK-qLh"/>
                                     <constraint firstAttribute="trailing" secondItem="Z7y-D0-11Q" secondAttribute="trailing" id="x0A-xI-BVt"/>
                                     <constraint firstItem="jg5-33-vH0" firstAttribute="firstBaseline" secondItem="cih-xp-HmY" secondAttribute="firstBaseline" id="xwe-Nb-2Rz"/>
+                                    <constraint firstItem="VFI-oW-dMZ" firstAttribute="leading" secondItem="dus-WQ-AmE" secondAttribute="leading" id="y24-g1-nh1"/>
+                                    <constraint firstItem="nAW-KH-ipk" firstAttribute="top" secondItem="VFI-oW-dMZ" secondAttribute="bottom" id="yZy-ia-HIz"/>
                                     <constraint firstAttribute="bottom" secondItem="nAW-KH-ipk" secondAttribute="bottom" constant="54" id="z8O-Xk-fS8"/>
                                     <constraint firstItem="jg5-33-vH0" firstAttribute="leading" secondItem="dus-WQ-AmE" secondAttribute="leading" constant="20" id="zEw-GJ-NfA"/>
                                 </constraints>
@@ -326,6 +359,8 @@
                 <outlet property="mainSplitView" destination="u8g-jy-S4e" id="lI5-wR-kef"/>
                 <outlet property="mediaSourceCollectionView" destination="r7v-GI-W1U" id="3JJ-GU-o5o"/>
                 <outlet property="mediaSourceScrollView" destination="cFG-c9-cI9" id="gRO-Y7-kdb"/>
+                <outlet property="openMediaButton" destination="SWh-4E-Qtf" id="sIZ-xo-GLA"/>
+                <outlet property="playlistDragDropView" destination="VFI-oW-dMZ" id="gVc-mu-f8T"/>
                 <outlet property="playlistTableView" destination="Fr1-af-8gb" id="yaB-Ab-jrx"/>
                 <outlet property="recentVideoLibraryCollectionView" destination="hnE-Hj-MZo" id="Fko-5v-1bC"/>
                 <outlet property="repeatPlaylistButton" destination="8zF-Wo-H79" id="6bH-HF-arx"/>
@@ -706,6 +741,7 @@
     <resources>
         <image name="backward-3btns" width="29" height="23"/>
         <image name="backward-3btns-pressed" width="29" height="23"/>
+        <image name="dropzone" width="112" height="112"/>
         <image name="forward-3btns" width="29" height="23"/>
         <image name="forward-3btns-pressed" width="29" height="23"/>
         <image name="fullscreen-one-button" width="29" height="23"/>
