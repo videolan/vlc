@@ -632,7 +632,7 @@ $(srcdir)/revision.txt:
 stamp-revision:
 	$(AM_V_at)rm -f -- revision.tmp
 	$(AM_V_GEN)if ! git \
-			--git-dir="$(top_srcdir)/.git" describe \
+			-C "$(top_srcdir)" describe \
 			--tags --long --match '?.*.*' --always; then \
 		cat $(srcdir)/revision.txt ; \
 	fi > revision.tmp
