@@ -272,7 +272,7 @@
                                         </constraints>
                                     </customView>
                                     <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Hg-t2-K5z" customClass="VLCSlider">
-                                        <rect key="frame" x="101" y="10" width="274" height="16"/>
+                                        <rect key="frame" x="134" y="10" width="161" height="16"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="14" id="4YR-vo-ZfK"/>
                                         </constraints>
@@ -284,7 +284,7 @@
                                         </connections>
                                     </slider>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oGd-mG-cFw" customClass="VLCTimeField">
-                                        <rect key="frame" x="381" y="12" width="56" height="13"/>
+                                        <rect key="frame" x="301" y="12" width="56" height="13"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="13" id="ZpD-fD-qke"/>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="52" id="aOU-Hc-ufI"/>
@@ -309,17 +309,74 @@
                                             <action selector="fullscreen:" target="Uzf-Tf-H8x" id="ayV-qE-Nmy"/>
                                         </connections>
                                     </button>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="IAy-58-UPp">
+                                        <rect key="frame" x="363" y="13" width="5" height="11"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="11" id="VxM-zR-jQR"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="volume-low" imagePosition="only" alignment="center" id="qTN-dX-Oj5">
+                                            <behavior key="behavior" lightByContents="YES"/>
+                                            <font key="font" metaFont="label"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="volumeAction:" target="Uzf-Tf-H8x" id="ugn-Py-dV8"/>
+                                        </connections>
+                                    </button>
+                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="noz-yJ-oH4" customClass="VLCVolumeSlider">
+                                        <rect key="frame" x="371" y="11" width="48" height="13"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="48" id="EM2-Hh-lqK"/>
+                                        </constraints>
+                                        <sliderCell key="cell" controlSize="mini" continuous="YES" alignment="left" maxValue="512" doubleValue="251.95348837209303" tickMarkPosition="above" sliderType="linear" id="IIu-VN-bEm" customClass="VLCVolumeSliderCell"/>
+                                        <connections>
+                                            <action selector="volumeAction:" target="Uzf-Tf-H8x" id="am0-Zu-eBs"/>
+                                        </connections>
+                                    </slider>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="75c-FF-mgb">
+                                        <rect key="frame" x="422" y="13" width="13" height="11"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="11" id="Kt0-WP-qU0"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="volume-high" imagePosition="only" alignment="center" id="a9Z-7I-lXJ">
+                                            <behavior key="behavior" lightByContents="YES"/>
+                                            <font key="font" metaFont="label"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="volumeAction:" target="Uzf-Tf-H8x" id="8aL-jE-MXa"/>
+                                        </connections>
+                                    </button>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="cEC-SX-pks">
+                                        <rect key="frame" x="97" y="7" width="29" height="23"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="23" id="VRF-YR-kTr"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="stop" imagePosition="only" alignment="center" alternateImage="stop-pressed" enabled="NO" id="NEI-Es-D2A">
+                                            <behavior key="behavior" lightByContents="YES"/>
+                                            <font key="font" metaFont="label"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="stop:" target="Uzf-Tf-H8x" id="kMO-P8-eOG"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="9Hg-t2-K5z" firstAttribute="leading" secondItem="cEC-SX-pks" secondAttribute="trailing" constant="8" id="1kG-GO-EmC"/>
                                     <constraint firstItem="9Hg-t2-K5z" firstAttribute="centerY" secondItem="MQH-bI-Zdh" secondAttribute="centerY" id="3I8-IC-m3C"/>
                                     <constraint firstItem="SUi-Nm-KtK" firstAttribute="centerY" secondItem="MQH-bI-Zdh" secondAttribute="centerY" id="7SA-kP-WYu"/>
+                                    <constraint firstItem="dwM-Uz-pAw" firstAttribute="leading" secondItem="noz-yJ-oH4" secondAttribute="trailing" constant="24" id="A2S-l6-Vfg"/>
                                     <constraint firstItem="dwM-Uz-pAw" firstAttribute="centerY" secondItem="oGd-mG-cFw" secondAttribute="centerY" id="Brc-26-tG5"/>
-                                    <constraint firstItem="9Hg-t2-K5z" firstAttribute="leading" secondItem="SUi-Nm-KtK" secondAttribute="trailing" constant="8" id="FtG-eC-1xc"/>
+                                    <constraint firstItem="cEC-SX-pks" firstAttribute="leading" secondItem="i34-50-c7o" secondAttribute="trailing" constant="4" id="FTA-il-NCk"/>
+                                    <constraint firstItem="75c-FF-mgb" firstAttribute="centerY" secondItem="noz-yJ-oH4" secondAttribute="centerY" id="HVh-uV-Ovg"/>
+                                    <constraint firstItem="cEC-SX-pks" firstAttribute="centerY" secondItem="i34-50-c7o" secondAttribute="centerY" id="KwV-AE-eNt"/>
+                                    <constraint firstItem="noz-yJ-oH4" firstAttribute="leading" secondItem="IAy-58-UPp" secondAttribute="trailing" constant="3" id="TH8-V3-URc"/>
                                     <constraint firstAttribute="trailing" secondItem="dwM-Uz-pAw" secondAttribute="trailing" constant="8" id="UeR-IT-Q50"/>
+                                    <constraint firstItem="75c-FF-mgb" firstAttribute="leading" secondItem="noz-yJ-oH4" secondAttribute="trailing" constant="3" id="Uqf-cR-gMY"/>
+                                    <constraint firstItem="IAy-58-UPp" firstAttribute="centerY" secondItem="noz-yJ-oH4" secondAttribute="centerY" id="V9R-uE-YMc"/>
                                     <constraint firstItem="SUi-Nm-KtK" firstAttribute="leading" secondItem="MQH-bI-Zdh" secondAttribute="leading" constant="8" id="Wgx-gy-pkh"/>
                                     <constraint firstItem="oGd-mG-cFw" firstAttribute="leading" secondItem="9Hg-t2-K5z" secondAttribute="trailing" constant="8" id="ZEi-tc-qH8"/>
-                                    <constraint firstItem="dwM-Uz-pAw" firstAttribute="leading" secondItem="oGd-mG-cFw" secondAttribute="trailing" constant="8" symbolic="YES" id="ZWE-GB-jJp"/>
                                     <constraint firstItem="dwM-Uz-pAw" firstAttribute="centerY" secondItem="MQH-bI-Zdh" secondAttribute="centerY" id="rld-Zd-Lbn"/>
+                                    <constraint firstItem="IAy-58-UPp" firstAttribute="leading" secondItem="oGd-mG-cFw" secondAttribute="trailing" constant="8" id="sUV-dY-Ewu"/>
+                                    <constraint firstItem="noz-yJ-oH4" firstAttribute="centerY" secondItem="MQH-bI-Zdh" secondAttribute="centerY" id="w6O-Hd-4Hv"/>
                                 </constraints>
                             </customView>
                         </subviews>
@@ -373,7 +430,7 @@
             </connections>
             <point key="canvasLocation" x="139" y="204.5"/>
         </window>
-        <customObject id="Uzf-Tf-H8x" userLabel="Detached Window Controls Bar" customClass="VLCControlsBarCommon">
+        <customObject id="Uzf-Tf-H8x" userLabel="Detached Window Controls Bar" customClass="VLCMainWindowControlsBar">
             <connections>
                 <outlet property="backwardButton" destination="Agm-yD-Chm" id="SZH-kZ-MBk"/>
                 <outlet property="bottomBarView" destination="vUy-jt-gjY" id="WqX-SW-mpv"/>
@@ -381,8 +438,12 @@
                 <outlet property="forwardButton" destination="i34-50-c7o" id="b5w-NB-g4X"/>
                 <outlet property="fullscreenButton" destination="dwM-Uz-pAw" id="gXA-WS-Gig"/>
                 <outlet property="playButton" destination="Pa9-uC-URK" id="8cD-Sr-Uht"/>
+                <outlet property="stopButton" destination="cEC-SX-pks" id="AJE-gb-v0o"/>
                 <outlet property="timeField" destination="oGd-mG-cFw" id="GwZ-Mm-ZSb"/>
                 <outlet property="timeSlider" destination="9Hg-t2-K5z" id="sVe-s8-xW6"/>
+                <outlet property="volumeDownButton" destination="IAy-58-UPp" id="dDN-pE-Vmj"/>
+                <outlet property="volumeSlider" destination="noz-yJ-oH4" id="nbe-1c-lFH"/>
+                <outlet property="volumeUpButton" destination="75c-FF-mgb" id="xRz-F4-n0Z"/>
             </connections>
         </customObject>
         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" id="vak-Gp-ljo">
@@ -750,5 +811,9 @@
         <image name="play-pressed" width="27" height="23"/>
         <image name="repeatOff" width="24" height="24"/>
         <image name="shuffleOn" width="24" height="24"/>
+        <image name="stop" width="29" height="23"/>
+        <image name="stop-pressed" width="29" height="23"/>
+        <image name="volume-high" width="13" height="11"/>
+        <image name="volume-low" width="5" height="11"/>
     </resources>
 </document>

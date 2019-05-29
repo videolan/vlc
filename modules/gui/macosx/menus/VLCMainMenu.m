@@ -365,12 +365,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_findItem setTitle: _NS("Find")];
 
     [_viewMenu setTitle: _NS("View")];
-    [_toggleJumpButtons setTitle: _NS("Show Previous & Next Buttons")];
-    [_toggleJumpButtons setState: var_InheritBool(getIntf(), "macosx-show-playback-buttons")];
-    [_togglePlaymodeButtons setTitle: _NS("Show Shuffle & Repeat Buttons")];
-    [_togglePlaymodeButtons setState: var_InheritBool(getIntf(), "macosx-show-playmode-buttons")];
-    [_toggleEffectsButton setTitle: _NS("Show Audio Effects Button")];
-    [_toggleEffectsButton setState: var_InheritBool(getIntf(), "macosx-show-effects-button")];
     [_showLibraryFolders setTitle: _NS("Show Library Folders...")];
     [_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
 
@@ -660,9 +654,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [_postprocessing setEnabled:YES];
         [self setSubmenusEnabled:YES];
         input_item_Release(p_mediaItem);
+
+        [self setRateControlsEnabled:_playerController.rateChangable];
     } else {
         [_postprocessing setEnabled:NO];
         [self setSubmenusEnabled:NO];
+        [self setRateControlsEnabled:NO];
     }
 }
 
@@ -735,35 +732,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 }
 
 #pragma mark - View
-
-- (IBAction)toggleEffectsButton:(id)sender
-{
-    BOOL b_value = !var_InheritBool(getIntf(), "macosx-show-effects-button");
-    config_PutInt("macosx-show-effects-button", b_value);
-    [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] libraryWindow] controlsBar] toggleEffectsButton];
-    [_toggleEffectsButton setState: b_value];
-}
-
-- (IBAction)toggleJumpButtons:(id)sender
-{
-    BOOL b_value = !var_InheritBool(getIntf(), "macosx-show-playback-buttons");
-    config_PutInt("macosx-show-playback-buttons", b_value);
-
-    [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] libraryWindow] controlsBar] toggleJumpButtons];
-    [[[VLCMain sharedInstance] voutProvider] updateWindowsUsingBlock:^(VLCVideoWindowCommon *window) {
-        [[window controlsBar] toggleForwardBackwardMode: b_value];
-    }];
-
-    [_toggleJumpButtons setState: b_value];
-}
-
-- (IBAction)togglePlaymodeButtons:(id)sender
-{
-    BOOL b_value = !var_InheritBool(getIntf(), "macosx-show-playmode-buttons");
-    config_PutInt("macosx-show-playmode-buttons", b_value);
-    [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] libraryWindow] controlsBar] togglePlaymodeButtons];
-    [_togglePlaymodeButtons setState: b_value];
-}
 
 - (IBAction)showLibraryFolders:(id)sender
 {

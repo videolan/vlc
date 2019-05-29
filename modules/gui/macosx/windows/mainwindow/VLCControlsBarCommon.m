@@ -109,7 +109,10 @@
     [self.playButton setImage: _playImage];
     [self.playButton setAlternateImage: _pressedPlayImage];
 
-    NSColor *timeFieldTextColor = [NSColor colorWithCalibratedRed:0.64 green:0.64 blue:0.64 alpha:100.0];
+    [self.timeSlider setHidden:NO];
+    [self updateTimeSlider:nil];
+
+    NSColor *timeFieldTextColor = [NSColor controlTextColor];
     [self.timeField setTextColor: timeFieldTextColor];
     [self.timeField setFont:[NSFont titleBarFontOfSize:10.0]];
     [self.timeField setAlignment: NSCenterTextAlignment];
@@ -122,8 +125,14 @@
         self.fullscreenButtonWidthConstraint.constant = 0;
     }
 
-    if (config_GetInt("macosx-show-playback-buttons"))
-        [self toggleForwardBackwardMode: YES];
+    self.backwardButton.accessibilityTitle = _NS("Previous");
+    self.backwardButton.accessibilityLabel = _NS("Go to previous item");
+
+    self.forwardButton.accessibilityTitle = _NS("Next");
+    self.forwardButton.accessibilityLabel = _NS("Go to next item");
+
+    [self.forwardButton setAction:@selector(fwd:)];
+    [self.backwardButton setAction:@selector(bwd:)];
 
     [self playerStateUpdated:nil];
 }
@@ -136,32 +145,6 @@
 - (CGFloat)height
 {
     return [self.bottomBarView frame].size.height;
-}
-
-- (void)toggleForwardBackwardMode:(BOOL)b_alt
-{
-    if (b_alt == YES) {
-        /* change the accessibility help for the backward/forward buttons accordingly */
-        self.backwardButton.accessibilityTitle = _NS("Backward");
-        self.backwardButton.accessibilityLabel = _NS("Seek backward");
-
-        self.forwardButton.accessibilityTitle = _NS("Forward");
-        self.forwardButton.accessibilityLabel = _NS("Seek forward");
-
-        [self.forwardButton setAction:@selector(alternateForward:)];
-        [self.backwardButton setAction:@selector(alternateBackward:)];
-
-    } else {
-        /* change the accessibility help for the backward/forward buttons accordingly */
-        self.backwardButton.accessibilityTitle = _NS("Previous");
-        self.backwardButton.accessibilityLabel = _NS("Go to previous item");
-
-        self.forwardButton.accessibilityTitle = _NS("Next");
-        self.forwardButton.accessibilityLabel = _NS("Go to next item");
-
-        [self.forwardButton setAction:@selector(fwd:)];
-        [self.backwardButton setAction:@selector(bwd:)];
-    }
 }
 
 #pragma mark -
@@ -242,17 +225,6 @@
     }
 }
 
-// alternative actions for forward / backward buttons when next / prev are activated
-- (IBAction)alternateForward:(id)sender
-{
-    [_playerController jumpForwardExtraShort];
-}
-
-- (IBAction)alternateBackward:(id)sender
-{
-    [_playerController jumpBackwardExtraShort];
-}
-
 - (IBAction)timeSliderAction:(id)sender
 {
     float f_updatedDelta;
@@ -294,8 +266,6 @@
 - (void)updateTimeSlider:(NSNotification *)aNotification;
 {
     input_item_t *p_item = _playerController.currentMedia;
-
-    [self.timeSlider setHidden:NO];
 
     if (!p_item) {
         // Nothing playing

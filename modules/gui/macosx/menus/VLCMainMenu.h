@@ -211,8 +211,6 @@
 
 - (void)releaseRepresentedObjects:(NSMenu *)the_menu;
 
-- (void)setRateControlsEnabled:(BOOL)b_enabled;
-
 - (IBAction)openAddonManager:(id)sender;
 
 - (IBAction)intfOpenFile:(id)sender;
@@ -222,9 +220,6 @@
 - (IBAction)intfOpenCapture:(id)sender;
 - (IBAction)savePlaylist:(id)sender;
 
-- (IBAction)toggleEffectsButton:(id)sender;
-- (IBAction)toggleJumpButtons:(id)sender;
-- (IBAction)togglePlaymodeButtons:(id)sender;
 - (IBAction)showLibraryFolders:(id)sender;
 
 - (IBAction)play:(id)sender;

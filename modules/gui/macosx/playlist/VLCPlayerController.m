@@ -1658,12 +1658,12 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
 - (void)incrementVolume
 {
-    vlc_player_aout_SetVolume(_p_player, _volume + 0.05);
+    vlc_player_aout_IncrementVolume(_p_player, 1, NULL);
 }
 
 - (void)decrementVolume
 {
-    vlc_player_aout_SetVolume(_p_player, _volume - 0.05);
+    vlc_player_aout_DecrementVolume(_p_player, 1, NULL);
 }
 
 - (void)muteChanged:(BOOL)mute

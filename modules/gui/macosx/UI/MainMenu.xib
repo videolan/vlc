@@ -145,9 +145,6 @@
                 <outlet property="teletext_yellow" destination="5500" id="auC-nl-mJx"/>
                 <outlet property="title" destination="5148" id="HFs-7N-MNr"/>
                 <outlet property="titleMenu" destination="5159" id="Akr-s6-bqw"/>
-                <outlet property="toggleEffectsButton" destination="5537" id="Gg8-nl-gzx"/>
-                <outlet property="toggleJumpButtons" destination="5240" id="53V-UC-536"/>
-                <outlet property="togglePlaymodeButtons" destination="5242" id="9TB-F7-ttT"/>
                 <outlet property="trackSynchronization" destination="4412" id="BHW-NJ-jbd"/>
                 <outlet property="videoMenu" destination="334" id="7Ri-Tc-yej"/>
                 <outlet property="videoeffects" destination="2390" id="fXe-JA-9GI"/>
@@ -369,24 +366,6 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="View" id="5238">
                         <items>
-                            <menuItem title="Show Previous &amp; Next Buttons" id="5240">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="toggleJumpButtons:" target="-2" id="rFJ-9Z-m4G"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Show Shuffle &amp; Repeat Buttons" id="5242">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="togglePlaymodeButtons:" target="-2" id="p7O-r4-WDX"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Show Audio Effects Button" id="5537">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="toggleEffectsButton:" target="-2" id="QSm-2E-Nlo"/>
-                                </connections>
-                            </menuItem>
                             <menuItem title="Show Library Folders..." id="5413">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>

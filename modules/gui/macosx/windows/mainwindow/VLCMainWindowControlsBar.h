@@ -1,10 +1,10 @@
 /*****************************************************************************
- * ControlsBar.h: MacOS X interface module
+ * VLCMainWindowControlsBar.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2012-2019 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
- *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
+ * Authors: Felix Paul Kühne <fkuehne # videolan dot org>
+ *          David Fuhrmann <dfuhrmann # videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,36 +38,15 @@
 @property (readwrite, strong) IBOutlet NSButton *stopButton;
 
 @property (readwrite, strong) IBOutlet NSButton *prevButton;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *prevButtonWidthConstraint;
 @property (readwrite, strong) IBOutlet NSButton *nextButton;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *nextButtonWidthConstraint;
-
-@property (readwrite, strong) IBOutlet NSButton *playlistButton;
-@property (readwrite, strong) IBOutlet NSButton *repeatButton;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *repeatButtonWidthConstraint;
-
-@property (readwrite, strong) IBOutlet NSButton *shuffleButton;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *shuffleButtonWidthConstraint;
 
 @property (readwrite, strong) IBOutlet VLCVolumeSlider *volumeSlider;
 @property (readwrite, strong) IBOutlet NSButton *volumeDownButton;
 @property (readwrite, strong) IBOutlet NSButton *volumeUpButton;
 
-@property (readwrite, strong) IBOutlet NSButton *effectsButton;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *effectsButtonWidthConstraint;
-
 - (IBAction)stop:(id)sender;
 
-- (IBAction)shuffle:(id)sender;
 - (IBAction)volumeAction:(id)sender;
-- (IBAction)effects:(id)sender;
-
-- (IBAction)repeat:(id)sender;
-
-- (IBAction)togglePlaylist:(id)sender;
-
-- (void)toggleEffectsButton;
-- (void)toggleJumpButtons;
-- (void)togglePlaymodeButtons;
 
 @end
+
