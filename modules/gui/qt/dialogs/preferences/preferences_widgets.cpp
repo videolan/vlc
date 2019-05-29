@@ -1433,13 +1433,17 @@ void KeyInputDialog::setExistingkeysSet( const QSet<QString> *keyset )
 void KeyInputDialog::checkForConflicts( int i_vlckey, const QString &sequence )
 {
     conflicts = false;
-    QList<QTreeWidgetItem *> conflictList =
-        table->findItems( VLCKeyToString( i_vlckey, true ), Qt::MatchExactly,
-                          column );
+    QString vlckey = VLCKeyToString( i_vlckey, true );
+    if ( vlckey == qtr( "Unset" ) )
+    {
+        accept();
+        return;
+    }
 
-    if( conflictList.count() &&
-        !conflictList[0]->data( column, Qt::UserRole ).toString().isEmpty() &&
-         conflictList[0]->data( column, Qt::UserRole ).toString() != "Unset" )
+    QList<QTreeWidgetItem *> conflictList =
+        table->findItems( vlckey, Qt::MatchExactly, column );
+
+    if( conflictList.count() )
     {
         warning->setText( qtr("Warning: this key or combination is already assigned to ") +
                 QString( "\"<b>%1</b>\"" )
