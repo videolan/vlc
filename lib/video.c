@@ -775,15 +775,6 @@ int libvlc_video_get_marquee_int( libvlc_media_player_t *p_mi,
 }
 
 /*****************************************************************************
- * libvlc_video_get_marquee_string : get a marq option value
- *****************************************************************************/
-char * libvlc_video_get_marquee_string( libvlc_media_player_t *p_mi,
-                                        unsigned option )
-{
-    return get_string( p_mi, "marq", marq_option_bynumber(option) );
-}
-
-/*****************************************************************************
  * libvlc_video_set_marquee_int: enable, disable or set an int option
  *****************************************************************************/
 void libvlc_video_set_marquee_int( libvlc_media_player_t *p_mi,

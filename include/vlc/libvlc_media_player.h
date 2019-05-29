@@ -1764,15 +1764,6 @@ LIBVLC_API int libvlc_video_get_marquee_int( libvlc_media_player_t *p_mi,
                                                  unsigned option );
 
 /**
- * Get a string marquee option value
- *
- * \param p_mi libvlc media player
- * \param option marq option to get \see libvlc_video_marquee_string_option_t
- */
-LIBVLC_API char *libvlc_video_get_marquee_string( libvlc_media_player_t *p_mi,
-                                                      unsigned option );
-
-/**
  * Enable, disable or set an integer marquee option
  *
  * Setting libvlc_marquee_Enable has the side effect of enabling (arg !0)
