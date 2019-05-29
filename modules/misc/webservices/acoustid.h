@@ -20,13 +20,13 @@
 
 #define MB_ID_SIZE 36
 
-struct musicbrainz_recording_t
+struct acoustid_mb_result_t
 {
     char *psz_artist;
     char *psz_title;
     char s_musicbrainz_id[MB_ID_SIZE];
 };
-typedef struct musicbrainz_recording_t musicbrainz_recording_t;
+typedef struct acoustid_mb_result_t acoustid_mb_result_t;
 
 struct acoustid_result_t
 {
@@ -35,7 +35,7 @@ struct acoustid_result_t
     struct
     {
         unsigned int count;
-        musicbrainz_recording_t *p_recordings;
+        acoustid_mb_result_t *p_recordings;
     } recordings;
 };
 typedef struct acoustid_result_t acoustid_result_t;
