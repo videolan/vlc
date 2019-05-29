@@ -40,6 +40,7 @@
 #include <vlc_plugin.h>
 
 #include <QString>
+#include <QStringList>
 #include <QVariant>
 #include <QGridLayout>
 #include <QSlider>
@@ -1304,11 +1305,14 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
             for( int i = 0; i < table->topLevelItemCount() ; i++ )
             {
                 it = table->topLevelItem(i);
-                if( ( keyItem != it ) &&
-                    ( it->data( column, Qt::UserRole ).toString() == d->vlckey ) )
+                if( keyItem == it )
+                    continue;
+                QStringList it_keys = it->data( column, Qt::UserRole ).toString().split( "\t" );
+                if( it_keys.removeAll( d->vlckey ) )
                 {
-                    it->setText( column, NULL );
-                    it->setData( column, Qt::UserRole, QVariant() );
+                    QString it_filteredkeys = it_keys.join( "\t" );
+                    it->setText( column, it_filteredkeys );
+                    it->setData( column, Qt::UserRole, it_filteredkeys );
                 }
             }
         }
@@ -1445,7 +1449,7 @@ void KeyInputDialog::checkForConflicts( const QString &sequence )
         if( item == keyItem )
             continue;
 
-        if( vlckey.compare( item->data( column, Qt::UserRole ).toString() ) != 0 )
+        if( !item->data( column, Qt::UserRole ).toString().split( "\t" ).contains( vlckey ) )
             continue;
 
         warning->setText( qtr("Warning: this key or combination is already assigned to ") +
