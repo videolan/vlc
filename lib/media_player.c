@@ -401,10 +401,12 @@ on_cork_changed(vlc_player_t *player, unsigned cork_count, void *data)
 
 static void
 on_vout_changed(vlc_player_t *player, enum vlc_player_vout_action action,
-                vout_thread_t *vout, void *data)
+                vout_thread_t *vout, vlc_es_id_t *es_id,
+                void *data)
 {
     (void) action;
     (void) vout;
+    (void) es_id;
 
     libvlc_media_player_t *mp = data;
 

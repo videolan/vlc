@@ -79,6 +79,7 @@ struct report_vout
 {
     enum vlc_player_vout_action action;
     vout_thread_t *vout;
+    vlc_es_id_t *es_id;
 };
 
 struct report_media_subitems
@@ -433,15 +434,16 @@ player_on_statistics_changed(vlc_player_t *player,
 
 static void
 player_on_vout_changed(vlc_player_t *player,
-                            enum vlc_player_vout_action action,
-                            vout_thread_t *vout, void *data)
+                       enum vlc_player_vout_action action,
+                       vout_thread_t *vout, vlc_es_id_t *es_id, void *data)
 {
     struct ctx *ctx = get_ctx(player, data);
     struct report_vout report = {
         .action = action,
-        .vout = vout,
+        .vout = vout_Hold(vout),
+        .es_id = vlc_es_id_Hold(es_id),
     };
-    vout_Hold(vout);
+    assert(report.es_id);
     VEC_PUSH(on_vout_changed, report);
 }
 
@@ -570,7 +572,10 @@ ctx_reset(struct ctx *ctx)
     {
         struct report_vout report;
         FOREACH_VEC(report, on_vout_changed)
+        {
             vout_Release(report.vout);
+            vlc_es_id_Release(report.es_id);
+        }
     }
 
     {

@@ -713,7 +713,7 @@ static void on_player_subitems_changed(vlc_player_t *, input_item_t *, input_ite
 }
 
 
-static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_action, vout_thread_t *, void *data)
+static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_action, vout_thread_t *, vlc_es_id_t *, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_vout_list_changed");

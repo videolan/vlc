@@ -104,7 +104,9 @@ vlc_module_end ()
 
 static void player_on_vout_changed(vlc_player_t *player,
                                    enum vlc_player_vout_action action,
-                                   vout_thread_t *vout, void *data);
+                                   vout_thread_t *vout,
+                                   vlc_es_id_t *es_id,
+                                   void *data);
 static int MovedEvent( vlc_object_t *, char const *,
                        vlc_value_t, vlc_value_t, void * );
 static int ButtonEvent( vlc_object_t *, char const *,
@@ -389,9 +391,10 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
 static void
 player_on_vout_changed(vlc_player_t *player,
                        enum vlc_player_vout_action action,
-                       vout_thread_t *vout, void *data)
+                       vout_thread_t *vout,
+                       vlc_es_id_t *es_id, void *data)
 {
-    VLC_UNUSED(player);
+    VLC_UNUSED(player); VLC_UNUSED(es_id);
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
     switch (action)

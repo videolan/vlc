@@ -1819,6 +1819,7 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
                                  const struct vlc_input_event_vout *ev)
 {
     assert(ev->vout);
+    assert(ev->id);
 
     static const char osd_vars[][sizeof("deinterlace-mode")] = {
         "aspect-ratio", "autoscale", "crop", "crop-bottom",
@@ -1831,7 +1832,7 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
     {
         case VLC_INPUT_EVENT_VOUT_ADDED:
             vlc_player_SendEvent(player, on_vout_changed,
-                                 VLC_PLAYER_VOUT_STARTED, ev->vout);
+                                 VLC_PLAYER_VOUT_STARTED, ev->vout, ev->id);
 
             /* Register vout callbacks after the vout list event */
             var_AddCallback(ev->vout, "fullscreen",
@@ -1853,7 +1854,7 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
                                 vlc_player_VoutOSDCallback, player);
 
             vlc_player_SendEvent(player, on_vout_changed,
-                                 VLC_PLAYER_VOUT_STOPPED, ev->vout);
+                                 VLC_PLAYER_VOUT_STOPPED, ev->vout, ev->id);
             break;
         default:
             vlc_assert_unreachable();

@@ -348,10 +348,10 @@ static void cb_player_stats_changed(vlc_player_t *p_player,
 
 static void cb_player_track_list_changed(vlc_player_t *p_player,
                                          enum vlc_player_list_action action,
-                                         const struct vlc_player_track *track,
+                                         vlc_es_id_t *es_id,
                                          void *p_data)
 {
-    VLC_UNUSED(p_player); VLC_UNUSED(action); VLC_UNUSED(track);
+    VLC_UNUSED(p_player); VLC_UNUSED(action); VLC_UNUSED(es_id);
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
         [playerController trackListChanged];
@@ -432,10 +432,12 @@ static void cb_player_item_meta_changed(vlc_player_t *p_player,
 static void cb_player_vout_changed(vlc_player_t *p_player,
                                    enum vlc_player_vout_action action,
                                    vout_thread_t *p_vout,
+                                   const struct vlc_player_track *track,
                                    void *p_data)
 {
     VLC_UNUSED(p_player);
     VLC_UNUSED(p_vout);
+    VLC_UNUSED(track);
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
         [playerController voutListUpdated];
