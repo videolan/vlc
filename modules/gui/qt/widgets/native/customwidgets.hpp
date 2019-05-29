@@ -76,16 +76,6 @@ signals:
     void longClicked();
 };
 
-class QVLCStackedWidget : public QStackedWidget
-{
-public:
-    QVLCStackedWidget( QWidget *parent ) : QStackedWidget( parent ) { }
-    QSize minimumSizeHint () const
-    {
-        return currentWidget() ? currentWidget()->minimumSizeHint() : QSize();
-    }
-};
-
 class QVLCDebugLevelSpinBox : public QSpinBox
 {
     Q_OBJECT
