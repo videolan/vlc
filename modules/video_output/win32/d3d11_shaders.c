@@ -214,10 +214,9 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     const char *psz_src_transform     = DEFAULT_NOOP;
     const char *psz_display_transform = DEFAULT_NOOP;
     const char *psz_primaries_transform = DEFAULT_NOOP;
-    const char *psz_tone_mapping      = DEFAULT_NOOP;
+    const char *psz_tone_mapping      = "return rgb * LuminanceScale";
     const char *psz_adjust_range      = DEFAULT_NOOP;
     char *psz_range = NULL;
-    char *psz_transform = NULL;
 
     switch (format->formatTexture)
     {
@@ -283,20 +282,17 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                        "rgb = pow(max(rgb, 0), 1.0/ST2084_m2);\n"
                        "rgb = max(rgb - ST2084_c1, 0.0) / (ST2084_c2 - ST2084_c3 * rgb);\n"
                        "rgb = pow(rgb, 1.0/ST2084_m1);\n"
-                       "return rgb";
+                       "return rgb * 10000";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             case TRANSFER_FUNC_HLG:
-                asprintf(&psz_transform, "const float alpha_gain = 10000.0;\n"
-                                          "rgb.r = inverse_HLG(rgb.r);\n"
-                                          "rgb.g = inverse_HLG(rgb.g);\n"
-                                          "rgb.b = inverse_HLG(rgb.b);\n"
-                                          "float3 ootf_2020 = float3(0.2627, 0.6780, 0.0593);\n"
-                                          "float ootf_ys = alpha_gain * dot(ootf_2020, rgb);\n"
-                                          "rgb *= pow(ootf_ys, 0.200);\n"
-                                          "return rgb / %lld;",
-                         display->colorspace->transfer == TRANSFER_FUNC_SMPTE_ST2084 ? 1000 : 250);
-                psz_src_transform = psz_transform;
+                psz_src_transform = "const float alpha_gain = 2000; /* depends on the display output */\n"
+                                    "rgb.r = inverse_HLG(rgb.r);\n"
+                                    "rgb.g = inverse_HLG(rgb.g);\n"
+                                    "rgb.b = inverse_HLG(rgb.b);\n"
+                                    "float3 ootf_2020 = float3(0.2627, 0.6780, 0.0593);\n"
+                                    "float ootf_ys = alpha_gain * dot(ootf_2020, rgb);\n"
+                                    "return rgb * pow(ootf_ys, 0.200)";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             case TRANSFER_FUNC_BT709:
@@ -345,7 +341,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                     /* Linear to ST2084 */
                     psz_display_transform =
                            ST2084_PQ_CONSTANTS
-                           "rgb = pow(rgb, ST2084_m1);\n"
+                           "rgb = pow(rgb / 10000, ST2084_m1);\n"
                            "rgb = (ST2084_c1 + ST2084_c2 * rgb) / (1 + ST2084_c3 * rgb);\n"
                            "rgb = pow(rgb, ST2084_m2);\n"
                            "return rgb";
@@ -476,7 +472,6 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     }
 #endif
     free(psz_range);
-    free(psz_transform);
 
     ID3DBlob *pPSBlob = D3D11_CompileShader(o, hd3d, d3d_dev, shader, true);
     free(shader);

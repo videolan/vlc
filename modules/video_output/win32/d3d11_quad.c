@@ -826,7 +826,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     HRESULT hr;
     const bool RGB_shader = IsRGBShader(quad->formatInfo);
 
-    quad->shaderConstants.LuminanceScale = GetFormatLuminance(o, fmt) / (float)displayFormat->luminance_peak;
+    quad->shaderConstants.LuminanceScale = (float)displayFormat->luminance_peak / GetFormatLuminance(o, fmt);
 
     /* pixel shader constant buffer */
     quad->shaderConstants.Opacity = 1.0;
