@@ -21,6 +21,8 @@
  *****************************************************************************/
 
 #import "VLCImageView.h"
+#import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 @implementation VLCImageView
 
@@ -47,6 +49,15 @@
     self.layer = [[CALayer alloc] init];
     self.contentGravity = VLCImageViewContentGravityResizeAspectFill;
     self.wantsLayer = YES;
+    self.layer.cornerRadius = 5.;
+    self.layer.masksToBounds = YES;
+    self.layer.borderWidth = 1.;
+    [self setupBorderColor];
+}
+
+- (void)setupBorderColor
+{
+    self.layer.borderColor = self.shouldShowDarkAppearance ? [NSColor VLClibrarySeparatorDarkColor].CGColor : [NSColor VLClibrarySeparatorLightColor].CGColor;
 }
 
 - (void)setImage:(NSImage *)image
@@ -103,6 +114,11 @@
             self.layer.contentsGravity = kCAGravityResizeAspectFill;
             break;
     }
+}
+
+- (void)viewDidChangeEffectiveAppearance
+{
+    [self setupBorderColor];
 }
 
 @end
