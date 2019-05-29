@@ -23,39 +23,58 @@
 #import "VLCLinearProgressIndicator.h"
 #import "extensions/NSColor+VLCAdditions.h"
 
+@interface VLCLinearProgressIndicator()
+{
+    NSView *_foregroundView;
+}
+@end
+
 @implementation VLCLinearProgressIndicator
 
-- (void)drawRect:(NSRect)dirtyRect
+- (instancetype)initWithFrame:(NSRect)frameRect
 {
-    [super drawRect:dirtyRect];
-
-    CGRect rect = NSRectToCGRect(dirtyRect);
-
-    CGContextClearRect([NSGraphicsContext currentContext].CGContext, rect);
-
-    NSColor *drawingColor = [NSColor VLClibraryHighlightColor];
-
-    NSBezierPath* bezierPath = [NSBezierPath bezierPath];
-
-    float progress_width = self.progress * rect.size.width;
-
-    // Create our triangle
-    [bezierPath moveToPoint:CGPointMake(progress_width - rect.size.height + 3., 2.)];
-    [bezierPath lineToPoint:CGPointMake(progress_width - (rect.size.height/2), rect.size.height - 5.)];
-    [bezierPath lineToPoint:CGPointMake(progress_width - 3., 2.)];
-    [bezierPath closePath];
-
-    // Set the display for the path, and stroke it
-    bezierPath.lineWidth = 6.;
-    [drawingColor setStroke];
-    [bezierPath stroke];
-    [drawingColor setFill];
-    [bezierPath fill];
+    self = [super initWithFrame:frameRect];
+    if (self) {
+        [self setupSubviews];
+    }
+    return self;
 }
 
-- (BOOL)isFlipped
+- (instancetype)initWithCoder:(NSCoder *)decoder
 {
-    return YES;
+    self = [super initWithCoder:decoder];
+    if (self) {
+        [self setupSubviews];
+    }
+    return self;
+}
+
+- (void)setupSubviews
+{
+    self.wantsLayer = YES;
+    self.layer.backgroundColor = [NSColor VLClibraryProgressIndicatorBackgroundColor].CGColor;
+
+    CGRect frame = self.frame;
+    frame.size.width = 0.;
+    _foregroundView = [[NSView alloc] initWithFrame:frame];
+    _foregroundView.wantsLayer = YES;
+    _foregroundView.layer.backgroundColor = [NSColor VLClibraryProgressIndicatorForegroundColor].CGColor;
+    _foregroundView.autoresizingMask = NSViewWidthSizable;
+    _foregroundView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_foregroundView];
+}
+
+- (void)setProgress:(CGFloat)progress
+{
+    if (progress > 1.) {
+        progress = 1.;
+    }
+
+    CGRect rect = self.frame;
+    rect.size.width = rect.size.width * progress;
+    _foregroundView.frame = rect;
+
+    _progress = progress;
 }
 
 @end
