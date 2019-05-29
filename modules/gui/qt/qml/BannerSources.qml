@@ -38,7 +38,7 @@ Utils.NavigableFocusScope {
     signal itemClicked(int index)
     signal subItemClicked(int index)
 
-    property alias sortModel: sort_control.model
+    property alias sortModel: sortControl.model
     property var contentModel
 
     property alias model: pLBannerSources.model
@@ -94,8 +94,8 @@ Utils.NavigableFocusScope {
                         when: history.nextEmpty && history.previousEmpty
                         PropertyChanges {
                             target: buttonView
-                            KeyNavigation.left: searchBox
-                            KeyNavigation.down: searchBox
+                            KeyNavigation.left: menu_selector
+                            KeyNavigation.down: menu_selector
                         }
                     },
                     State {
@@ -309,12 +309,12 @@ Utils.NavigableFocusScope {
                     Layout.preferredHeight: VLCStyle.icon_normal
                     contentModel: root.contentModel
 
-                    KeyNavigation.right: sort_control
+                    KeyNavigation.right: sortControl
                     KeyNavigation.up: buttonView
                 }
 
                 Utils.SortControl {
-                    id: sort_control
+                    id: sortControl
 
                     textRole: "text"
                     listWidth: VLCStyle.widthSortBox
@@ -371,6 +371,34 @@ Utils.NavigableFocusScope {
                         }
                     }
                 }
+
+                // Content model states
+                states: [
+                    State {
+                        name: "contentModel"
+                        when: root.contentModel !== undefined
+                        PropertyChanges {
+                            target: searchBox
+                            visible: true
+                        }
+                        PropertyChanges {
+                            target: sortControl
+                            visible: true
+                        }
+                    },
+                    State {
+                        name: "noContentModel"
+                        when: root.contentModel === undefined
+                        PropertyChanges {
+                            target: searchBox
+                            visible: false
+                        }
+                        PropertyChanges {
+                            target: sortControl
+                            visible: false
+                        }
+                    }
+                ]
             }
         }
     }
