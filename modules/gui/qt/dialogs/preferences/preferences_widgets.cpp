@@ -1385,12 +1385,15 @@ bool KeySelectorControl::eventFilter( QObject *obj, QEvent *e )
 KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
                                 const QString& keyToChange,
                                 QWidget *_parent,
-                                bool _b_global ) :
-                                QDialog( _parent ), keyValue(0), b_global( _b_global )
+                                bool b_global ) :
+                                QDialog( _parent ), keyValue(0)
 {
     setModal( true );
     conflicts = false;
     existingkeys = NULL;
+
+    column = b_global ? KeySelectorControl::GLOBAL_HOTKEY_COL
+                      : KeySelectorControl::HOTKEY_COL;
 
     table = _table;
     setWindowTitle( ( b_global ? qtr( "Global" ) + QString(" ") : "" )
@@ -1436,11 +1439,11 @@ void KeyInputDialog::checkForConflicts( int i_vlckey, const QString &sequence )
 {
     QList<QTreeWidgetItem *> conflictList =
         table->findItems( VLCKeyToString( i_vlckey, true ), Qt::MatchExactly,
-                          b_global ? 2 : 1 );
+                          column );
 
     if( conflictList.count() &&
-        !conflictList[0]->data( b_global ? 2 : 1, Qt::UserRole ).toString().isEmpty() &&
-         conflictList[0]->data( b_global ? 2 : 1, Qt::UserRole ).toString() != "Unset" )
+        !conflictList[0]->data( column, Qt::UserRole ).toString().isEmpty() &&
+         conflictList[0]->data( column, Qt::UserRole ).toString() != "Unset" )
     {
         warning->setText( qtr("Warning: this key or combination is already assigned to ") +
                 QString( "\"<b>%1</b>\"" )

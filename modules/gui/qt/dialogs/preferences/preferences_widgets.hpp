@@ -539,11 +539,11 @@ private:
     QTreeWidget *table;
     QLabel *selected, *warning;
     QPushButton *ok, *unset;
+    enum KeySelectorControl::ColumnIndex column;
 
     void checkForConflicts( int i_vlckey, const QString &sequence );
     void keyPressEvent( QKeyEvent *);
     void wheelEvent( QWheelEvent *);
-    bool b_global;
     const QSet<QString> *existingkeys;
 
 private slots:
