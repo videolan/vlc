@@ -1252,6 +1252,7 @@ void KeySelectorControl::finish()
     module_config_free (p_config);
 
     table->resizeColumnToContents( ACTION_COL );
+    table->resizeColumnToContents( HOTKEY_COL );
 
     CONNECT( table, itemActivated( QTreeWidgetItem *, int ),
              this, selectKey( QTreeWidgetItem *, int ) );
