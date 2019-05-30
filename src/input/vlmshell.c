@@ -1354,8 +1354,8 @@ static vlm_message_t *vlm_ShowMedia( vlm_media_sys_t *p_media )
         APPEND_INPUT_INFO( "time", "%"PRId64, time );
         APPEND_INPUT_INFO( "length", "%"PRId64, length );
         APPEND_INPUT_INFO( "rate", "%f", rate );
-        APPEND_INPUT_INFO( "title", "%"PRId64, title );
-        APPEND_INPUT_INFO( "chapter", "%"PRId64, chapter );
+        APPEND_INPUT_INFO( "title", "%zd", title );
+        APPEND_INPUT_INFO( "chapter", "%zd", chapter );
         APPEND_INPUT_INFO( "can-seek", "%d", can_seek );
 #undef APPEND_INPUT_INFO
         vlm_MessageAdd( p_msg_instance, vlm_MessageNew( "playlistindex",
