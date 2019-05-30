@@ -214,7 +214,6 @@ libvlc_track_description_list_release
 libvlc_video_get_adjust_float
 libvlc_video_get_adjust_int
 libvlc_video_get_aspect_ratio
-libvlc_video_get_crop_geometry
 libvlc_video_get_size
 libvlc_video_get_cursor
 libvlc_video_get_logo_int

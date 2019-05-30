@@ -1657,14 +1657,6 @@ void libvlc_chapter_descriptions_release( libvlc_chapter_description_t **p_chapt
                                           unsigned i_count );
 
 /**
- * Get current crop filter geometry.
- *
- * \param p_mi the media player
- * \return the crop filter geometry or NULL if unset
- */
-LIBVLC_API char *libvlc_video_get_crop_geometry( libvlc_media_player_t *p_mi );
-
-/**
  * Set new crop filter geometry.
  *
  * \param p_mi the media player

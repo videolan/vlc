@@ -362,11 +362,6 @@ int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi,
     return 0;
 }
 
-char *libvlc_video_get_crop_geometry (libvlc_media_player_t *p_mi)
-{
-    return var_GetNonEmptyString (p_mi, "crop");
-}
-
 void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi,
                                      const char *psz_geometry )
 {
