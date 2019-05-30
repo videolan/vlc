@@ -359,6 +359,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_input_skipLoopLabel setStringValue: _NS("Skip the loop filter for H.264 decoding")];
     [_input_urlhandlerButton setTitle: _NS("Edit default application settings for network protocols")];
     [_input_skipFramesCheckbox setTitle: _NS("Skip frames")];
+    [_input_fastSeekCheckbox setTitle: _NS("Fast seek")];
 
     /* url handler */
     [_urlhandler_titleLabel setStringValue: _NS("Open network streams using the following protocols")];
@@ -736,6 +737,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
     [self setupButton:_input_hardwareAccelerationCheckbox forBoolValue: "videotoolbox"];
     [self setupButton:_input_skipFramesCheckbox forBoolValue: "skip-frames"];
+    [self setupButton:_input_fastSeekCheckbox forBoolValue: "input-fast-seek"];
     [self setupButton:_input_aviPopup forIntList: "avi-index"];
     [self setupButton:_input_skipLoopPopup forIntList: "avcodec-skiploopfilter"];
 
@@ -1044,6 +1046,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         config_PutInt("videotoolbox", [_input_hardwareAccelerationCheckbox state]);
         config_PutInt("skip-frames", [_input_skipFramesCheckbox state]);
+        config_PutInt("input-fast-seek", [_input_fastSeekCheckbox state]);
 
         SaveIntList(_input_aviPopup, "avi-index");
 

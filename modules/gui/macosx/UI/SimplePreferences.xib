@@ -49,6 +49,7 @@
                 <outlet property="input_cachelevelPopup" destination="2580" id="lts-mx-3Kh"/>
                 <outlet property="input_cachelevel_customLabel" destination="3162" id="fbZ-oF-HKW"/>
                 <outlet property="input_cachingBox" destination="2572" id="EC7-3Y-jc1"/>
+                <outlet property="input_fastSeekCheckbox" destination="mFh-ke-4yF" id="auB-Bw-bo3"/>
                 <outlet property="input_hardwareAccelerationCheckbox" destination="E3R-AI-QGD" id="I73-W4-R8Y"/>
                 <outlet property="input_muxBox" destination="2585" id="Yng-39-8zd"/>
                 <outlet property="input_netBox" destination="2563" id="xSD-ks-oYK"/>
@@ -1267,6 +1268,16 @@ Gw
                                     <action selector="inputSettingChanged:" target="-2" id="tI4-5J-NJ2"/>
                                 </connections>
                             </button>
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="mFh-ke-4yF">
+                                <rect key="frame" x="437" y="11" width="80" height="18"/>
+                                <buttonCell key="cell" type="check" title="Fast seek" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="XWc-M2-awg">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="inputSettingChanged:" target="-2" id="Dqa-wB-P4l"/>
+                                </connections>
+                            </button>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2594">
                                 <rect key="frame" x="267" y="71" width="251" height="25"/>
                                 <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2598" id="3520">
@@ -1313,6 +1324,7 @@ Gw
                             </button>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="mFh-ke-4yF" firstAttribute="trailing" secondItem="3435" secondAttribute="trailing" id="5cw-wL-iQh"/>
                             <constraint firstItem="2593" firstAttribute="leading" secondItem="E3R-AI-QGD" secondAttribute="leading" id="5jy-4Z-Yf9"/>
                             <constraint firstItem="3434" firstAttribute="leading" secondItem="2593" secondAttribute="leading" id="DbT-Jq-Nxe"/>
                             <constraint firstItem="2594" firstAttribute="leading" secondItem="2593" secondAttribute="trailing" constant="17" id="H8f-vv-gko"/>
@@ -1325,15 +1337,14 @@ Gw
                             <constraint firstItem="E3R-AI-QGD" firstAttribute="top" secondItem="30i-kg-rYI" secondAttribute="top" constant="12" id="Uiy-Rc-Z9G"/>
                             <constraint firstItem="3435" firstAttribute="width" secondItem="2594" secondAttribute="width" id="V0T-ah-xQd"/>
                             <constraint firstItem="3434" firstAttribute="centerY" secondItem="3435" secondAttribute="centerY" id="WV5-Nx-zJo"/>
+                            <constraint firstAttribute="bottom" secondItem="lem-yf-jZB" secondAttribute="bottom" constant="13" id="Y7N-0N-QVd"/>
                             <constraint firstItem="3435" firstAttribute="leading" secondItem="3434" secondAttribute="trailing" constant="17" id="eZZ-2v-na1"/>
                             <constraint firstItem="3435" firstAttribute="leading" secondItem="2594" secondAttribute="leading" id="h44-ac-8ao"/>
                             <constraint firstItem="2593" firstAttribute="centerY" secondItem="2594" secondAttribute="centerY" id="jae-OS-C7i"/>
                             <constraint firstItem="E3R-AI-QGD" firstAttribute="leading" secondItem="30i-kg-rYI" secondAttribute="leading" constant="16" id="v2C-3E-DlJ"/>
+                            <constraint firstItem="mFh-ke-4yF" firstAttribute="centerY" secondItem="lem-yf-jZB" secondAttribute="centerY" id="v6Z-GB-X2Z"/>
                         </constraints>
                     </view>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="152" id="rXT-GE-OGD"/>
-                    </constraints>
                 </box>
                 <box borderType="line" title="Record directory or filename" translatesAutoresizingMaskIntoConstraints="NO" id="3623">
                     <rect key="frame" x="17" y="179" width="538" height="62"/>

@@ -105,6 +105,7 @@
 @property (readwrite, weak) IBOutlet NSPopUpButton *input_skipLoopPopup;
 @property (readwrite, weak) IBOutlet NSButton *input_urlhandlerButton;
 @property (readwrite, weak) IBOutlet NSButton *input_skipFramesCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *input_fastSeekCheckbox;
 
 // intf pane - general box
 @property (readwrite, strong) IBOutlet NSView *intfView;
