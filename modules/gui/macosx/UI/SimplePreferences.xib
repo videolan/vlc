@@ -39,6 +39,7 @@
                 <outlet property="hotkeys_change_takenLabel" destination="2803" id="IL0-j6-d9h"/>
                 <outlet property="hotkeys_change_win" destination="2677" id="rwN-5b-lyj"/>
                 <outlet property="hotkeys_clearButton" destination="2674" id="0JA-op-ATZ"/>
+                <outlet property="hotkeys_dimKeyboardCheckbox" destination="Gjp-57-RUZ" id="IeI-rL-DwJ"/>
                 <outlet property="hotkeys_listbox" destination="2670" id="i2J-F5-aT6"/>
                 <outlet property="hotkeys_mediakeysCheckbox" destination="6Ro-o1-WEd" id="fGa-18-7ey"/>
                 <outlet property="inputView" destination="2562" id="FPv-Zx-DLZ"/>
@@ -1848,10 +1849,10 @@ Gw
             <point key="canvasLocation" x="274" y="2038.5"/>
         </customView>
         <customView translatesAutoresizingMaskIntoConstraints="NO" id="2668" userLabel="Hotkeys">
-            <rect key="frame" x="0.0" y="0.0" width="570" height="461"/>
+            <rect key="frame" x="0.0" y="0.0" width="570" height="494"/>
             <subviews>
                 <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="0.0" verticalLineScroll="19" verticalPageScroll="0.0" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2669">
-                    <rect key="frame" x="20" y="95" width="530" height="321"/>
+                    <rect key="frame" x="20" y="128" width="530" height="321"/>
                     <clipView key="contentView" id="EbT-aN-Pgg">
                         <rect key="frame" x="1" y="0.0" width="528" height="320"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1914,7 +1915,7 @@ Gw
                     </tableHeaderView>
                 </scrollView>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2675">
-                    <rect key="frame" x="469" y="47" width="87" height="32"/>
+                    <rect key="frame" x="469" y="80" width="87" height="32"/>
                     <buttonCell key="cell" type="push" title="Change" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="3526">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -1924,7 +1925,7 @@ Gw
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2674">
-                    <rect key="frame" x="14" y="47" width="72" height="32"/>
+                    <rect key="frame" x="14" y="80" width="72" height="32"/>
                     <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="3525">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -1934,7 +1935,7 @@ Gw
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2673">
-                    <rect key="frame" x="18" y="424" width="306" height="17"/>
+                    <rect key="frame" x="18" y="457" width="306" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Select an action to change the associated hotkey:" usesSingleLineMode="YES" id="3524">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1942,7 +1943,7 @@ Gw
                     </textFieldCell>
                 </textField>
                 <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="6Ro-o1-WEd">
-                    <rect key="frame" x="18" y="18" width="225" height="18"/>
+                    <rect key="frame" x="18" y="51" width="225" height="18"/>
                     <buttonCell key="cell" type="check" title="Control playback with media keys" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="kZN-TJ-neV">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -1951,15 +1952,27 @@ Gw
                         <action selector="hotkeySettingChanged:" target="-2" id="TcH-tQ-KTD"/>
                     </connections>
                 </button>
+                <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="Gjp-57-RUZ">
+                    <rect key="frame" x="18" y="18" width="328" height="18"/>
+                    <buttonCell key="cell" type="check" title="Dim keyboard backlight during fullscreen playback" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="bTZ-p2-Jsa">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="hotkeySettingChanged:" target="-2" id="4oo-j1-Uhs"/>
+                    </connections>
+                </button>
             </subviews>
             <constraints>
                 <constraint firstItem="2669" firstAttribute="leading" secondItem="2673" secondAttribute="leading" id="07J-bM-GTd"/>
+                <constraint firstItem="Gjp-57-RUZ" firstAttribute="leading" secondItem="6Ro-o1-WEd" secondAttribute="leading" id="0dF-zN-dVK"/>
                 <constraint firstItem="2674" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="2PK-yW-KzL"/>
+                <constraint firstAttribute="bottom" secondItem="Gjp-57-RUZ" secondAttribute="bottom" constant="20" id="8dn-tg-H5s"/>
                 <constraint firstAttribute="trailing" secondItem="2669" secondAttribute="trailing" constant="20" id="9ma-RK-c6X"/>
                 <constraint firstItem="2675" firstAttribute="centerY" secondItem="2674" secondAttribute="centerY" id="GfX-2H-4qu"/>
                 <constraint firstItem="2673" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="HYF-Bu-NcI"/>
                 <constraint firstItem="2675" firstAttribute="top" secondItem="2669" secondAttribute="bottom" constant="20" id="Kep-UP-GNR"/>
-                <constraint firstAttribute="bottom" secondItem="6Ro-o1-WEd" secondAttribute="bottom" constant="20" id="QnU-7e-UeB"/>
+                <constraint firstItem="Gjp-57-RUZ" firstAttribute="top" secondItem="6Ro-o1-WEd" secondAttribute="bottom" constant="19" id="NCm-yd-mjg"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2673" secondAttribute="trailing" constant="20" id="Sdf-9E-91g"/>
                 <constraint firstItem="2674" firstAttribute="top" secondItem="2669" secondAttribute="bottom" constant="20" id="aa2-ha-RSP"/>
                 <constraint firstItem="2669" firstAttribute="top" secondItem="2673" secondAttribute="bottom" constant="8" id="cl3-aB-HqL"/>
@@ -1968,7 +1981,7 @@ Gw
                 <constraint firstItem="6Ro-o1-WEd" firstAttribute="top" secondItem="2674" secondAttribute="bottom" constant="20" id="sM1-Th-Aiu"/>
                 <constraint firstItem="6Ro-o1-WEd" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="yqH-HV-wNV"/>
             </constraints>
-            <point key="canvasLocation" x="255" y="1026.5"/>
+            <point key="canvasLocation" x="255" y="1043"/>
         </customView>
         <window title="Change Hotkey" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="2677" userLabel="Hotkey Changer" customClass="VLCHotkeyChangeWindow">
             <windowStyleMask key="styleMask" titled="YES"/>

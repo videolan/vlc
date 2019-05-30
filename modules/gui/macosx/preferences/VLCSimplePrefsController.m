@@ -343,6 +343,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [[[_hotkeys_listbox tableColumnWithIdentifier: @"action"] headerCell] setStringValue: _NS("Action")];
     [[[_hotkeys_listbox tableColumnWithIdentifier: @"shortcut"] headerCell] setStringValue: _NS("Shortcut")];
     [_hotkeys_mediakeysCheckbox setTitle: _NS("Control playback with media keys")];
+    [_hotkeys_dimKeyboardCheckbox setTitle: _NS("Dim keyboard backlight during fullscreen playback")];
 
     /* input */
     [_input_recordBox setTitle: _NS("Record directory or filename")];
@@ -827,6 +828,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
     [_hotkeys_listbox reloadData];
     [self setupButton:_hotkeys_mediakeysCheckbox forBoolValue: "macosx-mediakeys"];
+    [self setupButton:_hotkeys_dimKeyboardCheckbox forBoolValue: "macosx-dim-keyboard"];
 }
 
 #pragma mark -
@@ -1092,6 +1094,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         _hotkeyChanged = NO;
 
         config_PutInt("macosx-mediakeys", [_hotkeys_mediakeysCheckbox state]);
+        config_PutInt("macosx-dim-keyboard", [_hotkeys_dimKeyboardCheckbox state]);
     }
 
     fixIntfSettings();
