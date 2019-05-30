@@ -42,6 +42,7 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
         self.textColor = self.shouldShowDarkAppearance ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
         self.editable = NO;
         self.selectable = NO;
+        self.bordered = NO;
     }
     return self;
 }
