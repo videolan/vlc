@@ -58,6 +58,8 @@
 #define MINWIDTH_BOX 90
 #define LAST_COLUMN 10
 
+#define HOTKEY_ITEM_HEIGHT 24
+
 QString formatTooltip(const QString & tooltip)
 {
     QString text = tooltip;
@@ -1257,6 +1259,9 @@ void KeySelectorControl::finish()
 
     table->resizeColumnToContents( ACTION_COL );
     table->resizeColumnToContents( HOTKEY_COL );
+
+    table->setUniformRowHeights( true );
+    table->topLevelItem(0)->setSizeHint( 0, QSize( 0, HOTKEY_ITEM_HEIGHT ) );
 
     CONNECT( table, itemActivated( QTreeWidgetItem *, int ),
              this, selectKey( QTreeWidgetItem *, int ) );
