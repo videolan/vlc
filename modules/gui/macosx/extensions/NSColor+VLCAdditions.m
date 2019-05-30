@@ -26,7 +26,7 @@
 
 + (instancetype)VLClibraryHighlightColor
 {
-    return [NSColor colorWithRed:0.96 green:0.5 blue:.0 alpha:1.];
+    return [NSColor colorWithRed:1. green:136./255. blue:.0 alpha:1.];
 }
 
 + (instancetype)VLClibraryLightTitleColor
