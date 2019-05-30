@@ -1404,6 +1404,7 @@ static const char *const mouse_wheel_texts[] = {
 #define ZOOM_HALF_KEY_TEXT N_("1:2 Half")
 #define ZOOM_ORIGINAL_KEY_TEXT N_("1:1 Original")
 #define ZOOM_DOUBLE_KEY_TEXT N_("2:1 Double")
+#define ZOOM_LEVEL_KEY_LONGTEXT N_("Select the hotkey to use to zoom to the corresponding level.")
 
 #define PLAY_BOOKMARK1_KEY_TEXT N_("Play playlist bookmark 1")
 #define PLAY_BOOKMARK2_KEY_TEXT N_("Play playlist bookmark 2")
@@ -1459,6 +1460,7 @@ static const char *const mouse_wheel_texts[] = {
 #define DEINTERLACE_MODE_KEY_TEXT N_("Cycle deinterlace modes")
 #define DEINTERLACE_MODE_KEY_LONGTEXT N_("Cycle through available deinterlace modes.")
 #define INTF_TOGGLE_FSC_KEY_TEXT N_("Show controller in fullscreen")
+#define INTF_TOGGLE_FSC_KEY_LONGTEXT N_("Select the hotkey to use to toggle visibility of controls in fullscreen mode.")
 #define INTF_BOSS_KEY_TEXT N_("Boss key")
 #define INTF_BOSS_KEY_LONGTEXT N_("Hide the interface and pause playback.")
 #define INTF_POPUP_MENU_KEY_TEXT N_("Context menu")
@@ -1503,9 +1505,13 @@ static const char *const mouse_wheel_texts[] = {
 
 /* 360° Viewpoint */
 #define VIEWPOINT_FOV_IN_KEY_TEXT N_("Shrink the viewpoint field of view (360°)")
+#define VIEWPOINT_FOV_IN_KEY_LONGTEXT N_("Select the hotkey to use to shrink the viewpoint (360°) field of view.")
 #define VIEWPOINT_FOV_OUT_KEY_TEXT N_("Expand the viewpoint field of view (360°)")
+#define VIEWPOINT_FOV_OUT_KEY_LONGTEXT N_("Select the hotkey to use to expand the viewpoint (360°) field of view.")
 #define VIEWPOINT_ROLL_CLOCK_KEY_TEXT N_("Roll the viewpoint clockwise (360°)")
+#define VIEWPOINT_ROLL_CLOCK_KEY_LONGTEXT N_("Select the hotkey to use for viewpoint (360°) clockwise roll.")
 #define VIEWPOINT_ROLL_ANTICLOCK_KEY_TEXT N_("Roll the viewpoint anti-clockwise (360°)")
+#define VIEWPOINT_ROLL_ANTICLOCK_KEY_LONGTEXT N_("Select the hotkey to use for viewpoint (360°) anti-clockwise roll.")
 
 #define WALLPAPER_KEY_TEXT N_("Toggle wallpaper mode in video output")
 #define WALLPAPER_KEY_LONGTEXT N_( \
@@ -2703,7 +2709,7 @@ vlc_module_begin ()
     add_key("key-deinterlace-mode", KEY_DEINTERLACE_MODE,
             DEINTERLACE_MODE_KEY_TEXT, DEINTERLACE_MODE_KEY_LONGTEXT)
     add_key("key-intf-show", KEY_INTF_TOGGLE_FSC,
-            INTF_TOGGLE_FSC_KEY_TEXT, INTF_TOGGLE_FSC_KEY_TEXT)
+            INTF_TOGGLE_FSC_KEY_TEXT, INTF_TOGGLE_FSC_KEY_LONGTEXT)
     add_obsolete_inner( "key-intf-hide", CONFIG_ITEM_KEY )
 
     add_key("key-intf-boss", KEY_INTF_BOSS,
@@ -2737,20 +2743,19 @@ vlc_module_begin ()
     add_key("key-loop", KEY_LOOP, LOOP_KEY_TEXT, LOOP_KEY_LONGTEXT)
 
     add_key("key-viewpoint-fov-in", KEY_VIEWPOINT_FOV_IN,
-            VIEWPOINT_FOV_IN_KEY_TEXT, VIEWPOINT_FOV_IN_KEY_TEXT)
+            VIEWPOINT_FOV_IN_KEY_TEXT, VIEWPOINT_FOV_IN_KEY_LONGTEXT)
     add_key("key-viewpoint-fov-out", KEY_VIEWPOINT_FOV_OUT,
-            VIEWPOINT_FOV_OUT_KEY_TEXT, VIEWPOINT_FOV_OUT_KEY_TEXT)
+            VIEWPOINT_FOV_OUT_KEY_TEXT, VIEWPOINT_FOV_OUT_KEY_LONGTEXT)
     add_key("key-viewpoint-roll-clock", NULL,
-            VIEWPOINT_ROLL_CLOCK_KEY_TEXT, VIEWPOINT_ROLL_CLOCK_KEY_TEXT)
+            VIEWPOINT_ROLL_CLOCK_KEY_TEXT, VIEWPOINT_ROLL_CLOCK_KEY_LONGTEXT)
     add_key("key-viewpoint-roll-anticlock", NULL,
             VIEWPOINT_ROLL_ANTICLOCK_KEY_TEXT,
-            VIEWPOINT_ROLL_ANTICLOCK_KEY_TEXT)
+            VIEWPOINT_ROLL_ANTICLOCK_KEY_LONGTEXT)
 
-    add_key("key-zoom-quarter", KEY_ZOOM_QUARTER, ZOOM_QUARTER_KEY_TEXT, NULL)
-    add_key("key-zoom-half", KEY_ZOOM_HALF, ZOOM_HALF_KEY_TEXT, NULL)
-    add_key("key-zoom-original", KEY_ZOOM_ORIGINAL,
-            ZOOM_ORIGINAL_KEY_TEXT, NULL)
-    add_key("key-zoom-double", KEY_ZOOM_DOUBLE, ZOOM_DOUBLE_KEY_TEXT, NULL)
+    add_key("key-zoom-quarter", KEY_ZOOM_QUARTER, ZOOM_QUARTER_KEY_TEXT, ZOOM_LEVEL_KEY_LONGTEXT)
+    add_key("key-zoom-half", KEY_ZOOM_HALF, ZOOM_HALF_KEY_TEXT, ZOOM_LEVEL_KEY_LONGTEXT)
+    add_key("key-zoom-original", KEY_ZOOM_ORIGINAL, ZOOM_ORIGINAL_KEY_TEXT, ZOOM_LEVEL_KEY_LONGTEXT)
+    add_key("key-zoom-double", KEY_ZOOM_DOUBLE, ZOOM_DOUBLE_KEY_TEXT, ZOOM_LEVEL_KEY_LONGTEXT)
 
     add_key("key-clear-playlist", KEY_PLAY_CLEAR,
             PLAY_CLEAR_KEY_TEXT, PLAY_CLEAR_KEY_LONGTEXT)
