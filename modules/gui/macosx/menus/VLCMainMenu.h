@@ -66,7 +66,6 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *toggleJumpButtons;
 @property (readwrite, weak) IBOutlet NSMenuItem *togglePlaymodeButtons;
 @property (readwrite, weak) IBOutlet NSMenuItem *toggleEffectsButton;
-@property (readwrite, weak) IBOutlet NSMenuItem *showLibraryFolders;
 @property (readwrite, weak) IBOutlet NSMenu *playlistTableColumnsMenu;
 @property (readwrite, weak) IBOutlet NSMenuItem *playlistTableColumns;
 
@@ -219,8 +218,6 @@
 - (IBAction)intfOpenNet:(id)sender;
 - (IBAction)intfOpenCapture:(id)sender;
 - (IBAction)savePlaylist:(id)sender;
-
-- (IBAction)showLibraryFolders:(id)sender;
 
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;

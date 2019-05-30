@@ -29,7 +29,6 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryWindow.h"
-#import "library/VLCLibraryFolderManagementWindow.h"
 
 #import "menus/renderers/VLCRendererMenuController.h"
 
@@ -95,7 +94,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     VLCRendererMenuController *_rendererMenuController;
     VLCPlaylistController *_playlistController;
     VLCPlayerController *_playerController;
-    VLCLibraryFolderManagementWindowController *_libraryFoldersController;
     NSTimer *_cancelRendererDiscoveryTimer;
 
     NSMenu *_playlistTableColumnsContextMenu;
@@ -365,7 +363,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_findItem setTitle: _NS("Find")];
 
     [_viewMenu setTitle: _NS("View")];
-    [_showLibraryFolders setTitle: _NS("Show Library Folders...")];
     [_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
 
     [_controlsMenu setTitle: _NS("Playback")];
@@ -732,14 +729,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 }
 
 #pragma mark - View
-
-- (IBAction)showLibraryFolders:(id)sender
-{
-    if (!_libraryFoldersController) {
-        _libraryFoldersController = [[VLCLibraryFolderManagementWindowController alloc] initWithWindowNibName:@"VLCLibraryFolderManagementWindow"];
-    }
-    [_libraryFoldersController showWindow:sender];
-}
 
 #pragma mark - Playback
 

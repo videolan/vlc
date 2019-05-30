@@ -472,8 +472,6 @@ modules/gui/macosx/library/VLCLibraryController.h
 modules/gui/macosx/library/VLCLibraryController.m
 modules/gui/macosx/library/VLCLibraryDataTypes.h
 modules/gui/macosx/library/VLCLibraryDataTypes.m
-modules/gui/macosx/library/VLCLibraryFolderManagementWindow.h
-modules/gui/macosx/library/VLCLibraryFolderManagementWindow.m
 modules/gui/macosx/library/VLCLibraryMenuController.h
 modules/gui/macosx/library/VLCLibraryMenuController.m
 modules/gui/macosx/library/VLCLibraryModel.h

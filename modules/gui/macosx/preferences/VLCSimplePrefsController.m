@@ -1,24 +1,26 @@
 /*****************************************************************************
-* VLCSimplePrefsController.m: Simple Preferences for Mac OS X
-*****************************************************************************
-* Copyright (C) 2008-2014 VLC authors and VideoLAN
-*
-* Authors: Felix Paul Kühne <fkuehne at videolan dot org>
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
-*****************************************************************************/
+ * VLCSimplePrefsController.m: Simple Preferences for Mac OS X
+ *****************************************************************************
+ * Copyright (C) 2008-2019 VLC authors and VideoLAN
+ *
+ * Authors: Felix Paul Kühne <fkuehne # videolan dot org>
+ *          David Fuhrmann <dfuhrmann # videolan dot org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -45,6 +47,9 @@
 #import "main/VLCMain+OldPrefs.h"
 #import "os-integration/VLCClickerManager.h"
 #import "preferences/prefs.h"
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryDataTypes.h"
 
 static struct {
     const char iso[6];
@@ -125,7 +130,27 @@ static NSString* VLCAudioSettingToolbarIdentifier = @"Audio Settings Item Identi
 static NSString* VLCVideoSettingToolbarIdentifier = @"Video Settings Item Identifier";
 static NSString* VLCOSDSettingToolbarIdentifier = @"Subtitles Settings Item Identifier";
 static NSString* VLCInputSettingToolbarIdentifier = @"Input Settings Item Identifier";
+static NSString* VLCMediaLibrarySettingToolbarIdentifier = @"Media Library Settings Item Identifier";
 static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Identifier";
+
+@interface VLCMediaLibraryFolderManagementController : NSObject <NSTableViewDelegate, NSTableViewDataSource>
+{
+    NSArray *_cachedFolderList;
+    VLCLibraryController *_libraryController;
+}
+
+@property (readwrite, weak) NSTableView *libraryFolderTableView;
+@property (readwrite, weak) NSTableColumn *nameTableColumn;
+@property (readwrite, weak) NSTableColumn *pathTableColumn;
+@property (readwrite, weak) NSTableColumn *presentTableColumn;
+@property (readwrite, weak) NSTableColumn *bannedTableColumn;
+@property (readwrite, weak) NSButton *removeFolderButton;
+@property (readwrite, weak) NSButton *banFolderButton;
+
+- (IBAction)addFolder:(id)sender;
+- (IBAction)removeFolder:(id)sender;
+- (IBAction)banFolder:(id)sender;
+@end
 
 @interface VLCSimplePrefsController() <NSToolbarDelegate, NSWindowDelegate>
 {
@@ -142,6 +167,7 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
     NSArray *_hotkeysNonUseableKeys;
     NSMutableArray *_hotkeySettings;
     NSString *_keyInTransition;
+    VLCMediaLibraryFolderManagementController *_mediaLibraryManagementController;
 
     intf_thread_t *p_intf;
 }
@@ -199,6 +225,31 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
     NSDictionary *views = @{ @"view": _contentView };
     NSArray *constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"|[view]|" options:0 metrics:nil views:views];
     [clipView addConstraints:constraints];
+
+    [self setupMediaLibraryControlInterface];
+}
+
+- (void)setupMediaLibraryControlInterface
+{
+    _mediaLibraryManagementController = [[VLCMediaLibraryFolderManagementController alloc] init];
+    _mediaLibraryBanFolderButton.enabled = _mediaLibraryRemoveFolderButton.enabled = NO;
+
+    _mediaLibraryFolderTableView.delegate = _mediaLibraryManagementController;
+    _mediaLibraryFolderTableView.dataSource = _mediaLibraryManagementController;
+
+    _mediaLibraryManagementController.nameTableColumn = _mediaLibraryNameTableColumn;
+    _mediaLibraryManagementController.presentTableColumn = _mediaLibraryPresentTableColumn;
+    _mediaLibraryManagementController.bannedTableColumn = _mediaLibraryBannedTableColumn;
+    _mediaLibraryManagementController.pathTableColumn = _mediaLibraryPathTableColumn;
+    _mediaLibraryManagementController.removeFolderButton = _mediaLibraryRemoveFolderButton;
+    _mediaLibraryManagementController.banFolderButton = _mediaLibraryBanFolderButton;
+
+    _mediaLibraryAddFolderButton.target = _mediaLibraryManagementController;
+    _mediaLibraryAddFolderButton.action = @selector(addFolder:);
+    _mediaLibraryBanFolderButton.target = _mediaLibraryManagementController;
+    _mediaLibraryBanFolderButton.action = @selector(banFolder:);
+    _mediaLibraryRemoveFolderButton.target = _mediaLibraryManagementController;
+    _mediaLibraryRemoveFolderButton.action = @selector(removeFolder:);
 }
 
 #define CreateToolbarItem(name, desc, img, sel) \
@@ -239,6 +290,8 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
         CreateToolbarItem(_NS(SUBPIC_TITLE), _NS("Subtitle & On Screen Display Settings"), @"VLCSubtitleCone", showOSDSettings);
     } else if ([itemIdent isEqual: VLCInputSettingToolbarIdentifier]) {
         CreateToolbarItem(_NS(INPUT_TITLE), _NS("Input & Codec Settings"), @"VLCInputCone", showInputSettings);
+    } else if ([itemIdent isEqual: VLCMediaLibrarySettingToolbarIdentifier]) {
+        CreateToolbarItem(_NS("Media Library"), _NS("Media Library settings"), @"NXHelpBacktrack", showMediaLibrarySettings);
     } else if ([itemIdent isEqual: VLCHotkeysSettingToolbarIdentifier]) {
         CreateToolbarItem(_NS("Hotkeys"), _NS("Hotkeys settings"), @"VLCHotkeysCone", showHotkeySettings);
     }
@@ -249,21 +302,21 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
 - (NSArray *)toolbarDefaultItemIdentifiers: (NSToolbar *)toolbar
 {
     return [NSArray arrayWithObjects:VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier,
-             VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier,
+             VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCMediaLibrarySettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier,
              NSToolbarFlexibleSpaceItemIdentifier, nil];
 }
 
 - (NSArray *)toolbarAllowedItemIdentifiers: (NSToolbar *)toolbar
 {
     return [NSArray arrayWithObjects:VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier,
-             VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier,
+             VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCMediaLibrarySettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier,
              NSToolbarFlexibleSpaceItemIdentifier, nil];
 }
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
     return [NSArray arrayWithObjects:VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier,
-             VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier, nil];
+             VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCMediaLibrarySettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier, nil];
 }
 
 - (void)initStrings
@@ -375,6 +428,15 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_video_deinterlaceLabel setStringValue: _NS("Deinterlace")];
     [_video_deinterlace_modeLabel setStringValue: _NS("Deinterlace mode")];
     [_video_videoBox setTitle: _NS("Video")];
+
+    /* media library */
+    [_mediaLibraryAddFolderButton setTitle:_NS("Add Folder...")];
+    [_mediaLibraryBanFolderButton setTitle:_NS("Ban Folder")];
+    [_mediaLibraryRemoveFolderButton setTitle:_NS("Remove Folder")];
+    [_mediaLibraryNameTableColumn setTitle:_NS("Name")];
+    [_mediaLibraryPresentTableColumn setTitle:_NS("Present")];
+    [_mediaLibraryBannedTableColumn setTitle:_NS("Banned")];
+    [_mediaLibraryPathTableColumn setTitle:_NS("Location")];
 
     /* generic stuff */
     [_showAllButton setTitle: _NS("Show All")];
@@ -1456,6 +1518,104 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         _keyInTransition = theKey;
         return YES;
     }
+}
+
+- (void)showMediaLibrarySettings
+{
+    [self showSettingsForCategory:_mediaLibraryView];
+}
+
+
+@end
+
+@implementation VLCMediaLibraryFolderManagementController
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _libraryController = [[VLCMain sharedInstance] libraryController];
+    }
+    return self;
+}
+
+- (IBAction)addFolder:(id)sender
+{
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setTitle:_NS("Add Folder")];
+    [openPanel setCanChooseFiles:NO];
+    [openPanel setCanChooseDirectories:YES];
+    [openPanel setAllowsMultipleSelection:YES];
+
+    NSModalResponse returnValue = [openPanel runModal];
+
+    if (returnValue == NSModalResponseOK) {
+        NSArray *URLs = [openPanel URLs];
+        NSUInteger count = [URLs count];
+        for (NSUInteger i = 0; i < count ; i++) {
+            NSURL *url = URLs[i];
+            [_libraryController addFolderWithFileURL:url];
+        }
+
+        _cachedFolderList = nil;
+        [self.libraryFolderTableView reloadData];
+    }
+}
+
+- (IBAction)banFolder:(id)sender
+{
+    VLCMediaLibraryEntryPoint *entryPoint = _cachedFolderList[self.libraryFolderTableView.selectedRow];
+    if (entryPoint.isBanned) {
+        [_libraryController unbanFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
+    } else {
+        [_libraryController banFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
+    }
+
+    _cachedFolderList = nil;
+    [self.libraryFolderTableView reloadData];
+}
+
+- (IBAction)removeFolder:(id)sender
+{
+    VLCMediaLibraryEntryPoint *entryPoint = _cachedFolderList[self.libraryFolderTableView.selectedRow];
+    [_libraryController removeFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
+
+    _cachedFolderList = nil;
+    [self.libraryFolderTableView reloadData];
+}
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    if (!_cachedFolderList) {
+        _cachedFolderList = [[_libraryController libraryModel] listOfMonitoredFolders];
+    }
+    return _cachedFolderList.count;
+}
+
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    VLCMediaLibraryEntryPoint *entryPoint = _cachedFolderList[row];
+    if (tableColumn == self.nameTableColumn) {
+        return [entryPoint.decodedMRL lastPathComponent];
+    } else if (tableColumn == self.presentTableColumn) {
+        return entryPoint.isPresent ? @"✔" : @"✘";
+    } else if (tableColumn == self.bannedTableColumn) {
+        return entryPoint.isBanned ? @"✔" : @"✘";
+    } else {
+        return entryPoint.decodedMRL;
+    }
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    NSInteger selectedRow = self.libraryFolderTableView.selectedRow;
+    if (selectedRow == -1) {
+        self.banFolderButton.enabled = self.removeFolderButton.enabled = NO;
+        return;
+    }
+    self.banFolderButton.enabled = self.removeFolderButton.enabled = YES;
+    VLCMediaLibraryEntryPoint *entryPoint = _cachedFolderList[selectedRow];
+    [self.banFolderButton setTitle:entryPoint.isBanned ? _NS("Unban Folder") : _NS("Ban Folder")];
 }
 
 @end

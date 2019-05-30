@@ -1,24 +1,25 @@
 /*****************************************************************************
-* VLCSimplePrefsController.h: Simple Preferences for Mac OS X
-*****************************************************************************
-* Copyright (C) 2008-2014 VLC authors and VideoLAN
-*
-* Authors: Felix Paul Kühne <fkuehne at videolan dot org>
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
-*****************************************************************************/
+ * VLCSimplePrefsController.h: Simple Preferences for Mac OS X
+ *****************************************************************************
+ * Copyright (C) 2008-2019 VLC authors and VideoLAN
+ *
+ * Authors: Felix Paul Kühne <fkuehne # videolan dot org>
+ *          David Fuhrmann <dfuhrmann # videolan dot org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
 
@@ -57,6 +58,17 @@
 @property (readwrite, weak) IBOutlet NSMatrix *audio_autosavevolMatrix;
 @property (readwrite, weak) IBOutlet NSButtonCell *audio_autosavevol_yesButtonCell;
 @property (readwrite, weak) IBOutlet NSButtonCell *audio_autosavevol_noButtonCell;
+
+// library pane
+@property (readwrite, strong) IBOutlet NSView *mediaLibraryView;
+@property (readwrite, weak) IBOutlet NSTableView *mediaLibraryFolderTableView;
+@property (readwrite, weak) IBOutlet NSTableColumn *mediaLibraryNameTableColumn;
+@property (readwrite, weak) IBOutlet NSTableColumn *mediaLibraryPathTableColumn;
+@property (readwrite, weak) IBOutlet NSTableColumn *mediaLibraryPresentTableColumn;
+@property (readwrite, weak) IBOutlet NSTableColumn *mediaLibraryBannedTableColumn;
+@property (readwrite, weak) IBOutlet NSButton *mediaLibraryAddFolderButton;
+@property (readwrite, weak) IBOutlet NSButton *mediaLibraryRemoveFolderButton;
+@property (readwrite, weak) IBOutlet NSButton *mediaLibraryBanFolderButton;
 
 // hotkeys pane
 @property (readwrite, strong) IBOutlet NSView *hotkeysView;
