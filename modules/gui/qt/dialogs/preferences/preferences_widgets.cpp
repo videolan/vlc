@@ -1150,7 +1150,9 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this, QWidget *p ) :
     finish();
 
     CONNECT( actionSearch, textChanged( const QString& ),
-             this, filter( const QString& ) );
+             this, filter() );
+    connect( searchOption, QOverload<int>::of(&QComboBox::activated),
+             this, &KeySelectorControl::filter );
 }
 
 void KeySelectorControl::fillGrid( QGridLayout *l, int line )
@@ -1258,8 +1260,9 @@ void KeySelectorControl::finish()
              this, selectKey( QTreeWidgetItem *, int ) );
 }
 
-void KeySelectorControl::filter( const QString &qs_search )
+void KeySelectorControl::filter()
 {
+    const QString &qs_search = actionSearch->text();
     int i_column = searchOption->itemData( searchOption->currentIndex() ).toInt();
     QList<QTreeWidgetItem *> resultList;
     if ( i_column == ANY_COL )
