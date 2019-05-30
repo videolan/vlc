@@ -101,8 +101,6 @@
 @property (readwrite, weak) IBOutlet NSBox *input_muxBox;
 @property (readwrite, weak) IBOutlet NSBox *input_netBox;
 @property (readwrite, weak) IBOutlet NSButton *input_hardwareAccelerationCheckbox;
-@property (readwrite, weak) IBOutlet NSTextField *input_postprocTextField;
-@property (readwrite, weak) IBOutlet NSTextField *input_postprocLabel;
 @property (readwrite, weak) IBOutlet NSTextField *input_skipLoopLabel;
 @property (readwrite, weak) IBOutlet NSPopUpButton *input_skipLoopPopup;
 @property (readwrite, weak) IBOutlet NSButton *input_urlhandlerButton;
