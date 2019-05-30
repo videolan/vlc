@@ -1657,13 +1657,82 @@ void libvlc_chapter_descriptions_release( libvlc_chapter_description_t **p_chapt
                                           unsigned i_count );
 
 /**
- * Set new crop filter geometry.
+ * Set/unset the video crop ratio.
  *
- * \param p_mi the media player
- * \param psz_geometry new crop filter geometry (NULL to unset)
+ * This function forces a crop ratio on any and all video tracks rendered by
+ * the media player. If the display aspect ratio of a video does not match the
+ * crop ratio, either the top and bottom, or the left and right of the video
+ * will be cut out to fit the crop ratio.
+ *
+ * For instance, a ratio of 1:1 will force the video to a square shape.
+ *
+ * To disable video crop, set a crop ratio with zero as denominator.
+ *
+ * A call to this function overrides any previous call to any of
+ * libvlc_video_set_crop_ratio(), libvlc_video_set_crop_border() and/or
+ * libvlc_video_set_crop_window().
+ *
+ * \see libvlc_video_set_aspect_ratio()
+ *
+ * \param mp the media player
+ * \param num crop ratio numerator (ignored if denominator is 0)
+ * \param den crop ratio denominator (or 0 to unset the crop ratio)
+ *
+ * \version LibVLC 4.0.0 and later
  */
 LIBVLC_API
-void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi, const char *psz_geometry );
+void libvlc_video_set_crop_ratio(libvlc_media_player_t *mp,
+                                 unsigned num, unsigned den);
+
+/**
+ * Set the video crop window.
+ *
+ * This function selects a sub-rectangle of video to show. Any pixels outside
+ * the rectangle will not be shown.
+ *
+ * To unset the video crop window, use libvlc_video_set_crop_ratio() or
+ * libvlc_video_set_crop_border().
+ *
+ * A call to this function overrides any previous call to any of
+ * libvlc_video_set_crop_ratio(), libvlc_video_set_crop_border() and/or
+ * libvlc_video_set_crop_window().
+ *
+ * \param mp the media player
+ * \param x abscissa (i.e. leftmost sample column offset) of the crop window
+ * \param y ordinate (i.e. topmost sample row offset) of the crop window
+ * \param width sample width of the crop window (cannot be zero)
+ * \param height sample height of the crop window (cannot be zero)
+ *
+ * \version LibVLC 4.0.0 and later
+ */
+LIBVLC_API
+void libvlc_video_set_crop_window(libvlc_media_player_t *mp,
+                                  unsigned x, unsigned y,
+                                  unsigned width, unsigned height);
+
+/**
+ * Set the video crop borders.
+ *
+ * This function selects the size of video edges to be cropped out.
+ *
+ * To unset the video crop borders, set all borders to zero.
+ *
+ * A call to this function overrides any previous call to any of
+ * libvlc_video_set_crop_ratio(), libvlc_video_set_crop_border() and/or
+ * libvlc_video_set_crop_window().
+ *
+ * \param mp the media player
+ * \param left number of sample columns to crop on the left
+ * \param right number of sample columns to crop on the right
+ * \param top number of sample rows to crop on the top
+ * \param bottom number of sample rows to corp on the bottom
+ *
+ * \version LibVLC 4.0.0 and later
+ */
+LIBVLC_API
+void libvlc_video_set_crop_border(libvlc_media_player_t *mp,
+                                  unsigned left, unsigned right,
+                                  unsigned top, unsigned bottom);
 
 /**
  * Get current teletext page requested or 0 if it's disabled.

@@ -362,25 +362,54 @@ int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi,
     return 0;
 }
 
-void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi,
-                                     const char *psz_geometry )
+static void libvlc_video_set_crop(libvlc_media_player_t *mp,
+                                  const char *geometry)
 {
-    if (psz_geometry == NULL)
-        psz_geometry = "";
-
-    var_SetString (p_mi, "crop", psz_geometry);
+    var_SetString(mp, "crop", geometry);
 
     size_t n;
-    vout_thread_t **pp_vouts = GetVouts (p_mi, &n);
+    vout_thread_t **vouts = GetVouts(mp, &n);
 
     for (size_t i = 0; i < n; i++)
     {
-        vout_thread_t *p_vout = pp_vouts[i];
-
-        var_SetString (p_vout, "crop", psz_geometry);
-        vout_Release(p_vout);
+        var_SetString(vouts[i], "crop", geometry);
+        vout_Release(vouts[i]);
     }
-    free (pp_vouts);
+    free(vouts);
+}
+
+void libvlc_video_set_crop_ratio(libvlc_media_player_t *mp,
+                                 unsigned num, unsigned den)
+{
+    char geometry[2 * (3 * sizeof (unsigned) + 1)];
+
+    if (den == 0)
+        geometry[0] = '\0';
+    else
+        sprintf(geometry, "%u:%u", num, den);
+
+    libvlc_video_set_crop(mp, geometry);
+}
+
+void libvlc_video_set_crop_window(libvlc_media_player_t *mp,
+                                  unsigned x, unsigned y,
+                                  unsigned width, unsigned height)
+{
+    char geometry[4 * (3 * sizeof (unsigned) + 1)];
+
+    assert(width != 0 && height != 0);
+    sprintf(geometry, "%ux%u+%u+%u", x, y, width, height);
+    libvlc_video_set_crop(mp, geometry);
+}
+
+void libvlc_video_set_crop_border(libvlc_media_player_t *mp,
+                                  unsigned left, unsigned right,
+                                  unsigned top, unsigned bottom)
+{
+    char geometry[4 * (3 * sizeof (unsigned) + 1)];
+
+    sprintf(geometry, "%u+%u+%u+%u", left, top, right, bottom);
+    libvlc_video_set_crop(mp, geometry);
 }
 
 int libvlc_video_get_teletext( libvlc_media_player_t *p_mi )
