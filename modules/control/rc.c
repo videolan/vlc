@@ -66,9 +66,6 @@
 
 struct intf_sys_t
 {
-    int *pi_socket_listen;
-    int i_socket;
-    char *psz_unix_path;
     vlc_thread_t thread;
 
     /* playlist */
@@ -81,10 +78,16 @@ struct intf_sys_t
     enum vlc_player_state   last_state;
     bool                    b_input_buffering;
 
-#ifdef _WIN32
+#ifndef _WIN32
+# ifdef AF_LOCAL
+    char *psz_unix_path;
+# endif
+#else
     HANDLE hConsoleIn;
     bool b_quiet;
 #endif
+    int *pi_socket_listen;
+    int i_socket;
 };
 
 VLC_FORMAT(2, 3)
@@ -1687,17 +1690,11 @@ static int Activate( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 #endif
-
+#ifdef AF_LOCAL
     psz_unix_path = var_InheritString( p_intf, "rc-unix" );
     if( psz_unix_path )
     {
         int i_socket;
-
-#ifndef AF_LOCAL
-        msg_Warn( p_intf, "your OS doesn't support filesystem sockets" );
-        free( psz_unix_path );
-        return VLC_EGENERIC;
-#else
         struct sockaddr_un addr;
 
         memset( &addr, 0, sizeof(struct sockaddr_un) );
@@ -1752,8 +1749,8 @@ static int Activate( vlc_object_t *p_this )
         }
         pi_socket[0] = i_socket;
         pi_socket[1] = -1;
-#endif /* AF_LOCAL */
     }
+#endif /* AF_LOCAL */
 #endif /* !_WIN32 */
 
     if( ( pi_socket == NULL ) &&
@@ -1803,7 +1800,9 @@ static int Activate( vlc_object_t *p_this )
     p_intf->p_sys = p_sys;
     p_sys->pi_socket_listen = pi_socket;
     p_sys->i_socket = -1;
+#ifdef AF_LOCAL
     p_sys->psz_unix_path = psz_unix_path;
+#endif
     vlc_mutex_init( &p_sys->status_lock );
     p_sys->last_state = VLC_PLAYER_STATE_STOPPED;
     p_sys->b_input_buffering = false;
@@ -1888,13 +1887,13 @@ static void Deactivate( vlc_object_t *p_this )
     net_ListenClose( p_sys->pi_socket_listen );
     if( p_sys->i_socket != -1 )
         net_Close( p_sys->i_socket );
+#if defined(AF_LOCAL) && !defined(_WIN32)
     if( p_sys->psz_unix_path != NULL )
     {
-#if defined(AF_LOCAL) && !defined(_WIN32)
         unlink( p_sys->psz_unix_path );
-#endif
         free( p_sys->psz_unix_path );
     }
+#endif
     vlc_mutex_destroy( &p_sys->status_lock );
     free( p_sys );
 }
@@ -1939,7 +1938,9 @@ vlc_module_begin()
 #if defined (HAVE_ISATTY)
     add_bool("rc-fake-tty", false, TTY_TEXT, TTY_LONGTEXT, true)
 #endif
+#ifdef AF_LOCAL
     add_string("rc-unix", NULL, UNIX_TEXT, UNIX_LONGTEXT, true)
+#endif
 #endif
     add_string("rc-host", NULL, HOST_TEXT, HOST_LONGTEXT, true)
 
