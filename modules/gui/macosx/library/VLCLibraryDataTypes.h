@@ -31,6 +31,7 @@ extern const CGFloat VLCMediaLibrary4KWidth;
 extern const CGFloat VLCMediaLibrary4KHeight;
 extern const CGFloat VLCMediaLibrary720pWidth;
 extern const CGFloat VLCMediaLibrary720pHeight;
+extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @interface VLCMediaLibraryFile : NSObject
 

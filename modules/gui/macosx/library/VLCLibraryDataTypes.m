@@ -31,6 +31,7 @@ const CGFloat VLCMediaLibrary4KWidth = 3840.;
 const CGFloat VLCMediaLibrary4KHeight = 2160.;
 const CGFloat VLCMediaLibrary720pWidth = 1280.;
 const CGFloat VLCMediaLibrary720pHeight = 720.;
+const long long int VLCMediaLibraryMediaItemDurationDenominator = 1000;
 
 @implementation VLCMediaLibraryFile
 

@@ -142,12 +142,31 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (void)updateRepresentation
 {
     if (_representedMediaItem == nil) {
+        NSAssert(1, @"no media item assigned for collection view item", nil);
         return;
     }
 
     _mediaTitleTextField.stringValue = _representedMediaItem.title;
-    _durationTextField.stringValue = [NSString stringWithTime:_representedMediaItem.duration / 1000];
+    _durationTextField.stringValue = [NSString stringWithTime:_representedMediaItem.duration / VLCMediaLibraryMediaItemDurationDenominator];
 
+    _mediaImageView.image = [self imageForMedia];
+
+    VLCMediaLibraryTrack *videoTrack = _representedMediaItem.firstVideoTrack;
+    [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth andHeight:videoTrack.videoHeight];
+
+    CGFloat position = _representedMediaItem.lastPlaybackPosition;
+    if (position > VLCLibraryCollectionViewItemMinimalDisplayedProgress && position < VLCLibraryCollectionViewItemMaximumDisplayedProgress) {
+        _progressIndicator.progress = position;
+        _progressIndicator.hidden = NO;
+    }
+
+    if (_representedMediaItem.playCount == 0) {
+        _unplayedIndicatorTextField.hidden = NO;
+    }
+}
+
+- (NSImage *)imageForMedia
+{
     NSImage *image;
     if (_representedMediaItem.artworkGenerated) {
         image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:_representedMediaItem.artworkMRL]];
@@ -159,27 +178,17 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     if (!image) {
         image = [NSImage imageNamed: @"noart.png"];
     }
-    _mediaImageView.image = image;
+    return image;
+}
 
-    VLCMediaLibraryTrack *videoTrack = _representedMediaItem.firstVideoTrack;
-    CGFloat width = videoTrack.videoWidth;
-    CGFloat height = videoTrack.videoHeight;
+- (void)showVideoSizeIfNeededForWidth:(CGFloat)width andHeight:(CGFloat)height
+{
     if (width >= VLCMediaLibrary4KWidth || height >= VLCMediaLibrary4KHeight) {
         _annotationTextField.stringValue = @" 4K ";
         _annotationTextField.hidden = NO;
     } else if (width >= VLCMediaLibrary720pWidth || height >= VLCMediaLibrary720pHeight) {
         _annotationTextField.stringValue = @" HD ";
         _annotationTextField.hidden = NO;
-    }
-
-    CGFloat position = _representedMediaItem.lastPlaybackPosition;
-    if (position > VLCLibraryCollectionViewItemMinimalDisplayedProgress && position < VLCLibraryCollectionViewItemMaximumDisplayedProgress) {
-        _progressIndicator.progress = position;
-        _progressIndicator.hidden = NO;
-    }
-
-    if (_representedMediaItem.playCount == 0) {
-        _unplayedIndicatorTextField.hidden = NO;
     }
 }
 
