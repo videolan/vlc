@@ -1117,8 +1117,8 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this, QWidget *p ) :
                                 ConfigControl( _p_this, nullptr )
 {
     label = new QLabel(
-        qtr( "Select or double click an action to change the associated "
-             "hotkey. Use delete key to remove hotkeys."), p );
+        qtr( "Action hotkey mappings. Double-click (or select and press Enter) "
+             "to change an action's hotkey. The delete key will unset." ), p );
 
     label->setWordWrap( true );
     searchLabel = new QLabel( qtr( "Search" ), p );
