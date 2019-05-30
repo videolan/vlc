@@ -371,9 +371,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
 
     [_intf_playbackControlBox setTitle:_NS("Playback control")];
     [_intf_continueplaybackLabel setStringValue:_NS("Continue playback")];
-    [_intf_appleremoteCheckbox setTitle: _NS("Control playback with the Apple Remote")];
     [_intf_mediakeysCheckbox setTitle: _NS("Control playback with media keys")];
-    [_intf_appleremote_sysvolCheckbox setTitle: _NS("Control system volume with the Apple Remote")];
     [_intf_statusIconCheckbox setTitle: _NS("Display VLC status menu icon")];
 
     [_intf_playbackBehaviourBox setTitle:_NS("Playback behaviour")];
@@ -619,8 +617,6 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
         [_intf_continueplaybackPopup setEnabled: YES];
     }
 
-    [self setupButton:_intf_appleremoteCheckbox forBoolValue: "macosx-appleremote"];
-    [self setupButton:_intf_appleremote_sysvolCheckbox forBoolValue: "macosx-appleremote-sysvol"];
     [self setupButton:_intf_statusIconCheckbox forBoolValue: "macosx-statusicon"];
     [self setupButton:_intf_mediakeysCheckbox forBoolValue: "macosx-mediakeys"];
 
@@ -968,8 +964,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         config_PutInt("metadata-network-access", [_intf_artCheckbox state]);
 
-        config_PutInt("macosx-appleremote", [_intf_appleremoteCheckbox state]);
-        config_PutInt("macosx-appleremote-sysvol", [_intf_appleremote_sysvolCheckbox state]);
         config_PutInt("macosx-statusicon", [_intf_statusIconCheckbox state]);
         config_PutInt("macosx-mediakeys", [_intf_mediakeysCheckbox state]);
 
@@ -1107,7 +1101,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter postNotificationName:VLCMediaKeySupportSettingChangedNotification object:nil];
     [notificationCenter postNotificationName:VLCConfigurationChangedNotification object:nil];
-    [notificationCenter postNotificationName:VLCAppleRemoteSettingChangedNotification object:nil];
 }
 
 - (void)showSettingsForCategory:(NSView *)categoryView

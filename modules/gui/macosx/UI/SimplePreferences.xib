@@ -60,8 +60,6 @@
                 <outlet property="input_skipLoopPopup" destination="3435" id="ia2-kQ-VwV"/>
                 <outlet property="input_urlhandlerButton" destination="3742" id="1GV-O9-8SF"/>
                 <outlet property="intfView" destination="2311" id="pUM-XM-2rM"/>
-                <outlet property="intf_appleremoteCheckbox" destination="3542" id="Oxt-Lr-ogk"/>
-                <outlet property="intf_appleremote_sysvolCheckbox" destination="3738" id="uwy-oj-7yn"/>
                 <outlet property="intf_artCheckbox" destination="3928" id="HND-nW-BHK"/>
                 <outlet property="intf_continueplaybackLabel" destination="3919" id="ZJO-qY-UCq"/>
                 <outlet property="intf_continueplaybackPopup" destination="3920" id="dZ3-SI-SCp"/>
@@ -339,23 +337,13 @@ Gw
                     </view>
                 </box>
                 <box borderType="line" title="Playback control" translatesAutoresizingMaskIntoConstraints="NO" id="CZP-ZN-k6p">
-                    <rect key="frame" x="18" y="333" width="563" height="144"/>
+                    <rect key="frame" x="18" y="386" width="563" height="91"/>
                     <view key="contentView" id="gj4-zO-E26">
-                        <rect key="frame" x="3" y="3" width="557" height="126"/>
+                        <rect key="frame" x="3" y="3" width="557" height="73"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3542">
-                                <rect key="frame" x="15" y="67" width="265" height="18"/>
-                                <buttonCell key="cell" type="check" title="Control playback with the Apple Remote" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3547">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="interfaceSettingChanged:" target="-2" id="3Jy-4t-gHQ"/>
-                                </connections>
-                            </button>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3543">
-                                <rect key="frame" x="15" y="40" width="225" height="18"/>
+                                <rect key="frame" x="15" y="12" width="225" height="18"/>
                                 <buttonCell key="cell" type="check" title="Control playback with media keys" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3546">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -365,7 +353,7 @@ Gw
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3919">
-                                <rect key="frame" x="15" y="97" width="117" height="17"/>
+                                <rect key="frame" x="15" y="44" width="117" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Continue playback" usesSingleLineMode="YES" id="3923">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -373,7 +361,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3920">
-                                <rect key="frame" x="145" y="92" width="398" height="25"/>
+                                <rect key="frame" x="145" y="39" width="398" height="25"/>
                                 <popUpButtonCell key="cell" type="push" bezelStyle="rounded" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="3921">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
@@ -383,38 +371,22 @@ Gw
                                     <action selector="interfaceSettingChanged:" target="-2" id="SxN-sI-55J"/>
                                 </connections>
                             </popUpButton>
-                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3738">
-                                <rect key="frame" x="15" y="12" width="302" height="18"/>
-                                <buttonCell key="cell" type="check" title="Control system volume with the Apple Remote" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3739">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="interfaceSettingChanged:" target="-2" id="a0a-gR-teU"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="3543" firstAttribute="leading" secondItem="3542" secondAttribute="leading" id="8yA-RG-EeC"/>
-                            <constraint firstItem="3738" firstAttribute="leading" secondItem="3543" secondAttribute="leading" id="CA9-Jp-LKR"/>
-                            <constraint firstItem="3543" firstAttribute="top" secondItem="3542" secondAttribute="bottom" constant="13" id="Cxe-2U-4do"/>
-                            <constraint firstAttribute="bottom" secondItem="3738" secondAttribute="bottom" constant="14" id="JMe-BU-ijt"/>
                             <constraint firstAttribute="trailing" secondItem="3920" secondAttribute="trailing" constant="17" id="M7f-H3-4Mk"/>
                             <constraint firstItem="3919" firstAttribute="top" secondItem="gj4-zO-E26" secondAttribute="top" constant="12" id="R4h-Ob-XbD"/>
                             <constraint firstItem="3919" firstAttribute="centerY" secondItem="3920" secondAttribute="centerY" id="Txp-Vc-Bet"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3542" secondAttribute="trailing" constant="17" id="VnT-23-aR4"/>
+                            <constraint firstAttribute="bottom" secondItem="3543" secondAttribute="bottom" constant="14" id="VmW-US-ODf"/>
+                            <constraint firstItem="3543" firstAttribute="top" secondItem="3920" secondAttribute="bottom" constant="14" id="X5z-9u-yDg"/>
                             <constraint firstItem="3919" firstAttribute="leading" secondItem="gj4-zO-E26" secondAttribute="leading" constant="17" id="cnI-H9-J0k"/>
                             <constraint firstItem="3920" firstAttribute="leading" secondItem="3919" secondAttribute="trailing" constant="17" id="gLu-nZ-tla"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3738" secondAttribute="trailing" constant="17" id="i5Z-d3-Tkh"/>
-                            <constraint firstItem="3919" firstAttribute="leading" secondItem="3542" secondAttribute="leading" id="jfe-Eg-0AO"/>
-                            <constraint firstItem="3738" firstAttribute="top" secondItem="3543" secondAttribute="bottom" constant="14" id="pw3-AG-3aR"/>
+                            <constraint firstItem="3543" firstAttribute="leading" secondItem="3919" secondAttribute="leading" id="mSz-UU-aQm"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3543" secondAttribute="trailing" constant="17" id="stN-2i-k8h"/>
-                            <constraint firstItem="3542" firstAttribute="top" secondItem="3919" secondAttribute="bottom" constant="14" id="vZI-fE-nJ7"/>
                         </constraints>
                     </view>
                 </box>
                 <box verticalHuggingPriority="251" verticalCompressionResistancePriority="751" borderType="line" title="Playback behaviour" translatesAutoresizingMaskIntoConstraints="NO" id="EKZ-iB-CMo">
-                    <rect key="frame" x="18" y="243" width="563" height="86"/>
+                    <rect key="frame" x="18" y="296" width="563" height="86"/>
                     <view key="contentView" id="BMS-wa-oJS">
                         <rect key="frame" x="3" y="3" width="557" height="68"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -465,9 +437,9 @@ Gw
                     </constraints>
                 </box>
                 <box verticalHuggingPriority="249" borderType="line" title="Privacy / Network Interaction" translatesAutoresizingMaskIntoConstraints="NO" id="2318">
-                    <rect key="frame" x="18" y="114" width="563" height="125"/>
+                    <rect key="frame" x="18" y="183" width="563" height="109"/>
                     <view key="contentView" id="nnH-Tj-ON7">
-                        <rect key="frame" x="3" y="3" width="557" height="107"/>
+                        <rect key="frame" x="3" y="3" width="557" height="91"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button verticalHuggingPriority="251" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3556">
@@ -481,7 +453,7 @@ Gw
                                 </connections>
                             </button>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3928">
-                                <rect key="frame" x="14" y="65" width="161" height="34"/>
+                                <rect key="frame" x="14" y="65" width="161" height="18"/>
                                 <buttonCell key="cell" type="check" title="Allow metadata access" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="3929">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -514,13 +486,13 @@ Gw
                     </view>
                 </box>
                 <box borderType="line" title="HTTP Server" translatesAutoresizingMaskIntoConstraints="NO" id="drh-ot-Vyn">
-                    <rect key="frame" x="18" y="16" width="563" height="91"/>
+                    <rect key="frame" x="18" y="86" width="563" height="90"/>
                     <view key="contentView" id="Who-VF-GbQ">
-                        <rect key="frame" x="3" y="3" width="557" height="73"/>
+                        <rect key="frame" x="3" y="3" width="557" height="72"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3875">
-                                <rect key="frame" x="14" y="20" width="118" height="17"/>
+                                <rect key="frame" x="14" y="19" width="118" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Password" usesSingleLineMode="YES" id="3876">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -540,7 +512,7 @@ Gw
                                 </connections>
                             </textField>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="lpZ-9y-Vfn">
-                                <rect key="frame" x="14" y="47" width="187" height="18"/>
+                                <rect key="frame" x="14" y="46" width="187" height="18"/>
                                 <buttonCell key="cell" type="check" title="Enable VLC HTTP interface" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Nby-oq-jkQ">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -570,7 +542,6 @@ Gw
                 <constraint firstItem="EKZ-iB-CMo" firstAttribute="top" secondItem="CZP-ZN-k6p" secondAttribute="bottom" constant="8" id="6rd-dG-SxK"/>
                 <constraint firstItem="2318" firstAttribute="top" secondItem="EKZ-iB-CMo" secondAttribute="bottom" constant="8" id="9hm-PK-wnp"/>
                 <constraint firstItem="2318" firstAttribute="leading" secondItem="EKZ-iB-CMo" secondAttribute="leading" id="C2v-Vz-tFm"/>
-                <constraint firstAttribute="bottom" secondItem="drh-ot-Vyn" secondAttribute="bottom" constant="20" id="CO3-Gq-TzK"/>
                 <constraint firstItem="3920" firstAttribute="leading" secondItem="3911" secondAttribute="leading" id="G1a-CX-xIQ"/>
                 <constraint firstItem="3884" firstAttribute="leading" secondItem="3911" secondAttribute="leading" id="HYO-kS-Hu7"/>
                 <constraint firstItem="drh-ot-Vyn" firstAttribute="top" secondItem="2318" secondAttribute="bottom" constant="11" id="Hqu-NO-bpg"/>

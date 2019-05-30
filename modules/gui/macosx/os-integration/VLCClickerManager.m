@@ -31,7 +31,6 @@
 #import "playlist/VLCPlayerController.h"
 
 NSString *VLCMediaKeySupportSettingChangedNotification = @"VLCMediaKeySupportSettingChangedNotification";
-NSString *VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSettingChangedNotification";
 
 @interface VLCClickerManager()
 {
@@ -76,11 +75,6 @@ NSString *VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSettingChan
                                selector:@selector(playlistUpdated:)
                                    name:VLCPlaylistItemsRemoved
                                  object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(coreChangedAppleRemoteSetting:)
-                                   name:VLCAppleRemoteSettingChangedNotification
-                                 object:nil];
-
 
         /* init Apple Remote support */
         _remote = [[AppleRemote alloc] init];
@@ -212,15 +206,6 @@ NSString *VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSettingChan
 
 #pragma mark -
 #pragma mark Apple Remote Control
-
-- (void)coreChangedAppleRemoteSetting:(NSNotification *)notification
-{
-    if (var_InheritBool(getIntf(), "macosx-appleremote") == YES) {
-        [_remote startListening: self];
-    } else {
-        [_remote stopListening:self];
-    }
-}
 
 - (void)startListeningWithAppleRemote
 {
