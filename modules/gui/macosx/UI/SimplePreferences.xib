@@ -31,14 +31,13 @@
                 <outlet property="contentView" destination="HOX-DS-Fgr" id="Gcx-RH-0il"/>
                 <outlet property="hotkeysLabel" destination="2673" id="uXG-oU-1G0"/>
                 <outlet property="hotkeysView" destination="2668" id="0q1-GK-Zyd"/>
-                <outlet property="hotkeys_changeButton" destination="2675" id="836-wB-D98"/>
                 <outlet property="hotkeys_changeLabel" destination="2679" id="313-9Y-bXf"/>
                 <outlet property="hotkeys_change_cancelButton" destination="2792" id="7lu-ja-pxu"/>
+                <outlet property="hotkeys_change_clearButton" destination="0Dd-AY-La9" id="COr-ly-7f3"/>
                 <outlet property="hotkeys_change_keysLabel" destination="2800" id="f3a-Nj-ecb"/>
                 <outlet property="hotkeys_change_okButton" destination="2791" id="CTo-iG-kmD"/>
                 <outlet property="hotkeys_change_takenLabel" destination="2803" id="IL0-j6-d9h"/>
                 <outlet property="hotkeys_change_win" destination="2677" id="rwN-5b-lyj"/>
-                <outlet property="hotkeys_clearButton" destination="2674" id="0JA-op-ATZ"/>
                 <outlet property="hotkeys_dimKeyboardCheckbox" destination="Gjp-57-RUZ" id="IeI-rL-DwJ"/>
                 <outlet property="hotkeys_listbox" destination="2670" id="i2J-F5-aT6"/>
                 <outlet property="hotkeys_mediakeysCheckbox" destination="6Ro-o1-WEd" id="fGa-18-7ey"/>
@@ -1846,13 +1845,13 @@ Gw
             <rect key="frame" x="0.0" y="0.0" width="570" height="494"/>
             <subviews>
                 <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="0.0" verticalLineScroll="19" verticalPageScroll="0.0" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2669">
-                    <rect key="frame" x="20" y="128" width="530" height="321"/>
+                    <rect key="frame" x="20" y="87" width="530" height="362"/>
                     <clipView key="contentView" id="EbT-aN-Pgg">
-                        <rect key="frame" x="1" y="0.0" width="528" height="320"/>
+                        <rect key="frame" x="1" y="0.0" width="528" height="361"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveName="sprefs_hotkeys_view" headerView="3541" id="2670">
-                                <rect key="frame" x="0.0" y="0.0" width="528" height="297"/>
+                                <rect key="frame" x="0.0" y="0.0" width="528" height="338"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1908,29 +1907,9 @@ Gw
                         <autoresizingMask key="autoresizingMask"/>
                     </tableHeaderView>
                 </scrollView>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2675">
-                    <rect key="frame" x="469" y="80" width="87" height="32"/>
-                    <buttonCell key="cell" type="push" title="Change" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="3526">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="hotkeySettingChanged:" target="-2" id="ryh-Ni-dNC"/>
-                    </connections>
-                </button>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2674">
-                    <rect key="frame" x="14" y="80" width="72" height="32"/>
-                    <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="3525">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="hotkeySettingChanged:" target="-2" id="tPO-H3-GJp"/>
-                    </connections>
-                </button>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2673">
-                    <rect key="frame" x="18" y="457" width="306" height="17"/>
-                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Select an action to change the associated hotkey:" usesSingleLineMode="YES" id="3524">
+                    <rect key="frame" x="18" y="457" width="345" height="17"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Double-click an action to change the associated hotkey:" usesSingleLineMode="YES" id="3524">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1960,19 +1939,14 @@ Gw
             <constraints>
                 <constraint firstItem="2669" firstAttribute="leading" secondItem="2673" secondAttribute="leading" id="07J-bM-GTd"/>
                 <constraint firstItem="Gjp-57-RUZ" firstAttribute="leading" secondItem="6Ro-o1-WEd" secondAttribute="leading" id="0dF-zN-dVK"/>
-                <constraint firstItem="2674" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="2PK-yW-KzL"/>
+                <constraint firstItem="6Ro-o1-WEd" firstAttribute="top" secondItem="2669" secondAttribute="bottom" constant="20" id="8B2-PI-H5C"/>
                 <constraint firstAttribute="bottom" secondItem="Gjp-57-RUZ" secondAttribute="bottom" constant="20" id="8dn-tg-H5s"/>
                 <constraint firstAttribute="trailing" secondItem="2669" secondAttribute="trailing" constant="20" id="9ma-RK-c6X"/>
-                <constraint firstItem="2675" firstAttribute="centerY" secondItem="2674" secondAttribute="centerY" id="GfX-2H-4qu"/>
                 <constraint firstItem="2673" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="HYF-Bu-NcI"/>
-                <constraint firstItem="2675" firstAttribute="top" secondItem="2669" secondAttribute="bottom" constant="20" id="Kep-UP-GNR"/>
                 <constraint firstItem="Gjp-57-RUZ" firstAttribute="top" secondItem="6Ro-o1-WEd" secondAttribute="bottom" constant="19" id="NCm-yd-mjg"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2673" secondAttribute="trailing" constant="20" id="Sdf-9E-91g"/>
-                <constraint firstItem="2674" firstAttribute="top" secondItem="2669" secondAttribute="bottom" constant="20" id="aa2-ha-RSP"/>
                 <constraint firstItem="2669" firstAttribute="top" secondItem="2673" secondAttribute="bottom" constant="8" id="cl3-aB-HqL"/>
                 <constraint firstItem="2673" firstAttribute="top" secondItem="2668" secondAttribute="top" constant="20" id="cmU-2H-taN"/>
-                <constraint firstAttribute="trailing" secondItem="2675" secondAttribute="trailing" constant="20" id="gZf-hH-gcD"/>
-                <constraint firstItem="6Ro-o1-WEd" firstAttribute="top" secondItem="2674" secondAttribute="bottom" constant="20" id="sM1-Th-Aiu"/>
                 <constraint firstItem="6Ro-o1-WEd" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="yqH-HV-wNV"/>
             </constraints>
             <point key="canvasLocation" x="255" y="1043"/>
@@ -2032,10 +2006,21 @@ Gw
                             <action selector="hotkeySettingChanged:" target="-2" id="dLE-0s-rau"/>
                         </connections>
                     </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0Dd-AY-La9">
+                        <rect key="frame" x="14" y="12" width="72" height="32"/>
+                        <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="MXS-Da-DZW">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="hotkeySettingChanged:" target="-2" id="J2W-Uw-4ip"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="2679" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2678" secondAttribute="leading" constant="17" id="3nd-rp-ZnD"/>
                     <constraint firstItem="2679" firstAttribute="top" relation="greaterThanOrEqual" secondItem="2678" secondAttribute="top" constant="17" id="55x-0r-0qV"/>
+                    <constraint firstItem="0Dd-AY-La9" firstAttribute="leading" secondItem="2678" secondAttribute="leading" constant="20" id="57E-sW-DD6"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2800" secondAttribute="trailing" constant="17" id="6e5-ip-qeH"/>
                     <constraint firstItem="2803" firstAttribute="top" secondItem="2800" secondAttribute="bottom" constant="8" id="7lB-JR-wGe"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2679" secondAttribute="trailing" constant="17" id="COG-xA-ijE"/>
@@ -2043,6 +2028,7 @@ Gw
                     <constraint firstAttribute="trailing" secondItem="2791" secondAttribute="trailing" constant="20" id="QIF-0S-zPw"/>
                     <constraint firstItem="2803" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2678" secondAttribute="leading" constant="17" id="Ril-RK-86t"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2803" secondAttribute="trailing" constant="17" id="TOI-Bo-QnU"/>
+                    <constraint firstItem="0Dd-AY-La9" firstAttribute="centerY" secondItem="2792" secondAttribute="centerY" id="V7M-TA-7Ut"/>
                     <constraint firstItem="2800" firstAttribute="top" secondItem="2679" secondAttribute="bottom" constant="8" id="aBX-2J-mHL"/>
                     <constraint firstItem="2800" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2678" secondAttribute="leading" constant="17" id="fgc-9A-80d"/>
                     <constraint firstItem="2800" firstAttribute="centerX" secondItem="2803" secondAttribute="centerX" id="hod-8D-J9c"/>

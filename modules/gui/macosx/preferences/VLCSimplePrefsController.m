@@ -334,12 +334,11 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_audio_autosavevol_noButtonCell setTitle: _NS("Always reset audio start level to:")];
 
     /* hotkeys */
-    [_hotkeys_changeButton setTitle: _NS("Change")];
     [_hotkeys_change_win setTitle: _NS("Change Hotkey")];
     [_hotkeys_change_cancelButton setTitle: _NS("Cancel")];
     [_hotkeys_change_okButton setTitle: _NS("OK")];
-    [_hotkeys_clearButton setTitle: _NS("Clear")];
-    [_hotkeysLabel setStringValue: _NS("Select an action to change the associated hotkey:")];
+    [_hotkeys_change_clearButton setTitle: _NS("Clear")];
+    [_hotkeysLabel setStringValue: _NS("Double-click an action to change the associated hotkey:")];
     [[[_hotkeys_listbox tableColumnWithIdentifier: @"action"] headerCell] setStringValue: _NS("Action")];
     [[[_hotkeys_listbox tableColumnWithIdentifier: @"shortcut"] headerCell] setStringValue: _NS("Shortcut")];
     [_hotkeys_mediakeysCheckbox setTitle: _NS("Control playback with media keys")];
@@ -1421,7 +1420,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (IBAction)hotkeySettingChanged:(id)sender
 {
-    if (sender == _hotkeys_changeButton || sender == _hotkeys_listbox) {
+    if (sender == _hotkeys_listbox) {
         [_hotkeys_changeLabel setStringValue: [NSString stringWithFormat: _NS("Press new keys for\n\"%@\""),
                                                [_hotkeyDescriptions objectAtIndex:[_hotkeys_listbox selectedRow]]]];
         [_hotkeys_change_keysLabel setStringValue: OSXStringKeyToString([_hotkeySettings objectAtIndex:[_hotkeys_listbox selectedRow]])];
@@ -1437,7 +1436,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         if (! _keyInTransition) {
             [NSApp stopModal];
             [_hotkeys_change_win close];
-            msg_Err(p_intf, "internal error prevented the hotkey switch");
+            NSAssert(1, @"internal error prevented the hotkey switch");
             return;
         }
 
@@ -1458,10 +1457,12 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [_hotkeys_change_win close];
 
         [_hotkeys_listbox reloadData];
-    } else if (sender == _hotkeys_clearButton) {
+    } else if (sender == _hotkeys_change_clearButton) {
         [_hotkeySettings replaceObjectAtIndex: [_hotkeys_listbox selectedRow] withObject: [NSString string]];
-        [_hotkeys_listbox reloadData];
         _hotkeyChanged = YES;
+        [NSApp stopModal];
+        [_hotkeys_change_win close];
+        [_hotkeys_listbox reloadData];
     }
 }
 
