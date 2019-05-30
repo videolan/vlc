@@ -145,6 +145,7 @@
                 <outlet property="video_nativeFullscreenCheckbox" destination="6mo-Qc-MZV" id="4Qq-ci-Gbl"/>
                 <outlet property="video_onTopCheckbox" destination="2451" id="64h-nw-rQ0"/>
                 <outlet property="video_pauseWhenMinimizedCheckbox" destination="rpy-5O-tek" id="jBe-GO-Iiw"/>
+                <outlet property="video_resizeToNativeSizeCheckbox" destination="4a1-oW-HKH" id="bCd-bh-8FT"/>
                 <outlet property="video_snapBox" destination="2466" id="bQQ-pv-z09"/>
                 <outlet property="video_snap_folderButton" destination="2473" id="c2H-eo-wvH"/>
                 <outlet property="video_snap_folderLabel" destination="2470" id="oBs-TH-xvl"/>
@@ -820,10 +821,10 @@ Gw
             <point key="canvasLocation" x="265.5" y="1003"/>
         </customView>
         <customView translatesAutoresizingMaskIntoConstraints="NO" id="2440" userLabel="Video">
-            <rect key="frame" x="0.0" y="-4" width="582" height="501"/>
+            <rect key="frame" x="0.0" y="0.0" width="582" height="527"/>
             <subviews>
                 <button verticalHuggingPriority="251" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2448">
-                    <rect key="frame" x="18" y="465" width="101" height="18"/>
+                    <rect key="frame" x="18" y="491" width="101" height="18"/>
                     <buttonCell key="cell" type="check" title="Enable Video" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3477">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -833,13 +834,13 @@ Gw
                     </connections>
                 </button>
                 <box title="Display" translatesAutoresizingMaskIntoConstraints="NO" id="2449">
-                    <rect key="frame" x="17" y="354" width="548" height="105"/>
+                    <rect key="frame" x="17" y="354" width="548" height="131"/>
                     <view key="contentView" id="eGM-I9-pBb">
-                        <rect key="frame" x="3" y="3" width="542" height="87"/>
+                        <rect key="frame" x="3" y="3" width="542" height="113"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2452">
-                                <rect key="frame" x="15" y="61" width="214" height="18"/>
+                                <rect key="frame" x="15" y="87" width="214" height="18"/>
                                 <buttonCell key="cell" type="check" title="Show video within main window" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3479">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -859,13 +860,23 @@ Gw
                                 </connections>
                             </button>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="rpy-5O-tek">
-                                <rect key="frame" x="15" y="36" width="278" height="18"/>
+                                <rect key="frame" x="15" y="62" width="278" height="18"/>
                                 <buttonCell key="cell" type="check" title="Pause the video playback when minimized" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="v2U-aI-gRI">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="videoSettingChanged:" target="-2" id="sk0-pw-9AE"/>
+                                </connections>
+                            </button>
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="4a1-oW-HKH">
+                                <rect key="frame" x="15" y="36" width="263" height="18"/>
+                                <buttonCell key="cell" type="check" title="Resize interface to the native video size" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="rNV-hL-qNL">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="videoSettingChanged:" target="-2" id="Thc-PT-O88"/>
                                 </connections>
                             </button>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3728">
@@ -880,8 +891,10 @@ Gw
                             </button>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="4a1-oW-HKH" firstAttribute="top" secondItem="rpy-5O-tek" secondAttribute="bottom" constant="12" id="3nN-jE-RrJ"/>
                             <constraint firstItem="3728" firstAttribute="centerY" secondItem="2451" secondAttribute="centerY" id="5ha-iW-rt3"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="rpy-5O-tek" secondAttribute="trailing" constant="17" id="B4h-FQ-7aL"/>
+                            <constraint firstItem="2451" firstAttribute="top" secondItem="4a1-oW-HKH" secondAttribute="bottom" constant="12" id="DId-Tv-O07"/>
                             <constraint firstItem="rpy-5O-tek" firstAttribute="leading" secondItem="2452" secondAttribute="leading" id="KNc-3N-uYy"/>
                             <constraint firstItem="2451" firstAttribute="leading" secondItem="rpy-5O-tek" secondAttribute="leading" id="O89-st-t01"/>
                             <constraint firstItem="2452" firstAttribute="top" secondItem="eGM-I9-pBb" secondAttribute="top" constant="10" id="Zf8-Vt-ftS"/>
@@ -891,7 +904,7 @@ Gw
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3728" secondAttribute="trailing" constant="17" id="rDL-Im-FxZ"/>
                             <constraint firstItem="rpy-5O-tek" firstAttribute="top" secondItem="2452" secondAttribute="bottom" constant="11" id="rH1-SK-emj"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2452" secondAttribute="trailing" constant="17" id="tZx-bu-85x"/>
-                            <constraint firstItem="2451" firstAttribute="top" secondItem="rpy-5O-tek" secondAttribute="bottom" constant="12" id="y3H-yC-OW5"/>
+                            <constraint firstItem="4a1-oW-HKH" firstAttribute="leading" secondItem="rpy-5O-tek" secondAttribute="leading" id="vPv-oH-IkT"/>
                         </constraints>
                     </view>
                 </box>
@@ -1172,7 +1185,7 @@ Gw
                     </view>
                 </box>
                 <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Hrj-mH-eqd" userLabel="half size helper view">
-                    <rect key="frame" x="291" y="463" width="271" height="23"/>
+                    <rect key="frame" x="291" y="489" width="271" height="23"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="23" id="5d3-4W-bXj"/>
                     </constraints>

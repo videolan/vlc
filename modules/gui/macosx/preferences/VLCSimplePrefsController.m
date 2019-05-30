@@ -409,6 +409,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_video_displayBox setTitle: _NS("Display")];
     [_video_embeddedCheckbox setTitle: _NS("Show video within the main window")];
     [_video_pauseWhenMinimizedCheckbox setTitle:_NS("Pause the video playback when minimized")];
+    [_video_resizeToNativeSizeCheckbox setTitle:_NS("Resize interface to the native video size")];
     [_video_onTopCheckbox setTitle: _NS("Float on Top")];
     [_video_videodecoCheckbox setTitle: _NS("Window decorations")];
 
@@ -699,6 +700,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     [self setupButton:_video_blackScreenCheckbox forBoolValue: "macosx-black"];
     [self setupButton:_video_videodecoCheckbox forBoolValue: "video-deco"];
     [self setupButton:_video_pauseWhenMinimizedCheckbox forBoolValue: "macosx-pause-minimized"];
+    [self setupButton:_video_resizeToNativeSizeCheckbox forBoolValue: "macosx-video-autoresize"];
 
     [_video_devicePopup removeAllItems];
     i = 0;
@@ -1019,6 +1021,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         config_PutInt("macosx-black", [_video_blackScreenCheckbox state]);
 
         config_PutInt("macosx-pause-minimized", [_video_pauseWhenMinimizedCheckbox state]);
+        config_PutInt("macosx-video-autoresize", [_video_resizeToNativeSizeCheckbox state]);
 
         config_PutInt("embedded-video", [_video_embeddedCheckbox state]);
         config_PutInt("macosx-nativefullscreenmode", [_video_nativeFullscreenCheckbox state]);
