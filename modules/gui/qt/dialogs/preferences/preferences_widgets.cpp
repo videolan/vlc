@@ -1216,7 +1216,7 @@ void KeySelectorControl::finish()
                                QVariant( qfu( p_config_item->psz_name ) ) );
 
             QString keys = p_config_item->value.psz ? qfut(p_config_item->value.psz) : qfu("");
-            treeItem->setText( HOTKEY_COL, keys );
+            treeItem->setText( HOTKEY_COL, keys.replace( "\t", ", " ) );
             treeItem->setToolTip( HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
             treeItem->setToolTip( GLOBAL_HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
             treeItem->setData( HOTKEY_COL, Qt::UserRole, QVariant( p_config_item->value.psz ) );
@@ -1240,7 +1240,7 @@ void KeySelectorControl::finish()
         if( list.count() >= 1 )
         {
             QString keys = i.value();
-            list[0]->setText( GLOBAL_HOTKEY_COL, keys );
+            list[0]->setText( GLOBAL_HOTKEY_COL, keys.replace( "\t", ", " ) );
             list[0]->setData( GLOBAL_HOTKEY_COL, Qt::UserRole, keys );
         }
         if( list.count() >= 2 )
@@ -1312,7 +1312,7 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
                 if( it_keys.removeAll( d->vlckey ) )
                 {
                     QString it_filteredkeys = it_keys.join( "\t" );
-                    it->setText( column, it_filteredkeys );
+                    it->setText( column, it_filteredkeys.replace( "\t", ", " ) );
                     it->setData( column, Qt::UserRole, it_filteredkeys );
                 }
             }
