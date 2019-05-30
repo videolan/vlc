@@ -342,6 +342,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_hotkeysLabel setStringValue: _NS("Select an action to change the associated hotkey:")];
     [[[_hotkeys_listbox tableColumnWithIdentifier: @"action"] headerCell] setStringValue: _NS("Action")];
     [[[_hotkeys_listbox tableColumnWithIdentifier: @"shortcut"] headerCell] setStringValue: _NS("Shortcut")];
+    [_hotkeys_mediakeysCheckbox setTitle: _NS("Control playback with media keys")];
 
     /* input */
     [_input_recordBox setTitle: _NS("Record directory or filename")];
@@ -371,7 +372,6 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
 
     [_intf_playbackControlBox setTitle:_NS("Playback control")];
     [_intf_continueplaybackLabel setStringValue:_NS("Continue playback")];
-    [_intf_mediakeysCheckbox setTitle: _NS("Control playback with media keys")];
     [_intf_statusIconCheckbox setTitle: _NS("Display VLC status menu icon")];
 
     [_intf_playbackBehaviourBox setTitle:_NS("Playback behaviour")];
@@ -618,7 +618,6 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     }
 
     [self setupButton:_intf_statusIconCheckbox forBoolValue: "macosx-statusicon"];
-    [self setupButton:_intf_mediakeysCheckbox forBoolValue: "macosx-mediakeys"];
 
     [self setupButton:_video_nativeFullscreenCheckbox forBoolValue: "macosx-nativefullscreenmode"];
     [self setupButton:_video_embeddedCheckbox forBoolValue: "embedded-video"];
@@ -827,6 +826,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     _hotkeyNames = [[NSArray alloc] initWithArray:tempArray_names copyItems: YES];
 
     [_hotkeys_listbox reloadData];
+    [self setupButton:_hotkeys_mediakeysCheckbox forBoolValue: "macosx-mediakeys"];
 }
 
 #pragma mark -
@@ -965,7 +965,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         config_PutInt("metadata-network-access", [_intf_artCheckbox state]);
 
         config_PutInt("macosx-statusicon", [_intf_statusIconCheckbox state]);
-        config_PutInt("macosx-mediakeys", [_intf_mediakeysCheckbox state]);
 
         [self changeModule:@"growl" inConfig:@"control" enable:[_intf_enableNotificationsCheckbox state] == NSOnState];
 
@@ -1091,6 +1090,8 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         for (NSUInteger i = 0; i < hotKeyCount; i++)
             config_PutPsz([[_hotkeyNames objectAtIndex:i] UTF8String], [[_hotkeySettings objectAtIndex:i]UTF8String]);
         _hotkeyChanged = NO;
+
+        config_PutInt("macosx-mediakeys", [_hotkeys_mediakeysCheckbox state]);
     }
 
     fixIntfSettings();

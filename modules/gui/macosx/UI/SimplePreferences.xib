@@ -40,6 +40,7 @@
                 <outlet property="hotkeys_change_win" destination="2677" id="rwN-5b-lyj"/>
                 <outlet property="hotkeys_clearButton" destination="2674" id="0JA-op-ATZ"/>
                 <outlet property="hotkeys_listbox" destination="2670" id="i2J-F5-aT6"/>
+                <outlet property="hotkeys_mediakeysCheckbox" destination="6Ro-o1-WEd" id="fGa-18-7ey"/>
                 <outlet property="inputView" destination="2562" id="FPv-Zx-DLZ"/>
                 <outlet property="input_aviLabel" destination="2593" id="Tm7-Yh-wKr"/>
                 <outlet property="input_aviPopup" destination="2594" id="2No-D7-Fgf"/>
@@ -71,7 +72,6 @@
                 <outlet property="intf_luahttpBox" destination="drh-ot-Vyn" id="YKi-8n-s8a"/>
                 <outlet property="intf_luahttppwdLabel" destination="3875" id="zl0-da-lHe"/>
                 <outlet property="intf_luahttppwdTextField" destination="3884" id="dxk-zl-ZLZ"/>
-                <outlet property="intf_mediakeysCheckbox" destination="3543" id="qh4-7b-Dff"/>
                 <outlet property="intf_networkBox" destination="2318" id="wm1-kM-rZB"/>
                 <outlet property="intf_pauseitunesLabel" destination="3910" id="miA-VW-WB3"/>
                 <outlet property="intf_pauseitunesPopup" destination="3911" id="UZN-lH-STQ"/>
@@ -337,23 +337,13 @@ Gw
                     </view>
                 </box>
                 <box borderType="line" title="Playback control" translatesAutoresizingMaskIntoConstraints="NO" id="CZP-ZN-k6p">
-                    <rect key="frame" x="18" y="386" width="563" height="91"/>
+                    <rect key="frame" x="18" y="413" width="563" height="64"/>
                     <view key="contentView" id="gj4-zO-E26">
-                        <rect key="frame" x="3" y="3" width="557" height="73"/>
+                        <rect key="frame" x="3" y="3" width="557" height="46"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3543">
-                                <rect key="frame" x="15" y="12" width="225" height="18"/>
-                                <buttonCell key="cell" type="check" title="Control playback with media keys" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3546">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="interfaceSettingChanged:" target="-2" id="Svx-Jd-ghP"/>
-                                </connections>
-                            </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3919">
-                                <rect key="frame" x="15" y="44" width="117" height="17"/>
+                                <rect key="frame" x="15" y="17" width="117" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Continue playback" usesSingleLineMode="YES" id="3923">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -361,7 +351,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3920">
-                                <rect key="frame" x="145" y="39" width="398" height="25"/>
+                                <rect key="frame" x="145" y="12" width="398" height="25"/>
                                 <popUpButtonCell key="cell" type="push" bezelStyle="rounded" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="3921">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
@@ -373,20 +363,17 @@ Gw
                             </popUpButton>
                         </subviews>
                         <constraints>
+                            <constraint firstAttribute="bottom" secondItem="3920" secondAttribute="bottom" constant="15" id="11b-WT-SyB"/>
                             <constraint firstAttribute="trailing" secondItem="3920" secondAttribute="trailing" constant="17" id="M7f-H3-4Mk"/>
                             <constraint firstItem="3919" firstAttribute="top" secondItem="gj4-zO-E26" secondAttribute="top" constant="12" id="R4h-Ob-XbD"/>
                             <constraint firstItem="3919" firstAttribute="centerY" secondItem="3920" secondAttribute="centerY" id="Txp-Vc-Bet"/>
-                            <constraint firstAttribute="bottom" secondItem="3543" secondAttribute="bottom" constant="14" id="VmW-US-ODf"/>
-                            <constraint firstItem="3543" firstAttribute="top" secondItem="3920" secondAttribute="bottom" constant="14" id="X5z-9u-yDg"/>
                             <constraint firstItem="3919" firstAttribute="leading" secondItem="gj4-zO-E26" secondAttribute="leading" constant="17" id="cnI-H9-J0k"/>
                             <constraint firstItem="3920" firstAttribute="leading" secondItem="3919" secondAttribute="trailing" constant="17" id="gLu-nZ-tla"/>
-                            <constraint firstItem="3543" firstAttribute="leading" secondItem="3919" secondAttribute="leading" id="mSz-UU-aQm"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3543" secondAttribute="trailing" constant="17" id="stN-2i-k8h"/>
                         </constraints>
                     </view>
                 </box>
                 <box verticalHuggingPriority="251" verticalCompressionResistancePriority="751" borderType="line" title="Playback behaviour" translatesAutoresizingMaskIntoConstraints="NO" id="EKZ-iB-CMo">
-                    <rect key="frame" x="18" y="296" width="563" height="86"/>
+                    <rect key="frame" x="18" y="323" width="563" height="86"/>
                     <view key="contentView" id="BMS-wa-oJS">
                         <rect key="frame" x="3" y="3" width="557" height="68"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -437,7 +424,7 @@ Gw
                     </constraints>
                 </box>
                 <box verticalHuggingPriority="249" borderType="line" title="Privacy / Network Interaction" translatesAutoresizingMaskIntoConstraints="NO" id="2318">
-                    <rect key="frame" x="18" y="183" width="563" height="109"/>
+                    <rect key="frame" x="18" y="210" width="563" height="109"/>
                     <view key="contentView" id="nnH-Tj-ON7">
                         <rect key="frame" x="3" y="3" width="557" height="91"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -486,7 +473,7 @@ Gw
                     </view>
                 </box>
                 <box borderType="line" title="HTTP Server" translatesAutoresizingMaskIntoConstraints="NO" id="drh-ot-Vyn">
-                    <rect key="frame" x="18" y="86" width="563" height="90"/>
+                    <rect key="frame" x="18" y="113" width="563" height="90"/>
                     <view key="contentView" id="Who-VF-GbQ">
                         <rect key="frame" x="3" y="3" width="557" height="72"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1861,16 +1848,16 @@ Gw
             <point key="canvasLocation" x="274" y="2038.5"/>
         </customView>
         <customView translatesAutoresizingMaskIntoConstraints="NO" id="2668" userLabel="Hotkeys">
-            <rect key="frame" x="0.0" y="0.0" width="570" height="416"/>
+            <rect key="frame" x="0.0" y="0.0" width="570" height="461"/>
             <subviews>
                 <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="0.0" verticalLineScroll="19" verticalPageScroll="0.0" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2669">
-                    <rect key="frame" x="20" y="60" width="530" height="311"/>
+                    <rect key="frame" x="20" y="95" width="530" height="321"/>
                     <clipView key="contentView" id="EbT-aN-Pgg">
-                        <rect key="frame" x="1" y="0.0" width="528" height="310"/>
+                        <rect key="frame" x="1" y="0.0" width="528" height="320"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveName="sprefs_hotkeys_view" headerView="3541" id="2670">
-                                <rect key="frame" x="0.0" y="0.0" width="528" height="287"/>
+                                <rect key="frame" x="0.0" y="0.0" width="528" height="297"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1927,7 +1914,7 @@ Gw
                     </tableHeaderView>
                 </scrollView>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2675">
-                    <rect key="frame" x="469" y="12" width="87" height="32"/>
+                    <rect key="frame" x="469" y="47" width="87" height="32"/>
                     <buttonCell key="cell" type="push" title="Change" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="3526">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -1937,7 +1924,7 @@ Gw
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2674">
-                    <rect key="frame" x="14" y="12" width="72" height="32"/>
+                    <rect key="frame" x="14" y="47" width="72" height="32"/>
                     <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="3525">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -1947,28 +1934,41 @@ Gw
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2673">
-                    <rect key="frame" x="18" y="379" width="306" height="17"/>
+                    <rect key="frame" x="18" y="424" width="306" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Select an action to change the associated hotkey:" usesSingleLineMode="YES" id="3524">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
+                <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="6Ro-o1-WEd">
+                    <rect key="frame" x="18" y="18" width="225" height="18"/>
+                    <buttonCell key="cell" type="check" title="Control playback with media keys" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="kZN-TJ-neV">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="hotkeySettingChanged:" target="-2" id="TcH-tQ-KTD"/>
+                    </connections>
+                </button>
             </subviews>
             <constraints>
                 <constraint firstItem="2669" firstAttribute="leading" secondItem="2673" secondAttribute="leading" id="07J-bM-GTd"/>
                 <constraint firstItem="2674" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="2PK-yW-KzL"/>
                 <constraint firstAttribute="trailing" secondItem="2669" secondAttribute="trailing" constant="20" id="9ma-RK-c6X"/>
+                <constraint firstItem="2675" firstAttribute="centerY" secondItem="2674" secondAttribute="centerY" id="GfX-2H-4qu"/>
                 <constraint firstItem="2673" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="HYF-Bu-NcI"/>
                 <constraint firstItem="2675" firstAttribute="top" secondItem="2669" secondAttribute="bottom" constant="20" id="Kep-UP-GNR"/>
+                <constraint firstAttribute="bottom" secondItem="6Ro-o1-WEd" secondAttribute="bottom" constant="20" id="QnU-7e-UeB"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2673" secondAttribute="trailing" constant="20" id="Sdf-9E-91g"/>
-                <constraint firstAttribute="bottom" secondItem="2674" secondAttribute="bottom" constant="19" id="Ubu-5f-bOl"/>
                 <constraint firstItem="2674" firstAttribute="top" secondItem="2669" secondAttribute="bottom" constant="20" id="aa2-ha-RSP"/>
                 <constraint firstItem="2669" firstAttribute="top" secondItem="2673" secondAttribute="bottom" constant="8" id="cl3-aB-HqL"/>
                 <constraint firstItem="2673" firstAttribute="top" secondItem="2668" secondAttribute="top" constant="20" id="cmU-2H-taN"/>
                 <constraint firstAttribute="trailing" secondItem="2675" secondAttribute="trailing" constant="20" id="gZf-hH-gcD"/>
-                <constraint firstAttribute="bottom" secondItem="2675" secondAttribute="bottom" constant="19" id="yYm-vV-dk7"/>
+                <constraint firstItem="6Ro-o1-WEd" firstAttribute="top" secondItem="2674" secondAttribute="bottom" constant="20" id="sM1-Th-Aiu"/>
+                <constraint firstItem="6Ro-o1-WEd" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="yqH-HV-wNV"/>
             </constraints>
+            <point key="canvasLocation" x="255" y="1026.5"/>
         </customView>
         <window title="Change Hotkey" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="2677" userLabel="Hotkey Changer" customClass="VLCHotkeyChangeWindow">
             <windowStyleMask key="styleMask" titled="YES"/>
