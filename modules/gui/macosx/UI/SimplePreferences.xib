@@ -1221,136 +1221,8 @@ Gw
         <customView translatesAutoresizingMaskIntoConstraints="NO" id="2562" userLabel="Input &amp; Codecs">
             <rect key="frame" x="0.0" y="0.0" width="572" height="422"/>
             <subviews>
-                <box borderType="line" title="Record directory or filename" translatesAutoresizingMaskIntoConstraints="NO" id="3623">
-                    <rect key="frame" x="17" y="340" width="538" height="62"/>
-                    <view key="contentView" id="7b2-vV-8CM">
-                        <rect key="frame" x="3" y="3" width="532" height="44"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <textField verticalHuggingPriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="3614">
-                                <rect key="frame" x="16" y="12" width="406" height="20"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="20" id="aEu-v9-mQg"/>
-                                </constraints>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="3619">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                                <connections>
-                                    <action selector="inputSettingChanged:" target="-2" id="sVP-nU-25F"/>
-                                    <outlet property="delegate" destination="-2" id="PfN-d7-gla"/>
-                                </connections>
-                            </textField>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3616">
-                                <rect key="frame" x="424" y="5" width="96" height="32"/>
-                                <buttonCell key="cell" type="push" title="Browse..." bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="3617">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="inputSettingChanged:" target="-2" id="a1o-fS-ATd"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <constraints>
-                            <constraint firstItem="3614" firstAttribute="centerY" secondItem="3616" secondAttribute="centerY" id="5OQ-KI-2Jz"/>
-                            <constraint firstAttribute="bottom" secondItem="3614" secondAttribute="bottom" constant="12" id="URP-T8-g5e"/>
-                            <constraint firstAttribute="trailing" secondItem="3616" secondAttribute="trailing" constant="18" id="VdX-cL-psJ"/>
-                            <constraint firstItem="3616" firstAttribute="leading" secondItem="3614" secondAttribute="trailing" constant="8" id="niL-qT-A9B"/>
-                            <constraint firstItem="3614" firstAttribute="top" secondItem="7b2-vV-8CM" secondAttribute="top" constant="12" id="t7h-YC-c9L"/>
-                        </constraints>
-                    </view>
-                    <constraints>
-                        <constraint firstItem="3614" firstAttribute="leading" secondItem="3623" secondAttribute="leading" constant="16" id="YUQ-6L-lr3"/>
-                    </constraints>
-                </box>
-                <box title="Network" translatesAutoresizingMaskIntoConstraints="NO" id="2563">
-                    <rect key="frame" x="17" y="273" width="538" height="63"/>
-                    <view key="contentView" id="1lv-cw-XiH">
-                        <rect key="frame" x="3" y="3" width="532" height="45"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3742">
-                                <rect key="frame" x="10" y="5" width="512" height="32"/>
-                                <buttonCell key="cell" type="push" title="Edit default application settings for network protocols" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="3743">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="urlHandlerAction:" target="-2" id="fzB-9k-nU3"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <constraints>
-                            <constraint firstAttribute="bottom" secondItem="3742" secondAttribute="bottom" constant="12" id="EZO-4w-F6B"/>
-                            <constraint firstItem="3742" firstAttribute="top" secondItem="1lv-cw-XiH" secondAttribute="top" constant="12" id="qZb-WG-HCN"/>
-                        </constraints>
-                    </view>
-                    <constraints>
-                        <constraint firstItem="3742" firstAttribute="leading" secondItem="2563" secondAttribute="leading" constant="16" id="0wq-Sm-I8k"/>
-                        <constraint firstAttribute="trailing" secondItem="3742" secondAttribute="trailing" constant="16" id="tGu-zJ-RHQ"/>
-                    </constraints>
-                </box>
-                <box title="Caching" translatesAutoresizingMaskIntoConstraints="NO" id="2572">
-                    <rect key="frame" x="17" y="179" width="538" height="89"/>
-                    <view key="contentView" id="deK-kX-Lvr">
-                        <rect key="frame" x="3" y="3" width="532" height="71"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2580">
-                                <rect key="frame" x="267" y="37" width="251" height="25"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="197" id="5lH-sw-4lb"/>
-                                </constraints>
-                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2583" id="3514">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="menu"/>
-                                    <menu key="menu" title="OtherViews" id="2581">
-                                        <items>
-                                            <menuItem title="Item1" state="on" id="2583"/>
-                                            <menuItem title="Item2" id="2584"/>
-                                            <menuItem title="Item3" id="2582"/>
-                                        </items>
-                                    </menu>
-                                </popUpButtonCell>
-                                <connections>
-                                    <action selector="inputSettingChanged:" target="-2" id="dYl-jy-tc2"/>
-                                </connections>
-                            </popUpButton>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2574">
-                                <rect key="frame" x="14" y="42" width="240" height="17"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Default Caching Level" usesSingleLineMode="YES" id="3513">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="3162" customClass="VLCWrappableTextField">
-                                <rect key="frame" x="15" y="24" width="502" height="11"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Use the complete preferences to configure custom caching values for each access module." id="3515">
-                                    <font key="font" metaFont="miniSystem"/>
-                                    <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                        </subviews>
-                        <constraints>
-                            <constraint firstItem="3162" firstAttribute="leading" secondItem="deK-kX-Lvr" secondAttribute="leading" constant="17" id="2z7-Hd-etu"/>
-                            <constraint firstItem="2574" firstAttribute="top" secondItem="deK-kX-Lvr" secondAttribute="top" constant="12" id="4so-vT-r4H"/>
-                            <constraint firstAttribute="bottom" secondItem="3162" secondAttribute="bottom" constant="24" id="DHM-6v-unL"/>
-                            <constraint firstItem="3162" firstAttribute="centerX" secondItem="deK-kX-Lvr" secondAttribute="centerX" id="Huj-Q0-fSB"/>
-                            <constraint firstItem="2580" firstAttribute="leading" secondItem="2574" secondAttribute="trailing" constant="17" id="MpM-4o-ZxL"/>
-                            <constraint firstAttribute="trailing" secondItem="2580" secondAttribute="trailing" constant="17" id="N4J-65-EWZ"/>
-                            <constraint firstItem="2574" firstAttribute="leading" secondItem="deK-kX-Lvr" secondAttribute="leading" constant="16" id="YS7-i8-eoQ"/>
-                            <constraint firstAttribute="trailing" secondItem="3162" secondAttribute="trailing" constant="17" id="cZZ-fq-ISG"/>
-                            <constraint firstItem="3162" firstAttribute="top" secondItem="2580" secondAttribute="bottom" constant="5" id="ltx-8x-IZC"/>
-                            <constraint firstItem="2574" firstAttribute="centerY" secondItem="2580" secondAttribute="centerY" id="yq3-Ir-bxc"/>
-                        </constraints>
-                    </view>
-                </box>
                 <box title="Codecs / Muxers" translatesAutoresizingMaskIntoConstraints="NO" id="2585">
-                    <rect key="frame" x="17" y="16" width="538" height="156"/>
+                    <rect key="frame" x="17" y="246" width="538" height="156"/>
                     <view key="contentView" id="30i-kg-rYI">
                         <rect key="frame" x="3" y="3" width="532" height="138"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1449,11 +1321,137 @@ Gw
                         <constraint firstAttribute="height" constant="152" id="rXT-GE-OGD"/>
                     </constraints>
                 </box>
+                <box borderType="line" title="Record directory or filename" translatesAutoresizingMaskIntoConstraints="NO" id="3623">
+                    <rect key="frame" x="17" y="179" width="538" height="62"/>
+                    <view key="contentView" id="7b2-vV-8CM">
+                        <rect key="frame" x="3" y="3" width="532" height="44"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField verticalHuggingPriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="3614">
+                                <rect key="frame" x="16" y="12" width="406" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="aEu-v9-mQg"/>
+                                </constraints>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="3619">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <action selector="inputSettingChanged:" target="-2" id="sVP-nU-25F"/>
+                                    <outlet property="delegate" destination="-2" id="PfN-d7-gla"/>
+                                </connections>
+                            </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3616">
+                                <rect key="frame" x="424" y="5" width="96" height="32"/>
+                                <buttonCell key="cell" type="push" title="Browse..." bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="3617">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="inputSettingChanged:" target="-2" id="a1o-fS-ATd"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="3614" firstAttribute="centerY" secondItem="3616" secondAttribute="centerY" id="5OQ-KI-2Jz"/>
+                            <constraint firstAttribute="bottom" secondItem="3614" secondAttribute="bottom" constant="12" id="URP-T8-g5e"/>
+                            <constraint firstAttribute="trailing" secondItem="3616" secondAttribute="trailing" constant="18" id="VdX-cL-psJ"/>
+                            <constraint firstItem="3616" firstAttribute="leading" secondItem="3614" secondAttribute="trailing" constant="8" id="niL-qT-A9B"/>
+                            <constraint firstItem="3614" firstAttribute="top" secondItem="7b2-vV-8CM" secondAttribute="top" constant="12" id="t7h-YC-c9L"/>
+                        </constraints>
+                    </view>
+                    <constraints>
+                        <constraint firstItem="3614" firstAttribute="leading" secondItem="3623" secondAttribute="leading" constant="16" id="YUQ-6L-lr3"/>
+                    </constraints>
+                </box>
+                <box title="Network" translatesAutoresizingMaskIntoConstraints="NO" id="2563">
+                    <rect key="frame" x="17" y="112" width="538" height="63"/>
+                    <view key="contentView" id="1lv-cw-XiH">
+                        <rect key="frame" x="3" y="3" width="532" height="45"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3742">
+                                <rect key="frame" x="10" y="5" width="512" height="32"/>
+                                <buttonCell key="cell" type="push" title="Edit default application settings for network protocols" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="3743">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="urlHandlerAction:" target="-2" id="fzB-9k-nU3"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="3742" secondAttribute="bottom" constant="12" id="EZO-4w-F6B"/>
+                            <constraint firstItem="3742" firstAttribute="top" secondItem="1lv-cw-XiH" secondAttribute="top" constant="12" id="qZb-WG-HCN"/>
+                        </constraints>
+                    </view>
+                    <constraints>
+                        <constraint firstItem="3742" firstAttribute="leading" secondItem="2563" secondAttribute="leading" constant="16" id="0wq-Sm-I8k"/>
+                        <constraint firstAttribute="trailing" secondItem="3742" secondAttribute="trailing" constant="16" id="tGu-zJ-RHQ"/>
+                    </constraints>
+                </box>
+                <box title="Caching" translatesAutoresizingMaskIntoConstraints="NO" id="2572">
+                    <rect key="frame" x="17" y="18" width="538" height="89"/>
+                    <view key="contentView" id="deK-kX-Lvr">
+                        <rect key="frame" x="3" y="3" width="532" height="71"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2580">
+                                <rect key="frame" x="267" y="37" width="251" height="25"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="197" id="5lH-sw-4lb"/>
+                                </constraints>
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2583" id="3514">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" title="OtherViews" id="2581">
+                                        <items>
+                                            <menuItem title="Item1" state="on" id="2583"/>
+                                            <menuItem title="Item2" id="2584"/>
+                                            <menuItem title="Item3" id="2582"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <action selector="inputSettingChanged:" target="-2" id="dYl-jy-tc2"/>
+                                </connections>
+                            </popUpButton>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2574">
+                                <rect key="frame" x="14" y="42" width="240" height="17"/>
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Default Caching Level" usesSingleLineMode="YES" id="3513">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="3162" customClass="VLCWrappableTextField">
+                                <rect key="frame" x="15" y="24" width="502" height="11"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Use the complete preferences to configure custom caching values for each access module." id="3515">
+                                    <font key="font" metaFont="miniSystem"/>
+                                    <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="3162" firstAttribute="leading" secondItem="deK-kX-Lvr" secondAttribute="leading" constant="17" id="2z7-Hd-etu"/>
+                            <constraint firstItem="2574" firstAttribute="top" secondItem="deK-kX-Lvr" secondAttribute="top" constant="12" id="4so-vT-r4H"/>
+                            <constraint firstAttribute="bottom" secondItem="3162" secondAttribute="bottom" constant="24" id="DHM-6v-unL"/>
+                            <constraint firstItem="3162" firstAttribute="centerX" secondItem="deK-kX-Lvr" secondAttribute="centerX" id="Huj-Q0-fSB"/>
+                            <constraint firstItem="2580" firstAttribute="leading" secondItem="2574" secondAttribute="trailing" constant="17" id="MpM-4o-ZxL"/>
+                            <constraint firstAttribute="trailing" secondItem="2580" secondAttribute="trailing" constant="17" id="N4J-65-EWZ"/>
+                            <constraint firstItem="2574" firstAttribute="leading" secondItem="deK-kX-Lvr" secondAttribute="leading" constant="16" id="YS7-i8-eoQ"/>
+                            <constraint firstAttribute="trailing" secondItem="3162" secondAttribute="trailing" constant="17" id="cZZ-fq-ISG"/>
+                            <constraint firstItem="3162" firstAttribute="top" secondItem="2580" secondAttribute="bottom" constant="5" id="ltx-8x-IZC"/>
+                            <constraint firstItem="2574" firstAttribute="centerY" secondItem="2580" secondAttribute="centerY" id="yq3-Ir-bxc"/>
+                        </constraints>
+                    </view>
+                </box>
             </subviews>
             <constraints>
-                <constraint firstItem="3623" firstAttribute="top" secondItem="2562" secondAttribute="top" constant="20" id="1ix-eF-TTK"/>
                 <constraint firstItem="2585" firstAttribute="width" secondItem="2572" secondAttribute="width" id="7tR-4o-Bl3"/>
-                <constraint firstItem="2585" firstAttribute="top" secondItem="2572" secondAttribute="bottom" constant="11" id="FDR-q2-Lo9"/>
                 <constraint firstItem="2572" firstAttribute="top" secondItem="2563" secondAttribute="bottom" constant="9" id="GEn-WD-38d"/>
                 <constraint firstItem="2563" firstAttribute="top" secondItem="3623" secondAttribute="bottom" constant="8" id="HYu-M9-6fQ"/>
                 <constraint firstItem="2585" firstAttribute="leading" secondItem="2572" secondAttribute="leading" id="Iy8-4C-OoE"/>
@@ -1461,7 +1459,9 @@ Gw
                 <constraint firstItem="2572" firstAttribute="width" secondItem="2563" secondAttribute="width" id="WDe-ZI-UG5"/>
                 <constraint firstItem="2572" firstAttribute="leading" secondItem="2563" secondAttribute="leading" id="bpU-pH-0tc"/>
                 <constraint firstItem="3623" firstAttribute="width" secondItem="2563" secondAttribute="width" id="c9G-uN-T6d"/>
+                <constraint firstItem="2585" firstAttribute="top" secondItem="2562" secondAttribute="top" constant="20" id="gJz-mz-MZc"/>
                 <constraint firstItem="3623" firstAttribute="leading" secondItem="2562" secondAttribute="leading" constant="20" id="iUT-Of-JWh"/>
+                <constraint firstItem="3623" firstAttribute="top" secondItem="30i-kg-rYI" secondAttribute="bottom" constant="8" id="md4-QO-qOV"/>
                 <constraint firstAttribute="trailing" secondItem="3623" secondAttribute="trailing" constant="20" id="noM-v5-qkA"/>
                 <constraint firstItem="2580" firstAttribute="leading" secondItem="2594" secondAttribute="leading" id="tB2-xC-k7x"/>
                 <constraint firstItem="2563" firstAttribute="leading" secondItem="3623" secondAttribute="leading" id="zVq-6c-r8n"/>
