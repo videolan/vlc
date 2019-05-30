@@ -65,8 +65,10 @@
                 <outlet property="intf_continueplaybackPopup" destination="3920" id="dZ3-SI-SCp"/>
                 <outlet property="intf_enableNotificationsCheckbox" destination="3564" id="IIA-ce-g61"/>
                 <outlet property="intf_enableluahttpCheckbox" destination="lpZ-9y-Vfn" id="ieR-ZH-mcd"/>
+                <outlet property="intf_generalSettingsBox" destination="kup-aY-Wqq" id="RsL-yE-DVe"/>
                 <outlet property="intf_languageLabel" destination="3892" id="klM-r2-XKf"/>
                 <outlet property="intf_languagePopup" destination="3900" id="USp-A1-Aut"/>
+                <outlet property="intf_largeFontInListsCheckbox" destination="MeC-2c-kJf" id="2mk-ld-N5A"/>
                 <outlet property="intf_last_updateLabel" destination="3560" id="9TG-0W-rqH"/>
                 <outlet property="intf_luahttpBox" destination="drh-ot-Vyn" id="YKi-8n-s8a"/>
                 <outlet property="intf_luahttppwdLabel" destination="3875" id="zl0-da-lHe"/>
@@ -286,13 +288,13 @@ Gw
             <rect key="frame" x="0.0" y="0.0" width="597" height="597"/>
             <subviews>
                 <box borderType="line" title="General Settings" translatesAutoresizingMaskIntoConstraints="NO" id="kup-aY-Wqq">
-                    <rect key="frame" x="18" y="481" width="563" height="95"/>
+                    <rect key="frame" x="18" y="450" width="563" height="126"/>
                     <view key="contentView" id="wFl-aV-3Hn">
-                        <rect key="frame" x="3" y="3" width="557" height="77"/>
+                        <rect key="frame" x="3" y="3" width="557" height="108"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3892">
-                                <rect key="frame" x="15" y="48" width="117" height="17"/>
+                                <rect key="frame" x="15" y="79" width="117" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Language" usesSingleLineMode="YES" id="3893">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -300,7 +302,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3900">
-                                <rect key="frame" x="145" y="43" width="395" height="25"/>
+                                <rect key="frame" x="145" y="74" width="395" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="288" id="Kfa-pp-08X"/>
                                 </constraints>
@@ -314,7 +316,7 @@ Gw
                                 </connections>
                             </popUpButton>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="r3P-eU-tEX">
-                                <rect key="frame" x="15" y="15" width="185" height="18"/>
+                                <rect key="frame" x="15" y="46" width="185" height="18"/>
                                 <buttonCell key="cell" type="check" title="Enable VLC status bar icon" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Vhy-1T-Knj">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -323,21 +325,33 @@ Gw
                                     <action selector="interfaceSettingChanged:" target="-2" id="Ys3-K6-647"/>
                                 </connections>
                             </button>
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="MeC-2c-kJf">
+                                <rect key="frame" x="15" y="15" width="186" height="18"/>
+                                <buttonCell key="cell" type="check" title="Use large text for list views" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="QEl-8k-Hyj">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="interfaceSettingChanged:" target="-2" id="NdO-a5-vue"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="r3P-eU-tEX" firstAttribute="top" secondItem="3892" secondAttribute="bottom" constant="17" id="0lq-Ud-BSO"/>
                             <constraint firstItem="3892" firstAttribute="centerY" secondItem="3900" secondAttribute="centerY" id="I4b-x2-YzY"/>
+                            <constraint firstItem="MeC-2c-kJf" firstAttribute="leading" secondItem="r3P-eU-tEX" secondAttribute="leading" id="Oki-bv-W2C"/>
                             <constraint firstItem="3892" firstAttribute="top" secondItem="wFl-aV-3Hn" secondAttribute="top" constant="12" id="QjC-Pr-bJB"/>
-                            <constraint firstAttribute="bottom" secondItem="r3P-eU-tEX" secondAttribute="bottom" constant="17" id="S5c-OB-bFD"/>
                             <constraint firstItem="3892" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="17" id="SZk-gE-9Fb"/>
+                            <constraint firstAttribute="bottom" secondItem="MeC-2c-kJf" secondAttribute="bottom" constant="17" id="bAb-M0-dQk"/>
                             <constraint firstItem="r3P-eU-tEX" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="17" id="g2X-29-Ah0"/>
                             <constraint firstItem="3900" firstAttribute="leading" secondItem="3892" secondAttribute="trailing" constant="17" id="h9A-kZ-JjD"/>
+                            <constraint firstItem="MeC-2c-kJf" firstAttribute="top" secondItem="r3P-eU-tEX" secondAttribute="bottom" constant="17" id="tWH-LK-QkS"/>
                             <constraint firstAttribute="trailing" secondItem="3900" secondAttribute="trailing" constant="20" id="tlF-b1-Tuz"/>
                         </constraints>
                     </view>
                 </box>
                 <box borderType="line" title="Playback control" translatesAutoresizingMaskIntoConstraints="NO" id="CZP-ZN-k6p">
-                    <rect key="frame" x="18" y="413" width="563" height="64"/>
+                    <rect key="frame" x="18" y="382" width="563" height="64"/>
                     <view key="contentView" id="gj4-zO-E26">
                         <rect key="frame" x="3" y="3" width="557" height="46"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -373,7 +387,7 @@ Gw
                     </view>
                 </box>
                 <box verticalHuggingPriority="251" verticalCompressionResistancePriority="751" borderType="line" title="Playback behaviour" translatesAutoresizingMaskIntoConstraints="NO" id="EKZ-iB-CMo">
-                    <rect key="frame" x="18" y="323" width="563" height="86"/>
+                    <rect key="frame" x="18" y="292" width="563" height="86"/>
                     <view key="contentView" id="BMS-wa-oJS">
                         <rect key="frame" x="3" y="3" width="557" height="68"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -424,7 +438,7 @@ Gw
                     </constraints>
                 </box>
                 <box verticalHuggingPriority="249" borderType="line" title="Privacy / Network Interaction" translatesAutoresizingMaskIntoConstraints="NO" id="2318">
-                    <rect key="frame" x="18" y="210" width="563" height="109"/>
+                    <rect key="frame" x="18" y="179" width="563" height="109"/>
                     <view key="contentView" id="nnH-Tj-ON7">
                         <rect key="frame" x="3" y="3" width="557" height="91"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -473,7 +487,7 @@ Gw
                     </view>
                 </box>
                 <box borderType="line" title="HTTP Server" translatesAutoresizingMaskIntoConstraints="NO" id="drh-ot-Vyn">
-                    <rect key="frame" x="18" y="113" width="563" height="90"/>
+                    <rect key="frame" x="18" y="82" width="563" height="90"/>
                     <view key="contentView" id="Who-VF-GbQ">
                         <rect key="frame" x="3" y="3" width="557" height="72"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

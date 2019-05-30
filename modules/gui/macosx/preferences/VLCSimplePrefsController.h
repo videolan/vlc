@@ -112,10 +112,8 @@
 @property (readwrite, weak) IBOutlet NSBox *intf_generalSettingsBox;
 @property (readwrite, weak) IBOutlet NSPopUpButton *intf_languagePopup;
 @property (readwrite, weak) IBOutlet NSTextField *intf_languageLabel;
-@property (readwrite, weak) IBOutlet NSTextField *intf_styleLabel;
-@property (readwrite, weak) IBOutlet NSButtonCell *intf_style_darkButtonCell;
-@property (readwrite, weak) IBOutlet NSButtonCell *intf_style_brightButtonCell;
 @property (readwrite, weak) IBOutlet NSButton *intf_statusIconCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *intf_largeFontInListsCheckbox;
 
 // intf pane - control box
 @property (readwrite, weak) IBOutlet NSBox *intf_playbackControlBox;

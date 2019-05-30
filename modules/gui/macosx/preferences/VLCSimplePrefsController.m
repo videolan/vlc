@@ -373,6 +373,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_intf_playbackControlBox setTitle:_NS("Playback control")];
     [_intf_continueplaybackLabel setStringValue:_NS("Continue playback")];
     [_intf_statusIconCheckbox setTitle: _NS("Display VLC status menu icon")];
+    [_intf_largeFontInListsCheckbox setTitle: _NS("Use large text for list views")];
 
     [_intf_playbackBehaviourBox setTitle:_NS("Playback behaviour")];
     [_intf_enableNotificationsCheckbox setTitle: _NS("Enable notifications on playlist item change")];
@@ -619,6 +620,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     }
 
     [self setupButton:_intf_statusIconCheckbox forBoolValue: "macosx-statusicon"];
+    [self setupButton:_intf_largeFontInListsCheckbox forBoolValue: "macosx-large-text"];
 
     [self setupButton:_video_nativeFullscreenCheckbox forBoolValue: "macosx-nativefullscreenmode"];
     [self setupButton:_video_embeddedCheckbox forBoolValue: "embedded-video"];
@@ -966,6 +968,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         config_PutInt("metadata-network-access", [_intf_artCheckbox state]);
 
         config_PutInt("macosx-statusicon", [_intf_statusIconCheckbox state]);
+        config_PutInt("macosx-large-text", [_intf_largeFontInListsCheckbox state]);
 
         [self changeModule:@"growl" inConfig:@"control" enable:[_intf_enableNotificationsCheckbox state] == NSOnState];
 
