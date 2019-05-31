@@ -40,17 +40,24 @@
 {
     self = [super init];
     if (self) {
-        _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
-        [_libraryMenu addItemWithTitle:_NS("Play") action:@selector(play:) keyEquivalent:@""];
-        [[_libraryMenu itemAtIndex:0] setTarget:self];
-        [_libraryMenu addItemWithTitle:_NS("Append to Playlist") action:@selector(appendToPlaylist:) keyEquivalent:@""];
-        [[_libraryMenu itemAtIndex:1] setTarget:self];
-        [_libraryMenu addItemWithTitle:_NS("Add Media...") action:@selector(addMedia:) keyEquivalent:@""];
-        [[_libraryMenu itemAtIndex:2] setTarget:self];
-        [_libraryMenu addItemWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
-        [[_libraryMenu itemAtIndex:3] setTarget:self];
+        [self createMenu];
     }
     return self;
+}
+
+- (void)createMenu
+{
+    NSMenuItem *playItem = [[NSMenuItem alloc] initWithTitle:_NS("Play") action:@selector(play:) keyEquivalent:@""];
+    playItem.target = self;
+    NSMenuItem *appendItem = [[NSMenuItem alloc] initWithTitle:_NS("Append to Playlist") action:@selector(appendToPlaylist:) keyEquivalent:@""];
+    appendItem.target = self;
+    NSMenuItem *addItem = [[NSMenuItem alloc] initWithTitle:_NS("Add Media...") action:@selector(addMedia:) keyEquivalent:@""];
+    addItem.target = self;
+    NSMenuItem *revealItem = [[NSMenuItem alloc] initWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
+    revealItem.target = self;
+
+    _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
+    _libraryMenu.itemArray = @[playItem, appendItem, revealItem, [NSMenuItem separatorItem], addItem];
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView

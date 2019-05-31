@@ -60,34 +60,27 @@
 
 - (void)createMenu
 {
-    _playlistMenu = [[NSMenu alloc] init];
-
     _playMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Play") action:@selector(play:) keyEquivalent:@""];
     _playMenuItem.target = self;
-    [_playlistMenu addItem:_playMenuItem];
 
     _removeMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Delete") action:@selector(remove:) keyEquivalent:@""];
     _removeMenuItem.target = self;
-    [_playlistMenu addItem:_removeMenuItem];
 
     _revealInFinderMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
     _revealInFinderMenuItem.target = self;
-    [_playlistMenu addItem:_revealInFinderMenuItem];
-
-    [_playlistMenu addItem:[NSMenuItem separatorItem]];
 
     _addFilesToPlaylistMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Add File...") action:@selector(addFilesToPlaylist:) keyEquivalent:@""];
     _addFilesToPlaylistMenuItem.target = self;
-    [_playlistMenu addItem:_addFilesToPlaylistMenuItem];
 
     _clearPlaylistMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Clear the playlist") action:@selector(clearPlaylist:) keyEquivalent:@""];
     _clearPlaylistMenuItem.target = self;
-    [_playlistMenu addItem:_clearPlaylistMenuItem];
 
     _playlistSortingMenuController = [[VLCPlaylistSortingMenuController alloc] init];
     _sortMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Sort") action:nil keyEquivalent:@""];
     [_sortMenuItem setSubmenu:_playlistSortingMenuController.playlistSortingMenu];
-    [_playlistMenu addItem:_sortMenuItem];
+
+    _playlistMenu = [[NSMenu alloc] init];
+    _playlistMenu.itemArray = @[_playMenuItem, _removeMenuItem, _revealInFinderMenuItem, [NSMenuItem separatorItem], _addFilesToPlaylistMenuItem, _clearPlaylistMenuItem, _sortMenuItem];
 }
 
 - (void)play:(id)sender
