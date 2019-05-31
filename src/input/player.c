@@ -50,10 +50,15 @@ static_assert(VLC_PLAYER_TITLE_MENU == INPUT_TITLE_MENU &&
               VLC_PLAYER_TITLE_INTERACTIVE == INPUT_TITLE_INTERACTIVE,
               "player/input title flag mismatch");
 
+struct vlc_player_track_priv
+{
+    struct vlc_player_track t;
+};
+
 typedef struct VLC_VECTOR(struct vlc_player_program *)
     vlc_player_program_vector;
 
-typedef struct VLC_VECTOR(struct vlc_player_track *)
+typedef struct VLC_VECTOR(struct vlc_player_track_priv *)
     vlc_player_track_vector;
 
 struct vlc_player_listener_id
@@ -120,7 +125,7 @@ struct vlc_player_input
     vlc_player_track_vector video_track_vector;
     vlc_player_track_vector audio_track_vector;
     vlc_player_track_vector spu_track_vector;
-    struct vlc_player_track *teletext_menu;
+    struct vlc_player_track_priv *teletext_menu;
 
     struct vlc_player_title_list *titles;
 
@@ -410,12 +415,13 @@ vlc_player_program_vector_FindById(vlc_player_program_vector *vec, int id,
     return NULL;
 }
 
-static struct vlc_player_track *
+static struct vlc_player_track_priv *
 vlc_player_track_New(vlc_es_id_t *id, const char *name, const es_format_t *fmt)
 {
-    struct vlc_player_track *track = malloc(sizeof(*track));
-    if (!track)
+    struct vlc_player_track_priv *trackpriv = malloc(sizeof(*trackpriv));
+    if (!trackpriv)
         return NULL;
+    struct vlc_player_track *track = &trackpriv->t;
     track->name = strdup(name);
     if (!track->name)
     {
@@ -433,34 +439,45 @@ vlc_player_track_New(vlc_es_id_t *id, const char *name, const es_format_t *fmt)
     track->es_id = vlc_es_id_Hold(id);
     track->selected = false;
 
-    return track;
+    return trackpriv;
 }
 
 struct vlc_player_track *
 vlc_player_track_Dup(const struct vlc_player_track *src)
 {
-    struct vlc_player_track *dup =
+    struct vlc_player_track_priv *duppriv =
         vlc_player_track_New(src->es_id, src->name, &src->fmt);
 
-    if (!dup)
+    if (!duppriv)
         return NULL;
-    dup->selected = src->selected;
-    return dup;
+    duppriv->t.selected = src->selected;
+    return &duppriv->t;
+}
+
+static void
+vlc_player_track_priv_Delete(struct vlc_player_track_priv *trackpriv)
+{
+    struct vlc_player_track *track = &trackpriv->t;
+    es_format_Clean(&track->fmt);
+    free((char *)track->name);
+    vlc_es_id_Release(track->es_id);
+    free(trackpriv);
 }
 
 void
 vlc_player_track_Delete(struct vlc_player_track *track)
 {
-    es_format_Clean(&track->fmt);
-    free((char *)track->name);
-    vlc_es_id_Release(track->es_id);
-    free(track);
+    struct vlc_player_track_priv *trackpriv =
+        container_of(track, struct vlc_player_track_priv, t);
+    vlc_player_track_priv_Delete(trackpriv);
 }
 
 static int
-vlc_player_track_Update(struct vlc_player_track *track,
+vlc_player_track_priv_Update(struct vlc_player_track_priv *trackpriv,
                         const char *name, const es_format_t *fmt)
 {
+    struct vlc_player_track *track = &trackpriv->t;
+
     if (strcmp(name, track->name) != 0)
     {
         char *dup = strdup(name);
@@ -1216,18 +1233,18 @@ vlc_player_input_GetTrackVector(struct vlc_player_input *input,
     }
 }
 
-static struct vlc_player_track *
+static struct vlc_player_track_priv *
 vlc_player_track_vector_FindById(vlc_player_track_vector *vec, vlc_es_id_t *id,
                                  size_t *idx)
 {
     for (size_t i = 0; i < vec->size; ++i)
     {
-        struct vlc_player_track *track = vec->data[i];
-        if (track->es_id == id)
+        struct vlc_player_track_priv *trackpriv = vec->data[i];
+        if (trackpriv->t.es_id == id)
         {
             if (idx)
                 *idx = i;
-            return track;
+            return trackpriv;
         }
     }
     return NULL;
@@ -1258,11 +1275,12 @@ vlc_player_GetTrackAt(vlc_player_t *player, enum es_format_category_e cat,
     if (!vec)
         return NULL;
     assert(index < vec->size);
-    return vec->data[index];
+    return &vec->data[index]->t;
 }
 
-const struct vlc_player_track *
-vlc_player_GetTrack(vlc_player_t *player, vlc_es_id_t *id)
+static struct vlc_player_track_priv *
+vlc_player_GetPrivTrack(vlc_player_t *player, vlc_es_id_t *id)
+
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
 
@@ -1274,6 +1292,15 @@ vlc_player_GetTrack(vlc_player_t *player, vlc_es_id_t *id)
         return NULL;
     return vlc_player_track_vector_FindById(vec, id, NULL);
 }
+
+const struct vlc_player_track *
+vlc_player_GetTrack(vlc_player_t *player, vlc_es_id_t *id)
+{
+    struct vlc_player_track_priv *trackpriv =
+        vlc_player_GetPrivTrack(player, id);
+    return trackpriv ? &trackpriv->t : NULL;
+}
+
 
 static inline const char *
 es_format_category_to_string(enum es_format_category_e cat)
@@ -1417,7 +1444,7 @@ vlc_player_input_HandleTeletextMenu(struct vlc_player_input *input,
             {
                 msg_Warn(player, "Can't handle more than one teletext menu "
                          "track. Using the last one.");
-                vlc_player_track_Delete(input->teletext_menu);
+                vlc_player_track_priv_Delete(input->teletext_menu);
             }
             input->teletext_menu = vlc_player_track_New(ev->id, ev->title,
                                                         ev->fmt);
@@ -1428,11 +1455,11 @@ vlc_player_input_HandleTeletextMenu(struct vlc_player_input *input,
             break;
         case VLC_INPUT_ES_DELETED:
         {
-            if (input->teletext_menu && input->teletext_menu->es_id == ev->id)
+            if (input->teletext_menu && input->teletext_menu->t.es_id == ev->id)
             {
                 assert(!input->teletext_enabled);
 
-                vlc_player_track_Delete(input->teletext_menu);
+                vlc_player_track_priv_Delete(input->teletext_menu);
                 input->teletext_menu = NULL;
                 vlc_player_SendEvent(player, on_teletext_menu_changed, false);
             }
@@ -1442,7 +1469,7 @@ vlc_player_input_HandleTeletextMenu(struct vlc_player_input *input,
             break;
         case VLC_INPUT_ES_SELECTED:
         case VLC_INPUT_ES_UNSELECTED:
-            if (input->teletext_menu->es_id == ev->id)
+            if (input->teletext_menu->t.es_id == ev->id)
             {
                 input->teletext_enabled = ev->action == VLC_INPUT_ES_SELECTED;
                 vlc_player_SendEvent(player, on_teletext_enabled_changed,
@@ -1461,9 +1488,9 @@ vlc_player_SetTeletextEnabled(vlc_player_t *player, bool enabled)
     if (!input || !input->teletext_menu)
         return;
     if (enabled)
-        vlc_player_SelectTrack(player, input->teletext_menu->es_id);
+        vlc_player_SelectTrack(player, input->teletext_menu->t.es_id);
     else
-        vlc_player_UnselectTrack(player, input->teletext_menu->es_id);
+        vlc_player_UnselectTrack(player, input->teletext_menu->t.es_id);
 }
 
 void
@@ -1475,7 +1502,7 @@ vlc_player_SelectTeletextPage(vlc_player_t *player, unsigned page)
 
     input_ControlPush(input->thread, INPUT_CONTROL_SET_VBI_PAGE,
         &(input_control_param_t) {
-            .vbi_page.id = input->teletext_menu->es_id,
+            .vbi_page.id = input->teletext_menu->t.es_id,
             .vbi_page.page = page,
     });
 }
@@ -1489,7 +1516,7 @@ vlc_player_SetTeletextTransparency(vlc_player_t *player, bool enabled)
 
     input_ControlPush(input->thread, INPUT_CONTROL_SET_VBI_TRANSPARENCY,
         &(input_control_param_t) {
-            .vbi_transparency.id = input->teletext_menu->es_id,
+            .vbi_transparency.id = input->teletext_menu->t.es_id,
             .vbi_transparency.enabled = enabled,
     });
 }
@@ -1547,60 +1574,60 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
         return; /* UNKNOWN_ES or DATA_ES not handled */
 
     vlc_player_t *player = input->player;
-    struct vlc_player_track *track;
+    struct vlc_player_track_priv *trackpriv;
     switch (ev->action)
     {
         case VLC_INPUT_ES_ADDED:
-            track = vlc_player_track_New(ev->id, ev->title, ev->fmt);
-            if (!track)
+            trackpriv = vlc_player_track_New(ev->id, ev->title, ev->fmt);
+            if (!trackpriv)
                 break;
 
-            if (!vlc_vector_push(vec, track))
+            if (!vlc_vector_push(vec, trackpriv))
             {
-                vlc_player_track_Delete(track);
+                vlc_player_track_priv_Delete(trackpriv);
                 break;
             }
             vlc_player_SendEvent(player, on_track_list_changed,
-                                 VLC_PLAYER_LIST_ADDED, track);
+                                 VLC_PLAYER_LIST_ADDED, &trackpriv->t);
             break;
         case VLC_INPUT_ES_DELETED:
         {
             size_t idx;
-            track = vlc_player_track_vector_FindById(vec, ev->id, &idx);
-            if (track)
+            trackpriv = vlc_player_track_vector_FindById(vec, ev->id, &idx);
+            if (trackpriv)
             {
                 vlc_player_SendEvent(player, on_track_list_changed,
-                                     VLC_PLAYER_LIST_REMOVED, track);
+                                     VLC_PLAYER_LIST_REMOVED, &trackpriv->t);
                 vlc_vector_remove(vec, idx);
-                vlc_player_track_Delete(track);
+                vlc_player_track_priv_Delete(trackpriv);
             }
             break;
         }
         case VLC_INPUT_ES_UPDATED:
-            track = vlc_player_track_vector_FindById(vec, ev->id, NULL);
-            if (!track)
+            trackpriv = vlc_player_track_vector_FindById(vec, ev->id, NULL);
+            if (!trackpriv)
                 break;
-            if (vlc_player_track_Update(track, ev->title, ev->fmt) != 0)
+            if (vlc_player_track_priv_Update(trackpriv, ev->title, ev->fmt) != 0)
                 break;
             vlc_player_SendEvent(player, on_track_list_changed,
-                                 VLC_PLAYER_LIST_UPDATED, track);
+                                 VLC_PLAYER_LIST_UPDATED, &trackpriv->t);
             break;
         case VLC_INPUT_ES_SELECTED:
-            track = vlc_player_track_vector_FindById(vec, ev->id, NULL);
-            if (track)
+            trackpriv = vlc_player_track_vector_FindById(vec, ev->id, NULL);
+            if (trackpriv)
             {
-                track->selected = true;
+                trackpriv->t.selected = true;
                 vlc_player_SendEvent(player, on_track_selection_changed,
-                                     NULL, track->es_id);
+                                     NULL, trackpriv->t.es_id);
             }
             break;
         case VLC_INPUT_ES_UNSELECTED:
-            track = vlc_player_track_vector_FindById(vec, ev->id, NULL);
-            if (track)
+            trackpriv = vlc_player_track_vector_FindById(vec, ev->id, NULL);
+            if (trackpriv)
             {
-                track->selected = false;
+                trackpriv->t.selected = false;
                 vlc_player_SendEvent(player, on_track_selection_changed,
-                                     track->es_id, NULL);
+                                     trackpriv->t.es_id, NULL);
             }
             break;
         default:
