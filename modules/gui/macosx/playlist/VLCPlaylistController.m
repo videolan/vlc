@@ -403,7 +403,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     __block vlc_playlist_item_t **items = calloc(indexes.count, sizeof(vlc_playlist_item_t *));
     __block NSUInteger pos = 0;
     [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
-        VLCPlaylistItem *item = [_playlistModel playlistItemAtIndex:idx];
+        VLCPlaylistItem *item = [self->_playlistModel playlistItemAtIndex:idx];
         items[pos++] = item.playlistItem;
     }];
 
