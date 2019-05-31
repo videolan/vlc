@@ -118,6 +118,7 @@
                 <outlet property="services" destination="1996" id="X3H-XI-xFK"/>
                 <outlet property="show_all" destination="150" id="XQ2-CW-0PI"/>
                 <outlet property="snapshot" destination="2249" id="6bO-HY-I3I"/>
+                <outlet property="sortPlaylist" destination="lkj-Wj-TYr" id="T45-2w-c0O"/>
                 <outlet property="stop" destination="5156" id="irh-Cr-vBT"/>
                 <outlet property="subtitle_bgcolor" destination="5581" id="moz-G5-DBl"/>
                 <outlet property="subtitle_bgcolorMenu" destination="5582" id="gPd-5S-3xK"/>
@@ -447,6 +448,9 @@
                                 <connections>
                                     <action selector="toggleAtoBloop:" target="-2" id="Wrv-He-P33"/>
                                 </connections>
+                            </menuItem>
+                            <menuItem title="Sort Playlist" id="lkj-Wj-TYr">
+                                <modifierMask key="keyEquivalentModifierMask"/>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="5141"/>
                             <menuItem title="Quit after Playback" id="5140">

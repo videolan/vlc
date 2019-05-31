@@ -42,6 +42,7 @@
 
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "playlist/VLCPlaylistSortingMenuController.h"
 #import "preferences/VLCSimplePrefsController.h"
 
 #import "windows/VLCAboutWindowController.h"
@@ -95,6 +96,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     VLCPlaylistController *_playlistController;
     VLCPlayerController *_playerController;
     NSTimer *_cancelRendererDiscoveryTimer;
+    VLCPlaylistSortingMenuController *_playlistSortingController;
 
     NSMenu *_playlistTableColumnsContextMenu;
 
@@ -147,6 +149,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     _rendererMenuController = [[VLCRendererMenuController alloc] init];
     _rendererMenuController.rendererNoneItem = _rendererNoneItem;
     _rendererMenuController.rendererMenu = _rendererMenu;
+    _playlistSortingController = [[VLCPlaylistSortingMenuController alloc] init];
+    _sortPlaylist.submenu = _playlistSortingController.playlistSortingMenu;
 
     [self mediaItemChanged:nil];
     [self updateTitleAndChapterMenus:nil];
@@ -382,6 +386,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_repeat setTitle: _NS("Repeat One")];
     [_loop setTitle: _NS("Repeat All")];
     [_AtoBloop setTitle: _NS("A→B Loop")];
+    [_sortPlaylist setTitle: _NS("Sort Playlist")];
     [_quitAfterPB setTitle: _NS("Quit after Playback")];
     [_fwd setTitle: _NS("Step Forward")];
     [_bwd setTitle: _NS("Step Backward")];

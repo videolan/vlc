@@ -29,17 +29,20 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistModel.h"
 #import "playlist/VLCPlaylistItem.h"
+#import "playlist/VLCPlaylistSortingMenuController.h"
 #import "windows/VLCOpenWindowController.h"
 
 @interface VLCPlaylistMenuController ()
 {
     VLCPlaylistController *_playlistController;
+    VLCPlaylistSortingMenuController *_playlistSortingMenuController;
 
     NSMenuItem *_playMenuItem;
     NSMenuItem *_revealInFinderMenuItem;
     NSMenuItem *_addFilesToPlaylistMenuItem;
     NSMenuItem *_removeMenuItem;
     NSMenuItem *_clearPlaylistMenuItem;
+    NSMenuItem *_sortMenuItem;
 }
 @end
 
@@ -80,6 +83,11 @@
     _clearPlaylistMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Clear the playlist") action:@selector(clearPlaylist:) keyEquivalent:@""];
     _clearPlaylistMenuItem.target = self;
     [_playlistMenu addItem:_clearPlaylistMenuItem];
+
+    _playlistSortingMenuController = [[VLCPlaylistSortingMenuController alloc] init];
+    _sortMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Sort") action:nil keyEquivalent:@""];
+    [_sortMenuItem setSubmenu:_playlistSortingMenuController.playlistSortingMenu];
+    [_playlistMenu addItem:_sortMenuItem];
 }
 
 - (void)play:(id)sender
