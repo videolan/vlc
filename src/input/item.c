@@ -1325,6 +1325,13 @@ void input_item_UpdateTracksInfo(input_item_t *item, const es_format_t *fmt)
     vlc_mutex_unlock( &item->lock );
 }
 
+char *input_item_CreateFilename(input_item_t *item,
+                                const char *dir, const char *filenamefmt,
+                                const char *ext)
+{
+    return input_CreateFilename(NULL, item, dir, filenamefmt, ext);
+}
+
 struct input_item_parser_id_t
 {
     input_thread_t *input;

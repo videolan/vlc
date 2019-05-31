@@ -176,6 +176,7 @@ input_item_AddOptions
 input_item_AddOpaque
 input_item_Copy
 input_item_CopyOptions
+input_item_CreateFilename
 input_item_DelInfo
 input_item_GetDuration
 input_item_GetInfo

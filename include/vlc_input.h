@@ -224,12 +224,6 @@ struct input_thread_t
     struct vlc_object_t obj;
 };
 
-/**
- * Record prefix string.
- * TODO make it configurable.
- */
-#define INPUT_RECORD_PREFIX "vlc-record-%Y-%m-%d-%Hh%Mm%Ss-$ N-$ p"
-
 /*****************************************************************************
  * Input events and variables
  *****************************************************************************/

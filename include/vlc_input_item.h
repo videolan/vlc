@@ -372,6 +372,19 @@ VLC_API input_item_t *input_item_Hold(input_item_t *);
 VLC_API void input_item_Release(input_item_t *);
 
 /**
+ * Record prefix string.
+ * TODO make it configurable.
+ */
+#define INPUT_RECORD_PREFIX "vlc-record-%Y-%m-%d-%Hh%Mm%Ss-$ N-$ p"
+
+/**
+ * This function creates a sane filename path.
+ */
+VLC_API char * input_item_CreateFilename( input_item_t *,
+                                          const char *psz_path, const char *psz_prefix,
+                                          const char *psz_extension ) VLC_USED;
+
+/**
  * input item parser opaque structure
  */
 typedef struct input_item_parser_id_t input_item_parser_id_t;
