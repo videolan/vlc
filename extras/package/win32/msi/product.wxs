@@ -276,7 +276,7 @@
                               On="uninstall" />
                 <!-- Application shortcuts -->
                 <Shortcut Id="VLCShortcut" Name="$(var.ProductName)" Target="[APPLICATIONFOLDER]vlc.exe" />
-                <Shortcut Id="SkinShortcut" Name="$(var.ProductName) skinned" Target="[APPLICATIONFOLDER]vlc.exe" Arguments="-Iskins" />
+                <!--<Shortcut Id="SkinShortcut" Name="$(var.ProductName) skinned" Target="[APPLICATIONFOLDER]vlc.exe" Arguments="-Iskins" />-->
                 <Shortcut Id="VLCCleanShortcut" Name="Reset $(var.ProductName) preferences and cache files" Target="[APPLICATIONFOLDER]vlc.exe" Arguments="--reset-config --reset-plugins-cache vlc://quit" />
                 <Shortcut Id="NEWSShortcut" Name="Release Notes" Target="[APPLICATIONFOLDER]NEWS.txt" />
                 <util:InternetShortcut Id="WebsiteShortcut" Name="VideoLAN website" Target="https://www.videolan.org/"/>
@@ -306,7 +306,7 @@
             <ComponentGroupRef Id='CompPluginsGroup' />
             <ComponentGroupRef Id='CompLocaleGroup' />
             <ComponentGroupRef Id='CompLuaGroup' />
-            <ComponentGroupRef Id='CompSkinsGroup' />
+            <!--<ComponentGroupRef Id='CompSkinsGroup' />-->
 
             <Feature Id='WEBPLUGINS' Title='Web plugins' Level='1' AllowAdvertise="no">
                 <Feature Id='ACTIVEX' Title='ActiveX plugin' Level='1' AllowAdvertise="no">
