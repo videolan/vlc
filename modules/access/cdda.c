@@ -211,6 +211,67 @@ static int DemuxControl(demux_t *demux, int query, va_list args)
     return VLC_SUCCESS;
 }
 
+/*
+ * Check for Mixed Audio/CDROM data
+ *
+ * ioctl will return first track # and last track # from last TOC
+ * (this could start > 1..  but where's the case ?)
+ *
+ * vcdev_toc stores i_tracks as the number of STORED sectors info,
+ * this is last - first track, plus one (the LEADOUT one)
+ *
+ * tracks can be DATA in mixed data/audio mode (CDROM spec, not CDDA)
+ * and this is control flag (Subcode Channel Q)
+ *
+ * first: 1 last 13
+ * track:   1 lba:         0 (        0) 00:02:00 adr: 1 control: 0 mode: -1
+ * track:   2 lba:     16462 (    65848) 03:41:37 adr: 1 control: 0 mode: -1
+ * ...
+ * track:  12 lba:    212405 (   849620) 47:14:05 adr: 1 control: 0 mode: -1
+ * track:  13 lba:    250948 (  1003792) 55:47:73 adr: 1 control: 4 mode: -1
+ * track:lout lba:    266286 (  1065144) 59:12:36 adr: 1 control: 4 mode: -1
+*/
+static int TOC_GetAudioRange(vcddev_toc_t *p_toc,
+                             int *pi_first, int *pi_last)
+{
+    if( p_toc->i_tracks < 1 )
+        return 0;
+
+    int i_first = p_toc->i_first_track;
+    int i_last = p_toc->i_last_track;
+    for(int i=i_first; i<p_toc->i_tracks; i++)
+    {
+        if((p_toc->p_sectors[i - 1].i_control & CD_ROM_DATA_FLAG) == 0)
+            break;
+        i_first++;
+    }
+    for(int i=i_last; i > 0; i--)
+    {
+        if((p_toc->p_sectors[i - 1].i_control & CD_ROM_DATA_FLAG) == 0)
+            break;
+        i_last--;
+    }
+
+    /* FIX copy protection TOC
+     * https://github.com/metabrainz/libdiscid/blob/e46249415eb6d657ecc63667b03d670a4347712f/src/toc.c#L101 */
+    do
+    {
+        vcddev_sector_t *p_last = &p_toc->p_sectors[i_last - p_toc->i_first_track];
+        vcddev_sector_t *p_lout = &p_toc->p_sectors[p_toc->i_tracks];
+        if(p_lout->i_lba > p_last->i_lba || i_last <= i_first)
+            break;
+        /* last audio is invalid, bigger than lead out */
+        i_last = i_last - 1;
+        p_toc->i_last_track = i_last;
+        p_last->i_lba -= CD_ROM_XA_INTERVAL;
+        p_toc->i_tracks--; /* change lead out */
+    } while( i_last > i_first );
+
+    *pi_first = i_first;
+    *pi_last = i_last;
+    return (i_last >= i_first) ? i_last - i_first + 1 : 0;
+}
+
 static int DemuxOpen(vlc_object_t *obj, vcddev_t *dev, unsigned track)
 {
     demux_t *demux = (demux_t *)obj;
@@ -233,15 +294,25 @@ static int DemuxOpen(vlc_object_t *obj, vcddev_t *dev, unsigned track)
         vcddev_toc_t *p_toc = ioctl_GetTOC(obj, dev, true);
         if(p_toc == NULL)
             goto error;
-        if (track > (unsigned)p_toc->i_tracks)
+
+        int i_cdda_tracks, i_cdda_first, i_cdda_last;
+        i_cdda_tracks = TOC_GetAudioRange(p_toc, &i_cdda_first, &i_cdda_last);
+
+        if (track == 0 || track > (unsigned) i_cdda_tracks)
         {
-            msg_Err(obj, "invalid track number: %u/%i", track, p_toc->i_tracks);
+            msg_Err(obj, "invalid track number: %u/%i", track, i_cdda_tracks);
             vcddev_toc_Free(p_toc);
             goto error;
         }
 
-        sys->start = p_toc->p_sectors[track - 1].i_lba;
-        sys->length = p_toc->p_sectors[track].i_lba - sys->start;
+        track--;
+        int i_first_sector = p_toc->p_sectors[track].i_lba;
+        int i_last_sector = p_toc->p_sectors[track + 1].i_lba;
+        if(i_cdda_first + track == (unsigned) i_cdda_last && p_toc->i_last_track > i_cdda_last)
+            i_last_sector -= CD_ROM_XA_INTERVAL;
+
+        sys->start = i_first_sector;
+        sys->length = i_last_sector - i_first_sector;
         vcddev_toc_Free(p_toc);
     }
 
@@ -272,6 +343,9 @@ typedef struct
 {
     vcddev_t    *vcddev;                            /* vcd device descriptor */
     vcddev_toc_t *p_toc;                            /* Tracks TOC */
+    int          i_cdda_tracks;                     /* # of audio tracks in TOC */
+    int          i_cdda_first;                      /* First .. */
+    int          i_cdda_last;                       /* Last .. */
     int          cdtextc;
     vlc_meta_t **cdtextv;
 #ifdef HAVE_LIBCDDB
@@ -455,19 +529,30 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
     const vcddev_toc_t *p_toc = sys->p_toc;
 
     /* Build title table */
-    for (int i = 0; i < p_toc->i_tracks; i++)
+    const int i_start_track_offset = sys->i_cdda_first - sys->p_toc->i_first_track;
+    for (int i = 0; i < sys->i_cdda_tracks; i++)
     {
+        if(i < i_start_track_offset)
+            continue;
+
         msg_Dbg(access, "track[%d] start=%d", i, p_toc->p_sectors[i].i_lba);
 
         /* Initial/default name */
         char *name;
 
-        if (unlikely(asprintf(&name, _("Audio CD - Track %02i"), i + 1) == -1))
+        if (unlikely(asprintf(&name, _("Audio CD - Track %02i"),
+                              i - i_start_track_offset + 1 ) == -1))
             name = NULL;
 
         /* Create playlist items */
+        int i_first_sector = p_toc->p_sectors[i].i_lba;
+        int i_last_sector = p_toc->p_sectors[i + 1].i_lba;
+        if(sys->i_cdda_first + i == sys->i_cdda_last &&
+           p_toc->i_last_track > sys->i_cdda_last)
+            i_last_sector -= CD_ROM_XA_INTERVAL;
+
         const vlc_tick_t duration =
-            (vlc_tick_t)(p_toc->p_sectors[i + 1].i_lba - p_toc->p_sectors[i].i_lba)
+            (vlc_tick_t)(i_last_sector - i_first_sector)
             * CDDA_DATA_SIZE * CLOCK_FREQ / 44100 / 2 / 2;
 
         input_item_t *item = input_item_NewDisc(access->psz_url,
@@ -492,8 +577,7 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
             free(opt);
         }
 
-        if (likely(asprintf(&opt, "cdda-last-sector=%i",
-                            p_toc->p_sectors[i + 1].i_lba) != -1))
+        if (likely(asprintf(&opt, "cdda-last-sector=%i", i_last_sector) != -1))
         {
             input_item_AddOption(item, opt, VLC_INPUT_OPTION_TRUSTED);
             free(opt);
@@ -607,7 +691,8 @@ static int AccessOpen(vlc_object_t *obj, vcddev_t *dev)
         goto error;
     }
 
-    if (sys->p_toc->i_tracks == 0)
+    sys->i_cdda_tracks = TOC_GetAudioRange(sys->p_toc, &sys->i_cdda_first, &sys->i_cdda_last);
+    if (sys->i_cdda_tracks == 0)
     {
         msg_Err(obj, "no audio tracks found");
         vcddev_toc_Free(sys->p_toc);

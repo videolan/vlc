@@ -37,6 +37,12 @@ enum {
 #define CD_ROM_XA_MODE2_F1_DATA_SIZE 2048
 #define CD_ROM_XA_MODE2_F2_DATA_SIZE 2324
 
+#define CD_ROM_XA_FRAMES   75
+#define CD_ROM_XA_INTERVAL ((60 + 90 + 2) * CD_ROM_XA_FRAMES)
+
+/* Subcode control flag */
+#define CD_ROM_DATA_FLAG    0x04
+
 /* size of a CD sector */
 #define CD_SECTOR_SIZE      CD_ROM_MODE1_DATA_SIZE
 
