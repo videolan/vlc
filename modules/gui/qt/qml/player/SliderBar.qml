@@ -40,6 +40,7 @@ Slider {
     property int barHeight: 5
 
     background: Rectangle {
+        id: sliderRect
         width: control.availableWidth
         implicitHeight: control.implicitHeight
         height: implicitHeight
@@ -50,6 +51,79 @@ Slider {
             height: control.barHeight
             color: control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.bgHover
             radius: control.barHeight
+        }
+
+        Rectangle {
+            id: bufferRect    
+            property int bufferAnimWidth: 100 * VLCStyle.scale
+            property int bufferAnimPosition: 0
+            property int bufferFrames: 1000
+            property alias animateLoading: loadingAnim.running
+
+            height: control.barHeight
+            opacity: 0.4
+            color: VLCStyle.colors.buffer
+            radius: control.barHeight
+
+            states: [
+                State {
+                    name: "buffering not started"
+                    when: player.buffering === 0
+                    PropertyChanges {
+                        target: bufferRect
+                        width: bufferAnimWidth
+                        visible: true
+                        x: (bufferAnimPosition / bufferFrames)* (parent.width - bufferAnimWidth)
+                        animateLoading: true
+                    }
+                },
+                State {
+                    name: "time to start playing known"
+                    when: player.buffering < 1
+                    PropertyChanges {
+                        target: bufferRect
+                        width: player.buffering * parent.width
+                        visible: true
+                        x: 0
+                        animateLoading: false
+                    }
+                },
+                State {
+                    name: "playing from buffer"
+                    when: player.buffering === 1
+                    PropertyChanges {
+                        target: bufferRect
+                        width: player.buffering * parent.width
+                        visible: false
+                        x: 0
+                        animateLoading: false
+                    }
+                }
+            ]
+
+            SequentialAnimation on bufferAnimPosition {
+                id: loadingAnim
+                running: bufferRect.animateLoading
+                loops: Animation.Infinite
+                PropertyAnimation {
+                    from: 0.0
+                    to: bufferRect.bufferFrames
+                    duration: 2000
+                    easing.type: "OutBounce"
+                }
+                PauseAnimation {
+                    duration: 500
+                }
+                PropertyAnimation {
+                    from: bufferRect.bufferFrames
+                    to: 0.0
+                    duration: 2000
+                    easing.type: "OutBounce"
+                }
+                PauseAnimation {
+                    duration: 500
+                }
+            }
         }
 
         Text {

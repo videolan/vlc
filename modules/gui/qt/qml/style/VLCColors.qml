@@ -77,6 +77,7 @@ Item {
 
     property color lightText: "#747474";
 
+    property color buffer: "#696969";
 
     property var colorSchemes: ["system", "day", "night"]
 
