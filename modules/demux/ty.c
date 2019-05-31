@@ -43,7 +43,7 @@
 #include <vlc_demux.h>
 #include <vlc_codec.h>
 #include <vlc_meta.h>
-#include <vlc_input.h>
+#include <vlc_input_item.h>
 #include "../codec/cc.h"
 
 #include "mpeg/pes.h"

@@ -26,7 +26,7 @@
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
-#include <vlc_input.h>
+#include <vlc_input_item.h>
 #include <vlc_plugin.h>
 
 static int Demux( demux_t *p_demux )

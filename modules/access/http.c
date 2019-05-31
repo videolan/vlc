@@ -43,7 +43,7 @@
 #include <vlc_url.h>
 #include <vlc_strings.h>
 #include <vlc_charset.h>
-#include <vlc_input.h>
+#include <vlc_input_item.h>
 #include <vlc_http.h>
 #include <vlc_interrupt.h>
 #include <vlc_keystore.h>

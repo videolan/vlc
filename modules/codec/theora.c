@@ -31,7 +31,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_sout.h>
-#include <vlc_input.h>
+#include <vlc_input_item.h>
 #include "../demux/xiph.h"
 
 #include <ogg/ogg.h>

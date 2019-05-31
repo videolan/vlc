@@ -29,7 +29,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_input.h>
+#include <vlc_input_item.h>
 #include <vlc_meta.h>
 #include <vlc_charset.h>
 #include <vlc_playlist_export.h>

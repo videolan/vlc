@@ -35,7 +35,7 @@
 #include <vlc_codec.h>
 #include <vlc_charset.h>
 #include <vlc_aout.h>
-#include <vlc_input.h>
+#include <vlc_input_item.h>
 #include <vlc_sout.h>
 #include "../demux/xiph.h"
 
