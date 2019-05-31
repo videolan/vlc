@@ -55,5 +55,5 @@ struct acoustid_fingerprint_t
 };
 typedef struct acoustid_fingerprint_t acoustid_fingerprint_t;
 
-int DoAcoustIdWebRequest( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data );
-void free_acoustid_result_t( acoustid_result_t * r );
+int acoustid_lookup_fingerprint( vlc_object_t *, acoustid_fingerprint_t * );
+void acoustid_result_release( acoustid_result_t * );

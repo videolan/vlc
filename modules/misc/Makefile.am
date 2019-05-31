@@ -19,6 +19,7 @@ misc_LTLIBRARIES += libexport_plugin.la
 libfingerprinter_plugin_la_SOURCES =  \
 	misc/webservices/acoustid.c misc/webservices/acoustid.h \
 	misc/webservices/json.c misc/webservices/json.h \
+        misc/webservices/json_helper.h \
 	misc/fingerprinter.c
 libfingerprinter_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/misc
 libfingerprinter_plugin_la_LIBADD = $(LIBM) $(LIBPTHREAD)
