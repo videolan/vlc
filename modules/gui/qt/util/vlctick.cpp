@@ -49,3 +49,8 @@ QString VLCTick::toString() const
                 .arg(min, 2, 10, QChar('0'))
                 .arg(sec, 2, 10, QChar('0'));
 }
+
+VLCTick VLCTick::scale(float scalar) const
+{
+    return VLCTick(m_ticks*scalar);
+}
