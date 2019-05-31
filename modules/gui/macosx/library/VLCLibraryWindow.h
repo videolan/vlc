@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
 @property (readwrite, weak) IBOutlet NSSplitView *mainSplitView;
 @property (readwrite, weak) IBOutlet NSStackView *videoLibraryStackView;
+@property (readwrite, strong) IBOutlet NSView *playlistView;
 @property (readwrite, weak) IBOutlet NSCollectionView *videoLibraryCollectionView;
 @property (readwrite, weak) IBOutlet NSCollectionView *recentVideoLibraryCollectionView;
 @property (readwrite, weak) IBOutlet NSCollectionView *mediaSourceCollectionView;
@@ -71,6 +72,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)repeatAction:(id)sender;
 - (IBAction)clearPlaylist:(id)sender;
 - (IBAction)openMedia:(id)sender;
+- (IBAction)showAndHidePlaylist:(id)sender;
 
 @end
 

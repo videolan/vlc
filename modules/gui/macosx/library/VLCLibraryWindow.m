@@ -57,8 +57,9 @@ const CGFloat VLCLibraryWindowMinimalHeight = 307.;
 const CGFloat VLCLibraryWindowPlaylistRowHeight = 72.;
 const CGFloat VLCLibraryWindowSmallRowHeight = 24.;
 const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
+const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 
-@interface VLCLibraryWindow () <VLCDragDropTarget>
+@interface VLCLibraryWindow () <VLCDragDropTarget, NSSplitViewDelegate>
 {
     VLCPlaylistDataSource *_playlistDataSource;
     VLCLibraryVideoDataSource *_libraryVideoDataSource;
@@ -70,6 +71,7 @@ const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
     VLCPlaylistController *_playlistController;
 
     NSRect _windowFrameBeforePlayback;
+    CGFloat _lastPlaylistWidthBeforeCollaps;
 
     VLCFSPanelController *_fspanel;
 }
@@ -191,10 +193,6 @@ const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
 
     self.upNextLabel.font = [NSFont VLClibrarySectionHeaderFont];
     self.upNextLabel.stringValue = _NS("Playlist");
-    NSAttributedString *attributedTitle = [[NSAttributedString alloc] initWithString:_NS("Clear queue")
-                                                                          attributes:@{NSFontAttributeName : [NSFont VLClibraryButtonFont],
-                                                                                       NSForegroundColorAttributeName : [NSColor VLClibraryHighlightColor]}];
-    self.clearPlaylistButton.attributedTitle = attributedTitle;
     [self updateColorsBasedOnAppearance];
     self.openMediaButton.title = _NS("Open media...");
 
@@ -203,6 +201,9 @@ const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
     _alternativeAudioViewController.segmentedControl = self.alternativeAudioSegmentedControl;
     _alternativeAudioViewController.libraryModel = mainInstance.libraryController.libraryModel;
     [_alternativeAudioViewController setupAppearance];
+
+    _mainSplitView.delegate = self;
+    _lastPlaylistWidthBeforeCollaps = VLCLibraryWindowDefaultPlaylistWidth;
 
     [self segmentedControlAction:nil];
     [self repeatStateUpdated:nil];
@@ -429,6 +430,57 @@ const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
     }
 
     return NO;
+}
+
+#pragma mark - split view delegation
+
+- (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMinimumPosition ofSubviewAt:(NSInteger)dividerIndex
+{
+    switch (dividerIndex) {
+        case 0:
+            return VLCLibraryWindowMinimalWidth;
+            break;
+
+        case 1:
+            return VLCLibraryWindowDefaultPlaylistWidth;
+            break;
+
+        default:
+            break;
+    }
+
+    return proposedMinimumPosition;
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview
+{
+    return [subview isEqual:_playlistView];
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
+{
+    return [subview isEqual:_playlistView];
+}
+
+- (void)splitViewDidResizeSubviews:(NSNotification *)notification
+{
+    _lastPlaylistWidthBeforeCollaps = [_playlistView frame].size.width;
+}
+
+- (void)togglePlaylist
+{
+    [_mainSplitView adjustSubviews];
+    CGFloat splitViewWidth = _mainSplitView.frame.size.width;
+    if ([_mainSplitView isSubviewCollapsed:_playlistView]) {
+        [_mainSplitView setPosition:splitViewWidth - _lastPlaylistWidthBeforeCollaps ofDividerAtIndex:0];
+    } else {
+        [_mainSplitView setPosition:splitViewWidth ofDividerAtIndex:0];
+    }
+}
+
+- (IBAction)showAndHidePlaylist:(id)sender
+{
+    [self togglePlaylist];
 }
 
 #pragma mark - video output controlling
