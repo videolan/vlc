@@ -114,10 +114,16 @@
 {
     if (menuItem == self.addFilesToPlaylistMenuItem) {
         return YES;
-    }
 
-    if (_playlistController.playlistModel.numberOfPlaylistItems > 0) {
-        return YES;
+    } else if (menuItem == self.clearPlaylistMenuItem) {
+        return (self.playlistTableView.numberOfRows > 0);
+
+    } else if (menuItem == self.removeMenuItem ||
+               menuItem == self.playMenuItem) {
+        return (self.playlistTableView.numberOfSelectedRows > 0);
+
+    } else if (menuItem == self.revealInFinderMenuItem) {
+        return (self.playlistTableView.numberOfSelectedRows == 1);
     }
 
     return NO;
