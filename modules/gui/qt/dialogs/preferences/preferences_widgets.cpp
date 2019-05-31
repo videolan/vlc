@@ -1264,20 +1264,25 @@ void KeySelectorControl::filter()
 {
     const QString &qs_search = actionSearch->text();
     int i_column = searchOption->itemData( searchOption->currentIndex() ).toInt();
-    QList<QTreeWidgetItem *> resultList;
-    if ( i_column == ANY_COL )
+    int i_column_count = 1;
+    if( i_column == ANY_COL )
     {
-        for( int i = 0; i < ANY_COL; i++ )
-            resultList << table->findItems( qs_search, Qt::MatchContains, i );
+        i_column = 0; // ACTION_COL
+        i_column_count = ANY_COL;
     }
-    else
+    for (QTreeWidgetItemIterator iter(table); *iter; ++iter)
     {
-        resultList = table->findItems( qs_search, Qt::MatchContains, i_column );
-    }
-    for( int i = 0; i < table->topLevelItemCount(); i++ )
-    {
-        table->topLevelItem( i )->setHidden(
-                !resultList.contains( table->topLevelItem( i ) ) );
+        QTreeWidgetItem *item = *iter;
+        bool found = false;
+        for( int idx = i_column; idx < (i_column + i_column_count); idx++ )
+        {
+            if( item->text( idx ).contains( qs_search, Qt::CaseInsensitive ) )
+            {
+                found = true;
+                break;
+            }
+        }
+        item->setHidden( !found );
     }
 }
 
