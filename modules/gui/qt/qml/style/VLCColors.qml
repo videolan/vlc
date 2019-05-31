@@ -79,6 +79,8 @@ Item {
 
     property color buffer: "#696969";
 
+    property color seekpoint: "red";
+
     property var colorSchemes: ["system", "day", "night"]
 
     state: "system"
