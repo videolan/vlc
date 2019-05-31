@@ -216,13 +216,19 @@ EXTRA_LTLIBRARIES += libvnc_plugin.la
 
 ### Optical media ###
 
-libcdda_plugin_la_SOURCES = access/cdda.c access/vcd/cdrom.c access/vcd/cdrom.h access/vcd/cdrom_internals.h
+libcdda_plugin_la_SOURCES = access/cdda.c access/vcd/cdrom.c access/vcd/cdrom.h access/vcd/cdrom_internals.h \
+                            misc/webservices/json.c misc/webservices/json.h misc/webservices/json_helper.h \
+                            misc/webservices/musicbrainz.c misc/webservices/musicbrainz.h
 libcdda_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBCDDB_CFLAGS)
 libcdda_plugin_la_LIBADD = $(LIBCDDB_LIBS) $(LIBM)
 libcdda_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 if HAVE_DARWIN
 libcdda_plugin_la_LIBADD += -liconv
 libcdda_plugin_la_LDFLAGS += -Wl,-framework,IOKit,-framework,CoreFoundation
+endif
+if HAVE_GCRYPT
+libcdda_plugin_la_CFLAGS += $(GCRYPT_CFLAGS)
+libcdda_plugin_la_LIBADD += $(GCRYPT_LIBS)
 endif
 EXTRA_LTLIBRARIES += libcdda_plugin.la
 access_LTLIBRARIES += $(LTLIBcdda)

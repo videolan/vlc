@@ -40,6 +40,7 @@ Access:
  * Added support for the RIST (Reliable Internet Stream Transport) Protocol
  * Added avaudiocapture module as a replacement for qtsound, which is removed now
  * Audio CD data tracks are now correctly detected and skipped
+ * Deprecates Audio CD CDDB lookups in favor of more accurate Musicbrainz
 
 Access output:
  * Added support for the RIST (Reliable Internet Stream Transport) Protocol
