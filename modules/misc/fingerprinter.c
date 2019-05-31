@@ -353,11 +353,11 @@ static void *Run( void *opaque )
                 DoFingerprint( p_fingerprinter, &acoustid_print, psz_uri );
                 free( psz_uri );
 
-                DoAcoustIdWebRequest( VLC_OBJECT(p_fingerprinter), &acoustid_print );
+                acoustid_lookup_fingerprint( VLC_OBJECT(p_fingerprinter), &acoustid_print );
                 fill_metas_with_results( p_data, &acoustid_print );
 
                 for( unsigned j = 0; j < acoustid_print.results.count; j++ )
-                     free_acoustid_result_t( &acoustid_print.results.p_results[j] );
+                     acoustid_result_release( &acoustid_print.results.p_results[j] );
                 if( acoustid_print.results.count )
                     free( acoustid_print.results.p_results );
                 free( acoustid_print.psz_fingerprint );
