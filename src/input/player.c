@@ -53,6 +53,7 @@ static_assert(VLC_PLAYER_TITLE_MENU == INPUT_TITLE_MENU &&
 struct vlc_player_track_priv
 {
     struct vlc_player_track t;
+    vout_thread_t *vout; /* weak reference */
 };
 
 typedef struct VLC_VECTOR(struct vlc_player_program *)
@@ -1301,6 +1302,39 @@ vlc_player_GetTrack(vlc_player_t *player, vlc_es_id_t *id)
     return trackpriv ? &trackpriv->t : NULL;
 }
 
+vout_thread_t *
+vlc_player_GetVoutFromEsId(vlc_player_t *player, vlc_es_id_t *es_id)
+{
+    struct vlc_player_track_priv *trackpriv =
+        vlc_player_GetPrivTrack(player, es_id);
+    return trackpriv ? trackpriv->vout : NULL;
+}
+
+vlc_es_id_t *
+vlc_player_GetEsIdFromVout(vlc_player_t *player, vout_thread_t *vout)
+{
+    struct vlc_player_input *input = vlc_player_get_input_locked(player);
+
+    if (!input)
+        return NULL;
+
+    static const enum es_format_category_e cats[] = {
+        VIDEO_ES, AUDIO_ES /* for visualisation filters */
+    };
+    for (size_t i = 0; i < ARRAY_SIZE(cats); ++i)
+    {
+        enum es_format_category_e cat = cats[i];
+        vlc_player_track_vector *vec =
+            vlc_player_input_GetTrackVector(input, cat);
+        for (size_t j = 0; j < vec->size; ++j)
+        {
+            struct vlc_player_track_priv *trackpriv = vec->data[j];
+            if (trackpriv->vout == vout)
+                return trackpriv->t.es_id;
+        }
+    }
+    return NULL;
+}
 
 static inline const char *
 es_format_category_to_string(enum es_format_category_e cat)
@@ -1828,9 +1862,18 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
     };
 
     vlc_player_t *player = input->player;
+
+    vlc_player_track_vector *vec =
+        vlc_player_input_GetTrackVector(input, vlc_es_id_GetCat(ev->id));
+    struct vlc_player_track_priv *trackpriv =
+        vec ? vlc_player_track_vector_FindById(vec, ev->id, NULL) : NULL;
+    if (!trackpriv)
+        return;
+
     switch (ev->action)
     {
         case VLC_INPUT_EVENT_VOUT_ADDED:
+            trackpriv->vout = ev->vout;
             vlc_player_SendEvent(player, on_vout_changed,
                                  VLC_PLAYER_VOUT_STARTED, ev->vout, ev->id);
 
@@ -1853,6 +1896,7 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
                 var_DelCallback(ev->vout, osd_vars[i],
                                 vlc_player_VoutOSDCallback, player);
 
+            trackpriv->vout = NULL;
             vlc_player_SendEvent(player, on_vout_changed,
                                  VLC_PLAYER_VOUT_STOPPED, ev->vout, ev->id);
             break;

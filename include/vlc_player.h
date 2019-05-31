@@ -1674,6 +1674,40 @@ VLC_API const struct vlc_player_track *
 vlc_player_GetTrack(vlc_player_t *player, vlc_es_id_t *es_id);
 
 /**
+ * Get and the video output used by a ES identifier
+ *
+ * @warning A same vout can be associated with multiple ES during the lifetime
+ * of the player. The information returned by this function becomes invalid
+ * when the player is unlocked. The returned vout doesn't need to be released,
+ * but must be held with vout_Hold() if it is accessed after the player is
+ * unlocked.
+ *
+ * @param player locked player instance
+ * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
+ * vlc_player_GetTrackAt())
+ * @return a valid vout or NULL (if the track is disabled, it it's not a video
+ * track, or if the vout failed to start)
+ */
+VLC_API vout_thread_t *
+vlc_player_GetVoutFromEsId(vlc_player_t *player, vlc_es_id_t *es_id);
+
+/**
+ * Get the ES identifier of a video output
+ *
+ * @warning A same vout can be associated with multiple ES during the lifetime
+ * of the player. The information returned by this function becomes invalid
+ * when the player is unlocked. The returned es_id doesn't need to be released,
+ * but must be held with vlc_es_id_Hold() if it accessed after the player is
+ * unlocked.
+ *
+ * @param player locked player instance
+ * @param vout vout (can't be NULL)
+ * @return a valid ES identifier or NULL (if the vout is stopped)
+ */
+VLC_API vlc_es_id_t *
+vlc_player_GetEsIdFromVout(vlc_player_t *player, vout_thread_t *vout);
+
+/**
  * Helper to get the selected track from an ES category
  *
  * @warning The player can have more than one selected track for a same ES
