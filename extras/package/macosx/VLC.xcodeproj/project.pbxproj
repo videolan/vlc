@@ -486,7 +486,6 @@
 		7D445D8A22032B9200263D34 /* VLCPlaylistTableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCPlaylistTableView.m; sourceTree = "<group>"; };
 		7D445D8C2203375100263D34 /* VLCPlaylistMenuController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCPlaylistMenuController.h; sourceTree = "<group>"; };
 		7D445D8D2203375100263D34 /* VLCPlaylistMenuController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCPlaylistMenuController.m; sourceTree = "<group>"; };
-		7D445D8F220339D400263D34 /* VLCPlaylistMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCPlaylistMenu.xib; sourceTree = "<group>"; };
 		7D460B0A229EB4C700097948 /* VLCDragDropView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCDragDropView.h; sourceTree = "<group>"; };
 		7D460B0B229EB4C700097948 /* VLCDragDropView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCDragDropView.m; sourceTree = "<group>"; };
 		7D5678EB1D5BA1DC002698F3 /* VLCApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCApplication.h; sourceTree = "<group>"; };
@@ -1518,7 +1517,6 @@
 				6B8224091E4D2A9000833BE1 /* MainMenu.xib */,
 				7D713D332201BB130042BEB7 /* VLCLibraryWindow.xib */,
 				7D0F64002201F66D00FDB91F /* VLCPlaylistTableCellView.xib */,
-				7D445D8F220339D400263D34 /* VLCPlaylistMenu.xib */,
 				7D0F64052202047900FDB91F /* VLCLibraryCollectionViewItem.xib */,
 				7DE2F0482282D7980040DD0A /* VLCLibraryTableCellView.xib */,
 				7DE82E7A228437AA002D341A /* VLCLibraryAlbumTableCellView.xib */,

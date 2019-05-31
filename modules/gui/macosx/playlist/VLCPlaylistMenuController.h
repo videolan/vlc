@@ -29,21 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCPlaylistMenuController : NSObject
 
 @property (readwrite, weak) NSTableView *playlistTableView;
-
-@property (readwrite, strong) IBOutlet NSMenu *playlistMenu;
-@property (readwrite, weak) IBOutlet NSMenuItem *playMenuItem;
-@property (readwrite, weak) IBOutlet NSMenuItem *revealInFinderMenuItem;
-@property (readwrite, weak) IBOutlet NSMenuItem *addFilesToPlaylistMenuItem;
-@property (readwrite, weak) IBOutlet NSMenuItem *removeMenuItem;
-@property (readwrite, weak) IBOutlet NSMenuItem *clearPlaylistMenuItem;
-@property (readwrite, weak) IBOutlet NSMenuItem *sortPlaylistMenuItem;
-@property (readwrite, weak) IBOutlet NSMenuItem *sortPlaylistMenu;
-
-- (IBAction)play:(id)sender;
-- (IBAction)remove:(id)sender;
-- (IBAction)revealInFinder:(id)sender;
-- (IBAction)addFilesToPlaylist:(id)sender;
-- (IBAction)clearPlaylist:(id)sender;
+@property (readonly) NSMenu *playlistMenu;
 
 @end
 

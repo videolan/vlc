@@ -34,6 +34,12 @@
 @interface VLCPlaylistMenuController ()
 {
     VLCPlaylistController *_playlistController;
+
+    NSMenuItem *_playMenuItem;
+    NSMenuItem *_revealInFinderMenuItem;
+    NSMenuItem *_addFilesToPlaylistMenuItem;
+    NSMenuItem *_removeMenuItem;
+    NSMenuItem *_clearPlaylistMenuItem;
 }
 @end
 
@@ -43,23 +49,40 @@
 {
     self = [super init];
     if (self) {
+        [self createMenu];
         _playlistController = [[VLCMain sharedInstance] playlistController];
-        [[NSBundle mainBundle] loadNibNamed:@"VLCPlaylistMenu" owner:self topLevelObjects:nil];
     }
     return self;
 }
 
-- (void)awakeFromNib
+- (void)createMenu
 {
-    [_playMenuItem setTitle:_NS("Play")];
-    [_revealInFinderMenuItem setTitle:_NS("Reveal in Finder")];
-    [_addFilesToPlaylistMenuItem setTitle:_NS("Add File...")];
-    [_removeMenuItem setTitle:_NS("Delete")];
-    [_clearPlaylistMenuItem setTitle:_NS("Clear the playlist")];
-    [_sortPlaylistMenuItem setTitle:_NS("Sort by")];
+    _playlistMenu = [[NSMenu alloc] init];
+
+    _playMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Play") action:@selector(play:) keyEquivalent:@""];
+    _playMenuItem.target = self;
+    [_playlistMenu addItem:_playMenuItem];
+
+    _removeMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Delete") action:@selector(remove:) keyEquivalent:@""];
+    _removeMenuItem.target = self;
+    [_playlistMenu addItem:_removeMenuItem];
+
+    _revealInFinderMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
+    _revealInFinderMenuItem.target = self;
+    [_playlistMenu addItem:_revealInFinderMenuItem];
+
+    [_playlistMenu addItem:[NSMenuItem separatorItem]];
+
+    _addFilesToPlaylistMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Add File...") action:@selector(addFilesToPlaylist:) keyEquivalent:@""];
+    _addFilesToPlaylistMenuItem.target = self;
+    [_playlistMenu addItem:_addFilesToPlaylistMenuItem];
+
+    _clearPlaylistMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Clear the playlist") action:@selector(clearPlaylist:) keyEquivalent:@""];
+    _clearPlaylistMenuItem.target = self;
+    [_playlistMenu addItem:_clearPlaylistMenuItem];
 }
 
-- (IBAction)play:(id)sender
+- (void)play:(id)sender
 {
     NSInteger selectedRow = self.playlistTableView.selectedRow;
 
@@ -70,7 +93,7 @@
     }
 }
 
-- (IBAction)remove:(id)sender
+- (void)remove:(id)sender
 {
     if (self.playlistTableView.selectedRow == -1)
         return;
@@ -78,7 +101,7 @@
     [_playlistController removeItemsAtIndexes:self.playlistTableView.selectedRowIndexes];
 }
 
-- (IBAction)revealInFinder:(id)sender
+- (void)revealInFinder:(id)sender
 {
     NSInteger selectedRow = self.playlistTableView.selectedRow;
 
@@ -93,7 +116,7 @@
     [[NSWorkspace sharedWorkspace] selectFile:path inFileViewerRootedAtPath:path];
 }
 
-- (IBAction)addFilesToPlaylist:(id)sender
+- (void)addFilesToPlaylist:(id)sender
 {
     NSInteger selectedRow = self.playlistTableView.selectedRow;
 
@@ -104,24 +127,24 @@
     }];
 }
 
-- (IBAction)clearPlaylist:(id)sender
+- (void)clearPlaylist:(id)sender
 {
     [_playlistController clearPlaylist];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-    if (menuItem == self.addFilesToPlaylistMenuItem) {
+    if (menuItem == _addFilesToPlaylistMenuItem) {
         return YES;
 
-    } else if (menuItem == self.clearPlaylistMenuItem) {
+    } else if (menuItem == _clearPlaylistMenuItem) {
         return (self.playlistTableView.numberOfRows > 0);
 
-    } else if (menuItem == self.removeMenuItem ||
-               menuItem == self.playMenuItem) {
+    } else if (menuItem == _removeMenuItem ||
+               menuItem == _playMenuItem) {
         return (self.playlistTableView.numberOfSelectedRows > 0);
 
-    } else if (menuItem == self.revealInFinderMenuItem) {
+    } else if (menuItem == _revealInFinderMenuItem) {
         return (self.playlistTableView.numberOfSelectedRows == 1);
     }
 
