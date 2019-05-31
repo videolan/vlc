@@ -25,7 +25,7 @@
 #endif
 
 #include <vlc_thumbnailer.h>
-#include <vlc_input.h>
+#include "input_internal.h"
 #include "misc/background_worker.h"
 
 struct vlc_thumbnailer_t

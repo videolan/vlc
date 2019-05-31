@@ -26,6 +26,7 @@
 
 #include <vlc_common.h>
 #include <vlc_stream.h>
+#include "input_internal.h"
 
 stream_t *vlc_stream_CustomNew(vlc_object_t *parent,
                                void (*destroy)(stream_t *), size_t extra_size,

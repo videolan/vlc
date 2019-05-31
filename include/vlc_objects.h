@@ -193,10 +193,6 @@ static inline libvlc_int_t *vlc_object_instance(vlc_object_t *obj)
 }
 #define vlc_object_instance(o) vlc_object_instance(VLC_OBJECT(o))
 
-/* Here for backward compatibility. TODO: Move to <vlc_input.h>! */
-VLC_API input_thread_t *input_Hold(input_thread_t *input);
-VLC_API void input_Release(input_thread_t *input);
-
 /* Here for backward compatibility. TODO: Move to <vlc_vout.h>! */
 VLC_API vout_thread_t *vout_Hold(vout_thread_t *vout);
 VLC_API void vout_Release(vout_thread_t *vout);
@@ -210,8 +206,6 @@ VLC_DEPRECATED static inline void *vlc_object_hold(vlc_object_t *o)
 {
     const char *tn = vlc_object_typename(o);
 
-    if (!strcmp(tn, "input"))
-        input_Hold((input_thread_t *)o);
     if (!strcmp(tn, "audio output"))
         aout_Hold((audio_output_t *)o);
     if (!strcmp(tn, "video output"))
@@ -223,8 +217,6 @@ static inline void vlc_object_release(vlc_object_t *o)
 {
     const char *tn = vlc_object_typename(o);
 
-    if (!strcmp(tn, "input"))
-        input_Release((input_thread_t *)o);
     if (!strcmp(tn, "audio output"))
         aout_Release((audio_output_t *)o);
     if (!strcmp(tn, "video output"))

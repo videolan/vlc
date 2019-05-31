@@ -43,7 +43,6 @@
 #endif
 
 /* Needed by vlc_strfinput */
-#include <vlc_input.h>
 #include <vlc_meta.h>
 #include <vlc_aout.h>
 #include <vlc_memstream.h>
@@ -54,6 +53,7 @@
 #include <vlc_player.h>
 #include <libvlc.h>
 #include <errno.h>
+#include "../input/input_internal.h"
 
 static const struct xml_entity_s
 {

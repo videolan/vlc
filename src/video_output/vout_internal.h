@@ -33,6 +33,7 @@
 #include "statistic.h"
 #include "chrono.h"
 #include "../clock/clock.h"
+#include "../input/input_internal.h"
 
 /* It should be high enough to absorbe jitter due to difficult picture(s)
  * to decode but not too high as memory is not that cheap.

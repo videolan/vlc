@@ -31,10 +31,10 @@
 #include <libvlc.h>
 #include <vlc_codec.h>
 #include <vlc_meta.h>
-#include <vlc_input.h>
 #include <vlc_url.h>
 #include <vlc_modules.h>
 #include <vlc_strings.h>
+#include "input_internal.h"
 
 typedef const struct
 {
