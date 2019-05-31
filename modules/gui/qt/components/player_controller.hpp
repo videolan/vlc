@@ -411,6 +411,11 @@ private:
     Q_DECLARE_PRIVATE(PlayerController)
     QScopedPointer<PlayerControllerPrivate> d_ptr;
     QSignalMapper *menusAudioMapper; //used by VLCMenuBar
+
+    /* updateArt gui request */
+    input_fetcher_callbacks_t input_fetcher_cbs;
+    static void onArtFetchEnded_callback(input_item_t *, bool fetched, void *userdata);
+    void onArtFetchEnded(input_item_t *, bool fetched);
 };
 
 #endif

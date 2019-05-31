@@ -886,6 +886,8 @@ PlayerController::PlayerController( intf_thread_t *_p_intf )
     /* Audio Menu */
     menusAudioMapper = new QSignalMapper(this);
     CONNECT( menusAudioMapper, mapped(const QString&), this, menusUpdateAudio(const QString&) );
+
+    input_fetcher_cbs.on_art_fetch_ended = onArtFetchEnded_callback;
 }
 
 PlayerController::~PlayerController()
@@ -1351,16 +1353,13 @@ void PlayerController::snapshot()
 void PlayerController::requestArtUpdate( input_item_t *p_item, bool b_forced )
 {
     Q_D(PlayerController);
-    bool b_current_item = false;
+
     if ( !p_item )
     {
         /* default to current item */
         vlc_player_locker lock{ d->m_player };
         if ( vlc_player_IsStarted( d->m_player ) )
-        {
             p_item = vlc_player_GetCurrentMedia( d->m_player );
-            b_current_item = true;
-        }
     }
 
     if ( p_item )
@@ -1375,14 +1374,29 @@ void PlayerController::requestArtUpdate( input_item_t *p_item, bool b_forced )
         libvlc_ArtRequest( vlc_object_instance(d->p_intf), p_item,
                            (b_forced) ? META_REQUEST_OPTION_SCOPE_ANY
                                       : META_REQUEST_OPTION_NONE,
-                           NULL, NULL );
-        /* No input will signal the cover art to update,
-             * let's do it ourself */
-        if ( b_current_item )
-            d->UpdateArt( p_item );
-        else
-            emit artChanged( p_item );
+                           &input_fetcher_cbs, this );
     }
+}
+
+void PlayerController::onArtFetchEnded_callback(input_item_t *p_item, bool fetched,
+                                                void *userdata)
+{
+    PlayerController *me = reinterpret_cast<PlayerController *>(userdata);
+    me->onArtFetchEnded(p_item, fetched);
+}
+
+void PlayerController::onArtFetchEnded(input_item_t *p_item, bool)
+{
+    Q_D(PlayerController);
+
+    vlc_player_locker lock{ d->m_player };
+    bool b_current_item = (p_item == vlc_player_GetCurrentMedia( d->m_player ));
+    /* No input will signal the cover art to update,
+         * let's do it ourself */
+    if ( b_current_item )
+        d->UpdateArt( p_item );
+    else
+        emit artChanged( p_item );
 }
 
 const QString PlayerController::decodeArtURL( input_item_t *p_item )
