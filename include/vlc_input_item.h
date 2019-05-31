@@ -371,6 +371,66 @@ VLC_API input_item_t *input_item_Hold(input_item_t *);
 /** Releases an input item, i.e. decrements its reference counter. */
 VLC_API void input_item_Release(input_item_t *);
 
+/**
+ * input item parser opaque structure
+ */
+typedef struct input_item_parser_id_t input_item_parser_id_t;
+
+/**
+ * input item parser callbacks
+ */
+typedef struct input_item_parser_cbs_t
+{
+    /**
+     * Event received when the parser ends
+     *
+     * @note This callback is mandatory.
+     *
+     * @param item the parsed item
+     * @param status VLC_SUCCESS in case of success, an error otherwise
+     * @param userdata user data set by input_item_Parse()
+     */
+    void (*on_ended)(input_item_t *item, int status, void *userdata);
+
+    /**
+     * Event received when a new subtree is added
+     *
+     * @note This callback is optional.
+     *
+     * @param item the parsed item
+     * @param subtree sub items of the current item
+     * @param userdata user data set by input_item_Parse()
+     */
+    void (*on_subtree_added)(input_item_t *item, input_item_node_t *subtree, void *userdata);
+} input_item_parser_cbs_t;
+
+/**
+ * Parse an item asynchronously
+ *
+ * @note The parsing is done asynchronously. The user can call
+ * input_item_parser_id_Release() before receiving the on_ended() event in
+ * order to interrupt it.
+ *
+ * @param item the item to parse
+ * @param parent the parent obj
+ * @param cbs callbacks to be notified of the end of the parsing
+ * @param userdata opaque data used by parser callbacks
+ *
+ * @return a parser instance or NULL in case of error, the parser needs to be
+ * released with input_item_parser_id_Release()
+ */
+VLC_API input_item_parser_id_t *
+input_item_Parse(input_item_t *item, vlc_object_t *parent,
+                 const input_item_parser_cbs_t *cbs, void *userdata) VLC_USED;
+
+/**
+ * Release (and interrupt if needed) a parser
+ *
+ * @param parser the parser returned by input_item_Parse
+ */
+VLC_API void
+input_item_parser_id_Release(input_item_parser_id_t *parser);
+
 typedef enum input_item_meta_request_option_t
 {
     META_REQUEST_OPTION_NONE          = 0x00,
