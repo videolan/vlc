@@ -300,10 +300,14 @@ NSString * getVolumeTypeFromMountPath(NSString *mountPath)
         return @"";
     }
 
-    CFMutableDictionaryRef matchingDict = IOBSDNameMatching(kIOMasterPortDefault, 0, stf.f_mntfromname);
-    io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
+    /* the matching dictionary wants the BSD name without its path, so strip it */
+    NSString *bsdMount = [NSString stringWithUTF8String:stf.f_mntfromname];
+    NSString *bsdName = [bsdMount lastPathComponent];
+
+    CFMutableDictionaryRef matchingDict = IOBSDNameMatching(kIOMasterPortDefault, 0, [bsdName UTF8String]);
     NSString *returnValue;
 
+    io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
     if (IO_OBJECT_NULL != service) {
         if (IOObjectConformsTo(service, kIOCDMediaClass))
             returnValue = kVLCMediaAudioCD;
@@ -317,7 +321,6 @@ NSString * getVolumeTypeFromMountPath(NSString *mountPath)
             return returnValue;
     }
 
-    out:
     if ([mountPath rangeOfString:@"VIDEO_TS" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
         returnValue = kVLCMediaVideoTSFolder;
     else if ([mountPath rangeOfString:@"BDMV" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
@@ -367,8 +370,12 @@ NSString * getBSDNodeFromMountPath(NSString *mountPath)
     if (ret != 0) {
         return @"";
     }
+    /* the provided BSD mount path doesn't include the r prefix we need */
+    NSString *bsdMount = [NSString stringWithUTF8String:stf.f_mntfromname];
+    NSString *bsdName = [bsdMount lastPathComponent];
+    NSString *fixedBsdName = [NSString stringWithFormat:@"/dev/r%@", bsdName];
 
-    return [NSString stringWithFormat:@"r%s", stf.f_mntfromname];
+    return fixedBsdName;
 }
 
 NSString * OSXStringKeyToString(NSString *theString)
