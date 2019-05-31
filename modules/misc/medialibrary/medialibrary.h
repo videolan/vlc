@@ -50,24 +50,24 @@ private:
     {
         ParseContext( MetadataExtractor* mde, medialibrary::parser::IItem& item )
             : needsProbing( false )
-            , state( INIT_S )
+            , success( false )
             , mde( mde )
             , item( item )
             , inputItem( nullptr, &input_item_Release )
-            , input( nullptr, &input_Close )
+            , inputParser( nullptr, &input_item_parser_id_Release )
         {
         }
 
         vlc::threads::condition_variable m_cond;
         vlc::threads::mutex m_mutex;
         bool needsProbing;
-        input_state_e state;
+        bool success;
         MetadataExtractor* mde;
         medialibrary::parser::IItem& item;
         std::unique_ptr<input_item_t, decltype(&input_item_Release)> inputItem;
         // Needs to be last to be destroyed first, otherwise a late callback
         // could use some already destroyed fields
-        std::unique_ptr<input_thread_t, decltype(&input_Close)> input;
+        std::unique_ptr<input_item_parser_id_t, decltype(&input_item_parser_id_Release)> inputParser;
     };
 
 public:
@@ -85,12 +85,13 @@ private:
     virtual void onFlushing() override;
     virtual void onRestarted() override;
 
-    void onInputEvent( const vlc_input_event* event, ParseContext& ctx );
+    void onParserEnded( ParseContext& ctx, int status );
     void addSubtree( ParseContext& ctx, input_item_node_t *root );
     void populateItem( medialibrary::parser::IItem& item, input_item_t* inputItem );
 
-    static void onInputEvent( input_thread_t *input,
-                              const struct vlc_input_event *event, void *user_data );
+    static void onParserEnded( input_item_t *, int status, void *user_data );
+    static void onParserSubtreeAdded( input_item_t *, input_item_node_t *subtree,
+                                      void *user_data );
 
 private:
     vlc_object_t* m_obj;

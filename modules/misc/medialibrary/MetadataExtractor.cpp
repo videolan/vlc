@@ -29,31 +29,14 @@ MetadataExtractor::MetadataExtractor( vlc_object_t* parent )
 {
 }
 
-void MetadataExtractor::onInputEvent( const vlc_input_event* ev,
-                                      ParseContext& ctx )
+void MetadataExtractor::onParserEnded( ParseContext& ctx, int status )
 {
-    switch ( ev->type )
-    {
-        case INPUT_EVENT_SUBITEMS:
-            addSubtree( ctx, ev->subitems );
-            break;
-        case INPUT_EVENT_STATE:
-            {
-                vlc::threads::mutex_locker lock( ctx.m_mutex );
-                ctx.state = ev->state;
-            }
-            break;
-        case INPUT_EVENT_DEAD:
-            {
-                vlc::threads::mutex_locker lock( ctx.m_mutex );
-                // We need to probe the item now, but not from the input thread
-                ctx.needsProbing = true;
-            }
-            ctx.m_cond.signal();
-            break;
-        default:
-            break;
-    }
+    vlc::threads::mutex_locker lock( ctx.m_mutex );
+
+    // We need to probe the item now, but not from the input thread
+    ctx.success = status == VLC_SUCCESS;
+    ctx.needsProbing = true;
+    ctx.m_cond.signal();
 }
 
 void MetadataExtractor::populateItem( medialibrary::parser::IItem& item, input_item_t* inputItem )
@@ -128,12 +111,18 @@ void MetadataExtractor::populateItem( medialibrary::parser::IItem& item, input_i
     }
 }
 
-void MetadataExtractor::onInputEvent( input_thread_t*,
-                                      const struct vlc_input_event *event,
-                                      void *data )
+void MetadataExtractor::onParserEnded( input_item_t *, int status, void *data )
 {
     auto* ctx = static_cast<ParseContext*>( data );
-    ctx->mde->onInputEvent( event, *ctx );
+    ctx->mde->onParserEnded( *ctx, status );
+}
+
+void MetadataExtractor::onParserSubtreeAdded( input_item_t *,
+                                              input_item_node_t *subtree,
+                                              void *data )
+{
+    auto* ctx = static_cast<ParseContext*>( data );
+    ctx->mde->addSubtree( *ctx, subtree );
 }
 
 void MetadataExtractor::addSubtree( ParseContext& ctx, input_item_node_t *root )
@@ -157,16 +146,19 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
     if ( ctx.inputItem == nullptr )
         return medialibrary::parser::Status::Fatal;
 
-    ctx.inputItem->i_preparse_depth = 1;
-    ctx.input = {
-        input_CreatePreparser( m_obj, &MetadataExtractor::onInputEvent,
-                               std::addressof( ctx ), ctx.inputItem.get() ),
-        &input_Close
+    const input_item_parser_cbs_t cbs = {
+        &MetadataExtractor::onParserEnded,
+        &MetadataExtractor::onParserSubtreeAdded,
     };
-    if ( ctx.input == nullptr )
-        return medialibrary::parser::Status::Fatal;
 
-    input_Start( ctx.input.get() );
+    ctx.inputItem->i_preparse_depth = 1;
+    ctx.inputParser = {
+        input_item_Parse( ctx.inputItem.get(), m_obj, &cbs,
+                          std::addressof( ctx ) ),
+        &input_item_parser_id_Release
+    };
+    if ( ctx.inputParser == nullptr )
+        return medialibrary::parser::Status::Fatal;
 
     {
         vlc::threads::mutex_locker lock( ctx.m_mutex );
@@ -178,23 +170,13 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
             {
                 msg_Dbg( m_obj, "Timed out while extracting %s metadata",
                          item.mrl().c_str() );
-                ctx.state = ERROR_S;
-                input_Stop( ctx.input.get() );
                 break;
-            }
-            if ( ctx.needsProbing == true )
-            {
-                if ( ctx.state == END_S || ctx.state == ERROR_S )
-                    break;
-                // Reset the probing flag for next event
-                ctx.needsProbing = false;
             }
         }
     }
 
-    if ( ctx.state == ERROR_S )
+    if ( !ctx.success )
         return medialibrary::parser::Status::Fatal;
-    assert( ctx.state == END_S );
 
     populateItem( item, ctx.inputItem.get() );
 
