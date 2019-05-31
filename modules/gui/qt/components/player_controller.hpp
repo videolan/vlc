@@ -114,7 +114,6 @@ public:
     Q_PROPERTY(bool seekable READ isSeekable NOTIFY seekableChanged)
     Q_PROPERTY(bool rewindable READ isRewindable NOTIFY rewindableChanged)
     Q_PROPERTY(bool pausable READ isPausable NOTIFY pausableChanged)
-    Q_PROPERTY(bool recordable READ isRecordable NOTIFY recordableChanged)
     Q_PROPERTY(bool ratechangable READ isRateChangable NOTIFY rateChangableChanged)
 
     //tracks
@@ -165,7 +164,6 @@ public:
     Q_PROPERTY(bool hasAudioVisualization READ hasAudioVisualization NOTIFY hasAudioVisualizationChanged)
 
     //misc
-    Q_PROPERTY(bool recording READ isRecording WRITE setRecording NOTIFY recordingChanged)
     Q_PROPERTY(ABLoopState ABloopState READ getABloopState WRITE setABloopState NOTIFY ABLoopStateChanged)
     Q_PROPERTY(VLCTick ABLoopA READ getABLoopA NOTIFY ABLoopAChanged)
     Q_PROPERTY(VLCTick ABLoopB READ getABLoopB NOTIFY ABLoopBChanged)
@@ -257,7 +255,6 @@ public slots:
     bool isSeekable() const;
     bool isRewindable() const;
     bool isPausable() const;
-    bool isRecordable() const;
     bool isRateChangable() const;
 
     //tracks
