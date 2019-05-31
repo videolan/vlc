@@ -72,11 +72,10 @@
 
 - (IBAction)remove:(id)sender
 {
-    NSInteger selectedRow = self.playlistTableView.selectedRow;
+    if (self.playlistTableView.selectedRow == -1)
+        return;
 
-    if (selectedRow != -1) {
-        [_playlistController removeItemAtIndex:selectedRow];
-    }
+    [_playlistController removeItemsAtIndexes:self.playlistTableView.selectedRowIndexes];
 }
 
 - (IBAction)revealInFinder:(id)sender

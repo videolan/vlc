@@ -132,10 +132,10 @@ extern NSString *VLCPlaylistItemsRemoved;
       startPlayback:(BOOL)startPlayback;
 
 /**
- * Remove the item at the given index (if any)
- * @param index the index to remove
+ * Remove all items at the given index set
+ * @param indexes Set of indexes to remove
  */
-- (void)removeItemAtIndex:(size_t)index;
+- (void)removeItemsAtIndexes:(NSIndexSet *)indexes;
 
 /**
  * Clear the entire playlist

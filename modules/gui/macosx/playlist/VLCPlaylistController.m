@@ -395,14 +395,26 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     return ret;
 }
 
-- (void)removeItemAtIndex:(size_t)index
+- (void)removeItemsAtIndexes:(NSIndexSet *)indexes
 {
+    if (indexes.count == 0)
+        return;
+
+    __block vlc_playlist_item_t **items = calloc(indexes.count, sizeof(vlc_playlist_item_t *));
+    __block NSUInteger pos = 0;
+    [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+        VLCPlaylistItem *item = [_playlistModel playlistItemAtIndex:idx];
+        items[pos++] = item.playlistItem;
+    }];
+
     /* note: we don't remove the cached data from the model here
      * because this will be done asynchronously through the callback */
 
     vlc_playlist_Lock(_p_playlist);
-    vlc_playlist_Remove(_p_playlist, index, 1);
+    vlc_playlist_RequestRemove(_p_playlist, items, pos, indexes.firstIndex);
     vlc_playlist_Unlock(_p_playlist);
+
+    free(items);
 }
 
 - (void)clearPlaylist

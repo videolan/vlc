@@ -70,14 +70,8 @@
         case NSDeleteCharFunctionKey:
         case NSBackspaceCharacter:
         {
-            if (selectedIndexes.count == 1) {
-                [[[VLCMain sharedInstance] playlistController] removeItemAtIndex:indexOfSelectedItem];
-            } else {
-                VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
-                [selectedIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
-                    [playlistController removeItemAtIndex:idx];
-                }];
-            }
+            VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+            [playlistController removeItemsAtIndexes:selectedIndexes];
             break;
         }
 
