@@ -43,7 +43,6 @@
 #ifdef _WIN32
 #  include <vlc_charset.h>
 #endif
-#include <vlc_input.h>
 #include <vlc_es_out.h>
 #include <vlc_block.h>
 #include "input_internal.h"

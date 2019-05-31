@@ -37,7 +37,6 @@
 #include <vlc_block.h>
 
 
-#include <vlc_input.h>
 #include <vlc_httpd.h>
 
 /*****************************************************************************

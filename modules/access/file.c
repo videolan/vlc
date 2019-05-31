@@ -54,7 +54,6 @@
 
 #include <vlc_common.h>
 #include "fs.h"
-#include <vlc_input.h>
 #include <vlc_access.h>
 #ifdef _WIN32
 # include <vlc_charset.h>

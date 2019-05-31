@@ -33,7 +33,6 @@
 #include <vlc/libvlc_events.h>
 
 #include <vlc_common.h>
-#include <vlc_input.h>
 
 #include "libvlc_internal.h"
 #include "media_internal.h" // libvlc_media_new_from_input_item()

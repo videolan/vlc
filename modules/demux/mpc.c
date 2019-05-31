@@ -30,7 +30,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
-#include <vlc_input.h>
 #include <vlc_codec.h>
 #include <math.h>
 

@@ -36,7 +36,6 @@
 
 #include <vlc_common.h>
 #include <vlc_modules.h>
-#include <vlc_input.h>
 #include <vlc_vout.h>
 #include <vlc_url.h>
 

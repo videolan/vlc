@@ -44,7 +44,6 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#include <vlc_input.h>
 #include "input_internal.h"
 #include <vlc_stream.h>
 #include "vlm_internal.h"

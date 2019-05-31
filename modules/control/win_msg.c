@@ -30,7 +30,6 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
-#include <vlc_input.h>
 #include <vlc_url.h> // FIXME: move URL generation to calling process
 
 #include <windows.h>

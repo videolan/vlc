@@ -36,7 +36,6 @@
 #include <vlc_meta.h>                  /* vlc_meta_Set*, vlc_meta_New */
 #include <vlc_access.h>                /* GET_PRIVATE_ID_STATE */
 #include <vlc_codecs.h>                /* VLC_BITMAPINFOHEADER, WAVEFORMATEX */
-#include <vlc_input.h>
 #include <vlc_vout.h>
 
 #include <limits.h>

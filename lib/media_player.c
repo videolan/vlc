@@ -33,7 +33,6 @@
 #include <vlc/libvlc_events.h>
 
 #include <vlc_demux.h>
-#include <vlc_input.h>
 #include <vlc_vout.h>
 #include <vlc_aout.h>
 #include <vlc_actions.h>

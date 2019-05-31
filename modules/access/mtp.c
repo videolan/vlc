@@ -39,7 +39,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_input.h>
 #include <vlc_access.h>
 #include <vlc_dialog.h>
 #include <vlc_fs.h>

@@ -35,7 +35,6 @@
 #include <vlc/libvlc_media_player.h>
 
 #include <vlc_common.h>
-#include <vlc_input.h>
 #include <vlc_aout.h>
 #include <vlc_modules.h>
 

@@ -30,7 +30,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_input.h>
 #include "input_clock.h"
 #include "clock_internal.h"
 #include <assert.h>

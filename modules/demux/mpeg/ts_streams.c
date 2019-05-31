@@ -40,7 +40,6 @@
 #include <vlc_demux.h>
 #include <vlc_es.h>
 #include <vlc_es_out.h>
-#include <vlc_input.h>
 
 #include "sections.h"
 #include "ts_pid.h"
