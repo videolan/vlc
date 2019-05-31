@@ -49,6 +49,7 @@
 #include <vlc_url.h>
 #include "../stream_output/stream_output.h"
 #include "../libvlc.h"
+#include "input_internal.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -101,28 +102,28 @@ static void player_on_state_changed(vlc_player_t *player,
         }
     }
     assert(psz_instance_name);
-    enum input_state_e legacy_state;
+    enum vlm_state_e vlm_state;
     switch (new_state)
     {
         case VLC_PLAYER_STATE_STOPPED:
-            legacy_state = vlc_player_GetError(player) ? ERROR_S : INIT_S;
+            vlm_state = vlc_player_GetError(player) ? VLM_ERROR_S : VLM_INIT_S;
             break;
         case VLC_PLAYER_STATE_STARTED:
-            legacy_state = OPENING_S;
+            vlm_state = VLM_OPENING_S;
             break;
         case VLC_PLAYER_STATE_PLAYING:
-            legacy_state = PLAYING_S;
+            vlm_state = VLM_PLAYING_S;
             break;
         case VLC_PLAYER_STATE_PAUSED:
-            legacy_state = PAUSE_S;
+            vlm_state = VLM_PAUSE_S;
             break;
         case VLC_PLAYER_STATE_STOPPING:
-            legacy_state = vlc_player_GetError(player) ? ERROR_S : END_S;
+            vlm_state = vlc_player_GetError(player) ? VLM_ERROR_S : VLM_END_S;
             break;
         default:
             vlc_assert_unreachable();
     }
-    vlm_SendEventMediaInstanceState( p_vlm, p_media->cfg.id, p_media->cfg.psz_name, psz_instance_name, legacy_state );
+    vlm_SendEventMediaInstanceState( p_vlm, p_media->cfg.id, p_media->cfg.psz_name, psz_instance_name, vlm_state );
 
     vlc_mutex_lock( &p_vlm->lock_manage );
     p_vlm->input_state_changed = true;

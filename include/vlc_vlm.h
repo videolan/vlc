@@ -104,13 +104,23 @@ enum vlm_event_type_e
     VLM_EVENT_MEDIA_INSTANCE_STATE,
 };
 
+typedef enum vlm_state_e
+{
+    VLM_INIT_S = 0,
+    VLM_OPENING_S,
+    VLM_PLAYING_S,
+    VLM_PAUSE_S,
+    VLM_END_S,
+    VLM_ERROR_S,
+} vlm_state_e;
+
 typedef struct
 {
     int            i_type;            /* a vlm_event_type_e value */
     int64_t        id;                /* Media ID */
     const char    *psz_name;          /* Media name */
     const char    *psz_instance_name; /* Instance name or NULL */
-    input_state_e  input_state;       /* Input instance event type */
+    vlm_state_e    input_state;       /* Input instance event type */
 } vlm_event_t;
 
 /** VLM control query */

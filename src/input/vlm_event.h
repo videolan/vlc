@@ -34,6 +34,6 @@ void vlm_SendEventMediaChanged( vlm_t *, int64_t id, const char *psz_name );
 
 void vlm_SendEventMediaInstanceStarted( vlm_t *, int64_t id, const char *psz_name );
 void vlm_SendEventMediaInstanceStopped( vlm_t *, int64_t id, const char *psz_name );
-void vlm_SendEventMediaInstanceState( vlm_t *, int64_t id, const char *psz_name, const char *psz_instance_name, input_state_e state );
+void vlm_SendEventMediaInstanceState( vlm_t *, int64_t id, const char *psz_name, const char *psz_instance_name, vlm_state_e state );
 
 #endif
