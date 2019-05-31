@@ -553,6 +553,8 @@ modules/gui/macosx/playlist/VLCPlaylistMenuController.h
 modules/gui/macosx/playlist/VLCPlaylistMenuController.m
 modules/gui/macosx/playlist/VLCPlaylistModel.h
 modules/gui/macosx/playlist/VLCPlaylistModel.m
+modules/gui/macosx/playlist/VLCPlaylistSortingMenuController.h
+modules/gui/macosx/playlist/VLCPlaylistSortingMenuController.m
 modules/gui/macosx/playlist/VLCPlaylistTableCellView.h
 modules/gui/macosx/playlist/VLCPlaylistTableCellView.m
 modules/gui/macosx/playlist/VLCPlaylistTableView.h

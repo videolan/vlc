@@ -29,6 +29,7 @@
 
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistDataSource.h"
+#import "playlist/VLCPlaylistSortingMenuController.h"
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryAudioDataSource.h"
@@ -68,6 +69,7 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
     VLCLibraryGroupDataSource *_libraryAudioGroupDataSource;
     VLCMediaSourceDataSource *_mediaSourceDataSource;
     VLCLibraryAlternativeAudioViewController *_alternativeAudioViewController;
+    VLCPlaylistSortingMenuController *_playlistSortingMenuController;
 
     VLCPlaylistController *_playlistController;
 
@@ -401,6 +403,14 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 - (IBAction)clearPlaylist:(id)sender
 {
     [_playlistController clearPlaylist];
+}
+
+- (IBAction)sortPlaylist:(id)sender
+{
+    if (!_playlistSortingMenuController) {
+        _playlistSortingMenuController = [[VLCPlaylistSortingMenuController alloc] init];
+    }
+    [NSMenu popUpContextMenu:_playlistSortingMenuController.playlistSortingMenu withEvent:[NSApp currentEvent] forView:sender];
 }
 
 - (IBAction)openMedia:(id)sender

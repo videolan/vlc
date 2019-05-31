@@ -73,6 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)shuffleAction:(id)sender;
 - (IBAction)repeatAction:(id)sender;
 - (IBAction)clearPlaylist:(id)sender;
+- (IBAction)sortPlaylist:(id)sender;
 - (IBAction)openMedia:(id)sender;
 - (IBAction)showAndHidePlaylist:(id)sender;
 

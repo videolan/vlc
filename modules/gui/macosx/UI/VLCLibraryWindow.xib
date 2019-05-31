@@ -23,7 +23,7 @@
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="W1M-0o-qYG">
-                        <rect key="frame" x="212.5" y="333" width="56" height="23"/>
+                        <rect key="frame" x="212" y="333" width="56" height="23"/>
                         <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedRounded" trackingMode="selectOne" id="Twg-gp-8ng">
                             <font key="font" metaFont="system"/>
                             <segments>
@@ -196,7 +196,7 @@
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <connections>
-                                            <action selector="repeatAction:" target="QvC-M9-y7g" id="r9L-pE-b8A"/>
+                                            <action selector="sortPlaylist:" target="QvC-M9-y7g" id="sBc-0X-g5C"/>
                                         </connections>
                                     </button>
                                 </subviews>
