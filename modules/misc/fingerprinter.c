@@ -353,7 +353,9 @@ static void *Run( void *opaque )
                 DoFingerprint( p_fingerprinter, &acoustid_print, psz_uri );
                 free( psz_uri );
 
-                acoustid_lookup_fingerprint( VLC_OBJECT(p_fingerprinter), &acoustid_print );
+                acoustid_config_t cfg = { .p_obj = VLC_OBJECT(p_fingerprinter),
+                                          .psz_server = NULL, .psz_apikey = NULL };
+                acoustid_lookup_fingerprint( &cfg, &acoustid_print );
                 fill_metas_with_results( p_data, &acoustid_print );
 
                 for( unsigned j = 0; j < acoustid_print.results.count; j++ )
