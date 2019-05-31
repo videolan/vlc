@@ -172,8 +172,8 @@ on_capabilities_changed(vlc_player_t *player, int old_caps, int new_caps, void *
 
     libvlc_event_t event;
 
-    bool old_seekable = old_caps & VLC_INPUT_CAPABILITIES_SEEKABLE;
-    bool new_seekable = new_caps & VLC_INPUT_CAPABILITIES_SEEKABLE;
+    bool old_seekable = old_caps & VLC_PLAYER_CAP_SEEK;
+    bool new_seekable = new_caps & VLC_PLAYER_CAP_SEEK;
     if (new_seekable != old_seekable)
     {
         event.type = libvlc_MediaPlayerSeekableChanged;
@@ -181,8 +181,8 @@ on_capabilities_changed(vlc_player_t *player, int old_caps, int new_caps, void *
         libvlc_event_send(&mp->event_manager, &event);
     }
 
-    bool old_pauseable = old_caps & VLC_INPUT_CAPABILITIES_PAUSEABLE;
-    bool new_pauseable = new_caps & VLC_INPUT_CAPABILITIES_PAUSEABLE;
+    bool old_pauseable = old_caps & VLC_PLAYER_CAP_PAUSE;
+    bool new_pauseable = new_caps & VLC_PLAYER_CAP_PAUSE;
     if (new_pauseable != old_pauseable)
     {
         event.type = libvlc_MediaPlayerPausableChanged;
