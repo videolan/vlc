@@ -25,6 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCDragDropView;
+@class VLCRoundedCornerTextField;
 
 @interface VLCLibraryWindowController : NSWindowController
 
@@ -56,6 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSBox *clearPlaylistSeparator;
 @property (readwrite, weak) IBOutlet NSButton *repeatPlaylistButton;
 @property (readwrite, weak) IBOutlet NSButton *shufflePlaylistButton;
+@property (readwrite, weak) IBOutlet VLCRoundedCornerTextField *playlistCounterTextField;
 @property (readwrite, weak) IBOutlet NSView *alternativeAudioView;
 @property (readwrite, weak) IBOutlet NSCollectionView *alternativeAudioCollectionView;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *alternativeAudioSegmentedControl;

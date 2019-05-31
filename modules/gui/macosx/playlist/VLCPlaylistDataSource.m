@@ -86,9 +86,13 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
 - (void)playlistUpdated
 {
-    self.dragDropView.hidden = _playlistModel.numberOfPlaylistItems > 0 ? YES : NO;
+    NSUInteger numberOfPlaylistItems = _playlistModel.numberOfPlaylistItems;
+    self.dragDropView.hidden = numberOfPlaylistItems > 0 ? YES : NO;
+    self.counterTextField.hidden = numberOfPlaylistItems == 0 ? YES : NO;
+    self.counterTextField.stringValue = [NSString stringWithFormat:@"%lu", numberOfPlaylistItems];
 
     [_tableView reloadData];
 }
 
 @end
+

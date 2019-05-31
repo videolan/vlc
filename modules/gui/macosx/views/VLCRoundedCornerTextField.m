@@ -23,6 +23,9 @@
 #import "VLCRoundedCornerTextField.h"
 #import "extensions/NSColor+VLCAdditions.h"
 
+const CGFloat VLCRoundedCornerTextFieldLightCornerRadius = 3.;
+const CGFloat VLCRoundedCornerTextFieldStrongCornerRadius = 10.;
+
 @implementation VLCRoundedCornerTextField
 
 - (instancetype)initWithCoder:(NSCoder *)coder
@@ -46,7 +49,7 @@
 - (void)setupCustomAppearance
 {
     self.wantsLayer = YES;
-    self.layer.cornerRadius = 3.;
+    self.layer.cornerRadius = VLCRoundedCornerTextFieldLightCornerRadius;
     self.layer.masksToBounds = YES;
     self.layer.backgroundColor = [NSColor VLClibraryAnnotationBackgroundColor].CGColor;
 }
@@ -54,6 +57,25 @@
 - (void)setBackgroundColor:(NSColor *)backgroundColor
 {
     self.layer.backgroundColor = backgroundColor.CGColor;
+}
+
+- (void)setUseStrongRounding:(BOOL)useStrongRounding
+{
+    _useStrongRounding = useStrongRounding;
+    if (_useStrongRounding) {
+        self.layer.cornerRadius = VLCRoundedCornerTextFieldStrongCornerRadius;
+    } else {
+        self.layer.cornerRadius = VLCRoundedCornerTextFieldLightCornerRadius;
+    }
+}
+
+- (void)setStringValue:(NSString *)stringValue
+{
+    if (stringValue != nil) {
+        [super setStringValue:[NSString stringWithFormat:@" %@ ", stringValue]];
+    } else {
+        [super setStringValue:@""];
+    }
 }
 
 @end

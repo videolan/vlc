@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign, nonatomic) VLCPlaylistController *playlistController;
 @property (readwrite, assign) NSTableView *tableView;
 @property (readwrite, assign) VLCDragDropView *dragDropView;
+@property (readwrite, assign) NSTextField *counterTextField;
 
 - (void)playlistUpdated;
 

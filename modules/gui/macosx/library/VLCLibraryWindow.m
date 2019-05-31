@@ -42,6 +42,7 @@
 #import "media-source/VLCMediaSourceDataSource.h"
 
 #import "views/VLCDragDropView.h"
+#import "views/VLCRoundedCornerTextField.h"
 
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 #import "windows/video/VLCFSPanelController.h"
@@ -141,11 +142,16 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
     [_segmentedTitleControl setSelectedSegment:0];
 
     _playlistDragDropView.dropTarget = self;
+    _playlistCounterTextField.useStrongRounding = YES;
+    _playlistCounterTextField.font = [NSFont VLCplaylistSelectedItemLabelFont];
+    _playlistCounterTextField.textColor = [NSColor VLClibraryAnnotationColor];
+    _playlistCounterTextField.hidden = YES;
 
     _playlistDataSource = [[VLCPlaylistDataSource alloc] init];
     _playlistDataSource.playlistController = _playlistController;
     _playlistDataSource.tableView = _playlistTableView;
     _playlistDataSource.dragDropView = _playlistDragDropView;
+    _playlistDataSource.counterTextField = _playlistCounterTextField;
     _playlistController.playlistDataSource = _playlistDataSource;
 
     _playlistTableView.dataSource = _playlistDataSource;
