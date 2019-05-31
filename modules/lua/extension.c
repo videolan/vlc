@@ -562,7 +562,7 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
         case EXTENSION_SET_INPUT:
         {
             p_ext = va_arg( args, extension_t* );
-            input_thread_t *p_input = va_arg( args, struct input_thread_t * );
+            input_item_t *p_item = va_arg( args, struct input_item_t * );
 
             if( p_ext == NULL )
                 return VLC_EGENERIC;
@@ -577,24 +577,21 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
             vlc_mutex_lock( &p_ext->p_sys->running_lock );
 
             // Change input
-            input_thread_t *old = p_ext->p_sys->p_input;
-            input_item_t *p_item;
+            input_item_t *old = p_ext->p_sys->p_item;
             if( old )
             {
                 // Untrack meta fetched events
                 if( p_ext->p_sys->i_capabilities & EXT_META_LISTENER )
                 {
-                    p_item = input_GetItem( old );
-                    vlc_event_detach( &p_item->event_manager,
+                    vlc_event_detach( &old->event_manager,
                                       vlc_InputItemMetaChanged,
                                       inputItemMetaChanged,
                                       p_ext );
-                    input_item_Release( p_item );
                 }
-                input_Release(old);
+                input_item_Release( old );
             }
 
-            p_ext->p_sys->p_input = p_input ? input_Hold(p_input) : NULL;
+            p_ext->p_sys->p_item = p_item ? input_item_Hold(p_item) : NULL;
 
             // Tell the script the input changed
             if( p_ext->p_sys->i_capabilities & EXT_INPUT_LISTENER )
@@ -603,11 +600,9 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
             }
 
             // Track meta fetched events
-            if( p_ext->p_sys->p_input &&
+            if( p_ext->p_sys->p_item &&
                 p_ext->p_sys->i_capabilities & EXT_META_LISTENER )
             {
-                p_item = input_GetItem( p_ext->p_sys->p_input );
-                input_item_Hold( p_item );
                 vlc_event_attach( &p_item->event_manager,
                                   vlc_InputItemMetaChanged,
                                   inputItemMetaChanged,
@@ -659,16 +654,15 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
     vlclua_fd_interrupt( &p_ext->p_sys->dtable );
 
     // Unset and release input objects
-    if( p_ext->p_sys->p_input )
+    if( p_ext->p_sys->p_item )
     {
         if( p_ext->p_sys->i_capabilities & EXT_META_LISTENER )
-        {
-            // Release item
-            input_item_t *p_item = input_GetItem( p_ext->p_sys->p_input );
-            input_item_Release( p_item );
-        }
-        input_Release(p_ext->p_sys->p_input);
-        p_ext->p_sys->p_input = NULL;
+            vlc_event_detach( &p_ext->p_sys->p_item->event_manager,
+                              vlc_InputItemMetaChanged,
+                              inputItemMetaChanged,
+                              p_ext );
+        input_item_Release(p_ext->p_sys->p_item);
+        p_ext->p_sys->p_item = NULL;
     }
 
     int i_ret = lua_ExecuteFunction( p_mgr, p_ext, "deactivate", LUA_END );
