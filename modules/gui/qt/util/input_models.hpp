@@ -140,7 +140,8 @@ class ChapterListModel : public QAbstractListModel
 public:
     //user role
     enum ChapterListRoles {
-        TimeRole = Qt::UserRole + 1
+        TimeRole = Qt::UserRole + 1 ,
+        PositionRole
     };
 public:
     ChapterListModel(vlc_player_t* player, QObject* parent = nullptr);
@@ -158,6 +159,9 @@ public:
     void setCurrent(int current);
 
     void resetTitle(const vlc_player_title* newTitle);
+
+public slots:
+    QString getNameAtPosition(float pos) const;
 
 private:
     vlc_player_t* m_player = nullptr;

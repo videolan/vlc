@@ -287,6 +287,8 @@ QVariant ChapterListModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue<bool>(row == m_current);
     else if (role == ChapterListRoles::TimeRole )
         return QVariant::fromValue<vlc_tick_t>(chapter.time);
+    else if (role == ChapterListRoles::PositionRole && (m_title->length != 0) )
+        return QVariant::fromValue<float>(chapter.time /(float) m_title->length);
     return QVariant{};
 }
 
@@ -313,7 +315,8 @@ QHash<int, QByteArray> ChapterListModel::roleNames() const
     return QHash<int, QByteArray>{
         {Qt::DisplayRole, "display"},
         {Qt::CheckStateRole, "checked"},
-        {ChapterListRoles::TimeRole, "time"}
+        {ChapterListRoles::TimeRole, "time"},
+        {ChapterListRoles::PositionRole, "position"}
     };
 }
 
@@ -341,6 +344,27 @@ void ChapterListModel::resetTitle(const vlc_player_title *newTitle)
     endResetModel();
 }
 
+QString ChapterListModel::getNameAtPosition(float pos) const
+{
+    if(m_title == nullptr)
+        return qtr("nothing found");
+
+    vlc_tick_t posTime = pos * m_title->length;
+    int prevChapterIndex = 0;
+
+    for(unsigned int i=0;i<m_title->chapter_count;i++){
+
+        vlc_tick_t currentChapterTime = m_title->chapters[i].time;
+
+        if(currentChapterTime > posTime)
+           return qfu(m_title->chapters[prevChapterIndex].name);
+
+        else if(i == (m_title->chapter_count - 1))
+            return qfu(m_title->chapters[i].name);
+
+        prevChapterIndex = i;
+    }
+}
 
 //***************************
 //  ProgramListModel
