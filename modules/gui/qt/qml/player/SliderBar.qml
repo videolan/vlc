@@ -22,10 +22,22 @@ import "qrc:///style/"
 
 Slider {
     id: control
+    property int barHeight: 5
+    property bool _isHold: false
+
     anchors.margins: VLCStyle.margin_xxsmall
 
-    value: player.position
-    onMoved: player.position = control.position
+    Keys.onRightPressed: player.jumpFwd()
+    Keys.onLeftPressed: player.jumpBwd()
+
+    Connections {
+        /* only update the control position when the player position actually change, this avoid the slider
+         * to jump around when clicking
+         */
+        target: player
+        enabled: !_isHold
+        onPositionChanged: control.value = player.position
+    }
 
     height: control.barHeight + VLCStyle.fontHeight_normal + VLCStyle.margin_xxsmall * 2
     implicitHeight: control.barHeight + VLCStyle.fontHeight_normal + VLCStyle.margin_xxsmall * 2
@@ -37,8 +49,6 @@ Slider {
 
     stepSize: 0.01
 
-    property int barHeight: 5
-
     background: Rectangle {
         id: sliderRect
         width: control.availableWidth
@@ -46,7 +56,27 @@ Slider {
         height: implicitHeight
         color: "transparent"
 
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+
+            onPressed: function (event) {
+                control.focus = true
+                control._isHold = true
+                control.value = event.x / control.width
+                player.position = control.value
+            }
+            onReleased: control._isHold = false
+            onPositionChanged: function (event) {
+                if (pressed && (event.x <= control.width)) {
+                    control.value = event.x / control.width
+                    player.position = control.value
+                }
+            }
+        }
+
         Rectangle {
+            id: progressRect
             width: control.visualPosition * parent.width
             height: control.barHeight
             color: control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.bgHover
@@ -54,7 +84,7 @@ Slider {
         }
 
         Rectangle {
-            id: bufferRect    
+            id: bufferRect
             property int bufferAnimWidth: 100 * VLCStyle.scale
             property int bufferAnimPosition: 0
             property int bufferFrames: 1000
@@ -73,7 +103,7 @@ Slider {
                         target: bufferRect
                         width: bufferAnimWidth
                         visible: true
-                        x: (bufferAnimPosition / bufferFrames)* (parent.width - bufferAnimWidth)
+                        x: (bufferAnimPosition / bufferFrames) * (parent.width - bufferAnimWidth)
                         animateLoading: true
                     }
                 },
