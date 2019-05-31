@@ -338,28 +338,23 @@ static void on_player_capabilities_changed(vlc_player_t *, int old_caps, int new
         PlayerController* q = that->q_func();
         that->m_capabilities = new_caps;
 
-        bool oldSeekable = old_caps & VLC_INPUT_CAPABILITIES_SEEKABLE;
-        bool newSeekable = new_caps & VLC_INPUT_CAPABILITIES_SEEKABLE;
+        bool oldSeekable = old_caps & VLC_PLAYER_CAP_SEEK;
+        bool newSeekable = new_caps & VLC_PLAYER_CAP_SEEK;
         if (newSeekable != oldSeekable)
             emit q->seekableChanged( newSeekable );
 
-        bool oldRewindable = old_caps & VLC_INPUT_CAPABILITIES_REWINDABLE;
-        bool newRewindable = new_caps & VLC_INPUT_CAPABILITIES_REWINDABLE;
+        bool oldRewindable = old_caps & VLC_PLAYER_CAP_REWIND;
+        bool newRewindable = new_caps & VLC_PLAYER_CAP_REWIND;
         if (newRewindable != oldRewindable)
             emit q->rewindableChanged( newRewindable );
 
-        bool oldPauseable = old_caps & VLC_INPUT_CAPABILITIES_PAUSEABLE;
-        bool newPauseable = new_caps & VLC_INPUT_CAPABILITIES_PAUSEABLE;
+        bool oldPauseable = old_caps & VLC_PLAYER_CAP_PAUSE;
+        bool newPauseable = new_caps & VLC_PLAYER_CAP_PAUSE;
         if (newPauseable != oldPauseable)
             emit q->pausableChanged( newPauseable );
 
-        bool oldRecordable = old_caps & VLC_INPUT_CAPABILITIES_RECORDABLE;
-        bool newRecordable = new_caps & VLC_INPUT_CAPABILITIES_RECORDABLE;
-        if (newRecordable != oldRecordable)
-            emit q->recordableChanged( newRecordable);
-
-        bool oldChangeRate = old_caps & VLC_INPUT_CAPABILITIES_CHANGE_RATE;
-        bool newChangeRate = new_caps & VLC_INPUT_CAPABILITIES_CHANGE_RATE;
+        bool oldChangeRate = old_caps & VLC_PLAYER_CAP_CHANGE_RATE;
+        bool newChangeRate = new_caps & VLC_PLAYER_CAP_CHANGE_RATE;
         if (newChangeRate != oldChangeRate)
             emit q->rateChangableChanged( newChangeRate );
     });
@@ -1487,10 +1482,10 @@ PRIMITIVETYPE_GETTER(float, getPosition, m_position)
 PRIMITIVETYPE_GETTER(VLCTick, getLength, m_length)
 PRIMITIVETYPE_GETTER(VLCTick, getAudioDelay, m_audioDelay)
 PRIMITIVETYPE_GETTER(VLCTick, getSubtitleDelay, m_subtitleDelay)
-PRIMITIVETYPE_GETTER(bool, isSeekable, m_capabilities & VLC_INPUT_CAPABILITIES_SEEKABLE)
-PRIMITIVETYPE_GETTER(bool, isRewindable, m_capabilities & VLC_INPUT_CAPABILITIES_REWINDABLE)
-PRIMITIVETYPE_GETTER(bool, isPausable, m_capabilities & VLC_INPUT_CAPABILITIES_PAUSEABLE)
-PRIMITIVETYPE_GETTER(bool, isRateChangable, m_capabilities & VLC_INPUT_CAPABILITIES_CHANGE_RATE)
+PRIMITIVETYPE_GETTER(bool, isSeekable, m_capabilities & VLC_PLAYER_CAP_SEEK)
+PRIMITIVETYPE_GETTER(bool, isRewindable, m_capabilities & VLC_PLAYER_CAP_REWIND)
+PRIMITIVETYPE_GETTER(bool, isPausable, m_capabilities & VLC_PLAYER_CAP_PAUSE)
+PRIMITIVETYPE_GETTER(bool, isRateChangable, m_capabilities & VLC_PLAYER_CAP_CHANGE_RATE)
 PRIMITIVETYPE_GETTER(float, getSubtitleFPS, m_subtitleFPS)
 PRIMITIVETYPE_GETTER(bool, hasVideoOutput, m_hasVideo)
 PRIMITIVETYPE_GETTER(float, getBuffering, m_buffering)

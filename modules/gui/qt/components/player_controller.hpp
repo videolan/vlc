@@ -23,8 +23,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_input.h>
-
 #include "qt.hpp"
 #include <QObject>
 #include <QEvent>
