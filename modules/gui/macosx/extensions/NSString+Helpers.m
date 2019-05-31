@@ -309,33 +309,36 @@ NSString * getVolumeTypeFromMountPath(NSString *mountPath)
 
     io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
     if (IO_OBJECT_NULL != service) {
-        if (IOObjectConformsTo(service, kIOCDMediaClass))
+        if (IOObjectConformsTo(service, kIOCDMediaClass)) {
             returnValue = kVLCMediaAudioCD;
-        else if (IOObjectConformsTo(service, kIODVDMediaClass))
+        } else if (IOObjectConformsTo(service, kIODVDMediaClass)) {
             returnValue = kVLCMediaDVD;
-        else if (IOObjectConformsTo(service, kIOBDMediaClass))
+        } else if (IOObjectConformsTo(service, kIOBDMediaClass)) {
             returnValue = kVLCMediaBD;
+        }
         IOObjectRelease(service);
 
-        if (returnValue)
+        if (returnValue) {
             return returnValue;
+        }
     }
 
-    if ([mountPath rangeOfString:@"VIDEO_TS" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
+    if ([mountPath rangeOfString:@"VIDEO_TS" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound) {
         returnValue = kVLCMediaVideoTSFolder;
-    else if ([mountPath rangeOfString:@"BDMV" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
+    } else if ([mountPath rangeOfString:@"BDMV" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound) {
         returnValue = kVLCMediaBDMVFolder;
-    else {
+    } else {
         // NSFileManager is not thread-safe, don't use defaultManager outside of the main thread
-        NSFileManager * fm = [[NSFileManager alloc] init];
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
 
-        NSArray *dirContents = [fm contentsOfDirectoryAtPath:mountPath error:nil];
-        for (int i = 0; i < [dirContents count]; i++) {
-            NSString *currentFile = [dirContents objectAtIndex:i];
+        NSArray *directoryContents = [fileManager contentsOfDirectoryAtPath:mountPath error:nil];
+        NSUInteger directoryContentCount = [directoryContents count];
+        for (NSUInteger i = 0; i < directoryContentCount; i++) {
+            NSString *currentFile = directoryContents[i];
             NSString *fullPath = [mountPath stringByAppendingPathComponent:currentFile];
 
-            BOOL isDir;
-            if ([fm fileExistsAtPath:fullPath isDirectory:&isDir] && isDir)
+            BOOL isDirectory;
+            if ([fileManager fileExistsAtPath:fullPath isDirectory:&isDirectory] && isDirectory)
             {
                 if ([currentFile caseInsensitiveCompare:@"SVCD"] == NSOrderedSame) {
                     returnValue = kVLCMediaSVCD;
