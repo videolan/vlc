@@ -121,28 +121,47 @@ error:
     return false;
 }
 
-int acoustid_lookup_fingerprint( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data )
+int acoustid_lookup_fingerprint( const acoustid_config_t *p_cfg, acoustid_fingerprint_t *p_data )
 {
     if ( !p_data->psz_fingerprint )
         return VLC_SUCCESS;
 
     char *psz_url;
-    if( unlikely(asprintf( &psz_url, "https://fingerprint.videolan.org/"
-                           "acoustid.php?meta=recordings+tracks+usermeta+"
-                           "releases&duration=%d&fingerprint=%s",
-                           p_data->i_duration, p_data->psz_fingerprint ) < 1 ) )
-         return VLC_EGENERIC;
+    if( p_cfg->psz_server )
+    {
+        if( unlikely(asprintf( &psz_url, "https://%s/v2/lookup"
+                               "?client=%s"
+                               "&meta=recordings+tracks+usermeta+releases"
+                               "&duration=%d"
+                               "&fingerprint=%s",
+                               p_cfg->psz_server,
+                               p_cfg->psz_apikey ? p_cfg->psz_apikey : "",
+                               p_data->i_duration,
+                               p_data->psz_fingerprint ) < 1 ) )
+             return VLC_EGENERIC;
+    }
+    else /* Use VideoLAN anonymized requests proxy */
+    {
+        if( unlikely(asprintf( &psz_url, "https://" ACOUSTID_ANON_SERVER
+                               ACOUSTID_ANON_SERVER_PATH
+                               "?meta=recordings+tracks+usermeta+releases"
+                               "&duration=%d"
+                               "&fingerprint=%s",
+                               p_data->i_duration,
+                               p_data->psz_fingerprint ) < 1 ) )
+             return VLC_EGENERIC;
+    }
 
-    msg_Dbg( p_obj, "Querying AcoustID from %s", psz_url );
-    void *p_buffer = json_retrieve_document( p_obj, psz_url );
+    msg_Dbg( p_cfg->p_obj, "Querying AcoustID from %s", psz_url );
+    void *p_buffer = json_retrieve_document( p_cfg->p_obj, psz_url );
     free( psz_url );
     if( !p_buffer )
         return VLC_EGENERIC;
 
-    if ( ParseJson( p_obj, p_buffer, & p_data->results ) )
-        msg_Dbg( p_obj, "results count == %d", p_data->results.count );
+    if ( ParseJson( p_cfg->p_obj, p_buffer, & p_data->results ) )
+        msg_Dbg( p_cfg->p_obj, "results count == %d", p_data->results.count );
     else
-        msg_Dbg( p_obj, "No results" );
+        msg_Dbg( p_cfg->p_obj, "No results" );
     free( p_buffer );
 
     return VLC_SUCCESS;
