@@ -86,9 +86,8 @@
         return;
 
     VLCPlaylistItem *item = [_playlistController.playlistModel playlistItemAtIndex:selectedRow];
-    if (item == nil) {
+    if (item == nil)
         return;
-    }
 
     NSString *path = item.path;
     [[NSWorkspace sharedWorkspace] selectFile:path inFileViewerRootedAtPath:path];
