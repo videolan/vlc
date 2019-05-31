@@ -210,6 +210,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
         /* set initial values, further updates through callbacks */
         vlc_playlist_Lock(_p_playlist);
+        _unsorted = YES;
         _playbackOrder = vlc_playlist_GetPlaybackOrder(_p_playlist);
         _playbackRepeat = vlc_playlist_GetPlaybackRepeat(_p_playlist);
         _playlistListenerID = vlc_playlist_AddListener(_p_playlist,
@@ -422,6 +423,21 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     vlc_playlist_Lock(_p_playlist);
     vlc_playlist_Clear(_p_playlist);
     vlc_playlist_Unlock(_p_playlist);
+}
+
+- (int)sortByKey:(enum vlc_playlist_sort_key)sortKey andOrder:(enum vlc_playlist_sort_order)sortOrder
+{
+    struct vlc_playlist_sort_criterion sortCriterion = { sortKey, sortOrder };
+    int returnValue = VLC_SUCCESS;
+    vlc_playlist_Lock(_p_playlist);
+    returnValue = vlc_playlist_Sort(_p_playlist, &sortCriterion, 1);
+    vlc_playlist_Unlock(_p_playlist);
+    if (returnValue == VLC_SUCCESS) {
+        _lastSortKey = sortKey;
+        _lastSortOrder = sortOrder;
+        _unsorted = NO;
+    }
+    return returnValue;
 }
 
 - (int)startPlaylist

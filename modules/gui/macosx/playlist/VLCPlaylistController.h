@@ -143,6 +143,30 @@ extern NSString *VLCPlaylistItemsRemoved;
 - (void)clearPlaylist;
 
 /**
+ * Sort the entire playlist listen based on:
+ * @param sortKey the key used for sorting
+ * @param sortOrder sort ascending or descending..
+ * @return Returns VLC_SUCCESS on success.
+ */
+- (int)sortByKey:(enum vlc_playlist_sort_key)sortKey andOrder:(enum vlc_playlist_sort_order)sortOrder;
+
+/**
+ * Initially, the playlist is unsorted until the user decides to do so
+ * Until then, the unsorted state is retained.
+ */
+@property (readonly) BOOL unsorted;
+
+/**
+ * The last key used for sorting
+ */
+@property (readonly) enum vlc_playlist_sort_key lastSortKey;
+
+/**
+ * The last order used for sorting
+ */
+@property (readonly) enum vlc_playlist_sort_order lastSortOrder;
+
+/**
  * Start the playlist
  * @return Returns VLC_SUCCESS on success.
  */
