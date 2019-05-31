@@ -83,7 +83,7 @@ struct metadata_request {
     vlc::threads::mutex lock;
     vlc::threads::condition_variable cond;
     /* results */
-    input_state_e state;
+    bool success;
     bool probe;
     std::vector<InputItemPtr> *children;
 };
@@ -93,43 +93,31 @@ struct metadata_request {
 
 extern "C" {
 
-static void onInputEvent( input_thread_t*, const struct vlc_input_event *event,
-                          void *data )
+static void onParserEnded( input_item_t *, int status, void *data )
 {
     auto req = static_cast<vlc::medialibrary::metadata_request*>( data );
-    switch ( event->type )
-    {
-        case INPUT_EVENT_SUBITEMS:
-        {
-            for (int i = 0; i < event->subitems->i_children; ++i)
-            {
-                input_item_node_t *child = event->subitems->pp_children[i];
-                /* this class assumes we always receive a flat list */
-               assert(child->i_children == 0);
-               input_item_t *media = child->p_item;
-               req->children->emplace_back( media );
-            }
-            break;
-        }
-        case INPUT_EVENT_STATE:
-            {
-                vlc::threads::mutex_locker lock( req->lock );
-                req->state = event->state;
-            }
-            break;
-        case INPUT_EVENT_DEAD:
-            {
-                vlc::threads::mutex_locker lock( req->lock );
-                // We need to probe the item now, but not from the input thread
-                req->probe = true;
-            }
-            req->cond.signal();
-            break;
-        default:
-            break;
-    }
 
+    vlc::threads::mutex_locker lock( req->lock );
+    req->success = status == VLC_SUCCESS;
+    req->probe = true;
+    req->cond.signal();
 }
+
+static void onParserSubtreeAdded( input_item_t *, input_item_node_t *subtree,
+                                  void *data )
+{
+    auto req = static_cast<vlc::medialibrary::metadata_request*>( data );
+
+    for (int i = 0; i < subtree->i_children; ++i)
+    {
+        input_item_node_t *child = subtree->pp_children[i];
+        /* this class assumes we always receive a flat list */
+       assert(child->i_children == 0);
+       input_item_t *media = child->p_item;
+       req->children->emplace_back( media );
+    }
+}
+
 } /* extern C */
 
 namespace vlc {
@@ -144,34 +132,31 @@ static bool request_metadata_sync( libvlc_int_t *libvlc, input_item_t *media,
     auto deadline = vlc_tick_now() + VLC_TICK_FROM_SEC( 5 );
 
     media->i_preparse_depth = 1;
-    auto inputThread = vlc::wrap_cptr(
-        input_CreatePreparser( VLC_OBJECT( libvlc ), onInputEvent, &req, media ),
-        &input_Close );
 
-    if ( inputThread == nullptr )
+    static const input_item_parser_cbs_t cbs = {
+        onParserEnded,
+        onParserSubtreeAdded,
+    };
+
+    auto inputParser = vlc::wrap_cptr(
+        input_item_Parse( media, VLC_OBJECT( libvlc ), &cbs, &req ),
+        &input_item_parser_id_Release );
+
+    if ( inputParser== nullptr )
         return false;
 
     vlc::threads::mutex_locker lock( req.lock );
-    if ( input_Start( inputThread.get() ) != VLC_SUCCESS )
-        return false;
     while ( req.probe == false )
     {
         auto res = req.cond.timedwait( req.lock, deadline );
         if (res != 0 )
         {
-            input_Stop( inputThread.get() );
             throw std::system_error( ETIMEDOUT, std::generic_category(),
                                      "Failed to browse network directory: "
                                      "Network is too slow");
         }
-        if ( req.probe == true )
-        {
-            if ( req.state == END_S || req.state == ERROR_S )
-                break;
-            req.probe = false;
-        }
     }
-    return req.state == END_S;
+    return req.success;
 }
 
 void
