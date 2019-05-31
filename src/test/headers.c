@@ -37,7 +37,6 @@
 #include <vlc/libvlc_events.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_media_discoverer.h>
-#include <vlc/libvlc_media_library.h>
 #include <vlc/libvlc_media_list.h>
 #include <vlc/libvlc_media_list_player.h>
 #include <vlc/libvlc_media_player.h>

@@ -142,7 +142,6 @@ lib/libvlc_internal.h
 lib/log.c
 lib/media.c
 lib/media_discoverer.c
-lib/media_library.c
 lib/media_list.c
 lib/media_list_path.h
 lib/media_list_player.c
