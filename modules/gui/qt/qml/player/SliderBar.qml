@@ -30,7 +30,41 @@ Slider {
     Keys.onRightPressed: player.jumpFwd()
     Keys.onLeftPressed: player.jumpBwd()
 
-    Connections {
+    Item {
+        id: timeTooltip
+        property real location: 0
+        property real position: location/control.width
+
+        y: -35 * VLCStyle.scale
+        x: location - (timeIndicatorRect.width / 2)
+        visible: control.hovered
+
+        Rectangle {
+            width: 10 * VLCStyle.scale
+            height: 10 * VLCStyle.scale
+
+            anchors.horizontalCenter: timeIndicatorRect.horizontalCenter
+            anchors.verticalCenter: timeIndicatorRect.bottom
+
+            rotation: 45
+            color: VLCStyle.colors.bgAlt
+        }
+
+        Rectangle {
+            id: timeIndicatorRect
+            width: childrenRect.width
+            height: 20 * VLCStyle.scale
+            color: VLCStyle.colors.bgAlt
+
+            Text {
+                anchors.centerIn: parent
+                text: (player.length.scale(timeTooltip.position).toString())
+                color: VLCStyle.colors.text
+            }
+        }
+    }
+
+    Connections {    
         /* only update the control position when the player position actually change, this avoid the slider
          * to jump around when clicking
          */
@@ -72,6 +106,7 @@ Slider {
                     control.value = event.x / control.width
                     player.position = control.value
                 }
+                timeTooltip.location = event.x
             }
         }
 
