@@ -103,6 +103,7 @@
 		7D0F63FF2201F63400FDB91F /* VLCPlaylistTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D0F63FE2201F63400FDB91F /* VLCPlaylistTableCellView.m */; };
 		7D0F64062202047900FDB91F /* VLCLibraryCollectionViewItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D0F64042202047900FDB91F /* VLCLibraryCollectionViewItem.m */; };
 		7D0F640C2202163E00FDB91F /* VLCPlaylistDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D0F640B2202163E00FDB91F /* VLCPlaylistDataSource.m */; };
+		7D1BF28A22A153E20027C50F /* VLCRoundedCornerTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D1BF28922A153E20027C50F /* VLCRoundedCornerTextField.m */; };
 		7D20081A2289835C002679DF /* VLCTrackingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D2008192289835C002679DF /* VLCTrackingView.m */; };
 		7D28E6362275B4820098D30E /* NSColor+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D28E6352275B4820098D30E /* NSColor+VLCAdditions.m */; };
 		7D28E6392275B7340098D30E /* NSFont+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D28E6382275B7340098D30E /* NSFont+VLCAdditions.m */; };
@@ -449,6 +450,8 @@
 		7D0F64052202047900FDB91F /* VLCLibraryCollectionViewItem.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCLibraryCollectionViewItem.xib; sourceTree = "<group>"; };
 		7D0F640A2202163E00FDB91F /* VLCPlaylistDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCPlaylistDataSource.h; sourceTree = "<group>"; };
 		7D0F640B2202163E00FDB91F /* VLCPlaylistDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCPlaylistDataSource.m; sourceTree = "<group>"; };
+		7D1BF28822A153E20027C50F /* VLCRoundedCornerTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCRoundedCornerTextField.h; sourceTree = "<group>"; };
+		7D1BF28922A153E20027C50F /* VLCRoundedCornerTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCRoundedCornerTextField.m; sourceTree = "<group>"; };
 		7D2008182289835C002679DF /* VLCTrackingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCTrackingView.h; sourceTree = "<group>"; };
 		7D2008192289835C002679DF /* VLCTrackingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCTrackingView.m; sourceTree = "<group>"; };
 		7D28E6342275B4820098D30E /* NSColor+VLCAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSColor+VLCAdditions.h"; sourceTree = "<group>"; };
@@ -851,6 +854,8 @@
 				7D2008192289835C002679DF /* VLCTrackingView.m */,
 				7D460B0A229EB4C700097948 /* VLCDragDropView.h */,
 				7D460B0B229EB4C700097948 /* VLCDragDropView.m */,
+				7D1BF28822A153E20027C50F /* VLCRoundedCornerTextField.h */,
+				7D1BF28922A153E20027C50F /* VLCRoundedCornerTextField.m */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -1752,6 +1757,7 @@
 				1C3113DD1E508C6900D4DD76 /* VLCTrackSynchronizationWindowController.m in Sources */,
 				7D0F5A9B2264EB410009C48A /* VLCHotkeysController.m in Sources */,
 				6B6FFF701EF9EC350001CEB1 /* CompatibilityFixes.m in Sources */,
+				7D1BF28A22A153E20027C50F /* VLCRoundedCornerTextField.m in Sources */,
 				7DFBDCB4226CD00900B700A5 /* VLCLibraryDataTypes.m in Sources */,
 				1C3113DF1E508C6900D4DD76 /* VLCVideoEffectsWindowController.m in Sources */,
 				1C3113E11E508C6900D4DD76 /* VLCVoutView.m in Sources */,

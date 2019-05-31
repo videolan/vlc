@@ -43,9 +43,9 @@
                                 <action selector="playInstantly:" target="-2" id="E2B-oj-rx3"/>
                             </connections>
                         </button>
-                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tm2-NW-WsZ">
-                            <rect key="frame" x="12" y="144" width="37" height="17"/>
-                            <textFieldCell key="cell" lineBreakMode="clipping" title="Label" drawsBackground="YES" id="tyb-Ur-7J9">
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tm2-NW-WsZ" customClass="VLCRoundedCornerTextField">
+                            <rect key="frame" x="8" y="144" width="37" height="17"/>
+                            <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="tyb-Ur-7J9">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -77,7 +77,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ubz-8I-W2F">
-                    <rect key="frame" x="216" y="187" width="20" height="20"/>
+                    <rect key="frame" x="222" y="187" width="20" height="20"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="20" id="XhX-7U-Nxj"/>
                         <constraint firstAttribute="height" constant="20" id="ZDT-YM-Cbr"/>
@@ -108,9 +108,9 @@
                 <constraint firstItem="u2r-zy-XEW" firstAttribute="centerY" secondItem="VAn-gF-QiZ" secondAttribute="centerY" id="H5N-j9-THf"/>
                 <constraint firstAttribute="bottom" secondItem="VAn-gF-QiZ" secondAttribute="bottom" id="Kp0-Hx-3Ek"/>
                 <constraint firstItem="VAn-gF-QiZ" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="QUW-dn-Fbc"/>
-                <constraint firstAttribute="trailing" secondItem="Ubz-8I-W2F" secondAttribute="trailing" constant="20" id="ZVz-SL-rxZ"/>
+                <constraint firstAttribute="trailing" secondItem="Ubz-8I-W2F" secondAttribute="trailing" constant="14" id="ZVz-SL-rxZ"/>
                 <constraint firstItem="tm2-NW-WsZ" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="7" id="cvk-A5-enS"/>
-                <constraint firstItem="tm2-NW-WsZ" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="12" id="fH0-Om-7gV"/>
+                <constraint firstItem="tm2-NW-WsZ" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="10" id="fH0-Om-7gV"/>
                 <constraint firstAttribute="trailing" secondItem="2aB-sB-hfY" secondAttribute="trailing" id="oZw-Ab-83p"/>
                 <constraint firstItem="2aB-sB-hfY" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="t9g-tX-AQX"/>
                 <constraint firstItem="OBS-Eh-1mT" firstAttribute="top" secondItem="2aB-sB-hfY" secondAttribute="bottom" constant="4" id="vJy-Kf-4Jh"/>
