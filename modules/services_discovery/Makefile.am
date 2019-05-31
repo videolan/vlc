@@ -1,9 +1,6 @@
 sddir = $(pluginsdir)/services_discovery
 sd_LTLIBRARIES =
 
-libmediadirs_plugin_la_SOURCES = services_discovery/mediadirs.c
-sd_LTLIBRARIES += libmediadirs_plugin.la
-
 libpodcast_plugin_la_SOURCES = services_discovery/podcast.c
 sd_LTLIBRARIES += libpodcast_plugin.la
 

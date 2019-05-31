@@ -1078,7 +1078,6 @@ modules/packetizer/mpegvideo.c
 modules/packetizer/vc1.c
 modules/services_discovery/avahi.c
 modules/services_discovery/bonjour.m
-modules/services_discovery/mediadirs.c
 modules/services_discovery/microdns.c
 modules/services_discovery/mtp.c
 modules/services_discovery/os2drive.c
