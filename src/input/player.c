@@ -31,6 +31,7 @@
 #include <vlc_vector.h>
 #include <vlc_atomic.h>
 #include <vlc_tick.h>
+#include <vlc_decoder.h>
 
 #include "libvlc.h"
 #include "input_internal.h"

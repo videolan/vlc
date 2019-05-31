@@ -43,6 +43,8 @@
 
 #include <string.h>
 
+typedef struct input_resource_t input_resource_t;
+
 /*****************************************************************************
  * Seek point: (generalisation of chapters)
  *****************************************************************************/
@@ -212,11 +214,6 @@ static inline input_attachment_t *vlc_input_attachment_Duplicate( const input_at
 /*****************************************************************************
  * input defines/constants.
  *****************************************************************************/
-
-/**
- * This defines an opaque input resource handler.
- */
-typedef struct input_resource_t input_resource_t;
 
 /**
  * Main structure representing an input thread. This structure is mostly
@@ -587,64 +584,12 @@ VLC_API void input_SetPosition( input_thread_t *, float f_position, bool b_fast 
  */
 VLC_API input_item_t* input_GetItem( input_thread_t * ) VLC_USED;
 
-/* */
-VLC_API decoder_t * input_DecoderCreate( vlc_object_t *, const es_format_t *, input_resource_t * ) VLC_USED;
-VLC_API void input_DecoderDelete( decoder_t * );
-VLC_API void input_DecoderDecode( decoder_t *, block_t *, bool b_do_pace );
-VLC_API void input_DecoderDrain( decoder_t * );
-VLC_API void input_DecoderFlush( decoder_t * );
-VLC_API int  input_DecoderSetSpuHighlight( decoder_t *, const vlc_spu_highlight_t * );
-
 /**
  * This function creates a sane filename path.
  */
 VLC_API char * input_CreateFilename( input_thread_t *, input_item_t *,
                                      const char *psz_path, const char *psz_prefix,
                                      const char *psz_extension ) VLC_USED;
-
-/**
- * It creates an empty input resource handler.
- *
- * The given object MUST stay alive as long as the input_resource_t is
- * not deleted.
- */
-VLC_API input_resource_t * input_resource_New( vlc_object_t * ) VLC_USED;
-
-/**
- * It releases an input resource.
- */
-VLC_API void input_resource_Release( input_resource_t * );
-
-/**
- * Forcefully destroys the video output (e.g. when the playlist is stopped).
- */
-VLC_API void input_resource_TerminateVout( input_resource_t * );
-
-/**
- * This function releases all resources (object).
- */
-VLC_API void input_resource_Terminate( input_resource_t * );
-
-/**
- * \return the current audio output if any.
- * Use aout_Release() to drop the reference.
- */
-VLC_API audio_output_t *input_resource_HoldAout( input_resource_t * );
-
-/**
- * This function creates or recycles an audio output.
- */
-VLC_API audio_output_t *input_resource_GetAout( input_resource_t * );
-
-/**
- * This function retains or destroys an audio output.
- */
-VLC_API void input_resource_PutAout( input_resource_t *, audio_output_t * );
-
-/**
- * Prevents the existing audio output (if any) from being recycled.
- */
-VLC_API void input_resource_ResetAout( input_resource_t * );
 
 /** @} */
 #endif

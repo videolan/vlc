@@ -38,6 +38,7 @@
 #include <vlc_fourcc.h>
 #include <vlc_meta.h>
 #include <vlc_list.h>
+#include <vlc_decoder.h>
 
 #include "input_internal.h"
 #include "../clock/input_clock.h"
