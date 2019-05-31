@@ -70,6 +70,7 @@ static  void *Preparse( void * );
 static input_thread_t * Create  ( vlc_object_t *, input_thread_events_cb, void *,
                                   input_item_t *, enum input_create_option option,
                                   input_resource_t *, vlc_renderer_item_t * );
+static void             Destroy ( input_thread_t *p_input );
 static  int             Init    ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input, bool b_interactive );
@@ -241,7 +242,7 @@ void input_Close( input_thread_t *p_input )
     if( input_priv(p_input)->is_running )
         vlc_join( input_priv(p_input)->thread, NULL );
     vlc_interrupt_deinit( &input_priv(p_input)->interrupt );
-    input_Release(p_input);
+    Destroy(p_input);
 }
 
 void input_SetTime( input_thread_t *p_input, vlc_tick_t i_time, bool b_fast )
@@ -438,27 +439,12 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     priv->p_es_out_display = input_EsOutNew( p_input, priv->rate );
     priv->p_es_out = NULL;
 
-    /* Set the destructor when we are sure we are initialized */
-    atomic_init(&priv->refs, 0);
     return p_input;
 }
 
-input_thread_t *input_Hold(input_thread_t *input)
+static void Destroy(input_thread_t *input)
 {
     input_thread_private_t *priv = input_priv(input);
-
-    atomic_fetch_add_explicit(&priv->refs, 1, memory_order_relaxed);
-    return input;
-}
-
-void input_Release(input_thread_t *input)
-{
-    input_thread_private_t *priv = input_priv(input);
-
-    if (atomic_fetch_sub_explicit(&priv->refs, 1, memory_order_release))
-        return;
-
-    atomic_thread_fence(memory_order_acquire);
 
 #ifndef NDEBUG
     char *name = input_item_GetName(priv->p_item);

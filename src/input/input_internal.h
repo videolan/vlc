@@ -361,9 +361,6 @@ input_thread_t *input_CreateThumbnailer(vlc_object_t *obj,
                                         void *events_data, input_item_t *item)
 VLC_USED;
 
-input_thread_t *input_Hold(input_thread_t *input);
-void input_Release(input_thread_t *input);
-
 int input_Start( input_thread_t * );
 
 void input_Stop( input_thread_t * );
@@ -542,7 +539,6 @@ typedef struct input_thread_private_t
 
     vlc_thread_t thread;
     vlc_interrupt_t interrupt;
-    atomic_uintptr_t refs;
 } input_thread_private_t;
 
 static inline input_thread_private_t *input_priv(input_thread_t *input)
