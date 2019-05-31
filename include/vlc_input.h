@@ -578,12 +578,5 @@ VLC_API void input_SetPosition( input_thread_t *, float f_position, bool b_fast 
  */
 VLC_API input_item_t* input_GetItem( input_thread_t * ) VLC_USED;
 
-/**
- * This function creates a sane filename path.
- */
-VLC_API char * input_CreateFilename( input_thread_t *, input_item_t *,
-                                     const char *psz_path, const char *psz_prefix,
-                                     const char *psz_extension ) VLC_USED;
-
 /** @} */
 #endif

@@ -160,7 +160,6 @@ image_Mime2Fourcc
 image_Type2Fourcc
 InitMD5
 input_Create
-input_CreateFilename
 input_CreatePreparser
 input_CreateThumbnailer
 input_DecoderCreate
