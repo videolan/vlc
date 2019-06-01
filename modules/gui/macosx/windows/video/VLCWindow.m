@@ -94,7 +94,7 @@
 
     // Animate window alpha value
     [self setAlphaValue:1.0];
-    __unsafe_unretained typeof(self) this = self;
+    __weak typeof(self) this = self;
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
         [[NSAnimationContext currentContext] setDuration:0.9];
         [[this animator] setAlphaValue:0.0];
@@ -114,7 +114,7 @@
         [super orderOut:self];
         return;
     }
-    __unsafe_unretained typeof(self) this = self;
+    __weak typeof(self) this = self;
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
         [[NSAnimationContext currentContext] setDuration:0.5];
         [[this animator] setAlphaValue:0.0];

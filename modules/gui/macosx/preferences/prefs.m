@@ -86,7 +86,7 @@
     NSMutableArray *_options;
     NSMutableArray *_subviews;
 }
-@property (readwrite, unsafe_unretained) VLCPrefs *prefsViewController;
+@property (readwrite, weak) VLCPrefs *prefsViewController;
 
 - (id)initWithName:(NSString*)name;
 

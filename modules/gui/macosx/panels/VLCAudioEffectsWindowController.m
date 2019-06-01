@@ -497,7 +497,7 @@
     [_textfieldPanel setCancelButtonString:_NS("Cancel")];
     [_textfieldPanel setOkButtonString:_NS("Save")];
 
-    __unsafe_unretained typeof(self) _self = self;
+    __weak typeof(self) _self = self;
     [_textfieldPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSString *resultingText) {
 
         NSInteger currentProfileIndex = [_self currentProfileIndex];
@@ -552,7 +552,7 @@
     [_popupPanel setCancelButtonString:_NS("Cancel")];
     [_popupPanel setPopupButtonContent:[self nonDefaultProfileNames]];
 
-    __unsafe_unretained typeof(self) _self = self;
+    __weak typeof(self) _self = self;
     [_popupPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSInteger selectedIndex) {
 
         NSInteger currentProfileIndex = [_self currentProfileIndex];
@@ -798,7 +798,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [_textfieldPanel setCancelButtonString:_NS("Cancel")];
     [_textfieldPanel setOkButtonString:_NS("Save")];
 
-    __unsafe_unretained typeof(self) _self = self;
+    __weak typeof(self) _self = self;
     [_textfieldPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSString *resultingText) {
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
@@ -842,7 +842,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [_popupPanel setCancelButtonString:_NS("Cancel")];
     [_popupPanel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"EQTitles"]];
 
-    __unsafe_unretained typeof(self) _self = self;
+    __weak typeof(self) _self = self;
     [_popupPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSInteger selectedIndex) {
 
         if (returnCode != NSModalResponseOK)
