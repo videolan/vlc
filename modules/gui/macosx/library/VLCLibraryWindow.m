@@ -56,7 +56,8 @@
 
 const CGFloat VLCLibraryWindowMinimalWidth = 604.;
 const CGFloat VLCLibraryWindowMinimalHeight = 307.;
-const CGFloat VLCLibraryWindowPlaylistRowHeight = 72.;
+const CGFloat VLCLibraryWindowLargePlaylistRowHeight = 60.;
+const CGFloat VLCLibraryWindowSmallPlaylistRowHeight = 45.;
 const CGFloat VLCLibraryWindowSmallRowHeight = 24.;
 const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
 const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
@@ -158,7 +159,7 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 
     _playlistTableView.dataSource = _playlistDataSource;
     _playlistTableView.delegate = _playlistDataSource;
-    _playlistTableView.rowHeight = VLCLibraryWindowPlaylistRowHeight;
+    _playlistTableView.rowHeight = config_GetInt("macosx-large-text") ? VLCLibraryWindowLargePlaylistRowHeight : VLCLibraryWindowSmallPlaylistRowHeight;
     [_playlistTableView reloadData];
 
     _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];

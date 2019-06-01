@@ -64,19 +64,19 @@
                                         <rect key="frame" x="20" y="220" width="197" height="5"/>
                                     </box>
                                     <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Z7y-D0-11Q">
-                                        <rect key="frame" x="20" y="63" width="217" height="151"/>
+                                        <rect key="frame" x="0.0" y="63" width="237" height="151"/>
                                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="Vdr-bg-tuS">
-                                            <rect key="frame" x="0.0" y="0.0" width="217" height="151"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="237" height="151"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="Fr1-af-8gb" customClass="VLCPlaylistTableView">
-                                                    <rect key="frame" x="0.0" y="0.0" width="217" height="151"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="237" height="151"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                     <tableColumns>
-                                                        <tableColumn width="214" minWidth="40" maxWidth="1000" id="gkH-E7-Nn4">
+                                                        <tableColumn width="234" minWidth="40" maxWidth="1000" id="gkH-E7-Nn4">
                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                                 <font key="font" metaFont="smallSystem"/>
                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -90,11 +90,11 @@
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
                                                                 <tableCellView id="3Pj-5C-4K4">
-                                                                    <rect key="frame" x="1" y="1" width="214" height="17"/>
+                                                                    <rect key="frame" x="1" y="1" width="234" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
                                                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dY4-Im-HRr">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="214" height="17"/>
+                                                                            <rect key="frame" x="0.0" y="0.0" width="234" height="17"/>
                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="vlq-wz-y8v">
                                                                                 <font key="font" metaFont="system"/>
@@ -205,7 +205,7 @@
                                     <constraint firstItem="nAW-KH-ipk" firstAttribute="leading" secondItem="dus-WQ-AmE" secondAttribute="leading" constant="20" id="EUp-9J-Fid"/>
                                     <constraint firstItem="qmL-Ar-cj1" firstAttribute="top" secondItem="dus-WQ-AmE" secondAttribute="top" constant="34" id="FfM-yJ-qCy"/>
                                     <constraint firstItem="Z7y-D0-11Q" firstAttribute="top" secondItem="qmL-Ar-cj1" secondAttribute="bottom" constant="8" id="GIh-g3-rqJ"/>
-                                    <constraint firstItem="Z7y-D0-11Q" firstAttribute="leading" secondItem="dus-WQ-AmE" secondAttribute="leading" constant="20" id="J3s-se-6bL"/>
+                                    <constraint firstItem="Z7y-D0-11Q" firstAttribute="leading" secondItem="dus-WQ-AmE" secondAttribute="leading" id="J3s-se-6bL"/>
                                     <constraint firstItem="VFI-oW-dMZ" firstAttribute="top" secondItem="qmL-Ar-cj1" secondAttribute="bottom" id="JzJ-oS-dIb"/>
                                     <constraint firstItem="8zF-Wo-H79" firstAttribute="centerY" secondItem="jg5-33-vH0" secondAttribute="centerY" id="Qdp-7K-RkD"/>
                                     <constraint firstItem="244-FS-P3T" firstAttribute="centerY" secondItem="cih-xp-HmY" secondAttribute="centerY" id="XB9-iZ-mQY"/>

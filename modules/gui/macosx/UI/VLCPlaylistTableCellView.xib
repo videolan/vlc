@@ -13,7 +13,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ohB-P0-nCv">
-                    <rect key="frame" x="131" y="32" width="37" height="17"/>
+                    <rect key="frame" x="142" y="32" width="37" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="ZPw-XO-XD1">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -21,7 +21,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xJW-ps-ycn">
-                    <rect key="frame" x="131" y="46" width="37" height="17"/>
+                    <rect key="frame" x="142" y="46" width="37" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="aCe-ia-0Ww">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -29,17 +29,17 @@
                     </textFieldCell>
                 </textField>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ydb-7n-5Cd" customClass="VLCImageView">
-                    <rect key="frame" x="3" y="3" width="120" height="75"/>
+                    <rect key="frame" x="14" y="3" width="120" height="75"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="Ydb-7n-5Cd" secondAttribute="height" multiplier="16:10" id="4aB-rs-m22"/>
                     </constraints>
                 </customView>
                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xnT-RR-pOf">
-                    <rect key="frame" x="3" y="28" width="24" height="24"/>
+                    <rect key="frame" x="14" y="28" width="24" height="24"/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="note" id="UzG-df-K2K"/>
                 </imageView>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="97z-d7-S3D" customClass="VLCImageView">
-                    <rect key="frame" x="48" y="3" width="75" height="75"/>
+                    <rect key="frame" x="59" y="3" width="75" height="75"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="97z-d7-S3D" secondAttribute="height" multiplier="1:1" id="YBL-j9-anm"/>
                     </constraints>
@@ -56,7 +56,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TPv-k2-6XS">
-                    <rect key="frame" x="131" y="18" width="37" height="17"/>
+                    <rect key="frame" x="142" y="18" width="37" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="jZ4-pa-K3T">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -67,7 +67,7 @@
             <constraints>
                 <constraint firstItem="ohB-P0-nCv" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" constant="10" id="3wD-FP-vka"/>
                 <constraint firstItem="TPv-k2-6XS" firstAttribute="leading" secondItem="ohB-P0-nCv" secondAttribute="leading" id="4qb-9H-TVg"/>
-                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="3" id="8hv-Qt-uAI"/>
+                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="14" id="8hv-Qt-uAI"/>
                 <constraint firstItem="xJW-ps-ycn" firstAttribute="leading" secondItem="ohB-P0-nCv" secondAttribute="leading" id="DYk-9g-adD"/>
                 <constraint firstItem="ohB-P0-nCv" firstAttribute="top" secondItem="xJW-ps-ycn" secondAttribute="bottom" constant="-3" id="Epo-on-wpL"/>
                 <constraint firstItem="97z-d7-S3D" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="3" id="FbP-R4-bAA"/>

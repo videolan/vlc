@@ -26,14 +26,28 @@
 #import "playlist/VLCPlaylistItem.h"
 #import "views/VLCImageView.h"
 
+@interface VLCPlaylistTableCellView ()
+{
+    NSFont *_displayedFont;
+    NSFont *_displayedBoldFont;
+}
+@end
+
 @implementation VLCPlaylistTableCellView
+
+- (void)awakeFromNib
+{
+    [self updateFontsBasedOnSetting];
+}
 
 - (void)setRepresentsCurrentPlaylistItem:(BOOL)representsCurrentPlaylistItem
 {
     _representsCurrentPlaylistItem = representsCurrentPlaylistItem;
-    NSFont *displayedFont = _representsCurrentPlaylistItem ? [NSFont VLCplaylistSelectedItemLabelFont] : [NSFont VLCplaylistLabelFont];
+    NSFont *displayedFont = _representsCurrentPlaylistItem ? _displayedBoldFont : _displayedFont;
     self.mediaTitleTextField.font = displayedFont;
     self.secondaryMediaTitleTextField.font = displayedFont;
+    self.artistTextField.font = _displayedFont;
+    self.durationTextField.font = _displayedFont;
 }
 
 - (void)setRepresentedPlaylistItem:(VLCPlaylistItem *)item
@@ -61,6 +75,19 @@
     self.durationTextField.stringValue = [NSString stringWithTimeFromTicks:item.duration];
 
     _representedPlaylistItem = item;
+}
+
+- (void)updateFontsBasedOnSetting
+{
+    BOOL largeText = config_GetInt("macosx-large-text");
+    if (largeText) {
+        _displayedFont = [NSFont VLCplaylistLabelFont];
+        _displayedBoldFont = [NSFont VLCplaylistSelectedItemLabelFont];
+    } else {
+        _displayedFont = [NSFont VLCsmallPlaylistLabelFont];
+        _displayedBoldFont = [NSFont VLCsmallPlaylistSelectedItemLabelFont];
+    }
+    [self setRepresentsCurrentPlaylistItem:_representsCurrentPlaylistItem];
 }
 
 @end
