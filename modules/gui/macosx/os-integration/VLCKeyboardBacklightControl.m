@@ -1,8 +1,7 @@
 /*****************************************************************************
  * VLCKeyboardBlacklightControl.m: MacBook keyboard backlight control for VLC
  *****************************************************************************
- * Copyright (C) 2015 VLC authors and VideoLAN
- *
+ * Copyright (C) 2015, 2019 VLC authors and VideoLAN
  *
  * Authors: Maxime Mouchet <max@maxmouchet.com>
  *
@@ -23,6 +22,7 @@
 
 #import "VLCKeyboardBacklightControl.h"
 #import <IOKit/IOKitLib.h>
+#import "main/VLCMain.h"
 
 enum {
     kGetSensorReadingID = 0, // getSensorReading(int *, int *)
@@ -31,40 +31,57 @@ enum {
     kSetLEDFadeID = 3        // setLEDFade(int, int, int, int *)
 };
 
-@implementation VLCKeyboardBacklightControl {
-    io_connect_t dataPort;
+@interface VLCKeyboardBacklightControl ()
+{
+    io_connect_t _dataPort;
+    float _lastBrightnessLevel;
 }
+@end
 
-static float lastBrightnessLevel;
+@implementation VLCKeyboardBacklightControl
 
-- (id)init {
-    dataPort = [self getDataPort];
-    lastBrightnessLevel = [self getBrightness];
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        _dataPort = [self getDataPort];
+        _lastBrightnessLevel = [self getBrightness];
+    }
     return self;
 }
 
-- (void)dealloc {
-    if (dataPort)
-        IOServiceClose(dataPort);
+- (void)dealloc
+{
+    if (_dataPort)
+        IOServiceClose(_dataPort);
 }
 
 - (io_connect_t)getDataPort {
-    if (dataPort) return dataPort;
+    if (_dataPort)
+        return _dataPort;
 
     io_service_t serviceObject = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleLMUController"));
 
-    if (!serviceObject) return 0;
+    if (!serviceObject) {
+        msg_Err(getIntf(), "Failed to get an AppleLMUController service, keyboard dimming will not work");
+        return 0;
+    }
 
-    kern_return_t kr = IOServiceOpen(serviceObject, mach_task_self(), 0, &dataPort);
+    kern_return_t kr = IOServiceOpen(serviceObject, mach_task_self(), 0, &_dataPort);
     IOObjectRelease(serviceObject);
 
-    if (kr != KERN_SUCCESS) return 0;
+    if (kr != KERN_SUCCESS) {
+        msg_Err(getIntf(), "Failed to open an AppleLMUController service, keyboard dimming will not work");
+        return 0;
+    }
 
-    return dataPort;
+    return _dataPort;
 }
 
-- (void)setBrightness:(float)brightness {
-    if (!dataPort) return;
+- (void)setBrightness:(float)brightness
+{
+    if (!_dataPort)
+        return;
 
     UInt32 inputCount = 2;
     UInt64 inputValues[2] = { 0, brightness * 0xfff };
@@ -72,18 +89,21 @@ static float lastBrightnessLevel;
     UInt32 outputCount = 1;
     UInt64 outputValues[1];
 
-    kern_return_t kr = IOConnectCallScalarMethod(dataPort,
+    kern_return_t kr = IOConnectCallScalarMethod(_dataPort,
                                                  kSetLEDBrightnessID,
                                                  inputValues,
                                                  inputCount,
                                                  outputValues,
                                                  &outputCount);
 
-    if (kr != KERN_SUCCESS) return;
+    if (kr != KERN_SUCCESS)
+        return;
 }
 
-- (float)getBrightness {
-    if (!dataPort) return 0.0;
+- (float)getBrightness
+{
+    if (!_dataPort)
+        return 0.0;
 
     uint32_t inputCount = 1;
     uint64_t inputValues[1] = { 0 };
@@ -91,7 +111,7 @@ static float lastBrightnessLevel;
     uint32_t outputCount = 1;
     uint64_t outputValues[1];
 
-    kern_return_t kr = IOConnectCallScalarMethod(dataPort,
+    kern_return_t kr = IOConnectCallScalarMethod(_dataPort,
                                                  kGetLEDBrightnessID,
                                                  inputValues,
                                                  inputCount,
@@ -106,16 +126,20 @@ static float lastBrightnessLevel;
     return brightness;
 }
 
-- (void)lightsUp {
-    if (!dataPort) return;
+- (void)lightsUp
+{
+    if (!_dataPort) {
+        return;
+    }
 
     @synchronized(self) {
         float start = [self getBrightness];
-        float target = lastBrightnessLevel;
+        float target = _lastBrightnessLevel;
 
         // Don't do anything if the user has put
         // backlight on again during playback.
-        if (start != 0) return;
+        if (start != 0)
+            return;
 
         for (float i = start; i <= target; i += 0.08) {
             [self setBrightness:i];
@@ -126,14 +150,17 @@ static float lastBrightnessLevel;
     }
 }
 
-- (void)lightsDown {
-    if (!dataPort) return;
+- (void)lightsDown
+{
+    if (!_dataPort) {
+        return;
+    }
 
     @synchronized(self) {
         float start = [self getBrightness];
         float target = 0;
 
-        lastBrightnessLevel = start;
+        _lastBrightnessLevel = start;
 
         for (float i = start; i >= target; i -= 0.08) {
             [self setBrightness:i];
@@ -144,7 +171,8 @@ static float lastBrightnessLevel;
     }
 }
 
-- (void)switchLightsAsync:(BOOL)on {
+- (void)switchLightsAsync:(BOOL)on
+{
     if (on) {
         [NSThread detachNewThreadSelector:@selector(lightsUp) toTarget:self withObject:nil];
     } else {
@@ -152,11 +180,12 @@ static float lastBrightnessLevel;
     }
 }
 
-- (void)switchLightsInstantly:(BOOL)on {
+- (void)switchLightsInstantly:(BOOL)on
+{
     if (on) {
         // Don't do anything if the user has put backlight on again during playback.
         if ([self getBrightness] == 0) {
-            [self setBrightness:lastBrightnessLevel];
+            [self setBrightness:_lastBrightnessLevel];
         }
     } else {
         [self setBrightness:0];

@@ -26,14 +26,6 @@
 @interface VLCKeyboardBacklightControl : NSObject
 
 /*!
- *  Initialize an instance of KeyboardBacklight.
- *
- *  Note: this will return nil if the connection to
- *  the controller could not be opened.
- */
-- (id)init;
-
-/*!
  *  Smoothly turn on backlight on MacBook keyboard.
  *
  *  Try to restore the previous brightness level. If the user has put
