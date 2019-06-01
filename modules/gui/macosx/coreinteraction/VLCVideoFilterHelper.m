@@ -121,7 +121,6 @@
         return;
 
     int i_type = 0;
-    bool b_is_command = false;
     char const *psz_filter_type = [self getFilterType: psz_filter];
     if (!psz_filter_type) {
         msg_Err(p_intf, "Unable to find filter module \"%s\".", psz_filter);

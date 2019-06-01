@@ -25,7 +25,6 @@
 #import "coreinteraction/VLCVideoFilterHelper.h"
 #import "extensions/VLCHexNumberFormatter.h"
 #import "extensions/NSString+Helpers.h"
-#import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "panels/dialogs/VLCPopupPanelController.h"
 #import "panels/dialogs/VLCTextfieldPanelController.h"
@@ -471,7 +470,6 @@
 /// Sets widget values based on variables
 - (void)resetValues
 {
-    intf_thread_t *p_intf = getIntf();
     VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
     vout_thread_t *vout = [playerController mainVideoOutputThread];
     if (!vout)
@@ -647,7 +645,6 @@
 
 - (NSString *)generateProfileString
 {
-    intf_thread_t *p_intf = getIntf();
     VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
     vout_thread_t *vout = [playerController mainVideoOutputThread];
     if (!vout)

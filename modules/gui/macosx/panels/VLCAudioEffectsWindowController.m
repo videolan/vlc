@@ -103,7 +103,7 @@
     self = [super initWithWindowNibName:@"AudioEffects"];
     if (self) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+            self->_playerController = [[[VLCMain sharedInstance] playlistController] playerController];
 
             self.popupPanel = [[VLCPopupPanelController alloc] init];
             self.textfieldPanel = [[VLCTextfieldPanelController alloc] init];
@@ -138,7 +138,6 @@
 /// Loads values from profile into variables
 - (void)loadProfile
 {
-    intf_thread_t *p_intf = getIntf();
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSInteger profileIndex = [self currentProfileIndex];
     audio_output_t *p_aout = [_playerController mainAudioOutput];
