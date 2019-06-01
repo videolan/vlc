@@ -469,21 +469,22 @@ int WindowOpen(vout_window_t *p_wnd)
 {
     intf_thread_t *p_intf = getIntf();
     BOOL b_nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
+    BOOL b_fullscreen = i_full != 0;
+
+    if (var_InheritBool(p_intf, "macosx-dim-keyboard")) {
+        [_keyboardBacklight switchLightsAsync:!b_fullscreen];
+    }
 
     if (!p_intf || (!b_nativeFullscreenMode && !p_wnd))
         return;
-    BOOL b_fullscreen = i_full != 0;
 
     if (!_playerController.fullscreen != !b_fullscreen) {
         _playerController.fullscreen = b_fullscreen;
     }
 
     VLCVideoWindowCommon *o_current_window = nil;
-    if(p_wnd)
+    if (p_wnd) {
         o_current_window = [_voutWindows objectForKey:[NSValue valueWithPointer:p_wnd]];
-
-    if (var_InheritBool(p_intf, "macosx-dim-keyboard")) {
-        [_keyboardBacklight switchLightsAsync:!b_fullscreen];
     }
 
     if (b_nativeFullscreenMode) {
