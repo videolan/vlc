@@ -25,6 +25,7 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "playlist/VLCPlaylistItem.h"
 #import "views/VLCImageView.h"
+#import "main/VLCMain.h"
 
 @interface VLCPlaylistTableCellView ()
 {
@@ -40,7 +41,7 @@
     [self updateFontsBasedOnSetting:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updateFontsBasedOnSetting:)
-                                                 name:VLCMacOSXInterfaceLargeTextSettingChanged
+                                                 name:VLCConfigurationChangedNotification
                                                object:nil];
 }
 

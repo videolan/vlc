@@ -124,7 +124,7 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(updateViewCellDimensionsBasedOnSetting:)
-                               name:VLCMacOSXInterfaceLargeTextSettingChanged
+                               name:VLCConfigurationChangedNotification
                              object:nil];
 
     if (@available(macOS 10_14, *)) {

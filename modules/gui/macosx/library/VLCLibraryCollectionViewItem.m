@@ -59,7 +59,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(updateFontBasedOnSetting:)
-                                   name:VLCMacOSXInterfaceLargeTextSettingChanged
+                                   name:VLCConfigurationChangedNotification
                                  object:nil];
     }
     return self;

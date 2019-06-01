@@ -30,8 +30,6 @@
 #import "playlist/VLCPlaylistModel.h"
 #import "playlist/VLCPlayerController.h"
 
-NSString *VLCMediaKeySupportSettingChangedNotification = @"VLCMediaKeySupportSettingChangedNotification";
-
 @interface VLCClickerManager()
 {
     VLCPlaylistController *_playlistController;
@@ -65,7 +63,7 @@ NSString *VLCMediaKeySupportSettingChangedNotification = @"VLCMediaKeySupportSet
         }
         [notificationCenter addObserver:self
                                selector:@selector(coreChangedMediaKeySupportSetting:)
-                                   name:VLCMediaKeySupportSettingChangedNotification
+                                   name:VLCConfigurationChangedNotification
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(playlistUpdated:)
