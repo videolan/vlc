@@ -16,8 +16,9 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-06-02 00:01+0200\n"
+"Last-Translator: Jonathan Joseph Chiarella <jonathan.chiarella@gmail.com>, "
+"2019\n"
 "Language-Team: Korean (https://www.transifex.com/yaron/teams/16553/ko/)\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -23451,7 +23452,7 @@ msgstr "AVparser 패킷타이저"
 
 #: modules/packetizer/av1.c:557
 msgid "AV1 video packetizer"
-msgstr ""
+msgstr "AV1 비디오 패킷타이저"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
