@@ -57,11 +57,12 @@
 #import <vlc_plugin.h>
 
 #import "extensions/NSString+Helpers.h"
-#import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "preferences/prefs.h"
 #import "preferences/VLCSimplePrefsController.h"
 #import "preferences/prefs_widgets.h"
+#import "extensions/NSFont+VLCAdditions.h"
+#import "os-integration/VLCClickerManager.h"
 
 #define LEFTMARGIN  18
 #define RIGHTMARGIN 18
@@ -217,6 +218,10 @@
     [_rootTreeItem applyChanges];
     fixIntfSettings();
     config_SaveConfigFile(getIntf());
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter postNotificationName:VLCMediaKeySupportSettingChangedNotification object:nil];
+    [notificationCenter postNotificationName:VLCMacOSXInterfaceLargeTextSettingChanged object:nil];
+    [notificationCenter postNotificationName:VLCConfigurationChangedNotification object:nil];
     [self.window orderOut:self];
 }
 

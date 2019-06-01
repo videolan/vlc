@@ -43,7 +43,6 @@
 #import "extensions/NSScreen+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
-#import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "main/VLCMain+OldPrefs.h"
 #import "os-integration/VLCClickerManager.h"
