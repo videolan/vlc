@@ -964,7 +964,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         [defaults setObject:toNSStr(language_map[index].iso) forKey:@"language"];
         [VLCSimplePrefsController updateRightToLeftSettings];
-        [defaults synchronize];
 
         config_PutInt("metadata-network-access", [_intf_artCheckbox state]);
 

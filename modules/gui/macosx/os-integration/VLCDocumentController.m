@@ -40,7 +40,6 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:[NSDictionary dictionary] forKey:@"recentlyPlayedMedia"];
     [defaults setObject:[NSArray array] forKey:@"recentlyPlayedMediaList"];
-    [defaults synchronize];
 
     [super clearRecentDocuments:sender];
 }

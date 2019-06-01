@@ -382,7 +382,6 @@
 
     [workArray replaceObjectAtIndex:currentProfileIndex withObject:newProfile];
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfiles"];
-    [defaults synchronize];
 }
 
 - (void)saveCurrentProfileAtTerminate
@@ -470,8 +469,6 @@
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfileNames"];
 
     [self saveCurrentProfileIndex:([workArray count] - 1)];
-
-    [defaults synchronize];
 }
 
 - (IBAction)profileSelectorAction:(id)sender
@@ -535,11 +532,7 @@
 
         [_self saveCurrentProfileIndex:([workArray count] - 1)];
 
-
-        /* save defaults */
-        [defaults synchronize];
         [_self resetProfileSelector];
-
     }];
 }
 
@@ -576,8 +569,6 @@
         if (currentProfileIndex >= selectedIndex)
             [_self saveCurrentProfileIndex:(currentProfileIndex - 1)];
 
-        /* save defaults */
-        [defaults synchronize];
         [_self resetProfileSelector];
     }];
 }
@@ -819,7 +810,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQNames"]];
         [workArray addObject:decomposedStringWithCanonicalMapping];
         [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQNames"];
-        [defaults synchronize];
 
         /* update VLC internals */
         char const *psz_eq_preset = [decomposedStringWithCanonicalMapping UTF8String];
@@ -862,7 +852,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQNames"]];
         [workArray removeObjectAtIndex:selectedIndex];
         [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQNames"];
-        [defaults synchronize];
 
         /* update UI */
         [_self updatePresetSelector];
@@ -873,7 +862,6 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 #pragma mark Compressor
 - (void)resetCompressor
 {
-    intf_thread_t *p_intf = getIntf();
     audio_output_t *p_aout = [_playerController mainAudioOutput];
     if (!p_aout)
         return;

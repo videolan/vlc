@@ -1055,7 +1055,6 @@
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:_profileNames forKey:@"CASProfileNames"];
     [defaults setObject:_profileValueList forKey:@"CASProfiles"];
-    [defaults synchronize];
 }
 
 - (void)recreateProfilePopup

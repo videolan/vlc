@@ -238,7 +238,6 @@
     }
     [defaults setObject:mutDict forKey:@"recentlyPlayedMedia"];
     [defaults setObject:mediaList forKey:@"recentlyPlayedMediaList"];
-    [defaults synchronize];
 }
 
 @end

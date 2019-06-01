@@ -713,7 +713,6 @@
 
     [workArray replaceObjectAtIndex:currentProfileIndex withObject:newProfile];
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
-    [defaults synchronize];
 }
 
 - (void)saveCurrentProfileAtTerminate
@@ -750,8 +749,6 @@
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
 
     [self saveCurrentProfileIndex:([workArray count] - 1)];
-
-    [defaults synchronize];
 }
 
 - (IBAction)toggleWindow:(id)sender
@@ -823,9 +820,6 @@
         [workArray addObject:resultingText];
         [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
 
-        /* save defaults */
-        [defaults synchronize];
-
         /* refresh UI */
         [_self resetProfileSelector];
     }];
@@ -867,9 +861,6 @@
 
         if (activeProfileIndex >= selectedIndex)
             [self saveCurrentProfileIndex:(activeProfileIndex - 1)];
-
-        /* save defaults */
-        [defaults synchronize];
 
         /* refresh UI */
         [_self resetProfileSelector];
