@@ -122,6 +122,10 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
                            selector:@selector(repeatStateUpdated:)
                                name:VLCPlaybackRepeatChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateViewCellDimensionsBasedOnSetting:)
+                               name:VLCMacOSXInterfaceLargeTextSettingChanged
+                             object:nil];
 
     if (@available(macOS 10_14, *)) {
         [[NSApplication sharedApplication] addObserver:self
@@ -159,7 +163,7 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 
     _playlistTableView.dataSource = _playlistDataSource;
     _playlistTableView.delegate = _playlistDataSource;
-    _playlistTableView.rowHeight = config_GetInt("macosx-large-text") ? VLCLibraryWindowLargePlaylistRowHeight : VLCLibraryWindowSmallPlaylistRowHeight;
+    [self updateViewCellDimensionsBasedOnSetting:nil];
     [_playlistTableView reloadData];
 
     _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
@@ -227,6 +231,8 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
     }
 }
 
+#pragma mark - appearance setters
+
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
                         change:(NSDictionary<NSKeyValueChangeKey,id> *)change
@@ -246,6 +252,11 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
         self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
         self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
     }
+}
+
+- (void)updateViewCellDimensionsBasedOnSetting:(NSNotification *)aNotification
+{
+    _playlistTableView.rowHeight = config_GetInt("macosx-large-text") ? VLCLibraryWindowLargePlaylistRowHeight : VLCLibraryWindowSmallPlaylistRowHeight;
 }
 
 #pragma mark - playmode state display and interaction

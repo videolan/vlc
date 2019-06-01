@@ -22,6 +22,8 @@
 
 #import "NSFont+VLCAdditions.h"
 
+NSString *VLCMacOSXInterfaceLargeTextSettingChanged = @"VLCMacOSXInterfaceLargeTextSettingChanged";
+
 @implementation NSFont (VLCAdditions)
 
 + (instancetype)VLClibrarySectionHeaderFont

@@ -37,7 +37,16 @@
 
 - (void)awakeFromNib
 {
-    [self updateFontsBasedOnSetting];
+    [self updateFontsBasedOnSetting:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateFontsBasedOnSetting:)
+                                                 name:VLCMacOSXInterfaceLargeTextSettingChanged
+                                               object:nil];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)setRepresentsCurrentPlaylistItem:(BOOL)representsCurrentPlaylistItem
@@ -77,7 +86,7 @@
     _representedPlaylistItem = item;
 }
 
-- (void)updateFontsBasedOnSetting
+- (void)updateFontsBasedOnSetting:(NSNotification *)aNotification
 {
     BOOL largeText = config_GetInt("macosx-large-text");
     if (largeText) {

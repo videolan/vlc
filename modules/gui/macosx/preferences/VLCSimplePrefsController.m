@@ -42,6 +42,7 @@
 #import "extensions/misc.h"
 #import "extensions/NSScreen+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSFont+VLCAdditions.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 #import "main/VLCMain+OldPrefs.h"
@@ -1108,6 +1109,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter postNotificationName:VLCMediaKeySupportSettingChangedNotification object:nil];
+    [notificationCenter postNotificationName:VLCMacOSXInterfaceLargeTextSettingChanged object:nil];
     [notificationCenter postNotificationName:VLCConfigurationChangedNotification object:nil];
 }
 

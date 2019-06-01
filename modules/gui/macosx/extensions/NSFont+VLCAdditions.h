@@ -24,6 +24,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString *VLCMacOSXInterfaceLargeTextSettingChanged;
+
 @interface NSFont (VLCAdditions)
 
 + (instancetype)VLClibrarySectionHeaderFont;
