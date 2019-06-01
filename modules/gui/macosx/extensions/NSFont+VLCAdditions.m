@@ -46,14 +46,24 @@ NSString *VLCMacOSXInterfaceLargeTextSettingChanged = @"VLCMacOSXInterfaceLargeT
     return [NSFont systemFontOfSize:11. weight:NSFontWeightBold];
 }
 
-+ (instancetype)VLClibraryCellTitleFont
++ (instancetype)VLClibraryLargeCellTitleFont
 {
     return [NSFont systemFontOfSize:17. weight:NSFontWeightMedium];
 }
 
-+ (instancetype)VLClibraryCellSubtitleFont
++ (instancetype)VLClibraryLargeCellSubtitleFont
 {
     return [NSFont systemFontOfSize:13. weight:NSFontWeightSemibold];
+}
+
++ (instancetype)VLClibrarySmallCellTitleFont
+{
+    return [NSFont systemFontOfSize:13. weight:NSFontWeightMedium];
+}
+
++ (instancetype)VLClibrarySmallCellSubtitleFont
+{
+    return [NSFont systemFontOfSize:10. weight:NSFontWeightSemibold];
 }
 
 + (instancetype)VLClibraryCellAnnotationFont

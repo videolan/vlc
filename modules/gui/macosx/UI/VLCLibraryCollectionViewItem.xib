@@ -25,7 +25,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="2aB-sB-hfY" customClass="VLCImageView">
-                    <rect key="frame" x="0.0" y="46" width="256" height="168"/>
+                    <rect key="frame" x="0.0" y="49" width="256" height="165"/>
                     <subviews>
                         <customView translatesAutoresizingMaskIntoConstraints="NO" id="dFt-oZ-h9P" customClass="VLCLinearProgressIndicator">
                             <rect key="frame" x="0.0" y="0.0" width="256" height="4"/>
@@ -34,7 +34,7 @@
                             </constraints>
                         </customView>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S3I-5Z-qgS">
-                            <rect key="frame" x="96" y="52" width="64" height="64"/>
+                            <rect key="frame" x="96" y="51" width="64" height="64"/>
                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="libraryPlay" imagePosition="only" alignment="center" inset="2" id="IHP-p1-d0R">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -44,7 +44,7 @@
                             </connections>
                         </button>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tm2-NW-WsZ" customClass="VLCRoundedCornerTextField">
-                            <rect key="frame" x="8" y="144" width="37" height="17"/>
+                            <rect key="frame" x="8" y="141" width="37" height="17"/>
                             <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="tyb-Ur-7J9">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -61,7 +61,7 @@
                     </constraints>
                 </customView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OBS-Eh-1mT">
-                    <rect key="frame" x="-2" y="18" width="52" height="24"/>
+                    <rect key="frame" x="-2" y="21" width="52" height="24"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" title="Label" usesSingleLineMode="YES" id="7Hy-o3-LvX">
                         <font key="font" size="20" name=".AppleSystemUIFont"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -103,7 +103,7 @@
                 <constraint firstItem="2aB-sB-hfY" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="3Ah-0T-rA9"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="OBS-Eh-1mT" secondAttribute="trailing" id="457-oy-EbD"/>
                 <constraint firstItem="Ubz-8I-W2F" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="7" id="8Qf-Un-Gdl"/>
-                <constraint firstItem="VAn-gF-QiZ" firstAttribute="top" secondItem="OBS-Eh-1mT" secondAttribute="bottom" constant="-1" id="ALi-0z-Mza"/>
+                <constraint firstItem="VAn-gF-QiZ" firstAttribute="top" secondItem="OBS-Eh-1mT" secondAttribute="bottom" constant="2" id="ALi-0z-Mza"/>
                 <constraint firstAttribute="trailing" secondItem="u2r-zy-XEW" secondAttribute="trailing" id="Dd7-va-0UJ"/>
                 <constraint firstItem="u2r-zy-XEW" firstAttribute="centerY" secondItem="VAn-gF-QiZ" secondAttribute="centerY" id="H5N-j9-THf"/>
                 <constraint firstAttribute="bottom" secondItem="VAn-gF-QiZ" secondAttribute="bottom" id="Kp0-Hx-3Ek"/>

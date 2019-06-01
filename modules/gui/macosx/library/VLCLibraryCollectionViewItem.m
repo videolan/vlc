@@ -52,9 +52,15 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(mediaItemUpdated:)
-                                                     name:VLCLibraryModelMediaItemUpdated object:nil];
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                               selector:@selector(mediaItemUpdated:)
+                                   name:VLCLibraryModelMediaItemUpdated
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(updateFontBasedOnSetting:)
+                                   name:VLCMacOSXInterfaceLargeTextSettingChanged
+                                 object:nil];
     }
     return self;
 }
@@ -70,8 +76,6 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (void)awakeFromNib
 {
     [(VLCTrackingView *)self.view setViewToHide:self.playInstantlyButton];
-    self.mediaTitleTextField.font = [NSFont VLClibraryCellTitleFont];
-    self.durationTextField.font = [NSFont VLClibraryCellSubtitleFont];
     self.durationTextField.textColor = [NSColor VLClibrarySubtitleColor];
     self.annotationTextField.font = [NSFont VLClibraryCellAnnotationFont];
     self.annotationTextField.textColor = [NSColor VLClibraryAnnotationColor];
@@ -88,8 +92,11 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     }
 
     [self updateColoredAppearance];
+    [self updateFontBasedOnSetting:nil];
     [self prepareForReuse];
 }
+
+#pragma mark - dynamic appearance
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
@@ -102,6 +109,17 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (void)updateColoredAppearance
 {
     self.mediaTitleTextField.textColor = self.view.shouldShowDarkAppearance ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
+}
+
+- (void)updateFontBasedOnSetting:(NSNotification *)aNotification
+{
+    if (config_GetInt("macosx-large-text")) {
+        self.mediaTitleTextField.font = [NSFont VLClibraryLargeCellTitleFont];
+        self.durationTextField.font = [NSFont VLClibraryLargeCellSubtitleFont];
+    } else {
+        self.mediaTitleTextField.font = [NSFont VLClibrarySmallCellTitleFont];
+        self.durationTextField.font = [NSFont VLClibrarySmallCellSubtitleFont];
+    }
 }
 
 #pragma mark - view representation

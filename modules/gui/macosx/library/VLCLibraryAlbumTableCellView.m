@@ -50,9 +50,9 @@ const CGFloat VLCLibraryTracksRowHeight = 50.;
 
 - (void)awakeFromNib
 {
-    self.albumNameTextField.font = [NSFont VLClibraryCellTitleFont];
-    self.yearTextField.font = [NSFont VLClibraryCellTitleFont];
-    self.summaryTextField.font = [NSFont VLClibraryCellSubtitleFont];
+    self.albumNameTextField.font = [NSFont VLClibraryLargeCellTitleFont];
+    self.yearTextField.font = [NSFont VLClibraryLargeCellTitleFont];
+    self.summaryTextField.font = [NSFont VLClibraryLargeCellSubtitleFont];
     self.trackingView.viewToHide = self.playInstantlyButton;
     [self prepareForReuse];
 }
