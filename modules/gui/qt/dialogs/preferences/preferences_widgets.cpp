@@ -1432,6 +1432,7 @@ void KeyInputDialog::setExistingkeysSet( const QSet<QString> *keyset )
 
 void KeyInputDialog::checkForConflicts( int i_vlckey, const QString &sequence )
 {
+    conflicts = false;
     QList<QTreeWidgetItem *> conflictList =
         table->findItems( VLCKeyToString( i_vlckey, true ), Qt::MatchExactly,
                           column );
