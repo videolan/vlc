@@ -51,7 +51,7 @@
     playItem.target = self;
     NSMenuItem *appendItem = [[NSMenuItem alloc] initWithTitle:_NS("Append to Playlist") action:@selector(appendToPlaylist:) keyEquivalent:@""];
     appendItem.target = self;
-    NSMenuItem *addItem = [[NSMenuItem alloc] initWithTitle:_NS("Add Media...") action:@selector(addMedia:) keyEquivalent:@""];
+    NSMenuItem *addItem = [[NSMenuItem alloc] initWithTitle:_NS("Add Media Folder...") action:@selector(addMedia:) keyEquivalent:@""];
     addItem.target = self;
     NSMenuItem *revealItem = [[NSMenuItem alloc] initWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
     revealItem.target = self;
@@ -79,7 +79,22 @@
 
 - (void)addMedia:(id)sender
 {
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseFiles: NO];
+    [openPanel setCanChooseDirectories: YES];
+    [openPanel setAllowsMultipleSelection: YES];
 
+    NSModalResponse modalResponse = [openPanel runModal];
+
+    if (modalResponse == NSModalResponseOK) {
+        NSArray *URLs = [openPanel URLs];
+        NSUInteger count = [URLs count];
+        VLCLibraryController *libraryController = [[VLCMain sharedInstance] libraryController];
+        for (NSUInteger i = 0; i < count ; i++) {
+            NSURL *url = URLs[i];
+            [libraryController addFolderWithFileURL:url];
+        }
+    }
 }
 
 - (void)revealInFinder:(id)sender
