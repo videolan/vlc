@@ -30,7 +30,7 @@
 @property (strong) IBOutlet NSView *playbackInfoView;
 @property (strong) IBOutlet NSView *controlsView;
 
-- (IBAction)restoreMainWindow:(id)sender;
+- (IBAction)statusBarIconShowMainWindow:(id)sender;
 - (IBAction)statusBarIconTogglePlayPause:(id)sender;
 - (IBAction)statusBarIconStop:(id)sender;
 - (IBAction)statusBarIconNext:(id)sender;

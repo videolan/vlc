@@ -56,7 +56,6 @@
     IBOutlet NSMenuItem *showMainWindowItem;
     IBOutlet NSMenuItem *quitItem;
 
-    BOOL isStopped;
     BOOL _showTimeElapsed;
     NSString *_currentPlaybackUrl;
 }
@@ -128,6 +127,10 @@
                            selector:@selector(configurationChanged:)
                                name:VLCConfigurationChangedNotification
                              object:nil];
+
+    [self inputItemChanged:nil];
+
+    [self setMetadataTitle:_NS("VLC media player") artist:_NS("Nothing playing") album:nil andCover:[NSImage imageNamed:@"noart.png"]];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -236,11 +239,7 @@
         vlc_tick_t duration = input_item_GetDuration(p_item);
         vlc_tick_t time = playerController.time;
 
-        if (duration == -1) {
-            /* Unknown duration, possibly due to buffering */
-            [progressField setStringValue:@"--:--"];
-            [totalField setStringValue:@"--:--"];
-        } else if (duration == 0) {
+        if (duration == 0) {
             /* Infinite duration */
             [progressField setStringValue:[NSString stringWithDuration:duration currentTime:time negative:NO]];
             [totalField setStringValue:@"∞"];
@@ -442,7 +441,6 @@
 // Set the play/pause menu item status
 - (void)setStoppedStatus:(BOOL)stopped
 {
-    isStopped = stopped;
     if (stopped) {
         [playPauseButton setState:NSOffState];
     } else {
@@ -486,9 +484,9 @@
 }
 
 // Action: Show VLC main window
-- (IBAction)restoreMainWindow:(id)sender
+- (IBAction)statusBarIconShowMainWindow:(id)sender
 {
-    [[NSApp sharedApplication] activateIgnoringOtherApps:YES];
+    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     [(NSWindow *)[[VLCMain sharedInstance] libraryWindow] makeKeyAndOrderFront:sender];
 }
 
