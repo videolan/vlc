@@ -299,24 +299,37 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     return toolbarItem;
 }
 
+- (NSArray<NSString *> *)toolbarIdentifiers {
+    static dispatch_once_t onceToken;
+    static NSArray<NSString *> *toolbarIdentifiers = nil;
+
+    dispatch_once(&onceToken, ^{
+        toolbarIdentifiers = @[VLCIntfSettingToolbarIdentifier,
+                               VLCAudioSettingToolbarIdentifier,
+                               VLCVideoSettingToolbarIdentifier,
+                               VLCOSDSettingToolbarIdentifier,
+                               VLCInputSettingToolbarIdentifier,
+                               VLCMediaLibrarySettingToolbarIdentifier,
+                               VLCHotkeysSettingToolbarIdentifier,
+                               NSToolbarFlexibleSpaceItemIdentifier];
+    });
+
+    return toolbarIdentifiers;
+}
+
 - (NSArray *)toolbarDefaultItemIdentifiers: (NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects:VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier,
-             VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCMediaLibrarySettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier,
-             NSToolbarFlexibleSpaceItemIdentifier, nil];
+    return [self toolbarIdentifiers];
 }
 
 - (NSArray *)toolbarAllowedItemIdentifiers: (NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects:VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier,
-             VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCMediaLibrarySettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier,
-             NSToolbarFlexibleSpaceItemIdentifier, nil];
+    return [self toolbarIdentifiers];
 }
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects:VLCIntfSettingToolbarIdentifier, VLCAudioSettingToolbarIdentifier, VLCVideoSettingToolbarIdentifier,
-             VLCOSDSettingToolbarIdentifier, VLCInputSettingToolbarIdentifier, VLCMediaLibrarySettingToolbarIdentifier, VLCHotkeysSettingToolbarIdentifier, nil];
+    return [self toolbarIdentifiers];
 }
 
 - (void)initStrings
