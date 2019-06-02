@@ -63,7 +63,7 @@ enum {
     io_service_t serviceObject = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleLMUController"));
 
     if (!serviceObject) {
-        msg_Err(getIntf(), "Failed to get an AppleLMUController service, keyboard dimming will not work");
+        msg_Warn(getIntf(), "Failed to get an AppleLMUController service, keyboard dimming will not work");
         return 0;
     }
 
@@ -71,7 +71,7 @@ enum {
     IOObjectRelease(serviceObject);
 
     if (kr != KERN_SUCCESS) {
-        msg_Err(getIntf(), "Failed to open an AppleLMUController service, keyboard dimming will not work");
+        msg_Warn(getIntf(), "Failed to open an AppleLMUController service, keyboard dimming will not work");
         return 0;
     }
 
