@@ -205,16 +205,16 @@ bool IsRGBShader(const d3d_format_t *cfg)
 static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool legacy_shader,
                                    d3d11_device_t *d3d_dev,
                                    const char *psz_sampler,
-                                   const char *psz_src_transform,
+                                   const char *psz_src_to_linear,
                                    const char *psz_primaries_transform,
-                                   const char *psz_display_transform,
+                                   const char *psz_linear_to_display,
                                    const char *psz_tone_mapping,
                                    const char *psz_adjust_range, const char *psz_move_planes,
                                    ID3D11PixelShader **output)
 {
     char *shader;
     int allocated = asprintf(&shader, globPixelShaderDefault, legacy_shader ? "" : "Array",
-                             psz_src_transform, psz_display_transform,
+                             psz_src_to_linear, psz_linear_to_display,
                              psz_primaries_transform, psz_tone_mapping,
                              psz_adjust_range, psz_move_planes, psz_sampler);
     if (allocated <= 0)
@@ -226,10 +226,10 @@ static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool l
         msg_Dbg(o, "shader %s", shader);
 #ifndef NDEBUG
     else {
-    msg_Dbg(o,"psz_src_transform %s", psz_src_transform);
+    msg_Dbg(o,"psz_src_to_linear %s", psz_src_to_linear);
     msg_Dbg(o,"psz_primaries_transform %s", psz_primaries_transform);
     msg_Dbg(o,"psz_tone_mapping %s", psz_tone_mapping);
-    msg_Dbg(o,"psz_display_transform %s", psz_display_transform);
+    msg_Dbg(o,"psz_linear_to_display %s", psz_linear_to_display);
     msg_Dbg(o,"psz_adjust_range %s", psz_adjust_range);
     msg_Dbg(o,"psz_sampler %s", psz_sampler);
     msg_Dbg(o,"psz_move_planes %s", psz_move_planes);
@@ -259,8 +259,8 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
 {
     static const char *DEFAULT_NOOP = "return rgb";
     const char *psz_sampler[2] = {NULL, NULL};
-    const char *psz_src_transform     = DEFAULT_NOOP;
-    const char *psz_display_transform = DEFAULT_NOOP;
+    const char *psz_src_to_linear     = DEFAULT_NOOP;
+    const char *psz_linear_to_display = DEFAULT_NOOP;
     const char *psz_primaries_transform = DEFAULT_NOOP;
     const char *psz_tone_mapping      = "return rgb * LuminanceScale";
     const char *psz_adjust_range      = DEFAULT_NOOP;
@@ -430,7 +430,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
         {
             case TRANSFER_FUNC_SMPTE_ST2084:
                 /* ST2084 to Linear */
-                psz_src_transform =
+                psz_src_to_linear =
                        ST2084_PQ_CONSTANTS
                        "rgb = pow(max(rgb, 0), 1.0/ST2084_m2);\n"
                        "rgb = max(rgb - ST2084_c1, 0.0) / (ST2084_c2 - ST2084_c3 * rgb);\n"
@@ -439,7 +439,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             case TRANSFER_FUNC_HLG:
-                psz_src_transform = "const float alpha_gain = 2000; /* depends on the display output */\n"
+                psz_src_to_linear = "const float alpha_gain = 2000; /* depends on the display output */\n"
                                     "/* TODO: in one call */\n"
                                     "rgb.r = inverse_HLG(rgb.r);\n"
                                     "rgb.g = inverse_HLG(rgb.g);\n"
@@ -450,16 +450,16 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             case TRANSFER_FUNC_BT709:
-                psz_src_transform = "return pow(rgb, 1.0 / 0.45)";
+                psz_src_to_linear = "return pow(rgb, 1.0 / 0.45)";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             case TRANSFER_FUNC_BT470_M:
             case TRANSFER_FUNC_SRGB:
-                psz_src_transform = "return pow(rgb, 2.2)";
+                psz_src_to_linear = "return pow(rgb, 2.2)";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             case TRANSFER_FUNC_BT470_BG:
-                psz_src_transform = "return pow(rgb, 2.8)";
+                psz_src_to_linear = "return pow(rgb, 2.8)";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             default:
@@ -474,7 +474,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                 if (src_transfer == TRANSFER_FUNC_LINEAR)
                 {
                     /* Linear to sRGB */
-                    psz_display_transform = "return pow(rgb, 1.0 / 2.2)";
+                    psz_linear_to_display = "return pow(rgb, 1.0 / 2.2)";
 
                     if (transfer == TRANSFER_FUNC_SMPTE_ST2084 || transfer == TRANSFER_FUNC_HLG)
                     {
@@ -493,7 +493,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                 if (src_transfer == TRANSFER_FUNC_LINEAR)
                 {
                     /* Linear to ST2084 */
-                    psz_display_transform =
+                    psz_linear_to_display =
                            ST2084_PQ_CONSTANTS
                            "rgb = pow(rgb / 10000, ST2084_m1);\n"
                            "rgb = (ST2084_c1 + ST2084_c2 * rgb) / (1 + ST2084_c3 * rgb);\n"
@@ -603,15 +603,15 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     }
 
     hr = CompileTargetShader(o, hd3d, legacy_shader, d3d_dev,
-                                     psz_sampler[0], psz_src_transform,
+                                     psz_sampler[0], psz_src_to_linear,
                                      psz_primaries_transform,
-                                     psz_display_transform, psz_tone_mapping,
+                                     psz_linear_to_display, psz_tone_mapping,
                                      psz_adjust_range, psz_move_planes[0], &quad->d3dpixelShader[0]);
     if (!FAILED(hr) && psz_sampler[1])
         hr = CompileTargetShader(o, hd3d, legacy_shader, d3d_dev,
-                                 psz_sampler[1], psz_src_transform,
+                                 psz_sampler[1], psz_src_to_linear,
                                  psz_primaries_transform,
-                                 psz_display_transform, psz_tone_mapping,
+                                 psz_linear_to_display, psz_tone_mapping,
                                  psz_adjust_range, psz_move_planes[1], &quad->d3dpixelShader[1]);
     free(psz_range);
 
