@@ -109,6 +109,13 @@ NSImage *imageFromRes(NSString *name);
 + (instancetype)stringWithTimeFromTicks:(vlc_tick_t)time;
 
 /**
+ Returns a time in seconds from strings formatted with colons (aka ##, ##:##, ##:##:##)
+
+ \param aString the string to parse
+ */
++ (NSInteger)timeInSecondsFromStringWithColons:(NSString *)aString;
+
+/**
  Creates an NSString from the given null-terminated C string
  buffer encoded as base64
 

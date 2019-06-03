@@ -113,6 +113,28 @@ NSString *const kVLCMediaUnknown = @"Unknown";
     }
 }
 
++ (NSInteger)timeInSecondsFromStringWithColons:(NSString *)aString
+{
+    NSArray *components = [aString componentsSeparatedByString:@":"];
+    NSUInteger componentCount = [components count];
+    NSInteger returnValue = 0;
+    switch (componentCount) {
+        case 3:
+            returnValue = [[components firstObject] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
+            break;
+
+        case 2:
+            returnValue = [[components firstObject] intValue] * 60 + [[components objectAtIndex:1] intValue];
+            break;
+
+        default:
+            returnValue = [[components firstObject] intValue];
+            break;
+    }
+
+    return returnValue;
+}
+
 + (instancetype)base64StringWithCString:(const char *)cstring
 {
     if (cstring == NULL)

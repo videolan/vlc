@@ -187,7 +187,6 @@
 @property (nonatomic) float fileSubFps;
 
 - (IBAction)outputSettings:(id)sender;
-- (void)setSubPanel;
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi;
 - (void)textFieldWasClicked:(NSNotification *)o_notification;
 - (IBAction)expandMRLfieldAction:(id)sender;

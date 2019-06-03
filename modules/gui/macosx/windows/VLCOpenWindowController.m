@@ -120,6 +120,67 @@ static NSString *kCaptureTabViewId  = @"capture";
 
     [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
+    [self initStrings];
+
+    // setup start / stop time fields
+    [_fileStartTimeTextField setFormatter:[[VLCPositionFormatter alloc] init]];
+    [_fileStopTimeTextField setFormatter:[[VLCPositionFormatter alloc] init]];
+
+    // Auto collapse MRL field
+    self.mrlViewHeightConstraint.constant = 0;
+
+    [self updateVideoDevicesAndRepresentation];
+
+    [self updateAudioDevicesAndRepresentation];
+
+    [self setupSubtitlesPanel];
+
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver: self
+                           selector: @selector(openNetInfoChanged:)
+                               name: NSControlTextDidChangeNotification
+                             object: _netUDPPortTextField];
+    [notificationCenter addObserver: self
+                           selector: @selector(openNetInfoChanged:)
+                               name: NSControlTextDidChangeNotification
+                             object: _netUDPMAddressTextField];
+    [notificationCenter addObserver: self
+                           selector: @selector(openNetInfoChanged:)
+                               name: NSControlTextDidChangeNotification
+                             object: _netUDPMPortTextField];
+    [notificationCenter addObserver: self
+                           selector: @selector(openNetInfoChanged:)
+                               name: NSControlTextDidChangeNotification
+                             object: _netHTTPURLTextField];
+
+    [notificationCenter addObserver: self
+                           selector: @selector(screenFPSfieldChanged:)
+                               name: NSControlTextDidChangeNotification
+                             object: _screenFPSTextField];
+
+    /* register clicks on text fields */
+    [notificationCenter addObserver: self
+                           selector: @selector(textFieldWasClicked:)
+                               name: VLCOpenTextFieldWasClicked
+                             object: nil];
+
+    /* we want to be notified about removed or added media */
+    _allMediaDevices = [[NSMutableArray alloc] init];
+    _specialMediaFolders = [[NSMutableArray alloc] init];
+    _displayInfos = [[NSMutableArray alloc] init];
+    NSNotificationCenter *sharedNotificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+    [sharedNotificationCenter addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidMountNotification object:nil];
+    [sharedNotificationCenter addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
+
+    [self qtkToggleUIElements:nil];
+    [self updateMediaSelector:nil];
+    [self scanOpticalMedia:nil];
+
+    [self setMRL: @""];
+}
+
+- (void)initStrings
+{
     [self.window setTitle: _NS("Open Source")];
     [_mrlButtonLabel setTitle: _NS("Media Resource Locator (MRL)")];
 
@@ -206,159 +267,14 @@ static NSString *kCaptureTabViewId  = @"capture";
     [_screenHeightLabel setStringValue: [NSString stringWithFormat:@"%@:",_NS("Subscreen Height")]];
     [_screenFollowMouseCheckbox setTitle: _NS("Follow the mouse")];
     [_screenqtkAudioCheckbox setTitle: _NS("Capture Audio")];
-
-    // setup start / stop time fields
-    [_fileStartTimeTextField setFormatter:[[VLCPositionFormatter alloc] init]];
-    [_fileStopTimeTextField setFormatter:[[VLCPositionFormatter alloc] init]];
-
-    // Auto collapse MRL field
-    self.mrlViewHeightConstraint.constant = 0;
-
-    [self updateVideoDevices];
-    [_qtkVideoDevicePopup removeAllItems];
-    msg_Dbg(getIntf(), "Found %lu video capture devices", _avvideoDevices.count);
-
-    if (_avvideoDevices.count >= 1) {
-        if (!_avCurrentDeviceUID)
-            _avCurrentDeviceUID = [[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] uniqueID]
-                                    stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-
-        NSUInteger deviceCount = _avvideoDevices.count;
-        for (int ivideo = 0; ivideo < deviceCount; ivideo++) {
-            AVCaptureDevice *avDevice = [_avvideoDevices objectAtIndex:ivideo];
-            // allow same name for multiple times
-            [[_qtkVideoDevicePopup menu] addItemWithTitle:[avDevice localizedName] action:nil keyEquivalent:@""];
-
-            if ([[[avDevice uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:_avCurrentDeviceUID])
-                [_qtkVideoDevicePopup selectItemAtIndex:ivideo];
-        }
-    } else {
-        [_qtkVideoDevicePopup addItemWithTitle: _NS("None")];
-    }
-
-    [_qtkAudioDevicePopup removeAllItems];
-    [_screenqtkAudioPopup removeAllItems];
-
-    [self updateAudioDevices];
-    msg_Dbg(getIntf(), "Found %lu audio capture devices", _avaudioDevices.count);
-
-    if (_avaudioDevices.count >= 1) {
-        if (!_avCurrentAudioDeviceUID)
-            _avCurrentAudioDeviceUID = [[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio] uniqueID]
-                                         stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-
-        NSUInteger deviceCount = _avaudioDevices.count;
-        for (int iaudio = 0; iaudio < deviceCount; iaudio++) {
-            AVCaptureDevice *avAudioDevice = [_avaudioDevices objectAtIndex:iaudio];
-
-            // allow same name for multiple times
-            NSString *localizedName = [avAudioDevice localizedName];
-            [[_qtkAudioDevicePopup menu] addItemWithTitle:localizedName action:nil keyEquivalent:@""];
-            [[_screenqtkAudioPopup menu] addItemWithTitle:localizedName action:nil keyEquivalent:@""];
-
-            if ([[[avAudioDevice uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:_avCurrentAudioDeviceUID]) {
-                [_qtkAudioDevicePopup selectItemAtIndex:iaudio];
-                [_screenqtkAudioPopup selectItemAtIndex:iaudio];
-            }
-        }
-    } else {
-        [_qtkAudioDevicePopup addItemWithTitle: _NS("None")];
-        [_screenqtkAudioPopup addItemWithTitle: _NS("None")];
-    }
-
-    [self setSubPanel];
-
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    [notificationCenter addObserver: self
-                           selector: @selector(openNetInfoChanged:)
-                               name: NSControlTextDidChangeNotification
-                             object: _netUDPPortTextField];
-    [notificationCenter addObserver: self
-                           selector: @selector(openNetInfoChanged:)
-                               name: NSControlTextDidChangeNotification
-                             object: _netUDPMAddressTextField];
-    [notificationCenter addObserver: self
-                           selector: @selector(openNetInfoChanged:)
-                               name: NSControlTextDidChangeNotification
-                             object: _netUDPMPortTextField];
-    [notificationCenter addObserver: self
-                           selector: @selector(openNetInfoChanged:)
-                               name: NSControlTextDidChangeNotification
-                             object: _netHTTPURLTextField];
-
-    [notificationCenter addObserver: self
-                           selector: @selector(screenFPSfieldChanged:)
-                               name: NSControlTextDidChangeNotification
-                             object: _screenFPSTextField];
-
-    /* register clicks on text fields */
-    [notificationCenter addObserver: self
-                           selector: @selector(textFieldWasClicked:)
-                               name: VLCOpenTextFieldWasClicked
-                             object: nil];
-
-    /* we want to be notified about removed or added media */
-    _allMediaDevices = [[NSMutableArray alloc] init];
-    _specialMediaFolders = [[NSMutableArray alloc] init];
-    _displayInfos = [[NSMutableArray alloc] init];
-    NSNotificationCenter *sharedNotificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-    [sharedNotificationCenter addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidMountNotification object:nil];
-    [sharedNotificationCenter addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
-
-    [self qtkToggleUIElements:nil];
-    [self updateMediaSelector:nil];
-    [self scanOpticalMedia:nil];
-
-    [self setMRL: @""];
 }
 
-- (void)setMRL:(NSString *)newMRL
-{
-    if (!newMRL)
-        newMRL = @"";
-
-    _MRL = newMRL;
-    [self.mrlTextField performSelectorOnMainThread:@selector(setStringValue:) withObject:_MRL waitUntilDone:NO];
-    if ([_MRL length] > 0)
-        [_okButton setEnabled: YES];
-    else
-        [_okButton setEnabled: NO];
-}
-
-- (NSString *)MRL
-{
-    return _MRL;
-}
-
-- (void)setSubPanel
+- (void)setupSubtitlesPanel
 {
     int i_index;
     module_config_t * p_item;
 
-    [_fileSubCheckbox setTitle: _NS("Add Subtitle File:")];
-    [_fileSubPathLabel setStringValue: _NS("Choose a file")];
-    [_fileSubPathLabel setHidden: NO];
-    [_fileSubPathTextField setStringValue: @""];
-    [_fileSubSettingsButton setTitle: _NS("Choose...")];
-    _fileSubSettingsButton.accessibilityLabel = _NS("Setup subtitle playback details");
-    _fileBrowseButton.accessibilityLabel = _NS("Select a file for playback");
-    [_fileSubBrowseButton setTitle: _NS("Browse...")];
-    _fileSubBrowseButton.accessibilityLabel = _NS("Select a subtitle file");
-    [_fileSubOverrideCheckbox setTitle: _NS("Override parameters")];
-    [_fileSubDelayLabel setStringValue: _NS("Delay")];
-    [_fileSubDelayStepper setEnabled: NO];
-    [_fileSubFPSLabel setStringValue: _NS("FPS")];
-    [_fileSubFPSStepper setEnabled: NO];
-    [_fileSubEncodingLabel setStringValue: _NS("Subtitle encoding")];
-    [_fileSubEncodingPopup removeAllItems];
-    [_fileSubSizeLabel setStringValue: _NS("Font size")];
-    [_fileSubSizePopup removeAllItems];
-    [_fileSubAlignLabel setStringValue: _NS("Subtitle alignment")];
-    [_fileSubAlignPopup removeAllItems];
-    [_fileSubOKButton setStringValue: _NS("OK")];
-    _fileSubOKButton.accessibilityLabel = _NS("Dismiss the subtitle setup dialog");
-    [_fileSubFontBox setTitle: _NS("Font Properties")];
-    [_fileSubFileBox setTitle: _NS("Subtitle File")];
+    [self initSubtitlesPanelStrings];
 
     [[_fileSubDelayTextField formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("s")]];
     [[_fileSubFPSTextField formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("fps")]];
@@ -399,6 +315,57 @@ static NSString *kCaptureTabViewId  = @"capture";
     }
 }
 
+- (void)initSubtitlesPanelStrings
+{
+    [_fileSubCheckbox setTitle: _NS("Add Subtitle File:")];
+    [_fileSubPathLabel setStringValue: _NS("Choose a file")];
+    [_fileSubPathLabel setHidden: NO];
+    [_fileSubPathTextField setStringValue: @""];
+    [_fileSubSettingsButton setTitle: _NS("Choose...")];
+    _fileSubSettingsButton.accessibilityLabel = _NS("Setup subtitle playback details");
+    _fileBrowseButton.accessibilityLabel = _NS("Select a file for playback");
+    [_fileSubBrowseButton setTitle: _NS("Browse...")];
+    _fileSubBrowseButton.accessibilityLabel = _NS("Select a subtitle file");
+    [_fileSubOverrideCheckbox setTitle: _NS("Override parameters")];
+    [_fileSubDelayLabel setStringValue: _NS("Delay")];
+    [_fileSubDelayStepper setEnabled: NO];
+    [_fileSubFPSLabel setStringValue: _NS("FPS")];
+    [_fileSubFPSStepper setEnabled: NO];
+    [_fileSubEncodingLabel setStringValue: _NS("Subtitle encoding")];
+    [_fileSubEncodingPopup removeAllItems];
+    [_fileSubSizeLabel setStringValue: _NS("Font size")];
+    [_fileSubSizePopup removeAllItems];
+    [_fileSubAlignLabel setStringValue: _NS("Subtitle alignment")];
+    [_fileSubAlignPopup removeAllItems];
+    [_fileSubOKButton setStringValue: _NS("OK")];
+    _fileSubOKButton.accessibilityLabel = _NS("Dismiss the subtitle setup dialog");
+    [_fileSubFontBox setTitle: _NS("Font Properties")];
+    [_fileSubFileBox setTitle: _NS("Subtitle File")];
+}
+
+#pragma mark - property handling
+
+- (void)setMRL:(NSString *)newMRL
+{
+    if (!newMRL)
+        newMRL = @"";
+
+    _MRL = newMRL;
+    [self.mrlTextField performSelectorOnMainThread:@selector(setStringValue:) withObject:_MRL waitUntilDone:NO];
+    if ([_MRL length] > 0)
+        [_okButton setEnabled: YES];
+    else
+        [_okButton setEnabled: NO];
+}
+
+- (NSString *)MRL
+{
+    return _MRL;
+}
+
+#pragma mark -
+#pragma mark Main Actions
+
 - (void)openTarget:(NSString *)identifier
 {
     /* check whether we already run a modal dialog */
@@ -418,86 +385,32 @@ static NSString *kCaptureTabViewId  = @"capture";
     if (i_result <= 0)
         return;
 
+    [self fetchMRLcreateOptionsAndStartPlayback];
+}
+
+- (void)fetchMRLcreateOptionsAndStartPlayback
+{
     NSMutableArray *options = [NSMutableArray array];
     VLCOpenInputMetadata *inputMetadata = [[VLCOpenInputMetadata alloc] init];
     inputMetadata.MRLString = [self MRL];
 
     if ([_fileSubCheckbox state] == NSOnState) {
-        module_config_t * p_item;
-
-        [options addObject: [NSString stringWithFormat: @"sub-file=%@", _subPath]];
-        if ([_fileSubOverrideCheckbox state] == NSOnState) {
-            [options addObject: [NSString stringWithFormat: @"sub-delay=%f", ([self fileSubDelay] * 10)]];
-            [options addObject: [NSString stringWithFormat: @"sub-fps=%f", [self fileSubFps]]];
-        }
-        [options addObject: [NSString stringWithFormat:
-                             @"subsdec-encoding=%@", [[_fileSubEncodingPopup selectedItem] representedObject]]];
-        [options addObject: [NSString stringWithFormat:
-                             @"subsdec-align=%li", [_fileSubAlignPopup indexOfSelectedItem]]];
-
-        p_item = config_FindConfig("freetype-rel-fontsize");
-
-        if (p_item) {
-            [options addObject: [NSString stringWithFormat:
-                                 @"freetype-rel-fontsize=%i",
-                                 p_item->list.i[[_fileSubSizePopup indexOfSelectedItem]]]];
-        }
+        [self addSubtitleOptionsToArray:options];
     }
     if ([_fileCustomTimingCheckbox state] == NSOnState) {
-        NSArray *components = [[_fileStartTimeTextField stringValue] componentsSeparatedByString:@":"];
-        NSUInteger componentCount = [components count];
-        NSInteger tempValue = 0;
-        if (componentCount == 1)
-            tempValue = [[components firstObject] intValue];
-        else if (componentCount == 2)
-            tempValue = [[components firstObject] intValue] * 60 + [[components objectAtIndex:1] intValue];
-        else if (componentCount == 3)
-            tempValue = [[components firstObject] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
-        if (tempValue > 0)
-            [options addObject: [NSString stringWithFormat:@"start-time=%li", tempValue]];
-        components = [[_fileStopTimeTextField stringValue] componentsSeparatedByString:@":"];
-        componentCount = [components count];
-        if (componentCount == 1)
-            tempValue = [[components firstObject] intValue];
-        else if (componentCount == 2)
-            tempValue = [[components firstObject] intValue] * 60 + [[components objectAtIndex:1] intValue];
-        else if (componentCount == 3)
-            tempValue = [[components firstObject] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
-        if (tempValue != 0)
-            [options addObject: [NSString stringWithFormat:@"stop-time=%li", tempValue]];
+        [self addTimingOptionsToArray:options];
     }
     if ([_outputCheckbox state] == NSOnState) {
-        NSArray *soutMRL = [_output soutMRL];
-        NSUInteger count = [soutMRL count];
-        for (NSUInteger i = 0 ; i < count ; i++)
-            [options addObject: [NSString stringWithString: [soutMRL objectAtIndex:i]]];
+        [self addStreamOutputOptionsToArray:options];
     }
     if ([_fileSlaveCheckbox state] && _fileSlavePath)
         [options addObject: [NSString stringWithFormat: @"input-slave=%@", _fileSlavePath]];
     if ([[[_tabView selectedTabViewItem] identifier] isEqualToString: kCaptureTabViewId]) {
         if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Screen")]) {
-            NSInteger selected_index = [_screenPopup indexOfSelectedItem];
-            NSValue *v = [_displayInfos objectAtIndex:selected_index];
-            struct display_info_t *item = (struct display_info_t *)[v pointerValue];
-
-            [options addObject: [NSString stringWithFormat: @"screen-fps=%f", [_screenFPSTextField floatValue]]];
-            [options addObject: [NSString stringWithFormat: @"screen-display-id=%i", item->id]];
-            [options addObject: [NSString stringWithFormat: @"screen-left=%i", [_screenLeftTextField intValue]]];
-            [options addObject: [NSString stringWithFormat: @"screen-top=%i", [_screenTopTextField intValue]]];
-            [options addObject: [NSString stringWithFormat: @"screen-width=%i", [_screenWidthTextField intValue]]];
-            [options addObject: [NSString stringWithFormat: @"screen-height=%i", [_screenHeightTextField intValue]]];
-            if ([_screenFollowMouseCheckbox intValue] == YES)
-                [options addObject: @"screen-follow-mouse"];
-            else
-                [options addObject: @"no-screen-follow-mouse"];
-            if ([_screenqtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
-                [options addObject: [NSString stringWithFormat: @"input-slave=avaudiocapture://%@", _avCurrentAudioDeviceUID]];
+            [self addScreenRecordingOptionsToArray:options];
         }
         else if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Input Devices")]) {
-            if ([_qtkVideoCheckbox state]) {
-                if ([_qtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
-                    [options addObject: [NSString stringWithFormat: @"input-slave=avaudiocapture://%@", _avCurrentAudioDeviceUID]];
-            }
+            [self avDeviceOptionsToArray:options];
         }
     }
 
@@ -507,9 +420,79 @@ static NSString *kCaptureTabViewId  = @"capture";
     [[[VLCMain sharedInstance] playlistController] addPlaylistItems:@[inputMetadata]];
 }
 
-#pragma mark -
-#pragma mark Main Actions
+- (void)addSubtitleOptionsToArray:(NSMutableArray *)options
+{
+    module_config_t * p_item;
 
+    [options addObject: [NSString stringWithFormat: @"sub-file=%@", _subPath]];
+    if ([_fileSubOverrideCheckbox state] == NSOnState) {
+        [options addObject: [NSString stringWithFormat: @"sub-delay=%f", ([self fileSubDelay] * 10)]];
+        [options addObject: [NSString stringWithFormat: @"sub-fps=%f", [self fileSubFps]]];
+    }
+    [options addObject: [NSString stringWithFormat:
+                         @"subsdec-encoding=%@", [[_fileSubEncodingPopup selectedItem] representedObject]]];
+    [options addObject: [NSString stringWithFormat:
+                         @"subsdec-align=%li", [_fileSubAlignPopup indexOfSelectedItem]]];
+
+    p_item = config_FindConfig("freetype-rel-fontsize");
+
+    if (p_item) {
+        [options addObject: [NSString stringWithFormat:
+                             @"freetype-rel-fontsize=%i",
+                             p_item->list.i[[_fileSubSizePopup indexOfSelectedItem]]]];
+    }
+}
+
+- (void)addTimingOptionsToArray:(NSMutableArray *)options
+{
+    NSInteger startTime = [NSString timeInSecondsFromStringWithColons:[_fileStartTimeTextField stringValue]];
+    if (startTime > 0) {
+        [options addObject: [NSString stringWithFormat:@"start-time=%li", startTime]];
+    }
+
+    NSInteger stopTime = [NSString timeInSecondsFromStringWithColons:[_fileStopTimeTextField stringValue]];
+    if (stopTime > 0) {
+        [options addObject: [NSString stringWithFormat:@"stop-time=%li", stopTime]];
+    }
+}
+
+- (void)addStreamOutputOptionsToArray:(NSMutableArray *)options
+{
+    NSArray *soutMRL = [_output soutMRL];
+    NSUInteger count = [soutMRL count];
+    for (NSUInteger i = 0 ; i < count ; i++)
+        [options addObject: [NSString stringWithString: [soutMRL objectAtIndex:i]]];
+}
+
+- (void)addScreenRecordingOptionsToArray:(NSMutableArray *)options
+{
+    NSInteger selected_index = [_screenPopup indexOfSelectedItem];
+    NSValue *v = [_displayInfos objectAtIndex:selected_index];
+    struct display_info_t *item = (struct display_info_t *)[v pointerValue];
+
+    [options addObject: [NSString stringWithFormat: @"screen-fps=%f", [_screenFPSTextField floatValue]]];
+    [options addObject: [NSString stringWithFormat: @"screen-display-id=%i", item->id]];
+    [options addObject: [NSString stringWithFormat: @"screen-left=%i", [_screenLeftTextField intValue]]];
+    [options addObject: [NSString stringWithFormat: @"screen-top=%i", [_screenTopTextField intValue]]];
+    [options addObject: [NSString stringWithFormat: @"screen-width=%i", [_screenWidthTextField intValue]]];
+    [options addObject: [NSString stringWithFormat: @"screen-height=%i", [_screenHeightTextField intValue]]];
+    if ([_screenFollowMouseCheckbox intValue] == YES)
+        [options addObject: @"screen-follow-mouse"];
+    else
+        [options addObject: @"no-screen-follow-mouse"];
+    if ([_screenqtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
+        [options addObject: [NSString stringWithFormat: @"input-slave=avaudiocapture://%@", _avCurrentAudioDeviceUID]];
+}
+
+- (void)avDeviceOptionsToArray:(NSMutableArray *)options
+{
+    if ([_qtkVideoCheckbox state]) {
+        if ([_qtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
+            [options addObject: [NSString stringWithFormat: @"input-slave=avaudiocapture://%@", _avCurrentAudioDeviceUID]];
+    }
+}
+
+#pragma mark - UI interaction
 
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
@@ -783,8 +766,8 @@ static NSString *kCaptureTabViewId  = @"capture";
     NSString *devicePath;
 
     // BDMV path must not end with BDMV directory
-    if([type isEqualToString: kVLCMediaBDMVFolder]) {
-        if([[path lastPathComponent] isEqualToString: @"BDMV"]) {
+    if ([type isEqualToString: kVLCMediaBDMVFolder]) {
+        if ([[path lastPathComponent] isEqualToString: @"BDMV"]) {
             path = [path stringByDeletingLastPathComponent];
         }
     }
@@ -1302,16 +1285,67 @@ static NSString *kCaptureTabViewId  = @"capture";
         NSBeep();
 }
 
-- (void)updateVideoDevices
+#pragma mark - audio and video device management
+
+- (void)updateVideoDevicesAndRepresentation
 {
     _avvideoDevices = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]
                          arrayByAddingObjectsFromArray:[AVCaptureDevice devicesWithMediaType:AVMediaTypeMuxed]];
+
+    [_qtkVideoDevicePopup removeAllItems];
+    msg_Dbg(getIntf(), "Found %lu video capture devices", _avvideoDevices.count);
+
+    if (_avvideoDevices.count >= 1) {
+        if (!_avCurrentDeviceUID)
+            _avCurrentDeviceUID = [[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] uniqueID]
+                                   stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+        NSUInteger deviceCount = _avvideoDevices.count;
+        for (int ivideo = 0; ivideo < deviceCount; ivideo++) {
+            AVCaptureDevice *avDevice = [_avvideoDevices objectAtIndex:ivideo];
+            // allow same name for multiple times
+            [[_qtkVideoDevicePopup menu] addItemWithTitle:[avDevice localizedName] action:nil keyEquivalent:@""];
+
+            if ([[[avDevice uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:_avCurrentDeviceUID])
+                [_qtkVideoDevicePopup selectItemAtIndex:ivideo];
+        }
+    } else {
+        [_qtkVideoDevicePopup addItemWithTitle: _NS("None")];
+    }
 }
 
-- (void)updateAudioDevices
+- (void)updateAudioDevicesAndRepresentation
 {
     _avaudioDevices = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio]
                         arrayByAddingObjectsFromArray:[AVCaptureDevice devicesWithMediaType:AVMediaTypeMuxed]];
+
+    [_qtkAudioDevicePopup removeAllItems];
+    [_screenqtkAudioPopup removeAllItems];
+    msg_Dbg(getIntf(), "Found %lu audio capture devices", _avaudioDevices.count);
+
+    if (_avaudioDevices.count >= 1) {
+        if (!_avCurrentAudioDeviceUID)
+            _avCurrentAudioDeviceUID = [[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio] uniqueID]
+                                        stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+        NSUInteger deviceCount = _avaudioDevices.count;
+        for (int iaudio = 0; iaudio < deviceCount; iaudio++) {
+            AVCaptureDevice *avAudioDevice = [_avaudioDevices objectAtIndex:iaudio];
+
+            // allow same name for multiple times
+            NSString *localizedName = [avAudioDevice localizedName];
+            [[_qtkAudioDevicePopup menu] addItemWithTitle:localizedName action:nil keyEquivalent:@""];
+            [[_screenqtkAudioPopup menu] addItemWithTitle:localizedName action:nil keyEquivalent:@""];
+
+            if ([[[avAudioDevice uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:_avCurrentAudioDeviceUID]) {
+                [_qtkAudioDevicePopup selectItemAtIndex:iaudio];
+                [_screenqtkAudioPopup selectItemAtIndex:iaudio];
+            }
+        }
+    } else {
+        [_qtkAudioDevicePopup addItemWithTitle: _NS("None")];
+        [_screenqtkAudioPopup addItemWithTitle: _NS("None")];
+    }
 }
 
 @end
