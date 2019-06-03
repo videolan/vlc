@@ -60,7 +60,7 @@
 #include "d3d11_shaders.h"
 
 #include "common.h"
-#include "../video_chroma/copy.h"
+#include "../../video_chroma/copy.h"
 
 DEFINE_GUID(GUID_SWAPCHAIN_WIDTH,  0xf1b59347, 0x1643, 0x411a, 0xad, 0x6b, 0xc7, 0x80, 0x17, 0x7a, 0x06, 0xb6);
 DEFINE_GUID(GUID_SWAPCHAIN_HEIGHT, 0x6ea976a0, 0x9d60, 0x4bb7, 0xa5, 0xa9, 0x7d, 0xd1, 0x18, 0x7f, 0xc9, 0xbd);
@@ -222,9 +222,9 @@ static int UpdateDisplayFormat(vout_display_t *vd, libvlc_video_output_cfg_t *ou
         return VLC_EGENERIC;
     }
 
-    new_display.color = out->colorspace;
-    new_display.transfer = out->transfer;
-    new_display.primaries = out->primaries;
+    new_display.color     = (video_color_space_t)     out->colorspace;
+    new_display.transfer  = (video_transfer_func_t)   out->transfer;
+    new_display.primaries = (video_color_primaries_t) out->primaries;
     new_display.b_full_range = out->full_range;
 
     /* guestimate the display peak luminance */
@@ -300,9 +300,9 @@ static int QueryDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
                      /* the YUV->RGB conversion already output full range */
                      is_d3d11_opaque(fmt->i_chroma) ||
                      vlc_fourcc_IsYUV(fmt->i_chroma);
-    cfg.primaries  = fmt->primaries;
-    cfg.colorspace = fmt->space;
-    cfg.transfer   = fmt->transfer;
+    cfg.primaries  = (libvlc_video_color_primaries_t) fmt->primaries;
+    cfg.colorspace = (libvlc_video_color_space_t)     fmt->space;
+    cfg.transfer   = (libvlc_video_transfer_func_t)   fmt->transfer;
 
     libvlc_video_output_cfg_t out;
     if (!sys->updateOutputCb( sys->outside_opaque, &cfg, &out ))
@@ -602,9 +602,9 @@ static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_direct3
         return false;
     out->surface_format = display->pixelFormat->formatTexture;
     out->full_range     = display->colorspace->b_full_range;
-    out->colorspace     = display->colorspace->color;
-    out->primaries      = display->colorspace->primaries;
-    out->transfer       = display->colorspace->transfer;
+    out->colorspace     = (libvlc_video_color_space_t)     display->colorspace->color;
+    out->primaries      = (libvlc_video_color_primaries_t) display->colorspace->primaries;
+    out->transfer       = (libvlc_video_transfer_func_t)   display->colorspace->transfer;
     return true;
 }
 
@@ -619,10 +619,10 @@ static bool LocalSwapchainStartEndRendering( void *opaque, bool enter, const lib
             DXGI_HDR_METADATA_HDR10 hdr10 = { 0 };
             hdr10.GreenPrimary[0] = p_hdr10->GreenPrimary[0];
             hdr10.GreenPrimary[1] = p_hdr10->GreenPrimary[1];
-            hdr10.BluePrimary[0] = p_hdr10->BluePrimary[2];
-            hdr10.BluePrimary[1] = p_hdr10->BluePrimary[3];
-            hdr10.RedPrimary[0] = p_hdr10->RedPrimary[4];
-            hdr10.RedPrimary[1] = p_hdr10->RedPrimary[5];
+            hdr10.BluePrimary[0] = p_hdr10->BluePrimary[0];
+            hdr10.BluePrimary[1] = p_hdr10->BluePrimary[1];
+            hdr10.RedPrimary[0] = p_hdr10->RedPrimary[0];
+            hdr10.RedPrimary[1] = p_hdr10->RedPrimary[1];
             hdr10.WhitePoint[0] = p_hdr10->WhitePoint[0];
             hdr10.WhitePoint[1] = p_hdr10->WhitePoint[1];
             hdr10.MinMasteringLuminance = p_hdr10->MinMasteringLuminance;
@@ -1259,11 +1259,11 @@ static void SelectSwapchainColorspace(struct d3d11_local_swapchain *display, con
             if (!display->logged_capabilities)
                 msg_Dbg(display->obj, "supports colorspace %s", color_spaces[i].name);
             score = 0;
-            if (color_spaces[i].primaries == cfg->primaries)
+            if (color_spaces[i].primaries == (video_color_primaries_t) cfg->primaries)
                 score++;
-            if (color_spaces[i].color == cfg->colorspace)
+            if (color_spaces[i].color == (video_color_space_t) cfg->colorspace)
                 score += 2; /* we don't want to translate color spaces */
-            if (color_spaces[i].transfer == cfg->transfer ||
+            if (color_spaces[i].transfer == (video_transfer_func_t) cfg->transfer ||
                 /* favor 2084 output for HLG source */
                 (color_spaces[i].transfer == TRANSFER_FUNC_SMPTE_ST2084 && cfg->transfer == TRANSFER_FUNC_HLG))
                 score++;
@@ -1372,7 +1372,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
     HRESULT hr = E_FAIL;
 
     libvlc_video_direct3d_device_cfg_t cfg = {
-        .hardware_decoding = is_d3d11_opaque( vd->source.i_chroma ) 
+        .hardware_decoding = is_d3d11_opaque( vd->source.i_chroma )
     };
     libvlc_video_direct3d_device_setup_t out;
     ID3D11DeviceContext *d3d11_ctx = NULL;
