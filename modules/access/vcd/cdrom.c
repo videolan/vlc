@@ -1209,6 +1209,32 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
     p_buffer += 4;
     i_buffer -= 4;
 
+    /* block size information is split in a sequence of 3 */
+    const uint8_t *bsznfopayl[3] = { NULL, NULL, NULL };
+    for( int i = 0; i < i_buffer/CDTEXT_PACK_SIZE; i++ )
+    {
+        const uint8_t *p_pack = &p_buffer[CDTEXT_PACK_SIZE*i];
+        const uint8_t i_block_number = (p_pack[3] >> 4) & 0x07;
+        if( i_block_number > 0 )
+            continue;
+        if( p_pack[0] == 0x8f )
+        {
+            const int i_track = p_pack[1] & 0x7f;
+            /* can't be higher than 3 blocks */
+            if( i_track > 2 )
+                return -1;
+            /* duplicate should not happen */
+            if( bsznfopayl[i_track] != NULL )
+                return -1;
+            /* point to payload (12) */
+            bsznfopayl[i_track] = &p_pack[CDTEXT_PACK_HEADER];
+        }
+    }
+    /* incomplete ? */
+    if( (!bsznfopayl[0] ^ !bsznfopayl[1]) ||
+        (!bsznfopayl[1] ^ !bsznfopayl[2]) )
+        return -1;
+
     memset( pppsz_info, 0, sizeof(pppsz_info) );
 
     for( int i = 0; i < i_buffer/CDTEXT_PACK_SIZE; i++ )
