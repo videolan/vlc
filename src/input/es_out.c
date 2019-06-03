@@ -3438,8 +3438,6 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
         {
             info_category_AddInfo( p_cat, _("Sample rate"), _("%u Hz"),
                                    fmt->audio.i_rate );
-            /* FIXME that should be removed or improved ! (used by text/strings.c) */
-            var_SetInteger( p_input, "sample-rate", fmt->audio.i_rate );
         }
 
         unsigned int i_bitspersample = fmt->audio.i_bitspersample;
@@ -3453,8 +3451,6 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
         {
             info_category_AddInfo( p_cat, _("Bitrate"), _("%u kb/s"),
                                    fmt->i_bitrate / 1000 );
-            /* FIXME that should be removed or improved ! (used by text/strings.c) */
-            var_SetInteger( p_input, "bit-rate", fmt->i_bitrate );
         }
         for( int i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
         {
