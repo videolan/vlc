@@ -54,7 +54,6 @@ public:
         ,p_current_vsegment(NULL)
         ,dvd_interpretor( *this )
         ,i_duration(-1)
-        ,p_input(NULL)
         ,ev(&demux)
     {
         vlc_mutex_init( &lock_demuxer );
@@ -105,8 +104,6 @@ public:
     bool AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c * );
     void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter );
 
-    /* for spu variables */
-    input_thread_t *p_input;
     uint8_t        palette[4][4];
     vlc_mutex_t    lock_demuxer;
 
