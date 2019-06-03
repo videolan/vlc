@@ -547,7 +547,6 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/utils/KeyNavigableListView.qml \
 	gui/qt/qml/utils/KeyNavigableTableView.qml \
 	gui/qt/qml/utils/SelectableDelegateModel.qml \
-	gui/qt/qml/utils/ComboBoxExt.qml \
 	gui/qt/qml/utils/StackViewExt.qml \
 	gui/qt/qml/utils/ScanProgressBar.qml \
         gui/qt/qml/utils/SearchBox.qml \
