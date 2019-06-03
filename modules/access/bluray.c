@@ -1531,7 +1531,7 @@ static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
                i_plane < MAX_OVERLAY &&
                esout_priv->overlay.channels[i_plane] != VOUT_SPU_CHANNEL_INVALID)
             {
-                i_ret = es_out_Control(esout_priv->p_dst_out, ES_OUT_VOUT_FLUSH_OVERLAY,
+                i_ret = es_out_Control(esout_priv->p_dst_out, ES_OUT_VOUT_DEL_OVERLAY,
                                        esout_priv->overlay.p_video_es,
                                        esout_priv->overlay.channels[i_plane]);
                 esout_priv->overlay.channels[i_plane] = VOUT_SPU_CHANNEL_INVALID;

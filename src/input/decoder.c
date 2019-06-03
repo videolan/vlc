@@ -71,7 +71,7 @@ struct decoder_owner
     input_resource_t*p_resource;
     vlc_clock_t     *p_clock;
 
-    int              i_spu_channel;
+    ssize_t          i_spu_channel;
     int64_t          i_spu_order;
 
     sout_instance_t         *p_sout;
@@ -611,8 +611,15 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
         msg_Warn( p_dec, "no vout found, dropping subpicture" );
         if( p_owner->p_vout )
         {
-            vlc_mutex_lock( &p_owner->lock );
+            if (p_owner->i_spu_channel != -1)
+            {
+                vout_UnregisterSubpictureChannel(p_owner->p_vout,
+                                                 p_owner->i_spu_channel);
+                p_owner->i_spu_channel = -1;
+            }
             vout_SetSubpictureClock(p_owner->p_vout, NULL);
+
+            vlc_mutex_lock( &p_owner->lock );
             vout_Release(p_owner->p_vout);
             p_owner->p_vout = NULL;
             vlc_mutex_unlock( &p_owner->lock );
@@ -622,19 +629,27 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 
     if( p_owner->p_vout != p_vout )
     {
+        ssize_t old_spu_channel = p_owner->i_spu_channel;
         p_owner->i_spu_channel = vout_RegisterSubpictureChannel( p_vout );
         p_owner->i_spu_order = 0;
 
-        vlc_mutex_lock( &p_owner->lock );
-        if( p_owner->p_vout )
+        if (p_owner->i_spu_channel != -1)
         {
-            vout_SetSubpictureClock(p_owner->p_vout, NULL);
-            vout_Release(p_owner->p_vout);
-        }
-        p_owner->p_vout = p_vout;
-        vlc_mutex_unlock( &p_owner->lock );
+            if (p_owner->p_vout)
+            {
+                vout_SetSubpictureClock(p_owner->p_vout, NULL);
+                if (old_spu_channel != -1)
+                    vout_UnregisterSubpictureChannel(p_owner->p_vout,
+                                                     old_spu_channel);
+            }
+            vlc_mutex_lock(&p_owner->lock);
+            if (p_owner->p_vout)
+                vout_Release(p_owner->p_vout);
+            p_owner->p_vout = p_vout;
+            vlc_mutex_unlock(&p_owner->lock);
 
-        vout_SetSubpictureClock( p_vout, p_owner->p_clock );
+            vout_SetSubpictureClock(p_vout, p_owner->p_clock);
+        }
     }
     else
         vout_Release(p_vout);
@@ -1483,7 +1498,10 @@ static void DecoderProcessFlush( decoder_t *p_dec )
     else if( p_dec->fmt_out.i_cat == SPU_ES )
     {
         if( p_owner->p_vout )
+        {
+            assert( p_owner->i_spu_channel >= 0 );
             vout_FlushSubpictureChannel( p_owner->p_vout, p_owner->i_spu_channel );
+        }
     }
 
     p_owner->i_preroll_end = (vlc_tick_t)INT64_MIN;
@@ -1782,7 +1800,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->p_resource = p_resource;
     p_owner->p_aout = NULL;
     p_owner->p_vout = NULL;
-    p_owner->i_spu_channel = 0;
+    p_owner->i_spu_channel = -1;
     p_owner->i_spu_order = 0;
     p_owner->p_sout = p_sout;
     p_owner->p_sout_input = NULL;
@@ -1969,8 +1987,9 @@ static void DeleteDecoder( decoder_t * p_dec )
         {
             if( p_owner->p_vout )
             {
-                vout_FlushSubpictureChannel( p_owner->p_vout,
-                                             p_owner->i_spu_channel );
+                assert( p_owner->i_spu_channel > 0 );
+                vout_UnregisterSubpictureChannel( p_owner->p_vout,
+                                                  p_owner->i_spu_channel );
                 vout_SetSubpictureClock(p_owner->p_vout, NULL);
                 vout_Release(p_owner->p_vout);
             }
@@ -2528,7 +2547,7 @@ void input_DecoderSetVoutMouseEvent( decoder_t *dec, vlc_mouse_event mouse_event
 }
 
 int input_DecoderAddVoutOverlay( decoder_t *dec, subpicture_t *sub,
-                                 int *channel )
+                                 size_t *channel )
 {
     struct decoder_owner *owner = dec_get_owner( dec );
     assert( dec->fmt_in.i_cat == VIDEO_ES );
@@ -2541,8 +2560,15 @@ int input_DecoderAddVoutOverlay( decoder_t *dec, subpicture_t *sub,
         vlc_mutex_unlock( &owner->lock );
         return VLC_EGENERIC;
     }
+    ssize_t channel_id =
+        vout_RegisterSubpictureChannel( owner->p_vout );
+    if (channel_id == -1)
+    {
+        vlc_mutex_unlock( &owner->lock );
+        return VLC_EGENERIC;
+    }
     sub->i_start = sub->i_stop = vlc_tick_now();
-    sub->i_channel = *channel = vout_RegisterSubpictureChannel( owner->p_vout );
+    sub->i_channel = *channel = channel_id;
     sub->i_order = 0;
     sub->b_ephemer = true;
     vout_PutSubpicture( owner->p_vout, sub );
@@ -2551,7 +2577,7 @@ int input_DecoderAddVoutOverlay( decoder_t *dec, subpicture_t *sub,
     return VLC_SUCCESS;
 }
 
-int input_DecoderFlushVoutOverlay( decoder_t *dec, int channel )
+int input_DecoderDelVoutOverlay( decoder_t *dec, size_t channel )
 {
     struct decoder_owner *owner = dec_get_owner( dec );
     assert( dec->fmt_in.i_cat == VIDEO_ES );
@@ -2563,7 +2589,7 @@ int input_DecoderFlushVoutOverlay( decoder_t *dec, int channel )
         vlc_mutex_unlock( &owner->lock );
         return VLC_EGENERIC;
     }
-    vout_FlushSubpictureChannel( owner->p_vout, channel );
+    vout_UnregisterSubpictureChannel( owner->p_vout, channel );
 
     vlc_mutex_unlock( &owner->lock );
     return VLC_SUCCESS;

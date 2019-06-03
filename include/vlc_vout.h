@@ -110,15 +110,16 @@ VLC_API void vout_PutPicture( vout_thread_t *, picture_t * );
 
 /* Subpictures channels ID */
 #define VOUT_SPU_CHANNEL_INVALID      (-1) /* Always fails in comparison */
-#define VOUT_SPU_CHANNEL_OSD            1 /* OSD channel is automatically cleared */
-#define VOUT_SPU_CHANNEL_OSD_HSLIDER    2
-#define VOUT_SPU_CHANNEL_OSD_VSLIDER    3
-#define VOUT_SPU_CHANNEL_AVAIL_FIRST    8 /* Registerable channels from this offset */
+#define VOUT_SPU_CHANNEL_OSD            0 /* OSD channel is automatically cleared */
+#define VOUT_SPU_CHANNEL_OSD_HSLIDER    1
+#define VOUT_SPU_CHANNEL_OSD_VSLIDER    2
+#define VOUT_SPU_CHANNEL_OSD_COUNT      3
 
 /* */
 VLC_API void vout_PutSubpicture( vout_thread_t *, subpicture_t * );
-VLC_API int vout_RegisterSubpictureChannel( vout_thread_t * );
-VLC_API void vout_FlushSubpictureChannel( vout_thread_t *, int );
+VLC_API ssize_t vout_RegisterSubpictureChannel( vout_thread_t * );
+VLC_API void vout_UnregisterSubpictureChannel( vout_thread_t *, size_t );
+VLC_API void vout_FlushSubpictureChannel( vout_thread_t *, size_t );
 /**
  * This function will ensure that all ready/displayed pictures have at most
  * the provided date.

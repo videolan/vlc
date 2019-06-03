@@ -267,10 +267,10 @@ void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
     vlc_mutex_unlock(&sys->spu_lock);
 }
 
-int vout_RegisterSubpictureChannel( vout_thread_t *vout )
+ssize_t vout_RegisterSubpictureChannel( vout_thread_t *vout )
 {
     assert(!vout->p->dummy);
-    int channel = VOUT_SPU_CHANNEL_AVAIL_FIRST;
+    ssize_t channel = VOUT_SPU_CHANNEL_INVALID;
 
     vlc_mutex_lock(&vout->p->spu_lock);
     if (vout->p->spu)
@@ -278,6 +278,14 @@ int vout_RegisterSubpictureChannel( vout_thread_t *vout )
     vlc_mutex_unlock(&vout->p->spu_lock);
 
     return channel;
+}
+
+void vout_UnregisterSubpictureChannel( vout_thread_t *vout, size_t channel )
+{
+    assert(!vout->p->dummy);
+
+    if (vout->p->spu)
+        spu_UnregisterChannel(vout->p->spu, channel);
 }
 
 void vout_SetSubpictureClock( vout_thread_t *vout, vlc_clock_t *clock )
@@ -289,7 +297,7 @@ void vout_SetSubpictureClock( vout_thread_t *vout, vlc_clock_t *clock )
     vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
-void vout_FlushSubpictureChannel( vout_thread_t *vout, int channel )
+void vout_FlushSubpictureChannel( vout_thread_t *vout, size_t channel )
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);

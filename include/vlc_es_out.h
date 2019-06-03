@@ -104,10 +104,9 @@ enum es_out_query_e
 
     ES_OUT_VOUT_ADD_OVERLAY, /* arg1= es_out_id_t* (video es),
                               * arg2= subpicture_t *,
-                              * arg3= int * (channel id), res= can fail */
-
-    ES_OUT_VOUT_FLUSH_OVERLAY, /* arg1= es_out_id_t* (video es),
-                                * arg2= int (channel id), res= can fail */
+                              * arg3= size_t * (channel id), res= can fail */
+    ES_OUT_VOUT_DEL_OVERLAY, /* arg1= es_out_id_t* (video es),
+                              * arg2= size_t (channel id), res= can fail */
 
     ES_OUT_SPU_SET_HIGHLIGHT, /* arg1= es_out_id_t* (spu es),
                                  arg2= const vlc_spu_highlight_t *, res=can fail  */

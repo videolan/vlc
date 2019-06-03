@@ -349,6 +349,7 @@ spu_ChangeSources
 spu_ChangeFilters
 spu_Render
 spu_RegisterChannel
+spu_UnregisterChannel
 spu_ClearChannel
 vlc_stream_directory_Attach
 vlc_stream_extractor_Attach
@@ -697,6 +698,7 @@ vout_GetPicture
 vout_PutPicture
 vout_PutSubpicture
 vout_RegisterSubpictureChannel
+vout_UnregisterSubpictureChannel
 vout_FlushSubpictureChannel
 vout_Flush
 vout_GetSnapshot

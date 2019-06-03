@@ -165,7 +165,7 @@ struct subpicture_t
 {
     /** \name Channel ID */
     /**@{*/
-    int             i_channel;                    /**< subpicture channel ID */
+    ssize_t         i_channel;                    /**< subpicture channel ID */
     /**@}*/
 
     /** \name Type and flags

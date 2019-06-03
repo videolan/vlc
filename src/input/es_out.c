@@ -3131,17 +3131,17 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
     {
         es_out_id_t *p_es = va_arg( args, es_out_id_t * );
         subpicture_t *sub = va_arg( args, subpicture_t * );
-        int *channel = va_arg( args, int * );
+        size_t *channel = va_arg( args, size_t * );
         if( p_es && p_es->fmt.i_cat == VIDEO_ES && p_es->p_dec )
             return input_DecoderAddVoutOverlay( p_es->p_dec, sub, channel );
         return VLC_EGENERIC;
     }
-    case ES_OUT_VOUT_FLUSH_OVERLAY:
+    case ES_OUT_VOUT_DEL_OVERLAY:
     {
         es_out_id_t *p_es = va_arg( args, es_out_id_t * );
-        int channel = va_arg( args, int );
+        size_t channel = va_arg( args, size_t );
         if( p_es && p_es->fmt.i_cat == VIDEO_ES && p_es->p_dec )
-            return input_DecoderFlushVoutOverlay( p_es->p_dec, channel );
+            return input_DecoderDelVoutOverlay( p_es->p_dec, channel );
         return VLC_EGENERIC;
     }
     case ES_OUT_SPU_SET_HIGHLIGHT:

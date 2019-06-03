@@ -50,7 +50,7 @@ struct spu_t
     spu_private_t *p;
 };
 
-    VLC_API spu_t * spu_Create( vlc_object_t *, vout_thread_t * );
+VLC_API spu_t * spu_Create( vlc_object_t *, vout_thread_t * );
 #define spu_Create(a,b) spu_Create(VLC_OBJECT(a),b)
 VLC_API void spu_Destroy( spu_t * );
 
@@ -80,12 +80,13 @@ VLC_API subpicture_t * spu_Render( spu_t *, const vlc_fourcc_t *p_chroma_list,
 /**
  * It registers a new SPU channel.
  */
-VLC_API int spu_RegisterChannel( spu_t * );
+VLC_API ssize_t spu_RegisterChannel( spu_t * );
+VLC_API void spu_UnregisterChannel( spu_t *, size_t );
 
 /**
  * It clears all subpictures associated to a SPU channel.
  */
-VLC_API void spu_ClearChannel( spu_t *, int );
+VLC_API void spu_ClearChannel( spu_t *, size_t );
 
 /**
  * It changes the sub sources list
