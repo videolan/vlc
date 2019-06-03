@@ -86,7 +86,6 @@ private:
     virtual ~OpenDialog();
 
     static OpenDialog *instance;
-    input_thread_t *p_input;
 
     QString optionsMRL;
     QString storedMethod;
