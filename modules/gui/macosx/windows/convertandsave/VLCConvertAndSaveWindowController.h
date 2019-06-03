@@ -132,13 +132,6 @@
 @property (strong) VLCPopupPanelController *popupPanel;
 @property (strong) VLCTextfieldPanelController *textfieldPanel;
 
-
-@property (readwrite, nonatomic, retain) NSString * MRL;
-@property (readwrite, nonatomic, retain) NSString * outputDestination;
-@property (readwrite, retain) NSArray * profileNames;
-@property (readwrite, retain) NSArray * profileValueList;
-@property (readwrite, retain) NSMutableArray * currentProfile;
-
 // Bindings for field / stepper combis
 @property (nonatomic) int vidBitrate;
 @property (nonatomic) int vidFramerate;

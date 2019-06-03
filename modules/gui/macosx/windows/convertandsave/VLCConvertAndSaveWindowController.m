@@ -51,6 +51,9 @@
 #define ASF 12
 /* 13-15 are present, but not set */
 
+NSString *VLCConvertAndSaveProfilesKey = @"CASProfiles";
+NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
+
 @interface VLCConvertAndSaveWindowController() <VLCDragDropTarget>
 {
     NSArray *_videoCodecs;
@@ -58,6 +61,11 @@
     NSArray *_subsCodecs;
     BOOL b_streaming;
 }
+@property (readwrite, nonatomic, retain) NSString *MRL;
+@property (readwrite, nonatomic, retain) NSString *outputDestination;
+@property (readwrite, retain) NSArray *profileNames;
+@property (readwrite, retain) NSArray *profileValueList;
+@property (readwrite, retain) NSMutableArray *currentProfile;
 
 - (void)updateDropView;
 - (void)updateOKButton;
@@ -118,7 +126,8 @@
                                      @"Audio - CD",
                                      nil];
 
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:defaultProfiles, @"CASProfiles", defaultProfileNames, @"CASProfileNames", nil];
+    NSDictionary *appDefaults = @{defaultProfiles : VLCConvertAndSaveProfilesKey,
+                                  defaultProfileNames : VLCConvertAndSaveProfileNamesKey};
 
     [defaults registerDefaults:appDefaults];
 }
@@ -134,6 +143,36 @@
 }
 
 - (void)windowDidLoad
+{
+    [self initStrings];
+
+    /* there is no way to hide single cells, so replace the existing ones with empty cells.. */
+    NSCell *blankCell = [[NSCell alloc] init];
+    [blankCell setEnabled:NO];
+    [_customizeEncapMatrix putCell:blankCell atRow:3 column:1];
+    [_customizeEncapMatrix putCell:blankCell atRow:3 column:2];
+    [_customizeEncapMatrix putCell:blankCell atRow:3 column:3];
+
+    /* fetch profiles from defaults */
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [self setProfileValueList: [defaults arrayForKey:VLCConvertAndSaveProfilesKey]];
+    [self setProfileNames: [defaults arrayForKey:VLCConvertAndSaveProfileNamesKey]];
+    [self recreateProfilePopup];
+
+    [self initCodecStructures];
+
+    [self populatePopupButtons];
+
+    [_okButton setEnabled: NO];
+
+    // setup drop view
+    [_dropBox enablePlaylistItems];
+    [_dropBox setDropTarget:self];
+
+    [self resetCustomizationSheetBasedOnProfile:[self.profileValueList firstObject]];
+}
+
+- (void)initStrings
 {
     [self.window setTitle: _NS("Convert & Stream")];
     [_okButton setTitle: _NS("Go!")];
@@ -199,33 +238,26 @@
     [_streamSDPFileBrowseButton setStringValue:_NS("Browse...")];
     [_streamChannelLabel setStringValue:_NS("Channel Name")];
     [_streamSDPLabel setStringValue:_NS("SDP URL")];
+}
 
-    /* there is no way to hide single cells, so replace the existing ones with empty cells.. */
-    id blankCell = [[NSCell alloc] init];
-    [blankCell setEnabled:NO];
-    [_customizeEncapMatrix putCell:blankCell atRow:3 column:1];
-    [_customizeEncapMatrix putCell:blankCell atRow:3 column:2];
-    [_customizeEncapMatrix putCell:blankCell atRow:3 column:3];
+- (void)initCodecStructures
+{
+    _videoCodecs = @[
+                     @[@"MPEG-1", @"MPEG-2", @"MPEG-4", @"DIVX 1", @"DIVX 2", @"DIVX 3", @"H.263", @"H.264", @"VP8", @"WMV1", @"WMV2", @"M-JPEG", @"Theora", @"Dirac"],
+                     @[@"mpgv", @"mp2v", @"mp4v", @"DIV1", @"DIV2", @"DIV3", @"H263", @"h264", @"VP80", @"WMV1", @"WMV2", @"MJPG", @"theo", @"drac"],
+                     ];
+    _audioCodecs = @[
+                     @[@"MPEG Audio", @"MP3", @"MPEG 4 Audio (AAC)", @"A52/AC-3", @"Vorbis", @"Flac", @"Speex", @"WAV", @"WMA2"],
+                     @[@"mpga", @"mp3", @"mp4a", @"a52", @"vorb", @"flac", @"spx", @"s16l", @"wma2"],
+                     ];
+    _subsCodecs = @[
+                    @[@"DVB subtitle", @"T.140"],
+                    @[@"dvbs", @"t140"],
+                    ];
+}
 
-    /* fetch profiles from defaults */
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [self setProfileValueList: [defaults arrayForKey:@"CASProfiles"]];
-    [self setProfileNames: [defaults arrayForKey:@"CASProfileNames"]];
-    [self recreateProfilePopup];
-
-    _videoCodecs = [[NSArray alloc] initWithObjects:
-                    [NSArray arrayWithObjects:@"MPEG-1", @"MPEG-2", @"MPEG-4", @"DIVX 1", @"DIVX 2", @"DIVX 3", @"H.263", @"H.264", @"VP8", @"WMV1", @"WMV2", @"M-JPEG", @"Theora", @"Dirac", nil],
-                    [NSArray arrayWithObjects:@"mpgv", @"mp2v", @"mp4v", @"DIV1", @"DIV2", @"DIV3", @"H263", @"h264", @"VP80", @"WMV1", @"WMV2", @"MJPG", @"theo", @"drac", nil],
-                    nil];
-    _audioCodecs = [[NSArray alloc] initWithObjects:
-                    [NSArray arrayWithObjects:@"MPEG Audio", @"MP3", @"MPEG 4 Audio (AAC)", @"A52/AC-3", @"Vorbis", @"Flac", @"Speex", @"WAV", @"WMA2", nil],
-                    [NSArray arrayWithObjects:@"mpga", @"mp3", @"mp4a", @"a52", @"vorb", @"flac", @"spx", @"s16l", @"wma2", nil],
-                    nil];
-    _subsCodecs = [[NSArray alloc] initWithObjects:
-                   [NSArray arrayWithObjects:@"DVB subtitle", @"T.140", nil],
-                   [NSArray arrayWithObjects:@"dvbs", @"t140", nil],
-                    nil];
-
+- (void)populatePopupButtons
+{
     [_customizeVidCodecPopup removeAllItems];
     [_customizeVidScalePopup removeAllItems];
     [_customizeAudCodecPopup removeAllItems];
@@ -250,14 +282,6 @@
     [_customizeVidScalePopup addItemWithTitle:@"1.5"];
     [_customizeVidScalePopup addItemWithTitle:@"1.75"];
     [_customizeVidScalePopup addItemWithTitle:@"2"];
-
-    [_okButton setEnabled: NO];
-
-    // setup drop view
-    [_dropBox enablePlaylistItems];
-    [_dropBox setDropTarget:self];
-
-    [self resetCustomizationSheetBasedOnProfile:[self.profileValueList firstObject]];
 }
 
 # pragma mark -
@@ -711,10 +735,10 @@
 - (void)resetCustomizationSheetBasedOnProfile:(NSString *)profileString
 {
     /* Container(string), transcode video(bool), transcode audio(bool),
-    * use subtitles(bool), video codec(string), video bitrate(integer),
-    * scale(float), fps(float), width(integer, height(integer),
-    * audio codec(string), audio bitrate(integer), channels(integer),
-    * samplerate(integer), subtitle codec(string), subtitle overlay(bool) */
+     * use subtitles(bool), video codec(string), video bitrate(integer),
+     * scale(float), fps(float), width(integer, height(integer),
+     * audio codec(string), audio bitrate(integer), channels(integer),
+     * samplerate(integer), subtitle codec(string), subtitle overlay(bool) */
 
     NSArray * components = [profileString componentsSeparatedByString:@";"];
     if ([components count] != 16) {
@@ -903,7 +927,7 @@
     if ([[self.currentProfile objectAtIndex:1] intValue]) {
         // video is enabled
         if (![[self.currentProfile objectAtIndex:4] isEqualToString:@"copy"]) {
-        [composedOptions appendFormat:@"vcodec=%@", [self.currentProfile objectAtIndex:4]];
+            [composedOptions appendFormat:@"vcodec=%@", [self.currentProfile objectAtIndex:4]];
             if ([[self.currentProfile objectAtIndex:5] intValue] > 0) // bitrate
                 [composedOptions appendFormat:@",vb=%@", [self.currentProfile objectAtIndex:5]];
             if ([[self.currentProfile objectAtIndex:6] floatValue] > 0.) // scale
@@ -1053,8 +1077,8 @@
 - (void)storeProfilesOnDisk
 {
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:_profileNames forKey:@"CASProfileNames"];
-    [defaults setObject:_profileValueList forKey:@"CASProfiles"];
+    [defaults setObject:_profileNames forKey:VLCConvertAndSaveProfileNamesKey];
+    [defaults setObject:_profileValueList forKey:VLCConvertAndSaveProfilesKey];
 }
 
 - (void)recreateProfilePopup
