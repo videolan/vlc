@@ -1224,6 +1224,9 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
         const int i_extension_flag = ( p_block[1] >> 7)& 0x01;
         if( i_extension_flag )
             continue;
+        const uint8_t i_block_number = (p_pack[3] >> 4) & 0x07;
+        if( i_block_number > 0 )
+            continue;
 
         //const int i_sequence_number = p_block[2];
         //const int i_charater_position = (p_block[3] >> 0) &0x0f;
