@@ -238,23 +238,6 @@
     }
 }
 
-- (void)inputChanged:(input_thread_t *)p_input
-{
-    // FIXME: this is never called!
-    //This is unlikely, but can happen if no extension modules can be loaded.
-    if (p_extensions_manager == NULL)
-        return;
-    vlc_mutex_lock(&p_extensions_manager->lock);
-
-    extension_t *p_ext;
-    ARRAY_FOREACH(p_ext, p_extensions_manager->extensions) {
-        if (extension_IsActivated(p_extensions_manager, p_ext))
-            extension_SetInput(p_extensions_manager, p_ext, p_input);
-    }
-
-    vlc_mutex_unlock(&p_extensions_manager->lock);
-}
-
 - (void)playingChanged:(int)state
 {
     //This is unlikely, but can happen if no extension modules can be loaded.

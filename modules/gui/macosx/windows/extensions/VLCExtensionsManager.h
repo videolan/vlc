@@ -37,7 +37,6 @@
 - (void)reloadExtensions;
 
 - (void)triggerMenu:(id)sender;
-- (void)inputChanged:(input_thread_t *)p_input;
 - (void)playingChanged:(int)state;
 - (void)metaChanged:(input_item_t *)p_input;
 
