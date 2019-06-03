@@ -30,11 +30,16 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 #import "windows/video/VLCVideoWindowCommon.h"
+#import "windows/video/VLCWindow.h"
+#import "views/VLCDefaultValueSlider.h"
+#import "views/VLCTimeField.h"
+#import "views/VLCSlider.h"
 
 NSString *VLCFSPanelShouldBecomeActive = @"VLCFSPanelShouldBecomeActive";
 NSString *VLCFSPanelShouldBecomeInactive = @"VLCFSPanelShouldBecomeInactive";
 
-@interface VLCFSPanelController () {
+@interface VLCFSPanelController ()
+{
     BOOL _isCounting;
 
     // Only used to track changes and trigger centering of FS panel
@@ -45,7 +50,6 @@ NSString *VLCFSPanelShouldBecomeInactive = @"VLCFSPanelShouldBecomeInactive";
     VLCPlaylistController *_playlistController;
     VLCPlayerController *_playerController;
 }
-
 @end
 
 @implementation VLCFSPanelController

@@ -25,8 +25,6 @@
 
 #import <vlc_vout_window.h>
 
-#import "os-integration/VLCKeyboardBacklightControl.h"
-
 @class VLCControlsBarCommon;
 @class VLCVideoWindowCommon;
 @class VLCVoutView;

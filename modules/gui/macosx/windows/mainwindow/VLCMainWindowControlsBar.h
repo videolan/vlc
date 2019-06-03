@@ -23,8 +23,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "views/VLCVolumeSlider.h"
 #import "windows/mainwindow/VLCControlsBarCommon.h"
+
+@class VLCVolumeSlider;
 
 /*****************************************************************************
  * VLCMainWindowControlsBar

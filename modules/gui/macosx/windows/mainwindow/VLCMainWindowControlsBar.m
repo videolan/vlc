@@ -28,6 +28,7 @@
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "views/VLCVolumeSlider.h"
 
 /*****************************************************************************
  * VLCMainWindowControlsBar

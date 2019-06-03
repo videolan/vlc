@@ -110,7 +110,7 @@ NSString *VLCVideoWindowDidEnterFullscreen = @"VLCVideoWindowDidEnterFullscreen"
 
     if (b_nativeFullscreenMode) {
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
-    } else if (@available(macOS 10.11, *)) {
+    } else {
         // Native fullscreen seems to be default on El Capitan, this disables it explicitely
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
     }
@@ -900,9 +900,10 @@ NSString *VLCVideoWindowDidEnterFullscreen = @"VLCVideoWindowDidEnterFullscreen"
         [[[viewAnimations firstObject] objectForKey: NSViewAnimationEffectKey] isEqualToString:NSViewAnimationFadeInEffect]) {
         /* Fullscreen ended */
         [self hasEndedFullscreen];
-    } else
+    } else {
     /* Fullscreen started */
         [self hasBecomeFullscreen];
+    }
 }
 
 @end

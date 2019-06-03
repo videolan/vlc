@@ -25,10 +25,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "windows/video/VLCWindow.h"
-#import "views/VLCDefaultValueSlider.h"
-#import "views/VLCTimeField.h"
-#import "views/VLCSlider.h"
+@class VLCTimeField;
+@class VLCSlider;
+@class VLCDefaultValueSlider;
 
 extern NSString *VLCFSPanelShouldBecomeActive;
 extern NSString *VLCFSPanelShouldBecomeInactive;

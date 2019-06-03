@@ -34,6 +34,7 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 #import "library/VLCLibraryWindow.h"
+#import "os-integration/VLCKeyboardBacklightControl.h"
 
 #import "panels/dialogs/VLCResumeDialogController.h"
 #import "panels/VLCVideoEffectsWindowController.h"
