@@ -70,8 +70,8 @@ static BOOL SetDefaultDllDirectories_(DWORD flags)
 
     BOOL (WINAPI * SetDefaultDllDirectoriesReal)(DWORD);
 
-    SetDefaultDllDirectoriesReal = GetProcAddress(h,
-                                                  "SetDefaultDllDirectories");
+    SetDefaultDllDirectoriesReal = (BOOL (WINAPI *)(DWORD))
+                                    GetProcAddress(h, "SetDefaultDllDirectories");
     if (SetDefaultDllDirectoriesReal == NULL)
         return FALSE;
 
@@ -149,7 +149,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     if (h_Kernel32 != NULL)
     {
         /* Enable DEP */
+#ifndef PROCESS_DEP_ENABLE
 # define PROCESS_DEP_ENABLE 1
+#endif /* PROCESS_DEP_ENABLE */
         BOOL (WINAPI * mySetProcessDEPPolicy)( DWORD dwFlags);
         mySetProcessDEPPolicy = (BOOL (WINAPI *)(DWORD))
                             GetProcAddress(h_Kernel32, "SetProcessDEPPolicy");
