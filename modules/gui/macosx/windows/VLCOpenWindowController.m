@@ -32,8 +32,8 @@
 #import <vlc_common.h>
 #import <vlc_url.h>
 
-#import "extensions/misc.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/VLCPositionFormatter.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "windows/convertandsave/VLCOutput.h"
@@ -208,8 +208,8 @@ static NSString *kCaptureTabViewId  = @"capture";
     [_screenqtkAudioCheckbox setTitle: _NS("Capture Audio")];
 
     // setup start / stop time fields
-    [_fileStartTimeTextField setFormatter:[[PositionFormatter alloc] init]];
-    [_fileStopTimeTextField setFormatter:[[PositionFormatter alloc] init]];
+    [_fileStartTimeTextField setFormatter:[[VLCPositionFormatter alloc] init]];
+    [_fileStopTimeTextField setFormatter:[[VLCPositionFormatter alloc] init]];
 
     // Auto collapse MRL field
     self.mrlViewHeightConstraint.constant = 0;

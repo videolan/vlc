@@ -28,7 +28,6 @@
 #import "main/VLCMain.h"
 #import "VLCExtensionsManager.h"
 #import "extensions/NSString+Helpers.h"
-#import "extensions/misc.h"
 #import "VLCUIWidgets.h"
 
 #import <WebKit/WebKit.h>

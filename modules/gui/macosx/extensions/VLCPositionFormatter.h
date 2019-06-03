@@ -1,10 +1,9 @@
 /*****************************************************************************
- * misc.h: code not specific to vlc
+ * VLCPositionFormatter.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2003-2014 VLC authors and VideoLAN
+ * Copyright (C) 2013, 2019 VLC authors and VideoLAN
  *
- * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Felix Paul Kühne <fkuehne at videolan dot org>
+ * Author: David Fuhrmann <dfuhrmann # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,14 +20,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
-/*****************************************************************************
- * PositionFormatter interface
- *
- * Formats a text field to only accept decimals and :
- *****************************************************************************/
-@interface PositionFormatter : NSFormatter
+@interface VLCPositionFormatter : NSFormatter
 
 - (NSString*)stringForObjectValue:(id)obj;
 

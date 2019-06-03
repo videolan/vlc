@@ -23,7 +23,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "extensions/misc.h"
 #import "views/VLCVolumeSlider.h"
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 

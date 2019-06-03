@@ -44,8 +44,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/NSView+VLCAdditions.m \
 	gui/macosx/extensions/VLCHexNumberFormatter.h \
 	gui/macosx/extensions/VLCHexNumberFormatter.m \
-	gui/macosx/extensions/misc.h \
-	gui/macosx/extensions/misc.m \
+	gui/macosx/extensions/VLCPositionFormatter.h \
+	gui/macosx/extensions/VLCPositionFormatter.m \
 	gui/macosx/imported/AppleRemote/AppleRemote.h \
 	gui/macosx/imported/AppleRemote/AppleRemote.m \
 	gui/macosx/imported/SPMediaKeyTap/SPMediaKeyTap.h \

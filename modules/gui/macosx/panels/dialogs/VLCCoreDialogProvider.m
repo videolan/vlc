@@ -23,7 +23,6 @@
 
 #import "VLCCoreDialogProvider.h"
 
-#import "extensions/misc.h"
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "windows/VLCErrorWindowController.h"

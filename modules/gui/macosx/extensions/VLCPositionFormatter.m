@@ -1,10 +1,9 @@
 /*****************************************************************************
- * misc.m: code not specific to vlc
+ * VLCPositionFormatter.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2003-2015 VLC authors and VideoLAN
+ * Copyright (C) 2013, 2019 VLC authors and VideoLAN
  *
- * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Felix Paul Kühne <fkuehne at videolan dot org>
+ * Author: David Fuhrmann <dfuhrmann # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,24 +20,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "misc.h"
-#import "NSString+Helpers.h"
+#import "VLCPositionFormatter.h"
 
-@interface PositionFormatter()
+@interface VLCPositionFormatter()
 {
     NSCharacterSet *o_forbidden_characters;
 }
 @end
 
-@implementation PositionFormatter
+@implementation VLCPositionFormatter
 
 - (id)init
 {
     self = [super init];
-    NSMutableCharacterSet *nonNumbers = [[[NSCharacterSet decimalDigitCharacterSet] invertedSet] mutableCopy];
-    [nonNumbers removeCharactersInString:@"-:"];
-    o_forbidden_characters = [nonNumbers copy];
-
+    if (self) {
+        NSMutableCharacterSet *nonNumbers = [[[NSCharacterSet decimalDigitCharacterSet] invertedSet] mutableCopy];
+        [nonNumbers removeCharactersInString:@"-:"];
+        o_forbidden_characters = [nonNumbers copy];
+    }
     return self;
 }
 

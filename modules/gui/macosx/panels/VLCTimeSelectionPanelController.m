@@ -22,7 +22,6 @@
 #import "VLCTimeSelectionPanelController.h"
 
 #import "extensions/NSString+Helpers.h"
-#import "extensions/misc.h"
 
 @interface VLCTimeSelectionPanelController()
 {

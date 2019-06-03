@@ -39,7 +39,6 @@
 #import <vlc_config_cat.h>
 #import <vlc_aout.h>
 
-#import "extensions/misc.h"
 #import "extensions/NSScreen+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
