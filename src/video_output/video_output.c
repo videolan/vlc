@@ -1829,7 +1829,8 @@ vout_thread_t *vout_Create(vlc_object_t *object)
 
     /* Initialize subpicture unit */
     vlc_mutex_init(&sys->spu_lock);
-    sys->spu = spu_Create(vout, vout);
+    sys->spu = var_InheritBool(vout, "spu") || var_InheritBool(vout, "osd") ?
+               spu_Create(vout, vout) : NULL;
 
     vout_control_Init(&sys->control);
 
