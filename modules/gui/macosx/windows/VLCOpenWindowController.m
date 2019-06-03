@@ -41,6 +41,19 @@
 
 NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
+@interface VLCOpenBlockDeviceDescription : NSObject
+
+@property (readwrite, retain) NSString *path;
+@property (readwrite, retain) NSString *devicePath;
+@property (readwrite, retain) NSString *mediaType;
+@property (readwrite, retain) NSImage *mediaIcon;
+
+@end
+
+@implementation VLCOpenBlockDeviceDescription
+
+@end
+
 @interface VLCOpenTextField : NSTextField
 - (void)mouseDown:(NSEvent *)theEvent;
 @end
@@ -715,12 +728,12 @@ static NSString *kCaptureTabViewId  = @"capture";
     [opticalTabView displayIfNeeded];
 }
 
-- (void)showOpticalAtPath: (NSDictionary *)valueDictionary
+- (void)showOpticalAtPath:(VLCOpenBlockDeviceDescription *)deviceDescription
 {
-    NSString *diskType = [valueDictionary objectForKey:@"mediaType"];
-    NSString *opticalDevicePath = [valueDictionary objectForKey:@"path"];
-    NSString *devicePath = [valueDictionary objectForKey:@"devicePath"];
-    NSImage *image = [valueDictionary objectForKey:@"image"];
+    NSString *diskType = deviceDescription.mediaType;
+    NSString *opticalDevicePath = deviceDescription.path;
+    NSString *devicePath = deviceDescription.devicePath;
+    NSImage *mediaIcon = deviceDescription.mediaIcon;
 
     if ([diskType isEqualToString: kVLCMediaDVD] || [diskType isEqualToString: kVLCMediaVideoTSFolder]) {
         [_discDVDLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath:opticalDevicePath]];
@@ -728,27 +741,27 @@ static NSString *kCaptureTabViewId  = @"capture";
 
         if (!b_nodvdmenus) {
             [self setMRL: [NSString stringWithFormat: @"dvdnav://%@", devicePath]];
-            [self showOpticalMediaView: _discDVDView withIcon:image];
+            [self showOpticalMediaView: _discDVDView withIcon:mediaIcon];
         } else {
             [self setMRL: [NSString stringWithFormat: @"dvdread://%@#%i:%i-", devicePath, [_discDVDwomenusTitleTextField intValue], [_discDVDwomenusChapterTextField intValue]]];
-            [self showOpticalMediaView: _discDVDwomenusView withIcon:image];
+            [self showOpticalMediaView: _discDVDwomenusView withIcon:mediaIcon];
         }
     } else if ([diskType isEqualToString: kVLCMediaAudioCD]) {
         [_discAudioCDLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath: opticalDevicePath]];
         [_discAudioCDTrackCountLabel setStringValue: [NSString stringWithFormat:_NS("%i tracks"), [[[NSFileManager defaultManager] subpathsOfDirectoryAtPath: opticalDevicePath error:NULL] count] - 1]]; // minus .TOC.plist
-        [self showOpticalMediaView: _discAudioCDView withIcon: image];
+        [self showOpticalMediaView: _discAudioCDView withIcon: mediaIcon];
         [self setMRL: [NSString stringWithFormat: @"cdda://%@", devicePath]];
     } else if ([diskType isEqualToString: kVLCMediaVCD]) {
         [_discVCDLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath: opticalDevicePath]];
-        [self showOpticalMediaView: _discVCDView withIcon: image];
+        [self showOpticalMediaView: _discVCDView withIcon: mediaIcon];
         [self setMRL: [NSString stringWithFormat: @"vcd://%@#%i:%i", devicePath, [_discVCDTitleTextField intValue], [_discVCDChapterTextField intValue]]];
     } else if ([diskType isEqualToString: kVLCMediaSVCD]) {
         [_discVCDLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath: opticalDevicePath]];
-        [self showOpticalMediaView: _discVCDView withIcon: image];
+        [self showOpticalMediaView: _discVCDView withIcon: mediaIcon];
         [self setMRL: [NSString stringWithFormat: @"vcd://%@@%i:%i", devicePath, [_discVCDTitleTextField intValue], [_discVCDChapterTextField intValue]]];
     } else if ([diskType isEqualToString: kVLCMediaBD] || [diskType isEqualToString: kVLCMediaBDMVFolder]) {
         [_discBDLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath: opticalDevicePath]];
-        [self showOpticalMediaView: _discBDView withIcon: image];
+        [self showOpticalMediaView: _discBDView withIcon: mediaIcon];
         [self setMRL: [NSString stringWithFormat: @"bluray://%@", opticalDevicePath]];
     } else {
         msg_Warn(getIntf(), "unknown disk type, no idea what to display");
@@ -757,10 +770,9 @@ static NSString *kCaptureTabViewId  = @"capture";
     }
 }
 
-- (NSDictionary *)scanPath:(NSURL *)url
+- (VLCOpenBlockDeviceDescription *)scanPath:(NSURL *)url
 {
     NSString *path = [url path];
-
     NSString *type = getVolumeTypeFromMountPath(path);
     NSImage *image = [[NSWorkspace sharedWorkspace] iconForFile: path];
     NSString *devicePath;
@@ -780,10 +792,13 @@ static NSString *kCaptureTabViewId  = @"capture";
     else
         devicePath = getBSDNodeFromMountPath(path);
 
-    return [NSDictionary dictionaryWithObjectsAndKeys: path, @"path",
-            devicePath, @"devicePath",
-            type, @"mediaType",
-            image, @"image", nil];
+    VLCOpenBlockDeviceDescription *deviceDescription = [[VLCOpenBlockDeviceDescription alloc] init];
+    deviceDescription.path = path;
+    deviceDescription.devicePath = devicePath;
+    deviceDescription.mediaType = type;
+    deviceDescription.mediaIcon = image;
+
+    return deviceDescription;
 }
 
 - (void)scanDevices
@@ -818,10 +833,10 @@ static NSString *kCaptureTabViewId  = @"capture";
 - (void)scanSpecialPath:(NSURL *)oPath
 {
     @autoreleasepool {
-        NSDictionary *o_dict = [self scanPath:oPath];
+        VLCOpenBlockDeviceDescription *deviceDescription = [self scanPath:oPath];
 
         @synchronized (self) {
-            [_specialMediaFolders addObject:o_dict];
+            [_specialMediaFolders addObject:deviceDescription];
         }
 
         [self performSelectorOnMainThread:@selector(updateMediaSelector:) withObject:[NSNumber numberWithBool:YES] waitUntilDone:NO];
@@ -899,7 +914,7 @@ static NSString *kCaptureTabViewId  = @"capture";
 
 - (IBAction)dvdreadOptionChanged:(id)sender
 {
-    NSString *devicePath = [[_allMediaDevices objectAtIndex:[_discSelectorPopup indexOfSelectedItem]] objectForKey:@"devicePath"];
+    NSString *devicePath = [[_allMediaDevices objectAtIndex:[_discSelectorPopup indexOfSelectedItem]] devicePath];
 
     if (sender == _discDVDwomenusEnableMenusButton) {
         b_nodvdmenus = NO;
@@ -935,7 +950,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     if (sender == _discVCDChapterStepper)
         [_discVCDChapterTextField setIntValue: [_discVCDChapterStepper intValue]];
 
-    NSString *devicePath = [[_allMediaDevices objectAtIndex:[_discSelectorPopup indexOfSelectedItem]] objectForKey:@"devicePath"];
+    NSString *devicePath = [[_allMediaDevices objectAtIndex:[_discSelectorPopup indexOfSelectedItem]] devicePath];
     [self setMRL: [NSString stringWithFormat: @"vcd://%@@%i:%i", devicePath, [_discVCDTitleTextField intValue], [_discVCDChapterTextField intValue]]];
 }
 
