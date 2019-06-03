@@ -1,9 +1,10 @@
 /*****************************************************************************
  * VLCVideoEffectsWindowController.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2015 Felix Paul Kühne
+ * Copyright (C) 2011-2019 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
+ * Authors: Felix Paul Kühne <fkuehne # videolan dot org>
+ *          David Fuhrmann <dfuhrmann # videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +38,10 @@
 #define getWidgetFloatValue(w)  ((vlc_value_t){ .f_float = [w floatValue] })
 #define getWidgetStringValue(w) ((vlc_value_t){ .psz_string = (char *)[[w stringValue] UTF8String] })
 
+NSString *VLCVideoEffectsSelectedProfileKey = @"VideoEffectSelectedProfile";
+NSString *VLCVideoEffectsProfilesKey = @"VideoEffectProfiles";
+NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
+
 #pragma mark -
 #pragma mark Initialization
 
@@ -52,8 +57,8 @@
      */
 
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 [NSArray arrayWithObject:[VLCVideoEffectsWindowController defaultProfileString]], @"VideoEffectProfiles",
-                                 [NSArray arrayWithObject:_NS("Default")], @"VideoEffectProfileNames",
+                                 [NSArray arrayWithObject:[VLCVideoEffectsWindowController defaultProfileString]], VLCVideoEffectsProfilesKey,
+                                 [NSArray arrayWithObject:_NS("Default")], VLCVideoEffectsProfileNamesKey,
                                  nil];
     [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
 }
@@ -96,7 +101,7 @@
     if (profileIndex == 0)
         profileString = [VLCVideoEffectsWindowController defaultProfileString];
     else
-        profileString = [[defaults objectForKey:@"VideoEffectProfiles"] objectAtIndex:profileIndex];
+        profileString = [[defaults objectForKey:VLCVideoEffectsProfilesKey] objectAtIndex:profileIndex];
 
     NSArray *items = [profileString componentsSeparatedByString:@";"];
 
@@ -340,12 +345,12 @@
 
 - (void)saveCurrentProfileIndex:(NSInteger)index
 {
-    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"VideoEffectSelectedProfile"];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:VLCVideoEffectsSelectedProfileKey];
 }
 
 - (NSInteger)currentProfileIndex
 {
-    return [[NSUserDefaults standardUserDefaults] integerForKey:@"VideoEffectSelectedProfile"];
+    return [[NSUserDefaults standardUserDefaults] integerForKey:VLCVideoEffectsSelectedProfileKey];
 }
 
 /// Returns the list of profile names (omitting the Default entry)
@@ -353,7 +358,7 @@
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-    NSMutableArray *names = [[defaults stringArrayForKey:@"VideoEffectProfileNames"] mutableCopy];
+    NSMutableArray *names = [[defaults stringArrayForKey:VLCVideoEffectsProfileNamesKey] mutableCopy];
     [names removeObjectAtIndex:0];
     return [names copy];
 }
@@ -707,12 +712,12 @@
     NSString *newProfile = [self generateProfileString];
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfiles"]];
+    NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:VLCVideoEffectsProfilesKey]];
     if (currentProfileIndex >= [workArray count])
         return;
 
     [workArray replaceObjectAtIndex:currentProfileIndex withObject:newProfile];
-    [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
+    [defaults setObject:[NSArray arrayWithArray:workArray] forKey:VLCVideoEffectsProfilesKey];
 }
 
 - (void)saveCurrentProfileAtTerminate
@@ -732,11 +737,11 @@
         return;
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfiles"]];
+    NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:VLCVideoEffectsProfilesKey]];
     [workArray addObject:newProfile];
-    [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
+    [defaults setObject:[NSArray arrayWithArray:workArray] forKey:VLCVideoEffectsProfilesKey];
 
-    NSArray<NSString *> *profileNames = [defaults objectForKey:@"VideoEffectProfileNames"];
+    NSArray<NSString *> *profileNames = [defaults objectForKey:VLCVideoEffectsProfileNamesKey];
     NSString *newProfileName;
 
     unsigned int num_custom = 0;
@@ -744,9 +749,9 @@
         newProfileName = [@"Custom" stringByAppendingString:[NSString stringWithFormat:@"%03i",num_custom++]];
     while ([profileNames containsObject:newProfileName]);
 
-    workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfileNames"]];
+    workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:VLCVideoEffectsProfileNamesKey]];
     [workArray addObject:newProfileName];
-    [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
+    [defaults setObject:[NSArray arrayWithArray:workArray] forKey:VLCVideoEffectsProfileNamesKey];
 
     [self saveCurrentProfileIndex:([workArray count] - 1)];
 }
@@ -790,7 +795,7 @@
         }
 
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        NSArray *profileNames = [defaults objectForKey:@"VideoEffectProfileNames"];
+        NSArray *profileNames = [defaults objectForKey:VLCVideoEffectsProfileNamesKey];
 
         // duplicate names are not allowed in the popup control
         if ([resultingText length] == 0 || [profileNames containsObject:resultingText]) {
@@ -810,15 +815,15 @@
 
         /* add string to user defaults as well as a label */
 
-        NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfiles"]];
+        NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:VLCVideoEffectsProfilesKey]];
         [workArray addObject:newProfile];
-        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:VLCVideoEffectsProfilesKey];
 
         [self saveCurrentProfileIndex:([workArray count] - 1)];
 
-        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfileNames"]];
+        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:VLCVideoEffectsProfileNamesKey]];
         [workArray addObject:resultingText];
-        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:VLCVideoEffectsProfileNamesKey];
 
         /* refresh UI */
         [_self resetProfileSelector];
@@ -851,13 +856,13 @@
 
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         /* remove selected profile from settings */
-        NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray: [defaults objectForKey:@"VideoEffectProfiles"]];
+        NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray: [defaults objectForKey:VLCVideoEffectsProfilesKey]];
         [workArray removeObjectAtIndex:selectedIndex];
-        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:VLCVideoEffectsProfilesKey];
 
-        workArray = [[NSMutableArray alloc] initWithArray: [defaults objectForKey:@"VideoEffectProfileNames"]];
+        workArray = [[NSMutableArray alloc] initWithArray: [defaults objectForKey:VLCVideoEffectsProfileNamesKey]];
         [workArray removeObjectAtIndex:selectedIndex];
-        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:VLCVideoEffectsProfileNamesKey];
 
         if (activeProfileIndex >= selectedIndex)
             [self saveCurrentProfileIndex:(activeProfileIndex - 1)];
