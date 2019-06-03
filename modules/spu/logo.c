@@ -540,9 +540,9 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
             int i_dx, i_dy;
             vlc_mouse_GetMotion( &i_dx, &i_dy, p_old, p_new );
             p_sys->i_pos_x = VLC_CLIP( p_sys->i_pos_x + i_dx, 0,
-                                    p_filter->fmt_in.video.i_width  - i_logo_w );
+                                    (int)p_filter->fmt_in.video.i_width  - i_logo_w );
             p_sys->i_pos_y = VLC_CLIP( p_sys->i_pos_y + i_dy, 0,
-                                    p_filter->fmt_in.video.i_height - i_logo_h );
+                                    (int)p_filter->fmt_in.video.i_height - i_logo_h );
         }
 
         if( p_sys->b_mouse_grab || b_over )
