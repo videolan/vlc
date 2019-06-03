@@ -1477,6 +1477,23 @@ vlc_player_SelectCategoryLanguage(vlc_player_t *player,
     }
 }
 
+char *
+vlc_player_GetCategoryLanguage(vlc_player_t *player,
+                               enum es_format_category_e cat)
+{
+    vlc_player_assert_locked(player);
+    switch (cat)
+    {
+        case AUDIO_ES:
+            return var_GetString(player, "audio-language");
+            break;
+        case SPU_ES:
+            return var_GetString(player, "sub-language");
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
 static void
 vlc_player_input_HandleTeletextMenu(struct vlc_player_input *input,
                                     const struct vlc_input_event_es *ev)

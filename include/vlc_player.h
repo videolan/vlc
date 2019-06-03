@@ -1853,6 +1853,23 @@ vlc_player_SelectCategoryLanguage(vlc_player_t *player,
                                   const char *lang);
 
 /**
+ * Get the language of an ES category
+ *
+ * @warning This only reflects the change made by
+ * vlc_player_SelectCategoryLanguage(). The current playing track doesn't
+ * necessarily correspond to the returned language.
+ *
+ * @see vlc_player_SelectCategoryLanguage
+ *
+ * @param player locked player instance
+ * @param cat AUDIO_ES or SPU_ES
+ * @return valid language or NULL, need to be freed
+ */
+VLC_API char *
+vlc_player_GetCategoryLanguage(vlc_player_t *player,
+                               enum es_format_category_e cat);
+
+/**
  * Helper to select the audio language
  */
 static inline void

@@ -795,6 +795,7 @@ vlc_player_DecrementRate
 vlc_player_Delete
 vlc_player_GetAudioDelay
 vlc_player_GetCapabilities
+vlc_player_GetCategoryLanguage
 vlc_player_GetCurrentMedia
 vlc_player_GetError
 vlc_player_GetEsIdFromVout
