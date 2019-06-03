@@ -41,7 +41,7 @@
 
 @interface VLCBookmarksWindowController() <NSTableViewDataSource, NSTableViewDelegate>
 {
-    input_thread_t *p_old_input;
+    //input_thread_t *p_old_input;
 }
 @end
 
@@ -60,8 +60,8 @@
 
 - (void)dealloc
 {
-    if (p_old_input)
-        input_Release(p_old_input);
+    //if (p_old_input)
+    //    input_Release(p_old_input);
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
