@@ -365,10 +365,6 @@ int input_Start( input_thread_t * );
 
 void input_Stop( input_thread_t * );
 
-int input_Read( vlc_object_t *, input_item_t *,
-                        input_thread_events_cb, void * );
-#define input_Read(a,b,c,d) input_Read(VLC_OBJECT(a),b,c,d)
-
 void input_Close( input_thread_t * );
 
 void input_SetTime( input_thread_t *, vlc_tick_t i_time, bool b_fast );

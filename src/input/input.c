@@ -140,32 +140,6 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
                    INPUT_CREATE_OPTION_NONE, p_resource, p_renderer );
 }
 
-#undef input_Read
-/**
- * Initialize an input thread and run it until it stops by itself.
- *
- * \param p_parent a vlc_object
- * \param p_item an input item
- * \return an error code, VLC_SUCCESS on success
- */
-int input_Read( vlc_object_t *p_parent, input_item_t *p_item,
-                input_thread_events_cb events_cb, void *events_data )
-{
-    input_thread_t *p_input = Create( p_parent, events_cb, events_data, p_item,
-                                      INPUT_CREATE_OPTION_NONE, NULL, NULL );
-    if( !p_input )
-        return VLC_EGENERIC;
-
-    if( !Init( p_input ) )
-    {
-        MainLoop( p_input, false );
-        End( p_input );
-    }
-
-    input_Close(p_input);
-    return VLC_SUCCESS;
-}
-
 input_thread_t *input_CreatePreparser( vlc_object_t *parent,
                                        input_thread_events_cb events_cb,
                                        void *events_data, input_item_t *item )
