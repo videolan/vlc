@@ -1195,6 +1195,9 @@ static void astrcat( char **ppsz_dst, char *psz_src )
 }
 
 /* */
+#define CDTEXT_PACK_SIZE 18
+#define CDTEXT_PACK_HEADER 4
+#define CDTEXT_PACK_PAYLOAD 12
 static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
                         const uint8_t *p_buffer, int i_buffer )
 {
@@ -1203,12 +1206,15 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
     if( i_buffer < 4 )
         return -1;
 
+    p_buffer += 4;
+    i_buffer -= 4;
+
     memset( pppsz_info, 0, sizeof(pppsz_info) );
 
-    for( int i = 0; i < (i_buffer-4)/18; i++ )
+    for( int i = 0; i < i_buffer/CDTEXT_PACK_SIZE; i++ )
     {
-        const uint8_t *p_block = &p_buffer[4 + 18*i];
-        char psz_text[12+1];
+        const uint8_t *p_block = &p_buffer[CDTEXT_PACK_SIZE*i];
+        char psz_text[CDTEXT_PACK_PAYLOAD+1];
 
         const int i_pack_type = p_block[0];
         if( i_pack_type < 0x80 || i_pack_type > 0x8f )
@@ -1228,13 +1234,13 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
         //const int i_crc = (p_block[4+12] << 8) | (p_block[4+13] << 0);
 
         /* */
-        memcpy( psz_text, &p_block[4], 12 );
-        psz_text[12] = '\0';
+        memcpy( psz_text, &p_block[CDTEXT_PACK_HEADER], CDTEXT_PACK_PAYLOAD );
+        psz_text[CDTEXT_PACK_PAYLOAD] = '\0';
 
         /* */
         int i_track =  i_track_number;
         char *psz_track = &psz_text[0];
-        while( i_track <= 127 && psz_track < &psz_text[12] )
+        while( i_track <= 127 && psz_track < &psz_text[CDTEXT_PACK_PAYLOAD] )
         {
             //fprintf( stderr, "t=%d psz_track=%p end=%p", i_track, (void *)psz_track, (void *)&psz_text[12] );
             if( *psz_track )
