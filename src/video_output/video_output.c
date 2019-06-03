@@ -1687,7 +1687,8 @@ void vout_StopDisplay(vout_thread_t *vout)
     if (sys->mouse_event)
         sys->mouse_event(NULL, sys->mouse_opaque);
 
-    spu_Detach(sys->spu);
+    if (sys->spu)
+        spu_Detach(sys->spu);
     sys->mouse_event = NULL;
     sys->clock = NULL;
     video_format_Clean(&sys->original);
@@ -1725,8 +1726,8 @@ void vout_Close(vout_thread_t *vout)
     vout_chrono_Clean(&sys->render);
 
     vlc_mutex_lock(&sys->spu_lock);
-    spu_Destroy(sys->spu);
-    sys->spu = NULL;
+    if (sys->spu)
+        spu_Destroy(sys->spu);
     vlc_mutex_unlock(&sys->spu_lock);
 
     vout_Release(vout);
@@ -1845,7 +1846,8 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     /* Window */
     sys->display_cfg.window = vout_display_window_New(vout);
     if (sys->display_cfg.window == NULL) {
-        spu_Destroy(sys->spu);
+        if (sys->spu)
+            spu_Destroy(sys->spu);
         vlc_object_delete(vout);
         return NULL;
     }
@@ -1958,7 +1960,7 @@ error:
         return -1;
     }
 
-    if (input != NULL)
+    if (input != NULL && sys->spu)
         spu_Attach(sys->spu, input);
     vout_IntfReinit(vout);
     return 0;
