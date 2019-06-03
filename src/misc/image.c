@@ -225,6 +225,12 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         p_fmt_out->i_visible_width = p_fmt_out->i_width;
     if( !p_fmt_out->i_visible_height )
         p_fmt_out->i_visible_height = p_fmt_out->i_height;
+    if( p_fmt_out->transfer == TRANSFER_FUNC_UNDEF )
+        p_fmt_out->transfer = p_image->p_dec->fmt_out.video.transfer;
+    if( p_fmt_out->primaries == COLOR_PRIMARIES_UNDEF )
+        p_fmt_out->primaries = p_image->p_dec->fmt_out.video.primaries;
+    if( p_fmt_out->space == COLOR_SPACE_UNDEF )
+        p_fmt_out->space = p_image->p_dec->fmt_out.video.space;
 
     /* Check if we need chroma conversion or resizing */
     if( p_image->p_dec->fmt_out.video.i_chroma != p_fmt_out->i_chroma ||
