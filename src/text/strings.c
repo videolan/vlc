@@ -51,6 +51,7 @@
 #include <vlc_strings.h>
 #include <vlc_charset.h>
 #include <vlc_arrays.h>
+#include <vlc_player.h>
 #include <libvlc.h>
 #include <errno.h>
 
@@ -529,8 +530,7 @@ static int write_meta(struct vlc_memstream *stream, input_item_t *item,
     return 0;
 }
 
-/* FIXME: replace input_thread_t by vlc_player_t */
-char *vlc_strfinput(input_thread_t *input, input_item_t *item, const char *s)
+char *vlc_strfinput(vlc_player_t *player, input_item_t *item, const char *s)
 {
     struct vlc_memstream stream[1];
 
@@ -540,8 +540,8 @@ char *vlc_strfinput(input_thread_t *input, input_item_t *item, const char *s)
 
     assert(s != NULL);
 
-    if (!item && input)
-        item = input_GetItem(input);
+    if (!item && player)
+        item = vlc_player_GetCurrentMedia(player);
 
     vlc_memstream_open(stream);
 
@@ -626,8 +626,8 @@ char *vlc_strfinput(input_thread_t *input, input_item_t *item, const char *s)
             {
                 char *lang = NULL;
 
-                if (input != NULL)
-                    lang = var_GetNonEmptyString(input, "sub-language");
+                if (player != NULL)
+                    lang = vlc_player_GetCategoryLanguage(player, SPU_ES);
                 if (lang != NULL)
                 {
                     vlc_memstream_puts(stream, lang);
@@ -647,17 +647,33 @@ char *vlc_strfinput(input_thread_t *input, input_item_t *item, const char *s)
                 write_meta(stream, item, vlc_meta_Date);
                 break;
             case 'B':
-                if (input != NULL)
-                    vlc_memstream_printf(stream, "%"PRId64,
-                            var_GetInteger(input, "bit-rate") / 1000);
-                else if (!b_empty_if_na)
+            {
+                if (player)
+                {
+                    const struct vlc_player_track *track =
+                        vlc_player_GetSelectedTrack(player, AUDIO_ES);
+                    if (track)
+                    {
+                        vlc_memstream_printf(stream, "%u",
+                                             track->fmt.i_bitrate);
+                        break;
+                    }
+                }
+                if (!b_empty_if_na)
                     vlc_memstream_putc(stream, '-');
                 break;
+            }
             case 'C':
-                if (input != NULL)
-                    vlc_memstream_printf(stream, "%"PRId64,
-                            var_GetInteger(input, "chapter"));
-                else if (!b_empty_if_na)
+                if (player)
+                {
+                    ssize_t chapter = vlc_player_GetSelectedChapterIdx(player);
+                    if (chapter != -1)
+                    {
+                        vlc_memstream_printf(stream, "%"PRId64, chapter);
+                        break;
+                    }
+                }
+                if (!b_empty_if_na)
                     vlc_memstream_putc(stream, '-');
                 break;
             case 'D':
@@ -678,20 +694,27 @@ char *vlc_strfinput(input_thread_t *input, input_item_t *item, const char *s)
                 }
                 break;
             case 'I':
-                if (input != NULL)
-                    vlc_memstream_printf(stream, "%"PRId64,
-                                         var_GetInteger(input, "title"));
-                else if (!b_empty_if_na)
+                if (player)
+                {
+                    ssize_t title = vlc_player_GetSelectedTitleIdx(player);
+                    if (title != -1)
+                    {
+                        vlc_memstream_printf(stream, "%"PRId64, title);
+                        break;
+                    }
+                }
+                if (!b_empty_if_na)
                     vlc_memstream_putc(stream, '-');
                 break;
             case 'L':
-                if (item != NULL)
+                if (player)
                 {
-                    assert(input != NULL);
-                    write_duration(stream, input_item_GetDuration(item)
-                                   - var_GetInteger(input, "time"));
+                    vlc_tick_t length = vlc_player_GetLength(player);
+                    vlc_tick_t time = vlc_player_GetTime(player);
+                    if (length != VLC_TICK_INVALID && time != VLC_TICK_INVALID)
+                        write_duration(stream, length - time);
                 }
-                else if (!b_empty_if_na)
+                if (!b_empty_if_na)
                     vlc_memstream_puts(stream, "--:--:--");
                 break;
             case 'N':
@@ -709,8 +732,8 @@ char *vlc_strfinput(input_thread_t *input, input_item_t *item, const char *s)
             {
                 char *lang = NULL;
 
-                if (input != NULL)
-                    lang = var_GetNonEmptyString(input, "audio-language");
+                if (player != NULL)
+                    lang = vlc_player_GetCategoryLanguage(player, AUDIO_ES);
                 if (lang != NULL)
                 {
                     vlc_memstream_puts(stream, lang);
@@ -721,34 +744,51 @@ char *vlc_strfinput(input_thread_t *input, input_item_t *item, const char *s)
                 break;
             }
             case 'P':
-                if (input != NULL)
-                    vlc_memstream_printf(stream, "%2.1f",
-                            var_GetFloat(input, "position") * 100.f);
-                else if (!b_empty_if_na)
+                if (player)
+                {
+                    float pos = vlc_player_GetPosition(player);
+                    if (pos >= 0)
+                    {
+                        vlc_memstream_printf(stream, "%2.1f", pos);
+                        break;
+                    }
+                }
+                if (!b_empty_if_na)
                     vlc_memstream_puts(stream, "--.-%");
                 break;
             case 'R':
-                if (input != NULL)
+                if (player)
                     vlc_memstream_printf(stream, "%.3f",
-                                         var_GetFloat(input, "rate"));
+                                         vlc_player_GetRate(player));
                 else if (!b_empty_if_na)
                     vlc_memstream_putc(stream, '-');
                 break;
             case 'S':
-                if (input != NULL)
+                if (player)
                 {
-                    int rate = var_GetInteger(input, "sample-rate");
-                    div_t dr = div((rate + 50) / 100, 10);
-
-                    vlc_memstream_printf(stream, "%d.%01d", dr.quot, dr.rem);
+                    const struct vlc_player_track *track =
+                        vlc_player_GetSelectedTrack(player, AUDIO_ES);
+                    if (track)
+                    {
+                        div_t dr = div((track->fmt.audio.i_rate + 50) / 100, 10);
+                        vlc_memstream_printf(stream, "%d.%01d", dr.quot, dr.rem);
+                        break;
+                    }
                 }
-                else if (!b_empty_if_na)
+                if (!b_empty_if_na)
                     vlc_memstream_putc(stream, '-');
                 break;
             case 'T':
-                if (input != NULL)
-                    write_duration(stream, var_GetInteger(input, "time"));
-                else if (!b_empty_if_na)
+                if (player)
+                {
+                    vlc_tick_t time = vlc_player_GetTime(player);
+                    if (time != VLC_TICK_INVALID)
+                    {
+                        write_duration(stream, time);
+                        break;
+                    }
+                }
+                if (!b_empty_if_na)
                     vlc_memstream_puts(stream, "--:--:--");
                 break;
             case 'U':
@@ -758,16 +798,14 @@ char *vlc_strfinput(input_thread_t *input, input_item_t *item, const char *s)
             {
                 float vol = 0.f;
 
-                if (input != NULL)
+                if (player)
                 {
-#if 0 /* cf. FIXME */
-                    audio_output_t *aout = input_GetAout(input);
+                    audio_output_t *aout = vlc_player_aout_Hold(player);
                     if (aout != NULL)
                     {
                         vol = aout_VolumeGet(aout);
                         aout_Release(aout);
                     }
-#endif
                 }
                 if (vol >= 0.f)
                     vlc_memstream_printf(stream, "%ld", lroundf(vol * 256.f));

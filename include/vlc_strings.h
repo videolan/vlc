@@ -31,6 +31,8 @@
  * Helper functions for nul-terminated strings
  */
 
+typedef struct vlc_player_t vlc_player_t;
+
 static inline int vlc_ascii_toupper( int c )
 {
     if ( c >= 'a' && c <= 'z' )
@@ -158,14 +160,22 @@ VLC_API char *vlc_strftime( const char * );
  * Formats input meta-data.
  *
  * Formats input and input item meta-informations into a heap-allocated string.
+ *
+ * @param player a locked player instance or NULL (player and item can't be
+ * both NULL)
+ * @param item a valid item or NULL (player and item can't be both NULL)
+ * @param fmt format string
+ * @return the formated string, or NULL in case of error, the string need to be
+ * freed with ()
  */
-VLC_API char *vlc_strfinput( input_thread_t *, input_item_t *, const char * );
+VLC_API char *vlc_strfinput( vlc_player_t *player, input_item_t *item,
+                             const char *fmt );
 
-static inline char *str_format( input_thread_t *input, input_item_t *item,
+static inline char *str_format( vlc_player_t *player, input_item_t *item,
                                 const char *fmt )
 {
     char *s1 = vlc_strftime( fmt );
-    char *s2 = vlc_strfinput( input, item, s1 );
+    char *s2 = vlc_strfinput( player, item, s1 );
     free( s1 );
     return s2;
 }
