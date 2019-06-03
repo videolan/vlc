@@ -203,6 +203,11 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
     text->pf_get_attachments = spu_get_attachments;
 
     text->p_module = module_need_var(text, "text renderer", "text-renderer");
+    if (!text->p_module)
+    {
+        vlc_object_delete(text);
+        return NULL;
+    }
 
     /* Create a few variables used for enhanced text rendering */
     var_Create(text, "spu-elapsed",   VLC_VAR_INTEGER);
@@ -241,6 +246,11 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
     scale->owner.video = &spu_scaler_cbs;
 
     scale->p_module = module_need(scale, "video converter", NULL, false);
+    if (!scale->p_module)
+    {
+        vlc_object_delete(scale);
+        return NULL;
+    }
 
     return scale;
 }
@@ -253,9 +263,6 @@ static void SpuRenderText(spu_t *spu, bool *rerender_text,
     filter_t *text = spu->p->text;
 
     assert(region->fmt.i_chroma == VLC_CODEC_TEXT);
-
-    if (!text || !text->p_module)
-        return;
 
     /* Setup 3 variables which can be used to render
      * time-dependent text (and effects). The first indicates
@@ -858,10 +865,8 @@ static void SpuRenderRegion(spu_t *spu,
     }
 
     /* Scale from rendered size to destination size */
-    if (sys->scale && sys->scale->p_module &&
-        (!using_palette || (sys->scale_yuvp && sys->scale_yuvp->p_module)) &&
-        (scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT ||
-        using_palette || convert_chroma)) {
+    if (scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT || convert_chroma)
+    {
         const unsigned dst_width  = spu_scale_w(region->fmt.i_visible_width,  scale_size);
         const unsigned dst_height = spu_scale_h(region->fmt.i_visible_height, scale_size);
 
@@ -1123,14 +1128,12 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
             subpic->i_original_picture_height = fmt_src->i_visible_height;
         }
 
-        if (sys->text) {
-            /* FIXME aspect ratio ? */
-            sys->text->fmt_out.video.i_width          =
-            sys->text->fmt_out.video.i_visible_width  = subpic->i_original_picture_width;
+        /* FIXME aspect ratio ? */
+        sys->text->fmt_out.video.i_width          =
+        sys->text->fmt_out.video.i_visible_width  = subpic->i_original_picture_width;
 
-            sys->text->fmt_out.video.i_height         =
-            sys->text->fmt_out.video.i_visible_height = subpic->i_original_picture_height;
-        }
+        sys->text->fmt_out.video.i_height         =
+        sys->text->fmt_out.video.i_visible_height = subpic->i_original_picture_height;
 
         /* Render all regions
          * We always transform non absolute subtitle into absolute one on the
@@ -1364,9 +1367,6 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
     SpuHeapInit(&sys->heap);
 
     sys->clock = NULL;
-    sys->text = NULL;
-    sys->scale = NULL;
-    sys->scale_yuvp = NULL;
 
     atomic_init(&sys->margin, var_InheritInteger(spu, "sub-margin"));
 
@@ -1392,6 +1392,14 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
     sys->scale_yuvp = SpuRenderCreateAndLoadScale(VLC_OBJECT(spu),
                                                   VLC_CODEC_YUVP, VLC_CODEC_YUVA, false);
 
+
+    if (!sys->source_chain || !sys->filter_chain || !sys->text || !sys->scale
+     || !sys->scale_yuvp)
+    {
+        sys->vout = NULL;
+        spu_Destroy(spu);
+        return NULL;
+    }
     /* */
     sys->last_sort_date = -1;
     sys->vout = vout;
