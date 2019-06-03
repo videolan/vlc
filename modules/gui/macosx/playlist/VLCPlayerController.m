@@ -984,11 +984,11 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
 - (void)capabilitiesChanged:(int)newCapabilities
 {
-    _seekable = newCapabilities & VLC_INPUT_CAPABILITIES_SEEKABLE ? YES : NO;
-    _rewindable = newCapabilities & VLC_INPUT_CAPABILITIES_REWINDABLE ? YES : NO;
-    _pausable = newCapabilities & VLC_INPUT_CAPABILITIES_PAUSEABLE ? YES : NO;
-    _recordable = newCapabilities & VLC_INPUT_CAPABILITIES_RECORDABLE ? YES : NO;
-    _rateChangable = newCapabilities & VLC_INPUT_CAPABILITIES_CHANGE_RATE ? YES : NO;
+    _seekable = newCapabilities & VLC_PLAYER_CAP_SEEK ? YES : NO;
+    _rewindable = newCapabilities & VLC_PLAYER_CAP_REWIND ? YES : NO;
+    _pausable = newCapabilities & VLC_PLAYER_CAP_PAUSE ? YES : NO;
+    _recordable = YES;
+    _rateChangable = newCapabilities & VLC_PLAYER_CAP_CHANGE_RATE ? YES : NO;
     [_defaultNotificationCenter postNotificationName:VLCPlayerCapabilitiesChanged
                                               object:self];
 }
