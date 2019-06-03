@@ -58,8 +58,6 @@
 
 #include "smb_common.h"
 
-#define CIFS_PORT 445
-
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
@@ -584,10 +582,6 @@ Open(vlc_object_t *p_obj)
     if (vlc_UrlParseFixup(&sys->encoded_url, access->psz_url) != 0)
         return VLC_ENOMEM;
 
-    if (sys->encoded_url.i_port != 0 && sys->encoded_url.i_port != CIFS_PORT)
-        goto error;
-    sys->encoded_url.i_port = 0;
-
     sys->smb2 = smb2_init_context();
     if (sys->smb2 == NULL)
     {
@@ -599,10 +593,10 @@ Open(vlc_object_t *p_obj)
         sys->encoded_url.psz_path = (char *) "/";
 
     char *resolved_host = vlc_smb2_resolve(access, sys->encoded_url.psz_host,
-                                           CIFS_PORT);
+                                           sys->encoded_url.i_port);
 
     /* smb2_* functions need a decoded url. Re compose the url from the
-     * modified sys->encoded_url (without port and with the resolved host). */
+     * modified sys->encoded_url (with the resolved host). */
     char *url;
     if (resolved_host != NULL)
     {
