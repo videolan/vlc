@@ -1460,11 +1460,21 @@ vlc_player_RestartTrack(vlc_player_t *player, vlc_es_id_t *id)
 }
 
 void
-vlc_player_SelectDefaultTrack(vlc_player_t *player,
-                              enum es_format_category_e cat, const char *lang)
+vlc_player_SelectCategoryLanguage(vlc_player_t *player,
+                                  enum es_format_category_e cat,
+                                  const char *lang)
 {
     vlc_player_assert_locked(player);
-    /* TODO */ (void) cat; (void) lang;
+    switch (cat)
+    {
+        case AUDIO_ES:
+            var_SetString(player, "audio-language", lang);
+            break;
+        case SPU_ES:
+            var_SetString(player, "sub-language", lang);
+        default:
+            vlc_assert_unreachable();
+    }
 }
 
 static void
@@ -3609,6 +3619,8 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     VAR_CREATE("sout-audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     VAR_CREATE("spu", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     VAR_CREATE("sout-spu", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    VAR_CREATE("audio-language", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    VAR_CREATE("sub-language", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
     /* TODO: Override these variables since the player handle media ended
      * action itself. */

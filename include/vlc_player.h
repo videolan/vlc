@@ -1838,44 +1838,36 @@ vlc_player_RestartTrackCategory(vlc_player_t *player,
 }
 
 /**
- * Select the default track for an ES category.
+ * Select the language for an ES category
  *
- * Tracks for this category will be automatically chosen according to the
- * language for all future played media.
+ * @warning The language will only be set for all future played media.
  *
  * @param player locked player instance
- * @param cat VIDEO_ES, AUDIO_ES or SPU_ES
- * @param lang language (TODO: define it) or NULL to reset the default state
+ * @param cat AUDIO_ES or SPU_ES
+ * @param lang comma separated, two or three letters country code, 'any' as a
+ * fallback or NULL to reset the default state
  */
 VLC_API void
-vlc_player_SelectDefaultTrack(vlc_player_t *player,
-                              enum es_format_category_e cat, const char *lang);
+vlc_player_SelectCategoryLanguage(vlc_player_t *player,
+                                  enum es_format_category_e cat,
+                                  const char *lang);
 
 /**
- * Helper to select the default video track
+ * Helper to select the audio language
  */
 static inline void
-vlc_player_SelectDefaultVideoTrack(vlc_player_t *player, const char *lang)
+vlc_player_SelectAudioLanguage(vlc_player_t *player, const char *lang)
 {
-    vlc_player_SelectDefaultTrack(player, VIDEO_ES, lang);
+    vlc_player_SelectCategoryLanguage(player, AUDIO_ES, lang);
 }
 
 /**
- * Helper to select the default audio track
- */
-static inline void
-vlc_player_SelectDefaultAudioTrack(vlc_player_t *player, const char *lang)
-{
-    vlc_player_SelectDefaultTrack(player, AUDIO_ES, lang);
-}
-
-/**
- * Helper to select the default spu track
+ * Helper to select the spu language
  */
 static inline void
 vlc_player_SelectDefaultSubtitleTrack(vlc_player_t *player, const char *lang)
 {
-    vlc_player_SelectDefaultTrack(player, SPU_ES, lang);
+    vlc_player_SelectCategoryLanguage(player, SPU_ES, lang);
 }
 
 /**

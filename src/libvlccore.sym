@@ -839,9 +839,9 @@ vlc_player_RestartTrack
 vlc_player_Resume
 vlc_player_SeekByPos
 vlc_player_SeekByTime
+vlc_player_SelectCategoryLanguage
 vlc_player_SelectChapter
 vlc_player_SelectChapterIdx
-vlc_player_SelectDefaultTrack
 vlc_player_SelectNextChapter
 vlc_player_SelectNextTitle
 vlc_player_SelectNextTrack
