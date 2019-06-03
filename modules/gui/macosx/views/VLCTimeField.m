@@ -27,6 +27,8 @@
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
 
+NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
+
 @interface VLCTimeField ()
 {
     NSString *o_remaining_identifier;
@@ -39,8 +41,7 @@
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 @"NO", @"DisplayTimeAsTimeRemaining",
-                                 @"YES", @"DisplayFullscreenTimeAsTimeRemaining",
+                                 @"NO", VLCTimeFieldDisplayTimeAsRemaining,
                                  nil];
 
     [defaults registerDefaults:appDefaults];

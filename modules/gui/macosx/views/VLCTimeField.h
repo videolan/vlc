@@ -30,6 +30,8 @@
  * we need the implementation to catch our click-event in the controller window
  *****************************************************************************/
 
+extern NSString *VLCTimeFieldDisplayTimeAsRemaining;
+
 @interface VLCTimeField : NSTextField
 
 @property (readonly) BOOL timeRemaining;

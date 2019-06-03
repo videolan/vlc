@@ -117,7 +117,7 @@
     [self.timeField setFont:[NSFont titleBarFontOfSize:10.0]];
     [self.timeField setAlignment: NSCenterTextAlignment];
     [self.timeField setNeedsDisplay:YES];
-    [self.timeField setRemainingIdentifier:@"DisplayTimeAsTimeRemaining"];
+    [self.timeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsRemaining];
     self.timeField.accessibilityLabel = _NS("Playback time");
 
     // remove fullscreen button for lion fullscreen

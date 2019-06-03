@@ -156,7 +156,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
      * this is the same identifier as used for the window playback cotrols
      * so the state is shared between those.
      */
-    [_remainingOrTotalTime setRemainingIdentifier:@"DisplayTimeAsTimeRemaining"];
+    [_remainingOrTotalTime setRemainingIdentifier:VLCTimeFieldDisplayTimeAsRemaining];
 }
 
 #undef setupButton
