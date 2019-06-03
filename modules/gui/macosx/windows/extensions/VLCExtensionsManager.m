@@ -28,6 +28,7 @@
 #import <vlc_modules.h>
 #import <vlc_extensions.h>
 
+#import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
 #import "windows/extensions/VLCExtensionsDialogProvider.h"
 

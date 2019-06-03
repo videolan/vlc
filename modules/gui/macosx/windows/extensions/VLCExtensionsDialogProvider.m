@@ -28,10 +28,9 @@
 #import "main/VLCMain.h"
 #import "VLCExtensionsManager.h"
 #import "extensions/NSString+Helpers.h"
-#import "VLCUIWidgets.h"
+#import "windows/extensions/VLCUIWidgets.h"
 
 #import <WebKit/WebKit.h>
-#import <stdlib.h>
 
 /*****************************************************************************
  * VLCExtensionsDialogProvider implementation

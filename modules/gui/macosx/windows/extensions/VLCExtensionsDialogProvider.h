@@ -22,15 +22,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "main/VLCMain.h"
+#import <Cocoa/Cocoa.h>
 
 #import <vlc_common.h>
 #import <vlc_dialog.h>
 #import <vlc_extensions.h>
 
-#import <Cocoa/Cocoa.h>
-
-#import "windows/extensions/VLCUIWidgets.h"
+@class VLCDialogWindow;
 
 /*****************************************************************************
  * ExtensionsDialogProvider interface

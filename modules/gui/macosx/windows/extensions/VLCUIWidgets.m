@@ -23,10 +23,6 @@
 
 #import "VLCUIWidgets.h"
 
-#import <stdlib.h>
-
-#import "main/CompatibilityFixes.h"
-
 @implementation VLCDialogButton
 
 @end
