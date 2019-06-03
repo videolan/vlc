@@ -75,7 +75,9 @@ void PlayerControllerPrivate::UpdateName(input_item_t* media)
     char *formatted = NULL;
     if (format != NULL)
     {
-        formatted = vlc_strfinput( NULL, media, format );
+        vlc_player_Lock( m_player );
+        formatted = vlc_strfinput( m_player, media, format );
+        vlc_player_Unlock( m_player );
         free( format );
         if( formatted != NULL )
         {
