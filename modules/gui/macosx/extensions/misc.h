@@ -41,11 +41,3 @@
             errorDescription:(NSString**)error;
 
 @end
-
-/*****************************************************************************
- * VLCByteCountFormatter addition
- *****************************************************************************/
-
-@interface VLCByteCountFormatter : NSFormatter
-+ (NSString *)stringFromByteCount:(long long)byteCount countStyle:(NSByteCountFormatterCountStyle)countStyle;
-@end
