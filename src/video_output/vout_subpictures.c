@@ -679,6 +679,14 @@ static void SpuRenderRegion(spu_t *spu,
 
     /* Render text region */
     if (region->fmt.i_chroma == VLC_CODEC_TEXT) {
+        // assume rendered text is in sRGB if nothing is set
+        if (region->fmt.transfer == TRANSFER_FUNC_UNDEF)
+            region->fmt.transfer = TRANSFER_FUNC_SRGB;
+        if (region->fmt.primaries == COLOR_PRIMARIES_UNDEF)
+            region->fmt.primaries = COLOR_PRIMARIES_SRGB;
+        if (region->fmt.space == COLOR_SPACE_UNDEF)
+            region->fmt.space = COLOR_SPACE_SRGB;
+
         SpuRenderText(spu, &restore_text, region,
                       chroma_list,
                       render_date - subpic->i_start);
