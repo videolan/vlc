@@ -259,12 +259,10 @@ void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
 
-    vlc_mutex_lock(&sys->spu_lock);
     if (sys->spu != NULL)
         spu_PutSubpicture(sys->spu, subpic);
     else
         subpicture_Delete(subpic);
-    vlc_mutex_unlock(&sys->spu_lock);
 }
 
 ssize_t vout_RegisterSubpictureChannel( vout_thread_t *vout )
@@ -272,10 +270,8 @@ ssize_t vout_RegisterSubpictureChannel( vout_thread_t *vout )
     assert(!vout->p->dummy);
     ssize_t channel = VOUT_SPU_CHANNEL_INVALID;
 
-    vlc_mutex_lock(&vout->p->spu_lock);
     if (vout->p->spu)
         channel = spu_RegisterChannel(vout->p->spu);
-    vlc_mutex_unlock(&vout->p->spu_lock);
 
     return channel;
 }
@@ -296,9 +292,7 @@ void vout_UnregisterSubpictureChannel( vout_thread_t *vout, size_t channel )
 {
     assert(!vout->p->dummy);
     assert(vout->p->spu);
-    vlc_mutex_lock(&vout->p->spu_lock);
     spu_UnregisterChannel(vout->p->spu, channel);
-    vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
 void vout_FlushSubpictureChannel( vout_thread_t *vout, size_t channel )
@@ -306,20 +300,15 @@ void vout_FlushSubpictureChannel( vout_thread_t *vout, size_t channel )
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
     assert(sys->spu);
-
-    vlc_mutex_lock(&sys->spu_lock);
     spu_ClearChannel(vout->p->spu, channel);
-    vlc_mutex_unlock(&sys->spu_lock);
 }
 
 void vout_SetSpuHighlight( vout_thread_t *vout,
                         const vlc_spu_highlight_t *spu_hl )
 {
     assert(!vout->p->dummy);
-    vlc_mutex_lock(&vout->p->spu_lock);
     if (vout->p->spu)
         spu_SetHighlight(vout->p->spu, spu_hl);
-    vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
 /**
@@ -595,30 +584,22 @@ void vout_ControlChangeFilters(vout_thread_t *vout, const char *filters)
 void vout_ControlChangeSubSources(vout_thread_t *vout, const char *filters)
 {
     assert(!vout->p->dummy);
-    vlc_mutex_lock(&vout->p->spu_lock);
     if (likely(vout->p->spu != NULL))
         spu_ChangeSources(vout->p->spu, filters);
-    vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
 void vout_ControlChangeSubFilters(vout_thread_t *vout, const char *filters)
 {
     assert(!vout->p->dummy);
-    vlc_mutex_lock(&vout->p->spu_lock);
     if (likely(vout->p->spu != NULL))
         spu_ChangeFilters(vout->p->spu, filters);
-    vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
 void vout_ChangeSubMargin(vout_thread_t *vout, int margin)
 {
     assert(!vout->p->dummy);
-    if (unlikely(vout->p->spu == NULL))
-        return;
-
-    vlc_mutex_lock(&vout->p->spu_lock);
-    spu_ChangeMargin(vout->p->spu, margin);
-    vlc_mutex_unlock(&vout->p->spu_lock);
+    if (likely(vout->p->spu != NULL))
+        spu_ChangeMargin(vout->p->spu, margin);
 }
 
 void vout_ChangeViewpoint(vout_thread_t *vout,
@@ -1379,18 +1360,14 @@ void vout_ChangeSpuDelay(vout_thread_t *vout, size_t channel_id,
 {
     assert(!vout->p->dummy);
     assert(vout->p->spu);
-    vlc_mutex_lock(&vout->p->spu_lock);
     spu_SetClockDelay(vout->p->spu, channel_id, delay);
-    vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
 void vout_ChangeSpuRate(vout_thread_t *vout, size_t channel_id, float rate)
 {
     assert(!vout->p->dummy);
     assert(vout->p->spu);
-    vlc_mutex_lock(&vout->p->spu_lock);
     spu_SetClockRate(vout->p->spu, channel_id, rate);
-    vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
 static void ThreadProcessMouseState(vout_thread_t *vout,
@@ -1730,10 +1707,8 @@ void vout_Close(vout_thread_t *vout)
     vout_control_Dead(&sys->control);
     vout_chrono_Clean(&sys->render);
 
-    vlc_mutex_lock(&sys->spu_lock);
     if (sys->spu)
         spu_Destroy(sys->spu);
-    vlc_mutex_unlock(&sys->spu_lock);
 
     vout_Release(vout);
 }
@@ -1755,7 +1730,6 @@ void vout_Release(vout_thread_t *vout)
 
     /* Destroy the locks */
     vlc_mutex_destroy(&vout->p->window_lock);
-    vlc_mutex_destroy(&vout->p->spu_lock);
     vlc_mutex_destroy(&vout->p->filter.lock);
 
     assert(!sys->window_enabled);
@@ -1833,7 +1807,6 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     vout_statistic_Init(&sys->statistic);
 
     /* Initialize subpicture unit */
-    vlc_mutex_init(&sys->spu_lock);
     sys->spu = var_InheritBool(vout, "spu") || var_InheritBool(vout, "osd") ?
                spu_Create(vout, vout) : NULL;
 
