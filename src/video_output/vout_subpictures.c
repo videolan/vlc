@@ -59,11 +59,8 @@ typedef struct {
     vlc_tick_t       stop;
 } spu_render_entry_t;
 
-typedef struct {
-    subpicture_t *entries[VOUT_MAX_SUBPICTURES];
-} spu_heap_t;
-
 struct spu_channel {
+    subpicture_t *entries[VOUT_MAX_SUBPICTURES];
     size_t id;
 };
 
@@ -75,8 +72,6 @@ struct spu_private_t {
 
     spu_channel_vector channels;
     vlc_clock_t *clock;
-
-    spu_heap_t   heap;
 
     int channel;             /**< number of subpicture channels registered */
     filter_t *text;                              /**< text renderer module */
@@ -107,57 +102,55 @@ struct spu_private_t {
     vout_thread_t       *vout;
 };
 
-/*****************************************************************************
- * heap management
- *****************************************************************************/
-static void SpuHeapInit(spu_heap_t *heap)
+static void spu_channel_Init(struct spu_channel *channel, size_t id)
 {
-    for (int i = 0; i < VOUT_MAX_SUBPICTURES; i++)
-        heap->entries[i] = NULL;
+    channel->id = id;
+
+    for (size_t i = 0; i < VOUT_MAX_SUBPICTURES; i++)
+        channel->entries[i] = NULL;
 }
 
-static int SpuHeapPush(spu_heap_t *heap, subpicture_t *subpic)
+static int spu_channel_Push(struct spu_channel *channel, subpicture_t *subpic)
 {
-    for (int i = 0; i < VOUT_MAX_SUBPICTURES; i++)
+    for (size_t i = 0; i < VOUT_MAX_SUBPICTURES; i++)
     {
-        if (heap->entries[i])
+        if (channel->entries[i])
             continue;
 
-        heap->entries[i] = subpic;
+        channel->entries[i] = subpic;
         return VLC_SUCCESS;
     }
     return VLC_EGENERIC;
 }
 
-static void SpuHeapDeleteAt(spu_heap_t *heap, int index)
+static void spu_channel_DeleteAt(struct spu_channel *channel, size_t index)
 {
-    if (heap->entries[index])
+    if (channel->entries[index])
     {
-        subpicture_Delete(heap->entries[index]);
-        heap->entries[index] = NULL;
+        subpicture_Delete(channel->entries[index]);
+        channel->entries[index] = NULL;
     }
 }
 
-static int SpuHeapDeleteSubpicture(spu_heap_t *heap, subpicture_t *subpic)
+static int spu_channel_DeleteSubpicture(struct spu_channel *channel,
+                                        subpicture_t *subpic)
 {
     for (int i = 0; i < VOUT_MAX_SUBPICTURES; i++)
     {
-        if (heap->entries[i] != subpic)
+        if (channel->entries[i] != subpic)
             continue;
 
-        SpuHeapDeleteAt(heap, i);
+        spu_channel_DeleteAt(channel, i);
         return VLC_SUCCESS;
     }
     return VLC_EGENERIC;
 }
 
-static void SpuHeapClean(spu_heap_t *heap)
+static void spu_channel_Clean(struct spu_channel *channel)
 {
     for (int i = 0; i < VOUT_MAX_SUBPICTURES; i++)
-    {
-        if (heap->entries[i])
-            subpicture_Delete(heap->entries[i]);
-    }
+        if (channel->entries[i])
+            subpicture_Delete(channel->entries[i]);
 }
 
 static struct spu_channel *spu_GetChannel(spu_t *spu, size_t channel_id)
@@ -569,18 +562,19 @@ static int SpuRenderCmp(const void *s0, const void *s1)
     return r;
 }
 
-static int SpuConvertDates(spu_t *spu, vlc_tick_t system_now,
-                           spu_render_entry_t *render_entries, float rate)
+static int spu_channel_ConvertDates(struct spu_channel *channel,
+                                    vlc_clock_t *clock,
+                                    vlc_tick_t system_now,
+                                    spu_render_entry_t *render_entries,
+                                    float rate)
 {
-    spu_private_t *sys = spu->p;
-
     /* Put every spu start and stop ts into the same array to convert them in
      * one shot */
     vlc_tick_t date_array[VOUT_MAX_SUBPICTURES *2];
     size_t entry_count = 0;
     for (size_t index = 0; index < VOUT_MAX_SUBPICTURES; index++)
     {
-        subpicture_t *current = sys->heap.entries[index];
+        subpicture_t *current = channel->entries[index];
 
         if (!current)
             continue;
@@ -593,8 +587,8 @@ static int SpuConvertDates(spu_t *spu, vlc_tick_t system_now,
         return 0;
 
     /* Convert all spu ts */
-    if (sys->clock)
-        vlc_clock_ConvertArrayToSystem(sys->clock, system_now, date_array,
+    if (clock)
+        vlc_clock_ConvertArrayToSystem(clock, system_now, date_array,
                                        entry_count * 2, rate);
 
     /* Put back the converted ts into the output spu_render_entry_t struct */
@@ -602,7 +596,7 @@ static int SpuConvertDates(spu_t *spu, vlc_tick_t system_now,
     for (size_t index = 0; index < VOUT_MAX_SUBPICTURES; index++)
     {
         spu_render_entry_t *render_entry = &render_entries[index];
-        subpicture_t *current = sys->heap.entries[index];
+        subpicture_t *current = channel->entries[index];
 
         if (!current)
             render_entry->subpicture = NULL;
@@ -618,7 +612,7 @@ static int SpuConvertDates(spu_t *spu, vlc_tick_t system_now,
 }
 
 /*****************************************************************************
- * SpuSelectSubpictures: find the subpictures to display
+ * spu_SelectSubpictures: find the subpictures to display
  *****************************************************************************
  * This function parses all subpictures and decides which ones need to be
  * displayed. If no picture has been selected, display_date will depend on
@@ -627,41 +621,28 @@ static int SpuConvertDates(spu_t *spu, vlc_tick_t system_now,
  * to be removed if a newer one is available), which makes it a lot
  * more difficult to guess if a subpicture has to be rendered or not.
  *****************************************************************************/
-static void SpuSelectSubpictures(spu_t *spu,
-                                 size_t *subpicture_count,
-                                 spu_render_entry_t *subpicture_array,
-                                 vlc_tick_t system_now,
-                                 vlc_tick_t render_subtitle_date, float rate,
-                                 bool ignore_osd)
+static spu_render_entry_t *
+spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
+                      vlc_tick_t render_subtitle_date, float rate,
+                      bool ignore_osd, size_t *subpicture_count)
 {
     spu_private_t *sys = spu->p;
 
+    assert(sys->channels.size >= VOUT_SPU_CHANNEL_OSD_COUNT);
+
     /* */
     *subpicture_count = 0;
-
-    spu_render_entry_t render_entries[VOUT_MAX_SUBPICTURES];
-    if (SpuConvertDates(spu, system_now, render_entries, rate) == 0)
-        return;
-
-    /* Create a list of channels */
-    ssize_t channel[VOUT_MAX_SUBPICTURES];
-    size_t channel_count = 0;
-
-    for (int index = 0; index < VOUT_MAX_SUBPICTURES; index++) {
-        if (!sys->heap.entries[index])
-            continue;
-        const int i_channel = sys->heap.entries[index]->i_channel;
-        size_t i;
-        for (i = 0; i < channel_count; i++) {
-            if (channel[i] == i_channel)
-                break;
-        }
-        if (channel_count <= i)
-            channel[channel_count++] = i_channel;
-    }
+    spu_render_entry_t *subpicture_array =
+        vlc_alloc(sys->channels.size,
+                  sizeof(spu_render_entry_t) * VOUT_MAX_SUBPICTURES);
+    if (!subpicture_array)
+        return NULL;
 
     /* Fill up the subpicture_array arrays with relevant pictures */
-    for (size_t i = 0; i < channel_count; i++) {
+    for (size_t i = 0; i < sys->channels.size; i++)
+    {
+        struct spu_channel *channel = &sys->channels.data[i];
+        spu_render_entry_t render_entries[VOUT_MAX_SUBPICTURES];
         spu_render_entry_t available_entries[VOUT_MAX_SUBPICTURES];
         bool         is_available_late[VOUT_MAX_SUBPICTURES];
         size_t       available_count = 0;
@@ -672,17 +653,21 @@ static void SpuSelectSubpictures(spu_t *spu,
         int64_t      ephemer_subtitle_order = INT64_MIN;
         int64_t      ephemer_system_order = INT64_MIN;
 
+        if (spu_channel_ConvertDates(channel, sys->clock, system_now, render_entries,
+                                     rate) == 0)
+            continue;
+
         /* Select available pictures */
         for (int index = 0; index < VOUT_MAX_SUBPICTURES; index++) {
             spu_render_entry_t *render_entry = &render_entries[index];
-            subpicture_t *current = sys->heap.entries[index];
+            subpicture_t *current = channel->entries[index];
             bool is_stop_valid;
             bool is_late;
 
             if (!current)
                 continue;
 
-            if (current->i_channel != channel[i] ||
+            if ((current->i_channel >= 0 && (size_t) current->i_channel != channel->id) ||
                (ignore_osd && !current->b_subtitle))
                 continue;
 
@@ -744,13 +729,14 @@ static void SpuSelectSubpictures(spu_t *spu,
             }
 
             if (is_rejeted)
-                SpuHeapDeleteSubpicture(&sys->heap, current);
+                spu_channel_DeleteSubpicture(channel, current);
             else
                 subpicture_array[(*subpicture_count)++] = *render_entry;
         }
     }
 
     sys->last_sort_date = render_subtitle_date;
+    return subpicture_array;
 }
 
 
@@ -1418,17 +1404,13 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
     }
     for (size_t i = 0; i < VOUT_SPU_CHANNEL_OSD_COUNT; ++i)
     {
-        struct spu_channel channel = {
-            .id = i,
-        };
-        bool success = vlc_vector_push(&sys->channels, channel);
-        assert(success); /* already reserved */
+        struct spu_channel channel;
+        spu_channel_Init(&channel, i);
+        vlc_vector_push(&sys->channels, channel);
     }
 
     /* Initialize private fields */
     vlc_mutex_init(&sys->lock);
-
-    SpuHeapInit(&sys->heap);
 
     sys->clock = NULL;
 
@@ -1502,7 +1484,8 @@ void spu_Destroy(spu_t *spu)
     free(sys->filter_chain_update);
 
     /* Destroy all remaining subpictures */
-    SpuHeapClean(&sys->heap);
+    for (size_t i = 0; i < sys->channels.size; ++i)
+        spu_channel_Clean(&sys->channels.data[i]);
 
     vlc_vector_destroy(&sys->channels);
 
@@ -1623,8 +1606,12 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
     vlc_mutex_lock(&sys->filter_chain_lock);
     subpic = filter_chain_SubFilter(spu->p->filter_chain, subpic);
     vlc_mutex_unlock(&sys->filter_chain_lock);
-    if (!subpic)
+    if (!subpic || subpic->i_channel < 0)
+    {
+        if (subpic)
+            subpicture_Delete(subpic);
         return;
+    }
 
     /* SPU_DEFAULT_CHANNEL always reset itself */
     if (subpic->i_channel == VOUT_SPU_CHANNEL_OSD)
@@ -1636,7 +1623,9 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
 
     /* */
     vlc_mutex_lock(&sys->lock);
-    if (SpuHeapPush(&sys->heap, subpic)) {
+    struct spu_channel *channel = spu_GetChannel(spu, subpic->i_channel);
+    if (spu_channel_Push(channel, subpic))
+    {
         vlc_mutex_unlock(&sys->lock);
         msg_Err(spu, "subpicture heap full");
         subpicture_Delete(subpic);
@@ -1705,12 +1694,13 @@ subpicture_t *spu_Render(spu_t *spu,
     vlc_mutex_lock(&sys->lock);
 
     size_t subpicture_count;
-    spu_render_entry_t subpicture_array[VOUT_MAX_SUBPICTURES];
 
     /* Get an array of subpictures to render */
-    SpuSelectSubpictures(spu, &subpicture_count, subpicture_array, system_now,
-                         render_subtitle_date, rate, ignore_osd);
-    if (subpicture_count == 0) {
+    spu_render_entry_t *subpicture_array =
+        spu_SelectSubpictures(spu, system_now, render_subtitle_date, rate,
+                             ignore_osd, &subpicture_count);
+    if (!subpicture_array)
+    {
         vlc_mutex_unlock(&sys->lock);
         return NULL;
     }
@@ -1733,7 +1723,7 @@ subpicture_t *spu_Render(spu_t *spu,
                           subpic->b_subtitle ? render_subtitle_date : system_now);
 
         /* Restore original dates, otherwise, the next call to
-         * SpuSelectSubpictures() won't be able to select this subtitle */
+         * spu_SelectSubpictures() won't be able to select this subtitle */
         subpic->i_start = i_original_start;
         subpic->i_stop = i_original_stop;
     }
@@ -1751,6 +1741,7 @@ subpicture_t *spu_Render(spu_t *spu,
                                                 system_now,
                                                 render_subtitle_date,
                                                 external_scale);
+    free(subpicture_array);
     vlc_mutex_unlock(&sys->lock);
 
     return render;
@@ -1766,9 +1757,8 @@ ssize_t spu_RegisterChannel(spu_t *spu)
 
     if (channel_id != VOUT_SPU_CHANNEL_INVALID)
     {
-        struct spu_channel channel = {
-            .id = channel_id,
-        };
+        struct spu_channel channel;
+        spu_channel_Init(&channel, channel_id);
         if (vlc_vector_push(&sys->channels, channel))
         {
             vlc_mutex_unlock(&sys->lock);
@@ -1781,25 +1771,18 @@ ssize_t spu_RegisterChannel(spu_t *spu)
     return VOUT_SPU_CHANNEL_INVALID;
 }
 
-static void spu_ClearChannelLocked(spu_t *spu, size_t channel_id)
+static void spu_channel_Clear(struct spu_channel *channel)
 {
-    spu_private_t *sys = spu->p;
-
     for (size_t i = 0; i < VOUT_MAX_SUBPICTURES; i++)
-    {
-        subpicture_t *subpic = sys->heap.entries[i];
-
-        if (subpic && subpic->i_channel >= 0
-         && (size_t) subpic->i_channel == channel_id)
-            SpuHeapDeleteAt(&sys->heap, i);
-    }
+        spu_channel_DeleteAt(channel, i);
 }
 
 void spu_ClearChannel(spu_t *spu, size_t channel_id)
 {
     spu_private_t *sys = spu->p;
     vlc_mutex_lock(&sys->lock);
-    spu_ClearChannelLocked(spu, channel_id);
+    struct spu_channel *channel = spu_GetChannel(spu, channel_id);
+    spu_channel_Clear(channel);
     vlc_mutex_unlock(&sys->lock);
 }
 
@@ -1808,7 +1791,8 @@ void spu_UnregisterChannel(spu_t *spu, size_t channel_id)
     spu_private_t *sys = spu->p;
 
     vlc_mutex_lock(&sys->lock);
-    spu_ClearChannelLocked(spu, channel_id);
+    struct spu_channel *channel = spu_GetChannel(spu, channel_id);
+    spu_channel_Clear(channel);
     vlc_vector_remove(&sys->channels, channel_id);
     vlc_mutex_unlock(&sys->lock);
 }
