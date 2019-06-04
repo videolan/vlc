@@ -99,9 +99,16 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
                 break;
             }
         }
-        vlm_SendEventMediaInstanceState( p_vlm, p_media->cfg.id, p_media->cfg.psz_name, psz_instance_name, var_GetInteger( p_input, "state" ) );
+        int state = var_GetInteger(p_input, "state");
+        vlm_SendEventMediaInstanceState( p_vlm, p_media->cfg.id, p_media->cfg.psz_name, psz_instance_name, state );
 
         vlc_mutex_lock( &p_vlm->lock_manage );
+
+        if (state == PLAYING_S)
+            p_vlm->i_consecutive_errors = 0;
+        else if (state == ERROR_S && p_vlm->i_consecutive_errors < 6)
+            p_vlm->i_consecutive_errors++;
+
         p_vlm->input_state_changed = true;
         vlc_cond_signal( &p_vlm->wait_manage );
         vlc_mutex_unlock( &p_vlm->lock_manage );
@@ -145,6 +152,10 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
     }
 
     vlc_mutex_init( &p_vlm->lock );
+
+    vlc_mutex_init( &p_vlm->lock_delete );
+    vlc_cond_init( &p_vlm->wait_delete );
+
     vlc_mutex_init( &p_vlm->lock_manage );
     vlc_cond_init_daytime( &p_vlm->wait_manage );
     p_vlm->users = 1;
@@ -153,13 +164,16 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
     TAB_INIT( p_vlm->i_media, p_vlm->media );
     TAB_INIT( p_vlm->i_schedule, p_vlm->schedule );
     p_vlm->p_vod = NULL;
+    p_vlm->i_consecutive_errors = 0;
     var_Create( p_vlm, "intf-event", VLC_VAR_ADDRESS );
 
     if( vlc_clone( &p_vlm->thread, Manage, p_vlm, VLC_THREAD_PRIORITY_LOW ) )
     {
+        vlc_cond_destroy( &p_vlm->wait_delete );
         vlc_cond_destroy( &p_vlm->wait_manage );
         vlc_mutex_destroy( &p_vlm->lock );
         vlc_mutex_destroy( &p_vlm->lock_manage );
+        vlc_mutex_destroy( &p_vlm->lock_delete );
         vlc_object_release( p_vlm );
         vlc_mutex_unlock( &vlm_mutex );
         return NULL;
@@ -212,6 +226,8 @@ void vlm_Delete( vlm_t *p_vlm )
         return;
     }
 
+    vlc_cond_signal(&p_vlm->wait_delete);
+
     /* Destroy and release VLM */
     vlc_mutex_lock( &p_vlm->lock );
     vlm_ControlInternal( p_vlm, VLM_CLEAR_MEDIAS );
@@ -234,9 +250,11 @@ void vlm_Delete( vlm_t *p_vlm )
 
     vlc_join( p_vlm->thread, NULL );
 
+    vlc_cond_destroy( &p_vlm->wait_delete );
     vlc_cond_destroy( &p_vlm->wait_manage );
     vlc_mutex_destroy( &p_vlm->lock );
     vlc_mutex_destroy( &p_vlm->lock_manage );
+    vlc_mutex_destroy( &p_vlm->lock_delete );
     vlc_object_release( p_vlm );
 }
 
@@ -1006,6 +1024,18 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         if( p_instance->p_input )
         {
             var_AddCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
+
+            if (p_vlm->i_consecutive_errors)
+            {
+                int slowdown = 1 << (p_vlm->i_consecutive_errors - 1);
+                /* 100ms, 200ms, 400ms, 800ms, 1.6s, 3.2s */
+                mtime_t deadline = mdate() + slowdown * 100000L; /* usecs */
+
+                /* like a sleep, but interrupted on deletion */
+                vlc_mutex_lock(&p_vlm->lock_delete);
+                vlc_cond_timedwait(&p_vlm->wait_delete, &p_vlm->lock_delete, deadline);
+                vlc_mutex_unlock(&p_vlm->lock_delete);
+            }
 
             if( input_Start( p_instance->p_input ) != VLC_SUCCESS )
             {
