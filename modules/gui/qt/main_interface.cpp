@@ -275,8 +275,10 @@ MainInterface::~MainInterface()
 
 void MainInterface::computeMinimumSize()
 {
-    int minWidth = 80;
+    int minWidth = 450;
+    int minHeight = 300;
     setMinimumWidth( minWidth );
+    setMinimumHeight( minHeight );
 }
 
 QList<QQmlError> MainInterface::qmlErrors() const
