@@ -1472,6 +1472,7 @@ vlc_player_SelectCategoryLanguage(vlc_player_t *player,
             break;
         case SPU_ES:
             var_SetString(player, "sub-language", lang);
+            break;
         default:
             vlc_assert_unreachable();
     }
@@ -1486,7 +1487,6 @@ vlc_player_GetCategoryLanguage(vlc_player_t *player,
     {
         case AUDIO_ES:
             return var_GetString(player, "audio-language");
-            break;
         case SPU_ES:
             return var_GetString(player, "sub-language");
         default:
