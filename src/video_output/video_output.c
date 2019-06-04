@@ -1702,9 +1702,9 @@ void vout_Stop(vout_thread_t *vout)
         vout_StopDisplay(vout);
 
     vlc_mutex_lock(&sys->window_lock);
-    if (sys->window_active) {
+    if (sys->window_enabled) {
         vout_window_Disable(sys->display_cfg.window);
-        sys->window_active = false;
+        sys->window_enabled = false;
     }
     vlc_mutex_unlock(&sys->window_lock);
 }
@@ -1752,7 +1752,7 @@ void vout_Release(vout_thread_t *vout)
     vlc_mutex_destroy(&vout->p->spu_lock);
     vlc_mutex_destroy(&vout->p->filter.lock);
 
-    assert(!sys->window_active);
+    assert(!sys->window_enabled);
     vout_display_window_Delete(sys->display_cfg.window);
 
     vout_control_Clean(&vout->p->control);
@@ -1852,7 +1852,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
 
     if (sys->splitter_name != NULL)
         var_Destroy(vout, "window");
-    sys->window_active = false;
+    sys->window_enabled = false;
     vlc_mutex_init(&sys->window_lock);
 
     /* Arbitrary initial time */
@@ -1913,7 +1913,7 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
     sys->original = original;
 
     vlc_mutex_lock(&sys->window_lock);
-    if (!sys->window_active) {
+    if (!sys->window_enabled) {
         vout_window_cfg_t wcfg = {
             .is_fullscreen = var_GetBool(vout, "fullscreen"),
             .is_decorated = var_InheritBool(vout, "video-deco"),
@@ -1931,7 +1931,7 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
             vlc_mutex_unlock(&sys->window_lock);
             goto error;
         }
-        sys->window_active = true;
+        sys->window_enabled = true;
     } else
         vout_UpdateWindowSize(vout);
 
@@ -1946,7 +1946,7 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
     {
         vlc_mutex_lock(&sys->window_lock);
         vout_window_Disable(sys->display_cfg.window);
-        sys->window_active = false;
+        sys->window_enabled = false;
         vlc_mutex_unlock(&sys->window_lock);
         goto error;
     }
