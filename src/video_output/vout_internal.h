@@ -240,7 +240,7 @@ void vout_ChangeWindowState(vout_thread_t *, unsigned state);
 void vout_ChangeDisplaySize(vout_thread_t *, unsigned width, unsigned height);
 void vout_ChangeDisplayFilled(vout_thread_t *, bool is_filled);
 void vout_ChangeZoom(vout_thread_t *, unsigned num, unsigned den);
-void vout_ChangeSampleAspectRatio(vout_thread_t *, unsigned num, unsigned den);
+void vout_ChangeDisplayAspectRatio(vout_thread_t *, unsigned num, unsigned den);
 void vout_ChangeCropRatio(vout_thread_t *, unsigned num, unsigned den);
 void vout_ChangeCropWindow(vout_thread_t *, int x, int y, int width, int height);
 void vout_ChangeCropBorder(vout_thread_t *, int left, int top, int right, int bottom);

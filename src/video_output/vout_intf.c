@@ -495,9 +495,9 @@ static int AspectCallback( vlc_object_t *object, char const *cmd,
 
     if (sscanf(newval.psz_string, "%u:%u", &num, &den) == 2 &&
         (num != 0) == (den != 0))
-        vout_ChangeSampleAspectRatio(vout, num, den);
+        vout_ChangeDisplayAspectRatio(vout, num, den);
     else if (*newval.psz_string == '\0')
-        vout_ChangeSampleAspectRatio(vout, 0, 0);
+        vout_ChangeDisplayAspectRatio(vout, 0, 0);
     return VLC_SUCCESS;
 }
 

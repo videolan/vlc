@@ -468,21 +468,21 @@ void vout_ChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
                           num, den);
 }
 
-void vout_ChangeSampleAspectRatio(vout_thread_t *vout,
-                                  unsigned num, unsigned den)
+void vout_ChangeDisplayAspectRatio(vout_thread_t *vout,
+                                   unsigned dar_num, unsigned dar_den)
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
 
     vlc_mutex_lock(&sys->window_lock);
-    sys->source.dar.num = num;
-    sys->source.dar.den = den;
+    sys->source.dar.num = dar_num;
+    sys->source.dar.den = dar_den;
 
     vout_UpdateWindowSizeLocked(vout);
     vlc_mutex_unlock(&sys->window_lock);
 
     vout_control_PushPair(&vout->p->control, VOUT_CONTROL_ASPECT_RATIO,
-                          num, den);
+                          dar_num, dar_den);
 }
 
 void vout_ChangeCropRatio(vout_thread_t *vout, unsigned num, unsigned den)
