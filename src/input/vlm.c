@@ -966,9 +966,10 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     input_thread_t *p_input = p_instance->p_input;
     if( p_input )
     {
-        if( p_instance->i_index == i_input_index )
+        int state = var_GetInteger( p_input, "state" );
+        if( p_instance->i_index == i_input_index &&
+                state != END_S && state != ERROR_S)
         {
-            int state = var_GetInteger( p_input, "state" );
             if( state == PAUSE_S )
                 var_SetInteger( p_input, "state",  PLAYING_S );
             return VLC_SUCCESS;
