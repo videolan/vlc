@@ -72,9 +72,7 @@ struct vout_thread_sys_t
 
     vlc_clock_t     *clock;
     float           rate;
-    float           spu_rate;
     vlc_tick_t      delay;
-    vlc_tick_t      spu_delay;
 
     /* */
     video_format_t  original;   /* Original format ie coming from the decoder */
@@ -262,12 +260,12 @@ int vout_OpenWrapper(vout_thread_t *, const char *,
 void vout_CloseWrapper(vout_thread_t *);
 
 /* */
-void vout_SetSubpictureClock(vout_thread_t *vout, vlc_clock_t *clock);
+ssize_t vout_RegisterSubpictureChannelInternal( vout_thread_t *, vlc_clock_t *clock );
+ssize_t spu_RegisterChannelInternal( spu_t *, vlc_clock_t * );
 void spu_Attach( spu_t *, input_thread_t *input );
 void spu_Detach( spu_t * );
-void spu_clock_Set(spu_t *, vlc_clock_t *);
-void spu_clock_Reset(spu_t *);
-void spu_clock_SetDelay(spu_t *spu, vlc_tick_t delay);
+void spu_SetClockDelay(spu_t *spu, size_t channel_id, vlc_tick_t delay);
+void spu_SetClockRate(spu_t *spu, size_t channel_id, float rate);
 void spu_ChangeMargin(spu_t *, int);
 void spu_SetHighlight(spu_t *, const vlc_spu_highlight_t*);
 
@@ -293,12 +291,12 @@ void vout_ChangeDelay( vout_thread_t *, vlc_tick_t delay );
  * This function will change the rate of the spu channel
  * It is thread safe
  */
-void vout_ChangeSpuRate( vout_thread_t *, float rate );
+void vout_ChangeSpuRate( vout_thread_t *, size_t channel_id, float rate );
 /**
  * This function will change the delay of the spu channel
  * It is thread safe
  */
-void vout_ChangeSpuDelay( vout_thread_t *, vlc_tick_t delay );
+void vout_ChangeSpuDelay( vout_thread_t *, size_t channel_id, vlc_tick_t delay );
 
 
 /**

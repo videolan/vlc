@@ -74,7 +74,7 @@ VLC_API void spu_PutSubpicture( spu_t *, subpicture_t * );
  */
 VLC_API subpicture_t * spu_Render( spu_t *, const vlc_fourcc_t *p_chroma_list,
                                    const video_format_t *p_fmt_dst, const video_format_t *p_fmt_src,
-                                   vlc_tick_t system_now, vlc_tick_t pts, float rate,
+                                   vlc_tick_t system_now, vlc_tick_t pts,
                                    bool ignore_osd, bool external_scale );
 
 /**

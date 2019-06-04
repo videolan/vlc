@@ -617,7 +617,6 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
                                                  p_owner->i_spu_channel);
                 p_owner->i_spu_channel = -1;
             }
-            vout_SetSubpictureClock(p_owner->p_vout, NULL);
 
             vlc_mutex_lock( &p_owner->lock );
             vout_Release(p_owner->p_vout);
@@ -630,25 +629,20 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
     if( p_owner->p_vout != p_vout )
     {
         ssize_t old_spu_channel = p_owner->i_spu_channel;
-        p_owner->i_spu_channel = vout_RegisterSubpictureChannel( p_vout );
+        p_owner->i_spu_channel =
+            vout_RegisterSubpictureChannelInternal(p_vout, p_owner->p_clock);
         p_owner->i_spu_order = 0;
 
         if (p_owner->i_spu_channel != -1)
         {
-            if (p_owner->p_vout)
-            {
-                vout_SetSubpictureClock(p_owner->p_vout, NULL);
-                if (old_spu_channel != -1)
-                    vout_UnregisterSubpictureChannel(p_owner->p_vout,
-                                                     old_spu_channel);
-            }
+            if (p_owner->p_vout && old_spu_channel != -1)
+                vout_UnregisterSubpictureChannel(p_owner->p_vout,
+                                                 old_spu_channel);
             vlc_mutex_lock(&p_owner->lock);
             if (p_owner->p_vout)
                 vout_Release(p_owner->p_vout);
             p_owner->p_vout = p_vout;
             vlc_mutex_unlock(&p_owner->lock);
-
-            vout_SetSubpictureClock(p_vout, p_owner->p_clock);
         }
     }
     else
@@ -1547,7 +1541,11 @@ static void OutputChangeRate( decoder_t *p_dec, float rate )
             break;
         case SPU_ES:
             if( p_owner->p_vout != NULL )
-                vout_ChangeSpuRate( p_owner->p_vout, rate );
+            {
+                assert(p_owner->i_spu_channel != -1);
+                vout_ChangeSpuRate(p_owner->p_vout, p_owner->i_spu_channel,
+                                   rate );
+            }
             break;
         default:
             vlc_assert_unreachable();
@@ -1573,7 +1571,11 @@ static void OutputChangeDelay( decoder_t *p_dec, vlc_tick_t delay )
             break;
         case SPU_ES:
             if( p_owner->p_vout != NULL )
-                vout_ChangeSpuDelay( p_owner->p_vout, delay );
+            {
+                assert(p_owner->i_spu_channel != -1);
+                vout_ChangeSpuDelay(p_owner->p_vout, p_owner->i_spu_channel,
+                                    delay);
+            }
             break;
         default:
             vlc_assert_unreachable();
@@ -1990,7 +1992,6 @@ static void DeleteDecoder( decoder_t * p_dec )
                 assert( p_owner->i_spu_channel > 0 );
                 vout_UnregisterSubpictureChannel( p_owner->p_vout,
                                                   p_owner->i_spu_channel );
-                vout_SetSubpictureClock(p_owner->p_vout, NULL);
                 vout_Release(p_owner->p_vout);
             }
             break;

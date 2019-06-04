@@ -280,20 +280,24 @@ ssize_t vout_RegisterSubpictureChannel( vout_thread_t *vout )
     return channel;
 }
 
+ssize_t vout_RegisterSubpictureChannelInternal(vout_thread_t *vout,
+                                               vlc_clock_t *clock)
+{
+    assert(!vout->p->dummy);
+    ssize_t channel = VOUT_SPU_CHANNEL_INVALID;
+
+    if (vout->p->spu)
+        channel = spu_RegisterChannelInternal(vout->p->spu, clock);
+
+    return channel;
+}
+
 void vout_UnregisterSubpictureChannel( vout_thread_t *vout, size_t channel )
 {
     assert(!vout->p->dummy);
-
-    if (vout->p->spu)
-        spu_UnregisterChannel(vout->p->spu, channel);
-}
-
-void vout_SetSubpictureClock( vout_thread_t *vout, vlc_clock_t *clock )
-{
-    assert(!vout->p->dummy);
+    assert(vout->p->spu);
     vlc_mutex_lock(&vout->p->spu_lock);
-    if (vout->p->spu)
-        spu_clock_Set(vout->p->spu, clock);
+    spu_UnregisterChannel(vout->p->spu, channel);
     vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
@@ -301,10 +305,10 @@ void vout_FlushSubpictureChannel( vout_thread_t *vout, size_t channel )
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
+    assert(sys->spu);
 
     vlc_mutex_lock(&sys->spu_lock);
-    if (sys->spu != NULL)
-        spu_ClearChannel(vout->p->spu, channel);
+    spu_ClearChannel(vout->p->spu, channel);
     vlc_mutex_unlock(&sys->spu_lock);
 }
 
@@ -1081,7 +1085,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     subpicture_t *subpic = spu_Render(sys->spu,
                                       subpicture_chromas, &fmt_spu_rot,
                                       &vd->source, system_now,
-                                      render_subtitle_date, sys->spu_rate,
+                                      render_subtitle_date,
                                       do_snapshot, vd->info.can_scale_spu);
     /*
      * Perform rendering
@@ -1313,14 +1317,6 @@ static void vout_FlushUnlocked(vout_thread_t *vout, bool below,
 
     vlc_clock_Reset(vout->p->clock);
     vlc_clock_SetDelay(vout->p->clock, vout->p->delay);
-
-    vlc_mutex_lock(&vout->p->spu_lock);
-    if (vout->p->spu)
-    {
-        spu_clock_Reset(vout->p->spu);
-        spu_clock_SetDelay(vout->p->spu, vout->p->spu_delay);
-    }
-    vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
 void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
@@ -1378,21 +1374,22 @@ void vout_ChangeRate(vout_thread_t *vout, float rate)
     vout_control_Release(&sys->control);
 }
 
-void vout_ChangeSpuDelay(vout_thread_t *vout, vlc_tick_t delay)
+void vout_ChangeSpuDelay(vout_thread_t *vout, size_t channel_id,
+                         vlc_tick_t delay)
 {
     assert(!vout->p->dummy);
+    assert(vout->p->spu);
     vlc_mutex_lock(&vout->p->spu_lock);
-    if (vout->p->spu)
-        spu_clock_SetDelay(vout->p->spu, delay);
-    vout->p->spu_delay = delay;
+    spu_SetClockDelay(vout->p->spu, channel_id, delay);
     vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
-void vout_ChangeSpuRate(vout_thread_t *vout, float rate)
+void vout_ChangeSpuRate(vout_thread_t *vout, size_t channel_id, float rate)
 {
     assert(!vout->p->dummy);
+    assert(vout->p->spu);
     vlc_mutex_lock(&vout->p->spu_lock);
-    vout->p->spu_rate = rate;
+    spu_SetClockRate(vout->p->spu, channel_id, rate);
     vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
@@ -1946,10 +1943,10 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
     } else
         vout_UpdateWindowSizeLocked(vout);
 
-    sys->delay = sys->spu_delay = 0;
-    sys->rate = sys->spu_rate = 1.f;
+    sys->delay = 0;
+    sys->rate = 1.f;
     sys->clock = cfg->clock;
-    sys->delay = sys->spu_delay = 0;
+    sys->delay = 0;
 
     vlc_mutex_unlock(&sys->window_lock);
 

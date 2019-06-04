@@ -62,6 +62,9 @@ typedef struct {
 struct spu_channel {
     subpicture_t *entries[VOUT_MAX_SUBPICTURES];
     size_t id;
+    vlc_clock_t *clock;
+    vlc_tick_t delay;
+    float rate;
 };
 
 typedef struct VLC_VECTOR(struct spu_channel) spu_channel_vector;
@@ -71,7 +74,6 @@ struct spu_private_t {
     input_thread_t *input;
 
     spu_channel_vector channels;
-    vlc_clock_t *clock;
 
     int channel;             /**< number of subpicture channels registered */
     filter_t *text;                              /**< text renderer module */
@@ -102,9 +104,13 @@ struct spu_private_t {
     vout_thread_t       *vout;
 };
 
-static void spu_channel_Init(struct spu_channel *channel, size_t id)
+static void spu_channel_Init(struct spu_channel *channel, size_t id,
+                             vlc_clock_t *clock)
 {
     channel->id = id;
+    channel->clock = clock;
+    channel->delay = 0;
+    channel->rate = 1.f;
 
     for (size_t i = 0; i < VOUT_MAX_SUBPICTURES; i++)
         channel->entries[i] = NULL;
@@ -563,10 +569,8 @@ static int SpuRenderCmp(const void *s0, const void *s1)
 }
 
 static int spu_channel_ConvertDates(struct spu_channel *channel,
-                                    vlc_clock_t *clock,
                                     vlc_tick_t system_now,
-                                    spu_render_entry_t *render_entries,
-                                    float rate)
+                                    spu_render_entry_t *render_entries)
 {
     /* Put every spu start and stop ts into the same array to convert them in
      * one shot */
@@ -587,9 +591,9 @@ static int spu_channel_ConvertDates(struct spu_channel *channel,
         return 0;
 
     /* Convert all spu ts */
-    if (clock)
-        vlc_clock_ConvertArrayToSystem(clock, system_now, date_array,
-                                       entry_count * 2, rate);
+    if (channel->clock)
+        vlc_clock_ConvertArrayToSystem(channel->clock, system_now, date_array,
+                                       entry_count * 2, channel->rate);
 
     /* Put back the converted ts into the output spu_render_entry_t struct */
     entry_count = 0;
@@ -623,7 +627,7 @@ static int spu_channel_ConvertDates(struct spu_channel *channel,
  *****************************************************************************/
 static spu_render_entry_t *
 spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
-                      vlc_tick_t render_subtitle_date, float rate,
+                      vlc_tick_t render_subtitle_date,
                       bool ignore_osd, size_t *subpicture_count)
 {
     spu_private_t *sys = spu->p;
@@ -653,8 +657,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
         int64_t      ephemer_subtitle_order = INT64_MIN;
         int64_t      ephemer_system_order = INT64_MIN;
 
-        if (spu_channel_ConvertDates(channel, sys->clock, system_now, render_entries,
-                                     rate) == 0)
+        if (spu_channel_ConvertDates(channel, system_now, render_entries) == 0)
             continue;
 
         /* Select available pictures */
@@ -836,7 +839,6 @@ static void SpuRenderRegion(spu_t *spu,
     spu_area_t display = spu_area_create(0, 0, fmt->i_visible_width,
                                          fmt->i_visible_height,
                                          spu_scale_unit());
-    //fprintf("
     SpuAreaFitInside(&restrained, &display);
 
     /* Fix the position for the current scale_size */
@@ -1405,14 +1407,12 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
     for (size_t i = 0; i < VOUT_SPU_CHANNEL_OSD_COUNT; ++i)
     {
         struct spu_channel channel;
-        spu_channel_Init(&channel, i);
+        spu_channel_Init(&channel, i, NULL);
         vlc_vector_push(&sys->channels, channel);
     }
 
     /* Initialize private fields */
     vlc_mutex_init(&sys->lock);
-
-    sys->clock = NULL;
 
     atomic_init(&sys->margin, var_InheritInteger(spu, "sub-margin"));
 
@@ -1522,21 +1522,27 @@ void spu_Detach(spu_t *spu)
     vlc_mutex_unlock(&spu->p->lock);
 }
 
-void spu_clock_Set(spu_t *spu, vlc_clock_t *clock)
+void spu_SetClockDelay(spu_t *spu, size_t channel_id, vlc_tick_t delay)
 {
-    spu->p->clock = clock;
+    spu_private_t *sys = spu->p;
+
+    vlc_mutex_lock(&sys->lock);
+    struct spu_channel *channel = spu_GetChannel(spu, channel_id);
+    assert(channel->clock);
+    vlc_clock_SetDelay(channel->clock, delay);
+    channel->delay = delay;
+    vlc_mutex_unlock(&sys->lock);
 }
 
-void spu_clock_Reset(spu_t *spu)
+void spu_SetClockRate(spu_t *spu, size_t channel_id, float rate)
 {
-    if (spu->p->clock)
-        vlc_clock_Reset(spu->p->clock);
-}
+    spu_private_t *sys = spu->p;
 
-void spu_clock_SetDelay(spu_t *spu, vlc_tick_t delay)
-{
-    if (spu->p->clock)
-        vlc_clock_SetDelay(spu->p->clock, delay);
+    vlc_mutex_lock(&sys->lock);
+    struct spu_channel *channel = spu_GetChannel(spu, channel_id);
+    assert(channel->clock);
+    channel->rate = rate;
+    vlc_mutex_unlock(&sys->lock);
 }
 
 /**
@@ -1639,7 +1645,7 @@ subpicture_t *spu_Render(spu_t *spu,
                          const video_format_t *fmt_dst,
                          const video_format_t *fmt_src,
                          vlc_tick_t system_now,
-                         vlc_tick_t render_subtitle_date, float rate,
+                         vlc_tick_t render_subtitle_date,
                          bool ignore_osd,
                          bool external_scale)
 {
@@ -1697,7 +1703,7 @@ subpicture_t *spu_Render(spu_t *spu,
 
     /* Get an array of subpictures to render */
     spu_render_entry_t *subpicture_array =
-        spu_SelectSubpictures(spu, system_now, render_subtitle_date, rate,
+        spu_SelectSubpictures(spu, system_now, render_subtitle_date,
                              ignore_osd, &subpicture_count);
     if (!subpicture_array)
     {
@@ -1747,7 +1753,7 @@ subpicture_t *spu_Render(spu_t *spu,
     return render;
 }
 
-ssize_t spu_RegisterChannel(spu_t *spu)
+ssize_t spu_RegisterChannelInternal(spu_t *spu, vlc_clock_t *clock)
 {
     spu_private_t *sys = spu->p;
 
@@ -1758,7 +1764,7 @@ ssize_t spu_RegisterChannel(spu_t *spu)
     if (channel_id != VOUT_SPU_CHANNEL_INVALID)
     {
         struct spu_channel channel;
-        spu_channel_Init(&channel, channel_id);
+        spu_channel_Init(&channel, channel_id, clock);
         if (vlc_vector_push(&sys->channels, channel))
         {
             vlc_mutex_unlock(&sys->lock);
@@ -1769,6 +1775,11 @@ ssize_t spu_RegisterChannel(spu_t *spu)
     vlc_mutex_unlock(&sys->lock);
 
     return VOUT_SPU_CHANNEL_INVALID;
+}
+
+ssize_t spu_RegisterChannel(spu_t *spu)
+{
+    return spu_RegisterChannelInternal(spu, NULL);
 }
 
 static void spu_channel_Clear(struct spu_channel *channel)
@@ -1783,6 +1794,11 @@ void spu_ClearChannel(spu_t *spu, size_t channel_id)
     vlc_mutex_lock(&sys->lock);
     struct spu_channel *channel = spu_GetChannel(spu, channel_id);
     spu_channel_Clear(channel);
+    if (channel->clock)
+    {
+        vlc_clock_Reset(channel->clock);
+        vlc_clock_SetDelay(channel->clock, channel->delay);
+    }
     vlc_mutex_unlock(&sys->lock);
 }
 
