@@ -891,7 +891,9 @@ static int AccessOpen(vlc_object_t *obj, vcddev_t *dev)
     }
 
     sys->mbrecord = NULL;
+#ifdef HAVE_LIBCDDB
     sys->cddb = NULL;
+#endif
 
     if(var_InheritBool(obj, "metadata-network-access"))
     {
