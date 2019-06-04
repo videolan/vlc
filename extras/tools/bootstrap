@@ -177,7 +177,7 @@ TOOLS = $BOOTSTRAP_PATH
 MAKEFLAGS += -j$CPUS
 CMAKEFLAGS += --parallel=$CPUS
 PREFIX=\$(abspath ./build)
-PATH="\${PREFIX}/bin:$PATH"
+PATH=\${PREFIX}/bin:$PATH
 EOF
 
 for t in $FOUND; do
