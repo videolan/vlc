@@ -74,6 +74,8 @@ SDIOutput::~SDIOutput()
         audioStreams.pop_front();
     }
     delete audioMultiplex;
+    delete captionsStream;
+    delete videoStream;
     if(video.pic_nosignal)
         picture_Release(video.pic_nosignal);
     es_format_Clean(&video.configuredfmt);
@@ -153,15 +155,6 @@ void SDIOutput::Del(AbstractStream *s)
 {
     s->Drain();
     Process();
-    if(videoStream == s)
-        videoStream = NULL;
-    else if(dynamic_cast<AudioDecodedStream *>(s))
-    {
-        audioStreams.remove(static_cast<AudioDecodedStream *>(s));
-    }
-    else if(captionsStream == s)
-        captionsStream = NULL;
-    delete s;
 }
 
 int SDIOutput::Control(int i_query, va_list args)
@@ -174,6 +167,23 @@ int SDIOutput::Control(int i_query, va_list args)
         default:
             return VLC_EGENERIC;
     };
+}
+
+bool SDIOutput::ReachedPlaybackTime(vlc_tick_t t)
+{
+    if (captionsStream &&
+        !captionsStream->ReachedPlaybackTime(t))
+        return false;
+
+    for(auto it = audioStreams.begin(); it != audioStreams.end(); ++it)
+        if(!(*it)->ReachedPlaybackTime(t))
+            return false;
+
+    if(!videoStream || /* must have video */
+       !videoStream->ReachedPlaybackTime(t))
+        return false;
+
+    return true;
 }
 
 AbstractStream *SDIOutput::createStream(const StreamID &id,

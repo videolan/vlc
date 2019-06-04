@@ -47,6 +47,7 @@ namespace sdi_sout
                                                   bool = true);
             virtual int ConfigureVideo(const video_format_t *) = 0;
             virtual int ConfigureAudio(const audio_format_t *) = 0;
+            virtual bool ReachedPlaybackTime(vlc_tick_t);
             sout_stream_t *p_stream;
             VideoDecodedStream *videoStream;
             std::list<AbstractStream *> audioStreams;

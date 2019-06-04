@@ -40,24 +40,49 @@ AbstractStreamOutputBuffer::~AbstractStreamOutputBuffer()
 {
 }
 
+AbstractQueueStreamOutputBuffer::AbstractQueueStreamOutputBuffer()
+{
+    b_draining = false;
+}
+
+AbstractQueueStreamOutputBuffer::~AbstractQueueStreamOutputBuffer()
+{
+
+}
+
 void AbstractQueueStreamOutputBuffer::Enqueue(void *p)
 {
-    queue_mutex.lock();
+    buffer_mutex.lock();
     queued.push(p);
-    queue_mutex.unlock();
+    buffer_mutex.unlock();
 }
 
 void *AbstractQueueStreamOutputBuffer::Dequeue()
 {
     void *p = NULL;
-    queue_mutex.lock();
+    buffer_mutex.lock();
     if(!queued.empty())
     {
         p = queued.front();
         queued.pop();
     }
-    queue_mutex.unlock();
+    buffer_mutex.unlock();
     return p;
+}
+
+void AbstractQueueStreamOutputBuffer::Drain()
+{
+    buffer_mutex.lock();
+    b_draining = true;
+    buffer_mutex.unlock();
+}
+
+bool AbstractQueueStreamOutputBuffer::isEOS()
+{
+    buffer_mutex.lock();
+    bool b = b_draining && queued.empty();
+    buffer_mutex.unlock();
+    return b;
 }
 
 BlockStreamOutputBuffer::BlockStreamOutputBuffer()
@@ -82,12 +107,27 @@ void BlockStreamOutputBuffer::FlushQueued()
 PictureStreamOutputBuffer::PictureStreamOutputBuffer()
     : AbstractQueueStreamOutputBuffer()
 {
-
+    vlc_sem_init(&pool_semaphore, 16);
 }
 
 PictureStreamOutputBuffer::~PictureStreamOutputBuffer()
 {
+    vlc_sem_destroy(&pool_semaphore);
+}
 
+void * PictureStreamOutputBuffer::Dequeue()
+{
+    void *p = AbstractQueueStreamOutputBuffer::Dequeue();
+    if(p)
+        vlc_sem_post(&pool_semaphore);
+    return p;
+}
+
+void PictureStreamOutputBuffer::Enqueue(void *p)
+{
+    if(p)
+        vlc_sem_wait(&pool_semaphore);
+    AbstractQueueStreamOutputBuffer::Enqueue(p);
 }
 
 void PictureStreamOutputBuffer::FlushQueued()
@@ -95,6 +135,18 @@ void PictureStreamOutputBuffer::FlushQueued()
     picture_t *p;
     while((p = reinterpret_cast<picture_t *>(Dequeue())))
         picture_Release(p);
+}
+
+vlc_tick_t PictureStreamOutputBuffer::NextPictureTime()
+{
+    vlc_tick_t t;
+    buffer_mutex.lock();
+    if(!queued.empty())
+        t = reinterpret_cast<picture_t *>(queued.front())->date;
+    else
+        t = VLC_TICK_INVALID;
+    buffer_mutex.unlock();
+    return t;
 }
 
 unsigned StreamID::i_next_sequence_id = 0;
@@ -172,20 +224,39 @@ AbstractDecodedStream::AbstractDecodedStream(vlc_object_t *p_obj,
 {
     p_decoder = NULL;
     es_format_Init(&requestedoutput, 0, 0);
+    vlc_mutex_init(&inputLock);
+    vlc_cond_init(&inputWait);
+    threadEnd = false;
+    status = DECODING;
+    pcr = VLC_TICK_INVALID;
 }
 
 AbstractDecodedStream::~AbstractDecodedStream()
 {
+    Flush();
+    deinit();
     es_format_Clean(&requestedoutput);
+    vlc_cond_destroy(&inputWait);
+    vlc_mutex_destroy(&inputLock);
+}
 
-    if(!p_decoder)
-        return;
-
-    struct decoder_owner *p_owner;
-    p_owner = container_of(p_decoder, struct decoder_owner, dec);
-    es_format_Clean(&p_owner->decoder_out);
-    es_format_Clean(&p_owner->last_fmt_update);
-    decoder_Destroy( p_decoder );
+void AbstractDecodedStream::deinit()
+{
+    if(p_decoder)
+    {
+        Flush();
+        vlc_mutex_lock(&inputLock);
+        vlc_cond_signal(&inputWait);
+        threadEnd = true;
+        vlc_mutex_unlock(&inputLock);
+        vlc_join(thread, NULL);
+        struct decoder_owner *p_owner;
+        p_owner = container_of(p_decoder, struct decoder_owner, dec);
+        es_format_Clean(&p_owner->decoder_out);
+        es_format_Clean(&p_owner->last_fmt_update);
+        decoder_Destroy(p_decoder);
+        p_decoder = NULL;
+    }
 }
 
 bool AbstractDecodedStream::init(const es_format_t *p_fmt)
@@ -226,46 +297,134 @@ bool AbstractDecodedStream::init(const es_format_t *p_fmt)
         return false;
     }
 
+    if(vlc_clone(&thread, decoderThreadCallback, this, VLC_THREAD_PRIORITY_VIDEO))
+    {
+        es_format_Clean(&p_owner->decoder_out);
+        es_format_Clean(&p_owner->last_fmt_update);
+        decoder_Destroy( p_decoder );
+        p_decoder = NULL;
+        return false;
+    }
+
     return true;
+}
+
+void * AbstractDecodedStream::decoderThreadCallback(void *me)
+{
+    reinterpret_cast<AbstractDecodedStream *>(me)->decoderThread();
+    return NULL;
+}
+
+void AbstractDecodedStream::decoderThread()
+{
+    struct decoder_owner *p_owner =
+            container_of(p_decoder, struct decoder_owner, dec);
+
+    vlc_savecancel();
+    vlc_mutex_lock(&inputLock);
+    for(;;)
+    {
+        while(inputQueue.empty() && !threadEnd)
+            vlc_cond_wait(&inputWait, &inputLock);
+        if(threadEnd)
+        {
+            vlc_mutex_unlock(&inputLock);
+            break;
+        }
+
+        block_t *p_block = inputQueue.front();
+        inputQueue.pop();
+
+        bool b_draincall = (status == DRAINING) && (p_block == NULL);
+        vlc_mutex_unlock(&inputLock);
+
+        if(!p_owner->b_error)
+        {
+            int ret = p_decoder->pf_decode(p_decoder, p_block);
+            switch(ret)
+            {
+                case VLCDEC_SUCCESS:
+                    break;
+                case VLCDEC_ECRITICAL:
+                    p_owner->b_error = true;
+                    break;
+                case VLCDEC_RELOAD:
+                    p_owner->b_error = true;
+                    if(p_block)
+                        block_Release(p_block);
+                    break;
+                default:
+                    vlc_assert_unreachable();
+            }
+        }
+
+        vlc_mutex_lock(&inputLock);
+        if(p_owner->b_error)
+        {
+            status = FAILED;
+            outputbuffer->Drain();
+        }
+        else if(b_draincall)
+        {
+            status = DRAINED;
+            outputbuffer->Drain();
+        }
+    }
 }
 
 int AbstractDecodedStream::Send(block_t *p_block)
 {
     assert(p_decoder);
-
-    struct decoder_owner *p_owner =
-            container_of(p_decoder, struct decoder_owner, dec);
-
-     if(!p_owner->b_error)
+    vlc_mutex_lock(&inputLock);
+    inputQueue.push(p_block);
+    if(p_block)
     {
-        int ret = p_decoder->pf_decode(p_decoder, p_block);
-        switch(ret)
-        {
-            case VLCDEC_SUCCESS:
-                break;
-            case VLCDEC_ECRITICAL:
-                p_owner->b_error = true;
-                break;
-            case VLCDEC_RELOAD:
-                p_owner->b_error = true;
-                if(p_block)
-                    block_Release(p_block);
-                break;
-            default:
-                vlc_assert_unreachable();
-        }
+        vlc_tick_t t = std::min(p_block->i_dts, p_block->i_pts);
+        if(t == VLC_TICK_INVALID)
+            t = std::max(p_block->i_dts, p_block->i_pts);
+        pcr = std::max(pcr, t);
     }
-
-    return p_owner->b_error ? VLC_EGENERIC : VLC_SUCCESS;
+    vlc_cond_signal(&inputWait);
+    vlc_mutex_unlock(&inputLock);
+    return VLC_SUCCESS;
 }
 
 void AbstractDecodedStream::Flush()
 {
+    vlc_mutex_lock(&inputLock);
+    while(!inputQueue.empty())
+    {
+        if(inputQueue.front())
+            block_Release(inputQueue.front());
+        inputQueue.pop();
+    }
+    vlc_mutex_unlock(&inputLock);
 }
 
 void AbstractDecodedStream::Drain()
 {
     Send(NULL);
+    vlc_mutex_lock(&inputLock);
+    if(status != FAILED && status != DRAINED)
+        status = DRAINING;
+    vlc_mutex_unlock(&inputLock);
+}
+
+bool AbstractDecodedStream::isEOS()
+{
+    vlc_mutex_lock(&inputLock);
+    bool b = (status == FAILED || status == DRAINED);
+    vlc_mutex_unlock(&inputLock);
+    return b;
+}
+
+bool AbstractDecodedStream::ReachedPlaybackTime(vlc_tick_t t)
+{
+    vlc_mutex_lock(&inputLock);
+    bool b = (pcr != VLC_TICK_INVALID) && t < pcr;
+    b |= (status == DRAINED) || (status == FAILED);
+    vlc_mutex_unlock(&inputLock);
+    return b;
 }
 
 void AbstractDecodedStream::setOutputFormat(const es_format_t *p_fmt)
@@ -285,6 +444,7 @@ VideoDecodedStream::VideoDecodedStream(vlc_object_t *p_obj,
 
 VideoDecodedStream::~VideoDecodedStream()
 {
+    deinit();
     if(p_filters_chain)
         filter_chain_Delete(p_filters_chain);
 }
@@ -333,7 +493,6 @@ int VideoDecodedStream::VideoDecCallback_update_format(decoder_t *p_dec)
 
     return VLC_SUCCESS;
 }
-
 
 static picture_t *transcode_video_filter_buffer_new(filter_t *p_filter)
 {
@@ -403,7 +562,6 @@ void VideoDecodedStream::Output(picture_t *p_pic)
 
     if(p_filters_chain)
         p_pic = filter_chain_VideoFilter(p_filters_chain, p_pic);
-
     if(p_pic)
         outputbuffer->Enqueue(p_pic);
 }
@@ -423,6 +581,7 @@ AudioDecodedStream::AudioDecodedStream(vlc_object_t *p_obj,
 
 AudioDecodedStream::~AudioDecodedStream()
 {
+    deinit();
     if(p_filters)
         aout_FiltersDelete(p_stream, p_filters);
 }
@@ -513,7 +672,8 @@ AbstractRawStream::AbstractRawStream(vlc_object_t *p_obj, const StreamID &id,
                                AbstractStreamOutputBuffer *buffer)
     : AbstractStream(p_obj, id, buffer)
 {
-
+    pcr = VLC_TICK_INVALID;
+    b_draining = false;
 }
 
 AbstractRawStream::~AbstractRawStream()
@@ -523,10 +683,16 @@ AbstractRawStream::~AbstractRawStream()
 
 int AbstractRawStream::Send(block_t *p_block)
 {
+    vlc_tick_t t = std::min(p_block->i_dts, p_block->i_pts);
+    if(t == VLC_TICK_INVALID)
+        t = std::max(p_block->i_dts, p_block->i_pts);
     if(p_block->i_buffer)
         outputbuffer->Enqueue(p_block);
     else
         block_Release(p_block);
+    buffer_mutex.lock();
+    pcr = std::max(pcr, t);
+    buffer_mutex.unlock();
     return VLC_SUCCESS;
 }
 
@@ -537,7 +703,26 @@ void AbstractRawStream::Flush()
 
 void AbstractRawStream::Drain()
 {
+    buffer_mutex.lock();
+    b_draining = true;
+    buffer_mutex.unlock();
+}
 
+bool AbstractRawStream::ReachedPlaybackTime(vlc_tick_t t)
+{
+    buffer_mutex.lock();
+    bool b = (pcr != VLC_TICK_INVALID) && t < pcr;
+    b |= b_draining;
+    buffer_mutex.unlock();
+    return b;
+}
+
+bool AbstractRawStream::isEOS()
+{
+    buffer_mutex.lock();
+    bool b = b_draining;
+    buffer_mutex.unlock();
+    return b;
 }
 
 void AbstractRawStream::FlushQueued()

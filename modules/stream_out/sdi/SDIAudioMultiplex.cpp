@@ -32,7 +32,7 @@ using namespace sdi_sout;
 SDIAudioMultiplexBuffer::SDIAudioMultiplexBuffer(vlc_object_t *obj)
     : AES3AudioBuffer(obj, 2), AbstractStreamOutputBuffer()
 {
-
+    b_draining = false;
 }
 
 SDIAudioMultiplexBuffer::~SDIAudioMultiplexBuffer()
@@ -53,6 +53,16 @@ void SDIAudioMultiplexBuffer::Enqueue(void *p)
 void * SDIAudioMultiplexBuffer::Dequeue()
 {
     return NULL;
+}
+
+void SDIAudioMultiplexBuffer::Drain()
+{
+    b_draining = true;
+}
+
+bool SDIAudioMultiplexBuffer::isEOS()
+{
+    return b_draining && AES3AudioBuffer::bufferStart() == VLC_TICK_INVALID;
 }
 
 static void ConfigureChannels(unsigned i, es_format_t *fmt)

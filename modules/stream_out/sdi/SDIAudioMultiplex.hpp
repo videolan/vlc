@@ -39,6 +39,10 @@ namespace sdi_sout
             virtual void FlushQueued(); /* impl */
             virtual void Enqueue(void *); /* impl */
             virtual void * Dequeue(); /* impl */
+            virtual void Drain(); /* impl */
+            virtual bool isEOS(); /* impl */
+        private:
+            bool b_draining;
     };
 
     class SDIAudioMultiplexConfig

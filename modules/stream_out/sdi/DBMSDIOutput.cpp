@@ -47,6 +47,12 @@
 
 #include <arpa/inet.h>
 
+#define DECKLINK_CARD_BUFFER (CLOCK_FREQ)
+#define DECKLINK_PREROLL (CLOCK_FREQ*3/4)
+#define DECKLINK_SCHED_OFFSET (CLOCK_FREQ/20)
+
+static_assert(DECKLINK_CARD_BUFFER > DECKLINK_PREROLL + DECKLINK_SCHED_OFFSET, "not in card buffer limits");
+
 using namespace sdi_sout;
 
 DBMSDIOutput::DBMSDIOutput(sout_stream_t *p_stream) :
@@ -58,10 +64,21 @@ DBMSDIOutput::DBMSDIOutput(sout_stream_t *p_stream) :
     clock.offset = 0;
     lasttimestamp = 0;
     b_running = false;
+    streamStartTime = VLC_TICK_INVALID;
+    vlc_mutex_init(&feeder.lock);
+    vlc_cond_init(&feeder.cond);
 }
 
 DBMSDIOutput::~DBMSDIOutput()
 {
+    if(p_output)
+    {
+        while(!isDrained())
+            vlc_tick_wait(vlc_tick_now() + CLOCK_FREQ/60);
+        vlc_cancel(feeder.thread);
+        vlc_join(feeder.thread, NULL);
+    }
+
     es_format_Clean(&video.configuredfmt);
     if(p_output)
     {
@@ -73,6 +90,9 @@ DBMSDIOutput::~DBMSDIOutput()
     }
     if(p_card)
         p_card->Release();
+
+    vlc_cond_destroy(&feeder.cond);
+    vlc_mutex_destroy(&feeder.lock);
 }
 
 AbstractStream *DBMSDIOutput::Add(const es_format_t *fmt)
@@ -92,16 +112,6 @@ AbstractStream *DBMSDIOutput::Add(const es_format_t *fmt)
     return s;
 }
 
-int DBMSDIOutput::Send(AbstractStream *s, block_t *b)
-{
-    if(!b_running && b->i_dts != VLC_TICK_INVALID)
-    {
-        if( videoStream && (!audioStreams.empty() || audio.i_channels == 0) )
-            Start(b->i_dts);
-    }
-    return SDIOutput::Send(s, b);
-}
-
 #define CHECK(message) do { \
     if (result != S_OK) \
     { \
@@ -113,6 +123,43 @@ int DBMSDIOutput::Send(AbstractStream *s, block_t *b)
     goto error; \
 } \
 } while(0)
+
+HRESULT STDMETHODCALLTYPE DBMSDIOutput::QueryInterface( REFIID, LPVOID * )
+{
+    return E_NOINTERFACE;
+}
+
+ULONG STDMETHODCALLTYPE DBMSDIOutput::AddRef()
+{
+    return 1;
+}
+
+ULONG STDMETHODCALLTYPE DBMSDIOutput::Release()
+{
+    return 1;
+}
+
+HRESULT STDMETHODCALLTYPE DBMSDIOutput::ScheduledFrameCompleted
+    (IDeckLinkVideoFrame *, BMDOutputFrameCompletionResult result)
+{
+    if(result == bmdOutputFrameDropped)
+        msg_Warn(p_stream, "dropped frame");
+    else if(result == bmdOutputFrameDisplayedLate)
+        msg_Warn(p_stream, "late frame");
+
+    bool b_active;
+    vlc_mutex_lock(&feeder.lock);
+    if((S_OK == p_output->IsScheduledPlaybackRunning(&b_active)) && b_active)
+        vlc_cond_signal(&feeder.cond);
+    vlc_mutex_unlock(&feeder.lock);
+
+    return S_OK;
+}
+
+HRESULT DBMSDIOutput::ScheduledPlaybackHasStopped (void)
+{
+    return S_OK;
+}
 
 int DBMSDIOutput::Open()
 {
@@ -158,6 +205,9 @@ int DBMSDIOutput::Open()
     CHECK("No outputs");
 
     decklink_iterator->Release();
+
+    if(vlc_clone(&feeder.thread, feederThreadCallback, this, VLC_THREAD_PRIORITY_INPUT))
+        goto error;
 
     return VLC_SUCCESS;
 
@@ -216,6 +266,13 @@ int DBMSDIOutput::ConfigureAudio(const audio_format_t *)
                     maxchannels,
                     bmdAudioOutputStreamTimestamped);
         CHECK("Could not start audio output");
+
+        if(S_OK != p_output->BeginAudioPreroll())
+        {
+            p_output->DisableAudioOutput();
+            goto error;
+        }
+
         audio.b_configured = true;
 
         p_attributes->Release();
@@ -378,6 +435,8 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
         result = p_output->EnableVideoOutput(mode_id, flags);
         CHECK("Could not enable video output");
 
+        p_output->SetScheduledFrameCompletionCallback(this);
+
         video_format_Copy(fmt, vfmt);
         fmt->i_width = fmt->i_visible_width = p_display_mode->GetWidth();
         fmt->i_height = fmt->i_visible_height = p_display_mode->GetHeight();
@@ -416,7 +475,7 @@ error:
     return VLC_EGENERIC;
 }
 
-int DBMSDIOutput::Start(vlc_tick_t startTime)
+int DBMSDIOutput::StartPlayback()
 {
     HRESULT result;
     if(FAKE_DRIVER && !b_running)
@@ -427,7 +486,10 @@ int DBMSDIOutput::Start(vlc_tick_t startTime)
     if(b_running)
         return VLC_EGENERIC;
 
-    result = p_output->StartScheduledPlayback(startTime, CLOCK_FREQ, 1.0);
+    if(audio.b_configured)
+        p_output->EndAudioPreroll();
+
+    result = p_output->StartScheduledPlayback(streamStartTime, CLOCK_FREQ, 1.0);
     CHECK("Could not start playback");
     b_running = true;
     return VLC_SUCCESS;
@@ -436,43 +498,161 @@ error:
     return VLC_EGENERIC;
 }
 
-int DBMSDIOutput::Process()
+int DBMSDIOutput::FeedOneFrame()
 {
-    if((!p_output && !FAKE_DRIVER) || !b_running)
-        return VLC_EGENERIC;
+    picture_t *p = reinterpret_cast<picture_t *>(videoBuffer.Dequeue());
+    if(p)
+        return ProcessVideo(p, reinterpret_cast<block_t *>(captionsBuffer.Dequeue()));
 
-    picture_t *p;
-    while((p = reinterpret_cast<picture_t *>(videoBuffer.Dequeue())))
-    {
-        vlc_tick_t bufferStart = audioMultiplex->bufferStart();
-        unsigned i_samples_per_frame =
-                audioMultiplex->alignedInterleaveInSamples(bufferStart, SAMPLES_PER_FRAME);
+    return VLC_SUCCESS;
+}
 
+int DBMSDIOutput::FeedAudio(vlc_tick_t start, vlc_tick_t preroll, bool b_truncate)
+{
 #ifdef SDI_MULTIPLEX_DEBUG
         audioMultiplex->Debug();
 #endif
+    vlc_tick_t bufferStart = audioMultiplex->bufferStart();
+    unsigned i_samples_per_frame =
+            audioMultiplex->alignedInterleaveInSamples(bufferStart, SAMPLES_PER_FRAME);
 
-        while(bufferStart <= p->date &&
-              audioMultiplex->availableVirtualSamples(bufferStart) >= i_samples_per_frame)
+    unsigned buffered = 0;
+    while(bufferStart <= (start+preroll) &&
+          audioMultiplex->availableVirtualSamples(bufferStart) >= i_samples_per_frame)
+    {
+        block_t *out = audioMultiplex->Extract(i_samples_per_frame);
+        if(out)
         {
-            block_t *out = audioMultiplex->Extract(i_samples_per_frame);
-            if(out)
-            {
 #ifdef SDI_MULTIPLEX_DEBUG
-                  msg_Dbg(p_stream, "extracted %u samples pts %ld i_samples_per_frame %u",
-                          out->i_nb_samples, out->i_dts, i_samples_per_frame);
+              msg_Dbg(p_stream, "extracted %u samples pts %ld i_samples_per_frame %u",
+                      out->i_nb_samples, out->i_dts, i_samples_per_frame);
 #endif
+              if(b_truncate && out->i_pts < start)
+              {
+#ifdef SDI_MULTIPLEX_DEBUG
+                  msg_Err(p_stream,"dropping %u samples at %ld (-%ld)",
+                          i_samples_per_frame, out->i_pts, (start - out->i_pts));
+#endif
+                  block_Release(out);
+              }
+              else
+              {
                   ProcessAudio(out);
-            }
-            else break;
-            bufferStart = audioMultiplex->bufferStart();
-            i_samples_per_frame = audioMultiplex->alignedInterleaveInSamples(bufferStart, SAMPLES_PER_FRAME);
+              }
         }
-
-        ProcessVideo(p, reinterpret_cast<block_t *>(captionsBuffer.Dequeue()));
+        else break;
+        bufferStart = audioMultiplex->bufferStart();
+        i_samples_per_frame = audioMultiplex->alignedInterleaveInSamples(bufferStart, SAMPLES_PER_FRAME);
+        buffered += i_samples_per_frame;
     }
 
+    return buffered > 0 ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
+void * DBMSDIOutput::feederThreadCallback(void *me)
+{
+    reinterpret_cast<DBMSDIOutput *>(me)->feederThread();
+    return NULL;
+}
+
+void DBMSDIOutput::feederThread()
+{
+    vlc_tick_t maxdelay = CLOCK_FREQ/60;
+    for(;;)
+    {
+        vlc_mutex_lock(&feeder.lock);
+        mutex_cleanup_push(&feeder.lock);
+        vlc_cond_timedwait(&feeder.cond, &feeder.lock, vlc_tick_now() + maxdelay);
+        vlc_cleanup_pop();
+        int cancel = vlc_savecancel();
+        doSchedule();
+        if(timescale)
+            maxdelay = CLOCK_FREQ * frameduration / timescale;
+        vlc_restorecancel(cancel);
+        vlc_mutex_unlock(&feeder.lock);
+    }
+}
+
+int DBMSDIOutput::Process()
+{
+    if((!p_output && !FAKE_DRIVER))
+        return VLC_SUCCESS;
+
+    vlc_mutex_lock(&feeder.lock);
+    vlc_cond_signal(&feeder.cond);
+    vlc_mutex_unlock(&feeder.lock);
+
     return VLC_SUCCESS;
+}
+
+int DBMSDIOutput::doSchedule()
+{
+    const vlc_tick_t preroll = DECKLINK_PREROLL;
+    vlc_tick_t next = videoBuffer.NextPictureTime();
+    if(next == VLC_TICK_INVALID ||
+       (!b_running && !ReachedPlaybackTime(next + preroll + SAMPLES_PER_FRAME*CLOCK_FREQ/48000)))
+        return VLC_SUCCESS;
+
+    if(FAKE_DRIVER)
+    {
+        FeedOneFrame();
+        FeedAudio(next, preroll, false);
+        b_running = true;
+        return VLC_SUCCESS;
+    }
+
+    uint32_t bufferedFramesCount;
+    uint32_t bufferedAudioCount = 0;
+    if(S_OK != p_output->GetBufferedVideoFrameCount(&bufferedFramesCount))
+        return VLC_EGENERIC;
+
+    uint32_t bufferedFramesTarget = (uint64_t)timescale*preroll/frameduration/CLOCK_FREQ;
+    if( bufferedFramesTarget > bufferedFramesCount )
+    {
+        for(size_t i=0; i<bufferedFramesTarget - bufferedFramesCount; i++)
+        {
+            FeedOneFrame();
+            if(b_running)
+                break;
+        }
+        p_output->GetBufferedVideoFrameCount(&bufferedFramesCount);
+    }
+
+    /* no frames got in ?? */
+    if(streamStartTime == VLC_TICK_INVALID)
+    {
+        assert(bufferedFramesTarget);
+        assert(!b_running);
+        return VLC_EGENERIC;
+    }
+
+    if(audio.b_configured)
+    {
+        if(S_OK != p_output->GetBufferedAudioSampleFrameCount(&bufferedAudioCount))
+            return VLC_EGENERIC;
+
+        uint32_t bufferedAudioTarget = 48000*preroll/CLOCK_FREQ;
+        if(bufferedAudioCount < bufferedAudioTarget)
+        {
+            vlc_tick_t audioSamplesDuration = (bufferedAudioTarget - bufferedAudioCount)
+                                            * CLOCK_FREQ / 48000;
+            if(b_running)
+                FeedAudio(next, audioSamplesDuration, false);
+            else
+                FeedAudio(streamStartTime, audioSamplesDuration, true);
+
+            p_output->GetBufferedAudioSampleFrameCount(&bufferedAudioCount);
+        }
+    }
+
+    if(!b_running && bufferedFramesCount >= bufferedFramesTarget)
+    {
+        msg_Dbg(p_stream, "Preroll end with %d frames/%d samples",
+                          bufferedFramesCount, bufferedAudioCount);
+        StartPlayback();
+    }
+
+    return (bufferedFramesCount < bufferedFramesTarget) ? VLC_ENOITEM : VLC_SUCCESS;
 }
 
 int DBMSDIOutput::ProcessAudio(block_t *p_block)
@@ -489,14 +669,13 @@ int DBMSDIOutput::ProcessAudio(block_t *p_block)
         return VLC_EGENERIC;
     }
 
-    p_block->i_pts -= clock.offset;
-
     uint32_t sampleFrameCount = p_block->i_nb_samples;
     uint32_t written;
+    p_block->i_pts -= clock.offset;
+    const BMDTimeValue scheduleTime = p_block->i_pts + DECKLINK_SCHED_OFFSET;
     HRESULT result = p_output->ScheduleAudioSamples(
                 p_block->p_buffer, p_block->i_nb_samples,
-                p_block->i_pts + CLOCK_FREQ,
-                CLOCK_FREQ, &written);
+                scheduleTime, CLOCK_FREQ, &written);
 
     if (result != S_OK)
         msg_Err(p_stream, "Failed to schedule audio sample: 0x%X", result);
@@ -525,8 +704,8 @@ int DBMSDIOutput::ProcessVideo(picture_t *picture, block_t *p_cc)
         double playbackSpeed;
         if(S_OK == p_output->GetScheduledStreamTime(CLOCK_FREQ, &streamTime, &playbackSpeed))
         {
-            if(picture->date + CLOCK_FREQ - streamTime >
-                    VLC_TICK_FROM_SEC(video.nosignal_delay))
+            if(picture->date - streamTime >
+               VLC_TICK_FROM_SEC(video.nosignal_delay))
             {
                 msg_Info(p_stream, "no signal");
                 picture_Hold(video.pic_nosignal);
@@ -543,6 +722,7 @@ int DBMSDIOutput::doProcessVideo(picture_t *picture, block_t *p_cc)
 {
     HRESULT result;
     int w, h, stride, length, ret = VLC_EGENERIC;
+    BMDTimeValue scheduleTime;
     IDeckLinkMutableVideoFrame *pDLVideoFrame = NULL;
     w = video.configuredfmt.video.i_visible_width;
     h = video.configuredfmt.video.i_visible_height;
@@ -613,15 +793,21 @@ int DBMSDIOutput::doProcessVideo(picture_t *picture, block_t *p_cc)
     // compute frame duration in CLOCK_FREQ units
     length = (frameduration * CLOCK_FREQ) / timescale;
     picture->date -= clock.offset;
-    result = p_output->ScheduleVideoFrame(pDLVideoFrame,
-                                          picture->date + CLOCK_FREQ,
-                                          length, CLOCK_FREQ);
+    scheduleTime = picture->date + DECKLINK_SCHED_OFFSET;
+    result = p_output->ScheduleVideoFrame(pDLVideoFrame, scheduleTime, length, CLOCK_FREQ);
     if (result != S_OK) {
         msg_Err(p_stream, "Dropped Video frame %" PRId64 ": 0x%x",
                 picture->date, result);
         goto error;
     }
-    lasttimestamp = __MAX(picture->date, lasttimestamp);
+    lasttimestamp = __MAX(scheduleTime, lasttimestamp);
+
+    if(!b_running) /* preroll */
+    {
+        if(streamStartTime == VLC_TICK_INVALID ||
+           picture->date < streamStartTime)
+            streamStartTime = picture->date;
+    }
 
 end:
     ret = VLC_SUCCESS;
@@ -629,6 +815,7 @@ end:
 error:
     if(p_cc)
         block_Release(p_cc);
+
     picture_Release(picture);
     if (pDLVideoFrame)
         pDLVideoFrame->Release();
@@ -639,7 +826,7 @@ error:
 void DBMSDIOutput::checkClockDrift()
 {
     BMDTimeValue hardwareTime, timeInFrame, ticksPerFrame;
-    if(FAKE_DRIVER)
+    if(!b_running || FAKE_DRIVER)
         return;
     if(S_OK == p_output->GetHardwareReferenceClock(CLOCK_FREQ,
                                                    &hardwareTime,
@@ -663,4 +850,15 @@ void DBMSDIOutput::checkClockDrift()
             }
         }
     }
+}
+
+bool DBMSDIOutput::isDrained()
+{
+    if(b_running)
+    {
+        if(!videoStream->isEOS() || !videoBuffer.isEOS())
+            return false;
+    }
+
+    return true;
 }

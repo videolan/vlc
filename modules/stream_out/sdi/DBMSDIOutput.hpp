@@ -28,7 +28,8 @@
 
 namespace sdi_sout
 {
-    class DBMSDIOutput : public SDIOutput
+    class DBMSDIOutput : public SDIOutput,
+                         public IDeckLinkVideoOutputCallback
     {
         public:
             DBMSDIOutput(sout_stream_t *);
@@ -36,7 +37,12 @@ namespace sdi_sout
             virtual AbstractStream *Add(const es_format_t *); /* reimpl */
             virtual int Open(); /* impl */
             virtual int Process(); /* impl */
-            virtual int Send(AbstractStream *, block_t *); /* reimpl */
+
+            virtual HRESULT STDMETHODCALLTYPE QueryInterface (REFIID, LPVOID *);
+            virtual ULONG STDMETHODCALLTYPE AddRef ();
+            virtual ULONG STDMETHODCALLTYPE Release ();
+            virtual HRESULT ScheduledFrameCompleted (IDeckLinkVideoFrame *, BMDOutputFrameCompletionResult);
+            virtual HRESULT ScheduledPlaybackHasStopped (void);
 
         protected:
             int ProcessVideo(picture_t *, block_t *);
@@ -59,9 +65,23 @@ namespace sdi_sout
                 BMDTimeValue hardware_reference;
             } clock;
             bool b_running;
-            int Start(vlc_tick_t);
+            bool b_prerolled;
+            vlc_tick_t streamStartTime;
+            int StartPlayback();
+            struct
+            {
+                vlc_mutex_t lock; /* Driver calls callback... until buffer is empty :/ */
+                vlc_cond_t cond;
+                vlc_thread_t thread;
+            } feeder;
+            static void *feederThreadCallback(void *);
+            void feederThread();
+            int doSchedule();
             int doProcessVideo(picture_t *, block_t *);
+            int FeedOneFrame();
+            int FeedAudio(vlc_tick_t, vlc_tick_t, bool);
             void checkClockDrift();
+            bool isDrained();
     };
 }
 
