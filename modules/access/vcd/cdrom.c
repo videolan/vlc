@@ -1266,6 +1266,7 @@ static size_t CdTextPayloadLength( const char *p_buffer, size_t i_buffer,
 static void CdTextParsePackText( const uint8_t *p_pack,
                                  enum cdtext_charset_e e_charset,
                                  size_t *pi_textbuffer,
+                                 size_t *pi_repeatbuffer,
                                  char *textbuffer,
                                  int *pi_last_track,
                                  char *pppsz_info[CDTEXT_MAX_TRACKS + 1][0x10] )
@@ -1286,16 +1287,28 @@ static void CdTextParsePackText( const uint8_t *p_pack,
         size_t i_payload = CdTextPayloadLength( (char *)p_readpos,
                                                 p_end - p_readpos,
                                                 b_double_byte );
+
         /* update max used track # */
         if( i_payload > 0 )
             *pi_last_track = __MAX( *pi_last_track, i_track );
 
-        /* copy out segment to buffer */
-        size_t i_append = i_payload;
-        if( *pi_textbuffer + i_payload >= CDTEXT_TEXT_BUFFER )
-            i_append = CDTEXT_TEXT_BUFFER - *pi_textbuffer;
-        memcpy( &textbuffer[*pi_textbuffer], p_readpos, i_append );
-        *pi_textbuffer += i_append;
+        /* check for repeats */
+        if( i_payload == 1 && p_readpos[0] == '\t' &&
+            *pi_repeatbuffer && !*pi_textbuffer )
+        {
+            *pi_textbuffer = *pi_repeatbuffer;
+            textbuffer[*pi_textbuffer] = 0;
+        }
+        else
+        {
+            /* copy out segment to buffer */
+            size_t i_append = i_payload;
+            if( *pi_textbuffer + i_payload >= CDTEXT_TEXT_BUFFER )
+                i_append = CDTEXT_TEXT_BUFFER - *pi_textbuffer;
+            memcpy( &textbuffer[*pi_textbuffer], p_readpos, i_append );
+            *pi_textbuffer += i_append;
+            *pi_repeatbuffer = 0;
+        }
 
         /* end of pack or just first split ? */
         if( &p_readpos[i_payload] < p_end ) /* not continuing */
@@ -1305,6 +1318,7 @@ static void CdTextParsePackText( const uint8_t *p_pack,
             {
                 CdTextAppendPayload( textbuffer, *pi_textbuffer, e_charset,
                                      &pppsz_info[i_track][i_pack_type-0x80] );
+                *pi_repeatbuffer = *pi_textbuffer;
                 *pi_textbuffer = 0;
 
                 if(++i_track > CDTEXT_MAX_TRACKS) /* increment for next part of the split */
@@ -1372,6 +1386,7 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
     /* capture buffer */
     char textbuffer[CDTEXT_TEXT_BUFFER];
     size_t i_textbuffer = 0;
+    size_t i_repeatbuffer = 0;
     uint8_t i_prev_pack_type = 0x00;
 
     for( int i = 0; i < i_buffer/CDTEXT_PACK_SIZE; i++ )
@@ -1384,7 +1399,10 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
 
         /* non flushed text buffer */
         if(i_textbuffer && i_pack_type != i_prev_pack_type)
+        {
             i_textbuffer = 0;
+            i_repeatbuffer = 0;
+        }
         i_prev_pack_type = i_pack_type;
 
         uint8_t i_track = p_pack[1] & 0x7f;
@@ -1406,7 +1424,7 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
             case 0x87:
             {
                 CdTextParsePackText( p_pack, e_textpackcharset,
-                                     &i_textbuffer, textbuffer,
+                                     &i_textbuffer, &i_repeatbuffer, textbuffer,
                                      &i_track_last, pppsz_info );
                 break;
             }
