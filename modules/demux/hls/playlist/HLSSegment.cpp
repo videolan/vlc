@@ -106,12 +106,12 @@ void HLSSegment::onChunkDownload(block_t **pp_block, SegmentChunk *chunk, BaseRe
                 {
                     /* remove the PKCS#7 padding from the buffer */
                     const uint8_t pad = p_block->p_buffer[p_block->i_buffer - 1];
-                    for(uint8_t i=0; i<pad && i<=16; i++)
+                    for(uint8_t i=0; i<pad && i<16; i++)
                     {
                         if(p_block->p_buffer[p_block->i_buffer - i - 1] != pad)
                             break;
 
-                        if(i==pad)
+                        if(i+1==pad)
                             p_block->i_buffer -= pad;
                     }
 
