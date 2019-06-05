@@ -307,11 +307,6 @@ void vout_ChangeSpuDelay( vout_thread_t *, vlc_tick_t delay );
 void vout_MouseState(vout_thread_t *, const vlc_mouse_t *);
 
 /**
- * This function will apply an offset on subtitle subpicture.
- */
-void spu_OffsetSubtitleDate( spu_t *p_spu, vlc_tick_t i_duration );
-
-/**
  * This function will return and reset internal statistics.
  */
 void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,

@@ -1756,25 +1756,6 @@ subpicture_t *spu_Render(spu_t *spu,
     return render;
 }
 
-void spu_OffsetSubtitleDate(spu_t *spu, vlc_tick_t duration)
-{
-    spu_private_t *sys = spu->p;
-
-    vlc_mutex_lock(&sys->lock);
-    for (int i = 0; i < VOUT_MAX_SUBPICTURES; i++)
-    {
-        subpicture_t *current = sys->heap.entries[i];
-
-        if (current && current->b_subtitle) {
-            if (current->i_start > 0)
-                current->i_start += duration;
-            if (current->i_stop > 0)
-                current->i_stop  += duration;
-        }
-    }
-    vlc_mutex_unlock(&sys->lock);
-}
-
 ssize_t spu_RegisterChannel(spu_t *spu)
 {
     spu_private_t *sys = spu->p;
