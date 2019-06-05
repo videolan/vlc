@@ -42,7 +42,7 @@
 
 #include "events.h"
 #include "common.h"
-#include "../video_chroma/copy.h"
+#include "../../video_chroma/copy.h"
 
 void CommonInit(vout_display_t *vd, display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
 {

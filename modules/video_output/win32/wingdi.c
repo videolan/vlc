@@ -37,7 +37,7 @@
 #include <windows.h>
 
 #include "common.h"
-#include "../video_chroma/copy.h"
+#include "../../video_chroma/copy.h"
 
 /*****************************************************************************
  * Module descriptor
