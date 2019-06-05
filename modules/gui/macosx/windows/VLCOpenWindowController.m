@@ -1297,7 +1297,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     if ([[self MRL] length])
         [NSApp stopModalWithCode: 1];
     else
-        NSBeep();
+        vlc_assert_unreachable();
 }
 
 #pragma mark - audio and video device management
