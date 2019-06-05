@@ -519,7 +519,7 @@ int DBMSDIOutput::ProcessVideo(picture_t *picture, block_t *p_cc)
 
     checkClockDrift();
 
-    if(video.pic_nosignal)
+    if(video.pic_nosignal && !FAKE_DRIVER)
     {
         BMDTimeValue streamTime;
         double playbackSpeed;
@@ -639,6 +639,8 @@ error:
 void DBMSDIOutput::checkClockDrift()
 {
     BMDTimeValue hardwareTime, timeInFrame, ticksPerFrame;
+    if(FAKE_DRIVER)
+        return;
     if(S_OK == p_output->GetHardwareReferenceClock(CLOCK_FREQ,
                                                    &hardwareTime,
                                                    &timeInFrame,
