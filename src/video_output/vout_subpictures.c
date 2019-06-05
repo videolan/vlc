@@ -60,7 +60,6 @@ typedef struct {
 
 typedef struct {
     subpicture_t *subpicture;
-    bool          reject;
 } spu_heap_entry_t;
 
 typedef struct {
@@ -113,7 +112,6 @@ static void SpuHeapInit(spu_heap_t *heap)
         spu_heap_entry_t *e = &heap->entry[i];
 
         e->subpicture = NULL;
-        e->reject     = false;
     }
 }
 
@@ -126,7 +124,6 @@ static int SpuHeapPush(spu_heap_t *heap, subpicture_t *subpic)
             continue;
 
         e->subpicture = subpic;
-        e->reject     = false;
         return VLC_SUCCESS;
     }
     return VLC_EGENERIC;
@@ -608,7 +605,7 @@ static void SpuSelectSubpictures(spu_t *spu,
 
     for (int index = 0; index < VOUT_MAX_SUBPICTURES; index++) {
         spu_heap_entry_t *entry = &sys->heap.entry[index];
-        if (!entry->subpicture || entry->reject)
+        if (!entry->subpicture)
             continue;
         const int i_channel = entry->subpicture->i_channel;
         int i;
@@ -619,10 +616,6 @@ static void SpuSelectSubpictures(spu_t *spu,
         if (channel_count <= i)
             channel[channel_count++] = i_channel;
     }
-
-    /* Ensure a 1 pass garbage collection for rejected subpictures */
-    if(channel_count == 0)
-        channel[channel_count++] = VOUT_SPU_CHANNEL_INVALID;
 
     /* Fill up the subpicture_array arrays with relevant pictures */
     for (int i = 0; i < channel_count; i++) {
@@ -644,11 +637,8 @@ static void SpuSelectSubpictures(spu_t *spu,
             bool is_stop_valid;
             bool is_late;
 
-            if (!current || entry->reject) {
-                if (entry->reject)
-                    SpuHeapDeleteAt(&sys->heap, index);
+            if (!current)
                 continue;
-            }
 
             if (current->i_channel != channel[i] ||
                (ignore_osd && !current->b_subtitle))
@@ -1756,8 +1746,7 @@ void spu_ClearChannel(spu_t *spu, int channel)
             (channel != VOUT_SPU_CHANNEL_INVALID || subpic->i_channel == VOUT_SPU_CHANNEL_OSD))
             continue;
 
-        /* You cannot delete subpicture outside of SpuSelectSubpictures */
-        entry->reject = true;
+        SpuHeapDeleteAt(&sys->heap, i);
     }
 
     vlc_mutex_unlock(&sys->lock);
