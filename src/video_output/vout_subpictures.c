@@ -1012,13 +1012,12 @@ static void SpuRenderRegion(spu_t *spu,
         }
     }
 
-    subpicture_region_t *dst = *dst_ptr = subpicture_region_New(&region_fmt);
+    subpicture_region_t *dst = *dst_ptr = subpicture_region_NewInternal(&region_fmt);
     if (dst) {
         dst->i_x       = x_offset;
         dst->i_y       = y_offset;
         dst->i_align   = 0;
-        if (dst->p_picture)
-            picture_Release(dst->p_picture);
+        assert(!dst->p_picture);
         dst->p_picture = picture_Hold(region_picture);
         int fade_alpha = 255;
         if (subpic->b_fade) {
