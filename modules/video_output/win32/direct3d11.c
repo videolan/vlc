@@ -683,17 +683,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     if ( sys->setupDeviceCb == NULL || sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
-        /* use our internal swapchain callbacks */
-        sys->internal_swapchain.obj = VLC_OBJECT(vd);
-        sys->internal_swapchain.hd3d =  &sys->hd3d;
-        sys->outside_opaque = &sys->internal_swapchain;
-        sys->setupDeviceCb       = LocalSwapchainSetupDevice;
-        sys->cleanupDeviceCb     = LocalSwapchainCleanupDevice;
-        sys->updateOutputCb      = LocalSwapchainUpdateOutput;
-        sys->swapCb              = LocalSwapchainSwap;
-        sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
-        sys->selectPlaneCb       = LocalSwapchainSelectPlane;
-
 #if VLC_WINSTORE_APP
         /* LEGACY, the d3dcontext and swapchain were given by the host app */
         if (var_InheritInteger(vd, "winrt-d3dcontext") == 0)
@@ -707,6 +696,17 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
             goto error;
         sys->internal_swapchain.swapchainHwnd = sys->sys.hvideownd;
 #endif /* !VLC_WINSTORE_APP */
+
+        /* use our internal swapchain callbacks */
+        sys->internal_swapchain.obj = VLC_OBJECT(vd);
+        sys->internal_swapchain.hd3d =  &sys->hd3d;
+        sys->outside_opaque = &sys->internal_swapchain;
+        sys->setupDeviceCb       = LocalSwapchainSetupDevice;
+        sys->cleanupDeviceCb     = LocalSwapchainCleanupDevice;
+        sys->updateOutputCb      = LocalSwapchainUpdateOutput;
+        sys->swapCb              = LocalSwapchainSwap;
+        sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
+        sys->selectPlaneCb       = LocalSwapchainSelectPlane;
     }
 
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
