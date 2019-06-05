@@ -124,12 +124,11 @@ size_t CommonEncryptionSession::decrypt(void *inputdata, size_t inputbytes, bool
             /* last bytes */
             /* remove the PKCS#7 padding from the buffer */
             const uint8_t pad = reinterpret_cast<uint8_t *>(inputdata)[inputbytes - 1];
-            for(uint8_t i=0; i<pad && i<=16; i++)
+            for(uint8_t i=0; i<pad && i<16; i++)
             {
                 if(reinterpret_cast<uint8_t *>(inputdata)[inputbytes - i - 1] != pad)
                     break;
-
-                if(i==pad)
+                if(i+1==pad)
                     inputbytes -= pad;
             }
         }
