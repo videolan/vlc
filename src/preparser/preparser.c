@@ -128,13 +128,12 @@ static int PreparserOpenInput( void* preparser_, void* req_, void** out )
     atomic_init( &task->done, false );
 
     task->preparser = preparser_;
+    task->req = req;
+    task->preparse_status = -1;
     task->parser = input_item_Parse( req->item, preparser->owner, &cbs,
                                      task );
     if( !task->parser )
         goto error;
-
-    task->req = req;
-    task->preparse_status = -1;
 
     *out = task;
 
