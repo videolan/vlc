@@ -1748,6 +1748,9 @@ ConvertFromIEC61937( audio_output_t *p_aout, block_t *p_buffer )
     VLC_UNUSED( p_aout );
     uint8_t i_length_mul;
 
+    if( p_buffer->i_buffer < 6 )
+        return -1;
+
     switch( GetWBE( &p_buffer->p_buffer[4] ) & 0xFF )
     {
         case 0x01: /* IEC61937_AC3 */
@@ -1768,8 +1771,13 @@ ConvertFromIEC61937( audio_output_t *p_aout, block_t *p_buffer )
     uint16_t i_length = GetWBE( &p_buffer->p_buffer[6] );
     if( i_length == 0 )
         return -1;
+
+    i_length /= i_length_mul;
+    if( i_length > p_buffer->i_buffer - 8 )
+        return -1;
+
     p_buffer->p_buffer += 8; /* SPDIF_HEADER_SIZE */
-    p_buffer->i_buffer = i_length / i_length_mul;
+    p_buffer->i_buffer = i_length;
 
     return 0;
 }
