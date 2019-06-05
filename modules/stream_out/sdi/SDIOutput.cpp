@@ -94,7 +94,7 @@ AbstractStream *SDIOutput::Add(const es_format_t *fmt)
         if(videoStream)
         {
             videoStream->setOutputFormat(&video.configuredfmt);
-            videoStream->setCaptionsOutputBuffer(&captionsBuffer);
+            //videoStream->setCaptionsOutputBuffer(&captionsBuffer);
         }
     }
     else if(fmt->i_cat == AUDIO_ES && audio.i_channels)
