@@ -1920,7 +1920,7 @@ static bool Control( input_thread_t *p_input,
         {
             /* Get rate and direction */
             float rate = fabsf( param.val.f_float );
-            int i_rate_sign = rate < 0 ? -1 : 1;
+            int i_rate_sign = param.val.f_float < 0 ? -1 : 1;
 
             /* Check rate bound */
             if( rate > INPUT_RATE_MAX )
