@@ -28,8 +28,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-15 14:27+0200\n"
-"Last-Translator: Rui <xymarior@yandex.com>, 2019\n"
+"PO-Revision-Date: 2019-06-05 11:30+0200\n"
+"Last-Translator: Manuela Silva <manuelarodsilva@gmail.com>, 2019\n"
 "Language-Team: Portuguese (Portugal) (https://www.transifex.com/yaron/"
 "teams/16553/pt_PT/)\n"
 "Language: pt_PT\n"
@@ -1234,7 +1234,7 @@ msgstr "Retangular"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
-msgstr "Equiretangular"
+msgstr "Equidistante"
 
 #: src/input/es_out.c:3285
 msgid "Cubemap"
@@ -1661,11 +1661,12 @@ msgstr ""
 
 #: src/libvlc-module.c:129
 msgid "Media role"
-msgstr "Função multimédia"
+msgstr "Função de multimédia"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
-msgstr "Função do reprodutor para a política do sistema operativo."
+msgstr ""
+"Função de multimédia (reprodutor) para a política do sistema operativo."
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:267
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:407
@@ -2325,7 +2326,7 @@ msgstr ""
 
 #: src/libvlc-module.c:415
 msgid "Video snapshot height"
-msgstr "Altura da captura de ecrã"
+msgstr "Altura da captura de ecrã do vídeo"
 
 #: src/libvlc-module.c:417
 msgid ""
@@ -2455,7 +2456,7 @@ msgstr ""
 
 #: src/libvlc-module.c:473
 msgid "Drop late frames"
-msgstr "Descartar fotogramas atrasados"
+msgstr "Descartar fotogramas atrasadas"
 
 #: src/libvlc-module.c:475
 msgid ""
@@ -3110,7 +3111,7 @@ msgstr "Dispositivo VCD"
 
 #: src/libvlc-module.c:764 modules/access/cdda.c:701
 msgid "Audio CD device"
-msgstr "Dispositivo de CD áudio"
+msgstr "Dispositivo CD Áudio"
 
 #: src/libvlc-module.c:768
 msgid ""
@@ -3298,7 +3299,7 @@ msgstr "Palavra-passe do SOCKS"
 
 #: src/libvlc-module.c:868
 msgid "Password to be used for connection to the SOCKS proxy."
-msgstr "Palavra-passe a usar na ligação ao proxy SOCKS."
+msgstr "Palavra-passe para ser utilizada na ligação ao proxy SOCKS."
 
 #: src/libvlc-module.c:870
 msgid "Title metadata"
@@ -3361,7 +3362,7 @@ msgstr "Permite-lhe especificar os metadados da \"data\" para uma entrada."
 
 #: src/libvlc-module.c:898
 msgid "URL metadata"
-msgstr "Metadados do URL"
+msgstr "Metadados de URL"
 
 #: src/libvlc-module.c:900
 msgid "Allows you to specify a \"url\" metadata for an input."
@@ -3513,15 +3514,17 @@ msgstr "Lista dos empacotadores preferidos"
 msgid ""
 "This allows you to select the order in which VLC will choose its packetizers."
 msgstr ""
-"Permite que seja selecionada a ordem de escolha dos empacotadores do VLC."
+"Isto deixa-o selecionar a ordem em que o VLC irá escolher os seus "
+"empacotadores."
 
 #: src/libvlc-module.c:974
 msgid "Mux module"
-msgstr "Módulo de muxltiplexagem"
+msgstr "Módulo de multiplexagem"
 
 #: src/libvlc-module.c:976
 msgid "This is a legacy entry to let you configure mux modules"
-msgstr "Esta é uma entrada antiga que permite configurar módulos combinadores"
+msgstr ""
+"Esta é uma entrada antiga que o deixa configurar os módulos de multiplexagem"
 
 #: src/libvlc-module.c:978
 msgid "Access output module"
@@ -3530,7 +3533,7 @@ msgstr "Módulo de saída de acesso"
 #: src/libvlc-module.c:980
 msgid "This is a legacy entry to let you configure access output modules"
 msgstr ""
-"Esta é uma entrada antiga para o deixar configurar os módulos de saída de "
+"Isto é uma entrada antiga para o deixar configurar os módulos de saída de "
 "acesso"
 
 #: src/libvlc-module.c:983
@@ -3538,8 +3541,8 @@ msgid ""
 "If this option is enabled, the flow on the SAP multicast address will be "
 "controlled. This is needed if you want to make announcements on the MBone."
 msgstr ""
-"Se esta opção estiver ativada, será controlada a transmissão no endereço "
-"multiplexado SAP. Isto é necessário se quiser fazer anúncios no MBone."
+"Se esta opção estiver ativada, o fluxo no endereço multiplexado SAP será "
+"controlado. Isto é necessário se quiser efetuar anúncios no MBone."
 
 #: src/libvlc-module.c:987
 msgid "SAP announcement interval"
