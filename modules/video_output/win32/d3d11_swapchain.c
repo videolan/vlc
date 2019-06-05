@@ -46,13 +46,14 @@
 #endif
 
 #include "d3d11_swapchain.h"
+#include "d3d11_shaders.h"
 
 typedef enum video_color_axis {
     COLOR_AXIS_RGB,
     COLOR_AXIS_YCBCR,
 } video_color_axis;
 
-typedef struct dxgi_color_space {
+typedef struct {
     DXGI_COLOR_SPACE_TYPE   dxgi;
     const char              *name;
     video_color_axis        axis;
@@ -61,6 +62,26 @@ typedef struct dxgi_color_space {
     video_color_space_t     color;
     bool                    b_full_range;
 } dxgi_color_space;
+
+struct d3d11_local_swapchain
+{
+    vlc_object_t           *obj;
+    d3d11_handle_t         *hd3d;
+    d3d11_device_t         d3d_dev;
+
+    const d3d_format_t     *pixelFormat;
+    const dxgi_color_space *colorspace;
+
+#if !VLC_WINSTORE_APP
+    HWND                   swapchainHwnd;
+#endif /* !VLC_WINSTORE_APP */
+    IDXGISwapChain1        *dxgiswapChain;   /* DXGI 1.2 swap chain */
+    IDXGISwapChain4        *dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
+
+    ID3D11RenderTargetView *swapchainTargetView[D3D11_MAX_RENDER_TARGET];
+
+    bool                   logged_capabilities;
+};
 
 DEFINE_GUID(GUID_SWAPCHAIN_WIDTH,  0xf1b59347, 0x1643, 0x411a, 0xad, 0x6b, 0xc7, 0x80, 0x17, 0x7a, 0x06, 0xb6);
 DEFINE_GUID(GUID_SWAPCHAIN_HEIGHT, 0x6ea976a0, 0x9d60, 0x4bb7, 0xa5, 0xa9, 0x7d, 0xd1, 0x18, 0x7f, 0xc9, 0xbd);
@@ -538,4 +559,18 @@ bool LocalSwapchainSelectPlane( void *opaque, size_t plane )
     ID3D11DeviceContext_OMSetRenderTargets(display->d3d_dev.d3dcontext, 1,
                                             &display->swapchainTargetView[plane], NULL);
     return true;
+}
+
+void *CreateLocalSwapchainHandle(vlc_object_t *o, d3d11_handle_t *hd3d, HWND hwnd)
+{
+    struct d3d11_local_swapchain *display = vlc_obj_calloc(o, 1, sizeof(*display));
+    if (likely(display != NULL))
+    {
+        display->obj = o;
+        display->hd3d = hd3d;
+#if !VLC_WINSTORE_APP
+        display->swapchainHwnd = hwnd;
+#endif /* !VLC_WINSTORE_APP */
+    }
+    return display;
 }

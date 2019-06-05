@@ -46,11 +46,6 @@
 #define COBJMACROS
 #include <initguid.h>
 #include <d3d11.h>
-#ifdef HAVE_DXGI1_6_H
-# include <dxgi1_6.h>
-#else
-# include <dxgi1_5.h>
-#endif
 
 /* avoided until we can pass ISwapchainPanel without c++/cx mode
 # include <windows.ui.xaml.media.dxinterop.h> */
@@ -109,8 +104,6 @@ struct vout_display_sys_t
 
     picture_sys_t            stagingSys;
     picture_pool_t           *pool; /* hardware decoding pool */
-
-    struct d3d11_local_swapchain internal_swapchain; /* TODO do not access fields directly */
 
     d3d_vshader_t            projectionVShader;
     d3d_vshader_t            flatVShader;
@@ -347,13 +340,12 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
                        vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
             goto error;
-        sys->internal_swapchain.swapchainHwnd = sys->sys.hvideownd;
 #endif /* !VLC_WINSTORE_APP */
 
         /* use our internal swapchain callbacks */
-        sys->internal_swapchain.obj = VLC_OBJECT(vd);
-        sys->internal_swapchain.hd3d =  &sys->hd3d;
-        sys->outside_opaque = &sys->internal_swapchain;
+        sys->outside_opaque      = CreateLocalSwapchainHandle(VLC_OBJECT(vd), &sys->hd3d, sys->sys.hvideownd);
+        if (unlikely(sys->outside_opaque == NULL))
+            goto error;
         sys->setupDeviceCb       = LocalSwapchainSetupDevice;
         sys->cleanupDeviceCb     = LocalSwapchainCleanupDevice;
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;

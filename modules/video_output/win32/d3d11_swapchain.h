@@ -25,29 +25,9 @@
 #define VLC_D3D11_SWAPCHAIN_H
 
 #include <vlc_common.h>
-
 #include "../../video_chroma/d3d11_fmt.h"
-#include "d3d11_shaders.h"
 
-struct d3d11_local_swapchain
-{
-    vlc_object_t           *obj;
-    d3d11_handle_t         *hd3d;
-    d3d11_device_t         d3d_dev;
-
-    const d3d_format_t     *pixelFormat;
-    const struct dxgi_color_space *colorspace;
-
-#if !VLC_WINSTORE_APP
-    HWND                   swapchainHwnd;
-#endif /* !VLC_WINSTORE_APP */
-    IDXGISwapChain1        *dxgiswapChain;   /* DXGI 1.2 swap chain */
-    IDXGISwapChain4        *dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
-
-    ID3D11RenderTargetView *swapchainTargetView[D3D11_MAX_RENDER_TARGET];
-
-    bool                   logged_capabilities;
-};
+void *CreateLocalSwapchainHandle(vlc_object_t *, d3d11_handle_t *, HWND);
 
 bool LocalSwapchainSetupDevice( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out );
 void LocalSwapchainCleanupDevice( void *opaque );
