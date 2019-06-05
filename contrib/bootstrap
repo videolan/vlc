@@ -405,10 +405,10 @@ esac
 #
 # Results output
 #
-echo TOPSRC = .. >> Makefile
-echo TOPSRC_BUILT = ../.. >> Makefile
-echo TOPDST = .. >> Makefile
-echo include $\(TOPSRC\)/src/main.mak >> Makefile
+add_make "TOPSRC = .."
+add_make "TOPSRC_BUILT = ../.."
+add_make "TOPDST = .."
+add_make 'include $(TOPSRC)/src/main.mak'
 echo "Bootstrap completed."
 make help
 mkdir -p ../../contrib/tarballs || exit $?
