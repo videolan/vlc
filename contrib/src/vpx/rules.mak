@@ -161,7 +161,7 @@ VPX_CONF += --enable-debug --disable-optimizations
 endif
 
 .vpx: libvpx
-	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) ./configure --target=$(VPX_TARGET) \
+	cd $< && $(HOSTVARS) LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) ./configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
 	cd $< && $(MAKE)
 	cd $< && ../../../contrib/src/pkg-static.sh vpx.pc
