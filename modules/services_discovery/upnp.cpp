@@ -72,7 +72,7 @@ const char* SATIP_SERVER_DEVICE_TYPE = "urn:ses-com:device:SatIPServer:1";
 #define URL_LONGTEXT N_("The Url used to get the xml descriptor of the UPnP Renderer")
 
 static const char *const ppsz_satip_channel_lists[] = {
-    "Auto", "ASTRA_19_2E", "ASTRA_28_2E", "ASTRA_23_5E", "MasterList", "ServerList", "CustomList"
+    "auto", "ASTRA_19_2E", "ASTRA_28_2E", "ASTRA_23_5E", "MasterList", "ServerList", "CustomList"
 };
 static const char *const ppsz_readible_satip_channel_lists[] = {
     N_("Auto"), "Astra 19.2°E", "Astra 28.2°E", "Astra 23.5°E", N_("SAT>IP Main List"), N_("Device List"), N_("Custom List")
@@ -651,7 +651,8 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
     /* In Auto mode, default to MasterList list from satip.info */
     bool automode = false;
     if( !psz_satip_channellist || /* On lookup failure or empty string, use auto mode */
-        strcmp(psz_satip_channellist, "Auto") == 0 )
+        strcmp(psz_satip_channellist, "auto") == 0 ||
+        strcmp(psz_satip_channellist, "Auto") == 0 ) /* for backwards compatibility */
     {
         automode = true;
         if( psz_satip_channellist )
