@@ -24,7 +24,6 @@
 #define VLC_D3D11_SHADERS_H
 
 #include "../../video_chroma/d3d11_fmt.h"
-#include <dxgi1_4.h>
 
 #define DEFAULT_BRIGHTNESS         100
 #define DEFAULT_SRGB_BRIGHTNESS    100
