@@ -43,9 +43,9 @@ npapi-vlc/Makefile: npapi-vlc/configure
 		PKG_CONFIG_PATH="$(libdir)/pkgconfig:$(CONTRIB_DIR)/lib/pkgconfig"
 	touch $@
 
-npapi-vlc/npapi/npvlc.la: npapi-vlc/Makefile
+npapi-vlc/activex/axvlc.la: npapi-vlc/Makefile
 	$(MAKE) -C npapi-vlc
 
-install-npapi: npapi-vlc/npapi/npvlc.la
+install-npapi: npapi-vlc/activex/axvlc.la
 	$(MAKE) -C npapi-vlc \
 		DESTDIR="$(abs_builddir)/npapi-vlc/installed" install
