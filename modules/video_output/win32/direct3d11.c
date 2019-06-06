@@ -846,6 +846,12 @@ static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i
     return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, false, 0, 0, 0, false, supportFlags );
 }
 
+static void WindowResize(void *opaque, unsigned width, unsigned height)
+{
+    vout_window_t *window = opaque;
+    vout_window_ReportSize(window, width, height);
+}
+
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -854,8 +860,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
     libvlc_video_direct3d_device_cfg_t cfg = {
         .hardware_decoding = is_d3d11_opaque( vd->source.i_chroma ),
         /* bypass the size handling as the window doesn't handle the size */
-        .report_size_change = vd->cfg->window->ops->resize ? NULL: vout_window_ReportSize,
-        .report_opaque     = vd->cfg->window->ops->resize ? NULL: vd->cfg->window,
+        .report_size_change = vd->cfg->window->ops->resize ? NULL: WindowResize,
+        .report_opaque      = vd->cfg->window->ops->resize ? NULL: vd->cfg->window,
     };
     libvlc_video_direct3d_device_setup_t out;
     ID3D11DeviceContext *d3d11_ctx = NULL;
