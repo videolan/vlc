@@ -67,7 +67,7 @@ typedef struct
     D3DCAPS9                caps;
 } d3d9_device_t;
 
-static inline void AcquirePictureSys(picture_sys_t *p_sys)
+static inline void AcquireD3D9PictureSys(picture_sys_t *p_sys)
 {
     IDirect3DSurface9_AddRef(p_sys->surface);
     if (p_sys->decoder)
@@ -75,7 +75,7 @@ static inline void AcquirePictureSys(picture_sys_t *p_sys)
     p_sys->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
 }
 
-static inline void ReleasePictureSys(picture_sys_t *p_sys)
+static inline void ReleaseD3D9PictureSys(picture_sys_t *p_sys)
 {
     IDirect3DSurface9_Release(p_sys->surface);
     if (p_sys->decoder)

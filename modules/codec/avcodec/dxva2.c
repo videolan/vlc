@@ -171,7 +171,7 @@ static void d3d9_pic_context_destroy(struct picture_context_t *opaque)
     struct va_pic_context *pic_ctx = (struct va_pic_context*)opaque;
     if (pic_ctx->va_surface)
     {
-        ReleasePictureSys(&pic_ctx->picsys);
+        ReleaseD3D9PictureSys(&pic_ctx->picsys);
         va_surface_Release(pic_ctx->va_surface);
         free(pic_ctx);
     }
@@ -199,7 +199,7 @@ static struct va_pic_context *CreatePicContext(IDirect3DSurface9 *surface, IDire
     pic_ctx->s.copy    = d3d9_pic_context_copy;
     pic_ctx->picsys.surface = surface;
     pic_ctx->picsys.decoder = decoder;
-    AcquirePictureSys(&pic_ctx->picsys);
+    AcquireD3D9PictureSys(&pic_ctx->picsys);
     return pic_ctx;
 }
 
@@ -212,7 +212,7 @@ static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_ind
     /* all the resources are acquired during surfaces init, and a second time in
      * CreatePicContext(), undo one of them otherwise we need an extra release
      * when the pool is emptied */
-    ReleasePictureSys(&pic_ctx->picsys);
+    ReleaseD3D9PictureSys(&pic_ctx->picsys);
     return pic_ctx;
 }
 

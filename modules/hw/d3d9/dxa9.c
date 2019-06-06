@@ -174,7 +174,7 @@ static void DXA9_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 static void DestroyPicture(picture_t *picture)
 {
     picture_sys_t *p_sys = picture->p_sys;
-    ReleasePictureSys( p_sys );
+    ReleaseD3D9PictureSys( p_sys );
     free(p_sys);
 }
 
@@ -233,7 +233,7 @@ struct d3d_pic_context
 static void d3d9_pic_context_destroy(struct picture_context_t *ctx)
 {
     struct va_pic_context *pic_ctx = (struct va_pic_context*)ctx;
-    ReleasePictureSys(&pic_ctx->picsys);
+    ReleaseD3D9PictureSys(&pic_ctx->picsys);
     free(pic_ctx);
 }
 
@@ -246,7 +246,7 @@ static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t 
     pic_ctx->s.destroy = d3d9_pic_context_destroy;
     pic_ctx->s.copy    = d3d9_pic_context_copy;
     pic_ctx->picsys = src_ctx->picsys;
-    AcquirePictureSys(&pic_ctx->picsys);
+    AcquireD3D9PictureSys(&pic_ctx->picsys);
     return &pic_ctx->s;
 }
 
@@ -288,7 +288,7 @@ static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
             pic_ctx->s.destroy = d3d9_pic_context_destroy;
             pic_ctx->s.copy    = d3d9_pic_context_copy;
             pic_ctx->picsys = *p_sys;
-            AcquirePictureSys(&pic_ctx->picsys);
+            AcquireD3D9PictureSys(&pic_ctx->picsys);
             dst->context = &pic_ctx->s;
         }
     }

@@ -225,7 +225,7 @@ static HINSTANCE Direct3D9LoadShaderLibrary(void)
 
 static void DestroyPicture(picture_t *picture)
 {
-    ReleasePictureSys(picture->p_sys);
+    ReleaseD3D9PictureSys(picture->p_sys);
 
     free(picture->p_sys);
 }
