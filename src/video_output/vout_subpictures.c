@@ -54,13 +54,13 @@
 
 /* Hold of subpicture with converted ts */
 typedef struct {
-    subpicture_t *subpicture;
-    vlc_tick_t       start;
-    vlc_tick_t       stop;
+    subpicture_t *subpic;
+    vlc_tick_t start;
+    vlc_tick_t stop;
 } spu_render_entry_t;
 
 struct spu_channel {
-    subpicture_t *entries[VOUT_MAX_SUBPICTURES];
+    spu_render_entry_t entries[VOUT_MAX_SUBPICTURES];
     size_t id;
     vlc_clock_t *clock;
     vlc_tick_t delay;
@@ -113,17 +113,17 @@ static void spu_channel_Init(struct spu_channel *channel, size_t id,
     channel->rate = 1.f;
 
     for (size_t i = 0; i < VOUT_MAX_SUBPICTURES; i++)
-        channel->entries[i] = NULL;
+        channel->entries[i].subpic = NULL;
 }
 
 static int spu_channel_Push(struct spu_channel *channel, subpicture_t *subpic)
 {
     for (size_t i = 0; i < VOUT_MAX_SUBPICTURES; i++)
     {
-        if (channel->entries[i])
+        if (channel->entries[i].subpic)
             continue;
 
-        channel->entries[i] = subpic;
+        channel->entries[i].subpic = subpic;
         return VLC_SUCCESS;
     }
     return VLC_EGENERIC;
@@ -131,10 +131,10 @@ static int spu_channel_Push(struct spu_channel *channel, subpicture_t *subpic)
 
 static void spu_channel_DeleteAt(struct spu_channel *channel, size_t index)
 {
-    if (channel->entries[index])
+    if (channel->entries[index].subpic)
     {
-        subpicture_Delete(channel->entries[index]);
-        channel->entries[index] = NULL;
+        subpicture_Delete(channel->entries[index].subpic);
+        channel->entries[index].subpic = NULL;
     }
 }
 
@@ -143,7 +143,7 @@ static int spu_channel_DeleteSubpicture(struct spu_channel *channel,
 {
     for (int i = 0; i < VOUT_MAX_SUBPICTURES; i++)
     {
-        if (channel->entries[i] != subpic)
+        if (channel->entries[i].subpic != subpic)
             continue;
 
         spu_channel_DeleteAt(channel, i);
@@ -155,8 +155,8 @@ static int spu_channel_DeleteSubpicture(struct spu_channel *channel,
 static void spu_channel_Clean(struct spu_channel *channel)
 {
     for (int i = 0; i < VOUT_MAX_SUBPICTURES; i++)
-        if (channel->entries[i])
-            subpicture_Delete(channel->entries[i]);
+        if (channel->entries[i].subpic)
+            subpicture_Delete(channel->entries[i].subpic);
 }
 
 static struct spu_channel *spu_GetChannel(spu_t *spu, size_t channel_id)
@@ -554,8 +554,8 @@ static int SpuRenderCmp(const void *s0, const void *s1)
 {
     const spu_render_entry_t *render_entry0 = s0;
     const spu_render_entry_t *render_entry1 = s1;
-    subpicture_t *subpic0 = render_entry0->subpicture;
-    subpicture_t *subpic1 = render_entry1->subpicture;
+    subpicture_t *subpic0 = render_entry0->subpic;
+    subpicture_t *subpic1 = render_entry1->subpic;
     int r;
 
     r = IntegerCmp(!subpic0->b_absolute, !subpic1->b_absolute);
@@ -578,7 +578,7 @@ static int spu_channel_ConvertDates(struct spu_channel *channel,
     size_t entry_count = 0;
     for (size_t index = 0; index < VOUT_MAX_SUBPICTURES; index++)
     {
-        subpicture_t *current = channel->entries[index];
+        subpicture_t *current = channel->entries[index].subpic;
 
         if (!current)
             continue;
@@ -600,13 +600,13 @@ static int spu_channel_ConvertDates(struct spu_channel *channel,
     for (size_t index = 0; index < VOUT_MAX_SUBPICTURES; index++)
     {
         spu_render_entry_t *render_entry = &render_entries[index];
-        subpicture_t *current = channel->entries[index];
+        subpicture_t *current = channel->entries[index].subpic;
 
         if (!current)
-            render_entry->subpicture = NULL;
+            render_entry->subpic = NULL;
         else
         {
-            render_entry->subpicture = current;
+            render_entry->subpic = current;
             render_entry->start = date_array[entry_count * 2];
             render_entry->stop = date_array[entry_count * 2 + 1];
             entry_count++;
@@ -663,7 +663,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
         /* Select available pictures */
         for (int index = 0; index < VOUT_MAX_SUBPICTURES; index++) {
             spu_render_entry_t *render_entry = &render_entries[index];
-            subpicture_t *current = channel->entries[index];
+            subpicture_t *current = channel->entries[index].subpic;
             bool is_stop_valid;
             bool is_late;
 
@@ -714,7 +714,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
         /* Select pictures to be displayed */
         for (size_t index = 0; index < available_count; index++) {
             spu_render_entry_t *render_entry = &available_entries[index];
-            subpicture_t *current = render_entry->subpicture;
+            subpicture_t *current = render_entry->subpic;
             bool is_late = is_available_late[index];
 
             const vlc_tick_t stop_date = current->b_subtitle ? __MAX(start_date, sys->last_sort_date) : system_now;
@@ -756,7 +756,7 @@ static void SpuRenderRegion(spu_t *spu,
                             const spu_area_t *subtitle_area, int subtitle_area_count,
                             vlc_tick_t render_date)
 {
-    subpicture_t *subpic = entry->subpicture;
+    subpicture_t *subpic = entry->subpic;
     spu_private_t *sys = spu->p;
 
     video_format_t fmt_original = region->fmt;
@@ -1110,7 +1110,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
     unsigned int subtitle_region_count = 0;
     unsigned int region_count          = 0;
     for (unsigned i = 0; i < i_subpicture; i++) {
-        const subpicture_t *subpic = p_entries[i].subpicture;
+        const subpicture_t *subpic = p_entries[i].subpic;
 
         unsigned count = 0;
         for (subpicture_region_t *r = subpic->p_region; r != NULL; r = r->p_next)
@@ -1127,7 +1127,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
     subpicture_t *output = subpicture_New(NULL);
     if (!output)
         return NULL;
-    output->i_order = p_entries[i_subpicture - 1].subpicture->i_order;
+    output->i_order = p_entries[i_subpicture - 1].subpic->i_order;
     output->i_original_picture_width  = fmt_dst->i_visible_width;
     output->i_original_picture_height = fmt_dst->i_visible_height;
     subpicture_region_t **output_last_ptr = &output->p_region;
@@ -1145,7 +1145,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
     /* Process all subpictures and regions (in the right order) */
     for (size_t index = 0; index < i_subpicture; index++) {
         const spu_render_entry_t *entry = &p_entries[index];
-        subpicture_t *subpic = entry->subpicture;
+        subpicture_t *subpic = entry->subpic;
         subpicture_region_t *region;
 
         if (!subpic->p_region)
@@ -1714,7 +1714,7 @@ subpicture_t *spu_Render(spu_t *spu,
     /* Updates the subpictures */
     for (size_t i = 0; i < subpicture_count; i++) {
         spu_render_entry_t *entry = &subpicture_array[i];
-        subpicture_t *subpic = entry->subpicture;
+        subpicture_t *subpic = entry->subpic;
         if (!subpic->updater.pf_validate)
             continue;
 
