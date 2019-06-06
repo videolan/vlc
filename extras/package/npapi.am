@@ -8,10 +8,10 @@ fetch-npapi:
 	if test -d npapi-vlc; then \
 		cd npapi-vlc && \
 		git fetch origin && \
-		git reset --hard origin/master; \
+		git reset --hard origin/3.0.x; \
 		git submodule update; \
 	else \
-		git clone https://code.videolan.org/videolan/npapi-vlc.git npapi-vlc && \
+		git clone -b 3.0.x --single-branch https://code.videolan.org/videolan/npapi-vlc.git npapi-vlc && \
 		cd npapi-vlc && \
 		git submodule update --init; \
 	fi
