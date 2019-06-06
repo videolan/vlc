@@ -141,7 +141,7 @@ static void spu_channel_DeleteAt(struct spu_channel *channel, size_t index)
 static int spu_channel_DeleteSubpicture(struct spu_channel *channel,
                                         subpicture_t *subpic)
 {
-    for (int i = 0; i < VOUT_MAX_SUBPICTURES; i++)
+    for (size_t i = 0; i < VOUT_MAX_SUBPICTURES; i++)
     {
         if (channel->entries[i].subpic != subpic)
             continue;
@@ -154,7 +154,7 @@ static int spu_channel_DeleteSubpicture(struct spu_channel *channel,
 
 static void spu_channel_Clean(struct spu_channel *channel)
 {
-    for (int i = 0; i < VOUT_MAX_SUBPICTURES; i++)
+    for (size_t i = 0; i < VOUT_MAX_SUBPICTURES; i++)
         if (channel->entries[i].subpic)
             subpicture_Delete(channel->entries[i].subpic);
 }
@@ -437,7 +437,7 @@ static bool spu_area_overlap(spu_area_t a, spu_area_t b)
  * Avoid area overlapping
  */
 static void SpuAreaFixOverlap(spu_area_t *dst,
-                              const spu_area_t *sub_array, int sub_count, int align)
+                              const spu_area_t *sub_array, size_t sub_count, int align)
 {
     spu_area_t a = spu_area_scaled(*dst);
     bool is_moved = false;
@@ -447,7 +447,7 @@ static void SpuAreaFixOverlap(spu_area_t *dst,
      * XXX It is not fast O(n^2) but we should not have a lot of region */
     do {
         is_ok = true;
-        for (int i = 0; i < sub_count; i++) {
+        for (size_t i = 0; i < sub_count; i++) {
             spu_area_t sub = spu_area_scaled(sub_array[i]);
 
             if (!spu_area_overlap(a, sub))
@@ -568,8 +568,8 @@ static int SpuRenderCmp(const void *s0, const void *s1)
     return r;
 }
 
-static int spu_channel_ConvertDates(struct spu_channel *channel,
-                                    vlc_tick_t system_now)
+static size_t spu_channel_ConvertDates(struct spu_channel *channel,
+                                       vlc_tick_t system_now)
 {
     /* Put every spu start and stop ts into the same array to convert them in
      * one shot */
@@ -660,7 +660,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             continue;
 
         /* Select available pictures */
-        for (int index = 0; index < VOUT_MAX_SUBPICTURES; index++) {
+        for (size_t index = 0; index < VOUT_MAX_SUBPICTURES; index++) {
             spu_render_entry_t *render_entry = &render_entries[index];
             subpicture_t *current = channel->entries[index].subpic;
             bool is_stop_valid;
@@ -752,7 +752,7 @@ static void SpuRenderRegion(spu_t *spu,
                             const spu_scale_t scale_size,
                             const vlc_fourcc_t *chroma_list,
                             const video_format_t *fmt,
-                            const spu_area_t *subtitle_area, int subtitle_area_count,
+                            const spu_area_t *subtitle_area, size_t subtitle_area_count,
                             vlc_tick_t render_date)
 {
     subpicture_t *subpic = entry->subpic;
@@ -1134,9 +1134,8 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
     /* Allocate area array for subtitle overlap */
     spu_area_t subtitle_area_buffer[VOUT_MAX_SUBPICTURES];
     spu_area_t *subtitle_area;
-    int subtitle_area_count;
+    size_t subtitle_area_count = 0;
 
-    subtitle_area_count = 0;
     subtitle_area = subtitle_area_buffer;
     if (subtitle_region_count > sizeof(subtitle_area_buffer)/sizeof(*subtitle_area_buffer))
         subtitle_area = calloc(subtitle_region_count, sizeof(*subtitle_area));
