@@ -329,9 +329,14 @@ HOSTVARS_PIC := $(HOSTTOOLS) \
 	CXXFLAGS="$(CXXFLAGS) $(PIC)" \
 	LDFLAGS="$(LDFLAGS)"
 
-# Keep a version of HOSTVARS without the tools, since meson requires the
-# tools variables to point to the native ones
-HOSTVARS_MESON := $(HOSTVARS)
+# For cross-compilation with meson, do not set compiler and flags
+# in HOSTVARS as meson will always use them for the BUILD machine compiler!
+ifdef HAVE_CROSS_COMPILE
+HOSTVARS_MESON := PATH="$(PREFIX)/bin:$(PATH)"
+else
+HOSTVARS_MESON := $(HOSTTOOLS) $(HOSTVARS)
+endif
+
 HOSTVARS := $(HOSTTOOLS) $(HOSTVARS)
 
 download_git = \
