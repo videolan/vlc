@@ -51,7 +51,7 @@
 # include <windows.ui.xaml.media.dxinterop.h> */
 
 #include "../../video_chroma/d3d11_fmt.h"
-typedef picture_sys_t VA_PICSYS;
+typedef picture_sys_d3d11_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 #include "d3d11_quad.h"
@@ -105,7 +105,7 @@ struct vout_display_sys_t
 
     ID3D11Query              *prepareWait;
 
-    picture_sys_t            stagingSys;
+    picture_sys_d3d11_t      stagingSys;
     picture_pool_t           *pool; /* hardware decoding pool */
 
     d3d_vshader_t            projectionVShader;
@@ -433,7 +433,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         goto error;
 
     for (picture_count = 0; picture_count < pool_size; picture_count++) {
-        picture_sys_t *picsys = calloc(1, sizeof(*picsys));
+        picture_sys_d3d11_t *picsys = calloc(1, sizeof(*picsys));
         if (unlikely(picsys == NULL))
             goto error;
 
@@ -465,7 +465,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 #endif
     {
         for (picture_count = 0; picture_count < pool_size; picture_count++) {
-            picture_sys_t *p_sys = pictures[picture_count]->p_sys;
+            picture_sys_d3d11_t *p_sys = pictures[picture_count]->p_sys;
             if (!p_sys->texture[0])
                 continue;
             if (D3D11_AllocateResourceView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.textureFormat,
@@ -497,7 +497,7 @@ error:
 
 static void DestroyDisplayPoolPicture(picture_t *picture)
 {
-    picture_sys_t *p_sys = picture->p_sys;
+    picture_sys_d3d11_t *p_sys = picture->p_sys;
     ReleaseD3D11PictureSys( p_sys );
     free(p_sys);
 }
@@ -667,7 +667,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     }
     else
     {
-        picture_sys_t *p_sys = ActivePictureSys(picture);
+        picture_sys_d3d11_t *p_sys = ActivePictureSys(picture);
 
         d3d11_device_lock( &sys->d3d_dev );
 
@@ -731,7 +731,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader)
         renderSrc = sys->stagingSys.renderSrc;
     else {
-        picture_sys_t *p_sys = ActivePictureSys(picture);
+        picture_sys_d3d11_t *p_sys = ActivePictureSys(picture);
         renderSrc = p_sys->renderSrc;
     }
     D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad,
@@ -1430,7 +1430,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
             picture_resource_t picres = {
-                .p_sys      = (picture_sys_t *) d3dquad,
+                .p_sys      = (picture_sys_d3d11_t *) d3dquad,
                 .pf_destroy = DestroyPictureQuad,
             };
             (*region)[i] = picture_NewFromResource(&r->p_picture->format, &picres);

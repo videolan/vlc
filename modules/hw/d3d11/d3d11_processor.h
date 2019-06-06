@@ -44,7 +44,7 @@ int D3D11_CreateProcessor(vlc_object_t *, d3d11_device_t *,
 
 void D3D11_ReleaseProcessor(d3d11_processor_t *);
 
-HRESULT D3D11_Assert_ProcessorInput(vlc_object_t *, d3d11_processor_t *, picture_sys_t *);
+HRESULT D3D11_Assert_ProcessorInput(vlc_object_t *, d3d11_processor_t *, picture_sys_d3d11_t *);
 #define D3D11_Assert_ProcessorInput(a,b,c) D3D11_Assert_ProcessorInput(VLC_OBJECT(a),b,c)
 #endif
 

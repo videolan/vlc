@@ -45,7 +45,7 @@
 #include "d3d11_processor.h"
 #include "../../video_chroma/d3d11_fmt.h"
 
-typedef picture_sys_t VA_PICSYS;
+typedef picture_sys_d3d11_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 #ifdef ID3D11VideoContext_VideoProcessorBlt
@@ -153,7 +153,7 @@ static HRESULT can_map(filter_sys_t *sys, ID3D11DeviceContext *context)
     return hr;
 }
 
-static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
+static int assert_staging(filter_t *p_filter, picture_sys_d3d11_t *p_sys)
 {
     filter_sys_t *sys = p_filter->p_sys;
     HRESULT hr;
@@ -238,7 +238,7 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 
     filter_sys_t *sys = p_filter->p_sys;
-    picture_sys_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
+    picture_sys_d3d11_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
 
     D3D11_TEXTURE2D_DESC desc;
     D3D11_MAPPED_SUBRESOURCE lock;
@@ -367,7 +367,7 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 
     filter_sys_t *sys = p_filter->p_sys;
-    picture_sys_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
+    picture_sys_d3d11_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
 
     D3D11_TEXTURE2D_DESC desc;
     D3D11_MAPPED_SUBRESOURCE lock;
@@ -457,7 +457,7 @@ static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = p_filter->p_sys;
     assert(src->context != NULL);
-    picture_sys_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
+    picture_sys_d3d11_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
 
     D3D11_TEXTURE2D_DESC desc;
     D3D11_MAPPED_SUBRESOURCE lock;
@@ -499,7 +499,7 @@ static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
 
 static void DestroyPicture(picture_t *picture)
 {
-    picture_sys_t *p_sys = picture->p_sys;
+    picture_sys_d3d11_t *p_sys = picture->p_sys;
     ReleaseD3D11PictureSys( p_sys );
     free(p_sys);
 }
@@ -574,7 +574,7 @@ static struct picture_context_t *d3d11_pic_context_copy(struct picture_context_t
 static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = p_filter->p_sys;
-    picture_sys_t *p_sys = dst->p_sys;
+    picture_sys_d3d11_t *p_sys = dst->p_sys;
     if (unlikely(p_sys==NULL))
     {
         /* the output filter configuration may have changed since the filter
@@ -582,7 +582,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         return;
     }
 
-    picture_sys_t *p_staging_sys = sys->staging_pic->p_sys;
+    picture_sys_d3d11_t *p_staging_sys = sys->staging_pic->p_sys;
 
     D3D11_TEXTURE2D_DESC texDesc;
     ID3D11Texture2D_GetDesc( p_staging_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
@@ -748,7 +748,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
 
     picture_resource_t res;
     res.pf_destroy = DestroyPicture;
-    picture_sys_t *res_sys = calloc(1, sizeof(picture_sys_t));
+    picture_sys_d3d11_t *res_sys = calloc(1, sizeof(picture_sys_d3d11_t));
     if (res_sys == NULL) {
         err = VLC_ENOMEM;
         goto done;
@@ -767,7 +767,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
         msg_Err(p_filter, "Failed to map create the temporary picture.");
         goto done;
     }
-    picture_sys_t *p_dst_sys = p_dst->p_sys;
+    picture_sys_d3d11_t *p_dst_sys = p_dst->p_sys;
     picture_Setup(p_dst, &p_dst->format);
 
     texDesc.MipLevels = 1;

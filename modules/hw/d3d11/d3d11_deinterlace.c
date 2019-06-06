@@ -39,7 +39,7 @@
 #include "../../video_chroma/d3d11_fmt.h"
 #include "../../video_filter/deinterlace/common.h"
 
-typedef picture_sys_t VA_PICSYS;
+typedef picture_sys_d3d11_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 typedef struct
@@ -88,7 +88,7 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     VLC_UNUSED(order);
     HRESULT hr;
     filter_sys_t *p_sys = p_filter->p_sys;
-    picture_sys_t *p_out_sys = p_outpic->p_sys;
+    picture_sys_d3d11_t *p_out_sys = p_outpic->p_sys;
 
     picture_t *p_prev = p_sys->context.pp_history[0];
     picture_t *p_cur  = p_sys->context.pp_history[1];
@@ -108,17 +108,17 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
 
     if( p_cur && p_next )
     {
-        picture_sys_t *picsys_next = ActivePictureSys(p_next);
+        picture_sys_d3d11_t *picsys_next = ActivePictureSys(p_next);
         if ( unlikely(!picsys_next) || FAILED(D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, picsys_next) ))
             return VLC_EGENERIC;
 
-        picture_sys_t *picsys_cur = ActivePictureSys(p_cur);
+        picture_sys_d3d11_t *picsys_cur = ActivePictureSys(p_cur);
         if ( unlikely(!picsys_cur) || FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, picsys_cur) ))
             return VLC_EGENERIC;
 
         if ( p_prev )
         {
-            picture_sys_t *picsys_prev = ActivePictureSys(p_prev);
+            picture_sys_d3d11_t *picsys_prev = ActivePictureSys(p_prev);
             if ( unlikely(!picsys_prev) || FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, picsys_prev) ))
                 return VLC_EGENERIC;
 
@@ -139,7 +139,7 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     }
     else
     {
-        picture_sys_t *p_sys_src = ActivePictureSys(p_pic);
+        picture_sys_d3d11_t *p_sys_src = ActivePictureSys(p_pic);
         if ( unlikely(!p_sys_src) || FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, p_sys_src) ))
             return VLC_EGENERIC;
 
@@ -235,7 +235,7 @@ picture_t *AllocPicture( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     picture_t *pic = filter_NewPicture( p_filter );
-    picture_sys_t *pic_sys = pic->p_sys;
+    picture_sys_d3d11_t *pic_sys = pic->p_sys;
     if ( !pic->context )
     {
         bool b_local_texture = false;

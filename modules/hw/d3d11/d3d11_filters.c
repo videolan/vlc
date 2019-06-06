@@ -41,7 +41,7 @@
 #include "d3d11_processor.h"
 #include "../../video_chroma/d3d11_fmt.h"
 
-typedef picture_sys_t VA_PICSYS;
+typedef picture_sys_d3d11_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 #ifdef __MINGW32__
@@ -196,7 +196,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    picture_sys_t *p_src_sys = ActivePictureSys(p_pic);
+    picture_sys_d3d11_t *p_src_sys = ActivePictureSys(p_pic);
     if (FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, p_src_sys) ))
     {
         picture_Release( p_pic );
@@ -209,7 +209,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
         picture_Release( p_pic );
         return NULL;
     }
-    picture_sys_t *p_out_sys = p_outpic->p_sys;
+    picture_sys_d3d11_t *p_out_sys = p_outpic->p_sys;
     if (unlikely(!p_out_sys))
     {
         /* the output filter configuration may have changed since the filter

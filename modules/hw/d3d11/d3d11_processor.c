@@ -145,7 +145,7 @@ void D3D11_ReleaseProcessor(d3d11_processor_t *out)
 }
 
 #undef D3D11_Assert_ProcessorInput
-HRESULT D3D11_Assert_ProcessorInput(vlc_object_t *o, d3d11_processor_t *d3d_proc, picture_sys_t *p_sys)
+HRESULT D3D11_Assert_ProcessorInput(vlc_object_t *o, d3d11_processor_t *d3d_proc, picture_sys_d3d11_t *p_sys)
 {
     if (p_sys->processorInput)
         return S_OK;

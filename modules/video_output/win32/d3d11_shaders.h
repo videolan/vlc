@@ -73,7 +73,7 @@ typedef struct {
 /* A Quad is texture that can be displayed in a rectangle */
 typedef struct
 {
-    picture_sys_t             picSys;
+    picture_sys_d3d11_t       picSys;
     const d3d_format_t        *textureFormat;
     UINT                      resourceCount;
     ID3D11Buffer              *pVertexBuffer;

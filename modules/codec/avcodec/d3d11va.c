@@ -50,7 +50,7 @@
 
 #include "../../video_chroma/d3d11_fmt.h"
 
-typedef picture_sys_t VA_PICSYS;
+typedef picture_sys_d3d11_t VA_PICSYS;
 #include "va_surface.h"
 
 #define D3D_DecoderType     ID3D11VideoDecoder
@@ -59,7 +59,7 @@ typedef picture_sys_t VA_PICSYS;
 #include "directx_va.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
-                const es_format_t *, picture_sys_t *p_sys);
+                const es_format_t *, picture_sys_d3d11_t *p_sys);
 static void Close(vlc_va_t *, void **);
 
 vlc_module_begin()
@@ -251,11 +251,11 @@ static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_ind
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
-    picture_sys_t *p_sys = pic->p_sys;
+    picture_sys_d3d11_t *p_sys = pic->p_sys;
 #if D3D11_DIRECT_DECODE
     if (va->sys->dx_sys.can_extern_pool)
     {
-        /* copy the original picture_sys_t in the va_pic_context */
+        /* copy the original picture_sys_d3d11_t in the va_pic_context */
         if (!pic->context)
         {
             assert(p_sys!=NULL);
@@ -311,7 +311,7 @@ static void Close(vlc_va_t *va, void **ctx)
 }
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
-                const es_format_t *fmt, picture_sys_t *p_sys)
+                const es_format_t *fmt, picture_sys_d3d11_t *p_sys)
 {
     int err = VLC_EGENERIC;
     directx_sys_t *dx_sys;
@@ -786,7 +786,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
             }
 
             D3D11_TEXTURE2D_DESC texDesc;
-            picture_sys_t * p_sys = pic->p_sys;
+            picture_sys_d3d11_t * p_sys = pic->p_sys;
             ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
             assert(texDesc.Format == sys->render);
             assert(texDesc.BindFlags & D3D11_BIND_DECODER);
@@ -828,7 +828,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
                 }
                 if (sys->extern_pics[i])
                 {
-                    picture_sys_t *p_sys = sys->extern_pics[i]->p_sys;
+                    picture_sys_d3d11_t *p_sys = sys->extern_pics[i]->p_sys;
                     p_sys->decoder = NULL;
                     picture_Release(sys->extern_pics[i]);
                     sys->extern_pics[i] = NULL;
