@@ -57,6 +57,7 @@ typedef struct {
     subpicture_t *subpic;
     vlc_tick_t start;
     vlc_tick_t stop;
+    bool is_late;
 } spu_render_entry_t;
 
 struct spu_channel {
@@ -647,7 +648,6 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
         struct spu_channel *channel = &sys->channels.data[i];
         spu_render_entry_t *render_entries = channel->entries;
         spu_render_entry_t available_entries[VOUT_MAX_SUBPICTURES];
-        bool         is_available_late[VOUT_MAX_SUBPICTURES];
         size_t       available_count = 0;
 
         vlc_tick_t   start_date = render_subtitle_date;
@@ -700,7 +700,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
 
             /* */
             available_entries[available_count] = *render_entry;
-            is_available_late[available_count] = is_late;
+            available_entries[available_count].is_late = is_late;
             available_count++;
         }
 
@@ -714,7 +714,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
         for (size_t index = 0; index < available_count; index++) {
             spu_render_entry_t *render_entry = &available_entries[index];
             subpicture_t *current = render_entry->subpic;
-            bool is_late = is_available_late[index];
+            bool is_late = render_entry->is_late;
 
             const vlc_tick_t stop_date = current->b_subtitle ? __MAX(start_date, sys->last_sort_date) : system_now;
             const vlc_tick_t ephemer_date  = current->b_subtitle ? ephemer_subtitle_date  : ephemer_osd_date;
