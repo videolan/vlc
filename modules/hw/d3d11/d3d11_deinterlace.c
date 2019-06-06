@@ -39,6 +39,8 @@
 #include "../../video_chroma/d3d11_fmt.h"
 #include "../../video_filter/deinterlace/common.h"
 
+#include "../../codec/avcodec/va_surface.h"
+
 typedef struct
 {
     d3d11_handle_t                 hd3d;

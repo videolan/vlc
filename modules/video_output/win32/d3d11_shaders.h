@@ -25,6 +25,8 @@
 
 #include "../../video_chroma/d3d11_fmt.h"
 
+#include <vlc_es.h>
+
 #define DEFAULT_BRIGHTNESS         100
 #define DEFAULT_SRGB_BRIGHTNESS    100
 #define MAX_HLG_BRIGHTNESS        1000

@@ -50,6 +50,8 @@
 
 #include "../../video_chroma/d3d11_fmt.h"
 
+#include "va_surface.h"
+
 #define D3D_DecoderType     ID3D11VideoDecoder
 #define D3D_DecoderDevice   ID3D11VideoDevice
 #define D3D_DecoderSurface  ID3D11VideoDecoderOutputView

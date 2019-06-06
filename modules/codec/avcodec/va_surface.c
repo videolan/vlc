@@ -39,6 +39,7 @@ typedef struct
     void *dummy;
 } picture_sys_t;
 #include "va_surface_internal.h"
+#include "va_surface.h"
 
 #include "avcodec.h"
 

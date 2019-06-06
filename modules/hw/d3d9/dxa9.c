@@ -41,6 +41,8 @@
 #include <d3d9.h>
 #include "../../video_chroma/d3d9_fmt.h"
 
+#include "../../codec/avcodec/va_surface.h"
+
 typedef struct
 {
     /* GPU to CPU */

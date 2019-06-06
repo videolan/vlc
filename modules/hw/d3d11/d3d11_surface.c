@@ -45,6 +45,8 @@
 #include "d3d11_processor.h"
 #include "../../video_chroma/d3d11_fmt.h"
 
+#include "../../codec/avcodec/va_surface.h"
+
 #ifdef ID3D11VideoContext_VideoProcessorBlt
 #define CAN_PROCESSOR 1
 #else

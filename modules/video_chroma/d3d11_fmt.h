@@ -74,8 +74,6 @@ typedef struct
     DXGI_FORMAT                   formatTexture;
 } picture_sys_t;
 
-#include "../codec/avcodec/va_surface.h"
-
 /* index to use for texture/resource that use a known DXGI format
  * (ie not DXGI_FORMAT_UNKNWON) */
 #define KNOWN_DXGI_INDEX   0

@@ -31,6 +31,8 @@
 #include <vlc/libvlc_renderer_discoverer.h>
 #include <vlc/libvlc_media_player.h>
 
+#include <assert.h>
+
 #if !defined(_WIN32_WINNT) || _WIN32_WINNT < _WIN32_WINNT_WIN7
 # undef _WIN32_WINNT
 # define _WIN32_WINNT _WIN32_WINNT_WIN7

@@ -51,6 +51,8 @@
 # include <windows.ui.xaml.media.dxinterop.h> */
 
 #include "../../video_chroma/d3d11_fmt.h"
+#include "../../codec/avcodec/va_surface.h"
+
 #include "d3d11_quad.h"
 #include "d3d11_shaders.h"
 #include "d3d11_swapchain.h"

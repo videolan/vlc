@@ -40,6 +40,8 @@
 
 #include "d3d9_filters.h"
 
+#include "../../codec/avcodec/va_surface.h"
+
 typedef struct
 {
     HINSTANCE                      hdecoder_dll;

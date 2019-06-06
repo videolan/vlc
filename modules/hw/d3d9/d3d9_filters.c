@@ -39,6 +39,8 @@
 #include <dxva2api.h>
 #include "../../video_chroma/d3d9_fmt.h"
 
+#include "../../codec/avcodec/va_surface.h"
+
 #include "d3d9_filters.h"
 
 struct filter_level

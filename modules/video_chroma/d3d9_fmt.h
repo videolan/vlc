@@ -67,8 +67,6 @@ typedef struct
     D3DCAPS9                caps;
 } d3d9_device_t;
 
-#include "../codec/avcodec/va_surface.h"
-
 static inline void AcquirePictureSys(picture_sys_t *p_sys)
 {
     IDirect3DSurface9_AddRef(p_sys->surface);

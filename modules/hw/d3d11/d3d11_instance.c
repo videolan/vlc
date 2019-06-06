@@ -33,6 +33,7 @@
 #include <d3d11.h>
 
 #include "d3d11_filters.h"
+#include "../../codec/avcodec/va_surface.h"
 
 static vlc_mutex_t inst_lock = VLC_STATIC_MUTEX;
 static d3d11_device_t device = { .context_mutex = INVALID_HANDLE_VALUE };

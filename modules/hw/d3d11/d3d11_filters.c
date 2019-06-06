@@ -41,6 +41,8 @@
 #include "d3d11_processor.h"
 #include "../../video_chroma/d3d11_fmt.h"
 
+#include "../../codec/avcodec/va_surface.h"
+
 #ifdef __MINGW32__
 #define D3D11_VIDEO_PROCESSOR_FILTER_CAPS_BRIGHTNESS   0x1
 #define D3D11_VIDEO_PROCESSOR_FILTER_CAPS_CONTRAST     0x2

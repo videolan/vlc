@@ -56,6 +56,8 @@
 #endif
 #include "../../video_chroma/d3d9_fmt.h"
 
+#include "../../codec/avcodec/va_surface.h"
+
 #include "common.h"
 #include "builtin_shaders.h"
 #include "../../video_chroma/copy.h"

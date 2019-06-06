@@ -27,8 +27,6 @@
 #ifndef AVCODEC_VA_SURFACE_INTERNAL_H
 #define AVCODEC_VA_SURFACE_INTERNAL_H
 
-#include "va_surface.h"
-
 #include <libavcodec/avcodec.h>
 #include "va.h"
 
