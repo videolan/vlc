@@ -2,7 +2,6 @@
  * art_manager.cpp
  *****************************************************************************
  * Copyright (C) 2010 the VideoLAN team
- * $Id$
  *
  * Author: Erwan Tulou      <erwan10@vidoelan.org>
  *

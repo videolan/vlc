@@ -2,7 +2,6 @@
  * messages.cpp : Information about an item
  ****************************************************************************
  * Copyright (C) 2006-2011 the VideoLAN team
- * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb (at) videolan.org>
  *
@@ -133,7 +132,13 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     restoreWidgetPosition( "Messages", QSize( 600, 450 ) );
 
     /* Hook up to LibVLC messaging */
-    vlc_LogSet( p_intf->obj.libvlc, MsgCallback, this );
+    static const struct vlc_logger_operations log_ops =
+    {
+        MessagesDialog::MsgCallback,
+        NULL
+    };
+
+    vlc_LogSet( p_intf->obj.libvlc, &log_ops, this );
 
     buildTree( NULL, VLC_OBJECT( p_intf->obj.libvlc ) );
 }

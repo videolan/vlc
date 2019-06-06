@@ -179,7 +179,7 @@ int  transcode_spu_init   ( sout_stream_t *, const es_format_t *, sout_stream_id
 
 /* AUDIO */
 
-void transcode_audio_clean  ( sout_stream_id_sys_t * );
+void transcode_audio_clean  ( sout_stream_t *, sout_stream_id_sys_t * );
 int  transcode_audio_process( sout_stream_t *, sout_stream_id_sys_t *,
                                      block_t *, block_t ** );
 int  transcode_audio_init   ( sout_stream_t *, const es_format_t *,

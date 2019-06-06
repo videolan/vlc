@@ -474,7 +474,11 @@ static void AllocateAllPlugins (vlc_object_t *p_this)
     if( paths == NULL )
         return;
 
+#ifdef _WIN32
+    paths = realpath( paths, NULL );
+#else
     paths = strdup( paths ); /* don't harm the environment ! :) */
+#endif
     if( unlikely(paths == NULL) )
         return;
 

@@ -2,7 +2,6 @@
  * vlc_vod.h: interface for VoD server modules
  *****************************************************************************
  * Copyright (C) 2000, 2001 VLC authors and VideoLAN
- * $Id$
  *
  * Author: Gildas Bazin <gbazin@videolan.org>
  *

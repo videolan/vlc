@@ -139,7 +139,7 @@ static int vlclua_io_file_seek( lua_State *L )
     const char* psz_mode = luaL_optstring( L, 2, NULL );
     if ( psz_mode != NULL )
     {
-        long i_offset = luaL_optlong( L, 3, 0 );
+        long i_offset = luaL_optinteger( L, 3, 0 );
         int i_mode;
         if ( !strcmp( psz_mode, "set" ) )
             i_mode = SEEK_SET;

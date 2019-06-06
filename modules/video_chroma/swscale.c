@@ -2,7 +2,6 @@
  * swscale.c: scaling and chroma conversion using libswscale
  *****************************************************************************
  * Copyright (C) 1999-2008 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -61,7 +60,7 @@ static void CloseScaler( vlc_object_t * );
 static const int pi_mode_values[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 const char *const ppsz_mode_descriptions[] =
 { N_("Fast bilinear"), N_("Bilinear"), N_("Bicubic (good quality)"),
-  N_("Experimental"), N_("Nearest neighbour (bad quality)"),
+  N_("Experimental"), N_("Nearest neighbor (bad quality)"),
   N_("Area"), N_("Luma bicubic / chroma bilinear"), N_("Gauss"),
   N_("SincR"), N_("Lanczos"), N_("Bicubic spline") };
 

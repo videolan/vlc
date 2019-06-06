@@ -29,6 +29,7 @@
 #include <vlc_opengl.h>
 
 #include "../opengl/vout_helper.h"
+#include <GL/glew.h>
 #include <GL/wglew.h>
 
 #include "common.h"
@@ -36,8 +37,8 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int Open(vlc_object_t *);
-static void Close(vlc_object_t *);
+static int Open(vlc_gl_t *, unsigned width, unsigned height);
+static void Close(vlc_gl_t *);
 
 #define HW_GPU_AFFINITY_TEXT N_("GPU affinity")
 
@@ -156,9 +157,8 @@ static void DestroyGPUAffinityDC(vlc_gl_t *gl) {
     fncDeleteDCNV(sys->affinityHDC);
 }
 
-static int Open(vlc_object_t *object)
+static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 {
-    vlc_gl_t *gl = (vlc_gl_t *)object;
     vout_display_sys_t *sys;
 
     /* Allocate structure */
@@ -195,6 +195,24 @@ static int Open(vlc_object_t *object)
     }
 
     wglMakeCurrent(sys->hGLDC, sys->hGLRC);
+#if 0 /* TODO pick higher display depth if possible and the source requires it */
+    int attribsDesired[] = {
+        WGL_DRAW_TO_WINDOW_ARB, 1,
+        WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
+        WGL_RED_BITS_ARB, 10,
+        WGL_GREEN_BITS_ARB, 10,
+        WGL_BLUE_BITS_ARB, 10,
+        WGL_ALPHA_BITS_ARB, 2,
+        WGL_DOUBLE_BUFFER_ARB, 1,
+        0,0
+    };
+
+    UINT nMatchingFormats;
+    int index = 0;
+    PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB__ = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress( "wglChoosePixelFormatARB" );
+    if (wglChoosePixelFormatARB__!= NULL)
+        wglChoosePixelFormatARB__(sys->hGLDC, attribsDesired, NULL, 1, &index,  &nMatchingFormats);
+#endif
 #ifdef WGL_EXT_swap_control
     /* Create an GPU Affinity DC */
     const char *extensions = (const char*)glGetString(GL_EXTENSIONS);
@@ -224,16 +242,16 @@ static int Open(vlc_object_t *object)
     if (sys->exts.GetExtensionsStringEXT || sys->exts.GetExtensionsStringARB)
         gl->wgl.getExtensionsString = GetExtensionsString;
 
+    (void) width; (void) height;
     return VLC_SUCCESS;
 
 error:
-    Close(object);
+    Close(gl);
     return VLC_EGENERIC;
 }
 
-static void Close(vlc_object_t *object)
+static void Close(vlc_gl_t *gl)
 {
-    vlc_gl_t *gl = (vlc_gl_t *)object;
     vout_display_sys_t *sys = gl->sys;
 
     if (sys->hGLRC)

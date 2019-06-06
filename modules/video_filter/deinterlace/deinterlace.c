@@ -2,7 +2,6 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2011 VLC authors and VideoLAN
- * $Id$
  *
  * Author: Sam Hocevar <sam@zoy.org>
  *         Christophe Massiot <massiot@via.ecp.fr>
@@ -575,8 +574,13 @@ notsupp:
         p_sys->pf_merge = pixel_size == 1 ? merge8_armv6 : merge16_armv6;
     else
 #endif
+#if defined(CAN_COMPILE_SVE)
+    if( vlc_CPU_ARM_SVE() )
+        p_sys->pf_merge = pixel_size == 1 ? merge8_arm_sve : merge16_arm_sve;
+    else
+#endif
 #if defined(CAN_COMPILE_ARM64)
-    if( vlc_CPU_ARM64_NEON() )
+    if( vlc_CPU_ARM_NEON() )
         p_sys->pf_merge = pixel_size == 1 ? merge8_arm64_neon : merge16_arm64_neon;
     else
 #endif

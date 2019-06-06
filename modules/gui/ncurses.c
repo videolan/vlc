@@ -2,7 +2,6 @@
  * ncurses.c : NCurses interface for vlc
  *****************************************************************************
  * Copyright © 2001-2011 the VideoLAN team
- * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -53,7 +52,7 @@
 #include <vlc_charset.h>
 #include <vlc_input.h>
 #include <vlc_es.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_meta.h>
 #include <vlc_fs.h>
 #include <vlc_url.h>
@@ -1764,6 +1763,8 @@ static void MsgCallback(void *data, int type, const vlc_log_t *msg,
     vlc_mutex_unlock(&sys->msg_lock);
 }
 
+static const struct vlc_logger_operations log_ops = { MsgCallback, NULL };
+
 /*****************************************************************************
  * Run: ncurses thread
  *****************************************************************************/
@@ -1802,7 +1803,7 @@ static int Open(vlc_object_t *p_this)
     vlc_mutex_init(&sys->msg_lock);
 
     sys->verbosity = var_InheritInteger(intf, "verbose");
-    vlc_LogSet(intf->obj.libvlc, MsgCallback, sys);
+    vlc_LogSet(intf->obj.libvlc, &log_ops, sys);
 
     sys->box_type = BOX_PLAYLIST;
     sys->plidx_follow = true;

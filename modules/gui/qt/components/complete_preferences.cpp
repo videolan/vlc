@@ -2,7 +2,6 @@
  * complete_preferences.cpp : "Normal preferences"
  ****************************************************************************
  * Copyright (C) 2006-2011 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *

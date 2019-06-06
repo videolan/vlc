@@ -2,7 +2,6 @@
  * idummy.c: dummy input plugin, to manage "vlc://" special options
  *****************************************************************************
  * Copyright (C) 2001, 2002 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

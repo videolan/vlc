@@ -3,7 +3,6 @@
  *****************************************************************************
  * Copyright (C) 2001-2006 VLC authors and VideoLAN
  * Copyright © 2006 Rémi Denis-Courmont
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr> - original code
  *          Rémi Denis-Courmont <rem # videolan.org> - EPSV support
@@ -142,7 +141,7 @@ struct access_sys_t
     vlc_url_t  url;
 
     ftp_features_t   features;
-    vlc_tls_creds_t *p_creds;
+    vlc_tls_client_t *p_creds;
     enum tls_mode_e  tlsmode;
     vlc_tls_t *cmd;
     vlc_tls_t *data;
@@ -763,7 +762,7 @@ error:
 
 exit_error:
     vlc_UrlClean( &p_sys->url );
-    vlc_tls_Delete( p_sys->p_creds );
+    vlc_tls_ClientDelete( p_sys->p_creds );
     return VLC_EGENERIC;
 }
 
@@ -811,7 +810,7 @@ static int OutOpen( vlc_object_t *p_this )
 
 exit_error:
     vlc_UrlClean( &p_sys->url );
-    vlc_tls_Delete( p_sys->p_creds );
+    vlc_tls_ClientDelete( p_sys->p_creds );
     return VLC_EGENERIC;
 }
 #endif
@@ -837,7 +836,7 @@ static void Close( vlc_object_t *p_access, access_sys_t *p_sys )
 
     /* free memory */
     vlc_UrlClean( &p_sys->url );
-    vlc_tls_Delete( p_sys->p_creds );
+    vlc_tls_ClientDelete( p_sys->p_creds );
 }
 
 static void InClose( vlc_object_t *p_this )

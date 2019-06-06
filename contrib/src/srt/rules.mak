@@ -18,10 +18,6 @@ ifdef HAVE_WIN32
 DEPS_srt += pthreads $(DEPS_pthreads)
 endif
 
-ifdef HAVE_DARWIN_OS
-SRT_CFLAGS   += -Wno-error=partial-availability
-SRT_CXXFLAGS += -Wno-error=partial-availability
-endif
 
 $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
 	$(call download_pkg,$(SRT_URL),srt)

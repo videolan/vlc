@@ -14,9 +14,10 @@ Audio output:
    Use --alsa-passthrough to configure S/PDIF or HDMI passthrough.
 
 Demuxer:
- * Support for HEIF format
+ * Support for HEIF image and grid image formats
  * Support for DASH WebM
  * Support for DVBSUB in mkv
+ * Improved Bluray menus, clips and stream selection
 
 Codecs:
  * Support for experimental AV1 video encoding
@@ -30,11 +31,13 @@ Codecs:
 Access:
  * Enable SMB2 / SMB3 support on mobile ports with libsmb2
  * Added support for the RIST (Reliable Internet Stream Transport) Protocol
+ * Added avaudiocapture module as a replacement for qtsound, which is removed now
 
 Access output:
  * Added support for the RIST (Reliable Internet Stream Transport) Protocol
 
 Video output:
+ * Added X11 RENDER video output plugin
  * Remove aa plugin
  * Remove evas plugin
  * Remove omxil_vout plugin
@@ -44,6 +47,7 @@ Video output:
 Stream output:
  * New SDI output with improved audio and ancillary support.
    Candidate for deprecation of decklink vout/aout modules.
+ * Support for DLNA/UPNP renderers
 
 macOS:
  * Remove Growl notification support

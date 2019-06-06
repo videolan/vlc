@@ -2,7 +2,6 @@
  * panoramix.c : Wall panoramic video with edge blending plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id$
  *
  * Authors: Cedric Cocquebert <cedric.cocquebert@supelec.fr>
  *          based on Samuel Hocevar <sam@zoy.org>
@@ -35,9 +34,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_video_splitter.h>
-
-/* FIXME it is needed for VOUT_ALIGN_* only */
-#include <vlc_vout.h>
+#include <vlc_vout_window.h>
 
 #define OVERLAP
 
@@ -248,7 +245,7 @@ typedef struct
     int i_y;
     int i_width;
     int i_height;
-    int i_align;
+    vlc_video_align_t align;
 
     /* Source position and size */
     int  i_src_x;
@@ -274,7 +271,7 @@ typedef struct
 
 } panoramix_chroma_t;
 
-struct video_splitter_sys_t
+typedef struct
 {
     const panoramix_chroma_t *p_chroma;
 
@@ -296,15 +293,12 @@ struct video_splitter_sys_t
     int i_col;
     int i_row;
     panoramix_output_t pp_output[COL_MAX][ROW_MAX]; /* [x][y] */
-};
+} video_splitter_sys_t;
 
 /* */
 static int Filter( video_splitter_t *, picture_t *pp_dst[], picture_t * );
 
-static int Mouse( video_splitter_t *, vlc_mouse_t *,
-                  int i_index,
-                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new );
-
+static int Mouse( video_splitter_t *, int, vout_window_mouse_event_t * );
 
 /* */
 static int Configuration( panoramix_output_t pp_output[ROW_MAX][COL_MAX],
@@ -685,9 +679,9 @@ static int Open( vlc_object_t *p_this )
             p_cfg->fmt.i_visible_height =
             p_cfg->fmt.i_height         = p_output->i_height;
 
-            p_cfg->window.i_x     = p_output->i_x;
-            p_cfg->window.i_y     = p_output->i_y;
-            p_cfg->window.i_align = p_output->i_align;
+            p_cfg->window.i_x   = p_output->i_x;
+            p_cfg->window.i_y   = p_output->i_y;
+            p_cfg->window.align = p_output->align;
 
             p_cfg->psz_module = NULL;
         }
@@ -696,7 +690,7 @@ static int Open( vlc_object_t *p_this )
 
     /* */
     p_splitter->pf_filter = Filter;
-    p_splitter->pf_mouse  = Mouse;
+    p_splitter->mouse = Mouse;
 
     return VLC_SUCCESS;
 }
@@ -788,12 +782,10 @@ static int Filter( video_splitter_t *p_splitter, picture_t *pp_dst[], picture_t 
 /**
  * It converts mouse events
  */
-static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
-                  int i_index,
-                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+static int Mouse( video_splitter_t *p_splitter, int i_index,
+                  vout_window_mouse_event_t *restrict ev )
 {
     video_splitter_sys_t *p_sys = p_splitter->p_sys;
-    VLC_UNUSED(p_old);
 
     for( int y = 0; y < p_sys->i_row; y++ )
     {
@@ -802,14 +794,14 @@ static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
             const panoramix_output_t *p_output = &p_sys->pp_output[x][y];
             if( p_output->b_active && p_output->i_output == i_index )
             {
-                const int i_x = p_new->i_x - p_output->filter.black.i_left;
-                const int i_y = p_new->i_y - p_output->filter.black.i_top;
+                const int i_x = ev->x - p_output->filter.black.i_left;
+                const int i_y = ev->y - p_output->filter.black.i_top;
+
                 if( i_x >= 0 && i_x < p_output->i_width  - p_output->filter.black.i_right &&
                     i_y >= 0 && i_y < p_output->i_height - p_output->filter.black.i_bottom )
                 {
-                    *p_mouse = *p_new;
-                    p_mouse->i_x = p_output->i_src_x + i_x;
-                    p_mouse->i_y = p_output->i_src_y + i_y;
+                    ev->x = p_output->i_src_x + i_x;
+                    ev->y = p_output->i_src_y + i_y;
                     return VLC_SUCCESS;
                 }
             }
@@ -906,20 +898,20 @@ static int Configuration( panoramix_output_t pp_output[ROW_MAX][COL_MAX],
             }
 
             /* Compute alignment */
-            int i_align = 0;
+            char halign = 0, valign = 0;
             if( i_col > 1 )
             {
                 if( b_col_first )
-                    i_align |= VOUT_ALIGN_RIGHT;
+                    halign = VLC_VIDEO_ALIGN_RIGHT;
                 if( b_col_last )
-                    i_align |= VOUT_ALIGN_LEFT;
+                    halign = VLC_VIDEO_ALIGN_LEFT;
             }
             if( i_row > 1 )
             {
                 if( b_row_first )
-                    i_align |= VOUT_ALIGN_BOTTOM;
+                    valign = VLC_VIDEO_ALIGN_BOTTOM;
                 if( b_row_last )
-                    i_align |= VOUT_ALIGN_TOP;
+                    valign = VLC_VIDEO_ALIGN_TOP;
             }
 
             /* */
@@ -935,7 +927,8 @@ static int Configuration( panoramix_output_t pp_output[ROW_MAX][COL_MAX],
             p_output->filter = cfg;
 
             /* */
-            p_output->i_align = i_align;
+            p_output->align.horizontal = halign;
+            p_output->align.vertical = valign;
             p_output->i_x = i_dst_x;
             p_output->i_y = i_dst_y;
 

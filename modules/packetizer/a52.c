@@ -2,7 +2,6 @@
  * a52.c: parse A/52 audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2016 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -138,7 +137,7 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
 static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t p_header[VLC_A52_HEADER_SIZE];
+    uint8_t p_header[VLC_A52_MIN_HEADER_SIZE];
     block_t *p_out_buffer;
 
     block_t *p_block = pp_block ? *pp_block : NULL;
@@ -195,7 +194,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_HEADER:
             /* Get A/52 frame header (VLC_A52_HEADER_SIZE bytes) */
             if( block_PeekBytes( &p_sys->bytestream, p_header,
-                                 VLC_A52_HEADER_SIZE ) != VLC_SUCCESS )
+                                 VLC_A52_MIN_HEADER_SIZE ) != VLC_SUCCESS )
             {
                 /* Need more data */
                 return NULL;
@@ -203,7 +202,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
 
             /* Check if frame is valid and get frame info */
             if( vlc_a52_header_Parse( &p_sys->frame, p_header,
-                                      VLC_A52_HEADER_SIZE ) != VLC_SUCCESS )
+                                      VLC_A52_MIN_HEADER_SIZE ) != VLC_SUCCESS )
             {
                 msg_Dbg( p_dec, "emulated sync word" );
                 block_SkipByte( &p_sys->bytestream );
@@ -211,7 +210,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
-            if( p_sys->frame.b_eac3 && p_sys->frame.eac3.strmtyp == EAC3_STRMTYP_DEPENDENT )
+            if( p_sys->frame.b_eac3 && p_sys->frame.bs.eac3.strmtyp == EAC3_STRMTYP_DEPENDENT )
             {
                 msg_Warn( p_dec, "starting with dependent stream, skip it" );
                 p_sys->i_state = STATE_NOSYNC;
@@ -228,7 +227,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_NEXT_SYNC:
             /* Check if next expected frame contains the sync word */
             if( block_PeekOffsetBytes( &p_sys->bytestream, p_sys->i_input_size,
-                                       p_header, VLC_A52_HEADER_SIZE )
+                                       p_header, VLC_A52_MIN_HEADER_SIZE )
                                        != VLC_SUCCESS )
             {
                 if( p_block == NULL ) /* drain */
@@ -257,8 +256,8 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             }
 
             vlc_a52_header_t a52;
-            if( !vlc_a52_header_Parse( &a52, p_header, VLC_A52_HEADER_SIZE )
-             && a52.b_eac3 && a52.eac3.strmtyp == EAC3_STRMTYP_DEPENDENT )
+            if( !vlc_a52_header_Parse( &a52, p_header, VLC_A52_MIN_HEADER_SIZE )
+             && a52.b_eac3 && a52.bs.eac3.strmtyp == EAC3_STRMTYP_DEPENDENT )
                 p_sys->i_input_size += a52.i_size;
 
             p_sys->i_state = STATE_GET_DATA;

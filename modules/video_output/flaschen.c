@@ -54,8 +54,9 @@
 #define T_HEIGHT N_("Height")
 #define LT_HEIGHT N_("Video height")
 
-static int Open( vlc_object_t * );
-static void Close( vlc_object_t * );
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 
 vlc_module_begin ()
     set_shortname( N_("Flaschen") )
@@ -77,19 +78,16 @@ vlc_module_end ()
  *****************************************************************************/
 struct vout_display_sys_t {
     int             fd;
-
-    picture_pool_t *pool;
 };
-static picture_pool_t *Pool(vout_display_t *, unsigned count);
 static void            Display(vout_display_t *, picture_t *);
 static int             Control(vout_display_t *, int, va_list);
 
 /*****************************************************************************
  * Open: activates flaschen vout display method
  *****************************************************************************/
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
     int fd;
     const unsigned port = 1337;
@@ -97,11 +95,10 @@ static int Open(vlc_object_t *object)
     vd->sys = sys = calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
-    sys->pool = NULL;
     sys->fd = -1;
 
     /* */
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt = *fmtp;
     fmt.i_chroma = VLC_CODEC_RGB24;
     /* TODO: check if this works on big-endian systems */
     fmt.i_rmask = 0xff0000;
@@ -140,34 +137,22 @@ static int Open(vlc_object_t *object)
     setsockopt (fd, SOL_SOCKET, SO_RCVBUF, &(int){ 0 }, sizeof (int));
 
 
-    vd->fmt     = fmt;
+    *fmtp = fmt;
 
-    vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
 
+    (void) cfg; (void) context;
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_object_t *object)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
-
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
 
     net_Close(sys->fd);
     free(sys);
-}
-
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
-{
-    vout_display_sys_t *sys = vd->sys;
-    if (!sys->pool)
-        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
-    return sys->pool;
 }
 
 static void Display(vout_display_t *vd, picture_t *picture)
@@ -178,16 +163,17 @@ static void Display(vout_display_t *vd, picture_t *picture)
     const long iovmax = sysconf(_SC_IOV_MAX);
 #endif
     vout_display_sys_t *sys = vd->sys;
+    video_format_t *fmt = &picture->format;
     int result;
 
     char buffer[64];
     int header_len = snprintf(buffer, sizeof(buffer), "P6\n%d %d\n255\n",
-                              vd->fmt.i_width, vd->fmt.i_height);
+                              fmt->i_width, fmt->i_height);
     /* TODO: support offset_{x,y,z}? (#FT:...) */
     /* Note the protocol doesn't include any picture order field. */
     /* (maybe add as comment?) */
 
-    int iovcnt = 1 + vd->fmt.i_height;
+    int iovcnt = 1 + fmt->i_height;
     if (unlikely(iovcnt > iovmax))
         return;
 
@@ -199,7 +185,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
     for (int i = 1; i < iovcnt; i++)
     {
         iov[i].iov_base = src;
-        iov[i].iov_len = vd->fmt.i_width * 3;
+        iov[i].iov_len = fmt->i_width * 3;
         src += picture->p->i_pitch;
     }
 
@@ -215,7 +201,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
     result = sendmsg(sys->fd, &hdr, 0);
     if (result < 0)
         msg_Err(vd, "sendmsg: error %s in vout display flaschen", vlc_strerror_c(errno));
-    else if (result < (int)(header_len + vd->fmt.i_width * vd->fmt.i_height * 3))
+    else if (result < (int)(header_len + fmt->i_width * fmt->i_height * 3))
         msg_Err(vd, "sendmsg only sent %d bytes in vout display flaschen", result);
         /* we might want to drop some frames? */
 }

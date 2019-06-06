@@ -25,7 +25,7 @@ $(TARBALLS)/x265-$(X265_VERSION).tar.bz2:
 x265: x265-$(X265_VERSION).tar.bz2 .sum-x265
 	rm -Rf $@-$(X265_VERSION)
 	mkdir -p $@-$(X265_VERSION)
-	tar xvjf "$<" --strip-components=1 -C $@-$(X265_VERSION)
+	tar xvjfo "$<" --strip-components=1 -C $@-$(X265_VERSION)
 	$(APPLY) $(SRC)/x265/x265-ldl-linking.patch
 	$(APPLY) $(SRC)/x265/x265-no-pdb-install.patch
 	$(call pkg_static,"source/x265.pc.in")

@@ -94,5 +94,5 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
 int transcode_encoder_audio_configure( vlc_object_t *p_obj,
                                        const transcode_encoder_config_t *p_cfg,
                                        const audio_format_t *p_dec_out,
-                                       transcode_encoder_t *p_enc );
+                                       transcode_encoder_t *p_enc, bool );
 

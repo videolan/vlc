@@ -45,6 +45,7 @@
 #include "../adaptive/tools/Conversions.hpp"
 #include <vlc_stream.h>
 #include <cstdio>
+#include <limits>
 
 using namespace dash::mpd;
 using namespace adaptive::xml;
@@ -104,10 +105,12 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
     it = attr.find("minimumUpdatePeriod");
     if(it != attr.end())
     {
+        mpd->b_needsUpdates = true;
         vlc_tick_t minupdate = IsoTime(it->second);
         if(minupdate > 0)
             mpd->minUpdatePeriod.Set(minupdate);
     }
+    else mpd->b_needsUpdates = false;
 
     it = attr.find("maxSegmentDuration");
     if(it != attr.end())
@@ -459,9 +462,13 @@ void IsoffMainParser::parseTimeline(Node *node, MediaSegmentTemplate *templ)
             if(!s->hasAttribute("d")) /* Mandatory */
                 continue;
             stime_t d = Integer<stime_t>(s->getAttributeValue("d"));
-            uint64_t r = 0; // never repeats by default
+            int64_t r = 0; // never repeats by default
             if(s->hasAttribute("r"))
-                r = Integer<uint64_t>(s->getAttributeValue("r"));
+            {
+                r = Integer<int64_t>(s->getAttributeValue("r"));
+                if(r < 0)
+                    r = std::numeric_limits<unsigned>::max();
+            }
 
             if(s->hasAttribute("t"))
             {

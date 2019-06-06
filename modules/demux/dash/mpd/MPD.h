@@ -40,6 +40,8 @@ namespace dash
 
         class MPD : public AbstractPlaylist
         {
+            friend class IsoffMainParser;
+
             public:
                 MPD(vlc_object_t *, Profile);
                 virtual ~MPD();

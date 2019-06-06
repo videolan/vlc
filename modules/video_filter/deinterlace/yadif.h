@@ -22,66 +22,6 @@
 #   include "config.h"
 #endif
 
-#include <stdalign.h>
-
-#if defined(__GNUC__)
-# define ATTR_USED __attribute__((used))
-#else
-# define ATTR_USED
-#endif
-
-typedef intptr_t x86_reg;
-typedef struct { uint64_t a, b; } xmm_reg;
-
-const ATTR_USED alignas (16) xmm_reg pb_1 = {
-    0x0101010101010101ULL, 0x0101010101010101ULL
-};
-const ATTR_USED alignas (16) xmm_reg pw_1 = {
-    0x0001000100010001ULL, 0x0001000100010001ULL
-};
-
-#ifdef CAN_COMPILE_SSSE3
-#if defined(__SSE__) || defined(__GNUC__) || defined(__clang__)
-// ================ SSSE3 =================
-#define HAVE_YADIF_SSSE3
-#define COMPILE_TEMPLATE_SSE 1
-#define COMPILE_TEMPLATE_SSSE3 1
-#define VLC_TARGET VLC_SSE
-#define RENAME(a) a ## _ssse3
-#include "yadif_template.h"
-#undef COMPILE_TEMPLATE_SSE
-#undef COMPILE_TEMPLATE_SSSE3
-#undef VLC_TARGET
-#undef RENAME
-#endif
-#endif
-
-#ifdef CAN_COMPILE_SSE2
-#if defined(__SSE__) || defined(__GNUC__) || defined(__clang__)
-// ================= SSE2 =================
-#define HAVE_YADIF_SSE2
-#define COMPILE_TEMPLATE_SSE 1
-#define VLC_TARGET VLC_SSE
-#define RENAME(a) a ## _sse2
-#include "yadif_template.h"
-#undef COMPILE_TEMPLATE_SSE
-#undef VLC_TARGET
-#undef RENAME
-#endif
-#endif
-
-#ifdef CAN_COMPILE_MMX
-#if defined(__MMX__) || defined(__GNUC__) || defined(__clang__)
-// ================ MMX =================
-#define HAVE_YADIF_MMX
-#define VLC_TARGET VLC_MMX
-#define RENAME(a) a ## _mmx
-#include "yadif_template.h"
-#undef VLC_TARGET
-#undef RENAME
-#endif
-#endif
-
 #define FFABS abs
 
 #define CHECK(j)\
@@ -151,3 +91,11 @@ static void yadif_filter_line_c_16bit(uint8_t *dst8, uint8_t *prev8, uint8_t *cu
     prefs /= 2;
     FILTER
 }
+
+#if defined(__i386__) || defined(__x86_64__)
+void vlcpriv_yadif_filter_line_ssse3(uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8_t *next, int w, int prefs, int mrefs, int parity, int mode);
+void vlcpriv_yadif_filter_line_sse2(uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8_t *next, int w, int prefs, int mrefs, int parity, int mode);
+#endif
+#if defined(__i386__)
+void vlcpriv_yadif_filter_line_mmxext(uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8_t *next, int w, int prefs, int mrefs, int parity, int mode);
+#endif

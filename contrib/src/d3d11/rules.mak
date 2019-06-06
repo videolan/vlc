@@ -1,10 +1,10 @@
 # generate Direct3D11 temporary include
 
 ifdef HAVE_CROSS_COMPILE
-IDL_INC_PATH = /usr/include/wine/windows/
+IDL_INCLUDES = -I/usr/include/wine/windows/ -I/usr/include/wine/wine/windows/
 else
 #ugly way to get the default location of standard idl files
-IDL_INC_PATH = /`echo $(MSYSTEM) | tr A-Z a-z`/$(BUILD)/include
+IDL_INCLUDES = -I/`echo $(MSYSTEM) | tr A-Z a-z`/$(BUILD)/include
 endif
 
 D3D11_COMMIT_ID := a0cd5afeb60be3be0860e9a203314c10485bb9b8
@@ -61,11 +61,11 @@ dxgi12: .sum-d3d11
 
 $(DST_D3D11_H): d3d11
 	mkdir -p -- "$(PREFIX)/include/"
-	$(WIDL) -DBOOL=WINBOOL -I$(PREFIX)/include -I$(IDL_INC_PATH) -h -o $@ $</d3d11.idl
+	$(WIDL) -DBOOL=WINBOOL -I$(PREFIX)/include $(IDL_INCLUDES) -h -o $@ $</d3d11.idl
 
 $(DST_DXGIDEBUG_H): $(TARBALLS)/dxgidebug.idl
 	mkdir -p -- "$(PREFIX)/include/"
-	$(WIDL) -DBOOL=WINBOOL -I$(PREFIX)/include -I$(IDL_INC_PATH) -h -o $@ $<
+	$(WIDL) -DBOOL=WINBOOL -I$(PREFIX)/include $(IDL_INCLUDES) -h -o $@ $<
 
 $(DST_DXGITYPE_H): $(TARBALLS)/dxgitype.h
 	mkdir -p -- "$(PREFIX)/include/"
@@ -81,23 +81,23 @@ $(DST_DXGI_IDL): $(TARBALLS)/dxgi.idl
 
 $(DST_DXGI12_H): dxgi12
 	mkdir -p -- "$(PREFIX)/include/"
-	$(WIDL) -DBOOL=WINBOOL -I$(PREFIX)/include -I$(IDL_INC_PATH) -h -o $@ $</dxgi1_2.idl
+	$(WIDL) -DBOOL=WINBOOL -I$(PREFIX)/include $(IDL_INCLUDES) -h -o $@ $</dxgi1_2.idl
 
 $(DST_DXGI13_H): $(SRC)/d3d11/dxgi1_3.idl $(DST_DXGI12_H)
 	mkdir -p -- "$(PREFIX)/include/"
-	$(WIDL) -DBOOL=WINBOOL -Idxgi12 -I$(PREFIX)/include -I$(IDL_INC_PATH) -h -o $@ $<
+	$(WIDL) -DBOOL=WINBOOL -Idxgi12 -I$(PREFIX)/include $(IDL_INCLUDES) -h -o $@ $<
 
 $(DST_DXGI14_H): $(SRC)/d3d11/dxgi1_4.idl $(DST_DXGI13_H)
 	mkdir -p -- "$(PREFIX)/include/"
-	$(WIDL) -DBOOL=WINBOOL -Idxgi12 -I$(PREFIX)/include -I$(IDL_INC_PATH) -h -o $@ $<
+	$(WIDL) -DBOOL=WINBOOL -Idxgi12 -I$(PREFIX)/include $(IDL_INCLUDES) -h -o $@ $<
 
 $(DST_DXGI15_H): $(SRC)/d3d11/dxgi1_5.idl $(DST_DXGI14_H)
 	mkdir -p -- "$(PREFIX)/include/"
-	$(WIDL) -DBOOL=WINBOOL -Idxgi12 -I$(PREFIX)/include -I$(IDL_INC_PATH) -h -o $@ $<
+	$(WIDL) -DBOOL=WINBOOL -Idxgi12 -I$(PREFIX)/include $(IDL_INCLUDES) -h -o $@ $<
 
 $(DST_DXGI16_H): $(SRC)/d3d11/dxgi1_6.idl $(DST_DXGI15_H)
 	mkdir -p -- "$(PREFIX)/include/"
-	$(WIDL) -DBOOL=WINBOOL -Idxgi12 -I$(PREFIX)/include -I$(IDL_INC_PATH) -h -o $@ $<
+	$(WIDL) -DBOOL=WINBOOL -Idxgi12 -I$(PREFIX)/include $(IDL_INCLUDES) -h -o $@ $<
 
 .dxgitype: $(DST_DXGITYPE_H) $(DST_DXGIFORMAT_H) $(DST_DXGI_IDL)
 	touch $@

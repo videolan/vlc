@@ -131,7 +131,7 @@ static const char* globPixelShaderDefault = "\
         sample = sampleTexture( SamplerStates[1], In.Texture );\n\
     else\n\
         sample = sampleTexture( SamplerStates[0], In.Texture );\n\
-    float4 rgba = mul(mul(sample, WhitePoint), Colorspace);\n\
+    float4 rgba = max(mul(mul(sample, WhitePoint), Colorspace),0);\n\
     float opacity = rgba.a * Opacity;\n\
     float4 rgb = rgba; rgb.a = 0;\n\
     rgb = sourceToLinear(rgb);\n\

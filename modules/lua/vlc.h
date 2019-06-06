@@ -2,7 +2,6 @@
  * vlc.h: VLC specific lua library functions.
  *****************************************************************************
  * Copyright (C) 2007-2008 the VideoLAN team
- * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
  *          Pierre d'Herbemont <pdherbemont # videolan.org>
@@ -30,7 +29,7 @@
 
 #include <vlc_common.h>
 #include <vlc_input.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_meta.h>
 #include <vlc_meta_fetcher.h>
 #include <vlc_url.h>

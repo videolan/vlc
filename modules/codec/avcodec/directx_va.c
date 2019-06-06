@@ -4,7 +4,6 @@
  * Copyright (C) 2009 Geoffroy Couprie
  * Copyright (C) 2009 Laurent Aimar
  * Copyright (C) 2015 Steve Lhomme
- * $Id$
  *
  * Authors: Geoffroy Couprie <geal@videolan.org>
  *          Laurent Aimar <fenrir _AT_ videolan _DOT_ org>

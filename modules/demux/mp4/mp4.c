@@ -461,10 +461,14 @@ static int LoadInitFrag( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     /* Load all boxes ( except raw data ) */
-    if( ( p_sys->p_root = MP4_BoxGetRoot( p_demux->s ) ) == NULL )
+    MP4_Box_t *p_root = MP4_BoxGetRoot( p_demux->s );
+    if( p_root == NULL || !MP4_BoxGet( p_root, "/moov" ) )
     {
+        MP4_BoxFree( p_root );
         goto LoadInitFragError;
     }
+
+    p_sys->p_root = p_root;
 
     return VLC_SUCCESS;
 
@@ -744,13 +748,14 @@ static int Open( vlc_object_t * p_this )
             switch( VLC_FOURCC(p_peek[8], p_peek[9], p_peek[10], p_peek[11]) )
             {
                 /* HEIF pictures goes to heif demux */
-                case MAJOR_heic:
-                case MAJOR_heix:
-                case MAJOR_mif1:
-                case MAJOR_jpeg:
-                case MAJOR_avci:
+                case BRAND_heic:
+                case BRAND_heix:
+                case BRAND_mif1:
+                case BRAND_jpeg:
+                case BRAND_avci:
+                case BRAND_avif:
                 /* We don't yet support f4v, but avformat does. */
-                case MAJOR_f4v:
+                case BRAND_f4v:
                     return VLC_EGENERIC;
                 default:
                     break;
@@ -788,28 +793,28 @@ static int Open( vlc_object_t * p_this )
     {
         switch( BOXDATA(p_ftyp)->i_major_brand )
         {
-            case MAJOR_isom:
+            case BRAND_isom:
                 msg_Dbg( p_demux,
                          "ISO Media (isom) version %d.",
                          BOXDATA(p_ftyp)->i_minor_version );
                 break;
-            case MAJOR_3gp4:
-            case MAJOR_3gp5:
-            case MAJOR_3gp6:
-            case MAJOR_3gp7:
+            case BRAND_3gp4:
+            case BRAND_3gp5:
+            case BRAND_3gp6:
+            case BRAND_3gp7:
                 msg_Dbg( p_demux, "3GPP Media Release: %4.4s",
                          (char *)&BOXDATA(p_ftyp)->i_major_brand );
                 break;
-            case MAJOR_qt__:
+            case BRAND_qt__:
                 msg_Dbg( p_demux, "Apple QuickTime media" );
                 break;
-            case MAJOR_isml:
+            case BRAND_isml:
                 msg_Dbg( p_demux, "PIFF (= isml = fMP4) media" );
                 break;
-            case MAJOR_dash:
+            case BRAND_dash:
                 msg_Dbg( p_demux, "DASH Stream" );
                 break;
-            case MAJOR_M4A:
+            case BRAND_M4A:
                 msg_Dbg( p_demux, "iTunes audio" );
                 if( var_InheritBool( p_demux, CFG_PREFIX"m4a-audioonly" ) )
                     p_sys->hacks.es_cat_filters = AUDIO_ES;
@@ -823,11 +828,11 @@ static int Open( vlc_object_t * p_this )
         /* also lookup in compatibility list */
         for(uint32_t i=0; i<BOXDATA(p_ftyp)->i_compatible_brands_count; i++)
         {
-            if (BOXDATA(p_ftyp)->i_compatible_brands[i] == MAJOR_dash)
+            if (BOXDATA(p_ftyp)->i_compatible_brands[i] == BRAND_dash)
             {
                 msg_Dbg( p_demux, "DASH Stream" );
             }
-            else if (BOXDATA(p_ftyp)->i_compatible_brands[i] == VLC_FOURCC('s', 'm', 'o', 'o') )
+            else if (BOXDATA(p_ftyp)->i_compatible_brands[i] == BRAND_smoo)
             {
                 msg_Dbg( p_demux, "Handling VLC Smooth Stream" );
             }
@@ -1343,8 +1348,9 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
         }
 
         /* Next sample */
-        if ( i_nb_samples ) /* sample size could be 0, need to go fwd. see return */
-            MP4_TrackNextSample( p_demux, tk, i_nb_samples );
+        if ( i_nb_samples && /* sample size could be 0, need to go fwd. see return */
+             MP4_TrackNextSample( p_demux, tk, i_nb_samples ) )
+            goto end;
 
         uint32_t i_next_run_seq = MP4_TrackGetRunSeq( tk );
         if( i_next_run_seq != i_run_seq )

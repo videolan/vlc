@@ -33,6 +33,7 @@
 #include "libvlc.h"
 #include <stdarg.h>
 #include <stdatomic.h>
+#include <stdnoreturn.h>
 #include <signal.h>
 #include <errno.h>
 #include <time.h>
@@ -553,7 +554,7 @@ void vlc_testcancel (void)
     pthread_testcancel ();
 }
 
-void vlc_control_cancel (int cmd, ...)
+noreturn void vlc_control_cancel (int cmd, ...)
 {
     (void) cmd;
     vlc_assert_unreachable ();

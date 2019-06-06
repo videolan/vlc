@@ -2,7 +2,6 @@
  * bdmv.c: Dummy bdmv demux - opens BluRays rips via index.bdmv
  *****************************************************************************
  * Copyright (C) 2018 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Shaya Potter <spotter@gmail.com>
  *

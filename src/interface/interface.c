@@ -4,7 +4,6 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2007 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -42,9 +41,9 @@
 #include <vlc_common.h>
 #include <vlc_modules.h>
 #include <vlc_interface.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include "libvlc.h"
-#include "playlist/playlist_internal.h"
+#include "playlist_legacy/playlist_internal.h"
 #include "../lib/libvlc_internal.h"
 
 static int AddIntfCallback( vlc_object_t *, char const *,
@@ -144,6 +143,12 @@ static playlist_t *intf_GetPlaylist(libvlc_int_t *libvlc)
     vlc_mutex_unlock(&lock);
 
     return playlist;
+}
+
+vlc_playlist_t *
+vlc_intf_GetMainPlaylist(intf_thread_t *intf)
+{
+    return libvlc_priv(intf->obj.libvlc)->main_playlist;
 }
 
 /**

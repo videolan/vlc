@@ -2,7 +2,6 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -33,9 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_video_splitter.h>
-
-/* FIXME it is needed for VOUT_ALIGN_* only */
-#include <vlc_vout.h>
+#include <vlc_vout_window.h>
 
 #define ROW_MAX (15)
 #define COL_MAX (15)
@@ -97,23 +94,21 @@ typedef struct
     int  i_output;
     int  i_width;
     int  i_height;
-    int  i_align;
+    vlc_video_align_t align;
     int  i_left;
     int  i_top;
 } wall_output_t;
 
-struct video_splitter_sys_t
+typedef struct
 {
     int           i_col;
     int           i_row;
     int           i_output;
     wall_output_t pp_output[COL_MAX][ROW_MAX]; /* [x][y] */
-};
+} video_splitter_sys_t;
 
 static int Filter( video_splitter_t *, picture_t *pp_dst[], picture_t * );
-static int Mouse( video_splitter_t *, vlc_mouse_t *,
-                  int i_index,
-                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new );
+static int Mouse( video_splitter_t *, int, vout_window_mouse_event_t * );
 
 /**
  * This function allocates and initializes a Wall splitter module.
@@ -265,12 +260,12 @@ static int Open( vlc_object_t *p_this )
                          i_vstart%i_target_height );
             if(  y >= ( p_sys->i_row / 2 ) )
             {
-                i_halign = VOUT_ALIGN_TOP;
+                i_halign = VLC_VIDEO_ALIGN_TOP;
                 i_height -= b_vstart_rounded ? 2: 0;
             }
             else
             {
-                i_halign = VOUT_ALIGN_BOTTOM;
+                i_halign = VLC_VIDEO_ALIGN_BOTTOM;
             }
         }
 
@@ -297,12 +292,12 @@ static int Open( vlc_object_t *p_this )
                 i_width = ( i_target_width - i_hstart % i_target_width );
                 if( x >= ( p_sys->i_col / 2 ) )
                 {
-                    i_valign = VOUT_ALIGN_LEFT;
+                    i_valign = VLC_VIDEO_ALIGN_LEFT;
                     i_width -= b_hstart_rounded ? 2: 0;
                 }
                 else
                 {
-                    i_valign = VOUT_ALIGN_RIGHT;
+                    i_valign = VLC_VIDEO_ALIGN_RIGHT;
                 }
             }
 
@@ -310,7 +305,8 @@ static int Open( vlc_object_t *p_this )
             p_output->b_active = pb_active[y * p_sys->i_col + x] &&
                                  i_height > 0 && i_width > 0;
             p_output->i_output = -1;
-            p_output->i_align = i_valign | i_halign;
+            p_output->align.vertical = i_valign;
+            p_output->align.horizontal = i_halign;
             p_output->i_width = i_width;
             p_output->i_height = i_height;
             p_output->i_left = i_left;
@@ -361,16 +357,16 @@ static int Open( vlc_object_t *p_this )
             p_cfg->fmt.i_height         = p_output->i_height;
             p_cfg->fmt.i_sar_num        = p_splitter->fmt.i_sar_num;
             p_cfg->fmt.i_sar_den        = p_splitter->fmt.i_sar_den;
-            p_cfg->window.i_x     = p_output->i_left;
-            p_cfg->window.i_y     = p_output->i_top;
-            p_cfg->window.i_align = p_output->i_align;
+            p_cfg->window.i_x   = p_output->i_left;
+            p_cfg->window.i_y   = p_output->i_top;
+            p_cfg->window.align = p_output->align;
             p_cfg->psz_module = NULL;
         }
     }
 
     /* */
     p_splitter->pf_filter = Filter;
-    p_splitter->pf_mouse = Mouse;
+    p_splitter->mouse = Mouse;
 
     return VLC_SUCCESS;
 }
@@ -425,11 +421,9 @@ static int Filter( video_splitter_t *p_splitter, picture_t *pp_dst[], picture_t 
     picture_Release( p_src );
     return VLC_SUCCESS;
 }
-static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
-                  int i_index,
-                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+static int Mouse( video_splitter_t *p_splitter, int i_index,
+                  vout_window_mouse_event_t *restrict ev )
 {
-    VLC_UNUSED(p_old);
     video_splitter_sys_t *p_sys = p_splitter->p_sys;
 
     for( int y = 0; y < p_sys->i_row; y++ )
@@ -437,11 +431,11 @@ static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
         for( int x = 0; x < p_sys->i_col; x++ )
         {
             wall_output_t *p_output = &p_sys->pp_output[x][y];
+
             if( p_output->b_active && p_output->i_output == i_index )
             {
-                *p_mouse = *p_new;
-                p_mouse->i_x += p_output->i_left;
-                p_mouse->i_y += p_output->i_top;
+                ev->x += p_output->i_left;
+                ev->y += p_output->i_top;
                 return VLC_SUCCESS;
             }
         }

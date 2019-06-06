@@ -122,8 +122,8 @@ struct frame_info_t
     picture_t *p_picture;
     int i_poc;
     int i_foc;
-    bool b_forced;
     bool b_flush;
+    bool b_eos;
     bool b_keyframe;
     bool b_field;
     bool b_progressive;
@@ -478,7 +478,7 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
         video_color_primaries_t primaries;
         video_transfer_func_t transfer;
         video_color_space_t colorspace;
-        bool full_range;
+        video_color_range_t full_range;
         if (hxxx_helper_get_colorimetry(&p_sys->hh,
                                         &primaries,
                                         &transfer,
@@ -488,7 +488,7 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
             p_dec->fmt_out.video.primaries = primaries;
             p_dec->fmt_out.video.transfer = transfer;
             p_dec->fmt_out.video.space = colorspace;
-            p_dec->fmt_out.video.b_color_range_full = full_range;
+            p_dec->fmt_out.video.color_range = full_range;
         }
     }
 
@@ -930,7 +930,7 @@ static frame_info_t * CreateReorderInfo(decoder_t *p_dec, const block_t *p_block
     p_info->i_length = p_block->i_length;
 
     /* required for still pictures/menus */
-    p_info->b_forced = (p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
+    p_info->b_eos = (p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
 
     if (date_Get(&p_sys->pts) == VLC_TICK_INVALID)
         date_Set(&p_sys->pts, p_block->i_dts);
@@ -2206,7 +2206,8 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         p_info->p_picture = p_pic;
 
         p_pic->date = pts.value;
-        p_pic->b_force = p_info->b_forced;
+        p_pic->b_force = p_info->b_eos;
+        p_pic->b_still = p_info->b_eos;
         p_pic->b_progressive = p_info->b_progressive;
         if(!p_pic->b_progressive)
         {

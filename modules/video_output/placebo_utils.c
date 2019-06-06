@@ -439,7 +439,7 @@ struct pl_color_repr vlc_placebo_ColorRepr(const video_format_t *fmt)
     return (struct pl_color_repr) {
         .sys        = sys,
         .alpha      = PL_ALPHA_PREMULTIPLIED,
-        .levels     = unlikely(fmt->b_color_range_full)
+        .levels     = unlikely(fmt->color_range == COLOR_RANGE_FULL)
                         ? PL_COLOR_LEVELS_PC
                         : PL_COLOR_LEVELS_TV,
         .bits = {

@@ -2,7 +2,6 @@
  * mmal_picture.h: Shared header for MMAL pictures
  *****************************************************************************
  * Copyright © 2014 jusst technologies GmbH
- * $Id$
  *
  * Authors: Julian Scheel <julian@jusst.de>
  *

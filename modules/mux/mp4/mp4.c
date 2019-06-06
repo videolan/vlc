@@ -2,7 +2,6 @@
  * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003, 2006 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin at videolan dot org>
@@ -44,6 +43,7 @@
 #include "libmp4mux.h"
 #include "../packetizer/hxxx_nal.h"
 #include "../av1_pack.h"
+#include "../extradata.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -128,7 +128,8 @@ typedef struct mp4_fragqueue_t
 typedef struct
 {
     mp4mux_trackinfo_t *tinfo;
-    const es_format_t *p_fmt;
+
+    mux_extradata_builder_t *extrabuilder;
 
     /* index */
     vlc_tick_t   i_length_neg;
@@ -174,6 +175,48 @@ typedef struct
     vlc_tick_t     i_written_duration;
     uint32_t       i_mfhd_sequence;
 } sout_mux_sys_t;
+
+static void mp4_stream_Delete(mp4_stream_t *p_stream)
+{
+    if(p_stream->extrabuilder)
+        mux_extradata_builder_Delete(p_stream->extrabuilder);
+
+    /* mp4 frag */
+    if (p_stream->p_held_entry)
+    {
+        block_Release(p_stream->p_held_entry->p_block);
+        free(p_stream->p_held_entry);
+    }
+    while(p_stream->read.p_first)
+    {
+        mp4_fragentry_t *p_next = p_stream->read.p_first->p_next;
+        block_Release(p_stream->read.p_first->p_block);
+        free(p_stream->read.p_first);
+        p_stream->read.p_first = p_next;
+    }
+    while(p_stream->towrite.p_first)
+    {
+        mp4_fragentry_t *p_next = p_stream->towrite.p_first->p_next;
+        block_Release(p_stream->towrite.p_first->p_block);
+        free(p_stream->towrite.p_first);
+        p_stream->towrite.p_first = p_next;
+    }
+    free(p_stream->p_indexentries);
+
+    free(p_stream);
+}
+
+static mp4_stream_t *mp4_stream_New(void)
+{
+    mp4_stream_t *p_stream = calloc(1, sizeof(*p_stream));
+    if(p_stream)
+    {
+        p_stream->i_first_dts = VLC_TICK_INVALID;
+        p_stream->i_last_dts = VLC_TICK_INVALID;
+        p_stream->i_last_pts = VLC_TICK_INVALID;
+    }
+    return p_stream;
+}
 
 static void box_send(sout_mux_t *p_mux,  bo_t *box);
 
@@ -258,12 +301,12 @@ static int Open(vlc_object_t *p_this)
 
     if(p_sys->b_3gp)
     {
-        mp4mux_SetBrand(p_sys->muxh, MAJOR_3gp6, 0x0);
-        mp4mux_AddExtraBrand(p_sys->muxh, MAJOR_3gp4);
+        mp4mux_SetBrand(p_sys->muxh, BRAND_3gp6, 0x0);
+        mp4mux_AddExtraBrand(p_sys->muxh, BRAND_3gp4);
     }
     else
     {
-        mp4mux_SetBrand(p_sys->muxh, MAJOR_isom, 0x0);
+        mp4mux_SetBrand(p_sys->muxh, BRAND_isom, 0x0);
     }
 
     return VLC_SUCCESS;
@@ -382,7 +425,7 @@ static void Close(vlc_object_t *p_this)
 cleanup:
     /* Clean-up */
     for (unsigned int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++)
-        free(p_sys->pp_streams[i_trak]);
+        mp4_stream_Delete(p_sys->pp_streams[i_trak]);
     TAB_CLEAN(p_sys->i_nb_streams, p_sys->pp_streams);
     mp4mux_Delete(p_sys->muxh);
     free(p_sys);
@@ -423,7 +466,7 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     mp4_stream_t    *p_stream;
 
     if(!mp4mux_CanMux(VLC_OBJECT(p_mux), p_input->p_fmt,
-                      mp4mux_Is(p_sys->muxh, QUICKTIME) ? MAJOR_qt__ : MAJOR_isom,
+                      mp4mux_Is(p_sys->muxh, QUICKTIME) ? BRAND_qt__ : BRAND_isom,
                       mp4mux_Is(p_sys->muxh, FRAGMENTED)))
     {
         msg_Err(p_mux, "unsupported codec %4.4s in mp4",
@@ -431,8 +474,7 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
         return VLC_EGENERIC;
     }
 
-    p_stream = malloc(sizeof(mp4_stream_t));
-    if(!p_stream)
+    if(!(p_stream = mp4_stream_New()))
         return VLC_ENOMEM;
 
     uint32_t i_track_timescale = CLOCK_FREQ;
@@ -482,24 +524,8 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
         return VLC_ENOMEM;
     }
 
-    p_stream->p_fmt = p_input->p_fmt;
-    p_stream->i_length_neg  = 0;
-    p_stream->i_last_dts    = VLC_TICK_INVALID;
-    p_stream->i_last_pts    = VLC_TICK_INVALID;
-
-    p_stream->b_hasiframes  = false;
-
-    p_stream->i_current_run = 0;
-    p_stream->read.p_first  = NULL;
-    p_stream->read.p_last   = NULL;
-    p_stream->towrite.p_first = NULL;
-    p_stream->towrite.p_last  = NULL;
-    p_stream->p_held_entry    = NULL;
-    p_stream->i_last_iframe_time = 0;
-    p_stream->i_written_duration = 0;
-    p_stream->p_indexentries     = NULL;
-    p_stream->i_indexentriesmax  = 0;
-    p_stream->i_indexentries     = 0;
+    p_stream->extrabuilder = mux_extradata_builder_New(p_input->p_fmt->i_codec,
+                                                       EXTRADATA_ISOBMFF);
 
     p_input->p_sys          = p_stream;
 
@@ -581,7 +607,18 @@ static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
     if(unlikely(!p_block))
         return NULL;
 
-    switch(p_stream->p_fmt->i_codec)
+    /* Create on the fly extradata as packetizer is not in the loop */
+    if(p_stream->extrabuilder && !mp4mux_track_HasSamplePriv(p_stream->tinfo))
+    {
+         mux_extradata_builder_Feed(p_stream->extrabuilder,
+                                    p_block->p_buffer, p_block->i_buffer);
+         const uint8_t *p_extra;
+         size_t i_extra = mux_extradata_builder_Get(p_stream->extrabuilder, &p_extra);
+         if(i_extra)
+            mp4mux_track_SetSamplePriv(p_stream->tinfo, p_extra, i_extra);
+    }
+
+    switch(mp4mux_track_GetFmt(p_stream->tinfo)->i_codec)
     {
         case VLC_CODEC_AV1:
             p_block = AV1_Pack_Sample(p_block);
@@ -592,15 +629,6 @@ static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
             break;
         case VLC_CODEC_SUBT:
             p_block = ConvertSUBT(p_block);
-            break;
-        case VLC_CODEC_A52:
-        case VLC_CODEC_EAC3:
-            if(!mp4mux_track_HasSamplePriv(p_stream->tinfo) &&
-               p_block->i_buffer >= 8)
-            {
-                mp4mux_track_SetSamplePriv(p_stream->tinfo,
-                                           p_block->p_buffer, p_block->i_buffer);
-            }
             break;
         default:
             break;
@@ -650,7 +678,7 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
             p_sys->i_start_dts = p_stream->i_first_dts;
     }
 
-    if (p_stream->p_fmt->i_cat != SPU_ES)
+    if (mp4mux_track_GetFmt(p_stream->tinfo)->i_cat != SPU_ES)
     {
         /* Fix length of the sample */
         if (block_FifoCount(p_input->p_fifo) > 0)
@@ -658,23 +686,23 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
             block_t *p_next = block_FifoShow(p_input->p_fifo);
             if ( p_next->i_flags & BLOCK_FLAG_DISCONTINUITY )
             { /* we have no way to know real length except by decoding */
-                if ( p_stream->p_fmt->i_cat == VIDEO_ES )
+                if ( mp4mux_track_GetFmt(p_stream->tinfo)->i_cat == VIDEO_ES )
                 {
                     p_data->i_length = vlc_tick_from_samples(
-                            p_stream->p_fmt->video.i_frame_rate_base,
-                            p_stream->p_fmt->video.i_frame_rate );
+                            mp4mux_track_GetFmt(p_stream->tinfo)->video.i_frame_rate_base,
+                            mp4mux_track_GetFmt(p_stream->tinfo)->video.i_frame_rate );
                     if( p_data->i_flags & BLOCK_FLAG_SINGLE_FIELD )
                         p_data->i_length >>= 1;
                     msg_Dbg( p_mux, "video track %u fixup to %"PRId64" for sample %u",
                              mp4mux_track_GetID(p_stream->tinfo), p_data->i_length,
                              mp4mux_track_GetSampleCount(p_stream->tinfo) );
                 }
-                else if ( p_stream->p_fmt->i_cat == AUDIO_ES &&
-                          p_stream->p_fmt->audio.i_rate &&
+                else if ( mp4mux_track_GetFmt(p_stream->tinfo)->i_cat == AUDIO_ES &&
+                          mp4mux_track_GetFmt(p_stream->tinfo)->audio.i_rate &&
                           p_data->i_nb_samples )
                 {
                     p_data->i_length = vlc_tick_from_samples(p_data->i_nb_samples,
-                            p_stream->p_fmt->audio.i_rate);
+                            mp4mux_track_GetFmt(p_stream->tinfo)->audio.i_rate);
                     msg_Dbg( p_mux, "audio track %u fixup to %"PRId64" for sample %u",
                              mp4mux_track_GetID(p_stream->tinfo), p_data->i_length,
                              mp4mux_track_GetSampleCount(p_stream->tinfo) );
@@ -750,12 +778,12 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
     }
 
     /* Add SPU clearing tag (duration tb fixed on next SPU or stream end )*/
-    if ( p_stream->p_fmt->i_cat == SPU_ES && sample.i_length > 0 )
+    if ( mp4mux_track_GetFmt(p_stream->tinfo)->i_cat == SPU_ES && sample.i_length > 0 )
     {
         block_t *p_empty = NULL;
-        if(p_stream->p_fmt->i_codec == VLC_CODEC_SUBT||
-           p_stream->p_fmt->i_codec == VLC_CODEC_QTXT||
-           p_stream->p_fmt->i_codec == VLC_CODEC_TX3G)
+        if(mp4mux_track_GetFmt(p_stream->tinfo)->i_codec == VLC_CODEC_SUBT||
+           mp4mux_track_GetFmt(p_stream->tinfo)->i_codec == VLC_CODEC_QTXT||
+           mp4mux_track_GetFmt(p_stream->tinfo)->i_codec == VLC_CODEC_TX3G)
         {
             p_empty = block_Alloc(3);
             if(p_empty)
@@ -766,13 +794,13 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
                 p_empty->p_buffer[2] = ' ';
             }
         }
-        else if(p_stream->p_fmt->i_codec == VLC_CODEC_TTML)
+        else if(mp4mux_track_GetFmt(p_stream->tinfo)->i_codec == VLC_CODEC_TTML)
         {
             p_empty = block_Alloc(40);
             if(p_empty)
                 memcpy(p_empty->p_buffer, "<tt><body><div><p></p></div></body></tt>", 40);
         }
-        else if(p_stream->p_fmt->i_codec == VLC_CODEC_WEBVTT)
+        else if(mp4mux_track_GetFmt(p_stream->tinfo)->i_codec == VLC_CODEC_WEBVTT)
         {
             p_empty = block_Alloc(8);
             if(p_empty)
@@ -1112,7 +1140,8 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
 
                 /* Add keyframe entry if needed */
                 if (p_stream->b_hasiframes && (p_entry->p_block->i_flags & BLOCK_FLAG_TYPE_I) &&
-                    (p_stream->p_fmt->i_cat == VIDEO_ES || p_stream->p_fmt->i_cat == AUDIO_ES))
+                    (mp4mux_track_GetFmt(p_stream->tinfo)->i_cat == VIDEO_ES ||
+                     mp4mux_track_GetFmt(p_stream->tinfo)->i_cat == AUDIO_ES))
                 {
                     AddKeyframeEntry(p_stream, i_write_pos, i_trak, i_sample, i_time);
                 }
@@ -1275,8 +1304,8 @@ static void WriteFragments(sout_mux_t *p_mux, bool b_flush)
             /* set a barrier so we try to align to keyframe */
             if (p_stream->b_hasiframes &&
                     p_stream->i_last_iframe_time > p_stream->i_written_duration &&
-                    (p_stream->p_fmt->i_cat == VIDEO_ES ||
-                     p_stream->p_fmt->i_cat == AUDIO_ES) )
+                    (mp4mux_track_GetFmt(p_stream->tinfo)->i_cat == VIDEO_ES ||
+                     mp4mux_track_GetFmt(p_stream->tinfo)->i_cat == AUDIO_ES) )
             {
                 i_barrier_time = __MIN(i_barrier_time, p_stream->i_last_iframe_time);
             }
@@ -1317,21 +1346,22 @@ static void WriteFragments(sout_mux_t *p_mux, bool b_flush)
  * This is the end boundary case. */
 static void LengthLocalFixup(sout_mux_t *p_mux, const mp4_stream_t *p_stream, block_t *p_entrydata)
 {
-    if ( p_stream->p_fmt->i_cat == VIDEO_ES && p_stream->p_fmt->video.i_frame_rate )
+    if ( mp4mux_track_GetFmt(p_stream->tinfo)->i_cat == VIDEO_ES &&
+         mp4mux_track_GetFmt(p_stream->tinfo)->video.i_frame_rate )
     {
         p_entrydata->i_length = vlc_tick_from_samples(
-                p_stream->p_fmt->video.i_frame_rate_base,
-                p_stream->p_fmt->video.i_frame_rate);
+                mp4mux_track_GetFmt(p_stream->tinfo)->video.i_frame_rate_base,
+                mp4mux_track_GetFmt(p_stream->tinfo)->video.i_frame_rate);
         msg_Dbg(p_mux, "video track %d fixup to %"PRId64" for sample %u",
                 mp4mux_track_GetID(p_stream->tinfo), p_entrydata->i_length,
                 mp4mux_track_GetSampleCount(p_stream->tinfo) - 1);
     }
-    else if (p_stream->p_fmt->i_cat == AUDIO_ES &&
-             p_stream->p_fmt->audio.i_rate &&
-             p_entrydata->i_nb_samples && p_stream->p_fmt->audio.i_rate)
+    else if (mp4mux_track_GetFmt(p_stream->tinfo)->i_cat == AUDIO_ES &&
+             mp4mux_track_GetFmt(p_stream->tinfo)->audio.i_rate &&
+             p_entrydata->i_nb_samples && mp4mux_track_GetFmt(p_stream->tinfo)->audio.i_rate)
     {
         p_entrydata->i_length = vlc_tick_from_samples(p_entrydata->i_nb_samples,
-                p_stream->p_fmt->audio.i_rate);
+                mp4mux_track_GetFmt(p_stream->tinfo)->audio.i_rate);
         msg_Dbg(p_mux, "audio track %d fixup to %"PRId64" for sample %u",
                 mp4mux_track_GetID(p_stream->tinfo), p_entrydata->i_length,
                 mp4mux_track_GetSampleCount(p_stream->tinfo) - 1);
@@ -1343,38 +1373,6 @@ static void LengthLocalFixup(sout_mux_t *p_mux, const mp4_stream_t *p_stream, bl
                  mp4mux_track_GetSampleCount(p_stream->tinfo) - 1);
         p_entrydata->i_length = 1;
     }
-}
-
-static void CleanupFrag(sout_mux_sys_t *p_sys)
-{
-    for (unsigned int i = 0; i < p_sys->i_nb_streams; i++)
-    {
-        mp4_stream_t *p_stream = p_sys->pp_streams[i];
-        if (p_stream->p_held_entry)
-        {
-            block_Release(p_stream->p_held_entry->p_block);
-            free(p_stream->p_held_entry);
-        }
-        while(p_stream->read.p_first)
-        {
-            mp4_fragentry_t *p_next = p_stream->read.p_first->p_next;
-            block_Release(p_stream->read.p_first->p_block);
-            free(p_stream->read.p_first);
-            p_stream->read.p_first = p_next;
-        }
-        while(p_stream->towrite.p_first)
-        {
-            mp4_fragentry_t *p_next = p_stream->towrite.p_first->p_next;
-            block_Release(p_stream->towrite.p_first->p_block);
-            free(p_stream->towrite.p_first);
-            p_stream->towrite.p_first = p_next;
-        }
-        free(p_stream->p_indexentries);
-        free(p_stream);
-    }
-    TAB_CLEAN(p_sys->i_nb_streams, p_sys->pp_streams);
-    mp4mux_Delete(p_sys->muxh);
-    free(p_sys);
 }
 
 static void CloseFrag(vlc_object_t *p_this)
@@ -1419,7 +1417,11 @@ static void CloseFrag(vlc_object_t *p_this)
         }
     }
 
-    CleanupFrag(p_sys);
+    for (unsigned int i = 0; i < p_sys->i_nb_streams; i++)
+        mp4_stream_Delete(p_sys->pp_streams[i]);
+    TAB_CLEAN(p_sys->i_nb_streams, p_sys->pp_streams);
+    mp4mux_Delete(p_sys->muxh);
+    free(p_sys);
 }
 
 static int MuxFrag(sout_mux_t *p_mux)
@@ -1489,7 +1491,7 @@ static int MuxFrag(sout_mux_t *p_mux)
     p_stream->p_held_entry->i_run    = p_stream->i_current_run;
     p_stream->p_held_entry->p_next   = NULL;
 
-    if (p_stream->p_fmt->i_cat == VIDEO_ES )
+    if (mp4mux_track_GetFmt(p_stream->tinfo)->i_cat == VIDEO_ES )
     {
         if (!p_stream->b_hasiframes && (p_currentblock->i_flags & BLOCK_FLAG_TYPE_I))
             p_stream->b_hasiframes = true;
@@ -1506,7 +1508,8 @@ static int MuxFrag(sout_mux_t *p_mux)
     for (unsigned int i=0; i<p_sys->i_nb_streams; i++)
     {
         const mp4_stream_t *p_s = p_sys->pp_streams[i];
-        if (p_s->p_fmt->i_cat != VIDEO_ES && p_s->p_fmt->i_cat != AUDIO_ES)
+        if (mp4mux_track_GetFmt(p_stream->tinfo)->i_cat != VIDEO_ES &&
+            mp4mux_track_GetFmt(p_stream->tinfo)->i_cat != AUDIO_ES)
             continue;
         if (mp4mux_track_GetDuration(p_s->tinfo) < i_min_read_duration)
             i_min_read_duration = mp4mux_track_GetDuration(p_s->tinfo);

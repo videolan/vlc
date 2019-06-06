@@ -2,7 +2,6 @@
  * main_interface_win32.cpp : Main interface
  ****************************************************************************
  * Copyright (C) 2006-2010 VideoLAN and AUTHORS
- * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb@videolan.org>
  *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>

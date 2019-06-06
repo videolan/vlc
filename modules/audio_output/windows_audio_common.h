@@ -2,7 +2,6 @@
  * windows_audio_common.h: Windows Audio common code
  *****************************************************************************
  * Copyright (C) 2001-2009 VideoLAN
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>

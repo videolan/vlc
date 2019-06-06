@@ -423,9 +423,9 @@ static void CloseSD(vlc_object_t *p_this)
 static int OpenRD(vlc_object_t *p_this)
 {
     vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t *)p_this;
-    vlc_renderer_discovery_sys *p_sys = NULL;
+    struct vlc_renderer_discovery_sys *p_sys = NULL;
 
-    p_rd->p_sys = p_sys = calloc(1, sizeof(vlc_renderer_discovery_sys));
+    p_rd->p_sys = p_sys = calloc(1, sizeof(struct vlc_renderer_discovery_sys));
     if (!p_sys) {
         return VLC_ENOMEM;
     }
@@ -442,7 +442,7 @@ static int OpenRD(vlc_object_t *p_this)
 static void CloseRD(vlc_object_t *p_this)
 {
     vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t *)p_this;
-    vlc_renderer_discovery_sys *p_sys = p_rd->p_sys;
+    struct vlc_renderer_discovery_sys *p_sys = p_rd->p_sys;
 
     VLCNetServiceDiscoveryController *discoveryController = (__bridge VLCNetServiceDiscoveryController *)(p_sys->discoveryController);
     [discoveryController stopDiscovery];

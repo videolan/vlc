@@ -2,7 +2,6 @@
  * mux.c: muxer using libavformat
  *****************************************************************************
  * Copyright (C) 2006 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -45,7 +44,7 @@
 //#define AVFORMAT_DEBUG 1
 
 static const char *const ppsz_mux_options[] = {
-    "mux", "options", NULL
+    "mux", "options", "reset-ts", NULL
 };
 
 /*****************************************************************************
@@ -151,6 +150,8 @@ int avformat_OpenMux( vlc_object_t *p_this )
     p_sys->io->write_data_type = IOWriteTyped;
     p_sys->b_header_done = false;
 #endif
+    if( var_GetBool( p_mux, "sout-avformat-reset-ts" ) )
+        p_sys->oc->avoid_negative_ts = AVFMT_AVOID_NEG_TS_MAKE_ZERO;
 
     /* Fill p_mux fields */
     p_mux->pf_control   = Control;
@@ -292,7 +293,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             video_format_Copy(&vfmt, &fmt->video);
             video_format_FixRgb(&vfmt);
             if(GetFfmpegChroma(&codecpar->format, &vfmt))
-                msg_Warn(p_mux, "can't match format RAW video %4.4s", &vfmt.i_chroma);
+                msg_Warn(p_mux, "can't match format RAW video %4.4s",
+                         (const char *)&vfmt.i_chroma);
             video_format_Clean(&vfmt);
         }
         if (fmt->i_bitrate == 0) {

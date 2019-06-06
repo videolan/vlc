@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCPlaylistTableCellView"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="c22-O7-iKe" customClass="VLCPlaylistTableCellView">
+            <rect key="frame" x="0.0" y="0.0" width="398" height="65"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ohB-P0-nCv">
+                    <rect key="frame" x="73" y="24" width="37" height="17"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="ZPw-XO-XD1">
+                        <font key="font" usesAppearanceFont="YES"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Hnm-OH-KKY">
+                    <rect key="frame" x="0.0" y="0.0" width="65" height="65"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="Hnm-OH-KKY" secondAttribute="height" multiplier="1:1" id="4tH-UG-Xdn"/>
+                    </constraints>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="AB8-xJ-YJC"/>
+                </imageView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Ha-ZH-fa9">
+                    <rect key="frame" x="353" y="24" width="37" height="17"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="33" id="0cB-ga-0Uw"/>
+                    </constraints>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="N0j-xB-3t9">
+                        <font key="font" usesAppearanceFont="YES"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="3Ha-ZH-fa9" firstAttribute="centerY" secondItem="ohB-P0-nCv" secondAttribute="centerY" id="Flo-4k-Vaz"/>
+                <constraint firstAttribute="bottom" secondItem="Hnm-OH-KKY" secondAttribute="bottom" id="KCN-ec-D7a"/>
+                <constraint firstItem="ohB-P0-nCv" firstAttribute="leading" secondItem="Hnm-OH-KKY" secondAttribute="trailing" constant="10" id="L6s-Ro-Qtx"/>
+                <constraint firstAttribute="trailing" secondItem="3Ha-ZH-fa9" secondAttribute="trailing" constant="10" id="SVJ-UL-O5m"/>
+                <constraint firstItem="ohB-P0-nCv" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="mGo-gc-dR6"/>
+                <constraint firstItem="Hnm-OH-KKY" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="owl-FT-tZX"/>
+                <constraint firstItem="Hnm-OH-KKY" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="vEf-1U-gh4"/>
+                <constraint firstItem="3Ha-ZH-fa9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ohB-P0-nCv" secondAttribute="trailing" constant="10" id="wQv-VX-Hhb"/>
+            </constraints>
+            <connections>
+                <outlet property="durationTextField" destination="3Ha-ZH-fa9" id="vbh-oE-Afj"/>
+                <outlet property="mediaImageView" destination="Hnm-OH-KKY" id="SzS-Oe-Ghh"/>
+                <outlet property="mediaTitleTextField" destination="ohB-P0-nCv" id="iS6-q4-h8I"/>
+            </connections>
+            <point key="canvasLocation" x="98" y="50.5"/>
+        </customView>
+    </objects>
+</document>

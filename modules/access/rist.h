@@ -140,7 +140,7 @@ static inline void populate_cname(int fd, char *identifier)
     char hostname[MAX_CNAME];
     struct sockaddr_storage peer_sockaddr;
     int name_length = 0;
-    socklen_t peer_socklen;
+    socklen_t peer_socklen = 0;
     int ret_hostname = gethostname(hostname, MAX_CNAME);
     if (ret_hostname == -1)
         snprintf(hostname, MAX_CNAME, "UnknownHost");
@@ -278,15 +278,17 @@ static inline ssize_t rist_WriteTo_i11e(int fd, const void *buf, size_t len,
         && net_errno != ENOBUFS && net_errno != ENOMEM )
     {
         int type;
-        getsockopt( fd, SOL_SOCKET, SO_TYPE,
-                    &type, &(socklen_t){ sizeof(type) });
-        if( type == SOCK_DGRAM )
+        if (!getsockopt( fd, SOL_SOCKET, SO_TYPE,
+                    &type, &(socklen_t){ sizeof(type) }))
         {
-            /* ICMP soft error: ignore and retry */
-            if (slen == 0)
-                r = vlc_send_i11e( fd, buf, len, 0 );
-            else
-                r = vlc_sendto_i11e( fd, buf, len, 0, peer, slen );
+            if( type == SOCK_DGRAM )
+            {
+                /* ICMP soft error: ignore and retry */
+                if (slen == 0)
+                    r = vlc_send_i11e( fd, buf, len, 0 );
+                else
+                    r = vlc_sendto_i11e( fd, buf, len, 0, peer, slen );
+            }
         }
     }
     return r;
@@ -315,15 +317,17 @@ static inline ssize_t rist_WriteTo(int fd, const void *buf, size_t len, const st
         && net_errno != ENOBUFS && net_errno != ENOMEM )
     {
         int type;
-        getsockopt( fd, SOL_SOCKET, SO_TYPE,
-                    &type, &(socklen_t){ sizeof(type) });
-        if( type == SOCK_DGRAM )
+        if (!getsockopt( fd, SOL_SOCKET, SO_TYPE,
+                    &type, &(socklen_t){ sizeof(type) }))
         {
-            /* ICMP soft error: ignore and retry */
-            if (slen == 0)
-                r = send( fd, buf, len, 0 );
-            else
-                r = sendto( fd, buf, len, 0, peer, slen );
+            if( type == SOCK_DGRAM )
+            {
+                /* ICMP soft error: ignore and retry */
+                if (slen == 0)
+                    r = send( fd, buf, len, 0 );
+                else
+                    r = sendto( fd, buf, len, 0, peer, slen );
+            }
         }
     }
     return r;

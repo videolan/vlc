@@ -2,7 +2,6 @@
  * qt.hpp : Qt interface
  ****************************************************************************
  * Copyright (C) 2006-2009 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
@@ -31,7 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h> /* intf_thread_t */
-#include <vlc_playlist.h>  /* playlist_t */
+#include <vlc_playlist_legacy.h>  /* playlist_t */
 
 #include <qconfig.h>
 

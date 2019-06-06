@@ -47,12 +47,6 @@
         } \
     }
 
-struct  priv
-{
-    vdp_t *vdp;
-    VdpDevice vdp_device;
-};
-
 static PFNGLVDPAUINITNVPROC                     _glVDPAUInitNV;
 static PFNGLVDPAUFININVPROC                     _glVDPAUFiniNV;
 static PFNGLVDPAUREGISTEROUTPUTSURFACENVPROC    _glVDPAURegisterOutputSurfaceNV;
@@ -63,62 +57,12 @@ static PFNGLVDPAUSURFACEACCESSNVPROC            _glVDPAUSurfaceAccessNV;
 static PFNGLVDPAUMAPSURFACESNVPROC              _glVDPAUMapSurfacesNV;
 static PFNGLVDPAUUNMAPSURFACESNVPROC            _glVDPAUUnmapSurfacesNV;
 
-static void
-pool_pic_destroy_cb(picture_t *pic)
-{
-    picture_sys_t *p_sys = pic->p_sys;
-    vdp_output_surface_destroy(p_sys->vdp, p_sys->surface);
-    vdp_release_x11(p_sys->vdp);
-    free(p_sys);
-    free(pic);
-}
-
 static picture_pool_t *
 tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
                      unsigned int requested_count)
 {
-    struct priv *priv = tc->priv;
-    picture_t *pics[requested_count];
-
-    unsigned int i;
-    for (i = 0; i < requested_count; ++i)
-    {
-        VdpOutputSurface surface;
-
-        VdpStatus st;
-        if ((st = vdp_output_surface_create(priv->vdp, priv->vdp_device,
-                                            VDP_RGBA_FORMAT_B8G8R8A8,
-                                            tc->fmt.i_visible_width,
-                                            tc->fmt.i_visible_height,
-                                            &surface)) != VDP_STATUS_OK)
-            goto error;
-
-        picture_sys_t *picsys = calloc(1, sizeof(*picsys));
-        if (!picsys)
-            goto error;
-
-        picsys->vdp = vdp_hold_x11(priv->vdp, NULL);
-        picsys->device = priv->vdp_device;
-        picsys->surface = surface;
-
-        picture_resource_t rsc = { .p_sys = picsys,
-                                   .pf_destroy = pool_pic_destroy_cb };
-
-        pics[i] = picture_NewFromResource(&tc->fmt, &rsc);
-        if (!pics[i])
-            goto error;
-    }
-
-    picture_pool_t *pool = picture_pool_New(requested_count, pics);
-    if (!pool)
-        goto error;
-
-    return pool;
-
-error:
-    while (i--)
-        picture_Release(pics[i]);
-    return NULL;
+    return vlc_vdp_output_pool_create(tc->priv, VDP_RGBA_FORMAT_B8G8R8A8,
+                                      &tc->fmt, requested_count);
 }
 
 static int
@@ -130,32 +74,34 @@ tc_vdpau_gl_update(opengl_tex_converter_t const *tc, GLuint textures[],
     VLC_UNUSED(tex_heights);
     VLC_UNUSED(plane_offsets);
 
-    picture_sys_t *p_sys = pic->p_sys;
+    vlc_vdp_output_surface_t *p_sys = pic->p_sys;
+    GLvdpauSurfaceNV gl_nv_surface = p_sys->gl_nv_surface;
 
-    GLvdpauSurfaceNV *p_gl_nv_surface =
-        (GLvdpauSurfaceNV *)&p_sys->gl_nv_surface;
+    static_assert (sizeof (gl_nv_surface) <= sizeof (p_sys->gl_nv_surface),
+                   "Type too small");
 
-    if (*p_gl_nv_surface)
+    if (gl_nv_surface)
     {
-        assert(_glVDPAUIsSurfaceNV(*p_gl_nv_surface) == GL_TRUE);
+        assert(_glVDPAUIsSurfaceNV(gl_nv_surface) == GL_TRUE);
 
         GLint state;
         GLsizei num_val;
-        INTEROP_CALL(glVDPAUGetSurfaceivNV, *p_gl_nv_surface,
+        INTEROP_CALL(glVDPAUGetSurfaceivNV, gl_nv_surface,
                      GL_SURFACE_STATE_NV, 1, &num_val, &state);
         assert(num_val == 1); assert(state == GL_SURFACE_MAPPED_NV);
 
-        INTEROP_CALL(glVDPAUUnmapSurfacesNV, 1, p_gl_nv_surface);
-        INTEROP_CALL(glVDPAUUnregisterSurfaceNV, *p_gl_nv_surface);
+        INTEROP_CALL(glVDPAUUnmapSurfacesNV, 1, &gl_nv_surface);
+        INTEROP_CALL(glVDPAUUnregisterSurfaceNV, gl_nv_surface);
     }
 
-    *p_gl_nv_surface =
+    gl_nv_surface =
         INTEROP_CALL(glVDPAURegisterOutputSurfaceNV,
                      (void *)(size_t)p_sys->surface,
                      GL_TEXTURE_2D, tc->tex_count, textures);
-    INTEROP_CALL(glVDPAUSurfaceAccessNV, *p_gl_nv_surface, GL_READ_ONLY);
-    INTEROP_CALL(glVDPAUMapSurfacesNV, 1, p_gl_nv_surface);
+    INTEROP_CALL(glVDPAUSurfaceAccessNV, gl_nv_surface, GL_READ_ONLY);
+    INTEROP_CALL(glVDPAUMapSurfacesNV, 1, &gl_nv_surface);
 
+    p_sys->gl_nv_surface = gl_nv_surface;
     return VLC_SUCCESS;
 }
 
@@ -164,8 +110,7 @@ Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
     _glVDPAUFiniNV(); assert(tc->vt->GetError() == GL_NO_ERROR);
-    vdp_release_x11(((struct priv *)tc->priv)->vdp);
-    free(tc->priv);
+    vdp_release_x11(tc->priv);
 }
 
 static int
@@ -184,25 +129,21 @@ Open(vlc_object_t *obj)
     if (!vlc_xlib_init(VLC_OBJECT(tc->gl)))
         return VLC_EGENERIC;
 
-    struct priv *priv = calloc(1, sizeof(*priv));
-    if (!priv)
-        return VLC_EGENERIC;
-    tc->priv = priv;
+    vdp_t *vdp;
+    VdpDevice device;
 
     if (vdp_get_x11(tc->gl->surface->display.x11, -1,
-                    &priv->vdp, &priv->vdp_device) != VDP_STATUS_OK)
-    {
-        free(priv);
+                    &vdp, &device) != VDP_STATUS_OK)
         return VLC_EGENERIC;
-    }
+
+    tc->priv = vdp;
 
     void *vdp_gpa;
-    if (vdp_get_proc_address(priv->vdp, priv->vdp_device,
+    if (vdp_get_proc_address(vdp, device,
                              VDP_FUNC_ID_GET_PROC_ADDRESS, &vdp_gpa)
         != VDP_STATUS_OK)
     {
-        vdp_release_x11(priv->vdp);
-        free(priv);
+        vdp_release_x11(vdp);
         return VLC_EGENERIC;
     }
 
@@ -210,8 +151,7 @@ Open(vlc_object_t *obj)
     _##fct = vlc_gl_GetProcAddress(tc->gl, #fct); \
     if (!_##fct) \
     { \
-        vdp_release_x11(priv->vdp); \
-        free(priv); \
+        vdp_release_x11(vdp); \
         return VLC_EGENERIC; \
     }
     SAFE_GPA(glVDPAUInitNV);
@@ -225,7 +165,7 @@ Open(vlc_object_t *obj)
     SAFE_GPA(glVDPAUUnmapSurfacesNV);
 #undef SAFE_GPA
 
-    INTEROP_CALL(glVDPAUInitNV, (void *)(size_t)priv->vdp_device, vdp_gpa);
+    INTEROP_CALL(glVDPAUInitNV, (void *)(uintptr_t)device, vdp_gpa);
 
     tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D,
                                               VLC_CODEC_RGB32,

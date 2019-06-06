@@ -2,7 +2,6 @@
  * mmsh.h:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -44,7 +43,7 @@ typedef struct
 {
     int             i_proto;
 
-    int             fd;
+    struct vlc_tls *stream;
     vlc_url_t       url;
 
     bool      b_proxy;

@@ -192,7 +192,7 @@ bool h264_get_colorimetry( const h264_sequence_parameter_set_t *p_sps,
                            video_color_primaries_t *p_primaries,
                            video_transfer_func_t *p_transfer,
                            video_color_space_t *p_colorspace,
-                           bool *p_full_range );
+                           video_color_range_t *p_full_range );
 
 /* Get level and Profile from DecoderConfigurationRecord */
 bool h264_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,

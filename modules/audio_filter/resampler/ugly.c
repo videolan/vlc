@@ -2,7 +2,6 @@
  * ugly.c : zero-order hold "ugly" resampler
  *****************************************************************************
  * Copyright (C) 2002, 2006 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

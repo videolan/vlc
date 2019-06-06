@@ -2,7 +2,6 @@
  * motion.c: control VLC with laptop built-in motion sensors
  *****************************************************************************
  * Copyright (C) 2006 - 2007 the VideoLAN team
- * $Id$
  *
  * Author: Sam Hocevar <sam@zoy.org>
  *         Jérôme Decoodt <djc@videolan.org> (unimotion integration)
@@ -37,7 +36,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_input.h>
 #include <vlc_vout.h>
 

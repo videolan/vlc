@@ -88,26 +88,28 @@ static void mp4mux_AddExtraBrandForFormat(mp4mux_handle_t *h, const es_format_t 
     switch(fmt->i_codec)
     {
         case VLC_CODEC_H264:
-            mp4mux_AddExtraBrand(h, MAJOR_avc1);
+            mp4mux_AddExtraBrand(h, BRAND_avc1);
             break;
         case VLC_CODEC_HEVC:
-            mp4mux_AddExtraBrand(h, MAJOR_hevc);
+            mp4mux_AddExtraBrand(h, BRAND_hevc);
             break;
         case VLC_CODEC_AV1:
-            mp4mux_AddExtraBrand(h, VLC_FOURCC('a','v','0','1'));
-            mp4mux_AddExtraBrand(h, VLC_FOURCC('i','s','o','6'));
+            mp4mux_AddExtraBrand(h, BRAND_av01);
+            mp4mux_AddExtraBrand(h, BRAND_iso6);
             break;
+        case VLC_CODEC_MP3:
+        case VLC_CODEC_MPGA:
         case VLC_CODEC_MP4V:
         case VLC_CODEC_DIV1:
         case VLC_CODEC_DIV2:
         case VLC_CODEC_DIV3:
         case VLC_CODEC_H263:
-            mp4mux_AddExtraBrand(h, MAJOR_mp41);
+            mp4mux_AddExtraBrand(h, BRAND_mp41);
             break;
         case VLC_CODEC_MP4A:
-            mp4mux_AddExtraBrand(h, MAJOR_mp41);
+            mp4mux_AddExtraBrand(h, BRAND_mp41);
             if(vlc_array_count(&h->tracks) == 1)
-                mp4mux_AddExtraBrand(h, MAJOR_M4A);
+                mp4mux_AddExtraBrand(h, BRAND_M4A);
             break;
         default:
             break;
@@ -235,6 +237,11 @@ vlc_tick_t mp4mux_track_GetDefaultSampleDuration(const mp4mux_trackinfo_t *t)
 uint32_t mp4mux_track_GetDefaultSampleSize(const mp4mux_trackinfo_t *t)
 {
     return t->i_trex_default_size;
+}
+
+const es_format_t * mp4mux_track_GetFmt(const mp4mux_trackinfo_t *t)
+{
+    return &t->fmt;
 }
 
 bool mp4mux_track_HasBFrames(const mp4mux_trackinfo_t *t)
@@ -546,48 +553,50 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
     if (i_bitrate_max <= 1)
         i_bitrate_max = 0x7fffffff;
 
-    /* ES_Descr */
+    /* ES_Descriptor ISO/IEC 14496-1 */
     bo_add_mp4_tag_descr(esds, 0x03, 3 + 5 + 13 + i_decoder_specific_info_size + 5 + 1);
     bo_add_16be(esds, p_track->i_track_id);
     bo_add_8   (esds, 0x1f);      // flags=0|streamPriority=0x1f
 
-    /* DecoderConfigDescr */
+    /* DecoderConfigDescr ISO/IEC 14496-1
+        http://mp4ra.org/#/object_types */
     bo_add_mp4_tag_descr(esds, 0x04, 13 + i_decoder_specific_info_size);
 
-    int  i_object_type_indication;
+    uint8_t i_object_profile_indication;
     switch(p_track->fmt.i_codec)
     {
     case VLC_CODEC_MP4V:
-        i_object_type_indication = 0x20;
+        i_object_profile_indication = 0x20; /* Visual 14496-2 */
         break;
     case VLC_CODEC_MPGV:
         if(p_track->fmt.i_original_fourcc == VLC_CODEC_MP1V)
         {
-            i_object_type_indication = 0x6b;
+            i_object_profile_indication = 0x6a; /* Visual ISO/IEC 11172-2  */
             break;
         }
         /* fallthrough */
     case VLC_CODEC_MP2V:
         /* MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
-        i_object_type_indication = 0x65;
+        i_object_profile_indication = 0x61; /* Visual 13818-2 Main Profile */
         break;
     case VLC_CODEC_MP1V:
-        /* MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
-        i_object_type_indication = 0x6b;
+        i_object_profile_indication = 0x6a; /* Visual ISO/IEC 11172-2  */
         break;
     case VLC_CODEC_MP4A:
         /* FIXME for mpeg2-aac == 0x66->0x68 */
-        i_object_type_indication = 0x40;
+        i_object_profile_indication = 0x40; /* Audio 14496-3 */
         break;
+    case VLC_CODEC_MP3:
     case VLC_CODEC_MPGA:
-        i_object_type_indication =
-            p_track->fmt.audio.i_rate < 32000 ? 0x69 : 0x6b;
+        i_object_profile_indication =
+            p_track->fmt.audio.i_rate < 32000 ? 0x69 /* Audio 13818-3 */
+                                              : 0x6b;/* Audio 11172-3 */
         break;
     case VLC_CODEC_DTS:
-        i_object_type_indication = 0xa9;
+        i_object_profile_indication = 0xa9; /* Core Substream */
         break;
     default:
-        i_object_type_indication = 0xFE; /* No profile specified */
+        i_object_profile_indication = 0xFE; /* No profile specified */
         break;
     }
 
@@ -608,7 +617,7 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
             break;
     }
 
-    bo_add_8   (esds, i_object_type_indication);
+    bo_add_8   (esds, i_object_profile_indication);
     bo_add_8   (esds, (i_stream_type << 2) | 1);
     bo_add_24be(esds, 1024 * 1024);       // bufferSizeDB
     bo_add_32be(esds, i_bitrate_max);     // maxBitrate
@@ -668,177 +677,6 @@ static bo_t *GetWaveTag(mp4mux_trackinfo_t *p_track)
     return wave;
 }
 
-static bo_t *GetDec3Tag(es_format_t *p_fmt,
-                        const uint8_t *p_data, size_t i_data)
-{
-    if (!i_data)
-        return NULL;
-
-    bs_t s;
-    bs_init(&s, p_data, i_data);
-    bs_skip(&s, 16); // syncword
-
-    uint8_t fscod, bsid, bsmod, acmod, lfeon, strmtyp;
-
-    bsmod = 0;
-
-    strmtyp = bs_read(&s, 2);
-
-    if (strmtyp & 0x1) // dependent or reserved stream
-        return NULL;
-
-    if (bs_read(&s, 3) != 0x0) // substreamid: we don't support more than 1 stream
-        return NULL;
-
-    int numblkscod;
-    bs_skip(&s, 11); // frmsizecod
-    fscod = bs_read(&s, 2);
-    if (fscod == 0x03) {
-        bs_skip(&s, 2); // fscod2
-        numblkscod = 3;
-    } else {
-        numblkscod = bs_read(&s, 2);
-    }
-
-    acmod = bs_read(&s, 3);
-    lfeon = bs_read1(&s);
-
-    bsid = bs_read(&s, 5);
-
-    bs_skip(&s, 5); // dialnorm
-    if (bs_read1(&s)) // compre
-        bs_skip(&s, 5); // compr
-
-    if (acmod == 0) {
-        bs_skip(&s, 5); // dialnorm2
-        if (bs_read1(&s)) // compr2e
-            bs_skip(&s, 8); // compr2
-    }
-
-    if (strmtyp == 0x1) // dependent stream XXX: unsupported
-        if (bs_read1(&s)) // chanmape
-            bs_skip(&s, 16); // chanmap
-
-    /* we have to skip mixing info to read bsmod */
-    if (bs_read1(&s)) { // mixmdate
-        if (acmod > 0x2) // 2+ channels
-            bs_skip(&s, 2); // dmixmod
-        if ((acmod & 0x1) && (acmod > 0x2)) // 3 front channels
-            bs_skip(&s, 3 + 3); // ltrtcmixlev + lorocmixlev
-        if (acmod & 0x4) // surround channel
-            bs_skip(&s, 3 + 3); // ltrsurmixlev + lorosurmixlev
-        if (lfeon)
-            if (bs_read1(&s))
-                bs_skip(&s, 5); // lfemixlevcod
-        if (strmtyp == 0) { // independent stream
-            if (bs_read1(&s)) // pgmscle
-                bs_skip(&s, 6); // pgmscl
-            if (acmod == 0x0) // dual mono
-                if (bs_read1(&s)) // pgmscl2e
-                    bs_skip(&s, 6); // pgmscl2
-            if (bs_read1(&s)) // extpgmscle
-                bs_skip(&s, 6); // extpgmscl
-            uint8_t mixdef = bs_read(&s, 2);
-            if (mixdef == 0x1)
-                bs_skip(&s, 5);
-            else if (mixdef == 0x2)
-                bs_skip(&s, 12);
-            else if (mixdef == 0x3) {
-                uint8_t mixdeflen = bs_read(&s, 5);
-                bs_skip(&s, 8 * (mixdeflen + 2));
-            }
-            if (acmod < 0x2) { // mono or dual mono
-                if (bs_read1(&s)) // paninfoe
-                    bs_skip(&s, 14); // paninfo
-                if (acmod == 0) // dual mono
-                    if (bs_read1(&s)) // paninfo2e
-                        bs_skip(&s, 14); // paninfo2
-            }
-            if (bs_read1(&s)) { // frmmixcfginfoe
-                static const int blocks[4] = { 1, 2, 3, 6 };
-                int number_of_blocks = blocks[numblkscod];
-                if (number_of_blocks == 1)
-                    bs_skip(&s, 5); // blkmixcfginfo[0]
-                else for (int i = 0; i < number_of_blocks; i++)
-                    if (bs_read1(&s)) // blkmixcfginfoe
-                        bs_skip(&s, 5); // blkmixcfginfo[i]
-            }
-        }
-    }
-
-    if (bs_read1(&s)) // infomdate
-        bsmod = bs_read(&s, 3);
-
-    uint8_t mp4_eac3_header[5] = {0};
-    bs_write_init(&s, mp4_eac3_header, sizeof(mp4_eac3_header));
-
-    int data_rate = p_fmt->i_bitrate / 1000;
-    bs_write(&s, 13, data_rate);
-    bs_write(&s, 3, 0); // num_ind_sub - 1
-    bs_write(&s, 2, fscod);
-    bs_write(&s, 5, bsid);
-    bs_write(&s, 5, bsmod);
-    bs_write(&s, 3, acmod);
-    bs_write(&s, 1, lfeon);
-    bs_write(&s, 3, 0); // reserved
-    bs_write(&s, 4, 0); // num_dep_sub
-    bs_write(&s, 1, 0); // reserved
-
-    bo_t *dec3 = box_new("dec3");
-    if(dec3)
-        bo_add_mem(dec3, sizeof(mp4_eac3_header), mp4_eac3_header);
-
-    return dec3;
-}
-
-static bo_t *GetDac3Tag(const uint8_t *p_data, size_t i_data)
-{
-    if (!i_data)
-        return NULL;
-
-    bo_t *dac3 = box_new("dac3");
-    if(!dac3)
-        return NULL;
-
-    bs_t s;
-    bs_init(&s, p_data, i_data);
-
-    uint8_t fscod, bsid, bsmod, acmod, lfeon, frmsizecod;
-
-    bs_skip(&s, 16 + 16); // syncword + crc
-
-    fscod = bs_read(&s, 2);
-    frmsizecod = bs_read(&s, 6);
-    bsid = bs_read(&s, 5);
-    bsmod = bs_read(&s, 3);
-    acmod = bs_read(&s, 3);
-    if (acmod == 2)
-        bs_skip(&s, 2); // dsurmod
-    else {
-        if ((acmod & 1) && acmod != 1)
-            bs_skip(&s, 2); // cmixlev
-        if (acmod & 4)
-            bs_skip(&s, 2); // surmixlev
-    }
-
-    lfeon = bs_read1(&s);
-
-    uint8_t mp4_a52_header[3];
-    bs_write_init(&s, mp4_a52_header, sizeof(mp4_a52_header));
-
-    bs_write(&s, 2, fscod);
-    bs_write(&s, 5, bsid);
-    bs_write(&s, 3, bsmod);
-    bs_write(&s, 3, acmod);
-    bs_write(&s, 1, lfeon);
-    bs_write(&s, 5, frmsizecod >> 1); // bit_rate_code
-    bs_write(&s, 5, 0); // reserved
-
-    bo_add_mem(dac3, sizeof(mp4_a52_header), mp4_a52_header);
-
-    return dac3;
-}
-
 static bo_t *GetDamrTag(es_format_t *p_fmt)
 {
     bo_t *damr = box_new("damr");
@@ -870,17 +708,19 @@ static bo_t *GetD263Tag(void)
     return d263;
 }
 
-static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
+static bo_t *GetHvcCTag(const uint8_t *p_extra, size_t i_extra,
+                        bool b_completeness)
 {
+
     /* Generate hvcC box matching iso/iec 14496-15 3rd edition */
     bo_t *hvcC = box_new("hvcC");
-    if(!hvcC || !p_fmt->i_extra)
+    if(!hvcC || !i_extra)
         return hvcC;
 
     /* Extradata is already an HEVCDecoderConfigurationRecord */
-    if(hevc_ishvcC(p_fmt->p_extra, p_fmt->i_extra))
+    if(hevc_ishvcC(p_extra, i_extra))
     {
-        (void) bo_add_mem(hvcC, p_fmt->i_extra, p_fmt->p_extra);
+        (void) bo_add_mem(hvcC, i_extra, p_extra);
         return hvcC;
     }
 
@@ -889,7 +729,7 @@ static bo_t *GetHvcCTag(es_format_t *p_fmt, bool b_completeness)
     size_t i_nal;
 
     hxxx_iterator_ctx_t it;
-    hxxx_iterator_init(&it, p_fmt->p_extra, p_fmt->i_extra, 0);
+    hxxx_iterator_init(&it, p_extra, i_extra, 0);
     while(hxxx_annexb_iterate_next(&it, &p_nal, &i_nal))
     {
         switch (hevc_getNALType(p_nal))
@@ -975,12 +815,13 @@ static bo_t *GetWaveFormatExTag(es_format_t *p_fmt, const char *tag)
     return box;
 }
 
-static bo_t *GetxxxxTag(es_format_t *p_fmt, const char *tag)
+static bo_t *GetxxxxTag(const uint8_t *p_extra, size_t i_extra,
+                        const char *tag)
 {
     bo_t *box = box_new(tag);
     if(!box)
         return NULL;
-    bo_add_mem(box, p_fmt->i_extra, p_fmt->p_extra);
+    bo_add_mem(box, i_extra, p_extra);
     return box;
 }
 
@@ -993,7 +834,7 @@ static bo_t *GetColrBox(const video_format_t *p_vfmt, bool b_mov)
         bo_add_16be(p_box, vlc_primaries_to_iso_23001_8_cp(p_vfmt->primaries));
         bo_add_16be(p_box, vlc_xfer_to_iso_23001_8_tc(p_vfmt->transfer));
         bo_add_16be(p_box, vlc_coeffs_to_iso_23001_8_mc(p_vfmt->space));
-        bo_add_8(p_box, p_vfmt->b_color_range_full ? 0x80 : 0x00);
+        bo_add_8(p_box, p_vfmt->color_range == COLOR_RANGE_FULL ? 0x80 : 0x00);
     }
     return p_box;
 }
@@ -1028,7 +869,7 @@ static bo_t *GetClli(const video_format_t *p_vfmt)
     return p_box;
 }
 
-static bo_t *GetAvcCTag(es_format_t *p_fmt)
+static bo_t *GetAvcCTag(const uint8_t *p_extra, size_t i_extra)
 {
     bo_t    *avcC = box_new("avcC");/* FIXME use better value */
     if(!avcC)
@@ -1036,7 +877,7 @@ static bo_t *GetAvcCTag(es_format_t *p_fmt)
     const uint8_t *p_sps, *p_pps, *p_ext;
     size_t i_sps_size, i_pps_size, i_ext_size;
 
-    if(! h264_AnnexB_get_spspps(p_fmt->p_extra, p_fmt->i_extra,
+    if(! h264_AnnexB_get_spspps(p_extra, i_extra,
                         &p_sps, &i_sps_size,
                         &p_pps, &i_pps_size,
                         &p_ext, &i_ext_size ) )
@@ -1093,15 +934,15 @@ static bo_t *GetAvcCTag(es_format_t *p_fmt)
 }
 
 /* TODO: No idea about these values */
-static bo_t *GetSVQ3Tag(es_format_t *p_fmt)
+static bo_t *GetSVQ3Tag(const uint8_t *p_extra, size_t i_extra)
 {
     bo_t *smi = box_new("SMI ");
     if(!smi)
         return NULL;
 
-    if (p_fmt->i_extra > 0x4e) {
-        uint8_t *p_end = &((uint8_t*)p_fmt->p_extra)[p_fmt->i_extra];
-        uint8_t *p     = &((uint8_t*)p_fmt->p_extra)[0x46];
+    if (i_extra > 0x4e) {
+        const uint8_t *p_end = &p_extra[i_extra];
+        const uint8_t *p     = &p_extra[0x46];
 
         while (p + 8 < p_end) {
             int i_size = GetDWBE(p);
@@ -1199,7 +1040,8 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     vlc_fourcc_t codec = p_track->fmt.i_codec;
     char fcc[4];
 
-    if (codec == VLC_CODEC_MPGA) {
+    if (codec == VLC_CODEC_MPGA ||
+        codec == VLC_CODEC_MP3) {
         if (b_mov) {
             b_descr = false;
             memcpy(fcc, ".mp3", 4);
@@ -1254,14 +1096,23 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     if (b_descr) {
         bo_t *box;
 
+        /* codec specific extradata */
+        const uint8_t *p_extradata = p_track->fmt.p_extra;
+        size_t i_extradata = p_track->fmt.i_extra;
+        if(p_track->sample_priv.i_data)
+        {
+            p_extradata = p_track->sample_priv.p_data;
+            i_extradata = p_track->sample_priv.i_data;
+        }
+
         if (b_mov && codec == VLC_CODEC_MP4A)
             box = GetWaveTag(p_track);
         else if (codec == VLC_CODEC_AMR_NB)
             box = GetDamrTag(&p_track->fmt);
-        else if (codec == VLC_CODEC_A52)
-            box = GetDac3Tag(p_track->sample_priv.p_data, p_track->sample_priv.i_data);
-        else if (codec == VLC_CODEC_EAC3)
-            box = GetDec3Tag(&p_track->fmt, p_track->sample_priv.p_data, p_track->sample_priv.i_data);
+        else if (codec == VLC_CODEC_A52 && i_extradata >= 3)
+            box = GetxxxxTag(p_extradata, i_extradata, "dac3");
+        else if (codec == VLC_CODEC_EAC3 && i_extradata >= 5)
+            box = GetxxxxTag(p_extradata, i_extradata, "dec3");
         else if (codec == VLC_CODEC_WMAP)
             box = GetWaveFormatExTag(&p_track->fmt, "wfex");
         else
@@ -1337,11 +1188,20 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     bo_add_16be(vide, 0x18);      // depth
     bo_add_16be(vide, 0xffff);    // predefined
 
+    /* codec specific extradata */
+    const uint8_t *p_extradata = p_track->fmt.p_extra;
+    size_t i_extradata = p_track->fmt.i_extra;
+    if(p_track->sample_priv.i_data)
+    {
+        p_extradata = p_track->sample_priv.p_data;
+        i_extradata = p_track->sample_priv.i_data;
+    }
+
     /* add an ES Descriptor */
     switch(p_track->fmt.i_codec)
     {
     case VLC_CODEC_AV1:
-        box_gather(vide, GetxxxxTag(&p_track->fmt, "av1C"));
+        box_gather(vide, GetxxxxTag(p_extradata, i_extradata, "av1C"));
         box_gather(vide, GetColrBox(&p_track->fmt.video, b_mov));
         box_gather(vide, GetMdcv(&p_track->fmt.video));
         box_gather(vide, GetClli(&p_track->fmt.video));
@@ -1357,20 +1217,20 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         break;
 
     case VLC_CODEC_SVQ3:
-        box_gather(vide, GetSVQ3Tag(&p_track->fmt));
+        box_gather(vide, GetSVQ3Tag(p_extradata, i_extradata));
         break;
 
     case VLC_CODEC_H264:
-        box_gather(vide, GetAvcCTag(&p_track->fmt));
+        box_gather(vide, GetAvcCTag(p_extradata, i_extradata));
         break;
 
     case VLC_CODEC_VC1:
-        box_gather(vide, GetxxxxTag(&p_track->fmt, "dvc1"));
+        box_gather(vide, GetxxxxTag(p_extradata, i_extradata, "dvc1"));
             break;
 
     case VLC_CODEC_HEVC:
         /* Write HvcC without forcing VPS/SPS/PPS/SEI array_completeness */
-        box_gather(vide, GetHvcCTag(&p_track->fmt, false));
+        box_gather(vide, GetHvcCTag(p_extradata, i_extradata, false));
         break;
     }
 
@@ -2234,15 +2094,7 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
     case VLC_CODEC_YUYV:
     case VLC_CODEC_VC1:
     case VLC_CODEC_WMAP:
-        break;
     case VLC_CODEC_AV1:
-        /* Extradata is an AVC1DecoderConfigurationRecord */
-        if(p_fmt->i_extra < 4 || ((uint8_t *)p_fmt->p_extra)[0] != 0x81)
-        {
-            if(p_obj)
-                msg_Err(p_obj, "Can't mux AV1 without extradata");
-            return false;
-        }
         break;
     case VLC_CODEC_H264:
         if(!p_fmt->i_extra && p_obj)
@@ -2263,7 +2115,7 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
     case VLC_CODEC_TTML:
         /* Special case with smooth headers where we need to force frag TTML */
         /* TTML currently not supported in sout, until we can keep original timestamps */
-            return i_brand == VLC_FOURCC('s', 'm', 'o', 'o');
+            return i_brand == BRAND_smoo;
     case VLC_CODEC_QTXT:
     case VLC_CODEC_TX3G:
     case VLC_CODEC_WEBVTT:

@@ -1,0 +1,15 @@
+--- aom/CMakeLists.txt.target-cpu	2019-01-08 12:23:33.570217317 -0500
++++ aom/CMakeLists.txt	2019-01-08 12:23:26.118217140 -0500
+@@ -18,12 +18,6 @@ if(NOT EMSCRIPTEN)
+   endif()
+ endif()
+ 
+-if(NOT AOM_TARGET_CPU)
+-  set(AOM_TARGET_CPU generic)
+-  message("Forcing generic build for normative branch; set AOM_TARGET_CPU to "
+-          "the target CPU type to allow for an optimized build.")
+-endif()
+-
+ option(ENABLE_CCACHE "Enable ccache support." OFF)
+ option(ENABLE_DECODE_PERF_TESTS "Enables decoder performance tests" OFF)
+ option(ENABLE_DISTCC "Enable distcc support." OFF)

@@ -2,7 +2,6 @@
  * html.c : HTML playlist export module
  *****************************************************************************
  * Copyright (C) 2008-2009 the VideoLAN team
- * $Id$
  *
  * Authors: Rémi Duraffort <ivoire@videolan.org>
  *
@@ -26,7 +25,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_input.h>
 #include <vlc_strings.h>
 

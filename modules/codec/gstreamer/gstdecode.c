@@ -2,7 +2,6 @@
  * gstdecode.c: Decoder module making use of gstreamer
  *****************************************************************************
  * Copyright (C) 2014-2016 VLC authors and VideoLAN
- * $Id:
  *
  * Author: Vikram Fugro <vikram.fugro@gmail.com>
  *

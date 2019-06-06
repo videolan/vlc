@@ -2,7 +2,6 @@
  * image.c: Image demuxer
  *****************************************************************************
  * Copyright (C) 2010 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
@@ -138,7 +137,7 @@ static block_t *Load(demux_t *demux)
 }
 
 static block_t *Decode(demux_t *demux,
-                       video_format_t *fmt, vlc_fourcc_t chroma, block_t *data)
+                       es_format_t *fmt, vlc_fourcc_t chroma, block_t *data)
 {
     image_handler_t *handler = image_HandlerCreate(demux);
     if (!handler) {
@@ -155,8 +154,9 @@ static block_t *Decode(demux_t *demux,
     if (!image)
         return NULL;
 
-    video_format_Clean(fmt);
-    *fmt = decoded;
+    es_format_Clean(fmt);
+    es_format_InitFromVideo(fmt, &decoded);
+    video_format_Clean(&decoded);
 
     size_t size = 0;
     for (int i = 0; i < image->i_planes; i++)
@@ -698,8 +698,7 @@ static int Open(vlc_object_t *object)
         vlc_fourcc_t chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, string);
         free(string);
 
-        data = Decode(demux, &fmt.video, chroma, data);
-        fmt.i_codec = fmt.video.i_chroma;
+        data = Decode(demux, &fmt, chroma, data);
     }
     fmt.i_id    = var_InheritInteger(demux, "image-id");
     fmt.i_group = var_InheritInteger(demux, "image-group");

@@ -26,9 +26,17 @@
 # define ORDER XCB_IMAGE_ORDER_LSB_FIRST
 #endif
 
+#include <stdbool.h>
+#include <stdint.h>
+#include <xcb/xcb.h>
+#include <xcb/shm.h>
 #include <vlc_picture.h>
 #include <vlc_vout_display.h>
-#include <xcb/shm.h>
+
+const xcb_format_t *vlc_xcb_DepthToPixmapFormat(const xcb_setup_t *,
+                                                uint_fast8_t depth);
+bool vlc_xcb_VisualToFormat(const xcb_setup_t *, uint_fast8_t depth,
+                            const xcb_visualtype_t *, video_format_t *);
 
 bool XCB_shm_Check (vlc_object_t *obj, xcb_connection_t *conn);
 int XCB_picture_Alloc (vout_display_t *, picture_resource_t *, size_t size,

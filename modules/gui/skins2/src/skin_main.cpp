@@ -2,7 +2,6 @@
  * skin_main.cpp
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
- * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -30,10 +29,9 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_input.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_threads.h>
 #include <vlc_vout_window.h>
-#include <vlc_vout_display.h>
 
 #include "dialogs.hpp"
 #include "os_factory.hpp"
@@ -318,21 +316,22 @@ end:
     return NULL;
 }
 
-static int  WindowOpen( vout_window_t *, const vout_window_cfg_t * );
+static int  WindowOpen( vout_window_t * );
 static void WindowClose( vout_window_t * );
-static int  WindowControl( vout_window_t *, int, va_list );
 
-struct vout_window_sys_t
+typedef struct
 {
     intf_thread_t*     pIntf;
     vout_window_cfg_t  cfg;
-};
+} vout_window_skins_t;
 
 static void WindowOpenLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
 {
     vout_window_t* pWnd = (vout_window_t*)pObj;
-    int width = (int)pWnd->sys->cfg.width;
-    int height = (int)pWnd->sys->cfg.height;
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+    int width = sys->cfg.width;
+    int height = sys->cfg.height;
+
     VoutManager::instance( pIntf )->acceptWnd( pWnd, width, height );
 }
 
@@ -342,42 +341,12 @@ static void WindowCloseLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
     VoutManager::instance( pIntf )->releaseWnd( pWnd );
 }
 
-static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
+static int WindowEnable( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 {
-    if( var_InheritBool( pWnd, "video-wallpaper" ) )
-        return VLC_EGENERIC;
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+    intf_thread_t *pIntf = sys->pIntf;
 
-    vout_window_sys_t* sys;
-
-    vlc_mutex_lock( &skin_load.mutex );
-    intf_thread_t *pIntf = skin_load.intf;
-    if( pIntf )
-        vlc_object_hold( pIntf );
-    vlc_mutex_unlock( &skin_load.mutex );
-
-    if( pIntf == NULL )
-        return VLC_EGENERIC;
-
-    if( !var_InheritBool( pIntf, "skinned-video") ||
-        cfg->is_standalone )
-    {
-        vlc_object_release( pIntf );
-        return VLC_EGENERIC;
-    }
-
-    sys = (vout_window_sys_t*)calloc( 1, sizeof( *sys ) );
-    if( !sys )
-    {
-        vlc_object_release( pIntf );
-        return VLC_ENOMEM;
-    }
-
-    pWnd->sys = sys;
-    pWnd->sys->cfg = *cfg;
-    pWnd->sys->pIntf = pIntf;
-    pWnd->control = WindowControl;
-
-    pWnd->type = VOUT_WINDOW_TYPE_DUMMY;
+    sys->cfg = *cfg;
 
     // force execution in the skins2 thread context
     CmdExecuteBlock* cmd = new CmdExecuteBlock( pIntf, VLC_OBJECT( pWnd ),
@@ -387,8 +356,6 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     if( pWnd->type == VOUT_WINDOW_TYPE_DUMMY )
     {
         msg_Dbg( pIntf, "Vout window creation failed" );
-        free( sys );
-        vlc_object_release( pIntf );
         return VLC_EGENERIC;
     }
 
@@ -397,9 +364,9 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     return VLC_SUCCESS;
 }
 
-static void WindowClose( vout_window_t *pWnd )
+static void WindowDisable( vout_window_t *pWnd )
 {
-    vout_window_sys_t* sys = pWnd->sys;
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
     intf_thread_t *pIntf = sys->pIntf;
 
     // force execution in the skins2 thread context
@@ -407,60 +374,102 @@ static void WindowClose( vout_window_t *pWnd )
                                                 WindowCloseLocal );
     CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
 
-    vlc_object_release( sys->pIntf );
-    free( sys );
+    pWnd->type = VOUT_WINDOW_TYPE_DUMMY;
 }
 
-static int WindowControl( vout_window_t *pWnd, int query, va_list args )
+static void WindowResize( vout_window_t *pWnd,
+                          unsigned i_width, unsigned i_height )
 {
-    vout_window_sys_t* sys = pWnd->sys;
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+    intf_thread_t *pIntf = sys->pIntf;
+
+    if( i_width == 0 || i_height == 0 )
+        return;
+
+    // Post a vout resize command
+    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+    CmdResizeVout *pCmd = new CmdResizeVout( pIntf, pWnd,
+                                             (int)i_width, (int)i_height );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+}
+
+static void WindowSetState( vout_window_t *pWnd, unsigned i_arg )
+{
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
     intf_thread_t *pIntf = sys->pIntf;
     AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+    bool on_top = i_arg & VOUT_WINDOW_STATE_ABOVE;
 
-    switch( query )
-    {
-        case VOUT_WINDOW_SET_SIZE:
-        {
-            unsigned int i_width  = va_arg( args, unsigned int );
-            unsigned int i_height = va_arg( args, unsigned int );
+    // Post a SetOnTop command
+    CmdSetOnTop* pCmd = new CmdSetOnTop( pIntf, on_top );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+}
 
-            if( i_width && i_height )
-            {
-                // Post a vout resize command
-                CmdResizeVout *pCmd =
-                    new CmdResizeVout( pIntf, pWnd,
-                                       (int)i_width, (int)i_height );
-                pQueue->push( CmdGenericPtr( pCmd ) );
-            }
-            return VLC_EGENERIC;
-        }
+static void WindowUnsetFullscreen( vout_window_t *pWnd )
+{
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+    intf_thread_t *pIntf = sys->pIntf;
+    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+    CmdSetFullscreen* pCmd = new CmdSetFullscreen( pIntf, pWnd, false );
 
-        case VOUT_WINDOW_SET_FULLSCREEN:
-        case VOUT_WINDOW_UNSET_FULLSCREEN:
-        {
-            // Post a set fullscreen command
-            CmdSetFullscreen* pCmd = new CmdSetFullscreen( pIntf, pWnd,
-                query == VOUT_WINDOW_SET_FULLSCREEN );
-            pQueue->push( CmdGenericPtr( pCmd ) );
-            return VLC_SUCCESS;
-        }
+    pQueue->push( CmdGenericPtr( pCmd ) );
+}
 
-        case VOUT_WINDOW_SET_STATE:
-        {
-            unsigned i_arg = va_arg( args, unsigned );
-            unsigned on_top = i_arg & VOUT_WINDOW_STATE_ABOVE;
+static void WindowSetFullscreen( vout_window_t *pWnd, const char * )
+{
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+    intf_thread_t *pIntf = sys->pIntf;
+    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+    // Post a set fullscreen command
+    CmdSetFullscreen* pCmd = new CmdSetFullscreen( pIntf, pWnd, true );
 
-            // Post a SetOnTop command
-            CmdSetOnTop* pCmd =
-                new CmdSetOnTop( pIntf, on_top );
-            pQueue->push( CmdGenericPtr( pCmd ) );
-            return VLC_SUCCESS;
-        }
+    pQueue->push( CmdGenericPtr( pCmd ) );
+}
 
-        default:
-            msg_Dbg( pIntf, "control query not supported" );
-            return VLC_EGENERIC;
-    }
+static const struct vout_window_operations window_ops = {
+    WindowEnable,
+    WindowDisable,
+    WindowResize,
+    WindowClose,
+    WindowSetState,
+    WindowUnsetFullscreen,
+    WindowSetFullscreen,
+};
+
+static int WindowOpen( vout_window_t *pWnd )
+{
+    if( var_InheritBool( pWnd, "video-wallpaper" )
+     || !var_InheritBool( pWnd, "embedded-video" ) )
+        return VLC_EGENERIC;
+
+    vout_window_skins_t* sys;
+
+    vlc_mutex_lock( &skin_load.mutex );
+    intf_thread_t *pIntf = skin_load.intf;
+    vlc_mutex_unlock( &skin_load.mutex );
+
+    if( pIntf == NULL )
+        return VLC_EGENERIC;
+
+    if( !var_InheritBool( pIntf, "skinned-video") )
+        return VLC_EGENERIC;
+
+    sys = new (std::nothrow) vout_window_skins_t;
+    if( !sys )
+        return VLC_ENOMEM;
+
+    pWnd->sys = sys;
+    sys->pIntf = pIntf;
+    pWnd->ops = &window_ops;
+    pWnd->type = VOUT_WINDOW_TYPE_DUMMY;
+    return VLC_SUCCESS;
+}
+
+static void WindowClose( vout_window_t *pWnd )
+{
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+
+    delete sys;
 }
 
 //---------------------------------------------------------------------------
@@ -514,6 +523,6 @@ vlc_module_begin ()
 
     add_submodule ()
         set_capability( "vout window", 51 )
-        set_callbacks( WindowOpen, WindowClose )
+        set_callbacks( WindowOpen, NULL )
 
 vlc_module_end ()

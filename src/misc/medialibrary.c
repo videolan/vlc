@@ -87,6 +87,14 @@ void vlc_ml_event_unregister_callback( vlc_medialibrary_t* p_ml,
     free( p_cb );
 }
 
+void vlc_ml_event_unregister_from_callback( vlc_medialibrary_t* p_ml,
+                                            vlc_ml_event_callback_t* p_cb )
+{
+    vlc_mutex_assert( &p_ml->lock );
+    vlc_list_remove( &p_cb->node );
+    free( p_cb );
+}
+
 static const vlc_medialibrary_callbacks_t callbacks = {
     .pf_send_event = &vlc_ml_event_send
 };

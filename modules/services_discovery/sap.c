@@ -3,7 +3,6 @@
  *****************************************************************************
  * Copyright (C) 2004-2005 the VideoLAN team
  * Copyright © 2007 Rémi Denis-Courmont
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Rémi Denis-Courmont
@@ -1152,6 +1151,20 @@ static int ParseSDPConnection (const char *str, struct sockaddr_storage *addr,
     return 0;
 }
 
+static void net_SetPort(struct sockaddr *addr, uint16_t port)
+{
+    switch (addr->sa_family)
+    {
+#ifdef AF_INET6
+        case AF_INET6:
+            ((struct sockaddr_in6 *)addr)->sin6_port = port;
+        break;
+#endif
+        case AF_INET:
+            ((struct sockaddr_in *)addr)->sin_port = port;
+        break;
+    }
+}
 
 /***********************************************************************
  * ParseSDP : SDP parsing

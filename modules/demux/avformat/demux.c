@@ -2,7 +2,6 @@
  * demux.c: demuxer using libavformat
  *****************************************************************************
  * Copyright (C) 2004-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -811,7 +810,6 @@ static int Demux( demux_t *p_demux )
         p_frame->i_flags |= BLOCK_FLAG_TYPE_I;
 
     /* Used to avoid timestamps overlow */
-    lldiv_t q;
     if( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE )
     {
         i_start_time = vlc_tick_from_frac(p_sys->ic->start_time, AV_TIME_BASE);

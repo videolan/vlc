@@ -84,6 +84,10 @@ static int Open( vlc_object_t *p_this )
     LIBMTP_raw_device_t *p_rawdevices;
     int i_numrawdevices;
 
+    int *fdp = vlc_obj_malloc( p_this, sizeof (*fdp) );
+    if( unlikely(fdp == NULL) )
+        return VLC_ENOMEM;
+
     if( sscanf( p_access->psz_location, "%"SCNu32":%"SCNu8":%"SCNu16":%d",
                 &i_bus, &i_dev, &i_product_id, &i_track_id ) != 4 )
         return VLC_EGENERIC;
@@ -130,7 +134,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_access->p_sys = (void *)(intptr_t)fd;
+    *fdp = fd;
+    p_access->p_sys = fdp;
     ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek );
     return VLC_SUCCESS;
 }
@@ -141,9 +146,9 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t * p_this )
 {
     stream_t *p_access = ( stream_t* )p_this;
-    int fd = (intptr_t)p_access->p_sys;
+    int *fdp = p_access->p_sys;
 
-    vlc_close ( fd );
+    vlc_close ( *fdp );
 }
 
 /*****************************************************************************
@@ -151,7 +156,7 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
 {
-    int fd = (intptr_t)p_access->p_sys;
+    int *fdp = p_access->p_sys, fd = *fdp;
     ssize_t i_ret = read( fd, p_buffer, i_len );
 
     if( i_ret < 0 )
@@ -180,7 +185,7 @@ static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
  *****************************************************************************/
 static int Seek( stream_t *p_access, uint64_t i_pos )
 {
-    int fd = (intptr_t)p_access->p_sys;
+    int *fdp = p_access->p_sys, fd = *fdp;
 
     if (lseek( fd, i_pos, SEEK_SET ) == (off_t)-1)
         return VLC_EGENERIC;
@@ -192,7 +197,7 @@ static int Seek( stream_t *p_access, uint64_t i_pos )
  *****************************************************************************/
 static int Control( stream_t *p_access, int i_query, va_list args )
 {
-    int fd = (intptr_t)p_access->p_sys;
+    int *fdp = p_access->p_sys, fd = *fdp;
     bool   *pb_bool;
 
     switch( i_query )

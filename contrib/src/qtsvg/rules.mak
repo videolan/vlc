@@ -25,11 +25,7 @@ qtsvg: qtsvg-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	$(MOVE)
 
 .qtsvg: qtsvg
-ifdef HAVE_CROSS_COMPILE
 	cd $< && $(PREFIX)/bin/qmake
-else
-	cd $< && ../qt/bin/qmake
-endif
 	# Make && Install libraries
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) -C src sub-plugins-install_subtargets sub-svg-install_subtargets

@@ -2,7 +2,6 @@
  * rtpvideo.c: video encoder for raw video for RTP (see RFC 4175)
  *****************************************************************************
  * Copyright (C) 2015 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Tristan Matthews <tmatth@videolan.org>
  *

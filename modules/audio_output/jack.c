@@ -2,7 +2,6 @@
  * jack.c : JACK audio output module
  *****************************************************************************
  * Copyright (C) 2006 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Cyril Deguet <asmax _at_ videolan.org>
  *          Jon Griffiths <jon_p_griffiths _At_ yahoo _DOT_ com>

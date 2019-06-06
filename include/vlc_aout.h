@@ -491,15 +491,13 @@ typedef struct
     };
 
 typedef struct aout_filters aout_filters_t;
-typedef struct aout_request_vout aout_request_vout_t;
 
 VLC_API aout_filters_t *aout_FiltersNew(vlc_object_t *,
                                         const audio_sample_format_t *,
                                         const audio_sample_format_t *,
-                                        const aout_request_vout_t *,
                                         const aout_filters_cfg_t *cfg) VLC_USED;
-#define aout_FiltersNew(o,inf,outf,rv,remap) \
-        aout_FiltersNew(VLC_OBJECT(o),inf,outf,rv,remap)
+#define aout_FiltersNew(o,inf,outf,remap) \
+        aout_FiltersNew(VLC_OBJECT(o),inf,outf,remap)
 VLC_API void aout_FiltersDelete(vlc_object_t *, aout_filters_t *);
 #define aout_FiltersDelete(o,f) \
         aout_FiltersDelete(VLC_OBJECT(o),f)
@@ -509,7 +507,7 @@ VLC_API block_t *aout_FiltersDrain(aout_filters_t *);
 VLC_API void     aout_FiltersFlush(aout_filters_t *);
 VLC_API void     aout_FiltersChangeViewpoint(aout_filters_t *, const vlc_viewpoint_t *vp);
 
-VLC_API vout_thread_t * aout_filter_RequestVout( filter_t *, vout_thread_t *p_vout, const video_format_t *p_fmt );
+VLC_API vout_thread_t *aout_filter_GetVout(filter_t *, const video_format_t *);
 
 /** @} */
 

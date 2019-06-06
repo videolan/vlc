@@ -2,7 +2,6 @@
  * vlc_input_item.h: Core input item
  *****************************************************************************
  * Copyright (C) 1999-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -218,8 +217,8 @@ VLC_API void input_item_node_AppendNode( input_item_node_t *p_parent, input_item
 /**
  * Remove a node from its parent.
  */
-void input_item_node_RemoveNode( input_item_node_t *parent,
-                                 input_item_node_t *child );
+VLC_API void input_item_node_RemoveNode( input_item_node_t *parent,
+                                         input_item_node_t *child );
 
 /**
  * Delete a node created with input_item_node_Create() and all its children.
@@ -271,6 +270,7 @@ VLC_API bool input_item_HasErrorWhenReading( input_item_t * );
 VLC_API void input_item_SetMeta( input_item_t *, vlc_meta_type_t meta_type, const char *psz_val );
 VLC_API bool input_item_MetaMatch( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz );
 VLC_API char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type ) VLC_USED;
+VLC_API const char *input_item_GetMetaLocked(input_item_t *, vlc_meta_type_t meta_type);
 VLC_API char * input_item_GetName( input_item_t * p_i ) VLC_USED;
 VLC_API char * input_item_GetTitleFbName( input_item_t * p_i ) VLC_USED;
 VLC_API char * input_item_GetURI( input_item_t * p_i ) VLC_USED;

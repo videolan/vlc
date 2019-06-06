@@ -87,7 +87,8 @@ static void Flush(filter_t *filter)
 static void FillExtendedFormat( const video_format_t *p_fmt,
                                 DXVA2_ExtendedFormat *out )
 {
-    out->NominalRange = p_fmt->b_color_range_full ? DXVA2_NominalRange_0_255 : DXVA2_NominalRange_16_235;
+    out->NominalRange = p_fmt->color_range == COLOR_RANGE_FULL ?
+                DXVA2_NominalRange_0_255 : DXVA2_NominalRange_16_235;
     switch (p_fmt->space)
     {
     case COLOR_SPACE_BT601:

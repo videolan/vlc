@@ -1,0 +1,121 @@
+From 75a5f417c6dc20bb950d5106ba8ab978fa4c9942 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Tue, 20 Nov 2018 18:09:47 +0100
+Subject: [PATCH] Simplify package version management
+
+This mostly fixes .pc generation from a `make dist` tarball
+---
+ Makefile.am        |  1 -
+ configure.ac       |  9 +++++----
+ libdsm.pc.in       |  2 +-
+ package_version.sh | 40 ----------------------------------------
+ 4 files changed, 6 insertions(+), 46 deletions(-)
+ delete mode 100755 package_version.sh
+
+diff --git a/Makefile.am b/Makefile.am
+index 4a78c3c..5c191cf 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -4,7 +4,6 @@ DISTCLEANFILES = @DOLT_CLEANFILES@
+ 
+ EXTRA_DIST = \
+ 	abi_version.sh \
+-	package_version.sh \
+ 	contrib/spnego/spnego.asn1 \
+ 	contrib/spnego/spnego_asn1.c \
+ 	src/libdsm.sym
+diff --git a/configure.ac b/configure.ac
+index 17757d5..c8a9c5b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,8 +1,12 @@
+ AC_PREREQ([2.53])
+ 
++m4_define([BDSM_MAJOR], [0])
++m4_define([BDSM_MINOR], [3])
++m4_define([BDSM_MICRO], [0])
++
+ AC_COPYRIGHT([Copyright 2014-2018 VideoLabs])
+ 
+-AC_INIT([libdsm], [m4_esyscmd([./package_version.sh])], [], [libdsm], [])
++AC_INIT([libdsm], [BDSM_MAJOR.BDSM_MINOR.BDSM_MICRO], [], [libdsm], [])
+ AC_CONFIG_HEADER(config.h)
+ AC_CONFIG_SRCDIR([include/bdsm.h])
+ AC_CONFIG_LIBOBJ_DIR([compat])
+@@ -14,14 +18,11 @@ m4_ifdef([AM_SILENT_RULES], [
+ AC_CANONICAL_HOST
+ 
+ BDSM_ABI_VERSION=m4_esyscmd([./abi_version.sh])
+-BDSM_PACKAGE_VERSION=m4_esyscmd([./package_version.sh])
+ BDSM_LIBTOOL_VERSION=m4_esyscmd([./abi_version.sh -libtool])
+ 
+ AC_SUBST(BDSM_ABI_VERSION)
+-AC_SUBST(BDSM_PACKAGE_VERSION)
+ AC_SUBST(BDSM_LIBTOOL_VERSION)
+ 
+-AC_MSG_NOTICE([dsm package version: $BDSM_PACKAGE_VERSION])
+ AC_MSG_NOTICE([dsm ABI version: $BDSM_ABI_VERSION])
+ 
+ AC_PROG_CC_C99
+diff --git a/libdsm.pc.in b/libdsm.pc.in
+index cc9b22a..8626580 100644
+--- a/libdsm.pc.in
++++ b/libdsm.pc.in
+@@ -5,7 +5,7 @@ includedir=${prefix}/include
+ 
+ Name: libdsm
+ Description: Minimalist and read-only smb client library
+-Version: @BDSM_PACKAGE_VERSION@
++Version: @PACKAGE_VERSION@
+ Cflags: -I${includedir} @PTHREAD_CFLAGS@
+ Libs: -L${libdir} -ldsm
+ Libs.private: @LIBICONV@ -ltasn1 @PTHREAD_LIBS@ @BDSM_LIB_LOG@ @SOCKET_LIBS@
+diff --git a/package_version.sh b/package_version.sh
+deleted file mode 100755
+index 865a899..0000000
+--- a/package_version.sh
++++ /dev/null
+@@ -1,40 +0,0 @@
+-#!/bin/sh
+-# Copyright (c) 2013 Luca Barbato
+-#
+-# Permission is hereby granted, free of charge, to any person obtaining a copy
+-# of this software and associated documentation files (the "Software"),
+-# to deal in the Software without restriction, including without limitation
+-# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+-# and/or sell copies of the Software, and to permit persons to whom
+-# the Software is furnished to do so, subject to the following conditions:
+-#
+-# The above copyright notice and this permission notice shall be included
+-# in all copies or substantial portions of the Software.
+-#
+-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+-# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+-# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+-# IN THE SOFTWARE.
+-
+-if [ -d .git ]; then
+-    #  Retrieve the version from the last git tag.
+-    VER=`git describe --always | sed -e "s:v::"`
+-    if [ x"`git diff-index --name-only HEAD`" != x ]; then
+-        #  If the sources have been changed locally, add -dirty to the version.
+-        VER="${VER}-dirty"
+-    fi
+-elif [ -f .version ]; then
+-    #  If git is not available (e.g. when building from source package)
+-    #  we can extract the package version from .version file.
+-    VER=`< .version`
+-else
+-    #  The package version cannot be retrieved.
+-    VER="Unknown"
+-fi
+-
+-printf '%s' "$VER"
+-
+-
+-- 
+2.19.1
+

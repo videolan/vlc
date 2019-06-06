@@ -2,7 +2,6 @@
  * netconf.m : Network configuration
  *****************************************************************************
  * Copyright (C) 2013-2018 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne # videolan org>
  *

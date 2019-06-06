@@ -86,14 +86,14 @@ $(TARBALLS)/$(X264_BASENAME):
 x264 x26410b: %: $(X264_BASENAME) .sum-%
 	rm -Rf $*-git
 	mkdir -p $*-git
-	tar xvjf "$<" --strip-components=1 -C $*-git
+	tar xvjfo "$<" --strip-components=1 -C $*-git
 	$(UPDATE_AUTOCONFIG)
 	mv $*-git $*
 
 x262: x262-git.tar.gz .sum-x262
 	rm -Rf $@-git
 	mkdir -p $@-git
-	tar xvzf "$<" --strip-components=1 -C $@-git
+	tar xvzfo "$<" --strip-components=1 -C $@-git
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 

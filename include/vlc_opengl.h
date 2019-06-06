@@ -31,6 +31,7 @@
 
 struct vout_window_t;
 struct vout_window_cfg_t;
+struct vout_display_cfg;
 
 /**
  * A VLC GL context (and its underlying surface)
@@ -82,7 +83,18 @@ enum {
     VLC_OPENGL_ES2,
 };
 
-VLC_API vlc_gl_t *vlc_gl_Create(struct vout_window_t *, unsigned, const char *) VLC_USED;
+/**
+ * Creates an OpenGL context (and its underlying surface).
+ *
+ * @note In most cases, you should vlc_gl_MakeCurrent() afterward.
+ *
+ * @param cfg initial configuration (including window to use as OpenGL surface)
+ * @param flags OpenGL context type
+ * @param name module name (or NULL for auto)
+ * @return a new context, or NULL on failure
+ */
+VLC_API vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *cfg,
+                                unsigned flags, const char *name) VLC_USED;
 VLC_API void vlc_gl_Release(vlc_gl_t *);
 VLC_API void vlc_gl_Hold(vlc_gl_t *);
 

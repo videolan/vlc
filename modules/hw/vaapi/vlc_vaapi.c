@@ -564,7 +564,6 @@ pool_pic_destroy_cb(picture_t *pic)
         free(instance);
     }
     free(pic->p_sys);
-    free(pic);
 }
 
 static void

@@ -2,7 +2,6 @@
  * vlc_media_library.h: SQL-based media library
  *****************************************************************************
  * Copyright (C) 2008-2010 the VideoLAN Team and AUTHORS
- * $Id$
  *
  * Authors: Antoine Lejeune <phytos@videolan.org>
  *          Jean-Philippe André <jpeg@videolan.org>
@@ -122,6 +121,8 @@ typedef struct vlc_ml_file_t
     char* psz_mrl;
     vlc_ml_file_type_t i_type;
     bool b_external;
+    bool b_removable;
+    bool b_present;
 } vlc_ml_file_t;
 
 typedef struct vlc_ml_file_list_t
@@ -182,6 +183,9 @@ typedef struct vlc_ml_media_t
     char* psz_title;
 
     char* psz_artwork_mrl;
+    /* True if a thumbnail is available, or if thumbnail generation was
+     * attempted but failed */
+    bool b_artwork_generated;
     bool b_is_favorite;
 
     union
@@ -322,6 +326,7 @@ struct vlc_ml_query_params_t
 enum vlc_ml_get_queries
 {
     VLC_ML_GET_MEDIA,           /**< arg1: Media    ID; ret: vlc_ml_media_t*    */
+    VLC_ML_GET_INPUT_ITEM,      /**< arg1: Media    ID; ret: input_item_t*      */
     VLC_ML_GET_ALBUM,           /**< arg1: Album    ID; ret: vlc_ml_album_t*    */
     VLC_ML_GET_ARTIST,          /**< arg1: Artist   ID; ret: vlc_ml_artist_t*   */
     VLC_ML_GET_GENRE,           /**< arg1: Genre    ID; ret: vlc_ml_genre_t*    */
@@ -393,7 +398,8 @@ enum vlc_ml_list_queries
 
 enum vlc_ml_parent_type
 {
-    VLC_ML_PARENT_ALBUM = 1,
+    VLC_ML_PARENT_UNKNOWN,
+    VLC_ML_PARENT_ALBUM,
     VLC_ML_PARENT_ARTIST,
     VLC_ML_PARENT_SHOW,
     VLC_ML_PARENT_GENRE,
@@ -408,6 +414,7 @@ enum vlc_ml_control
     VLC_ML_BAN_FOLDER,              /**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_UNBAN_FOLDER,            /**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_LIST_FOLDERS,            /**< arg1: entrypoints (vlc_ml_entry_point_list_t**); res: can fail */
+    VLC_ML_IS_INDEXED,              /**< arg1: mrl (const char*) arg2 (out): bool*;       res: can fail */
     /**
      * Reload a specific folder, or all.
      * arg1: mrl (const char*), NULL to reload all folders
@@ -431,6 +438,7 @@ enum vlc_ml_control
     VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_PREF,   /**< arg1: media id; arg2: vlc_ml_playback_pref; arg3: char**; */
     VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_PREF,   /**< arg1: media id; arg2: vlc_ml_playback_pref; arg3: const char*; */
     VLC_ML_MEDIA_SET_THUMBNAIL,             /**< arg1: media id; arg2: const char*; */
+    VLC_ML_MEDIA_GENERATE_THUMBNAIL,        /**< arg1: media id; */
     VLC_ML_MEDIA_ADD_EXTERNAL_MRL,          /**< arg1: media id; arg2: const char*; arg3: type(vlc_ml_file_type_t) */
 };
 
@@ -568,6 +576,13 @@ enum vlc_ml_event_type
      * increase once all discovery operations are completed.
      */
     VLC_ML_EVENT_PARSING_PROGRESS_UPDATED,
+    /**
+     * Sent after a media thumbnail was generated, or if it's generation failed.
+     * The media is stored in vlc_ml_event_t::media_thumbnail_generated::p_media
+     * and the success state is stored in
+     * vlc_ml_event_t::media_thumbnail_generated::b_success
+     */
+    VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED,
 };
 
 typedef struct vlc_ml_event_t
@@ -632,6 +647,11 @@ typedef struct vlc_ml_event_t
         {
             bool b_idle;
         } background_idle_changed;
+        struct
+        {
+            const vlc_ml_media_t* p_media;
+            bool b_success;
+        } media_thumbnail_generated;
     };
 } vlc_ml_event_t;
 
@@ -703,6 +723,16 @@ vlc_ml_event_register_callback( vlc_medialibrary_t* p_ml, vlc_ml_callback_t cb, 
  */
 VLC_API void vlc_ml_event_unregister_callback( vlc_medialibrary_t* p_ml,
                                                vlc_ml_event_callback_t* p_callback );
+/**
+ * \brief Unregisters a medialibrary callback from the said callback.
+ * \param p_callback The handle returned by vlc_ml_register_callback
+ *
+ * This must only be called synchronously from the callback function provided to
+ * vlc_ml_event_register_callback
+ * The p_callback handle must be considered invalid when this function returns
+ */
+VLC_API void vlc_ml_event_unregister_from_callback( vlc_medialibrary_t* p_ml,
+                                                    vlc_ml_event_callback_t* p_callback );
 
 
 VLC_API void vlc_ml_show_release( vlc_ml_show_t* p_show );
@@ -757,6 +787,12 @@ static inline int vlc_ml_list_folder( vlc_medialibrary_t* p_ml,
                                       vlc_ml_entry_point_list_t** pp_entrypoints )
 {
     return vlc_ml_control( p_ml, VLC_ML_LIST_FOLDERS, pp_entrypoints );
+}
+
+static inline int vlc_ml_is_indexed( vlc_medialibrary_t* p_ml,
+                                     const char* psz_mrl, bool* p_res )
+{
+    return vlc_ml_control( p_ml, VLC_ML_IS_INDEXED, psz_mrl, p_res );
 }
 
 static inline int vlc_ml_reload_folder( vlc_medialibrary_t* p_ml, const char* psz_mrl )
@@ -815,6 +851,11 @@ static inline int vlc_ml_media_set_thumbnail( vlc_medialibrary_t* p_ml, int64_t 
     return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_THUMBNAIL, i_media_id, psz_mrl );
 }
 
+static inline int vlc_ml_media_generate_thumbnail( vlc_medialibrary_t* p_ml, int64_t i_media_id )
+{
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_GENERATE_THUMBNAIL, i_media_id );
+}
+
 static inline int vlc_ml_media_add_external_mrl( vlc_medialibrary_t* p_ml, int64_t i_media_id,
                                                  const char* psz_mrl, int i_type )
 {
@@ -824,6 +865,11 @@ static inline int vlc_ml_media_add_external_mrl( vlc_medialibrary_t* p_ml, int64
 static inline vlc_ml_media_t* vlc_ml_get_media( vlc_medialibrary_t* p_ml, int64_t i_media_id )
 {
     return (vlc_ml_media_t*)vlc_ml_get( p_ml, VLC_ML_GET_MEDIA, i_media_id );
+}
+
+static inline input_item_t* vlc_ml_get_input_item( vlc_medialibrary_t* p_ml, int64_t i_media_id )
+{
+    return (input_item_t*)vlc_ml_get( p_ml, VLC_ML_GET_INPUT_ITEM, i_media_id );
 }
 
 static inline vlc_ml_album_t* vlc_ml_get_album( vlc_medialibrary_t* p_ml, int64_t i_album_id )
@@ -1213,6 +1259,24 @@ static inline size_t vlc_ml_count_playlists( vlc_medialibrary_t* p_ml, const vlc
     vlc_assert( p_ml != NULL );
     size_t count;
     if ( vlc_ml_list( p_ml, VLC_ML_COUNT_PLAYLISTS, params, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
+}
+
+static inline vlc_ml_media_list_t* vlc_ml_list_playlist_media( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params, int64_t i_playlist_id )
+{
+    vlc_assert( p_ml != NULL );
+    vlc_ml_media_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_PLAYLIST_MEDIA, params, i_playlist_id, &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_playlist_media( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params, int64_t i_playlist_id )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_PLAYLIST_MEDIA, params, i_playlist_id, &count ) != VLC_SUCCESS )
         return 0;
     return count;
 }

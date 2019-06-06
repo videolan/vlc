@@ -166,19 +166,25 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
             break;
     }
 
-    if ( i_chroma != VLC_CODEC_RGB8 ) /* Palette based, no mask */
+    switch( i_chroma )
     {
-        video_format_t videofmt;
-        video_format_Init( &videofmt, i_chroma );
-        video_format_FixRgb( &videofmt );
-
-        p_client->format.redShift = videofmt.i_lrshift;
-        p_client->format.greenShift = videofmt.i_lgshift;
-        p_client->format.blueShift = videofmt.i_lbshift;
-        p_client->format.redMax = videofmt.i_rmask >> videofmt.i_lrshift;
-        p_client->format.greenMax = videofmt.i_gmask >> videofmt.i_lgshift;
-        p_client->format.blueMax = videofmt.i_bmask >> videofmt.i_lbshift;
-        video_format_Clean( &videofmt );
+        case VLC_CODEC_RGB16:
+            p_client->format.redShift   = 11;
+            p_client->format.greenShift =  5;
+            p_client->format.blueShift  =  0;
+            p_client->format.redMax     = 0x1f;
+            p_client->format.greenMax   = 0x3f;
+            p_client->format.blueMax    = 0x1f;
+            break;
+        case VLC_CODEC_RGB24:
+        case VLC_CODEC_RGB32:
+            p_client->format.redShift   = 16;
+            p_client->format.greenShift =  8;
+            p_client->format.blueShift  =  0;
+            p_client->format.redMax     = 0xff;
+            p_client->format.greenMax   = 0xff;
+            p_client->format.blueMax    = 0xff;
+            break;
     }
 
     /* Set up framebuffer */

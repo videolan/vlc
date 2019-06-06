@@ -2,7 +2,6 @@
  * cmd_muxer.cpp
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
- * $Id$
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *

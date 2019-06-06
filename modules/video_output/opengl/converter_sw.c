@@ -114,7 +114,6 @@ pbo_picture_destroy(picture_t *pic)
         picsys->DeleteBuffers(pic->i_planes, picsys->buffers);
 
     free(picsys);
-    free(pic);
 }
 
 static picture_t *

@@ -1,0 +1,34 @@
+From bbf867237c7fa326b5467afaad08f18a56a79935 Mon Sep 17 00:00:00 2001
+From: David Fuhrmann <dfuhrmann@videolan.org>
+Date: Mon, 7 Jan 2019 19:30:56 +0100
+Subject: [PATCH] library paths: Explicitly add /usr/local/lib
+
+Hardened runtime prevents the program to load any libraries outside
+of the application bundle by default. Specifically, it also ignores
+DYLD_FALLBACK_PATH which would contain /usr/local/lib.
+To allow usage of a library outside of the application bundle, add
+/usr/local/lib explicitly.
+---
+ src/file/dl_posix.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/file/dl_posix.c b/src/file/dl_posix.c
+index b97f12fe..49813856 100644
+--- a/src/file/dl_posix.c
++++ b/src/file/dl_posix.c
+@@ -69,10 +69,11 @@ void *dl_dlopen(const char *path, const char *version)
+        @loader_path     - location of current library/binary (ex. libbluray.dylib)
+        @executable_path - location of running binary (ex. /Applications/Some.app/Contents/MacOS)
+        @rpath           - search rpaths of running binary (man install_name_path)
++       /usr/local/lib/  - explicitly added path, as runtime hardened programs ignore DYLD_FALLBACK_PATH now
+     */
+     static const char *search_paths[] = {"", "@loader_path/lib/", "@loader_path/", "@executable_path/",
+                                          "@executable_path/lib/", "@executable_path/../lib/",
+-                                         "@executable_path/../Resources/", "@rpath/", NULL};
++                                         "@executable_path/../Resources/", "@rpath/", "/usr/local/lib/", NULL};
+     version = NULL;
+ #else
+     static const char ext[] = ".so";
+-- 
+2.17.2 (Apple Git-113)
+

@@ -185,7 +185,7 @@
 # define VLC_USED
 #endif
 
-#ifdef __ELF__
+#if defined (__ELF__) || defined (__MACH__)
 # define VLC_WEAK __attribute__((weak))
 #else
 /**

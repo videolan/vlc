@@ -2,7 +2,6 @@
  * volume.c
  *****************************************************************************
  * Copyright (C) 2007-2008 the VideoLAN team
- * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
  *          Pierre d'Herbemont <pdherbemont # videolan.org>
@@ -37,7 +36,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_meta.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_aout.h>
 
 #include "../vlc.h"
@@ -49,7 +48,7 @@
 static int vlclua_volume_set( lua_State *L )
 {
     playlist_t *p_this = vlclua_get_playlist_internal( L );
-    int i_volume = luaL_checkint( L, 1 );
+    int i_volume = luaL_checkinteger( L, 1 );
     if( i_volume < 0 )
         i_volume = 0;
     int i_ret = playlist_VolumeSet( p_this, i_volume/(float)AOUT_VOLUME_DEFAULT );

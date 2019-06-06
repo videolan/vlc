@@ -105,6 +105,7 @@ libmedialibrary_plugin_la_SOURCES = \
 	misc/medialibrary/medialib.cpp \
 	misc/medialibrary/MetadataExtractor.cpp \
 	misc/medialibrary/entities.cpp \
+	misc/medialibrary/Thumbnailer.cpp \
 	misc/medialibrary/medialibrary.h
 
 libmedialibrary_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(MEDIALIBRARY_CFLAGS)

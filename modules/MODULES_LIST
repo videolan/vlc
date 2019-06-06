@@ -17,7 +17,6 @@ $Id$
  * access_output_shout: Shoutcast access output
  * access_output_srt: SRT (Secure Reliable Transport) access_output module
  * access_output_udp: UDP Network access_output module
- * access_qtsound: Quicktime Audio Capture
  * access_rist: RIST (Reliable Internet Stream Transport) access module
  * access_srt: SRT(Secure Reliable Transport) access module
  * access_wasapi: WASAPI audio input
@@ -56,6 +55,7 @@ $Id$
  * audiounit_ios: AudioUnit output plugin for iOS
  * auhal: Audio output for Mac OS X based on the AUHAL API
  * avahi: Zeroconf services discovery
+ * avaudiocapture: AVFoundation based audio capture module
  * avcapture: AVFoundation based video capture module
  * avcodec: libavcodec audio/video decoder
  * avformat: libavformat demuxer
@@ -379,6 +379,7 @@ $Id$
  * stream_out_delay: introduce delay in an ES when streaming
  * stream_out_description: helper module for RTSP vod
  * stream_out_display: displays a stream output chain
+ * stream_out_dlna: DLNA streaming output module
  * stream_out_dummy: dummy stream out chain module
  * stream_out_duplicate: duplicates a stream output chain
  * stream_out_es: stream out module outputing ES
@@ -479,6 +480,7 @@ $Id$
  * xa: XA demuxer
  * xcb_apps: List the application windows using XCB
  * xcb_hotkeys: module to catch hotkeys when application doesn't have the focus
+ * xcb_render: RENDER video output using XCB
  * xcb_screen: input module that takes screenshots of the primary monitor
  * xcb_window: XCB window provider
  * xcb_x11: a X11 video output using XCB

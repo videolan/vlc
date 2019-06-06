@@ -5,7 +5,6 @@
  * item changes.
  *****************************************************************************
  * Copyright © 2008, 2011, 2012, 2015, 2018 the VideoLAN team
- * $Id$
  *
  * Authors: Rafaël Carré <funman@videolanorg>
  *          Felix Paul Kühne <fkuehne@videolan.org
@@ -37,7 +36,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_input.h>
 #include <vlc_meta.h>
 #include <vlc_interface.h>

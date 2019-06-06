@@ -238,7 +238,7 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
     p_enc_out->space     = p_src->space;
     p_enc_out->transfer  = p_src->transfer;
     p_enc_out->primaries = p_src->primaries;
-    p_enc_out->b_color_range_full = p_src->b_color_range_full;
+    p_enc_out->color_range = p_src->color_range;
 
      /* set masks when RGB */
     video_format_FixRgb(&p_enc->p_encoder->fmt_in.video);

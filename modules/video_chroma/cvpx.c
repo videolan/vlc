@@ -22,12 +22,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <QuartzCore/QuartzCore.h>
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
+#include <QuartzCore/QuartzCore.h>
 #include <TargetConditionals.h>
 
 #include <vlc_common.h>

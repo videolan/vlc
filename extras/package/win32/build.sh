@@ -20,11 +20,11 @@ Build vlc in the current directory
 OPTIONS:
    -h            Show some help
    -r            Release mode (default is debug)
-   -a <arch>     Use the specified arch (default: x86_64, possible i686)
+   -a <arch>     Use the specified arch (default: x86_64, possible i686, aarch64)
    -p            Use a Prebuilt contrib package (speeds up compilation)
    -c            Create a Prebuilt contrib package (rarely used)
    -l            Enable translations (can be slow)
-   -i <n|r|u>    Create an Installer (n: nightly, r: release, u: unsigned release archive)
+   -i <n|r|u|m>  Create an Installer (n: nightly, r: release, u: unsigned release archive, m: msi only)
    -s            Interactive shell (get correct environment variables for build)
    -b <url>      Enable breakpad support and send crash reports to this URL
 EOF
@@ -79,6 +79,9 @@ case $ARCH in
     i686)
         SHORTARCH="win32"
         ;;
+    aarch64)
+        SHORTARCH="winarm64"
+        ;;
     *)
         usage
         exit 1
@@ -124,7 +127,7 @@ fi
 if [ "$PREBUILT" != "yes" ]; then
 make list
 make -j$JOBS fetch
-make -j$JOBS
+make -j$JOBS -k || make -j1
 if [ "$PACKAGE" = "yes" ]; then
 make package
 fi
@@ -145,6 +148,8 @@ cd $SHORTARCH
 CONFIGFLAGS=""
 if [ "$RELEASE" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --enable-debug"
+else
+     CONFIGFLAGS="$CONFIGFLAGS --disable-debug"
 fi
 if [ "$I18N" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --disable-nls"
@@ -165,4 +170,6 @@ make package-win32
 elif [ "$INSTALLER" = "u" ]; then
 make package-win32-release
 sha512sum vlc-*-release.7z
+elif [ "$INSTALLER" = "m" ]; then
+make package-msi
 fi

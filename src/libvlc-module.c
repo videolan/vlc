@@ -2,7 +2,6 @@
  * libvlc-module.c: Options for the core (libvlc itself) module
  *****************************************************************************
  * Copyright (C) 1998-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -36,7 +35,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_cpu.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include "libvlc.h"
 #include "modules/modules.h"
 
@@ -1690,10 +1689,6 @@ vlc_module_begin ()
     add_module_list("video-filter", "video filter", NULL,
                     VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT)
 
-    set_subcategory( SUBCAT_VIDEO_SPLITTER )
-    add_module_list("video-splitter", "video splitter", NULL,
-                    VIDEO_SPLITTER_TEXT, VIDEO_SPLITTER_LONGTEXT)
-    add_obsolete_string( "vout-filter" ) /* since 2.0.0 */
 #if 0
     add_string( "pixel-ratio", "1", PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT )
 #endif

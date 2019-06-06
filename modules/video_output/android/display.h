@@ -101,7 +101,6 @@ static inline void AndroidOpaquePicture_DetachVout(picture_t *p_pic)
     }
     else
         vlc_mutex_unlock(&p_picsys->hw.lock);
-    free(p_pic);
 }
 
 static inline void

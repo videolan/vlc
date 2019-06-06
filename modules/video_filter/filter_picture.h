@@ -2,7 +2,6 @@
  * filter_picture.h: Common picture functions for filters
  *****************************************************************************
  * Copyright (C) 2007 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan dot org>
  *
@@ -98,14 +97,14 @@ static inline int GetPackedRgbIndexes( const video_format_t *p_fmt, int *i_r_ind
         return VLC_EGENERIC;
 
 #ifdef WORDS_BIGENDIAN
-    const int i_mask_bits = p_fmt->i_chroma == VLC_CODEC_RGB24 ? 24 : 32;
-    *i_r_index = ( i_mask_bits - p_fmt->i_lrshift ) / 8;
-    *i_g_index = ( i_mask_bits - p_fmt->i_lgshift ) / 8;
-    *i_b_index = ( i_mask_bits - p_fmt->i_lbshift ) / 8;
+    const int i_mask_bits = p_fmt->i_chroma == VLC_CODEC_RGB24 ? 16 : 24;
+    *i_r_index = (i_mask_bits - vlc_ctz(p_fmt->i_rmask)) / 8;
+    *i_g_index = (i_mask_bits - vlc_ctz(p_fmt->i_gmask)) / 8;
+    *i_b_index = (i_mask_bits - vlc_ctz(p_fmt->i_bmask)) / 8;
 #else
-    *i_r_index = p_fmt->i_lrshift / 8;
-    *i_g_index = p_fmt->i_lgshift / 8;
-    *i_b_index = p_fmt->i_lbshift / 8;
+    *i_r_index = vlc_ctz(p_fmt->i_rmask) / 8;
+    *i_g_index = vlc_ctz(p_fmt->i_gmask) / 8;
+    *i_b_index = vlc_ctz(p_fmt->i_bmask) / 8;
 #endif
     return VLC_SUCCESS;
 }

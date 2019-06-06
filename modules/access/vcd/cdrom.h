@@ -2,7 +2,6 @@
  * cdrom.h: cdrom tools header
  *****************************************************************************
  * Copyright (C) 1998-2001 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>

@@ -82,6 +82,7 @@ static const int prim_values[] = {
     PL_COLOR_PRIM_DCI_P3,
     PL_COLOR_PRIM_V_GAMUT,
     PL_COLOR_PRIM_S_GAMUT,
+    PL_COLOR_PRIM_DISPLAY_P3,
 };
 
 static const char * const prim_text[] = {
@@ -98,6 +99,7 @@ static const char * const prim_text[] = {
     "DCI-P3 (Digital Cinema)",
     "Panasonic V-Gamut (VARICAM)",
     "Sony S-Gamut",
+    "Display-P3 (Digital Cinema with D65)",
 };
 
 #define TRC_TEXT "Display gamma / transfer function"
@@ -263,7 +265,7 @@ static const char * const scale_text[] = {
     "Mitchell-Netravali (recommended downscaler)",
     "Bicubic",
     "Jinc / EWA Lanczos 3 taps (high quality, slow)",
-    "Nearest neighbour",
+    "Nearest neighbor",
     "Bilinear",
     "Gaussian",
     "Lanczos 3 taps",

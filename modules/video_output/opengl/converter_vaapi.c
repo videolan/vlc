@@ -306,6 +306,11 @@ Close(vlc_object_t *obj)
     free(tc->priv);
 }
 
+static int strcasecmp_void(const void *a, const void *b)
+{
+    return strcasecmp(a, b);
+}
+
 static int
 tc_va_check_interop_blacklist(opengl_tex_converter_t *tc, VADisplay *vadpy)
 {
@@ -325,7 +330,7 @@ tc_va_check_interop_blacklist(opengl_tex_converter_t *tc, VADisplay *vadpy)
 
     const char *found = bsearch(vendor_prefix, blacklist_prefix,
                                 ARRAY_SIZE(blacklist_prefix),
-                                BL_SIZE_MAX, (void *) strcasecmp);
+                                BL_SIZE_MAX, strcasecmp_void);
     if (found != NULL)
     {
         msg_Warn(tc->gl, "The '%s' driver is blacklisted: no interop", found);

@@ -394,17 +394,35 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         if(block_FindStartcodeFromOffset(&p_sys->bytestream, &p_sys->i_offset,
                                          NULL, 2,
                                          FLACStartcodeHelper,
-                                         FLACStartcodeMatcher) == VLC_SUCCESS)
+                                         FLACStartcodeMatcher) != VLC_SUCCESS)
         {
-            p_sys->i_state = STATE_GET_DATA;
-            break;
+            if( pp_block == NULL ) /* EOF/Drain */
+            {
+                p_sys->i_offset = block_BytestreamRemaining( &p_sys->bytestream );
+                p_sys->i_state = STATE_GET_DATA;
+                continue;
+            }
+            return NULL;
         }
-        else if( pp_block == NULL )
+
+        /* Check next header */
+        uint8_t nextheader[FLAC_HEADER_SIZE_MAX];
+        if (block_PeekOffsetBytes(&p_sys->bytestream, p_sys->i_offset,
+                                  nextheader, FLAC_HEADER_SIZE_MAX))
+            return NULL; /* Need more data */
+
+        struct flac_header_info dummy;
+        /* Check if frame is valid and get frame info */
+        if(FLAC_ParseSyncInfo(nextheader,
+                              p_sys->b_stream_info ? &p_sys->stream_info : NULL,
+                              NULL, &dummy) == 0)
         {
-            p_sys->i_offset = block_BytestreamRemaining( &p_sys->bytestream );
-            p_sys->i_state = STATE_GET_DATA;
+            p_sys->i_offset++;
+            continue;
         }
-        return NULL;
+
+        p_sys->i_state = STATE_GET_DATA;
+        continue;
     }
 
     case STATE_GET_DATA:
@@ -478,6 +496,11 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             p_sys->i_last_frame_size = p_sys->i_frame_size;
             p_sys->i_offset = 0;
             p_sys->crc = 0;
+
+            if( block_BytestreamRemaining(&p_sys->bytestream) > 0 )
+                p_sys->i_state = STATE_SEND_DATA;
+            else
+                p_sys->i_state = STATE_NOSYNC;
         }
         break;
 

@@ -2,7 +2,6 @@
  * video.c: transcoding stream output module (video)
  *****************************************************************************
  * Copyright (C) 2003-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -47,10 +46,9 @@ static const video_format_t* filtered_video_format( sout_stream_id_sys_t *id,
     assert( id && p_pic );
     if( id->p_uf_chain )
         return &filter_chain_GetFmtOut( id->p_uf_chain )->video;
-    else if( id->p_f_chain )
+    if( id->p_f_chain )
         return &filter_chain_GetFmtOut( id->p_f_chain )->video;
-    else
-        return &p_pic->format;
+    return &p_pic->format;
 }
 
 static int video_update_format_decoder( decoder_t *p_dec )
@@ -75,8 +73,8 @@ static int video_update_format_decoder( decoder_t *p_dec )
         return 0;
     }
 
-    video_format_Clean( &id->decoder_out.video );
-    video_format_Copy( &id->decoder_out.video, &p_dec->fmt_out.video );
+    es_format_Clean( &id->decoder_out );
+    es_format_Copy( &id->decoder_out, &p_dec->fmt_out );
 
     /* crap, decoders resetting the whole fmtout... */
     es_format_SetMeta( &id->decoder_out, &p_dec->fmt_in );
@@ -282,25 +280,6 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
 
         /* Update encoder so it matches filters output */
         transcode_encoder_update_format_in( id->encoder, p_src );
-
-        /* FIXME: modifying decoder output size from filters
-         *        sounds really suspicious an buggy
-         *        see also size adaption already done in conversion_video_filter_append() */
-        const es_format_t *enc_out = transcode_encoder_format_out( id->encoder );
-        if( enc_out->video.i_width != p_dst->video.i_width ||
-            enc_out->video.i_height != p_dst->video.i_height ||
-            enc_out->video.i_sar_num != p_dst->video.i_sar_num ||
-            enc_out->video.i_sar_den != p_dst->video.i_sar_den )
-        {
-            es_format_t tmp;
-            es_format_Copy( &tmp, enc_out );
-            tmp.video.i_width = p_dst->video.i_width;
-            tmp.video.i_height = p_dst->video.i_height;
-            tmp.video.i_sar_num = p_dst->video.i_sar_num;
-            tmp.video.i_sar_den = p_dst->video.i_sar_den;
-            transcode_encoder_update_format_in( id->encoder, &tmp );
-            es_format_Clean( &tmp );
-        }
     }
 }
 
@@ -406,7 +385,7 @@ static picture_t * RenderSubpictures( sout_stream_t *p_stream, sout_stream_id_sy
 
     subpicture_t *p_subpic = spu_Render( id->p_spu, NULL, &fmt,
                                          &outfmt,
-                                         p_pic->date, p_pic->date, false );
+                                         p_pic->date, p_pic->date, false, false );
 
     /* Overlay subpicture */
     if( p_subpic )

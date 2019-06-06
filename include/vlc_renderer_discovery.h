@@ -114,7 +114,6 @@ vlc_renderer_item_flags(const vlc_renderer_item_t *p_item);
  * @{
  */
 
-typedef struct vlc_renderer_discovery_sys vlc_renderer_discovery_sys;
 struct vlc_renderer_discovery_owner;
 
 /**
@@ -172,7 +171,7 @@ struct vlc_renderer_discovery_t
     char *              psz_name;
     config_chain_t *    p_cfg;
 
-    vlc_renderer_discovery_sys *p_sys;
+    void *p_sys;
 };
 
 /**

@@ -2,7 +2,6 @@
  * vlc_bits.h : Bit handling helpers
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003, 2006, 2015 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin at videolan dot org>

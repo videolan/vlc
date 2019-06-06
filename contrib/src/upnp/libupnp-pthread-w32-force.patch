@@ -1,0 +1,10 @@
+--- upnp/configure.ac.pthread-w32      2018-05-17 11:51:47.115502500 +0200
++++ upnp/configure.ac  2018-05-17 12:49:30.371786100 +0200
+@@ -667,6 +667,7 @@ ACX_PTHREAD(
+ #
+ # Update environment variables for pthreads
+ #
++PTHREAD_LIBS="-lpthread"
+ CC="$PTHREAD_CC"
+ CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
+ LIBS="$PTHREAD_LIBS $LIBS"

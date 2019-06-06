@@ -1430,6 +1430,7 @@ static int HandleSDBuffer( demux_t *p_demux, uint8_t *p_buffer,
             break;
         p_sys->i_state = STATE_STARTSYNC;
         p_sys->i_last_state_change = vlc_tick_now();
+        /* fallthrough */
 
     case STATE_STARTSYNC:
         p_parser = FindReferenceCode( FIELD_1_VBLANK_EAV, p_parser, p_end );
@@ -1438,6 +1439,7 @@ static int HandleSDBuffer( demux_t *p_demux, uint8_t *p_buffer,
         p_sys->i_anc_size = 0;
         p_sys->i_state = STATE_ANCSYNC;
         p_sys->i_last_state_change = vlc_tick_now();
+        /* fallthrough */
 
     case STATE_ANCSYNC:
         p_parser = CountReference( &p_sys->i_anc_size,
@@ -1447,6 +1449,7 @@ static int HandleSDBuffer( demux_t *p_demux, uint8_t *p_buffer,
         p_sys->i_active_size = 0;
         p_sys->i_state = STATE_LINESYNC;
         p_sys->i_last_state_change = vlc_tick_now();
+        /* fallthrough */
 
     case STATE_LINESYNC:
         p_parser = CountReference( &p_sys->i_active_size,
@@ -1456,6 +1459,7 @@ static int HandleSDBuffer( demux_t *p_demux, uint8_t *p_buffer,
         p_sys->i_picture_size = p_sys->i_anc_size + p_sys->i_active_size;
         p_sys->i_state = STATE_ACTIVESYNC;
         p_sys->i_last_state_change = vlc_tick_now();
+        /* fallthrough */
 
     case STATE_ACTIVESYNC:
         p_parser = CountReference( &p_sys->i_picture_size,
@@ -1466,6 +1470,7 @@ static int HandleSDBuffer( demux_t *p_demux, uint8_t *p_buffer,
                              / (p_sys->i_anc_size + p_sys->i_active_size);
         p_sys->i_state = STATE_VBLANKSYNC;
         p_sys->i_last_state_change = vlc_tick_now();
+        /* fallthrough */
 
     case STATE_VBLANKSYNC:
         p_parser = CountReference( &p_sys->i_picture_size,
@@ -1474,6 +1479,7 @@ static int HandleSDBuffer( demux_t *p_demux, uint8_t *p_buffer,
             break;
         p_sys->i_state = STATE_PICSYNC;
         p_sys->i_last_state_change = vlc_tick_now();
+        /* fallthrough */
 
     case STATE_PICSYNC:
         p_parser = CountReference( &p_sys->i_picture_size,

@@ -22,6 +22,9 @@
 # include "config.h"
 #endif
 
+#undef MODULE_STRING
+#define MODULE_STRING "http"
+
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>

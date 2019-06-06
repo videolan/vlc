@@ -2,7 +2,6 @@
  * window.h : Header for FFT window routines
  *****************************************************************************
  * Copyright (C) 2014 Ronald Wright
- * $Id$
  *
  * Author: Ronald Wright <logiconcepts819@gmail.com>
  *

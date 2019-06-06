@@ -580,6 +580,14 @@ libtwolame_plugin_la_LIBADD = $(TWOLAME_LIBS) $(LIBM)
 EXTRA_LTLIBRARIES += libtwolame_plugin.la
 codec_LTLIBRARIES += $(LTLIBtwolame)
 
+libdav1d_plugin_la_SOURCES = codec/dav1d.c
+libdav1d_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(DAV1D_CFLAGS)
+libdav1d_plugin_la_CFLAGS = $(AM_CFLAGS)
+libdav1d_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libdav1d_plugin_la_LIBADD = $(DAV1D_LIBS)
+EXTRA_LTLIBRARIES += libdav1d_plugin.la
+codec_LTLIBRARIES += $(LTLIBdav1d)
+
 
 ### Hardware encoders ###
 

@@ -2,7 +2,6 @@
  * evt_dragndrop.hpp
  *****************************************************************************
  * Copyright (C) 2011 the VideoLAN team
- * $Id$
  *
  * Author: Erwan Tulou      <erwan10 At videolan Dot org>
  *

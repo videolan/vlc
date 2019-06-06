@@ -2,7 +2,6 @@
  * cmd_dvd.cpp
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
- * $Id$
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -23,7 +22,7 @@
 
 #include "cmd_dvd.hpp"
 #include <vlc_input.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 
 void CmdDvdNextTitle::execute()
 {

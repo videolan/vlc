@@ -2,7 +2,6 @@
  * vlc_picture_fifo.h: picture fifo definitions
  *****************************************************************************
  * Copyright (C) 2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *

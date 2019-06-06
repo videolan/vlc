@@ -3,7 +3,6 @@
  *****************************************************************************
  * Copyright (C) 2005 VLC authors and VideoLAN
  *
- * $Id$
  *
  * Authors: Damien Fouilleul <damienf@videolan.org>
  *
@@ -77,6 +76,10 @@ static void libvlc_logf (void *data, int level, const vlc_log_t *item,
     inst->log.cb (inst->log.data, level, item, fmt, ap);
 }
 
+static const struct vlc_logger_operations libvlc_log_ops = {
+    libvlc_logf, NULL
+};
+
 void libvlc_log_unset (libvlc_instance_t *inst)
 {
     vlc_LogSet (inst->p_libvlc_int, NULL, NULL);
@@ -87,7 +90,7 @@ void libvlc_log_set (libvlc_instance_t *inst, libvlc_log_cb cb, void *data)
     libvlc_log_unset (inst); /* <- Barrier before modifying the callback */
     inst->log.cb = cb;
     inst->log.data = data;
-    vlc_LogSet (inst->p_libvlc_int, libvlc_logf, inst);
+    vlc_LogSet(inst->p_libvlc_int, &libvlc_log_ops, inst);
 }
 
 /*** Helpers for logging to files ***/

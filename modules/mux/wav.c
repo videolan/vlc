@@ -2,7 +2,6 @@
  * wav.c: wav muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2004, 2006 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *

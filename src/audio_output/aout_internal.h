@@ -2,7 +2,6 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -35,13 +34,6 @@ enum {
     AOUT_RESAMPLING_NONE=0,
     AOUT_RESAMPLING_UP,
     AOUT_RESAMPLING_DOWN
-};
-
-struct aout_request_vout
-{
-    struct vout_thread_t  *(*pf_request_vout)( void *, struct vout_thread_t *,
-                                               const video_format_t *, bool );
-    void *p_private;
 };
 
 typedef struct aout_volume aout_volume_t;
@@ -82,7 +74,6 @@ typedef struct
     audio_sample_format_t input_format;
     audio_sample_format_t mixer_format;
 
-    aout_request_vout_t request_vout;
     aout_filters_cfg_t filters_cfg;
 
     atomic_uint buffers_lost;
@@ -137,7 +128,7 @@ void aout_FormatsPrint(vlc_object_t *, const char *,
 #define AOUT_DEC_FAILED VLC_EGENERIC
 
 int aout_DecNew(audio_output_t *, const audio_sample_format_t *,
-                const audio_replay_gain_t *, const aout_request_vout_t *);
+                const audio_replay_gain_t *);
 void aout_DecDelete(audio_output_t *);
 int aout_DecPlay(audio_output_t *aout, block_t *block);
 void aout_DecGetResetStats(audio_output_t *, unsigned *, unsigned *);

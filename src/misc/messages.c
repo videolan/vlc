@@ -4,7 +4,6 @@
  * modules, especially intf modules. See vlc_config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2005 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -47,9 +46,8 @@ struct vlc_logger_t
 {
     struct vlc_common_members obj;
     vlc_rwlock_t lock;
-    vlc_log_cb log;
+    const struct vlc_logger_operations *ops;
     void *sys;
-    module_t *module;
 };
 
 static void vlc_vaLogCallback(libvlc_int_t *vlc, int type,
@@ -62,7 +60,7 @@ static void vlc_vaLogCallback(libvlc_int_t *vlc, int type,
     assert(logger != NULL);
     canc = vlc_savecancel();
     vlc_rwlock_rdlock(&logger->lock);
-    logger->log(logger->sys, type, item, format, ap);
+    logger->ops->log(logger->sys, type, item, format, ap);
     vlc_rwlock_unlock(&logger->lock);
     vlc_restorecancel(canc);
 }
@@ -218,6 +216,7 @@ typedef struct
     vlc_mutex_t lock;
     vlc_log_early_t *head;
     vlc_log_early_t **tailp;
+    vlc_logger_t *sink;
 } vlc_logger_early_t;
 
 static void vlc_vaLogEarly(void *d, int type, const vlc_log_t *item,
@@ -251,26 +250,11 @@ static void vlc_vaLogEarly(void *d, int type, const vlc_log_t *item,
     vlc_mutex_unlock(&sys->lock);
 }
 
-static int vlc_LogEarlyOpen(vlc_logger_t *logger)
+static void vlc_LogEarlyClose(void *d)
 {
-    vlc_logger_early_t *sys = malloc(sizeof (*sys));
-
-    if (unlikely(sys == NULL))
-        return -1;
-
-    vlc_mutex_init(&sys->lock);
-    sys->head = NULL;
-    sys->tailp = &sys->head;
-
-    logger->log = vlc_vaLogEarly;
-    logger->sys = sys;
-    return 0;
-}
-
-static void vlc_LogEarlyClose(vlc_logger_t *logger, void *d)
-{
-    libvlc_int_t *vlc = logger->obj.libvlc;
     vlc_logger_early_t *sys = d;
+    vlc_logger_t *logger = sys->sink;
+    libvlc_int_t *vlc = logger->obj.libvlc;
 
     /* Drain early log messages */
     for (vlc_log_early_t *log = sys->head, *next; log != NULL; log = next)
@@ -286,29 +270,74 @@ static void vlc_LogEarlyClose(vlc_logger_t *logger, void *d)
     free(sys);
 }
 
+static const struct vlc_logger_operations early_ops = {
+    vlc_vaLogEarly,
+    vlc_LogEarlyClose,
+};
+
+static
+const struct vlc_logger_operations *vlc_LogEarlyOpen(vlc_logger_t *logger,
+                                                     void **restrict sysp)
+{
+    vlc_logger_early_t *sys = malloc(sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return NULL;
+
+    vlc_mutex_init(&sys->lock);
+    sys->head = NULL;
+    sys->tailp = &sys->head;
+    sys->sink = logger;
+    *sysp = sys;
+    return &early_ops;
+}
+
 static void vlc_vaLogDiscard(void *d, int type, const vlc_log_t *item,
                              const char *format, va_list ap)
 {
     (void) d; (void) type; (void) item; (void) format; (void) ap;
 }
 
+static const struct vlc_logger_operations discard_ops =
+{
+    vlc_vaLogDiscard,
+    NULL,
+};
+
 static int vlc_logger_load(void *func, va_list ap)
 {
-    vlc_log_cb (*activate)(vlc_object_t *, void **) = func;
+    const struct vlc_logger_operations *(*activate)(vlc_object_t *,
+                                                    void **) = func;
     vlc_logger_t *logger = va_arg(ap, vlc_logger_t *);
-    vlc_log_cb *cb = va_arg(ap, vlc_log_cb *);
+    const struct vlc_logger_operations **ops = va_arg(ap,
+                                        const struct vlc_logger_operations **);
     void **sys = va_arg(ap, void **);
 
-    *cb = activate(VLC_OBJECT(logger), sys);
-    return (*cb != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
+    *ops = activate(VLC_OBJECT(logger), sys);
+    return (*ops != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-static void vlc_logger_unload(void *func, va_list ap)
+static void vlc_LogSwitch(libvlc_int_t *vlc,
+                          const struct vlc_logger_operations *ops,
+                          void *opaque)
 {
-    void (*deactivate)(vlc_logger_t *) = func;
-    void *sys = va_arg(ap, void *);
+    vlc_logger_t *logger = libvlc_priv(vlc)->logger;
+    const struct vlc_logger_operations *old_ops;
+    void *old_opaque;
 
-    deactivate(sys);
+    assert(logger != NULL);
+
+    if (ops == NULL)
+        ops = &discard_ops;
+
+    vlc_rwlock_wrlock(&logger->lock);
+    old_ops = logger->ops;
+    old_opaque = logger->sys;
+    logger->ops = ops;
+    logger->sys = opaque;
+    vlc_rwlock_unlock(&logger->lock);
+
+    if (old_ops->destroy != NULL)
+        old_ops->destroy(old_opaque);
 }
 
 /**
@@ -323,94 +352,48 @@ static void vlc_logger_unload(void *func, va_list ap)
 int vlc_LogPreinit(libvlc_int_t *vlc)
 {
     vlc_logger_t *logger = vlc_custom_create(vlc, sizeof (*logger), "logger");
-
-    libvlc_priv(vlc)->logger = logger;
-
     if (unlikely(logger == NULL))
         return -1;
 
+    libvlc_priv(vlc)->logger = logger;
     vlc_rwlock_init(&logger->lock);
+    logger->ops = &discard_ops;
 
-    if (vlc_LogEarlyOpen(logger))
-    {
-        logger->log = vlc_vaLogDiscard;
-        return -1;
-    }
+    const struct vlc_logger_operations *ops;
+    void *opaque;
 
-    /* Announce who we are */
-    msg_Dbg(vlc, "VLC media player - %s", VERSION_MESSAGE);
-    msg_Dbg(vlc, "%s", COPYRIGHT_MESSAGE);
-    msg_Dbg(vlc, "revision %s", psz_vlc_changeset);
-    msg_Dbg(vlc, "configured with %s", CONFIGURE_LINE);
+    ops = vlc_LogEarlyOpen(logger, &opaque);
+    vlc_LogSet(vlc, ops, opaque);
     return 0;
 }
 
 /**
  * Initializes the messages logging subsystem and drain the early messages to
  * the configured log.
- *
- * \return 0 on success, -1 on error.
  */
-int vlc_LogInit(libvlc_int_t *vlc)
+void vlc_LogInit(libvlc_int_t *vlc)
 {
     vlc_logger_t *logger = libvlc_priv(vlc)->logger;
-    if (unlikely(logger == NULL))
-        return -1;
-
-    vlc_log_cb cb;
-    void *sys, *early_sys = NULL;
+    const struct vlc_logger_operations *ops;
+    void *opaque;
 
     /* TODO: module configuration item */
-    module_t *module = vlc_module_load(logger, "logger", NULL, false,
-                                       vlc_logger_load, logger, &cb, &sys);
-    if (module == NULL)
-        cb = vlc_vaLogDiscard;
+    if (vlc_module_load(logger, "logger", NULL, false,
+                        vlc_logger_load, logger, &ops, &opaque) == NULL)
+        ops = NULL;
 
-    vlc_rwlock_wrlock(&logger->lock);
-    if (logger->log == vlc_vaLogEarly)
-        early_sys = logger->sys;
-
-    logger->log = cb;
-    logger->sys = sys;
-    assert(logger->module == NULL); /* Only one call to vlc_LogInit()! */
-    logger->module = module;
-    vlc_rwlock_unlock(&logger->lock);
-
-    if (early_sys != NULL)
-        vlc_LogEarlyClose(logger, early_sys);
-
-    return 0;
+    vlc_LogSwitch(vlc, ops, opaque);
 }
 
 /**
  * Sets the message logging callback.
- * \param cb message callback, or NULL to clear
+ * \param ops message callback, or NULL to clear
  * \param data data pointer for the message callback
  */
-void vlc_LogSet(libvlc_int_t *vlc, vlc_log_cb cb, void *opaque)
+void vlc_LogSet(libvlc_int_t *vlc, const struct vlc_logger_operations *ops,
+                void *opaque)
 {
-    vlc_logger_t *logger = libvlc_priv(vlc)->logger;
-
-    if (unlikely(logger == NULL))
-        return;
-
-    module_t *module;
-    void *sys;
-
-    if (cb == NULL)
-        cb = vlc_vaLogDiscard;
-
-    vlc_rwlock_wrlock(&logger->lock);
-    sys = logger->sys;
-    module = logger->module;
-
-    logger->log = cb;
-    logger->sys = opaque;
-    logger->module = NULL;
-    vlc_rwlock_unlock(&logger->lock);
-
-    if (module != NULL)
-        vlc_module_unload(vlc, module, vlc_logger_unload, sys);
+    vlc_LogSwitch(vlc, ops, opaque);
 
     /* Announce who we are */
     msg_Dbg (vlc, "VLC media player - %s", VERSION_MESSAGE);
@@ -423,20 +406,7 @@ void vlc_LogDeinit(libvlc_int_t *vlc)
 {
     vlc_logger_t *logger = libvlc_priv(vlc)->logger;
 
-    if (unlikely(logger == NULL))
-        return;
-
-    if (logger->module != NULL)
-        vlc_module_unload(vlc, logger->module, vlc_logger_unload, logger->sys);
-    else
-    /* Flush early log messages (corner case: no call to vlc_LogInit()) */
-    if (logger->log == vlc_vaLogEarly)
-    {
-        logger->log = vlc_vaLogDiscard;
-        vlc_LogEarlyClose(logger, logger->sys);
-    }
-
+    vlc_LogSwitch(vlc, NULL, NULL);
     vlc_rwlock_destroy(&logger->lock);
     vlc_object_release(logger);
-    libvlc_priv(vlc)->logger = NULL;
 }

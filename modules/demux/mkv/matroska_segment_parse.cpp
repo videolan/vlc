@@ -2,7 +2,6 @@
  * matroska_segment_parse.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2003-2010 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Steve Lhomme <steve.lhomme@free.fr>
@@ -36,6 +35,8 @@ extern "C" {
 #include "../windows_audio_commons.h"
 #include "../mp4/libmp4.h"
 }
+
+#include "../../packetizer/iso_color_tables.h"
 
 #include <vlc_codecs.h>
 #include <stdexcept>
@@ -247,6 +248,9 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         unsigned int i_display_unit;
         unsigned int i_display_width;
         unsigned int i_display_height;
+
+        unsigned int chroma_sit_vertical;
+        unsigned int chroma_sit_horizontal;
       } track_video_info;
 
     } metadata_payload = {
@@ -488,6 +492,34 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             unsigned int i_display_width  = vars.track_video_info.i_display_width;
             unsigned int i_display_height = vars.track_video_info.i_display_height;
 
+            if (vars.track_video_info.chroma_sit_vertical || vars.track_video_info.chroma_sit_horizontal)
+            {
+                switch (vars.track_video_info.chroma_sit_vertical)
+                {
+                case 0: // unspecified
+                case 2: // center
+                    if (vars.track_video_info.chroma_sit_horizontal == 1) // left
+                        tk->fmt.video.chroma_location = CHROMA_LOCATION_LEFT;
+                    else if (vars.track_video_info.chroma_sit_horizontal == 2) // half
+                        tk->fmt.video.chroma_location = CHROMA_LOCATION_CENTER;
+                    else
+                        debug( vars, "unsupported chroma Siting %u/%u",
+                               vars.track_video_info.chroma_sit_horizontal,
+                               vars.track_video_info.chroma_sit_vertical);
+                    break;
+                case 1: // top
+                    if (vars.track_video_info.chroma_sit_horizontal == 1) // left
+                        tk->fmt.video.chroma_location = CHROMA_LOCATION_TOP_LEFT;
+                    else if (vars.track_video_info.chroma_sit_horizontal == 2) // half
+                        tk->fmt.video.chroma_location = CHROMA_LOCATION_TOP_CENTER;
+                    else
+                        debug( vars, "unsupported chroma Siting %u/%u",
+                               vars.track_video_info.chroma_sit_horizontal,
+                               vars.track_video_info.chroma_sit_vertical);
+                    break;
+                }
+            }
+
             if( i_display_height && i_display_width )
             {
                 tk->fmt.video.i_sar_num = i_display_width  * tk->fmt.video.i_height;
@@ -672,87 +704,158 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxVideoColourRange, range )
         {
+            const char *name = nullptr;
             switch( static_cast<uint8>(range) )
             {
-            case 1: // broadcast
-                vars.tk->fmt.video.b_color_range_full = 0;
+            case 1:
+                vars.tk->fmt.video.color_range = COLOR_RANGE_LIMITED;
+                name ="limited";
                 break;
-            case 2: // full range
-                vars.tk->fmt.video.b_color_range_full = 1;
+            case 2:
+                vars.tk->fmt.video.color_range = COLOR_RANGE_FULL;
+                name ="full";
                 break;
             case 3: // Matrix coefficients + Transfer characteristics
             default:
                 debug( vars, "Unsupported Colour Range=%d", static_cast<uint8>(range) );
             }
+            if (name != nullptr) debug( vars, "Range=%s", name );
         }
         E_CASE( KaxVideoColourTransferCharacter, tranfer )
         {
+            vars.tk->fmt.video.transfer = iso_23001_8_tc_to_vlc_xfer( static_cast<uint8>(tranfer) );
+            const char *name = nullptr;
             switch( static_cast<uint8>(tranfer) )
             {
-            case 1: // BT-709
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_BT709;
+            case 1: name = "BT-709";
                 break;
-            case 4: // Gamma 2.2
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_SRGB;
+            case 4: name = "BT.470BM";
                 break;
-            case 5: // Gamma 2.8
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_BT470_BG;
+            case 5: name = "BT.470BG";
                 break;
-            case 6: // SMPTE 170
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_SMPTE_170;
+            case 6: name = "SMPTE 170M";
                 break;
-            case 7: // SMPTE 240M
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_SMPTE_240;
+            case 7: name = "SMPTE 240M";
                 break;
-            case 8: // Linear
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_LINEAR;
+            case 8: name = "linear";
                 break;
-            case 16: // SMPTE ST-2084
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_SMPTE_ST2084;
+            case 13: name = "sRGB/sYCC";
                 break;
-            case 18: // ARIB STD-B67
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_ARIB_B67;
+            case 16: name = "BT.2100 PQ";
+                break;
+            case 18: name = "HLG";
                 break;
             case 9:  // Log
             case 10: // Log SQRT
             case 11: // IEC 61966-2-4
             case 12: // ITU-R BT.1361 Extended Colour Gamut
-            case 13: // IEC 61966-2-1
             case 14: // ITU-R BT.2020 10 bit
             case 15: // ITU-R BT.2020 12 bit
             case 17: // SMPTE ST 428-1
             default:
-                debug( vars, "Unsupported Colour Transfer=%d", static_cast<uint8>(tranfer) );
+                break;
             }
+            if (vars.tk->fmt.video.transfer == TRANSFER_FUNC_UNDEF)
+                debug( vars, "Unsupported Colour Transfer=%d", static_cast<uint8>(tranfer) );
+            else if (name == nullptr)
+                debug( vars, "Colour Transfer=%d", static_cast<uint8>(tranfer) );
+            else
+                debug( vars, "Colour Transfer=%s", name );
         }
         E_CASE( KaxVideoColourPrimaries, primaries )
         {
+            vars.tk->fmt.video.primaries = iso_23001_8_cp_to_vlc_primaries( static_cast<uint8>(primaries) );
+            const char *name = nullptr;
             switch( static_cast<uint8>(primaries) )
             {
-            case 1: // ITU-R BT.709
-                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_BT709;
+            case 1: name = "BT-709";
                 break;
-            case 4: // ITU-R BT.470M
-                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_BT470_M;
+            case 4: name = "BT.470M";
                 break;
-            case 5: // ITU-R BT.470BG
-                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_BT470_BG;
+            case 5: name = "BT.470BG";
                 break;
-            case 6: // SMPTE 170M
-                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_SMTPE_170;
+            case 6: name = "SMPTE 170M";
                 break;
-            case 7: // SMPTE 240M
-                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_SMTPE_240;
+            case 7: name = "SMPTE 240M";
                 break;
-            case 9: // ITU-R BT.2020
-                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_BT2020;
+            case 9: name = "BT.2020";
                 break;
             case 8:  // FILM
             case 10: // SMPTE ST 428-1
             case 22: // JEDEC P22 phosphors
             default:
-                debug( vars, "Unsupported Colour Primaries=%d", static_cast<uint8>(primaries) );
+                break;
             }
+            if (vars.tk->fmt.video.primaries == COLOR_PRIMARIES_UNDEF)
+                debug( vars, "Unsupported Colour Primaries=%d", static_cast<uint8>(primaries) );
+            else if (name == nullptr)
+                debug( vars, "Colour Primaries=%s", static_cast<uint8>(primaries) );
+            else
+                debug( vars, "Colour Primaries=%s", name );
+        }
+        E_CASE( KaxVideoColourMatrix, matrix )
+        {
+            vars.tk->fmt.video.space = iso_23001_8_mc_to_vlc_coeffs( static_cast<uint8>(matrix) );
+            const char *name = nullptr;
+            switch( static_cast<uint8>(matrix) )
+            {
+            case 1: name = "BT-709";
+                break;
+            case 6: name = "SMPTE 170M";
+                break;
+            case 7: name = "SMPTE 240M";
+                break;
+            case 9: name = "BT.2020 Non-constant Luminance";
+                break;
+            case 10: name = "BT.2020 Constant Luminance";
+                break;
+            case 0: // Identity
+            case 2: // unspecified
+            case 3: // reserved
+            case 4: // US FCC 73.682
+            case 5: // ITU-R BT.470BG
+            case 8: // YCoCg
+            case 11: // SMPTE ST 2085
+            case 12: // Chroma-derived Non-constant Luminance
+            case 13: // Chroma-derived Constant Luminance
+            case 14: // ITU-R BT.2100
+            default:
+                break;
+            }
+            if (vars.tk->fmt.video.space == COLOR_SPACE_UNDEF)
+                debug( vars, "Unsupported Colour Matrix=%d", static_cast<uint8>(matrix) );
+            else if (name == nullptr)
+                debug( vars, "Colour Matrix=%d", static_cast<uint8>(matrix) );
+            else
+                debug( vars, "Colour Matrix=%s", name );
+        }
+        E_CASE( KaxVideoChromaSitHorz, chroma_hor )
+        {
+            const char *name = nullptr;
+            vars.track_video_info.chroma_sit_horizontal = static_cast<uint8>(chroma_hor);
+            switch( static_cast<uint8>(chroma_hor) )
+            {
+            case 0: name = "unspecified"; break;
+            case 1: name = "left";        break;
+            case 2: name = "center";      break;
+            default:
+                debug( vars, "Unsupported Horizontal Chroma Siting=%d", static_cast<uint8>(chroma_hor) );
+            }
+            if (name != nullptr) debug( vars, "Chroma Siting Horizontal=%s", name);
+        }
+        E_CASE( KaxVideoChromaSitVert, chroma_ver )
+        {
+            const char *name = nullptr;
+            vars.track_video_info.chroma_sit_vertical = static_cast<uint8>(chroma_ver);
+            switch( static_cast<uint8>(chroma_ver) )
+            {
+            case 0: name = "unspecified"; break;
+            case 1: name = "left";        break;
+            case 2: name = "center";      break;
+            default:
+                debug( vars, "Unsupported Vertical Chroma Siting=%d", static_cast<uint8>(chroma_ver) );
+            }
+            if (name != nullptr) debug( vars, "Chroma Siting Vertical=%s", name);
         }
         E_CASE( KaxVideoColourMaxCLL, maxCLL )
         {
@@ -1664,6 +1767,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         S_CASE("V_MJPEG") {
             vars.p_fmt->i_codec = VLC_CODEC_MJPG;
+            vars.p_tk->b_pts_only = true;
         }
         S_CASE("V_UNCOMPRESSED") {
             msg_Dbg( vars.p_demuxer, "uncompressed format detected");

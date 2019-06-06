@@ -4,7 +4,6 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -102,6 +101,12 @@ VLC_API const char *vlc_strerror_c(int);
  */
 typedef void (*vlc_log_cb) (void *data, int type, const vlc_log_t *item,
                             const char *fmt, va_list args);
+
+struct vlc_logger_operations
+{
+    vlc_log_cb log;
+    void (*destroy)(void *data);
+};
 
 /**
  * @}

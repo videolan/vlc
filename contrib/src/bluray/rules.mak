@@ -49,6 +49,10 @@ $(TARBALLS)/libbluray-$(BLURAY_VERSION).tar.bz2:
 bluray: libbluray-$(BLURAY_VERSION).tar.bz2 .sum-bluray
 	$(UNPACK)
 	$(APPLY) $(SRC)/bluray/0001-Implement-dl_get_path-for-darwin-macOS.patch
+	$(APPLY) $(SRC)/bluray/0001-keep-on-with-menuless-user-selected-streams-between-.patch
+	$(APPLY) $(SRC)/bluray/0001-install-bdjo_data-header.patch
+	$(APPLY) $(SRC)/bluray/0001-library-paths-Explicitly-add-usr-local-lib.patch
+	$(APPLY) $(SRC)/bluray/0001-improve-main-playlist-guess.patch
 	$(call pkg_static,"src/libbluray.pc.in")
 	$(MOVE)
 

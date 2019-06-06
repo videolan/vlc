@@ -64,13 +64,15 @@ static void Log(void *opaque, int type, const vlc_log_t *meta,
     (void) opaque;
 }
 
+static const struct vlc_logger_operations ops = { Log, NULL };
+
 static vlc_log_cb Open(vlc_object_t *obj, void **sysp)
 {
     if (!var_InheritBool(obj, "syslog"))
         return NULL;
 
     (void) sysp;
-    return Log;
+    return &ops;
 }
 
 vlc_module_begin()

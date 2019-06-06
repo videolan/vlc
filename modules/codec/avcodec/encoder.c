@@ -2,7 +2,6 @@
  * encoder.c: video and audio encoder using the libavcodec library
  *****************************************************************************
  * Copyright (C) 1999-2004 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -344,12 +343,14 @@ int InitVideoEnc( vlc_object_t *p_this )
         if( !p_codec )
         {
             msg_Err( p_this, "Encoder `%s' not found", psz_encoder );
+            free( psz_encoder );
             return VLC_EGENERIC;
         }
         else if( p_codec->id != i_codec_id )
         {
             msg_Err( p_this, "Encoder `%s' can't handle %4.4s",
                     psz_encoder, (char*)&p_enc->fmt_out.i_codec );
+            free( psz_encoder );
             return VLC_EGENERIC;
         }
     }

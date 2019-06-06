@@ -52,7 +52,7 @@ void vlc_http_dbg(void *ctx, const char *fmt, ...)
     va_end(ap);
 }
 
-vlc_tls_t *vlc_https_connect(vlc_tls_creds_t *creds, const char *name,
+vlc_tls_t *vlc_https_connect(vlc_tls_client_t *creds, const char *name,
                              unsigned port, bool *restrict two)
 {
     if (port == 0)
@@ -95,7 +95,7 @@ static char *vlc_http_proxy_find(const char *hostname, unsigned port,
 struct vlc_http_mgr
 {
     vlc_object_t *obj;
-    vlc_tls_creds_t *creds;
+    vlc_tls_client_t *creds;
     struct vlc_http_cookie_jar_t *jar;
     struct vlc_http_conn *conn;
 };
@@ -282,6 +282,6 @@ void vlc_http_mgr_destroy(struct vlc_http_mgr *mgr)
     if (mgr->conn != NULL)
         vlc_http_mgr_release(mgr, mgr->conn);
     if (mgr->creds != NULL)
-        vlc_tls_Delete(mgr->creds);
+        vlc_tls_ClientDelete(mgr->creds);
     free(mgr);
 }

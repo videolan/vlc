@@ -63,6 +63,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_keystore.h \
 	../include/vlc_list.h \
 	../include/vlc_md5.h \
+	../include/vlc_media_source.h \
 	../include/vlc_messages.h \
 	../include/vlc_meta.h \
 	../include/vlc_meta_fetcher.h \
@@ -76,6 +77,8 @@ pluginsinclude_HEADERS = \
 	../include/vlc_picture.h \
 	../include/vlc_picture_fifo.h \
 	../include/vlc_picture_pool.h \
+	../include/vlc_playlist_legacy.h \
+	../include/vlc_player.h \
 	../include/vlc_playlist.h \
 	../include/vlc_plugin.h \
 	../include/vlc_probe.h \
@@ -84,6 +87,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_fingerprinter.h \
 	../include/vlc_interrupt.h \
 	../include/vlc_renderer_discovery.h \
+	../include/vlc_sort.h \
 	../include/vlc_sout.h \
 	../include/vlc_spu.h \
 	../include/vlc_stream.h \
@@ -94,6 +98,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_threads.h \
 	../include/vlc_tick.h \
 	../include/vlc_timestamp_helper.h \
+	../include/vlc_thumbnailer.h \
 	../include/vlc_tls.h \
 	../include/vlc_url.h \
 	../include/vlc_variables.h \
@@ -204,6 +209,10 @@ libvlccore_la_SOURCES = \
 	config/getopt.c \
 	config/vlc_getopt.h \
 	extras/libc.c \
+	media_source/media_source.c \
+	media_source/media_source.h \
+	media_source/media_tree.c \
+	media_source/media_tree.h \
 	modules/modules.h \
 	modules/modules.c \
 	modules/bank.c \
@@ -212,18 +221,37 @@ libvlccore_la_SOURCES = \
 	modules/textdomain.c \
 	interface/dialog.c \
 	interface/interface.c \
-	playlist/playlist_internal.h \
-	playlist/aout.c \
-	playlist/thread.c \
+	playlist_legacy/playlist_internal.h \
+	playlist_legacy/aout.c \
+	playlist_legacy/thread.c \
+	playlist_legacy/control.c \
+	playlist_legacy/engine.c \
+	playlist_legacy/sort.c \
+	playlist_legacy/loadsave.c \
+	playlist_legacy/tree.c \
+	playlist_legacy/item.c \
+	playlist_legacy/search.c \
+	playlist_legacy/services_discovery.c \
+	playlist_legacy/renderer.c \
+	playlist/content.c \
+	playlist/content.h \
 	playlist/control.c \
-	playlist/engine.c \
-	playlist/sort.c \
-	playlist/loadsave.c \
-	playlist/tree.c \
+	playlist/control.h \
 	playlist/item.c \
-	playlist/search.c \
-	playlist/services_discovery.c \
-	playlist/renderer.c \
+	playlist/item.h \
+	playlist/notify.c \
+	playlist/notify.h \
+	playlist/player.c \
+	playlist/player.h \
+	playlist/playlist.c \
+	playlist/playlist.h \
+	playlist/preparse.c \
+	playlist/preparse.h \
+	playlist/randomizer.c \
+	playlist/randomizer.h \
+	playlist/request.c \
+	playlist/shuffle.c \
+	playlist/sort.c \
 	preparser/art.c \
 	preparser/art.h \
 	preparser/fetcher.c \
@@ -241,6 +269,8 @@ libvlccore_la_SOURCES = \
 	input/es_out.c \
 	input/es_out_timeshift.c \
 	input/input.c \
+	input/player.c \
+	input/player.h \
 	input/info.h \
 	input/meta.c \
 	clock/input_clock.h \
@@ -267,6 +297,7 @@ libvlccore_la_SOURCES = \
 	input/stream_filter.c \
 	input/stream_memory.c \
 	input/subtitles.c \
+	input/thumbnailer.c \
 	input/var.c \
 	audio_output/aout_internal.h \
 	audio_output/common.c \
@@ -356,6 +387,7 @@ libvlccore_la_SOURCES = \
 	misc/httpcookies.c \
 	misc/fingerprinter.c \
 	misc/text_style.c \
+	misc/sort.c \
 	misc/subpicture.c \
 	misc/subpicture.h \
 	misc/medialibrary.c
@@ -417,6 +449,10 @@ libvlccore_la_SOURCES += \
 	linux/dirs.c \
 	linux/thread.c
 else
+
+# All except OS2/WIN32/NACL/ANDROID
+libvlccore_la_SOURCES += posix/sort.c
+
 if HAVE_DARWIN
 libvlccore_la_SOURCES += \
 	darwin/dirs.c \
@@ -533,7 +569,11 @@ check_PROGRAMS = \
 	test_headers \
 	test_mrl_helpers \
 	test_arrays \
-	test_vector
+	test_vector \
+	test_shared_data_ptr \
+	test_playlist \
+	test_randomizer \
+	test_media_source
 
 TESTS = $(check_PROGRAMS) check_symbols
 
@@ -557,6 +597,27 @@ test_headers_SOURCES = test/headers.c
 test_mrl_helpers_SOURCES = test/mrl_helpers.c
 test_arrays_SOURCES = test/arrays.c
 test_vector_SOURCES = test/vector.c
+test_shared_data_ptr_SOURCES = test/shared_data_ptr.cpp
+test_playlist_SOURCES = playlist/test.c \
+	playlist/content.c \
+	playlist/control.c \
+	playlist/item.c \
+	playlist/notify.c \
+	playlist/player.c \
+	playlist/playlist.c \
+	playlist/preparse.c \
+	playlist/randomizer.c \
+	playlist/request.c \
+	playlist/shuffle.c \
+	playlist/sort.c
+test_playlist_CFLAGS = -DTEST_PLAYLIST
+test_randomizer_SOURCES = playlist/randomizer.c
+test_randomizer_CFLAGS = -DTEST_RANDOMIZER
+test_media_source_LDADD = $(LDADD) $(LIBS_libvlccore)
+test_media_source_CFLAGS = -DTEST_MEDIA_SOURCE
+test_media_source_SOURCES = media_source/test.c \
+	media_source/media_source.c \
+	media_source/media_tree.c
 
 AM_LDFLAGS = -no-install
 LDADD = libvlccore.la \

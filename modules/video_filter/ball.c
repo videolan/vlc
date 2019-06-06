@@ -551,21 +551,21 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
 
     picture_t *p_converted;
     video_format_t fmt_comp;
-    memset( &fmt_comp, 0, sizeof(fmt_comp) );
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_RGB24:
         CASE_PACKED_YUV_422
+            video_format_Init( &fmt_comp, VLC_CODEC_GREY );
             fmt_comp.i_width = p_filter->fmt_in.video.i_width;
             fmt_comp.i_height = p_filter->fmt_in.video.i_height;
-            fmt_comp.i_chroma = VLC_FOURCC('G','R','E','Y');
             fmt_comp.i_visible_width = fmt_comp.i_width;
             fmt_comp.i_visible_height = fmt_comp.i_height;
 
             p_converted = image_Convert( p_sys->p_image, p_inpic,
                                          &(p_filter->fmt_in.video),
                                          &fmt_comp );
+            video_format_Clean( &fmt_comp );
             if( !p_converted )
                 return;
 
@@ -613,44 +613,44 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
        | -2 0 2 | and |  0  0  0 |
        | -1 0 1 |     | -1 -2 -1 | */
 
-    for( int y = 1; y < i_numLines - 1; y++ )
+    for( int line = 1; line < i_numLines - 1; line++ )
     {
-        for( int x = 1; x < i_numCols - 1; x++ )
+        for( int col = 1; col < i_numCols - 1; col++ )
         {
 
-            p_grad_x[ y * i_numCols + x ] =
-                    ( p_smooth[(y-1)*i_numCols+x-1]
-                    - p_smooth[(y+1)*i_numCols+x-1] )
-                    + ( ( p_smooth[(y-1)*i_numCols+x]
-                    - p_smooth[(y+1)*i_numCols+x] ) <<1 )
-                    + ( p_smooth[(y-1)*i_numCols+x+1]
-                    - p_smooth[(y+1)*i_numCols+x+1] );
-            p_grad_y[ y * i_numCols + x ] =
-                    ( p_smooth[(y-1)*i_numCols+x-1]
-                    - p_smooth[(y-1)*i_numCols+x+1] )
-                    + ( ( p_smooth[y*i_numCols+x-1]
-                    - p_smooth[y*i_numCols+x+1] ) <<1 )
-                    + ( p_smooth[(y+1)*i_numCols+x-1]
-                    - p_smooth[(y+1)*i_numCols+x+1] );
+            p_grad_x[ line * i_numCols + col ] =
+                    ( p_smooth[(line-1)*i_numCols+col-1]
+                    - p_smooth[(line+1)*i_numCols+col-1] )
+                    + ( ( p_smooth[(line-1)*i_numCols+col]
+                    - p_smooth[(line+1)*i_numCols+col] ) <<1 )
+                    + ( p_smooth[(line-1)*i_numCols+col+1]
+                    - p_smooth[(line+1)*i_numCols+col+1] );
+            p_grad_y[ line * i_numCols + col ] =
+                    ( p_smooth[(line-1)*i_numCols+col-1]
+                    - p_smooth[(line-1)*i_numCols+col+1] )
+                    + ( ( p_smooth[line*i_numCols+col-1]
+                    - p_smooth[line*i_numCols+col+1] ) <<1 )
+                    + ( p_smooth[(line+1)*i_numCols+col-1]
+                    - p_smooth[(line+1)*i_numCols+col+1] );
         }
     }
 
     if( p_sys->b_edgeVisible )
     {
         /* Display the edges. */
-        for( int y = 1; y < i_numLines - 1; y++ )
+        for( int line = 1; line < i_numLines - 1; line++ )
         {
-            for( int x = 1; x < i_numCols - 1; x++ )
+            for( int col = 1; col < i_numCols - 1; col++ )
             {
-                if( abs( p_grad_x[ y * i_numCols + x ] )
-                    + abs( p_grad_y[ y * i_numCols + x ] )
+                if( abs( p_grad_x[ line * i_numCols + col ] )
+                    + abs( p_grad_y[ line * i_numCols + col ] )
                     > p_sys->i_gradThresh )
                 {
                     ( *p_sys->drawingPixelFunction )( p_sys, p_outpic,
                                                       p_sys->colorList[ WHITE ].comp1,
                                                       p_sys->colorList[ WHITE ].comp2,
                                                       p_sys->colorList[ WHITE ].comp3,
-                                                      x, y, 0 );
+                                                      col, line, 0 );
                 }
             }
         }

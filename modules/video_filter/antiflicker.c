@@ -2,7 +2,6 @@
  * antiflicker.c : antiflicker video effect plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2011 VLC authors and VideoLAN
- * $Id:
  *
  * Authors: Dharani Prabhu <dharani.prabhu.s@gmail.com>
  *

@@ -131,11 +131,14 @@ libdeinterlace_plugin_la_SOURCES = \
 	video_filter/deinterlace/algo_basic.c video_filter/deinterlace/algo_basic.h \
 	video_filter/deinterlace/algo_x.c video_filter/deinterlace/algo_x.h \
 	video_filter/deinterlace/algo_yadif.c video_filter/deinterlace/algo_yadif.h \
-	video_filter/deinterlace/yadif.h video_filter/deinterlace/yadif_template.h \
+	video_filter/deinterlace/yadif.h \
 	video_filter/deinterlace/algo_phosphor.c video_filter/deinterlace/algo_phosphor.h \
 	video_filter/deinterlace/algo_ivtc.c video_filter/deinterlace/algo_ivtc.h
 # inline ASM doesn't build with -O0
 libdeinterlace_plugin_la_CFLAGS = $(AM_CFLAGS) -O2
+if HAVE_X86ASM
+libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/yadif_x86.asm
+endif
 if HAVE_NEON
 libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_arm.S
 libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_ARM
@@ -143,6 +146,10 @@ endif
 if HAVE_ARM64
 libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_arm64.S
 libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_ARM64
+endif
+if HAVE_SVE
+libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_sve.S
+libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_SVE
 endif
 libdeinterlace_plugin_la_LIBADD = libdeinterlace_common.la
 video_filter_LTLIBRARIES += libdeinterlace_plugin.la

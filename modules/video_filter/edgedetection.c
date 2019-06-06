@@ -2,7 +2,6 @@
  * edgedetection.c : edge detection plugin for VLC
   *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Odd-Arild Kristensen <oddarildkristensen@gmail.com>
  *

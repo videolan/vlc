@@ -2,7 +2,6 @@
  * simple_preferences.cpp : "Simple preferences"
  ****************************************************************************
  * Copyright (C) 2006-2010 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Antoine Cellerier <dionoea@videolan.org>

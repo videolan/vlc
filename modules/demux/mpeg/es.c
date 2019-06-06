@@ -2,7 +2,6 @@
  * es.c : Generic audio ES input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2008 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -507,10 +506,22 @@ static bool Parse( demux_t *p_demux, block_t **pp_output )
         if( p_sys->codec.b_use_word && !p_sys->b_big_endian && p_block_in->i_buffer > 0 )
         {
             /* Convert to big endian */
-            swab( p_block_in->p_buffer, p_block_in->p_buffer, p_block_in->i_buffer );
+            block_t *old = p_block_in;
+            p_block_in = block_Alloc( p_block_in->i_buffer );
+            if( p_block_in )
+            {
+                block_CopyProperties( p_block_in, old );
+                swab( old->p_buffer, p_block_in->p_buffer, old->i_buffer );
+            }
+            block_Release( old );
         }
 
-        p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start || p_sys->b_initial_sync_failed ? VLC_TICK_0 : VLC_TICK_INVALID;
+        if( p_block_in )
+        {
+            p_block_in->i_pts =
+            p_block_in->i_dts = (p_sys->b_start || p_sys->b_initial_sync_failed) ?
+                                 VLC_TICK_0 : VLC_TICK_INVALID;
+        }
     }
     p_sys->b_initial_sync_failed = p_sys->b_start; /* Only try to resync once */
 
@@ -1127,16 +1138,16 @@ static int AacInit( demux_t *p_demux )
 static int A52CheckSync( const uint8_t *p_peek, bool *p_big_endian, unsigned *pi_samples, bool b_eac3 )
 {
     vlc_a52_header_t header;
-    uint8_t p_tmp[VLC_A52_HEADER_SIZE];
+    uint8_t p_tmp[VLC_A52_MIN_HEADER_SIZE];
 
     *p_big_endian =  p_peek[0] == 0x0b && p_peek[1] == 0x77;
     if( !*p_big_endian )
     {
-        swab( p_peek, p_tmp, VLC_A52_HEADER_SIZE );
+        swab( p_peek, p_tmp, VLC_A52_MIN_HEADER_SIZE );
         p_peek = p_tmp;
     }
 
-    if( vlc_a52_header_Parse( &header, p_peek, VLC_A52_HEADER_SIZE ) )
+    if( vlc_a52_header_Parse( &header, p_peek, VLC_A52_MIN_HEADER_SIZE ) )
         return VLC_EGENERIC;
 
     if( !header.b_eac3 != !b_eac3 )
@@ -1157,8 +1168,8 @@ static int EA52Probe( demux_t *p_demux, uint64_t *pi_offset )
     const uint16_t rgi_twocc[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_A52, WAVE_FORMAT_UNKNOWN };
 
     return GenericProbe( p_demux, pi_offset, ppsz_name, EA52CheckSyncProbe,
-                         VLC_A52_HEADER_SIZE,
-                         1920 + VLC_A52_HEADER_SIZE + 1,
+                         VLC_A52_MIN_HEADER_SIZE,
+                         1920 + VLC_A52_MIN_HEADER_SIZE + 1,
                          WAV_EXTRA_PROBE_SIZE,
                          true, rgi_twocc, GenericFormatCheck );
 }
@@ -1175,8 +1186,8 @@ static int A52Probe( demux_t *p_demux, uint64_t *pi_offset )
     const uint16_t rgi_twocc[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_A52, WAVE_FORMAT_UNKNOWN };
 
     return GenericProbe( p_demux, pi_offset, ppsz_name, A52CheckSyncProbe,
-                         VLC_A52_HEADER_SIZE,
-                         1920 + VLC_A52_HEADER_SIZE + 1,
+                         VLC_A52_MIN_HEADER_SIZE,
+                         1920 + VLC_A52_MIN_HEADER_SIZE + 1,
                          WAV_EXTRA_PROBE_SIZE,
                          true, rgi_twocc, GenericFormatCheck );
 }
@@ -1191,7 +1202,7 @@ static int A52Init( demux_t *p_demux )
     const uint8_t *p_peek;
 
     /* peek the begining */
-    if( vlc_stream_Peek( p_demux->s, &p_peek, VLC_A52_HEADER_SIZE ) >= VLC_A52_HEADER_SIZE )
+    if( vlc_stream_Peek( p_demux->s, &p_peek, VLC_A52_MIN_HEADER_SIZE ) >= VLC_A52_MIN_HEADER_SIZE )
     {
         A52CheckSync( p_peek, &p_sys->b_big_endian, NULL, true );
     }

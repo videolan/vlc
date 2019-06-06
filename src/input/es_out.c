@@ -2,7 +2,6 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003-2004 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
@@ -1821,6 +1820,7 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t *p_input = p_sys->p_input;
+    bool b_thumbnailing = input_priv(p_input)->b_thumbnailing;
 
     if( EsIsSelected( es ) )
     {
@@ -1859,7 +1859,7 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es )
             }
             else if( es->fmt.i_cat == AUDIO_ES )
             {
-                if( !var_GetBool( p_input, b_sout ? "sout-audio" : "audio" ) )
+                if( !var_GetBool( p_input, b_sout ? "sout-audio" : "audio" ) || b_thumbnailing )
                 {
                     msg_Dbg( p_input, "audio is disabled, not selecting ES 0x%x",
                              es->fmt.i_id );
@@ -1868,7 +1868,7 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es )
             }
             if( es->fmt.i_cat == SPU_ES )
             {
-                if( !var_GetBool( p_input, b_sout ? "sout-spu" : "spu" ) )
+                if( !var_GetBool( p_input, b_sout ? "sout-spu" : "spu" ) || b_thumbnailing )
                 {
                     msg_Dbg( p_input, "spu is disabled, not selecting ES 0x%x",
                              es->fmt.i_id );
@@ -3516,10 +3516,20 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
            };
            static_assert(ARRAY_SIZE(space_names) == COLOR_SPACE_MAX+1,
                          "Color space table mismatch");
-           info_category_AddInfo( p_cat, _("Color space"), _("%s %s Range"),
-               vlc_gettext(space_names[fmt->video.space]),
-               vlc_gettext(fmt->video.b_color_range_full
-                           ? N_("Full") : N_("Limited")) );
+           info_category_AddInfo( p_cat, _("Color space"), "%s",
+               vlc_gettext(space_names[fmt->video.space]) );
+       }
+       if( fmt->video.color_range != COLOR_RANGE_UNDEF )
+       {
+           static const char range_names[][16] = {
+               [COLOR_RANGE_UNDEF]   = N_("Undefined"),
+               [COLOR_RANGE_FULL]    = N_("Full"),
+               [COLOR_RANGE_LIMITED] = N_("Limited"),
+           };
+           static_assert(ARRAY_SIZE(range_names) == COLOR_RANGE_MAX+1,
+                         "Color range table mismatch");
+           info_category_AddInfo( p_cat, _("Color Range"), "%s",
+               vlc_gettext(range_names[fmt->video.color_range]) );
        }
        if( fmt->video.chroma_location != CHROMA_LOCATION_UNDEF )
        {

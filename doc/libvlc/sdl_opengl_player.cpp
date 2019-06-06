@@ -16,7 +16,7 @@
 #include <vlc/vlc.h>
 
 /*
- * This program show how to use libvlc_video_set_opengl_callbacks API.
+ * This program show how to use libvlc_video_set_output_callbacks API.
  *
  * The main idea is to set up libvlc to render into FBO, and to use a
  * triple buffer mechanism to share textures between VLC and the rendering
@@ -79,7 +79,7 @@ public:
             return false;
         }
         // Define the opengl rendering callbacks
-        libvlc_video_set_opengl_callbacks(m_mp, libvlc_gl_engine_opengl,
+        libvlc_video_set_output_callbacks(m_mp, libvlc_video_engine_opengl,
             setup, cleanup, resize, swap,
             make_current, get_proc_address,
             this);

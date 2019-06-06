@@ -2,7 +2,6 @@
  * qt.cpp : Qt interface
  ****************************************************************************
  * Copyright © 2006-2009 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
@@ -90,8 +89,7 @@ static int  OpenIntf     ( vlc_object_t * );
 static int  OpenDialogs  ( vlc_object_t * );
 static int  Open         ( vlc_object_t *, bool );
 static void Close        ( vlc_object_t * );
-static int  WindowOpen   ( vout_window_t *, const vout_window_cfg_t * );
-static void WindowClose  ( vout_window_t * );
+static int  WindowOpen   ( vout_window_t * );
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 /*****************************************************************************
@@ -346,7 +344,7 @@ vlc_module_begin ()
 
     add_submodule ()
         set_capability( "vout window", 0 )
-        set_callbacks( WindowOpen, WindowClose )
+        set_callbacks( WindowOpen, NULL )
 
 vlc_module_end ()
 
@@ -689,14 +687,10 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
 
 /**
  * Video output window provider
- *
- * TODO move it out of here ?
  */
-static int WindowControl( vout_window_t *, int i_query, va_list );
-
-static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
+static int WindowOpen( vout_window_t *p_wnd )
 {
-    if( cfg->is_standalone )
+    if( !var_InheritBool( p_wnd, "embedded-video" ) )
         return VLC_EGENERIC;
 
     intf_thread_t *p_intf =
@@ -721,49 +715,6 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         return VLC_EGENERIC;
 
     MainInterface *p_mi = p_intf->p_sys->p_mi;
-    msg_Dbg( p_wnd, "requesting video window..." );
 
-    if( !p_mi->getVideo( p_wnd, cfg->width, cfg->height, cfg->is_fullscreen ) )
-        return VLC_EGENERIC;
-
-    p_wnd->info.has_double_click = true;
-    p_wnd->control = WindowControl;
-    p_wnd->sys = (vout_window_sys_t*)p_mi;
-    return VLC_SUCCESS;
-}
-
-static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
-{
-    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
-    QMutexLocker locker (&lock);
-
-    if (unlikely(!active))
-    {
-        msg_Warn (p_wnd, "video already released before control");
-        return VLC_EGENERIC;
-    }
-    return p_mi->controlVideo( i_query, args );
-}
-
-static void WindowClose( vout_window_t *p_wnd )
-{
-    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
-    QMutexLocker locker (&lock);
-
-    /* Normally, the interface terminates after the video. In the contrary, the
-     * Qt main loop is gone, so we cannot send any event to the user interface
-     * widgets. Ideally, we would keep the Qt main loop running until after
-     * the video window is released. But it is far simpler to just have the Qt
-     * thread destroy the window early, and to turn this function into a stub.
-     *
-     * That assumes the video output will behave sanely if it window is
-     * destroyed asynchronously.
-     * XCB and Xlib-XCB are fine with that. Plain Xlib wouldn't, */
-    if (unlikely(!active))
-    {
-        msg_Warn (p_wnd, "video already released");
-        return;
-    }
-    msg_Dbg (p_wnd, "releasing video...");
-    p_mi->releaseVideo();
+    return p_mi->getVideo( p_wnd ) ? VLC_SUCCESS : VLC_EGENERIC;
 }

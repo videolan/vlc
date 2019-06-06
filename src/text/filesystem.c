@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
+#include <vlc_sort.h>
 
 #include <assert.h>
 
@@ -105,6 +106,14 @@ static int dummy_select( const char *str )
     return 1;
 }
 
+static int compar_void(const void *a, const void *b, void *data)
+{
+    const char *sa = a, *sb = b;
+    int (*cmp)(const char **, const char **) = data;
+
+    return cmp(&sa, &sb);
+}
+
 /**
  * Does the same as vlc_scandir(), but takes an open directory pointer
  * instead of a directory path.
@@ -153,8 +162,7 @@ int vlc_loaddir( DIR *dir, char ***namelist,
     }
 
     if (compar != NULL && num > 0)
-        qsort (tab, num, sizeof (*tab),
-               (int (*)( const void *, const void *))compar);
+        vlc_qsort(tab, num, sizeof (*tab), compar_void, compar);
     *namelist = tab;
     return num;
 

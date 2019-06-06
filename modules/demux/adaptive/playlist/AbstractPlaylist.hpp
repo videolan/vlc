@@ -58,6 +58,7 @@ namespace adaptive
                 virtual BasePeriod*                      getFirstPeriod();
                 virtual BasePeriod*                      getNextPeriod(BasePeriod *period);
 
+                bool                needsUpdates() const;
                 void                mergeWith(AbstractPlaylist *, vlc_tick_t = 0);
                 void                pruneByPlaybackTime(vlc_tick_t);
 
@@ -77,6 +78,7 @@ namespace adaptive
                 std::string                         playlistUrl;
                 std::string                         type;
                 vlc_tick_t                          minBufferTime;
+                bool                                b_needsUpdates;
         };
     }
 }

@@ -4,7 +4,6 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -30,6 +29,7 @@
 extern "C" {
 # endif
 
+typedef struct vlc_playlist vlc_playlist_t;
 typedef struct intf_dialog_args_t intf_dialog_args_t;
 
 /**
@@ -96,6 +96,9 @@ static inline playlist_t *pl_Get( struct intf_thread_t *intf )
     return (playlist_t *)(intf->obj.parent);
 }
 
+VLC_API vlc_playlist_t *
+vlc_intf_GetMainPlaylist(intf_thread_t *intf);
+
 /**
  * Retrieves the current input thread from the playlist.
  * @note The returned object must be released with vlc_object_release().
@@ -107,7 +110,8 @@ static inline playlist_t *pl_Get( struct intf_thread_t *intf )
  * @{
  */
 
-VLC_API void vlc_LogSet(libvlc_int_t *, vlc_log_cb cb, void *data);
+VLC_API void vlc_LogSet(libvlc_int_t *, const struct vlc_logger_operations *,
+                        void *data);
 
 /*@}*/
 

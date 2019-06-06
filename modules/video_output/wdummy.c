@@ -30,36 +30,21 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 
-static int Control(vout_window_t *wnd, int query, va_list ap)
+static int Enable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
-    switch (query)
-    {
-        case VOUT_WINDOW_SET_SIZE:
-        {
-            unsigned width = va_arg(ap, unsigned);
-            unsigned height = va_arg(ap, unsigned);
-
-            vout_window_ReportSize(wnd, width, height);
-            return VLC_SUCCESS;
-        }
-
-        case VOUT_WINDOW_SET_STATE:
-        case VOUT_WINDOW_SET_FULLSCREEN:
-        case VOUT_WINDOW_UNSET_FULLSCREEN:
-            /* These controls deserve a proper window provider. Move along. */
-            return VLC_EGENERIC;
-
-        default:
-            msg_Warn(wnd, "unsupported control query %d", query);
-            return VLC_EGENERIC;
-    }
+    vout_window_ReportSize(wnd, cfg->width, cfg->height);
+    return VLC_SUCCESS;
 }
 
-static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
+static const struct vout_window_operations ops = {
+    .enable = Enable,
+    .resize = vout_window_ReportSize,
+};
+
+static int Open(vout_window_t *wnd)
 {
     wnd->type = VOUT_WINDOW_TYPE_DUMMY;
-    wnd->control = Control;
-    vout_window_ReportSize(wnd, cfg->width, cfg->height);
+    wnd->ops = &ops;
     return VLC_SUCCESS;
 }
 

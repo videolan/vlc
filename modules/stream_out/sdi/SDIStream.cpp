@@ -495,7 +495,7 @@ void AudioDecodedStream::Output(block_t *p_block)
 
 aout_filters_t * AudioDecodedStream::AudioFiltersCreate(const es_format_t *afmt)
 {
-    return aout_FiltersNew(p_stream, &afmt->audio, &requestedoutput.audio, NULL, NULL);
+    return aout_FiltersNew(p_stream, &afmt->audio, &requestedoutput.audio, NULL);
 }
 
 int AudioDecodedStream::AudioDecCallback_update_format(decoder_t *p_dec)

@@ -2,7 +2,6 @@
  * bridge.c: bridge stream output module
  *****************************************************************************
  * Copyright (C) 2005-2008 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Antoine Cellerier <dionoea at videolan dot org>

@@ -2,7 +2,6 @@
  * openurl.cpp: Open a MRL or clipboard content
  *****************************************************************************
  * Copyright © 2009 the VideoLAN team
- * $Id$
  *
  * Authors: Jean-Philippe André <jpeg@videolan.org>
  *

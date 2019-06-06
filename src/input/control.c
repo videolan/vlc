@@ -2,7 +2,6 @@
  * control.c
  *****************************************************************************
  * Copyright (C) 1999-2015 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -229,7 +228,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_ADD_SLAVE:
         {
-            enum slave_type type =  (enum slave_type) va_arg( args, enum slave_type );
+            enum slave_type type =  va_arg( args, enum slave_type );
             psz = va_arg( args, char * );
             b_bool = va_arg( args, int );
             bool b_notify = va_arg( args, int );

@@ -2,7 +2,6 @@
  * matroska_segment.hpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Filip Roséen <filip@videolabs.io>
  *

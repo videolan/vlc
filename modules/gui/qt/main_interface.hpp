@@ -2,7 +2,6 @@
  * main_interface.hpp : Main Interface
  ****************************************************************************
  * Copyright (C) 2006-2010 VideoLAN and AUTHORS
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
@@ -36,6 +35,8 @@
 # include <shobjidl.h>
 #endif
 
+#include <atomic>
+
 class QSettings;
 class QCloseEvent;
 class QKeyEvent;
@@ -55,6 +56,7 @@ class QScreen;
 class QTimer;
 class StandardPLPanel;
 struct vout_window_t;
+struct vout_window_cfg_t;
 
 class MainInterface : public QVLCMW
 {
@@ -70,11 +72,19 @@ public:
     static const QEvent::Type ToolbarsNeedRebuild;
 
     /* Video requests from core */
-    bool getVideo( struct vout_window_t *,
-                   unsigned int i_width, unsigned int i_height, bool );
-    void releaseVideo( void );
-    int  controlVideo( int i_query, va_list args );
+    bool getVideo( struct vout_window_t * );
+private:
+    std::atomic_flag videoActive;
+    static int enableVideo( struct vout_window_t *,
+                            const struct vout_window_cfg_t * );
+    static void disableVideo( struct vout_window_t * );
+    static void releaseVideo( struct vout_window_t * );
+    static void resizeVideo( struct vout_window_t *, unsigned, unsigned );
+    static void requestVideoState( struct vout_window_t *, unsigned );
+    static void requestVideoWindowed( struct vout_window_t * );
+    static void requestVideoFullScreen( struct vout_window_t *, const char * );
 
+public:
     /* Getters */
     QSystemTrayIcon *getSysTray() { return sysTray; }
     QMenu *getSysTrayMenu() { return systrayMenu; }
@@ -216,7 +226,7 @@ public slots:
 
     /* Manage the Video Functions from the vout threads */
     void getVideoSlot( struct vout_window_t *,
-                       unsigned i_width, unsigned i_height, bool, bool * );
+                       unsigned i_width, unsigned i_height, bool );
     void releaseVideoSlot( void );
 
     void emitBoss();
@@ -272,8 +282,7 @@ protected slots:
     void onInputChanged( bool );
 
 signals:
-    void askGetVideo( struct vout_window_t *, unsigned, unsigned, bool,
-                      bool * );
+    void askGetVideo( struct vout_window_t *, unsigned, unsigned, bool );
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );

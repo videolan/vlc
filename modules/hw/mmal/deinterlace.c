@@ -2,7 +2,6 @@
  * mmal.c: MMAL-based deinterlace plugin for Raspberry Pi
  *****************************************************************************
  * Copyright © 2014 jusst technologies GmbH
- * $Id$
  *
  * Authors: Julian Scheel <julian@jusst.de>
  *          Dennis Hamester <dennis.hamester@gmail.com>

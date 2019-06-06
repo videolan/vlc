@@ -21,6 +21,7 @@
 #define VLC_VECTOR_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 /**
  * \defgroup vector Vector
@@ -39,21 +40,21 @@
  *
  * To use a vector, a new type must be defined:
  *
- * \verbatim
+ * \code
  * struct vec_int VLC_VECTOR(int);
- * \endverbatim
+ * \endcode
  *
  * The struct may be anonymous:
  *
- * \verbatim
+ * \code
  * struct VLC_VECTOR(const char *) names;
- * \endverbatim
+ * \endcode
  *
  * It is convenient to define a typedef to an anonymous structure:
  *
- * \verbatim
+ * \code
  * typedef struct VLC_VECTOR(int) vec_int_t;
- * \endverbatim
+ * \endcode
  *
  * Vector size is accessible via `vec.size`, and items are intended to be
  * accessed directly, via `vec.data[i]`.
@@ -156,10 +157,10 @@ vlc_vector_enforce_size_t_(size_t value)
  * Private.
  *
  * \param ptr the current data to realloc
- * \param the requested capacity, in number of items
- * \param the size of one item
- * \pcap a pointer to the `cap` field of the vector [IN/OUT]
- * \pcap a pointer to the `size` field of the vector [IN/OUT]
+ * \param count the requested capacity, in number of items
+ * \param size the size of one item
+ * \param pcap a pointer to the `cap` field of the vector [IN/OUT]
+ * \param psize a pointer to the `size` field of the vector [IN/OUT]
  * \return the reallocated array, or `ptr` if reallocation failed
  */
 static inline void *

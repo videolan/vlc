@@ -2,7 +2,6 @@
  * effects.c : Effects for the visualization system
  *****************************************************************************
  * Copyright (C) 2002-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *          Adrien Maglo <magsoft@videolan.org>

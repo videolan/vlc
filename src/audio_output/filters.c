@@ -2,7 +2,6 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002-2007 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -37,22 +36,20 @@
 #include <vlc_modules.h>
 #include <vlc_aout.h>
 #include <vlc_filter.h>
-#include <vlc_vout.h>                  /* for vout_Request */
-
 #include <libvlc.h>
 #include "aout_internal.h"
+#include "../video_output/vout_internal.h" /* for vout_Request */
 
-static filter_t *CreateFilter (vlc_object_t *obj, const char *type,
-                               const char *name, void *sys,
-                               const audio_sample_format_t *infmt,
-                               const audio_sample_format_t *outfmt,
-                               config_chain_t *cfg, bool const_fmt)
+static filter_t *CreateFilter(vlc_object_t *obj, const char *type,
+                              const char *name,
+                              const audio_sample_format_t *infmt,
+                              const audio_sample_format_t *outfmt,
+                              config_chain_t *cfg, bool const_fmt)
 {
     filter_t *filter = vlc_custom_create (obj, sizeof (*filter), type);
     if (unlikely(filter == NULL))
         return NULL;
 
-    filter->owner.sys = sys;
     filter->p_cfg = cfg;
     filter->fmt_in.audio = *infmt;
     filter->fmt_in.i_codec = infmt->i_format;
@@ -93,8 +90,8 @@ static filter_t *FindConverter (vlc_object_t *obj,
                                 const audio_sample_format_t *infmt,
                                 const audio_sample_format_t *outfmt)
 {
-    return CreateFilter (obj, "audio converter", NULL, NULL, infmt, outfmt,
-                         NULL, true);
+    return CreateFilter(obj, "audio converter", NULL, infmt, outfmt,
+                        NULL, true);
 }
 
 static filter_t *FindResampler (vlc_object_t *obj,
@@ -102,8 +99,8 @@ static filter_t *FindResampler (vlc_object_t *obj,
                                 const audio_sample_format_t *outfmt)
 {
     char *modlist = var_InheritString(obj, "audio-resampler");
-    filter_t *filter = CreateFilter (obj, "audio resampler", modlist, NULL,
-                                     infmt, outfmt, NULL, true);
+    filter_t *filter = CreateFilter(obj, "audio resampler", modlist,
+                                    infmt, outfmt, NULL, true);
     free(modlist);
     return filter;
 }
@@ -208,8 +205,8 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
         config_chain_t *cfg = NULL;
         if (headphones)
             config_ChainParseOptions(&cfg, "{headphones=true}");
-        filter_t *f = CreateFilter (obj, filter_type, NULL, NULL,
-                                    &input, &output, cfg, true);
+        filter_t *f = CreateFilter(obj, filter_type, NULL,
+                                   &input, &output, cfg, true);
         if (cfg)
             config_ChainDestroy(cfg);
 
@@ -383,25 +380,18 @@ static int VisualizationCallback (vlc_object_t *obj, const char *var,
     return VLC_SUCCESS;
 }
 
-vout_thread_t *aout_filter_RequestVout (filter_t *filter, vout_thread_t *vout,
-                                        const video_format_t *fmt)
+vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
 {
-    /* NOTE: This only works from aout_filters_t.
-     * If you want to use visualization filters from another place, you will
-     * need to add a new pf_aout_request_vout callback or store a pointer
-     * to aout_request_vout_t inside filter_t (i.e. a level of indirection). */
-    const aout_request_vout_t *req = filter->owner.sys;
-    char *visual = var_InheritString (filter->obj.parent, "audio-visual");
-    /* NOTE: Disable recycling to always close the filter vout because OpenGL
-     * visualizations do not use this function to ask for a context. */
-    bool recycle = false;
-    free (visual);
+    video_format_t adj_fmt = *fmt;
+    vout_configuration_t cfg = { .fmt = &adj_fmt, .dpb_size = 1 };
 
-    return req->pf_request_vout (req->p_private, vout, fmt, recycle);
+    video_format_AdjustColorSpace(&adj_fmt);
+
+    return vout_Request(VLC_OBJECT(filter), &cfg, NULL);
 }
 
 static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
-                        aout_filters_t *restrict filters, const void *owner,
+                        aout_filters_t *restrict filters,
                         audio_sample_format_t *restrict infmt,
                         const audio_sample_format_t *restrict outfmt,
                         config_chain_t *cfg)
@@ -413,8 +403,8 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
         return -1;
     }
 
-    filter_t *filter = CreateFilter (obj, type, name,
-                                     (void *)owner, infmt, outfmt, cfg, false);
+    filter_t *filter = CreateFilter(obj, type, name,
+                                    infmt, outfmt, cfg, false);
     if (filter == NULL)
     {
         msg_Err (obj, "cannot add user %s \"%s\" (skipped)", type, name);
@@ -473,7 +463,7 @@ static int AppendRemapFilter(vlc_object_t *obj, aout_filters_t *restrict filters
     free(config_ChainCreate(&name, &cfg, str));
     if (name != NULL && cfg != NULL)
         ret = AppendFilter(obj, "audio filter", name, filters,
-                           NULL, infmt, outfmt, cfg);
+                           infmt, outfmt, cfg);
     else
         ret = -1;
 
@@ -490,21 +480,13 @@ static int AppendRemapFilter(vlc_object_t *obj, aout_filters_t *restrict filters
  * \param obj parent object for the filters
  * \param infmt chain input format [IN]
  * \param outfmt chain output format [IN]
- * \param request_vout visualization video output request callback
  * \param cfg a valid aout_filters_cfg_t struct or NULL.
  * \return a filters chain or NULL on failure
- *
- * \note
- * *request_vout (if not NULL) must remain valid until aout_FiltersDelete().
- *
- * \bug
- * If request_vout is non NULL, obj is assumed to be an audio_output_t pointer.
  */
-aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
-                                 const audio_sample_format_t *restrict infmt,
-                                 const audio_sample_format_t *restrict outfmt,
-                                 const aout_request_vout_t *request_vout,
-                                 const aout_filters_cfg_t *cfg)
+aout_filters_t *aout_FiltersNew(vlc_object_t *obj,
+                                const audio_sample_format_t *restrict infmt,
+                                const audio_sample_format_t *restrict outfmt,
+                                const aout_filters_cfg_t *cfg)
 {
     aout_filters_t *filters = malloc (sizeof (*filters));
     if (unlikely(filters == NULL))
@@ -521,8 +503,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
     audio_sample_format_t output_format = *outfmt;
 
     /* Callbacks (before reading values and also before return statement) */
-    if (request_vout != NULL)
-        var_AddCallback (obj, "visual", VisualizationCallback, NULL);
+    var_AddCallback (obj, "visual", VisualizationCallback, NULL);
 
     if (!AOUT_FMT_LINEAR(outfmt))
     {   /* Non-linear output: just convert formats, no filters/visu */
@@ -594,7 +575,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
     if (var_InheritBool (obj, "audio-time-stretch"))
     {
         if (AppendFilter(obj, "audio filter", "scaletempo",
-                         filters, NULL, &input_format, &output_format, NULL) == 0)
+                         filters, &input_format, &output_format, NULL) == 0)
             filters->rate_filter = filters->tab[filters->count - 1];
     }
 
@@ -604,8 +585,8 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
                           cfg->remap);
 
         if (input_format.i_channels > 2 && cfg->headphones)
-            AppendFilter(obj, "audio filter", "binauralizer", filters, NULL,
-                    &input_format, &output_format, NULL);
+            AppendFilter(obj, "audio filter", "binauralizer", filters,
+                         &input_format, &output_format, NULL);
     }
 
     /* Now add user filters */
@@ -616,19 +597,16 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
         while ((name = strsep (&p, " :")) != NULL)
         {
             AppendFilter(obj, "audio filter", name, filters,
-                         NULL, &input_format, &output_format, NULL);
+                         &input_format, &output_format, NULL);
         }
         free (str);
     }
 
-    if (request_vout != NULL)
-    {
-        char *visual = var_InheritString (obj, "audio-visual");
-        if (visual != NULL && strcasecmp (visual, "none"))
-            AppendFilter(obj, "visualization", visual, filters,
-                         request_vout, &input_format, &output_format, NULL);
-        free (visual);
-    }
+    char *visual = var_InheritString(obj, "audio-visual");
+    if (visual != NULL && strcasecmp(visual, "none"))
+        AppendFilter(obj, "visualization", visual, filters,
+                     &input_format, &output_format, NULL);
+    free(visual);
 
     /* convert to the output format (minus resampling) if necessary */
     output_format.i_rate = input_format.i_rate;
@@ -657,8 +635,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
 
 error:
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
-    if (request_vout != NULL)
-        var_DelCallback (obj, "visual", VisualizationCallback, NULL);
+    var_DelCallback(obj, "visual", VisualizationCallback, NULL);
     free (filters);
     return NULL;
 }
@@ -668,17 +645,13 @@ error:
  * Destroys a chain of audio filters.
  * \param obj object used with aout_FiltersNew()
  * \param filters chain to be destroyed
- * \bug
- * obj must be NULL iff request_vout was NULL in aout_FiltersNew()
- * (this implies obj is an audio_output_t pointer if non NULL).
  */
 void aout_FiltersDelete (vlc_object_t *obj, aout_filters_t *filters)
 {
     if (filters->resampler != NULL)
         aout_FiltersPipelineDestroy (&filters->resampler, 1);
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
-    if (obj != NULL)
-        var_DelCallback (obj, "visual", VisualizationCallback, NULL);
+    var_DelCallback(obj, "visual", VisualizationCallback, NULL);
     free (filters);
 }
 

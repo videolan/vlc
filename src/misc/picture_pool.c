@@ -77,8 +77,6 @@ static void picture_pool_ReleasePicture(picture_t *clone)
     unsigned offset = sys & (POOL_MAX - 1);
     picture_t *picture = pool->picture[offset];
 
-    free(clone);
-
     if (pool->pic_unlock != NULL)
         pool->pic_unlock(picture);
     picture_Release(picture);
@@ -294,25 +292,28 @@ bool picture_pool_OwnsPic(picture_pool_t *pool, picture_t *pic)
     picture_priv_t *priv = (picture_priv_t *)pic;
 
     while (priv->gc.destroy != picture_pool_ReleasePicture) {
+        if (priv->gc.opaque == NULL)
+            return false; /* not a pooled picture */
+
         pic = priv->gc.opaque;
         priv = (picture_priv_t *)pic;
     }
 
-    uintptr_t sys = (uintptr_t)priv->gc.opaque;
-    picture_pool_t *picpool = (void *)(sys & ~(POOL_MAX - 1));
-    return pool == picpool;
+    do {
+        uintptr_t sys = (uintptr_t)priv->gc.opaque;
+        picture_pool_t *picpool = (void *)(sys & ~(POOL_MAX - 1));
+
+        if (pool == picpool)
+            return true;
+
+        pic = picpool->picture[sys & (POOL_MAX - 1 )];
+        priv = (picture_priv_t *)pic;
+    } while (priv->gc.destroy == picture_pool_ReleasePicture);
+
+    return false;
 }
 
 unsigned picture_pool_GetSize(const picture_pool_t *pool)
 {
     return pool->picture_count;
-}
-
-void picture_pool_Enum(picture_pool_t *pool, void (*cb)(void *, picture_t *),
-                       void *opaque)
-{
-    /* NOTE: So far, the pictures table cannot change after the pool is created
-     * so there is no need to lock the pool mutex here. */
-    for (unsigned i = 0; i < pool->picture_count; i++)
-        cb(opaque, pool->picture[i]);
 }

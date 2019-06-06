@@ -3,7 +3,6 @@
  *****************************************************************************
  * Copyright (C) 2004-2005, 2007 VLC authors and VideoLAN
  * Copyright © 2005-2006 Rémi Denis-Courmont
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *          Rémi Denis-Courmont <rem # videolan.org>
@@ -39,6 +38,9 @@
 #include <assert.h>
 
 #include <unistd.h>
+#ifdef HAVE_POLL
+# include <poll.h>
+#endif
 #ifdef HAVE_LINUX_DCCP_H
 /* TODO: use glibc instead of linux-kernel headers */
 # include <linux/dccp.h>
@@ -48,6 +50,14 @@
 #include <vlc_common.h>
 #include <vlc_network.h>
 #include <vlc_interrupt.h>
+#if defined (_WIN32)
+#   undef EINPROGRESS
+#   define EINPROGRESS WSAEWOULDBLOCK
+#   undef EWOULDBLOCK
+#   define EWOULDBLOCK WSAEWOULDBLOCK
+#   undef EAGAIN
+#   define EAGAIN WSAEWOULDBLOCK
+#endif
 
 extern int rootwrap_bind (int family, int socktype, int protocol,
                           const struct sockaddr *addr, size_t alen);
@@ -102,6 +112,100 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
     return fd;
 }
 
+int (net_Connect)(vlc_object_t *obj, const char *host, int serv,
+                  int type, int proto)
+{
+    struct addrinfo hints = {
+        .ai_socktype = type,
+        .ai_protocol = proto,
+        .ai_flags = AI_NUMERICSERV | AI_IDN,
+    }, *res;
+    int ret = -1;
+
+    int val = vlc_getaddrinfo_i11e(host, serv, &hints, &res);
+    if (val)
+    {
+        msg_Err(obj, "cannot resolve %s port %d : %s", host, serv,
+                gai_strerror (val));
+        return -1;
+    }
+
+    vlc_tick_t timeout = VLC_TICK_FROM_MS(var_InheritInteger(obj,
+                                                             "ipv4-timeout"));
+
+    for (struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
+    {
+        int fd = net_Socket(obj, ptr->ai_family,
+                            ptr->ai_socktype, ptr->ai_protocol);
+        if (fd == -1)
+        {
+            msg_Dbg(obj, "socket error: %s", vlc_strerror_c(net_errno));
+            continue;
+        }
+
+        if (connect(fd, ptr->ai_addr, ptr->ai_addrlen))
+        {
+            if (net_errno != EINPROGRESS && errno != EINTR)
+            {
+                msg_Err(obj, "connection failed: %s",
+                        vlc_strerror_c(net_errno));
+                goto next_ai;
+            }
+
+            struct pollfd ufd;
+            vlc_tick_t deadline = VLC_TICK_INVALID;
+
+            ufd.fd = fd;
+            ufd.events = POLLOUT;
+            deadline = vlc_tick_now() + timeout;
+
+            do
+            {
+                vlc_tick_t now = vlc_tick_now();
+
+                if (vlc_killed())
+                    goto next_ai;
+
+                if (now > deadline)
+                    now = deadline;
+
+                val = vlc_poll_i11e(&ufd, 1, MS_FROM_VLC_TICK(deadline - now));
+            }
+            while (val == -1 && errno == EINTR);
+
+            switch (val)
+            {
+                 case -1: /* error */
+                     msg_Err(obj, "polling error: %s",
+                             vlc_strerror_c(net_errno));
+                     goto next_ai;
+
+                 case 0: /* timeout */
+                     msg_Warn(obj, "connection timed out");
+                     goto next_ai;
+            }
+
+            /* There is NO WAY around checking SO_ERROR.
+             * Don't ifdef it out!!! */
+            if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &val,
+                           &(socklen_t){ sizeof (val) }) || val)
+            {
+                msg_Err(obj, "connection failed: %s", vlc_strerror_c(val));
+                goto next_ai;
+            }
+        }
+
+        msg_Dbg(obj, "connection succeeded (socket = %d)", fd);
+        ret = fd; /* success! */
+        break;
+
+next_ai: /* failure */
+        net_Close(fd);
+    }
+
+    freeaddrinfo(res);
+    return ret;
+}
 
 int *net_Listen (vlc_object_t *p_this, const char *psz_host,
                  unsigned i_port, int type, int protocol)
@@ -138,27 +242,6 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
         }
 
         /* Bind the socket */
-#if defined (_WIN32)
-        /*
-         * Under Win32 and for multicasting, we bind to INADDR_ANY.
-         * This is of course a severe bug, since the socket would logically
-         * receive unicast traffic, and multicast traffic of groups subscribed
-         * to via other sockets.
-         */
-        if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
-         && (sizeof (struct sockaddr_storage) >= ptr->ai_addrlen))
-        {
-            // This works for IPv4 too - don't worry!
-            struct sockaddr_in6 dumb =
-            {
-                .sin6_family = ptr->ai_addr->sa_family,
-                .sin6_port =  ((struct sockaddr_in *)(ptr->ai_addr))->sin_port
-            };
-
-            bind (fd, (struct sockaddr *)&dumb, ptr->ai_addrlen);
-        }
-        else
-#endif
         if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
         {
             int err = net_errno;
@@ -179,31 +262,13 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
             }
         }
 
-        if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen))
-        {
-            if (net_Subscribe (p_this, fd, ptr->ai_addr, ptr->ai_addrlen))
-            {
-                net_Close (fd);
-                continue;
-            }
-        }
-
         /* Listen */
-        switch (ptr->ai_socktype)
+        if (listen(fd, INT_MAX))
         {
-            case SOCK_STREAM:
-            case SOCK_RDM:
-            case SOCK_SEQPACKET:
-#ifdef SOCK_DCCP
-            case SOCK_DCCP:
-#endif
-                if (listen (fd, INT_MAX))
-                {
-                    msg_Err (p_this, "socket listen error: %s",
-                             vlc_strerror_c(net_errno));
-                    net_Close (fd);
-                    continue;
-                }
+            msg_Err(p_this, "socket listen error: %s",
+                    vlc_strerror_c(net_errno));
+            net_Close(fd);
+            continue;
         }
 
         int *nsockv = (int *)realloc (sockv, (sockc + 2) * sizeof (int));
@@ -224,12 +289,78 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
     return sockv;
 }
 
-/**
- * Reads data from a socket, blocking until all requested data is received or
- * the end of the stream is reached.
- * This function is a cancellation point.
- * @return -1 on error, or the number of bytes of read.
- */
+void net_ListenClose(int *fds)
+{
+    if (fds != NULL)
+    {
+        for (int *p = fds; *p != -1; p++)
+            net_Close(*p);
+
+        free(fds);
+    }
+}
+
+#undef net_Accept
+int net_Accept(vlc_object_t *obj, int *fds)
+{
+    assert(fds != NULL);
+
+    unsigned n = 0;
+    while (fds[n] != -1)
+        n++;
+
+    struct pollfd ufd[n];
+    /* Initialize file descriptor set */
+    for (unsigned i = 0; i < n; i++)
+    {
+        ufd[i].fd = fds[i];
+        ufd[i].events = POLLIN;
+    }
+
+    for (;;)
+    {
+        while (poll(ufd, n, -1) == -1)
+        {
+            if (net_errno != EINTR)
+            {
+                msg_Err(obj, "poll error: %s", vlc_strerror_c(net_errno));
+                return -1;
+            }
+        }
+
+        for (unsigned i = 0; i < n; i++)
+        {
+            if (ufd[i].revents == 0)
+                continue;
+
+            int sfd = ufd[i].fd;
+            int fd = vlc_accept(sfd, NULL, NULL, true);
+            if (fd == -1)
+            {
+                if (net_errno != EAGAIN)
+#if (EAGAIN != EWOULDBLOCK)
+                if (net_errno != EWOULDBLOCK)
+#endif
+                    msg_Err(obj, "accept failed (from socket %d): %s", sfd,
+                            vlc_strerror_c(net_errno));
+                continue;
+            }
+
+            msg_Dbg(obj, "accepted socket %d (from socket %d)", fd, sfd);
+            setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
+                       &(int){ 1 }, sizeof (int));
+            /*
+             * Move listening socket to the end to let the others in the
+             * set a chance next time.
+             */
+            memmove(fds + i, fds + i + 1, n - (i + 1));
+            fds[n - 1] = sfd;
+            return fd;
+        }
+    }
+    return -1;
+}
+
 ssize_t (net_Read)(vlc_object_t *restrict obj, int fd,
                    void *restrict buf, size_t len)
 {
@@ -277,15 +408,6 @@ ssize_t (net_Read)(vlc_object_t *restrict obj, int fd,
     return rd;
 }
 
-/**
- * Writes data to a socket.
- * This blocks until all data is written or an error occurs.
- *
- * This function is a cancellation point.
- *
- * @return the total number of bytes written, or -1 if an error occurs
- * before any data is written.
- */
 ssize_t (net_Write)(vlc_object_t *obj, int fd, const void *buf, size_t len)
 {
     size_t written = 0;
@@ -320,92 +442,4 @@ ssize_t (net_Write)(vlc_object_t *obj, int fd, const void *buf, size_t len)
     while (len > 0);
 
     return written;
-}
-
-#undef net_Gets
-/**
- * Reads a line from a file descriptor.
- * This function is not thread-safe; the same file descriptor I/O cannot be
- * read by another thread at the same time (although it can be written to).
- *
- * @note This only works with stream-oriented file descriptors, not with
- * datagram or packet-oriented ones.
- *
- * @return nul-terminated heap-allocated string, or NULL on I/O error.
- */
-char *net_Gets(vlc_object_t *obj, int fd)
-{
-    char *buf = NULL;
-    size_t size = 0, len = 0;
-
-    for (;;)
-    {
-        if (len == size)
-        {
-            if (unlikely(size >= (1 << 16)))
-            {
-                errno = EMSGSIZE;
-                goto error; /* put sane buffer size limit */
-            }
-
-            char *newbuf = realloc(buf, size + 1024);
-            if (unlikely(newbuf == NULL))
-                goto error;
-            buf = newbuf;
-            size += 1024;
-        }
-        assert(len < size);
-
-        ssize_t val = vlc_recv_i11e(fd, buf + len, size - len, MSG_PEEK);
-        if (val <= 0)
-            goto error;
-
-        char *end = memchr(buf + len, '\n', val);
-        if (end != NULL)
-            val = (end + 1) - (buf + len);
-        if (recv(fd, buf + len, val, 0) != val)
-            goto error;
-        len += val;
-        if (end != NULL)
-            break;
-    }
-
-    assert(len > 0);
-    buf[--len] = '\0';
-    if (len > 0 && buf[--len] == '\r')
-        buf[len] = '\0';
-    return buf;
-error:
-    msg_Err(obj, "read error: %s", vlc_strerror_c(errno));
-    free(buf);
-    return NULL;
-}
-
-#undef net_Printf
-ssize_t net_Printf( vlc_object_t *p_this, int fd, const char *psz_fmt, ... )
-{
-    int i_ret;
-    va_list args;
-    va_start( args, psz_fmt );
-    i_ret = net_vaPrintf( p_this, fd, psz_fmt, args );
-    va_end( args );
-
-    return i_ret;
-}
-
-#undef net_vaPrintf
-ssize_t net_vaPrintf( vlc_object_t *p_this, int fd,
-                      const char *psz_fmt, va_list args )
-{
-    char    *psz;
-    int      i_ret;
-
-    int i_size = vasprintf( &psz, psz_fmt, args );
-    if( i_size == -1 )
-        return -1;
-    i_ret = net_Write( p_this, fd, psz, i_size ) < i_size
-        ? -1 : i_size;
-    free( psz );
-
-    return i_ret;
 }

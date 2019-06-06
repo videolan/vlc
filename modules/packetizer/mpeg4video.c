@@ -2,7 +2,6 @@
  * mpeg4video.c: mpeg 4 video packetizer
  *****************************************************************************
  * Copyright (C) 2001-2006 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -475,7 +474,7 @@ static int ParseVO( decoder_t *p_dec, block_t *p_vo )
             p_dec->fmt_out.video.primaries = iso_23001_8_cp_to_vlc_primaries( colour_primaries );
             p_dec->fmt_out.video.transfer = iso_23001_8_tc_to_vlc_xfer( colour_xfer );
             p_dec->fmt_out.video.space = iso_23001_8_mc_to_vlc_coeffs( colour_matrix_coeff );
-            p_dec->fmt_out.video.b_color_range_full = full_range;
+            p_dec->fmt_out.video.color_range = full_range ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
         }
     }
 

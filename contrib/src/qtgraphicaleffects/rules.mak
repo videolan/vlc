@@ -27,11 +27,7 @@ qtgraphicaleffects: qtgraphicaleffects-$(QTGE_VERSION).tar.xz .sum-qtgraphicalef
 	$(MOVE)
 
 .qtgraphicaleffects: qtgraphicaleffects
-ifdef HAVE_CROSS_COMPILE
 	cd $< && $(PREFIX)/bin/qmake
-else
-	cd $< && ../qt/bin/qmake
-endif
 	# Make && Install libraries
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) -C src sub-effects-install_subtargets

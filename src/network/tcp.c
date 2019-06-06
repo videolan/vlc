@@ -3,7 +3,6 @@
  *****************************************************************************
  * Copyright (C) 2004-2005 VLC authors and VideoLAN
  * Copyright (C) 2005-2006 Rémi Denis-Courmont
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *          Rémi Denis-Courmont <rem # videolan.org>
@@ -32,291 +31,10 @@
 
 #include <vlc_common.h>
 
-#include <errno.h>
-#include <assert.h>
-#include <limits.h>
 #include <unistd.h>
-#ifdef HAVE_POLL
-# include <poll.h>
-#endif
 
 #include <vlc_network.h>
-#if defined (_WIN32)
-#   undef EINPROGRESS
-#   define EINPROGRESS WSAEWOULDBLOCK
-#   undef EWOULDBLOCK
-#   define EWOULDBLOCK WSAEWOULDBLOCK
-#   undef EAGAIN
-#   define EAGAIN WSAEWOULDBLOCK
-#endif
 #include <vlc_interrupt.h>
-
-static int SocksNegotiate( vlc_object_t *, int fd, int i_socks_version,
-                           const char *psz_user, const char *psz_passwd );
-static int SocksHandshakeTCP( vlc_object_t *,
-                              int fd, int i_socks_version,
-                              const char *psz_user, const char *psz_passwd,
-                              const char *psz_host, int i_port );
-
-#undef net_Connect
-/*****************************************************************************
- * net_Connect:
- *****************************************************************************
- * Open a network connection.
- * @return socket handler or -1 on error.
- *****************************************************************************/
-int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
-                 int type, int proto )
-{
-    const char      *psz_realhost;
-    char            *psz_socks;
-    int             i_realport, i_handle = -1;
-
-    psz_socks = var_InheritString( p_this, "socks" );
-    if( psz_socks != NULL )
-    {
-        char *psz = strchr( psz_socks, ':' );
-
-        if( psz )
-            *psz++ = '\0';
-
-        psz_realhost = psz_socks;
-        i_realport = ( psz != NULL ) ? atoi( psz ) : 1080;
-
-        msg_Dbg( p_this, "net: connecting to %s port %d (SOCKS) "
-                 "for %s port %d", psz_realhost, i_realport,
-                 psz_host, i_port );
-
-        /* We only implement TCP with SOCKS */
-        switch( type )
-        {
-            case 0:
-                type = SOCK_STREAM;
-            case SOCK_STREAM:
-                break;
-            default:
-                msg_Err( p_this, "Socket type not supported through SOCKS" );
-                free( psz_socks );
-                return -1;
-        }
-        switch( proto )
-        {
-            case 0:
-                proto = IPPROTO_TCP;
-            case IPPROTO_TCP:
-                break;
-            default:
-                msg_Err( p_this, "Transport not supported through SOCKS" );
-                free( psz_socks );
-                return -1;
-        }
-    }
-    else
-    {
-        psz_realhost = psz_host;
-        i_realport = i_port;
-
-        msg_Dbg( p_this, "net: connecting to %s port %d", psz_realhost,
-                 i_realport );
-    }
-
-    struct addrinfo hints = {
-        .ai_socktype = type,
-        .ai_protocol = proto,
-        .ai_flags = AI_NUMERICSERV | AI_IDN,
-    }, *res;
-
-    int val = vlc_getaddrinfo_i11e(psz_realhost, i_realport, &hints, &res);
-    if (val)
-    {
-        msg_Err (p_this, "cannot resolve %s port %d : %s", psz_realhost,
-                 i_realport, gai_strerror (val));
-        free( psz_socks );
-        return -1;
-    }
-    free( psz_socks );
-
-    vlc_tick_t timeout = VLC_TICK_FROM_MS( var_InheritInteger(p_this, "ipv4-timeout") );
-
-    for (struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
-    {
-        int fd = net_Socket( p_this, ptr->ai_family,
-                             ptr->ai_socktype, ptr->ai_protocol );
-        if( fd == -1 )
-        {
-            msg_Dbg( p_this, "socket error: %s", vlc_strerror_c(net_errno) );
-            continue;
-        }
-
-        if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) )
-        {
-            if( net_errno != EINPROGRESS && errno != EINTR )
-            {
-                msg_Err( p_this, "connection failed: %s",
-                         vlc_strerror_c(net_errno) );
-                goto next_ai;
-            }
-
-            struct pollfd ufd;
-            vlc_tick_t deadline = VLC_TICK_INVALID;
-
-            ufd.fd = fd;
-            ufd.events = POLLOUT;
-            deadline = vlc_tick_now() + timeout;
-
-            do
-            {
-                vlc_tick_t now = vlc_tick_now();
-
-                if (vlc_killed())
-                    goto next_ai;
-
-                if (now > deadline)
-                    now = deadline;
-
-                val = vlc_poll_i11e(&ufd, 1, MS_FROM_VLC_TICK(deadline - now));
-            }
-            while (val == -1 && errno == EINTR);
-
-            switch (val)
-            {
-                 case -1: /* error */
-                     msg_Err (p_this, "polling error: %s",
-                              vlc_strerror_c(net_errno));
-                     goto next_ai;
-
-                 case 0: /* timeout */
-                     msg_Warn (p_this, "connection timed out");
-                     goto next_ai;
-            }
-
-            /* There is NO WAY around checking SO_ERROR.
-             * Don't ifdef it out!!! */
-            if (getsockopt (fd, SOL_SOCKET, SO_ERROR, &val,
-                            &(socklen_t){ sizeof (val) }) || val)
-            {
-                msg_Err (p_this, "connection failed: %s",
-                         vlc_strerror_c(val));
-                goto next_ai;
-            }
-        }
-
-        msg_Dbg( p_this, "connection succeeded (socket = %d)", fd );
-        i_handle = fd; /* success! */
-        break;
-
-next_ai: /* failure */
-        net_Close( fd );
-    }
-
-    freeaddrinfo( res );
-
-    if( i_handle == -1 )
-        return -1;
-
-    if( psz_socks != NULL )
-    {
-        /* NOTE: psz_socks already free'd! */
-        char *psz_user = var_InheritString( p_this, "socks-user" );
-        char *psz_pwd  = var_InheritString( p_this, "socks-pwd" );
-
-        if( SocksHandshakeTCP( p_this, i_handle, 5, psz_user, psz_pwd,
-                               psz_host, i_port ) )
-        {
-            msg_Err( p_this, "SOCKS handshake failed" );
-            net_Close( i_handle );
-            i_handle = -1;
-        }
-
-        free( psz_user );
-        free( psz_pwd );
-    }
-
-    return i_handle;
-}
-
-
-int net_AcceptSingle (vlc_object_t *obj, int lfd)
-{
-    int fd = vlc_accept (lfd, NULL, NULL, true);
-    if (fd == -1)
-    {
-        if (net_errno != EAGAIN)
-#if (EAGAIN != EWOULDBLOCK)
-          if (net_errno != EWOULDBLOCK)
-#endif
-            msg_Err (obj, "accept failed (from socket %d): %s", lfd,
-                     vlc_strerror_c(net_errno));
-        return -1;
-    }
-
-    msg_Dbg (obj, "accepted socket %d (from socket %d)", fd, lfd);
-    setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int));
-    return fd;
-}
-
-
-#undef net_Accept
-/**
- * Accepts an new connection on a set of listening sockets.
- * If there are no pending connections, this function will wait.
- * @note If the thread needs to handle events other than incoming connections,
- * you need to use poll() and net_AcceptSingle() instead.
- *
- * @param p_this VLC object for logging and object kill signal
- * @param pi_fd listening socket set
- * @return -1 on error (may be transient error due to network issues),
- * a new socket descriptor on success.
- */
-int net_Accept (vlc_object_t *p_this, int *pi_fd)
-{
-    assert (pi_fd != NULL);
-
-    unsigned n = 0;
-    while (pi_fd[n] != -1)
-        n++;
-
-    struct pollfd ufd[n];
-    /* Initialize file descriptor set */
-    for (unsigned i = 0; i < n; i++)
-    {
-        ufd[i].fd = pi_fd[i];
-        ufd[i].events = POLLIN;
-    }
-
-    for (;;)
-    {
-        while (poll (ufd, n, -1) == -1)
-        {
-            if (net_errno != EINTR)
-            {
-                msg_Err (p_this, "poll error: %s", vlc_strerror_c(net_errno));
-                return -1;
-            }
-        }
-
-        for (unsigned i = 0; i < n; i++)
-        {
-            if (ufd[i].revents == 0)
-                continue;
-
-            int sfd = ufd[i].fd;
-            int fd = net_AcceptSingle (p_this, sfd);
-            if (fd == -1)
-                continue;
-
-            /*
-             * Move listening socket to the end to let the others in the
-             * set a chance next time.
-             */
-            memmove (pi_fd + i, pi_fd + i + 1, n - (i + 1));
-            pi_fd[n - 1] = sfd;
-            return fd;
-        }
-    }
-    return -1;
-}
-
 
 /*****************************************************************************
  * SocksNegotiate:
@@ -526,14 +244,53 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
     return VLC_SUCCESS;
 }
 
-void net_ListenClose( int *pi_fd )
+int (net_ConnectTCP)(vlc_object_t *obj, const char *host, int serv)
 {
-    if( pi_fd != NULL )
-    {
-        int *pi;
+    const char *realhost;
+    int realserv;
 
-        for( pi = pi_fd; *pi != -1; pi++ )
-            net_Close( *pi );
-        free( pi_fd );
+    char *socks = var_InheritString(obj, "socks");
+    if (socks != NULL)
+    {
+        realhost = socks;
+
+        char *p = strchr(socks, ':');
+        if (p != NULL)
+        {
+            *(p++) = '\0';
+            realserv = atoi(p);
+        }
+        else
+            realserv = 1080;
+
+        msg_Dbg(obj, "net: connecting to %s port %d (SOCKS) "
+                "for %s port %d", realhost, realserv, host, serv);
     }
+    else
+    {
+        msg_Dbg(obj, "net: connecting to %s port %d", host, serv);
+        realhost = host;
+        realserv = serv;
+    }
+
+    int fd = net_Connect(obj, realhost, realserv, SOCK_STREAM, IPPROTO_TCP);
+
+    if (socks != NULL && fd != -1)
+    {
+        /* NOTE: psz_socks already free'd! */
+        char *user = var_InheritString(obj, "socks-user");
+        char *pwd = var_InheritString(obj, "socks-pwd");
+
+        if (SocksHandshakeTCP(obj, fd, 5, user, pwd, host, serv))
+        {
+            msg_Err(obj, "SOCKS handshake failed");
+            net_Close(fd);
+            fd = -1;
+        }
+
+        free(pwd);
+        free(user);
+    }
+
+    return fd;
 }

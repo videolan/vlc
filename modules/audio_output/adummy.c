@@ -2,7 +2,6 @@
  * adummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *

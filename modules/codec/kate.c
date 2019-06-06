@@ -2,7 +2,6 @@
  * kate.c : a decoder for the kate bitstream format
  *****************************************************************************
  * Copyright (C) 2000-2008 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Vincent Penquerc'h <ogg.k.ogg.k@googlemail.com>
  *

@@ -5,7 +5,6 @@
  * Copyright © 2007-2011 Mirsal Ennaime
  * Copyright © 2009-2011 The VideoLAN team
  * Copyright © 2013      Alex Merry
- * $Id$
  *
  * Authors:    Mirsal Ennaime <mirsal at mirsal fr>
  *             Rafaël Carré <funman at videolanorg>
@@ -35,7 +34,7 @@
 #include <vlc_input.h>
 #include <vlc_vout.h>
 #include <vlc_plugin.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 
 #include <unistd.h>
 #include <limits.h>

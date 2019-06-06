@@ -2,7 +2,6 @@
  * libvlc_media.h:  libvlc external API
  *****************************************************************************
  * Copyright (C) 1998-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Paul Saman <jpsaman@videolan.org>
@@ -28,6 +27,8 @@
 
 # ifdef __cplusplus
 extern "C" {
+# else
+#  include <stdbool.h>
 # endif
 
 /** \defgroup libvlc_media LibVLC media
@@ -799,6 +800,86 @@ void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks,
  */
 LIBVLC_API
 libvlc_media_type_t libvlc_media_get_type( libvlc_media_t *p_md );
+
+/**
+ * \brief libvlc_media_thumbnail_request_t An opaque thumbnail request object
+ */
+typedef struct libvlc_media_thumbnail_request_t libvlc_media_thumbnail_request_t;
+
+typedef enum libvlc_thumbnailer_seek_speed_t
+{
+    libvlc_media_thumbnail_seek_precise,
+    libvlc_media_thumbnail_seek_fast,
+} libvlc_thumbnailer_seek_speed_t;
+
+/**
+ * \brief libvlc_media_get_thumbnail_by_time Start an asynchronous thumbnail generation
+ *
+ * If the request is successfuly queued, the libvlc_MediaThumbnailGenerated
+ * is guaranteed to be emited.
+ *
+ * \param md media descriptor object
+ * \param time The time at which the thumbnail should be generated
+ * \param speed The seeking speed \sa{libvlc_thumbnailer_seek_speed_t}
+ * \param width The thumbnail width
+ * \param height the thumbnail height
+ * \param picture_type The thumbnail picture type \sa{libvlc_picture_type_t}
+ * \param timeout A timeout value in ms, or 0 to disable timeout
+ *
+ * \return A valid opaque request object, or NULL in case of failure.
+ *
+ * \version libvlc 4.0 or later
+ *
+ * \see libvlc_picture_t
+ * \see libvlc_picture_type_t
+ */
+LIBVLC_API libvlc_media_thumbnail_request_t*
+libvlc_media_thumbnail_request_by_time( libvlc_media_t *md,
+                                        libvlc_time_t time,
+                                        libvlc_thumbnailer_seek_speed_t speed,
+                                        unsigned int width, unsigned int height,
+                                        libvlc_picture_type_t picture_type,
+                                        libvlc_time_t timeout );
+
+/**
+ * \brief libvlc_media_get_thumbnail_by_pos Start an asynchronous thumbnail generation
+ *
+ * If the request is successfuly queued, the libvlc_MediaThumbnailGenerated
+ * is guaranteed to be emited.
+ *
+ * \param md media descriptor object
+ * \param pos The position at which the thumbnail should be generated
+ * \param speed The seeking speed \sa{libvlc_thumbnailer_seek_speed_t}
+ * \param width The thumbnail width
+ * \param height the thumbnail height
+ * \param picture_type The thumbnail picture type \sa{libvlc_picture_type_t}
+ * \param timeout A timeout value in ms, or 0 to disable timeout
+ *
+ * \return A valid opaque request object, or NULL in case of failure.
+ *
+ * \version libvlc 4.0 or later
+ *
+ * \see libvlc_picture_t
+ * \see libvlc_picture_type_t
+ */
+LIBVLC_API libvlc_media_thumbnail_request_t*
+libvlc_media_thumbnail_request_by_pos( libvlc_media_t *md,
+                                       float pos,
+                                       libvlc_thumbnailer_seek_speed_t speed,
+                                       unsigned int width, unsigned int height,
+                                       libvlc_picture_type_t picture_type,
+                                       libvlc_time_t timeout );
+
+/**
+ * @brief libvlc_media_thumbnail_cancel cancels a thumbnailing request
+ * @param p_req An opaque thumbnail request object.
+ *
+ * Cancelling the request will still cause libvlc_MediaThumbnailGenerated event
+ * to be emited, with a NULL libvlc_picture_t
+ * If the request is cancelled after its completion, the behavior is undefined.
+ */
+LIBVLC_API void
+libvlc_media_thumbnail_cancel( libvlc_media_thumbnail_request_t *p_req );
 
 /**
  * Add a slave to the current media.

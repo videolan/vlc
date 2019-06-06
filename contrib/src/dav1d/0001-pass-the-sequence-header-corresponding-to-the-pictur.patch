@@ -1,0 +1,94 @@
+From fe62b6cf1ebcde4f64868ce13ea58736beb68efd Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@videolan.org>
+Date: Thu, 13 Dec 2018 11:57:31 +0100
+Subject: [PATCH] pass the sequence header corresponding to the picture being
+ allocated
+
+Otherwise there's no way to know the colorimetry parameters during allocation.
+
+This is a problem in VLC as getting it after decoding means we need to issue a
+costly format update.
+---
+ src/decode.c  |  2 +-
+ src/picture.c | 11 ++++++-----
+ src/picture.h |  2 +-
+ 3 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/src/decode.c b/src/decode.c
+index bacd097..1872050 100644
+--- a/src/decode.c
++++ b/src/decode.c
+@@ -3124,7 +3124,7 @@ int dav1d_submit_frame(Dav1dContext *const c) {
+     // allocate frame
+     res = dav1d_thread_picture_alloc(&f->sr_cur, f->frame_hdr->width[1],
+                                      f->frame_hdr->height,
+-                                     f->seq_hdr->layout, bpc,
++                                     f->seq_hdr, bpc,
+                                      c->n_fc > 1 ? &f->frame_thread.td : NULL,
+                                      f->frame_hdr->show_frame, &c->allocator);
+     if (res < 0) goto error;
+diff --git a/src/picture.c b/src/picture.c
+index ba51d82..2f52bbd 100644
+--- a/src/picture.c
++++ b/src/picture.c
+@@ -99,7 +99,7 @@ static void free_buffer(const uint8_t *const data, void *const user_data) {
+ 
+ static int picture_alloc_with_edges(Dav1dPicture *const p,
+                                     const int w, const int h,
+-                                    const enum Dav1dPixelLayout layout,
++                                    Dav1dSequenceHeader *seq_hdr,
+                                     const int bpc,
+                                     Dav1dPicAllocator *const p_allocator,
+                                     const size_t extra, void **const extra_ptr)
+@@ -120,7 +120,8 @@ static int picture_alloc_with_edges(Dav1dPicture *const p,
+     p->m.timestamp = INT64_MIN;
+     p->m.duration = 0;
+     p->m.offset = -1;
+-    p->p.layout = layout;
++    p->seq_hdr = seq_hdr;
++    p->p.layout = seq_hdr->layout;
+     p->p.bpc = bpc;
+     int res = p_allocator->alloc_picture_callback(p, p_allocator->cookie);
+     if (res < 0) {
+@@ -146,14 +147,14 @@ static int picture_alloc_with_edges(Dav1dPicture *const p,
+ 
+ int dav1d_thread_picture_alloc(Dav1dThreadPicture *const p,
+                                const int w, const int h,
+-                               const enum Dav1dPixelLayout layout, const int bpc,
++                               Dav1dSequenceHeader *seq_hdr, const int bpc,
+                                struct thread_data *const t, const int visible,
+                                Dav1dPicAllocator *const p_allocator)
+ {
+     p->t = t;
+ 
+     const int res =
+-        picture_alloc_with_edges(&p->p, w, h, layout, bpc, p_allocator,
++        picture_alloc_with_edges(&p->p, w, h, seq_hdr, bpc, p_allocator,
+                                  t != NULL ? sizeof(atomic_int) * 2 : 0,
+                                  (void **) &p->progress);
+     if (res) return res;
+@@ -170,7 +171,7 @@ int dav1d_picture_alloc_copy(Dav1dPicture *const dst, const int w,
+                              const Dav1dPicture *const src)
+ {
+     struct pic_ctx_context *const pic_ctx = src->ref->user_data;
+-    const int res = picture_alloc_with_edges(dst, w, src->p.h, src->p.layout,
++    const int res = picture_alloc_with_edges(dst, w, src->p.h, src->seq_hdr,
+                                              src->p.bpc, &pic_ctx->allocator,
+                                              0, NULL);
+ 
+diff --git a/src/picture.h b/src/picture.h
+index f31edb5..ca80a90 100644
+--- a/src/picture.h
++++ b/src/picture.h
+@@ -55,7 +55,7 @@ typedef struct Dav1dThreadPicture {
+  * Allocate a picture with custom border size.
+  */
+ int dav1d_thread_picture_alloc(Dav1dThreadPicture *p, int w, int h,
+-                               enum Dav1dPixelLayout layout, int bpc,
++                               Dav1dSequenceHeader *seq_hdr, int bpc,
+                                struct thread_data *t, int visible,
+                                Dav1dPicAllocator *);
+ 
+-- 
+2.19.1.windows.1
+

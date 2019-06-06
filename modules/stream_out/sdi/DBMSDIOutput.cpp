@@ -735,17 +735,16 @@ picture_t * DBMSDIOutput::CreateNoSignalPicture(const char *psz_file, const vide
     image_handler_t *img = image_HandlerCreate(p_stream);
     if (img)
     {
-        video_format_t in, dummy;
-        video_format_Init(&dummy, 0);
+        video_format_t in;
         video_format_Init(&in, 0);
         video_format_Setup(&in, 0,
                            fmt->i_width, fmt->i_height,
                            fmt->i_width, fmt->i_height, 1, 1);
 
-        picture_t *png = image_ReadUrl(img, psz_file, &dummy, &in);
+        picture_t *png = image_ReadUrl(img, psz_file, &in);
         if (png)
         {
-            video_format_Clean(&dummy);
+            video_format_t dummy;
             video_format_Copy(&dummy, fmt);
             p_pic = image_Convert(img, png, &in, &dummy);
             if(!video_format_IsSimilar(&dummy, fmt))
@@ -754,10 +753,10 @@ picture_t * DBMSDIOutput::CreateNoSignalPicture(const char *psz_file, const vide
                 p_pic = NULL;
             }
             picture_Release(png);
+            video_format_Clean(&dummy);
         }
         image_HandlerDelete(img);
         video_format_Clean(&in);
-        video_format_Clean(&dummy);
     }
     return p_pic;
 }

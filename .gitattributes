@@ -1,6 +1,0 @@
-*.c   ident
-*.h   ident
-*.m   ident
-*.cpp ident
-*.hpp ident
-README ident

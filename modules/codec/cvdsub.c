@@ -2,7 +2,6 @@
  * cvdsub.c : CVD Subtitle decoder
  *****************************************************************************
  * Copyright (C) 2003, 2004 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Rocky Bernstein
  *          Gildas Bazin <gbazin@videolan.org>
@@ -357,15 +356,16 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
             p_sys->i_duration = FROM_SCALE_NZ( (p[1]<<16) + (p[2]<<8) + p[3] );
 
 #ifdef DEBUG_CVDSUB
-            msg_Dbg( p_dec, "subtitle display duration %lu ms",
+            msg_Dbg( p_dec, "subtitle display duration %"PRIu64" ms",
                      MS_FROM_VLC_TICK(p_sys->i_duration) );
 #endif
             break;
 
         case 0x0c: /* unknown */
 #ifdef DEBUG_CVDSUB
-            msg_Dbg( p_dec, "subtitle command unknown 0x%0x 0x%0x 0x%0x 0x%0x",
-                     (int)p[0], (int)p[1], (int)p[2], (int)p[3] );
+            msg_Dbg( p_dec, "subtitle command unknown "
+                     "0x%02"PRIx8" 0x%02"PRIx8" 0x%02"PRIx8" 0x%02"PRIx8,
+                     p[0], p[1], p[2], p[3] );
 #endif
             break;
 
@@ -373,7 +373,7 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
             ExtractXY(p_sys->i_x_start, p_sys->i_y_start);
 
 #ifdef DEBUG_CVDSUB
-            msg_Dbg( p_dec, "start position (%d,%d)",
+            msg_Dbg( p_dec, "start position (%"PRIu16",%"PRIu16")",
                      p_sys->i_x_start, p_sys->i_y_start );
 #endif
             break;
@@ -387,7 +387,7 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
             p_sys->i_height = lasty - p_sys->i_y_start + 1;
 
 #ifdef DEBUG_CVDSUB
-            msg_Dbg( p_dec, "end position (%d,%d), w x h: %dx%d",
+            msg_Dbg( p_dec, "end position (%d,%d), w x h: %"PRIu16"x%"PRIu16,
                      lastx, lasty, p_sys->i_width, p_sys->i_height );
 #endif
             break;
@@ -402,8 +402,9 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
 
 #ifdef DEBUG_CVDSUB
             /* Primary Palette */
-            msg_Dbg( p_dec, "primary palette %d (y,u,v): (0x%0x,0x%0x,0x%0x)",
-                     (int)v, (int)p[1], (int)p[2], (int)p[3] );
+            msg_Dbg( p_dec, "primary palette %"PRIu8" (y,u,v): "
+                     "(0x%02"PRIx8",0x%02"PRIx8",0x%02"PRIx8")",
+                     v, p[1], p[2], p[3] );
 #endif
 
             p_sys->p_palette[v][0] = p[1]; /* Y */
@@ -420,8 +421,9 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
             uint8_t v = p[0] - 0x2c;
 
 #ifdef DEBUG_CVDSUB
-            msg_Dbg( p_dec,"highlight palette %d (y,u,v): (0x%0x,0x%0x,0x%0x)",
-                     (int)v, (int)p[1], (int)p[2], (int)p[3] );
+            msg_Dbg( p_dec,"highlight palette %"PRIu8" (y,u,v): "
+                     "(0x%02"PRIx8",0x%02"PRIx8",0x%02"PRIx8")",
+                     v, p[1], p[2], p[3] );
 #endif
 
             /* Highlight Palette */
@@ -440,9 +442,9 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
 
 #ifdef DEBUG_CVDSUB
             msg_Dbg( p_dec, "transparency for primary palette 0..3: "
-                     "0x%0x 0x%0x 0x%0x 0x%0x",
-                     (int)p_sys->p_palette[0][3], (int)p_sys->p_palette[1][3],
-                     (int)p_sys->p_palette[2][3], (int)p_sys->p_palette[3][3]);
+                     "0x%02"PRIx8" 0x%02"PRIx8" 0x%02"PRIx8" 0x%02"PRIx8,
+                     p_sys->p_palette[0][3], p_sys->p_palette[1][3],
+                     p_sys->p_palette[2][3], p_sys->p_palette[3][3]);
 #endif
             break;
 
@@ -455,11 +457,11 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
 
 #ifdef DEBUG_CVDSUB
             msg_Dbg( p_dec, "transparency for highlight palette 0..3: "
-                     "0x%0x 0x%0x 0x%0x 0x%0x",
-                     (int)p_sys->p_palette_highlight[0][3],
-                     (int)p_sys->p_palette_highlight[1][3],
-                     (int)p_sys->p_palette_highlight[2][3],
-                     (int)p_sys->p_palette_highlight[3][3] );
+                     "0x%02"PRIx8" 0x%02"PRIx8" 0x%02"PRIx8" 0x%02"PRIx8,
+                     p_sys->p_palette_highlight[0][3],
+                     p_sys->p_palette_highlight[1][3],
+                     p_sys->p_palette_highlight[2][3],
+                     p_sys->p_palette_highlight[3][3] );
 #endif
             break;
 
@@ -488,7 +490,8 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
         default:
 #ifdef DEBUG_CVDSUB
             msg_Warn( p_dec, "unknown sequence in control header "
-                      "0x%0x 0x%0x 0x%0x 0x%0x", p[0], p[1], p[2], p[3]);
+                      "0x%02"PRIx8" 0x%02"PRIx8" 0x%02"PRIx8" 0x%02"PRIx8,
+                      p[0], p[1], p[2], p[3]);
 #endif
         }
     }

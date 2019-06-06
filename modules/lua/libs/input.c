@@ -2,7 +2,6 @@
  * input.c
  *****************************************************************************
  * Copyright (C) 2007-2008 the VideoLAN team
- * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
  *
@@ -35,7 +34,7 @@
 #include <vlc_common.h>
 #include <vlc_meta.h>
 #include <vlc_url.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 
 #include <assert.h>
 

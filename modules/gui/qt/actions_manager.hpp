@@ -2,7 +2,6 @@
  * actions_manager.hpp : Controller for the main interface
  ****************************************************************************
  * Copyright (C) 2006-2008 the VideoLAN team
- * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb@videolan.org>
  *

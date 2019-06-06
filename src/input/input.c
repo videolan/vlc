@@ -2,7 +2,6 @@
  * input.c: input thread
  *****************************************************************************
  * Copyright (C) 1998-2007 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -63,7 +62,7 @@ static  void *Run( void * );
 static  void *Preparse( void * );
 
 static input_thread_t * Create  ( vlc_object_t *, input_thread_events_cb, void *,
-                                  input_item_t *, const char *, bool,
+                                  input_item_t *, const char *, bool, bool,
                                   input_resource_t *, vlc_renderer_item_t * );
 static  int             Init    ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
@@ -132,7 +131,7 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
                               vlc_renderer_item_t *p_renderer )
 {
     return Create( p_parent, events_cb, events_data, p_item, psz_log, false,
-                   p_resource, p_renderer );
+                   false, p_resource, p_renderer );
 }
 
 #undef input_Read
@@ -147,7 +146,7 @@ int input_Read( vlc_object_t *p_parent, input_item_t *p_item,
                 input_thread_events_cb events_cb, void *events_data )
 {
     input_thread_t *p_input = Create( p_parent, events_cb, events_data, p_item,
-                                      NULL, false, NULL, NULL );
+                                      NULL, false, false, NULL, NULL );
     if( !p_input )
         return VLC_EGENERIC;
 
@@ -165,7 +164,14 @@ input_thread_t *input_CreatePreparser( vlc_object_t *parent,
                                        input_thread_events_cb events_cb,
                                        void *events_data, input_item_t *item )
 {
-    return Create( parent, events_cb, events_data, item, NULL, true, NULL, NULL );
+    return Create( parent, events_cb, events_data, item, NULL, true, false, NULL, NULL );
+}
+
+input_thread_t *input_CreateThumbnailer(vlc_object_t *obj,
+                                        input_thread_events_cb events_cb,
+                                        void *events_data, input_item_t *item)
+{
+    return Create( obj, events_cb, events_data, item, NULL, false, true, NULL, NULL );
 }
 
 /**
@@ -308,7 +314,8 @@ input_item_t *input_GetItem( input_thread_t *p_input )
 static input_thread_t *Create( vlc_object_t *p_parent,
                                input_thread_events_cb events_cb, void *events_data,
                                input_item_t *p_item, const char *psz_header,
-                               bool b_preparsing, input_resource_t *p_resource,
+                               bool b_preparsing, bool b_thumbnailing,
+                               input_resource_t *p_resource,
                                vlc_renderer_item_t *p_renderer )
 {
     /* Allocate descriptor */
@@ -345,13 +352,14 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     priv->is_running = false;
     priv->is_stopped = false;
     priv->b_recording = false;
+    priv->b_thumbnailing = b_thumbnailing;
     priv->i_rate = INPUT_RATE_DEFAULT;
     memset( &priv->bookmark, 0, sizeof(priv->bookmark) );
     TAB_INIT( priv->i_bookmark, priv->pp_bookmark );
     TAB_INIT( priv->i_attachment, priv->attachment );
     priv->attachment_demux = NULL;
     priv->p_sout   = NULL;
-    priv->b_out_pace_control = false;
+    priv->b_out_pace_control = b_thumbnailing;
     priv->p_renderer = p_renderer && b_preparsing == false ?
                 vlc_renderer_item_hold( p_renderer ) : NULL;
 
@@ -1326,6 +1334,10 @@ static int Init( input_thread_t * p_input )
     input_thread_private_t *priv = input_priv(p_input);
     input_source_t *master;
 
+    /* */
+    input_ChangeState( p_input, OPENING_S );
+    input_SendEventCache( p_input, 0.0 );
+
     if( var_Type( p_input->obj.parent, "meta-file" ) )
     {
         msg_Dbg( p_input, "Input is a meta file: disabling unneeded options" );
@@ -1347,10 +1359,6 @@ static int Init( input_thread_t * p_input )
                                               priv->i_rate );
     if( priv->p_es_out == NULL )
         goto error;
-
-    /* */
-    input_ChangeState( p_input, OPENING_S );
-    input_SendEventCache( p_input, 0.0 );
 
     /* */
     master = InputSourceNew( p_input, priv->p_item->psz_uri, NULL, false );

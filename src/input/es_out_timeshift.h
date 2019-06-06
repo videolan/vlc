@@ -2,7 +2,6 @@
  * es_out_timeshift.h: Es Out timeshift.
  *****************************************************************************
  * Copyright (C) 2008 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar < fenrir _AT_ via _DOT_ ecp _DOT_ fr>
  *

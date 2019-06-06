@@ -2,7 +2,6 @@
  * vlc_es.h: Elementary stream formats descriptions
  *****************************************************************************
  * Copyright (C) 1999-2012 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -334,6 +333,15 @@ typedef enum video_chroma_location_t
 #define CHROMA_LOCATION_MAX CHROMA_LOCATION_BOTTOM_CENTER
 } video_chroma_location_t;
 
+typedef enum video_color_range_t
+{
+    COLOR_RANGE_UNDEF,
+    COLOR_RANGE_FULL,
+    COLOR_RANGE_LIMITED,
+#define COLOR_RANGE_STUDIO COLOR_RANGE_LIMITED
+#define COLOR_RANGE_MAX    COLOR_RANGE_LIMITED
+} video_color_range_t;
+
 /**
  * video format description
  */
@@ -357,15 +365,12 @@ struct video_format_t
     unsigned int i_frame_rate_base;              /**< frame rate denominator */
 
     uint32_t i_rmask, i_gmask, i_bmask;      /**< color masks for RGB chroma */
-    int i_rrshift, i_lrshift;
-    int i_rgshift, i_lgshift;
-    int i_rbshift, i_lbshift;
     video_palette_t *p_palette;              /**< video palette from demuxer */
     video_orientation_t orientation;                /**< picture orientation */
     video_color_primaries_t primaries;                  /**< color primaries */
     video_transfer_func_t transfer;                   /**< transfer function */
     video_color_space_t space;                        /**< YCbCr color space */
-    bool b_color_range_full;                    /**< 0-255 instead of 16-235 */
+    video_color_range_t color_range;            /**< 0-255 instead of 16-235 */
     video_chroma_location_t chroma_location;      /**< YCbCr chroma location */
 
     video_multiview_mode_t multiview_mode;        /** Multiview mode, 2D, 3D */
@@ -446,6 +451,14 @@ static inline void video_format_AdjustColorSpace( video_format_t *p_fmt )
         else
             p_fmt->space = COLOR_SPACE_BT601;
     }
+
+    if ( p_fmt->color_range == COLOR_RANGE_UNDEF )
+    {
+        if ( vlc_fourcc_IsYUV(p_fmt->i_chroma) )
+            p_fmt->color_range = COLOR_RANGE_LIMITED;
+        else
+            p_fmt->color_range = COLOR_RANGE_FULL;
+    }
 }
 
 /**
@@ -470,6 +483,14 @@ VLC_API void video_format_Setup( video_format_t *, vlc_fourcc_t i_chroma,
  * It will copy the crop properties from a video_format_t to another.
  */
 VLC_API void video_format_CopyCrop( video_format_t *, const video_format_t * );
+
+static inline void video_format_CopyCropAr(video_format_t *dst,
+                                           const video_format_t *src)
+{
+    video_format_CopyCrop(dst, src);
+    dst->i_sar_num = src->i_sar_num;
+    dst->i_sar_den = src->i_sar_den;
+}
 
 /**
  * It will compute the crop/ar properties when scaling.

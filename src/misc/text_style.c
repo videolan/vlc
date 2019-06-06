@@ -2,7 +2,6 @@
  * text_style.c
  *****************************************************************************
  * Copyright (C) 1999-2010 VLC authors and VideoLAN
- * $Id$
  *
  * Author: basOS G <noxelia 4t gmail , com>
  *

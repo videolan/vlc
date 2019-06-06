@@ -24,34 +24,42 @@
 
 #include <vlc_es.h>
 #include <vlc_codecs.h>
+#include "coreaudio.h"
 
 /* Use alias for scaled time */
 typedef int64_t stime_t;
 
 #define BLOCK16x16 (1<<16)
 
-#define MAJOR_3gp4 VLC_FOURCC( '3', 'g', 'p', '4' )
-#define MAJOR_3gp5 VLC_FOURCC( '3', 'g', 'p', '5' )
-#define MAJOR_3gp6 VLC_FOURCC( '3', 'g', 'p', '6' )
-#define MAJOR_3gp7 VLC_FOURCC( '3', 'g', 'p', '7' )
-#define MAJOR_isml VLC_FOURCC( 'i', 's', 'm', 'l' )
-#define MAJOR_isom VLC_FOURCC( 'i', 's', 'o', 'm' )
-#define MAJOR_qt__ VLC_FOURCC( 'q', 't', ' ', ' ' )
-#define MAJOR_f4v  VLC_FOURCC( 'f', '4', 'v', ' ' ) /* Adobe Flash */
-#define MAJOR_dash VLC_FOURCC( 'd', 'a', 's', 'h' )
-#define MAJOR_mp41 VLC_FOURCC( 'm', 'p', '4', '1' )
-#define MAJOR_avc1 VLC_FOURCC( 'a', 'v', 'c', '1' )
-#define MAJOR_M4A  VLC_FOURCC( 'M', '4', 'A', ' ' )
-#define MAJOR_mif1 VLC_FOURCC( 'm', 'i', 'f', '1' ) /* heif */
-#define MAJOR_msf1 VLC_FOURCC( 'm', 's', 'f', '1' ) /* heif */
-#define MAJOR_heic VLC_FOURCC( 'h', 'e', 'i', 'c' ) /* heif */
-#define MAJOR_heix VLC_FOURCC( 'h', 'e', 'i', 'x' ) /* heif */
-#define MAJOR_hevc VLC_FOURCC( 'h', 'e', 'v', 'c' ) /* heif */
-#define MAJOR_hevx VLC_FOURCC( 'h', 'e', 'v', 'x' ) /* heif */
-#define MAJOR_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' ) /* heif */
-#define MAJOR_jpgs VLC_FOURCC( 'j', 'p', 'g', 's' ) /* heif */
-#define MAJOR_avci VLC_FOURCC( 'a', 'v', 'c', 'i' ) /* heif */
-#define MAJOR_avcs VLC_FOURCC( 'a', 'v', 'c', 's' ) /* heif */
+#define BRAND_3gp4 VLC_FOURCC( '3', 'g', 'p', '4' )
+#define BRAND_3gp5 VLC_FOURCC( '3', 'g', 'p', '5' )
+#define BRAND_3gp6 VLC_FOURCC( '3', 'g', 'p', '6' )
+#define BRAND_3gp7 VLC_FOURCC( '3', 'g', 'p', '7' )
+#define BRAND_isml VLC_FOURCC( 'i', 's', 'm', 'l' )
+#define BRAND_isom VLC_FOURCC( 'i', 's', 'o', 'm' )
+#define BRAND_iso2 VLC_FOURCC( 'i', 's', 'o', '2' )
+#define BRAND_iso6 VLC_FOURCC( 'i', 's', 'o', '6' )
+#define BRAND_qt__ VLC_FOURCC( 'q', 't', ' ', ' ' )
+#define BRAND_f4v  VLC_FOURCC( 'f', '4', 'v', ' ' ) /* Adobe Flash */
+#define BRAND_dash VLC_FOURCC( 'd', 'a', 's', 'h' )
+#define BRAND_smoo VLC_FOURCC( 's', 'm', 'o', 'o' ) /* Internal use */
+#define BRAND_mp41 VLC_FOURCC( 'm', 'p', '4', '1' )
+#define BRAND_av01 VLC_FOURCC( 'a', 'v', '0', '1' )
+#define BRAND_avc1 VLC_FOURCC( 'a', 'v', 'c', '1' )
+#define BRAND_M4A  VLC_FOURCC( 'M', '4', 'A', ' ' )
+#define BRAND_piff VLC_FOURCC( 'p', 'i', 'f', 'f' )
+#define BRAND_mif1 VLC_FOURCC( 'm', 'i', 'f', '1' ) /* heif */
+#define BRAND_msf1 VLC_FOURCC( 'm', 's', 'f', '1' ) /* heif */
+#define BRAND_heic VLC_FOURCC( 'h', 'e', 'i', 'c' ) /* heif */
+#define BRAND_heix VLC_FOURCC( 'h', 'e', 'i', 'x' ) /* heif */
+#define BRAND_hevc VLC_FOURCC( 'h', 'e', 'v', 'c' ) /* heif */
+#define BRAND_hevx VLC_FOURCC( 'h', 'e', 'v', 'x' ) /* heif */
+#define BRAND_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' ) /* heif */
+#define BRAND_jpgs VLC_FOURCC( 'j', 'p', 'g', 's' ) /* heif */
+#define BRAND_avci VLC_FOURCC( 'a', 'v', 'c', 'i' ) /* heif */
+#define BRAND_avcs VLC_FOURCC( 'a', 'v', 'c', 's' ) /* heif */
+#define BRAND_avif VLC_FOURCC( 'a', 'v', 'i', 'f' ) /* heif AV1 AVIF */
+#define BRAND_avis VLC_FOURCC( 'a', 'v', 'i', 's' ) /* heig AV1 AVIF */
 
 #define ATOM_root VLC_FOURCC( 'r', 'o', 'o', 't' )
 #define ATOM_uuid VLC_FOURCC( 'u', 'u', 'i', 'd' )
@@ -415,6 +423,7 @@ typedef int64_t stime_t;
 #define ATOM_SA3D VLC_FOURCC( 'S', 'A', '3', 'D' )
 
 /* iso4 meta references */
+#define ATOM_idat VLC_FOURCC('i','d','a','t')
 #define ATOM_iloc VLC_FOURCC('i','l','o','c')
 #define ATOM_iinf VLC_FOURCC('i','i','n','f')
 #define ATOM_infe VLC_FOURCC('i','n','f','e')
@@ -1009,7 +1018,7 @@ typedef struct MP4_descriptor_SL_config_s
 } MP4_descriptor_SL_config_t;
 
 
-typedef struct MP4_descriptor_ES_s
+typedef struct MP4_descriptor_ES_s /* ISO/IEC 14496-1 8.3.3 ES_DescrTag */
 {
     uint16_t i_ES_ID;
     int      b_stream_dependence;
@@ -1366,71 +1375,11 @@ typedef struct
     } entries;
 } MP4_Box_data_sbgp_t;
 
-/* According to Apple's CoreAudio/CoreAudioTypes.h */
-#define MP4_CHAN_USE_CHANNELS_DESC           0
-#define MP4_CHAN_USE_CHANNELS_BITMAP         (1<<16)
-
-#define MP4_CHAN_BITMAP_LEFT                 (1<<0)
-#define MP4_CHAN_BITMAP_RIGHT                (1<<1)
-#define MP4_CHAN_BITMAP_CENTER               (1<<2)
-#define MP4_CHAN_BITMAP_LFESCREEN            (1<<3)
-#define MP4_CHAN_BITMAP_BACKLEFT             (1<<4)
-#define MP4_CHAN_BITMAP_BACKRIGHT            (1<<5)
-#define MP4_CHAN_BITMAP_LEFTCENTER           (1<<6)
-#define MP4_CHAN_BITMAP_RIGHTCENTER          (1<<7)
-#define MP4_CHAN_BITMAP_BACKCENTER           (1<<8)
-#define MP4_CHAN_BITMAP_SIDELEFT             (1<<9)
-#define MP4_CHAN_BITMAP_SIDERIGHT            (1<<10)
-#define MP4_CHAN_BITMAP_TOPCENTER            (1<<11)
-#define MP4_CHAN_BITMAP_TOPFRONTLEFT         (1<<12)
-#define MP4_CHAN_BITMAP_TOPFRONTENTER        (1<<13)
-#define MP4_CHAN_BITMAP_TOPFRONTRIGHT        (1<<14)
-#define MP4_CHAN_BITMAP_TOPBACKLEFT          (1<<15)
-#define MP4_CHAN_BITMAP_TOPBACKCENTER        (1<<16)
-#define MP4_CHAN_BITMAP_TOPBACKRIGHT         (1<<17)
-
-#define MP4_CHAN_BITMAP_MAPPING_COUNT 18
-static const struct
-{
-    uint32_t i_bitmap;
-    uint32_t i_vlc;
-} chan_bitmap_mapping[MP4_CHAN_BITMAP_MAPPING_COUNT] = {
-    { MP4_CHAN_BITMAP_LEFT,         AOUT_CHAN_LEFT },
-    { MP4_CHAN_BITMAP_RIGHT,        AOUT_CHAN_RIGHT },
-    { MP4_CHAN_BITMAP_CENTER,       AOUT_CHAN_CENTER },
-    { MP4_CHAN_BITMAP_LFESCREEN,    AOUT_CHAN_LFE },
-    { MP4_CHAN_BITMAP_BACKLEFT,     AOUT_CHAN_REARLEFT },
-    { MP4_CHAN_BITMAP_BACKRIGHT,    AOUT_CHAN_REARRIGHT },
-    { MP4_CHAN_BITMAP_LEFTCENTER,   AOUT_CHAN_MIDDLELEFT },
-    { MP4_CHAN_BITMAP_RIGHTCENTER,  AOUT_CHAN_MIDDLERIGHT },
-    { MP4_CHAN_BITMAP_BACKCENTER,   AOUT_CHAN_REARCENTER },
-    { MP4_CHAN_BITMAP_SIDELEFT,     AOUT_CHAN_LEFT },
-    { MP4_CHAN_BITMAP_SIDERIGHT,    AOUT_CHAN_RIGHT },
-    { MP4_CHAN_BITMAP_TOPCENTER,    AOUT_CHAN_CENTER },
-    { MP4_CHAN_BITMAP_TOPFRONTLEFT, AOUT_CHAN_LEFT },
-    { MP4_CHAN_BITMAP_TOPFRONTENTER,AOUT_CHAN_CENTER },
-    { MP4_CHAN_BITMAP_TOPFRONTRIGHT,AOUT_CHAN_RIGHT },
-    { MP4_CHAN_BITMAP_TOPBACKLEFT,  AOUT_CHAN_REARLEFT },
-    { MP4_CHAN_BITMAP_TOPBACKCENTER,AOUT_CHAN_REARCENTER },
-    { MP4_CHAN_BITMAP_TOPBACKRIGHT, AOUT_CHAN_REARRIGHT },
-};
-
 typedef struct
 {
     uint8_t i_version;
     uint32_t i_channels_flags; /* 24 bits */
-    struct
-    {
-        uint32_t i_channels_layout_tag;
-        uint32_t i_channels_bitmap;
-        uint32_t i_channels_description_count;
-        struct
-        {
-            uint32_t i_channel_label;
-            uint32_t i_channel_flags;
-            float    f_coordinates[3];
-        } *p_descriptions;
-    } layout;
+    struct CoreAudio_layout_s layout;
 } MP4_Box_data_chan_t;
 
 typedef struct

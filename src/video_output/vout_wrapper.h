@@ -2,7 +2,6 @@
  * vout_wrapper.h: definitions for vout wrappers (temporary)
  *****************************************************************************
  * Copyright (C) 2009 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
@@ -28,64 +27,15 @@
 
 /* XXX DO NOT use it outside the vout module wrapper XXX */
 
-/**
- * It retreives a picture pool from the display
- */
-static inline picture_pool_t *vout_display_Pool(vout_display_t *vd, unsigned count)
-{
-    return vd->pool(vd, count);
-}
+picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count);
 
-/**
- * It preparse a picture for display.
- */
-static inline void vout_display_Prepare(vout_display_t *vd,
-                                        picture_t *picture,
-                                        subpicture_t *subpicture,
-                                        vlc_tick_t date)
-{
-    if (vd->prepare)
-        vd->prepare(vd, picture, subpicture, date);
-}
-
-/**
- * It display a picture.
- */
-static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
-{
-    if (vd->display)
-        vd->display(vd, picture);
-    picture_Release(picture);
-}
-
-/**
- * It holds a state for a vout display.
- */
-typedef struct {
-    vout_display_cfg_t cfg;
-#if defined(_WIN32) || defined(__OS2__)
-    unsigned wm_state;
-#endif
-    vlc_rational_t sar;
-} vout_display_state_t;
-
-/**
- * It creates a vout managed display.
- */
-vout_display_t *vout_NewDisplay( vout_thread_t *, const video_format_t *,
-    const vout_display_state_t *, const char *module);
 /**
  * It destroy a vout managed display.
  */
-void vout_DeleteDisplay(vout_display_t *, vout_display_state_t *);
 bool vout_IsDisplayFiltered(vout_display_t *);
 picture_t * vout_FilterDisplay(vout_display_t *, picture_t *);
 void vout_FilterFlush(vout_display_t *);
-bool vout_AreDisplayPicturesInvalid(vout_display_t *);
 
-bool vout_ManageDisplay(vout_display_t *, bool allow_reset_pictures);
-
-void vout_SetDisplaySize(vout_display_t *, unsigned width, unsigned height);
 void vout_SetDisplayFilled(vout_display_t *, bool is_filled);
 void vout_SetDisplayZoom(vout_display_t *, unsigned num, unsigned den);
 void vout_SetDisplayAspect(vout_display_t *, unsigned num, unsigned den);

@@ -2,7 +2,6 @@
  * nuv.c:
  *****************************************************************************
  * Copyright (C) 2005 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gertjan Van Droogenbroeck <gertjanvd _PLUS_ vlc _AT_ gmail _DOT_ com>

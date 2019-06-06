@@ -1,0 +1,6 @@
+ - Remove input/control.c (move remaining implementation to player.c)
+ - Remove bookmark handling from input
+ - Remove INPUT_GET_VOUTS/INPUT_GET_AOUT
+ - Remove INPUT_GET_FULL_TITLE_INFO and priv->*title
+ - http cookies jar
+ - Seek callback

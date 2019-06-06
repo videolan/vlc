@@ -2,7 +2,6 @@
  * playtree.hpp
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
- * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -25,7 +24,7 @@
 #ifndef PLAYTREE_HPP
 #define PLAYTREE_HPP
 
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include "../utils/var_tree.hpp"
 
 #include <map>

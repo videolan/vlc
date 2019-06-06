@@ -41,7 +41,7 @@ namespace adaptive
                 void    disconnect  ();
 
             protected:
-                vlc_tls_creds_t *creds;
+                vlc_tls_client_t *creds;
                 vlc_tls_t *tls;
                 bool b_secure;
         };

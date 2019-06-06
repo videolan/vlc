@@ -2,7 +2,6 @@
  * vobsub.h: Vobsub support
  *****************************************************************************
  * Copyright (C) 2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: John Stebbins
  *

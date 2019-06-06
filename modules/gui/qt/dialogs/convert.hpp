@@ -2,7 +2,6 @@
  * convert.hpp : GotoTime dialogs
  ****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
- * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb (at) videolan.org>
  *

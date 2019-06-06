@@ -2,7 +2,6 @@
  * delay.c: delay a stream
  *****************************************************************************
  * Copyright © 2009-2011 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *

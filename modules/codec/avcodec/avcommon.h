@@ -2,7 +2,6 @@
  * avcommon.h: common code for libav*
  *****************************************************************************
  * Copyright (C) 2012 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Rafaël Carré <funman@videolanorg>
  *
@@ -59,6 +58,9 @@
 
 #define AV_OPTIONS_TEXT     N_("Advanced options")
 #define AV_OPTIONS_LONGTEXT N_("Advanced options, in the form {opt=val,opt2=val2}.")
+
+#define AV_RESET_TS_TEXT     N_("Reset timestamps")
+#define AV_RESET_TS_LONGTEXT N_("The muxed content will start near a 0 timestamp.")
 
 static inline void vlc_av_get_options(const char *psz_opts, AVDictionary** pp_dict)
 {
@@ -136,6 +138,10 @@ static inline void vlc_init_avcodec(vlc_object_t *obj)
 }
 #endif
 
+#ifndef AV_ERROR_MAX_STRING_SIZE
+ #define AV_ERROR_MAX_STRING_SIZE 64
+#endif
+
 static inline vlc_rational_t FromAVRational(const AVRational rat)
 {
     return (vlc_rational_t){.num = rat.num, .den = rat.den};
@@ -143,8 +149,19 @@ static inline vlc_rational_t FromAVRational(const AVRational rat)
 
 static inline void set_video_color_settings( const video_format_t *p_fmt, AVCodecContext *p_context )
 {
-    if( p_fmt->b_color_range_full )
+    switch( p_fmt->color_range )
+    {
+    case COLOR_RANGE_FULL:
         p_context->color_range = AVCOL_RANGE_JPEG;
+        break;
+    case COLOR_RANGE_LIMITED:
+        p_context->color_range = AVCOL_RANGE_MPEG;
+    case COLOR_RANGE_UNDEF: /* do nothing */
+        break;
+    default:
+        p_context->color_range = AVCOL_RANGE_UNSPECIFIED;
+        break;
+    }
 
     switch( p_fmt->space )
     {
@@ -208,6 +225,30 @@ static inline void set_video_color_settings( const video_format_t *p_fmt, AVCode
             break;
         default:
             p_context->color_primaries = AVCOL_PRI_UNSPECIFIED;
+            break;
+    }
+    switch( p_fmt->chroma_location )
+    {
+        case CHROMA_LOCATION_LEFT:
+            p_context->chroma_sample_location = AVCHROMA_LOC_LEFT;
+            break;
+        case CHROMA_LOCATION_CENTER:
+            p_context->chroma_sample_location = AVCHROMA_LOC_CENTER;
+            break;
+        case CHROMA_LOCATION_TOP_LEFT:
+            p_context->chroma_sample_location = AVCHROMA_LOC_TOPLEFT;
+            break;
+        case CHROMA_LOCATION_TOP_CENTER:
+            p_context->chroma_sample_location = AVCHROMA_LOC_TOP;
+            break;
+        case CHROMA_LOCATION_BOTTOM_LEFT:
+            p_context->chroma_sample_location = AVCHROMA_LOC_BOTTOMLEFT;
+            break;
+        case CHROMA_LOCATION_BOTTOM_CENTER:
+            p_context->chroma_sample_location = AVCHROMA_LOC_BOTTOM;
+            break;
+        default:
+            p_context->chroma_sample_location = AVCHROMA_LOC_UNSPECIFIED;
             break;
     }
 }

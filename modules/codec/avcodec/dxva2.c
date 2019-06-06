@@ -3,7 +3,6 @@
  *****************************************************************************
  * Copyright (C) 2009 Geoffroy Couprie
  * Copyright (C) 2009 Laurent Aimar
- * $Id$
  *
  * Authors: Geoffroy Couprie <geal@videolan.org>
  *          Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
@@ -149,7 +148,6 @@ static int DxSetupOutput(vlc_va_t *, const GUID *, const video_format_t *);
 static int DxCreateVideoDecoder(vlc_va_t *, int codec_id,
                                 const video_format_t *, unsigned surface_count);
 static void DxDestroyVideoDecoder(vlc_va_t *);
-static int DxResetVideoDecoder(vlc_va_t *);
 static void SetupAVCodecContext(vlc_va_t *);
 
 void SetupAVCodecContext(vlc_va_t *va)
@@ -222,12 +220,11 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 
     /* Check the device */
     HRESULT hr = IDirect3DDeviceManager9_TestDevice(sys->devmng, sys->device);
-    if (hr == DXVA2_E_NEW_VIDEO_DEVICE) {
-        msg_Warn(va, "New video device detected.");
-        if (DxResetVideoDecoder(va))
-            return VLC_EGENERIC;
-    } else if (FAILED(hr)) {
-        msg_Err(va, "IDirect3DDeviceManager9_TestDevice %u", (unsigned)hr);
+    if (FAILED(hr)) {
+        if (hr == DXVA2_E_NEW_VIDEO_DEVICE)
+            msg_Warn(va, "New video device detected.");
+        else
+            msg_Err(va, "device not usable. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
 
@@ -250,7 +247,6 @@ static void Close(vlc_va_t *va, void **ctx)
     if (sys->dxva2_dll)
         FreeLibrary(sys->dxva2_dll);
 
-    free((char *)va->description);
     free(sys);
 }
 
@@ -270,7 +266,26 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         return VLC_ENOMEM;
 
     /* Load dll*/
-    if (D3D9_Create(va, &sys->hd3d) != VLC_SUCCESS) {
+    if (p_sys!=NULL && p_sys->surface!=NULL)
+    {
+        IDirect3DDevice9 *device;
+        if ( FAILED(IDirect3DSurface9_GetDevice( p_sys->surface, &device )) )
+        {
+            free( sys );
+            goto error;
+        }
+        if ( D3D9_CreateExternal(va, &sys->hd3d, device) != VLC_SUCCESS ||
+             FAILED(D3D9_CreateDeviceExternal( device, &sys->hd3d, 0, &fmt->video, &sys->d3d_dev)) )
+        {
+            IDirect3DDevice9_Release(device);
+            free( sys );
+            goto error;
+        }
+        D3DSURFACE_DESC src;
+        if (SUCCEEDED(IDirect3DSurface9_GetDesc(p_sys->surface, &src)))
+            sys->render = src.Format;
+    }
+    else if (D3D9_Create(va, &sys->hd3d) != VLC_SUCCESS) {
         msg_Warn(va, "cannot load d3d9.dll");
         free( sys );
         goto error;
@@ -302,15 +317,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     va->sys = sys;
 
-    if (p_sys!=NULL)
-    {
-        D3DSURFACE_DESC src;
-        if (SUCCEEDED(IDirect3DSurface9_GetDesc(p_sys->surface, &src)))
-            sys->render = src.Format;
-        IDirect3DSurface9_GetDevice(p_sys->surface, &sys->d3d_dev.dev );
-        sys->d3d_dev.owner = false;
-    }
-
     err = directx_va_Open(va, &sys->dx_sys);
     if (err!=VLC_SUCCESS)
         goto error;
@@ -319,10 +325,15 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (err != VLC_SUCCESS)
         goto error;
 
+    /* TODO print the hardware name/vendor for debugging purposes */
+    char *desc = DxDescribe(sys);
+    if (desc != NULL) {
+        msg_Info(va, "Using %s", desc);
+        free(desc);
+    }
+
     ctx->hwaccel_context = &sys->hw;
 
-    /* TODO print the hardware name/vendor for debugging purposes */
-    va->description = DxDescribe(sys);
     va->get     = Get;
     return VLC_SUCCESS;
 
@@ -719,10 +730,4 @@ static void DxDestroyVideoDecoder(vlc_va_t *va)
         for (unsigned i = 0; i < dx_sys->va_pool.surface_count; i++)
             IDirect3DSurface9_Release(dx_sys->hw_surface[i]);
     }
-}
-
-static int DxResetVideoDecoder(vlc_va_t *va)
-{
-    msg_Err(va, "DxResetVideoDecoder unimplemented");
-    return VLC_EGENERIC;
 }

@@ -1,0 +1,11 @@
+--- glslang/CMakeLists.txt.win32	2019-01-28 14:20:18.208266400 +0100
++++ glslang/CMakeLists.txt	2019-01-28 14:19:39.874088600 +0100
+@@ -52,7 +52,7 @@ if(ENABLE_HLSL)
+ endif(ENABLE_HLSL)
+ 
+ if(WIN32)
+-    set(CMAKE_DEBUG_POSTFIX "d")
++    #set(CMAKE_DEBUG_POSTFIX "d")
+     if(MSVC)
+         include(ChooseMSVCCRT.cmake)
+     endif(MSVC)

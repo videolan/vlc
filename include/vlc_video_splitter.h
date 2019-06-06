@@ -2,7 +2,6 @@
  * vlc_video_splitter.h: "video splitter" related structures and functions
  *****************************************************************************
  * Copyright (C) 2009 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
@@ -27,6 +26,7 @@
 #include <vlc_es.h>
 #include <vlc_picture.h>
 #include <vlc_mouse.h>
+#include <vlc_vout_display.h>
 
 /**
  * \file
@@ -34,8 +34,8 @@
  */
 
 typedef struct video_splitter_t video_splitter_t;
-typedef struct video_splitter_sys_t video_splitter_sys_t;
-typedef struct video_splitter_owner_t video_splitter_owner_t;
+
+struct vout_window_mouse_event_t;
 
 /** Structure describing a video splitter output properties
  */
@@ -55,7 +55,7 @@ typedef struct
 
         /* Alignment inside the window
          */
-        int i_align;
+        vlc_video_align_t align;
     } window;
 
     /* Video output module
@@ -93,16 +93,10 @@ struct video_splitter_t
 
     int             (*pf_filter)( video_splitter_t *, picture_t *pp_dst[],
                                   picture_t *p_src );
-    int             (*pf_mouse) ( video_splitter_t *, vlc_mouse_t *,
-                                  int i_index,
-                                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new );
+    int (*mouse)(video_splitter_t *, int idx,
+                 struct vout_window_mouse_event_t *);
 
-    video_splitter_sys_t *p_sys;
-
-    /* Buffer allocation */
-    int  (*pf_picture_new) ( video_splitter_t *, picture_t *pp_picture[] );
-    void (*pf_picture_del) ( video_splitter_t *, picture_t *pp_picture[] );
-    video_splitter_owner_t *p_owner;
+    void *p_sys;
 };
 
 /**
@@ -113,13 +107,20 @@ struct video_splitter_t
  *
  * If VLC_SUCCESS is not returned, pp_picture values are undefined.
  */
-static inline int video_splitter_NewPicture( video_splitter_t *p_splitter,
-                                             picture_t *pp_picture[] )
+static inline int video_splitter_NewPicture(video_splitter_t *splitter,
+                                            picture_t *pics[])
 {
-    int i_ret = p_splitter->pf_picture_new( p_splitter, pp_picture );
-    if( i_ret )
-        msg_Warn( p_splitter, "can't get output pictures" );
-    return i_ret;
+    for (int i = 0; i < splitter->i_output; i++) {
+        pics[i] = picture_NewFromFormat(&splitter->p_output[i].fmt);
+        if (pics[i] == NULL) {
+            for (int j = 0; j < i; j++)
+                picture_Release(pics[j]);
+
+            msg_Warn(splitter, "can't get output pictures");
+            return VLC_EGENERIC;
+        }
+    }
+    return VLC_SUCCESS;
 }
 
 /**
@@ -129,7 +130,8 @@ static inline int video_splitter_NewPicture( video_splitter_t *p_splitter,
 static inline void video_splitter_DeletePicture( video_splitter_t *p_splitter,
                                                  picture_t *pp_picture[] )
 {
-    p_splitter->pf_picture_del( p_splitter, pp_picture );
+    for (int i = 0; i < p_splitter->i_output; i++)
+        picture_Release(pp_picture[i]);
 }
 
 /* */
@@ -141,17 +143,12 @@ static inline int video_splitter_Filter( video_splitter_t *p_splitter,
 {
     return p_splitter->pf_filter( p_splitter, pp_dst, p_src );
 }
-static inline int video_splitter_Mouse( video_splitter_t *p_splitter,
-                                        vlc_mouse_t *p_mouse,
-                                        int i_index,
-                                        const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+
+static inline int video_splitter_Mouse(video_splitter_t *splitter, int index,
+                                       struct vout_window_mouse_event_t *ev)
 {
-    if( !p_splitter->pf_mouse )
-    {
-        *p_mouse = *p_new;
-        return VLC_SUCCESS;
-    }
-    return p_splitter->pf_mouse( p_splitter, p_mouse, i_index, p_old, p_new );
+    return (splitter->mouse != NULL)
+        ? splitter->mouse(splitter, index, ev) : VLC_SUCCESS;
 }
 
 #endif /* VLC_VIDEO_SPLITTER_H */

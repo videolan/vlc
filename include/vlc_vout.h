@@ -2,7 +2,6 @@
  * vlc_vout.h: common video definitions
  *****************************************************************************
  * Copyright (C) 1999 - 2008 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -77,6 +76,15 @@ struct vout_thread_t {
  *****************************************************************************/
 
 /**
+ * Destroys a vout.
+ *
+ * This function closes and releases a vout created by vout_Request().
+ *
+ * \param vout the vout to close
+ */
+VLC_API void vout_Close(vout_thread_t *vout);
+
+/**
  * This function will handle a snapshot request.
  *
  * pp_image, pp_picture and p_fmt can be NULL otherwise they will be
@@ -96,15 +104,15 @@ VLC_API int vout_GetSnapshot( vout_thread_t *p_vout,
                               video_format_t *p_fmt,
                               const char *psz_format, vlc_tick_t i_timeout );
 
-VLC_API void vout_ChangeAspectRatio( vout_thread_t *p_vout,
-                                     unsigned int i_num, unsigned int i_den );
-
 /* */
 VLC_API picture_t * vout_GetPicture( vout_thread_t * );
 VLC_API void vout_PutPicture( vout_thread_t *, picture_t * );
 
 /* Subpictures channels ID */
+#define VOUT_SPU_CHANNEL_INVALID      (-1) /* Always fails in comparison */
 #define VOUT_SPU_CHANNEL_OSD            1 /* OSD channel is automatically cleared */
+#define VOUT_SPU_CHANNEL_OSD_HSLIDER    2
+#define VOUT_SPU_CHANNEL_OSD_VSLIDER    3
 #define VOUT_SPU_CHANNEL_AVAIL_FIRST    8 /* Registerable channels from this offset */
 
 /* */

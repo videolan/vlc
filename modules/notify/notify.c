@@ -2,7 +2,6 @@
  * notify.c : libnotify notification plugin
  *****************************************************************************
  * Copyright (C) 2006-2009 the VideoLAN team
- * $Id$
  *
  * Authors: Christophe Mutricy <xtophe -at- videolan -dot- org>
  *
@@ -33,7 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_input.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_url.h>
 
 #include <gtk/gtk.h>

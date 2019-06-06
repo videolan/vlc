@@ -1,0 +1,51 @@
+From 35f1bcc4885f84b3c4836ba1ffea8db6ec4f2682 Mon Sep 17 00:00:00 2001
+From: Francois Cartegnie <fcvlcdev@free.fr>
+Date: Tue, 13 Nov 2018 23:10:30 +0100
+Subject: [PATCH] keep on with menuless user selected streams between clips
+
+---
+ src/libbluray/bluray.c | 20 ++------------------
+ 1 file changed, 2 insertions(+), 18 deletions(-)
+
+diff --git a/src/libbluray/bluray.c b/src/libbluray/bluray.c
+index 1728801..aa3135e 100644
+--- a/src/libbluray/bluray.c
++++ b/src/libbluray/bluray.c
+@@ -323,24 +323,8 @@ static void _update_clip_psrs(BLURAY *bd, NAV_CLIP *clip)
+     /* Update selected audio and subtitle stream PSRs when not using menus.
+      * Selection is based on language setting PSRs and clip STN.
+      */
+-    if (bd->title_type == title_undef) {
+-
+-        if (stn->num_audio) {
+-            _update_stream_psr_by_lang(bd->regs,
+-                                       PSR_AUDIO_LANG, PSR_PRIMARY_AUDIO_ID, 0,
+-                                       stn->audio, stn->num_audio,
+-                                       &audio_lang, 0);
+-        }
+-
+-        if (stn->num_pg) {
+-            _update_stream_psr_by_lang(bd->regs,
+-                                       PSR_PG_AND_SUB_LANG, PSR_PG_STREAM, 0x80000000,
+-                                       stn->pg, stn->num_pg,
+-                                       NULL, audio_lang);
+-        }
+-
+     /* Validate selected audio, subtitle and IG stream PSRs when using menus */
+-    } else {
++    {
+         uint32_t psr_val;
+ 
+         if (stn->num_audio) {
+@@ -367,7 +351,7 @@ static void _update_clip_psrs(BLURAY *bd, NAV_CLIP *clip)
+             }
+             bd_psr_unlock(bd->regs);
+         }
+-        if (stn->num_ig) {
++        if (stn->num_ig && bd->title_type != title_undef) {
+             bd_psr_lock(bd->regs);
+             psr_val = bd_psr_read(bd->regs, PSR_IG_STREAM_ID);
+             if ((psr_val == 0) || (psr_val > stn->num_ig)) {
+-- 
+2.17.2
+

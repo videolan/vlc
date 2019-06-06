@@ -2,7 +2,6 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -484,15 +483,19 @@ static int PrepareSamples( const avi_stream_t *p_stream,
         (p_fmt->video.i_bmask != 0xFF0000 ||
          p_fmt->video.i_rmask != 0x0000FF) )
     {
+        unsigned rshift = ctz(p_fmt->video.i_rmask);
+        unsigned gshift = ctz(p_fmt->video.i_gmask);
+        unsigned bshift = ctz(p_fmt->video.i_bmask);
+
         uint8_t *p_data = (*pp_block)->p_buffer;
         for( size_t i=0; i<(*pp_block)->i_buffer / 3; i++ )
         {
             uint8_t *p = &p_data[i*3];
             /* reorder as BGR using shift value (done by FixRGB) */
             uint32_t v = (p[0] << 16) | (p[1] << 8) | p[2];
-            p[0] = (v & p_fmt->video.i_bmask) >> p_fmt->video.i_lbshift;
-            p[1] = (v & p_fmt->video.i_gmask) >> p_fmt->video.i_lgshift;
-            p[2] = (v & p_fmt->video.i_rmask) >> p_fmt->video.i_lrshift;
+            p[0] = (v & p_fmt->video.i_bmask) >> bshift;
+            p[1] = (v & p_fmt->video.i_gmask) >> gshift;
+            p[2] = (v & p_fmt->video.i_rmask) >> rshift;
         }
     }
 

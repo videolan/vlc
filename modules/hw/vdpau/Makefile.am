@@ -30,7 +30,7 @@ libvdpau_chroma_plugin_la_SOURCES = hw/vdpau/chroma.c hw/vdpau/picture.c
 libvdpau_chroma_plugin_la_CFLAGS = $(AM_CFLAGS) $(VDPAU_CFLAGS)
 libvdpau_chroma_plugin_la_LIBADD = libvlc_vdpau.la
 
-libvdpau_display_plugin_la_SOURCES = hw/vdpau/display.c
+libvdpau_display_plugin_la_SOURCES = hw/vdpau/display.c hw/vdpau/picture.c
 libvdpau_display_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/video_output/xcb
 libvdpau_display_plugin_la_CFLAGS = $(AM_CFLAGS) $(XCB_CFLAGS) $(VDPAU_CFLAGS)
 libvdpau_display_plugin_la_LIBADD = libvlc_vdpau.la libvlc_xcb_events.la \

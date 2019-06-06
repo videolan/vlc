@@ -2,7 +2,6 @@
  * control.h : vout internal control
  *****************************************************************************
  * Copyright (C) 2009-2010 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
@@ -29,22 +28,14 @@
 /* */
 enum {
     VOUT_CONTROL_CLEAN,
-    VOUT_CONTROL_REINIT,                /* cfg */
-    VOUT_CONTROL_CANCEL,
 
 #if 0
     /* */
     VOUT_CONTROL_START,
     VOUT_CONTROL_STOP,
 #endif
-    VOUT_CONTROL_SUBPICTURE,            /* subpicture */
-    VOUT_CONTROL_FLUSH_SUBPICTURE,      /* integer */
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
-
-    VOUT_CONTROL_PAUSE,
-    VOUT_CONTROL_FLUSH,                 /* time */
-    VOUT_CONTROL_STEP,                  /* time_ptr */
 
     VOUT_CONTROL_MOUSE_STATE,           /* vlc_mouse_t */
     VOUT_CONTROL_DISPLAY_SIZE,          /* window */
@@ -63,18 +54,11 @@ typedef struct {
 
     union {
         bool    boolean;
-        vlc_tick_t time;
-        vlc_tick_t *time_ptr;
         char    *string;
-        int     integer;
         struct {
             int a;
             int b;
         } pair;
-        struct {
-            bool is_on;
-            vlc_tick_t date;
-        } pause;
         struct {
             unsigned left;
             unsigned top;
@@ -88,8 +72,6 @@ typedef struct {
             unsigned height;
         } window;
         vlc_mouse_t mouse;
-        const vout_configuration_t *cfg;
-        subpicture_t *subpicture;
         vlc_viewpoint_t viewpoint;
     };
 } vout_control_cmd_t;
@@ -100,12 +82,13 @@ void vout_control_cmd_Clean(vout_control_cmd_t *);
 typedef struct {
     vlc_mutex_t lock;
     vlc_cond_t  wait_request;
-    vlc_cond_t  wait_acknowledge;
+    vlc_cond_t  wait_available;
 
     /* */
     bool is_dead;
     bool can_sleep;
-    bool is_processing;
+    bool is_waiting;
+    bool is_held;
     DECL_ARRAY(vout_control_cmd_t) cmd;
 } vout_control_t;
 
@@ -119,11 +102,11 @@ void vout_control_WaitEmpty(vout_control_t *);
 void vout_control_Push(vout_control_t *, vout_control_cmd_t *);
 void vout_control_PushVoid(vout_control_t *, int type);
 void vout_control_PushBool(vout_control_t *, int type, bool boolean);
-void vout_control_PushInteger(vout_control_t *, int type, int integer);
-void vout_control_PushTime(vout_control_t *, int type, vlc_tick_t time);
 void vout_control_PushPair(vout_control_t *, int type, int a, int b);
 void vout_control_PushString(vout_control_t *, int type, const char *string);
 void vout_control_Wake(vout_control_t *);
+void vout_control_Hold(vout_control_t *);
+void vout_control_Release(vout_control_t *);
 
 /* control inside of the vout thread */
 int vout_control_Pop(vout_control_t *, vout_control_cmd_t *, vlc_tick_t deadline);

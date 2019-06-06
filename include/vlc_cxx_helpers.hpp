@@ -122,6 +122,143 @@ inline std::unique_ptr<T[], void (*)(void*)> wrap_carray( T* ptr ) noexcept
 
 } // anonymous namespace
 
+///
+/// Wraps a C shared resource having associated Hold() and Release() functions
+//
+/// This is a RAII wrapper for C shared resources (which are manually managed by
+/// calling explicitly their Hold() and Release() functions).
+///
+/// The Hold() and Release() functions must accept exactly one parameter having
+/// type T* (the raw pointer type). Their return type is irrelevant.
+///
+/// To create a new shared resource wrapper type for my_type_t, simply declare:
+///
+///     using MyTypePtr =
+///         vlc_shared_data_ptr_type(my_type_t, my_type_Hold, my_type_Release);
+///
+/// Then use it to wrap a raw C pointer:
+///
+///     my_type_t *raw_ptr = /* ... */;
+///     MyTypePtr ptr(raw_ptr);
+
+// In C++17, the template declaration could be replaced by:
+//     template<typename T, auto HOLD, auto RELEASE>
+template <typename T, typename H, typename R, H HOLD, R RELEASE>
+class vlc_shared_data_ptr {
+    T *ptr = nullptr;
+
+public:
+    /* default implicit constructor */
+    vlc_shared_data_ptr() = default;
+
+    /**
+     * Wrap a shared resource.
+     *
+     * If the pointer is not nullptr, and hold is true, then the resource is
+     * hold (the caller shared ownership is preserved).
+     * If hold is false, then the caller transfers the ownership to this
+     * wrapper.
+     *
+     * \param ptr  the raw pointer (can be nullptr)
+     * \param hold whether the resource must be hold
+     */
+    explicit vlc_shared_data_ptr(T *ptr, bool hold = true)
+        : ptr(ptr)
+    {
+        if (ptr && hold)
+            HOLD(ptr);
+    }
+
+    vlc_shared_data_ptr(const vlc_shared_data_ptr &other)
+        : vlc_shared_data_ptr(other.ptr) {}
+
+    vlc_shared_data_ptr(vlc_shared_data_ptr &&other) noexcept
+        : ptr(other.ptr)
+    {
+        other.ptr = nullptr;
+    }
+
+    ~vlc_shared_data_ptr()
+    {
+        if (ptr)
+            RELEASE(ptr);
+    }
+
+    vlc_shared_data_ptr &operator=(const vlc_shared_data_ptr &other)
+    {
+        reset(other.ptr, true);
+        return *this;
+    }
+
+    vlc_shared_data_ptr &operator=(vlc_shared_data_ptr &&other) noexcept
+    {
+        reset(other.ptr, false);
+        other.ptr = nullptr;
+        return *this;
+    }
+
+    bool operator==(const vlc_shared_data_ptr &other) const
+    {
+        return ptr == other.ptr;
+    }
+
+    bool operator!=(const vlc_shared_data_ptr &other) const
+    {
+        return !(*this == other);
+    }
+
+    explicit operator bool() const
+    {
+        return ptr;
+    }
+
+    T &operator*() const
+    {
+        return *ptr;
+    }
+
+    T *operator->() const
+    {
+        return ptr;
+    }
+
+    T *get() const
+    {
+        return ptr;
+    }
+
+    /**
+     * Reset the shared resource.
+     *
+     *     ptr.reset(rawptr, hold);
+     *
+     * is semantically equivalent to:
+     *
+     *     ptr = vlc_shared_data_ptr<...>(rawptr, hold);
+     *
+     * If the pointer is not nullptr, and hold is true, then the resource is
+     * hold (the caller shared ownership is preserved).
+     * If hold is false, then the caller transfers the ownership to this
+     * wrapper.
+     *
+     * \param ptr  the raw pointer (can be nullptr)
+     * \param hold whether the resource must be hold
+     */
+    void reset(T *newptr = nullptr, bool hold = true)
+    {
+        if (newptr && hold)
+            HOLD(newptr);
+        if (ptr)
+            RELEASE(ptr);
+        ptr = newptr;
+    }
+};
+
+// useful due to the unnecessarily complex template declaration before C++17
+#define vlc_shared_data_ptr_type(type, hold, release) \
+    ::vlc::vlc_shared_data_ptr<type, decltype(&hold), decltype(&release), \
+                               &hold, &release>
+
 #ifdef VLC_THREADS_H_
 
 namespace threads

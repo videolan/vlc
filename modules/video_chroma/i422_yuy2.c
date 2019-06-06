@@ -2,7 +2,6 @@
  * i422_yuy2.c : Planar YUV 4:2:2 to Packed YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Damien Fouilleul <damienf@videolan.org>

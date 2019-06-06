@@ -1,0 +1,37 @@
+From 45e48b777207853d7b125612b40b5d8fde101634 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Mon, 3 Dec 2018 14:13:26 +0100
+Subject: [PATCH] compat: Don't use _pipe when building for winstore
+
+---
+ compat/compat.h | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/compat/compat.h b/compat/compat.h
+index 4eef355..b7f878c 100644
+--- a/compat/compat.h
++++ b/compat/compat.h
+@@ -66,13 +66,18 @@ char *strndup(const char *str, size_t n);
+ #endif
+ 
+ #if !defined(HAVE_PIPE) && defined(HAVE__PIPE)
+-#include <fcntl.h>
+-#define HAVE_PIPE
++# ifdef _WIN32
++#  include <winapifamily.h>
++# endif
++# if !defined(_WIN32) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++#  include <fcntl.h>
++#  define HAVE_PIPE
+ static inline int pipe(int fds[2])
+ {
+     return _pipe(fds, 32768, O_NOINHERIT | O_BINARY);
+ }
+ #endif
++#endif
+ 
+ #ifndef _WIN32
+ #define closesocket(fd) close(fd)
+-- 
+2.19.2
+

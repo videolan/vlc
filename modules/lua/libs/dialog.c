@@ -2,7 +2,6 @@
  * dialog.c: Functions to create interface dialogs from Lua extensions
  *****************************************************************************
  * Copyright (C) 2009-2010 VideoLAN and authors
- * $Id$
  *
  * Authors: Jean-Philippe André < jpeg # videolan.org >
  *
@@ -381,7 +380,7 @@ static int lua_GetDialogUpdate( lua_State *L )
     /* Read entry in the Lua registry */
     lua_pushlightuserdata( L, (void*) &key_update );
     lua_gettable( L, LUA_REGISTRYINDEX );
-    return luaL_checkint( L, -1 );
+    return luaL_checkinteger( L, -1 );
 }
 
 /** Manually update a dialog
@@ -572,22 +571,22 @@ static int vlclua_create_widget_inner( lua_State *L, int i_args,
 
     /* Set common arguments: col, row, hspan, vspan, width, height */
     if( lua_isnumber( L, arg ) )
-        p_widget->i_column = luaL_checkint( L, arg );
+        p_widget->i_column = luaL_checkinteger( L, arg );
     else goto end_of_args;
     if( lua_isnumber( L, ++arg ) )
-        p_widget->i_row = luaL_checkint( L, arg );
+        p_widget->i_row = luaL_checkinteger( L, arg );
     else goto end_of_args;
     if( lua_isnumber( L, ++arg ) )
-        p_widget->i_horiz_span = luaL_checkint( L, arg );
+        p_widget->i_horiz_span = luaL_checkinteger( L, arg );
     else goto end_of_args;
     if( lua_isnumber( L, ++arg ) )
-        p_widget->i_vert_span = luaL_checkint( L, arg );
+        p_widget->i_vert_span = luaL_checkinteger( L, arg );
     else goto end_of_args;
     if( lua_isnumber( L, ++arg ) )
-        p_widget->i_width = luaL_checkint( L, arg );
+        p_widget->i_width = luaL_checkinteger( L, arg );
     else goto end_of_args;
     if( lua_isnumber( L, ++arg ) )
-        p_widget->i_height = luaL_checkint( L, arg );
+        p_widget->i_height = luaL_checkinteger( L, arg );
     else goto end_of_args;
 
 end_of_args:

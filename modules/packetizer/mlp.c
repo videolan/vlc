@@ -2,7 +2,6 @@
  * mlp.c: packetize MLP/TrueHD audio
  *****************************************************************************
  * Copyright (C) 2008 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar < fenrir _AT videolan _DOT_ org >
  *

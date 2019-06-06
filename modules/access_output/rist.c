@@ -110,6 +110,8 @@ static struct rist_flow *rist_init_tx()
         free(flow);
         return NULL;
     }
+    flow->fd_out = -1;
+    flow->fd_rtcp = -1;
 
     return flow;
 }
@@ -126,20 +128,29 @@ static struct rist_flow *rist_udp_transmitter(sout_access_out_t *p_access, char 
     if (flow->fd_out < 0)
     {
         msg_Err( p_access, "cannot open output socket" );
-        return NULL;
+        goto fail;
     }
 
     flow->fd_rtcp = net_ConnectDgram(p_access, psz_dst_server, i_dst_port + 1, -1, IPPROTO_UDP );
     if (flow->fd_rtcp < 0)
     {
         msg_Err( p_access, "cannot open nack socket" );
-        return NULL;
+        goto fail;
     }
 
     populate_cname(flow->fd_rtcp, flow->cname);
     msg_Info(p_access, "our cname is %s", flow->cname);
 
     return flow;
+
+fail:
+    if (flow->fd_out != -1)
+        vlc_close(flow->fd_out);
+    if (flow->fd_rtcp != -1)
+        vlc_close(flow->fd_rtcp);
+    free(flow->buffer);
+    free(flow);
+    return NULL;
 }
 
 static void rist_retransmit(sout_access_out_t *p_access, struct rist_flow *flow, uint16_t seq)
@@ -173,7 +184,10 @@ static void rist_retransmit(sout_access_out_t *p_access, struct rist_flow *flow,
             seq, age, flow->wi);
         p_sys->i_retransmit_packets++;
         vlc_mutex_lock( &p_sys->fd_lock );
-        rist_Write(flow->fd_out, pkt->buffer->p_buffer, pkt->buffer->i_buffer);
+        if (rist_Write(flow->fd_out, pkt->buffer->p_buffer, pkt->buffer->i_buffer) 
+                != (ssize_t)pkt->buffer->i_buffer) {
+            msg_Err(p_access, "Error sending retransmitted packet after 2 tries ...");
+        }
         vlc_mutex_unlock( &p_sys->fd_lock );
     }
 }
@@ -333,7 +347,9 @@ static void rist_rtcp_send(sout_access_out_t *p_access)
     rtcp_sr_set_length(p_sr, 6);
     rtcp_fb_set_int_ssrc_pkt_sender(p_sr, p_sys->ssrc);
     rtcp_sr_set_ntp_time_msw(p_sr, tv.tv_sec + SEVENTY_YEARS_OFFSET);
-    fractions = (tv.tv_usec << 32ULL) / 1000000ULL;
+    fractions = (uint64_t)tv.tv_usec;
+    fractions <<= 32ULL;
+    fractions /= 1000000ULL;
     rtcp_sr_set_ntp_time_lsw(p_sr, (uint32_t)fractions);
     rtcp_sr_set_rtp_time(p_sr, rtp_get_ts(vlc_tick_now()));
     vlc_mutex_lock( &p_sys->lock );
@@ -368,7 +384,7 @@ static void *rist_thread(void *data)
     uint8_t pkt[RTP_PKT_SIZE];
     struct pollfd pfd[1];
     int ret;
-    int r;
+    ssize_t r;
 
     pfd[0].fd = p_sys->flow->fd_rtcp;
     pfd[0].events = POLLIN;
@@ -382,7 +398,7 @@ static void *rist_thread(void *data)
             {
                 r = rist_Read(p_sys->flow->fd_rtcp, pkt, RTP_PKT_SIZE);
                 if (r == RTP_PKT_SIZE) {
-                    msg_Err(p_access, "Rist RTCP messsage is too big (%d bytes) and was probably " \
+                    msg_Err(p_access, "Rist RTCP messsage is too big (%zd bytes) and was probably " \
                         "cut, please keep it under %d bytes", r, RTP_PKT_SIZE);
                 }
                 if (unlikely(r == -1)) {
@@ -677,15 +693,11 @@ static int Open( vlc_object_t *p_this )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    p_sys->rtp_counter = 0;
-    p_sys->last_rtcp_tx = 0;
-    memset(p_sys->receiver_name, 0, MAX_CNAME);
-
     int i_dst_port = RIST_DEFAULT_PORT;
     char *psz_dst_addr;
     char *psz_parser = psz_dst_addr = strdup( p_access->psz_path );
     if( !psz_dst_addr )
-        goto failed;
+        return VLC_ENOMEM;
 
     if ( psz_parser[0] == '[' )
         psz_parser = strchr( psz_parser, ']' );
@@ -763,10 +775,10 @@ failed:
     "a near jitter free output. Be aware that this setting will also add to " \
     "the overall latency of the stream." )
 
-#define BUFFER_TEXT N_("RIST client side buffer size (ms)")
+#define BUFFER_TEXT N_("RIST retry-buffer queue size (ms)")
 #define BUFFER_LONGTEXT N_( \
     "This must match the buffer size (latency) configured on the server side. If you " \
-    "are not sure, leave the default of -1 which will set it the maximum " \
+    "are not sure, leave the default of 0 which will set it the maximum " \
     "value and will use about 100MB of RAM" )
 
 #define SSRC_TEXT N_("SSRC used in RTP output (default is random, i.e. 0)")

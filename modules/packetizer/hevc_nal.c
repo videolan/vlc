@@ -1193,7 +1193,7 @@ bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
                            video_color_primaries_t *p_primaries,
                            video_transfer_func_t *p_transfer,
                            video_color_space_t *p_colorspace,
-                           bool *p_full_range )
+                           video_color_range_t *p_full_range )
 {
     if( !p_sps->vui_parameters_present_flag )
         return false;
@@ -1203,7 +1203,7 @@ bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
         iso_23001_8_tc_to_vlc_xfer( p_sps->vui.vs.colour.transfer_characteristics );
     *p_colorspace =
         iso_23001_8_mc_to_vlc_coeffs( p_sps->vui.vs.colour.matrix_coeffs );
-    *p_full_range = p_sps->vui.vs.video_full_range_flag;
+    *p_full_range = p_sps->vui.vs.video_full_range_flag ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
     return true;
 }
 

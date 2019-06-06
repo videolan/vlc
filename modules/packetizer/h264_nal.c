@@ -802,7 +802,7 @@ bool h264_get_colorimetry( const h264_sequence_parameter_set_t *p_sps,
                            video_color_primaries_t *p_primaries,
                            video_transfer_func_t *p_transfer,
                            video_color_space_t *p_colorspace,
-                           bool *p_full_range )
+                           video_color_range_t *p_full_range )
 {
     if( !p_sps->vui.b_valid )
         return false;
@@ -812,7 +812,7 @@ bool h264_get_colorimetry( const h264_sequence_parameter_set_t *p_sps,
         iso_23001_8_tc_to_vlc_xfer( p_sps->vui.colour.i_transfer_characteristics );
     *p_colorspace =
         iso_23001_8_mc_to_vlc_coeffs( p_sps->vui.colour.i_matrix_coefficients );
-    *p_full_range = p_sps->vui.colour.b_full_range;
+    *p_full_range = p_sps->vui.colour.b_full_range ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
     return true;
 }
 

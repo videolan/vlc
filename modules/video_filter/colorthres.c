@@ -2,7 +2,6 @@
  * colorthres.c: Threshold color based on similarity to reference color
  *****************************************************************************
  * Copyright (C) 2000-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Sigmund Augdal <dnumgis@videolan.org>
  *          Antoine Cellerier <dionoea at videolan dot org>

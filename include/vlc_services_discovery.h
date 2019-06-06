@@ -2,7 +2,6 @@
  * vlc_services_discovery.h : Services Discover functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
  *
@@ -149,6 +148,8 @@ VLC_API char ** vlc_sd_GetNames( vlc_object_t *, char ***, int ** ) VLC_USED;
 VLC_API services_discovery_t *vlc_sd_Create(vlc_object_t *parent,
     const char *chain, const struct services_discovery_owner_t *owner)
 VLC_USED;
+#define vlc_sd_Create( obj, a, b ) \
+        vlc_sd_Create( VLC_OBJECT( obj ), a, b )
 
 VLC_API void vlc_sd_Destroy( services_discovery_t * );
 

@@ -28,7 +28,7 @@
 
 #include "components/epg/EPGWidget.hpp"
 #include "components/epg/EPGItem.hpp"
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 
 #include <QVBoxLayout>
 #include <QSplitter>

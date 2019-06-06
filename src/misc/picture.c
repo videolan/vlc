@@ -3,7 +3,6 @@
  *****************************************************************************
  * Copyright (C) 2000-2010 VLC authors and VideoLAN
  * Copyright (C) 2009-2010 Laurent Aimar
- * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -53,36 +52,34 @@ static void PictureDestroyContext( picture_t *p_picture )
  * Destroys a picture allocated by picture_NewFromResource() but without
  * a custom destruction callback.
  */
-static void picture_DestroyFromResource( picture_t *p_picture )
+static void picture_DestroyDummy( picture_t *p_picture )
 {
-    free( p_picture->p_sys );
-    free( p_picture );
+    (void) p_picture;
 }
 
 /**
  * Destroys a picture allocated with picture_NewFromFormat().
  */
-static void picture_Destroy(picture_t *pic)
+static void picture_DestroyFromFormat(picture_t *pic)
 {
     picture_buffer_t *res = pic->p_sys;
 
     if (res != NULL)
         picture_Deallocate(res->fd, res->base, res->size);
-    free(pic);
 }
 
 VLC_WEAK void *picture_Allocate(int *restrict fdp, size_t size)
 {
-    assert((size % 16) == 0);
+    assert((size % 64) == 0);
     *fdp = -1;
-    return aligned_alloc(16, size);
+    return aligned_alloc(64, size);
 }
 
 VLC_WEAK void picture_Deallocate(int fd, void *base, size_t size)
 {
     assert(fd == -1);
     aligned_free(base);
-    assert((size % 16) == 0);
+    assert((size % 64) == 0);
 }
 
 /*****************************************************************************
@@ -93,6 +90,7 @@ void picture_Reset( picture_t *p_picture )
     /* */
     p_picture->date = VLC_TICK_INVALID;
     p_picture->b_force = false;
+    p_picture->b_still = false;
     p_picture->b_progressive = false;
     p_picture->i_nb_fields = 2;
     p_picture->b_top_field_first = false;
@@ -215,7 +213,7 @@ static picture_priv_t *picture_NewPrivate(const video_format_t *restrict p_fmt,
         return NULL;
     }
 
-    atomic_init( &priv->gc.refs, 1 );
+    atomic_init(&p_picture->refs, 1);
     priv->gc.opaque = NULL;
 
     return priv;
@@ -236,7 +234,7 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     if( p_resource->pf_destroy != NULL )
         priv->gc.destroy = p_resource->pf_destroy;
     else
-        priv->gc.destroy = picture_DestroyFromResource;
+        priv->gc.destroy = picture_DestroyDummy;
 
     for( int i = 0; i < p_picture->i_planes; i++ )
     {
@@ -256,7 +254,7 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
     if (unlikely(priv == NULL))
         return NULL;
 
-    priv->gc.destroy = picture_Destroy;
+    priv->gc.destroy = picture_DestroyFromFormat;
 
     picture_t *pic = &priv->picture;
     if (pic->i_planes == 0) {
@@ -319,29 +317,18 @@ picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_
  *
  *****************************************************************************/
 
-picture_t *picture_Hold( picture_t *p_picture )
+void picture_Destroy(picture_t *picture)
 {
-    assert( p_picture != NULL );
+    /* See changes from other threads */
+    atomic_thread_fence(memory_order_acquire);
+    assert(atomic_load_explicit(&picture->refs, memory_order_relaxed) == 0);
 
-    picture_priv_t *priv = (picture_priv_t *)p_picture;
-    uintptr_t refs = atomic_fetch_add( &priv->gc.refs, 1 );
-    assert( refs > 0 );
-    return p_picture;
-}
+    PictureDestroyContext(picture);
 
-void picture_Release( picture_t *p_picture )
-{
-    assert( p_picture != NULL );
-
-    picture_priv_t *priv = (picture_priv_t *)p_picture;
-    uintptr_t refs = atomic_fetch_sub( &priv->gc.refs, 1 );
-    assert( refs != 0 );
-    if( refs > 1 )
-        return;
-
-    PictureDestroyContext( p_picture );
-    assert( priv->gc.destroy != NULL );
-    priv->gc.destroy( p_picture );
+    picture_priv_t *priv = container_of(picture, picture_priv_t, picture);
+    assert(priv->gc.destroy != NULL);
+    priv->gc.destroy(picture);
+    free(priv);
 }
 
 /*****************************************************************************
@@ -387,6 +374,7 @@ void picture_CopyProperties( picture_t *p_dst, const picture_t *p_src )
 {
     p_dst->date = p_src->date;
     p_dst->b_force = p_src->b_force;
+    p_dst->b_still = p_src->b_still;
 
     p_dst->b_progressive = p_src->b_progressive;
     p_dst->i_nb_fields = p_src->i_nb_fields;
@@ -414,7 +402,6 @@ static void picture_DestroyClone(picture_t *clone)
 {
     picture_t *picture = ((picture_priv_t *)clone)->gc.opaque;
 
-    free(clone);
     picture_Release(picture);
 }
 

@@ -2,7 +2,6 @@
  * zvbi.c : VBI and Teletext PES demux and decoder using libzvbi
  *****************************************************************************
  * Copyright (C) 2007, M2X
- * $Id$
  *
  * Authors: Derk-Jan Hartman <djhartman at m2x dot nl>
  *          Jean-Paul Saman <jpsaman at m2x dot nl>

@@ -2,7 +2,6 @@
  * preferences_widgets.hpp : Widgets for preferences panels
  ****************************************************************************
  * Copyright (C) 2006-2011 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Antoine Cellerier <dionoea@videolan.org>

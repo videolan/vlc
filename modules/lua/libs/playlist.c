@@ -2,7 +2,6 @@
  * playlist.c
  *****************************************************************************
  * Copyright (C) 2007-2011 the VideoLAN team
- * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
  *
@@ -35,7 +34,7 @@
 #include <vlc_common.h>
 
 #include <vlc_interface.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 
 #include "../vlc.h"
 #include "../libs.h"
@@ -69,7 +68,7 @@ static int vlclua_playlist_next( lua_State * L )
 
 static int vlclua_playlist_skip( lua_State * L )
 {
-    int i_skip = luaL_checkint( L, 1 );
+    int i_skip = luaL_checkinteger( L, 1 );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     playlist_Skip( p_playlist, i_skip );
     return 0;
@@ -127,7 +126,7 @@ static int vlclua_playlist_random( lua_State * L )
 
 static int vlclua_playlist_gotoitem( lua_State * L )
 {
-    int i_id = luaL_checkint( L, 1 );
+    int i_id = luaL_checkinteger( L, 1 );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     PL_LOCK;
     playlist_ViewPlay( p_playlist, NULL,
@@ -138,7 +137,7 @@ static int vlclua_playlist_gotoitem( lua_State * L )
 
 static int vlclua_playlist_delete( lua_State * L )
 {
-    int i_id = luaL_checkint( L, 1 );
+    int i_id = luaL_checkinteger( L, 1 );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
 
     PL_LOCK;
@@ -152,8 +151,8 @@ static int vlclua_playlist_delete( lua_State * L )
 
 static int vlclua_playlist_move( lua_State * L )
 {
-    int i_item = luaL_checkint( L, 1 );
-    int i_target = luaL_checkint( L, 2 );
+    int i_item = luaL_checkinteger( L, 1 );
+    int i_target = luaL_checkinteger( L, 2 );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_item );

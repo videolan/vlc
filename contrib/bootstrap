@@ -282,9 +282,23 @@ case "${OS}" in
 			add_make_enabled "HAVE_IOS" "HAVE_DARWIN_OS" "HAVE_BSD" "HAVE_FPU"
 
 			case "${HOST}" in
-				*arm*)
-				add_make_enabled "HAVE_NEON" "HAVE_ARMV7A"
-				;;
+			    *armv7s*)
+			    add_make "PLATFORM_SHORT_ARCH := armv7s"
+			    add_make_enabled "HAVE_NEON" "HAVE_ARMV7A"
+			    ;;
+			    *arm*)
+			    add_make "PLATFORM_SHORT_ARCH := armv7"
+			    add_make_enabled "HAVE_NEON" "HAVE_ARMV7A"
+			    ;;
+			    *arm64*|*aarch64*)
+			    add_make "PLATFORM_SHORT_ARCH := arm64"
+			    ;;
+			    *x86_64*)
+			    add_make "PLATFORM_SHORT_ARCH := x86_64"
+			    ;;
+			    *86*)
+			    add_make "PLATFORM_SHORT_ARCH := i386"
+			    ;;
 			esac;
 		fi
 		if test "$BUILDFORTVOS"

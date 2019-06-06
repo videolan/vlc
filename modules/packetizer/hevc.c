@@ -2,7 +2,6 @@
  * hevc.c: h.265/hevc video packetizer
  *****************************************************************************
  * Copyright (C) 2014 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Denis Charmet <typx@videolan.org>
  *
@@ -564,7 +563,7 @@ static void ActivateSets(decoder_t *p_dec,
                                          &p_dec->fmt_out.video.primaries,
                                          &p_dec->fmt_out.video.transfer,
                                          &p_dec->fmt_out.video.space,
-                                         &p_dec->fmt_out.video.b_color_range_full);
+                                         &p_dec->fmt_out.video.color_range);
         }
 
         unsigned sizes[4];

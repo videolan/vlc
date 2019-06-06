@@ -41,9 +41,10 @@ static bool send_failure = false;
 static bool expect_hello = true;
 static vlc_sem_t rx;
 
-static int fd_callback(vlc_tls_t *tls)
+static int fd_callback(vlc_tls_t *tls, short *restrict events)
 {
     (void) tls;
+    (void) events;
     return fileno(stderr); /* should be writable (at least most of the time) */
 }
 

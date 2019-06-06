@@ -17,6 +17,6 @@ DSHOW_SOURCES := dshow-headers-oss.tar.bz2
 
 .dshow: $(DSHOW_SOURCES) .sum-dshow
 	mkdir -p -- "$(PREFIX)/include"
-	tar xjf $< -C "$(PREFIX)/include" \
+	tar xjfo $< -C "$(PREFIX)/include" \
 		--wildcards --no-anchored '*.h' --strip-components=1
 	touch $@

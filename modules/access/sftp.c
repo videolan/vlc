@@ -2,7 +2,6 @@
  * sftp.c: SFTP input module
  *****************************************************************************
  * Copyright (C) 2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Rémi Duraffort <ivoire@videolan.org>
  *          Petri Hintukainen <phintuka@gmail.com>
@@ -195,7 +194,8 @@ static int SSHSessionInit( stream_t *p_access, const char *psz_host, int i_port 
 
     /* Connect to the server using a regular socket */
     assert( p_sys->i_socket == -1 );
-    p_sys->i_socket = net_ConnectTCP( p_access, psz_host, i_port );
+    p_sys->i_socket = net_Connect( p_access, psz_host, i_port, SOCK_STREAM,
+                                   0 );
     if( p_sys->i_socket < 0 )
         goto error;
 

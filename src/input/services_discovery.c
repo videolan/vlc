@@ -2,7 +2,6 @@
  * services_discovery.c : Manage playlist services_discovery modules
  *****************************************************************************
  * Copyright (C) 1999-2004 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -103,6 +102,7 @@ char **vlc_sd_GetNames (vlc_object_t *obj, char ***pppsz_longnames, int **pp_cat
  * That's how the playlist get's Service Discovery information
  */
 
+#undef vlc_sd_Create
 services_discovery_t *vlc_sd_Create(vlc_object_t *parent, const char *cfg,
     const struct services_discovery_owner_t *restrict owner)
 {

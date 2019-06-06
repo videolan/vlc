@@ -11,6 +11,7 @@ $(TARBALLS)/jpegsrc.v$(JPEG_VERSION).tar.gz:
 jpeg: jpegsrc.v$(JPEG_VERSION).tar.gz .sum-jpeg
 	$(UNPACK)
 	mv jpeg-$(JPEG_VERSION) jpegsrc.v$(JPEG_VERSION)
+	$(APPLY) $(SRC)/jpeg/no_executables.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 

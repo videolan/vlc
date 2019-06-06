@@ -2,7 +2,6 @@
  * playlist_model.hpp : Model for a playlist tree
  ****************************************************************************
  * Copyright (C) 2006-2011 the VideoLAN team
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jakob Leben <jleben@videolan.org>
@@ -30,7 +29,7 @@
 #endif
 
 #include <vlc_input.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include "vlc_model.hpp"
 #include "playlist_item.hpp"
 
