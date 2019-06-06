@@ -36,4 +36,10 @@ struct va_pic_context
     picture_sys_t             picsys;
 };
 
+static inline picture_sys_t *ActivePictureSys(picture_t *p_pic)
+{
+    struct va_pic_context *pic_ctx = (struct va_pic_context*)p_pic->context;
+    return pic_ctx ? &pic_ctx->picsys : p_pic->p_sys;
+}
+
 #endif /* AVCODEC_VA_SURFACE_H */
