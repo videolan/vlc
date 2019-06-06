@@ -41,7 +41,7 @@
 #include <d3d9.h>
 #include "../../video_chroma/d3d9_fmt.h"
 
-typedef picture_sys_t VA_PICSYS;
+typedef picture_sys_d3d9_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 typedef struct
@@ -74,7 +74,7 @@ static bool GetLock(filter_t *p_filter, IDirect3DSurface9 *d3d,
 static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     copy_cache_t *p_copy_cache = (copy_cache_t*) p_filter->p_sys;
-    picture_sys_t *p_sys = &((struct va_pic_context *)src->context)->picsys;
+    picture_sys_d3d9_t *p_sys = &((struct va_pic_context *)src->context)->picsys;
 
     D3DSURFACE_DESC desc;
     D3DLOCKED_RECT lock;
@@ -144,7 +144,7 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 static void DXA9_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     copy_cache_t *p_copy_cache = (copy_cache_t*) p_filter->p_sys;
-    picture_sys_t *p_sys = &((struct va_pic_context *)src->context)->picsys;
+    picture_sys_d3d9_t *p_sys = &((struct va_pic_context *)src->context)->picsys;
 
     D3DSURFACE_DESC desc;
     D3DLOCKED_RECT lock;
@@ -174,7 +174,7 @@ static void DXA9_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 
 static void DestroyPicture(picture_t *picture)
 {
-    picture_sys_t *p_sys = picture->p_sys;
+    picture_sys_d3d9_t *p_sys = picture->p_sys;
     ReleaseD3D9PictureSys( p_sys );
     free(p_sys);
 }
@@ -254,8 +254,8 @@ static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t 
 static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = p_filter->p_sys;
-    picture_sys_t *p_sys = dst->p_sys;
-    picture_sys_t *p_staging_sys = sys->staging->p_sys;
+    picture_sys_d3d9_t *p_sys = dst->p_sys;
+    picture_sys_d3d9_t *p_staging_sys = sys->staging->p_sys;
 
     D3DSURFACE_DESC texDesc;
     IDirect3DSurface9_GetDesc( p_sys->surface, &texDesc);
@@ -414,7 +414,7 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
     {
         picture_resource_t res;
         res.pf_destroy = DestroyPicture;
-        picture_sys_t *res_sys = calloc(1, sizeof(picture_sys_t));
+        picture_sys_d3d9_t *res_sys = calloc(1, sizeof(picture_sys_d3d9_t));
         if (res_sys == NULL) {
             err = VLC_ENOMEM;
             goto done;

@@ -34,7 +34,7 @@
 
 #include "d3d9_filters.h"
 
-typedef picture_sys_t VA_PICSYS;
+typedef picture_sys_d3d9_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 static vlc_mutex_t inst_lock = VLC_STATIC_MUTEX;
@@ -49,7 +49,7 @@ void D3D9_FilterHoldInstance(filter_t *filter, d3d9_device_t *out, D3DSURFACE_DE
     if (!pic)
         return;
 
-    picture_sys_t *p_sys = ActivePictureSys(pic);
+    picture_sys_d3d9_t *p_sys = ActivePictureSys(pic);
 
     vlc_mutex_lock(&inst_lock);
     if (p_sys)

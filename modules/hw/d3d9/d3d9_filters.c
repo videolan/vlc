@@ -39,7 +39,7 @@
 #include <dxva2api.h>
 #include "../../video_chroma/d3d9_fmt.h"
 
-typedef picture_sys_t VA_PICSYS;
+typedef picture_sys_d3d9_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 #include "d3d9_filters.h"
@@ -92,7 +92,7 @@ static void FillSample( DXVA2_VideoSample *p_sample,
                         picture_t *p_pic,
                         const RECT *p_area )
 {
-    picture_sys_t *p_sys_src = ActivePictureSys(p_pic);
+    picture_sys_d3d9_t *p_sys_src = ActivePictureSys(p_pic);
 
     p_sample->SrcSurface = p_sys_src->surface;
     p_sample->SampleFormat.SampleFormat = DXVA2_SampleProgressiveFrame;
@@ -107,13 +107,13 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    picture_sys_t *p_src_sys = ActivePictureSys(p_pic);
+    picture_sys_d3d9_t *p_src_sys = ActivePictureSys(p_pic);
 
     picture_t *p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
         goto failed;
 
-    picture_sys_t *p_out_sys = p_outpic->p_sys;
+    picture_sys_d3d9_t *p_out_sys = p_outpic->p_sys;
     if( !p_out_sys || !p_out_sys->surface )
         goto failed;
 

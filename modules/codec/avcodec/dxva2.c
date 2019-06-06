@@ -37,7 +37,7 @@
 #include <libavcodec/dxva2.h>
 #include "../../video_chroma/d3d9_fmt.h"
 
-typedef picture_sys_t VA_PICSYS;
+typedef picture_sys_d3d9_t VA_PICSYS;
 #include "va_surface.h"
 
 #define D3D_DecoderType     IDirectXVideoDecoder
@@ -46,7 +46,7 @@ typedef picture_sys_t VA_PICSYS;
 #include "directx_va.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
-                const es_format_t *, picture_sys_t *p_sys);
+                const es_format_t *, picture_sys_d3d9_t *p_sys);
 static void Close(vlc_va_t *, void **);
 
 vlc_module_begin()
@@ -254,7 +254,7 @@ static void Close(vlc_va_t *va, void **ctx)
 }
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
-                const es_format_t *fmt, picture_sys_t *p_sys)
+                const es_format_t *fmt, picture_sys_d3d9_t *p_sys)
 {
     int err = VLC_EGENERIC;
     directx_sys_t *dx_sys;

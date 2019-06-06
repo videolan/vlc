@@ -56,7 +56,7 @@
 #endif
 #include "../../video_chroma/d3d9_fmt.h"
 
-typedef picture_sys_t VA_PICSYS;
+typedef picture_sys_d3d9_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 #include "common.h"
@@ -257,7 +257,7 @@ static picture_pool_t *Direct3D9CreatePicturePool(vlc_object_t *o,
 
     for (picture_count = 0; picture_count < count; ++picture_count)
     {
-        picture_sys_t *picsys = calloc(1, sizeof(*picsys));
+        picture_sys_d3d9_t *picsys = calloc(1, sizeof(*picsys));
         if (unlikely(picsys == NULL))
             goto error;
 
@@ -1276,7 +1276,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         sys->area.place_changed = false;
     }
 
-    picture_sys_t *p_sys = picture->p_sys;
+    picture_sys_d3d9_t *p_sys = picture->p_sys;
     IDirect3DSurface9 *surface = p_sys->surface;
     d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
 
@@ -1852,7 +1852,7 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
     struct glpriv *priv = tc->priv;
     HRESULT hr;
 
-    picture_sys_t *picsys = ActivePictureSys(pic);
+    picture_sys_d3d9_t *picsys = ActivePictureSys(pic);
     if (unlikely(!picsys || !priv->gl_render))
         return VLC_EGENERIC;
 

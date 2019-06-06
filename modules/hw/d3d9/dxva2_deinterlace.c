@@ -40,7 +40,7 @@
 
 #include "d3d9_filters.h"
 
-typedef picture_sys_t VA_PICSYS;
+typedef picture_sys_d3d9_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 typedef struct
@@ -145,7 +145,7 @@ static void FillSample( DXVA2_VideoSample *p_sample,
                         const RECT *p_area,
                         int i_field )
 {
-    picture_sys_t *p_sys_src = ActivePictureSys(p_pic);
+    picture_sys_d3d9_t *p_sys_src = ActivePictureSys(p_pic);
 
     p_sample->SrcSurface = p_sys_src->surface;
     p_sample->SampleFormat.SampleFormat = p_pic->b_top_field_first ?
@@ -189,7 +189,7 @@ static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
                       int order, int i_field )
 {
     filter_sys_t *sys = filter->p_sys;
-    picture_sys_t *p_out_sys = p_outpic->p_sys;
+    picture_sys_d3d9_t *p_out_sys = p_outpic->p_sys;
     const int i_samples = sys->decoder_caps.NumBackwardRefSamples + 1 +
                           sys->decoder_caps.NumForwardRefSamples;
     HRESULT hr;
@@ -203,7 +203,7 @@ static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
     picture_t *p_cur  = sys->context.pp_history[1];
     picture_t *p_next = sys->context.pp_history[2];
 
-    picture_sys_t *p_sys_src = ActivePictureSys(src);
+    picture_sys_d3d9_t *p_sys_src = ActivePictureSys(src);
 
     hr = IDirect3DSurface9_GetDesc( p_sys_src->surface, &srcDesc );
     if (unlikely(FAILED(hr)))
@@ -310,7 +310,7 @@ picture_t *AllocPicture( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     picture_t *pic = filter_NewPicture( p_filter );
-    picture_sys_t *pic_sys = pic->p_sys;
+    picture_sys_d3d9_t *pic_sys = pic->p_sys;
     if ( !pic->context )
     {
         bool b_local_texture = false;
