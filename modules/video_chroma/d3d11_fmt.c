@@ -40,7 +40,7 @@
 
 #include "../codec/avcodec/va_surface.h"
 
-void AcquirePictureSys(picture_sys_t *p_sys)
+void AcquireD3D11PictureSys(picture_sys_t *p_sys)
 {
     for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
         if (p_sys->renderSrc[i])
@@ -58,7 +58,7 @@ void AcquirePictureSys(picture_sys_t *p_sys)
         ID3D11VideoProcessorOutputView_AddRef(p_sys->processorOutput);
 }
 
-void ReleasePictureSys(picture_sys_t *p_sys)
+void ReleaseD3D11PictureSys(picture_sys_t *p_sys)
 {
     for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
         if (p_sys->renderSrc[i])

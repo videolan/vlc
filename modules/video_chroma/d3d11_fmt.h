@@ -86,9 +86,9 @@ static inline bool is_d3d11_opaque(vlc_fourcc_t chroma)
            chroma == VLC_CODEC_D3D11_OPAQUE_BGRA;
 }
 
-void AcquirePictureSys(picture_sys_t *p_sys);
+void AcquireD3D11PictureSys(picture_sys_t *p_sys);
 
-void ReleasePictureSys(picture_sys_t *p_sys);
+void ReleaseD3D11PictureSys(picture_sys_t *p_sys);
 
 /* map texture planes to resource views */
 int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,

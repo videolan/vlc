@@ -192,7 +192,7 @@ void D3D11_ReleaseQuad(d3d_quad_t *quad)
             quad->d3dsampState[i] = NULL;
         }
     }
-    ReleasePictureSys(&quad->picSys);
+    ReleaseD3D11PictureSys(&quad->picSys);
 }
 
 /**

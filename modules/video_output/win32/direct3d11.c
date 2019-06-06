@@ -497,7 +497,7 @@ error:
 static void DestroyDisplayPoolPicture(picture_t *picture)
 {
     picture_sys_t *p_sys = picture->p_sys;
-    ReleasePictureSys( p_sys );
+    ReleaseD3D11PictureSys( p_sys );
     free(p_sys);
 }
 
@@ -1307,7 +1307,7 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     Direct3D11DeleteRegions(sys->d3dregion_count, sys->d3dregions);
     sys->d3dregion_count = 0;
 
-    ReleasePictureSys(&sys->stagingSys);
+    ReleaseD3D11PictureSys(&sys->stagingSys);
 
     D3D11_ReleaseVertexShader(&sys->flatVShader);
     D3D11_ReleaseVertexShader(&sys->projectionVShader);

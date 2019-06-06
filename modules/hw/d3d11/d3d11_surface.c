@@ -499,7 +499,7 @@ static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
 static void DestroyPicture(picture_t *picture)
 {
     picture_sys_t *p_sys = picture->p_sys;
-    ReleasePictureSys( p_sys );
+    ReleaseD3D11PictureSys( p_sys );
     free(p_sys);
 }
 
@@ -553,7 +553,7 @@ static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in
 static void d3d11_pic_context_destroy(struct picture_context_t *opaque)
 {
     struct va_pic_context *pic_ctx = (struct va_pic_context*)opaque;
-    ReleasePictureSys(&pic_ctx->picsys);
+    ReleaseD3D11PictureSys(&pic_ctx->picsys);
     free(pic_ctx);
 }
 
@@ -566,7 +566,7 @@ static struct picture_context_t *d3d11_pic_context_copy(struct picture_context_t
     pic_ctx->s.destroy = d3d11_pic_context_destroy;
     pic_ctx->s.copy    = d3d11_pic_context_copy;
     pic_ctx->picsys = src_ctx->picsys;
-    AcquirePictureSys(&pic_ctx->picsys);
+    AcquireD3D11PictureSys(&pic_ctx->picsys);
     return &pic_ctx->s;
 }
 
@@ -618,7 +618,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
             pic_ctx->s.destroy = d3d11_pic_context_destroy;
             pic_ctx->s.copy    = d3d11_pic_context_copy;
             pic_ctx->picsys = *p_sys;
-            AcquirePictureSys(&pic_ctx->picsys);
+            AcquireD3D11PictureSys(&pic_ctx->picsys);
             dst->context = &pic_ctx->s;
         }
     }
