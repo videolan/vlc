@@ -56,6 +56,7 @@
 #endif
 #include "../../video_chroma/d3d9_fmt.h"
 
+typedef picture_sys_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 #include "common.h"

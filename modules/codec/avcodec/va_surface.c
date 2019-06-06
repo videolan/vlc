@@ -34,11 +34,8 @@
 #include <vlc_codec.h>
 #include <vlc_picture.h>
 
-typedef struct
-{
-    void *dummy;
-} picture_sys_t;
 #include "va_surface_internal.h"
+typedef int VA_PICSYS;
 #include "va_surface.h"
 
 #include "avcodec.h"

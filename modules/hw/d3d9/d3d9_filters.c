@@ -39,6 +39,7 @@
 #include <dxva2api.h>
 #include "../../video_chroma/d3d9_fmt.h"
 
+typedef picture_sys_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 #include "d3d9_filters.h"

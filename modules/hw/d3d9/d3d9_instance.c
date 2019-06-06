@@ -34,6 +34,7 @@
 
 #include "d3d9_filters.h"
 
+typedef picture_sys_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 static vlc_mutex_t inst_lock = VLC_STATIC_MUTEX;

@@ -33,10 +33,10 @@ struct va_pic_context
 {
     picture_context_t         s;
     struct vlc_va_surface_t *va_surface;
-    picture_sys_t             picsys;
+    VA_PICSYS                 picsys;
 };
 
-static inline picture_sys_t *ActivePictureSys(picture_t *p_pic)
+static inline VA_PICSYS *ActivePictureSys(picture_t *p_pic)
 {
     struct va_pic_context *pic_ctx = (struct va_pic_context*)p_pic->context;
     return pic_ctx ? &pic_ctx->picsys : p_pic->p_sys;

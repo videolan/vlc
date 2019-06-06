@@ -38,6 +38,7 @@
 
 #include "d3d11_fmt.h"
 
+typedef picture_sys_t VA_PICSYS;
 #include "../codec/avcodec/va_surface.h"
 
 void AcquireD3D11PictureSys(picture_sys_t *p_sys)

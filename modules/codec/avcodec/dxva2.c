@@ -37,6 +37,7 @@
 #include <libavcodec/dxva2.h>
 #include "../../video_chroma/d3d9_fmt.h"
 
+typedef picture_sys_t VA_PICSYS;
 #include "va_surface.h"
 
 #define D3D_DecoderType     IDirectXVideoDecoder

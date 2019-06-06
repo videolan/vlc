@@ -50,6 +50,7 @@
 
 #include "../../video_chroma/d3d11_fmt.h"
 
+typedef picture_sys_t VA_PICSYS;
 #include "va_surface.h"
 
 #define D3D_DecoderType     ID3D11VideoDecoder

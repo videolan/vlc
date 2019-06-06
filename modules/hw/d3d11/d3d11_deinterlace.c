@@ -39,6 +39,7 @@
 #include "../../video_chroma/d3d11_fmt.h"
 #include "../../video_filter/deinterlace/common.h"
 
+typedef picture_sys_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 typedef struct

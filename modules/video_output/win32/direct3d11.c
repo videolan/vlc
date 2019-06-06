@@ -51,6 +51,7 @@
 # include <windows.ui.xaml.media.dxinterop.h> */
 
 #include "../../video_chroma/d3d11_fmt.h"
+typedef picture_sys_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 #include "d3d11_quad.h"

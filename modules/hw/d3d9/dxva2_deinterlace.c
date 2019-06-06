@@ -40,6 +40,7 @@
 
 #include "d3d9_filters.h"
 
+typedef picture_sys_t VA_PICSYS;
 #include "../../codec/avcodec/va_surface.h"
 
 typedef struct
