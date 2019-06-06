@@ -615,6 +615,28 @@ static size_t spu_channel_ConvertDates(struct spu_channel *channel,
     return entry_count;
 }
 
+static bool
+spu_render_entry_IsSelected(spu_render_entry_t *render_entry, size_t channel_id,
+                            vlc_tick_t system_now,
+                            vlc_tick_t render_subtitle_date, bool ignore_osd)
+{
+    subpicture_t *subpic = render_entry->subpic;
+
+    if (!subpic)
+        return false;
+
+    if ((subpic->i_channel >= 0 && (size_t) subpic->i_channel != channel_id) ||
+       (ignore_osd && !subpic->b_subtitle))
+        return false;
+
+    const vlc_tick_t render_date =
+        subpic->b_subtitle ? render_subtitle_date : system_now;
+
+    if (render_date && render_date < render_entry->start)
+        return false; /* Too early, come back next monday */
+    return true;
+}
+
 /*****************************************************************************
  * spu_SelectSubpictures: find the subpictures to display
  *****************************************************************************
@@ -647,8 +669,6 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
     {
         struct spu_channel *channel = &sys->channels.data[i];
         spu_render_entry_t *render_entries = channel->entries;
-        spu_render_entry_t available_entries[VOUT_MAX_SUBPICTURES];
-        size_t       available_count = 0;
 
         vlc_tick_t   start_date = render_subtitle_date;
         vlc_tick_t   ephemer_subtitle_date = 0;
@@ -662,23 +682,16 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
         /* Select available pictures */
         for (size_t index = 0; index < VOUT_MAX_SUBPICTURES; index++) {
             spu_render_entry_t *render_entry = &render_entries[index];
-            subpicture_t *current = channel->entries[index].subpic;
+            subpicture_t *current = render_entry->subpic;
             bool is_stop_valid;
             bool is_late;
 
-            if (!current)
-                continue;
-
-            if ((current->i_channel >= 0 && (size_t) current->i_channel != channel->id) ||
-               (ignore_osd && !current->b_subtitle))
+            if (!spu_render_entry_IsSelected(render_entry, channel->id,
+                                             system_now, render_subtitle_date,
+                                             ignore_osd))
                 continue;
 
             const vlc_tick_t render_date = current->b_subtitle ? render_subtitle_date : system_now;
-            if (render_date &&
-                render_date < render_entry->start) {
-                /* Too early, come back next monday */
-                continue;
-            }
 
             vlc_tick_t *ephemer_date_ptr  = current->b_subtitle ? &ephemer_subtitle_date  : &ephemer_osd_date;
             int64_t *ephemer_order_ptr = current->b_subtitle ? &ephemer_subtitle_order : &ephemer_system_order;
@@ -699,9 +712,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
                 start_date = render_entry->start;
 
             /* */
-            available_entries[available_count] = *render_entry;
-            available_entries[available_count].is_late = is_late;
-            available_count++;
+            render_entry->is_late = is_late;
         }
 
         /* Only forced old picture display at the transition */
@@ -711,10 +722,15 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             start_date = INT64_MAX;
 
         /* Select pictures to be displayed */
-        for (size_t index = 0; index < available_count; index++) {
-            spu_render_entry_t *render_entry = &available_entries[index];
+        for (size_t index = 0; index < VOUT_MAX_SUBPICTURES; index++) {
+            spu_render_entry_t *render_entry = &render_entries[index];
             subpicture_t *current = render_entry->subpic;
             bool is_late = render_entry->is_late;
+
+            if (!spu_render_entry_IsSelected(render_entry, channel->id,
+                                             system_now, render_subtitle_date,
+                                             ignore_osd))
+                continue;
 
             const vlc_tick_t stop_date = current->b_subtitle ? __MAX(start_date, sys->last_sort_date) : system_now;
             const vlc_tick_t ephemer_date  = current->b_subtitle ? ephemer_subtitle_date  : ephemer_osd_date;
