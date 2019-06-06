@@ -126,7 +126,7 @@ vlc_module_begin ()
              WIDTH_TEXT, WIDTH_LONGTEXT )
     add_integer("effect-height" , VOUT_HEIGHT ,
              HEIGHT_TEXT, HEIGHT_LONGTEXT )
-    add_string("effect-fft-window", "flat",
+    add_string("effect-fft-window", "none",
             FFT_WINDOW_TEXT, FFT_WINDOW_LONGTEXT )
         change_string_list( window_list, window_list_text )
     add_float("effect-kaiser-param", 3.0f,
