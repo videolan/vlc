@@ -283,7 +283,7 @@ vlc_module_begin ()
     add_integer ("dvb-bandwidth", 0, BANDWIDTH_TEXT, NULL)
         change_integer_list (bandwidth_vlc, bandwidth_user)
         change_safe ()
-    add_integer ("dvb-transmission", 0,
+    add_integer ("dvb-transmission", -1,
                  TRANSMISSION_TEXT, NULL)
         change_integer_list (transmission_vlc, transmission_user)
         change_safe ()
