@@ -67,16 +67,17 @@
 #define POS_TEXT N_("Logo position")
 #define POS_LONGTEXT N_( \
   "Enforce the logo position on the video " \
-  "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
+  "(-1=absolute, 0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
   "also use combinations of these values, eg 6 = top-right).")
 
 #define LOGO_HELP N_("Use a local picture as logo on the video")
 
 #define CFG_PREFIX "logo-"
 
-static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const int pi_pos_values[] = { -1, 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *const ppsz_pos_descriptions[] =
-{ N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
+{ N_("Absolute"),
+  N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
 static int  OpenSub  ( filter_t * );
