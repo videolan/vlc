@@ -533,55 +533,28 @@ ifdef HAVE_CROSS_COMPILE
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> $@
 endif
 
-crossfile.meson:
-	$(RM) $@
-	echo "[binaries]" >> $@
-	echo "c = '$(CC)'" >> $@
-	echo "cpp = '$(CXX)'" >> $@
-	echo "ar = '$(AR)'" >> $@
-	echo "strip = '$(STRIP)'" >> $@
-	echo "pkgconfig = '$(PKG_CONFIG)'" >> $@
-	echo "windres = '$(WINDRES)'" >> $@
-	echo "[properties]" >> $@
-	echo "needs_exe_wrapper = true" >> $@
-ifdef HAVE_CROSS_COMPILE
-	echo "cpp_args = [ '-I$(PREFIX)/include' ]" >> $@
-	echo "cpp_link_args = [ '-L$(PREFIX)/lib' ]" >> $@
-ifdef HAVE_DARWIN_OS
-ifdef HAVE_IOS
-ifdef HAVE_TVOS
-	echo "c_args = ['-I$(PREFIX)/include', '-isysroot', '$(IOS_SDK)', '-mtvos-version-min=10.2', '-arch', '$(PLATFORM_SHORT_ARCH)', '-fembed-bitcode']" >> $@
-	echo "c_link_args = ['-L$(PREFIX)/lib', '-isysroot', '$(IOS_SDK)', '-arch', '$(PLATFORM_SHORT_ARCH)', '-fembed-bitcode']" >> $@
-else
-	echo "c_args = ['-I$(PREFIX)/include', '-isysroot', '$(IOS_SDK)', '-miphoneos-version-min=8.4', '-arch', '$(PLATFORM_SHORT_ARCH)']" >> $@
-	echo "c_link_args = ['-L$(PREFIX)/lib', '-isysroot', '$(IOS_SDK)', '-arch', '$(PLATFORM_SHORT_ARCH)']" >> $@
-endif
-endif
-ifdef HAVE_MACOSX
-	echo "c_args = ['-I$(PREFIX)/include', '-isysroot', '$(MACOSX_SDK)', '-mmacosx-version-min=10.10', '-arch', '$(ARCH)']" >> $@
-	echo "c_link_args = ['-L$(PREFIX)/lib', '-isysroot', '$(MACOSX_SDK)', '-arch', '$(ARCH)']" >> $@
-endif
-else
-	echo "c_args = [ '-I$(PREFIX)/include' ]" >> $@
-	echo "c_link_args = [ '-L$(PREFIX)/lib' ]" >> $@
-endif
-	echo "[host_machine]" >> $@
+MESON_SYSTEM_NAME =
 ifdef HAVE_WIN32
-	echo "system = 'windows'" >> $@
+	MESON_SYSTEM_NAME = windows
 else
 ifdef HAVE_DARWIN_OS
-	echo "system = 'darwin'" >> $@
+	MESON_SYSTEM_NAME = darwin
 else
 ifdef HAVE_LINUX
 	# android has also system = linux and defines HAVE_LINUX
-	echo "system = 'linux'" >> $@
+	MESON_SYSTEM_NAME = 'linux'
 endif
 endif
 endif
-	echo "cpu_family = '$(subst i386,x86,$(ARCH))'" >> $@
-	echo "cpu = '`echo $(HOST) | cut -d - -f 1`'" >> $@
-	echo "endian = 'little'" >> $@
-endif
+
+crossfile.meson:
+	$(HOSTVARS) \
+	WINDRES="$(WINDRES)" \
+	PKG_CONFIG="$(PKG_CONFIG)" \
+	HOST_SYSTEM="$(MESON_SYSTEM_NAME)" \
+	HOST_ARCH="$(subst i386,x86,$(ARCH))" \
+	HOST="$(HOST)" \
+	$(SRC)/gen-meson-crossfile.py $@
 
 # Default pattern rules
 .sum-%: $(SRC)/%/SHA512SUMS
