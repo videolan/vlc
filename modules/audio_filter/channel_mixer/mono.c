@@ -82,9 +82,10 @@ typedef struct
 #define MONO_CHANNEL_LONGTEXT N_("This option silences all other channels " \
     "except the selected channel.")
 
-static const int pi_pos_values[] = { 0, 1, 4, 5, 7, 8, 2, 3, 6 };
+static const int pi_pos_values[] = { -1, 0, 1, 4, 5, 7, 8, 2, 3, 6 };
 static const char *const ppsz_pos_descriptions[] =
-{ N_("Left"), N_("Right"),
+{ N_("Stereo mix"),
+  N_("Left"), N_("Right"),
   N_("Rear left"), N_("Rear right"),
   N_("Center"), N_("Low-frequency effects"),
   N_("Side left"), N_("Side right"), N_("Rear center") };
