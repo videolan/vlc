@@ -569,8 +569,7 @@ static int SpuRenderCmp(const void *s0, const void *s1)
 }
 
 static int spu_channel_ConvertDates(struct spu_channel *channel,
-                                    vlc_tick_t system_now,
-                                    spu_render_entry_t *render_entries)
+                                    vlc_tick_t system_now)
 {
     /* Put every spu start and stop ts into the same array to convert them in
      * one shot */
@@ -599,8 +598,8 @@ static int spu_channel_ConvertDates(struct spu_channel *channel,
     entry_count = 0;
     for (size_t index = 0; index < VOUT_MAX_SUBPICTURES; index++)
     {
-        spu_render_entry_t *render_entry = &render_entries[index];
-        subpicture_t *current = channel->entries[index].subpic;
+        spu_render_entry_t *render_entry = &channel->entries[index];
+        subpicture_t *current = render_entry->subpic;
 
         if (!current)
             render_entry->subpic = NULL;
@@ -646,7 +645,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
     for (size_t i = 0; i < sys->channels.size; i++)
     {
         struct spu_channel *channel = &sys->channels.data[i];
-        spu_render_entry_t render_entries[VOUT_MAX_SUBPICTURES];
+        spu_render_entry_t *render_entries = channel->entries;
         spu_render_entry_t available_entries[VOUT_MAX_SUBPICTURES];
         bool         is_available_late[VOUT_MAX_SUBPICTURES];
         size_t       available_count = 0;
@@ -657,7 +656,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
         int64_t      ephemer_subtitle_order = INT64_MIN;
         int64_t      ephemer_system_order = INT64_MIN;
 
-        if (spu_channel_ConvertDates(channel, system_now, render_entries) == 0)
+        if (spu_channel_ConvertDates(channel, system_now) == 0)
             continue;
 
         /* Select available pictures */
