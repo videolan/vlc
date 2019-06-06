@@ -33,11 +33,6 @@
 #define D3D_DecoderDevice   IUnknown
 #define D3D_DecoderSurface  IUnknown
 
-typedef struct
-{
-    void *dummy;
-} picture_sys_t;
-
 #include "directx_va.h"
 
 extern const GUID DXVA2_ModeMPEG2_VLD;
