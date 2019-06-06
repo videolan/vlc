@@ -20,7 +20,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-19 15:56+0200\n"
+"PO-Revision-Date: 2019-06-06 14:06+0200\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2019\n"
 "Language-Team: Turkish (https://www.transifex.com/yaron/teams/16553/tr/)\n"
 "Language: tr\n"
@@ -1556,10 +1556,10 @@ msgid ""
 "list of interface modules. (common values are \"rc\" (remote control), \"http"
 "\", \"gestures\" ...)"
 msgstr ""
-"VLC ile \"ek arayüzler\" kullanabilirsiniz. Bunlar varsayılan arayüze ek "
-"olarak art alanda açılır. Birden çok arayüz modülünü, virgülle ayırarak "
-"yazabilirsiniz. (Sık kullanılan modüller, \"rc\" (uzaktan kumanda), \"http"
-"\", \"gestures\" (fare hareketleri) ...)"
+"VLC için \"ek arayüzler\" seçebilirsiniz. Bunlar varsayılan arayüze ek "
+"olarak arka planda açılırlar. Birden çok arayüz modülünü, virgül ile "
+"ayrılmış liste olarak yazın. (sık kullanılan değerler \"rc\" (uzaktan "
+"kumanda), \"http\", \"gestures\" (fare hareketleri) ...)"
 
 #: src/libvlc-module.c:83
 msgid "You can select control interfaces for VLC."
@@ -2124,7 +2124,7 @@ msgstr "Duvar kağıdı kipi kullanılsın"
 msgid ""
 "The wallpaper mode allows you to display the video as the desktop background."
 msgstr ""
-"Bu seçenek etkinleştirildiğinde, görüntü masaüstü arkaplanında oynatılır."
+"Bu seçenek etkinleştirildiğinde, görüntü masaüstü arka planında oynatılır."
 
 #: src/libvlc-module.c:324
 msgid "Show media title on video"
@@ -2276,12 +2276,12 @@ msgstr "Görüntü fotoğrafları kaydedilirken kullanılacak görsel dosyası b
 
 #: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
-msgstr "Görüntü Fotoğrafının Önizlemesi Görüntülensin"
+msgstr "Görüntü Fotoğrafının Ön İzlemesi Görüntülensin"
 
 #: src/libvlc-module.c:403
 msgid "Display the snapshot preview in the screen's top-left corner."
 msgstr ""
-"Bu seçenek etkinleştirildiğinde, çekilen görüntü fotoğrafının önizlemesi, "
+"Bu seçenek etkinleştirildiğinde, çekilen görüntü fotoğrafının ön izlemesi, "
 "ekranın sol üst köşesinde görüntülenir."
 
 #: src/libvlc-module.c:405
@@ -3872,7 +3872,7 @@ msgid ""
 "Specifies the services discovery modules to preload, separated by colons. "
 "Typical value is \"sap\"."
 msgstr ""
-"Önceden yüklenecek hizmet algılama modüllerini, virgülle ayırarak yazın. "
+"Önceden yüklenecek hizmet algılama modüllerini, virgül ile ayırarak yazın. "
 "Tipik değer: \"sap\"."
 
 #: src/libvlc-module.c:1156
@@ -10015,11 +10015,11 @@ msgstr "A/52/DTS->S/PDIF Paketlemesi İçin Ses Süzgeci"
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
-msgstr "Dengeleyici Önayarı"
+msgstr "Dengeleyici Hazır Ayarı"
 
 #: modules/audio_filter/equalizer.c:59
 msgid "Preset to use for the equalizer."
-msgstr "Dengeleyicinin kullanacağı önayar."
+msgstr "Dengeleyicinin kullanacağı hazır ayar."
 
 #: modules/audio_filter/equalizer.c:61
 msgid "Bands gain"
@@ -10031,7 +10031,7 @@ msgid ""
 "values between -20dB and 20dB, separated by spaces, e.g. \"0 2 4 2 0 -2 -4 "
 "-2 0 2\"."
 msgstr ""
-"Önayarlar yerine el ile ayarlanmış bantlar kullanılır. -20dB ile 20dB "
+"Hazır ayarlar yerine el ile ayarlanmış bantlar kullanılır. -20dB ile 20dB "
 "arasında, boşlukla ayrılmış 10 değer yazmalısınız. Örneğin \"0 2 4 2 0 -2 -4 "
 "-2 0 2\"."
 
@@ -11955,7 +11955,7 @@ msgid ""
 "Add a font effect to text to improve readability against different "
 "backgrounds."
 msgstr ""
-"Bu seçenek etkinleştirildiğinde, farklı art alanlarda okunabilirliği "
+"Bu seçenek etkinleştirildiğinde, farklı arka planlarda okunabilirliği "
 "arttırmak için bir yazı türü etkisi eklenir."
 
 #: modules/codec/kate.c:226
@@ -12006,27 +12006,27 @@ msgstr ""
 
 #: modules/codec/kate.c:247
 msgid "Default background color"
-msgstr "Varsayılan art alan rengi"
+msgstr "Varsayılan arka plan rengi"
 
 #: modules/codec/kate.c:248
 msgid ""
 "Default background color if the Kate stream does not specify a background "
 "color to use."
 msgstr ""
-"Kate akışı hangi art alan renginin kullanılacağı bilgisini içermiyorsa, "
-"varsayılan olarak kullanılacak art alan rengi."
+"Kate akışında hangi arka plan renginin kullanılacağı bilgisi bulunmuyorsa, "
+"varsayılan olarak kullanılacak arka plan rengi."
 
 #: modules/codec/kate.c:252
 msgid "Default background alpha"
-msgstr "Varsayılan art alan alfa"
+msgstr "Varsayılan arka plan alfa değeri"
 
 #: modules/codec/kate.c:253
 msgid ""
 "Transparency of the default background color if the Kate stream does not "
 "specify a particular background color to use."
 msgstr ""
-"Kate akışı hangi art alan renginin kullanılacağı bilgisini içermiyorsa, "
-"varsayılan olarak kullanılacak art alan rengi saydamlığı."
+"Kate akışında hangi arka plan renginin kullanılacağı bilgisi bulunmuyorsa, "
+"varsayılan olarak kullanılacak arka plan rengi saydamlığı."
 
 #: modules/codec/kate.c:259
 msgid ""
@@ -14307,7 +14307,7 @@ msgstr "Kullanılan varsayılan alıcı ayarı"
 
 #: modules/codec/x264.c:413
 msgid "Default preset setting used"
-msgstr "Kullanılan varsayılan önayar"
+msgstr "Kullanılan varsayılan hazır ayar"
 
 #: modules/codec/x264.c:415
 msgid "x264 advanced options"
@@ -16747,13 +16747,13 @@ msgstr "Farklı profillerin adı aynı olamaz."
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:868
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:857
 msgid "Remove a preset"
-msgstr "Bir önayarı sil"
+msgstr "Bir hazır ayarı sil"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:569
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:869
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:858
 msgid "Select the preset you would like to remove:"
-msgstr "Silmek istediğiniz önayarı seçin:"
+msgstr "Silmek istediğiniz hazır ayarı seçin:"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:570
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:870
@@ -16766,19 +16766,19 @@ msgstr "Kaldır"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:647
 msgid "Add new Preset..."
-msgstr "Önayar Ekle..."
+msgstr "Hazır Ayar Ekle..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:652
 msgid "Organize Presets..."
-msgstr "Önayarları Düzenle..."
+msgstr "Hazır Ayarları Düzenle..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:823
 msgid "Save current selection as new preset"
-msgstr "Geçerli seçimi yeni bir önayar olarak kaydeder"
+msgstr "Geçerli seçimi yeni bir hazır ayar olarak kaydeder"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:824
 msgid "Enter a name for the new preset:"
-msgstr "Yeni önayar için bir ad yazın:"
+msgstr "Yeni hazır ayar için bir ad yazın:"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:77
 msgid "Bookmarks"
@@ -17782,11 +17782,11 @@ msgstr "Çerçeve Kalınlığı"
 
 #: modules/gui/macosx/VLCMainMenu.m:462 modules/gui/macosx/VLCMainMenu.m:463
 msgid "Background Opacity"
-msgstr "Art Alan Saydamlığı"
+msgstr "Arka Plan Saydamlığı"
 
 #: modules/gui/macosx/VLCMainMenu.m:464
 msgid "Background Color"
-msgstr "Art Alan Rengi"
+msgstr "Arka Plan Rengi"
 
 #: modules/gui/macosx/VLCMainMenu.m:466
 msgid "Transparent"
@@ -21107,7 +21107,7 @@ msgstr "Profil seçin:"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:187
 msgid "Preview"
-msgstr "Önizleme"
+msgstr "Ön İzleme"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:196
 msgid "Cl&ose"
@@ -21807,24 +21807,24 @@ msgstr "Menüler olmadan sade görünümde başlatılsın"
 
 #: modules/gui/qt/qt.cpp:164
 msgid "Display background cone or art"
-msgstr "Art alanda koni ya da kapak görseli görüntülensin"
+msgstr "Arka planda koni ya da kapak görseli görüntülensin"
 
 #: modules/gui/qt/qt.cpp:165
 msgid ""
 "Display background cone or current album art when not playing. Can be "
 "disabled to prevent burning screen."
 msgstr ""
-"Bu seçenek etkinleştirildiğinde, oynatılan bir ortam yokken, art alanda koni "
-"ya da kapak görseli görüntülenir. Ekranı korumak için devre dışı "
+"Bu seçenek etkinleştirildiğinde, herhangi bir ortam oynatılmazken, arka "
+"planda koni ya da kapak görseli görüntülenir. Ekranı korumak için devre dışı "
 "bırakılabilir."
 
 #: modules/gui/qt/qt.cpp:168
 msgid "Expanding background cone or art"
-msgstr "Yayılan art alan konisi ya da kapak görseli. "
+msgstr "Genişletilmiş arka plan koni ya da kapak görseli"
 
 #: modules/gui/qt/qt.cpp:169
 msgid "Background art fits window's size."
-msgstr "Art alan görseli pencere boyutuna sığdırılsın."
+msgstr "Arka plan görseli pencere boyutuna sığdırılsın."
 
 #: modules/gui/qt/qt.cpp:171
 msgid "Ignore keyboard volume buttons."
@@ -22101,7 +22101,7 @@ msgid ""
 "directly above and a black background directly below."
 msgstr ""
 "Görüntünün görüntülendiği yerdeki VideoCore katmanı. Alt görseller doğrudan "
-"üstte, siyah art alan doğrudan altta görüntülenir."
+"üstte, siyah arka plan doğrudan altta görüntülenir."
 
 #: modules/hw/mmal/vout.c:54
 msgid "Blank screen below video."
@@ -23585,7 +23585,7 @@ msgid ""
 msgstr ""
 "Bu seçenek etkinleştirildiğinde, \"Hızlı Başlat\" dosyaları oluşturulur. "
 "\"Hızlı Başlat\" dosyaları indirmeler için iyileştirme sağlayarak, "
-"kullanıcıların indirme devam ederken önizleme yapabilmesini sağlar."
+"kullanıcıların indirme devam ederken ön izleme yapabilmesini sağlar."
 
 #: modules/mux/mp4/mp4.c:64
 msgid "MP4/MOV muxer"
@@ -25058,7 +25058,7 @@ msgstr "Okuma boyutu"
 
 #: modules/stream_filter/prefetch.c:538
 msgid "Prefetch background read size (bytes)"
-msgstr "Ön alma art alan okuma boyutu (bayt)"
+msgstr "Ön alma arka plan okuma boyutu (bayt)"
 
 #: modules/stream_filter/prefetch.c:540
 msgid "Seek threshold"
@@ -26165,11 +26165,11 @@ msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:106
 msgid "Background opacity"
-msgstr "Art alan matlığı"
+msgstr "Arka plan matlığı"
 
 #: modules/text_renderer/freetype/freetype.c:107
 msgid "Background color"
-msgstr "Art alan rengi"
+msgstr "Arka plan rengi"
 
 #: modules/text_renderer/freetype/freetype.c:109
 msgid "Outline opacity"
@@ -27356,19 +27356,19 @@ msgstr "Karılmayan kenarlık genişliği."
 
 #: modules/video_filter/puzzle.c:61
 msgid "Small preview"
-msgstr "Küçük önizleme"
+msgstr "Küçük ön izleme"
 
 #: modules/video_filter/puzzle.c:62
 msgid "Show small preview."
-msgstr "Küçük önizleme görüntülensin."
+msgstr "Küçük ön izleme görüntülensin."
 
 #: modules/video_filter/puzzle.c:63
 msgid "Small preview size"
-msgstr "Küçük önizleme boyutu"
+msgstr "Küçük ön izleme boyutu"
 
 #: modules/video_filter/puzzle.c:64
 msgid "Show small preview size (percent of source)."
-msgstr "Görüntülenecek küçük önizleme boyutu (kaynağın yüzdesi)."
+msgstr "Görüntülenecek küçük ön izleme boyutu (kaynağın yüzdesi)."
 
 #: modules/video_filter/puzzle.c:65
 msgid "Piece edge shape size"
@@ -28630,11 +28630,11 @@ msgstr "projectM modülünü ayarlamak için kullanılacak dosya."
 
 #: modules/visualization/projectm.cpp:56
 msgid "projectM preset path"
-msgstr "projectM önayar yolu"
+msgstr "projectM hazır ayar yolu"
 
 #: modules/visualization/projectm.cpp:57
 msgid "Path to the projectM preset directory"
-msgstr "projectM önayar klasörünün yolu"
+msgstr "projectM hazır ayar klasörünün yolu"
 
 #: modules/visualization/projectm.cpp:59
 msgid "Title font"
@@ -28929,7 +28929,7 @@ msgstr "Sütun sınırı"
 
 #: share/lua/http/dialogs/mosaic_window.html:133
 msgid "Background"
-msgstr "Art alan"
+msgstr "Arka plan"
 
 #: share/lua/http/dialogs/mosaic_window.html:135
 msgid "Mosaic Tiles"
@@ -29074,7 +29074,7 @@ msgstr "Form"
 
 #: modules/gui/qt/ui/equalizer.h:132
 msgid "Preset"
-msgstr "Öntanımlar"
+msgstr "Hazır Ayar"
 
 #: modules/gui/qt/ui/equalizer.h:134
 msgid "0.00 dB"
@@ -29505,7 +29505,7 @@ msgstr "H.264 çevrim içi engel kaldırma süzgeci atlansın"
 
 #: modules/gui/qt/ui/sprefs_input.h:359
 msgid "x264 preset and tuning selection"
-msgstr "x264 ön ayar ve ince ayar seçimi"
+msgstr "x264 hazır ayar ve ince ayar seçimi"
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "Optical drive"
@@ -29681,7 +29681,7 @@ msgstr " piksel"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a background"
-msgstr "Art alan eklensin"
+msgstr "Arka plan eklensin"
 
 #: modules/gui/qt/ui/sprefs_video.h:313
 msgid "O&utput"
