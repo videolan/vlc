@@ -175,7 +175,7 @@ EXTRA_CFLAGS += -DWINSTORECOMPAT
 EXTRA_LDFLAGS += -lwinstorecompat
 endif
 
-ifneq ($(findstring clang, $(shell $(CC) --version)),)
+ifneq ($(findstring clang, $(shell $(CC) --version 2>/dev/null)),)
 HAVE_CLANG := 1
 endif
 
