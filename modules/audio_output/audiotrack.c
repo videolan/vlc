@@ -1112,11 +1112,12 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
     aout_sys_t *p_sys = p_aout->sys;
     int i_at_format;
 
+    bool b_dtshd;
+    if( !AudioTrack_HasEncoding( p_aout, p_sys->fmt.i_format, &b_dtshd ) )
+        return VLC_EGENERIC;
+
     if( jfields.AudioFormat.has_ENCODING_IEC61937 )
     {
-        bool b_dtshd;
-        if( !AudioTrack_HasEncoding( p_aout, p_sys->fmt.i_format, &b_dtshd ) )
-            return VLC_EGENERIC;
         i_at_format = jfields.AudioFormat.ENCODING_IEC61937;
         switch( p_sys->fmt.i_format )
         {
