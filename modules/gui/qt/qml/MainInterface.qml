@@ -121,16 +121,16 @@ Rectangle {
             id: stackView
             anchors.fill: parent
             focus: true
-            property int prevPlayerState: PlayerController.PLAYING_STATE_STOPPED
 
             Connections {
                 target: player
                 onPlayingStateChanged: {
-                    if (state == PlayerController.PLAYING_STATE_STOPPED )
+                    if (state === PlayerController.PLAYING_STATE_STOPPED)
                         loadCurrentHistoryView()
-                    else if (stackView.prevPlayerState == PlayerController.PLAYING_STATE_STOPPED)
+                }
+                onHasVideoOutputChanged: {
+                    if (player.hasVideoOutput)
                         stackView.replace(audioplayerComp)
-                    stackView.prevPlayerState = state
                 }
             }
         }

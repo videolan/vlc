@@ -100,6 +100,8 @@ Item {
 
     property int selectedBorder: 2
 
+    property int miniPlayerHeight: 60 * scale;
+
     //timings
     property int delayToolTipAppear: 500;
     property int timingPlaylistClose: 1000;

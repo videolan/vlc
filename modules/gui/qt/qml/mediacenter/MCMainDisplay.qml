@@ -203,6 +203,10 @@ Utils.NavigableFocusScope {
                         }
                     }
                 }
+
+                MiniPlayer {
+                    id: miniPlayer
+                }
             }
 
             Connections {

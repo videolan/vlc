@@ -596,6 +596,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/mediacenter/NetworkDriveDisplay.qml \
 	gui/qt/qml/mediacenter/NetworkFileDisplay.qml \
 	gui/qt/qml/mediacenter/NetworkListItem.qml \
+	gui/qt/qml/mediacenter/MiniPlayer.qml \
 	gui/qt/qml/playlist/PlaylistListView.qml \
 	gui/qt/qml/playlist/PlaylistMainView.qml \
 	gui/qt/qml/playlist/PLItem.qml \
