@@ -766,7 +766,6 @@ static int DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
-    assert( p_owner->p_clock );
     assert( !p_sout_block->p_next );
 
     vlc_mutex_lock( &p_owner->lock );
