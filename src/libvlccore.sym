@@ -374,7 +374,7 @@ vlc_stream_fifo_New
 vlc_stream_fifo_Queue
 vlc_stream_fifo_Write
 vlc_stream_fifo_Close
-vlc_strfinput
+vlc_strfplayer
 vlc_strftime
 subpicture_Delete
 subpicture_New

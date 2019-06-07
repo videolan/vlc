@@ -42,7 +42,7 @@
 # define strcoll strcasecmp
 #endif
 
-/* Needed by vlc_strfinput */
+/* Needed by vlc_strfplayer */
 #include <vlc_meta.h>
 #include <vlc_aout.h>
 #include <vlc_memstream.h>
@@ -530,7 +530,7 @@ static int write_meta(struct vlc_memstream *stream, input_item_t *item,
     return 0;
 }
 
-char *vlc_strfinput(vlc_player_t *player, input_item_t *item, const char *s)
+char *vlc_strfplayer(vlc_player_t *player, input_item_t *item, const char *s)
 {
     struct vlc_memstream stream[1];
 

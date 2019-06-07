@@ -168,14 +168,14 @@ VLC_API char *vlc_strftime( const char * );
  * @return the formated string, or NULL in case of error, the string need to be
  * freed with ()
  */
-VLC_API char *vlc_strfinput( vlc_player_t *player, input_item_t *item,
-                             const char *fmt );
+VLC_API char *vlc_strfplayer( vlc_player_t *player, input_item_t *item,
+                              const char *fmt );
 
 static inline char *str_format( vlc_player_t *player, input_item_t *item,
                                 const char *fmt )
 {
     char *s1 = vlc_strftime( fmt );
-    char *s2 = vlc_strfinput( player, item, s1 );
+    char *s2 = vlc_strfplayer( player, item, s1 );
     free( s1 );
     return s2;
 }

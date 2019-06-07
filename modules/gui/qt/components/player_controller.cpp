@@ -26,7 +26,7 @@
 
 #include <vlc_actions.h>           /* ACTION_ID */
 #include <vlc_url.h>            /* vlc_uri_decode */
-#include <vlc_strings.h>        /* vlc_strfinput */
+#include <vlc_strings.h>        /* vlc_strfplayer */
 #include <vlc_aout.h>           /* audio_output_t */
 #include <vlc_es.h>
 #include <vlc_cxx_helpers.hpp>
@@ -76,7 +76,7 @@ void PlayerControllerPrivate::UpdateName(input_item_t* media)
     if (format != NULL)
     {
         vlc_player_Lock( m_player );
-        formatted = vlc_strfinput( m_player, media, format );
+        formatted = vlc_strfplayer( m_player, media, format );
         vlc_player_Unlock( m_player );
         free( format );
         if( formatted != NULL )
