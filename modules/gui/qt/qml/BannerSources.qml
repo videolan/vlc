@@ -303,34 +303,11 @@ Utils.NavigableFocusScope {
                     Layout.fillWidth: true
                 }
 
-                TextField {
-                    Layout.preferredWidth: VLCStyle.widthSearchInput
-                    Layout.preferredHeight: VLCStyle.heightInput
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-
+                Utils.SearchBox {
                     id: searchBox
-                    font.pixelSize: VLCStyle.fontSize_normal
-
-                    color: VLCStyle.colors.buttonText
-                    placeholderText: qsTr("filter")
-                    hoverEnabled: true
-
-                    background: Rectangle {
-                        color: VLCStyle.colors.button
-                        border.color: {
-                            if ( searchBox.text.length < 3 && searchBox.text.length !== 0 )
-                                return VLCStyle.colors.alert
-                            else if ( searchBox.hovered || searchBox.activeFocus )
-                                return VLCStyle.colors.accent
-                            else
-                                return VLCStyle.colors.buttonBorder
-                       }
-                    }
-
-                    onTextChanged: {
-                        if (contentModel !== undefined)
-                            contentModel.searchPattern = text;
-                    }
+                    Layout.minimumWidth: width
+                    Layout.preferredHeight: VLCStyle.icon_normal
+                    contentModel: root.contentModel
 
                     KeyNavigation.right: combo
                     KeyNavigation.up: buttonView
@@ -340,8 +317,6 @@ Utils.NavigableFocusScope {
                 Utils.ComboBoxExt {
                     id: combo
 
-                    //Layout.fillHeight: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                     Layout.preferredWidth: VLCStyle.widthSortBox
                     Layout.preferredHeight: VLCStyle.heightInput
                     textRole: "text"

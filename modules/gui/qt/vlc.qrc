@@ -102,6 +102,7 @@
         <file alias="noart_album.svg">pixmaps/noart_album.svg</file>
         <file alias="noart_artist.svg">pixmaps/noart_artist.svg</file>
         <file alias="noart_artist_small.svg">pixmaps/noart_artist_small.svg</file>
+        <file>qml/utils/SearchBox.qml</file>
     </qresource>
     <qresource prefix="/prefsmenu">
         <file alias="cone_audio_64.png">pixmaps/prefs/spref_cone_Audio_64.png</file>
@@ -188,6 +189,7 @@
         <file alias="MenuItemExt.qml">qml/utils/MenuItemExt.qml</file>
         <file alias="ExpandGridView.qml">qml/utils/ExpandGridView.qml</file>
         <file alias="ScanProgressBar.qml">qml/utils/ScanProgressBar.qml</file>
+        <file alias="SearchBox.qml">qml/utils/SearchBox.qml</file>
     </qresource>
     <qresource prefix="/mediacenter">
         <file alias="MCMusicDisplay.qml">qml/mediacenter/MCMusicDisplay.qml</file>

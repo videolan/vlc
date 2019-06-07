@@ -153,4 +153,5 @@ Item {
     property string topbar_network: "\ue078"
     property string topbar_previous: "\ue079"
     property string topbar_next: "\ue07a"
+    property string topbar_filter: "\ue07b"
 }
