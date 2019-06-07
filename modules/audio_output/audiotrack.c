@@ -1762,8 +1762,10 @@ ConvertFromIEC61937( audio_output_t *p_aout, block_t *p_buffer )
         case 0x0B: /* IEC61937_DTS1 */
         case 0x0C: /* IEC61937_DTS2 */
         case 0x0D: /* IEC61937_DTS3 */
-        case 0x11: /* IEC61937_DTSHD */
             i_length_mul = 8;
+            break;
+        case 0x11: /* IEC61937_DTSHD */
+            i_length_mul = 1;
             break;
         default:
             vlc_assert_unreachable();
