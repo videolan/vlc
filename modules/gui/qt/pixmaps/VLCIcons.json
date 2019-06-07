@@ -124,6 +124,8 @@
 		{"key":"menu", "path": "./menu.svg"},
 		{"key":"topbar_video", "path": "./topbar/video.svg"},
 		{"key":"topbar_music", "path": "./topbar/music.svg"},
-		{"key":"topbar_network", "path": "./topbar/network.svg"}
+ 		{"key":"topbar_network", "path": "./topbar/network.svg"},
+		{"key":"topbar_previous", "path": "./topbar/previous.svg"},
+		{"key":"topbar_next", "path": "./topbar/next.svg"}
 	]
 }

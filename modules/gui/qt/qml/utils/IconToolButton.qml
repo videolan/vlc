@@ -27,34 +27,29 @@ ToolButton {
                         : VLCStyle.colors.buttonText
     property int size: VLCStyle.icon_normal
 
-    property color highlightColor: control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.bgHover
+    property color highlightColor: VLCStyle.colors.accent
 
-    contentItem: Label {
-        text: control.text
-        color: control.color
+    padding: 0
 
-        font.pixelSize: control.size
-        font.family: VLCIcons.fontFamily
-
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
-
-        anchors {
-            centerIn: parent
-            //verticalCenter: parent.verticalCenter
-            //rightMargin: VLCStyle.margin_xsmall
-            //leftMargin: VLCStyle.margin_small
-        }
+    contentItem: Item {
 
         Rectangle {
-            anchors {
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-            }
-            height: 2
-            visible: control.activeFocus || control.checked
-            color: control.highlightColor
+            anchors.fill: parent
+            visible: control.activeFocus || control.hovered || control.highlighted
+            color: highlightColor
+        }
+
+        Label {
+            text: control.text
+            color: control.color
+
+            anchors.centerIn: parent
+
+            font.pixelSize: control.size
+            font.family: VLCIcons.fontFamily
+
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
         }
     }
 

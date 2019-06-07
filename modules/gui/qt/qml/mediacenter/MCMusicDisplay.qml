@@ -34,6 +34,17 @@ Utils.NavigableFocusScope {
     property string view: "albums"
     property var viewProperties: ({})
 
+    property var sortModel
+    property var contentModel
+
+    function loadIndex(index) {
+        stackView.replace(root.pageModel[index].component)
+        history.push(["mc", "music", root.pageModel[index].name], History.Stay)
+        stackView.focus = true
+        sortModel = stackView.currentItem.sortModel
+        contentModel = stackView.currentItem.model
+    }
+
     Component { id: albumComp; MusicAlbumsDisplay{ } }
     Component { id: artistComp; MusicArtistsDisplay{ } }
     Component { id: genresComp; MusicGenresDisplay{ } }
@@ -64,7 +75,6 @@ Utils.NavigableFocusScope {
                 append({
                     displayText: e.displayText,
                     name: e.name,
-                    selected: (e.name === root.view)
                 })
             })
         }
@@ -74,160 +84,18 @@ Utils.NavigableFocusScope {
         anchors.fill : parent
         spacing: 0
 
-        Utils.NavigableFocusScope {
-            id: toobar
-
-            Layout.fillWidth: true
-            Layout.preferredHeight: VLCStyle.icon_normal + VLCStyle.margin_small
-
-            Rectangle {
-                anchors.fill: parent
-                color: VLCStyle.colors.banner
-
-                RowLayout {
-                    anchors.fill: parent
-
-                    TabBar {
-                        id: bar
-
-                        focus: true
-
-                        Layout.preferredHeight: parent.height - VLCStyle.margin_small
-                        Layout.alignment: Qt.AlignVCenter
-
-                        background: Rectangle {
-                            color: VLCStyle.colors.banner
-                        }
-                        Component.onCompleted: {
-                            bar.contentItem.focus= true
-                        }
-
-                        /* List of sub-sources for Music */
-                        Repeater {
-                            id: model_music_id
-
-                            model: tabModel
-
-                            //Column {
-                            TabButton {
-                                id: control
-                                text: model.displayText
-                                font.pixelSize: VLCStyle.fontSize_normal
-                                background: Rectangle {
-                                    color: control.hovered ? VLCStyle.colors.bannerHover : VLCStyle.colors.banner
-                                }
-                                contentItem: Label {
-                                    text: control.text
-                                    font: control.font
-                                    color:  control.hovered ?  VLCStyle.colors.textActiveSource : VLCStyle.colors.text
-                                    verticalAlignment: Text.AlignVCenter
-                                    horizontalAlignment: Text.AlignHCenter
-
-                                    Rectangle {
-                                        anchors {
-                                            left: parent.left
-                                            right: parent.right
-                                            bottom: parent.bottom
-                                        }
-                                        height: 2
-                                        visible: control.activeFocus || control.checked
-                                        color: control.activeFocus ? VLCStyle.colors.accent  : VLCStyle.colors.bgHover
-                                    }
-                                }
-                                onClicked: {
-                                    stackView.replace(pageModel[index].component)
-                                    history.push(["mc", "music", model.name ], History.Stay)
-                                    stackView.focus = true
-                                }
-                                checked: (model.name === root.view)
-                                activeFocusOnTab: true
-                                Component.onCompleted: {
-                                    if (model.selected)
-                                        bar.currentIndex = index
-                                }
-                            }
-                        }
-
-                        KeyNavigation.right: searchBox
-                    }
-
-                    /* Spacer */
-                    Item {
-                        Layout.fillWidth: true
-                    }
-
-                    TextField {
-                        Layout.preferredWidth: VLCStyle.widthSearchInput
-                        Layout.preferredHeight: parent.height - VLCStyle.margin_small
-                        Layout.alignment: Qt.AlignVCenter  | Qt.AlignRight
-
-                        id: searchBox
-                        font.pixelSize: VLCStyle.fontSize_normal
-
-                        color: VLCStyle.colors.buttonText
-                        placeholderText: qsTr("filter")
-                        hoverEnabled: true
-
-                        background: Rectangle {
-                            radius: 5 //fixme
-                            color: VLCStyle.colors.button
-                            border.color: {
-                                if ( searchBox.text.length < 3 && searchBox.text.length !== 0 )
-                                    return VLCStyle.colors.alert
-                                else if ( searchBox.hovered || searchBox.activeFocus )
-                                    return VLCStyle.colors.accent
-                                else
-                                    return VLCStyle.colors.buttonBorder
-                           }
-                        }
-
-                        onTextChanged: {
-                            stackView.currentItem.model.searchPattern = text;
-                        }
-
-                        KeyNavigation.right: combo
-                    }
-
-                    /* Selector to choose a specific sorting operation */
-                    Utils.ComboBoxExt {
-                        id: combo
-
-                        //Layout.fillHeight: true
-                        Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-                        Layout.preferredWidth: VLCStyle.widthSortBox
-                        Layout.preferredHeight: parent.height - VLCStyle.margin_small
-                        textRole: "text"
-                        model: stackView.currentItem.sortModel
-                        onCurrentIndexChanged: {
-                            var sorting = model.get(currentIndex);
-                            stackView.currentItem.model.sortCriteria = sorting.criteria
-                        }
-                    }
-                }
-            }
-
-            onActionLeft:   root.actionLeft(index)
-            onActionRight:  root.actionRight(index)
-            onActionDown:   stackView.focus = true
-            onActionUp:     root.actionUp( index )
-            onActionCancel: root.actionCancel( index )
-
-            Keys.priority: Keys.AfterItem
-            Keys.onPressed: {
-                if (!event.accepted)
-                    defaultKeyAction(event, 0)
-            }
-        }
-
         /* The data elements */
         Utils.StackViewExt  {
             id: stackView
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.margins: VLCStyle.margin_normal
             focus: true
 
             Component.onCompleted: {
                 var found = stackView.loadView(root.pageModel, view, viewProperties)
+                sortModel = stackView.currentItem.sortModel
+                contentModel = stackView.currentItem.model
                 if (!found)
                     replace(pageModel[0].component)
             }
@@ -239,8 +107,8 @@ Utils.NavigableFocusScope {
             onActionLeft:   root.actionLeft(index)
             onActionRight:  root.actionRight(index)
             onActionDown:   root.actionDown(index)
-            onActionUp:     toobar.focus = true
-            onActionCancel: toobar.focus = true
+            onActionUp:     root.actionUp(index)
+            onActionCancel: root.actionCancel(index)
         }
     }
 }

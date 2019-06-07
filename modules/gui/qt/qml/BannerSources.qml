@@ -33,7 +33,16 @@ Utils.NavigableFocusScope {
     height: pLBannerSources.height
 
     property int selectedIndex: 0
+    property int subSelectedIndex: 0
+
+    signal itemClicked(int index)
+    signal subItemClicked(int index)
+
+    property alias sortModel: combo.model
+    property var contentModel
+
     property alias model: pLBannerSources.model
+    property alias subTabModel: model_music_id.model
     signal toogleMenu()
 
     // Triggered when the toogleView button is selected
@@ -61,6 +70,8 @@ Utils.NavigableFocusScope {
                 right: parent.right
             }
 
+            spacing: VLCStyle.margin_xxsmall
+
             /* Button for the sources */
             TabBar {
                 id: buttonView
@@ -69,14 +80,43 @@ Utils.NavigableFocusScope {
                     horizontalCenter: parent.horizontalCenter
                 }
 
-                focusPolicy: Qt.StrongFocus
-
                 Layout.preferredHeight: VLCStyle.icon_normal
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                 spacing: VLCStyle.margin_small
 
-                KeyNavigation.left: history_back
+                focus: true
+
+                // KeyNavigation states
+                states: [
+                    State {
+                        name: "no_history"
+                        when: history.nextEmpty && history.previousEmpty
+                        PropertyChanges {
+                            target: buttonView
+                            KeyNavigation.left: searchBox
+                            KeyNavigation.down: searchBox
+                        }
+                    },
+                    State {
+                        name: "has_previous_history"
+                        when: !history.previousEmpty
+                        PropertyChanges {
+                            target: buttonView
+                            KeyNavigation.left: history_back
+                            KeyNavigation.down: history_back
+                        }
+                    },
+                    State {
+                        name: "has_only_next_history"
+                        when: !history.nextEmpty && history.previousEmpty
+                        PropertyChanges {
+                            target: buttonView
+                            KeyNavigation.left: history_next
+                            KeyNavigation.down: history_next
+                        }
+                    }
+                ]
 
                 Component.onCompleted: {
                     buttonView.contentItem.focus = true
@@ -90,28 +130,16 @@ Utils.NavigableFocusScope {
                 /* Repeater to display each button */
                 Repeater {
                     id: sourcesButtons
-                    focus: true
 
                     TabButton {
                         id: control
                         text: model.displayText
 
-                        //initial focus
-                        focusPolicy: Qt.StrongFocus
-                        //focus: index === 1
-                        focus: model.selected
-
-                        Component.onCompleted: {
-                            if (model.selected) {
-                                buttonView.currentIndex = index
-                            }
-                        }
-
                         padding: 0
                         width: contentItem.implicitWidth
 
                         onClicked: {
-                            root.selectedIndex = model.index
+                            root.itemClicked(model.index)
                         }
 
                         font.pixelSize: VLCStyle.fontSize_normal
@@ -126,6 +154,13 @@ Utils.NavigableFocusScope {
                         contentItem: Item {
                             implicitWidth: tabRow.width
                             implicitHeight: tabRow.height
+
+                            Rectangle {
+                                anchors.fill: tabRow
+                                visible: control.activeFocus || control.hovered
+                                color: VLCStyle.colors.accent
+                            }
+
                             Row {
                                 id: tabRow
                                 padding: VLCStyle.margin_xxsmall
@@ -166,7 +201,7 @@ Utils.NavigableFocusScope {
                                     bottom: tabRow.bottom
                                 }
                                 height: 2
-                                visible: root.selectedIndex === model.index || control.activeFocus || control.hovered
+                                visible: root.selectedIndex === model.index
                                 color: "transparent"
                                 border.color: VLCStyle.colors.accent
                             }
@@ -177,21 +212,153 @@ Utils.NavigableFocusScope {
 
             RowLayout {
                 width: parent.width
+                spacing: 0
 
                 Utils.IconToolButton {
                     id: history_back
                     size: VLCStyle.icon_normal
-                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                    text: VLCIcons.dvd_prev
-                    focus: true
-                    KeyNavigation.right: buttonView
+                    Layout.minimumWidth: width
+                    text: VLCIcons.topbar_previous
+                    KeyNavigation.right: history_next
                     onClicked: history.pop(History.Go)
                 }
 
+                Utils.IconToolButton {
+                    id: history_next
+                    size: VLCStyle.icon_normal
+                    Layout.minimumWidth: width
+                    text: VLCIcons.topbar_next
+                    KeyNavigation.right: bar
+                    KeyNavigation.up: buttonView
+                }
+
+                TabBar {
+                    id: bar
+
+                    visible: model_music_id.model !== undefined
+                    enabled: model_music_id.model !== undefined
+
+                    Component.onCompleted: {
+                        bar.contentItem.focus= true
+                    }
+
+                    /* List of sub-sources for Music */
+                    Repeater {
+                        id: model_music_id
+
+                        //Column {
+                        TabButton {
+                            id: control
+                            text: model.displayText
+                            font.pixelSize: VLCStyle.fontSize_normal
+                            background: Rectangle {
+                                color: VLCStyle.colors.banner
+                            }
+                            contentItem: Item {
+                                implicitWidth: subSectionName.width
+                                implicitHeight: subSectionName.height
+
+                                Rectangle {
+                                    anchors.fill: subSectionName
+                                    visible: control.activeFocus || control.hovered
+                                    color: VLCStyle.colors.accent
+                                }
+
+                                Label {
+                                    id: subSectionName
+                                    padding: VLCStyle.margin_xxsmall
+                                    text: control.text
+                                    font: control.font
+                                    color: VLCStyle.colors.text
+                                }
+
+                                Rectangle {
+                                    anchors {
+                                        left: subSectionName.left
+                                        right: subSectionName.right
+                                        bottom: subSectionName.bottom
+                                    }
+                                    height: 2
+                                    visible: root.subSelectedIndex === model.index
+
+                                    color: VLCStyle.colors.accent
+                                }
+                            }
+                            onClicked: {
+                                root.subItemClicked(model.index)
+                            }
+                            activeFocusOnTab: true
+                        }
+                    }
+
+                    KeyNavigation.right: searchBox
+                    KeyNavigation.up: buttonView
+                }
+
+                /* Spacer */
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                TextField {
+                    Layout.preferredWidth: VLCStyle.widthSearchInput
+                    Layout.preferredHeight: VLCStyle.heightInput
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+
+                    id: searchBox
+                    font.pixelSize: VLCStyle.fontSize_normal
+
+                    color: VLCStyle.colors.buttonText
+                    placeholderText: qsTr("filter")
+                    hoverEnabled: true
+
+                    background: Rectangle {
+                        color: VLCStyle.colors.button
+                        border.color: {
+                            if ( searchBox.text.length < 3 && searchBox.text.length !== 0 )
+                                return VLCStyle.colors.alert
+                            else if ( searchBox.hovered || searchBox.activeFocus )
+                                return VLCStyle.colors.accent
+                            else
+                                return VLCStyle.colors.buttonBorder
+                       }
+                    }
+
+                    onTextChanged: {
+                        if (contentModel !== undefined)
+                            contentModel.searchPattern = text;
+                    }
+
+                    KeyNavigation.right: combo
+                    KeyNavigation.up: buttonView
+                }
+
+                /* Selector to choose a specific sorting operation */
+                Utils.ComboBoxExt {
+                    id: combo
+
+                    //Layout.fillHeight: true
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+                    Layout.preferredWidth: VLCStyle.widthSortBox
+                    Layout.preferredHeight: VLCStyle.heightInput
+                    textRole: "text"
+                    onCurrentIndexChanged: {
+                        if (model !== undefined && contentModel !== undefined) {
+                            var sorting = model.get(currentIndex);
+                            contentModel.sortCriteria = sorting.criteria
+                        }
+                    }
+
+                    KeyNavigation.right: playlist_btn
+                    KeyNavigation.up: buttonView
+                }
+
                 ToolBar {
+                    id: tools
+                    Layout.minimumWidth: width
                     Layout.preferredHeight: VLCStyle.icon_normal
                     //Layout.preferredWidth: VLCStyle.icon_normal * 3
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+                    Layout.alignment: Qt.AlignRight
                     background: Item{
                         width: parent.implicitWidth
                         height: parent.implicitHeight
@@ -204,9 +371,10 @@ Utils.NavigableFocusScope {
                             size: VLCStyle.icon_normal
                             text: VLCIcons.playlist
 
-                            KeyNavigation.left: buttonView
-
                             onClicked: root.toogleMenu()
+
+                            KeyNavigation.right: menu_selector
+                            KeyNavigation.up: buttonView
                         }
 
                         Utils.IconToolButton {
@@ -215,14 +383,14 @@ Utils.NavigableFocusScope {
                             size: VLCStyle.icon_normal
                             text: VLCIcons.menu
 
-                            KeyNavigation.left: playlist_btn
-
                             onClicked: mainMenu.openBelow(this)
 
                             Menus.MainDropdownMenu {
                                 id: mainMenu
                                 onClosed: menu_selector.forceActiveFocus()
                             }
+
+                            KeyNavigation.up: buttonView
                         }
                     }
                 }

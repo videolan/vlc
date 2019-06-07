@@ -84,7 +84,6 @@ Utils.NavigableFocusScope {
         color: VLCStyle.colors.bg
         anchors.fill: parent
 
-
         Utils.NavigableFocusScope {
             focus: true
             id: medialibId
@@ -107,16 +106,28 @@ Utils.NavigableFocusScope {
                     Layout.maximumHeight: height
                     Layout.fillWidth: true
 
+                    focus: true
                     model: root.tabModel
-                    selectedIndex: pageModel.findIndex(function (e) {
-                        return e.name === root.view
-                    })
 
-                    onSelectedIndexChanged: {
-                        var name = root.tabModel.get(selectedIndex).name
-                        stackView.replace(root.pageModel[selectedIndex].component)
+                    onItemClicked: {
+                        sourcesBanner.subTabModel = undefined
+
+                        var name = root.tabModel.get(index).name
+                        stackView.replace(root.pageModel[index].component)
                         history.push(["mc", name], History.Stay)
-                        stackView.focus = true
+
+                        subTabModel = stackView.currentItem.tabModel
+                        sortModel = stackView.currentItem.sortModel
+                        contentModel = stackView.currentItem.contentModel
+
+                        selectedIndex = index
+                    }
+
+                    onSubItemClicked: {
+                        subSelectedIndex = index
+                        stackView.currentItem.loadIndex(index)
+                        sortModel = stackView.currentItem.sortModel
+                        contentModel = stackView.currentItem.contentModel
                     }
 
                     onActionDown: stackView.focus = true
@@ -128,14 +139,23 @@ Utils.NavigableFocusScope {
                     onToogleMenu: playlist.toggleState()
                 }
 
-
                 Utils.StackViewExt {
                     id: stackView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    focus: true
                     Component.onCompleted: {
                         var found = stackView.loadView(root.pageModel, root.view, root.viewProperties)
+                        sourcesBanner.subTabModel = stackView.currentItem.tabModel
+                        sourcesBanner.sortModel = stackView.currentItem.sortModel
+                        sourcesBanner.contentModel = stackView.currentItem.contentModel
+                        // Restore sourcesBanner state
+                        sourcesBanner.selectedIndex = pageModel.findIndex(function (e) {
+                            return e.name === root.view
+                        })
+                        if (stackView.currentItem.pageModel !== undefined)
+                            sourcesBanner.subSelectedIndex = stackView.currentItem.pageModel.findIndex(function (e) {
+                                return e.name === stackView.currentItem.view
+                            })
                     }
 
                     Utils.Drawer {
@@ -197,7 +217,7 @@ Utils.NavigableFocusScope {
                 target: stackView.currentItem
                 ignoreUnknownSignals: true
 
-                onActionUp:     sourcesBanner.focus = true
+                onActionUp: sourcesBanner.focus = true
                 onActionCancel: sourcesBanner.focus = true
 
                 onActionLeft:   medialibId.actionLeft(index)

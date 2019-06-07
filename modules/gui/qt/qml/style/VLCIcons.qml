@@ -151,4 +151,6 @@ Item {
     property string topbar_video: "\ue076"
     property string topbar_music: "\ue077"
     property string topbar_network: "\ue078"
+    property string topbar_previous: "\ue079"
+    property string topbar_next: "\ue07a"
 }
