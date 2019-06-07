@@ -388,23 +388,6 @@ ${MementoSection} "$(Name_Section02b)" SEC02b
 ${MementoSectionEnd}
 
 SectionGroup /e "!$(Name_Section34)"
-!ifdef INSTALL_MOZILLA
-${MementoSection} "$(Name_Section03)" SEC03
-  SectionIn 1 3
-
-  SetOutPath "$INSTDIR"
-  !insertmacro OpenUninstallLog
-  !insertmacro InstallFile npvlc.dll
-  !insertmacro CloseUninstallLog
-
-  !define Moz "SOFTWARE\MozillaPlugins\@videolan.org/vlc,version=${VERSION}"
-  WriteRegStr HKLM ${Moz} "Description" "VLC Multimedia Plugin"
-  WriteRegStr HKLM ${Moz} "Path" "$INSTDIR\npvlc.dll"
-  WriteRegStr HKLM ${Moz} "Product" "VLC media player"
-  WriteRegStr HKLM ${Moz} "Vendor" "VideoLAN"
-  WriteRegStr HKLM ${Moz} "Version" "${VERSION}"
-${MementoSectionEnd}
-!endif
 
 !ifdef INSTALL_ACTIVEX
 ${MementoSection} "$(Name_Section04)" SEC04

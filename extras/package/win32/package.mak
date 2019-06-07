@@ -5,7 +5,6 @@ endif
 
 win32_destdir=$(top_builddir)/vlc-$(VERSION)
 win32_debugdir=$(abs_top_builddir)/symbols-$(VERSION)
-win32_xpi_destdir=$(abs_top_builddir)/vlc-plugin-$(VERSION)
 
 7ZIP_OPTS=-t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on
 
@@ -88,13 +87,12 @@ endif
 # Convert to DOS line endings
 	find $(win32_destdir) -type f \( -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*.lua' \) -exec $(U2D) -q {} \;
 
-package-win-npapi: build-npapi
+package-win-activex: build-npapi
 	cp "$(top_builddir)/npapi-vlc/installed/lib/axvlc.dll" "$(win32_destdir)/"
-	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
 	mkdir -p "$(win32_destdir)/sdk/activex/"
 	cp $(top_builddir)/npapi-vlc/activex/README.TXT $(top_builddir)/npapi-vlc/share/test/test.html $(win32_destdir)/sdk/activex/
 
-package-win-strip: package-win-common package-win-npapi
+package-win-strip: package-win-common package-win-activex
 	mkdir -p "$(win32_debugdir)"/
 	find $(win32_destdir) -type f \( -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' \) | while read i; \
 	do if test -n "$$i" ; then \
@@ -103,24 +101,6 @@ package-win-strip: package-win-common package-win-npapi
 	    $(OBJCOPY) --add-gnu-debuglink="$(win32_debugdir)/`basename $$i.dbg`" "$$i" ; \
 	  fi ; \
 	done
-
-package-win32-webplugin-common: package-win-strip
-	mkdir -p "$(win32_xpi_destdir)/plugins/"
-	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/plugins/"
-	cp "$(win32_destdir)/libvlc.dll" "$(win32_destdir)/libvlccore.dll" "$(win32_destdir)/npvlc.dll" "$(win32_xpi_destdir)/plugins/"
-	rm -rf "$(win32_xpi_destdir)/plugins/plugins/gui/"
-
-
-package-win32-xpi: package-win32-webplugin-common
-	cp $(top_builddir)/npapi-vlc/npapi/package/install.rdf "$(win32_xpi_destdir)/"
-	zip -r -9 $(WINVERSION).xpi $(win32_xpi_destdir)/install.rdf $(win32_xpi_destdir)/plugins
-
-
-package-win32-crx: package-win32-webplugin-common
-	cp $(top_builddir)/npapi-vlc/npapi/package/manifest.json "$(win32_xpi_destdir)/"
-	crxmake --pack-extension "$(win32_xpi_destdir)" \
-		--extension-output "$(win32_destdir)/$(WINVERSION).crx" --ignore-file install.rdf
-
 
 $(win32_destdir)/NSIS/nsProcess.dll: extras/package/win32/NSIS/nsProcess/nsProcess.c extras/package/win32/NSIS/nsProcess/pluginapi.c
 	mkdir -p "$(win32_destdir)/NSIS/"
@@ -165,9 +145,9 @@ package-win32-debug-7zip: package-win-common
 	$(SEVENZIP) a $(7ZIP_OPTS) $(WINVERSION)-debug.7z vlc-$(VERSION)
 
 package-win32-cleanup:
-	rm -Rf $(win32_destdir) $(win32_debugdir) $(win32_xpi_destdir)
+	rm -Rf $(win32_destdir) $(win32_debugdir)
 
-package-win32: package-win32-zip package-win32-7zip package-win32-exe package-win32-xpi
+package-win32: package-win32-zip package-win32-7zip package-win32-exe
 
 package-win32-debug: package-win32-debug-zip package-win32-debug-7zip
 
@@ -196,7 +176,7 @@ package-wince: package-win-strip
 	rm -f -- vlc-$(VERSION)-wince.zip
 	zip -r -9 vlc-$(VERSION)-wince.zip vlc-$(VERSION)
 
-.PHONY: package-win-install package-win-common package-win-strip package-win32-webplugin-common package-win32-xpi package-win32-crx package-win32-exe package-win32-zip package-win32-debug-zip package-win32-7zip package-win32-debug-7zip package-win32-cleanup package-win32 package-win32-debug package-wince
+.PHONY: package-win-install package-win-common package-win-strip package-win32-exe package-win32-zip package-win32-debug-zip package-win32-7zip package-win32-debug-7zip package-win32-cleanup package-win32 package-win32-debug package-wince
 
 EXTRA_DIST += \
 	extras/package/win32/vlc.exe.manifest \
