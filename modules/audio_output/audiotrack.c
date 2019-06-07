@@ -1940,7 +1940,7 @@ Play( audio_output_t *p_aout, block_t *p_buffer, vlc_tick_t i_date )
     size_t i_buffer_offset = 0;
     aout_sys_t *p_sys = p_aout->sys;
 
-    if( p_sys->b_passthrough && !jfields.AudioFormat.has_ENCODING_IEC61937
+    if( p_sys->b_passthrough && p_sys->fmt.i_format == VLC_CODEC_SPDIFB
      && ConvertFromIEC61937( p_aout, p_buffer ) != 0 )
     {
         block_Release(p_buffer);
