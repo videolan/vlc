@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_codec.h>
 
 #define COBJMACROS
 #include <d3d11.h>
@@ -584,5 +585,14 @@ vlc_module_begin()
     add_submodule()
     set_callbacks( D3D11OpenCPUConverter, D3D11CloseCPUConverter )
     set_capability( "video converter", 10 )
+
+    add_submodule()
+    set_description(N_("Direct3D11"))
+    set_callback_dec_device( D3D11OpenDecoderDevice, 20 )
+#if VLC_WINSTORE_APP
+    /* LEGACY, the d3dcontext and swapchain were given by the host app */
+    add_integer("winrt-d3dcontext",    0x0, NULL, NULL, true) /* ID3D11DeviceContext* */
+#endif /* VLC_WINSTORE_APP */
+    add_shortcut ("d3d11-device")
 
 vlc_module_end()
