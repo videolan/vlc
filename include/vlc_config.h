@@ -68,14 +68,6 @@
 #define DEFAULT_PTS_DELAY               VLC_TICK_FROM_MS(300)
 
 /*****************************************************************************
- * SPU configuration
- *****************************************************************************/
-
-/* Buffer must avoid arriving more than SPU_MAX_PREPARE_TIME in advanced to
- * the SPU */
-#define SPU_MAX_PREPARE_TIME            VLC_TICK_FROM_MS(500)
-
-/*****************************************************************************
  * Video configuration
  *****************************************************************************/
 
