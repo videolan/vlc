@@ -1,7 +1,7 @@
 !insertmacro LANGFILE_EXT Latvian
 ${LangFileString} Name_Section01 "Mediju atskaņotājs (nepieciešams)"
 ${LangFileString} Name_Section02a "Sākuma izvēlnes saīsne"
-${LangFileString} Name_Section02b "Darbavirsmas saīsne"
+${LangFileString} Name_Section02b "Darbvirsmas saīsne"
 ${LangFileString} Name_Section34 "Tīmekļa spraudņi"
 ${LangFileString} Name_Section03 "Mozilla spraudnis"
 ${LangFileString} Name_Section04 "ActiveX spraudnis"
