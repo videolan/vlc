@@ -38,7 +38,7 @@ Utils.NavigableFocusScope {
     signal itemClicked(int index)
     signal subItemClicked(int index)
 
-    property alias sortModel: combo.model
+    property alias sortModel: sort_control.model
     property var contentModel
 
     property alias model: pLBannerSources.model
@@ -309,17 +309,16 @@ Utils.NavigableFocusScope {
                     Layout.preferredHeight: VLCStyle.icon_normal
                     contentModel: root.contentModel
 
-                    KeyNavigation.right: combo
+                    KeyNavigation.right: sort_control
                     KeyNavigation.up: buttonView
                 }
 
-                /* Selector to choose a specific sorting operation */
-                Utils.ComboBoxExt {
-                    id: combo
+                Utils.SortControl {
+                    id: sort_control
 
-                    Layout.preferredWidth: VLCStyle.widthSortBox
-                    Layout.preferredHeight: VLCStyle.heightInput
                     textRole: "text"
+                    listWidth: VLCStyle.widthSortBox
+
                     onCurrentIndexChanged: {
                         if (model !== undefined && contentModel !== undefined) {
                             var sorting = model.get(currentIndex);
@@ -337,7 +336,7 @@ Utils.NavigableFocusScope {
                     Layout.preferredHeight: VLCStyle.icon_normal
                     //Layout.preferredWidth: VLCStyle.icon_normal * 3
                     Layout.alignment: Qt.AlignRight
-                    background: Item{
+                    background: Item {
                         width: parent.implicitWidth
                         height: parent.implicitHeight
                     }

@@ -551,6 +551,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/utils/StackViewExt.qml \
 	gui/qt/qml/utils/ScanProgressBar.qml \
         gui/qt/qml/utils/SearchBox.qml \
+        gui/qt/qml/utils/SortControl.qml \
 	gui/qt/qml/menus/CheckableModelSubMenu.qml \
 	gui/qt/qml/menus/AudioMenu.qml \
 	gui/qt/qml/menus/HelpMenu.qml \
