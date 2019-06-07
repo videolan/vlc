@@ -3317,28 +3317,6 @@ static char *input_SubtitleFile2Uri( input_thread_t *p_input,
     return psz_uri;
 }
 
-/**/
-/* TODO FIXME nearly the same logic that snapshot code */
-char *input_CreateFilename(input_thread_t *input, input_item_t *item,
-                           const char *dir, const char *filenamefmt,
-                           const char *ext)
-{
-    char *path;
-    char *filename = str_format(NULL, item, filenamefmt);
-    if (unlikely(filename == NULL))
-        return NULL;
-
-    filename_sanitize(filename);
-
-    if (((ext != NULL)
-            ? asprintf(&path, "%s"DIR_SEP"%s.%s", dir, filename, ext)
-            : asprintf(&path, "%s"DIR_SEP"%s", dir, filename)) < 0)
-        path = NULL;
-
-    free(filename);
-    return path;
-}
-
 int input_GetAttachments(input_thread_t *input,
                          input_attachment_t ***attachments)
 {

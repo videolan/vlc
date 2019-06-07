@@ -601,8 +601,9 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
 
         if( !psz_sout && psz_path )
         {
-            char *psz_file = input_CreateFilename( p_input, NULL, psz_path,
-                                                   INPUT_RECORD_PREFIX, NULL );
+            char *psz_file = input_item_CreateFilename( input_GetItem(p_input),
+                                                        psz_path,
+                                                        INPUT_RECORD_PREFIX, NULL );
             if( psz_file )
             {
                 char* psz_file_esc = config_StringEscape( psz_file );

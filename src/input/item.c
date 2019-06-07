@@ -1329,7 +1329,20 @@ char *input_item_CreateFilename(input_item_t *item,
                                 const char *dir, const char *filenamefmt,
                                 const char *ext)
 {
-    return input_CreateFilename(NULL, item, dir, filenamefmt, ext);
+    char *path;
+    char *filename = str_format(NULL, item, filenamefmt);
+    if (unlikely(filename == NULL))
+        return NULL;
+
+    filename_sanitize(filename);
+
+    if (((ext != NULL)
+            ? asprintf(&path, "%s"DIR_SEP"%s.%s", dir, filename, ext)
+            : asprintf(&path, "%s"DIR_SEP"%s", dir, filename)) < 0)
+        path = NULL;
+
+    free(filename);
+    return path;
 }
 
 struct input_item_parser_id_t
