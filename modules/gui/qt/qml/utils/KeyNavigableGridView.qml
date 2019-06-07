@@ -94,7 +94,7 @@ NavigableFocusScope {
                 newIndex = Math.max(0, currentIndex - _colCount * 5)
             }
 
-            if (newIndex != -1 && newIndex != currentIndex) {
+            if (newIndex >= 0 && newIndex < modelCount && newIndex != currentIndex) {
                 var oldIndex = currentIndex
                 currentIndex = newIndex
                 event.accepted = true
