@@ -31,6 +31,7 @@
 #include <vlc_atomic.h>
 #include <vlc_meta.h>
 #include <vlc_modules.h>
+#include "libvlc.h"
 
 void decoder_Init( decoder_t *p_dec, const es_format_t *restrict p_fmt )
 {
@@ -138,6 +139,7 @@ vlc_decoder_device_Create(vout_window_t *window)
     free(name);
     if (!priv->module)
     {
+        vlc_objres_clear(VLC_OBJECT(&priv->device));
         vlc_object_delete(&priv->device);
         return NULL;
     }
@@ -162,6 +164,7 @@ vlc_decoder_device_Release(vlc_decoder_device *device)
     if (vlc_atomic_rc_dec(&priv->rc))
     {
         vlc_module_unload(priv->module, decoder_device_Close, device);
+        vlc_objres_clear(VLC_OBJECT(device));
         vlc_object_delete(device);
     }
 }
