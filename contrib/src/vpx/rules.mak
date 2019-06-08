@@ -15,7 +15,6 @@ $(TARBALLS)/libvpx-$(VPX_VERSION).tar.gz:
 
 libvpx: libvpx-$(VPX_VERSION).tar.gz .sum-vpx
 	$(UNPACK)
-	$(APPLY) $(SRC)/vpx/libvpx-mac.patch
 	$(APPLY) $(SRC)/vpx/libvpx-ios.patch
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/vpx/libvpx-android.patch
