@@ -38,6 +38,9 @@ Rectangle {
     property bool noActionButtons: false
 
     property alias sourceSize: cover.sourceSize
+    property string infoLeft: ""
+    property bool isVideo: false
+    property bool isNew: false
 
     signal playClicked
     signal addToPlaylistClicked
@@ -211,7 +214,27 @@ Rectangle {
                     color: VLCStyle.colors.lightText
                     horizontalAlignment: Qt.AlignHCenter
                 }
+                RowLayout {
+                    visible: isVideo
+                    anchors {
+                        bottom:parent.bottom
+                        left: parent.left
+                        right: parent.right
+                    }
+                    Text {
+                        Layout.alignment: Qt.AlignLeft
+                        font.pixelSize: VLCStyle.fontSize_small
+                        color: VLCStyle.colors.videosGridInfoLeft
+                        text: infoLeft
+                    }
+                    Text {
+                        visible: root.isNew
+                        Layout.alignment: Qt.AlignRight
+                        font.pixelSize: VLCStyle.fontSize_small
+                        color: VLCStyle.colors.accent
+                        text: "NEW"
             }
         }
     }
-
+}
+}

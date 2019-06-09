@@ -75,6 +75,8 @@ Item {
     property color volhigh: "#ffc70f"
     property color volmax: "#f5271d"
 
+    property color videosGridInfoLeft: "grey"
+
     //vlc orange
     property color accent: "#FFFF950D";
 
