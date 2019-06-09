@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-04-19 02:21+0200\n"
+"PO-Revision-Date: 2019-06-10 00:59+0200\n"
 "Last-Translator: A S Alam <alam.yellow@gmail.com>, 2019\n"
 "Language-Team: Panjabi (Punjabi) (https://www.transifex.com/yaron/"
 "teams/16553/pa/)\n"
@@ -29,7 +29,7 @@ msgid ""
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
 "ਇਹ ਪਰੋਗਰਾਮ ਦੀ ਕੋਈ ਵਾਰੰਟੀ ਨਹੀਂ ਹੈ, ਜਿੱਥੋਂ ਤੱਕ ਵੀ ਕਾਨੂੰਨ ਵਲੋਂ ਮਾਨਤਾ ਹੈ।\n"
-"ਤੁਸੀਂ ਇਸ ਨੂੰ ਗਨੂ ਜਰਨਲ ਪਬਲਿਕ ਲਾਈਸੈਂਸ ਦੀ ਸ਼ਰਤਾਂ ਤਹਿਤ ਵੰਡ ਸਕਦੇ ਹੋ,\n"
+"ਤੁਸੀਂ ਇਸ ਨੂੰ ਗਨੂ ਜਰਨਲ ਪਬਲਿਕ ਲਸੰਸ ਦੀ ਸ਼ਰਤਾਂ ਤਹਿਤ ਵੰਡ ਸਕਦੇ ਹੋ,\n"
 "ਵਧੇਰੇ ਜਾਣਕਾਰੀ ਵਾਸਤੇ COPYING ਨਾਂ ਦੀ ਫਾਇਲ ਨੂੰ ਵੇਖੋ ਜੀ।\n"
 "ਵੀਡਿਓਲੈਨ ਟੀਮ ਵਲੋਂ ਲਿਖਿਆ, ਜਾਣਕਾਰੀ ਵਾਸਤੇ AUTHORS ਫਾਇਲ ਵੇਖੋ।\n"
 
@@ -50,11 +50,11 @@ msgstr "ਇੰਟਰਫੇਸ"
 
 #: include/vlc_config_cat.h:39
 msgid "Settings for VLC's interfaces"
-msgstr "VLC ਇੰਟਰਫੇਸ ਲਈ ਸੈਟਿੰਗ"
+msgstr "VLC ਇੰਟਰਫੇਸ ਲਈ ਸੈਟਿੰਗਾਂ"
 
 #: include/vlc_config_cat.h:41
 msgid "Main interfaces settings"
-msgstr "ਮੁੱਖ ਇੰਟਰਫੇਸ ਸੈਟਿੰਗ"
+msgstr "ਮੁੱਖ ਇੰਟਰਫੇਸ ਸੈਟਿੰਗਾਂ"
 
 #: include/vlc_config_cat.h:43
 msgid "Main interfaces"
@@ -62,7 +62,7 @@ msgstr "ਮੁੱਖ ਇੰਟਰਫੇਸ"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for the main interface"
-msgstr "ਮੇਨ ਇੰਟਰਫੇਸ ਲਈ ਸੈਟਿੰਗ"
+msgstr "ਮੇਨ ਇੰਟਰਫੇਸ ਲਈ ਸੈਟਿੰਗਾਂ"
 
 #: include/vlc_config_cat.h:46 src/libvlc-module.c:81
 msgid "Control interfaces"
@@ -70,12 +70,12 @@ msgstr "ਕੰਟਰੋਲ ਇੰਟਰਫੇਸ"
 
 #: include/vlc_config_cat.h:47
 msgid "Settings for VLC's control interfaces"
-msgstr "VLC ਦੇ ਕੰਟਰੋਲ ਇੰਟਰਫੇਸ ਲਈ ਸੈਟਿੰਗ"
+msgstr "VLC ਦੇ ਕੰਟਰੋਲ ਇੰਟਰਫੇਸ ਲਈ ਸੈਟਿੰਗਾਂ"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
 #: modules/gui/macosx/VLCSimplePrefsController.m:237
 msgid "Hotkeys settings"
-msgstr "ਹਾਟ-ਕੀ ਸੈਟਿੰਗ"
+msgstr "ਹਾਟ-ਕੀ ਸੈਟਿੰਗਾਂ"
 
 #: include/vlc_config_cat.h:53 src/input/es_out.c:3120 src/libvlc-module.c:1492
 #: modules/access/imem.c:64
@@ -94,11 +94,11 @@ msgstr "ਆਡੀਓ"
 
 #: include/vlc_config_cat.h:54
 msgid "Audio settings"
-msgstr "ਆਡੀਓ ਸੈਟਿੰਗ"
+msgstr "ਆਡੀਓ ਸੈਟਿੰਗਾਂ"
 
 #: include/vlc_config_cat.h:56
 msgid "General audio settings"
-msgstr "ਆਮ ਆਡੀਓ ਸੈਟਿੰਗ"
+msgstr "ਆਮ ਆਡੀਓ ਸੈਟਿੰਗਾਂ"
 
 #: include/vlc_config_cat.h:58 include/vlc_config_cat.h:81
 #: modules/gui/qt/ui/profiles.h:748 modules/gui/qt/ui/profiles.h:758
@@ -129,7 +129,7 @@ msgstr "ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ"
 
 #: include/vlc_config_cat.h:67
 msgid "General settings for audio output modules."
-msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ ਲਈ ਆਮ ਸੈਟਿੰਗ ਹਨ।"
+msgstr "ਆਡੀਓ ਆਉਟਪੁੱਟ ਮੋਡੀਊਲ ਲਈ ਆਮ ਸੈਟਿੰਗਾਂ ਹਨ।"
 
 #: include/vlc_config_cat.h:69 src/libvlc-module.c:2027
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:196
@@ -139,7 +139,7 @@ msgstr "ਫੁਟਕਲ"
 
 #: include/vlc_config_cat.h:70
 msgid "Miscellaneous audio settings and modules."
-msgstr "ਫੁਟਕਲ ਆਡੀਓ ਸੈਟਿੰਗ ਅਤੇ ਮੋਡੀਊਲ।"
+msgstr "ਫੁਟਕਲ ਆਡੀਓ ਸੈਟਿੰਗਾਂ ਅਤੇ ਮੋਡੀਊਲ।"
 
 #: include/vlc_config_cat.h:73 src/input/es_out.c:3164 src/libvlc-module.c:142
 #: src/libvlc-module.c:1551 modules/access/imem.c:64
@@ -168,7 +168,7 @@ msgstr "ਸਧਾਰਨ ਵਿਡੀਓ  ਸੈਟਿੰਗਾਂ"
 
 #: include/vlc_config_cat.h:79
 msgid "General settings for video output modules."
-msgstr "ਵਿਡੀਓ ਆਉਟਪੁੱਟ ਮੋਡੀਊਲਾਂ ਲਈ ਆਮ ਸੈਟਿੰਗ ਹੈ।"
+msgstr "ਵਿਡੀਓ ਆਉਟਪੁੱਟ ਮੋਡੀਊਲਾਂ ਲਈ ਆਮ ਸੈਟਿੰਗਾਂ ਹੈ।"
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
@@ -243,7 +243,7 @@ msgstr "ਆਡੀਓ ਕੋਡਕਸ"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
-msgstr "ਕੇਵਲ ਆਡੀਓ ਡੀਕੋਡਰ ਅਤੇ ਇੰਕੋਡਰ ਲਈ ਸੈਟਿੰਗ"
+msgstr "ਕੇਵਲ ਆਡੀਓ ਡੀਕੋਡਰ ਅਤੇ ਇੰਕੋਡਰ ਲਈ ਸੈਟਿੰਗਾਂ"
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
@@ -255,7 +255,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
-msgstr "ਆਮ ਇੰਪੁੱਟ ਸੈਟਿੰਗ ਹੈ। ਧਿਆਨ ਨਾਲ ਵਰਤੋਂ..."
+msgstr "ਆਮ ਇੰਪੁੱਟ ਸੈਟਿੰਗਾਂ ਹੈ। ਧਿਆਨ ਨਾਲ ਵਰਤੋਂ..."
 
 #: include/vlc_config_cat.h:127 src/libvlc-module.c:1962
 #: modules/access/avio.h:50
@@ -275,7 +275,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:137
 msgid "General stream output settings"
-msgstr "ਆਮ ਸਟਰੀਮ ਆਉਟਪੁੱਟ ਸੈਟਿੰਗ"
+msgstr "ਆਮ ਸਟਰੀਮ ਆਉਟਪੁੱਟ ਸੈਟਿੰਗਾਂ"
 
 #: include/vlc_config_cat.h:139
 msgid "Muxers"
