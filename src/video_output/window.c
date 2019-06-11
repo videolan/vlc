@@ -210,6 +210,7 @@ void vout_window_ReportFullscreen(vout_window_t *window, const char *id)
 
 typedef struct vout_display_window
 {
+    vout_thread_t *vout;
     vlc_mouse_t mouse;
     vlc_tick_t last_left_press;
 } vout_display_window_t;
@@ -217,7 +218,8 @@ typedef struct vout_display_window
 static void vout_display_window_ResizeNotify(vout_window_t *window,
                                              unsigned width, unsigned height)
 {
-    vout_thread_t *vout = (vout_thread_t *)vlc_object_parent(window);
+    vout_display_window_t *state = window->owner.sys;
+    vout_thread_t *vout = state->vout;
 
     msg_Dbg(window, "resized to %ux%u", width, height);
     vout_ChangeDisplaySize(vout, width, height);
@@ -231,40 +233,49 @@ static void vout_display_window_CloseNotify(vout_window_t *window)
 }
 
 static void vout_display_window_StateNotify(vout_window_t *window,
-                                            unsigned state)
+                                            unsigned window_state)
 {
+    vout_display_window_t *state = window->owner.sys;
+    vout_thread_t *vout = state->vout;
+
     static const char states[][8] = {
         [VOUT_WINDOW_STATE_NORMAL] = "normal",
         [VOUT_WINDOW_STATE_ABOVE] = "above",
         [VOUT_WINDOW_STATE_BELOW] = "below",
     };
 
-    assert(state < ARRAY_SIZE(states));
-    msg_Dbg(window, "window state changed: %s", states[state]);
-    var_SetInteger(vlc_object_parent(window), "window-state", state);
+    assert(window_state < ARRAY_SIZE(states));
+    msg_Dbg(window, "window state changed: %s", states[window_state]);
+    var_SetInteger(vout, "window-state", window_state);
 }
 
 static void vout_display_window_FullscreenNotify(vout_window_t *window,
                                                  const char *id)
 {
+    vout_display_window_t *state = window->owner.sys;
+    vout_thread_t *vout = state->vout;
+
     msg_Dbg(window, (id != NULL) ? "window set to fullscreen on %s"
                                  : "window set to fullscreen", id);
-    var_SetString(vlc_object_parent(window), "window-fullscreen-output",
+    var_SetString(vout, "window-fullscreen-output",
                   (id != NULL) ? id : "");
-    var_SetBool(vlc_object_parent(window), "window-fullscreen", true);
+    var_SetBool(vout, "window-fullscreen", true);
 }
 
 static void vout_display_window_WindowingNotify(vout_window_t *window)
 {
+    vout_display_window_t *state = window->owner.sys;
+    vout_thread_t *vout = state->vout;
+
     msg_Dbg(window, "window set windowed");
-    var_SetBool(vlc_object_parent(window), "window-fullscreen", false);
+    var_SetBool(vout, "window-fullscreen", false);
 }
 
 static void vout_display_window_MouseEvent(vout_window_t *window,
                                            const vout_window_mouse_event_t *ev)
 {
     vout_display_window_t *state = window->owner.sys;
-    vout_thread_t *vout = (vout_thread_t *)vlc_object_parent(window);
+    vout_thread_t *vout = state->vout;
     vlc_mouse_t *m = &state->mouse;
 
     m->b_double_click = false;
@@ -315,7 +326,10 @@ static void vout_display_window_MouseEvent(vout_window_t *window,
 static void vout_display_window_KeyboardEvent(vout_window_t *window,
                                               unsigned key)
 {
-    var_SetInteger(vlc_object_instance(window), "key-pressed", key);
+    vout_display_window_t *state = window->owner.sys;
+    vout_thread_t *vout = state->vout;
+
+    var_SetInteger(vout, "key-pressed", key);
 }
 
 static void vout_display_window_OutputEvent(vout_window_t *window,
@@ -349,6 +363,7 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout)
 
     vlc_mouse_Init(&state->mouse);
     state->last_left_press = INT64_MIN;
+    state->vout = vout;
 
     char *modlist = var_InheritString(vout, "window");
     vout_window_owner_t owner = {
@@ -374,8 +389,8 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout)
  */
 void vout_display_window_Delete(vout_window_t *window)
 {
-    vout_thread_t *vout = (vout_thread_t *)vlc_object_parent(window);
     vout_display_window_t *state = window->owner.sys;
+    vout_thread_t *vout = state->vout;
 
     vout_window_Delete(window);
     var_Destroy(vout, "window-fullscreen-output");
