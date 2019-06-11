@@ -177,34 +177,6 @@ void CloseIntf (vlc_object_t *p_this)
 #pragma mark -
 #pragma mark Variables Callback
 
-/*****************************************************************************
- * ShowController: Callback triggered by the show-intf playlist variable
- * through the ShowIntf-control-intf, to let us show the controller-win;
- * usually when in fullscreen-mode
- *****************************************************************************/
-static int ShowController(vlc_object_t *p_this, const char *psz_variable,
-                     vlc_value_t old_val, vlc_value_t new_val, void *param)
-{
-    @autoreleasepool {
-        dispatch_async(dispatch_get_main_queue(), ^{
-
-            intf_thread_t *p_intf = getIntf();
-            if (p_intf) {
-                VLCMain *mainInstance = [VLCMain sharedInstance];
-                if ([[[mainInstance playlistController] playerController] fullscreen]) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:VLCVideoWindowShouldShowFullscreenController
-                                                                        object:mainInstance];
-                } else if (!strcmp(psz_variable, "intf-show")) {
-                    [[mainInstance libraryWindow] makeKeyAndOrderFront:nil];
-                }
-            }
-
-        });
-
-        return VLC_SUCCESS;
-    }
-}
-
 static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
@@ -268,8 +240,6 @@ static VLCMain *sharedInstance = nil;
         _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
 
         libvlc_int_t *libvlc = vlc_object_instance(p_intf);
-        var_AddCallback(libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
-        var_AddCallback(libvlc, "intf-show", ShowController, (__bridge void *)self);
         var_AddCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
 
         // Load them here already to apply stored profiles
@@ -353,8 +323,6 @@ static VLCMain *sharedInstance = nil;
     [[self audioEffectsPanel] saveCurrentProfileAtTerminate];
 
     libvlc_int_t *libvlc = vlc_object_instance(p_intf);
-    var_DelCallback(libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
-    var_DelCallback(libvlc, "intf-show", ShowController, (__bridge void *)self);
     var_DelCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
 
     [[NSNotificationCenter defaultCenter] removeObserver: self];

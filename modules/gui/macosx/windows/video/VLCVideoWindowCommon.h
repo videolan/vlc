@@ -27,6 +27,7 @@
 
 extern NSString *VLCVideoWindowShouldShowFullscreenController;
 extern NSString *VLCVideoWindowDidEnterFullscreen;
+extern NSString *VLCWindowShouldShowController;
 extern const CGFloat VLCVideoWindowCommonMinimalHeight;
 
 @class VLCVoutView;

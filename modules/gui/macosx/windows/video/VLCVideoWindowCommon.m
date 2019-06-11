@@ -39,6 +39,7 @@
 const CGFloat VLCVideoWindowCommonMinimalHeight = 70.;
 NSString *VLCVideoWindowShouldShowFullscreenController = @"VLCVideoWindowShouldShowFullscreenController";
 NSString *VLCVideoWindowDidEnterFullscreen = @"VLCVideoWindowDidEnterFullscreen";
+NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
 /*****************************************************************************
  * VLCVideoWindowCommon

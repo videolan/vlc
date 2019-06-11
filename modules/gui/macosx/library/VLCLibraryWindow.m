@@ -52,6 +52,7 @@
 #import "windows/VLCOpenWindowController.h"
 #import "windows/VLCOpenInputMetadata.h"
 
+#import <vlc_common.h>
 #import <vlc_url.h>
 
 const CGFloat VLCLibraryWindowMinimalWidth = 604.;
@@ -81,12 +82,42 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 }
 @end
 
+static int ShowFullscreenController(vlc_object_t *p_this, const char *psz_variable,
+                                    vlc_value_t old_val, vlc_value_t new_val, void *param)
+{
+    @autoreleasepool {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:VLCVideoWindowShouldShowFullscreenController
+                                                                object:nil];
+        });
+
+        return VLC_SUCCESS;
+    }
+}
+
+static int ShowController(vlc_object_t *p_this, const char *psz_variable,
+                          vlc_value_t old_val, vlc_value_t new_val, void *param)
+{
+    @autoreleasepool {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:VLCWindowShouldShowController
+                                                                object:nil];
+        });
+
+        return VLC_SUCCESS;
+    }
+}
+
 @implementation VLCLibraryWindow
 
 - (void)awakeFromNib
 {
     VLCMain *mainInstance = [VLCMain sharedInstance];
     _playlistController = [mainInstance playlistController];
+
+    libvlc_int_t *libvlc = vlc_object_instance(getIntf());
+    var_AddCallback(libvlc, "intf-toggle-fscontrol", ShowFullscreenController, (__bridge void *)self);
+    var_AddCallback(libvlc, "intf-show", ShowController, (__bridge void *)self);
 
     self.videoView = [[VLCVoutView alloc] initWithFrame:self.mainSplitView.frame];
     self.videoView.hidden = YES;
@@ -101,6 +132,10 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
     [notificationCenter addObserver:self
                            selector:@selector(shouldShowFullscreenController:)
                                name:VLCVideoWindowShouldShowFullscreenController
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(shouldShowController:)
+                               name:VLCWindowShouldShowController
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(updateLibraryRepresentation:)
@@ -229,6 +264,10 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
     if (@available(macOS 10_14, *)) {
         [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
     }
+
+    libvlc_int_t *libvlc = vlc_object_instance(getIntf());
+    var_DelCallback(libvlc, "intf-toggle-fscontrol", ShowFullscreenController, (__bridge void *)self);
+    var_DelCallback(libvlc, "intf-show", ShowController, (__bridge void *)self);
 }
 
 #pragma mark - appearance setters
@@ -572,7 +611,12 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 }
 
 #pragma mark -
-#pragma mark Fullscreen support
+#pragma mark respond to core events
+
+- (void)shouldShowController:(NSNotification *)aNotification
+{
+    [self makeKeyAndOrderFront:nil];
+}
 
 - (void)shouldShowFullscreenController:(NSNotification *)aNotification
 {
