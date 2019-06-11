@@ -39,6 +39,10 @@
 #import "windows/convertandsave/VLCOutput.h"
 #import "windows/VLCOpenInputMetadata.h"
 
+NSString *const VLCOpenFileTabViewId = @"file";
+NSString *const VLCOpenDiscTabViewId = @"disc";
+NSString *const VLCOpenNetworkTabViewId = @"network";
+NSString *const VLCOpenCaptureTabViewId = @"capture";
 NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
 @interface VLCOpenBlockDeviceDescription : NSObject
@@ -51,11 +55,20 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 @end
 
 @implementation VLCOpenBlockDeviceDescription
+@end
+
+@interface VLCOpenDisplayInformation : NSObject
+
+@property (readwrite) CGRect displayBounds;
+@property (readwrite) CGDirectDisplayID displayID;
 
 @end
 
+@implementation VLCOpenDisplayInformation
+@end
+
 @interface VLCOpenTextField : NSTextField
-- (void)mouseDown:(NSEvent *)theEvent;
+
 @end
 
 @implementation VLCOpenTextField
@@ -68,12 +81,6 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 }
 
 @end
-
-struct display_info_t
-{
-    CGRect rect;
-    CGDirectDisplayID id;
-};
 
 @interface VLCOpenWindowController()
 {
@@ -104,11 +111,6 @@ struct display_info_t
 
 @implementation VLCOpenWindowController
 
-static NSString *kFileTabViewId     = @"file";
-static NSString *kDiscTabViewId     = @"disc";
-static NSString *kNetworkTabViewId  = @"network";
-static NSString *kCaptureTabViewId  = @"capture";
-
 #pragma mark -
 #pragma mark Init
 
@@ -116,15 +118,6 @@ static NSString *kCaptureTabViewId  = @"capture";
 {
     self = [super initWithWindowNibName:@"Open"];
     return self;
-}
-
-- (void)dealloc
-{
-    NSUInteger displayInfoCount = [_displayInfos count];
-    for (int i = 0; i < displayInfoCount; i ++) {
-        NSValue *v = [_displayInfos objectAtIndex:i];
-        free([v pointerValue]);
-    }
 }
 
 - (void)windowDidLoad
@@ -418,7 +411,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     }
     if ([_fileSlaveCheckbox state] && _fileSlavePath)
         [options addObject: [NSString stringWithFormat: @"input-slave=%@", _fileSlavePath]];
-    if ([[[_tabView selectedTabViewItem] identifier] isEqualToString: kCaptureTabViewId]) {
+    if ([[[_tabView selectedTabViewItem] identifier] isEqualToString: VLCOpenCaptureTabViewId]) {
         if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Screen")]) {
             [self addScreenRecordingOptionsToArray:options];
         }
@@ -480,11 +473,10 @@ static NSString *kCaptureTabViewId  = @"capture";
 - (void)addScreenRecordingOptionsToArray:(NSMutableArray *)options
 {
     NSInteger selected_index = [_screenPopup indexOfSelectedItem];
-    NSValue *v = [_displayInfos objectAtIndex:selected_index];
-    struct display_info_t *item = (struct display_info_t *)[v pointerValue];
+    VLCOpenDisplayInformation *displayInformation = [_displayInfos objectAtIndex:selected_index];
 
     [options addObject: [NSString stringWithFormat: @"screen-fps=%f", [_screenFPSTextField floatValue]]];
-    [options addObject: [NSString stringWithFormat: @"screen-display-id=%i", item->id]];
+    [options addObject: [NSString stringWithFormat: @"screen-display-id=%i", displayInformation.displayID]];
     [options addObject: [NSString stringWithFormat: @"screen-left=%i", [_screenLeftTextField intValue]]];
     [options addObject: [NSString stringWithFormat: @"screen-top=%i", [_screenTopTextField intValue]]];
     [options addObject: [NSString stringWithFormat: @"screen-width=%i", [_screenWidthTextField intValue]]];
@@ -511,14 +503,14 @@ static NSString *kCaptureTabViewId  = @"capture";
 {
     NSString *identifier = [tabViewItem identifier];
 
-    if ([identifier isEqualToString: kFileTabViewId])
+    if ([identifier isEqualToString: VLCOpenFileTabViewId])
         [self openFilePathChanged: nil];
-    else if ([identifier isEqualToString: kDiscTabViewId])
+    else if ([identifier isEqualToString: VLCOpenDiscTabViewId])
         [self scanOpticalMedia: nil];
-    else if ([identifier isEqualToString: kNetworkTabViewId]) {
+    else if ([identifier isEqualToString: VLCOpenNetworkTabViewId]) {
         [self openNetInfoChanged: nil];
         [_netHTTPURLTextField selectText:nil];
-    } else if ([identifier isEqualToString: kCaptureTabViewId])
+    } else if ([identifier isEqualToString: VLCOpenCaptureTabViewId])
         [self openCaptureModeChanged: nil];
 }
 
@@ -534,7 +526,7 @@ static NSString *kCaptureTabViewId  = @"capture";
 - (void)openFileGeneric
 {
     [self openFilePathChanged: nil];
-    [self openTarget: kFileTabViewId];
+    [self openTarget: VLCOpenFileTabViewId];
 }
 
 - (void)openDisc
@@ -544,20 +536,20 @@ static NSString *kCaptureTabViewId  = @"capture";
     }
 
     [self scanOpticalMedia: nil];
-    [self openTarget: kDiscTabViewId];
+    [self openTarget: VLCOpenDiscTabViewId];
 }
 
 - (void)openNet
 {
     [self openNetInfoChanged: nil];
-    [self openTarget: kNetworkTabViewId];
+    [self openTarget: VLCOpenNetworkTabViewId];
     [_netHTTPURLTextField selectText:nil];
 }
 
 - (void)openCapture
 {
     [self openCaptureModeChanged: nil];
-    [self openTarget: kCaptureTabViewId];
+    [self openTarget: VLCOpenCaptureTabViewId];
 }
 
 - (void)openFileWithAction:(void (^)(NSArray *files))action;
@@ -704,7 +696,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     [theView setFrame: NSMakeRect(233, 0, viewRect.size.width, viewRect.size.height)];
     [theView setAutoresizesSubviews: YES];
 
-    NSView *opticalTabView = [[_tabView tabViewItemAtIndex: [_tabView indexOfTabViewItemWithIdentifier:kDiscTabViewId]] view];
+    NSView *opticalTabView = [[_tabView tabViewItemAtIndex: [_tabView indexOfTabViewItemWithIdentifier:VLCOpenDiscTabViewId]] view];
     if (_currentOpticalMediaView) {
         [[opticalTabView animator] replaceSubview: _currentOpticalMediaView with: theView];
     } else {
@@ -734,6 +726,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     NSString *opticalDevicePath = deviceDescription.path;
     NSString *devicePath = deviceDescription.devicePath;
     NSImage *mediaIcon = deviceDescription.mediaIcon;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
 
     if ([diskType isEqualToString: kVLCMediaDVD] || [diskType isEqualToString: kVLCMediaVideoTSFolder]) {
         [_discDVDLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath:opticalDevicePath]];
@@ -747,20 +740,20 @@ static NSString *kCaptureTabViewId  = @"capture";
             [self showOpticalMediaView: _discDVDwomenusView withIcon:mediaIcon];
         }
     } else if ([diskType isEqualToString: kVLCMediaAudioCD]) {
-        [_discAudioCDLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath: opticalDevicePath]];
-        [_discAudioCDTrackCountLabel setStringValue: [NSString stringWithFormat:_NS("%i tracks"), [[[NSFileManager defaultManager] subpathsOfDirectoryAtPath: opticalDevicePath error:NULL] count] - 1]]; // minus .TOC.plist
+        [_discAudioCDLabel setStringValue: [fileManager displayNameAtPath: opticalDevicePath]];
+        [_discAudioCDTrackCountLabel setStringValue: [NSString stringWithFormat:_NS("%i tracks"), [[fileManager subpathsOfDirectoryAtPath: opticalDevicePath error:NULL] count] - 1]]; // minus .TOC.plist
         [self showOpticalMediaView: _discAudioCDView withIcon: mediaIcon];
         [self setMRL: [NSString stringWithFormat: @"cdda://%@", devicePath]];
     } else if ([diskType isEqualToString: kVLCMediaVCD]) {
-        [_discVCDLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath: opticalDevicePath]];
+        [_discVCDLabel setStringValue: [fileManager displayNameAtPath: opticalDevicePath]];
         [self showOpticalMediaView: _discVCDView withIcon: mediaIcon];
         [self setMRL: [NSString stringWithFormat: @"vcd://%@#%i:%i", devicePath, [_discVCDTitleTextField intValue], [_discVCDChapterTextField intValue]]];
     } else if ([diskType isEqualToString: kVLCMediaSVCD]) {
-        [_discVCDLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath: opticalDevicePath]];
+        [_discVCDLabel setStringValue: [fileManager displayNameAtPath: opticalDevicePath]];
         [self showOpticalMediaView: _discVCDView withIcon: mediaIcon];
         [self setMRL: [NSString stringWithFormat: @"vcd://%@@%i:%i", devicePath, [_discVCDTitleTextField intValue], [_discVCDChapterTextField intValue]]];
     } else if ([diskType isEqualToString: kVLCMediaBD] || [diskType isEqualToString: kVLCMediaBDMVFolder]) {
-        [_discBDLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath: opticalDevicePath]];
+        [_discBDLabel setStringValue: [fileManager displayNameAtPath: opticalDevicePath]];
         [self showOpticalMediaView: _discBDView withIcon: mediaIcon];
         [self setMRL: [NSString stringWithFormat: @"bluray://%@", opticalDevicePath]];
     } else {
@@ -875,7 +868,7 @@ static NSString *kCaptureTabViewId  = @"capture";
             [_discSelectorPopup selectItemAtIndex: [[_discSelectorPopup itemArray] count] - 1];
 
         // only trigger MRL update if the tab view is active
-        if ([[[_tabView selectedTabViewItem] identifier] isEqualToString:kDiscTabViewId])
+        if ([[[_tabView selectedTabViewItem] identifier] isEqualToString:VLCOpenDiscTabViewId])
             [self discSelectorChanged:nil];
     } else {
         msg_Dbg(getIntf(), "no optical media found");
@@ -1112,8 +1105,7 @@ static NSString *kCaptureTabViewId  = @"capture";
         NSInteger displayID = config_GetInt("screen-display-id");
         unsigned int displayCount = 0;
         CGError returnedError;
-        struct display_info_t *item;
-        NSValue *v;
+        VLCOpenDisplayInformation *displayInformation;
 
         returnedError = CGGetOnlineDisplayList(0, NULL, &displayCount);
         if (!returnedError) {
@@ -1121,26 +1113,21 @@ static NSString *kCaptureTabViewId  = @"capture";
             ids = (CGDirectDisplayID *)vlc_alloc(displayCount, sizeof(CGDirectDisplayID));
             returnedError = CGGetOnlineDisplayList(displayCount, ids, &displayCount);
             if (!returnedError) {
-                NSUInteger displayInfoCount = [_displayInfos count];
-                for (NSUInteger i = 0; i < displayInfoCount; i ++) {
-                    v = [_displayInfos objectAtIndex:i];
-                    free([v pointerValue]);
-                }
                 [_displayInfos removeAllObjects];
                 [_screenPopup removeAllItems];
                 for (unsigned int i = 0; i < displayCount; i ++) {
-                    item = (struct display_info_t *)malloc(sizeof(struct display_info_t));
-                    item->id = ids[i];
-                    item->rect = CGDisplayBounds(item->id);
-                    [_screenPopup addItemWithTitle: [NSString stringWithFormat:@"Screen %d (%dx%d)", i + 1, (int)item->rect.size.width, (int)item->rect.size.height]];
-                    v = [NSValue valueWithPointer:item];
-                    [_displayInfos addObject:v];
-                    if (i == 0 || displayID == item->id || screenIindex - 1 == i) {
+                    displayInformation = [[VLCOpenDisplayInformation alloc] init];
+                    displayInformation.displayID = ids[i];
+                    NSRect displayBounds = CGDisplayBounds(displayInformation.displayID);
+                    displayInformation.displayBounds = displayBounds;
+                    [_screenPopup addItemWithTitle: [NSString stringWithFormat:@"Screen %d (%dx%d)", i + 1, (int)displayBounds.size.width, (int)displayBounds.size.height]];
+                    [_displayInfos addObject:displayInformation];
+                    if (i == 0 || displayID == displayInformation.displayID || screenIindex - 1 == i) {
                         [_screenPopup selectItemAtIndex: i];
-                        [_screenLeftStepper setMaxValue: item->rect.size.width];
-                        [_screenTopStepper setMaxValue: item->rect.size.height];
-                        [_screenWidthStepper setMaxValue: item->rect.size.width];
-                        [_screenHeightStepper setMaxValue: item->rect.size.height];
+                        [_screenLeftStepper setMaxValue: displayBounds.size.width];
+                        [_screenTopStepper setMaxValue: displayBounds.size.height];
+                        [_screenWidthStepper setMaxValue: displayBounds.size.width];
+                        [_screenHeightStepper setMaxValue: displayBounds.size.height];
                     }
                 }
             }
@@ -1177,13 +1164,13 @@ static NSString *kCaptureTabViewId  = @"capture";
     if (selected_index >= [_displayInfos count])
         return;
 
-    NSValue *v = [_displayInfos objectAtIndex:selected_index];
-    struct display_info_t *item = (struct display_info_t *)[v pointerValue];
+    VLCOpenDisplayInformation *displayInformation = [_displayInfos objectAtIndex:selected_index];
+    CGRect displayBounds = displayInformation.displayBounds;
 
-    [_screenLeftStepper setMaxValue: item->rect.size.width];
-    [_screenTopStepper setMaxValue: item->rect.size.height];
-    [_screenWidthStepper setMaxValue: item->rect.size.width];
-    [_screenHeightStepper setMaxValue: item->rect.size.height];
+    [_screenLeftStepper setMaxValue: displayBounds.size.width];
+    [_screenTopStepper setMaxValue: displayBounds.size.height];
+    [_screenWidthStepper setMaxValue: displayBounds.size.width];
+    [_screenHeightStepper setMaxValue: displayBounds.size.height];
 
     [_screenqtkAudioPopup setEnabled: [_screenqtkAudioCheckbox state]];
 }
