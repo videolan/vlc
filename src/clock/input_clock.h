@@ -52,9 +52,9 @@ void           input_clock_Delete( input_clock_t * );
  *
  * \param b_buffering_allowed tells if we are allowed to bufferize more data in
  * advanced (if possible).
+ * \return clock update delay
  */
-void    input_clock_Update( input_clock_t *, vlc_object_t *p_log,
-                            bool *pb_late,
+vlc_tick_t input_clock_Update( input_clock_t *, vlc_object_t *p_log,
                             bool b_can_pace_control, bool b_buffering_allowed,
                             vlc_tick_t i_clock, vlc_tick_t i_system );
 /**

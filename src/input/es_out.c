@@ -3031,11 +3031,10 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         }
 
         /* TODO do not use vlc_tick_now() but proper stream acquisition date */
-        bool b_late;
         bool b_extra_buffering_allowed = !input_priv(p_sys->p_input)->b_low_delay &&
                                          EsOutIsExtraBufferingAllowed( out );
-        input_clock_Update( p_pgrm->p_input_clock, VLC_OBJECT(p_sys->p_input),
-                            &b_late,
+        vlc_tick_t i_late = input_clock_Update(
+                            p_pgrm->p_input_clock, VLC_OBJECT(p_sys->p_input),
                             input_priv(p_sys->p_input)->b_can_pace_control || p_sys->b_buffering,
                             b_extra_buffering_allowed,
                             i_pcr, vlc_tick_now() );
@@ -3050,7 +3049,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         }
         else if( p_pgrm == p_sys->p_pgrm )
         {
-            if( b_late && ( !input_priv(p_sys->p_input)->p_sout ||
+            if( i_late > 0 && ( !input_priv(p_sys->p_input)->p_sout ||
                             !input_priv(p_sys->p_input)->b_out_pace_control ) )
             {
                 vlc_tick_t i_pts_delay = input_clock_GetJitter( p_pgrm->p_input_clock );
@@ -3063,8 +3062,10 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
                     es_out_pgrm_t *pgrm;
 
                     msg_Err( p_sys->p_input,
-                             "ES_OUT_SET_(GROUP_)PCR  is called too late (jitter of %d ms ignored)",
+                             "ES_OUT_SET_(GROUP_)PCR  is called %d ms late (jitter of %d ms ignored)",
+                             (int)MS_FROM_VLC_TICK(i_late),
                              (int)MS_FROM_VLC_TICK(i_pts_delay - p_sys->i_pts_delay) );
+
                     i_pts_delay = p_sys->i_pts_delay + p_sys->i_pts_jitter
                                 + p_sys->i_tracks_pts_delay;
 
@@ -3078,7 +3079,8 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
                 else
                 {
                     msg_Err( p_sys->p_input,
-                             "ES_OUT_SET_(GROUP_)PCR  is called too late (pts_delay increased to %d ms)",
+                             "ES_OUT_SET_(GROUP_)PCR  is called %d ms late (pts_delay increased to %d ms)",
+                             (int)MS_FROM_VLC_TICK(i_late),
                              (int)MS_FROM_VLC_TICK(i_pts_delay) );
 
                     /* Force a rebufferization when we are too late */

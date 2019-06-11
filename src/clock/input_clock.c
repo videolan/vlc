@@ -199,8 +199,7 @@ void input_clock_Delete( input_clock_t *cl )
  *  i_ck_stream: date in stream clock
  *  i_ck_system: date in system clock
  *****************************************************************************/
-void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
-                         bool *pb_late,
+vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
                          bool b_can_pace_control, bool b_buffering_allowed,
                          vlc_tick_t i_ck_stream, vlc_tick_t i_ck_system )
 {
@@ -279,7 +278,6 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
      * the goal of the clock here */
     const vlc_tick_t i_system_expected = ClockStreamToSystem( cl, i_ck_stream + AvgGet( &cl->drift ) );
     const vlc_tick_t i_late = ( i_ck_system - cl->i_pts_delay ) - i_system_expected;
-    *pb_late = i_late > 0;
     if( i_late > 0 )
     {
         cl->late.pi_value[cl->late.i_index] = i_late;
@@ -287,6 +285,8 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
     }
 
     vlc_mutex_unlock( &cl->lock );
+
+    return i_late > 0 ? i_late : 0;
 }
 
 /*****************************************************************************
