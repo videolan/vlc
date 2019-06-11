@@ -263,3 +263,11 @@ int D3D9_CreateExternal(vlc_object_t *o, d3d9_handle_t *hd3d, IDirect3DDevice9 *
     hd3d->use_ex = false; /* we don't care */
     return VLC_SUCCESS;
 }
+
+void D3D9_CloneExternal(d3d9_handle_t *hd3d, IDirect3D9 *dev)
+{
+    hd3d->obj = dev;
+    IDirect3D9_AddRef( hd3d->obj );
+    hd3d->hdll = NULL;
+    hd3d->use_ex = false; /* we don't care */
+}

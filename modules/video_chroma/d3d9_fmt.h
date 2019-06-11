@@ -106,6 +106,7 @@ int D3D9_Create(vlc_object_t *, d3d9_handle_t *);
 #define D3D9_Create(a,b) D3D9_Create( VLC_OBJECT(a), b )
 int D3D9_CreateExternal(vlc_object_t *, d3d9_handle_t *, IDirect3DDevice9 *);
 #define D3D9_CreateExternal(a,b,c) D3D9_CreateExternal( VLC_OBJECT(a), b, c )
+void D3D9_CloneExternal(d3d9_handle_t *, IDirect3D9 *);
 
 void D3D9_Destroy(d3d9_handle_t *);
 
