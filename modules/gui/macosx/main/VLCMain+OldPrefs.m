@@ -54,7 +54,7 @@ static const int kCurrentPreferencesVersion = 4;
 
     // set correct version to avoid question about outdated config
     [standardUserDefaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
-    [standardUserDefaults synchronize];
+    CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 }
 
 - (void)migrateOldPreferences
@@ -78,7 +78,7 @@ static const int kCurrentPreferencesVersion = 4;
 
     if (version == 1) {
         [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
-        [defaults synchronize];
+        CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 
         if (!fixIntfSettings())
             return;
@@ -93,7 +93,7 @@ static const int kCurrentPreferencesVersion = 4;
         /* version 4 (introduced in 3.0.0) adds RTL settings depending on stored language */
         [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
         [VLCSimplePrefsController updateRightToLeftSettings];
-        [defaults synchronize];
+        CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 
         // In VLC 2.2.x, config for filters was fully controlled by audio and video effects panel.
         // In VLC 3.0, this is no longer the case and VLCs config is not touched anymore. Therefore,

@@ -329,7 +329,7 @@ static VLCMain *sharedInstance = nil;
     _voutProvider = nil;
 
     /* write cached user defaults to disk */
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 }
 
 #pragma mark -
