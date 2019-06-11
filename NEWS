@@ -1,3 +1,13 @@
+Changes between 3.0.7 and 3.0.7.1:
+----------------------------------
+
+Access:
+ * Update libbluray to 1.1.2
+
+Video Output:
+ * Fix hardware acceleration with some AMD drivers
+ * Improve direct3d11 HDR support
+
 Changes between 3.0.6 and 3.0.7:
 --------------------------------
 
