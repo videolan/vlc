@@ -24,6 +24,7 @@
 #define VLC_D3D9_FILTERS_H
 
 #include <vlc_common.h>
+#include <vlc_vout_display.h>
 
 #include "../../video_chroma/d3d9_fmt.h"
 
@@ -33,6 +34,8 @@ int  D3D9OpenConverter(vlc_object_t *);
 void D3D9CloseConverter(vlc_object_t *);
 int  D3D9OpenCPUConverter(vlc_object_t *);
 void D3D9CloseCPUConverter(vlc_object_t *);
+
+int D3D9OpenDecoderDevice(vlc_decoder_device *, vout_window_t *);
 
 void D3D9_FilterHoldInstance(filter_t *, d3d9_device_t *, D3DSURFACE_DESC *);
 void D3D9_FilterReleaseInstance(d3d9_device_t *);
