@@ -1695,6 +1695,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
+    CommonInit(vd, &sys->area, cfg);
+
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->setupDeviceCb       = var_InheritAddress( vd, "vout-cb-setup" );
     sys->cleanupDeviceCb     = var_InheritAddress( vd, "vout-cb-cleanup" );
@@ -1705,6 +1707,9 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if ( sys->setupDeviceCb == NULL || sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
         /* use our own callbacks, since there isn't any external ones */
+        if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false))
+            goto error;
+
         sys->outside_opaque = vd;
         sys->setupDeviceCb       = LocalSwapchainSetupDevice;
         sys->cleanupDeviceCb     = NULL;
@@ -1746,6 +1751,9 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_EGENERIC;
     }
 
+    if (sys->setupDeviceCb != LocalSwapchainSetupDevice)
+        CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
+
     sys->hxdll = Direct3D9LoadShaderLibrary();
     if (!sys->hxdll)
         msg_Warn(vd, "cannot load Direct3D9 Shader Library; HLSL pixel shading will be disabled.");
@@ -1753,17 +1761,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->reset_device = false;
     sys->lost_not_ready = false;
     sys->allow_hw_yuv = var_CreateGetBool(vd, "directx-hw-yuv");
-
-    CommonInit(vd, &sys->area, cfg);
-    if (d3d9_device == NULL)
-    {
-        if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false))
-            goto error;
-    }
-    else
-    {
-        CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
-    }
 
     /* */
     video_format_t fmt;
