@@ -75,6 +75,10 @@
                            selector:@selector(updateValues:)
                                name:VLCPlayerSubtitlesFPSChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateCocoaWindowLevel:)
+                               name:VLCWindowShouldUpdateLevel
+                             object:nil];
 
     [self.window setTitle:_NS("Track Synchronization")];
     [_resetButton setTitle:_NS("Reset")];
@@ -117,8 +121,9 @@
     [self resetValues:self];
 }
 
-- (void)updateCocoaWindowLevel:(NSInteger)i_level
+- (void)updateCocoaWindowLevel:(NSNotification *)aNotification
 {
+    NSInteger i_level = [aNotification.userInfo[VLCWindowLevelKey] integerValue];
     if (self.isWindowLoaded && [self.window isVisible] && [self.window level] != i_level)
         [self.window setLevel: i_level];
 }

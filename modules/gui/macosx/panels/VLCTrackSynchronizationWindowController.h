@@ -46,8 +46,6 @@
 @property (readwrite, weak) IBOutlet NSTextField *sv_durTextField;
 @property (readwrite, weak) IBOutlet NSStepper *sv_durStepper;
 
-- (void)updateCocoaWindowLevel:(NSInteger)i_level;
-
 - (IBAction)toggleWindow:(id)sender;
 - (IBAction)resetValues:(id)sender;
 

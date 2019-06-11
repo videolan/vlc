@@ -114,7 +114,6 @@
 - (IBAction)applyProfileCheckboxChanged:(id)sender;
 
 - (void)toggleWindow:(id)sender;
-- (void)updateCocoaWindowLevel:(NSInteger)i_level;
 - (void)saveCurrentProfileAtTerminate;
 
 /* Equalizer */

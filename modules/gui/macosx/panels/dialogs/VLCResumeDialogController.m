@@ -40,8 +40,19 @@
 - (id)init
 {
     self = [super initWithWindowNibName:@"ResumeDialog"];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(updateCocoaWindowLevel:)
+                                                     name:VLCWindowShouldUpdateLevel
+                                                   object:nil];
+    }
 
     return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)windowDidLoad
@@ -58,7 +69,6 @@
 
     currentResumeTimeout = 10;
     completionBlock = [block copy];
-
 
     NSString *o_restartButtonLabel = _NS("Restart playback");
     o_restartButtonLabel = [o_restartButtonLabel stringByAppendingFormat:@" (%d)", currentResumeTimeout];
@@ -122,8 +132,9 @@
     config_PutInt("macosx-continue-playback", newState);
 }
 
-- (void)updateCocoaWindowLevel:(NSInteger)i_level
+- (void)updateCocoaWindowLevel:(NSNotification *)aNotification
 {
+    NSInteger i_level = [aNotification.userInfo[VLCWindowLevelKey] integerValue];
     if (self.isWindowLoaded && [self.window isVisible] && [self.window level] != i_level)
         [self.window setLevel: i_level];
 }

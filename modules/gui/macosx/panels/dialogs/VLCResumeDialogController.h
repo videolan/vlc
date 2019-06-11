@@ -51,8 +51,6 @@ typedef void(^CompletionBlock)(enum ResumeResult);
 
 - (void)showWindowWithItem:(input_item_t *)p_item withLastPosition:(NSInteger)pos completionBlock:(CompletionBlock)block;
 
-- (void)updateCocoaWindowLevel:(NSInteger)i_level;
-
 - (void)cancel;
 
 @end

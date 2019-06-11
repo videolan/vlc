@@ -43,6 +43,9 @@
 #import "panels/VLCBookmarksWindowController.h"
 #import "panels/VLCTrackSynchronizationWindowController.h"
 
+NSString *VLCWindowShouldUpdateLevel = @"VLCWindowShouldUpdateLevel";
+NSString *VLCWindowLevelKey = @"VLCWindowLevelKey";
+
 static int WindowEnable(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 {
     @autoreleasepool {
@@ -551,16 +554,10 @@ int WindowOpen(vout_window_t *p_wnd)
         _currentStatusWindowLevel = i_level + 1;
     }
 
-    NSInteger currentStatusWindowLevel = self.currentStatusWindowLevel;
-
     VLCMain *main = [VLCMain sharedInstance];
     [[main libraryWindow] setWindowLevel:i_level];
-    [[main videoEffectsPanel] updateCocoaWindowLevel:currentStatusWindowLevel];
-    [[main audioEffectsPanel] updateCocoaWindowLevel:currentStatusWindowLevel];
-    [[main currentMediaInfoPanel] updateCocoaWindowLevel:currentStatusWindowLevel];
-    [[main bookmarks] updateCocoaWindowLevel:currentStatusWindowLevel];
-    [[main trackSyncPanel] updateCocoaWindowLevel:currentStatusWindowLevel];
-    [[main resumeDialog] updateCocoaWindowLevel:currentStatusWindowLevel];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:VLCWindowShouldUpdateLevel object:self userInfo:@{VLCWindowLevelKey : @(_currentWindowLevel)}];
 }
 
 @end

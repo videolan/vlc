@@ -74,6 +74,10 @@
                                       selector:@selector(updateStatistics:)
                                           name:VLCPlayerStatisticsUpdated
                                         object:nil];
+        [defaultNotificationCenter addObserver:self
+                                      selector:@selector(updateCocoaWindowLevel:)
+                                          name:VLCWindowShouldUpdateLevel
+                                        object:nil];
     }
     return self;
 }
@@ -148,8 +152,9 @@
     [self updatePanelWithItem:_mediaItem];
 }
 
-- (void)updateCocoaWindowLevel:(NSInteger)i_level
+- (void)updateCocoaWindowLevel:(NSNotification *)aNotification
 {
+    NSInteger i_level = [aNotification.userInfo[VLCWindowLevelKey] integerValue];
     if (self.isWindowLoaded && [self.window isVisible] && [self.window level] != i_level)
         [self.window setLevel: i_level];
 }

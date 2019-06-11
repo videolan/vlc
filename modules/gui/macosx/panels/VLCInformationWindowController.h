@@ -84,7 +84,6 @@
 @property (readwrite, weak) IBOutlet NSTextField *videoDecodedLabel;
 @property (readwrite, weak) IBOutlet NSTextField *videoDecodedTextField;
 
-- (void)updateCocoaWindowLevel:(NSInteger)i_level;
 - (IBAction)toggleWindow:(id)sender;
 
 - (IBAction)metaFieldChanged:(id)sender;

@@ -72,6 +72,11 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 {
     self = [super initWithWindowNibName:@"VideoEffects"];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(updateCocoaWindowLevel:)
+                                                     name:VLCWindowShouldUpdateLevel
+                                                   object:nil];
+
         self.popupPanel = [[VLCPopupPanelController alloc] init];
         self.textfieldPanel = [[VLCTextfieldPanelController alloc] init];
 
@@ -334,8 +339,9 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)updateCocoaWindowLevel:(NSInteger)i_level
+- (void)updateCocoaWindowLevel:(NSNotification *)aNotification
 {
+    NSInteger i_level = [aNotification.userInfo[VLCWindowLevelKey] integerValue];
     if (self.isWindowLoaded && [self.window isVisible] && [self.window level] != i_level)
         [self.window setLevel: i_level];
 }

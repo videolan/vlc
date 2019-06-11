@@ -42,7 +42,6 @@
 @property (readwrite, weak) IBOutlet NSTextField *editNameTextField;
 @property (readwrite, weak) IBOutlet NSTextField *editTimeTextField;
 
-- (void)updateCocoaWindowLevel:(NSInteger)i_level;
 - (IBAction)toggleWindow:(id)sender;
 
 - (IBAction)add:(id)sender;

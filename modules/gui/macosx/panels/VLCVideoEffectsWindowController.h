@@ -167,7 +167,6 @@
 @property (nonatomic) int posterizeValue;
 
 /* generic */
-- (void)updateCocoaWindowLevel:(NSInteger)i_level;
 - (void)saveCurrentProfileAtTerminate;
 
 - (void)toggleWindow:(id)sender;

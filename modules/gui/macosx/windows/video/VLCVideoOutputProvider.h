@@ -29,6 +29,9 @@
 @class VLCVideoWindowCommon;
 @class VLCVoutView;
 
+extern NSString *VLCWindowShouldUpdateLevel;
+extern NSString *VLCWindowLevelKey;
+
 @interface VLCVideoOutputProvider : NSObject
 
 @property (readonly, nonatomic) NSInteger currentStatusWindowLevel;

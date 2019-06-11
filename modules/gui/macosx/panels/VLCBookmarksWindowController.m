@@ -54,7 +54,9 @@
 - (id)init
 {
     self = [super initWithWindowNibName:@"Bookmarks"];
-
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateCocoaWindowLevel:) name:VLCWindowShouldUpdateLevel object:nil];
+    }
     return self;
 }
 
@@ -93,8 +95,9 @@
     [_editTimeLabel setStringValue: _NS("Time")];
 }
 
-- (void)updateCocoaWindowLevel:(NSInteger)i_level
+- (void)updateCocoaWindowLevel:(NSNotification *)aNotification
 {
+    NSInteger i_level = [aNotification.userInfo[VLCWindowLevelKey] integerValue];
     if (self.isWindowLoaded && [self.window isVisible] && [self.window level] != i_level)
         [self.window setLevel: i_level];
 }

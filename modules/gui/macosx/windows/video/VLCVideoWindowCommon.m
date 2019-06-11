@@ -78,12 +78,14 @@ NSString *VLCVideoWindowDidEnterFullscreen = @"VLCVideoWindowDidEnterFullscreen"
     self = [super initWithContentRect:contentRect styleMask:styleMask
                               backing:backingType defer:flag];
 
-    /* we want to be moveable regardless of our style */
-    [self setMovableByWindowBackground: YES];
-    [self setCanBecomeKeyWindow:YES];
+    if (self) {
+        /* we want to be moveable regardless of our style */
+        [self setMovableByWindowBackground: YES];
+        [self setCanBecomeKeyWindow:YES];
 
-    o_temp_view = [[NSView alloc] init];
-    [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+        o_temp_view = [[NSView alloc] init];
+        [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+    }
 
     return self;
 }
