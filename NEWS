@@ -4,6 +4,9 @@ Changes between 3.0.7 and 3.0.7.1:
 Access:
  * Update libbluray to 1.1.2
 
+macOS:
+ * Fix bluray java menu playback regression in 3.0.7
+
 Video Output:
  * Fix hardware acceleration with some AMD drivers
  * Improve direct3d11 HDR support
