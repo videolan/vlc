@@ -72,10 +72,15 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 {
     self = [super initWithWindowNibName:@"VideoEffects"];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(updateCocoaWindowLevel:)
-                                                     name:VLCWindowShouldUpdateLevel
-                                                   object:nil];
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                               selector:@selector(updateCocoaWindowLevel:)
+                                   name:VLCWindowShouldUpdateLevel
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(saveCurrentProfileAtTerminate:)
+                                   name:NSApplicationWillTerminateNotification
+                                 object:nil];
 
         self.popupPanel = [[VLCPopupPanelController alloc] init];
         self.textfieldPanel = [[VLCTextfieldPanelController alloc] init];
@@ -726,7 +731,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:VLCVideoEffectsProfilesKey];
 }
 
-- (void)saveCurrentProfileAtTerminate
+- (void)saveCurrentProfileAtTerminate:(NSNotification *)aNotification
 {
     if ([self currentProfileIndex] > 0) {
         [self saveCurrentProfile];

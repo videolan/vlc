@@ -167,8 +167,6 @@
 @property (nonatomic) int posterizeValue;
 
 /* generic */
-- (void)saveCurrentProfileAtTerminate;
-
 - (void)toggleWindow:(id)sender;
 - (IBAction)profileSelectorAction:(id)sender;
 - (IBAction)applyProfileCheckboxChanged:(id)sender;

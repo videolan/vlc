@@ -114,7 +114,6 @@
 - (IBAction)applyProfileCheckboxChanged:(id)sender;
 
 - (void)toggleWindow:(id)sender;
-- (void)saveCurrentProfileAtTerminate;
 
 /* Equalizer */
 - (IBAction)equalizerBandSliderUpdated:(id)sender;

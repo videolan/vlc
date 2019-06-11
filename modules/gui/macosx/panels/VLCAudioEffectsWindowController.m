@@ -204,10 +204,15 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
 
 - (void)windowDidLoad
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updateCocoaWindowLevel:)
-                                                 name:VLCWindowShouldUpdateLevel
-                                               object:nil];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateCocoaWindowLevel:)
+                               name:VLCWindowShouldUpdateLevel
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(saveCurrentProfileAtTerminate:)
+                               name:NSApplicationWillTerminateNotification
+                             object:nil];
 
     [_applyProfileCheckbox setState:[[NSUserDefaults standardUserDefaults] boolForKey:@"AudioEffectApplyProfileOnStartup"]];
     [_applyProfileCheckbox setTitle:_NS("Apply profile at next launch")];
@@ -403,7 +408,7 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:VLCAudioEffectsProfilesKey];
 }
 
-- (void)saveCurrentProfileAtTerminate
+- (void)saveCurrentProfileAtTerminate:(NSNotification *)notification
 {
     if ([self currentProfileIndex] > 0) {
         [self saveCurrentProfile];

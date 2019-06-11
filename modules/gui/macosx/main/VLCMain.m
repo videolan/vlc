@@ -312,20 +312,18 @@ static VLCMain *sharedInstance = nil;
     if (b_intf_terminating)
         return;
     b_intf_terminating = true;
+    NSNotificationCenter *notiticationCenter = [NSNotificationCenter defaultCenter];
 
     _continuityController = nil;
 
-    if (notification == nil)
-        [[NSNotificationCenter defaultCenter] postNotificationName: NSApplicationWillTerminateNotification object: nil];
-
-    /* save current video and audio profiles */
-    [[self videoEffectsPanel] saveCurrentProfileAtTerminate];
-    [[self audioEffectsPanel] saveCurrentProfileAtTerminate];
+    if (notification == nil) {
+        [notiticationCenter postNotificationName: NSApplicationWillTerminateNotification object: nil];
+    }
 
     libvlc_int_t *libvlc = vlc_object_instance(p_intf);
     var_DelCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
 
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [notiticationCenter removeObserver: self];
 
     // closes all open vouts
     _voutProvider = nil;
