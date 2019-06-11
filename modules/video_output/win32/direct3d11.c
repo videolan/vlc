@@ -1469,7 +1469,10 @@ static bool CanUseTextureArray(vout_display_t *vd)
     return false;
 #else
     struct wddm_version WDDM = {
-        .revision     = 162, // 17.5.1 - 2017/05/04
+        .wddm         = 20,  // starting with drivers designed for W10
+        // 15.200.1062.1004 is wrong - 2015/08/03
+        // 22.19.165.3 is good       - 2017/05/04
+        .revision     = 162, // 17.5.1
     };
     if (D3D11CheckDriverVersion(&vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM) == VLC_SUCCESS)
         return true;
