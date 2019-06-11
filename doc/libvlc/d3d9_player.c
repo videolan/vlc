@@ -46,48 +46,6 @@ struct CUSTOMVERTEX {FLOAT X, Y, Z, RHW; DWORD COLOR;
 #define CUSTOMFVF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 
 /**
- * Callback called just before VLC starts drawing the video.
- *
- * Set the surface VLC will render to (could be the backbuffer if nothing else
- * needs to be displayed). And then call BeginScene().
- *
- * This is called outside of the UI thread (in the VLC rendering thread).
- */
-static bool StartRender(struct render_context *ctx)
-{
-    HRESULT hr;
-
-    hr = IDirect3DDevice9_SetRenderTarget(ctx->libvlc_d3d, 0, ctx->sharedRenderSurface);
-    if (FAILED(hr)) return false;
-
-    /* clear the vlc destination texture to black alternatively */
-    hr = IDirect3DDevice9_Clear(ctx->libvlc_d3d, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-    if (FAILED(hr)) return false;
-
-    hr = IDirect3DDevice9_BeginScene(ctx->libvlc_d3d);
-    if (hr == D3DERR_DEVICENOTRESET)
-    {
-        /* TODO reset the device, this may not work with hardware decoding */
-        return false;
-    }
-    if (FAILED(hr)) return false;
-
-    return true;
-}
-
-/**
- * Callback called after VLC has finished drawing the video.
- *
- * This is called outside of the UI thread (in the VLC rendering thread).
- */
-static void EndRender(struct render_context *ctx)
-{
-    IDirect3DDevice9_EndScene(ctx->libvlc_d3d);
-
-    IDirect3DDevice9_Present(ctx->libvlc_d3d, NULL, NULL, NULL, NULL);
-}
-
-/**
  * Callback called when it's time to display the video, in sync with the audio.
  *
  * This is called outside of the UI thread (in the VLC rendering thread).
@@ -172,6 +130,9 @@ static bool Resize(struct render_context *ctx, unsigned width, unsigned height,
     hr = IDirect3DTexture9_GetSurfaceLevel(ctx->sharedRenderTexture, 0, &ctx->sharedRenderSurface);
     if (FAILED(hr))
         return false;
+
+    hr = IDirect3DDevice9_SetRenderTarget(ctx->libvlc_d3d, 0, ctx->sharedRenderSurface);
+    if (FAILED(hr)) return false;
 
     out->surface_format = d3ddm.Format;
     out->full_range     = true;
@@ -286,15 +247,27 @@ static void Swap_cb( void* opaque )
     Swap( ctx );
 }
 
+/**
+ * Callback called just before VLC starts/finishes drawing the video.
+ *
+ * Set the surface VLC will render to (could be the backbuffer if nothing else
+ * needs to be displayed). And then call BeginScene().
+ *
+ * This is called outside of the UI thread (in the VLC rendering thread).
+ */
 static bool StartRendering_cb( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *hdr10 )
 {
     struct render_context *ctx = opaque;
     if ( enter )
     {
-        return StartRender( ctx );
+        /* we already set the RenderTarget on the IDirect3DDevice9 */
+        return true;
     }
 
-    EndRender( ctx );
+    /* VLC has finished preparing drawning on our surface, we need do the drawing now
+       so the surface is finished rendering when Swap() is called to do our own
+       rendering */
+    IDirect3DDevice9_Present(ctx->libvlc_d3d, NULL, NULL, NULL, NULL);
     return true;
 }
 

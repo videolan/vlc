@@ -1167,44 +1167,6 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     return 0;
 }
 
-static bool StartRendering(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    IDirect3DDevice9 *d3ddev = sys->d3d_dev.dev;
-    HRESULT hr;
-
-    if (sys->clear_scene) {
-        /* Clear the backbuffer and the zbuffer */
-        hr = IDirect3DDevice9_Clear(d3ddev, 0, NULL, D3DCLEAR_TARGET,
-                                  D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-        if (FAILED(hr)) {
-            msg_Dbg(vd, "Failed Clear: 0x%lX", hr);
-            return false;
-        }
-        sys->clear_scene = false;
-    }
-
-    // Begin the scene
-    hr = IDirect3DDevice9_BeginScene(d3ddev);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed BeginScene: 0x%lX", hr);
-        return false;
-    }
-    return true;
-}
-
-static void EndRendering(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    IDirect3DDevice9 *d3ddev = sys->d3d_dev.dev;
-    HRESULT hr;
-
-    // End the scene
-    hr = IDirect3DDevice9_EndScene(d3ddev);
-    if (FAILED(hr))
-        msg_Dbg(vd, "Failed EndScene: 0x%lX", hr);
-}
-
 /**
  * It renders the scene.
  *
@@ -1218,9 +1180,27 @@ static void Direct3D9RenderScene(vout_display_t *vd,
 {
     vout_display_sys_t *sys = vd->sys;
     IDirect3DDevice9 *d3ddev = sys->d3d_dev.dev;
+    HRESULT hr;
 
-    if (!sys->startEndRenderingCb( sys->outside_opaque, true, NULL ))
+    if (sys->startEndRenderingCb && !sys->startEndRenderingCb( sys->outside_opaque, true, NULL ))
         return;
+
+    if (sys->clear_scene) {
+        /* Clear the backbuffer and the zbuffer */
+        hr = IDirect3DDevice9_Clear(d3ddev, 0, NULL, D3DCLEAR_TARGET,
+                                  D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+        if (FAILED(hr)) {
+            msg_Dbg(vd, "Failed Clear: 0x%lX", hr);
+            return;
+        }
+        sys->clear_scene = false;
+    }
+
+    hr = IDirect3DDevice9_BeginScene(d3ddev);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "Failed BeginScene: 0x%lX", hr);
+        return;
+    }
 
     Direct3D9RenderRegion(vd, picture, true);
 
@@ -1235,7 +1215,12 @@ static void Direct3D9RenderScene(vout_display_t *vd,
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHABLENDENABLE, FALSE);
     }
 
-    sys->startEndRenderingCb( sys->outside_opaque, false, NULL );
+    hr = IDirect3DDevice9_EndScene(d3ddev);
+    if (FAILED(hr))
+        msg_Dbg(vd, "Failed EndScene: 0x%lX", hr);
+
+    if (sys->startEndRenderingCb)
+        sys->startEndRenderingCb( sys->outside_opaque, false, NULL );
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
@@ -1648,19 +1633,6 @@ static void LocalSwapchainSwap( void *opaque )
     Swap( vd );
 }
 
-static bool LocalSwapchainStartEndRendering( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *p_hdr10 )
-{
-    VLC_UNUSED(p_hdr10);
-    vout_display_t *vd = opaque;
-    if ( enter )
-    {
-        return StartRendering( vd );
-    }
-
-    EndRendering( vd );
-    return true;
-}
-
 /**
  * It creates a Direct3D vout display.
  */
@@ -1711,7 +1683,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->cleanupDeviceCb     = LocalSwapchainCleanupDevice;
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;
         sys->swapCb              = LocalSwapchainSwap;
-        sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
+        sys->startEndRenderingCb = NULL;
     }
 
     libvlc_video_direct3d_device_cfg_t surface_cfg = {
