@@ -205,6 +205,7 @@ static void vout_UpdateWindowSizeLocked(vout_thread_t *vout)
 
     vlc_mutex_assert(&vout->p->window_lock);
 
+#warning Data race! /* Window lock does not protect original format */
     if (vout->p->original.i_chroma == 0)
         return;
 
@@ -1282,6 +1283,8 @@ void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
 static void vout_FlushUnlocked(vout_thread_t *vout, bool below,
                                vlc_tick_t date)
 {
+    vout_thread_sys_t *sys = vout->p;
+
     vout->p->step.timestamp = VLC_TICK_INVALID;
     vout->p->step.last      = VLC_TICK_INVALID;
 
@@ -1302,6 +1305,7 @@ static void vout_FlushUnlocked(vout_thread_t *vout, bool below,
 
     picture_fifo_Flush(vout->p->decoder_fifo, date, below);
 
+    assert(sys->display != NULL);
     vlc_mutex_lock(&vout->p->display_lock);
     vout_FilterFlush(vout->p->display);
     vlc_mutex_unlock(&vout->p->display_lock);
@@ -1314,8 +1318,6 @@ void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
-
-    assert(vout->p->original.i_chroma != 0);
 
     vout_control_Hold(&sys->control);
     vout_FlushUnlocked(vout, false, date);
@@ -1663,7 +1665,7 @@ void vout_StopDisplay(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
 
-    assert(sys->original.i_chroma != 0);
+    assert(sys->display != NULL);
     vlc_cancel(sys->thread);
     vlc_join(sys->thread, NULL);
 
@@ -1707,7 +1709,7 @@ void vout_Stop(vout_thread_t *vout)
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
 
-    if (sys->original.i_chroma != 0)
+    if (sys->display != NULL)
         vout_StopDisplay(vout);
 
     vlc_mutex_lock(&sys->window_lock);
@@ -1725,7 +1727,7 @@ void vout_Close(vout_thread_t *vout)
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
 
-    if (sys->original.i_chroma != 0)
+    if (sys->display != NULL)
         vout_Stop(vout);
 
     vout_IntfDeinit(VLC_OBJECT(vout));
@@ -1917,7 +1919,7 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
         msg_Warn(vout, "DPB need to be increased");
     }
 
-    if (sys->original.i_chroma != 0)
+    if (sys->display != NULL)
         vout_StopDisplay(vout);
 
     vout_ReinitInterlacingSupport(vout);
