@@ -136,7 +136,7 @@ struct vlc_va_sys_t
 
 
 /* */
-static int D3dCreateDevice(vlc_va_t *);
+static int D3dCreateDevice(vlc_va_t *, const video_format_t *);
 static void D3dDestroyDevice(vlc_va_t *);
 static char *DxDescribe(vlc_va_sys_t *);
 
@@ -267,7 +267,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
-
     /* Load dll*/
     if (p_sys!=NULL && p_sys->surface!=NULL)
     {
@@ -320,7 +319,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     va->sys = sys;
 
-    err = directx_va_Open(va, &sys->dx_sys);
+    err = directx_va_Open(va, &fmt->video, &sys->dx_sys);
     if (err!=VLC_SUCCESS)
         goto error;
 
@@ -349,7 +348,7 @@ error:
 /**
  * It creates a Direct3D device usable for DXVA 2
  */
-static int D3dCreateDevice(vlc_va_t *va)
+static int D3dCreateDevice(vlc_va_t *va, const video_format_t *fmt)
 {
     vlc_va_sys_t *sys = va->sys;
 
@@ -358,8 +357,7 @@ static int D3dCreateDevice(vlc_va_t *va)
         return VLC_SUCCESS;
     }
 
-    video_format_t fmt = { 0 };
-    HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, GetDesktopWindow(), &fmt, &sys->d3d_dev);
+    HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, NULL, fmt, &sys->d3d_dev);
     if (FAILED(hr))
     {
         msg_Err(va, "IDirect3D9_CreateDevice failed");
