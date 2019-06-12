@@ -510,10 +510,13 @@ void vout_ChangeCropRatio(vout_thread_t *vout, unsigned num, unsigned den)
         sys->source.crop.mode = VOUT_CROP_NONE;
 
     vout_UpdateWindowSizeLocked(vout);
+
+    vlc_mutex_lock(&sys->display_lock);
     vlc_mutex_unlock(&sys->window_lock);
 
-    vout_control_PushPair(&vout->p->control, VOUT_CONTROL_CROP_RATIO,
-                          num, den);
+    if (sys->display != NULL)
+        vout_SetDisplayCrop(sys->display, num, den, 0, 0, 0, 0);
+    vlc_mutex_unlock(&sys->display_lock);
 }
 
 void vout_ChangeCropWindow(vout_thread_t *vout,
@@ -1580,12 +1583,6 @@ static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         vlc_mutex_lock(&vout->p->display_lock);
         vout_display_SetSize(vout->p->display,
                              cmd.window.width, cmd.window.height);
-        vlc_mutex_unlock(&vout->p->display_lock);
-        break;
-    case VOUT_CONTROL_CROP_RATIO:
-        vlc_mutex_lock(&vout->p->display_lock);
-        vout_SetDisplayCrop(vout->p->display, cmd.pair.a, cmd.pair.b,
-                            0, 0, 0, 0);
         vlc_mutex_unlock(&vout->p->display_lock);
         break;
     case VOUT_CONTROL_CROP_WINDOW:
