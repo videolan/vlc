@@ -34,7 +34,6 @@ enum {
     VOUT_CONTROL_DISPLAY_SIZE,          /* window */
 
     VOUT_CONTROL_CROP_BORDER,           /* border */
-    VOUT_CONTROL_CROP_WINDOW,           /* window */
     VOUT_CONTROL_VIEWPOINT,             /* viewpoint */
 };
 

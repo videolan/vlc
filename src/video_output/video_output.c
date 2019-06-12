@@ -524,7 +524,6 @@ void vout_ChangeCropWindow(vout_thread_t *vout,
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
-    vout_control_cmd_t cmd;
 
     if (x < 0)
         x = 0;
@@ -543,14 +542,13 @@ void vout_ChangeCropWindow(vout_thread_t *vout,
     sys->source.crop.window.height = height;
 
     vout_UpdateWindowSizeLocked(vout);
+
+    vlc_mutex_lock(&sys->display_lock);
     vlc_mutex_unlock(&sys->window_lock);
 
-    vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_WINDOW);
-    cmd.window.x = x;
-    cmd.window.y = y;
-    cmd.window.width = width;
-    cmd.window.height = height;
-    vout_control_Push(&vout->p->control, &cmd);
+    if (sys->display != NULL)
+        vout_SetDisplayCrop(vout->p->display, 0, 0, x, y, width, height);
+    vlc_mutex_unlock(&vout->p->display_lock);
 }
 
 void vout_ChangeCropBorder(vout_thread_t *vout,
@@ -1583,13 +1581,6 @@ static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         vlc_mutex_lock(&vout->p->display_lock);
         vout_display_SetSize(vout->p->display,
                              cmd.window.width, cmd.window.height);
-        vlc_mutex_unlock(&vout->p->display_lock);
-        break;
-    case VOUT_CONTROL_CROP_WINDOW:
-        vlc_mutex_lock(&vout->p->display_lock);
-        vout_SetDisplayCrop(vout->p->display, 0, 0,
-                            cmd.window.x, cmd.window.y,
-                            cmd.window.width, cmd.window.height);
         vlc_mutex_unlock(&vout->p->display_lock);
         break;
     case VOUT_CONTROL_CROP_BORDER:
