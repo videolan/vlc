@@ -58,7 +58,7 @@ static int TryEnterMTA(vlc_object_t *obj)
     HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (unlikely(FAILED(hr)))
     {
-        msg_Err (obj, "cannot initialize COM (error 0x%lx)", hr);
+        msg_Err (obj, "cannot initialize COM (error 0x%lX)", hr);
         return -1;
     }
     return 0;
@@ -842,7 +842,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
         msg_Dbg(aout, "using selected device %ls", sys->requested_device);
         hr = IMMDeviceEnumerator_GetDevice(it, sys->requested_device, &sys->dev);
         if (FAILED(hr))
-            msg_Err(aout, "cannot get selected device %ls (error 0x%lx)",
+            msg_Err(aout, "cannot get selected device %ls (error 0x%lX)",
                     sys->requested_device, hr);
         sys->acquired_device = sys->requested_device;
     }
@@ -857,7 +857,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
                                                          eConsole, &sys->dev);
         if (FAILED(hr))
         {
-            msg_Err(aout, "cannot get default device (error 0x%lx)", hr);
+            msg_Err(aout, "cannot get default device (error 0x%lX)", hr);
             sys->acquired_device = NULL;
         }
         else
@@ -891,7 +891,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     }
     else
     {
-        msg_Err(aout, "cannot get device identifier (error 0x%lx)", hr);
+        msg_Err(aout, "cannot get device identifier (error 0x%lX)", hr);
         return hr;
     }
 
@@ -916,12 +916,12 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
                                                          &sys->session_events);
         }
         else
-            msg_Err(aout, "cannot get session control (error 0x%lx)", hr);
+            msg_Err(aout, "cannot get session control (error 0x%lX)", hr);
 
         hr = IAudioSessionManager_GetSimpleAudioVolume(manager, guid, FALSE,
                                                        &volume);
         if (FAILED(hr))
-            msg_Err(aout, "cannot get simple volume (error 0x%lx)", hr);
+            msg_Err(aout, "cannot get simple volume (error 0x%lX)", hr);
 
         /* Try to get version 2 (Windows 7) of the manager & control */
         wchar_t *siid = NULL;
@@ -958,7 +958,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     }
     else
     {
-        msg_Err(aout, "cannot activate session manager (error 0x%lx)", hr);
+        msg_Err(aout, "cannot activate session manager (error 0x%lX)", hr);
         control = NULL;
         volume = NULL;
     }
@@ -975,10 +975,10 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
             msg_Dbg(aout, "volume from %+f dB to %+f dB with %f dB increments",
                     min, max, inc);
         else
-            msg_Err(aout, "cannot get volume range (error 0x%lx)", hr);
+            msg_Err(aout, "cannot get volume range (error 0x%lX)", hr);
     }
     else
-        msg_Err(aout, "cannot activate endpoint volume (error %lx)", hr);
+        msg_Err(aout, "cannot activate endpoint volume (error 0x%lX)", hr);
 
     /* Main loop (adjust volume as long as device is unchanged) */
     while (sys->requested_device == NULL)
@@ -992,7 +992,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
             {
                 hr = ISimpleAudioVolume_SetMasterVolume(volume, level, NULL);
                 if (FAILED(hr))
-                    msg_Err(aout, "cannot set master volume (error 0x%lx)",
+                    msg_Err(aout, "cannot set master volume (error 0x%lX)",
                             hr);
             }
             sys->requested_volume = -1.f;
@@ -1001,13 +1001,13 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
             if (SUCCEEDED(hr))
                 aout_VolumeReport(aout, cbrtf(level * sys->gain));
             else
-                msg_Err(aout, "cannot get master volume (error 0x%lx)", hr);
+                msg_Err(aout, "cannot get master volume (error 0x%lX)", hr);
 
             BOOL mute;
 
             hr = ISimpleAudioVolume_GetMute(volume, &mute);
             if (FAILED(hr))
-                msg_Err(aout, "cannot get mute (error 0x%lx)", hr);
+                msg_Err(aout, "cannot get mute (error 0x%lX)", hr);
 
             if (sys->requested_mute >= 0)
             {
@@ -1015,7 +1015,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
 
                 hr = ISimpleAudioVolume_SetMute(volume, mute, NULL);
                 if (FAILED(hr))
-                    msg_Err(aout, "cannot set mute (error 0x%lx)", hr);
+                    msg_Err(aout, "cannot set mute (error 0x%lX)", hr);
             }
             sys->requested_mute = -1;
 
@@ -1094,7 +1094,7 @@ static void *MMThread(void *data)
                                                           &sys->device_events);
     hr = DevicesEnum(it, MMThread_DevicesEnum_Added, aout);
     if (FAILED(hr))
-        msg_Warn(aout, "cannot enumerate audio endpoints (error 0x%lx)", hr);
+        msg_Warn(aout, "cannot enumerate audio endpoints (error 0x%lX)", hr);
 
     EnterCriticalSection(&sys->lock);
 

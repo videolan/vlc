@@ -548,7 +548,7 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
         hr = taskbl->lpVtbl->SetThumbnailClip(taskbl, hroot,
                                                  show ? &video : NULL);
         if ( hr != S_OK )
-            msg_Err(vd, "SetThumbNailClip failed: 0x%0lx", hr);
+            msg_Err(vd, "SetThumbNailClip failed: 0x%lX", hr);
 
         taskbl->lpVtbl->Release(taskbl);
     }

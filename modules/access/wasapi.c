@@ -98,7 +98,7 @@ static IAudioClient *GetClient(demux_t *demux, bool *restrict loopbackp)
                           &IID_IMMDeviceEnumerator, &pv);
     if (FAILED(hr))
     {
-        msg_Err(demux, "cannot create device enumerator (error 0x%lx)", hr);
+        msg_Err(demux, "cannot create device enumerator (error 0x%lX)", hr);
         return NULL;
     }
     e = pv;
@@ -111,7 +111,7 @@ static IAudioClient *GetClient(demux_t *demux, bool *restrict loopbackp)
     IMMDeviceEnumerator_Release(e);
     if (FAILED(hr))
     {
-        msg_Err(demux, "cannot get default device (error 0x%lx)", hr);
+        msg_Err(demux, "cannot get default device (error 0x%lX)", hr);
         return NULL;
     }
 
@@ -119,7 +119,7 @@ static IAudioClient *GetClient(demux_t *demux, bool *restrict loopbackp)
     *loopbackp = GetDeviceFlow(dev) == eRender;
     IMMDevice_Release(dev);
     if (FAILED(hr))
-        msg_Err(demux, "cannot activate device (error 0x%lx)", hr);
+        msg_Err(demux, "cannot activate device (error 0x%lX)", hr);
     return pv;
 }
 
@@ -233,7 +233,7 @@ static es_out_id_t *CreateES(demux_t *demux, IAudioClient *client, bool loop,
     hr = IAudioClient_GetMixFormat(client, &pwf);
     if (FAILED(hr))
     {
-        msg_Err(demux, "cannot get mix format (error 0x%lx)", hr);
+        msg_Err(demux, "cannot get mix format (error 0x%lX)", hr);
         return NULL;
     }
 
@@ -265,7 +265,7 @@ static es_out_id_t *CreateES(demux_t *demux, IAudioClient *client, bool loop,
     CoTaskMemFree(pwf);
     if (FAILED(hr))
     {
-        msg_Err(demux, "cannot initialize audio client (error 0x%lx)", hr);
+        msg_Err(demux, "cannot initialize audio client (error 0x%lX)", hr);
         return NULL;
     }
     return es_out_Add(demux->out, &fmt);
@@ -302,7 +302,7 @@ static unsigned __stdcall Thread(void *data)
     hr = IAudioClient_GetService(sys->client, &IID_IAudioCaptureClient, &pv);
     if (FAILED(hr))
     {
-        msg_Err(demux, "cannot get capture client (error 0x%lx)", hr);
+        msg_Err(demux, "cannot get capture client (error 0x%lX)", hr);
         goto out;
     }
     capture = pv;
@@ -310,7 +310,7 @@ static unsigned __stdcall Thread(void *data)
     hr = IAudioClient_Start(sys->client);
     if (FAILED(hr))
     {
-        msg_Err(demux, "cannot start client (error 0x%lx)", hr);
+        msg_Err(demux, "cannot start client (error 0x%lX)", hr);
         IAudioCaptureClient_Release(capture);
         goto out;
     }
@@ -410,7 +410,7 @@ static int Open(vlc_object_t *obj)
 
     hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (unlikely(FAILED(hr))) {
-        msg_Err(demux, "cannot initialize COM (error 0x%lx)", hr);
+        msg_Err(demux, "cannot initialize COM (error 0x%lX)", hr);
         goto error;
     }
 
@@ -428,7 +428,7 @@ static int Open(vlc_object_t *obj)
 
     hr = IAudioClient_SetEventHandle(sys->client, sys->events[1]);
     if (FAILED(hr)) {
-        msg_Err(demux, "cannot set event handle (error 0x%lx)", hr);
+        msg_Err(demux, "cannot set event handle (error 0x%lX)", hr);
         goto error;
     }
 

@@ -297,14 +297,14 @@ static int VolumeSet(audio_output_t *aout, float vol)
     hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pc_AudioVolume);
     if (FAILED(hr))
     {
-        msg_Err(aout, "cannot get volume service (error 0x%lx)", hr);
+        msg_Err(aout, "cannot get volume service (error 0x%lX)", hr);
         goto done;
     }
 
     hr = ISimpleAudioVolume_SetMasterVolume(pc_AudioVolume, linear_vol, NULL);
     if (FAILED(hr))
     {
-        msg_Err(aout, "cannot set volume (error 0x%lx)", hr);
+        msg_Err(aout, "cannot set volume (error 0x%lX)", hr);
         goto done;
     }
 
@@ -328,14 +328,14 @@ static int MuteSet(audio_output_t *aout, bool mute)
     hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pc_AudioVolume);
     if (FAILED(hr))
     {
-        msg_Err(aout, "cannot get volume service (error 0x%lx)", hr);
+        msg_Err(aout, "cannot get volume service (error 0x%lX)", hr);
         goto done;
     }
 
     hr = ISimpleAudioVolume_SetMute(pc_AudioVolume, mute, NULL);
     if (FAILED(hr))
     {
-        msg_Err(aout, "cannot set mute (error 0x%lx)", hr);
+        msg_Err(aout, "cannot set mute (error 0x%lX)", hr);
         goto done;
     }
 

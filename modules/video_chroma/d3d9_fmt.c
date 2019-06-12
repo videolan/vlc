@@ -67,10 +67,10 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
     ZeroMemory(&out->caps, sizeof(out->caps));
     hr = IDirect3D9_GetDeviceCaps(hd3d->obj, AdapterToUse, DeviceType, &out->caps);
     if (FAILED(hr)) {
-       msg_Err(o, "Could not read adapter capabilities. (hr=0x%0lx)", hr);
+       msg_Err(o, "Could not read adapter capabilities. (hr=0x%lX)", hr);
        return hr;
     }
-    msg_Dbg(o, "D3D9 device caps 0x%0lX / 0x%0lX", out->caps.DevCaps, out->caps.DevCaps2);
+    msg_Dbg(o, "D3D9 device caps 0x%lX / 0x%lX", out->caps.DevCaps, out->caps.DevCaps2);
 
     /* TODO: need to test device capabilities and select the right render function */
     if (!(out->caps.DevCaps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES)) {
@@ -284,7 +284,7 @@ void Direct3D9UnlockSurface(picture_t *picture)
     /* Unlock the Surface */
     HRESULT hr = IDirect3DSurface9_UnlockRect(picture->p_sys->surface);
     if (FAILED(hr)) {
-        //msg_Dbg(vd, "Failed IDirect3DSurface9_UnlockRect: 0x%0lx", hr);
+        //msg_Dbg(vd, "Failed IDirect3DSurface9_UnlockRect: 0x%lX", hr);
     }
 }
 
@@ -331,7 +331,7 @@ picture_pool_t *Direct3D9CreatePicturePool(vlc_object_t *o,
                                                           &picsys->surface,
                                                           NULL);
         if (FAILED(hr)) {
-           msg_Err(o, "Failed to allocate surface %d (hr=0x%0lx)", picture_count, hr);
+           msg_Err(o, "Failed to allocate surface %d (hr=0x%0lX)", picture_count, hr);
            free(picsys);
            goto error;
         }
