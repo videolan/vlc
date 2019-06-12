@@ -487,10 +487,13 @@ void vout_ChangeDisplayAspectRatio(vout_thread_t *vout,
     sys->source.dar.den = dar_den;
 
     vout_UpdateWindowSizeLocked(vout);
+
+    vlc_mutex_lock(&sys->display_lock);
     vlc_mutex_unlock(&sys->window_lock);
 
-    vout_control_PushPair(&vout->p->control, VOUT_CONTROL_ASPECT_RATIO,
-                          dar_num, dar_den);
+    if (sys->display != NULL)
+        vout_SetDisplayAspect(sys->display, dar_num, dar_den);
+    vlc_mutex_unlock(&sys->display_lock);
 }
 
 void vout_ChangeCropRatio(vout_thread_t *vout, unsigned num, unsigned den)
@@ -1577,11 +1580,6 @@ static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         vlc_mutex_lock(&vout->p->display_lock);
         vout_display_SetSize(vout->p->display,
                              cmd.window.width, cmd.window.height);
-        vlc_mutex_unlock(&vout->p->display_lock);
-        break;
-    case VOUT_CONTROL_ASPECT_RATIO:
-        vlc_mutex_lock(&vout->p->display_lock);
-        vout_SetDisplayAspect(vout->p->display, cmd.pair.a, cmd.pair.b);
         vlc_mutex_unlock(&vout->p->display_lock);
         break;
     case VOUT_CONTROL_CROP_RATIO:
