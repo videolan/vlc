@@ -299,8 +299,8 @@ void vout_FlushSubpictureChannel( vout_thread_t *vout, size_t channel )
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
-    assert(sys->spu);
-    spu_ClearChannel(vout->p->spu, channel);
+    if (sys->spu)
+        spu_ClearChannel(sys->spu, channel);
 }
 
 void vout_SetSpuHighlight( vout_thread_t *vout,
