@@ -39,7 +39,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-04-29 11:36+0200\n"
+"PO-Revision-Date: 2019-06-12 07:16+0200\n"
 "Last-Translator: Anton Regnander <anton_r_3@hotmail.com>, 2019\n"
 "Language-Team: Swedish (https://www.transifex.com/yaron/teams/16553/sv/)\n"
 "Language: sv\n"
@@ -1848,7 +1848,7 @@ msgstr "Välj läge för uppspelningsförstärkning"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
-msgstr "Uppspelningsförförstärkare"
+msgstr "Uppspelningsförsteg"
 
 #: src/libvlc-module.c:218
 msgid ""
@@ -16108,7 +16108,7 @@ msgstr "2 pass"
 #: modules/gui/qt/components/extended_panels.cpp:1132
 #: modules/gui/qt/ui/equalizer.h:133
 msgid "Preamp"
-msgstr "Förstärk"
+msgstr "Försteg"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:223
 msgid "Enable dynamic range compressor"
@@ -28152,7 +28152,7 @@ msgstr "Filnamn"
 #: share/lua/http/dialogs/equalizer_window.html:49
 #: share/lua/http/mobile_equalizer.html:62
 msgid "Preamp:"
-msgstr "Förstärk:"
+msgstr "Försteg:"
 
 #: share/lua/http/dialogs/mosaic_window.html:104
 msgid "Row border"
