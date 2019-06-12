@@ -82,6 +82,7 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
 
     out->adapterId = AdapterToUse;
     out->hwnd      = hwnd;
+    /* TODO only create a device for the decoder dimensions */
     if (D3D9_FillPresentationParameters(hd3d, source, out))
     {
         msg_Err(o, "Could not presentation parameters");
@@ -175,12 +176,9 @@ int D3D9_FillPresentationParameters(d3d9_handle_t *hd3d,
     ** buffer of the same format
     */
     D3DDISPLAYMODE d3ddm;
-    if (source->i_width)
-    {
-        HRESULT hr = IDirect3D9_GetAdapterDisplayMode(hd3d->obj, out->adapterId, &d3ddm);
-        if (FAILED(hr))
-           return VLC_EGENERIC;
-    }
+    HRESULT hr = IDirect3D9_GetAdapterDisplayMode(hd3d->obj, out->adapterId, &d3ddm);
+    if (FAILED(hr))
+        return VLC_EGENERIC;
 
     /* Set up the structure used to create the D3DDevice. */
     D3DPRESENT_PARAMETERS *d3dpp = &out->pp;
@@ -190,24 +188,14 @@ int D3D9_FillPresentationParameters(d3d9_handle_t *hd3d,
     d3dpp->MultiSampleType        = D3DMULTISAMPLE_NONE;
     d3dpp->PresentationInterval   = D3DPRESENT_INTERVAL_DEFAULT;
     d3dpp->EnableAutoDepthStencil = FALSE;
-    if (source->i_width)
-    {
-        d3dpp->hDeviceWindow     = out->hwnd;
-        d3dpp->SwapEffect        = D3DSWAPEFFECT_COPY;
-        d3dpp->BackBufferFormat  = d3ddm.Format;
-        d3dpp->BackBufferCount   = 1;
-        d3dpp->BackBufferWidth   = __MAX((unsigned int)GetSystemMetrics(SM_CXVIRTUALSCREEN),
-                                              source->i_width);
-        d3dpp->BackBufferHeight  = __MAX((unsigned int)GetSystemMetrics(SM_CYVIRTUALSCREEN),
-                                              source->i_height);
-    }
-    else
-    {
-        d3dpp->hDeviceWindow     = NULL;
-        d3dpp->SwapEffect        = D3DSWAPEFFECT_DISCARD;
-        d3dpp->BackBufferCount   = 0;
-        d3dpp->BackBufferFormat  = D3DFMT_X8R8G8B8;    /* FIXME what to put here */
-    }
+    d3dpp->hDeviceWindow          = out->hwnd;
+    d3dpp->SwapEffect             = D3DSWAPEFFECT_COPY;
+    d3dpp->BackBufferFormat       = d3ddm.Format;
+    d3dpp->BackBufferCount        = 1;
+    d3dpp->BackBufferWidth        = __MAX((unsigned int)GetSystemMetrics(SM_CXVIRTUALSCREEN),
+                                            source->i_width);
+    d3dpp->BackBufferHeight       = __MAX((unsigned int)GetSystemMetrics(SM_CYVIRTUALSCREEN),
+                                            source->i_height);
 
     return VLC_SUCCESS;
 }
