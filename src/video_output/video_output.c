@@ -1448,26 +1448,12 @@ static int vout_Start(vout_thread_t *vout, const vout_configuration_t *cfg)
     sys->filter.chain_interactive = filter_chain_NewVideo(vout, true, &owner);
 
     vout_display_cfg_t dcfg;
+    int x = 0, y = 0, w = 0, h = 0;
+    unsigned num, den;
 
     vlc_mutex_lock(&sys->window_lock);
     dcfg = sys->display_cfg;
-    /* Any configuration change after unlocking will involve a control request
-     * that will be processed in the new thread. There may also be some pending
-     * control requests for configuration change already visible in
-     * sys->display_cfg, leading to processing of extra harmless and useless
-     * control request processing.
-     *
-     * TODO: display lock separate from window lock.
-     */
-    vlc_mutex_unlock(&sys->window_lock);
 
-    if (vout_OpenWrapper(vout, sys->splitter_name, &dcfg))
-        goto error;
-
-    unsigned num = 0, den = 0;
-    int x = 0, y = 0, w = 0, h = 0;
-
-    vlc_mutex_lock(&sys->window_lock); /* see above */
     switch (sys->source.crop.mode) {
         case VOUT_CROP_NONE:
             break;
@@ -1488,13 +1474,25 @@ static int vout_Start(vout_thread_t *vout, const vout_configuration_t *cfg)
             h = -(int)sys->source.crop.border.bottom;
             break;
     }
-    vlc_mutex_unlock(&sys->window_lock);
-    vout_SetDisplayCrop(sys->display, num, den, x, y, w, h);
 
-    vlc_mutex_lock(&sys->window_lock); /* see above */
     num = sys->source.dar.num;
     den = sys->source.dar.den;
+    /*
+     * Any configuration change after unlocking will involve a control request
+     * that will be processed in the new thread. There may also be some pending
+     * control requests for configuration change already visible in
+     * sys->display_cfg, leading to processing of extra harmless and useless
+     * control request processing.
+     *
+     * TODO: display lock separate from window lock.
+     */
     vlc_mutex_unlock(&sys->window_lock);
+
+    if (vout_OpenWrapper(vout, sys->splitter_name, &dcfg))
+        goto error;
+
+    vout_SetDisplayCrop(sys->display, num, den, x, y, w, h);
+
     if (num != 0 && den != 0)
         vout_SetDisplayAspect(sys->display, num, den);
 
