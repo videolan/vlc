@@ -441,7 +441,7 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
                                                           &texture,
                                                           NULL);
         if (FAILED(hr)) {
-            msg_Err(p_filter, "Failed to create a %4.4s staging texture to extract surface pixels (hr=0x%0lx)", (char *)texDesc.Format, hr );
+            msg_Err(p_filter, "Failed to create a %4.4s staging texture to extract surface pixels (hr=0x%lX)", (char *)texDesc.Format, hr );
             goto done;
         }
         res_sys->surface = texture;

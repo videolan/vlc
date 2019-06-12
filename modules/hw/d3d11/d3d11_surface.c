@@ -178,7 +178,7 @@ static int assert_staging(filter_t *p_filter, picture_sys_d3d11_t *p_sys)
     hr = ID3D11Device_CreateTexture2D( d3d_dev.d3ddevice, &texDesc, NULL, &sys->staging);
     /* test if mapping the texture works ref #18746 */
     if (SUCCEEDED(hr) && FAILED(hr = can_map(sys, p_sys->context)))
-        msg_Dbg(p_filter, "can't map default staging texture (hr=0x%0lx)", hr);
+        msg_Dbg(p_filter, "can't map default staging texture (hr=0x%lX)", hr);
 #if CAN_PROCESSOR
     if (FAILED(hr)) {
         /* failed with the this format, try a different one */
@@ -211,7 +211,7 @@ static int assert_staging(filter_t *p_filter, picture_sys_d3d11_t *p_sys)
                 }
                 else
                 {
-                    msg_Dbg(p_filter, "can't create intermediate texture (hr=0x%0lx)", hr);
+                    msg_Dbg(p_filter, "can't create intermediate texture (hr=0x%lX)", hr);
                     ID3D11Texture2D_Release(sys->staging);
                     sys->staging = NULL;
                 }
@@ -221,7 +221,7 @@ static int assert_staging(filter_t *p_filter, picture_sys_d3d11_t *p_sys)
 #endif
     ID3D11Device_Release(d3d_dev.d3ddevice);
     if (FAILED(hr)) {
-        msg_Err(p_filter, "Failed to create a %s staging texture to extract surface pixels (hr=0x%0lx)", DxgiFormatToStr(texDesc.Format), hr );
+        msg_Err(p_filter, "Failed to create a %s staging texture to extract surface pixels (hr=0x%lX)", DxgiFormatToStr(texDesc.Format), hr );
         return VLC_EGENERIC;
     }
 ok:
@@ -297,7 +297,7 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
     HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, sys->staging_resource,
                                          0, D3D11_MAP_READ, 0, &lock);
     if (FAILED(hr)) {
-        msg_Err(p_filter, "Failed to map source surface. (hr=0x%0lx)", hr);
+        msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
         vlc_mutex_unlock(&sys->staging_lock);
         return;
     }
@@ -425,7 +425,7 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, sys->staging_resource,
                                          0, D3D11_MAP_READ, 0, &lock);
     if (FAILED(hr)) {
-        msg_Err(p_filter, "Failed to map source surface. (hr=0x%0lx)", hr);
+        msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
         vlc_mutex_unlock(&sys->staging_lock);
         return;
     }
@@ -478,7 +478,7 @@ static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
     HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, sys->staging_resource,
                                          0, D3D11_MAP_READ, 0, &lock);
     if (FAILED(hr)) {
-        msg_Err(p_filter, "Failed to map source surface. (hr=0x%0lx)", hr);
+        msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
         vlc_mutex_unlock(&sys->staging_lock);
         return;
     }
@@ -591,7 +591,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
     HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, p_staging_sys->resource[KNOWN_DXGI_INDEX],
                                          0, D3D11_MAP_WRITE, 0, &lock);
     if (FAILED(hr)) {
-        msg_Err(p_filter, "Failed to map source surface. (hr=0x%0lx)", hr);
+        msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
         return;
     }
 
@@ -781,7 +781,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
 
     HRESULT hr = ID3D11Device_CreateTexture2D( d3d_dev.d3ddevice, &texDesc, NULL, &texture);
     if (FAILED(hr)) {
-        msg_Err(p_filter, "Failed to create a %s staging texture to extract surface pixels (hr=0x%0lx)", DxgiFormatToStr(texDesc.Format), hr );
+        msg_Err(p_filter, "Failed to create a %s staging texture to extract surface pixels (hr=0x%lX)", DxgiFormatToStr(texDesc.Format), hr );
         goto done;
     }
 

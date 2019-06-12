@@ -192,7 +192,7 @@ static void CommonChangeThumbnailClip(vlc_object_t *obj, vout_display_sys_win32_
         hr = taskbl->lpVtbl->SetThumbnailClip(taskbl, hroot,
                                                  show ? &video : NULL);
         if ( hr != S_OK )
-            msg_Err(obj, "SetThumbNailClip failed: 0x%0lx", hr);
+            msg_Err(obj, "SetThumbNailClip failed: 0x%lX", hr);
 
         taskbl->lpVtbl->Release(taskbl);
     }

@@ -74,7 +74,7 @@ static int TryEnterMTA(vlc_object_t *obj)
     HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (unlikely(FAILED(hr)))
     {
-        msg_Err (obj, "cannot initialize COM (error 0x%lx)", hr);
+        msg_Err (obj, "cannot initialize COM (error 0x%lX)", hr);
         return -1;
     }
     return 0;

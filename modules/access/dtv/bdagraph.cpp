@@ -3000,7 +3000,7 @@ HRESULT BDAGraph::Start()
     hr = p_media_control->Run();
     if( SUCCEEDED( hr ) )
     {
-        msg_Dbg( p_access, "Start: Graph started, hr=0x%lx", hr );
+        msg_Dbg( p_access, "Start: Graph started, hr=0x%lX", hr );
         return S_OK;
     }
 
@@ -3019,7 +3019,7 @@ HRESULT BDAGraph::Start()
     msg_Dbg( p_access, "Start: got state" );
     if( i_state == State_Running )
     {
-        msg_Dbg( p_access, "Graph started after a delay, hr=0x%lx", hr );
+        msg_Dbg( p_access, "Graph started after a delay, hr=0x%lX", hr );
         return S_OK;
     }
 

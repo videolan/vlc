@@ -424,7 +424,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
 
     hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &sys->outTexture );
     if (FAILED(hr)) {
-        msg_Err(filter, "CreateTexture2D failed. (hr=0x%0lx)", hr);
+        msg_Err(filter, "CreateTexture2D failed. (hr=0x%lX)", hr);
         goto error;
     }
 

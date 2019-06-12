@@ -1228,7 +1228,7 @@ FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
                            IID_ICreateDevEnum, (void**)p_dev_enum.GetAddressOf() );
     if( FAILED(hr) )
     {
-        msg_Err( p_this, "failed to create the device enumerator (0x%lx)", hr);
+        msg_Err( p_this, "failed to create the device enumerator (0x%lX)", hr);
         return p_base_filter;
     }
 
@@ -1242,7 +1242,7 @@ FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
                                                 p_class_enum.GetAddressOf(), 0 );
     if( FAILED(hr) )
     {
-        msg_Err( p_this, "failed to create the class enumerator (0x%lx)", hr );
+        msg_Err( p_this, "failed to create the class enumerator (0x%lX)", hr );
         return p_base_filter;
     }
 
@@ -1306,7 +1306,7 @@ FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
                     if( FAILED(hr) )
                     {
                         msg_Err( p_this, "couldn't bind moniker to filter "
-                                 "object (0x%lx)", hr );
+                                 "object (0x%lX)", hr );
                         return NULL;
                     }
                     return p_base_filter;

@@ -285,7 +285,7 @@ static HRESULT Play( vlc_object_t *obj, aout_stream_sys_t *sys,
                                             0, 0, DSBPLAY_LOOPING );
     }
     if( dsresult != DS_OK )
-        msg_Err( obj, "cannot start playing buffer: (hr=0x%0lx)", dsresult );
+        msg_Err( obj, "cannot start playing buffer: (hr=0x%lX)", dsresult );
     else
     {
         vlc_mutex_lock( &sys->lock );

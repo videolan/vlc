@@ -807,7 +807,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
                                                                  &viewDesc,
                                                                  &p_sys->decoder );
             if (FAILED(hr)) {
-                msg_Warn(va, "CreateVideoDecoderOutputView %d failed. (hr=0x%0lx)", surface_idx, hr);
+                msg_Warn(va, "CreateVideoDecoderOutputView %d failed. (hr=0x%lX)", surface_idx, hr);
                 dx_sys->can_extern_pool = false;
                 break;
             }
@@ -861,7 +861,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         ID3D11Texture2D *p_texture;
         hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &p_texture );
         if (FAILED(hr)) {
-            msg_Err(va, "CreateTexture2D %d failed. (hr=0x%0lx)", surface_count, hr);
+            msg_Err(va, "CreateTexture2D %d failed. (hr=0x%lX)", surface_count, hr);
             return VLC_EGENERIC;
         }
 
@@ -875,7 +875,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
                                                                  &viewDesc,
                                                                  &dx_sys->hw_surface[surface_idx] );
             if (FAILED(hr)) {
-                msg_Err(va, "CreateVideoDecoderOutputView %d failed. (hr=0x%0lx)", surface_idx, hr);
+                msg_Err(va, "CreateVideoDecoderOutputView %d failed. (hr=0x%lX)", surface_idx, hr);
                 ID3D11Texture2D_Release(p_texture);
                 return VLC_EGENERIC;
             }

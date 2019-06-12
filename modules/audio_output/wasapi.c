@@ -113,7 +113,7 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
     hr = IAudioClient_GetService(sys->client, &IID_IAudioClock, &pv);
     if (FAILED(hr))
     {
-        msg_Err(s, "cannot get clock (error 0x%lx)", hr);
+        msg_Err(s, "cannot get clock (error 0x%lX)", hr);
         return hr;
     }
 
@@ -125,7 +125,7 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
     IAudioClock_Release(clock);
     if (FAILED(hr))
     {
-        msg_Err(s, "cannot get position (error 0x%lx)", hr);
+        msg_Err(s, "cannot get position (error 0x%lX)", hr);
         return hr;
     }
 
@@ -153,7 +153,7 @@ static HRESULT Play(aout_stream_t *s, block_t *block)
     hr = IAudioClient_GetService(sys->client, &IID_IAudioRenderClient, &pv);
     if (FAILED(hr))
     {
-        msg_Err(s, "cannot get render client (error 0x%lx)", hr);
+        msg_Err(s, "cannot get render client (error 0x%lX)", hr);
         goto out;
     }
 
@@ -164,7 +164,7 @@ static HRESULT Play(aout_stream_t *s, block_t *block)
         hr = IAudioClient_GetCurrentPadding(sys->client, &frames);
         if (FAILED(hr))
         {
-            msg_Err(s, "cannot get current padding (error 0x%lx)", hr);
+            msg_Err(s, "cannot get current padding (error 0x%lX)", hr);
             break;
         }
 
@@ -177,7 +177,7 @@ static HRESULT Play(aout_stream_t *s, block_t *block)
         hr = IAudioRenderClient_GetBuffer(render, frames, &dst);
         if (FAILED(hr))
         {
-            msg_Err(s, "cannot get buffer (error 0x%lx)", hr);
+            msg_Err(s, "cannot get buffer (error 0x%lX)", hr);
             break;
         }
 
@@ -187,7 +187,7 @@ static HRESULT Play(aout_stream_t *s, block_t *block)
         hr = IAudioRenderClient_ReleaseBuffer(render, frames, 0);
         if (FAILED(hr))
         {
-            msg_Err(s, "cannot release buffer (error 0x%lx)", hr);
+            msg_Err(s, "cannot release buffer (error 0x%lX)", hr);
             break;
         }
         IAudioClient_Start(sys->client);
@@ -219,7 +219,7 @@ static HRESULT Pause(aout_stream_t *s, bool paused)
     else
         hr = IAudioClient_Start(sys->client);
     if (FAILED(hr))
-        msg_Warn(s, "cannot %s stream (error 0x%lx)",
+        msg_Warn(s, "cannot %s stream (error 0x%lX)",
                  paused ? "stop" : "start", hr);
     return hr;
 }
@@ -238,7 +238,7 @@ static HRESULT Flush(aout_stream_t *s)
         sys->written = 0;
     }
     else
-        msg_Warn(s, "cannot reset stream (error 0x%lx)", hr);
+        msg_Warn(s, "cannot reset stream (error 0x%lX)", hr);
     return hr;
 }
 
@@ -494,7 +494,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     HRESULT hr = aout_stream_Activate(s, &IID_IAudioClient, NULL, &pv);
     if (FAILED(hr))
     {
-        msg_Err(s, "cannot activate client (error 0x%lx)", hr);
+        msg_Err(s, "cannot activate client (error 0x%lX)", hr);
         goto error;
     }
     sys->client = pv;
@@ -552,13 +552,13 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
         if (pfmt->i_format == VLC_CODEC_DTS && b_hdmi)
         {
             msg_Warn(s, "cannot negotiate DTS at 768khz IEC958 rate (HDMI), "
-                     "fallback to 48kHz (S/PDIF) (error 0x%lx)", hr);
+                     "fallback to 48kHz (S/PDIF) (error 0x%lX)", hr);
             IAudioClient_Release(sys->client);
             free(sys);
             var_SetBool(vlc_object_parent(s), "dtshd", false);
             return Start(s, pfmt, sid);
         }
-        msg_Err(s, "cannot negotiate audio format (error 0x%lx)%s", hr,
+        msg_Err(s, "cannot negotiate audio format (error 0x%lX)%s", hr,
                 hr == AUDCLNT_E_UNSUPPORTED_FORMAT
                 && fmt.i_format == VLC_CODEC_SPDIFL ?
                 ": digital pass-through not supported" : "");
@@ -593,14 +593,14 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     CoTaskMemFree(pwf_closest);
     if (FAILED(hr))
     {
-        msg_Err(s, "cannot initialize audio client (error 0x%lx)", hr);
+        msg_Err(s, "cannot initialize audio client (error 0x%lX)", hr);
         goto error;
     }
 
     hr = IAudioClient_GetBufferSize(sys->client, &sys->frames);
     if (FAILED(hr))
     {
-        msg_Err(s, "cannot get buffer size (error 0x%lx)", hr);
+        msg_Err(s, "cannot get buffer size (error 0x%lX)", hr);
         goto error;
     }
     msg_Dbg(s, "buffer size    : %"PRIu32" frames", sys->frames);

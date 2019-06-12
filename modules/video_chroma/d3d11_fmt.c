@@ -653,7 +653,7 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
 
         hr = ID3D11Device_CreateTexture2D( d3d_dev->d3ddevice, &texDesc, NULL, &slicedTexture );
         if (FAILED(hr)) {
-            msg_Err(obj, "CreateTexture2D failed for the %d pool. (hr=0x%0lx)", pool_size, hr);
+            msg_Err(obj, "CreateTexture2D failed for the %d pool. (hr=0x%lX)", pool_size, hr);
             goto error;
         }
     }
@@ -669,7 +669,7 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
                 texDesc.Width = fmt->i_width * p_chroma_desc->p[plane].w.num / p_chroma_desc->p[plane].w.den;
                 hr = ID3D11Device_CreateTexture2D( d3d_dev->d3ddevice, &texDesc, NULL, &textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] );
                 if (FAILED(hr)) {
-                    msg_Err(obj, "CreateTexture2D failed for the %d pool. (hr=0x%0lx)", pool_size, hr);
+                    msg_Err(obj, "CreateTexture2D failed for the %d pool. (hr=0x%lX)", pool_size, hr);
                     goto error;
                 }
             }

@@ -269,7 +269,7 @@ static picture_pool_t *Direct3D9CreatePicturePool(vlc_object_t *o,
                                                           &picsys->surface,
                                                           NULL);
         if (FAILED(hr)) {
-           msg_Err(o, "Failed to allocate surface %d (hr=0x%0lx)", picture_count, hr);
+           msg_Err(o, "Failed to allocate surface %d (hr=0x%lX)", picture_count, hr);
            free(picsys);
            goto error;
         }
@@ -449,7 +449,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     IDirect3DSurface9 *destination;
     hr = IDirect3DTexture9_GetSurfaceLevel(sys->sceneTexture, 0, &destination);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed IDirect3DTexture9_GetSurfaceLevel: 0x%0lx", hr);
+        msg_Dbg(vd, "Failed IDirect3DTexture9_GetSurfaceLevel: 0x%lX", hr);
         return VLC_EGENERIC;
     }
 
@@ -486,7 +486,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
                                       D3DTEXF_NONE);
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed StretchRect: source 0x%p 0x%0lx",
+        msg_Dbg(vd, "Failed StretchRect: source 0x%p 0x%lX",
                 (LPVOID)source, hr);
         return VLC_EGENERIC;
     }
@@ -658,7 +658,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
                                         &sys->sceneTexture,
                                         NULL);
     if (FAILED(hr)) {
-        msg_Err(vd, "Failed to create texture. (hr=0x%lx)", hr);
+        msg_Err(vd, "Failed to create texture. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
 
@@ -678,7 +678,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
                                              &sys->sceneVertexBuffer,
                                              NULL);
     if (FAILED(hr)) {
-        msg_Err(vd, "Failed to create vertex buffer. (hr=0x%lx)", hr);
+        msg_Err(vd, "Failed to create vertex buffer. (hr=0x%lX)", hr);
         IDirect3DTexture9_Release(sys->sceneTexture);
         sys->sceneTexture = NULL;
         return VLC_EGENERIC;
@@ -784,7 +784,7 @@ static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source,
                 "main", "ps_3_0", shader_flags, &compiled_shader, &error_msgs, NULL);
 
     if (FAILED(hr)) {
-        msg_Warn(vd, "D3DXCompileShader Error (hr=0x%0lx)", hr);
+        msg_Warn(vd, "D3DXCompileShader Error (hr=0x%lX)", hr);
         if (error_msgs) {
             msg_Warn(vd, "HLSL Compilation Error: %s", (char*)ID3DXBuffer_GetBufferPointer(error_msgs));
             ID3DXBuffer_Release(error_msgs);
@@ -802,7 +802,7 @@ static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source,
         ID3DXBuffer_Release(error_msgs);
 
     if (FAILED(hr)) {
-        msg_Warn(vd, "IDirect3DDevice9_CreatePixelShader error (hr=0x%0lx)", hr);
+        msg_Warn(vd, "IDirect3DDevice9_CreatePixelShader error (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -929,7 +929,7 @@ static int Direct3D9CreateResources(vout_display_t *vd, video_format_t *fmt)
                                                           &sys->dx_render,
                                                           NULL);
         if (FAILED(hr)) {
-           msg_Err(vd, "Failed to allocate offscreen surface (hr=0x%0lx)", hr);
+           msg_Err(vd, "Failed to allocate offscreen surface (hr=0x%lX)", hr);
            return VLC_EGENERIC;
         }
     }
@@ -962,7 +962,7 @@ static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
         hr = IDirect3DDevice9_Reset(p_d3d9_dev->dev, &p_d3d9_dev->pp);
     }
     if (FAILED(hr)) {
-        msg_Err(vd, "IDirect3DDevice9_Reset failed! (hr=0x%0lx)", hr);
+        msg_Err(vd, "IDirect3DDevice9_Reset failed! (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
 
@@ -1022,7 +1022,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
                                                 NULL);
             if (FAILED(hr)) {
                 d3dr->texture = NULL;
-                msg_Err(vd, "Failed to create %dx%d texture for OSD (hr=0x%0lx)",
+                msg_Err(vd, "Failed to create %dx%d texture for OSD (hr=0x%lX)",
                         d3dr->width, d3dr->height, hr);
                 continue;
             }
@@ -1113,13 +1113,13 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     void *vertex;
     hr = IDirect3DVertexBuffer9_Lock(sys->sceneVertexBuffer, 0, 0, &vertex, D3DLOCK_DISCARD);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed IDirect3DVertexBuffer9_Lock: 0x%0lx", hr);
+        msg_Dbg(vd, "Failed IDirect3DVertexBuffer9_Lock: 0x%lX", hr);
         return -1;
     }
     memcpy(vertex, region->vertex, sizeof(region->vertex));
     hr = IDirect3DVertexBuffer9_Unlock(sys->sceneVertexBuffer);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed IDirect3DVertexBuffer9_Unlock: 0x%0lx", hr);
+        msg_Dbg(vd, "Failed IDirect3DVertexBuffer9_Unlock: 0x%lX", hr);
         return -1;
     }
 
@@ -1129,7 +1129,7 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     // (blending) our texture with the diffuse color of the vertices.
     hr = IDirect3DDevice9_SetTexture(d3ddev, 0, (IDirect3DBaseTexture9*)region->texture);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed SetTexture: 0x%0lx", hr);
+        msg_Dbg(vd, "Failed SetTexture: 0x%lX", hr);
         return -1;
     }
 
@@ -1140,14 +1140,14 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
             float shader_data[4] = { region->width, region->height, 0, 0 };
             hr = IDirect3DDevice9_SetPixelShaderConstantF(d3ddev, 0, shader_data, 1);
             if (FAILED(hr)) {
-                msg_Dbg(vd, "Failed SetPixelShaderConstantF: 0x%0lx", hr);
+                msg_Dbg(vd, "Failed SetPixelShaderConstantF: 0x%lX", hr);
                 return -1;
             }
         }
         else /* Disable any existing pixel shader. */
             hr = IDirect3DDevice9_SetPixelShader(d3ddev, NULL);
         if (FAILED(hr)) {
-            msg_Dbg(vd, "Failed SetPixelShader: 0x%0lx", hr);
+            msg_Dbg(vd, "Failed SetPixelShader: 0x%lX", hr);
             return -1;
         }
     }
@@ -1155,21 +1155,21 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     // Render the vertex buffer contents
     hr = IDirect3DDevice9_SetStreamSource(d3ddev, 0, sys->sceneVertexBuffer, 0, sizeof(CUSTOMVERTEX));
     if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed SetStreamSource: 0x%0lx", hr);
+        msg_Dbg(vd, "Failed SetStreamSource: 0x%lX", hr);
         return -1;
     }
 
     // we use FVF instead of vertex shader
     hr = IDirect3DDevice9_SetFVF(d3ddev, D3DFVF_CUSTOMVERTEX);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed SetFVF: 0x%0lx", hr);
+        msg_Dbg(vd, "Failed SetFVF: 0x%lX", hr);
         return -1;
     }
 
     // draw rectangle
     hr = IDirect3DDevice9_DrawPrimitive(d3ddev, D3DPT_TRIANGLEFAN, 0, 2);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed DrawPrimitive: 0x%0lx", hr);
+        msg_Dbg(vd, "Failed DrawPrimitive: 0x%lX", hr);
         return -1;
     }
     return 0;
@@ -1186,7 +1186,7 @@ static bool StartRendering(vout_display_t *vd)
         hr = IDirect3DDevice9_Clear(d3ddev, 0, NULL, D3DCLEAR_TARGET,
                                   D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
         if (FAILED(hr)) {
-            msg_Dbg(vd, "Failed Clear: 0x%0lx", hr);
+            msg_Dbg(vd, "Failed Clear: 0x%lX", hr);
             return false;
         }
         sys->clear_scene = false;
@@ -1195,7 +1195,7 @@ static bool StartRendering(vout_display_t *vd)
     // Begin the scene
     hr = IDirect3DDevice9_BeginScene(d3ddev);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed BeginScene: 0x%0lx", hr);
+        msg_Dbg(vd, "Failed BeginScene: 0x%lX", hr);
         return false;
     }
     return true;
@@ -1210,7 +1210,7 @@ static void EndRendering(vout_display_t *vd)
     // End the scene
     hr = IDirect3DDevice9_EndScene(d3ddev);
     if (FAILED(hr))
-        msg_Dbg(vd, "Failed EndScene: 0x%0lx", hr);
+        msg_Dbg(vd, "Failed EndScene: 0x%lX", hr);
 }
 
 /**
@@ -1321,7 +1321,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
                 hr = IDirect3DDevice9_StretchRect( p_d3d9_dev->dev, pic_ctx->picsys.surface, &visibleSource, surface, &visibleSource, D3DTEXF_NONE);
                 if (FAILED(hr)) {
-                    msg_Err(vd, "Failed to copy the hw surface to the decoder surface (hr=0x%0lx)", hr );
+                    msg_Err(vd, "Failed to copy the hw surface to the decoder surface (hr=0x%lX)", hr );
                 }
             }
         }
@@ -1383,7 +1383,7 @@ static void Swap(vout_display_t *vd)
         hr = IDirect3DDevice9_Present(p_d3d9_dev->dev, &src, &src, NULL, NULL);
     }
     if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed Present: 0x%0lx", hr);
+        msg_Dbg(vd, "Failed Present: 0x%lX", hr);
     }
 }
 
@@ -1439,7 +1439,7 @@ static int Direct3D9CheckConversion(vout_display_t *vd,
     }
     if (!SUCCEEDED(hr)) {
         if (D3DERR_NOTAVAILABLE != hr)
-            msg_Err(vd, "Could not query adapter supported formats. (hr=0x%0lx)", hr);
+            msg_Err(vd, "Could not query adapter supported formats. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -1523,7 +1523,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
                                &vd->source, &sys->d3d_dev);
 
     if (FAILED(hr)) {
-        msg_Err( vd, "D3D9 Creation failed! (hr=0x%0lx)", hr);
+        msg_Err( vd, "D3D9 Creation failed! (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
 
