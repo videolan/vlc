@@ -160,8 +160,8 @@ struct vout_display_sys_t
     IDirect3DTexture9       *sceneTexture;
     IDirect3DVertexBuffer9  *sceneVertexBuffer;
     D3DFORMAT               d3dregion_format;    /* Backbuffer output format */
-    size_t                  d3dregion_count;
-    struct d3d_region_t     *d3dregion;
+    size_t                  d3dregion_count;    /* for subpictures */
+    struct d3d_region_t     *d3dregion;         /* for subpictures */
 
     const d3d9_format_t     *sw_texture_fmt;  /* Rendering texture(s) format */
     IDirect3DSurface9       *dx_render;
@@ -191,9 +191,9 @@ typedef struct
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW|D3DFVF_TEX1)
 
 typedef struct d3d_region_t {
-    D3DFORMAT          format;
-    unsigned           width;
-    unsigned           height;
+    D3DFORMAT          format; // for subpictures
+    unsigned           width;  // for pixel shaders
+    unsigned           height; // for pixel shaders
     CUSTOMVERTEX       vertex[4];
     IDirect3DTexture9  *texture;
 } d3d_region_t;
@@ -445,14 +445,6 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
         return VLC_EGENERIC;
     }
 
-    /* retrieve texture top-level surface */
-    IDirect3DSurface9 *destination;
-    hr = IDirect3DTexture9_GetSurfaceLevel(sys->sceneTexture, 0, &destination);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed IDirect3DTexture9_GetSurfaceLevel: 0x%lX", hr);
-        return VLC_EGENERIC;
-    }
-
     /* Copy picture surface into texture surface
      * color space conversion happen here */
     RECT source_visible_rect = {
@@ -479,6 +471,14 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     {
         texture_visible_rect.bottom++;
         source_visible_rect.bottom++;
+    }
+
+    /* retrieve texture top-level surface */
+    IDirect3DSurface9 *destination;
+    hr = IDirect3DTexture9_GetSurfaceLevel(sys->sceneTexture, 0, &destination);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "Failed IDirect3DTexture9_GetSurfaceLevel: 0x%lX", hr);
+        return VLC_EGENERIC;
     }
 
     hr = IDirect3DDevice9_StretchRect(sys->d3d_dev.dev, source, &source_visible_rect,
@@ -682,6 +682,13 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
         IDirect3DTexture9_Release(sys->sceneTexture);
         sys->sceneTexture = NULL;
         return VLC_EGENERIC;
+    }
+
+    // we use FVF instead of vertex shader
+    hr = IDirect3DDevice9_SetFVF(d3ddev, D3DFVF_CUSTOMVERTEX);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "Failed SetFVF: 0x%lX", hr);
+        return -1;
     }
 
     /* */
@@ -1100,7 +1107,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
 }
 
 static int Direct3D9RenderRegion(vout_display_t *vd,
-                                d3d_region_t *region,
+                                const d3d_region_t *region,
                                 bool use_pixel_shader)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1120,6 +1127,13 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     hr = IDirect3DVertexBuffer9_Unlock(sys->sceneVertexBuffer);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DVertexBuffer9_Unlock: 0x%lX", hr);
+        return -1;
+    }
+
+    // Render the vertex buffer contents
+    hr = IDirect3DDevice9_SetStreamSource(d3ddev, 0, sys->sceneVertexBuffer, 0, sizeof(CUSTOMVERTEX));
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "Failed SetStreamSource: 0x%lX", hr);
         return -1;
     }
 
@@ -1150,20 +1164,6 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
             msg_Dbg(vd, "Failed SetPixelShader: 0x%lX", hr);
             return -1;
         }
-    }
-
-    // Render the vertex buffer contents
-    hr = IDirect3DDevice9_SetStreamSource(d3ddev, 0, sys->sceneVertexBuffer, 0, sizeof(CUSTOMVERTEX));
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed SetStreamSource: 0x%lX", hr);
-        return -1;
-    }
-
-    // we use FVF instead of vertex shader
-    hr = IDirect3DDevice9_SetFVF(d3ddev, D3DFVF_CUSTOMVERTEX);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed SetFVF: 0x%lX", hr);
-        return -1;
     }
 
     // draw rectangle
@@ -1276,15 +1276,33 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         sys->area.place_changed = false;
     }
 
-    picture_sys_d3d9_t *p_sys = picture->p_sys;
-    IDirect3DSurface9 *surface = p_sys->surface;
     d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
+
+    /* check if device is still available */
+    HRESULT hr = IDirect3DDevice9_TestCooperativeLevel(p_d3d9_dev->dev);
+    if (FAILED(hr)) {
+        if (hr == D3DERR_DEVICENOTRESET && !sys->reset_device) {
+            if (vd->info.has_pictures_invalid)
+                vout_display_SendEventPicturesInvalid(vd);
+            sys->reset_device = true;
+            sys->lost_not_ready = false;
+        }
+        if (hr == D3DERR_DEVICELOST && !sys->lost_not_ready) {
+            /* Device is lost but not yet ready for reset. */
+            sys->lost_not_ready = true;
+        }
+        return;
+    }
 
     /* FIXME it is a bit ugly, we need the surface to be unlocked for
      * rendering.
      *  The clean way would be to release the picture (and ensure that
      * the vout doesn't keep a reference). But because of the vout
      * wrapper, we can't */
+    IDirect3DSurface9 *surface;
+
+    picture_sys_d3d9_t *p_sys = picture->p_sys;
+    surface = p_sys->surface;
     if ( !is_d3d9_opaque(picture->format.i_chroma) )
     {
         D3DLOCKED_RECT d3drect;
@@ -1325,22 +1343,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
                 }
             }
         }
-    }
-
-    /* check if device is still available */
-    HRESULT hr = IDirect3DDevice9_TestCooperativeLevel(p_d3d9_dev->dev);
-    if (FAILED(hr)) {
-        if (hr == D3DERR_DEVICENOTRESET && !sys->reset_device) {
-            if (vd->info.has_pictures_invalid)
-                vout_display_SendEventPicturesInvalid(vd);
-            sys->reset_device = true;
-            sys->lost_not_ready = false;
-        }
-        if (hr == D3DERR_DEVICELOST && !sys->lost_not_ready) {
-            /* Device is lost but not yet ready for reset. */
-            sys->lost_not_ready = true;
-        }
-        return;
     }
 
     d3d_region_t picture_region;
