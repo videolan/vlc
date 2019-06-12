@@ -1493,6 +1493,7 @@ static int vout_Start(vout_thread_t *vout, const vout_configuration_t *cfg)
     vlc_mutex_unlock(&sys->window_lock);
 
     if (vout_OpenWrapper(vout, sys->splitter_name, &dcfg)) {
+        assert(sys->display == NULL);
         vlc_mutex_unlock(&sys->display_lock);
         goto error;
     }
@@ -1669,13 +1670,14 @@ void vout_StopDisplay(vout_thread_t *vout)
     if (sys->spu_blend != NULL)
         filter_DeleteBlend(sys->spu_blend);
 
-    /* Destroy translation tables */
+    /* Destroy the rendering display */
     if (sys->display != NULL) {
         if (sys->decoder_pool != NULL)
             vout_FlushUnlocked(vout, true, INT64_MAX);
 
         vlc_mutex_lock(&sys->display_lock);
         vout_CloseWrapper(vout);
+        sys->display = NULL;
         vlc_mutex_unlock(&sys->display_lock);
     }
 
@@ -1848,6 +1850,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     vlc_mutex_init(&sys->filter.lock);
 
     /* Display */
+    sys->display = NULL;
     vlc_mutex_init(&sys->display_lock);
 
     /* Window */
