@@ -151,9 +151,8 @@ static int DxSetupOutput(vlc_va_t *, const GUID *, const video_format_t *);
 static int DxCreateVideoDecoder(vlc_va_t *, int codec_id,
                                 const video_format_t *, unsigned surface_count);
 static void DxDestroyVideoDecoder(vlc_va_t *);
-static void SetupAVCodecContext(vlc_va_t *);
 
-void SetupAVCodecContext(vlc_va_t *va)
+static void SetupAVCodecContext(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
     directx_sys_t *dx_sys = &sys->dx_sys;

@@ -266,7 +266,7 @@ error:
 int D3D9_CreateExternal(vlc_object_t *o, d3d9_handle_t *hd3d, IDirect3DDevice9 *d3d9dev)
 {
     HRESULT hr = IDirect3DDevice9_GetDirect3D(d3d9dev, &hd3d->obj);
-    if (FAILED(hr))
+    if (unlikely(FAILED(hr)))
         return VLC_EGENERIC;
     hd3d->hdll = NULL;
     hd3d->use_ex = false; /* we don't care */
