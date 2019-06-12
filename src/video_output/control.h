@@ -33,7 +33,6 @@ enum {
     VOUT_CONTROL_MOUSE_STATE,           /* vlc_mouse_t */
     VOUT_CONTROL_DISPLAY_SIZE,          /* window */
 
-    VOUT_CONTROL_CROP_BORDER,           /* border */
     VOUT_CONTROL_VIEWPOINT,             /* viewpoint */
 };
 
@@ -43,12 +42,6 @@ typedef struct {
     union {
         bool    boolean;
         char    *string;
-        struct {
-            unsigned left;
-            unsigned top;
-            unsigned right;
-            unsigned bottom;
-        } border;
         struct {
             unsigned x;
             unsigned y;
