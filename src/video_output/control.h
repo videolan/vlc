@@ -31,7 +31,6 @@ enum {
     VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
 
     VOUT_CONTROL_MOUSE_STATE,           /* vlc_mouse_t */
-    VOUT_CONTROL_DISPLAY_SIZE,          /* window */
 
     VOUT_CONTROL_VIEWPOINT,             /* viewpoint */
 };
@@ -42,12 +41,6 @@ typedef struct {
     union {
         bool    boolean;
         char    *string;
-        struct {
-            unsigned x;
-            unsigned y;
-            unsigned width;
-            unsigned height;
-        } window;
         struct {
             int channel;
             float value;

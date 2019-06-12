@@ -413,16 +413,15 @@ void vout_ChangeWindowState(vout_thread_t *vout, unsigned st)
 void vout_ChangeDisplaySize(vout_thread_t *vout,
                             unsigned width, unsigned height)
 {
-    assert(!vout->p->dummy);
-    /* DO NOT call this outside the vout window callbacks */
-    vout_control_cmd_t cmd;
+    vout_thread_sys_t *sys = vout->p;
 
-    vout_control_cmd_Init(&cmd, VOUT_CONTROL_DISPLAY_SIZE);
-    cmd.window.x      = 0;
-    cmd.window.y      = 0;
-    cmd.window.width  = width;
-    cmd.window.height = height;
-    vout_control_Push(&vout->p->control, &cmd);
+    assert(!vout->p->dummy);
+
+    /* DO NOT call this outside the vout window callbacks */
+    vlc_mutex_lock(&sys->display_lock);
+    if (sys->display != NULL)
+        vout_display_SetSize(sys->display, width, height);
+    vlc_mutex_unlock(&sys->display_lock);
 }
 
 void vout_ChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
@@ -1575,12 +1574,6 @@ static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         break;
     case VOUT_CONTROL_MOUSE_STATE:
         ThreadProcessMouseState(vout, &cmd.mouse);
-        break;
-    case VOUT_CONTROL_DISPLAY_SIZE:
-        vlc_mutex_lock(&vout->p->display_lock);
-        vout_display_SetSize(vout->p->display,
-                             cmd.window.width, cmd.window.height);
-        vlc_mutex_unlock(&vout->p->display_lock);
         break;
     case VOUT_CONTROL_VIEWPOINT:
         vlc_mutex_lock(&vout->p->display_lock);
