@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-20 03:01+0200\n"
+"PO-Revision-Date: 2019-06-12 12:42+0200\n"
 "Last-Translator: antiparvos <marcoslansgarza@gmail.com>, 2019\n"
 "Language-Team: Galician (https://www.transifex.com/yaron/teams/16553/gl/)\n"
 "Language: gl\n"
@@ -16657,12 +16657,12 @@ msgstr "Mostrar só os instalados"
 #: modules/gui/macosx/VLCAddonsWindowController.m:118
 #: modules/gui/qt/dialogs/plugins.cpp:423
 msgid "Find more addons online"
-msgstr "Buscar máis engadidos en liña"
+msgstr "Buscar máis complementos en liña"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:128
 #: modules/gui/macosx/VLCMainMenu.m:345 modules/gui/qt/dialogs/plugins.cpp:85
 msgid "Addons Manager"
-msgstr "Xestor de engadidos"
+msgstr "Xestor de complementos"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:130
 #: modules/gui/qt/dialogs/plugins.cpp:1165
@@ -20978,12 +20978,12 @@ msgstr "Recuperando complementos..."
 
 #: modules/gui/qt/dialogs/plugins.cpp:534
 msgid "No addons found"
-msgstr "Non foi posíbel atopar engadidos"
+msgstr "Non foi posíbel atopar complementos"
 
 #: modules/gui/qt/dialogs/plugins.cpp:813
 msgid "This addon has been installed manually. VLC can't manage it by itself."
 msgstr ""
-"Este engadido foi instalado manualmente. O VLC non pode xestionalo solo."
+"Este complemento foi instalado manualmente. O VLC non pode xestionalo solo."
 
 #: modules/gui/qt/dialogs/plugins.cpp:1196
 msgid "Version %1"
@@ -21957,7 +21957,7 @@ msgstr "Ficheiros de aparencia |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
-msgstr "Ficheiros de listas de reprodución |"
+msgstr "Ficheiros de listas |"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
@@ -21974,8 +21974,7 @@ msgstr "Gardar a lista de reprodución"
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
 msgstr ""
-"Lista de reprodución XSPF |*.xspf|ficheiro M3U |*.m3u|lista de reprodución "
-"HTML |*.html"
+"Lista XSPF |*.xspf|ficheiro M3U |*.m3u|lista de reprodución HTML |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
@@ -23205,7 +23204,7 @@ msgstr "Synthpop"
 
 #: modules/misc/addons/fsstorage.c:83
 msgid "addons local storage"
-msgstr ""
+msgstr "almacenamento local de complementos"
 
 #: modules/misc/addons/fsstorage.c:85
 msgid "Addons local storage installer"
@@ -23217,7 +23216,7 @@ msgstr ""
 
 #: modules/misc/addons/vorepository.c:62
 msgid "Videolan.org's addons finder"
-msgstr ""
+msgstr "Buscador de complementos de Videolan.org"
 
 #: modules/misc/addons/vorepository.c:64
 msgid "addons.videolan.org addons finder"
@@ -23294,6 +23293,9 @@ msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
 msgstr ""
+"Con todo, o certificado de seguranza presentado polo servidor é descoñecido "
+"e non puido ser autenticado por ningunha Autoridade Certificadora de "
+"confianza."
 
 #: modules/misc/gnutls.c:491
 msgid ""
@@ -23301,6 +23303,9 @@ msgid ""
 "previous visit and was not authenticated by any trusted Certificate "
 "Authority."
 msgstr ""
+"Con todo, o certificado de seguranza presentado polo servidor cambiou desde "
+"a anterior visita e non foi autenticado por ningunha Autoridade "
+"Certificadora de confianza."
 
 #: modules/misc/gnutls.c:502 modules/misc/gnutls.c:523
 #: modules/misc/securetransport.c:346
@@ -23900,6 +23905,8 @@ msgstr "Intervalo de indexación"
 msgid ""
 "Minimal index interval, in microseconds. Set to 0 to disable index creation."
 msgstr ""
+"Intervalo de indexación mínimo, en microsegundos. Estabelecer a 0 para "
+"desactivar a creación do  índice."
 
 #: modules/mux/ogg.c:50
 msgid "Index size ratio"
@@ -25284,15 +25291,15 @@ msgstr "Desactivar se o receptor non é compatíbel co Dolby®."
 
 #: modules/stream_out/chromecast/cast.cpp:217
 msgid "High (high quality and high bandwidth)"
-msgstr ""
+msgstr "Alta (calidade e largo de banda altos)"
 
 #: modules/stream_out/chromecast/cast.cpp:218
 msgid "Medium (medium quality and medium bandwidth)"
-msgstr ""
+msgstr "Media (calidade e largo de banda medios)"
 
 #: modules/stream_out/chromecast/cast.cpp:219
 msgid "Low (low quality and low bandwidth)"
-msgstr ""
+msgstr "Baixa (calidade e largo de banda baixos)"
 
 #: modules/stream_out/chromecast/cast.cpp:220
 msgid "Low CPU (low quality but high bandwidth)"
@@ -26190,6 +26197,8 @@ msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
 "the video. 0 = transparent, 255 = totally opaque."
 msgstr ""
+"A opacidade (inverso de transparencia) do texto que se mostrará no vídeo. 0 "
+"= transparente, 255 = totalmente opaco. "
 
 #: modules/text_renderer/freetype/freetype.c:95
 msgid "Text default color"
@@ -26431,7 +26440,7 @@ msgstr "Convertedor YUVP"
 
 #: modules/video_filter/adjust.c:67
 msgid "Image hue (-180..180)"
-msgstr ""
+msgstr "Matiz da imaxe (-180..180)"
 
 #: modules/video_filter/adjust.c:68
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
@@ -26749,7 +26758,7 @@ msgstr "Filtro de lenzo para vídeo"
 
 #: modules/video_filter/ci_filters.m:755
 msgid "Use a specific Core Image Filter"
-msgstr ""
+msgstr "Usar un filtro específico de Core Image"
 
 #: modules/video_filter/ci_filters.m:757
 msgid ""
@@ -26865,7 +26874,7 @@ msgstr ""
 
 #: modules/video_filter/croppadd.c:80
 msgid "Video cropping filter"
-msgstr ""
+msgstr "Filtro de recorte de video"
 
 #: modules/video_filter/croppadd.c:97
 msgid "Padd"
@@ -26962,7 +26971,7 @@ msgstr "Filtro de vídeo de desentrelazado"
 
 #: modules/video_filter/edgedetection.c:39
 msgid "Edge detection video filter"
-msgstr ""
+msgstr "Filtro de vídeo para detección de bordos"
 
 #: modules/video_filter/edgedetection.c:40
 msgid "Edge detection"
@@ -26970,7 +26979,7 @@ msgstr "Detección de bordos"
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
-msgstr ""
+msgstr "Detecta os bordos do fotograma e resáltaos en branco."
 
 #: modules/video_filter/erase.c:56
 msgid "Image mask. Pixels with an alpha value greater than 50% will be erased."
@@ -27012,7 +27021,7 @@ msgstr "Extraer o filtro de vídeo da compoñente RGB"
 
 #: modules/video_filter/fps.c:45
 msgid "FPS conversion video filter"
-msgstr ""
+msgstr "Filtro de vídeo para a conversión de FPS"
 
 #: modules/video_filter/fps.c:46
 msgid "FPS Converter"
@@ -27727,21 +27736,23 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:72
 msgid "Timelength after which we assume there is no signal."
-msgstr ""
+msgstr "Tempo tras o cal asumimos que non hai sinal."
 
 #: modules/video_output/decklink.cpp:74
 msgid ""
 "Timelength after which we assume there is no signal.\n"
 "After this delay we black out the video."
 msgstr ""
+"Tempo tras o cal asumimos que non hai sinal.\n"
+"Despois desta espera apagamos o vídeo."
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor value"
-msgstr ""
+msgstr "Valor do descritor de formato activo"
 
 #: modules/video_output/decklink.cpp:81
 msgid "Aspect Ratio of the source picture."
-msgstr ""
+msgstr "Proporción de aspecto da imaxe fonte"
 
 #: modules/video_output/decklink.cpp:83
 msgid "Active Format Descriptor line"
@@ -28924,7 +28935,7 @@ msgstr "Hann"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Flat Top"
-msgstr ""
+msgstr "Plano enriba"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Blackman-Harris"
