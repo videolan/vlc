@@ -114,15 +114,7 @@ void vout_control_PushBool(vout_control_t *ctrl, int type, bool boolean)
     cmd.boolean = boolean;
     vout_control_Push(ctrl, &cmd);
 }
-void vout_control_PushPair(vout_control_t *ctrl, int type, int a, int b)
-{
-    vout_control_cmd_t cmd;
 
-    vout_control_cmd_Init(&cmd, type);
-    cmd.pair.a = a;
-    cmd.pair.b = b;
-    vout_control_Push(ctrl, &cmd);
-}
 void vout_control_PushString(vout_control_t *ctrl, int type, const char *string)
 {
     vout_control_cmd_t cmd;

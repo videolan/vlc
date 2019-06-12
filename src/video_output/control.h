@@ -45,10 +45,6 @@ typedef struct {
         bool    boolean;
         char    *string;
         struct {
-            int a;
-            int b;
-        } pair;
-        struct {
             unsigned left;
             unsigned top;
             unsigned right;
@@ -99,7 +95,6 @@ void vout_control_WaitEmpty(vout_control_t *);
 void vout_control_Push(vout_control_t *, vout_control_cmd_t *);
 void vout_control_PushVoid(vout_control_t *, int type);
 void vout_control_PushBool(vout_control_t *, int type, bool boolean);
-void vout_control_PushPair(vout_control_t *, int type, int a, int b);
 void vout_control_PushString(vout_control_t *, int type, const char *string);
 void vout_control_Wake(vout_control_t *);
 void vout_control_Hold(vout_control_t *);
