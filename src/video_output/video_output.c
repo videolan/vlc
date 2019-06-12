@@ -977,7 +977,6 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_t *vout, picture_t *pic,
 static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 {
     vout_thread_sys_t *sys = vout->p;
-    vout_display_t *vd = sys->display;
 
     picture_t *torender = picture_Hold(sys->displayed.current);
 
@@ -992,6 +991,10 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
     if (filtered->date != sys->displayed.current->date)
         msg_Warn(vout, "Unsupported timestamp modifications done by chain_interactive");
+
+    vout_display_t *vd = sys->display;
+
+    vlc_mutex_lock(&sys->display_lock);
 
     /*
      * Get the subpicture to be displayed
@@ -1121,6 +1124,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
     todisplay = vout_ConvertForDisplay(vd, todisplay);
     if (todisplay == NULL) {
+        vlc_mutex_unlock(&sys->display_lock);
+
         if (subpic != NULL)
             subpicture_Delete(subpic);
         return VLC_EGENERIC;
@@ -1156,6 +1161,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
     /* Display the direct buffer returned by vout_RenderPicture */
     vout_display_Display(vd, todisplay);
+    vlc_mutex_unlock(&sys->display_lock);
+
     if (subpic)
         subpicture_Delete(subpic);
 
@@ -1294,7 +1301,10 @@ static void vout_FlushUnlocked(vout_thread_t *vout, bool below,
     }
 
     picture_fifo_Flush(vout->p->decoder_fifo, date, below);
+
+    vlc_mutex_lock(&vout->p->display_lock);
     vout_FilterFlush(vout->p->display);
+    vlc_mutex_unlock(&vout->p->display_lock);
 
     vlc_clock_Reset(vout->p->clock);
     vlc_clock_SetDelay(vout->p->clock, vout->p->delay);
@@ -1376,7 +1386,9 @@ static void ThreadProcessMouseState(vout_thread_t *vout,
     vlc_mouse_t vid_mouse, tmp1, tmp2, *m;
 
     /* Translate window coordinates to video coordinates */
+    vlc_mutex_lock(&vout->p->display_lock);
     vout_display_TranslateMouseState(vout->p->display, &vid_mouse, win_mouse);
+    vlc_mutex_unlock(&vout->p->display_lock);
 
     /* Then pass up the filter chains. */
     m = &vid_mouse;
@@ -1477,24 +1489,19 @@ static int vout_Start(vout_thread_t *vout, const vout_configuration_t *cfg)
 
     num = sys->source.dar.num;
     den = sys->source.dar.den;
-    /*
-     * Any configuration change after unlocking will involve a control request
-     * that will be processed in the new thread. There may also be some pending
-     * control requests for configuration change already visible in
-     * sys->display_cfg, leading to processing of extra harmless and useless
-     * control request processing.
-     *
-     * TODO: display lock separate from window lock.
-     */
+    vlc_mutex_lock(&sys->display_lock);
     vlc_mutex_unlock(&sys->window_lock);
 
-    if (vout_OpenWrapper(vout, sys->splitter_name, &dcfg))
+    if (vout_OpenWrapper(vout, sys->splitter_name, &dcfg)) {
+        vlc_mutex_unlock(&sys->display_lock);
         goto error;
+    }
 
     vout_SetDisplayCrop(sys->display, num, den, x, y, w, h);
 
     if (num != 0 && den != 0)
         vout_SetDisplayAspect(sys->display, num, den);
+    vlc_mutex_unlock(&sys->display_lock);
 
     assert(sys->decoder_pool != NULL && sys->private_pool != NULL);
 
@@ -1558,34 +1565,50 @@ static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         ThreadProcessMouseState(vout, &cmd.mouse);
         break;
     case VOUT_CONTROL_DISPLAY_SIZE:
+        vlc_mutex_lock(&vout->p->display_lock);
         vout_display_SetSize(vout->p->display,
                              cmd.window.width, cmd.window.height);
+        vlc_mutex_unlock(&vout->p->display_lock);
         break;
     case VOUT_CONTROL_DISPLAY_FILLED:
+        vlc_mutex_lock(&vout->p->display_lock);
         vout_SetDisplayFilled(vout->p->display, cmd.boolean);
+        vlc_mutex_unlock(&vout->p->display_lock);
         break;
     case VOUT_CONTROL_ZOOM:
+        vlc_mutex_lock(&vout->p->display_lock);
         vout_SetDisplayZoom(vout->p->display, cmd.pair.a, cmd.pair.b);
+        vlc_mutex_unlock(&vout->p->display_lock);
         break;
     case VOUT_CONTROL_ASPECT_RATIO:
+        vlc_mutex_lock(&vout->p->display_lock);
         vout_SetDisplayAspect(vout->p->display, cmd.pair.a, cmd.pair.b);
+        vlc_mutex_unlock(&vout->p->display_lock);
         break;
     case VOUT_CONTROL_CROP_RATIO:
+        vlc_mutex_lock(&vout->p->display_lock);
         vout_SetDisplayCrop(vout->p->display, cmd.pair.a, cmd.pair.b,
                             0, 0, 0, 0);
+        vlc_mutex_unlock(&vout->p->display_lock);
         break;
     case VOUT_CONTROL_CROP_WINDOW:
+        vlc_mutex_lock(&vout->p->display_lock);
         vout_SetDisplayCrop(vout->p->display, 0, 0,
                             cmd.window.x, cmd.window.y,
                             cmd.window.width, cmd.window.height);
+        vlc_mutex_unlock(&vout->p->display_lock);
         break;
     case VOUT_CONTROL_CROP_BORDER:
+        vlc_mutex_lock(&vout->p->display_lock);
         vout_SetDisplayCrop(vout->p->display, 0, 0,
                             cmd.border.left, cmd.border.top,
                             -(int)cmd.border.right, -(int)cmd.border.bottom);
+        vlc_mutex_unlock(&vout->p->display_lock);
         break;
     case VOUT_CONTROL_VIEWPOINT:
+        vlc_mutex_lock(&vout->p->display_lock);
         vout_SetDisplayViewpoint(vout->p->display, &cmd.viewpoint);
+        vlc_mutex_unlock(&vout->p->display_lock);
         break;
     default:
         break;
@@ -1650,7 +1673,10 @@ void vout_StopDisplay(vout_thread_t *vout)
     if (sys->display != NULL) {
         if (sys->decoder_pool != NULL)
             vout_FlushUnlocked(vout, true, INT64_MAX);
+
+        vlc_mutex_lock(&sys->display_lock);
         vout_CloseWrapper(vout);
+        vlc_mutex_unlock(&sys->display_lock);
     }
 
     /* Destroy the video filters */
@@ -1734,6 +1760,7 @@ void vout_Release(vout_thread_t *vout)
     vout_display_window_Delete(sys->display_cfg.window);
 
     vout_control_Clean(&vout->p->control);
+    vlc_mutex_destroy(&sys->display_lock);
 
     /* */
     vout_statistic_Clean(&vout->p->statistic);
@@ -1819,6 +1846,9 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     sys->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
 
     vlc_mutex_init(&sys->filter.lock);
+
+    /* Display */
+    vlc_mutex_init(&sys->display_lock);
 
     /* Window */
     sys->display_cfg.window = vout_display_window_New(vout);

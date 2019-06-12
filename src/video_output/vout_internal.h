@@ -177,6 +177,7 @@ struct vout_thread_sys_t
     /* Video output display */
     vout_display_cfg_t display_cfg;
     vout_display_t *display;
+    vlc_mutex_t     display_lock;
 
     picture_pool_t  *private_pool;
     picture_pool_t  *display_pool;
