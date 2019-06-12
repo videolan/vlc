@@ -3078,8 +3078,6 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
                 /* If the jitter increase is over our max or the total hits the maximum */
                 if( i_new_jitter > i_jitter_max || i_clock_total_delay > INPUT_PTS_DELAY_MAX )
                 {
-                    es_out_pgrm_t *pgrm;
-
                     msg_Err( p_sys->p_input,
                              "ES_OUT_SET_(GROUP_)PCR  is called %d ms late (jitter of %d ms ignored)",
                              (int)MS_FROM_VLC_TICK(i_late),
@@ -3087,13 +3085,6 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
 
                     /* don't change the current jitter */
                     i_new_jitter = p_sys->i_pts_jitter;
-
-                    /* and reset clock */
-                    vlc_list_foreach(pgrm, &p_sys->programs, node)
-                    {
-                        input_clock_Reset(pgrm->p_input_clock);
-                        vlc_clock_main_Reset(p_pgrm->p_main_clock);
-                    }
                 }
                 else
                 {
@@ -3101,10 +3092,10 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
                              "ES_OUT_SET_(GROUP_)PCR  is called %d ms late (pts_delay increased to %d ms)",
                              (int)MS_FROM_VLC_TICK(i_late),
                              (int)MS_FROM_VLC_TICK(i_clock_total_delay) );
-
-                    /* Force a rebufferization when we are too late */
-                    EsOutControlLocked( out, ES_OUT_RESET_PCR );
                 }
+
+                /* Force a rebufferization when we are too late */
+                EsOutControlLocked( out, ES_OUT_RESET_PCR );
 
                 EsOutControlLocked( out, ES_OUT_SET_JITTER,
                                     p_sys->i_pts_delay,
