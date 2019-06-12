@@ -201,17 +201,20 @@ static void vout_SizeWindow(vout_thread_t *vout, unsigned *restrict width,
 
 static void vout_UpdateWindowSizeLocked(vout_thread_t *vout)
 {
+    vout_thread_sys_t *sys = vout->p;
     unsigned width, height;
 
-    vlc_mutex_assert(&vout->p->window_lock);
+    vlc_mutex_assert(&sys->window_lock);
 
-#warning Data race! /* Window lock does not protect original format */
-    if (vout->p->original.i_chroma == 0)
-        return;
+    vlc_mutex_lock(&sys->display_lock);
+    if (sys->display != NULL) {
+        vout_SizeWindow(vout, &width, &height);
+        vlc_mutex_unlock(&sys->display_lock);
 
-    vout_SizeWindow(vout, &width, &height);
-    msg_Dbg(vout, "requested window size: %ux%u", width, height);
-    vout_window_SetSize(vout->p->display_cfg.window, width, height);
+        msg_Dbg(vout, "requested window size: %ux%u", width, height);
+        vout_window_SetSize(vout->p->display_cfg.window, width, height);
+    } else
+        vlc_mutex_unlock(&sys->display_lock);
 }
 
 /* */
