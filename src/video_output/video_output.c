@@ -433,10 +433,13 @@ void vout_ChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
     vlc_mutex_lock(&sys->window_lock);
     sys->display_cfg.is_display_filled = is_filled;
     /* no window size update here */
+
+    vlc_mutex_lock(&sys->display_lock);
     vlc_mutex_unlock(&sys->window_lock);
 
-    vout_control_PushBool(&vout->p->control, VOUT_CONTROL_DISPLAY_FILLED,
-                          is_filled);
+    if (sys->display != NULL)
+        vout_SetDisplayFilled(sys->display, is_filled);
+    vlc_mutex_unlock(&sys->display_lock);
 }
 
 void vout_ChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
@@ -1571,11 +1574,6 @@ static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         vlc_mutex_lock(&vout->p->display_lock);
         vout_display_SetSize(vout->p->display,
                              cmd.window.width, cmd.window.height);
-        vlc_mutex_unlock(&vout->p->display_lock);
-        break;
-    case VOUT_CONTROL_DISPLAY_FILLED:
-        vlc_mutex_lock(&vout->p->display_lock);
-        vout_SetDisplayFilled(vout->p->display, cmd.boolean);
         vlc_mutex_unlock(&vout->p->display_lock);
         break;
     case VOUT_CONTROL_ZOOM:

@@ -32,7 +32,6 @@ enum {
 
     VOUT_CONTROL_MOUSE_STATE,           /* vlc_mouse_t */
     VOUT_CONTROL_DISPLAY_SIZE,          /* window */
-    VOUT_CONTROL_DISPLAY_FILLED,        /* bool */
     VOUT_CONTROL_ZOOM,                  /* pair */
 
     VOUT_CONTROL_ASPECT_RATIO,          /* pair */
