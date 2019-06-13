@@ -71,54 +71,10 @@ Utils.NavigableFocusScope {
         to: 0
     }
 
-    Row {
-        id: content
-
-        Utils.IconToolButton {
-            id: icon
-
-            size: VLCStyle.icon_normal
-            text: VLCIcons.topbar_filter
-
-            onClicked: {
-                if (searchBox.text == "")
-                    expanded = !expanded
-            }
-        }
-
-        TextField {
-            id: searchBox
-
-            anchors.verticalCenter: parent.verticalCenter
-
-            font.pixelSize: VLCStyle.fontSize_normal
-
-            color: VLCStyle.colors.buttonText
-            width: 0
-
-            background: Rectangle {
-                color: VLCStyle.colors.button
-                border.color: {
-                    if ( searchBox.text.length < 3 && searchBox.text.length !== 0 )
-                        return VLCStyle.colors.alert
-                    else if ( searchBox.activeFocus )
-                        return VLCStyle.colors.accent
-                    else
-                        return VLCStyle.colors.buttonBorder
-               }
-            }
-
-            onTextChanged: {
-                if (contentModel !== undefined)
-                    contentModel.searchPattern = text;
-            }
-        }
-    }
-
     MouseArea {
         id: mouseArea
         hoverEnabled: true
-        anchors.fill: content
+        anchors.fill: parent
 
         onClicked: {
             searchBox.forceActiveFocus()
@@ -131,6 +87,53 @@ Utils.NavigableFocusScope {
         onExited: {
             if (searchBox.text == "")
                 expanded = false
+        }
+
+
+        Row {
+            id: content
+
+            Utils.IconToolButton {
+                id: icon
+
+                size: VLCStyle.icon_normal
+                text: VLCIcons.topbar_filter
+
+                onClicked: {
+                    if (searchBox.text == "")
+                        expanded = !expanded
+                }
+            }
+
+            TextField {
+                id: searchBox
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                font.pixelSize: VLCStyle.fontSize_normal
+
+                color: VLCStyle.colors.buttonText
+                width: 0
+
+                selectByMouse: true
+
+                background: Rectangle {
+                    color: VLCStyle.colors.button
+                    border.color: {
+                        if ( searchBox.text.length < 3 && searchBox.text.length !== 0 )
+                            return VLCStyle.colors.alert
+                        else if ( searchBox.activeFocus )
+                            return VLCStyle.colors.accent
+                        else
+                            return VLCStyle.colors.buttonBorder
+                    }
+                }
+
+                onTextChanged: {
+                    if (contentModel !== undefined)
+                        contentModel.searchPattern = text;
+                }
+            }
         }
     }
 }
