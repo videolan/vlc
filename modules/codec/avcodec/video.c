@@ -1752,7 +1752,7 @@ no_reuse:
         // TEMP: decoder_NewPicture cannot be used until decoder_UpdateVideoOutput is called
         vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, src_desc, hwfmt,
                                   &p_dec->fmt_in,
-                                  NULL);
+                                  init_device, NULL);
         if (init_device)
             vlc_decoder_device_Release(init_device);
         vlc_mutex_lock(&p_sys->lock);

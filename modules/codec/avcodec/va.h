@@ -28,6 +28,7 @@
 
 typedef struct vlc_va_t vlc_va_t;
 typedef struct vlc_va_sys_t vlc_va_sys_t;
+typedef struct vlc_decoder_device vlc_decoder_device;
 
 struct vlc_va_operations {
     int (*get)(vlc_va_t *, picture_t *pic, uint8_t **surface);
@@ -43,7 +44,7 @@ struct vlc_va_t {
 
 typedef int (*vlc_va_open)(vlc_va_t *, AVCodecContext *, const AVPixFmtDescriptor *,
                            enum PixelFormat,
-                           const es_format_t *, void *);
+                           const es_format_t *, void *, vlc_decoder_device *);
 
 #define set_va_callback(activate, priority) \
     { \
@@ -70,7 +71,7 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt);
  */
 vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *, const AVPixFmtDescriptor *,
                      enum PixelFormat, const es_format_t *fmt,
-                     void *p_sys);
+                     vlc_decoder_device *device, void *p_sys);
 
 /**
  * Get a hardware video surface for a libavcodec frame.
