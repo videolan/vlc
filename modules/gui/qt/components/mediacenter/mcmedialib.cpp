@@ -94,6 +94,8 @@ void MCMediaLib::addToPlaylist(const MLParentId & itemId)
         vlc_ml_query_params_t query;
         memset(&query, 0, sizeof(vlc_ml_query_params_t));
         ml_unique_ptr<vlc_ml_media_list_t> media_list(vlc_ml_list_media_of( m_ml, &query, itemId.type, itemId.id));
+        if (media_list == nullptr)
+            return;
 
         auto mediaRange = ml_range_iterate<vlc_ml_media_t>( media_list );
         QVector<vlc::playlist::Media> medias;
@@ -147,6 +149,8 @@ void MCMediaLib::addAndPlay(const MLParentId & itemId )
         vlc_ml_query_params_t query;
         memset(&query, 0, sizeof(vlc_ml_query_params_t));
         ml_unique_ptr<vlc_ml_media_list_t> media_list(vlc_ml_list_media_of( m_ml, &query, itemId.type, itemId.id));
+        if (media_list == nullptr)
+            return;
 
         auto mediaRange = ml_range_iterate<vlc_ml_media_t>( media_list );
         QVector<vlc::playlist::Media> medias;
