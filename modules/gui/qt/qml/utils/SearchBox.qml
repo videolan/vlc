@@ -99,6 +99,8 @@ Utils.NavigableFocusScope {
                 size: VLCStyle.icon_normal
                 text: VLCIcons.topbar_filter
 
+                focus: true
+
                 onClicked: {
                     if (searchBox.text == "")
                         expanded = !expanded
