@@ -1357,9 +1357,9 @@ static void Swap(vout_display_t *vd)
 
     HRESULT hr;
     if (sys->hd3d.use_ex) {
-        hr = IDirect3DDevice9Ex_PresentEx(p_d3d9_dev->devex, &src, &src, NULL, NULL, 0);
+        hr = IDirect3DDevice9Ex_PresentEx(p_d3d9_dev->devex, &src, &src, sys->sys.hvideownd, NULL, 0);
     } else {
-        hr = IDirect3DDevice9_Present(p_d3d9_dev->dev, &src, &src, NULL, NULL);
+        hr = IDirect3DDevice9_Present(p_d3d9_dev->dev, &src, &src, sys->sys.hvideownd, NULL);
     }
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed Present: 0x%lX", hr);
@@ -1699,7 +1699,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
     IDirect3D9 *d3d9_device = device_setup.device_context;
     D3D9_CloneExternal( &sys->hd3d, d3d9_device );
-    HRESULT hr = D3D9_CreateDevice(vd, &sys->hd3d, device_setup.adapter, sys->sys.hvideownd, &sys->d3d_dev);
+    HRESULT hr = D3D9_CreateDevice(vd, &sys->hd3d, device_setup.adapter, NULL, &sys->d3d_dev);
     if (FAILED(hr)) {
         msg_Err( vd, "D3D9 Creation failed! (hr=0x%lX)", hr);
         D3D9_Destroy(&sys->hd3d);
@@ -1961,7 +1961,7 @@ GLConvOpen(vlc_object_t *obj)
         goto error;
     }
 
-    if (FAILED(D3D9_CreateDevice(obj, &priv->hd3d, -1, tc->gl->surface->handle.hwnd,
+    if (FAILED(D3D9_CreateDevice(obj, &priv->hd3d, -1, NULL,
                                  &priv->d3d_dev)))
         goto error;
 
