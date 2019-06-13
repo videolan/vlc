@@ -146,7 +146,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
 
 #ifdef _WIN32
     var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
-    var_AddCallback(vout, "video-wallpaper", Forward, NULL);
+    var_AddCallback(vout, "video-wallpaper", Forward, vd);
 #endif
     var_SetBool(VLC_OBJECT(vout), "viewpoint-changeable",
         sys->display->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
@@ -172,7 +172,7 @@ void vout_CloseWrapper(vout_thread_t *vout)
         picture_pool_Release(sys->decoder_pool);
 
 #ifdef _WIN32
-    var_DelCallback(vout, "video-wallpaper", Forward, NULL);
+    var_DelCallback(vout, "video-wallpaper", Forward, sys->display);
 #endif
     sys->decoder_pool = NULL; /* FIXME remove */
 
@@ -184,10 +184,10 @@ static int Forward(vlc_object_t *object, char const *var,
                    vlc_value_t oldval, vlc_value_t newval, void *data)
 {
     vout_thread_t *vout = (vout_thread_t*)object;
+    vout_display_t *vd = data;
 
     VLC_UNUSED(oldval);
-    VLC_UNUSED(data);
-    return var_Set(vout->p->display, var, newval);
+    return var_Set(vd, var, newval);
 }
 #endif
 
