@@ -83,7 +83,8 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
     out->adapterId = AdapterToUse;
     out->hwnd      = hwnd;
     /* TODO only create a device for the decoder dimensions */
-    if (D3D9_FillPresentationParameters(hd3d, source, out))
+    D3DPRESENT_PARAMETERS d3dpp;
+    if (D3D9_FillPresentationParameters(hd3d, source, out, &d3dpp))
     {
         msg_Err(o, "Could not presentation parameters");
         return E_INVALIDARG;
@@ -113,14 +114,15 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
                 hr = IDirect3D9Ex_CreateDeviceEx(hd3d->objex, AdapterToUse,
                                                  DeviceType, hwnd,
                                                  creationFlags,
-                                                 &out->pp, NULL, &out->devex);
+                                                 &d3dpp, NULL, &out->devex);
             else
                 hr = IDirect3D9_CreateDevice(hd3d->obj, AdapterToUse,
                                              DeviceType, hwnd,
                                              creationFlags,
-                                             &out->pp, &out->dev);
+                                             &d3dpp, &out->dev);
             if (SUCCEEDED(hr))
             {
+                out->BufferFormat = d3dpp.BackBufferFormat;
                 out->owner = true;
                 return hr;
             }
@@ -147,11 +149,12 @@ HRESULT D3D9_CreateDeviceExternal(IDirect3DDevice9 *dev, d3d9_handle_t *hd3d, HW
     hr = IDirect3D9_GetDeviceCaps(hd3d->obj, out->adapterId, params.DeviceType, &out->caps);
     if (FAILED(hr))
        return hr;
-    if (D3D9_FillPresentationParameters(hd3d, source, out))
-    {
-        return E_FAIL;
-    }
+    D3DDISPLAYMODE d3ddm;
+    hr = IDirect3D9_GetAdapterDisplayMode(hd3d->obj, out->adapterId, &d3ddm);
+    if (FAILED(hr))
+        return hr;
     IDirect3DDevice9_AddRef(out->dev);
+    out->BufferFormat = d3ddm.Format;
     return S_OK;
 }
 
@@ -169,7 +172,9 @@ void D3D9_ReleaseDevice(d3d9_device_t *d3d_dev)
  * from the default adapter.
  */
 int D3D9_FillPresentationParameters(d3d9_handle_t *hd3d,
-                                    const video_format_t *source, d3d9_device_t *out)
+                                    const video_format_t *source,
+                                    const d3d9_device_t *out,
+                                    D3DPRESENT_PARAMETERS *d3dpp)
 {
     /*
     ** Get the current desktop display mode, so we can set up a back
@@ -181,7 +186,6 @@ int D3D9_FillPresentationParameters(d3d9_handle_t *hd3d,
         return VLC_EGENERIC;
 
     /* Set up the structure used to create the D3DDevice. */
-    D3DPRESENT_PARAMETERS *d3dpp = &out->pp;
     ZeroMemory(d3dpp, sizeof(D3DPRESENT_PARAMETERS));
     d3dpp->Flags                  = D3DPRESENTFLAG_VIDEO;
     d3dpp->Windowed               = TRUE;

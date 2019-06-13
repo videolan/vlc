@@ -653,7 +653,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
                                         height,
                                         1,
                                         D3DUSAGE_RENDERTARGET,
-                                        p_d3d9_dev->pp.BackBufferFormat,
+                                        p_d3d9_dev->BufferFormat,
                                         D3DPOOL_DEFAULT,
                                         &sys->sceneTexture,
                                         NULL);
@@ -917,7 +917,7 @@ static int Direct3D9CreateResources(vout_display_t *vd, video_format_t *fmt)
         if (SUCCEEDED(IDirect3D9_CheckDeviceFormat(sys->hd3d.obj,
                                                    D3DADAPTER_DEFAULT,
                                                    D3DDEVTYPE_HAL,
-                                                   sys->d3d_dev.pp.BackBufferFormat,
+                                                   sys->d3d_dev.BufferFormat,
                                                    D3DUSAGE_DYNAMIC,
                                                    D3DRTYPE_TEXTURE,
                                                    dfmt))) {
@@ -952,7 +952,8 @@ static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
     vout_display_sys_t *sys = vd->sys;
     d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
 
-    if (D3D9_FillPresentationParameters(&sys->hd3d, &vd->source, p_d3d9_dev))
+    D3DPRESENT_PARAMETERS d3dpp;
+    if (D3D9_FillPresentationParameters(&sys->hd3d, &vd->source, p_d3d9_dev, &d3dpp))
     {
         msg_Err(vd, "Could not presentation parameters to reset device");
         return VLC_EGENERIC;
@@ -964,14 +965,15 @@ static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
     /* */
     HRESULT hr;
     if (sys->hd3d.use_ex){
-        hr = IDirect3DDevice9Ex_ResetEx(p_d3d9_dev->devex, &p_d3d9_dev->pp, NULL);
+        hr = IDirect3DDevice9Ex_ResetEx(p_d3d9_dev->devex, &d3dpp, NULL);
     } else {
-        hr = IDirect3DDevice9_Reset(p_d3d9_dev->dev, &p_d3d9_dev->pp);
+        hr = IDirect3DDevice9_Reset(p_d3d9_dev->dev, &d3dpp);
     }
     if (FAILED(hr)) {
         msg_Err(vd, "IDirect3DDevice9_Reset failed! (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
+    p_d3d9_dev->BufferFormat = d3dpp.BackBufferFormat;
 
     /* re-create them */
     if (Direct3D9CreateResources(vd, fmtp)) {
@@ -1536,7 +1538,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
     /* Find the appropriate D3DFORMAT for the render chroma, the format will be the closest to
      * the requested chroma which is usable by the hardware in an offscreen surface, as they
      * typically support more formats than textures */
-    const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, fmt, p_d3d9_dev->pp.BackBufferFormat);
+    const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, fmt, p_d3d9_dev->BufferFormat);
     if (!d3dfmt) {
         msg_Err(vd, "surface pixel format is not supported.");
         goto error;
@@ -1644,7 +1646,7 @@ static bool LocalSwapchainSetupDevice( void **opaque, const libvlc_video_direct3
 static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
 {
     vout_display_t *vd = opaque;
-    out->surface_format = vd->sys->d3d_dev.pp.BackBufferFormat;
+    out->surface_format = vd->sys->d3d_dev.BufferFormat;
     return true;
 }
 
