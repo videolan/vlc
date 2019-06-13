@@ -45,7 +45,7 @@ _add_environ_arr('cpp_link_args', 'LDFLAGS')
 args.file.write("\n[host_machine]\n")
 _add_environ_val('system', 'HOST_SYSTEM')
 _add_environ_val('cpu_family', 'HOST_ARCH')
-args.file.write("endian = 'little'")
+args.file.write("endian = 'little'\n")
 
 # Get first part of triplet
 cpu = os.environ.get('HOST', '').split('-')[0]
