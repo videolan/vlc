@@ -150,7 +150,8 @@ Utils.NavigableFocusScope {
                     Text {
                         id: textArea
                         text: about.thanks
-                        horizontalAlignment: Text.AlignHCenter
+                        horizontalAlignment: Text.AlignHLeft
+                        font.family: "Courier New, Monospace"
                         anchors.fill: parent
                         Layout.fillHeight: true
                         Layout.fillWidth: true
