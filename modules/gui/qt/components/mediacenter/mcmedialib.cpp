@@ -83,9 +83,9 @@ void MCMediaLib::addToPlaylist(const MLParentId & itemId)
 
     if (itemId.type == VLC_ML_PARENT_UNKNOWN)
     {
-        input_item_t* item = vlc_ml_get_input_item( m_ml, itemId.id );
+        vlc::playlist::InputItemPtr item( vlc_ml_get_input_item( m_ml, itemId.id ), false );
         if (item) {
-            QVector<vlc::playlist::Media> medias = { vlc::playlist::Media(item) };
+            QVector<vlc::playlist::Media> medias = { vlc::playlist::Media(item.get()) };
             m_intf->p_sys->p_mainPlaylistController->append(medias, false);
         }
     }
@@ -100,8 +100,8 @@ void MCMediaLib::addToPlaylist(const MLParentId & itemId)
         auto mediaRange = ml_range_iterate<vlc_ml_media_t>( media_list );
         QVector<vlc::playlist::Media> medias;
         std::transform(mediaRange.begin(), mediaRange.end(), std::back_inserter(medias), [&](vlc_ml_media_t& m) {
-            input_item_t* item = vlc_ml_get_input_item( m_ml, m.i_id );
-            return vlc::playlist::Media(item);
+            vlc::playlist::InputItemPtr item(vlc_ml_get_input_item( m_ml, m.i_id ), false);
+            return vlc::playlist::Media(item.get());
         });
         m_intf->p_sys->p_mainPlaylistController->append(medias, false);
     }
@@ -137,11 +137,10 @@ void MCMediaLib::addAndPlay(const MLParentId & itemId )
         return;
     if (itemId.type == VLC_ML_PARENT_UNKNOWN)
     {
-        input_item_t* item = vlc_ml_get_input_item( m_ml, itemId.id );
+        vlc::playlist::InputItemPtr item(vlc_ml_get_input_item( m_ml, itemId.id ), false);
         if (item) {
-            QVector<vlc::playlist::Media> medias = { vlc::playlist::Media(item) };
+            QVector<vlc::playlist::Media> medias = { vlc::playlist::Media(item.get()) };
             m_intf->p_sys->p_mainPlaylistController->append(medias, true);
-            input_item_Release( item );
         }
     }
     else
@@ -155,11 +154,8 @@ void MCMediaLib::addAndPlay(const MLParentId & itemId )
         auto mediaRange = ml_range_iterate<vlc_ml_media_t>( media_list );
         QVector<vlc::playlist::Media> medias;
         std::transform(mediaRange.begin(), mediaRange.end(), std::back_inserter(medias), [&](vlc_ml_media_t& m) {
-            input_item_t* item = vlc_ml_get_input_item( m_ml, m.i_id );
-            auto res = vlc::playlist::Media(item);
-            if ( item )
-                input_item_Release( item );
-            return res;
+            vlc::playlist::InputItemPtr item(vlc_ml_get_input_item( m_ml, m.i_id ), false);
+            return vlc::playlist::Media(item.get());
         });
         m_intf->p_sys->p_mainPlaylistController->append(medias, true);
     }
