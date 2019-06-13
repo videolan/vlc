@@ -259,6 +259,138 @@ static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
     for( int fetes_i=0; fetes_i<2; fetes_i++ ) \
         vlc_list_foreach( pos, (!fetes_i ? &p_sys->es : &p_sys->es_slaves), node )
 
+static vlc_es_id_t *
+FindEsIdFromDecoder(es_out_sys_t *p_sys, decoder_t *decoder)
+{
+    es_out_id_t *es;
+    foreach_es_then_es_slaves(es)
+        if (es->p_dec == decoder)
+            return &es->id;
+    return NULL;
+}
+
+static void
+decoder_on_vout_added(decoder_t *decoder, vout_thread_t *vout, void *userdata)
+{
+    es_out_sys_t *priv = userdata;
+    if (!priv->p_input)
+        return;
+
+    vlc_es_id_t *id = FindEsIdFromDecoder(priv, decoder);
+    assert(id);
+
+    struct vlc_input_event_vout event = {
+        .action = VLC_INPUT_EVENT_VOUT_ADDED,
+        .vout = vout,
+        .id = id,
+    };
+
+    input_SendEventVout(priv->p_input, &event);
+}
+
+static void
+decoder_on_vout_deleted(decoder_t *decoder, vout_thread_t *vout, void *userdata)
+{
+    es_out_sys_t *priv = userdata;
+    if (!priv->p_input)
+        return;
+
+    vlc_es_id_t *id = FindEsIdFromDecoder(priv, decoder);
+    assert(id);
+
+    struct vlc_input_event_vout event = {
+        .action = VLC_INPUT_EVENT_VOUT_DELETED,
+        .vout = vout,
+        .id = id,
+    };
+
+    input_SendEventVout(priv->p_input, &event);
+}
+
+static void
+decoder_on_thumbnail_ready(decoder_t *decoder, picture_t *pic, void *userdata)
+{
+    es_out_sys_t *priv = userdata;
+    if (!priv->p_input)
+        return;
+
+    vlc_es_id_t *id = FindEsIdFromDecoder(priv, decoder);
+    assert(id);
+
+    struct vlc_input_event event = {
+        .type = INPUT_EVENT_THUMBNAIL_READY,
+        .thumbnail = pic,
+    };
+
+    input_SendEvent(priv->p_input, &event);
+}
+
+static void
+decoder_on_new_video_stats(decoder_t *decoder, unsigned decoded, unsigned lost,
+                           unsigned displayed, void *userdata)
+{
+    (void) decoder;
+
+    es_out_sys_t *priv = userdata;
+    if (!priv->p_input)
+        return;
+
+    struct input_stats *stats = input_priv(priv->p_input)->stats;
+    if (!stats)
+        return;
+
+    atomic_fetch_add_explicit(&stats->decoded_video, decoded,
+                              memory_order_relaxed);
+    atomic_fetch_add_explicit(&stats->lost_pictures, lost,
+                              memory_order_relaxed);
+    atomic_fetch_add_explicit(&stats->displayed_pictures, displayed,
+                              memory_order_relaxed);
+}
+
+static void
+decoder_on_new_audio_stats(decoder_t *decoder, unsigned decoded, unsigned lost,
+                           unsigned played, void *userdata)
+{
+    (void) decoder;
+
+    es_out_sys_t *priv = userdata;
+    if (!priv->p_input)
+        return;
+
+    struct input_stats *stats = input_priv(priv->p_input)->stats;
+    if (!stats)
+        return;
+
+    atomic_fetch_add_explicit(&stats->decoded_audio, decoded,
+                              memory_order_relaxed);
+    atomic_fetch_add_explicit(&stats->lost_abuffers, lost,
+                              memory_order_relaxed);
+    atomic_fetch_add_explicit(&stats->played_abuffers, played,
+                              memory_order_relaxed);
+}
+
+static int
+decoder_get_attachments(decoder_t *decoder,
+                        input_attachment_t ***ppp_attachment,
+                        void *userdata)
+{
+    (void) decoder;
+
+    es_out_sys_t *priv = userdata;
+    if (!priv->p_input)
+        return -1;
+
+    return input_GetAttachments(priv->p_input, ppp_attachment);
+}
+
+static const struct input_decoder_callbacks decoder_cbs = {
+    .on_vout_added = decoder_on_vout_added,
+    .on_vout_deleted = decoder_on_vout_deleted,
+    .on_thumbnail_ready = decoder_on_thumbnail_ready,
+    .on_new_video_stats = decoder_on_new_video_stats,
+    .on_new_audio_stats = decoder_on_new_audio_stats,
+    .get_attachments = decoder_get_attachments,
+};
 
 /*****************************************************************************
  * Es category specific structs
@@ -640,8 +772,12 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
             if( !p_es->p_dec )
                 continue;
 
-            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->id, &p_es->fmt,
-                                                   NULL, p_sys->p_sout_record );
+            p_es->p_dec_record =
+                input_DecoderNew( VLC_OBJECT(p_input), &p_es->fmt, NULL,
+                                  input_priv(p_input)->p_resource,
+                                  p_sys->p_sout_record, false,
+                                  &decoder_cbs, p_sys );
+
             if( p_es->p_dec_record && p_sys->b_buffering )
                 input_DecoderStartWait( p_es->p_dec_record );
         }
@@ -1844,8 +1980,10 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     if( !p_es->p_clock )
         return;
 
-    dec = input_DecoderNew( p_input, &p_es->id, &p_es->fmt, p_es->p_clock,
-                            input_priv(p_input)->p_sout );
+    input_thread_private_t *priv = input_priv(p_input);
+    dec = input_DecoderNew( VLC_OBJECT(p_input), &p_es->fmt, p_es->p_clock,
+                            priv->p_resource, priv->p_sout,
+                            priv->b_thumbnailing, &decoder_cbs, p_sys );
     if( dec != NULL )
     {
         input_DecoderChangeRate( dec, p_sys->rate );
@@ -1855,8 +1993,10 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
 
         if( !p_es->p_master && p_sys->p_sout_record )
         {
-            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->id, &p_es->fmt,
-                                                   NULL, p_sys->p_sout_record );
+            p_es->p_dec_record =
+                input_DecoderNew( VLC_OBJECT(p_input), &p_es->fmt, NULL,
+                                  priv->p_resource, p_sys->p_sout_record, false,
+                                  &decoder_cbs, p_sys );
             if( p_es->p_dec_record && p_sys->b_buffering )
                 input_DecoderStartWait( p_es->p_dec_record );
         }

@@ -28,8 +28,32 @@
 #include <vlc_codec.h>
 #include <vlc_mouse.h>
 
-decoder_t *input_DecoderNew( input_thread_t *, vlc_es_id_t *, es_format_t *,
-                             vlc_clock_t *, sout_instance_t * ) VLC_USED;
+struct input_decoder_callbacks {
+    /* notifications */
+    void (*on_vout_added)(decoder_t *decoder, vout_thread_t *vout,
+                          void *userdata);
+    void (*on_vout_deleted)(decoder_t *decoder, vout_thread_t *vout,
+                            void *userdata);
+    void (*on_thumbnail_ready)(decoder_t *decoder, picture_t *pic,
+                               void *userdata);
+
+    void (*on_new_video_stats)(decoder_t *decoder, unsigned decoded,
+                               unsigned lost, unsigned displayed,
+                               void *userdata);
+    void (*on_new_audio_stats)(decoder_t *decoder, unsigned decoded,
+                               unsigned lost, unsigned played, void *userdata);
+
+    /* requests */
+    int (*get_attachments)(decoder_t *decoder,
+                           input_attachment_t ***ppp_attachment,
+                           void *userdata);
+};
+
+decoder_t *input_DecoderNew( vlc_object_t *parent, es_format_t *, vlc_clock_t *,
+                             input_resource_t *, sout_instance_t *,
+                             bool thumbnailing,
+                             const struct input_decoder_callbacks *cbs,
+                             void *userdata ) VLC_USED;
 
 /**
  * This function changes the pause state.
