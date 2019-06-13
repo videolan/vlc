@@ -1032,8 +1032,14 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         }
 
         case VLC_FOURCC( 't', 'w', 'o', 's' ):
+            p_track->fmt.i_codec = VLC_CODEC_S16B;
+            p_track->fmt.i_original_fourcc = p_sample->i_type;
+            p_track->fmt.audio.i_bitspersample = 16;
+            break;
+
         case VLC_FOURCC( 's', 'o', 'w', 't' ):
-            p_track->fmt.i_codec = p_sample->i_type;
+            p_track->fmt.i_codec = VLC_CODEC_S16L;
+            p_track->fmt.i_original_fourcc = p_sample->i_type;
             p_track->fmt.audio.i_bitspersample = 16;
             break;
 
@@ -1048,7 +1054,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             }
             else
             {
-                p_track->fmt.i_codec = VLC_FOURCC( 't', 'w', 'o', 's' );
+                p_track->fmt.i_codec = VLC_CODEC_S16B;
                 p_track->fmt.audio.i_bitspersample = 16;
             }
             p_track->fmt.i_original_fourcc = p_track->fmt.i_codec;
