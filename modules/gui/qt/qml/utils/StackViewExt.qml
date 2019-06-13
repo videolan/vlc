@@ -75,7 +75,7 @@ StackView {
                     found = true
                     break;
                 } else {
-                    console.warn("component is not ready")
+                    console.warn("component is not ready: " + component.errorString())
                 }
             }
         }
