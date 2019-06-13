@@ -256,9 +256,9 @@ void vout_IntfReinit( vout_thread_t * );
 void vout_IntfDeinit(vlc_object_t *);
 
 /* */
-int vout_OpenWrapper(vout_thread_t *, const char *,
+vout_display_t *vout_OpenWrapper(vout_thread_t *, const char *,
                      const vout_display_cfg_t *);
-void vout_CloseWrapper(vout_thread_t *);
+void vout_CloseWrapper(vout_thread_t *, vout_display_t *vd);
 
 /* */
 ssize_t vout_RegisterSubpictureChannelInternal( vout_thread_t *, vlc_clock_t *clock );

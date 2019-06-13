@@ -64,7 +64,7 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 /*****************************************************************************
  *
  *****************************************************************************/
-int vout_OpenWrapper(vout_thread_t *vout,
+vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
                      const char *splitter_name, const vout_display_cfg_t *cfg)
 {
     vout_thread_sys_t *sys = vout->p;
@@ -87,7 +87,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
     free(modlistbuf);
 
     if (vd == NULL)
-        return VLC_EGENERIC;
+        return NULL;
 
     sys->decoder_pool = NULL;
     sys->display_pool = NULL;
@@ -142,25 +142,23 @@ int vout_OpenWrapper(vout_thread_t *vout,
         goto error;
     }
 
-    sys->display = vd;
-
 #ifdef _WIN32
     var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
     var_AddCallback(vout, "video-wallpaper", Forward, vd);
 #endif
     var_SetBool(VLC_OBJECT(vout), "viewpoint-changeable",
-        sys->display->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
-    return VLC_SUCCESS;
+                vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
+    return vd;
 
 error:
     vout_display_Delete(vd);
-    return VLC_EGENERIC;
+    return NULL;
 }
 
 /*****************************************************************************
  *
  *****************************************************************************/
-void vout_CloseWrapper(vout_thread_t *vout)
+void vout_CloseWrapper(vout_thread_t *vout, vout_display_t *vd)
 {
     vout_thread_sys_t *sys = vout->p;
 
@@ -168,15 +166,15 @@ void vout_CloseWrapper(vout_thread_t *vout)
 
     picture_pool_Release(sys->private_pool);
 
-    if (sys->display_pool != NULL || vout_IsDisplayFiltered(sys->display))
+    if (sys->display_pool != NULL || vout_IsDisplayFiltered(vd))
         picture_pool_Release(sys->decoder_pool);
 
 #ifdef _WIN32
-    var_DelCallback(vout, "video-wallpaper", Forward, sys->display);
+    var_DelCallback(vout, "video-wallpaper", Forward, vd);
 #endif
     sys->decoder_pool = NULL; /* FIXME remove */
 
-    vout_display_Delete(sys->display);
+    vout_display_Delete(vd);
 }
 
 #ifdef _WIN32

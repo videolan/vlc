@@ -1505,8 +1505,8 @@ static int vout_Start(vout_thread_t *vout, const vout_configuration_t *cfg)
     vlc_mutex_lock(&sys->display_lock);
     vlc_mutex_unlock(&sys->window_lock);
 
-    if (vout_OpenWrapper(vout, sys->splitter_name, &dcfg)) {
-        assert(sys->display == NULL);
+    sys->display = vout_OpenWrapper(vout, sys->splitter_name, &dcfg);
+    if (sys->display == NULL) {
         vlc_mutex_unlock(&sys->display_lock);
         goto error;
     }
@@ -1648,7 +1648,7 @@ void vout_StopDisplay(vout_thread_t *vout)
             vout_FlushUnlocked(vout, true, INT64_MAX);
 
         vlc_mutex_lock(&sys->display_lock);
-        vout_CloseWrapper(vout);
+        vout_CloseWrapper(vout, sys->display);
         sys->display = NULL;
         vlc_mutex_unlock(&sys->display_lock);
     }
