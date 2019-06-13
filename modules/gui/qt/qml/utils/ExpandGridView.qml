@@ -303,7 +303,7 @@ NavigableFocusScope {
             animateRetractItem.start()
         }
 
-        PropertyAnimation {
+        NumberAnimation {
             id: animateRetractItem;
             target: flickable.expandItem;
             properties: "height"
@@ -319,13 +319,20 @@ NavigableFocusScope {
             }
         }
 
-        PropertyAnimation {
+        NumberAnimation {
             id: animateExpandItem;
             target: flickable.expandItem;
             properties: "height"
             easing.type: Easing.InQuad
             duration: 250
             from: 0
+        }
+
+        Binding {
+            target: flickable.expandItem
+            property: "visible"
+            value: flickable.expandItem.height > 0
+            delayed: true
         }
 
         function setCurrentItemFocus() {
