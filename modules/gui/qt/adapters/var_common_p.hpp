@@ -51,6 +51,8 @@ public:
         assert(false);
     }
 
+    virtual void clear() {}
+
     operator bool() const {
         return get() != nullptr;
     }
@@ -81,6 +83,10 @@ public:
         m_object.reset(vout, hold);
     }
 
+    void clear() override {
+        m_object.reset(NULL, false);
+    }
+
 private:
     static void obj_hold( vout_thread_t* obj ) { vout_Hold(obj); }
     static void obj_release( vout_thread_t* obj ) { vout_Release(obj); }
@@ -108,6 +114,10 @@ public:
         m_object = p_intf;
     }
 
+    void clear() override {
+        m_object = NULL;
+    }
+
 private:
     intf_thread_t* m_object;
 };
@@ -133,6 +143,10 @@ public:
         m_object.reset(aout, hold);
     }
 
+    void clear() override {
+        m_object.reset(NULL, false);
+    }
+
 private:
     static void obj_hold( audio_output_t* obj ) { aout_Hold(obj); }
     static void obj_release( audio_output_t* obj ) { aout_Release(obj); }
@@ -155,6 +169,10 @@ public:
 
     void reset(vlc_object_t* obj, bool) override {
         m_object = obj;
+    }
+
+    void clear() override {
+        m_object = NULL;
     }
 
 private:

@@ -105,6 +105,13 @@ struct VLCVarTypeTraits<float>
 template<typename Derived, typename BaseType>
 class QVLCVariable : public QObject
 {
+    typedef QVLCVariable<Derived, BaseType> SelfType;
+
+    struct QVLCVariableCRef  {
+        SelfType* self;
+    };
+    static_assert( std::is_pod<QVLCVariableCRef>::value,  "QVLCVariableCRef must be POD");
+
 public:
     template<typename T>
     QVLCVariable(T* object, QString property, QObject* parent)
@@ -112,55 +119,50 @@ public:
         , m_object(new VLCObjectHolderImpl<T>(nullptr))
         , m_property(property)
     {
-        resetObject<T>(object);
-        Derived* derived = static_cast<Derived*>(this);
-        connect(derived, &Derived::valueChangedInternal, this, &QVLCVariable<Derived, BaseType>::onValueChangedInternal, Qt::QueuedConnection);
+        cref.self = this;
     }
 
     virtual ~QVLCVariable()
     {
-        if (m_object->get())
-        {
-            Derived* derived = static_cast<Derived*>(this);
-            var_DelCallback(m_object->get(), qtu(m_property), value_modified, derived);
-            var_Destroy(m_object->get(), qtu(m_property));
-        }
+        assert(m_object->get() == nullptr);
     }
 
     ///change the object beeing observed
     template<typename T>
     void resetObject( T* object )
     {
-        Derived* derived = static_cast<Derived*>(this);
-        if (m_object->get()) {
-            var_DelCallback( m_object->get(), qtu(m_property), value_modified, derived );
-            var_Destroy(m_object->get(), qtu(m_property));
-        }
-
-        m_object->reset( object, true );
-        if (m_object->get())
+        clearObject();
+        if (object)
         {
+            m_object->reset( object, true );
             int type = var_Type(object, qtu(m_property));
             if (type == 0) //variable not found
             {
                 msg_Warn(m_object->get(), "variable %s not found in object", qtu(m_property));
-                m_object->reset((T*)nullptr);
+                m_object->clear();
                 return;
             }
             assert((type & VLC_VAR_CLASS) == VLCVarTypeTraits<BaseType>::var_type);
             vlc_value_t currentvalue;
             if (var_Get(m_object->get(), qtu(m_property), &currentvalue) == VLC_SUCCESS)
             {
-                BaseType value = VLCVarTypeTraits<BaseType>::fromValue(currentvalue);
-                if (m_value != value)
-                {
-                    m_value = value;
-                    emit derived->valueChanged( m_value );
-                }
+                Derived* derived = static_cast<Derived*>(this);
+                m_value = VLCVarTypeTraits<BaseType>::fromValue(currentvalue);
+                emit derived->valueChanged( m_value );
             }
 
             var_Create(m_object->get(), qtu(m_property), VLCVarTypeTraits<BaseType>::var_type);
-            var_AddCallback(m_object->get(), qtu(m_property), value_modified, derived);
+            var_AddCallback(m_object->get(), qtu(m_property), value_modified, &cref);
+        }
+    }
+
+    void clearObject()
+    {
+        if (m_object->get())
+        {
+            var_DelCallback( m_object->get(), qtu(m_property), value_modified, &cref );
+            var_Destroy(m_object->get(), qtu(m_property));
+            m_object->clear();
         }
     }
 
@@ -199,14 +201,16 @@ private:
     //executed on variable thread, this forwards the callback to the UI thread
     static int value_modified( vlc_object_t * object, char const *, vlc_value_t, vlc_value_t newValue, void * data)
     {
-        Derived* that = static_cast<Derived*>(data);
-        emit that->onValueChangedInternal( object, VLCVarTypeTraits<BaseType>::fromValue( newValue ) );
+        QVLCVariableCRef* cref = static_cast<QVLCVariableCRef*>(data);
+        Derived* derived = static_cast<Derived*>(cref->self);
+        emit derived->onValueChangedInternal( object, VLCVarTypeTraits<BaseType>::fromValue( newValue ) );
         return VLC_SUCCESS;
     }
 
     std::unique_ptr<VLCObjectHolder> m_object;
     QString m_property;
     BaseType m_value;
+    QVLCVariableCRef cref;
 };
 
 //specialisation
@@ -221,6 +225,12 @@ public:
     QVLCBool(T* object, QString property, QObject* parent = nullptr)
         : QVLCVariable<QVLCBool, bool>(object, property, parent)
     {
+        resetObject<T>(object);
+        connect(this, &QVLCBool::valueChangedInternal, this, &QVLCBool::onValueChangedInternal, Qt::QueuedConnection);
+    }
+
+    ~QVLCBool() {
+        clearObject();
     }
 
 public slots:
@@ -241,6 +251,12 @@ public:
     QVLCString(T* object, QString property, QObject* parent = nullptr)
         : QVLCVariable<QVLCString, QString>(object, property, parent)
     {
+        resetObject<T>(object);
+        connect(this, &QVLCString::valueChangedInternal, this, &QVLCString::onValueChangedInternal, Qt::QueuedConnection);
+    }
+
+    ~QVLCString() {
+        clearObject();
     }
 
 public slots:
@@ -261,6 +277,12 @@ public:
     QVLCFloat(T* object, QString property, QObject* parent = nullptr)
         : QVLCVariable<QVLCFloat, float>(object, property, parent)
     {
+        resetObject<T>(object);
+        connect(this, &QVLCFloat::valueChangedInternal, this, &QVLCFloat::onValueChangedInternal, Qt::QueuedConnection);
+    }
+
+    ~QVLCFloat() {
+        clearObject();
     }
 
 public slots:
@@ -282,6 +304,12 @@ public:
     QVLCInteger(T* object, QString property, QObject* parent = nullptr)
         : QVLCVariable<QVLCInteger, int64_t>(object, property, parent)
     {
+        resetObject<T>(object);
+        connect(this, &QVLCInteger::valueChangedInternal, this, &QVLCInteger::onValueChangedInternal, Qt::QueuedConnection);
+    }
+
+    ~QVLCInteger() {
+        clearObject();
     }
 
 public slots:
