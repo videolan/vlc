@@ -996,7 +996,7 @@ int MediaLibrary::filterListChildrenQuery( int query, int parentType )
                 case VLC_ML_PARENT_ALBUM:
                     return VLC_ML_LIST_ALBUM_TRACKS;
                 case VLC_ML_PARENT_ARTIST:
-                    return VLC_ML_LIST_ALBUM_TRACKS;
+                    return VLC_ML_LIST_ARTIST_TRACKS;
                 case VLC_ML_PARENT_SHOW:
                     return VLC_ML_LIST_SHOW_EPISODES;
                 case VLC_ML_PARENT_GENRE:
@@ -1012,7 +1012,7 @@ int MediaLibrary::filterListChildrenQuery( int query, int parentType )
                 case VLC_ML_PARENT_ALBUM:
                     return VLC_ML_COUNT_ALBUM_TRACKS;
                 case VLC_ML_PARENT_ARTIST:
-                    return VLC_ML_COUNT_ALBUM_TRACKS;
+                    return VLC_ML_COUNT_ARTIST_TRACKS;
                 case VLC_ML_PARENT_SHOW:
                     return VLC_ML_COUNT_SHOW_EPISODES;
                 case VLC_ML_PARENT_GENRE:
