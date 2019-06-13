@@ -112,11 +112,12 @@ INTF_ACTION_HANDLER(ActionCombo)
 
 #define PLAYLIST_ACTION_HANDLER(name) \
 static inline void \
-action_handler_Playlist##name(vlc_playlist_t *playlist, \
+action_handler_Playlist##name(intf_thread_t *intf, vlc_playlist_t *playlist, \
                               vlc_action_id_t action_id)
 
 PLAYLIST_ACTION_HANDLER(Interact)
 {
+    VLC_UNUSED(intf);
     switch (action_id)
     {
         case ACTIONID_PLAY_CLEAR:
@@ -135,6 +136,7 @@ PLAYLIST_ACTION_HANDLER(Interact)
 
 PLAYLIST_ACTION_HANDLER(Playback)
 {
+    VLC_UNUSED(intf);
     switch (action_id)
     {
         case ACTIONID_LOOP:
@@ -231,11 +233,13 @@ INTF_ACTION_HANDLER(PlaylistBookmark)
  **************************/
 
 #define PLAYER_ACTION_HANDLER(name) \
-static inline void action_handler_Player##name(vlc_player_t *player, \
+static inline void action_handler_Player##name(intf_thread_t *intf, \
+                                               vlc_player_t *player, \
                                                vlc_action_id_t action_id)
 
 PLAYER_ACTION_HANDLER(State)
 {
+    VLC_UNUSED(intf);
     switch (action_id)
     {
         case ACTIONID_PLAY_PAUSE:
@@ -307,7 +311,7 @@ INTF_ACTION_HANDLER(PlayerSeek)
 
 PLAYER_ACTION_HANDLER(Position)
 {
-    VLC_UNUSED(action_id);
+    VLC_UNUSED(action_id); VLC_UNUSED(intf);
     vout_thread_t *vout = vlc_player_vout_Hold(player);
     if (vout_OSDEpg(vout, vlc_player_GetCurrentMedia(player)))
         vlc_player_DisplayPosition(player);
@@ -316,6 +320,7 @@ PLAYER_ACTION_HANDLER(Position)
 
 PLAYER_ACTION_HANDLER(NavigateMedia)
 {
+    VLC_UNUSED(intf);
     switch (action_id)
     {
         case ACTIONID_PROGRAM_SID_PREV:
@@ -346,6 +351,7 @@ PLAYER_ACTION_HANDLER(NavigateMedia)
 
 PLAYER_ACTION_HANDLER(Track)
 {
+    VLC_UNUSED(intf);
     switch (action_id)
     {
         case ACTIONID_AUDIO_TRACK:
@@ -364,6 +370,7 @@ PLAYER_ACTION_HANDLER(Track)
 
 PLAYER_ACTION_HANDLER(Delay)
 {
+    VLC_UNUSED(intf);
     enum { AUDIODELAY, SUBDELAY } type;
     int delta = 50;
     switch (action_id)
@@ -407,6 +414,7 @@ AdjustRateFine(float rate, int const dir)
 
 PLAYER_ACTION_HANDLER(Rate)
 {
+    VLC_UNUSED(intf);
     switch (action_id)
     {
         case ACTIONID_RATE_SLOWER:
@@ -443,12 +451,13 @@ PLAYER_ACTION_HANDLER(Rate)
 
 PLAYER_ACTION_HANDLER(ToggleSubtitle)
 {
-    VLC_UNUSED(action_id);
+    VLC_UNUSED(action_id); VLC_UNUSED(intf);
     vlc_player_ToggleSubtitle(player);
 }
 
 PLAYER_ACTION_HANDLER(SyncSubtitle)
 {
+    VLC_UNUSED(intf);
     switch (action_id)
     {
         case ACTIONID_SUBSYNC_MARKAUDIO:
@@ -483,6 +492,7 @@ PLAYER_ACTION_HANDLER(SyncSubtitle)
 
 PLAYER_ACTION_HANDLER(Navigate)
 {
+    VLC_UNUSED(intf);
     enum vlc_player_nav nav;
     switch (action_id)
     {
@@ -504,6 +514,7 @@ PLAYER_ACTION_HANDLER(Navigate)
 
 PLAYER_ACTION_HANDLER(Viewpoint)
 {
+    VLC_UNUSED(intf);
     vlc_viewpoint_t viewpoint;
     switch (action_id)
     {
@@ -528,6 +539,7 @@ PLAYER_ACTION_HANDLER(Viewpoint)
 
 PLAYER_ACTION_HANDLER(Record)
 {
+    VLC_UNUSED(intf);
     VLC_UNUSED(action_id);
     vlc_player_ToggleRecording(player);
 }
@@ -570,6 +582,7 @@ end:
 
 PLAYER_ACTION_HANDLER(Aout)
 {
+    VLC_UNUSED(intf);
     switch (action_id)
     {
         case ACTIONID_VOL_DOWN:
@@ -602,6 +615,7 @@ PLAYER_ACTION_HANDLER(Aout)
 
 PLAYER_ACTION_HANDLER(Vouts)
 {
+    VLC_UNUSED(intf);
     switch (action_id)
     {
         case ACTIONID_TOGGLE_FULLSCREEN:
@@ -627,7 +641,7 @@ PLAYER_ACTION_HANDLER(Vouts)
 
 #define VOUT_ACTION_HANDLER(name) \
 static inline void \
-action_handler_Vout##name(vout_thread_t *vout, vlc_action_id_t action_id)
+action_handler_Vout##name(intf_thread_t *intf, vout_thread_t *vout, vlc_action_id_t action_id)
 
 static inline void
 vout_CycleVariable(vout_thread_t *vout,
@@ -682,12 +696,13 @@ vout_CycleVariable(vout_thread_t *vout,
 
 VOUT_ACTION_HANDLER(AspectRatio)
 {
-    VLC_UNUSED(action_id);
+    VLC_UNUSED(action_id); VLC_UNUSED(intf);
     vout_CycleVariable(vout, "aspect-ratio", VLC_VAR_STRING, true);
 }
 
 VOUT_ACTION_HANDLER(Crop)
 {
+    VLC_UNUSED(intf);
     if (action_id == ACTIONID_CROP)
     {
         vout_CycleVariable(vout, "crop", VLC_VAR_STRING, true);
@@ -717,6 +732,7 @@ VOUT_ACTION_HANDLER(Crop)
 
 VOUT_ACTION_HANDLER(Zoom)
 {
+    VLC_UNUSED(intf);
     char const *varname = "zoom";
     switch (action_id)
     {
@@ -753,6 +769,7 @@ VOUT_ACTION_HANDLER(Zoom)
 
 VOUT_ACTION_HANDLER(Deinterlace)
 {
+    VLC_UNUSED(intf);
     if (action_id == ACTIONID_DEINTERLACE)
         var_SetInteger(vout, "deinterlace",
                        var_GetInteger(vout, "deinterlace") ? 0 : 1);
@@ -762,6 +779,7 @@ VOUT_ACTION_HANDLER(Deinterlace)
 
 VOUT_ACTION_HANDLER(SubtitleDisplay)
 {
+    VLC_UNUSED(intf);
     switch (action_id)
     {
         case ACTIONID_SUBPOS_DOWN:
@@ -817,9 +835,9 @@ struct vlc_action
     {
         void *fptr;
         void (*pf_intf)(intf_thread_t *, vlc_action_id_t);
-        void (*pf_playlist)(vlc_playlist_t *, vlc_action_id_t);
-        void (*pf_player)(vlc_player_t *, vlc_action_id_t);
-        void (*pf_vout)(vout_thread_t *vout, vlc_action_id_t);
+        void (*pf_playlist)(intf_thread_t *, vlc_playlist_t *, vlc_action_id_t);
+        void (*pf_player)(intf_thread_t *, vlc_player_t *, vlc_action_id_t);
+        void (*pf_vout)(intf_thread_t *, vout_thread_t *vout, vlc_action_id_t);
     } handler;
     bool pl_need_lock;
 };
@@ -902,18 +920,18 @@ handle_action(intf_thread_t *intf, vlc_action_id_t action_id)
             action->handler.pf_intf(intf, action_id);
             break;
         case PLAYLIST_ACTION:
-            action->handler.pf_playlist(playlist, action_id);
+            action->handler.pf_playlist(intf, playlist, action_id);
             break;
         case PLAYER_ACTION:
         case VOUT_ACTION:
         {
             vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
             if (action->type == PLAYER_ACTION)
-                action->handler.pf_player(player, action_id);
+                action->handler.pf_player(intf, player, action_id);
             else
             {
                 vout_thread_t *vout = vlc_player_vout_Hold(player);
-                action->handler.pf_vout(vout, action_id);
+                action->handler.pf_vout(intf, vout, action_id);
                 vout_Release(vout);
             }
             break;
