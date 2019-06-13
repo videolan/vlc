@@ -32,21 +32,6 @@
 #import <mach/mach_time.h>
 
 #pragma mark -
-#pragma mark local prototypes & module descriptor
-
-static int  Open  (vlc_object_t *);
-static void Close (vlc_object_t *);
-
-vlc_module_begin ()
-    set_shortname("audiounit_ios")
-    set_description("AudioUnit output for iOS")
-    set_capability("audio output", 101)
-    set_category(CAT_AUDIO)
-    set_subcategory(SUBCAT_AUDIO_AOUT)
-    set_callbacks(Open, Close)
-vlc_module_end ()
-
-#pragma mark -
 #pragma mark private declarations
 
 /* aout wrapper: used as observer for notifications */
@@ -647,3 +632,15 @@ Open(vlc_object_t *obj)
     ca_Open(aout);
     return VLC_SUCCESS;
 }
+
+#pragma mark -
+#pragma mark module descriptor
+
+vlc_module_begin ()
+    set_shortname("audiounit_ios")
+    set_description("AudioUnit output for iOS")
+    set_capability("audio output", 101)
+    set_category(CAT_AUDIO)
+    set_subcategory(SUBCAT_AUDIO_AOUT)
+    set_callbacks(Open, Close)
+vlc_module_end ()
