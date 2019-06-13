@@ -245,6 +245,10 @@ Utils.NavigableFocusScope {
                         bar.contentItem.focus= true
                     }
 
+                    background: Rectangle {
+                        color: "transparent"
+                    }
+
                     /* List of sub-sources for Music */
                     Repeater {
                         id: model_music_id
