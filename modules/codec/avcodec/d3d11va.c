@@ -129,7 +129,6 @@ struct vlc_va_sys_t
 /* */
 static int D3dCreateDevice(vlc_va_t *, const video_format_t *);
 static void D3dDestroyDevice(vlc_va_t *);
-static char *DxDescribe(vlc_va_sys_t *);
 
 static int DxCreateVideoService(vlc_va_t *);
 static void DxDestroyVideoService(vlc_va_t *);
@@ -396,11 +395,16 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (err != VLC_SUCCESS)
         goto error;
 
-    /* TODO print the hardware name/vendor for debugging purposes */
-    char *desc = DxDescribe(sys);
-    if (desc != NULL) {
-        msg_Info(va, "Using %s", desc);
-        free(desc);
+    IDXGIAdapter *p_adapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
+    if (p_adapter) {
+        char *description = NULL;
+        DXGI_ADAPTER_DESC adapterDesc;
+        if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc))) {
+            msg_Info(va, "Using D3D11VA (%ls, vendor %x(%s), device %x, revision %x)",
+                        adapterDesc.Description,
+                        adapterDesc.VendorId, DxgiVendorStr(adapterDesc.VendorId), adapterDesc.DeviceId, adapterDesc.Revision);
+        }
+        IDXGIAdapter_Release(p_adapter);
     }
 
     ctx->hwaccel_context = &sys->hw;
@@ -472,30 +476,6 @@ static void D3dDestroyDevice(vlc_va_t *va)
     if (sys->d3dvidctx)
         ID3D11VideoContext_Release(sys->d3dvidctx);
     D3D11_ReleaseDevice( &sys->d3d_dev );
-}
-
-/**
- * It describes our Direct3D object
- */
-static char *DxDescribe(vlc_va_sys_t *sys)
-{
-
-    IDXGIAdapter *p_adapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
-    if (!p_adapter) {
-       return NULL;
-    }
-
-    char *description = NULL;
-    DXGI_ADAPTER_DESC adapterDesc;
-    if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc))) {
-        if (asprintf(&description, "D3D11VA (%ls, vendor %x(%s), device %x, revision %x)",
-                     adapterDesc.Description,
-                     adapterDesc.VendorId, DxgiVendorStr(adapterDesc.VendorId), adapterDesc.DeviceId, adapterDesc.Revision) < 0)
-            description = NULL;
-    }
-
-    IDXGIAdapter_Release(p_adapter);
-    return description;
 }
 
 /**
