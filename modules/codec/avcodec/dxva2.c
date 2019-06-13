@@ -138,7 +138,6 @@ struct vlc_va_sys_t
 /* */
 static int D3dCreateDevice(vlc_va_t *, const video_format_t *);
 static void D3dDestroyDevice(vlc_va_t *);
-static char *DxDescribe(vlc_va_sys_t *);
 
 static int D3dCreateDeviceManager(vlc_va_t *);
 static void D3dDestroyDeviceManager(vlc_va_t *);
@@ -326,11 +325,12 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (err != VLC_SUCCESS)
         goto error;
 
-    /* TODO print the hardware name/vendor for debugging purposes */
-    char *desc = DxDescribe(sys);
-    if (desc != NULL) {
-        msg_Info(va, "Using %s", desc);
-        free(desc);
+    D3DADAPTER_IDENTIFIER9 d3dai;
+    if (SUCCEEDED(IDirect3D9_GetAdapterIdentifier(sys->hd3d.obj,
+                                               sys->d3d_dev.adapterId, 0, &d3dai))) {
+        msg_Info(va, "Using DXVA2 (%.*s, vendor %s(%lx), device %lx, revision %lx)",
+                    (int)sizeof(d3dai.Description), d3dai.Description,
+                    DxgiVendorStr(d3dai.VendorId), d3dai.VendorId, d3dai.DeviceId, d3dai.Revision);
     }
 
     ctx->hwaccel_context = &sys->hw;
@@ -374,24 +374,6 @@ static void D3dDestroyDevice(vlc_va_t *va)
     vlc_va_sys_t *sys = va->sys;
     D3D9_ReleaseDevice(&sys->d3d_dev);
     D3D9_Destroy( &sys->hd3d );
-}
-/**
- * It describes our Direct3D object
- */
-static char *DxDescribe(vlc_va_sys_t *sys)
-{
-    D3DADAPTER_IDENTIFIER9 d3dai;
-    if (FAILED(IDirect3D9_GetAdapterIdentifier(sys->hd3d.obj,
-                                               sys->d3d_dev.adapterId, 0, &d3dai))) {
-        return NULL;
-    }
-
-    char *description;
-    if (asprintf(&description, "DXVA2 (%.*s, vendor %s(%lx), device %lx, revision %lx)",
-                 (int)sizeof(d3dai.Description), d3dai.Description,
-                 DxgiVendorStr(d3dai.VendorId), d3dai.VendorId, d3dai.DeviceId, d3dai.Revision) < 0)
-        return NULL;
-    return description;
 }
 
 /**
