@@ -45,10 +45,11 @@ int vlc_memfd(void)
 
     /* Fallback to open with O_TMPFILE, */
     fd = open("/tmp", O_RDWR | O_CLOEXEC | O_TMPFILE, S_IRUSR | S_IWUSR);
-    if (fd != -1 || (errno != EISDIR && errno != ENOENT))
+    if (fd != -1 || (errno != EISDIR && errno != EOPNOTSUPP))
         return fd;
 
-    /* Fallback to POSIX implementation if O_TMPFILE is not supported */
+    /* Fallback to POSIX implementation if O_TMPFILE is not supported (errno is
+     * EISDIR, or EOPNOTSUPP, cf. man open(2). */
     char bufpath[] = "/tmp/"PACKAGE_NAME"XXXXXX";
     fd = vlc_mkstemp(bufpath);
     if (fd != -1)
