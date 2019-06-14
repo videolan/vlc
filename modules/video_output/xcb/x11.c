@@ -334,8 +334,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     sys->fmt = *fmtp;
     /* Setup vout_display_t once everything is fine */
-    vd->info.has_pictures_invalid = true;
-
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
