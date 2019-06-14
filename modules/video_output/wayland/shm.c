@@ -348,8 +348,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     fmtp->i_chroma = VLC_CODEC_RGB32;
 
-    vd->info.has_pictures_invalid = sys->viewport == NULL;
-
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
