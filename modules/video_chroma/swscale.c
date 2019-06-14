@@ -58,7 +58,7 @@ static void CloseScaler( vlc_object_t * );
 #define SCALEMODE_LONGTEXT N_("Scaling mode to use.")
 
 static const int pi_mode_values[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-const char *const ppsz_mode_descriptions[] =
+static const char *const ppsz_mode_descriptions[] =
 { N_("Fast bilinear"), N_("Bilinear"), N_("Bicubic (good quality)"),
   N_("Experimental"), N_("Nearest neighbor (bad quality)"),
   N_("Area"), N_("Luma bicubic / chroma bilinear"), N_("Gauss"),
