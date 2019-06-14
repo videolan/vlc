@@ -593,7 +593,7 @@ ifdef HAVE_DARWIN_OS
 else
 ifdef HAVE_LINUX
 	# android has also system = linux and defines HAVE_LINUX
-	MESON_SYSTEM_NAME = 'linux'
+	MESON_SYSTEM_NAME = linux
 endif
 endif
 endif
