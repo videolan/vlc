@@ -710,11 +710,16 @@ static void on_player_subitems_changed(vlc_player_t *, input_item_t *, input_ite
 }
 
 
-static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_action, vout_thread_t *, vlc_es_id_t *, void *data)
+static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_action,
+    vout_thread_t *, enum vlc_vout_order, vlc_es_id_t *es_id, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_vout_list_changed");
 
+    switch (vlc_es_id_GetCat(es_id))
+    {
+        case VIDEO_ES:
+        {
     //player is locked within callbacks*
     size_t i_vout = 0;
     vout_thread_t **vouts = vlc_player_vout_HoldAll(player, &i_vout);
@@ -729,6 +734,11 @@ static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_ac
     that->callAsync([that,voutsPtr,i_vout] () {
         that->UpdateVouts(voutsPtr.get(), i_vout);
     });
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 //player vout callbacks

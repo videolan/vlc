@@ -105,6 +105,7 @@ vlc_module_end ()
 static void player_on_vout_changed(vlc_player_t *player,
                                    enum vlc_player_vout_action action,
                                    vout_thread_t *vout,
+                                   enum vlc_vout_order order,
                                    vlc_es_id_t *es_id,
                                    void *data);
 static int MovedEvent( vlc_object_t *, char const *,
@@ -392,11 +393,16 @@ static void
 player_on_vout_changed(vlc_player_t *player,
                        enum vlc_player_vout_action action,
                        vout_thread_t *vout,
+                       enum vlc_vout_order order,
                        vlc_es_id_t *es_id, void *data)
 {
-    VLC_UNUSED(player); VLC_UNUSED(es_id);
+    VLC_UNUSED(player); VLC_UNUSED(order);
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
+
+    if (vlc_es_id_GetCat(es_id) != VIDEO_ES)
+        return;
+
     switch (action)
     {
         case VLC_PLAYER_VOUT_STARTED:

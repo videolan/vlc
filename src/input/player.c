@@ -59,6 +59,8 @@ struct vlc_player_track_priv
     struct vlc_player_track t;
     vout_thread_t *vout; /* weak reference */
     vlc_tick_t delay;
+    /* only valid if selected and if category is VIDEO_ES or SPU_ES */
+    enum vlc_vout_order vout_order;
 };
 
 typedef struct VLC_VECTOR(struct vlc_player_program *)
@@ -423,6 +425,8 @@ vlc_player_track_New(vlc_es_id_t *id, const char *name, const es_format_t *fmt)
     struct vlc_player_track *track = &trackpriv->t;
 
     trackpriv->delay = INT64_MAX;
+    trackpriv->vout = NULL;
+    trackpriv->vout_order = VLC_VOUT_ORDER_NONE;
 
     track->name = strdup(name);
     if (!track->name)
@@ -1327,11 +1331,18 @@ vlc_player_GetTrack(vlc_player_t *player, vlc_es_id_t *id)
 }
 
 vout_thread_t *
-vlc_player_GetEsIdVout(vlc_player_t *player, vlc_es_id_t *es_id)
+vlc_player_GetEsIdVout(vlc_player_t *player, vlc_es_id_t *es_id,
+                       enum vlc_vout_order *order)
 {
     struct vlc_player_track_priv *trackpriv =
         vlc_player_GetPrivTrack(player, es_id);
-    return trackpriv ? trackpriv->vout : NULL;
+    if (trackpriv)
+    {
+        if (order)
+            *order = trackpriv->vout_order;
+        return trackpriv->vout;
+    }
+    return NULL;
 }
 
 vlc_es_id_t *
@@ -1343,7 +1354,7 @@ vlc_player_GetEsIdFromVout(vlc_player_t *player, vout_thread_t *vout)
         return NULL;
 
     static const enum es_format_category_e cats[] = {
-        VIDEO_ES, AUDIO_ES /* for visualisation filters */
+        VIDEO_ES, SPU_ES, AUDIO_ES /* for visualisation filters */
     };
     for (size_t i = 0; i < ARRAY_SIZE(cats); ++i)
     {
@@ -2060,16 +2071,17 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
         return;
 
     const bool is_video_es = trackpriv->t.fmt.i_cat == VIDEO_ES;
-    if (!is_video_es) /* XXX: will be removed on next commits */
-        return;
 
     switch (ev->action)
     {
         case VLC_INPUT_EVENT_VOUT_ADDED:
             trackpriv->vout = ev->vout;
             vlc_player_SendEvent(player, on_vout_changed,
-                                 VLC_PLAYER_VOUT_STARTED, ev->vout, ev->id);
+                                 VLC_PLAYER_VOUT_STARTED, ev->vout,
+                                 ev->order, ev->id);
 
+            if (is_video_es)
+            {
             /* Register vout callbacks after the vout list event */
             var_AddCallback(ev->vout, "fullscreen",
                             vlc_player_VoutCallback, player);
@@ -2078,8 +2090,11 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
             for (size_t i = 0; i < ARRAY_SIZE(osd_vars); ++i)
                 var_AddCallback(ev->vout, osd_vars[i],
                                 vlc_player_VoutOSDCallback, player);
+            }
             break;
         case VLC_INPUT_EVENT_VOUT_DELETED:
+            if (is_video_es)
+            {
             /* Un-register vout callbacks before the vout list event */
             var_DelCallback(ev->vout, "fullscreen",
                             vlc_player_VoutCallback, player);
@@ -2088,10 +2103,12 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
             for (size_t i = 0; i < ARRAY_SIZE(osd_vars); ++i)
                 var_DelCallback(ev->vout, osd_vars[i],
                                 vlc_player_VoutOSDCallback, player);
+            }
 
             trackpriv->vout = NULL;
             vlc_player_SendEvent(player, on_vout_changed,
-                                 VLC_PLAYER_VOUT_STOPPED, ev->vout, ev->id);
+                                 VLC_PLAYER_VOUT_STOPPED, ev->vout,
+                                 VLC_VOUT_ORDER_NONE, ev->id);
             break;
         default:
             vlc_assert_unreachable();

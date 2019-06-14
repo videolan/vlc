@@ -850,12 +850,13 @@ struct vlc_player_cbs
      * @param player locked player instance
      * @param action started or stopped
      * @param vout vout (can't be NULL)
+     * @param order vout order
      * @param es_id the ES id associated with this vout
      * @param data opaque pointer set by vlc_player_AddListener()
      */
     void (*on_vout_changed)(vlc_player_t *player,
         enum vlc_player_vout_action action, vout_thread_t *vout,
-        vlc_es_id_t *es_id, void *data);
+        enum vlc_vout_order order, vlc_es_id_t *es_id, void *data);
 
     /**
      * Called when the player is corked
@@ -1703,11 +1704,13 @@ vlc_player_GetTrack(vlc_player_t *player, vlc_es_id_t *es_id);
  * @param player locked player instance
  * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
  * vlc_player_GetTrackAt())
+ * @param order if not null, the order of the vout
  * @return a valid vout or NULL (if the track is disabled, it it's not a video
- * track, or if the vout failed to start)
+ * or spu track, or if the vout failed to start)
  */
 VLC_API vout_thread_t *
-vlc_player_GetEsIdVout(vlc_player_t *player, vlc_es_id_t *es_id);
+vlc_player_GetEsIdVout(vlc_player_t *player, vlc_es_id_t *es_id,
+                       enum vlc_vout_order *order);
 
 /**
  * Get the ES identifier of a video output

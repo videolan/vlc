@@ -85,6 +85,7 @@ struct report_vout
 {
     enum vlc_player_vout_action action;
     vout_thread_t *vout;
+    enum vlc_vout_order order;
     vlc_es_id_t *es_id;
 };
 
@@ -437,12 +438,14 @@ player_on_statistics_changed(vlc_player_t *player,
 static void
 player_on_vout_changed(vlc_player_t *player,
                        enum vlc_player_vout_action action,
-                       vout_thread_t *vout, vlc_es_id_t *es_id, void *data)
+                       vout_thread_t *vout, enum vlc_vout_order order,
+                       vlc_es_id_t *es_id, void *data)
 {
     struct ctx *ctx = get_ctx(player, data);
     struct report_vout report = {
         .action = action,
         .vout = vout_Hold(vout),
+        .order = order,
         .es_id = vlc_es_id_Hold(es_id),
     };
     assert(report.es_id);

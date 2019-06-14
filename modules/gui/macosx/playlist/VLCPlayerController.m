@@ -434,12 +434,17 @@ static void cb_player_item_meta_changed(vlc_player_t *p_player,
 static void cb_player_vout_changed(vlc_player_t *p_player,
                                    enum vlc_player_vout_action action,
                                    vout_thread_t *p_vout,
+                                   enum vlc_vout_order order,
                                    vlc_es_id_t *es_id,
                                    void *p_data)
 {
     VLC_UNUSED(p_player);
     VLC_UNUSED(p_vout);
-    VLC_UNUSED(es_id);
+    VLC_UNUSED(order);
+
+    if (vlc_es_id_GetCat(es_id) != VIDEO_ES)
+        return;
+
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
         [playerController voutListUpdated];

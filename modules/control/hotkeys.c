@@ -1053,11 +1053,15 @@ ViewpointMovedCallback(vlc_object_t *obj, char const *var,
 static void
 player_on_vout_changed(vlc_player_t *player,
                        enum vlc_player_vout_action action, vout_thread_t *vout,
-                       vlc_es_id_t *es_id,
+                       enum vlc_vout_order order, vlc_es_id_t *es_id,
                        void *data)
 {
-    VLC_UNUSED(es_id);
+    VLC_UNUSED(order);
     intf_thread_t *intf = data;
+
+    if (vlc_es_id_GetCat(es_id) != VIDEO_ES)
+        return;
+
     bool vrnav = var_GetBool(vout, "viewpoint-changeable");
     switch (action)
     {
