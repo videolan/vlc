@@ -1259,6 +1259,15 @@ vlc_player_track_vector_FindById(vlc_player_track_vector *vec, vlc_es_id_t *id,
     return NULL;
 }
 
+static struct vlc_player_track_priv *
+vlc_player_input_FindTrackById(struct vlc_player_input *input, vlc_es_id_t *id,
+                               size_t *idx)
+{
+    vlc_player_track_vector *vec =
+        vlc_player_input_GetTrackVector(input, vlc_es_id_GetCat(id));
+    return vec ? vlc_player_track_vector_FindById(vec, id, idx) : NULL;
+}
+
 size_t
 vlc_player_GetTrackCount(vlc_player_t *player, enum es_format_category_e cat)
 {
@@ -1898,10 +1907,8 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
 
     vlc_player_t *player = input->player;
 
-    vlc_player_track_vector *vec =
-        vlc_player_input_GetTrackVector(input, vlc_es_id_GetCat(ev->id));
     struct vlc_player_track_priv *trackpriv =
-        vec ? vlc_player_track_vector_FindById(vec, ev->id, NULL) : NULL;
+        vlc_player_input_FindTrackById(input, ev->id, NULL);
     if (!trackpriv)
         return;
 
