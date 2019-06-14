@@ -348,21 +348,21 @@ QString ChapterListModel::getNameAtPosition(float pos) const
 {
     if(m_title != nullptr){
 
-    vlc_tick_t posTime = pos * m_title->length;
-    int prevChapterIndex = 0;
+        vlc_tick_t posTime = pos * m_title->length;
+        int prevChapterIndex = 0;
 
-    for(unsigned int i=0;i<m_title->chapter_count;i++){
+        for(unsigned int i=0;i<m_title->chapter_count;i++){
 
-        vlc_tick_t currentChapterTime = m_title->chapters[i].time;
+            vlc_tick_t currentChapterTime = m_title->chapters[i].time;
 
-        if(currentChapterTime > posTime)
-           return qfu(m_title->chapters[prevChapterIndex].name);
+            if(currentChapterTime > posTime)
+                return qfu(m_title->chapters[prevChapterIndex].name);
 
-        else if(i == (m_title->chapter_count - 1))
-            return qfu(m_title->chapters[i].name);
+            else if(i == (m_title->chapter_count - 1))
+                return qfu(m_title->chapters[i].name);
 
-        prevChapterIndex = i;
-    }
+            prevChapterIndex = i;
+        }
     }
     return QString();
 }
