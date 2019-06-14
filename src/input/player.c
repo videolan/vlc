@@ -1327,7 +1327,7 @@ vlc_player_GetTrack(vlc_player_t *player, vlc_es_id_t *id)
 }
 
 vout_thread_t *
-vlc_player_GetVoutFromEsId(vlc_player_t *player, vlc_es_id_t *es_id)
+vlc_player_GetEsIdVout(vlc_player_t *player, vlc_es_id_t *es_id)
 {
     struct vlc_player_track_priv *trackpriv =
         vlc_player_GetPrivTrack(player, es_id);

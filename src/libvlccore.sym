@@ -791,6 +791,7 @@ vlc_player_GetCurrentMedia
 vlc_player_GetError
 vlc_player_GetEsIdDelay
 vlc_player_GetEsIdFromVout
+vlc_player_GetEsIdVout
 vlc_player_GetLength
 vlc_player_GetPosition
 vlc_player_GetProgram
@@ -811,7 +812,6 @@ vlc_player_GetTrack
 vlc_player_GetTrackAt
 vlc_player_GetTrackCount
 vlc_player_GetV4l2Object
-vlc_player_GetVoutFromEsId
 vlc_player_HasTeletextMenu
 vlc_player_IncrementRate
 vlc_player_InvalidateNextMedia

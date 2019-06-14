@@ -1707,7 +1707,7 @@ vlc_player_GetTrack(vlc_player_t *player, vlc_es_id_t *es_id);
  * track, or if the vout failed to start)
  */
 VLC_API vout_thread_t *
-vlc_player_GetVoutFromEsId(vlc_player_t *player, vlc_es_id_t *es_id);
+vlc_player_GetEsIdVout(vlc_player_t *player, vlc_es_id_t *es_id);
 
 /**
  * Get the ES identifier of a video output
