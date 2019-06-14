@@ -70,10 +70,10 @@
 #define ROTATION_TEXT N_("Rotation")
 #define ROTATION_LONGTEXT N_("Rotation parameter: none;180;90-270;mirror")
 
-const int pi_mode_values[] = { (int) 0, (int) 1, (int) 2, (int) 3 };
-const char *const ppsz_mode_descriptions[] = { N_("jigsaw puzzle"), N_("sliding puzzle"), N_("swap puzzle"), N_("exchange puzzle") };
-const int pi_rotation_values[] = { (int) 0, (int) 1, (int) 2, (int) 3 };
-const char *const ppsz_rotation_descriptions[] = { N_("0"), N_("0/180"), N_("0/90/180/270"), N_("0/90/180/270/mirror") };
+static const int pi_mode_values[] = { (int) 0, (int) 1, (int) 2, (int) 3 };
+static const char *const ppsz_mode_descriptions[] = { N_("jigsaw puzzle"), N_("sliding puzzle"), N_("swap puzzle"), N_("exchange puzzle") };
+static const int pi_rotation_values[] = { (int) 0, (int) 1, (int) 2, (int) 3 };
+static const char *const ppsz_rotation_descriptions[] = { N_("0"), N_("0/180"), N_("0/90/180/270"), N_("0/90/180/270/mirror") };
 
 #define CFG_PREFIX "puzzle-"
 
