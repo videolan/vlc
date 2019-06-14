@@ -41,6 +41,7 @@
 #include <vlc_vout_osd.h>
 #include <vlc_strings.h>
 #include <vlc_charset.h>
+#include <vlc_spu.h>
 #include "vout_internal.h"
 #include "snapshot.h"
 
@@ -74,6 +75,8 @@ static int SubFilterCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 static int SubMarginCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
+static int SecondarySubMarginCallback( vlc_object_t *, char const *,
+                                       vlc_value_t, vlc_value_t, void * );
 static int ViewpointCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 
@@ -265,6 +268,11 @@ void vout_CreateVars( vout_thread_t *p_vout )
     var_Create( p_vout, "sub-margin",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
 
+    /* Add secondary-sub-margin variable (dual subtitles) */
+    var_Create( p_vout, "secondary-sub-margin",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_vout, "secondary-sub-margin", SecondarySubMarginCallback, NULL );
+
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
     var_Create( p_vout, "mouse-moved", VLC_VAR_COORDS );
@@ -308,12 +316,14 @@ void vout_IntfReinit( vout_thread_t *p_vout )
     var_TriggerCallback( p_vout, "sub-source" );
     var_TriggerCallback( p_vout, "sub-filter" );
     var_TriggerCallback( p_vout, "sub-margin" );
+    var_TriggerCallback( p_vout, "secondary-sub-margin" );
 }
 
 void vout_IntfDeinit(vlc_object_t *obj)
 {
     var_DelCallback(obj, "viewpoint", ViewpointCallback, NULL);
     var_DelCallback(obj, "sub-margin", SubMarginCallback, NULL);
+    var_DelCallback(obj, "secondary-sub-margin", SecondarySubMarginCallback, NULL);
     var_DelCallback(obj, "sub-filter", SubFilterCallback, NULL);
     var_DelCallback(obj, "sub-source", SubSourceCallback, NULL);
     var_DelCallback(obj, "video-filter", VideoFilterCallback, NULL);
@@ -610,6 +620,16 @@ static int SubMarginCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     vout_ChangeSpuChannelMargin(p_vout, VLC_VOUT_ORDER_PRIMARY, newval.i_int);
+    return VLC_SUCCESS;
+}
+
+static int SecondarySubMarginCallback( vlc_object_t *p_this, char const *psz_cmd,
+                              vlc_value_t oldval, vlc_value_t newval, void *p_data)
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+
+    vout_ChangeSpuChannelMargin(p_vout, VLC_VOUT_ORDER_SECONDARY, newval.i_int);
     return VLC_SUCCESS;
 }
 
