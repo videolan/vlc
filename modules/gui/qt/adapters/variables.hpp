@@ -184,7 +184,6 @@ protected:
         VLCVarTypeTraits<BaseType>::releaseValue(vlcvalue);
     }
 
-private:
     //executed on UI thread
     virtual void onValueChangedInternal(vlc_object_t* object, BaseType value)
     {
@@ -198,6 +197,7 @@ private:
     }
 
 
+private:
     //executed on variable thread, this forwards the callback to the UI thread
     static int value_modified( vlc_object_t * object, char const *, vlc_value_t, vlc_value_t newValue, void * data)
     {
