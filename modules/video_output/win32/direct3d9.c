@@ -176,7 +176,6 @@ struct vout_display_sys_t
     void *outside_opaque;
     libvlc_video_direct3d_device_setup_cb    setupDeviceCb;
     libvlc_video_direct3d_device_cleanup_cb  cleanupDeviceCb;
-    libvlc_video_direct3d_set_resize_cb      setResizeCb;
     libvlc_video_direct3d_update_output_cb   updateOutputCb;
     libvlc_video_swap_cb                     swapCb;
     libvlc_video_direct3d_start_end_rendering_cb startEndRenderingCb;
@@ -1413,9 +1412,6 @@ static void Direct3D9Destroy(vout_display_sys_t *sys)
         sys->hxdll = NULL;
     }
 
-    if (sys->setResizeCb && !vd->cfg->window->ops->resize)
-        sys->setResizeCb( sys->outside_opaque, NULL, NULL );
-
     if ( sys->cleanupDeviceCb )
         sys->cleanupDeviceCb( sys->outside_opaque );
 }
@@ -1671,12 +1667,6 @@ static bool LocalSwapchainStartEndRendering( void *opaque, bool enter, const lib
     return true;
 }
 
-static void WindowResize(void *opaque, unsigned width, unsigned height)
-{
-    vout_window_t *window = opaque;
-    vout_window_ReportSize(window, width, height);
-}
-
 /**
  * It creates a Direct3D vout display.
  */
@@ -1712,7 +1702,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->setupDeviceCb       = var_InheritAddress( vd, "vout-cb-setup" );
     sys->cleanupDeviceCb     = var_InheritAddress( vd, "vout-cb-cleanup" );
-    sys->setResizeCb         = var_InheritAddress( vd, "vout-cb-resize-cb" );
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
     sys->swapCb              = var_InheritAddress( vd, "vout-cb-swap" );
     sys->startEndRenderingCb = var_InheritAddress( vd, "vout-cb-make-current" );
@@ -1726,7 +1715,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->outside_opaque = vd;
         sys->setupDeviceCb       = LocalSwapchainSetupDevice;
         sys->cleanupDeviceCb     = NULL;
-        sys->setResizeCb         = NULL;
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;
         sys->swapCb              = LocalSwapchainSwap;
         sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
@@ -1761,9 +1749,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         free( sys );
         return VLC_EGENERIC;
     }
-
-    if (sys->setResizeCb && !vd->cfg->window->ops->resize)
-        sys->setResizeCb( sys->outside_opaque, WindowResize, vd->cfg->window );
 
     if (sys->setupDeviceCb != LocalSwapchainSetupDevice)
         CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);

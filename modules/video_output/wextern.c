@@ -30,17 +30,13 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 
-static const struct vout_window_operations ops = {
-    // .resize: don't let the core resize us on zoom/crop/ar changes
-    //          the display module should do the ReportSize for us
-};
+#include <vlc/libvlc.h>
+#include <vlc/libvlc_picture.h>
+#include <vlc/libvlc_media.h>
+#include <vlc/libvlc_renderer_discoverer.h>
+#include <vlc/libvlc_media_player.h>
 
-static int Open(vout_window_t *wnd)
-{
-    wnd->type = VOUT_WINDOW_TYPE_DUMMY;
-    wnd->ops = &ops;
-    return VLC_SUCCESS;
-}
+static int Open(vout_window_t *);
 
 vlc_module_begin()
     set_shortname(N_("Callback window"))
@@ -49,5 +45,55 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_capability("vout window", 0)
     set_callbacks(Open, NULL)
-    add_shortcut("dummy")
 vlc_module_end()
+
+typedef struct {
+    void                                     *opaque;
+    libvlc_video_direct3d_set_resize_cb      setResizeCb;
+} wextern_t;
+
+static void WindowResize(void *opaque, unsigned width, unsigned height)
+{
+    vout_window_t *window = opaque;
+    vout_window_ReportSize(window, width, height);
+}
+
+static int Enable(struct vout_window_t *wnd, const vout_window_cfg_t *wcfg)
+{
+    wextern_t *sys = wnd->sys;
+
+    if ( sys->setResizeCb != NULL )
+        /* bypass the size handling as the window doesn't handle the size */
+        sys->setResizeCb( sys->opaque, WindowResize, wnd );
+
+    return VLC_SUCCESS;
+}
+
+static void Disable(struct vout_window_t *wnd)
+{
+    wextern_t *sys = wnd->sys;
+
+    if ( sys->setResizeCb != NULL )
+        sys->setResizeCb( sys->opaque, NULL, NULL );
+}
+
+static const struct vout_window_operations ops = {
+    .enable  = Enable,
+    .disable = Disable,
+    // .resize: don't let the core resize us on zoom/crop/ar changes
+    //          the display module should do the ReportSize for us
+};
+
+static int Open(vout_window_t *wnd)
+{
+    wextern_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof(*sys));
+    if (unlikely(sys==NULL))
+        return VLC_ENOMEM;
+    sys->opaque          = var_InheritAddress( wnd, "vout-cb-opaque" );
+    sys->setResizeCb     = var_InheritAddress( wnd, "vout-cb-resize-cb" );
+
+    wnd->sys = sys;
+    wnd->type = VOUT_WINDOW_TYPE_DUMMY;
+    wnd->ops = &ops;
+    return VLC_SUCCESS;
+}
