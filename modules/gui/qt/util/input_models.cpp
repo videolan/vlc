@@ -346,8 +346,7 @@ void ChapterListModel::resetTitle(const vlc_player_title *newTitle)
 
 QString ChapterListModel::getNameAtPosition(float pos) const
 {
-    if(m_title == nullptr)
-        return qtr("nothing found");
+    if(m_title != nullptr){
 
     vlc_tick_t posTime = pos * m_title->length;
     int prevChapterIndex = 0;
@@ -364,6 +363,8 @@ QString ChapterListModel::getNameAtPosition(float pos) const
 
         prevChapterIndex = i;
     }
+    }
+    return QString();
 }
 
 //***************************
