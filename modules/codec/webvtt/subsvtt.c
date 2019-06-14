@@ -1856,7 +1856,7 @@ static void Render( decoder_t *p_dec, vlc_tick_t i_start, vlc_tick_t i_stop )
     vlc_array_init( &timedtags );
 
     GetTimedTags( p_sys->p_root->p_child, i_start, i_stop, &timedtags );
-    if( timedtags.i_count == 0 )
+    if( timedtags.i_count )
         qsort( timedtags.pp_elems, timedtags.i_count, sizeof(*timedtags.pp_elems), timedtagsArrayCmp );
 
     vlc_tick_t i_substart = i_start;
