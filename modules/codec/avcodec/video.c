@@ -48,7 +48,7 @@
 
 #include <libavutil/stereo3d.h>
 
-#include "../codec/cc.h"
+#include "../cc.h"
 #define FRAME_INFO_DEPTH 64
 
 struct frame_info_s
