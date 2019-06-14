@@ -609,7 +609,7 @@ static int SubMarginCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
-    vout_ChangeSubMargin(p_vout, newval.i_int);
+    vout_ChangeSpuChannelMargin(p_vout, VLC_VOUT_ORDER_PRIMARY, newval.i_int);
     return VLC_SUCCESS;
 }
 

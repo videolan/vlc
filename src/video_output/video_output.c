@@ -603,11 +603,12 @@ void vout_ControlChangeSubFilters(vout_thread_t *vout, const char *filters)
         spu_ChangeFilters(vout->p->spu, filters);
 }
 
-void vout_ChangeSubMargin(vout_thread_t *vout, int margin)
+void vout_ChangeSpuChannelMargin(vout_thread_t *vout,
+                                 enum vlc_vout_order order, int margin)
 {
     assert(!vout->p->dummy);
     if (likely(vout->p->spu != NULL))
-        spu_ChangeMargin(vout->p->spu, margin);
+        spu_ChangeChannelOrderMargin(vout->p->spu, order, margin);
 }
 
 void vout_ChangeViewpoint(vout_thread_t *vout,

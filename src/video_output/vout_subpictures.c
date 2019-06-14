@@ -1910,12 +1910,23 @@ void spu_ChangeFilters(spu_t *spu, const char *filters)
     vlc_mutex_unlock(&sys->lock);
 }
 
-void spu_ChangeMargin(spu_t *spu, int margin)
+void spu_ChangeChannelOrderMargin(spu_t *spu, enum vlc_vout_order order,
+                                  int margin)
 {
     spu_private_t *sys = spu->p;
 
     vlc_mutex_lock(&sys->lock);
-    sys->margin = margin;
+    switch (order)
+    {
+        case VLC_VOUT_ORDER_PRIMARY:
+            sys->margin = margin;
+            break;
+        case VLC_VOUT_ORDER_SECONDARY:
+            sys->secondary_margin = margin;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
     vlc_mutex_unlock(&sys->lock);
 }
 

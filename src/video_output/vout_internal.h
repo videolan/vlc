@@ -246,7 +246,7 @@ void vout_ChangeCropBorder(vout_thread_t *, int left, int top, int right, int bo
 void vout_ControlChangeFilters(vout_thread_t *, const char *);
 void vout_ControlChangeSubSources(vout_thread_t *, const char *);
 void vout_ControlChangeSubFilters(vout_thread_t *, const char *);
-void vout_ChangeSubMargin(vout_thread_t *, int);
+void vout_ChangeSpuChannelMargin(vout_thread_t *, enum vlc_vout_order order, int);
 void vout_ChangeViewpoint( vout_thread_t *, const vlc_viewpoint_t *);
 
 /* */
@@ -269,7 +269,7 @@ void spu_Attach( spu_t *, input_thread_t *input );
 void spu_Detach( spu_t * );
 void spu_SetClockDelay(spu_t *spu, size_t channel_id, vlc_tick_t delay);
 void spu_SetClockRate(spu_t *spu, size_t channel_id, float rate);
-void spu_ChangeMargin(spu_t *, int);
+void spu_ChangeChannelOrderMargin(spu_t *, enum vlc_vout_order, int);
 void spu_SetHighlight(spu_t *, const vlc_spu_highlight_t*);
 
 /**
