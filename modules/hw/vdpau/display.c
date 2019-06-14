@@ -498,7 +498,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     /* */
     sys->current = NULL;
     vd->sys = sys;
-    vd->info.has_pictures_invalid = true;
     vd->info.subpicture_chromas = spu_chromas;
     *fmtp = fmt;
 
