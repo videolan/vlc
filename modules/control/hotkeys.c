@@ -36,6 +36,7 @@
 #include <vlc_player.h>
 #include <vlc_playlist.h>
 #include <vlc_actions.h>
+#include <vlc_spu.h>
 #include "math.h"
 
 struct intf_sys_t
@@ -53,6 +54,7 @@ struct intf_sys_t
         vlc_tick_t audio_time;
         vlc_tick_t subtitle_time;
     } subsync;
+    enum vlc_vout_order spu_channel_order;
 };
 
 static void handle_action(intf_thread_t *, vlc_action_id_t);
@@ -355,19 +357,109 @@ PLAYER_ACTION_HANDLER(NavigateMedia)
     }
 }
 
+static void CycleSecondarySubtitles(intf_thread_t *intf, vlc_player_t *player,
+                                    bool next)
+{
+    intf_sys_t *sys = intf->p_sys;
+    const enum es_format_category_e cat = SPU_ES;
+    size_t count = vlc_player_GetTrackCount(player, cat);
+    if (!count)
+        return;
+
+    vlc_es_id_t *cycle_id = NULL;
+    vlc_es_id_t *keep_id = NULL;
+
+    /* Check how many subtitle tracks are already selected */
+    size_t selected_count = 0;
+    for (size_t i = 0; i < count; ++i)
+    {
+        const struct vlc_player_track *track =
+            vlc_player_GetTrackAt(player, cat, i);
+        assert(track);
+
+        if (track->selected)
+        {
+            enum vlc_vout_order order;
+            if (vlc_player_GetEsIdVout(player, track->es_id, &order)
+             && order == sys->spu_channel_order)
+                cycle_id = track->es_id;
+            else
+                keep_id = track->es_id;
+            ++selected_count;
+        }
+    }
+
+    if ((sys->spu_channel_order == VLC_VOUT_ORDER_PRIMARY
+      && selected_count == 1) || selected_count == 0)
+    {
+        /* Only cycle the primary subtitle track */
+        if (next)
+            vlc_player_SelectNextTrack(player, cat);
+        else
+            vlc_player_SelectPrevTrack(player, cat);
+    }
+    else
+    {
+        /* Find out the current selected index.
+           If no track selected, select the first or the last track */
+        size_t index = next ? 0 : count - 1;
+        for (size_t i = 0; i < count; ++i)
+        {
+            const struct vlc_player_track *track =
+                vlc_player_GetTrackAt(player, cat, i);
+            assert(track);
+
+            if (track->es_id == cycle_id)
+            {
+                index = i;
+                break;
+            }
+        }
+
+        /* Look for the next free (unselected) track */
+        while (true)
+        {
+            const struct vlc_player_track *track =
+                vlc_player_GetTrackAt(player, cat, index);
+
+            if (!track->selected)
+            {
+                cycle_id = track->es_id;
+                break;
+            }
+            /* Unselect if we reach the end of the cycle */
+            else if ((next && index + 1 == count) || (!next && index == 0))
+            {
+                cycle_id = NULL;
+                break;
+            }
+            else /* Switch to the next or previous track */
+                index = index + (next ? 1 : -1);
+        }
+
+        /* Make sure the list never contains NULL before a valid id */
+        if ( !keep_id )
+        {
+            keep_id = cycle_id;
+            cycle_id = NULL;
+        }
+
+        vlc_es_id_t *esIds[] = { keep_id, cycle_id, NULL };
+        vlc_player_SelectEsIdList(player, cat, esIds);
+    }
+}
+
 PLAYER_ACTION_HANDLER(Track)
 {
-    VLC_UNUSED(intf);
     switch (action_id)
     {
         case ACTIONID_AUDIO_TRACK:
             vlc_player_SelectNextTrack(player, AUDIO_ES);
             break;
         case ACTIONID_SUBTITLE_REVERSE_TRACK:
-            vlc_player_SelectPrevTrack(player, SPU_ES);
-            break;
         case ACTIONID_SUBTITLE_TRACK:
-            vlc_player_SelectNextTrack(player, SPU_ES);
+            CycleSecondarySubtitles(intf, player,
+                                    action_id == ACTIONID_SUBTITLE_TRACK);
             break;
         default:
             vlc_assert_unreachable();
@@ -376,7 +468,7 @@ PLAYER_ACTION_HANDLER(Track)
 
 PLAYER_ACTION_HANDLER(Delay)
 {
-    VLC_UNUSED(intf);
+    intf_sys_t *sys = intf->p_sys;
     enum { AUDIODELAY, SUBDELAY } type;
     int delta = 50;
     switch (action_id)
@@ -401,7 +493,27 @@ PLAYER_ACTION_HANDLER(Delay)
     if (type == AUDIODELAY)
         vlc_player_SetAudioDelay(player, delta, whence);
     else
-        vlc_player_SetSubtitleDelay(player, delta, whence);
+    {
+        if (sys->spu_channel_order == VLC_VOUT_ORDER_PRIMARY)
+            vlc_player_SetSubtitleDelay(player, delta, whence);
+        else
+        {
+            size_t count = vlc_player_GetTrackCount(player, SPU_ES);
+            for (size_t i = 0; i < count; ++i)
+            {
+                const struct vlc_player_track *track =
+                    vlc_player_GetTrackAt(player, SPU_ES, i);
+
+                enum vlc_vout_order order;
+                if (vlc_player_GetEsIdVout(player, track->es_id, &order)
+                 && order == VLC_VOUT_ORDER_SECONDARY)
+                {
+                    vlc_player_SetEsIdDelay(player, track->es_id, delta, whence);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 static inline float
@@ -459,6 +571,19 @@ PLAYER_ACTION_HANDLER(ToggleSubtitle)
 {
     VLC_UNUSED(action_id); VLC_UNUSED(intf);
     vlc_player_ToggleSubtitle(player);
+}
+
+PLAYER_ACTION_HANDLER(ControlSubtitleSecondary)
+{
+    VLC_UNUSED(action_id);
+    intf_sys_t *sys = intf->p_sys;
+
+    sys->spu_channel_order =
+        sys->spu_channel_order == VLC_VOUT_ORDER_PRIMARY ?
+        VLC_VOUT_ORDER_SECONDARY : VLC_VOUT_ORDER_PRIMARY;
+
+    vlc_player_vout_OSDMessage(player, _("%s subtitle control"),
+        sys->spu_channel_order == VLC_VOUT_ORDER_PRIMARY ? "Primary" : "Secondary");
 }
 
 PLAYER_ACTION_HANDLER(SyncSubtitle)
@@ -798,14 +923,16 @@ VOUT_ACTION_HANDLER(Deinterlace)
 
 VOUT_ACTION_HANDLER(SubtitleDisplay)
 {
-    VLC_UNUSED(intf);
+    intf_sys_t *sys = intf->p_sys;
+    const char* psz_sub_margin = sys->spu_channel_order == VLC_VOUT_ORDER_PRIMARY ?
+        "sub-margin" : "secondary-sub-margin";
     switch (action_id)
     {
         case ACTIONID_SUBPOS_DOWN:
-            var_DecInteger(vout, "sub-margin");
+            var_DecInteger(vout, psz_sub_margin);
             break;
         case ACTIONID_SUBPOS_UP:
-            var_IncInteger(vout, "sub-margin");
+            var_IncInteger(vout, psz_sub_margin);
             break;
         default:
         {
@@ -895,6 +1022,8 @@ static struct vlc_action const actions[] =
     VLC_ACTION_PLAYER(AUDIODELAY_DOWN, SUBDELAY_UP, Delay, true)
     VLC_ACTION_PLAYER(RATE_NORMAL, RATE_FASTER_FINE, Rate, true)
     VLC_ACTION_PLAYER(SUBTITLE_TOGGLE, SUBTITLE_TOGGLE, ToggleSubtitle, true)
+    VLC_ACTION_PLAYER(SUBTITLE_CONTROL_SECONDARY, SUBTITLE_CONTROL_SECONDARY,
+                      ControlSubtitleSecondary, true)
     VLC_ACTION_PLAYER(SUBSYNC_MARKAUDIO, SUBSYNC_RESET, SyncSubtitle, true)
     VLC_ACTION_PLAYER(NAV_ACTIVATE, NAV_RIGHT, Navigate, true)
     VLC_ACTION_PLAYER(VIEWPOINT_FOV_IN, VIEWPOINT_ROLL_ANTICLOCK, Viewpoint, true)
@@ -1107,6 +1236,7 @@ Open(vlc_object_t *this)
     sys->vrnav.btn_pressed = false;
     sys->playlist = vlc_intf_GetMainPlaylist(intf);
     sys->subsync.audio_time = sys->subsync.subtitle_time = VLC_TICK_INVALID;
+    sys->spu_channel_order = VLC_VOUT_ORDER_PRIMARY;
     static struct vlc_player_cbs const player_cbs =
     {
         .on_vout_changed = player_on_vout_changed,
