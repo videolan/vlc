@@ -77,6 +77,7 @@ Rectangle {
         { name: "about", component: aboutComp },
         { name: "mc", url: "qrc:///mediacenter/MCMainDisplay.qml" },
         { name: "playlist", url: "qrc:///playlist/PlaylistMainView.qml" },
+        { name: "player", component: audioplayerComp },
     ]
 
     function loadCurrentHistoryView() {
@@ -125,12 +126,22 @@ Rectangle {
             Connections {
                 target: player
                 onPlayingStateChanged: {
+                    console.log("onPlayingStateChanged", state)
                     if (state === PlayerController.PLAYING_STATE_STOPPED)
                         loadCurrentHistoryView()
+                    else {
+                        console.log(player.hasVideoOutput, history.current.view !== "player")
+                        if (player.hasVideoOutput && history.current.view !== "player")
+                            history.push(["player"], History.Go)
+                    }
                 }
+
                 onHasVideoOutputChanged: {
-                    if (player.hasVideoOutput)
-                        stackView.replace(audioplayerComp)
+                    console.log("before push player", player.hasVideoOutput)
+                    if (player.hasVideoOutput) {
+                        console.log("push player")
+                        history.push(["player"], History.Go)
+                    }
                 }
             }
         }
