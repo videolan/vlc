@@ -243,17 +243,6 @@ static bool Setup_cb( void **opaque, const libvlc_video_direct3d_device_cfg_t *c
 {
     struct render_context *ctx = *opaque;
     out->device_context = ctx->libvlc_d3d;
-
-    EnterCriticalSection(&ctx->sizeLock);
-    ctx->ReportSize = cfg->report_size_change;
-    ctx->ReportOpaque = cfg->report_opaque;
-
-    if (ctx->ReportSize != NULL)
-    {
-        /* report our initial size */
-        ctx->ReportSize(ctx->ReportOpaque, ctx->width, ctx->height);
-    }
-    LeaveCriticalSection(&ctx->sizeLock);
     return true;
 }
 
@@ -261,8 +250,22 @@ static void Cleanup_cb( void *opaque )
 {
     /* here we can release all things Direct3D9 for good  (if playing only one file) */
     struct render_context *ctx = opaque;
+}
+
+static void Resize_cb( void *opaque,
+                       void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
+                       void *report_opaque )
+{
+    struct render_context *ctx = opaque;
     EnterCriticalSection(&ctx->sizeLock);
-    ctx->ReportSize = NULL;
+    ctx->ReportSize = report_size_change;
+    ctx->ReportOpaque = report_opaque;
+
+    if (ctx->ReportSize != NULL)
+    {
+        /* report our initial size */
+        ctx->ReportSize(ctx->ReportOpaque, ctx->width, ctx->height);
+    }
     LeaveCriticalSection(&ctx->sizeLock);
 }
 
@@ -395,7 +398,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     /* Tell VLC to render into our D3D9 environment */
     libvlc_video_direct3d_set_callbacks( p_mp, libvlc_video_direct3d_engine_d3d9,
-                                        Setup_cb, Cleanup_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb, NULL,
+                                        Setup_cb, Cleanup_cb, Resize_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb, NULL,
                                         &Context );
 
     libvlc_media_player_play( p_mp );

@@ -125,6 +125,7 @@ struct vout_display_sys_t
     void *outside_opaque;
     libvlc_video_direct3d_device_setup_cb    setupDeviceCb;
     libvlc_video_direct3d_device_cleanup_cb  cleanupDeviceCb;
+    libvlc_video_direct3d_set_resize_cb      setResizeCb;
     libvlc_video_direct3d_update_output_cb   updateOutputCb;
     libvlc_video_swap_cb                     swapCb;
     libvlc_video_direct3d_start_end_rendering_cb startEndRenderingCb;
@@ -325,6 +326,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->setupDeviceCb       = var_InheritAddress( vd, "vout-cb-setup" );
     sys->cleanupDeviceCb     = var_InheritAddress( vd, "vout-cb-cleanup" );
+    sys->setResizeCb         = var_InheritAddress( vd, "vout-cb-resize-cb" );
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
     sys->swapCb              = var_InheritAddress( vd, "vout-cb-swap" );
     sys->startEndRenderingCb = var_InheritAddress( vd, "vout-cb-make-current" );
@@ -351,6 +353,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
             goto error;
         sys->setupDeviceCb       = LocalSwapchainSetupDevice;
         sys->cleanupDeviceCb     = LocalSwapchainCleanupDevice;
+        sys->setResizeCb         = NULL;
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;
         sys->swapCb              = LocalSwapchainSwap;
         sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
@@ -862,9 +865,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
 
     libvlc_video_direct3d_device_cfg_t cfg = {
         .hardware_decoding = is_d3d11_opaque( vd->source.i_chroma ),
-        /* bypass the size handling as the window doesn't handle the size */
-        .report_size_change = vd->cfg->window->ops->resize ? NULL: WindowResize,
-        .report_opaque      = vd->cfg->window->ops->resize ? NULL: vd->cfg->window,
     };
     libvlc_video_direct3d_device_setup_t out;
     ID3D11DeviceContext *d3d11_ctx = NULL;
@@ -916,6 +916,9 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
         }
     }
 
+    if (sys->setResizeCb && !vd->cfg->window->ops->resize)
+        sys->setResizeCb( sys->outside_opaque, WindowResize, vd->cfg->window );
+
     /* adjust the decoder sizes to have proper padding */
     sys->picQuad.i_width  = fmt.i_width;
     sys->picQuad.i_height = fmt.i_height;
@@ -945,6 +948,9 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
 
     if (Direct3D11CreateGenericResources(vd)) {
         msg_Err(vd, "Failed to allocate resources");
+        if (sys->setResizeCb && !vd->cfg->window->ops->resize)
+            sys->setResizeCb( sys->outside_opaque, NULL, NULL );
+
         if ( sys->cleanupDeviceCb )
             sys->cleanupDeviceCb( sys->outside_opaque );
         return VLC_EGENERIC;
@@ -1056,6 +1062,9 @@ static void Direct3D11Close(vout_display_t *vd)
     Direct3D11DestroyResources(vd);
 
     D3D11_ReleaseDevice( &sys->d3d_dev );
+
+    if (sys->setResizeCb && !vd->cfg->window->ops->resize)
+        sys->setResizeCb( sys->outside_opaque, NULL, NULL );
 
     if ( sys->cleanupDeviceCb )
         sys->cleanupDeviceCb( sys->outside_opaque );

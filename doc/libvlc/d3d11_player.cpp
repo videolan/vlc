@@ -190,18 +190,6 @@ static bool Setup_cb( void **opaque, const libvlc_video_direct3d_device_cfg_t *c
 {
     struct render_context *ctx = static_cast<struct render_context *>(*opaque);
     out->device_context = ctx->d3dctx;
-
-    EnterCriticalSection(&ctx->sizeLock);
-    ctx->ReportSize = cfg->report_size_change;
-    ctx->ReportOpaque = cfg->report_opaque;
-
-    if (ctx->ReportSize != nullptr)
-    {
-        /* report our initial size */
-        ctx->ReportSize(ctx->ReportOpaque, ctx->width, ctx->height);
-    }
-    LeaveCriticalSection(&ctx->sizeLock);
-
     return true;
 }
 
@@ -209,8 +197,22 @@ static void Cleanup_cb( void *opaque )
 {
     // here we can release all things Direct3D11 for good (if playing only one file)
     struct render_context *ctx = static_cast<struct render_context *>( opaque );
+}
+
+static void Resize_cb( void *opaque,
+                       void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
+                       void *report_opaque )
+{
+    struct render_context *ctx = static_cast<struct render_context *>( opaque );
     EnterCriticalSection(&ctx->sizeLock);
-    ctx->ReportSize = nullptr;
+    ctx->ReportSize = report_size_change;
+    ctx->ReportOpaque = report_opaque;
+
+    if (ctx->ReportSize != nullptr)
+    {
+        /* report our initial size */
+        ctx->ReportSize(ctx->ReportOpaque, ctx->width, ctx->height);
+    }
     LeaveCriticalSection(&ctx->sizeLock);
 }
 
@@ -499,7 +501,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     /* Tell VLC to render into our D3D11 environment */
     libvlc_video_direct3d_set_callbacks( p_mp, libvlc_video_direct3d_engine_d3d11,
-                                        Setup_cb, Cleanup_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb, SelectPlane_cb,
+                                        Setup_cb, Cleanup_cb, Resize_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb, SelectPlane_cb,
                                         &Context );
 
     libvlc_media_player_play( p_mp );

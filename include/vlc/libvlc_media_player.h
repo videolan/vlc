@@ -611,14 +611,6 @@ typedef enum libvlc_video_direct3d_engine_t {
 typedef struct
 {
     bool hardware_decoding; /** set if D3D11_CREATE_DEVICE_VIDEO_SUPPORT is needed for D3D11 */
-
-    /** Callback to call when the size of the host changes
-     *
-     * \note This may be called from any thread as long as it's not after
-     *    \ref libvlc_video_direct3d_device_cleanup_cb has been called.
-     */
-    void (*report_size_change)(void *report_opaque, unsigned width, unsigned height);
-    void *report_opaque;
 } libvlc_video_direct3d_device_cfg_t;
 
 typedef struct
@@ -654,6 +646,23 @@ typedef bool( *libvlc_video_direct3d_device_setup_cb )( void **opaque,
  * \version LibVLC 4.0.0 or later
  */
 typedef void( *libvlc_video_direct3d_device_cleanup_cb )( void *opaque );
+
+/** Set the callback to call when the host app resizes the rendering area.
+ *
+ * This allows text rendering and aspect ratio to be handled properly when the host
+ * rendering size changes.
+ *
+ * It may be called before the \ref libvlc_video_direct3d_device_setup_cb callback.
+ *
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \param report_size_change callback to use when the size changes. [IN]
+ *        The callback is valid until another call to \ref libvlc_video_direct3d_set_resize_cb
+ *        is done. This may be called from any thread.
+ * \param report_opaque private pointer to pass to the \ref report_size_change callback. [IN]
+ */
+typedef void( *libvlc_video_direct3d_set_resize_cb )( void *opaque,
+                                                      void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
+                                                      void *report_opaque );
 
 typedef struct
 {
@@ -783,6 +792,7 @@ typedef bool( *libvlc_video_direct3d_select_plane_cb )( void *opaque, size_t pla
  * \param engine the GPU engine to use
  * \param setup_cb callback to setup and return the device to use (cannot be NULL)
  * \param cleanup_cb callback to cleanup the device given by the \ref setup_cb callback
+ * \param resize_cb callback to set the resize callback
  * \param update_output_cb callback to notify of the source format and get the
  *                         rendering format used by the host (cannot be NULL)
  * \param swap_cb callback to tell the host it should display the rendered picture (cannot be NULL)
@@ -799,6 +809,7 @@ bool libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
                                          libvlc_video_direct3d_engine_t engine,
                                          libvlc_video_direct3d_device_setup_cb setup_cb,
                                          libvlc_video_direct3d_device_cleanup_cb cleanup_cb,
+                                         libvlc_video_direct3d_set_resize_cb resize_cb,
                                          libvlc_video_direct3d_update_output_cb update_output_cb,
                                          libvlc_video_swap_cb swap_cb,
                                          libvlc_video_direct3d_start_end_rendering_cb makeCurrent_cb,
