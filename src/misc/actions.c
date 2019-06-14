@@ -347,6 +347,7 @@ static const struct name2action
     { "subsync-markaudio", ACTIONID_SUBSYNC_MARKAUDIO, },
     { "subsync-marksub", ACTIONID_SUBSYNC_MARKSUB, },
     { "subsync-reset", ACTIONID_SUBSYNC_RESET, },
+    { "subtitle-control-secondary", ACTIONID_SUBTITLE_CONTROL_SECONDARY, },
     { "subtitle-revtrack", ACTIONID_SUBTITLE_REVERSE_TRACK, },
     { "subtitle-text-scale-down", ACTIONID_SUBTITLE_TEXT_SCALE_DOWN, },
     { "subtitle-text-scale-normal", ACTIONID_SUBTITLE_TEXT_SCALE_NORMAL, },

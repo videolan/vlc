@@ -2353,6 +2353,7 @@ vlc_module_begin ()
 #   define KEY_AUDIO_TRACK        "l"
 #   define KEY_SUBTITLE_TRACK     "s"
 #   define KEY_SUBTITLE_TOGGLE    "Shift+s"
+#   define KEY_SUBTITLE_CONTROL_S "Command+Shift+v"
 #   define KEY_SUBTITLE_REVTRACK  "Alt+s"
 #   define KEY_PROGRAM_SID_NEXT   "x"
 #   define KEY_PROGRAM_SID_PREV   "Shift+x"
@@ -2496,6 +2497,7 @@ vlc_module_begin ()
 #   define KEY_AUDIO_TRACK        "b"
 #   define KEY_SUBTITLE_TRACK     "v"
 #   define KEY_SUBTITLE_TOGGLE    "Shift+v"
+#   define KEY_SUBTITLE_CONTROL_S "Ctrl+Shift+v"
 #   define KEY_SUBTITLE_REVTRACK  "Alt+v"
 #   define KEY_PROGRAM_SID_NEXT   "x"
 #   define KEY_PROGRAM_SID_PREV   "Shift+x"
@@ -2665,6 +2667,8 @@ vlc_module_begin ()
             SUBTITLE_TRACK_KEY_TEXT, SUBTITLE_TRACK_KEY_LONGTEXT)
     add_key("key-subtitle-toggle", KEY_SUBTITLE_TOGGLE,
             SUBTITLE_TOGGLE_KEY_TEXT, SUBTITLE_TOGGLE_KEY_LONGTEXT)
+    add_key("key-subtitle-control-secondary", KEY_SUBTITLE_CONTROL_S,
+            SUBTITLE_CONTROL_SECONDARY_KEY_TEXT, SUBTITLE_CONTROL_SECONDARY_KEY_LONGTEXT)
     add_key("key-program-sid-next", KEY_PROGRAM_SID_NEXT,
             PROGRAM_SID_NEXT_KEY_TEXT, PROGRAM_SID_NEXT_KEY_LONGTEXT)
     add_key("key-program-sid-prev", KEY_PROGRAM_SID_PREV,

@@ -191,6 +191,8 @@ typedef enum vlc_action_id {
     ACTIONID_SUBDELAY_UP,
     /* subtitle toggle */
     ACTIONID_SUBTITLE_TOGGLE,
+    /* dual subtitle control */
+    ACTIONID_SUBTITLE_CONTROL_SECONDARY,
     /* subtitle sync */
     ACTIONID_SUBSYNC_MARKAUDIO,
     ACTIONID_SUBSYNC_MARKSUB,
