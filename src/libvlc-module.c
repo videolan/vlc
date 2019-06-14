@@ -370,6 +370,11 @@ static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
+static const int pi_sub_align_values[] = { -1, 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const char *const ppsz_sub_align_descriptions[] =
+{ N_("Unset"), N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
+  N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
+
 #define SS_TEXT N_("Disable screensaver")
 #define SS_LONGTEXT N_("Disable the screensaver during video playback." )
 
@@ -741,6 +746,15 @@ static const char *const ppsz_prefres[] = {
 #define SPU_TEXT N_("Enable sub-pictures")
 #define SPU_LONGTEXT N_( \
     "You can completely disable the sub-picture processing.")
+
+#define SECONDARY_SUB_POSITION_TEXT N_("Position of secondary subtitles")
+#define SECONDARY_SUB_POSITION_LONGTEXT N_( \
+    "Place on video where to display secondary subtitles (default bottom center).")
+
+#define SECONDARY_SUB_MARGIN_TEXT N_("Force secondary subtitle position")
+#define SECONDARY_SUB_MARGIN_LONGTEXT N_( \
+    "You can use this option to vertically adjust the position secondary " \
+    "subtitles are displayed.")
 
 #define OSD_TEXT N_("On Screen Display")
 #define OSD_LONGTEXT N_( \
@@ -1440,6 +1454,8 @@ static const char *const mouse_wheel_texts[] = {
 #define SUBTITLE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks.")
 #define SUBTITLE_TOGGLE_KEY_TEXT N_("Toggle subtitles")
 #define SUBTITLE_TOGGLE_KEY_LONGTEXT N_("Toggle subtitle track visibility.")
+#define SUBTITLE_CONTROL_SECONDARY_KEY_TEXT N_("Toggle secondary subtitle control")
+#define SUBTITLE_CONTROL_SECONDARY_KEY_LONGTEXT N_("Use original subtitle controls to manage secondary subtitles.")
 #define PROGRAM_SID_NEXT_KEY_TEXT N_("Cycle next program Service ID")
 #define PROGRAM_SID_NEXT_KEY_LONGTEXT N_("Cycle through the available next program Service IDs (SIDs).")
 #define PROGRAM_SID_PREV_KEY_TEXT N_("Cycle previous program Service ID")
@@ -1751,6 +1767,15 @@ vlc_module_begin ()
                     SUB_SOURCE_TEXT, SUB_SOURCE_LONGTEXT)
     add_module_list("sub-filter", "sub filter", NULL,
                     SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT)
+
+    set_section( N_( "Multiple Subtitles" ) , NULL )
+    add_integer( "secondary-sub-alignment", -1, SECONDARY_SUB_POSITION_TEXT,
+                 SECONDARY_SUB_POSITION_LONGTEXT, false )
+        change_integer_list( pi_sub_align_values, ppsz_sub_align_descriptions )
+    /* Push the secondary subtitles up a bit so they won't overlap with
+       the primary subtitles using the default settings.*/
+    add_integer( "secondary-sub-margin", 100, SECONDARY_SUB_MARGIN_TEXT,
+                 SECONDARY_SUB_MARGIN_LONGTEXT, true )
 
 /* Input options */
     set_category( CAT_INPUT )
