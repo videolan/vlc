@@ -2046,10 +2046,10 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
     assert(ev->vout);
     assert(ev->id);
 
-    static const char osd_vars[][sizeof("deinterlace-mode")] = {
+    static const char osd_vars[][sizeof("secondary-sub-margin")] = {
         "aspect-ratio", "autoscale", "crop", "crop-bottom",
         "crop-top", "crop-left", "crop-right", "deinterlace",
-        "deinterlace-mode", "sub-margin", "zoom"
+        "deinterlace-mode", "sub-margin", "secondary-sub-margin", "zoom"
     };
 
     vlc_player_t *player = input->player;
@@ -3526,6 +3526,9 @@ vlc_player_VoutOSDCallback(vlc_object_t *this, const char *var,
 
     else if (strcmp(var, "sub-margin") == 0)
         vouts_osd_Message(&vout, 1, _("Subtitle position %d px"), newval.i_int);
+
+    else if (strcmp(var, "secondary-sub-margin") == 0)
+        vouts_osd_Message(&vout, 1, _("Secondary subtitle position %d px"), newval.i_int);
 
     else if (strcmp(var, "sub-text-scale") == 0)
         vouts_osd_Message(&vout, 1, _("Subtitle text scale %d%%"), newval.i_int);
