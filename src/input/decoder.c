@@ -611,8 +611,10 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
         msg_Warn( p_dec, "no vout found, dropping subpicture" );
         if( p_owner->p_vout )
         {
-            vlc_mutex_lock( &p_owner->lock );
             assert(p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID);
+            decoder_Notify(p_owner, on_vout_deleted, p_owner->p_vout);
+
+            vlc_mutex_lock( &p_owner->lock );
             vout_UnregisterSubpictureChannel(p_owner->p_vout,
                                              p_owner->i_spu_channel);
             p_owner->i_spu_channel = VOUT_SPU_CHANNEL_INVALID;
@@ -626,6 +628,9 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 
     if( p_owner->p_vout != p_vout )
     {
+        if (p_owner->p_vout) /* notify the previous vout deletion unlocked */
+            decoder_Notify(p_owner, on_vout_deleted, p_owner->p_vout);
+
         vlc_mutex_lock(&p_owner->lock);
 
         if (p_owner->p_vout)
@@ -637,9 +642,10 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
             vout_Release(p_owner->p_vout);
         }
 
+        enum vlc_vout_order channel_order;
         p_owner->i_spu_channel =
             vout_RegisterSubpictureChannelInternal(p_vout, p_owner->p_clock,
-                                                   NULL);
+                                                   &channel_order);
         p_owner->i_spu_order = 0;
 
         if (p_owner->i_spu_channel == VOUT_SPU_CHANNEL_INVALID)
@@ -650,8 +656,12 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
             vout_Release(p_vout);
             return NULL;
         }
+
         p_owner->p_vout = p_vout;
         vlc_mutex_unlock(&p_owner->lock);
+
+        assert(channel_order != VLC_VOUT_ORDER_NONE);
+        decoder_Notify(p_owner, on_vout_added, p_vout, channel_order);
     }
     else
         vout_Release(p_vout);
@@ -1958,6 +1968,8 @@ static void DeleteDecoder( decoder_t * p_dec )
             if( p_owner->p_vout )
             {
                 assert( p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID );
+                decoder_Notify(p_owner, on_vout_deleted, p_owner->p_vout);
+
                 vout_UnregisterSubpictureChannel( p_owner->p_vout,
                                                   p_owner->i_spu_channel );
                 vout_Release(p_owner->p_vout);

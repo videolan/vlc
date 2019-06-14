@@ -2059,6 +2059,10 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
     if (!trackpriv)
         return;
 
+    const bool is_video_es = trackpriv->t.fmt.i_cat == VIDEO_ES;
+    if (!is_video_es) /* XXX: will be removed on next commits */
+        return;
+
     switch (ev->action)
     {
         case VLC_INPUT_EVENT_VOUT_ADDED:
