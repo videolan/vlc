@@ -784,8 +784,21 @@ ac_cv_type_socklen_t,
 #endif]], [[socklen_t len; len = 0;]])],
 ac_cv_type_socklen_t=yes,
 ac_cv_type_socklen_t=no)])
-AS_IF([test "$ac_cv_type_socklen_t" = no],
- [AC_DEFINE(socklen_t, unsigned int)])
+AS_IF([test "$ac_cv_type_socklen_t" = no], [
+  AC_COMPILE_IFELSE([
+    AC_LANG_PROGRAM([[
+#include <sys/types.h>
+#ifdef _WIN32
+# include <winsock2.h>
+# include <ws2tcpip.h>
+#else
+# include <sys/socket.h>
+#endif
+    ]], [[
+_Generic(getpeername, int (*)(int, struct sockaddr *, int *): 0);
+    ]])
+  ], AC_DEFINE(socklen_t, int), AC_DEFINE(socklen_t, unsigned int))
+])
 
 dnl Check for struct sockaddr_storage
 AH_TEMPLATE(sockaddr_storage, [Define to `sockaddr' if <sys/socket.h> does not define.]) dnl ` (fix VIM syntax highlight
