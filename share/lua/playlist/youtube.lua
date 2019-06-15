@@ -201,25 +201,20 @@ function pick_url( url_map, fmt, js_url )
             if url then
                 url = vlc.strings.decode_uri( url )
 
-                local sig = string.match( stream, "sig=([^&,]+)" )
-                if not sig then
-                    -- Scrambled signature
-                    sig = string.match( stream, "s=([^&,]+)" )
-                    if sig then
-                        vlc.msg.dbg( "Found "..string.len( sig ).."-character scrambled signature for youtube video URL, attempting to descramble... " )
-                        if js_url then
-                            sig = js_descramble( sig, js_url )
-                        else
-                            vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
-                        end
+                -- Descramble any scrambled signature and append it to URL
+                local s = string.match( stream, "s=([^&,]+)" )
+                if s then
+                    vlc.msg.err( "Found "..string.len( s ).."-character scrambled signature for youtube video URL, attempting to descramble... " )
+                    if js_url then
+                        s = js_descramble( s, js_url )
+                    else
+                        vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
                     end
-                end
-                local signature = ""
-                if sig then
-                    signature = "&signature="..sig
+
+                    url = url.."&signature="..s
                 end
 
-                path = url..signature
+                path = url
                 break
             end
         end
