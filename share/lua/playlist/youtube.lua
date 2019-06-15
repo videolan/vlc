@@ -107,10 +107,10 @@ function js_descramble( sig, js_url )
     end
 
     -- Look for the descrambler function's name
-    -- k.s&&f.set(k.sp,(0,window.encodeURIComponent)(DK((0,window.decodeURIComponent)(k.s))));
+    -- k.s&&f.set(k.sp,encodeURIComponent(DK(decodeURIComponent(k.s))));
     -- k.s (from stream map field "s") holds the input scrambled signature
     -- k.sp (from stream map field "sp") holds a parameter name (normally
-    -- "signature") to set with the output, descrambled signature
+    -- "signature" or "sig") to set with the output, descrambled signature
     local descrambler = js_extract( js, "%.set%([^,]-%.sp,[^;]-%((..)%(" )
     if not descrambler then
         vlc.msg.dbg( "Couldn't extract youtube video URL signature descrambling function name" )
@@ -212,7 +212,12 @@ function pick_url( url_map, fmt, js_url )
                         vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
                     end
 
-                    url = url.."&signature="..vlc.strings.encode_uri_component( s )
+                    local sp = string.match( stream, "sp=([^&,]+)" )
+                    if not sp then
+                        vlc.msg.warn( "Couldn't extract signature parameters for youtube video URL, guessing" )
+                        sp = "signature"
+                    end
+                    url = url.."&"..sp.."="..vlc.strings.encode_uri_component( s )
                 end
 
                 path = url
