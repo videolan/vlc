@@ -468,7 +468,7 @@ static vlc_fourcc_t ParseFormat(const xcb_setup_t *setup,
             if (bpp == 32 && d->red_mask == 0xff && d->green_mask == 0xff
              && d->blue_mask == 0xff && d->alpha_mask == 0x00)
                 return VLC_CODEC_RGB32;
-            if (bpp == 32 && d->red_mask == 0xff && d->green_mask == 0xff
+            if (bpp == 24 && d->red_mask == 0xff && d->green_mask == 0xff
              && d->blue_mask == 0xff && d->alpha_mask == 0x00)
                 return VLC_CODEC_RGB24;
             break;
