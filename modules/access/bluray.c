@@ -1237,7 +1237,7 @@ typedef struct
     struct
     {
         es_out_id_t *p_video_es;
-        int channels[MAX_OVERLAY];
+        size_t channels[MAX_OVERLAY];
     } overlay;
     es_out_t es_out;
 } bluray_esout_priv_t;
@@ -1529,7 +1529,7 @@ static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
             int i_plane = va_arg(args, int);
             if(esout_priv->overlay.p_video_es &&
                i_plane < MAX_OVERLAY &&
-               esout_priv->overlay.channels[i_plane] != VOUT_SPU_CHANNEL_INVALID)
+               (ssize_t)esout_priv->overlay.channels[i_plane] != VOUT_SPU_CHANNEL_INVALID)
             {
                 i_ret = es_out_Control(esout_priv->p_dst_out, ES_OUT_VOUT_DEL_OVERLAY,
                                        esout_priv->overlay.p_video_es,
@@ -1538,7 +1538,7 @@ static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
             }
             else
             {
-                assert(esout_priv->overlay.channels[i_plane] == VOUT_SPU_CHANNEL_INVALID);
+                assert((ssize_t)esout_priv->overlay.channels[i_plane] == VOUT_SPU_CHANNEL_INVALID);
                 i_ret = VLC_EGENERIC;
             }
             break;
