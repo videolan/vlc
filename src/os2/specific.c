@@ -24,7 +24,7 @@
 
 #include <vlc_common.h>
 #include "../libvlc.h"
-#include <vlc_playlist_legacy.h>
+#include <vlc_playlist.h>
 #include <vlc_interface.h>
 #include <vlc_url.h>
 
@@ -43,6 +43,24 @@ static HPIPE hpipeIPC     = NULLHANDLE;
 static int   tidIPCFirst  = -1;
 static int   tidIPCHelper = -1;
 
+static void add_to_playlist(vlc_playlist_t *playlist, const char *uri,
+                            bool play_now, int options_count,
+                            const char *const *options)
+{
+    input_item_t *media = input_item_New(uri, NULL);
+    if (!media)
+        return;
+    input_item_AddOptions(media, options_count, options,
+                          VLC_INPUT_OPTION_TRUSTED);
+
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_AppendOne(playlist, media);
+    if (play_now)
+        vlc_playlist_Start(playlist);
+    vlc_playlist_Unlock(playlist);
+    input_item_Release(media);
+}
+
 static void IPCHelperThread( void *arg )
 {
     libvlc_int_t *libvlc = arg;
@@ -55,7 +73,7 @@ static void IPCHelperThread( void *arg )
     int    i_options;
 
     /* Add files to the playlist */
-    playlist_t *p_playlist;
+    vlc_playlist_t *p_playlist;
 
     do
     {
@@ -82,7 +100,7 @@ static void IPCHelperThread( void *arg )
             DosRead( hpipeIPC, ppsz_argv[ i_opt ], i_len, &cbActual );
         }
 
-        p_playlist = libvlc_priv(libvlc)->playlist;
+        p_playlist = libvlc_priv(libvlc)->main_playlist;
 
         for( int i_opt = 0; i_opt < i_argc;)
         {
@@ -96,13 +114,12 @@ static void IPCHelperThread( void *arg )
 
             if( p_playlist )
             {
-                playlist_AddExt( p_playlist, ppsz_argv[ i_opt ], NULL,
+                add_to_playlist( p_playlist, ppsz_argv[ i_opt ],
                                  i_opt == 0 && ulCmd != IPC_CMD_ENQUEUE,
                                  i_options,
                                  ( char const ** )
                                      ( i_options ? &ppsz_argv[ i_opt + 1 ] :
-                                                   NULL ),
-                                 VLC_INPUT_OPTION_TRUSTED );
+                                                   NULL ));
             }
 
             for( ; i_options >= 0; i_options-- )
