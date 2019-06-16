@@ -151,9 +151,6 @@ int OpenIntf (vlc_object_t *p_this)
             [VLCApplication sharedApplication];
             [VLCMain sharedInstance];
 
-            [[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:[[VLCMain sharedInstance] mainMenu] topLevelObjects:nil];
-            [[[VLCMain sharedInstance] libraryWindow] makeKeyAndOrderFront:nil];
-
             msg_Dbg(p_intf, "Finished loading macosx interface");
             return VLC_SUCCESS;
         } @catch (NSException *exception) {
@@ -233,7 +230,7 @@ static VLCMain *sharedInstance = nil;
         _coredialogs = [[VLCCoreDialogProvider alloc] init];
 
         _mainmenu = [[VLCMainMenu alloc] init];
-        _statusBarIcon = [[VLCStatusBarIcon  alloc] init];
+        _statusBarIcon = [[VLCStatusBarIcon alloc] init];
 
         _voutProvider = [[VLCVideoOutputProvider alloc] init];
 
@@ -272,6 +269,8 @@ static VLCMain *sharedInstance = nil;
 {
     _clickerManager = [[VLCClickerManager alloc] init];
 
+    [[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:_mainmenu topLevelObjects:nil];
+
 #ifdef HAVE_SPARKLE
     [[SUUpdater sharedUpdater] setDelegate:self];
 #endif
@@ -280,6 +279,7 @@ static VLCMain *sharedInstance = nil;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     launched = YES;
+    [_libraryWindowController.window makeKeyAndOrderFront:nil];
 
     if (!p_intf)
         return;
