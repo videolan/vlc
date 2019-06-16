@@ -771,6 +771,11 @@ extern const CGFloat VLCVolumeDefault;
 @property (readwrite, nonatomic) BOOL fullscreen;
 
 /**
+ * indicates whether we currently have an active video playback session
+ */
+@property (readwrite) BOOL activeVideoPlayback;
+
+/**
  * helper function to inverse the current fullscreen state
  */
 - (void)toggleFullscreen;

@@ -27,6 +27,7 @@
 #import "extensions/NSView+VLCAdditions.h"
 #import "main/VLCMain.h"
 
+#import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistDataSource.h"
 #import "playlist/VLCPlaylistSortingMenuController.h"
@@ -623,7 +624,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     id currentWindow = [NSApp keyWindow];
     if ([currentWindow respondsToSelector:@selector(hasActiveVideo)] && [currentWindow hasActiveVideo]) {
         if ([currentWindow respondsToSelector:@selector(fullscreen)] && [currentWindow fullscreen] && ![[currentWindow videoView] isHidden]) {
-            if ([[VLCMain sharedInstance] activeVideoPlayback]) {
+            if ([_playlistController.playerController activeVideoPlayback]) {
                 [_fspanel fadeIn];
             }
         }

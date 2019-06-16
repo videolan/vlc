@@ -355,7 +355,7 @@ int WindowOpen(vout_window_t *p_wnd)
     [newVideoWindow setHasActiveVideo: YES];
     [_voutWindows setObject:newVideoWindow forKey:[NSValue valueWithPointer:p_wnd]];
 
-    [mainInstance setActiveVideoPlayback: YES];
+    [_playerController setActiveVideoPlayback: YES];
     [[mainInstance libraryWindow] setNonembedded:!b_mainWindowHasVideo];
 
     // TODO: find a cleaner way for "start in fullscreen"
@@ -418,7 +418,7 @@ int WindowOpen(vout_window_t *p_wnd)
 
     [_voutWindows removeObjectForKey:key];
     if ([_voutWindows count] == 0) {
-        [mainInstance setActiveVideoPlayback:NO];
+        [_playerController setActiveVideoPlayback:NO];
         _statusLevelWindowCounter = 0;
     }
 
@@ -507,7 +507,7 @@ int WindowOpen(vout_window_t *p_wnd)
         assert(o_current_window);
 
         if (b_fullscreen) {
-            if (_playerController.playerState != VLC_PLAYER_STATE_STOPPED && [[VLCMain sharedInstance] activeVideoPlayback]) {
+            if (_playerController.playerState != VLC_PLAYER_STATE_STOPPED && [_playerController activeVideoPlayback]) {
                 // activate app, as method can also be triggered from outside the app (prevents nasty window layout)
                 [NSApp activateIgnoringOtherApps:YES];
                 [o_current_window enterFullscreenWithAnimation:b_animation];

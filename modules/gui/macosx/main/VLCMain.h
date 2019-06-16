@@ -67,7 +67,6 @@ extern NSString *VLCConfigurationChangedNotification;
 
 + (VLCMain *)sharedInstance;
 
-@property (readwrite) BOOL activeVideoPlayback;
 @property (readonly) BOOL isTerminating;
 
 @property (readonly) VLCAudioEffectsWindowController *audioEffectsPanel;

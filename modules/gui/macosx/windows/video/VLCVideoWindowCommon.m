@@ -61,6 +61,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     BOOL b_video_view_was_hidden;
 
     NSRect frameBeforeLionFullscreen;
+    VLCPlayerController *_playerController;
 }
 
 - (void)customZoom:(id)sender;
@@ -86,6 +87,8 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
         o_temp_view = [[NSView alloc] init];
         [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+
+        _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
     }
 
     return self;
@@ -125,7 +128,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 {
     VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
     input_item_t *mediaItem = [playlistController currentlyPlayingInputItem];
-    if (mediaItem == NULL || playlistController.playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
+    if (mediaItem == NULL || _playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
         [self setTitle:_NS("VLC media player")];
         self.representedURL = nil;
         return;
@@ -390,7 +393,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
 - (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)proposedFrameSize
 {
-    if (![[VLCMain sharedInstance] activeVideoPlayback] || self.nativeVideoSize.width == 0. || self.nativeVideoSize.height == 0. || window != self)
+    if (![_playerController activeVideoPlayback] || self.nativeVideoSize.width == 0. || self.nativeVideoSize.height == 0. || window != self)
         return proposedFrameSize;
 
     // needed when entering lion fullscreen mode
@@ -400,7 +403,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     if ([_videoView isHidden])
         return proposedFrameSize;
 
-    if ([[[[VLCMain sharedInstance] playlistController] playerController] aspectRatioIsLocked]) {
+    if ([_playerController aspectRatioIsLocked]) {
         NSRect videoWindowFrame = [self frame];
         NSRect viewRect = [_videoView convertRect:[_videoView bounds] toView: nil];
         NSRect contentRect = [self contentRectForFrameRect:videoWindowFrame];
@@ -504,7 +507,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
-    _windowShouldExitFullscreenWhenFinished = [[VLCMain sharedInstance] activeVideoPlayback];
+    _windowShouldExitFullscreenWhenFinished = [_playerController activeVideoPlayback];
 
     NSInteger i_currLevel = [self level];
     // self.fullscreen and _inFullscreenTransition must not be true yet
@@ -514,13 +517,12 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
     _inFullscreenTransition = YES;
 
-    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
-    playerController.fullscreen = YES;
+    _playerController.fullscreen = YES;
 
     frameBeforeLionFullscreen = [self frame];
 
     if ([self hasActiveVideo]) {
-        vout_thread_t *p_vout = [playerController videoOutputThreadForKeyWindow];
+        vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
         if (p_vout) {
             var_SetBool(p_vout, "fullscreen", true);
             vout_Release(p_vout);
@@ -566,10 +568,9 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     [self setFullscreen: NO];
 
     if ([self hasActiveVideo]) {
-        VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
-        playerController.fullscreen = NO;
+        _playerController.fullscreen = NO;
 
-        vout_thread_t *p_vout = [playerController videoOutputThreadForKeyWindow];
+        vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
         if (p_vout) {
             var_SetBool(p_vout, "fullscreen", false);
             vout_Release(p_vout);

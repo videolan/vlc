@@ -346,7 +346,7 @@ static VLCMain *sharedInstance = nil;
 /* don't be enthusiastic about an update if we currently play a video */
 - (BOOL)updaterMayCheckForUpdates:(SUUpdater *)bundle
 {
-    if ([self activeVideoPlayback])
+    if ([_playlistController.playerController activeVideoPlayback])
         return NO;
 
     return YES;
@@ -406,16 +406,6 @@ static VLCMain *sharedInstance = nil;
         [[self libraryWindow] makeKeyAndOrderFront:self];
 
     return YES;
-}
-
-- (void)setActiveVideoPlayback:(BOOL)b_value
-{
-    assert([NSThread isMainThread]);
-
-    b_active_videoplayback = b_value;
-    if ([self libraryWindow]) {
-//        [[self libraryWindow] toggleVideoPlaybackAppearance];
-    }
 }
 
 #pragma mark -
@@ -521,11 +511,6 @@ static VLCMain *sharedInstance = nil;
         _resume_dialog = [[VLCResumeDialogController alloc] init];
 
     return _resume_dialog;
-}
-
-- (BOOL)activeVideoPlayback
-{
-    return b_active_videoplayback;
 }
 
 @end
