@@ -783,8 +783,8 @@ vlc_player_CondWait
 vlc_player_DisplayPosition
 vlc_player_DecrementRate
 vlc_player_Delete
-vlc_player_GetAudioDelay
 vlc_player_GetCapabilities
+vlc_player_GetCategoryDelay
 vlc_player_GetCategoryLanguage
 vlc_player_GetCurrentMedia
 vlc_player_GetError
@@ -801,7 +801,6 @@ vlc_player_GetSelectedTitleIdx
 vlc_player_GetSignal
 vlc_player_GetState
 vlc_player_GetStatistics
-vlc_player_GetSubtitleDelay
 vlc_player_GetSubtitleTextScale
 vlc_player_GetTeletextPage
 vlc_player_GetTime
@@ -848,13 +847,12 @@ vlc_player_SelectTitleIdx
 vlc_player_SelectTrack
 vlc_player_SetAssociatedSubsFPS
 vlc_player_SetAtoBLoop
-vlc_player_SetAudioDelay
+vlc_player_SetCategoryDelay
 vlc_player_SetCurrentMedia
 vlc_player_SetMediaStoppedAction
 vlc_player_SetRecordingEnabled
 vlc_player_SetRenderer
 vlc_player_SetStartPaused
-vlc_player_SetSubtitleDelay
 vlc_player_SetSubtitleTextScale
 vlc_player_SetTeletextEnabled
 vlc_player_SetTeletextTransparency

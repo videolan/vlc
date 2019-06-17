@@ -579,25 +579,25 @@ static void on_player_teletext_transparency_changed(vlc_player_t *, bool enabled
     });
 }
 
-static void on_player_audio_delay_changed(vlc_player_t *, vlc_tick_t new_delay,
+static void on_player_category_delay_changed(vlc_player_t *,
+                               enum es_format_category_e cat, vlc_tick_t new_delay,
                                void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
-    msg_Dbg( that->p_intf, "on_player_audio_delay_changed");
-    that->callAsync([that,new_delay] (){
-        that->m_audioDelay = new_delay;
-        emit that->q_func()->audioDelayChanged( new_delay );
-    });
-}
-
-static void on_player_subtitle_delay_changed(vlc_player_t *, vlc_tick_t new_delay,
-                                  void *data)
-{
-    PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
-    msg_Dbg( that->p_intf, "on_player_subtitle_delay_changed");
-    that->callAsync([that,new_delay] (){
-        that->m_subtitleDelay = new_delay;
-        emit that->q_func()->subtitleDelayChanged( new_delay );
+    msg_Dbg( that->p_intf, "on_player_category_delay_changed: %d", cat );
+    that->callAsync([that,cat,new_delay] (){
+        switch (cat)
+        {
+            case AUDIO_ES:
+                that->m_audioDelay = new_delay;
+                emit that->q_func()->audioDelayChanged( new_delay );
+                break;
+            case SPU_ES:
+                that->m_subtitleDelay = new_delay;
+                emit that->q_func()->subtitleDelayChanged( new_delay );
+                break;
+            default: vlc_assert_unreachable();
+        }
     });
 }
 
@@ -819,8 +819,7 @@ static const struct vlc_player_cbs player_cbs = {
     on_player_teletext_enabled_changed,
     on_player_teletext_page_changed,
     on_player_teletext_transparency_changed,
-    on_player_audio_delay_changed,
-    on_player_subtitle_delay_changed,
+    on_player_category_delay_changed,
     on_player_associated_subs_fps_changed,
     on_player_renderer_changed,
     on_player_record_changed,

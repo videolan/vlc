@@ -284,21 +284,23 @@ static void cb_player_teletext_transparency_changed(vlc_player_t *p_player, bool
     });
 }
 
-static void cb_player_audio_delay_changed(vlc_player_t *p_player, vlc_tick_t newDelay, void *p_data)
+static void cb_player_category_delay_changed(vlc_player_t *p_player, enum es_format_category_e cat,
+                                             vlc_tick_t newDelay, void *p_data)
 {
     VLC_UNUSED(p_player);
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
-        [playerController audioDelayChanged:newDelay];
-    });
-}
-
-static void cb_player_subtitle_delay_changed(vlc_player_t *p_player, vlc_tick_t newDelay, void *p_data)
-{
-    VLC_UNUSED(p_player);
-    dispatch_async(dispatch_get_main_queue(), ^{
-        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
-        [playerController subtitlesDelayChanged:newDelay];
+        switch (cat)
+        {
+            case AUDIO_ES:
+                [playerController audioDelayChanged:newDelay];
+                break;
+            case SPU_ES:
+                [playerController subtitlesDelayChanged:newDelay];
+                break;
+            default:
+                vlc_assert_unreachable();
+        }
     });
 }
 
@@ -464,8 +466,7 @@ static const struct vlc_player_cbs player_callbacks = {
     cb_player_teletext_enabled_changed,
     cb_player_teletext_page_changed,
     cb_player_teletext_transparency_changed,
-    cb_player_audio_delay_changed,
-    cb_player_subtitle_delay_changed,
+    cb_player_category_delay_changed,
     cb_player_associated_subs_fps_changed,
     cb_player_renderer_changed,
     cb_player_record_changed,

@@ -2053,12 +2053,12 @@ input_thread_Events(input_thread_t *input_thread,
             break;
         case INPUT_EVENT_AUDIO_DELAY:
             input->audio_delay = event->audio_delay;
-            vlc_player_SendEvent(player, on_audio_delay_changed,
+            vlc_player_SendEvent(player, on_category_delay_changed, AUDIO_ES,
                                  input->audio_delay);
             break;
         case INPUT_EVENT_SUBTITLE_DELAY:
             input->subtitle_delay = event->subtitle_delay;
-            vlc_player_SendEvent(player, on_subtitle_delay_changed,
+            vlc_player_SendEvent(player, on_category_delay_changed, SPU_ES,
                                  input->subtitle_delay);
             break;
         case INPUT_EVENT_CACHE:
@@ -2823,62 +2823,61 @@ vlc_player_SetRecordingEnabled(vlc_player_t *player, bool enable)
                                _("Recording") : _("Recording done"));
 }
 
-void
-vlc_player_SetAudioDelay(vlc_player_t *player, vlc_tick_t delay,
-                         enum vlc_player_whence whence)
+int
+vlc_player_SetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat,
+                            vlc_tick_t delay, enum vlc_player_whence whence)
 {
     bool absolute = whence == VLC_PLAYER_WHENCE_ABSOLUTE;
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
-        return;
+        return VLC_EGENERIC;
 
-    input_ControlPush(input->thread, INPUT_CONTROL_SET_AUDIO_DELAY,
-        &(input_control_param_t) {
-            .delay = {
-                .b_absolute = whence == VLC_PLAYER_WHENCE_ABSOLUTE,
-                .i_val = delay,
-            },
-    });
+    switch (cat)
+    {
+        case AUDIO_ES:
+            input_ControlPush(input->thread, INPUT_CONTROL_SET_AUDIO_DELAY,
+                &(input_control_param_t) {
+                    .delay = {
+                        .b_absolute = absolute,
+                        .i_val = delay,
+                    },
+            });
+            break;
+        case SPU_ES:
+            input_ControlPush(input->thread, INPUT_CONTROL_SET_SPU_DELAY,
+                &(input_control_param_t) {
+                    .delay = {
+                        .b_absolute = absolute,
+                        .i_val = delay,
+                    },
+            });
+            break;
+        default:
+            return VLC_EGENERIC;
+    }
 
-    if (!absolute)
-        delay += input->audio_delay;
-    vlc_player_vout_OSDMessage(player, _("Audio delay: %i ms"),
+    vlc_player_vout_OSDMessage(player, _("%s delay: %s%i ms"),
+                               es_format_category_to_string(cat),
+                               absolute ? "" : "+",
                                (int)MS_FROM_VLC_TICK(delay));
+    return VLC_SUCCESS;
 }
 
 vlc_tick_t
-vlc_player_GetAudioDelay(vlc_player_t *player)
+vlc_player_GetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat)
 {
-    struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    return input ? input->audio_delay : 0;
-}
-
-static void
-vlc_player_SetSubtitleDelayInternal(vlc_player_t *player, vlc_tick_t delay,
-                                    enum vlc_player_whence whence)
-{
-    bool absolute = whence == VLC_PLAYER_WHENCE_ABSOLUTE;
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
-        return;
-
-    input_ControlPush(input->thread, INPUT_CONTROL_SET_SPU_DELAY,
-        &(input_control_param_t) {
-            .delay = {
-                .b_absolute = absolute,
-                .i_val = delay,
-            },
-    });
-}
-
-void
-vlc_player_SetSubtitleDelay(vlc_player_t *player, vlc_tick_t delay,
-                            enum vlc_player_whence whence)
-{
-    vlc_player_SetSubtitleDelayInternal(player, delay, whence);
-    vlc_player_vout_OSDMessage(player, _("Subtitle delay: %s%i ms"),
-                               whence == VLC_PLAYER_WHENCE_ABSOLUTE ? "" : "+",
-                               (int)MS_FROM_VLC_TICK(delay));
+        return 0;
+    switch (cat)
+    {
+        case AUDIO_ES:
+            return input->audio_delay;
+        case SPU_ES:
+            return input->subtitle_delay;
+        default:
+            return 0;
+    }
 }
 
 static struct {
@@ -2929,13 +2928,6 @@ unsigned
 vlc_player_GetSubtitleTextScale(vlc_player_t *player)
 {
     return var_GetInteger(player, "sub-text-scale");
-}
-
-vlc_tick_t
-vlc_player_GetSubtitleDelay(vlc_player_t *player)
-{
-    struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    return input ? input->subtitle_delay : 0;
 }
 
 int

@@ -281,8 +281,7 @@ enum vlc_player_seek_speed
  *
  * @see vlc_player_SeekByPos()
  * @see vlc_player_SeekByTime()
- * @see vlc_player_SetAudioDelay()
- * @see vlc_player_SetSubtitleDelay()
+ * @see vlc_player_SetCategoryDelay()
  */
 enum vlc_player_whence
 {
@@ -671,28 +670,17 @@ struct vlc_player_cbs
         bool enabled, void *data);
 
     /**
-     * Called when the player audio delay has changed
+     * Called when the player category delay has changed
      *
-     * @see vlc_player_SetAudioDelay()
+     * @see vlc_player_SetCategoryDelay()
      *
      * @param player locked player instance
+     * @param cat AUDIO_ES or SPU_ES
      * @param new_delay audio delay
      * @param data opaque pointer set by vlc_player_AddListener()
      */
-    void (*on_audio_delay_changed)(vlc_player_t *player,
-        vlc_tick_t new_delay, void *data);
-
-    /**
-     * Called when the player subtitle delay has changed
-     *
-     * @see vlc_player_SetSubtitleDelay()
-     *
-     * @param player locked player instance
-     * @param new_delay subtitle delay
-     * @param data opaque pointer set by vlc_player_AddListener()
-     */
-    void (*on_subtitle_delay_changed)(vlc_player_t *player,
-        vlc_tick_t new_delay, void *data);
+    void (*on_category_delay_changed)(vlc_player_t *player,
+         enum es_format_category_e cat, vlc_tick_t new_delay, void *data);
 
     /**
      * Called when associated subtitle has changed
@@ -2404,52 +2392,71 @@ vlc_player_ToggleRecording(vlc_player_t *player)
 }
 
 /**
- * Get the audio delay for the current media
+ * Get the delay of a category
  *
- * @see vlc_player_cbs.on_audio_delay_changed
+ * @see vlc_player_cbs.on_category_delay_changed
  *
  * @param player locked player instance
+ * @param cat AUDIO_ES or SPU_ES (VIDEO_ES not supported yet)
+ * @return a valid delay or 0
  */
 VLC_API vlc_tick_t
-vlc_player_GetAudioDelay(vlc_player_t *player);
+vlc_player_GetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat);
 
 /**
- * Set the audio delay for the current media
+ * Set the delay of one category for the current media
  *
  * @note A successful call will trigger the
- * vlc_player_cbs.on_audio_delay_changed event.
+ * vlc_player_cbs.on_category_delay_changed event.
  *
  * @param player locked player instance
+ * @param cat AUDIO_ES or SPU_ES (VIDEO_ES not supported yet)
  * @param delay a valid time
  * @param whence absolute or relative
+ * @return VLC_SUCCESS or VLC_EGENERIC if the category is not handled
  */
-VLC_API void
+VLC_API int
+vlc_player_SetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat,
+                            vlc_tick_t delay, enum vlc_player_whence whence);
+
+/**
+ * Helper to get the audio delay
+ */
+static inline vlc_tick_t
+vlc_player_GetAudioDelay(vlc_player_t *player)
+{
+    return vlc_player_GetCategoryDelay(player, AUDIO_ES);
+}
+
+/**
+ * Helper to set the audio delay
+ */
+static inline void
 vlc_player_SetAudioDelay(vlc_player_t *player, vlc_tick_t delay,
-                         enum vlc_player_whence whence);
+                         enum vlc_player_whence whence)
+
+{
+    vlc_player_SetCategoryDelay(player, AUDIO_ES, delay, whence);
+}
 
 /**
- * Get the subtitle delay for the current media
- *
- * @see vlc_player_cbs.on_subtitle_delay_changed
- *
- * @param player locked player instance
+ * Helper to get the subtitle delay
  */
-VLC_API vlc_tick_t
-vlc_player_GetSubtitleDelay(vlc_player_t *player);
+static inline vlc_tick_t
+vlc_player_GetSubtitleDelay(vlc_player_t *player)
+{
+    return vlc_player_GetCategoryDelay(player, SPU_ES);
+}
 
 /**
- * Set the subtitle delay for the current media
- *
- * @note A successful call will trigger the
- * vlc_player_cbs.on_subtitle_delay_changed event.
- *
- * @param player locked player instance
- * @param delay a valid time
- * @param whence absolute or relative
+ * Helper to set the subtitle delay
  */
-VLC_API void
+static inline void
 vlc_player_SetSubtitleDelay(vlc_player_t *player, vlc_tick_t delay,
-                            enum vlc_player_whence whence);
+                            enum vlc_player_whence whence)
+{
+    vlc_player_SetCategoryDelay(player, SPU_ES, delay, whence);
+}
 
 /**
  * Set the subtitle text scaling factor

@@ -104,8 +104,7 @@ struct report_media_subitems
     X(vlc_player_title_list *, on_titles_changed) \
     X(size_t, on_title_selection_changed) \
     X(struct report_chapter_selection, on_chapter_selection_changed) \
-    X(vlc_tick_t, on_audio_delay_changed) \
-    X(vlc_tick_t, on_subtitle_delay_changed) \
+    X(vlc_tick_t, on_category_delay_changed) \
     X(bool, on_recording_changed) \
     X(struct report_signal, on_signal_changed) \
     X(struct input_stats_t, on_statistics_changed) \
@@ -389,19 +388,11 @@ player_on_chapter_selection_changed(vlc_player_t *player,
 }
 
 static void
-player_on_audio_delay_changed(vlc_player_t *player, vlc_tick_t new_delay,
+player_on_category_delay_changed(vlc_player_t *player, vlc_tick_t new_delay,
                               void *data)
 {
     struct ctx *ctx = get_ctx(player, data);
-    VEC_PUSH(on_audio_delay_changed, new_delay);
-}
-
-static void
-player_on_subtitle_delay_changed(vlc_player_t *player, vlc_tick_t new_delay,
-                                 void *data)
-{
-    struct ctx *ctx = get_ctx(player, data);
-    VEC_PUSH(on_subtitle_delay_changed, new_delay);
+    VEC_PUSH(on_category_delay_changed, new_delay);
 }
 
 static void
