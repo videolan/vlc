@@ -3734,7 +3734,7 @@ static void EsOutDeleteInfoEs( es_out_t *out, es_out_id_t *es )
     }
 }
 
-static inline es_out_id_t *vlc_es_id_get_out(vlc_es_id_t *id)
+es_out_id_t *vlc_es_id_get_out(vlc_es_id_t *id)
 {
     return container_of(id, es_out_id_t, id);
 }
