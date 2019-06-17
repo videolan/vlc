@@ -50,6 +50,40 @@ static auto const strdup_helper = []( std::string const& src, char*& dst )
     return true;
 };
 
+static_assert( static_cast<uint32_t>( VLC_ML_THUMBNAIL_SMALL ) ==
+                static_cast<uint32_t>( medialibrary::ThumbnailSizeType::Thumbnail ) &&
+               static_cast<uint32_t>( VLC_ML_THUMBNAIL_BANNER ) ==
+                static_cast<uint32_t>( medialibrary::ThumbnailSizeType::Banner ) &&
+               static_cast<uint32_t>( VLC_ML_THUMBNAIL_SIZE_COUNT ) ==
+                static_cast<uint32_t>( medialibrary::ThumbnailSizeType::Count ),
+               "Mismatched thumbnail sizes" );
+
+template <typename T>
+static bool convertThumbnails( const T input, vlc_ml_thumbnail_t *output )
+{
+    for ( auto i = 0u; i < VLC_ML_THUMBNAIL_SIZE_COUNT; ++i )
+    {
+        auto sizeType = static_cast<medialibrary::ThumbnailSizeType>( i );
+        if ( input->isThumbnailGenerated( sizeType ) == false )
+        {
+            output[i].psz_mrl = nullptr;
+            output[i].b_generated = false;
+            continue;
+        }
+        output[i].b_generated = true;
+        const auto thumbnailMrl = input->thumbnailMrl( sizeType );
+        if ( thumbnailMrl.empty() == false )
+        {
+            output[i].psz_mrl = strdup( thumbnailMrl.c_str() );
+            if ( output[i].psz_mrl == nullptr )
+                return false;
+        }
+        else
+            output[i].psz_mrl = nullptr;
+    }
+    return true;
+}
+
 bool Convert( const medialibrary::IAlbumTrack* input, vlc_ml_album_track_t& output )
 {
     output.i_artist_id = input->artistId();
@@ -218,24 +252,8 @@ bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output )
     if ( convertTracks( input, output ) == false )
         return false;
 
-    if ( input->isThumbnailGenerated() == true )
-    {
-        output.b_artwork_generated = true;
-        const auto& thumbnail = input->thumbnail();
-        if ( thumbnail.empty() == true )
-            output.psz_artwork_mrl = nullptr;
-        else
-        {
-            output.psz_artwork_mrl = strdup( thumbnail.c_str() );
-            if ( unlikely( output.psz_artwork_mrl == nullptr ) )
-                return false;
-        }
-    }
-    else
-    {
-        output.psz_artwork_mrl = nullptr;
-        output.b_artwork_generated = false;
-    }
+    if ( convertThumbnails( input, output.thumbnails ) == false )
+        return false;
 
     return true;
 }
@@ -288,8 +306,10 @@ bool Convert( const medialibrary::IAlbum* input, vlc_ml_album_t& output )
     output.i_year = input->releaseYear();
 
     if( !strdup_helper( input->title(), output.psz_title ) ||
-        !strdup_helper( input->shortSummary(), output.psz_summary ) ||
-        !strdup_helper( input->thumbnailMrl(), output.psz_artwork_mrl ) )
+        !strdup_helper( input->shortSummary(), output.psz_summary ) )
+        return false;
+
+    if ( convertThumbnails( input, output.thumbnails ) == false )
         return false;
 
     auto artist = input->albumArtist();
@@ -337,10 +357,10 @@ bool Convert( const medialibrary::IArtist* input, vlc_ml_artist_t& output )
         return false;
 
     if( !strdup_helper( input->shortBio(), output.psz_shortbio ) ||
-        !strdup_helper( input->thumbnailMrl(), output.psz_artwork_mrl ) ||
         !strdup_helper( input->musicBrainzId(), output.psz_mb_id ) )
         return false;
-    return true;
+
+    return convertThumbnails( input, output.thumbnails );
 }
 
 bool Convert( const medialibrary::IGenre* input, vlc_ml_genre_t& output )
@@ -423,9 +443,9 @@ input_item_t* MediaToInputItem( const medialibrary::IMedia* media )
                                    VLC_TICK_FROM_MS( media->duration() ),
                                    ITEM_TYPE_FILE, ITEM_NET_UNKNOWN ),
                 &input_item_Release );
-    if ( media->isThumbnailGenerated() == true )
+    if ( media->isThumbnailGenerated( medialibrary::ThumbnailSizeType::Thumbnail ) == true )
     {
-        auto thumbnail = media->thumbnail();
+        auto thumbnail = media->thumbnailMrl( medialibrary::ThumbnailSizeType::Thumbnail );
         if ( thumbnail.length() > 0 )
             input_item_SetArtworkURL( inputItem.get(), thumbnail.c_str() );
     }

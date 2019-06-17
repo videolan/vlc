@@ -68,6 +68,24 @@ typedef enum vlc_ml_track_type_t
     VLC_ML_TRACK_TYPE_AUDIO,
 } vlc_ml_track_type_t;
 
+typedef enum vlc_ml_thumbnail_size_t
+{
+    VLC_ML_THUMBNAIL_SMALL,
+    VLC_ML_THUMBNAIL_BANNER,
+
+    VLC_ML_THUMBNAIL_SIZE_COUNT
+} vlc_ml_thumbnail_size_t;
+
+typedef struct vlc_ml_thumbnail_t
+{
+    char* psz_mrl;
+    /**
+     * True if a thumbnail is available, or if thumbnail generation was
+     * attempted but failed
+     */
+    bool b_generated;
+} vlc_ml_thumbnail_t;
+
 typedef struct vlc_ml_movie_t
 {
     char* psz_summary;
@@ -182,10 +200,8 @@ typedef struct vlc_ml_media_t
     time_t i_last_played_date;
     char* psz_title;
 
-    char* psz_artwork_mrl;
-    /* True if a thumbnail is available, or if thumbnail generation was
-     * attempted but failed */
-    bool b_artwork_generated;
+    vlc_ml_thumbnail_t thumbnails[VLC_ML_THUMBNAIL_SIZE_COUNT];
+
     bool b_is_favorite;
 
     union
@@ -209,7 +225,7 @@ typedef struct vlc_ml_artist_t
     int64_t i_id;
     char* psz_name;
     char* psz_shortbio;
-    char* psz_artwork_mrl;
+    vlc_ml_thumbnail_t thumbnails[VLC_ML_THUMBNAIL_SIZE_COUNT];
     char* psz_mb_id;
 
     unsigned int i_nb_album;
@@ -226,7 +242,7 @@ typedef struct vlc_ml_album_t {
     int64_t i_id;
     char* psz_title;
     char* psz_summary;
-    char* psz_artwork_mrl;
+    vlc_ml_thumbnail_t thumbnails[VLC_ML_THUMBNAIL_SIZE_COUNT];
     char* psz_artist;
     int64_t i_artist_id;
 
@@ -439,8 +455,8 @@ enum vlc_ml_control
     VLC_ML_MEDIA_INCREASE_PLAY_COUNT,       /**< arg1: media id; can fail */
     VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_PREF,   /**< arg1: media id; arg2: vlc_ml_playback_pref; arg3: char**; */
     VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_PREF,   /**< arg1: media id; arg2: vlc_ml_playback_pref; arg3: const char*; */
-    VLC_ML_MEDIA_SET_THUMBNAIL,             /**< arg1: media id; arg2: const char*; */
-    VLC_ML_MEDIA_GENERATE_THUMBNAIL,        /**< arg1: media id; */
+    VLC_ML_MEDIA_SET_THUMBNAIL,             /**< arg1: media id; arg2: const char*; arg3: vlc_ml_thumbnail_size_t */
+    VLC_ML_MEDIA_GENERATE_THUMBNAIL,        /**< arg1: media id; arg2: vlc_ml_thumbnail_size_t; arg3: width; arg4: height; arg5: position */
     VLC_ML_MEDIA_ADD_EXTERNAL_MRL,          /**< arg1: media id; arg2: const char*; arg3: type(vlc_ml_file_type_t) */
 };
 
@@ -543,6 +559,16 @@ enum vlc_ml_event_type
      */
     VLC_ML_EVENT_RELOAD_COMPLETED,
     /**
+     * Sent when a new entry point gets added to the database.
+     * The entry point that was added is stored in
+     * vlc::ml_event_t::entry_point_added::psz_entry_point, and the success or failure
+     * state is stored in vlc_ml_event_t::entry_point_added::b_success
+     * If successful, this event won't be emited again for this entry point.
+     * In case of failure, this event will be fired again if the same entry point
+     * is queued for discovery again.
+     */
+    VLC_ML_EVENT_ENTRY_POINT_ADDED,
+    /**
      * Sent when an entry point removal request has been processed.
      * The removed entry point is stored in
      * vlc_ml_event_t::entry_point_removed::psz_entry_point and the success or failure
@@ -618,6 +644,11 @@ typedef struct vlc_ml_event_t
         {
             const char* psz_entry_point;
             bool b_success;
+        } entry_point_added;
+        struct
+        {
+            const char* psz_entry_point;
+            bool b_success;
         } entry_point_removed;
         struct
         {
@@ -652,6 +683,7 @@ typedef struct vlc_ml_event_t
         struct
         {
             const vlc_ml_media_t* p_media;
+            vlc_ml_thumbnail_size_t i_size;
             bool b_success;
         } media_thumbnail_generated;
     };
@@ -848,14 +880,20 @@ static inline int vlc_ml_media_set_playback_pref( vlc_medialibrary_t* p_ml, int6
     return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_PREF, i_media_id, i_pref, psz_value );
 }
 
-static inline int vlc_ml_media_set_thumbnail( vlc_medialibrary_t* p_ml, int64_t i_media_id, const char* psz_mrl )
+static inline int vlc_ml_media_set_thumbnail( vlc_medialibrary_t* p_ml, int64_t i_media_id,
+                                              const char* psz_mrl, vlc_ml_thumbnail_size_t sizeType )
 {
-    return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_THUMBNAIL, i_media_id, psz_mrl );
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_THUMBNAIL, i_media_id, psz_mrl, sizeType );
 }
 
-static inline int vlc_ml_media_generate_thumbnail( vlc_medialibrary_t* p_ml, int64_t i_media_id )
+static inline int vlc_ml_media_generate_thumbnail( vlc_medialibrary_t* p_ml, int64_t i_media_id,
+                                                   vlc_ml_thumbnail_size_t size_type,
+                                                   uint32_t i_desired_width,
+                                                   uint32_t i_desired_height,
+                                                   float position )
 {
-    return vlc_ml_control( p_ml, VLC_ML_MEDIA_GENERATE_THUMBNAIL, i_media_id );
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_GENERATE_THUMBNAIL, i_media_id,
+                           size_type, i_desired_width, i_desired_height, position );
 }
 
 static inline int vlc_ml_media_add_external_mrl( vlc_medialibrary_t* p_ml, int64_t i_media_id,

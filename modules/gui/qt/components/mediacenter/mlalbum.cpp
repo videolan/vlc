@@ -25,7 +25,7 @@ MLAlbum::MLAlbum(vlc_medialibrary_t* _ml, const vlc_ml_album_t *_data, QObject *
     , m_title       ( QString::fromUtf8( _data->psz_title ) )
     , m_releaseYear ( _data->i_year )
     , m_shortSummary( QString::fromUtf8( _data->psz_summary ) )
-    , m_cover       ( QString::fromUtf8( _data->psz_artwork_mrl ) )
+    , m_cover       ( QString::fromUtf8( _data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
     , m_mainArtist  ( QString::fromUtf8( _data->psz_artist ) )
     , m_nbTracks    ( _data->i_nb_tracks )
 {

@@ -63,6 +63,10 @@ private:
     {
         msg_Dbg( m_obj, "%s", msg.c_str() );
     }
+    virtual void Verbose( const std::string& msg ) override
+    {
+        msg_Dbg( m_obj, "%s", msg.c_str() );
+    }
 
 private:
     vlc_object_t* m_obj;
@@ -227,6 +231,15 @@ void MediaLibrary::onReloadCompleted( const std::string& entryPoint, bool succes
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
+void MediaLibrary::onEntryPointAdded( const std::string& entryPoint, bool success )
+{
+    vlc_ml_event_t ev;
+    ev.i_type = VLC_ML_EVENT_ENTRY_POINT_ADDED;
+    ev.entry_point_added.psz_entry_point = entryPoint.c_str();
+    ev.entry_point_added.b_success = success;
+    m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
+}
+
 void MediaLibrary::onEntryPointRemoved( const std::string& entryPoint, bool success )
 {
     vlc_ml_event_t ev;
@@ -270,11 +283,14 @@ void MediaLibrary::onBackgroundTasksIdleChanged( bool idle )
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
-void MediaLibrary::onMediaThumbnailReady( medialibrary::MediaPtr media, bool success )
+void MediaLibrary::onMediaThumbnailReady( medialibrary::MediaPtr media,
+                                          medialibrary::ThumbnailSizeType sizeType,
+                                          bool success )
 {
     vlc_ml_event_t ev;
     ev.i_type = VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED;
     ev.media_thumbnail_generated.b_success = success;
+    ev.media_thumbnail_generated.i_size = static_cast<vlc_ml_thumbnail_size_t>( sizeType );
     auto mPtr = vlc::wrap_cptr<vlc_ml_media_t>(
                 static_cast<vlc_ml_media_t*>( malloc( sizeof( vlc_ml_media_t ) ) ),
                 vlc_ml_media_release );
@@ -327,8 +343,7 @@ bool MediaLibrary::Start()
     ml->addParserService( std::make_shared<MetadataExtractor>( VLC_OBJECT( m_vlc_ml ) ) );
     try
     {
-        ml->addThumbnailer( std::make_shared<Thumbnailer>(
-                                m_vlc_ml, std::move( thumbnailsDir ) ) );
+        ml->addThumbnailer( std::make_shared<Thumbnailer>( m_vlc_ml ) );
     }
     catch ( const std::runtime_error& ex )
     {
@@ -966,12 +981,18 @@ int MediaLibrary::controlMedia( int query, va_list args )
         case VLC_ML_MEDIA_SET_THUMBNAIL:
         {
             auto mrl = va_arg( args, const char* );
-            m->setThumbnail( mrl );
+            auto sizeType = va_arg( args, int );
+            m->setThumbnail( mrl, static_cast<medialibrary::ThumbnailSizeType>( sizeType ) );
             return VLC_SUCCESS;
         }
         case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
         {
-            auto res = m_ml->requestThumbnail( m );
+            auto sizeType = va_arg( args, int );
+            auto width = va_arg( args, uint32_t );
+            auto height = va_arg( args, uint32_t );
+            auto position = va_arg( args, double );
+            auto res = m->requestThumbnail( static_cast<medialibrary::ThumbnailSizeType>( sizeType ),
+                                            width, height, position );
             return res == true ? VLC_SUCCESS : VLC_EGENERIC;
         }
         case VLC_ML_MEDIA_ADD_EXTERNAL_MRL:

@@ -24,7 +24,7 @@ MLArtist::MLArtist(const vlc_ml_artist_t* _data, QObject *_parent)
     , m_id      ( _data->i_id, VLC_ML_PARENT_ARTIST )
     , m_name    ( QString::fromUtf8( _data->psz_name ) )
     , m_shortBio( QString::fromUtf8( _data->psz_shortbio ) )
-    , m_cover   ( QString::fromUtf8( _data->psz_artwork_mrl ) )
+    , m_cover   ( QString::fromUtf8( _data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
     , m_nbAlbums( _data->i_nb_album )
 {
     assert( _data );

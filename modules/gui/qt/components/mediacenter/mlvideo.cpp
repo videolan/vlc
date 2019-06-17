@@ -27,9 +27,9 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
     , m_ml( ml )
     , m_id( data->i_id, VLC_ML_PARENT_UNKNOWN )
     , m_title( QString::fromUtf8( data->psz_title ) )
-    , m_thumbnail( QString::fromUtf8( data->psz_artwork_mrl ) )
+    , m_thumbnail( QString::fromUtf8( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
     , m_playCount( data->i_playcount )
-    , m_thumbnailGenerated( data->b_artwork_generated )
+    , m_thumbnailGenerated( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].b_generated )
     , m_ml_event_handle( nullptr, [this](vlc_ml_event_callback_t* cb ) {
         assert( m_ml != nullptr );
         vlc_ml_event_unregister_callback( m_ml, cb );
@@ -88,14 +88,16 @@ void MLVideo::onMlEvent( void* data, const vlc_ml_event_t* event )
 
 void MLVideo::onMlEvent( const vlc_ml_event_t* event )
 {
-    if ( event->i_type != VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED )
+    if ( event->i_type != VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED ||
+         event->media_thumbnail_generated.i_size != VLC_ML_THUMBNAIL_SMALL )
         return;
     m_thumbnailGenerated = true;
     if ( event->media_thumbnail_generated.p_media->i_id != m_id.id )
         return;
     if ( event->media_thumbnail_generated.b_success == false )
         return;
-    auto thumbnailMrl = event->media_thumbnail_generated.p_media->psz_artwork_mrl;
+    auto thumbnailMrl = event->media_thumbnail_generated
+            .p_media->thumbnails[event->media_thumbnail_generated.i_size].psz_mrl;
     m_thumbnail = QString::fromUtf8( thumbnailMrl );
     vlc_ml_event_unregister_from_callback( m_ml, m_ml_event_handle.release() );
     emit onThumbnailChanged( m_thumbnail );
@@ -116,7 +118,8 @@ QString MLVideo::getThumbnail()
     if ( m_thumbnailGenerated == false )
     {
         m_ml_event_handle.reset( vlc_ml_event_register_callback( m_ml, onMlEvent, this ) );
-        vlc_ml_media_generate_thumbnail( m_ml, m_id.id );
+        vlc_ml_media_generate_thumbnail( m_ml, m_id.id, VLC_ML_THUMBNAIL_SMALL,
+                                         512, 320, .15 );
     }
 
     return m_thumbnail;

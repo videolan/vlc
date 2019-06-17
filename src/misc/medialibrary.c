@@ -134,6 +134,12 @@ vlc_medialibrary_t* vlc_ml_instance_get( vlc_object_t* p_obj )
     return p_priv->p_media_library;
 }
 
+static void vlc_ml_thumbnails_release( vlc_ml_thumbnail_t *p_thumbnails )
+{
+    for ( int i = 0; i < VLC_ML_THUMBNAIL_SIZE_COUNT; ++i )
+        free( p_thumbnails[i].psz_mrl );
+}
+
 static void vlc_ml_show_release_inner( vlc_ml_show_t* p_show )
 {
     free( p_show->psz_artwork_mrl );
@@ -169,7 +175,7 @@ static void vlc_ml_media_release_inner( vlc_ml_media_t* p_media )
     vlc_ml_file_list_release( p_media->p_files );
     vlc_ml_media_release_tracks_inner( p_media->p_tracks );
     free( p_media->psz_title );
-    free( p_media->psz_artwork_mrl );
+    vlc_ml_thumbnails_release( p_media->thumbnails );
     switch( p_media->i_subtype )
     {
         case VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK:
@@ -189,7 +195,7 @@ static void vlc_ml_media_release_inner( vlc_ml_media_t* p_media )
 
 static void vlc_ml_artist_release_inner( vlc_ml_artist_t* p_artist )
 {
-    free( p_artist->psz_artwork_mrl );
+    vlc_ml_thumbnails_release( p_artist->thumbnails );
     free( p_artist->psz_name );
     free( p_artist->psz_shortbio );
     free( p_artist->psz_mb_id );
@@ -205,8 +211,8 @@ void vlc_ml_artist_release( vlc_ml_artist_t* p_artist )
 
 static void vlc_ml_album_release_inner( vlc_ml_album_t* p_album )
 {
+    vlc_ml_thumbnails_release( p_album->thumbnails );
     free( p_album->psz_artist );
-    free( p_album->psz_artwork_mrl );
     free( p_album->psz_summary );
     free( p_album->psz_title );
 }

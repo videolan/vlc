@@ -30,9 +30,8 @@
 #include <vlc_url.h>
 #include <vlc_cxx_helpers.hpp>
 
-Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml, std::string thumbnailsDir )
+Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
     : m_ml( ml )
-    , m_thumbnailDir( std::move( thumbnailsDir ) )
     , m_thumbnailer( nullptr, &vlc_thumbnailer_Release )
 {
     m_thumbnailer.reset( vlc_thumbnailer_Create( VLC_OBJECT( ml ) ) );
@@ -40,71 +39,68 @@ Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml, std::string thumbnailsD
         throw std::runtime_error( "Failed to instantiate a vlc_thumbnailer_t" );
 }
 
-struct ThumbnailerCtx
-{
-    ~ThumbnailerCtx()
-    {
-        if ( item != nullptr )
-            input_item_Release( item );
-        if ( thumbnail != nullptr )
-            picture_Release( thumbnail );
-    }
-    vlc::threads::condition_variable cond;
-    vlc::threads::mutex mutex;
-    input_item_t* item;
-    bool done;
-    picture_t* thumbnail;
-};
-
-static void onThumbnailComplete( void* data, picture_t* thumbnail )
+void Thumbnailer::onThumbnailComplete( void* data, picture_t* thumbnail )
 {
     ThumbnailerCtx* ctx = static_cast<ThumbnailerCtx*>( data );
 
     {
-        vlc::threads::mutex_locker lock( ctx->mutex );
+        vlc::threads::mutex_locker lock( ctx->thumbnailer->m_mutex );
         ctx->done = true;
         ctx->thumbnail = thumbnail ? picture_Hold( thumbnail ) : nullptr;
+        ctx->thumbnailer->m_currentContext = nullptr;
     }
-    ctx->cond.signal();
+    ctx->thumbnailer->m_cond.signal();
 }
 
-bool Thumbnailer::generate( medialibrary::MediaPtr media, const std::string& mrl )
+bool Thumbnailer::generate( const std::string& mrl, uint32_t desiredWidth,
+                            uint32_t desiredHeight, float position,
+                            const std::string& dest )
 {
     ThumbnailerCtx ctx{};
-    ctx.item = input_item_New( mrl.c_str(), media->title().c_str() );
-    if ( unlikely( ctx.item == nullptr ) )
+    auto item = vlc::wrap_cptr( input_item_New( mrl.c_str(), nullptr ),
+                                &input_item_Release );
+    if ( unlikely( item == nullptr ) )
         return false;
 
-    input_item_AddOption( ctx.item, "no-hwdec", VLC_INPUT_OPTION_TRUSTED );
+    input_item_AddOption( item.get(), "no-hwdec", VLC_INPUT_OPTION_TRUSTED );
     ctx.done = false;
+    ctx.thumbnailer = this;
     {
-        vlc::threads::mutex_locker lock( ctx.mutex );
-        vlc_thumbnailer_RequestByPos( m_thumbnailer.get(), .3f,
-                                      VLC_THUMBNAILER_SEEK_FAST, ctx.item,
+        vlc::threads::mutex_locker lock( m_mutex );
+        m_currentContext = &ctx;
+        ctx.request = vlc_thumbnailer_RequestByPos( m_thumbnailer.get(), position,
+                                      VLC_THUMBNAILER_SEEK_FAST, item.get(),
                                       VLC_TICK_FROM_SEC( 3 ),
                                       &onThumbnailComplete, &ctx );
 
         while ( ctx.done == false )
-            ctx.cond.wait( ctx.mutex );
+            m_cond.wait( m_mutex );
+        m_currentContext = nullptr;
     }
     if ( ctx.thumbnail == nullptr )
         return false;
 
     block_t* block;
     if ( picture_Export( VLC_OBJECT( m_ml ), &block, nullptr, ctx.thumbnail,
-                         VLC_CODEC_JPEG, 512, 320, true ) != VLC_SUCCESS )
+                         VLC_CODEC_JPEG, desiredWidth, desiredHeight, true ) != VLC_SUCCESS )
         return false;
     auto blockPtr = vlc::wrap_cptr( block, &block_Release );
 
-    std::string outputPath = m_thumbnailDir + std::to_string( media->id() ) + ".jpg";
-    auto f = vlc::wrap_cptr( vlc_fopen( outputPath.c_str(), "wb" ), &fclose );
+    auto f = vlc::wrap_cptr( vlc_fopen( dest.c_str(), "wb" ), &fclose );
     if ( f == nullptr )
         return false;
     if ( fwrite( block->p_buffer, block->i_buffer, 1, f.get() ) != 1 )
         return false;
-    auto thumbnailMrl = vlc::wrap_cptr( vlc_path2uri( outputPath.c_str(), nullptr ) );
-    if ( thumbnailMrl == nullptr )
-        return false;
+    return true;
+}
 
-    return media->setThumbnail( thumbnailMrl.get() );
+void Thumbnailer::stop()
+{
+    vlc::threads::mutex_locker lock{ m_mutex };
+    if ( m_currentContext != nullptr )
+    {
+        vlc_thumbnailer_Cancel( m_thumbnailer.get(), m_currentContext->request );
+        m_currentContext->done = true;
+        m_cond.signal();
+    }
 }

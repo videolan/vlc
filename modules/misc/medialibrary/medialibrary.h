@@ -40,6 +40,7 @@
 struct vlc_event_t;
 struct vlc_object_t;
 struct vlc_thumbnailer_t;
+struct vlc_thumbnailer_request_t;
 
 class Logger;
 
@@ -58,8 +59,6 @@ private:
         {
         }
 
-        vlc::threads::condition_variable m_cond;
-        vlc::threads::mutex m_mutex;
         bool needsProbing;
         bool success;
         MetadataExtractor* mde;
@@ -79,11 +78,11 @@ public:
 private:
     virtual medialibrary::parser::Status run( medialibrary::parser::IItem& item ) override;
     virtual const char*name() const override;
-    virtual uint8_t nbThreads() const override;
     virtual medialibrary::parser::Step targetedStep() const override;
     virtual bool initialize( medialibrary::IMediaLibrary* ml ) override;
     virtual void onFlushing() override;
     virtual void onRestarted() override;
+    virtual void stop() override;
 
     void onParserEnded( ParseContext& ctx, int status );
     void addSubtree( ParseContext& ctx, input_item_node_t *root );
@@ -94,18 +93,41 @@ private:
                                       void *user_data );
 
 private:
+    vlc::threads::condition_variable m_cond;
+    vlc::threads::mutex m_mutex;
+    ParseContext* m_currentCtx;
     vlc_object_t* m_obj;
 };
 
 class Thumbnailer : public medialibrary::IThumbnailer
 {
+    struct ThumbnailerCtx
+    {
+        ~ThumbnailerCtx()
+        {
+            if ( thumbnail != nullptr )
+                picture_Release( thumbnail );
+        }
+        Thumbnailer* thumbnailer;
+        bool done;
+        picture_t* thumbnail;
+        vlc_thumbnailer_request_t* request;
+    };
 public:
-    Thumbnailer( vlc_medialibrary_module_t* ml, std::string thumbnailsDir);
-    virtual bool generate( medialibrary::MediaPtr media, const std::string& mrl ) override;
+    Thumbnailer(vlc_medialibrary_module_t* ml);
+    virtual bool generate( const std::string& mrl, uint32_t desiredWidth,
+                           uint32_t desiredHeight, float position,
+                           const std::string& dest ) override;
+    virtual void stop() override;
+
+private:
+    static void onThumbnailComplete( void* data, picture_t* thumbnail );
 
 private:
     vlc_medialibrary_module_t* m_ml;
-    std::string m_thumbnailDir;
+    vlc::threads::mutex m_mutex;
+    vlc::threads::condition_variable m_cond;
+    ThumbnailerCtx* m_currentContext;
     std::unique_ptr<vlc_thumbnailer_t, void(*)(vlc_thumbnailer_t*)> m_thumbnailer;
 };
 
@@ -162,12 +184,15 @@ public:
     virtual void onDiscoveryCompleted(const std::string& entryPoint, bool success) override;
     virtual void onReloadStarted(const std::string& entryPoint) override;
     virtual void onReloadCompleted(const std::string& entryPoint, bool success) override;
+    virtual void onEntryPointAdded(const std::string& entryPoint, bool success) override;
     virtual void onEntryPointRemoved(const std::string& entryPoint, bool success) override;
     virtual void onEntryPointBanned(const std::string& entryPoint, bool success) override;
     virtual void onEntryPointUnbanned(const std::string& entryPoint, bool success) override;
     virtual void onParsingStatsUpdated(uint32_t percent) override;
     virtual void onBackgroundTasksIdleChanged(bool isIdle) override;
-    virtual void onMediaThumbnailReady(medialibrary::MediaPtr media, bool success) override;
+    virtual void onMediaThumbnailReady(medialibrary::MediaPtr media,
+                                       medialibrary::ThumbnailSizeType sizeType,
+                                       bool success) override;
 };
 
 bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output );
