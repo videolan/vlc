@@ -467,6 +467,13 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/toolbar/atob.svg \
 	gui/qt/pixmaps/toolbar/atob_noa.svg \
 	gui/qt/pixmaps/toolbar/atob_nob.svg \
+	gui/qt/pixmaps/toolbar/atob_bg_a.svg \
+	gui/qt/pixmaps/toolbar/atob_bg_ab.svg \
+	gui/qt/pixmaps/toolbar/atob_bg_b.svg \
+	gui/qt/pixmaps/toolbar/atob_bg_none.svg \
+	gui/qt/pixmaps/toolbar/atob_fg_a.svg \
+	gui/qt/pixmaps/toolbar/atob_fg_ab.svg \
+	gui/qt/pixmaps/toolbar/atob_fg_b.svg \
 	gui/qt/pixmaps/toolbar/renderer.svg \
 	gui/qt/pixmaps/toolbar/defullscreen.svg \
 	gui/qt/pixmaps/toolbar/dvd_menu.svg \

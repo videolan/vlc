@@ -48,6 +48,13 @@
         <file alias="clear.svg">pixmaps/clear.svg</file>
         <file alias="atob.svg">pixmaps/toolbar/atob.svg</file>
         <file alias="atob_noa.svg">pixmaps/toolbar/atob_noa.svg</file>
+        <file alias="atob_bg_a.svg">pixmaps/toolbar/atob_bg_a.svg</file>
+        <file alias="atob_bg_ab.svg">pixmaps/toolbar/atob_bg_ab.svg</file>
+        <file alias="atob_bg_b.svg">pixmaps/toolbar/atob_bg_b.svg</file>
+        <file alias="atob_bg_none.svg">pixmaps/toolbar/atob_bg_none.svg</file>
+        <file alias="atob_fg_a.svg">pixmaps/toolbar/atob_fg_a.svg</file>
+        <file alias="atob_fg_ab.svg">pixmaps/toolbar/atob_fg_ab.svg</file>
+        <file alias="atob_fg_b.svg">pixmaps/toolbar/atob_fg_b.svg</file>
         <file alias="dvd_menu.svg">pixmaps/toolbar/dvd_menu.svg</file>
         <file alias="dvd_next.svg">pixmaps/toolbar/dvd_next.svg</file>
         <file alias="dvd_prev.svg">pixmaps/toolbar/dvd_prev.svg</file>
