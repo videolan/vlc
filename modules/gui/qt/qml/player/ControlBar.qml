@@ -15,9 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+import QtQml.Models 2.11
 
 import org.videolan.vlc 0.1
 
@@ -32,14 +34,14 @@ Utils.NavigableFocusScope {
     signal showTrackBar()
     signal showPlaylist()
 
-    property bool noAutoHide: mainMenu.opened
+    property bool noAutoHide: _lockAutoHide !== 0
+    property int  _lockAutoHide: 0 //count the number of element locking the autoHide
     property bool showPlaylistButton: false
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)
 
     onActionCancel: mainPlaylistController.stop()
-
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -50,7 +52,6 @@ Utils.NavigableFocusScope {
             Layout.fillWidth: true
             enabled: player.playingState == PlayerController.PLAYING_STATE_PLAYING || player.playingState == PlayerController.PLAYING_STATE_PAUSED
             Keys.onDownPressed: buttons.focus = true
-
         }
 
         Utils.NavigableFocusScope {
@@ -66,6 +67,7 @@ Utils.NavigableFocusScope {
                 else
                     root.actionUp(index)
             }
+
             onActionDown: root.actionDown(index)
             onActionLeft: root.actionLeft(index)
             onActionRight: root.actionRight(index)
@@ -74,134 +76,61 @@ Utils.NavigableFocusScope {
             Keys.priority: Keys.AfterItem
             Keys.onPressed: defaultKeyAction(event, 0)
 
-            Utils.IconToolButton {
-                id: fullscreenBtn
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                KeyNavigation.right: randomBtn
-                size: VLCStyle.icon_large
-                text: VLCIcons.exit
-                onClicked: mainPlaylistController.stop()
-            }
-
             ToolBar {
-                id: centerbuttons
-                anchors.centerIn: parent
-
+                id: buttonstoolbar
                 focusPolicy: Qt.StrongFocus
                 focus: true
+                anchors.fill: parent
 
                 background: Rectangle {
                     color: "transparent"
                 }
 
-                Component.onCompleted: {
-                    playBtn.focus= true
-                }
-
-                RowLayout {
+                RowLayout{
+                    id: buttonrow
+                    property bool _focusGiven: false
                     focus: true
                     anchors.fill: parent
-                    Utils.IconToolButton {
-                        id: randomBtn
-                        size: VLCStyle.icon_large
-                        checked: mainPlaylistController.random
-                        text: VLCIcons.shuffle_on
-                        onClicked: mainPlaylistController.toggleRandom()
-                        KeyNavigation.right: prevBtn
-                    }
+                    spacing: 0
 
-                    Utils.IconToolButton {
-                        id: prevBtn
-                        size: VLCStyle.icon_large
-                        text: VLCIcons.previous
-                        onClicked: mainPlaylistController.prev()
-                        KeyNavigation.right: playBtn
-                    }
+                    Repeater{
+                        model: PlayerControlBarModel{
+                            id: buttonsmodel
+                            mainCtx: mainctx
+                        }
+                        delegate: Loader{
+                            id: buttonloader
 
-                    Utils.IconToolButton {
-                        id: playBtn
-                        size: VLCStyle.icon_large
-                        text: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
-                               && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
-                                     ? VLCIcons.pause
-                                     : VLCIcons.play
-                        onClicked: mainPlaylistController.togglePlayPause()
-                        focus: true
-                        KeyNavigation.right: nextBtn
-                    }
+                            sourceComponent: controlmodelbuttons.returnbuttondelegate(model.id)
+                            onLoaded: {
+                                if (! buttonloader.item.acceptFocus)
+                                    return
+                                else
+                                    if (!buttonrow._focusGiven){
+                                        buttonloader.item.forceActiveFocus()
+                                        buttonrow._focusGiven = true
+                                    }
+                                if(buttonloader.item instanceof Utils.IconToolButton)
+                                    buttonloader.item.size = model.size === PlayerControlBarModel.WIDGET_BIG ?
+                                                VLCStyle.icon_large : VLCStyle.icon_medium
 
-                    Utils.IconToolButton {
-                        id: nextBtn
-                        size: VLCStyle.icon_large
-                        text: VLCIcons.next
-                        onClicked: mainPlaylistController.next()
-                        KeyNavigation.right: repeatBtn
-                    }
+                                var buttonindex = DelegateModel.itemsIndex
+                                while(buttonindex > 0 && !(buttonrow.children[buttonindex-1].item.acceptFocus))
+                                    buttonindex = buttonindex-1
 
-                    Utils.IconToolButton {
-                        id: repeatBtn
-                        size: VLCStyle.icon_large
-                        checked: mainPlaylistController.repeatMode !== PlaylistControllerModel.PLAYBACK_REPEAT_NONE
-                        text: (mainPlaylistController.repeatMode == PlaylistControllerModel.PLAYBACK_REPEAT_CURRENT)
-                                     ? VLCIcons.repeat_one
-                                     : VLCIcons.repeat_all
-                        onClicked: mainPlaylistController.toggleRepeatMode()
-                        KeyNavigation.right: langBtn
-                    }
-                }
-            }
+                                if (buttonindex > 0)
+                                    buttonloader.item.KeyNavigation.left = buttonrow.children[buttonindex-1].item
 
-            ToolBar {
-                id: rightButtons
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-
-                focusPolicy: Qt.StrongFocus
-                background: Rectangle {
-                    color: "transparent"
-                }
-                Component.onCompleted: {
-                    rightButtons.contentItem.focus= true
-                }
-
-                RowLayout {
-                    anchors.fill: parent
-
-
-                    Utils.IconToolButton {
-                        id: langBtn
-                        size: VLCStyle.icon_large
-                        text: VLCIcons.audiosub
-                        onClicked: root.showTrackBar()
-                        KeyNavigation.right: showPlaylistButton ? playlistBtn : menuBtn
-                    }
-
-                    Utils.IconToolButton {
-                        id: playlistBtn
-                        visible: showPlaylistButton
-                        size: VLCStyle.icon_large
-                        text: VLCIcons.playlist
-                        onClicked: root.showPlaylist()
-                        KeyNavigation.right: menuBtn
-                    }
-
-                    Utils.IconToolButton {
-                        id: menuBtn
-                        size: VLCStyle.icon_large
-                        text: VLCIcons.menu
-                        onClicked: mainMenu.openAbove(this)
-
-                        Menus.MainDropdownMenu {
-                            id: mainMenu
-                            onClosed: {
-                                menuBtn.forceActiveFocus()
                             }
                         }
                     }
-
                 }
             }
         }
     }
+
+    ControlButtons{
+        id:controlmodelbuttons
+    }
+
 }
