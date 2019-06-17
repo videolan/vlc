@@ -95,9 +95,11 @@ def main(model_fd):
         c = font.createChar(charcode)
         glyph["charcode"]  = "\\u{:x}".format(charcode)
         c.importOutlines(glyph["path"])
-        #scale glyph to fit between 200 (base line) and 800 (x 0.6) and center it horizontally around 0
-        c.transform((0.6, 0.0, 0.0, 0.6, -300.0, 200.0))
+        #scale glyph to fit between 200 (base line) and 800 (x 0.6)
+        c.transform((0.6, 0.0, 0.0, 0.6, 200.0, 200.0))
         c.vwidth = 1000
+        c.width = 1000
+
     font.generate(data["font_file"])
     genQml(data)
 
