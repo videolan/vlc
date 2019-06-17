@@ -69,6 +69,7 @@ Item {
     property int icon_xsmall: 8 * scale;
     property int icon_small: 16 * scale;
     property int icon_normal: 32 * scale;
+    property int icon_medium: 48 * scale;
     property int icon_large: 64 * scale;
     property int icon_xlarge: 128 * scale;
 
