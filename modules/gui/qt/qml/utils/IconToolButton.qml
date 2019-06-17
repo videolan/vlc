@@ -23,7 +23,7 @@ import "qrc:///style/"
 ToolButton {
     id: control
     property color color: control.enabled ?
-                    VLCStyle.colors.buttonText : VLCStyle.colors.lightText
+                              VLCStyle.colors.buttonText : VLCStyle.colors.lightText
 
     property int size: VLCStyle.icon_normal
 
@@ -31,7 +31,16 @@ ToolButton {
 
     padding: 0
 
+    property color colorOverlay: "transparent"
+    property string textOverlay: ""
+
     contentItem: Item {
+
+        Rectangle{
+            anchors.fill: parent
+            visible: control.checked
+            color: VLCStyle.colors.bannerHover
+        }
 
         Rectangle {
             anchors.fill: parent
@@ -51,6 +60,21 @@ ToolButton {
 
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
+
+            Label {
+                text: control.textOverlay
+                color: control.colorOverlay
+
+                anchors.centerIn: parent
+
+                font.pixelSize: control.size
+                font.family: VLCIcons.fontFamily
+
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+
+            }
+
         }
     }
 
