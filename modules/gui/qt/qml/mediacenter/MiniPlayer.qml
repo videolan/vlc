@@ -13,18 +13,20 @@ Utils.NavigableFocusScope {
 
     Layout.fillWidth: true
 
-    height: player.playingState === PlayerController.PLAYING_STATE_STOPPED ? 0 : root.childrenRect.height
-
+    Component.onCompleted : {
+        if (player.playingState === PlayerController.PLAYING_STATE_STOPPED)
+            root.implicitHeight = 0;
+        else
+            root.implicitHeight = root.childrenRect.height;
+    }
 
     Connections {
         target: player
         onPlayingStateChanged: {
-            root.height = VLCStyle.miniPlayerHeight
             if (player.playingState === PlayerController.PLAYING_STATE_STOPPED)
                 animateRetract.start()
-            else {
+            else if (player.playingState === PlayerController.PLAYING_STATE_PLAYING)
                 animateExpand.start()
-            }
         }
     }
 

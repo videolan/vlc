@@ -134,7 +134,6 @@ Rectangle {
                             history.push(["player"], History.Go)
                     }
                     else {
-                        console.log("go previous", history.current.view)
                         if (history.current.view === "player")
                             history.previous(History.Go)
                     }
