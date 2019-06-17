@@ -165,6 +165,7 @@ public:
     Q_PROPERTY(ABLoopState ABloopState READ getABloopState WRITE setABloopState NOTIFY ABLoopStateChanged)
     Q_PROPERTY(VLCTick ABLoopA READ getABLoopA NOTIFY ABLoopAChanged)
     Q_PROPERTY(VLCTick ABLoopB READ getABLoopB NOTIFY ABLoopBChanged)
+    Q_PROPERTY(bool recording READ isRecording WRITE setRecording NOTIFY recordingChanged)
 
     /* exposed actions */
 public slots:
