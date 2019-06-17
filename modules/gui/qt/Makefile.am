@@ -101,6 +101,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/interface_widgets.cpp \
 	gui/qt/components/interface_widgets.hpp \
 	gui/qt/components/controller.cpp gui/qt/components/controller.hpp \
+	gui/qt/components/playercontrolbarmodel.cpp gui/qt/components/playercontrolbarmodel.hpp \
 	gui/qt/components/controller_widget.cpp \
 	gui/qt/components/controller_widget.hpp \
 	gui/qt/components/recent_media_model.cpp  \
@@ -253,6 +254,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/interface_widgets.moc.cpp \
 	gui/qt/components/navigation_history.moc.cpp \
 	gui/qt/components/controller.moc.cpp \
+	gui/qt/components/playercontrolbarmodel.moc.cpp \
 	gui/qt/components/controller_widget.moc.cpp \
 	gui/qt/components/custom_menus.moc.cpp \
 	gui/qt/components/recent_media_model.moc.cpp \

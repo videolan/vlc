@@ -56,6 +56,7 @@
 #include "components/navigation_history.hpp"
 #include "components/aboutmodel.hpp"
 #include "components/dialogmodel.hpp"
+#include "components/playercontrolbarmodel.hpp"
 
 #include "components/voutwindow/qvoutwindowdummy.hpp"
 
@@ -361,6 +362,7 @@ void MainInterface::createMainWidget( QSettings * )
 
     qmlRegisterType<QmlEventFilter>( "org.videolan.vlc", 0, 1, "EventFilter" );
 
+    qmlRegisterType<PlayerControlBarModel>( "org.videolan.vlc", 0, 1, "PlayerControlBarModel");
 
     mediacenterView = new QQuickWidget(this);
     mediacenterView->setClearColor(Qt::transparent);
