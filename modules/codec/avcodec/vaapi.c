@@ -146,7 +146,7 @@ static void Delete(vlc_va_t *va)
     free(sys);
 }
 
-static const struct vlc_va_operations ops = { Get, Delete, };
+static const struct vlc_va_operations ops = { Get, NULL /* TODO */, Delete, };
 
 static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                   enum PixelFormat pix_fmt,

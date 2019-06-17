@@ -251,7 +251,7 @@ static void Close(vlc_va_t *va)
         vlc_video_context_Release(sys->vctx);
 }
 
-static const struct vlc_va_operations ops = { Get, Close, };
+static const struct vlc_va_operations ops = { Get, NULL, Close, };
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                 enum PixelFormat pix_fmt,

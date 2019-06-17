@@ -33,6 +33,7 @@ typedef struct vlc_video_context vlc_video_context;
 
 struct vlc_va_operations {
     int (*get)(vlc_va_t *, picture_t *pic, uint8_t **surface);
+    picture_t *(*get_picture)(vlc_va_t *, const video_format_t *);
     void (*close)(vlc_va_t *);
 };
 
@@ -95,6 +96,16 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *, const AVPixFmtDescript
 static inline int vlc_va_Get(vlc_va_t *va, picture_t *pic, uint8_t **surface)
 {
     return va->ops->get(va, pic, surface);
+}
+
+/**
+ * Can be called from any thread
+ */
+static inline picture_t *vlc_va_GetPicture(vlc_va_t *va, const video_format_t *fmt)
+{
+    if (va->ops->get_picture)
+        return va->ops->get_picture(va, fmt);
+    return NULL;
 }
 
 /**

@@ -133,7 +133,7 @@ static void Close(vlc_va_t *va)
     free(sys);
 }
 
-static const struct vlc_va_operations ops = { Lock, Close, };
+static const struct vlc_va_operations ops = { Lock, NULL, Close, };
 
 static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *desc,
                 enum PixelFormat pix_fmt,
