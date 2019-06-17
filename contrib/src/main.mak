@@ -476,8 +476,8 @@ vlc-contrib-$(HOST)-latest.tar.bz2:
 	$(call download,$(PREBUILT_URL))
 
 prebuilt: vlc-contrib-$(HOST)-latest.tar.bz2
-	-$(UNPACK)
 	$(RM) -r $(PREFIX)
+	-$(UNPACK)
 	mv $(HOST) $(TOPDST)
 	cd $(PREFIX) && $(SRC)/change_prefix.sh
 ifdef HAVE_WIN32
