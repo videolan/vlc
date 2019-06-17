@@ -795,6 +795,8 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
 
     vlc_player_Delete(p_mi->player);
 
+    if (p_mi->p_md)
+        media_detach_preparsed_event(p_mi->p_md);
     libvlc_event_manager_destroy(&p_mi->event_manager);
     libvlc_media_release( p_mi->p_md );
 
