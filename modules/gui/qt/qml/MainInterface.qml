@@ -124,23 +124,19 @@ Rectangle {
             focus: true
 
             Connections {
-                target: player
-                onPlayingStateChanged: {
-                    console.log("onPlayingStateChanged", state)
-                    if (state === PlayerController.PLAYING_STATE_STOPPED)
-                        loadCurrentHistoryView()
-                    else {
-                        console.log(player.hasVideoOutput, history.current.view !== "player")
-                        if (player.hasVideoOutput && history.current.view !== "player")
+                target: player.videoTracks
+
+                onDataChanged: {
+                    var nbVideoTracks = player.videoTracks.rowCount()
+
+                    if (nbVideoTracks > 0) {
+                        if (history.current.view !== "player")
                             history.push(["player"], History.Go)
                     }
-                }
-
-                onHasVideoOutputChanged: {
-                    console.log("before push player", player.hasVideoOutput)
-                    if (player.hasVideoOutput) {
-                        console.log("push player")
-                        history.push(["player"], History.Go)
+                    else {
+                        console.log("go previous", history.current.view)
+                        if (history.current.view === "player")
+                            history.previous(History.Go)
                     }
                 }
             }
