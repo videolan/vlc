@@ -69,6 +69,11 @@ Item {
 
     property color banner: activePalette.window;
     property color bannerHover: activePalette.highlight;
+    property color volsliderbg: "#bdbebf"
+    property color volbelowmid: "#99d299"
+    property color volabovemid: "#14d214"
+    property color volhigh: "#ffc70f"
+    property color volmax: "#f5271d"
 
     //vlc orange
     property color accent: "#FFFF950D";

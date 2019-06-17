@@ -536,6 +536,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/player/TrackSelector.qml \
 	gui/qt/qml/player/ControlBar.qml \
 	gui/qt/qml/player/ControlButtons.qml \
+	gui/qt/qml/player/VolumeWidget.qml \
 	gui/qt/qml/player/ModalControlBar.qml \
 	gui/qt/qml/player/SliderBar.qml \
 	gui/qt/qml/dialogs/Dialogs.qml \

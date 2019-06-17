@@ -55,6 +55,7 @@ Item{
         case PlayerControlBarModel.SKIP_FW_BUTTON: return stepFwdBtnDelegate
         case PlayerControlBarModel.SKIP_BACK_BUTTON: return stepBackBtnDelegate
         case PlayerControlBarModel.QUIT_BUTTON: return quitBtnDelegate
+        case PlayerControlBarModel.VOLUME: return volumeBtnDelegate
         }
         console.log("button delegate id " + inpID +  " doesn't exists")
         return spacerDelegate
@@ -389,4 +390,8 @@ Item{
         }
     }
 
+    Component{
+        id: volumeBtnDelegate
+        VolumeWidget{}
+    }
 }

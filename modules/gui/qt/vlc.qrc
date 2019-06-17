@@ -250,6 +250,7 @@
         <file alias="TrackSelector.qml">qml/player/TrackSelector.qml</file>
         <file alias="ModalControlBar.qml">qml/player/ModalControlBar.qml</file>
         <file alias="ControlButtons.qml">qml/player/ControlButtons.qml</file>
+        <file alias="VolumeWidget.qml">qml/player/VolumeWidget.qml</file>
     </qresource>
     <qresource prefix="/about">
         <file alias="About.qml">qml/about/About.qml</file>
