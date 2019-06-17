@@ -52,12 +52,6 @@ AD_CLAUSES=
 WITH_OPTIMIZATION="1"
 ENABLE_PDB=
 
-if test ! -f "../../contrib/src/main.mak"
-then
-	echo "$0 must be run from a subdirectory"
-	exit 1
-fi
-
 while test -n "$1"
 do
 	case "$1" in
@@ -400,10 +394,16 @@ esac
 #
 # Results output
 #
-add_make "TOPSRC = .."
-add_make "TOPSRC_BUILT = ../.."
+BOOTSTRAP_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
+CURRENT_PATH="$( pwd -P )"
+# location of the contrib/src folder from the root of the contrib build folder
+TOPSRC=$(python -c "import os; print(os.path.relpath('$BOOTSTRAP_PATH', '$CURRENT_PATH'))")
+# location of the contrib/src folder from a built library folder
+TOPSRC_BUILT=$(python -c "import os; print(os.path.relpath('$BOOTSTRAP_PATH', '$CURRENT_PATH/libfoo'))")
+add_make "TOPSRC = $TOPSRC"
+add_make "TOPSRC_BUILT = $TOPSRC_BUILT"
 add_make "TOPDST = .."
 add_make 'include $(TOPSRC)/src/main.mak'
 echo "Bootstrap completed."
 make help
-mkdir -p ../../contrib/tarballs || exit $?
+mkdir -p $BOOTSTRAP_PATH/tarballs || exit $?
