@@ -79,11 +79,14 @@ void TrackListModel::updateTracks(vlc_player_list_action action, const vlc_playe
 {
     switch (action) {
     case VLC_PLAYER_LIST_ADDED:
+    {
         beginInsertRows({}, m_data.size(), m_data.size());
         m_data.append(Data{ track_info });
         endInsertRows();
+        QModelIndex dataIndex = index(m_data.size() - 1);
+        emit dataChanged(dataIndex, dataIndex);
         break;
-
+    }
     case VLC_PLAYER_LIST_REMOVED:
     {
         auto it = std::find_if(m_data.begin(), m_data.end(), [&](const Data& t) {
@@ -96,6 +99,8 @@ void TrackListModel::updateTracks(vlc_player_list_action action, const vlc_playe
         beginRemoveRows({}, pos, pos);
         m_data.erase(it);
         endRemoveRows();
+        QModelIndex dataIndex = index(pos);
+        emit dataChanged(dataIndex, dataIndex);
         break;
     }
     case VLC_PLAYER_LIST_UPDATED:
