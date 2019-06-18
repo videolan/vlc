@@ -1853,7 +1853,7 @@ static inline void
 vlc_player_ToggleSubtitle(vlc_player_t *player)
 {
     bool enabled = !vlc_player_IsSubtitleEnabled(player);
-    return vlc_player_SetSubtitleEnabled(player, enabled);
+    vlc_player_SetSubtitleEnabled(player, enabled);
 }
 
 /**
