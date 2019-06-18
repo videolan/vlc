@@ -90,11 +90,12 @@ StreamFormat::StreamFormat(const void *data_, size_t sz)
     const uint8_t *data = reinterpret_cast<const uint8_t *>(data_);
     formatid = UNKNOWN;
     const char moov[] = "ftypmoovmoof";
+
     if(sz > 188 && data[0] == 0x47 && data[188] == 0x47)
         formatid = StreamFormat::MPEG2TS;
-    else if(sz > 4 && (!memcmp(&moov, data, 4) ||
-                       !memcmp(&moov[4], data, 4) ||
-                       !memcmp(&moov[8], data, 4)))
+    else if(sz > 8 && (!memcmp(&moov,    &data[4], 4) ||
+                       !memcmp(&moov[4], &data[4], 4) ||
+                       !memcmp(&moov[8], &data[4], 4)))
         formatid = StreamFormat::MP4;
     else if(sz > 7 && !memcmp("WEBVTT", data, 6) &&
             std::isspace(static_cast<unsigned char>(data[7])))
