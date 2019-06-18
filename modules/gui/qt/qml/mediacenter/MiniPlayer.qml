@@ -59,36 +59,71 @@ Utils.NavigableFocusScope {
         RowLayout {
             anchors.fill: parent
 
-            Image {
-                id: cover
-                source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
-                        ? mainPlaylistController.currentItem.artwork
-                        : VLCStyle.noArtAlbum
-                fillMode: Image.PreserveAspectFit
-
+            Item {
+                id: playingItemInfo
                 Layout.fillHeight: true
-                Layout.maximumWidth: height
+                width: childrenRect.width
+
+                Rectangle {
+                    anchors.fill: parent
+                    visible: parent.activeFocus
+                    color: VLCStyle.colors.accent
+                    border.width: 0
+                    border.color: VLCStyle.colors.accent
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: history.push(["player"], History.Go)
+                }
+
+                Keys.onReleased: {
+                    if (!event.accepted && (event.key === Qt.Key_Return || event.key === Qt.Key_Space))
+                        history.push(["player"], History.Go)
+                }
+
+                Row {
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+
+                    rightPadding: VLCStyle.margin_normal
+
+                    Image {
+                        id: cover
+                        source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
+                                ? mainPlaylistController.currentItem.artwork
+                                : VLCStyle.noArtAlbum
+                        fillMode: Image.PreserveAspectFit
+
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                    }
+
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter
+                        leftPadding: VLCStyle.margin_normal
+
+                        Text {
+                            id: titleLabel
+                            text: mainPlaylistController.currentItem.title
+                            font.pixelSize: VLCStyle.fontSize_large
+                            color: VLCStyle.colors.text
+                        }
+
+                        Text {
+                            id: artistLabel
+                            text: mainPlaylistController.currentItem.artist
+                            font.pixelSize: VLCStyle.fontSize_normal
+                            color: VLCStyle.colors.lightText
+                        }
+                    }
+                }
+
+                KeyNavigation.right: randomBtn
             }
 
-            Column {
-                Layout.alignment: Qt.AlignVCenter
+            Item {
                 Layout.fillWidth: true
-
-                leftPadding: VLCStyle.margin_normal
-
-                Text {
-                    id: titleLabel
-                    text: mainPlaylistController.currentItem.title
-                    font.pixelSize: VLCStyle.fontSize_large
-                    color: VLCStyle.colors.text
-                }
-
-                Text {
-                    id: artistLabel
-                    text: mainPlaylistController.currentItem.artist
-                    font.pixelSize: VLCStyle.fontSize_normal
-                    color: VLCStyle.colors.lightText
-                }
             }
 
             Row {

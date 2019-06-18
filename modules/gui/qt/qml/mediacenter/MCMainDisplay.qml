@@ -145,14 +145,6 @@ Utils.NavigableFocusScope {
                         id: stackViewZone
                         anchors.fill: parent
 
-                        Rectangle {
-                            visible: parent.focus
-                            anchors.fill: parent
-                            color: "transparent"
-                            border.width: VLCStyle.selectedBorder
-                            border.color: VLCStyle.colors.accent
-                        }
-
                         onActionUp: sourcesBanner.focus = true
                         onActionDown: {
                             if (miniPlayer.expanded)
@@ -169,6 +161,15 @@ Utils.NavigableFocusScope {
                                 stackView.focus = true
                             }
                         }
+                    }
+
+                    Rectangle {
+                        visible: stackViewZone.focus
+                        anchors.fill: stackViewZone
+                        z: 42
+                        color: "#22ff950d"
+                        border.width: VLCStyle.selectedBorder
+                        border.color: VLCStyle.colors.accent
                     }
 
                     Utils.StackViewExt {
