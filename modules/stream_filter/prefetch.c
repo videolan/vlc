@@ -450,10 +450,6 @@ static int Open(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    stream->pf_read = Read;
-    stream->pf_seek = Seek;
-    stream->pf_control = Control;
-
     vlc_stream_Control(stream->s, STREAM_CAN_SEEK, &sys->can_seek);
     vlc_stream_Control(stream->s, STREAM_CAN_PAUSE, &sys->can_pause);
     vlc_stream_Control(stream->s, STREAM_CAN_CONTROL_PACE, &sys->can_pace);
@@ -506,6 +502,7 @@ static int Open(vlc_object_t *obj)
 
     msg_Dbg(stream, "using %zu bytes buffer", sys->buffer_size);
     stream->pf_read = Read;
+    stream->pf_seek = Seek;
     stream->pf_control = Control;
     return VLC_SUCCESS;
 
