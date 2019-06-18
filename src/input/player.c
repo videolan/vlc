@@ -114,8 +114,7 @@ struct vlc_player_input
 
     struct input_stats_t stats;
 
-    vlc_tick_t audio_delay;
-    vlc_tick_t subtitle_delay;
+    vlc_tick_t cat_delays[DATA_ES];
 
     vlc_player_program_vector program_vector;
     vlc_player_track_vector video_track_vector;
@@ -663,8 +662,6 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
 
     memset(&input->stats, 0, sizeof(input->stats));
 
-    input->audio_delay = input->subtitle_delay = 0;
-
     vlc_vector_init(&input->program_vector);
     vlc_vector_init(&input->video_track_vector);
     vlc_vector_init(&input->audio_track_vector);
@@ -685,6 +682,25 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     {
         free(input);
         return NULL;
+    }
+
+    /* Initial sub/audio delay */
+    const vlc_tick_t cat_delays[DATA_ES] = {
+        [AUDIO_ES] =
+            VLC_TICK_FROM_MS(var_InheritInteger(player, "audio-desync")),
+        [SPU_ES] =
+            vlc_tick_from_samples(var_InheritInteger(player, "sub-delay"), 10),
+    };
+
+    for (enum es_format_category_e i = UNKNOWN_ES; i < DATA_ES; ++i)
+    {
+        input->cat_delays[i] = cat_delays[i];
+        if (cat_delays[i] != 0)
+        {
+            input_SetCategoryDelay(input->thread, i, cat_delays[i]);
+            vlc_player_SendEvent(player, on_category_delay_changed, i,
+                                 cat_delays[i]);
+        }
     }
     return input;
 }
@@ -2051,16 +2067,6 @@ input_thread_Events(input_thread_t *input_thread,
             vlc_player_SendEvent(player, on_signal_changed,
                                  input->signal_quality, input->signal_strength);
             break;
-        case INPUT_EVENT_AUDIO_DELAY:
-            input->audio_delay = event->audio_delay;
-            vlc_player_SendEvent(player, on_category_delay_changed, AUDIO_ES,
-                                 input->audio_delay);
-            break;
-        case INPUT_EVENT_SUBTITLE_DELAY:
-            input->subtitle_delay = event->subtitle_delay;
-            vlc_player_SendEvent(player, on_category_delay_changed, SPU_ES,
-                                 input->subtitle_delay);
-            break;
         case INPUT_EVENT_CACHE:
             input->cache = event->cache;
             vlc_player_SendEvent(player, on_buffering_changed, event->cache);
@@ -2832,34 +2838,23 @@ vlc_player_SetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat,
     if (!input)
         return VLC_EGENERIC;
 
-    switch (cat)
+    if (cat != AUDIO_ES && cat != SPU_ES)
+        return VLC_EGENERIC;
+    vlc_tick_t *cat_delay = &input->cat_delays[cat];
+
+    if (absolute)
+        *cat_delay = delay;
+    else
     {
-        case AUDIO_ES:
-            input_ControlPush(input->thread, INPUT_CONTROL_SET_AUDIO_DELAY,
-                &(input_control_param_t) {
-                    .delay = {
-                        .b_absolute = absolute,
-                        .i_val = delay,
-                    },
-            });
-            break;
-        case SPU_ES:
-            input_ControlPush(input->thread, INPUT_CONTROL_SET_SPU_DELAY,
-                &(input_control_param_t) {
-                    .delay = {
-                        .b_absolute = absolute,
-                        .i_val = delay,
-                    },
-            });
-            break;
-        default:
-            return VLC_EGENERIC;
+        *cat_delay += delay;
+        delay = *cat_delay;
     }
 
-    vlc_player_vout_OSDMessage(player, _("%s delay: %s%i ms"),
+    input_SetCategoryDelay(input->thread, cat, delay);
+    vlc_player_vout_OSDMessage(player, _("%s delay: %i ms"),
                                es_format_category_to_string(cat),
-                               absolute ? "" : "+",
                                (int)MS_FROM_VLC_TICK(delay));
+    vlc_player_SendEvent(player, on_category_delay_changed, cat, delay);
     return VLC_SUCCESS;
 }
 
@@ -2869,15 +2864,11 @@ vlc_player_GetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat)
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
         return 0;
-    switch (cat)
-    {
-        case AUDIO_ES:
-            return input->audio_delay;
-        case SPU_ES:
-            return input->subtitle_delay;
-        default:
-            return 0;
-    }
+
+    if (cat != AUDIO_ES && cat != SPU_ES)
+        return 0;
+
+    return input->cat_delays[cat];
 }
 
 static struct {

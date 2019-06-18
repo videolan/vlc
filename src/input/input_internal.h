@@ -160,11 +160,6 @@ typedef enum input_event_type_e
     /* At least one of "signal-quality" or "signal-strength" has changed */
     INPUT_EVENT_SIGNAL,
 
-    /* "audio-delay" has changed */
-    INPUT_EVENT_AUDIO_DELAY,
-    /* "spu-delay" has changed */
-    INPUT_EVENT_SUBTITLE_DELAY,
-
     /* "bookmark" has changed */
     INPUT_EVENT_BOOKMARK,
 
@@ -305,10 +300,6 @@ struct vlc_input_event
         const struct input_stats_t *stats;
         /* INPUT_EVENT_SIGNAL */
         struct vlc_input_event_signal signal;
-        /* INPUT_EVENT_AUDIO_DELAY */
-        vlc_tick_t audio_delay;
-        /* INPUT_EVENT_SUBTITLE_DELAY */
-        vlc_tick_t subtitle_delay;
         /* INPUT_EVENT_CACHE */
         float cache;
         /* INPUT_EVENT_VOUT */
@@ -370,6 +361,16 @@ void input_Close( input_thread_t * );
 void input_SetTime( input_thread_t *, vlc_tick_t i_time, bool b_fast );
 
 void input_SetPosition( input_thread_t *, float f_position, bool b_fast );
+
+/**
+ * Set the delay of an ES category
+ *
+ * If called before input_Start(), the delay will be applied for next ES
+ * tracks. If called after input_Start(), the delay will be applied for all
+ * tracks of the category (and all future tracks).
+ */
+void input_SetCategoryDelay(input_thread_t *input, enum es_format_category_e cat,
+                            vlc_tick_t delay);
 
 /**
  * Get the input item for an input thread
@@ -436,10 +437,6 @@ typedef union
         float f_val;
     } pos;
     struct {
-        bool b_absolute;
-        vlc_tick_t i_val;
-    } delay;
-    struct {
         vlc_es_id_t *id;
         unsigned page;
     } vbi_page;
@@ -481,10 +478,6 @@ typedef struct input_thread_private_t
     vlc_tick_t  i_start;    /* :start-time,0 by default */
     vlc_tick_t  i_stop;     /* :stop-time, 0 if none */
     vlc_tick_t  i_time;     /* Current time */
-
-    /* Delays */
-    vlc_tick_t  i_audio_delay;
-    vlc_tick_t  i_spu_delay;
 
     /* Output */
     bool            b_out_pace_control; /* XXX Move it ot es_sout ? */
@@ -587,9 +580,6 @@ enum input_control_e
     INPUT_CONTROL_SET_VIEWPOINT,    // new absolute viewpoint
     INPUT_CONTROL_SET_INITIAL_VIEWPOINT, // set initial viewpoint (generally from video)
     INPUT_CONTROL_UPDATE_VIEWPOINT, // update viewpoint relative to current
-
-    INPUT_CONTROL_SET_AUDIO_DELAY,
-    INPUT_CONTROL_SET_SPU_DELAY,
 
     INPUT_CONTROL_ADD_SLAVE,
     INPUT_CONTROL_SET_SUBS_FPS,

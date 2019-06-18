@@ -91,24 +91,6 @@ static inline void input_SendEventRate(input_thread_t *p_input, float rate)
     });
 }
 
-static inline void input_SendEventAudioDelay(input_thread_t *p_input,
-                                              vlc_tick_t i_delay)
-{
-    input_SendEvent(p_input, &(struct vlc_input_event) {
-        .type = INPUT_EVENT_AUDIO_DELAY,
-        .audio_delay = i_delay,
-    });
-}
-
-static inline void input_SendEventSubtitleDelay(input_thread_t *p_input,
-                                                 vlc_tick_t i_delay)
-{
-    input_SendEvent(p_input, &(struct vlc_input_event) {
-        .type = INPUT_EVENT_SUBTITLE_DELAY,
-        .subtitle_delay = i_delay,
-    });
-}
-
 static inline void input_SendEventRecord(input_thread_t *p_input,
                                          bool b_recording)
 {

@@ -237,6 +237,13 @@ void input_SetPosition( input_thread_t *p_input, float f_position, bool b_fast )
     input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION, &param );
 }
 
+void input_SetCategoryDelay(input_thread_t *input, enum es_format_category_e cat,
+                            vlc_tick_t delay)
+{
+    assert(cat == AUDIO_ES || cat == SPU_ES);
+    es_out_SetDelay(input_priv(input)->p_es_out_display, cat, delay);
+}
+
 /**
  * Get the item from an input thread
  * FIXME it does not increase ref count of the item.
@@ -395,10 +402,6 @@ static input_thread_t *Create( vlc_object_t *p_parent,
 
     /* Create Object Variables for private use only */
     input_ConfigVarInit( p_input );
-
-    priv->i_audio_delay =
-        VLC_TICK_FROM_MS( var_GetInteger( p_input, "audio-desync" ) );
-    priv->i_spu_delay = 0;
 
     /* Remove 'Now playing' info as it is probably outdated */
     input_item_SetNowPlaying( p_item, NULL );
@@ -946,22 +949,12 @@ static void RequestSubRate( input_thread_t *p_input, float f_slave_fps )
 
 static void SetSubtitlesOptions( input_thread_t *p_input )
 {
-    input_thread_private_t *priv = input_priv(p_input);
-
     /* Get fps and set it if not already set */
     const float f_fps = input_priv(p_input)->master->f_fps;
     if( f_fps > 1.f )
     {
         var_SetFloat( p_input, "sub-original-fps", f_fps );
         RequestSubRate( p_input, var_InheritFloat( p_input, "sub-fps" ) );
-    }
-
-    int64_t sub_delay = var_InheritInteger( p_input, "sub-delay" );
-    if( sub_delay != 0 )
-    {
-        priv->i_spu_delay = vlc_tick_from_samples(sub_delay, 10);
-        input_SendEventSubtitleDelay( p_input, priv->i_spu_delay );
-        /* UpdatePtsDelay will be called next by InitPrograms */
     }
 }
 
@@ -1178,19 +1171,9 @@ static void UpdatePtsDelay( input_thread_t *p_input )
     if( i_pts_delay < 0 )
         i_pts_delay = 0;
 
-    /* Take care of audio/spu delay */
-    const vlc_tick_t i_extra_delay = __MIN( p_sys->i_audio_delay, p_sys->i_spu_delay );
-    if( i_extra_delay < 0 )
-        i_pts_delay -= i_extra_delay;
-
     /* Update cr_average depending on the caching */
     const int i_cr_average = var_GetInteger( p_input, "cr-average" ) * i_pts_delay / DEFAULT_PTS_DELAY;
 
-    /* */
-    es_out_SetDelay( input_priv(p_input)->p_es_out_display, AUDIO_ES,
-                     p_sys->i_audio_delay );
-    es_out_SetDelay( input_priv(p_input)->p_es_out_display, SPU_ES,
-                     p_sys->i_spu_delay );
     es_out_SetJitter( input_priv(p_input)->p_es_out, i_pts_delay, 0, i_cr_average );
 }
 
@@ -2058,24 +2041,6 @@ static bool Control( input_thread_t *p_input,
             }
 
             ViewpointApply( p_input );
-            break;
-
-        case INPUT_CONTROL_SET_AUDIO_DELAY:
-            if( param.delay.b_absolute )
-                priv->i_audio_delay = param.delay.i_val;
-            else
-                priv->i_audio_delay += param.delay.i_val;
-            input_SendEventAudioDelay( p_input, priv->i_audio_delay );
-            UpdatePtsDelay( p_input );
-            break;
-
-        case INPUT_CONTROL_SET_SPU_DELAY:
-            if( param.delay.b_absolute )
-                priv->i_spu_delay = param.delay.i_val;
-            else
-                priv->i_spu_delay += param.delay.i_val;
-            input_SendEventSubtitleDelay( p_input, priv->i_spu_delay );
-            UpdatePtsDelay( p_input );
             break;
 
         case INPUT_CONTROL_SET_TITLE:
