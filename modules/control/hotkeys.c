@@ -47,6 +47,12 @@ struct intf_sys_t
         bool btn_pressed;
         int x, y;
     } vrnav;
+
+    struct
+    {
+        vlc_tick_t audio_time;
+        vlc_tick_t subtitle_time;
+    } subsync;
 };
 
 static void handle_action(intf_thread_t *, vlc_action_id_t);
@@ -457,33 +463,46 @@ PLAYER_ACTION_HANDLER(ToggleSubtitle)
 
 PLAYER_ACTION_HANDLER(SyncSubtitle)
 {
-    VLC_UNUSED(intf);
+    intf_sys_t *sys = intf->p_sys;
+
     switch (action_id)
     {
         case ACTIONID_SUBSYNC_MARKAUDIO:
-            vlc_player_SetSubtitleSync(
-                    player, VLC_PLAYER_SUBTITLE_SYNC_MARK_AUDIO);
+            sys->subsync.audio_time = vlc_tick_now();
+            vlc_player_vout_OSDMessage(player, _("Sub sync: bookmarked audio time"));
             break;
         case ACTIONID_SUBSYNC_MARKSUB:
-            vlc_player_SetSubtitleSync(
-                    player, VLC_PLAYER_SUBTITLE_SYNC_MARK_SUBTITLE);
+            sys->subsync.subtitle_time = vlc_tick_now();
+            vlc_player_vout_OSDMessage(player, _("Sub sync: bookmarked subtitle time"));
             break;
         case ACTIONID_SUBSYNC_APPLY:
-            // FIXME is that still the case?
-            /* Warning! Can yield a pause in the playback.
-             * For example, the following succession of actions will yield a 5 second delay :
-             * - Pressing Shift-H (ACTIONID_SUBSYNC_MARKAUDIO)
-             * - wait 5 second
-             * - Press Shift-J (ACTIONID_SUBSYNC_MARKSUB)
-             * - Press Shift-K (ACTIONID_SUBSYNC_APPLY)
-             * --> 5 seconds pause
-             * This is due to var_SetTime() (and ultimately UpdatePtsDelay())
-             * which causes the video to pause for an equivalent duration
-             * (This problem is also present in the "Track synchronization" window) */
-            vlc_player_SetSubtitleSync(player, VLC_PLAYER_SUBTITLE_SYNC_APPLY);
+        {
+            if (sys->subsync.audio_time == VLC_TICK_INVALID ||
+                sys->subsync.subtitle_time == VLC_TICK_INVALID)
+            {
+                vlc_player_vout_OSDMessage(player, _("Sub sync: set bookmarks first!"));
+                break;
+            }
+            vlc_tick_t delay =
+                sys->subsync.audio_time - sys->subsync.subtitle_time;
+            sys->subsync.audio_time = VLC_TICK_INVALID;
+            sys->subsync.subtitle_time = VLC_TICK_INVALID;
+
+            vlc_tick_t previous_delay = vlc_player_GetSubtitleDelay(player);
+            vlc_player_SetSubtitleDelay(player, delay, VLC_PLAYER_WHENCE_RELATIVE);
+
+            long long delay_ms = MS_FROM_VLC_TICK(delay);
+            long long totdelay_ms =  MS_FROM_VLC_TICK(previous_delay + delay);
+            vlc_player_vout_OSDMessage(player, _("Sub sync: corrected %"PRId64
+                                       " ms (total delay = %"PRId64" ms)"),
+                                       delay_ms, totdelay_ms);
             break;
+        }
         case ACTIONID_SUBSYNC_RESET:
-            vlc_player_SetSubtitleSync(player, VLC_PLAYER_SUBTITLE_SYNC_RESET);
+            sys->subsync.audio_time = VLC_TICK_INVALID;
+            sys->subsync.subtitle_time = VLC_TICK_INVALID;
+            vlc_player_SetSubtitleDelay(player, 0, VLC_PLAYER_WHENCE_ABSOLUTE);
+            vlc_player_vout_OSDMessage(player, _("Sub sync: delay reset"));
             break;
         default:
             vlc_assert_unreachable();
@@ -1083,6 +1102,7 @@ Open(vlc_object_t *this)
         return VLC_ENOMEM;
     sys->vrnav.btn_pressed = false;
     sys->playlist = vlc_intf_GetMainPlaylist(intf);
+    sys->subsync.audio_time = sys->subsync.subtitle_time = VLC_TICK_INVALID;
     static struct vlc_player_cbs const player_cbs =
     {
         .on_vout_changed = player_on_vout_changed,
