@@ -196,7 +196,7 @@ Item{
         Item {
             objectName: "space"
             id: spacer
-            implicitWidth: 32 * scale
+            implicitWidth: 32 * VLCStyle.scale
             property bool acceptFocus: false
         }
     }
@@ -206,7 +206,7 @@ Item{
         Item{
             objectName: "extendedspace"
             id: extendedspacer
-            implicitWidth: 128 * scale
+            implicitWidth: 128 * VLCStyle.scale
             property bool acceptFocus: false
             Component.onCompleted: {
                 parent.Layout.fillWidth=true
