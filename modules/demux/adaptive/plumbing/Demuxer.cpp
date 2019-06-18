@@ -100,7 +100,7 @@ bool MimeDemuxer::create()
     if(!p_newstream)
         return false;
 
-    StreamFormat format;
+    StreamFormat format(StreamFormat::UNKNOWN);
     char *type = stream_ContentType(p_newstream);
     if(type)
     {
