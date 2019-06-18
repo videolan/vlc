@@ -117,12 +117,6 @@ struct vlc_player_input
     vlc_tick_t audio_delay;
     vlc_tick_t subtitle_delay;
 
-    struct
-    {
-        vlc_tick_t audio_time;
-        vlc_tick_t subtitle_time;
-    } subsync;
-
     vlc_player_program_vector program_vector;
     vlc_player_track_vector video_track_vector;
     vlc_player_track_vector audio_track_vector;
@@ -670,9 +664,6 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     memset(&input->stats, 0, sizeof(input->stats));
 
     input->audio_delay = input->subtitle_delay = 0;
-
-    input->subsync.audio_time =
-    input->subsync.subtitle_time = VLC_TICK_INVALID;
 
     vlc_vector_init(&input->program_vector);
     vlc_vector_init(&input->video_track_vector);
@@ -2938,87 +2929,6 @@ unsigned
 vlc_player_GetSubtitleTextScale(vlc_player_t *player)
 {
     return var_GetInteger(player, "sub-text-scale");
-}
-
-static void
-vlc_player_SubtitleSyncMarkAudio(vlc_player_t *player)
-{
-    struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    if (!input)
-        return;
-    input->subsync.audio_time = vlc_tick_now();
-    vlc_player_vout_OSDMessage(player, _("Sub sync: bookmarked audio time"));
-}
-
-static void
-vlc_player_SubtitleSyncMarkSubtitle(vlc_player_t *player)
-{
-    struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    if (!input)
-        return;
-    input->subsync.subtitle_time = vlc_tick_now();
-    vlc_player_vout_OSDMessage(player, _("Sub sync: bookmarked subtitle time"));
-}
-
-static void
-vlc_player_SubtitleSyncApply(vlc_player_t *player)
-{
-    struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    if (!input)
-        return;
-    if (input->subsync.audio_time == VLC_TICK_INVALID ||
-        input->subsync.subtitle_time == VLC_TICK_INVALID)
-    {
-        vlc_player_vout_OSDMessage(player, _("Sub sync: set bookmarks first!"));
-        return;
-    }
-    vlc_tick_t delay =
-        input->subsync.audio_time - input->subsync.subtitle_time;
-    input->subsync.audio_time = VLC_TICK_INVALID;
-    input->subsync.subtitle_time = VLC_TICK_INVALID;
-    vlc_player_SetSubtitleDelayInternal(player, delay,
-                                        VLC_PLAYER_WHENCE_RELATIVE);
-
-    long long delay_ms = MS_FROM_VLC_TICK(delay);
-    long long totdelay_ms = MS_FROM_VLC_TICK(input->subtitle_delay + delay);
-    vlc_player_vout_OSDMessage(player, _("Sub sync: corrected %"PRId64
-                               " ms (total delay = %"PRId64" ms)"),
-                               delay_ms, totdelay_ms);
-}
-
-static void
-vlc_player_SubtitleSyncReset(vlc_player_t *player)
-{
-    struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    if (!input)
-        return;
-    vlc_player_SetSubtitleDelayInternal(player, 0, VLC_PLAYER_WHENCE_ABSOLUTE);
-    input->subsync.audio_time = VLC_TICK_INVALID;
-    input->subsync.subtitle_time = VLC_TICK_INVALID;
-    vlc_player_vout_OSDMessage(player, _("Sub sync: delay reset"));
-}
-
-void
-vlc_player_SetSubtitleSync(vlc_player_t *player,
-                           enum vlc_player_subtitle_sync sync)
-{
-    switch (sync)
-    {
-        case VLC_PLAYER_SUBTITLE_SYNC_RESET:
-            vlc_player_SubtitleSyncReset(player);
-            break;
-        case VLC_PLAYER_SUBTITLE_SYNC_MARK_AUDIO:
-            vlc_player_SubtitleSyncMarkAudio(player);
-            break;
-        case VLC_PLAYER_SUBTITLE_SYNC_MARK_SUBTITLE:
-            vlc_player_SubtitleSyncMarkSubtitle(player);
-            break;
-        case VLC_PLAYER_SUBTITLE_SYNC_APPLY:
-            vlc_player_SubtitleSyncApply(player);
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
 }
 
 vlc_tick_t

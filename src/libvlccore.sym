@@ -855,7 +855,6 @@ vlc_player_SetRecordingEnabled
 vlc_player_SetRenderer
 vlc_player_SetStartPaused
 vlc_player_SetSubtitleDelay
-vlc_player_SetSubtitleSync
 vlc_player_SetSubtitleTextScale
 vlc_player_SetTeletextEnabled
 vlc_player_SetTeletextTransparency

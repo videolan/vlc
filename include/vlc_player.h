@@ -319,19 +319,6 @@ enum vlc_player_abloop
 };
 
 /**
- * Subtitle synchronisation
- *
- * @see vlc_player_SetSubtitleSync()
- */
-enum vlc_player_subtitle_sync
-{
-    VLC_PLAYER_SUBTITLE_SYNC_RESET,
-    VLC_PLAYER_SUBTITLE_SYNC_MARK_AUDIO,
-    VLC_PLAYER_SUBTITLE_SYNC_MARK_SUBTITLE,
-    VLC_PLAYER_SUBTITLE_SYNC_APPLY,
-};
-
-/**
  * Player lock type (normal or reentrant)
  */
 enum vlc_player_lock_type
@@ -2449,26 +2436,6 @@ vlc_player_SetAudioDelay(vlc_player_t *player, vlc_tick_t delay,
  */
 VLC_API vlc_tick_t
 vlc_player_GetSubtitleDelay(vlc_player_t *player);
-
-/**
- * Set subtitle synchronisation
- *
- * This function can be used to synchronise subtitles with the audio.
- *
- * Call this function with VLC_PLAYER_SUBTITLE_SYNC_MARK_AUDIO when your hear a
- * voice you want to synchronise with subtitles. Then, call this function with
- * VLC_PLAYER_SUBTITLE_SYNC_MARK_SUBTITLE when the subtitle corresponding to
- * the voice is displayed. Finally call this function with
- * VLC_PLAYER_SUBTITLE_SYNC_APPLY to apply the subtitle delay. Calling this
- * function with VLC_PLAYER_SUBTITLE_SYNC_RESET will reset the subtitle
- * synchronisation and set a subtitle delay of 0.
- *
- * @param player locked player instance
- * @param sync synchronisation action
- */
-VLC_API void
-vlc_player_SetSubtitleSync(vlc_player_t *player,
-                           enum vlc_player_subtitle_sync sync);
 
 /**
  * Set the subtitle delay for the current media
