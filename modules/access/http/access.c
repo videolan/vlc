@@ -123,13 +123,6 @@ static block_t *LiveRead(stream_t *access, bool *restrict eof)
     return b;
 }
 
-static int NoSeek(stream_t *access, uint64_t pos)
-{
-    (void) access;
-    (void) pos;
-    return VLC_EGENERIC;
-}
-
 static int LiveControl(stream_t *access, int query, va_list args)
 {
     access_sys_t *sys = access->p_sys;
@@ -253,7 +246,7 @@ static int Open(vlc_object_t *obj)
     if (live)
     {
         access->pf_block = LiveRead;
-        access->pf_seek = NoSeek;
+        access->pf_seek = NULL;
         access->pf_control = LiveControl;
     }
     else
