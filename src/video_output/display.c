@@ -588,18 +588,28 @@ static int vout_SetSourceAspect(vout_display_t *vd,
     return ret;
 }
 
+void VoutFixFormatAR(video_format_t *fmt)
+{
+    vlc_ureduce( &fmt->i_sar_num, &fmt->i_sar_den,
+                 fmt->i_sar_num,  fmt->i_sar_den, 50000 );
+    if (fmt->i_sar_num <= 0 || fmt->i_sar_den <= 0) {
+        fmt->i_sar_num = 1;
+        fmt->i_sar_den = 1;
+    }
+}
+
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *source)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     int err1 = 0, err2 = 0;
 
-    if (source->i_sar_num * osys->source.i_sar_den !=
-        source->i_sar_den * osys->source.i_sar_num) {
+    video_format_t fixed_src = *source;
+    VoutFixFormatAR( &fixed_src );
+    if (fixed_src.i_sar_num * osys->source.i_sar_den !=
+        fixed_src.i_sar_den * osys->source.i_sar_num) {
 
-        osys->source.i_sar_num = source->i_sar_num;
-        osys->source.i_sar_den = source->i_sar_den;
-        vlc_ureduce(&osys->source.i_sar_num, &osys->source.i_sar_den,
-                    osys->source.i_sar_num, osys->source.i_sar_den, 0);
+        osys->source.i_sar_num = fixed_src.i_sar_num;
+        osys->source.i_sar_den = fixed_src.i_sar_den;
 
         /* FIXME it will override any AR that the user would have forced */
         err1 = vout_SetSourceAspect(vd, osys->source.i_sar_num,

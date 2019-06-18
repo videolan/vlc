@@ -87,12 +87,7 @@ static void VoutFixFormat(video_format_t *dst, const video_format_t *src)
 {
     video_format_Copy(dst, src);
     dst->i_chroma = vlc_fourcc_GetCodec(VIDEO_ES, src->i_chroma);
-    vlc_ureduce( &dst->i_sar_num, &dst->i_sar_den,
-                 src->i_sar_num,  src->i_sar_den, 50000 );
-    if (dst->i_sar_num <= 0 || dst->i_sar_den <= 0) {
-        dst->i_sar_num = 1;
-        dst->i_sar_den = 1;
-    }
+    VoutFixFormatAR( dst );
     video_format_FixRgb(dst);
 }
 
