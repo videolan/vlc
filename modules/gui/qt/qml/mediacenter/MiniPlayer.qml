@@ -13,6 +13,8 @@ Utils.NavigableFocusScope {
 
     Layout.fillWidth: true
 
+    readonly property bool expanded: root.implicitHeight === root.childrenRect.height
+
     Component.onCompleted : {
         if (player.playingState === PlayerController.PLAYING_STATE_STOPPED)
             root.implicitHeight = 0;
@@ -90,10 +92,7 @@ Utils.NavigableFocusScope {
             }
 
             Row {
-                focus: true
-
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-
                 rightPadding: VLCStyle.margin_normal
 
                 Utils.IconToolButton {
@@ -137,12 +136,17 @@ Utils.NavigableFocusScope {
                     id: repeatBtn
                     size: VLCStyle.icon_normal
                     checked: mainPlaylistController.repeatMode !== PlaylistControllerModel.PLAYBACK_REPEAT_NONE
-                    text: (mainPlaylistController.repeatMode == PlaylistControllerModel.PLAYBACK_REPEAT_CURRENT)
+                    text: (mainPlaylistController.repeatMode === PlaylistControllerModel.PLAYBACK_REPEAT_CURRENT)
                                  ? VLCIcons.repeat_one
                                  : VLCIcons.repeat_all
                     onClicked: mainPlaylistController.toggleRepeatMode()
                 }
             }
         }
+    }
+
+    Keys.onPressed: {
+        if (!event.accepted)
+            defaultKeyAction(event, 0)
     }
 }
