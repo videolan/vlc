@@ -81,10 +81,13 @@ FocusScope{
             }
 
             background: Rectangle {
+                id: sliderBg
                 x: volControl.leftPadding
                 y: volControl.topPadding + volControl.availableHeight / 2 - height / 2
                 implicitWidth: parent.width
                 implicitHeight: 4 * VLCStyle.scale
+                height: implicitHeight
+                width: volControl.availableWidth
                 radius: 4 * VLCStyle.scale
                 color: VLCStyle.colors.volsliderbg
 
@@ -114,14 +117,14 @@ FocusScope{
                 }
                 Rectangle {
                     id: filled
-                    width: volControl.visualPosition * parent.width
+                    width: volControl.visualPosition * sliderBg.width
                     height: parent.height
                     radius: 4 * VLCStyle.scale
                     color: VLCStyle.colors.buttonText
                     layer.enabled: (volControl.hovered || volControl.activeFocus)
                     layer.effect: LinearGradient {
                         start: Qt.point(0, 0)
-                        end: Qt.point(volControl.width, 0)
+                        end: Qt.point(sliderBg.width, 0)
                         gradient: Gradient {
                             GradientStop { position: 0.30; color: VLCStyle.colors.volbelowmid }
                             GradientStop { position: 0.80; color: VLCStyle.colors.volabovemid }
