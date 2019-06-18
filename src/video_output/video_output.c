@@ -368,7 +368,7 @@ int vout_GetSnapshot(vout_thread_t *vout,
         const int override_height = var_InheritInteger(vout, "snapshot-height");
 
         if (picture_Export(VLC_OBJECT(vout), image_dst, fmt,
-                           picture, codec, override_width, override_height)) {
+                           picture, codec, override_width, override_height, false)) {
             msg_Err(vout, "Failed to convert image for snapshot");
             picture_Release(picture);
             return VLC_EGENERIC;

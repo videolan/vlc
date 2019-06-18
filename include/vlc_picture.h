@@ -260,10 +260,13 @@ VLC_API picture_t *picture_Clone(picture_t *pic);
  *  - if strictly lower than 0, the original dimension will be used.
  *  - if equal to 0, it will be deduced from the other dimension which must be
  *  different to 0.
- *  - if strictly higher than 0, it will override the dimension.
+ *  - if strictly higher than 0, it will either override the dimension if b_crop
+ *  is false, or crop the picture to the provided size if b_crop is true.
  * If at most one of them is > 0 then the picture aspect ratio will be kept.
  */
-VLC_API int picture_Export( vlc_object_t *p_obj, block_t **pp_image, video_format_t *p_fmt, picture_t *p_picture, vlc_fourcc_t i_format, int i_override_width, int i_override_height );
+VLC_API int picture_Export( vlc_object_t *p_obj, block_t **pp_image, video_format_t *p_fmt,
+                            picture_t *p_picture, vlc_fourcc_t i_format, int i_override_width,
+                            int i_override_height, bool b_crop );
 
 /**
  * This function will setup all fields of a picture_t without allocating any

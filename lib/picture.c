@@ -69,7 +69,7 @@ libvlc_picture_t* libvlc_picture_new( vlc_object_t* p_obj, picture_t* input,
             vlc_assert_unreachable();
     }
     if ( picture_Export( p_obj, &pic->converted, &pic->fmt,
-                         input, format, width, height ) != VLC_SUCCESS )
+                         input, format, width, height, false ) != VLC_SUCCESS )
     {
         free( pic );
         return NULL;

@@ -92,7 +92,7 @@ bool Thumbnailer::generate( medialibrary::MediaPtr media, const std::string& mrl
 
     block_t* block;
     if ( picture_Export( VLC_OBJECT( m_ml ), &block, nullptr, ctx.thumbnail,
-                         VLC_CODEC_JPEG, 512, 320 ) != VLC_SUCCESS )
+                         VLC_CODEC_JPEG, 512, 320, true ) != VLC_SUCCESS )
         return false;
     auto blockPtr = vlc::wrap_cptr( block, &block_Release );
 

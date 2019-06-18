@@ -438,7 +438,8 @@ int picture_Export( vlc_object_t *p_obj,
                     video_format_t *p_fmt,
                     picture_t *p_picture,
                     vlc_fourcc_t i_format,
-                    int i_override_width, int i_override_height )
+                    int i_override_width, int i_override_height,
+                    bool b_crop )
 {
     /* */
     video_format_t fmt_in = p_picture->format;
@@ -479,10 +480,35 @@ int picture_Export( vlc_object_t *p_obj,
     }
 
     /* */
-    fmt_out.i_width  = ( i_override_width < 0 ) ?
-                       i_original_width : (unsigned)i_override_width;
-    fmt_out.i_height = ( i_override_height < 0 ) ?
-                       i_original_height : (unsigned)i_override_height;
+    if( b_crop && i_override_width > 0 && i_override_height > 0 )
+    {
+        float f_ar_dest = (float)i_override_width / i_override_height;
+        float f_ar_src = (float)i_width / i_height;
+        unsigned int i_crop_width, i_crop_height;
+        if ( f_ar_dest > f_ar_src )
+        {
+            i_crop_width = i_width;
+            i_crop_height = (float)i_crop_width / f_ar_dest;
+        }
+        else
+        {
+            i_crop_height = i_height;
+            i_crop_width = (float)i_crop_height * f_ar_dest;
+        }
+        fmt_out.i_width = i_override_width;
+        fmt_out.i_height = i_override_height;
+        fmt_in.i_visible_width = i_crop_width;
+        fmt_in.i_visible_height = i_crop_height;
+        fmt_in.i_x_offset += (i_width - i_crop_width) / 2;
+        fmt_in.i_y_offset += (i_height - i_crop_height) / 2;
+    }
+    else
+    {
+        fmt_out.i_width  = ( i_override_width < 0 ) ?
+                           i_original_width : (unsigned)i_override_width;
+        fmt_out.i_height = ( i_override_height < 0 ) ?
+                           i_original_height : (unsigned)i_override_height;
+    }
 
     /* scale if only one direction is provided */
     if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
