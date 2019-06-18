@@ -326,10 +326,7 @@ static void vout_display_window_MouseEvent(vout_window_t *window,
 static void vout_display_window_KeyboardEvent(vout_window_t *window,
                                               unsigned key)
 {
-    vout_display_window_t *state = window->owner.sys;
-    vout_thread_t *vout = state->vout;
-
-    var_SetInteger(vout, "key-pressed", key);
+    var_SetInteger(vlc_object_instance(window), "key-pressed", key);
 }
 
 static void vout_display_window_OutputEvent(vout_window_t *window,
