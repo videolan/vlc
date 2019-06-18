@@ -670,7 +670,7 @@ struct vlc_player_cbs
         bool enabled, void *data);
 
     /**
-     * Called when the player category delay has changed
+     * Called when the player category delay has changed for the current media
      *
      * @see vlc_player_SetCategoryDelay()
      *
@@ -2392,7 +2392,7 @@ vlc_player_ToggleRecording(vlc_player_t *player)
 }
 
 /**
- * Get the delay of a category
+ * Get the delay of an ES category for the current media
  *
  * @see vlc_player_cbs.on_category_delay_changed
  *
