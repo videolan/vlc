@@ -424,9 +424,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
     memset(textures, 0, sizeof(textures));
     unsigned slices = pool_size;
-    if (!CanUseVoutPool(&sys->d3d_dev, pool_size))
-        /* only provide enough for the filters, we can still do direct rendering */
-        slices = __MIN(slices, 6);
+    /* only provide enough for the filters, we can still do direct rendering */
+    slices = __MIN(slices, 6);
 
     if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &sys->area.texture_source, slices, textures, NULL))
         goto error;

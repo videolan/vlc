@@ -418,33 +418,6 @@ bool isXboxHardware(ID3D11Device *d3ddev)
     return result;
 }
 
-static bool isNvidiaHardware(ID3D11Device *d3ddev)
-{
-    IDXGIAdapter *p_adapter = D3D11DeviceAdapter(d3ddev);
-    if (!p_adapter)
-        return false;
-
-    DXGI_ADAPTER_DESC adapterDesc;
-    if (FAILED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc)))
-        adapterDesc.VendorId = 0;
-    IDXGIAdapter_Release(p_adapter);
-
-    return adapterDesc.VendorId == GPU_MANUFACTURER_NVIDIA;
-}
-
-bool CanUseVoutPool(d3d11_device_t *d3d_dev, UINT slices)
-{
-#if VLC_WINSTORE_APP
-    /* Phones and the Xbox are memory constrained, rely on the d3d11va pool
-     * which is always smaller, we still get direct rendering from the decoder */
-    return false;
-#else
-    /* NVIDIA cards crash when calling CreateVideoDecoderOutputView
-     * on more than 30 slices */
-    return slices <= 30 || !isNvidiaHardware(d3d_dev->d3ddevice);
-#endif
-}
-
 /**
  * Performs a check on each value of the WDDM version. Any value that is OK will
  * consider the driver valid (OR on each value)

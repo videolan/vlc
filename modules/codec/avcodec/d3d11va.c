@@ -71,13 +71,6 @@ vlc_module_begin()
     set_va_callback(Open, 110)
 vlc_module_end()
 
-/*
- * In this mode libavcodec doesn't need the whole array on texture on startup
- * So we get the surfaces from the decoder pool when needed. We don't need to
- * extract the decoded surface into the decoder picture anymore.
- */
-#define D3D11_DIRECT_DECODE  LIBAVCODEC_VERSION_CHECK( 57, 30, 3, 72, 101 )
-
 #include <initguid.h> /* must be last included to not redefine existing GUIDs */
 
 /* dxva2api.h GUIDs: http://msdn.microsoft.com/en-us/library/windows/desktop/ms697067(v=vs100).aspx
@@ -103,10 +96,6 @@ DEFINE_GUID(DXVA2_NoEncrypt,                        0x1b81bed0, 0xa0c7, 0x11d3, 
 
 struct vlc_va_sys_t
 {
-    UINT                         totalTextureSlices;
-    unsigned                     textureWidth;
-    unsigned                     textureHeight;
-
     d3d11_handle_t               hd3d;
     d3d11_device_t               d3d_dev;
 
@@ -114,9 +103,6 @@ struct vlc_va_sys_t
 
     /* Video service */
     DXGI_FORMAT                  render;
-
-    /* pool */
-    picture_t                    *extern_pics[MAX_SURFACE_COUNT];
 
     /* Video decoder */
     D3D11_VIDEO_DECODER_CONFIG   cfg;
@@ -248,43 +234,6 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
     vlc_va_sys_t *sys = va->sys;
     picture_sys_d3d11_t *p_sys = pic->p_sys;
-#if D3D11_DIRECT_DECODE
-    if (sys->va_pool->can_extern_pool)
-    {
-        /* copy the original picture_sys_d3d11_t in the va_pic_context */
-        if (!pic->context)
-        {
-            assert(p_sys!=NULL);
-            if (!p_sys->decoder)
-            {
-                HRESULT hr;
-                D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
-                ZeroMemory(&viewDesc, sizeof(viewDesc));
-                viewDesc.DecodeProfile = *sys->selected_decoder->guid;
-                viewDesc.ViewDimension = D3D11_VDOV_DIMENSION_TEXTURE2D;
-                viewDesc.Texture2D.ArraySlice = p_sys->slice_index;
-
-                hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( sys->d3ddec,
-                                                                     p_sys->resource[KNOWN_DXGI_INDEX],
-                                                                     &viewDesc,
-                                                                     &p_sys->decoder );
-                if (FAILED(hr))
-                    return VLC_EGENERIC;
-            }
-
-            struct d3d11va_pic_context *pic_ctx = CreatePicContext(
-                                             p_sys->decoder,
-                                             p_sys->resource[KNOWN_DXGI_INDEX],
-                                             sys->d3d_dev.d3dcontext,
-                                             p_sys->slice_index,
-                                             p_sys->renderSrc );
-            if (pic_ctx == NULL)
-                return VLC_EGENERIC;
-            pic->context = &pic_ctx->ctx.s;
-        }
-    }
-    else
-#endif
     {
         vlc_va_surface_t *va_surface = va_pool_Get(sys->va_pool);
         if (unlikely(va_surface == NULL))
@@ -646,13 +595,6 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
         }
 
         msg_Dbg(va, "Using output format %s for decoder %s", DxgiFormatToStr(processorInput[idx]), mode->name);
-        if ( sys->render == processorInput[idx] && sys->totalTextureSlices > 4)
-        {
-            if (CanUseVoutPool(&sys->d3d_dev, sys->totalTextureSlices))
-                sys->va_pool->can_extern_pool = true;
-            else
-                msg_Warn( va, "use internal pool" );
-        }
         sys->render = processorInput[idx];
         return VLC_SUCCESS;
     }
@@ -694,35 +636,11 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         ID3D10Multithread_Release(pMultithread);
     }
 
-    if (!sys->textureWidth || !sys->textureHeight)
-    {
-        sys->textureWidth  = fmt->i_width;
-        sys->textureHeight = fmt->i_height;
-    }
-
-    assert(sys->textureWidth  >= fmt->i_width);
-    assert(sys->textureHeight >= fmt->i_height);
-
-    if ((sys->textureWidth != fmt->i_width || sys->textureHeight != fmt->i_height) &&
-        !CanUseDecoderPadding(sys))
-    {
-        msg_Dbg(va, "mismatching external pool sizes use the internal one %dx%d vs %dx%d",
-                sys->textureWidth, sys->textureHeight, fmt->i_width, fmt->i_height);
-        sys->va_pool->can_extern_pool = false;
-        sys->textureWidth  = fmt->i_width;
-        sys->textureHeight = fmt->i_height;
-    }
-    if (sys->totalTextureSlices && sys->totalTextureSlices < surface_count)
-    {
-        msg_Warn(va, "not enough decoding slices in the texture (%d/%d)",
-                 sys->totalTextureSlices, surface_count);
-        sys->va_pool->can_extern_pool = false;
-    }
 #if VLC_WINSTORE_APP
     /* On the Xbox 1/S, any decoding of H264 with one dimension over 2304
      * crashes totally the device */
     if (codec_id == AV_CODEC_ID_H264 &&
-        (sys->textureWidth > 2304 || sys->textureHeight > 2304) &&
+        (fmt->i_width > 2304 || fmt->i_height > 2304) &&
         isXboxHardware(sys->d3d_dev.d3ddevice))
     {
         msg_Warn(va, "%dx%d resolution not supported by your hardware", fmt->i_width, fmt->i_height);
@@ -752,82 +670,10 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         return VLC_EGENERIC;
     }
 
-    if (sys->va_pool->can_extern_pool)
-    {
-#if !D3D11_DIRECT_DECODE
-        size_t surface_idx;
-        for (surface_idx = 0; surface_idx < surface_count; surface_idx++) {
-            picture_t *pic = decoder_NewPicture( (decoder_t*) vlc_object_parent(va) );
-            sys->extern_pics[surface_idx] = pic;
-            sys->hw_surface[surface_idx] = NULL;
-            if (pic==NULL)
-            {
-                msg_Warn(va, "not enough decoder pictures %d out of %d", surface_idx, surface_count);
-                sys->va_pool->can_extern_pool = false;
-                break;
-            }
-
-            D3D11_TEXTURE2D_DESC texDesc;
-            picture_sys_d3d11_t * p_sys = pic->p_sys;
-            ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
-            assert(texDesc.Format == sys->render);
-            assert(texDesc.BindFlags & D3D11_BIND_DECODER);
-
-#if !LIBAVCODEC_VERSION_CHECK( 57, 27, 2, 61, 102 )
-            if (p_sys->slice_index != surface_idx)
-            {
-                msg_Warn(va, "d3d11va requires decoding slices to be the first in the texture (%d/%d)",
-                         p_sys->slice_index, surface_idx);
-                sys->va_pool->can_extern_pool = false;
-                break;
-            }
-#endif
-
-            viewDesc.Texture2D.ArraySlice = p_sys->slice_index;
-            hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( sys->d3ddec,
-                                                                 p_sys->resource[KNOWN_DXGI_INDEX],
-                                                                 &viewDesc,
-                                                                 &p_sys->decoder );
-            if (FAILED(hr)) {
-                msg_Warn(va, "CreateVideoDecoderOutputView %d failed. (hr=0x%lX)", surface_idx, hr);
-                sys->va_pool->can_extern_pool = false;
-                break;
-            }
-
-            D3D11_AllocateResourceView(va, sys->d3d_dev.d3ddevice, textureFmt, pic->p_sys->texture, pic->p_sys->slice_index, pic->p_sys->renderSrc);
-
-            sys->hw_surface[surface_idx] = p_sys->decoder;
-        }
-
-        if (!sys->va_pool->can_extern_pool)
-        {
-            for (size_t i = 0; i < surface_idx; ++i)
-            {
-                if (sys->hw_surface[i])
-                {
-                    ID3D11VideoDecoderOutputView_Release(sys->hw_surface[i]);
-                    sys->hw_surface[i] = NULL;
-                }
-                if (sys->extern_pics[i])
-                {
-                    picture_sys_d3d11_t *p_sys = sys->extern_pics[i]->p_sys;
-                    p_sys->decoder = NULL;
-                    picture_Release(sys->extern_pics[i]);
-                    sys->extern_pics[i] = NULL;
-                }
-            }
-        }
-        else
-#endif
-            msg_Dbg(va, "using external surface pool");
-    }
-
-    if (!sys->va_pool->can_extern_pool)
-    {
         D3D11_TEXTURE2D_DESC texDesc;
         ZeroMemory(&texDesc, sizeof(texDesc));
-        texDesc.Width = sys->textureWidth;
-        texDesc.Height = sys->textureHeight;
+        texDesc.Width = fmt->i_width;
+        texDesc.Height = fmt->i_height;
         texDesc.MipLevels = 1;
         texDesc.Format = sys->render;
         texDesc.SampleDesc.Count = 1;
@@ -849,7 +695,6 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 
         unsigned surface_idx;
         for (surface_idx = 0; surface_idx < surface_count; surface_idx++) {
-            sys->extern_pics[surface_idx] = NULL;
             viewDesc.Texture2D.ArraySlice = surface_idx;
 
             hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( sys->d3ddec,
@@ -869,7 +714,6 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
                                    &sys->renderSrc[surface_idx * D3D11_MAX_SHADER_VIEW]);
             }
         }
-    }
     msg_Dbg(va, "ID3D11VideoDecoderOutputView succeed with %d surfaces (%dx%d)",
             surface_count, fmt->i_width, fmt->i_height);
 
@@ -945,7 +789,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 
 static void DxDestroySurfaces(vlc_va_sys_t *sys)
 {
-    if (sys->va_pool->surface_count && !sys->va_pool->can_extern_pool) {
+    if (sys->va_pool->surface_count) {
         ID3D11Resource *p_texture;
         ID3D11VideoDecoderOutputView_GetResource( sys->hw_surface[0], &p_texture );
         ID3D11Resource_Release(p_texture);
