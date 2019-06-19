@@ -100,6 +100,12 @@ struct vlc_player_program
 
 /**
  * Player track structure.
+ *
+ * A track is a representation of an ES identifier at a given time. Once the
+ * player is unlocked, all content except the es_id pointer can be updated.
+ *
+ * @see vlc_player_cbs.on_track_list_changed
+ * @see vlc_player_GetTrack
  */
 struct vlc_player_track
 {
@@ -937,6 +943,9 @@ struct vlc_player_aout_cbs
  *
  * This function can be used to pass a track from a callback to an other
  * context. The es_id will be held by the duplicated track.
+ *
+ * @warning The returned track won't be updated if the original one is modified
+ * by the player.
  *
  * @see vlc_player_cbs.on_track_list_changed
  *
