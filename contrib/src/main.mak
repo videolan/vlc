@@ -147,7 +147,6 @@ ifdef HAVE_NEON
 AS=perl $(abspath $(VLC_TOOLS)/bin/gas-preprocessor.pl) $(CC)
 CCAS=gas-preprocessor.pl $(CC) -c
 endif
-EXTRA_CFLAGS += $(CFLAGS)
 endif
 
 LN_S = ln -s
