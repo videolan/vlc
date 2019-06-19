@@ -1464,12 +1464,12 @@ static int GetCueTextAlignment( const webvtt_dom_cue_t *p_cue )
             return SUBPICTURE_ALIGN_LEFT;
         case WEBVTT_ALIGN_RIGHT:
             return SUBPICTURE_ALIGN_RIGHT;
-        case WEBVTT_ALIGN_START:
-            return ((p_cue->settings.vertical == WEBVTT_ALIGN_RIGHT) ?
-                     SUBPICTURE_ALIGN_LEFT : SUBPICTURE_ALIGN_RIGHT);
-        case WEBVTT_ALIGN_END:
-            return ((p_cue->settings.vertical == WEBVTT_ALIGN_RIGHT)) ?
+        case WEBVTT_ALIGN_START: /* vertical provides rl or rl base direction */
+            return (p_cue->settings.vertical == WEBVTT_ALIGN_RIGHT) ?
                      SUBPICTURE_ALIGN_RIGHT : SUBPICTURE_ALIGN_LEFT;
+        case WEBVTT_ALIGN_END:
+            return (p_cue->settings.vertical == WEBVTT_ALIGN_RIGHT) ?
+                     SUBPICTURE_ALIGN_LEFT : SUBPICTURE_ALIGN_RIGHT;
         default:
             return 0;
     }
