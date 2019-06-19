@@ -244,6 +244,14 @@ void input_SetCategoryDelay(input_thread_t *input, enum es_format_category_e cat
     es_out_SetDelay(input_priv(input)->p_es_out_display, cat, delay);
 }
 
+void input_SetEsIdDelay(input_thread_t *input, vlc_es_id_t *es_id,
+                        vlc_tick_t delay)
+{
+    assert(es_id);
+    es_out_SetEsDelay(input_priv(input)->p_es_out_display,
+                      vlc_es_id_get_out(es_id), delay);
+}
+
 /**
  * Get the item from an input thread
  * FIXME it does not increase ref count of the item.

@@ -119,6 +119,8 @@ struct es_out_id_t
     decoder_t   *p_dec_record;
     vlc_clock_t *p_clock;
 
+    vlc_tick_t delay;
+
     /* Fields for Video with CC */
     struct
     {
@@ -696,6 +698,19 @@ static bool EsOutDecodersIsEmpty( es_out_t *out )
     return true;
 }
 
+static void EsOutSetEsDelay(es_out_t *out, es_out_id_t *es, vlc_tick_t delay)
+{
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    es->delay = delay;
+
+    EsOutDecoderChangeDelay(out, es);
+
+    /* Update the clock pts delay only if the extra tracks delay changed */
+    EsOutControlLocked(out, ES_OUT_SET_JITTER, p_sys->i_pts_delay,
+                       p_sys->i_pts_jitter, p_sys->i_cr_average);
+}
+
 static void EsOutSetDelay( es_out_t *out, int i_cat, vlc_tick_t i_delay )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
@@ -1049,7 +1064,9 @@ static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es )
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
 
     vlc_tick_t i_delay;
-    if( p_es->fmt.i_cat == AUDIO_ES )
+    if( p_es->delay != INT64_MAX )
+        i_delay = p_es->delay; /* The track use its own delay, and not a category delay */
+    else if( p_es->fmt.i_cat == AUDIO_ES )
         i_delay = p_sys->i_audio_delay;
     else if( p_es->fmt.i_cat == SPU_ES )
         i_delay = p_sys->i_spu_delay;
@@ -1917,6 +1934,7 @@ static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
     es->p_master = p_master;
     es->mouse_event_cb = NULL;
     es->mouse_event_userdata = NULL;
+    es->delay = INT64_MAX;
 
     vlc_list_append(&es->node, es->p_master ? &p_sys->es_slaves : &p_sys->es);
 
@@ -3120,6 +3138,14 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
     {
         bool *pb = va_arg( args, bool* );
         *pb = EsOutDecodersIsEmpty( out );
+        return VLC_SUCCESS;
+    }
+
+    case ES_OUT_SET_ES_DELAY:
+    {
+        es_out_id_t *es = va_arg(args, es_out_id_t *);
+        const vlc_tick_t delay = va_arg(args, vlc_tick_t);
+        EsOutSetEsDelay(out, es, delay);
         return VLC_SUCCESS;
     }
 

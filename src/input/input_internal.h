@@ -373,6 +373,12 @@ void input_SetCategoryDelay(input_thread_t *input, enum es_format_category_e cat
                             vlc_tick_t delay);
 
 /**
+ * Set the delay of an ES identifier
+ */
+void input_SetEsIdDelay(input_thread_t *input, vlc_es_id_t *es_id,
+                        vlc_tick_t delay);
+
+/**
  * Get the input item for an input thread
  *
  * You have to keep a reference to the input or to the input_item_t until

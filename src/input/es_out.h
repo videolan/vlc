@@ -57,6 +57,9 @@ enum es_out_query_private_e
     /* Get buffering state */
     ES_OUT_GET_BUFFERING,                           /* arg1=bool*               res=cannot fail */
 
+    /* Set delay for an ES identifier */
+    ES_OUT_SET_ES_DELAY,                            /* arg1=es_out_id_t *, res=cannot fail */
+
     /* Set delay for a ES category */
     ES_OUT_SET_DELAY,                               /* arg1=es_category_e,      res=cannot fail */
 
@@ -119,6 +122,11 @@ static inline bool es_out_GetEmpty( es_out_t *p_out )
 
     assert( !i_ret );
     return b;
+}
+static inline void es_out_SetEsDelay( es_out_t *p_out, es_out_id_t *es, vlc_tick_t i_delay )
+{
+    int i_ret = es_out_Control( p_out, ES_OUT_SET_ES_DELAY, es, i_delay );
+    assert( !i_ret );
 }
 static inline void es_out_SetDelay( es_out_t *p_out, int i_cat, vlc_tick_t i_delay )
 {
