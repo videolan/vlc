@@ -151,10 +151,14 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (pix_fmt != AV_PIX_FMT_VAAPI_VLD || p_sys == NULL)
         return VLC_EGENERIC;
 
+    vlc_va_sys_t *sys = malloc(sizeof *sys);
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+    memset(sys, 0, sizeof (*sys));
+
     vlc_object_t *o = VLC_OBJECT(va);
 
     int ret = VLC_EGENERIC;
-    vlc_va_sys_t *sys = NULL;
 
     /* The picture must be allocated by the vout */
     VADisplay va_dpy;
@@ -172,14 +176,6 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     int i_vlc_chroma;
     if (GetVaProfile(ctx, fmt, &i_profile, &i_vlc_chroma, &count) != VLC_SUCCESS)
         goto error;
-
-    sys = malloc(sizeof *sys);
-    if (unlikely(sys == NULL))
-    {
-        ret = VLC_ENOMEM;
-        goto error;
-    }
-    memset(sys, 0, sizeof (*sys));
 
     /* */
     sys->dec_device = dec_device;
@@ -209,14 +205,11 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     return VLC_SUCCESS;
 
 error:
-    if (sys != NULL)
-    {
-        if (sys->hw_ctx.context_id != VA_INVALID_ID)
-            vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
-        if (sys->hw_ctx.config_id != VA_INVALID_ID)
-            vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
-        free(sys);
-    }
+    if (sys->hw_ctx.context_id != VA_INVALID_ID)
+        vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
+    if (sys->hw_ctx.config_id != VA_INVALID_ID)
+        vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
+    free(sys);
     vlc_decoder_device_Release(dec_device);
     return ret;
 }
