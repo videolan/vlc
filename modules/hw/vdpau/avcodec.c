@@ -89,7 +89,7 @@ static vlc_vdp_video_field_t *GetSurface(vlc_va_t *va)
     return NULL;
 }
 
-static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
+static vlc_vdp_video_field_t *Get(vlc_va_t *va)
 {
     vlc_vdp_video_field_t *field;
     unsigned tries = (VLC_TICK_FROM_SEC(1) + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
@@ -97,11 +97,20 @@ static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
     while ((field = GetSurface(va)) == NULL)
     {
         if (--tries == 0)
-            return VLC_ENOMEM;
+            return NULL;
         /* Pool empty. Wait for some time as in src/input/decoder.c.
          * XXX: Both this and the core should use a semaphore or a CV. */
         vlc_tick_sleep(VOUT_OUTMEM_SLEEP);
     }
+
+    return field;
+}
+
+static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
+{
+    vlc_vdp_video_field_t *field = Get(va);
+    if (field == NULL)
+        return VLC_ENOMEM;
 
     pic->context = &field->context;
     *data = (void *)(uintptr_t)field->frame->surface;
