@@ -28,6 +28,7 @@ DEPS_libdsm += pthreads $(DEPS_pthreads)
 endif
 
 .libdsm: libdsm
+	cd $< && touch "config.rpath"
 	$(RECONF)
 	cd $< && $(HOSTVARS_PIC) ./configure --disable-programs $(LIBDSM_CONF)
 	cd $< && $(MAKE)
