@@ -702,6 +702,8 @@ static void EsOutSetEsDelay(es_out_t *out, es_out_id_t *es, vlc_tick_t delay)
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
 
+    assert(es->fmt.i_cat == AUDIO_ES || es->fmt.i_cat == SPU_ES);
+
     es->delay = delay;
 
     EsOutDecoderChangeDelay(out, es);
@@ -2614,8 +2616,30 @@ static int EsOutControlLocked( es_out_t *out, int i_query, ... )
 static vlc_tick_t EsOutGetTracksDelay(es_out_t *out)
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
-    const vlc_tick_t tracks_delay = __MIN(p_sys->i_audio_delay,
-                                          p_sys->i_spu_delay);
+
+    vlc_tick_t tracks_delay = 0;
+    bool has_audio = false;
+    bool has_spu = false;
+
+    /* Get the smaller (and negative) delay between category delays and tracks
+     * delays */
+    es_out_id_t *es;
+    foreach_es_then_es_slaves(es)
+    {
+        if (es->p_dec)
+        {
+            if (es->delay != INT64_MAX)
+                tracks_delay = __MIN(tracks_delay, es->delay);
+            else if (es->fmt.i_cat == AUDIO_ES)
+                has_audio = true;
+            else if (es->fmt.i_cat == SPU_ES)
+                has_spu = true;
+        }
+    }
+    if (has_audio)
+        tracks_delay = __MIN(tracks_delay, p_sys->i_audio_delay);
+    if (has_spu)
+        tracks_delay = __MIN(tracks_delay, p_sys->i_spu_delay);
     return tracks_delay < 0 ? -tracks_delay : 0;
 }
 
