@@ -35,6 +35,7 @@
 #include <vlc_plugin.h>
 #include <vlc_fourcc.h>
 #include <vlc_picture.h>
+#include <vlc_codec.h>
 #include <vlc_xlib.h>
 #include "vlc_vdpau.h"
 #include "../../codec/avcodec/va.h"
@@ -136,7 +137,8 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
                 enum PixelFormat pix_fmt,
                 const es_format_t *fmt, void *p_sys, vlc_decoder_device *dec_device)
 {
-    if (pix_fmt != AV_PIX_FMT_VDPAU)
+    if (pix_fmt != AV_PIX_FMT_VDPAU|| dec_device == NULL ||
+        dec_device->type != VLC_DECODER_DEVICE_VDPAU)
         return VLC_EGENERIC;
 
     (void) fmt;
@@ -177,13 +179,8 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     sys->width = width;
     sys->height = height;
     sys->hwaccel_context = NULL;
-
-    err = vdp_get_x11(NULL, -1, &sys->vdp, &sys->device);
-    if (err != VDP_STATUS_OK)
-    {
-        free(sys);
-        return VLC_EGENERIC;
-    }
+    sys->vdp = dec_device->opaque;
+    vdp_hold_x11(sys->vdp, &sys->device);
 
     unsigned flags = AV_HWACCEL_FLAG_ALLOW_HIGH_DEPTH;
 
