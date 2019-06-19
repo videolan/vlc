@@ -3326,7 +3326,8 @@ vlc_player_VoutOSDCallback(vlc_object_t *this, const char *var,
             newval.psz_string : var_GetString(vout, "deinterlace-mode");
         vouts_osd_Message(&vout, 1, _("Deinterlace %s (%s)"),
                           on == 1 ? _("On") : _("Off"), mode);
-        free(mode);
+        if (!varmode)
+            free(mode);
     }
 
     else if (strcmp(var, "sub-margin") == 0)
