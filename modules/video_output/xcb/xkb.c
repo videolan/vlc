@@ -26,6 +26,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <wctype.h>
 #include <X11/keysym.h>
 #include <X11/XF86keysym.h>
 #include <vlc_common.h>
@@ -112,11 +113,15 @@ uint_fast32_t vlc_xkb_get_one(struct xkb_state *state, uint_fast32_t keycode)
     xkb_keysym_t keysym = xkb_state_key_get_one_sym(state, keycode);
     uint_fast32_t vk = vlc_xkb_convert_keysym(keysym);
 
-    if (vk != KEY_UNSET)
+    if (vk != KEY_UNSET) {
+        if (vk < 0x110000)
+            vk = towlower(vk); /* Lower case for Unicode code points */
+
         for (size_t i = 0; i < ARRAY_SIZE(modifiers); i++)
             if (xkb_state_mod_name_is_active(state, modifiers[i].name,
                                              XKB_STATE_MODS_EFFECTIVE) > 0)
                 vk |= modifiers[i].mask;
+    }
 
     return vk;
 }
