@@ -1373,14 +1373,14 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 - (void)selectTrack:(VLCTrackMetaData *)track
 {
     vlc_player_Lock(_p_player);
-    vlc_player_SelectTrack(_p_player, track.esID);
+    vlc_player_SelectEsId(_p_player, track.esID);
     vlc_player_Unlock(_p_player);
 }
 
 - (void)unselectTrack:(VLCTrackMetaData *)track
 {
     vlc_player_Lock(_p_player);
-    vlc_player_UnselectTrack(_p_player, track.esID);
+    vlc_player_UnselectEsId(_p_player, track.esID);
     vlc_player_Unlock(_p_player);
 }
 

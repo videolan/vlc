@@ -1371,7 +1371,7 @@ vlc_player_vout_OSDTrack(vlc_player_t *player, vlc_es_id_t *id, bool select)
 }
 
 void
-vlc_player_SelectTrack(vlc_player_t *player, vlc_es_id_t *id)
+vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *id)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
@@ -1427,9 +1427,9 @@ vlc_player_CycleTrack(vlc_player_t *player, enum es_format_category_e cat,
     const struct vlc_player_track *track =
         vlc_player_GetTrackAt(player, cat, index);
     if (selected)
-        vlc_player_SelectTrack(player, track->es_id);
+        vlc_player_SelectTrack(player, track);
     else
-        vlc_player_UnselectTrack(player, track->es_id);
+        vlc_player_UnselectTrack(player, track);
 }
 
 void
@@ -1447,7 +1447,7 @@ vlc_player_SelectPrevTrack(vlc_player_t *player,
 }
 
 void
-vlc_player_UnselectTrack(vlc_player_t *player, vlc_es_id_t *id)
+vlc_player_UnselectEsId(vlc_player_t *player, vlc_es_id_t *id)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
@@ -1458,7 +1458,7 @@ vlc_player_UnselectTrack(vlc_player_t *player, vlc_es_id_t *id)
 }
 
 void
-vlc_player_RestartTrack(vlc_player_t *player, vlc_es_id_t *id)
+vlc_player_RestartEsId(vlc_player_t *player, vlc_es_id_t *id)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
 
@@ -1557,9 +1557,9 @@ vlc_player_SetTeletextEnabled(vlc_player_t *player, bool enabled)
     if (!input || !input->teletext_menu)
         return;
     if (enabled)
-        vlc_player_SelectTrack(player, input->teletext_menu->t.es_id);
+        vlc_player_SelectEsId(player, input->teletext_menu->t.es_id);
     else
-        vlc_player_UnselectTrack(player, input->teletext_menu->t.es_id);
+        vlc_player_UnselectEsId(player, input->teletext_menu->t.es_id);
 }
 
 void

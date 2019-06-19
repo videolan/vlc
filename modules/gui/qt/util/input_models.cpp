@@ -62,9 +62,9 @@ bool TrackListModel::setData(const QModelIndex &index, const QVariant &value, in
     vlc_player_locker lock{ m_player };
 
     if (select)
-        vlc_player_SelectTrack(m_player, m_data[row].m_id.get());
+        vlc_player_SelectEsId(m_player, m_data[row].m_id.get());
     else
-        vlc_player_UnselectTrack(m_player, m_data[row].m_id.get());
+        vlc_player_UnselectEsId(m_player, m_data[row].m_id.get());
     return true;
 }
 

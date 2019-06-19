@@ -370,9 +370,9 @@ static int vlclua_player_toggle_track_(lua_State *L,
     const struct vlc_player_track *track = FindTrack(player, cat, id);
     if (track) {
         if (track->selected)
-            vlc_player_UnselectTrack(player, track->es_id);
+            vlc_player_UnselectTrack(player, track);
         else
-            vlc_player_SelectTrack(player, track->es_id);
+            vlc_player_SelectTrack(player, track);
     }
 
     vlc_player_Unlock(player);

@@ -103,7 +103,7 @@ struct vlc_player_program
  */
 struct vlc_player_track
 {
-    /** Id used for any player actions, like vlc_player_SelectTrack() */
+    /** Id used for any player actions, like vlc_player_SelectEsId() */
     vlc_es_id_t *es_id;
     /** Track name, always valid */
     const char *name;
@@ -1716,7 +1716,18 @@ vlc_player_GetSelectedTrack(vlc_player_t *player, enum es_format_category_e cat)
  * vlc_player_GetTrackAt())
  */
 VLC_API void
-vlc_player_SelectTrack(vlc_player_t *player, vlc_es_id_t *es_id);
+vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *es_id);
+
+
+/**
+ * Helper to select a track
+ */
+static inline void
+vlc_player_SelectTrack(vlc_player_t *player,
+                       const struct vlc_player_track *track)
+{
+    vlc_player_SelectEsId(player, track->es_id);
+}
 
 /**
  * Select the next track
@@ -1761,7 +1772,17 @@ vlc_player_SelectPrevTrack(vlc_player_t *player,
  * vlc_player_GetTrackAt())
  */
 VLC_API void
-vlc_player_UnselectTrack(vlc_player_t *player, vlc_es_id_t *es_id);
+vlc_player_UnselectEsId(vlc_player_t *player, vlc_es_id_t *es_id);
+
+/**
+ * Helper to unselect a track
+ */
+static inline void
+vlc_player_UnselectTrack(vlc_player_t *player,
+                         const struct vlc_player_track *track)
+{
+    vlc_player_UnselectEsId(player, track->es_id);
+}
 
 /**
  * Helper to unselect all tracks from an ES category
@@ -1777,7 +1798,7 @@ vlc_player_UnselectTrackCategory(vlc_player_t *player,
             vlc_player_GetTrackAt(player, cat, i);
         assert(track);
         if (track->selected)
-            vlc_player_UnselectTrack(player, track->es_id);
+            vlc_player_UnselectTrack(player, track);
     }
 }
 
@@ -1792,7 +1813,17 @@ vlc_player_UnselectTrackCategory(vlc_player_t *player,
  * vlc_player_GetTrackAt())
  */
 VLC_API void
-vlc_player_RestartTrack(vlc_player_t *player, vlc_es_id_t *es_id);
+vlc_player_RestartEsId(vlc_player_t *player, vlc_es_id_t *es_id);
+
+/**
+ * Helper to restart a track
+ */
+static inline void
+vlc_player_RestartTrack(vlc_player_t *player,
+                        const struct vlc_player_track *track)
+{
+    vlc_player_RestartEsId(player, track->es_id);
+}
 
 /**
   * Helper to restart all selected tracks from an ES category
@@ -1808,7 +1839,7 @@ vlc_player_RestartTrackCategory(vlc_player_t *player,
             vlc_player_GetTrackAt(player, cat, i);
         assert(track);
         if (track->selected)
-            vlc_player_RestartTrack(player, track->es_id);
+            vlc_player_RestartTrack(player, track);
     }
 }
 

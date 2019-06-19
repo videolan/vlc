@@ -383,7 +383,7 @@ int libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track )
         if (i_track == vlc_es_id_GetInputId(track->es_id))
         {
             /* found */
-            vlc_player_SelectTrack(player, track->es_id);
+            vlc_player_SelectTrack(player, track);
             i_ret = 0;
             goto end;
         }

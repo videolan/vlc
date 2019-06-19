@@ -825,13 +825,14 @@ vlc_player_Pause
 vlc_player_program_Delete
 vlc_player_program_Dup
 vlc_player_RemoveListener
-vlc_player_RestartTrack
+vlc_player_RestartEsId
 vlc_player_Resume
 vlc_player_SeekByPos
 vlc_player_SeekByTime
 vlc_player_SelectCategoryLanguage
 vlc_player_SelectChapter
 vlc_player_SelectChapterIdx
+vlc_player_SelectEsId
 vlc_player_SelectNextChapter
 vlc_player_SelectNextTitle
 vlc_player_SelectNextTrack
@@ -844,7 +845,6 @@ vlc_player_SelectProgram
 vlc_player_SelectTeletextPage
 vlc_player_SelectTitle
 vlc_player_SelectTitleIdx
-vlc_player_SelectTrack
 vlc_player_SetAssociatedSubsFPS
 vlc_player_SetAtoBLoop
 vlc_player_SetCategoryDelay
@@ -866,7 +866,7 @@ vlc_player_title_list_Release
 vlc_player_track_Delete
 vlc_player_track_Dup
 vlc_player_Unlock
-vlc_player_UnselectTrack
+vlc_player_UnselectEsId
 vlc_player_UpdateViewpoint
 vlc_player_vout_AddListener
 vlc_player_vout_Hold
