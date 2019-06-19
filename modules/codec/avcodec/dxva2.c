@@ -229,10 +229,13 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
         return VLC_EGENERIC;
     }
 
-    int res = va_pool_Get(&sys->dx_sys.va_pool, pic);
-    if (likely(res==VLC_SUCCESS))
-        *data = (uint8_t*)((struct va_pic_context*)pic->context)->picsys.surface;
-    return res;
+    picture_context_t *pic_ctx = va_pool_Get(&sys->dx_sys.va_pool);
+    if (likely(pic_ctx==NULL))
+        return VLC_ENOITEM;
+
+    pic->context = pic_ctx;
+    *data = (uint8_t*)((struct va_pic_context*)pic->context)->picsys.surface;
+    return VLC_SUCCESS;
 }
 
 static void Close(vlc_va_t *va, void **ctx)

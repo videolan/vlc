@@ -78,7 +78,7 @@ int va_pool_Open(vlc_va_t *, const video_format_t *, va_pool_t *);
 void va_pool_Close(vlc_va_t *va, va_pool_t *);
 int va_pool_SetupDecoder(vlc_va_t *, va_pool_t *, const AVCodecContext *, unsigned count, int alignment);
 int va_pool_SetupSurfaces(vlc_va_t *, va_pool_t *, unsigned count);
-int va_pool_Get(va_pool_t *, picture_t *);
+picture_context_t *va_pool_Get(va_pool_t *);
 void va_surface_AddRef(vlc_va_surface_t *surface);
 void va_surface_Release(vlc_va_surface_t *surface);
 

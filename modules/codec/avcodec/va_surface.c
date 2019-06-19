@@ -157,24 +157,23 @@ static picture_context_t *GetSurface(va_pool_t *va_pool)
     return NULL;
 }
 
-int va_pool_Get(va_pool_t *va_pool, picture_t *pic)
+picture_context_t *va_pool_Get(va_pool_t *va_pool)
 {
     unsigned tries = (VLC_TICK_FROM_SEC(1) + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
     picture_context_t *field;
 
     if (va_pool->surface_count == 0)
-        return VLC_ENOITEM;
+        return NULL;
 
     while ((field = GetSurface(va_pool)) == NULL)
     {
         if (--tries == 0)
-            return VLC_ENOITEM;
+            return NULL;
         /* Pool empty. Wait for some time as in src/input/decoder.c.
          * XXX: Both this and the core should use a semaphore or a CV. */
         vlc_tick_sleep(VOUT_OUTMEM_SLEEP);
     }
-    pic->context = field;
-    return VLC_SUCCESS;
+    return field;
 }
 
 void va_surface_AddRef(vlc_va_surface_t *surface)

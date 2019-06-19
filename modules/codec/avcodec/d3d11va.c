@@ -287,9 +287,10 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     else
 #endif
     {
-        int res = va_pool_Get(&va->sys->dx_sys.va_pool, pic);
-        if (unlikely(res != VLC_SUCCESS))
-            return res;
+        picture_context_t *pic_ctx = va_pool_Get(&va->sys->dx_sys.va_pool);
+        if (unlikely(pic_ctx == NULL))
+            return VLC_ENOITEM;
+        pic->context = pic_ctx;
     }
     *data = (uint8_t*)((struct va_pic_context *)pic->context)->picsys.decoder;
     return VLC_SUCCESS;
