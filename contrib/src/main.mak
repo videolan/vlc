@@ -139,7 +139,6 @@ ifdef HAVE_NEON
 AS=perl $(abspath ../../extras/tools/build/bin/gas-preprocessor.pl) $(CC)
 CCAS=gas-preprocessor.pl $(CC) -c
 endif
-EXTRA_CFLAGS += $(CFLAGS)
 endif
 
 ifdef HAVE_WIN32
