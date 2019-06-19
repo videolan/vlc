@@ -317,7 +317,7 @@ HOSTTOOLS := \
 	CC="$(CC)" CXX="$(CXX)" LD="$(LD)" \
 	AR="$(AR)" CCAS="$(CCAS)" RANLIB="$(RANLIB)" STRIP="$(STRIP)" \
 	PATH="$(PREFIX)/bin:$(PATH)"
-HOSTVARS := \
+HOSTVARS := $(HOSTTOOLS) \
 	CPPFLAGS="$(CPPFLAGS)" \
 	CFLAGS="$(CFLAGS)" \
 	CXXFLAGS="$(CXXFLAGS)" \
@@ -333,10 +333,8 @@ HOSTVARS_PIC := $(HOSTTOOLS) \
 ifdef HAVE_CROSS_COMPILE
 HOSTVARS_MESON := PATH="$(PREFIX)/bin:$(PATH)"
 else
-HOSTVARS_MESON := $(HOSTTOOLS) $(HOSTVARS)
+HOSTVARS_MESON := $(HOSTVARS)
 endif
-
-HOSTVARS := $(HOSTTOOLS) $(HOSTVARS)
 
 download_git = \
 	rm -Rf -- "$(@:.tar.xz=)" && \
