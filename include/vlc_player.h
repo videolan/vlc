@@ -547,6 +547,17 @@ struct vlc_player_cbs
         vlc_es_id_t *unselected_id, vlc_es_id_t *selected_id, void *data);
 
     /**
+     * Called when a track delay has changed
+     *
+     * @param player locked player instance
+     * @param es_id valid track id
+     * @param delay a valid delay or INT64_MAX if the delay of this track is
+     * canceled
+     */
+    void (*on_track_delay_changed)(vlc_player_t *player,
+        vlc_es_id_t *es_id, vlc_tick_t delay, void *data);
+
+    /**
      * Called when a new program is added, removed or updated
      *
      * @note The program is only valid from this callback context. Users should
@@ -2450,6 +2461,9 @@ vlc_player_GetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat)
  * @note A successful call will trigger the
  * vlc_player_cbs.on_category_delay_changed event.
  *
+ * @warning This has no effect on tracks where the delay was set by
+ * vlc_player_SetEsIdDelay()
+ *
  * @param player locked player instance
  * @param cat AUDIO_ES or SPU_ES (VIDEO_ES not supported yet)
  * @param delay a valid time
@@ -2459,6 +2473,40 @@ vlc_player_GetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat)
 VLC_API int
 vlc_player_SetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat,
                             vlc_tick_t delay, enum vlc_player_whence whence);
+
+/**
+ * Get the delay of a track
+ *
+ * @see vlc_player_cbs.on_track_delay_changed
+ *
+ * @param player locked player instance
+ * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
+ * vlc_player_GetTrackAt())
+ * @return a valid delay or INT64_MAX is no delay is set for this track
+ */
+VLC_API vlc_tick_t
+vlc_player_GetEsIdDelay(vlc_player_t *player, vlc_es_id_t *es_id);
+
+/**
+ * Set the delay of one track
+ *
+ * @note A successful call will trigger the
+ * vlc_player_cbs.on_track_delay_changed event.
+ *
+ * @warning Setting the delay of one specific track will override previous and
+ * future changes of delay made by vlc_player_SetCategoryDelay()
+ *
+ * @param player locked player instance
+ * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
+ * vlc_player_GetTrackAt())
+ * @param delay a valid time or INT64_MAX to use default category delay
+ * @param whence absolute or relative
+ * @return VLC_SUCCESS or VLC_EGENERIC if the category of the es_id is not
+ * handled (VIDEO_ES not supported yet)
+ */
+VLC_API int
+vlc_player_SetEsIdDelay(vlc_player_t *player, vlc_es_id_t *es_id,
+                        vlc_tick_t delay, enum vlc_player_whence whence);
 
 /**
  * Helper to get the audio delay

@@ -789,6 +789,7 @@ vlc_player_GetCategoryDelay
 vlc_player_GetCategoryLanguage
 vlc_player_GetCurrentMedia
 vlc_player_GetError
+vlc_player_GetEsIdDelay
 vlc_player_GetEsIdFromVout
 vlc_player_GetLength
 vlc_player_GetPosition
@@ -850,6 +851,7 @@ vlc_player_SetAssociatedSubsFPS
 vlc_player_SetAtoBLoop
 vlc_player_SetCategoryDelay
 vlc_player_SetCurrentMedia
+vlc_player_SetEsIdDelay
 vlc_player_SetMediaStoppedAction
 vlc_player_SetRecordingEnabled
 vlc_player_SetRenderer

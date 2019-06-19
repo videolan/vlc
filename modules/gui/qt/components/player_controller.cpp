@@ -810,6 +810,7 @@ static const struct vlc_player_cbs player_cbs = {
     on_player_length_changed,
     on_player_track_list_changed,
     on_player_track_selection_changed,
+    NULL /* on_player_track_delay_changed */,
     on_player_program_list_changed,
     on_player_program_selection_changed,
     on_player_titles_changed,

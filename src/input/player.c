@@ -55,6 +55,7 @@ struct vlc_player_track_priv
 {
     struct vlc_player_track t;
     vout_thread_t *vout; /* weak reference */
+    vlc_tick_t delay;
 };
 
 typedef struct VLC_VECTOR(struct vlc_player_program *)
@@ -417,6 +418,9 @@ vlc_player_track_New(vlc_es_id_t *id, const char *name, const es_format_t *fmt)
     if (!trackpriv)
         return NULL;
     struct vlc_player_track *track = &trackpriv->t;
+
+    trackpriv->delay = INT64_MAX;
+
     track->name = strdup(name);
     if (!track->name)
     {
@@ -2876,6 +2880,53 @@ vlc_player_GetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat)
         return 0;
 
     return input->cat_delays[cat];
+}
+
+int
+vlc_player_SetEsIdDelay(vlc_player_t *player, vlc_es_id_t *es_id,
+                        vlc_tick_t delay, enum vlc_player_whence whence)
+{
+    bool absolute = whence == VLC_PLAYER_WHENCE_ABSOLUTE;
+    struct vlc_player_input *input = vlc_player_get_input_locked(player);
+    if (!input)
+        return VLC_EGENERIC;
+
+    struct vlc_player_track_priv *trackpriv =
+        vlc_player_input_FindTrackById(input, es_id, NULL);
+    if (trackpriv == NULL ||
+        (trackpriv->t.fmt.i_cat != AUDIO_ES && trackpriv->t.fmt.i_cat != SPU_ES))
+        return VLC_EGENERIC;
+
+    if (absolute)
+        trackpriv->delay = delay;
+    else
+    {
+        if (trackpriv->delay == INT64_MAX)
+            trackpriv->delay = 0;
+        trackpriv->delay += delay;
+        delay = trackpriv->delay;
+    }
+
+    input_SetEsIdDelay(input->thread, es_id, delay);
+    if (delay != INT64_MAX)
+        vlc_player_vout_OSDMessage(player, _("%s delay: %i ms"),
+                                   trackpriv->t.name,
+                                   (int)MS_FROM_VLC_TICK(delay));
+    vlc_player_SendEvent(player, on_track_delay_changed, es_id, delay);
+
+    return VLC_SUCCESS;
+}
+
+vlc_tick_t
+vlc_player_GetEsIdDelay(vlc_player_t *player, vlc_es_id_t *es_id)
+{
+    struct vlc_player_input *input = vlc_player_get_input_locked(player);
+    if (!input)
+        return 0;
+
+    struct vlc_player_track_priv *trackpriv =
+        vlc_player_input_FindTrackById(input, es_id, NULL);
+    return trackpriv ? trackpriv->delay : INT64_MAX;
 }
 
 static struct {
