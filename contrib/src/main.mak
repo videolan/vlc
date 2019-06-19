@@ -548,8 +548,8 @@ ifdef HAVE_CROSS_COMPILE
 endif
 endif
 ifdef HAVE_DARWIN_OS
-	echo "set(CMAKE_C_FLAGS \"$(CFLAGS) $(EXTRA_CFLAGS)\")" >> $@
-	echo "set(CMAKE_CXX_FLAGS \"$(CXXFLAGS) $(EXTRA_CXXFLAGS)\")" >> $@
+	echo "set(CMAKE_C_FLAGS \"$(CFLAGS)\")" >> $@
+	echo "set(CMAKE_CXX_FLAGS \"$(CXXFLAGS)\")" >> $@
 	echo "set(CMAKE_LD_FLAGS \"$(LDFLAGS)\")" >> $@
 	echo "set(CMAKE_AR ar CACHE FILEPATH "Archiver")" >> $@
 ifdef HAVE_IOS
