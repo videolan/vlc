@@ -151,7 +151,6 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (pix_fmt != AV_PIX_FMT_VAAPI_VLD || p_sys == NULL)
         return VLC_EGENERIC;
 
-    (void) fmt;
     vlc_object_t *o = VLC_OBJECT(va);
 
     int ret = VLC_EGENERIC;
