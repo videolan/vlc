@@ -720,20 +720,20 @@ static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_ac
     {
         case VIDEO_ES:
         {
-    //player is locked within callbacks*
-    size_t i_vout = 0;
-    vout_thread_t **vouts = vlc_player_vout_HoldAll(player, &i_vout);
+            //player is locked within callbacks*
+            size_t i_vout = 0;
+            vout_thread_t **vouts = vlc_player_vout_HoldAll(player, &i_vout);
 
-    std::shared_ptr<vout_thread_t*> voutsPtr( vouts, [i_vout]( vout_thread_t**vouts ) {
-        for (size_t i = 0; i < i_vout; i++)
-            vout_Release( vouts[i] );
-        free(vouts);
-    });
+            std::shared_ptr<vout_thread_t*> voutsPtr( vouts, [i_vout]( vout_thread_t**vouts ) {
+                for (size_t i = 0; i < i_vout; i++)
+                    vout_Release( vouts[i] );
+                free(vouts);
+            });
 
-    //call on object thread
-    that->callAsync([that,voutsPtr,i_vout] () {
-        that->UpdateVouts(voutsPtr.get(), i_vout);
-    });
+            //call on object thread
+            that->callAsync([that,voutsPtr,i_vout] () {
+                that->UpdateVouts(voutsPtr.get(), i_vout);
+            });
             break;
         }
         default:
