@@ -110,6 +110,8 @@ static bool convertTracks( const medialibrary::IMedia* inputMedia, vlc_ml_media_
             return false;
         output->i_type = VLC_ML_TRACK_TYPE_VIDEO;
         output->i_bitrate = t->bitrate();
+        output->v.i_width = t->width();
+        output->v.i_height = t->height();
         output->v.i_fpsNum = t->fpsNum();
         output->v.i_fpsDen = t->fpsDen();
         output->v.i_sarNum = t->sarNum();
