@@ -835,6 +835,7 @@ vlc_player_SelectCategoryLanguage
 vlc_player_SelectChapter
 vlc_player_SelectChapterIdx
 vlc_player_SelectEsId
+vlc_player_SelectEsIdList
 vlc_player_SelectNextChapter
 vlc_player_SelectNextTitle
 vlc_player_SelectNextTrack

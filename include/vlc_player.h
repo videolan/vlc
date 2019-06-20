@@ -309,7 +309,14 @@ enum vlc_player_select_policy
      * policy will disable all other tracks for the same category.
      */
     VLC_PLAYER_SELECT_EXCLUSIVE,
-    /* XXX VLC_PLAYER_SELECT_SIMULTANEOUS, */
+    /**
+     * Select multiple tracks for one category.
+     *
+     * Only one audio track can be selected at a time.
+     * Two subtitle tracks can be selected simultaneously.
+     * Multiple video tracks can be selected simultaneously.
+     */
+    VLC_PLAYER_SELECT_SIMULTANEOUS,
 };
 
 /**
@@ -1751,8 +1758,9 @@ vlc_player_GetSelectedTrack(vlc_player_t *player, enum es_format_category_e cat)
  * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
  * vlc_player_GetTrackAt())
  * @param policy exclusive or simultaneous
+ * @return the number of track selected for es_id category
  */
-VLC_API void
+VLC_API unsigned
 vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *es_id,
                       enum vlc_player_select_policy policy);
 
@@ -1760,13 +1768,40 @@ vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *es_id,
 /**
  * Helper to select a track
  */
-static inline void
+static inline unsigned
 vlc_player_SelectTrack(vlc_player_t *player,
                        const struct vlc_player_track *track,
                        enum vlc_player_select_policy policy)
 {
-    vlc_player_SelectEsId(player, track->es_id, policy);
+    return vlc_player_SelectEsId(player, track->es_id, policy);
 }
+
+/**
+ * Select multiple tracks from a list of ES identifiers.
+ *
+ * Any tracks of the category, not referenced in the list will be unselected.
+ *
+ * @warning there is no guarantee all requested tracks will be selected. The
+ * behaviour is undefined if the list is not null-terminated.
+ *
+ * @note A successful call will trigger the
+ * vlc_player_cbs.on_track_selection_changed event for each track that has
+ * its selection state changed.
+ *
+ * @see VLC_PLAYER_SELECT_SIMULTANEOUS
+ *
+ * @param player locked player instance
+ * @param cat VIDEO_ES, AUDIO_ES or SPU_ES
+ * @param es_id_list a null-terminated list of ES identifiers. es_ids not
+ * corresponding to the category will be ignored.
+ * (ES IDs can be retrieved from vlc_player_cbs.on_track_list_changed or
+ * vlc_player_GetTrackAt())
+ * @return the number of track selected for that category
+ */
+VLC_API unsigned
+vlc_player_SelectEsIdList(vlc_player_t *player,
+                          enum es_format_category_e cat,
+                          vlc_es_id_t *const es_id_list[]);
 
 /**
  * Select the next track
@@ -1804,6 +1839,8 @@ vlc_player_SelectPrevTrack(vlc_player_t *player,
 
 /**
  * Unselect a track from an ES identifier
+ *
+ * @warning Other tracks of the same category won't be touched.
  *
  * @note A successful call will trigger the
  * vlc_player_cbs.on_track_selection_changed event.
