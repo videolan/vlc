@@ -45,7 +45,8 @@ struct libvlc_picture_t
 
 libvlc_picture_t* libvlc_picture_new( vlc_object_t* p_obj, picture_t* input,
                                       libvlc_picture_type_t type,
-                                      unsigned int width, unsigned int height )
+                                      unsigned int width, unsigned int height,
+                                      bool crop )
 {
     libvlc_picture_t *pic = malloc( sizeof( *pic ) );
     if ( unlikely( pic == NULL ) )
@@ -69,7 +70,7 @@ libvlc_picture_t* libvlc_picture_new( vlc_object_t* p_obj, picture_t* input,
             vlc_assert_unreachable();
     }
     if ( picture_Export( p_obj, &pic->converted, &pic->fmt,
-                         input, format, width, height, false ) != VLC_SUCCESS )
+                         input, format, width, height, crop ) != VLC_SUCCESS )
     {
         free( pic );
         return NULL;

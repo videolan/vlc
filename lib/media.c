@@ -1096,6 +1096,7 @@ struct libvlc_media_thumbnail_request_t
     libvlc_media_t *md;
     unsigned int width;
     unsigned int height;
+    bool crop;
     libvlc_picture_type_t type;
     vlc_thumbnailer_request_t* req;
 };
@@ -1109,7 +1110,8 @@ static void media_on_thumbnail_ready( void* data, picture_t* thumbnail )
     libvlc_picture_t* pic = NULL;
     if ( thumbnail != NULL )
         pic = libvlc_picture_new( VLC_OBJECT(p_media->p_libvlc_instance->p_libvlc_int),
-                                    thumbnail, req->type, req->width, req->height );
+                                    thumbnail, req->type, req->width, req->height,
+                                    req->crop );
     event.u.media_thumbnail_generated.p_thumbnail = pic;
     libvlc_event_send( &p_media->event_manager, &event );
     if ( pic != NULL )
@@ -1122,7 +1124,7 @@ libvlc_media_thumbnail_request_t*
 libvlc_media_thumbnail_request_by_time( libvlc_media_t *md, libvlc_time_t time,
                                         libvlc_thumbnailer_seek_speed_t speed,
                                         unsigned int width, unsigned int height,
-                                        libvlc_picture_type_t picture_type,
+                                        bool crop, libvlc_picture_type_t picture_type,
                                         libvlc_time_t timeout )
 {
     assert( md );
@@ -1137,6 +1139,7 @@ libvlc_media_thumbnail_request_by_time( libvlc_media_t *md, libvlc_time_t time,
     req->width = width;
     req->height = height;
     req->type = picture_type;
+    req->crop = crop;
     libvlc_media_retain( md );
     req->req = vlc_thumbnailer_RequestByTime( p_priv->p_thumbnailer,
         VLC_TICK_FROM_MS( time ),
@@ -1158,7 +1161,7 @@ libvlc_media_thumbnail_request_t*
 libvlc_media_thumbnail_request_by_pos( libvlc_media_t *md, float pos,
                                        libvlc_thumbnailer_seek_speed_t speed,
                                        unsigned int width, unsigned int height,
-                                       libvlc_picture_type_t picture_type,
+                                       bool crop, libvlc_picture_type_t picture_type,
                                        libvlc_time_t timeout )
 {
     assert( md );
@@ -1172,6 +1175,7 @@ libvlc_media_thumbnail_request_by_pos( libvlc_media_t *md, float pos,
     req->md = md;
     req->width = width;
     req->height = height;
+    req->crop = crop;
     req->type = picture_type;
     libvlc_media_retain( md );
     req->req = vlc_thumbnailer_RequestByPos( priv->p_thumbnailer, pos,
