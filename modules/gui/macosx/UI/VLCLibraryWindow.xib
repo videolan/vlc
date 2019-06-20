@@ -461,6 +461,9 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="sortLibrary:" target="QvC-M9-y7g" id="VJd-p4-owD"/>
+                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Rhu-eh-ywm">
                         <rect key="frame" x="56" y="328" width="45" height="32"/>
@@ -561,7 +564,7 @@
                     <rect key="frame" x="0.0" y="498" width="242" height="310"/>
                     <clipView key="contentView" copiesOnScroll="NO" id="J5s-sy-il6">
                         <rect key="frame" x="0.0" y="0.0" width="242" height="310"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <collectionView selectable="YES" id="hnE-Hj-MZo">
                                 <rect key="frame" x="0.0" y="0.0" width="242" height="310"/>
@@ -591,7 +594,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="242" height="498"/>
                     <clipView key="contentView" copiesOnScroll="NO" id="OKa-dt-1yY">
                         <rect key="frame" x="0.0" y="0.0" width="242" height="498"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <collectionView selectable="YES" id="B8x-e8-7zp">
                                 <rect key="frame" x="0.0" y="0.0" width="242" height="498"/>
@@ -639,7 +642,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <clipView key="contentView" id="tI4-x3-55j">
                 <rect key="frame" x="0.0" y="0.0" width="242" height="291"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <collectionView id="r7v-GI-W1U">
                         <rect key="frame" x="0.0" y="0.0" width="242" height="291"/>
@@ -669,7 +672,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <clipView key="contentView" id="dmB-cB-az6">
                         <rect key="frame" x="0.0" y="0.0" width="155" height="327"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="36" rowSizeStyle="large" viewBased="YES" id="dNP-8u-8iI">
                                 <rect key="frame" x="0.0" y="0.0" width="155" height="327"/>
@@ -729,7 +732,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <clipView key="contentView" id="qva-RZ-DvL">
                         <rect key="frame" x="0.0" y="0.0" width="154" height="327"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" viewBased="YES" id="LNt-ot-2wU">
                                 <rect key="frame" x="0.0" y="0.0" width="154" height="327"/>
@@ -789,7 +792,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <clipView key="contentView" id="xCC-h9-931">
                         <rect key="frame" x="0.0" y="0.0" width="197" height="327"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="4ll-T2-J16">
                                 <rect key="frame" x="0.0" y="0.0" width="197" height="327"/>
@@ -860,7 +863,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="500" height="302"/>
                     <clipView key="contentView" id="2oa-WL-dxA">
                         <rect key="frame" x="0.0" y="0.0" width="500" height="302"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <collectionView id="QAt-jP-zE7">
                                 <rect key="frame" x="0.0" y="0.0" width="500" height="302"/>

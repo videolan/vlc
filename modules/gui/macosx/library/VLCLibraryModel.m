@@ -45,6 +45,9 @@ NSString *VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
     NSArray *_cachedVideoMedia;
     NSArray *_cachedRecentMedia;
     NSNotificationCenter *_defaultNotificationCenter;
+
+    enum vlc_ml_sorting_criteria_t _sortCriteria;
+    bool _sortDescending;
 }
 
 - (void)updateCachedListOfAudioMedia;
@@ -88,6 +91,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     self = [super init];
     if (self) {
+        _sortCriteria = VLC_ML_SORTING_DEFAULT;
+        _sortDescending = NO;
         _p_mediaLibrary = library;
         _p_eventCallback = vlc_ml_event_register_callback(_p_mediaLibrary, libraryCallback, (__bridge void *)self);
         _defaultNotificationCenter = [NSNotificationCenter defaultCenter];
@@ -249,7 +254,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)updateCachedListOfVideoMedia
 {
-    vlc_ml_media_list_t *p_media_list = vlc_ml_list_video_media(_p_mediaLibrary, NULL);
+    vlc_ml_query_params_t queryParameters;
+    memset(&queryParameters, 0, sizeof(vlc_ml_query_params_t));
+    queryParameters.i_nbResults = 20;
+    queryParameters.i_sort = _sortCriteria;
+    queryParameters.b_desc = _sortDescending;
+    vlc_ml_media_list_t *p_media_list = vlc_ml_list_video_media(_p_mediaLibrary, &queryParameters);
     if (p_media_list == NULL) {
         return;
     }
@@ -278,6 +288,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     vlc_ml_query_params_t queryParameters;
     memset(&queryParameters, 0, sizeof(vlc_ml_query_params_t));
     queryParameters.i_nbResults = 20;
+    // we don't set the sorting criteria here as they are not applicable to history
     vlc_ml_media_list_t *p_media_list = vlc_ml_list_history(_p_mediaLibrary, &queryParameters);
     if (p_media_list == NULL) {
         return;
@@ -346,6 +357,19 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
     vlc_ml_album_list_release(p_albumList);
     return [mutableArray copy];
+}
+
+- (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria andDescending:(bool)descending
+{
+    _sortCriteria = sortCriteria;
+    _sortDescending = descending;
+    [self dropCaches];
+}
+
+- (void)dropCaches
+{
+    _cachedVideoMedia = nil;
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaListUpdated object:nil];
 }
 
 @end

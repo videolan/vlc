@@ -44,6 +44,7 @@
     if (self) {
         _p_libraryInstance = vlc_ml_instance_get(getIntf());
         _libraryModel = [[VLCLibraryModel alloc] initWithLibrary:_p_libraryInstance];
+        _unsorted = YES;
 
         NSNotificationCenter *defaultNotificationCenter = [NSNotificationCenter defaultCenter];
         [defaultNotificationCenter addObserver:self
@@ -152,6 +153,14 @@
 - (int)clearHistory
 {
     return vlc_ml_clear_history(_p_libraryInstance);
+}
+
+- (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria andDescending:(bool)descending
+{
+    _unsorted = NO;
+    _lastSortingCriteria = sortCriteria;
+    _descendingLibrarySorting = descending;
+    [_libraryModel sortByCriteria:sortCriteria andDescending:descending];
 }
 
 @end

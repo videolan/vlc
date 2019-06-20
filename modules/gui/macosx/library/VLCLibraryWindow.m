@@ -39,6 +39,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryAlternativeAudioViewController.h"
+#import "library/VLCLibrarySortingMenuController.h"
 
 #import "media-source/VLCMediaSourceCollectionViewItem.h"
 #import "media-source/VLCMediaSourceDataSource.h"
@@ -70,6 +71,7 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
     VLCLibraryVideoDataSource *_libraryVideoDataSource;
     VLCLibraryAudioDataSource *_libraryAudioDataSource;
     VLCLibraryGroupDataSource *_libraryAudioGroupDataSource;
+    VLCLibrarySortingMenuController *_librarySortingMenuController;
     VLCMediaSourceDataSource *_mediaSourceDataSource;
     VLCLibraryAlternativeAudioViewController *_alternativeAudioViewController;
     VLCPlaylistSortingMenuController *_playlistSortingMenuController;
@@ -463,6 +465,14 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
         _playlistSortingMenuController = [[VLCPlaylistSortingMenuController alloc] init];
     }
     [NSMenu popUpContextMenu:_playlistSortingMenuController.playlistSortingMenu withEvent:[NSApp currentEvent] forView:sender];
+}
+
+- (IBAction)sortLibrary:(id)sender
+{
+    if (!_librarySortingMenuController) {
+        _librarySortingMenuController = [[VLCLibrarySortingMenuController alloc] init];
+    }
+    [NSMenu popUpContextMenu:_librarySortingMenuController.librarySortingMenu withEvent:[NSApp currentEvent] forView:sender];
 }
 
 - (IBAction)openMedia:(id)sender

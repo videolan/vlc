@@ -22,6 +22,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import <vlc_media_library.h>
+
 @class VLCLibraryModel;
 @class VLCMediaLibraryMediaItem;
 
@@ -41,6 +43,29 @@ NS_ASSUME_NONNULL_BEGIN
 - (int)removeFolderWithFileURL:(NSURL *)fileURL;
 
 - (int)clearHistory;
+
+/**
+ * Sort the entire library representation based on:
+ * @param sortCriteria the criteria used for sorting
+ * @param descending sort ascending or descending.
+ */
+- (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria andDescending:(bool)descending;
+
+/**
+ * Initially, the library is unsorted until the user decides to do so
+ * Until then, the unsorted state is retained.
+ */
+@property (readonly) BOOL unsorted;
+
+/**
+ * The last key used for sorting
+ */
+@property (readonly) enum vlc_ml_sorting_criteria_t lastSortingCriteria;
+
+/**
+ * The last order used for sorting
+ */
+@property (readonly) bool descendingLibrarySorting;
 
 @end
 

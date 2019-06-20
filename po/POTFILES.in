@@ -475,6 +475,8 @@ modules/gui/macosx/library/VLCLibraryMenuController.h
 modules/gui/macosx/library/VLCLibraryMenuController.m
 modules/gui/macosx/library/VLCLibraryModel.h
 modules/gui/macosx/library/VLCLibraryModel.m
+modules/gui/macosx/library/VLCLibrarySortingMenuController.h
+modules/gui/macosx/library/VLCLibrarySortingMenuController.m
 modules/gui/macosx/library/VLCLibraryTableCellView.h
 modules/gui/macosx/library/VLCLibraryTableCellView.m
 modules/gui/macosx/library/VLCLibraryVideoDataSource.h
