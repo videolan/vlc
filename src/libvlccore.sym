@@ -204,6 +204,7 @@ input_item_slave_GetType
 input_item_slave_New
 input_item_AddSlave
 input_item_Parse
+input_item_parser_id_Interrupt
 input_item_parser_id_Release
 input_resource_New
 input_resource_Release

@@ -1405,9 +1405,15 @@ input_item_Parse(input_item_t *item, vlc_object_t *obj,
 }
 
 void
-input_item_parser_id_Release(input_item_parser_id_t *parser)
+input_item_parser_id_Interrupt(input_item_parser_id_t *parser)
 {
     input_Stop(parser->input);
+}
+
+void
+input_item_parser_id_Release(input_item_parser_id_t *parser)
+{
+    input_item_parser_id_Interrupt(parser);
     input_Close(parser->input);
     free(parser);
 }

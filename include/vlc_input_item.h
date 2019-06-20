@@ -421,7 +421,7 @@ typedef struct input_item_parser_cbs_t
  * Parse an item asynchronously
  *
  * @note The parsing is done asynchronously. The user can call
- * input_item_parser_id_Release() before receiving the on_ended() event in
+ * input_item_parser_id_Interrupt() before receiving the on_ended() event in
  * order to interrupt it.
  *
  * @param item the item to parse
@@ -435,6 +435,18 @@ typedef struct input_item_parser_cbs_t
 VLC_API input_item_parser_id_t *
 input_item_Parse(input_item_t *item, vlc_object_t *parent,
                  const input_item_parser_cbs_t *cbs, void *userdata) VLC_USED;
+
+/**
+ * Interrupts & cancels the parsing
+ *
+ * @note The parser still needs to be released with input_item_parser_id_Release
+ * afterward.
+ * @note Calling this function will cause the on_ended callback to be invoked.
+ *
+ * @param the parser to interrupt
+ */
+VLC_API void
+input_item_parser_id_Interrupt(input_item_parser_id_t *parser);
 
 /**
  * Release (and interrupt if needed) a parser
