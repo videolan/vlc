@@ -737,7 +737,7 @@ LIBVLC_API void
  * Get media descriptor's user_data. user_data is specialized data
  * accessed by the host application, VLC.framework uses it as a pointer to
  * an native object that references a libvlc_media_t pointer
- * 
+ *
  * \see libvlc_media_set_user_data
  *
  * \param p_md media descriptor object
