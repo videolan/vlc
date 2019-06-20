@@ -246,16 +246,6 @@ check_android_sdk()
 	[ ${ANDROID_ABI} = "armeabi" -a -z "${NO_ARMV6}" ] && add_make_enabled "HAVE_ARMV6"
 }
 
-check_tizen_sdk()
-{
-	[ -z "${TIZEN_SDK}" ] && echo "You must set TIZEN_SDK environment variable" && exit 1
-	add_make "TIZEN_SDK := ${TIZEN_SDK}"
-	[ -z "${TIZEN_ABI}" ] && echo "You must set TIZEN_ABI environment variable" && exit 1
-	add_make "TIZEN_ABI := ${TIZEN_ABI}"
-	[ ${TIZEN_ABI} = "armv7l" ] && add_make_enabled "HAVE_NEON"
-	[ ${TIZEN_ABI} = "armv7l" ] && add_make_enabled "HAVE_ARMV7A"
-}
-
 test -z "$PREFIX" || add_make "PREFIX := $PREFIX"
 test -z "$BUILD_DISCS" || add_make_enabled "BUILD_DISCS"
 test -z "$BUILD_ENCODERS" || add_make_enabled "BUILD_ENCODERS"
@@ -333,8 +323,6 @@ case "${OS}" in
 		;;
 	*linux*)
 		if [ "`${CC} -v 2>&1 | grep tizen`" ]; then
-			check_tizen_sdk
-			add_make_enabled "HAVE_TIZEN"
 			case "${HOST}" in
 				*arm*)
 					add_make "PLATFORM_SHORT_ARCH := arm"
