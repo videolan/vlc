@@ -220,6 +220,8 @@ static void         EsOutDel    ( es_out_t *, es_out_id_t * );
 
 static void         EsOutTerminate( es_out_t * );
 static void         EsOutSelect( es_out_t *, es_out_id_t *es, bool b_force );
+static void         EsOutSelectList( es_out_t *, enum es_format_category_e cat,
+                                     vlc_es_id_t *const* es_id_list );
 static void         EsOutUpdateInfo( es_out_t *, es_out_id_t *es, const vlc_meta_t * );
 static int          EsOutSetRecord(  es_out_t *, bool b_record );
 
@@ -2359,6 +2361,41 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
         p_esprops->p_main_es = es;
 }
 
+static void EsOutSelectList( es_out_t *out, enum es_format_category_e cat,
+                             vlc_es_id_t * const*es_id_list )
+{
+
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    es_out_id_t *other;
+
+    foreach_es_then_es_slaves(other)
+    {
+        if( other->fmt.i_cat == cat )
+        {
+            bool select = false;
+            for( size_t i = 0; ; i++ )
+            {
+                vlc_es_id_t *es_id = es_id_list[i];
+                if( es_id == NULL )
+                    break;
+                else if( es_id->i_id == other->id.i_id )
+                {
+                    select = true;
+                    break;
+                }
+            }
+            if( !select && EsIsSelected( other ) )
+            {
+                EsOutUnselectEs( out, other, other->p_pgrm == p_sys->p_pgrm );
+            }
+            else if( select && !EsIsSelected( other ) )
+            {
+                EsOutSelectEs( out, other );
+            }
+        }
+    }
+}
+
 static void EsOutCreateCCChannels( es_out_t *out, vlc_fourcc_t codec, uint64_t i_bitmap,
                                    const char *psz_descfmt, es_out_id_t *parent )
 {
@@ -2806,6 +2843,13 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         }
 
         EsOutStopFreeVout( out );
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_SET_ES_LIST:
+    {
+        enum es_format_category_e cat = va_arg( args, enum es_format_category_e );
+        vlc_es_id_t *const*es_id_list = va_arg( args, vlc_es_id_t ** );
+        EsOutSelectList( out, cat, es_id_list );
         return VLC_SUCCESS;
     }
     case ES_OUT_UNSET_ES:

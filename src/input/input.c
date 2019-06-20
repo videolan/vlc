@@ -1594,6 +1594,18 @@ static void ControlRelease( int i_type, const input_control_param_t *p_param )
     case INPUT_CONTROL_RESTART_ES:
         vlc_es_id_Release( p_param->id );
         break;
+    case INPUT_CONTROL_SET_ES_LIST:
+    {
+        for (size_t i = 0; ; i++)
+        {
+            vlc_es_id_t *es_id = p_param->list.ids[i];
+            if (es_id == NULL)
+                break;
+            vlc_es_id_Release(es_id);
+        }
+        free(p_param->list.ids);
+        break;
+    }
 
     default:
         break;
@@ -2013,6 +2025,35 @@ static bool Control( input_thread_t *p_input,
                 demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_ES,
                                vlc_es_id_GetInputId( param.id ) );
             break;
+        case INPUT_CONTROL_SET_ES_LIST:
+        {
+            if( es_out_Control( input_priv(p_input)->p_es_out_display,
+                                ES_OUT_SET_ES_LIST, param.list.cat,
+                                param.list.ids ) == VLC_SUCCESS )
+            {
+                if( param.list.ids[0] != NULL && param.list.ids[1] == NULL )
+                    demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_ES,
+                                   vlc_es_id_GetInputId( param.list.ids[0] ) );
+                else
+                {
+                    /* Send an array of int id from the array of es_id to the
+                     * demux */
+                    size_t count;
+                    for (count = 0; param.list.ids[count] != NULL; count++);
+
+                    int *ids = count ? vlc_alloc(count, sizeof(int)) : NULL;
+                    if (count == 0 || ids)
+                    {
+                        for (size_t i = 0; i < count; ++i)
+                            ids[i] = vlc_es_id_GetInputId(param.list.ids[i]);
+                        demux_Control(input_priv(p_input)->master->p_demux,
+                                      DEMUX_SET_ES_LIST, count, ids);
+                    }
+                    free(ids);
+                }
+            }
+            break;
+        }
         case INPUT_CONTROL_UNSET_ES:
             es_out_Control( input_priv(p_input)->p_es_out_display,
                             ES_OUT_UNSET_ES, vlc_es_id_get_out(param.id) );

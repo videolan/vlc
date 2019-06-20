@@ -435,6 +435,10 @@ typedef union
     vlc_viewpoint_t viewpoint;
     vlc_es_id_t *id;
     struct {
+        enum es_format_category_e cat;
+        vlc_es_id_t **ids;
+    } list;
+    struct {
         bool b_fast_seek;
         vlc_tick_t i_val;
     } time;
@@ -580,6 +584,7 @@ enum input_control_e
     INPUT_CONTROL_RESTART_ES_BY_ID,
 
     INPUT_CONTROL_SET_ES,
+    INPUT_CONTROL_SET_ES_LIST,  // select a list of ES atomically
     INPUT_CONTROL_UNSET_ES,
     INPUT_CONTROL_RESTART_ES,
 

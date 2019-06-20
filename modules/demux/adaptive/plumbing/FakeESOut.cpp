@@ -470,6 +470,7 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
         }
 
         case ES_OUT_SET_ES:
+        case ES_OUT_SET_ES_LIST:
         case ES_OUT_SET_ES_DEFAULT:
         case ES_OUT_SET_ES_STATE:
             return VLC_SUCCESS;
