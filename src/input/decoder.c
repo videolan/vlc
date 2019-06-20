@@ -42,6 +42,7 @@
 #include <vlc_dialog.h>
 #include <vlc_modules.h>
 #include <vlc_decoder.h>
+#include <vlc_picture_pool.h>
 
 #include "audio_output/aout_internal.h"
 #include "stream_output/stream_output.h"
@@ -99,6 +100,9 @@ struct decoder_owner
     vlc_cond_t  wait_request;
     vlc_cond_t  wait_acknowledge;
     vlc_cond_t  wait_fifo; /* TODO: merge with wait_acknowledge */
+
+    /* pool to use when the decoder doesn't use its own */
+    struct picture_pool_t *out_pool;
 
     /*
      * 3 threads can read/write these output variables, the DecoderThread, the
@@ -485,31 +489,39 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
     video_format_t fmt;
     FixDisplayFormat( p_dec, &fmt );
 
-    unsigned dpb_size;
-    switch( p_dec->fmt_in.i_codec )
+    if ( p_owner->out_pool == NULL )
     {
-    case VLC_CODEC_HEVC:
-    case VLC_CODEC_H264:
-    case VLC_CODEC_DIRAC: /* FIXME valid ? */
-        dpb_size = 18;
-        break;
-    case VLC_CODEC_AV1:
-        dpb_size = 10;
-        break;
-    case VLC_CODEC_VP5:
-    case VLC_CODEC_VP6:
-    case VLC_CODEC_VP6F:
-    case VLC_CODEC_VP8:
-        dpb_size = 3;
-        break;
-    default:
-        dpb_size = 2;
-        break;
+        unsigned dpb_size;
+        switch( p_dec->fmt_in.i_codec )
+        {
+        case VLC_CODEC_HEVC:
+        case VLC_CODEC_H264:
+        case VLC_CODEC_DIRAC: /* FIXME valid ? */
+            dpb_size = 18;
+            break;
+        case VLC_CODEC_AV1:
+            dpb_size = 10;
+            break;
+        case VLC_CODEC_VP5:
+        case VLC_CODEC_VP6:
+        case VLC_CODEC_VP6F:
+        case VLC_CODEC_VP8:
+            dpb_size = 3;
+            break;
+        default:
+            dpb_size = 2;
+            break;
+        }
+
+        p_owner->out_pool = picture_pool_NewFromFormat( &fmt,
+                            dpb_size + p_dec->i_extra_picture_buffers + 1 );
+        if (p_owner->out_pool == NULL)
+            return -1;
     }
     int res;
     if (p_owner->vout_thread_started)
     {
-        res = vout_ChangeSource(p_vout, &fmt, dpb_size + p_dec->i_extra_picture_buffers + 1);
+        res = vout_ChangeSource(p_vout, &fmt, 0);
         if (res == 0)
             // the display/thread is started and can handle the new source format
             return 0;
@@ -517,7 +529,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
 
     vout_configuration_t cfg = {
         .vout = p_vout, .clock = p_owner->p_clock, .fmt = &fmt,
-        .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
+        .dpb_size = 0,
         .mouse_event = MouseEvent, .mouse_opaque = p_dec,
     };
     res = input_resource_StartVout( p_owner->p_resource, vctx, &cfg);
@@ -633,6 +645,12 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner,
     p_owner->fmt.video.i_chroma = p_dec->fmt_out.i_codec;
     vlc_mutex_unlock( &p_owner->lock );
 
+     if ( p_owner->out_pool != NULL )
+     {
+         picture_pool_Release( p_owner->out_pool );
+         p_owner->out_pool = NULL;
+     }
+
     if( p_vout == NULL )
     {
         msg_Err( p_dec, "failed to create video output" );
@@ -696,7 +714,10 @@ static picture_t *ModuleThread_NewVideoBuffer( decoder_t *p_dec )
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     assert( p_owner->p_vout );
 
-    return vout_GetPicture( p_owner->p_vout );
+    picture_t *pic = picture_pool_Wait( p_owner->out_pool );
+    if (pic)
+        picture_Reset( pic );
+    return pic;
 }
 
 static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
@@ -870,6 +891,9 @@ static void DecoderThread_AbortPictures( decoder_t *p_dec, bool b_abort )
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
     vlc_mutex_lock( &p_owner->lock ); // called in DecoderThread
+    if (p_owner->out_pool)
+        picture_pool_Cancel( p_owner->out_pool, b_abort );
+
     if( p_owner->p_vout != NULL )
         vout_Cancel( p_owner->p_vout, b_abort );
     vlc_mutex_unlock( &p_owner->lock );
@@ -2015,6 +2039,11 @@ static void DeleteDecoder( decoder_t * p_dec )
              (char*)&p_dec->fmt_in.i_codec );
 
     const enum es_format_category_e i_cat =p_dec->fmt_in.i_cat;
+    if ( p_owner->out_pool )
+    {
+        picture_pool_Release( p_owner->out_pool );
+        p_owner->out_pool = NULL;
+    }
     decoder_Clean( p_dec );
 
     if (p_owner->vctx)
@@ -2050,6 +2079,8 @@ static void DeleteDecoder( decoder_t * p_dec )
             {
                 /* Reset the cancel state that was set before joining the decoder
                  * thread */
+                if (p_owner->out_pool)
+                    picture_pool_Cancel( p_owner->out_pool, false );
                 vout_StopDisplay(vout);
                 p_owner->vout_thread_started = false;
                 decoder_Notify(p_owner, on_vout_stopped, vout);
@@ -2234,7 +2265,11 @@ void input_DecoderDelete( decoder_t *p_dec )
      * This unblocks the thread, allowing the decoder module to join all its
      * worker threads (if any) and the decoder thread to terminate. */
     if( p_dec->fmt_in.i_cat == VIDEO_ES && p_owner->p_vout != NULL && p_owner->vout_thread_started )
+    {
+        if (p_owner->out_pool)
+            picture_pool_Cancel( p_owner->out_pool, true );
         vout_Cancel( p_owner->p_vout, true );
+    }
     vlc_mutex_unlock( &p_owner->lock );
 
     vlc_join( p_owner->thread, NULL );
