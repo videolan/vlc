@@ -3787,22 +3787,6 @@ if test "${HAVE_ANDROID}" = "1"; then
 fi
 
 dnl
-dnl  Tizen audio
-dnl
-AC_ARG_ENABLE([tizen_audio],
-  AS_HELP_STRING([--enable-tizen-audio],
-    [Tizen audio module (default enabled on Tizen)]),, [
-  AS_IF([test "$HAVE_TIZEN" = "1"], [
-    enable_tizen_audio="yes"
-  ])
-])
-if test "${enable_tizen_audio}" = "yes"; then
-  AC_CHECK_HEADERS([audio_io.h],
-    [ VLC_ADD_PLUGIN([tizen_audio]) ],
-    [ AC_MSG_ERROR([cannot find Tizen audio_io headers])] )
-fi
-
-dnl
 dnl libsamplerate plugin
 dnl
 PKG_ENABLE_MODULES_VLC([SAMPLERATE], [], [samplerate], [Resampler with libsamplerate], [auto])
