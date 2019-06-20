@@ -55,9 +55,6 @@ DEPS_gnutls = nettle $(DEPS_nettle)
 ifdef HAVE_ANDROID
 GNUTLS_ENV += gl_cv_header_working_stdint_h=yes
 endif
-ifdef HAVE_TIZEN
-	GNUTLS_CONF += --with-default-trust-store-dir=/etc/ssl/certs/
-endif
 ifdef HAVE_WINSTORE
 ifeq ($(ARCH),x86_64)
 	GNUTLS_CONF += --disable-hardware-acceleration
