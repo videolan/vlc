@@ -1,0 +1,612 @@
+# General options
+
+option('nls',
+    type : 'feature',
+    value : 'auto',
+    description : 'Native Language Support')
+
+option('optimize_memory',
+    type : 'boolean',
+    value : false,
+    description : 'Optimize memory usage over performance')
+
+option('binary_version',
+    type : 'string',
+    value : '',
+    description : 'To avoid plugins cache problem between binary version')
+
+option('stream_outputs',
+    type : 'boolean',
+    value : true,
+    description : 'Build the VLC stream output modules')
+
+option('videolan_manager',
+    type : 'boolean',
+    value : true,
+    description : 'Build the VideoLAN manager')
+
+option('addon_manager',
+    type : 'boolean',
+    value : true,
+    description : 'Build the VLC add-on manager modules')
+
+option('run_as_root',
+    type : 'boolean',
+    value : false,
+    description : 'Allow running VLC as root')
+
+# TODO: Missing pdb option, this should probably be solved in meson itself
+
+# TODO: Missing ssp option
+# TODO: Missing sse option
+# TODO: Missing avx option
+# TODO: Missing neon option
+# TODO: Missing sve option
+# TODO: Missing branch_protection option
+# TODO: Missing altivec option
+# TODO: Missing vlc option
+# TODO: Missing update-check option
+
+# Font options
+
+option('default_font_path',
+    type : 'string',
+    value : '',
+    description : 'Path to the default font')
+
+option('default_monospace_font_path',
+    type : 'string',
+    value : '',
+    description : 'Path to the default monospace font')
+
+option('default_font_family',
+    type : 'string',
+    value : '',
+    description : 'Name of the default font family')
+
+option('default_monospace_font_family',
+    type : 'string',
+    value : '',
+    description : 'Name of the default monospace font family')
+
+# Module options
+
+option('vcd_module',
+    type : 'boolean',
+    value : true,
+    description : 'Built-in VCD and CD-DA support')
+
+option('css_engine',
+    type : 'feature',
+    value : 'auto',
+    description : 'CSS selector engine for WebVTT')
+
+# Dependency options
+
+option('qt',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable Qt support')
+
+option('dbus',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable D-Bus message bus support')
+
+option('wayland',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable wayland support')
+
+option('x11',
+    type : 'feature',
+    value : 'auto',
+    description : 'X11 support')
+
+option('xcb',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable X11 support with XCB')
+
+option('avcodec',
+    type : 'feature',
+    value : 'enabled',
+    description : 'Enable/disable avcodec support')
+
+option('libva',
+    type: 'feature',
+    value: 'auto',
+    description: 'VAAPI GPU decoding support (libVA)')
+
+option('omxil',
+    type: 'boolean',
+    value: false,
+    description: 'Enable/disable OpenMAX IL codec')
+
+option('avformat',
+    type : 'feature',
+    value : 'enabled',
+    description : 'Enable/disable avformat support')
+
+option('alsa',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable ALSA support')
+
+option('pulse',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable Pulseaudio support')
+
+option('oss',
+    type: 'feature',
+    value: 'auto',
+    description: 'Enable/disable OSS support (default-enabled on BSD)')
+
+option('ogg',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libogg support')
+
+option('dca',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libdca support')
+
+option('mpg123',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libmpg123 support')
+
+option('mpeg2',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libmpeg2 support')
+
+option('schroedinger',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable schroedinger support')
+
+option('rsvg',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable librsvg support')
+
+option('cairo',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libcairo support')
+
+option('freetype',
+    type : 'feature',
+    value : 'auto',
+    description : 'Font rasterization support with freetype')
+
+option('flac',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libflac support')
+
+option('opus',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libopus support')
+
+option('theoraenc',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable theoraenc support')
+
+option('theoradec',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable theoradec support')
+
+option('daaladec',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable daaladec support')
+
+option('daalaenc',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable daalaenc support')
+
+option('vorbis',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable vorbis support')
+
+option('x265',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libx265 support')
+
+option('x264',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libx264 support')
+
+option('x262',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libx262 support')
+
+option('fdk-aac',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable fdk-aac support')
+
+option('vpx',
+    type : 'feature',
+    value : 'auto',
+    description : 'libvpx VP8/VP9 encoder and decoder')
+
+option('shine',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable shine support')
+
+option('aom',
+    type : 'feature',
+    value : 'auto',
+    description : 'libaom AV1 decoder support')
+
+option('rav1e',
+    type: 'feature',
+    value: 'auto',
+    description: 'rav1e AV1 encoder support')
+
+option('dav1d',
+    type : 'feature',
+    value : 'auto',
+    description : 'libdav1d AV1 decoder support')
+
+option('twolame',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable twolame support')
+
+option('mfx',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libmfx support')
+
+option('spatialaudio',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libspatialaudio support')
+
+option('samplerate',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libsamplerate support')
+
+option('soxr',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable soxr support')
+
+option('speexdsp',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable speexdsp support')
+
+option('caca',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable caca support')
+
+option('drm',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libdrm support')
+
+option('goom2',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable goom2 visualization plugin')
+
+option('avahi',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable zeroconf (avahi) services discovery plugin')
+
+option('upnp',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable UPnP plugin (Intel SDK)')
+
+option('libxml2',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable XML support')
+
+option('medialibrary',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable medialibrary support')
+
+option('a52',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable a52 support')
+
+option('faad',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable faad support')
+
+option('fluidsynth',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable fluidsynth/fluidlite support')
+
+option('microdns',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable microdns support')
+
+option('gnutls',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable GnuTLS support')
+
+option('libsecret',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libsecret support')
+
+option('matroska',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable matroska (MKV) support')
+
+option('libdvbpsi',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libdvbpsi support')
+
+option('aribb24',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable aribb24 support')
+
+option('libmodplug',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libmodplug support')
+
+option('taglib',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable taglib support')
+
+option('libcddb',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libcddb support')
+
+option('libass',
+    type : 'feature',
+    value : 'auto',
+    description : 'ASS/SSA subtitle support using libass')
+
+option('libchromaprint',
+    type : 'feature',
+    value : 'auto',
+    description : 'Audio fingerprinting support using chromaprint')
+
+option('mad',
+    type : 'feature',
+    value : 'auto',
+    description : 'MP3 decoding support using libmad')
+
+option('png',
+    type : 'feature',
+    value : 'enabled',
+    description : 'PNG support')
+
+option('jpeg',
+    type : 'feature',
+    value : 'auto',
+    description : 'JPEG support')
+
+option('bpg',
+    type : 'feature',
+    value : 'disabled',
+    description : 'BPG support')
+
+option('aribsub',
+    type : 'feature',
+    value : 'auto',
+    description : 'ARIB Subtitles support')
+
+option('telx',
+    type : 'feature',
+    value : 'auto',
+    description : 'Teletext decoding support (conflicting with zvbi, default enabled if zvbi is absent)')
+
+option('zvbi',
+    type : 'feature',
+    value : 'enabled',
+    description : 'VBI (inc. Teletext) decoding support with libzvbi')
+
+option('kate',
+    type : 'feature',
+    value : 'auto',
+    description : 'kate codec')
+
+option('tiger',
+    type : 'feature',
+    value : 'auto',
+    description : 'Tiger rendering library for Kate streams')
+
+option('libplacebo',
+    type : 'feature',
+    value : 'auto',
+    description : 'libplacebo support')
+
+option('gles2',
+    type : 'feature',
+    value : 'disabled',
+    description : 'GLES2 support')
+
+option('lua',
+    type : 'feature',
+    value : 'enabled',
+    description : 'Lua support')
+
+option('srt',
+    type : 'feature',
+    value : 'auto',
+    description : 'SRT input/output plugin')
+
+option('vulkan',
+    type : 'feature',
+    value : 'auto',
+    description : 'vulkan output')
+
+option('screen',
+    type : 'feature',
+    value : 'enabled',
+    description : 'screen capture')
+
+option('freerdp',
+    type : 'feature',
+    value : 'auto',
+    description : 'RDP/Remote Client Desktop support')
+
+option('vnc',
+    type : 'feature',
+    value : 'auto',
+    description : 'VNC/rfb client support')
+
+option('swscale',
+    type : 'feature',
+    value : 'enabled',
+    description : 'libswscale image scaling and conversion')
+
+option('postproc',
+    type : 'feature',
+    value : 'auto',
+    description : 'libpostproc image post-processing')
+
+option('ebur128',
+    type : 'feature',
+    value : 'auto',
+    description : 'EBU R 128 standard for loudness normalisation')
+
+option('rnnoise',
+    type : 'feature',
+    value : 'auto',
+    description : 'Rnnoise denoiser')
+
+option('mtp',
+    type : 'feature',
+    value : 'auto',
+    description : 'MTP devices support')
+
+option('wasapi',
+    type: 'feature',
+    value: 'auto',
+    description: 'Use the Windows Audio Session API')
+
+option('macosx_avfoundation',
+    type: 'feature',
+    value: 'auto',
+    description: 'macOS AVCapture (Video) module')
+
+option('dc1394',
+    type: 'feature',
+    value: 'auto',
+    description: 'IIDC FireWire input module')
+
+option('dv1394',
+    type: 'feature',
+    value: 'auto',
+    description: 'DV FireWire input module')
+
+option('linsys',
+    type: 'feature',
+    value: 'auto',
+    description: 'Linux Linear Systems Ltd. SDI and HD-SDI input cards')
+
+option('dvdnav',
+    type: 'feature',
+    value: 'auto',
+    description: 'DVD with navigation input module (dvdnav)')
+
+option('dvdread',
+    type: 'feature',
+    value: 'auto',
+    description: 'DVD input module (dvdread)')
+
+option('bluray',
+    type: 'feature',
+    value: 'auto',
+    description: 'Blu-ray input module (libbluray)')
+
+option('shout',
+    type: 'feature',
+    value: 'auto',
+    description: 'Icecast/Shoutcast stream output (libshout)')
+
+option('ncurses',
+    type: 'feature',
+    value: 'auto',
+    description: 'Text-based interface (ncurses)')
+
+option('minimal_macosx',
+    type: 'feature',
+    value: 'auto',
+    description: 'Minimal macOS interface support')
+
+option('udev',
+    type: 'feature',
+    value: 'auto',
+    description: 'Linux udev services discovery')
+
+# TODO: Missing live555
+# TODO: Missing v4l2
+# TODO: Missing nvdec
+# TODO: Missing decklink
+# TODO: Missing gme
+# TODO: Missing sid
+# TODO: Missing mpc
+# TODO: Missing rpi-omxil
+# TODO: Missing gst-decode
+# TODO: Missing merge-ffmpeg
+# TODO: Missing libva
+# TODO: Missing dxva2
+# TODO: Missing d3d11va
+# TODO: Missing tremor
+# TODO: Missing x26410b
+# TODO: Missing vdpau
+# TODO: Missing fribidi
+# TODO: Missing harfbuzz
+# TODO: Missing fontconfig
+# TODO: Missing directx
+# TODO: Missing kva
+# TODO: Missing mmal
+# TODO: Missing sndio
+# TODO: Missing jack
+# TODO: Missing opensles
+# TODO: Missing kai
+# TODO: Missing qt-qml-cache
+# TODO: Missing qt-qml-debug
+# TODO: Missing skins2
+# TODO: Missing libtar
+# TODO: Missing macosx
+# TODO: Missing sparkle
+# TODO: Missing lirc
+# TODO: Missing projectm
+# TODO: Missing vsxu
+# TODO: Missing libgcrypt
+# TODO: Missing kwallet
+# TODO: Missing osx_notifications
+# TODO: Missing dsm
+# TODO: Missing asdcplib
+# TODO: Missing faad2
+# TODO: Missing chromecast

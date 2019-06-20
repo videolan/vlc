@@ -1,0 +1,2 @@
+const char psz_vlc_changeset[] = "@VCS_TAG@";
+
