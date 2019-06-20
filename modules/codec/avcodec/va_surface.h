@@ -38,8 +38,8 @@ struct va_pic_context
 
 static inline VA_PICSYS *ActivePictureSys(picture_t *p_pic)
 {
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)p_pic->context;
-    return pic_ctx ? &pic_ctx->picsys : p_pic->p_sys;
+    struct va_pic_context *pic_ctx = container_of(p_pic->context, struct va_pic_context, s);
+    return p_pic->context ? &pic_ctx->picsys : p_pic->p_sys;
 }
 
 #endif /* AVCODEC_VA_SURFACE_H */
