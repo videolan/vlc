@@ -481,7 +481,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, float rate )
     vlc_list_init(&p_sys->es_slaves);
 
     /* */
-    EsOutPropsInit( &p_sys->video, true, p_input, ES_OUT_ES_POLICY_SIMULTANEOUS,
+    EsOutPropsInit( &p_sys->video, true, p_input, ES_OUT_ES_POLICY_EXCLUSIVE,
                     "video-track-id", "video-track", NULL, NULL );
     EsOutPropsInit( &p_sys->audio, true, p_input, ES_OUT_ES_POLICY_EXCLUSIVE,
                     "audio-track-id", "audio-track", "audio-language", "audio" );
