@@ -14,10 +14,6 @@ ifeq ($(ANDROID_ABI), x86)
 WITH_ASS_ASM = 0
 endif
 else
-ifdef HAVE_TIZEN
-WITH_FONTCONFIG = 0
-WITH_HARFBUZZ = 0
-else
 ifdef HAVE_DARWIN_OS
 WITH_FONTCONFIG = 0
 WITH_HARFBUZZ = 1
@@ -34,7 +30,6 @@ WITH_ASS_ASM = 0
 else
 WITH_FONTCONFIG = 1
 WITH_HARFBUZZ = 1
-endif
 endif
 endif
 endif
