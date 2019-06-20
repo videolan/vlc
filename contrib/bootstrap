@@ -322,17 +322,6 @@ case "${OS}" in
 		esac
 		;;
 	*linux*)
-		if [ "`${CC} -v 2>&1 | grep tizen`" ]; then
-			case "${HOST}" in
-				*arm*)
-					add_make "PLATFORM_SHORT_ARCH := arm"
-					;;
-				*i386*)
-					add_make "PLATFORM_SHORT_ARCH := x86"
-					;;
-			esac
-		fi
-
 		add_make_enabled "HAVE_LINUX"
 		;;
 	*mingw*)
