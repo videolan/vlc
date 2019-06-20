@@ -421,22 +421,6 @@ AS_IF([test "$SYS" = linux],[
 ])
 AM_CONDITIONAL([HAVE_ANDROID], [test "${HAVE_ANDROID}" = "1"])
 
-dnl Tizen (minimum SDK version: 2.3)
-AS_IF([test "$SYS" = linux],[
-    AC_MSG_CHECKING([for Tizen])
-    AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
-        [[#include <tizen.h>
-        ]],[[;]])
-    ],[
-      HAVE_TIZEN="1"
-      AC_DEFINE([HAVE_TIZEN_SDK], [1], [Define to 1 if vlc is built against Tizen SDK])
-      AC_MSG_RESULT([yes])
-    ],[
-      AC_MSG_RESULT([no])
-    ])
-])
-AM_CONDITIONAL([HAVE_TIZEN], [test "${HAVE_TIZEN}" = "1"])
-
 dnl
 dnl  Check for the contrib directory
 dnl
