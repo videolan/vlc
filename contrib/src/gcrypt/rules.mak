@@ -64,11 +64,6 @@ ifeq ($(ARCH),aarch64)
 GCRYPT_CONF += --disable-arm-crypto-support
 endif
 endif
-ifdef HAVE_TIZEN
-ifeq ($(TIZEN_ABI), x86)
-GCRYPT_CONF += ac_cv_sys_symbol_underscore=no
-endif
-endif
 ifdef HAVE_NACL
 GCRYPT_CONF += --disable-asm --disable-aesni-support ac_cv_func_syslog=no --disable-sse41-support
 GCRYPT_CONF += --disable-avx-support --disable-avx2-support --disable-padlock-support
