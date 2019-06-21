@@ -91,7 +91,7 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, 
                     segmentTracker->registerListener(this);
                     segmentTracker->notifyBufferingState(true);
                     connManager = conn;
-                    setTimeOffset(segmentTracker->getPlaybackTime());
+                    fakeesout->setExpectedTimestamp(segmentTracker->getPlaybackTime());
                     declaredCodecs();
                     return true;
                 }
@@ -129,7 +129,7 @@ void AbstractStream::prepareRestart(bool b_discontinuity)
     {
         /* Enqueue Del Commands for all current ES */
         demuxer->drain();
-        setTimeOffset(-1);
+        fakeEsOut()->resetTimestamps();
         /* Enqueue Del Commands for all current ES */
         fakeEsOut()->scheduleAllForDeletion();
         if(b_discontinuity)
@@ -545,9 +545,10 @@ bool AbstractStream::setPosition(vlc_tick_t time, bool tryonly)
             currentChunk = NULL;
             needrestart = false;
 
-            setTimeOffset(-1);
-            setTimeOffset(segmentTracker->getPlaybackTime());
+            fakeEsOut()->resetTimestamps();
 
+            vlc_tick_t seekMediaTime = segmentTracker->getPlaybackTime();
+            fakeEsOut()->setExpectedTimestamp(seekMediaTime);
             if( !restartDemux() )
             {
                 msg_Info(p_realdemux, "Restart demux failed");
@@ -568,15 +569,13 @@ bool AbstractStream::setPosition(vlc_tick_t time, bool tryonly)
     return ret;
 }
 
-vlc_tick_t AbstractStream::getPlaybackTime() const
+bool AbstractStream::getMediaPlaybackTimes(vlc_tick_t *start, vlc_tick_t *end,
+                                           vlc_tick_t *length,
+                                           vlc_tick_t *mediaStart,
+                                           vlc_tick_t *demuxStart) const
 {
-    return segmentTracker->getPlaybackTime();
-}
-
-bool AbstractStream::getMediaPlaybackRange(vlc_tick_t *start, vlc_tick_t *end,
-                                           vlc_tick_t *length) const
-{
-    return segmentTracker->getMediaPlaybackRange(start, end, length);
+    return (segmentTracker->getMediaPlaybackRange(start, end, length) &&
+            fakeEsOut()->getStartTimestamps(mediaStart, demuxStart));
 }
 
 void AbstractStream::runUpdates()
@@ -591,20 +590,6 @@ void AbstractStream::fillExtraFMTInfo( es_format_t *p_fmt ) const
         p_fmt->psz_language = strdup(language.c_str());
     if(!p_fmt->psz_description && !description.empty())
         p_fmt->psz_description = strdup(description.c_str());
-}
-
-void AbstractStream::setTimeOffset(vlc_tick_t i_offset)
-{
-    /* Check if we need to set an offset as the demuxer
-     * will start from zero from seek point */
-    if(i_offset < 0) /* reset */
-    {
-        fakeEsOut()->setExpectedTimestamp(-1);
-    }
-    else
-    {
-        fakeEsOut()->setExpectedTimestamp(i_offset);
-    }
 }
 
 AbstractDemuxer * AbstractStream::createDemux(const StreamFormat &format)

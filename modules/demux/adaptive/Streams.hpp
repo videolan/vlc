@@ -88,8 +88,8 @@ namespace adaptive
         status dequeue(vlc_tick_t, vlc_tick_t *);
         bool decodersDrained();
         virtual bool setPosition(vlc_tick_t, bool);
-        vlc_tick_t getPlaybackTime() const;
-        bool getMediaPlaybackRange(vlc_tick_t *, vlc_tick_t *, vlc_tick_t *) const;
+        bool getMediaPlaybackTimes(vlc_tick_t *, vlc_tick_t *, vlc_tick_t *,
+                                   vlc_tick_t *, vlc_tick_t *) const;
         void runUpdates();
 
         /* Used by demuxers fake streams */
@@ -103,7 +103,6 @@ namespace adaptive
     protected:
         bool seekAble() const;
         void setDisabled(bool);
-        virtual void setTimeOffset(vlc_tick_t);
         virtual block_t *checkBlock(block_t *, bool) = 0;
         AbstractDemuxer * createDemux(const StreamFormat &);
         virtual AbstractDemuxer * newDemux(demux_t *, const StreamFormat &,

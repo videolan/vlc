@@ -22,6 +22,7 @@
 
 //#define ADAPTATIVE_ADVANCED_DEBUG 0
 //#define ADAPTATIVE_BW_DEBUG 0
+//#define ADAPTATIVE_SEEK_DEBUG 0
 
 #ifdef ADAPTATIVE_ADVANCED_DEBUG
   #define AdvDebug(code) code
@@ -33,6 +34,12 @@
   #define BwDebug(code) code
 #else
   #define BwDebug(code)
+#endif
+
+#ifdef ADAPTATIVE_SEEK_DEBUG
+  #define SeekDebug(code) code
+#else
+  #define SeekDebug(code)
 #endif
 
 #endif // DEBUG_HPP

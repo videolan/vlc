@@ -74,12 +74,11 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
     vlc_cond_init(&waitcond);
     vlc_mutex_init(&cached.lock);
     cached.b_live = false;
-    cached.i_length = 0;
     cached.f_position = 0.0;
     cached.i_time = VLC_TICK_INVALID;
-    cached.rangeStart = 0;
-    cached.rangeEnd = 0;
-    cached.rangeLength = 0;
+    cached.playlistStart = 0;
+    cached.playlistEnd = 0;
+    cached.playlistLength = 0;
     cached.lastupdate = 0;
 }
 
@@ -397,7 +396,7 @@ vlc_tick_t PlaylistManager::getFirstPlaybackTime() const
     return 0;
 }
 
-vlc_tick_t PlaylistManager::getCurrentPlaybackTime() const
+vlc_tick_t PlaylistManager::getCurrentDemuxTime() const
 {
     vlc_mutex_locker locker(&demux.lock);
     return demux.i_nzpcr;
@@ -537,16 +536,16 @@ int PlaylistManager::doControl(int i_query, va_list args)
         case DEMUX_GET_LENGTH:
         {
             vlc_mutex_locker locker(&cached.lock);
-            if(cached.b_live && cached.i_length == 0)
+            if(cached.b_live && cached.playlistLength == 0)
                 return VLC_EGENERIC;
-            *(va_arg (args, vlc_tick_t *)) = cached.i_length;
+            *(va_arg (args, vlc_tick_t *)) = cached.playlistLength;
             break;
         }
 
         case DEMUX_GET_POSITION:
         {
             vlc_mutex_locker locker(&cached.lock);
-            if(cached.b_live && cached.i_length == 0)
+            if(cached.b_live && cached.playlistLength == 0)
                 return VLC_EGENERIC;
             *(va_arg (args, double *)) = cached.f_position;
             break;
@@ -557,35 +556,26 @@ int PlaylistManager::doControl(int i_query, va_list args)
             setBufferingRunState(false); /* stop downloader first */
             vlc_mutex_locker locker(&cached.lock);
 
-            vlc_tick_t i_start, i_duration;
-            if(cached.b_live)
-            {
-                i_duration = cached.i_length;
-                if(cached.rangeStart < 0)
-                    i_start = vlc_tick_from_sec(time(NULL)) - cached.i_length;
-                else
-                    i_start = cached.rangeStart;
-            }
-            else
-            {
-                i_duration = playlist->duration.Get();
-                i_start = getFirstPlaybackTime();
-            }
-
-            if(i_duration == 0)
+            if(cached.playlistLength == 0)
             {
                 setBufferingRunState(true);
                 return VLC_EGENERIC;
             }
 
-            vlc_tick_t seektime = i_start + i_duration * va_arg(args, double);
-            if(!setPosition(seektime))
+            double pos = va_arg(args, double);
+            vlc_tick_t seekTime = cached.playlistStart + cached.playlistLength * pos;
+
+            SeekDebug(msg_Dbg(p_demux, "Seek %f to %ld plstart %ld duration %ld",
+                   pos, seekTime, cached.playlistEnd, cached.playlistLength));
+
+            if(!setPosition(seekTime))
             {
                 setBufferingRunState(true);
                 return VLC_EGENERIC;
             }
 
             demux.i_nzpcr = VLC_TICK_INVALID;
+            cached.lastupdate = 0;
             setBufferingRunState(true);
             break;
         }
@@ -603,6 +593,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
 
             vlc_mutex_locker locker(&cached.lock);
             demux.i_nzpcr = VLC_TICK_INVALID;
+            cached.lastupdate = 0;
             setBufferingRunState(true);
             break;
         }
@@ -697,46 +688,62 @@ void PlaylistManager::updateControlsPosition()
         return;
     cached.lastupdate = now;
 
-    cached.i_time = getCurrentPlaybackTime();
+    vlc_tick_t rapPlaylistStart = 0;
+    vlc_tick_t rapDemuxStart = 0;
+    std::vector<AbstractStream *>::iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
+    {
+        AbstractStream *st = *it;
+        if(st->isValid() && !st->isDisabled() && st->isSelected())
+        {
+            if(st->getMediaPlaybackTimes(&cached.playlistStart, &cached.playlistEnd,
+                                         &cached.playlistLength,
+                                         &rapPlaylistStart, &rapDemuxStart))
+                break;
+        }
+    }
+
+    /*
+     * Relative position:
+     * -> Elapsed demux time (current demux time - first demux time)
+     * Since PlaylistTime != DemuxTime (HLS crap, TS):
+     * -> Use Playlist<->Demux time offset provided by EsOut
+     *    to convert to elapsed playlist time.
+     *    But this diff is not available until we have demuxed data...
+     *    Fallback on relative seek from playlist start in that case
+     * But also playback might not have started at beginning of playlist
+     * -> Apply relative start from seek point (set on EsOut as ExpectedTime)
+     *
+     * All seeks need to be done in playlist time !
+     */
+
+    vlc_tick_t currentDemuxTime = getCurrentDemuxTime();
     cached.b_live = playlist->isLive();
+
+    SeekDebug(msg_Dbg(p_demux, "playlist Start/End %ld/%ld len %ld"
+                               "rap pl/demux (%ld/%ld)",
+                      cached.playlistStart, cached.playlistEnd, cached.playlistEnd,
+                      rapPlaylistStart, rapDemuxStart));
+
     if(cached.b_live)
     {
-        std::vector<AbstractStream *>::iterator it;
-        for(it=streams.begin(); it!=streams.end(); ++it)
+        /* Special case for live until we can provide relative start to fully match
+           the above description */
+        cached.i_time = currentDemuxTime;
+
+        if(cached.playlistStart != cached.playlistEnd)
         {
-            AbstractStream *st = *it;
-            if(st->isValid() && !st->isDisabled() && st->isSelected())
+            if(cached.playlistStart < 0) /* Live template. Range start = now() - buffering depth */
             {
-                if(st->getMediaPlaybackRange(&cached.rangeStart, &cached.rangeEnd,
-                                             &cached.rangeLength))
-                    break;
+                cached.playlistEnd = vlc_tick_from_sec(now);
+                cached.playlistStart = cached.playlistEnd - cached.playlistLength;
             }
         }
-
-        if(cached.rangeStart != cached.rangeEnd)
+        const vlc_tick_t currentTime = getCurrentDemuxTime();
+        if(currentTime > cached.playlistStart &&
+           currentTime <= cached.playlistEnd && cached.playlistLength)
         {
-            if(cached.rangeStart < 0) /* Live template. Range start = now() - buffering depth */
-                cached.i_length = cached.rangeLength;
-            else
-                cached.i_length = cached.rangeEnd - cached.rangeStart;
-        }
-
-        vlc_tick_t start, end;
-        if(cached.rangeStart < 0) /* Live template. Range start = now() - buffering depth */
-        {
-            end = vlc_tick_from_sec(now);
-            start = end - cached.i_length;
-        }
-        else
-        {
-            end = cached.rangeEnd;
-            start = cached.rangeStart;
-        }
-
-        const vlc_tick_t currentTime = getCurrentPlaybackTime();
-        if(currentTime > start && currentTime <= end && cached.i_length)
-        {
-            cached.f_position = ((double)(currentTime - start)) / cached.i_length;
+            cached.f_position = ((double)(currentTime - cached.playlistStart)) / cached.playlistLength;
         }
         else
         {
@@ -745,18 +752,26 @@ void PlaylistManager::updateControlsPosition()
     }
     else
     {
-        cached.i_length = playlist->duration.Get();
-        cached.i_time -= getFirstPlaybackTime();
-        if(cached.i_length)
+        if(playlist->duration.Get() > cached.playlistLength)
+            cached.playlistLength = playlist->duration.Get();
+
+        if(cached.playlistLength && currentDemuxTime)
         {
-            const vlc_tick_t i_length = getCurrentPlaybackTime() - getFirstPlaybackTime();
-            cached.f_position = (double) i_length / cached.i_length;
+            /* convert to playlist time */
+            vlc_tick_t rapRelOffset = currentDemuxTime - rapDemuxStart; /* offset from start/seek */
+            vlc_tick_t absPlaylistTime = rapPlaylistStart + rapRelOffset; /* converted as abs playlist time */
+            vlc_tick_t relMediaTime = absPlaylistTime - cached.playlistStart; /* elapsed, in playlist time */
+            cached.i_time = absPlaylistTime;
+            cached.f_position = (double) relMediaTime / cached.playlistLength;
         }
         else
         {
             cached.f_position = 0.0;
         }
     }
+
+    SeekDebug(msg_Dbg(p_demux, "cached.i_time (%ld) cur %ld rap start (pl %ld/dmx %ld)",
+               cached.i_time, currentDemuxTime, rapPlaylistStart, rapDemuxStart));
 }
 
 AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::LogicType type, AbstractConnectionManager *conn)
