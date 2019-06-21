@@ -911,7 +911,7 @@ struct vlc_player_aout_cbs
      *
      * @param player unlocked player instance
      * @param new_volume volume in the range [0;2.f]
-     * @param data opaque pointer set by vlc_player_vout_AddListener()
+     * @param data opaque pointer set by vlc_player_aout_AddListener()
      */
     void (*on_volume_changed)(vlc_player_t *player,
         float new_volume, void *data);
@@ -923,7 +923,7 @@ struct vlc_player_aout_cbs
      *
      * @param player unlocked player instance
      * @param new_mute true if muted
-     * @param data opaque pointer set by vlc_player_vout_AddListener()
+     * @param data opaque pointer set by vlc_player_aout_AddListener()
      */
     void (*on_mute_changed)(vlc_player_t *player,
         bool new_muted, void *data);
@@ -933,6 +933,7 @@ struct vlc_player_aout_cbs
      *
      * @param player unlocked player instance
      * @param device the device name
+     * @param data opaque pointer set by vlc_player_aout_AddListener()
      */
     void (*on_device_changed)(vlc_player_t *player, const char *device,
                               void *data);
