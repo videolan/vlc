@@ -439,6 +439,10 @@ bool CanUseVoutPool(d3d11_device_t *d3d_dev, UINT slices)
 #endif
 }
 
+/**
+ * Performs a check on each value of the WDDM version. Any value that is OK will
+ * consider the driver valid (OR on each value)
+ */
 int D3D11CheckDriverVersion(d3d11_device_t *d3d_dev, UINT vendorId, const struct wddm_version *min_ver)
 {
     IDXGIAdapter *pAdapter = D3D11DeviceAdapter(d3d_dev->d3ddevice);
