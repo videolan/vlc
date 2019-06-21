@@ -71,7 +71,7 @@ Item{
             anchors.verticalCenter: parent.verticalCenter
             size: VLCStyle.icon_medium
             text: VLCIcons.exit
-            onClicked: mainPlaylistController.stop()
+            onClicked: history.previous(History.Go)
             property bool acceptFocus: true
         }
     }
