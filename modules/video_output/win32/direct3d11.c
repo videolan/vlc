@@ -1468,17 +1468,29 @@ static bool CanUseTextureArray(vout_display_t *vd)
     (void) vd;
     return false;
 #else
-    struct wddm_version WDDM = {
-        .wddm         = 20,  // starting with drivers designed for W10
-        // 15.200.1062.1004 is wrong - 2015/08/03
-        // 22.19.165.3 is good       - 2017/05/04
-        .revision     = 162, // 17.5.1
+    // 15.200.1062.1004 is wrong - 2015/08/03 - 15.7.1 WHQL
+    // 21.19.144.1281 is wrong   -
+    // 22.19.165.3 is good       - 2017/05/04 - ReLive Edition 17.5.1
+    struct wddm_version WDDM_os = {
+        .wddm         = 21,  // starting with drivers designed for W10 Anniversary Update
     };
-    if (D3D11CheckDriverVersion(&vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM) == VLC_SUCCESS)
-        return true;
+    if (D3D11CheckDriverVersion(&vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_os) != VLC_SUCCESS)
+    {
+        msg_Dbg(vd, "AMD driver too old, fallback to legacy shader mode");
+        return false;
+    }
 
-    msg_Dbg(vd, "fallback to legacy shader mode for old AMD drivers");
-    return false;
+    // xx.xx.1000.xxx drivers can't happen here for WDDM > 2.0
+    struct wddm_version WDDM_build = {
+        .revision     = 162,
+    };
+    if (D3D11CheckDriverVersion(&vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_build) != VLC_SUCCESS)
+    {
+        msg_Dbg(vd, "Bogus AMD driver detected, fallback to legacy shader mode");
+        return false;
+    }
+
+    return true;
 #endif
 }
 
