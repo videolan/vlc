@@ -1868,7 +1868,7 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
                                         &rect, priv->dx_render, NULL, D3DTEXF_NONE);
     if (FAILED(hr))
     {
-        msg_Warn(tc->gl, "IDirect3DDevice9Ex_StretchRect failed");
+        msg_Warn(tc->gl, "IDirect3DDevice9Ex_StretchRect failed. (0x%lX)", hr);
         return VLC_EGENERIC;
     }
 
