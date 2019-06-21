@@ -29,9 +29,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <xcb/xcb.h>
-#include <xcb/shm.h>
 #include <vlc_picture.h>
-#include <vlc_vout_display.h>
 
 const xcb_format_t *vlc_xcb_DepthToPixmapFormat(const xcb_setup_t *,
                                                 uint_fast8_t depth);
@@ -39,13 +37,3 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *, uint_fast8_t depth,
                             const xcb_visualtype_t *, video_format_t *);
 
 bool XCB_shm_Check (vlc_object_t *obj, xcb_connection_t *conn);
-int XCB_picture_Alloc (vout_display_t *, picture_resource_t *, size_t size,
-                       xcb_connection_t *, xcb_shm_seg_t);
-picture_t *XCB_picture_NewFromResource (const video_format_t *,
-                                        const picture_resource_t *,
-                                        xcb_connection_t *);
-
-static inline xcb_shm_seg_t XCB_picture_GetSegment(const picture_t *pic)
-{
-    return (uintptr_t)pic->p_sys;
-}
