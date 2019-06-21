@@ -268,6 +268,7 @@ struct vlc_input_event_vout
         VLC_INPUT_EVENT_VOUT_DELETED,
     } action;
     vout_thread_t *vout;
+    enum vlc_vout_order order;
     vlc_es_id_t *id;
 };
 

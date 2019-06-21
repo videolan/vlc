@@ -548,7 +548,7 @@ static int vout_update_format( decoder_t *p_dec )
                 .mouse_event = MouseEvent, .mouse_opaque = p_dec
             }, &order );
         if (p_vout)
-            decoder_Notify(p_owner, on_vout_added, p_vout);
+            decoder_Notify(p_owner, on_vout_added, p_vout, order);
 
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_vout = p_vout;

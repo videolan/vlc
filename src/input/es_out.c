@@ -274,7 +274,8 @@ FindEsIdFromDecoder(es_out_sys_t *p_sys, decoder_t *decoder)
 }
 
 static void
-decoder_on_vout_added(decoder_t *decoder, vout_thread_t *vout, void *userdata)
+decoder_on_vout_added(decoder_t *decoder, vout_thread_t *vout,
+                      enum vlc_vout_order order, void *userdata)
 {
     es_out_sys_t *priv = userdata;
     if (!priv->p_input)
@@ -286,6 +287,7 @@ decoder_on_vout_added(decoder_t *decoder, vout_thread_t *vout, void *userdata)
     struct vlc_input_event_vout event = {
         .action = VLC_INPUT_EVENT_VOUT_ADDED,
         .vout = vout,
+        .order = order,
         .id = id,
     };
 
@@ -305,6 +307,7 @@ decoder_on_vout_deleted(decoder_t *decoder, vout_thread_t *vout, void *userdata)
     struct vlc_input_event_vout event = {
         .action = VLC_INPUT_EVENT_VOUT_DELETED,
         .vout = vout,
+        .order = VLC_VOUT_ORDER_NONE,
         .id = id,
     };
 
