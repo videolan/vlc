@@ -124,6 +124,45 @@ Utils.NavigableFocusScope {
             onActionDown: root.actionDown(index)
             onActionUp: root.actionUp(index)
             onActionCancel: root.actionCancel(index)
+
+            header:Item {
+                id: videosHeader
+                height: childrenRect.height + VLCStyle.margin_normal
+                anchors{
+                    left: parent.left
+                    right: parent.right
+                }
+
+                Label {
+                    id: videosTxt
+
+                    anchors.top: videosHeader.top
+                    anchors.left: videosHeader.left
+                    anchors.topMargin: VLCStyle.margin_normal
+                    anchors.leftMargin: VLCStyle.margin_large
+
+                    font.pixelSize: VLCStyle.fontSize_xxlarge
+                    color: VLCStyle.colors.text
+                    text: qsTr("Videos")
+                    font.weight: Font.Bold
+                }
+
+                Rectangle {
+                    id: videosSeparator
+                    height: VLCStyle.heightBar_xxxsmall
+                    radius: 2
+
+                    anchors{
+                        left: videosHeader.left
+                        right: videosHeader.right
+                        top: videosTxt.bottom
+                        topMargin: VLCStyle.margin_small
+                        leftMargin: VLCStyle.margin_large
+
+                    }
+                    color: VLCStyle.colors.bgAlt
+                }
+            }
         }
     }
 
