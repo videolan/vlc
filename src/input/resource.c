@@ -385,7 +385,8 @@ void input_resource_PutVout(input_resource_t *p_resource,
 }
 
 vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
-                                      const vout_configuration_t *cfg)
+                                      const vout_configuration_t *cfg,
+                                      enum vlc_vout_order *order)
 {
     vout_configuration_t cfg_buf;
     vout_thread_t *vout;
@@ -411,10 +412,24 @@ vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
                 goto out;
 
             vlc_mutex_lock(&p_resource->lock_hold);
+            *order = p_resource->i_vout == 0 ? VLC_VOUT_ORDER_PRIMARY
+                                             : VLC_VOUT_ORDER_SECONDARY;
             TAB_APPEND(p_resource->i_vout, p_resource->pp_vout, vout);
             vlc_mutex_unlock(&p_resource->lock_hold);
         } else
+        {
+            /* The free vout is always the first one */
+            *order = VLC_VOUT_ORDER_PRIMARY;
             msg_Dbg(p_resource->p_parent, "trying to reuse free vout");
+        }
+    }
+    else
+    {
+        vlc_mutex_lock(&p_resource->lock_hold);
+        assert(p_resource->i_vout > 0);
+        *order = p_resource->pp_vout[0] == cfg->vout ? VLC_VOUT_ORDER_PRIMARY
+                                                     : VLC_VOUT_ORDER_SECONDARY;
+        vlc_mutex_unlock(&p_resource->lock_hold);
     }
 
 #ifndef NDEBUG

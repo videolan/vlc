@@ -38,7 +38,8 @@ void input_resource_SetInput( input_resource_t *, input_thread_t * );
 sout_instance_t *input_resource_RequestSout( input_resource_t *, sout_instance_t *, const char *psz_sout );
 
 vout_thread_t *input_resource_GetVout(input_resource_t *,
-                                      const vout_configuration_t *);
+                                      const vout_configuration_t *,
+                                      enum vlc_vout_order *order);
 void input_resource_PutVout(input_resource_t *, vout_thread_t *);
 
 /**

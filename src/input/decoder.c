@@ -540,12 +540,13 @@ static int vout_update_format( decoder_t *p_dec )
             dpb_size = 2;
             break;
         }
+        enum vlc_vout_order order;
         p_vout = input_resource_GetVout( p_owner->p_resource,
             &(vout_configuration_t) {
                 .vout = p_vout, .clock = p_owner->p_clock, .fmt = &fmt,
                 .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
                 .mouse_event = MouseEvent, .mouse_opaque = p_dec
-            } );
+            }, &order );
         if (p_vout)
             decoder_Notify(p_owner, on_vout_added, p_vout);
 
