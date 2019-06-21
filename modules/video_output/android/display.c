@@ -956,7 +956,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
                     subpicture_t *subpicture, vlc_tick_t date)
 {
     vout_display_sys_t *sys = vd->sys;
-    VLC_UNUSED(picture);
 
     if (subpicture && sys->p_sub_window) {
         if (sys->b_sub_invalid) {
@@ -1014,7 +1013,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 static void Display(vout_display_t *vd, picture_t *picture)
 {
     vout_display_sys_t *sys = vd->sys;
-    VLC_UNUSED(picture);
 
     if (sys->p_window->b_opaque)
         AndroidOpaquePicture_Release(picture->p_sys, true);
