@@ -79,7 +79,7 @@ namespace adaptive
             mtime_t getFirstDTS() const;
 
             virtual mtime_t getFirstPlaybackTime() const;
-            mtime_t getCurrentPlaybackTime() const;
+            mtime_t getCurrentDemuxTime() const;
 
             virtual bool reactivateStream(AbstractStream *);
             bool setupPeriod();
@@ -118,13 +118,12 @@ namespace adaptive
             struct
             {
                 bool        b_live;
-                mtime_t     i_length;
                 mtime_t     i_time;
                 double      f_position;
-                vlc_mutex_t lock;
-                mtime_t     rangeStart;
-                mtime_t     rangeEnd;
-                mtime_t     rangeLength;
+                mutable vlc_mutex_t lock;
+                mtime_t     playlistStart;
+                mtime_t     playlistEnd;
+                mtime_t     playlistLength;
                 time_t      lastupdate;
             } cached;
 
