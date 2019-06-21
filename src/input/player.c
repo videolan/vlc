@@ -2082,27 +2082,27 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
 
             if (is_video_es)
             {
-            /* Register vout callbacks after the vout list event */
-            var_AddCallback(ev->vout, "fullscreen",
-                            vlc_player_VoutCallback, player);
-            var_AddCallback(ev->vout, "video-wallpaper",
-                            vlc_player_VoutCallback, player);
-            for (size_t i = 0; i < ARRAY_SIZE(osd_vars); ++i)
-                var_AddCallback(ev->vout, osd_vars[i],
-                                vlc_player_VoutOSDCallback, player);
+                /* Register vout callbacks after the vout list event */
+                var_AddCallback(ev->vout, "fullscreen",
+                                vlc_player_VoutCallback, player);
+                var_AddCallback(ev->vout, "video-wallpaper",
+                                vlc_player_VoutCallback, player);
+                for (size_t i = 0; i < ARRAY_SIZE(osd_vars); ++i)
+                    var_AddCallback(ev->vout, osd_vars[i],
+                                    vlc_player_VoutOSDCallback, player);
             }
             break;
         case VLC_INPUT_EVENT_VOUT_DELETED:
             if (is_video_es)
             {
-            /* Un-register vout callbacks before the vout list event */
-            var_DelCallback(ev->vout, "fullscreen",
-                            vlc_player_VoutCallback, player);
-            var_DelCallback(ev->vout, "video-wallpaper",
-                            vlc_player_VoutCallback, player);
-            for (size_t i = 0; i < ARRAY_SIZE(osd_vars); ++i)
-                var_DelCallback(ev->vout, osd_vars[i],
-                                vlc_player_VoutOSDCallback, player);
+                /* Un-register vout callbacks before the vout list event */
+                var_DelCallback(ev->vout, "fullscreen",
+                                vlc_player_VoutCallback, player);
+                var_DelCallback(ev->vout, "video-wallpaper",
+                                vlc_player_VoutCallback, player);
+                for (size_t i = 0; i < ARRAY_SIZE(osd_vars); ++i)
+                    var_DelCallback(ev->vout, osd_vars[i],
+                                    vlc_player_VoutOSDCallback, player);
             }
 
             trackpriv->vout = NULL;
