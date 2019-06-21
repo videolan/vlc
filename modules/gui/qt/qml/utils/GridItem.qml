@@ -27,7 +27,7 @@ import org.videolan.medialib 0.1
 import "qrc:///utils/" as Utils
 import "qrc:///style/"
 
-Item {
+Rectangle {
     id: root
 
     property url image
@@ -44,8 +44,12 @@ Item {
     signal itemClicked(int keys, int modifier)
     signal itemDoubleClicked(int keys, int modifier)
 
-    Item {
+    Rectangle {
+        id: gridItem
         x: shiftX
+        width: childrenRect.width
+        height: childrenRect.height
+        color: "transparent"
 
         MouseArea {
             id: mouseArea
@@ -57,7 +61,6 @@ Item {
             width: childrenRect.width
             height: childrenRect.height
 
-            Column {
                 Item {
                     id: picture
 
@@ -211,4 +214,4 @@ Item {
             }
         }
     }
-}
+
