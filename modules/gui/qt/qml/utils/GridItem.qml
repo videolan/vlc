@@ -259,33 +259,98 @@ Rectangle {
                             ]
                         }
 
-                        Rectangle {
-                            visible: picture.highlighted
-                            anchors.fill: parent
-                            color: "transparent"
-                            border.width: VLCStyle.selectedBorder
-                            border.color: VLCStyle.colors.accent
+                Rectangle {
+                    id: textHolderRect
+                width: picture.width
+                height: childrenRect.height
+                anchors.top: picture.bottom
+                color: "transparent"
+                Rectangle {
+                    id: textTitleRect
+                    height: childrenRect.height
+                    color: "transparent"
+                    clip: true
+                    property bool showTooltip: false
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        rightMargin: VLCStyle.margin_small
+                        leftMargin: VLCStyle.margin_small
+                    }
+
+                    ToolTip {
+                        visible: textTitleRect.showTooltip
+                        x: (parent.width/2) - (width/2)
+                        y: (parent.height/2) - (height/2)
+                        text: root.title
+                    }
+
+                    Text{
+                        id:textTitle
+                        text:root.title
+                        color: VLCStyle.colors.text
+                        font.pixelSize: VLCStyle.fontSize_normal
+                        property bool _needsToScroll: (textTitleRect.width < textTitle.width)
+
+                        state: ((mouseArea.containsMouse || contextButton.activeFocus || picture.highlighted) && textTitle._needsToScroll ) ? "HOVERED": "RELEASED"
+
+                            states: [
+                                State {
+                                    name: "HOVERED"
+                                    PropertyChanges {
+                                        target: textTitle
+                                        x: textTitleRect.width - textTitle.width - VLCStyle.margin_small
+                                    }
+                                },
+                                State {
+                                    name: "RELEASED"
+                                    PropertyChanges {
+                                        target: textTitle
+                                        x: 0
+                                    }
+
+                                }
+                            ]
+                            transitions: [
+                                Transition {
+                                    from: "RELEASED"
+                                    to: "HOVERED"
+
+                                    SequentialAnimation {
+                                    PauseAnimation { duration: 1000 }
+                                        SmoothedAnimation{
+                                            property: "x"
+                                            maximumEasingTime: 0
+                                            velocity: 25
+                                        }
+                                    PauseAnimation { duration: 2000 }
+                                        ScriptAction { script: textTitle.state = "RELEASED"; }
+                                    }
+                                }
+                            ]
+
                         }
                     }
-                }
+
+                    MouseArea {
+                        id: titleMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: textTitleRect.showTooltip = true
+                        onExited: textTitleRect.showTooltip = false
+                    }
+
                 Text {
-                    id: textTitle
-                    width: cover_bg.width
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    text: root.title
-
-                    elide: Text.ElideRight
-                    font.pixelSize: VLCStyle.fontSize_normal
-                    color: VLCStyle.colors.text
-                    horizontalAlignment: Qt.AlignHCenter
-                }
-                Text {
-                    width: cover_bg.width
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    text : root.subtitle
-
+                    id: subtitleTxt
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        top: textTitleRect.bottom
+                        rightMargin: VLCStyle.margin_small
+                        leftMargin: VLCStyle.margin_small
+                    }
+                    text: root.subtitle
+                    font.weight:Font.Light
                     elide: Text.ElideRight
                     font.pixelSize: VLCStyle.fontSize_small
                     color: VLCStyle.colors.lightText
@@ -294,9 +359,12 @@ Rectangle {
                 RowLayout {
                     visible: isVideo
                     anchors {
-                        bottom:parent.bottom
+                        top:subtitleTxt.top
                         left: parent.left
                         right: parent.right
+                        rightMargin: VLCStyle.margin_small
+                        leftMargin: VLCStyle.margin_small
+                        topMargin: VLCStyle.margin_xxxsmall
                     }
                     Text {
                         Layout.alignment: Qt.AlignLeft
@@ -310,10 +378,14 @@ Rectangle {
                         font.pixelSize: VLCStyle.fontSize_small
                         color: VLCStyle.colors.accent
                         text: "NEW"
+                        font.bold: true
                     }
                 }
+
+        }
             }
         }
     }
 }
-
+}
+}
