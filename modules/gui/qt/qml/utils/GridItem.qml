@@ -71,24 +71,40 @@ Rectangle {
                     id: picture
                 width: isVideo ? VLCStyle.video_normal_width : VLCStyle.cover_small
                 height: isVideo ? VLCStyle.video_normal_height : VLCStyle.cover_small
+                anchors.top:mouseArea.top
                     property bool highlighted: selected || root.activeFocus
 
-                    Rectangle {
-                        id: cover_bg
-                        width: isVideo? VLCStyle.video_normal_width : VLCStyle.cover_small
-                        height: VLCStyle.cover_small
-                        Behavior on width  { SmoothedAnimation { velocity: 100 } }
-                        Behavior on height { SmoothedAnimation { velocity: 100 } }
-                        anchors.centerIn: parent
-                        color: VLCStyle.colors.banner
+                Rectangle {
+                    id: cover_bg
+                    width: picture.width
+                    height: picture.height
+                    color: (cover.status !== Image.Ready ) ? VLCStyle.colors.banner : "transparent"
+
+                    RectangularGlow {
+                        visible: picture.highlighted || mouseArea.containsMouse
+                        anchors.fill: cover
+                        spread: 0.1
+                        glowRadius: VLCStyle.margin_xxsmall
+                        color: VLCStyle.colors.getBgColor( selected, mouseArea.containsMouse, root.activeFocus )
+                    }
 
                         Image {
                             id: cover
                             anchors.fill: parent
+                        anchors.margins: VLCStyle.margin_normal
                             source: image
                             fillMode: Image.PreserveAspectCrop
                             sourceSize: Qt.size(width, height)
-
+                            layer.enabled: true
+                            layer.effect: OpacityMask{
+                                maskSource: Rectangle{
+                                radius: 3
+                                    width: cover.width
+                                    height: cover.height
+                                    visible: false
+                                }
+                            }
+                        Behavior on anchors.margins  { SmoothedAnimation { velocity: 100 } }
                             Rectangle {
                                 id: overlay
                                 anchors.fill: parent
@@ -237,27 +253,31 @@ Rectangle {
                         }
                         states: [
                             State {
-                                name: "visible"
-                                PropertyChanges { target: overlay; visible: true }
+                            name: "visiblebig"
+                            PropertyChanges { target: overlay; visible: true; }
+                            PropertyChanges { target: cover; anchors.margins: VLCStyle.margin_xxsmall; }
                                 when: mouseArea.containsMouse
                             },
                             State {
-                                name: "hidden"
-                                PropertyChanges { target: overlay; visible: false }
-                                when: !mouseArea.containsMouse
+                            name: "hiddenbig"
+                            PropertyChanges { target: overlay; visible: false;}
+                            PropertyChanges { target: cover; anchors.margins: VLCStyle.margin_xxsmall; }
+                            when: !mouseArea.containsMouse && picture.highlighted
+                        },
+                        State {
+                            name: "hiddensmall"
+                            PropertyChanges { target: overlay; visible: false;}
+                            PropertyChanges { target: cover; anchors.margins: VLCStyle.margin_xsmall; }
+                            when: !mouseArea.containsMouse && !picture.highlighted
                             }
                         ]
                         transitions: [
-                            Transition {
-                                from: "hidden";  to: "visible"
-                                NumberAnimation  {
-                                    target: overlay
-                                    properties: "opacity"
-                                    from: 0; to: 0.8; duration: 300
-                                }
-                             }
-                            ]
-                        }
+                        Transition {from: "hiddenbig";  to: "visiblebig";NumberAnimation  {target: overlay;properties: "opacity";from: 0; to: 0.8; duration: 300}},
+                        Transition {from: "hiddensmall";  to: "visiblebig";NumberAnimation  {target: overlay;properties: "opacity";from: 0; to: 0.8; duration: 300}}
+                        ]
+
+                    }
+                }
 
                 Rectangle {
                     id: textHolderRect
@@ -382,7 +402,7 @@ Rectangle {
                     }
                 }
 
-        }
+
             }
         }
     }
