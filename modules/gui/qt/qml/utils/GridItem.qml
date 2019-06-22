@@ -66,15 +66,13 @@ Rectangle {
 
                 Item {
                     id: picture
-
-                    width: VLCStyle.cover_normal
-                    height: VLCStyle.cover_normal - VLCStyle.margin_small
-                    anchors.horizontalCenter: parent.horizontalCenter
+                width: isVideo ? VLCStyle.video_normal_width : VLCStyle.cover_small
+                height: isVideo ? VLCStyle.video_normal_height : VLCStyle.cover_small
                     property bool highlighted: selected || root.activeFocus
 
                     Rectangle {
                         id: cover_bg
-                        width: VLCStyle.cover_small
+                        width: isVideo? VLCStyle.video_normal_width : VLCStyle.cover_small
                         height: VLCStyle.cover_small
                         Behavior on width  { SmoothedAnimation { velocity: 100 } }
                         Behavior on height { SmoothedAnimation { velocity: 100 } }
