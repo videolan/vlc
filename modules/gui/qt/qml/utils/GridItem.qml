@@ -98,10 +98,12 @@ Rectangle {
                                     anchors.fill: parent
                                     visible: !noActionButtons
                                     Item {
+                                    id: plusItem
                                         Layout.fillHeight: true
                                         Layout.fillWidth: true
                                         /* A addToPlaylist button visible when hovered */
                                         Text {
+                                        id: plusIcon
                                             property int iconSize: VLCStyle.icon_large
                                             Behavior on iconSize  { SmoothedAnimation { velocity: 100 } }
                                             Binding on iconSize {
@@ -125,14 +127,24 @@ Rectangle {
                                                 onClicked: root.addToPlaylistClicked()
                                             }
                                         }
+                                    Text {
+                                        anchors{
+                                            top: plusIcon.bottom
+                                        }
+                                        anchors.horizontalCenter:plusItem.horizontalCenter
+                                        font.pixelSize: root.isVideo ? VLCStyle.fontSize_normal : VLCStyle.fontSize_small
+                                        text: qsTr("Enqueue")
+                                        color: "white"
                                     }
 
                                     /* A play button visible when hovered */
                                     Item {
+                                    id: playItem
                                         Layout.fillHeight: true
                                         Layout.fillWidth: true
 
                                         Text {
+                                        id: playIcon
                                             property int iconSize: VLCStyle.icon_large
                                             Behavior on iconSize  {
                                                 SmoothedAnimation { velocity: 100 }
@@ -156,6 +168,14 @@ Rectangle {
                                                 onClicked: root.playClicked()
                                             }
                                         }
+                                    Text {
+                                        anchors{
+                                            top: playIcon.bottom
+                                        }
+                                        anchors.horizontalCenter:playItem.horizontalCenter
+                                        font.pixelSize: root.isVideo ? VLCStyle.fontSize_normal : VLCStyle.fontSize_small
+                                        text: qsTr("Play")
+                                        color: "white"
                                     }
                                 }
                             }
@@ -290,6 +310,8 @@ Rectangle {
                         font.pixelSize: VLCStyle.fontSize_small
                         color: VLCStyle.colors.accent
                         text: "NEW"
+                    }
+                }
             }
         }
     }
