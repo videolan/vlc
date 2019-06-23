@@ -51,6 +51,7 @@ AbstractStream::AbstractStream(demux_t * demux_)
     discontinuity = false;
     needrestart = false;
     inrestart = false;
+    demuxfirstchunk = false;
     segmentTracker = NULL;
     demuxersource = NULL;
     demuxer = NULL;
@@ -235,6 +236,7 @@ bool AbstractStream::startDemux()
     if(!demuxer && format != StreamFormat())
         msg_Err(p_realdemux, "Failed to create demuxer %p %s", (void *)demuxer,
                 format.str().c_str());
+    demuxfirstchunk = true;
 
     return !!demuxer;
 }
@@ -474,6 +476,12 @@ block_t * AbstractStream::readNextBlock()
     if (currentChunk == NULL && !eof)
         currentChunk = segmentTracker->getNextChunk(!fakeEsOut()->restarting(), connManager);
 
+    if(discontinuity && demuxfirstchunk)
+    {
+        /* clear up discontinuity on demux start (discontinuity on start segment bug) */
+        discontinuity = false;
+    }
+
     if(discontinuity || needrestart)
     {
         msg_Info(p_realdemux, "Encountered discontinuity");
@@ -497,6 +505,8 @@ block_t * AbstractStream::readNextBlock()
         return NULL;
     }
 
+    demuxfirstchunk = false;
+
     if (currentChunk->isEmpty())
     {
         delete currentChunk;
@@ -519,6 +529,7 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
     {
         // clear eof flag before restartDemux() to prevent readNextBlock() fail
         eof = false;
+        demuxfirstchunk = true;
         if(b_needs_restart)
         {
             if(currentChunk)

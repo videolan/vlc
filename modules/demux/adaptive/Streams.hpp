@@ -116,6 +116,7 @@ namespace adaptive
         bool discontinuity;
         bool needrestart;
         bool inrestart;
+        bool demuxfirstchunk;
 
         demux_t *p_realdemux;
         StreamFormat format;
