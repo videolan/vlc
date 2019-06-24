@@ -1384,8 +1384,10 @@ vlc_player_vout_OSDTrack(vlc_player_t *player, vlc_es_id_t *id, bool select)
 }
 
 void
-vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *id)
+vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *id,
+                      enum vlc_player_select_policy policy)
 {
+    assert(policy == VLC_PLAYER_SELECT_EXCLUSIVE); /* TODO */
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
         return;
@@ -1440,7 +1442,7 @@ vlc_player_CycleTrack(vlc_player_t *player, enum es_format_category_e cat,
     const struct vlc_player_track *track =
         vlc_player_GetTrackAt(player, cat, index);
     if (selected)
-        vlc_player_SelectTrack(player, track);
+        vlc_player_SelectTrack(player, track, VLC_PLAYER_SELECT_EXCLUSIVE);
     else
         vlc_player_UnselectTrack(player, track);
 }
@@ -1570,7 +1572,8 @@ vlc_player_SetTeletextEnabled(vlc_player_t *player, bool enabled)
     if (!input || !input->teletext_menu)
         return;
     if (enabled)
-        vlc_player_SelectEsId(player, input->teletext_menu->t.es_id);
+        vlc_player_SelectEsId(player, input->teletext_menu->t.es_id,
+                              VLC_PLAYER_SELECT_EXCLUSIVE);
     else
         vlc_player_UnselectEsId(player, input->teletext_menu->t.es_id);
 }

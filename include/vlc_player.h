@@ -298,6 +298,21 @@ enum vlc_player_whence
 };
 
 /**
+ * Player selection policy
+ *
+ * @see vlc_player_SelectEsId()
+ */
+enum vlc_player_select_policy
+{
+    /**
+     * Only one track per category is selected. Selecting a track with this
+     * policy will disable all other tracks for the same category.
+     */
+    VLC_PLAYER_SELECT_EXCLUSIVE,
+    /* XXX VLC_PLAYER_SELECT_SIMULTANEOUS, */
+};
+
+/**
  * Action when the player is stopped
  *
  * @see vlc_player_SetMediaStoppedAction()
@@ -1735,9 +1750,11 @@ vlc_player_GetSelectedTrack(vlc_player_t *player, enum es_format_category_e cat)
  * @param player locked player instance
  * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
  * vlc_player_GetTrackAt())
+ * @param policy exclusive or simultaneous
  */
 VLC_API void
-vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *es_id);
+vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *es_id,
+                      enum vlc_player_select_policy policy);
 
 
 /**
@@ -1745,9 +1762,10 @@ vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *es_id);
  */
 static inline void
 vlc_player_SelectTrack(vlc_player_t *player,
-                       const struct vlc_player_track *track)
+                       const struct vlc_player_track *track,
+                       enum vlc_player_select_policy policy)
 {
-    vlc_player_SelectEsId(player, track->es_id);
+    vlc_player_SelectEsId(player, track->es_id, policy);
 }
 
 /**
@@ -1757,7 +1775,8 @@ vlc_player_SelectTrack(vlc_player_t *player,
  * this last track. And a second call will select the first track.
  *
  * @warning This function has no effects if there are several tracks selected
- * for a same category.
+ * for a same category. Therefore the default policy is
+ * VLC_PLAYER_SELECT_EXCLUSIVE.
  *
  * @param player locked player instance
  * @param cat VIDEO_ES, AUDIO_ES or SPU_ES
@@ -1773,7 +1792,8 @@ vlc_player_SelectNextTrack(vlc_player_t *player,
  * this first track. And a second call will select the last track.
  *
  * @warning This function has no effects if there are several tracks selected
- * for a same category.
+ * for a same category. Therefore the default policy is
+ * VLC_PLAYER_SELECT_EXCLUSIVE.
  *
  * @param player locked player instance
  * @param cat VIDEO_ES, AUDIO_ES or SPU_ES

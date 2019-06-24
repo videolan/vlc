@@ -549,7 +549,7 @@ static void Input(intf_thread_t *intf, char const *psz_cmd,
                 vlc_player_GetTrackAt(player, cat, (size_t)idx);
             if (!track)
                 goto out;
-            vlc_player_SelectTrack(player, track);
+            vlc_player_SelectTrack(player, track, VLC_PLAYER_SELECT_EXCLUSIVE);
         }
         else
         {

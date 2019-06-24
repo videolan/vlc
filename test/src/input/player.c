@@ -1144,7 +1144,7 @@ player_select_next_unselected_track(struct ctx *ctx,
     old_id = old_track ? vlc_es_id_Hold(old_track->es_id) : NULL;
 
     if (new_id)
-        vlc_player_SelectEsId(player, new_id);
+        vlc_player_SelectEsId(player, new_id, VLC_PLAYER_SELECT_EXCLUSIVE);
     else
     {
         assert(old_id);

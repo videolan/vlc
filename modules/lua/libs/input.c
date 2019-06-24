@@ -372,7 +372,7 @@ static int vlclua_player_toggle_track_(lua_State *L,
         if (track->selected)
             vlc_player_UnselectTrack(player, track);
         else
-            vlc_player_SelectTrack(player, track);
+            vlc_player_SelectTrack(player, track, VLC_PLAYER_SELECT_EXCLUSIVE);
     }
 
     vlc_player_Unlock(player);
