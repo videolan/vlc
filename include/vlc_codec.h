@@ -49,6 +49,7 @@ struct decoder_owner_callbacks
     {
         struct
         {
+            vlc_decoder_device * (*get_device)( decoder_t * );
             int         (*format_update)( decoder_t * );
 
             /* cf. decoder_NewPicture, can be called from any decoder thread */
@@ -254,6 +255,52 @@ struct encoder_t
  * \ingroup decoder
  * @{
  */
+
+/**
+ * Creates/Updates the output decoder device.
+ *
+ * This function notifies the video output pipeline of a new video output
+ * format (fmt_out.video). If there was no decoder device so far or a new
+ * decoder device is required, a new decoder device will be set up.
+ * decoder_UpdateVideoOutput() can then be used.
+ *
+ * If the format is unchanged, this function has no effects and returns zero.
+ *
+ * \param dec the decoder object
+ *
+ * \note
+ * This function is not reentrant.
+ *
+ * @return the received of the held decoder device, NULL not to get one
+ */
+static inline vlc_decoder_device * decoder_GetDecoderDevice( decoder_t *dec )
+{
+    vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+    if ( unlikely(dec->fmt_in.i_cat != VIDEO_ES || dec->cbs == NULL ) )
+        return NULL;
+
+    if ( dec->cbs->video.get_device == NULL )
+        return NULL; /* TODO make it mandatory for all decoder owners */
+
+    return dec->cbs->video.get_device( dec );
+}
+
+/**
+ * Creates/Updates the rest of the video output pipeline.
+ *
+ * After a call to decoder_GetDecoderDevice() this function notifies the
+ * video output pipeline of a new video output format (fmt_out.video). If there
+ * was no video output from the decoder so far, a new decoder video output will
+ * be set up. decoder_NewPicture() can then be used to allocate picture buffers.
+ *
+ * If the format is unchanged, this function has no effects and returns zero.
+ *
+ * \note
+ * This function is not reentrant.
+ *
+ * @return 0 if the video output was set up successfully, -1 otherwise.
+ */
+VLC_API int decoder_UpdateVideoOutput( decoder_t *dec );
 
 /**
  * Updates the video output format.
