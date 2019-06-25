@@ -208,7 +208,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         /* Setup vout_display_t once everything is fine */
         vd->info.subpicture_chromas = subpicture_chromas;
 
-        vd->pool = PicturePool;
+        vd->pool    = vout_display_opengl_HasPool(vgl) ? PicturePool : NULL;
         vd->prepare = PictureRender;
         vd->display = PictureDisplay;
         vd->control = Control;

@@ -163,7 +163,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     *fmtp    = fmt;
 
-    vd->pool    = Pool;
+    vd->pool    = vout_display_opengl_HasPool(sys->vgl) ? Pool : NULL;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
