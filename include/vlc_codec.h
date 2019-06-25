@@ -514,6 +514,9 @@ typedef struct vlc_decoder_device
      * The type of pointer will depend of the type:
      * VAAPI: VADisplay
      * VDPAU: vdp_t *
+     * DXVA2: IDirect3DDevice9*
+     * D3D11VA: ID3D11DeviceContext*
+     * AWindow: android AWindowHandler*
      */
     void *opaque;
 } vlc_decoder_device;
