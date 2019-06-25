@@ -662,11 +662,6 @@ static int video_update_format( decoder_t *p_dec )
     return 0;
 }
 
-static picture_t *video_new_buffer( decoder_t *p_dec )
-{
-    return picture_NewFromFormat( &p_dec->fmt_out.video );
-}
-
 static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fmt )
 {
     decoder_t *p_dec;
@@ -684,7 +679,6 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fm
     {
         .video = {
             .format_update = video_update_format,
-            .buffer_new = video_new_buffer,
             .queue = ImageQueueVideo,
         },
     };
