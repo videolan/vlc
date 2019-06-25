@@ -293,7 +293,6 @@ void VideoDecodedStream::setCallbacks()
     static struct decoder_owner_callbacks dec_cbs;
     memset(&dec_cbs, 0, sizeof(dec_cbs));
     dec_cbs.video.format_update = VideoDecCallback_update_format;
-    dec_cbs.video.buffer_new = VideoDecCallback_new_buffer;
     dec_cbs.video.queue = VideoDecCallback_queue;
     dec_cbs.video.queue_cc = VideoDecCallback_queue_cc;
 
@@ -332,11 +331,6 @@ int VideoDecodedStream::VideoDecCallback_update_format(decoder_t *p_dec)
     es_format_Copy(&p_owner->last_fmt_update, &p_dec->fmt_out);
 
     return VLC_SUCCESS;
-}
-
-picture_t *VideoDecodedStream::VideoDecCallback_new_buffer(decoder_t *p_dec)
-{
-    return picture_NewFromFormat(&p_dec->fmt_out.video);
 }
 
 

@@ -135,7 +135,6 @@ namespace sdi_sout
             static void VideoDecCallback_queue_cc( decoder_t *, block_t *,
                                                    const decoder_cc_desc_t * );
             static int VideoDecCallback_update_format(decoder_t *);
-            static picture_t *VideoDecCallback_new_buffer(decoder_t *);
             filter_chain_t * VideoFilterCreate(const es_format_t *);
             void Output(picture_t *);
             void QueueCC(block_t *);
