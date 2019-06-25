@@ -88,6 +88,8 @@ int decoder_UpdateVideoFormat( decoder_t *dec )
 picture_t *decoder_NewPicture( decoder_t *dec )
 {
     vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+    if (dec->cbs->video.buffer_new == NULL)
+        return picture_NewFromFormat( &dec->fmt_out.video );
     return dec->cbs->video.buffer_new( dec );
 }
 
