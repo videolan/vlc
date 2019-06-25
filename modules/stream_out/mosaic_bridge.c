@@ -85,7 +85,6 @@ static int   Send( sout_stream_t *, void *, block_t * );
 
 static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic );
 inline static int video_update_format_decoder( decoder_t *p_dec );
-inline static picture_t *video_new_buffer_decoder( decoder_t * );
 inline static picture_t *video_new_buffer_filter( filter_t * );
 static void video_update_format( video_format_t *, es_format_t * );
 
@@ -303,7 +302,6 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     {
         .video = {
             .format_update = video_update_format_decoder,
-            .buffer_new = video_new_buffer_decoder,
             .queue = decoder_queue_video,
         },
     };
@@ -577,11 +575,6 @@ inline static int video_update_format_decoder( decoder_t *p_dec )
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     video_update_format( &p_owner->video, &p_dec->fmt_out );
     return 0;
-}
-
-inline static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
-{
-    return picture_NewFromFormat( &p_dec->fmt_out.video );
 }
 
 inline static picture_t *video_new_buffer_filter( filter_t *p_filter )
