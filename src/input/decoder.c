@@ -610,12 +610,12 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
         msg_Warn( p_dec, "no vout found, dropping subpicture" );
         if( p_owner->p_vout )
         {
+            vlc_mutex_lock( &p_owner->lock );
             assert(p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID);
             vout_UnregisterSubpictureChannel(p_owner->p_vout,
                                              p_owner->i_spu_channel);
             p_owner->i_spu_channel = VOUT_SPU_CHANNEL_INVALID;
 
-            vlc_mutex_lock( &p_owner->lock );
             vout_Release(p_owner->p_vout);
             p_owner->p_vout = NULL;
             vlc_mutex_unlock( &p_owner->lock );
@@ -625,22 +625,20 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 
     if( p_owner->p_vout != p_vout )
     {
+        vlc_mutex_lock(&p_owner->lock);
+
         if (p_owner->p_vout)
         {
             /* Unregister the SPU channel of the previous vout */
             assert(p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID);
             vout_UnregisterSubpictureChannel(p_owner->p_vout,
                                              p_owner->i_spu_channel);
+            vout_Release(p_owner->p_vout);
         }
 
         p_owner->i_spu_channel =
             vout_RegisterSubpictureChannelInternal(p_vout, p_owner->p_clock);
         p_owner->i_spu_order = 0;
-
-        vlc_mutex_lock(&p_owner->lock);
-        /* Release the previous vout */
-        if (p_owner->p_vout)
-            vout_Release(p_owner->p_vout);
 
         if (p_owner->i_spu_channel == VOUT_SPU_CHANNEL_INVALID)
         {
