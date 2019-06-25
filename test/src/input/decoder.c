@@ -50,11 +50,6 @@ static inline struct decoder_owner *dec_get_owner(decoder_t *dec)
     return container_of(dec, struct decoder_owner, dec);
 }
 
-static picture_t *video_new_buffer_decoder(decoder_t *dec)
-{
-    return picture_NewFromFormat(&dec->fmt_out.video);
-}
-
 static subpicture_t *spu_new_buffer_decoder(decoder_t *dec,
                                             const subpicture_updater_t * p_subpic)
 {
@@ -141,7 +136,6 @@ decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
     static const struct decoder_owner_callbacks dec_video_cbs =
     {
         .video = {
-            .buffer_new = video_new_buffer_decoder,
             .queue = queue_video,
             .queue_cc = queue_cc,
         },
