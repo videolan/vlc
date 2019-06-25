@@ -29,10 +29,6 @@
 #include <vlc_common.h>
 #include "internal.h"
 
-#ifndef GL_MIN_MAP_BUFFER_ALIGNMENT
-# define GL_MIN_MAP_BUFFER_ALIGNMENT 0x90BC
-#endif
-
 #ifndef GL_UNPACK_ROW_LENGTH
 # define GL_UNPACK_ROW_LENGTH 0x0CF2
 #endif
@@ -44,42 +40,12 @@
 # define GL_DYNAMIC_DRAW 0x88E8
 #endif
 
-#ifndef GL_MAP_READ_BIT
-# define GL_MAP_READ_BIT 0x0001
-#endif
-#ifndef GL_MAP_WRITE_BIT
-# define GL_MAP_WRITE_BIT 0x0002
-#endif
-#ifndef GL_MAP_FLUSH_EXPLICIT_BIT
-#define GL_MAP_FLUSH_EXPLICIT_BIT 0x0010
-#endif
-#ifndef GL_MAP_PERSISTENT_BIT
-# define GL_MAP_PERSISTENT_BIT 0x0040
-#endif
-
-#ifndef GL_CLIENT_STORAGE_BIT
-# define GL_CLIENT_STORAGE_BIT 0x0200
-#endif
-
-#ifndef GL_ALREADY_SIGNALED
-# define GL_ALREADY_SIGNALED 0x911A
-#endif
-#ifndef GL_CONDITION_SATISFIED
-# define GL_CONDITION_SATISFIED 0x911C
-#endif
-#ifndef GL_SYNC_GPU_COMMANDS_COMPLETE
-# define GL_SYNC_GPU_COMMANDS_COMPLETE 0x9117
-#endif
-
 #define PBO_DISPLAY_COUNT 2 /* Double buffering */
 typedef struct
 {
-    vlc_gl_t    *gl;
     PFNGLDELETEBUFFERSPROC DeleteBuffers;
     GLuint      buffers[PICTURE_PLANE_MAX];
     size_t      bytes[PICTURE_PLANE_MAX];
-    GLsync      fence;
-    unsigned    index;
 } picture_sys_t;
 
 struct priv
@@ -91,10 +57,6 @@ struct priv
         picture_t *display_pics[PBO_DISPLAY_COUNT];
         size_t display_idx;
     } pbo;
-    struct {
-        picture_t *pics[VLCGL_PICTURE_MAX];
-        unsigned long long list;
-    } persistent;
 };
 
 static void
@@ -102,22 +64,13 @@ pbo_picture_destroy(picture_t *pic)
 {
     picture_sys_t *picsys = pic->p_sys;
 
-    if (picsys->gl)
-    {
-        /* Don't call glDeleteBuffers() here, since a picture can be destroyed
-         * from any threads after the vout is destroyed. Instead, release the
-         * reference to the GL context. All buffers will be destroyed when it
-         * reaches 0. */
-        vlc_gl_Release(picsys->gl);
-    }
-    else
-        picsys->DeleteBuffers(pic->i_planes, picsys->buffers);
+    picsys->DeleteBuffers(pic->i_planes, picsys->buffers);
 
     free(picsys);
 }
 
 static picture_t *
-pbo_picture_create(const opengl_tex_converter_t *tc, bool direct_rendering)
+pbo_picture_create(const opengl_tex_converter_t *tc)
 {
     picture_sys_t *picsys = calloc(1, sizeof(*picsys));
     if (unlikely(picsys == NULL))
@@ -136,12 +89,6 @@ pbo_picture_create(const opengl_tex_converter_t *tc, bool direct_rendering)
 
     tc->vt->GenBuffers(pic->i_planes, picsys->buffers);
     picsys->DeleteBuffers = tc->vt->DeleteBuffers;
-
-    if (direct_rendering)
-    {
-        picsys->gl = tc->gl;
-        vlc_gl_Hold(picsys->gl);
-    }
 
     /* XXX: needed since picture_NewFromResource override pic planes */
     if (picture_Setup(pic, &tc->fmt))
@@ -197,7 +144,7 @@ pbo_pics_alloc(const opengl_tex_converter_t *tc)
     struct priv *priv = tc->priv;
     for (size_t i = 0; i < PBO_DISPLAY_COUNT; ++i)
     {
-        picture_t *pic = priv->pbo.display_pics[i] = pbo_picture_create(tc, false);
+        picture_t *pic = priv->pbo.display_pics[i] = pbo_picture_create(tc);
         if (pic == NULL)
             goto error;
 
@@ -249,188 +196,6 @@ tc_pbo_update(const opengl_tex_converter_t *tc, GLuint *textures,
     tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     return VLC_SUCCESS;
-}
-
-static int
-persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
-{
-    picture_sys_t *picsys = pic->p_sys;
-
-    const GLbitfield access = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT |
-                              GL_MAP_PERSISTENT_BIT;
-    for (int i = 0; i < pic->i_planes; ++i)
-    {
-        tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
-        tc->vt->BufferStorage(GL_PIXEL_UNPACK_BUFFER, picsys->bytes[i], NULL,
-                               access | GL_CLIENT_STORAGE_BIT);
-
-        pic->p[i].p_pixels =
-            tc->vt->MapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, picsys->bytes[i],
-                                   access | GL_MAP_FLUSH_EXPLICIT_BIT);
-
-        if (pic->p[i].p_pixels == NULL)
-        {
-            msg_Err(tc->gl, "could not map PBO buffers");
-            for (i = i - 1; i >= 0; --i)
-            {
-                tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER,
-                                    picsys->buffers[i]);
-                tc->vt->UnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
-            }
-            tc->vt->DeleteBuffers(pic->i_planes, picsys->buffers);
-            memset(picsys->buffers, 0, PICTURE_PLANE_MAX * sizeof(GLuint));
-            return VLC_EGENERIC;
-        }
-#ifndef NDEBUG
-        GLint min_align = 0;
-        tc->vt->GetIntegerv(GL_MIN_MAP_BUFFER_ALIGNMENT, &min_align);
-        assert(((uintptr_t)pic->p[i].p_pixels) % min_align == 0);
-#endif
-    }
-    return VLC_SUCCESS;
-}
-
-static void
-persistent_release_gpupics(const opengl_tex_converter_t *tc, bool force)
-{
-    struct priv *priv = tc->priv;
-    unsigned long long list = priv->persistent.list;
-
-    /* Release all pictures that are not used by the GPU anymore */
-    while (list != 0)
-    {
-        int i = ctz(list);
-        assert(priv->persistent.pics[i] != NULL);
-
-        picture_t *pic = priv->persistent.pics[i];
-        picture_sys_t *picsys = pic->p_sys;
-
-        assert(picsys->fence != NULL);
-        GLenum wait = force ? GL_ALREADY_SIGNALED
-                            : tc->vt->ClientWaitSync(picsys->fence, 0, 0);
-
-        if (wait == GL_ALREADY_SIGNALED || wait == GL_CONDITION_SATISFIED)
-        {
-            tc->vt->DeleteSync(picsys->fence);
-            picsys->fence = NULL;
-
-            priv->persistent.list &= ~(1ULL << i);
-            priv->persistent.pics[i] = NULL;
-            picture_Release(pic);
-        }
-        list &= ~(1ULL << i);
-    }
-}
-
-static int
-tc_persistent_update(const opengl_tex_converter_t *tc, GLuint *textures,
-                     const GLsizei *tex_width, const GLsizei *tex_height,
-                     picture_t *pic, const size_t *plane_offset)
-{
-    (void) plane_offset; assert(plane_offset == NULL);
-    struct priv *priv = tc->priv;
-    picture_sys_t *picsys = pic->p_sys;
-
-    for (int i = 0; i < pic->i_planes; i++)
-    {
-        tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
-        if (picsys->fence == NULL)
-            tc->vt->FlushMappedBufferRange(GL_PIXEL_UNPACK_BUFFER, 0,
-                                            picsys->bytes[i]);
-        tc->vt->ActiveTexture(GL_TEXTURE0 + i);
-        tc->vt->BindTexture(tc->tex_target, textures[i]);
-
-        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, pic->p[i].i_pitch
-                                * tex_width[i] / pic->p[i].i_visible_pitch);
-
-        tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
-                              tc->texs[i].format, tc->texs[i].type, NULL);
-    }
-
-    bool hold;
-    if (picsys->fence == NULL)
-        hold = true;
-    else
-    {
-        /* The picture is already held */
-        hold = false;
-        tc->vt->DeleteSync(picsys->fence);
-    }
-
-    picsys->fence = tc->vt->FenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-    if (picsys->fence == NULL)
-    {
-        /* Error (corner case): don't hold the picture */
-        hold = false;
-    }
-
-    persistent_release_gpupics(tc, false);
-
-    if (hold)
-    {
-        /* Hold the picture while it's used by the GPU */
-        unsigned index = picsys->index;
-
-        priv->persistent.list |= 1ULL << index;
-        assert(priv->persistent.pics[index] == NULL);
-        priv->persistent.pics[index] = pic;
-        picture_Hold(pic);
-    }
-
-    /* turn off pbo */
-    tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-
-    return VLC_SUCCESS;
-}
-
-static picture_pool_t *
-tc_persistent_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
-{
-    struct priv *priv = tc->priv;
-    picture_t *pictures[VLCGL_PICTURE_MAX];
-    unsigned count;
-
-    priv->persistent.list = 0;
-    requested_count++;
-
-    for (count = 0; count < requested_count; count++)
-    {
-        picture_t *pic = pictures[count] = pbo_picture_create(tc, true);
-        if (pic == NULL)
-            break;
-
-        picture_sys_t *p_sys = pic->p_sys;
-#ifndef NDEBUG
-        for (int i = 0; i < pic->i_planes; ++i)
-            assert(p_sys->bytes[i] == ((picture_sys_t *) pictures[0]->p_sys)->bytes[i]);
-#endif
-        p_sys->index = count;
-
-        if (persistent_map(tc, pic) != VLC_SUCCESS)
-        {
-            picture_Release(pic);
-            break;
-        }
-    }
-
-    /* We need minumum 2 pbo buffers */
-    if (count <= 1)
-        goto error;
-
-    /* turn off pbo */
-    tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-
-    /* Wrap the pictures into a pool */
-    picture_pool_t *pool = picture_pool_New(count, pictures);
-    if (!pool)
-        goto error;
-    return pool;
-
-error:
-    for (unsigned i = 0; i < count; i++)
-        picture_Release(pictures[i]);
-
-    return NULL;
 }
 
 static int
@@ -600,12 +365,7 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
 
     if (allow_dr && priv->has_unpack_subimage)
     {
-        bool supports_map_persistent = false;
-
-        /* Ensure we do direct rendering / PBO with OpenGL 3.0 or higher.
-         * Indeed, persistent mapped buffers or PBO seems to be slow with
-         * OpenGL 2.1 drivers and bellow. This may be caused by OpenGL
-         * compatibility layer. */
+        /* Ensure we do direct rendering / PBO with OpenGL 3.0 or higher. */
         const unsigned char *ogl_version = tc->vt->GetString(GL_VERSION);
         const bool glver_ok = strverscmp((const char *)ogl_version, "3.0") >= 0;
 
@@ -613,31 +373,12 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
             (vlc_gl_StrHasToken(tc->glexts, "GL_ARB_pixel_buffer_object") ||
              vlc_gl_StrHasToken(tc->glexts, "GL_EXT_pixel_buffer_object"));
 
-        const bool has_bs = has_pbo &&
-            (vlc_gl_StrHasToken(tc->glexts, "GL_ARB_buffer_storage") ||
-             vlc_gl_StrHasToken(tc->glexts, "GL_EXT_buffer_storage"));
-
-        GLint min_align = 0;
-        tc->vt->GetIntegerv(GL_MIN_MAP_BUFFER_ALIGNMENT, &min_align);
-        supports_map_persistent = min_align >= 64 && has_bs && tc->gl->module
-            && tc->vt->BufferStorage && tc->vt->MapBufferRange && tc->vt->FlushMappedBufferRange
-            && tc->vt->UnmapBuffer && tc->vt->FenceSync && tc->vt->DeleteSync
-            && tc->vt->ClientWaitSync;
-        if (supports_map_persistent)
+        const bool supports_pbo = has_pbo && tc->vt->BufferData
+            && tc->vt->BufferSubData;
+        if (supports_pbo && pbo_pics_alloc(tc) == VLC_SUCCESS)
         {
-            tc->pf_get_pool = tc_persistent_get_pool;
-            tc->pf_update   = tc_persistent_update;
-            msg_Dbg(tc->gl, "MAP_PERSISTENT support (direct rendering) enabled");
-        }
-        if (!supports_map_persistent)
-        {
-            const bool supports_pbo = has_pbo && tc->vt->BufferData
-                && tc->vt->BufferSubData;
-            if (supports_pbo && pbo_pics_alloc(tc) == VLC_SUCCESS)
-            {
-                tc->pf_update  = tc_pbo_update;
-                msg_Dbg(tc->gl, "PBO support enabled");
-            }
+            tc->pf_update  = tc_pbo_update;
+            msg_Dbg(tc->gl, "PBO support enabled");
         }
     }
 
@@ -652,7 +393,6 @@ opengl_tex_converter_generic_deinit(opengl_tex_converter_t *tc)
     struct priv *priv = tc->priv;
     for (size_t i = 0; i < PBO_DISPLAY_COUNT && priv->pbo.display_pics[i]; ++i)
         picture_Release(priv->pbo.display_pics[i]);
-    persistent_release_gpupics(tc, true);
     free(priv->texture_temp_buf);
     free(tc->priv);
 }
