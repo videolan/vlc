@@ -47,7 +47,6 @@ struct vout_display_sys_t
     const struct pl_tex *plane_tex[4];
     struct pl_renderer *renderer;
     picture_pool_t *pool;
-    bool pool_dr;
 
     // Pool of textures for the subpictures
     struct pl_overlay *overlays;
@@ -57,10 +56,6 @@ struct vout_display_sys_t
     // Dynamic during rendering
     vout_display_place_t place;
     uint64_t counter;
-
-    // Mapped buffers
-    picture_t *pics[VLCVK_MAX_BUFFERS];
-    unsigned long long list; // bitset of available pictures
 
     // Storage for rendering parameters
     struct pl_filter_config upscaler;
@@ -78,19 +73,11 @@ struct vout_display_sys_t
     int dither_depth;
 };
 
-struct picture_sys
-{
-    vlc_vk_t *vk;
-    unsigned index;
-    const struct pl_buf *buf;
-};
-
 // Display callbacks
 static picture_pool_t *Pool(vout_display_t *, unsigned);
 static void PictureRender(vout_display_t *, picture_t *, subpicture_t *, mtime_t);
 static void PictureDisplay(vout_display_t *, picture_t *);
 static int Control(vout_display_t *, int, va_list);
-static void PollBuffers(vout_display_t *);
 static void UpdateParams(vout_display_t *);
 
 // Allocates a Vulkan surface and instance for video output.
@@ -187,88 +174,10 @@ static void Close(vout_display_t *vd)
     }
 
     pl_renderer_destroy(&sys->renderer);
-    for (int i = 0; i < VLCVK_MAX_BUFFERS; i++) {
-        if (sys->pics[i])
-            picture_Release(sys->pics[i]);
-    }
     if (sys->pool)
         picture_pool_Release(sys->pool);
 
     vlc_vk_Release(sys->vk);
-}
-
-static void DestroyPicture(picture_t *pic)
-{
-    struct picture_sys *picsys = pic->p_sys;
-    const struct pl_gpu *gpu = picsys->vk->vulkan->gpu;
-
-    pl_buf_destroy(gpu, &picsys->buf);
-    vlc_vk_Release(picsys->vk);
-    free(picsys);
-}
-
-static picture_t *CreatePicture(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    const struct pl_gpu *gpu = sys->vk->vulkan->gpu;
-
-    struct picture_sys *picsys = calloc(1, sizeof(*picsys));
-    if (unlikely(picsys == NULL))
-        return NULL;
-
-    picture_t *pic = picture_NewFromResource(&vd->fmt, &(picture_resource_t) {
-        .p_sys = picsys,
-        .pf_destroy = DestroyPicture,
-    });
-
-    if (!pic) {
-        free(picsys);
-        return NULL;
-    }
-
-    picsys->vk = sys->vk;
-    vlc_vk_Hold(picsys->vk);
-
-    // XXX: needed since picture_NewFromResource override pic planes
-    // cf. opengl display.c
-    if (picture_Setup(pic, &vd->fmt) != VLC_SUCCESS) {
-        picture_Release(pic);
-        return NULL;
-    }
-
-    size_t buf_size = 0;
-    size_t offsets[PICTURE_PLANE_MAX];
-    for (int i = 0; i < pic->i_planes; i++)
-    {
-        const plane_t *p = &pic->p[i];
-
-        if (p->i_pitch < 0 || p->i_lines <= 0 ||
-            (size_t) p->i_pitch > SIZE_MAX/p->i_lines)
-        {
-            picture_Release(pic);
-            return NULL;
-        }
-        offsets[i] = buf_size;
-        buf_size += p->i_pitch * p->i_lines;
-    }
-
-    picsys->buf = pl_buf_create(gpu, &(struct pl_buf_params) {
-        .type = PL_BUF_TEX_TRANSFER,
-        .size = buf_size,
-        .host_mapped = true,
-    });
-
-    if (!picsys->buf) {
-        picture_Release(pic);
-        return NULL;
-    }
-
-    for (int i = 0; i < pic->i_planes; ++i)
-    {
-        pic->p[i].p_pixels = (void *) &picsys->buf->data[offsets[i]];
-    }
-
-    return pic;
 }
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
@@ -278,67 +187,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
     if (sys->pool)
         return sys->pool;
 
-    if (var_InheritBool(vd, "disable-dr"))
-        goto fallback;
-
-    unsigned count;
-    picture_t *pictures[VLCVK_MAX_BUFFERS];
-    for (count = 0; count < requested_count; count++)
-    {
-        pictures[count] = CreatePicture(vd);
-        if (!pictures[count])
-            break;
-
-        struct picture_sys *picsys = pictures[count]->p_sys;
-        picsys->index = count;
-    }
-
-    if (count <= 1)
-        goto error;
-
-    sys->pool = picture_pool_New(count, pictures);
-    if (!sys->pool)
-        goto error;
-
-    sys->pool_dr = true;
-    return sys->pool;
-
-error:
-    for (unsigned i = 0; i < count; i++) {
-        picture_Release(pictures[i]);
-        sys->pics[i] = NULL;
-    }
-
-fallback:
-    // Fallback to a regular memory pool
     sys->pool = picture_pool_NewFromFormat(&vd->fmt, requested_count);
-    sys->pool_dr = false;
     return sys->pool;
-}
-
-// Garbage collect all buffers that can be re-used
-static void PollBuffers(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    const struct pl_gpu *gpu = sys->vk->vulkan->gpu;
-    unsigned long long list = sys->list;
-
-    // Release all pictures that are not used by the GPU anymore
-    while (list != 0) {
-        int i = ctz(list);
-        picture_t *pic = sys->pics[i];
-        assert(pic);
-        struct picture_sys *picsys = pic->p_sys;
-        assert(picsys);
-
-        if (!pl_buf_poll(gpu, picsys->buf, 0)) {
-            sys->list &= ~(1ULL << i);
-            sys->pics[i] = NULL;
-            picture_Release(pic);
-        }
-
-        list &= ~(1ULL << i);
-    }
 }
 
 static void PictureRender(vout_display_t *vd, picture_t *pic,
@@ -370,8 +220,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
     // Upload the image data for each plane
     struct pl_plane_data data[4];
-    struct picture_sys *picsys = sys->pool_dr ? pic->p_sys : NULL;
-    if (!vlc_placebo_PlaneData(pic, data, picsys ? picsys->buf : NULL)) {
+    if (!vlc_placebo_PlaneData(pic, data, NULL)) {
         // This should never happen, in theory
         assert(!"Failed processing the picture_t into pl_plane_data!?");
     }
@@ -389,19 +238,6 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
             pl_chroma_location_offset(sys->yuv_chroma_loc, &plane->shift_x,
                                       &plane->shift_y);
     }
-
-    // If this was a mapped buffer, mark it as in use by the GPU
-    if (picsys) {
-        unsigned index = picsys->index;
-        if (sys->pics[index] == NULL) {
-            sys->list |= 1ULL << index;
-            sys->pics[index] = pic;
-            picture_Hold(pic);
-        }
-    }
-
-    // Garbage collect all previously used mapped buffers
-    PollBuffers(vd);
 
     struct pl_render_target target;
     pl_render_target_from_swapchain(&target, &frame);
@@ -682,7 +518,6 @@ vlc_module_begin () set_shortname ("Vulkan")
             0.0, 10.0, TAPER_TEXT, TAPER_LONGTEXT, true)
 
     set_section("Performance tweaks / debugging", NULL)
-    add_bool("disable-dr", false, DISABLE_DR_TEXT, DISABLE_DR_LONGTEXT, false)
     add_bool("skip-aa", false, SKIP_AA_TEXT, SKIP_AA_LONGTEXT, false)
     add_float_with_range("polar-cutoff", 0.001,
             0., 1., POLAR_CUTOFF_TEXT, POLAR_CUTOFF_LONGTEXT, false)
