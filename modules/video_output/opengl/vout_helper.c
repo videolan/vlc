@@ -1024,6 +1024,12 @@ void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
     vgl->vt.Viewport(x, y, width, height);
 }
 
+bool vout_display_opengl_HasPool(const vout_display_opengl_t *vgl)
+{
+    opengl_tex_converter_t *tc = vgl->prgm->tc;
+    return tc->pf_get_pool != NULL;
+}
+
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned requested_count)
 {
     GL_ASSERT_NOERROR();
