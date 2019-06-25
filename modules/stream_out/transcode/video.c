@@ -95,11 +95,6 @@ static int video_update_format_decoder( decoder_t *p_dec )
     return chain_works;
 }
 
-static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
-{
-    return picture_NewFromFormat( &p_dec->fmt_out.video );
-}
-
 static picture_t *video_new_buffer_encoder( transcode_encoder_t *p_enc )
 {
     return picture_NewFromFormat( &transcode_encoder_format_in( p_enc )->video );
@@ -154,7 +149,6 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     {
         .video = {
             .format_update = video_update_format_decoder,
-            .buffer_new = video_new_buffer_decoder,
             .queue = decoder_queue_video,
         },
     };
