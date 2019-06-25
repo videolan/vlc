@@ -1040,36 +1040,10 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     opengl_tex_converter_t *tc = vgl->prgm->tc;
     requested_count = __MIN(VLCGL_PICTURE_MAX, requested_count);
     /* Allocate with tex converter pool callback if it exists */
-    if (tc->pf_get_pool != NULL)
-    {
-        vgl->pool = tc->pf_get_pool(tc, requested_count);
-        if (!vgl->pool)
-            goto error;
-        return vgl->pool;
-    }
-
-    /* Allocate our pictures */
-    picture_t *picture[VLCGL_PICTURE_MAX] = {NULL, };
-    unsigned count;
-    for (count = 0; count < requested_count; count++)
-    {
-        picture[count] = picture_NewFromFormat(&vgl->fmt);
-        if (!picture[count])
-            break;
-    }
-    if (count <= 0)
-        goto error;
-
-    /* Wrap the pictures into a pool */
-    vgl->pool = picture_pool_New(count, picture);
+    assert(tc->pf_get_pool != NULL);
+    vgl->pool = tc->pf_get_pool(tc, requested_count);
     if (!vgl->pool)
-    {
-        for (unsigned i = 0; i < count; i++)
-            picture_Release(picture[i]);
         goto error;
-    }
-
-    GL_ASSERT_NOERROR();
     return vgl->pool;
 
 error:
