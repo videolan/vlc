@@ -99,7 +99,7 @@ HRESULT D3D9_CreateDevice(vlc_object_t *, d3d9_handle_t *, HWND,
                           const video_format_t *, d3d9_device_t *out);
 #define D3D9_CreateDevice(a,b,c,d,e) D3D9_CreateDevice( VLC_OBJECT(a), b, c, d, e )
 HRESULT D3D9_CreateDeviceExternal(IDirect3DDevice9 *, d3d9_handle_t *, HWND,
-                                  const video_format_t *, d3d9_device_t *out);
+                                  d3d9_device_t *out);
 
 void D3D9_ReleaseDevice(d3d9_device_t *);
 int D3D9_Create(vlc_object_t *, d3d9_handle_t *);

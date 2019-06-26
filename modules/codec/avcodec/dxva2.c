@@ -278,7 +278,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
             goto error;
         }
         if ( D3D9_CreateExternal(va, &sys->hd3d, device) != VLC_SUCCESS ||
-             FAILED(D3D9_CreateDeviceExternal( device, &sys->hd3d, 0, &fmt->video, &sys->d3d_dev)) )
+             FAILED(D3D9_CreateDeviceExternal( device, &sys->hd3d, 0, &sys->d3d_dev)) )
         {
             IDirect3DDevice9_Release(device);
             free( sys );

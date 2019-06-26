@@ -1509,7 +1509,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
 
     if (external_dev)
         hr = D3D9_CreateDeviceExternal(external_dev, &sys->hd3d, sys->sys.hvideownd,
-                                       &vd->source, &sys->d3d_dev);
+                                       &sys->d3d_dev);
     else
         hr = D3D9_CreateDevice(vd, &sys->hd3d, sys->sys.hvideownd,
                                &vd->source, &sys->d3d_dev);
