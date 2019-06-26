@@ -350,7 +350,7 @@ static input_thread_t *Create( vlc_object_t *p_parent,
 
     /* setup the preparse depth of the item
      * if we are preparsing, use the i_preparse_depth of the parent item */
-    if( priv->b_preparsing )
+    if( priv->b_preparsing || priv->b_thumbnailing )
     {
         p_input->obj.logger = NULL;
         p_input->obj.no_interact = true;
