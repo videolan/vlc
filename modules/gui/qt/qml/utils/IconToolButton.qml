@@ -55,6 +55,7 @@ ToolButton {
 
             anchors.centerIn: parent
 
+            renderType: Text.NativeRendering
             font.pixelSize: control.size
             font.family: VLCIcons.fontFamily
 
