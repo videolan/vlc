@@ -603,6 +603,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create( mp, "vout-cb-make-current", VLC_VAR_ADDRESS );
     var_Create( mp, "vout-cb-select-plane", VLC_VAR_ADDRESS );
 
+    var_Create (mp, "dec-dev", VLC_VAR_STRING);
     var_Create (mp, "avcodec-hw", VLC_VAR_STRING);
     var_Create (mp, "drawable-xid", VLC_VAR_INTEGER);
 #if defined (_WIN32) || defined (__OS2__)
