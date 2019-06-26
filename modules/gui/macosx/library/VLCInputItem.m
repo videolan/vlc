@@ -92,6 +92,16 @@
     return self;
 }
 
+- (NSString *)description
+{
+    NSString *inputItemName;
+    if (_p_inputNode->p_item)
+        inputItemName = toNSStr(_p_inputNode->p_item->psz_name);
+    else
+        inputItemName = @"p_item == nil";
+    return [NSString stringWithFormat:@"%@: node: %p input name: %@, number of children: %i", NSStringFromClass([self class]), _p_inputNode, inputItemName, self.numberOfChildren];
+}
+
 - (VLCInputItem *)inputItem
 {
     if (_p_inputNode->p_item) {

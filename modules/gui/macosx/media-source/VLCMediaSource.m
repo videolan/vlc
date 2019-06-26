@@ -43,8 +43,9 @@ static void cb_children_reset(vlc_media_tree_t *p_tree,
                               void *p_data)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        VLCMediaSource *mediaSource = (__bridge VLCMediaSource *)p_data;
         [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourceChildrenReset
-                                                            object:[[VLCInputNode alloc] initWithInputNode:p_node]];
+                                                            object:mediaSource];
     });
 }
 
@@ -55,8 +56,9 @@ static void cb_children_added(vlc_media_tree_t *p_tree,
                               void *p_data)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        VLCMediaSource *mediaSource = (__bridge VLCMediaSource *)p_data;
         [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourceChildrenAdded
-                                                            object:[[VLCInputNode alloc] initWithInputNode:p_node]];
+                                                            object:mediaSource];
     });
 }
 
@@ -67,8 +69,9 @@ static void cb_children_removed(vlc_media_tree_t *p_tree,
                                 void *p_data)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        VLCMediaSource *mediaSource = (__bridge VLCMediaSource *)p_data;
         [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourceChildrenRemoved
-                                                            object:[[VLCInputNode alloc] initWithInputNode:p_node]];
+                                                            object:mediaSource];
     });
 }
 

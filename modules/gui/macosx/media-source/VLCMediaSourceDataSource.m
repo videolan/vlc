@@ -32,7 +32,7 @@
 
 @interface VLCMediaSourceDataSource ()
 {
-    NSArray *_mediaDiscovery;
+    NSArray *_mediaSources;
 }
 @end
 
@@ -42,39 +42,55 @@
 {
     self = [super init];
     if (self) {
-        _mediaDiscovery = @[];
+        _mediaSources = @[];
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                               selector:@selector(mediaSourceChildrenReset:)
+                                   name:VLCMediaSourceChildrenReset
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(mediaSourceChildrenAdded:)
+                                   name:VLCMediaSourceChildrenAdded
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(mediaSourceChildrenRemoved:)
+                                   name:VLCMediaSourceChildrenRemoved
+                                 object:nil];
     }
     return self;
 }
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)loadMediaSources
 {
-    NSArray *mediaDiscoveryForLAN = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_LAN];
-    NSUInteger count = mediaDiscoveryForLAN.count;
+    NSArray *mediaSourcesOnLAN = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_LAN];
+    NSUInteger count = mediaSourcesOnLAN.count;
     if (count > 0) {
         for (NSUInteger x = 0; x < count; x++) {
-            VLCMediaSource *mediaSource = mediaDiscoveryForLAN[x];
+            VLCMediaSource *mediaSource = mediaSourcesOnLAN[x];
             VLCInputNode *rootNode = [mediaSource rootNode];
             [mediaSource preparseInputItemWithinTree:rootNode.inputItem];
         }
     }
-    _mediaDiscovery = mediaDiscoveryForLAN;
+    _mediaSources = mediaSourcesOnLAN;
     [self.collectionView reloadData];
+}
+
+- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
+{
+    return _mediaSources.count;
 }
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
 {
-    switch (self.mediaSourceMode) {
-        case VLCMediaSourceModeLAN:
-            return _mediaDiscovery.count;
-            break;
-
-        case VLCMediaSourceModeInternet:
-        default:
-            return 0;
-            break;
-    }
+    VLCMediaSource *mediaSource = _mediaSources[section];
+    VLCInputNode *rootNode = mediaSource.rootNode;
+    return rootNode.numberOfChildren;
 }
 
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
@@ -82,21 +98,12 @@
 {
     VLCMediaSourceCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCMediaSourceCellIdentifier forIndexPath:indexPath];
 
-    NSArray *mediaArray;
-    switch (self.mediaSourceMode) {
-        case VLCMediaSourceModeLAN:
-            mediaArray = _mediaDiscovery;
-            break;
-
-        case VLCMediaSourceModeInternet:
-        default:
-            NSAssert(1, @"no representation for selected media source mode %li", (long)self.mediaSourceMode);
-            mediaArray = @[];
-            break;
-    }
-
-    VLCMediaSource *mediaSource = mediaArray[indexPath.item];
-    viewItem.titleTextField.stringValue = mediaSource.mediaSourceDescription;
+    VLCMediaSource *mediaSource = _mediaSources[indexPath.section];
+    VLCInputNode *rootNode = mediaSource.rootNode;
+    NSArray *nodeChildren = rootNode.children;
+    VLCInputNode *childNode = nodeChildren[indexPath.item];
+    VLCInputItem *childRootInput = childNode.inputItem;
+    viewItem.titleTextField.stringValue = childRootInput.name;
 
     return viewItem;
 }
@@ -104,6 +111,32 @@
 - (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
     NSLog(@"media source selection changed: %@", indexPaths);
+}
+
+#pragma mark - VLCMediaSource Delegation
+
+- (void)mediaSourceChildrenReset:(NSNotification *)aNotification
+{
+    msg_Dbg(getIntf(), "Reset nodes: %s", [[aNotification.object description] UTF8String]);
+    [self reloadDataForNotification:aNotification];
+}
+
+- (void)mediaSourceChildrenAdded:(NSNotification *)aNotification
+{
+    msg_Dbg(getIntf(), "Received new nodes: %s", [[aNotification.object description] UTF8String]);
+    [self reloadDataForNotification:aNotification];
+}
+
+- (void)mediaSourceChildrenRemoved:(NSNotification *)aNotification
+{
+    msg_Dbg(getIntf(), "Removed nodes: %s", [[aNotification.object description] UTF8String]);
+    [self reloadDataForNotification:aNotification];
+}
+
+- (void)reloadDataForNotification:(NSNotification *)aNotification
+{
+    NSInteger index = [_mediaSources indexOfObject:aNotification.object];
+    [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:index]];
 }
 
 @end
