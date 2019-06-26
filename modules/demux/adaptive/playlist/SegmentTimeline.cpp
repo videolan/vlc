@@ -39,6 +39,7 @@ SegmentTimeline::SegmentTimeline(uint64_t scale)
     :TimescaleAble(NULL)
 {
     setTimescale(scale);
+    totalLength = 0;
 }
 
 SegmentTimeline::~SegmentTimeline()
