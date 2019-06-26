@@ -53,14 +53,16 @@ namespace adaptive
             es_out_t * getEsOut();
             LockedFakeEsOut WithLock();
             CommandsQueue * commandsQueue();
-            void setTimestampOffset( mtime_t );
-            void setExpectedTimestampOffset(mtime_t);
+            void setAssociatedTimestamp( mtime_t );
+            void setExpectedTimestamp( mtime_t );
+            void resetTimestamps();
+            bool getStartTimestamps( mtime_t *, mtime_t * );
             size_t esCount() const;
             bool hasSelectedEs() const;
             bool decodersDrained();
             bool restarting() const;
             void setExtraInfoProvider( ExtraFMTInfoInterface * );
-            void checkTimestampsStart(mtime_t);
+            mtime_t fixTimestamp( mtime_t );
             void declareEs( const es_format_t * );
 
             /* Used by FakeES ID */
@@ -87,12 +89,16 @@ namespace adaptive
             es_out_t *real_es_out;
             FakeESOutID * createNewID( const es_format_t * );
             ExtraFMTInfoInterface *extrainfo;
-            mtime_t getTimestampOffset() const;
             CommandsQueue *commandsqueue;
             es_out_t *fakeesout;
+            struct
+            {
+                mtime_t timestamp;
+                bool b_timestamp_set;
+                bool b_offset_calculated;
+            } associated, expected;
+            mtime_t timestamp_first;
             mtime_t timestamps_offset;
-            mtime_t timestamps_expected;
-            bool timestamps_check_done;
             int priority;
             std::list<FakeESOutID *> fakeesidlist;
             std::list<FakeESOutID *> recycle_candidates;

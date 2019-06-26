@@ -128,7 +128,7 @@ void AbstractStream::prepareRestart(bool b_discontinuity)
     {
         /* Enqueue Del Commands for all current ES */
         demuxer->drain();
-        setTimeOffset(true);
+        setTimeOffset(-1);
         /* Enqueue Del Commands for all current ES */
         fakeEsOut()->scheduleAllForDeletion();
         if(b_discontinuity)
@@ -591,11 +591,11 @@ void AbstractStream::setTimeOffset(mtime_t i_offset)
      * will start from zero from seek point */
     if(i_offset < 0) /* reset */
     {
-        fakeEsOut()->setExpectedTimestampOffset(0);
+        fakeEsOut()->setExpectedTimestamp(-1);
     }
     else
     {
-        fakeEsOut()->setExpectedTimestampOffset(i_offset);
+        fakeEsOut()->setExpectedTimestamp(i_offset);
     }
 }
 
