@@ -48,6 +48,7 @@
 #include "audio_output/aout_internal.h"
 #include "stream_output/stream_output.h"
 #include "../clock/clock.h"
+#include "input_internal.h"
 #include "decoder.h"
 #include "resource.h"
 #include "libvlc.h"
@@ -1807,13 +1808,15 @@ static vlc_input_decoder_t *
 CreateDecoder( vlc_object_t *p_parent, const es_format_t *fmt,
                const char *psz_id, vlc_clock_t *p_clock,
                input_resource_t *p_resource, sout_stream_t *p_sout,
-               bool b_thumbnailing, const struct vlc_input_decoder_callbacks *cbs,
+               enum input_type input_type, const struct vlc_input_decoder_callbacks *cbs,
                void *cbs_userdata )
 {
     decoder_t *p_dec;
     vlc_input_decoder_t *p_owner;
     static_assert(offsetof(vlc_input_decoder_t, dec) == 0,
                   "the decoder must be first in the owner structure");
+
+    assert(input_type != INPUT_TYPE_PREPARSING);
 
     p_owner = vlc_custom_create( p_parent, sizeof( *p_owner ), "decoder" );
     if( p_owner == NULL )
@@ -1898,10 +1901,10 @@ CreateDecoder( vlc_object_t *p_parent, const es_format_t *fmt,
     switch( fmt->i_cat )
     {
         case VIDEO_ES:
-            if( !b_thumbnailing )
-                p_dec->cbs = &dec_video_cbs;
-            else
+            if( input_type == INPUT_TYPE_THUMBNAILING )
                 p_dec->cbs = &dec_thumbnailer_cbs;
+            else
+                p_dec->cbs = &dec_video_cbs;
             break;
         case AUDIO_ES:
             p_dec->cbs = &dec_audio_cbs;
@@ -2064,7 +2067,7 @@ static void DecoderUnsupportedCodec( decoder_t *p_dec, const es_format_t *fmt, b
 static vlc_input_decoder_t *
 decoder_New( vlc_object_t *p_parent, const es_format_t *fmt, const char *psz_id,
              vlc_clock_t *p_clock, input_resource_t *p_resource,
-             sout_stream_t *p_sout, bool thumbnailing,
+             sout_stream_t *p_sout, enum input_type input_type,
              const struct vlc_input_decoder_callbacks *cbs, void *userdata)
 {
     const char *psz_type = p_sout ? N_("packetizer") : N_("decoder");
@@ -2073,7 +2076,7 @@ decoder_New( vlc_object_t *p_parent, const es_format_t *fmt, const char *psz_id,
     /* Create the decoder configuration structure */
     vlc_input_decoder_t *p_owner =
         CreateDecoder( p_parent, fmt, psz_id, p_clock, p_resource, p_sout,
-                       thumbnailing, cbs, userdata );
+                       input_type, cbs, userdata );
     if( p_owner == NULL )
     {
         msg_Err( p_parent, "could not create %s", psz_type );
@@ -2139,11 +2142,11 @@ vlc_input_decoder_t *
 vlc_input_decoder_New( vlc_object_t *parent, es_format_t *fmt,
                   const char *psz_id, vlc_clock_t *p_clock,
                   input_resource_t *resource,
-                  sout_stream_t *p_sout, bool thumbnailing,
+                  sout_stream_t *p_sout, enum input_type input_type,
                   const struct vlc_input_decoder_callbacks *cbs,
                   void *cbs_userdata)
 {
-    return decoder_New( parent, fmt, psz_id, p_clock, resource, p_sout, thumbnailing,
+    return decoder_New( parent, fmt, psz_id, p_clock, resource, p_sout, input_type,
                         cbs, cbs_userdata );
 }
 
@@ -2154,8 +2157,8 @@ vlc_input_decoder_t *
 vlc_input_decoder_Create( vlc_object_t *p_parent, const es_format_t *fmt,
                      input_resource_t *p_resource )
 {
-    return decoder_New( p_parent, fmt, NULL, NULL, p_resource, NULL, false, NULL,
-                        NULL );
+    return decoder_New( p_parent, fmt, NULL, NULL, p_resource, NULL, INPUT_TYPE_NONE,
+                        NULL, NULL );
 }
 
 
@@ -2409,7 +2412,7 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t cod
         fmt.subs.cc.i_reorder_depth = p_owner->cc.desc.i_reorder_depth;
         p_ccowner = vlc_input_decoder_New( VLC_OBJECT(p_dec), &fmt, p_owner->psz_id,
                                       p_owner->p_clock, p_owner->p_resource, p_owner->p_sout,
-                                      false, NULL, NULL );
+                                      INPUT_TYPE_NONE, NULL, NULL );
         if( !p_ccowner )
         {
             msg_Err( p_dec, "could not create decoder" );
