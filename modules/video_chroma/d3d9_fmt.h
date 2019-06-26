@@ -67,6 +67,18 @@ typedef struct
     D3DCAPS9                caps;
 } d3d9_device_t;
 
+static inline bool is_d3d9_opaque(vlc_fourcc_t chroma)
+{
+    switch (chroma)
+    {
+    case VLC_CODEC_D3D9_OPAQUE:
+    case VLC_CODEC_D3D9_OPAQUE_10B:
+        return true;
+    default:
+        return false;
+    }
+}
+
 static inline void AcquireD3D9PictureSys(picture_sys_d3d9_t *p_sys)
 {
     IDirect3DSurface9_AddRef(p_sys->surface);

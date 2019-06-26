@@ -199,18 +199,6 @@ typedef struct d3d_region_t {
 } d3d_region_t;
 
 /* */
-static bool is_d3d9_opaque(vlc_fourcc_t chroma)
-{
-    switch (chroma)
-    {
-    case VLC_CODEC_D3D9_OPAQUE:
-    case VLC_CODEC_D3D9_OPAQUE_10B:
-        return true;
-    default:
-        return false;
-    }
-}
-
 static HINSTANCE Direct3D9LoadShaderLibrary(void)
 {
     HINSTANCE instance = NULL;
