@@ -655,7 +655,7 @@ typedef void( *libvlc_video_direct3d_device_cleanup_cb )( void *opaque );
  * It may be called before the \ref libvlc_video_direct3d_device_setup_cb callback.
  *
  * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
- * \param report_size_change callback to use when the size changes. [IN]
+ * \param report_size_change callback which must be called when the host size changes. [IN]
  *        The callback is valid until another call to \ref libvlc_video_direct3d_set_resize_cb
  *        is done. This may be called from any thread.
  * \param report_opaque private pointer to pass to the \ref report_size_change callback. [IN]
