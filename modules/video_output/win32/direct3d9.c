@@ -941,7 +941,7 @@ static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
     d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
 
     D3DPRESENT_PARAMETERS d3dpp;
-    if (D3D9_FillPresentationParameters(&sys->hd3d, &vd->source, p_d3d9_dev, &d3dpp))
+    if (D3D9_FillPresentationParameters(&sys->hd3d, p_d3d9_dev, &d3dpp))
     {
         msg_Err(vd, "Could not presentation parameters to reset device");
         return VLC_EGENERIC;

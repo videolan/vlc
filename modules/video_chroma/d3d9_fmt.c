@@ -84,7 +84,7 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
     out->hwnd      = hwnd;
     /* TODO only create a device for the decoder dimensions */
     D3DPRESENT_PARAMETERS d3dpp;
-    if (D3D9_FillPresentationParameters(hd3d, source, out, &d3dpp))
+    if (D3D9_FillPresentationParameters(hd3d, out, &d3dpp))
     {
         msg_Err(o, "Could not presentation parameters");
         return E_INVALIDARG;
@@ -172,7 +172,6 @@ void D3D9_ReleaseDevice(d3d9_device_t *d3d_dev)
  * from the default adapter.
  */
 int D3D9_FillPresentationParameters(d3d9_handle_t *hd3d,
-                                    const video_format_t *source,
                                     const d3d9_device_t *out,
                                     D3DPRESENT_PARAMETERS *d3dpp)
 {
@@ -196,10 +195,8 @@ int D3D9_FillPresentationParameters(d3d9_handle_t *hd3d,
     d3dpp->SwapEffect             = D3DSWAPEFFECT_COPY;
     d3dpp->BackBufferFormat       = d3ddm.Format;
     d3dpp->BackBufferCount        = 1;
-    d3dpp->BackBufferWidth        = __MAX((unsigned int)GetSystemMetrics(SM_CXVIRTUALSCREEN),
-                                            source->i_width);
-    d3dpp->BackBufferHeight       = __MAX((unsigned int)GetSystemMetrics(SM_CYVIRTUALSCREEN),
-                                            source->i_height);
+    d3dpp->BackBufferWidth        = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    d3dpp->BackBufferHeight       = GetSystemMetrics(SM_CYVIRTUALSCREEN);
 
     return VLC_SUCCESS;
 }

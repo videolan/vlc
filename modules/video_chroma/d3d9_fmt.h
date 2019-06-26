@@ -109,6 +109,6 @@ int D3D9_CreateExternal(vlc_object_t *, d3d9_handle_t *, IDirect3DDevice9 *);
 
 void D3D9_Destroy(d3d9_handle_t *);
 
-int D3D9_FillPresentationParameters(d3d9_handle_t *, const video_format_t *, const d3d9_device_t *, D3DPRESENT_PARAMETERS *);
+int D3D9_FillPresentationParameters(d3d9_handle_t *, const d3d9_device_t *, D3DPRESENT_PARAMETERS *);
 
 #endif /* VLC_VIDEOCHROMA_D3D9_FMT_H_ */
