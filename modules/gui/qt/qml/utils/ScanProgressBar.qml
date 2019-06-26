@@ -35,10 +35,12 @@ ProgressBar {
             progressText_id.text = entryPoint;
         }
         onDiscoveryStarted: discoveryDone = false
+        onReloadStarted: discoveryDone = false
         onDiscoveryCompleted: discoveryDone = true
+        onReloadCompleted: discoveryDone = true
     }
 
-    visible: (progressPercent < 100) && (progressPercent != 0)
+    visible: ((progressPercent < 100) && (progressPercent != 0)) || !discoveryDone
     id: progressBar_id
     from: 0
     to: 100
@@ -46,9 +48,12 @@ ProgressBar {
     anchors.topMargin: 10
     anchors.bottomMargin: 10
     value: progressPercent
+    indeterminate: !discoveryDone
     Text {
         id: progressText_id
         color: VLCStyle.colors.text
+        z: progressBar_id.z + 1
         anchors.horizontalCenter: parent.horizontalCenter
+        visible: true
     }
 }
