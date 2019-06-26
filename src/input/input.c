@@ -62,9 +62,6 @@
 static  void *Run( void * );
 static  void *Preparse( void * );
 
-static input_thread_t * Create  ( vlc_object_t *, input_thread_events_cb, void *,
-                                  input_item_t *, enum input_type type,
-                                  input_resource_t *, vlc_renderer_item_t * );
 static void             Destroy ( input_thread_t *p_input );
 static  int             Init    ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
@@ -112,44 +109,6 @@ static int input_SlaveSourceAdd( input_thread_t *, enum slave_type,
                                  const char *, unsigned );
 static char *input_SubtitleFile2Uri( input_thread_t *, const char * );
 static void input_ChangeState( input_thread_t *p_input, int i_state, vlc_tick_t ); /* TODO fix name */
-
-#undef input_Create
-/**
- * Create a new input_thread_t.
- *
- * You need to call input_Start on it when you are done
- * adding callback on the variables/events you want to monitor.
- *
- * \param p_parent a vlc_object
- * \param p_item an input item
- * \param p_resource an optional input resource
- * \return a pointer to the spawned input thread
- */
-input_thread_t *input_Create( vlc_object_t *p_parent,
-                              input_thread_events_cb events_cb, void *events_data,
-                              input_item_t *p_item,
-                              input_resource_t *p_resource,
-                              vlc_renderer_item_t *p_renderer )
-{
-    return Create( p_parent, events_cb, events_data, p_item,
-                   INPUT_TYPE_NONE, p_resource, p_renderer );
-}
-
-input_thread_t *input_CreatePreparser( vlc_object_t *parent,
-                                       input_thread_events_cb events_cb,
-                                       void *events_data, input_item_t *item )
-{
-    return Create( parent, events_cb, events_data, item,
-                   INPUT_TYPE_PREPARSING, NULL, NULL );
-}
-
-input_thread_t *input_CreateThumbnailer(vlc_object_t *obj,
-                                        input_thread_events_cb events_cb,
-                                        void *events_data, input_item_t *item)
-{
-    return Create( obj, events_cb, events_data, item,
-                   INPUT_TYPE_THUMBNAILING, NULL, NULL );
-}
 
 /**
  * Start a input_thread_t created by input_Create.
@@ -244,17 +203,23 @@ input_item_t *input_GetItem( input_thread_t *p_input )
     return input_priv(p_input)->p_item;
 }
 
-/*****************************************************************************
- * This function creates a new input, and returns a pointer
- * to its description. On error, it returns NULL.
+#undef input_Create
+/**
+ * Create a new input_thread_t.
  *
- * XXX Do not forget to update vlc_input.h if you add new variables.
- *****************************************************************************/
-static input_thread_t *Create( vlc_object_t *p_parent,
-                               input_thread_events_cb events_cb, void *events_data,
-                               input_item_t *p_item, enum input_type type,
-                               input_resource_t *p_resource,
-                               vlc_renderer_item_t *p_renderer )
+ * You need to call input_Start on it when you are done
+ * adding callback on the variables/events you want to monitor.
+ *
+ * \param p_parent a vlc_object
+ * \param p_item an input item
+ * \param p_resource an optional input ressource
+ * \return a pointer to the spawned input thread
+ */
+input_thread_t *input_Create( vlc_object_t *p_parent,
+                              input_thread_events_cb events_cb, void *events_data,
+                              input_item_t *p_item, enum input_type type,
+                              input_resource_t *p_resource,
+                              vlc_renderer_item_t *p_renderer )
 {
     /* Allocate descriptor */
     input_thread_private_t *priv;

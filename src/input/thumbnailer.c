@@ -184,8 +184,8 @@ RunnableRun(void *userdata)
     vlc_tick_t now = vlc_tick_now();
 
     input_thread_t* input =
-        input_CreateThumbnailer(thumbnailer->parent, on_thumbnailer_input_event,
-                                task, task->item);
+            input_Create( thumbnailer->parent, on_thumbnailer_input_event, task,
+                          task->item, INPUT_TYPE_THUMBNAILING, NULL, NULL );
     if (!input)
         goto end;
 

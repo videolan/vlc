@@ -1384,8 +1384,8 @@ input_item_Parse(input_item_t *item, vlc_object_t *obj,
     parser->state = INIT_S;
     parser->cbs = cbs;
     parser->userdata = userdata;
-    parser->input = input_CreatePreparser(obj, input_item_parser_InputEvent,
-                                          parser, item);
+    parser->input = input_Create(obj, input_item_parser_InputEvent, parser,
+                                 item, INPUT_TYPE_PREPARSING, NULL, NULL);
     if (!parser->input || input_Start(parser->input))
     {
         if (parser->input)

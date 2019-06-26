@@ -319,31 +319,9 @@ typedef void (*input_thread_events_cb)( input_thread_t *input,
  *****************************************************************************/
 input_thread_t * input_Create( vlc_object_t *p_parent,
                                input_thread_events_cb event_cb, void *events_data,
-                               input_item_t *, input_resource_t *,
-                               vlc_renderer_item_t* p_renderer ) VLC_USED;
-#define input_Create(a,b,c,d,e,f) input_Create(VLC_OBJECT(a),b,c,d,e,f)
-
-
-/**
- * Creates an item preparser.
- *
- * Creates an input thread to preparse an item. The input needs to be started
- * with input_Start() afterwards.
- *
- * @param obj parent object
- * @param item input item to preparse
- * @return an input thread or NULL on error
- */
-input_thread_t *input_CreatePreparser(vlc_object_t *obj,
-                                      input_thread_events_cb events_cb,
-                                      void *events_data, input_item_t *item)
-VLC_USED;
-
-VLC_API
-input_thread_t *input_CreateThumbnailer(vlc_object_t *obj,
-                                        input_thread_events_cb events_cb,
-                                        void *events_data, input_item_t *item)
-VLC_USED;
+                               input_item_t *, enum input_type type,
+                               input_resource_t *, vlc_renderer_item_t* p_renderer ) VLC_USED;
+#define input_Create(a,b,c,d,e,f,g) input_Create(VLC_OBJECT(a),b,c,d,e,f,g)
 
 int input_Start( input_thread_t * );
 
