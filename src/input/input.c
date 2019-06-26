@@ -350,7 +350,12 @@ static input_thread_t *Create( vlc_object_t *p_parent,
 
     /* setup the preparse depth of the item
      * if we are preparsing, use the i_preparse_depth of the parent item */
-    if( !priv->b_preparsing )
+    if( priv->b_preparsing )
+    {
+        p_input->obj.logger = NULL;
+        p_input->obj.no_interact = true;
+    }
+    else
     {
         char *psz_rec = var_InheritString( p_parent, "recursive" );
 
@@ -365,11 +370,6 @@ static input_thread_t *Create( vlc_object_t *p_parent,
             free (psz_rec);
         } else
             p_item->i_preparse_depth = -1;
-    }
-    else
-    {
-        p_input->obj.logger = NULL;
-        p_input->obj.no_interact = true;
     }
 
     /* Make sure the interaction option is honored */
