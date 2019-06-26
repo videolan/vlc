@@ -2105,7 +2105,8 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es )
             }
             else if( es->fmt.i_cat == AUDIO_ES )
             {
-                if( !var_GetBool( p_input, b_sout ? "sout-audio" : "audio" ) || b_thumbnailing )
+                if( b_thumbnailing
+                 || !var_GetBool( p_input, b_sout ? "sout-audio" : "audio" ) )
                 {
                     msg_Dbg( p_input, "audio is disabled, not selecting ES 0x%x",
                              es->fmt.i_id );
@@ -2114,7 +2115,8 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es )
             }
             if( es->fmt.i_cat == SPU_ES )
             {
-                if( !var_GetBool( p_input, b_sout ? "sout-spu" : "spu" ) || b_thumbnailing )
+                if( b_thumbnailing
+                 || !var_GetBool( p_input, b_sout ? "sout-spu" : "spu" ) )
                 {
                     msg_Dbg( p_input, "spu is disabled, not selecting ES 0x%x",
                              es->fmt.i_id );
