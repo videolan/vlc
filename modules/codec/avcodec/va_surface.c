@@ -197,10 +197,10 @@ void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)
     va_pool->pf_destroy_device(va);
 }
 
-int va_pool_Open(vlc_va_t *va, const video_format_t *fmt, va_pool_t *va_pool)
+int va_pool_Open(vlc_va_t *va, va_pool_t *va_pool)
 {
     /* */
-    if (va_pool->pf_create_device(va, fmt)) {
+    if (va_pool->pf_create_device(va)) {
         msg_Err(va, "Failed to create device");
         goto error;
     }

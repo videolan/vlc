@@ -339,9 +339,9 @@ void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)
     va_pool_Close(va, &dx_sys->va_pool);
 }
 
-int directx_va_Open(vlc_va_t *va, const video_format_t *fmt, directx_sys_t *dx_sys)
+int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys)
 {
-    return va_pool_Open(va, fmt, &dx_sys->va_pool);
+    return va_pool_Open(va, &dx_sys->va_pool);
 }
 
 static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *fmt,

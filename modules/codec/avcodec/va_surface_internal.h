@@ -43,7 +43,7 @@ typedef struct
 
     struct va_pic_context  *surface[MAX_SURFACE_COUNT];
 
-    int (*pf_create_device)(vlc_va_t *, const video_format_t *);
+    int (*pf_create_device)(vlc_va_t *);
     void (*pf_destroy_device)(vlc_va_t *);
 
     int (*pf_create_device_manager)(vlc_va_t *);
@@ -74,7 +74,7 @@ typedef struct
 
 } va_pool_t;
 
-int va_pool_Open(vlc_va_t *, const video_format_t *, va_pool_t *);
+int va_pool_Open(vlc_va_t *, va_pool_t *);
 void va_pool_Close(vlc_va_t *va, va_pool_t *);
 int va_pool_SetupDecoder(vlc_va_t *, va_pool_t *, const AVCodecContext *, unsigned count, int alignment);
 int va_pool_SetupSurfaces(vlc_va_t *, va_pool_t *, unsigned count);

@@ -136,7 +136,7 @@ struct vlc_va_sys_t
 
 
 /* */
-static int D3dCreateDevice(vlc_va_t *, const video_format_t *);
+static int D3dCreateDevice(vlc_va_t *);
 static void D3dDestroyDevice(vlc_va_t *);
 
 static int D3dCreateDeviceManager(vlc_va_t *);
@@ -320,7 +320,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     va->sys = sys;
 
-    err = directx_va_Open(va, &fmt->video, &sys->dx_sys);
+    err = directx_va_Open(va, &sys->dx_sys);
     if (err!=VLC_SUCCESS)
         goto error;
 
@@ -350,7 +350,7 @@ error:
 /**
  * It creates a Direct3D device usable for DXVA 2
  */
-static int D3dCreateDevice(vlc_va_t *va, const video_format_t *fmt)
+static int D3dCreateDevice(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
 
