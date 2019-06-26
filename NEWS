@@ -11,7 +11,23 @@ Platform support changes:
  * Windows on ARM is now supported
 
 Core:
- * new medialibrary
+ * New output clock (internal):
+     - The input clock (PCR) or the audio output can drive the output clock
+     - By default, the audio output will drive the output clock: no more audio
+       resampling or flush when the audio is late or early
+ * New medialibrary (vlc_media_library.h)
+ * New player (vlc_player.h):
+     - Replace the input_thread_t API that is now internal
+     - One instance is used to play subsequent medias
+     - Allow multiple track selection
+     - Fix TOCTOU issues (the player lock is exposed)
+ * New mediatree and mediasource (vlc_media_source.h)
+     - Browse local network and service discoveries
+ * New playlist (vlc_playlist.h)
+     - Replace the previous one
+     - Flat, new random implementation
+     - Can't browse anymore (cf. mediatree)
+ * Add support for dual subtitles selection (via the player)
 
 Audio output:
  * ALSA: HDMI passthrough support.
