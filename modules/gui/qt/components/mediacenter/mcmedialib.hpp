@@ -59,8 +59,10 @@ public:
 signals:
     void gridViewChanged();
     void discoveryStarted();
+    void reloadStarted();
     void discoveryProgress( QString entryPoint );
     void discoveryCompleted();
+    void reloadCompleted();
     void progressUpdated( quint32 percent );
 
 private:

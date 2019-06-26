@@ -231,6 +231,12 @@ void MCMediaLib::onMediaLibraryEvent( void* data, const vlc_ml_event_t* event )
         case VLC_ML_EVENT_DISCOVERY_COMPLETED:
             self->emit discoveryCompleted();
             break;
+        case VLC_ML_EVENT_RELOAD_STARTED:
+            self->emit reloadStarted();
+            break;
+        case VLC_ML_EVENT_RELOAD_COMPLETED:
+            self->emit reloadCompleted();
+            break;
         default:
             break;
     }
