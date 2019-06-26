@@ -32,7 +32,7 @@ typedef picture_sys_d3d9_t VA_PICSYS;
 
 #undef D3D9_CreateDevice
 HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
-                          const video_format_t *source, d3d9_device_t *out)
+                          d3d9_device_t *out)
 {
     HRESULT hr;
 
@@ -67,16 +67,6 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
     /* TODO: need to test device capabilities and select the right render function */
     if (!(out->caps.DevCaps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES)) {
         msg_Err(o, "Device does not support stretching from textures.");
-        return E_INVALIDARG;
-    }
-
-    if ( source->i_width > out->caps.MaxTextureWidth ||
-         source->i_height > out->caps.MaxTextureHeight )
-    {
-        msg_Err(o, "Textures too large %ux%u max possible: %ux%u",
-                source->i_width, source->i_height,
-                (unsigned) out->caps.MaxTextureWidth,
-                (unsigned) out->caps.MaxTextureHeight);
         return E_INVALIDARG;
     }
 

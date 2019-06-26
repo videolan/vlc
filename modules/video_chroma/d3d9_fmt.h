@@ -96,8 +96,8 @@ static inline void ReleaseD3D9PictureSys(picture_sys_d3d9_t *p_sys)
 }
 
 HRESULT D3D9_CreateDevice(vlc_object_t *, d3d9_handle_t *, HWND,
-                          const video_format_t *, d3d9_device_t *out);
-#define D3D9_CreateDevice(a,b,c,d,e) D3D9_CreateDevice( VLC_OBJECT(a), b, c, d, e )
+                          d3d9_device_t *out);
+#define D3D9_CreateDevice(a,b,c,d) D3D9_CreateDevice( VLC_OBJECT(a), b, c, d )
 HRESULT D3D9_CreateDeviceExternal(IDirect3DDevice9 *, d3d9_handle_t *, HWND,
                                   d3d9_device_t *out);
 

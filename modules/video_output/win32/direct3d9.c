@@ -1512,7 +1512,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
                                        &sys->d3d_dev);
     else
         hr = D3D9_CreateDevice(vd, &sys->hd3d, sys->sys.hvideownd,
-                               &vd->source, &sys->d3d_dev);
+                               &sys->d3d_dev);
 
     if (FAILED(hr)) {
         msg_Err( vd, "D3D9 Creation failed! (hr=0x%lX)", hr);
@@ -1993,7 +1993,7 @@ GLConvOpen(vlc_object_t *obj)
     }
 
     if (FAILED(D3D9_CreateDevice(obj, &priv->hd3d, tc->gl->surface->handle.hwnd,
-                                 &tc->fmt, &priv->d3d_dev)))
+                                 &priv->d3d_dev)))
         goto error;
 
     HRESULT hr;
