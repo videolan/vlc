@@ -57,7 +57,7 @@ void HLSStream::setTimeOffset(vlc_tick_t i_offset)
         {
             if(!b_id3_timestamps_offset_set)
             {
-                fakeEsOut()->setTimestampOffset(i_offset);
+                fakeEsOut()->setAssociatedTimestamp(i_offset);
             }
             return;
         }

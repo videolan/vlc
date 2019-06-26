@@ -73,9 +73,10 @@ FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
     , commandsqueue( queue )
     , fakeesout( new struct es_out_fake )
     , timestamps_offset( 0 )
-    , timestamps_expected( 0 )
-    , timestamps_check_done( false )
 {
+    associated.b_timestamp_set = false;
+    expected.b_timestamp_set = false;
+    timestamp_first = 0;
     fakeesout->fake = this;
     fakeesout->es_out.cbs = &esOutCallbacks;
     priority = ES_PRIORITY_SELECTABLE_MIN;
@@ -108,17 +109,49 @@ FakeESOut::~FakeESOut()
     vlc_mutex_destroy(&lock);
 }
 
-void FakeESOut::setExpectedTimestampOffset(vlc_tick_t offset)
+void FakeESOut::resetTimestamps()
 {
-    timestamps_offset = 0;
-    timestamps_expected = offset;
-    timestamps_check_done = false;
+    setExpectedTimestamp(-1);
+    setAssociatedTimestamp(-1);
 }
 
-void FakeESOut::setTimestampOffset(vlc_tick_t offset)
+bool FakeESOut::getStartTimestamps( vlc_tick_t *pi_mediats, vlc_tick_t *pi_demuxts )
 {
-    timestamps_offset = offset;
-    timestamps_check_done = true;
+    if(!expected.b_timestamp_set)
+        return false;
+    *pi_demuxts = timestamp_first;
+    *pi_mediats = expected.timestamp;
+    return true;
+}
+
+void FakeESOut::setExpectedTimestamp(vlc_tick_t ts)
+{
+    if(ts < 0)
+    {
+        expected.b_timestamp_set = false;
+        timestamps_offset = 0;
+    }
+    else if(!expected.b_timestamp_set)
+    {
+        expected.b_timestamp_set = true;
+        expected.timestamp = ts;
+        expected.b_offset_calculated = false;
+    }
+}
+
+void FakeESOut::setAssociatedTimestamp(vlc_tick_t ts)
+{
+    if(ts < 0)
+    {
+        associated.b_timestamp_set = false;
+        timestamps_offset = 0;
+    }
+    else if(!associated.b_timestamp_set)
+    {
+        associated.b_timestamp_set = true;
+        associated.timestamp = ts;
+        associated.b_offset_calculated = false;
+    }
 }
 
 void FakeESOut::setExtraInfoProvider( ExtraFMTInfoInterface *extra )
@@ -199,12 +232,6 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
 void FakeESOut::setPriority(int p)
 {
     priority = p;
-}
-
-vlc_tick_t FakeESOut::getTimestampOffset() const
-{
-    vlc_tick_t time = timestamps_offset;
-    return time;
 }
 
 size_t FakeESOut::esCount() const
@@ -312,17 +339,40 @@ void FakeESOut::recycle( FakeESOutID *id )
     recycle_candidates.push_back( id );
 }
 
-void FakeESOut::checkTimestampsStart(vlc_tick_t i_start)
+vlc_tick_t FakeESOut::fixTimestamp(vlc_tick_t ts)
 {
-    if( i_start == VLC_TICK_INVALID )
-        return;
-
-    if( !timestamps_check_done )
+    if(ts != VLC_TICK_INVALID)
     {
-        if( i_start < VLC_TICK_FROM_SEC(1) ) /* Starts 0 */
-            timestamps_offset = timestamps_expected;
-        timestamps_check_done = true;
+        if(associated.b_timestamp_set)
+        {
+            /* Some streams (ex: HLS) have a timestamp mapping
+               embedded in some header or metadata (ID3 crap for HLS).
+               In that case it needs to remap original timestamp. */
+            if(!associated.b_offset_calculated)
+            {
+                timestamps_offset = associated.timestamp - ts;
+                associated.b_offset_calculated = true;
+                timestamp_first = ts + timestamps_offset;
+            }
+        }
+        else if(expected.b_timestamp_set)
+        {
+            /* Some streams (ex: smooth mp4 without TFDT)
+             * do not have proper timestamps and will always start 0.
+             * In that case we need to enforce playlist time */
+            if(!expected.b_offset_calculated)
+            {
+                if(ts < VLC_TICK_FROM_SEC(1)) /* Starting 0 */
+                    timestamps_offset = expected.timestamp - ts;
+                else
+                    timestamps_offset = 0;
+                expected.b_offset_calculated = true;
+                timestamp_first = ts + timestamps_offset;
+            }
+        }
+        ts += timestamps_offset;
     }
+    return ts;
 }
 
 void FakeESOut::declareEs(const es_format_t *fmt)
@@ -388,15 +438,9 @@ int FakeESOut::esOutSend_Callback(es_out_t *fakees, es_out_id_t *p_es, block_t *
     FakeESOutID *es_id = reinterpret_cast<FakeESOutID *>( p_es );
     assert(!es_id->scheduledForDeletion());
 
-    me->checkTimestampsStart( p_block->i_dts );
+    p_block->i_dts = me->fixTimestamp( p_block->i_dts );
+    p_block->i_pts = me->fixTimestamp( p_block->i_pts );
 
-    vlc_tick_t offset = me->getTimestampOffset();
-    if( p_block->i_dts != VLC_TICK_INVALID )
-    {
-        p_block->i_dts += offset;
-        if( p_block->i_pts != VLC_TICK_INVALID )
-                p_block->i_pts += offset;
-    }
     AbstractCommand *command = me->commandsqueue->factory()->createEsOutSendCommand( es_id, p_block );
     if( likely(command) )
     {
@@ -436,8 +480,7 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
             else
                 i_group = 0;
             vlc_tick_t  pcr = va_arg( args, vlc_tick_t );
-            me->checkTimestampsStart( pcr );
-            pcr += me->getTimestampOffset();
+            pcr = me->fixTimestamp( pcr );
             AbstractCommand *command = me->commandsqueue->factory()->createEsOutControlPCRCommand( i_group, pcr );
             if( likely(command) )
             {

@@ -54,14 +54,16 @@ namespace adaptive
             es_out_t * getEsOut();
             LockedFakeEsOut WithLock();
             CommandsQueue * commandsQueue();
-            void setTimestampOffset( vlc_tick_t );
-            void setExpectedTimestampOffset(vlc_tick_t);
+            void setAssociatedTimestamp( vlc_tick_t );
+            void setExpectedTimestamp( vlc_tick_t );
+            void resetTimestamps();
+            bool getStartTimestamps( vlc_tick_t *, vlc_tick_t * );
             size_t esCount() const;
             bool hasSelectedEs() const;
             bool decodersDrained();
             bool restarting() const;
             void setExtraInfoProvider( ExtraFMTInfoInterface * );
-            void checkTimestampsStart(vlc_tick_t);
+            vlc_tick_t fixTimestamp(vlc_tick_t);
             void declareEs( const es_format_t * );
 
             /* Used by FakeES ID */
@@ -88,12 +90,16 @@ namespace adaptive
             es_out_t *real_es_out;
             FakeESOutID * createNewID( const es_format_t * );
             ExtraFMTInfoInterface *extrainfo;
-            vlc_tick_t getTimestampOffset() const;
             CommandsQueue *commandsqueue;
             struct es_out_fake *fakeesout;
+            struct
+            {
+                vlc_tick_t timestamp;
+                bool b_timestamp_set;
+                bool b_offset_calculated;
+            } associated, expected;
+            vlc_tick_t timestamp_first;
             vlc_tick_t timestamps_offset;
-            vlc_tick_t timestamps_expected;
-            bool timestamps_check_done;
             int priority;
             std::list<FakeESOutID *> fakeesidlist;
             std::list<FakeESOutID *> recycle_candidates;
