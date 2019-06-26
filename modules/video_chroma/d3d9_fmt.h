@@ -63,7 +63,6 @@ typedef struct
     /* creation parameters */
     D3DFORMAT               BufferFormat;
     UINT                    adapterId;
-    HWND                    hwnd;
     D3DCAPS9                caps;
 } d3d9_device_t;
 
@@ -95,17 +94,16 @@ static inline void ReleaseD3D9PictureSys(picture_sys_d3d9_t *p_sys)
     FreeLibrary(p_sys->dxva2_dll);
 }
 
-HRESULT D3D9_CreateDevice(vlc_object_t *, d3d9_handle_t *, int, HWND,
+HRESULT D3D9_CreateDevice(vlc_object_t *, d3d9_handle_t *, int,
                           d3d9_device_t *out);
-#define D3D9_CreateDevice(a,b,c,d,e) D3D9_CreateDevice( VLC_OBJECT(a), b, c, d, e )
-HRESULT D3D9_CreateDeviceExternal(IDirect3DDevice9 *, d3d9_handle_t *, HWND,
+#define D3D9_CreateDevice(a,b,c,d) D3D9_CreateDevice( VLC_OBJECT(a), b, c, d )
+HRESULT D3D9_CreateDeviceExternal(IDirect3DDevice9 *, d3d9_handle_t *,
                                   d3d9_device_t *out);
 
 void D3D9_ReleaseDevice(d3d9_device_t *);
 int D3D9_Create(vlc_object_t *, d3d9_handle_t *);
 #define D3D9_Create(a,b) D3D9_Create( VLC_OBJECT(a), b )
-int D3D9_CreateExternal(vlc_object_t *, d3d9_handle_t *, IDirect3DDevice9 *);
-#define D3D9_CreateExternal(a,b,c) D3D9_CreateExternal( VLC_OBJECT(a), b, c )
+int D3D9_CreateExternal(d3d9_handle_t *, IDirect3DDevice9 *);
 void D3D9_CloneExternal(d3d9_handle_t *, IDirect3D9 *);
 
 void D3D9_Destroy(d3d9_handle_t *);

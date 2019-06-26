@@ -277,8 +277,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
             free( sys );
             goto error;
         }
-        if ( D3D9_CreateExternal(va, &sys->hd3d, device) != VLC_SUCCESS ||
-             FAILED(D3D9_CreateDeviceExternal( device, &sys->hd3d, 0, &sys->d3d_dev)) )
+        if ( D3D9_CreateExternal(&sys->hd3d, device) != VLC_SUCCESS ||
+             FAILED(D3D9_CreateDeviceExternal( device, &sys->hd3d, &sys->d3d_dev)) )
         {
             IDirect3DDevice9_Release(device);
             free( sys );
@@ -359,7 +359,7 @@ static int D3dCreateDevice(vlc_va_t *va)
         return VLC_SUCCESS;
     }
 
-    HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, -1, NULL, &sys->d3d_dev);
+    HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, -1, &sys->d3d_dev);
     if (FAILED(hr))
     {
         msg_Err(va, "IDirect3D9_CreateDevice failed");
