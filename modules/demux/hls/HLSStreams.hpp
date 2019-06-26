@@ -33,15 +33,16 @@ namespace hls
             virtual ~HLSStream();
 
         protected:
-            virtual void setTimeOffset(mtime_t); /* reimpl */
             virtual block_t *checkBlock(block_t *, bool); /* reimpl */
             virtual AbstractDemuxer * newDemux(demux_t *, const StreamFormat &,
                                                es_out_t *, AbstractSourceStream *) const; /* reimpl */
+            virtual bool setPosition(mtime_t, bool);
 
         private:
             static int ID3TAG_Parse_Handler(uint32_t, const uint8_t *, size_t, void *);
             int ParseID3Tag(uint32_t, const uint8_t *, size_t);
             int ParseID3PrivTag(const uint8_t *, size_t);
+            void setMetadataTimeOffset(mtime_t);
             bool b_id3_timestamps_offset_set;
             vlc_meta_t *p_meta;
             bool b_meta_updated;

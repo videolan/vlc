@@ -47,24 +47,27 @@ HLSStream::~HLSStream()
         vlc_meta_Delete(p_meta);
 }
 
-void HLSStream::setTimeOffset(mtime_t i_offset)
+void HLSStream::setMetadataTimeOffset(mtime_t i_offset)
 {
     if(i_offset >= 0)
     {
-        if((unsigned)format == StreamFormat::PACKEDAAC)
-        {
-            if(!b_id3_timestamps_offset_set)
-            {
-                fakeEsOut()->setAssociatedTimestamp(i_offset);
-            }
-            return;
-        }
+        if(!b_id3_timestamps_offset_set)
+            fakeEsOut()->setAssociatedTimestamp(i_offset);
+        b_id3_timestamps_offset_set = true;
     }
     else
     {
+        fakeEsOut()->setAssociatedTimestamp(-1);
         b_id3_timestamps_offset_set = false;
     }
-    AbstractStream::setTimeOffset(i_offset);
+}
+
+bool HLSStream::setPosition(mtime_t ts , bool b)
+{
+    bool ok = AbstractStream::setPosition(ts ,b);
+    if(b && ok)
+        b_id3_timestamps_offset_set = false;
+    return ok;
 }
 
 int HLSStream::ParseID3PrivTag(const uint8_t *p_payload, size_t i_payload)
@@ -72,19 +75,17 @@ int HLSStream::ParseID3PrivTag(const uint8_t *p_payload, size_t i_payload)
     if(i_payload == 53 &&
        !memcmp( p_payload, "com.apple.streaming.transportStreamTimestamp", 45))
     {
-        if(!b_id3_timestamps_offset_set)
-        {
-            const mtime_t i_aac_offset = GetQWBE(&p_payload[45]) * 100 / 9;
-            setTimeOffset(i_aac_offset);
-            b_id3_timestamps_offset_set = true;
-        }
+        setMetadataTimeOffset(GetQWBE(&p_payload[45]) * 100 / 9);
     }
     return VLC_SUCCESS;
 }
 
 int HLSStream::ParseID3Tag(uint32_t i_tag, const uint8_t *p_payload, size_t i_payload)
 {
-    (void) ID3HandleTag(p_payload, i_payload, i_tag, p_meta, &b_meta_updated);
+    if(i_tag == VLC_FOURCC('P','R','I','V'))
+        (void) ParseID3PrivTag(p_payload, i_payload);
+    else
+        (void) ID3HandleTag(p_payload, i_payload, i_tag, p_meta, &b_meta_updated);
     return VLC_SUCCESS;
 }
 
