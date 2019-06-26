@@ -118,6 +118,7 @@ static void Swap(struct render_context *ctx)
  * This is called outside of the UI thread (not the VLC rendering thread).
  */
 static bool Resize(struct render_context *ctx, unsigned width, unsigned height,
+                   IDirect3DDevice9 *vlc_device,
                    libvlc_video_output_cfg_t *out)
 {
     HRESULT hr;
@@ -132,16 +133,23 @@ static bool Resize(struct render_context *ctx, unsigned width, unsigned height,
         ctx->renderTexture = NULL;
         ctx->sharedHandled = NULL;
     }
-    if (ctx->sharedRenderSurface)
-    {
-        IDirect3DSurface9_Release(ctx->sharedRenderSurface);
-        ctx->sharedRenderSurface = NULL;
-    }
     if (ctx->sharedRenderTexture)
     {
         IDirect3DTexture9_Release(ctx->sharedRenderTexture);
         ctx->sharedRenderTexture = NULL;
     }
+    if (ctx->sharedRenderSurface)
+    {
+        IDirect3DSurface9_Release(ctx->sharedRenderSurface);
+        ctx->sharedRenderSurface = NULL;
+    }
+    /* the device to use may have changed */
+    if (ctx->libvlc_d3d)
+    {
+        IDirect3DDevice9_Release(ctx->libvlc_d3d);
+    }
+    ctx->libvlc_d3d = vlc_device;
+    IDirect3DDevice9_AddRef(ctx->libvlc_d3d);
 
     /* texture we can use on our device */
     hr = IDirect3DDevice9_CreateTexture(ctx->d3ddev, width, height, 1, D3DUSAGE_RENDERTARGET,
@@ -191,15 +199,6 @@ static void init_direct3d(struct render_context *ctx, HWND hWnd)
                             &d3dpp,
                             &ctx->d3ddev);
 
-    d3dpp.hDeviceWindow = 0;
-
-    IDirect3D9Ex_CreateDevice(ctx->d3d, D3DADAPTER_DEFAULT,
-                            D3DDEVTYPE_HAL,
-                            NULL,
-                            D3DCREATE_MULTITHREADED| D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_PUREDEVICE,
-                            &d3dpp,
-                            &ctx->libvlc_d3d);
-
     IDirect3DDevice9_GetRenderTarget(ctx->d3ddev, 0, &ctx->backBuffer);
 
     struct CUSTOMVERTEX rectangleVertices[] =
@@ -234,7 +233,8 @@ static void release_direct3d(struct render_context *ctx)
         IDirect3DTexture9_Release(ctx->sharedRenderTexture);
     if (ctx->rectangleFVFVertexBuf)
         IDirect3DVertexBuffer9_Release(ctx->rectangleFVFVertexBuf);
-    IDirect3DDevice9_Release(ctx->libvlc_d3d);
+    if (ctx->libvlc_d3d)
+        IDirect3DDevice9_Release(ctx->libvlc_d3d);
     IDirect3DDevice9_Release(ctx->d3ddev);
     IDirect3D9_Release(ctx->d3d);
 }
@@ -242,7 +242,7 @@ static void release_direct3d(struct render_context *ctx)
 static bool Setup_cb( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
 {
     struct render_context *ctx = *opaque;
-    out->device_context = ctx->libvlc_d3d;
+    out->device_context = ctx->d3d;
     return true;
 }
 
@@ -250,6 +250,11 @@ static void Cleanup_cb( void *opaque )
 {
     /* here we can release all things Direct3D9 for good  (if playing only one file) */
     struct render_context *ctx = opaque;
+    if (ctx->libvlc_d3d)
+    {
+        IDirect3DDevice9_Release(ctx->libvlc_d3d);
+        ctx->libvlc_d3d = NULL;
+    }
 }
 
 static void Resize_cb( void *opaque,
@@ -272,7 +277,7 @@ static void Resize_cb( void *opaque,
 static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
 {
     struct render_context *ctx = opaque;
-    return Resize(ctx, cfg->width, cfg->height, out);
+    return Resize(ctx, cfg->width, cfg->height, (IDirect3DDevice9*)cfg->device, out);
 }
 
 static void Swap_cb( void* opaque )

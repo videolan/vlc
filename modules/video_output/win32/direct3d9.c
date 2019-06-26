@@ -600,6 +600,8 @@ static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt)
     cfg.colorspace = fmt->space;
     cfg.transfer   = fmt->transfer;
 
+    cfg.device = sys->d3d_dev.dev;
+
     libvlc_video_output_cfg_t out;
     if (!sys->updateOutputCb( sys->outside_opaque, &cfg, &out ))
     {
@@ -1501,23 +1503,9 @@ static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_f
 /**
  * It creates a Direct3D9 device and the associated resources.
  */
-static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
-                         IDirect3DDevice9 *external_dev)
+static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
-    HRESULT hr;
-
-    if (external_dev)
-        hr = D3D9_CreateDeviceExternal(external_dev, &sys->hd3d, sys->sys.hvideownd,
-                                       &sys->d3d_dev);
-    else
-        hr = D3D9_CreateDevice(vd, &sys->hd3d, sys->sys.hvideownd,
-                               &sys->d3d_dev);
-
-    if (FAILED(hr)) {
-        msg_Err( vd, "D3D9 Creation failed! (hr=0x%lX)", hr);
-        return VLC_EGENERIC;
-    }
 
     const d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
     /* */
@@ -1628,7 +1616,23 @@ static int FindShadersCallback(const char *name, char ***values, char ***descs)
 
 static bool LocalSwapchainSetupDevice( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
 {
-    return false; /* don't use an "external" D3D9 device */
+    vout_display_t *vd = *opaque;
+    vout_display_sys_t *sys = vd->sys;
+    if (D3D9_Create(vd, &sys->hd3d) != VLC_SUCCESS)
+    {
+        msg_Err( vd, "Direct3D9 could not be initialized" );
+        return false;
+    }
+
+    out->device_context = sys->hd3d.obj;
+    return true;
+}
+
+static void LocalSwapchainCleanupDevice( void *opaque )
+{
+    vout_display_t *vd = opaque;
+    vout_display_sys_t *sys = vd->sys;
+    D3D9_Destroy(&sys->hd3d);
 }
 
 static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
@@ -1704,7 +1708,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
         sys->outside_opaque = vd;
         sys->setupDeviceCb       = LocalSwapchainSetupDevice;
-        sys->cleanupDeviceCb     = NULL;
+        sys->cleanupDeviceCb     = LocalSwapchainCleanupDevice;
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;
         sys->swapCb              = LocalSwapchainSwap;
         sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
@@ -1714,29 +1718,22 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         .hardware_decoding = is_d3d9_opaque( vd->source.i_chroma ),
     };
     libvlc_video_direct3d_device_setup_t device_setup;
-    IDirect3DDevice9 *d3d9_device = NULL;
+    IDirect3D9 *d3d9_device = NULL;
     if ( sys->setupDeviceCb( &sys->outside_opaque, &surface_cfg, &device_setup ) )
         d3d9_device = device_setup.device_context;
-    if ( d3d9_device == NULL && sys->setupDeviceCb != LocalSwapchainSetupDevice )
+    if ( d3d9_device == NULL )
     {
-        msg_Err(vd, "Missing external IDirect3DDevice9");
+        msg_Err(vd, "Missing external IDirect3D9");
         return VLC_EGENERIC;
     }
-    if (d3d9_device != NULL)
-    {
-        if (D3D9_CreateExternal(vd, &sys->hd3d, d3d9_device)) {
-            msg_Err(vd, "External Direct3D9 could not be used");
-            if ( sys->cleanupDeviceCb )
-                sys->cleanupDeviceCb( sys->outside_opaque );
-            free(sys);
-            return VLC_EGENERIC;
-        }
-    }
-    else if (D3D9_Create(vd, &sys->hd3d)) {
-        msg_Err( vd, "Direct3D9 could not be initialized" );
+    D3D9_CloneExternal( &sys->hd3d, d3d9_device );
+    HRESULT hr = D3D9_CreateDevice(vd, &sys->hd3d, sys->sys.hvideownd, &sys->d3d_dev);
+    if (FAILED(hr)) {
+        msg_Err( vd, "D3D9 Creation failed! (hr=0x%lX)", hr);
+        D3D9_Destroy(&sys->hd3d);
         if ( sys->cleanupDeviceCb )
             sys->cleanupDeviceCb( sys->outside_opaque );
-        free( sys );
+        free(sys);
         return VLC_EGENERIC;
     }
 
@@ -1763,7 +1760,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     /* */
     video_format_t fmt;
-    if (Direct3D9Open(vd, &fmt, d3d9_device)) {
+    if (Direct3D9Open(vd, &fmt)) {
         msg_Err(vd, "Direct3D9 could not be opened");
         goto error;
     }
