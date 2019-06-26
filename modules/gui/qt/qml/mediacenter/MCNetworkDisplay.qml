@@ -111,4 +111,12 @@ Utils.NavigableFocusScope {
         onActionUp: root.actionUp(index)
         onActionCancel: root.actionCancel(index)
     }
+
+    Label {
+        anchors.centerIn: parent
+        visible: delegateModel.items.count === 0
+        font.pixelSize: VLCStyle.fontHeight_xxlarge
+        color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
+        text: qsTr("No network shares found")
+    }
 }
