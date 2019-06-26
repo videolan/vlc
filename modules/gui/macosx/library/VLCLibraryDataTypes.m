@@ -137,7 +137,7 @@ const long long int VLCMediaLibraryMediaItemDurationDenominator = 1000;
         _artistID = p_artist->i_id;
         _name = toNSStr(p_artist->psz_name);
         _shortBiography = toNSStr(p_artist->psz_shortbio);
-        _artworkMRL = toNSStr(p_artist->psz_artwork_mrl);
+        _artworkMRL = toNSStr(p_artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl);
         _musicBrainzID = toNSStr(p_artist->psz_mb_id);
         _numberOfAlbums = p_artist->i_nb_album;
         _numberOfTracks = p_artist->i_nb_tracks;
@@ -156,7 +156,7 @@ const long long int VLCMediaLibraryMediaItemDurationDenominator = 1000;
         _albumID = p_album->i_id;
         _title = toNSStr(p_album->psz_title);
         _summary = toNSStr(p_album->psz_summary);
-        _artworkMRL = toNSStr(p_album->psz_artwork_mrl);
+        _artworkMRL = toNSStr(p_album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl);
         _artistName = toNSStr(p_album->psz_artist);
         _artistID = p_album->i_artist_id;
         _numberOfTracks = p_album->i_nb_tracks;
@@ -273,8 +273,8 @@ const long long int VLCMediaLibraryMediaItemDurationDenominator = 1000;
         _playCount = p_mediaItem->i_playcount;
         _lastPlayedDate = p_mediaItem->i_last_played_date;
         _title = toNSStr(p_mediaItem->psz_title);
-        _artworkMRL = toNSStr(p_mediaItem->psz_artwork_mrl);
-        _artworkGenerated = p_mediaItem->b_artwork_generated;
+        _smallArtworkMRL = toNSStr(p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl);
+        _smallArtworkGenerated = p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].b_generated;
         _favorited = p_mediaItem->b_is_favorite;
 
         switch (p_mediaItem->i_subtype) {
@@ -300,7 +300,7 @@ const long long int VLCMediaLibraryMediaItemDurationDenominator = 1000;
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"%@ — title: %@, ID: %lli, type: %i, artwork: %@",
-            NSStringFromClass([self class]), _title, _libraryID, _mediaType, _artworkMRL];
+            NSStringFromClass([self class]), _title, _libraryID, _mediaType, _smallArtworkMRL];
 }
 
 #pragma mark - preference setters / getters

@@ -186,8 +186,8 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (NSImage *)imageForMedia
 {
     NSImage *image;
-    if (_representedMediaItem.artworkGenerated) {
-        image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:_representedMediaItem.artworkMRL]];
+    if (_representedMediaItem.smallArtworkGenerated) {
+        image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:_representedMediaItem.smallArtworkMRL]];
     } else {
         if (_representedMediaItem.mediaType != VLC_ML_MEDIA_TYPE_AUDIO) {
             [_libraryController attemptToGenerateThumbnailForMediaItem:_representedMediaItem];

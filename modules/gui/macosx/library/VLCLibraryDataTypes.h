@@ -161,9 +161,9 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) time_t lastPlayedDate;
 @property (readonly) NSString *title;
 
-@property (readonly) NSString *artworkMRL;
+@property (readonly) NSString *smallArtworkMRL;
 
-@property (readonly) BOOL artworkGenerated;
+@property (readonly) BOOL smallArtworkGenerated;
 @property (readonly) BOOL favorited;
 
 @property (readonly, nullable) VLCMediaLibraryShowEpisode *showEpisode;

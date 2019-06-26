@@ -159,9 +159,9 @@ const CGFloat VLCLibraryTracksRowHeight = 50.;
     VLCMediaLibraryMediaItem *mediaItem = _tracks[row];
 
     NSImage *image;
-    if (mediaItem.artworkGenerated) {
-        if (mediaItem.artworkMRL.length > 0) {
-            image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:mediaItem.artworkMRL]];
+    if (mediaItem.smallArtworkGenerated) {
+        if (mediaItem.smallArtworkMRL.length > 0) {
+            image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:mediaItem.smallArtworkMRL]];
         }
     }
     if (!image) {
