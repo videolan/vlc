@@ -40,7 +40,7 @@ void input_ConfigVarInit ( input_thread_t *p_input )
 {
     /* Create Object Variables for private use only */
 
-    if( !input_priv(p_input)->b_preparsing )
+    if( input_priv(p_input)->type != INPUT_TYPE_PREPARSING )
     {
         var_Create( p_input, "video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Create( p_input, "audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );

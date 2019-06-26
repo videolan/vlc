@@ -54,6 +54,12 @@ typedef struct input_thread_t
  * Input events and variables
  *****************************************************************************/
 
+enum input_type {
+    INPUT_TYPE_NONE,
+    INPUT_TYPE_PREPARSING,
+    INPUT_TYPE_THUMBNAILING,
+};
+
 /**
  * Input state
  *
@@ -469,15 +475,13 @@ typedef struct input_thread_private_t
     input_thread_events_cb events_cb;
     void *events_data;
 
-    /* Global properties */
-    bool        b_preparsing;
+    enum input_type type;
 
     /* Current state */
     int         i_state;
     bool        is_running;
     bool        is_stopped;
     bool        b_recording;
-    bool        b_thumbnailing;
     float       rate;
     vlc_tick_t  normal_time;
 

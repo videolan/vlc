@@ -173,6 +173,7 @@ typedef struct
 typedef struct
 {
     input_thread_t *p_input;
+    enum input_type input_type;
 
     input_source_t *main_source;
 
@@ -498,7 +499,7 @@ static void EsOutPropsCleanup( es_out_es_props_t *p_props )
 
 static void EsOutPropsInit( es_out_es_props_t *p_props,
                             bool autoselect,
-                            input_thread_t *p_input,
+                            input_thread_t *p_input, enum input_type input_type,
                             enum es_out_policy_e e_default_policy,
                             const char *psz_trackidvar,
                             const char *psz_trackvar,
@@ -513,7 +514,7 @@ static void EsOutPropsInit( es_out_es_props_t *p_props,
     p_props->i_demux_id = -1;
     p_props->p_main_es = NULL;
 
-    if( !input_priv(p_input)->b_preparsing && psz_langvar )
+    if( input_type != INPUT_TYPE_PREPARSING && psz_langvar )
     {
         char *psz_string = var_GetString( p_input, psz_langvar );
         p_props->ppsz_language = LanguageSplit( psz_string );
@@ -532,7 +533,8 @@ static const struct es_out_callbacks es_out_cbs;
 /*****************************************************************************
  * input_EsOutNew:
  *****************************************************************************/
-es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, float rate )
+es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, float rate,
+                          enum input_type input_type )
 {
     es_out_sys_t *p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )
@@ -546,17 +548,21 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
 
     p_sys->b_active = false;
     p_sys->i_mode   = ES_OUT_MODE_NONE;
+    p_sys->input_type = input_type;
 
     vlc_list_init(&p_sys->programs);
     vlc_list_init(&p_sys->es);
     vlc_list_init(&p_sys->es_slaves);
 
     /* */
-    EsOutPropsInit( &p_sys->video, true, p_input, ES_OUT_ES_POLICY_AUTO,
+    EsOutPropsInit( &p_sys->video, true, p_input, input_type,
+                    ES_OUT_ES_POLICY_AUTO,
                     "video-track-id", "video-track", NULL, NULL );
-    EsOutPropsInit( &p_sys->audio, true, p_input, ES_OUT_ES_POLICY_EXCLUSIVE,
+    EsOutPropsInit( &p_sys->audio, true, p_input, input_type,
+                    ES_OUT_ES_POLICY_EXCLUSIVE,
                     "audio-track-id", "audio-track", "audio-language", "audio" );
-    EsOutPropsInit( &p_sys->sub,  false, p_input, ES_OUT_ES_POLICY_AUTO,
+    EsOutPropsInit( &p_sys->sub,  false, p_input, input_type,
+                    ES_OUT_ES_POLICY_AUTO,
                     "sub-track-id", "sub-track", "sub-language", "sub" );
 
     p_sys->cc_decoder = var_InheritInteger( p_input, "captions" );
@@ -1788,7 +1794,7 @@ static void EsOutProgramMeta( es_out_t *out, input_source_t *source,
         input_item_MergeInfos( p_item, p_cat );
         b_has_new_infos = true;
     }
-    if( !input_priv(p_input)->b_preparsing && b_has_new_infos )
+    if( p_sys->input_type != INPUT_TYPE_PREPARSING && b_has_new_infos )
         input_SendEventMetaInfo( p_input );
 }
 
@@ -1883,7 +1889,7 @@ static void EsOutProgramEpg( es_out_t *out, input_source_t *source,
         else
             ret = input_item_DelInfo( p_item, psz_cat, now_playing_tr );
 
-        if( ret == VLC_SUCCESS && !input_priv(p_input)->b_preparsing  )
+        if( ret == VLC_SUCCESS && p_sys->input_type != INPUT_TYPE_PREPARSING  )
             input_SendEventMetaInfo( p_input );
     }
 
@@ -1927,7 +1933,7 @@ static void EsOutProgramUpdateScrambled( es_out_t *p_out, es_out_pgrm_t *p_pgrm 
         ret = input_item_DelInfo( p_item, psz_cat, _("Scrambled") );
     free( psz_cat );
 
-    if( ret == VLC_SUCCESS && !input_priv(p_input)->b_preparsing  )
+    if( ret == VLC_SUCCESS && p_sys->input_type != INPUT_TYPE_PREPARSING )
         input_SendEventMetaInfo( p_input );
     input_SendEventProgramScrambled( p_input, p_pgrm->i_id, b_scrambled );
 }
@@ -2338,7 +2344,8 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     dec = vlc_input_decoder_New( VLC_OBJECT(p_input), &p_es->fmt,
                                  p_es->id.str_id, p_es->p_clock,
                                  priv->p_resource, priv->p_sout,
-                                 priv->b_thumbnailing, &decoder_cbs, p_es );
+                                 p_sys->input_type == INPUT_TYPE_THUMBNAILING,
+                                 &decoder_cbs, p_es );
     if( dec != NULL )
     {
         vlc_input_decoder_ChangeRate( dec, p_sys->rate );
@@ -2399,7 +2406,7 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es, bool b_force )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t *p_input = p_sys->p_input;
-    bool b_thumbnailing = input_priv(p_input)->b_thumbnailing;
+    bool b_thumbnailing = p_sys->input_type == INPUT_TYPE_THUMBNAILING;
 
     if( EsIsSelected( es ) )
     {
@@ -4539,7 +4546,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
     }
     /* */
     input_item_ReplaceInfos( p_item, p_cat );
-    if( !input_priv(p_input)->b_preparsing  )
+    if( p_sys->input_type != INPUT_TYPE_PREPARSING )
         input_SendEventMetaInfo( p_input );
 }
 
@@ -4555,7 +4562,7 @@ static void EsOutDeleteInfoEs( es_out_t *out, es_out_id_t *es )
         int ret = input_item_DelInfo( p_item, psz_info_category, NULL );
         free( psz_info_category );
 
-        if( ret == VLC_SUCCESS && !input_priv(p_input)->b_preparsing  )
+        if( ret == VLC_SUCCESS && p_sys->input_type != INPUT_TYPE_PREPARSING )
             input_SendEventMetaInfo( p_input );
     }
 }
