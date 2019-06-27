@@ -1203,8 +1203,6 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     case VLC_CODEC_AV1:
         box_gather(vide, GetxxxxTag(p_extradata, i_extradata, "av1C"));
         box_gather(vide, GetColrBox(&p_track->fmt.video, b_mov));
-        box_gather(vide, GetMdcv(&p_track->fmt.video));
-        box_gather(vide, GetClli(&p_track->fmt.video));
         break;
 
     case VLC_CODEC_MP4V:
@@ -1233,6 +1231,9 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         box_gather(vide, GetHvcCTag(p_extradata, i_extradata, false));
         break;
     }
+
+    box_gather(vide, GetMdcv(&p_track->fmt.video));
+    box_gather(vide, GetClli(&p_track->fmt.video));
 
     return vide;
 }
