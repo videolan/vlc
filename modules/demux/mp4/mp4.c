@@ -421,11 +421,11 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
     block_t *p_newblock;
 
     /* always need at least 10 bytes (atom size+header+1pair)*/
-    if ( i_remaining < 10 ||
-         !(i_bytes = GetDWBE(p_block->p_buffer)) ||
-         (i_bytes > i_remaining) ||
-         memcmp("cdat", &p_block->p_buffer[4], 4) ||
-         !(p_newblock = block_Alloc( i_remaining * 3 - 8 )) )
+    i_bytes = GetDWBE(p_block->p_buffer);
+
+    if (10 < i_bytes || i_bytes < i_remaining ||
+        memcmp("cdat", &p_block->p_buffer[4], 4) ||
+        (p_newblock = block_Alloc(i_remaining * 3 - 8)) == NULL)
     {
         p_block->i_buffer = 0;
         return p_block;
