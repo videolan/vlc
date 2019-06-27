@@ -495,17 +495,6 @@ exit:
     vlc_mutex_unlock( &p_resource->lock_hold );
 }
 
-void input_resource_TerminateVout( input_resource_t *p_resource )
-{
-    vlc_mutex_lock(&p_resource->lock);
-    if (p_resource->p_vout_free != NULL)
-    {
-        msg_Dbg(p_resource->p_vout_free, "destroying useless vout");
-        DestroyVout(p_resource);
-    }
-    vlc_mutex_unlock(&p_resource->lock);
-}
-
 void input_resource_StopFreeVout(input_resource_t *p_resource)
 {
     vlc_mutex_lock(&p_resource->lock);

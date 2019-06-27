@@ -60,11 +60,6 @@ VLC_API input_resource_t * input_resource_New( vlc_object_t * ) VLC_USED;
 VLC_API void input_resource_Release( input_resource_t * );
 
 /**
- * Forcefully destroys the video output (e.g. when the playlist is stopped).
- */
-VLC_API void input_resource_TerminateVout( input_resource_t * );
-
-/**
  * \return the current audio output if any.
  * Use aout_Release() to drop the reference.
  */
