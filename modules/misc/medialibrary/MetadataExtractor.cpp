@@ -25,7 +25,8 @@
 #include "medialibrary.h"
 
 MetadataExtractor::MetadataExtractor( vlc_object_t* parent )
-    : m_obj( parent )
+    : m_currentCtx( nullptr )
+    , m_obj( parent )
 {
 }
 
