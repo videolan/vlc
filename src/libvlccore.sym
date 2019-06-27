@@ -212,7 +212,6 @@ input_resource_TerminateVout
 input_resource_GetAout
 input_resource_HoldAout
 input_resource_PutAout
-input_resource_ResetAout
 vlc_readdir_helper_init
 vlc_readdir_helper_finish
 vlc_readdir_helper_additem
