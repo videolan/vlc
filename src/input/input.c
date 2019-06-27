@@ -391,15 +391,9 @@ static input_thread_t *Create( vlc_object_t *p_parent,
 
     /* */
     if( p_resource )
-    {
-        priv->p_resource_private = NULL;
         priv->p_resource = input_resource_Hold( p_resource );
-    }
     else
-    {
-        priv->p_resource_private = input_resource_New( VLC_OBJECT( p_input ) );
-        priv->p_resource = input_resource_Hold( priv->p_resource_private );
-    }
+        priv->p_resource = input_resource_New( VLC_OBJECT( p_input ) );
     input_resource_SetInput( priv->p_resource, p_input );
 
     /* Init control buffer */
@@ -444,8 +438,6 @@ static void Destroy(input_thread_t *input)
 
     if (priv->p_resource != NULL)
         input_resource_Release(priv->p_resource);
-    if (priv->p_resource_private != NULL)
-        input_resource_Release(priv->p_resource_private);
 
     input_item_Release(priv->p_item);
 
@@ -1359,8 +1351,11 @@ error:
             input_resource_RequestSout( input_priv(p_input)->p_resource,
                                          input_priv(p_input)->p_sout, NULL );
         input_resource_SetInput( input_priv(p_input)->p_resource, NULL );
-        if( input_priv(p_input)->p_resource_private )
-            input_resource_Terminate( input_priv(p_input)->p_resource_private );
+        if( input_priv(p_input)->p_resource )
+        {
+            input_resource_Release( input_priv(p_input)->p_resource );
+            input_priv(p_input)->p_resource = NULL;
+        }
     }
 
     /* Mark them deleted */
@@ -1423,8 +1418,11 @@ static void End( input_thread_t * p_input )
     input_resource_RequestSout( input_priv(p_input)->p_resource,
                                  input_priv(p_input)->p_sout, NULL );
     input_resource_SetInput( input_priv(p_input)->p_resource, NULL );
-    if( input_priv(p_input)->p_resource_private )
-        input_resource_Terminate( input_priv(p_input)->p_resource_private );
+    if( input_priv(p_input)->p_resource )
+    {
+        input_resource_Release( input_priv(p_input)->p_resource );
+        input_priv(p_input)->p_resource = NULL;
+    }
 }
 
 /*****************************************************************************

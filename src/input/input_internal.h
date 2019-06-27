@@ -486,7 +486,6 @@ typedef struct input_thread_private_t
 
     /* Resources */
     input_resource_t *p_resource;
-    input_resource_t *p_resource_private;
 
     /* Stats counters */
     struct input_stats *stats;
