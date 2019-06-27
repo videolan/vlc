@@ -137,6 +137,11 @@ void FormatNamespace::Parse(vlc_fourcc_t fcc, const std::vector<std::string> &el
         case MP4RA("vp09"):
         case MP4RA("vp08"):
             es_format_Change(&fmt, VIDEO_ES, vlc_fourcc_GetCodec(VIDEO_ES, fcc));
+            if(elements.size() > 1)
+            {
+                fmt.i_profile = std::stoi(elements.at(0), nullptr, 16);
+                fmt.i_level = std::stoi(elements.at(1), nullptr, 16);
+            }
             break;
         case MSFCC("AVC1"):
         case MSFCC("AVCB"):
