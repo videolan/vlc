@@ -61,11 +61,6 @@ vout_thread_t *input_resource_HoldDummyVout( input_resource_t * );
  */
 void input_resource_HoldVouts( input_resource_t *, vout_thread_t ***, size_t * );
 
-/**
- * This function releases all resources (object).
- */
-void input_resource_Terminate( input_resource_t * );
-
 void input_resource_StopFreeVout( input_resource_t * );
 
 /**

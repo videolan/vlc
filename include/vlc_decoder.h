@@ -65,11 +65,6 @@ VLC_API void input_resource_Release( input_resource_t * );
 VLC_API void input_resource_TerminateVout( input_resource_t * );
 
 /**
- * This function releases all resources (object).
- */
-VLC_API void input_resource_Terminate( input_resource_t * );
-
-/**
  * \return the current audio output if any.
  * Use aout_Release() to drop the reference.
  */
