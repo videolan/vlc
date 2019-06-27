@@ -447,10 +447,10 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
     } while( i_bytes >= 2 );
 
     /* cdt2 is optional */
-    if ( i_remaining >= 10 &&
-         (i_bytes = GetDWBE(p_read)) &&
-         (i_bytes <= i_remaining) &&
-         !memcmp("cdt2", &p_read[4], 4) )
+    i_bytes = GetDWBE(p_read);
+
+    if (10 <= i_bytes && i_bytes <= i_remaining &&
+        !memcmp("cdt2", &p_read[4], 4))
     {
         p_read += 8;
         i_bytes -= 8;
