@@ -33,7 +33,7 @@
 #include <vlc_codec.h>
 #include <vlc_picture_pool.h>
 
-#include <vlc_fifo_helper.h>
+#include "vlc_fifo_helper.h"
 
 #include <mfx/mfxvideo.h>
 #include "../demux/mpeg/timestamps.h"
