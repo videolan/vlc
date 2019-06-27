@@ -132,7 +132,6 @@ static void Close( vlc_object_t * p_this )
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    input_resource_Terminate( p_sys->p_resource );
     input_resource_Release( p_sys->p_resource );
     free( p_sys );
 }
