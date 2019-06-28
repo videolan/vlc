@@ -191,6 +191,7 @@
         <file alias="IconToolButton.qml">qml/utils/IconToolButton.qml</file>
         <file alias="StackViewExt.qml">qml/utils/StackViewExt.qml</file>
         <file alias="ComboBoxExt.qml">qml/utils/ComboBoxExt.qml</file>
+        <file alias="SpinBoxExt.qml">qml/utils/SpinBoxExt.qml</file>
         <file alias="MenuExt.qml">qml/utils/MenuExt.qml</file>
         <file alias="MenuItemExt.qml">qml/utils/MenuItemExt.qml</file>
         <file alias="ExpandGridView.qml">qml/utils/ExpandGridView.qml</file>
