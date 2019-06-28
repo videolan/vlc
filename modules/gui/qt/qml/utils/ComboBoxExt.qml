@@ -23,7 +23,8 @@ import "qrc:///style/"
 ComboBox {
     id: control
 
-    font.pixelSize: VLCStyle.fontSize_normal
+    font.pixelSize: VLCStyle.fontSize_large
+    leftPadding: 5
 
     delegate: ItemDelegate {
         width: control.width
@@ -43,8 +44,8 @@ ComboBox {
         id: canvas
         x: control.width - width - control.rightPadding
         y: control.topPadding + (control.availableHeight - height) / 2
-        width: 12
-        height: 8
+        width: 10
+        height: 6
         contextType: "2d"
 
         Connections {
@@ -64,7 +65,7 @@ ComboBox {
     }
 
     contentItem: Text {
-        leftPadding: 0
+        leftPadding: 5
         rightPadding: control.indicator.width + control.spacing
 
         text: control.displayText
