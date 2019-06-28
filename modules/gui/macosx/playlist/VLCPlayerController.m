@@ -35,6 +35,8 @@
 
 #import <MediaPlayer/MediaPlayer.h>
 
+NSString *VLCPlayerElementaryStreamID = @"VLCPlayerElementaryStreamID";
+NSString *VLCTick = @"VLCTick";
 NSString *VLCPlayerCurrentMediaItemChanged = @"VLCPlayerCurrentMediaItemChanged";
 NSString *VLCPlayerMetadataChangedForCurrentMedia = @"VLCPlayerMetadataChangedForCurrentMedia";
 NSString *VLCPlayerStateChanged = @"VLCPlayerStateChanged";
@@ -57,6 +59,7 @@ NSString *VLCPlayerTeletextPageChanged = @"VLCPlayerTeletextPageChanged";
 NSString *VLCPlayerTeletextTransparencyChanged = @"VLCPlayerTeletextTransparencyChanged";
 NSString *VLCPlayerAudioDelayChanged = @"VLCPlayerAudioDelayChanged";
 NSString *VLCPlayerSubtitlesDelayChanged = @"VLCPlayerSubtitlesDelayChanged";
+NSString *VLCPlayerDelayChangedForSpecificElementaryStream = @"VLCPlayerDelayChangedForSpecificElementaryStream";
 NSString *VLCPlayerSubtitlesFPSChanged = @"VLCPlayerSubtitlesFPSChanged";
 NSString *VLCPlayerSubtitleTextScalingFactorChanged = @"VLCPlayerSubtitleTextScalingFactorChanged";
 NSString *VLCPlayerRecordingChanged = @"VLCPlayerRecordingChanged";
@@ -111,6 +114,7 @@ const CGFloat VLCVolumeDefault = 1.;
 - (void)audioDelayChanged:(vlc_tick_t)audioDelay;
 - (void)rendererChanged:(vlc_renderer_item_t *)newRendererItem;
 - (void)subtitlesDelayChanged:(vlc_tick_t)subtitlesDelay;
+- (void)delayChanged:(vlc_tick_t)trackDelay forTrack:(vlc_es_id_t *)esID;
 - (void)subtitlesFPSChanged:(float)subtitlesFPS;
 - (void)recordingChanged:(BOOL)recording;
 - (void)inputStatsUpdated:(VLCInputStats *)inputStats;
@@ -372,6 +376,18 @@ static void cb_player_track_selection_changed(vlc_player_t *p_player,
     });
 }
 
+static void cb_player_track_delay_changed(vlc_player_t *p_player,
+                                          vlc_es_id_t *es_id,
+                                          vlc_tick_t delay,
+                                          void *p_data)
+{
+    VLC_UNUSED(p_player);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController delayChanged:delay forTrack:es_id];
+    });
+}
+
 static void cb_player_program_list_changed(vlc_player_t *p_player,
                                            enum vlc_player_list_action action,
                                            const struct vlc_player_program *prgm,
@@ -462,6 +478,7 @@ static const struct vlc_player_cbs player_callbacks = {
     cb_player_length_changed,
     cb_player_track_list_changed,
     cb_player_track_selection_changed,
+    cb_player_track_delay_changed,
     cb_player_program_list_changed,
     cb_player_program_selection_changed,
     cb_player_titles_changed,
@@ -1278,6 +1295,31 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     vlc_player_Lock(_p_player);
     vlc_player_SetSubtitleDelay(_p_player, subtitlesDelay, VLC_PLAYER_WHENCE_ABSOLUTE);
     vlc_player_Unlock(_p_player);
+}
+
+- (void)delayChanged:(vlc_tick_t)trackDelay forTrack:(vlc_es_id_t *)esID
+{
+    [_defaultNotificationCenter postNotificationName:VLCPlayerDelayChangedForSpecificElementaryStream
+                                              object:self
+                                            userInfo:@{ VLCPlayerElementaryStreamID : [NSValue valueWithPointer:esID],
+                                                        VLCTick : [NSNumber numberWithLongLong:trackDelay] }];
+
+}
+
+- (vlc_tick_t)delayForElementaryStreamID:(vlc_es_id_t *)esID
+{
+    vlc_player_Lock(_p_player);
+    vlc_tick_t delay = vlc_player_GetEsIdDelay(_p_player, esID);
+    vlc_player_Unlock(_p_player);
+    return delay;
+}
+
+- (int)setDelay:(vlc_tick_t)delay forElementaryStreamID:(vlc_es_id_t *)esID relativeWhence:(BOOL)relative
+{
+    vlc_player_Lock(_p_player);
+    int returnValue = vlc_player_SetEsIdDelay(_p_player, esID, delay, relative ? VLC_PLAYER_WHENCE_RELATIVE : VLC_PLAYER_WHENCE_ABSOLUTE);
+    vlc_player_Unlock(_p_player);
+    return returnValue;
 }
 
 - (void)subtitlesFPSChanged:(float)subtitlesFPS

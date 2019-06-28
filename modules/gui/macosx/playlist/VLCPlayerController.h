@@ -29,6 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCTrackMetaData;
 @class VLCProgramMetaData;
 
+extern NSString *VLCPlayerElementaryStreamID;
+extern NSString *VLCTick;
+
 /**
  * Listen to VLCPlayerCurrentMediaItemChanged to notified if the current media item changes for the player
  * @note the affected player object will be the object of the notification
@@ -158,6 +161,13 @@ extern NSString *VLCPlayerAudioDelayChanged;
  * @note the affected player object will be the object of the notification
  */
 extern NSString *VLCPlayerSubtitlesDelayChanged;
+
+/**
+ * Listen to VLCPlayerDelayChangedForSpecificElementaryStream to be notified if the delay of a specific elementary stream changes
+ * @note the affected player object will be the object of the notification
+ * @return the notification's userInfo dictionary will hold key/value pairs for VLCPlayerElementaryStreamID and VLCTick to describe the changes
+ */
+extern NSString *VLCPlayerDelayChangedForSpecificElementaryStream;
 
 /**
  * Listen to VLCPlayerSubtitlesFPSChanged to be notified if the subtitles FPS of the current media changes
@@ -626,6 +636,22 @@ extern const CGFloat VLCVolumeDefault;
  * @note listen to VLCPlayerSubtitlesDelayChanged to be notified about changes to this property
  */
 @property (readwrite, nonatomic) vlc_tick_t subtitlesDelay;
+
+/**
+ * fetch the delay for a specific track identified through its elementary stream ID
+ * @return the delay for the track or INT64_MAX if none is set
+ */
+- (vlc_tick_t)delayForElementaryStreamID:(vlc_es_id_t *)esID;
+
+/**
+ * set the delay of a specific track identified through its elementary stream ID
+ * @warning Setting the delay of one specific track will override previous and future changes of delay made through generic calls
+ * @param delay the delay as a valid time or INT64_MAX to reset to the default for the ES category
+ * @param esID the ID for the elementary stream
+ * @param relative use an absolute or relative whence to describe the time
+ * @return VLC_SUCCESS on success
+ */
+- (int)setDelay:(vlc_tick_t)delay forElementaryStreamID:(vlc_es_id_t *)esID relativeWhence:(BOOL)relative;
 
 /**
  * the subtitles fps to correct mismatch between video and text
