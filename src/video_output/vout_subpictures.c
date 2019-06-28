@@ -141,21 +141,6 @@ static void spu_channel_DeleteAt(struct spu_channel *channel, size_t index)
     vlc_vector_remove(&channel->entries, index);
 }
 
-static void spu_channel_DeleteSubpicture(struct spu_channel *channel,
-                                         subpicture_t *subpic)
-{
-    for (size_t i = 0; i < channel->entries.size; i++)
-    {
-        if (channel->entries.data[i].subpic == subpic)
-        {
-            subpicture_Delete(subpic);
-            vlc_vector_remove(&channel->entries, i);
-            return;
-        }
-    }
-    vlc_assert_unreachable();
-}
-
 static void spu_channel_Clean(struct spu_channel *channel)
 {
     for (size_t i = 0; i < channel->entries.size; i++)
@@ -677,7 +662,6 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
     for (size_t i = 0; i < sys->channels.size; i++)
     {
         struct spu_channel *channel = &sys->channels.data[i];
-        spu_render_entry_t *render_entries = channel->entries.data;
 
         vlc_tick_t   start_date = render_subtitle_date;
         vlc_tick_t   ephemer_subtitle_date = 0;
@@ -690,7 +674,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
 
         /* Select available pictures */
         for (size_t index = 0; index < channel->entries.size; index++) {
-            spu_render_entry_t *render_entry = &render_entries[index];
+            spu_render_entry_t *render_entry = &channel->entries.data[index];
             subpicture_t *current = render_entry->subpic;
             bool is_stop_valid;
             bool is_late;
@@ -731,15 +715,18 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             start_date = INT64_MAX;
 
         /* Select pictures to be displayed */
-        for (size_t index = 0; index < channel->entries.size; index++) {
-            spu_render_entry_t *render_entry = &render_entries[index];
+        for (size_t index = 0; index < channel->entries.size; ) {
+            spu_render_entry_t *render_entry = &channel->entries.data[index];
             subpicture_t *current = render_entry->subpic;
             bool is_late = render_entry->is_late;
 
             if (!spu_render_entry_IsSelected(render_entry, channel->id,
                                              system_now, render_subtitle_date,
                                              ignore_osd))
+            {
+                index++;
                 continue;
+            }
 
             const vlc_tick_t stop_date = current->b_subtitle ? __MAX(start_date, sys->last_sort_date) : system_now;
             const vlc_tick_t ephemer_date  = current->b_subtitle ? ephemer_subtitle_date  : ephemer_osd_date;
@@ -756,11 +743,15 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             }
 
             if (is_rejeted)
-                spu_channel_DeleteSubpicture(channel, current);
+            {
+                subpicture_Delete(current);
+                vlc_vector_remove(&channel->entries, index);
+            }
             else
             {
                 render_entry->channel_order = channel->order;
                 subpicture_array[(*subpicture_count)++] = *render_entry;
+                index++;
             }
         }
     }
