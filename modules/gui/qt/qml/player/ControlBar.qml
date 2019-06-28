@@ -90,7 +90,6 @@ Utils.NavigableFocusScope {
                     property bool _focusGiven: false
                     focus: true
                     anchors.fill: parent
-                    spacing: 0
 
                     Repeater{
                         model: PlayerControlBarModel{

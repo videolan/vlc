@@ -71,6 +71,9 @@ public:
     static int on_variable_callback( vlc_object_t * object, char const * , vlc_value_t oldvalue, vlc_value_t newvalue, void * data);
     static int on_variable_list_callback( vlc_object_t * object, char const * , int action, vlc_value_t* value, void * data);
 
+public slots:
+    Q_INVOKABLE void toggleIndex(int index);
+
 private slots:
     void onDataUpdated(const vlc_object_t* object, QVariant oldvalue, QVariant newvalue);
     void onListUpdated(const vlc_object_t* object, int action, QVariant newvalue);

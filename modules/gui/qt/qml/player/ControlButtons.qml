@@ -56,6 +56,7 @@ Item{
         case PlayerControlBarModel.SKIP_BACK_BUTTON: return stepBackBtnDelegate
         case PlayerControlBarModel.QUIT_BUTTON: return quitBtnDelegate
         case PlayerControlBarModel.VOLUME: return volumeBtnDelegate
+        case PlayerControlBarModel.ASPECT_RATIO_COMBOBOX: return aspectRatioDelegate
         }
         console.log("button delegate id " + inpID +  " doesn't exists")
         return spacerDelegate
@@ -385,6 +386,20 @@ Item{
             size: VLCStyle.icon_medium
             text: VLCIcons.clear
             onClicked: rootWindow.close()
+            property bool acceptFocus: true
+        }
+    }
+
+    Component{
+        id: aspectRatioDelegate
+        Utils.ComboBoxExt {
+            id: combo
+            Layout.alignment: Qt.AlignVCenter
+            height: 28 * scale
+            width: 100 * scale
+            textRole: "display"
+            model: player.aspectRatio
+            onCurrentIndexChanged: model.toggleIndex(currentIndex)
             property bool acceptFocus: true
         }
     }
