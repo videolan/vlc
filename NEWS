@@ -50,6 +50,7 @@ Codecs:
  * Support IMM4 decoder
  * Improve 708 decoder
  * Support AGM decoder
+ * Support VP4 decoder
 
 Access:
  * Enable SMB2 / SMB3 support on mobile ports with libsmb2
