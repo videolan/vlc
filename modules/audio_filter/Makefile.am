@@ -67,6 +67,9 @@ libsimple_channel_mixer_plugin_la_LIBADD =
 if HAVE_NEON
 EXTRA_LTLIBRARIES += libsimple_channel_mixer_plugin_arm_neon.la
 libsimple_channel_mixer_plugin_arm_neon_la_SOURCES = arm_neon/simple_channel_mixer.S
+# Intentionally leaving out AM_LDFLAGS from this one; it's not meant to be
+# built like a plugin.
+libsimple_channel_mixer_plugin_arm_neon_la_LDFLAGS = -static
 
 libsimple_channel_mixer_plugin_la_LIBADD += libsimple_channel_mixer_plugin_arm_neon.la
 libsimple_channel_mixer_plugin_la_CFLAGS += -DCAN_COMPILE_NEON
