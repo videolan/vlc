@@ -485,6 +485,10 @@ static const staticentry_t p_list_video[] = {
         A("VP31"),
         A("vp31"),
 
+    /* On2 VP4 Video Codec */
+    B(VLC_CODEC_VP4, "On2's VP4 Video"),
+        A("VP40"),
+
     /* On2  VP5, VP6 codecs */
     B(VLC_CODEC_VP5, "On2's VP5 Video"),
         A("VP5 "),
