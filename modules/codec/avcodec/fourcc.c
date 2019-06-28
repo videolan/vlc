@@ -201,6 +201,9 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     /* AV_CODEC_ID_IFF_BYTERUN1 */
     { VLC_CODEC_KGV1, AV_CODEC_ID_KGV1 },
     { VLC_CODEC_YOP, AV_CODEC_ID_YOP },
+#if LIBAVCODEC_VERSION_CHECK( 58, 0, 0, 53, 100 )
+    { VLC_CODEC_VP4, AV_CODEC_ID_VP4 },
+#endif
     { VLC_CODEC_VP8, AV_CODEC_ID_VP8 },
     /* AV_CODEC_ID_PICTOR */
     /* AV_CODEC_ID_ANSI */
