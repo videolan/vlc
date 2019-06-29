@@ -3110,7 +3110,6 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
     uint64_t     i_dts;
     unsigned int i_sample;
     unsigned int i_chunk;
-    int          i_index;
     stime_t      i_start;
 
     /* FIXME see if it's needed to check p_track->i_chunk_count */
@@ -3176,8 +3175,11 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
     /* *** find sample in the chunk *** */
     i_sample = p_track->chunk[i_chunk].i_sample_first;
     i_dts    = p_track->chunk[i_chunk].i_first_dts;
-    for( i_index = 0;  i_index < p_track->chunk[i_chunk].i_entries_dts &&
-                       i_sample < p_track->chunk[i_chunk].i_sample_count; )
+
+    for( uint_fast32_t i_index = 0;
+         i_index < p_track->chunk[i_chunk].i_entries_dts &&
+         i_sample < p_track->chunk[i_chunk].i_sample_count;
+         i_index++ )
     {
         if( i_dts +
             p_track->chunk[i_chunk].p_sample_count_dts[i_index] *
@@ -3188,7 +3190,6 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
                 p_track->chunk[i_chunk].p_sample_delta_dts[i_index];
 
             i_sample += p_track->chunk[i_chunk].p_sample_count_dts[i_index];
-            i_index++;
         }
         else
         {
