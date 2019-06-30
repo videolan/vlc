@@ -4,22 +4,18 @@
 #
 # Translators:
 # Daniel Pastera <pasterad@gmail.com>, 2016
-# dawon <dawon.cz@gmail.com>, 2009
 # Jiri Sedlak <jiri_sedlak@users.sourceforge.net>, 2017
-# kalerme, 2013
 # Kamil Páral <ripper42@gmail.com>, 2009
 # Martin Zicha <zicha@centrum.cz>, 2012
-# IAmNotImportant, 2016
 # Michal Vašíček <michalvasicek@icloud.com>, 2017
 # Miroslav Oujeský <oujesky@mail.muni.cz>, 2006
 # Sofartin <hrubymar10@gmail.com>, 2013
 # dreddux <dreddux@gmail.com>, 2012
+# Petr Dolejší <dolejsi.petr@gmail.com>, 2019
 # Petr Nekvinda <petr.nekvinda@gmail.com>, 2015
 # Petr Šimáček <petr.simacek@gmail.com>, 2012
 # Roman Horník <roman.hornik@debian-linux.cz>, 2016
 # Roman Ondráček <ondracek.roman@centrum.cz>, 2014-2015
-# sifkka <sifkka@gmail.com>, 2014
-# Sofartin <hrubymar10@gmail.com>, 2014
 # Tadeáš Valenta <tadashicz@gmail.com>, 2019
 # Tomáš Chvátal <tomas.chvatal@gmail.com>, 2014-2018
 # Tomáš Souček <soucek.gns@gmail.com>, 2014
@@ -34,8 +30,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-02 15:38+0200\n"
-"Last-Translator: Tadeáš Valenta <tadashicz@gmail.com>, 2019\n"
+"PO-Revision-Date: 2019-06-30 19:28+0200\n"
+"Last-Translator: Petr Dolejší <dolejsi.petr@gmail.com>, 2019\n"
 "Language-Team: Czech (https://www.transifex.com/yaron/teams/16553/cs/)\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -1192,7 +1188,7 @@ msgstr "%s Rozsah"
 
 #: src/input/es_out.c:3255
 msgid "Full"
-msgstr ""
+msgstr "Plný"
 
 #: src/input/es_out.c:3262 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -7364,7 +7360,7 @@ msgstr ""
 
 #: modules/access/http/access.c:301
 msgid "Referrer"
-msgstr ""
+msgstr "Odkazovatel"
 
 #: modules/access/http/access.c:302
 msgid "Provide the referral URL, i.e. HTTP \"Referer\" (sic)."
@@ -7372,7 +7368,7 @@ msgstr ""
 
 #: modules/access/http/access.c:306
 msgid "User agent"
-msgstr ""
+msgstr "Uživatelský agent"
 
 #: modules/access/http/access.c:307
 msgid ""
@@ -7503,7 +7499,7 @@ msgstr ""
 
 #: modules/access/imem.c:105
 msgid "Get function"
-msgstr ""
+msgstr "Získejte funkci"
 
 #: modules/access/imem.c:107
 msgid "Address of the get callback function"
@@ -8056,11 +8052,11 @@ msgstr ""
 
 #: modules/access/screen/screen.c:63 modules/access/screen/xcb.c:51
 msgid "Capture region width"
-msgstr ""
+msgstr "Šířka oblasti zachycení"
 
 #: modules/access/screen/screen.c:65 modules/access/screen/xcb.c:55
 msgid "Capture region height"
-msgstr ""
+msgstr "Výška oblasti zachycení"
 
 #: modules/access/screen/screen.c:67 modules/access/screen/xcb.c:59
 #: modules/gui/macosx/VLCOpenWindowController.m:214
@@ -8090,7 +8086,7 @@ msgstr "ID displeje. Není-li zadáno, použije se ID hlavního displeje."
 
 #: modules/access/screen/screen.c:83
 msgid "Screen index"
-msgstr ""
+msgstr "Index obrazovky"
 
 #: modules/access/screen/screen.c:85
 msgid "Index of screen (1, 2, 3, ...). Alternative to Display ID."
@@ -8098,7 +8094,7 @@ msgstr ""
 
 #: modules/access/screen/screen.c:98
 msgid "Screen Input"
-msgstr ""
+msgstr "Vstup obrazovky"
 
 #: modules/access/screen/screen.c:99 modules/access/screen/xcb.c:70
 #: modules/gui/macosx/VLCMainMenu.m:610
