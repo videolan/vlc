@@ -24,12 +24,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCMediaSourceBaseDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
+@interface VLCMediaSourceBaseDataSource : NSObject
 
 @property (readwrite) NSCollectionView *collectionView;
 @property (readwrite) NSButton *homeButton;
 @property (readwrite) NSPathControl *pathControl;
 
+- (void)setupViews;
 - (void)loadMediaSources;
 
 @end

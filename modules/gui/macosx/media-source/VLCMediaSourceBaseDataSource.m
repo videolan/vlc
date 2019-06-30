@@ -28,10 +28,11 @@
 #import "media-source/VLCMediaSourceDataSource.h"
 
 #import "main/VLCMain.h"
+#import "views/VLCImageView.h"
 #import "library/VLCInputItem.h"
 #import "extensions/NSString+Helpers.h"
 
-@interface VLCMediaSourceBaseDataSource ()
+@interface VLCMediaSourceBaseDataSource () <NSCollectionViewDataSource, NSCollectionViewDelegate>
 {
     NSArray *_mediaSources;
     VLCMediaSourceDataSource *_childDataSource;
@@ -67,12 +68,19 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)loadMediaSources
+- (void)setupViews
 {
+    self.collectionView.dataSource = self;
+    self.collectionView.delegate = self;
+    [self.collectionView registerClass:[VLCMediaSourceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceCellIdentifier];
+
     self.homeButton.action = @selector(homeButtonAction:);
     self.homeButton.target = self;
     self.pathControl.URL = nil;
+}
 
+- (void)loadMediaSources
+{
     NSArray *mediaSourcesOnLAN = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_LAN];
     NSUInteger count = mediaSourcesOnLAN.count;
     if (count > 0) {

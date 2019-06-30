@@ -41,7 +41,6 @@
 #import "library/VLCLibraryAlternativeAudioViewController.h"
 #import "library/VLCLibrarySortingMenuController.h"
 
-#import "media-source/VLCMediaSourceCollectionViewItem.h"
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 
 #import "views/VLCDragDropView.h"
@@ -240,9 +239,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     _mediaSourceDataSource.collectionView = _mediaSourceCollectionView;
     _mediaSourceDataSource.homeButton = _mediaSourceHomeButton;
     _mediaSourceDataSource.pathControl = _mediaSourcePathControl;
-    _mediaSourceCollectionView.dataSource = _mediaSourceDataSource;
-    _mediaSourceCollectionView.delegate = _mediaSourceDataSource;
-    [_mediaSourceCollectionView registerClass:[VLCMediaSourceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceCellIdentifier];
+    [_mediaSourceDataSource setupViews];
 
     self.upNextLabel.font = [NSFont VLClibrarySectionHeaderFont];
     self.upNextLabel.stringValue = _NS("Playlist");
