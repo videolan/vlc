@@ -95,6 +95,9 @@ struct es_out_id_t
 {
     vlc_es_id_t id;
 
+    /* weak reference, used by input_decoder_callbacks */
+    es_out_t *out;
+
     /* ES ID */
     es_out_pgrm_t *p_pgrm;
 
@@ -263,73 +266,69 @@ static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
     for( int fetes_i=0; fetes_i<2; fetes_i++ ) \
         vlc_list_foreach( pos, (!fetes_i ? &p_sys->es : &p_sys->es_slaves), node )
 
-static vlc_es_id_t *
-FindEsIdFromDecoder(es_out_sys_t *p_sys, decoder_t *decoder)
-{
-    es_out_id_t *es;
-    foreach_es_then_es_slaves(es)
-        if (es->p_dec == decoder)
-            return &es->id;
-    return NULL;
-}
-
 static void
 decoder_on_vout_added(decoder_t *decoder, vout_thread_t *vout,
                       enum vlc_vout_order order, void *userdata)
 {
-    es_out_sys_t *priv = userdata;
-    if (!priv->p_input)
-        return;
+    (void) decoder;
 
-    vlc_es_id_t *id = FindEsIdFromDecoder(priv, decoder);
-    assert(id);
+    es_out_id_t *id = userdata;
+    es_out_t *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (!p_sys->p_input)
+        return;
 
     struct vlc_input_event_vout event = {
         .action = VLC_INPUT_EVENT_VOUT_ADDED,
         .vout = vout,
         .order = order,
-        .id = id,
+        .id = &id->id,
     };
 
-    input_SendEventVout(priv->p_input, &event);
+    input_SendEventVout(p_sys->p_input, &event);
 }
 
 static void
 decoder_on_vout_deleted(decoder_t *decoder, vout_thread_t *vout, void *userdata)
 {
-    es_out_sys_t *priv = userdata;
-    if (!priv->p_input)
-        return;
+    (void) decoder;
 
-    vlc_es_id_t *id = FindEsIdFromDecoder(priv, decoder);
-    assert(id);
+    es_out_id_t *id = userdata;
+    es_out_t *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (!p_sys->p_input)
+        return;
 
     struct vlc_input_event_vout event = {
         .action = VLC_INPUT_EVENT_VOUT_DELETED,
         .vout = vout,
         .order = VLC_VOUT_ORDER_NONE,
-        .id = id,
+        .id = &id->id,
     };
 
-    input_SendEventVout(priv->p_input, &event);
+    input_SendEventVout(p_sys->p_input, &event);
 }
 
 static void
 decoder_on_thumbnail_ready(decoder_t *decoder, picture_t *pic, void *userdata)
 {
-    es_out_sys_t *priv = userdata;
-    if (!priv->p_input)
-        return;
+    (void) decoder;
 
-    vlc_es_id_t *id = FindEsIdFromDecoder(priv, decoder);
-    assert(id);
+    es_out_id_t *id = userdata;
+    es_out_t *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (!p_sys->p_input)
+        return;
 
     struct vlc_input_event event = {
         .type = INPUT_EVENT_THUMBNAIL_READY,
         .thumbnail = pic,
     };
 
-    input_SendEvent(priv->p_input, &event);
+    input_SendEvent(p_sys->p_input, &event);
 }
 
 static void
@@ -338,11 +337,14 @@ decoder_on_new_video_stats(decoder_t *decoder, unsigned decoded, unsigned lost,
 {
     (void) decoder;
 
-    es_out_sys_t *priv = userdata;
-    if (!priv->p_input)
+    es_out_id_t *id = userdata;
+    es_out_t *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (!p_sys->p_input)
         return;
 
-    struct input_stats *stats = input_priv(priv->p_input)->stats;
+    struct input_stats *stats = input_priv(p_sys->p_input)->stats;
     if (!stats)
         return;
 
@@ -360,11 +362,14 @@ decoder_on_new_audio_stats(decoder_t *decoder, unsigned decoded, unsigned lost,
 {
     (void) decoder;
 
-    es_out_sys_t *priv = userdata;
-    if (!priv->p_input)
+    es_out_id_t *id = userdata;
+    es_out_t *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (!p_sys->p_input)
         return;
 
-    struct input_stats *stats = input_priv(priv->p_input)->stats;
+    struct input_stats *stats = input_priv(p_sys->p_input)->stats;
     if (!stats)
         return;
 
@@ -383,11 +388,14 @@ decoder_get_attachments(decoder_t *decoder,
 {
     (void) decoder;
 
-    es_out_sys_t *priv = userdata;
-    if (!priv->p_input)
+    es_out_id_t *id = userdata;
+    es_out_t *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (!p_sys->p_input)
         return -1;
 
-    return input_GetAttachments(priv->p_input, ppp_attachment);
+    return input_GetAttachments(p_sys->p_input, ppp_attachment);
 }
 
 static const struct input_decoder_callbacks decoder_cbs = {
@@ -798,7 +806,7 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
                 input_DecoderNew( VLC_OBJECT(p_input), &p_es->fmt, NULL,
                                   input_priv(p_input)->p_resource,
                                   p_sys->p_sout_record, false,
-                                  &decoder_cbs, p_sys );
+                                  &decoder_cbs, p_es );
 
             if( p_es->p_dec_record && p_sys->b_buffering )
                 input_DecoderStartWait( p_es->p_dec_record );
@@ -1869,6 +1877,8 @@ static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
     if( !es )
         return NULL;
 
+    es->out = out;
+
     if( es_format_Copy( &es->fmt, fmt ) != VLC_SUCCESS )
     {
         free( es );
@@ -2008,7 +2018,7 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     input_thread_private_t *priv = input_priv(p_input);
     dec = input_DecoderNew( VLC_OBJECT(p_input), &p_es->fmt, p_es->p_clock,
                             priv->p_resource, priv->p_sout,
-                            priv->b_thumbnailing, &decoder_cbs, p_sys );
+                            priv->b_thumbnailing, &decoder_cbs, p_es );
     if( dec != NULL )
     {
         input_DecoderChangeRate( dec, p_sys->rate );
@@ -2021,7 +2031,7 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
             p_es->p_dec_record =
                 input_DecoderNew( VLC_OBJECT(p_input), &p_es->fmt, NULL,
                                   priv->p_resource, p_sys->p_sout_record, false,
-                                  &decoder_cbs, p_sys );
+                                  &decoder_cbs, p_es );
             if( p_es->p_dec_record && p_sys->b_buffering )
                 input_DecoderStartWait( p_es->p_dec_record );
         }
