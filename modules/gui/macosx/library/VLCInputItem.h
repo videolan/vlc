@@ -42,6 +42,7 @@ extern NSString *VLCInputItemSubtreeAdded;
 @property (readonly) vlc_tick_t duration;
 @property (readonly) enum input_item_type_e inputType;
 @property (readonly) struct input_item_node_t *subTree;
+@property (readonly) NSURL *artworkURL;
 
 - (void)parseInputItem;
 - (void)cancelParsing;

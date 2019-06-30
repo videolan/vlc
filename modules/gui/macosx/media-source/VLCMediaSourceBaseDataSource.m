@@ -119,6 +119,14 @@
     VLCInputItem *childRootInput = childNode.inputItem;
     viewItem.titleTextField.stringValue = childRootInput.name;
 
+    NSURL *artworkURL = childRootInput.artworkURL;
+    NSImage *placeholder = [NSImage imageNamed:@"NSApplicationIcon"];
+    if (artworkURL) {
+        [viewItem.mediaImageView setImageURL:artworkURL placeholderImage:placeholder];
+    } else {
+        viewItem.mediaImageView.image = placeholder;
+    }
+
     return viewItem;
 }
 

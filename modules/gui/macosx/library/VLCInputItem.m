@@ -115,6 +115,19 @@ static const struct input_item_parser_cbs_t parserCallbacks =
     return ITEM_TYPE_UNKNOWN;
 }
 
+- (NSURL *)artworkURL
+{
+    if (_vlcInputItem) {
+        char *p_artworkURL = input_item_GetArtworkURL(_vlcInputItem);
+        if (p_artworkURL) {
+            NSString *artworkURLString = toNSStr(p_artworkURL);
+            FREENULL(p_artworkURL);
+            return [NSURL URLWithString:artworkURLString];
+        }
+    }
+    return nil;
+}
+
 - (void)parseInputItem
 {
     _p_parserID = input_item_Parse(_vlcInputItem,

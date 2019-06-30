@@ -31,10 +31,10 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCMediaSourceCellIdentifier";
 
 @implementation VLCMediaSourceCollectionViewItem
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-
-    [self.mediaImageView setImage:[NSImage imageNamed:@"NSApplicationIcon"]];
+- (void)prepareForReuse
+{
+    [super prepareForReuse];
+    self.mediaImageView.image = nil;
 }
 
 @end
