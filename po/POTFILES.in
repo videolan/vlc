@@ -498,6 +498,8 @@ modules/gui/macosx/media-source/VLCMediaSourceBaseDataSource.h
 modules/gui/macosx/media-source/VLCMediaSourceBaseDataSource.m
 modules/gui/macosx/media-source/VLCMediaSourceCollectionViewItem.h
 modules/gui/macosx/media-source/VLCMediaSourceCollectionViewItem.m
+modules/gui/macosx/media-source/VLCMediaSourceDataSource.h
+modules/gui/macosx/media-source/VLCMediaSourceDataSource.m
 modules/gui/macosx/media-source/VLCMediaSourceProvider.h
 modules/gui/macosx/media-source/VLCMediaSourceProvider.m
 modules/gui/macosx/menus/VLCMainMenu.h

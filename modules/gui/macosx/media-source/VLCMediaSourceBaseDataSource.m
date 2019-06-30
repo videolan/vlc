@@ -25,6 +25,7 @@
 #import "media-source/VLCMediaSourceProvider.h"
 #import "media-source/VLCMediaSource.h"
 #import "media-source/VLCMediaSourceCollectionViewItem.h"
+#import "media-source/VLCMediaSourceDataSource.h"
 
 #import "main/VLCMain.h"
 #import "library/VLCInputItem.h"
@@ -33,6 +34,7 @@
 @interface VLCMediaSourceBaseDataSource ()
 {
     NSArray *_mediaSources;
+    VLCMediaSourceDataSource *_childDataSource;
 }
 @end
 
@@ -67,6 +69,10 @@
 
 - (void)loadMediaSources
 {
+    self.homeButton.action = @selector(homeButtonAction:);
+    self.homeButton.target = self;
+    self.pathControl.URL = nil;
+
     NSArray *mediaSourcesOnLAN = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_LAN];
     NSUInteger count = mediaSourcesOnLAN.count;
     if (count > 0) {
@@ -110,7 +116,32 @@
 
 - (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
-    NSLog(@"media source selection changed: %@", indexPaths);
+    NSIndexPath *indexPath = indexPaths.anyObject;
+    if (!indexPath) {
+        return;
+    }
+    VLCMediaSource *mediaSource = _mediaSources[indexPath.section];
+    VLCInputNode *rootNode = mediaSource.rootNode;
+    NSArray *nodeChildren = rootNode.children;
+    VLCInputNode *childNode = nodeChildren[indexPath.item];
+    VLCInputItem *childRootInput = childNode.inputItem;
+    self.pathControl.URL = [NSURL URLWithString:[NSString stringWithFormat:@"vlc://%@", [childRootInput.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
+    _childDataSource = [[VLCMediaSourceDataSource alloc] init];
+    _childDataSource.displayedMediaSource = mediaSource;
+    _childDataSource.nodeToDisplay = childNode;
+    _childDataSource.collectionView = self.collectionView;
+    _childDataSource.pathControl = self.pathControl;
+    self.collectionView.dataSource = _childDataSource;
+    self.collectionView.delegate = _childDataSource;
+    [self.collectionView reloadData];
+}
+
+- (IBAction)homeButtonAction:(id)sender
+{
+    self.collectionView.dataSource = self;
+    self.collectionView.delegate = self;
+    [self.collectionView reloadData];
+    _childDataSource = nil;
 }
 
 #pragma mark - VLCMediaSource Delegation
@@ -135,8 +166,12 @@
 
 - (void)reloadDataForNotification:(NSNotification *)aNotification
 {
-    NSInteger index = [_mediaSources indexOfObject:aNotification.object];
-    [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:index]];
+    if (self.collectionView.dataSource == self) {
+        NSInteger index = [_mediaSources indexOfObject:aNotification.object];
+        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:index]];
+    } else {
+        [self.collectionView reloadData];
+    }
 }
 
 @end
