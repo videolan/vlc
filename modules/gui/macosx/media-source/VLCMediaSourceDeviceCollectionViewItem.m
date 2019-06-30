@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaSourceCollectionViewItem.h: MacOS X interface module
+ * VLCMediaSourceDeviceCollectionView.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,19 +20,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "VLCMediaSourceDeviceCollectionViewItem.h"
+#import "views/VLCImageView.h"
 
-NS_ASSUME_NONNULL_BEGIN
+NSString *VLCMediaSourceDeviceCellIdentifier = @"VLCMediaSourceDeviceCellIdentifier";
 
-@class VLCImageView;
-
-extern NSString *VLCMediaSourceCellIdentifier;
-
-@interface VLCMediaSourceCollectionViewItem : NSCollectionViewItem
-
-@property (readwrite, assign) IBOutlet NSTextField *titleTextField;
-@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
+@interface VLCMediaSourceDeviceCollectionViewItem ()
 
 @end
 
-NS_ASSUME_NONNULL_END
+@implementation VLCMediaSourceDeviceCollectionViewItem
+
+- (void)prepareForReuse
+{
+    [super prepareForReuse];
+    self.mediaImageView.image = nil;
+}
+
+@end

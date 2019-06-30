@@ -24,7 +24,7 @@
 
 #import "media-source/VLCMediaSourceProvider.h"
 #import "media-source/VLCMediaSource.h"
-#import "media-source/VLCMediaSourceCollectionViewItem.h"
+#import "media-source/VLCMediaSourceDeviceCollectionViewItem.h"
 #import "media-source/VLCMediaSourceDataSource.h"
 
 #import "main/VLCMain.h"
@@ -72,7 +72,7 @@
 {
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
-    [self.collectionView registerClass:[VLCMediaSourceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceCellIdentifier];
+    [self.collectionView registerClass:[VLCMediaSourceDeviceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceDeviceCellIdentifier];
 
     self.homeButton.action = @selector(homeButtonAction:);
     self.homeButton.target = self;
@@ -110,7 +110,7 @@
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCMediaSourceCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCMediaSourceCellIdentifier forIndexPath:indexPath];
+    VLCMediaSourceDeviceCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCMediaSourceDeviceCellIdentifier forIndexPath:indexPath];
 
     VLCMediaSource *mediaSource = _mediaSources[indexPath.section];
     VLCInputNode *rootNode = mediaSource.rootNode;

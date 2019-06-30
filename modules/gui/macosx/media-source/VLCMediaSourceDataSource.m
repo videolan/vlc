@@ -23,7 +23,7 @@
 #import "VLCMediaSourceDataSource.h"
 
 #import "library/VLCInputItem.h"
-#import "media-source/VLCMediaSourceCollectionViewItem.h"
+#import "media-source/VLCMediaSourceDeviceCollectionViewItem.h"
 #import "media-source/VLCMediaSource.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
@@ -65,7 +65,7 @@
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCMediaSourceCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCMediaSourceCellIdentifier forIndexPath:indexPath];
+    VLCMediaSourceDeviceCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCMediaSourceDeviceCellIdentifier forIndexPath:indexPath];
 
     VLCInputNode *rootNode = _nodeToDisplay;
     NSArray *nodeChildren = rootNode.children;

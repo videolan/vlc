@@ -5,7 +5,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="VLCMediaSourceCollectionViewItem">
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCMediaSourceDeviceCollectionView">
             <connections>
                 <outlet property="mediaImageView" destination="rko-Nc-j4c" id="4SM-TL-qbd"/>
                 <outlet property="titleTextField" destination="jJ3-BQ-y8F" id="YO5-1X-TIk"/>
@@ -28,7 +28,7 @@
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jJ3-BQ-y8F">
                     <rect key="frame" x="223" y="150" width="35" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="Utm-F6-CKx">
-                        <font key="font" metaFont="controlContent"/>
+                        <font key="font" metaFont="cellTitle"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
