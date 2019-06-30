@@ -237,8 +237,12 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
     _mediaSourceDataSource = [[VLCMediaSourceBaseDataSource alloc] init];
     _mediaSourceDataSource.collectionView = _mediaSourceCollectionView;
+    _mediaSourceDataSource.collectionViewScrollView = _mediaSourceCollectionViewScrollView;
     _mediaSourceDataSource.homeButton = _mediaSourceHomeButton;
     _mediaSourceDataSource.pathControl = _mediaSourcePathControl;
+    _mediaSourceDataSource.gridVsListSegmentedControl = _gridVsListSegmentedControl;
+    _mediaSourceTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
+    _mediaSourceDataSource.tableView = _mediaSourceTableView;
     [_mediaSourceDataSource setupViews];
 
     self.upNextLabel.font = [NSFont VLClibrarySectionHeaderFont];

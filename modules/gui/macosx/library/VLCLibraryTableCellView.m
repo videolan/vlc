@@ -27,12 +27,8 @@
 #import "main/VLCMain.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
-
-@interface VLCLibraryTableCellView ()
-{
-    VLCLibraryController *_libraryController;
-}
-@end
+#import "library/VLCInputItem.h"
+#import "playlist/VLCPlaylistController.h"
 
 @implementation VLCLibraryTableCellView
 
@@ -58,16 +54,53 @@
 - (void)setRepresentedMediaItem:(VLCMediaLibraryMediaItem *)representedMediaItem
 {
     _representedMediaItem = representedMediaItem;
+
     self.trackingView.viewToHide = self.playInstantlyButton;
+    self.playInstantlyButton.action = @selector(playMediaItemInstantly:);
+    self.playInstantlyButton.target = self;
 }
 
-- (IBAction)playInstantly:(id)sender
+- (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
 {
-    if (!_libraryController) {
-        _libraryController = [[VLCMain sharedInstance] libraryController];
+    _representedInputItem = representedInputItem;
+
+    self.singlePrimaryTitleTextField.hidden = NO;
+    self.singlePrimaryTitleTextField.stringValue = _representedInputItem.name;
+
+    NSURL *artworkURL = _representedInputItem.artworkURL;
+    NSImage *placeholderImage = [self imageForInputItem];
+    if (artworkURL) {
+        [self.representedImageView setImageURL:artworkURL placeholderImage:placeholderImage];
+    } else {
+        self.representedImageView.image = placeholderImage;
     }
 
-    [_libraryController appendItemToPlaylist:_representedMediaItem playImmediately:YES];
+    self.trackingView.viewToHide = self.playInstantlyButton;
+    self.playInstantlyButton.action = @selector(playInputItemInstantly:);
+    self.playInstantlyButton.target = self;
+}
+
+- (NSImage *)imageForInputItem
+{
+    NSImage *image;
+    if (_representedInputItem.inputType == ITEM_TYPE_DIRECTORY) {
+        image = [NSImage imageNamed:NSImageNameFolder];
+    }
+
+    if (!image) {
+        image = [NSImage imageNamed: @"noart.png"];
+    }
+    return image;
+}
+
+- (void)playMediaItemInstantly:(id)sender
+{
+    [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:_representedMediaItem playImmediately:YES];
+}
+
+- (void)playInputItemInstantly:(id)sender
+{
+    [[[VLCMain sharedInstance] playlistController] addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:YES];
 }
 
 @end

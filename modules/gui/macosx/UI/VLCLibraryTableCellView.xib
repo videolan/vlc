@@ -62,9 +62,6 @@
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
-                    <connections>
-                        <action selector="playInstantly:" target="c22-O7-iKe" id="Isu-g1-2RI"/>
-                    </connections>
                 </button>
             </subviews>
             <constraints>

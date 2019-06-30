@@ -23,6 +23,7 @@
 #import "VLCMediaSourceDataSource.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryTableCellView.h"
 #import "media-source/VLCMediaSourceCollectionViewItem.h"
 #import "media-source/VLCMediaSource.h"
 #import "main/VLCMain.h"
@@ -33,7 +34,6 @@
 @interface VLCMediaSourceDataSource()
 {
     VLCInputItem *_childRootInput;
-    VLCMediaSourceDataSource *_childDataSource;
 }
 @end
 
@@ -46,6 +46,14 @@
     _childRootInput = _nodeToDisplay.inputItem;
     [self.displayedMediaSource preparseInputItemWithinTree:_childRootInput];
 }
+
+- (void)setupViews
+{
+    [self.tableView setDoubleAction:@selector(tableViewAction:)];
+    [self.tableView setTarget:self];
+}
+
+#pragma mark - collection view data source and delegation
 
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
 {
@@ -86,17 +94,100 @@
     VLCInputNode *rootNode = self.nodeToDisplay;
     NSArray *nodeChildren = rootNode.children;
     VLCInputNode *childNode = nodeChildren[indexPath.item];
+
+    [self performActionForNode:childNode allowPlayback:YES];
+}
+
+#pragma mark - table view data source and delegation
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    if (_nodeToDisplay) {
+        return _nodeToDisplay.numberOfChildren;
+    }
+
+    return 0;
+}
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:@"VLCMediaSourceTableViewCellIdentifier" owner:self];
+
+    if (cellView == nil) {
+        /* the following code saves us an instance of NSViewController which we don't need */
+        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCLibraryTableCellView" bundle:nil];
+        NSArray *topLevelObjects;
+        if (![nib instantiateWithOwner:self topLevelObjects:&topLevelObjects]) {
+            NSAssert(1, @"Failed to load nib file to show audio library items");
+            return nil;
+        }
+
+        for (id topLevelObject in topLevelObjects) {
+            if ([topLevelObject isKindOfClass:[VLCLibraryTableCellView class]]) {
+                cellView = topLevelObject;
+                break;
+            }
+        }
+        cellView.identifier = @"VLCMediaSourceTableViewCellIdentifier";
+    }
+
+    VLCInputNode *rootNode = _nodeToDisplay;
+    NSArray *nodeChildren = rootNode.children;
+    VLCInputNode *childNode = nodeChildren[row];
     VLCInputItem *childRootInput = childNode.inputItem;
+    cellView.representedInputItem = childRootInput;
+
+    return cellView;
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    NSInteger selectedIndex = self.tableView.selectedRow;
+    if (selectedIndex < 0) {
+        return;
+    }
+    VLCInputNode *rootNode = self.nodeToDisplay;
+    NSArray *nodeChildren = rootNode.children;
+    VLCInputNode *childNode = nodeChildren[selectedIndex];
+
+    [self performActionForNode:childNode allowPlayback:NO];
+}
+
+- (void)tableViewAction:(id)sender
+{
+    NSInteger selectedIndex = self.tableView.selectedRow;
+    if (selectedIndex < 0) {
+        return;
+    }
+
+    VLCInputNode *rootNode = self.nodeToDisplay;
+    NSArray *nodeChildren = rootNode.children;
+    VLCInputNode *childNode = nodeChildren[selectedIndex];
+
+    [self performActionForNode:childNode allowPlayback:YES];
+}
+
+#pragma mark - generic actions
+
+- (void)performActionForNode:(VLCInputNode *)node allowPlayback:(BOOL)allowPlayback
+{
+    VLCInputItem *childRootInput = node.inputItem;
 
     if (childRootInput.inputType == ITEM_TYPE_DIRECTORY || childRootInput.inputType == ITEM_TYPE_NODE) {
         self.pathControl.URL = [NSURL URLWithString:[self.pathControl.URL.path stringByAppendingPathComponent:[childRootInput.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
-        self.nodeToDisplay = childNode;
-        [self.collectionView reloadData];
-    } else if (childRootInput.inputType == ITEM_TYPE_FILE) {
+        self.nodeToDisplay = node;
+        [self reloadData];
+    } else if (childRootInput.inputType == ITEM_TYPE_FILE && allowPlayback) {
         [[[VLCMain sharedInstance] playlistController] addInputItem:childRootInput.vlcInputItem atPosition:-1 startPlayback:YES];
+    }
+}
+
+- (void)reloadData
+{
+    if (_gridViewMode) {
+        [self.collectionView reloadData];
     } else {
-        NSAssert(1, @"unhandled input type when browsing media source hierarchy %i", childRootInput.inputType);
-        msg_Warn(getIntf(), "unhandled input type when browsing media source hierarchy %i", childRootInput.inputType);
+        [self.tableView reloadData];
     }
 }
 

@@ -31,12 +31,17 @@
 #import "main/VLCMain.h"
 #import "views/VLCImageView.h"
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryTableCellView.h"
 #import "extensions/NSString+Helpers.h"
 
-@interface VLCMediaSourceBaseDataSource () <NSCollectionViewDataSource, NSCollectionViewDelegate>
+NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellIdentifier";
+
+@interface VLCMediaSourceBaseDataSource () <NSCollectionViewDataSource, NSCollectionViewDelegate, NSTableViewDelegate, NSTableViewDataSource>
 {
     NSArray *_mediaSources;
     VLCMediaSourceDataSource *_childDataSource;
+    NSArray *_discoveredLANdevices;
+    BOOL _gridViewMode;
 }
 @end
 
@@ -69,6 +74,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+#pragma mark - view and model state management
+
 - (void)setupViews
 {
     self.collectionView.dataSource = self;
@@ -79,6 +86,15 @@
     self.homeButton.action = @selector(homeButtonAction:);
     self.homeButton.target = self;
     self.pathControl.URL = nil;
+
+    self.gridVsListSegmentedControl.action = @selector(switchGripOrListMode:);
+    self.gridVsListSegmentedControl.target = self;
+    self.gridVsListSegmentedControl.selectedSegment = 0;
+
+    self.tableView.dataSource = self;
+    self.tableView.delegate = self;
+    self.tableView.hidden = YES;
+    _gridViewMode = YES;
 }
 
 - (void)loadMediaSources
@@ -108,6 +124,8 @@
     [self loadMediaSources];
     [self homeButtonAction:nil];
 }
+
+#pragma mark - collection view data source
 
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
 {
@@ -168,7 +186,6 @@
 
     VLCMediaSource *mediaSource;
     VLCInputNode *childNode;
-    _childDataSource = [[VLCMediaSourceDataSource alloc] init];
 
     if (_mediaSourceMode == VLCMediaSourceModeLAN) {
         mediaSource = _mediaSources[indexPath.section];
@@ -180,25 +197,155 @@
         childNode = mediaSource.rootNode;
     }
 
-    VLCInputItem *childRootInput = childNode.inputItem;
-    self.pathControl.URL = [NSURL URLWithString:[NSString stringWithFormat:@"vlc://%@", [childRootInput.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
+    [self configureChildDataSourceWithNode:childNode andMediaSource:mediaSource];
+
+    [self reloadData];
+}
+
+#pragma mark - table view data source and delegation
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+        /* for LAN, we don't show the root items but the top items, which may change any time through a callback
+         * so we don't run into conflicts, we compile a list of the currently known here and propose that
+         * as the truth to the table view. For collection view, we use sections which can be reloaded individually,
+         * so the problem is well hidden and does not need this work-around */
+        _discoveredLANdevices = nil;
+        NSMutableArray *currentDevices;
+        @synchronized (_mediaSources) {
+            NSInteger mediaSourceCount = _mediaSources.count;
+            currentDevices = [[NSMutableArray alloc] initWithCapacity:mediaSourceCount];
+            for (NSUInteger x = 0; x < mediaSourceCount; x++) {
+                VLCMediaSource *mediaSource = _mediaSources[x];
+                VLCInputNode *rootNode = mediaSource.rootNode;
+                [currentDevices addObjectsFromArray:rootNode.children];
+            }
+        }
+        _discoveredLANdevices = [currentDevices copy];
+        return _discoveredLANdevices.count;
+    }
+
+    return _mediaSources.count;
+}
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:VLCMediaSourceTableViewCellIdentifier owner:self];
+
+    if (cellView == nil) {
+        /* the following code saves us an instance of NSViewController which we don't need */
+        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCLibraryTableCellView" bundle:nil];
+        NSArray *topLevelObjects;
+        if (![nib instantiateWithOwner:self topLevelObjects:&topLevelObjects]) {
+            NSAssert(1, @"Failed to load nib file to show audio library items");
+            return nil;
+        }
+
+        for (id topLevelObject in topLevelObjects) {
+            if ([topLevelObject isKindOfClass:[VLCLibraryTableCellView class]]) {
+                cellView = topLevelObject;
+                break;
+            }
+        }
+        cellView.identifier = VLCMediaSourceTableViewCellIdentifier;
+    }
+    cellView.primaryTitleTextField.hidden = YES;
+    cellView.secondaryTitleTextField.hidden = YES;
+    cellView.singlePrimaryTitleTextField.hidden = NO;
+
+    if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+        VLCInputNode *currentNode = _discoveredLANdevices[row];
+        VLCInputItem *currentNodeInput = currentNode.inputItem;
+
+        NSURL *artworkURL = currentNodeInput.artworkURL;
+        NSImage *placeholder = [NSImage imageNamed:@"NXdefaultappicon"];
+        if (artworkURL) {
+            [cellView.representedImageView setImageURL:artworkURL placeholderImage:placeholder];
+        } else {
+            cellView.representedImageView.image = placeholder;
+        }
+
+        cellView.singlePrimaryTitleTextField.stringValue = currentNodeInput.name;
+    } else {
+        VLCMediaSource *mediaSource = _mediaSources[row];
+        cellView.singlePrimaryTitleTextField.stringValue = mediaSource.mediaSourceDescription;
+        cellView.representedImageView.image = [NSImage imageNamed:@"NXFollow"];
+    }
+
+    return cellView;
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    NSInteger selectedRow = self.tableView.selectedRow;
+    if (selectedRow < 0) {
+        return;
+    }
+
+    VLCMediaSource *mediaSource = _mediaSources[selectedRow];;
+    VLCInputNode *childNode;
+    if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+        childNode = _discoveredLANdevices[selectedRow];
+    } else {
+        childNode = mediaSource.rootNode;
+    }
+    [self configureChildDataSourceWithNode:childNode andMediaSource:mediaSource];
+
+    [self reloadData];
+}
+
+#pragma mark - glue code
+
+- (void)configureChildDataSourceWithNode:(VLCInputNode *)node andMediaSource:(VLCMediaSource *)mediaSource
+{
+    _childDataSource = [[VLCMediaSourceDataSource alloc] init];
+
+    VLCInputItem *nodeInput = node.inputItem;
+    self.pathControl.URL = [NSURL URLWithString:[NSString stringWithFormat:@"vlc://%@", [nodeInput.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
 
     _childDataSource.displayedMediaSource = mediaSource;
-    _childDataSource.nodeToDisplay = childNode;
+    _childDataSource.nodeToDisplay = node;
     _childDataSource.collectionView = self.collectionView;
     _childDataSource.pathControl = self.pathControl;
+    _childDataSource.tableView = self.tableView;
+    [_childDataSource setupViews];
 
     self.collectionView.dataSource = _childDataSource;
     self.collectionView.delegate = _childDataSource;
-    [self.collectionView reloadData];
+
+    self.tableView.dataSource = _childDataSource;
+    self.tableView.delegate = _childDataSource;
 }
 
-- (IBAction)homeButtonAction:(id)sender
+#pragma mark - user interaction with generic buttons
+
+- (void)homeButtonAction:(id)sender
 {
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
-    [self.collectionView reloadData];
+    self.tableView.dataSource = self;
+    self.tableView.delegate = self;
+
     _childDataSource = nil;
+
+    [self reloadData];
+}
+
+- (void)switchGripOrListMode:(id)sender
+{
+    _gridViewMode = !_gridViewMode;
+    _childDataSource.gridViewMode = _gridViewMode;
+
+    if (_gridViewMode) {
+        self.collectionViewScrollView.hidden = NO;
+        self.tableView.hidden = YES;
+        [self.collectionView reloadData];
+    } else {
+        self.collectionViewScrollView.hidden = YES;
+        self.tableView.hidden = NO;
+        [self.tableView reloadData];
+    }
 }
 
 #pragma mark - VLCMediaSource Delegation
@@ -223,11 +370,24 @@
 
 - (void)reloadDataForNotification:(NSNotification *)aNotification
 {
-    if (self.collectionView.dataSource == self) {
-        NSInteger index = [_mediaSources indexOfObject:aNotification.object];
-        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:index]];
+    if (_gridViewMode) {
+        if (self.collectionView.dataSource == self) {
+            NSInteger index = [_mediaSources indexOfObject:aNotification.object];
+            [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:index]];
+        } else {
+            [self.collectionView reloadData];
+        }
     } else {
+        [self.tableView reloadData];
+    }
+}
+
+- (void)reloadData
+{
+    if (_gridViewMode) {
         [self.collectionView reloadData];
+    } else {
+        [self.tableView reloadData];
     }
 }
 
