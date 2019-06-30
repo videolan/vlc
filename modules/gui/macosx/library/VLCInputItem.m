@@ -22,7 +22,46 @@
 
 #import "VLCInputItem.h"
 
+#import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
+
+NSString *VLCInputItemParsingSucceeded = @"VLCInputItemParsingSucceeded";
+NSString *VLCInputItemParsingFailed = @"VLCInputItemParsingFailed";
+NSString *VLCInputItemSubtreeAdded = @"VLCInputItemSubtreeAdded";
+
+@interface VLCInputItem()
+{
+    input_item_parser_id_t *_p_parserID;
+}
+
+- (void)parsingEnded:(int)status;
+- (void)subTreeAdded:(input_item_node_t *)p_node;
+
+@end
+
+static void cb_parsing_ended(input_item_t *p_item, int status, void *p_data)
+{
+    VLC_UNUSED(p_item);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCInputItem *inputItem = (__bridge VLCInputItem *)p_data;
+        [inputItem parsingEnded:status];
+    });
+}
+
+static void cb_subtree_added(input_item_t *p_item, input_item_node_t *p_node, void *p_data)
+{
+    VLC_UNUSED(p_item);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCInputItem *inputItem = (__bridge VLCInputItem *)p_data;
+        [inputItem subTreeAdded:p_node];
+    });
+}
+
+static const struct input_item_parser_cbs_t parserCallbacks =
+{
+    cb_parsing_ended,
+    cb_subtree_added,
+};
 
 @implementation VLCInputItem
 
@@ -38,6 +77,9 @@
 
 - (void)dealloc
 {
+    if (_p_parserID) {
+        input_item_parser_id_Release(_p_parserID);
+    }
     input_item_Release(_vlcInputItem);
 }
 
@@ -71,6 +113,39 @@
         return _vlcInputItem->i_type;
     }
     return ITEM_TYPE_UNKNOWN;
+}
+
+- (void)parseInputItem
+{
+    _p_parserID = input_item_Parse(_vlcInputItem,
+                                   (vlc_object_t *)getIntf(),
+                                   &parserCallbacks,
+                                   (__bridge void *) self);
+}
+
+- (void)cancelParsing
+{
+    if (_p_parserID) {
+        input_item_parser_id_Interrupt(_p_parserID);
+    }
+}
+
+- (void)parsingEnded:(int)status
+{
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    if (status) {
+        [notificationCenter postNotificationName:VLCInputItemParsingSucceeded object:self];
+    } else {
+        [notificationCenter postNotificationName:VLCInputItemParsingFailed object:self];
+    }
+    input_item_parser_id_Release(_p_parserID);
+    _p_parserID = NULL;
+}
+
+- (void)subTreeAdded:(input_item_node_t *)p_node
+{
+    _subTree = p_node;
+    [[NSNotificationCenter defaultCenter] postNotificationName:VLCInputItemSubtreeAdded object:self];
 }
 
 @end

@@ -28,6 +28,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString *VLCInputItemParsingSucceeded;
+extern NSString *VLCInputItemParsingFailed;
+extern NSString *VLCInputItemSubtreeAdded;
+
 @interface VLCInputItem : NSObject
 
 - (instancetype)initWithInputItem:(struct input_item_t *)p_inputItem;
@@ -37,6 +41,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSString *MRL;
 @property (readonly) vlc_tick_t duration;
 @property (readonly) enum input_item_type_e inputType;
+@property (readonly) struct input_item_node_t *subTree;
+
+- (void)parseInputItem;
+- (void)cancelParsing;
 
 @end
 
