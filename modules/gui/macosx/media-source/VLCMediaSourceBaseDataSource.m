@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaSourceDataSource.m: MacOS X interface module
+ * VLCMediaSourceBaseDataSource.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCMediaSourceDataSource.h"
+#import "VLCMediaSourceBaseDataSource.h"
 
 #import "media-source/VLCMediaSourceProvider.h"
 #import "media-source/VLCMediaSource.h"
@@ -30,13 +30,13 @@
 #import "library/VLCInputItem.h"
 #import "extensions/NSString+Helpers.h"
 
-@interface VLCMediaSourceDataSource ()
+@interface VLCMediaSourceBaseDataSource ()
 {
     NSArray *_mediaSources;
 }
 @end
 
-@implementation VLCMediaSourceDataSource
+@implementation VLCMediaSourceBaseDataSource
 
 - (instancetype)init
 {

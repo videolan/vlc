@@ -23,7 +23,7 @@
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="W1M-0o-qYG">
-                        <rect key="frame" x="212" y="333" width="56" height="23"/>
+                        <rect key="frame" x="211.5" y="333" width="57" height="23"/>
                         <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedRounded" trackingMode="selectOne" id="Twg-gp-8ng">
                             <font key="font" metaFont="system"/>
                             <segments>
@@ -523,7 +523,8 @@
                 <outlet property="libraryTargetView" destination="iSp-bV-w6B" id="a94-ux-wUc"/>
                 <outlet property="mainSplitView" destination="u8g-jy-S4e" id="lI5-wR-kef"/>
                 <outlet property="mediaSourceCollectionView" destination="r7v-GI-W1U" id="3JJ-GU-o5o"/>
-                <outlet property="mediaSourceScrollView" destination="cFG-c9-cI9" id="gRO-Y7-kdb"/>
+                <outlet property="mediaSourcePathControl" destination="Rjk-Q6-FYy" id="G63-NM-Ekn"/>
+                <outlet property="mediaSourceView" destination="eHd-Q9-F8D" id="gfU-Jp-eFr"/>
                 <outlet property="openMediaButton" destination="SWh-4E-Qtf" id="sIZ-xo-GLA"/>
                 <outlet property="playlistCounterTextField" destination="mbV-My-cm7" id="ZYU-Jq-Z8R"/>
                 <outlet property="playlistDragDropView" destination="VFI-oW-dMZ" id="gVc-mu-f8T"/>
@@ -637,32 +638,6 @@
             </customSpacing>
             <point key="canvasLocation" x="585" y="10"/>
         </stackView>
-        <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="cFG-c9-cI9">
-            <rect key="frame" x="0.0" y="0.0" width="242" height="291"/>
-            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-            <clipView key="contentView" id="tI4-x3-55j">
-                <rect key="frame" x="0.0" y="0.0" width="242" height="291"/>
-                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                <subviews>
-                    <collectionView id="r7v-GI-W1U">
-                        <rect key="frame" x="0.0" y="0.0" width="242" height="291"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                        <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="v0C-1b-7Ss">
-                            <size key="itemSize" width="210" height="150"/>
-                        </collectionViewFlowLayout>
-                        <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </collectionView>
-                </subviews>
-            </clipView>
-            <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="WUt-1y-tQd">
-                <rect key="frame" x="-100" y="-100" width="240" height="16"/>
-                <autoresizingMask key="autoresizingMask"/>
-            </scroller>
-            <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="247-FY-ZXk">
-                <rect key="frame" x="226" y="0.0" width="16" height="291"/>
-                <autoresizingMask key="autoresizingMask"/>
-            </scroller>
-        </scrollView>
         <splitView dividerStyle="thin" vertical="YES" id="llh-BF-BEJ">
             <rect key="frame" x="0.0" y="0.0" width="508" height="327"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -893,8 +868,69 @@
             </constraints>
             <point key="canvasLocation" x="247" y="771"/>
         </customView>
+        <customView id="eHd-Q9-F8D">
+            <rect key="frame" x="0.0" y="0.0" width="528" height="307"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cFG-c9-cI9">
+                    <rect key="frame" x="0.0" y="0.0" width="528" height="267"/>
+                    <clipView key="contentView" id="tI4-x3-55j">
+                        <rect key="frame" x="0.0" y="0.0" width="528" height="267"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView id="r7v-GI-W1U">
+                                <rect key="frame" x="0.0" y="0.0" width="528" height="267"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="v0C-1b-7Ss">
+                                    <size key="itemSize" width="210" height="150"/>
+                                </collectionViewFlowLayout>
+                                <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </collectionView>
+                        </subviews>
+                    </clipView>
+                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="WUt-1y-tQd">
+                        <rect key="frame" x="-100" y="-100" width="240" height="16"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="247-FY-ZXk">
+                        <rect key="frame" x="441" y="0.0" width="16" height="267"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                </scrollView>
+                <pathControl verticalHuggingPriority="750" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rjk-Q6-FYy">
+                    <rect key="frame" x="46" y="277" width="472" height="20"/>
+                    <pathCell key="cell" controlSize="small" selectable="YES" editable="YES" alignment="left" id="kIb-Jz-eus">
+                        <font key="font" metaFont="smallSystem"/>
+                        <url key="url" string="file://localhost/Applications/"/>
+                    </pathCell>
+                </pathControl>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jfA-Vr-sQc">
+                    <rect key="frame" x="5" y="272" width="36" height="27"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="26" id="bRL-Fs-cKa"/>
+                    </constraints>
+                    <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSHomeTemplate" imagePosition="only" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OHf-j4-3In">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                </button>
+            </subviews>
+            <constraints>
+                <constraint firstItem="Rjk-Q6-FYy" firstAttribute="leading" secondItem="jfA-Vr-sQc" secondAttribute="trailing" constant="10" id="1OY-9N-uuV"/>
+                <constraint firstAttribute="bottom" secondItem="cFG-c9-cI9" secondAttribute="bottom" id="DjO-Ru-7sa"/>
+                <constraint firstItem="cFG-c9-cI9" firstAttribute="top" secondItem="Rjk-Q6-FYy" secondAttribute="bottom" constant="10" id="Lji-yk-wiI"/>
+                <constraint firstItem="Rjk-Q6-FYy" firstAttribute="top" secondItem="eHd-Q9-F8D" secondAttribute="top" constant="10" id="Sf6-jz-ool"/>
+                <constraint firstItem="jfA-Vr-sQc" firstAttribute="centerY" secondItem="Rjk-Q6-FYy" secondAttribute="centerY" id="aFD-99-R3a"/>
+                <constraint firstAttribute="trailing" secondItem="Rjk-Q6-FYy" secondAttribute="trailing" constant="10" id="c3j-mQ-afF"/>
+                <constraint firstItem="jfA-Vr-sQc" firstAttribute="leading" secondItem="eHd-Q9-F8D" secondAttribute="leading" constant="10" id="saP-eI-VDF"/>
+                <constraint firstAttribute="trailing" secondItem="cFG-c9-cI9" secondAttribute="trailing" id="vkQ-o0-jz4"/>
+                <constraint firstItem="cFG-c9-cI9" firstAttribute="leading" secondItem="eHd-Q9-F8D" secondAttribute="leading" id="vq6-rW-p6Q"/>
+            </constraints>
+            <point key="canvasLocation" x="144" y="161.5"/>
+        </customView>
     </objects>
     <resources>
+        <image name="NSHomeTemplate" width="14" height="14"/>
         <image name="NSIconViewTemplate" width="14" height="10"/>
         <image name="NSLeftFacingTriangleTemplate" width="9" height="12"/>
         <image name="NSListViewTemplate" width="14" height="10"/>

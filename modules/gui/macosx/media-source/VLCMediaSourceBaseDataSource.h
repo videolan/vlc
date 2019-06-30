@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaSourceDataSource.h: MacOS X interface module
+ * VLCMediaSourceBaseDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -22,16 +22,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-typedef NS_ENUM(NSInteger, VLCMediaSourceMode) {
-    VLCMediaSourceModeLAN,
-    VLCMediaSourceModeInternet,
-};
-
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCMediaSourceDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
+@interface VLCMediaSourceBaseDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
 
 @property (readwrite) NSCollectionView *collectionView;
+@property (readwrite) NSButton *homeButton;
+@property (readwrite) NSPathControl *pathControl;
 
 - (void)loadMediaSources;
 

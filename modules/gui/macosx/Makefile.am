@@ -89,10 +89,10 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/main/macosx.m \
 	gui/macosx/media-source/VLCMediaSource.h \
 	gui/macosx/media-source/VLCMediaSource.m \
+	gui/macosx/media-source/VLCMediaSourceBaseDataSource.h \
+	gui/macosx/media-source/VLCMediaSourceBaseDataSource.m \
 	gui/macosx/media-source/VLCMediaSourceCollectionViewItem.h \
 	gui/macosx/media-source/VLCMediaSourceCollectionViewItem.m \
-	gui/macosx/media-source/VLCMediaSourceDataSource.h \
-	gui/macosx/media-source/VLCMediaSourceDataSource.m \
 	gui/macosx/media-source/VLCMediaSourceProvider.h \
 	gui/macosx/media-source/VLCMediaSourceProvider.m \
 	gui/macosx/menus/VLCMainMenu.h \

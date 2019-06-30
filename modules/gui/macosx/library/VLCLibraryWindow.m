@@ -42,7 +42,7 @@
 #import "library/VLCLibrarySortingMenuController.h"
 
 #import "media-source/VLCMediaSourceCollectionViewItem.h"
-#import "media-source/VLCMediaSourceDataSource.h"
+#import "media-source/VLCMediaSourceBaseDataSource.h"
 
 #import "views/VLCDragDropView.h"
 #import "views/VLCRoundedCornerTextField.h"
@@ -72,7 +72,7 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
     VLCLibraryAudioDataSource *_libraryAudioDataSource;
     VLCLibraryGroupDataSource *_libraryAudioGroupDataSource;
     VLCLibrarySortingMenuController *_librarySortingMenuController;
-    VLCMediaSourceDataSource *_mediaSourceDataSource;
+    VLCMediaSourceBaseDataSource *_mediaSourceDataSource;
     VLCLibraryAlternativeAudioViewController *_alternativeAudioViewController;
     VLCPlaylistSortingMenuController *_playlistSortingMenuController;
 
@@ -236,8 +236,10 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     _audioGroupSelectionTableView.delegate = _libraryAudioGroupDataSource;
     _audioGroupSelectionTableView.rowHeight = 450.;
 
-    _mediaSourceDataSource = [[VLCMediaSourceDataSource alloc] init];
+    _mediaSourceDataSource = [[VLCMediaSourceBaseDataSource alloc] init];
     _mediaSourceDataSource.collectionView = _mediaSourceCollectionView;
+    _mediaSourceDataSource.homeButton = _mediaSourceHomeButton;
+    _mediaSourceDataSource.pathControl = _mediaSourcePathControl;
     _mediaSourceCollectionView.dataSource = _mediaSourceDataSource;
     _mediaSourceCollectionView.delegate = _mediaSourceDataSource;
     [_mediaSourceCollectionView registerClass:[VLCMediaSourceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceCellIdentifier];
@@ -361,8 +363,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 {
     switch (_segmentedTitleControl.selectedSegment) {
         case 0:
-            if (_mediaSourceScrollView.superview != nil) {
-                [_mediaSourceScrollView removeFromSuperview];
+            if (_mediaSourceView.superview != nil) {
+                [_mediaSourceView removeFromSuperview];
             }
             if (_audioLibrarySplitView.superview != nil) {
                 [_audioLibrarySplitView removeFromSuperview];
@@ -382,8 +384,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
             break;
 
         case 1:
-            if (_mediaSourceScrollView.superview != nil) {
-                [_mediaSourceScrollView removeFromSuperview];
+            if (_mediaSourceView.superview != nil) {
+                [_mediaSourceView removeFromSuperview];
             }
             if (_videoLibraryStackView.superview != nil) {
                 [_videoLibraryStackView removeFromSuperview];
@@ -403,8 +405,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
             break;
 
         case 2:
-            if (_mediaSourceScrollView.superview != nil) {
-                [_mediaSourceScrollView removeFromSuperview];
+            if (_mediaSourceView.superview != nil) {
+                [_mediaSourceView removeFromSuperview];
             }
             if (_videoLibraryStackView.superview != nil) {
                 [_videoLibraryStackView removeFromSuperview];
@@ -432,12 +434,12 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
             if (_alternativeAudioView.superview != nil) {
                 [_alternativeAudioView removeFromSuperview];
             }
-            if (_mediaSourceScrollView.superview == nil) {
-                _mediaSourceScrollView.translatesAutoresizingMaskIntoConstraints = NO;
-                [_libraryTargetView addSubview:_mediaSourceScrollView];
-                NSDictionary *dict = NSDictionaryOfVariableBindings(_mediaSourceScrollView);
-                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_mediaSourceScrollView(>=572.)]|" options:0 metrics:0 views:dict]];
-                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_mediaSourceScrollView(>=444.)]|" options:0 metrics:0 views:dict]];
+            if (_mediaSourceView.superview == nil) {
+                _mediaSourceView.translatesAutoresizingMaskIntoConstraints = NO;
+                [_libraryTargetView addSubview:_mediaSourceView];
+                NSDictionary *dict = NSDictionaryOfVariableBindings(_mediaSourceView);
+                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_mediaSourceView(>=572.)]|" options:0 metrics:0 views:dict]];
+                [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_mediaSourceView(>=444.)]|" options:0 metrics:0 views:dict]];
             }
             [_mediaSourceDataSource loadMediaSources];
             [_mediaSourceCollectionView reloadData];
