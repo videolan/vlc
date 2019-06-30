@@ -378,6 +378,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
             }
             [_videoLibraryCollectionView reloadData];
             [_recentVideoLibraryCollectionView reloadData];
+            _librarySortButton.hidden = NO;
+            _alternativeAudioSegmentedControl.hidden = YES;
             break;
 
         case 1:
@@ -399,6 +401,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
             }
             [_audioCategorySelectionTableView reloadData];
             [_audioCollectionSelectionTableView reloadData];
+            _librarySortButton.hidden = NO;
+            _alternativeAudioSegmentedControl.hidden = NO;
             break;
 
         case 2:
@@ -419,6 +423,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
                 [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_alternativeAudioView(>=444.)]|" options:0 metrics:0 views:dict]];
             }
             [_alternativeAudioViewController reloadAppearance];
+            _librarySortButton.hidden = NO;
+            _alternativeAudioSegmentedControl.hidden = NO;
             break;
 
         default:
@@ -438,8 +444,9 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
                 [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_mediaSourceView(>=572.)]|" options:0 metrics:0 views:dict]];
                 [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_mediaSourceView(>=444.)]|" options:0 metrics:0 views:dict]];
             }
-            [_mediaSourceDataSource loadMediaSources];
-            [_mediaSourceCollectionView reloadData];
+            _mediaSourceDataSource.mediaSourceMode = _segmentedTitleControl.selectedSegment == 3 ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
+            _librarySortButton.hidden = YES;
+            _alternativeAudioSegmentedControl.hidden = YES;
             break;
     }
 }

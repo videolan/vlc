@@ -88,7 +88,7 @@
     VLCInputNode *childNode = nodeChildren[indexPath.item];
     VLCInputItem *childRootInput = childNode.inputItem;
 
-    if (childRootInput.inputType == ITEM_TYPE_DIRECTORY) {
+    if (childRootInput.inputType == ITEM_TYPE_DIRECTORY || childRootInput.inputType == ITEM_TYPE_NODE) {
         self.pathControl.URL = [NSURL URLWithString:[self.pathControl.URL.path stringByAppendingPathComponent:[childRootInput.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
         self.nodeToDisplay = childNode;
         [self.collectionView reloadData];

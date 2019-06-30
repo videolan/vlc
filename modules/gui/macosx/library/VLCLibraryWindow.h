@@ -63,6 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSView *alternativeAudioView;
 @property (readwrite, weak) IBOutlet NSCollectionView *alternativeAudioCollectionView;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *alternativeAudioSegmentedControl;
+@property (readwrite, weak) IBOutlet NSButton *librarySortButton;
 
 @property (readonly) BOOL nativeFullscreenMode;
 @property (readwrite) BOOL nonembedded;

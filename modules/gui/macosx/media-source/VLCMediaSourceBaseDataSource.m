@@ -83,30 +83,51 @@
 
 - (void)loadMediaSources
 {
-    NSArray *mediaSourcesOnLAN = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_LAN];
-    NSUInteger count = mediaSourcesOnLAN.count;
+    self.pathControl.URL = nil;
+    NSArray *mediaSources;
+    if (self.mediaSourceMode == VLCMediaSourceModeLAN) {
+        mediaSources = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_LAN];
+    } else {
+        mediaSources = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_INTERNET];
+    }
+    NSUInteger count = mediaSources.count;
     if (count > 0) {
         for (NSUInteger x = 0; x < count; x++) {
-            VLCMediaSource *mediaSource = mediaSourcesOnLAN[x];
+            VLCMediaSource *mediaSource = mediaSources[x];
             VLCInputNode *rootNode = [mediaSource rootNode];
             [mediaSource preparseInputItemWithinTree:rootNode.inputItem];
         }
     }
-    _mediaSources = mediaSourcesOnLAN;
+    _mediaSources = mediaSources;
     [self.collectionView reloadData];
+}
+
+- (void)setMediaSourceMode:(VLCMediaSourceMode)mediaSourceMode
+{
+    _mediaSourceMode = mediaSourceMode;
+    [self loadMediaSources];
+    [self homeButtonAction:nil];
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
 {
-    return _mediaSources.count;
+    if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+        return _mediaSources.count;
+    }
+
+    return 1;
 }
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
 {
-    VLCMediaSource *mediaSource = _mediaSources[section];
-    VLCInputNode *rootNode = mediaSource.rootNode;
-    return rootNode.numberOfChildren;
+    if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+        VLCMediaSource *mediaSource = _mediaSources[section];
+        VLCInputNode *rootNode = mediaSource.rootNode;
+        return rootNode.numberOfChildren;
+    }
+
+    return _mediaSources.count;
 }
 
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
@@ -114,19 +135,25 @@
 {
     VLCMediaSourceDeviceCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCMediaSourceDeviceCellIdentifier forIndexPath:indexPath];
 
-    VLCMediaSource *mediaSource = _mediaSources[indexPath.section];
-    VLCInputNode *rootNode = mediaSource.rootNode;
-    NSArray *nodeChildren = rootNode.children;
-    VLCInputNode *childNode = nodeChildren[indexPath.item];
-    VLCInputItem *childRootInput = childNode.inputItem;
-    viewItem.titleTextField.stringValue = childRootInput.name;
+    if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+        VLCMediaSource *mediaSource = _mediaSources[indexPath.section];
+        VLCInputNode *rootNode = mediaSource.rootNode;
+        NSArray *nodeChildren = rootNode.children;
+        VLCInputNode *childNode = nodeChildren[indexPath.item];
+        VLCInputItem *childRootInput = childNode.inputItem;
+        viewItem.titleTextField.stringValue = childRootInput.name;
 
-    NSURL *artworkURL = childRootInput.artworkURL;
-    NSImage *placeholder = [NSImage imageNamed:@"NSApplicationIcon"];
-    if (artworkURL) {
-        [viewItem.mediaImageView setImageURL:artworkURL placeholderImage:placeholder];
+        NSURL *artworkURL = childRootInput.artworkURL;
+        NSImage *placeholder = [NSImage imageNamed:@"NXdefaultappicon"];
+        if (artworkURL) {
+            [viewItem.mediaImageView setImageURL:artworkURL placeholderImage:placeholder];
+        } else {
+            viewItem.mediaImageView.image = placeholder;
+        }
     } else {
-        viewItem.mediaImageView.image = placeholder;
+        VLCMediaSource *mediaSource = _mediaSources[indexPath.item];
+        viewItem.titleTextField.stringValue = mediaSource.mediaSourceDescription;
+        viewItem.mediaImageView.image = [NSImage imageNamed:@"NXFollow"];
     }
 
     return viewItem;
@@ -138,17 +165,29 @@
     if (!indexPath) {
         return;
     }
-    VLCMediaSource *mediaSource = _mediaSources[indexPath.section];
-    VLCInputNode *rootNode = mediaSource.rootNode;
-    NSArray *nodeChildren = rootNode.children;
-    VLCInputNode *childNode = nodeChildren[indexPath.item];
+
+    VLCMediaSource *mediaSource;
+    VLCInputNode *childNode;
+    _childDataSource = [[VLCMediaSourceDataSource alloc] init];
+
+    if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+        mediaSource = _mediaSources[indexPath.section];
+        VLCInputNode *rootNode = mediaSource.rootNode;
+        NSArray *nodeChildren = rootNode.children;
+        childNode = nodeChildren[indexPath.item];
+    } else {
+        mediaSource = _mediaSources[indexPath.item];
+        childNode = mediaSource.rootNode;
+    }
+
     VLCInputItem *childRootInput = childNode.inputItem;
     self.pathControl.URL = [NSURL URLWithString:[NSString stringWithFormat:@"vlc://%@", [childRootInput.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
-    _childDataSource = [[VLCMediaSourceDataSource alloc] init];
+
     _childDataSource.displayedMediaSource = mediaSource;
     _childDataSource.nodeToDisplay = childNode;
     _childDataSource.collectionView = self.collectionView;
     _childDataSource.pathControl = self.pathControl;
+
     self.collectionView.dataSource = _childDataSource;
     self.collectionView.delegate = _childDataSource;
     [self.collectionView reloadData];

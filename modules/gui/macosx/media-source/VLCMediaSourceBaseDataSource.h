@@ -22,6 +22,11 @@
 
 #import <Cocoa/Cocoa.h>
 
+typedef NS_ENUM(NSInteger, VLCMediaSourceMode) {
+    VLCMediaSourceModeLAN,
+    VLCMediaSourceModeInternet,
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMediaSourceBaseDataSource : NSObject
@@ -29,9 +34,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite) NSCollectionView *collectionView;
 @property (readwrite) NSButton *homeButton;
 @property (readwrite) NSPathControl *pathControl;
+@property (readwrite, nonatomic) VLCMediaSourceMode mediaSourceMode;
 
 - (void)setupViews;
-- (void)loadMediaSources;
 
 @end
 
