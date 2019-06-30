@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCMediaSourceCollectionViewItem">
+            <connections>
+                <outlet property="addToPlaylistButton" destination="Ubz-8I-W2F" id="ywN-PH-QZt"/>
+                <outlet property="annotationTextField" destination="kHQ-HZ-YIi" id="XX9-Sc-oam"/>
+                <outlet property="mediaImageView" destination="2aB-sB-hfY" id="Sv0-G1-KNm"/>
+                <outlet property="mediaTitleTextField" destination="OBS-Eh-1mT" id="h1n-PU-IAx"/>
+                <outlet property="playInstantlyButton" destination="S3I-5Z-qgS" id="VV4-Lu-IMq"/>
+                <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="Hz6-mo-xeY" customClass="VLCTrackingView">
+            <rect key="frame" x="0.0" y="0.0" width="256" height="214"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="2aB-sB-hfY" customClass="VLCImageView">
+                    <rect key="frame" x="0.0" y="32" width="256" height="182"/>
+                    <subviews>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S3I-5Z-qgS">
+                            <rect key="frame" x="96" y="59" width="64" height="64"/>
+                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="libraryPlay" imagePosition="only" alignment="center" inset="2" id="IHP-p1-d0R">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="playInstantly:" target="-2" id="fi3-0G-oEM"/>
+                            </connections>
+                        </button>
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kHQ-HZ-YIi" customClass="VLCRoundedCornerTextField">
+                            <rect key="frame" x="5" y="155" width="37" height="17"/>
+                            <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="F0j-LH-r6g">
+                                <font key="font" metaFont="system"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="kHQ-HZ-YIi" firstAttribute="top" secondItem="2aB-sB-hfY" secondAttribute="top" constant="10" id="1we-Fw-12H"/>
+                        <constraint firstItem="S3I-5Z-qgS" firstAttribute="centerX" secondItem="2aB-sB-hfY" secondAttribute="centerX" id="Seo-tS-piW"/>
+                        <constraint firstItem="S3I-5Z-qgS" firstAttribute="centerY" secondItem="2aB-sB-hfY" secondAttribute="centerY" id="ZWU-oW-OVa"/>
+                        <constraint firstItem="kHQ-HZ-YIi" firstAttribute="leading" secondItem="2aB-sB-hfY" secondAttribute="leading" constant="7" id="s9g-G1-oCF"/>
+                    </constraints>
+                </customView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OBS-Eh-1mT">
+                    <rect key="frame" x="-2" y="4" width="52" height="24"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="24" id="wMC-00-Vuv"/>
+                    </constraints>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" title="Label" usesSingleLineMode="YES" id="7Hy-o3-LvX">
+                        <font key="font" size="20" name=".AppleSystemUIFont"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ubz-8I-W2F">
+                    <rect key="frame" x="222" y="187" width="20" height="20"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="20" id="XhX-7U-Nxj"/>
+                        <constraint firstAttribute="height" constant="20" id="ZDT-YM-Cbr"/>
+                    </constraints>
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ellipsis" imagePosition="only" alignment="center" inset="2" id="6ko-MM-ds0">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="addToPlaylist:" target="-2" id="Lxc-A8-UMA"/>
+                    </connections>
+                </button>
+            </subviews>
+            <constraints>
+                <constraint firstItem="2aB-sB-hfY" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="3Ah-0T-rA9"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="OBS-Eh-1mT" secondAttribute="trailing" id="457-oy-EbD"/>
+                <constraint firstItem="Ubz-8I-W2F" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="7" id="8Qf-Un-Gdl"/>
+                <constraint firstAttribute="trailing" secondItem="Ubz-8I-W2F" secondAttribute="trailing" constant="14" id="ZVz-SL-rxZ"/>
+                <constraint firstAttribute="bottom" secondItem="OBS-Eh-1mT" secondAttribute="bottom" constant="4" id="d6E-7J-S2d"/>
+                <constraint firstAttribute="trailing" secondItem="2aB-sB-hfY" secondAttribute="trailing" id="oZw-Ab-83p"/>
+                <constraint firstItem="2aB-sB-hfY" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="t9g-tX-AQX"/>
+                <constraint firstItem="OBS-Eh-1mT" firstAttribute="top" secondItem="2aB-sB-hfY" secondAttribute="bottom" constant="4" id="vJy-Kf-4Jh"/>
+                <constraint firstItem="OBS-Eh-1mT" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="yvp-xr-geN"/>
+            </constraints>
+        </customView>
+    </objects>
+    <resources>
+        <image name="ellipsis" width="17" height="3"/>
+        <image name="libraryPlay" width="64" height="64"/>
+    </resources>
+</document>

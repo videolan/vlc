@@ -23,7 +23,7 @@
 #import "VLCMediaSourceDataSource.h"
 
 #import "library/VLCInputItem.h"
-#import "media-source/VLCMediaSourceDeviceCollectionViewItem.h"
+#import "media-source/VLCMediaSourceCollectionViewItem.h"
 #import "media-source/VLCMediaSource.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
@@ -65,21 +65,14 @@
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCMediaSourceDeviceCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCMediaSourceDeviceCellIdentifier forIndexPath:indexPath];
+    VLCMediaSourceCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCMediaSourceCellIdentifier forIndexPath:indexPath];
 
     VLCInputNode *rootNode = _nodeToDisplay;
     NSArray *nodeChildren = rootNode.children;
     VLCInputNode *childNode = nodeChildren[indexPath.item];
     VLCInputItem *childRootInput = childNode.inputItem;
-    viewItem.titleTextField.stringValue = childRootInput.name;
 
-    NSURL *artworkURL = childRootInput.artworkURL;
-    NSImage *placeholder = [NSImage imageNamed:@"NSApplicationIcon"];
-    if (artworkURL) {
-        [viewItem.mediaImageView setImageURL:artworkURL placeholderImage:placeholder];
-    } else {
-        viewItem.mediaImageView.image = placeholder;
-    }
+    viewItem.representedInputItem = childRootInput;
 
     return viewItem;
 }
