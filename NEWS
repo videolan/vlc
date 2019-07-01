@@ -1,3 +1,21 @@
+Changes between 3.0.7.1 and 3.0.8:
+----------------------------------
+
+Demux:
+ * Fix channel ordering in some MP4 files
+
+Decoder:
+ * Fix WebVTT subtitles rendering
+
+Stream filter:
+ * Improve network buffering
+
+Misc:
+ * Update Youtube script
+
+Security:
+ * Fix a couple of interger underflows in the MP4 demuxer
+
 Changes between 3.0.7 and 3.0.7.1:
 ----------------------------------
 
