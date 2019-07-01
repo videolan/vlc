@@ -551,14 +551,14 @@ ifdef HAVE_DARWIN_OS
 	echo "set(CMAKE_C_FLAGS \"$(CFLAGS)\")" >> $@
 	echo "set(CMAKE_CXX_FLAGS \"$(CXXFLAGS)\")" >> $@
 	echo "set(CMAKE_LD_FLAGS \"$(LDFLAGS)\")" >> $@
-	echo "set(CMAKE_AR ar CACHE FILEPATH "Archiver")" >> $@
+	echo "set(CMAKE_AR ar CACHE FILEPATH \"Archiver\")" >> $@
 ifdef HAVE_IOS
 	echo "set(CMAKE_OSX_SYSROOT $(IOS_SDK))" >> $@
 else
 	echo "set(CMAKE_OSX_SYSROOT $(MACOSX_SDK))" >> $@
 endif
 else
-	echo "set(CMAKE_AR $(AR) CACHE FILEPATH "Archiver")" >> $@
+	echo "set(CMAKE_AR $(AR) CACHE FILEPATH \"Archiver\")" >> $@
 endif
 ifdef HAVE_CROSS_COMPILE
 	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(HOST)-)" >> $@
