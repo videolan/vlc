@@ -14,6 +14,7 @@ confinement: strict
 apps:
   vlc:
     desktop: usr/share/applications/vlc.desktop
+    common-id: org.videolan.vlc
     command: desktop-launch $SNAP/bin/vlc-snap-wrapper.sh
     plugs:
       - unity7
