@@ -23,8 +23,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import <vlc_common.h>
-#import <vlc_input.h>
+@class VLCInputItem;
 
 enum ResumeResult {
     RESUME_RESTART,
@@ -49,7 +48,7 @@ typedef void(^CompletionBlock)(enum ResumeResult);
 - (IBAction)buttonClicked:(id)sender;
 - (IBAction)resumeSettingChanged:(id)sender;
 
-- (void)showWindowWithItem:(input_item_t *)p_item withLastPosition:(NSInteger)pos completionBlock:(CompletionBlock)block;
+- (void)showWindowWithItem:(VLCInputItem *)inputItem withLastPosition:(NSInteger)pos completionBlock:(CompletionBlock)block;
 
 - (void)cancel;
 

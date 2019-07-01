@@ -29,6 +29,7 @@
 #import "os-integration/VLCRemoteControlService.h"
 #import "os-integration/iTunes.h"
 #import "os-integration/Spotify.h"
+#import "library/VLCInputItem.h"
 
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoWindowCommon.h"
@@ -727,25 +728,26 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
 #pragma mark - player callback delegations
 
-- (input_item_t *)currentMedia
+- (VLCInputItem *)currentMedia
 {
-    input_item_t *inputItem;
+    VLCInputItem *inputItem;
+    input_item_t *p_input;
     vlc_player_Lock(_p_player);
-    inputItem = vlc_player_GetCurrentMedia(_p_player);
-    if (inputItem) {
-        input_item_Hold(inputItem);
+    p_input = vlc_player_GetCurrentMedia(_p_player);
+    if (p_input) {
+        inputItem = [[VLCInputItem alloc] initWithInputItem:p_input];
     }
     vlc_player_Unlock(_p_player);
     return inputItem;
 }
 
-- (int)setCurrentMedia:(input_item_t *)currentMedia
+- (int)setCurrentMedia:(VLCInputItem *)currentMedia
 {
     if (currentMedia == NULL) {
         return VLC_ENOITEM;
     }
     vlc_player_Lock(_p_player);
-    int ret = vlc_player_SetCurrentMedia(_p_player, currentMedia);
+    int ret = vlc_player_SetCurrentMedia(_p_player, currentMedia.vlcInputItem);
     vlc_player_Unlock(_p_player);
     return ret;
 }
@@ -758,69 +760,37 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
 - (vlc_tick_t)durationOfCurrentMediaItem
 {
-    input_item_t *p_item = self.currentMedia;
-
-    if (!p_item) {
+    if (!self.currentMedia) {
         return -1;
     }
 
-    vlc_tick_t duration = input_item_GetDuration(p_item);
-    input_item_Release(p_item);
-
-    return duration;
+    return self.currentMedia.duration;
 }
 
 - (NSURL *)URLOfCurrentMediaItem;
 {
-    input_item_t *p_item = self.currentMedia;
-    if (!p_item) {
+    if (!self.currentMedia) {
         return nil;
     }
 
-    char *psz_url = vlc_uri_decode(input_item_GetURI(p_item));
-    if (!psz_url) {
-        return nil;
-    }
-    NSURL *url = [NSURL URLWithString:toNSStr(psz_url)];
-    free(psz_url);
-    input_item_Release(p_item);
-
-    return url;
+    return [NSURL URLWithString:self.currentMedia.MRL];
 }
 
 - (NSString*)nameOfCurrentMediaItem;
 {
-    input_item_t *p_item = self.currentMedia;
-    if (!p_item) {
+    if (!self.currentMedia) {
         return nil;
     }
 
-    NSString *name;
-    static char *tmp_cstr = NULL;
-
-    // Get Title
-    tmp_cstr = input_item_GetTitleFbName(p_item);
-    if (tmp_cstr) {
-        name = toNSStr(tmp_cstr);
-        FREENULL(tmp_cstr);
-    }
-
+    NSString *name = self.currentMedia.name;
     if (!name) {
-        char *psz_uri = input_item_GetURI(p_item);
-        if (!psz_uri) {
-            input_item_Release(p_item);
-            return nil;
-        }
-        NSURL *url = [NSURL URLWithString:toNSStr(psz_uri)];
-        free(psz_uri);
-
+        NSURL *url = [NSURL URLWithString:self.currentMedia.MRL];
         if ([url isFileURL])
             name = [[NSFileManager defaultManager] displayNameAtPath:[url path]];
         else
             name = [url absoluteString];
     }
 
-    input_item_Release(p_item);
     return name;
 }
 

@@ -22,11 +22,10 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <vlc_common.h>
+
+@class VLCInputItem;
 
 @interface VLCInformationWindowController : NSWindowController
-
-@property (readonly) input_item_t *item;
 
 @property (readwrite, weak) IBOutlet NSOutlineView *outlineView;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedView;
@@ -84,12 +83,11 @@
 @property (readwrite, weak) IBOutlet NSTextField *videoDecodedLabel;
 @property (readwrite, weak) IBOutlet NSTextField *videoDecodedTextField;
 
+@property (readwrite, strong, nonatomic) VLCInputItem *representedInputItem;
+
 - (IBAction)toggleWindow:(id)sender;
 
 - (IBAction)metaFieldChanged:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
-- (IBAction)downloadCoverArt:(id)sender;
-
-- (void)updatePanelWithItem:(input_item_t *)newInputItem;
 
 @end

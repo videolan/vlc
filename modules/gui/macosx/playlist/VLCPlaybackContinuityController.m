@@ -28,12 +28,13 @@
 #import "panels/dialogs/VLCResumeDialogController.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "library/VLCInputItem.h"
 
 #import <vlc_url.h>
 
 @interface VLCPlaybackContinuityController()
 {
-    input_item_t *p_current_input;
+    VLCInputItem *_currentInput;
 }
 @end
 
@@ -72,9 +73,9 @@
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
-    if (p_current_input) {
+    if (_currentInput) {
         /* continue playback where you left off */
-        [self storePlaybackPositionForItem:p_current_input player:[VLCMain sharedInstance].playlistController.playerController];
+        [self storePlaybackPositionForItem:_currentInput player:[VLCMain sharedInstance].playlistController.playerController];
     }
 }
 
@@ -85,10 +86,10 @@
     [[mainInstance resumeDialog] cancel];
 
     // object is hold here and released then it is dead
-    p_current_input = [[mainInstance playlistController] currentlyPlayingInputItem];
-    if (p_current_input) {
+    _currentInput = [[mainInstance playlistController] currentlyPlayingInputItem];
+    if (_currentInput) {
         VLCPlaylistController *playlistController = aNotification.object;
-        [self continuePlaybackWhereYouLeftOff:p_current_input player:playlistController.playerController];
+        [self continuePlaybackWhereYouLeftOff:_currentInput player:playlistController.playerController];
     }
 }
 
@@ -105,16 +106,14 @@
 
     if (playerState == VLC_PLAYER_STATE_STOPPED || playerState == VLC_PLAYER_STATE_STOPPING) {
         /* continue playback where you left off */
-        if (p_current_input)
-            [self storePlaybackPositionForItem:p_current_input player:playerController];
+        if (_currentInput)
+            [self storePlaybackPositionForItem:_currentInput player:playerController];
     }
 }
 
-- (BOOL)isValidResumeItem:(input_item_t *)p_item
+- (BOOL)isValidResumeItem:(VLCInputItem *)inputItem
 {
-    char *psz_url = input_item_GetURI(p_item);
-    NSString *urlString = toNSStr(psz_url);
-    free(psz_url);
+    NSString *urlString = inputItem.MRL;
 
     if ([urlString isEqualToString:@""])
         return NO;
@@ -134,13 +133,13 @@
     return YES;
 }
 
-- (void)continuePlaybackWhereYouLeftOff:(input_item_t *)p_input_item player:(VLCPlayerController *)playerController
+- (void)continuePlaybackWhereYouLeftOff:(VLCInputItem *)inputItem player:(VLCPlayerController *)playerController
 {
     NSDictionary *recentlyPlayedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"recentlyPlayedMedia"];
     if (!recentlyPlayedFiles)
         return;
 
-    if (!p_input_item)
+    if (!inputItem)
         return;
 
     /* allow the user to over-write the start/stop/run-time */
@@ -154,14 +153,13 @@
 #endif
 
     /* check for file existance before resuming */
-    if (![self isValidResumeItem:p_input_item])
+    if (![self isValidResumeItem:inputItem])
         return;
 
-    char *psz_url = vlc_uri_decode(input_item_GetURI(p_input_item));
-    if (!psz_url)
+    NSString *url = inputItem.MRL;
+    if (!url) {
         return;
-    NSString *url = toNSStr(psz_url);
-    free(psz_url);
+    }
 
     NSNumber *lastPosition = [recentlyPlayedFiles objectForKey:url];
     if (!lastPosition || lastPosition.intValue <= 0)
@@ -187,35 +185,33 @@
         return;
     }
 
-    [[[VLCMain sharedInstance] resumeDialog] showWindowWithItem:p_input_item
-                                    withLastPosition:lastPosition.intValue
-                                     completionBlock:completionBlock];
+    [[[VLCMain sharedInstance] resumeDialog] showWindowWithItem:inputItem
+                                               withLastPosition:lastPosition.intValue
+                                                completionBlock:completionBlock];
 
 }
 
-- (void)storePlaybackPositionForItem:(input_item_t *)p_input_item player:(VLCPlayerController *)playerController
+- (void)storePlaybackPositionForItem:(VLCInputItem *)inputItem player:(VLCPlayerController *)playerController
 {
     if (!var_InheritBool(getIntf(), "macosx-recentitems"))
         return;
 
-    if (!p_input_item)
+    if (!inputItem)
         return;
 
-    if (![self isValidResumeItem:p_input_item])
+    if (![self isValidResumeItem:inputItem])
         return;
 
-    char *psz_url = vlc_uri_decode(input_item_GetURI(p_input_item));
-    if (!psz_url)
+    NSString *url = inputItem.MRL;
+    if (!url)
         return;
-    NSString *url = toNSStr(psz_url);
-    free(psz_url);
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:@"recentlyPlayedMedia"]];
 
     float relativePos = playerController.position;
     long long pos = SEC_FROM_VLC_TICK(playerController.time);
-    long long dur = SEC_FROM_VLC_TICK(input_item_GetDuration(p_input_item));
+    long long dur = SEC_FROM_VLC_TICK(inputItem.duration);
 
     NSMutableArray *mediaList = [[defaults objectForKey:@"recentlyPlayedMediaList"] mutableCopy];
 

@@ -27,6 +27,7 @@
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "library/VLCInputItem.h"
 
 #import "views/VLCBottomBarView.h"
 #import "views/VLCDragDropView.h"
@@ -265,9 +266,9 @@
 
 - (void)updateTimeSlider:(NSNotification *)aNotification;
 {
-    input_item_t *p_item = _playerController.currentMedia;
+    VLCInputItem *inputItem = _playerController.currentMedia;
 
-    if (!p_item) {
+    if (!inputItem) {
         // Nothing playing
         [self.timeSlider setKnobHidden:YES];
         [self.timeSlider setFloatValue: 0.0];
@@ -280,7 +281,7 @@
     [self.timeSlider setKnobHidden:NO];
     [self.timeSlider setFloatValue:(10000. * _playerController.position)];
 
-    vlc_tick_t duration = input_item_GetDuration(p_item);
+    vlc_tick_t duration = inputItem.duration;
     bool buffering = _playerController.playerState == VLC_PLAYER_STATE_STARTED;
     if (duration == -1) {
         // No duration, disable slider
@@ -297,8 +298,6 @@
                                          negative:self.timeField.timeRemaining];
     [self.timeField setStringValue:time];
     [self.timeField setNeedsDisplay:YES];
-
-    input_item_Release(p_item);
 }
 
 - (void)playerStateUpdated:(NSNotification *)aNotification

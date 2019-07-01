@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCPlayerController;
 @class VLCPlaylistExportModuleDescription;
 @class VLCOpenInputMetadata;
+@class VLCInputItem;
 
 extern NSString *VLCPlaybackOrderChanged;
 extern NSString *VLCPlaybackRepeatChanged;
@@ -78,7 +79,7 @@ extern NSString *VLCPlaylistItemsRemoved;
  @note the receiver is responsible for releasing the input item
  @note Subscribe to the VLCPlaylistCurrentItemChanged notification to be notified about changes
  */
-@property (readonly, nullable) input_item_t *currentlyPlayingInputItem;
+@property (readonly, nullable) VLCInputItem *currentlyPlayingInputItem;
 
 /**
  * indicates whether there is a previous item in the list the user could go back to

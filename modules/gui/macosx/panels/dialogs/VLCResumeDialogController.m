@@ -27,6 +27,7 @@
 #import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
 #import "windows/video/VLCVideoOutputProvider.h"
+#import "library/VLCInputItem.h"
 
 @interface VLCResumeDialogController()
 {
@@ -63,7 +64,7 @@
     [o_always_resume_chk setTitle:_NS("Always continue media playback")];
 }
 
-- (void)showWindowWithItem:(input_item_t *)p_item withLastPosition:(NSInteger)pos completionBlock:(CompletionBlock)block
+- (void)showWindowWithItem:(VLCInputItem *)inputItem withLastPosition:(NSInteger)pos completionBlock:(CompletionBlock)block
 {
     NSWindow *w = [self window];
 
@@ -74,10 +75,7 @@
     o_restartButtonLabel = [o_restartButtonLabel stringByAppendingFormat:@" (%d)", currentResumeTimeout];
     [o_restart_btn setTitle:o_restartButtonLabel];
 
-    char *psz_title_name = input_item_GetTitleFbName(p_item);
-    NSString *o_title = toNSStr(psz_title_name);
-    free(psz_title_name);
-    NSString *labelString = [NSString stringWithFormat:_NS("Playback of \"%@\" will continue at %@"), o_title, [NSString stringWithTime:pos]];
+    NSString *labelString = [NSString stringWithFormat:_NS("Playback of \"%@\" will continue at %@"), inputItem.title, [NSString stringWithTime:pos]];
     [o_text_lbl setStringValue:labelString];
     [o_always_resume_chk setState: NSOffState];
 

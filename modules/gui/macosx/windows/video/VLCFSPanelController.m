@@ -34,6 +34,7 @@
 #import "views/VLCDefaultValueSlider.h"
 #import "views/VLCTimeField.h"
 #import "views/VLCSlider.h"
+#import "library/VLCInputItem.h"
 
 NSString *VLCFSPanelShouldBecomeActive = @"VLCFSPanelShouldBecomeActive";
 NSString *VLCFSPanelShouldBecomeInactive = @"VLCFSPanelShouldBecomeInactive";
@@ -270,27 +271,12 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 {
     NSString *title;
     NSString *nowPlaying;
-    input_item_t *mediaItem = _playerController.currentMedia;
+    VLCInputItem *inputItem = _playerController.currentMedia;
 
-    if (mediaItem) {
+    if (inputItem) {
         /* Something is playing */
-        static char *tmp_cstr = NULL;
-
-        // Get Title
-        tmp_cstr = input_item_GetTitleFbName(mediaItem);
-        if (tmp_cstr) {
-            title = toNSStr(tmp_cstr);
-            FREENULL(tmp_cstr);
-        }
-
-        // Get Now Playing
-        tmp_cstr = input_item_GetNowPlaying(mediaItem);
-        if (tmp_cstr) {
-            nowPlaying = toNSStr(tmp_cstr);
-            FREENULL(tmp_cstr);
-        }
-
-        input_item_Release(mediaItem);
+        title = inputItem.title;
+        nowPlaying = inputItem.nowPlaying;
     } else {
         /* Nothing playing */
         title = _NS("VLC media player");
@@ -306,10 +292,10 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 - (void)updatePositionAndTime:(NSNotification *)aNotification
 {
     VLCPlayerController *playerController = aNotification.object;
-    input_item_t *p_item = playerController.currentMedia;
+    VLCInputItem *inputItem = playerController.currentMedia;
 
     /* If nothing is playing, reset times and slider */
-    if (!p_item) {
+    if (!inputItem) {
         [_timeSlider setFloatValue:0.0];
         [_elapsedTime setStringValue:@""];
         [_remainingOrTotalTime setHidden:YES];
@@ -319,7 +305,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [_timeSlider setFloatValue:(10000. * playerController.position)];
 
     vlc_tick_t time =_playerController.time;
-    vlc_tick_t duration = input_item_GetDuration(p_item);
+    vlc_tick_t duration = inputItem.duration;
 
     bool buffering = playerController.playerState == VLC_PLAYER_STATE_STARTED;
     if (duration == -1) {
@@ -345,7 +331,6 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     NSString *playbackPosition = toNSStr(secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(time)));
 
     [_elapsedTime setStringValue:playbackPosition];
-    input_item_Release(p_item);
 }
 
 - (void)capabilitiesChanged:(NSNotification *)aNotification

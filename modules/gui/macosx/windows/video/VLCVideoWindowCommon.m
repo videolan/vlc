@@ -34,6 +34,7 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCInputItem.h"
 #import "views/VLCBottomBarView.h"
 
 const CGFloat VLCVideoWindowCommonMinimalHeight = 70.;
@@ -127,41 +128,22 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 - (void)mediaMetadataChanged:(NSNotification *)aNotification
 {
     VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
-    input_item_t *mediaItem = [playlistController currentlyPlayingInputItem];
-    if (mediaItem == NULL || _playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
+    VLCInputItem *inputItem = [playlistController currentlyPlayingInputItem];
+    if (inputItem == NULL || _playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
         [self setTitle:_NS("VLC media player")];
         self.representedURL = nil;
         return;
     }
 
-    NSString *title, *nowPlaying = nil;
-    char *tmp_cstr = NULL;
-
-    tmp_cstr = input_item_GetTitleFbName(mediaItem);
-    if (tmp_cstr) {
-        title = toNSStr(tmp_cstr);
-        FREENULL(tmp_cstr);
-    }
-
-    tmp_cstr = input_item_GetNowPlaying(mediaItem);
-    if (tmp_cstr) {
-        nowPlaying = toNSStr(tmp_cstr);
-        FREENULL(tmp_cstr);
-    }
-
+    NSString *title = inputItem.title;
+    NSString *nowPlaying = inputItem.nowPlaying;
     if (nowPlaying) {
         [self setTitle:[NSString stringWithFormat:@"%@ — %@", title, nowPlaying]];
     } else {
         [self setTitle:title];
     }
 
-    tmp_cstr = input_item_GetURI(mediaItem);
-    if (tmp_cstr) {
-        self.representedURL = [NSURL URLWithString:toNSStr(tmp_cstr)];
-        FREENULL(tmp_cstr);
-    }
-
-    input_item_Release(mediaItem);
+    self.representedURL = [NSURL URLWithString:inputItem.MRL];
 }
 
 - (void)setTitle:(NSString *)title

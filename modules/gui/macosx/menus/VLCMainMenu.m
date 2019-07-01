@@ -604,9 +604,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 {
     [self updateTrackHandlingMenus:aNotification];
 
-    input_item_t *p_mediaItem = _playerController.currentMedia;
+    VLCInputItem *inputItem = _playerController.currentMedia;
 
-    if (p_mediaItem != NULL) {
+    if (inputItem != NULL) {
         audio_output_t *p_aout = [_playerController mainAudioOutput];
         if (p_aout != NULL) {
             [self setupVarMenuItem:_channels
@@ -655,7 +655,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         }
         [_postprocessing setEnabled:YES];
         [self setSubmenusEnabled:YES];
-        input_item_Release(p_mediaItem);
+        inputItem = nil;
 
         [self setRateControlsEnabled:_playerController.rateChangable];
     } else {
@@ -1751,7 +1751,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (BOOL)validateMenuItem:(NSMenuItem *)mi
 {
     BOOL enabled = YES;
-    input_item_t *inputItem = _playlistController.currentlyPlayingInputItem;
+    VLCInputItem *inputItem = _playlistController.currentlyPlayingInputItem;
 
     if (mi == _stop || mi == _voutMenustop || mi == _dockMenustop) {
         if (!inputItem)
@@ -1823,9 +1823,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         }
     }
 
-    if (inputItem) {
-        input_item_Release(inputItem);
-    }
+    inputItem = nil;
 
     return enabled;
 }

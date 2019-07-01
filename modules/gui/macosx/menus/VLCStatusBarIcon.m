@@ -23,14 +23,11 @@
 
 #import "VLCStatusBarIcon.h"
 
-#import <vlc_common.h>
-#import <vlc_input.h>
-#import <vlc_url.h>
-
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "library/VLCInputItem.h"
 
 @interface VLCStatusBarIcon ()
 {
@@ -233,10 +230,10 @@
 {
     VLCPlayerController *playerController = aNotification.object;
 
-    input_item_t *p_item = playerController.currentMedia;
+    VLCInputItem *inputItem = playerController.currentMedia;
 
-    if (p_item) {
-        vlc_tick_t duration = input_item_GetDuration(p_item);
+    if (inputItem) {
+        vlc_tick_t duration = inputItem.duration;
         vlc_tick_t time = playerController.time;
 
         if (duration == 0) {
@@ -254,8 +251,6 @@
             [totalField setStringValue:[NSString stringWithTimeFromTicks:duration]];
         }
         [self setStoppedStatus:NO];
-
-        input_item_Release(p_item);
     } else {
         /* Nothing playing */
         [progressField setStringValue:@"--:--"];
@@ -267,19 +262,14 @@
 #pragma mark -
 #pragma mark Update functions
 
-- (void)updateCachedURLOfCurrentMedia:(input_item_t *)media
+- (void)updateCachedURLOfCurrentMedia:(VLCInputItem *)inputItem
 {
-    if (!media) {
+    if (!inputItem) {
         _currentPlaybackUrl = nil;
         return;
     }
-    char *psz_url = vlc_uri_decode(input_item_GetURI(media));
-    if (!psz_url) {
-        _currentPlaybackUrl = nil;
-        return;
-    }
-    _currentPlaybackUrl = toNSStr(psz_url);
-    free(psz_url);
+
+    _currentPlaybackUrl = inputItem.decodedMRL;
 }
 
 - (void)hasPreviousChanged:(NSNotification *)aNotification
@@ -302,18 +292,17 @@
     NSString        *nowPlaying;
     NSString        *artist;
     NSString        *album;
-    input_item_t    *mediaItem  = NULL;
 
     VLCPlayerController *playerController = aNotification.object;
     enum vlc_player_state playerState = playerController.playerState;
-    mediaItem = playerController.currentMedia;
+    VLCInputItem *inputItem = playerController.currentMedia;
 
     switch (playerState) {
         case VLC_PLAYER_STATE_PLAYING:
             [self setStoppedStatus:NO];
             [self setProgressTimeEnabled:YES];
             [pathActionItem setEnabled:YES];
-            [self updateCachedURLOfCurrentMedia:mediaItem];
+            [self updateCachedURLOfCurrentMedia:inputItem];
             break;
         case VLC_PLAYER_STATE_STOPPED:
             [self setStoppedStatus:YES];
@@ -325,56 +314,18 @@
             [self setStoppedStatus:NO];
             [self setProgressTimeEnabled:YES];
             [pathActionItem setEnabled:YES];
-            [self updateCachedURLOfCurrentMedia:mediaItem];
+            [self updateCachedURLOfCurrentMedia:inputItem];
             [playPauseButton setState:NSOffState];
         default:
             break;
     }
 
-    if (mediaItem) {
-        /* Something is playing */
-        static char *tmp_cstr = NULL;
-
-        // Get Coverart
-        tmp_cstr = input_item_GetArtworkURL(mediaItem);
-        if (tmp_cstr) {
-            NSString *tempStr = toNSStr(tmp_cstr);
-            if (![tempStr hasPrefix:@"attachment://"]) {
-                coverArtImage = [[NSImage alloc]
-                                 initWithContentsOfURL:[NSURL URLWithString:tempStr]];
-            }
-            FREENULL(tmp_cstr);
-        }
-
-        // Get Titel
-        tmp_cstr = input_item_GetTitleFbName(mediaItem);
-        if (tmp_cstr) {
-            title = toNSStr(tmp_cstr);
-            FREENULL(tmp_cstr);
-        }
-
-        // Get Now Playing
-        tmp_cstr = input_item_GetNowPlaying(mediaItem);
-        if (tmp_cstr) {
-            nowPlaying = toNSStr(tmp_cstr);
-            FREENULL(tmp_cstr);
-        }
-
-        // Get author
-        tmp_cstr = input_item_GetArtist(mediaItem);
-        if (tmp_cstr) {
-            artist = toNSStr(tmp_cstr);
-            FREENULL(tmp_cstr);
-        }
-
-        // Get album
-        tmp_cstr = input_item_GetAlbum(mediaItem);
-        if (tmp_cstr) {
-            album = toNSStr(tmp_cstr);
-            FREENULL(tmp_cstr);
-        }
-
-        input_item_Release(mediaItem);
+    if (inputItem) {
+        coverArtImage = [[NSImage alloc] initWithContentsOfURL:inputItem.artworkURL];
+        title = inputItem.title;
+        nowPlaying = inputItem.nowPlaying;
+        artist = inputItem.artist;
+        album = inputItem.albumName;
     } else {
         /* Nothing playing */
         title = _NS("VLC media player");
