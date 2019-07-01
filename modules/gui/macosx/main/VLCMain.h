@@ -44,7 +44,6 @@ extern NSString *VLCConfigurationChangedNotification;
  * VLCMain interface
  *****************************************************************************/
 @class VLCExtensionsManager;
-@class VLCInformationWindowController;
 @class VLCMainMenu;
 @class VLCResumeDialogController;
 @class VLCSimplePrefsController;
@@ -74,7 +73,6 @@ extern NSString *VLCConfigurationChangedNotification;
 @property (readonly) VLCConvertAndSaveWindowController *convertAndSaveWindow;
 @property (readonly) VLCCoreDialogProvider *coreDialogProvider;
 @property (readonly) VLCExtensionsManager *extensionsManager;
-@property (readonly) VLCInformationWindowController *currentMediaInfoPanel;
 @property (readonly) VLCLogWindowController *debugMsgPanel;
 @property (readonly) VLCLibraryController *libraryController;
 @property (readonly) VLCLibraryWindow *libraryWindow;

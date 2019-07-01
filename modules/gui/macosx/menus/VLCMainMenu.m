@@ -1423,7 +1423,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)showInformationPanel:(id)sender
 {
-    [[[VLCMain sharedInstance] currentMediaInfoPanel] toggleWindow:sender];
+    VLCInformationWindowController *informationController = [[VLCInformationWindowController alloc] init];
+    informationController.representedInputItem = _playlistController.currentlyPlayingInputItem;
+    [informationController toggleWindow:sender];
 }
 
 #pragma mark - playback state

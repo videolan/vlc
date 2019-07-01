@@ -102,6 +102,8 @@
     } else {
         [self initMediaPanelStats];
     }
+
+    [self updateRepresentation];
 }
 
 - (void)initStrings
@@ -150,7 +152,7 @@
 - (void)updateCocoaWindowLevel:(NSNotification *)aNotification
 {
     NSInteger windowLevel = [aNotification.userInfo[VLCWindowLevelKey] integerValue];
-    if (self.isWindowLoaded && [self.window isVisible] && [self.window level] != windowLevel)
+    if ([self.window isVisible] && [self.window level] != windowLevel)
         [self.window setLevel: windowLevel];
 }
 
@@ -194,67 +196,12 @@
 {
     _representedInputItem = representedInputItem;
 
-    [_saveMetaDataButton setEnabled: NO];
-
-    if (!self.isWindowLoaded)
-        return;
-
-    if (!_representedInputItem) {
-        /* Erase */
-#define SET( foo ) \
-[_##foo##TextField setStringValue:@""];
-        SET( uri );
-        SET( title );
-        SET( author );
-        SET( collection );
-        SET( seqNum );
-        SET( genre );
-        SET( copyright );
-        SET( publisher );
-        SET( nowPlaying );
-        SET( language );
-        SET( date );
-        SET( description );
-        SET( encodedby );
-#undef SET
-        [_imageWell setImage: [NSImage imageNamed: @"noart.png"]];
-    } else {
-        if (!_representedInputItem.preparsed) {
-            [_representedInputItem preparseInputItem];
-        }
-
-        _uriTextField.stringValue = _representedInputItem.MRL;
-        _titleTextField.stringValue = _representedInputItem.title;
-        _authorTextField.stringValue = _representedInputItem.artist;
-        _collectionTextField.stringValue = _representedInputItem.albumName;
-        _seqNumTextField.stringValue = _representedInputItem.trackNumber;
-        _genreTextField.stringValue = _representedInputItem.genre;
-        _copyrightTextField.stringValue = _representedInputItem.copyright;
-        _publisherTextField.stringValue = _representedInputItem.publisher;
-        _nowPlayingTextField.stringValue = _representedInputItem.nowPlaying;
-        _languageTextField.stringValue = _representedInputItem.language;
-        _dateTextField.stringValue = _representedInputItem.date;
-        _descriptionTextField.stringValue = _representedInputItem.contentDescription;
-        _encodedbyTextField.stringValue = _representedInputItem.encodedBy;
-
-        NSURL *artworkURL = _representedInputItem.artworkURL;
-        NSImage *artwork;
-        if (artworkURL) {
-            artwork = [[NSImage alloc] initWithContentsOfURL:_representedInputItem.artworkURL];
-        }
-        if (!artwork) {
-            artwork = [NSImage imageNamed: @"noart.png"];
-        }
-        [_imageWell setImage:artwork];
-    }
-
-    /* reload the codec details table */
-    [self updateStreamsList];
+    [self updateRepresentation];
 }
 
 - (void)updateStatistics:(NSNotification *)aNotification
 {
-    if (!self.isWindowLoaded || !_statisticsEnabled)
+    if (!_statisticsEnabled)
         return;
 
     if (![self.window isVisible])
@@ -285,6 +232,65 @@
     [_audioDecodedTextField setIntegerValue: inputStats.decodedAudio];
     [_playedAudioBuffersTextField setIntegerValue: inputStats.playedAudioBuffers];
     [_lostAudioBuffersTextField setIntegerValue: inputStats.lostAudioBuffers];
+}
+
+- (void)updateRepresentation
+{
+    [_saveMetaDataButton setEnabled: NO];
+
+    if (!_representedInputItem) {
+        /* Erase */
+#define SET( foo ) \
+[_##foo##TextField setStringValue:@""];
+        SET( uri );
+        SET( title );
+        SET( author );
+        SET( collection );
+        SET( seqNum );
+        SET( genre );
+        SET( copyright );
+        SET( publisher );
+        SET( nowPlaying );
+        SET( language );
+        SET( date );
+        SET( description );
+        SET( encodedby );
+#undef SET
+        [_imageWell setImage: [NSImage imageNamed: @"noart.png"]];
+    } else {
+        if (!_representedInputItem.preparsed) {
+            NSLog(@"item wasn't preparsed");
+            [_representedInputItem preparseInputItem];
+        }
+
+        NSLog(@"%s: %@ - %@ - %@", __PRETTY_FUNCTION__, _representedInputItem.title, _representedInputItem.MRL, _uriTextField);
+        _uriTextField.stringValue = _representedInputItem.MRL;
+        _titleTextField.stringValue = _representedInputItem.title;
+        _authorTextField.stringValue = _representedInputItem.artist;
+        _collectionTextField.stringValue = _representedInputItem.albumName;
+        _seqNumTextField.stringValue = _representedInputItem.trackNumber;
+        _genreTextField.stringValue = _representedInputItem.genre;
+        _copyrightTextField.stringValue = _representedInputItem.copyright;
+        _publisherTextField.stringValue = _representedInputItem.publisher;
+        _nowPlayingTextField.stringValue = _representedInputItem.nowPlaying;
+        _languageTextField.stringValue = _representedInputItem.language;
+        _dateTextField.stringValue = _representedInputItem.date;
+        _descriptionTextField.stringValue = _representedInputItem.contentDescription;
+        _encodedbyTextField.stringValue = _representedInputItem.encodedBy;
+
+        NSURL *artworkURL = _representedInputItem.artworkURL;
+        NSImage *artwork;
+        if (artworkURL) {
+            artwork = [[NSImage alloc] initWithContentsOfURL:_representedInputItem.artworkURL];
+        }
+        if (!artwork) {
+            artwork = [NSImage imageNamed: @"noart.png"];
+        }
+        [_imageWell setImage:artwork];
+    }
+
+    /* reload the codec details table */
+    [self updateStreamsList];
 }
 
 - (void)updateStreamsList

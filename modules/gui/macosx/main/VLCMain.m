@@ -59,7 +59,6 @@
 #import "panels/dialogs/VLCCoreDialogProvider.h"
 #import "panels/VLCAudioEffectsWindowController.h"
 #import "panels/VLCBookmarksWindowController.h"
-#import "panels/VLCInformationWindowController.h"
 #import "panels/VLCVideoEffectsWindowController.h"
 #import "panels/VLCTrackSynchronizationWindowController.h"
 
@@ -115,7 +114,6 @@ NSString *VLCConfigurationChangedNotification = @"VLCConfigurationChangedNotific
     VLCAudioEffectsWindowController *_audioEffectsPanel;
     VLCVideoEffectsWindowController *_videoEffectsPanel;
     VLCConvertAndSaveWindowController *_convertAndSaveWindow;
-    VLCInformationWindowController *_currentMediaInfoPanel;
     VLCLibraryWindowController *_libraryWindowController;
     VLCClickerManager *_clickerManager;
 
@@ -450,14 +448,6 @@ static VLCMain *sharedInstance = nil;
 - (VLCVideoEffectsWindowController *)videoEffectsPanel
 {
     return _videoEffectsPanel;
-}
-
-- (VLCInformationWindowController *)currentMediaInfoPanel;
-{
-    if (!_currentMediaInfoPanel)
-        _currentMediaInfoPanel = [[VLCInformationWindowController alloc] init];
-
-    return _currentMediaInfoPanel;
 }
 
 - (VLCBookmarksWindowController *)bookmarks
