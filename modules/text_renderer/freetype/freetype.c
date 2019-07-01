@@ -786,11 +786,9 @@ static inline void RenderBackground( subpicture_region_t *p_region,
             if( p_char->p_style->i_style_flags & STYLE_BACKGROUND )
             {
                 uint8_t i_x, i_y, i_z;
-                ExtractComponents( p_char->b_in_karaoke ? p_char->p_style->i_karaoke_background_color :
-                                                          p_char->p_style->i_background_color,
+                ExtractComponents( p_char->p_style->i_background_color,
                                    &i_x, &i_y, &i_z );
-                const uint8_t i_alpha = p_char->b_in_karaoke ? p_char->p_style->i_karaoke_background_alpha:
-                                                               p_char->p_style->i_background_alpha;
+                const uint8_t i_alpha = p_char->p_style->i_background_alpha;
 
                 /* Render the actual background */
                 if( i_alpha != STYLE_ALPHA_TRANSPARENT )

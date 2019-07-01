@@ -45,7 +45,6 @@ typedef struct
     const ruby_block_t *p_ruby;
     int            i_line_offset;       /* underline/strikethrough offset */
     int            i_line_thickness;    /* underline/strikethrough thickness */
-    bool           b_in_karaoke;
 } line_character_t;
 
 struct line_desc_t

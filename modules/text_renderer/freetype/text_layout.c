@@ -142,7 +142,6 @@ typedef struct paragraph_t
     FT_Face             *pp_faces;         /**< Used to determine run boundaries when performing font fallback */
     int                 *pi_run_ids;       /**< The run to which each glyph belongs */
     glyph_bitmaps_t     *p_glyph_bitmaps;
-    uint8_t             *pi_karaoke_bar;
     int                  i_size;
     run_desc_t          *p_runs;
     int                  i_runs_count;
@@ -323,8 +322,6 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
             calloc( i_size, sizeof( *p_paragraph->pi_run_ids ) );
     p_paragraph->p_glyph_bitmaps =
             calloc( i_size, sizeof( *p_paragraph->p_glyph_bitmaps ) );
-    p_paragraph->pi_karaoke_bar =
-            calloc( i_size, sizeof( *p_paragraph->pi_karaoke_bar ) );
     if( pp_ruby )
         p_paragraph->pp_ruby = calloc( i_size, sizeof( *p_paragraph->pp_ruby ) );
 
@@ -335,7 +332,7 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
     if( !p_paragraph->p_code_points || !p_paragraph->pi_glyph_indices
      || !p_paragraph->pp_styles || !p_paragraph->pp_faces
      || !p_paragraph->pi_run_ids|| !p_paragraph->p_glyph_bitmaps
-     || !p_paragraph->pi_karaoke_bar || !p_paragraph->p_runs )
+     || !p_paragraph->p_runs )
         goto error;
 
     if( p_code_points )
@@ -388,7 +385,6 @@ error:
     if( p_paragraph->pp_faces ) free( p_paragraph->pp_faces );
     if( p_paragraph->pi_run_ids ) free( p_paragraph->pi_run_ids );
     if( p_paragraph->p_glyph_bitmaps ) free( p_paragraph->p_glyph_bitmaps );
-    if (p_paragraph->pi_karaoke_bar ) free( p_paragraph->pi_karaoke_bar );
     if( p_paragraph->p_runs ) free( p_paragraph->p_runs );
 #ifdef HAVE_HARFBUZZ
     if( p_paragraph->p_scripts ) free( p_paragraph->p_scripts );
@@ -411,7 +407,6 @@ static void FreeParagraph( paragraph_t *p_paragraph )
     free( p_paragraph->p_runs );
     free( p_paragraph->pi_glyph_indices );
     free( p_paragraph->p_glyph_bitmaps );
-    free( p_paragraph->pi_karaoke_bar );
     free( p_paragraph->pi_run_ids );
     free( p_paragraph->pp_faces );
     free( p_paragraph->pp_ruby );
@@ -870,8 +865,6 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
             if( p_new_paragraph->pp_ruby )
                 p_new_paragraph->pp_ruby[ i_index ] =
                     p_paragraph->pp_ruby[ i_source_index ];
-            p_new_paragraph->pi_karaoke_bar[ i_index ] =
-                p_paragraph->pi_karaoke_bar[ i_source_index ];
             p_new_paragraph->p_glyph_bitmaps[ i_index ].i_x_offset =
                 p_positions[ i_run_index ].x_offset;
             p_new_paragraph->p_glyph_bitmaps[ i_index ].i_y_offset =
@@ -1340,7 +1333,6 @@ static int LayoutLine( filter_t *p_filter,
         p_ch->p_glyph = ( FT_BitmapGlyph ) p_bitmaps->p_glyph;
         p_ch->p_outline = ( FT_BitmapGlyph ) p_bitmaps->p_outline;
         p_ch->p_shadow = ( FT_BitmapGlyph ) p_bitmaps->p_shadow;
-        p_ch->b_in_karaoke = (p_paragraph->pi_karaoke_bar[ i_paragraph_index ] != 0);
 
         p_ch->i_line_thickness = i_line_thickness;
         p_ch->i_line_offset = i_line_offset;
