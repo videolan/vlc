@@ -212,16 +212,15 @@ extern "C" void DWrite_Close( FT_Stream )
 
 class TextSource : public IDWriteTextAnalysisSource
 {
-    IDWriteFactory              *mp_factory;
     IDWriteNumberSubstitution   *mp_substitution;
     wchar_t                      mpwsz_text[ 3 ];
     uint32_t                     mi_text_length;
     ULONG                        ml_ref_count;
 
 public:
-    TextSource( IDWriteFactory *p_factory, IDWriteNumberSubstitution *p_substitution,
+    TextSource( IDWriteNumberSubstitution *p_substitution,
                 const wchar_t *pwsz_text, uint32_t i_text_length )
-              : mp_factory( p_factory ), mp_substitution( p_substitution ), ml_ref_count( 0 )
+              : mp_substitution( p_substitution ), ml_ref_count( 0 )
     {
         memset( mpwsz_text, 0, sizeof( mpwsz_text ) );
         mi_text_length = i_text_length < 2 ? i_text_length : 2;
@@ -709,7 +708,7 @@ static char *DWrite_Fallback( filter_t *p_filter, const char *psz_family,
     if( unlikely( !pwsz_family ) ) return NULL;
 
     ComPtr< TextSource > p_ts;
-    p_ts = new(std::nothrow) TextSource( p_dw_sys->p_dw_factory.Get(), p_dw_sys->p_dw_substitution.Get(), p_text, i_text_length );
+    p_ts = new(std::nothrow) TextSource( p_dw_sys->p_dw_substitution.Get(), p_text, i_text_length );
     if( unlikely( p_ts == NULL ) ) { goto done; }
 
     if( p_dw_sys->p_dw_fallbacks->MapCharacters( p_ts.Get(), 0, i_text_length, p_dw_sys->p_dw_system_fonts.Get(), pwsz_family,
