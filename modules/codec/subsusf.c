@@ -749,17 +749,6 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         {
                             p_ssa_style->p_style->i_shadow_width = atoi( val );
                         }
-                        else if( !strcasecmp( "back-color", attr ) )
-                        {
-                            if( *val == '#' )
-                            {
-                                unsigned long col = strtol(val+1, NULL, 16);
-                                p_ssa_style->p_style->i_karaoke_background_color = (col & 0x00ffffff);
-                                p_ssa_style->p_style->i_karaoke_background_alpha = (col >> 24) & 0xff;
-                                p_ssa_style->p_style->i_features |= STYLE_HAS_K_BACKGROUND_COLOR
-                                                                  | STYLE_HAS_K_BACKGROUND_ALPHA;
-                            }
-                        }
                         else if( !strcasecmp( "spacing", attr ) )
                         {
                             p_ssa_style->p_style->i_spacing = atoi( val );
