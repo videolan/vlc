@@ -36,7 +36,7 @@ void vlc_sd_Destroy(services_discovery_t *sd);
 }
 
 namespace medialibrary {
-struct IDeviceListerCb;
+class IDeviceListerCb;
 }
 
 namespace vlc {
