@@ -429,14 +429,25 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
         *pp_dec_dev = vout_GetDevice(cfg);
     }
 
-    if (vout_Request(cfg, pp_dec_dev ? *pp_dec_dev : NULL, p_resource->p_input)) {
+    vout = cfg->vout;
+
+out:
+    vlc_mutex_unlock( &p_resource->lock );
+    return vout;
+}
+
+int input_resource_StartVout(input_resource_t *p_resource,
+                              vlc_decoder_device *dec_dev,
+                              const vout_configuration_t *cfg)
+{
+    vlc_mutex_lock( &p_resource->lock );
+    if (vout_Request(cfg, dec_dev, p_resource->p_input)) {
         input_resource_PutVoutLocked(p_resource, cfg->vout, false);
         vlc_mutex_unlock(&p_resource->lock);
-        return NULL;
+        return -1;
     }
 
-    vout = cfg->vout;
-    DisplayVoutTitle(p_resource, vout);
+    DisplayVoutTitle(p_resource, cfg->vout);
 
     /* Send original viewpoint to the input in order to update other ESes */
     if (p_resource->p_input != NULL)
@@ -445,10 +456,8 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
         input_ControlPush(p_resource->p_input, INPUT_CONTROL_SET_INITIAL_VIEWPOINT,
                           &param);
     }
-
-out:
     vlc_mutex_unlock( &p_resource->lock );
-    return vout;
+    return 0;
 }
 
 vout_thread_t *input_resource_HoldVout( input_resource_t *p_resource )
