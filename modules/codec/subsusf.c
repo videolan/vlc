@@ -100,6 +100,7 @@ typedef struct
 
 static int           DecodeBlock   ( decoder_t *, block_t * );
 static char         *CreatePlainText( char * );
+static char         *StripTags( char *psz_subtitle );
 static int           ParseImageAttachments( decoder_t *p_dec );
 
 static subpicture_t        *ParseText     ( decoder_t *, block_t * );
@@ -850,21 +851,37 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                 {
                     subpicture_region_t  *p_text_region;
 
+                    char *psz_flat = NULL;
+                    char *psz_knodes = strndup( &psz_subtitle[9], psz_end - &psz_subtitle[9] );
+                    if( psz_knodes )
+                    {
+                        /* remove timing <k> tags */
+                        psz_flat = CreatePlainText( psz_knodes );
+                        free( psz_knodes );
+                        if( psz_flat )
+                        {
+                            p_text_region = CreateTextRegion( p_dec,
+                                                              psz_flat,
+                                                              p_sys->i_align );
+                            if( p_text_region )
+                            {
+                                free( p_text_region->p_text->psz_text );
+                                p_text_region->p_text->psz_text = psz_flat;
+                                if( !p_region_first )
+                                {
+                                    p_region_first = p_region_upto = p_text_region;
+                                }
+                                else if( p_text_region )
+                                {
+                                    p_region_upto->p_next = p_text_region;
+                                    p_region_upto = p_region_upto->p_next;
+                                }
+                            }
+                            else free( psz_flat );
+                        }
+                    }
+
                     psz_end += strcspn( psz_end, ">" ) + 1;
-
-                    p_text_region = CreateTextRegion( p_dec,
-                                                      psz_subtitle,
-                                                      p_sys->i_align );
-
-                    if( !p_region_first )
-                    {
-                        p_region_first = p_region_upto = p_text_region;
-                    }
-                    else if( p_text_region )
-                    {
-                        p_region_upto->p_next = p_text_region;
-                        p_region_upto = p_region_upto->p_next;
-                    }
                 }
             }
             else if(( !strncasecmp( psz_subtitle, "<image ", 7 )) ||
