@@ -25,12 +25,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCInputItem;
+
 @interface VLCPlaylistItem : NSObject
 
 @property (readonly) vlc_playlist_item_t *playlistItem;
 @property (readwrite, retain) NSString *title;
 @property (readonly, copy, nullable) NSString *path;
 @property (readwrite, assign) vlc_tick_t duration;
+@property (readonly, nullable) VLCInputItem *inputItem;
 
 @property (readwrite, retain, nullable) NSString *artistName;
 @property (readwrite, retain, nullable) NSString *albumName;

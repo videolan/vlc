@@ -26,6 +26,7 @@
 #import <vlc_url.h>
 
 #import "extensions/NSString+Helpers.h"
+#import "library/VLCInputItem.h"
 
 @implementation VLCPlaylistItem
 
@@ -48,6 +49,19 @@
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"item %p, title: %@ duration %lli", &_playlistItem, _title, _duration];
+}
+
+- (VLCInputItem *)inputItem
+{
+    if (!_playlistItem) {
+        return nil;
+    }
+    input_item_t *p_input = vlc_playlist_item_GetMedia(_playlistItem);
+    if (!p_input) {
+        return nil;
+    }
+    VLCInputItem *inputItem = [[VLCInputItem alloc] initWithInputItem:p_input];
+    return inputItem;
 }
 
 - (void)updateRepresentation

@@ -31,16 +31,19 @@
 #import "playlist/VLCPlaylistItem.h"
 #import "playlist/VLCPlaylistSortingMenuController.h"
 #import "windows/VLCOpenWindowController.h"
+#import "panels/VLCInformationWindowController.h"
 
 @interface VLCPlaylistMenuController ()
 {
     VLCPlaylistController *_playlistController;
     VLCPlaylistSortingMenuController *_playlistSortingMenuController;
+    VLCInformationWindowController *_informationWindowController;
 
     NSMenuItem *_playMenuItem;
+    NSMenuItem *_removeMenuItem;
+    NSMenuItem *_informationMenuItem;
     NSMenuItem *_revealInFinderMenuItem;
     NSMenuItem *_addFilesToPlaylistMenuItem;
-    NSMenuItem *_removeMenuItem;
     NSMenuItem *_clearPlaylistMenuItem;
     NSMenuItem *_sortMenuItem;
 }
@@ -69,6 +72,9 @@
     _revealInFinderMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
     _revealInFinderMenuItem.target = self;
 
+    _informationMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Information...") action:@selector(showInformationPanel:) keyEquivalent:@""];
+    _informationMenuItem.target = self;
+
     _addFilesToPlaylistMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Add File...") action:@selector(addFilesToPlaylist:) keyEquivalent:@""];
     _addFilesToPlaylistMenuItem.target = self;
 
@@ -80,7 +86,7 @@
     [_sortMenuItem setSubmenu:_playlistSortingMenuController.playlistSortingMenu];
 
     _playlistMenu = [[NSMenu alloc] init];
-    _playlistMenu.itemArray = @[_playMenuItem, _removeMenuItem, _revealInFinderMenuItem, [NSMenuItem separatorItem], _addFilesToPlaylistMenuItem, _clearPlaylistMenuItem, _sortMenuItem];
+    _playlistMenu.itemArray = @[_playMenuItem, _removeMenuItem, _revealInFinderMenuItem, _informationMenuItem, [NSMenuItem separatorItem], _addFilesToPlaylistMenuItem, _clearPlaylistMenuItem, _sortMenuItem];
 }
 
 - (void)play:(id)sender
@@ -100,6 +106,26 @@
         return;
 
     [_playlistController removeItemsAtIndexes:self.playlistTableView.selectedRowIndexes];
+}
+
+- (void)showInformationPanel:(id)sender
+{
+    if (!_informationWindowController) {
+        _informationWindowController = [[VLCInformationWindowController alloc] init];
+    }
+
+    NSInteger selectedRow = self.playlistTableView.selectedRow;
+
+    if (selectedRow == -1)
+        return;
+
+    VLCPlaylistItem *playlistItem = [_playlistController.playlistModel playlistItemAtIndex:selectedRow];
+    if (playlistItem == nil)
+        return;
+
+    _informationWindowController.representedInputItem = playlistItem.inputItem;
+
+    [_informationWindowController toggleWindow:sender];
 }
 
 - (void)revealInFinder:(id)sender
@@ -142,7 +168,8 @@
         return (self.playlistTableView.numberOfRows > 0);
 
     } else if (menuItem == _removeMenuItem ||
-               menuItem == _playMenuItem) {
+               menuItem == _playMenuItem ||
+               menuItem == _informationMenuItem) {
         return (self.playlistTableView.numberOfSelectedRows > 0);
 
     } else if (menuItem == _revealInFinderMenuItem) {
