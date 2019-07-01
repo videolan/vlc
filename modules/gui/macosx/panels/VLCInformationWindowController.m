@@ -98,6 +98,14 @@
                            selector:@selector(updateCocoaWindowLevel:)
                                name:VLCWindowShouldUpdateLevel
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(mediaItemWasParsed:)
+                               name:VLCInputItemParsingSucceeded
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(mediaItemWasParsed:)
+                               name:VLCInputItemPreparsingSucceeded
+                             object:nil];
 
     [notificationCenter postNotificationName:VLCPlayerStatisticsUpdated object:self];
 
@@ -204,6 +212,11 @@
 {
     _representedInputItem = representedInputItem;
 
+    [self updateRepresentation];
+}
+
+- (void)mediaItemWasParsed:(NSNotification *)aNotification
+{
     [self updateRepresentation];
 }
 
