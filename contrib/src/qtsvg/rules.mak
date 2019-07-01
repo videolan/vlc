@@ -1,7 +1,7 @@
 # Qt
 
 QTSVG_VERSION := 5.6.3
-QTSVG_URL := https://download.qt.io/official_releases/qt/5.6/$(QTSVG_VERSION)/submodules/qtsvg-opensource-src-$(QTSVG_VERSION).tar.xz
+QTSVG_URL := https://download.qt.io/archive/qt/5.6/$(QTSVG_VERSION)/submodules/qtsvg-opensource-src-$(QTSVG_VERSION).tar.xz
 
 DEPS_qtsvg += qt $(DEPS_qt)
 
