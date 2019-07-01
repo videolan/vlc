@@ -546,7 +546,7 @@ endif
 endif
 endif
 
-crossfile.meson:
+crossfile.meson: $(SRC)/gen-meson-crossfile.py
 	$(HOSTVARS) \
 	WINDRES="$(WINDRES)" \
 	PKG_CONFIG="$(PKG_CONFIG)" \
