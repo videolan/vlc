@@ -1382,12 +1382,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
             if( !rv )
                 break;
         }
-
-        /* With karaoke, we're going to have to render the text a number
-         * of times to show the progress marker on the text.
-         */
-        if( text_block.pi_k_durations )
-            var_SetBool( p_filter, "text-rerender", true );
     }
 
     FreeLines( text_block.p_laid );
@@ -1396,7 +1390,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     FreeStylesArray( text_block.pp_styles, text_block.i_count );
     if( text_block.pp_ruby )
         FreeRubyBlockArray( text_block.pp_ruby, text_block.i_count );
-    free( text_block.pi_k_durations );
 
     return rv;
 }

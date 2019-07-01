@@ -304,7 +304,6 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
                                   const uni_char_t *p_code_points,
                                   text_style_t **pp_styles,
                                   ruby_block_t **pp_ruby,
-                                  uint32_t *pi_k_dates,
                                   int i_runs_size )
 {
     paragraph_t *p_paragraph = calloc( 1, sizeof( paragraph_t ) );
@@ -347,15 +346,6 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
                 i_size * sizeof( *pp_styles ) );
     if( p_paragraph->pp_ruby )
         memcpy( p_paragraph->pp_ruby, pp_ruby, i_size * sizeof( *pp_ruby ) );
-
-    if( pi_k_dates )
-    {
-        int64_t i_elapsed  = MS_FROM_VLC_TICK(var_GetInteger( p_filter, "spu-elapsed" ));
-        for( int i = 0; i < i_size; ++i )
-        {
-            p_paragraph->pi_karaoke_bar[ i ] = pi_k_dates[ i ] >= i_elapsed;
-        }
-    }
 
 #ifdef HAVE_HARFBUZZ
     p_paragraph->p_scripts = vlc_alloc( i_size, sizeof( *p_paragraph->p_scripts ) );
@@ -831,7 +821,7 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
     }
 
     p_new_paragraph = NewParagraph( p_filter, i_total_glyphs,
-                                    NULL, NULL, NULL, NULL,
+                                    NULL, NULL, NULL,
                                     p_paragraph->i_runs_size );
     if( !p_new_paragraph )
     {
@@ -1647,7 +1637,6 @@ static paragraph_t * BuildParagraph( filter_t *p_filter,
                                      const uni_char_t *p_uchars,
                                      text_style_t **pp_styles,
                                      ruby_block_t **pp_ruby,
-                                     uint32_t *pi_k_dates,
                                      int i_runs_size,
                                      unsigned *pi_max_advance_x )
 {
@@ -1655,7 +1644,6 @@ static paragraph_t * BuildParagraph( filter_t *p_filter,
                                 p_uchars,
                                 pp_styles,
                                 pp_ruby,
-                                pi_k_dates,
                                 i_runs_size );
     if( !p_paragraph )
         return NULL;
@@ -1712,7 +1700,7 @@ static int LayoutRubyText( filter_t *p_filter,
 
     paragraph_t *p_paragraph = BuildParagraph( p_filter, i_uchars,
                                                p_uchars, pp_styles,
-                                               NULL, NULL, 1,
+                                               NULL, 1,
                                                &i_max_advance_x );
     if( !p_paragraph )
     {
@@ -1780,8 +1768,6 @@ int LayoutTextBlock( filter_t *p_filter,
                                     &p_textblock->pp_styles[i_paragraph_start],
                                     p_textblock->pp_ruby ?
                                     &p_textblock->pp_ruby[i_paragraph_start] : NULL,
-                                    p_textblock->pi_k_durations ?
-                                    &p_textblock->pi_k_durations[i_paragraph_start] : NULL,
                                     20, &i_max_advance_x );
             if( !p_paragraph )
             {
