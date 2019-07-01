@@ -226,7 +226,7 @@ void vout_StopDisplay(vout_thread_t *);
 /**
  * Destroys a vout.
  *
- * This function closes and releases a vout created by vout_Request().
+ * This function closes and releases a vout created by vout_Create().
  *
  * \param p_vout the vout to close
  */

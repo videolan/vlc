@@ -100,7 +100,7 @@ enum vlc_vout_order
 /**
  * Destroys a vout.
  *
- * This function closes and releases a vout created by vout_Request().
+ * This function closes and releases a vout created by vout_Create().
  *
  * \param vout the vout to close
  */
