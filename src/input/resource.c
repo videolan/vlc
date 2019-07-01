@@ -424,9 +424,12 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
     }
 #endif
 
-    vlc_decoder_device *dec_dev = vout_GetDevice(cfg);
+    if (pp_dec_dev)
+    {
+        *pp_dec_dev = vout_GetDevice(cfg);
+    }
 
-    if (vout_Request(cfg, dec_dev, p_resource->p_input)) {
+    if (vout_Request(cfg, pp_dec_dev ? *pp_dec_dev : NULL, p_resource->p_input)) {
         input_resource_PutVoutLocked(p_resource, cfg->vout, false);
         vlc_mutex_unlock(&p_resource->lock);
         return NULL;
