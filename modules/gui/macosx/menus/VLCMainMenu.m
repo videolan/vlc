@@ -97,6 +97,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     VLCPlayerController *_playerController;
     NSTimer *_cancelRendererDiscoveryTimer;
     VLCPlaylistSortingMenuController *_playlistSortingController;
+    VLCInformationWindowController *_infoWindowController;
 
     NSMenu *_playlistTableColumnsContextMenu;
 
@@ -1423,9 +1424,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)showInformationPanel:(id)sender
 {
-    VLCInformationWindowController *informationController = [[VLCInformationWindowController alloc] init];
-    informationController.representedInputItem = _playlistController.currentlyPlayingInputItem;
-    [informationController toggleWindow:sender];
+    if (!_infoWindowController) {
+        _infoWindowController = [[VLCInformationWindowController alloc] init];
+        _infoWindowController.mainMenuInstance = YES;
+    }
+    _infoWindowController.representedInputItem = _playlistController.currentlyPlayingInputItem;
+    [_infoWindowController toggleWindow:sender];
 }
 
 #pragma mark - playback state

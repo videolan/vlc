@@ -71,16 +71,16 @@
             <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="34" width="506" height="476"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
-            <view key="contentView" misplaced="YES" id="3">
+            <view key="contentView" id="3">
                 <rect key="frame" x="0.0" y="0.0" width="506" height="476"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <tabView misplaced="YES" drawsBackground="NO" type="noTabsNoBorder" initialItem="419" translatesAutoresizingMaskIntoConstraints="NO" id="418">
+                    <tabView drawsBackground="NO" type="noTabsNoBorder" initialItem="419" translatesAutoresizingMaskIntoConstraints="NO" id="418">
                         <rect key="frame" x="-21" y="-1" width="542" height="444"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="General" identifier="1" id="419">
-                                <view key="view" id="422">
+                                <view key="view" misplaced="YES" id="422">
                                     <rect key="frame" x="0.0" y="0.0" width="542" height="444"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -459,9 +459,9 @@
                                             <rect key="frame" x="17" y="0.0" width="510" height="440"/>
                                             <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="jDW-Lc-WE4">
                                                 <rect key="frame" x="0.0" y="0.0" width="510" height="440"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" indentationPerLevel="16" autoresizesOutlineColumn="YES" outlineTableColumn="521" id="519">
+                                                    <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" indentationPerLevel="16" autoresizesOutlineColumn="YES" outlineTableColumn="521" id="519" customClass="VLCHUDOutlineView">
                                                         <rect key="frame" x="0.0" y="0.0" width="510" height="440"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
@@ -471,7 +471,7 @@
                                                             <tableColumn identifier="0" editable="NO" width="241.91015625" minWidth="16" maxWidth="1000" id="521">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                                                     <font key="font" metaFont="smallSystem"/>
-                                                                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
                                                                 <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="524">
@@ -484,7 +484,7 @@
                                                             <tableColumn identifier="1" editable="NO" width="262" minWidth="10" maxWidth="3.4028234663852886e+38" id="644">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                                                     <font key="font" metaFont="smallSystem"/>
-                                                                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
                                                                 <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="645">
@@ -497,6 +497,7 @@
                                                         </tableColumns>
                                                     </outlineView>
                                                 </subviews>
+                                                <nil key="backgroundColor"/>
                                             </clipView>
                                             <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="518">
                                                 <rect key="frame" x="0.0" y="428" width="510" height="16"/>
@@ -843,7 +844,7 @@
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
-                    <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GFW-aJ-Pub">
+                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GFW-aJ-Pub">
                         <rect key="frame" x="118" y="448" width="270" height="24"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="WVH-Tg-9g5"/>
@@ -860,7 +861,7 @@
                             <action selector="takeSelectedTabViewItemFromSender:" target="418" id="Z4V-Lm-ikS"/>
                         </connections>
                     </segmentedControl>
-                    <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="cFC-fJ-8UH">
+                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="cFC-fJ-8UH">
                         <rect key="frame" x="0.0" y="440" width="506" height="5"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="1" id="ivG-J4-70G"/>

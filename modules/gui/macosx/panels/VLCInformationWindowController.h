@@ -84,6 +84,7 @@
 @property (readwrite, weak) IBOutlet NSTextField *videoDecodedTextField;
 
 @property (readwrite, strong, nonatomic) VLCInputItem *representedInputItem;
+@property (readwrite) BOOL mainMenuInstance;
 
 - (IBAction)toggleWindow:(id)sender;
 

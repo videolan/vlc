@@ -45,6 +45,11 @@
 
 @implementation VLCCodecInformationTreeItem
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@: name: %@ value: %@ children: %lu", NSStringFromClass([self class]), self.name, self.value, self.children.count];
+}
+
 @end
 
 #pragma mark - window controller
@@ -62,21 +67,6 @@
 - (id)init
 {
     self = [super initWithWindowNibName:@"MediaInfo"];
-    if (self) {
-        NSNotificationCenter *defaultNotificationCenter = [NSNotificationCenter defaultCenter];
-        [defaultNotificationCenter addObserver:self
-                                                 selector:@selector(currentPlaylistItemChanged:)
-                                                     name:VLCPlaylistCurrentItemChanged
-                                                   object:nil];
-        [defaultNotificationCenter addObserver:self
-                                      selector:@selector(updateStatistics:)
-                                          name:VLCPlayerStatisticsUpdated
-                                        object:nil];
-        [defaultNotificationCenter addObserver:self
-                                      selector:@selector(updateCocoaWindowLevel:)
-                                          name:VLCWindowShouldUpdateLevel
-                                        object:nil];
-    }
     return self;
 }
 
@@ -85,7 +75,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)windowDidLoad
+- (void)awakeFromNib
 {
     [self.window setExcludedFromWindowsMenu: YES];
     [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
@@ -93,10 +83,28 @@
 
     _outlineView.dataSource = self;
 
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    if (_mainMenuInstance) {
+        [notificationCenter addObserver:self
+                               selector:@selector(currentPlaylistItemChanged:)
+                                   name:VLCPlaylistCurrentItemChanged
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(updateStatistics:)
+                                   name:VLCPlayerStatisticsUpdated
+                                 object:nil];
+    }
+    [notificationCenter addObserver:self
+                           selector:@selector(updateCocoaWindowLevel:)
+                               name:VLCWindowShouldUpdateLevel
+                             object:nil];
+
+    [notificationCenter postNotificationName:VLCPlayerStatisticsUpdated object:self];
+
     [self initStrings];
 
     _statisticsEnabled = var_InheritBool(getIntf(), "stats");
-    if (!_statisticsEnabled) {
+    if (!_statisticsEnabled || !_mainMenuInstance) {
         if ([_segmentedView segmentCount] >= 3)
             [_segmentedView setSegmentCount: 2];
     } else {
@@ -259,11 +267,9 @@
         [_imageWell setImage: [NSImage imageNamed: @"noart.png"]];
     } else {
         if (!_representedInputItem.preparsed) {
-            NSLog(@"item wasn't preparsed");
             [_representedInputItem preparseInputItem];
         }
 
-        NSLog(@"%s: %@ - %@ - %@", __PRETTY_FUNCTION__, _representedInputItem.title, _representedInputItem.MRL, _uriTextField);
         _uriTextField.stringValue = _representedInputItem.MRL;
         _titleTextField.stringValue = _representedInputItem.title;
         _authorTextField.stringValue = _representedInputItem.artist;
@@ -287,6 +293,10 @@
             artwork = [NSImage imageNamed: @"noart.png"];
         }
         [_imageWell setImage:artwork];
+
+        if (!_mainMenuInstance) {
+            [self.window setTitle:_representedInputItem.title];
+        }
     }
 
     /* reload the codec details table */
@@ -375,7 +385,8 @@
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView
-   isItemExpandable:(id)item {
+   isItemExpandable:(id)item
+{
     return ([item children].count > 0);
 }
 
