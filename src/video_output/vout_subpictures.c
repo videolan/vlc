@@ -248,10 +248,6 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
         return NULL;
     }
 
-    /* Create a few variables used for enhanced text rendering */
-    var_Create(text, "spu-elapsed",   VLC_VAR_INTEGER);
-    var_Create(text, "text-rerender", VLC_VAR_BOOL);
-
     return text;
 }
 
@@ -294,40 +290,16 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
     return scale;
 }
 
-static void SpuRenderText(spu_t *spu, bool *rerender_text,
+static void SpuRenderText(spu_t *spu,
                           subpicture_region_t *region,
-                          const vlc_fourcc_t *chroma_list,
-                          vlc_tick_t elapsed_time)
+                          const vlc_fourcc_t *chroma_list)
 {
     filter_t *text = spu->p->text;
 
     assert(region->fmt.i_chroma == VLC_CODEC_TEXT);
 
-    /* Setup 3 variables which can be used to render
-     * time-dependent text (and effects). The first indicates
-     * the total amount of time the text will be on screen,
-     * the second the amount of time it has already been on
-     * screen (can be a negative value as text is laid out
-     * before it is rendered) and the third is a feedback
-     * variable from the renderer - if the renderer sets it
-     * then this particular text is time-dependent, eg. the
-     * visual progress bar inside the text in karaoke and the
-     * text needs to be rendered multiple times in order for
-     * the effect to work - we therefore need to return the
-     * region to its original state at the end of the loop,
-     * instead of leaving it in YUVA or YUVP.
-     * Any renderer which is unaware of how to render
-     * time-dependent text can happily ignore the variables
-     * and render the text the same as usual - it should at
-     * least show up on screen, but the effect won't change
-     * the text over time.
-     */
-    var_SetInteger(text, "spu-elapsed", elapsed_time);
-    var_SetBool(text, "text-rerender", false);
-
     if ( region->p_text )
         text->pf_render(text, region, region, chroma_list);
-    *rerender_text = var_GetBool(text, "text-rerender");
 }
 
 /**
@@ -777,8 +749,6 @@ static void SpuRenderRegion(spu_t *spu,
     subpicture_t *subpic = entry->subpic;
     spu_private_t *sys = spu->p;
 
-    video_format_t fmt_original = region->fmt;
-    bool restore_text = false;
     int x_offset;
     int y_offset;
 
@@ -801,13 +771,11 @@ static void SpuRenderRegion(spu_t *spu,
         if (region->fmt.color_range == COLOR_RANGE_UNDEF)
             region->fmt.color_range = COLOR_RANGE_FULL;
 
-        SpuRenderText(spu, &restore_text, region,
-                      chroma_list,
-                      render_date - entry->start);
+        SpuRenderText(spu, region, chroma_list);
 
         /* Check if the rendering has failed ... */
         if (region->fmt.i_chroma == VLC_CODEC_TEXT)
-            goto exit;
+            return;
     }
 
     video_format_AdjustColorSpace(&region->fmt);
@@ -1114,24 +1082,6 @@ static void SpuRenderRegion(spu_t *spu,
                                    (entry->stop - fade_start);
         }
         dst->i_alpha   = fade_alpha * subpic->i_alpha * region->i_alpha / 65025;
-    }
-
-exit:
-    if (restore_text) {
-        /* Some forms of subtitles need to be re-rendered more than
-         * once, eg. karaoke. We therefore restore the region to its
-         * pre-rendered state, so the next time through everything is
-         * calculated again.
-         */
-        if (region->p_picture) {
-            picture_Release(region->p_picture);
-            region->p_picture = NULL;
-        }
-        if (region->p_private) {
-            subpicture_region_private_Delete(region->p_private);
-            region->p_private = NULL;
-        }
-        region->fmt = fmt_original;
     }
 }
 
