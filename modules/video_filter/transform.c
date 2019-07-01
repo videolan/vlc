@@ -198,6 +198,7 @@ static void PlaneYUY2_##f(plane_t *restrict dst, const plane_t *restrict src) \
     } \
 }
 
+#undef PLANES // already exists on Windows
 #define PLANES(f) \
 PLANE(f,8) PLANE(f,16) PLANE(f,32)
 
