@@ -62,11 +62,9 @@ typedef struct
     uint8_t    i_shadow_alpha;    /**< The transparency of the shadow. */
     int        i_shadow_width;    /**< The width of the shadow in pixels */
 
-    /* Background (and karaoke) */
+    /* Background */
     int        i_background_color;/**< The color of the background 0xRRGGBB */
     uint8_t    i_background_alpha;/**< The transparency of the background */
-    int        i_karaoke_background_color;/**< Background color for karaoke 0xRRGGBB */
-    uint8_t    i_karaoke_background_alpha;/**< The transparency of the karaoke bg */
 
     /* Line breaking */
     enum
@@ -92,9 +90,7 @@ typedef struct
 #define STYLE_HAS_SHADOW_ALPHA          (1 << 6)
 #define STYLE_HAS_BACKGROUND_COLOR      (1 << 7)
 #define STYLE_HAS_BACKGROUND_ALPHA      (1 << 8)
-#define STYLE_HAS_K_BACKGROUND_COLOR    (1 << 9)
-#define STYLE_HAS_K_BACKGROUND_ALPHA    (1 << 10)
-#define STYLE_HAS_WRAP_INFO             (1 << 11)
+#define STYLE_HAS_WRAP_INFO             (1 << 9)
 
 /* Style flags for \ref text_style_t */
 #define STYLE_BOLD              (1 << 0)
