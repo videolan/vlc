@@ -508,7 +508,7 @@ static void SpuRegionPlace(int *x, int *y,
         *y = region->i_y;
     } else {
         if (i_align & SUBPICTURE_ALIGN_TOP)
-            *y = region->i_y + ( subpic->b_subtitle ? region->fmt.i_visible_height : 0 );
+            *y = region->i_y;
         else if (i_align & SUBPICTURE_ALIGN_BOTTOM)
             *y = subpic->i_original_picture_height - region->fmt.i_visible_height - region->i_y;
         else
