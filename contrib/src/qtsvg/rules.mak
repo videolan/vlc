@@ -14,7 +14,7 @@ PKGS_FOUND += qtsvg
 endif
 
 $(TARBALLS)/qtsvg-$(QTSVG_VERSION).tar.xz:
-	$(call download,$(QTSVG_URL))
+	$(call download_pkg,$(QTSVG_URL),qt)
 
 .sum-qtsvg: qtsvg-$(QTSVG_VERSION).tar.xz
 
