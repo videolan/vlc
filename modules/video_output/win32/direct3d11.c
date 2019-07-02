@@ -858,14 +858,13 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
         .hardware_decoding = is_d3d11_opaque( vd->source.i_chroma ),
     };
     libvlc_video_direct3d_device_setup_t out;
-    ID3D11DeviceContext *d3d11_ctx = NULL;
-    if ( sys->setupDeviceCb( &sys->outside_opaque, &cfg, &out ) )
-        d3d11_ctx = out.device_context;
-    if ( d3d11_ctx == NULL )
+    if ( !sys->setupDeviceCb( &sys->outside_opaque, &cfg, &out ) ||
+         out.device_context == NULL )
     {
         msg_Err(vd, "Missing external ID3D11DeviceContext");
         return VLC_EGENERIC;
     }
+    ID3D11DeviceContext *d3d11_ctx = out.device_context;
     hr = D3D11_CreateDeviceExternal(vd, d3d11_ctx,
                                     is_d3d11_opaque(vd->source.i_chroma),
                                     &sys->d3d_dev);
