@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-21 23:10+0200\n"
+"PO-Revision-Date: 2019-07-02 04:09+0200\n"
 "Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2019\n"
 "Language-Team: Icelandic (https://www.transifex.com/yaron/teams/16553/is/)\n"
 "Language: is\n"
@@ -8798,7 +8798,7 @@ msgstr ""
 
 #: modules/access_output/http.c:61
 msgid "Metacube"
-msgstr ""
+msgstr "Metacube"
 
 #: modules/access_output/http.c:62
 msgid ""
