@@ -109,13 +109,23 @@ protected:
 
 private:
     QVector<IconToolButton> mButtons;
-    QVector<IconToolButton> buttons() const;
 
     void parseAndAdd(QString& config);
-    void loadConfig();
+
     bool setButtonAt(int index, const IconToolButton &button);
+    void addProfiles();
+    void loadConfig();
 
     QmlMainContext* m_mainCtx;
+
+public slots:
+    Q_INVOKABLE void insert(int index, QVariantMap bdata);
+    Q_INVOKABLE void move(int src,int dest);
+    Q_INVOKABLE void remove(int index);
+    Q_INVOKABLE void reloadConfig(QString config);
+    Q_INVOKABLE void saveConfig();
+    Q_INVOKABLE QString getConfig();
+    Q_INVOKABLE void reloadModel();
 };
 
 #endif // CONTROLLERMODEL_H
