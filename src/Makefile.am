@@ -564,7 +564,8 @@ check_PROGRAMS = \
 	test_shared_data_ptr \
 	test_playlist \
 	test_randomizer \
-	test_media_source
+	test_media_source \
+	test_extensions
 
 TESTS = $(check_PROGRAMS) check_symbols
 
@@ -589,6 +590,7 @@ test_mrl_helpers_SOURCES = test/mrl_helpers.c
 test_arrays_SOURCES = test/arrays.c
 test_vector_SOURCES = test/vector.c
 test_shared_data_ptr_SOURCES = test/shared_data_ptr.cpp
+test_extensions_SOURCES = test/extensions.c 
 test_playlist_SOURCES = playlist/test.c \
 	playlist/content.c \
 	playlist/control.c \
