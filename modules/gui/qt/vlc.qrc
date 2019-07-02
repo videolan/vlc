@@ -273,5 +273,6 @@
     <qresource prefix="/dialogs">
         <file alias="Dialogs.qml">qml/dialogs/Dialogs.qml</file>
         <file alias="ModalDialog.qml">qml/dialogs/ModalDialog.qml</file>
+        <file alias="EditorDummyButton.qml">qml/dialogs/EditorDummyButton.qml</file>
     </qresource>
 </RCC>

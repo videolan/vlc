@@ -565,6 +565,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/player/TopBar.qml \
 	gui/qt/qml/dialogs/Dialogs.qml \
 	gui/qt/qml/dialogs/ModalDialog.qml \
+	gui/qt/qml/dialogs/EditorDummyButton.qml \
 	gui/qt/qml/utils/DNDLabel.qml \
 	gui/qt/qml/utils/ToolTipArea.qml \
 	gui/qt/qml/utils/DrawerExt.qml \
