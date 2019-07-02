@@ -246,7 +246,8 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         vd->control = Control;
 
         /* */
-        vout_window_ReportSize(sys->embed, fmt->i_visible_width, fmt->i_visible_height);
+        // FIXME: this call leads to a fatal mutex locking error in vout_ChangeDisplaySize()
+        // vout_window_ReportSize(sys->embed, fmt->i_visible_width, fmt->i_visible_height);
 
         return VLC_SUCCESS;
 
@@ -644,7 +645,8 @@ static void OpenglSwap (vlc_gl_t *gl)
             sys->cfg.display.height = bounds.size.height;
 
             vout_display_PlacePicture(&place, &vd->source, &sys->cfg);
-            vout_window_ReportSize(sys->embed, bounds.size.width, bounds.size.height);
+            // FIXME: this call leads to a fatal mutex locking error in vout_ChangeDisplaySize()
+            // vout_window_ReportSize(sys->embed, bounds.size.width, bounds.size.height);
         }
     }
 
