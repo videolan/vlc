@@ -616,6 +616,7 @@ typedef struct
 typedef struct
 {
     void *device_context; /** ID3D11DeviceContext* for D3D11, IDirect3D9 * for D3D9 */
+    int  adapter;         /** Adapter to use with the IDirect3D9 for D3D9 */
 } libvlc_video_direct3d_device_setup_t;
 
 /** Setup the rendering environment.

@@ -204,6 +204,7 @@ static bool Setup_cb( void **opaque, const libvlc_video_direct3d_device_cfg_t *c
 {
     struct render_context *ctx = *opaque;
     out->device_context = ctx->d3d;
+    out->adapter = D3DADAPTER_DEFAULT;
     return true;
 }
 

@@ -1610,6 +1610,7 @@ static bool LocalSwapchainSetupDevice( void **opaque, const libvlc_video_direct3
     }
 
     out->device_context = sys->hd3d.obj;
+    out->adapter = -1;
     return true;
 }
 
@@ -1698,7 +1699,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
     IDirect3D9 *d3d9_device = device_setup.device_context;
     D3D9_CloneExternal( &sys->hd3d, d3d9_device );
-    HRESULT hr = D3D9_CreateDevice(vd, &sys->hd3d, -1, sys->sys.hvideownd, &sys->d3d_dev);
+    HRESULT hr = D3D9_CreateDevice(vd, &sys->hd3d, device_setup.adapter, sys->sys.hvideownd, &sys->d3d_dev);
     if (FAILED(hr)) {
         msg_Err( vd, "D3D9 Creation failed! (hr=0x%lX)", hr);
         D3D9_Destroy(&sys->hd3d);
