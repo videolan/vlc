@@ -24,6 +24,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class VLCInputItem;
+@class VLCImageView;
 
 @interface VLCInformationWindowController : NSWindowController
 
@@ -68,7 +69,7 @@
 @property (readwrite, weak) IBOutlet NSTextField *actorsTextField;
 @property (readwrite, weak) IBOutlet NSTextField *directorLabel;
 @property (readwrite, weak) IBOutlet NSTextField *directorTextField;
-@property (readwrite, weak) IBOutlet NSImageView *imageWell;
+@property (readwrite, weak) IBOutlet VLCImageView *artworkImageView;
 @property (readwrite, weak) IBOutlet NSButton *saveMetaDataButton;
 
 @property (readwrite, weak) IBOutlet NSTextField *audioLabel;

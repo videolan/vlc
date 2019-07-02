@@ -29,6 +29,7 @@
 #import "playlist/VLCPlayerController.h"
 #import "windows/video/VLCVideoOutputProvider.h"
 #import "library/VLCInputItem.h"
+#import "views/VLCImageView.h"
 
 #import <vlc_url.h>
 
@@ -289,7 +290,7 @@
         SET( description );
         SET( encodedby );
 #undef SET
-        [_imageWell setImage: [NSImage imageNamed: @"noart.png"]];
+        [_artworkImageView setImage: [NSImage imageNamed:@"noart.png"]];
     } else {
         if (!_representedInputItem.preparsed) {
             [_representedInputItem preparseInputItem];
@@ -316,14 +317,8 @@
         _encodedbyTextField.stringValue = _representedInputItem.encodedBy;
 
         NSURL *artworkURL = _representedInputItem.artworkURL;
-        NSImage *artwork;
-        if (artworkURL) {
-            artwork = [[NSImage alloc] initWithContentsOfURL:_representedInputItem.artworkURL];
-        }
-        if (!artwork) {
-            artwork = [NSImage imageNamed: @"noart.png"];
-        }
-        [_imageWell setImage:artwork];
+        NSImage *placeholderImage = [NSImage imageNamed: @"noart.png"];
+        [_artworkImageView setImageURL:artworkURL placeholderImage:placeholderImage];
 
         if (!_mainMenuInstance) {
             [self.window setTitle:_representedInputItem.title];
