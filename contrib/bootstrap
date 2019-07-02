@@ -397,9 +397,9 @@ esac
 BOOTSTRAP_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 CURRENT_PATH="$( pwd -P )"
 # location of the contrib/src folder from the root of the contrib build folder
-TOPSRC=$(python -c "import os; print(os.path.relpath('$BOOTSTRAP_PATH', '$CURRENT_PATH'))")
+TOPSRC=$(python3 -c "import os; print(os.path.relpath('$BOOTSTRAP_PATH', '$CURRENT_PATH'))")
 # location of the contrib/src folder from a built library folder
-TOPSRC_BUILT=$(python -c "import os; print(os.path.relpath('$BOOTSTRAP_PATH', '$CURRENT_PATH/libfoo'))")
+TOPSRC_BUILT=$(python3 -c "import os; print(os.path.relpath('$BOOTSTRAP_PATH', '$CURRENT_PATH/libfoo'))")
 add_make "TOPSRC = $TOPSRC"
 add_make "TOPSRC_BUILT = $TOPSRC_BUILT"
 add_make "TOPDST = .."
