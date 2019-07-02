@@ -275,5 +275,6 @@
         <file alias="ModalDialog.qml">qml/dialogs/ModalDialog.qml</file>
         <file alias="EditorDummyButton.qml">qml/dialogs/EditorDummyButton.qml</file>
         <file alias="EditorDNDDelegate.qml">qml/dialogs/EditorDNDDelegate.qml</file>
+        <file alias="ToolbarEditorButtonList.qml">qml/dialogs/ToolbarEditorButtonList.qml</file>
     </qresource>
 </RCC>

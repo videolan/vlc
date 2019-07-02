@@ -27,6 +27,36 @@ import "qrc:///menus/" as Menus
 import "qrc:///style/"
 
 Item{
+    property var buttonL: [
+        { id:  PlayerControlBarModel.PLAY_BUTTON, label: VLCIcons.play, text: qsTr("Play")},
+        { id:  PlayerControlBarModel.STOP_BUTTON, label: VLCIcons.stop, text: qsTr("Stop")},
+        { id:  PlayerControlBarModel.OPEN_BUTTON, label: VLCIcons.eject, text: qsTr("Open")},
+        { id:  PlayerControlBarModel.PREVIOUS_BUTTON, label: VLCIcons.previous, text: qsTr("Previous")},
+        { id:  PlayerControlBarModel.NEXT_BUTTON, label: VLCIcons.next, text: qsTr("Next")},
+        { id:  PlayerControlBarModel.SLOWER_BUTTON, label: VLCIcons.slower, text: qsTr("Slower")},
+        { id:  PlayerControlBarModel.FASTER_BUTTON, label: VLCIcons.faster, text: qsTr("Faster")},
+        { id:  PlayerControlBarModel.FULLSCREEN_BUTTON, label: VLCIcons.fullscreen, text: qsTr("Fullscreen")},
+        { id:  PlayerControlBarModel.EXTENDED_BUTTON, label: VLCIcons.extended, text: qsTr("Extended panel")},
+        { id:  PlayerControlBarModel.PLAYLIST_BUTTON, label: VLCIcons.playlist, text: qsTr("Playlist")},
+        { id:  PlayerControlBarModel.SNAPSHOT_BUTTON, label: VLCIcons.snapshot, text: qsTr("Snapshot")},
+        { id:  PlayerControlBarModel.RECORD_BUTTON, label: VLCIcons.record, text: qsTr("Record")},
+        { id:  PlayerControlBarModel.ATOB_BUTTON, label: VLCIcons.atob, text: qsTr("A-B Loop")},
+        { id:  PlayerControlBarModel.FRAME_BUTTON, label: VLCIcons.frame_by_frame, text: qsTr("Frame By Frame")},
+        { id:  PlayerControlBarModel.SKIP_BACK_BUTTON, label: VLCIcons.skip_back, text: qsTr("Step backward")},
+        { id:  PlayerControlBarModel.SKIP_FW_BUTTON, label: VLCIcons.skip_for, text: qsTr("Step forward")},
+        { id:  PlayerControlBarModel.QUIT_BUTTON, label: VLCIcons.clear, text: qsTr("Quit")},
+        { id:  PlayerControlBarModel.RANDOM_BUTTON, label: VLCIcons.shuffle_on, text: qsTr("Random")},
+        { id:  PlayerControlBarModel.LOOP_BUTTON, label: VLCIcons.repeat_all, text: qsTr("Loop")},
+        { id:  PlayerControlBarModel.INFO_BUTTON, label: VLCIcons.info, text: qsTr("Information")},
+        { id:  PlayerControlBarModel.LANG_BUTTON, label: VLCIcons.audiosub, text: qsTr("Open subtitles")},
+        { id:  PlayerControlBarModel.MENU_BUTTON, label: VLCIcons.menu, text: qsTr("Menu Button")},
+        { id:  PlayerControlBarModel.BACK_BUTTON, label: VLCIcons.exit, text: qsTr("Back Button")},
+        { id:  PlayerControlBarModel.VOLUME, label: VLCIcons.volume_high, text: qsTr("Volume Widget")},
+        { id:  PlayerControlBarModel.TELETEXT_BUTTONS, label: VLCIcons.tvtelx, text: qsTr("Teletext")},
+        { id:  PlayerControlBarModel.ASPECT_RATIO_COMBOBOX, label: VLCIcons.aspect_ratio, text: qsTr("Aspect Ratio")},
+        { id:  PlayerControlBarModel.WIDGET_SPACER, label: VLCIcons.space, text: qsTr("Spacer")},
+        { id:  PlayerControlBarModel.WIDGET_SPACER_EXTEND, label: VLCIcons.space, text: qsTr("Expanding Spacer")}
+    ]
 
     function returnbuttondelegate(inpID){
         switch (inpID){

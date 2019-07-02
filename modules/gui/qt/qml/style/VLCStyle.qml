@@ -87,6 +87,7 @@ Item {
     property int heightBar_xsmall: 8 * scale;
     property int heightBar_small: 16 * scale;
     property int heightBar_normal: 32 * scale;
+    property int heightBar_medium: 48 * scale;
     property int heightBar_large: 64 * scale;
     property int heightBar_xlarge: 128 * scale;
     property int heightBar_xxlarge: 256 * scale;
@@ -101,6 +102,9 @@ Item {
     property int widthTeletext: 280 * scale;
     property int widthExtendedSpacer: 128 * scale;
     property int heightInput: 22 * scale;
+
+    property int scrollbarWidth: 8 * scale;
+    property int scrollbarHeight: 100 * scale;
 
     property int selectedBorder: 2
     property real video_normal_height: 160 * scale;
