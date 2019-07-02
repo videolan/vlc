@@ -34,7 +34,6 @@
 #include <limits.h>
 #include <assert.h>
 
-#include "../src/revision.c"
 
 libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
 {
