@@ -1,0 +1,128 @@
+/*****************************************************************************
+ * Copyright (C) 2019 VLC authors and VideoLAN
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * ( at your option ) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+import QtQuick 2.11
+import QtQml.Models 2.11
+
+import org.videolan.vlc 0.1
+
+import "qrc:///utils/" as Utils
+import "qrc:///style/"
+
+MouseArea {
+    id: dragArea
+
+    property bool held: false
+    property bool dropVisible: false
+    anchors.verticalCenter: parent.verticalCenter
+    cursorShape: dropVisible ? Qt.DragMoveCursor : Qt.OpenHandCursor
+    drag.target: held ? content : undefined
+    width: buttonloader.width
+    height: VLCStyle.icon_medium
+
+    Rectangle {
+        z: 1
+        width: 2 * scale
+        height: parent.height
+        anchors {
+            left: parent.left
+            verticalCenter: parent.verticalCenter
+        }
+        antialiasing: true
+        visible: dropVisible
+        color: VLCStyle.colors.accent
+    }
+    onPressed: held = true
+
+    onExited: {
+        if(containsPress)
+            playerBtnDND.deleteBtn = true
+    }
+
+    onReleased: {
+        drag.target.Drag.drop()
+        held = false
+        if(playerBtnDND.deleteBtn){
+            playerBtnDND.deleteBtn = false
+            playerBtnDND.model.remove(
+                        dragArea.DelegateModel.itemsIndex)
+        }
+    }
+
+    Rectangle {
+        id: content
+        Drag.active: dragArea.held
+        Drag.source: dragArea
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            verticalCenter: parent.verticalCenter
+        }
+        Loader{
+            id: buttonloader
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                verticalCenter: parent.verticalCenter
+            }
+            sourceComponent: controlButtons.returnbuttondelegate(model.id)
+            onLoaded: buttonloader.item.paintOnly = true
+
+        }
+
+        states: State {
+            when: dragArea.held
+
+            ParentChange { target: content; parent: root }
+            AnchorChanges {
+                target: content
+                anchors { horizontalCenter: undefined; verticalCenter: undefined }
+            }
+        }
+    }
+    DropArea {
+        anchors.fill: parent
+
+        onEntered: {
+            dropVisible = true
+            playerBtnDND.deleteBtn = false
+        }
+
+        onExited: {
+            dropVisible = false
+            if(!playerBtnDND.addBtn)
+                playerBtnDND.deleteBtn = true
+        }
+
+        onDropped: {
+            if (drag.source.objectName == "buttonsList")
+                playerBtnDND.model.insert(parent.DelegateModel.itemsIndex,
+                                            {"id" : drag.source.mIndex,
+                                                "size": bigButton.checked ?
+                                                            PlayerControlBarModel.WIDGET_BIG :
+                                                            PlayerControlBarModel.WIDGET_NORMAL})
+            else{
+                var srcIndex = drag.source.DelegateModel.itemsIndex
+                var destIndex = parent.DelegateModel.itemsIndex
+
+                if(srcIndex < destIndex)
+                    destIndex -= 1
+                playerBtnDND.model.move(srcIndex,destIndex)
+            }
+            dropVisible = false
+        }
+    }
+}
