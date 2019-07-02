@@ -103,7 +103,7 @@ Item {
     property int widthExtendedSpacer: 128 * scale;
     property int heightInput: 22 * scale;
 
-    property int scrollbarWidth: 8 * scale;
+    property int scrollbarWidth: 4 * scale;
     property int scrollbarHeight: 100 * scale;
 
     property int selectedBorder: 2

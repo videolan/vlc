@@ -29,5 +29,6 @@ Utils.MenuExt {
     Action { text: qsTr("&Messages");               onTriggered: dialogProvider.messagesDialog();   icon.source: "qrc:/menu/messages.svg";    shortcut: "Ctrl+M" }
     Action { text: qsTr("Plu&gins and extensions"); onTriggered: dialogProvider.pluginDialog();                                                                  }
     MenuSeparator {}
+    Action { text: qsTr("Customise Interface");     onTriggered: dialogProvider.toolbarDialog();    icon.source: "qrc:/menu/preferences.svg";}
     Action { text: qsTr("&Preferences");            onTriggered: dialogProvider.prefsDialog();      icon.source: "qrc:/menu/preferences.svg"; shortcut: "Ctrl+P" }
 }

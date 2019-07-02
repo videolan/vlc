@@ -90,12 +90,8 @@ Utils.NavigableFocusScope {
                     property bool _focusGiven: false
                     focus: true
                     anchors.fill: parent
-
                     Repeater{
-                        model: PlayerControlBarModel{
-                            id: buttonsmodel
-                            mainCtx: mainctx
-                        }
+                        model: playerControlBarModel
                         delegate: Loader{
                             id: buttonloader
 
@@ -126,6 +122,11 @@ Utils.NavigableFocusScope {
                 }
             }
         }
+    }
+
+    PlayerControlBarModel{
+        id:playerControlBarModel
+        mainCtx: mainctx
     }
 
     ControlButtons{
