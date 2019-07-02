@@ -727,31 +727,6 @@ typedef struct
  * \return true on success
  * \version LibVLC 4.0.0 or later
  *
- * On Direct3D9 the following may change on the provided IDirect3DDevice9*
- * between \ref enter being true and \ref enter being false:
- * - D3DSAMP_ADDRESSU
- * - D3DSAMP_ADDRESSV
- * - D3DSAMP_MINFILTER
- * - D3DSAMP_MAGFILTER
- * - D3DRS_AMBIENT
- * - D3DRS_CULLMODE
- * - D3DRS_ZENABLE
- * - D3DRS_LIGHTING
- * - D3DRS_DITHERENABLE
- * - D3DRS_STENCILENABLE
- * - D3DRS_ALPHABLENDENABLE
- * - D3DRS_SRCBLEND,D3DBLEND_SRCALPHA
- * - D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA
- * - D3DPCMPCAPS_GREATER
- * - D3DRS_ALPHATESTENABLE
- * - D3DRS_ALPHAREF
- * - D3DRS_ALPHAFUNC
- * - D3DTSS_COLOROP
- * - D3DTSS_COLORARG1
- * - D3DTSS_ALPHAOP
- * - D3DTSS_ALPHAARG1
- * - D3DTSS_ALPHAARG2
- *
  * On Direct3D11 the following may change on the provided ID3D11DeviceContext*
  * between \ref enter being true and \ref enter being false:
  * - IASetPrimitiveTopology()
