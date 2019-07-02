@@ -41,7 +41,8 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
 
 #ifndef NDEBUG
     // Look for 'NVIDIA PerfHUD' adapter
-    // If it is present, override default settings
+    // If it is present, override default settings for performance debugging
+    // see https://developer.nvidia.com/nvidia-perfhud up to Win7
     for (UINT Adapter=0; Adapter< IDirect3D9_GetAdapterCount(hd3d->obj); ++Adapter) {
         D3DADAPTER_IDENTIFIER9 Identifier;
         hr = IDirect3D9_GetAdapterIdentifier(hd3d->obj,Adapter,0,&Identifier);
