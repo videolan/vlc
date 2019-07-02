@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-21 07:33+0200\n"
+"PO-Revision-Date: 2019-07-02 11:38+0200\n"
 "Last-Translator: picodotdev <pico.dev@gmail.com>, 2019\n"
 "Language-Team: Spanish (https://www.transifex.com/yaron/teams/16553/es/)\n"
 "Language: es\n"
@@ -18022,7 +18022,7 @@ msgstr "Abrir ventana Efectos de audio"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
-msgstr "Abrir fuente"
+msgstr "Código abierto"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:131
 msgid "Media Resource Locator (MRL)"
