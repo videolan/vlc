@@ -32,12 +32,12 @@
 
 @property (readwrite, weak) IBOutlet NSTextField *uriLabel;
 @property (readwrite, weak) IBOutlet NSTextField *titleLabel;
-@property (readwrite, weak) IBOutlet NSTextField *authorLabel;
 @property (readwrite, weak) IBOutlet NSTextField *uriTextField;
 @property (readwrite, weak) IBOutlet NSTextField *titleTextField;
-@property (readwrite, weak) IBOutlet NSTextField *authorTextField;
-@property (readwrite, weak) IBOutlet NSTextField *collectionLabel;
-@property (readwrite, weak) IBOutlet NSTextField *collectionTextField;
+@property (readwrite, weak) IBOutlet NSTextField *artistLabel;
+@property (readwrite, weak) IBOutlet NSTextField *artistTextField;
+@property (readwrite, weak) IBOutlet NSTextField *albumLabel;
+@property (readwrite, weak) IBOutlet NSTextField *albumTextField;
 @property (readwrite, weak) IBOutlet NSTextField *copyrightLabel;
 @property (readwrite, weak) IBOutlet NSTextField *copyrightTextField;
 @property (readwrite, weak) IBOutlet NSTextField *dateLabel;
@@ -54,8 +54,20 @@
 @property (readwrite, weak) IBOutlet NSTextField *nowPlayingTextField;
 @property (readwrite, weak) IBOutlet NSTextField *publisherLabel;
 @property (readwrite, weak) IBOutlet NSTextField *publisherTextField;
-@property (readwrite, weak) IBOutlet NSTextField *seqNumLabel;
-@property (readwrite, weak) IBOutlet NSTextField *seqNumTextField;
+@property (readwrite, weak) IBOutlet NSTextField *trackNumberLabel;
+@property (readwrite, weak) IBOutlet NSTextField *trackNumberTextField;
+@property (readwrite, weak) IBOutlet NSTextField *trackTotalLabel;
+@property (readwrite, weak) IBOutlet NSTextField *trackTotalTextField;
+@property (readwrite, weak) IBOutlet NSTextField *showNameLabel;
+@property (readwrite, weak) IBOutlet NSTextField *showNameTextField;
+@property (readwrite, weak) IBOutlet NSTextField *seasonLabel;
+@property (readwrite, weak) IBOutlet NSTextField *seasonTextField;
+@property (readwrite, weak) IBOutlet NSTextField *episodeLabel;
+@property (readwrite, weak) IBOutlet NSTextField *episodeTextField;
+@property (readwrite, weak) IBOutlet NSTextField *actorsLabel;
+@property (readwrite, weak) IBOutlet NSTextField *actorsTextField;
+@property (readwrite, weak) IBOutlet NSTextField *directorLabel;
+@property (readwrite, weak) IBOutlet NSTextField *directorTextField;
 @property (readwrite, weak) IBOutlet NSImageView *imageWell;
 @property (readwrite, weak) IBOutlet NSButton *saveMetaDataButton;
 
