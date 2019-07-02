@@ -1690,16 +1690,15 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         .hardware_decoding = is_d3d9_opaque( vd->source.i_chroma ),
     };
     libvlc_video_direct3d_device_setup_t device_setup;
-    IDirect3D9 *d3d9_device = NULL;
-    if ( sys->setupDeviceCb( &sys->outside_opaque, &surface_cfg, &device_setup ) )
-        d3d9_device = device_setup.device_context;
-    if ( d3d9_device == NULL )
+    if ( !sys->setupDeviceCb( &sys->outside_opaque, &surface_cfg, &device_setup ) ||
+         device_setup.device_context == NULL )
     {
         msg_Err(vd, "Missing external IDirect3D9");
         return VLC_EGENERIC;
     }
+    IDirect3D9 *d3d9_device = device_setup.device_context;
     D3D9_CloneExternal( &sys->hd3d, d3d9_device );
-    HRESULT hr = D3D9_CreateDevice(vd, &sys->hd3d, sys->sys.hvideownd, &sys->d3d_dev);
+    HRESULT hr = D3D9_CreateDevice(vd, &sys->hd3d, -1, sys->sys.hvideownd, &sys->d3d_dev);
     if (FAILED(hr)) {
         msg_Err( vd, "D3D9 Creation failed! (hr=0x%lX)", hr);
         D3D9_Destroy(&sys->hd3d);
@@ -1961,7 +1960,7 @@ GLConvOpen(vlc_object_t *obj)
         goto error;
     }
 
-    if (FAILED(D3D9_CreateDevice(obj, &priv->hd3d, tc->gl->surface->handle.hwnd,
+    if (FAILED(D3D9_CreateDevice(obj, &priv->hd3d, -1, tc->gl->surface->handle.hwnd,
                                  &priv->d3d_dev)))
         goto error;
 

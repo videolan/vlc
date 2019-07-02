@@ -31,28 +31,30 @@ typedef picture_sys_d3d9_t VA_PICSYS;
 #include "../codec/avcodec/va_surface.h"
 
 #undef D3D9_CreateDevice
-HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
+HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, int AdapterToUse, HWND hwnd,
                           d3d9_device_t *out)
 {
     HRESULT hr;
-
-    UINT AdapterToUse = D3DADAPTER_DEFAULT;
     D3DDEVTYPE DeviceType = D3DDEVTYPE_HAL;
 
+    if (AdapterToUse == -1)
+    {
+        AdapterToUse = D3DADAPTER_DEFAULT;
 #ifndef NDEBUG
-    // Look for 'NVIDIA PerfHUD' adapter
-    // If it is present, override default settings for performance debugging
-    // see https://developer.nvidia.com/nvidia-perfhud up to Win7
-    for (UINT Adapter=0; Adapter< IDirect3D9_GetAdapterCount(hd3d->obj); ++Adapter) {
-        D3DADAPTER_IDENTIFIER9 Identifier;
-        hr = IDirect3D9_GetAdapterIdentifier(hd3d->obj,Adapter,0,&Identifier);
-        if (SUCCEEDED(hr) && strstr(Identifier.Description,"PerfHUD") != 0) {
-            AdapterToUse = Adapter;
-            DeviceType = D3DDEVTYPE_REF;
-            break;
+        // Check for 'NVIDIA PerfHUD' adapter
+        // If it is present, override default settings for performance debugging
+        // see https://developer.nvidia.com/nvidia-perfhud up to Win7
+        for (UINT Adapter=0; Adapter< IDirect3D9_GetAdapterCount(hd3d->obj); ++Adapter) {
+            D3DADAPTER_IDENTIFIER9 Identifier;
+            hr = IDirect3D9_GetAdapterIdentifier(hd3d->obj, Adapter, 0, &Identifier);
+            if (SUCCEEDED(hr) && strstr(Identifier.Description,"PerfHUD") != 0) {
+                AdapterToUse = Adapter;
+                DeviceType = D3DDEVTYPE_REF;
+                break;
+            }
         }
-    }
 #endif
+    }
 
     /*
     ** Get device capabilities

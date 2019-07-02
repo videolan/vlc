@@ -95,9 +95,9 @@ static inline void ReleaseD3D9PictureSys(picture_sys_d3d9_t *p_sys)
     FreeLibrary(p_sys->dxva2_dll);
 }
 
-HRESULT D3D9_CreateDevice(vlc_object_t *, d3d9_handle_t *, HWND,
+HRESULT D3D9_CreateDevice(vlc_object_t *, d3d9_handle_t *, int, HWND,
                           d3d9_device_t *out);
-#define D3D9_CreateDevice(a,b,c,d) D3D9_CreateDevice( VLC_OBJECT(a), b, c, d )
+#define D3D9_CreateDevice(a,b,c,d,e) D3D9_CreateDevice( VLC_OBJECT(a), b, c, d, e )
 HRESULT D3D9_CreateDeviceExternal(IDirect3DDevice9 *, d3d9_handle_t *, HWND,
                                   d3d9_device_t *out);
 

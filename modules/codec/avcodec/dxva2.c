@@ -359,7 +359,7 @@ static int D3dCreateDevice(vlc_va_t *va)
         return VLC_SUCCESS;
     }
 
-    HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, NULL, &sys->d3d_dev);
+    HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, -1, NULL, &sys->d3d_dev);
     if (FAILED(hr))
     {
         msg_Err(va, "IDirect3D9_CreateDevice failed");
