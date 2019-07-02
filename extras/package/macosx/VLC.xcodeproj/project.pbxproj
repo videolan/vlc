@@ -60,7 +60,7 @@
 		1CCC88F32078A3D500E5626F /* VideoEffects.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224171E4D2A9000833BE1 /* VideoEffects.xib */; };
 		1CCC88F42078A3D500E5626F /* Bookmarks.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224011E4D2A9000833BE1 /* Bookmarks.xib */; };
 		1CCC88F52078A3D500E5626F /* SyncTracks.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224141E4D2A9000833BE1 /* SyncTracks.xib */; };
-		1CCC88F62078A3D500E5626F /* MediaInfo.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82240B1E4D2A9000833BE1 /* MediaInfo.xib */; };
+		1CCC88F62078A3D500E5626F /* VLCInformationWindow.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82240B1E4D2A9000833BE1 /* VLCInformationWindow.xib */; };
 		1CCC88F72078A3D500E5626F /* ConvertAndSave.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224031E4D2A9000833BE1 /* ConvertAndSave.xib */; };
 		1CCC88F82078A3D500E5626F /* CoreDialogs.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224041E4D2A9000833BE1 /* CoreDialogs.xib */; };
 		1CCC88F92078A3D500E5626F /* DetachedVideoWindow.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224051E4D2A9000833BE1 /* DetachedVideoWindow.xib */; };
@@ -263,7 +263,7 @@
 		6B8224071E4D2A9000833BE1 /* Help.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Help.xib; sourceTree = "<group>"; };
 		6B8224081E4D2A9000833BE1 /* LogMessageWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LogMessageWindow.xib; sourceTree = "<group>"; };
 		6B8224091E4D2A9000833BE1 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
-		6B82240B1E4D2A9000833BE1 /* MediaInfo.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MediaInfo.xib; sourceTree = "<group>"; };
+		6B82240B1E4D2A9000833BE1 /* VLCInformationWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCInformationWindow.xib; sourceTree = "<group>"; };
 		6B82240C1E4D2A9000833BE1 /* Open.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Open.xib; sourceTree = "<group>"; };
 		6B82240D1E4D2A9000833BE1 /* PlaylistAccessoryView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PlaylistAccessoryView.xib; sourceTree = "<group>"; };
 		6B82240F1E4D2A9000833BE1 /* PopupPanel.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PopupPanel.xib; sourceTree = "<group>"; };
@@ -1551,7 +1551,7 @@
 				6B8224171E4D2A9000833BE1 /* VideoEffects.xib */,
 				6B8224011E4D2A9000833BE1 /* Bookmarks.xib */,
 				6B8224141E4D2A9000833BE1 /* SyncTracks.xib */,
-				6B82240B1E4D2A9000833BE1 /* MediaInfo.xib */,
+				6B82240B1E4D2A9000833BE1 /* VLCInformationWindow.xib */,
 				6B8224031E4D2A9000833BE1 /* ConvertAndSave.xib */,
 				6B8224041E4D2A9000833BE1 /* CoreDialogs.xib */,
 				6B8224051E4D2A9000833BE1 /* DetachedVideoWindow.xib */,
@@ -1664,7 +1664,7 @@
 				1CCC88F42078A3D500E5626F /* Bookmarks.xib in Sources */,
 				7D2554C522C8E8B500F2D9C2 /* VLCMediaSourceDeviceCollectionViewItem.m in Sources */,
 				1CCC88F52078A3D500E5626F /* SyncTracks.xib in Sources */,
-				1CCC88F62078A3D500E5626F /* MediaInfo.xib in Sources */,
+				1CCC88F62078A3D500E5626F /* VLCInformationWindow.xib in Sources */,
 				7D66D4392200C5B80040D04A /* VLCVideoFilterHelper.m in Sources */,
 				7D445D812202524000263D34 /* VLCPlaylistController.m in Sources */,
 				7DFBDCBE226CED7200B700A5 /* VLCMediaSource.m in Sources */,

@@ -66,7 +66,7 @@
 
 - (id)init
 {
-    self = [super initWithWindowNibName:@"MediaInfo"];
+    self = [super initWithWindowNibName:@"VLCInformationWindow"];
     return self;
 }
 

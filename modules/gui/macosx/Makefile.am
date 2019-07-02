@@ -278,7 +278,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCLibraryCollectionViewItem.xib \
 	gui/macosx/UI/VLCMediaSourceCollectionViewItem.xib \
 	gui/macosx/UI/VLCMediaSourceDeviceCollectionViewItem.xib \
-	gui/macosx/UI/MediaInfo.xib \
+	gui/macosx/UI/VLCInformationWindow.xib \
 	gui/macosx/UI/Open.xib \
 	gui/macosx/UI/PlaylistAccessoryView.xib \
 	gui/macosx/UI/PopupPanel.xib \
