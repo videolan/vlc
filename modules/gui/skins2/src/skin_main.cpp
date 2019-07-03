@@ -366,8 +366,21 @@ static int WindowEnable( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 
 static void WindowDisable( vout_window_t *pWnd )
 {
-    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
-    intf_thread_t *pIntf = sys->pIntf;
+    // vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+
+    // Design issue
+    // In the process of quitting vlc, the interfaces are destroyed first,
+    // then comes the playlist along with the player and possible vouts.
+    // problem: the interface is no longer active to properly deallocate
+    // ressources allocated as a vout window submodule.
+    vlc_mutex_lock( &skin_load.mutex );
+    intf_thread_t *pIntf = skin_load.intf;
+    vlc_mutex_unlock( &skin_load.mutex );
+    if( pIntf == NULL )
+    {
+        msg_Err( pWnd, "Design issue: the interface no longer exists !!!!" );
+        return;
+    }
 
     // force execution in the skins2 thread context
     CmdExecuteBlock* cmd = new CmdExecuteBlock( pIntf, VLC_OBJECT( pWnd ),
