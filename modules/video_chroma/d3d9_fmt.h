@@ -66,6 +66,12 @@ typedef struct
     D3DCAPS9                caps;
 } d3d9_device_t;
 
+typedef struct
+{
+    IDirect3D9    *device;
+    int            adapter;
+} d3d9_decoder_device_t;
+
 static inline bool is_d3d9_opaque(vlc_fourcc_t chroma)
 {
     switch (chroma)
