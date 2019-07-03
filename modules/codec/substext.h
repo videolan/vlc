@@ -140,6 +140,13 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     video_format_t fmt;
     video_format_Init(&fmt, VLC_CODEC_TEXT);
 
+    /* NOTE about fmt_dst:
+     * fmt_dst area and A/R will change to display once WxH of the
+     * display is greater than the source video in direct rendering.
+     * This will cause weird sudded region "moves" or "linebreaks" when
+     * resizing window, mostly vertically.
+     * see changes by 4a49754d943560fe79bc42f107d8ce566ea24898 */
+
     if( sys->region.flags & UPDT_REGION_USES_GRID_COORDINATES )
     {
         fmt.i_sar_num = 4;
