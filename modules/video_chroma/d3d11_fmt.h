@@ -79,6 +79,11 @@ typedef struct
     DXGI_FORMAT                   formatTexture;
 } picture_sys_d3d11_t;
 
+typedef struct
+{
+    ID3D11DeviceContext *device;
+} d3d11_decoder_device_t;
+
 /* index to use for texture/resource that use a known DXGI format
  * (ie not DXGI_FORMAT_UNKNWON) */
 #define KNOWN_DXGI_INDEX   0

@@ -524,7 +524,7 @@ typedef struct vlc_decoder_device
      * VAAPI: VADisplay
      * VDPAU: vdp_t *
      * DXVA2: d3d9_decoder_device_t*
-     * D3D11VA: ID3D11DeviceContext*
+     * D3D11VA: d3d11_decoder_device_t*
      * AWindow: android AWindowHandler*
      * NVDEC: decoder_device_nvdec_t*
      * MMAL: MMAL_PORT_T*
