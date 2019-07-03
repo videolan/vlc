@@ -25,6 +25,7 @@
 
 #include <assert.h>
 
+#include <initguid.h>
 #include "d3d9_fmt.h"
 
 typedef picture_sys_d3d9_t VA_PICSYS;
@@ -269,5 +270,9 @@ void D3D9_CloneExternal(d3d9_handle_t *hd3d, IDirect3D9 *dev)
     hd3d->obj = dev;
     IDirect3D9_AddRef( hd3d->obj );
     hd3d->hdll = NULL;
-    hd3d->use_ex = false; /* we don't care */
+
+    void *pv = NULL;
+    hd3d->use_ex = SUCCEEDED(IDirect3D9_QueryInterface(dev, &IID_IDirect3D9Ex, &pv));
+    if (hd3d->use_ex && pv)
+        IDirect3D9Ex_Release((IDirect3D9Ex*) pv);
 }
