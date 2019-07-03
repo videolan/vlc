@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-22 19:46+0200\n"
+"PO-Revision-Date: 2019-07-03 20:01+0200\n"
 "Last-Translator: Marián Hikaník <podnety@mojepreklady.net>, 2019\n"
 "Language-Team: Slovak (https://www.transifex.com/yaron/teams/16553/sk/)\n"
 "Language: sk\n"
@@ -21552,7 +21552,7 @@ msgstr "Priblí&žiť"
 
 #: modules/gui/qt/menus.cpp:688
 msgid "&Aspect Ratio"
-msgstr "Str&anový pomer"
+msgstr "Po&mer strán"
 
 #: modules/gui/qt/menus.cpp:689
 msgid "&Crop"
