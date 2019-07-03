@@ -214,11 +214,14 @@ vlc_playlist_RequestMove(vlc_playlist_t *playlist,
 
     vlc_playlist_FindIndices(playlist, items, count, index_hint, &vector);
 
-    if (vector.size > 0)
+    size_t move_count = vector.size;
+    if (move_count)
     {
         size_t size = vlc_playlist_Count(playlist);
-        if (target >= size)
-            target = size - 1;
+        assert(size >= move_count);
+        /* move at most to the end of the list */
+        if (target + move_count > size)
+            target = size - move_count;
 
         /* keep the items in the same order as the request (do not sort them) */
         vlc_playlist_MoveBySlices(playlist, vector.data, vector.size, target);

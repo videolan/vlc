@@ -1782,6 +1782,107 @@ test_request_move_adapt(void)
 }
 
 static void
+test_request_move_to_end_adapt(void)
+{
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    assert(playlist);
+
+    input_item_t *media[16];
+    CreateDummyMediaArray(media, 16);
+
+    /* initial playlist with 15 items */
+    int ret = vlc_playlist_Append(playlist, media, 15);
+    assert(ret == VLC_SUCCESS);
+
+    struct vlc_playlist_callbacks cbs = {
+        .on_items_moved = callback_on_items_moved,
+    };
+
+    struct callback_ctx ctx = CALLBACK_CTX_INITIALIZER;
+    vlc_playlist_listener_id *listener =
+            vlc_playlist_AddListener(playlist, &cbs, &ctx, false);
+    assert(listener);
+
+    vlc_playlist_item_t *dummy = vlc_playlist_item_New(media[15], 0);
+    assert(dummy);
+
+    /* move items in a wrong order at wrong position, as if the playlist had
+     * been sorted/shuffled before the request were applied */
+    vlc_playlist_item_t *items_to_move[] = {
+        vlc_playlist_Get(playlist, 7),
+        vlc_playlist_Get(playlist, 8),
+        vlc_playlist_Get(playlist, 5),
+        vlc_playlist_Get(playlist, 12),
+        dummy, /* inexistant */
+        vlc_playlist_Get(playlist, 3),
+        vlc_playlist_Get(playlist, 13),
+        vlc_playlist_Get(playlist, 14),
+        vlc_playlist_Get(playlist, 1),
+    };
+
+    /* target 20 is far beyond the end of the list */
+    vlc_playlist_RequestMove(playlist, items_to_move, 9, 20, 2);
+
+    vlc_playlist_item_Release(dummy);
+
+    assert(vlc_playlist_Count(playlist) == 15);
+
+    EXPECT_AT(0, 0);
+    EXPECT_AT(1, 2);
+    EXPECT_AT(2, 4);
+    EXPECT_AT(3, 6);
+    EXPECT_AT(4, 9);
+    EXPECT_AT(5, 10);
+    EXPECT_AT(6, 11);
+
+    EXPECT_AT(7, 7);
+    EXPECT_AT(8, 8);
+    EXPECT_AT(9, 5);
+    EXPECT_AT(10, 12);
+    EXPECT_AT(11, 3);
+    EXPECT_AT(12, 13);
+    EXPECT_AT(13, 14);
+    EXPECT_AT(14, 1);
+
+    /* there are 6 slices to move: 7-8, 5, 12, 3, 13-14, 1 */
+    assert(ctx.vec_items_moved.size == 6);
+
+    struct VLC_VECTOR(int) vec = VLC_VECTOR_INITIALIZER;
+    for (int i = 0; i < 15; ++i)
+        vlc_vector_push(&vec, i * 10);
+
+    struct items_moved_report report;
+    vlc_vector_foreach(report, &ctx.vec_items_moved)
+        /* apply the changes as reported by the callbacks */
+        vlc_vector_move_slice(&vec, report.index, report.count, report.target);
+
+    /* the vector items must have been moved the same way as the playlist */
+    assert(vec.size == 15);
+    assert(vec.data[0] == 0);
+    assert(vec.data[1] == 20);
+    assert(vec.data[2] == 40);
+    assert(vec.data[3] == 60);
+    assert(vec.data[4] == 90);
+    assert(vec.data[5] == 100);
+    assert(vec.data[6] == 110);
+    assert(vec.data[7] == 70);
+    assert(vec.data[8] == 80);
+    assert(vec.data[9] == 50);
+    assert(vec.data[10] == 120);
+    assert(vec.data[11] == 30);
+    assert(vec.data[12] == 130);
+    assert(vec.data[13] == 140);
+    assert(vec.data[14] == 10);
+
+    vlc_vector_destroy(&vec);
+
+    callback_ctx_destroy(&ctx);
+    vlc_playlist_RemoveListener(playlist, listener);
+    DestroyMediaArray(media, 16);
+    vlc_playlist_Delete(playlist);
+}
+
+static void
 test_request_goto_with_matching_hint(void)
 {
     vlc_playlist_t *playlist = vlc_playlist_New(NULL);
@@ -2274,6 +2375,7 @@ int main(void)
     test_request_move_with_matching_hint();
     test_request_move_without_hint();
     test_request_move_adapt();
+    test_request_move_to_end_adapt();
     test_request_goto_with_matching_hint();
     test_request_goto_without_hint();
     test_request_goto_adapt();
