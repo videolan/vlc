@@ -13,7 +13,7 @@
 # Freddydelanuit Dec <fred.dec@free.fr>, 2014
 # Rafaël Carré <funman@videolan.org>, 2014
 # Hugo Beauzée-Luyssen <hugo@beauzee.fr>, 2015
-# ryann, 2015-2019
+# Yann Ricquebourg <yann.ricquebourg@gmail.com>, 2015-2019
 # Benoit Andrieu <benoit.andrieu@gmail.com>, 2017
 # Mortimer <doug.mortimer@netcourrier.com>, 2017
 # Romain Constantin <romzer2330@gmail.com>, 2018
@@ -25,8 +25,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-20 17:49+0200\n"
-"Last-Translator: ryann, 2019\n"
+"PO-Revision-Date: 2019-07-03 23:00+0200\n"
+"Last-Translator: Yann Ricquebourg <yann.ricquebourg@gmail.com>, 2019\n"
 "Language-Team: French (https://www.transifex.com/yaron/teams/16553/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -3287,31 +3287,31 @@ msgstr "Mot de passe à utiliser pour la connexion au serveur SOCKS."
 
 #: src/libvlc-module.c:870
 msgid "Title metadata"
-msgstr "Titre"
+msgstr "Métadonnées Titre"
 
 #: src/libvlc-module.c:872
 msgid "Allows you to specify a \"title\" metadata for an input."
-msgstr "Permet de spécifier un « titre » pour une entrée."
+msgstr "Permet de spécifier des métadonnées « titre » pour une entrée."
 
 #: src/libvlc-module.c:874
 msgid "Author metadata"
-msgstr "Auteur"
+msgstr "Métadonnées Auteur"
 
 #: src/libvlc-module.c:876
 msgid "Allows you to specify an \"author\" metadata for an input."
-msgstr "Permet de spécifier un « auteur » pour une entrée."
+msgstr "Permet de spécifier des métadonnées « auteur » pour une entrée."
 
 #: src/libvlc-module.c:878
 msgid "Artist metadata"
-msgstr "Artiste"
+msgstr "Métadonnées Artiste"
 
 #: src/libvlc-module.c:880
 msgid "Allows you to specify an \"artist\" metadata for an input."
-msgstr "Permet de spécifier un « artiste » pour une entrée."
+msgstr "Permet de spécifier des métadonnées « artiste » pour une entrée."
 
 #: src/libvlc-module.c:882
 msgid "Genre metadata"
-msgstr "Genre"
+msgstr "Métadonnées Genre"
 
 #: src/libvlc-module.c:884
 msgid "Allows you to specify a \"genre\" metadata for an input."
@@ -3319,35 +3319,35 @@ msgstr "Permet de spécifier un « genre » pour une entrée."
 
 #: src/libvlc-module.c:886
 msgid "Copyright metadata"
-msgstr "Copyright"
+msgstr "Métadonnées Droit d'auteur"
 
 #: src/libvlc-module.c:888
 msgid "Allows you to specify a \"copyright\" metadata for an input."
-msgstr "Permet de spécifier un « copyright » pour une entrée."
+msgstr "Permet de spécifier des métadonnées « copyright » pour une entrée."
 
 #: src/libvlc-module.c:890
 msgid "Description metadata"
-msgstr "Description"
+msgstr "Métadonnées Description"
 
 #: src/libvlc-module.c:892
 msgid "Allows you to specify a \"description\" metadata for an input."
-msgstr "Permet de spécifier une « description » pour une entrée."
+msgstr "Permet de spécifier des métadonnées « description » pour une entrée."
 
 #: src/libvlc-module.c:894
 msgid "Date metadata"
-msgstr "Date"
+msgstr "Métadonnées Date"
 
 #: src/libvlc-module.c:896
 msgid "Allows you to specify a \"date\" metadata for an input."
-msgstr "Permet de spécifier une « date » pour une entrée."
+msgstr "Permet de spécifier des métadonnées « date » pour une entrée."
 
 #: src/libvlc-module.c:898
 msgid "URL metadata"
-msgstr "URL"
+msgstr "Métadonnées URL"
 
 #: src/libvlc-module.c:900
 msgid "Allows you to specify a \"url\" metadata for an input."
-msgstr "Permet de spécifier une « URL » pour une entrée."
+msgstr "Permet de spécifier des métadonnées « URL » pour une entrée."
 
 #: src/libvlc-module.c:904
 msgid ""
@@ -3661,11 +3661,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1058
 msgid "Preferred keystore list"
-msgstr "Liste des séquences de touches"
+msgstr "Liste des trousseaux de clés préférés"
 
 #: src/libvlc-module.c:1060
 msgid "List of keystores that VLC will use in priority."
-msgstr "Liste des séquences de touches que VLC utilisera en priorité."
+msgstr "Liste des trousseaux de clés que VLC utilisera en priorité."
 
 #: src/libvlc-module.c:1062
 msgid "Locally collect statistics"
@@ -5351,7 +5351,7 @@ msgstr "%<PRIu64> octets"
 
 #: src/misc/update.c:580
 msgid "Saving file failed"
-msgstr "Echec enregistrement du fichier"
+msgstr "L'enregistrement du fichier a échoué"
 
 #: src/misc/update.c:581
 #, c-format
@@ -6351,7 +6351,7 @@ msgstr ""
 #: modules/access/bluray.c:889
 msgid "Your system BD+ decoding library does not work. Missing configuration?"
 msgstr ""
-"Votre bibliothèque système BD+ ne fonctionne pas. Erreur de configuration ?"
+"Votre bibliothèque système BD+ ne fonctionne pas. Configuration manquante ?"
 
 #: modules/access/bluray.c:922
 msgid "Java required"
@@ -6373,7 +6373,7 @@ msgstr "Java n'a pas été trouvé sur votre système."
 #: modules/access/bluray.c:947
 msgid "Failed to start bluray playback. Please try without menu support."
 msgstr ""
-"Impossible de démarrer la lecture du Blu-ray. Merci de essayer sans la prise "
+"Échec au démarrage de la lecture du Blu-ray. Veuillez essayer sans la prise "
 "en charge des menus."
 
 #: modules/access/bluray.c:978 modules/access/bluray.c:2764
@@ -6487,7 +6487,7 @@ msgid ""
 "FOURCC code in textual form, e.g. \"ntsc\"."
 msgstr ""
 "Mode vidéo en entrée pour les captures DeckLink. Cette valeur doit être un "
-"code FOURCC sous forme textuelle, par exemple « ntsc »."
+"identifiant FOURCC sous forme textuelle, par exemple « ntsc »."
 
 #: modules/access/decklink.cpp:60 modules/video_output/decklink.cpp:100
 msgid "Audio connection"
@@ -7588,7 +7588,7 @@ msgstr "Entrée FTP"
 
 #: modules/access/ftp.c:98
 msgid "FTP upload output"
-msgstr "Envois FTP"
+msgstr "Téléversements FTP"
 
 #: modules/access/ftp.c:369 modules/access/ftp.c:385 modules/access/ftp.c:537
 msgid "Network interaction failed"
@@ -8122,7 +8122,7 @@ msgstr "Entrée NFS"
 
 #: modules/access/nfs.c:114
 msgid "NFS operation failed"
-msgstr "Échec de l'opération NFS"
+msgstr "L'opération NFS a échoué"
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -9588,7 +9588,7 @@ msgstr "Sortie IceCAST"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr "Longueur de la clé de cryptage en octets"
+msgstr "Longueur de la clé de chiffrement en octets"
 
 #: modules/access_output/srt.c:57
 msgid "16 bytes"
@@ -9608,7 +9608,7 @@ msgstr "Sortie flux SRT"
 
 #: modules/access_output/srt.c:446
 msgid "Password for stream encryption"
-msgstr "Mot de passe du cryptage de flux"
+msgstr "Mot de passe de chiffrement du flux"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9880,7 +9880,7 @@ msgstr "Mode casque (binaural)"
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
 msgstr ""
 "Si la sortie est en stéréo, créer la spatialisation sonore avec le décodeur "
-"binaural"
+"binaural."
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:65
 msgid "Ambisonics renderer and binauralizer"
@@ -10693,7 +10693,7 @@ msgstr "Ajouter un en-tête WAV"
 #: modules/audio_output/file.c:90
 msgid "Instead of writing a raw file, you can add a WAV header to the file."
 msgstr ""
-"Au lieu d'écrire un fichier brut, il est possible ajouter un entête WAV au "
+"Au lieu d'écrire un fichier brut, il est possible ajouter un en-tête WAV au "
 "fichier."
 
 #: modules/audio_output/file.c:108 modules/stream_out/stats.c:40
@@ -11696,7 +11696,7 @@ msgstr ""
 
 #: modules/codec/fdkaac.c:76
 msgid "Enable afterburner library"
-msgstr "Activer la bibliothèque « afterburner »"
+msgstr "Activer la bibliothèque afterburner"
 
 #: modules/codec/fdkaac.c:77
 msgid ""
@@ -11716,7 +11716,7 @@ msgid ""
 "hierarchical."
 msgstr ""
 "1 est explicite pour SBR et implicite pour PS (par défaut), 2 est une "
-"hiérarchie explicite "
+"hiérarchie explicite."
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-LC"
@@ -12280,9 +12280,9 @@ msgid ""
 "The target usage allow to choose between different trade-offs between "
 "quality and speed. Allowed values are: 'speed', 'balanced' and 'quality'."
 msgstr ""
-"L'utilisation ciblée permet de choisir entre la vitesse et la qualité. Les "
+"L'utilisation visée permet de choisir entre la vitesse et la qualité. Les "
 "valeurs autorisées sont 'speed' (vitesse), 'balanced' (équilibrée) et "
-"'quality' (qualité)"
+"'quality' (qualité)."
 
 #: modules/codec/qsv.c:90
 msgid "IDR interval"
@@ -12297,12 +12297,13 @@ msgid ""
 "the sequence header before every Nth I-frame. If IdrInterval=0 (default), "
 "SDK inserts the sequence header once at the beginning of the stream."
 msgstr ""
-"Pour le H.264, IdrInterval spécifie l'intervalle de l'IDR-frame en terme d'I-"
-"Frames : si IdrInterval=0, alors toutes les I-Frames sont un IDR-Frame, si "
-"IdrInterval=1, alors toutes les autres I-Frames sont un IDR-Frame, etc. Pour "
-"MPEG2, IdrInterval définit l’intervalle de séquence d'en-tête en terme d'I-"
-"Frames : si IdrInterval=N, une en-tête est insérée toutes les N I-Frames, si "
-"IdrInterval=0 (par défaut), une seule en-tête est insérée au début du flux."
+"Pour le H.264, IdrInterval spécifie l'intervalle de la trame IDR en terme "
+"d'inter-trames : si IdrInterval=0, alors toutes les inter-trames sont IDR, "
+"si IdrInterval=1, alors toutes les autres inter-trames sont IDR, etc. Pour "
+"MPEG2, IdrInterval définit l’intervalle de séquence d'en-tête en terme "
+"d'inter-trames : si IdrInterval=N, un en-tête est inséré toutes les N inter-"
+"trames, si IdrInterval=0 (par défaut), un seul en-tête est inséré au début "
+"du flux."
 
 #: modules/codec/qsv.c:100
 msgid "Rate Control Method"
@@ -15333,7 +15334,7 @@ msgstr "Débit adaptatif"
 
 #: modules/demux/adaptive/adaptive.cpp:113
 msgid "Unified adaptive streaming for DASH/HLS"
-msgstr "Flux adaptatif unifié pour DASH et HLS (formats de streaming)"
+msgstr "Diffusion adaptative unifiée pour DASH et HLS"
 
 #: modules/demux/aiff.c:50
 msgid "AIFF demuxer"
@@ -15349,7 +15350,7 @@ msgstr "Impossible de démultiplexer le flux ASF"
 
 #: modules/demux/asf/asf.c:268
 msgid "VLC failed to load the ASF header."
-msgstr "VLC n'a pas pu ouvrir l'entête ASF"
+msgstr "VLC n'a pas pu ouvrir l'en-tête ASF."
 
 #: modules/demux/au.c:51
 msgid "AU demuxer"
@@ -16318,12 +16319,13 @@ msgstr ""
 
 #: modules/demux/rawaud.c:49
 msgid "FOURCC code of raw input format"
-msgstr "Code FOURCC du flux d'entrée brut"
+msgstr "Identifiant FOURCC du flux d'entrée brut"
 
 #: modules/demux/rawaud.c:51
 msgid "FOURCC code of the raw input format. This is a four character string."
 msgstr ""
-"Code FOURCC du flux d'entrée brut. Ceci est une chaîne de 4 caractères."
+"Identifiant FOURCC du flux d'entrée brut. Ceci est une chaîne de 4 "
+"caractères."
 
 #: modules/demux/rawaud.c:53
 msgid "Forces the audio language"
@@ -16606,7 +16608,7 @@ msgstr "Interfaces"
 #: modules/gui/qt/dialogs/plugins.cpp:392
 #: modules/gui/qt/managers/addons_manager.cpp:94
 msgid "Art and meta fetchers"
-msgstr "Récupérateurs de pochettes et infos"
+msgstr "Récupérateurs d'illustrations et métadonnées"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:113
 #: modules/gui/macosx/VLCAddonsWindowController.m:361
@@ -17962,7 +17964,7 @@ msgstr "Saisir l'URL pour s'abonner à un podcast :"
 
 #: modules/gui/macosx/VLCMainWindow.m:252
 msgid "Check for album art and metadata?"
-msgstr "Vérifier la pochette et les métadonnées ?"
+msgstr "Rechercher l'illustration et les métadonnées ?"
 
 #: modules/gui/macosx/VLCMainWindow.m:252
 msgid "Enable Metadata Retrieval"
@@ -18154,7 +18156,7 @@ msgstr ""
 "machine.\n"
 "\n"
 "Pour ouvrir un flux avec un protocole différent, appuyer sur [Annuler] pour "
-"fermer cette fenêtre."
+"fermer cette feuille."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:191
 msgid ""
@@ -18402,11 +18404,11 @@ msgstr "Tampons perdus"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:339
 msgid "Error while saving meta"
-msgstr "Erreur lors de l'enregistrement des méta-données"
+msgstr "Erreur lors de l'enregistrement des métadonnées"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:340
 msgid "VLC was unable to save the meta data."
-msgstr "VLC est incapable d'enregistrer les méta-données."
+msgstr "VLC est incapable d'enregistrer les métadonnées."
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:194
 #: modules/gui/qt/ui/sprefs_interface.h:551
@@ -18716,8 +18718,8 @@ msgstr "Préférences"
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
 msgstr ""
-"La lecture des fichiers média ne peut pas être reprise car la récupération "
-"des médias récents est désactivée."
+"La lecture des fichiers multimédias ne peut pas être reprise car la "
+"mémorisation des médias récents est désactivée."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:574
 msgid "Last check on: %@"
@@ -19258,7 +19260,7 @@ msgstr "i Afficher/Masquer les informations"
 
 #: modules/gui/ncurses.c:863
 msgid " M                      Show/Hide metadata box"
-msgstr "m Afficher/Masquer les métainformations"
+msgstr " M                      Afficher/Masquer les métadonnéees"
 
 #: modules/gui/ncurses.c:864
 msgid " L                      Show/Hide messages box"
@@ -19855,7 +19857,7 @@ msgstr "&Empreinte audio"
 
 #: modules/gui/qt/components/info_panels.cpp:133
 msgid "Find meta data using audio fingerprinting"
-msgstr "Récupère des méta-données en utilisant l'empreinte audio"
+msgstr "Récupère des métadonnées en utilisant l'empreinte audio"
 
 #: modules/gui/qt/components/info_panels.cpp:154
 msgid "Comments"
@@ -22112,7 +22114,7 @@ msgstr "Décodeur MMAL pour Raspberry Pi"
 
 #: modules/hw/mmal/deinterlace.c:45
 msgid "Use QPUs for advanced HD deinterlacing."
-msgstr "Utiliser les processeurs QPU pour le désentrelacement HD avancé"
+msgstr "Utiliser les processeurs QPU pour le désentrelacement HD avancé."
 
 #: modules/hw/mmal/deinterlace.c:46
 msgid ""
@@ -22163,7 +22165,7 @@ msgid ""
 "Force the HDMI output into an interlaced video mode for interlaced video "
 "content."
 msgstr ""
-"Forcer la sortie HDMI dans un mode vidéo entrelacé pour le contenu vidéo "
+"Forcer la sortie HDMI dans un mode vidéo entrelacé pour du contenu vidéo "
 "entrelacé."
 
 #: modules/hw/mmal/vout.c:75
@@ -22244,19 +22246,19 @@ msgstr "Filtre de netteté VDPAU"
 
 #: modules/keystore/file.c:54
 msgid "File keystore (plaintext)"
-msgstr "Fichier des séquences de touches (plaintext)"
+msgstr "Trousseau de clés en fichier (plein texte)"
 
 #: modules/keystore/file.c:55
 msgid "Secrets are stored on a file without any encryption"
-msgstr "Le contenu confidentiel est stocké dans un fichier non crypté."
+msgstr "Le contenu confidentiel est stocké dans un fichier non chiffré."
 
 #: modules/keystore/file.c:65
 msgid "Crypt keystore"
-msgstr "Crypter les séquences de touches"
+msgstr "Chiffrer le trousseau de clés"
 
 #: modules/keystore/file.c:66
 msgid "Secrets are stored encrypted on a file"
-msgstr "Le contenu confidentiel est stocké dans un fichier crypté"
+msgstr "Le contenu confidentiel est stocké dans un fichier chiffré"
 
 #: modules/keystore/keychain.m:41
 msgid "No"
@@ -22322,15 +22324,15 @@ msgstr ""
 
 #: modules/keystore/keychain.m:109
 msgid "Keychain keystore"
-msgstr "Chaîne de caractères des séquences de touches"
+msgstr "Trousseau de clés"
 
 #: modules/keystore/keychain.m:110
 msgid "Keystore for iOS, Mac OS X and tvOS"
-msgstr "Séquences de touches pour iOS, Mac OS X et tvOS"
+msgstr "Trousseau de clés pour iOS, Mac OS X et tvOS"
 
 #: modules/keystore/kwallet.c:48
 msgid "KWallet keystore"
-msgstr "Magasin de clés KWallet"
+msgstr "Trousseau de clés KWallet"
 
 #: modules/keystore/kwallet.c:49
 msgid "Secrets are stored via KWallet"
@@ -22338,7 +22340,7 @@ msgstr "Le contenu confidentiel est stocké via KWallet"
 
 #: modules/keystore/memory.c:41
 msgid "Memory keystore"
-msgstr "Flux mémoire"
+msgstr "Trousseau de clés en mémoire"
 
 #: modules/keystore/memory.c:42
 msgid "Secrets are stored in memory"
@@ -22346,11 +22348,11 @@ msgstr "Le contenu confidentiel est stocké dans la mémoire"
 
 #: modules/keystore/secret.c:39
 msgid "libsecret keystore"
-msgstr "Magasin de clés libsecret"
+msgstr "Trousseau de clés libsecret"
 
 #: modules/keystore/secret.c:40
 msgid "Secrets are stored via libsecret"
-msgstr "Le contenu confidentiel est stocké vie libsecret"
+msgstr "Le contenu confidentiel est stocké via libsecret"
 
 #: modules/logger/android.c:85
 msgid "Android log"
@@ -22597,19 +22599,19 @@ msgstr "Lua par telnet"
 
 #: modules/lua/vlc.c:135
 msgid "Lua Meta Fetcher"
-msgstr "Méta-récupérateur Lua"
+msgstr "Métarécupérateur Lua"
 
 #: modules/lua/vlc.c:136
 msgid "Fetch meta data using lua scripts"
-msgstr "Récupère des méta-données en utilisant des scripts lua"
+msgstr "Récupérer des métadonnées en utilisant des scripts lua"
 
 #: modules/lua/vlc.c:141
 msgid "Lua Meta Reader"
-msgstr "Méta-lecteur Lua"
+msgstr "Métalecteur Lua"
 
 #: modules/lua/vlc.c:142
 msgid "Read meta data using lua scripts"
-msgstr "Lit des méta-données en utilisant des scripts lua"
+msgstr "Lit des métadonnées en utilisant des scripts lua"
 
 #: modules/lua/vlc.c:148
 msgid "Lua Playlist"
@@ -22637,7 +22639,7 @@ msgstr "Module SD Lua"
 
 #: modules/meta_engine/folder.c:71
 msgid "Folder meta data"
-msgstr "Dossier de méta-données"
+msgstr "Dossier de métadonnées"
 
 #: modules/meta_engine/folder.c:73
 msgid "Album art filename"
@@ -22681,7 +22683,7 @@ msgstr "Jazz"
 
 #: modules/meta_engine/ID3Genres.h:42
 msgid "Metal"
-msgstr "Métal"
+msgstr "Metal"
 
 #: modules/meta_engine/ID3Genres.h:43
 msgid "New Age"
@@ -23241,7 +23243,7 @@ msgstr "Soumission des chansons lues à Last.fm"
 
 #: modules/misc/audioscrobbler.c:566
 msgid "last.fm: Authentication failed"
-msgstr "Last.fm : échec de l'authentification"
+msgstr "Last.fm : L'authentification a échoué"
 
 #: modules/misc/audioscrobbler.c:567
 msgid ""
@@ -23279,7 +23281,7 @@ msgid ""
 "could not be authenticated by any trusted Certificate Authority."
 msgstr ""
 "Attention, le certificat de sécurité présenté par le serveur est inconnu et "
-"ne peut pas être authentifié par une autorité de certificat fiable."
+"ne peut pas être authentifié par une autorité de certification fiable."
 
 #: modules/misc/gnutls.c:491
 msgid ""
@@ -23287,9 +23289,9 @@ msgid ""
 "previous visit and was not authenticated by any trusted Certificate "
 "Authority."
 msgstr ""
-"Attention, le certificat de sécurité présenté par le serveur est différent "
-"de votre précédente visite et n'a été authentifié par aucune autorité de "
-"certificat fiable."
+"Attention, le certificat de sécurité présenté par le serveur a changé depuis "
+"votre précédente visite et n'a été authentifié par aucune autorité de "
+"certification fiable."
 
 #: modules/misc/gnutls.c:502 modules/misc/gnutls.c:523
 #: modules/misc/securetransport.c:346
@@ -23848,19 +23850,19 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:168
 msgid "Crypt audio"
-msgstr "Cryptage audio"
+msgstr "Chiffrer l'audio"
 
 #: modules/mux/mpeg/ts.c:169
 msgid "Crypt audio using CSA"
-msgstr "Cryptage CSA de l'audio"
+msgstr "Crypter l'audio avec CSA"
 
 #: modules/mux/mpeg/ts.c:170
 msgid "Crypt video"
-msgstr "Cryptage vidéo"
+msgstr "Chiffrer la vidéo"
 
 #: modules/mux/mpeg/ts.c:171
 msgid "Crypt video using CSA"
-msgstr "Cryptage CSA de la vidéo"
+msgstr "Chiffrer la vidéo avec CSA"
 
 #: modules/mux/mpeg/ts.c:181
 msgid "CSA Key in use"
@@ -25188,10 +25190,10 @@ msgid ""
 "configure a place holder stream when the real source breaks. Source and "
 "placeholder streams should have the same format."
 msgstr ""
-"Si activé, le pont rejettera toutes entrées de flux élémentaires sauf s'il "
-"ne reçoit pas les données depuis un autre pont. Ceci peut être utilisé pour "
+"Si activé, le pont rejettera tous les flux d'entrée élémentaire sauf s'il ne "
+"reçoit pas de données d'un autre pont. Ceci peut être utilisé pour "
 "configurer un flux de secours lorsque la source est défaillante. Flux source "
-"et substitution doivent être au même format."
+"et de substitution doivent être au même format."
 
 #: modules/stream_out/bridge.c:72
 msgid "Placeholder delay"
@@ -26107,15 +26109,15 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:130
 msgid "Picture pool size"
-msgstr "Taille du groupe d'images"
+msgstr "Taille de la réserver d'images"
 
 #: modules/stream_out/transcode/transcode.c:131
 msgid ""
 "Defines how many pictures we allow to be in pool between decoder/encoder "
 "threads when threads > 0"
 msgstr ""
-"Définit le nombre d'images autorisées à être dans le groupe entre le "
-"décodeur/encodeur de threads lorsque threads > 0"
+"Définit le nombre d'images dans la réserve entre les processus décodeurs/"
+"encodeurs lorsque leur nombre est > 0"
 
 #: modules/stream_out/transcode/transcode.c:146
 msgid "Transcode"
@@ -27744,8 +27746,8 @@ msgid ""
 "Desired output mode for DeckLink output. This value should be a FOURCC code "
 "in textual form, e.g. \"ntsc\"."
 msgstr ""
-"Mode vidéo en sorties DeckLink. Cette valeur doit être un code FOURCC sous "
-"forme textuelle, par exemple « ntsc »."
+"Mode vidéo en sorties DeckLink. Cette valeur doit être un identifiant FOURCC "
+"sous forme textuelle, par exemple « ntsc »."
 
 #: modules/video_output/decklink.cpp:102
 msgid "Audio connection for DeckLink output."
@@ -27872,8 +27874,8 @@ msgid ""
 "Chroma fourcc used by the framebuffer. Default is RGB since the fb device "
 "has no way to report its chroma."
 msgstr ""
-"Chrominance FOURCC du framebuffer. RGB par défaut car le périphérique fb n'a "
-"pas de moyen d'indiquer sa chrominance."
+"Identifiant fourcc de chrominance du framebuffer. RGB par défaut car le "
+"périphérique fb n'a pas de moyen d'indiquer sa chrominance."
 
 #: modules/video_output/fb.c:92
 msgid "GNU/Linux framebuffer video output"
