@@ -52,6 +52,7 @@
 #include "components/mediacenter/mlvideomodel.hpp"
 #include "components/mediacenter/mlnetworkmodel.hpp"
 #include "components/recent_media_model.hpp"
+#include "components/settings.hpp"
 
 #include "components/navigation_history.hpp"
 #include "components/aboutmodel.hpp"
@@ -381,6 +382,7 @@ void MainInterface::createMainWidget( QSettings * )
     rootCtx->setContextProperty( "rootWindow", this);
     rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
     rootCtx->setContextProperty( "recentsMedias",  new VLCRecentMediaModel( p_intf, this ));
+    rootCtx->setContextProperty( "settings",  new Settings( p_intf, this ));
 
     if (b_hasMedialibrary)
     {

@@ -65,7 +65,7 @@ Utils.MenuExt {
                 text: modelData
                 checkable: true
                 checked: modelData === VLCStyle.colors.state
-                onTriggered: VLCStyle.colors.state = modelData
+                onTriggered: settings.VLCStyle_colors_state = modelData
             }
         }
     }

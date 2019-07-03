@@ -88,7 +88,7 @@ Item {
 
     property var colorSchemes: ["system", "day", "night"]
 
-    state: "system"
+    state: settings.VLCStyle_colors_state
     states: [
         //other styles are provided for testing purpose
         State {

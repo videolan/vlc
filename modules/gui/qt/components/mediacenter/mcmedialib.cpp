@@ -24,11 +24,12 @@
 #include <vlc_input_item.h>
 #include "components/playlist/media.hpp"
 #include "components/playlist/playlist_controller.hpp"
+#include <QSettings>
 
 MCMediaLib::MCMediaLib(intf_thread_t *_intf, QObject *_parent)
     : QObject( _parent )
     , m_intf( _intf )
-    , m_gridView( true )
+    , m_gridView ( m_intf->p_sys->mainSettings->value("medialib-gridView",true).toBool() )
     , m_ml( vlcMl() )
     , m_event_cb( nullptr, [this](vlc_ml_event_callback_t* cb ) {
         vlc_ml_event_unregister_callback( m_ml, cb );
@@ -47,6 +48,7 @@ bool MCMediaLib::isGridView() const
 void MCMediaLib::setGridView(bool state)
 {
     m_gridView = state;
+    m_intf->p_sys->mainSettings->setValue("medialib-gridView",state);
     emit gridViewChanged();
 }
 

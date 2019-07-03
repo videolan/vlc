@@ -106,6 +106,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/controller_widget.hpp \
 	gui/qt/components/recent_media_model.cpp  \
 	gui/qt/components/recent_media_model.hpp \
+	gui/qt/components/settings.cpp \
+	gui/qt/components/settings.hpp \
 	gui/qt/components/voutwindow/videosurface.cpp \
 	gui/qt/components/voutwindow/videosurface.hpp \
 	gui/qt/components/voutwindow/qvoutwindow.cpp \
@@ -258,6 +260,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/controller_widget.moc.cpp \
 	gui/qt/components/custom_menus.moc.cpp \
 	gui/qt/components/recent_media_model.moc.cpp \
+	gui/qt/components/settings.moc.cpp \
 	gui/qt/components/voutwindow/videosurface.moc.cpp \
 	gui/qt/components/voutwindow/qvoutwindow.moc.cpp \
 	gui/qt/components/voutwindow/qvoutwindowdummy.moc.cpp \
