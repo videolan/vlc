@@ -125,7 +125,11 @@ Utils.NavigableFocusScope {
         }
         focus: false
         expandHorizontally: true
-
+        state: (rootWindow.playlistDocked && rootWindow.playlistVisible) ? "visible" : "hidden"
+        onVisibleChanged: {
+            if (playlistpopup.visible)
+                playlistpopup.forceActiveFocus()
+        }
         component: Rectangle {
             color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
             width: root.width/4
@@ -135,17 +139,21 @@ Utils.NavigableFocusScope {
                 id: playlistView
                 focus: true
                 anchors.fill: parent
-                onActionLeft: playlistpopup.quit()
-                onActionCancel: playlistpopup.quit()
+                onActionLeft: playlistpopup.closeAndFocus(controlBarView)
+                onActionCancel: playlistpopup.closeAndFocus(controlBarView)
             }
-        }
-        function quit() {
-            state = "hidden"
-            controlBarView.focus = true
         }
         onStateChanged: {
             if (state === "hidden")
                 toolbarAutoHide.restart()
+        }
+
+        function closeAndFocus(item){
+            if (!item)
+                return
+
+            rootWindow.playlistVisible = false
+            item.forceActiveFocus()
         }
     }
 
@@ -193,14 +201,6 @@ Utils.NavigableFocusScope {
                     onActionLeft: root.actionLeft(index)
                     onActionRight: root.actionRight(index)
                     onActionCancel: root.actionCancel(index)
-                    onShowPlaylist: {
-                        if (playlistpopup.state === "visible") {
-                            playlistpopup.state = "hidden"
-                        } else {
-                            playlistpopup.state = "visible"
-                            playlistpopup.focus = true
-                        }
-                    }
 
                     //unhandled keys are forwarded to the vout window
                     Keys.forwardTo: videoSurface

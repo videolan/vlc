@@ -27,10 +27,25 @@ import "qrc:///style/"
 import "qrc:///player/" as Player
 import "qrc:///about/" as AB
 import "qrc:///dialogs/" as DG
+import "qrc:///playlist/" as PL
+import QtQuick.Window 2.11
 
 Rectangle {
     id: root
     color: "transparent"
+
+    Window {
+        id: playlistWindow
+        visible: !rootWindow.playlistDocked && rootWindow.playlistVisible
+        title: qsTr("Playlist")
+        color: VLCStyle.colors.bg
+        onClosing: rootWindow.playlistVisible = false
+        PL.PlaylistListView {
+            id: playlistView
+            focus: true
+            anchors.fill: parent
+        }
+    }
 
     PlaylistControllerModel {
         id: mainPlaylistController

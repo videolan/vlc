@@ -26,6 +26,7 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///utils/" as Utils
 import "qrc:///menus/" as Menus
+import "qrc:///playlist/" as PL
 
 
 Utils.NavigableFocusScope {
@@ -120,6 +121,7 @@ Utils.NavigableFocusScope {
 
                                 if (buttonindex > 0)
                                     buttonloader.item.KeyNavigation.left = buttonrow.children[buttonindex-1].item
+
 
                             }
                         }

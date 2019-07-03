@@ -22,6 +22,17 @@ import "qrc:///style/"
 import "qrc:///utils/" as Utils
 
 Utils.MenuExt {
+    id: viewMenu
+    Action {
+        text: qsTr("Play&list")
+        onTriggered: rootWindow.playlistVisible = !rootWindow.playlistVisible
+    }
+    Action {
+        text: qsTr("Docked Playlist")
+        checkable: true
+        checked: rootWindow.playlistDocked
+        onTriggered: rootWindow.playlistDocked = !rootWindow.playlistDocked
+    }
     Action {
         text: qsTr("&Always on Top")
         checkable: true

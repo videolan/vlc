@@ -26,8 +26,6 @@ import "qrc:///utils/" as Utils
 
 Utils.NavigableFocusScope {
     id: root
-    signal showPlaylist();
-
     property bool showPlaylistButton: false
 
     property bool forceNoAutoHide: false
@@ -41,7 +39,6 @@ Utils.NavigableFocusScope {
             showPlaylistButton: root.showPlaylistButton
 
             onShowTrackBar: root.state = "tracks"
-            onShowPlaylist: root.showPlaylist()
 
             onActionUp: root.actionUp(index)
             onActionDown: root.actionDown(index)

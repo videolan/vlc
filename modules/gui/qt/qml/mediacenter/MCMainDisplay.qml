@@ -88,7 +88,7 @@ Utils.NavigableFocusScope {
             focus: true
             id: medialibId
             anchors.fill: parent
-            onActionRight: playlist.show()
+            onActionRight: rootWindow.playlistVisible = true
 
             ColumnLayout {
                 id: column
@@ -135,8 +135,6 @@ Utils.NavigableFocusScope {
                     onActionRight: root.actionRight(index)
                     onActionUp: root.actionUp(index)
                     onActionCancel: root.actionCancel(index)
-
-                    onToogleMenu: playlist.toggleState()
                 }
 
                 Utils.StackViewExt {
@@ -169,7 +167,11 @@ Utils.NavigableFocusScope {
                         focus: false
                         expandHorizontally: true
 
-                        state: "hidden"
+                        state: (rootWindow.playlistDocked && rootWindow.playlistVisible) ? "visible" : "hidden"
+                        onVisibleChanged: {
+                            if (playlist.visible)
+                                playlist.forceActiveFocus()
+                        }
                         component: Rectangle {
                             color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.9)
                             width: root.width/3
@@ -186,28 +188,18 @@ Utils.NavigableFocusScope {
                                     id: playlistView
                                     focus: true
                                     anchors.fill: parent
-                                    onActionLeft: playlist.quit()
-                                    onActionCancel: playlist.quit()
-                                    onActionUp: {
-                                        playlist.state = "hidden"
-                                        sourcesBanner.forceActiveFocus()
-                                    }
+                                    onActionLeft: playlist.closeAndFocus(stackView.currentItem)
+                                    onActionCancel: playlist.closeAndFocus(stackView.currentItem)
+                                    onActionUp: playlist.closeAndFocus(sourcesBanner)
                                 }
                             }
                         }
-                        function toggleState() {
-                            if (state === "hidden")
-                                show()
-                            else
-                                quit()
-                        }
-                        function quit() {
-                            state = "hidden"
-                            stackView.currentItem.forceActiveFocus()
-                        }
-                        function show() {
-                            state = "visible"
-                            playlist.forceActiveFocus()
+                        function closeAndFocus(item){
+                            if (!item)
+                                return
+
+                            rootWindow.playlistVisible = false
+                            item.forceActiveFocus()
                         }
                     }
                 }

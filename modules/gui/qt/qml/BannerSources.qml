@@ -352,7 +352,7 @@ Utils.NavigableFocusScope {
                             size: VLCStyle.icon_normal
                             text: VLCIcons.playlist
 
-                            onClicked: root.toogleMenu()
+                            onClicked: rootWindow.playlistVisible = !rootWindow.playlistVisible
 
                             KeyNavigation.right: menu_selector
                             KeyNavigation.up: buttonView
@@ -364,14 +364,17 @@ Utils.NavigableFocusScope {
                             size: VLCStyle.icon_normal
                             text: VLCIcons.menu
 
+                            KeyNavigation.left: playlist_btn
+                            KeyNavigation.right: playlist
+
                             onClicked: mainMenu.openBelow(this)
 
-                            Menus.MainDropdownMenu {
-                                id: mainMenu
-                                onClosed: menu_selector.forceActiveFocus()
+                        Menus.MainDropdownMenu {
+                            id: mainMenu
+                            onClosed: {
+                                if (mainMenu.activeFocus)
+                                    menu_selector.forceActiveFocus()
                             }
-
-                            KeyNavigation.up: buttonView
                         }
                     }
                 }
@@ -412,4 +415,5 @@ Utils.NavigableFocusScope {
         if (!event.accepted)
             defaultKeyAction(event, 0)
     }
+}
 }

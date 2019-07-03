@@ -537,6 +537,20 @@ void MainInterface::setVideoOnTop( bool on_top )
     }
 }
 
+void MainInterface::setPlaylistDocked( bool docked )
+{
+    b_playlistDocked = docked;
+
+    emit playlistDockedChanged(docked);
+}
+
+void MainInterface::setPlaylistVisible( bool visible )
+{
+    playlistVisible = visible;
+
+    emit playlistVisibleChanged(visible);
+}
+
 void MainInterface::setInterfaceAlwaysOnTop( bool on_top )
 {
     b_interfaceOnTop = on_top;

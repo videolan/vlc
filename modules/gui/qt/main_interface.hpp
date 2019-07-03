@@ -63,6 +63,8 @@ class MainInterface : public QVLCMW
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool playlistDocked READ isPlaylistDocked WRITE setPlaylistDocked NOTIFY playlistDockedChanged)
+    Q_PROPERTY(bool playlistVisible READ isPlaylistVisible WRITE setPlaylistVisible NOTIFY playlistVisibleChanged)
     Q_PROPERTY(bool interfaceAlwaysOnTop READ isInterfaceAlwaysOnTop WRITE setInterfaceAlwaysOnTop NOTIFY interfaceAlwaysOnTopChanged)
     Q_PROPERTY(bool interfaceFullScreen READ isInterfaceFullScreen WRITE setInterfaceFullScreen NOTIFY interfaceFullScreenChanged)
     Q_PROPERTY(bool hasEmbededVideo READ hasEmbededVideo NOTIFY hasEmbededVideoChanged)
@@ -111,6 +113,8 @@ public:
         RAISE_AUDIOVIDEO,
     };
     bool isInterfaceFullScreen() { return b_interfaceFullScreen; }
+    bool isPlaylistDocked() { return b_playlistDocked; }
+    bool isPlaylistVisible() { return playlistVisible; }
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
     bool hasEmbededVideo() { return m_hasEmbededVideo; }
     QList<QQmlError> qmlErrors() const;
@@ -171,6 +175,7 @@ protected:
     bool                 b_videoFullScreen;     ///< --fullscreen
     bool                 b_hideAfterCreation;
     bool                 b_minimalView;         ///< Minimal video
+    bool                 b_playlistDocked;
     bool                 b_interfaceFullScreen;
     bool                 b_interfaceOnTop;      ///keep UI on top
     bool                 b_pauseOnMinimize;
@@ -196,6 +201,8 @@ public slots:
     void showUpdateSystrayMenu();
     void hideUpdateSystrayMenu();
     void toggleInterfaceFullScreen();
+    void setPlaylistDocked( bool );
+    void setPlaylistVisible( bool );
     void setInterfaceAlwaysOnTop( bool );
 
     void emitBoss();
@@ -242,6 +249,8 @@ signals:
     void askPopupMenu( bool show );
     void kc_pressed(); /* easter eggs */
 
+    void playlistDockedChanged(bool);
+    void playlistVisibleChanged(bool);
     void interfaceAlwaysOnTopChanged(bool);
     void interfaceFullScreenChanged(bool);
     void hasEmbededVideoChanged(bool);
