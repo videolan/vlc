@@ -25,7 +25,7 @@
 
 #include "util/qvlcframe.hpp"
 #include "util/singleton.hpp"
-#include "ui/messages_panel.h"
+#include "ui_messages_panel.h"
 #include <stdarg.h>
 #include <QMutex>
 #include <QAtomicInt>

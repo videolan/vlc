@@ -30,7 +30,7 @@
 
 #include <vlc_vlm.h>
 
-#include "ui/vlm.h"
+#include "ui_vlm.h"
 #include "util/qvlcframe.hpp"
 #include "util/singleton.hpp"
 #include <QDateTime>

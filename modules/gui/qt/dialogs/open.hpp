@@ -31,7 +31,7 @@
 #include <vlc_url.h>
 
 #include "util/qvlcframe.hpp"
-#include "ui/open.h"
+#include "ui_open.h"
 #include "components/open_panels.hpp"
 
 enum {

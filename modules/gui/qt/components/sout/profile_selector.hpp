@@ -30,7 +30,7 @@
 #include <QHash>
 
 #include "util/qvlcframe.hpp"
-#include "ui/profiles.h"
+#include "ui_profiles.h"
 
 class QComboBox;
 

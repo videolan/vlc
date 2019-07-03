@@ -14,7 +14,7 @@
 SUFFIXES += .ui .h .hpp .moc.cpp .qml
 
 libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt
+	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt/ui
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
 libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM)
 libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)'
@@ -306,27 +306,27 @@ nodist_libqt_plugin_la_SOURCES += gui/qt/main_interface_win32.moc.cpp
 endif
 
 nodist_libqt_plugin_la_SOURCES += \
-	gui/qt/ui/equalizer.h \
-	gui/qt/ui/video_effects.h \
-	gui/qt/ui/open_file.h \
-	gui/qt/ui/open_disk.h \
-	gui/qt/ui/open_net.h \
-	gui/qt/ui/open_capture.h \
-	gui/qt/ui/open.h \
-	gui/qt/ui/vlm.h \
-	gui/qt/ui/podcast_configuration.h \
-	gui/qt/ui/profiles.h \
-	gui/qt/ui/sprefs_audio.h \
-	gui/qt/ui/sprefs_input.h \
-	gui/qt/ui/sprefs_interface.h \
-	gui/qt/ui/sprefs_subtitles.h \
-	gui/qt/ui/sprefs_video.h \
-	gui/qt/ui/streampanel.h \
-	gui/qt/ui/messages_panel.h \
-	gui/qt/ui/about.h \
-	gui/qt/ui/update.h \
-	gui/qt/ui/fingerprintdialog.h \
-	gui/qt/ui/sout.h
+	gui/qt/ui/ui_equalizer.h \
+	gui/qt/ui/ui_video_effects.h \
+	gui/qt/ui/ui_open_file.h \
+	gui/qt/ui/ui_open_disk.h \
+	gui/qt/ui/ui_open_net.h \
+	gui/qt/ui/ui_open_capture.h \
+	gui/qt/ui/ui_open.h \
+	gui/qt/ui/ui_vlm.h \
+	gui/qt/ui/ui_podcast_configuration.h \
+	gui/qt/ui/ui_profiles.h \
+	gui/qt/ui/ui_sprefs_audio.h \
+	gui/qt/ui/ui_sprefs_input.h \
+	gui/qt/ui/ui_sprefs_interface.h \
+	gui/qt/ui/ui_sprefs_subtitles.h \
+	gui/qt/ui/ui_sprefs_video.h \
+	gui/qt/ui/ui_streampanel.h \
+	gui/qt/ui/ui_messages_panel.h \
+	gui/qt/ui/ui_about.h \
+	gui/qt/ui/ui_update.h \
+	gui/qt/ui/ui_fingerprintdialog.h \
+	gui/qt/ui/ui_sout.h
 
 # User interface compilation
 
@@ -369,8 +369,8 @@ libqt_plugin_la_UI = \
 	gui/qt/ui/fingerprintdialog.ui
 EXTRA_DIST += $(libqt_plugin_la_UI)
 
-.ui.h:
-	$(AM_V_at)mkdir -p -- gui/qt/ui
+ui_%.h: %.ui
+	$(AM_V_at)$(MKDIR_P) "gui/qt/ui"
 	$(AM_V_at)rm -f $@ $@.tmp
 	$(AM_V_at)echo "#define Q_(a,b) QString::fromUtf8(_(a))" > $@.tmp
 	$(uic_verbose)$(UIC) -tr "Q_" $< >> $@.tmp

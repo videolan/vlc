@@ -1269,23 +1269,23 @@ share/lua/http/mobile_view.html
 # qt .ui files
 # uncomment (and prepend $builddir} if you want to generate a proper vlc.pot
 
-#modules/gui/qt/ui/about.h
-#modules/gui/qt/ui/equalizer.h
-#modules/gui/qt/ui/messages_panel.h
-#modules/gui/qt/ui/open.h
-#modules/gui/qt/ui/open_capture.h
-#modules/gui/qt/ui/open_disk.h
-#modules/gui/qt/ui/open_file.h
-#modules/gui/qt/ui/open_net.h
-#modules/gui/qt/ui/podcast_configuration.h
-#modules/gui/qt/ui/profiles.h
-#modules/gui/qt/ui/sout.h
-#modules/gui/qt/ui/sprefs_audio.h
-#modules/gui/qt/ui/sprefs_input.h
-#modules/gui/qt/ui/sprefs_interface.h
-#modules/gui/qt/ui/sprefs_subtitles.h
-#modules/gui/qt/ui/sprefs_video.h
-#modules/gui/qt/ui/streampanel.h
-#modules/gui/qt/ui/update.h
-#modules/gui/qt/ui/video_effects.h
-#modules/gui/qt/ui/vlm.h
+#modules/gui/qt/ui/ui_about.h
+#modules/gui/qt/ui/ui_equalizer.h
+#modules/gui/qt/ui/ui_messages_panel.h
+#modules/gui/qt/ui/ui_open.h
+#modules/gui/qt/ui/ui_open_capture.h
+#modules/gui/qt/ui/ui_open_disk.h
+#modules/gui/qt/ui/ui_open_file.h
+#modules/gui/qt/ui/ui_open_net.h
+#modules/gui/qt/ui/ui_podcast_configuration.h
+#modules/gui/qt/ui/ui_profiles.h
+#modules/gui/qt/ui/ui_sout.h
+#modules/gui/qt/ui/ui_sprefs_audio.h
+#modules/gui/qt/ui/ui_sprefs_input.h
+#modules/gui/qt/ui/ui_sprefs_interface.h
+#modules/gui/qt/ui/ui_sprefs_subtitles.h
+#modules/gui/qt/ui/ui_sprefs_video.h
+#modules/gui/qt/ui/ui_streampanel.h
+#modules/gui/qt/ui/ui_update.h
+#modules/gui/qt/ui/ui_video_effects.h
+#modules/gui/qt/ui/ui_vlm.h

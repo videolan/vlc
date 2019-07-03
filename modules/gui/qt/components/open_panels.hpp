@@ -33,10 +33,10 @@
 
 #include "components/preferences_widgets.hpp"
 
-#include "ui/open_file.h"
-#include "ui/open_disk.h"
-#include "ui/open_net.h"
-#include "ui/open_capture.h"
+#include "ui_open_file.h"
+#include "ui_open_disk.h"
+#include "ui_open_net.h"
+#include "ui_open_capture.h"
 
 #include <QFileDialog>
 

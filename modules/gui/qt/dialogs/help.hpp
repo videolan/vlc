@@ -31,8 +31,8 @@
 
 #include "util/qvlcframe.hpp"
 #include "util/singleton.hpp"
-#include "ui/about.h"
-#include "ui/update.h"
+#include "ui_about.h"
+#include "ui_update.h"
 
 class QEvent;
 

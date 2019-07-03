@@ -29,7 +29,7 @@
 
 #include <vlc_common.h> /* Gettext functions */
 
-#include "ui/sout.h"
+#include "ui_sout.h"
 #include "util/qvlcframe.hpp"
 
 #include <QWizard>

@@ -30,11 +30,11 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 
-#include "ui/sprefs_input.h"
-#include "ui/sprefs_audio.h"
-#include "ui/sprefs_video.h"
-#include "ui/sprefs_subtitles.h"
-#include "ui/sprefs_interface.h"
+#include "ui_sprefs_input.h"
+#include "ui_sprefs_audio.h"
+#include "ui_sprefs_video.h"
+#include "ui_sprefs_subtitles.h"
+#include "ui_sprefs_interface.h"
 
 #ifdef _WIN32
 # include "util/registry.hpp"

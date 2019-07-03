@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 #include "fingerprintdialog.hpp"
-#include "ui/fingerprintdialog.h"
+#include "ui_fingerprintdialog.h"
 
 #include "adapters/chromaprint.hpp"
 #include <vlc_url.h>
