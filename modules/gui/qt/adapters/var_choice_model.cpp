@@ -137,17 +137,20 @@ void VLCVarChoiceModel::onDataUpdated(const vlc_object_t* object, QVariant , QVa
         return;
 
     int oldCurrent = m_current;
+    m_current = -1;
     for (int i = 0; i < m_values.count(); i++)
         if( newvalue == m_values[i] )
         {
             m_current = i;
-            if (oldCurrent == -1)
-                emit hasCurrentChanged(true);
-            return;
+            break;
         }
-    m_current = -1;
+
+    if (m_current != oldCurrent)
+        emit hasCurrentChanged(m_current != -1);
+    if (m_current != -1)
+        emit dataChanged(index(m_current), index(m_current), { Qt::CheckStateRole } );
     if (oldCurrent != -1)
-        emit hasCurrentChanged(false);
+        emit dataChanged(index(oldCurrent), index(oldCurrent), { Qt::CheckStateRole } );
 }
 
 //update the choices of the variable, called on UI thread
