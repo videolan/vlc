@@ -161,8 +161,10 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
     {
         pFribidiString = new uint32_t[len+1];
         FriBidiCharType baseDir = FRIBIDI_TYPE_ON;
-        fribidi_log2vis( (FriBidiChar*)pString, len, &baseDir,
-                         (FriBidiChar*)pFribidiString, 0, 0, 0 );
+        FriBidiLevel level = fribidi_log2vis(
+                        (FriBidiChar*)pString, len, &baseDir,
+                        (FriBidiChar*)pFribidiString, 0, 0, 0 );
+        (void)level;
         pString = pFribidiString;
     }
 #endif
