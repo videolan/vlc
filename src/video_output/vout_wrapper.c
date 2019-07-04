@@ -80,7 +80,6 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
     if (vd == NULL)
         return NULL;
 
-    sys->decoder_pool = NULL;
     sys->display_pool = NULL;
 
     const bool use_dr = !vout_IsDisplayFiltered(vd);
@@ -90,61 +89,22 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
     const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
                                       private_picture +
                                       kept_picture;
-    unsigned display_pool_size;
 
-    /* TODO: During the push transition, both decoder and vout handle a picture
-     * pool. Therefore we can lower this picture count when we know it is
-     * handled by the decoder. The vout pool will be only used for filters */
-    switch (vctx ? vlc_video_context_GetType(vctx) : VLC_VIDEO_CONTEXT_NONE)
-    {
-    case VLC_VIDEO_CONTEXT_VAAPI:
-    case VLC_VIDEO_CONTEXT_VDPAU:
-    case VLC_VIDEO_CONTEXT_NVDEC:
-    case VLC_VIDEO_CONTEXT_DXVA2:
-    case VLC_VIDEO_CONTEXT_D3D11VA:
-        display_pool_size = reserved_picture;
-        break;
-    default:
-        display_pool_size = allow_dr ? __MAX(VOUT_MAX_PICTURES,
-                                             reserved_picture) : 3;
-        break;
-    }
-
-    picture_pool_t *display_pool = vout_GetPool(vd, display_pool_size);
+    picture_pool_t *display_pool = vout_GetPool(vd, reserved_picture);
     if (display_pool == NULL)
         goto error;
 
-    picture_pool_t *decoder_pool = NULL;
-
 #ifndef NDEBUG
-    if ( picture_pool_GetSize(display_pool) < display_pool_size )
+    if ( picture_pool_GetSize(display_pool) < reserved_picture )
         msg_Warn(vout, "Not enough display buffers in the pool, requested %u got %u",
-                 display_pool_size, picture_pool_GetSize(display_pool));
+                 reserved_picture, picture_pool_GetSize(display_pool));
 #endif
 
-    if (allow_dr &&
-        picture_pool_GetSize(display_pool) >= reserved_picture) {
-        sys->decoder_pool = display_pool;
-    } else {
-        sys->decoder_pool = decoder_pool =
-            picture_pool_NewFromFormat(&vd->source,
-                                       __MAX(VOUT_MAX_PICTURES,
-                                             reserved_picture - DISPLAY_PICTURE_COUNT));
-        if (!sys->decoder_pool)
-            goto error;
-        if (allow_dr) {
-            msg_Warn(vout, "Not enough direct buffers, using system memory");
-        }
-        if (use_dr)
-            sys->display_pool = vout_GetPool(vd, 3);
-    }
-    sys->private_pool = picture_pool_Reserve(sys->decoder_pool, private_picture);
+    sys->private_pool = picture_pool_Reserve(display_pool, private_picture);
     if (sys->private_pool == NULL) {
-        if (decoder_pool != NULL)
-            picture_pool_Release(decoder_pool);
-        sys->decoder_pool = NULL;
         goto error;
     }
+    sys->display_pool = display_pool;
 
 #ifdef _WIN32
     var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
@@ -166,17 +126,14 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_t *vd)
 {
     vout_thread_sys_t *sys = vout->p;
 
-    assert(vout->p->decoder_pool && vout->p->private_pool);
+    assert(sys->display_pool && sys->private_pool);
 
     picture_pool_Release(sys->private_pool);
-
-    if (sys->display_pool != NULL || vout_IsDisplayFiltered(vd))
-        picture_pool_Release(sys->decoder_pool);
+    sys->display_pool = NULL;
 
 #ifdef _WIN32
     var_DelCallback(vout, "video-wallpaper", Forward, vd);
 #endif
-    sys->decoder_pool = NULL; /* FIXME remove */
 
     vout_display_Delete(vd);
 }

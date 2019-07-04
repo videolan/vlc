@@ -1509,7 +1509,6 @@ static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_c
     vlc_mouse_Init(&sys->mouse);
 
     sys->decoder_fifo = picture_fifo_New();
-    sys->decoder_pool = NULL;
     sys->display_pool = NULL;
     sys->private_pool = NULL;
 
@@ -1586,7 +1585,7 @@ static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_c
         vout_SetDisplayAspect(sys->display, num, den);
     vlc_mutex_unlock(&sys->display_lock);
 
-    assert(sys->decoder_pool != NULL && sys->private_pool != NULL);
+    assert(sys->display_pool != NULL && sys->private_pool != NULL);
 
     sys->displayed.current       = NULL;
     sys->displayed.next          = NULL;
@@ -1630,8 +1629,8 @@ void vout_Cancel(vout_thread_t *vout, bool canceled)
     assert(sys->display);
 
     vout_control_Hold(&sys->control);
-    if (sys->decoder_pool != NULL)
-        picture_pool_Cancel(sys->decoder_pool, canceled);
+    if (sys->display_pool != NULL)
+        picture_pool_Cancel(sys->display_pool, canceled);
     vout_control_Release(&sys->control);
 }
 
@@ -1710,7 +1709,7 @@ static void vout_ReleaseDisplay(vout_thread_t *vout)
         filter_DeleteBlend(sys->spu_blend);
 
     /* Destroy the rendering display */
-    if (sys->decoder_pool != NULL)
+    if (sys->display_pool != NULL)
         vout_FlushUnlocked(vout, true, INT64_MAX);
 
     vlc_mutex_lock(&sys->display_lock);
@@ -1730,7 +1729,7 @@ static void vout_ReleaseDisplay(vout_thread_t *vout)
         picture_fifo_Delete(sys->decoder_fifo);
         sys->decoder_fifo = NULL;
     }
-    assert(sys->decoder_pool == NULL);
+    assert(sys->display_pool == NULL);
 
     if (sys->mouse_event)
         sys->mouse_event(NULL, sys->mouse_opaque);
