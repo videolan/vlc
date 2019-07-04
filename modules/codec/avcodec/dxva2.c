@@ -396,7 +396,7 @@ static int D3dCreateDeviceManager(vlc_va_t *va)
         msg_Err(va, "cannot load function");
         return VLC_EGENERIC;
     }
-    msg_Dbg(va, "OurDirect3DCreateDeviceManager9 Success!");
+    msg_Dbg(va, "got CreateDeviceManager9");
 
     UINT token;
     IDirect3DDeviceManager9 *devmng;
