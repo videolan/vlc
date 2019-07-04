@@ -31,8 +31,6 @@
 #import "library/VLCInputItem.h"
 #import "views/VLCImageView.h"
 
-#import <vlc_url.h>
-
 #pragma mark - data storage object
 
 @interface VLCCodecInformationTreeItem : NSObject
@@ -156,10 +154,14 @@
 
     /* statistics */
     [_inputLabel setStringValue: _NS("Input")];
-    [_readBytesLabel setStringValue: _NS("Read at media")];
+    [_inputReadBytesLabel setStringValue: _NS("Read at media")];
     [_inputBitrateLabel setStringValue: _NS("Input bitrate")];
-    [_demuxBytesLabel setStringValue: _NS("Demuxed")];
+    [_inputReadPacketsLabel setStringValue: _NS("Read packets")];
+    [_demuxReadBytesLabel setStringValue: _NS("Demuxed")];
+    [_demuxReadPacketsLabel setStringValue: _NS("Demuxed packets")];
     [_demuxBitrateLabel setStringValue: _NS("Stream bitrate")];
+    [_demuxCorruptedLabel setStringValue: _NS("Corrupted")];
+    [_demuxDiscontinuitiesLabel setStringValue: _NS("Discontinuities")];
 
     [_videoLabel setStringValue: _NS("Video")];
     [_videoDecodedLabel setStringValue: _NS("Decoded blocks")];
@@ -192,10 +194,14 @@
 - (void)initMediaPanelStats
 {
     //Initializing Input Variables
-    [_readBytesTextField setStringValue: [NSString stringWithFormat:_NS("%.1f KiB"), (float)0]];
+    [_inputReadBytesTextField setStringValue: [NSString stringWithFormat:_NS("%.1f KiB"), (float)0]];
+    [_inputReadPacketsTextField setIntValue: 0];
     [_inputBitrateTextField setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
-    [_demuxBytesTextField setStringValue: [NSString stringWithFormat:_NS("%.1f KiB"), (float)0]];
+    [_demuxReadBytesTextField setStringValue: [NSString stringWithFormat:_NS("%.1f KiB"), (float)0]];
+    [_demuxReadPacketsTextField setIntValue: 0];
     [_demuxBitrateTextField setStringValue: [NSString stringWithFormat:@"%6.0f kb/s", (float)0]];
+    [_demuxDiscontinuitiesTextField setIntValue: 0];
+    [_demuxCorruptedTextField setIntValue: 0];
 
     //Initializing Video Variables
     [_videoDecodedTextField setIntValue:0];
@@ -242,14 +248,18 @@
     }
 
     /* input */
-    [_readBytesTextField setStringValue: [NSString stringWithFormat:
+    [_inputReadBytesTextField setStringValue: [NSString stringWithFormat:
                                           @"%8.0f KiB", (float)(inputStats.inputReadBytes)/1024]];
+    [_inputReadPacketsTextField setIntegerValue:inputStats.inputReadPackets];
     [_inputBitrateTextField setStringValue: [NSString stringWithFormat:
                                              @"%6.0f kb/s", (float)(inputStats.inputBitrate)*8000]];
-    [_demuxBytesTextField setStringValue: [NSString stringWithFormat:
+    [_demuxReadBytesTextField setStringValue: [NSString stringWithFormat:
                                            @"%8.0f KiB", (float)(inputStats.demuxReadBytes)/1024]];
+    [_demuxReadPacketsTextField setIntegerValue:inputStats.demuxReadPackets];
     [_demuxBitrateTextField setStringValue: [NSString stringWithFormat:
                                              @"%6.0f kb/s", (float)(inputStats.demuxBitrate)*8000]];
+    [_demuxCorruptedTextField setIntegerValue:inputStats.demuxCorrupted];
+    [_demuxDiscontinuitiesTextField setIntegerValue:inputStats.demuxDiscontinuity];
 
     /* Video */
     [_videoDecodedTextField setIntegerValue: inputStats.decodedVideo];
