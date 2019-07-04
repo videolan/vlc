@@ -329,7 +329,7 @@ void vout_SetSpuHighlight( vout_thread_t *vout,
 picture_t *vout_GetPicture(vout_thread_t *vout)
 {
     assert(!vout->p->dummy);
-    picture_t *picture = picture_pool_Wait(vout->p->decoder_pool);
+    picture_t *picture = picture_pool_Wait(vout->p->display_pool);
     if (likely(picture != NULL)) {
         picture_Reset(picture);
         video_format_CopyCropAr(&picture->format, &vout->p->original);
