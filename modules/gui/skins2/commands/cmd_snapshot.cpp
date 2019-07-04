@@ -21,37 +21,26 @@
  *****************************************************************************/
 
 #include "cmd_snapshot.hpp"
-#include <vlc_input.h>
-#include <vlc_vout.h>
+#include <vlc_player.h>
 
 void CmdSnapshot::execute()
 {
-    if( getIntf()->p_sys->p_input == NULL )
-        return;
-
-    vout_thread_t *pVout = input_GetVout( getIntf()->p_sys->p_input );
-    if( pVout )
-    {
-        // Take a snapshot
-        var_TriggerCallback( pVout, "video-snapshot" );
-        vout_Release(pVout);
-    }
+    vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
+    vlc_player_vout_Snapshot( player );
 }
 
 
 void CmdToggleRecord::execute()
 {
-    input_thread_t* pInput = getIntf()->p_sys->p_input;
-    if( pInput )
-        var_ToggleBool( pInput, "record" );
+    vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
+    vlc_player_ToggleRecording( player );
 }
 
 
 void CmdNextFrame::execute()
 {
-    input_thread_t* pInput = getIntf()->p_sys->p_input;
-    if( pInput )
-        var_TriggerCallback( pInput, "frame-next" );
+    vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
+    vlc_player_NextVideoFrame( player );
 }
 
 

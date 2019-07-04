@@ -44,6 +44,9 @@ private:
     VarTree &m_rTree;
 };
 
+/// Command to reset the playtree
+DEFINE_COMMAND( PlaytreeReset, "playtree reset" )
+
 /// Command to sort the playtree
 DEFINE_COMMAND( PlaytreeSort, "playtree sort" )
 

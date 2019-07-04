@@ -24,8 +24,8 @@
 #ifndef PLAYTREE_HPP
 #define PLAYTREE_HPP
 
-#include <vlc_playlist_legacy.h>
 #include "../utils/var_tree.hpp"
+#include <vlc_playlist.h>
 
 #include <map>
 
@@ -46,16 +46,16 @@ public:
     void onChange();
 
     /// Function called to notify playlist item update
-    void onUpdateItem( int id );
+    void onUpdateItem( int pos );
 
     /// Function called to notify about current playing item
-    void onUpdateCurrent( bool b_active );
+    void onUpdatePlaying( int pos );
 
     /// Function called to notify playlist item append
-    void onAppend( int );
+    void onAppend( int pos );
 
     /// Function called to notify playlist item delete
-    void onDelete( int );
+    void onDelete( int pos );
 
     ///
     void onUpdateSlider();
@@ -64,23 +64,23 @@ public:
     void insertItems( VarTree& item, const std::list<std::string>& files, bool start );
 
 private:
-    /// VLC playlist object
-    playlist_t *m_pPlaylist;
-
-    ///
-    std::map< int, VarTree* > m_allItems;
+    /// Current index being played back
+    int m_currentIndex;
 
     /// Build the list from the VLC playlist
     void buildTree();
 
-    /// Retrieve an iterator from playlist_item_t->id
-    Iterator findById( int id );
+    /// Retrieve an iterator from vlc_playlist_item_t
+    //Iterator findById( vlc_playlist_item_t *item );
 
     /// Update Node's children
-    void buildNode( playlist_item_t *p_node, VarTree &m_pNode );
+    void buildNode( int pos, VarTree &m_pNode );
 
     /// title for an item
     UString* getTitle( input_item_t *pItem );
+
+    /// point to the Playlist itself (pos = -1) or a child (pos >= 0)
+    Iterator getPlaylistIt( int pos = -1 );
 };
 
 #endif

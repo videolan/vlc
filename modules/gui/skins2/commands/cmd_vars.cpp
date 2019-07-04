@@ -29,45 +29,29 @@
 
 void CmdItemUpdate::execute()
 {
-    if( !m_pItem )
-        return;
-
-    // update playtree
-    playlist_t* pPlaylist = getPL();
-    playlist_Lock( pPlaylist );
-    playlist_item_t* p_plItem = playlist_ItemGetByInput( pPlaylist, m_pItem );
-    int id = p_plItem ? p_plItem->i_id : 0;
-    playlist_Unlock( pPlaylist );
-
-    if( id )
-        VlcProc::instance( getIntf() )->getPlaytreeVar().onUpdateItem( id );
-
-    // update current input if needed
-    input_item_t* p_current = NULL;
-    input_thread_t* pInput = getIntf()->p_sys->p_input;
-    if( pInput )
-        p_current = input_GetItem( pInput );
-
-    if( p_current == m_pItem )
-        VlcProc::instance( getIntf() )->update_current_input();
+    VlcProc::instance( getIntf() )->getPlaytreeVar().onUpdateItem( m_pos );
 }
 
 bool CmdItemUpdate::checkRemove( CmdGeneric *pQueuedCommand ) const
 {
     // We don't use RTTI - Use C-style cast
     CmdItemUpdate *pUpdateCommand = (CmdItemUpdate *)(pQueuedCommand);
-    return m_pItem == pUpdateCommand->m_pItem;
+    return m_pos== pUpdateCommand->m_pos;
 }
 
+void CmdItemPlaying::execute()
+{
+    VlcProc::instance( getIntf() )->getPlaytreeVar().onUpdatePlaying( m_pos );
+}
 
 void CmdPlaytreeAppend::execute()
 {
-    VlcProc::instance( getIntf() )->getPlaytreeVar().onAppend( m_id );
+    VlcProc::instance( getIntf() )->getPlaytreeVar().onAppend( m_pos );
 }
 
 void CmdPlaytreeDelete::execute()
 {
-    VlcProc::instance( getIntf() )->getPlaytreeVar().onDelete( m_id );
+    VlcProc::instance( getIntf() )->getPlaytreeVar().onDelete( m_pos );
 }
 
 void CmdSetText::execute()

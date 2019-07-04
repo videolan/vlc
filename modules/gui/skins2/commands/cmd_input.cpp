@@ -23,32 +23,25 @@
 
 #include "cmd_input.hpp"
 #include "cmd_dialogs.hpp"
-#include <vlc_input.h>
-#include <vlc_playlist_legacy.h>
+#include <vlc_player.h>
+#include <vlc_playlist.h>
 
 void CmdPlay::execute()
 {
-    playlist_t *pPlaylist = getPL();
-
-    // if already playing an input, reset rate to normal speed
-    input_thread_t *pInput = playlist_CurrentInput( pPlaylist );
-    if( pInput )
-    {
-        var_SetFloat( getPL(), "rate", 1.0 );
-        input_Release(pInput);
-    }
-
-    playlist_Lock( pPlaylist );
-    const bool b_empty = playlist_IsEmpty( pPlaylist );
-    playlist_Unlock( pPlaylist );
-
+    vlc_playlist_Lock( getPL() );
+    bool b_empty = (vlc_playlist_Count( getPL() ) == 0 );
     if( !b_empty )
     {
-        playlist_Play( pPlaylist );
+        vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
+        if( vlc_player_IsStarted( player ) )
+            vlc_playlist_Resume( getPL() );
+        else
+            vlc_playlist_PlayAt( getPL(), 0 );
+        vlc_playlist_Unlock( getPL() );
     }
     else
     {
-        // If the playlist is empty, open a file requester instead
+        vlc_playlist_Unlock( getPL() );
         CmdDlgFile( getIntf() ).execute();
     }
 }
@@ -56,42 +49,70 @@ void CmdPlay::execute()
 
 void CmdPause::execute()
 {
-    playlist_TogglePause( getPL() );
+    vlc_playlist_Lock( getPL() );
+    vlc_playlist_Pause( getPL() );
+    vlc_playlist_Unlock( getPL() );
 }
 
 
 void CmdStop::execute()
 {
-    playlist_Stop( getPL() );
+    vlc_playlist_Lock( getPL() );
+#if 0
+    vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
+    if( vlc_player_IsStarted( player ) )
+        vlc_playlist_Stop( getPL() );
+    else
+        vlc_playlist_GoTo( getPL(), 0 );
+#endif
+    vlc_playlist_Stop( getPL() );
+    vlc_playlist_GoTo( getPL(), -1 );
+
+    vlc_playlist_Unlock( getPL() );
 }
 
 
 void CmdSlower::execute()
 {
-    var_TriggerCallback( getPL(), "rate-slower" );
+    vlc_playlist_Lock( getPL() );
+    vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
+    vlc_player_DecrementRate( player );
+    vlc_playlist_Unlock( getPL() );
 }
 
 
 void CmdFaster::execute()
 {
-    var_TriggerCallback( getPL(), "rate-faster" );
+    vlc_playlist_Lock( getPL() );
+    vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
+    vlc_player_IncrementRate( player );
+    vlc_playlist_Unlock( getPL() );
 }
 
 
 void CmdMute::execute()
 {
-    playlist_MuteToggle( getPL() );
+    vlc_playlist_Lock( getPL() );
+    vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
+    vlc_player_aout_ToggleMute( player );
+    vlc_playlist_Unlock( getPL() );
 }
 
 
 void CmdVolumeUp::execute()
 {
-    playlist_VolumeUp( getPL(), 1, NULL );
+    vlc_playlist_Lock( getPL() );
+    vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
+    vlc_player_aout_IncrementVolume( player, 1, NULL );
+    vlc_playlist_Unlock( getPL() );
 }
 
 
 void CmdVolumeDown::execute()
 {
-    playlist_VolumeDown( getPL(), 1, NULL );
+    vlc_playlist_Lock( getPL() );
+    vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
+    vlc_player_aout_DecrementVolume( player, 1, NULL );
+    vlc_playlist_Unlock( getPL() );
 }
 

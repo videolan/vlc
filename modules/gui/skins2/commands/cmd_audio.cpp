@@ -22,13 +22,14 @@
 
 #include "cmd_audio.hpp"
 #include "../src/vlcproc.hpp"
-#include <vlc_playlist_legacy.h>
-#include <vlc_input.h>
+#include <vlc_playlist.h>
+#include <vlc_player.h>
 #include <string>
 
 void CmdSetEqualizer::execute()
 {
-    playlist_EnableAudioFilter( getPL(), "equalizer", m_enable );
+    vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
+    (void)vlc_player_aout_EnableFilter( player, "equalizer", m_enable );
 }
 
 

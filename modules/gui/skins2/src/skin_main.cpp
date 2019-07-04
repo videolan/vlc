@@ -28,8 +28,7 @@
 #define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_input.h>
-#include <vlc_playlist_legacy.h>
+#include <vlc_playlist.h>
 #include <vlc_threads.h>
 #include <vlc_vout_window.h>
 
@@ -79,8 +78,6 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys = (intf_sys_t *) calloc( 1, sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
         return VLC_ENOMEM;
-
-    p_intf->p_sys->p_input = NULL;
 
     // Initialize "singleton" objects
     p_intf->p_sys->p_logger = NULL;
@@ -145,9 +142,6 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     msg_Dbg( p_intf, "closing skins2 module" );
-
-    /* Terminate input to ensure that our window provider is released. */
-    playlist_Deactivate( pl_Get(p_intf) );
 
     vlc_mutex_lock( &skin_load.mutex );
     skin_load.intf = NULL;

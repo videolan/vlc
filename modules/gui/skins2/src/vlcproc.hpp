@@ -27,7 +27,8 @@
 #include <set>
 
 #include <vlc_common.h>
-#include <vlc_input.h>
+#include <vlc_player.h>
+#include <vlc_playlist.h>
 #include <vlc_vout.h>
 #include "../vars/equalizer.hpp"
 #include "../vars/playtree.hpp"
@@ -97,25 +98,33 @@ public:
     /// initialize equalizer
     void init_equalizer( );
 
-    /// update global variables for the current input
-    void update_current_input( );
+    void on_intf_event_changed( vlc_value_t newVal );
+    void on_bit_rate_changed( vlc_value_t newVal );
+    void on_sample_rate_changed( vlc_value_t newVal );
 
-    void on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal );
-    void on_bit_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal );
-    void on_sample_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal );
-    void on_can_record_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+    void on_current_media_changed( vlc_value_t newVal );
+    void on_random_changed( vlc_value_t newVal );
+    void on_loop_changed( vlc_value_t newVal );
+    void on_repeat_changed( vlc_value_t newVal );
+    void on_order_changed( vlc_value_t newVal );
 
-    void on_random_changed( vlc_object_t* p_obj, vlc_value_t newVal );
-    void on_loop_changed( vlc_object_t* p_obj, vlc_value_t newVal );
-    void on_repeat_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+    void on_volume_changed( vlc_value_t newVal );
+    void on_mute_changed( vlc_value_t newVal );
 
-    void on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal );
-    void on_mute_changed( vlc_object_t* p_obj, vlc_value_t newVal );
-    void on_audio_filter_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+    void on_state_changed( vlc_value_t newVal );
+    void on_rate_changed( vlc_value_t newVal );
+    void on_capabilities_changed( vlc_value_t newVal );
+    void on_position_changed( vlc_value_t newVal );
+    void on_audio_es_changed( vlc_value_t newVal );
+    void on_isDvd_changed( vlc_value_t newVal );
+    void on_recording_changed( vlc_value_t newVal );
+    void on_vout_changed( vlc_value_t newVal );
 
-    void on_intf_show_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+    void on_audio_filter_changed( vlc_value_t newVal );
 
-    void on_mouse_moved_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+    void on_intf_show_changed( vlc_value_t newVal );
+
+    void on_mouse_moved_changed( vlc_value_t newVal );
 
 protected:
     // Protected because it is a singleton
@@ -163,6 +172,13 @@ private:
 
     /// Vout thread
     vout_thread_t *m_pVout;
+    audio_output_t *m_pAout;
+
+    /// Listener to various objects
+    vlc_playlist_listener_id *mPlaylistListenerId;
+    vlc_player_listener_id *mPlayerListenerId;
+    vlc_player_aout_listener_id *mPlayerAoutListenerId;
+    vlc_player_vout_listener_id *mPlayerVoutListenerId;
 
     // reset variables when input is over
     void reset_input();
@@ -170,57 +186,25 @@ private:
     // init variables (libvlc and playlist levels)
     void init_variables();
 
-    /// Callback for input-current variable
-    static int onInputNew( vlc_object_t *pObj, const char *pVariable,
-                           vlc_value_t oldVal, vlc_value_t newVal,
-                           void *pParam );
+public:
 
-    /// Callback for item-change variable
-    static int onItemChange( vlc_object_t *pObj, const char *pVariable,
-                             vlc_value_t oldVal, vlc_value_t newVal,
-                             void *pParam );
-
-    /// Callback for item-change variable
-    static int onItemAppend( vlc_object_t *pObj, const char *pVariable,
-                             vlc_value_t oldVal, vlc_value_t newVal,
-                             void *pParam );
-
-    /// Callback for item-change variable
-    static int onItemDelete( vlc_object_t *pObj, const char *pVariable,
-                             vlc_value_t oldVal, vlc_value_t newVal,
-                             void *pParam );
-
-    static int onInteraction( vlc_object_t *pObj, const char *pVariable,
-                              vlc_value_t oldVal, vlc_value_t newVal,
-                              void *pParam );
-
-    static int onEqBandsChange( vlc_object_t *pObj, const char *pVariable,
+    static int genericCallback( vlc_object_t *pObj,
+                                const char *pVariable,
                                 vlc_value_t oldVal, vlc_value_t newVal,
                                 void *pParam );
 
-    static int onEqPreampChange( vlc_object_t *pObj, const char *pVariable,
+    static int EqBandsCallback( vlc_object_t *pObj, const char *pVariable,
+                                vlc_value_t oldVal, vlc_value_t newVal,
+                                void *pParam );
+
+    static int EqPreampCallback( vlc_object_t *pObj, const char *pVariable,
                                  vlc_value_t oldVal, vlc_value_t newVal,
                                  void *pParam );
 
-    /// Generic Callback
-    static int onGenericCallback( vlc_object_t *pObj, const char *pVariable,
-                                  vlc_value_t oldVal, vlc_value_t newVal,
-                                  void *pParam );
-    static int onInputCallback( vlc_object_t *pObj, const char *pVariable,
-                                vlc_value_t oldVal, vlc_value_t newVal,
-                                void *pParam );
 
-    static int onVoutCallback( vlc_object_t *pObj, const char *pVariable,
-                               vlc_value_t oldVal, vlc_value_t newVal,
-                               void *pParam );
-    static int onAoutCallback( vlc_object_t *pObj, const char *pVariable,
-                               vlc_value_t oldVal, vlc_value_t newVal,
-                               void *pParam );
+    static void onGenericCallback( const char *pVariable,
+                                   vlc_value_t newVal, void *data );
 
-    /// Generic Callback for intf-event
-    static int onIntfEvent( vlc_object_t *pObj, const char *pVariable,
-                            vlc_value_t oldVal, vlc_value_t newVal,
-                            void *pParam );
 };
 
 #endif

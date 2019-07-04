@@ -27,7 +27,6 @@
 
 #include <vlc_vout.h>
 #include <vlc_vout_osd.h>
-#include <vlc_input.h>
 
 #include "cmd_quit.hpp"
 #include "../src/os_factory.hpp"
@@ -36,15 +35,9 @@
 
 void CmdQuit::execute()
 {
-    if( getIntf()->p_sys->p_input )
-    {
-        vout_thread_t *pVout = input_GetVout( getIntf()->p_sys->p_input );
-        if( pVout )
-        {
-            vout_OSDMessage( pVout, VOUT_SPU_CHANNEL_OSD, "%s", _( "Quit" ) );
-            vout_Release(pVout);
-        }
-    }
+    vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
+    vlc_player_vout_OSDMessage( player,
+        VOUT_SPU_CHANNEL_OSD, "%s", _( "Quit" ) );
 
     // Kill libvlc
     libvlc_Quit( vlc_object_instance(getIntf()) );
