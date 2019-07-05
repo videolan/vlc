@@ -1727,7 +1727,7 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 - (instancetype)initWithStatsStructure:(const struct input_stats_t *)p_stats
 {
     self = [super init];
-    if (p_stats != NULL) {
+    if (self && p_stats != NULL) {
         _inputReadPackets = p_stats->i_read_packets;
         _inputReadBytes = p_stats->i_read_bytes;
         _inputBitrate = p_stats->f_input_bitrate;
@@ -1757,7 +1757,7 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 - (instancetype)initWithTrackStructure:(const struct vlc_player_track *)p_track
 {
     self = [super init];
-    if (p_track != NULL) {
+    if (self && p_track != NULL) {
         _esID = p_track->es_id;
         _name = toNSStr(p_track->name);
         _selected = p_track->selected;
@@ -1777,7 +1777,7 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 - (instancetype)initWithProgramStructure:(const struct vlc_player_program *)p_program
 {
     self = [super init];
-    if (p_program != NULL) {
+    if (self && p_program != NULL) {
         _group_id = p_program->group_id;
         _name = toNSStr(p_program->name);
         _selected = p_program->selected;
