@@ -34,6 +34,8 @@ const CGFloat VLCMediaLibrary720pWidth = 1280.;
 const CGFloat VLCMediaLibrary720pHeight = 720.;
 const long long int VLCMediaLibraryMediaItemDurationDenominator = 1000;
 
+NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryID";
+
 @implementation VLCMediaLibraryFile
 
 - (instancetype)initWithFile:(struct vlc_ml_file_t *)p_file
@@ -296,6 +298,18 @@ const long long int VLCMediaLibraryMediaItemDurationDenominator = 1000;
         }
     }
     return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    int64_t libraryID = [aDecoder decodeInt64ForKey:VLCMediaLibraryMediaItemLibraryID];
+    self = [VLCMediaLibraryMediaItem mediaItemForLibraryID:libraryID];
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [aCoder encodeInt64:_libraryID forKey:VLCMediaLibraryMediaItemLibraryID];
 }
 
 - (NSString *)description
