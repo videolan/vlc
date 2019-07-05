@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-04-24 07:41+0200\n"
+"PO-Revision-Date: 2019-07-11 07:30+0200\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2019\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/16553/he/)\n"
 "Language: he\n"
@@ -1056,11 +1056,11 @@ msgstr "%.2f דציבל"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr "רזולוציית וידאו"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
-msgstr ""
+msgstr "ממדי האוגרים"
 
 #: src/input/es_out.c:3183 src/input/es_out.c:3186 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1609,11 +1609,11 @@ msgstr ""
 
 #: src/libvlc-module.c:129
 msgid "Media role"
-msgstr ""
+msgstr "תפקיד מדיה"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
-msgstr ""
+msgstr "תפקיד (נגן) מדיה למדיניות מערכת ההפעלה."
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:267
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:407
@@ -1674,16 +1674,16 @@ msgstr "גודל הצעד בין רמת עוצמת שמע אחת לאחרת"
 
 #: src/libvlc-module.c:153
 msgid "The step size of the volume is adjustable using this option."
-msgstr ""
+msgstr "גודל הצעד של שינוי עצמת השמע ניתן לכוונון דרך אפשרות זו."
 
 #: src/libvlc-module.c:156
 msgid "Remember the audio volume"
-msgstr ""
+msgstr "לזכור את עצמת השמע"
 
 #: src/libvlc-module.c:158
 msgid ""
 "The volume can be recorded and automatically restored next time VLC is used."
-msgstr ""
+msgstr "ניתן לשמור ולשחזר את עצמת השמע בהפעלה הבאה של VLC אוטומטית."
 
 #: src/libvlc-module.c:161
 msgid "Audio desynchronization compensation"
@@ -2585,6 +2585,8 @@ msgid ""
 "Language of the menus you want to use with DVD/BluRay (comma separated, two "
 "or three letters country code, you may use 'any' as a fallback)."
 msgstr ""
+"השפות בהן יופיעו התפריטים ב־DVD/BluRay (מופרדות בפסיקים, 2 או 3 אותיות לקוד "
+"מדינה, ניתן להשתמש ב־‚any’ במקרה של ספק)."
 
 #: src/libvlc-module.c:604
 msgid "Audio track ID"
@@ -12798,7 +12800,7 @@ msgstr ""
 
 #: modules/codec/x264.c:164
 msgid "Interlaced mode"
-msgstr ""
+msgstr "מצב שזור"
 
 #: modules/codec/x264.c:165
 msgid "Pure-interlaced mode."
@@ -12919,11 +12921,11 @@ msgstr ""
 
 #: modules/codec/x264.c:217
 msgid "VBV buffer"
-msgstr ""
+msgstr "אוגר VBV"
 
 #: modules/codec/x264.c:218
 msgid "Averaging period for the maximum local bitrate (in kbits)."
-msgstr ""
+msgstr "טווח מיצוע של קצב הסיביות המרבי (בקילוסיביות)."
 
 #: modules/codec/x264.c:221
 msgid "Initial VBV buffer occupancy"
@@ -13242,11 +13244,11 @@ msgstr ""
 
 #: modules/codec/x264.c:381
 msgid "CPU optimizations"
-msgstr ""
+msgstr "שיפורי מעבד"
 
 #: modules/codec/x264.c:382
 msgid "Use assembler CPU optimizations."
-msgstr ""
+msgstr "שימוש בשיפורי אסמבלי למעבד."
 
 #: modules/codec/x264.c:384
 msgid "Filename for 2 pass stats file"
@@ -13258,27 +13260,27 @@ msgstr ""
 
 #: modules/codec/x264.c:387
 msgid "PSNR computation"
-msgstr ""
+msgstr "חישוב PSNR"
 
 #: modules/codec/x264.c:388
 msgid ""
 "Compute and print PSNR stats. This has no effect on the actual encoding "
 "quality."
-msgstr ""
+msgstr "חישוב והצגה של סטטיסטיקת PSNR. אין לזה כל השפעה על איכות הקידוד בפועל."
 
 #: modules/codec/x264.c:391
 msgid "SSIM computation"
-msgstr ""
+msgstr "חישוב SSIM"
 
 #: modules/codec/x264.c:392
 msgid ""
 "Compute and print SSIM stats. This has no effect on the actual encoding "
 "quality."
-msgstr ""
+msgstr "חישוב והצגה של סטטיסטיקת SSIM. אין לזה כל השפעה על איכות הקידוד בפועל."
 
 #: modules/codec/x264.c:395
 msgid "Quiet mode"
-msgstr ""
+msgstr "מצב שקט"
 
 #: modules/codec/x264.c:397 modules/gui/macosx/VLCPlaylistInfo.m:69
 #: modules/gui/qt/ui/streampanel.h:168
@@ -13291,13 +13293,14 @@ msgstr "הצגת סטטיסטיקה לכל שקופית."
 
 #: modules/codec/x264.c:400
 msgid "SPS and PPS id numbers"
-msgstr ""
+msgstr "מספרי זיהוי של SPS ושל PPS"
 
 #: modules/codec/x264.c:401
 msgid ""
 "Set SPS and PPS id numbers to allow concatenating streams with different "
 "settings."
 msgstr ""
+"הגדרת מספרי זיהוי של SPS ושל PPS כדי לאפשר חיבור של תזרימים עם הגדרות שונות."
 
 #: modules/codec/x264.c:404
 msgid "Access unit delimiters"
@@ -13331,31 +13334,31 @@ msgstr ""
 
 #: modules/codec/x264.c:415
 msgid "x264 advanced options"
-msgstr ""
+msgstr "אפשרויות מתקדמות של x264"
 
 #: modules/codec/x264.c:416
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
-msgstr ""
+msgstr "אפשרויות מתקדמות של x264, בצורה {אפשרות=ערך,אפשרות2=ערך2}"
 
 #: modules/codec/x264.c:421
 msgid "dia"
-msgstr ""
+msgstr "dia"
 
 #: modules/codec/x264.c:421
 msgid "hex"
-msgstr ""
+msgstr "hex"
 
 #: modules/codec/x264.c:421
 msgid "umh"
-msgstr ""
+msgstr "umh"
 
 #: modules/codec/x264.c:421
 msgid "esa"
-msgstr ""
+msgstr "esa"
 
 #: modules/codec/x264.c:421
 msgid "tesa"
-msgstr ""
+msgstr "tesa"
 
 #: modules/codec/x264.c:429
 msgid "Fast"
@@ -23764,15 +23767,15 @@ msgstr "יש להשבית אם המגבר שלך אינו תומך ב־Dolby®�
 
 #: modules/stream_out/chromecast/cast.cpp:217
 msgid "High (high quality and high bandwidth)"
-msgstr ""
+msgstr "גבוהה (איכות גבוהה ורוחב פס גבוה)"
 
 #: modules/stream_out/chromecast/cast.cpp:218
 msgid "Medium (medium quality and medium bandwidth)"
-msgstr ""
+msgstr "בינונית (איכות בינונית ורוחב פס בינוני)"
 
 #: modules/stream_out/chromecast/cast.cpp:219
 msgid "Low (low quality and low bandwidth)"
-msgstr ""
+msgstr "נמוכה (איכות נמוכה ורוחב פס נמוך)"
 
 #: modules/stream_out/chromecast/cast.cpp:220
 msgid "Low CPU (low quality but high bandwidth)"
@@ -23815,10 +23818,12 @@ msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"לצורך שידור הסרטון הזה נדרשת המרה. המרה זו יכולה להשתמש בכל תכולת הסוללה "
+"ואולי אף לרוקן אותה בזמן קצר."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:511
 msgid "Chromecast demux wrapper"
-msgstr ""
+msgstr "עוטף פילוג Chromecast"
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
@@ -24137,7 +24142,7 @@ msgstr "הגדרה זו מאפשרת לציין את פתחת הווידאו כ�
 
 #: modules/stream_out/rtp.c:130
 msgid "RTP/RTCP multiplexing"
-msgstr ""
+msgstr "ריבוב RTP/RTCP"
 
 #: modules/stream_out/rtp.c:132
 msgid ""
@@ -24151,7 +24156,7 @@ msgstr ""
 msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
 "milliseconds."
-msgstr ""
+msgstr "ערך המטמון כבררת מחדל לתזרימי RTP יוצאים. הערך הוא במילישניות."
 
 #: modules/stream_out/rtp.c:140
 msgid "Transport protocol"
@@ -24495,13 +24500,14 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:108
 msgid "Subtitle encoder"
-msgstr ""
+msgstr "מקודד כתוביות"
 
 #: modules/stream_out/transcode/transcode.c:110
 msgid ""
 "This is the subtitle encoder module that will be used (and its associated "
 "options)."
 msgstr ""
+"זה הוא מודול קידוד הכתוביות בוא יעשה שימוש (לרבות האפשרויות המשויכות אליו)."
 
 #: modules/stream_out/transcode/transcode.c:112
 msgid "Destination subtitle codec"
@@ -24556,13 +24562,15 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:201
 msgid "Overlays/Subtitles"
-msgstr ""
+msgstr "שכבות על/כתוביות"
 
 #: modules/text_renderer/freetype/fonts/fontconfig.c:79
 msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
 msgstr ""
+"נא להמתין לבניית מטמון הגופנים שלך מחדש.\n"
+"פעולה זו לא אמורה להימשך מעבר למספר דקות."
 
 #: modules/text_renderer/freetype/freetype.c:81
 msgid "Monospace Font"
@@ -24596,6 +24604,8 @@ msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
 "the video. 0 = transparent, 255 = totally opaque."
 msgstr ""
+"האטימות (ההפך משקיפות) של הטקסט שיעובד על גבי הווידאו. 0 = שקוף, 255 = אטום "
+"לחלוטין."
 
 #: modules/text_renderer/freetype/freetype.c:95
 msgid "Text default color"
@@ -24649,11 +24659,11 @@ msgstr "מרחק הצל"
 
 #: modules/text_renderer/freetype/freetype.c:118
 msgid "Text direction"
-msgstr ""
+msgstr "כיוון הטקסט"
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
-msgstr ""
+msgstr "כיוון הבסיס לפסקה עבור אלגוריתם יוניקוד דו־כיווני"
 
 #: modules/text_renderer/freetype/freetype.c:125
 msgid "Use YUVP renderer"
@@ -25130,10 +25140,11 @@ msgstr ""
 msgid ""
 "Example: 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'"
 msgstr ""
+"לדוגמה: ‚CICrystallize’,‏ ‚CIBumpDistortion’,‏ ‚CIThermal’,‏ ’CIComicEffect‚"
 
 #: modules/video_filter/ci_filters.m:763
 msgid "Mac OS X hardware video filters"
-msgstr ""
+msgstr "מסנני וידאו חומרתיים של Mac OS X"
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -25544,7 +25555,7 @@ msgstr "כיווניות"
 
 #: modules/video_filter/mirror.c:72
 msgid "Direction of the mirroring."
-msgstr ""
+msgstr "כיוון השיקוף."
 
 #: modules/video_filter/mirror.c:75
 msgid "Left to right/Top to bottom"
@@ -25552,19 +25563,19 @@ msgstr "שמאל לימין/למעלה למטה"
 
 #: modules/video_filter/mirror.c:75
 msgid "Right to left/Bottom to top"
-msgstr ""
+msgstr "מימין לשמאל/מלמעלה למטה"
 
 #: modules/video_filter/mirror.c:80
 msgid "Mirror video filter"
-msgstr ""
+msgstr "מסנן שיקוף סרטונים"
 
 #: modules/video_filter/mirror.c:81
 msgid "Mirror video"
-msgstr ""
+msgstr "שיקוף סרטון"
 
 #: modules/video_filter/mirror.c:82
 msgid "Splits video in two same parts, like in a mirror"
-msgstr ""
+msgstr "פיצול סרטון לכמה חלקים, כמו במראה"
 
 #: modules/video_filter/motionblur.c:54
 msgid "Blur factor (1-127)"
@@ -25576,7 +25587,7 @@ msgstr "מידת הטשטוש, מ-1 ועד 127."
 
 #: modules/video_filter/motionblur.c:61
 msgid "Motion blur filter"
-msgstr ""
+msgstr "מסנן טשטוש תנועה"
 
 #: modules/video_filter/motiondetect.c:48
 msgid "Motion detect video filter"
@@ -25592,7 +25603,7 @@ msgstr "סרט ישן"
 
 #: modules/video_filter/opencv_example.cpp:72
 msgid "OpenCV face detection example filter"
-msgstr ""
+msgstr "מסנן זיהוי פנים של OpenCV לדוגמה"
 
 #: modules/video_filter/opencv_example.cpp:73
 msgid "OpenCV example"
@@ -25612,7 +25623,7 @@ msgstr ""
 
 #: modules/video_filter/opencv_wrapper.c:62
 msgid "I420 - first plane is grayscale"
-msgstr ""
+msgstr "I420 - המישור הראשון הוא בגווני אפור"
 
 #: modules/video_filter/opencv_wrapper.c:62
 msgid "RGB32"
@@ -27351,6 +27362,8 @@ msgid ""
 "To stop the stream and resume normal controls, click the <i>Open Stream</i> "
 "button again."
 msgstr ""
+"כדי לעצור את התזרים ולהמשיך עם הפקדים הרגילים יש ללחוץ על הכפתור <i>פתיחת "
+"תזרים</i> שוב."
 
 #: share/lua/http/index.html:278
 msgid "Are you sure you wish to create the stream?"
