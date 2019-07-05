@@ -26,6 +26,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCMediaLibraryMediaItem;
+@class VLCInputItem;
 
 extern const CGFloat VLCMediaLibrary4KWidth;
 extern const CGFloat VLCMediaLibrary4KHeight;
@@ -150,6 +151,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) int64_t libraryID;
 @property (readonly) vlc_ml_media_type_t mediaType;
 @property (readonly) vlc_ml_media_subtype_t mediaSubType;
+@property (readonly) VLCInputItem *inputItem;
 
 @property (readonly) NSArray <VLCMediaLibraryFile *> *files;
 @property (readonly) NSArray <VLCMediaLibraryTrack *> *tracks;

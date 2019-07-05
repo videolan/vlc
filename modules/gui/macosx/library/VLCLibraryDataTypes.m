@@ -24,6 +24,7 @@
 
 #import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
+#import "library/VLCInputItem.h"
 
 #import <vlc_url.h>
 
@@ -301,6 +302,17 @@ const long long int VLCMediaLibraryMediaItemDurationDenominator = 1000;
 {
     return [NSString stringWithFormat:@"%@ — title: %@, ID: %lli, type: %i, artwork: %@",
             NSStringFromClass([self class]), _title, _libraryID, _mediaType, _smallArtworkMRL];
+}
+
+- (VLCInputItem *)inputItem
+{
+    input_item_t *p_inputItem = vlc_ml_get_input_item(_p_mediaLibrary, _libraryID);
+    VLCInputItem *inputItem = nil;
+    if (p_inputItem) {
+        inputItem = [[VLCInputItem alloc] initWithInputItem:p_inputItem];
+    }
+    input_item_Release(p_inputItem);
+    return inputItem;
 }
 
 #pragma mark - preference setters / getters
