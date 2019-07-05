@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) VLCDragDropView *dragDropView;
 @property (readwrite, assign) NSTextField *counterTextField;
 
+- (void)prepareForUse;
 - (void)playlistUpdated;
 
 @end

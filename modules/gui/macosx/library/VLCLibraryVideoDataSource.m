@@ -25,6 +25,7 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryDataTypes.h"
 
 #import "main/CompatibilityFixes.h"
 #import "extensions/NSString+Helpers.h"
@@ -81,6 +82,40 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 - (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
     NSLog(@"library selection changed: %@", indexPaths);
+}
+
+#pragma mark - drag and drop support
+
+- (BOOL)collectionView:(NSCollectionView *)collectionView
+canDragItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+             withEvent:(NSEvent *)event
+{
+    return YES;
+}
+
+- (BOOL)collectionView:(NSCollectionView *)collectionView
+writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+          toPasteboard:(NSPasteboard *)pasteboard
+{
+    NSArray *mediaArray;
+    if (collectionView == self.recentMediaCollectionView) {
+        mediaArray = [_libraryModel listOfRecentMedia];
+    } else {
+        mediaArray = [_libraryModel listOfVideoMedia];
+    }
+
+    NSMutableArray *mutableArray = [NSMutableArray arrayWithCapacity:indexPaths.count];
+    for (NSIndexPath *indexPath in indexPaths) {
+        VLCMediaLibraryMediaItem *mediaItem = mediaArray[indexPath.item];
+        [mutableArray addObject:mediaItem];
+    }
+
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:mutableArray];
+    NSString *pasteboardType = NSStringFromClass([VLCMediaLibraryMediaItem class]);
+    [pasteboard declareTypes:@[pasteboardType] owner:self];
+    [pasteboard setData:data forType:pasteboardType];
+
+    return YES;
 }
 
 @end

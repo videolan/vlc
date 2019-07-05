@@ -28,6 +28,8 @@
 #import "playlist/VLCPlaylistItem.h"
 #import "playlist/VLCPlaylistModel.h"
 #import "views/VLCDragDropView.h"
+#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCInputItem.h"
 
 static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
@@ -43,6 +45,12 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 {
     _playlistController = playlistController;
     _playlistModel = _playlistController.playlistModel;
+}
+
+- (void)prepareForUse
+{
+    NSString *pasteboardType = NSStringFromClass([VLCMediaLibraryMediaItem class]);
+    [_tableView registerForDraggedTypes:@[pasteboardType]];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
@@ -94,5 +102,36 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
     [_tableView reloadData];
 }
 
-@end
+- (NSDragOperation)tableView:(NSTableView *)tableView
+                validateDrop:(id<NSDraggingInfo>)info
+                 proposedRow:(NSInteger)row
+       proposedDropOperation:(NSTableViewDropOperation)dropOperation
+{
+    return NSDragOperationCopy;
+}
 
+- (BOOL)tableView:(NSTableView *)tableView
+       acceptDrop:(id<NSDraggingInfo>)info
+              row:(NSInteger)row
+    dropOperation:(NSTableViewDropOperation)dropOperation
+{
+    NSString *pasteboardType = NSStringFromClass([VLCMediaLibraryMediaItem class]);
+    NSData *data = [info.draggingPasteboard dataForType:pasteboardType];
+    if (!data) {
+        return NO;
+    }
+    NSArray *array = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    if (!data) {
+        return NO;
+    }
+    NSUInteger arrayCount = array.count;
+
+    for (NSUInteger x = 0; x < arrayCount; x++) {
+        VLCMediaLibraryMediaItem *mediaItem = array[x];
+        [_playlistController addInputItem:mediaItem.inputItem.vlcInputItem atPosition:row startPlayback:NO];
+    }
+
+    return YES;
+}
+
+@end
