@@ -76,8 +76,8 @@ ComboBox {
     }
 
     background: Rectangle {
-        implicitWidth: 120
-        implicitHeight: 40
+        implicitWidth: control.width
+        implicitHeight: control.height
         color: VLCStyle.colors.button
         border.color: control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.buttonBorder
         border.width: control.activeFocus ? 2 : 1
