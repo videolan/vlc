@@ -159,7 +159,7 @@ static const staticentry_t p_list_video[] = {
         E("PLV1", "Pelco DVR MPEG-4"),
         E("QMP4", "QNAP Systems MPEG-4"),
         E("qMP4", "QNAP Systems MPEG-4"),
-        A("wMP4"), /* Seems QNAP too */
+        E("wMP4", "QNAP Systems MPEG-4"),
         /* 3ivx delta 3.5 Unsupported
          * putting it here gives extreme distorted images */
         //E("3IV1", "3ivx delta 3.5 MPEG-4 Video"),
@@ -338,9 +338,9 @@ static const staticentry_t p_list_video[] = {
         A("FLJP"),
         A("FMJP"),
         A("SJPG"),
-        A("QIVG"), /* Probably QNAP */
-        A("qIVG"), /* Probably QNAP */
-        A("wIVG"), /* Probably QNAP */
+        E("QIVG", "QNAP Motion JPEG"),
+        E("qIVG", "QNAP Motion JPEG"),
+        E("wIVG", "QNAP Motion JPEG"),
         E("AVRn", "Avid Motion JPEG"),
         E("AVDJ", "Avid Motion JPEG"),
         E("ADJV", "Avid Motion JPEG"),
