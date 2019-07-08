@@ -47,7 +47,7 @@
 
 - (void)enablePlaylistItems
 {
-    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
+    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, nil]];
 }
 
 - (BOOL)mouseDownCanMoveWindow

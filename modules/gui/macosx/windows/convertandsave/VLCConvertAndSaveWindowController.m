@@ -331,9 +331,8 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
     [openPanel setResolvesAliases:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger returnCode) {
-        if (returnCode == NSModalResponseOK)
-        {
-            [self setMRL: toNSStr(vlc_path2uri([[[openPanel URL] path] UTF8String], NULL))];
+        if (returnCode == NSModalResponseOK) {
+            [self setMRL: [[openPanel URL] absoluteString]];
             [self updateOKButton];
             [self updateDropView];
         }
@@ -641,7 +640,7 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
 
 - (BOOL)handlePasteBoardFromDragSession:(NSPasteboard *)paste
 {
-    NSArray *types = [NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil];
+    NSArray *types = [NSArray arrayWithObjects:NSFilenamesPboardType, nil];
     NSString *desired_type = [paste availableTypeFromArray: types];
     NSData *carried_data = [paste dataForType: desired_type];
 
@@ -652,48 +651,17 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
         NSArray *values = [[paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
         if ([values count] > 0) {
-            [self setMRL: toNSStr(vlc_path2uri([[values firstObject] UTF8String], NULL))];
+            NSURL *url = [NSURL fileURLWithPath:[values firstObject] isDirectory:NO];
+            if (!url) {
+                return NO;
+            }
+            [self setMRL:url.absoluteString];
             [self updateOKButton];
             [self updateDropView];
             return YES;
         }
     }
 
-#if 0
-    // FIXME: re-implement drag-n-drop from the new playlist
-    else if ([desired_type isEqualToString:@"VLCPlaylistItemPboardType"]) {
-        NSArray *draggedItems = [[[VLCMain sharedInstance] playlist] draggedItems];
-
-        // Return early to prevent unnecessary playlist access/locking
-        if ([draggedItems count] <= 0) {
-            return NO;
-        }
-
-        playlist_t *p_playlist = pl_Get(getIntf());
-        playlist_item_t *p_item = NULL;
-
-        PL_LOCK;
-        for (VLCPLItem *draggedItem in draggedItems) {
-            p_item = playlist_ItemGetById(p_playlist, [draggedItem plItemId]);
-
-            // Check if the item is usable
-            if (!p_item || !p_item->p_input || !p_item->p_input->psz_uri) {
-                // Item not usable, reset it.
-                p_item = NULL;
-                continue;
-            }
-
-            // First usable item found
-            [self setMRL: toNSStr(p_item->p_input->psz_uri)];
-            [self updateDropView];
-            [self updateOKButton];
-            break;
-        }
-        PL_UNLOCK;
-
-        return (p_item != NULL) ? YES : NO;
-    }
-#endif
     return NO;
 }
 

@@ -50,8 +50,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
 - (void)prepareForUse
 {
-    NSString *pasteboardType = NSStringFromClass([VLCMediaLibraryMediaItem class]);
-    [_tableView registerForDraggedTypes:@[pasteboardType, NSFilenamesPboardType]];
+    [_tableView registerForDraggedTypes:@[VLCMediaLibraryMediaItemPasteboardType, NSFilenamesPboardType]];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
@@ -116,8 +115,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
               row:(NSInteger)row
     dropOperation:(NSTableViewDropOperation)dropOperation
 {
-    NSString *pasteboardType = NSStringFromClass([VLCMediaLibraryMediaItem class]);
-    NSData *data = [info.draggingPasteboard dataForType:pasteboardType];
+    NSData *data = [info.draggingPasteboard dataForType:VLCMediaLibraryMediaItemPasteboardType];
     if (!data) {
         id propertyList = [info.draggingPasteboard propertyListForType:NSFilenamesPboardType];
         if (propertyList == nil) {

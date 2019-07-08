@@ -111,9 +111,8 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
     }
 
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:mutableArray];
-    NSString *pasteboardType = NSStringFromClass([VLCMediaLibraryMediaItem class]);
-    [pasteboard declareTypes:@[pasteboardType] owner:self];
-    [pasteboard setData:data forType:pasteboardType];
+    [pasteboard declareTypes:@[VLCMediaLibraryMediaItemPasteboardType] owner:self];
+    [pasteboard setData:data forType:VLCMediaLibraryMediaItemPasteboardType];
 
     return YES;
 }
