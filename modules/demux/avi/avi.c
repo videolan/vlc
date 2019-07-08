@@ -1012,6 +1012,34 @@ static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
 }
 
 /*****************************************************************************
+ * SendFrame: Sends frame to ES and does payload processing
+ *****************************************************************************/
+static void AVI_SendFrame( demux_t *p_demux, avi_track_t *tk, block_t *p_frame )
+{
+    if( tk->fmt.i_cat != VIDEO_ES )
+        p_frame->i_dts = p_frame->i_pts;
+    else
+    {
+        p_frame->i_dts = p_frame->i_pts;
+        p_frame->i_pts = VLC_TS_INVALID;
+    }
+
+    if( tk->i_dv_audio_rate )
+        AVI_DvHandleAudio( p_demux, tk, p_frame );
+
+    if( tk->i_next_block_flags )
+    {
+        p_frame->i_flags = tk->i_next_block_flags;
+        tk->i_next_block_flags = 0;
+    }
+
+    if( tk->p_es )
+        es_out_Send( p_demux->out, tk->p_es, p_frame );
+    else
+        block_Release( p_frame );
+}
+
+/*****************************************************************************
  * Demux_Seekable: reads and demuxes data packets for stream seekable
  *****************************************************************************
  * AVIDemux: reads and demuxes data packets
@@ -1359,27 +1387,7 @@ static int Demux_Seekable( demux_t *p_demux )
             toread[i_track].i_posf = -1;
         }
 
-        if( tk->fmt.i_cat != VIDEO_ES )
-            p_frame->i_dts = p_frame->i_pts;
-        else
-        {
-            p_frame->i_dts = p_frame->i_pts;
-            p_frame->i_pts = VLC_TS_INVALID;
-        }
-
-        if( tk->i_dv_audio_rate )
-            AVI_DvHandleAudio( p_demux, tk, p_frame );
-
-        if( tk->i_next_block_flags )
-        {
-            p_frame->i_flags = tk->i_next_block_flags;
-            tk->i_next_block_flags = 0;
-        }
-
-        if( tk->p_es )
-            es_out_Send( p_demux->out, tk->p_es, p_frame );
-        else
-            block_Release( p_frame );
+        AVI_SendFrame( p_demux, tk, p_frame );
     }
 }
 
@@ -1498,21 +1506,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
                 }
                 p_frame->i_pts = VLC_TS_0 + AVI_GetPTS( p_stream );
 
-                if( avi_pk.i_cat != VIDEO_ES )
-                    p_frame->i_dts = p_frame->i_pts;
-                else
-                {
-                    p_frame->i_dts = p_frame->i_pts;
-                    p_frame->i_pts = VLC_TS_INVALID;
-                }
-
-                if( p_stream->i_dv_audio_rate )
-                    AVI_DvHandleAudio( p_demux, p_stream, p_frame );
-
-                if( p_stream->p_es )
-                    es_out_Send( p_demux->out, p_stream->p_es, p_frame );
-                else
-                    block_Release( p_frame );
+                AVI_SendFrame( p_demux, p_stream, p_frame );
             }
             else
             {
