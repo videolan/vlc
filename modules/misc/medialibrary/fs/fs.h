@@ -53,6 +53,9 @@ public:
     std::shared_ptr<IDirectory>
     createDirectory(const std::string &mrl) override;
 
+    std::shared_ptr<fs::IFile>
+    createFile(const std::string& mrl) override;
+
     std::shared_ptr<IDevice>
     createDevice(const std::string &uuid) override;
 

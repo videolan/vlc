@@ -24,7 +24,9 @@
 
 #include "directory.h"
 #include "file.h"
+#include "util.h"
 
+#include <algorithm>
 #include <assert.h>
 #include <vector>
 #include <system_error>
@@ -77,6 +79,21 @@ SDDirectory::device() const
     if (!m_device)
         m_device = m_fs.createDeviceFromMrl(mrl());
     return m_device;
+}
+
+std::shared_ptr<IFile> SDDirectory::file(const std::string& mrl) const
+{
+    auto fs = files();
+    // Don't compare entire mrls, this might yield false negative when a
+    // device has multiple mountpoints.
+    auto fileName = utils::fileName( mrl );
+    auto it = std::find_if( cbegin( fs ), cend( fs ),
+                            [&fileName]( const std::shared_ptr<fs::IFile> f ) {
+                                return f->name() == fileName;
+                            });
+    if ( it == cend( fs ) )
+        throw std::runtime_error( mrl + " wasn't found in the directory" );
+    return *it;
 }
 
 struct metadata_request {

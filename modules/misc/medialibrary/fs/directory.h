@@ -39,6 +39,7 @@ public:
     const std::vector<std::shared_ptr<IFile>> &files() const override;
     const std::vector<std::shared_ptr<IDirectory>> &dirs() const override;
     std::shared_ptr<IDevice> device() const override;
+    std::shared_ptr<IFile> file( const std::string& mrl ) const override;
 
 private:
     void read() const;

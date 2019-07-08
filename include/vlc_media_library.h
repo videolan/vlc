@@ -671,6 +671,10 @@ typedef struct vlc_ml_event_t
             const vlc_ml_album_t* p_album;
             const vlc_ml_playlist_t* p_playlist;
             const vlc_ml_genre_t* p_genre;
+        } creation;
+        struct
+        {
+            int64_t i_entity_id;
         } modification;
         struct
         {

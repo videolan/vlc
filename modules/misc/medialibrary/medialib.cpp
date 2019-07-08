@@ -26,6 +26,7 @@
 #include <vlc_plugin.h>
 #include <vlc_url.h>
 #include <vlc_media_library.h>
+#include <vlc_dialog.h>
 #include "medialibrary.h"
 #include "fs/fs.h"
 
@@ -75,15 +76,16 @@ private:
 namespace
 {
 
-void assignToEvent( vlc_ml_event_t* ev, vlc_ml_media_t* m )    { ev->modification.p_media    = m; }
-void assignToEvent( vlc_ml_event_t* ev, vlc_ml_artist_t* a )   { ev->modification.p_artist   = a; }
-void assignToEvent( vlc_ml_event_t* ev, vlc_ml_album_t* a )    { ev->modification.p_album    = a; }
-void assignToEvent( vlc_ml_event_t* ev, vlc_ml_genre_t* g )    { ev->modification.p_genre    = g; }
-void assignToEvent( vlc_ml_event_t* ev, vlc_ml_playlist_t* p ) { ev->modification.p_playlist = p; }
+void assignToEvent( vlc_ml_event_t* ev, vlc_ml_media_t* m )    { ev->creation.p_media    = m; }
+void assignToEvent( vlc_ml_event_t* ev, vlc_ml_artist_t* a )   { ev->creation.p_artist   = a; }
+void assignToEvent( vlc_ml_event_t* ev, vlc_ml_album_t* a )    { ev->creation.p_album    = a; }
+void assignToEvent( vlc_ml_event_t* ev, vlc_ml_genre_t* g )    { ev->creation.p_genre    = g; }
+void assignToEvent( vlc_ml_event_t* ev, vlc_ml_playlist_t* p ) { ev->creation.p_playlist = p; }
 
 template <typename To, typename From>
-void wrapEntityEventCallback( vlc_medialibrary_module_t* ml,
-                              const std::vector<From>& entities, vlc_ml_event_type evType )
+void wrapEntityCreatedEventCallback( vlc_medialibrary_module_t* ml,
+                                     const std::vector<From>& entities,
+                                     vlc_ml_event_type evType )
 {
     vlc_ml_event_t ev;
     ev.i_type = evType;
@@ -96,6 +98,19 @@ void wrapEntityEventCallback( vlc_medialibrary_module_t* ml,
         if ( Convert( e.get(), *val ) == false )
             return;
         assignToEvent( &ev, val.get() );
+        ml->cbs->pf_send_event( ml, &ev );
+    }
+}
+
+void wrapEntityModifiedEventCallback( vlc_medialibrary_module_t* ml,
+                                      const std::vector<int64_t>& ids,
+                                      vlc_ml_event_type evType )
+{
+    vlc_ml_event_t ev;
+    ev.i_type = evType;
+    for ( const auto& id : ids )
+    {
+        ev.modification.i_entity_id = id;
         ml->cbs->pf_send_event( ml, &ev );
     }
 }
@@ -116,12 +131,12 @@ void wrapEntityDeletedEventCallback( vlc_medialibrary_module_t* ml,
 
 void MediaLibrary::onMediaAdded( std::vector<medialibrary::MediaPtr> media )
 {
-    wrapEntityEventCallback<vlc_ml_media_t>( m_vlc_ml, media, VLC_ML_EVENT_MEDIA_ADDED );
+    wrapEntityCreatedEventCallback<vlc_ml_media_t>( m_vlc_ml, media, VLC_ML_EVENT_MEDIA_ADDED );
 }
 
-void MediaLibrary::onMediaModified( std::vector<medialibrary::MediaPtr> media )
+void MediaLibrary::onMediaModified( std::vector<int64_t> mediaIds )
 {
-    wrapEntityEventCallback<vlc_ml_media_t>( m_vlc_ml, media, VLC_ML_EVENT_MEDIA_UPDATED );
+    wrapEntityModifiedEventCallback( m_vlc_ml, mediaIds, VLC_ML_EVENT_MEDIA_UPDATED );
 }
 
 void MediaLibrary::onMediaDeleted( std::vector<int64_t> mediaIds )
@@ -131,12 +146,12 @@ void MediaLibrary::onMediaDeleted( std::vector<int64_t> mediaIds )
 
 void MediaLibrary::onArtistsAdded( std::vector<medialibrary::ArtistPtr> artists )
 {
-    wrapEntityEventCallback<vlc_ml_artist_t>( m_vlc_ml, artists, VLC_ML_EVENT_ARTIST_ADDED );
+    wrapEntityCreatedEventCallback<vlc_ml_artist_t>( m_vlc_ml, artists, VLC_ML_EVENT_ARTIST_ADDED );
 }
 
-void MediaLibrary::onArtistsModified( std::vector<medialibrary::ArtistPtr> artists )
+void MediaLibrary::onArtistsModified( std::vector<int64_t> artistIds )
 {
-    wrapEntityEventCallback<vlc_ml_artist_t>( m_vlc_ml, artists, VLC_ML_EVENT_ARTIST_UPDATED );
+    wrapEntityModifiedEventCallback( m_vlc_ml, artistIds, VLC_ML_EVENT_ARTIST_UPDATED );
 }
 
 void MediaLibrary::onArtistsDeleted( std::vector<int64_t> artistIds )
@@ -146,12 +161,12 @@ void MediaLibrary::onArtistsDeleted( std::vector<int64_t> artistIds )
 
 void MediaLibrary::onAlbumsAdded( std::vector<medialibrary::AlbumPtr> albums )
 {
-    wrapEntityEventCallback<vlc_ml_album_t>( m_vlc_ml, albums, VLC_ML_EVENT_ALBUM_ADDED );
+    wrapEntityCreatedEventCallback<vlc_ml_album_t>( m_vlc_ml, albums, VLC_ML_EVENT_ALBUM_ADDED );
 }
 
-void MediaLibrary::onAlbumsModified( std::vector<medialibrary::AlbumPtr> albums )
+void MediaLibrary::onAlbumsModified( std::vector<int64_t> albumIds )
 {
-    wrapEntityEventCallback<vlc_ml_album_t>( m_vlc_ml, albums, VLC_ML_EVENT_ALBUM_UPDATED );
+    wrapEntityModifiedEventCallback( m_vlc_ml, albumIds, VLC_ML_EVENT_ALBUM_UPDATED );
 }
 
 void MediaLibrary::onAlbumsDeleted( std::vector<int64_t> albumIds )
@@ -161,12 +176,12 @@ void MediaLibrary::onAlbumsDeleted( std::vector<int64_t> albumIds )
 
 void MediaLibrary::onPlaylistsAdded( std::vector<medialibrary::PlaylistPtr> playlists )
 {
-    wrapEntityEventCallback<vlc_ml_playlist_t>( m_vlc_ml, playlists, VLC_ML_EVENT_PLAYLIST_ADDED );
+    wrapEntityCreatedEventCallback<vlc_ml_playlist_t>( m_vlc_ml, playlists, VLC_ML_EVENT_PLAYLIST_ADDED );
 }
 
-void MediaLibrary::onPlaylistsModified( std::vector<medialibrary::PlaylistPtr> playlists )
+void MediaLibrary::onPlaylistsModified( std::vector<int64_t> playlistIds )
 {
-    wrapEntityEventCallback<vlc_ml_playlist_t>( m_vlc_ml, playlists, VLC_ML_EVENT_PLAYLIST_UPDATED );
+    wrapEntityModifiedEventCallback( m_vlc_ml, playlistIds, VLC_ML_EVENT_PLAYLIST_UPDATED );
 }
 
 void MediaLibrary::onPlaylistsDeleted( std::vector<int64_t> playlistIds )
@@ -176,12 +191,12 @@ void MediaLibrary::onPlaylistsDeleted( std::vector<int64_t> playlistIds )
 
 void MediaLibrary::onGenresAdded( std::vector<medialibrary::GenrePtr> genres )
 {
-    wrapEntityEventCallback<vlc_ml_genre_t>( m_vlc_ml, genres, VLC_ML_EVENT_GENRE_ADDED );
+    wrapEntityCreatedEventCallback<vlc_ml_genre_t>( m_vlc_ml, genres, VLC_ML_EVENT_GENRE_ADDED );
 }
 
-void MediaLibrary::onGenresModified( std::vector<medialibrary::GenrePtr> genres )
+void MediaLibrary::onGenresModified( std::vector<int64_t> genreIds )
 {
-    wrapEntityEventCallback<vlc_ml_genre_t>( m_vlc_ml, genres, VLC_ML_EVENT_GENRE_UPDATED );
+    wrapEntityModifiedEventCallback( m_vlc_ml, genreIds, VLC_ML_EVENT_GENRE_UPDATED );
 }
 
 void MediaLibrary::onGenresDeleted( std::vector<int64_t> genreIds )
@@ -302,6 +317,10 @@ void MediaLibrary::onMediaThumbnailReady( medialibrary::MediaPtr media,
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
+void MediaLibrary::onHistoryChanged( medialibrary::HistoryType )
+{
+}
+
 MediaLibrary::MediaLibrary( vlc_medialibrary_module_t* ml )
     : m_vlc_ml( ml )
 {
@@ -321,9 +340,8 @@ bool MediaLibrary::Start()
 
     auto userDir = vlc::wrap_cptr( config_GetUserDir( VLC_USERDATA_DIR ) );
     std::string mlDir = std::string{ userDir.get() } + "/ml/";
-    auto thumbnailsDir = mlDir + "thumbnails/";
 
-    auto initStatus = ml->initialize( mlDir + "ml.db", thumbnailsDir, this );
+    auto initStatus = ml->initialize( mlDir + "ml.db", mlDir + "/mlstorage/", this );
     switch ( initStatus )
     {
         case medialibrary::InitializeResult::AlreadyInitialized:
@@ -338,6 +356,27 @@ bool MediaLibrary::Start()
         case medialibrary::InitializeResult::Success:
             msg_Dbg( m_vlc_ml, "MediaLibrary successfully initialized" );
             break;
+        case medialibrary::InitializeResult::DbCorrupted:
+        {
+            auto res = vlc_dialog_wait_question(VLC_OBJECT( m_vlc_ml ),
+                VLC_DIALOG_QUESTION_NORMAL, _( "Ignore" ), _( "Recover" ),
+                _( "Recreate" ), _( "Media database corrupted" ),
+                "Your media database appears to be corrupted. You can try to "
+                "recover it, recreate it entirely, or ignore this error (the "
+                "mediacenter will be disabled)." );
+            switch ( res )
+            {
+                case 1:
+                    ml->clearDatabase( true );
+                    break;
+                case 2:
+                    ml->clearDatabase( false );
+                    break;
+                default:
+                    return false;
+            }
+            break;
+        }
     }
 
     ml->addParserService( std::make_shared<MetadataExtractor>( VLC_OBJECT( m_vlc_ml ) ) );
@@ -936,7 +975,7 @@ int MediaLibrary::getMeta( const medialibrary::IMedia& media, int meta, char** r
         *result = nullptr;
         return VLC_SUCCESS;
     }
-    *result = strdup( md.str().c_str() );
+    *result = strdup( md.asStr().c_str() );
     if ( *result == nullptr )
         return VLC_ENOMEM;
     return VLC_SUCCESS;

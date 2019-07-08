@@ -128,9 +128,6 @@ void MLRecentsVideoModel::onVlcMlEvent( const vlc_ml_event_t* event )
     {
         case VLC_ML_EVENT_MEDIA_ADDED:
         case VLC_ML_EVENT_MEDIA_UPDATED:
-            if ( event->modification.p_media->i_type == VLC_ML_MEDIA_TYPE_VIDEO )
-                m_need_reset = true;
-            break;
         case VLC_ML_EVENT_MEDIA_DELETED:
             m_need_reset = true;
             break;

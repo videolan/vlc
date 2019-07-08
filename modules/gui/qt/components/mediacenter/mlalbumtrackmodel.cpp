@@ -163,10 +163,10 @@ void MLAlbumTrackModel::onVlcMlEvent(const vlc_ml_event_t* event)
     switch (event->i_type)
     {
         case VLC_ML_EVENT_MEDIA_ADDED:
-        case VLC_ML_EVENT_MEDIA_UPDATED:
-            if ( event->modification.p_media->i_subtype == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK )
+            if ( event->creation.p_media->i_subtype == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK )
                 m_need_reset = true;
             break;
+        case VLC_ML_EVENT_MEDIA_UPDATED:
         case VLC_ML_EVENT_MEDIA_DELETED:
             // FIXME: Not optimal, this will trigger a clean/refresh for video
             // media as well, but this needs fixing in the medialibrary
@@ -174,7 +174,7 @@ void MLAlbumTrackModel::onVlcMlEvent(const vlc_ml_event_t* event)
             break;
         case VLC_ML_EVENT_ALBUM_UPDATED:
             if ( m_parent.id != 0 && m_parent.type == VLC_ML_PARENT_ALBUM &&
-                 m_parent.id == event->modification.p_album->i_id )
+                 m_parent.id == event->modification.i_entity_id )
                 m_need_reset = true;
             break;
         case VLC_ML_EVENT_ALBUM_DELETED:

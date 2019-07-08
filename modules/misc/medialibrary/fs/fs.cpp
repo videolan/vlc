@@ -80,6 +80,14 @@ SDFileSystemFactory::createDirectory(const std::string &mrl)
     return std::make_shared<SDDirectory>(mrl, *this);
 }
 
+std::shared_ptr<IFile>
+SDFileSystemFactory::createFile(const std::string& mrl)
+{
+    auto dir = createDirectory(mrl);
+    assert(dir != nullptr);
+    return dir->file(mrl);
+}
+
 std::shared_ptr<IDevice>
 SDFileSystemFactory::createDevice(const std::string &uuid)
 {
