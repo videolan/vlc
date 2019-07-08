@@ -534,7 +534,6 @@ static inline float decoder_GetDisplayRate( decoder_t *dec )
 /** Decoder device type */
 enum vlc_decoder_device_type
 {
-    VLC_DECODER_DEVICE_NONE,
     VLC_DECODER_DEVICE_VAAPI,
     VLC_DECODER_DEVICE_VDPAU,
     VLC_DECODER_DEVICE_DXVA2,

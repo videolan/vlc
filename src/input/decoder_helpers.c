@@ -114,26 +114,11 @@ struct vlc_decoder_device_priv
 
 static int decoder_device_Open(void *func, bool forced, va_list ap)
 {
+    VLC_UNUSED(forced);
     vlc_decoder_device_Open open = func;
     vlc_decoder_device *device = va_arg(ap, vlc_decoder_device *);
     vout_window_t *window = va_arg(ap, vout_window_t *);
-    int ret = open(device, window);
-    if (ret != VLC_SUCCESS)
-    {
-        struct vlc_decoder_device_priv *priv =
-            container_of(device, struct vlc_decoder_device_priv, device);
-
-        vlc_objres_clear(VLC_OBJECT(&priv->device));
-        device->sys = NULL;
-        device->type = VLC_DECODER_DEVICE_NONE;
-        device->opaque = NULL;
-    }
-    else
-    {
-        assert(device->type != VLC_DECODER_DEVICE_NONE);
-    }
-    (void) forced;
-    return ret;
+    return open(device, window);
 }
 
 vlc_decoder_device *
