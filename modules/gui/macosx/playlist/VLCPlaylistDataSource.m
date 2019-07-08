@@ -30,6 +30,7 @@
 #import "views/VLCDragDropView.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCInputItem.h"
+#import "windows/VLCOpenInputMetadata.h"
 
 static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
@@ -50,7 +51,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 - (void)prepareForUse
 {
     NSString *pasteboardType = NSStringFromClass([VLCMediaLibraryMediaItem class]);
-    [_tableView registerForDraggedTypes:@[pasteboardType]];
+    [_tableView registerForDraggedTypes:@[pasteboardType, NSFilenamesPboardType]];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
@@ -118,6 +119,29 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
     NSString *pasteboardType = NSStringFromClass([VLCMediaLibraryMediaItem class]);
     NSData *data = [info.draggingPasteboard dataForType:pasteboardType];
     if (!data) {
+        id propertyList = [info.draggingPasteboard propertyListForType:NSFilenamesPboardType];
+        if (propertyList == nil) {
+            return NO;
+        }
+
+        NSArray *mediaPaths = [propertyList sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+        NSUInteger mediaCount = [mediaPaths count];
+        if (mediaCount > 0) {
+            NSMutableArray *metadataArray = [NSMutableArray arrayWithCapacity:mediaCount];
+            for (NSUInteger i = 0; i < mediaCount; i++) {
+                VLCOpenInputMetadata *inputMetadata;
+                NSURL *url = [NSURL fileURLWithPath:mediaPaths[i] isDirectory:NO];
+                if (!url) {
+                    continue;
+                }
+                inputMetadata = [[VLCOpenInputMetadata alloc] init];
+                inputMetadata.MRLString = url.absoluteString;
+                [metadataArray addObject:inputMetadata];
+            }
+            [_playlistController addPlaylistItems:metadataArray];
+
+            return YES;
+        }
         return NO;
     }
     NSArray *array = [NSKeyedUnarchiver unarchiveObjectWithData:data];
