@@ -302,6 +302,38 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     return self;
 }
 
+- (instancetype)initWithExternalURL:(NSURL *)url
+{
+    NSString *urlString = url.absoluteString;
+    if (!urlString) {
+        return self;
+    }
+
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    vlc_ml_media_t *p_media = vlc_ml_new_external_media(p_mediaLibrary, urlString.UTF8String);
+    if (p_media) {
+        self = [self initWithMediaItem:p_media library:p_mediaLibrary];
+        vlc_ml_media_release(p_media);
+    }
+    return self;
+}
+
+- (instancetype)initWithStreamURL:(NSURL *)url
+{
+    NSString *urlString = url.absoluteString;
+    if (!urlString) {
+        return self;
+    }
+
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    vlc_ml_media_t *p_media = vlc_ml_new_stream(p_mediaLibrary, urlString.UTF8String);
+    if (p_media) {
+        self = [self initWithMediaItem:p_media library:p_mediaLibrary];
+        vlc_ml_media_release(p_media);
+    }
+    return self;
+}
+
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
     int64_t libraryID = [aDecoder decodeInt64ForKey:VLCMediaLibraryMediaItemLibraryID];

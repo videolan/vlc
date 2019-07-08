@@ -149,6 +149,8 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID;
 - (instancetype)initWithMediaItem:(struct vlc_ml_media_t *)mediaItem;
+- (instancetype)initWithExternalURL:(NSURL *)url;
+- (instancetype)initWithStreamURL:(NSURL *)url;
 
 @property (readonly) int64_t libraryID;
 @property (readonly) vlc_ml_media_type_t mediaType;
