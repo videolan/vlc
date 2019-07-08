@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) vlc_playlist_item_t *playlistItem;
 @property (readwrite, retain) NSString *title;
+@property (readonly, copy, nullable) NSURL *url;
 @property (readonly, copy, nullable) NSString *path;
 @property (readwrite, assign) vlc_tick_t duration;
 @property (readonly, nullable) VLCInputItem *inputItem;

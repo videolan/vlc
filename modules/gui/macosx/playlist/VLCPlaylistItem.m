@@ -79,6 +79,25 @@
     vlc_mutex_unlock(&p_media->lock);
 }
 
+- (NSURL *)url
+{
+    if (_playlistItem) {
+        return nil;
+    }
+
+    input_item_t *p_media = vlc_playlist_item_GetMedia(_playlistItem);
+    if (!p_media) {
+        return nil;
+    }
+    char *psz_url = input_item_GetURI(p_media);
+    if (!psz_url)
+        return nil;
+
+    NSURL *url = [NSURL URLWithString:toNSStr(psz_url)];
+    free(psz_url);
+    return url;
+}
+
 - (NSString *)path
 {
     if (!_playlistItem) {
