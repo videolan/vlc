@@ -218,6 +218,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     _recentVideoLibraryCollectionView.dataSource = _libraryVideoDataSource;
     _recentVideoLibraryCollectionView.delegate = _libraryVideoDataSource;
     [_recentVideoLibraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [_videoLibraryCollectionView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
 
     _libraryAudioDataSource = [[VLCLibraryAudioDataSource alloc] init];
     _libraryAudioDataSource.libraryModel = mainInstance.libraryController.libraryModel;

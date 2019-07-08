@@ -104,14 +104,23 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
         mediaArray = [_libraryModel listOfVideoMedia];
     }
 
-    NSMutableArray *mutableArray = [NSMutableArray arrayWithCapacity:indexPaths.count];
+    NSUInteger numberOfIndexPaths = indexPaths.count;
+    NSMutableArray *encodedLibraryItemsArray = [NSMutableArray arrayWithCapacity:numberOfIndexPaths];
+    NSMutableArray *filePathsArray = [NSMutableArray arrayWithCapacity:numberOfIndexPaths];
     for (NSIndexPath *indexPath in indexPaths) {
         VLCMediaLibraryMediaItem *mediaItem = mediaArray[indexPath.item];
-        [mutableArray addObject:mediaItem];
+        [encodedLibraryItemsArray addObject:mediaItem];
+
+        VLCMediaLibraryFile *file = mediaItem.files.firstObject;
+        if (file) {
+            NSURL *url = [NSURL URLWithString:file.MRL];
+            [filePathsArray addObject:url.path];
+        }
     }
 
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:mutableArray];
-    [pasteboard declareTypes:@[VLCMediaLibraryMediaItemPasteboardType] owner:self];
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:encodedLibraryItemsArray];
+    [pasteboard declareTypes:@[VLCMediaLibraryMediaItemPasteboardType, NSFilenamesPboardType] owner:self];
+    [pasteboard setPropertyList:filePathsArray forType:NSFilenamesPboardType];
     [pasteboard setData:data forType:VLCMediaLibraryMediaItemPasteboardType];
 
     return YES;
