@@ -28,7 +28,6 @@
 
 #define COBJMACROS
 #include <d3d9.h>
-#include <dxva2api.h>
 
 #include "dxgi_fmt.h"
 
@@ -36,8 +35,6 @@
 typedef struct
 {
     IDirect3DSurface9    *surface;
-    /* decoder only */
-    IDirectXVideoDecoder *decoder; /* keep a reference while the surface exist */
     HINSTANCE            dxva2_dll;
 } picture_sys_d3d9_t;
 
@@ -130,16 +127,12 @@ static inline d3d9_video_context_t *GetD3D9ContextPrivate(vlc_video_context *vct
 static inline void AcquireD3D9PictureSys(picture_sys_d3d9_t *p_sys)
 {
     IDirect3DSurface9_AddRef(p_sys->surface);
-    if (p_sys->decoder)
-        IDirectXVideoDecoder_AddRef(p_sys->decoder);
     p_sys->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
 }
 
 static inline void ReleaseD3D9PictureSys(picture_sys_d3d9_t *p_sys)
 {
     IDirect3DSurface9_Release(p_sys->surface);
-    if (p_sys->decoder)
-        IDirectXVideoDecoder_Release(p_sys->decoder);
     FreeLibrary(p_sys->dxva2_dll);
 }
 
