@@ -60,8 +60,6 @@ void AcquireD3D11PictureSys(picture_sys_d3d11_t *p_sys)
     }
     if (p_sys->context)
         ID3D11DeviceContext_AddRef(p_sys->context);
-    if (p_sys->decoder)
-        ID3D11VideoDecoderOutputView_AddRef(p_sys->decoder);
     if (p_sys->processorInput)
         ID3D11VideoProcessorInputView_AddRef(p_sys->processorInput);
     if (p_sys->processorOutput)
@@ -78,8 +76,6 @@ void ReleaseD3D11PictureSys(picture_sys_d3d11_t *p_sys)
     }
     if (p_sys->context)
         ID3D11DeviceContext_Release(p_sys->context);
-    if (p_sys->decoder)
-        ID3D11VideoDecoderOutputView_Release(p_sys->decoder);
     if (p_sys->processorInput)
         ID3D11VideoProcessorInputView_Release(p_sys->processorInput);
     if (p_sys->processorOutput)

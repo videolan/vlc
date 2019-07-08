@@ -68,7 +68,6 @@ typedef struct
 /* owned by the vout for VLC_CODEC_D3D11_OPAQUE */
 typedef struct
 {
-    ID3D11VideoDecoderOutputView  *decoder; /* may be NULL for pictures from the pool */
     union {
         ID3D11Texture2D           *texture[D3D11_MAX_SHADER_VIEW];
         ID3D11Resource            *resource[D3D11_MAX_SHADER_VIEW];
