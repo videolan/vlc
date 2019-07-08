@@ -248,6 +248,26 @@ static int        AVI_TrackStopFinishedStreams( demux_t *);
  - to complete....
  */
 
+#define QNAP_HEADER_SIZE 56
+static bool IsQNAPCodec(vlc_fourcc_t codec)
+{
+    switch (codec)
+    {
+        case VLC_FOURCC('w', '2', '6', '4'):
+        case VLC_FOURCC('q', '2', '6', '4'):
+        case VLC_FOURCC('Q', '2', '6', '4'):
+        case VLC_FOURCC('w', 'M', 'P', '4'):
+        case VLC_FOURCC('q', 'M', 'P', '4'):
+        case VLC_FOURCC('Q', 'M', 'P', '4'):
+        case VLC_FOURCC('w', 'I', 'V', 'G'):
+        case VLC_FOURCC('q', 'I', 'V', 'G'):
+        case VLC_FOURCC('Q', 'I', 'V', 'G'):
+            return true;
+        default:
+            return false;
+    }
+}
+
 /*****************************************************************************
  * Close: frees unused data
  *****************************************************************************/
@@ -1026,6 +1046,19 @@ static void AVI_SendFrame( demux_t *p_demux, avi_track_t *tk, block_t *p_frame )
 
     if( tk->i_dv_audio_rate )
         AVI_DvHandleAudio( p_demux, tk, p_frame );
+
+    /* Strip QNAP header */
+    if( IsQNAPCodec( tk->fmt.i_codec ) )
+    {
+        if( p_frame->i_buffer <= QNAP_HEADER_SIZE )
+        {
+            block_Release( p_frame );
+            return;
+        }
+
+        p_frame->i_buffer -= QNAP_HEADER_SIZE;
+        p_frame->p_buffer += QNAP_HEADER_SIZE;
+    }
 
     if( tk->i_next_block_flags )
     {
