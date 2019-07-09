@@ -516,7 +516,7 @@ FindPictScreen(const xcb_setup_t *setup, const xcb_screen_t *scr,
 
 /* Find an X11 visual for a RENDER picture format */
 static xcb_visualid_t
-FindVisual(const xcb_setup_t *setup, const xcb_screen_t *scr, 
+FindVisual(const xcb_setup_t *setup, const xcb_screen_t *scr,
            const xcb_render_query_pict_formats_reply_t *r,
            xcb_render_pictformat_t fmt_id)
 {
@@ -713,8 +713,7 @@ vlc_module_begin()
     set_description(N_("X11 RENDER video output (XCB)"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_capability("vout display", 200)
-    set_callbacks(Open, Close)
+    set_callbacks_display(Open, Close, 200)
     add_shortcut("x11-render", "xcb-render", "render")
     add_string("x11-render-filter", "good", N_("Scaling mode"),
                N_("Scaling mode"), true)

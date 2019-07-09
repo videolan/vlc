@@ -51,8 +51,7 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_shortname("GDI")
     set_description(N_("Windows GDI video output"))
-    set_capability("vout display", 110)
-    set_callbacks(Open, Close)
+    set_callbacks_display(Open, Close, 110)
 vlc_module_end ()
 
 

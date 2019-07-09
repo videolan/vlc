@@ -354,8 +354,7 @@ vlc_module_begin()
     set_description(N_("X11 video output (XCB)"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_capability("vout display", 100)
-    set_callbacks(Open, Close)
+    set_callbacks_display(Open, Close, 100)
     add_shortcut("xcb-x11", "x11")
 
     add_obsolete_bool("x11-shm") /* obsoleted since 2.0.0 */

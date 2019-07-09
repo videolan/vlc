@@ -110,9 +110,8 @@ vlc_module_begin ()
     add_loadfile("direct3d9-shader-file", NULL,
                  PIXEL_SHADER_FILE_TEXT, PIXEL_SHADER_FILE_LONGTEXT)
 
-    set_capability("vout display", 280)
     add_shortcut("direct3d9", "direct3d")
-    set_callbacks(Open, Close)
+    set_callbacks_display(Open, Close, 280)
 
 #ifdef HAVE_GL
     add_submodule()

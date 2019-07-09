@@ -788,6 +788,5 @@ vlc_module_begin ()
     add_string( "kms-drm-chroma", NULL, DRM_CHROMA_TEXT, DRM_CHROMA_LONGTEXT,
                 true)
     set_description("Linux kernel mode setting video output")
-    set_capability("vout display", 30)
-    set_callbacks(Open, Close)
+    set_callbacks_display(Open, Close, 30)
 vlc_module_end ()

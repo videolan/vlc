@@ -58,7 +58,6 @@ vlc_module_begin()
     set_description(N_("YUV video output"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_capability("vout display", 0)
 
     add_string(CFG_PREFIX "file", "stream.yuv",
                 YUV_FILE_TEXT, YUV_FILE_LONGTEXT, false)
@@ -67,7 +66,7 @@ vlc_module_begin()
     add_bool  (CFG_PREFIX "yuv4mpeg2", false,
                 YUV4MPEG2_TEXT, YUV4MPEG2_LONGTEXT, true)
 
-    set_callbacks(Open, Close)
+    set_callbacks_display(Open, Close, 0)
 vlc_module_end()
 
 /*****************************************************************************
@@ -212,7 +211,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
              * the exact fourcc used. */
             header = "YUV4MPEG2";
         } else {
-            snprintf(buffer, sizeof(buffer), "%4.4s", 
+            snprintf(buffer, sizeof(buffer), "%4.4s",
                      (const char*)&fmt.i_chroma);
             header = buffer;
         }

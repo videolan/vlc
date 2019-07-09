@@ -53,10 +53,9 @@ static void Close(vout_display_t *vd);
 
 vlc_module_begin()
     set_description(N_("Core Animation OpenGL Layer (Mac OS X)"))
-    set_capability("vout display", 0)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_callbacks(Open, Close)
+    set_callbacks_display(Open, Close, 0)
 vlc_module_end()
 
 static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count);

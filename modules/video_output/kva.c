@@ -70,9 +70,8 @@ vlc_module_begin ()
         change_string_list( ppsz_kva_video_mode, ppsz_kva_video_mode_text )
     add_bool( "kva-fixt23", false, KVA_FIXT23_TEXT, KVA_FIXT23_LONGTEXT, true )
     set_description( N_("K Video Acceleration video output") )
-    set_capability( "vout display", 100 )
     add_shortcut( "kva" )
-    set_callbacks( Open, Close )
+    set_callbacks_display( Open, Close, 100 )
 vlc_module_end ()
 
 /*****************************************************************************
