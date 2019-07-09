@@ -60,6 +60,16 @@ static const video_format_t* filtered_video_format( sout_stream_id_sys_t *id,
     return &p_pic->format;
 }
 
+static vlc_decoder_device * video_get_decoder_device( decoder_t *p_dec )
+{
+    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+    if (p_owner->id->dec_dev == NULL)
+    {
+        p_owner->id->dec_dev = vlc_decoder_device_Create( &p_dec->obj, NULL );
+    }
+    return p_owner->id->dec_dev ? vlc_decoder_device_Hold(p_owner->id->dec_dev) : NULL;
+}
+
 static void debug_format( sout_stream_t *p_stream, const es_format_t *fmt )
 {
     msg_Dbg( p_stream, "format now %4.4s/%4.4s %dx%d(%dx%d) ø%d",
@@ -163,6 +173,7 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     static const struct decoder_owner_callbacks dec_cbs =
     {
         .video = {
+            .get_device = video_get_decoder_device,
             .format_update = video_update_format_decoder,
             .queue = decoder_queue_video,
         },
@@ -395,6 +406,8 @@ void transcode_video_clean( sout_stream_t *p_stream,
         filter_DeleteBlend( id->p_spu_blender );
     if( id->p_spu )
         spu_Destroy( id->p_spu );
+    if ( id->dec_dev )
+        vlc_decoder_device_Release( id->dec_dev );
 }
 
 void transcode_video_push_spu( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
