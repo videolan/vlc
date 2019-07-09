@@ -1145,6 +1145,15 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
     ModuleThread_UpdateStatVideo( p_owner, success != VLC_SUCCESS );
 }
 
+static vlc_decoder_device * thumbnailer_get_device( decoder_t *p_dec )
+{
+    VLC_UNUSED(p_dec);
+    // no hardware decoder on purpose
+    // we don't want to load many DLLs and allocate many pictures
+    // just to decode one picture
+    return NULL;
+}
+
 static picture_t *thumbnailer_buffer_new( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
@@ -1773,6 +1782,7 @@ static const struct decoder_owner_callbacks dec_video_cbs =
 static const struct decoder_owner_callbacks dec_thumbnailer_cbs =
 {
     .video = {
+        .get_device = thumbnailer_get_device,
         .buffer_new = thumbnailer_buffer_new,
         .queue = ModuleThread_QueueThumbnail,
     },
