@@ -63,6 +63,9 @@ public:
         return d ? d->item.get() : nullptr;
     }
 
+    bool isSelected() const;
+    void setSelected(bool selected);
+
     QString getTitle() const;
 
     QString getArtist() const;
@@ -79,6 +82,8 @@ public:
 private:
     struct Data : public QSharedData {
         PlaylistItemPtr item;
+
+        bool selected = false;
 
         /* cached values */
         QString title;

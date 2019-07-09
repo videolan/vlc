@@ -233,13 +233,13 @@ PlaylistListModelPrivate::notifyItemsChanged(int idx, int count, const QVector<i
 // public API
 
 PlaylistListModel::PlaylistListModel(QObject *parent)
-    : QAbstractListModel(parent)
+    : SelectableListModel(parent)
     , d_ptr(new PlaylistListModelPrivate(this))
 {
 }
 
 PlaylistListModel::PlaylistListModel(vlc_playlist_t *raw_playlist, QObject *parent)
-    : QAbstractListModel(parent)
+    : SelectableListModel(parent)
     , d_ptr(new PlaylistListModelPrivate(this))
 {
     setPlaylistId(PlaylistPtr(raw_playlist));
@@ -247,6 +247,23 @@ PlaylistListModel::PlaylistListModel(vlc_playlist_t *raw_playlist, QObject *pare
 
 PlaylistListModel::~PlaylistListModel()
 {
+}
+
+bool PlaylistListModel::isRowSelected(int row) const
+{
+    Q_D(const PlaylistListModel);
+    return d->m_items[row].isSelected();
+}
+
+void PlaylistListModel::setRowSelected(int row, bool selected)
+{
+    Q_D(PlaylistListModel);
+    return d->m_items[row].setSelected(selected);
+}
+
+int PlaylistListModel::getSelectedRole() const
+{
+    return SelectedRole;
 }
 
 QHash<int, QByteArray>
@@ -259,6 +276,7 @@ PlaylistListModel::roleNames() const
         { ArtistRole , "artist" },
         { AlbumRole  , "album" },
         { ArtworkRole, "artwork" },
+        { SelectedRole, "selected" },
     };
 }
 
@@ -440,6 +458,8 @@ PlaylistListModel::data(const QModelIndex &index, int role) const
         return d->m_items[row].getAlbum();
     case ArtworkRole:
         return d->m_items[row].getArtwork();
+    case SelectedRole:
+        return d->m_items[row].isSelected();
     default:
         return {};
     }

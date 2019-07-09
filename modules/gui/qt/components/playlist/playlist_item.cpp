@@ -30,6 +30,16 @@ PlaylistItem::PlaylistItem(vlc_playlist_item_t* item)
     }
 }
 
+bool PlaylistItem::isSelected() const
+{
+    return d->selected;
+}
+
+void PlaylistItem::setSelected(bool selected)
+{
+    d->selected = selected;
+}
+
 QString PlaylistItem::getTitle() const
 {
     return d->title;
