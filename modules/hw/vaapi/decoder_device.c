@@ -28,7 +28,7 @@
 #include <vlc_codec.h>
 #include <vlc_fs.h>
 
-#include "hw/vaapi/vlc_vaapi.h"
+#include "vlc_vaapi.h"
 #include <va/va_drmcommon.h>
 
 #ifdef HAVE_VA_WL
