@@ -46,140 +46,81 @@ Utils.NavigableFocusScope {
         z: 2
 
         onMenuExit:{
-            delegateModel.mode = "normal"
+            view.mode = "normal"
             view.focus = true
         }
-        onClear: delegateModel.onDelete()
-        onPlay: delegateModel.onPlay()
+        onClear: view.onDelete()
+        onPlay: view.onPlay()
         onSelectionMode:  {
-            delegateModel.mode = selectionMode ? "select" : "normal"
+            view.mode = selectionMode ? "select" : "normal"
             view.focus = true
         }
         onMoveMode: {
-            delegateModel.mode = moveMode ? "move" : "normal"
+            view.mode = moveMode ? "move" : "normal"
             view.focus = true
         }
     }
 
-    //model
+    Utils.KeyNavigableListView {
+        id: view
 
-    Utils.SelectableDelegateModel {
-        id: delegateModel
+        anchors.fill: parent
+        focus: true
+
         model: root.plmodel
+        modelCount: root.plmodel.count
 
+        property int shiftIndex: -1
         property string mode: "normal"
 
-        delegate: Package {
-            id: element
+        footer: PLItemFooter {}
 
-            PLItem {
-                id: plitem
-                Package.name: "list"
-                width: root.width
-                color: VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, plitem.hovered, plitem.activeFocus)
+        delegate: PLItem {
+            /*
+             * implicit variables:
+             *  - model: gives access to the values associated to PlaylistListModel roles
+             *  - index: the index of this item in the list
+             */
+            id: plitem
+            plmodel: root.plmodel
+            width: root.width
 
-                dragitem: dragItem
-
-                onItemClicked : {
-                    view.forceActiveFocus()
-                    if (delegateModel.mode == "move") {
-                        var selectedIndexes = delegateModel.getSelectedIndexes()
-                        var preTarget = index
-                        /* move to _above_ the clicked item if move up, but
-                         * _below_ the clicked item if move down */
-                        if (preTarget > selectedIndexes[0])
-                            preTarget++
-                        view.currentIndex = selectedIndexes[0]
-                        root.plmodel.moveItemsPre(selectedIndexes, preTarget)
-                    } else if ( delegateModel.mode == "select" ) {
-                    } else {
-                        delegateModel.onUpdateIndex( modifier , view.currentIndex, index)
-                        view.currentIndex = index
-                    }
-                }
-                onItemDoubleClicked:  delegateModel.onAction(index, true)
-
-                onDropedMovedAt: {
-                    if (drop.hasUrls) {
-                        delegateModel.onDropUrlAtPos(drop.urls, target)
-                    } else {
-                        /* on drag&drop, the target is the position _before_
-                         * the move is applied */
-                        delegateModel.moveSelectionToPreTarget(target)
-                    }
+            onItemClicked : {
+                /* to receive keys events */
+                view.forceActiveFocus()
+                if (view.mode == "move") {
+                    var selectedIndexes = root.plmodel.getSelection()
+                    var preTarget = index
+                    /* move to _above_ the clicked item if move up, but
+                     * _below_ the clicked item if move down */
+                    if (preTarget > selectedIndexes[0])
+                        preTarget++
+                    view.currentIndex = selectedIndexes[0]
+                    root.plmodel.moveItemsPre(selectedIndexes, preTarget)
+                } else if (view.mode == "select") {
+                } else {
+                    view.updateSelection(modifier, view.currentIndex, index)
+                    view.currentIndex = index
                 }
             }
-        }
+            onItemDoubleClicked: mainPlaylistController.goTo(index, true)
+            color: VLCStyle.colors.getBgColor(model.selected, plitem.hovered, plitem.activeFocus)
 
-        function getSelectedIndexes() {
-            var list = []
-            for (var i = 0; i < delegateModel.selectedGroup.count; i++ ) {
-                list.push(delegateModel.selectedGroup.get(i).itemsIndex)
+            onDropedMovedAt: {
+                if (drop.hasUrls) {
+                    mainPlaylistController.insert(target, drop.urls)
+                } else {
+                    root.plmodel.moveItemsPre(root.plmodel.getSelection(), target)
+                }
             }
-            return list;
         }
 
-        function moveSelectionToPreTarget(target) {
-            var selectedIndexes = getSelectedIndexes()
-            view.currentIndex = selectedIndexes[0]
-            root.plmodel.moveItemsPre(selectedIndexes, target)
-        }
-
-        function moveSelectionToPostTarget(target) {
-            var selectedIndexes = getSelectedIndexes()
-            view.currentIndex = selectedIndexes[0]
-            root.plmodel.moveItemsPost(selectedIndexes, target)
-        }
-
-        function onDropMovedAtEnd() {
-            moveSelectionToPreTarget(items.count)
-        }
-
-        function onDropUrlAtPos(urls, target) {
-            var list = []
-            for (var i = 0; i < urls.length; i++){
-                list.push(urls[i])
-            }
-            mainPlaylistController.insert(target, list)
-        }
-
-        function onDropUrlAtEnd(urls) {
-            var list = []
-            for (var i = 0; i < urls.length; i++){
-                list.push(urls[i])
-            }
-            mainPlaylistController.append(list)
-        }
-
-        function onDelete() {
-            var list = []
-            for (var i = 0; i < delegateModel.selectedGroup.count; i++ ) {
-                list.push(delegateModel.selectedGroup.get(i).itemsIndex)
-            }
-            root.plmodel.removeItems(list)
-        }
-
-        function onPlay() {
-            if (delegateModel.selectedGroup.count > 0)
-                mainPlaylistController.goTo(delegateModel.selectedGroup.get(0).itemsIndex, true)
-        }
-
-        function onAction(index) {
-            if (mode === "select")
-                updateSelection( Qt.ControlModifier, index, view.currentIndex )
-            else //normal
-                onPlay()
-        }
-
-        function onUpdateIndex( keyModifiers, oldIndex, newIndex )
-        {
-            if (delegateModel.mode === "select") {
+        onSelectAll: root.plmodel.selectAll()
+        onSelectionUpdated: {
+            if (view.mode === "select") {
                 console.log("update selection select")
-            } else if (delegateModel.mode === "move") {
-                if (delegateModel.selectedGroup.count === 0)
-                    return
-
-                var selectedIndexes = getSelectedIndexes()
+            } else if (mode == "move") {
+                var selectedIndexes = root.plmodel.getSelection()
 
                 /* always move relative to the first item of the selection */
                 var target = selectedIndexes[0];
@@ -194,64 +135,88 @@ Utils.NavigableFocusScope {
                 view.currentIndex = selectedIndexes[0]
                 /* the target is the position _after_ the move is applied */
                 root.plmodel.moveItemsPost(selectedIndexes, target)
-            } else  { //normal
-                updateSelection( keyModifiers, oldIndex, newIndex )
+            } else { // normal
+                updateSelection(keyModifiers, oldIndex, newIndex);
             }
         }
-    }
-
-    Utils.KeyNavigableListView {
-        id: view
-
-        anchors.fill: parent
-        focus: true
-
-        model: delegateModel.parts.list
-        modelCount: delegateModel.items.count
-
-        footer: PLItemFooter {}
-
-        onSelectAll: delegateModel.selectAll()
-        onSelectionUpdated: delegateModel.onUpdateIndex( keyModifiers, oldIndex, newIndex )
-        Keys.onDeletePressed: delegateModel.onDelete()
-        onActionAtIndex: delegateModel.onAction(index)
+        Keys.onDeletePressed: onDelete()
         onActionRight: {
             overlay.state = "normal"
             overlay.focus = true
         }
-        onActionLeft: this.onCancel(index, root.actionLeft)
-        onActionCancel: this.onCancel(index, root.actionCancel)
+        onActionLeft: {
+            if (mode === "normal") {
+                root.actionLeft(index)
+            } else {
+                overlay.state = "hidden"
+                mode = "normal"
+            }
+        }
+        onActionCancel: {
+            if (mode === "normal") {
+                root.actionCancel(index)
+            } else {
+                overlay.state = "hidden"
+                mode = "normal"
+            }
+        }
         onActionUp: root.actionUp(index)
         onActionDown: root.actionDown(index)
-
-        function onCancel(index, fct) {
-            if (delegateModel.mode === "select" || delegateModel.mode === "move")
-            {
-                overlay.state = "hidden"
-                delegateModel.mode = "normal"
-            }
-            else
-            {
-                fct(index)
-            }
+        onActionAtIndex: {
+            if (mode === "select")
+                root.plmodel.toggleSelected(index)
+            else //normal
+                // play
+                mainPlaylistController.goTo(index, true)
         }
 
-        Connections {
-            target: root.plmodel
-            onCurrentIndexChanged: {
-                var plIndex = root.plmodel.currentIndex
-                if (view.currentIndex === -1 && plIndex >= 0) {
-                    delegateModel.items.get(plIndex).inSelected = true
-                    view.currentIndex = plIndex
+        function onPlay() {
+            let selection = root.plmodel.getSelection()
+            if (selection.length > 0)
+                mainPlaylistController.goTo(selection[0], true)
+        }
+
+        function onDelete() {
+            root.plmodel.removeItems(root.plmodel.getSelection())
+        }
+
+        function _addRange(from, to) {
+            root.plmodel.setRangeSelected(from, to - from + 1, true)
+        }
+
+        function _delRange(from, to) {
+            root.plmodel.setRangeSelected(from, to - from + 1, false)
+        }
+
+        // copied from SelectableDelegateModel, which is intended to be removed
+        function updateSelection( keymodifiers, oldIndex, newIndex ) {
+            if ((keymodifiers & Qt.ShiftModifier)) {
+                if ( shiftIndex === oldIndex) {
+                    if ( newIndex > shiftIndex )
+                        _addRange(shiftIndex, newIndex)
+                    else
+                        _addRange(newIndex, shiftIndex)
+                } else if (shiftIndex <= newIndex && newIndex < oldIndex) {
+                    _delRange(newIndex + 1, oldIndex )
+                } else if ( shiftIndex < oldIndex && oldIndex < newIndex ) {
+                    _addRange(oldIndex, newIndex)
+                } else if ( newIndex < shiftIndex && shiftIndex < oldIndex ) {
+                    _delRange(shiftIndex, oldIndex)
+                    _addRange(newIndex, shiftIndex)
+                } else if ( newIndex < oldIndex && oldIndex < shiftIndex  ) {
+                    _addRange(newIndex, oldIndex)
+                } else if ( oldIndex <= shiftIndex && shiftIndex < newIndex ) {
+                    _delRange(oldIndex, shiftIndex)
+                    _addRange(shiftIndex, newIndex)
+                } else if ( oldIndex < newIndex && newIndex <= shiftIndex  ) {
+                    _delRange(oldIndex, newIndex - 1)
                 }
-            }
-        }
-        Connections {
-            target: delegateModel.items
-            onCountChanged: {
-                if (view.currentIndex === -1 && delegateModel.items.count > 0) {
-                    delegateModel.items.get(0).inSelected = true
-                    view.currentIndex = 0
+            } else {
+                shiftIndex = newIndex
+                if (keymodifiers & Qt.ControlModifier) {
+                    root.plmodel.toggleSelected(newIndex)
+                } else {
+                    root.plmodel.setSelection([newIndex])
                 }
             }
         }
@@ -259,7 +224,7 @@ Utils.NavigableFocusScope {
 
     Label {
         anchors.centerIn: parent
-        visible: delegateModel.items.count === 0
+        visible: plmodel.count === 0
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
         text: qsTr("playlist is empty")
