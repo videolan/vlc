@@ -36,8 +36,8 @@
 #include <vlc_aout.h>
 #include <vlc_filter.h>
 
-#include "../packetizer/a52.h"
-#include "../packetizer/dts_header.h"
+#include "../../packetizer/a52.h"
+#include "../../packetizer/dts_header.h"
 
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
