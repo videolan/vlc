@@ -1102,7 +1102,7 @@ static void DecoderQueueVideo( decoder_t *p_dec, picture_t *p_pic )
 
 static int thumbnailer_update_format( decoder_t *p_dec )
 {
-    VLC_UNUSED(p_dec);
+    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
     return 0;
 }
 
