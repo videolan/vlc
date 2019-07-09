@@ -142,7 +142,7 @@ static void *Run( void *data )
     intf_thread_t *p_intf = data;
     SERVICE_TABLE_ENTRY dispatchTable[] =
     {
-        { TEXT(VLCSERVICENAME), &ServiceDispatch },
+        { (WCHAR*) TEXT(VLCSERVICENAME), (LPSERVICE_MAIN_FUNCTION) &ServiceDispatch },
         { NULL, NULL }
     };
 
