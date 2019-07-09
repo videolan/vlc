@@ -271,6 +271,11 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
+static void ReleaseDecoder( decoder_t *p_dec )
+{
+    decoder_Destroy( p_dec );
+}
+
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -336,7 +341,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     if( !p_sys->p_decoder->p_module )
     {
         msg_Err( p_stream, "cannot find decoder" );
-        decoder_Destroy( p_sys->p_decoder );
+        ReleaseDecoder( p_sys->p_decoder );
         return NULL;
     }
 
@@ -413,7 +418,7 @@ static void Del( sout_stream_t *p_stream, void *id )
     if( !p_sys->b_inited )
         return;
 
-    decoder_Destroy( p_sys->p_decoder );
+    ReleaseDecoder( p_sys->p_decoder );
 
     /* Destroy user specified video filters */
     if( p_sys->p_vf2 )
