@@ -250,12 +250,7 @@ void AbstractDecodedStream::deinit()
         threadEnd = true;
         vlc_mutex_unlock(&inputLock);
         vlc_join(thread, NULL);
-        struct decoder_owner *p_owner;
-        p_owner = container_of(p_decoder, struct decoder_owner, dec);
-        es_format_Clean(&p_owner->decoder_out);
-        es_format_Clean(&p_owner->last_fmt_update);
-        decoder_Destroy(p_decoder);
-        p_decoder = NULL;
+        ReleaseDecoder();
     }
 }
 
@@ -290,10 +285,7 @@ bool AbstractDecodedStream::init(const es_format_t *p_fmt)
     if(!p_decoder->p_module)
     {
         msg_Err(p_stream, "cannot find %s for %4.4s", category, (char *)&p_fmt->i_codec);
-        es_format_Clean(&p_owner->decoder_out);
-        es_format_Clean(&p_owner->last_fmt_update);
-        decoder_Destroy( p_decoder );
-        p_decoder = NULL;
+        ReleaseDecoder();
         return false;
     }
 
@@ -425,6 +417,16 @@ bool AbstractDecodedStream::ReachedPlaybackTime(vlc_tick_t t)
     b |= (status == DRAINED) || (status == FAILED);
     vlc_mutex_unlock(&inputLock);
     return b;
+}
+
+void AbstractDecodedStream::ReleaseDecoder()
+{
+    struct decoder_owner *p_owner;
+    p_owner = container_of(p_decoder, struct decoder_owner, dec);
+    es_format_Clean(&p_owner->decoder_out);
+    es_format_Clean(&p_owner->last_fmt_update);
+    decoder_Destroy( p_decoder );
+    p_decoder = NULL;
 }
 
 void AbstractDecodedStream::setOutputFormat(const es_format_t *p_fmt)

@@ -138,6 +138,7 @@ namespace sdi_sout
             static void *decoderThreadCallback(void *);
             void decoderThread();
             void deinit();
+            virtual void ReleaseDecoder();
             es_format_t requestedoutput;
             std::queue<block_t *> inputQueue;
             vlc_mutex_t inputLock;
