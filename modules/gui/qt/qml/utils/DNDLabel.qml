@@ -30,6 +30,8 @@ Rectangle {
 
     Drag.active: visible
 
+    property var count: 0
+
     function updatePos(x, y) {
         var pos = root.mapFromGlobal(x, y)
         dragItem.x = pos.x + 10
@@ -40,6 +42,6 @@ Rectangle {
         id: label
         font.pixelSize: VLCStyle.fontSize_normal
         color: VLCStyle.colors.text
-        text: qsTr("%1 tracks selected").arg(delegateModel.selectedGroup.count)
+        text: qsTr("%1 tracks selected").arg(count)
     }
 }

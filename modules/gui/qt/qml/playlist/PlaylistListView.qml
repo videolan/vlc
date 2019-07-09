@@ -34,7 +34,6 @@ Utils.NavigableFocusScope {
     //label for DnD
     Utils.DNDLabel {
         id: dragItem
-        text: qsTr("%1 tracks selected").arg(delegateModel.selectedGroup.count)
     }
 
 

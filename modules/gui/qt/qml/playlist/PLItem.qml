@@ -28,6 +28,8 @@ import "qrc:///style/"
 Rectangle {
     id: root
 
+    property var plmodel
+
     signal itemClicked(int keys, int modifier)
     signal itemDoubleClicked(int keys, int modifier)
     property alias hovered: mouse.containsMouse
@@ -71,8 +73,10 @@ Rectangle {
 
         property bool hold: false
         onPositionChanged: {
-            if (hold)
+            if (hold && !dragItem.visible) {
+                dragItem.count = plmodel.getSelection().length
                 dragItem.visible = true
+            }
         }
         onPressed:  {
             hold = true
