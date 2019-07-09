@@ -198,8 +198,8 @@ static int assert_staging(filter_t *p_filter, picture_sys_d3d11_t *p_sys)
                 hr = ID3D11Device_CreateTexture2D( d3d_dev.d3ddevice, &texDesc, NULL, &sys->procOutTexture);
                 if (SUCCEEDED(hr) && SUCCEEDED(hr = can_map(sys, p_sys->context)))
                 {
-                    d3d11_device_t d3d_dev = { .d3ddevice = d3d_dev.d3ddevice, .d3dcontext = p_sys->context };
-                    if (SetupProcessor(p_filter, &d3d_dev, srcFormat, new_fmt->formatTexture))
+                    d3d11_device_t proc_dev = { .d3ddevice = d3d_dev.d3ddevice, .d3dcontext = p_sys->context };
+                    if (SetupProcessor(p_filter, &proc_dev, srcFormat, new_fmt->formatTexture))
                     {
                         ID3D11Texture2D_Release(sys->procOutTexture);
                         ID3D11Texture2D_Release(sys->staging);
