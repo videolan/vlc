@@ -215,6 +215,7 @@ struct decoder_owner
     bool b_error;
     es_format_t last_fmt_update;
     es_format_t decoder_out;
+    vlc_decoder_device *dec_dev;
 };
 
 AbstractDecodedStream::AbstractDecodedStream(vlc_object_t *p_obj,
@@ -455,6 +456,7 @@ void VideoDecodedStream::setCallbacks()
 {
     static struct decoder_owner_callbacks dec_cbs;
     memset(&dec_cbs, 0, sizeof(dec_cbs));
+    dec_cbs.video.get_device = VideoDecCallback_get_device;
     dec_cbs.video.format_update = VideoDecCallback_update_format;
     dec_cbs.video.queue = VideoDecCallback_queue;
     dec_cbs.video.queue_cc = captionsOutputBuffer ? VideoDecCallback_queue_cc : NULL;
@@ -480,6 +482,30 @@ void VideoDecodedStream::VideoDecCallback_queue_cc(decoder_t *p_dec, block_t *p_
     struct decoder_owner *p_owner;
     p_owner = container_of(p_dec, struct decoder_owner, dec);
     static_cast<VideoDecodedStream *>(p_owner->id)->QueueCC(p_block);
+}
+
+vlc_decoder_device * VideoDecodedStream::VideoDecCallback_get_device(decoder_t *p_dec)
+{
+    struct decoder_owner *p_owner;
+    p_owner = container_of(p_dec, struct decoder_owner, dec);
+    if (p_owner->dec_dev == NULL)
+    {
+        p_owner->dec_dev = vlc_decoder_device_Create(&p_dec->obj, NULL);
+    }
+    return p_owner->dec_dev ? vlc_decoder_device_Hold(p_owner->dec_dev) : NULL;
+}
+
+void VideoDecodedStream::ReleaseDecoder()
+{
+    AbstractDecodedStream::ReleaseDecoder();
+
+    struct decoder_owner *p_owner;
+    p_owner = container_of(p_decoder, struct decoder_owner, dec);
+    if (p_owner->dec_dev)
+    {
+        vlc_decoder_device_Release(p_owner->dec_dev);
+        p_owner->dec_dev = NULL;
+    }
 }
 
 int VideoDecodedStream::VideoDecCallback_update_format(decoder_t *p_dec,

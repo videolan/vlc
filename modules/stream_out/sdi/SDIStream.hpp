@@ -168,8 +168,10 @@ namespace sdi_sout
             static void VideoDecCallback_queue(decoder_t *, picture_t *);
             static void VideoDecCallback_queue_cc( decoder_t *, block_t *,
                                                    const decoder_cc_desc_t * );
+            static vlc_decoder_device * VideoDecCallback_get_device(decoder_t *);
             static int VideoDecCallback_update_format(decoder_t *, vlc_video_context *);
             filter_chain_t * VideoFilterCreate(const es_format_t *, vlc_video_context *);
+            virtual void ReleaseDecoder();
             void Output(picture_t *);
             void QueueCC(block_t *);
             filter_chain_t *p_filters_chain;
