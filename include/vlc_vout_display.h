@@ -215,6 +215,24 @@ typedef int (*vout_display_open_cb)(vout_display_t *vd,
  */
 typedef void (*vout_display_close_cb)(vout_display_t *vd);
 
+#define set_callbacks_display(activate, deactivate, priority) \
+    { \
+        vout_display_open_cb open__ = activate; \
+        vout_display_close_cb close__ = deactivate; \
+        (void) open__; (void) close__; \
+        set_callbacks(activate, deactivate) \
+    } \
+    set_capability( "vout display", priority )
+
+#define set_callback_display(activate, priority) \
+    { \
+        vout_display_open_cb open__ = activate; \
+        (void) open__; \
+        set_callback(activate) \
+    } \
+    set_capability( "vout display", priority )
+
+
 struct vout_display_t {
     struct vlc_object_t obj;
 
