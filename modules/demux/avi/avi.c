@@ -693,6 +693,10 @@ static int Open( vlc_object_t * p_this )
                     /* Shitty files storing chroma in biCompression */
                     Set_BMP_RGB_Masks( &tk->fmt );
                 }
+
+                if( IsQNAPCodec( tk->fmt.i_codec ) )
+                    tk->fmt.b_packetized = false;
+
                 tk->i_samplesize = 0;
 
                 tk->fmt.video.i_visible_width =
