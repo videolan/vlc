@@ -83,6 +83,7 @@ decoder_AbortPictures
 decoder_NewAudioBuffer
 decoder_UpdateVideoFormat
 decoder_UpdateVideoOutput
+vlc_decoder_device_Create
 vlc_decoder_device_Hold
 vlc_decoder_device_Release
 demux_PacketizerDestroy
