@@ -208,12 +208,17 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
         {
             AVI_ChunkClean( s, p_chk );
             free( p_chk );
-            break;
+            p_chk = NULL;
+            if( i_ret != AVI_ZEROSIZED_CHUNK )
+                break;
         }
 
-        *pp_append = p_chk;
-        while( *pp_append )
-            pp_append = &((*pp_append)->common.p_next);
+        if( p_chk )
+        {
+            *pp_append = p_chk;
+            while( *pp_append )
+                pp_append = &((*pp_append)->common.p_next);
+        }
 
         if( p_container->common.i_chunk_size > 0 &&
             vlc_stream_Tell( s ) >= AVI_ChunkEnd( p_container ) )
@@ -222,7 +227,8 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
         }
 
         /* If we can't seek then stop when we 've found LIST-movi */
-        if( p_chk->common.i_chunk_fourcc == AVIFOURCC_LIST &&
+        if( p_chk &&
+            p_chk->common.i_chunk_fourcc == AVIFOURCC_LIST &&
             p_chk->list.i_type == AVIFOURCC_movi &&
             ( !b_seekable || p_chk->common.i_chunk_size == 0 ) )
         {
