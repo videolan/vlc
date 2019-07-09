@@ -1682,6 +1682,18 @@ asm volatile("ptrue p0.s" ::: "p0");
 ])
 AM_CONDITIONAL([HAVE_SVE], [test "${ac_cv_arm_sve}" = "yes"])
 
+AC_ARG_ENABLE([pointer-auth],
+  AS_HELP_STRING([--disable-pointer-auth],
+    [disable ARMv8.3 Pointer Authentication (default auto)]),, [
+  AS_IF([test "${host_cpu}" = "aarch64"], [enable_ptrauth="yes"] ,[enable_ptrauth="no"])
+])
+AS_IF([test "${enable_ptrauth}" != "no"], [
+  AX_CHECK_COMPILE_FLAG([-msign-return-address=non-leaf], [
+    AX_APPEND_FLAG([-msign-return-address=non-leaf], [CFLAGS])
+    AX_APPEND_FLAG([-msign-return-address=non-leaf], [CXXFLAGS])
+  ])
+])
+
 
 AC_ARG_ENABLE([altivec],
   AS_HELP_STRING([--disable-altivec],
