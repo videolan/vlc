@@ -93,6 +93,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/player_controller.cpp gui/qt/components/player_controller.hpp gui/qt/components/player_controller_p.hpp \
 	gui/qt/components/preferences_widgets.cpp \
 	gui/qt/components/preferences_widgets.hpp \
+	gui/qt/components/selectable_list_model.hpp \
+	gui/qt/components/selectable_list_model.cpp \
 	gui/qt/components/complete_preferences.cpp \
 	gui/qt/components/complete_preferences.hpp \
 	gui/qt/components/simple_preferences.cpp \
@@ -260,6 +262,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/controller_widget.moc.cpp \
 	gui/qt/components/custom_menus.moc.cpp \
 	gui/qt/components/recent_media_model.moc.cpp \
+	gui/qt/components/selectable_list_model.moc.cpp \
 	gui/qt/components/settings.moc.cpp \
 	gui/qt/components/voutwindow/videosurface.moc.cpp \
 	gui/qt/components/voutwindow/qvoutwindow.moc.cpp \
