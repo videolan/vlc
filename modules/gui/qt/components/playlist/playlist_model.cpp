@@ -178,6 +178,8 @@ void PlaylistListModelPrivate::onItemsReset(const QVector<PlaylistItem>& newCont
     q->beginResetModel();
     m_items = newContent;
     q->endResetModel();
+
+    emit q->countChanged(m_items.size());
 }
 
 void PlaylistListModelPrivate::onItemsAdded(const QVector<PlaylistItem>& added, size_t index)
@@ -188,6 +190,8 @@ void PlaylistListModelPrivate::onItemsAdded(const QVector<PlaylistItem>& added, 
     m_items.insert(index, count, nullptr);
     std::move(added.cbegin(), added.cend(), m_items.begin() + index);
     q->endInsertRows();
+
+    emit q->countChanged(m_items.size());
 }
 
 void PlaylistListModelPrivate::onItemsMoved(size_t index, size_t count, size_t target)
@@ -218,6 +222,8 @@ void PlaylistListModelPrivate::onItemsRemoved(size_t index, size_t count)
     q->beginRemoveRows({}, index, index + count - 1);
     m_items.remove(index, count);
     q->endRemoveRows();
+
+    emit q->countChanged(m_items.size());
 }
 
 

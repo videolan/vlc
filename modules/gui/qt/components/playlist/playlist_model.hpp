@@ -38,6 +38,7 @@ class PlaylistListModel : public SelectableListModel
     Q_OBJECT
     Q_PROPERTY(PlaylistPtr playlistId READ getPlaylistId WRITE setPlaylistId NOTIFY playlistIdChanged)
     Q_PROPERTY(int currentIndex READ getCurrentIndex NOTIFY currentIndexChanged)
+    Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
 
 public:
     enum Roles
@@ -82,6 +83,7 @@ public slots:
 signals:
     void playlistIdChanged(const PlaylistPtr& );
     void currentIndexChanged( int );
+    void countChanged(int);
 
 private:
     Q_DECLARE_PRIVATE(PlaylistListModel)
