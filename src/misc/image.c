@@ -656,6 +656,12 @@ vlc_fourcc_t image_Mime2Fourcc( const char *psz_mime )
     return 0;
 }
 
+static vlc_decoder_device * image_get_device( decoder_t *p_dec )
+{
+    VLC_UNUSED(p_dec);
+    return NULL; // no hardware decoding for now
+}
+
 static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fmt )
 {
     decoder_t *p_dec;
@@ -672,6 +678,7 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fm
     static const struct decoder_owner_callbacks dec_cbs =
     {
         .video = {
+            .get_device = image_get_device,
             .queue = ImageQueueVideo,
         },
     };
