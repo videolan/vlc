@@ -279,9 +279,7 @@ static inline vlc_decoder_device * decoder_GetDecoderDevice( decoder_t *dec )
     if ( unlikely(dec->fmt_in.i_cat != VIDEO_ES || dec->cbs == NULL ) )
         return NULL;
 
-    if ( dec->cbs->video.get_device == NULL )
-        return NULL; /* TODO make it mandatory for all decoder owners */
-
+    vlc_assert(dec->cbs->video.get_device != NULL);
     return dec->cbs->video.get_device( dec );
 }
 
