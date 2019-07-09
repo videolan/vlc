@@ -84,8 +84,14 @@ Utils.NavigableFocusScope {
                 onItemClicked : {
                     view.forceActiveFocus()
                     if (delegateModel.mode == "move") {
-                        delegateModel.onMoveSelectionAtPos(index)
-                        view.currentIndex = index
+                        var selectedIndexes = delegateModel.getSelectedIndexes()
+                        var preTarget = index
+                        /* move to _above_ the clicked item if move up, but
+                         * _below_ the clicked item if move down */
+                        if (preTarget > selectedIndexes[0])
+                            preTarget++
+                        view.currentIndex = selectedIndexes[0]
+                        root.plmodel.moveItemsPre(selectedIndexes, preTarget)
                     } else if ( delegateModel.mode == "select" ) {
                     } else {
                         delegateModel.onUpdateIndex( modifier , view.currentIndex, index)
@@ -98,22 +104,36 @@ Utils.NavigableFocusScope {
                     if (drop.hasUrls) {
                         delegateModel.onDropUrlAtPos(drop.urls, target)
                     } else {
-                        delegateModel.onMoveSelectionAtPos(target)
+                        /* on drag&drop, the target is the position _before_
+                         * the move is applied */
+                        delegateModel.moveSelectionToPreTarget(target)
                     }
                 }
             }
         }
 
-        function onMoveSelectionAtPos(target) {
+        function getSelectedIndexes() {
             var list = []
             for (var i = 0; i < delegateModel.selectedGroup.count; i++ ) {
                 list.push(delegateModel.selectedGroup.get(i).itemsIndex)
             }
-            root.plmodel.moveItems(list, target)
+            return list;
+        }
+
+        function moveSelectionToPreTarget(target) {
+            var selectedIndexes = getSelectedIndexes()
+            view.currentIndex = selectedIndexes[0]
+            root.plmodel.moveItemsPre(selectedIndexes, target)
+        }
+
+        function moveSelectionToPostTarget(target) {
+            var selectedIndexes = getSelectedIndexes()
+            view.currentIndex = selectedIndexes[0]
+            root.plmodel.moveItemsPost(selectedIndexes, target)
         }
 
         function onDropMovedAtEnd() {
-            onMoveSelectionAtPos(items.count)
+            moveSelectionToPreTarget(items.count)
         }
 
         function onDropUrlAtPos(urls, target) {
@@ -160,25 +180,21 @@ Utils.NavigableFocusScope {
                 if (delegateModel.selectedGroup.count === 0)
                     return
 
-                var list = []
-                for (var i = 0; i < delegateModel.selectedGroup.count; i++ ) {
-                    list.push(delegateModel.selectedGroup.get(i).itemsIndex)
-                }
-                var minIndex= delegateModel.selectedGroup.get(0).itemsIndex
-                var maxIndex= delegateModel.selectedGroup.get(delegateModel.selectedGroup.count - 1).itemsIndex
+                var selectedIndexes = getSelectedIndexes()
 
+                /* always move relative to the first item of the selection */
+                var target = selectedIndexes[0];
                 if (newIndex > oldIndex) {
-                    //after the next item
-                    newIndex = Math.min(maxIndex + 2, delegateModel.items.count)
-                    view.currentIndex = Math.min(maxIndex, delegateModel.items.count)
-                } else if (newIndex < oldIndex) {
-                    //before the previous item
-                    view.currentIndex = Math.max(minIndex, 0)
-                    newIndex = Math.max(minIndex - 1, 0)
+                    /* move down */
+                    target++
+                } else if (newIndex < oldIndex && target > 0) {
+                    /* move up */
+                    target--
                 }
 
-                root.plmodel.moveItems(list, newIndex)
-
+                view.currentIndex = selectedIndexes[0]
+                /* the target is the position _after_ the move is applied */
+                root.plmodel.moveItemsPost(selectedIndexes, target)
             } else  { //normal
                 updateSelection( keyModifiers, oldIndex, newIndex )
             }

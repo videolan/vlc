@@ -300,36 +300,67 @@ void PlaylistListModel::removeItems(const QList<int>& indexes)
     }
 }
 
-void PlaylistListModel::moveItems(const QList<int> &indexes, int target)
+/**
+ * Return the target position *after* the move has been applied, knowing the
+ * index *before* the move and the list of indexes to move.
+ *
+ * The core playlist interprets the move target as the index of the (first)
+ * item *after* the move. During a drag&drop, we know the index *before* the
+ * move.
+ */
+static int
+getMovePostTarget(const QList<int> &sortedIndexesToMove, int preTarget)
+{
+    int postTarget = preTarget;
+    for (int index : sortedIndexesToMove)
+    {
+        if (index >= preTarget)
+            break;
+        postTarget--;
+    }
+    return postTarget;
+}
+
+void
+PlaylistListModel::moveItems(const QList<int> &sortedIndexes, int target,
+                             bool isPreTarget)
 {
     Q_D(PlaylistListModel);
     if (!d->m_playlist)
         return;
-    int targetPre = target;
-    int targetPost = target;
-    if (indexes.size() == 0)
+    if (sortedIndexes.size() == 0)
         return;
     QVector<vlc_playlist_item_t*> itemsToMove;
-    //std::sort(indexes.begin(), indexes.end()); //Indexes are already sorted
-    std::transform(indexes.begin(), indexes.end(),std::back_inserter(itemsToMove), [&] (int index) {
-        return d->m_items[index].raw();
-    });
-    //the target is in the referential of the list before doing the operation,
-    //the playlist expect the target to be defined as the index after the operation
-    for ( const int index : indexes ) {
-        if (index < targetPre)
-            targetPost--;
-        else
-            break;
+    std::transform(sortedIndexes.begin(), sortedIndexes.end(),
+                   std::back_inserter(itemsToMove),
+                   [&] (int index) {
+                       return d->m_items[index].raw();
+                   });
+
+    if (isPreTarget) {
+        /* convert pre-target to post-target */
+        target = getMovePostTarget(sortedIndexes, target);
     }
 
-    {
-        PlaylistLocker locker(d->m_playlist);
-        int ret = vlc_playlist_RequestMove(d->m_playlist, itemsToMove.constData(),
-                                           itemsToMove.size(), targetPost, indexes[0]);
-        if (ret != VLC_SUCCESS)
-            throw std::bad_alloc();
-    }
+    PlaylistLocker locker(d->m_playlist);
+    int ret = vlc_playlist_RequestMove(d->m_playlist, itemsToMove.constData(),
+                                       itemsToMove.size(), target,
+                                       sortedIndexes[0]);
+    if (ret != VLC_SUCCESS)
+        throw std::bad_alloc();
+}
+
+void
+PlaylistListModel::moveItemsPre(const QList<int> &sortedIndexes, int preTarget)
+{
+    return moveItems(sortedIndexes, preTarget, true);
+}
+
+void
+PlaylistListModel::moveItemsPost(const QList<int> &sortedIndexes,
+                                 int postTarget)
+{
+    return moveItems(sortedIndexes, postTarget, false);
 }
 
 int PlaylistListModel::getCurrentIndex() const
