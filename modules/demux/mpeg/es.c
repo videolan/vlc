@@ -38,9 +38,9 @@
 
 #include "../../packetizer/a52.h"
 #include "../../packetizer/dts_header.h"
-#include "../meta_engine/ID3Tag.h"
-#include "../meta_engine/ID3Text.h"
-#include "../meta_engine/ID3Meta.h"
+#include "../../meta_engine/ID3Tag.h"
+#include "../../meta_engine/ID3Text.h"
+#include "../../meta_engine/ID3Meta.h"
 
 /*****************************************************************************
  * Module descriptor
