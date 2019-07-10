@@ -99,7 +99,7 @@ Utils.NavigableFocusScope {
 
         property point mousePosition: Qt.point(0,0)
 
-        Keys.onReleased: {
+        Keys.onPressed: {
             if (event.key === Qt.Key_Menu) {
                 toolbarAutoHide.toggleForceVisible()
             }
@@ -201,15 +201,20 @@ Utils.NavigableFocusScope {
                     onActionRight: root.actionRight(index)
                     onActionCancel: root.actionCancel(index)
 
-                    //unhandled keys are forwarded to the vout window
-                    Keys.forwardTo: videoSurface
+                    //unhandled keys are forwarded as hotkeys
+                    Keys.onPressed: {
+                        if (event.key === Qt.Key_Menu)
+                            toolbarAutoHide.toggleForceVisible()
+                        else
+                            rootWindow.sendHotkey(event.key);
+                    }
 
                     //filter global events to keep toolbar
                     //visible when user navigates within the control bar
                     EventFilter {
                         id: filter
                         source: rootQMLView
-                        filterEnabled: controllerId.activeFocus
+                        filterEnabled: controlBarView.state === "visible"
                         Keys.onPressed: toolbarAutoHide.setVisible(5000)
                     }
                 }

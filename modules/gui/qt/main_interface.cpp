@@ -316,6 +316,16 @@ void MainInterface::onInputChanged( bool hasInput )
     emit askRaise();
 }
 
+#ifdef KeyPress
+#undef KeyPress
+#endif
+void MainInterface::sendHotkey( Qt::Key key )
+{
+    QKeyEvent event(QEvent::KeyPress, key, Qt::NoModifier);
+    int vlckey = qtEventToVLCKey(&event);
+    var_SetInteger(vlc_object_instance(p_intf), "key-pressed", vlckey);
+}
+
 void MainInterface::createMainWidget( QSettings * )
 {
     qRegisterMetaType<VLCTick>();
