@@ -60,6 +60,7 @@ Utils.NavigableFocusScope {
             Keys.onPressed:  {
                 if (event.key === Qt.Key_Space || event.matches(StandardKey.InsertParagraphSeparator)) { //enter/return/space
                     model.checked  = !model.checked
+                    event.accepted = true
                 }
             }
         }
@@ -95,8 +96,8 @@ Utils.NavigableFocusScope {
         delegate: delegateComponent
         currentIndex: 0
 
-        //Keys.forwardTo: [trackTypeTumbler.currentItem]
         KeyNavigation.right: trackTumble
+        Keys.forwardTo: [trackTypeTumbler.currentItem]
     }
     //
     Tumbler {
