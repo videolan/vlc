@@ -77,12 +77,6 @@ vlc_module_begin ()
 
 vlc_module_end ()
 
-/* Store the filter chain */
-typedef struct
-{
-    filter_chain_t *p_chain;
-} filter_sys_t;
-
 static const struct filter_video_callbacks filter_video_edge_cbs =
 {
     .buffer_new = new_frame,
@@ -104,36 +98,33 @@ static int Open( vlc_object_t *p_this )
         .sys = p_filter,
     };
     /* Store the filter chain in p_sys */
-    p_filter->p_sys = (filter_sys_t *)filter_chain_NewVideo( p_filter, true, &owner );
-
-    if ( p_filter->p_sys == NULL)
+    filter_chain_t *sys = filter_chain_NewVideo( p_filter, true, &owner );
+    if ( sys == NULL)
     {
         msg_Err( p_filter, "Could not allocate filter chain" );
-        free( p_filter->p_sys );
         return VLC_EGENERIC;
     }
     /* Clear filter chain */
-    filter_chain_Reset( (filter_chain_t *)p_filter->p_sys, &p_filter->fmt_in, &p_filter->fmt_in);
+    filter_chain_Reset( sys, &p_filter->fmt_in, &p_filter->fmt_in);
     /* Add adjust filter to turn frame black-and-white */
-    i_ret = filter_chain_AppendFromString( (filter_chain_t *)p_filter->p_sys,
-                                           "adjust{saturation=0}" );
+    i_ret = filter_chain_AppendFromString( sys, "adjust{saturation=0}" );
     if ( i_ret == -1 )
     {
         msg_Err( p_filter, "Could not append filter to filter chain" );
-        filter_chain_Delete( (filter_chain_t *)p_filter->p_sys );
+        filter_chain_Delete( sys );
         return VLC_EGENERIC;
     }
     /* Add gaussian blur to the frame so to remove noise from the frame */
-    i_ret = filter_chain_AppendFromString( (filter_chain_t *)p_filter->p_sys,
-                                           "gaussianblur{deviation=1}" );
+    i_ret = filter_chain_AppendFromString( sys, "gaussianblur{deviation=1}" );
     if ( i_ret == -1 )
     {
         msg_Err( p_filter, "Could not append filter to filter chain" );
-        filter_chain_Delete( (filter_chain_t *)p_filter->p_sys );
+        filter_chain_Delete( sys );
         return VLC_EGENERIC;
     }
     /* Set callback function */
     p_filter->pf_video_filter = Filter;
+    p_filter->p_sys = sys;
     return VLC_SUCCESS;
 }
 
