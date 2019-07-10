@@ -347,6 +347,7 @@ static int Open(vlc_object_t *obj)
         sys->url = url;
         access->pf_readdir = DirRead;
         access->pf_control = access_vaDirectoryControlHelper;
+        fd = -1;
     }
     else
     {
