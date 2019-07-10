@@ -33,7 +33,6 @@ Utils.NavigableFocusScope {
     id: root
 
     signal showTrackBar()
-    signal showPlaylist()
 
     property bool noAutoHide: _lockAutoHide !== 0
     property int  _lockAutoHide: 0 //count the number of element locking the autoHide
