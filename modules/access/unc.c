@@ -69,9 +69,12 @@ static void Win32AddConnection(stream_t *access, const char *server,
         *delim = '\0';
 
     const char *msg;
-    net_resource.lpRemoteName = remote_name;
+    net_resource.lpRemoteName = ToWide(remote_name);
 
-    switch (WNetAddConnection2(&net_resource, pwd, user, 0))
+    wchar_t *wpwd  = pwd  ? ToWide(pwd)  : NULL;
+    wchar_t *wuser = user ? ToWide(user) : NULL;
+
+    switch (WNetAddConnection2(&net_resource, wpwd, wuser, 0))
     {
         case NO_ERROR:
             msg = "connected to %s";
@@ -83,6 +86,9 @@ static void Win32AddConnection(stream_t *access, const char *server,
         default:
             msg = "failed to connect to %s";
     }
+    free(net_resource.lpRemoteName);
+    free(wpwd);
+    free(wuser);
     msg_Dbg(access, msg, remote_name);
 }
 
