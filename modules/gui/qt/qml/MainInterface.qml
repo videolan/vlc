@@ -34,16 +34,19 @@ Rectangle {
     id: root
     color: "transparent"
 
-    Window {
-        id: playlistWindow
-        visible: !rootWindow.playlistDocked && rootWindow.playlistVisible
-        title: qsTr("Playlist")
-        color: VLCStyle.colors.bg
-        onClosing: rootWindow.playlistVisible = false
-        PL.PlaylistListView {
-            id: playlistView
-            focus: true
-            anchors.fill: parent
+    Loader {
+        id: playlistWindowLoader
+        active: !rootWindow.playlistDocked && rootWindow.playlistVisible
+        sourceComponent: Window {
+            visible: true
+            title: qsTr("Playlist")
+            color: VLCStyle.colors.bg
+            onClosing: rootWindow.playlistVisible = false
+            PL.PlaylistListView {
+                id: playlistView
+                focus: true
+                anchors.fill: parent
+            }
         }
     }
 
