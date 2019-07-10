@@ -368,11 +368,16 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
     if (!hdecoder_dll)
         goto error;
 
-    D3DSURFACE_DESC dstDesc;
-    D3D9_FilterHoldInstance( filter, &sys->d3d_dev, &dstDesc );
-    if (!sys->d3d_dev.dev)
+    d3d9_video_context_t *vtcx_sys = GetD3D9ContextPrivate( filter->vctx_in );
+    if (!vtcx_sys)
     {
         msg_Dbg(filter, "Filter without a context");
+        goto error;
+    }
+
+    if (FAILED(D3D9_CreateDeviceExternal( vtcx_sys->dev, &sys->hd3d, &sys->d3d_dev )))
+    {
+        msg_Dbg(filter, "Failed to use the given video context");
         goto error;
     }
 
@@ -390,9 +395,9 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
 
     DXVA2_VideoDesc dsc;
     ZeroMemory(&dsc, sizeof(dsc));
-    dsc.SampleWidth     = dstDesc.Width;
-    dsc.SampleHeight    = dstDesc.Height;
-    dsc.Format          = dstDesc.Format;
+    dsc.SampleWidth     = filter->fmt_out.video.i_width;
+    dsc.SampleHeight    = filter->fmt_out.video.i_height;
+    dsc.Format = vtcx_sys->format;
     if (filter->fmt_in.video.i_frame_rate && filter->fmt_in.video.i_frame_rate_base) {
         dsc.InputSampleFreq.Numerator   = filter->fmt_in.video.i_frame_rate;
         dsc.InputSampleFreq.Denominator = filter->fmt_in.video.i_frame_rate_base;
@@ -525,6 +530,7 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
     IDirectXVideoProcessorService_Release(processor);
 
     filter->fmt_out.video   = out_fmt;
+    filter->vctx_out        = vlc_video_context_Hold(filter->vctx_in);
     filter->pf_video_filter = Deinterlace;
     filter->pf_flush        = Flush;
     filter->p_sys = sys;
@@ -537,7 +543,7 @@ error:
         IDirectXVideoProcessor_Release( sys->processor );
     if (processor)
         IDirectXVideoProcessorService_Release(processor);
-    D3D9_FilterReleaseInstance( &sys->d3d_dev );
+    D3D9_ReleaseDevice( &sys->d3d_dev );
     if (hdecoder_dll)
         FreeLibrary(hdecoder_dll);
     D3D9_Destroy( &sys->hd3d );
@@ -553,8 +559,9 @@ void D3D9CloseDeinterlace(vlc_object_t *obj)
 
     IDirect3DSurface9_Release( sys->hw_surface );
     IDirectXVideoProcessor_Release( sys->processor );
-    D3D9_FilterReleaseInstance( &sys->d3d_dev );
+    D3D9_ReleaseDevice( &sys->d3d_dev );
     FreeLibrary( sys->hdecoder_dll );
+    vlc_video_context_Release(filter->vctx_out);
     D3D9_Destroy( &sys->hd3d );
 
     free(sys);
