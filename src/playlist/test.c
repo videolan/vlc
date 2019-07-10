@@ -1680,6 +1680,7 @@ test_request_move_without_hint(void)
     DestroyMediaArray(media, 10);
     vlc_playlist_Delete(playlist);
 }
+
 static void
 test_request_move_adapt(void)
 {
@@ -1689,7 +1690,7 @@ test_request_move_adapt(void)
     input_item_t *media[16];
     CreateDummyMediaArray(media, 16);
 
-    /* initial playlist with 10 items */
+    /* initial playlist with 15 items */
     int ret = vlc_playlist_Append(playlist, media, 15);
     assert(ret == VLC_SUCCESS);
 
@@ -1975,6 +1976,7 @@ test_request_goto_without_hint(void)
     DestroyMediaArray(media, 10);
     vlc_playlist_Delete(playlist);
 }
+
 static void
 test_request_goto_adapt(void)
 {
