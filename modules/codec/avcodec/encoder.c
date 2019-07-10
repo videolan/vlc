@@ -580,8 +580,14 @@ int InitVideoEnc( vlc_object_t *p_this )
 
         if ( p_sys->b_mpeg4_matrix )
         {
-            p_context->intra_matrix = mpeg4_default_intra_matrix;
-            p_context->inter_matrix = mpeg4_default_non_intra_matrix;
+            p_context->intra_matrix = av_malloc( sizeof(mpeg4_default_intra_matrix) );
+            if ( p_context->intra_matrix )
+                memcpy( p_context->intra_matrix, mpeg4_default_intra_matrix,
+                        sizeof(mpeg4_default_intra_matrix));
+            p_context->inter_matrix = av_malloc( sizeof(mpeg4_default_non_intra_matrix) );
+            if ( p_context->inter_matrix )
+                memcpy( p_context->inter_matrix, mpeg4_default_non_intra_matrix,
+                        sizeof(mpeg4_default_non_intra_matrix));
         }
 
         if ( p_sys->b_pre_me )
