@@ -26,8 +26,6 @@ import "qrc:///utils/" as Utils
 
 Utils.NavigableFocusScope {
     id: root
-    property bool showPlaylistButton: false
-
     property bool forceNoAutoHide: false
     property bool noAutoHide:  stack_id.currentItem.noAutoHide || forceNoAutoHide
 
@@ -35,8 +33,6 @@ Utils.NavigableFocusScope {
         id: controlbarComp_id
         ControlBar {
             focus: true
-
-            showPlaylistButton: root.showPlaylistButton
 
             onShowTrackBar: root.state = "tracks"
 

@@ -194,7 +194,6 @@ Utils.NavigableFocusScope {
                         if (!noAutoHide)
                             toolbarAutoHide.restart()
                     }
-                    showPlaylistButton: true
 
                     onActionUp: root.actionUp(index)
                     onActionDown: root.actionDown(index)

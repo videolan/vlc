@@ -37,7 +37,6 @@ Utils.NavigableFocusScope {
 
     property bool noAutoHide: _lockAutoHide !== 0
     property int  _lockAutoHide: 0 //count the number of element locking the autoHide
-    property bool showPlaylistButton: false
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)

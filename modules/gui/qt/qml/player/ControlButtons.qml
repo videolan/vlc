@@ -159,7 +159,6 @@ Item{
         Utils.IconToolButton {
             id: playlistBtn
             objectName: "IconToolButton"
-            visible: showPlaylistButton
             size: VLCStyle.icon_medium
             text: VLCIcons.playlist
             onClicked: root.showPlaylist()
