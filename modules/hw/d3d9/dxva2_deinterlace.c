@@ -456,10 +456,10 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
         goto error;
 
     hr = IDirectXVideoProcessorService_CreateSurface( processor,
-                                                      dstDesc.Width,
-                                                      dstDesc.Height,
+                                                      dsc.SampleWidth,
+                                                      dsc.SampleHeight,
                                                       0,
-                                                      dstDesc.Format,
+                                                      dsc.Format,
                                                       D3DPOOL_DEFAULT,
                                                       0,
                                                       DXVA2_VideoProcessorRenderTarget,
@@ -470,28 +470,28 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
 
     DXVA2_ValueRange Range;
     hr = IDirectXVideoProcessorService_GetProcAmpRange( processor, processorGUID, &dsc,
-                                                        dstDesc.Format, DXVA2_ProcAmp_Brightness,
+                                                        dsc.Format, DXVA2_ProcAmp_Brightness,
                                                         &Range );
     if (FAILED(hr))
         goto error;
     sys->Brightness = Range.DefaultValue.Value;
 
     hr = IDirectXVideoProcessorService_GetProcAmpRange( processor, processorGUID, &dsc,
-                                                        dstDesc.Format, DXVA2_ProcAmp_Contrast,
+                                                        dsc.Format, DXVA2_ProcAmp_Contrast,
                                                         &Range );
     if (FAILED(hr))
         goto error;
     sys->Contrast = Range.DefaultValue.Value;
 
     hr = IDirectXVideoProcessorService_GetProcAmpRange( processor, processorGUID, &dsc,
-                                                        dstDesc.Format, DXVA2_ProcAmp_Hue,
+                                                        dsc.Format, DXVA2_ProcAmp_Hue,
                                                         &Range );
     if (FAILED(hr))
         goto error;
     sys->Hue = Range.DefaultValue.Value;
 
     hr = IDirectXVideoProcessorService_GetProcAmpRange( processor, processorGUID, &dsc,
-                                                        dstDesc.Format, DXVA2_ProcAmp_Saturation,
+                                                        dsc.Format, DXVA2_ProcAmp_Saturation,
                                                         &Range );
     if (FAILED(hr))
         goto error;
