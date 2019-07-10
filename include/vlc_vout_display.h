@@ -213,7 +213,7 @@ typedef int (*vout_display_open_cb)(vout_display_t *vd,
  *
  * @param vd vout display context
  */
-typedef int (*vout_display_close_cb)(vout_display_t *vd);
+typedef void (*vout_display_close_cb)(vout_display_t *vd);
 
 struct vout_display_t {
     struct vlc_object_t obj;
