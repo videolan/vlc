@@ -1429,7 +1429,7 @@ vlc_player_GetLength(vlc_player_t *player);
  *
  * @note A started and playing media doesn't have necessarily a valid time.
  *
- * @see vlc_player_cbs.vlc_player_cbs.on_position_changed
+ * @see vlc_player_cbs.on_position_changed
  *
  * @param player locked player instance
  * @return a valid time or VLC_TICK_INVALID (if no media is set, the media
