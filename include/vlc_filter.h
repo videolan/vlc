@@ -29,6 +29,8 @@
 #include <vlc_picture.h>
 #include <vlc_codec.h>
 
+typedef struct vlc_video_context  vlc_video_context;
+
 /**
  * \defgroup filter Filters
  * \ingroup output
@@ -76,9 +78,11 @@ struct filter_t
 
     /* Input format */
     es_format_t         fmt_in;
+    vlc_video_context   *vctx_in;  // video filter, set by owner
 
     /* Output format of filter */
     es_format_t         fmt_out;
+    vlc_video_context   *vctx_out; // video filter, handled by the filter
     bool                b_allow_fmt_out_change;
 
     /* Name of the "video filter" shortcut that is requested, can be NULL */
