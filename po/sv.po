@@ -39,7 +39,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-06-12 07:16+0200\n"
+"PO-Revision-Date: 2019-08-02 15:30+0200\n"
 "Last-Translator: Anton Regnander <anton_r_3@hotmail.com>, 2019\n"
 "Language-Team: Swedish (https://www.transifex.com/yaron/teams/16553/sv/)\n"
 "Language: sv\n"
@@ -555,7 +555,7 @@ msgstr "Upprepa alla"
 #: include/vlc_intf_strings.h:80 modules/gui/macosx/VLCCoreInteraction.m:467
 #: modules/gui/macosx/VLCMainMenu.m:398
 msgid "Repeat One"
-msgstr "Repetera en gång"
+msgstr "Upprepa en gång"
 
 #: include/vlc_intf_strings.h:81 src/libvlc-module.c:1429
 #: modules/gui/macosx/VLCMainMenu.m:397
@@ -7161,6 +7161,8 @@ msgstr "Satellitintervallskod"
 #: modules/access/dtv/access.c:232
 msgid "Satellite range code as defined by manufacturer e.g. DISEqC switch code"
 msgstr ""
+"Satellitkodsintervall som definieras av tillverkaren, d.v.s. DISEqC-"
+"mottagarkod"
 
 #: modules/access/dtv/access.c:236
 msgid "Major channel"
@@ -9420,7 +9422,7 @@ msgstr "Utmatning för SRT-ström"
 
 #: modules/access_output/srt.c:446
 msgid "Password for stream encryption"
-msgstr ""
+msgstr "Lösenord för strömkryptering"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9685,7 +9687,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:54
 msgid "Headphones mode (binaural)"
-msgstr ""
+msgstr "Hörlursläge (binaural)"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
@@ -10556,7 +10558,7 @@ msgstr "Inaktiverad"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Aktiverad (endast AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
