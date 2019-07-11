@@ -587,7 +587,7 @@ void AbstractStream::fillExtraFMTInfo( es_format_t *p_fmt ) const
 AbstractDemuxer * AbstractStream::createDemux(const StreamFormat &format)
 {
     AbstractDemuxer *ret = newDemux( VLC_OBJECT(p_realdemux), format,
-                                     fakeEsOut()->getEsOut(), demuxersource );
+                                     (es_out_t *)fakeEsOut(), demuxersource );
     if(ret && !ret->create())
     {
         delete ret;

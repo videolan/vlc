@@ -34,7 +34,24 @@ namespace adaptive
     class CommandsQueue;
     class FakeESOutID;
 
-    class FakeESOut
+    class AbstractFakeEsOut
+    {
+        friend class EsOutCallbacks;
+        public:
+            AbstractFakeEsOut();
+            virtual ~AbstractFakeEsOut();
+            operator es_out_t*();
+
+        private:
+            void *esoutpriv;
+            virtual es_out_id_t *esOutAdd( const es_format_t * ) = 0;
+            virtual int esOutSend( es_out_id_t *, block_t * ) = 0;
+            virtual void esOutDel( es_out_id_t * ) = 0;
+            virtual int esOutControl( int, va_list ) = 0;
+            virtual void esOutDestroy() = 0;
+    };
+
+    class FakeESOut : public AbstractFakeEsOut
     {
         public:
             class LockedFakeEsOut
@@ -42,6 +59,7 @@ namespace adaptive
                 friend class FakeESOut;
                 public:
                     ~LockedFakeEsOut();
+                    operator es_out_t*();
                     FakeESOut & operator*();
                     FakeESOut * operator->();
                 private:
@@ -49,8 +67,7 @@ namespace adaptive
                     LockedFakeEsOut(FakeESOut &q);
             };
             FakeESOut( es_out_t *, CommandsQueue * );
-            ~FakeESOut();
-            es_out_t * getEsOut();
+            virtual ~FakeESOut();
             LockedFakeEsOut WithLock();
             CommandsQueue * commandsQueue();
             void setAssociatedTimestamp( mtime_t );
@@ -76,21 +93,18 @@ namespace adaptive
             void recycleAll(); /* Cancels all commands and send fakees for recycling */
             void gc();
 
-            /* static callbacks for demuxer */
-            static es_out_id_t *esOutAdd_Callback( es_out_t *, const es_format_t * );
-            static int esOutSend_Callback( es_out_t *, es_out_id_t *, block_t * );
-            static void esOutDel_Callback( es_out_t *, es_out_id_t * );
-            static int esOutControl_Callback( es_out_t *, int, va_list );
-            static void esOutDestroy_Callback( es_out_t * );
-
         private:
             friend class LockedFakeESOut;
             vlc_mutex_t lock;
+            virtual es_out_id_t *esOutAdd( const es_format_t * ); /* impl */
+            virtual int esOutSend( es_out_id_t *, block_t * ); /* impl */
+            virtual void esOutDel( es_out_id_t * ); /* impl */
+            virtual int esOutControl( int, va_list ); /* impl */
+            virtual void esOutDestroy(); /* impl */
             es_out_t *real_es_out;
             FakeESOutID * createNewID( const es_format_t * );
             ExtraFMTInfoInterface *extrainfo;
             CommandsQueue *commandsqueue;
-            es_out_t *fakeesout;
             struct
             {
                 mtime_t timestamp;

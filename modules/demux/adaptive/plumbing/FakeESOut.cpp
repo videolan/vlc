@@ -31,6 +31,78 @@
 
 using namespace adaptive;
 
+namespace adaptive
+{
+    class EsOutCallbacks
+    {
+        public:
+            /* static callbacks for demuxer */
+            static es_out_id_t *es_out_Add( es_out_t *, const es_format_t * );
+            static int es_out_Send( es_out_t *, es_out_id_t *, block_t * );
+            static void es_out_Del( es_out_t *, es_out_id_t * );
+            static int es_out_Control( es_out_t *, int, va_list );
+            static void es_out_Destroy( es_out_t * );
+            static const struct es_out_callbacks cbs;
+            struct Private
+            {
+                AbstractFakeEsOut *fake;
+                es_out_t es_out;
+            };
+    };
+}
+
+es_out_id_t * EsOutCallbacks::es_out_Add(es_out_t *fakees, const es_format_t *p_fmt)
+{
+    AbstractFakeEsOut *me = container_of(fakees, Private, es_out)->fake;
+    return me->esOutAdd(p_fmt);
+}
+
+int EsOutCallbacks::es_out_Send(es_out_t *fakees, es_out_id_t *p_es, block_t *p_block)
+{
+    AbstractFakeEsOut *me = container_of(fakees, Private, es_out)->fake;
+    return me->esOutSend(p_es, p_block);
+}
+
+void EsOutCallbacks::es_out_Del(es_out_t *fakees, es_out_id_t *p_es)
+{
+    AbstractFakeEsOut *me = container_of(fakees, Private, es_out)->fake;
+    me->esOutDel(p_es);
+}
+
+int EsOutCallbacks::es_out_Control(es_out_t *fakees, int i_query, va_list args)
+{
+    AbstractFakeEsOut *me = container_of(fakees, Private, es_out)->fake;
+    return me->esOutControl(i_query, args);
+}
+
+void EsOutCallbacks::es_out_Destroy(es_out_t *fakees)
+{
+    AbstractFakeEsOut *me = container_of(fakees, Private, es_out)->fake;
+    me->esOutDestroy();
+}
+
+AbstractFakeEsOut::AbstractFakeEsOut()
+{
+    EsOutCallbacks::Private *priv = new EsOutCallbacks::Private;
+    priv->fake = this;
+    priv->es_out.pf_add = EsOutCallbacks::es_out_Add;
+    priv->es_out.pf_send = EsOutCallbacks::es_out_Send,
+    priv->es_out.pf_del = EsOutCallbacks::es_out_Del,
+    priv->es_out.pf_control =  EsOutCallbacks::es_out_Control,
+    priv->es_out.pf_destroy = EsOutCallbacks::es_out_Destroy,
+    esoutpriv = priv;
+}
+
+AbstractFakeEsOut::~AbstractFakeEsOut()
+{
+    delete reinterpret_cast<EsOutCallbacks::Private *>(esoutpriv);
+}
+
+AbstractFakeEsOut::operator es_out_t *()
+{
+    return & reinterpret_cast<EsOutCallbacks::Private *>(esoutpriv)->es_out;
+}
+
 FakeESOut::LockedFakeEsOut::LockedFakeEsOut(FakeESOut &q)
 {
     p = &q;
@@ -40,6 +112,11 @@ FakeESOut::LockedFakeEsOut::LockedFakeEsOut(FakeESOut &q)
 FakeESOut::LockedFakeEsOut::~LockedFakeEsOut()
 {
     vlc_mutex_unlock(&p->lock);
+}
+
+FakeESOut::LockedFakeEsOut::operator es_out_t*()
+{
+    return (es_out_t *) *p;
 }
 
 FakeESOut & FakeESOut::LockedFakeEsOut::operator *()
@@ -53,18 +130,12 @@ FakeESOut * FakeESOut::LockedFakeEsOut::operator ->()
 }
 
 FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
-    : real_es_out( es )
+    : AbstractFakeEsOut()
+    , real_es_out( es )
     , extrainfo( NULL )
     , commandsqueue( queue )
-    , fakeesout( new es_out_t )
     , timestamps_offset( 0 )
 {
-    fakeesout->pf_add = esOutAdd_Callback;
-    fakeesout->pf_control = esOutControl_Callback;
-    fakeesout->pf_del = esOutDel_Callback;
-    fakeesout->pf_destroy = esOutDestroy_Callback;
-    fakeesout->pf_send = esOutSend_Callback;
-    fakeesout->p_sys = (es_out_sys_t*) this;
     associated.b_timestamp_set = false;
     expected.b_timestamp_set = false;
     timestamp_first = 0;
@@ -83,17 +154,11 @@ CommandsQueue * FakeESOut::commandsQueue()
     return commandsqueue;
 }
 
-es_out_t * FakeESOut::getEsOut()
-{
-    return fakeesout;
-}
-
 FakeESOut::~FakeESOut()
 {
     recycleAll();
     gc();
 
-    delete fakeesout;
     delete commandsqueue;
     vlc_mutex_destroy(&lock);
 }
@@ -388,25 +453,24 @@ void FakeESOut::declareEs(const es_format_t *fmt)
 
 /* Static callbacks */
 /* Always pass Fake ES ID to slave demuxes, it is just an opaque struct to them */
-es_out_id_t * FakeESOut::esOutAdd_Callback(es_out_t *fakees, const es_format_t *p_fmt)
+es_out_id_t * FakeESOut::esOutAdd(const es_format_t *p_fmt)
 {
-    FakeESOut *me = (FakeESOut *) fakees->p_sys;
-    vlc_mutex_locker locker(&me->lock);
+    vlc_mutex_locker locker(&lock);
 
     if( p_fmt->i_cat != VIDEO_ES && p_fmt->i_cat != AUDIO_ES && p_fmt->i_cat != SPU_ES )
         return NULL;
 
     /* Feed the slave demux/stream_Demux with FakeESOutID struct,
      * we'll create real ES later on main demux on execution */
-    FakeESOutID *es_id = me->createNewID( p_fmt );
+    FakeESOutID *es_id = createNewID( p_fmt );
     if( likely(es_id) )
     {
         assert(!es_id->scheduledForDeletion());
-        AbstractCommand *command = me->commandsqueue->factory()->createEsOutAddCommand( es_id );
+        AbstractCommand *command = commandsqueue->factory()->createEsOutAddCommand( es_id );
         if( likely(command) )
         {
-            me->fakeesidlist.push_back(es_id);
-            me->commandsqueue->Schedule( command );
+            fakeesidlist.push_back(es_id);
+            commandsqueue->Schedule( command );
             return reinterpret_cast<es_out_id_t *>(es_id);
         }
         else
@@ -417,44 +481,41 @@ es_out_id_t * FakeESOut::esOutAdd_Callback(es_out_t *fakees, const es_format_t *
     return NULL;
 }
 
-int FakeESOut::esOutSend_Callback(es_out_t *fakees, es_out_id_t *p_es, block_t *p_block)
+int FakeESOut::esOutSend(es_out_id_t *p_es, block_t *p_block)
 {
-    FakeESOut *me = (FakeESOut *) fakees->p_sys;
-    vlc_mutex_locker locker(&me->lock);
+    vlc_mutex_locker locker(&lock);
 
     FakeESOutID *es_id = reinterpret_cast<FakeESOutID *>( p_es );
     assert(!es_id->scheduledForDeletion());
 
-    p_block->i_dts = me->fixTimestamp( p_block->i_dts );
-    p_block->i_pts = me->fixTimestamp( p_block->i_pts );
+    p_block->i_dts = fixTimestamp( p_block->i_dts );
+    p_block->i_pts = fixTimestamp( p_block->i_pts );
 
-    AbstractCommand *command = me->commandsqueue->factory()->createEsOutSendCommand( es_id, p_block );
+    AbstractCommand *command = commandsqueue->factory()->createEsOutSendCommand( es_id, p_block );
     if( likely(command) )
     {
-        me->commandsqueue->Schedule( command );
+        commandsqueue->Schedule( command );
         return VLC_SUCCESS;
     }
     return VLC_EGENERIC;
 }
 
-void FakeESOut::esOutDel_Callback(es_out_t *fakees, es_out_id_t *p_es)
+void FakeESOut::esOutDel(es_out_id_t *p_es)
 {
-    FakeESOut *me = (FakeESOut *) fakees->p_sys;
-    vlc_mutex_locker locker(&me->lock);
+    vlc_mutex_locker locker(&lock);
 
     FakeESOutID *es_id = reinterpret_cast<FakeESOutID *>( p_es );
-    AbstractCommand *command = me->commandsqueue->factory()->createEsOutDelCommand( es_id );
+    AbstractCommand *command = commandsqueue->factory()->createEsOutDelCommand( es_id );
     if( likely(command) )
     {
         es_id->setScheduledForDeletion();
-        me->commandsqueue->Schedule( command );
+        commandsqueue->Schedule( command );
     }
 }
 
-int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args)
+int FakeESOut::esOutControl(int i_query, va_list args)
 {
-    FakeESOut *me = (FakeESOut *) fakees->p_sys;
-    vlc_mutex_locker locker(&me->lock);
+    vlc_mutex_locker locker(&lock);
 
     switch( i_query )
     {
@@ -467,11 +528,11 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
             else
                 i_group = 0;
             mtime_t  pcr = va_arg( args, mtime_t );
-            pcr = me->fixTimestamp( pcr );
-            AbstractCommand *command = me->commandsqueue->factory()->createEsOutControlPCRCommand( i_group, pcr );
+            pcr = fixTimestamp( pcr );
+            AbstractCommand *command = commandsqueue->factory()->createEsOutControlPCRCommand( i_group, pcr );
             if( likely(command) )
             {
-                me->commandsqueue->Schedule( command );
+                commandsqueue->Schedule( command );
                 return VLC_SUCCESS;
             }
         }
@@ -481,10 +542,10 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
         {
             static_cast<void>(va_arg( args, int )); /* ignore group */
             const vlc_meta_t *p_meta = va_arg( args, const vlc_meta_t * );
-            AbstractCommand *command = me->commandsqueue->factory()->createEsOutMetaCommand( -1, p_meta );
+            AbstractCommand *command = commandsqueue->factory()->createEsOutMetaCommand( -1, p_meta );
             if( likely(command) )
             {
-                me->commandsqueue->Schedule( command );
+                commandsqueue->Schedule( command );
                 return VLC_SUCCESS;
             }
         }
@@ -508,13 +569,12 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
     return VLC_EGENERIC;
 }
 
-void FakeESOut::esOutDestroy_Callback(es_out_t *fakees)
+void FakeESOut::esOutDestroy()
 {
-    FakeESOut *me = (FakeESOut *) fakees->p_sys;
-    vlc_mutex_locker locker(&me->lock);
+    vlc_mutex_locker locker(&lock);
 
-    AbstractCommand *command = me->commandsqueue->factory()->createEsOutDestroyCommand();
+    AbstractCommand *command = commandsqueue->factory()->createEsOutDestroyCommand();
     if( likely(command) )
-        me->commandsqueue->Schedule( command );
+        commandsqueue->Schedule( command );
 }
 /* !Static callbacks */
