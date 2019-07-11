@@ -94,6 +94,7 @@ typedef struct
 typedef struct
 {
     ID3D11DeviceContext *device;
+    DXGI_FORMAT         format;
 } d3d11_video_context_t;
 
 /* index to use for texture/resource that use a known DXGI format

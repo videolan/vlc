@@ -305,10 +305,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     }
     sys->hw.video_context = d3dvidctx;
 
-    d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
-    priv->device = sys->d3d_dev.d3dcontext;
-    ID3D11DeviceContext_Release(priv->device);
-
     struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
         DxDestroySurfaces,
@@ -347,6 +343,11 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         }
         IDXGIAdapter_Release(p_adapter);
     }
+
+    d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
+    priv->format = sys->render;
+    priv->device = sys->d3d_dev.d3dcontext;
+    ID3D11DeviceContext_Release(priv->device);
 
     va->ops = &ops;
     *vtcx_out = sys->vctx;
