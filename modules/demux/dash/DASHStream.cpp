@@ -35,7 +35,7 @@ block_t * DASHStream::checkBlock(block_t *p_block, bool)
     return p_block;
 }
 
-AbstractDemuxer *DASHStream::newDemux(demux_t *p_realdemux, const StreamFormat &format,
+AbstractDemuxer *DASHStream::newDemux(vlc_object_t *p_obj, const StreamFormat &format,
                                       es_out_t *out, AbstractSourceStream *source) const
 {
     AbstractDemuxer *ret = NULL;
@@ -43,19 +43,19 @@ AbstractDemuxer *DASHStream::newDemux(demux_t *p_realdemux, const StreamFormat &
     {
         case StreamFormat::MP4:
         case StreamFormat::MPEG2TS:
-            ret = AbstractStream::newDemux(p_realdemux, format, out, source);
+            ret = AbstractStream::newDemux(p_obj, format, out, source);
             break;
 
         case StreamFormat::WEBM:
-            ret = new Demuxer(p_realdemux, "mkv", out, source);
+            ret = new Demuxer(p_obj, "mkv", out, source);
             break;
 
         case StreamFormat::WEBVTT:
-            ret = new SlaveDemuxer(p_realdemux, "webvtt", out, source);
+            ret = new SlaveDemuxer(p_obj, "webvtt", out, source);
             break;
 
         case StreamFormat::TTML:
-            ret = new SlaveDemuxer(p_realdemux, "ttml", out, source);
+            ret = new SlaveDemuxer(p_obj, "ttml", out, source);
             break;
 
         default:

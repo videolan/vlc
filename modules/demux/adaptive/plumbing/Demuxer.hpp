@@ -55,7 +55,7 @@ namespace adaptive
     class MimeDemuxer : public AbstractDemuxer
     {
         public:
-            MimeDemuxer(demux_t *, const DemuxerFactoryInterface *,
+            MimeDemuxer(vlc_object_t *, const DemuxerFactoryInterface *,
                         es_out_t *, AbstractSourceStream *);
             virtual ~MimeDemuxer();
             virtual int demux(vlc_tick_t); /* impl */
@@ -65,7 +65,7 @@ namespace adaptive
 
         protected:
             AbstractSourceStream *sourcestream;
-            demux_t *p_realdemux;
+            vlc_object_t *p_obj;
             AbstractDemuxer *demuxer;
             const DemuxerFactoryInterface *factory;
             es_out_t *p_es_out;
@@ -74,7 +74,7 @@ namespace adaptive
     class Demuxer : public AbstractDemuxer
     {
         public:
-            Demuxer(demux_t *, const std::string &, es_out_t *, AbstractSourceStream *);
+            Demuxer(vlc_object_t *, const std::string &, es_out_t *, AbstractSourceStream *);
             virtual ~Demuxer();
             virtual int demux(vlc_tick_t); /* impl */
             virtual void drain(); /* impl */
@@ -83,7 +83,7 @@ namespace adaptive
 
         protected:
             AbstractSourceStream *sourcestream;
-            demux_t *p_realdemux;
+            vlc_object_t *p_obj;
             demux_t *p_demux;
             std::string name;
             es_out_t *p_es_out;
@@ -93,7 +93,7 @@ namespace adaptive
     class SlaveDemuxer : public Demuxer
     {
         public:
-            SlaveDemuxer(demux_t *, const std::string &, es_out_t *, AbstractSourceStream *);
+            SlaveDemuxer(vlc_object_t *, const std::string &, es_out_t *, AbstractSourceStream *);
             virtual ~SlaveDemuxer();
             virtual bool create(); /* reimpl */
             virtual int demux(vlc_tick_t); /* reimpl */
@@ -105,7 +105,7 @@ namespace adaptive
     class DemuxerFactoryInterface
     {
         public:
-            virtual AbstractDemuxer * newDemux(demux_t *, const StreamFormat &,
+            virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
                                                es_out_t *, AbstractSourceStream *) const = 0;
     };
 }
