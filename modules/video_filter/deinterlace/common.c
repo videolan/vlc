@@ -92,7 +92,7 @@ vlc_tick_t GetFieldDuration(const struct deinterlace_ctx *p_context,
         /* One field took this long. */
         i_field_dur = (p_pic->date - p_context->meta[i].pi_date) / i_fields_total;
     }
-    else if (fmt->i_frame_rate_base)
+    else if (fmt->i_frame_rate)
         i_field_dur = vlc_tick_from_samples( fmt->i_frame_rate_base, fmt->i_frame_rate);
 
     /* Note that we default to field duration 0 if it could not be
