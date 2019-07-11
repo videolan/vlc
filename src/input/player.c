@@ -1802,7 +1802,7 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
 
     if (ev->fmt->i_cat == SPU_ES && ev->fmt->i_codec == VLC_CODEC_TELETEXT
      && (ev->fmt->subs.teletext.i_magazine == 1
-      || ev->fmt->subs.teletext.i_magazine == -1))
+      || ev->fmt->subs.teletext.i_magazine > 8))
     {
         vlc_player_input_HandleTeletextMenu(input, ev);
         return;

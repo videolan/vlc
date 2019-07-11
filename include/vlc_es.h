@@ -573,8 +573,8 @@ struct subs_format_t
     } dvb;
     struct
     {
-        int i_magazine;
-        int i_page;
+        uint8_t i_magazine; /* magazine value (3 bits), > 8 for any */
+        uint8_t i_page;     /* BCD packet address value (4+4 bits) */
     } teletext;
     struct
     {

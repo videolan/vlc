@@ -856,7 +856,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_stream_t *p_pes,
 
     if( !p_sys->b_split_es || i_page <= 0 )
     {
-        p_fmt->subs.teletext.i_magazine = -1;
+        p_fmt->subs.teletext.i_magazine = 255;
         p_fmt->subs.teletext.i_page = 0;
         p_fmt->psz_description = strdup( vlc_gettext(ppsz_teletext_type[1]) );
 

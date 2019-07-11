@@ -253,7 +253,7 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_dec, "vbi-page", RequestPage, p_sys );
 
     /* Check if the Teletext track has a known "initial page". */
-    if( p_sys->i_wanted_page == 100 && p_dec->fmt_in.subs.teletext.i_magazine != -1 )
+    if( p_sys->i_wanted_page == 100 && p_dec->fmt_in.subs.teletext.i_magazine < 9 )
     {
         p_sys->i_wanted_page = 100 * p_dec->fmt_in.subs.teletext.i_magazine +
                                vbi_bcd2dec( p_dec->fmt_in.subs.teletext.i_page );

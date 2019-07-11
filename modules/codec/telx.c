@@ -189,7 +189,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->pi_active_national_set[i] = ppi_national_subsets[1];
 
     i_val = var_CreateGetInteger( p_dec, "telx-override-page" );
-    if( i_val == -1 && p_dec->fmt_in.subs.teletext.i_magazine != -1 &&
+    if( i_val == -1 && p_dec->fmt_in.subs.teletext.i_magazine < 9 &&
         ( p_dec->fmt_in.subs.teletext.i_magazine != 1 ||
           p_dec->fmt_in.subs.teletext.i_page != 0 ) ) /* ignore if TS demux wants page 100 (unlikely to be sub) */
     {
