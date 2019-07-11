@@ -105,7 +105,7 @@ namespace adaptive
         void setDisabled(bool);
         virtual block_t *checkBlock(block_t *, bool) = 0;
         AbstractDemuxer * createDemux(const StreamFormat &);
-        virtual AbstractDemuxer * newDemux(demux_t *, const StreamFormat &,
+        virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
                                            es_out_t *, AbstractSourceStream *) const; /* impl */
         virtual bool startDemux();
         virtual bool restartDemux();

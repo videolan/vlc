@@ -34,7 +34,7 @@ namespace hls
 
         protected:
             virtual block_t *checkBlock(block_t *, bool); /* reimpl */
-            virtual AbstractDemuxer * newDemux(demux_t *, const StreamFormat &,
+            virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
                                                es_out_t *, AbstractSourceStream *) const; /* reimpl */
             virtual bool setPosition(mtime_t, bool);
 
@@ -51,7 +51,7 @@ namespace hls
     class HLSStreamFactory : public AbstractStreamFactory
     {
         public:
-            virtual AbstractStream *create(demux_t*, const StreamFormat &,
+            virtual AbstractStream *create(demux_t *, const StreamFormat &,
                                    SegmentTracker *, AbstractConnectionManager *) const;
     };
 

@@ -31,12 +31,12 @@ SmoothStream::SmoothStream(demux_t *demux)
 {
 }
 
-AbstractDemuxer *SmoothStream::newDemux(demux_t *p_realdemux, const StreamFormat &format,
+AbstractDemuxer *SmoothStream::newDemux(vlc_object_t *p_obj, const StreamFormat &format,
                                         es_out_t *out, AbstractSourceStream *source) const
 {
     if((unsigned)format != StreamFormat::MP4)
         return NULL;
-    return AbstractStream::newDemux(p_realdemux, format, out, source);
+    return AbstractStream::newDemux(p_obj, format, out, source);
 }
 
 block_t * SmoothStream::checkBlock(block_t *p_block, bool)

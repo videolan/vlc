@@ -586,7 +586,7 @@ void AbstractStream::fillExtraFMTInfo( es_format_t *p_fmt ) const
 
 AbstractDemuxer * AbstractStream::createDemux(const StreamFormat &format)
 {
-    AbstractDemuxer *ret = newDemux( p_realdemux, format,
+    AbstractDemuxer *ret = newDemux( VLC_OBJECT(p_realdemux), format,
                                      fakeEsOut()->getEsOut(), demuxersource );
     if(ret && !ret->create())
     {
@@ -598,18 +598,18 @@ AbstractDemuxer * AbstractStream::createDemux(const StreamFormat &format)
     return ret;
 }
 
-AbstractDemuxer *AbstractStream::newDemux(demux_t *p_realdemux, const StreamFormat &format,
+AbstractDemuxer *AbstractStream::newDemux(vlc_object_t *p_obj, const StreamFormat &format,
                                           es_out_t *out, AbstractSourceStream *source) const
 {
     AbstractDemuxer *ret = NULL;
     switch((unsigned)format)
     {
         case StreamFormat::MP4:
-            ret = new Demuxer(p_realdemux, "mp4", out, source);
+            ret = new Demuxer(p_obj, "mp4", out, source);
             break;
 
         case StreamFormat::MPEG2TS:
-            ret = new Demuxer(p_realdemux, "ts", out, source);
+            ret = new Demuxer(p_obj, "ts", out, source);
             break;
 
         default:
