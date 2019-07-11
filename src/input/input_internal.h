@@ -324,16 +324,6 @@ void input_SetTime( input_thread_t *, vlc_tick_t i_time, bool b_fast );
 void input_SetPosition( input_thread_t *, float f_position, bool b_fast );
 
 /**
- * Set the delay of an ES category
- *
- * If called before input_Start(), the delay will be applied for next ES
- * tracks. If called after input_Start(), the delay will be applied for all
- * tracks of the category (and all future tracks).
- */
-void input_SetCategoryDelay(input_thread_t *input, enum es_format_category_e cat,
-                            vlc_tick_t delay);
-
-/**
  * Set the delay of an ES identifier
  */
 void input_SetEsIdDelay(input_thread_t *input, vlc_es_id_t *es_id,
@@ -407,6 +397,16 @@ typedef union
         bool b_fast_seek;
         float f_val;
     } pos;
+    struct
+    {
+        enum es_format_category_e cat;
+        vlc_tick_t delay;
+    } cat_delay;
+    struct
+    {
+        vlc_es_id_t *id;
+        vlc_tick_t delay;
+    } es_delay;
     struct {
         vlc_es_id_t *id;
         unsigned page;
@@ -551,6 +551,9 @@ enum input_control_e
     INPUT_CONTROL_SET_VIEWPOINT,    // new absolute viewpoint
     INPUT_CONTROL_SET_INITIAL_VIEWPOINT, // set initial viewpoint (generally from video)
     INPUT_CONTROL_UPDATE_VIEWPOINT, // update viewpoint relative to current
+
+    INPUT_CONTROL_SET_CATEGORY_DELAY,
+    INPUT_CONTROL_SET_ES_DELAY,
 
     INPUT_CONTROL_ADD_SLAVE,
     INPUT_CONTROL_SET_SUBS_FPS,

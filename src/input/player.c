@@ -708,7 +708,11 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
         input->cat_delays[i] = cat_delays[i];
         if (cat_delays[i] != 0)
         {
-            input_SetCategoryDelay(input->thread, i, cat_delays[i]);
+            const input_control_param_t param = {
+                .cat_delay = { i, cat_delays[i] }
+            };
+            input_ControlPush(input->thread, INPUT_CONTROL_SET_CATEGORY_DELAY,
+                              &param);
             vlc_player_SendEvent(player, on_category_delay_changed, i,
                                  cat_delays[i]);
         }
@@ -3025,7 +3029,8 @@ vlc_player_SetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat,
         delay = *cat_delay;
     }
 
-    input_SetCategoryDelay(input->thread, cat, delay);
+    const input_control_param_t param = { .cat_delay = { cat, delay } };
+    input_ControlPush(input->thread, INPUT_CONTROL_SET_CATEGORY_DELAY, &param);
     vlc_player_vout_OSDMessage(player, _("%s delay: %i ms"),
                                es_format_category_to_string(cat),
                                (int)MS_FROM_VLC_TICK(delay));
@@ -3071,7 +3076,8 @@ vlc_player_SetEsIdDelay(vlc_player_t *player, vlc_es_id_t *es_id,
         delay = trackpriv->delay;
     }
 
-    input_SetEsIdDelay(input->thread, es_id, delay);
+    const input_control_param_t param = { .es_delay = { es_id, delay } };
+    input_ControlPush(input->thread, INPUT_CONTROL_SET_ES_DELAY, &param);
     if (delay != INT64_MAX)
         vlc_player_vout_OSDMessage(player, _("%s delay: %i ms"),
                                    trackpriv->t.name,

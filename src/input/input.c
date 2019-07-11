@@ -237,21 +237,6 @@ void input_SetPosition( input_thread_t *p_input, float f_position, bool b_fast )
     input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION, &param );
 }
 
-void input_SetCategoryDelay(input_thread_t *input, enum es_format_category_e cat,
-                            vlc_tick_t delay)
-{
-    assert(cat == AUDIO_ES || cat == SPU_ES);
-    es_out_SetDelay(input_priv(input)->p_es_out_display, cat, delay);
-}
-
-void input_SetEsIdDelay(input_thread_t *input, vlc_es_id_t *es_id,
-                        vlc_tick_t delay)
-{
-    assert(es_id);
-    es_out_SetEsDelay(input_priv(input)->p_es_out_display,
-                      vlc_es_id_get_out(es_id), delay);
-}
-
 /**
  * Get the item from an input thread
  * FIXME it does not increase ref count of the item.
@@ -2088,6 +2073,19 @@ static bool Control( input_thread_t *p_input,
             }
 
             ViewpointApply( p_input );
+            break;
+
+        case INPUT_CONTROL_SET_CATEGORY_DELAY:
+            assert(param.cat_delay.cat == AUDIO_ES
+                || param.cat_delay.cat == SPU_ES);
+            es_out_SetDelay(priv->p_es_out_display,
+                            param.cat_delay.cat, param.cat_delay.delay);
+            break;
+        case INPUT_CONTROL_SET_ES_DELAY:
+            assert(param.es_delay.id);
+            es_out_SetEsDelay(priv->p_es_out_display,
+                              vlc_es_id_get_out(param.es_delay.id),
+                              param.es_delay.delay);
             break;
 
         case INPUT_CONTROL_SET_TITLE:
