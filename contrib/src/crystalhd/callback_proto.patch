@@ -1,0 +1,29 @@
+--- libcrystalhd/bc_dts_defs.h.orig	2019-07-12 07:02:21.393012000 +0200
++++ libcrystalhd/bc_dts_defs.h	2019-07-12 07:01:48.787781100 +0200
+@@ -439,6 +439,8 @@ enum DECODER_CAP_FLAGS
+ 	BC_DEC_FLAGS_M4P2		= 0x08,	//MPEG-4 Part 2: Divx, Xvid etc.
+ };
+ 
++typedef struct _BC_DTS_PROC_OUT BC_DTS_PROC_OUT;
++
+ #if defined(__KERNEL__) || defined(__LINUX_USER__)
+ typedef BC_STATUS (*dts_pout_callback)(void  *shnd, U32	width,U32 height, U32 stride, void *pOut);
+ #else
+@@ -449,7 +451,7 @@ typedef BC_STATUS (*dts_pout_callback)(v
+ //User Data
+ #define MAX_UD_SIZE		1792	//1920 - 128
+ 
+-typedef struct _BC_DTS_PROC_OUT{
++struct _BC_DTS_PROC_OUT{
+ 	U8		*Ybuff;			/* Caller Supplied buffer for Y data */
+ 	U32		YbuffSz;		/* Caller Supplied Y buffer size */
+ 	U32		YBuffDoneSz;	/* Transferred Y datasize */
+@@ -478,7 +480,7 @@ typedef struct _BC_DTS_PROC_OUT{
+ 	U8		bRevertScramble;
+ 	U32		StrideSzUV;		/* Caller supplied Stride Size for UV data */
+ 
+-}BC_DTS_PROC_OUT;
++};
+ 
+ typedef struct _BC_DTS_STATUS {
+ 	U8	ReadyListCount;             /* Number of frames in ready list (reported by driver) */
