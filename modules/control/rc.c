@@ -278,6 +278,7 @@ static void Help( intf_thread_t *p_intf)
     msg_rc("%s", _("| vcrop [X]  . . . . . . . . . . .  set/get video crop"));
     msg_rc("%s", _("| vzoom [X]  . . . . . . . . . . .  set/get video zoom"));
     msg_rc("%s", _("| snapshot . . . . . . . . . . . . take video snapshot"));
+    msg_rc("%s", _("| record [on|off] . . . . . . . . . . toggle recording"));
     msg_rc("%s", _("| strack [X] . . . . . . . . .  set/get subtitle track"));
     msg_rc("%s", _("| key [hotkey name] . . . . . .  simulate hotkey press"));
     msg_rc(  "| ");
@@ -566,6 +567,25 @@ static void Input(intf_thread_t *intf, char const *psz_cmd,
                           i, track->name, track == cur_track ? " *" : "");
             }
             msg_print(intf, "+----[ end of %s ]", name);
+        }
+    }
+    else if( !strcmp( psz_cmd, "record" ) )
+    {
+        bool b_update = true;
+        bool b_value = vlc_player_IsRecording(player);
+
+        if( newval.psz_string[0] != '\0' )
+        {
+            if ( ( !strncmp( newval.psz_string, "on", 2 )  &&  b_value ) ||
+                 ( !strncmp( newval.psz_string, "off", 3 ) && !b_value ) )
+            {
+                b_update = false;
+            }
+        }
+        if( b_update )
+        {
+            b_value = !b_value;
+            vlc_player_SetRecordingEnabled( player, b_value );
         }
     }
 out:
@@ -1302,6 +1322,7 @@ static const struct
     { "atrack", Input },
     { "vtrack", Input },
     { "strack", Input },
+    { "record", Input },
 
     /* video commands */
     { "vratio", VideoConfig },
