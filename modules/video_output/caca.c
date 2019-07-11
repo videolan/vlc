@@ -357,6 +357,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 {
     vout_display_sys_t *sys;
 
+    (void) context;
+
     if (vout_display_cfg_IsWindowed(cfg))
         return VLC_EGENERIC;
 #if !defined(__APPLE__) && !defined(_WIN32)
