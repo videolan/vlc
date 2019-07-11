@@ -513,7 +513,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_SET_POSITION:
         if ( p_sys->p_fp &&
-             ! ( p_sys->p_fp->i_flags & ASF_FILE_PROPERTIES_SEEKABLE ) )
+             ! ( p_sys->p_fp->i_flags & ASF_FILE_PROPERTIES_SEEKABLE ) && !p_sys->b_index )
             return VLC_EGENERIC;
 
         SeekPrepare( p_demux );
@@ -537,7 +537,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_CAN_SEEK:
         if ( p_sys->p_fp &&
-             ! ( p_sys->p_fp->i_flags & ASF_FILE_PROPERTIES_SEEKABLE ) )
+             ! ( p_sys->p_fp->i_flags & ASF_FILE_PROPERTIES_SEEKABLE ) && !p_sys->b_index )
         {
             bool *pb_bool = va_arg( args, bool * );
             *pb_bool = false;
