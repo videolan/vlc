@@ -109,8 +109,6 @@
         <file alias="noart_album.svg">pixmaps/noart_album.svg</file>
         <file alias="noart_artist.svg">pixmaps/noart_artist.svg</file>
         <file alias="noart_artist_small.svg">pixmaps/noart_artist_small.svg</file>
-        <file>qml/utils/SearchBox.qml</file>
-        <file>qml/utils/SortControl.qml</file>
     </qresource>
     <qresource prefix="/prefsmenu">
         <file alias="cone_audio_64.png">pixmaps/prefs/spref_cone_Audio_64.png</file>
