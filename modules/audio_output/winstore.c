@@ -207,7 +207,7 @@ static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
     return S_OK;
 }
 
-static int aout_stream_Start(void *func, va_list ap)
+static int aout_stream_Start(void *func, bool forced, va_list ap)
 {
     aout_stream_start_t start = func;
     aout_stream_t *s = va_arg(ap, aout_stream_t *);
