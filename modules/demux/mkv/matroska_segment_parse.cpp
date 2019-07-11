@@ -1860,8 +1860,10 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                 if( p_wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE &&
                     p_tk->i_extra_data >= sizeof(WAVEFORMATEXTENSIBLE) )
                 {
-                    WAVEFORMATEXTENSIBLE * p_wext = (WAVEFORMATEXTENSIBLE*) p_wf;
-                    sf_tag_to_fourcc( &p_wext->SubFormat,  &p_tk->fmt.i_codec, NULL);
+                    WAVEFORMATEXTENSIBLE *p_wext = (WAVEFORMATEXTENSIBLE*)p_wf;
+                    GUID subFormat = p_wext->SubFormat;
+
+                    sf_tag_to_fourcc( &subFormat,  &p_tk->fmt.i_codec, NULL);
                     /* FIXME should we use Samples */
 
                     if( p_tk->fmt.audio.i_channels > 2 &&
