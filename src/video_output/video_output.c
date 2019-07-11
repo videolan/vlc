@@ -210,7 +210,7 @@ static void vout_UpdateWindowSizeLocked(vout_thread_t *vout)
         vlc_mutex_unlock(&sys->display_lock);
 
         msg_Dbg(vout, "requested window size: %ux%u", width, height);
-        vout_window_SetSize(vout->p->display_cfg.window, width, height);
+        vout_window_SetSize(sys->display_cfg.window, width, height);
     } else
         vlc_mutex_unlock(&sys->display_lock);
 }
@@ -401,7 +401,8 @@ void vout_ChangeWindowed(vout_thread_t *vout)
 {
     assert(!vout->p->dummy);
     vlc_mutex_lock(&vout->p->window_lock);
-    vout_window_UnsetFullScreen(vout->p->display_cfg.window);
+    vout_thread_sys_t *sys = vout->p;
+    vout_window_UnsetFullScreen(sys->display_cfg.window);
     /* Attempt to reset the intended window size */
     vout_UpdateWindowSizeLocked(vout);
     vlc_mutex_unlock(&vout->p->window_lock);
