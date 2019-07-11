@@ -295,12 +295,11 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
                 D3D11_ReleaseDevice(&sys->d3d_dev);
                 vlc_video_context_Release( sys->vctx );
                 sys->vctx = NULL;
-            } else {
-                sys->hw.video_context = d3dvidctx;
-                d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
-                priv->device = sys->d3d_dev.d3dcontext;
-                ID3D11DeviceContext_Release(priv->device);
+                /* TODO we can try all adapters to see if there's one that can decode */
+                goto error;
             }
+
+            sys->hw.video_context = d3dvidctx;
         }
     }
 
@@ -310,6 +309,10 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         err = VLC_EGENERIC;
         goto error;
     }
+
+    d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
+    priv->device = sys->d3d_dev.d3dcontext;
+    ID3D11DeviceContext_Release(priv->device);
 
     struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
