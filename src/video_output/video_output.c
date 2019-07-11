@@ -629,10 +629,10 @@ void vout_ChangeViewpoint(vout_thread_t *vout,
 }
 
 /* */
-static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg)
+static void VoutGetDisplayCfg(vout_thread_t *vout, const video_format_t *fmt, vout_display_cfg_t *cfg)
 {
     /* Load configuration */
-    cfg->viewpoint = vout->p->original.pose;
+    cfg->viewpoint = fmt->pose;
 
     const int display_width = var_GetInteger(vout, "width");
     const int display_height = var_GetInteger(vout, "height");
@@ -1912,7 +1912,7 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
 #endif
         };
 
-        VoutGetDisplayCfg(vout, &sys->display_cfg);
+        VoutGetDisplayCfg(vout, &original, &sys->display_cfg);
         vout_SizeWindow(vout, &wcfg.width, &wcfg.height);
 
         if (vout_window_Enable(sys->display_cfg.window, &wcfg)) {
