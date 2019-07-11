@@ -66,6 +66,7 @@ static int Enable(struct vout_window_t *wnd, const vout_window_cfg_t *wcfg)
         /* bypass the size handling as the window doesn't handle the size */
         sys->setResizeCb( sys->opaque, WindowResize, wnd );
 
+    (void) wcfg;
     return VLC_SUCCESS;
 }
 
