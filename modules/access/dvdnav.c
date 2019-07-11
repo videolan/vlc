@@ -140,6 +140,11 @@ typedef struct
     /* palette for menus */
     uint32_t clut[16];
     bool b_spu_change;
+    struct
+    {
+        bool b_pending;
+        bool b_from_user;
+    } highlight;
 
     /* Aspect ration */
     struct {
@@ -207,6 +212,7 @@ static int CommonOpen( vlc_object_t *p_this,
     p_sys->i_mux_rate = 0;
     p_sys->i_pgc_length = 0;
     p_sys->b_spu_change = false;
+    p_sys->highlight.b_pending = false;
     p_sys->i_vobu_index = 0;
     p_sys->i_vobu_flush = 0;
     p_sys->b_readahead = b_readahead;
@@ -512,6 +518,15 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
+
+/*****************************************************************************
+ * Reset variables on Random Access:
+ *****************************************************************************/
+static void RandomAccessCleanup(demux_sys_t *p_sys)
+{
+    p_sys->highlight.b_pending = false;
+}
+
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -548,6 +563,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     return VLC_SUCCESS;
                 }
+                RandomAccessCleanup( p_sys );
                 break;
 
             case DEMUX_GET_TIME:
@@ -616,6 +632,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
             p_sys->cur_title = i;
             p_sys->cur_seekpoint = 0;
+            RandomAccessCleanup( p_sys );
             return VLC_SUCCESS;
 
         case DEMUX_SET_SEEKPOINT:
@@ -644,6 +661,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
             p_sys->cur_seekpoint = i;
+            RandomAccessCleanup( p_sys );
             return VLC_SUCCESS;
 
         case DEMUX_TEST_AND_CLEAR_FLAGS:
@@ -798,6 +816,11 @@ static int Demux( demux_t *p_demux )
         return -1;
     }
 
+    vlc_mutex_lock( &p_sys->event_lock );
+    if(p_sys->highlight.b_pending)
+        ButtonUpdate(p_demux, p_sys->highlight.b_from_user);
+    vlc_mutex_unlock( &p_sys->event_lock );
+
     switch( i_event )
     {
     case DVDNAV_BLOCK_OK:   /* mpeg block */
@@ -934,6 +957,7 @@ static int Demux( demux_t *p_demux )
                     {
                         vlc_mutex_lock( &p_sys->event_lock );
                         p_sys->spu_es = NULL;
+                        p_sys->highlight.b_pending = false;
                         vlc_mutex_unlock( &p_sys->event_lock );
                     }
                     es_out_Del( p_demux->out, tk->es );
@@ -1232,6 +1256,10 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int32_t i_title, i_part;
+    int i_ret;
+
+    p_sys->highlight.b_pending = true;
+    p_sys->highlight.b_from_user = b_mode;
 
     if( !p_sys->spu_es )
         return;
@@ -1281,18 +1309,21 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
             spu_hl.palette.palette[i][3] = i_alpha;
         }
 
-        es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT, p_sys->spu_es,
-                        &spu_hl );
-
-        msg_Dbg( p_demux, "buttonUpdate %d", i_button );
+        i_ret = es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT,
+                                p_sys->spu_es, &spu_hl );
     }
     else
     {
-        msg_Dbg( p_demux, "buttonUpdate not done b=%d t=%d",
-                 i_button, i_title );
+        i_ret = es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT,
+                                p_sys->spu_es, NULL );
+    }
 
-        es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT, p_sys->spu_es,
-                        NULL );
+    if( i_ret == VLC_SUCCESS )
+    {
+        msg_Dbg( p_demux, "menu highlight %s button=%d title=%d",
+                          b_button_ok ? "set" : "cleared",
+                          i_button, i_title );
+        p_sys->highlight.b_pending = false;
     }
 }
 
