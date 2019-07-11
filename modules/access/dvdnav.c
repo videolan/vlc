@@ -687,7 +687,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             if( dvdnav_button_activate( p_sys->dvdnav, pci ) != DVDNAV_STATUS_OK )
                 return VLC_EGENERIC;
+            vlc_mutex_lock( &p_sys->event_lock );
             ButtonUpdate( p_demux, true );
+            vlc_mutex_unlock( &p_sys->event_lock );
             break;
         }
 
@@ -1045,7 +1047,9 @@ static int Demux( demux_t *p_demux )
         DemuxBlock( p_demux, packet, i_len );
         if( p_sys->b_spu_change )
         {
+            vlc_mutex_lock(&p_sys->event_lock);
             ButtonUpdate( p_demux, false );
+            vlc_mutex_unlock(&p_sys->event_lock);
             p_sys->b_spu_change = false;
         }
         break;
@@ -1064,7 +1068,9 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "DVDNAV_HIGHLIGHT" );
         msg_Dbg( p_demux, "     - display=%d", event->display );
         msg_Dbg( p_demux, "     - buttonN=%d", event->buttonN );
+        vlc_mutex_lock(&p_sys->event_lock);
         ButtonUpdate( p_demux, false );
+        vlc_mutex_unlock(&p_sys->event_lock);
         break;
     }
 
@@ -1296,7 +1302,9 @@ static void ESSubtitleUpdate( demux_t *p_demux )
     int         i_spu = dvdnav_get_active_spu_stream( p_sys->dvdnav );
     int32_t i_title, i_part;
 
+    vlc_mutex_lock(&p_sys->event_lock);
     ButtonUpdate( p_demux, false );
+    vlc_mutex_unlock(&p_sys->event_lock);
 
     dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
     if( i_title > 0 ) return;
@@ -1321,8 +1329,8 @@ static void ESSubtitleUpdate( demux_t *p_demux )
             {
                 vlc_mutex_lock( &p_sys->event_lock );
                 p_sys->spu_es = tk->es;
-                vlc_mutex_unlock( &p_sys->event_lock );
                 ButtonUpdate( p_demux, false );
+                vlc_mutex_unlock( &p_sys->event_lock );
             }
         }
     }
@@ -1552,7 +1560,9 @@ static void ESNew( demux_t *p_demux, int i_id )
         {
             es_out_Control( p_demux->out, ES_OUT_VOUT_SET_MOUSE_EVENT, tk->es,
                             EventMouse, p_demux );
+            vlc_mutex_lock( &p_sys->event_lock );
             ButtonUpdate( p_demux, false );
+            vlc_mutex_unlock( &p_sys->event_lock );
         }
     }
     tk->b_configured = true;
