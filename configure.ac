@@ -3913,7 +3913,7 @@ AS_IF([test "${enable_qt}" != "no"], [
 AC_ARG_ENABLE([qt-qml-cache],
   AS_HELP_STRING([--enable-qt-qml-cache],
     [enable qml cache generation]))
-AM_CONDITIONAL([HAVE_QMLCACHE], [test "${enable_qt_qml_cache}" = "yes" && "x$QMLCACHE" != "xno"])
+AM_CONDITIONAL([HAVE_QMLCACHE], [test "${enable_qt_qml_cache}" = "yes" && test "x$QMLCACHE" != "xno"])
 
 AC_ARG_ENABLE([qt-qml-debug],
   AS_HELP_STRING([--enable-qt-qml-debug], [enable qml debuger]))
