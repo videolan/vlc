@@ -749,21 +749,6 @@ get_float( libvlc_media_player_t *p_mi, const char *restrict name,
     return var_GetFloat( p_mi, opt->name );
 }
 
-static char *
-get_string( libvlc_media_player_t *p_mi, const char *restrict name,
-            const opt_t *restrict opt )
-{
-    if( !opt ) return NULL;
-
-    if( opt->type != VLC_VAR_STRING )
-    {
-        libvlc_printerr( "Invalid argument to %s in %s", name, "get string" );
-        return NULL;
-    }
-
-    return var_GetString( p_mi, opt->name );
-}
-
 static const opt_t *
 marq_option_bynumber(unsigned option)
 {
