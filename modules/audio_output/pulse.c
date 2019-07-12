@@ -555,6 +555,21 @@ static void Drain(audio_output_t *aout)
     pa_stream *s = sys->stream;
 
     pa_threaded_mainloop_lock(sys->mainloop);
+
+    if (unlikely(pa_stream_is_corked(s) > 0))
+    {
+        /* Drain while the stream is corked. It happens with very small input
+         * when the stream is drained while the start is still being deferred.
+         * In that case, we need start the stream before we actually drain it.
+         * */
+        if (sys->trigger != NULL)
+        {
+            vlc_pa_rttime_free(sys->mainloop, sys->trigger);
+            sys->trigger = NULL;
+        }
+        stream_start_now(s, aout);
+    }
+
     pa_operation *op = pa_stream_drain(s, NULL, NULL);
     if (op != NULL)
         pa_operation_unref(op);
