@@ -71,15 +71,13 @@ Rectangle {
 
         drag.target: dragItem
 
-        property bool hold: false
         onPositionChanged: {
-            if (hold && !dragItem.visible) {
+            if (pressed && !dragItem.visible) {
                 dragItem.count = plmodel.getSelection().length
                 dragItem.visible = true
             }
         }
         onPressed:  {
-            hold = true
             var pos = this.mapToGlobal( mouseX, mouseY)
             dragItem.updatePos(pos.x, pos.y)
         }
@@ -87,7 +85,6 @@ Rectangle {
             if (dragItem.visible)
                 dragItem.Drag.drop()
             dragItem.visible = false
-            hold = false
         }
 
         RowLayout {
