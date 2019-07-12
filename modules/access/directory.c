@@ -136,11 +136,13 @@ int DirRead (stream_t *access, input_item_node_t *node)
 #endif
         switch (st.st_mode & S_IFMT)
         {
+#ifdef S_IFBLK
             case S_IFBLK:
                 if (!special_files)
                     continue;
                 type = ITEM_TYPE_DISC;
                 break;
+#endif
             case S_IFCHR:
                 if (!special_files)
                     continue;
