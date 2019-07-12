@@ -394,7 +394,7 @@ AudioDeviceSupportsDigital(audio_output_t *p_aout, AudioDeviceID i_dev_id)
 }
 
 static void
-ReportDevice(audio_output_t *p_aout, UInt32 i_id, char *name)
+ReportDevice(audio_output_t *p_aout, UInt32 i_id, const char *name)
 {
     char deviceid[10];
     sprintf(deviceid, "%i", i_id);
@@ -409,6 +409,7 @@ ReportDevice(audio_output_t *p_aout, UInt32 i_id, char *name)
 static bool
 AudioDeviceIsAHeadphone(audio_output_t *p_aout, AudioDeviceID i_dev_id)
 {
+    VLC_UNUSED(p_aout);
     UInt32 defaultSize = sizeof(AudioDeviceID);
 
     const AudioObjectPropertyAddress defaultAddr = {
@@ -494,7 +495,6 @@ RebuildDeviceList(audio_output_t * p_aout, UInt32 *p_id_exists)
     {
         CFStringRef device_name_ref;
         char *psz_name;
-        CFIndex length;
         UInt32 i_id = p_devices[i];
 
         int ret = AO_GET1PROP(i_id, CFStringRef, &device_name_ref,
