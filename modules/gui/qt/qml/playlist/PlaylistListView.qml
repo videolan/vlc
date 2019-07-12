@@ -106,6 +106,13 @@ Utils.NavigableFocusScope {
             onItemDoubleClicked: mainPlaylistController.goTo(index, true)
             color: VLCStyle.colors.getBgColor(model.selected, plitem.hovered, plitem.activeFocus)
 
+            onDragStarting: {
+                if (!root.plmodel.isSelected(index)) {
+                    /* the dragged item is not in the selection, replace the selection */
+                    root.plmodel.setSelection([index])
+                }
+            }
+
             onDropedMovedAt: {
                 if (drop.hasUrls) {
                     mainPlaylistController.insert(target, drop.urls)

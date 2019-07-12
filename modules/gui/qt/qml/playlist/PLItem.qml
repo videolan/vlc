@@ -32,6 +32,7 @@ Rectangle {
 
     signal itemClicked(int keys, int modifier)
     signal itemDoubleClicked(int keys, int modifier)
+    signal dragStarting()
     property alias hovered: mouse.containsMouse
 
     property var dragitem: null
@@ -75,6 +76,7 @@ Rectangle {
             target: mouse.drag
             onActiveChanged: {
                 if (target.active) {
+                    root.dragStarting()
                     dragItem.count = plmodel.getSelection().length
                     dragItem.visible = true
                 } else {
