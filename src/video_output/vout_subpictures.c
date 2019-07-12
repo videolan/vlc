@@ -166,7 +166,7 @@ static ssize_t spu_GetFreeChannelId(spu_t *spu, enum vlc_vout_order *order)
 {
     spu_private_t *sys = spu->p;
 
-    if (unlikely(sys->channels.size) > SSIZE_MAX)
+    if (unlikely(sys->channels.size > SSIZE_MAX))
         return VOUT_SPU_CHANNEL_INVALID;
 
     size_t id;
