@@ -539,6 +539,15 @@ typedef struct vlc_decoder_device
 typedef int (*vlc_decoder_device_Open)(vlc_decoder_device *device,
                                         vout_window_t *window);
 
+#define set_callback_dec_device(activate, priority) \
+    { \
+        vlc_decoder_device_Open open__ = activate; \
+        (void) open__; \
+        set_callback(activate) \
+    } \
+    set_capability( "decoder device", priority )
+
+
 /**
  * Create a decoder device from a window
  *
