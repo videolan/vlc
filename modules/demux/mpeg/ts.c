@@ -1339,6 +1339,33 @@ invalid:
     return NULL;
 }
 
+static vlc_tick_t GetTimeForUntimed( const ts_pmt_t *p_pmt )
+{
+    vlc_tick_t i_ts = p_pmt->pcr.i_current;
+    const ts_stream_t *p_cand = NULL;
+    for( int i=0; i< p_pmt->e_streams.i_size; i++ )
+    {
+        const ts_pid_t *p_pid = p_pmt->e_streams.p_elems[i];
+        if( (p_pid->i_flags & FLAG_FILTERED) && SEEN(p_pid) &&
+             p_pid->type == TYPE_STREAM &&
+             p_pid->u.p_stream->p_es &&
+             SETANDVALID(p_pid->u.p_stream->i_last_dts) )
+        {
+            const ts_es_t *p_es = p_pid->u.p_stream->p_es;
+            if( p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES )
+            {
+                if( !p_cand || (p_es->fmt.i_cat == VIDEO_ES &&
+                                p_cand->p_es->fmt.i_cat != VIDEO_ES) )
+                {
+                    p_cand = p_pid->u.p_stream;
+                    i_ts = p_cand->i_last_dts;
+                }
+            }
+        }
+    }
+    return i_ts;
+}
+
 static block_t * ConvertPESBlock( demux_t *p_demux, ts_es_t *p_es,
                                   size_t i_pes_size, uint8_t i_stream_id,
                                   block_t *p_block )
@@ -1359,13 +1386,26 @@ static block_t * ConvertPESBlock( demux_t *p_demux, ts_es_t *p_es,
     }
     else if( p_es->fmt.i_codec == VLC_CODEC_TELETEXT )
     {
+        const ts_pmt_t *p_pmt = p_es->p_program;
+        if( p_block->i_pts != VLC_TICK_INVALID &&
+            p_pmt->pcr.i_current > -1 )
+        {
+            /* Teletext can have totally offset timestamps... RAI1, German */
+            vlc_tick_t i_pcr = FROM_SCALE(TimeStampWrapAround( p_pmt->pcr.i_first,
+                                                               p_pmt->pcr.i_current ));
+            if( i_pcr < p_block->i_pts || i_pcr - p_block->i_pts > CLOCK_FREQ )
+                p_block->i_dts = p_block->i_pts = VLC_TICK_INVALID;
+        }
         if( p_block->i_pts == VLC_TICK_INVALID )
         {
             /* Teletext may have missing PTS (ETSI EN 300 472 Annexe A)
              * In this case use the last PCR + 40ms */
-            stime_t i_pcr = p_es->p_program->pcr.i_current;
-            if( SETANDVALID(i_pcr) )
-                p_block->i_pts = FROM_SCALE(i_pcr) + VLC_TICK_FROM_MS(40);
+            stime_t i_ts = GetTimeForUntimed( p_es->p_program );
+            if( SETANDVALID(i_ts) )
+            {
+                i_ts = TimeStampWrapAround( p_pmt->pcr.i_first, i_ts );
+                p_block->i_dts = p_block->i_pts = FROM_SCALE(i_ts) + VLC_TICK_FROM_MS(40);
+            }
         }
     }
     else if( p_es->fmt.i_codec == VLC_CODEC_ARIB_A ||
