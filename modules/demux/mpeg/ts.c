@@ -1559,6 +1559,9 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
     if( i_pts >= 0 && i_dts < 0 )
         i_dts = i_pts;
 
+    if( i_dts >= 0 )
+        pid->u.p_stream->i_last_dts = i_dts;
+
     if( p_pes )
     {
         ts_pmt_t *p_pmt = p_es->p_program;
@@ -1844,6 +1847,7 @@ static void ReadyQueuesPostSeek( demux_t *p_demux )
                 p_es->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
 
             pid->i_cc = 0xff;
+            pid->u.p_stream->i_last_dts = -1;
 
             if( pid->u.p_stream->prepcr.p_head )
             {
