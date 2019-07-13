@@ -1712,7 +1712,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if ( vd->source.i_visible_width  > sys->d3d_dev.caps.MaxTextureWidth ||
          vd->source.i_visible_height > sys->d3d_dev.caps.MaxTextureHeight )
     {
-        msg_Err(vd, "Textures too large %ux%u max possible: %lx%l",
+        msg_Err(vd, "Textures too large %ux%u max possible: %lx%lx",
                 vd->source.i_visible_width, vd->source.i_visible_height,
                 sys->d3d_dev.caps.MaxTextureWidth,
                 sys->d3d_dev.caps.MaxTextureHeight);
