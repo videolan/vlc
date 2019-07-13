@@ -388,7 +388,7 @@ static void satip_teardown(void *data) {
             };
             char *msg;
 
-            ssize_t len = asprintf(&msg, "TEARDOWN %s RTSP/1.0\r\n"
+            int len = asprintf(&msg, "TEARDOWN %s RTSP/1.0\r\n"
                     "CSeq: %d\r\n"
                     "Session: %s\r\n\r\n",
                     sys->control, sys->cseq++, sys->session_id);
@@ -403,7 +403,7 @@ static void satip_teardown(void *data) {
             ioctlsocket(sys->tcp_sock, FIONBIO, &(unsigned long){ 1 });
 #endif
 
-            for (unsigned sent = 0; sent < len;) {
+            for (int sent = 0; sent < len;) {
                 ret = poll(&pfd, 1, 5000);
                 if (ret == 0) {
                     msg_Err(access, "Timed out sending RTSP teardown\n");
