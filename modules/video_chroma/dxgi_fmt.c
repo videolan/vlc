@@ -140,7 +140,7 @@ void DxgiFormatMask(DXGI_FORMAT format, video_format_t *fmt)
     }
 }
 
-const char *DxgiVendorStr(int gpu_vendor)
+const char *DxgiVendorStr(unsigned int gpu_vendor)
 {
     static const struct {
         unsigned   id;
