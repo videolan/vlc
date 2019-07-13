@@ -255,6 +255,7 @@ if [ "$REBUILD" = "yes" ]; then
     make clean
 fi
 if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
+    make list
     make fetch
     make -j$JOBS -k || make -j1
 
