@@ -669,7 +669,7 @@ char *vlc_strfplayer(vlc_player_t *player, input_item_t *item, const char *s)
                     ssize_t chapter = vlc_player_GetSelectedChapterIdx(player);
                     if (chapter != -1)
                     {
-                        vlc_memstream_printf(stream, "%"PRId64, chapter);
+                        vlc_memstream_printf(stream, "%zd", chapter);
                         break;
                     }
                 }
@@ -699,7 +699,7 @@ char *vlc_strfplayer(vlc_player_t *player, input_item_t *item, const char *s)
                     ssize_t title = vlc_player_GetSelectedTitleIdx(player);
                     if (title != -1)
                     {
-                        vlc_memstream_printf(stream, "%"PRId64, title);
+                        vlc_memstream_printf(stream, "%zd", title);
                         break;
                     }
                 }
