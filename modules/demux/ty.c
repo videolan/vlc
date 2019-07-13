@@ -38,6 +38,8 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
@@ -1642,6 +1644,11 @@ static int parse_master(demux_t *p_demux)
         return VLC_SUCCESS;
     }
 
+#if (UINT32_MAX > SSIZE_MAX)
+    if (i_map_size > SSIZE_MAX)
+        return VLC_EGENERIC;
+#endif
+
     /* parse all the entries */
     p_sys->seq_table = calloc(p_sys->i_seq_table_size, sizeof(ty_seq_table_t));
     if (p_sys->seq_table == NULL)
@@ -1655,10 +1662,12 @@ static int parse_master(demux_t *p_demux)
         p_sys->seq_table[j].l_timestamp = U64_AT(&mst_buf[0]);
         if (i_map_size > 8) {
             msg_Err(p_demux, "Unsupported SEQ bitmap size in master chunk");
-            if(vlc_stream_Read(p_demux->s, NULL, i_map_size) != i_map_size)
+            if (vlc_stream_Read(p_demux->s, NULL, i_map_size)
+                                       < (ssize_t)i_map_size)
                 return VLC_EGENERIC;
         } else {
-            if(vlc_stream_Read(p_demux->s, mst_buf + 8, i_map_size) != i_map_size)
+            if (vlc_stream_Read(p_demux->s, mst_buf + 8, i_map_size)
+                                              < (ssize_t)i_map_size)
                 return VLC_EGENERIC;
             memcpy(p_sys->seq_table[j].chunk_bitmask, &mst_buf[8], i_map_size);
         }
