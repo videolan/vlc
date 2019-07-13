@@ -138,6 +138,8 @@ struct ts_stream_t
         block_t *p_head;
         block_t **pp_last;
     } prepcr;
+
+    stime_t i_last_dts;
 };
 
 typedef struct ts_si_context_t ts_si_context_t;
