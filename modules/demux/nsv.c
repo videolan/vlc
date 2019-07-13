@@ -28,6 +28,8 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
@@ -484,10 +486,14 @@ static int ReadNSVf( demux_t *p_demux )
 
     if( i_header_size == 0 || i_header_size == UINT32_MAX )
         return VLC_EGENERIC;
-
-
-    return vlc_stream_Read( p_demux->s, NULL, i_header_size ) == i_header_size
-        ? VLC_SUCCESS : VLC_EGENERIC;
+#if (UINT32_MAX > SSIZE_MAX)
+    if( i_header_size > SSIZE_MAX )
+        return VLC_EGENERIC;
+#endif
+    if ( vlc_stream_Read( p_demux->s, NULL, i_header_size )
+                                 < (ssize_t)i_header_size )
+         return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 /*****************************************************************************
  * ReadNSVs:
