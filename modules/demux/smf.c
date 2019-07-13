@@ -258,7 +258,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr, es_out_t *out)
     demux_sys_t *sys = p_demux->p_sys;
     block_t *block;
     uint8_t first, event;
-    unsigned datalen;
+    int datalen;
 
     if (vlc_stream_Seek (s, tr->start + tr->offset)
      || (vlc_stream_Read (s, &first, 1) != 1))
