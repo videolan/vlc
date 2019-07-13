@@ -1395,14 +1395,23 @@ static void Reload_DevicesEnum_Added(void *data, LPCWSTR wid, IMMDevice *dev)
 
 static int ReloadAudioDevices(char const *name, char ***values, char ***descs)
 {
+    bool in_mta = true;
+    HRESULT hr;
+
     (void) name;
 
-    bool in_mta = SUCCEEDED(CoInitializeEx(NULL, COINIT_MULTITHREADED));
+    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if (FAILED(hr)) {
+        if (hr != RPC_E_CHANGED_MODE)
+            return -1;
+
+        in_mta = false;
+    }
 
     struct mm_list list = { .count = 0 };
     void *it;
-    HRESULT hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
-                                  &IID_IMMDeviceEnumerator, &it);
+    hr = CoCreateInstance(&CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
+                          &IID_IMMDeviceEnumerator, &it);
     if (FAILED(hr))
         goto error;
 
