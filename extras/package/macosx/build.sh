@@ -154,6 +154,7 @@ mkdir -p contrib-$TRIPLET && cd contrib-$TRIPLET
 ../bootstrap --build=$TRIPLET --host=$TRIPLET > $out
 
 if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
+    make list
     make fetch
     make -j$JOBS .gettext
     make -j$JOBS -k || make -j1
