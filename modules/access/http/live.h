@@ -36,6 +36,6 @@ struct block_t *vlc_http_live_read(struct vlc_http_resource *);
 #define vlc_http_live_get_status vlc_http_res_get_status
 #define vlc_http_live_get_redirect vlc_http_res_get_redirect
 #define vlc_http_live_get_type vlc_http_res_get_type
-#define vlc_http_live_destroye vlc_http_res_destroy
+#define vlc_http_live_destroy vlc_http_res_destroy
 
 /** @} */
