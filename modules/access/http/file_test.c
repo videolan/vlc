@@ -35,6 +35,8 @@
 #include "file.h"
 #include "message.h"
 
+const char vlc_module_name[] = "test_http_file";
+
 static const char url[] = "https://www.example.com:8443/dir/file.ext?a=b";
 static const char url_http[] = "http://www.example.com:8443/dir/file.ext?a=b";
 static const char url_mmsh[] = "mmsh://www.example.com:8443/dir/file.ext?a=b";

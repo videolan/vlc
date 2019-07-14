@@ -39,6 +39,8 @@
 #include "conn.h"
 #include "message.h"
 
+const char vlc_module_name[] = "test_h1conn";
+
 static struct vlc_http_conn *conn;
 static struct vlc_tls *external_tls;
 

@@ -34,6 +34,8 @@
 #include "message.h"
 #include "h2frame.h"
 
+const char vlc_module_name[] = "test_http_msg";
+
 static void check_req(const struct vlc_http_msg *m)
 {
     const char *str;

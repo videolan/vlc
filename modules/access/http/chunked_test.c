@@ -34,6 +34,8 @@
 #include "conn.h"
 #include "message.h"
 
+const char vlc_module_name[] = "test_h1chunked";
+
 /* I/O callbacks */
 static const char *stream_content;
 static size_t stream_length;

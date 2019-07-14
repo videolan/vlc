@@ -47,6 +47,8 @@
 #include <vlc_tls.h>
 #include "transport.h"
 
+const char vlc_module_name[] = "test_http_tunnel";
+
 static void proxy_client_process(int fd)
 {
     char buf[1024];

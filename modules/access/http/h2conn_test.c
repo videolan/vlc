@@ -40,6 +40,8 @@
 #include "conn.h"
 #include "message.h"
 
+const char vlc_module_name[] = "test_h2conn";
+
 static struct vlc_http_conn *conn;
 static struct vlc_tls *external_tls;
 

@@ -36,6 +36,8 @@
 
 #undef vlc_tick_sleep
 
+const char vlc_module_name[] = "test_h2output";
+
 static unsigned char counter = 0;
 static bool send_failure = false;
 static bool expect_hello = true;
