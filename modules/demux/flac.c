@@ -270,7 +270,7 @@ static int RefineSeek( demux_t *p_demux, vlc_tick_t i_time, double i_bytemicrora
     unsigned i_frame_size = FLAC_FRAME_SIZE_MIN;
 
     bool b_canfastseek = false;
-    (int) vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_canfastseek );
+    vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_canfastseek );
 
     uint64_t i_start_pos = vlc_stream_Tell( p_demux->s );
 
