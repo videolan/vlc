@@ -27,6 +27,7 @@
 
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryDataTypes.h"
 
 @implementation VLCPlaylistItem
 
@@ -62,6 +63,11 @@
     }
     VLCInputItem *inputItem = [[VLCInputItem alloc] initWithInputItem:p_input];
     return inputItem;
+}
+
+- (VLCMediaLibraryMediaItem *)mediaLibraryItem
+{
+    return [VLCMediaLibraryMediaItem mediaItemForURL:self.url];
 }
 
 - (void)updateRepresentation

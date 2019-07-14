@@ -232,7 +232,19 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID
 {
     vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
-    vlc_ml_media_t *p_mediaItem = vlc_ml_get(p_mediaLibrary, VLC_ML_GET_MEDIA, libraryID);
+    vlc_ml_media_t *p_mediaItem = vlc_ml_get_media(p_mediaLibrary, libraryID);
+    VLCMediaLibraryMediaItem *returnValue = nil;
+    if (p_mediaItem) {
+        returnValue = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:p_mediaItem library:p_mediaLibrary];
+    }
+    return returnValue;
+}
+
++ (instancetype)mediaItemForURL:(NSURL *)url
+{
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    vlc_ml_media_t *p_mediaItem = vlc_ml_get_media_by_mrl(p_mediaLibrary,
+                                                          [[url absoluteString] UTF8String]);
     VLCMediaLibraryMediaItem *returnValue = nil;
     if (p_mediaItem) {
         returnValue = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:p_mediaItem library:p_mediaLibrary];
