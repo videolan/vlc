@@ -1681,11 +1681,11 @@ static void CEA708_Decode_ServiceBuffer( cea708_t *h )
 
         if( c < 0x20 )
             i_ret = CEA708_Decode_C0( c, h );
-        else if( c >= 0x20 && c <=0x7F )
+        else if( c <= 0x7F )
             i_ret = CEA708_Decode_G0( c, h );
-        else if( c >= 0x80 && c <= 0x9F )
+        else if( c <= 0x9F )
             i_ret = CEA708_Decode_C1( c, h );
-        else if( c > 0x9F )
+        else
             i_ret = CEA708_Decode_G1( c, h );
 
         if( i_ret & CEA708_STATUS_OUTPUT )
