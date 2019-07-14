@@ -29,6 +29,8 @@
 #include <vlc_common.h>
 #include <vlc_strings.h>
 
+const char vlc_module_name[] = "test_xmlent";
+
 static void decode (const char *in, const char *out)
 {
     char buf[strlen (in) + 1];

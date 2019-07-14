@@ -32,6 +32,8 @@
 #include <vlc_interrupt.h>
 #include <vlc_network.h>
 
+const char vlc_module_name[] = "test_interrupt";
+
 static vlc_sem_t sem;
 static int fds[2];
 

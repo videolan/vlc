@@ -30,6 +30,8 @@
 #include <vlc_url.h>
 #include <vlc_strings.h>
 
+const char vlc_module_name[] = "test_url";
+
 static int exitcode = 0;
 
 static void test_compare(const char *in, const char *exp, const char *res)

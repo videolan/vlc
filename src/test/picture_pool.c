@@ -32,6 +32,8 @@
 
 #define PICTURES 10
 
+const char vlc_module_name[] = "test_picture_pool";
+
 static video_format_t fmt;
 static picture_pool_t *pool, *reserve;
 
