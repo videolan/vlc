@@ -97,7 +97,7 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
     size_t libdir_len = strlen(libdir);
 
     if (suffix_len > libdir_len
-     || memcmp(LIBDIR + prefix_len, libdir + (libdir_len - suffix_len),
+     || memcmp(&LIBDIR[prefix_len], libdir + (libdir_len - suffix_len),
                suffix_len)) {
         suffix_len = libdir_len;
         prefix_len = 0;
