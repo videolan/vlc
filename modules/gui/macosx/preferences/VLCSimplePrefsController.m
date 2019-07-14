@@ -303,14 +303,24 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     static NSArray<NSString *> *toolbarIdentifiers = nil;
 
     dispatch_once(&onceToken, ^{
-        toolbarIdentifiers = @[VLCIntfSettingToolbarIdentifier,
-                               VLCAudioSettingToolbarIdentifier,
-                               VLCVideoSettingToolbarIdentifier,
-                               VLCOSDSettingToolbarIdentifier,
-                               VLCInputSettingToolbarIdentifier,
-                               VLCMediaLibrarySettingToolbarIdentifier,
-                               VLCHotkeysSettingToolbarIdentifier,
-                               NSToolbarFlexibleSpaceItemIdentifier];
+        if ([[[VLCMain sharedInstance] libraryController] libraryModel]) {
+            toolbarIdentifiers = @[VLCIntfSettingToolbarIdentifier,
+                                   VLCAudioSettingToolbarIdentifier,
+                                   VLCVideoSettingToolbarIdentifier,
+                                   VLCOSDSettingToolbarIdentifier,
+                                   VLCInputSettingToolbarIdentifier,
+                                   VLCMediaLibrarySettingToolbarIdentifier,
+                                   VLCHotkeysSettingToolbarIdentifier,
+                                   NSToolbarFlexibleSpaceItemIdentifier];
+        } else {
+            toolbarIdentifiers = @[VLCIntfSettingToolbarIdentifier,
+                                   VLCAudioSettingToolbarIdentifier,
+                                   VLCVideoSettingToolbarIdentifier,
+                                   VLCOSDSettingToolbarIdentifier,
+                                   VLCInputSettingToolbarIdentifier,
+                                   VLCHotkeysSettingToolbarIdentifier,
+                                   NSToolbarFlexibleSpaceItemIdentifier];
+        }
     });
 
     return toolbarIdentifiers;
