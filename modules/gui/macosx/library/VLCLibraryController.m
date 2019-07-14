@@ -47,6 +47,10 @@ float kVLCDefaultThumbnailPosition = .15;
     self = [super init];
     if (self) {
         _p_libraryInstance = vlc_ml_instance_get(getIntf());
+        if (!_p_libraryInstance) {
+            msg_Info(getIntf(), "VLC runs without media library support");
+            return self;
+        }
         _libraryModel = [[VLCLibraryModel alloc] initWithLibrary:_p_libraryInstance];
         _unsorted = YES;
 
@@ -83,16 +87,23 @@ float kVLCDefaultThumbnailPosition = .15;
 
 - (void)applicationWillEnterBackground:(NSNotification *)aNotification
 {
-    vlc_ml_resume_background(_p_libraryInstance);
+    if (_p_libraryInstance) {
+        vlc_ml_resume_background(_p_libraryInstance);
+    }
 }
 
 - (void)applicationWillBecomeActive:(NSNotification *)aNotification
 {
-    vlc_ml_pause_background(_p_libraryInstance);
+    if (_p_libraryInstance) {
+        vlc_ml_pause_background(_p_libraryInstance);
+    }
 }
 
 - (void)playbackStateChanged:(NSNotification *)aNotification
 {
+    if (!_p_libraryInstance) {
+        return;
+    }
     VLCPlayerController *playerController = aNotification.object;
     if (playerController.playerState == VLC_PLAYER_STATE_PLAYING) {
         vlc_ml_pause_background(_p_libraryInstance);
@@ -103,6 +114,9 @@ float kVLCDefaultThumbnailPosition = .15;
 
 - (int)appendItemToPlaylist:(VLCMediaLibraryMediaItem *)mediaItem playImmediately:(BOOL)playImmediately
 {
+    if (!_p_libraryInstance) {
+        return VLC_ENOOBJ;
+    }
     input_item_t *p_inputItem = vlc_ml_get_input_item(_p_libraryInstance, mediaItem.libraryID);
     int ret = [[[VLCMain sharedInstance] playlistController] addInputItem:p_inputItem atPosition:-1 startPlayback:playImmediately];
     input_item_Release(p_inputItem);
@@ -129,6 +143,9 @@ float kVLCDefaultThumbnailPosition = .15;
 
 - (int)attemptToGenerateThumbnailForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
 {
+    if (!_p_libraryInstance) {
+        return VLC_ENOOBJ;
+    }
     return vlc_ml_media_generate_thumbnail(_p_libraryInstance,
                                            mediaItem.libraryID,
                                            VLC_ML_THUMBNAIL_SMALL,
@@ -141,26 +158,41 @@ float kVLCDefaultThumbnailPosition = .15;
 
 - (int)addFolderWithFileURL:(NSURL *)fileURL
 {
+    if (!_p_libraryInstance) {
+        return VLC_ENOOBJ;
+    }
     return vlc_ml_add_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
 
 - (int)banFolderWithFileURL:(NSURL *)fileURL
 {
+    if (!_p_libraryInstance) {
+        return VLC_ENOOBJ;
+    }
     return vlc_ml_ban_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
 
 - (int)unbanFolderWithFileURL:(NSURL *)fileURL
 {
+    if (!_p_libraryInstance) {
+        return VLC_ENOOBJ;
+    }
     return vlc_ml_unban_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
 
 - (int)removeFolderWithFileURL:(NSURL *)fileURL
 {
+    if (!_p_libraryInstance) {
+        return VLC_ENOOBJ;
+    }
     return vlc_ml_remove_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
 
 - (int)clearHistory
 {
+    if (!_p_libraryInstance) {
+        return VLC_ENOOBJ;
+    }
     return vlc_ml_clear_history(_p_libraryInstance);
 }
 

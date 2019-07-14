@@ -35,6 +35,9 @@
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
 {
+    if (!_libraryModel) {
+        return 0;
+    }
     if (collectionView == self.recentMediaCollectionView) {
         return [_libraryModel numberOfRecentMedia];
     }

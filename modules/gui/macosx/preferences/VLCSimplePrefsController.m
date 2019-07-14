@@ -1596,8 +1596,12 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
+    VLCLibraryModel *libraryModel = [_libraryController libraryModel];
+    if (!libraryModel) {
+        return 0;
+    }
     if (!_cachedFolderList) {
-        _cachedFolderList = [[_libraryController libraryModel] listOfMonitoredFolders];
+        _cachedFolderList = [libraryModel listOfMonitoredFolders];
     }
     return _cachedFolderList.count;
 }

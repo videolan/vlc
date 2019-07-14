@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryController : NSObject
 
-@property (readonly) VLCLibraryModel *libraryModel;
+@property (readonly, nullable) VLCLibraryModel *libraryModel;
 
 - (int)appendItemToPlaylist:(VLCMediaLibraryMediaItem *)mediaItem playImmediately:(BOOL)playImmediately;
 - (void)showItemInFinder:(VLCMediaLibraryMediaItem *)mediaItem;
