@@ -1187,7 +1187,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 
             /* we can only set bitmap for VLC mapping or [re]mapped pcm audio
              * as vlc can't enumerate channels for compressed content */
-            if( i_bps || p_track->rgi_chans_reordering == NULL )
+            if( i_bps )
             {
                 p_track->fmt.audio.i_channels = vlc_popcount(i_vlc_mapping);
                 p_track->fmt.audio.i_physical_channels = i_vlc_mapping;
