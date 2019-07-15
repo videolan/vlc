@@ -490,6 +490,16 @@ void twalk( const void *root, void(*action)(const void *nodep, VISIT which, int 
 void *lfind( const void *key, const void *base, size_t *nmemb,
              size_t size, int(*cmp)(const void *, const void *) );
 #endif /* HAVE_SEARCH_H */
+
+#ifdef _WIN64
+# ifdef HAVE_SEARCH_H
+#  include <search.h>
+# endif
+/* the Win32 prototype of lfind() expects an unsigned* for 'nelp' */
+# define lfind(a,b,c,d,e) \
+         lfind((a),(b), &(unsigned){ (*(c) > UINT_MAX) ? UINT_MAX : *(c) }, (d),(e))
+#endif /* _WIN64 */
+
 #ifndef HAVE_TDESTROY
 void tdestroy( void *root, void (*free_node)(void *nodep) );
 #endif
