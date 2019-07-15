@@ -3027,7 +3027,7 @@
 		return false;
 	};
 	var xsl = {
-		'nest' : '<' + '?xml version="1.0" encoding="utf-8" ?<?vlc print '>'?>' +
+		'nest' : '<' + '?xml version="1.0" encoding="utf-8" ?>' +
 			'<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" >' + 
 			'<xsl:output method="html" encoding="utf-8" omit-xml-declaration="yes" standalone="no" indent="no" media-type="text/html" />' + 
 			'<xsl:template match="/">' + 
@@ -3088,7 +3088,7 @@
 			'</xsl:template>' + 
 			'</xsl:stylesheet>',
 
-		'flat' : '<' + '?xml version="1.0" encoding="utf-8" ?<?vlc print '>'?>' +
+		'flat' : '<' + '?xml version="1.0" encoding="utf-8" ?>' +
 			'<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" >' + 
 			'<xsl:output method="html" encoding="utf-8" omit-xml-declaration="yes" standalone="no" indent="no" media-type="text/xml" />' + 
 			'<xsl:template match="/">' + 

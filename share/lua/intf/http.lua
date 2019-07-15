@@ -73,11 +73,8 @@ function process_raw(filename)
     end
     str=string.rep("=",#str-1)
 
-    --[[ FIXME:
-    <?xml version="1.0" encoding="charset" standalone="yes" ?> is still a problem. The closing '?>' needs to be printed using '?<?vlc print ">" ?>' to prevent a parse error.
-    --]]
-    local code0 = string.gsub(input,escape(close_tag)," print(["..str.."[")
-    local code1 = string.gsub(code0,escape(open_tag),"]"..str.."]) ")
+    local code0 = string.gsub(input,escape(open_tag),"]"..str.."]) ")
+    local code1 = string.gsub(code0,"(%]"..str.."%]%) "..".-)("..escape(close_tag)..")","%1 print(["..str.."[")
     local code = "print(["..str.."["..code1.."]"..str.."])"
     --[[ Uncomment to debug
     if string.match(filename,"vlm_cmd.xml$") then

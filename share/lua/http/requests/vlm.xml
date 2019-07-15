@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?<?vlc print '>'
---[[
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?vlc --[[
 vim:syntax=lua
 <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  vlm.xml: VLC media player web interface
