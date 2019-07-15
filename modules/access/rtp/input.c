@@ -41,7 +41,7 @@
 
 #include "rtp.h"
 #ifdef HAVE_SRTP
-# include <srtp.h>
+# include "srtp.h"
 #endif
 
 #define DEFAULT_MRU (1500u - (20 + 8))

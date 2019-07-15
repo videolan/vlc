@@ -36,7 +36,7 @@
 
 #include "rtp.h"
 #ifdef HAVE_SRTP
-# include <srtp.h>
+# include "srtp.h"
 # include <gcrypt.h>
 # include <vlc_gcrypt.h>
 #endif
