@@ -271,6 +271,8 @@ ca_Flush(audio_output_t *p_aout, bool wait)
     p_sys->i_render_host_time = 0;
     p_sys->i_render_frames = 0;
     lock_unlock(p_sys);
+
+    p_sys->b_played = false;
 }
 
 void
@@ -352,7 +354,9 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
 
     lock_unlock(p_sys);
 
-    if (i_underrun_size > 0)
+    if (!p_sys->b_played)
+        p_sys->b_played = true;
+    else if (i_underrun_size > 0)
         msg_Warn(p_aout, "underrun of %zu bytes", i_underrun_size);
 }
 
@@ -400,6 +404,7 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     }
 
     ca_ClearOutBuffers(p_aout);
+    p_sys->b_played = false;
 
     return VLC_SUCCESS;
 }
@@ -424,6 +429,7 @@ ca_SetAliveState(audio_output_t *p_aout, bool alive)
     if (!alive && p_sys->b_do_flush)
     {
         ca_ClearOutBuffers(p_aout);
+        p_sys->b_played = false;
         p_sys->b_do_flush = false;
         b_sem_post = true;
     }
