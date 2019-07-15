@@ -37,7 +37,7 @@
 #include <vlc_url.h>
 #include <assert.h>
 #include <limits.h>
-#include "../codec/cc.h"
+#include "../../codec/cc.h"
 #include "heif.h"
 #include "../av1_unpack.h"
 
