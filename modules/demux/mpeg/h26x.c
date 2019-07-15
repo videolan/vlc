@@ -33,8 +33,8 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <vlc_codec.h>
-#include "../packetizer/hevc_nal.h" /* definitions, inline helpers */
-#include "../packetizer/h264_nal.h" /* definitions, inline helpers */
+#include "../../packetizer/hevc_nal.h" /* definitions, inline helpers */
+#include "../../packetizer/h264_nal.h" /* definitions, inline helpers */
 
 /*****************************************************************************
  * Module descriptor

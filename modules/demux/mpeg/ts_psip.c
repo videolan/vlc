@@ -51,8 +51,8 @@
 
 #include "ts_psip.h"
 
-#include "../codec/atsc_a65.h"
-#include "../codec/scte18.h"
+#include "../../codec/atsc_a65.h"
+#include "../../codec/scte18.h"
 
 #include <assert.h>
 
