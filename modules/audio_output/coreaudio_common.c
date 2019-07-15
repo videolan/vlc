@@ -211,15 +211,15 @@ ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
 
     lock_lock(p_sys);
 
-    vlc_tick_t i_render_delay;
-    if (likely(p_sys->i_render_host_time != 0))
+    if (p_sys->i_render_host_time == 0)
     {
-        const uint64_t i_render_time_us = p_sys->i_render_host_time
-                                        * tinfo.numer / tinfo.denom / 1000;
-        i_render_delay = i_render_time_us - vlc_tick_now();
+        lock_unlock(p_sys);
+        return -1;
     }
-    else
-        i_render_delay = 0;
+
+    const uint64_t i_render_time_us = p_sys->i_render_host_time
+                                    * tinfo.numer / tinfo.denom / 1000;
+    const vlc_tick_t i_render_delay = i_render_time_us - vlc_tick_now();
 
     const int64_t i_out_frames = BytesToFrames(p_sys, p_sys->i_out_size);
     *delay = FramesToUs(p_sys, i_out_frames + p_sys->i_render_frames)
