@@ -1106,6 +1106,11 @@ static inline void SetQWLE (void *p, uint64_t qw)
 #   ifndef O_NONBLOCK
 #       define O_NONBLOCK 0
 #   endif
+
+/* the mingw32 swab() and win32 _swab() prototypes expect a char* instead of a
+   const void* */
+#  define swab(a,b,c)  swab((char*) (a), (char*) (b), (c))
+
 #endif /* _WIN32 */
 
 typedef struct {
