@@ -877,43 +877,54 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_stream_t *p_pes,
     }
     else
     {
-        for( unsigned i = 0; i < i_page; i++ )
+        ts_es_t *p_page_es = p_pes->p_es;
+        enum txt_pass_s
         {
-            ts_es_t *p_page_es;
+            TXT_SUBTITLES = 0,
+            TXT_INDEX_PAGE,
+            TXT_OTHER,
+        };
+        for( enum txt_pass_s pass = TXT_SUBTITLES; pass <= TXT_OTHER; pass++ )
+        {
+            for( unsigned i = 0; i < i_page; i++ )
+            {
+                const ts_teletext_page_t *p = &p_page[i];
+                if(p->i_magazine == 1 && pass != TXT_INDEX_PAGE)
+                    continue;
+                if((p->i_type == 0x02 || p->i_type == 0x05) && pass != TXT_SUBTITLES)
+                    continue;
 
-            /* */
-            if( i == 0 )
-            {
-                p_page_es = p_pes->p_es;
-            }
-            else
-            {
-                p_page_es = ts_es_New( p_pes->p_es->p_program );
+                /* */
                 if( !p_page_es )
-                    break;
+                {
+                    p_page_es = ts_es_New( p_pes->p_es->p_program );
+                    if( !p_page_es )
+                        break;
 
-                es_format_Copy( &p_page_es->fmt, p_fmt );
-                free( p_page_es->fmt.psz_language );
-                free( p_page_es->fmt.psz_description );
-                p_page_es->fmt.psz_language = NULL;
-                p_page_es->fmt.psz_description = NULL;
-                ts_stream_Add_es( p_pes, p_page_es, true );
+                    es_format_Copy( &p_page_es->fmt, p_fmt );
+                    free( p_page_es->fmt.psz_language );
+                    free( p_page_es->fmt.psz_description );
+                    p_page_es->fmt.psz_language = NULL;
+                    p_page_es->fmt.psz_description = NULL;
+                    ts_stream_Add_es( p_pes, p_page_es, true );
+                }
+
+                /* */
+                p_page_es->fmt.i_priority = (pass == TXT_SUBTITLES) ?
+                          ES_PRIORITY_SELECTABLE_MIN : ES_PRIORITY_NOT_DEFAULTABLE;
+                p_page_es->fmt.psz_language = strndup( p->p_iso639, 3 );
+                p_page_es->fmt.psz_description = strdup(vlc_gettext(ppsz_teletext_type[p->i_type]));
+                p_page_es->fmt.subs.teletext.i_magazine = p->i_magazine;
+                p_page_es->fmt.subs.teletext.i_page = p->i_page;
+
+                msg_Dbg( p_demux,
+                             "    * ttxt type=%s lan=%s page=%d%02x",
+                             p_page_es->fmt.psz_description,
+                             p_page_es->fmt.psz_language,
+                             p->i_magazine, p->i_page );
+
+                p_page_es = NULL; /* used */
             }
-
-            /* */
-            const ts_teletext_page_t *p = &p_page[i];
-            p_page_es->fmt.i_priority = (p->i_type == 0x02 || p->i_type == 0x05) ?
-                      ES_PRIORITY_SELECTABLE_MIN : ES_PRIORITY_NOT_DEFAULTABLE;
-            p_page_es->fmt.psz_language = strndup( p->p_iso639, 3 );
-            p_page_es->fmt.psz_description = strdup(vlc_gettext(ppsz_teletext_type[p->i_type]));
-            p_page_es->fmt.subs.teletext.i_magazine = p->i_magazine;
-            p_page_es->fmt.subs.teletext.i_page = p->i_page;
-
-            msg_Dbg( p_demux,
-                         "    * ttxt type=%s lan=%s page=%d%02x",
-                         p_page_es->fmt.psz_description,
-                         p_page_es->fmt.psz_language,
-                         p->i_magazine, p->i_page );
         }
     }
 }
