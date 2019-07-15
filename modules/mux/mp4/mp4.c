@@ -39,9 +39,9 @@
 #include <vlc_iso_lang.h>
 #include <vlc_meta.h>
 
-#include "../demux/mp4/libmp4.h"
+#include "../../demux/mp4/libmp4.h"
 #include "libmp4mux.h"
-#include "../packetizer/hxxx_nal.h"
+#include "../../packetizer/hxxx_nal.h"
 #include "../av1_pack.h"
 #include "../extradata.h"
 
