@@ -27,14 +27,14 @@
 #include "Representation.hpp"
 #include "ForgedInitSegment.hpp"
 #include "SmoothSegment.hpp"
-#include "../adaptive/playlist/BasePeriod.h"
-#include "../adaptive/playlist/BaseAdaptationSet.h"
-#include "../adaptive/playlist/SegmentTimeline.h"
-#include "../adaptive/playlist/SegmentList.h"
-#include "../adaptive/xml/DOMHelper.h"
-#include "../adaptive/xml/Node.h"
-#include "../adaptive/tools/Helper.h"
-#include "../adaptive/tools/Conversions.hpp"
+#include "../../adaptive/playlist/BasePeriod.h"
+#include "../../adaptive/playlist/BaseAdaptationSet.h"
+#include "../../adaptive/playlist/SegmentTimeline.h"
+#include "../../adaptive/playlist/SegmentList.h"
+#include "../../adaptive/xml/DOMHelper.h"
+#include "../../adaptive/xml/Node.h"
+#include "../../adaptive/tools/Helper.h"
+#include "../../adaptive/tools/Conversions.hpp"
 
 using namespace smooth::playlist;
 using namespace adaptive::xml;

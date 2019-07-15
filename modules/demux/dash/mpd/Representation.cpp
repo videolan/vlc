@@ -30,8 +30,8 @@
 #include "Representation.h"
 #include "AdaptationSet.h"
 #include "MPD.h"
-#include "../adaptive/playlist/SegmentTemplate.h"
-#include "../adaptive/playlist/SegmentTimeline.h"
+#include "../../adaptive/playlist/SegmentTemplate.h"
+#include "../../adaptive/playlist/SegmentTimeline.h"
 #include "TemplatedUri.hpp"
 
 using namespace dash::mpd;

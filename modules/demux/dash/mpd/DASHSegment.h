@@ -25,8 +25,8 @@
 #ifndef DASHSEGMENT_H_
 #define DASHSEGMENT_H_
 
-#include "../adaptive/playlist/Segment.h"
-#include "../adaptive/playlist/SegmentChunk.hpp"
+#include "../../adaptive/playlist/Segment.h"
+#include "../../adaptive/playlist/SegmentChunk.hpp"
 
 namespace dash
 {

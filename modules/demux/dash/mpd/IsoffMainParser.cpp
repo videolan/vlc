@@ -27,22 +27,22 @@
 #endif
 
 #include "IsoffMainParser.h"
-#include "../adaptive/playlist/SegmentTemplate.h"
-#include "../adaptive/playlist/Segment.h"
-#include "../adaptive/playlist/SegmentBase.h"
-#include "../adaptive/playlist/SegmentList.h"
-#include "../adaptive/playlist/SegmentTimeline.h"
-#include "../adaptive/playlist/SegmentInformation.hpp"
+#include "../../adaptive/playlist/SegmentTemplate.h"
+#include "../../adaptive/playlist/Segment.h"
+#include "../../adaptive/playlist/SegmentBase.h"
+#include "../../adaptive/playlist/SegmentList.h"
+#include "../../adaptive/playlist/SegmentTimeline.h"
+#include "../../adaptive/playlist/SegmentInformation.hpp"
 #include "MPD.h"
 #include "Representation.h"
 #include "Period.h"
 #include "AdaptationSet.h"
 #include "ProgramInformation.h"
 #include "DASHSegment.h"
-#include "../adaptive/xml/DOMHelper.h"
-#include "../adaptive/tools/Helper.h"
-#include "../adaptive/tools/Debug.hpp"
-#include "../adaptive/tools/Conversions.hpp"
+#include "../../adaptive/xml/DOMHelper.h"
+#include "../../adaptive/tools/Helper.h"
+#include "../../adaptive/tools/Debug.hpp"
+#include "../../adaptive/tools/Conversions.hpp"
 #include <vlc_stream.h>
 #include <cstdio>
 #include <limits>

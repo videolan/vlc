@@ -20,8 +20,8 @@
 #ifndef SMOOTHSEGMENT_HPP
 #define SMOOTHSEGMENT_HPP
 
-#include "../adaptive/playlist/SegmentTemplate.h"
-#include "../adaptive/playlist/SegmentChunk.hpp"
+#include "../../adaptive/playlist/SegmentTemplate.h"
+#include "../../adaptive/playlist/SegmentChunk.hpp"
 
 namespace smooth
 {

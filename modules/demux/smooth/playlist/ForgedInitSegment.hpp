@@ -20,8 +20,8 @@
 #ifndef FORGEDINITSEGMENT_HPP
 #define FORGEDINITSEGMENT_HPP
 
-#include "../adaptive/playlist/Segment.h"
-#include "../adaptive/playlist/Inheritables.hpp"
+#include "../../adaptive/playlist/Segment.h"
+#include "../../adaptive/playlist/Inheritables.hpp"
 
 #include <vlc_es.h>
 #include <vlc_codecs.h>

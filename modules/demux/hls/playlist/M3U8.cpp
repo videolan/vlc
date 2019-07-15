@@ -23,8 +23,8 @@
 
 #include "M3U8.hpp"
 #include "Representation.hpp"
-#include "../adaptive/playlist/BasePeriod.h"
-#include "../adaptive/playlist/BaseAdaptationSet.h"
+#include "../../adaptive/playlist/BasePeriod.h"
+#include "../../adaptive/playlist/BaseAdaptationSet.h"
 
 using namespace hls::playlist;
 

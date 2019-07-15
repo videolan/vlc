@@ -29,8 +29,8 @@
 
 extern "C"
 {
-    #include "../meta_engine/ID3Tag.h"
-    #include "../meta_engine/ID3Meta.h"
+    #include "../../meta_engine/ID3Tag.h"
+    #include "../../meta_engine/ID3Meta.h"
 }
 
 using namespace hls;

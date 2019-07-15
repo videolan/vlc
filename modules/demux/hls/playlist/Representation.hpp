@@ -21,9 +21,9 @@
 #ifndef HLSREPRESENTATION_H_
 #define HLSREPRESENTATION_H_
 
-#include "../adaptive/playlist/BaseRepresentation.h"
-#include "../adaptive/tools/Properties.hpp"
-#include "../adaptive/StreamFormat.hpp"
+#include "../../adaptive/playlist/BaseRepresentation.h"
+#include "../../adaptive/tools/Properties.hpp"
+#include "../../adaptive/StreamFormat.hpp"
 
 namespace hls
 {

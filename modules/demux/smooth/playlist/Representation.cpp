@@ -23,9 +23,9 @@
 
 #include "Representation.hpp"
 #include "Manifest.hpp"
-#include "../adaptive/playlist/SegmentTemplate.h"
-#include "../adaptive/playlist/SegmentTimeline.h"
-#include "../adaptive/playlist/BaseAdaptationSet.h"
+#include "../../adaptive/playlist/SegmentTemplate.h"
+#include "../../adaptive/playlist/SegmentTimeline.h"
+#include "../../adaptive/playlist/BaseAdaptationSet.h"
 
 using namespace smooth::playlist;
 

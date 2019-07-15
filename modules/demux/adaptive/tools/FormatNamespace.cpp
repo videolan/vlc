@@ -22,8 +22,8 @@
 #endif
 
 #include "FormatNamespace.hpp"
-#include "../../demux/mp4/mpeg4.h"
-#include "../../packetizer/mpeg4audio.h"
+#include "../../mp4/mpeg4.h"
+#include "../../../packetizer/mpeg4audio.h"
 #include "../tools/Helper.h"
 
 #include <list>

@@ -25,8 +25,8 @@
 #ifndef MPD_H_
 #define MPD_H_
 
-#include "../adaptive/playlist/AbstractPlaylist.hpp"
-#include "../adaptive/StreamFormat.hpp"
+#include "../../adaptive/playlist/AbstractPlaylist.hpp"
+#include "../../adaptive/StreamFormat.hpp"
 #include "Profile.hpp"
 
 namespace dash

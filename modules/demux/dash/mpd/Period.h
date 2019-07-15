@@ -24,8 +24,8 @@
 #ifndef PERIOD_H_
 #define PERIOD_H_
 
-#include "../adaptive/playlist/BasePeriod.h"
-#include "../adaptive/playlist/SegmentInformation.hpp"
+#include "../../adaptive/playlist/BasePeriod.h"
+#include "../../adaptive/playlist/SegmentInformation.hpp"
 
 namespace dash
 {

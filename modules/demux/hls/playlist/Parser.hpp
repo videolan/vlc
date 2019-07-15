@@ -20,7 +20,7 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
-#include "../adaptive/playlist/SegmentInfoCommon.h"
+#include "../../adaptive/playlist/SegmentInfoCommon.h"
 
 #include <cstdlib>
 #include <sstream>

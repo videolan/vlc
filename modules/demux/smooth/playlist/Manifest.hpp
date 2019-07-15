@@ -20,9 +20,9 @@
 #ifndef MANIFEST_HPP
 #define MANIFEST_HPP
 
-#include "../adaptive/playlist/AbstractPlaylist.hpp"
-#include "../adaptive/playlist/Inheritables.hpp"
-#include "../adaptive/Time.hpp"
+#include "../../adaptive/playlist/AbstractPlaylist.hpp"
+#include "../../adaptive/playlist/Inheritables.hpp"
+#include "../../adaptive/Time.hpp"
 
 namespace smooth
 {

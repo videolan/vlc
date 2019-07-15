@@ -22,11 +22,11 @@
 #endif
 
 #include "IndexReader.hpp"
-#include "../adaptive/playlist/BaseRepresentation.h"
-#include "../adaptive/playlist/BaseAdaptationSet.h"
-#include "../adaptive/playlist/SegmentTemplate.h"
-#include "../adaptive/playlist/SegmentTimeline.h"
-#include "../adaptive/playlist/AbstractPlaylist.hpp"
+#include "../../adaptive/playlist/BaseRepresentation.h"
+#include "../../adaptive/playlist/BaseAdaptationSet.h"
+#include "../../adaptive/playlist/SegmentTemplate.h"
+#include "../../adaptive/playlist/SegmentTimeline.h"
+#include "../../adaptive/playlist/AbstractPlaylist.hpp"
 
 using namespace adaptive::mp4;
 using namespace smooth::mp4;

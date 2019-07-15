@@ -29,7 +29,7 @@
 #include <string>
 #include <map>
 
-#include "../adaptive/playlist/BaseAdaptationSet.h"
+#include "../../adaptive/playlist/BaseAdaptationSet.h"
 #include "DASHCommonAttributesElements.h"
 
 namespace dash

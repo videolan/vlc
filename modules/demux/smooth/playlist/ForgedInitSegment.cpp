@@ -23,7 +23,7 @@
 
 #include "ForgedInitSegment.hpp"
 #include "MemoryChunk.hpp"
-#include "../adaptive/playlist/SegmentChunk.hpp"
+#include "../../adaptive/playlist/SegmentChunk.hpp"
 
 #include <vlc_common.h>
 
@@ -31,8 +31,8 @@
 
 extern "C"
 {
-    #include "../../mux/mp4/libmp4mux.h"
-    #include "../../demux/mp4/libmp4.h" /* majors */
+    #include "../../../mux/mp4/libmp4mux.h"
+    #include "../../mp4/libmp4.h" /* majors */
 }
 
 using namespace adaptive;

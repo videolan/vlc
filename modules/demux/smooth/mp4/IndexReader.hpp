@@ -20,7 +20,7 @@
 #ifndef SMOOTHINDEXREADER_HPP
 #define SMOOTHINDEXREADER_HPP
 
-#include "../adaptive/mp4/AtomsReader.hpp"
+#include "../../adaptive/mp4/AtomsReader.hpp"
 
 namespace adaptive
 {
