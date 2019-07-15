@@ -34,8 +34,8 @@
 #include <vlc_memstream.h>
 #include <assert.h>
 
-#include "../codec/substext.h"
-#include "../demux/mp4/minibox.h"
+#include "../substext.h"
+#include "../../demux/mp4/minibox.h"
 #include "webvtt.h"
 
 
