@@ -33,8 +33,8 @@
 
 #include <vlc_common.h>
 #include <vlc_block.h>
-#include "dtv/bdagraph.hpp"
-#include "dtv/dtv.h"
+#include "bdagraph.hpp"
+#include "dtv.h"
 #undef DEBUG_MONIKER_NAME
 
 static ModulationType dvb_parse_modulation (const char *mod)

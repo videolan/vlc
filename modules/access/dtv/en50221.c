@@ -47,9 +47,9 @@
 #   include <vlc_httpd.h>
 #endif
 
-#include "../demux/dvb-text.h"
-#include "dtv/en50221.h"
-#include "dtv/en50221_capmt.h"
+#include "../../demux/dvb-text.h"
+#include "en50221.h"
+#include "en50221_capmt.h"
 
 typedef struct en50221_session_t
 {

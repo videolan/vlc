@@ -38,8 +38,8 @@
 #include <linux/dvb/frontend.h>
 #include <linux/dvb/dmx.h>
 
-#include "dtv/dtv.h"
-#include "dtv/en50221.h"
+#include "dtv.h"
+#include "en50221.h"
 
 #ifndef O_SEARCH
 # define O_SEARCH O_RDONLY

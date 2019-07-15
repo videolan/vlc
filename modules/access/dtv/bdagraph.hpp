@@ -35,7 +35,7 @@
 #include <dshow.h>
 
 #include <comcat.h>
-#include "dtv/bdadefs.h"
+#include "bdadefs.h"
 #include <stdexcept>
 
 

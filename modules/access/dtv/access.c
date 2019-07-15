@@ -32,7 +32,7 @@
 #include <search.h>
 #endif
 
-#include "dtv/dtv.h"
+#include "dtv.h"
 
 #define ADAPTER_TEXT N_("DVB adapter")
 #define ADAPTER_LONGTEXT N_( \
