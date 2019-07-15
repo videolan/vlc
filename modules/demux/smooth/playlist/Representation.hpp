@@ -20,8 +20,8 @@
 #ifndef SMOOTHREPRESENTATION_HPP
 #define SMOOTHREPRESENTATION_HPP
 
-#include "../adaptive/playlist/SegmentInfoCommon.h"
-#include "../adaptive/playlist/BaseRepresentation.h"
+#include "../../adaptive/playlist/SegmentInfoCommon.h"
+#include "../../adaptive/playlist/BaseRepresentation.h"
 
 namespace adaptive
 {

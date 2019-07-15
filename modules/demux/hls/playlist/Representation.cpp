@@ -28,9 +28,9 @@
 #include "M3U8.hpp"
 #include "Parser.hpp"
 #include "HLSSegment.hpp"
-#include "../adaptive/playlist/BasePeriod.h"
-#include "../adaptive/playlist/BaseAdaptationSet.h"
-#include "../adaptive/playlist/SegmentList.h"
+#include "../../adaptive/playlist/BasePeriod.h"
+#include "../../adaptive/playlist/BaseAdaptationSet.h"
+#include "../../adaptive/playlist/SegmentList.h"
 
 #include <ctime>
 

@@ -22,7 +22,7 @@
 #endif
 
 #include "HLSSegment.hpp"
-#include "../adaptive/playlist/BaseRepresentation.h"
+#include "../../adaptive/playlist/BaseRepresentation.h"
 
 
 using namespace hls::playlist;

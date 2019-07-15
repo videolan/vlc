@@ -31,8 +31,8 @@
 #include "AdaptationSet.h"
 #include "MPD.h"
 #include "TrickModeType.h"
-#include "../adaptive/playlist/SegmentTemplate.h"
-#include "../adaptive/playlist/SegmentTimeline.h"
+#include "../../adaptive/playlist/SegmentTemplate.h"
+#include "../../adaptive/playlist/SegmentTimeline.h"
 
 using namespace dash::mpd;
 

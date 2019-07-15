@@ -22,7 +22,7 @@
 #endif
 
 #include "Manifest.hpp"
-#include "../adaptive/playlist/BasePeriod.h"
+#include "../../adaptive/playlist/BasePeriod.h"
 
 #include <vlc_common.h>
 

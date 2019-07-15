@@ -20,7 +20,7 @@
 #ifndef INDEXREADER_HPP
 #define INDEXREADER_HPP
 
-#include "../adaptive/mp4/AtomsReader.hpp"
+#include "../../adaptive/mp4/AtomsReader.hpp"
 
 namespace adaptive
 {

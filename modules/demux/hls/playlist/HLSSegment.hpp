@@ -20,8 +20,8 @@
 #ifndef HLSSEGMENT_HPP
 #define HLSSEGMENT_HPP
 
-#include "../adaptive/playlist/Segment.h"
-#include "../adaptive/encryption/CommonEncryption.hpp"
+#include "../../adaptive/playlist/Segment.h"
+#include "../../adaptive/encryption/CommonEncryption.hpp"
 
 namespace hls
 {

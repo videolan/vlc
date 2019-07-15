@@ -21,7 +21,7 @@
 #ifndef M3U8_H_
 #define M3U8_H_
 
-#include "../adaptive/playlist/AbstractPlaylist.hpp"
+#include "../../adaptive/playlist/AbstractPlaylist.hpp"
 
 namespace hls
 {

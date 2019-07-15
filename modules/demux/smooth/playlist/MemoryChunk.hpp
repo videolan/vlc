@@ -20,7 +20,7 @@
 #ifndef MEMORYCHUNK_HPP
 #define MEMORYCHUNK_HPP
 
-#include "../adaptive/http/Chunk.h"
+#include "../../adaptive/http/Chunk.h"
 
 namespace smooth
 {

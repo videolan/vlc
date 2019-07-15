@@ -29,7 +29,7 @@
 # include "config.h"
 #endif
 
-#include "../adaptive/playlist/SegmentInfoCommon.h"
+#include "../../adaptive/playlist/SegmentInfoCommon.h"
 #include "Profile.hpp"
 
 #include <cstdlib>
