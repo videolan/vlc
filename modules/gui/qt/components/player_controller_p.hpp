@@ -131,6 +131,7 @@ public:
     VLCVarChoiceModel m_audioStereoMode;
     float           m_volume = 0.f;
     bool            m_muted = false;
+    AudioDeviceModel m_audioDeviceList;
     VLCVarChoiceModel m_audioVisualization;
 
     //misc

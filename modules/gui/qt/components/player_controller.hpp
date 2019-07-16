@@ -30,6 +30,7 @@
 #include <QScopedPointer>
 #include <vlc_cxx_helpers.hpp>
 #include "util/input_models.hpp"
+#include "components/audio_device_model.hpp"
 #include "adapters/var_choice_model.hpp"
 #include "util/vlctick.hpp"
 
@@ -167,6 +168,7 @@ public:
     //aout properties
     Q_PROPERTY(float volume READ getVolume WRITE setVolume NOTIFY volumeChanged)
     Q_PROPERTY(bool muted READ isMuted WRITE setMuted NOTIFY soundMuteChanged)
+    Q_PROPERTY(AudioDeviceModel* audioDevices READ getAudioDevices CONSTANT)
     Q_PROPERTY(VLCVarChoiceModel* audioStereoMode READ getAudioStereoMode CONSTANT)
     Q_PROPERTY(VLCVarChoiceModel* audioVisualization READ getAudioVisualizations CONSTANT)
     Q_PROPERTY(bool hasAudioVisualization READ hasAudioVisualization NOTIFY hasAudioVisualizationChanged)
@@ -321,6 +323,7 @@ public slots:
     void setVolume( float volume );
     bool isMuted() const;
     void setMuted( bool muted );
+    AudioDeviceModel* getAudioDevices();
     VLCVarChoiceModel* getAudioStereoMode();
     VLCVarChoiceModel* getAudioVisualizations();
     bool hasAudioVisualization() const;
