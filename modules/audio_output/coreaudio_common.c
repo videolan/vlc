@@ -356,13 +356,6 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     msg_Dbg(p_aout, "Current device has a latency of %lld us",
             i_dev_latency_us);
 
-    /* TODO VLC can't handle latency higher than 1 seconds */
-    if (i_dev_latency_us > 1000000)
-    {
-        i_dev_latency_us = 1000000;
-        msg_Warn(p_aout, "VLC can't handle this device latency, lowering it to "
-                 "%lld", i_dev_latency_us);
-    }
     p_sys->i_dev_latency_us = i_dev_latency_us;
 
     /* setup circular buffer */
