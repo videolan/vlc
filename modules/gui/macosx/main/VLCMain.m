@@ -55,7 +55,6 @@
 
 #import "os-integration/VLCClickerManager.h"
 
-#import "panels/dialogs/VLCResumeDialogController.h"
 #import "panels/dialogs/VLCCoreDialogProvider.h"
 #import "panels/VLCAudioEffectsWindowController.h"
 #import "panels/VLCBookmarksWindowController.h"
@@ -106,7 +105,6 @@ NSString *VLCConfigurationChangedNotification = @"VLCConfigurationChangedNotific
     VLCOpenWindowController *_open;
     VLCCoreDialogProvider *_coredialogs;
     VLCBookmarksWindowController *_bookmarks;
-    VLCResumeDialogController *_resume_dialog;
     VLCPlaybackContinuityController *_continuityController;
     VLCLogWindowController *_messagePanelController;
     VLCStatusBarIcon *_statusBarIcon;
@@ -504,14 +502,6 @@ static VLCMain *sharedInstance = nil;
 - (VLCCoreDialogProvider *)coreDialogProvider
 {
     return _coredialogs;
-}
-
-- (VLCResumeDialogController *)resumeDialog
-{
-    if (!_resume_dialog)
-        _resume_dialog = [[VLCResumeDialogController alloc] init];
-
-    return _resume_dialog;
 }
 
 @end

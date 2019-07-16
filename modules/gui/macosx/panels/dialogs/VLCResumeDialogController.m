@@ -47,7 +47,6 @@
                                                      name:VLCWindowShouldUpdateLevel
                                                    object:nil];
     }
-
     return self;
 }
 

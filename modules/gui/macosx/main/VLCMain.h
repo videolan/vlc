@@ -45,7 +45,6 @@ extern NSString *VLCConfigurationChangedNotification;
  *****************************************************************************/
 @class VLCExtensionsManager;
 @class VLCMainMenu;
-@class VLCResumeDialogController;
 @class VLCSimplePrefsController;
 @class VLCPrefs;
 @class VLCCoreDialogProvider;
@@ -82,7 +81,6 @@ extern NSString *VLCConfigurationChangedNotification;
 @property (readonly) VLCOpenWindowController *open;
 @property (readonly) VLCPlaylistController *playlistController;
 @property (readonly) VLCPrefs *preferences;
-@property (readonly) VLCResumeDialogController *resumeDialog;
 @property (readonly) VLCSimplePrefsController *simplePreferences;
 @property (readonly) VLCTrackSynchronizationWindowController *trackSyncPanel;
 @property (readonly) VLCVideoEffectsWindowController *videoEffectsPanel;

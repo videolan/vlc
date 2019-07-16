@@ -35,6 +35,7 @@
 @interface VLCPlaybackContinuityController()
 {
     VLCInputItem *_currentInput;
+    VLCResumeDialogController *_resumeDialogController;
 }
 @end
 
@@ -63,6 +64,7 @@
                                selector:@selector(playbackStatusUpdated:)
                                    name:VLCPlayerStateChanged
                                  object:nil];
+        _resumeDialogController = [[VLCResumeDialogController alloc] init];
     }
     return self;
 }
@@ -83,7 +85,7 @@
 {
     VLCMain *mainInstance = [VLCMain sharedInstance];
     // Cancel pending resume dialogs
-    [[mainInstance resumeDialog] cancel];
+    [_resumeDialogController cancel];
 
     // object is hold here and released then it is dead
     _currentInput = [[mainInstance playlistController] currentlyPlayingInputItem];
@@ -185,9 +187,9 @@
         return;
     }
 
-    [[[VLCMain sharedInstance] resumeDialog] showWindowWithItem:inputItem
-                                               withLastPosition:lastPosition.intValue
-                                                completionBlock:completionBlock];
+    [_resumeDialogController showWindowWithItem:inputItem
+                               withLastPosition:lastPosition.intValue
+                                completionBlock:completionBlock];
 
 }
 
