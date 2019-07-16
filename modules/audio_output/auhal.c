@@ -1055,8 +1055,7 @@ WarnConfiguration(audio_output_t *p_aout)
  * StartAnalog: open and setup a HAL AudioUnit to do PCM audio output
  */
 static int
-StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
-            vlc_tick_t i_latency_us)
+StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 {
     aout_sys_t                  *p_sys = p_aout->sys;
     OSStatus                    err = noErr;
@@ -1110,7 +1109,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
 
     /* Do the last VLC aout setups */
     bool warn_configuration;
-    int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout, i_latency_us,
+    int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout, 0,
                             &warn_configuration);
     if (ret != VLC_SUCCESS)
         goto error;
@@ -1143,8 +1142,7 @@ error:
  * StartSPDIF: Setup an encoded digital stream (SPDIF) output
  */
 static int
-StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt,
-           vlc_tick_t i_latency_us)
+StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
 {
     aout_sys_t *p_sys = p_aout->sys;
     int ret;
@@ -1385,7 +1383,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt,
         return VLC_EGENERIC;
     }
 
-    ret = ca_Initialize(p_aout, fmt, i_latency_us);
+    ret = ca_Initialize(p_aout, fmt, 0);
     if (ret != VLC_SUCCESS)
     {
         AudioDeviceDestroyIOProcID(p_sys->i_selected_dev, p_sys->i_procID);
@@ -1611,7 +1609,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     /* Check for Digital mode or Analog output mode */
     if (do_spdif)
     {
-        if (StartSPDIF (p_aout, fmt, i_latency_us) == VLC_SUCCESS)
+        if (StartSPDIF(p_aout, fmt) == VLC_SUCCESS)
         {
             msg_Dbg(p_aout, "digital output successfully opened");
             return VLC_SUCCESS;
@@ -1619,7 +1617,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     }
     else
     {
-        if (StartAnalog(p_aout, fmt, i_latency_us) == VLC_SUCCESS)
+        if (StartAnalog(p_aout, fmt) == VLC_SUCCESS)
         {
             msg_Dbg(p_aout, "analog output successfully opened");
             fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
