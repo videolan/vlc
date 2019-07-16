@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf-prefs.m
  *****************************************************************************
- * Copyright (C) 2001-2015 VLC authors and VideoLAN
+ * Copyright (C) 2001-2019 VLC authors and VideoLAN
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
@@ -133,14 +133,21 @@ static const int kCurrentPreferencesVersion = 4;
         [self resetAndReinitializeUserDefaults];
     }
 
-    /* Relaunch now */
-    const char * path = [[[NSBundle mainBundle] executablePath] UTF8String];
+    [VLCMain relaunchApplication];
+}
 
-    /* For some reason we need to fork(), not just execl(), which reports a ENOTSUP then. */
-    if (fork() != 0) {
-        exit(0);
-    }
-    execl(path, path, (char *)NULL);
+- (void)resetPreferences
+{
+    /* reset VLC's config */
+    config_ResetAll();
+
+    /* force config file creation, since libvlc won't exit normally */
+    config_SaveConfigFile(getIntf());
+
+    /* reset OS X defaults */
+    [self resetAndReinitializeUserDefaults];
+
+    [VLCMain relaunchApplication];
 }
 
 @end

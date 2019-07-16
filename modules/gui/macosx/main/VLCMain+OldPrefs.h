@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf-prefs.h
  *****************************************************************************
- * Copyright (C) 2001-2015 VLC authors and VideoLAN
+ * Copyright (C) 2001-2019 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
  *
@@ -26,5 +26,7 @@
 
 - (void)resetAndReinitializeUserDefaults;
 - (void)migrateOldPreferences;
+
+- (void)resetPreferences;
 
 @end

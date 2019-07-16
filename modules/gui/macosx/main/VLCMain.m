@@ -210,6 +210,17 @@ static VLCMain *sharedInstance = nil;
     sharedInstance = nil;
 }
 
++ (void)relaunchApplication
+{
+    const char *path = [[[NSBundle mainBundle] executablePath] UTF8String];
+
+    /* For some reason we need to fork(), not just execl(), which reports a ENOTSUP then. */
+    if (fork() != 0) {
+        exit(0);
+    }
+    execl(path, path, (char *)NULL);
+}
+
 - (id)init
 {
     self = [super init];

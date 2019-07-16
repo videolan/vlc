@@ -908,25 +908,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     [alert addButtonWithTitle:_NS("Continue")];
     [alert beginSheetModalForWindow:[sender window] completionHandler:^(NSModalResponse returnCode) {
         if (returnCode == NSAlertSecondButtonReturn) {
-            /* reset VLC's config */
-            config_ResetAll();
-            [self resetControls];
-
-            /* force config file creation, since libvlc won't exit normally */
-            config_SaveConfigFile(self->p_intf);
-
-            /* reset OS X defaults */
-            [[VLCMain sharedInstance] resetAndReinitializeUserDefaults];
-
-            /* Relaunch now */
-            const char * path = [[[NSBundle mainBundle] executablePath] UTF8String];
-
-            /* For some reason we need to fork(), not just execl(), which reports a ENOTSUP then. */
-            if (fork() != 0) {
-                exit(0);
-                return;
-            }
-            execl(path, path, (char *)NULL);
+            [[VLCMain sharedInstance] resetPreferences];
         }
     }];
 }
