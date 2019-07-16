@@ -165,15 +165,18 @@ int vlc_memstream_vprintf(struct vlc_memstream *ms, const char *fmt,
     va_list ap;
     char *ptr;
     int len;
+    size_t newlen;
 
     va_copy(ap, args);
     len = vsnprintf(NULL, 0, fmt, ap);
     va_end(ap);
 
-    if (len < 0)
+    if (len < 0
+     || unlikely(add_overflow(ms->length, len, &newlen))
+     || unlikely(add_overflow(newlen, 1, &newlen)))
         goto error;
 
-    ptr = realloc(ms->ptr, ms->length + len + 1);
+    ptr = realloc(ms->ptr, newlen);
     if (ptr == NULL)
         goto error;
 
