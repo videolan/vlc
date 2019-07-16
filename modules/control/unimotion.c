@@ -107,7 +107,7 @@ union motion_data {
 };
 
 
-static int set_values(int type, int *kernFunc, char **servMatch, int *dataType)
+static int set_values(int type, int *kernFunc, const char **servMatch, int *dataType)
 {
     switch ( type ) {
         case powerbook:
@@ -137,7 +137,7 @@ static int set_values(int type, int *kernFunc, char **servMatch, int *dataType)
     return 1;
 }
 
-static int probe_sms(int kernFunc, char *servMatch, int dataType, void *data)
+static int probe_sms(int kernFunc, const char *servMatch, int dataType, void *data)
 {
     kern_return_t result;
     mach_port_t masterPort;
@@ -196,7 +196,7 @@ static int probe_sms(int kernFunc, char *servMatch, int dataType, void *data)
     memset(&inputStructure, 0, sizeof(union motion_data));
     memset(outputStructure, 0, sizeof(union motion_data));
 
-    result = IOConnectCallStructMethod(dataPort, kernFunc, &inputStructure, 
+    result = IOConnectCallStructMethod(dataPort, kernFunc, &inputStructure,
                 structureInputSize, outputStructure, &structureOutputSize );
 
     IOServiceClose(dataPort);
@@ -211,7 +211,7 @@ static int probe_sms(int kernFunc, char *servMatch, int dataType, void *data)
 int detect_sms()
 {
     int kernFunc;
-    char *servMatch;
+    const char *servMatch;
     int dataType;
     union motion_data data;
     int i;
@@ -229,7 +229,7 @@ int detect_sms()
 int read_sms_raw(int type, int *x, int *y, int *z)
 {
     int kernFunc;
-    char *servMatch;
+    const char *servMatch;
     int dataType;
     union motion_data data;
 
