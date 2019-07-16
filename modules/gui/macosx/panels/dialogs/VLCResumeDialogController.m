@@ -28,17 +28,19 @@
 #import "extensions/NSString+Helpers.h"
 #import "windows/video/VLCVideoOutputProvider.h"
 #import "library/VLCInputItem.h"
+#import "views/VLCWrappableTextField.h"
 
 @interface VLCResumeDialogController()
 {
-    int currentResumeTimeout;
-    CompletionBlock completionBlock;
+    int _currentResumeTimeout;
+    CompletionBlock _completionBlock;
+    NSTimer *_countdownTimer;
 }
 @end
 
 @implementation VLCResumeDialogController
 
-- (id)init
+- (instancetype)init
 {
     self = [super initWithWindowNibName:@"ResumeDialog"];
     if (self) {
@@ -57,68 +59,66 @@
 
 - (void)windowDidLoad
 {
-    [o_title_lbl setStringValue:_NS("Continue playback?")];
-    [o_resume_btn setTitle:_NS("Continue")];
+    [_titleLabel setStringValue:_NS("Continue playback?")];
+    [_resumeButton setTitle:_NS("Continue")];
 
-    [o_always_resume_chk setTitle:_NS("Always continue media playback")];
+    [_alwaysResumeCheckbox setTitle:_NS("Always continue media playback")];
 }
 
 - (void)showWindowWithItem:(VLCInputItem *)inputItem withLastPosition:(NSInteger)pos completionBlock:(CompletionBlock)block
 {
-    NSWindow *w = [self window];
+    _currentResumeTimeout = 10;
+    _completionBlock = [block copy];
 
-    currentResumeTimeout = 10;
-    completionBlock = [block copy];
-
-    NSString *o_restartButtonLabel = _NS("Restart playback");
-    o_restartButtonLabel = [o_restartButtonLabel stringByAppendingFormat:@" (%d)", currentResumeTimeout];
-    [o_restart_btn setTitle:o_restartButtonLabel];
+    NSString *restartButtonLabel = _NS("Restart playback");
+    restartButtonLabel = [restartButtonLabel stringByAppendingFormat:@" (%d)", _currentResumeTimeout];
+    [_restartButton setTitle:restartButtonLabel];
 
     NSString *labelString = [NSString stringWithFormat:_NS("Playback of \"%@\" will continue at %@"), inputItem.title, [NSString stringWithTime:pos]];
-    [o_text_lbl setStringValue:labelString];
-    [o_always_resume_chk setState: NSOffState];
+    [_descriptionLabel setStringValue:labelString];
+    [_alwaysResumeCheckbox setState:NSOffState];
 
-    o_countdown_timer = [NSTimer scheduledTimerWithTimeInterval:1
-                                                         target:self
-                                                       selector:@selector(updateAlertWindow:)
-                                                       userInfo:nil
-                                                        repeats:YES];
+    _countdownTimer = [NSTimer scheduledTimerWithTimeInterval:1
+                                                       target:self
+                                                     selector:@selector(updateAlertWindow:)
+                                                     userInfo:nil
+                                                      repeats:YES];
 
-    [w setLevel:[[[VLCMain sharedInstance] voutProvider] currentStatusWindowLevel]];
-    [w center];
-
-    [w makeKeyAndOrderFront:nil];
+    NSWindow *window = [self window];
+    [window setLevel:[[[VLCMain sharedInstance] voutProvider] currentStatusWindowLevel]];
+    [window center];
+    [window makeKeyAndOrderFront:nil];
 }
 
 - (void)updateAlertWindow:(NSTimer *)timer
 {
-    --currentResumeTimeout;
-    if (currentResumeTimeout <= 0) {
-        [self buttonClicked:o_restart_btn];
+    --_currentResumeTimeout;
+    if (_currentResumeTimeout <= 0) {
+        [self buttonClicked:_restartButton];
         [timer invalidate];
         timer = nil;
     }
 
     NSString *buttonLabel = _NS("Restart playback");
-    buttonLabel = [buttonLabel stringByAppendingFormat:@" (%d)", currentResumeTimeout];
+    buttonLabel = [buttonLabel stringByAppendingFormat:@" (%d)", _currentResumeTimeout];
 
-    [o_restart_btn setTitle:buttonLabel];
+    [_restartButton setTitle:buttonLabel];
 }
 
 - (IBAction)buttonClicked:(id)sender
 {
     enum ResumeResult resumeResult = RESUME_FAIL;
 
-    if (sender == o_restart_btn)
+    if (sender == _restartButton)
         resumeResult = RESUME_RESTART;
-    else if (sender == o_resume_btn)
+    else if (sender == _resumeButton)
         resumeResult = RESUME_NOW;
 
     [[self window] close];
 
-    if (completionBlock) {
-        completionBlock(resumeResult);
-        completionBlock = nil;
+    if (_completionBlock) {
+        _completionBlock(resumeResult);
+        _completionBlock = nil;
     }
 }
 
@@ -141,12 +141,12 @@
     if (![self isWindowLoaded])
         return;
 
-    if (o_countdown_timer != nil) {
-        [o_countdown_timer invalidate];
-        o_countdown_timer = nil;
+    if (_countdownTimer != nil) {
+        [_countdownTimer invalidate];
+        _countdownTimer = nil;
     }
 
-    [[self window] close];
+    [self.window close];
 }
 
 @end

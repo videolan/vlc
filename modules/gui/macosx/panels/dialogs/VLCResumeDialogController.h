@@ -24,6 +24,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class VLCInputItem;
+@class VLCWrappableTextField;
 
 enum ResumeResult {
     RESUME_RESTART,
@@ -34,16 +35,12 @@ enum ResumeResult {
 typedef void(^CompletionBlock)(enum ResumeResult);
 
 @interface VLCResumeDialogController : NSWindowController
-{
-    IBOutlet id o_title_lbl;
-    IBOutlet id o_text_lbl;
 
-    IBOutlet id o_restart_btn;
-    IBOutlet id o_resume_btn;
-    IBOutlet id o_always_resume_chk;
-
-    NSTimer *o_countdown_timer;
-}
+@property (readwrite, strong) IBOutlet NSTextField *titleLabel;
+@property (readwrite, strong) IBOutlet VLCWrappableTextField *descriptionLabel;
+@property (readwrite, strong) IBOutlet NSButton *restartButton;
+@property (readwrite, strong) IBOutlet NSButton *resumeButton;
+@property (readwrite, strong) IBOutlet NSButton *alwaysResumeCheckbox;
 
 - (IBAction)buttonClicked:(id)sender;
 - (IBAction)resumeSettingChanged:(id)sender;

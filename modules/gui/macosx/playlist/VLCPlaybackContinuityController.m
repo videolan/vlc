@@ -30,8 +30,6 @@
 #import "playlist/VLCPlayerController.h"
 #import "library/VLCInputItem.h"
 
-#import <vlc_url.h>
-
 @interface VLCPlaybackContinuityController()
 {
     VLCInputItem *_currentInput;
