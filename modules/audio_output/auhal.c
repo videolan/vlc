@@ -1608,9 +1608,12 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     /* get device latency */
     UInt32 i_latency_samples;
-    AO_GET1PROP(p_sys->i_selected_dev, UInt32, &i_latency_samples,
-                kAudioDevicePropertyLatency, kAudioObjectPropertyScopeOutput);
-    mtime_t i_latency_us = i_latency_samples * CLOCK_FREQ / fmt->i_rate;
+    mtime_t i_latency_us = 0;
+    int ret = AO_GET1PROP(p_sys->i_selected_dev, UInt32, &i_latency_samples,
+                          kAudioDevicePropertyLatency,
+                          kAudioObjectPropertyScopeOutput);
+    if (ret == VLC_SUCCESS)
+        i_latency_us += i_latency_samples * CLOCK_FREQ / fmt->i_rate;
 
     msg_Dbg(p_aout, "Current device has a latency of %lld us", i_latency_us);
 
