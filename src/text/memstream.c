@@ -127,7 +127,13 @@ int vlc_memstream_close(struct vlc_memstream *ms)
 size_t vlc_memstream_write(struct vlc_memstream *ms, const void *ptr,
                            size_t len)
 {
-    char *base = realloc(ms->ptr, ms->length + len + 1u);
+    size_t newlen;
+
+    if (unlikely(add_overflow(ms->length, len, &newlen))
+     || unlikely(add_overflow(newlen, 1, &newlen)))
+        goto error;
+
+    char *base = realloc(ms->ptr, newlen);
     if (unlikely(base == NULL))
         goto error;
 
