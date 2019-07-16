@@ -1603,6 +1603,8 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
                 kAudioDevicePropertyLatency, kAudioObjectPropertyScopeOutput);
     vlc_tick_t i_latency_us = vlc_tick_from_samples(i_latency_samples, fmt->i_rate);
 
+    msg_Dbg(p_aout, "Current device has a latency of %lld us", i_latency_us);
+
     /* Check for Digital mode or Analog output mode */
     if (do_spdif)
     {

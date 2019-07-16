@@ -357,9 +357,6 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     p_sys->i_frame_length = fmt->i_frame_length;
     p_sys->chans_to_reorder = 0;
 
-    msg_Dbg(p_aout, "Current device has a latency of %lld us",
-            i_dev_latency_us);
-
     p_sys->i_dev_latency_us = i_dev_latency_us;
 
     /* setup circular buffer */
