@@ -541,8 +541,10 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (err != noErr)
         ca_LogWarn("failed to set IO mode");
 
-    ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout,
-                        [p_sys->avInstance outputLatency] * CLOCK_FREQ, NULL);
+    const mtime_t latency_us = [p_sys->avInstance outputLatency] * CLOCK_FREQ;
+    msg_Dbg(p_aout, "Current device has a latency of %lld us", latency_us);
+
+    ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout, latency_us, NULL);
     if (ret != VLC_SUCCESS)
         goto error;
 

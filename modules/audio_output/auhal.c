@@ -1612,6 +1612,8 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
                 kAudioDevicePropertyLatency, kAudioObjectPropertyScopeOutput);
     mtime_t i_latency_us = i_latency_samples * CLOCK_FREQ / fmt->i_rate;
 
+    msg_Dbg(p_aout, "Current device has a latency of %lld us", i_latency_us);
+
     /* Check for Digital mode or Analog output mode */
     if (do_spdif)
     {
