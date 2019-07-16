@@ -38,34 +38,34 @@
 
 #define PLANAR_WRITE_UV_CLIP( i_bpp ) \
     i_u = *p_in++ ; i_v = *p_in_v++ ; \
-    *p_out++ = VLC_CLIP( (( ((i_u * i_cos + i_v * i_sin - i_x) >> i_bpp) \
-                     * i_sat) >> i_bpp) + I_MID( i_bpp ), 0, I_MAX( i_bpp ) ); \
-    *p_out_v++ = VLC_CLIP( (( ((i_v * i_cos - i_u * i_sin - i_y) >> i_bpp) \
-                       * i_sat) >> i_bpp) + I_MID( i_bpp ), 0, I_MAX( i_bpp ) )
+    *p_out++ = VLC_CLIP( ((( (((i_u * i_cos + i_v * i_sin - i_x) + I_MID( i_bpp )) >> i_bpp) \
+                     * i_sat) + I_MID( i_bpp )) >> i_bpp) + I_MID( i_bpp ), 0, I_MAX( i_bpp ) ); \
+    *p_out_v++ = VLC_CLIP( ((( (((i_v * i_cos - i_u * i_sin - i_y) + I_MID( i_bpp )) >> i_bpp) \
+                       * i_sat) + I_MID( i_bpp )) >> i_bpp) + I_MID( i_bpp ), 0, I_MAX( i_bpp ) )
 
 #define PLANAR_WRITE_UV( i_bpp ) \
     i_u = *p_in++ ; i_v = *p_in_v++ ; \
-    *p_out++ = (( ((i_u * i_cos + i_v * i_sin - i_x) >> i_bpp) \
-                       * i_sat) >> i_bpp) + I_MID( i_bpp ); \
-    *p_out_v++ = (( ((i_v * i_cos - i_u * i_sin - i_y) >> i_bpp) \
-                       * i_sat) >> i_bpp) + I_MID( i_bpp )
+    *p_out++ = ((( (((i_u * i_cos + i_v * i_sin - i_x) + I_MID( i_bpp )) >> i_bpp) \
+                       * i_sat) + I_MID( i_bpp )) >> i_bpp) + I_MID( i_bpp ); \
+    *p_out_v++ = ((( (((i_v * i_cos - i_u * i_sin - i_y) + I_MID( i_bpp )) >> i_bpp) \
+                       * i_sat) + I_MID( i_bpp )) >> i_bpp) + I_MID( i_bpp )
 
 #define PACKED_WRITE_UV_CLIP() \
     i_u = *p_in; p_in += 4; i_v = *p_in_v; p_in_v += 4; \
-    *p_out = clip_uint8_vlc( (( ((i_u * i_cos + i_v * i_sin - i_x) >> 8) \
-                           * i_sat) >> 8) + 128); \
+    *p_out = clip_uint8_vlc( ((( (((i_u * i_cos + i_v * i_sin - i_x) + I_MID( 8 )) >> 8) \
+                           * i_sat) + I_MID( 8 )) >> 8) + 128); \
     p_out += 4; \
-    *p_out_v = clip_uint8_vlc( (( ((i_v * i_cos - i_u * i_sin - i_y) >> 8) \
-                           * i_sat) >> 8) + 128); \
+    *p_out_v = clip_uint8_vlc( ((( (((i_v * i_cos - i_u * i_sin - i_y) + I_MID( 8 )) >> 8) \
+                           * i_sat) + I_MID( 8 )) >> 8) + 128); \
     p_out_v += 4
 
 #define PACKED_WRITE_UV() \
     i_u = *p_in; p_in += 4; i_v = *p_in_v; p_in_v += 4; \
-    *p_out = (( ((i_u * i_cos + i_v * i_sin - i_x) >> 8) \
-                       * i_sat) >> 8) + 128; \
+    *p_out = ((( (((i_u * i_cos + i_v * i_sin - i_x) + I_MID( 8 )) >> 8) \
+                       * i_sat) + I_MID( 8 )) >> 8) + 128; \
     p_out += 4; \
-    *p_out_v = (( ((i_v * i_cos - i_u * i_sin - i_y) >> 8) \
-                       * i_sat) >> 8) + 128; \
+    *p_out_v = ((( (((i_v * i_cos - i_u * i_sin - i_y) + I_MID( 8 )) >> 8) \
+                       * i_sat) + I_MID( 8 )) >> 8) + 128; \
     p_out_v += 4
 
 #define ADJUST_8_TIMES(x) x; x; x; x; x; x; x; x
