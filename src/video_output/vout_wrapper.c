@@ -181,10 +181,9 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_t *vd)
 static int Forward(vlc_object_t *object, char const *var,
                    vlc_value_t oldval, vlc_value_t newval, void *data)
 {
-    vout_thread_t *vout = (vout_thread_t*)object;
     vout_display_t *vd = data;
 
-    VLC_UNUSED(oldval);
+    VLC_UNUSED(object); VLC_UNUSED(oldval);
     return var_Set(vd, var, newval);
 }
 #endif
