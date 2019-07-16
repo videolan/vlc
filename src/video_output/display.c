@@ -70,18 +70,17 @@ static int vout_display_start(void *func, bool forced, va_list ap)
     vout_display_open_cb activate = func;
     vout_display_t *vd = va_arg(ap, vout_display_t *);
     const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
-    video_format_t *fmtp = va_arg(ap, video_format_t *);
     vlc_video_context *context = va_arg(ap, vlc_video_context *);
 
     /* Picture buffer does not have the concept of aspect ratio */
-    video_format_Copy(fmtp, &vd->source);
-    fmtp->i_sar_num = 0;
-    fmtp->i_sar_den = 0;
+    video_format_Copy(&vd->fmt, &vd->source);
+    vd->fmt.i_sar_num = 0;
+    vd->fmt.i_sar_den = 0;
     vd->obj.force = forced; /* TODO: pass to activate() instead? */
 
-    int ret = activate(vd, cfg, fmtp, context);
+    int ret = activate(vd, cfg, &vd->fmt, context);
     if (ret != VLC_SUCCESS) {
-        video_format_Clean(fmtp);
+        video_format_Clean(&vd->fmt);
         vlc_objres_clear(VLC_OBJECT(vd));
     }
     return ret;
@@ -765,7 +764,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
         vd->owner = *owner;
 
     if (vlc_module_load(vd, "vout display", module, module && *module != '\0',
-                        vout_display_start, vd, &osys->cfg, &vd->fmt,
+                        vout_display_start, vd, &osys->cfg,
                         vctx) == NULL)
         goto error;
 
