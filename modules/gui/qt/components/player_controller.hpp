@@ -97,6 +97,15 @@ public:
     };
     Q_ENUM(MediaStopAction)
 
+    enum Telekeys{
+        TELE_RED = VLC_PLAYER_TELETEXT_KEY_RED,
+        TELE_GREEN = VLC_PLAYER_TELETEXT_KEY_GREEN,
+        TELE_YELLOW = VLC_PLAYER_TELETEXT_KEY_YELLOW,
+        TELE_BLUE = VLC_PLAYER_TELETEXT_KEY_BLUE,
+        TELE_INDEX = VLC_PLAYER_TELETEXT_KEY_INDEX
+    };
+    Q_ENUM(Telekeys)
+
     //playback
     Q_PROPERTY(PlayingState playingState READ getPlayingState NOTIFY playingStateChanged)
     Q_PROPERTY(bool isPlaying READ hasInput NOTIFY inputChanged)

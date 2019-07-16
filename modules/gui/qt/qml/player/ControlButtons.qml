@@ -57,6 +57,7 @@ Item{
         case PlayerControlBarModel.QUIT_BUTTON: return quitBtnDelegate
         case PlayerControlBarModel.VOLUME: return volumeBtnDelegate
         case PlayerControlBarModel.ASPECT_RATIO_COMBOBOX: return aspectRatioDelegate
+        case PlayerControlBarModel.TELETEXT_BUTTONS: return teletextdelegate
         }
         console.log("button delegate id " + inpID +  " doesn't exists")
         return spacerDelegate
@@ -402,6 +403,11 @@ Item{
             onCurrentIndexChanged: model.toggleIndex(currentIndex)
             property bool acceptFocus: true
         }
+    }
+
+    Component{
+        id: teletextdelegate
+        TeletextWidget{}
     }
 
     Component{

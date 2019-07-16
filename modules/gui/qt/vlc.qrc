@@ -252,6 +252,7 @@
         <file alias="ModalControlBar.qml">qml/player/ModalControlBar.qml</file>
         <file alias="ControlButtons.qml">qml/player/ControlButtons.qml</file>
         <file alias="VolumeWidget.qml">qml/player/VolumeWidget.qml</file>
+        <file alias="TeletextWidget.qml">qml/player/TeletextWidget.qml</file>
     </qresource>
     <qresource prefix="/about">
         <file alias="About.qml">qml/about/About.qml</file>
