@@ -779,8 +779,6 @@ static int OpenVideo(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if(!sys)
         return VLC_ENOMEM;
 
-    vd->sys = (vout_display_sys_t*) sys;
-
     bool b_init;
     vlc_mutex_lock(&sys->lock);
     b_init = !sys->b_recycling;
@@ -817,6 +815,8 @@ static int OpenVideo(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = PrepareVideo;
     vd->display = NULL;
     vd->control = ControlVideo;
+
+    vd->sys = (vout_display_sys_t*) sys;
 
     return VLC_SUCCESS;
 }
