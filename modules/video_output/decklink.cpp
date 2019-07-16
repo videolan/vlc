@@ -220,7 +220,6 @@ struct decklink_sys_t
     /* single video module exclusive */
     struct
     {
-        video_format_t currentfmt;
         bool tenbits;
         uint8_t afd, ar;
         int nosignal_delay;
@@ -365,7 +364,6 @@ static void ReleaseDLSys(vlc_object_t *obj, int i_cat)
         /* Clean video specific */
         if (sys->video.pic_nosignal)
             picture_Release(sys->video.pic_nosignal);
-        video_format_Clean(&sys->video.currentfmt);
 
         free(sys);
         var_Destroy(libvlc, "decklink-sys");
@@ -406,7 +404,7 @@ static BMDVideoConnection getVConn(vout_display_t *vd, BMDVideoConnection mask)
 /*****************************************************************************
  *
  *****************************************************************************/
-static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
+static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t *fmt)
 {
 #define CHECK(message) do { \
     if (result != S_OK) \
@@ -514,7 +512,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
     CHECK("Could not set video output connection");
 
     p_display_mode = Decklink::Helper::MatchDisplayMode(VLC_OBJECT(vd), sys->p_output,
-                                          &vd->fmt, wanted_mode_id);
+                                          &vd->source, wanted_mode_id);
     if(p_display_mode == NULL)
     {
         msg_Err(vd, "Could not negociate a compatible display mode");
@@ -571,8 +569,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
         result = sys->p_output->EnableVideoOutput(mode_id, flags);
         CHECK("Could not enable video output");
 
-        video_format_t *fmt = &sys->video.currentfmt;
-        video_format_Copy(fmt, &vd->fmt);
+        video_format_Copy(fmt, &vd->source);
         fmt->i_width = fmt->i_visible_width = p_display_mode->GetWidth();
         fmt->i_height = fmt->i_visible_height = p_display_mode->GetHeight();
         fmt->i_x_offset = 0;
@@ -624,6 +621,7 @@ error:
         decklink_iterator->Release();
     if (p_display_mode)
         p_display_mode->Release();
+    video_format_Clean(fmt);
 
     vlc_mutex_unlock(&sys->lock);
 
@@ -792,7 +790,7 @@ static int OpenVideo(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->video.ar = var_InheritInteger(vd, VIDEO_CFG_PREFIX "ar");
         sys->video.pic_nosignal = NULL;
 
-        if (OpenDecklink(vd, sys) != VLC_SUCCESS)
+        if (OpenDecklink(vd, sys, fmtp) != VLC_SUCCESS)
         {
             CloseVideo(vd);
             return VLC_EGENERIC;
@@ -801,16 +799,12 @@ static int OpenVideo(vout_display_t *vd, const vout_display_cfg_t *cfg,
         char *pic_file = var_InheritString(vd, VIDEO_CFG_PREFIX "nosignal-image");
         if (pic_file)
         {
-            sys->video.pic_nosignal = sdi::Generator::Picture(VLC_OBJECT(vd), pic_file, &vd->fmt);
+            sys->video.pic_nosignal = sdi::Generator::Picture(VLC_OBJECT(vd), pic_file, fmtp);
             if (!sys->video.pic_nosignal)
                 msg_Err(vd, "Could not create no signal picture");
             free(pic_file);
         }
     }
-
-    /* vout must adapt */
-    video_format_Clean( &vd->fmt );
-    video_format_Copy( &vd->fmt, &sys->video.currentfmt );
 
     vd->prepare = PrepareVideo;
     vd->display = NULL;
