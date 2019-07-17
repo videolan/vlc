@@ -36,16 +36,7 @@ Utils.NavigableFocusScope {
         ColumnLayout {
             anchors.fill: parent
 
-            MenuBar {
-                Menus.MediaMenu { title: qsTr("&Media") }
-                Menus.PlaybackMenu { title: qsTr("&Playback") }
-                Menus.AudioMenu { title: qsTr("&Audio") }
-                Menus.VideoMenu { title: qsTr("&Video") }
-                Menus.SubtitleMenu { title: qsTr("&Subtitle") }
-                Menus.ToolsMenu { title: qsTr("&Tools") }
-                Menus.ViewMenu { title: qsTr("V&iew") }
-                Menus.HelpMenu { title: qsTr("&Help") }
-
+            Menus.MainMenubar {
                 Layout.fillWidth: true
             }
 
