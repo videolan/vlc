@@ -45,6 +45,9 @@ Utils.NavigableFocusScope {
     property alias subTabModel: model_music_id.model
     signal toogleMenu()
 
+
+    property var playlistWidget: undefined
+
     // Triggered when the toogleView button is selected
     function toggleView () {
         medialib.gridView = !medialib.gridView
@@ -348,7 +351,12 @@ Utils.NavigableFocusScope {
                             size: VLCStyle.icon_normal
                             text: VLCIcons.playlist
 
-                            onClicked: rootWindow.playlistVisible = !rootWindow.playlistVisible
+                            onClicked: {
+                                rootWindow.playlistVisible = !rootWindow.playlistVisible
+                                if (playlistWidget && rootWindow.playlistVisible && rootWindow.playlistDocked)
+                                    playlistWidget.gainFocus(playlist_btn)
+
+                            }
 
                             KeyNavigation.right: menu_selector
                             KeyNavigation.up: buttonView

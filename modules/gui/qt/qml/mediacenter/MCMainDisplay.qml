@@ -89,7 +89,12 @@ Utils.NavigableFocusScope {
             focus: true
             id: medialibId
             anchors.fill: parent
-            onActionRight: rootWindow.playlistVisible = true
+            onActionRight: {
+                if (rootWindow.playlistDocked) {
+                    rootWindow.playlistVisible = true
+                    playlist.gainFocus(medialibId)
+                }
+            }
 
             ColumnLayout {
                 id: column
@@ -109,6 +114,8 @@ Utils.NavigableFocusScope {
 
                     focus: true
                     model: root.tabModel
+
+                    playlistWidget: playlist
 
                     onItemClicked: {
                         sourcesBanner.subTabModel = undefined
@@ -203,10 +210,13 @@ Utils.NavigableFocusScope {
                             focus: false
                             expandHorizontally: true
 
+                            property var previousFocus: undefined
+
                             state: (rootWindow.playlistDocked && rootWindow.playlistVisible) ? "visible" : "hidden"
-                            onVisibleChanged: {
-                                if (playlist.visible)
-                                    playlist.forceActiveFocus()
+
+                            function gainFocus(previous) {
+                                playlist.previousFocus = previous
+                                playlist.forceActiveFocus()
                             }
                             component: Rectangle {
                                 color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.9)
@@ -225,16 +235,15 @@ Utils.NavigableFocusScope {
                                         focus: true
                                         anchors.fill: parent
                                         onActionLeft: playlist.closeAndFocus(stackView.currentItem)
-                                        onActionCancel: playlist.closeAndFocus(stackView.currentItem)
-                                        onActionUp: playlist.closeAndFocus(sourcesBanner)
+                                        onActionCancel: playlist.closeAndFocus(playlist.previousFocus)
+                                        onActionUp: playlist.closeAndFocus(playlist.previousFocus)
                                     }
                                 }
                             }
                             function closeAndFocus(item){
+                                rootWindow.playlistVisible = false
                                 if (!item)
                                     return
-
-                                rootWindow.playlistVisible = false
                                 item.forceActiveFocus()
                             }
                         }
