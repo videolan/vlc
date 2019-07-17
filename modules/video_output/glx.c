@@ -113,6 +113,17 @@ static bool CheckGLXext (Display *dpy, unsigned snum, const char *ext)
     return false;
 }
 
+static void Close(vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+    Display *dpy = sys->display;
+
+    glXDestroyContext(dpy, sys->ctx);
+    glXDestroyWindow(dpy, sys->win);
+    XCloseDisplay(dpy);
+    free(sys);
+}
+
 static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 {
     vlc_object_t *obj = VLC_OBJECT(gl);
@@ -252,17 +263,6 @@ error:
     XCloseDisplay (dpy);
     free (sys);
     return VLC_EGENERIC;
-}
-
-static void Close(vlc_gl_t *gl)
-{
-    vlc_gl_sys_t *sys = gl->sys;
-    Display *dpy = sys->display;
-
-    glXDestroyContext (dpy, sys->ctx);
-    glXDestroyWindow (dpy, sys->win);
-    XCloseDisplay (dpy);
-    free (sys);
 }
 
 vlc_module_begin ()
