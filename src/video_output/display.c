@@ -775,7 +775,8 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     vd->display = NULL;
     vd->control = NULL;
     vd->sys = NULL;
-    vd->owner = *owner;
+    if (owner)
+        vd->owner = *owner;
 
     osys->video_context.device = vlc_decoder_device_Create(osys->cfg.window);
     vlc_video_context *video_context = osys->video_context.device ?

@@ -189,7 +189,7 @@ struct vout_display_owner_t {
      * Be careful, it does not ensure correct serialization if it is used
      * from multiple threads.
      */
-    void            (*event)(vout_display_t *, int, va_list);
+    void (*viewpoint_moved)(void *sys, const vlc_viewpoint_t *vp);
 };
 
 /**
@@ -362,14 +362,6 @@ static inline int vout_display_Control(vout_display_t *vd, int query, ...)
     return ret;
 }
 
-static inline void vout_display_SendEvent(vout_display_t *vd, int query, ...)
-{
-    va_list args;
-    va_start(args, query);
-    vd->owner.event(vd, query, args);
-    va_end(args);
-}
-
 VLC_API void vout_display_SendEventPicturesInvalid(vout_display_t *vd);
 
 static inline void vout_display_SendEventMousePressed(vout_display_t *vd, int button)
@@ -387,7 +379,8 @@ static inline void vout_display_SendEventMouseDoubleClick(vout_display_t *vd)
 static inline void vout_display_SendEventViewpointMoved(vout_display_t *vd,
                                                         const vlc_viewpoint_t *vp)
 {
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED, vp);
+    if (vd->owner.viewpoint_moved)
+        vd->owner.viewpoint_moved(vd->owner.sys, vp);
 }
 
 /**

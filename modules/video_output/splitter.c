@@ -107,11 +107,6 @@ static int vlc_vidsplit_Control(vout_display_t *vd, int query, va_list args)
     return VLC_EGENERIC;
 }
 
-static void vlc_vidsplit_display_Event(vout_display_t *p, int id, va_list ap)
-{
-    (void) p; (void) id; (void) ap;
-}
-
 static void vlc_vidsplit_Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -230,10 +225,7 @@ static vout_display_t *vlc_vidsplit_CreateDisplay(vlc_object_t *obj,
     const vout_display_cfg_t *restrict cfg,
     const char *name)
 {
-    vout_display_owner_t owner = {
-        .event = vlc_vidsplit_display_Event,
-    };
-    return vout_display_New(obj, source, cfg, name, &owner);
+    return vout_display_New(obj, source, cfg, name, NULL);
 }
 
 static int vlc_vidsplit_Open(vout_display_t *vd,

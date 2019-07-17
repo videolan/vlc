@@ -42,20 +42,10 @@ static int  Forward(vlc_object_t *, char const *,
                     vlc_value_t, vlc_value_t, void *);
 #endif
 
-static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
+static void VoutViewpointMoved(void *sys, const vlc_viewpoint_t *vp)
 {
-    vout_thread_t *vout = vd->owner.sys;
-
-    switch (event) {
-    case VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED:
-        var_SetAddress(vout, "viewpoint-moved",
-                       (void *)va_arg(args, const vlc_viewpoint_t *));
-        break;
-    default:
-        msg_Err(vd, "VoutDisplayEvent received event %d", event);
-        /* TODO add an assert when all event are handled */
-        break;
-    }
+    vout_thread_t *vout = sys;
+    var_SetAddress(vout, "viewpoint-moved", (void*)vp);
 }
 
 /* Minimum number of display picture */
@@ -70,7 +60,7 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
     vout_thread_sys_t *sys = vout->p;
     vout_display_t *vd;
     vout_display_owner_t owner = {
-        .event = VoutDisplayEvent, .sys = vout,
+        .viewpoint_moved = VoutViewpointMoved, .sys = vout,
     };
     const char *modlist;
     char *modlistbuf = NULL;
