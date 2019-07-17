@@ -144,7 +144,7 @@ ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
 endif
 ifdef HAVE_IOS
-FFMPEGCONF += --enable-pic --extra-ldflags="$(EXTRA_CFLAGS)"
+FFMPEGCONF += --enable-pic --extra-ldflags="$(EXTRA_CFLAGS) -isysroot $(IOS_SDK)"
 ifdef HAVE_NEON
 FFMPEGCONF += --as="$(AS)"
 endif
