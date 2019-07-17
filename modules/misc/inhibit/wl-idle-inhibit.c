@@ -30,7 +30,7 @@
 #include <string.h>
 
 #include <wayland-client.h>
-#include "misc/inhibit/idle-inhibit-client-protocol.h"
+#include "idle-inhibit-client-protocol.h"
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
