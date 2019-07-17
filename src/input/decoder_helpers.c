@@ -97,7 +97,6 @@ struct vlc_decoder_device_priv
 {
     struct vlc_decoder_device device;
     vlc_atomic_rc_t rc;
-    module_t *module;
 };
 
 static int decoder_device_Open(void *func, bool forced, va_list ap)
@@ -128,11 +127,11 @@ vlc_decoder_device_Create(vout_window_t *window)
     if (!priv)
         return NULL;
     char *name = var_InheritString(window, "dec-dev");
-    priv->module = vlc_module_load(&priv->device, "decoder device", name,
+    module_t *module = vlc_module_load(&priv->device, "decoder device", name,
                                     true, decoder_device_Open, &priv->device,
                                     window);
     free(name);
-    if (!priv->module)
+    if (module == NULL)
     {
         vlc_objres_clear(VLC_OBJECT(&priv->device));
         vlc_object_delete(&priv->device);
