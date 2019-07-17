@@ -549,6 +549,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/player/ModalControlBar.qml \
 	gui/qt/qml/player/SliderBar.qml \
 	gui/qt/qml/player/TeletextWidget.qml \
+	gui/qt/qml/player/MiniPlayer.qml \
 	gui/qt/qml/dialogs/Dialogs.qml \
 	gui/qt/qml/dialogs/ModalDialog.qml \
 	gui/qt/qml/utils/DNDLabel.qml \
@@ -600,7 +601,6 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/mediacenter/NetworkDriveDisplay.qml \
 	gui/qt/qml/mediacenter/NetworkFileDisplay.qml \
 	gui/qt/qml/mediacenter/NetworkListItem.qml \
-	gui/qt/qml/mediacenter/MiniPlayer.qml \
 	gui/qt/qml/playlist/PlaylistListView.qml \
 	gui/qt/qml/playlist/PlaylistMainView.qml \
 	gui/qt/qml/playlist/PLItem.qml \

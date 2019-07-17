@@ -214,7 +214,6 @@
         <file alias="NetworkDriveDisplay.qml">qml/mediacenter/NetworkDriveDisplay.qml</file>
         <file alias="NetworkFileDisplay.qml">qml/mediacenter/NetworkFileDisplay.qml</file>
         <file alias="NetworkListItem.qml">qml/mediacenter/NetworkListItem.qml</file>
-        <file alias="MiniPlayer.qml">qml/mediacenter/MiniPlayer.qml</file>
     </qresource>
     <qresource prefix="/style">
         <file alias="qmldir">qml/style/qmldir</file>
@@ -253,6 +252,7 @@
         <file alias="ControlButtons.qml">qml/player/ControlButtons.qml</file>
         <file alias="VolumeWidget.qml">qml/player/VolumeWidget.qml</file>
         <file alias="TeletextWidget.qml">qml/player/TeletextWidget.qml</file>
+        <file alias="MiniPlayer.qml">qml/player/MiniPlayer.qml</file>
     </qresource>
     <qresource prefix="/about">
         <file alias="About.qml">qml/about/About.qml</file>

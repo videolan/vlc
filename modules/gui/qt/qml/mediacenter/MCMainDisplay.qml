@@ -25,6 +25,7 @@ import "qrc:///style/"
 import "qrc:///qml/"
 import "qrc:///utils/" as Utils
 import "qrc:///playlist/" as PL
+import "qrc:///player/" as Player
 
 Utils.NavigableFocusScope {
     id: root
@@ -240,7 +241,7 @@ Utils.NavigableFocusScope {
                     }
                 }
 
-                MiniPlayer {
+                Player.MiniPlayer {
                     id: miniPlayer
 
                     onActionUp: stackViewZone.focus = true
