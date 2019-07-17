@@ -170,6 +170,7 @@ enum port_type
 - (void)audioSessionRouteChange:(NSNotification *)notification
 {
     audio_output_t *p_aout = [self aout];
+    struct aout_sys_t *p_sys = p_aout->sys;
     NSDictionary *userInfo = notification.userInfo;
     NSInteger routeChangeReason =
         [[userInfo valueForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
@@ -179,6 +180,12 @@ enum port_type
     if (routeChangeReason == AVAudioSessionRouteChangeReasonNewDeviceAvailable
      || routeChangeReason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable)
         aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+    else
+    {
+        const mtime_t latency_us = [p_sys->avInstance outputLatency] * CLOCK_FREQ;
+        ca_SetDeviceLatency(p_aout, latency_us);
+        msg_Dbg(p_aout, "Current device has a new latency of %lld us", latency_us);
+    }
 }
 
 - (void)handleInterruption:(NSNotification *)notification

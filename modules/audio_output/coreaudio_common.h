@@ -103,6 +103,8 @@ void ca_Uninitialize(audio_output_t *p_aout);
 
 void ca_SetAliveState(audio_output_t *p_aout, bool alive);
 
+void ca_SetDeviceLatency(audio_output_t *p_aout, mtime_t i_dev_latency_us);
+
 AudioUnit au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type);
 
 int  au_Initialize(audio_output_t *p_aout, AudioUnit au,

@@ -437,6 +437,16 @@ ca_SetAliveState(audio_output_t *p_aout, bool alive)
         vlc_sem_post(&p_sys->flush_sem);
 }
 
+void ca_SetDeviceLatency(audio_output_t *p_aout, mtime_t i_dev_latency_us)
+{
+    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+
+    lock_lock(p_sys);
+    /* cf. TODO in ca_Initialize */
+    p_sys->i_dev_latency_us = i_dev_latency_us > 1000000 ? 1000000 : i_dev_latency_us;
+    lock_unlock(p_sys);
+}
+
 AudioUnit
 au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type)
 {
