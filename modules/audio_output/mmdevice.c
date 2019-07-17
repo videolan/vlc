@@ -77,7 +77,6 @@ static char default_device_b[1] = "";
 typedef struct
 {
     aout_stream_t *stream; /**< Underlying audio output stream */
-    module_t *module;
     audio_output_t *aout;
     IMMDeviceEnumerator *it; /**< Device enumerator, NULL when exiting */
     IMMDevice *dev; /**< Selected output device, NULL if none */
@@ -1149,14 +1148,16 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         return -1;
     }
 
+    module_t *module;
+
     for (;;)
     {
         char *modlist = var_InheritString(aout, "mmdevice-backend");
         HRESULT hr;
         s->owner.device = sys->dev;
 
-        sys->module = vlc_module_load(s, "aout stream", modlist,
-                                      false, aout_stream_Start, s, fmt, &hr);
+        module = vlc_module_load(s, "aout stream", modlist,
+                                 false, aout_stream_Start, s, fmt, &hr);
         free(modlist);
 
         int ret = -1;
@@ -1184,7 +1185,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             break;
     }
 
-    if (sys->module != NULL)
+    if (module != NULL)
     {
         IPropertyStore *props;
         HRESULT hr = IMMDevice_OpenPropertyStore(sys->dev, STGM_READ, &props);
@@ -1211,7 +1212,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     LeaveCriticalSection(&sys->lock);
     LeaveMTA();
 
-    if (sys->module == NULL)
+    if (module == NULL)
     {
         vlc_object_delete(s);
         return -1;
