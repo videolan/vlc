@@ -278,6 +278,7 @@ typedef struct {
 
     /* */
     video_format_t source;
+    vlc_video_context *src_vctx;
      /* filters to convert the vout source to fmt, NULL means no conversion
       * can be done and nothing will be displayed */
     filter_chain_t *converters;
@@ -751,6 +752,8 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     osys->crop.num = 0;
     osys->crop.den = 0;
 
+    osys->src_vctx = vctx ? vlc_video_context_Hold( vctx ) : NULL;
+
     /* */
     vout_display_t *vd = &osys->display;
     video_format_Copy(&vd->source, source);
@@ -767,7 +770,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
 
     if (vlc_module_load(vd, "vout display", module, module && *module != '\0',
                         vout_display_start, vd, &osys->cfg,
-                        vctx) == NULL)
+                        osys->src_vctx) == NULL)
         goto error;
 
 #if defined(__OS2__)
@@ -799,6 +802,12 @@ error:
 void vout_display_Delete(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+
+    if (osys->src_vctx)
+    {
+        vlc_video_context_Release( osys->src_vctx );
+        osys->src_vctx = NULL;
+    }
 
     if (osys->converters != NULL)
         filter_chain_Delete(osys->converters);
