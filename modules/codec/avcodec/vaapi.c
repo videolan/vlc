@@ -202,6 +202,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     ctx->hwaccel_context = &sys->hw_ctx;
     va->sys = sys;
     va->get = Get;
+    va->close = Delete;
     return VLC_SUCCESS;
 
 error:
@@ -217,7 +218,7 @@ error:
 vlc_module_begin ()
     set_description( N_("VA-API video decoder") )
     set_capability( "hw decoder", 100 )
-    set_callbacks( Create, Delete )
+    set_callbacks( Create, NULL )
     add_shortcut( "vaapi" )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )

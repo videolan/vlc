@@ -102,15 +102,6 @@ static int vlc_va_Start(void *func, bool forced, va_list ap)
     return open(va, ctx, pix_fmt, fmt, p_sys);
 }
 
-static void vlc_va_Stop(void *func, va_list ap)
-{
-    vlc_va_t *va = va_arg(ap, vlc_va_t *);
-    void *hwctx = va_arg(ap, void *);
-    void (*close)(vlc_va_t *, void *) = func;
-
-    close(va, hwctx);
-}
-
 struct vlc_va_priv {
     struct vlc_va_t va;
     module_t *module;
@@ -140,8 +131,7 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
 
 void vlc_va_Delete(vlc_va_t *va, void **hwctx)
 {
-    struct vlc_va_priv *priv = container_of(va, struct vlc_va_priv, va);
-
-    vlc_module_unload(priv->module, vlc_va_Stop, va, hwctx);
+    if (va->close != NULL)
+        va->close(va, hwctx);
     vlc_object_delete(va);
 }

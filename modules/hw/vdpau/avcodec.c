@@ -216,6 +216,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
         msg_Info(va, "Using %s", infos);
 
     va->get = Lock;
+    va->close = Close;
     return VLC_SUCCESS;
 
 error:
@@ -229,6 +230,6 @@ vlc_module_begin()
     set_capability("hw decoder", 100)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
-    set_callbacks(Open, Close)
+    set_callbacks(Open, NULL)
     add_shortcut("vdpau")
 vlc_module_end()
