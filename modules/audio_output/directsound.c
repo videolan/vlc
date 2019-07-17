@@ -575,13 +575,10 @@ static HRESULT Stop( aout_stream_sys_t *p_sys )
     return DS_OK;
 }
 
-static HRESULT StreamStop( aout_stream_t *s )
+static void StreamStop( aout_stream_t *s )
 {
-    HRESULT hr;
-
-    hr = Stop( s->sys );
+    Stop( s->sys );
     free( s->sys );
-    return hr;
 }
 
 static void OutputStop( audio_output_t *aout )
