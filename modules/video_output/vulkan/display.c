@@ -39,14 +39,11 @@
 #include <libplacebo/swapchain.h>
 #include <libplacebo/vulkan.h>
 
-#define VLCVK_MAX_BUFFERS 128
-
 struct vout_display_sys_t
 {
     vlc_vk_t *vk;
     const struct pl_tex *plane_tex[4];
     struct pl_renderer *renderer;
-    picture_pool_t *pool;
 
     // Pool of textures for the subpictures
     struct pl_overlay *overlays;
@@ -74,7 +71,6 @@ struct vout_display_sys_t
 };
 
 // Display callbacks
-static picture_pool_t *Pool(vout_display_t *, unsigned);
 static void PictureRender(vout_display_t *, picture_t *, subpicture_t *, mtime_t);
 static void PictureDisplay(vout_display_t *, picture_t *);
 static int Control(vout_display_t *, int, va_list);
@@ -142,7 +138,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     vd->info.subpicture_chromas = subfmts;
 
-    vd->pool = Pool;
     vd->prepare = PictureRender;
     vd->display = PictureDisplay;
     vd->control = Control;
@@ -174,21 +169,8 @@ static void Close(vout_display_t *vd)
     }
 
     pl_renderer_destroy(&sys->renderer);
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
 
     vlc_vk_Release(sys->vk);
-}
-
-static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
-{
-    assert(requested_count <= VLCVK_MAX_BUFFERS);
-    vout_display_sys_t *sys = vd->sys;
-    if (sys->pool)
-        return sys->pool;
-
-    sys->pool = picture_pool_NewFromFormat(&vd->fmt, requested_count);
-    return sys->pool;
 }
 
 static void PictureRender(vout_display_t *vd, picture_t *pic,
