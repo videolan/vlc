@@ -52,14 +52,6 @@ static int vlc_gl_start(void *func, bool forced, va_list ap)
     return ret;
 }
 
-static void vlc_gl_stop(void *func, va_list ap)
-{
-    void (*deactivate)(vlc_gl_t *) = func;
-    vlc_gl_t *gl = va_arg(ap, vlc_gl_t *);
-
-    deactivate(gl);
-}
-
 vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
                         unsigned flags, const char *name)
 {
@@ -111,7 +103,8 @@ void vlc_gl_Release(vlc_gl_t *gl)
     if (!vlc_atomic_rc_dec(&glpriv->rc))
         return;
 
-    vlc_module_unload(gl->module, vlc_gl_stop, gl);
+    if (gl->destroy != NULL)
+        gl->destroy(gl);
     vlc_objres_clear(VLC_OBJECT(gl));
     vlc_object_delete(gl);
 }

@@ -49,7 +49,7 @@ vlc_module_begin()
     add_integer("gpu-affinity", -1, HW_GPU_AFFINITY_TEXT, HW_GPU_AFFINITY_TEXT, true)
 
     set_capability("opengl", 50)
-    set_callbacks(Open, Close)
+    set_callbacks(Open, NULL)
     add_shortcut("wgl")
 vlc_module_end()
 
@@ -235,6 +235,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     gl->resize = NULL;
     gl->swap = Swap;
     gl->getProcAddress = OurGetProcAddress;
+    gl->destroy = Close;
 
     if (sys->exts.GetExtensionsStringEXT || sys->exts.GetExtensionsStringARB)
         gl->wgl.getExtensionsString = GetExtensionsString;

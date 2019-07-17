@@ -381,6 +381,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     gl->resize = Resize;
     gl->swap = SwapBuffers;
     gl->getProcAddress = GetSymbol;
+    gl->destroy = Close;
     gl->egl.queryString = QueryString;
 
     sys->eglCreateImageKHR = (void *)eglGetProcAddress("eglCreateImageKHR");
@@ -422,12 +423,12 @@ vlc_module_begin ()
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("opengl", 50)
-    set_callbacks (OpenGL, Close)
+    set_callbacks(OpenGL, NULL)
     add_shortcut ("egl")
 
     add_submodule ()
     set_capability ("opengl es2", 50)
-    set_callbacks (OpenGLES2, Close)
+    set_callbacks(OpenGLES2, NULL)
     add_shortcut ("egl")
 
 vlc_module_end ()

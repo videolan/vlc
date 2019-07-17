@@ -129,6 +129,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     gl->resize = Resize;
     gl->swap = VglSwapBuffers;
     gl->getProcAddress = OurGetProcAddress;
+    gl->destroy = Close;
 
     if( sys->setupCb )
         if( !sys->setupCb(sys->opaque) )
@@ -154,11 +155,11 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
     set_capability("opengl", 0)
-    set_callbacks(Open, Close)
+    set_callbacks(Open, NULL)
     add_shortcut("vglmem")
 
     add_submodule()
     set_capability("opengl es2", 0)
-    set_callbacks(Open, Close)
+    set_callbacks(Open, NULL)
     add_shortcut("vglmem")
 vlc_module_end()

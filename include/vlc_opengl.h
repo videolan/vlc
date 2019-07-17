@@ -51,6 +51,7 @@ struct vlc_gl_t
     void (*resize)(vlc_gl_t *, unsigned, unsigned);
     void (*swap)(vlc_gl_t *);
     void*(*getProcAddress)(vlc_gl_t *, const char *);
+    void (*destroy)(vlc_gl_t *);
 
     enum {
         VLC_GL_EXT_DEFAULT,

@@ -219,6 +219,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     gl->resize = NULL;
     gl->swap = SwapBuffers;
     gl->getProcAddress = GetSymbol;
+    gl->destroy = Close;
 
     bool is_swap_interval_set = false;
 
@@ -271,5 +272,5 @@ vlc_module_begin ()
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("opengl", 20)
-    set_callbacks (Open, Close)
+    set_callbacks(Open, NULL)
 vlc_module_end ()
