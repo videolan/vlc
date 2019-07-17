@@ -132,7 +132,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     return VLC_SUCCESS;
 }
 
-static void Delete(vlc_va_t *va, void *hwctx)
+static void Delete(vlc_va_t *va, void **hwctx)
 {
     vlc_va_sys_t *sys = va->sys;
     vlc_object_t *o = VLC_OBJECT(va);
