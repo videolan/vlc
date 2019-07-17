@@ -107,7 +107,7 @@ static int vlc_va_Start(void *func, va_list ap)
 static void vlc_va_Stop(void *func, va_list ap)
 {
     vlc_va_t *va = va_arg(ap, vlc_va_t *);
-    void *hwctx = va_arg(ap, void *);
+    void **hwctx = va_arg(ap, void **);
     void (*close)(vlc_va_t *, void *) = func;
 
     close(va, hwctx);
