@@ -1106,14 +1106,6 @@ static int aout_stream_Start(void *func, bool forced, va_list ap)
     return SUCCEEDED(*hr) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-static void aout_stream_Stop(void *func, va_list ap)
-{
-    aout_stream_stop_t stop = func;
-    aout_stream_t *s = va_arg(ap, aout_stream_t *);
-
-    stop(s);
-}
-
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
@@ -1238,7 +1230,7 @@ static void Stop(audio_output_t *aout)
     assert(sys->stream != NULL);
 
     EnterMTA();
-    vlc_module_unload(sys->module, aout_stream_Stop, sys->stream);
+    aout_stream_Stop(sys->stream);
     LeaveMTA();
 
     vlc_object_delete(sys->stream);

@@ -46,7 +46,6 @@ static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 static HRESULT StreamStart( aout_stream_t *, audio_sample_format_t *,
                             const GUID * );
-static HRESULT StreamStop( aout_stream_t * );
 static int ReloadDirectXDevices( const char *, char ***, char *** );
 static void * PlayedDataEraser( void * );
 /* Speaker setup override options list */
@@ -91,7 +90,7 @@ vlc_module_begin ()
 
     add_submodule()
         set_capability( "aout stream", 30 )
-        set_callbacks( StreamStart, StreamStop )
+        set_callbacks( StreamStart, NULL )
 vlc_module_end ()
 
 typedef struct aout_stream_sys
@@ -869,6 +868,7 @@ static HRESULT StreamStart( aout_stream_t *s,
     s->play = StreamPlay;
     s->pause = StreamPause;
     s->flush = StreamFlush;
+    s->stop = StreamStop;
     return S_OK;
 error:
     free( sys );

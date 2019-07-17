@@ -631,6 +631,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     s->play = Play;
     s->pause = Pause;
     s->flush = Flush;
+    s->stop = Stop;
     return S_OK;
 error:
     CoTaskMemFree(pwf_mix);
@@ -646,5 +647,5 @@ vlc_module_begin()
     set_capability("aout stream", 50)
     set_category(CAT_AUDIO)
     set_subcategory(SUBCAT_AUDIO_AOUT)
-    set_callbacks(Start, Stop)
+    set_callbacks(Start, NULL)
 vlc_module_end()

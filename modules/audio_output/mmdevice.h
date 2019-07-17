@@ -36,6 +36,7 @@ struct aout_stream
     struct vlc_object_t obj;
     void *sys;
 
+    HRESULT (*stop)(aout_stream_t *);
     HRESULT (*time_get)(aout_stream_t *, vlc_tick_t *);
     HRESULT (*play)(aout_stream_t *, block_t *);
     HRESULT (*pause)(aout_stream_t *, bool);
@@ -60,7 +61,10 @@ typedef HRESULT (*aout_stream_start_t)(aout_stream_t *s,
 /**
  * Destroys an audio output stream.
  */
-typedef HRESULT (*aout_stream_stop_t)(aout_stream_t *);
+static inline HRESULT aout_stream_Stop(aout_stream_t *s)
+{
+    return (s->stop)(s);
+}
 
 static inline HRESULT aout_stream_TimeGet(aout_stream_t *s, vlc_tick_t *delay)
 {
