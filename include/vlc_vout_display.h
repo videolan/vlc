@@ -253,7 +253,7 @@ struct vout_display_t {
      */
     vout_display_info_t info;
 
-    /* Return a pointer over the current picture_pool_t* (mandatory).
+    /* Return a pointer over the current picture_pool_t* (optional).
      *
      * For performance reasons, it is best to provide at least count
      * pictures but it is not mandatory.
