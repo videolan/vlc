@@ -40,7 +40,7 @@ vlc_module_begin()
     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
     set_capability( "stream_filter", 330 )
     set_description( N_( "ADF stream filter" ) )
-    set_callbacks( Open, NULL )
+    set_callback( Open )
 vlc_module_end()
 
 static int Control( stream_t *p_stream, int i_query, va_list args )

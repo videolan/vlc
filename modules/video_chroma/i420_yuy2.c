@@ -99,7 +99,7 @@ vlc_module_begin ()
     set_capability( "video converter", 250 )
 # define vlc_CPU_capable() vlc_CPU_ALTIVEC()
 #endif
-    set_callbacks( Activate, NULL )
+    set_callback( Activate )
 vlc_module_end ()
 
 /*****************************************************************************

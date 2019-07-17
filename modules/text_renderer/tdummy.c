@@ -34,7 +34,7 @@ vlc_module_begin ()
     set_shortname( N_("Dummy") )
     set_description( N_("Dummy font renderer") )
     set_capability( "text renderer", 1 )
-    set_callbacks( OpenRenderer, NULL )
+    set_callback( OpenRenderer )
 vlc_module_end ()
 
 

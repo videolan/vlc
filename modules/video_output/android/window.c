@@ -49,7 +49,7 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_capability("vout window", 10)
-    set_callbacks(Open, NULL)
+    set_callback(Open)
 vlc_module_end()
 
 

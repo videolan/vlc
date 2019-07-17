@@ -39,7 +39,7 @@ vlc_module_begin ()
     set_capability ("stream_filter", 301)
     /* Developers only module, no translation please */
     set_description ("Access controls tweaking")
-    set_callbacks(Open, NULL)
+    set_callback(Open)
 
     add_bool("seek", true, "Expose seeking capability", NULL, false)
         change_volatile ()

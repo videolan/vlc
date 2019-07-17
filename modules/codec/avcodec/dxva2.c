@@ -53,7 +53,7 @@ vlc_module_begin()
     set_capability("hw decoder", 100)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
-    set_callbacks(Open, NULL)
+    set_callback(Open)
 vlc_module_end()
 
 #include <initguid.h> /* must be last included to not redefine existing GUIDs */

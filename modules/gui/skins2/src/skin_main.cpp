@@ -531,6 +531,6 @@ vlc_module_begin ()
 
     add_submodule ()
         set_capability( "vout window", 51 )
-        set_callbacks( WindowOpen, NULL )
+        set_callback( WindowOpen )
 
 vlc_module_end ()

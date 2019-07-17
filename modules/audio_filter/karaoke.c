@@ -36,7 +36,7 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_AUDIO_AFILTER)
 
     set_capability ("audio filter", 0)
-    set_callbacks (Open, NULL)
+    set_callback(Open)
 vlc_module_end ()
 
 static block_t *Process (filter_t *, block_t *);

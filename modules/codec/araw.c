@@ -58,7 +58,7 @@ vlc_module_begin ()
     add_submodule ()
     set_description( N_("Raw audio encoder") )
     set_capability( "encoder", 150 )
-    set_callbacks( EncoderOpen, NULL )
+    set_callback( EncoderOpen )
 #endif
 vlc_module_end ()
 

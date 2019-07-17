@@ -71,7 +71,7 @@ add_submodule ()
     add_shortcut(ADDONS_MODULE_SHORTCUT".vlp")
     set_description(N_("single .vlp archive addons finder"))
     set_capability("addons finder", 101)
-    set_callbacks(OpenDesignated, NULL)
+    set_callback(OpenDesignated)
 vlc_module_end ()
 
 struct addons_finder_sys_t

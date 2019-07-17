@@ -49,7 +49,7 @@ vlc_module_begin ()
     set_description( N_("Dummy stream output") )
     set_capability( "sout stream", 50 )
     add_shortcut( "dummy", "drop" )
-    set_callbacks( Open, NULL )
+    set_callback( Open )
 vlc_module_end ()
 
 /*****************************************************************************

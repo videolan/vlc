@@ -943,7 +943,7 @@ vlc_module_begin ()
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout window", 10)
-    set_callbacks(Open, NULL)
+    set_callback(Open)
 
     /* Obsolete since 1.1.0: */
     add_obsolete_bool ("x11-altfullscreen")
@@ -957,7 +957,7 @@ vlc_module_begin ()
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout window", 70)
-    set_callbacks(EmOpen, NULL)
+    set_callback(EmOpen)
     add_shortcut ("embed-xid")
 
     add_string ("x11-display", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true)

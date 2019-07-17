@@ -62,6 +62,6 @@ vlc_module_begin ()
     /* Will be loaded even without interface module. see voutgl.m */
         set_description( "Minimal Mac OS X Video Output Provider" )
         set_capability( "vout window", 50 )
-        set_callbacks( WindowOpen, NULL )
+        set_callback( WindowOpen )
 vlc_module_end ()
 

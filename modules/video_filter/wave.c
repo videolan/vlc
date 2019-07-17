@@ -55,7 +55,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_shortcut( "wave" )
-    set_callbacks( Create, NULL )
+    set_callback( Create )
 vlc_module_end ()
 
 /*****************************************************************************

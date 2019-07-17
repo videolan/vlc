@@ -35,7 +35,7 @@ vlc_module_begin ()
     set_shortname( N_("Dummy") )
     set_description( N_("Dummy audio output") )
     set_capability( "audio output", 0 )
-    set_callbacks( Open, NULL )
+    set_callback( Open )
     add_shortcut( "dummy" )
 vlc_module_end ()
 

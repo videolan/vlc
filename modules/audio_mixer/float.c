@@ -47,7 +47,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_MISC )
     set_description( N_("Single precision audio volume") )
     set_capability( "audio volume", 10 )
-    set_callbacks( Create, NULL )
+    set_callback( Create )
 vlc_module_end ()
 
 /**

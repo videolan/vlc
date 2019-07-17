@@ -55,7 +55,7 @@ static picture_t *I422_YUVA_Filter( filter_t *, picture_t * );
 vlc_module_begin ()
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     set_capability( "video converter", 60 )
-    set_callbacks( Activate, NULL )
+    set_callback( Activate )
 vlc_module_end ()
 
 /*****************************************************************************

@@ -218,7 +218,7 @@ error:
 vlc_module_begin ()
     set_description( N_("VA-API video decoder") )
     set_capability( "hw decoder", 100 )
-    set_callbacks( Create, NULL )
+    set_callback( Create )
     add_shortcut( "vaapi" )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )

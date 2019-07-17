@@ -234,7 +234,7 @@ vlc_module_begin ()
         /* sout proxy that start the cc input when all streams are loaded */
         add_shortcut("chromecast-proxy")
         set_capability("sout stream", 0)
-        set_callbacks(ProxyOpen, NULL)
+        set_callback(ProxyOpen)
     add_submodule()
         set_subcategory(SUBCAT_SOUT_ACO)
         add_shortcut("chromecast-http")

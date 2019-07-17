@@ -44,7 +44,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_capability( "demux", 10 )
-    set_callbacks( Open, NULL )
+    set_callback( Open )
 vlc_module_end ()
 
 /*****************************************************************************

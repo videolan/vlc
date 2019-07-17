@@ -49,11 +49,11 @@ vlc_module_begin ()
     set_capability( "audio converter", 2 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_RESAMPLER )
-    set_callbacks( Create, NULL )
+    set_callback( Create )
 
     add_submodule()
     set_capability( "audio resampler", 2 )
-    set_callbacks( CreateResampler, NULL )
+    set_callback( CreateResampler )
 vlc_module_end ()
 
 /*****************************************************************************

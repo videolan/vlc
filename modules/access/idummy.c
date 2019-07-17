@@ -40,7 +40,7 @@ vlc_module_begin ()
     set_shortname( N_("Dummy") )
     set_description( N_("Dummy input") )
     set_capability( "access", 0 )
-    set_callbacks( OpenDemux, NULL )
+    set_callback( OpenDemux )
     add_shortcut( "dummy", "vlc" )
 vlc_module_end ()
 

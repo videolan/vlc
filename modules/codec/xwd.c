@@ -39,7 +39,7 @@ vlc_module_begin()
     set_capability("video decoder", 50)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
-    set_callbacks(Open, NULL)
+    set_callback(Open)
 vlc_module_end()
 
 static int Decode(decoder_t *, block_t *);

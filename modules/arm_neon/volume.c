@@ -37,7 +37,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_AUDIO_MISC)
     set_description(N_("ARM NEON audio volume"))
     set_capability("audio volume", 10)
-    set_callbacks(Probe, NULL)
+    set_callback(Probe)
 vlc_module_end()
 
 static void AmplifyFloat(audio_volume_t *, block_t *, float);

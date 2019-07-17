@@ -47,7 +47,7 @@ vlc_module_begin ()
     set_shortname( N_("Dummy") )
     set_description( N_("Dummy video output") )
     set_capability( "vout display", 0 )
-    set_callbacks( OpenDummy, NULL )
+    set_callback( OpenDummy )
     add_shortcut( "dummy" )
 
     set_category( CAT_VIDEO )
@@ -58,7 +58,7 @@ vlc_module_begin ()
     set_description( N_("Statistics video output") )
     set_capability( "vout display", 0 )
     add_shortcut( "stats" )
-    set_callbacks( OpenStats, NULL )
+    set_callback( OpenStats )
 vlc_module_end ()
 
 

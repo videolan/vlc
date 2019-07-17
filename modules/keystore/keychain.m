@@ -84,7 +84,7 @@ vlc_module_begin()
     change_integer_list(accessibility_list, accessibility_list_text)
     add_string("keychain-access-group", NULL, ACCESS_GROUP_TEXT, ACCESS_GROUP_LONGTEXT, true)
     set_capability("keystore", 100)
-    set_callbacks(Open, NULL)
+    set_callback(Open)
 vlc_module_end ()
 
 static NSMutableDictionary * CreateQuery(vlc_keystore *p_keystore)

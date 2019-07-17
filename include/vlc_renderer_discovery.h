@@ -212,7 +212,7 @@ static int vlc_rd_probe_open(vlc_object_t *obj) \
 #define VLC_RD_PROBE_SUBMODULE \
     add_submodule() \
         set_capability("renderer probe", 100) \
-        set_callbacks(vlc_rd_probe_open, NULL)
+        set_callback(vlc_rd_probe_open)
 
 /** @} @} */
 

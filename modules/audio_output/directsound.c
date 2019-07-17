@@ -90,7 +90,7 @@ vlc_module_begin ()
 
     add_submodule()
         set_capability( "aout stream", 30 )
-        set_callbacks( StreamStart, NULL )
+        set_callback( StreamStart )
 vlc_module_end ()
 
 typedef struct aout_stream_sys

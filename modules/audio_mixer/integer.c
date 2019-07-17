@@ -37,7 +37,7 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_AUDIO_MISC)
     set_description (N_("Integer audio volume"))
     set_capability ("audio volume", 9)
-    set_callbacks (Activate, NULL)
+    set_callback(Activate)
 vlc_module_end ()
 
 static void FilterS32N (audio_volume_t *vol, block_t *block, float volume)

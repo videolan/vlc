@@ -712,7 +712,7 @@ vlc_module_begin()
 #else
     set_capability("vout window", 10)
 #endif
-    set_callbacks(Open, NULL)
+    set_callback(Open)
 
     add_string("wl-display", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
     add_integer("wl-output", 0, OUTPUT_TEXT, OUTPUT_LONGTEXT, true)

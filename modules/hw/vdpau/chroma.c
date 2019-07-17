@@ -948,5 +948,5 @@ vlc_module_begin()
        N_("Scaling quality"), N_("High quality scaling level"), true)
 
     add_submodule()
-    set_callbacks(YCbCrOpen, NULL)
+    set_callback(YCbCrOpen)
 vlc_module_end()

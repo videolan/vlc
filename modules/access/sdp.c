@@ -38,7 +38,7 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_INPUT_ACCESS)
 
     set_capability ("access", 0)
-    set_callbacks (Open, NULL)
+    set_callback(Open)
     add_shortcut ("sdp")
 vlc_module_end()
 

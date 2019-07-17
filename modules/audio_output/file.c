@@ -125,7 +125,7 @@ vlc_module_begin ()
 
     set_capability( "audio output", 0 )
     add_shortcut( "file", "audiofile" )
-    set_callbacks( Open, NULL )
+    set_callback( Open )
 vlc_module_end ()
 
 static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
