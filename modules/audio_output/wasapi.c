@@ -636,7 +636,7 @@ error:
     return hr;
 }
 
-static void Stop(aout_stream_t *s)
+static HRESULT Stop(aout_stream_t *s)
 {
     aout_stream_sys_t *sys = s->sys;
 
@@ -644,6 +644,7 @@ static void Stop(aout_stream_t *s)
     IAudioClient_Release(sys->client);
 
     free(sys);
+    return S_OK;
 }
 
 vlc_module_begin()
