@@ -494,12 +494,19 @@ enum vlc_decoder_device_type
     VLC_DECODER_DEVICE_MMAL,
 };
 
+struct vlc_decoder_device_operations
+{
+    void (*close)(struct vlc_decoder_device *);
+};
+
 /**
  * Decoder context struct
  */
 typedef struct vlc_decoder_device
 {
     struct vlc_object_t obj;
+
+    const struct vlc_decoder_device_operations *ops;
 
     /** Private context that could be used by the "decoder device" module
      * implementation */
@@ -531,8 +538,6 @@ typedef struct vlc_decoder_device
  **/
 typedef int (*vlc_decoder_device_Open)(vlc_decoder_device *device,
                                         vout_window_t *window);
-/** "decoder device" module close entry point */
-typedef void (*vlc_decoder_device_Close)(vlc_decoder_device *device);
 
 /**
  * Create a decoder device from a window

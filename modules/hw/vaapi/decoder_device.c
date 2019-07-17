@@ -216,6 +216,10 @@ Close(vlc_decoder_device *device)
     vaapi_DestroyInstance(device->sys);
 }
 
+static const struct vlc_decoder_device_operations ops = {
+    .close = Close,
+};
+
 static int
 Open(vlc_decoder_device *device, vout_window_t *window)
 {
@@ -237,6 +241,7 @@ Open(vlc_decoder_device *device, vout_window_t *window)
         return VLC_EGENERIC;
     assert(vadpy != NULL);
 
+    device->ops = &ops;
     device->sys = vainst;
     device->type = VLC_DECODER_DEVICE_VAAPI;
     device->opaque = vadpy;
@@ -260,7 +265,7 @@ Open(vlc_decoder_device *device, vout_window_t *window)
 vlc_module_begin ()
     set_description("VA-API decoder device for " DESCRIPTION_SUFFIX)
     set_capability("decoder device", PRIORITY)
-    set_callbacks(Open, Close)
+    set_callbacks(Open, NULL)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_shortcut("vaapi", SHORTCUT)

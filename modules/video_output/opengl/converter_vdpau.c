@@ -184,6 +184,10 @@ DecoderContextClose(vlc_decoder_device *device)
     vdp_release_x11(device->opaque);
 }
 
+static const struct vlc_decoder_device_operations dev_ops = {
+    .close = DecoderContextClose,
+};
+
 static int
 DecoderContextOpen(vlc_decoder_device *device, vout_window_t *window)
 {
@@ -196,6 +200,7 @@ DecoderContextOpen(vlc_decoder_device *device, vout_window_t *window)
     if (vdp_get_x11(window->display.x11, -1, &vdp, &vdpdevice) != VDP_STATUS_OK)
         return VLC_EGENERIC;
 
+    device->ops = &dev_ops;
     device->type = VLC_DECODER_DEVICE_VDPAU;
     device->opaque = vdp;
     return VLC_SUCCESS;

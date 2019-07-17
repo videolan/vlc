@@ -120,13 +120,6 @@ static int decoder_device_Open(void *func, bool forced, va_list ap)
     return ret;
 }
 
-static void decoder_device_Close(void *func, va_list ap)
-{
-    vlc_decoder_device_Close close = func;
-    vlc_decoder_device *device = va_arg(ap, vlc_decoder_device *);
-    close(device);
-}
-
 vlc_decoder_device *
 vlc_decoder_device_Create(vout_window_t *window)
 {
@@ -145,6 +138,7 @@ vlc_decoder_device_Create(vout_window_t *window)
         vlc_object_delete(&priv->device);
         return NULL;
     }
+    assert(priv->device.ops != NULL);
     vlc_atomic_rc_init(&priv->rc);
     return &priv->device;
 }
@@ -165,7 +159,8 @@ vlc_decoder_device_Release(vlc_decoder_device *device)
             container_of(device, struct vlc_decoder_device_priv, device);
     if (vlc_atomic_rc_dec(&priv->rc))
     {
-        vlc_module_unload(priv->module, decoder_device_Close, device);
+        if (device->ops->close != NULL)
+            device->ops->close(device);
         vlc_objres_clear(VLC_OBJECT(device));
         vlc_object_delete(device);
     }
