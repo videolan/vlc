@@ -117,6 +117,17 @@ static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
     return VLC_SUCCESS;
 }
 
+static void Close(vlc_va_t *va, void **hwctx)
+{
+    vlc_va_sys_t *sys = va->sys;
+
+    for (unsigned i = 0; sys->pool[i] != NULL; i++)
+        vlc_vdp_video_destroy(sys->pool[i]);
+    vdp_release_x11(sys->vdp);
+    av_freep(hwctx);
+    free(sys);
+}
+
 static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, void *p_sys)
 {
@@ -211,17 +222,6 @@ error:
     vdp_release_x11(sys->vdp);
     free(sys);
     return VLC_EGENERIC;
-}
-
-static void Close(vlc_va_t *va, void **hwctx)
-{
-    vlc_va_sys_t *sys = va->sys;
-
-    for (unsigned i = 0; sys->pool[i] != NULL; i++)
-        vlc_vdp_video_destroy(sys->pool[i]);
-    vdp_release_x11(sys->vdp);
-    av_freep(hwctx);
-    free(sys);
 }
 
 vlc_module_begin()
