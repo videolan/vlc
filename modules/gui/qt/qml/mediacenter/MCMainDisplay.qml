@@ -138,7 +138,7 @@ Utils.NavigableFocusScope {
                         contentModel = stackView.currentItem.contentModel
                     }
 
-                    onActionDown: stackViewZone.focus = true
+                    onActionDown: stackView.focus = true
                     onActionLeft: root.actionLeft(index)
                     onActionRight: root.actionRight(index)
                     onActionUp: root.actionUp(index)
@@ -253,7 +253,7 @@ Utils.NavigableFocusScope {
                 Player.MiniPlayer {
                     id: miniPlayer
 
-                    onActionUp: stackViewZone.focus = true
+                    onActionUp: stackView.focus = true
                     onActionCancel: sourcesBanner.focus = true
                     onActionDown: medialibId.actionDown(index)
                 }
