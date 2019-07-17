@@ -246,7 +246,8 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
             biCompression = VLC_FOURCC( 'X', 'V', 'I', 'D' );
             break;
         default:
-            biCompression = fmt->i_original_fourcc ?: fmt->i_codec;
+            biCompression = fmt->i_original_fourcc
+                ? fmt->i_original_fourcc : fmt->i_codec;
             break;
     }
 
