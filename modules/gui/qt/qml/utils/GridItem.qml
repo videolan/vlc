@@ -51,8 +51,8 @@ Rectangle {
 
     signal playClicked
     signal addToPlaylistClicked
-    signal itemClicked(int key, int modifier)
-    signal itemDoubleClicked(int keys, int modifier)
+    signal itemClicked(Item menuParent, int key, int modifier)
+    signal itemDoubleClicked(Item menuParent, int keys, int modifier)
     signal contextMenuButtonClicked(Item menuParent)
 
     
@@ -66,8 +66,8 @@ Rectangle {
         MouseArea {
             id: mouseArea
             hoverEnabled: true
-            onClicked: root.itemClicked(mouse.button, mouse.modifiers)
-            onDoubleClicked: root.itemDoubleClicked(mouse.buttons,
+            onClicked: root.itemClicked(cover_bg,mouse.button, mouse.modifiers)
+            onDoubleClicked: root.itemDoubleClicked(cover_bg,mouse.buttons,
                                                     mouse.modifiers)
             width: childrenRect.width
             height: childrenRect.height

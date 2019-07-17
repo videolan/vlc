@@ -26,7 +26,7 @@ import "qrc:///style/"
 
 Utils.ExpandGridView {
     id: expandableGV
-    signal gridItemClicked(int key,int modifier,variant delegateModelItem)
+    signal gridItemClicked(Item menuParent,int key,int modifier,variant delegateModelItem)
     signal gridItemContextButtonClicked(Item menuParent,variant delegateModelItem)
     signal gridItemSelectedChanged(bool selected,Item item)
 
@@ -62,7 +62,7 @@ Utils.ExpandGridView {
         pictureWidth: expandableGV.gridDelegatePictureWidth
         pictureHeight: expandableGV.gridDelegatePictureHeight
 
-        onItemClicked : expandableGV.gridItemClicked(key,modifier, delegateModelItem)
+        onItemClicked : expandableGV.gridItemClicked(menuParent,key,modifier, delegateModelItem)
 
         onPlayClicked: medialib.addAndPlay( delegateModelItem.model.id )
         onAddToPlaylistClicked : medialib.addToPlaylist( delegateModelItem.model.id )

@@ -326,7 +326,7 @@ Utils.NavigableFocusScope {
                         onGridItemClicked: {
                             if (key == Qt.RightButton){
                                 contextMenu.model = delegateModelItem.model
-                                contextMenu.popup()
+                                contextMenu.popup(menuParent)
                             }
                             videosDelegate.updateSelection( modifier , view.currentItem.currentIndexVideos, delegateModelItem.itemsIndex)
                             view.currentItem.currentIndexVideos = delegateModelItem.itemsIndex
