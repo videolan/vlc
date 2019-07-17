@@ -21,6 +21,8 @@ import QtQuick.Controls 2.4
 import "qrc:///utils/" as Utils
 
 Utils.MenuExt {
+    id: mediaMenu
+
     Action { text: qsTr("Open &File..." ) ;               onTriggered: dialogProvider.simpleOpenDialog();          icon.source:"qrc:/type/file-asym.svg"                        }
     Action { text: qsTr( "&Open Multiple Files..." );     onTriggered: dialogProvider.openFileDialog();            icon.source:"qrc:/type/file-asym.svg";                       }
     Action { text: qsTr( "Open D&irectory" );             onTriggered: dialogProvider.PLOpenDir();                 icon.source:"qrc:/type/folder-grey.svg";  shortcut: "Ctrl+F" }
@@ -54,7 +56,7 @@ Utils.MenuExt {
             Utils.MenuItemExt {
                 text: mrl
                 onTriggered:{
-                    mainDropdownMenu.close() //needed since menuItem isn't a direct child of a menu
+                    mediaMenu.close() //needed since menuItem isn't a direct child of a menu
                     mainPlaylistController.append([mrl], true)
                 }
 
