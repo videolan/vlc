@@ -261,14 +261,6 @@ static int generic_start(void *func, bool forced, va_list ap)
     return ret;
 }
 
-static void generic_stop(void *func, va_list ap)
-{
-    vlc_object_t *obj = va_arg(ap, vlc_object_t *);
-    void (*deactivate)(vlc_object_t *) = func;
-
-    deactivate(obj);
-}
-
 #undef module_need
 module_t *module_need(vlc_object_t *obj, const char *cap, const char *name,
                       bool strict)
@@ -288,9 +280,14 @@ module_t *module_need(vlc_object_t *obj, const char *cap, const char *name,
 #undef module_unneed
 void module_unneed(vlc_object_t *obj, module_t *module)
 {
+    void (*deactivate)(vlc_object_t *) = module->pf_deactivate;
+
     msg_Dbg(obj, "removing module \"%s\"", module_get_object(module));
     var_Destroy(obj, "module-name");
-    vlc_module_unload(module, generic_stop, obj);
+
+    if (deactivate != NULL)
+        deactivate(obj);
+
     vlc_objres_clear(obj);
 }
 
