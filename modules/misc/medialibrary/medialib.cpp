@@ -91,7 +91,7 @@ void wrapEntityCreatedEventCallback( vlc_medialibrary_module_t* ml,
     ev.i_type = evType;
     for ( const auto& e : entities )
     {
-        auto val = vlc::wrap_cptr<To>( static_cast<To*>( malloc( sizeof( To ) ) ),
+        auto val = vlc::wrap_cptr<To>( static_cast<To*>( calloc( 1, sizeof( To ) ) ),
                                        static_cast<void(*)(To*)>( vlc_ml_release ) );
         if ( unlikely( val == nullptr ) )
             return;
@@ -307,7 +307,7 @@ void MediaLibrary::onMediaThumbnailReady( medialibrary::MediaPtr media,
     ev.media_thumbnail_generated.b_success = success;
     ev.media_thumbnail_generated.i_size = static_cast<vlc_ml_thumbnail_size_t>( sizeType );
     auto mPtr = vlc::wrap_cptr<vlc_ml_media_t>(
-                static_cast<vlc_ml_media_t*>( malloc( sizeof( vlc_ml_media_t ) ) ),
+                static_cast<vlc_ml_media_t*>( calloc( 1, sizeof( vlc_ml_media_t ) ) ),
                 vlc_ml_media_release );
     if ( unlikely( mPtr == nullptr ) )
         return;

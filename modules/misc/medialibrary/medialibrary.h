@@ -224,7 +224,7 @@ To* ml_convert_list( const std::vector<std::shared_ptr<From>>& input )
 
     // Allocate the ml_*_list_t
     auto list = vlc::wrap_cptr(
-        static_cast<To*>( malloc( sizeof( To ) + input.size() * sizeof( ItemType ) ) ),
+        static_cast<To*>( calloc( 1, sizeof( To ) + input.size() * sizeof( ItemType ) ) ),
         static_cast<void(*)(To*)>( &vlc_ml_release ) );
     if ( unlikely( list == nullptr ) )
         return nullptr;
@@ -246,7 +246,7 @@ T* CreateAndConvert( const Input* input )
     if ( input == nullptr )
         return nullptr;
     auto res = vlc::wrap_cptr(
-                static_cast<T*>( malloc( sizeof( T ) ) ),
+                static_cast<T*>( calloc( 1, sizeof( T ) ) ),
                 static_cast<void(*)(T*)>( &vlc_ml_release ) );
     if ( unlikely( res == nullptr ) )
         return nullptr;
