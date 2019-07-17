@@ -570,7 +570,7 @@ static int vlc_plugin_get_symbol(void *root, const char *name,
                                  void **restrict addrp)
 {
     if (name == NULL)
-    {   /* TODO: use this; do not define "NULL" as a name for NULL? */
+    {
         *addrp = NULL;
         return 0;
     }

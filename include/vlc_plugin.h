@@ -302,9 +302,13 @@ VLC_METADATA_EXPORTS
      || vlc_module_set (VLC_MODULE_SCORE, (int)(score))) \
         goto error;
 
+#define set_callback(activate) \
+    if (vlc_module_set(VLC_MODULE_CB_OPEN, #activate, (void *)(activate))) \
+        goto error;
+
 #define set_callbacks( activate, deactivate ) \
-    if (vlc_module_set(VLC_MODULE_CB_OPEN, #activate, (void *)(activate)) \
-     || vlc_module_set(VLC_MODULE_CB_CLOSE, #deactivate, \
+    set_callback(activate) \
+    if (vlc_module_set(VLC_MODULE_CB_CLOSE, #deactivate, \
                        (void *)(deactivate))) \
         goto error;
 
