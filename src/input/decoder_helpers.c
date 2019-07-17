@@ -107,6 +107,10 @@ static int decoder_device_Open(void *func, bool forced, va_list ap)
     int ret = open(device, window);
     if (ret != VLC_SUCCESS)
     {
+        struct vlc_decoder_device_priv *priv =
+            container_of(device, struct vlc_decoder_device_priv, device);
+
+        vlc_objres_clear(VLC_OBJECT(&priv->device));
         device->sys = NULL;
         device->type = VLC_DECODER_DEVICE_NONE;
         device->opaque = NULL;
@@ -133,7 +137,6 @@ vlc_decoder_device_Create(vout_window_t *window)
     free(name);
     if (module == NULL)
     {
-        vlc_objres_clear(VLC_OBJECT(&priv->device));
         vlc_object_delete(&priv->device);
         return NULL;
     }
