@@ -1147,6 +1147,25 @@ static const char *const ppsz_prefres[] = {
     "all the processor time and render the whole system unresponsive which " \
     "might require a reboot of your machine.")
 
+#define CLOCK_SOURCE_TEXT N_("Clock source")
+#ifdef _WIN32
+static const char *const clock_sources[] = {
+    "", "interrupt", "tick",
+#if !VLC_WINSTORE_APP
+    "multimedia",
+#endif
+    "perf", "wall",
+};
+
+static const char *const clock_sources_text[] = {
+    N_("Auto"), "Interrupt time", "Windows time",
+#if !VLC_WINSTORE_APP
+    "Multimedia timers",
+#endif
+    "Performance counters", "System time (DANGEROUS!)",
+};
+#endif
+
 #define PLAYLISTENQUEUE_TEXT N_( \
     "Enqueue items into playlist in one instance mode")
 #define PLAYLISTENQUEUE_LONGTEXT N_( \
@@ -2139,10 +2158,9 @@ vlc_module_begin ()
               HPRIORITY_LONGTEXT, false )
 #endif
 
-#define CLOCK_SOURCE_TEXT N_("Clock source")
 #ifdef _WIN32
     add_string( "clock-source", NULL, CLOCK_SOURCE_TEXT, CLOCK_SOURCE_TEXT, true )
-        change_string_cb( EnumClockSource )
+        change_string_list( clock_sources, clock_sources_text )
 #endif
 
 /* Playlist options */
