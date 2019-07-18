@@ -123,6 +123,10 @@ Utils.NavigableFocusScope {
             }
         }
     }
+    Connections{
+        target: rootWindow
+        onToolBarConfUpdated: playerControlBarModel.reloadModel()
+    }
 
     PlayerControlBarModel{
         id:playerControlBarModel
