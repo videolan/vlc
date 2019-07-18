@@ -108,10 +108,8 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
     case CONFIG_ITEM_INTEGER:
         if( p_item->list_count )
             p_control = new IntegerListConfigControl( p_this, p_item, parent, false );
-        else if( p_item->min.i || p_item->max.i )
-            p_control = new IntegerRangeConfigControl( p_this, p_item, parent );
         else
-            p_control = new IntegerConfigControl( p_this, p_item, parent );
+            p_control = new IntegerRangeConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_LOADFILE:
     case CONFIG_ITEM_SAVEFILE:
@@ -130,10 +128,7 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         p_control = new BoolConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_FLOAT:
-        if( p_item->min.f || p_item->max.f )
-            p_control = new FloatRangeConfigControl( p_this, p_item, parent );
-        else
-            p_control = new FloatConfigControl( p_this, p_item, parent );
+        p_control = new FloatRangeConfigControl( p_this, p_item, parent );
         break;
     default:
         break;
