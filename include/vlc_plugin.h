@@ -210,11 +210,11 @@ enum vlc_module_properties
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
 #ifdef __PLUGIN__
-# define __VLC_SYMBOL( symbol  ) CONCATENATE( symbol, MODULE_SYMBOL )
+# define VLC_SYMBOL(symbol) CONCATENATE(symbol, MODULE_SYMBOL)
 # define VLC_MODULE_NAME_HIDDEN_SYMBOL \
     const char vlc_module_name[] = MODULE_STRING;
 #else
-# define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_NAME )
+# define VLC_SYMBOL(symbol)  CONCATENATE(symbol, MODULE_NAME)
 # define VLC_MODULE_NAME_HIDDEN_SYMBOL
 #endif
 
@@ -253,9 +253,9 @@ EXTERN_SYMBOL typedef int (*vlc_set_cb) (void *, void *, int, ...);
  */
 #define vlc_module_begin() \
 EXTERN_SYMBOL DLL_SYMBOL \
-int CDECL_SYMBOL __VLC_SYMBOL(vlc_entry) (vlc_set_cb, void *); \
+int CDECL_SYMBOL VLC_SYMBOL(vlc_entry)(vlc_set_cb, void *); \
 EXTERN_SYMBOL DLL_SYMBOL \
-int CDECL_SYMBOL __VLC_SYMBOL(vlc_entry) (vlc_set_cb vlc_set, void *opaque) \
+int CDECL_SYMBOL VLC_SYMBOL(vlc_entry)(vlc_set_cb vlc_set, void *opaque) \
 { \
     module_t *module; \
     module_config_t *config = NULL; \
@@ -498,9 +498,9 @@ VLC_METADATA_EXPORTS
 /* Meta data plugin exports */
 #define VLC_META_EXPORT( name, value ) \
     EXTERN_SYMBOL DLL_SYMBOL const char * CDECL_SYMBOL \
-    __VLC_SYMBOL(vlc_entry_ ## name) (void); \
+    VLC_SYMBOL(vlc_entry_ ## name)(void); \
     EXTERN_SYMBOL DLL_SYMBOL const char * CDECL_SYMBOL \
-    __VLC_SYMBOL(vlc_entry_ ## name) (void) \
+    VLC_SYMBOL(vlc_entry_ ## name)(void) \
     { \
          return value; \
     }
