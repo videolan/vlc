@@ -96,8 +96,6 @@ static void GLConvClose(vlc_object_t *);
 
 #define D3D9_HELP N_("Recommended video output for Windows Vista and later versions")
 
-static int FindShadersCallback(const char *, char ***, char ***);
-
 vlc_module_begin ()
     set_shortname("Direct3D9")
     set_description(N_("Direct3D9 video output"))
@@ -109,7 +107,6 @@ vlc_module_begin ()
     add_bool("directx-hw-yuv", true, HW_YUV_TEXT, HW_YUV_LONGTEXT, true)
 
     add_string("direct3d9-shader", "", PIXEL_SHADER_TEXT, PIXEL_SHADER_LONGTEXT, true)
-        change_string_cb(FindShadersCallback)
     add_loadfile("direct3d9-shader-file", NULL,
                  PIXEL_SHADER_FILE_TEXT, PIXEL_SHADER_FILE_LONGTEXT)
 
@@ -1598,6 +1595,8 @@ static int FindShadersCallback(const char *name, char ***values, char ***descs)
     return ctx.count;
 
 }
+
+VLC_CONFIG_STRING_ENUM(FindShadersCallback)
 
 static bool LocalSwapchainSetupDevice( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
 {

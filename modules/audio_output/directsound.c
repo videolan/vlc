@@ -46,7 +46,6 @@ static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 static HRESULT StreamStart( aout_stream_t *, audio_sample_format_t *,
                             const GUID * );
-static int ReloadDirectXDevices( const char *, char ***, char *** );
 static void * PlayedDataEraser( void * );
 /* Speaker setup override options list */
 static const char *const speaker_list[] = { "Windows default", "Mono", "Stereo",
@@ -75,7 +74,6 @@ vlc_module_begin ()
 
     add_string( "directx-audio-device", NULL,
              DEVICE_TEXT, DEVICE_LONGTEXT, false )
-        change_string_cb( ReloadDirectXDevices )
     add_obsolete_string( "directx-audio-device-name")
     add_bool( "directx-audio-float32", true, FLOAT_TEXT,
               FLOAT_LONGTEXT, true )
@@ -1044,6 +1042,8 @@ static int ReloadDirectXDevices( char const *psz_name,
     *descs = list.names;
     return list.count;
 }
+
+VLC_CONFIG_STRING_ENUM(ReloadDirectXDevices)
 
 static int DeviceSelect (audio_output_t *aout, const char *id)
 {

@@ -1443,6 +1443,8 @@ error:
     return list.count;
 }
 
+VLC_CONFIG_STRING_ENUM(ReloadAudioDevices)
+
 #define MM_PASSTHROUGH_TEXT N_( \
     "HDMI/SPDIF audio passthrough")
 #define MM_PASSTHROUGH_LONGTEXT N_( \
@@ -1478,7 +1480,6 @@ vlc_module_begin()
         change_integer_list( pi_mmdevice_passthrough_values,
                              ppsz_mmdevice_passthrough_texts )
     add_string("mmdevice-audio-device", NULL, DEVICE_TEXT, DEVICE_LONGTEXT, false)
-        change_string_cb(ReloadAudioDevices)
     add_float("mmdevice-volume", 1.f, VOLUME_TEXT, VOLUME_LONGTEXT, true)
         change_float_range( 0.f, 1.25f )
 vlc_module_end()

@@ -70,7 +70,6 @@ static size_t EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
                               AM_MEDIA_TYPE *mt, size_t, bool );
 static bool ConnectFilters( vlc_object_t *, access_sys_t *,
                             IBaseFilter *, CaptureFilter * );
-static int FindDevices( const char *, char ***, char *** );
 
 static void ShowPropertyPage( IUnknown * );
 static void ShowDeviceProperties( vlc_object_t *, ICaptureGraphBuilder2 *,
@@ -193,10 +192,8 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_string( "dshow-vdev", NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
-        change_string_cb( FindDevices )
 
     add_string( "dshow-adev", NULL, ADEV_TEXT, ADEV_LONGTEXT, false)
-        change_string_cb( FindDevices )
 
     add_string( "dshow-size", NULL, SIZE_TEXT, SIZE_LONGTEXT, false)
         change_safe()
@@ -2076,6 +2073,8 @@ static int FindDevices( const char *psz_name, char ***vp, char ***tp )
     *tp = texts;
     return count;
 }
+
+VLC_CONFIG_STRING_ENUM(FindDevices)
 
 /*****************************************************************************
  * Properties

@@ -244,6 +244,15 @@ EXTERN_SYMBOL typedef int (*vlc_set_cb) (void *, void *, int, ...);
 #define vlc_module_set(...) vlc_set (opaque, module, __VA_ARGS__)
 #define vlc_config_set(...) vlc_set (opaque, config, __VA_ARGS__)
 
+EXTERN_SYMBOL DLL_SYMBOL
+int CDECL_SYMBOL VLC_SYMBOL(vlc_entry)(vlc_set_cb, void *);
+EXTERN_SYMBOL DLL_SYMBOL
+int CDECL_SYMBOL VLC_SYMBOL(vlc_entry_cfg_int_enum)(const char *name,
+    int64_t **values, char ***descs);
+EXTERN_SYMBOL DLL_SYMBOL
+int CDECL_SYMBOL VLC_SYMBOL(vlc_entry_cfg_str_enum)(const char *name,
+    char ***values, char ***descs);
+
 /*
  * InitModule: this function is called once and only once, when the module
  * is looked at for the first time. We get the useful data from it, for
@@ -251,8 +260,6 @@ EXTERN_SYMBOL typedef int (*vlc_set_cb) (void *, void *, int, ...);
  * a copy of its config because the module can be unloaded at any time.
  */
 #define vlc_module_begin() \
-EXTERN_SYMBOL DLL_SYMBOL \
-int CDECL_SYMBOL VLC_SYMBOL(vlc_entry)(vlc_set_cb, void *); \
 EXTERN_SYMBOL DLL_SYMBOL \
 int CDECL_SYMBOL VLC_SYMBOL(vlc_entry)(vlc_set_cb vlc_set, void *opaque) \
 { \
@@ -464,17 +471,11 @@ VLC_METADATA_EXPORTS
                     (const char *const *)(list), \
                     (const char *const *)(list_text));
 
-#define change_string_cb( cb ) \
-    vlc_config_set (VLC_CONFIG_LIST_CB, #cb, (void *)(cb));
-
 #define change_integer_list( list, list_text ) \
     vlc_config_set (VLC_CONFIG_LIST, \
                     (size_t)(sizeof (list) / sizeof (int)), \
                     (const int *)(list), \
                     (const char *const *)(list_text));
-
-#define change_integer_cb( cb ) \
-    vlc_config_set (VLC_CONFIG_LIST_CB, #cb, (cb));
 
 #define change_integer_range( minv, maxv ) \
     vlc_config_set (VLC_CONFIG_RANGE, (int64_t)(minv), (int64_t)(maxv));
@@ -493,6 +494,23 @@ VLC_METADATA_EXPORTS
 
 #define change_safe() \
     vlc_config_set (VLC_CONFIG_SAFE);
+
+/* Configuration item choice enumerators */
+#define VLC_CONFIG_INTEGER_ENUM(cb) \
+EXTERN_SYMBOL DLL_SYMBOL \
+int CDECL_SYMBOL VLC_SYMBOL(vlc_entry_cfg_int_enum)(const char *name, \
+    int64_t **values, char ***descs) \
+{ \
+    return (cb)(name, values, descs); \
+}
+
+#define VLC_CONFIG_STRING_ENUM(cb) \
+EXTERN_SYMBOL DLL_SYMBOL \
+int CDECL_SYMBOL VLC_SYMBOL(vlc_entry_cfg_str_enum)(const char *name, \
+    char ***values, char ***descs) \
+{ \
+    return (cb)(name, values, descs); \
+}
 
 /* Meta data plugin exports */
 #define VLC_META_EXPORT( name, value ) \

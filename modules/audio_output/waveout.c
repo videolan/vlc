@@ -76,7 +76,6 @@ static void WaveOutClean( aout_sys_t * p_sys );
 
 static void WaveOutClearBuffer( HWAVEOUT, WAVEHDR *);
 
-static int ReloadWaveoutDevices( const char *, char ***, char *** );
 static uint32_t findDeviceID(char *);
 static int WaveOutTimeGet(audio_output_t * , vlc_tick_t *);
 static void WaveOutFlush( audio_output_t *);
@@ -154,7 +153,6 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_string( "waveout-audio-device", "wavemapper",
                  DEVICE_TEXT, DEVICE_LONG, false )
-       change_string_cb( ReloadWaveoutDevices )
     add_float( "waveout-volume", 1.0f, VOLUME_TEXT, NULL, true )
          change_float_range(0.0f, 2.0f)
     add_bool( "waveout-float32", true, FLOAT_TEXT, FLOAT_LONGTEXT, true )
@@ -717,6 +715,8 @@ static int ReloadWaveoutDevices( char const *psz_name,
 
     return n;
 }
+
+VLC_CONFIG_STRING_ENUM(ReloadWaveoutDevices)
 
 /*
   convert devicename to device ID for output
