@@ -190,6 +190,7 @@ enum vlc_module_properties
  */
 # define MODULE_SYMBOL 4_0_4
 # define MODULE_SUFFIX "__4_0_4"
+#define VLC_API_VERSION_STRING "4.0.4"
 
 /*****************************************************************************
  * Add a few defines. You do not want to read this section. Really.
@@ -505,6 +506,9 @@ VLC_METADATA_EXPORTS
          return value; \
     }
 
+#define VLC_API_VERSION_EXPORT \
+    VLC_META_EXPORT(api_version, VLC_API_VERSION_STRING)
+
 #define VLC_COPYRIGHT_VIDEOLAN \
     "\x43\x6f\x70\x79\x72\x69\x67\x68\x74\x20\x28\x43\x29\x20\x74\x68" \
     "\x65\x20\x56\x69\x64\x65\x6f\x4c\x41\x4e\x20\x56\x4c\x43\x20\x6d" \
@@ -542,6 +546,7 @@ VLC_METADATA_EXPORTS
 #endif
 
 #define VLC_METADATA_EXPORTS \
+    VLC_API_VERSION_EXPORT \
     VLC_COPYRIGHT_EXPORT \
     VLC_LICENSE_EXPORT
 
