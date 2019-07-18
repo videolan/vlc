@@ -174,7 +174,6 @@ Utils.NavigableFocusScope {
                                     anchors.verticalCenter: parent.verticalCenter
                                     color: VLCStyle.colors.buttonText
 
-                                    renderType: Text.NativeRendering
                                     font.pixelSize: VLCStyle.icon_topbar
                                     font.family: VLCIcons.fontFamily
                                     horizontalAlignment: Text.AlignHCenter
