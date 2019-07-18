@@ -154,7 +154,7 @@ enum port_type
 - (void)audioSessionRouteChange:(NSNotification *)notification
 {
     audio_output_t *p_aout = [self aout];
-    struct aout_sys_t *p_sys = p_aout->sys;
+    aout_sys_t *p_sys = p_aout->sys;
     NSDictionary *userInfo = notification.userInfo;
     NSInteger routeChangeReason =
         [[userInfo valueForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
