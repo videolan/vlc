@@ -94,7 +94,7 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         p_control = new ModuleListConfigControl( p_this, p_item, parent, true );
         break;
     case CONFIG_ITEM_STRING:
-        if( p_item->list.psz_cb )
+        if( p_item->list_count )
             p_control = new StringListConfigControl( p_this, p_item, parent );
         else
             p_control = new StringConfigControl( p_this, p_item, parent, false );
@@ -106,7 +106,7 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         p_control = new ColorConfigControl( p_this, p_item, parent );
         break;
     case CONFIG_ITEM_INTEGER:
-        if( p_item->list.i_cb )
+        if( p_item->list_count )
             p_control = new IntegerListConfigControl( p_this, p_item, parent, false );
         else if( p_item->min.i || p_item->max.i )
             p_control = new IntegerRangeConfigControl( p_this, p_item, parent );
