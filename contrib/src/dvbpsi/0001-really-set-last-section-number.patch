@@ -1,0 +1,28 @@
+From 03a51fe87f8d9b3af092455ba43204187e2cd25a Mon Sep 17 00:00:00 2001
+From: Francois Cartegnie <fcvlcdev@free.fr>
+Date: Thu, 18 Jul 2019 18:39:36 +0200
+Subject: [PATCH] really set last section number
+
+fixes regressions by commit
+7e9f4ed39444c84679b1135684ec2aa4f39e476c
+(early multi sections table end, segmented EIT failure)
+---
+ src/dvbpsi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/dvbpsi.c b/src/dvbpsi.c
+index c5f0ddc..cbb7511 100644
+--- a/src/dvbpsi.c
++++ b/src/dvbpsi.c
+@@ -211,7 +211,7 @@ bool dvbpsi_decoder_psi_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_sect
+     /* Add to end of list */
+     if (p_prev->i_number < p_section->i_number)
+     {
+-        p_decoder->i_last_section_number = p_section->i_number;
++        p_decoder->i_last_section_number = p_section->i_last_number;
+         p_prev->p_next = p_section;
+         p_section->p_next = NULL;
+     }
+-- 
+2.20.1
+
