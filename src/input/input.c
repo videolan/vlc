@@ -2121,10 +2121,6 @@ static bool Control( input_thread_t *p_input,
             es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
             demux_Control( priv->master->p_demux,
                            DEMUX_SET_TITLE, i_title );
-            input_SendEventTitle( p_input, &(struct vlc_input_event_title) {
-                .action = VLC_INPUT_TITLE_SELECTED,
-                .selected_idx = i_title,
-            });
             break;
         }
         case INPUT_CONTROL_SET_SEEKPOINT:
