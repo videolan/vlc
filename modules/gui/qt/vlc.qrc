@@ -198,6 +198,8 @@
         <file alias="ScanProgressBar.qml">qml/utils/ScanProgressBar.qml</file>
         <file alias="SearchBox.qml">qml/utils/SearchBox.qml</file>
         <file alias="SortControl.qml">qml/utils/SortControl.qml</file>
+        <file alias="RoundButton.qml">qml/utils/RoundButton.qml</file>
+        <file alias="LabelSeparator.qml">qml/utils/LabelSeparator.qml</file>
     </qresource>
     <qresource prefix="/mediacenter">
         <file alias="MCMusicDisplay.qml">qml/mediacenter/MCMusicDisplay.qml</file>

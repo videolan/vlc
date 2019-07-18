@@ -82,6 +82,8 @@ Item {
     property int cover_large: 160 * scale;
     property int cover_xlarge: 192 * scale;
 
+    property int heightBar_xxxsmall: 2 * scale;
+    property int heightBar_xxsmall: 4 * scale;
     property int heightBar_xsmall: 8 * scale;
     property int heightBar_small: 16 * scale;
     property int heightBar_normal: 32 * scale;
