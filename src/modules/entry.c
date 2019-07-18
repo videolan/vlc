@@ -396,7 +396,6 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
             size_t len = va_arg (ap, size_t);
 
             assert (item->list_count == 0); /* cannot replace choices */
-            assert (item->list.psz_cb == NULL);
             if (len == 0)
                 break; /* nothing to do */
             /* Copy values */
@@ -422,23 +421,6 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
             memcpy(dtext, text, sizeof (const char *) * len);
             item->list_text = dtext;
             item->list_count = len;
-            break;
-        }
-
-        case VLC_CONFIG_LIST_CB:
-        {
-            void *cb;
-
-            item->list_cb_name = va_arg(ap, const char *);
-            cb = va_arg(ap, void *);
-
-            if (IsConfigIntegerType (item->i_type))
-               item->list.i_cb = cb;
-            else
-            if (IsConfigStringType (item->i_type))
-               item->list.psz_cb = cb;
-            else
-                break;
             break;
         }
 
@@ -503,7 +485,6 @@ static int vlc_plugin_gpa_cb(void *ctx, void *tgt, int propid, ...)
     {
         case VLC_MODULE_CB_OPEN:
         case VLC_MODULE_CB_CLOSE:
-        case VLC_CONFIG_LIST_CB:
         {
             va_list ap;
 
@@ -588,7 +569,7 @@ static int vlc_plugin_get_symbol(void *root, const char *name,
 int vlc_plugin_resolve(vlc_plugin_t *plugin, vlc_plugin_cb entry)
 {
     void *syms = vlc_plugin_get_symbols(entry);
-    int ret = -1;
+    int ret = 0;
 
     /* Resolve modules activate/deactivate callbacks */
     for (module_t *module = plugin->module;
@@ -599,29 +580,12 @@ int vlc_plugin_resolve(vlc_plugin_t *plugin, vlc_plugin_cb entry)
                                   &module->pf_activate)
          || vlc_plugin_get_symbol(syms, module->deactivate_name,
                                   &module->pf_deactivate))
-            goto error;
+        {
+            ret = -1;
+            break;
+        }
     }
 
-    /* Resolve configuration callbacks */
-    for (size_t i = 0; i < plugin->conf.size; i++)
-    {
-        module_config_t *item = plugin->conf.items + i;
-        void *cb;
-
-        if (item->list_cb_name == NULL)
-            continue;
-        if (vlc_plugin_get_symbol(syms, item->list_cb_name, &cb))
-            goto error;
-
-        if (IsConfigIntegerType (item->i_type))
-            item->list.i_cb = cb;
-        else
-        if (IsConfigStringType (item->i_type))
-            item->list.psz_cb = cb;
-    }
-
-    ret = 0;
-error:
     vlc_plugin_free_symbols(syms);
     return ret;
 }

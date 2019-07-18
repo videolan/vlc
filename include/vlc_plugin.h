@@ -101,9 +101,8 @@ enum vlc_module_properties
     /* list of suggested values
      * (args=size_t, const <type> *, const char *const *) */
 
-    VLC_CONFIG_LIST_CB,
-    /* callback for suggested values
-     * (args=const char *, size_t (*)(vlc_object_t *, <type> **, char ***)) */
+    VLC_CONFIG_LIST_CB_OBSOLETE,
+    /* unused (ignored) */
 
     /* Insert new VLC_CONFIG_* here */
 };

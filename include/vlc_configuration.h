@@ -97,11 +97,8 @@ struct module_config_t
     {
         const char **psz; /**< Table of possible string choices */
         const int  *i; /**< Table of possible integer choices */
-        vlc_string_list_cb psz_cb; /**< Callback to enumerate string choices */
-        vlc_integer_list_cb i_cb; /**< Callback to enumerate integer choices */
     } list; /**< Possible choices */
     const char **list_text; /**< Human-readable names for list values */
-    const char *list_cb_name; /**< Symbol name of the enumeration callback */
     void *owner; /**< Origin run-time linker module handle */
 };
 
