@@ -22,16 +22,18 @@
 # include "config.h"
 #endif
 
-#include "converter.h"
-#include "../../hw/vaapi/vlc_vaapi.h"
-#include <vlc_vout_window.h>
-#include <vlc_codec.h>
-
 #include <assert.h>
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #include <va/va_drmcommon.h>
+
+#include <vlc_common.h>
+#include <vlc_vout_window.h>
+#include <vlc_codec.h>
+
+#include "converter.h"
+#include "../../hw/vaapi/vlc_vaapi.h"
 
 struct priv
 {
