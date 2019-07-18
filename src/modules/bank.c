@@ -236,8 +236,6 @@ error:
     return handle;
 }
 
-static const char vlc_entry_name[] = "vlc_entry" MODULE_SUFFIX;
-
 /**
  * Loads a dynamically-linked plug-in into memory and initialize it.
  *
@@ -255,7 +253,7 @@ static vlc_plugin_t *module_InitDynamic(vlc_object_t *obj, const char *path,
         return NULL;
 
     /* Try to resolve the symbol */
-    vlc_plugin_cb entry = vlc_dlsym(handle, vlc_entry_name);
+    vlc_plugin_cb entry = vlc_dlsym(handle, "vlc_entry");
     if (entry == NULL)
     {
         msg_Warn (obj, "cannot find plug-in entry point in %s", path);
@@ -548,7 +546,7 @@ int module_Map(struct vlc_logger *log, vlc_plugin_t *plugin)
     if (handle == NULL)
         return -1;
 
-    vlc_plugin_cb entry = vlc_dlsym(handle, vlc_entry_name);
+    vlc_plugin_cb entry = vlc_dlsym(handle, "vlc_entry");
     if (entry == NULL)
     {
         vlc_error(log, "cannot find plug-in entry point in %s",

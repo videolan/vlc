@@ -188,8 +188,6 @@ enum vlc_module_properties
 /**
  * Current plugin ABI version
  */
-# define MODULE_SYMBOL 4_0_4
-# define MODULE_SUFFIX "__4_0_4"
 #define VLC_API_VERSION_STRING "4.0.4"
 
 /*****************************************************************************
@@ -211,7 +209,7 @@ enum vlc_module_properties
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
 #ifdef __PLUGIN__
-# define VLC_SYMBOL(symbol) CONCATENATE(symbol, MODULE_SYMBOL)
+# define VLC_SYMBOL(symbol) symbol
 # define VLC_MODULE_NAME_HIDDEN_SYMBOL \
     const char vlc_module_name[] = MODULE_STRING;
 #else
