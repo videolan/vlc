@@ -118,20 +118,41 @@ bool MLNetworkModel::setData( const QModelIndex& idx, const QVariant& value, int
     return res == VLC_SUCCESS;
 }
 
-void MLNetworkModel::setContext(QmlMainContext* ctx, NetworkTreeItem parentTree )
+void MLNetworkModel::setCtx(QmlMainContext* ctx)
 {
-    assert(!m_ctx);
     if (ctx) {
         m_ctx = ctx;
         m_ml = vlc_ml_instance_get( m_ctx->getIntf() );
-        m_treeItem = parentTree;
+    }
+    if (m_ctx && m_hasTree) {
         initializeMediaSources();
     }
+    emit ctxChanged();
+}
+
+void MLNetworkModel::setTree(QVariant parentTree)
+{
+    if (parentTree.canConvert<NetworkTreeItem>())
+        m_treeItem = parentTree.value<NetworkTreeItem>();
+    else
+        m_treeItem = NetworkTreeItem();
+    m_hasTree = true;
+    if (m_ctx && m_hasTree) {
+        initializeMediaSources();
+    }
+    emit treeChanged();
 }
 
 bool MLNetworkModel::initializeMediaSources()
 {
     auto libvlc = vlc_object_instance(m_ctx->getIntf());
+
+    m_listeners.clear();
+    if (!m_items.empty()) {
+        beginResetModel();
+        m_items.clear();
+        endResetModel();
+    }
 
     // When listing all found devices, we have no specified media and no parent,
     // but we can't go up a level in this case.
@@ -194,7 +215,7 @@ bool MLNetworkModel::initializeMediaSources()
     std::unique_ptr<SourceListener> l{ new SourceListener( m_treeItem.source, this ) };
     if ( l->listener == nullptr )
         return false;
-    vlc_media_tree_Preparse( tree, libvlc, m_treeItem.media );
+    vlc_media_tree_Preparse( tree, libvlc, m_treeItem.media.get() );
     m_listeners.push_back( std::move( l ) );
 
     return true;
@@ -206,7 +227,7 @@ void MLNetworkModel::onItemCleared( MediaSourcePtr mediaSource, input_item_node_
     {
         input_item_node_t *res;
         input_item_node_t *parent;
-        if ( vlc_media_tree_Find( m_treeItem.source->tree, m_treeItem.media,
+        if ( vlc_media_tree_Find( m_treeItem.source->tree, m_treeItem.media.get(),
                                           &res, &parent ) == false )
             return;
         refreshMediaList( std::move( mediaSource ), res->pp_children, res->i_children, true );
@@ -221,7 +242,7 @@ void MLNetworkModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t*
 {
     if ( m_treeItem.media == nullptr )
         refreshDeviceList( std::move( mediaSource ), children, count, false );
-    else if ( parent->p_item == m_treeItem.media )
+    else if ( parent->p_item == m_treeItem.media.get() )
         refreshMediaList( std::move( mediaSource ), children, count, false );
 }
 
@@ -289,7 +310,7 @@ void MLNetworkModel::refreshMediaList( MediaSourcePtr mediaSource,
                                     &item.indexed ) != VLC_SUCCESS )
                 item.indexed = false;
         }
-        item.tree = NetworkTreeItem{ mediaSource, it, m_treeItem.media };
+        item.tree = NetworkTreeItem( mediaSource, it, m_treeItem.media.get() );
         items->push_back( std::move( item ) );
     }
     callAsync([this, clear, items]() {

@@ -37,6 +37,10 @@
 using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
                                 vlc_media_source_Hold, vlc_media_source_Release);
 
+using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
+                                              input_item_Hold,
+                                              input_item_Release);
+
 class NetworkTreeItem
 {
     Q_GADGET
@@ -54,8 +58,8 @@ public:
     NetworkTreeItem& operator=( NetworkTreeItem&& ) = default;
 
     MediaSourcePtr source;
-    input_item_t *media;
-    input_item_t *parent;
+    InputItemPtr media;
+    InputItemPtr parent;
 };
 
 class MLNetworkModel : public QAbstractListModel
@@ -71,6 +75,9 @@ public:
     };
     Q_ENUM( ItemType );
 
+    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
+    Q_PROPERTY(QVariant tree READ getTree WRITE setTree NOTIFY treeChanged)
+
     explicit MLNetworkModel(QObject* parent = nullptr);
     MLNetworkModel( QmlMainContext* ctx, QString parentMrl, QObject* parent = nullptr );
 
@@ -81,7 +88,15 @@ public:
     Qt::ItemFlags flags( const QModelIndex& idx ) const override;
     bool setData( const QModelIndex& idx,const QVariant& value, int role ) override;
 
-    Q_INVOKABLE void setContext(QmlMainContext* ctx, NetworkTreeItem parentMrl);
+    void setCtx(QmlMainContext* ctx);
+    void setTree(QVariant tree);
+
+    inline QmlMainContext* getCtx() { return m_ctx; }
+    inline QVariant getTree() { return QVariant::fromValue( m_treeItem); }
+
+signals:
+    void ctxChanged();
+    void treeChanged();
 
 private:
     struct Item
@@ -152,6 +167,7 @@ private:
     std::vector<Item> m_items;
     QmlMainContext* m_ctx = nullptr;
     vlc_medialibrary_t* m_ml;
+    bool m_hasTree = false;
     NetworkTreeItem m_treeItem;
     std::vector<std::unique_ptr<SourceListener>> m_listeners;
 };

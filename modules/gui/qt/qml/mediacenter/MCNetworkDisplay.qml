@@ -28,15 +28,15 @@ import "qrc:///style/"
 Utils.NavigableFocusScope {
     id: root
 
-    property var tree
+    property alias tree: mlModel.tree
 
     Utils.SelectableDelegateModel {
         id: delegateModel
 
         model:  MLNetworkModel {
-            Component.onCompleted: {
-                setContext(mainctx, root.tree)
-            }
+            id: mlModel
+            ctx: mainctx
+            tree: undefined
         }
 
         delegate: Package {
@@ -69,7 +69,8 @@ Utils.NavigableFocusScope {
                 medialib.addAndPlay( list )
             } else {
                 if (delegateModel.items.get(index).model.type != MLNetworkModel.TYPE_FILE)  {
-                    history.push(["mc", "network", { tree: delegateModel.items.get(index).model.tree }], History.Go);
+                    root.tree = delegateModel.items.get(index).model.tree
+                    history.push(["mc", "network", { tree: delegateModel.items.get(index).model.tree }], History.Stay);
                 } else {
                     medialib.addAndPlay( delegateModel.items.get(index).model.mrl );
                 }
