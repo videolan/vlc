@@ -193,6 +193,49 @@ static void module_InitStaticModules(void) { }
 #endif
 
 #ifdef HAVE_DYNAMIC_PLUGINS
+static const char *module_GetVersion(void *handle)
+{
+    const char *(*get_api_version)(void);
+
+    get_api_version = vlc_dlsym(handle, "vlc_entry_api_version");
+    if (get_api_version == NULL)
+        return NULL;
+
+    return get_api_version();
+}
+
+static void *module_Open(struct vlc_logger *log,
+                         const char *path, bool fast)
+{
+    void *handle = vlc_dlopen(path, fast);
+    if (handle == NULL)
+    {
+        char *errmsg = vlc_dlerror();
+
+        vlc_error(log, "cannot load plug-in %s: %s", path,
+                  errmsg ? errmsg : "unknown error");
+        free(errmsg);
+        return NULL;
+    }
+
+    const char *str = module_GetVersion(handle);
+    if (str == NULL) {
+        vlc_error(log, "cannot load plug-in %s: %s", path,
+                  "unknown version or not a plug-in");
+error:
+        vlc_dlclose(handle);
+        return NULL;
+    }
+
+    if (strcmp(str, VLC_API_VERSION_STRING)) {
+        vlc_error(log, "cannot load plug-in %s: unsupported version %s", path,
+                  str);
+        goto error;
+    }
+
+    return handle;
+}
+
 static const char vlc_entry_name[] = "vlc_entry" MODULE_SUFFIX;
 
 /**
@@ -207,15 +250,9 @@ static const char vlc_entry_name[] = "vlc_entry" MODULE_SUFFIX;
 static vlc_plugin_t *module_InitDynamic(vlc_object_t *obj, const char *path,
                                         bool fast)
 {
-    void *handle = vlc_dlopen(path, fast);
+    void *handle = module_Open(obj->logger, path, fast);
     if (handle == NULL)
-    {
-        char *errmsg = vlc_dlerror();
-        msg_Err(obj, "cannot load plug-in %s: %s", path,
-                errmsg ? errmsg : "unknown error");
-        free(errmsg);
         return NULL;
-    }
 
     /* Try to resolve the symbol */
     vlc_plugin_cb entry = vlc_dlsym(handle, vlc_entry_name);
@@ -507,15 +544,9 @@ int module_Map(struct vlc_logger *log, vlc_plugin_t *plugin)
     /* Try to load the plug-in (without locks, so read-only) */
     assert(plugin->abspath != NULL);
 
-    void *handle = vlc_dlopen(plugin->abspath, false);
+    void *handle = module_Open(log, plugin->abspath, false);
     if (handle == NULL)
-    {
-        char *errmsg = vlc_dlerror();
-        vlc_error(log, "cannot load plug-in %s: %s",
-                  plugin->abspath, errmsg ? errmsg : "unknown error");
-        free(errmsg);
         return -1;
-    }
 
     vlc_plugin_cb entry = vlc_dlsym(handle, vlc_entry_name);
     if (entry == NULL)
