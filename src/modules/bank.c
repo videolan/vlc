@@ -592,6 +592,17 @@ static void module_Unmap(vlc_plugin_t *plugin)
     if (handle != NULL)
         vlc_dlclose(handle);
 }
+
+void *module_Symbol(struct vlc_logger *log,
+                    vlc_plugin_t *plugin, const char *name)
+{
+    if (module_Map(log, plugin))
+        return NULL;
+
+    void *handle = (void *)atomic_load_explicit(&plugin->handle,
+                                                memory_order_relaxed);
+    return vlc_dlsym(handle, name);
+}
 #else
 int module_Map(struct vlc_logger *log, vlc_plugin_t *plugin)
 {
@@ -602,6 +613,13 @@ int module_Map(struct vlc_logger *log, vlc_plugin_t *plugin)
 static void module_Unmap(vlc_plugin_t *plugin)
 {
     (void) plugin;
+}
+
+void *module_Symbol(struct vlc_logger *log,
+                    vlc_plugin_t *plugin, const char *name)
+{
+    (void) log; (void) plugin; (void) name;
+    return NULL;
 }
 #endif /* HAVE_DYNAMIC_PLUGINS */
 
