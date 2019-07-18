@@ -94,18 +94,17 @@ static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
     return chain;
 }
 
-#undef filter_chain_New
+#undef filter_chain_NewSPU
 /**
  * Filter chain initialisation
  */
-filter_chain_t *filter_chain_New( vlc_object_t *obj, const char *cap,
-                                  enum es_format_category_e cat )
+filter_chain_t *filter_chain_NewSPU( vlc_object_t *obj, const char *cap )
 {
     filter_owner_t callbacks = {
         .sys = obj,
     };
 
-    return filter_chain_NewInner( &callbacks, cap, NULL, false, NULL, cat );
+    return filter_chain_NewInner( &callbacks, cap, NULL, false, NULL, SPU_ES );
 }
 
 /** Chained filter picture allocator function */

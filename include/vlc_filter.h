@@ -307,13 +307,13 @@ typedef struct filter_chain_t filter_chain_t;
 /**
  * Create new filter chain
  *
- * \param p_object pointer to a vlc object
+ * \param obj pointer to a vlc object
  * \param psz_capability vlc capability of filters in filter chain
  * \return pointer to a filter chain
  */
-filter_chain_t * filter_chain_New( vlc_object_t *, const char *, enum es_format_category_e )
+filter_chain_t * filter_chain_NewSPU( vlc_object_t *obj, const char *psz_capability )
 VLC_USED;
-#define filter_chain_New( a, b, c ) filter_chain_New( VLC_OBJECT( a ), b, c )
+#define filter_chain_NewSPU( a, b ) filter_chain_NewSPU( VLC_OBJECT( a ), b )
 
 /**
  * Creates a new video filter chain.
