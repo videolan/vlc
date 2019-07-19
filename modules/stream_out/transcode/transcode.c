@@ -607,7 +607,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
             if( p_sys->b_master_sync )
             {
                 id->pf_drift_validate = ValidateDrift;
-                id->callback_data = p_sys;
+                id->callback_data = p_stream;
             }
             break;
         case VIDEO_ES:
