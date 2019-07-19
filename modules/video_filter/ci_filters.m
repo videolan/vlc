@@ -537,16 +537,6 @@ Close_RemoveConverters(filter_t *filter, struct ci_filters_ctx *ctx)
     }
 }
 
-static picture_t *CVPX_to_CVPX_converter_BufferNew(filter_t *p_filter)
-{
-    return picture_NewFromFormat(&p_filter->fmt_out.video);
-}
-
-static const struct filter_video_callbacks image_filter_cbs =
-{
-    CVPX_to_CVPX_converter_BufferNew,
-};
-
 static filter_t *
 CVPX_to_CVPX_converter_Create(filter_t *filter, bool to_rgba)
 {
@@ -567,8 +557,6 @@ CVPX_to_CVPX_converter_Create(filter_t *filter, bool to_rgba)
         converter->fmt_in.video.i_chroma =
         converter->fmt_in.i_codec = VLC_CODEC_CVPX_BGRA;
     }
-
-    converter->owner.video = &image_filter_cbs;
 
     converter->p_module = module_need(converter, "video converter", NULL, false);
     if (!converter->p_module)
