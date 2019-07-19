@@ -86,7 +86,6 @@ static void OpenglSwap         (vlc_gl_t *gl);
 struct vout_display_sys_t {
 
     picture_pool_t *pool;
-    picture_resource_t resource;
 
     CALayer <VLCCoreAnimationVideoLayerEmbedding> *container;
     vout_window_t *embed;
