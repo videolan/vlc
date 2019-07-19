@@ -26,6 +26,7 @@
 #define VLC_FILTER_H 1
 
 #include <vlc_es.h>
+#include <vlc_picture.h>
 
 /**
  * \defgroup filter Filters
@@ -160,7 +161,11 @@ struct filter_t
  */
 static inline picture_t *filter_NewPicture( filter_t *p_filter )
 {
-    picture_t *pic = p_filter->owner.video->buffer_new( p_filter );
+    picture_t *pic;
+    if ( p_filter->owner.video != NULL && p_filter->owner.video->buffer_new != NULL)
+        pic = p_filter->owner.video->buffer_new( p_filter );
+    else
+        pic = picture_NewFromFormat( &p_filter->fmt_out.video );
     if( pic == NULL )
         msg_Warn( p_filter, "can't get output picture" );
     return pic;
