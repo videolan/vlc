@@ -28,12 +28,16 @@
 typedef struct vlc_va_t vlc_va_t;
 typedef struct vlc_va_sys_t vlc_va_sys_t;
 
+struct vlc_va_operations {
+    int (*get)(vlc_va_t *, picture_t *pic, uint8_t **surface);
+    void (*close)(vlc_va_t *, void **hwctx);
+};
+
 struct vlc_va_t {
     struct vlc_object_t obj;
 
     vlc_va_sys_t *sys;
-    int (*get)(vlc_va_t *, picture_t *pic, uint8_t **surface);
-    void (*close)(vlc_va_t *, void **hwctx);
+    const struct vlc_va_operations *ops;
 };
 
 /**
@@ -75,7 +79,7 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *,
  */
 static inline int vlc_va_Get(vlc_va_t *va, picture_t *pic, uint8_t **surface)
 {
-    return va->get(va, pic, surface);
+    return va->ops->get(va, pic, surface);
 }
 
 /**

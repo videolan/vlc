@@ -125,7 +125,7 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
 
 void vlc_va_Delete(vlc_va_t *va, void **hwctx)
 {
-    if (va->close != NULL)
-        va->close(va, hwctx);
+    if (va->ops->close != NULL)
+        va->ops->close(va, hwctx);
     vlc_object_delete(va);
 }

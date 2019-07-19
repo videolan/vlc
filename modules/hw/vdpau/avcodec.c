@@ -128,6 +128,8 @@ static void Close(vlc_va_t *va, void **hwctx)
     free(sys);
 }
 
+static const struct vlc_va_operations ops = { Lock, Close, };
+
 static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, void *p_sys)
 {
@@ -215,8 +217,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
     if (vdp_get_information_string(sys->vdp, &infos) == VDP_STATUS_OK)
         msg_Info(va, "Using %s", infos);
 
-    va->get = Lock;
-    va->close = Close;
+    va->ops = &ops;
     return VLC_SUCCESS;
 
 error:

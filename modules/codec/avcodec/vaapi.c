@@ -145,6 +145,8 @@ static void Delete(vlc_va_t *va, void **hwctx)
     free(sys);
 }
 
+static const struct vlc_va_operations ops = { Get, Delete, };
+
 static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                   const es_format_t *fmt, void *p_sys)
 {
@@ -201,8 +203,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     ctx->hwaccel_context = &sys->hw_ctx;
     va->sys = sys;
-    va->get = Get;
-    va->close = Delete;
+    va->ops = &ops;
     return VLC_SUCCESS;
 
 error:

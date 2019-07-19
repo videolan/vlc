@@ -253,6 +253,8 @@ static void Close(vlc_va_t *va, void **ctx)
     free(sys);
 }
 
+static const struct vlc_va_operations ops = { Get, Close, };
+
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, picture_sys_d3d9_t *p_sys)
 {
@@ -337,8 +339,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     ctx->hwaccel_context = &sys->hw;
 
-    va->get = Get;
-    va->close = Close;
+    va->ops = &ops;
     return VLC_SUCCESS;
 
 error:
