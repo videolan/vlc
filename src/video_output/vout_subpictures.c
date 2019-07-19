@@ -221,13 +221,6 @@ static void FilterRelease(filter_t *filter)
     vlc_object_delete(filter);
 }
 
-static picture_t *spu_new_video_buffer(filter_t *filter)
-{
-    const video_format_t *fmt = &filter->fmt_out.video;
-
-    return picture_NewFromFormat(fmt);
-}
-
 static int spu_get_attachments(filter_t *filter,
                                input_attachment_t ***attachment_ptr,
                                int *attachment_count)
@@ -274,10 +267,6 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
     return text;
 }
 
-static const struct filter_video_callbacks spu_scaler_cbs = {
-    spu_new_video_buffer,
-};
-
 static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
                                              vlc_fourcc_t src_chroma,
                                              vlc_fourcc_t dst_chroma,
@@ -300,8 +289,6 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
     scale->fmt_out.video.i_visible_width =
     scale->fmt_out.video.i_height =
     scale->fmt_out.video.i_visible_height = require_resize ? 16 : 32;
-
-    scale->owner.video = &spu_scaler_cbs;
 
     scale->p_module = module_need(scale, "video converter", NULL, false);
     if (!scale->p_module)
