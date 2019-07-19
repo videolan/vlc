@@ -3031,8 +3031,8 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         }
 
         /* TODO do not use vlc_tick_now() but proper stream acquisition date */
-        bool b_extra_buffering_allowed = !input_priv(p_sys->p_input)->b_low_delay &&
-                                         EsOutIsExtraBufferingAllowed( out );
+        const bool b_low_delay = input_priv(p_sys->p_input)->b_low_delay;
+        bool b_extra_buffering_allowed = !b_low_delay && EsOutIsExtraBufferingAllowed( out );
         vlc_tick_t i_late = input_clock_Update(
                             p_pgrm->p_input_clock, VLC_OBJECT(p_sys->p_input),
                             input_priv(p_sys->p_input)->b_can_pace_control || p_sys->b_buffering,
@@ -3076,7 +3076,12 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
                 const vlc_tick_t i_jitter_max =
                         VLC_TICK_FROM_MS(var_InheritInteger( p_sys->p_input, "clock-jitter" ));
                 /* If the jitter increase is over our max or the total hits the maximum */
-                if( i_new_jitter > i_jitter_max || i_clock_total_delay > INPUT_PTS_DELAY_MAX )
+                if( i_new_jitter > i_jitter_max ||
+                    i_clock_total_delay > INPUT_PTS_DELAY_MAX ||
+                    /* jitter is always 0 due to median calculation first output
+                       and low delay can't allow non reversible jitter increase
+                       in branch below */
+                    (b_low_delay && i_late > i_jitter_max) )
                 {
                     msg_Err( p_sys->p_input,
                              "ES_OUT_SET_(GROUP_)PCR  is called %d ms late (jitter of %d ms ignored)",
