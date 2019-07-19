@@ -935,11 +935,6 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool fra
     return VLC_SUCCESS;
 }
 
-static picture_t *ConvertRGB32AndBlendBufferNew(filter_t *filter)
-{
-    return picture_NewFromFormat(&filter->fmt_out.video);
-}
-
 static picture_t *ConvertRGB32AndBlend(vout_thread_t *vout, picture_t *pic,
                                      subpicture_t *subpic)
 {
@@ -950,13 +945,7 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_t *vout, picture_t *pic,
 
     assert(vout->p->spu_blend);
 
-    static const struct filter_video_callbacks cbs = {
-        ConvertRGB32AndBlendBufferNew,
-    };
-    filter_owner_t owner = {
-        .video = &cbs,
-    };
-    filter_chain_t *filterc = filter_chain_NewVideo(vout, false, &owner);
+    filter_chain_t *filterc = filter_chain_NewVideo(vout, false, NULL);
     if (!filterc)
         return NULL;
 
