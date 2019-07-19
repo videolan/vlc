@@ -66,7 +66,7 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_SOUT_MUX)
     set_shortname("MP4")
 
-    add_bool(SOUT_CFG_PREFIX "faststart", true,
+    add_bool(SOUT_CFG_PREFIX "faststart", false,
               FASTSTART_TEXT, FASTSTART_LONGTEXT,
               true)
     set_capability("sout mux", 5)

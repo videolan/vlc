@@ -80,6 +80,9 @@ Stream output:
    Candidate for deprecation of decklink vout/aout modules.
  * Support for DLNA/UPNP renderers
 
+Muxers:
+ * MP4 files are no longer faststart by default
+
 Service discovery:
  * Support Renderer discovery with avahi
 
