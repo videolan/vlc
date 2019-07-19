@@ -734,6 +734,9 @@ bool h264_get_dpb_values( const h264_sequence_parameter_set_t *p_sps,
     {
         switch( p_sps->i_profile ) /* E-2.1 */
         {
+            case PROFILE_H264_BASELINE:
+                i_max_num_reorder_frames = 0; /* only I & P */
+                break;
             case PROFILE_H264_CAVLC_INTRA:
             case PROFILE_H264_SVC_HIGH:
             case PROFILE_H264_HIGH:
