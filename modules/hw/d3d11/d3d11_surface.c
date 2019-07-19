@@ -746,8 +746,9 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
     if (d3d_fourcc == 0)
         goto done;
 
-    picture_resource_t res;
-    res.pf_destroy = DestroyPicture;
+    picture_resource_t res = {
+        res.pf_destroy = DestroyPicture,
+    };
     picture_sys_d3d11_t *res_sys = calloc(1, sizeof(picture_sys_d3d11_t));
     if (res_sys == NULL) {
         err = VLC_ENOMEM;
