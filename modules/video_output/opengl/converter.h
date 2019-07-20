@@ -21,11 +21,11 @@
 #ifndef VLC_OPENGL_CONVERTER_H
 #define VLC_OPENGL_CONVERTER_H
 
-#include <vlc_plugin.h>
 #include <vlc_common.h>
 #include <vlc_codec.h>
-#include <vlc_picture_pool.h>
 #include <vlc_opengl.h>
+#include <vlc_picture_pool.h>
+#include <vlc_plugin.h>
 
 /* if USE_OPENGL_ES2 is defined, OpenGL ES version 2 will be used, otherwise
  * normal OpenGL will be used */
