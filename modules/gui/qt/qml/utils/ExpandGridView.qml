@@ -36,6 +36,12 @@ NavigableFocusScope {
     property int modelCount: 0
 
     property int currentIndex: 0
+    property real contentHeight: flickable.contentHeight
+    property real contentWidth: flickable.contentWidth
+    property alias contentX: flickable.contentX
+    property bool isSingleRow: false
+    property bool isAnimating: animateRetractItem.running || animateExpandItem.running
+    property alias flickableDirection: flickable.flickableDirection
 
     /// the id of the item to be expanded
     property int _expandIndex: -1
@@ -44,6 +50,7 @@ NavigableFocusScope {
     //delegate to display the extended item
     property Component gridDelegate: Item{}
     property Component expandDelegate: Item{}
+    property Item expanderItem: Item{}
 
     //signals emitted when selected items is updated from keyboard
     signal selectionUpdated( int keyModifiers, int oldIndex,int newIndex )
@@ -52,13 +59,20 @@ NavigableFocusScope {
 
     property double _expandRetractSpeed: 1.
 
+    function renderLayout() {
+        flickable.layout()
+    }
+
     function shiftX(index) {
         var colCount = flickable.getNbItemsPerRow()
         var rightSpace = width - colCount * root.cellWidth
         return ((index % colCount) + 1) * (rightSpace / (colCount + 1))
     }
 
-    function switchExpandItem(index) {
+    function switchExpandItem(index,item) {
+        if (item)
+            root.expanderItem = item
+
         if (index === _expandIndex)
             _newExpandIndex = -1
         else
@@ -79,17 +93,21 @@ NavigableFocusScope {
     Flickable {
         id: flickable
         clip: true
+        ScrollBar.horizontal: ScrollBar{
+            anchors.bottom: flickable.bottom
+            anchors.left: flickable.left
+        }
 
         property variant model
         property Item expandItem: root.expandDelegate.createObject(contentItem, {"height": 0})
-
         anchors.fill: parent
-
         onWidthChanged: { layout() }
         onHeightChanged: { layout() }
         onContentYChanged: { layout() }
 
         function getNbItemsPerRow() {
+            if (isSingleRow)
+                return model.count
             return Math.max(Math.floor(width / root.cellWidth), 1)
         }
 
@@ -220,6 +238,7 @@ NavigableFocusScope {
             if (root._expandIndex !== -1)
                 newContentHeight += expandItem.height
             contentHeight = newContentHeight
+            contentWidth = root.cellWidth * getNbItemsPerRow()
             setCurrentItemFocus()
         }
 
@@ -392,7 +411,7 @@ NavigableFocusScope {
                 newIndex = Math.max(0, currentIndex - 1)
             }
         } else if (event.key === Qt.Key_Down || event.matches(StandardKey.MoveToNextLine) ||event.matches(StandardKey.SelectNextLine) ) {
-            if (Math.floor(currentIndex / colCount) !== Math.floor(root.modelCount / colCount)) { //we are not on the last line
+            if (!isSingleRow && Math.floor(currentIndex / colCount) !== Math.floor(root.modelCount / colCount)) { //we are not on the last line
                 newIndex = Math.min(root.modelCount - 1, currentIndex + colCount)
             }
         } else if (event.key === Qt.Key_PageDown || event.matches(StandardKey.MoveToNextPage) ||event.matches(StandardKey.SelectNextPage)) {

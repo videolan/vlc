@@ -28,6 +28,7 @@ import "qrc:///style/"
 Rectangle {
     id: root
 
+    color: "transparent"
     property url image
     property string title: ""
     property string subtitle: ""
@@ -42,6 +43,11 @@ Rectangle {
     property bool isNew: false
     property double progress: 0.5
     property string channel: ""
+    property real pictureWidth: isVideo ? VLCStyle.video_normal_width : VLCStyle.cover_small
+    property real pictureHeight: isVideo ? VLCStyle.video_normal_height : VLCStyle.cover_small
+    property alias contextButtonDown: contextButton.down
+    width: gridItem.width
+    height: gridItem.height
 
     signal playClicked
     signal addToPlaylistClicked
@@ -56,7 +62,7 @@ Rectangle {
         width: childrenRect.width
         height: childrenRect.height
         color: "transparent"
-
+        
         MouseArea {
             id: mouseArea
             hoverEnabled: true
@@ -70,8 +76,8 @@ Rectangle {
 
             Item {
                 id: picture
-                width: isVideo ? VLCStyle.video_normal_width : VLCStyle.cover_small
-                height: isVideo ? VLCStyle.video_normal_height : VLCStyle.cover_small
+                width: root.pictureWidth
+                height: root.pictureHeight
                 anchors.top: mouseArea.top
                 property bool highlighted: selected || root.activeFocus
 
@@ -509,6 +515,7 @@ Rectangle {
                     }
                 }
             }
+
         }
     }
 }
