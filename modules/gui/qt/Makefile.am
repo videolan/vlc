@@ -536,7 +536,10 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/update.svg \
 	gui/qt/pixmaps/valid.svg \
 	gui/qt/pixmaps/search_clear.svg \
-	gui/qt/pixmaps/lock.svg
+	gui/qt/pixmaps/lock.svg \
+	gui/qt/pixmaps/close.svg \
+	gui/qt/pixmaps/rename.svg \
+	gui/qt/pixmaps/del.svg
 
 #QML and JS resources
 libqt_plugin_la_QML = \
