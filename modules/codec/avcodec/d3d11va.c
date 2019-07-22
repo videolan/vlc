@@ -358,7 +358,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     va->sys = sys;
 
     sys->d3d_dev.d3ddevice = NULL;
-    va->sys->render = DXGI_FORMAT_UNKNOWN;
+    sys->render = DXGI_FORMAT_UNKNOWN;
     if ( p_sys != NULL && p_sys->context != NULL ) {
         HRESULT hr = D3D11_CreateDeviceExternal(va, p_sys->context, true, &sys->d3d_dev);
         if (FAILED(hr))
@@ -381,9 +381,9 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                 sys->render = dstDesc.Format;
                 if (dstDesc.BindFlags & D3D11_BIND_DECODER)
                 {
-                    va->sys->textureWidth = dstDesc.Width;
-                    va->sys->textureHeight = dstDesc.Height;
-                    va->sys->totalTextureSlices = dstDesc.ArraySize;
+                    sys->textureWidth = dstDesc.Width;
+                    sys->textureHeight = dstDesc.Height;
+                    sys->totalTextureSlices = dstDesc.ArraySize;
                 }
             }
         }
