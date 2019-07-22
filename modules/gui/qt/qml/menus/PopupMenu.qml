@@ -33,7 +33,7 @@ Utils.MenuExt {
     Action { text: qsTr("Stop");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.stop();     icon.source: "qrc:/toolbar/stop_b.svg";     }
     Action { text: qsTr("Previous"); enabled: player.isPlaying ; onTriggered: mainPlaylistController.previous(); icon.source: "qrc:/toolbar/previous_b.svg"; }
     Action { text: qsTr("Next");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.next();     icon.source: "qrc:/toolbar/next_b.svg";     }
-    Action { text: qsTr("Record");   enabled: player.isPlaying ; onTriggered: player.record();         icon.source: "qrc:/toolbar/record.svg";     }
+    Action { text: qsTr("Record");   enabled: player.isPlaying ; onTriggered: player.toggleRecord();         icon.source: "qrc:/toolbar/record.svg";     }
 
     MenuSeparator {}
     Action { text: qsTr("&Fullscreen Interface"); checkable: true; checked: rootWindow.interfaceFullScreen;  onTriggered: rootWindow.interfaceFullScreen = !rootWindow.interfaceFullScreen }
