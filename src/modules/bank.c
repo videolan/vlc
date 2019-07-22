@@ -598,11 +598,12 @@ static void module_Unmap(vlc_plugin_t *plugin)
 void *module_Symbol(struct vlc_logger *log,
                     vlc_plugin_t *plugin, const char *name)
 {
-    if (module_Map(log, plugin))
+    if (plugin->abspath == NULL || module_Map(log, plugin))
         return NULL;
 
     void *handle = (void *)atomic_load_explicit(&plugin->handle,
                                                 memory_order_relaxed);
+    assert(handle != NULL);
     return vlc_dlsym(handle, name);
 }
 #else
