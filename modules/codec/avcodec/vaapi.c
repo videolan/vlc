@@ -51,6 +51,7 @@
 struct vlc_va_sys_t
 {
     struct vaapi_context hw_ctx;
+    vlc_video_context *vctx;
     /* mimick what is done in the decoder pool from the display for now */
     picture_pool_t *picture_pool;
 };
@@ -139,6 +140,7 @@ static void Delete(vlc_va_t *va)
     vlc_object_t *o = VLC_OBJECT(va);
 
     picture_pool_Release(sys->picture_pool);
+    vlc_video_context_Release(sys->vctx);
     vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
     vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
     free(sys);
@@ -204,9 +206,14 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
 
     msg_Info(va, "Using %s", vaQueryVendorString(sys->hw_ctx.display));
 
+    sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_VAAPI, 0, NULL );
+    if (sys->vctx == NULL)
+        goto error;
+
     ctx->hwaccel_context = &sys->hw_ctx;
     va->sys = sys;
     va->ops = &ops;
+    *vtcx_out = sys->vctx;
     return VLC_SUCCESS;
 
 error:
