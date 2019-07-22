@@ -340,7 +340,7 @@ libvideotoolbox_plugin_la_SOURCES = \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h
 libvideotoolbox_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 if HAVE_IOS
-libvideotoolbox_plugin_la_OBJCFLAGS += -miphoneos-version-min=10.0
+libvideotoolbox_plugin_la_OBJCFLAGS += -miphoneos-version-min=9.0
 endif
 if HAVE_TVOS
 libvideotoolbox_plugin_la_OBJCFLAGS += -mtvos-version-min=10.2
