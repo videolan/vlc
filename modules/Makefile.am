@@ -31,6 +31,7 @@ include hw/d3d11/Makefile.am
 include hw/vaapi/Makefile.am
 include hw/vdpau/Makefile.am
 include hw/mmal/Makefile.am
+include hw/gbm/Makefile.am
 include keystore/Makefile.am
 include logger/Makefile.am
 include lua/Makefile.am

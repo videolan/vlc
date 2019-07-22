@@ -24,13 +24,16 @@
 # include <config.h>
 #endif
 
+#include <fcntl.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
 #include <vlc_common.h>
+#include <vlc_modules.h>
 #include <vlc_plugin.h>
+#include <vlc_fs.h>
 #include <vlc_opengl.h>
 #include <vlc_vout_window.h>
 #ifdef USE_PLATFORM_X11
@@ -42,6 +45,11 @@
 #if defined (USE_PLATFORM_ANDROID)
 # include "../android/utils.h"
 #endif
+#if defined (USE_PLATFORM_GBM)
+# include <gbm.h>
+#endif
+
+#define GBM_DEVICE_FILE "/dev/dri/card0"
 
 typedef struct vlc_gl_sys_t
 {
@@ -311,6 +319,15 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
 # endif
     (void) width; (void) height;
 
+#elif defined (USE_PLATFORM_GBM)
+    if (wnd->type != VOUT_WINDOW_TYPE_GBM)
+        goto error;
+
+    window = &wnd->handle.gbm;
+    sys->display = eglGetDisplay((EGLNativeDisplayType)wnd->display.gbm);
+    VLC_UNUSED(width);
+    VLC_UNUSED(height);
+
 #endif
 
     if (sys->display == EGL_NO_DISPLAY)
@@ -353,6 +370,8 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     }
 
     /* Create a drawing surface */
+
+    // (EGLSurface // EGLDisplay ; ELGConfig ; EGLNativeWindowType * ; NULL )
     sys->surface = createSurface(sys->display, cfgv[0], window, NULL);
     if (sys->surface == EGL_NO_SURFACE)
     {
@@ -423,12 +442,20 @@ vlc_module_begin ()
     set_description (N_("EGL extension for OpenGL"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
+#if defined USE_PLATFORM_GBM
+    set_capability ("opengl", 0)
+#else
     set_capability ("opengl", 50)
+#endif
     set_callback(OpenGL)
     add_shortcut ("egl")
 
     add_submodule ()
+#if defined USE_PLATFORM_GBM
+    set_capability ("opengl es2", 0)
+#else
     set_capability ("opengl es2", 50)
+#endif
     set_callback(OpenGLES2)
     add_shortcut ("egl")
 

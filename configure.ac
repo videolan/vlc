@@ -2325,6 +2325,12 @@ dnl  RDP/Remote Desktop access module
 dnl
 PKG_ENABLE_MODULES_VLC([FREERDP], [rdp], [freerdp >= 1.0.1], (RDP/Remote Desktop client support) )
 
+dnl  GBM surface and filter modules
+dnl
+PKG_ENABLE_MODULES_VLC([EGL_GBM], [egl_gbm], [egl gbm], (GBM backend support), [auto])
+PKG_ENABLE_MODULES_VLC([EGL_GBM_FILTER], [egl_gbm_filter], [gbm], (GBM backend support), [auto])
+PKG_ENABLE_MODULES_VLC([GBM], [gbm], [gbm], (GBM backend support), [auto])
+
 dnl
 dnl AVFoundation
 AC_SUBST([have_avfoundation], ["no"])

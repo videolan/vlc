@@ -109,6 +109,23 @@ video_filter_LTLIBRARIES = \
 	libpuzzle_plugin.la \
 	librotate_plugin.la
 
+OPENGL_FILTERS_CFLAGS =
+if HAVE_ANDROID
+OPENGL_FILTERS_CFLAGS += -DUSE_OPENGL_ES2
+endif
+if HAVE_IOS
+OPENGL_FILTERS_CFLAGS += -DUSE_OPENGL_ES2
+endif
+
+if HAVE_LINUX
+if !HAVE_ANDROID
+libegl_gbm_filter_plugin_la_SOURCES = video_filter/gbm.c $(OPENGL_COMMONSOURCES)
+libegl_gbm_filter_plugin_la_LDFLAGS = $(AM_LDFLAGS) -lplacebo $(EGL_GBM_FILTER_LIBS) libvlc_opengl.la
+libegl_gbm_filter_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_GBM_FILTER_CFLAGS)
+video_filter_LTLIBRARIES += libegl_gbm_filter_plugin.la
+endif
+endif
+
 # macOS / iOS hardware video filters
 libci_filters_plugin_la_SOURCES = video_filter/ci_filters.m codec/vt_utils.c codec/vt_utils.h
 libci_filters_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)' \
