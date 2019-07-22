@@ -536,6 +536,8 @@ int module_Map(struct vlc_logger *log, vlc_plugin_t *plugin)
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
+    if (plugin->abspath == NULL)
+        return 0; /* static module needs not be mapped */
     if (atomic_load_explicit(&plugin->handle, memory_order_acquire))
         return 0; /* fast path: already loaded */
 
