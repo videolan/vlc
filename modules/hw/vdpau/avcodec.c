@@ -157,11 +157,12 @@ const struct vlc_video_context_operations vdpau_vctx_ops = {
 };
 
 static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *desc,
-                enum PixelFormat pix_fmt,
                 const es_format_t *fmt_in, vlc_decoder_device *dec_device,
-                vlc_video_context **vtcx_out)
+                video_format_t *fmt_out, vlc_video_context **vtcx_out)
 {
-    if (pix_fmt != AV_PIX_FMT_VDPAU|| dec_device == NULL ||
+    if ( ( fmt_out->i_chroma != VLC_CODEC_VDPAU_VIDEO_420 &&
+           fmt_out->i_chroma != VLC_CODEC_VDPAU_VIDEO_422 &&
+           fmt_out->i_chroma != VLC_CODEC_VDPAU_VIDEO_444 ) ||
         GetVDPAUOpaqueDevice(dec_device) == NULL)
         return VLC_EGENERIC;
 

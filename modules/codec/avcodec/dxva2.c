@@ -48,8 +48,8 @@ struct dxva2_pic_context
 
 #include "directx_va.h"
 
-static int Open(vlc_va_t *, AVCodecContext *, const AVPixFmtDescriptor *, enum PixelFormat,
-                const es_format_t *, vlc_decoder_device *, vlc_video_context **);
+static int Open(vlc_va_t *, AVCodecContext *, const AVPixFmtDescriptor *,
+                const es_format_t *, vlc_decoder_device *, video_format_t *, vlc_video_context **);
 
 vlc_module_begin()
     set_description(N_("DirectX Video Acceleration (DXVA) 2.0"))
@@ -248,13 +248,13 @@ static void Close(vlc_va_t *va)
 static const struct vlc_va_operations ops = { Get, Close, };
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
-                enum PixelFormat pix_fmt,
                 const es_format_t *fmt_in, vlc_decoder_device *dec_device,
-                vlc_video_context **vtcx_out)
+                video_format_t *fmt_out, vlc_video_context **vtcx_out)
 {
     int err = VLC_EGENERIC;
 
-    if (pix_fmt != AV_PIX_FMT_DXVA2_VLD)
+    if ( fmt_out->i_chroma != VLC_CODEC_D3D9_OPAQUE &&
+         fmt_out->i_chroma != VLC_CODEC_D3D9_OPAQUE_10B )
         return VLC_EGENERIC;
 
     d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueDevice( dec_device );
@@ -317,17 +317,17 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         goto error;
     }
 
-    video_format_t fmt_out;
+    video_format_t final_fmt = *fmt_out;
     static const directx_sys_t dx_sys = { DxGetInputList, DxSetupOutput };
     sys->selected_decoder = directx_va_Setup(va, &dx_sys, ctx, desc, fmt_in, 0,
-                                             &fmt_out, &sys->hw.surface_count);
+                                             &final_fmt, &sys->hw.surface_count);
     if (sys->selected_decoder == NULL)
     {
         err = VLC_EGENERIC;
         goto error;
     }
 
-    err = va_pool_SetupDecoder(va, sys->va_pool, ctx, &fmt_out, sys->hw.surface_count);
+    err = va_pool_SetupDecoder(va, sys->va_pool, ctx, &final_fmt, sys->hw.surface_count);
     if (err != VLC_SUCCESS)
         goto error;
 
@@ -342,6 +342,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     octx->format = sys->render;
 
     va->ops = &ops;
+    *fmt_out = final_fmt;
     *vtcx_out = sys->vctx;
     return VLC_SUCCESS;
 

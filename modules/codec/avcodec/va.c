@@ -100,20 +100,20 @@ static int vlc_va_Start(void *func, bool forced, va_list ap)
     vlc_va_t *va = va_arg(ap, vlc_va_t *);
     AVCodecContext *ctx = va_arg(ap, AVCodecContext *);
     const AVPixFmtDescriptor *src_desc = va_arg(ap, const AVPixFmtDescriptor *);
-    enum PixelFormat pix_fmt = va_arg(ap, enum PixelFormat);
     const es_format_t *fmt_in = va_arg(ap, const es_format_t *);
     vlc_decoder_device *device = va_arg(ap, vlc_decoder_device *);
+    video_format_t *fmt_out = va_arg(ap, video_format_t *);
     vlc_video_context **vtcx_out = va_arg(ap, vlc_video_context **);
     vlc_va_open open = func;
 
     (void) forced;
-    return open(va, ctx, src_desc, pix_fmt, fmt_in, device, vtcx_out);
+    return open(va, ctx, src_desc, fmt_in, device, fmt_out, vtcx_out);
 }
 
 vlc_va_t *vlc_va_New(vlc_object_t *obj,
                      AVCodecContext *avctx, const AVPixFmtDescriptor *src_desc,
-                     enum PixelFormat pix_fmt, const es_format_t *fmt,
-                     vlc_decoder_device *device, vlc_video_context **vtcx_out)
+                     const es_format_t *fmt_in, vlc_decoder_device *device,
+                     video_format_t *fmt_out, vlc_video_context **vtcx_out)
 {
     struct vlc_va_t *va = vlc_object_create(obj, sizeof (*va));
     if (unlikely(va == NULL))
@@ -121,7 +121,8 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj,
 
 
     if (vlc_module_load(va, "hw decoder", NULL, true,
-                        vlc_va_Start, va, avctx, src_desc, pix_fmt, fmt, device, vtcx_out) == NULL)
+                        vlc_va_Start, va, avctx, src_desc, fmt_in, device,
+                        fmt_out, vtcx_out) == NULL)
     {
         vlc_object_delete(va);
         va = NULL;

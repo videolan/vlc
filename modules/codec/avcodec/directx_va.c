@@ -335,7 +335,6 @@ const directx_va_mode_t *directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_
                   surface_width, surface_height,
                   avctx->coded_width, avctx->coded_height);
 
-    *fmt_out = fmt->video;
     fmt_out->i_width  = surface_width;
     fmt_out->i_height = surface_height;
 

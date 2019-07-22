@@ -236,12 +236,12 @@ static void VAAPISetupAVCodecContext(void *opaque, AVCodecContext *avctx)
 }
 
 static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
-                  enum PixelFormat pix_fmt,
                   const es_format_t *fmt_in, vlc_decoder_device *dec_device,
-                  vlc_video_context **vtcx_out)
+                  video_format_t *fmt_out, vlc_video_context **vtcx_out)
 {
     VLC_UNUSED(desc);
-    if (pix_fmt != AV_PIX_FMT_VAAPI_VLD || dec_device == NULL ||
+    if ( (fmt_out->i_chroma != VLC_CODEC_VAAPI_420 &&
+          fmt_out->i_chroma != VLC_CODEC_VAAPI_420_10BPP) || dec_device == NULL ||
         dec_device->type != VLC_DECODER_DEVICE_VAAPI)
         return VLC_EGENERIC;
 

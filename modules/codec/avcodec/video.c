@@ -1753,9 +1753,9 @@ no_reuse:
         vlc_mutex_unlock(&p_sys->lock);
 
         vlc_video_context *vctx_out;
-        vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, src_desc, hwfmt,
-                                  &p_dec->fmt_in,
-                                  init_device, &vctx_out);
+        vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, src_desc,
+                                  &p_dec->fmt_in, init_device,
+                                  &p_dec->fmt_out.video, &vctx_out);
         if (init_device)
             vlc_decoder_device_Release(init_device);
         vlc_mutex_lock(&p_sys->lock);
