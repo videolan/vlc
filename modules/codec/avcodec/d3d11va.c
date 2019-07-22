@@ -399,7 +399,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     IDXGIAdapter *p_adapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
     if (p_adapter) {
-        char *description = NULL;
         DXGI_ADAPTER_DESC adapterDesc;
         if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc))) {
             msg_Info(va, "Using D3D11VA (%ls, vendor %x(%s), device %x, revision %x)",
@@ -439,7 +438,6 @@ static int D3dCreateDevice(vlc_va_t *va)
 #endif
     if (sys->d3d_dev.d3dcontext != NULL)
     {
-        ID3D11Device* d3ddevice = NULL;
         ID3D11DeviceContext_GetDevice(sys->d3d_dev.d3dcontext, &sys->d3d_dev.d3ddevice);
         ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
         ID3D11Device_Release(sys->d3d_dev.d3ddevice);
