@@ -57,6 +57,14 @@ NavigableFocusScope {
     property alias highlightMoveVelocity: view.highlightMoveVelocity
 
     property alias section: view.section
+    property alias orientation: view.orientation
+
+    function nextPage() {
+        view.contentX += (Math.min(view.width, (view.contentWidth - view.width - view.contentX ) ))
+    }
+    function prevPage() {
+        view.contentX -= Math.min(view.width,view.contentX )
+    }
 
     Component {
         id: sectionHeading
@@ -83,11 +91,14 @@ NavigableFocusScope {
         anchors.fill: parent
         //key navigation is reimplemented for item selection
         keyNavigationEnabled: false
+        contentWidth: contentItem.childrenRect.width
+        contentHeight: contentItem.childrenRect.height
 
         focus: true
 
         clip: true
         ScrollBar.vertical: ScrollBar { id: scroll_id }
+        ScrollBar.horizontal: ScrollBar { }
 
         highlightMoveDuration: 300 //ms
         highlightMoveVelocity: 1000 //px/s
@@ -125,16 +136,33 @@ NavigableFocusScope {
 
         Keys.onPressed: {
             var newIndex = -1
-            if ( event.key === Qt.Key_Down || event.matches(StandardKey.MoveToNextLine) ||event.matches(StandardKey.SelectNextLine) ) {
-                if (currentIndex !== modelCount - 1 )
-                    newIndex = currentIndex + 1
-            } else if ( event.key === Qt.Key_PageDown || event.matches(StandardKey.MoveToNextPage) ||event.matches(StandardKey.SelectNextPage)) {
-                newIndex = Math.min(modelCount - 1, currentIndex + 10)
-            } else if ( event.key === Qt.Key_Up || event.matches(StandardKey.MoveToPreviousLine) ||event.matches(StandardKey.SelectPreviousLine) ) {
-                if ( currentIndex !== 0 )
-                    newIndex = currentIndex - 1
-            } else if ( event.key === Qt.Key_PageUp || event.matches(StandardKey.MoveToPreviousPage) ||event.matches(StandardKey.SelectPreviousPage)) {
-                newIndex = Math.max(0, currentIndex - 10)
+
+            if (orientation === ListView.Vertical)
+            {
+                if ( event.key === Qt.Key_Down || event.matches(StandardKey.MoveToNextLine) ||event.matches(StandardKey.SelectNextLine) ) {
+                    if (currentIndex !== modelCount - 1 )
+                        newIndex = currentIndex + 1
+                } else if ( event.key === Qt.Key_PageDown || event.matches(StandardKey.MoveToNextPage) ||event.matches(StandardKey.SelectNextPage)) {
+                    newIndex = Math.min(modelCount - 1, currentIndex + 10)
+                } else if ( event.key === Qt.Key_Up || event.matches(StandardKey.MoveToPreviousLine) ||event.matches(StandardKey.SelectPreviousLine) ) {
+                    if ( currentIndex !== 0 )
+                        newIndex = currentIndex - 1
+                } else if ( event.key === Qt.Key_PageUp || event.matches(StandardKey.MoveToPreviousPage) ||event.matches(StandardKey.SelectPreviousPage)) {
+                    newIndex = Math.max(0, currentIndex - 10)
+                }
+            }else{
+                if ( event.key === Qt.Key_Right || event.matches(StandardKey.SelectNextLine) ) {
+                    if (currentIndex !== modelCount - 1 )
+                        newIndex = currentIndex + 1
+                }
+                else if ( event.key === Qt.Key_PageDown || event.matches(StandardKey.MoveToNextPage) ||event.matches(StandardKey.SelectNextPage)) {
+                    newIndex = Math.min(modelCount - 1, currentIndex + 10)
+                } else if ( event.key === Qt.Key_Left || event.matches(StandardKey.SelectPreviousLine) ) {
+                    if ( currentIndex !== 0 )
+                        newIndex = currentIndex - 1
+                } else if ( event.key === Qt.Key_PageUp || event.matches(StandardKey.MoveToPreviousPage) ||event.matches(StandardKey.SelectPreviousPage)) {
+                    newIndex = Math.max(0, currentIndex - 10)
+                }
             }
 
             if (newIndex >= 0 && newIndex < modelCount) {

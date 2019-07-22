@@ -103,7 +103,9 @@ Item {
 
     property int selectedBorder: 2
     property real video_normal_height: 160 * scale;
+    property real video_large_height: 200 * scale;
     property real video_normal_width: video_normal_height * (16/10);
+    property real video_large_width: video_large_height * (16/10);
 
     property int miniPlayerHeight: 60 * scale;
 
