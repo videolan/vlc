@@ -146,7 +146,19 @@ static void Delete(vlc_va_t *va)
     free(sys);
 }
 
-static const struct vlc_va_operations ops = { Get, NULL /* TODO */, Delete, };
+static picture_t *GetVAAPIPicture(vlc_va_t *va, const video_format_t *fmt)
+{
+    picture_t *pic = picture_pool_Get(va->sys->picture_pool);
+    if (pic && !video_format_IsSimilar(&pic->format, fmt))
+    {
+        msg_Err(va, "mismatched pool/decoder format");
+        picture_Release(pic);
+        pic = NULL;
+    }
+    return pic;
+}
+
+static const struct vlc_va_operations ops = { Get, GetVAAPIPicture, Delete, };
 
 static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                   enum PixelFormat pix_fmt,
