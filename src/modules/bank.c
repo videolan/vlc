@@ -166,7 +166,7 @@ static vlc_plugin_t *module_InitStatic(vlc_plugin_cb entry)
         return NULL;
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-    atomic_init(&lib->handle, 1 /* must be non-zero for module_Map() */);
+    atomic_init(&lib->handle, 0);
     lib->unloadable = false;
 #endif
     return lib;
