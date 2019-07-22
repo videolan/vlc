@@ -175,7 +175,7 @@ Utils.NavigableFocusScope {
                         visible: stackViewZone.focus
                         anchors.fill: stackViewZone
                         z: 42
-                        color: "#22ff950d"
+                        color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.accent, 0.08)
                         border.width: VLCStyle.selectedBorder
                         border.color: VLCStyle.colors.accent
                     }
