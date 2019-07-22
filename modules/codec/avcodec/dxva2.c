@@ -46,14 +46,13 @@ typedef picture_sys_d3d9_t VA_PICSYS;
 #include "directx_va.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
-                const es_format_t *, picture_sys_d3d9_t *p_sys);
+                const es_format_t *, void *);
 
 vlc_module_begin()
     set_description(N_("DirectX Video Acceleration (DXVA) 2.0"))
-    set_capability("hw decoder", 100)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
-    set_callback(Open)
+    set_va_callback(Open, 110)
 vlc_module_end()
 
 #include <initguid.h> /* must be last included to not redefine existing GUIDs */
@@ -255,7 +254,7 @@ static void Close(vlc_va_t *va, void **ctx)
 static const struct vlc_va_operations ops = { Get, Close, };
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
-                const es_format_t *fmt, picture_sys_d3d9_t *p_sys)
+                const es_format_t *fmt, void *picsys)
 {
     int err = VLC_EGENERIC;
     directx_sys_t *dx_sys;
@@ -269,6 +268,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
     /* Load dll*/
+    picture_sys_d3d9_t *p_sys = picsys;
     if (p_sys!=NULL && p_sys->surface!=NULL)
     {
         IDirect3DDevice9 *device;
