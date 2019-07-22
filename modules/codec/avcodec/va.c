@@ -119,16 +119,14 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj,
     if (unlikely(va == NULL))
         return NULL;
 
-    char *modlist = var_InheritString(obj, "avcodec-hw");
 
-    if (vlc_module_load(va, "hw decoder", modlist, true,
+    if (vlc_module_load(va, "hw decoder", NULL, true,
                         vlc_va_Start, va, avctx, src_desc, pix_fmt, fmt, device, vtcx_out) == NULL)
     {
         vlc_object_delete(va);
         va = NULL;
     }
 
-    free(modlist);
     return va;
 }
 
