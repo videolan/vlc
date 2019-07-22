@@ -291,6 +291,18 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
 
     va->sys = sys;
 
+    switch (fmt_out->i_chroma)
+    {
+        case VLC_CODEC_D3D9_OPAQUE_10B:
+            sys->render = MAKEFOURCC('P','0','1','0');
+            break;
+        case VLC_CODEC_D3D9_OPAQUE:
+            sys->render =  MAKEFOURCC('N','V','1','2');
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
     /* Load dll*/
     sys->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
     if (!sys->dxva2_dll) {
