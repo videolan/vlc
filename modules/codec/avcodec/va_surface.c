@@ -44,11 +44,11 @@ struct vlc_va_surface_t {
     atomic_uintptr_t     refcount;
 };
 
-static void DestroyVideoDecoder(vlc_va_t *va, va_pool_t *va_pool)
+static void DestroyVideoDecoder(vlc_va_sys_t *sys, va_pool_t *va_pool)
 {
     for (unsigned i = 0; i < va_pool->surface_count; i++)
         va_surface_Release(va_pool->surface[i]->va_surface);
-    va_pool->pf_destroy_surfaces(va);
+    va_pool->pf_destroy_surfaces(sys);
     va_pool->surface_count = 0;
 }
 
@@ -81,7 +81,7 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
     }
 
     /* */
-    DestroyVideoDecoder(va, va_pool);
+    DestroyVideoDecoder(va->sys, va_pool);
 
     /* */
     msg_Dbg(va, "va_pool_SetupDecoder id %d %dx%d count: %d", avctx->codec_id, avctx->coded_width, avctx->coded_height, count);
@@ -107,7 +107,7 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
 done:
     va_pool->surface_count = i;
     if (err == VLC_SUCCESS)
-        va_pool->pf_setup_avcodec_ctx(va);
+        va_pool->pf_setup_avcodec_ctx(va->sys);
 
     return err;
 }
@@ -135,7 +135,7 @@ int va_pool_SetupSurfaces(vlc_va_t *va, va_pool_t *va_pool, unsigned count)
 done:
     va_pool->surface_count = i;
     if (err == VLC_SUCCESS)
-        va_pool->pf_setup_avcodec_ctx(va);
+        va_pool->pf_setup_avcodec_ctx(va->sys);
 
     return err;
 }
@@ -190,11 +190,11 @@ void va_surface_Release(vlc_va_surface_t *surface)
 
 void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)
 {
-    DestroyVideoDecoder(va, va_pool);
+    DestroyVideoDecoder(va->sys, va_pool);
     va_pool->pf_destroy_video_service(va);
     if (va_pool->pf_destroy_device_manager)
         va_pool->pf_destroy_device_manager(va);
-    va_pool->pf_destroy_device(va);
+    va_pool->pf_destroy_device(va->sys);
 }
 
 int va_pool_Open(vlc_va_t *va, va_pool_t *va_pool)

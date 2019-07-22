@@ -44,7 +44,7 @@ typedef struct
     struct va_pic_context  *surface[MAX_SURFACE_COUNT];
 
     int (*pf_create_device)(vlc_va_t *);
-    void (*pf_destroy_device)(vlc_va_t *);
+    void (*pf_destroy_device)(vlc_va_sys_t *);
 
     int (*pf_create_device_manager)(vlc_va_t *);
     void (*pf_destroy_device_manager)(vlc_va_t *);
@@ -61,11 +61,11 @@ typedef struct
     /**
      * Destroy resources allocated with the surfaces and the associated decoder
      */
-    void (*pf_destroy_surfaces)(vlc_va_t *);
+    void (*pf_destroy_surfaces)(vlc_va_sys_t *);
     /**
      * Set the avcodec hw context after the decoder is created
      */
-    void (*pf_setup_avcodec_ctx)(vlc_va_t *);
+    void (*pf_setup_avcodec_ctx)(vlc_va_sys_t *);
 
     /**
      * Create a new context for the surface being acquired

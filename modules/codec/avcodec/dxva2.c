@@ -136,7 +136,7 @@ struct vlc_va_sys_t
 
 /* */
 static int D3dCreateDevice(vlc_va_t *);
-static void D3dDestroyDevice(vlc_va_t *);
+static void D3dDestroyDevice(vlc_va_sys_t *);
 
 static int D3dCreateDeviceManager(vlc_va_t *);
 static void D3dDestroyDeviceManager(vlc_va_t *);
@@ -148,11 +148,10 @@ static int DxSetupOutput(vlc_va_t *, const GUID *, const video_format_t *);
 
 static int DxCreateVideoDecoder(vlc_va_t *, int codec_id,
                                 const video_format_t *, unsigned surface_count);
-static void DxDestroyVideoDecoder(vlc_va_t *);
+static void DxDestroyVideoDecoder(vlc_va_sys_t *);
 
-static void SetupAVCodecContext(vlc_va_t *va)
+static void SetupAVCodecContext(vlc_va_sys_t *sys)
 {
-    vlc_va_sys_t *sys = va->sys;
     directx_sys_t *dx_sys = &sys->dx_sys;
 
     sys->hw.decoder = dx_sys->decoder;
@@ -373,9 +372,8 @@ static int D3dCreateDevice(vlc_va_t *va)
 /**
  * It releases a Direct3D device and its resources.
  */
-static void D3dDestroyDevice(vlc_va_t *va)
+static void D3dDestroyDevice(vlc_va_sys_t *sys)
 {
-    vlc_va_sys_t *sys = va->sys;
     D3D9_ReleaseDevice(&sys->d3d_dev);
     D3D9_Destroy( &sys->hd3d );
 }
@@ -430,7 +428,7 @@ static void D3dDestroyDeviceManager(vlc_va_t *va)
 static int DxCreateVideoService(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
-    directx_sys_t *dx_sys = &va->sys->dx_sys;
+    directx_sys_t *dx_sys = &sys->dx_sys;
     HRESULT hr;
 
     HANDLE device;
@@ -458,12 +456,13 @@ static int DxCreateVideoService(vlc_va_t *va)
  */
 static void DxDestroyVideoService(vlc_va_t *va)
 {
-    directx_sys_t *dx_sys = &va->sys->dx_sys;
-    if (va->sys->device)
+    vlc_va_sys_t *sys = va->sys;
+    directx_sys_t *dx_sys = &sys->dx_sys;
+    if (sys->device)
     {
-        HRESULT hr = IDirect3DDeviceManager9_CloseDeviceHandle(va->sys->devmng, va->sys->device);
+        HRESULT hr = IDirect3DDeviceManager9_CloseDeviceHandle(sys->devmng, sys->device);
         if (FAILED(hr))
-            msg_Warn(va, "Failed to release device handle 0x%p. (hr=0x%lX)", va->sys->device, hr);
+            msg_Warn(va, "Failed to release device handle 0x%p. (hr=0x%lX)", sys->device, hr);
     }
     if (dx_sys->d3ddec)
         IDirectXVideoDecoderService_Release(dx_sys->d3ddec);
@@ -476,7 +475,8 @@ static void ReleaseInputList(input_list_t *p_list)
 
 static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
 {
-    directx_sys_t *dx_sys = &va->sys->dx_sys;
+    vlc_va_sys_t *sys = va->sys;
+    directx_sys_t *dx_sys = &sys->dx_sys;
     UINT input_count = 0;
     GUID *input_list = NULL;
     if (FAILED(IDirectXVideoDecoderService_GetDecoderDeviceGuids(dx_sys->d3ddec,
@@ -572,7 +572,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
                                 const video_format_t *fmt, unsigned surface_count)
 {
     vlc_va_sys_t *p_sys = va->sys;
-    directx_sys_t *sys = &va->sys->dx_sys;
+    directx_sys_t *sys = &p_sys->dx_sys;
     HRESULT hr;
 
     hr = IDirectXVideoDecoderService_CreateSurface(sys->d3ddec,
@@ -705,9 +705,9 @@ error:
     return VLC_EGENERIC;
 }
 
-static void DxDestroyVideoDecoder(vlc_va_t *va)
+static void DxDestroyVideoDecoder(vlc_va_sys_t *sys)
 {
-    directx_sys_t *dx_sys = &va->sys->dx_sys;
+    directx_sys_t *dx_sys = &sys->dx_sys;
     if (dx_sys->decoder)
     {
         /* releases a reference on each decoder surface */
