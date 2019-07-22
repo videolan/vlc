@@ -110,6 +110,8 @@ struct vlc_va_sys_t
     d3d11_handle_t               hd3d;
     d3d11_device_t               d3d_dev;
 
+    vlc_video_context            *vctx;
+
     /* Video service */
     DXGI_FORMAT                  render;
 
@@ -308,6 +310,9 @@ static void Close(vlc_va_t *va)
     if (sys->va_pool)
         va_pool_Close(va, sys->va_pool);
 
+    if (sys->vctx)
+        vlc_video_context_Release(sys->vctx);
+
     D3D11_Destroy( &sys->hd3d );
 
     free(sys);
@@ -362,15 +367,29 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         {
             if (sys->d3d_dev.context_mutex == INVALID_HANDLE_VALUE)
                 msg_Warn(va, "No mutex found to lock the decoder");
-            void *d3dvidctx = NULL;
-            hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
-            if (FAILED(hr)) {
-               msg_Err(va, "Could not Query ID3D11VideoContext Interface from the picture. (hr=0x%lX)", hr);
-               D3D11_ReleaseDevice(&sys->d3d_dev);
-            } else {
-                sys->hw.video_context = d3dvidctx;
+
+            sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_D3D11VA, 0, NULL );
+            if (likely(sys->vctx != NULL))
+            {
+                void *d3dvidctx = NULL;
+                hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
+                if (FAILED(hr)) {
+                    msg_Err(va, "Could not Query ID3D11VideoContext Interface from the picture. (hr=0x%lX)", hr);
+                    D3D11_ReleaseDevice(&sys->d3d_dev);
+                    vlc_video_context_Release( sys->vctx );
+                    sys->vctx = NULL;
+                } else {
+                    sys->hw.video_context = d3dvidctx;
+                }
             }
         }
+    }
+
+    if (sys->vctx == NULL)
+    {
+        msg_Dbg(va, "no video context");
+        err = VLC_EGENERIC;
+        goto error;
     }
 
     static const struct va_pool_cfg pool_cfg = {
@@ -416,6 +435,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     ctx->hwaccel_context = &sys->hw;
 
     va->ops = &ops;
+    *vtcx_out = sys->vctx;
     return VLC_SUCCESS;
 
 error:
