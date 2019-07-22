@@ -560,7 +560,8 @@ void PlaylistControllerModel::goTo(uint index, bool startPlaying)
 {
     Q_D(PlaylistControllerModel);
     PlaylistLocker lock{ d->m_playlist };
-    if (index > vlc_playlist_Count( d->m_playlist ) -1)
+    size_t count = vlc_playlist_Count( d->m_playlist );
+    if (count == 0 || index > count-1)
         return;
     vlc_playlist_GoTo( d->m_playlist, index );
     if (startPlaying)
