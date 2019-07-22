@@ -95,8 +95,7 @@ static int vlc_va_Start(void *func, bool forced, va_list ap)
     enum PixelFormat pix_fmt = va_arg(ap, enum PixelFormat);
     const es_format_t *fmt = va_arg(ap, const es_format_t *);
     void *p_sys = va_arg(ap, void *);
-    int (*open)(vlc_va_t *, AVCodecContext *, enum PixelFormat,
-                const es_format_t *, void *) = func;
+    vlc_va_open open = func;
 
     (void) forced;
     return open(va, ctx, pix_fmt, fmt, p_sys);

@@ -40,6 +40,17 @@ struct vlc_va_t {
     const struct vlc_va_operations *ops;
 };
 
+typedef int (*vlc_va_open)(vlc_va_t *, AVCodecContext *, enum PixelFormat,
+                           const es_format_t *, void *);
+
+#define set_va_callback(activate, priority) \
+    { \
+        vlc_va_open open__ = activate; \
+        (void) open__; \
+        set_callback(activate) \
+    } \
+    set_capability( "hw decoder", priority )
+
 /**
  * Determines the VLC video chroma value for a pair of hardware acceleration
  * PixelFormat and software PixelFormat.
