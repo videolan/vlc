@@ -166,11 +166,6 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
                   VADisplay dpy, unsigned count, VASurfaceID **render_targets,
                   const video_format_t *restrict fmt, bool b_force_fourcc);
 
-/* Get render targets from a pic_sys allocated by the vaapi pool (see
- * vlc_vaapi_PoolNew()) */
-unsigned
-vlc_vaapi_PicSysGetRenderTargets(void *sys, VASurfaceID **render_targets);
-
 /* Get and hold the VADisplay instance attached to the picture sys */
 vlc_decoder_device *
 vlc_vaapi_PicSysHoldInstance(void *sys, VADisplay *dpy);

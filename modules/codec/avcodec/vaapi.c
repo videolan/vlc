@@ -51,6 +51,8 @@
 struct vlc_va_sys_t
 {
     struct vaapi_context hw_ctx;
+    /* mimick what is done in the decoder pool from the display for now */
+    picture_pool_t *picture_pool;
 };
 
 static int GetVaProfile(const AVCodecContext *ctx, const es_format_t *fmt,
@@ -136,6 +138,7 @@ static void Delete(vlc_va_t *va)
     vlc_va_sys_t *sys = va->sys;
     vlc_object_t *o = VLC_OBJECT(va);
 
+    picture_pool_Release(sys->picture_pool);
     vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
     vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
     free(sys);
@@ -163,19 +166,20 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
 
     VADisplay va_dpy = dec_device->opaque;
 
-    VASurfaceID *render_targets;
-    unsigned num_render_targets;
-#if 0 // TODO create the render targets locally
-    num_render_targets =
-        vlc_vaapi_PicSysGetRenderTargets(p_sys, &render_targets);
-    if (num_render_targets == 0)
-        goto error;
-#endif
-
     VAProfile i_profile;
     unsigned count;
     int i_vlc_chroma;
     if (GetVaProfile(ctx, fmt, &i_profile, &i_vlc_chroma, &count) != VLC_SUCCESS)
+        goto error;
+
+    video_format_t fmt_video = fmt->video;
+    fmt_video.i_chroma = i_vlc_chroma;
+
+    VASurfaceID *render_targets;
+    sys->picture_pool =
+        vlc_vaapi_PoolNew(VLC_OBJECT(va), dec_device, va_dpy, count,
+                          &render_targets, &fmt_video, true);
+    if (sys->picture_pool == NULL)
         goto error;
 
     /* */
@@ -193,7 +197,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
     sys->hw_ctx.context_id =
         vlc_vaapi_CreateContext(o, sys->hw_ctx.display, sys->hw_ctx.config_id,
                                 ctx->coded_width, ctx->coded_height, VA_PROGRESSIVE,
-                                render_targets, num_render_targets);
+                                render_targets, count);
     if (sys->hw_ctx.context_id == VA_INVALID_ID)
         goto error;
 
@@ -205,6 +209,8 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
     return VLC_SUCCESS;
 
 error:
+    if (sys->picture_pool != NULL)
+        picture_pool_Release(sys->picture_pool);
     if (sys->hw_ctx.context_id != VA_INVALID_ID)
         vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
     if (sys->hw_ctx.config_id != VA_INVALID_ID)

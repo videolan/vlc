@@ -570,15 +570,6 @@ error:
     return NULL;
 }
 
-unsigned
-vlc_vaapi_PicSysGetRenderTargets(void *_sys, VASurfaceID **render_targets)
-{
-    picture_sys_t *sys = (picture_sys_t *)_sys;
-    assert(sys && sys->instance);
-    *render_targets = sys->instance->render_targets;
-    return sys->instance->num_render_targets;
-}
-
 vlc_decoder_device *
 vlc_vaapi_PicSysHoldInstance(void *_sys, VADisplay *dpy)
 {
