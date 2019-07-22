@@ -59,14 +59,13 @@ typedef picture_sys_d3d11_t VA_PICSYS;
 #include "directx_va.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
-                const es_format_t *, picture_sys_d3d11_t *p_sys);
+                const es_format_t *, void *);
 
 vlc_module_begin()
     set_description(N_("Direct3D11 Video Acceleration"))
-    set_capability("hw decoder", 110)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
-    set_callback(Open)
+    set_va_callback(Open, 110)
 vlc_module_end()
 
 /*
@@ -311,7 +310,7 @@ static void Close(vlc_va_t *va, void **ctx)
 static const struct vlc_va_operations ops = { Get, Close, };
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
-                const es_format_t *fmt, picture_sys_d3d11_t *p_sys)
+                const es_format_t *fmt, void *picsys)
 {
     int err = VLC_EGENERIC;
     directx_sys_t *dx_sys;
@@ -359,6 +358,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     sys->d3d_dev.d3ddevice = NULL;
     sys->render = DXGI_FORMAT_UNKNOWN;
+    picture_sys_d3d11_t *p_sys = picsys;
     if ( p_sys != NULL && p_sys->context != NULL ) {
         HRESULT hr = D3D11_CreateDeviceExternal(va, p_sys->context, true, &sys->d3d_dev);
         if (FAILED(hr))
