@@ -228,9 +228,8 @@ error:
 
 vlc_module_begin()
     set_description(N_("VDPAU video decoder"))
-    set_capability("hw decoder", 100)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
-    set_callback(Open)
+    set_va_callback(Open, 100)
     add_shortcut("vdpau")
 vlc_module_end()
