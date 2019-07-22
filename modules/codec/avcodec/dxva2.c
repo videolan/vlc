@@ -116,6 +116,8 @@ struct vlc_va_sys_t
     d3d9_handle_t          hd3d;
     d3d9_device_t          d3d_dev;
 
+    vlc_video_context      *vctx;
+
     /* DLL */
     HINSTANCE              dxva2_dll;
 
@@ -245,6 +247,9 @@ static void Close(vlc_va_t *va)
     if (sys->va_pool)
         va_pool_Close(va, sys->va_pool);
 
+    if (sys->vctx)
+        vlc_video_context_Release(sys->vctx);
+
     if (sys->dxva2_dll)
         FreeLibrary(sys->dxva2_dll);
 
@@ -272,13 +277,18 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueDevice( dec_device );
     if ( d3d9_decoder != NULL )
     {
-        D3D9_CloneExternal(&sys->hd3d, d3d9_decoder->device);
-        HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, d3d9_decoder->adapter, &sys->d3d_dev);
-        if ( FAILED(hr) )
+        sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_DXVA2, 0, NULL );
+        if (likely(sys->vctx != NULL))
         {
-            D3D9_Destroy(&sys->hd3d);
-            free( sys );
-            return VLC_EGENERIC;
+            D3D9_CloneExternal(&sys->hd3d, d3d9_decoder->device);
+            HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, d3d9_decoder->adapter, &sys->d3d_dev);
+            if ( FAILED(hr) )
+            {
+                vlc_video_context_Release(sys->vctx);
+                D3D9_Destroy(&sys->hd3d);
+                free( sys );
+                return VLC_EGENERIC;
+            }
         }
     }
     else if (D3D9_Create(va, &sys->hd3d) != VLC_SUCCESS) {
@@ -287,10 +297,21 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         return VLC_EGENERIC;
     }
 
+    va->sys = sys;
+
+    if (sys->vctx == NULL)
+    {
+        msg_Dbg(va, "no video context");
+        err = VLC_EGENERIC;
+        goto error;
+    }
+
     /* Load dll*/
     sys->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
     if (!sys->dxva2_dll) {
         msg_Warn(va, "cannot load DXVA2 decoder DLL");
+        if (sys->vctx)
+            vlc_video_context_Release(sys->vctx);
         D3D9_Destroy( &sys->hd3d );
         free( sys );
         return VLC_EGENERIC;
@@ -304,8 +325,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         SetupAVCodecContext,
         NewSurfacePicContext,
     };
-
-    va->sys = sys;
 
     sys->va_pool = va_pool_Create(va, &pool_cfg);
     if (sys->va_pool == NULL)
@@ -338,6 +357,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     ctx->hwaccel_context = &sys->hw;
 
     va->ops = &ops;
+    *vtcx_out = sys->vctx;
     return VLC_SUCCESS;
 
 error:
