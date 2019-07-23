@@ -54,7 +54,7 @@ struct vlc_va_sys_t
     struct vaapi_context hw_ctx;
 };
 
-static int GetVaProfile(AVCodecContext *ctx, const es_format_t *fmt,
+static int GetVaProfile(const AVCodecContext *ctx, const es_format_t *fmt,
                         VAProfile *va_profile, int *vlc_chroma,
                         unsigned *pic_count)
 {
