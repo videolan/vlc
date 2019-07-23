@@ -93,6 +93,11 @@ static bool IsSDPString (const char *str)
 static void vsdp_AddAttribute(struct vlc_memstream *restrict stream,
                               const char *name, const char *fmt, va_list ap)
 {
+    if (fmt == NULL)
+    {
+        vlc_memstream_printf(stream, "a=%s\r\n", name);
+        return;
+    }
     vlc_memstream_printf(stream, "a=%s:", name);
     vlc_memstream_vprintf(stream, fmt, ap);
     vlc_memstream_puts(stream, "\r\n");
