@@ -118,7 +118,7 @@ static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_va_t *va, void **hwctx)
+static void Close(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
 

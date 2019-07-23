@@ -1368,7 +1368,6 @@ void EndVideoDec( vlc_object_t *obj )
     decoder_t *p_dec = (decoder_t *)obj;
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *ctx = p_sys->p_context;
-    void *hwaccel_context;
 
     post_mt( p_sys );
 
@@ -1380,11 +1379,10 @@ void EndVideoDec( vlc_object_t *obj )
 
     cc_Flush( &p_sys->cc );
 
-    hwaccel_context = ctx->hwaccel_context;
     avcodec_free_context( &ctx );
 
     if( p_sys->p_va )
-        vlc_va_Delete( p_sys->p_va, &hwaccel_context );
+        vlc_va_Delete( p_sys->p_va );
 
     vlc_sem_destroy( &p_sys->sem_mt );
     free( p_sys );
@@ -1677,8 +1675,9 @@ no_reuse:
     if (p_sys->p_va != NULL)
     {
         msg_Err(p_dec, "existing hardware acceleration cannot be reused");
-        vlc_va_Delete(p_sys->p_va, &p_context->hwaccel_context);
+        vlc_va_Delete(p_sys->p_va);
         p_sys->p_va = NULL;
+        p_context->hwaccel_context = NULL;
     }
 
     p_sys->profile = p_context->profile;
