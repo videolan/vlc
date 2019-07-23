@@ -57,7 +57,8 @@ static inline unsigned int xiph_CountHeaders( const void *extra, unsigned int i_
     }
 }
 
-static inline int xiph_SplitHeaders(unsigned packet_size[], void * packet[], unsigned *packet_count,
+static inline int xiph_SplitHeaders(unsigned packet_size[],
+                                    const void *packet[], unsigned *packet_count,
                                     unsigned extra_size, const void *extra)
 {
     const uint8_t *current = (const uint8_t *)extra;
@@ -162,8 +163,9 @@ static inline int xiph_AppendHeaders(int *extra_size, void **extra,
                                      unsigned size, const void *data)
 {
     unsigned packet_size[XIPH_MAX_HEADER_COUNT];
-    void *packet[XIPH_MAX_HEADER_COUNT];
+    const void *packet[XIPH_MAX_HEADER_COUNT];
     unsigned count;
+
     if (*extra_size > 0 && *extra) {
         if (xiph_SplitHeaders(packet_size, packet, &count, *extra_size, *extra))
             return VLC_EGENERIC;
@@ -178,7 +180,7 @@ static inline int xiph_AppendHeaders(int *extra_size, void **extra,
     packet_size[count] = size;
     packet[count]      = (void*)data;
     if (xiph_PackHeaders(extra_size, extra, packet_size,
-                         (const void **)packet, count + 1)) {
+                         packet, count + 1)) {
         *extra_size = 0;
         *extra      = NULL;
     }

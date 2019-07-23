@@ -202,7 +202,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     unsigned opus_size[XIPH_MAX_HEADER_COUNT];
-    void     *opus_packet[XIPH_MAX_HEADER_COUNT];
+    const void *opus_packet[XIPH_MAX_HEADER_COUNT];
     if( fmt->i_codec == VLC_CODEC_OPUS )
     {
         unsigned count;
