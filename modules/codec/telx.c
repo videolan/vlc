@@ -159,6 +159,19 @@ static const uint16_t ppi_national_subsets[][20] =
     0x0131, 0x015f, 0x00f6, 0x00e7, 0x00fc }, /* turkish  ,1100 */
 };
 
+enum
+{
+    FLAG_ERASE_PAGE         = 0x000080,
+    FLAG_NEWSFLASH          = 0x004000,
+    FLAG_SUBTITLE           = 0x008000,
+    FLAG_SUPPRESS_HEADER    = 0x010000,
+    FLAG_UPDATE             = 0x020000,
+    FLAG_INTERRUPTED        = 0x040000,
+    FLAG_INHIBIT_DISPLAY    = 0x080000,
+    FLAG_MAGAZINE_SERIAL    = 0x100000,
+    FLAG_FRAGMENT           = 0x200000,
+    FLAG_PARTIAL_PAGE       = 0x400000,
+};
 
 /*****************************************************************************
  * Open: probe the decoder and return score
@@ -491,7 +504,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
                           << (a * 4);
             }
 
-    /*         if (!p_sys->b_ignore_sub_flag && !(1 & flag>>15)) */
+    /*         if (!p_sys->b_ignore_sub_flag && !(flag & FLAG_SUBTITLE)) */
     /*           continue; */
 
             p_sys->i_page[magazine] = (0xF0 & bytereverse( hamming_8_4(packet[7]) )) |
@@ -502,31 +515,31 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
             dbg((p_dec, "mag %d flags %x page %x character set %d subtitles %d", magazine, flag,
                  p_sys->i_page[magazine],
-                 7 & flag>>21, 1 & flag>>15, psz_line));
+                 7 & flag>>21, !!(flag & FLAG_SUBTITLE), psz_line));
 
             p_sys->pi_active_national_set[magazine] =
                                  ppi_national_subsets[7 & (flag >> 21)];
 
             p_sys->b_is_subtitle[magazine] = p_sys->b_ignore_sub_flag
-                                              || ( (1 & (flag >> 15))
-                                                  && (1 & (flag>>16)) );
+                                              || ( (flag & FLAG_SUBTITLE)
+                                                && (flag & FLAG_SUPPRESS_HEADER) );
 
             dbg(( p_dec, "FLAGS%s%s%s%s%s%s%s mag_ser %d",
-                  (1 & (flag>>14))? " news" : "",
-                  (1 & (flag>>15))? " subtitle" : "",
-                  (1 & (flag>>7))? " erase" : "",
-                  (1 & (flag>>16))? " suppressed_head" : "",
-                  (1 & (flag>>17))? " update" : "",
-                  (1 & (flag>>18))? " interrupt" : "",
-                  (1 & (flag>>19))? " inhibit" : "",
-                  (1 & (flag>>20)) ));
+                  (flag & FLAG_ERASE_PAGE)     ? " erase" : "",
+                  (flag & FLAG_NEWSFLASH)      ? " news" : "",
+                  (flag & FLAG_SUBTITLE)       ? " subtitle" : "",
+                  (flag & FLAG_SUPPRESS_HEADER)? " suppressed_head" : "",
+                  (flag & FLAG_UPDATE)         ? " update" : "",
+                  (flag & FLAG_INTERRUPTED)    ? " interrupt" : "",
+                  (flag & FLAG_INHIBIT_DISPLAY)? " inhibit" : "",
+                !!(flag & FLAG_MAGAZINE_SERIAL) ));
 
             if ( (p_sys->i_wanted_page != -1
                    && p_sys->i_page[magazine] != p_sys->i_wanted_page)
                    || !p_sys->b_is_subtitle[magazine] )
                 continue;
 
-            p_sys->b_erase[magazine] = (1 & (flag >> 7));
+            p_sys->b_erase[magazine] = !!(flag & FLAG_ERASE_PAGE);
 
             dbg((p_dec, "%ld --> %ld", (long int) p_block->i_pts, (long int)(p_sys->prev_pts+1500000)));
             /* kludge here :
