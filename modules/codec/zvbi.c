@@ -100,7 +100,7 @@ vlc_module_begin ()
 
     add_integer_with_range( "vbi-page", 100, 0, 'z' << 16,
                  PAGE_TEXT, PAGE_LONGTEXT, false )
-    add_bool( "vbi-opaque", false,
+    add_bool( "vbi-opaque", true,
                  OPAQUE_TEXT, OPAQUE_LONGTEXT, false )
     add_integer( "vbi-position", 8, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions );
