@@ -466,9 +466,11 @@ static bool DecodePageHeaderPacket( decoder_t *p_dec, const uint8_t *packet,
     p_sys->pi_active_national_set[magazine] =
                          ppi_national_subsets[7 & (flag >> 21)];
 
-    p_sys->b_is_subtitle[magazine] = p_sys->b_ignore_sub_flag
-                                      || ( (flag & FLAG_SUBTITLE)
-                                        && (flag & FLAG_SUPPRESS_HEADER) );
+    int subtitlesflags = FLAG_SUBTITLE;
+    if( !p_sys->b_ignore_sub_flag && p_sys->i_wanted_magazine != 0x07 )
+        subtitlesflags |= FLAG_SUPPRESS_HEADER;
+
+    p_sys->b_is_subtitle[magazine] = !((flag & subtitlesflags) != subtitlesflags);
 
     dbg(( p_dec, "FLAGS%s%s%s%s%s%s%s mag_ser %d",
           (flag & FLAG_ERASE_PAGE)     ? " erase" : "",
