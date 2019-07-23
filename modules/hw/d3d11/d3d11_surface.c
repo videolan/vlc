@@ -747,7 +747,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
         goto done;
 
     picture_resource_t res = {
-        res.pf_destroy = DestroyPicture,
+        .pf_destroy = DestroyPicture,
     };
     picture_sys_d3d11_t *res_sys = calloc(1, sizeof(picture_sys_d3d11_t));
     if (res_sys == NULL) {

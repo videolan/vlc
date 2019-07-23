@@ -413,7 +413,7 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
     if ( p_filter->fmt_in.video.i_chroma != texDesc.Format )
     {
         picture_resource_t res = {
-            res.pf_destroy = DestroyPicture,
+            .pf_destroy = DestroyPicture,
         };
         picture_sys_d3d9_t *res_sys = calloc(1, sizeof(picture_sys_d3d9_t));
         if (res_sys == NULL) {
