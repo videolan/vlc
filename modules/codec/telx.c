@@ -341,7 +341,7 @@ static void to_utf8( char * res, uint16_t ch )
 
 static void decode_string( char * res, int res_len,
                            decoder_sys_t *p_sys, int magazine,
-                           uint8_t * packet, int len )
+                           const uint8_t * packet, int len )
 {
     char utf8[7];
     char * pt = res;
@@ -436,6 +436,189 @@ static void decode_string( char * res, int res_len,
     *pt++ = 0;
 }
 
+static bool DecodePageHeaderPacket( decoder_t *p_dec, const uint8_t *packet,
+                                    int magazine )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    int flag = 0;
+    char psz_line[256];
+
+    for ( int a = 0; a < 6; a++ )
+    {
+        flag |= (0xF & (bytereverse( hamming_8_4(packet[8 + a]) ) >> 4))
+                  << (a * 4);
+    }
+
+/*         if (!p_sys->b_ignore_sub_flag && !(flag & FLAG_SUBTITLE)) */
+/*           return false; */
+
+    p_sys->i_page[magazine] = (0xF0 & bytereverse( hamming_8_4(packet[7]) )) | /* tens */
+                              (0x0F & (bytereverse( hamming_8_4(packet[6]) ) >> 4) ); /* units */
+
+    decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
+                   packet + 14, 40 - 14 );
+
+    dbg((p_dec, "mag %d flags %x page %x character set %d subtitles %d %s", magazine, flag,
+         p_sys->i_page[magazine],
+         7 & flag>>21, !!(flag & FLAG_SUBTITLE), psz_line));
+
+    p_sys->pi_active_national_set[magazine] =
+                         ppi_national_subsets[7 & (flag >> 21)];
+
+    p_sys->b_is_subtitle[magazine] = p_sys->b_ignore_sub_flag
+                                      || ( (flag & FLAG_SUBTITLE)
+                                        && (flag & FLAG_SUPPRESS_HEADER) );
+
+    dbg(( p_dec, "FLAGS%s%s%s%s%s%s%s mag_ser %d",
+          (flag & FLAG_ERASE_PAGE)     ? " erase" : "",
+          (flag & FLAG_NEWSFLASH)      ? " news" : "",
+          (flag & FLAG_SUBTITLE)       ? " subtitle" : "",
+          (flag & FLAG_SUPPRESS_HEADER)? " suppressed_head" : "",
+          (flag & FLAG_UPDATE)         ? " update" : "",
+          (flag & FLAG_INTERRUPTED)    ? " interrupt" : "",
+          (flag & FLAG_INHIBIT_DISPLAY)? " inhibit" : "",
+        !!(flag & FLAG_MAGAZINE_SERIAL) ));
+
+    if ( (p_sys->i_wanted_page != -1
+           && p_sys->i_page[magazine] != p_sys->i_wanted_page)
+           || !p_sys->b_is_subtitle[magazine] )
+        return false;
+
+    p_sys->b_erase[magazine] = !!(flag & FLAG_ERASE_PAGE);
+
+    /* kludge here :
+     * we ignore the erase flag if it happens less than 1.5 seconds
+     * before last caption
+     * TODO   make this time configurable
+     * UPDATE the kludge seems to be no more necessary
+     *        so it's commented out*/
+    if ( /*p_block->i_pts > p_sys->prev_pts + 1500000 && */
+         p_sys->b_erase[magazine] )
+    {
+        dbg((p_dec, "ERASE !"));
+
+        p_sys->b_erase[magazine] = 0;
+        for ( int i = 1; i < 32; i++ )
+        {
+            if ( !p_sys->ppsz_lines[i][0] ) continue;
+            /* b_update = true; */
+            p_sys->ppsz_lines[i][0] = 0;
+        }
+    }
+
+    /* replace the row if it's different */
+    if ( strcmp(psz_line, p_sys->ppsz_lines[0]) )
+    {
+        strncpy( p_sys->ppsz_lines[0], psz_line,
+                 sizeof(p_sys->ppsz_lines[0]) - 1);
+    }
+
+    return true;
+}
+
+static bool DecodePacketX1_X23( decoder_t *p_dec, const uint8_t *packet,
+                                int magazine, int row, vlc_tick_t pts )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    bool b_update = false;
+    char psz_line[256];
+    char * t;
+    int i;
+
+    if ( p_sys->i_wanted_page == -1 && p_sys->i_page[magazine] > 0x99)
+        return false;
+
+    decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
+                   packet + 6, 40 );
+    t = psz_line;
+
+    /* remove starting spaces */
+    while ( *t == 32 ) t++;
+
+    /* remove trailing spaces */
+    for ( i = strlen(t) - 1; i >= 0 && t[i] == 32; i-- );
+    t[i + 1] = 0;
+
+    /* replace the row if it's different */
+    if ( strcmp( t, p_sys->ppsz_lines[row] ) )
+    {
+        strncpy( p_sys->ppsz_lines[row], t,
+                 sizeof(p_sys->ppsz_lines[row]) - 1 );
+        b_update = true;
+    }
+
+    if (t[0])
+        p_sys->prev_pts = pts;
+
+    dbg((p_dec, "%d %d : ", magazine, row));
+    dbg((p_dec, "%s", t));
+
+#ifdef TELX_DEBUG
+    {
+        char dbg[256];
+        dbg[0] = 0;
+        for ( i = 0; i < 40; i++ )
+        {
+            int in = bytereverse(packet[6 + i]) & 0x7f;
+            sprintf(dbg + strlen(dbg), "%02x ", in);
+        }
+        dbg((p_dec, "%s", dbg));
+        dbg[0] = 0;
+        for ( i = 0; i < 40; i++ )
+        {
+            decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
+                           packet + 6 + i, 1 );
+            sprintf( dbg + strlen(dbg), "%s  ", psz_line );
+        }
+        dbg((p_dec, "%s", dbg));
+    }
+#endif
+    return b_update;
+}
+
+
+static bool DecodePacketX25( decoder_t *p_dec, const uint8_t *packet,
+                             int magazine )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* row 25 : alternate header line */
+    char psz_line[256];
+    decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
+                   packet + 6, 40 );
+
+    /* replace the row if it's different */
+    if ( strcmp( psz_line, p_sys->ppsz_lines[0] ) )
+    {
+        strncpy( p_sys->ppsz_lines[0], psz_line,
+                 sizeof(p_sys->ppsz_lines[0]) - 1 );
+        /* return true; */
+    }
+
+    return false;
+}
+
+static bool DecodeNormalPacket( decoder_t *p_dec, const uint8_t *packet,
+                                int magazine, int row, vlc_tick_t pts )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( (p_sys->i_wanted_page != -1 &&
+         p_sys->i_page[magazine] != p_sys->i_wanted_page)
+         || !p_sys->b_is_subtitle[magazine] )
+        return false;
+
+    if( row < 24 ) /* row 1-23 : normal lines */
+        return DecodePacketX1_X23( p_dec, packet, magazine, row, pts );
+    else if( row == 25 ) /* row 25 : alternate header line */
+        return DecodePacketX25( p_dec, packet, magazine );
+    else
+        return false;
+}
+
+
 /*****************************************************************************
  * Decode:
  *****************************************************************************/
@@ -445,7 +628,6 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     subpicture_t  *p_spu = NULL;
     video_format_t fmt;
     /* int erase = 0; */
-    int len;
 #if 0
     int i_wanted_magazine = i_conf_wanted_page / 100;
     int i_wanted_page = 0x10 * ((i_conf_wanted_page % 100) / 10)
@@ -453,18 +635,16 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 #endif
     bool b_update = false;
     char psz_text[512], *pt = psz_text;
-    char psz_line[256];
     int total;
 
     if( p_block == NULL ) /* No Drain */
         return VLCDEC_SUCCESS;
 
-    dbg((p_dec, "start of telx packet with header %2x",
-                * (uint8_t *) p_block->p_buffer));
-    len = p_block->i_buffer;
-    for ( int offset = 1; offset + 46 <= len; offset += 46 )
+//    dbg((p_dec, "start of telx packet with header %2x",
+//                * (uint8_t *) p_block->p_buffer));
+    for ( size_t offset = 1; offset + 46 <= p_block->i_buffer; offset += 46 )
     {
-        uint8_t * packet = (uint8_t *) p_block->p_buffer+offset;
+        const uint8_t *packet = &p_block->p_buffer[offset];
 //        int vbi = ((0x20 & packet[2]) != 0 ? 0 : 313) + (0x1F & packet[2]);
 
 //        dbg((p_dec, "vbi %d header %02x %02x %02x", vbi, packet[0], packet[1], packet[2]));
@@ -476,6 +656,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 /*         continue; */
 /*       } */
 
+        /* See EN.300.706 7.1.4 */
         int mpag = (hamming_8_4( packet[4] ) << 4) | hamming_8_4( packet[5] );
         int row, magazine;
         if ( mpag < 0 )
@@ -485,6 +666,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
             continue;
         }
 
+        /* magazine number 0-7, row 0-31 (== packet number... or Y) */
         row = 0xFF & bytereverse(mpag);
         magazine = (7 & row) == 0 ? 8 : (7 & row);
         row >>= 3;
@@ -493,166 +675,23 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
               && magazine != p_sys->i_wanted_magazine )
             continue;
 
-        if ( row == 0 )
+        if ( row == 0 ) /* Page Header Packet */
         {
             /* row 0 : flags and header line */
-            int flag = 0;
-
-            for ( int a = 0; a < 6; a++ )
-            {
-                flag |= (0xF & (bytereverse( hamming_8_4(packet[8 + a]) ) >> 4))
-                          << (a * 4);
-            }
-
-    /*         if (!p_sys->b_ignore_sub_flag && !(flag & FLAG_SUBTITLE)) */
-    /*           continue; */
-
-            p_sys->i_page[magazine] = (0xF0 & bytereverse( hamming_8_4(packet[7]) )) |
-                             (0xF & (bytereverse( hamming_8_4(packet[6]) ) >> 4) );
-
-            decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
-                           packet + 14, 40 - 14 );
-
-            dbg((p_dec, "mag %d flags %x page %x character set %d subtitles %d", magazine, flag,
-                 p_sys->i_page[magazine],
-                 7 & flag>>21, !!(flag & FLAG_SUBTITLE), psz_line));
-
-            p_sys->pi_active_national_set[magazine] =
-                                 ppi_national_subsets[7 & (flag >> 21)];
-
-            p_sys->b_is_subtitle[magazine] = p_sys->b_ignore_sub_flag
-                                              || ( (flag & FLAG_SUBTITLE)
-                                                && (flag & FLAG_SUPPRESS_HEADER) );
-
-            dbg(( p_dec, "FLAGS%s%s%s%s%s%s%s mag_ser %d",
-                  (flag & FLAG_ERASE_PAGE)     ? " erase" : "",
-                  (flag & FLAG_NEWSFLASH)      ? " news" : "",
-                  (flag & FLAG_SUBTITLE)       ? " subtitle" : "",
-                  (flag & FLAG_SUPPRESS_HEADER)? " suppressed_head" : "",
-                  (flag & FLAG_UPDATE)         ? " update" : "",
-                  (flag & FLAG_INTERRUPTED)    ? " interrupt" : "",
-                  (flag & FLAG_INHIBIT_DISPLAY)? " inhibit" : "",
-                !!(flag & FLAG_MAGAZINE_SERIAL) ));
-
-            if ( (p_sys->i_wanted_page != -1
-                   && p_sys->i_page[magazine] != p_sys->i_wanted_page)
-                   || !p_sys->b_is_subtitle[magazine] )
-                continue;
-
-            p_sys->b_erase[magazine] = !!(flag & FLAG_ERASE_PAGE);
-
-            dbg((p_dec, "%ld --> %ld", (long int) p_block->i_pts, (long int)(p_sys->prev_pts+1500000)));
-            /* kludge here :
-             * we ignore the erase flag if it happens less than 1.5 seconds
-             * before last caption
-             * TODO   make this time configurable
-             * UPDATE the kludge seems to be no more necessary
-             *        so it's commented out*/
-            if ( /*p_block->i_pts > p_sys->prev_pts + 1500000 && */
-                 p_sys->b_erase[magazine] )
-            {
-                dbg((p_dec, "ERASE !"));
-
-                p_sys->b_erase[magazine] = 0;
-                for ( int i = 1; i < 32; i++ )
-                {
-                    if ( !p_sys->ppsz_lines[i][0] ) continue;
-                    /* b_update = true; */
-                    p_sys->ppsz_lines[i][0] = 0;
-                }
-            }
-
-            /* replace the row if it's different */
-            if ( strcmp(psz_line, p_sys->ppsz_lines[row]) )
-            {
-                strncpy( p_sys->ppsz_lines[row], psz_line,
-                         sizeof(p_sys->ppsz_lines[row]) - 1);
-            }
-            b_update = true;
-
+            b_update |= DecodePageHeaderPacket( p_dec, packet, magazine );
+            if( b_update )
+                dbg((p_dec, "%ld --> %ld", (long int) p_block->i_pts,
+                                           (long int)(p_sys->prev_pts+1500000)));
         }
-        else if ( row < 24 )
+        else if ( row < 26 ) /* Normal Packet */
         {
-            char * t;
-            int i;
-            /* row 1-23 : normal lines */
-
-            if ( (p_sys->i_wanted_page != -1
-                   && p_sys->i_page[magazine] != p_sys->i_wanted_page)
-                   || !p_sys->b_is_subtitle[magazine]
-                   || (p_sys->i_wanted_page == -1
-                        && p_sys->i_page[magazine] > 0x99) )
-                continue;
-
-            decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
-                           packet + 6, 40 );
-            t = psz_line;
-
-            /* remove starting spaces */
-            while ( *t == 32 ) t++;
-
-            /* remove trailing spaces */
-            for ( i = strlen(t) - 1; i >= 0 && t[i] == 32; i-- );
-            t[i + 1] = 0;
-
-            /* replace the row if it's different */
-            if ( strcmp( t, p_sys->ppsz_lines[row] ) )
-            {
-                strncpy( p_sys->ppsz_lines[row], t,
-                         sizeof(p_sys->ppsz_lines[row]) - 1 );
-                b_update = true;
-            }
-
-            if (t[0])
-                p_sys->prev_pts = p_block->i_pts;
-
-            dbg((p_dec, "%d %d : ", magazine, row));
-            dbg((p_dec, "%s", t));
-
-#ifdef TELX_DEBUG
-            {
-                char dbg[256];
-                dbg[0] = 0;
-                for ( i = 0; i < 40; i++ )
-                {
-                    int in = bytereverse(packet[6 + i]) & 0x7f;
-                    sprintf(dbg + strlen(dbg), "%02x ", in);
-                }
-                dbg((p_dec, "%s", dbg));
-                dbg[0] = 0;
-                for ( i = 0; i < 40; i++ )
-                {
-                    decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
-                                   packet + 6 + i, 1 );
-                    sprintf( dbg + strlen(dbg), "%s  ", psz_line );
-                }
-                dbg((p_dec, "%s", dbg));
-            }
-#endif
+            b_update |= DecodeNormalPacket( p_dec, packet, magazine, row,
+                                            p_block->i_pts );
         }
-        else if ( row == 25 )
-        {
-            /* row 25 : alternate header line */
-            if ( (p_sys->i_wanted_page != -1
-                   && p_sys->i_page[magazine] != p_sys->i_wanted_page)
-                   || !p_sys->b_is_subtitle[magazine] )
-                continue;
-
-            decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
-                           packet + 6, 40 );
-
-            /* replace the row if it's different */
-            if ( strcmp( psz_line, p_sys->ppsz_lines[0] ) )
-            {
-                strncpy( p_sys->ppsz_lines[0], psz_line,
-                         sizeof(p_sys->ppsz_lines[0]) - 1 );
-                /* b_update = true; */
-            }
-        }
-/*       else if (row == 26) { */
-/*         // row 26 : TV listings */
-/*       } else */
-/*         dbg((p_dec, "%d %d : %s", magazine, row, decode_string(p_sys, magazine, packet+6, 40))); */
+//       else if (row >= 26) { /* Non Displayable Packet */
+//         // row 26 : TV listings
+//            dbg((p_dec, "%d %d : %s", magazine, row, decode_string(p_sys, magazine, packet+6, 40)));
+//       }
     }
 
     if ( !b_update )
