@@ -310,11 +310,12 @@ endif
 ifdef HAVE_CROSS_COMPILE
 HOSTVARS_MESON := PATH="$(PREFIX)/bin:$(PATH)"
 else
-HOSTVARS_MESON := $(HOSTTOOLS) \
+MESON_HOST_FLAGS := \
 	CPPFLAGS="$(CPPFLAGS)" \
 	CFLAGS="$(CFLAGS)" \
 	CXXFLAGS="$(CXXFLAGS)" \
 	LDFLAGS="$(LDFLAGS)"
+HOSTVARS_MESON := $(HOSTTOOLS) $(MESON_HOST_FLAGS)
 endif
 
 # Add these flags after Meson consumed the CFLAGS/CXXFLAGS
@@ -602,10 +603,7 @@ endif
 
 crossfile.meson: $(SRC)/gen-meson-crossfile.py
 	$(HOSTTOOLS) \
-	CPPFLAGS="$(CPPFLAGS)" \
-	CFLAGS="$(CFLAGS)" \
-	CXXFLAGS="$(CXXFLAGS)" \
-	LDFLAGS="$(LDFLAGS)" \
+	$(MESON_HOST_FLAGS) \
 	WINDRES="$(WINDRES)" \
 	PKG_CONFIG="$(PKG_CONFIG)" \
 	HOST_SYSTEM="$(MESON_SYSTEM_NAME)" \
