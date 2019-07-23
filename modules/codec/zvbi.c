@@ -655,10 +655,6 @@ static int OpaquePage( picture_t *p_src, const vbi_page *p_page,
 
             switch( opacity )
             {
-            /* Show video instead of this character */
-            case VBI_TRANSPARENT_SPACE:
-                *p_pixel = 0;
-                break;
             /* Display foreground and background color */
             /* To make the boxed text "closed captioning" transparent
              * change true to false.
@@ -668,10 +664,15 @@ static int OpaquePage( picture_t *p_src, const vbi_page *p_page,
             case VBI_SEMI_TRANSPARENT:
                 if( b_opaque )
                     break;
+                /* fallthrough */
             /* Full text transparency. only foreground color is show */
             case VBI_TRANSPARENT_FULL:
-                if( (*p_pixel) == (0xff000000 | p_page->color_map[background] ) )
-                    *p_pixel = 0;
+                if( (*p_pixel) != (0xff000000 | p_page->color_map[background] ) )
+                    break;
+                /* fallthrough */
+            /* Show video instead of this character */
+            case VBI_TRANSPARENT_SPACE:
+                *p_pixel = 0;
                 break;
             }
         }
