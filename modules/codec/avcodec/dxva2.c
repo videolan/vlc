@@ -338,6 +338,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
                     DxgiVendorStr(d3dai.VendorId), d3dai.VendorId, d3dai.DeviceId, d3dai.Revision);
     }
 
+    octx->format = sys->render;
+
     va->ops = &ops;
     *vtcx_out = sys->vctx;
     return VLC_SUCCESS;
