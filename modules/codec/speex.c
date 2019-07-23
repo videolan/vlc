@@ -410,7 +410,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     ogg_packet oggpacket;
 
     unsigned pi_size[XIPH_MAX_HEADER_COUNT];
-    void     *pp_data[XIPH_MAX_HEADER_COUNT];
+    const void *pp_data[XIPH_MAX_HEADER_COUNT];
     unsigned i_count;
     if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
                            p_dec->fmt_in.i_extra, p_dec->fmt_in.p_extra) )
@@ -425,7 +425,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     /* Take care of the initial Vorbis header */
     oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
     oggpacket.bytes  = pi_size[0];
-    oggpacket.packet = pp_data[0];
+    oggpacket.packet = (void *)pp_data[0];
     if( ProcessInitialHeader( p_dec, &oggpacket ) != VLC_SUCCESS )
     {
         msg_Err( p_dec, "initial Speex header is corrupted" );
@@ -435,7 +435,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     /* The next packet in order is the comments header */
     oggpacket.b_o_s = 0;
     oggpacket.bytes  = pi_size[1];
-    oggpacket.packet = pp_data[1];
+    oggpacket.packet = (void *)pp_data[1];
     ParseSpeexComments( p_dec, &oggpacket );
 
     if( p_sys->b_packetizer )

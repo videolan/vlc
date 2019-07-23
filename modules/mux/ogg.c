@@ -1021,8 +1021,9 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
             {
                 /* First packet in order: vorbis/speex/opus/theora/daala info */
                 unsigned pi_size[XIPH_MAX_HEADER_COUNT];
-                void     *pp_data[XIPH_MAX_HEADER_COUNT];
+                const void *pp_data[XIPH_MAX_HEADER_COUNT];
                 unsigned i_count;
+
                 if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
                                        p_input->p_fmt->i_extra, p_input->p_fmt->p_extra ) )
                 {
@@ -1032,7 +1033,7 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
                 }
 
                 op.bytes  = pi_size[0];
-                op.packet = pp_data[0];
+                op.packet = (void *)pp_data[0];
                 if( pi_size[0] <= 0 )
                     msg_Err( p_mux, "header data corrupted");
 
@@ -1187,8 +1188,9 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
             p_stream->fmt.i_codec == VLC_CODEC_DAALA )
         {
             unsigned pi_size[XIPH_MAX_HEADER_COUNT];
-            void     *pp_data[XIPH_MAX_HEADER_COUNT];
+            const void *pp_data[XIPH_MAX_HEADER_COUNT];
             unsigned i_count;
+
             if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
                                    p_input->p_fmt->i_extra, p_input->p_fmt->p_extra ) )
                 i_count = 0;
@@ -1198,7 +1200,7 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
             for( unsigned j = 1; j < i_count; j++ )
             {
                 op.bytes  = pi_size[j];
-                op.packet = pp_data[j];
+                op.packet = (void *)pp_data[j];
                 if( pi_size[j] <= 0 )
                     msg_Err( p_mux, "header data corrupted");
 

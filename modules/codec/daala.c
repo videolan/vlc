@@ -278,7 +278,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     daala_setup_info *ds = NULL; /* daala setup information */
 
     unsigned pi_size[XIPH_MAX_HEADER_COUNT];
-    void     *pp_data[XIPH_MAX_HEADER_COUNT];
+    const void *pp_data[XIPH_MAX_HEADER_COUNT];
     unsigned i_count;
     if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
                            p_dec->fmt_in.i_extra, p_dec->fmt_in.p_extra) )
@@ -293,7 +293,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     /* Take care of the initial info header */
     dpacket.b_o_s  = 1; /* yes this actually is a b_o_s packet :) */
     dpacket.bytes  = pi_size[0];
-    dpacket.packet = pp_data[0];
+    dpacket.packet = (void *)pp_data[0];
     if( daala_decode_header_in( &p_sys->di, &p_sys->dc, &ds, &dpacket ) < 0 )
     {
         msg_Err( p_dec, "this bitstream does not contain Daala video data" );
@@ -354,7 +354,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     /* The next packet in order is the comments header */
     dpacket.b_o_s  = 0;
     dpacket.bytes  = pi_size[1];
-    dpacket.packet = pp_data[1];
+    dpacket.packet = (void *)pp_data[1];
 
     if( daala_decode_header_in( &p_sys->di, &p_sys->dc, &ds, &dpacket ) < 0 )
     {
@@ -370,7 +370,7 @@ static int ProcessHeaders( decoder_t *p_dec )
      * missing or corrupted header is fatal. */
     dpacket.b_o_s  = 0;
     dpacket.bytes  = pi_size[2];
-    dpacket.packet = pp_data[2];
+    dpacket.packet = (void *)pp_data[2];
     if( daala_decode_header_in( &p_sys->di, &p_sys->dc, &ds, &dpacket ) < 0 )
     {
         msg_Err( p_dec, "Daala setup header is corrupted" );

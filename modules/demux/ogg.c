@@ -2321,14 +2321,16 @@ static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_strea
 static bool Ogg_IsVorbisFormatCompatible( const es_format_t *p_new, const es_format_t *p_old )
 {
     unsigned pi_new_size[XIPH_MAX_HEADER_COUNT];
-    void     *pp_new_data[XIPH_MAX_HEADER_COUNT];
+    const void *pp_new_data[XIPH_MAX_HEADER_COUNT];
     unsigned i_new_count;
+
     if( xiph_SplitHeaders(pi_new_size, pp_new_data, &i_new_count, p_new->i_extra, p_new->p_extra ) )
         i_new_count = 0;
 
     unsigned pi_old_size[XIPH_MAX_HEADER_COUNT];
-    void     *pp_old_data[XIPH_MAX_HEADER_COUNT];
+    const void *pp_old_data[XIPH_MAX_HEADER_COUNT];
     unsigned i_old_count;
+
     if( xiph_SplitHeaders(pi_old_size, pp_old_data, &i_old_count, p_old->i_extra, p_old->p_extra ) )
         i_old_count = 0;
 
@@ -2350,20 +2352,23 @@ static bool Ogg_IsOpusFormatCompatible( const es_format_t *p_new,
                                         const es_format_t *p_old )
 {
     unsigned pi_new_size[XIPH_MAX_HEADER_COUNT];
-    void     *pp_new_data[XIPH_MAX_HEADER_COUNT];
+    const void *pp_new_data[XIPH_MAX_HEADER_COUNT];
     unsigned i_new_count;
+
     if( xiph_SplitHeaders(pi_new_size, pp_new_data, &i_new_count, p_new->i_extra, p_new->p_extra ) )
         i_new_count = 0;
+
     unsigned pi_old_size[XIPH_MAX_HEADER_COUNT];
-    void     *pp_old_data[XIPH_MAX_HEADER_COUNT];
+    const void *pp_old_data[XIPH_MAX_HEADER_COUNT];
     unsigned i_old_count;
+
     if( xiph_SplitHeaders(pi_old_size, pp_old_data, &i_old_count, p_old->i_extra, p_old->p_extra ) )
         i_old_count = 0;
     bool b_match = false;
     if( i_new_count == i_old_count && i_new_count > 0 )
     {
         static const unsigned char default_map[2] = { 0, 1 };
-        unsigned char *p_old_head;
+        const unsigned char *p_old_head;
         unsigned char *p_new_head;
         const unsigned char *p_old_map;
         const unsigned char *p_new_map;
@@ -2373,7 +2378,7 @@ static bool Ogg_IsOpusFormatCompatible( const es_format_t *p_new,
         int i_new_stream_count;
         int i_old_coupled_count;
         int i_new_coupled_count;
-        p_old_head = (unsigned char *)pp_old_data[0];
+        p_old_head = pp_old_data[0];
         i_old_channel_count = i_old_stream_count = i_old_coupled_count = 0;
         p_old_map = default_map;
         if( pi_old_size[0] >= 19 && p_old_head[8] <= 15 )
@@ -2523,7 +2528,7 @@ static void Ogg_ExtractXiphMeta( demux_t *p_demux, es_format_t *p_fmt,
                                  const void *p_headers, unsigned i_headers, unsigned i_skip )
 {
     unsigned pi_size[XIPH_MAX_HEADER_COUNT];
-    void     *pp_data[XIPH_MAX_HEADER_COUNT];
+    const void *pp_data[XIPH_MAX_HEADER_COUNT];
     unsigned i_count;
 
     if( xiph_SplitHeaders( pi_size, pp_data, &i_count, i_headers, p_headers ) )
@@ -2531,7 +2536,9 @@ static void Ogg_ExtractXiphMeta( demux_t *p_demux, es_format_t *p_fmt,
     /* TODO how to handle multiple comments properly ? */
     if( i_count >= 2 && pi_size[1] > i_skip )
     {
-        Ogg_ExtractComments( p_demux, p_fmt, (uint8_t*)pp_data[1] + i_skip, pi_size[1] - i_skip );
+        Ogg_ExtractComments( p_demux, p_fmt,
+                             (const uint8_t *)pp_data[1] + i_skip,
+                             pi_size[1] - i_skip );
     }
 }
 
