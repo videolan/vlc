@@ -44,6 +44,7 @@ struct vlc_va_sys_t
     vdp_t *vdp;
     VdpDevice device;
     VdpChromaType type;
+    void *hwaccel_context;
     uint32_t width;
     uint32_t height;
     vlc_vdp_video_field_t *pool[];
@@ -124,7 +125,8 @@ static void Close(vlc_va_t *va, void **hwctx)
     for (unsigned i = 0; sys->pool[i] != NULL; i++)
         vlc_vdp_video_destroy(sys->pool[i]);
     vdp_release_x11(sys->vdp);
-    av_freep(hwctx);
+    if (sys->hwaccel_context)
+        av_free(sys->hwaccel_context);
     free(sys);
 }
 
@@ -172,6 +174,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
     sys->type = type;
     sys->width = width;
     sys->height = height;
+    sys->hwaccel_context = NULL;
 
     err = vdp_get_x11(NULL, -1, &sys->vdp, &sys->device);
     if (err != VDP_STATUS_OK)
@@ -189,6 +192,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
 
     if (av_vdpau_bind_context(avctx, sys->device, func, flags))
         goto error;
+    sys->hwaccel_context = avctx->hwaccel_context;
     va->sys = sys;
 
     unsigned i = 0;
@@ -221,6 +225,8 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
     return VLC_SUCCESS;
 
 error:
+    if (sys->hwaccel_context)
+        av_free(sys->hwaccel_context);
     vdp_release_x11(sys->vdp);
     free(sys);
     return VLC_EGENERIC;
