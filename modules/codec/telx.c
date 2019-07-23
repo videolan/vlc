@@ -446,7 +446,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     if( p_block == NULL ) /* No Drain */
         return VLCDEC_SUCCESS;
 
-    dbg((p_dec, "start of telx packet with header %2x\n",
+    dbg((p_dec, "start of telx packet with header %2x",
                 * (uint8_t *) p_block->p_buffer));
     len = p_block->i_buffer;
     for ( int offset = 1; offset + 46 <= len; offset += 46 )
@@ -454,7 +454,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         uint8_t * packet = (uint8_t *) p_block->p_buffer+offset;
 //        int vbi = ((0x20 & packet[2]) != 0 ? 0 : 313) + (0x1F & packet[2]);
 
-//        dbg((p_dec, "vbi %d header %02x %02x %02x\n", vbi, packet[0], packet[1], packet[2]));
+//        dbg((p_dec, "vbi %d header %02x %02x %02x", vbi, packet[0], packet[1], packet[2]));
         if ( packet[0] == 0xFF ) continue;
 
 /*      if (packet[1] != 0x2C) { */
@@ -468,7 +468,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         if ( mpag < 0 )
         {
             /* decode error */
-            dbg((p_dec, "mpag hamming error\n"));
+            dbg((p_dec, "mpag hamming error"));
             continue;
         }
 
@@ -528,7 +528,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
             p_sys->b_erase[magazine] = (1 & (flag >> 7));
 
-            dbg((p_dec, "%ld --> %ld\n", (long int) p_block->i_pts, (long int)(p_sys->prev_pts+1500000)));
+            dbg((p_dec, "%ld --> %ld", (long int) p_block->i_pts, (long int)(p_sys->prev_pts+1500000)));
             /* kludge here :
              * we ignore the erase flag if it happens less than 1.5 seconds
              * before last caption
@@ -538,7 +538,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
             if ( /*p_block->i_pts > p_sys->prev_pts + 1500000 && */
                  p_sys->b_erase[magazine] )
             {
-                dbg((p_dec, "ERASE !\n"));
+                dbg((p_dec, "ERASE !"));
 
                 p_sys->b_erase[magazine] = 0;
                 for ( int i = 1; i < 32; i++ )
@@ -594,7 +594,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
                 p_sys->prev_pts = p_block->i_pts;
 
             dbg((p_dec, "%d %d : ", magazine, row));
-            dbg((p_dec, "%s\n", t));
+            dbg((p_dec, "%s", t));
 
 #ifdef TELX_DEBUG
             {
@@ -605,7 +605,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
                     int in = bytereverse(packet[6 + i]) & 0x7f;
                     sprintf(dbg + strlen(dbg), "%02x ", in);
                 }
-                dbg((p_dec, "%s\n", dbg));
+                dbg((p_dec, "%s", dbg));
                 dbg[0] = 0;
                 for ( i = 0; i < 40; i++ )
                 {
@@ -613,7 +613,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
                                    packet + 6 + i, 1 );
                     sprintf( dbg + strlen(dbg), "%s  ", psz_line );
                 }
-                dbg((p_dec, "%s\n", dbg));
+                dbg((p_dec, "%s", dbg));
             }
 #endif
         }
@@ -639,7 +639,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 /*       else if (row == 26) { */
 /*         // row 26 : TV listings */
 /*       } else */
-/*         dbg((p_dec, "%d %d : %s\n", magazine, row, decode_string(p_sys, magazine, packet+6, 40))); */
+/*         dbg((p_dec, "%d %d : %s", magazine, row, decode_string(p_sys, magazine, packet+6, 40))); */
     }
 
     if ( !b_update )
@@ -670,7 +670,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     if ( !strcmp(psz_text, p_sys->psz_prev_text) )
         goto error;
 
-    dbg((p_dec, "UPDATE TELETEXT PICTURE\n"));
+    dbg((p_dec, "UPDATE TELETEXT PICTURE"));
 
     assert( sizeof(p_sys->psz_prev_text) >= sizeof(psz_text) );
     strcpy( p_sys->psz_prev_text, psz_text );
@@ -704,7 +704,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
     p_spu->b_ephemer = (p_block->i_length == 0);
     p_spu->b_absolute = false;
-    dbg((p_dec, "%ld --> %ld\n", (long int) p_block->i_pts/100000, (long int)p_block->i_length/100000));
+    dbg((p_dec, "%ld --> %ld", (long int) p_block->i_pts/100000, (long int)p_block->i_length/100000));
 
     block_Release( p_block );
     if( p_spu != NULL )
