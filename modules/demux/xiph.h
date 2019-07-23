@@ -111,7 +111,9 @@ static inline int xiph_SplitHeaders(unsigned packet_size[],
 }
 
 static inline int xiph_PackHeaders(int *extra_size, void **extra,
-                                   unsigned packet_size[], const void *packet[], unsigned packet_count )
+                                   unsigned packet_size[],
+                                   const void *const packet[],
+                                   unsigned packet_count)
 {
     if (packet_count <= 0 || packet_count > XIPH_MAX_HEADER_COUNT)
         return VLC_EGENERIC;
