@@ -707,6 +707,8 @@ static picture_t *VoutVideoFilterStaticNewPicture(filter_t *filter)
 
     vlc_mutex_assert(&vout->p->filter.lock);
     if (filter_chain_IsEmpty(vout->p->filter.chain_interactive))
+        // we may be using the last filter of both chains, so we get the picture
+        // from the display module pool, just like for the last interactive filter.
         return VoutVideoFilterInteractiveNewPicture(filter);
 
     return picture_NewFromFormat(&filter->fmt_out.video);
