@@ -235,6 +235,8 @@ static es_out_t *test_es_out_create(vlc_object_t *parent)
     out->cbs = &es_out_cbs;
 #ifdef HAVE_DECODERS
     ctx->parent = parent;
+#else
+    (void) parent;
 #endif
     return out;
 }
