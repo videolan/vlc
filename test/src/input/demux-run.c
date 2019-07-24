@@ -241,7 +241,7 @@ static es_out_t *test_es_out_create(vlc_object_t *parent)
 
 static unsigned demux_test_and_clear_flags(demux_t *demux, unsigned flags)
 {
-    unsigned update;
+    unsigned update = flags;
     if (demux_Control(demux, DEMUX_TEST_AND_CLEAR_FLAGS, &update))
         return 0;
     return update;
