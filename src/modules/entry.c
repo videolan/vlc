@@ -274,7 +274,7 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
 
         case VLC_MODULE_CB_CLOSE:
             module->deactivate_name = va_arg(ap, const char *);
-            module->deactivate = va_arg (ap, void *);
+            module->deactivate = va_arg(ap, void (*)(vlc_object_t *));
             break;
 
         case VLC_MODULE_NO_UNLOAD:
@@ -491,6 +491,16 @@ static int vlc_plugin_gpa_cb(void *ctx, void *tgt, int propid, ...)
             name = va_arg(ap, const char *);
             addr = va_arg(ap, void *);
             va_end (ap);
+            break;
+        }
+        case VLC_MODULE_CB_CLOSE:
+        {
+            va_list ap;
+
+            va_start(ap, propid);
+            name = va_arg(ap, const char *);
+            addr = va_arg(ap, void (*)(vlc_object_t *));
+            va_end(ap);
             break;
         }
         default:
