@@ -58,10 +58,6 @@ static int video_update_format_decoder( decoder_t *p_dec )
     vlc_object_t        *p_obj = p_owner->p_obj;
     filter_chain_t       *test_chain;
 
-    filter_owner_t filter_owner = {
-        .sys = id,
-    };
-
     vlc_mutex_lock( &id->fifo.lock );
 
     const es_format_t *p_enc_in = transcode_encoder_format_in( id->encoder );
@@ -83,7 +79,7 @@ static int video_update_format_decoder( decoder_t *p_dec )
 
     msg_Dbg( p_obj, "Checking if filter chain %4.4s -> %4.4s is possible",
                  (char *)&p_dec->fmt_out.i_codec, (char*)&p_enc_in->i_codec );
-    test_chain = filter_chain_NewVideo( p_obj, false, &filter_owner );
+    test_chain = filter_chain_NewVideo( p_obj, false, NULL );
     filter_chain_Reset( test_chain, &p_dec->fmt_out, &p_dec->fmt_out );
 
     int chain_works = filter_chain_AppendConverter( test_chain, &p_dec->fmt_out, p_enc_in );
