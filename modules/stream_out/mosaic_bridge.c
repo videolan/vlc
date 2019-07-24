@@ -382,7 +382,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     /* Create user specified video filters */
     static const struct filter_video_callbacks cbs =
     {
-        .buffer_new = video_new_buffer_filter,
+        video_new_buffer_filter,
     };
 
     psz_chain = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );

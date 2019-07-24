@@ -299,7 +299,7 @@ typedef struct {
 } vout_display_priv_t;
 
 static const struct filter_video_callbacks vout_display_filter_cbs = {
-    .buffer_new = VideoBufferNew,
+    VideoBufferNew,
 };
 
 static int VoutDisplayCreateRender(vout_display_t *vd)

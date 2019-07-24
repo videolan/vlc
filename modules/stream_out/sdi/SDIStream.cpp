@@ -502,7 +502,7 @@ static picture_t *transcode_video_filter_buffer_new(filter_t *p_filter)
 
 static const struct filter_video_callbacks transcode_filter_video_cbs =
 {
-    .buffer_new = transcode_video_filter_buffer_new,
+    transcode_video_filter_buffer_new,
 };
 
 filter_chain_t * VideoDecodedStream::VideoFilterCreate(const es_format_t *p_srcfmt)

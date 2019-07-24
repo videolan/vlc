@@ -547,7 +547,7 @@ static picture_t *CVPX_to_CVPX_converter_BufferNew(filter_t *p_filter)
 
 static const struct filter_video_callbacks image_filter_cbs =
 {
-    .buffer_new = CVPX_to_CVPX_converter_BufferNew,
+    CVPX_to_CVPX_converter_BufferNew,
 };
 
 static filter_t *

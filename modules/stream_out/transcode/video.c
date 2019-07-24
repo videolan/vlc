@@ -215,7 +215,7 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
 
 static const struct filter_video_callbacks transcode_filter_video_cbs =
 {
-    .buffer_new = transcode_video_filter_buffer_new,
+    transcode_video_filter_buffer_new,
 };
 
 static void transcode_video_filter_init( sout_stream_t *p_stream,

@@ -786,7 +786,7 @@ static picture_t *filter_new_picture( filter_t *p_filter )
 
 static const struct filter_video_callbacks image_filter_cbs =
 {
-    .buffer_new = filter_new_picture,
+    filter_new_picture,
 };
 
 static filter_t *CreateConverter( vlc_object_t *p_this, const es_format_t *p_fmt_in,

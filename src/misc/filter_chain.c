@@ -131,7 +131,7 @@ static picture_t *filter_chain_VideoBufferNew( filter_t *filter )
 
 static const struct filter_video_callbacks filter_chain_video_cbs =
 {
-    .buffer_new = filter_chain_VideoBufferNew,
+    filter_chain_VideoBufferNew,
 };
 
 #undef filter_chain_NewVideo

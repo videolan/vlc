@@ -252,7 +252,7 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
 }
 
 static const struct filter_video_callbacks spu_scaler_cbs = {
-    .buffer_new = spu_new_video_buffer,
+    spu_new_video_buffer,
 };
 
 static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
@@ -1296,7 +1296,7 @@ static subpicture_t *sub_new_buffer(filter_t *filter)
 }
 
 static const struct filter_subpicture_callbacks sub_cbs = {
-    .buffer_new = sub_new_buffer,
+    sub_new_buffer,
 };
 
 static int SubSourceInit(filter_t *filter, void *data)

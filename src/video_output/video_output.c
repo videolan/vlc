@@ -946,7 +946,7 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_t *vout, picture_t *pic,
     assert(vout->p->spu_blend);
 
     static const struct filter_video_callbacks cbs = {
-        .buffer_new = ConvertRGB32AndBlendBufferNew,
+        ConvertRGB32AndBlendBufferNew,
     };
     filter_owner_t owner = {
         .video = &cbs,
@@ -1458,10 +1458,10 @@ static int vout_Start(vout_thread_t *vout, const vout_configuration_t *cfg)
     video_format_Copy(&sys->filter.format, &sys->original);
 
     static const struct filter_video_callbacks static_cbs = {
-        .buffer_new = VoutVideoFilterStaticNewPicture,
+        VoutVideoFilterStaticNewPicture,
     };
     static const struct filter_video_callbacks interactive_cbs = {
-        .buffer_new = VoutVideoFilterInteractiveNewPicture,
+        VoutVideoFilterInteractiveNewPicture,
     };
     filter_owner_t owner = {
         .video = &static_cbs,

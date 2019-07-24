@@ -79,7 +79,7 @@ vlc_module_end ()
 
 static const struct filter_video_callbacks filter_video_edge_cbs =
 {
-    .buffer_new = new_frame,
+    new_frame,
 };
 
 /*****************************************************************************
