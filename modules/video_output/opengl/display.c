@@ -49,7 +49,7 @@ vlc_module_begin ()
 # define MODULE_VARNAME "gles2"
     set_shortname (N_("OpenGL ES2"))
     set_description (N_("OpenGL for Embedded Systems 2 video output"))
-    set_callbacks_display (Open, Close, 265)
+    set_callback_display(Open, 265)
     add_shortcut ("opengles2", "gles2")
     add_module("gles2", "opengl es2", NULL, GLES2_TEXT, PROVIDER_LONGTEXT)
 
@@ -61,7 +61,7 @@ vlc_module_begin ()
     set_description (N_("OpenGL video output"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_callbacks_display (Open, Close, 270)
+    set_callback_display(Open, 270)
     add_shortcut ("opengl", "gl")
     add_module("gl", "opengl", NULL, GL_TEXT, PROVIDER_LONGTEXT)
 #endif
@@ -147,6 +147,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = PictureRender;
     vd->display = PictureDisplay;
     vd->control = Control;
+    vd->close = Close;
     return VLC_SUCCESS;
 
 error:

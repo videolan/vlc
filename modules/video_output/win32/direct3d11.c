@@ -85,7 +85,7 @@ vlc_module_begin ()
 #endif
 
     add_shortcut("direct3d11")
-    set_callbacks_display(Open, Close,300)
+    set_callback_display(Open, 300)
 vlc_module_end ()
 
 struct vout_display_sys_t
@@ -384,6 +384,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
+    vd->close = Close;
 
     msg_Dbg(vd, "Direct3D11 Open Succeeded");
 

@@ -499,6 +499,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = Prepare;
     vd->display = PictureDisplay;
     vd->control = Control;
+    vd->close = Close;
 
     /* Fix initial state */
     caca_refresh_display(sys->dp);
@@ -532,5 +533,5 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_description(N_("Color ASCII art video output"))
-    set_callbacks_display(Open, Close, 15)
+    set_callback_display(Open, 15)
 vlc_module_end()

@@ -61,7 +61,7 @@ static void Close(vout_display_t *vd);
 vlc_module_begin ()
     set_shortname( N_("Flaschen") )
     set_description( N_("Flaschen-Taschen video output") )
-    set_callbacks_display( Open, Close, 0 )
+    set_callback_display( Open, 0 )
     add_shortcut( "flaschen" )
 
     set_category( CAT_VIDEO )
@@ -141,6 +141,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
+    vd->close = Close;
 
     (void) cfg; (void) context;
     return VLC_SUCCESS;

@@ -71,7 +71,7 @@ vlc_module_begin ()
     add_bool( "kva-fixt23", false, KVA_FIXT23_TEXT, KVA_FIXT23_LONGTEXT, true )
     set_description( N_("K Video Acceleration video output") )
     add_shortcut( "kva" )
-    set_callbacks_display( Open, Close, 100 )
+    set_callback_display( Open, 100 )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -274,6 +274,7 @@ static void PMThread( void *arg )
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
+    vd->close = Close;
 
     /* Prevent SIG_FPE */
     _control87(MCW_EM, MCW_EM);

@@ -74,6 +74,7 @@ struct vout_display_sys_t
 static void PictureRender(vout_display_t *, picture_t *, subpicture_t *, mtime_t);
 static void PictureDisplay(vout_display_t *, picture_t *);
 static int Control(vout_display_t *, int, va_list);
+static void Close(vout_display_t *);
 static void UpdateParams(vout_display_t *);
 
 // Allocates a Vulkan surface and instance for video output.
@@ -141,6 +142,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = PictureRender;
     vd->display = PictureDisplay;
     vd->control = Control;
+    vd->close = Close;
 
     UpdateParams(vd);
     (void) cfg; (void) context;
@@ -373,7 +375,7 @@ vlc_module_begin ()
     set_description (N_("Vulkan video output"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_callbacks_display (Open, Close, 0)
+    set_callback_display(Open, 0)
     add_shortcut ("vulkan", "vk")
     add_module ("vk", "vulkan", NULL, VK_TEXT, PROVIDER_LONGTEXT)
 

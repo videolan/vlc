@@ -64,11 +64,11 @@ vlc_module_begin()
     set_description("Android video output")
     add_shortcut("android-display")
     add_string(CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
-    set_callbacks_display(Open, Close, 260)
+    set_callback_display(Open, 260)
     add_submodule ()
         set_description("Android opaque video output")
         add_shortcut("android-opaque")
-        set_callbacks_display(OpenOpaque, Close, 280)
+        set_callback_display(OpenOpaque, 280)
 vlc_module_end()
 
 /*****************************************************************************
@@ -610,6 +610,7 @@ static int OpenCommon(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
+    vd->close = Close;
     vd->info.is_slow = !sys->p_window->b_opaque;
 
     return VLC_SUCCESS;

@@ -55,7 +55,7 @@ vlc_module_begin()
     set_description(N_("Core Animation OpenGL Layer (Mac OS X)"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_callbacks_display(Open, Close, 0)
+    set_callback_display(Open, 0)
 vlc_module_end()
 
 static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count);
@@ -200,6 +200,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         vd->prepare = PictureRender;
         vd->display = PictureDisplay;
         vd->control = Control;
+        vd->close   = Close;
 
         if (OSX_SIERRA_AND_HIGHER) {
             /* request our screen's HDR mode (introduced in OS X 10.11, but correctly supported in 10.12 only) */

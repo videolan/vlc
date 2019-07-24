@@ -82,7 +82,7 @@ vlc_module_begin()
                     MMAL_ADJUST_REFRESHRATE_LONGTEXT, false)
     add_bool(MMAL_NATIVE_INTERLACED, false, MMAL_NATIVE_INTERLACE_TEXT,
                     MMAL_NATIVE_INTERLACE_LONGTEXT, false)
-    set_callbacks_display(Open, Close, 90)
+    set_callback_display(Open, 90)
 vlc_module_end()
 
 struct dmx_region_t {
@@ -301,6 +301,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = vd_prepare;
     vd->display = vd_display;
     vd->control = vd_control;
+    vd->close = Close;
 
     vc_tv_register_callback(tvservice_cb, vd);
 

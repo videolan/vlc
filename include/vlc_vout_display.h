@@ -208,22 +208,6 @@ typedef int (*vout_display_open_cb)(vout_display_t *vd,
                                     video_format_t *fmtp,
                                     vlc_video_context *context);
 
-/**
- * "vout display" close callback
- *
- * @param vd vout display context
- */
-typedef void (*vout_display_close_cb)(vout_display_t *vd);
-
-#define set_callbacks_display(activate, deactivate, priority) \
-    { \
-        vout_display_open_cb open__ = activate; \
-        vout_display_close_cb close__ = deactivate; \
-        (void) open__; (void) close__; \
-        set_callbacks(activate, deactivate) \
-    } \
-    set_capability( "vout display", priority )
-
 #define set_callback_display(activate, priority) \
     { \
         vout_display_open_cb open__ = activate; \
@@ -304,6 +288,11 @@ struct vout_display_t {
 
     /* Control on the module (mandatory) */
     int        (*control)(vout_display_t *, int, va_list);
+
+    /**
+     * Destroys the display.
+     */
+    void (*close)(vout_display_t *);
 
     /* Private place holder for the vout_display_t module (optional)
      *

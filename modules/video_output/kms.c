@@ -768,6 +768,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
+    vd->close = Close;
 
     (void) context;
     return VLC_SUCCESS;
@@ -788,5 +789,5 @@ vlc_module_begin ()
     add_string( "kms-drm-chroma", NULL, DRM_CHROMA_TEXT, DRM_CHROMA_LONGTEXT,
                 true)
     set_description("Linux kernel mode setting video output")
-    set_callbacks_display(Open, Close, 30)
+    set_callback_display(Open, 30)
 vlc_module_end ()

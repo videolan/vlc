@@ -690,6 +690,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
+    vd->close = Close;
 
     (void) ctx;
     return VLC_SUCCESS;
@@ -713,7 +714,7 @@ vlc_module_begin()
     set_description(N_("X11 RENDER video output (XCB)"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_callbacks_display(Open, Close, 200)
+    set_callback_display(Open, 200)
     add_shortcut("x11-render", "xcb-render", "render")
     add_string("x11-render-filter", "good", N_("Scaling mode"),
                N_("Scaling mode"), true)

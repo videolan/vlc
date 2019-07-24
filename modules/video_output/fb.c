@@ -87,7 +87,7 @@ vlc_module_begin ()
                  true)
     add_obsolete_bool("fb-hw-accel") /* since 4.0.0 */
     set_description(N_("GNU/Linux framebuffer video output"))
-    set_callbacks_display(Open, Close, 30)
+    set_callback_display(Open, 30)
 vlc_module_end ()
 
 /*****************************************************************************
@@ -295,6 +295,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
+    vd->close = Close;
 
     (void) context;
     return VLC_SUCCESS;

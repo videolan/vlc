@@ -318,6 +318,7 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
     vd->prepare = vlc_vidsplit_Prepare;
     vd->display = vlc_vidsplit_Display;
     vd->control = vlc_vidsplit_Control;
+    vd->close = vlc_vidsplit_Close;
     (void) cfg; (void) fmtp; (void) ctx;
     return VLC_SUCCESS;
 }
@@ -327,7 +328,7 @@ vlc_module_begin()
     set_description(N_("Video splitter display plugin"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_callbacks_display(vlc_vidsplit_Open, vlc_vidsplit_Close, 0)
+    set_callback_display(vlc_vidsplit_Open, 0)
     add_module("video-splitter", "video splitter", NULL,
                N_("Video splitter module"), N_("Video splitter module"))
 vlc_module_end()

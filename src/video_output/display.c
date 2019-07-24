@@ -87,13 +87,6 @@ static int vout_display_start(void *func, bool forced, va_list ap)
     return ret;
 }
 
-static void vout_display_stop(void *func, va_list ap)
-{
-    vout_display_close_cb deactivate = func;
-
-    deactivate(va_arg(ap, vout_display_t *));
-}
-
 /* */
 void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
                                         const video_format_t *source,
@@ -774,6 +767,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     vd->prepare = NULL;
     vd->display = NULL;
     vd->control = NULL;
+    vd->close = NULL;
     vd->sys = NULL;
     if (owner)
         vd->owner = *owner;
@@ -803,7 +797,8 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
 
     if (VoutDisplayCreateRender(vd)) {
         if (vd->module != NULL) {
-            vlc_module_unload(vd->module, vout_display_stop, vd);
+            if (vd->close != NULL)
+                vd->close(vd);
             vlc_objres_clear(VLC_OBJECT(vd));
         }
         video_format_Clean(&vd->fmt);
@@ -829,7 +824,8 @@ void vout_display_Delete(vout_display_t *vd)
         picture_pool_Release(osys->pool);
 
     if (vd->module != NULL) {
-        vlc_module_unload(vd->module, vout_display_stop, vd);
+        if (vd->close != NULL)
+            vd->close(vd);
         vlc_objres_clear(VLC_OBJECT(vd));
     }
 

@@ -46,7 +46,7 @@ vlc_module_begin()
     set_description(N_("VDPAU output"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_callbacks_display(Open, Close, 0)
+    set_callback_display(Open, 0)
 
     add_shortcut("vdpau")
 vlc_module_end()
@@ -503,6 +503,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = Queue;
     vd->display = Wait;
     vd->control = Control;
+    vd->close = Close;
 
     (void) context;
     return VLC_SUCCESS;

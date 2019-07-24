@@ -111,7 +111,7 @@ vlc_module_begin ()
                  PIXEL_SHADER_FILE_TEXT, PIXEL_SHADER_FILE_LONGTEXT)
 
     add_shortcut("direct3d9", "direct3d")
-    set_callbacks_display(Open, Close, 280)
+    set_callback_display(Open, 280)
 
 #ifdef HAVE_GL
     add_submodule()
@@ -1758,6 +1758,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
+    vd->close = Close;
 
     return VLC_SUCCESS;
 error:

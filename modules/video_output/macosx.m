@@ -76,7 +76,7 @@ vlc_module_begin ()
     set_description (N_("Mac OS X OpenGL video output"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_callbacks_display (Open, Close, 300)
+    set_callback_display(Open, 300)
     add_shortcut ("macosx", "vout_macosx")
     add_glopts ()
 vlc_module_end ()
@@ -243,6 +243,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         vd->prepare = PictureRender;
         vd->display = PictureDisplay;
         vd->control = Control;
+        vd->close   = Close;
 
         /* */
         // FIXME: this call leads to a fatal mutex locking error in vout_ChangeDisplaySize()

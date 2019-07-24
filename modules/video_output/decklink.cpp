@@ -254,7 +254,7 @@ vlc_module_begin()
     set_description (N_("DeckLink Video Output module"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_callbacks_display (OpenVideo, CloseVideo, 0)
+    set_callback_display(OpenVideo, 0)
     set_section(N_("DeckLink Video Options"), NULL)
     add_string(VIDEO_CFG_PREFIX "video-connection", "sdi",
                 VIDEO_CONNECTION_TEXT, VIDEO_CONNECTION_LONGTEXT, true)
@@ -808,6 +808,7 @@ static int OpenVideo(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = PrepareVideo;
     vd->display = NULL;
     vd->control = ControlVideo;
+    vd->close = CloseVideo;
 
     vd->sys = (vout_display_sys_t*) sys;
 

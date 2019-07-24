@@ -73,7 +73,7 @@ vlc_module_begin ()
     set_description("iOS OpenGL video output")
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_callbacks_display(Open, Close, 300)
+    set_callback_display(Open, 300)
 
     add_shortcut("vout_ios2", "vout_ios")
     add_glopts()
@@ -211,6 +211,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         vd->prepare = PictureRender;
         vd->display = PictureDisplay;
         vd->control = Control;
+        vd->close   = Close;
 
         return VLC_SUCCESS;
 

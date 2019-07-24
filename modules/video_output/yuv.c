@@ -66,7 +66,7 @@ vlc_module_begin()
     add_bool  (CFG_PREFIX "yuv4mpeg2", false,
                 YUV4MPEG2_TEXT, YUV4MPEG2_LONGTEXT, true)
 
-    set_callbacks_display(Open, Close, 0)
+    set_callback_display(Open, 0)
 vlc_module_end()
 
 /*****************************************************************************
@@ -152,6 +152,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
+    vd->close = Close;
 
     (void) cfg; (void) context;
     return VLC_SUCCESS;
