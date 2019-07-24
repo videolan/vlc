@@ -701,28 +701,20 @@ bool demux_sys_t::PreloadLinked()
 
 void demux_sys_t::FreeUnused()
 {
-    for (std::vector<matroska_stream_c*>::reverse_iterator i = streams.rbegin();
-         i != streams.rend(); ++i)
-    {
-        matroska_stream_c *p_s = *i;
-        if( !p_s->isUsed() )
-        {
-            std::advance(i, 1);
-            streams.erase( i.base() );
-            delete p_s;
-        }
-    }
-    for (std::vector<matroska_segment_c*>::reverse_iterator i = opened_segments.rbegin();
-         i != opened_segments.rend(); ++i)
-    {
-        matroska_segment_c *p_sg = *i;
-        if( !p_sg->b_preloaded )
-        {
-            std::advance(i, 1);
-            opened_segments.erase( i.base() );
-            delete p_sg;
-        }
-    }
+    auto sIt = std::remove_if(begin(streams), end(streams), [](const matroska_stream_c* p_s) {
+        return !p_s->isUsed();
+    });
+    for (auto it = sIt; it != end(streams); ++it)
+        delete *it;
+    streams.erase(sIt, end(streams));
+
+    auto sgIt = std::remove_if(begin(opened_segments), end(opened_segments),
+                [](const matroska_segment_c* p_sg) {
+        return !p_sg->b_preloaded;
+    });
+    for (auto it = sgIt; it != end(opened_segments); ++it)
+        delete *it;
+    opened_segments.erase(sgIt, end(opened_segments));
 }
 
 bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, mtime_t i_mk_date )
