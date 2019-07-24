@@ -247,7 +247,7 @@ void MessagesDialog::sinkMessage( const MsgEvent *msg )
 
     /* Insert the message */
     format.setProperty( QTextFormat::FontItalic, false );
-    format.setForeground( messages->palette().foreground() );
+    format.setForeground( messages->palette().windowText() );
     messages->textCursor().insertText( msg->text, format );
 
     /* Pass the new message thru the filter */
