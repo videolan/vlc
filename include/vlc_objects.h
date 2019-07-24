@@ -231,9 +231,8 @@ static inline void vlc_object_release(vlc_object_t *o)
  * when the module instance associated with the VLC object is terminated.
  *
  * Specifically, if the module instance activation/probe function fails, the
- * resource will be freed immediately after the failure within
- * vlc_module_load(). If the activation succeeds, the resource will be freed
- * when the module instance is terminated with vlc_module_unload().
+ * resource will be freed immediately after the failure. If the activation
+ * succeeds, the resource will be freed when the module instance is terminated.
  *
  * This is a convenience mechanism to save explicit clean-up function calls
  * in modules.

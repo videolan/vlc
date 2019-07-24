@@ -235,19 +235,6 @@ done:
     return module;
 }
 
-void vlc_module_unload(module_t *module, vlc_deactivate_t deinit, ...)
-{
-    if (module->pf_deactivate != NULL)
-    {
-        va_list ap;
-
-        va_start(ap, deinit);
-        deinit(module->pf_deactivate, ap);
-        va_end(ap);
-    }
-}
-
-
 static int generic_start(void *func, bool forced, va_list ap)
 {
     vlc_object_t *obj = va_arg(ap, vlc_object_t *);

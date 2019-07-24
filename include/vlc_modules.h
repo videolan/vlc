@@ -29,7 +29,6 @@
  */
 
 typedef int (*vlc_activate_t)(void *func, bool forced, va_list args);
-typedef void (*vlc_deactivate_t)(void *func, va_list args);
 struct vlc_logger;
 
 /*****************************************************************************
@@ -70,22 +69,6 @@ VLC_API module_t *vlc_module_load(struct vlc_logger *log, const char *cap,
             vlc_module_load(vlc_object_logger((vlc_object_t *)(ctx)), cap, \
                             name, strict, __VA_ARGS__))
 #endif
-
-/**
- * Deinstantiates a module.
- *
- * This is an inconvenience wrapper for deactivating a module if the module
- * capability/type expects it. In that fashion, it is paired with
- * vlc_module_load(). It is rather inconvenient however, as it requires
- * variable arguments for no good reasons, and inhibits type safety.
- *
- * In practice, it is easier to treat vlc_module_load() as an object "factory",
- * and define a type-safe custom callback for object deletion.
- *
- * \param module the module pointer as returned by vlc_module_load()
- * \param deinit deactivation callback
- */
-VLC_API void vlc_module_unload(module_t *, vlc_deactivate_t deinit, ... );
 
 VLC_API module_t * module_need( vlc_object_t *, const char *, const char *, bool ) VLC_USED;
 #define module_need(a,b,c,d) module_need(VLC_OBJECT(a),b,c,d)
