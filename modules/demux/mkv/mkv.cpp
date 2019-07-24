@@ -244,7 +244,11 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    p_sys->FreeUnused();
+    if (!p_sys->FreeUnused())
+    {
+        msg_Err( p_demux, "no usable segment" );
+        goto error;
+    }
 
     p_sys->InitUi();
 
