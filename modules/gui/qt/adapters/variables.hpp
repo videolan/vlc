@@ -120,6 +120,9 @@ public:
         , m_property(property)
     {
         cref.self = this;
+        /* This parameter is later used by derivative classes, and only helps
+         * the type inference here. */
+        VLC_UNUSED(object);
     }
 
     virtual ~QVLCVariable()
