@@ -220,9 +220,6 @@ typedef int (*vout_display_open_cb)(vout_display_t *vd,
 struct vout_display_t {
     struct vlc_object_t obj;
 
-    /* Module */
-    module_t *module;
-
     /* Initial and current configuration.
      * You cannot modify it directly, you must use the appropriate events.
      *
