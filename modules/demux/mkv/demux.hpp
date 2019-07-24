@@ -99,7 +99,7 @@ public:
 
     void PreloadFamily( const matroska_segment_c & of_segment );
     bool PreloadLinked();
-    void FreeUnused();
+    bool FreeUnused();
     bool PreparePlayback( virtual_segment_c & new_vsegment, vlc_tick_t i_mk_date );
     bool AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c * );
     void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter );

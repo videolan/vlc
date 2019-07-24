@@ -259,7 +259,7 @@ bool demux_sys_t::PreloadLinked()
     return true;
 }
 
-void demux_sys_t::FreeUnused()
+bool demux_sys_t::FreeUnused()
 {
     auto sIt = std::remove_if(begin(streams), end(streams), [](const matroska_stream_c* p_s) {
         return !p_s->isUsed();
@@ -275,6 +275,8 @@ void demux_sys_t::FreeUnused()
     for (auto it = sgIt; it != end(opened_segments); ++it)
         delete *it;
     opened_segments.erase(sgIt, end(opened_segments));
+
+    return !streams.empty() && !opened_segments.empty();
 }
 
 bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, vlc_tick_t i_mk_date )
