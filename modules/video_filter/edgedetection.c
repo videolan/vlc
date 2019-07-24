@@ -46,7 +46,7 @@
  * Local prototypes
  *****************************************************************************/
 static int Open( vlc_object_t * );
-static int Close( vlc_object_t * );
+static void Close( vlc_object_t * );
 static picture_t *new_frame( filter_t * );
 static picture_t *Filter( filter_t *, picture_t * );
 static uint8_t sobel( const uint8_t *, const int, const int, int, int);
@@ -131,11 +131,10 @@ static int Open( vlc_object_t *p_this )
 /******************************************************************************
  * Closes the filter and cleans up all dynamically allocated data.
  ******************************************************************************/
-static int Close( vlc_object_t *p_this )
+static void Close( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_chain_Delete( (filter_chain_t *)p_filter->p_sys );
-    return VLC_SUCCESS;
 }
 
 /* *****************************************************************************
