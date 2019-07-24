@@ -52,7 +52,7 @@ static inline chained_filter_t *chained(filter_t *filter)
 struct filter_chain_t
 {
     vlc_object_t *obj;
-    filter_owner_t owner; /**< Owner (downstream) callbacks */
+    filter_owner_t parent_video_owner; /**< Owner (downstream) callbacks */
 
     chained_filter_t *first, *last; /**< List of filters */
 
@@ -70,7 +70,7 @@ static void FilterDeletePictures( picture_t * );
 
 static filter_chain_t *filter_chain_NewInner( vlc_object_t *obj,
     const char *cap, const char *conv_cap, bool fmt_out_change,
-    const filter_owner_t *owner, enum es_format_category_e cat )
+    enum es_format_category_e cat )
 {
     assert( obj != NULL );
     assert( cap != NULL );
@@ -80,10 +80,6 @@ static filter_chain_t *filter_chain_NewInner( vlc_object_t *obj,
         return NULL;
 
     chain->obj = obj;
-    if( owner != NULL )
-        chain->owner = *owner;
-    else
-        memset(&chain->owner, 0, sizeof(chain->owner));
     chain->first = NULL;
     chain->last = NULL;
     es_format_Init( &chain->fmt_in, cat, 0 );
@@ -100,7 +96,7 @@ static filter_chain_t *filter_chain_NewInner( vlc_object_t *obj,
  */
 filter_chain_t *filter_chain_NewSPU( vlc_object_t *obj, const char *cap )
 {
-    return filter_chain_NewInner( obj, cap, NULL, false, NULL, SPU_ES );
+    return filter_chain_NewInner( obj, cap, NULL, false, SPU_ES );
 }
 
 /** Chained filter picture allocator function */
@@ -118,8 +114,8 @@ static picture_t *filter_chain_VideoBufferNew( filter_t *filter )
         filter_chain_t *chain = filter->owner.sys;
 
         /* XXX ugly */
-        filter->owner.sys = chain->owner.sys;
-        picture_t *pic = chain->owner.video->buffer_new( filter );
+        filter->owner.sys = chain->parent_video_owner.sys;
+        picture_t *pic = chain->parent_video_owner.video->buffer_new( filter );
         filter->owner.sys = chain;
         return pic;
     }
@@ -134,8 +130,21 @@ static const struct filter_video_callbacks filter_chain_video_cbs =
 filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
                                        const filter_owner_t *restrict owner )
 {
-    return filter_chain_NewInner( obj, "video filter",
-                                  "video converter", allow_change, owner, VIDEO_ES );
+    filter_chain_t *chain =
+        filter_chain_NewInner( obj, "video filter",
+                                  "video converter", allow_change, VIDEO_ES );
+    if (unlikely(chain == NULL))
+        return NULL;
+
+    if( owner != NULL && owner->video != NULL )
+    {
+        // keep this to get pictures for the last filter in the chain
+        assert( owner->video->buffer_new != NULL );
+        chain->parent_video_owner = *owner;
+    }
+    else
+        chain->parent_video_owner = (filter_owner_t){};
+    return chain;
 }
 
 /**
