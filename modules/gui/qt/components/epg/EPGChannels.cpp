@@ -82,7 +82,11 @@ void EPGChannels::paintEvent( QPaintEvent *event )
         p.drawText( 0, - m_offset + ( i++ + 0.5 ) * TRACKS_HEIGHT - 4,
                     width(), height(), Qt::AlignLeft, text );
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+        int i_width = fontMetrics().horizontalAdvance( text );
+#else
         int i_width = fontMetrics().width( text );
+#endif
         if( width() < i_width )
             setMinimumWidth( i_width );
     }
