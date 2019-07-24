@@ -95,7 +95,7 @@ struct module_t
     const char *activate_name;
     const char *deactivate_name;
     void *pf_activate;
-    void *pf_deactivate;
+    void (*deactivate)(vlc_object_t *);
 };
 
 vlc_plugin_t *vlc_plugin_create(void);

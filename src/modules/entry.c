@@ -72,7 +72,7 @@ module_t *vlc_module_create(vlc_plugin_t *plugin)
     module->activate_name = NULL;
     module->deactivate_name = NULL;
     module->pf_activate = NULL;
-    module->pf_deactivate = NULL;
+    module->deactivate = NULL;
     return module;
 }
 
@@ -274,7 +274,7 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
 
         case VLC_MODULE_CB_CLOSE:
             module->deactivate_name = va_arg(ap, const char *);
-            module->pf_deactivate = va_arg (ap, void *);
+            module->deactivate = va_arg (ap, void *);
             break;
 
         case VLC_MODULE_NO_UNLOAD:
@@ -484,7 +484,6 @@ static int vlc_plugin_gpa_cb(void *ctx, void *tgt, int propid, ...)
     switch (propid)
     {
         case VLC_MODULE_CB_OPEN:
-        case VLC_MODULE_CB_CLOSE:
         {
             va_list ap;
 
@@ -576,14 +575,17 @@ int vlc_plugin_resolve(vlc_plugin_t *plugin, vlc_plugin_cb entry)
          module != NULL;
          module = module->next)
     {
+        void *deactivate;
+
         if (vlc_plugin_get_symbol(syms, module->activate_name,
                                   &module->pf_activate)
-         || vlc_plugin_get_symbol(syms, module->deactivate_name,
-                                  &module->pf_deactivate))
+         || vlc_plugin_get_symbol(syms, module->deactivate_name, &deactivate))
         {
             ret = -1;
             break;
         }
+
+        module->deactivate = deactivate;
     }
 
     vlc_plugin_free_symbols(syms);
