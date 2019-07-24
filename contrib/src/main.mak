@@ -307,14 +307,14 @@ endif
 
 # For cross-compilation with meson, do not set compiler and flags
 # in HOSTVARS as meson will always use them for the BUILD machine compiler!
-ifdef HAVE_CROSS_COMPILE
-HOSTVARS_MESON := PATH="$(PREFIX)/bin:$(PATH)"
-else
 MESON_HOST_FLAGS := \
 	CPPFLAGS="$(CPPFLAGS)" \
 	CFLAGS="$(CFLAGS)" \
 	CXXFLAGS="$(CXXFLAGS)" \
 	LDFLAGS="$(LDFLAGS)"
+ifdef HAVE_CROSS_COMPILE
+HOSTVARS_MESON := PATH="$(PREFIX)/bin:$(PATH)"
+else
 HOSTVARS_MESON := $(HOSTTOOLS) $(MESON_HOST_FLAGS)
 endif
 
