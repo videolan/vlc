@@ -50,7 +50,7 @@ void EPGChannels::addProgram( const EPGProgram *program )
     if ( !programsList.contains( program ) )
     {
         programsList << program;
-        qSort(programsList.begin(), programsList.end(), EPGProgram::lessThan);
+        std::sort(programsList.begin(), programsList.end(), EPGProgram::lessThan);
         update();
     }
 }
