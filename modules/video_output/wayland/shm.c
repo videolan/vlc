@@ -272,6 +272,32 @@ static const struct wl_registry_listener registry_cbs =
     registry_global_remove_cb,
 };
 
+static void Close(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    struct wl_display *display = sys->embed->display.wl;
+    struct wl_surface *surface = sys->embed->handle.wl;
+
+    wl_surface_attach(surface, NULL, 0, 0);
+    wl_surface_commit(surface);
+
+    /* Wait until all picture buffers are released by the server */
+    while (sys->active_buffers > 0) {
+        msg_Dbg(vd, "%zu buffer(s) still active", sys->active_buffers);
+        wl_display_roundtrip_queue(display, sys->eventq);
+    }
+    msg_Dbg(vd, "no active buffers left");
+
+    if (sys->viewport != NULL)
+        wp_viewport_destroy(sys->viewport);
+    if (sys->viewporter != NULL)
+        wp_viewporter_destroy(sys->viewporter);
+    wl_shm_destroy(sys->shm);
+    wl_display_flush(display);
+    wl_event_queue_destroy(sys->eventq);
+    free(sys);
+}
+
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
 {
@@ -366,32 +392,6 @@ error:
         wl_event_queue_destroy(sys->eventq);
     free(sys);
     return VLC_EGENERIC;
-}
-
-static void Close(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    struct wl_display *display = sys->embed->display.wl;
-    struct wl_surface *surface = sys->embed->handle.wl;
-
-    wl_surface_attach(surface, NULL, 0, 0);
-    wl_surface_commit(surface);
-
-    /* Wait until all picture buffers are released by the server */
-    while (sys->active_buffers > 0) {
-        msg_Dbg(vd, "%zu buffer(s) still active", sys->active_buffers);
-        wl_display_roundtrip_queue(display, sys->eventq);
-    }
-    msg_Dbg(vd, "no active buffers left");
-
-    if (sys->viewport != NULL)
-        wp_viewport_destroy(sys->viewport);
-    if (sys->viewporter != NULL)
-        wp_viewporter_destroy(sys->viewporter);
-    wl_shm_destroy(sys->shm);
-    wl_display_flush(display);
-    wl_event_queue_destroy(sys->eventq);
-    free(sys);
 }
 
 vlc_module_begin()
