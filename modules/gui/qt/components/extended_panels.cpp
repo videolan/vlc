@@ -1154,8 +1154,13 @@ void Equalizer::build()
     connectConfigChanged( preamp );
 
     /* fix sliders spacing accurately */
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    int i_width = qMax( QFontMetrics( smallFont ).horizontalAdvance( "500 Hz" ),
+                        QFontMetrics( smallFont ).horizontalAdvance( "-20.0 dB" ) );
+#else
     int i_width = qMax( QFontMetrics( smallFont ).width( "500 Hz" ),
                         QFontMetrics( smallFont ).width( "-20.0 dB" ) );
+#endif
     int i = 0;
     foreach( const FilterSliderData::slider_data_t &data, controls )
     {
