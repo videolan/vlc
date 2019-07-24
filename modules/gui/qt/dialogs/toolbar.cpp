@@ -331,7 +331,7 @@ void PreviewWidget::paintEvent( QPaintEvent * )
             if ( !strcmp( item->widget()->metaObject()->className(), "QLabel" ) )
             {
                 QPainter eraser( &pixmaps[i] );
-                eraser.fillRect( item->geometry(), palette().background() );
+                eraser.fillRect( item->geometry(), palette().window() );
                 eraser.end();
             }
         }
