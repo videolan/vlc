@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 int tt_OpenDemux( vlc_object_t* p_this );
-void tt_CloseDemux( demux_t* p_demux );
+void tt_CloseDemux( vlc_object_t* p_demux );
 
 int  tt_OpenDecoder   ( vlc_object_t * );
 void tt_CloseDecoder  ( vlc_object_t * );

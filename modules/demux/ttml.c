@@ -532,13 +532,14 @@ int tt_OpenDemux( vlc_object_t* p_this )
     return VLC_SUCCESS;
 
 error:
-    tt_CloseDemux( p_demux );
+    tt_CloseDemux( p_this );
 
     return VLC_EGENERIC;
 }
 
-void tt_CloseDemux( demux_t* p_demux )
+void tt_CloseDemux( vlc_object_t* p_this )
 {
+    demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t* p_sys = p_demux->p_sys;
 
     if( p_sys->p_rootnode )
