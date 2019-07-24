@@ -144,21 +144,35 @@ inline void FileOpenPanel::BuildOldPanel()
     dialogBox->setToolTip( qtr( "Select one or multiple files" ) );
     dialogBox->setMinimumHeight( 250 );
 
-    // But hide the two OK/Cancel buttons. Enable them for debug.
-    QDialogButtonBox *fileDialogAcceptBox =
-                      dialogBox->findChildren<QDialogButtonBox*>()[0];
-    fileDialogAcceptBox->hide();
-
+#warning Qt open_panels should use a more sustainable way to customize FileDialogBox
     /* Ugly hacks to get the good Widget */
-    //This lineEdit is the normal line in the fileDialog.
-    QLineEdit *lineFileEdit = dialogBox->findChildren<QLineEdit*>()[0];
+    // But hide the two OK/Cancel buttons. Enable them for debug.
+    QList<QDialogButtonBox*> buttons =
+        dialogBox->findChildren<QDialogButtonBox*>();
+    if( !buttons.isEmpty() )
+    {
+        QDialogButtonBox *fileDialogAcceptBox = buttons[0];
+        fileDialogAcceptBox->hide();
+    }
+
     /* Make a list of QLabel inside the QFileDialog to access the good ones */
     QList<QLabel *> listLabel = dialogBox->findChildren<QLabel*>();
 
-    /* Hide the FileNames one. Enable it for debug */
-    listLabel[1]->setText( qtr( "File names:" ) );
-    /* Change the text that was uncool in the usual box */
-    listLabel[2]->setText( qtr( "Filter:" ) );
+    if( listLabel.size() > 3 )
+    {
+        /* Hide the FileNames one. Enable it for debug */
+        listLabel[1]->setText( qtr( "File names:" ) );
+        /* Change the text that was uncool in the usual box */
+        listLabel[2]->setText( qtr( "Filter:" ) );
+    }
+
+    //This lineEdit is the normal line in the fileDialog.
+    QList<QLineEdit*> lineEdits = dialogBox->findChildren<QLineEdit*>();
+    if( !lineEdits.isEmpty() )
+    {
+        QLineEdit *lineFileEdit = lineEdits[0];
+        CONNECT( lineFileEdit, textChanged( const QString& ), this, updateMRL() );
+    }
 
     dialogBox->layout()->setMargin( 0 );
     dialogBox->layout()->setSizeConstraint( QLayout::SetNoConstraint );
@@ -168,7 +182,6 @@ inline void FileOpenPanel::BuildOldPanel()
     // Add the DialogBox to the layout
     ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
 
-    CONNECT( lineFileEdit, textChanged( const QString& ), this, updateMRL() );
     dialogBox->installEventFilter( this );
 }
 
