@@ -610,6 +610,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/mediacenter/MCMainDisplay.qml \
 	gui/qt/qml/mediacenter/MCMusicDisplay.qml \
 	gui/qt/qml/mediacenter/MCVideoDisplay.qml \
+	gui/qt/qml/mediacenter/MCVideoListDisplay.qml \
 	gui/qt/qml/mediacenter/MCNetworkDisplay.qml \
 	gui/qt/qml/mediacenter/MusicAlbumsDisplay.qml \
 	gui/qt/qml/mediacenter/MusicAlbumsGridExpandDelegate.qml \

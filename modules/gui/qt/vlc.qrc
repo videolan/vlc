@@ -221,6 +221,7 @@
         <file alias="NetworkFileDisplay.qml">qml/mediacenter/NetworkFileDisplay.qml</file>
         <file alias="NetworkListItem.qml">qml/mediacenter/NetworkListItem.qml</file>
         <file alias="VideoExpandableGrid.qml">qml/mediacenter/VideoExpandableGrid.qml</file>
+        <file alias="MCVideoListDisplay.qml">qml/mediacenter/MCVideoListDisplay.qml</file>
     </qresource>
     <qresource prefix="/style">
         <file alias="qmldir">qml/style/qmldir</file>
