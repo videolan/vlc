@@ -36,6 +36,12 @@
 #include "ui_sprefs_subtitles.h"
 #include "ui_sprefs_interface.h"
 
+#include <vlc_media_library.h>
+#include <QDialogButtonBox>
+#include <QTableView>
+#include <QFileDialog>
+#include "components/mediacenter/ml_folders_model.hpp"
+
 #ifdef _WIN32
 # include "util/registry.hpp"
 #endif
@@ -107,6 +113,9 @@ private:
 
     char *lang;
 
+    MlFoldersModel *mlModel;
+    QTableView * mlTableView;
+
 #ifdef _WIN32
     QList<QTreeWidgetItem *> listAsso;
     bool addType( const char * psz_ext, QTreeWidgetItem*, QTreeWidgetItem*, QVLCRegistry* );
@@ -124,6 +133,10 @@ private slots:
     void updateCheckBoxes( QTreeWidgetItem*, int );
     void saveAsso();
 #endif
+    void MLaddNewEntryPoint( );
+    QWidget * MLgenerateWidget( QModelIndex index , MlFoldersModel *mlf , QWidget *parent );
+    void MLdrawControls( );
+
     void configML();
     void changeStyle( QString );
 };

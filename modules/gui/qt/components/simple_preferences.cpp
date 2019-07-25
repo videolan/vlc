@@ -47,6 +47,17 @@
 #include <QScreen>
 #include <QtAlgorithms>
 #include <QDir>
+
+#include <QSpinBox>
+#include <QCheckBox>
+#include <QLabel>
+#include <QPushButton>
+#include <QGridLayout>
+#include <QWidget>
+#include <QHBoxLayout>
+#include <QDialog>
+#include <QBoxLayout>
+
 #include <assert.h>
 #include <math.h>
 
@@ -718,6 +729,24 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     + QString( " <a href=\"http://www.videolan.org/vlc/skins.php\">" )
                     + qtr( "VLC skins website" )+ QString( "</a>." ) );
             ui.skinsLabel->setFont( italicFont );
+
+            if ( vlc_ml_instance_get( p_intf ) != NULL )
+            {
+                mlModel = new MlFoldersModel( vlc_ml_instance_get( p_intf ) , this );
+
+                mlTableView = ui.entryPointsTV;
+
+                mlTableView->setModel( mlModel );
+
+                connect( mlModel , &QAbstractItemModel::modelReset , this , &SPrefsPanel::MLdrawControls );
+
+                BUTTONACT( ui.addButton , MLaddNewEntryPoint() );
+
+                MLdrawControls( );
+
+            }else {
+                ui.mlGroupBox->hide( );
+            }
 
 #ifdef _WIN32
             BUTTONACT( ui.assoButton, assoDialog() );
@@ -1474,4 +1503,71 @@ void SPrefsPanel::saveAsso()
 }
 
 #endif /* _WIN32 */
+
+void SPrefsPanel::MLaddNewEntryPoint( ){
+    QUrl newEntryPoints = QFileDialog::getExistingDirectoryUrl( this , qtr("Please choose an entry point folder") ,
+                                             QUrl( QDir::homePath( ) ) );
+
+    if(! newEntryPoints.isEmpty() )
+        mlModel->add( newEntryPoints );
+}
+
+QWidget *SPrefsPanel::MLgenerateWidget( QModelIndex index , MlFoldersModel *mlf , QWidget *parent){
+    if ( index.column() == 0 ){
+
+        QWidget *wid = new QWidget( parent );
+
+        QBoxLayout* layout = new QBoxLayout( QBoxLayout::LeftToRight , wid );
+
+        QCheckBox*cb = new QCheckBox( wid );
+        cb->setFixedSize( 16 , 16 );
+
+        //cb->setChecked(mlf->data(index, MlFoldersModel::CustomCheckBoxRole).toBool()); //TODO: disable banning till un-banning works
+        cb->setEnabled( false );
+
+        layout->addWidget( cb , Qt::AlignCenter );
+        wid->setLayout( layout );
+
+        connect( cb , &QPushButton::clicked, [=]( ) {
+            mlf->setData( index , cb->isChecked() , MlFoldersModel::CustomCheckBoxRole);
+        } );
+        return wid;
+    }
+    else if ( index.column( ) == 2 ){
+        QWidget *wid = new QWidget( parent );
+
+        QBoxLayout* layout = new QBoxLayout( QBoxLayout::LeftToRight , wid );
+
+        QPushButton *pb = new QPushButton( "-" , wid );
+        pb->setFixedSize( 16 , 16 );
+
+        layout->addWidget( pb , Qt::AlignCenter );
+        wid->setLayout( layout );
+
+
+        connect( pb , &QPushButton::clicked , [=]() {
+             mlf->setData( index , {} , MlFoldersModel::CustomRemoveRole);
+        } );
+
+        return wid;
+    }
+
+    return nullptr;
+}
+
+void SPrefsPanel::MLdrawControls( ) {
+  for ( int col = 0 ; col < mlModel->columnCount( ) ; col++ )
+    for (int row = 0 ; row < mlModel->rowCount() ; row++ )
+      {
+    QModelIndex index = mlModel->index ( row , col );
+    mlTableView->setIndexWidget ( index, MLgenerateWidget ( index, mlModel,
+                               mlTableView ) );
+      }
+
+  mlTableView->resizeColumnsToContents( );
+  mlTableView->horizontalHeader()->setMinimumSectionSize( 100 );
+  mlTableView->horizontalHeader()->setSectionResizeMode( 1 , QHeaderView::Stretch );
+
+  mlTableView->horizontalHeader()->setFixedHeight( 24 );
+}
 
