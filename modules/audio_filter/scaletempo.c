@@ -475,7 +475,6 @@ static filter_t *ResamplerCreate(filter_t *p_filter)
         return NULL;
 
     filter_sys_t *p_sys = p_filter->p_sys;
-    p_resampler->owner.sys = NULL;
     p_resampler->p_cfg = NULL;
     p_resampler->fmt_in = p_filter->fmt_in;
     p_resampler->fmt_out = p_filter->fmt_in;
