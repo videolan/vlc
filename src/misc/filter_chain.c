@@ -42,12 +42,6 @@ typedef struct chained_filter_t
     picture_t *pending;
 } chained_filter_t;
 
-/* Only use this with filter objects from _this_ C module */
-static inline chained_filter_t *chained(filter_t *filter)
-{
-    return container_of(filter, chained_filter_t, filter);
-}
-
 /* */
 struct filter_chain_t
 {
@@ -102,23 +96,28 @@ filter_chain_t *filter_chain_NewSPU( vlc_object_t *obj, const char *cap )
 /** Chained filter picture allocator function */
 static picture_t *filter_chain_VideoBufferNew( filter_t *filter )
 {
-    if( chained(filter)->next != NULL )
+    picture_t *pic;
+    chained_filter_t *chained = container_of(filter, chained_filter_t, filter);
+    if( chained->next != NULL )
     {
-        picture_t *pic = picture_NewFromFormat( &filter->fmt_out.video );
+        // HACK as intermediate filters may not have the same video format as
+        // the last one handled by the owner
+        pic = picture_NewFromFormat( &filter->fmt_out.video );
         if( pic == NULL )
             msg_Err( filter, "Failed to allocate picture" );
-        return pic;
     }
     else
     {
         filter_chain_t *chain = filter->owner.sys;
 
+        // the owner of the chain requires pictures from the last filter to be grabbed from its callback
         /* XXX ugly */
-        filter->owner.sys = chain->parent_video_owner.sys;
-        picture_t *pic = chain->parent_video_owner.video->buffer_new( filter );
-        filter->owner.sys = chain;
-        return pic;
+        filter_owner_t saved_owner = filter->owner;
+        filter->owner = chain->parent_video_owner;
+        pic = filter_NewPicture( filter );
+        filter->owner = saved_owner;
     }
+    return pic;
 }
 
 static const struct filter_video_callbacks filter_chain_video_cbs =
