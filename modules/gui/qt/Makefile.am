@@ -112,6 +112,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/settings.hpp \
 	gui/qt/components/audio_device_model.cpp  \
 	gui/qt/components/audio_device_model.hpp \
+	gui/qt/components/mediacenter/ml_folders_model.hpp  \
+	gui/qt/components/mediacenter/ml_folders_model.cpp \
 	gui/qt/components/voutwindow/videosurface.cpp \
 	gui/qt/components/voutwindow/videosurface.hpp \
 	gui/qt/components/voutwindow/qvoutwindow.cpp \
@@ -269,6 +271,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/selectable_list_model.moc.cpp \
 	gui/qt/components/settings.moc.cpp \
 	gui/qt/components/audio_device_model.moc.cpp \
+	gui/qt/components/mediacenter/ml_folders_model.moc.cpp \
 	gui/qt/components/voutwindow/videosurface.moc.cpp \
 	gui/qt/components/voutwindow/qvoutwindow.moc.cpp \
 	gui/qt/components/voutwindow/qvoutwindowdummy.moc.cpp \
