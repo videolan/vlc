@@ -22,9 +22,9 @@ dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2 .sum-dvdnav
 	$(call pkg_static,"misc/dvdnav.pc.in")
 	$(MOVE)
 
-DEPS_dvdnav = dvdcss dvdread
+DEPS_dvdnav = dvdread $(DEPS_dvdread)
 
-.dvdnav: dvdnav .dvdcss .dvdread
+.dvdnav: dvdnav
 	$(REQUIRE_GPL)
 	$(RECONF) -I m4
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-examples
