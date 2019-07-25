@@ -23,9 +23,9 @@ dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 	cd $(UNPACK_DIR) && sed -i -e 's,Requires.private,Requires,g' misc/*.pc.in
 	$(MOVE)
 
-DEPS_dvdread = dvdcss
+DEPS_dvdread = dvdcss $(DEPS_dvdcss)
 
-.dvdread: dvdread .dvdcss
+.dvdread: dvdread
 	$(REQUIRE_GPL)
 	$(RECONF) -I m4
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --with-libdvdcss
