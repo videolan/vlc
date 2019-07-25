@@ -1413,8 +1413,9 @@ static int Open( vlc_object_t* obj )
     return VLC_SUCCESS;
 }
 
-static void Close( vlc_medialibrary_module_t* module )
+static void Close( vlc_object_t* obj )
 {
+    vlc_medialibrary_module_t *module = reinterpret_cast<vlc_medialibrary_module_t*>( obj );
     MediaLibrary* p_ml = static_cast<MediaLibrary*>( module->p_sys );
     delete p_ml;
 }
