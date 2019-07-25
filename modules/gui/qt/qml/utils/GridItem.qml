@@ -39,9 +39,11 @@ Rectangle {
 
     property alias sourceSize: cover.sourceSize
     property string infoLeft: ""
+    property string resolution: ""
     property bool isVideo: false
     property bool isNew: false
     property double progress: 0.5
+    property string channel: ""
 
     signal playClicked
     signal addToPlaylistClicked
@@ -249,6 +251,56 @@ Rectangle {
                                 //                                    color: VLCStyle.colors.text
                                 //                                }
 
+                            }
+                        }
+
+                    Label {
+                        id: resolutionLabel
+                        visible: root.isVideo
+                        anchors {
+                            top:cover.top
+                            left:cover.left
+                            topMargin: VLCStyle.margin_xxsmall
+                            leftMargin: VLCStyle.margin_xxsmall
+                        }
+                        text: root.resolution
+                        color: "white"
+                        bottomPadding: VLCStyle.margin_xxxsmall
+                        topPadding: VLCStyle.margin_xxxsmall
+                        leftPadding: VLCStyle.margin_xxxsmall
+                        rightPadding: VLCStyle.margin_xxxsmall
+                        font.pixelSize: VLCStyle.fontSize_normal
+                        background: Rectangle {
+                            id: resolutionLabelRect
+                            anchors.fill: resolutionLabel
+                            color: "black"
+                            opacity: 0.5
+                            radius: 3
+                        }
+
+                    }
+                    Label {
+                        id: audioChannelLabel
+                        anchors {
+                            top:cover.top
+                            left:resolutionLabel.right
+                            topMargin: VLCStyle.margin_xxsmall
+                            leftMargin: VLCStyle.margin_xxxsmall
+                        }
+                        visible: channel.length > 0
+                        text: root.channel
+                        color: "limegreen"
+                        bottomPadding: VLCStyle.margin_xxxsmall
+                        topPadding: VLCStyle.margin_xxxsmall
+                        leftPadding: VLCStyle.margin_xxxsmall
+                        rightPadding: VLCStyle.margin_xxxsmall
+                        font.pixelSize: VLCStyle.fontSize_normal
+                        background: Rectangle {
+                            id: audioChannelLabelRect
+                            anchors.fill: audioChannelLabel
+                            color: "black"
+                            opacity: 0.5
+                            radius: 3
                             }
                         }
                         states: [
