@@ -22,6 +22,7 @@ import QtQml.Models 2.2
 import org.videolan.medialib 0.1
 
 import "qrc:///utils/" as Utils
+import "qrc:///dialogs/" as DG
 import "qrc:///style/"
 
 Utils.NavigableFocusScope {
@@ -29,6 +30,58 @@ Utils.NavigableFocusScope {
 
     property alias model: delegateModel.model
 
+    DG.ModalDialog {
+        id: deleteDialog
+        rootWindow: root
+        title: qsTr("Are you sure you want to delete?")
+        standardButtons: Dialog.Yes | Dialog.No
+
+        onAccepted: console.log("Ok clicked")
+        onRejected: console.log("Cancel clicked")
+    }
+
+    Utils.MenuExt {
+           id: contextMenu
+           property var model: ({})
+           closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
+
+           Utils.MenuItemExt {
+               id: playMenuItem
+               text: "Play from start"
+               onTriggered: medialib.addAndPlay( contextMenu.model.id )
+           }
+           Utils.MenuItemExt {
+               text: "Play all"
+               onTriggered: console.log("not implemented")
+           }
+           Utils.MenuItemExt {
+               text: "Play as audio"
+               onTriggered: console.log("not implemented")
+           }
+           Utils.MenuItemExt {
+               text: "Enqueue"
+               onTriggered: medialib.addToPlaylist( contextMenu.model.id )
+           }
+           Utils.MenuItemExt {
+               text: "Information"
+               onTriggered: console.log("not implemented")
+           }
+           Utils.MenuItemExt {
+               text: "Download subtitles"
+               onTriggered: console.log("not implemented")
+           }
+           Utils.MenuItemExt {
+               text: "Add to playlist"
+               onTriggered: console.log("not implemented")
+           }
+           Utils.MenuItemExt {
+               text: "Delete"
+               onTriggered: deleteDialog.open()
+           }
+
+           onClosed: contextMenu.parent.forceActiveFocus()
+
+       }
     Utils.SelectableDelegateModel {
         id: delegateModel
         model: MLVideoModel {
@@ -50,14 +103,24 @@ Utils.NavigableFocusScope {
                 progress: Math.max(model.saved_position,0)
 
                 onItemClicked : {
-                    delegateModel.updateSelection( modifier , view.currentItem.currentIndex, index)
-                    view.currentItem.currentIndex = index
-                    view.currentItem.forceActiveFocus()
+                    if (key == Qt.RightButton){
+                        contextMenu.model = model
+                        contextMenu.popup()
+                    }
+                    else {
+                        delegateModel.updateSelection( modifier , view.currentItem.currentIndex, index)
+                        view.currentItem.currentIndex = index
+                        view.currentItem.forceActiveFocus()
+                    }
                 }
                 onPlayClicked: medialib.addAndPlay( model.id )
                 onAddToPlaylistClicked : medialib.addToPlaylist( model.id )
-            }
+                onContextMenuButtonClicked:{
+                    contextMenu.model = model;
+                    contextMenu.popup(menuParent,contextMenu.width,0,playMenuItem)
+                }
 
+         }
             Utils.ListItem {
                 Package.name: "list"
                 width: root.width
@@ -107,7 +170,6 @@ Utils.NavigableFocusScope {
 
     Component {
         id: gridComponent
-
         Utils.KeyNavigableGridView {
             id: gridView_id
 
@@ -194,27 +256,24 @@ Utils.NavigableFocusScope {
         }
     }
 
-    Utils.StackViewExt {
-        id: view
+        Utils.StackViewExt {
+            id: view
 
-        anchors.fill: parent
-        anchors.margins: VLCStyle.margin_normal
+            anchors.fill: root
 
-        focus: true
-
-        initialItem: medialib.gridView ? gridComponent : listComponent
-
-        Connections {
-            target: medialib
-            onGridViewChanged: {
-                if (medialib.gridView)
-                    view.replace(gridComponent)
-                else
-                    view.replace(listComponent)
+            focus: true
+            initialItem: medialib.gridView ? gridComponent : listComponent
+            Connections {
+                target: medialib
+                onGridViewChanged: {
+                    if (medialib.gridView)
+                        view.replace(gridComponent)
+                    else
+                        view.replace(listComponent)
+                }
             }
-        }
-    }
 
+    }
     Label {
         anchors.centerIn: parent
         visible: delegateModel.items.count === 0

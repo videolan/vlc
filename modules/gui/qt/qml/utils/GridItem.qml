@@ -45,9 +45,11 @@ Rectangle {
 
     signal playClicked
     signal addToPlaylistClicked
-    signal itemClicked(int keys, int modifier)
+    signal itemClicked(int key, int modifier)
     signal itemDoubleClicked(int keys, int modifier)
+    signal contextMenuButtonClicked(Item menuParent)
 
+    
     Rectangle {
         id: gridItem
         x: shiftX
@@ -58,12 +60,12 @@ Rectangle {
         MouseArea {
             id: mouseArea
             hoverEnabled: true
-            onClicked:  {
-                root.itemClicked(mouse.buttons, mouse.modifiers)
-            }
+            onClicked: root.itemClicked(mouse.button, mouse.modifiers)
             onDoubleClicked: root.itemDoubleClicked(mouse.buttons, mouse.modifiers);
             width: childrenRect.width
             height: childrenRect.height
+            acceptedButtons: Qt.RightButton | Qt.LeftButton
+            Keys.onMenuPressed: root.contextMenuButtonClicked(cover_bg)
 
                 Item {
                     id: picture
@@ -157,7 +159,6 @@ Rectangle {
                                     }
                                 }
                             }
-
                         ProgressBar {
                             id: progressBar
                             value: root.progress
@@ -180,6 +181,39 @@ Rectangle {
                             }
                         }
 
+                        }
+                        Button {
+                            id: contextButton
+                            visible: isVideo
+                            anchors {
+                                top:cover.top
+                                right:cover.right
+                            }
+                            width: VLCStyle.icon_normal
+                            height: VLCStyle.icon_normal
+                            text: "\u22ef" //ellipsis icon
+                            font.pointSize: VLCStyle.fontMetrics_normal
+
+                            hoverEnabled: true
+                            onClicked: root.contextMenuButtonClicked(cover_bg)
+                            background: Rectangle {
+                                id: contextButtonRect
+                                anchors.fill: contextButton
+                                color: "transparent"
+                            }
+                            contentItem: Text {
+                                id: btnTxt
+                                text: contextButton.text
+                                font: contextButton.font
+                            color: "white"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                //                                layer.enabled: true
+                                //                                layer.effect: DropShadow {
+                                //                                    color: VLCStyle.colors.text
+                                //                                }
+
+                            }
                         }
                         states: [
                             State {
