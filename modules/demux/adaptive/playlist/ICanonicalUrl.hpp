@@ -30,6 +30,7 @@ namespace adaptive
         {
             public:
                 ICanonicalUrl( const ICanonicalUrl *parent = NULL ) { setParent(parent); }
+                virtual ~ICanonicalUrl() = default;
                 virtual Url getUrlSegment() const = 0;
                 void setParent( const ICanonicalUrl *parent ) { parentUrlMember = parent; }
 
