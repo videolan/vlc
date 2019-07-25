@@ -130,18 +130,19 @@ static int RestartFilterCallback( vlc_object_t *obj, char const *psz_name,
 /*****************************************************************************
  * Buffer management
  *****************************************************************************/
-static picture_t *BufferNew( filter_t *p_filter )
+static picture_t *BufferChainNew( filter_t *p_filter )
 {
-    filter_t *p_parent = p_filter->owner.sys;
-
-    return filter_NewPicture( p_parent );
+    filter_t *p_chain_parent = p_filter->owner.sys;
+    // the last filter of the internal chain gets its pictures from the original
+    // filter source
+    return filter_NewPicture( p_chain_parent );
 }
 
 #define CHAIN_LEVEL_MAX 2
 
 static const struct filter_video_callbacks filter_video_chain_cbs =
 {
-    .buffer_new = BufferNew,
+    BufferChainNew,
 };
 
 /*****************************************************************************

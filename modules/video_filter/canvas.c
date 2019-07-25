@@ -131,14 +131,17 @@ typedef struct
     filter_chain_t *p_chain;
 } filter_sys_t;
 
-static picture_t *video_new( filter_t *p_filter )
+static picture_t *video_chain_new( filter_t *p_filter )
 {
-    return filter_NewPicture( p_filter->owner.sys );
+    filter_t *p_chain_parent = p_filter->owner.sys;
+    // the last filter of the internal chain gets its pictures from the original
+    // filter source
+    return filter_NewPicture( p_chain_parent );
 }
 
 static const struct filter_video_callbacks canvas_cbs =
 {
-    .buffer_new = video_new,
+    video_chain_new,
 };
 
 /*****************************************************************************
