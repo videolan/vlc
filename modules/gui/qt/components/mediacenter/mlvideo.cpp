@@ -30,6 +30,7 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
     , m_thumbnail( QString::fromUtf8( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
     , m_playCount( data->i_playcount )
     , m_thumbnailGenerated( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].b_generated )
+    , m_position( 0.f )
     , m_ml_event_handle( nullptr, [this](vlc_ml_event_callback_t* cb ) {
         assert( m_ml != nullptr );
         vlc_ml_event_unregister_callback( m_ml, cb );
@@ -64,8 +65,49 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
     {
         m_progress = atoi( psz_progress );
         free( psz_progress );
+
+        if( data->i_duration )
+            m_position = m_progress / (float)data->i_duration;
     }
-}
+
+    unsigned int numChannel = 0 , maxWidth = 0 , maxHeight = 0;
+    for( const vlc_ml_media_track_t& track: ml_range_iterate<vlc_ml_media_track_t>( data->p_tracks ) ) {
+        if ( track.i_type == VLC_ML_TRACK_TYPE_AUDIO ) {
+            numChannel = std::max( numChannel , track.a.i_nbChannels );
+
+            audioDesc += qtr( "\n\tCodec: %1\n\tLanguage: %2\n\tChannels: %3\n\tSample Rate: %4" )
+                    .arg( QString::fromUtf8( track.psz_codec ))
+                    .arg( QString::fromUtf8( track.psz_language  ) )
+                    .arg( QString::number( track.a.i_nbChannels) )
+                    .arg( QString::number( track.a.i_sampleRate ) );
+        }
+        else if ( track.i_type == VLC_ML_TRACK_TYPE_VIDEO ){
+            maxWidth = std::max( maxWidth, track.v.i_width );
+            maxHeight = std::max( maxHeight, track.v.i_height );
+
+            videoDesc += qtr( "\n\tCodec: %1\n\tLanguage: %2\n\tFPS: %3" )
+                    .arg( QString::fromUtf8( track.psz_codec ) )
+                    .arg( QString::fromUtf8( track.psz_language ) )
+                    .arg( QString::number( track.v.i_fpsNum ) );
+        }
+    }
+
+    m_channel = "";
+    if ( numChannel >= 8 )
+        m_channel = "7.1";
+    else if ( numChannel >= 6 )
+        m_channel = "5.1";
+
+    m_resolution = "SD";
+    if ( maxWidth >= 7680 && maxHeight >= 4320 )
+        m_resolution = "8K";
+    else if ( maxWidth >= 3840 && maxHeight >= 2160 )
+        m_resolution = "4K";
+    else if ( maxWidth >= 1440 && maxHeight >= 1080 )
+        m_resolution = "HD";
+    else if ( maxWidth >= 720 && maxHeight >= 1280 )
+        m_resolution = "720p";  
+    }
 
 MLVideo::MLVideo(const MLVideo& video, QObject* parent)
     : QObject( parent )
@@ -134,6 +176,14 @@ QString MLVideo::getMRL() const
 {
     return m_mrl;
 }
+QString MLVideo::getResolutionName() const
+{
+    return m_resolution;
+}
+QString MLVideo::getChannel() const
+{
+    return m_channel;
+}
 
 unsigned int MLVideo::getProgress() const
 {
@@ -143,6 +193,20 @@ unsigned int MLVideo::getProgress() const
 unsigned int MLVideo::getPlayCount() const
 {
     return m_playCount;
+}
+float MLVideo::getSavedPosition() const
+{
+    return m_position;
+}
+
+QString MLVideo::getVideoDesc() const
+{
+    return videoDesc;
+}
+
+QString MLVideo::getAudioDesc() const
+{
+    return audioDesc;
 }
 
 MLVideo*MLVideo::clone(QObject* parent) const
