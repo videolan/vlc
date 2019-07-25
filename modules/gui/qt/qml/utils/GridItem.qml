@@ -41,6 +41,7 @@ Rectangle {
     property string infoLeft: ""
     property bool isVideo: false
     property bool isNew: false
+    property double progress: 0.5
 
     signal playClicked
     signal addToPlaylistClicked
@@ -156,27 +157,51 @@ Rectangle {
                                     }
                                 }
                             }
-                            states: [
-                                State {
-                                    name: "visible"
-                                    PropertyChanges { target: overlay; visible: true }
-                                    when: mouseArea.containsMouse
-                                },
-                                State {
-                                    name: "hidden"
-                                    PropertyChanges { target: overlay; visible: false }
-                                    when: !mouseArea.containsMouse
+
+                        ProgressBar {
+                            id: progressBar
+                            value: root.progress
+                            visible: isVideo
+                            anchors{
+                                bottom: parent.bottom
+                                left: parent.left
+                                right: parent.right
+                            }
+                            background: Rectangle {
+                                implicitHeight: 2 * VLCStyle.scale
+                                color: VLCStyle.colors.text
+                            }
+                            contentItem: Item {
+                                Rectangle {
+                                    width: progressBar.visualPosition * parent.width
+                                    height: parent.height
+                                    color: VLCStyle.colors.accent
                                 }
-                            ]
-                            transitions: [
-                                Transition {
-                                    from: "hidden";  to: "visible"
-                                    NumberAnimation  {
-                                        target: overlay
-                                        properties: "opacity"
-                                        from: 0; to: 0.8; duration: 300
-                                    }
+                            }
+                        }
+
+                        }
+                        states: [
+                            State {
+                                name: "visible"
+                                PropertyChanges { target: overlay; visible: true }
+                                when: mouseArea.containsMouse
+                            },
+                            State {
+                                name: "hidden"
+                                PropertyChanges { target: overlay; visible: false }
+                                when: !mouseArea.containsMouse
+                            }
+                        ]
+                        transitions: [
+                            Transition {
+                                from: "hidden";  to: "visible"
+                                NumberAnimation  {
+                                    target: overlay
+                                    properties: "opacity"
+                                    from: 0; to: 0.8; duration: 300
                                 }
+                             }
                             ]
                         }
 
@@ -235,4 +260,4 @@ Rectangle {
         }
     }
 }
-}
+
