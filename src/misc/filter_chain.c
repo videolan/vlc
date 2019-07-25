@@ -102,7 +102,10 @@ static picture_t *filter_chain_VideoBufferNew( filter_t *filter )
     {
         // HACK as intermediate filters may not have the same video format as
         // the last one handled by the owner
-        pic = picture_NewFromFormat( &filter->fmt_out.video );
+        filter_owner_t saved_owner = filter->owner;
+        filter->owner = (filter_owner_t) {};
+        pic = filter_NewPicture( filter );
+        filter->owner = saved_owner;
         if( pic == NULL )
             msg_Err( filter, "Failed to allocate picture" );
     }
