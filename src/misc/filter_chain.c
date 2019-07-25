@@ -51,7 +51,7 @@ static inline chained_filter_t *chained(filter_t *filter)
 /* */
 struct filter_chain_t
 {
-    filter_owner_t callbacks; /**< Inner callbacks */
+    vlc_object_t *obj;
     filter_owner_t owner; /**< Owner (downstream) callbacks */
 
     chained_filter_t *first, *last; /**< List of filters */
@@ -68,18 +68,18 @@ struct filter_chain_t
  */
 static void FilterDeletePictures( picture_t * );
 
-static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
+static filter_chain_t *filter_chain_NewInner( vlc_object_t *obj,
     const char *cap, const char *conv_cap, bool fmt_out_change,
     const filter_owner_t *owner, enum es_format_category_e cat )
 {
-    assert( callbacks != NULL && callbacks->sys != NULL );
+    assert( obj != NULL );
     assert( cap != NULL );
 
     filter_chain_t *chain = malloc( sizeof (*chain) );
     if( unlikely(chain == NULL) )
         return NULL;
 
-    chain->callbacks = *callbacks;
+    chain->obj = obj;
     if( owner != NULL )
         chain->owner = *owner;
     else
@@ -100,11 +100,7 @@ static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
  */
 filter_chain_t *filter_chain_NewSPU( vlc_object_t *obj, const char *cap )
 {
-    filter_owner_t callbacks = {
-        .sys = obj,
-    };
-
-    return filter_chain_NewInner( &callbacks, cap, NULL, false, NULL, SPU_ES );
+    return filter_chain_NewInner( obj, cap, NULL, false, NULL, SPU_ES );
 }
 
 /** Chained filter picture allocator function */
@@ -138,11 +134,7 @@ static const struct filter_video_callbacks filter_chain_video_cbs =
 filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
                                        const filter_owner_t *restrict owner )
 {
-    filter_owner_t callbacks = {
-        .sys = obj,
-    };
-
-    return filter_chain_NewInner( &callbacks, "video filter",
+    return filter_chain_NewInner( obj, "video filter",
                                   "video converter", allow_change, owner, VIDEO_ES );
 }
 
@@ -184,9 +176,8 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     const char *name, const char *capability, config_chain_t *cfg,
     const es_format_t *fmt_in, const es_format_t *fmt_out )
 {
-    vlc_object_t *parent = chain->callbacks.sys;
     chained_filter_t *chained =
-        vlc_custom_create( parent, sizeof(*chained), "filter" );
+        vlc_custom_create( chain->obj, sizeof(*chained), "filter" );
     if( unlikely(chained == NULL) )
         return NULL;
 
@@ -256,16 +247,16 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     chained->mouse = mouse;
     chained->pending = NULL;
 
-    msg_Dbg( parent, "Filter '%s' (%p) appended to chain",
+    msg_Dbg( chain->obj, "Filter '%s' (%p) appended to chain",
              (name != NULL) ? name : module_get_name(filter->p_module, false),
              (void *)filter );
     return filter;
 
 error:
     if( name != NULL )
-        msg_Err( parent, "Failed to create %s '%s'", capability, name );
+        msg_Err( chain->obj, "Failed to create %s '%s'", capability, name );
     else
-        msg_Err( parent, "Failed to create %s", capability );
+        msg_Err( chain->obj, "Failed to create %s", capability );
     es_format_Clean( &filter->fmt_out );
     es_format_Clean( &filter->fmt_in );
     vlc_object_delete(filter);
@@ -289,7 +280,6 @@ int filter_chain_AppendConverter( filter_chain_t *chain,
 
 void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
 {
-    vlc_object_t *obj = chain->callbacks.sys;
     chained_filter_t *chained = (chained_filter_t *)filter;
 
     /* Remove it from the chain */
@@ -311,7 +301,7 @@ void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
 
     module_unneed( filter, filter->p_module );
 
-    msg_Dbg( obj, "Filter %p removed from chain", (void *)filter );
+    msg_Dbg( chain->obj, "Filter %p removed from chain", (void *)filter );
     FilterDeletePictures( chained->pending );
 
     free( chained->mouse );
@@ -325,7 +315,6 @@ void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
 
 int filter_chain_AppendFromString( filter_chain_t *chain, const char *str )
 {
-    vlc_object_t *obj = chain->callbacks.sys;
     char *buf = NULL;
     int ret = 0;
 
@@ -347,7 +336,7 @@ int filter_chain_AppendFromString( filter_chain_t *chain, const char *str )
 
         if( filter == NULL )
         {
-            msg_Err( obj, "Failed to append '%s' to chain", name );
+            msg_Err( chain->obj, "Failed to append '%s' to chain", name );
             free( name );
             goto error;
         }
