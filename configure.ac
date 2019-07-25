@@ -4443,7 +4443,7 @@ AS_VAR_IF(with_libfuzzer, no, [], [
     AS_IF([test "${with_libfuzzer}" != "yes"], [
       LIBS="$LIBS -L${with_libfuzzer}"
     ])
-    LIBS="$LIBS -lfuzzer"
+    LIBS="$LIBS -lFuzzer"
     AX_CHECK_COMPILE_FLAG(-fsanitize-coverage=trace-pc-guard, [
         AX_APPEND_FLAG([-fsanitize-coverage=trace-pc-guard])
         AX_APPEND_FLAG([-fsanitize-coverage=trace-pc-guard], [CXXFLAGS])
