@@ -139,7 +139,6 @@ filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
                                        const filter_owner_t *restrict owner )
 {
     filter_owner_t callbacks = {
-        .video = &filter_chain_video_cbs,
         .sys = obj,
     };
 
@@ -210,8 +209,13 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     filter->p_cfg = cfg;
     filter->psz_name = name;
 
-    filter->owner = chain->callbacks;
-    filter->owner.sys = chain;
+    if (fmt_in->i_cat == VIDEO_ES)
+    {
+        filter->owner.video = &filter_chain_video_cbs;
+        filter->owner.sys = chain;
+    }
+    else
+        filter->owner.sub = NULL;
 
     assert( capability != NULL );
     if( name != NULL && filter->b_allow_fmt_out_change )
