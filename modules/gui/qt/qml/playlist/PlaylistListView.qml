@@ -73,6 +73,18 @@ Utils.NavigableFocusScope {
         property int shiftIndex: -1
         property string mode: "normal"
 
+        Connections {
+            target: root.plmodel
+            onRowsInserted: {
+                if (view.currentIndex == -1)
+                    view.currentIndex = 0
+            }
+            onModelReset: {
+                if (view.currentIndex == -1 &&  root.plmodel.count > 0)
+                    view.currentIndex = 0
+            }
+        }
+
         footer: PLItemFooter {}
 
         delegate: PLItem {
