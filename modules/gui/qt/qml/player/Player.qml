@@ -30,6 +30,8 @@ import "qrc:///menus/" as Menus
 Utils.NavigableFocusScope {
     id: rootPlayer
 
+    property alias playlistWidget: playlistpopup
+
     //center image
     Rectangle {
         visible: !rootWindow.hasEmbededVideo
@@ -123,13 +125,11 @@ Utils.NavigableFocusScope {
             right: parent.right
             bottom: controlBarView.top
         }
+
+        property var previousFocus: undefined
         focus: false
         expandHorizontally: true
         state: (rootWindow.playlistDocked && rootWindow.playlistVisible) ? "visible" : "hidden"
-        onVisibleChanged: {
-            if (playlistpopup.visible)
-                playlistpopup.forceActiveFocus()
-        }
         component: Rectangle {
             color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
             width: rootPlayer.width/4
@@ -139,8 +139,8 @@ Utils.NavigableFocusScope {
                 id: playlistView
                 focus: true
                 anchors.fill: parent
-                onActionLeft: playlistpopup.closeAndFocus(controlBarView)
-                onActionCancel: playlistpopup.closeAndFocus(controlBarView)
+                onActionLeft: playlistpopup.closeAndFocus(playlistpopup.previousFocus)
+                onActionCancel: playlistpopup.closeAndFocus(playlistpopup.previousFocus)
             }
         }
         onStateChanged: {
@@ -148,11 +148,17 @@ Utils.NavigableFocusScope {
                 toolbarAutoHide.restart()
         }
 
+        function gainFocus(previous) {
+            console.log("gain Focus")
+            playlistpopup.previousFocus = previous
+            playlistpopup.forceActiveFocus()
+        }
+
+
         function closeAndFocus(item){
+            rootWindow.playlistVisible = false
             if (!item)
                 return
-
-            rootWindow.playlistVisible = false
             item.forceActiveFocus()
         }
     }
