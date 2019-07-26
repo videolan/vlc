@@ -39,6 +39,10 @@
 #include "conn.h"
 #include "message.h"
 
+#if defined(PF_UNIX) && !defined(PF_LOCAL)
+#    define PF_LOCAL PF_UNIX
+#endif
+
 const char vlc_module_name[] = "test_h1conn";
 
 static struct vlc_http_conn *conn;

@@ -38,7 +38,11 @@
 # define SOCK_CLOEXEC 0
 # define accept4(a,b,c,d) accept(a,b,c)
 #endif
-#include <netinet/in.h>
+#ifdef _WIN32
+# include <winsock2.h>
+#else
+# include <netinet/in.h>
+#endif
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
