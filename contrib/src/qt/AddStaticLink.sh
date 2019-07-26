@@ -6,7 +6,7 @@
 #
 # This could also be done in configure.ac to detect what plugins are available and where to add them
 
-PREFIX=$(realpath "$1")
+PREFIX=$(python -c "import os; print(os.path.realpath('$1'))")
 PLUGIN_PATH="$3"
 PLUGIN_NAME="$4"
 
@@ -31,10 +31,10 @@ fi
 LIBS=$(sed -e "/QMAKE_PRL_LIBS/ { \
              s/QMAKE_PRL_LIBS =//; \
              s@$PREFIX/lib@\${libdir}@g; \
-             s@\$\$\[QT_INSTALL_LIBS\]@\${libdir}@g; p \
-         }; d"  $PRL_SOURCE )
+             s@\$\$\[QT_INSTALL_LIBS\]@\${libdir}@g;" -e "p" \
+         -e "};" -e "d"  $PRL_SOURCE )
 
 # prepend the plugin that uses the module
-sed -i -e "s# -l${2}# -l${PLUGIN_NAME} -l${2}#" $PC_DEST
+sed -i.bak -e "s# -l${2}# -l${PLUGIN_NAME} -l${2}#" $PC_DEST
 # add the plugin static dependencies to the ones of the module
-sed -i -e "s#Libs.private: #Libs.private: $LIBS -L\${prefix}/${PLUGIN_PATH} #" $PC_DEST
+sed -i.bak -e "s#Libs.private: #Libs.private: $LIBS -L\${prefix}/${PLUGIN_PATH} #" $PC_DEST
