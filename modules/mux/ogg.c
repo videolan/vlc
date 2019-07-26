@@ -838,7 +838,9 @@ static void OggGetSkeletonFisbone( uint8_t **pp_buffer, long *pi_size,
 
     /* preroll */
     if ( p_input->p_fmt->p_extra )
-        SetDWLE( &(*pp_buffer)[44], xiph_CountHeaders( p_input->p_fmt->p_extra, p_input->p_fmt->i_extra ) );
+        SetDWLE( &(*pp_buffer)[44],
+                xiph_CountUnknownHeaders( p_input->p_fmt->p_extra,
+                                          p_input->p_fmt->i_extra ) );
 
     if ( headers.i_size > 0 )
     {
