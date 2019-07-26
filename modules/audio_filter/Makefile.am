@@ -147,3 +147,11 @@ libspeex_resampler_plugin_la_LIBADD = $(SPEEXDSP_LIBS)
 if HAVE_SPEEXDSP
 audio_filter_LTLIBRARIES += libspeex_resampler_plugin.la
 endif
+
+librnnoise_plugin_la_SOURCES = audio_filter/rnnoise.c
+librnnoise_plugin_la_CFLAGS = $(AM_CFLAGS) $(RNNOISE_CFLAGS)
+librnnoise_plugin_la_LIBADD = $(RNNOISE_LIBS) $(LIBM)
+librnnoise_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(audio_filterdir)'
+
+audio_filter_LTLIBRARIES += $(LTLIBrnnoise)
+EXTRA_LTLIBRARIES += librnnoise_plugin.la

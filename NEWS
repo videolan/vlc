@@ -81,6 +81,9 @@ Video output:
  * Remove Real demuxer plugin
  * Fix washed out black on NVIDIA cards with Direct3D9
 
+Audio filter:
+ * Add RNNoise recurrent neural network denoiser
+
 Video filter:
  * Update yadif
  * Remove remote OSD plugin

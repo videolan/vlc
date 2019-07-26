@@ -3012,6 +3012,11 @@ AS_IF([test "${enable_speex}" != "no"], [
 AM_CONDITIONAL([HAVE_SPEEXDSP], [test "$have_speexdsp" = "yes"])
 
 dnl
+dnl  RNNoise plugin - Recurrent neural network for audio noise reduction
+dnl
+PKG_ENABLE_MODULES_VLC([RNNOISE], [], [rnnoise], [Rnnoise denoiser], [auto])
+
+dnl
 dnl  Opus plugin
 dnl
 PKG_ENABLE_MODULES_VLC([OPUS], [], [ogg opus >= 1.0.3], [Opus support], [auto])

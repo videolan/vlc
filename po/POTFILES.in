@@ -247,6 +247,7 @@ modules/audio_filter/resampler/soxr.c
 modules/audio_filter/resampler/speex.c
 modules/audio_filter/resampler/src.c
 modules/audio_filter/resampler/ugly.c
+modules/audio_filter/rnnoise.c
 modules/audio_filter/scaletempo.c
 modules/audio_filter/spatializer/spatializer.cpp
 modules/audio_filter/stereo_widen.c
