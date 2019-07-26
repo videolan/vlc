@@ -28,7 +28,7 @@ import "qrc:///playlist/" as PL
 import "qrc:///menus/" as Menus
 
 Utils.NavigableFocusScope {
-    id: root
+    id: rootPlayer
 
     //center image
     Rectangle {
@@ -132,7 +132,7 @@ Utils.NavigableFocusScope {
         }
         component: Rectangle {
             color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
-            width: root.width/4
+            width: rootPlayer.width/4
             height: playlistpopup.height
 
             PL.PlaylistListView {
@@ -195,11 +195,11 @@ Utils.NavigableFocusScope {
                             toolbarAutoHide.restart()
                     }
 
-                    onActionUp: root.actionUp(index)
-                    onActionDown: root.actionDown(index)
-                    onActionLeft: root.actionLeft(index)
-                    onActionRight: root.actionRight(index)
-                    onActionCancel: root.actionCancel(index)
+                    onActionUp: rootPlayer.actionUp(index)
+                    onActionDown: rootPlayer.actionDown(index)
+                    onActionLeft: rootPlayer.actionLeft(index)
+                    onActionRight: rootPlayer.actionRight(index)
+                    onActionCancel: rootPlayer.actionCancel(index)
 
                     //unhandled keys are forwarded as hotkeys
                     Keys.onPressed: {
