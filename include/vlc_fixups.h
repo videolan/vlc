@@ -90,6 +90,7 @@ typedef struct
 
 #if !defined (HAVE_ALIGNED_ALLOC) || \
     !defined (HAVE_MEMRCHR) || \
+    !defined (HAVE_POSIX_MEMALIGN) || \
     !defined (HAVE_QSORT_R) || \
     !defined (HAVE_STRLCPY) || \
     !defined (HAVE_STRNDUP) || \
@@ -297,6 +298,10 @@ static inline char *getenv (const char *name)
 #ifndef HAVE_SETENV
 int setenv (const char *, const char *, int);
 int unsetenv (const char *);
+#endif
+
+#ifndef HAVE_POSIX_MEMALIGN
+int posix_memalign(void **, size_t, size_t);
 #endif
 
 #ifndef HAVE_ALIGNED_ALLOC
