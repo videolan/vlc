@@ -220,7 +220,7 @@ Utils.NavigableFocusScope {
                     EventFilter {
                         id: filter
                         source: rootQMLView
-                        filterEnabled: controlBarView.state === "visible"
+                        filterEnabled: controlBarView.state === "visible" && !controlBarView.noAutoHide
                         Keys.onPressed: toolbarAutoHide.setVisible(5000)
                     }
                 }
