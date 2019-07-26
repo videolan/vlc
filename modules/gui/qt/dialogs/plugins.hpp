@@ -141,7 +141,7 @@ private slots:
 private:
     AddonsTab( intf_thread_t *p_intf );
     virtual ~AddonsTab();
-    bool eventFilter ( QObject * watched, QEvent * event );
+    bool eventFilter ( QObject * watched, QEvent * event ) override;
 
     enum
     {

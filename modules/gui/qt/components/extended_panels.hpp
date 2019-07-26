@@ -165,7 +165,7 @@ protected:
     float initialValue() Q_DECL_OVERRIDE;
     int index;
     QStringList getBandsFromAout() const;
-    void writeToConfig();
+    void writeToConfig() override;
 
 public slots:
     void onValueChanged( int i ) Q_DECL_OVERRIDE;

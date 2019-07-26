@@ -44,7 +44,7 @@ public:
 
     VideoSurfaceProvider* getVideoSurfaceProvider() override;
 
-    bool setupVoutWindow(vout_window_t* voutWindow);
+    bool setupVoutWindow(vout_window_t* voutWindow) override;
 
 private:
     VideoSurfaceProviderDummy* m_surfaceProvider = nullptr;
