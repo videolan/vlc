@@ -3,8 +3,6 @@ libcompat_la_SOURCES = dummy.c
 libcompat_la_LIBADD = $(LTLIBOBJS) $(LIBRT) $(LIBM)
 libcompat_la_LDFLAGS = -no-undefined -static
 
-BUILT_SOURCES = dummy.c
-CLEANFILES = dummy.c
 AUTOMAKE_OPTIONS = subdir-objects
 
 dummy.c:
