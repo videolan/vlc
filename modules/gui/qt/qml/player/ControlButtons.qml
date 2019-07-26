@@ -163,7 +163,12 @@ Item{
             objectName: "IconToolButton"
             size: VLCStyle.icon_medium
             text: VLCIcons.playlist
-            onClicked: rootWindow.playlistVisible = !rootWindow.playlistVisible
+            onClicked: {
+                rootWindow.playlistVisible = !rootWindow.playlistVisible
+                if (rootWindow.playlistVisible && rootWindow.playlistDocked) {
+                    playlistWidget.gainFocus(playlistBtn)
+                }
+            }
             property bool acceptFocus: true
         }
 
