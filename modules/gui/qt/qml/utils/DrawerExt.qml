@@ -87,4 +87,21 @@ NavigableFocusScope {
             default: return 0
             }
     }
+
+    transitions: [
+        Transition {
+            to: "hidden"
+            SequentialAnimation {
+                NumberAnimation { target: container; property: toChange; duration: 200}
+                PropertyAction{ target: container; property: "visible" }
+            }
+        },
+        Transition {
+            to: "visible"
+            SequentialAnimation {
+                PropertyAction{ target: container; property: "visible" }
+                NumberAnimation { target: container; property: toChange; duration: 200 }
+            }
+        }
+    ]
 }
