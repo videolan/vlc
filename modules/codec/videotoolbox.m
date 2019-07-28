@@ -1269,8 +1269,6 @@ static int StartVideoToolbox(decoder_t *p_dec)
     if (HandleVTStatus(p_dec, status, NULL) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
-    PtsInit(p_dec);
-
     return VLC_SUCCESS;
 }
 
@@ -1443,11 +1441,14 @@ static int OpenDecoder(vlc_object_t *p_this)
     }
 
     int i_ret = StartVideoToolbox(p_dec);
-    if (i_ret == VLC_SUCCESS)
+    if (i_ret == VLC_SUCCESS) {
+        PtsInit(p_dec);
         msg_Info(p_dec, "Using Video Toolbox to decode '%4.4s'",
                         (char *)&p_dec->fmt_in.i_codec);
-    else
+    } else {
         CloseDecoder(p_this);
+    }
+
     return i_ret;
 }
 
