@@ -36,7 +36,7 @@ Item {
             bottom: parent.bottom
             horizontalCenter: parent.horizontalCenter
         }
-        expandHorizontally: false
+        edge: Utils.DrawerExt.Edges.Bottom
         width: parent.width * 0.8
         z: 10
 

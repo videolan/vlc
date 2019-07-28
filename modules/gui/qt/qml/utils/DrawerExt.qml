@@ -23,17 +23,26 @@ NavigableFocusScope {
 
     property Component component: undefined
 
-    //readonly property int horizontal: 0
-    //readonly property int vertical: 1
+    enum Edges {
+        Top,
+        Bottom,
+        Left,
+        Right
+    }
 
-    property bool expandHorizontally: true
-    width:  (root.expandHorizontally) ? root._size : undefined
-    height: (!root.expandHorizontally) ? root._size : undefined
-    property int _size: 0
+    property int edge: DrawerExt.Edges.Bottom
+    property bool expandHorizontally: edge === DrawerExt.Edges.Left || edge === DrawerExt.Edges.Right
 
     property alias contentItem: content.item
 
+    width:  (root.expandHorizontally) ? root._size : undefined
+    height: (!root.expandHorizontally) ? root._size : undefined
+
+    property int _size: (root.expandHorizontally) ?  content.item.width : content.item.height
+    property string toChange: expandHorizontally ? "contentX" : "contentY"
+
     Flickable {
+        id: container
         anchors.fill: parent
         Loader {
             focus: true
@@ -47,34 +56,35 @@ NavigableFocusScope {
         State {
             name: "visible"
             PropertyChanges {
-                target: root
-                _size: (root.expandHorizontally) ?  content.item.width : content.item.height
+                target: container
+                contentY: 0
+                contentX: 0
                 visible: true
             }
         },
         State {
             name: "hidden"
             PropertyChanges {
-                target: root
-                _size: 0
-                visible: false
+                target: container
+                contentY: edgeToOffset(edge)
+                contentX: edgeToOffset(edge)
+                visible:false
             }
         }
     ]
-    transitions: [
-        Transition {
-            to: "hidden"
-            SequentialAnimation {
-                NumberAnimation { target: root; property: "_size"; duration: 200 }
-                PropertyAction{ target: root; property: "visible" }
+
+    function edgeToOffset(edge){
+        if(expandHorizontally)
+            switch(edge){
+            case DrawerExt.Edges.Left: return _size
+            case DrawerExt.Edges.Right: return -_size
+            default: return 0
             }
-        },
-        Transition {
-            to: "visible"
-            SequentialAnimation {
-                PropertyAction{ target: root; property: "visible" }
-                NumberAnimation { target: root; property: "_size"; duration: 200 }
+        else
+            switch(edge){
+            case DrawerExt.Edges.Top: return _size
+            case DrawerExt.Edges.Bottom: return -_size
+            default: return 0
             }
-        }
-    ]
+    }
 }

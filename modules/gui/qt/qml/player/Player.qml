@@ -128,7 +128,7 @@ Utils.NavigableFocusScope {
 
         property var previousFocus: undefined
         focus: false
-        expandHorizontally: true
+        edge: Utils.DrawerExt.Edges.Right
         state: (rootWindow.playlistDocked && rootWindow.playlistVisible) ? "visible" : "hidden"
         component: Rectangle {
             color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
@@ -175,7 +175,7 @@ Utils.NavigableFocusScope {
         property var  noAutoHide: controlBarView.contentItem.noAutoHide
 
         state: "visible"
-        expandHorizontally: false
+        edge: Utils.DrawerExt.Edges.Bottom
 
         component: Rectangle {
             id: controllerBarId

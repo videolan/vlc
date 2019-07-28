@@ -208,7 +208,7 @@ Utils.NavigableFocusScope {
                                 bottom: parent.bottom
                             }
                             focus: false
-                            expandHorizontally: true
+                            edge: Utils.DrawerExt.Edges.Top
 
                             property var previousFocus: undefined
 
