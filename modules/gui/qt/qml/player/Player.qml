@@ -118,10 +118,47 @@ Utils.NavigableFocusScope {
         }
     }
 
+    Utils.DrawerExt{
+        id: topcontrolView
+        anchors{
+            left: parent.left
+            right: parent.right
+            top: parent.top
+        }
+        edge: Utils.DrawerExt.Edges.Top
+        property var noAutoHide: topcontrolView.contentItem.noAutoHide
+
+        state: "visible"
+
+        component: TopBar{
+            focus: true
+            width: topcontrolView.width
+            noAutoHide: noAutoHideInt ||  playlistpopup.state === "visible"
+            onNoAutoHideChanged: {
+                if (!noAutoHide)
+                    toolbarAutoHide.restart()
+            }
+
+            onActionDown: controlBarView.forceActiveFocus()
+            onActionUp: root.actionUp(index)
+            onActionLeft: root.actionLeft(index)
+            onActionRight: root.actionRight(index)
+            onActionCancel: root.actionCancel(index)
+
+            Keys.onPressed: {
+                if (event.key === Qt.Key_Menu) {
+                    toolbarAutoHide.toggleForceVisible()
+                } else {
+                    rootWindow.sendHotkey(event.key);
+                }
+            }
+        }
+    }
+
     Utils.DrawerExt {
         id: playlistpopup
         anchors {
-            top: parent.top
+            top: topcontrolView.bottom
             right: parent.right
             bottom: controlBarView.top
         }
@@ -163,7 +200,6 @@ Utils.NavigableFocusScope {
         }
     }
 
-
     Utils.DrawerExt {
         id: controlBarView
         focus: true
@@ -184,7 +220,6 @@ Utils.NavigableFocusScope {
             height: 90 * VLCStyle.scale
             property alias noAutoHide: controllerId.noAutoHide
 
-
             MouseArea {
                 id: controllerMouseArea
                 hoverEnabled: true
@@ -201,7 +236,7 @@ Utils.NavigableFocusScope {
                             toolbarAutoHide.restart()
                     }
 
-                    onActionUp: rootPlayer.actionUp(index)
+                    onActionUp: topcontrolView.forceActiveFocus()
                     onActionDown: rootPlayer.actionDown(index)
                     onActionLeft: rootPlayer.actionLeft(index)
                     onActionRight: rootPlayer.actionRight(index)
@@ -214,15 +249,6 @@ Utils.NavigableFocusScope {
                         else
                             rootWindow.sendHotkey(event.key);
                     }
-
-                    //filter global events to keep toolbar
-                    //visible when user navigates within the control bar
-                    EventFilter {
-                        id: filter
-                        source: rootQMLView
-                        filterEnabled: controlBarView.state === "visible" && !controlBarView.noAutoHide
-                        Keys.onPressed: toolbarAutoHide.setVisible(5000)
-                    }
                 }
             }
         }
@@ -234,36 +260,51 @@ Utils.NavigableFocusScope {
         repeat: false
         interval: 3000
         onTriggered: {
-            _setVisible(false)
+            _setVisibleControlBar(false)
         }
 
-        function _setVisible(visible) {
+        function _setVisibleControlBar(visible) {
             if (visible)
             {
                 controlBarView.state = "visible"
-                controlBarView.forceActiveFocus()
+                topcontrolView.state = "visible"
+                if (!controlBarView.focus && !topcontrolView.focus)
+                    controlBarView.forceActiveFocus()
+
                 videoSurface.cursorShape = Qt.ArrowCursor
             }
             else
             {
-                if (controlBarView.noAutoHide)
+                if (controlBarView.noAutoHide || topcontrolView.noAutoHide)
                     return;
                 controlBarView.state = "hidden"
+                topcontrolView.state = "hidden"
                 videoSurface.forceActiveFocus()
                 videoSurface.cursorShape = Qt.BlankCursor
             }
         }
 
         function setVisible(duration) {
-            _setVisible(true)
+            _setVisibleControlBar(true)
             toolbarAutoHide.interval = duration
             toolbarAutoHide.restart()
         }
 
         function toggleForceVisible() {
-            _setVisible(controlBarView.state !== "visible")
+            _setVisibleControlBar(controlBarView.state !== "visible")
             toolbarAutoHide.stop()
         }
+
+    }
+
+    //filter global events to keep toolbar
+    //visible when user navigates within the control bar
+    EventFilter {
+        id: filter
+        source: rootQMLView
+        filterEnabled: controlBarView.state === "visible"
+            && (controlBarView.focus || topcontrolView.focus)
+        Keys.onPressed: toolbarAutoHide.setVisible(5000)
     }
 
     Connections {
