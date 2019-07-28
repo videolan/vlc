@@ -20,7 +20,7 @@
 #include "qt.hpp"
 #include "playercontrolbarmodel.hpp"
 
-#define MAIN_TB1_DEFAULT "68;37;65;19;22;0-2;1-2;23;20;65;35;7"
+#define MAIN_TB1_DEFAULT "20;21;65;17;3;0-2;1-2;4;18;65;33;7"
 
 PlayerControlBarModel::PlayerControlBarModel(QObject *_parent) : QAbstractListModel(_parent)
 {

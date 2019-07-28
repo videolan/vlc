@@ -42,55 +42,40 @@ public:
     };
     enum ButtonType_e
     {
+        PLAY_BUTTON,
+        STOP_BUTTON,
+        OPEN_BUTTON,
+        PREVIOUS_BUTTON,
+        NEXT_BUTTON,
+        SLOWER_BUTTON,
+        FASTER_BUTTON,
+        FULLSCREEN_BUTTON,
+        EXTENDED_BUTTON,
+        PLAYLIST_BUTTON,
+        SNAPSHOT_BUTTON,
+        RECORD_BUTTON,
+        ATOB_BUTTON,
+        FRAME_BUTTON,
+        SKIP_BACK_BUTTON,
+        SKIP_FW_BUTTON,
+        QUIT_BUTTON,
+        RANDOM_BUTTON,
+        LOOP_BUTTON,
+        INFO_BUTTON,
+        LANG_BUTTON,
+        MENU_BUTTON,
+        BACK_BUTTON,
+        BUTTON_MAX,
 
-        PLAY_BUTTON,            //0
-        STOP_BUTTON,            //1
-        OPEN_BUTTON,            //2
-        PREV_SLOW_BUTTON,       //3
-        NEXT_FAST_BUTTON,       //4
-        SLOWER_BUTTON,          //5
-        FASTER_BUTTON,          //6
-        FULLSCREEN_BUTTON,      //7
-        DEFULLSCREEN_BUTTON,    //8
-        EXTENDED_BUTTON,        //9
-        PLAYLIST_BUTTON,        //10
-        SNAPSHOT_BUTTON,        //11
-        RECORD_BUTTON,          //12
-        ATOB_BUTTON,            //13
-        FRAME_BUTTON,           //14
-        REVERSE_BUTTON,         //15
-        SKIP_BACK_BUTTON,       //16
-        SKIP_FW_BUTTON,         //17
-        QUIT_BUTTON,            //18
-        RANDOM_BUTTON,          //19
-        LOOP_BUTTON,            //20
-        INFO_BUTTON,            //21
-        PREVIOUS_BUTTON,        //22
-        NEXT_BUTTON,            //23
-        OPEN_SUB_BUTTON,        //24
-        FULLWIDTH_BUTTON,       //25
-        BUTTON_MAX,             //26
+        SPLITTER = 0x20,
+        VOLUME,
+        TELETEXT_BUTTONS,
+        ASPECT_RATIO_COMBOBOX,
+        SPECIAL_MAX,
 
-        SPLITTER = 0x20,        //32
-        INPUT_SLIDER,           //33
-        TIME_LABEL,             //34
-        VOLUME,                 //35
-        VOLUME_SPECIAL,         //36
-        MENU_BUTTONS,           //37
-        TELETEXT_BUTTONS,       //38
-        ADVANCED_CONTROLLER,    //39
-        PLAYBACK_BUTTONS,       //40
-        ASPECT_RATIO_COMBOBOX,  //41
-        SPEED_LABEL,            //42
-        TIME_LABEL_ELAPSED,     //43
-        TIME_LABEL_REMAINING,   //44
-        SPECIAL_MAX,            //45
-
-        WIDGET_SPACER = 0x40,   //64
-        WIDGET_SPACER_EXTEND,   //65
-        WIDGET_MAX,             //66
-        GOBACK_BUTTON,          //67
-        LANG_BUTTON             //68
+        WIDGET_SPACER = 0x40,
+        WIDGET_SPACER_EXTEND,
+        WIDGET_MAX
     };
     Q_ENUM(ButtonType_e)
 

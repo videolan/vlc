@@ -37,8 +37,8 @@ Item{
         case PlayerControlBarModel.LOOP_BUTTON: return repeatBtnDelegate
         case PlayerControlBarModel.LANG_BUTTON: return langBtnDelegate
         case PlayerControlBarModel.PLAYLIST_BUTTON:return playlistBtnDelegate
-        case PlayerControlBarModel.MENU_BUTTONS:return  menuBtnDelegate
-        case PlayerControlBarModel.GOBACK_BUTTON:return  backBtnDelegate
+        case PlayerControlBarModel.MENU_BUTTON:return  menuBtnDelegate
+        case PlayerControlBarModel.BACK_BUTTON:return  backBtnDelegate
         case PlayerControlBarModel.WIDGET_SPACER:return  spacerDelegate
         case PlayerControlBarModel.WIDGET_SPACER_EXTEND:return  extendiblespacerDelegate
         case PlayerControlBarModel.RECORD_BUTTON: return recordBtnDelegate
