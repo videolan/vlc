@@ -253,6 +253,7 @@
         <file alias="VolumeWidget.qml">qml/player/VolumeWidget.qml</file>
         <file alias="TeletextWidget.qml">qml/player/TeletextWidget.qml</file>
         <file alias="MiniPlayer.qml">qml/player/MiniPlayer.qml</file>
+        <file alias="TopBar.qml">qml/player/TopBar.qml</file>
     </qresource>
     <qresource prefix="/about">
         <file alias="About.qml">qml/about/About.qml</file>

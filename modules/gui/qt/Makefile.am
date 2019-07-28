@@ -550,6 +550,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/player/SliderBar.qml \
 	gui/qt/qml/player/TeletextWidget.qml \
 	gui/qt/qml/player/MiniPlayer.qml \
+	gui/qt/qml/player/TopBar.qml \
 	gui/qt/qml/dialogs/Dialogs.qml \
 	gui/qt/qml/dialogs/ModalDialog.qml \
 	gui/qt/qml/utils/DNDLabel.qml \
