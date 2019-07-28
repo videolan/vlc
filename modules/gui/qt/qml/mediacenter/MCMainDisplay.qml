@@ -199,7 +199,7 @@ Utils.NavigableFocusScope {
                                 })
                         }
 
-                        Utils.Drawer {
+                        Utils.DrawerExt {
                             z: 1
                             id: playlist
                             anchors {

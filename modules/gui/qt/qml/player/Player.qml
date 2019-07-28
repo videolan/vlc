@@ -118,7 +118,7 @@ Utils.NavigableFocusScope {
         }
     }
 
-    Utils.Drawer {
+    Utils.DrawerExt {
         id: playlistpopup
         anchors {
             top: parent.top
@@ -164,7 +164,7 @@ Utils.NavigableFocusScope {
     }
 
 
-    Utils.Drawer {
+    Utils.DrawerExt {
         id: controlBarView
         focus: true
         anchors {

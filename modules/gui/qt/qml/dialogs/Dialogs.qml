@@ -30,7 +30,7 @@ Item {
     signal restoreFocus();
     property var bgContent: undefined
 
-    Utils.Drawer {
+    Utils.DrawerExt {
         id: errorPopup
         anchors {
             bottom: parent.bottom

@@ -554,7 +554,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/dialogs/ModalDialog.qml \
 	gui/qt/qml/utils/DNDLabel.qml \
 	gui/qt/qml/utils/ToolTipArea.qml \
-	gui/qt/qml/utils/Drawer.qml \
+	gui/qt/qml/utils/DrawerExt.qml \
 	gui/qt/qml/utils/GridItem.qml \
 	gui/qt/qml/utils/IconToolButton.qml \
 	gui/qt/qml/utils/ImageToolButton.qml \
