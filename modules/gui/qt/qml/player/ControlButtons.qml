@@ -68,8 +68,6 @@ Item{
         Utils.IconToolButton {
             id: backBtn
             objectName: "IconToolButton"
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
             size: VLCStyle.icon_medium
             text: VLCIcons.exit
             onClicked: history.previous(History.Go)
