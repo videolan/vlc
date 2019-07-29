@@ -1966,10 +1966,10 @@ vlc_player_SelectAudioLanguage(vlc_player_t *player, const char *lang)
 }
 
 /**
- * Helper to select the spu language
+ * Helper to select the subtitle language
  */
 static inline void
-vlc_player_SelectDefaultSubtitleTrack(vlc_player_t *player, const char *lang)
+vlc_player_SelectSubtitleLanguage(vlc_player_t *player, const char *lang)
 {
     vlc_player_SelectCategoryLanguage(player, SPU_ES, lang);
 }
