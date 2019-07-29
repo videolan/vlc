@@ -397,10 +397,9 @@ Item{
     Component{
         id: aspectRatioDelegate
         Utils.ComboBoxExt {
-            id: combo
             Layout.alignment: Qt.AlignVCenter
-            height: 28 * scale
-            width: 100 * scale
+            width: VLCStyle.combobox_width_normal
+            height: VLCStyle.combobox_height_normal
             textRole: "display"
             model: player.aspectRatio
             onCurrentIndexChanged: model.toggleIndex(currentIndex)
