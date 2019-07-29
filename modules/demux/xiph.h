@@ -25,9 +25,18 @@
 #define XIPH_MAX_HEADER_COUNT (256)
 
 /* Temp ffmpeg vorbis format */
-static inline bool xiph_IsLavcFormat(const void *extra, unsigned i_extra)
+static inline bool xiph_IsLavcFormat(const void *extra, unsigned i_extra,
+                                     vlc_fourcc_t i_codec)
 {
-    return (i_extra >= 6 && GetWBE(extra) == 30);
+    switch(i_codec)
+    {
+        case VLC_CODEC_VORBIS:
+            return i_extra >= 6 && GetWBE(extra) == 30;
+        case VLC_CODEC_THEORA:
+            return i_extra >= 6 && GetWBE(extra) == 42;
+        default:
+            return false;
+    }
 }
 
 static inline unsigned xiph_CountLavcHeaders(const void *p_extra, unsigned i_extra)
@@ -58,9 +67,10 @@ static inline unsigned xiph_CountHeaders(const void *p_extra, unsigned i_extra)
     return *p + 1;
 }
 
-static inline unsigned xiph_CountUnknownHeaders(const void *p_extra, unsigned i_extra)
+static inline unsigned xiph_CountUnknownHeaders(const void *p_extra, unsigned i_extra,
+                                                vlc_fourcc_t i_codec)
 {
-    if (xiph_IsLavcFormat(p_extra, i_extra))
+    if (xiph_IsLavcFormat(p_extra, i_extra, i_codec))
         return xiph_CountLavcHeaders(p_extra, i_extra);
     else
         return xiph_CountHeaders(p_extra, i_extra);

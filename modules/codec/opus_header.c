@@ -35,6 +35,7 @@
 #include <stdlib.h>
 
 #include <vlc_common.h>
+#include <vlc_codec.h>
 #include "../demux/xiph.h"
 
 /* Header contents:
