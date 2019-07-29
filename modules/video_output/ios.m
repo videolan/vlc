@@ -147,7 +147,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (vout_display_cfg_IsWindowed(cfg))
         return VLC_EGENERIC;
 
-    vout_display_sys_t *sys = calloc(1, sizeof(*sys));
+    vout_display_sys_t *sys = vlc_obj_calloc(vd, 1, sizeof(*sys));
 
     if (!sys)
         return VLC_ENOMEM;
