@@ -20,6 +20,10 @@ libogg_plugin_la_LIBADD = $(LIBVORBIS_LIBS) $(OGG_LIBS) libxiph_metadata.la
 EXTRA_LTLIBRARIES += libogg_plugin.la
 demux_LTLIBRARIES += $(LTLIBogg)
 
+xiph_test_SOURCES = demux/xiph_test.c demux/xiph.h
+check_PROGRAMS += xiph_test
+TESTS += xiph_test
+
 libdemuxdump_plugin_la_SOURCES = demux/demuxdump.c
 demux_LTLIBRARIES += libdemuxdump_plugin.la
 
