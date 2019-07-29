@@ -39,8 +39,8 @@ Utils.NavigableFocusScope {
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)
+    onActionCancel: history.previous(History.Go)
 
-    onActionCancel: mainPlaylistController.stop()
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
