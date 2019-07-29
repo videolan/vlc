@@ -85,11 +85,15 @@ bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
         case VLC_CODEC_VC1:
-            if(fmt.i_extra && p_other->fmt.i_extra) /* AnnexB vs DCR */
-               return reinterpret_cast<uint8_t*>(fmt.p_extra)[0] !=
-                      reinterpret_cast<uint8_t*>(p_other->fmt.p_extra)[0];
-            else
-                return true;
+        {
+            if(fmt.i_codec == p_other->fmt.i_codec &&
+               fmt.i_extra && p_other->fmt.i_extra &&
+               fmt.i_extra == p_other->fmt.i_extra)
+            {
+               return !!memcmp(fmt.p_extra, p_other->fmt.p_extra, fmt.i_extra);
+            }
+            else return false; /* no extra, can't tell anything */
+        }
 
         default:
             if(fmt.i_cat == AUDIO_ES)
