@@ -124,18 +124,22 @@ Rectangle {
             focus: true
 
             Connections {
-                target: player.videoTracks
-
-                onDataChanged: {
-                    var nbVideoTracks = player.videoTracks.rowCount()
-
-                    if (nbVideoTracks > 0) {
-                        if (history.current.view !== "player")
-                            history.push(["player"], History.Go)
+                target: player
+                onPlayingStateChanged: {
+                    if (player.playingState === PlayerController.PLAYING_STATE_STOPPED
+                        && history.current.view === "player") {
+                        history.previous(History.Go)
                     }
-                    else {
-                        if (history.current.view === "player")
-                            history.previous(History.Go)
+                }
+            }
+
+            Connections {
+                target: player.videoTracks
+                onDataChanged: {
+                    if (player.videoTracks.rowCount() > 0
+                        && player.playingState === PlayerController.PLAYING_STATE_PLAYING
+                        && history.current.view !== "player") {
+                        history.push(["player"], History.Go)
                     }
                 }
             }
