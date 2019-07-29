@@ -13,6 +13,11 @@ Stream filter:
 Misc:
  * Update Youtube script
 
+Audio output:
+ * macOS/iOS: Fix stuttering or blank audio when starting or seeking when using
+   external audio devices (bluetooth for example)
+ * macOS: Fix AV synchronization when using external audio devices
+
 Security:
  * Fix a couple of integer underflows in the MP4 demuxer
 
