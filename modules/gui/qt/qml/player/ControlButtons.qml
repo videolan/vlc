@@ -67,7 +67,6 @@ Item{
         id: backBtnDelegate
         Utils.IconToolButton {
             id: backBtn
-            objectName: "IconToolButton"
             size: VLCStyle.icon_medium
             text: VLCIcons.exit
             onClicked: history.previous(History.Go)
@@ -79,7 +78,6 @@ Item{
         id: randomBtnDelegate
         Utils.IconToolButton {
             id: randomBtn
-            objectName: "IconToolButton"
             size: VLCStyle.icon_medium
             checked: mainPlaylistController.random
             text: VLCIcons.shuffle_on
@@ -92,7 +90,6 @@ Item{
         id: prevBtnDelegate
         Utils.IconToolButton {
             id: prevBtn
-            objectName: "IconToolButton"
             size: VLCStyle.icon_medium
             text: VLCIcons.previous
             onClicked: mainPlaylistController.prev()
@@ -104,7 +101,6 @@ Item{
         id:playBtnDelegate
         Utils.IconToolButton {
             id: playBtn
-            objectName: "IconToolButton"
             size: VLCStyle.icon_medium
             text: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
                    && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
@@ -119,7 +115,6 @@ Item{
         id: nextBtnDelegate
         Utils.IconToolButton {
             id: nextBtn
-            objectName: "IconToolButton"
             size: VLCStyle.icon_medium
             text: VLCIcons.next
             onClicked: mainPlaylistController.next()
@@ -131,7 +126,6 @@ Item{
         id: repeatBtnDelegate
         Utils.IconToolButton {
             id: repeatBtn
-            objectName: "IconToolButton"
             size: VLCStyle.icon_medium
             checked: mainPlaylistController.repeatMode !== PlaylistControllerModel.PLAYBACK_REPEAT_NONE
             text: (mainPlaylistController.repeatMode === PlaylistControllerModel.PLAYBACK_REPEAT_CURRENT)
@@ -146,7 +140,6 @@ Item{
         id: langBtnDelegate
         Utils.IconToolButton {
             id: langBtn
-            objectName: "IconToolButton"
             size: VLCStyle.icon_medium
             text: VLCIcons.audiosub
             onClicked: root.showTrackBar()
@@ -158,7 +151,6 @@ Item{
         id:playlistBtnDelegate
         Utils.IconToolButton {
             id: playlistBtn
-            objectName: "IconToolButton"
             size: VLCStyle.icon_medium
             text: VLCIcons.playlist
             onClicked: {
@@ -176,7 +168,6 @@ Item{
         id: menuBtnDelegate
         Utils.IconToolButton {
             id: menuBtn
-            objectName: "IconToolButton"
             size: VLCStyle.icon_medium
             text: VLCIcons.menu
             onClicked: {
@@ -198,7 +189,6 @@ Item{
     Component{
         id:spacerDelegate
         Item {
-            objectName: "space"
             id: spacer
             implicitWidth: 32 * VLCStyle.scale
             property bool acceptFocus: false
@@ -208,7 +198,6 @@ Item{
     Component{
         id: extendiblespacerDelegate
         Item{
-            objectName: "extendedspace"
             id: extendedspacer
             implicitWidth: 128 * VLCStyle.scale
             property bool acceptFocus: false
@@ -399,7 +388,6 @@ Item{
         Utils.ComboBoxExt {
             property bool paintOnly: false
             enabled: !paintOnly
-            objectName: PlayerControlBarModel.ASPECT_RATIO_COMBOBOX
             Layout.alignment: Qt.AlignVCenter
             width: VLCStyle.combobox_width_normal
             height: VLCStyle.combobox_height_normal
