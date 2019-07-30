@@ -212,7 +212,6 @@ public slots:
     void popupMenu( bool show );
 
     virtual void reloadPrefs();
-    void toolBarConfUpdated();
     VLCVarChoiceModel* getExtraInterfaces();
 
 protected slots:
@@ -257,6 +256,7 @@ signals:
     void interfaceAlwaysOnTopChanged(bool);
     void interfaceFullScreenChanged(bool);
     void hasEmbededVideoChanged(bool);
+    void toolBarConfUpdated();
 };
 
 #endif

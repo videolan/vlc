@@ -1073,11 +1073,6 @@ void MainInterface::closeEvent( QCloseEvent *e )
     }
 }
 
-void MainInterface::toolBarConfUpdated()
-{
-    QApplication::postEvent( this, new QEvent( MainInterface::ToolbarsNeedRebuild ) );
-}
-
 void MainInterface::setFullScreen( bool fs )
 {
     if( fs )
