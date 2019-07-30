@@ -71,7 +71,12 @@ Utils.NavigableFocusScope{
                     objectName: PlayerControlBarModel.PLAYLIST_BUTTON
                     size: VLCStyle.icon_normal
                     text: VLCIcons.playlist
-                    onClicked: rootWindow.playlistVisible = !rootWindow.playlistVisible
+                    onClicked: {
+                        rootWindow.playlistVisible = !rootWindow.playlistVisible
+                        if (rootWindow.playlistVisible && rootWindow.playlistDocked) {
+                            playlistWidget.gainFocus(playlistBtn)
+                        }
+                    }
                     property bool acceptFocus: true
                 }
             }

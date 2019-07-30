@@ -140,10 +140,10 @@ Utils.NavigableFocusScope {
             }
 
             onActionDown: controlBarView.forceActiveFocus()
-            onActionUp: root.actionUp(index)
-            onActionLeft: root.actionLeft(index)
-            onActionRight: root.actionRight(index)
-            onActionCancel: root.actionCancel(index)
+            onActionUp: rootPlayer.actionUp(index)
+            onActionLeft: rootPlayer.actionLeft(index)
+            onActionRight: rootPlayer.actionRight(index)
+            onActionCancel: rootPlayer.actionCancel(index)
 
             Keys.onPressed: {
                 if (event.key === Qt.Key_Menu) {
