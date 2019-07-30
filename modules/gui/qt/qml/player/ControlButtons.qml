@@ -235,7 +235,7 @@ Item{
             id: recordBtn
             size: VLCStyle.icon_medium
             text: VLCIcons.record
-            enabled: player.isPlaying
+            enabled: !paintOnly && player.isPlaying
             checked: player.isRecording
             onClicked: player.toggleRecord()
             property bool acceptFocus: true
@@ -270,7 +270,7 @@ Item{
         Utils.IconToolButton{
             id: snapshotBtn
             size: VLCStyle.icon_medium
-            enabled: player.isPlaying
+            enabled: !paintOnly && player.isPlaying
             text: VLCIcons.snapshot
             onClicked: player.snapshot()
             property bool acceptFocus: true
@@ -283,7 +283,7 @@ Item{
         Utils.IconToolButton{
             id: stopBtn
             size: VLCStyle.icon_medium
-            enabled: player.isPlaying
+            enabled: !paintOnly && player.isPlaying
             text: VLCIcons.stop
             onClicked: mainPlaylistController.stop()
             property bool acceptFocus: true
@@ -295,7 +295,7 @@ Item{
         Utils.IconToolButton{
             id: infoBtn
             size: VLCStyle.icon_medium
-            enabled: player.isPlaying
+            enabled: !paintOnly && player.isPlaying
             text: VLCIcons.info
             onClicked: dialogProvider.mediaInfoDialog()
             property bool acceptFocus: true
@@ -308,7 +308,7 @@ Item{
         Utils.IconToolButton{
             id: frameBtn
             size: VLCStyle.icon_medium
-            enabled: player.isPlaying
+            enabled: !paintOnly && player.isPlaying
             text: VLCIcons.frame_by_frame
             onClicked: player.frameNext()
             property bool acceptFocus: true
@@ -397,6 +397,9 @@ Item{
     Component{
         id: aspectRatioDelegate
         Utils.ComboBoxExt {
+            property bool paintOnly: false
+            enabled: !paintOnly
+            objectName: PlayerControlBarModel.ASPECT_RATIO_COMBOBOX
             Layout.alignment: Qt.AlignVCenter
             width: VLCStyle.combobox_width_normal
             height: VLCStyle.combobox_height_normal

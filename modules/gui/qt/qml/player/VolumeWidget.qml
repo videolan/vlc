@@ -29,13 +29,17 @@ FocusScope{
     y: volumeWidget.y
     width: volumeWidget.width
     height: volumeWidget.height
+    property bool paintOnly: true
+    enabled: !paintOnly
 
     property bool acceptFocus: true
+    Component.onCompleted: paintOnly = false
 
     RowLayout{
         id: volumeWidget
         Utils.IconToolButton{
             id: volumeBtn
+            paintOnly: widgetfscope.paintOnly
             size: VLCStyle.icon_normal
             text:
                 if( player.muted )
@@ -76,7 +80,7 @@ FocusScope{
             property double maxvolpos: maxvol / 100
 
             onValueChanged: {
-                if (player.muted) player.muted = false
+                if (!paintOnly && player.muted) player.muted = false
                 player.volume = volControl.value
             }
 

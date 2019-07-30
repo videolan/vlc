@@ -32,8 +32,9 @@ FocusScope{
     width: teleWidget.width
     height: teleWidget.height
 
-    property bool autohide: !player.isTeletextAvailable
+    property bool autohide: !paintOnly && !player.isTeletextAvailable
     property bool acceptFocus: autohide
+    property bool paintOnly: false
     visible: !autohide
 
     RowLayout{
@@ -44,6 +45,7 @@ FocusScope{
 
         Utils.IconToolButton{
             id: teleActivateBtn
+            paintOnly: widgetfscope.paintOnly
             text: VLCIcons.tv
             size: VLCStyle.icon_normal
             onClicked: player.teletextEnabled = !player.teletextEnabled
@@ -55,6 +57,7 @@ FocusScope{
 
         Utils.IconToolButton{
             id: teleTransparencyBtn
+            paintOnly: widgetfscope.paintOnly
             text: VLCIcons.tvtelx
             size: VLCStyle.icon_normal
             opacity: 0.5
@@ -75,6 +78,7 @@ FocusScope{
 
         Utils.IconToolButton{
             id: indexKeyBtn
+            paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
             text: VLCIcons.record
@@ -84,38 +88,42 @@ FocusScope{
         }
         Utils.IconToolButton{
             id: redKeyBtn
+            paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
             text: VLCIcons.record
             onClicked: player.teletextPage = PlayerController.TELE_RED
-            color: enabled ? "red" : "grey"
+            color: enabled || paintOnly? "red" : "grey"
             KeyNavigation.right: greenKeyBtn
         }
         Utils.IconToolButton{
             id: greenKeyBtn
+            paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
             text: VLCIcons.record
             onClicked: player.teletextPage = PlayerController.TELE_GREEN
-            color: enabled ? "green" : "grey"
+            color: enabled || paintOnly? "green" : "grey"
             KeyNavigation.right: yellowKeyBtn
         }
         Utils.IconToolButton{
             id: yellowKeyBtn
+            paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
             text: VLCIcons.record
             onClicked: player.teletextPage = PlayerController.TELE_YELLOW
-            color: enabled ? "yellow" : "grey"
+            color: enabled || paintOnly ? "yellow" : "grey"
             KeyNavigation.right: blueKeyBtn
         }
         Utils.IconToolButton{
             id: blueKeyBtn
+            paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
             text: VLCIcons.record
             onClicked: player.teletextPage = PlayerController.TELE_BLUE
-            color: enabled ? "blue" : "grey"
+            color: enabled || paintOnly? "blue" : "grey"
         }
     }
 }
