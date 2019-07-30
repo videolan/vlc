@@ -504,61 +504,64 @@ static int CreateTracks( demux_t *p_demux, unsigned i_tracks )
 static block_t * MP4_EIA608_Convert( block_t * p_block )
 {
     /* Rebuild codec data from encap */
-    size_t i_copied = 0;
-    size_t i_remaining = __MIN(p_block->i_buffer, INT64_MAX / 3);
-    uint32_t i_bytes = 0;
-    block_t *p_newblock;
+    block_t *p_newblock = NULL;
 
+    assert(p_block->i_buffer <= SSIZE_MAX);
     /* always need at least 10 bytes (atom size+header+1pair)*/
-    i_bytes = GetDWBE(p_block->p_buffer);
+    if (p_block->i_buffer < 8)
+        goto out;
 
-    if (10 < i_bytes || i_bytes < i_remaining ||
-        memcmp("cdat", &p_block->p_buffer[4], 4) ||
-        (p_newblock = block_Alloc(i_remaining * 3 - 8)) == NULL)
-    {
-        p_block->i_buffer = 0;
-        return p_block;
-    }
+    uint_fast32_t cdat_size = GetDWBE(p_block->p_buffer) - 8;
+    if (cdat_size > p_block->i_buffer)
+        goto out;
 
-    uint8_t *p_write = p_newblock->p_buffer;
-    uint8_t *p_read = &p_block->p_buffer[8];
-    i_bytes -= 8;
-    i_remaining -= 8;
+    const uint8_t *cdat = p_block->p_buffer + 8;
+    if (memcmp(cdat - 4, "cdat", 4) != 0)
+        goto out;
 
-    do
-    {
-        p_write[i_copied++] = CC_PKT_BYTE0(0); /* cc1 == field 0 */
-        p_write[i_copied++] = p_read[0];
-        p_write[i_copied++] = p_read[1];
-        p_read += 2;
-        i_bytes -= 2;
-        i_remaining -= 2;
-    } while( i_bytes >= 2 );
+    p_block->p_buffer += cdat_size;
+    p_block->i_buffer -= cdat_size;
+    cdat_size &= ~1;
 
     /* cdt2 is optional */
-    i_bytes = GetDWBE(p_read);
+    uint_fast32_t cdt2_size = 0;
+    const uint8_t *cdt2;
 
-    if (10 <= i_bytes && i_bytes <= i_remaining &&
-        !memcmp("cdt2", &p_read[4], 4))
-    {
-        p_read += 8;
-        i_bytes -= 8;
-        i_remaining -= 8;
-        do
-        {
-            p_write[i_copied++] = CC_PKT_BYTE0(0); /* cc1 == field 0 */
-            p_write[i_copied++] = p_read[0];
-            p_write[i_copied++] = p_read[1];
-            p_read += 2;
-            i_bytes -= 2;
-        } while( i_bytes >= 2 );
+    if (p_block->i_buffer >= 8) {
+        size_t size = GetDWBE(p_block->p_buffer) - 8;
+
+        if (size <= p_block->i_buffer) {
+            cdt2 = p_block->p_buffer + 8;
+
+            if (memcmp(cdt2 - 4, "cdt2", 4) == 0)
+                cdt2_size = size & ~1;
+        }
+    }
+
+    p_newblock = block_Alloc((cdat_size + cdt2_size) / 2 * 3);
+    if (unlikely(p_newblock == NULL))
+        goto out;
+
+    uint8_t *out = p_newblock->p_buffer;
+
+    while (cdat_size > 0) {
+         *(out++) = CC_PKT_BYTE0(0); /* cc1 == field 0 */
+         *(out++) = *(cdat++);
+         *(out++) = *(cdat++);
+         cdat_size -= 2;
+    }
+
+    while (cdt2_size > 0) {
+         *(out++) = CC_PKT_BYTE0(0); /* cc1 == field 0 */
+         *(out++) = *(cdt2++);
+         *(out++) = *(cdt2++);
+         cdt2_size -= 2;
     }
 
     p_newblock->i_pts = p_block->i_dts;
-    p_newblock->i_buffer = i_copied;
     p_newblock->i_flags = BLOCK_FLAG_TYPE_P;
+out:
     block_Release( p_block );
-
     return p_newblock;
 }
 
