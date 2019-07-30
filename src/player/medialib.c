@@ -134,7 +134,23 @@ vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
             return;
     }
 
-    input->ml.states.progress = input->position;
+    /* If we reached 95% of the media or have less than 10s remaining, bump the
+     * play count & the media in the history */
+    if (input->position >= .95f ||
+        input->length - input->time < VLC_TICK_FROM_SEC(10))
+    {
+        vlc_ml_media_increase_playcount(ml, media->i_id);
+        /* Ensure we remove any previously saved position to allow the playback
+         * of this media to restart from the begining */
+        if (input->ml.states.progress >= .0f )
+        {
+            vlc_ml_media_set_playback_state(ml, media->i_id,
+                                            VLC_ML_PLAYBACK_STATE_PROGRESS, NULL );
+            input->ml.states.progress = -1.f;
+        }
+    }
+    else
+        input->ml.states.progress = input->position;
 
     /* If the value changed during the playback, update it in the medialibrary.
      * If not, set each state to their "unset" values, so that they aren't saved
