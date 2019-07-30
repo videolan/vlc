@@ -140,7 +140,8 @@ static int Open( vlc_object_t *p_this )
 
         if( NeAACDecInit2( p_sys->hfaad, p_dec->fmt_in.p_extra,
                            p_dec->fmt_in.i_extra,
-                           &i_rate, &i_channels ) < 0 )
+                           &i_rate, &i_channels ) < 0 ||
+                i_channels >= MPEG4_ASC_MAX_INDEXEDPOS )
         {
             msg_Err( p_dec, "Failed to initialize faad using extra data" );
             NeAACDecClose( p_sys->hfaad );
