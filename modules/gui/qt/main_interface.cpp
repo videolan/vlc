@@ -163,7 +163,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf ),
     settings = getSettings();
 
     /* */
-    b_plDocked = getSettings()->value( "MainWindow/pl-dock-status", true ).toBool();
+    b_playlistDocked = getSettings()->value( "MainWindow/pl-dock-status", true ).toBool();
 
     /* Should the UI stays on top of other windows */
     b_interfaceOnTop = var_InheritBool( p_intf, "video-on-top" );
@@ -254,7 +254,7 @@ MainInterface::~MainInterface()
     /* Save states */
 
     settings->beginGroup("MainWindow");
-    settings->setValue( "pl-dock-status", b_plDocked );
+    settings->setValue( "pl-dock-status", b_playlistDocked );
 
     /* Save playlist state */
     settings->setValue( "playlist-visible", playlistVisible );
