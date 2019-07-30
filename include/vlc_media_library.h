@@ -455,6 +455,8 @@ enum vlc_ml_control
     VLC_ML_MEDIA_INCREASE_PLAY_COUNT,       /**< arg1: media id; can fail */
     VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE,  /**< arg1: media id; arg2: vlc_ml_playback_state; arg3: char**; */
     VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_STATE,  /**< arg1: media id; arg2: vlc_ml_playback_state; arg3: const char*; */
+    VLC_ML_MEDIA_GET_ALL_MEDIA_PLAYBACK_STATES, /**< arg1: media id; arg2(out): vlc_ml_playback_states_all* */
+    VLC_ML_MEDIA_SET_ALL_MEDIA_PLAYBACK_STATES, /**< arg1: media id; arg2: const vlc_ml_playback_states_all* */
     VLC_ML_MEDIA_SET_THUMBNAIL,             /**< arg1: media id; arg2: const char*; arg3: vlc_ml_thumbnail_size_t */
     VLC_ML_MEDIA_GENERATE_THUMBNAIL,        /**< arg1: media id; arg2: vlc_ml_thumbnail_size_t; arg3: width; arg4: height; arg5: position */
     VLC_ML_MEDIA_ADD_EXTERNAL_MRL,          /**< arg1: media id; arg2: const char*; arg3: type(vlc_ml_file_type_t) */
@@ -492,6 +494,21 @@ enum vlc_ml_playback_state
     VLC_ML_PLAYBACK_STATE_SUBTITLE_DELAY,
     VLC_ML_PLAYBACK_STATE_APP_SPECIFIC,
 };
+
+typedef struct vlc_ml_playback_states_all
+{
+    float progress;
+    float rate;
+    float zoom;
+    int current_title;
+    int current_video_track;
+    int current_audio_track;
+    int current_subtitle_track;
+    char* aspect_ratio;
+    char* crop;
+    char* deinterlace;
+    char* video_filter;
+} vlc_ml_playback_states_all;
 
 enum vlc_ml_event_type
 {
@@ -789,6 +806,7 @@ VLC_API void vlc_ml_show_list_release( vlc_ml_show_list_t* p_list );
 VLC_API void vlc_ml_genre_list_release( vlc_ml_genre_list_t* p_list );
 VLC_API void vlc_ml_playlist_list_release( vlc_ml_playlist_list_t* p_list );
 VLC_API void vlc_ml_entry_point_list_release( vlc_ml_entry_point_list_t* p_list );
+VLC_API void vlc_ml_playback_states_all_release( vlc_ml_playback_states_all* prefs );
 
 static inline vlc_ml_query_params_t vlc_ml_query_params_create()
 {
@@ -882,6 +900,20 @@ static inline int vlc_ml_media_get_playback_state( vlc_medialibrary_t* p_ml, int
 static inline int vlc_ml_media_set_playback_state( vlc_medialibrary_t* p_ml, int64_t i_media_id, int i_state, const char* psz_value )
 {
     return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_STATE, i_media_id, i_state, psz_value );
+}
+
+static inline int vlc_ml_media_get_all_playback_pref( vlc_medialibrary_t* p_ml,
+                                                      int64_t i_media_id,
+                                                      vlc_ml_playback_states_all* prefs )
+{
+    return vlc_ml_control( p_ml,VLC_ML_MEDIA_GET_ALL_MEDIA_PLAYBACK_STATES, i_media_id, prefs );
+}
+
+static inline int vlc_ml_media_set_all_playback_states( vlc_medialibrary_t* p_ml,
+                                                        int64_t i_media_id,
+                                                        const vlc_ml_playback_states_all* prefs )
+{
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_ALL_MEDIA_PLAYBACK_STATES, i_media_id, prefs );
 }
 
 static inline int vlc_ml_media_set_thumbnail( vlc_medialibrary_t* p_ml, int64_t i_media_id,
@@ -1357,7 +1389,8 @@ static inline size_t vlc_ml_count_playlist_media( vlc_medialibrary_t* p_ml, cons
     vlc_ml_show_list_t*: vlc_ml_show_list_release, \
     vlc_ml_genre_list_t*: vlc_ml_genre_list_release, \
     vlc_ml_playlist_list_t*: vlc_ml_playlist_list_release, \
-    vlc_ml_entry_point_list_t*: vlc_ml_entry_point_list_release \
+    vlc_ml_entry_point_list_t*: vlc_ml_entry_point_list_release, \
+    vlc_ml_playback_states_all*: vlc_ml_playback_states_all_release \
     )( OBJ )
 #else
 static inline void vlc_ml_release( vlc_ml_show_t* show ) { vlc_ml_show_release( show ); }
@@ -1375,6 +1408,7 @@ static inline void vlc_ml_release( vlc_ml_show_list_t* list ) { vlc_ml_show_list
 static inline void vlc_ml_release( vlc_ml_genre_list_t* list ) { vlc_ml_genre_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_playlist_list_t* list ) { vlc_ml_playlist_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_entry_point_list_t* list ) { vlc_ml_entry_point_list_release( list ); }
+static inline void vlc_ml_release( vlc_ml_playback_states_all* prefs ) { vlc_ml_playback_states_all_release( prefs ); }
 #endif
 
 #endif /* VLC_MEDIA_LIBRARY_H */

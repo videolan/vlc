@@ -143,7 +143,9 @@ public:
 private:
     int controlMedia( int query, va_list args );
     int getMeta( const medialibrary::IMedia& media, int meta, char** result );
+    int getMeta( const medialibrary::IMedia& media, vlc_ml_playback_states_all* result );
     int setMeta( medialibrary::IMedia& media, int meta, const char* value );
+    int setMeta( medialibrary::IMedia& media, const vlc_ml_playback_states_all* values );
     int filterListChildrenQuery( int query, int parentType );
     int listAlbums( int listQuery, const medialibrary::QueryParameters* paramsPtr,
                     const char* pattern, uint32_t nbItems, uint32_t offset, va_list args );

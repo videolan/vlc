@@ -518,6 +518,8 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_MEDIA_INCREASE_PLAY_COUNT:
         case VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE:
         case VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_STATE:
+        case VLC_ML_MEDIA_GET_ALL_MEDIA_PLAYBACK_STATES:
+        case VLC_ML_MEDIA_SET_ALL_MEDIA_PLAYBACK_STATES:
         case VLC_ML_MEDIA_SET_THUMBNAIL:
         case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
         case VLC_ML_MEDIA_ADD_EXTERNAL_MRL:
@@ -981,6 +983,67 @@ int MediaLibrary::getMeta( const medialibrary::IMedia& media, int meta, char** r
     return VLC_SUCCESS;
 }
 
+int MediaLibrary::getMeta( const medialibrary::IMedia& media,
+                           vlc_ml_playback_states_all* res )
+{
+    auto metas = media.metadata();
+    res->progress = -1.f;
+    res->rate = .0f;
+    res->zoom = -1.f;
+    res->current_title = -1;
+    // For tracks, -1 means disabled, so we can't use it for "unset"
+    res->current_video_track = res->current_audio_track =
+        res->current_subtitle_track = -2;
+    res->aspect_ratio = res->crop = res->deinterlace =
+        res->video_filter = nullptr;
+    for ( const auto& meta : metas )
+    {
+#define COPY_META( field ) res->field = strdup( meta.second.c_str() ); \
+    if ( res->field == nullptr ) return VLC_ENOMEM;
+
+        switch ( meta.first )
+        {
+            case medialibrary::IMedia::MetadataType::Progress:
+                res->progress = atof( meta.second.c_str() );
+                break;
+            case medialibrary::IMedia::MetadataType::Speed:
+                res->rate = atof( meta.second.c_str() );
+                break;
+            case medialibrary::IMedia::MetadataType::Title:
+                res->current_title = atoi( meta.second.c_str() );
+                break;
+            case medialibrary::IMedia::MetadataType::VideoTrack:
+                res->current_video_track = atoi( meta.second.c_str() );
+                break;
+            case medialibrary::IMedia::MetadataType::AspectRatio:
+                COPY_META( aspect_ratio );
+                break;
+            case medialibrary::IMedia::MetadataType::Zoom:
+                res->zoom = atof( meta.second.c_str() );
+                break;
+            case medialibrary::IMedia::MetadataType::Crop:
+                COPY_META( crop );
+                break;
+            case medialibrary::IMedia::MetadataType::Deinterlace:
+                COPY_META( deinterlace );
+                break;
+            case medialibrary::IMedia::MetadataType::VideoFilter:
+                COPY_META( video_filter );
+                break;
+            case medialibrary::IMedia::MetadataType::AudioTrack:
+                res->current_audio_track = atoi( meta.second.c_str() );
+                break;
+            case medialibrary::IMedia::MetadataType::SubtitleTrack:
+                res->current_subtitle_track = atoi( meta.second.c_str() );
+                break;
+            default:
+                break;
+        }
+#undef COPY_META
+    }
+    return VLC_SUCCESS;
+}
+
 int MediaLibrary::setMeta( medialibrary::IMedia& media, int meta, const char* value )
 {
     bool res;
@@ -989,6 +1052,39 @@ int MediaLibrary::setMeta( medialibrary::IMedia& media, int meta, const char* va
     else
         res = media.setMetadata( metadataType( meta ), value );
     if ( res == false )
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
+}
+
+int MediaLibrary::setMeta( medialibrary::IMedia& media,
+                           const vlc_ml_playback_states_all* values )
+{
+    using MT = medialibrary::IMedia::MetadataType;
+    std::unordered_map<MT, std::string> metas;
+    if ( values->progress >= .0f )
+        metas[MT::Progress] = std::to_string( values->progress );
+    if ( values->rate != .0f )
+        metas[MT::Speed] = std::to_string( values->rate );
+    if ( values->zoom != .0f )
+        metas[MT::Zoom] = std::to_string( values->zoom );
+    if ( values->current_title >= 0 )
+        metas[MT::Title] = std::to_string( values->current_title );
+    if ( values->aspect_ratio != nullptr )
+        metas[MT::AspectRatio] = values->aspect_ratio;
+    if ( values->crop != nullptr )
+        metas[MT::Crop] = values->crop;
+    if ( values->deinterlace != nullptr )
+        metas[MT::Deinterlace] = values->deinterlace;
+    if ( values->video_filter != nullptr )
+        metas[MT::VideoFilter] = values->video_filter;
+    if ( values->current_video_track != -2 )
+        metas[MT::VideoTrack] = std::to_string( values->current_video_track );
+    if ( values->current_audio_track != -2 )
+        metas[MT::AudioTrack] = std::to_string( values->current_audio_track );
+    if ( values->current_subtitle_track != -2 )
+        metas[MT::SubtitleTrack] = std::to_string( values->current_subtitle_track );
+
+    if ( media.setMetadata( std::move( metas ) ) == false )
         return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
@@ -1016,6 +1112,16 @@ int MediaLibrary::controlMedia( int query, va_list args )
             auto meta = va_arg( args, int );
             auto value = va_arg( args, const char* );
             return setMeta( *m, meta, value );
+        }
+        case VLC_ML_MEDIA_GET_ALL_MEDIA_PLAYBACK_STATES:
+        {
+            auto res = va_arg( args, vlc_ml_playback_states_all* );
+            return getMeta( *m, res );
+        }
+        case VLC_ML_MEDIA_SET_ALL_MEDIA_PLAYBACK_STATES:
+        {
+            auto res = va_arg( args, const vlc_ml_playback_states_all* );
+            return setMeta( *m, res );
         }
         case VLC_ML_MEDIA_SET_THUMBNAIL:
         {

@@ -339,6 +339,14 @@ void vlc_ml_entry_point_list_release( vlc_ml_entry_point_list_t* p_list )
     free( p_list );
 }
 
+void vlc_ml_playback_states_all_release( vlc_ml_playback_states_all* prefs )
+{
+    free( prefs->aspect_ratio );
+    free( prefs->crop );
+    free( prefs->deinterlace );
+    free( prefs->video_filter );
+}
+
 void* vlc_ml_get( vlc_medialibrary_t* p_ml, int i_query, ... )
 {
     assert( p_ml != NULL );
