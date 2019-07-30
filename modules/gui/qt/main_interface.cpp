@@ -50,6 +50,7 @@
 #include "components/mediacenter/mlalbumtrackmodel.hpp"
 #include "components/mediacenter/mlgenremodel.hpp"
 #include "components/mediacenter/mlvideomodel.hpp"
+#include "components/mediacenter/mlrecentsvideomodel.hpp"
 #include "components/mediacenter/mlnetworkmodel.hpp"
 #include "components/recent_media_model.hpp"
 #include "components/settings.hpp"
@@ -341,6 +342,7 @@ void MainInterface::createMainWidget( QSettings * )
         qmlRegisterType<MLAlbumTrackModel>( "org.videolan.medialib", 0, 1, "MLAlbumTrackModel" );
         qmlRegisterType<MLGenreModel>( "org.videolan.medialib", 0, 1, "MLGenreModel" );
         qmlRegisterType<MLVideoModel>( "org.videolan.medialib", 0, 1, "MLVideoModel" );
+        qmlRegisterType<MLRecentsVideoModel>( "org.videolan.medialib", 0, 1, "MLRecentsVideoModel" );
         qRegisterMetaType<NetworkTreeItem>();
         qmlRegisterType<MLNetworkModel>( "org.videolan.medialib", 0, 1, "MLNetworkModel");
 
