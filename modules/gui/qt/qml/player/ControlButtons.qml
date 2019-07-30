@@ -190,7 +190,24 @@ Item{
         id:spacerDelegate
         Item {
             id: spacer
-            implicitWidth: 32 * VLCStyle.scale
+            implicitWidth: VLCStyle.icon_normal
+            implicitHeight: VLCStyle.icon_normal
+            property alias spacetextExt: spacetext
+            property bool paintOnly: false
+            Label {
+                id: spacetext
+                text: VLCIcons.space
+                color: VLCStyle.colors.buttonText
+                visible: parent.paintOnly
+
+                anchors.centerIn: parent
+
+                font.pixelSize: VLCStyle.icon_medium
+                font.family: VLCIcons.fontFamily
+
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+            }
             property bool acceptFocus: false
         }
     }
@@ -199,7 +216,24 @@ Item{
         id: extendiblespacerDelegate
         Item{
             id: extendedspacer
-            implicitWidth: 128 * VLCStyle.scale
+            implicitWidth: VLCStyle.widthExtendedSpacer
+            implicitHeight: VLCStyle.icon_normal
+            property bool paintOnly: false
+            property alias spacetextExt: spacetext
+            Label {
+                id: spacetext
+                text: VLCIcons.space
+                color: VLCStyle.colors.buttonText
+                visible: paintOnly
+
+                anchors.centerIn: parent
+
+                font.pixelSize: VLCStyle.icon_medium
+                font.family: VLCIcons.fontFamily
+
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+            }
             property bool acceptFocus: false
             Component.onCompleted: {
                 parent.Layout.fillWidth=true

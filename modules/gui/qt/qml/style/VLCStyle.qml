@@ -99,6 +99,7 @@ Item {
     property int widthSearchInput: 200 * scale;
     property int widthSortBox: 150 * scale;
     property int widthTeletext: 280 * scale;
+    property int widthExtendedSpacer: 128 * scale;
     property int heightInput: 22 * scale;
 
     property int selectedBorder: 2
