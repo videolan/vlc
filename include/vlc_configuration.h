@@ -342,7 +342,7 @@ struct config_chain_t
  *
  * The option names will be created by adding the psz_prefix prefix.
  */
-VLC_API void config_ChainParse( vlc_object_t *, const char *psz_prefix, const char *const *ppsz_options, config_chain_t * );
+VLC_API void config_ChainParse( vlc_object_t *, const char *psz_prefix, const char *const *ppsz_options, const config_chain_t * );
 #define config_ChainParse( a, b, c, d ) config_ChainParse( VLC_OBJECT(a), b, c, d )
 
 /**

@@ -268,7 +268,7 @@ void config_ChainDestroy( config_chain_t *p_cfg )
 
 #undef config_ChainParse
 void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
-                        const char *const *ppsz_options, config_chain_t *cfg )
+                        const char *const *ppsz_options, const config_chain_t *cfg )
 {
     if( psz_prefix == NULL ) psz_prefix = "";
     size_t plen = 1 + strlen( psz_prefix );
