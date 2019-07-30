@@ -22,7 +22,8 @@ import "qrc:///style/"
 
 ToolButton {
     id: control
-    property color color: control.enabled ?
+    property bool paintOnly: false
+    property color color: control.enabled || paintOnly?
                               VLCStyle.colors.buttonText : VLCStyle.colors.lightText
 
     property int size: VLCStyle.icon_normal
@@ -33,12 +34,15 @@ ToolButton {
 
     property color colorOverlay: "transparent"
     property string textOverlay: ""
+    property bool borderEnabled: false
+
+    enabled: !paintOnly
 
     contentItem: Item {
 
         Rectangle{
             anchors.fill: parent
-            visible: control.checked
+            visible: control.checked && !paintOnly
             color: VLCStyle.colors.bannerHover
         }
 
