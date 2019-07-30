@@ -93,7 +93,9 @@ private:
     static void requestVideoFullScreen( struct vout_window_t *, const char * );
 
 public:
+    QQmlContext* getRootCtx() { return mediacenterView->rootContext(); }
     QQuickWindow* getRootQuickWindow();
+    QQmlEngine* getEngine(){ return mediacenterView->engine(); }
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
 
     /* Getters */
