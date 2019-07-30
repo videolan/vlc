@@ -70,6 +70,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/help.cpp gui/qt/dialogs/help.hpp \
 	gui/qt/dialogs/gototime.cpp gui/qt/dialogs/gototime.hpp \
 	gui/qt/dialogs/toolbar.cpp gui/qt/dialogs/toolbar.hpp \
+	gui/qt/dialogs/toolbareditor.cpp gui/qt/dialogs/toolbareditor.hpp \
 	gui/qt/dialogs/open.cpp gui/qt/dialogs/open.hpp \
 	gui/qt/dialogs/openurl.cpp gui/qt/dialogs/openurl.hpp \
 	gui/qt/dialogs/vlm.cpp gui/qt/dialogs/vlm.hpp \
@@ -244,6 +245,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/help.moc.cpp \
 	gui/qt/dialogs/gototime.moc.cpp \
 	gui/qt/dialogs/toolbar.moc.cpp \
+	gui/qt/dialogs/toolbareditor.moc.cpp \
 	gui/qt/dialogs/open.moc.cpp \
 	gui/qt/dialogs/openurl.moc.cpp \
 	gui/qt/dialogs/podcast_configuration.moc.cpp \
