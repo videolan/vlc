@@ -208,7 +208,7 @@ Utils.NavigableFocusScope {
                                 bottom: parent.bottom
                             }
                             focus: false
-                            edge: Utils.DrawerExt.Edges.Top
+                            edge: Utils.DrawerExt.Edges.Right
 
                             property var previousFocus: undefined
 
