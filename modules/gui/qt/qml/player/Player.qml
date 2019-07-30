@@ -146,6 +146,8 @@ Utils.NavigableFocusScope {
             onActionCancel: rootPlayer.actionCancel(index)
 
             Keys.onPressed: {
+                if (event.accepted)
+                    return
                 if (event.key === Qt.Key_Menu) {
                     toolbarAutoHide.toggleForceVisible()
                 } else {
@@ -244,6 +246,8 @@ Utils.NavigableFocusScope {
 
                     //unhandled keys are forwarded as hotkeys
                     Keys.onPressed: {
+                        if (event.accepted)
+                            return
                         if (event.key === Qt.Key_Menu)
                             toolbarAutoHide.toggleForceVisible()
                         else
