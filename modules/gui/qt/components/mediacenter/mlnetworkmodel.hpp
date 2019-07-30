@@ -133,7 +133,6 @@ private:
     void refreshDeviceList(MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count , bool clear);
 
     static bool canBeIndexed(const QUrl& url );
-    void filterMainMrl( Item& item, size_t itemIndex );
 
 private:
     struct SourceListener

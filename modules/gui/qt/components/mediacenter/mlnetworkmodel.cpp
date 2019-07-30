@@ -364,11 +364,7 @@ void MLNetworkModel::refreshDeviceList( MediaSourcePtr mediaSource, input_item_n
                         item.mainMrl.scheme() == i.mainMrl.scheme();
             });
             if ( it != end( m_items ) )
-            {
-                (*it).mrls.push_back( item.mainMrl );
-                filterMainMrl( ( *it ), std::distance( begin( m_items ), it ) );
                 return;
-            }
             if ( item.canBeIndexed == true )
             {
                 if ( vlc_ml_is_indexed( m_ml, qtu( item.mainMrl.toString( QUrl::None ) ),
@@ -429,38 +425,3 @@ bool MLNetworkModel::canBeIndexed(const QUrl& url)
 {
     return url.scheme() == "smb" || url.scheme() == "ftp";
 }
-
-void MLNetworkModel::filterMainMrl( MLNetworkModel::Item& item , size_t itemIndex )
-{
-    assert( item.mrls.empty() == false );
-    if ( item.mrls.size() == 1 )
-        return;
-
-    //maybe we should rather use QHostAddress, but this adds a dependency uppon QNetwork that we don't require at the moment
-    //https://stackoverflow.com/a/17871737/148173
-    QRegExp ipv4("((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])");
-    QRegExp ipv6("(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))");
-
-    // We're looking for the mrl which is a (netbios) name, not an IP
-    for ( const auto& mrl : item.mrls )
-    {
-        if (mrl.isEmpty() == true || mrl.scheme() == "")
-            continue;
-
-        QString host = mrl.host();
-        if (ipv4.exactMatch(host) || ipv6.exactMatch(host))
-            continue;
-
-        item.mainMrl = mrl;
-        item.canBeIndexed = canBeIndexed( mrl  );
-        auto idx = index( static_cast<int>( itemIndex ), 0 );
-        emit dataChanged( idx, idx, { NETWORK_MRL, NETWORK_CANINDEX } );
-        return;
-    }
-    // If we can't get a cannonical name, don't attempt to index this as we
-    // would fail to get a unique associated device in the medialibrary
-    item.canBeIndexed = false;
-    auto idx = index( static_cast<int>( itemIndex ), 0 );
-    emit dataChanged( idx, idx, { NETWORK_CANINDEX } );
-}
-
