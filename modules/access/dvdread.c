@@ -322,6 +322,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     int *pi_int;
     int i;
 
+    if(unlikely(!p_sys->p_vts_file))
+        return VLC_EGENERIC;
+
     switch( i_query )
     {
         case DEMUX_GET_POSITION:
@@ -445,6 +448,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    if(unlikely(!p_sys->p_vts_file))
+        return VLC_DEMUXER_EOF;
 
     uint8_t p_buffer[DVD_VIDEO_LB_LEN * DVD_BLOCK_READ_ONCE];
     int i_blocks_once, i_read;
