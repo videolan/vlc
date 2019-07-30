@@ -516,8 +516,8 @@ int MediaLibrary::Control( int query, va_list args )
             return VLC_SUCCESS;
         }
         case VLC_ML_MEDIA_INCREASE_PLAY_COUNT:
-        case VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_PREF:
-        case VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_PREF:
+        case VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE:
+        case VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_STATE:
         case VLC_ML_MEDIA_SET_THUMBNAIL:
         case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
         case VLC_ML_MEDIA_ADD_EXTERNAL_MRL:
@@ -891,43 +891,43 @@ medialibrary::IMedia::MetadataType MediaLibrary::metadataType( int meta )
 {
     switch ( meta )
     {
-        case VLC_ML_PLAYBACK_PREF_RATING:
+        case VLC_ML_PLAYBACK_STATE_RATING:
             return medialibrary::IMedia::MetadataType::Rating;
-        case VLC_ML_PLAYBACK_PREF_PROGRESS:
+        case VLC_ML_PLAYBACK_STATE_PROGRESS:
             return medialibrary::IMedia::MetadataType::Progress;
-        case VLC_ML_PLAYBACK_PREF_SPEED:
+        case VLC_ML_PLAYBACK_STATE_SPEED:
             return medialibrary::IMedia::MetadataType::Speed;
-        case VLC_ML_PLAYBACK_PREF_TITLE:
+        case VLC_ML_PLAYBACK_STATE_TITLE:
             return medialibrary::IMedia::MetadataType::Title;
-        case VLC_ML_PLAYBACK_PREF_CHAPTER:
+        case VLC_ML_PLAYBACK_STATE_CHAPTER:
             return medialibrary::IMedia::MetadataType::Chapter;
-        case VLC_ML_PLAYBACK_PREF_PROGRAM:
+        case VLC_ML_PLAYBACK_STATE_PROGRAM:
             return medialibrary::IMedia::MetadataType::Program;
-        case VLC_ML_PLAYBACK_PREF_SEEN:
+        case VLC_ML_PLAYBACK_STATE_SEEN:
             return medialibrary::IMedia::MetadataType::Seen;
-        case VLC_ML_PLAYBACK_PREF_VIDEO_TRACK:
+        case VLC_ML_PLAYBACK_STATE_VIDEO_TRACK:
             return medialibrary::IMedia::MetadataType::VideoTrack;
-        case VLC_ML_PLAYBACK_PREF_ASPECT_RATIO:
+        case VLC_ML_PLAYBACK_STATE_ASPECT_RATIO:
             return medialibrary::IMedia::MetadataType::AspectRatio;
-        case VLC_ML_PLAYBACK_PREF_ZOOM:
+        case VLC_ML_PLAYBACK_STATE_ZOOM:
             return medialibrary::IMedia::MetadataType::Zoom;
-        case VLC_ML_PLAYBACK_PREF_CROP:
+        case VLC_ML_PLAYBACK_STATE_CROP:
             return medialibrary::IMedia::MetadataType::Crop;
-        case VLC_ML_PLAYBACK_PREF_DEINTERLACE:
+        case VLC_ML_PLAYBACK_STATE_DEINTERLACE:
             return medialibrary::IMedia::MetadataType::Deinterlace;
-        case VLC_ML_PLAYBACK_PREF_VIDEO_FILTER:
+        case VLC_ML_PLAYBACK_STATE_VIDEO_FILTER:
             return medialibrary::IMedia::MetadataType::VideoFilter;
-        case VLC_ML_PLAYBACK_PREF_AUDIO_TRACK:
+        case VLC_ML_PLAYBACK_STATE_AUDIO_TRACK:
             return medialibrary::IMedia::MetadataType::AudioTrack;
-        case VLC_ML_PLAYBACK_PREF_GAIN:
+        case VLC_ML_PLAYBACK_STATE_GAIN:
             return medialibrary::IMedia::MetadataType::Gain;
-        case VLC_ML_PLAYBACK_PREF_AUDIO_DELAY:
+        case VLC_ML_PLAYBACK_STATE_AUDIO_DELAY:
             return medialibrary::IMedia::MetadataType::AudioDelay;
-        case VLC_ML_PLAYBACK_PREF_SUBTITLE_TRACK:
+        case VLC_ML_PLAYBACK_STATE_SUBTITLE_TRACK:
             return medialibrary::IMedia::MetadataType::SubtitleTrack;
-        case VLC_ML_PLAYBACK_PREF_SUBTITLE_DELAY:
+        case VLC_ML_PLAYBACK_STATE_SUBTITLE_DELAY:
             return medialibrary::IMedia::MetadataType::SubtitleDelay;
-        case VLC_ML_PLAYBACK_PREF_APP_SPECIFIC:
+        case VLC_ML_PLAYBACK_STATE_APP_SPECIFIC:
             return medialibrary::IMedia::MetadataType::ApplicationSpecific;
         default:
             vlc_assert_unreachable();
@@ -1005,13 +1005,13 @@ int MediaLibrary::controlMedia( int query, va_list args )
             if ( m->increasePlayCount() == false )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
-        case VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_PREF:
+        case VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE:
         {
             auto meta = va_arg( args, int );
             auto res = va_arg( args, char** );
             return getMeta( *m, meta, res );
         }
-        case VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_PREF:
+        case VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_STATE:
         {
             auto meta = va_arg( args, int );
             auto value = va_arg( args, const char* );

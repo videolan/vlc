@@ -453,8 +453,8 @@ enum vlc_ml_control
 
     /* Media management */
     VLC_ML_MEDIA_INCREASE_PLAY_COUNT,       /**< arg1: media id; can fail */
-    VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_PREF,   /**< arg1: media id; arg2: vlc_ml_playback_pref; arg3: char**; */
-    VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_PREF,   /**< arg1: media id; arg2: vlc_ml_playback_pref; arg3: const char*; */
+    VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE,  /**< arg1: media id; arg2: vlc_ml_playback_state; arg3: char**; */
+    VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_STATE,  /**< arg1: media id; arg2: vlc_ml_playback_state; arg3: const char*; */
     VLC_ML_MEDIA_SET_THUMBNAIL,             /**< arg1: media id; arg2: const char*; arg3: vlc_ml_thumbnail_size_t */
     VLC_ML_MEDIA_GENERATE_THUMBNAIL,        /**< arg1: media id; arg2: vlc_ml_thumbnail_size_t; arg3: width; arg4: height; arg5: position */
     VLC_ML_MEDIA_ADD_EXTERNAL_MRL,          /**< arg1: media id; arg2: const char*; arg3: type(vlc_ml_file_type_t) */
@@ -465,32 +465,32 @@ enum vlc_ml_control
  * All values/units are up to the caller and are not interpreted by the media
  * library.
  * All values are stored and returned as strings.
- * When calling vlc_medialibrary_t::pf_control with vlc_ml_MEDIA_GET_MEDIA_PLAYBACK_PREF,
- * the value will be returned stored in the provided char**. If the preference was
+ * When calling vlc_medialibrary_t::pf_control with vlc_ml_MEDIA_GET_MEDIA_PLAYBACK_STATE,
+ * the value will be returned stored in the provided char**. If the state was
  * not set yet, NULL will be returned.
- * When setting a preference, NULL can be provided as a value to unset it.
+ * When setting a state, NULL can be provided as a value to unset it.
  */
-enum vlc_ml_playback_pref
+enum vlc_ml_playback_state
 {
-    VLC_ML_PLAYBACK_PREF_RATING,
-    VLC_ML_PLAYBACK_PREF_PROGRESS,
-    VLC_ML_PLAYBACK_PREF_SPEED,
-    VLC_ML_PLAYBACK_PREF_TITLE,
-    VLC_ML_PLAYBACK_PREF_CHAPTER,
-    VLC_ML_PLAYBACK_PREF_PROGRAM,
-    VLC_ML_PLAYBACK_PREF_SEEN,
-    VLC_ML_PLAYBACK_PREF_VIDEO_TRACK,
-    VLC_ML_PLAYBACK_PREF_ASPECT_RATIO,
-    VLC_ML_PLAYBACK_PREF_ZOOM,
-    VLC_ML_PLAYBACK_PREF_CROP,
-    VLC_ML_PLAYBACK_PREF_DEINTERLACE,
-    VLC_ML_PLAYBACK_PREF_VIDEO_FILTER,
-    VLC_ML_PLAYBACK_PREF_AUDIO_TRACK,
-    VLC_ML_PLAYBACK_PREF_GAIN,
-    VLC_ML_PLAYBACK_PREF_AUDIO_DELAY,
-    VLC_ML_PLAYBACK_PREF_SUBTITLE_TRACK,
-    VLC_ML_PLAYBACK_PREF_SUBTITLE_DELAY,
-    VLC_ML_PLAYBACK_PREF_APP_SPECIFIC,
+    VLC_ML_PLAYBACK_STATE_RATING,
+    VLC_ML_PLAYBACK_STATE_PROGRESS,
+    VLC_ML_PLAYBACK_STATE_SPEED,
+    VLC_ML_PLAYBACK_STATE_TITLE,
+    VLC_ML_PLAYBACK_STATE_CHAPTER,
+    VLC_ML_PLAYBACK_STATE_PROGRAM,
+    VLC_ML_PLAYBACK_STATE_SEEN,
+    VLC_ML_PLAYBACK_STATE_VIDEO_TRACK,
+    VLC_ML_PLAYBACK_STATE_ASPECT_RATIO,
+    VLC_ML_PLAYBACK_STATE_ZOOM,
+    VLC_ML_PLAYBACK_STATE_CROP,
+    VLC_ML_PLAYBACK_STATE_DEINTERLACE,
+    VLC_ML_PLAYBACK_STATE_VIDEO_FILTER,
+    VLC_ML_PLAYBACK_STATE_AUDIO_TRACK,
+    VLC_ML_PLAYBACK_STATE_GAIN,
+    VLC_ML_PLAYBACK_STATE_AUDIO_DELAY,
+    VLC_ML_PLAYBACK_STATE_SUBTITLE_TRACK,
+    VLC_ML_PLAYBACK_STATE_SUBTITLE_DELAY,
+    VLC_ML_PLAYBACK_STATE_APP_SPECIFIC,
 };
 
 enum vlc_ml_event_type
@@ -874,14 +874,14 @@ static inline int vlc_ml_media_increase_playcount( vlc_medialibrary_t* p_ml, int
     return vlc_ml_control( p_ml, VLC_ML_MEDIA_INCREASE_PLAY_COUNT, i_media_id );
 }
 
-static inline int vlc_ml_media_get_playback_pref( vlc_medialibrary_t* p_ml, int64_t i_media_id, int i_pref, char** ppsz_result )
+static inline int vlc_ml_media_get_playback_state( vlc_medialibrary_t* p_ml, int64_t i_media_id, int i_state, char** ppsz_result )
 {
-    return vlc_ml_control( p_ml, VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_PREF, i_media_id, i_pref, ppsz_result );
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE, i_media_id, i_state, ppsz_result );
 }
 
-static inline int vlc_ml_media_set_playback_pref( vlc_medialibrary_t* p_ml, int64_t i_media_id, int i_pref, const char* psz_value )
+static inline int vlc_ml_media_set_playback_state( vlc_medialibrary_t* p_ml, int64_t i_media_id, int i_state, const char* psz_value )
 {
-    return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_PREF, i_media_id, i_pref, psz_value );
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_STATE, i_media_id, i_state, psz_value );
 }
 
 static inline int vlc_ml_media_set_thumbnail( vlc_medialibrary_t* p_ml, int64_t i_media_id,

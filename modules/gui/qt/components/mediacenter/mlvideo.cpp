@@ -60,7 +60,7 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
             break;
         }
     char *psz_progress;
-    if ( vlc_ml_media_get_playback_pref( ml, data->i_id, VLC_ML_PLAYBACK_PREF_PROGRESS,
+    if ( vlc_ml_media_get_playback_state( ml, data->i_id, VLC_ML_PLAYBACK_STATE_PROGRESS,
                                     &psz_progress ) == VLC_SUCCESS && psz_progress != NULL )
     {
         m_progress = atoi( psz_progress );
