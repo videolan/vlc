@@ -25,6 +25,7 @@
 #include <vlc_list.h>
 #include <vlc_vector.h>
 #include <vlc_atomic.h>
+#include <vlc_media_library.h>
 
 #include "input/input_internal.h"
 
@@ -101,6 +102,14 @@ struct vlc_player_input
         float pos;
         bool set;
     } abloop_state[2];
+
+    struct
+    {
+        vlc_ml_playback_states_all states;
+        int default_video_track;
+        int default_audio_track;
+        int default_subtitle_track;
+    } ml;
 };
 
 struct vlc_player_listener_id
@@ -334,6 +343,9 @@ struct vlc_player_track_priv *
 vlc_player_track_vector_FindById(vlc_player_track_vector *vec, vlc_es_id_t *id,
                                  size_t *idx);
 
+int
+vlc_player_GetFirstSelectedTrackId(const vlc_player_track_vector* tracks);
+
 /*
  * player_title.c
  */
@@ -467,5 +479,16 @@ vlc_player_osd_Track(vlc_player_t *player, vlc_es_id_t *id, bool select);
 
 void
 vlc_player_osd_Program(vlc_player_t *player, const char *name);
+
+/*
+ * player/medialib.c
+ */
+
+void
+vlc_player_input_RestoreMlStates(struct vlc_player_input* input,
+                                 const input_item_t* item);
+
+void
+vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input);
 
 #endif

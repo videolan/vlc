@@ -271,6 +271,7 @@ libvlccore_la_SOURCES = \
 	player/aout.c \
 	player/vout.c \
 	player/osd.c \
+	player/medialib.c \
 	clock/input_clock.h \
 	clock/clock.h \
 	clock/clock_internal.h \

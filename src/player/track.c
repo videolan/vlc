@@ -205,3 +205,16 @@ vlc_player_track_vector_FindById(vlc_player_track_vector *vec, vlc_es_id_t *id,
     }
     return NULL;
 }
+
+
+int
+vlc_player_GetFirstSelectedTrackId(const vlc_player_track_vector* tracks)
+{
+    struct vlc_player_track_priv* t;
+    vlc_vector_foreach(t, tracks)
+    {
+        if (t->t.selected)
+            return t->t.fmt.i_id;
+    }
+    return -1;
+}

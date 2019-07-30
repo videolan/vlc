@@ -54,7 +54,7 @@ vlc_player_PrepareNextMedia(vlc_player_t *player)
 {
     vlc_player_assert_locked(player);
 
-    if (!player->media_provider 
+    if (!player->media_provider
      || player->media_stopped_action != VLC_PLAYER_MEDIA_STOPPED_CONTINUE
      || player->next_media_requested)
         return;
@@ -207,6 +207,7 @@ vlc_player_destructor_Thread(void *data)
                                          VLC_TICK_INVALID);
             vlc_player_destructor_AddStoppingInput(player, input);
 
+            vlc_player_UpdateMLStates(player, input);
             input_Stop(input->thread);
         }
 

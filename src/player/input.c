@@ -437,6 +437,32 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
             }
             vlc_player_SendEvent(player, on_track_list_changed,
                                  VLC_PLAYER_LIST_ADDED, &trackpriv->t);
+            switch (ev->fmt->i_cat)
+            {
+                case VIDEO_ES:
+                    /* If we need to restore a specific track, let's do it upon
+                     * insertion. The initialization of the default track when
+                     * we don't have a value will be done when the first track
+                     * gets selected */
+                    if (input->ml.states.current_video_track != -2 &&
+                        input->ml.states.current_video_track == ev->fmt->i_id)
+                        vlc_player_SelectTrack(input->player, &trackpriv->t,
+                                               VLC_PLAYER_SELECT_EXCLUSIVE);
+                    break;
+                case AUDIO_ES:
+                    if (input->ml.states.current_audio_track != -2 &&
+                        input->ml.states.current_audio_track == ev->fmt->i_id)
+                        vlc_player_SelectTrack(input->player, &trackpriv->t,
+                                               VLC_PLAYER_SELECT_EXCLUSIVE);
+                    break;
+                case SPU_ES:
+                    if (input->ml.states.current_subtitle_track != -2 &&
+                        input->ml.states.current_subtitle_track == ev->fmt->i_id)
+                        vlc_player_SelectTrack(input->player, &trackpriv->t,
+                                               VLC_PLAYER_SELECT_EXCLUSIVE);
+                default:
+                    break;
+            }
             break;
         case VLC_INPUT_ES_DELETED:
         {
@@ -467,6 +493,26 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
                 trackpriv->t.selected = true;
                 vlc_player_SendEvent(player, on_track_selection_changed,
                                      NULL, trackpriv->t.es_id);
+            }
+            switch (ev->fmt->i_cat)
+            {
+                /* Save the default selected track to know if it changed
+                 * when the playback stops, in order to save the user's
+                 * explicitely selected track */
+                case VIDEO_ES:
+                    if (input->ml.default_video_track == -2)
+                        input->ml.default_video_track = ev->fmt->i_id;
+                    break;
+                case AUDIO_ES:
+                    if (input->ml.default_audio_track == -2)
+                        input->ml.default_audio_track = ev->fmt->i_id;
+                    break;
+                case SPU_ES:
+                    if (input->ml.default_subtitle_track == -2)
+                        input->ml.default_subtitle_track = ev->fmt->i_id;
+                    break;
+                default:
+                    break;
             }
             break;
         case VLC_INPUT_ES_UNSELECTED:
@@ -505,8 +551,15 @@ vlc_player_input_HandleTitleEvent(struct vlc_player_input *input,
                                              title_offset, chapter_offset);
             vlc_player_SendEvent(player, on_titles_changed, input->titles);
             if (input->titles)
+            {
                 vlc_player_SendEvent(player, on_title_selection_changed,
                                      &input->titles->array[0], 0);
+                if (input->ml.states.current_title >= 0 &&
+                    (size_t)input->ml.states.current_title < ev->list.count)
+                {
+                    vlc_player_SelectTitleIdx(player, input->ml.states.current_title);
+                }
+            }
             break;
         }
         case VLC_INPUT_TITLE_SELECTED:
@@ -517,6 +570,16 @@ vlc_player_input_HandleTitleEvent(struct vlc_player_input *input,
             vlc_player_SendEvent(player, on_title_selection_changed,
                                  &input->titles->array[input->title_selected],
                                  input->title_selected);
+            if (input->ml.states.current_title >= 0 &&
+                (size_t)input->ml.states.current_title == ev->selected_idx &&
+                input->ml.states.progress > .0f)
+            {
+                input_SetPosition(input->thread, input->ml.states.progress, false);
+                /* Reset the wanted title to avoid forcing it or the position
+                 * again during the next title change
+                 */
+                input->ml.states.current_title = 0;
+            }
             break;
         default:
             vlc_assert_unreachable();
@@ -802,6 +865,17 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
 
     input->abloop_state[0].set = input->abloop_state[1].set = false;
 
+    memset(&input->ml.states, 0, sizeof(input->ml.states));
+    input->ml.states.aspect_ratio = input->ml.states.crop =
+        input->ml.states.deinterlace = input->ml.states.video_filter = NULL;
+    input->ml.states.current_title = -1;
+    input->ml.states.current_video_track =
+        input->ml.states.current_audio_track =
+        input->ml.states.current_subtitle_track =
+        input->ml.default_video_track = input->ml.default_audio_track =
+        input->ml.default_subtitle_track = -2;
+    input->ml.states.progress = -1.f;
+
     input->thread = input_Create(player, input_thread_Events, input, item,
                                  player->resource, player->renderer);
     if (!input->thread)
@@ -809,6 +883,8 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
         free(input);
         return NULL;
     }
+
+    vlc_player_input_RestoreMlStates(input, item);
 
     /* Initial sub/audio delay */
     const vlc_tick_t cat_delays[DATA_ES] = {
