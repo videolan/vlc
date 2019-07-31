@@ -397,26 +397,22 @@ static void AndroidWindow_Destroy(vout_display_t *vd,
 }
 
 static int AndroidWindow_SetupANW(vout_display_sys_t *sys,
-                                  android_window *p_window,
-                                  bool b_java_configured)
+                                  android_window *p_window)
 {
     p_window->i_pic_count = 1;
 
-    if (!b_java_configured && sys->anw->setBuffersGeometry)
-        return sys->anw->setBuffersGeometry(p_window->p_surface,
-                                            p_window->fmt.i_width,
-                                            p_window->fmt.i_height,
-                                            p_window->i_android_hal);
-    else
+    if (!sys->anw->setBuffersGeometry)
         return 0;
+    return sys->anw->setBuffersGeometry(p_window->p_surface,
+                                        p_window->fmt.i_width,
+                                        p_window->fmt.i_height,
+                                        p_window->i_android_hal);
 }
 
 static int AndroidWindow_Setup(vout_display_sys_t *sys,
                                android_window *p_window,
                                unsigned int i_pic_count)
 {
-    bool b_java_configured = false;
-
     if (i_pic_count != 0)
         p_window->i_pic_count = i_pic_count;
 
@@ -430,7 +426,7 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
         p_window->fmt.i_width = (p_pic->format.i_width + align_pixels) & ~align_pixels;
         picture_Release(p_pic);
 
-        if (AndroidWindow_SetupANW(sys, p_window, b_java_configured) != 0)
+        if (AndroidWindow_SetupANW(sys, p_window) != 0)
             return -1;
     } else {
         sys->p_window->i_pic_count = 31; // TODO
