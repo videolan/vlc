@@ -1213,7 +1213,6 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     }
 #endif
 
-    vd->info.is_slow = false;
     return VLC_SUCCESS;
 }
 

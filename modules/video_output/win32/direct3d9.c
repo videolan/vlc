@@ -1736,7 +1736,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     /* Setup vout_display now that everything is fine */
-    vd->info.is_slow = false;
     vd->info.has_pictures_invalid = !is_d3d9_opaque(fmt.i_chroma);
 
     if (var_InheritBool(vd, "direct3d9-hw-blending") &&
@@ -1974,7 +1973,7 @@ GLConvOpen(vlc_object_t *obj)
                                                &priv->dx_render, &shared_handle);
     if (FAILED(hr))
     {
-        msg_Warn(obj, "IDirect3DDevice9_CreateOffscreenPlainSurface failed");
+        msg_Warn(obj, "IDirect3DDevice9Ex_CreateRenderTarget failed");
         goto error;
     }
 
