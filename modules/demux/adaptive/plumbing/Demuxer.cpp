@@ -76,6 +76,19 @@ bool AbstractDemuxer::needsRestartOnSeek() const
     return b_reinitsonseek;
 }
 
+AbstractDemuxer::Status AbstractDemuxer::returnCode(int i_ret)
+{
+    switch(i_ret)
+    {
+        case VLC_DEMUXER_SUCCESS:
+            return Status::STATUS_SUCCESS;
+        case VLC_DEMUXER_EGENERIC:
+            return Status::STATUS_END_OF_FILE;
+        default:
+            return Status::STATUS_ERROR;
+    };
+}
+
 MimeDemuxer::MimeDemuxer(vlc_object_t *p_obj_,
                          const DemuxerFactoryInterface *factory_,
                          es_out_t *out, AbstractSourceStream *source)
@@ -148,10 +161,10 @@ void MimeDemuxer::drain()
         demuxer->drain();
 }
 
-int MimeDemuxer::demux(vlc_tick_t t)
+AbstractDemuxer::Status MimeDemuxer::demux(vlc_tick_t t)
 {
     if(!demuxer)
-        return VLC_DEMUXER_EOF;
+        return Status::STATUS_END_OF_FILE;
     return demuxer->demux(t);
 }
 
@@ -220,14 +233,14 @@ void Demuxer::drain()
     while(p_demux && demux_Demux(p_demux) == VLC_DEMUXER_SUCCESS);
 }
 
-int Demuxer::demux(vlc_tick_t)
+Demuxer::Status Demuxer::demux(vlc_tick_t)
 {
     if(!p_demux || b_eof)
-        return VLC_DEMUXER_EOF;
+        return Status::STATUS_END_OF_FILE;
     int i_ret = demux_Demux(p_demux);
     if(i_ret != VLC_DEMUXER_SUCCESS)
         b_eof = true;
-    return i_ret;
+    return returnCode(i_ret);
 }
 
 SlaveDemuxer::SlaveDemuxer(vlc_object_t *p_obj, const std::string &name,
@@ -256,16 +269,16 @@ bool SlaveDemuxer::create()
     return false;
 }
 
-int SlaveDemuxer::demux(vlc_tick_t nz_deadline)
+AbstractDemuxer::Status SlaveDemuxer::demux(vlc_tick_t nz_deadline)
 {
     /* Always call with increment or buffering will get slow stuck */
     vlc_tick_t i_next_demux_time = VLC_TICK_0 + nz_deadline + VLC_TICK_FROM_MS(250);
     if( demux_Control(p_demux, DEMUX_SET_NEXT_DEMUX_TIME, i_next_demux_time ) != VLC_SUCCESS )
     {
         b_eof = true;
-        return VLC_DEMUXER_EOF;
+        return Status::STATUS_END_OF_FILE;
     }
-    int ret = Demuxer::demux(i_next_demux_time);
+    Status status = Demuxer::demux(i_next_demux_time);
     es_out_Control(p_es_out, ES_OUT_SET_GROUP_PCR, 0, i_next_demux_time);
-    return ret;
+    return status;
 }

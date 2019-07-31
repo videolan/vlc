@@ -32,9 +32,15 @@ namespace adaptive
     class AbstractDemuxer
     {
         public:
+            enum Status
+            {
+                STATUS_SUCCESS,
+                STATUS_ERROR,
+                STATUS_END_OF_FILE,
+            };
             AbstractDemuxer();
             virtual ~AbstractDemuxer();
-            virtual int demux(vlc_tick_t) = 0;
+            virtual Status demux(vlc_tick_t) = 0;
             virtual void drain() = 0;
             virtual bool create() = 0;
             virtual void destroy() = 0;
@@ -46,6 +52,7 @@ namespace adaptive
             void setRestartsOnEachSegment(bool);
 
         protected:
+            static Status returnCode(int);
             bool b_startsfromzero;
             bool b_reinitsonseek;
             bool b_alwaysrestarts;
@@ -58,7 +65,7 @@ namespace adaptive
             MimeDemuxer(vlc_object_t *, const DemuxerFactoryInterface *,
                         es_out_t *, AbstractSourceStream *);
             virtual ~MimeDemuxer();
-            virtual int demux(vlc_tick_t); /* impl */
+            virtual Status demux(vlc_tick_t); /* impl */
             virtual void drain(); /* impl */
             virtual bool create(); /* impl */
             virtual void destroy(); /* impl */
@@ -76,7 +83,7 @@ namespace adaptive
         public:
             Demuxer(vlc_object_t *, const std::string &, es_out_t *, AbstractSourceStream *);
             virtual ~Demuxer();
-            virtual int demux(vlc_tick_t); /* impl */
+            virtual Status demux(vlc_tick_t); /* impl */
             virtual void drain(); /* impl */
             virtual bool create(); /* impl */
             virtual void destroy(); /* impl */
@@ -96,7 +103,7 @@ namespace adaptive
             SlaveDemuxer(vlc_object_t *, const std::string &, es_out_t *, AbstractSourceStream *);
             virtual ~SlaveDemuxer();
             virtual bool create(); /* reimpl */
-            virtual int demux(vlc_tick_t); /* reimpl */
+            virtual Status demux(vlc_tick_t); /* reimpl */
 
         private:
             vlc_tick_t length;
