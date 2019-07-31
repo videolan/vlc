@@ -112,6 +112,7 @@ Utils.NavigableFocusScope {
             id: gridView_id
 
             activeFocusOnTab:true
+            flickableDirection: Flickable.VerticalFlick
 
             cellWidth: VLCStyle.cover_normal + VLCStyle.margin_small
             cellHeight: VLCStyle.cover_normal + VLCStyle.fontHeight_normal * 2
