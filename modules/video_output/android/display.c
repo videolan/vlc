@@ -93,7 +93,6 @@ struct android_window
     int i_android_hal;
     unsigned int i_angle;
     unsigned int i_pic_count;
-    unsigned int i_min_undequeued;
     bool b_opaque;
 
     enum AWindow_ID id;
@@ -402,7 +401,6 @@ static int AndroidWindow_SetupANW(vout_display_sys_t *sys,
                                   bool b_java_configured)
 {
     p_window->i_pic_count = 1;
-    p_window->i_min_undequeued = 0;
 
     if (!b_java_configured && sys->anw->setBuffersGeometry)
         return sys->anw->setBuffersGeometry(p_window->p_surface,
@@ -436,7 +434,6 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
             return -1;
     } else {
         sys->p_window->i_pic_count = 31; // TODO
-        sys->p_window->i_min_undequeued = 0;
     }
 
     return 0;
