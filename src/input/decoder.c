@@ -826,9 +826,6 @@ static void DecoderThread_AbortPictures( decoder_t *p_dec, bool b_abort )
     vlc_mutex_lock( &p_owner->lock ); // called in DecoderThread
     if (p_owner->out_pool)
         picture_pool_Cancel( p_owner->out_pool, b_abort );
-
-    if( p_owner->p_vout != NULL )
-        vout_Cancel( p_owner->p_vout, b_abort );
     vlc_mutex_unlock( &p_owner->lock );
 }
 
@@ -2203,7 +2200,6 @@ void input_DecoderDelete( decoder_t *p_dec )
     {
         if (p_owner->out_pool)
             picture_pool_Cancel( p_owner->out_pool, true );
-        vout_Cancel( p_owner->p_vout, true );
     }
     vlc_mutex_unlock( &p_owner->lock );
 
