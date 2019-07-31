@@ -405,6 +405,7 @@ Item{
             height: VLCStyle.combobox_height_normal
             textRole: "display"
             model: player.aspectRatio
+            currentIndex: -1
             onCurrentIndexChanged: model.toggleIndex(currentIndex)
             property bool acceptFocus: true
         }
