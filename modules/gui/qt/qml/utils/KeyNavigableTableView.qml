@@ -103,6 +103,7 @@ NavigableFocusScope {
                         anchors.leftMargin: VLCStyle.margin_xxxsmall
                         anchors.rightMargin: VLCStyle.margin_xxxsmall
                         color: VLCStyle.colors.bg
+                        radius: height / 10
 
                     Row {
                         anchors {
