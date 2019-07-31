@@ -317,8 +317,22 @@ void MediaLibrary::onMediaThumbnailReady( medialibrary::MediaPtr media,
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
-void MediaLibrary::onHistoryChanged( medialibrary::HistoryType )
+void MediaLibrary::onHistoryChanged( medialibrary::HistoryType historyType )
 {
+    vlc_ml_event_t ev;
+    ev.i_type = VLC_ML_EVENT_HISTORY_CHANGED;
+    switch ( historyType )
+    {
+        case medialibrary::HistoryType::Media:
+            ev.history_changed.history_type = VLC_ML_HISTORY_TYPE_MEDIA;
+            break;
+        case medialibrary::HistoryType::Network:
+            ev.history_changed.history_type = VLC_ML_HISTORY_TYPE_NETWORK;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+    m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
 MediaLibrary::MediaLibrary( vlc_medialibrary_module_t* ml )

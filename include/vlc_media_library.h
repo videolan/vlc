@@ -76,6 +76,12 @@ typedef enum vlc_ml_thumbnail_size_t
     VLC_ML_THUMBNAIL_SIZE_COUNT
 } vlc_ml_thumbnail_size_t;
 
+typedef enum vlc_ml_history_type_t
+{
+    VLC_ML_HISTORY_TYPE_MEDIA,
+    VLC_ML_HISTORY_TYPE_NETWORK,
+} vlc_ml_history_type_t;
+
 typedef struct vlc_ml_thumbnail_t
 {
     char* psz_mrl;
@@ -628,6 +634,13 @@ enum vlc_ml_event_type
      * vlc_ml_event_t::media_thumbnail_generated::b_success
      */
     VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED,
+    /**
+     * Sent after the history gets changed. It can be either cleaned, or simply
+     * modified because a media was recently played/removed from the history.
+     * The history type (media/network) is stored in
+     * vlc_ml_event_t::history_changed::history_type
+     */
+    VLC_ML_EVENT_HISTORY_CHANGED,
 };
 
 typedef struct vlc_ml_event_t
@@ -707,6 +720,10 @@ typedef struct vlc_ml_event_t
             vlc_ml_thumbnail_size_t i_size;
             bool b_success;
         } media_thumbnail_generated;
+        struct
+        {
+            vlc_ml_history_type_t history_type;
+        } history_changed;
     };
 } vlc_ml_event_t;
 
