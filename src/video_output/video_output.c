@@ -1032,8 +1032,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     //because there is currently no way to transform subpictures to match
     //the source format.
     const bool do_early_spu = !do_dr_spu &&
-                               vd->source.orientation == ORIENT_NORMAL &&
-                              (vd->info.is_slow || do_snapshot);
+                               vd->source.orientation == ORIENT_NORMAL;
 
     const vlc_fourcc_t *subpicture_chromas;
     video_format_t fmt_spu;
