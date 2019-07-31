@@ -417,14 +417,15 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
         p_window->i_pic_count = i_pic_count;
 
     if (!p_window->b_opaque) {
-        int align_pixels;
-        picture_t *p_pic = PictureAlloc(sys, &p_window->fmt, false);
-
-        // For RGB (32 or 16) we need to align on 8 or 4 pixels, 16 pixels for YUV
-        align_pixels = (16 / p_pic->p[0].i_pixel_pitch) - 1;
-        p_window->fmt.i_height = p_pic->format.i_height;
-        p_window->fmt.i_width = (p_pic->format.i_width + align_pixels) & ~align_pixels;
-        picture_Release(p_pic);
+        const vlc_chroma_description_t *p_dsc =
+            vlc_fourcc_GetChromaDescription( p_window->fmt.i_chroma );
+        if (p_dsc)
+        {
+            assert(p_dsc->pixel_size != 0);
+            // For RGB (32 or 16) we need to align on 8 or 4 pixels, 16 pixels for YUV
+            unsigned align_pixels = (16 / p_dsc->pixel_size) - 1;
+            p_window->fmt.i_width = (p_window->fmt.i_width + align_pixels) & ~align_pixels;
+        }
 
         if (AndroidWindow_SetupANW(sys, p_window) != 0)
             return -1;
