@@ -121,6 +121,8 @@ struct vout_display_sys_t
     android_window *p_window;
     android_window *p_sub_window;
 
+    picture_t *p_prepared_pic; // local surface
+
     bool b_displayed;
     bool b_sub_invalid;
     filter_t *p_spu_blend;
@@ -598,14 +600,31 @@ static int OpenCommon(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
     }
 
-    *fmtp = fmt;
     /* Setup vout_display */
-    vd->pool    = Pool;
+    if (sys->p_window->b_opaque)
+        vd->pool    = Pool;
+    else
+    {
+        if (AndroidWindow_Setup(sys, sys->p_window, 1) != 0)
+            goto error;
+
+        sys->p_prepared_pic = PictureAlloc(sys, &sys->p_window->fmt, false);
+        if (sys->p_prepared_pic == NULL)
+        {
+            msg_Err(vd, "cannot allocate prepare surface");
+            goto error;
+        }
+        msg_Dbg(vd, "PictureAlloc: got a frame");
+
+        UpdateVideoSize(sys, &sys->p_window->fmt);
+    }
+
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
     vd->close = Close;
-    vd->info.is_slow = !sys->p_window->b_opaque;
+
+    *fmtp = fmt;
 
     return VLC_SUCCESS;
 
@@ -711,6 +730,8 @@ static void Close(vout_display_t *vd)
         AndroidWindow_Destroy(vd, sys->p_window);
     }
 
+    if (sys->p_prepared_pic)
+        picture_Release(sys->p_prepared_pic);
     if (sys->p_sub_pic)
         picture_Release(sys->p_sub_pic);
     if (sys->p_spu_blend)
@@ -779,8 +800,7 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
 
     for (i = 0; i < requested_count; i++)
     {
-        picture_t *p_pic = PictureAlloc(sys, &sys->p_window->fmt,
-                                        sys->p_window->b_opaque);
+        picture_t *p_pic = PictureAlloc(sys, &sys->p_window->fmt, true);
         if (!p_pic)
             goto error;
 
@@ -791,16 +811,8 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
     memset(&pool_cfg, 0, sizeof(pool_cfg));
     pool_cfg.picture_count = requested_count;
     pool_cfg.picture       = pp_pics;
-    if (sys->p_window->b_opaque)
-    {
-        pool_cfg.lock      = PoolLockOpaquePicture;
-        pool_cfg.unlock    = PoolUnlockOpaquePicture;
-    }
-    else
-    {
-        pool_cfg.lock      = PoolLockPicture;
-        pool_cfg.unlock    = PoolUnlockPicture;
-    }
+    pool_cfg.lock      = PoolLockOpaquePicture;
+    pool_cfg.unlock    = PoolUnlockOpaquePicture;
     pool = picture_pool_NewExtended(&pool_cfg);
 
 error:
@@ -950,6 +962,15 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 {
     vout_display_sys_t *sys = vd->sys;
 
+    if (!sys->p_window->b_opaque)
+    {
+        if (PoolLockPicture(sys->p_prepared_pic) == 0)
+        {
+            picture_Copy(sys->p_prepared_pic, picture);
+            PoolUnlockPicture(sys->p_prepared_pic);
+        }
+    }
+
     if (subpicture && sys->p_sub_window) {
         if (sys->b_sub_invalid) {
             sys->b_sub_invalid = false;
@@ -1009,8 +1030,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
     if (sys->p_window->b_opaque)
         AndroidOpaquePicture_Release(picture->p_sys, true);
-    else
-        AndroidWindow_UnlockPicture(sys, sys->p_window, picture);
 
     if (sys->p_sub_pic)
         AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic);
