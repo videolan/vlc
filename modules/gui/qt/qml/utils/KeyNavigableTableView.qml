@@ -61,7 +61,7 @@ NavigableFocusScope {
                 Package.name: "list"
                 id: lineView
 
-                width: parent.width
+                width: view.width
                 height: VLCStyle.fontHeight_normal + VLCStyle.margin_large
 
                 color:  VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, hoverArea.containsMouse, this.activeFocus)
