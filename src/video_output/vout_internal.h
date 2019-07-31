@@ -333,12 +333,6 @@ void vout_MouseState(vout_thread_t *, const vlc_mouse_t *);
 void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,
                              unsigned *pi_lost );
 
-/*
- * Cancel the vout, if cancel is true, it won't return any pictures after this
- * call.
- */
-void vout_Cancel( vout_thread_t *p_vout, bool b_canceled );
-
 /**
  * This function will force to display the next picture while paused
  */

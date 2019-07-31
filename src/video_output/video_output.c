@@ -1622,18 +1622,6 @@ error:
     return VLC_EGENERIC;
 }
 
-void vout_Cancel(vout_thread_t *vout, bool canceled)
-{
-    vout_thread_sys_t *sys = vout->p;
-    assert(!sys->dummy);
-    assert(sys->display);
-
-    vout_control_Hold(&sys->control);
-    if (sys->display_pool != NULL)
-        picture_pool_Cancel(sys->display_pool, canceled);
-    vout_control_Release(&sys->control);
-}
-
 static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
 {
     switch(cmd.type) {
