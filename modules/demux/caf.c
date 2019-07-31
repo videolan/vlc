@@ -505,6 +505,11 @@ static int ReadDescChunk( demux_t *p_demux )
         return VLC_EGENERIC;
 
     p_sys->fmt.audio.i_rate = (unsigned int)lround( d_rate );
+    if( !p_sys->fmt.audio.i_rate )
+    {
+        msg_Err( p_demux, "Sample rate must be non-zero" );
+        return VLC_EGENERIC;
+    }
     p_sys->fmt.audio.i_channels = i_channels_per_frame;
     p_sys->fmt.audio.i_bytes_per_frame = i_bytes_per_packet; /* "mBytesPerPacket" in Apple parlance */
     p_sys->fmt.audio.i_frame_length = i_frames_per_packet; /* "mFramesPerPacket" in Apple parlance */
@@ -884,7 +889,7 @@ static int Open( vlc_object_t *p_this )
         i_idx++;
     }
 
-    if ( !p_sys->i_data_offset || p_sys->fmt.i_cat != AUDIO_ES ||
+    if ( !p_sys->i_data_offset || p_sys->fmt.i_cat != AUDIO_ES || !p_sys->fmt.audio.i_rate ||
         ( NeedsPacketTable( p_sys ) && !p_sys->packet_table.i_descriptions_start ))
     {
         msg_Err( p_demux, "Did not find all necessary chunks." );
