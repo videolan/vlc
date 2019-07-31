@@ -29,7 +29,7 @@ Utils.KeyNavigableTableView {
     id: root
 
     sortModel: ListModel {
-        ListElement{ criteria: "title";       width:0.44; text: qsTr("Title");    showSection: "title" }
+        ListElement{ isPrimary: true; criteria: "title";       width:0.44; text: qsTr("Title");    showSection: "title" }
         ListElement{ criteria: "album_title"; width:0.25; text: qsTr("Album");    showSection: "album_title" }
         ListElement{ criteria: "main_artist"; width:0.15; text: qsTr("Artist");   showSection: "main_artist" }
         ListElement{ criteria: "duration";    width:0.06; text: qsTr("Duration"); showSection: "" }
