@@ -1,7 +1,7 @@
 /*
- * ChunksSource.hpp
+ * AbstractSource.hpp
  *****************************************************************************
- * Copyright © 2015 - VideoLAN and VLC Authors
+ * Copyright © 2015-2019 - VideoLabs, VideoLAN and VLC Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,21 +17,21 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef CHUNKSSOURCE_HPP
-#define CHUNKSSOURCE_HPP
+#ifndef ABSTRACTSOURCE_HPP
+#define ABSTRACTSOURCE_HPP
 
 #include <vlc_common.h>
 
 namespace adaptive
 {
-    class ChunksSource
+    class AbstractSource
     {
         public:
-            virtual ~ChunksSource() {}
+            virtual ~AbstractSource() {}
             virtual block_t *readNextBlock() = 0;
             virtual std::string getContentType() = 0;
     };
 }
 
-#endif // CHUNKSSOURCE_HPP
+#endif // ABSTRACTSOURCE_HPP
 

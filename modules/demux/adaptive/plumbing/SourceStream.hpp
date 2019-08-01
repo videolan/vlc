@@ -27,7 +27,7 @@
 
 namespace adaptive
 {
-    class ChunksSource;
+    class AbstractSource;
 
     class AbstractSourceStream
     {
@@ -41,7 +41,7 @@ namespace adaptive
     class AbstractChunksSourceStream : public AbstractSourceStream
     {
         public:
-            AbstractChunksSourceStream(vlc_object_t *, ChunksSource *);
+            AbstractChunksSourceStream(vlc_object_t *, AbstractSource *);
             virtual ~AbstractChunksSourceStream();
             virtual void Reset(); /* impl */
             virtual stream_t *makeStream(); /* impl */
@@ -52,7 +52,7 @@ namespace adaptive
             virtual std::string getContentType() = 0;
             bool b_eof;
             vlc_object_t *p_obj;
-            ChunksSource *source;
+            AbstractSource *source;
 
         private:
             static ssize_t read_Callback(stream_t *, void *, size_t);
@@ -64,7 +64,7 @@ namespace adaptive
     class ChunksSourceStream : public AbstractChunksSourceStream
     {
         public:
-            ChunksSourceStream(vlc_object_t *, ChunksSource *);
+            ChunksSourceStream(vlc_object_t *, AbstractSource *);
             virtual ~ChunksSourceStream();
             virtual void Reset(); /* reimpl */
 
@@ -81,7 +81,7 @@ namespace adaptive
     class BufferedChunksSourceStream : public AbstractChunksSourceStream
     {
         public:
-            BufferedChunksSourceStream(vlc_object_t *, ChunksSource *);
+            BufferedChunksSourceStream(vlc_object_t *, AbstractSource *);
             virtual ~BufferedChunksSourceStream();
             virtual void Reset(); /* reimpl */
 

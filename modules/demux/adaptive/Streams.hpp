@@ -22,7 +22,7 @@
 
 #include <vlc_common.h>
 #include "StreamFormat.hpp"
-#include "ChunksSource.hpp"
+#include "AbstractSource.hpp"
 #include "SegmentTracker.hpp"
 
 #include "plumbing/CommandsQueue.hpp"
@@ -49,7 +49,7 @@ namespace adaptive
     using namespace http;
     using namespace playlist;
 
-    class AbstractStream : public ChunksSource,
+    class AbstractStream : public AbstractSource,
                            public ExtraFMTInfoInterface,
                            public SegmentTrackerListenerInterface,
                            public DemuxerFactoryInterface

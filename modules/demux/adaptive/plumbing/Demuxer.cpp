@@ -29,7 +29,7 @@
 #include "SourceStream.hpp"
 #include "../StreamFormat.hpp"
 #include "CommandsQueue.hpp"
-#include "../ChunksSource.hpp"
+#include "../AbstractSource.hpp"
 
 using namespace adaptive;
 
