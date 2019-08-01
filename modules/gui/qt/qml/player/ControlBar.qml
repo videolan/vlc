@@ -43,8 +43,38 @@ Utils.NavigableFocusScope {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: 0
+        spacing: VLCStyle.margin_xsmall
 
+
+        RowLayout {
+            Text {
+                text: player.time.toString()
+                color: VLCStyle.colors.playerFg
+                font.pixelSize: VLCStyle.fontSize_normal
+                font.bold: true
+                Layout.alignment: Qt.AlignLeft
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+
+            Text {
+                text: (rootWindow.showRemainingTime && player.remainingTime.valid())
+                    ? "-" + player.remainingTime.toString()
+                    : player.length.toString()
+                color: VLCStyle.colors.playerFg
+                font.pixelSize: VLCStyle.fontSize_normal
+                font.bold: true
+                Layout.alignment: Qt.AlignRight
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: rootWindow.showRemainingTime = !rootWindow.showRemainingTime
+                }
+            }
+
+        }
         SliderBar {
             id: trackPositionSlider
             Layout.alignment: Qt.AlignLeft | Qt.AlignTop
