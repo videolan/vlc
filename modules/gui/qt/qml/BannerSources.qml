@@ -227,10 +227,19 @@ Utils.NavigableFocusScope {
                     size: VLCStyle.icon_normal
                     Layout.minimumWidth: width
                     text: VLCIcons.topbar_next
-                    KeyNavigation.right: bar
+                    KeyNavigation.right: list_grid_btn
                     KeyNavigation.up: buttonView
                     onClicked: history.next(History.Go)
                     enabled: !history.nextEmpty
+                }
+
+                Utils.IconToolButton {
+                    id: list_grid_btn
+                    size: VLCStyle.icon_normal
+                    text: medialib.gridView ? VLCIcons.list : VLCIcons.grid
+                    onClicked: medialib.gridView = !medialib.gridView
+                    KeyNavigation.right: bar
+                    KeyNavigation.up: buttonView
                 }
 
                 TabBar {
