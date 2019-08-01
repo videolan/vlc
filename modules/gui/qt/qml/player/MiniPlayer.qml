@@ -77,6 +77,11 @@ Utils.NavigableFocusScope {
                     onClicked: history.push(["player"], History.Go)
                 }
 
+                Keys.onPressed: {
+                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                        event.accepted = true
+                    }
+                }
                 Keys.onReleased: {
                     if (!event.accepted && (event.key === Qt.Key_Return || event.key === Qt.Key_Space))
                         history.push(["player"], History.Go)
