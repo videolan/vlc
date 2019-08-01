@@ -127,7 +127,8 @@ Utils.NavigableFocusScope {
         id: gridComponent
         Flickable{
             id: flickable
-            anchors.fill: parent
+            height: view.height
+            width: view.width
             contentHeight: allSections.implicitHeight
             ScrollBar.vertical: ScrollBar{}
             onActiveFocusChanged: {
