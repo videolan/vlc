@@ -389,7 +389,7 @@ Utils.NavigableFocusScope {
             width: view.width
             onContextMenuButtonClicked:{
                 contextMenu.model = menuModel
-                contextMenu.popup(menuParent)
+                contextMenu.popup(menuParent,contextMenu.width,0)
             }
             onRightClick:{
                 contextMenu.model = menuModel

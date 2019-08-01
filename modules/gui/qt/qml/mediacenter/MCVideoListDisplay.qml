@@ -39,6 +39,98 @@ Utils.KeyNavigableTableView {
 
     rowHeight: VLCStyle.video_small_height + VLCStyle.margin_normal
 
+    property bool isFocusOnContextButton: false
+    colDelegate: Item {
+        id: colDel
+        anchors.fill: parent
+        anchors.leftMargin: VLCStyle.margin_normal
+        anchors.rightMargin: VLCStyle.margin_normal
+
+        property var rowModel: parent.rowModel
+        property var model: parent.colModel
+        FocusScope{
+            anchors.fill: parent
+            focus: isFocusOnContextButton && rowModel.index === currentIndex
+            onFocusChanged: focus && contextButtonLoader.forceActiveFocus()
+
+            Loader{
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                active: model.type === "image"
+                sourceComponent: Utils.RoundImage{
+                    id: cover
+                    height: VLCStyle.video_small_height
+                    width: VLCStyle.video_small_width
+                    source: !rowModel ? "" : rowModel[model.criteria]
+
+                    Utils.VideoQualityLabel {
+                        id: resolutionLabel
+                        anchors {
+                            top: cover.top
+                            left: cover.left
+                            topMargin: VLCStyle.margin_xxsmall
+                            leftMargin: VLCStyle.margin_xxsmall
+                        }
+                        text: !rowModel ? "" : rowModel.resolution_name
+                    }
+                    Utils.VideoQualityLabel {
+                        anchors {
+                            top: cover.top
+                            left: resolutionLabel.right
+                            topMargin: VLCStyle.margin_xxsmall
+                            leftMargin: VLCStyle.margin_xxxsmall
+                        }
+                        visible: !rowModel ? "" : rowModel.channel.length > 0
+                        text: !rowModel ? "" : rowModel.channel
+                        color: "limegreen"
+                    }
+                    Utils.VideoProgressBar {
+                        value: !rowModel ? "" : rowModel.saved_position
+                        anchors {
+                            bottom: parent.bottom
+                            left: parent.left
+                            right: parent.right
+                        }
+                    }
+
+                }
+            }
+            Loader{
+                id: contextButtonLoader
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: VLCStyle.margin_xxsmall
+                active: model.type === "contextButton"
+                sourceComponent: Utils.ContextButton{
+                    backgroundColor: hovered || activeFocus ?
+                                         VLCStyle.colors.getBgColor( root.isSelected, hovered,
+                                                                    root.activeFocus) : "transparent"
+                    focus: contextButtonLoader.focus
+                    onClicked: listView_id.contextMenuButtonClicked(this,rowModel)
+                }
+            }
+            Loader{
+                anchors.fill:parent
+                active: model.type !== "image"
+                sourceComponent: Text {
+                    text: !rowModel ? "" : rowModel[model.criteria] || ""
+                    elide: Text.ElideRight
+                    font.pixelSize: VLCStyle.fontSize_normal
+                    color: (model.isPrimary)? VLCStyle.colors.text : VLCStyle.colors.textInactive
+
+                    anchors {
+                        fill: parent
+                        leftMargin: VLCStyle.margin_xsmall
+                        rightMargin: VLCStyle.margin_xsmall
+                    }
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignLeft
+                }
+            }
+        }
+    }
+
     headerColor: VLCStyle.colors.bg
     spacing: VLCStyle.margin_small
 
@@ -49,5 +141,10 @@ Utils.KeyNavigableTableView {
         }
         medialib.addAndPlay(list)
     }
+    onActionLeft:  isFocusOnContextButton ? isFocusOnContextButton = false : root.actionLeft(index)
+    onActionRight: !isFocusOnContextButton ? isFocusOnContextButton = true : root.actionRight(index)
+    onActionDown:   root.actionDown(index)
+    onActionUp:     root.actionUp(index)
+    onActionCancel: root.actionCancel(index)
 
 }
