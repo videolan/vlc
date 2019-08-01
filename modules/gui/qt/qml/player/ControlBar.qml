@@ -44,7 +44,8 @@ Utils.NavigableFocusScope {
     ColumnLayout {
         anchors.fill: parent
         spacing: VLCStyle.margin_xsmall
-
+        anchors.leftMargin: VLCStyle.margin_xlarge
+        anchors.rightMargin: VLCStyle.margin_xlarge
 
         RowLayout {
             Text {
@@ -109,6 +110,8 @@ Utils.NavigableFocusScope {
                 id: buttonstoolbar
                 focusPolicy: Qt.StrongFocus
                 focus: true
+                rightPadding: 0
+                leftPadding: 0
                 anchors.fill: parent
 
                 background: Rectangle {
