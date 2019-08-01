@@ -138,6 +138,9 @@
 		{"key":"topbar_sort", "path": "./topbar/sort.svg"},
 		{"key":"rename", "path": "./rename.svg"},
 		{"key":"del", "path": "./del.svg"},
-		{"key":"close", "path": "./close.svg"}
+		{"key":"close", "path": "./close.svg"},
+		{"key":"ellipsis", "path": "./ellipsis.svg"},
+		{"key":"grid", "path": "./topbar/grid.svg"},
+		{"key":"list", "path": "./topbar/list.svg"}
 	]
 }

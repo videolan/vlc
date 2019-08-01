@@ -164,5 +164,8 @@ Item {
     property string rename : "\ue084"
     property string del : "\ue085"
     property string close : "\ue086"
+    property string ellipsis : "\ue087"
+    property string grid : "\ue088"
+    property string list : "\ue089"
 
 }
