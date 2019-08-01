@@ -1048,10 +1048,6 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     ShaderUpdateConstants(o, d3d_dev, quad, PS_CONST_COLORSPACE, &colorspace);
 
 
-    quad->picSys.formatTexture = quad->textureFormat->formatTexture;
-    quad->picSys.context = d3d_dev->d3dcontext;
-    ID3D11DeviceContext_AddRef(quad->picSys.context);
-
     if (!D3D11_UpdateQuadPosition(o, d3d_dev, quad, output, orientation))
         return VLC_EGENERIC;
 

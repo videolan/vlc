@@ -58,8 +58,6 @@ void AcquireD3D11PictureSys(picture_sys_d3d11_t *p_sys)
         if (p_sys->texture[i])
             ID3D11Texture2D_AddRef(p_sys->texture[i]);
     }
-    if (p_sys->context)
-        ID3D11DeviceContext_AddRef(p_sys->context);
     if (p_sys->processorInput)
         ID3D11VideoProcessorInputView_AddRef(p_sys->processorInput);
     if (p_sys->processorOutput)
@@ -74,8 +72,6 @@ void ReleaseD3D11PictureSys(picture_sys_d3d11_t *p_sys)
         if (p_sys->texture[i])
             ID3D11Texture2D_Release(p_sys->texture[i]);
     }
-    if (p_sys->context)
-        ID3D11DeviceContext_Release(p_sys->context);
     if (p_sys->processorInput)
         ID3D11VideoProcessorInputView_Release(p_sys->processorInput);
     if (p_sys->processorOutput)

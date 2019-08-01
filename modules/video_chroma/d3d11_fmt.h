@@ -72,12 +72,10 @@ typedef struct
         ID3D11Texture2D           *texture[D3D11_MAX_SHADER_VIEW];
         ID3D11Resource            *resource[D3D11_MAX_SHADER_VIEW];
     };
-    ID3D11DeviceContext           *context;
     unsigned                      slice_index;
     ID3D11VideoProcessorInputView  *processorInput;  /* when used as processor input */
     ID3D11VideoProcessorOutputView *processorOutput; /* when used as processor output */
     ID3D11ShaderResourceView      *renderSrc[D3D11_MAX_SHADER_VIEW];
-    DXGI_FORMAT                   formatTexture;
 } picture_sys_d3d11_t;
 
 struct d3d11_pic_context

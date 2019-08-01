@@ -169,7 +169,6 @@ static picture_context_t *d3d11va_pic_context_copy(picture_context_t *ctx)
 
 static struct d3d11va_pic_context *CreatePicContext(
                                                   ID3D11Resource *p_resource,
-                                                  ID3D11DeviceContext *context,
                                                   UINT slice,
                                                   ID3D11ShaderResourceView *renderSrc[D3D11_MAX_SHADER_VIEW],
                                                   vlc_video_context *vctx)
@@ -185,8 +184,6 @@ static struct d3d11va_pic_context *CreatePicContext(
     D3D11_TEXTURE2D_DESC txDesc;
     ID3D11Texture2D_GetDesc((ID3D11Texture2D*)p_resource, &txDesc);
 
-    pic_ctx->ctx.picsys.formatTexture = txDesc.Format;
-    pic_ctx->ctx.picsys.context = context;
     pic_ctx->ctx.picsys.slice_index = slice;
     for (int i=0;i<D3D11_MAX_SHADER_VIEW; i++)
     {
@@ -213,7 +210,6 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *v
 
     struct d3d11va_pic_context *pic_ctx = CreatePicContext(
                                                   p_resource,
-                                                  sys->d3d_dev.d3dcontext,
                                                   viewDesc.Texture2D.ArraySlice,
                                                   resourceView, sys->vctx);
     ID3D11Resource_Release(p_resource);

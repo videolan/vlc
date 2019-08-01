@@ -167,12 +167,11 @@ static int assert_staging(filter_t *p_filter, picture_sys_d3d11_t *p_sys)
     texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
     texDesc.BindFlags = 0;
 
-    d3d11_device_t d3d_dev = { .d3dcontext = p_sys->context };
-    ID3D11DeviceContext_GetDevice(d3d_dev.d3dcontext, &d3d_dev.d3ddevice);
+    d3d11_device_t d3d_dev = sys->d3d_dev;
     sys->staging = NULL;
     hr = ID3D11Device_CreateTexture2D( d3d_dev.d3ddevice, &texDesc, NULL, &sys->staging);
     /* test if mapping the texture works ref #18746 */
-    if (SUCCEEDED(hr) && FAILED(hr = can_map(sys, p_sys->context)))
+    if (SUCCEEDED(hr) && FAILED(hr = can_map(sys, d3d_dev.d3dcontext)))
         msg_Dbg(p_filter, "can't map default staging texture (hr=0x%lX)", hr);
 #if CAN_PROCESSOR
     if (FAILED(hr)) {
@@ -191,10 +190,9 @@ static int assert_staging(filter_t *p_filter, picture_sys_d3d11_t *p_sys)
                 texDesc.CPUAccessFlags = 0;
                 texDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
                 hr = ID3D11Device_CreateTexture2D( d3d_dev.d3ddevice, &texDesc, NULL, &sys->procOutTexture);
-                if (SUCCEEDED(hr) && SUCCEEDED(hr = can_map(sys, p_sys->context)))
+                if (SUCCEEDED(hr) && SUCCEEDED(hr = can_map(sys, d3d_dev.d3dcontext)))
                 {
-                    d3d11_device_t proc_dev = { .d3ddevice = d3d_dev.d3ddevice, .d3dcontext = p_sys->context };
-                    if (SetupProcessor(p_filter, &proc_dev, srcFormat, new_fmt->formatTexture))
+                    if (SetupProcessor(p_filter, &d3d_dev, srcFormat, new_fmt->formatTexture))
                     {
                         ID3D11Texture2D_Release(sys->procOutTexture);
                         ID3D11Texture2D_Release(sys->staging);
@@ -274,13 +272,14 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
         srcSlice = 0;
     }
 #endif
-    ID3D11DeviceContext_CopySubresourceRegion(p_sys->context, sys->staging_resource,
+    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(picture_GetVideoContext(src));
+    ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->device, sys->staging_resource,
                                               0, 0, 0, 0,
                                               srcResource,
                                               srcSlice,
                                               NULL);
 
-    HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, sys->staging_resource,
+    HRESULT hr = ID3D11DeviceContext_Map(vctx_sys->device, sys->staging_resource,
                                          0, D3D11_MAP_READ, 0, &lock);
     if (FAILED(hr)) {
         msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
@@ -339,7 +338,7 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
         picture_SwapUV( dst );
 
     /* */
-    ID3D11DeviceContext_Unmap(p_sys->context, sys->staging_resource, 0);
+    ID3D11DeviceContext_Unmap(vctx_sys->device, sys->staging_resource, 0);
     vlc_mutex_unlock(&sys->staging_lock);
 }
 
@@ -394,13 +393,14 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
         srcSlice = 0;
     }
 #endif
-    ID3D11DeviceContext_CopySubresourceRegion(p_sys->context, sys->staging_resource,
+    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(picture_GetVideoContext(src));
+    ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->device, sys->staging_resource,
                                               0, 0, 0, 0,
                                               srcResource,
                                               srcSlice,
                                               NULL);
 
-    HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, sys->staging_resource,
+    HRESULT hr = ID3D11DeviceContext_Map(vctx_sys->device, sys->staging_resource,
                                          0, D3D11_MAP_READ, 0, &lock);
     if (FAILED(hr)) {
         msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
@@ -427,7 +427,7 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 
     /* */
-    ID3D11DeviceContext_Unmap(p_sys->context, sys->staging_resource, 0);
+    ID3D11DeviceContext_Unmap(vctx_sys->device, sys->staging_resource, 0);
     vlc_mutex_unlock(&sys->staging_lock);
 }
 
@@ -447,13 +447,14 @@ static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
         return;
     }
 
-    ID3D11DeviceContext_CopySubresourceRegion(p_sys->context, sys->staging_resource,
+    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(picture_GetVideoContext(src));
+    ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->device, sys->staging_resource,
                                               0, 0, 0, 0,
                                               p_sys->resource[KNOWN_DXGI_INDEX],
                                               p_sys->slice_index,
                                               NULL);
 
-    HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, sys->staging_resource,
+    HRESULT hr = ID3D11DeviceContext_Map(vctx_sys->device, sys->staging_resource,
                                          0, D3D11_MAP_READ, 0, &lock);
     if (FAILED(hr)) {
         msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
@@ -470,7 +471,7 @@ static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
     plane_CopyPixels( dst->p, &src_planes );
 
     /* */
-    ID3D11DeviceContext_Unmap(p_sys->context,
+    ID3D11DeviceContext_Unmap(vctx_sys->device,
                               p_sys->resource[KNOWN_DXGI_INDEX], p_sys->slice_index);
     vlc_mutex_unlock(&sys->staging_lock);
 }
@@ -544,7 +545,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
     if (sys->filter == NULL)
     {
         D3D11_MAPPED_SUBRESOURCE lock;
-        HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX],
+        HRESULT hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, p_sys->resource[KNOWN_DXGI_INDEX],
                                             0, D3D11_MAP_WRITE_DISCARD, 0, &lock);
         if (FAILED(hr)) {
             msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
@@ -559,7 +560,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         picture_CopyPixels(dst, src);
 
         dst->context = dst_pic_ctx;
-        ID3D11DeviceContext_Unmap(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], 0);
+        ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, p_sys->resource[KNOWN_DXGI_INDEX], 0);
     }
     else
     {
@@ -569,7 +570,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         ID3D11Texture2D_GetDesc( p_staging_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
 
         D3D11_MAPPED_SUBRESOURCE lock;
-        HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, p_staging_sys->resource[KNOWN_DXGI_INDEX],
+        HRESULT hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, p_staging_sys->resource[KNOWN_DXGI_INDEX],
                                             0, D3D11_MAP_WRITE_DISCARD, 0, &lock);
         if (FAILED(hr)) {
             msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
@@ -585,12 +586,12 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         sys->filter->pf_video_filter(sys->filter, src);
 
         sys->staging_pic->context = staging_pic_ctx;
-        ID3D11DeviceContext_Unmap(p_sys->context, p_staging_sys->resource[KNOWN_DXGI_INDEX], 0);
+        ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, p_staging_sys->resource[KNOWN_DXGI_INDEX], 0);
 
         D3D11_BOX copyBox = {
             .right = dst->format.i_width, .bottom = dst->format.i_height, .back = 1,
         };
-        ID3D11DeviceContext_CopySubresourceRegion(p_sys->context,
+        ID3D11DeviceContext_CopySubresourceRegion(sys->d3d_dev.d3dcontext,
                                                 p_sys->resource[KNOWN_DXGI_INDEX],
                                                 p_sys->slice_index,
                                                 0, 0, 0,
@@ -634,8 +635,6 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
     picture_resource_t res = {};
     picture_sys_d3d11_t *res_sys = &pic_ctx->picsys;
     res.p_sys = res_sys;
-    res_sys->context = vctx_sys->device;
-    res_sys->formatTexture = vctx_sys->format;
 
     video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
     fmt_staging.i_chroma = cfg->fourcc;
