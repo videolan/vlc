@@ -98,7 +98,8 @@ Slider {
         width: control.availableWidth
         implicitHeight: control.implicitHeight
         height: implicitHeight
-        color: "transparent"
+        color:  VLCStyle.colors.setColorAlpha( VLCStyle.colors.playerFg, 0.7 )
+        radius: implicitHeight
 
         MouseArea {
             id: sliderRectMouseArea
