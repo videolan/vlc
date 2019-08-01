@@ -42,7 +42,7 @@ Utils.NavigableFocusScope {
                 font.pixelSize: VLCStyle.fontSize_large
                 anchors.verticalCenter:  parent.verticalCenter
                 visible: model.checked
-                color: (Tumbler.tumbler.activeFocus && model.index === Tumbler.tumbler.currentIndex ) ? VLCStyle.colors.accent : VLCStyle.colors.text
+                color: (Tumbler.tumbler.activeFocus && model.index === Tumbler.tumbler.currentIndex ) ? VLCStyle.colors.accent : VLCStyle.colors.playerFg
                 font.bold: true
                 text: "☑"
             }
@@ -54,7 +54,7 @@ Utils.NavigableFocusScope {
                 verticalAlignment: Text.AlignVCenter
 
                 font.pixelSize: (model.index === Tumbler.tumbler.currentIndex) ? VLCStyle.fontSize_large * 1.3 : VLCStyle.fontSize_large
-                color: (Tumbler.tumbler.activeFocus && model.index === Tumbler.tumbler.currentIndex ) ? VLCStyle.colors.accent : VLCStyle.colors.text
+                color: (Tumbler.tumbler.activeFocus && model.index === Tumbler.tumbler.currentIndex ) ? VLCStyle.colors.accent : VLCStyle.colors.playerFg
                 font.bold: true
             }
             Keys.onPressed:  {

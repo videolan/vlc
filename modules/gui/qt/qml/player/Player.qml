@@ -217,7 +217,11 @@ Utils.NavigableFocusScope {
 
         component: Rectangle {
             id: controllerBarId
-            color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
+            gradient: Gradient {
+                GradientStop { position: 1.0; color: VLCStyle.colors.playerBg }
+                GradientStop { position: 0.0; color: "transparent" }
+            }
+
             width: controlBarView.width
             height: 90 * VLCStyle.scale
             property alias noAutoHide: controllerId.noAutoHide

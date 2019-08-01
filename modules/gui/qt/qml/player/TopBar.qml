@@ -42,6 +42,12 @@ Utils.NavigableFocusScope{
         color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
         anchors.fill: parent
 
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: VLCStyle.colors.playerBg }
+            GradientStop { position: 1.0; color: "transparent" }
+        }
+
+
         MouseArea {
             id: topcontrollerMouseArea
             hoverEnabled: true
@@ -57,6 +63,7 @@ Utils.NavigableFocusScope{
                     objectName: "IconToolButton"
                     size: VLCStyle.icon_normal
                     text: VLCIcons.exit
+                    color: VLCStyle.colors.playerFg
                     onClicked: history.previous(History.Go)
                     KeyNavigation.right: playlistBtn
                     focus: true
@@ -71,6 +78,7 @@ Utils.NavigableFocusScope{
                     objectName: PlayerControlBarModel.PLAYLIST_BUTTON
                     size: VLCStyle.icon_normal
                     text: VLCIcons.playlist
+                    color: VLCStyle.colors.playerFg
                     onClicked: {
                         rootWindow.playlistVisible = !rootWindow.playlistVisible
                         if (rootWindow.playlistVisible && rootWindow.playlistDocked) {
