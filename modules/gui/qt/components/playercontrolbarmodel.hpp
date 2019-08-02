@@ -28,6 +28,7 @@ class PlayerControlBarModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QmlMainContext* mainCtx READ getMainCtx WRITE setMainCtx NOTIFY ctxChanged)
+    Q_PROPERTY(QString configName READ getConfigName WRITE setConfigName NOTIFY configNameChanged)
 
 public:
     explicit PlayerControlBarModel(QObject *_parent = nullptr);
@@ -101,14 +102,20 @@ public:
     inline QmlMainContext* getMainCtx() const { return m_mainCtx; }
     void setMainCtx(QmlMainContext*);
 
+    inline QString getConfigName() { return configName; }
+    void setConfigName(QString name);
+
 signals:
     void ctxChanged(QmlMainContext*);
+    void configNameChanged(QString);
 
 protected:
     intf_thread_t       *p_intf;
 
 private:
     QVector<IconToolButton> mButtons;
+    QString configName;
+    QString defaultConfig;
 
     void parseAndAdd(QString& config);
 

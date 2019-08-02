@@ -21,21 +21,17 @@
 #include "playercontrolbarmodel.hpp"
 
 #define MAIN_TB1_DEFAULT "20;21;65;17;3;0-2;1-2;4;18;65;33;7"
+#define MINI_TB_DEFAULT "17;3;0;1;4;18"
 
 PlayerControlBarModel::PlayerControlBarModel(QObject *_parent) : QAbstractListModel(_parent)
 {
-}
-
-void PlayerControlBarModel::loadConfig()
-{
-    QString config = getSettings() ->value( "MainWindow/PlayerControlToolbar1", MAIN_TB1_DEFAULT )
-                                            .toString();
-    parseAndAdd(config);
+    configName = "MainPlayerToolbar";
+    defaultConfig = MAIN_TB1_DEFAULT;
 }
 
 void PlayerControlBarModel::saveConfig()
 {
-    getSettings()->setValue("MainWindow/PlayerControlToolbar1",getConfig());
+    getSettings()->setValue(configName,getConfig());
 }
 
 QString PlayerControlBarModel::getConfig()
@@ -62,7 +58,7 @@ void PlayerControlBarModel::reloadModel()
 {
     beginResetModel();
     mButtons.clear();
-    QString config = getSettings() ->value( "MainWindow/PlayerControlToolbar1", MAIN_TB1_DEFAULT )
+    QString config = getSettings() ->value( configName, defaultConfig )
                                             .toString();
     parseAndAdd(config);
     endResetModel();
@@ -190,7 +186,18 @@ void PlayerControlBarModel::setMainCtx(QmlMainContext* ctx)
         p_intf = temp_intf;
     else
         return;
-    loadConfig();
+}
+
+void PlayerControlBarModel::setConfigName(QString name)
+{
+    if(configName == name)
+        return;
+    configName = name;
+    if(configName == "MainPlayerToolbar")
+        defaultConfig = MAIN_TB1_DEFAULT;
+    else
+        defaultConfig = MINI_TB_DEFAULT;
+    emit configNameChanged(name);
 }
 
 void PlayerControlBarModel::insert(int index, QVariantMap bdata)
