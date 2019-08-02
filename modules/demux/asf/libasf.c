@@ -125,7 +125,7 @@ static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj )
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,
-             "found object guid: " GUID_FMT " size:%"PRId64" at %"PRId64,
+             "found object guid: " GUID_FMT " size:%"PRIu64" at %"PRIu64,
              GUID_PRINT( p_common->i_object_id ),
              p_common->i_object_size, p_common->i_object_pos );
 #endif
@@ -196,7 +196,7 @@ static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,
-             "read \"header object\" subobj:%d, reserved1:%d, reserved2:%d",
+             "read \"header object\" subobj:%u, reserved1:%u, reserved2:%u",
              p_hdr->i_sub_object_count,
              p_hdr->i_reserved1,
              p_hdr->i_reserved2 );
@@ -236,7 +236,7 @@ static int ASF_ReadObject_Data( stream_t *s, asf_object_t *p_obj )
 #ifdef ASF_DEBUG
     msg_Dbg( s,
              "read \"data object\" file_id:" GUID_FMT " total data packet:"
-             "%"PRId64" reserved:%d",
+             "%"PRIu64" reserved:%u",
              GUID_PRINT( p_data->i_file_id ),
              p_data->i_total_data_packets,
              p_data->i_reserved );
@@ -267,12 +267,12 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
 #ifdef ASF_DEBUG
     msg_Dbg( s,
             "read \"index object\" file_id:" GUID_FMT
-            " index_entry_time_interval:%"PRId64" max_packet_count:%d "
-            "index_entry_count:%ld",
+            " index_entry_time_interval:%"PRId64" max_packet_count:%u "
+            "index_entry_count:%u",
             GUID_PRINT( p_index->i_file_id ),
             p_index->i_index_entry_time_interval,
             p_index->i_max_packet_count,
-            (long int)p_index->i_index_entry_count );
+            p_index->i_index_entry_count );
 #endif
 
     /* Sanity checking */
@@ -326,10 +326,10 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
 #ifdef ASF_DEBUG
     msg_Dbg( s,
             "read \"file properties object\" file_id:" GUID_FMT
-            " file_size:%"PRId64" creation_date:%"PRId64" data_packets_count:"
-            "%"PRId64" play_duration:%"PRId64" send_duration:%"PRId64" preroll:%"PRId64
-            " flags:%d min_data_packet_size:%d "
-            " max_data_packet_size:%d max_bitrate:%d",
+            " file_size:%"PRIu64" creation_date:%"PRIu64" data_packets_count:"
+            "%"PRIu64" play_duration:%"PRId64" send_duration:%"PRId64" preroll:%"PRId64
+            " flags:%u min_data_packet_size:%d "
+            " max_data_packet_size:%u max_bitrate:%u",
             GUID_PRINT( p_fp->i_file_id ), p_fp->i_file_size,
             p_fp->i_creation_date, p_fp->i_data_packets_count,
             p_fp->i_play_duration, p_fp->i_send_duration,
@@ -618,7 +618,7 @@ static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
             "read \"stream Properties object\" stream_type:" GUID_FMT
             " error_correction_type:" GUID_FMT " time_offset:%"PRIu64
             " type_specific_data_length:%"PRIu32" error_correction_data_length:%"PRIu32
-            " flags:0x%x stream_number:%d",
+            " flags:0x%x stream_number:%u",
             GUID_PRINT( p_sp->i_stream_type ),
             GUID_PRINT( p_sp->i_error_correction_type ),
             p_sp->i_time_offset,
@@ -671,7 +671,7 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
     uint32_t count = GetDWLE( p_peek + 40 );
 #ifdef ASF_DEBUG
     msg_Dbg( s, "read \"codec list object\" reserved_guid:" GUID_FMT
-             " codec_entries_count:%d", GUID_PRINT( p_cl->i_reserved ),
+             " codec_entries_count:%u", GUID_PRINT( p_cl->i_reserved ),
              count );
 #endif
 
@@ -1098,7 +1098,7 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
              ( p_ae->exclusion_type == BITRATE ) ? "Bitrate" : "Unknown"
     );
     for( i = 0; i < p_ae->i_stream_number_count; i++ )
-        msg_Dbg( s, "  - stream=%d", p_ae->pi_stream_number[i] );
+        msg_Dbg( s, "  - stream=%u", p_ae->pi_stream_number[i] );
 #endif
     return VLC_SUCCESS;
 }
@@ -1214,7 +1214,7 @@ static int ASF_ReadObject_bitrate_mutual_exclusion( stream_t *s, asf_object_t *p
              ( p_ex->exclusion_type == BITRATE ) ? "Bitrate" : "Unknown"
     );
     for( uint16_t i = 0; i < p_ex->i_stream_number_count; i++ )
-        msg_Dbg( s, "  - stream=%i", p_ex->pi_stream_numbers[i] );
+        msg_Dbg( s, "  - stream=%u", p_ex->pi_stream_numbers[i] );
 #endif
 
     return VLC_SUCCESS;
@@ -1299,19 +1299,19 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
         else if( i_type == ASF_METADATA_TYPE_DWORD )
         {
             /* DWord */
-            if( asprintf( &p_ec->ppsz_value[i], "%d", ASF_READ4() ) == -1 )
+            if( asprintf( &p_ec->ppsz_value[i], "%u", ASF_READ4() ) == -1 )
                 p_ec->ppsz_value[i] = NULL;
         }
         else if( i_type == ASF_METADATA_TYPE_QWORD )
         {
             /* QWord */
-            if( asprintf( &p_ec->ppsz_value[i], "%"PRId64, ASF_READ8() ) == -1 )
+            if( asprintf( &p_ec->ppsz_value[i], "%"PRIu64, ASF_READ8() ) == -1 )
                 p_ec->ppsz_value[i] = NULL;
         }
         else if( i_type == ASF_METADATA_TYPE_WORD )
         {
             /* Word */
-            if( asprintf( &p_ec->ppsz_value[i], "%d", ASF_READ2() ) == -1 )
+            if( asprintf( &p_ec->ppsz_value[i], "%u", ASF_READ2() ) == -1 )
                 p_ec->ppsz_value[i] = NULL;
         }
         else
