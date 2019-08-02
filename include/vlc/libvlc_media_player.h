@@ -807,10 +807,10 @@ bool libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
  * protocol:
  *
  * @code{.m}
- * \@protocol VLCVideoViewEmbedding <NSObject>
+ * @protocol VLCVideoViewEmbedding <NSObject>
  * - (void)addVoutSubview:(NSView *)view;
  * - (void)removeVoutSubview:(NSView *)view;
- * \@end
+ * @end
  * @endcode
  *
  * Or it can be an NSView object.
