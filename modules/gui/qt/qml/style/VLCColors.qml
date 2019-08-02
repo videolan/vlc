@@ -77,6 +77,10 @@ Item {
 
     property color videosGridInfoLeft: "grey"
 
+    property color playerFg: "white"
+    property color playerBg: "black"
+    property color playerBorder: "#222222"
+
     //vlc orange
     property color accent: "#FFFF950D";
 
