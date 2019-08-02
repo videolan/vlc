@@ -398,6 +398,8 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         if (p_sys->p_vf2 != NULL)
         {
             es_format_t fmt;
+            // at this point the decoder may not have called video_update_format_decoder()
+            // so we don't know the actual decoder format yet
             es_format_Copy( &fmt, &p_sys->p_decoder->fmt_out );
             if( p_sys->i_chroma )
                 fmt.video.i_chroma = p_sys->i_chroma;
@@ -574,13 +576,30 @@ inline static int video_update_format_decoder( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     video_update_format( &p_owner->video, &p_dec->fmt_out );
+    sout_stream_sys_t *p_sys = p_owner->p_stream->p_sys;
+    if ( p_sys->p_vf2 )
+    {
+        // update the filter after the format changed/is known
+        char *psz_chain = var_GetNonEmptyString( p_owner->p_stream, CFG_PREFIX "vfilter" );
+        msg_Dbg( p_owner->p_stream, "update filter: %s", psz_chain );
+        if( psz_chain )
+        {
+            es_format_t fmt;
+            es_format_InitFromVideo( &fmt, &p_owner->video );
+            if( p_sys->i_chroma )
+                fmt.video.i_chroma = p_sys->i_chroma;
+            filter_chain_Reset( p_sys->p_vf2, &fmt, &fmt );
+            es_format_Clean( &fmt );
+            filter_chain_AppendFromString( p_sys->p_vf2, psz_chain );
+            free( psz_chain );
+        }
+    }
     return 0;
 }
 
 inline static picture_t *video_new_buffer_filter( filter_t *p_filter )
 {
     struct decoder_owner *p_owner = p_filter->owner.sys;
-    video_update_format( &p_owner->video, &p_filter->fmt_out );
     return picture_NewFromFormat( &p_filter->fmt_out.video );
 }
 
