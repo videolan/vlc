@@ -74,8 +74,22 @@ FocusScope{
             Keys.onSpacePressed: player.muted = !player.muted
             Keys.onUpPressed: volControl.increase()
             Keys.onDownPressed: volControl.decrease()
-            Keys.onRightPressed: widgetfscope.KeyNavigation.right.forceActiveFocus()
-            Keys.onLeftPressed: widgetfscope.KeyNavigation.left.forceActiveFocus()
+            Keys.onRightPressed: {
+                var right = widgetfscope.KeyNavigation.right
+                while (right && (!right.enabled || !right.visible)) {
+                    right = right.KeyNavigation ? right.KeyNavigation.left : undefined
+                }
+                if (right)
+                    right.forceActiveFocus()
+            }
+            Keys.onLeftPressed: {
+                var left = widgetfscope.KeyNavigation.left
+                while (left && (!left.enabled || !left.visible)) {
+                    left = left.KeyNavigation ? left.KeyNavigation.left : undefined
+                }
+                if (left)
+                    left.forceActiveFocus()
+            }
 
             property color sliderColor: (volControl.position > fullvolpos) ? VLCStyle.colors.volmax : widgetfscope.color
             property int maxvol: 125
