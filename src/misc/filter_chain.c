@@ -52,7 +52,7 @@ struct filter_chain_t
 
     es_format_t fmt_in; /**< Chain input format (constant) */
     es_format_t fmt_out; /**< Chain current output format */
-    bool b_allow_fmt_out_change; /**< Can the output format be changed? */
+    bool b_allow_fmt_out_change; /**< Each filter can change the output */
     const char *filter_cap; /**< Filter modules capability */
     const char *conv_cap; /**< Converter modules capability */
 };
@@ -221,7 +221,7 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
         filter->owner.sub = NULL;
 
     assert( capability != NULL );
-    if( name != NULL && filter->b_allow_fmt_out_change )
+    if( name != NULL && chain->b_allow_fmt_out_change )
     {
         /* Append the "chain" video filter to the current list.
          * This filter will be used if the requested filter fails to load.
@@ -236,7 +236,7 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     if( filter->p_module == NULL )
         goto error;
 
-    if( filter->b_allow_fmt_out_change )
+    if( chain->b_allow_fmt_out_change )
     {
         es_format_Clean( &chain->fmt_out );
         es_format_Copy( &chain->fmt_out, &filter->fmt_out );
