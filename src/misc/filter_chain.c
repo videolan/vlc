@@ -51,7 +51,7 @@ struct filter_chain_t
     chained_filter_t *first, *last; /**< List of filters */
 
     es_format_t fmt_in; /**< Chain input format (constant) */
-    es_format_t fmt_out; /**< Chain current output format */
+    es_format_t fmt_out; /**< Chain output format (constant) */
     bool b_allow_fmt_out_change; /**< Each filter can change the output */
     const char *filter_cap; /**< Filter modules capability */
     const char *conv_cap; /**< Converter modules capability */
@@ -236,12 +236,6 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     if( filter->p_module == NULL )
         goto error;
 
-    if( chain->b_allow_fmt_out_change )
-    {
-        es_format_Clean( &chain->fmt_out );
-        es_format_Copy( &chain->fmt_out, &filter->fmt_out );
-    }
-
     if( chain->last == NULL )
     {
         assert( chain->first == NULL );
@@ -389,9 +383,6 @@ bool filter_chain_IsEmpty(const filter_chain_t *chain)
 
 const es_format_t *filter_chain_GetFmtOut( const filter_chain_t *p_chain )
 {
-    if( p_chain->b_allow_fmt_out_change )
-        return &p_chain->fmt_out;
-
     if( p_chain->last != NULL )
         return &p_chain->last->filter.fmt_out;
 
