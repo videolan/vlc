@@ -87,11 +87,8 @@ typedef enum input_event_type_e
     /* "capabilities" has changed */
     INPUT_EVENT_CAPABILITIES,
 
-    /* At least one of "position" or "time" */
-    INPUT_EVENT_POSITION,
-
-    /* "length" has changed */
-    INPUT_EVENT_LENGTH,
+    /* At least one of "position", "time" "length" has changed */
+    INPUT_EVENT_TIMES,
 
     /* A title has been added or removed or selected.
      * It implies that the chapter has changed (no chapter event is sent) */
@@ -150,10 +147,11 @@ typedef enum input_event_type_e
 #define VLC_INPUT_CAPABILITIES_REWINDABLE (1<<3)
 #define VLC_INPUT_CAPABILITIES_RECORDABLE (1<<4)
 
-struct vlc_input_event_position
+struct vlc_input_event_times
 {
     float percentage;
     vlc_tick_t ms;
+    vlc_tick_t length;
 };
 
 struct vlc_input_event_title
@@ -243,10 +241,8 @@ struct vlc_input_event
         float rate;
         /* INPUT_EVENT_CAPABILITIES */
         int capabilities; /**< cf. VLC_INPUT_CAPABILITIES_* bitwise flags */
-        /* INPUT_EVENT_POSITION */
-        struct vlc_input_event_position position;
-        /* INPUT_EVENT_LENGTH */
-        vlc_tick_t length;
+        /* INPUT_EVENT_TIMES */
+        struct vlc_input_event_times times;
         /* INPUT_EVENT_TITLE */
         struct vlc_input_event_title title;
         /* INPUT_EVENT_CHAPTER */
