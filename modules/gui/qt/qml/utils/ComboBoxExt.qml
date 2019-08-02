@@ -26,13 +26,17 @@ ComboBox {
     font.pixelSize: VLCStyle.fontSize_large
     leftPadding: 5
 
+    property color color: VLCStyle.colors.buttonText
+    property color bgColor: VLCStyle.colors.button
+    property color borderColor: VLCStyle.colors.buttonBorder
+
     delegate: ItemDelegate {
         width: control.width
         leftPadding: control.leftPadding
         background: Item {}
         contentItem: Text {
             text: control.textRole ? (Array.isArray(control.model) ? modelData[control.textRole] : model[control.textRole]) : modelData
-            color: VLCStyle.colors.buttonText
+            color: control.color
             font: control.font
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
@@ -59,7 +63,7 @@ ComboBox {
             context.lineTo(width, 0);
             context.lineTo(width / 2, height);
             context.closePath();
-            context.fillStyle = control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.buttonText;
+            context.fillStyle = control.activeFocus ? VLCStyle.colors.accent : control.color;
             context.fill();
         }
     }
@@ -70,7 +74,7 @@ ComboBox {
 
         text: control.displayText
         font: control.font
-        color: VLCStyle.colors.buttonText
+        color: control.color
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight
     }
@@ -78,8 +82,8 @@ ComboBox {
     background: Rectangle {
         implicitWidth: control.width
         implicitHeight: control.height
-        color: VLCStyle.colors.button
-        border.color: control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.buttonBorder
+        color: control.bgColor
+        border.color: control.activeFocus ? VLCStyle.colors.accent : control.borderColor
         border.width: control.activeFocus ? 2 : 1
         radius: 2
     }
@@ -112,8 +116,8 @@ ComboBox {
         }
 
         background: Rectangle {
-            color: VLCStyle.colors.button
-            border.color: VLCStyle.colors.buttonBorder
+            color: control.bgColor
+            border.color: control.borderColor
             radius: 2
         }
     }
