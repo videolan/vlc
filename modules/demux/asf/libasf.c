@@ -276,6 +276,12 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
 #endif
 
     /* Sanity checking */
+    if( !p_index->i_index_entry_time_interval )
+    {
+        /* We can't use this index if it has an invalid time interval */
+        p_index->i_index_entry_count = 0;
+        return VLC_ENOMEM;
+    }
     if( p_index->i_index_entry_count > (p_index->i_object_size - 56) / 6 )
         p_index->i_index_entry_count = (p_index->i_object_size - 56) / 6;
 
