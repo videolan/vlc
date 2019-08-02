@@ -35,6 +35,8 @@ FocusScope{
     property bool acceptFocus: true
     Component.onCompleted: paintOnly = false
 
+    property color color: VLCStyle.colors.buttonText
+
     RowLayout{
         id: volumeWidget
         Utils.IconToolButton{
@@ -50,6 +52,7 @@ FocusScope{
                     VLCIcons.volume_medium
                 else
                     VLCIcons.volume_high
+            color: widgetfscope.color
             onClicked: player.muted = !player.muted
             KeyNavigation.right: volControl
         }
@@ -74,7 +77,7 @@ FocusScope{
             Keys.onRightPressed: widgetfscope.KeyNavigation.right.forceActiveFocus()
             Keys.onLeftPressed: widgetfscope.KeyNavigation.left.forceActiveFocus()
 
-            property color sliderColor: (volControl.position > fullvolpos) ? VLCStyle.colors.volmax : VLCStyle.colors.buttonText
+            property color sliderColor: (volControl.position > fullvolpos) ? VLCStyle.colors.volmax : widgetfscope.color
             property int maxvol: 125
             property double fullvolpos: 100 / maxvol
             property double maxvolpos: maxvol / 100
@@ -124,7 +127,7 @@ FocusScope{
                     width: volControl.visualPosition * sliderBg.width
                     height: parent.height
                     radius: 4 * VLCStyle.scale
-                    color: VLCStyle.colors.buttonText
+                    color: widgetfscope.color
                     layer.enabled: (volControl.hovered || volControl.activeFocus)
                     layer.effect: LinearGradient {
                         start: Qt.point(0, 0)
@@ -143,7 +146,7 @@ FocusScope{
                     width: 1 * VLCStyle.scale
                     height: parent.height
                     radius: 2 * VLCStyle.scale
-                    color: VLCStyle.colors.buttonText
+                    color: widgetfscope.color
                 }
             }
 
