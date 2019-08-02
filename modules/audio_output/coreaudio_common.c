@@ -89,10 +89,10 @@ ca_ClearOutBuffers(audio_output_t *p_aout)
 static void
 ca_init_once(void)
 {
-    unfair_lock.lock = dlsym(RTLD_DEFAULT, "os_unfair_lock_lock");
+    unfair_lock.lock = os_unfair_lock_lock;
     if (!unfair_lock.lock)
         return;
-    unfair_lock.unlock = dlsym(RTLD_DEFAULT, "os_unfair_lock_unlock");
+    unfair_lock.unlock = os_unfair_lock_unlock;
     if (!unfair_lock.unlock)
         unfair_lock.lock = NULL;
 
