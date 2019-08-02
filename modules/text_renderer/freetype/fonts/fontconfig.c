@@ -90,8 +90,7 @@ int FontConfig_Prepare( filter_t *p_filter )
 #endif
 
     vlc_mutex_unlock( &lock );
-    ts -= mdate();
-    msg_Dbg( p_filter, "Took %ld microseconds", (long)ts );
+    msg_Dbg( p_filter, "Took %" PRId64 " microseconds", mdate() - ts );
 
     return (config != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
 }
