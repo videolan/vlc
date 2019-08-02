@@ -41,9 +41,6 @@
 #include <CoreImage/CIFilter.h>
 #include <CoreImage/CIVector.h>
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-
 enum    filter_type
 {
     FILTER_NONE = -1,
@@ -792,5 +789,3 @@ vlc_module_begin()
     add_shortcut("ci")
     add_string("ci-filter", "CIComicEffect", CI_CUSTOM_FILTER_TEXT, CI_CUSTOM_FILTER_LONGTEXT, true);
 vlc_module_end()
-
-#pragma clang diagnostic pop
