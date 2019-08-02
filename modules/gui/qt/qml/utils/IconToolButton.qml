@@ -23,8 +23,6 @@ import "qrc:///style/"
 ToolButton {
     id: control
     property bool paintOnly: false
-    property color color: control.enabled || paintOnly?
-                              VLCStyle.colors.buttonText : VLCStyle.colors.lightText
 
     property int size: VLCStyle.icon_normal
 
@@ -32,6 +30,8 @@ ToolButton {
 
     padding: 0
 
+    property color color: VLCStyle.colors.buttonText
+    property color colorDisabled: VLCStyle.colors.lightText
     property color colorOverlay: "transparent"
     property string textOverlay: ""
     property bool borderEnabled: false
@@ -55,7 +55,7 @@ ToolButton {
         Label {
             id: text
             text: control.text
-            color: control.color
+            color: control.enabled ? control.color : control.colorDisabled
 
             anchors.centerIn: parent
 
