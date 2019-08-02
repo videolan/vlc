@@ -122,6 +122,7 @@ Utils.NavigableFocusScope {
                     focus: true
                     anchors.fill: parent
                     model: playerControlBarModel
+                    forceColors: true
                 }
             }
         }

@@ -31,6 +31,7 @@ RowLayout{
     property bool _focusGiven: false
     property alias model: buttonsRepeater.model
     property var defaultSize: VLCStyle.icon_medium
+    property bool forceColors: false
 
     Repeater{
         id: buttonsRepeater
@@ -53,6 +54,16 @@ RowLayout{
                 var buttonindex = DelegateModel.itemsIndex
                 while(buttonindex > 0 && !(buttonrow.children[buttonindex-1].item.acceptFocus))
                     buttonindex = buttonindex-1
+
+                //force buttons color
+                if (buttonrow.forceColors) {
+                    if ( buttonloader.item.color )
+                        buttonloader.item.color = VLCStyle.colors.playerFg
+                    if ( buttonloader.item.bgColor )
+                        buttonloader.item.bgColor = VLCStyle.colors.setColorAlpha(VLCStyle.colors.playerBg, 0.8)
+                    if ( buttonloader.item.borderColor )
+                        buttonloader.item.borderColor = VLCStyle.colors.playerBorder
+                }
 
                 if (buttonindex > 0)
                     buttonloader.item.KeyNavigation.left = buttonrow.children[buttonindex-1].item
