@@ -1391,6 +1391,7 @@ static void DemuxEnd( demux_t *p_demux )
     {
         ASF_FreeObjectRoot( p_demux->s, p_sys->p_root );
         p_sys->p_root = NULL;
+        p_sys->p_fp = NULL;
     }
     if( p_sys->meta )
     {
