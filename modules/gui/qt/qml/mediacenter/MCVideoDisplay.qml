@@ -62,7 +62,7 @@ Utils.NavigableFocusScope {
                onTriggered: medialib.addToPlaylist( contextMenu.model.id )
            }
            Utils.MenuItemExt {
-               enabled:root.currentGridView.switchExpandItem !== undefined
+               enabled: root.currentGridView && root.currentGridView.switchExpandItem !== undefined
                text: "Information"
                onTriggered: {
                    root.currentGridView.switchExpandItem(contextMenu.model.index,root.currentGridView.currentItem)
@@ -384,25 +384,17 @@ Utils.NavigableFocusScope {
 
     Component {
         id: listComponent
-        /* ListView */
-        Utils.KeyNavigableListView {
-            id: listView_id
-
-            model: videosDelegate.parts.list
-            modelCount: videosDelegate.items.count
-
-            focus: true
-            spacing: VLCStyle.margin_xxxsmall
-
-            onSelectAll: videosDelegate.selectAll()
-            onSelectionUpdated: videosDelegate.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: videosDelegate.actionAtIndex(index)
-
-            onActionLeft: root.actionLeft(index)
-            onActionRight: root.actionRight(index)
-            onActionDown: root.actionDown(index)
-            onActionUp: root.actionUp(index)
-            onActionCancel: root.actionCancel(index)
+        MCVideoListDisplay {
+            height: view.height
+            width: view.width
+            onContextMenuButtonClicked:{
+                contextMenu.model = menuModel
+                contextMenu.popup(menuParent)
+            }
+            onRightClick:{
+                contextMenu.model = menuModel
+                contextMenu.popup(menuParent)
+            }
         }
     }
 
