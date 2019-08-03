@@ -117,7 +117,10 @@ Rectangle{
 
     Connections{
         target: toolbareditor
-        onUpdatePlayerModel: playerControlBarModel.reloadConfig(config)
+        onUpdatePlayerModel: {
+            if (toolbarName == "MainPlayerToolbar")
+                playerControlBarModel.reloadConfig(config)
+        }
         onSaveConfig: playerControlBarModel.saveConfig()
     }
 

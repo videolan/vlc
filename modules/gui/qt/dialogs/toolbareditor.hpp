@@ -50,7 +50,7 @@ private:
     QQuickWidget *editorView;
 
 signals:
-    void updatePlayerModel(QString config);
+    void updatePlayerModel(QString toolbarName,QString config);
     void saveConfig();
 };
 

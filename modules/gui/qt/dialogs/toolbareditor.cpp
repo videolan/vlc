@@ -151,7 +151,7 @@ void ToolbarEditorDialog::newProfile()
     if( !ok ) return;
 
     QVariant config;
-    QMetaObject::invokeMethod(editorView->rootObject(),"getConfig",
+    QMetaObject::invokeMethod(editorView->rootObject(),"getProfileConfig",
                               Q_RETURN_ARG(QVariant, config));
 
     profileCombo->addItem( name, config.toString() );
@@ -165,8 +165,11 @@ void ToolbarEditorDialog::deleteProfile()
 
 void ToolbarEditorDialog::changeProfile( int i )
 {
-    QString config = profileCombo->itemData( i ).toString();
-    emit updatePlayerModel(config);
+    QStringList qs_list = profileCombo->itemData( i ).toString().split( "|" );
+    if( qs_list.count() < 2 )
+            return;
+    emit updatePlayerModel("MainPlayerToolbar",qs_list[0]);
+    emit updatePlayerModel("MiniPlayerToolbar",qs_list[1]);
 }
 
 void ToolbarEditorDialog::deleteCursor()
