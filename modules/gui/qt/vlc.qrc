@@ -266,6 +266,7 @@
         <file alias="TeletextWidget.qml">qml/player/TeletextWidget.qml</file>
         <file alias="MiniPlayer.qml">qml/player/MiniPlayer.qml</file>
         <file alias="TopBar.qml">qml/player/TopBar.qml</file>
+        <file alias="PlayerButtonsLayout.qml">qml/player/PlayerButtonsLayout.qml</file>
     </qresource>
     <qresource prefix="/about">
         <file alias="About.qml">qml/about/About.qml</file>

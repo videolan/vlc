@@ -85,40 +85,10 @@ Utils.NavigableFocusScope {
                     color: "transparent"
                 }
 
-                RowLayout{
-                    id: buttonrow
-                    property bool _focusGiven: false
+                PlayerButtonsLayout {
                     focus: true
                     anchors.fill: parent
-                    Repeater{
-                        model: playerControlBarModel
-                        delegate: Loader{
-                            id: buttonloader
-
-                            sourceComponent: controlmodelbuttons.returnbuttondelegate(model.id)
-                            onLoaded: {
-                                if (! buttonloader.item.acceptFocus)
-                                    return
-                                else
-                                    if (!buttonrow._focusGiven){
-                                        buttonloader.item.forceActiveFocus()
-                                        buttonrow._focusGiven = true
-                                    }
-                                if(buttonloader.item instanceof Utils.IconToolButton)
-                                    buttonloader.item.size = model.size === PlayerControlBarModel.WIDGET_BIG ?
-                                                VLCStyle.icon_large : VLCStyle.icon_medium
-
-                                var buttonindex = DelegateModel.itemsIndex
-                                while(buttonindex > 0 && !(buttonrow.children[buttonindex-1].item.acceptFocus))
-                                    buttonindex = buttonindex-1
-
-                                if (buttonindex > 0)
-                                    buttonloader.item.KeyNavigation.left = buttonrow.children[buttonindex-1].item
-
-
-                            }
-                        }
-                    }
+                    model: playerControlBarModel
                 }
             }
         }
