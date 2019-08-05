@@ -83,6 +83,15 @@ Utils.NavigableFocusScope {
         delegate: Package {
             id: element
             Loader {
+                id: delegateLoaderGrid
+                focus: true
+                Package.name: "grid"
+                source: model.type == MLNetworkModel.TYPE_FILE ?
+                            "qrc:///mediacenter/NetworkFileDisplayGrid.qml" :
+                            "qrc:///mediacenter/NetworkDriveDisplayGrid.qml";
+            }
+
+            Loader {
                 id: delegateLoader
                 focus: true
                 Package.name: "list"
@@ -127,18 +136,38 @@ Utils.NavigableFocusScope {
     onActiveFocusChanged: {
         if (activeFocus && delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
             var initialIndex = 0
-            if (view.currentIndex !== -1)
-                initialIndex = view.currentIndex
+            if (view.currentItem.currentIndex !== -1)
+                initialIndex = view.currentItem.currentIndex
             delegateModel.items.get(initialIndex).inSelected = true
-            view.currentIndex = initialIndex
+            view.currentItem.currentIndex = initialIndex
         }
     }
 
    Component{
        id: gridComponent
-       Item {
+
+       Utils.KeyNavigableGridView {
+           id: gridView_id
            height: view.height
            width: view.width
+
+           model: delegateModel.parts.grid
+           modelCount: delegateModel.items.count
+
+           focus: true
+
+           cellWidth: VLCStyle.network_normal + VLCStyle.margin_large
+           cellHeight: VLCStyle.network_normal + VLCStyle.margin_xlarge
+
+           onSelectAll: delegateModel.selectAll()
+           onSelectionUpdated:  delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+           onActionAtIndex: delegateModel.actionAtIndex(index)
+
+           onActionLeft: root.actionLeft(index)
+           onActionRight: root.actionRight(index)
+           onActionUp: root.actionUp(index)
+           onActionDown: root.actionDown(index)
+           onActionCancel: root.actionCancel(index)
        }
    }
 
