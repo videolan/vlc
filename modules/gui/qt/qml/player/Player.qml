@@ -96,7 +96,7 @@ Utils.NavigableFocusScope {
             text: mainPlaylistController.currentItem.title
             font.pixelSize: VLCStyle.fontSize_xxlarge
             font.bold: true
-            color: VLCStyle.colors.text
+            color: VLCStyle.colors.playerFg
         }
 
         Text {
@@ -109,7 +109,7 @@ Utils.NavigableFocusScope {
 
             text: mainPlaylistController.currentItem.artist
             font.pixelSize: VLCStyle.fontSize_xlarge
-            color: VLCStyle.colors.text
+            color: VLCStyle.colors.playerFg
         }
     }
 
