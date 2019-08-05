@@ -39,6 +39,23 @@ Utils.NavigableFocusScope {
         color: VLCStyle.colors.bg
         anchors.fill: parent
 
+        FastBlur {
+            //destination aspect ration
+            readonly property real dar: parent.width / parent.height
+
+            anchors.centerIn: parent
+            width: (cover.sar < dar) ? parent.width :  parent.height * cover.sar
+            height: (cover.sar < dar) ? parent.width / cover.sar :  parent.height
+            source: cover
+            radius: 64
+
+            //darken background
+            Rectangle {
+                color: "#80000000"
+                anchors.fill: parent
+            }
+        }
+
         Image {
             id: cover
             source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
