@@ -40,6 +40,9 @@ bool VLCTick::valid() const
 
 QString VLCTick::toString() const
 {
+    if (m_ticks == VLC_TICK_INVALID)
+        return "--:--";
+
     int64_t t_sec = SEC_FROM_VLC_TICK(m_ticks);
     int sec = t_sec % 60;
     int min = (t_sec / 60) % 60;
