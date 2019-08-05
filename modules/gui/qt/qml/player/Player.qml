@@ -46,7 +46,10 @@ Utils.NavigableFocusScope {
                     : VLCStyle.noArtCover
             fillMode: Image.PreserveAspectFit
 
-            width: parent.width / 2
+            //source aspect ratio
+            property real sar: cover.sourceSize.width / cover.sourceSize.height
+
+            width: (parent.height * sar) / 2
             height: parent.height / 2
             anchors {
                 horizontalCenter:  parent.horizontalCenter
