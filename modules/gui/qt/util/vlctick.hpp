@@ -34,6 +34,9 @@ public:
     VLCTick(vlc_tick_t ticks);
 
     operator vlc_tick_t() const;
+
+    Q_INVOKABLE bool valid() const;
+
     /**
      * @brief toString
      * @return time as HH:MM:SS

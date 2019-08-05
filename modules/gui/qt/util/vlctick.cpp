@@ -33,6 +33,11 @@ VLCTick::operator vlc_tick_t() const
     return m_ticks;
 }
 
+bool VLCTick::valid() const
+{
+    return m_ticks != VLC_TICK_INVALID;
+}
+
 QString VLCTick::toString() const
 {
     int64_t t_sec = SEC_FROM_VLC_TICK(m_ticks);
