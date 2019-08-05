@@ -134,25 +134,54 @@ Utils.NavigableFocusScope {
         }
     }
 
-    Utils.KeyNavigableListView {
+   Component{
+       id: gridComponent
+       Item {
+           height: view.height
+           width: view.width
+       }
+   }
+
+   Component{
+       id: listComponent
+       Utils.KeyNavigableListView {
+           height: view.height
+           width: view.width
+           model: delegateModel.parts.list
+           modelCount: delegateModel.items.count
+
+           focus: true
+           spacing: VLCStyle.margin_xxxsmall
+
+           onSelectAll: delegateModel.selectAll()
+           onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+           onActionAtIndex: delegateModel.actionAtIndex(index)
+
+           onActionLeft: root.actionLeft(index)
+           onActionRight: root.actionRight(index)
+           onActionDown: root.actionDown(index)
+           onActionUp: root.actionUp(index)
+           onActionCancel: root.actionCancel(index)
+       }
+   }
+
+    Utils.StackViewExt {
         id: view
-        anchors.fill: parent
-        model: delegateModel.parts.list
-        modelCount: delegateModel.items.count
-
+        anchors.fill:parent
+        clip: true
         focus: true
-        spacing: VLCStyle.margin_xxxsmall
-
-        onSelectAll: delegateModel.selectAll()
-        onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-        onActionAtIndex: delegateModel.actionAtIndex(index)
-
-        onActionLeft: root.actionLeft(index)
-        onActionRight: root.actionRight(index)
-        onActionDown: root.actionDown(index)
-        onActionUp: root.actionUp(index)
-        onActionCancel: root.actionCancel(index)
-    }
+        initialItem: medialib.gridView ? gridComponent : listComponent
+        property int currentIndex: -1
+        Connections {
+            target: medialib
+            onGridViewChanged: {
+                if (medialib.gridView)
+                    view.replace(gridComponent)
+                else
+                    view.replace(listComponent)
+            }
+        }
+}
 
     Label {
         anchors.centerIn: parent
