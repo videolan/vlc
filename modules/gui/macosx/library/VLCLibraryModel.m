@@ -137,6 +137,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (void)updateCachedListOfAudioMedia
 {
     vlc_ml_media_list_t *p_media_list = vlc_ml_list_audio_media(_p_mediaLibrary, NULL);
+    if (!p_media_list) {
+        return;
+    }
+
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_media_list->i_nb_items];
     for (size_t x = 0; x < p_media_list->i_nb_items; x++) {
         VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_media_list->p_items[x]];
