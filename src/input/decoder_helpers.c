@@ -90,6 +90,26 @@ int decoder_UpdateVideoOutput( decoder_t *dec, vlc_video_context *vctx_out )
     /* */
     dec->fmt_out.video.i_chroma = dec->fmt_out.i_codec;
 
+    if( !dec->fmt_out.video.i_visible_width ||
+        !dec->fmt_out.video.i_visible_height )
+    {
+        if( dec->fmt_in.video.i_visible_width &&
+            dec->fmt_in.video.i_visible_height )
+        {
+            dec->fmt_out.video.i_visible_width  = dec->fmt_in.video.i_visible_width;
+            dec->fmt_out.video.i_visible_height = dec->fmt_in.video.i_visible_height;
+            dec->fmt_out.video.i_x_offset       = dec->fmt_in.video.i_x_offset;
+            dec->fmt_out.video.i_y_offset       = dec->fmt_in.video.i_y_offset;
+        }
+        else
+        {
+            dec->fmt_out.video.i_visible_width  = dec->fmt_out.video.i_width;
+            dec->fmt_out.video.i_visible_height = dec->fmt_out.video.i_height;
+            dec->fmt_out.video.i_x_offset       = 0;
+            dec->fmt_out.video.i_y_offset       = 0;
+        }
+    }
+
     if (dec->cbs->video.format_update == NULL)
         return 0;
 
