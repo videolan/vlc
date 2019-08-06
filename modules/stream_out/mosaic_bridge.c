@@ -86,7 +86,6 @@ static int   Send( sout_stream_t *, void *, block_t * );
 static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic );
 inline static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context * );
 inline static picture_t *video_new_buffer_filter( filter_t * );
-static void video_update_format( video_format_t *, es_format_t * );
 
 static int HeightCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -575,7 +574,7 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 inline static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vctx )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
-    video_update_format( &p_owner->video, &p_dec->fmt_out );
+    p_owner->video = p_dec->fmt_out.video;
     sout_stream_sys_t *p_sys = p_owner->p_stream->p_sys;
     if ( p_sys->p_vf2 )
     {
@@ -601,23 +600,6 @@ inline static int video_update_format_decoder( decoder_t *p_dec, vlc_video_conte
 inline static picture_t *video_new_buffer_filter( filter_t *p_filter )
 {
     return picture_NewFromFormat( &p_filter->fmt_out.video );
-}
-
-static void video_update_format( video_format_t *video, es_format_t *fmt_out )
-{
-    if( fmt_out->video.i_width != video->i_width ||
-        fmt_out->video.i_height != video->i_height ||
-        fmt_out->video.i_chroma != video->i_chroma ||
-        (int64_t)fmt_out->video.i_sar_num * video->i_sar_den !=
-        (int64_t)fmt_out->video.i_sar_den * video->i_sar_num )
-    {
-        vlc_ureduce( &fmt_out->video.i_sar_num,
-                     &fmt_out->video.i_sar_den,
-                     fmt_out->video.i_sar_num,
-                     fmt_out->video.i_sar_den, 0 );
-
-        *video = fmt_out->video;
-    }
 }
 
 /**********************************************************************
