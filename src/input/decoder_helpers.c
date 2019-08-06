@@ -90,6 +90,27 @@ int decoder_UpdateVideoOutput( decoder_t *dec, vlc_video_context *vctx_out )
     /* */
     dec->fmt_out.video.i_chroma = dec->fmt_out.i_codec;
 
+    if( dec->fmt_out.video.i_visible_height == 1088 &&
+        var_CreateGetBool( dec, "hdtv-fix" ) )
+    {
+        dec->fmt_out.video.i_visible_height = 1080;
+        if( !(dec->fmt_out.video.i_sar_num % 136))
+        {
+            dec->fmt_out.video.i_sar_num *= 135;
+            dec->fmt_out.video.i_sar_den *= 136;
+        }
+        msg_Warn( dec, "Fixing broken HDTV stream (display_height=1088)");
+    }
+
+    if( !dec->fmt_out.video.i_sar_num || !dec->fmt_out.video.i_sar_den )
+    {
+        dec->fmt_out.video.i_sar_num = 1;
+        dec->fmt_out.video.i_sar_den = 1;
+    }
+
+    vlc_ureduce( &dec->fmt_out.video.i_sar_num, &dec->fmt_out.video.i_sar_den,
+                    dec->fmt_out.video.i_sar_num, dec->fmt_out.video.i_sar_den, 50000 );
+
     if( !dec->fmt_out.video.i_visible_width ||
         !dec->fmt_out.video.i_visible_height )
     {

@@ -418,27 +418,6 @@ static void FixDisplayFormat(decoder_t *p_dec, video_format_t *fmt)
         }
     }
 
-    if( fmt->i_visible_height == 1088 &&
-        var_CreateGetBool( p_dec, "hdtv-fix" ) )
-    {
-        fmt->i_visible_height = 1080;
-        if( !(fmt->i_sar_num % 136))
-        {
-            fmt->i_sar_num *= 135;
-            fmt->i_sar_den *= 136;
-        }
-        msg_Warn( p_dec, "Fixing broken HDTV stream (display_height=1088)");
-    }
-
-    if( !fmt->i_sar_num || !fmt->i_sar_den )
-    {
-        fmt->i_sar_num = 1;
-        fmt->i_sar_den = 1;
-    }
-
-    vlc_ureduce( &fmt->i_sar_num, &fmt->i_sar_den,
-                    fmt->i_sar_num, fmt->i_sar_den, 50000 );
-
     video_format_AdjustColorSpace( fmt );
 }
 
