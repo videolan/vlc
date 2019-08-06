@@ -35,6 +35,7 @@ Rectangle {
     property bool selected: false
     property int shiftX: 0
     property bool noActionButtons: false
+    property bool showContextButton: isVideo
 
     property alias sourceSize: cover.sourceSize
     property string infoLeft: ""
@@ -218,7 +219,7 @@ Rectangle {
                     }
                     ContextButton {
                         id: contextButton
-                        visible: isVideo
+                        visible: root.showContextButton
                         anchors {
                             top: cover.top
                             right: cover.right
