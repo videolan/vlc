@@ -113,13 +113,12 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj)
 void UpnpInstanceWrapper::release()
 {
     UpnpInstanceWrapper *p_delete = NULL;
-    vlc_mutex_lock( &s_lock );
+    vlc::threads::mutex_locker lock( &s_lock );
     if (--s_instance->m_refcount == 0)
     {
         p_delete = s_instance;
         s_instance = NULL;
     }
-    vlc_mutex_unlock( &s_lock );
     delete p_delete;
 }
 
