@@ -616,13 +616,6 @@ static void video_update_format( video_format_t *video, es_format_t *fmt_out )
                      fmt_out->video.i_sar_num,
                      fmt_out->video.i_sar_den, 0 );
 
-        if( !fmt_out->video.i_visible_width ||
-            !fmt_out->video.i_visible_height )
-        {
-            fmt_out->video.i_visible_width = fmt_out->video.i_width;
-            fmt_out->video.i_visible_height = fmt_out->video.i_height;
-        }
-
         *video = fmt_out->video;
     }
 }
