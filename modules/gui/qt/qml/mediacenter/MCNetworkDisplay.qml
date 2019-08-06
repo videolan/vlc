@@ -18,6 +18,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQml.Models 2.2
+import QtQml 2.11
 
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
@@ -29,7 +30,47 @@ Utils.NavigableFocusScope {
     id: root
 
     property alias tree: mlModel.tree
+    Utils.MenuExt {
+        id: contextMenu
+        property var model: ({})
+        property bool isIndexible: !contextMenu.model ? false : Boolean(contextMenu.model.can_index)
+        property bool isFileType: !contextMenu.model ? false : contextMenu.model.type === MLNetworkModel.TYPE_FILE
+        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
+        focus:true
 
+        Instantiator {
+            id: instanciator
+            function perform(id){
+                switch(id){
+                    case 0: console.log("not implemented"); break;
+                    case 1: contextMenu.model.indexed = !contextMenu.model.indexed; break;
+                    default: console.log("unknown id:",id)
+                }
+                contextMenu.close()
+            }
+            model: [
+                {
+                    active: contextMenu.isFileType,
+                    text: qsTr("Play all"),
+                    performId: 0
+                },
+                {
+                    active: contextMenu.isIndexible,
+                    text: !contextMenu.model ? "" : contextMenu.model.indexed ? qsTr("Unindex") : qsTr("Index") ,
+                    performId: 1
+                }
+            ]
+            onObjectAdded: model[index].active && contextMenu.insertItem( index, object )
+            onObjectRemoved: model[index].active && contextMenu.removeItem( object )
+            delegate: Utils.MenuItemExt {
+                focus: true
+                text: modelData.text
+                onTriggered: instanciator.perform(modelData.performId)
+            }
+        }
+
+        onClosed: contextMenu.parent.forceActiveFocus()
+    }
     Utils.SelectableDelegateModel {
         id: delegateModel
 
