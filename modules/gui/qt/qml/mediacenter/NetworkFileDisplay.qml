@@ -26,7 +26,7 @@ import "qrc:///style/"
 
 Utils.ListItem {
     width: root.width
-    height: VLCStyle.icon_normal
+    height: VLCStyle.icon_normal + VLCStyle.margin_small
 
     focus: true
 

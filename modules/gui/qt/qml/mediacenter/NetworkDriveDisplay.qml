@@ -29,7 +29,7 @@ Utils.ListItem {
     id: item
 
     width: root.width
-    height: VLCStyle.icon_normal
+    height: VLCStyle.icon_normal + VLCStyle.margin_small
 
     focus: true
 

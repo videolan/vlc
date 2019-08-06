@@ -92,7 +92,7 @@ Utils.NavigableFocusScope {
             Utils.ListItem {
                 Package.name: "list"
                 width: root.width
-                height: VLCStyle.icon_normal
+                height: VLCStyle.icon_normal + VLCStyle.margin_small
 
                 color: VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, this.hovered, this.activeFocus)
 

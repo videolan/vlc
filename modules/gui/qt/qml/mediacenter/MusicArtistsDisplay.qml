@@ -45,7 +45,7 @@ Utils.NavigableFocusScope {
         }
 
         delegate: Utils.ListItem {
-            height: VLCStyle.icon_normal
+            height: VLCStyle.icon_normal + VLCStyle.margin_small
             width: artistList.width
 
             color: VLCStyle.colors.getBgColor(delegateModel.inSelected, this.hovered, this.activeFocus)
