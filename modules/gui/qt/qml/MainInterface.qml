@@ -146,12 +146,6 @@ Rectangle {
         }
     }
 
-    Utils.ScanProgressBar {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-    }
-
     DG.Dialogs {
         anchors.fill: parent
         bgContent: root
