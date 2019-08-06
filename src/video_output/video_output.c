@@ -1243,13 +1243,14 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
     }
     bool force_refresh = !drop_next_frame && refresh;
 
+    if (!frame_by_frame) {
+        if (date_refresh != VLC_TICK_INVALID)
+            *deadline = date_refresh;
+        if (date_next != VLC_TICK_INVALID && date_next < *deadline)
+            *deadline = date_next;
+    }
+
     if (!first && !refresh && !drop_next_frame) {
-        if (!frame_by_frame) {
-            if (date_refresh != VLC_TICK_INVALID)
-                *deadline = date_refresh;
-            if (date_next != VLC_TICK_INVALID && date_next < *deadline)
-                *deadline = date_next;
-        }
         return VLC_EGENERIC;
     }
 
