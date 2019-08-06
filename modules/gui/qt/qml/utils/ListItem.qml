@@ -19,6 +19,8 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+import QtGraphicalEffects 1.0
+
 import "qrc:///style/"
 
 NavigableFocusScope {
@@ -35,7 +37,7 @@ NavigableFocusScope {
     property alias line2: line2_text.text
     property alias imageText: cover_text.text
 
-    property alias color: linerect.color
+    property alias color: glow.color
 
     Component {
         id: actionAdd
@@ -86,6 +88,22 @@ NavigableFocusScope {
                 root.itemDoubleClicked(mouse.buttons, mouse.modifiers);
             }
         }
+        RectangularGlow {
+            id: glow
+            anchors.fill: innerRect
+            spread: 0.1
+            glowRadius: VLCStyle.margin_xxsmall
+            color: VLCStyle.colors.getBgColor(
+                       root.isSelected, root.hovered,
+                       root.activeFocus)
+        }
+        Rectangle {
+            id: innerRect
+            radius: height / 10
+            anchors.fill: parent
+            anchors.margins: VLCStyle.margin_xxsmall
+            anchors.verticalCenter: parent.verticalCenter
+            color: VLCStyle.colors.bg
 
         RowLayout {
             anchors.fill: parent
@@ -182,6 +200,8 @@ NavigableFocusScope {
                     }
                 }
             }
+        }
+
         }
     }
 }
