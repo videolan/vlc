@@ -405,18 +405,6 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
 static void FixDisplayFormat(decoder_t *p_dec, video_format_t *fmt)
 {
     *fmt = p_dec->fmt_out.video;
-
-    if( vlc_fourcc_IsYUV( fmt->i_chroma ) )
-    {
-        const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription( fmt->i_chroma );
-        for( unsigned int i = 0; dsc && i < dsc->plane_count; i++ )
-        {
-            while( fmt->i_width % dsc->p[i].w.den )
-                fmt->i_width++;
-            while( fmt->i_height % dsc->p[i].h.den )
-                fmt->i_height++;
-        }
-    }
 }
 
 static int CreateVoutIfNeeded(struct decoder_owner *, vout_thread_t **, enum vlc_vout_order *, vlc_decoder_device **);

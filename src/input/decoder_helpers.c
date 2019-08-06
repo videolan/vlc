@@ -111,6 +111,18 @@ int decoder_UpdateVideoOutput( decoder_t *dec, vlc_video_context *vctx_out )
     vlc_ureduce( &dec->fmt_out.video.i_sar_num, &dec->fmt_out.video.i_sar_den,
                     dec->fmt_out.video.i_sar_num, dec->fmt_out.video.i_sar_den, 50000 );
 
+    if( vlc_fourcc_IsYUV( dec->fmt_out.video.i_chroma ) )
+    {
+        const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription( dec->fmt_out.video.i_chroma );
+        for( unsigned int i = 0; dsc && i < dsc->plane_count; i++ )
+        {
+            while( dec->fmt_out.video.i_width % dsc->p[i].w.den )
+                dec->fmt_out.video.i_width++;
+            while( dec->fmt_out.video.i_height % dsc->p[i].h.den )
+                dec->fmt_out.video.i_height++;
+        }
+    }
+
     if( !dec->fmt_out.video.i_visible_width ||
         !dec->fmt_out.video.i_visible_height )
     {
