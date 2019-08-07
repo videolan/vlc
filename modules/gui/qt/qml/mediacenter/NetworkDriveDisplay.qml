@@ -51,6 +51,10 @@ Utils.ListItem {
     }
 
     onItemClicked : {
+        if (key == Qt.RightButton){
+            contextMenu.model = model
+            contextMenu.popup(this)
+        }
         delegateModel.updateSelection( modifier, view.currentIndex, index )
         view.currentIndex = index
         this.forceActiveFocus()
