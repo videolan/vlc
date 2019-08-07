@@ -247,6 +247,8 @@ public:
     void requestArtUpdate( input_item_t *p_item, bool b_forced );
     void setArt( input_item_t *p_item, QString fileUrl );
     static const QString decodeArtURL( input_item_t *p_item );
+    void updatePosition();
+    void updateTime(vlc_tick_t system_now, bool forceTimer);
 
     //getter/setters binded to a Q_PROPERTY
 public slots:
@@ -269,6 +271,8 @@ public slots:
     bool isRewindable() const;
     bool isPausable() const;
     bool isRateChangable() const;
+    void updatePositionFromTimer();
+    void updateTimeFromTimer();
 
     //tracks
     TrackListModel* getVideoTracks();
