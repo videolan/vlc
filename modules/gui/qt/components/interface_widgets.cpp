@@ -947,10 +947,7 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
     connect( THEMIM, &PlayerController::positionUpdated,
               this, QOverload<float , vlc_tick_t, int>::of(&TimeLabel::setDisplayPosition) );
 
-    connect( this, &TimeLabel::broadcastRemainingTime,
-         THEMIM, &PlayerController::remainingTimeChanged );
-
-    connect( THEMIM, &PlayerController::remainingTimeChanged,
+    connect( p_intf->p_sys->p_mi, &MainInterface::showRemainingTimeChanged,
               this, &TimeLabel::setRemainingTime );
 
     setStyleSheet( "QLabel { padding-left: 4px; padding-right: 4px; }" );
@@ -1046,6 +1043,5 @@ void TimeLabel::setDisplayPosition( float pos )
 void TimeLabel::toggleTimeDisplay()
 {
     b_remainingTime = !b_remainingTime;
-    getSettings()->setValue( "MainWindow/ShowRemainingTime", b_remainingTime );
-    emit broadcastRemainingTime( b_remainingTime );
+    p_intf->p_sys->p_mi->setShowRemainingTime(b_remainingTime);
 }
