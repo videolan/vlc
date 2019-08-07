@@ -165,6 +165,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf ),
 
     /* */
     b_playlistDocked = getSettings()->value( "MainWindow/pl-dock-status", true ).toBool();
+    m_showRemainingTime = getSettings()->value( "MainWindow/ShowRemainingTime", false ).toBool();
 
     /* Should the UI stays on top of other windows */
     b_interfaceOnTop = var_InheritBool( p_intf, "video-on-top" );
@@ -256,6 +257,7 @@ MainInterface::~MainInterface()
 
     settings->beginGroup("MainWindow");
     settings->setValue( "pl-dock-status", b_playlistDocked );
+    settings->setValue( "ShowRemainingTime", m_showRemainingTime );
 
     /* Save playlist state */
     settings->setValue( "playlist-visible", playlistVisible );
@@ -563,6 +565,12 @@ void MainInterface::setPlaylistVisible( bool visible )
     playlistVisible = visible;
 
     emit playlistVisibleChanged(visible);
+}
+
+void MainInterface::setShowRemainingTime( bool show )
+{
+    m_showRemainingTime = show;
+    emit showRemainingTimeChanged(show);
 }
 
 void MainInterface::setInterfaceAlwaysOnTop( bool on_top )
