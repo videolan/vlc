@@ -1796,6 +1796,12 @@ static void ControlInsertDemuxFilter( input_thread_t* p_input, const char* psz_d
         msg_Dbg(p_input, "Failed to create demux filter %s", psz_demux_chain);
 }
 
+void input_ControlSync(input_thread_t *p_input, int i_type,
+                       const input_control_param_t* param )
+{
+    assert( !input_priv(p_input)->is_running );
+    Control( p_input, i_type, *param );
+}
 
 static bool Control( input_thread_t *p_input,
                      int i_type, input_control_param_t param )

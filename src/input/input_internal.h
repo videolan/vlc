@@ -624,6 +624,11 @@ static inline int input_ControlPushEsHelper( input_thread_t *p_input, int i_type
     } );
 }
 
+/** Synchronously execute a control sequence. This MUST only be used before the
+ * input is started
+ */
+void input_ControlSync(input_thread_t *, int, const input_control_param_t *);
+
 bool input_Stopped( input_thread_t * );
 
 int input_GetAttachments(input_thread_t *input, input_attachment_t ***attachments);
