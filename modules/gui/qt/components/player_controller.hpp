@@ -116,6 +116,7 @@ public:
     Q_PROPERTY(MediaStopAction mediaStopAction READ getMediaStopAction WRITE setMediaStopAction NOTIFY mediaStopActionChanged)
 
     Q_PROPERTY(VLCTick time READ getTime WRITE setTime NOTIFY timeChanged)
+    Q_PROPERTY(VLCTick remainingTime READ getRemainingTime NOTIFY remainingTimeChanged)
     Q_PROPERTY(float position READ getPosition WRITE setPosition NOTIFY positionChanged)
     Q_PROPERTY(VLCTick length READ getLength NOTIFY lengthChanged)
 
@@ -260,6 +261,7 @@ public slots:
     void setMediaStopAction(MediaStopAction );
     VLCTick getTime() const;
     void setTime(VLCTick);
+    VLCTick getRemainingTime() const;
     float getPosition() const;
     void setPosition(float);
     VLCTick getLength() const;
@@ -347,12 +349,11 @@ signals:
     void mediaStopActionChanged( MediaStopAction );
 
     void timeChanged( VLCTick );
+    void remainingTimeChanged( VLCTick );
     void positionChanged( float );
     void lengthChanged( VLCTick );
     void positionUpdated( float , VLCTick, int );
     void seekRequested( float pos ); //not exposed through Q_PROPERTY
-
-    void remainingTimeChanged( bool );  //FIXME
 
     void seekableChanged( bool );
     void rewindableChanged( bool );

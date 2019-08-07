@@ -397,6 +397,11 @@ static void on_player_position_changed(vlc_player_t *player, vlc_tick_t time, fl
         emit q->positionChanged(pos);
         that->m_time = time;
         emit q->timeChanged(time);
+        if ( time != VLC_TICK_INVALID && length != VLC_TICK_INVALID )
+            that->m_remainingTime = length - time;
+        else
+            that->m_remainingTime = VLC_TICK_INVALID;
+        emit q->remainingTimeChanged(that->m_remainingTime);
         emit that->q_func()->positionUpdated(pos, time, SEC_FROM_VLC_TICK(length) );
     });
 }
@@ -410,6 +415,12 @@ static void on_player_length_changed(vlc_player_t *player, vlc_tick_t new_length
         PlayerController* q = that->q_func();
         that->m_length = new_length;
         emit q->lengthChanged(new_length);
+
+        if ( time != VLC_TICK_INVALID && new_length != VLC_TICK_INVALID )
+            that->m_remainingTime = new_length - time;
+        else
+            that->m_remainingTime = VLC_TICK_INVALID;
+        emit q->remainingTimeChanged(that->m_remainingTime);
         emit that->q_func()->positionUpdated( pos, time, SEC_FROM_VLC_TICK(new_length) );
     });
 
@@ -1548,6 +1559,7 @@ QABSTRACTLIST_GETTER( VLCVarChoiceModel, getAudioVisualizations, m_audioVisualiz
 PRIMITIVETYPE_GETTER(PlayerController::PlayingState, getPlayingState, m_playing_status)
 PRIMITIVETYPE_GETTER(QString, getName, m_name)
 PRIMITIVETYPE_GETTER(VLCTick, getTime, m_time)
+PRIMITIVETYPE_GETTER(VLCTick, getRemainingTime, m_remainingTime)
 PRIMITIVETYPE_GETTER(float, getPosition, m_position)
 PRIMITIVETYPE_GETTER(VLCTick, getLength, m_length)
 PRIMITIVETYPE_GETTER(VLCTick, getAudioDelay, m_audioDelay)

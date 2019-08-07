@@ -75,6 +75,7 @@ public:
     PlayerController::MediaStopAction m_mediaStopAction = PlayerController::MEDIA_STOPPED_CONTINUE;
 
     VLCTick      m_time = 0;
+    VLCTick      m_remainingTime = 0;
     float           m_position = 0.f;
     VLCTick      m_length= 0;
 
