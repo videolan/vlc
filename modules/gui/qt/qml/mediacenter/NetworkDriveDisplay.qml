@@ -53,19 +53,5 @@ Utils.ListItem {
         history.push( ["mc", "network", { tree: model.tree } ], History.Go)
     }
 
-    Component {
-        id: actionAdd
-        Utils.IconToolButton {
-            size: VLCStyle.icon_normal
-            text: model.indexed ? VLCIcons.remove : VLCIcons.add
-
-            focus: true
-
-            highlightColor: activeFocus ? VLCStyle.colors.buttonText : "transparent"
-
-            onClicked: model.indexed = !model.indexed
-        }
-    }
-
-    actionButtons: model.can_index ? [actionAdd] : []
+    actionButtons: []
 }
