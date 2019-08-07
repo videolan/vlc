@@ -21,37 +21,20 @@ import QtQuick.Controls 2.4
 import "qrc:///style/"
 
 ProgressBar {
-    property int progressPercent: 0
-    property bool discoveryDone: true
+    visible: !medialib.idle
 
-    Connections {
-        target: medialib
-        onProgressUpdated: {
-            progressPercent = percent;
-            if (discoveryDone)
-                progressText_id.text = percent + "%";
-        }
-        onDiscoveryProgress: {
-            progressText_id.text = entryPoint;
-        }
-        onDiscoveryStarted: discoveryDone = false
-        onReloadStarted: discoveryDone = false
-        onDiscoveryCompleted: discoveryDone = true
-        onReloadCompleted: discoveryDone = true
-    }
-
-    visible: ((progressPercent < 100) && (progressPercent != 0)) || !discoveryDone
     id: progressBar_id
     from: 0
     to: 100
     height: progressText_id.height
     anchors.topMargin: 10
     anchors.bottomMargin: 10
-    value: progressPercent
-    indeterminate: !discoveryDone
+    value: medialib.parsingProgress
+    indeterminate: medialib.discoveryPending
     Text {
         id: progressText_id
         color: VLCStyle.colors.text
+        text:  medialib.discoveryPending ? medialib.discoveryEntryPoint : (medialib.parsingProgress + "%")
         z: progressBar_id.z + 1
         anchors.horizontalCenter: parent.horizontalCenter
         visible: true

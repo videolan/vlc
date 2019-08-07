@@ -39,6 +39,10 @@ class MCMediaLib : public QObject
     Q_OBJECT
 
     Q_PROPERTY(bool gridView READ isGridView WRITE setGridView NOTIFY gridViewChanged)
+    Q_PROPERTY(bool discoveryPending READ discoveryPending NOTIFY discoveryPendingChanged)
+    Q_PROPERTY(int  parsingProgress READ parsingProgress NOTIFY parsingProgressChanged)
+    Q_PROPERTY(QString discoveryEntryPoint READ discoveryEntryPoint NOTIFY discoveryEntryPointChanged)
+    Q_PROPERTY(bool idle READ idle NOTIFY idleChanged)
 
 public:
     MCMediaLib(intf_thread_t* _intf, QObject* _parent = nullptr );
@@ -53,17 +57,23 @@ public:
     Q_INVOKABLE void addAndPlay(const QUrl& mrl);
     Q_INVOKABLE void addAndPlay(const QVariantList&itemIdList);
 
+    inline bool idle() const { return m_idle; }
+    inline int discoveryPending() const { return m_discoveryPending; }
+    inline QString discoveryEntryPoint() const { return m_discoveryEntryPoint; }
+    inline int parsingProgress() const { return m_parsingProgress; }
 
     vlc_medialibrary_t* vlcMl();
 
 signals:
     void gridViewChanged();
-    void discoveryStarted();
     void reloadStarted();
-    void discoveryProgress( QString entryPoint );
-    void discoveryCompleted();
     void reloadCompleted();
-    void progressUpdated( quint32 percent );
+    void discoveryStarted();
+    void discoveryCompleted();
+    void parsingProgressChanged( quint32 percent );
+    void discoveryEntryPointChanged( QString entryPoint );
+    void discoveryPendingChanged( bool state );
+    void idleChanged();
 
 private:
     bool isGridView() const;
@@ -76,6 +86,10 @@ private:
     intf_thread_t* m_intf;
 
     bool m_gridView;
+    bool m_idle = false;
+    bool m_discoveryPending = false;
+    int m_parsingProgress = 0;
+    QString m_discoveryEntryPoint;
 
     /* Medialibrary */
     vlc_medialibrary_t* m_ml;
