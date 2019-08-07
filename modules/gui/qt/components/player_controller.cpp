@@ -913,7 +913,6 @@ PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontrol
     , m_titleList(m_player)
     , m_chapterList(m_player)
     , m_programList(m_player)
-    , m_audioDeviceList(m_player)
     , m_zoom((vout_thread_t*)nullptr, "zoom")
     , m_aspectRatio((vout_thread_t*)nullptr, "aspect-ratio")
     , m_crop((vout_thread_t*)nullptr, "crop")
@@ -921,6 +920,7 @@ PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontrol
     , m_deinterlaceMode((vout_thread_t*)nullptr, "deinterlace-mode")
     , m_autoscale((vout_thread_t*)nullptr, "autoscale")
     , m_audioStereoMode((audio_output_t*)nullptr, "stereo-mode")
+    , m_audioDeviceList(m_player)
     , m_audioVisualization((audio_output_t*)nullptr, "visual")
 {
     {
