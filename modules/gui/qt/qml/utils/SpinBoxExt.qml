@@ -25,17 +25,22 @@ SpinBox{
     id: control
     font.pixelSize: VLCStyle.fontSize_large
 
+    property color textColor: VLCStyle.colors.buttonText
+    property color bgColor: VLCStyle.colors.bg
+    property color borderColor:  VLCStyle.colors.buttonBorder
+
     background: Rectangle {
         implicitWidth: 4 * scale
         implicitHeight: 32 * scale
-        border.color: VLCStyle.colors.buttonBorder
-        color: VLCStyle.colors.bg
+        border.color: control.borderColor
+        color: control.bgColor
     }
+
     contentItem: TextInput {
         text: control.textFromValue(control.value, control.locale)
 
         font: control.font
-        color: enabled ? VLCStyle.colors.buttonText : "grey"
+        color: enabled ? control.textColor : "grey"
 
         horizontalAlignment: Qt.AlignRight
         verticalAlignment: Qt.AlignVCenter
@@ -50,13 +55,13 @@ SpinBox{
         implicitWidth: 15 * scale
         implicitHeight: 10 * scale
         anchors.top: parent.top
-        color: control.up.pressed ? VLCStyle.colors.bgHover : VLCStyle.colors.bg
-        border.color: VLCStyle.colors.buttonBorder
+        color: control.up.pressed ? VLCStyle.colors.bgHover : control.bgColor
+        border.color: control.borderColor
 
         Text {
             text: "+"
             font.pixelSize: control.font.pixelSize * 2
-            color: VLCStyle.colors.buttonText
+            color: control.textColor
             anchors.fill: parent
             fontSizeMode: Text.Fit
             horizontalAlignment: Text.AlignHCenter
@@ -70,13 +75,13 @@ SpinBox{
         implicitWidth: 15 * scale
         implicitHeight: 10 * scale
         anchors.bottom: parent.bottom
-        color: control.down.pressed ? VLCStyle.colors.bgHover : VLCStyle.colors.bg
-        border.color: VLCStyle.colors.buttonBorder
+        color: control.down.pressed ? VLCStyle.colors.bgHover : control.bgColor
+        border.color: control.borderColor
 
         Text {
             text: "-"
             font.pixelSize: control.font.pixelSize * 2
-            color: VLCStyle.colors.buttonText
+            color: control.textColor
             anchors.fill: parent
             fontSizeMode: Text.Fit
             horizontalAlignment: Text.AlignHCenter
