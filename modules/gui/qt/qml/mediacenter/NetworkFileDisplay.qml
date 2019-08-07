@@ -40,6 +40,12 @@ Utils.ListItem {
     line1: model.name || qsTr("Unknown share")
     line2: model.mrl
 
+    showContextButton: true
+    onContextMenuButtonClicked: {
+        contextMenu.model = model
+        contextMenu.popup(menuParent,contextMenu.width,0)
+    }
+
     onItemClicked : {
         delegateModel.updateSelection( modifier, view.currentIndex, index )
         view.currentIndex = index

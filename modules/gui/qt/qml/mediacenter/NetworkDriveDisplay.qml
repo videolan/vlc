@@ -44,6 +44,12 @@ Utils.ListItem {
     line2: model.mrl
     imageText: model.type === MLNetworkModel.TYPE_SHARE ? model.protocol : ""
 
+    showContextButton: true
+    onContextMenuButtonClicked: {
+        contextMenu.model = model
+        contextMenu.popup(menuParent,contextMenu.width,0)
+    }
+
     onItemClicked : {
         delegateModel.updateSelection( modifier, view.currentIndex, index )
         view.currentIndex = index
