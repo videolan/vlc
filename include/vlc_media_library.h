@@ -523,7 +523,7 @@ enum vlc_ml_event_type
      * A discovery started.
      * For each VLC_ML_EVENT_DISCOVERY_STARTED event, there will be
      * 1 VLC_ML_EVENT_DISCOVERY_COMPLETED event, and N
-     * VLC_ML_EVENT_DISCOVERY_COMPLETED events.
+     * VLC_ML_EVENT_DISCOVERY_PROGRESS events.
      * The entry point being discovered is stored in
      * vlc_ml_event_t::discovery_started::psz_entry_point.
      */
