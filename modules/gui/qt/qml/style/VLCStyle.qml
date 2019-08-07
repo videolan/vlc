@@ -127,6 +127,11 @@ Item {
     property int combobox_height_normal: 24 * scale
     property int combobox_height_large: 30 * scale
 
+    //button
+    property int button_width_small: 64 * scale
+    property int button_width_normal: 96 * scale
+    property int button_width_large: 128 * scale
+
     //timings
     property int delayToolTipAppear: 500;
     property int timingPlaylistClose: 1000;
