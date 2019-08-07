@@ -22,6 +22,7 @@ import QtQuick.Layouts 1.3
 import QtGraphicalEffects 1.0
 
 import "qrc:///style/"
+import "qrc:///utils/" as Utils
 
 NavigableFocusScope {
     id: root
@@ -29,6 +30,7 @@ NavigableFocusScope {
     signal addToPlaylistClicked
     signal itemClicked(int keys, int modifier)
     signal itemDoubleClicked(int keys, int modifier)
+    signal contextMenuButtonClicked(Item menuParent)
 
     property alias hovered: mouse.containsMouse
 
@@ -38,6 +40,7 @@ NavigableFocusScope {
     property alias imageText: cover_text.text
 
     property alias color: glow.color
+    property bool showContextButton: false
 
     Component {
         id: actionAdd
@@ -156,7 +159,7 @@ NavigableFocusScope {
                 }
 
                 Keys.onRightPressed: {
-                    if (actionButtons.length === 0)
+                    if (actionButtons.length === 0 && !root.showContextButton)
                         root.actionRight(0)
                     else
                         toolButtons.focus = true
@@ -183,6 +186,14 @@ NavigableFocusScope {
                             sourceComponent: modelData
                             focus: index === toolButtons.focusIndex
                         }
+                        }                        
+                        Utils.ContextButton{
+                            id: contextButton
+                            color: contextButton.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
+                            focus: actionButtons.length == toolButtons.focusIndex
+                            visible: root.showContextButton
+                            onClicked: root.contextMenuButtonClicked(this)
+                        }
                     }
                 }
                 Keys.onLeftPressed: {
@@ -193,7 +204,7 @@ NavigableFocusScope {
                     }
                 }
                 Keys.onRightPressed: {
-                    if (focusIndex === actionButtons.length - 1)
+                if (focusIndex === (actionButtons.length - !root.showContextButton ? 1 : 0 ) )
                         root.actionRight(0)
                     else {
                         focusIndex += 1
@@ -204,4 +215,4 @@ NavigableFocusScope {
 
         }
     }
-}
+
