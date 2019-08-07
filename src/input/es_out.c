@@ -3495,6 +3495,26 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         }
         return ret;
     }
+    case ES_OUT_SET_AUTOSELECT:
+    {
+        int i_cat = va_arg( args, int );
+        bool b_enabled = va_arg( args, int );
+        switch ( i_cat )
+        {
+            case VIDEO_ES:
+                p_sys->video.b_autoselect = b_enabled;
+                break;
+            case AUDIO_ES:
+                p_sys->audio.b_autoselect = b_enabled;
+                break;
+            case SPU_ES:
+                p_sys->sub.b_autoselect = b_enabled;
+                break;
+            default:
+                return VLC_EGENERIC;
+        }
+        return VLC_SUCCESS;
+    }
     default:
         msg_Err( p_sys->p_input, "unknown query 0x%x in %s", i_query,
                  __func__  );

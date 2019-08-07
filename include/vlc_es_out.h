@@ -112,6 +112,10 @@ enum es_out_query_e
     ES_OUT_SPU_SET_HIGHLIGHT, /* arg1= es_out_id_t* (spu es),
                                  arg2= const vlc_spu_highlight_t *, res=can fail  */
 
+    /* Disable autoselection of tracks from a given category */
+    ES_OUT_SET_AUTOSELECT,  /* arg1= int (es category),
+                               arg2= int (enabled/disabled), res=can fail */
+
     /* First value usable for private control */
     ES_OUT_PRIVATE_START = 0x10000,
 };

@@ -2277,6 +2277,10 @@ static bool Control( input_thread_t *p_input,
                             param.vbi_transparency.id,
                             param.vbi_transparency.enabled );
             break;
+        case INPUT_CONTROL_SET_ES_AUTOSELECT:
+            es_out_Control( priv->p_es_out_display, ES_OUT_SET_AUTOSELECT,
+                            param.es_autoselect.cat, param.es_autoselect.enabled );
+            break;
 
         case INPUT_CONTROL_NAV_ACTIVATE:
         case INPUT_CONTROL_NAV_UP:

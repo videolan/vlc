@@ -435,6 +435,10 @@ typedef union
         vlc_es_id_t *id;
         bool enabled;
     } vbi_transparency;
+    struct {
+        enum es_format_category_e cat;
+        bool enabled;
+    } es_autoselect;
 } input_control_param_t;
 
 typedef struct
@@ -586,6 +590,8 @@ enum input_control_e
 
     INPUT_CONTROL_SET_VBI_PAGE,
     INPUT_CONTROL_SET_VBI_TRANSPARENCY,
+
+    INPUT_CONTROL_SET_ES_AUTOSELECT,
 };
 
 /* Internal helpers */
