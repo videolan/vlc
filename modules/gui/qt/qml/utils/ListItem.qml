@@ -197,17 +197,17 @@ NavigableFocusScope {
                     }
                 }
                 Keys.onLeftPressed: {
-                    if (focusIndex === 0)
+                    if (toolButtons.focusIndex === 0)
                         presentation.focus = true
                     else {
-                        focusIndex -= 1
+                        toolButtons.focusIndex -= 1
                     }
                 }
                 Keys.onRightPressed: {
-                if (focusIndex === (actionButtons.length - !root.showContextButton ? 1 : 0 ) )
+               if (toolButtons.focusIndex === (actionButtons.length - (!root.showContextButton ? 1 : 0) ) )
                         root.actionRight(0)
                     else {
-                        focusIndex += 1
+                        toolButtons.focusIndex += 1
                     }
                 }
             }
