@@ -3667,6 +3667,8 @@ vlc_player_Delete(vlc_player_t *player)
     vlc_cond_signal(&player->destructor.wait);
 
     assert(vlc_list_is_empty(&player->listeners));
+    assert(vlc_list_is_empty(&player->vout_listeners));
+    assert(vlc_list_is_empty(&player->aout_listeners));
 
     vlc_mutex_unlock(&player->lock);
 
