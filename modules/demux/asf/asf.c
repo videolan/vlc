@@ -1105,7 +1105,7 @@ static int DemuxInit( demux_t *p_demux )
                 {
                     GET_CHECKED( fmt.i_extra, __MIN( GetWLE( &p_data[16] ),
                                          p_sp->i_type_specific_data_length -
-                                         sizeof( WAVEFORMATEX ) ),
+                                         sizeof( WAVEFORMATEX ) - 64),
                                  INT_MAX, uint32_t );
                     fmt.p_extra = malloc( fmt.i_extra );
                     if ( fmt.p_extra )
