@@ -58,11 +58,6 @@ public:
 #endif
     }
 
-public slots:
-    void menusUpdateAudio( const QString& );
-    void AtoBLoop( float, VLCTick, int );
-
-
 public:
     intf_thread_t           *p_intf;
     vlc_player_t            *m_player;
