@@ -28,7 +28,7 @@ NavigableFocusScope {
     id: root
     signal playClicked
     signal addToPlaylistClicked
-    signal itemClicked(int keys, int modifier)
+    signal itemClicked(int key, int modifier)
     signal itemDoubleClicked(int keys, int modifier)
     signal contextMenuButtonClicked(Item menuParent)
 
@@ -84,8 +84,9 @@ NavigableFocusScope {
             id: mouse
             anchors.fill: parent
             hoverEnabled: true
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: {
-                root.itemClicked(mouse.buttons, mouse.modifiers);
+                root.itemClicked(mouse.button, mouse.modifiers);
             }
             onDoubleClicked: {
                 root.itemDoubleClicked(mouse.buttons, mouse.modifiers);
