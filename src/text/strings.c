@@ -53,7 +53,6 @@
 #include <vlc_player.h>
 #include <libvlc.h>
 #include <errno.h>
-#include "../input/input_internal.h"
 
 static const struct xml_entity_s
 {

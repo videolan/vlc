@@ -42,7 +42,6 @@
 #include "../libvlc.h"
 #include "vout_internal.h"
 #include "../misc/subpicture.h"
-#include "../input/input_internal.h"
 
 /*****************************************************************************
  * Local prototypes
