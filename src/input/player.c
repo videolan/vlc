@@ -739,6 +739,24 @@ vlc_player_input_Delete(struct vlc_player_input *input)
     free(input);
 }
 
+static void
+vlc_player_HandleAtoBLoop(vlc_player_t *player)
+{
+    struct vlc_player_input *input = vlc_player_get_input_locked(player);
+    assert(input);
+    assert(input->abloop_state[0].set && input->abloop_state[1].set);
+
+    if (input->time != VLC_TICK_INVALID
+     && input->abloop_state[0].time != VLC_TICK_INVALID
+     && input->abloop_state[1].time != VLC_TICK_INVALID)
+    {
+        if (input->time >= input->abloop_state[1].time)
+            vlc_player_SetTime(player, input->abloop_state[0].time);
+    }
+    else if (input->position >= input->abloop_state[1].pos)
+        vlc_player_SetPosition(player, input->abloop_state[0].pos);
+}
+
 static int
 vlc_player_input_Start(struct vlc_player_input *input)
 {
@@ -2150,24 +2168,6 @@ vlc_player_input_HandleStateEvent(struct vlc_player_input *input,
         default:
             vlc_assert_unreachable();
     }
-}
-
-static void
-vlc_player_HandleAtoBLoop(vlc_player_t *player)
-{
-    struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    assert(input);
-    assert(input->abloop_state[0].set && input->abloop_state[1].set);
-
-    if (input->time != VLC_TICK_INVALID
-     && input->abloop_state[0].time != VLC_TICK_INVALID
-     && input->abloop_state[1].time != VLC_TICK_INVALID)
-    {
-        if (input->time >= input->abloop_state[1].time)
-            vlc_player_SetTime(player, input->abloop_state[0].time);
-    }
-    else if (input->position >= input->abloop_state[1].pos)
-        vlc_player_SetPosition(player, input->abloop_state[0].pos);
 }
 
 static void
