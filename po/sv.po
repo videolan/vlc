@@ -31,7 +31,7 @@
 # Niklas Åkerström, 2009
 # Olle Neiman <olle.neiman@seoseon.com>, 2016
 # Paulus Paulus <suluap@alamier.com>, 2016
-# sebras <sebras@gmail.com>, 2015
+# Sebastian Rasmussen <sebras@gmail.com>, 2015,2019
 # theschitz <theodore@theschitz.se>, 2015-2016
 # Isis, 2014
 msgid ""
@@ -39,8 +39,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-08-02 15:30+0200\n"
-"Last-Translator: Anton Regnander <anton_r_3@hotmail.com>, 2019\n"
+"PO-Revision-Date: 2019-08-08 12:34+0200\n"
+"Last-Translator: Sebastian Rasmussen <sebras@gmail.com>, 2019\n"
 "Language-Team: Swedish (https://www.transifex.com/yaron/teams/16553/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -1288,7 +1288,7 @@ msgstr "Primär B"
 
 #: src/input/es_out.c:3339
 msgid "White point"
-msgstr ""
+msgstr "Vitpunkt"
 
 #: src/input/es_out.c:3354 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1774,6 +1774,7 @@ msgid ""
 "This option should be used when the audio output can't negotiate S/PDIF "
 "support."
 msgstr ""
+"Detta alternativ bör användas när ljudutången inte kan förhandla S/PDIF-stöd."
 
 #: src/libvlc-module.c:178
 msgid "Force detection of Dolby Surround"
