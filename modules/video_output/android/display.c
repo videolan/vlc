@@ -107,7 +107,6 @@ struct buffer_bounds
 struct vout_display_sys_t
 {
     vout_window_t *embed;
-    picture_pool_t *pool;
 
     int i_display_width;
     int i_display_height;
@@ -656,9 +655,6 @@ static void Close(vout_display_t *vd)
         SubpicturePrepare(vd, NULL);
         AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic);
     }
-
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
 
     if (sys->p_window)
     {
