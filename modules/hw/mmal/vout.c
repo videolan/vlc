@@ -547,6 +547,13 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
     }
 
 out:
+    if (!sys->picture_pool)
+    {
+        while(i-- != 0)
+            picture_Release(sys->pictures[i]);
+        free(sys->pictures);
+        sys->pictures = NULL;
+    }
     return sys->picture_pool;
 }
 
