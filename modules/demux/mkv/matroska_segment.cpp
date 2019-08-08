@@ -611,7 +611,6 @@ bool matroska_segment_c::Preload( )
             if ( tracks.size() == 0 )
             {
                 msg_Err( &sys.demuxer, "No tracks supported" );
-                return false;
             }
             i_tracks_position = el->GetElementPosition();
         }
