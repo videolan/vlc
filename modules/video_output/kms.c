@@ -495,6 +495,21 @@ static bool ChromaNegotiation(vout_display_t *vd)
     return false;
 }
 
+static void CustomDestroyPicture(picture_t *p_picture)
+{
+    picture_sys_t *psys = (picture_sys_t*)p_picture->p_sys;
+    vout_display_sys_t *sys = (vout_display_sys_t *)psys->p_voutsys;
+    int c;
+
+    for (c = 0; c < MAXHWBUF; c++)
+        DestroyFB(sys, c);
+
+    drmSetClientCap(sys->drm_fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 0);
+    drmDropMaster(sys->drm_fd);
+    vlc_close(sys->drm_fd);
+    sys->drm_fd = 0;
+    free(p_picture->p_sys);
+}
 
 static int OpenDisplay(vout_display_t *vd)
 {
@@ -595,23 +610,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
             return VLC_SUCCESS;
     }
     return VLC_EGENERIC;
-}
-
-
-static void CustomDestroyPicture(picture_t *p_picture)
-{
-    picture_sys_t *psys = (picture_sys_t*)p_picture->p_sys;
-    vout_display_sys_t *sys = (vout_display_sys_t *)psys->p_voutsys;
-    int c;
-
-    for (c = 0; c < MAXHWBUF; c++)
-        DestroyFB(sys, c);
-
-    drmSetClientCap(sys->drm_fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 0);
-    drmDropMaster(sys->drm_fd);
-    vlc_close(sys->drm_fd);
-    sys->drm_fd = 0;
-    free(p_picture->p_sys);
 }
 
 
