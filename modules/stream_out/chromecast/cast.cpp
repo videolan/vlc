@@ -924,6 +924,8 @@ sout_stream_sys_t::GetAcodecOption( sout_stream_t *p_stream, vlc_fourcc_t *p_cod
      * devices (Chromecast 1 & 2) */
     if( *p_codec_audio == VLC_CODEC_VORBIS )
         ssout << "aenc=vorbis{quality=4},";
+    else if( *p_codec_audio == VLC_CODEC_MP3 )
+        ssout << "ab=320,";
     return ssout.str();
 }
 
