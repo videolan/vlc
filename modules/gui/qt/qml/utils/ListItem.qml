@@ -195,6 +195,9 @@ NavigableFocusScope {
                             color: contextButton.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
                             focus: actionButtons.length == toolButtons.focusIndex
                             visible: root.showContextButton
+                            backgroundColor: hovered || activeFocus ? VLCStyle.colors.getBgColor(
+                                                 root.isSelected, root.hovered,
+                                                 root.activeFocus) : "transparent"
                             onClicked: root.contextMenuButtonClicked(this)
                         }
                     }
