@@ -99,7 +99,17 @@ NavigableFocusScope {
         }
 
         property variant model
-        property Item expandItem: root.expandDelegate.createObject(contentItem, {"height": 0})
+        property alias expandItem: expandItemLoader.item
+        //root.expandDelegate.createObject(contentItem, {"height": 0})
+        Loader {
+            id: expandItemLoader
+            sourceComponent: expandDelegate
+            active: root._expandIndex !== -1
+            focus: active
+            onLoaded: item.height = 0
+        }
+
+
         anchors.fill: parent
         onWidthChanged: { layout() }
         onHeightChanged: { layout() }
@@ -221,7 +231,8 @@ NavigableFocusScope {
                 item.visible = true
             }
 
-            expandItem.y = getItemPos(expandItemGridId)[1]
+            if (root._expandIndex !== -1)
+                expandItem.y = getItemPos(expandItemGridId)[1]
 
             // Place the delegates after the expandItem
             for (i = topGridEndId; i < lastId; ++i) {
@@ -247,7 +258,8 @@ NavigableFocusScope {
             onChanged: {
                 // Hide the expandItem with no animation
                 _expandIndex = -1
-                flickable.expandItem.height = 0
+
+                //flickable.expandItem.height = 0
                 // Regenerate the gridview layout
                 flickable.layout()
             }
@@ -284,6 +296,8 @@ NavigableFocusScope {
 
         function expand() {
             _expandIndex = _newExpandIndex
+            if (_expandIndex === -1)
+                return
             expandItem.model = model.items.get(_expandIndex).model
             /* We must also start the expand animation here since the expandItem implicitHeight is not
                changed if it had the same height at previous opening. */
@@ -291,6 +305,9 @@ NavigableFocusScope {
         }
 
         function expandAnimation() {
+            if (_expandIndex === -1)
+                return
+
             var expandItemHeight = flickable.expandItem.implicitHeight;
 
             // Expand animation
@@ -345,13 +362,6 @@ NavigableFocusScope {
             easing.type: Easing.InQuad
             duration: 250
             from: 0
-        }
-
-        Binding {
-            target: flickable.expandItem
-            property: "visible"
-            value: flickable.expandItem.height > 0
-            delayed: true
         }
 
         function setCurrentItemFocus() {
