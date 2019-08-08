@@ -50,8 +50,9 @@ NavigableFocusScope {
 
             focus: true
 
-            highlightColor: activeFocus ? VLCStyle.colors.banner : "transparent"
-
+            highlightColor: VLCStyle.colors.getBgColor(
+                                root.isSelected, root.hovered,
+                                root.activeFocus)
             //visible: mouse.containsMouse || root.activeFocus
             onClicked: root.addToPlaylistClicked()
         }
@@ -68,7 +69,9 @@ NavigableFocusScope {
 
             focus: true
 
-            highlightColor: add_and_play_icon.activeFocus ? VLCStyle.colors.banner : "transparent"
+            highlightColor: VLCStyle.colors.getBgColor(
+                                root.isSelected, root.hovered,
+                                root.activeFocus)
             onClicked: root.playClicked()
         }
     }
