@@ -135,17 +135,20 @@ smb2_set_generic_error(stream_t *access, const char *psz_func)
 static int
 vlc_smb2_mainloop(stream_t *access, bool teardown)
 {
+#define TEARDOWN_TIMEOUT 250 /* in ms */
     struct access_sys *sys = access->p_sys;
 
     int timeout = -1;
     int (*poll_func)(struct pollfd *, unsigned, int) = vlc_poll_i11e;
 
-    if (teardown && vlc_killed())
+    if (teardown)
     {
-        /* The thread is interrupted, so vlc_poll_i11e will return immediatly.
-         * Use poll() with a timeout instead for tear down. */
-        timeout = 500;
+        /* Don't use vlc_poll_i11e that will return immediately with the EINTR
+         * errno if VLC's input is interrupted. Use the posix poll with a
+         * timeout to let a chance for a clean teardown. */
+        timeout = TEARDOWN_TIMEOUT;
         poll_func = (void *)poll;
+        sys->error_status = 0;
     }
 
     sys->res_done = false;
@@ -159,11 +162,27 @@ vlc_smb2_mainloop(stream_t *access, bool teardown)
         if (p_fds[0].fd == -1 || (ret = poll_func(p_fds, 1, timeout)) < 0)
         {
             if (errno == EINTR)
+            {
                 msg_Warn(access, "vlc_poll_i11e interrupted");
+                if (poll_func != (void *) poll)
+                {
+                    /* Try again with a timeout to let the command complete.
+                     * Indeed, if this command is interrupted, every future
+                     * commands will fail and we won't be able to teardown. */
+                    timeout = TEARDOWN_TIMEOUT;
+                    poll_func = (void *) poll;
+                }
+                else
+                    sys->error_status = -errno;
+            }
             else
+            {
                 msg_Err(access, "vlc_poll_i11e failed");
-            sys->error_status = -errno;
+                sys->error_status = -errno;
+            }
         }
+        else if (ret == 0)
+            sys->error_status = -ETIMEDOUT;
         else if (ret > 0 && p_fds[0].revents
              && smb2_service(sys->smb2, p_fds[0].revents) < 0)
             VLC_SMB2_SET_GENERIC_ERROR(access, "smb2_service");
