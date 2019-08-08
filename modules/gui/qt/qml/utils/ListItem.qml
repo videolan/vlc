@@ -91,7 +91,6 @@ NavigableFocusScope {
             onDoubleClicked: {
                 root.itemDoubleClicked(mouse.buttons, mouse.modifiers);
             }
-        }
         RectangularGlow {
             id: glow
             anchors.fill: innerRect
@@ -213,7 +212,7 @@ NavigableFocusScope {
                 }
             }
         }
-
+        }
         }
     }
 
