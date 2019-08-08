@@ -2309,7 +2309,7 @@ fi
 dnl
 dnl  matroska demux plugin
 dnl
-PKG_WITH_MODULES([MATROSKA], [libebml libmatroska], [
+PKG_WITH_MODULES([MATROSKA], [libebml >= 1.3.6 libmatroska], [
        VLC_ADD_PLUGIN([mkv])
        VLC_ADD_CFLAGS([mkv], [$MATROSKA_CFLAGS])
        VLC_ADD_LIBS([mkv], [$MATROSKA_LIBS])
