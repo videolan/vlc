@@ -37,17 +37,19 @@
                                         /* the keyframe flag isn't a true flag */
                                         /* but have to be verified */
 
+typedef union avi_chunk_u avi_chunk_t;
+
 #define AVI_CHUNK_COMMON           \
     vlc_fourcc_t i_chunk_fourcc;   \
     uint64_t i_chunk_size;         \
     uint64_t i_chunk_pos;          \
-    union  avi_chunk_u *p_next;    \
-    union  avi_chunk_u *p_father;  \
-    union  avi_chunk_u *p_first;
+    avi_chunk_t *p_next;           \
+    avi_chunk_t *p_father;         \
+    avi_chunk_t *p_first;
 
 #define AVI_CHUNK( p_chk ) (avi_chunk_t*)(p_chk)
 
-typedef struct idx1_entry_s
+typedef struct
 {
     vlc_fourcc_t i_fourcc;
     uint32_t i_flags;
@@ -56,18 +58,18 @@ typedef struct idx1_entry_s
 
 } idx1_entry_t;
 
-typedef struct avi_chunk_common_s
+typedef struct
 {
     AVI_CHUNK_COMMON
 } avi_chunk_common_t;
 
-typedef struct avi_chunk_list_s
+typedef struct
 {
     AVI_CHUNK_COMMON
     vlc_fourcc_t i_type;
 } avi_chunk_list_t;
 
-typedef struct avi_chunk_idx1_s
+typedef struct
 {
     AVI_CHUNK_COMMON
     unsigned int i_entry_count;
@@ -76,7 +78,7 @@ typedef struct avi_chunk_idx1_s
 
 } avi_chunk_idx1_t;
 
-typedef struct avi_chunk_avih_s
+typedef struct
 {
     AVI_CHUNK_COMMON
     uint32_t i_microsecperframe;
@@ -96,7 +98,7 @@ typedef struct avi_chunk_avih_s
     uint32_t i_length;
 } avi_chunk_avih_t;
 
-typedef struct avi_chunk_strh_s
+typedef struct
 {
     AVI_CHUNK_COMMON
     vlc_fourcc_t i_type;
@@ -113,21 +115,21 @@ typedef struct avi_chunk_strh_s
     uint32_t i_samplesize;
 } avi_chunk_strh_t;
 
-typedef struct avi_chunk_strf_auds_s
+typedef struct
 {
     AVI_CHUNK_COMMON
     int             i_cat;
     WAVEFORMATEX    *p_wf;
 } avi_chunk_strf_auds_t;
 
-typedef struct avi_chunk_strf_vids_s
+typedef struct
 {
     AVI_CHUNK_COMMON
     int                     i_cat;
     VLC_BITMAPINFOHEADER    *p_bih;
 } avi_chunk_strf_vids_t;
 
-typedef union avi_chunk_strf_u
+typedef union
 {
     avi_chunk_strf_auds_t   auds;
     avi_chunk_strf_vids_t   vids;
@@ -138,13 +140,13 @@ typedef union avi_chunk_strf_u
     }                       common;
 } avi_chunk_strf_t;
 
-typedef struct avi_chunk_strd_s
+typedef struct
 {
     AVI_CHUNK_COMMON
     uint8_t  *p_data;
 } avi_chunk_strd_t;
 
-typedef struct avi_chunk_vprp_s
+typedef struct
 {
     AVI_CHUNK_COMMON
     uint32_t i_video_format_token;
@@ -170,7 +172,7 @@ typedef struct avi_chunk_vprp_s
 
 } avi_chunk_vprp_t;
 
-typedef struct avi_chunk_dmlh_s
+typedef struct
 {
     AVI_CHUNK_COMMON
     uint32_t dwTotalFrames;
@@ -204,7 +206,7 @@ typedef struct
     uint32_t i_duration;
 } indx_super_entry_t;
 
-typedef struct avi_chunk_indx_s
+typedef struct
 {
     AVI_CHUNK_COMMON
     int16_t  i_longsperentry;
@@ -223,14 +225,14 @@ typedef struct avi_chunk_indx_s
     } idx;
 } avi_chunk_indx_t;
 
-typedef struct avi_chunk_STRING_s
+typedef struct
 {
     AVI_CHUNK_COMMON
     char *p_type;
     char *p_str;
 } avi_chunk_STRING_t;
 
-typedef union avi_chunk_u
+union avi_chunk_u
 {
     avi_chunk_common_t  common;
     avi_chunk_list_t    list;
@@ -242,7 +244,7 @@ typedef union avi_chunk_u
     avi_chunk_vprp_t    vprp;
     avi_chunk_indx_t    indx;
     avi_chunk_STRING_t  strz;
-} avi_chunk_t;
+};
 
 /****************************************************************************
  * Stream(input) access functions

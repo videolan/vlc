@@ -195,7 +195,7 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
 #endif
     msg_Dbg( s, "<list \'%4.4s\'>", (char*)&p_container->list.i_type );
 
-    union  avi_chunk_u **pp_append = &p_container->common.p_first;
+    avi_chunk_t **pp_append = &p_container->common.p_first;
     for( ; ; )
     {
         p_chk = calloc( 1, sizeof( avi_chunk_t ) );
@@ -259,7 +259,7 @@ int AVI_ChunkFetchIndexes( stream_t *s, avi_chunk_t *p_riff )
     if ( !b_seekable || vlc_stream_Seek( s, i_indexpos ) )
         return VLC_EGENERIC;
 
-    union  avi_chunk_u **pp_append = &p_riff->common.p_first;
+    avi_chunk_t **pp_append = &p_riff->common.p_first;
     for( ; ; )
     {
         p_chk = calloc( 1, sizeof( avi_chunk_t ) );
@@ -1128,7 +1128,7 @@ int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
 
     p_list->i_type = VLC_FOURCC( 'r', 'o', 'o', 't' );
 
-    union  avi_chunk_u **pp_append = &p_root->common.p_first;
+    avi_chunk_t **pp_append = &p_root->common.p_first;
     for( ; ; )
     {
         p_chk = calloc( 1, sizeof( avi_chunk_t ) );
