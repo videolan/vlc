@@ -1698,7 +1698,7 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, services_disc
 void UpnpInstanceWrapper::release(bool isSd)
 {
     UpnpInstanceWrapper *p_delete = NULL;
-    vlc_mutex_lock( &s_lock );
+    vlc_mutex_locker lock( &s_lock );
     if ( isSd )
     {
         delete UpnpInstanceWrapper::p_server_list;
@@ -1709,7 +1709,6 @@ void UpnpInstanceWrapper::release(bool isSd)
         p_delete = s_instance;
         s_instance = NULL;
     }
-    vlc_mutex_unlock( &s_lock );
     delete p_delete;
 }
 
