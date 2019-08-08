@@ -2142,7 +2142,7 @@ fi
 dnl
 dnl  matroska demux plugin
 dnl
-PKG_ENABLE_MODULES_VLC([MATROSKA], [mkv], [libebml libmatroska], [MKV format support], [auto])
+PKG_ENABLE_MODULES_VLC([MATROSKA], [mkv], [libebml >= 1.3.6 libmatroska], [MKV format support], [auto])
 
 dnl
 dnl  modplug demux plugin
