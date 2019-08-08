@@ -51,7 +51,7 @@ T.Menu {
 
     background: Rectangle {
         implicitWidth: 200
-        implicitHeight: 40
+        implicitHeight: VLCStyle.fontSize_normal
         color: VLCStyle.colors.button
         border.color: VLCStyle.colors.buttonBorder
     }
