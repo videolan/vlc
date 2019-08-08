@@ -125,29 +125,15 @@ typedef struct avi_chunk_strh_s
     uint32_t i_samplesize;
 } avi_chunk_strh_t;
 
-typedef struct avi_chunk_strf_auds_s
+typedef struct
 {
     AVI_CHUNK_COMMON
-    int             i_cat;
-    WAVEFORMATEX    *p_wf;
-} avi_chunk_strf_auds_t;
-
-typedef struct avi_chunk_strf_vids_s
-{
-    AVI_CHUNK_COMMON
-    int                     i_cat;
-    VLC_BITMAPINFOHEADER    *p_bih;
-} avi_chunk_strf_vids_t;
-
-typedef union avi_chunk_strf_u
-{
-    avi_chunk_strf_auds_t   auds;
-    avi_chunk_strf_vids_t   vids;
-    struct
+    int i_cat;
+    union
     {
-        AVI_CHUNK_COMMON
-        int i_cat;
-    }                       common;
+        VLC_BITMAPINFOHEADER *p_bih;
+        WAVEFORMATEX         *p_wf;
+    } u;
 } avi_chunk_strf_t;
 
 typedef struct avi_chunk_strd_s
