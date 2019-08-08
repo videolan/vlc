@@ -72,13 +72,11 @@ struct vout_display_sys_t
 {
     vout_display_opengl_t *vgl;
     vlc_gl_t *gl;
-    picture_pool_t *pool;
     vout_display_place_t place;
     bool place_changed;
 };
 
 /* Display callbacks */
-static picture_pool_t *Pool (vout_display_t *, unsigned);
 static void PictureRender (vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
 static void PictureDisplay (vout_display_t *, picture_t *);
 static int Control (vout_display_t *, int, va_list);
@@ -94,7 +92,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     sys->gl = NULL;
-    sys->pool = NULL;
     sys->place_changed = false;
 
     vout_window_t *surface = cfg->window;
@@ -146,7 +143,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     vd->sys = sys;
     vd->info.subpicture_chromas = spu_chromas;
-    vd->pool    = vout_display_opengl_HasPool(sys->vgl) ? Pool : NULL;
     vd->prepare = PictureRender;
     vd->display = PictureDisplay;
     vd->control = Control;
@@ -174,21 +170,6 @@ static void Close(vout_display_t *vd)
 
     vlc_gl_Release (gl);
     free (sys);
-}
-
-/**
- * Returns picture buffers
- */
-static picture_pool_t *Pool (vout_display_t *vd, unsigned count)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (!sys->pool && vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
-    {
-        sys->pool = vout_display_opengl_GetPool (sys->vgl, count);
-        vlc_gl_ReleaseCurrent (sys->gl);
-    }
-    return sys->pool;
 }
 
 static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,

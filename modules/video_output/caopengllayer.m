@@ -58,7 +58,6 @@ vlc_module_begin()
     set_callback_display(Open, 0)
 vlc_module_end()
 
-static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count);
 static void PictureRender   (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,
                              vlc_tick_t date);
 static void PictureDisplay  (vout_display_t *vd, picture_t *pic);
@@ -84,8 +83,6 @@ static void OpenglSwap         (vlc_gl_t *gl);
 
 
 struct vout_display_sys_t {
-
-    picture_pool_t *pool;
 
     CALayer <VLCCoreAnimationVideoLayerEmbedding> *container;
     vout_window_t *embed;
@@ -196,7 +193,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         /* setup vout display */
         vd->info.subpicture_chromas = subpicture_chromas;
 
-        vd->pool    = vout_display_opengl_HasPool(sys->vgl) ? Pool : NULL;
         vd->prepare = PictureRender;
         vd->display = PictureDisplay;
         vd->control = Control;
@@ -260,18 +256,6 @@ static void Close(vout_display_t *vd)
     }
 
     free(sys);
-}
-
-static picture_pool_t *Pool (vout_display_t *vd, unsigned count)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (!sys->pool && !OpenglLock(sys->gl)) {
-        sys->pool = vout_display_opengl_GetPool(sys->vgl, count);
-        OpenglUnlock(sys->gl);
-        assert(sys->pool);
-    }
-    return sys->pool;
 }
 
 static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,

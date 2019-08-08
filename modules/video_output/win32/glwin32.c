@@ -64,13 +64,11 @@ struct vout_display_sys_t
 
     vlc_gl_t              *gl;
     vout_display_opengl_t *vgl;
-    picture_pool_t        *pool;
 
     /* Sensors */
     void *p_sensors;
 };
 
-static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
 static void           Display(vout_display_t *, picture_t *);
 
@@ -162,7 +160,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     *fmtp    = fmt;
 
-    vd->pool    = vout_display_opengl_HasPool(sys->vgl) ? Pool : NULL;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
@@ -203,18 +200,6 @@ static void Close(vout_display_t *vd)
 }
 
 /* */
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (!sys->pool && vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
-    {
-        sys->pool = vout_display_opengl_GetPool(sys->vgl, count);
-        vlc_gl_ReleaseCurrent (sys->gl);
-    }
-    return sys->pool;
-}
-
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture,
                     vlc_tick_t date)
 {

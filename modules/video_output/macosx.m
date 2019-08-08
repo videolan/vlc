@@ -55,7 +55,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmt, vlc_video_context *context);
 static void Close(vout_display_t *vd);
 
-static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count);
 static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,
                            vlc_tick_t date);
 static void PictureDisplay (vout_display_t *vd, picture_t *pic);
@@ -108,7 +107,6 @@ struct vout_display_sys_t
     vlc_gl_t *gl;
     vout_display_opengl_t *vgl;
 
-    picture_pool_t *pool;
     picture_t *current;
     bool has_first_frame;
 
@@ -145,7 +143,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
             msg_Err (vd, "no OpenGL hardware acceleration found. this can lead to slow output and unexpected results");
 
         vd->sys = sys;
-        sys->pool = NULL;
         sys->embed = NULL;
         sys->vgl = NULL;
         sys->gl = NULL;
@@ -239,7 +236,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         /* Setup vout_display_t once everything is fine */
         vd->info.subpicture_chromas = subpicture_chromas;
 
-        vd->pool    = vout_display_opengl_HasPool(sys->vgl) ? Pool : NULL;
         vd->prepare = PictureRender;
         vd->display = PictureDisplay;
         vd->control = Control;
@@ -302,18 +298,6 @@ static void Close(vout_display_t *vd)
 /*****************************************************************************
  * vout display callbacks
  *****************************************************************************/
-
-static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (!sys->pool && vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
-    {
-        sys->pool = vout_display_opengl_GetPool (sys->vgl, requested_count);
-        vlc_gl_ReleaseCurrent(sys->gl);
-    }
-    return sys->pool;
-}
 
 static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,
                            vlc_tick_t date)

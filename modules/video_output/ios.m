@@ -54,7 +54,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmt, vlc_video_context *context);
 static void Close(vout_display_t *vd);
 
-static picture_pool_t* PicturePool(vout_display_t *, unsigned);
 static void PictureRender(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
 static void PictureDisplay(vout_display_t *, picture_t *);
 static int Control(vout_display_t*, int, va_list);
@@ -121,7 +120,6 @@ struct vout_display_sys_t
 
     vlc_gl_t *gl;
 
-    picture_pool_t *picturePool;
     vout_window_t *embed;
 };
 
@@ -153,7 +151,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     vd->sys = sys;
-    sys->picturePool = NULL;
     sys->gl = NULL;
 
     var_Create(vlc_object_parent(vd), "ios-eaglcontext", VLC_VAR_ADDRESS);
@@ -207,7 +204,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         /* Setup vout_display_t once everything is fine */
         vd->info.subpicture_chromas = subpicture_chromas;
 
-        vd->pool    = vout_display_opengl_HasPool(vgl) ? PicturePool : NULL;
         vd->prepare = PictureRender;
         vd->display = PictureDisplay;
         vd->control = Control;
@@ -312,19 +308,6 @@ static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subp
         vout_display_opengl_Prepare(glsys->vgl, pic, subpicture);
         vlc_gl_ReleaseCurrent(sys->gl);
     }
-}
-
-static picture_pool_t *PicturePool(vout_display_t *vd, unsigned requested_count)
-{
-    vout_display_sys_t *sys = vd->sys;
-    struct gl_sys *glsys = sys->gl->sys;
-
-    if (!sys->picturePool && vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
-    {
-        sys->picturePool = vout_display_opengl_GetPool(glsys->vgl, requested_count);
-        vlc_gl_ReleaseCurrent(sys->gl);
-    }
-    return sys->picturePool;
 }
 
 /*****************************************************************************
