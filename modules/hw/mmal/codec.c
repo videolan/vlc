@@ -101,7 +101,6 @@ static int OpenDecoder(decoder_t *dec)
 {
     int ret = VLC_SUCCESS;
     decoder_sys_t *sys;
-    MMAL_PARAMETER_UINT32_T extra_buffers;
     MMAL_STATUS_T status;
 
     if (dec->fmt_in.i_codec != VLC_CODEC_MPGV &&
@@ -179,9 +178,10 @@ static int OpenDecoder(decoder_t *dec)
     sys->output->userdata = (struct MMAL_PORT_USERDATA_T *)dec;
 
     if (sys->opaque) {
-        extra_buffers.hdr.id = MMAL_PARAMETER_EXTRA_BUFFERS;
-        extra_buffers.hdr.size = sizeof(MMAL_PARAMETER_UINT32_T);
-        extra_buffers.value = NUM_EXTRA_BUFFERS;
+        MMAL_PARAMETER_UINT32_T extra_buffers = {
+            { MMAL_PARAMETER_EXTRA_BUFFERS, sizeof(MMAL_PARAMETER_UINT32_T) },
+            NUM_EXTRA_BUFFERS
+        };
         status = mmal_port_parameter_set(sys->output, &extra_buffers.hdr);
         if (status != MMAL_SUCCESS) {
             msg_Err(dec, "Failed to set MMAL_PARAMETER_EXTRA_BUFFERS on output port (status=%"PRIx32" %s)",
