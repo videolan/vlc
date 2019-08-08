@@ -2324,7 +2324,7 @@ AC_ARG_ENABLE([mod],
   AS_HELP_STRING([--disable-mod],
     [do not use libmodplug (default auto)]))
 if test "${enable_mod}" != "no" ; then
-    PKG_CHECK_MODULES(LIBMODPLUG, [libmodplug >= 0.8.4 libmodplug != 0.8.8], [
+    PKG_CHECK_MODULES(LIBMODPLUG, [libmodplug >= 0.8.9.0], [
           VLC_ADD_PLUGIN([mod])
           VLC_ADD_CXXFLAGS([mod],[$LIBMODPLUG_CFLAGS])
           VLC_ADD_CFLAGS([mod],[$LIBMODPLUG_CFLAGS]) #modules/demux/mod.c needs CFLAGS_mod, not CXXFLAGS_mod
