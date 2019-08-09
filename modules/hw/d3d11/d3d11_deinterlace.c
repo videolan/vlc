@@ -292,6 +292,13 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
     if (!video_format_IsSimilar(&filter->fmt_in.video, &filter->fmt_out.video))
         return VLC_EGENERIC;
 
+    d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate( filter->vctx_in );
+    if (unlikely(vtcx_sys == NULL))
+    {
+        msg_Dbg(filter, "Filter without a context");
+        return VLC_EGENERIC;
+    }
+
     filter_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -303,34 +310,28 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
        goto error;
     }
 
-    D3D11_TEXTURE2D_DESC dstDesc;
-    D3D11_FilterHoldInstance(filter, &sys->d3d_dev, &dstDesc);
-    if (unlikely(sys->d3d_dev.d3dcontext==NULL))
+    hr = D3D11_CreateDeviceExternal( filter, vtcx_sys->device, true, &sys->d3d_dev );
+    if (FAILED(hr))
     {
-        msg_Dbg(filter, "Filter without a context");
-        free(sys);
-        return VLC_ENOOBJ;
+        msg_Dbg(filter, "Failed to use the given video context");
+        goto error;
     }
 
-    video_format_t fmt_out = filter->fmt_out.video;
-    fmt_out.i_width  = dstDesc.Width;
-    fmt_out.i_height = dstDesc.Height;
-
     if (D3D11_CreateProcessor(filter, &sys->d3d_dev, D3D11_VIDEO_FRAME_FORMAT_INTERLACED_TOP_FIELD_FIRST,
-                              &filter->fmt_out.video, &fmt_out, &sys->d3d_proc) != VLC_SUCCESS)
+                              &filter->fmt_out.video, &filter->fmt_out.video, &sys->d3d_proc) != VLC_SUCCESS)
         goto error;
 
     UINT flags;
-    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(sys->d3d_proc.procEnumerator, dstDesc.Format, &flags);
+    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(sys->d3d_proc.procEnumerator, vtcx_sys->format, &flags);
     if (!SUCCEEDED(hr))
     {
-        msg_Dbg(filter, "can't read processor support for %s", DxgiFormatToStr(dstDesc.Format));
+        msg_Dbg(filter, "can't read processor support for %s", DxgiFormatToStr(vtcx_sys->format));
         goto error;
     }
     if ( !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_INPUT) ||
          !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT) )
     {
-        msg_Dbg(filter, "deinterlacing %s is not supported", DxgiFormatToStr(dstDesc.Format));
+        msg_Dbg(filter, "deinterlacing %s is not supported", DxgiFormatToStr(vtcx_sys->format));
         goto error;
     }
 
@@ -394,12 +395,12 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
     texDesc.MiscFlags = 0; //D3D11_RESOURCE_MISC_SHARED;
     texDesc.Usage = D3D11_USAGE_DEFAULT;
     texDesc.CPUAccessFlags = 0;
-    texDesc.Format = dstDesc.Format;
+    texDesc.Format = vtcx_sys->format;
     texDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
     texDesc.Usage = D3D11_USAGE_DEFAULT;
     texDesc.ArraySize = 1;
-    texDesc.Height = dstDesc.Height;
-    texDesc.Width = dstDesc.Width;
+    texDesc.Height = filter->fmt_out.video.i_height;
+    texDesc.Width  = filter->fmt_out.video.i_width;
 
     hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &sys->outTexture );
     if (FAILED(hr)) {
@@ -443,6 +444,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
     }
 
     filter->fmt_out.video   = out_fmt;
+    filter->vctx_out        = vlc_video_context_Hold(filter->vctx_in);
     filter->pf_video_filter = Deinterlace;
     filter->pf_flush        = Flush;
     filter->p_sys = sys;
@@ -455,7 +457,7 @@ error:
         ID3D11Texture2D_Release(sys->outTexture);
     D3D11_ReleaseProcessor(&sys->d3d_proc);
     if (sys->d3d_dev.d3dcontext)
-        D3D11_FilterReleaseInstance(&sys->d3d_dev);
+        D3D11_ReleaseDevice(&sys->d3d_dev);
     D3D11_Destroy(&sys->hd3d);
     free(sys);
 
@@ -471,7 +473,8 @@ void D3D11CloseDeinterlace(vlc_object_t *obj)
         ID3D11VideoProcessorOutputView_Release(sys->processorOutput);
     ID3D11Texture2D_Release(sys->outTexture);
     D3D11_ReleaseProcessor( &sys->d3d_proc );
-    D3D11_FilterReleaseInstance(&sys->d3d_dev);
+    D3D11_ReleaseDevice(&sys->d3d_dev);
+    vlc_video_context_Release(filter->vctx_out);
     D3D11_Destroy(&sys->hd3d);
 
     free(sys);
