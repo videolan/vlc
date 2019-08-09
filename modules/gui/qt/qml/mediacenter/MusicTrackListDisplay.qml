@@ -59,6 +59,30 @@ Utils.KeyNavigableTableView {
 
     property alias parentId: rootmodel.parentId
 
+    colDelegate: Item {
+        anchors.fill: parent
+
+        property var rowModel: parent.rowModel
+        property var model: parent.colModel
+
+        Text {
+            anchors.fill:parent
+
+            text: !rowModel ? "" : (rowModel[model.criteria] || "")
+            elide: Text.ElideRight
+            font.pixelSize: VLCStyle.fontSize_normal
+            color: (model.isPrimary)? VLCStyle.colors.text : VLCStyle.colors.textInactive
+
+            anchors {
+                fill: parent
+                leftMargin: VLCStyle.margin_xsmall
+                rightMargin: VLCStyle.margin_xsmall
+            }
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignLeft
+        }
+    }
+
     onActionForSelection: {
         var list = []
         for (var i = 0; i < selection.count; i++ ) {
