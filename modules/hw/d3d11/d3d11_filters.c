@@ -331,34 +331,30 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
         return VLC_ENOMEM;
     memset(sys, 0, sizeof (*sys));
 
-    D3D11_TEXTURE2D_DESC dstDesc;
-    D3D11_FilterHoldInstance(filter, &sys->d3d_dev, &dstDesc);
-    if (unlikely(sys->d3d_dev.d3dcontext==NULL))
+    d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate( filter->vctx_in );
+    hr = D3D11_CreateDeviceExternal( filter, vtcx_sys->device, true, &sys->d3d_dev );
+    if (FAILED(hr))
     {
-        msg_Dbg(filter, "Filter without a context");
-        free(sys);
-        return VLC_ENOOBJ;
+        msg_Dbg(filter, "Failed to use the given video context");
+        return VLC_EGENERIC;
     }
-
-    video_format_t fmt_out = filter->fmt_out.video;
-    fmt_out.i_width  = dstDesc.Width;
-    fmt_out.i_height = dstDesc.Height;
+    DXGI_FORMAT format = vtcx_sys->format;
 
     if (D3D11_CreateProcessor(filter, &sys->d3d_dev, D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE,
-                              &filter->fmt_out.video, &fmt_out, &sys->d3d_proc) != VLC_SUCCESS)
+                              &filter->fmt_out.video, &filter->fmt_out.video, &sys->d3d_proc) != VLC_SUCCESS)
         goto error;
 
     UINT flags;
-    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(sys->d3d_proc.procEnumerator, dstDesc.Format, &flags);
+    hr = ID3D11VideoProcessorEnumerator_CheckVideoProcessorFormat(sys->d3d_proc.procEnumerator, format, &flags);
     if (!SUCCEEDED(hr))
     {
-        msg_Dbg(filter, "can't read processor support for %s", DxgiFormatToStr(dstDesc.Format));
+        msg_Dbg(filter, "can't read processor support for %s", DxgiFormatToStr(format));
         goto error;
     }
     if ( !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_INPUT) ||
          !(flags & D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT) )
     {
-        msg_Dbg(filter, "input/output %s is not supported", DxgiFormatToStr(dstDesc.Format));
+        msg_Dbg(filter, "input/output %s is not supported", DxgiFormatToStr(format));
         goto error;
     }
 
@@ -437,12 +433,12 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     texDesc.MiscFlags = 0; //D3D11_RESOURCE_MISC_SHARED;
     texDesc.Usage = D3D11_USAGE_DEFAULT;
     texDesc.CPUAccessFlags = 0;
-    texDesc.Format = dstDesc.Format;
+    texDesc.Format = format;
     texDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
     texDesc.Usage = D3D11_USAGE_DEFAULT;
     texDesc.ArraySize = 1;
-    texDesc.Height = dstDesc.Height;
-    texDesc.Width = dstDesc.Width;
+    texDesc.Height = filter->fmt_out.video.i_height;
+    texDesc.Width  = filter->fmt_out.video.i_width;
 
     hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &sys->out[0].texture );
     if (FAILED(hr)) {
@@ -511,7 +507,7 @@ error:
         ID3D11Texture2D_Release(sys->out[1].texture);
     D3D11_ReleaseProcessor(&sys->d3d_proc);
     if (sys->d3d_dev.d3dcontext)
-        D3D11_FilterReleaseInstance(&sys->d3d_dev);
+        D3D11_ReleaseDevice(&sys->d3d_dev);
     free(sys);
 
     return VLC_EGENERIC;
@@ -540,7 +536,7 @@ static void D3D11CloseAdjust(vlc_object_t *obj)
     ID3D11Texture2D_Release(sys->out[0].texture);
     ID3D11Texture2D_Release(sys->out[1].texture);
     D3D11_ReleaseProcessor( &sys->d3d_proc );
-    D3D11_FilterReleaseInstance(&sys->d3d_dev);
+    D3D11_ReleaseDevice(&sys->d3d_dev);
 
     free(sys);
 }
