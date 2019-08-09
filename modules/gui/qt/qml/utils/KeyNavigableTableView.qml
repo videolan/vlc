@@ -83,8 +83,6 @@ NavigableFocusScope {
                     Row {
                         anchors {
                             fill: parent
-                            leftMargin: VLCStyle.margin_normal
-                            rightMargin: VLCStyle.margin_normal
                         }
 
                         Repeater {
