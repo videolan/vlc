@@ -569,6 +569,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/utils/ToolTipArea.qml \
 	gui/qt/qml/utils/DrawerExt.qml \
 	gui/qt/qml/utils/GridItem.qml \
+	gui/qt/qml/utils/ContextButton.qml \
 	gui/qt/qml/utils/IconToolButton.qml \
 	gui/qt/qml/utils/ImageToolButton.qml \
 	gui/qt/qml/utils/TextToolButton.qml \
@@ -588,6 +589,9 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/utils/ScanProgressBar.qml \
 	gui/qt/qml/utils/LabelSeparator.qml \
 	gui/qt/qml/utils/RoundButton.qml \
+	gui/qt/qml/utils/RoundImage.qml \
+	gui/qt/qml/utils/VideoQualityLabel.qml \
+	gui/qt/qml/utils/VideoProgressBar.qml \
         gui/qt/qml/utils/SearchBox.qml \
         gui/qt/qml/utils/SortControl.qml \
 	gui/qt/qml/menus/CheckableModelSubMenu.qml \

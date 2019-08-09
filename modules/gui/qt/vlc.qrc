@@ -200,6 +200,10 @@
         <file alias="SortControl.qml">qml/utils/SortControl.qml</file>
         <file alias="RoundButton.qml">qml/utils/RoundButton.qml</file>
         <file alias="LabelSeparator.qml">qml/utils/LabelSeparator.qml</file>
+        <file alias="ContextButton.qml">qml/utils/ContextButton.qml</file>
+        <file alias="RoundImage.qml">qml/utils/RoundImage.qml</file>
+        <file alias="VideoQualityLabel.qml">qml/utils/VideoQualityLabel.qml</file>
+        <file alias="VideoProgressBar.qml">qml/utils/VideoProgressBar.qml</file>
     </qresource>
     <qresource prefix="/mediacenter">
         <file alias="MCMusicDisplay.qml">qml/mediacenter/MCMusicDisplay.qml</file>
