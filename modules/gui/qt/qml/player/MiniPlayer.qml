@@ -119,71 +119,50 @@ Utils.NavigableFocusScope {
                     }
                 }
 
-                KeyNavigation.right: randomBtn
+                KeyNavigation.right: buttonrow.children[0].item
             }
 
             Item {
                 Layout.fillWidth: true
             }
 
-            Row {
+            PlayerButtonsLayout {
+                id: buttonrow
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                rightPadding: VLCStyle.margin_normal
+                Layout.rightMargin: VLCStyle.margin_normal
+                model: miniPlayerModel
+                defaultSize: VLCStyle.icon_normal
+            }
 
-                Utils.IconToolButton {
-                    id: randomBtn
-                    size: VLCStyle.icon_normal
-                    checked: mainPlaylistController.random
-                    text: VLCIcons.shuffle_on
-                    onClicked: mainPlaylistController.toggleRandom()
-                    KeyNavigation.right: prevBtn
-                }
+        }
 
-                Utils.IconToolButton {
-                    id: prevBtn
-                    size: VLCStyle.icon_normal
-                    text: VLCIcons.previous
-                    onClicked: mainPlaylistController.prev()
-                    KeyNavigation.right: playBtn
-                }
-
-                Utils.IconToolButton {
-                    id: playBtn
-                    size: VLCStyle.icon_normal
-                    text: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
-                           && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
-                                 ? VLCIcons.pause
-                                 : VLCIcons.play
-                    onClicked: mainPlaylistController.togglePlayPause()
-                    focus: true
-                    KeyNavigation.right: nextBtn
-                }
-
-                Utils.IconToolButton {
-                    id: nextBtn
-                    size: VLCStyle.icon_normal
-                    text: VLCIcons.next
-                    onClicked: mainPlaylistController.next()
-                    KeyNavigation.right: repeatBtn
-                }
-
-                Utils.IconToolButton {
-                    id: repeatBtn
-                    size: VLCStyle.icon_normal
-                    checked: mainPlaylistController.repeatMode !== PlaylistControllerModel.PLAYBACK_REPEAT_NONE
-                    text: (mainPlaylistController.repeatMode === PlaylistControllerModel.PLAYBACK_REPEAT_CURRENT)
-                                 ? VLCIcons.repeat_one
-                                 : VLCIcons.repeat_all
-                    onClicked: mainPlaylistController.toggleRepeatMode()
-                }
+        Connections{
+            target: rootWindow
+            onToolBarConfUpdated: {
+                playingItemInfo.KeyNavigation.right = null
+                miniPlayerModel.reloadModel()
+                playingItemInfo.KeyNavigation.right = buttonrow.children[0].item
             }
         }
-    }
 
-    Keys.onPressed: {
-        if (!event.accepted)
-            defaultKeyAction(event, 0)
-        if (!event.accepted)
-            rootWindow.sendHotkey(event.key);
+        PlayerControlBarModel {
+            id: miniPlayerModel
+            mainCtx: mainctx
+            configName: "MiniPlayerToolbar"
+            /* Load the model when mainctx is set */
+            Component.onCompleted: reloadModel()
+        }
+
+        ControlButtons {
+            id: controlmodelbuttons
+        }
+
+        Keys.onPressed: {
+            if (!event.accepted)
+                defaultKeyAction(event, 0)
+            if (!event.accepted)
+                rootWindow.sendHotkey(event.key);
+        }
+
     }
 }
