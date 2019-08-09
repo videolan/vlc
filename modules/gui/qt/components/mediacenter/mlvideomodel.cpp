@@ -33,6 +33,8 @@ enum Role {
     VIDEO_MRL,
     VIDEO_VIDEO_TRACK,
     VIDEO_AUDIO_TRACK,
+
+    VIDEO_TITLE_FIRST_SYMBOL,
 };
 
 }
@@ -80,6 +82,9 @@ QVariant MLVideoModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue( video->getVideoDesc() );
         case VIDEO_AUDIO_TRACK:
             return QVariant::fromValue( video->getAudioDesc() );
+        case VIDEO_TITLE_FIRST_SYMBOL:
+            return QVariant::fromValue( getFirstSymbol( video->getTitle() ) );
+
         default:
             return {};
     }
@@ -100,6 +105,7 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
         { VIDEO_MRL, "mrl" },
         { VIDEO_AUDIO_TRACK, "audioDesc" },
         { VIDEO_VIDEO_TRACK, "videoDesc" },
+        { VIDEO_TITLE_FIRST_SYMBOL, "title_first_symbol"},
     };
 }
 
@@ -157,4 +163,11 @@ void MLVideoModel::onVlcMlEvent(const vlc_ml_event_t* event)
             break;
     }
     MLBaseModel::onVlcMlEvent( event );
+}
+QString MLVideoModel::getFirstSymbol( const QString& str )
+{
+    QString ret("#");
+    if ( str.length() > 0 && str[0].isLetter() )
+        ret = str[0].toUpper();
+    return ret;
 }
