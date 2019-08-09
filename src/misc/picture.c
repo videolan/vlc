@@ -203,6 +203,7 @@ static bool picture_InitPrivate(const video_format_t *restrict p_fmt,
     picture_t *p_picture = &priv->picture;
 
     memset( p_picture, 0, sizeof( *p_picture ) );
+    p_picture->date = VLC_TICK_INVALID;
 
     p_picture->format = *p_fmt;
     /* Make sure the real dimensions are a multiple of 16 */
