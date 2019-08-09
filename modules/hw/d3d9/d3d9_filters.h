@@ -37,7 +37,4 @@ void D3D9CloseCPUConverter(vlc_object_t *);
 
 int D3D9OpenDecoderDevice(vlc_decoder_device *, vout_window_t *);
 
-void D3D9_FilterHoldInstance(filter_t *, d3d9_device_t *, D3DSURFACE_DESC *);
-void D3D9_FilterReleaseInstance(d3d9_device_t *);
-
 #endif /* VLC_D3D9_FILTERS_H */
