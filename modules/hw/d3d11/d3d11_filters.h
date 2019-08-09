@@ -38,7 +38,4 @@ void D3D11CloseCPUConverter(vlc_object_t *);
 int  D3D11OpenDecoderDeviceW8(vlc_decoder_device *, vout_window_t *);
 int  D3D11OpenDecoderDeviceAny(vlc_decoder_device *, vout_window_t *);
 
-void D3D11_FilterHoldInstance(filter_t *, d3d11_device_t *, D3D11_TEXTURE2D_DESC *);
-void D3D11_FilterReleaseInstance(d3d11_device_t *);
-
 #endif /* VLC_D3D11_FILTERS_H */
