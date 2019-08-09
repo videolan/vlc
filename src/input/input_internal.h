@@ -590,30 +590,30 @@ enum input_control_e
 
 /* Internal helpers */
 
-void input_ControlPush( input_thread_t *, int, const input_control_param_t * );
+int input_ControlPush( input_thread_t *, int, const input_control_param_t * );
 
 /* XXX for string value you have to allocate it before calling
  * input_ControlPushHelper
  */
-static inline void input_ControlPushHelper( input_thread_t *p_input, int i_type, vlc_value_t *val )
+static inline int input_ControlPushHelper( input_thread_t *p_input, int i_type, vlc_value_t *val )
 {
     if( val != NULL )
     {
         input_control_param_t param = { .val = *val };
-        input_ControlPush( p_input, i_type, &param );
+        return input_ControlPush( p_input, i_type, &param );
     }
     else
     {
-        input_ControlPush( p_input, i_type, NULL );
+        return input_ControlPush( p_input, i_type, NULL );
     }
 }
 
-static inline void input_ControlPushEsHelper( input_thread_t *p_input, int i_type,
-                                              vlc_es_id_t *id )
+static inline int input_ControlPushEsHelper( input_thread_t *p_input, int i_type,
+                                             vlc_es_id_t *id )
 {
     assert( i_type == INPUT_CONTROL_SET_ES || i_type == INPUT_CONTROL_UNSET_ES ||
             i_type == INPUT_CONTROL_RESTART_ES );
-    input_ControlPush( p_input, i_type, &(input_control_param_t) {
+    return input_ControlPush( p_input, i_type, &(input_control_param_t) {
         .id = vlc_es_id_Hold( id ),
     } );
 }

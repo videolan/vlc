@@ -1418,8 +1418,8 @@ static void End( input_thread_t * p_input )
 /*****************************************************************************
  * Control
  *****************************************************************************/
-void input_ControlPush( input_thread_t *p_input,
-                        int i_type, const input_control_param_t *p_param )
+int input_ControlPush( input_thread_t *p_input,
+                       int i_type, const input_control_param_t *p_param )
 {
     input_thread_private_t *sys = input_priv(p_input);
 
@@ -1434,6 +1434,8 @@ void input_ControlPush( input_thread_t *p_input,
                      i_type );
         if( p_param )
             ControlRelease( i_type, p_param );
+        vlc_mutex_unlock( &sys->lock_control );
+        return VLC_EGENERIC;
     }
     else
     {
@@ -1447,8 +1449,9 @@ void input_ControlPush( input_thread_t *p_input,
         sys->control[sys->i_control++] = c;
 
         vlc_cond_signal( &sys->wait_control );
+        vlc_mutex_unlock( &sys->lock_control );
+        return VLC_SUCCESS;
     }
-    vlc_mutex_unlock( &sys->lock_control );
 }
 
 static size_t ControlGetReducedIndexLocked( input_thread_t *p_input )
