@@ -147,6 +147,11 @@ vlc_ml_sorting_criteria_t MLVideoModel::nameToCriteria(QByteArray name) const
     return M_names_to_criteria.value(name, VLC_ML_SORTING_DEFAULT);
 }
 
+QByteArray MLVideoModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) const
+{
+    return M_names_to_criteria.key(criteria, "");
+}
+
 void MLVideoModel::onVlcMlEvent(const vlc_ml_event_t* event)
 {
     switch (event->i_type)

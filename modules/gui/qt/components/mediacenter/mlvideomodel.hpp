@@ -51,6 +51,7 @@ private:
 
     static QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
     static QString getFirstSymbol( const QString& str );
+    QByteArray criteriaToName(vlc_ml_sorting_criteria_t criteria) const override;
 };
 
 #endif // MCVIDEOMODEL_H
