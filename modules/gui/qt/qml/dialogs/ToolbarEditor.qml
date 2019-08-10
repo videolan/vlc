@@ -121,7 +121,9 @@ Rectangle{
                     }
 
                     model: playerControlBarModel
-                    delegate: EditorDNDDelegate {}
+                    delegate: EditorDNDDelegate {
+                        dndView: playerBtnDND
+                    }
                     displaced: Transition {
                         NumberAnimation { properties: "x,y"; easing.type: Easing.OutQuad }
                     }

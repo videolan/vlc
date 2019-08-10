@@ -29,6 +29,7 @@ MouseArea {
 
     property bool held: false
     property bool dropVisible: false
+    property var dndView: null
     anchors.verticalCenter: parent.verticalCenter
     cursorShape: dropVisible ? Qt.DragMoveCursor : Qt.OpenHandCursor
     drag.target: held ? content : undefined
@@ -51,15 +52,15 @@ MouseArea {
 
     onExited: {
         if(containsPress)
-            playerBtnDND.deleteBtn = true
+            dndView.deleteBtn = true
     }
 
     onReleased: {
         drag.target.Drag.drop()
         held = false
-        if(playerBtnDND.deleteBtn){
-            playerBtnDND.deleteBtn = false
-            playerBtnDND.model.remove(
+        if(dndView.deleteBtn){
+            dndView.deleteBtn = false
+            dndView.model.remove(
                         dragArea.DelegateModel.itemsIndex)
         }
     }
@@ -98,18 +99,18 @@ MouseArea {
 
         onEntered: {
             dropVisible = true
-            playerBtnDND.deleteBtn = false
+            dndView.deleteBtn = false
         }
 
         onExited: {
             dropVisible = false
-            if(!playerBtnDND.addBtn)
-                playerBtnDND.deleteBtn = true
+            if(!dndView.addBtn)
+                dndView.deleteBtn = true
         }
 
         onDropped: {
             if (drag.source.objectName == "buttonsList")
-                playerBtnDND.model.insert(parent.DelegateModel.itemsIndex,
+                dndView.model.insert(parent.DelegateModel.itemsIndex,
                                             {"id" : drag.source.mIndex,
                                                 "size": bigButton.checked ?
                                                             PlayerControlBarModel.WIDGET_BIG :
