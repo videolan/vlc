@@ -54,79 +54,10 @@ Rectangle{
                 border.color: VLCStyle.colors.buttonText
                 color: "transparent"
 
-                ListView {
-                    id: playerBtnDND
-                    anchors{
-                        fill: parent
-                        margins: VLCStyle.heightBar_xxsmall
-                    }
-                    spacing: VLCStyle.margin_xxsmall
-                    orientation: Qt.Horizontal
-                    clip: true
-                    property bool deleteBtn: false
-                    property bool addBtn: false
-                    onDeleteBtnChanged: {
-                        if(deleteBtn)
-                            toolbareditor.deleteCursor()
-                        else
-                            toolbareditor.restoreCursor()
-                    }
-
-                    ScrollBar.horizontal: ScrollBar {}
-
-                    footer: Item {
-                        height: VLCStyle.icon_medium
-                        width: height
-                        property bool dropVisible: false
-                        Rectangle {
-                            z: 2
-                            width: 2 * scale
-                            height: parent.height
-                            anchors {
-                                left: parent.left
-                            }
-                            antialiasing: true
-                            visible: dropVisible
-                            color: VLCStyle.colors.accent
-                        }
-                        DropArea {
-                            anchors.fill: parent
-
-                            onEntered: {
-                                dropVisible = true
-                                playerBtnDND.deleteBtn = false
-                            }
-
-                            onExited: {
-                                dropVisible = false
-                                playerBtnDND.deleteBtn = true
-                            }
-
-                            onDropped: {
-                                if (drag.source.objectName == "buttonsList"){
-                                    playerBtnDND.model.insert(playerBtnDND.count,
-                                                             {"id" : drag.source.mIndex,
-                                                                 "size": bigButton.checked ?
-                                                                             PlayerControlBarModel.WIDGET_BIG :
-                                                                             PlayerControlBarModel.WIDGET_NORMAL})
-                                }
-                                else
-                                    playerBtnDND.model.move(
-                                                drag.source.DelegateModel.itemsIndex,
-                                                playerBtnDND.count-1)
-                                dropVisible = false
-                            }
-                        }
-
-                    }
-
+                EditorDNDView {
+                    id : playerBtnDND
+                    anchors.fill: parent
                     model: playerControlBarModel
-                    delegate: EditorDNDDelegate {
-                        dndView: playerBtnDND
-                    }
-                    displaced: Transition {
-                        NumberAnimation { properties: "x,y"; easing.type: Easing.OutQuad }
-                    }
                 }
             }
         }
