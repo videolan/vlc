@@ -32,29 +32,31 @@ Rectangle{
     ColumnLayout{
         anchors.fill: parent
         spacing: 0
+        TabBar {
+            id: bar
+            Layout.preferredHeight: VLCStyle.heightBar_normal
+            Layout.preferredWidth: VLCStyle.button_width_large * bar.count
 
-        ColumnLayout{
+            EditorTabButton {
+                id: mainPlayerTab
+                index: 0
+                text: qsTr("Mainplayer")
+            }
+        }
+        Rectangle{
             Layout.preferredHeight: VLCStyle.heightBar_large
             Layout.fillWidth: true
-            spacing: 0
+            radius: 2
+            color: VLCStyle.colors.bgAlt
 
-            Text {
-                id: dndHint
-                Layout.topMargin: VLCStyle.margin_xxsmall
-                Layout.leftMargin: VLCStyle.margin_xxsmall
-                text: qsTr("Drag and drop the items below: ")
-                font.pointSize: VLCStyle.fontHeight_xsmall
-                color: VLCStyle.colors.buttonText
-            }
-            Rectangle{
-                Layout.preferredHeight: VLCStyle.heightBar_large
-                Layout.fillWidth: true
-                Layout.margins: VLCStyle.margin_xxsmall
-                color: VLCStyle.colors.bgAlt
+            StackLayout{
+                anchors.fill: parent
+                currentIndex: bar.currentIndex
 
                 EditorDNDView {
                     id : playerBtnDND
-                    anchors.fill: parent
+                    Layout.preferredHeight: VLCStyle.heightBar_large
+                    Layout.fillWidth: true
                     model: playerControlBarModel
                 }
             }
