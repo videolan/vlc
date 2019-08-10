@@ -50,9 +50,7 @@ Rectangle{
                 Layout.preferredHeight: VLCStyle.heightBar_large
                 Layout.fillWidth: true
                 Layout.margins: VLCStyle.margin_xxsmall
-                border.width: 1
-                border.color: VLCStyle.colors.buttonText
-                color: "transparent"
+                color: VLCStyle.colors.bgAlt
 
                 EditorDNDView {
                     id : playerBtnDND
@@ -67,9 +65,7 @@ Rectangle{
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.margins: VLCStyle.margin_xxsmall
-            border.color: VLCStyle.colors.buttonText
-            border.width: 1
-            color: "transparent"
+            color: VLCStyle.colors.bgAlt
 
             ColumnLayout{
                 anchors.fill: parent
