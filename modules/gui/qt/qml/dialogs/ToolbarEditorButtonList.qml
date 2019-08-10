@@ -54,6 +54,7 @@ GridView{
             var pos = this.mapToGlobal( mouseX, mouseY)
             buttonDragItem.updatePos(pos.x, pos.y)
             playerBtnDND.addBtn = true
+            miniPlayerBtnDND.addBtn = true
         }
 
         onReleased: {

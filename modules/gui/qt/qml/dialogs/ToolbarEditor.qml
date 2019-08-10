@@ -42,6 +42,12 @@ Rectangle{
                 index: 0
                 text: qsTr("Mainplayer")
             }
+
+            EditorTabButton {
+                id: miniPlayerTab
+                index: 1
+                text: qsTr("Miniplayer")
+            }
         }
         Rectangle{
             Layout.preferredHeight: VLCStyle.heightBar_large
@@ -59,6 +65,14 @@ Rectangle{
                     Layout.fillWidth: true
                     model: playerControlBarModel
                 }
+
+                EditorDNDView {
+                    id : miniPlayerBtnDND
+                    Layout.preferredHeight: VLCStyle.heightBar_large
+                    Layout.fillWidth: true
+                    model: miniPlayerModel
+                }
+
             }
         }
 
@@ -111,8 +125,8 @@ Rectangle{
 
     }
 
-    function getConfig(){
-        return playerControlBarModel.getConfig()
+    function getProfileConfig(){
+        return playerControlBarModel.getConfig() + "|" + miniPlayerModel.getConfig()
     }
 
     Connections{
@@ -120,8 +134,13 @@ Rectangle{
         onUpdatePlayerModel: {
             if (toolbarName == "MainPlayerToolbar")
                 playerControlBarModel.reloadConfig(config)
+            else
+                miniPlayerModel.reloadConfig(config)
         }
-        onSaveConfig: playerControlBarModel.saveConfig()
+        onSaveConfig: {
+            miniPlayerModel.saveConfig()
+            playerControlBarModel.saveConfig()
+        }
     }
 
     PlayerControlBarModel {
@@ -129,6 +148,13 @@ Rectangle{
         mainCtx: mainctx
         configName: "MainPlayerToolbar"
         /* Load the model when mainctx is set */
+        Component.onCompleted: reloadModel()
+    }
+
+    PlayerControlBarModel {
+        id: miniPlayerModel
+        mainCtx: mainctx
+        configName: "MiniPlayerToolbar"
         Component.onCompleted: reloadModel()
     }
 
