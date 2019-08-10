@@ -29,7 +29,7 @@ GridView{
     clip: true
 
     highlight: Rectangle{
-        color: VLCStyle.colors.accent
+        color: VLCStyle.colors.bgHover
     }
     ScrollBar.vertical: ScrollBar {}
     model: controlButtons.buttonL.length
