@@ -35,6 +35,7 @@ MouseArea {
     drag.target: held ? content : undefined
     width: buttonloader.width
     height: VLCStyle.icon_medium
+    hoverEnabled: true
 
     Rectangle {
         z: 1
@@ -49,6 +50,7 @@ MouseArea {
         color: VLCStyle.colors.accent
     }
     onPressed: held = true
+    onEntered: playerBtnDND.currentIndex = index
 
     onExited: {
         if(containsPress)

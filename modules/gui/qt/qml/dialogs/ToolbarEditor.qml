@@ -132,6 +132,8 @@ Rectangle{
     Connections{
         target: toolbareditor
         onUpdatePlayerModel: {
+            playerBtnDND.currentIndex = -1
+            miniPlayerBtnDND.currentIndex = -1
             if (toolbarName == "MainPlayerToolbar")
                 playerControlBarModel.reloadConfig(config)
             else
