@@ -29,11 +29,11 @@
 #include <QtQml/QQmlContext>
 
 #define PROFILE_NAME_1 "Minimalist Style"
-#define VALUE_1 "0;64;3;1;4;64;11;64;34;64;9;64;33"
+#define VALUE_1 "0;64;3;1;4;64;11;64;34;64;9;64;33 | 3;0;1;4"
 #define PROFILE_NAME_2 "One-Liner Style"
-#define VALUE_2 "0;64;3;1;4;64;7;9;8;64;64;11;10;12;13;65;33"
+#define VALUE_2 "0;64;3;1;4;64;7;9;8;64;64;11;10;12;13;65;33 | 17;3;0;1;4;18"
 #define PROFILE_NAME_3 "Simplest Style"
-#define VALUE_3 "33;65;0;4;1;65;7"
+#define VALUE_3 "33;65;0;4;1;65;7 | 3;0;4"
 
 ToolbarEditorDialog::ToolbarEditorDialog( QWidget *_w, intf_thread_t *_p_intf)
     : QVLCDialog( _w,  _p_intf )
