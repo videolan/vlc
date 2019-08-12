@@ -154,33 +154,6 @@ bool MLNetworkModel::initializeMediaSources()
         endResetModel();
     }
 
-    // When listing all found devices, we have no specified media and no parent,
-    // but we can't go up a level in this case.
-    // Otherwise, we can have a parent (when listing a subdirectory of a device)
-    // or simply a media (that represents the device root folder)
-    if ( m_treeItem.media != nullptr )
-    {
-        Item item;
-
-        item.name = QString::fromUtf8(u8"⮤"); //arrow up ^_
-        if ( m_treeItem.parent != nullptr )
-        {
-            QUrl parentMrl = QUrl{ m_treeItem.parent->psz_uri };
-            item.mainMrl = parentMrl;
-            item.mrls = {parentMrl};
-            item.protocol = parentMrl.scheme();
-        }
-        item.indexed = false;
-        item.type = TYPE_DIR;
-        item.canBeIndexed = false;
-        item.tree.source = m_treeItem.source;
-        item.tree.media = m_treeItem.parent;
-
-        beginInsertRows( {}, 0, 0 );
-        m_items.push_back(item);
-        endInsertRows();
-    }
-
     if ( m_treeItem.media == nullptr )
     {
         // If there's no target media, we're handling device discovery
@@ -318,8 +291,7 @@ void MLNetworkModel::refreshMediaList( MediaSourcePtr mediaSource,
         if ( clear == true )
         {
             beginResetModel();
-            // Keep the 'go to parent' item
-            m_items.erase( begin( m_items ) + 1, end( m_items ) );
+            m_items.erase( begin( m_items ) , end( m_items ) );
         }
         else
             beginInsertRows( {}, m_items.size(), m_items.size() + items->size() - 1 );
