@@ -1,8 +1,14 @@
 Changes between 3.0.7.1 and 3.0.8:
 ----------------------------------
 
+Core:
+ * Fix stuttering for low framerate videos
+
 Demux:
  * Fix channel ordering in some MP4 files
+ * Fix glitches in TS over HLS
+ * Add real probing of HLS streams
+ * Fix HLS MIME type fallback
 
 Decoder:
  * Fix WebVTT subtitles rendering
@@ -13,16 +19,34 @@ Stream filter:
 Misc:
  * Update Youtube script
 
-Audio output:
+Audio Output:
  * macOS/iOS: Fix stuttering or blank audio when starting or seeking when using
    external audio devices (bluetooth for example)
  * macOS: Fix AV synchronization when using external audio devices
+
+Video Output:
+ * Direct3D11: Fix hardware acceleration for some AMD drivers
 
 Stream output:
  * Fix transcoding when the decoder does not set the chroma
 
 Security:
- * Fix a couple of integer underflows in the MP4 demuxer
+ * Fix a buffer overflow in the MKV demuxer (CVE-2019-14970)
+ * Fix a read buffer overflow in the avcodec decoder (CVE-2019-13962)
+ * Fix a read buffer overflow in the FAAD decoder
+ * Fix a read buffer overflow in the OGG demuxer (CVE-2019-14437, CVE-2019-14438)
+ * Fix a read buffer overflow in the ASF demuxer (CVE-2019-14776)
+ * Fix a use after free in the MKV demuxer (CVE-2019-14777, CVE-2019-14778)
+ * Fix a use after free in the ASF demuxer (CVE-2019-14533)
+ * Fix a couple of integer underflows in the MP4 demuxer (CVE-2019-13602)
+ * Fix a null dereference in the dvdnav demuxer
+ * Fix a null dereference in the ASF demuxer (CVE-2019-14534)
+ * Fix a null dereference in the AVI demuxer
+ * Fix a division by zero in the CAF demuxer (CVE-2019-14498)
+ * Fix a division by zero in the ASF demuxer (CVE-2019-14535)
+
+Contribs:
+ * Update to a newer libmodplug version (0.8.9.0)
 
 Changes between 3.0.7 and 3.0.7.1:
 ----------------------------------
