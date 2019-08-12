@@ -41,7 +41,7 @@ ToolbarEditorDialog::ToolbarEditorDialog( QWidget *_w, intf_thread_t *_p_intf)
     setWindowTitle( qtr( "Toolbars Editor" ) );
     setWindowRole( "vlc-toolbars-editor" );
     setMinimumWidth( 800 );
-    setMinimumHeight( 500 );
+    setMinimumHeight( 600 );
 
     /* Profile */
     QGridLayout *mainLayout = new QGridLayout( this );
