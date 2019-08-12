@@ -60,7 +60,7 @@ enum vout_window_type {
     VOUT_WINDOW_TYPE_DUMMY /**< Dummy window (not an actual window) */,
     VOUT_WINDOW_TYPE_XID /**< X11 window */,
     VOUT_WINDOW_TYPE_HWND /**< Win32 or OS/2 window */,
-    VOUT_WINDOW_TYPE_NSOBJECT /**< MacOS X view */,
+    VOUT_WINDOW_TYPE_NSOBJECT /**< macOS/iOS view */,
     VOUT_WINDOW_TYPE_ANDROID_NATIVE /**< Android native window */,
     VOUT_WINDOW_TYPE_WAYLAND /**< Wayland surface */,
 };
@@ -357,7 +357,7 @@ typedef struct vout_window_t {
     union {
         void     *hwnd;          /**< Win32 window handle */
         uint32_t xid;            /**< X11 windows ID */
-        void     *nsobject;      /**< Mac OSX view object */
+        void     *nsobject;      /**< macOS/iOS view object */
         void     *anativewindow; /**< Android native window */
         struct wl_surface *wl;   /**< Wayland surface (client pointer) */
     } handle;
