@@ -109,6 +109,8 @@ Item {
     property real video_large_width: video_large_height * (16/10);
     property real video_small_width: video_small_height * (16/10);
 
+    property real network_normal: 100 * scale;
+
     property int miniPlayerHeight: 60 * scale;
 
     //combobox
