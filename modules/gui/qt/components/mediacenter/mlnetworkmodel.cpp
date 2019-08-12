@@ -274,7 +274,7 @@ void MLNetworkModel::refreshMediaList( MediaSourcePtr mediaSource,
                     QUrl::fromEncoded(QByteArray(it->psz_uri).append('/')) :
                     QUrl::fromEncoded(it->psz_uri);
 
-        item.canBeIndexed = canBeIndexed( item.mainMrl );
+        item.canBeIndexed = canBeIndexed( item.mainMrl , item.type );
         item.mediaSource = mediaSource;
 
         if ( item.canBeIndexed == true )
@@ -322,8 +322,8 @@ void MLNetworkModel::refreshDeviceList( MediaSourcePtr mediaSource, input_item_n
         item.name = qfu(children[i]->p_item->psz_name);
         item.mrls.push_back( item.mainMrl );
         item.indexed = false;
-        item.canBeIndexed = canBeIndexed( item.mainMrl );
         item.type = TYPE_SHARE;
+        item.canBeIndexed = canBeIndexed( item.mainMrl , item.type );
         item.protocol = item.mainMrl.scheme();
         item.tree = NetworkTreeItem{ mediaSource,
                                      children[i]->p_item,
@@ -393,7 +393,7 @@ void MLNetworkModel::SourceListener::onItemRemoved( vlc_media_tree_t *, input_it
     self->model->onItemRemoved( self->source, children, count );
 }
 
-bool MLNetworkModel::canBeIndexed(const QUrl& url)
+bool MLNetworkModel::canBeIndexed(const QUrl& url , ItemType itemType )
 {
-    return url.scheme() == "smb" || url.scheme() == "ftp";
+    return itemType != TYPE_FILE && (url.scheme() == "smb" || url.scheme() == "ftp");
 }
