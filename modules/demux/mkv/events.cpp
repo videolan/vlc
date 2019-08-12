@@ -50,10 +50,11 @@ void event_thread_t::SetPci(const pci_t *data)
 {
     vlc_mutex_locker l(&lock);
 
-    pci_packet = *data;
+    memcpy(&pci_packet, data, sizeof(pci_packet));
 
 #ifndef WORDS_BIGENDIAN
-    for( uint8_t button = 1; button <= pci_packet.hli.hl_gi.btn_ns; button++) {
+    for( uint8_t button = 1; button <= pci_packet.hli.hl_gi.btn_ns &&
+            button < ARRAY_SIZE(pci_packet.hli.btnit); button++) {
         btni_t *button_ptr = &(pci_packet.hli.btnit[button-1]);
         binary *p_data = (binary*) button_ptr;
 
