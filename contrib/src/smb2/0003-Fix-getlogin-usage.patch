@@ -1,7 +1,7 @@
-From dd506ff5c5d53c529380b637e809f740a49aece7 Mon Sep 17 00:00:00 2001
+From 4801820ba947ca895721ac0a198362409cd94d69 Mon Sep 17 00:00:00 2001
 From: Thomas Guillem <thomas@gllm.fr>
 Date: Tue, 30 Jul 2019 18:02:14 +0200
-Subject: [PATCH 3/3] Fix getlogin() usage
+Subject: [PATCH 3/4] Fix getlogin() usage
 
 Use the reentrant version (the getlogin() string was statically allocated and
 could be overwritten on subsequent calls).

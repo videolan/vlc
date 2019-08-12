@@ -1,7 +1,7 @@
-From ea434501d1987ac309f7e9a4070be2f7af6ca01d Mon Sep 17 00:00:00 2001
+From 13800418c0c2a8c1b26bf1acb0810004fb874213 Mon Sep 17 00:00:00 2001
 From: Thomas Guillem <thomas@gllm.fr>
 Date: Tue, 30 Jul 2019 17:46:49 +0200
-Subject: [PATCH 2/3] Fix indent and white spaces
+Subject: [PATCH 2/4] Fix indent and white spaces
 
 No functional changes.
 ---
