@@ -873,6 +873,10 @@ static int DemuxInit( demux_t *p_demux )
                                i_stream );
         p_esp = NULL;
 
+        /* Ignore duplicated streams numbers */
+        if (p_sys->track[p_sp->i_stream_number])
+            continue;
+
         tk = p_sys->track[p_sp->i_stream_number] = malloc( sizeof( asf_track_t ) );
         if (!tk)
             goto error;
