@@ -64,6 +64,9 @@ struct vlc_player_input
 
     float position;
     vlc_tick_t time;
+    vlc_tick_t normal_time;
+
+    vlc_tick_t pause_date;
 
     bool recording;
 
@@ -121,6 +124,71 @@ struct vlc_player_aout_listener_id
     struct vlc_list node;
 };
 
+enum vlc_player_timer_source_type
+{
+    VLC_PLAYER_TIMER_TYPE_BEST,
+    VLC_PLAYER_TIMER_TYPE_SMPTE,
+    VLC_PLAYER_TIMER_TYPE_COUNT
+};
+
+struct vlc_player_timer_id
+{
+    vlc_tick_t period;
+    vlc_tick_t last_update_date;
+
+    union
+    {
+        const struct vlc_player_timer_cbs *cbs;
+        const struct vlc_player_timer_smpte_cbs *smpte_cbs;
+    };
+    void *data;
+
+    struct vlc_list node;
+};
+
+struct vlc_player_timer_source
+{
+    struct vlc_list listeners; /* list of struct vlc_player_timer_id */
+    vlc_es_id_t *es; /* weak reference */
+    struct vlc_player_timer_point point;
+    union
+    {
+        struct {
+            unsigned long last_framenum;
+            unsigned frame_rate;
+            unsigned frame_rate_base;
+            unsigned frame_resolution;
+            unsigned df_fps;
+            int df;
+            int frames_per_10mins;
+        } smpte;
+    };
+};
+
+enum vlc_player_timer_state
+{
+    VLC_PLAYER_TIMER_STATE_PLAYING,
+    VLC_PLAYER_TIMER_STATE_PAUSED,
+    VLC_PLAYER_TIMER_STATE_DISCONTINUITY,
+};
+
+struct vlc_player_timer
+{
+    vlc_mutex_t lock;
+
+    enum vlc_player_timer_state state;
+    bool seeking;
+
+    vlc_tick_t input_length;
+    vlc_tick_t input_normal_time;
+    vlc_tick_t last_ts;
+    float input_position;
+
+    struct vlc_player_timer_source sources[VLC_PLAYER_TIMER_TYPE_COUNT];
+#define best_source sources[VLC_PLAYER_TIMER_TYPE_BEST]
+#define smpte_source sources[VLC_PLAYER_TIMER_TYPE_SMPTE]
+};
+
 struct vlc_player_t
 {
     struct vlc_object_t obj;
@@ -167,6 +235,8 @@ struct vlc_player_t
         struct vlc_list stopping_inputs;
         struct vlc_list joinable_inputs;
     } destructor;
+
+    struct vlc_player_timer timer;
 };
 
 #ifndef NDEBUG
@@ -315,6 +385,41 @@ vlc_player_input_Start(struct vlc_player_input *input);
 void
 vlc_player_input_HandleState(struct vlc_player_input *, enum vlc_player_state,
                              vlc_tick_t state_date);
+
+struct vlc_player_timer_point
+vlc_player_input_GetTimerValue(struct vlc_player_input *input);
+
+/*
+ * player_timer.c
+*/
+
+void
+vlc_player_InitTimer(vlc_player_t *player);
+
+void
+vlc_player_DestroyTimer(vlc_player_t *player);
+
+void
+vlc_player_ResetTimer(vlc_player_t *player);
+
+void
+vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
+                            enum vlc_player_timer_state state,
+                            vlc_tick_t system_date);
+
+void
+vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
+                       bool es_source_is_master,
+                       const struct vlc_player_timer_point *point,
+                       vlc_tick_t normal_time,
+                       unsigned frame_rate, unsigned frame_rate_base);
+
+void
+vlc_player_RemoveTimerSource(vlc_player_t *player, vlc_es_id_t *es_source);
+
+int
+vlc_player_GetTimerPoint(vlc_player_t *player, vlc_tick_t system_now,
+                         vlc_tick_t *out_ts, float *out_pos);
 
 /*
  * player_vout.c

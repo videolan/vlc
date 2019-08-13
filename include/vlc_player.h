@@ -3047,6 +3047,206 @@ vlc_player_RemoveListener(vlc_player_t *player,
 
 /** @} vlc_player__events */
 
+/**
+ * @defgroup vlc_player__timer Player timer
+ * @{
+ */
+
+/**
+ * Player timer opaque structure.
+ */
+typedef struct vlc_player_timer_id vlc_player_timer_id;
+
+/**
+ * Player timer point
+ *
+ * @see vlc_player_timer_cbs.on_update
+ */
+struct vlc_player_timer_point
+{
+    /** Position in the range [0.0f;1.0] */
+    float position;
+    /** Rate of the player */
+    double rate;
+    /** Valid time >= VLC_TICK_0 or VLC_TICK_INVALID, subtract this time with
+     * VLC_TICK_0 to get the original value. */
+    vlc_tick_t ts;
+    /** Valid length >= VLC_TICK_0 or VLC_TICK_INVALID */
+    vlc_tick_t length;
+    /** System date of this record (always valid), this date can be in the
+     * future or in the past. The special value of INT64_MAX mean that the
+     * clock was paused when this point was updated. In that case,
+     * vlc_player_timer_point_Interpolate() will return the current ts/pos of
+     * this point (there is nothing to interpolate). */
+    vlc_tick_t system_date;
+};
+
+/**
+ * Player smpte timecode
+ *
+ * @see vlc_player_timer_smpte_cbs
+ */
+struct vlc_player_timer_smpte_timecode
+{
+    /** Hours [0;n] */
+    unsigned hours;
+    /** Minutes [0;59] */
+    unsigned minutes;
+    /** Seconds [0;59] */
+    unsigned seconds;
+    /** Frame number [0;n] */
+    unsigned frames;
+    /** Maximum number of digits needed to display the frame number */
+    unsigned frame_resolution;
+    /** True if the source is NTSC 29.97fps or 59.94fps DF */
+    bool drop_frame;
+};
+
+/**
+ * Player timer callbacks
+ *
+ * @see vlc_player_AddTimer
+ */
+struct vlc_player_timer_cbs
+{
+    /**
+     * Called when the state or the time changed.
+     *
+     * Get notified when the time is updated by the input or output source. The
+     * input source is the 'demux' or the 'access_demux'. The output source are
+     * audio and video outputs: an update is received each time a video frame
+     * is displayed or an audio sample is written. The delay between each
+     * updates may depend on the input and source type (it can be every 5ms,
+     * 30ms, 1s or 10s...). The user of this timer may need to update the
+     * position at a higher frequency from its own mainloop via
+     * vlc_player_timer_point_Interpolate().
+     *
+     * @warning The player is not locked from this callback. It is forbidden
+     * to call any player functions from here.
+     *
+     * @param value always valid, the time corresponding to the state
+     * @param data opaque pointer set by vlc_player_AddTimer()
+     */
+    void (*on_update)(const struct vlc_player_timer_point *value, void *data);
+
+    /**
+     * The player is paused or a discontinuity occurred, likely caused by seek
+     * from the user or because the playback is stopped. The player user should
+     * stop its "interpolate" timer.
+     *
+     * @param system_date system date of this event, only valid when paused. It
+     * can be used to interpolate the last updated point to this date in order
+     * to get the last paused ts/position.
+     * @param data opaque pointer set by vlc_player_AddTimer()
+     */
+    void (*on_discontinuity)(vlc_tick_t system_date, void *data);
+};
+
+/**
+ * Player smpte timer callbacks
+ *
+ * @see vlc_player_AddSmpteTimer
+ */
+struct vlc_player_timer_smpte_cbs
+{
+    /**
+     * Called when a new frame is displayed
+
+     * @warning The player is not locked from this callback. It is forbidden
+     * to call any player functions from here.
+     *
+     * @param tc always valid, the timecode corresponding to the frame just
+     * displayed
+     * @param data opaque pointer set by vlc_player_AddTimer()
+     */
+    void (*on_update)(const struct vlc_player_timer_smpte_timecode *tc,
+                      void *data);
+};
+
+/**
+ * Add a timer in order to get times updates
+ *
+ * @param player player instance (locked or not)
+ * @param min_period corresponds to the minimum period between each updates,
+ * use it to avoid flood from too many source updates, set it to
+ * VLC_TICK_INVALID to receive all updates.
+ * @param cbs pointer to a vlc_player_timer_cbs structure, the structure must
+ * be valid during the lifetime of the player
+ * @param cbs_data opaque pointer used by the callbacks
+ * @return a valid vlc_player_timer_id or NULL in case of memory allocation
+ * error
+ */
+VLC_API vlc_player_timer_id *
+vlc_player_AddTimer(vlc_player_t *player, vlc_tick_t min_period,
+                    const struct vlc_player_timer_cbs *cbs, void *data);
+
+/**
+ * Add a smpte timer in order to get accurate video frame updates
+ *
+ * @param player player instance (locked or not)
+ * @param cbs pointer to a vlc_player_timer_smpte_cbs structure, the structure must
+ * be valid during the lifetime of the player
+ * @param cbs_data opaque pointer used by the callbacks
+ * @return a valid vlc_player_timer_id or NULL in case of memory allocation
+ * error
+ */
+VLC_API vlc_player_timer_id *
+vlc_player_AddSmpteTimer(vlc_player_t *player,
+                         const struct vlc_player_timer_smpte_cbs *cbs,
+                         void *data);
+
+/**
+ * Remove a player timer
+ *
+ * @param player player instance (locked or not)
+ * @param timer timer created by vlc_player_AddTimer()
+ */
+VLC_API void
+vlc_player_RemoveTimer(vlc_player_t *player, vlc_player_timer_id *timer);
+
+/**
+ * Interpolate the last timer value to now
+ *
+ * @param point time update obtained via the vlc_player_timer_cbs.on_update()
+ * callback
+ * @param system_now current system date
+ * @param player_rate rate of the player
+ * @param out_ts pointer where to set the interpolated ts, subtract this time
+ * with VLC_TICK_0 to get the original value.
+ * @param out_pos pointer where to set the interpolated position
+ * @return VLC_SUCCESS in case of success, an error in the interpolated ts is
+ * negative (could happen during the buffering step)
+ */
+VLC_API int
+vlc_player_timer_point_Interpolate(const struct vlc_player_timer_point *point,
+                                   vlc_tick_t system_now,
+                                   vlc_tick_t *out_ts, float *out_pos);
+
+/**
+ * Get the date of the next interval
+ *
+ * Can be used to setup an UI timer in order to update some widgets at specific
+ * interval. A next_interval of VLC_TICK_FROM_SEC(1) can be used to update a
+ * time widget when the media reaches a new second.
+ *
+ * @note The media time doesn't necessarily correspond to the system time, that
+ * is why this function is needed and use the rate of the current point.
+ *
+ * @param point time update obtained via the vlc_player_timer_cbs.on_update()
+ * @param system_now current system date
+ * @param interpolated_ts ts returned by vlc_player_timer_point_Interpolate()
+ * with the same system now
+ * @param next_interval next interval
+ * @return the absolute system date of the next interval
+ */
+VLC_API vlc_tick_t
+vlc_player_timer_point_GetNextIntervalDate(const struct vlc_player_timer_point *point,
+                                           vlc_tick_t system_now,
+                                           vlc_tick_t interpolated_ts,
+                                           vlc_tick_t next_interval);
+
+/** @} vlc_player__timer */
+
 /** @} vlc_player */
 
 #endif

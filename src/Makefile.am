@@ -265,6 +265,7 @@ libvlccore_la_SOURCES = \
 	player/player.c \
 	player/player.h \
 	player/input.c \
+	player/timer.c \
 	player/track.c \
 	player/title.c \
 	player/aout.c \

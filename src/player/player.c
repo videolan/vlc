@@ -910,6 +910,9 @@ vlc_player_Lock(vlc_player_t *player)
      * vlc_player_aout_cbs documentation */
     assert(!vlc_mutex_marked(&player->vout_listeners_lock));
     assert(!vlc_mutex_marked(&player->aout_listeners_lock));
+    /* The timer lock should not be held (possible lock-order-inversion), cf.
+     * vlc_player_timer_cbs.on_update documentation */
+    assert(!vlc_mutex_marked(&player->timer.lock));
 
     vlc_mutex_lock(&player->lock);
 }
@@ -1867,6 +1870,8 @@ vlc_player_Delete(vlc_player_t *player)
 
     vlc_player_DestroyLocks(player);
 
+    vlc_player_DestroyTimer(player);
+
     vlc_player_aout_DelCallbacks(player);
     var_DelCallback(player, "corks", vlc_player_CorkCallback, NULL);
 
@@ -1968,11 +1973,13 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
 
     player->deleting = false;
     vlc_player_InitLocks(player, lock_type);
+    vlc_player_InitTimer(player);
 
     if (vlc_clone(&player->destructor.thread, vlc_player_destructor_Thread,
                   player, VLC_THREAD_PRIORITY_LOW) != 0)
     {
         vlc_player_DestroyLocks(player);
+        vlc_player_DestroyTimer(player);
         goto error;
     }
 
