@@ -89,6 +89,7 @@ var_InheritFourcc(vlc_object_t *obj, const char *name)
     X(audio_format, vlc_fourcc_t, add_string, var_InheritFourcc, "u8") \
     X(audio_rate, unsigned, add_integer, var_InheritUnsigned, 44100) \
     X(audio_packetized, bool, add_bool, var_InheritBool, true) \
+    X(audio_sample_length, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_FROM_MS(40) ) \
     X(video_track_count, ssize_t, add_integer, var_InheritSsize, 0) \
     X(video_chroma, vlc_fourcc_t, add_string, var_InheritFourcc, "I420") \
     X(video_width, unsigned, add_integer, var_InheritUnsigned, 640) \
@@ -712,7 +713,7 @@ Open(vlc_object_t *obj)
         sys->step_length = VLC_TICK_FROM_SEC(1) * sys->video_frame_rate_base
                          / sys->video_frame_rate;
     else
-        sys->step_length = VLC_TICK_FROM_MS(100);
+        sys->step_length = sys->audio_sample_length;
 
     sys->pts = VLC_TICK_0;
     sys->current_title = 0;
