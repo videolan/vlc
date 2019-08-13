@@ -163,6 +163,7 @@ typedef struct
         uint64_t i_trun_sample;
         uint64_t i_trun_sample_pos;
 
+        int i_temp;
     } context;
 
     /* ASF packets handling */
