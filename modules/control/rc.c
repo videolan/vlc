@@ -1110,8 +1110,8 @@ static void AudioDevice(intf_thread_t *intf, char const *cmd,
             if (!strcmp(cur.psz_string, ids[i]))
                 break;
         if (i < n)
-            vlc_player_vout_OSDMessage(player,
-                                       _("Audio device: %s"), names[i]);
+            vlc_player_osd_Message(player,
+                                   _("Audio device: %s"), names[i]);
     }
     else
     {

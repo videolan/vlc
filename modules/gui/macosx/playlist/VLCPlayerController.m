@@ -1652,7 +1652,7 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
 - (void)displayOSDMessage:(NSString *)message
 {
-    vlc_player_vout_OSDMessage(_p_player, [message UTF8String]);
+    vlc_player_osd_Message(_p_player, [message UTF8String]);
 }
 
 - (void)setAspectRatioIsLocked:(BOOL)b_value

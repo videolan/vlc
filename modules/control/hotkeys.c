@@ -582,7 +582,7 @@ PLAYER_ACTION_HANDLER(ControlSubtitleSecondary)
         sys->spu_channel_order == VLC_VOUT_ORDER_PRIMARY ?
         VLC_VOUT_ORDER_SECONDARY : VLC_VOUT_ORDER_PRIMARY;
 
-    vlc_player_vout_OSDMessage(player, _("%s subtitle control"),
+    vlc_player_osd_Message(player, _("%s subtitle control"),
         sys->spu_channel_order == VLC_VOUT_ORDER_PRIMARY ? "Primary" : "Secondary");
 }
 
@@ -594,18 +594,18 @@ PLAYER_ACTION_HANDLER(SyncSubtitle)
     {
         case ACTIONID_SUBSYNC_MARKAUDIO:
             sys->subsync.audio_time = vlc_tick_now();
-            vlc_player_vout_OSDMessage(player, _("Sub sync: bookmarked audio time"));
+            vlc_player_osd_Message(player, _("Sub sync: bookmarked audio time"));
             break;
         case ACTIONID_SUBSYNC_MARKSUB:
             sys->subsync.subtitle_time = vlc_tick_now();
-            vlc_player_vout_OSDMessage(player, _("Sub sync: bookmarked subtitle time"));
+            vlc_player_osd_Message(player, _("Sub sync: bookmarked subtitle time"));
             break;
         case ACTIONID_SUBSYNC_APPLY:
         {
             if (sys->subsync.audio_time == VLC_TICK_INVALID ||
                 sys->subsync.subtitle_time == VLC_TICK_INVALID)
             {
-                vlc_player_vout_OSDMessage(player, _("Sub sync: set bookmarks first!"));
+                vlc_player_osd_Message(player, _("Sub sync: set bookmarks first!"));
                 break;
             }
             vlc_tick_t delay =
@@ -618,8 +618,8 @@ PLAYER_ACTION_HANDLER(SyncSubtitle)
 
             long long delay_ms = MS_FROM_VLC_TICK(delay);
             long long totdelay_ms =  MS_FROM_VLC_TICK(previous_delay + delay);
-            vlc_player_vout_OSDMessage(player, _("Sub sync: corrected %"PRId64
-                                       " ms (total delay = %"PRId64" ms)"),
+            vlc_player_osd_Message(player, _("Sub sync: corrected %"PRId64
+                                   " ms (total delay = %"PRId64" ms)"),
                                        delay_ms, totdelay_ms);
             break;
         }
@@ -627,7 +627,7 @@ PLAYER_ACTION_HANDLER(SyncSubtitle)
             sys->subsync.audio_time = VLC_TICK_INVALID;
             sys->subsync.subtitle_time = VLC_TICK_INVALID;
             vlc_player_SetSubtitleDelay(player, 0, VLC_PLAYER_WHENCE_ABSOLUTE);
-            vlc_player_vout_OSDMessage(player, _("Sub sync: delay reset"));
+            vlc_player_osd_Message(player, _("Sub sync: delay reset"));
             break;
         default:
             vlc_assert_unreachable();
@@ -746,7 +746,7 @@ PLAYER_ACTION_HANDLER(Aout)
             char *devname;
             if (!AudioDeviceCycle(aout, &devname))
             {
-                vlc_player_vout_OSDMessage(player, _("Audio device: %s"), devname);
+                vlc_player_osd_Message(player, _("Audio device: %s"), devname);
                 free(devname);
             }
             aout_Release(aout);

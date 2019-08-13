@@ -819,6 +819,7 @@ vlc_player_Lock
 vlc_player_Navigate
 vlc_player_New
 vlc_player_NextVideoFrame
+vlc_player_osd_Message
 vlc_player_Pause
 vlc_player_program_Delete
 vlc_player_program_Dup
@@ -873,7 +874,6 @@ vlc_player_vout_Hold
 vlc_player_vout_HoldAll
 vlc_player_vout_IsFullscreen
 vlc_player_vout_IsWallpaperModeEnabled
-vlc_player_vout_OSDMessage
 vlc_player_vout_RemoveListener
 vlc_player_vout_SetFullscreen
 vlc_player_vout_SetWallpaperModeEnabled

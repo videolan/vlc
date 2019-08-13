@@ -311,7 +311,7 @@ vouts_osd_Slider(vout_thread_t **vouts, size_t count, int position, short type)
 }
 
 void
-vlc_player_vout_OSDMessage(vlc_player_t *player, const char *fmt, ...)
+vlc_player_osd_Message(vlc_player_t *player, const char *fmt, ...)
 {
     size_t count;
     vout_thread_t **vouts = vlc_player_vout_OSDHoldAll(player, &count);
@@ -1130,7 +1130,7 @@ vlc_player_GetProgram(vlc_player_t *player, int id)
 static inline void
 vlc_player_vout_OSDProgram(vlc_player_t *player, const char *name)
 {
-    vlc_player_vout_OSDMessage(player, _("Program Service ID: %s"), name);
+    vlc_player_osd_Message(player, _("Program Service ID: %s"), name);
 }
 
 void
@@ -1440,7 +1440,7 @@ vlc_player_vout_OSDTrack(vlc_player_t *player, vlc_es_id_t *id, bool select)
     const char *cat_name = es_format_category_to_string(cat);
     assert(cat_name);
     const char *track_name = select ? track->name : _("N/A");
-    vlc_player_vout_OSDMessage(player, _("%s track: %s"), cat_name, track_name);
+    vlc_player_osd_Message(player, _("%s track: %s"), cat_name, track_name);
 }
 
 unsigned
@@ -1502,8 +1502,7 @@ vlc_player_SelectEsIdList(vlc_player_t *player,
     /* Display track selection message */
     const char *cat_name = es_format_category_to_string(cat);
     if (track_count == 0)
-        vlc_player_vout_OSDMessage(player, _("%s track: %s"), cat_name,
-                                   _("N/A"));
+        vlc_player_osd_Message(player, _("%s track: %s"), cat_name, _("N/A"));
     else if (track_count == 1)
         vlc_player_vout_OSDTrack(player, es_id_list[0], true);
     else
@@ -1524,8 +1523,8 @@ vlc_player_SelectEsIdList(vlc_player_t *player,
         }
         if (vlc_memstream_close(&stream) == 0)
         {
-            vlc_player_vout_OSDMessage(player, _("%s tracks: %s"), cat_name,
-                                       stream.ptr);
+            vlc_player_osd_Message(player, _("%s tracks: %s"), cat_name,
+                                   stream.ptr);
             free(stream.ptr);
         }
     }
@@ -2042,7 +2041,7 @@ vlc_player_SelectNextTitle(vlc_player_t *player)
     if (!input)
         return;
     input_ControlPush(input->thread, INPUT_CONTROL_SET_TITLE_NEXT, NULL);
-    vlc_player_vout_OSDMessage(player, _("Next title"));
+    vlc_player_osd_Message(player, _("Next title"));
 }
 
 void
@@ -2052,7 +2051,7 @@ vlc_player_SelectPrevTitle(vlc_player_t *player)
     if (!input)
         return;
     input_ControlPush(input->thread, INPUT_CONTROL_SET_TITLE_PREV, NULL);
-    vlc_player_vout_OSDMessage(player, _("Previous title"));
+    vlc_player_osd_Message(player, _("Previous title"));
 }
 
 ssize_t
@@ -2073,7 +2072,7 @@ vlc_player_SelectChapterIdx(vlc_player_t *player, size_t index)
         return;
     input_ControlPushHelper(input->thread, INPUT_CONTROL_SET_SEEKPOINT,
                             &(vlc_value_t){ .i_int = index });
-    vlc_player_vout_OSDMessage(player, _("Chapter %ld"), index);
+    vlc_player_osd_Message(player, _("Chapter %ld"), index);
 }
 
 void
@@ -2083,7 +2082,7 @@ vlc_player_SelectNextChapter(vlc_player_t *player)
     if (!input)
         return;
     input_ControlPush(input->thread, INPUT_CONTROL_SET_SEEKPOINT_NEXT, NULL);
-    vlc_player_vout_OSDMessage(player, _("Next chapter"));
+    vlc_player_osd_Message(player, _("Next chapter"));
 }
 
 void
@@ -2093,7 +2092,7 @@ vlc_player_SelectPrevChapter(vlc_player_t *player)
     if (!input)
         return;
     input_ControlPush(input->thread, INPUT_CONTROL_SET_SEEKPOINT_PREV, NULL);
-    vlc_player_vout_OSDMessage(player, _("Previous chapter"));
+    vlc_player_osd_Message(player, _("Previous chapter"));
 }
 
 static void
@@ -2446,12 +2445,12 @@ vlc_player_AddAssociatedMedia(vlc_player_t *player,
         switch( type )
         {
             case SLAVE_TYPE_AUDIO:
-                vlc_player_vout_OSDMessage(player, "%s",
-                                           vlc_gettext("Audio track added"));
+                vlc_player_osd_Message(player, "%s",
+                                       vlc_gettext("Audio track added"));
                 break;
             case SLAVE_TYPE_SPU:
-                vlc_player_vout_OSDMessage(player, "%s",
-                                vlc_gettext("Subtitle track added"));
+                vlc_player_osd_Message(player, "%s",
+                                       vlc_gettext("Subtitle track added"));
                 break;
         }
     }
@@ -2608,7 +2607,7 @@ vlc_player_NextVideoFrame(vlc_player_t *player)
     if (!input)
         return;
     input_ControlPushHelper(input->thread, INPUT_CONTROL_SET_FRAME_NEXT, NULL);
-    vlc_player_vout_OSDMessage(player, _("Next frame"));
+    vlc_player_osd_Message(player, _("Next frame"));
 }
 
 enum vlc_player_state
@@ -2661,7 +2660,7 @@ vlc_player_ChangeRate(vlc_player_t *player, float rate)
     else
         vlc_player_SendEvent(player, on_rate_changed, rate);
 
-    vlc_player_vout_OSDMessage(player, ("Speed: %.2fx"), rate);
+    vlc_player_osd_Message(player, ("Speed: %.2fx"), rate);
 }
 
 static void
@@ -3026,8 +3025,8 @@ vlc_player_SetRecordingEnabled(vlc_player_t *player, bool enable)
     input_ControlPushHelper(input->thread, INPUT_CONTROL_SET_RECORD_STATE,
                             &(vlc_value_t) { .b_bool = enable });
 
-    vlc_player_vout_OSDMessage(player, enable ?
-                               _("Recording") : _("Recording done"));
+    vlc_player_osd_Message(player, enable ?
+                           _("Recording") : _("Recording done"));
 }
 
 int
@@ -3053,9 +3052,9 @@ vlc_player_SetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat,
 
     const input_control_param_t param = { .cat_delay = { cat, delay } };
     input_ControlPush(input->thread, INPUT_CONTROL_SET_CATEGORY_DELAY, &param);
-    vlc_player_vout_OSDMessage(player, _("%s delay: %i ms"),
-                               es_format_category_to_string(cat),
-                               (int)MS_FROM_VLC_TICK(delay));
+    vlc_player_osd_Message(player, _("%s delay: %i ms"),
+                           es_format_category_to_string(cat),
+                           (int)MS_FROM_VLC_TICK(delay));
     vlc_player_SendEvent(player, on_category_delay_changed, cat, delay);
     return VLC_SUCCESS;
 }
@@ -3101,9 +3100,9 @@ vlc_player_SetEsIdDelay(vlc_player_t *player, vlc_es_id_t *es_id,
     const input_control_param_t param = { .es_delay = { es_id, delay } };
     input_ControlPush(input->thread, INPUT_CONTROL_SET_ES_DELAY, &param);
     if (delay != INT64_MAX)
-        vlc_player_vout_OSDMessage(player, _("%s delay: %i ms"),
-                                   trackpriv->t.name,
-                                   (int)MS_FROM_VLC_TICK(delay));
+        vlc_player_osd_Message(player, _("%s delay: %i ms"),
+                               trackpriv->t.name,
+                               (int)MS_FROM_VLC_TICK(delay));
     vlc_player_SendEvent(player, on_track_delay_changed, es_id, delay);
 
     return VLC_SUCCESS;

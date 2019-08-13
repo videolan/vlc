@@ -2530,7 +2530,7 @@ vlc_player_vout_Snapshot(vlc_player_t *player);
  * @param fmt format string
  */
 VLC_API void
-vlc_player_vout_OSDMessage(vlc_player_t *player, const char *fmt, ...);
+vlc_player_osd_Message(vlc_player_t *player, const char *fmt, ...);
 
 /** @} vlc_player__vout */
 

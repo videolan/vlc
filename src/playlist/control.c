@@ -65,9 +65,9 @@ vlc_playlist_PlaybackOrderChanged(vlc_playlist_t *playlist)
             state_text = N_("On");
             break;
     }
-    vlc_player_vout_OSDMessage(playlist->player,
-                               _("Random: %s"), vlc_gettext(state_text));
-    /* vlc_player_vout_OSDMessage() does nothing in tests */
+    vlc_player_osd_Message(playlist->player,
+                           _("Random: %s"), vlc_gettext(state_text));
+    /* vlc_player_osd_Message() does nothing in tests */
     VLC_UNUSED(state_text);
 }
 
@@ -102,9 +102,9 @@ vlc_playlist_PlaybackRepeatChanged(vlc_playlist_t *playlist)
             state_text = N_("One");
             break;
     }
-    vlc_player_vout_OSDMessage(playlist->player,
-                               _("Loop: %s"), vlc_gettext(state_text));
-    /* vlc_player_vout_OSDMessage() does nothing in tests */
+    vlc_player_osd_Message(playlist->player,
+                           _("Loop: %s"), vlc_gettext(state_text));
+    /* vlc_player_osd_Message() does nothing in tests */
     VLC_UNUSED(state_text);
 }
 
@@ -369,7 +369,7 @@ vlc_playlist_Prev(vlc_playlist_t *playlist)
     }
 
     vlc_playlist_SetCurrentIndex(playlist, index);
-    vlc_player_vout_OSDMessage(playlist->player, _("Previous"));
+    vlc_player_osd_Message(playlist->player, _("Previous"));
     return VLC_SUCCESS;
 }
 
@@ -397,7 +397,7 @@ vlc_playlist_Next(vlc_playlist_t *playlist)
     }
 
     vlc_playlist_SetCurrentIndex(playlist, index);
-    vlc_player_vout_OSDMessage(playlist->player, _("Next"));
+    vlc_player_osd_Message(playlist->player, _("Next"));
     return VLC_SUCCESS;
 }
 

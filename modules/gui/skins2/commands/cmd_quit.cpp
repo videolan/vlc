@@ -36,7 +36,7 @@
 void CmdQuit::execute()
 {
     vlc_player_t *player = vlc_playlist_GetPlayer( getPL() );
-    vlc_player_vout_OSDMessage( player,
+    vlc_player_osd_Message( player,
         VOUT_SPU_CHANNEL_OSD, "%s", _( "Quit" ) );
 
     // Kill libvlc
