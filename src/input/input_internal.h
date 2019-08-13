@@ -150,6 +150,13 @@ typedef enum input_event_type_e
 #define VLC_INPUT_CAPABILITIES_REWINDABLE (1<<3)
 #define VLC_INPUT_CAPABILITIES_RECORDABLE (1<<4)
 
+struct vlc_input_event_state
+{
+    input_state_e value;
+    /* Only valid for PAUSE_S and PLAYING_S states */
+    vlc_tick_t date;
+};
+
 struct vlc_input_event_times
 {
     float percentage;
@@ -250,7 +257,7 @@ struct vlc_input_event
 
     union {
         /* INPUT_EVENT_STATE */
-        input_state_e state;
+        struct vlc_input_event_state state;
         /* INPUT_EVENT_RATE */
         float rate;
         /* INPUT_EVENT_CAPABILITIES */

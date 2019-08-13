@@ -131,11 +131,12 @@ static inline void input_SendEventSignal(input_thread_t *p_input,
     });
 }
 
-static inline void input_SendEventState(input_thread_t *p_input, int i_state)
+static inline void input_SendEventState(input_thread_t *p_input, int i_state,
+                                        vlc_tick_t state_date)
 {
     input_SendEvent(p_input, &(struct vlc_input_event) {
         .type = INPUT_EVENT_STATE,
-        .state = i_state
+        .state = { i_state, state_date, },
     });
 }
 

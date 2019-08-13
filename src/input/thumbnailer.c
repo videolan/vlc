@@ -74,8 +74,8 @@ on_thumbnailer_input_event( input_thread_t *input,
 {
     VLC_UNUSED(input);
     if ( event->type != INPUT_EVENT_THUMBNAIL_READY &&
-         ( event->type != INPUT_EVENT_STATE || ( event->state != ERROR_S &&
-                                                 event->state != END_S ) ) )
+         ( event->type != INPUT_EVENT_STATE || ( event->state.value != ERROR_S &&
+                                                 event->state.value != END_S ) ) )
          return;
 
     vlc_thumbnailer_request_t* request = userdata;

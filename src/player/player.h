@@ -313,7 +313,8 @@ int
 vlc_player_input_Start(struct vlc_player_input *input);
 
 void
-vlc_player_input_HandleState(struct vlc_player_input *, enum vlc_player_state);
+vlc_player_input_HandleState(struct vlc_player_input *, enum vlc_player_state,
+                             vlc_tick_t state_date);
 
 /*
  * player_vout.c

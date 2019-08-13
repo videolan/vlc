@@ -116,7 +116,7 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
 static int input_SlaveSourceAdd( input_thread_t *, enum slave_type,
                                  const char *, unsigned );
 static char *input_SubtitleFile2Uri( input_thread_t *, const char * );
-static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO fix name */
+static void input_ChangeState( input_thread_t *p_input, int i_state, vlc_tick_t ); /* TODO fix name */
 
 #undef input_Create
 /**
@@ -560,7 +560,7 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed )
     }
     else if( i_ret == VLC_DEMUXER_EGENERIC )
     {
-        input_ChangeState( p_input, ERROR_S );
+        input_ChangeState( p_input, ERROR_S, VLC_TICK_INVALID );
     }
     else if( p_priv->i_slave > 0 )
         SlaveDemux( p_input );
@@ -796,7 +796,7 @@ static int InitSout( input_thread_t * p_input )
         priv->p_sout  = input_resource_RequestSout( priv->p_resource, NULL, psz );
         if( priv->p_sout == NULL )
         {
-            input_ChangeState( p_input, ERROR_S );
+            input_ChangeState( p_input, ERROR_S, VLC_TICK_INVALID );
             msg_Err( p_input, "cannot start stream output instance, " \
                               "aborting" );
             free( psz );
@@ -1232,7 +1232,7 @@ static int Init( input_thread_t * p_input )
     input_source_t *master;
 
     /* */
-    input_ChangeState( p_input, OPENING_S );
+    input_ChangeState( p_input, OPENING_S, VLC_TICK_INVALID );
     input_SendEventCache( p_input, 0.0 );
 
     if( var_Type( vlc_object_parent(p_input), "meta-file" ) )
@@ -1318,12 +1318,12 @@ static int Init( input_thread_t * p_input )
              input_priv(p_input)->p_item->psz_uri );
 
     /* initialization is complete */
-    input_ChangeState( p_input, PLAYING_S );
+    input_ChangeState( p_input, PLAYING_S, vlc_tick_now() );
 
     return VLC_SUCCESS;
 
 error:
-    input_ChangeState( p_input, ERROR_S );
+    input_ChangeState( p_input, ERROR_S, VLC_TICK_INVALID );
 
     if( input_priv(p_input)->p_es_out )
         es_out_Delete( input_priv(p_input)->p_es_out );
@@ -1356,7 +1356,7 @@ static void End( input_thread_t * p_input )
     input_thread_private_t *priv = input_priv(p_input);
 
     /* We are at the end */
-    input_ChangeState( p_input, END_S );
+    input_ChangeState( p_input, END_S, VLC_TICK_INVALID );
 
     /* Stop es out activity */
     es_out_SetMode( priv->p_es_out, ES_OUT_MODE_NONE );
@@ -1618,7 +1618,7 @@ static void ControlPause( input_thread_t *p_input, vlc_tick_t i_control_date )
     }
 
     /* Switch to new state */
-    input_ChangeState( p_input, i_state );
+    input_ChangeState( p_input, i_state, i_control_date );
 }
 
 static void ControlUnpause( input_thread_t *p_input, vlc_tick_t i_control_date )
@@ -1630,13 +1630,13 @@ static void ControlUnpause( input_thread_t *p_input, vlc_tick_t i_control_date )
         if( demux_Control( p_demux, DEMUX_SET_PAUSE_STATE, false ) )
         {
             msg_Err( p_input, "cannot resume" );
-            input_ChangeState( p_input, ERROR_S );
+            input_ChangeState( p_input, ERROR_S, i_control_date );
             return;
         }
     }
 
     /* Switch to play */
-    input_ChangeState( p_input, PLAYING_S );
+    input_ChangeState( p_input, PLAYING_S, i_control_date );
     es_out_SetPauseState( input_priv(p_input)->p_es_out, false, false, i_control_date );
 }
 
@@ -3078,7 +3078,8 @@ static void InputGetExtraFiles( input_thread_t *p_input,
 }
 
 /* */
-static void input_ChangeState( input_thread_t *p_input, int i_state )
+static void input_ChangeState( input_thread_t *p_input, int i_state,
+                               vlc_tick_t state_date )
 {
     if( input_priv(p_input)->i_state == i_state )
         return;
@@ -3086,7 +3087,7 @@ static void input_ChangeState( input_thread_t *p_input, int i_state )
     input_priv(p_input)->i_state = i_state;
     if( i_state == ERROR_S )
         input_item_SetErrorWhenReading( input_priv(p_input)->p_item, true );
-    input_SendEventState( p_input, i_state );
+    input_SendEventState( p_input, i_state, state_date );
 }
 
 
