@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, nonatomic) VLCMediaSourceMode mediaSourceMode;
 
 - (void)setupViews;
+- (void)reloadViews;
 
 @end
 

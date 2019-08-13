@@ -97,6 +97,13 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     _gridViewMode = YES;
 }
 
+- (void)reloadViews
+{
+    self.gridVsListSegmentedControl.action = @selector(switchGripOrListMode:);
+    self.gridVsListSegmentedControl.target = self;
+    self.gridVsListSegmentedControl.selectedSegment = _gridViewMode ? 0 : 1;
+}
+
 - (void)loadMediaSources
 {
     self.pathControl.URL = nil;
