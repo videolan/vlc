@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-06-12 12:42+0200\n"
+"PO-Revision-Date: 2019-08-13 02:02+0200\n"
 "Last-Translator: antiparvos <marcoslansgarza@gmail.com>, 2019\n"
 "Language-Team: Galician (https://www.transifex.com/yaron/teams/16553/gl/)\n"
 "Language: gl\n"
@@ -25271,6 +25271,8 @@ msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr ""
+"Isto estabelece o porto HTTP do servidor local usado para emitir o "
+"multimedia polo Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:192
 #: modules/stream_out/chromecast/cast.cpp:1196
