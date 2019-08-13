@@ -32,32 +32,47 @@
 
 static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
 
-@interface VLCLibraryAudioDataSource()
-{
-    NSArray *_availableCollectionsArray;
-}
-@end
-
 @implementation VLCLibraryAudioDataSource
 
 - (instancetype)init
 {
     self = [super init];
-    if (self) {
-        _availableCollectionsArray = [VLCLibraryModel availableAudioCollections];
-    }
     return self;
+}
+
+- (void)setupAppearance
+{
+    NSArray *availableCollections = [VLCLibraryModel availableAudioCollections];
+    NSUInteger availableCollectionsCount = availableCollections.count;
+    self.segmentedControl.segmentCount = availableCollectionsCount;
+    for (NSUInteger x = 0; x < availableCollectionsCount; x++) {
+        [self.segmentedControl setLabel:availableCollections[x] forSegment:x];
+    }
+
+    [self reloadAppearance];
+}
+
+- (void)reloadAppearance
+{
+    [self.segmentedControl setTarget:self];
+    [self.segmentedControl setAction:@selector(segmentedControlAction:)];
+    [self segmentedControlAction:nil];
+
+    [self.collectionSelectionTableView reloadData];
+    [self.groupSelectionTableView reloadData];
+}
+
+- (IBAction)segmentedControlAction:(id)sender
+{
+    [self.collectionSelectionTableView reloadData];
+    [self.groupSelectionTableView reloadData];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    if (tableView == self.categorySelectionTableView) {
-        return _availableCollectionsArray.count;
-    }
-
     NSInteger ret = 0;
 
-    switch (self.categorySelectionTableView.selectedRow) {
+    switch (_segmentedControl.selectedSegment) {
         case 0: // artists
             ret = _libraryModel.numberOfArtists;
             break;
@@ -103,15 +118,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
         cellView.identifier = VLCAudioLibraryCellIdentifier;
     }
 
-    if (tableView == self.categorySelectionTableView) {
-        cellView.singlePrimaryTitleTextField.hidden = NO;
-        cellView.singlePrimaryTitleTextField.stringValue = _availableCollectionsArray[row];
-        NSImage *image = [NSImage imageNamed:NSImageNameApplicationIcon];
-        cellView.representedImageView.image = image;
-        return cellView;
-    }
-
-    switch (self.categorySelectionTableView.selectedRow) {
+    switch (self.segmentedControl.selectedSegment) {
         case 0: // artists
         {
             NSArray *listOfArtists = [_libraryModel listOfArtists];
@@ -212,12 +219,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
-    if (notification.object == self.categorySelectionTableView) {
-        [self.collectionSelectionTableView reloadData];
-        return;
-    }
-
-    switch (self.categorySelectionTableView.selectedRow) {
+    switch (self.segmentedControl.selectedSegment) {
         case 0: // artists
         {
             NSArray *listOfArtists = [_libraryModel listOfArtists];

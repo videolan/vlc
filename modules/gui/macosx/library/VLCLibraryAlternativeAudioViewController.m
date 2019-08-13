@@ -46,8 +46,6 @@
     for (NSUInteger x = 0; x < availableCollectionsCount; x++) {
         [self.segmentedControl setLabel:availableCollections[x] forSegment:x];
     }
-    [self.segmentedControl setTarget:self];
-    [self.segmentedControl setAction:@selector(segmentedControlAction:)];
 
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
@@ -58,11 +56,17 @@
     flowLayout.minimumLineSpacing = 20.;
     flowLayout.minimumInteritemSpacing = 20.;
 
+    [self.segmentedControl setTarget:self];
+    [self.segmentedControl setAction:@selector(segmentedControlAction:)];
     [self segmentedControlAction:nil];
 }
 
 - (void)reloadAppearance
 {
+    [self.segmentedControl setTarget:self];
+    [self.segmentedControl setAction:@selector(segmentedControlAction:)];
+    [self segmentedControlAction:nil];
+
     [self.collectionView reloadData];
 }
 

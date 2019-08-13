@@ -222,12 +222,9 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
     _libraryAudioDataSource = [[VLCLibraryAudioDataSource alloc] init];
     _libraryAudioDataSource.libraryModel = mainInstance.libraryController.libraryModel;
-    _libraryAudioDataSource.categorySelectionTableView = _audioCategorySelectionTableView;
     _libraryAudioDataSource.collectionSelectionTableView = _audioCollectionSelectionTableView;
     _libraryAudioDataSource.groupSelectionTableView = _audioGroupSelectionTableView;
-    _audioCategorySelectionTableView.dataSource = _libraryAudioDataSource;
-    _audioCategorySelectionTableView.delegate = _libraryAudioDataSource;
-    _audioCategorySelectionTableView.rowHeight = VLCLibraryWindowSmallRowHeight;
+    _libraryAudioDataSource.segmentedControl = self.alternativeAudioSegmentedControl;
     _audioCollectionSelectionTableView.dataSource = _libraryAudioDataSource;
     _audioCollectionSelectionTableView.delegate = _libraryAudioDataSource;
     _audioCollectionSelectionTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
@@ -405,7 +402,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
                 [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_audioLibrarySplitView(>=572.)]|" options:0 metrics:0 views:dict]];
                 [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibrarySplitView(>=444.)]|" options:0 metrics:0 views:dict]];
             }
-            [_audioCategorySelectionTableView reloadData];
+            [_libraryAudioDataSource reloadAppearance];
             [_audioCollectionSelectionTableView reloadData];
             _librarySortButton.hidden = NO;
             _alternativeAudioSegmentedControl.hidden = NO;
