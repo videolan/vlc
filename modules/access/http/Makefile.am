@@ -12,6 +12,7 @@ libvlc_http_la_SOURCES = \
 	access/http/h2frame.c access/http/h2frame.h \
 	access/http/h2output.c access/http/h2output.h \
 	access/http/h2conn.c access/http/h1conn.c \
+	access/http/ports.c \
 	access/http/chunked.c access/http/tunnel.c access/http/conn.h \
 	access/http/connmgr.c access/http/connmgr.h
 libvlc_http_la_CPPFLAGS = -Dneedsomethinghere
