@@ -18,6 +18,9 @@ Audio output:
    external audio devices (bluetooth for example)
  * macOS: Fix AV synchronization when using external audio devices
 
+Stream output:
+ * Fix transcoding when the decoder does not set the chroma
+
 Security:
  * Fix a couple of integer underflows in the MP4 demuxer
 

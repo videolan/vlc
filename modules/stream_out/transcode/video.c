@@ -61,6 +61,9 @@ static int video_update_format_decoder( decoder_t *p_dec )
         .sys = sys,
     };
 
+    /* will need proper chroma for get_buffer */
+    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
+
     if( id->p_encoder->fmt_in.i_codec == p_dec->fmt_out.i_codec ||
         video_format_IsSimilar( &id->video_dec_out,
                                 &p_dec->fmt_out.video ) )
