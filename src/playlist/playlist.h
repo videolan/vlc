@@ -24,7 +24,7 @@
 #include <vlc_common.h>
 #include <vlc_playlist.h>
 #include <vlc_vector.h>
-#include "../input/player.h"
+#include "../player/player.h"
 #include "randomizer.h"
 
 typedef struct input_item_t input_item_t;

@@ -24,7 +24,7 @@
 
 #include "player.h"
 
-#include "input/player.h"
+#include "../player/player.h"
 #include "control.h"
 #include "item.h"
 #include "notify.h"

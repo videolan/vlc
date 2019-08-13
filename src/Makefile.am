@@ -260,10 +260,16 @@ libvlccore_la_SOURCES = \
 	input/es_out.c \
 	input/es_out_timeshift.c \
 	input/input.c \
-	input/player.c \
-	input/player.h \
 	input/info.h \
 	input/meta.c \
+	player/player.c \
+	player/player.h \
+	player/input.c \
+	player/track.c \
+	player/title.c \
+	player/aout.c \
+	player/vout.c \
+	player/osd.c \
 	clock/input_clock.h \
 	clock/clock.h \
 	clock/clock_internal.h \
