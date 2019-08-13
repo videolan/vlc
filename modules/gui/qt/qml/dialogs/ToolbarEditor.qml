@@ -86,27 +86,6 @@ Rectangle{
             ColumnLayout{
                 anchors.fill: parent
 
-                CheckBox{
-                    id: bigButton
-                    text: qsTr("Big Buttons")
-                    Layout.preferredHeight: VLCStyle.heightBar_small
-                    Layout.margins: VLCStyle.margin_xxsmall
-
-                    contentItem: Text {
-                        text: bigButton.text
-                        font: bigButton.font
-                        color: VLCStyle.colors.buttonText
-                        verticalAlignment: Text.AlignVCenter
-                        leftPadding: bigButton.indicator.width + bigButton.spacing
-                    }
-                }
-
-                Rectangle{
-                    Layout.preferredHeight: 1
-                    Layout.fillWidth: true
-                    color: VLCStyle.colors.buttonText
-                }
-
                 Text {
                     Layout.margins: VLCStyle.margin_xxsmall
                     text: qsTr("Drag items below to add them above: ")

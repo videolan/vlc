@@ -72,9 +72,7 @@ ListView {
                 if (drag.source.objectName == "buttonsList"){
                     playerBtnDND.model.insert(playerBtnDND.count,
                                              {"id" : drag.source.mIndex,
-                                                 "size": bigButton.checked ?
-                                                             PlayerControlBarModel.WIDGET_BIG :
-                                                             PlayerControlBarModel.WIDGET_NORMAL})
+                                                 "size": PlayerControlBarModel.WIDGET_NORMAL})
                 }
                 else
                     playerBtnDND.model.move(

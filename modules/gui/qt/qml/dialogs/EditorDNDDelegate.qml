@@ -114,9 +114,7 @@ MouseArea {
             if (drag.source.objectName == "buttonsList")
                 dndView.model.insert(parent.DelegateModel.itemsIndex,
                                             {"id" : drag.source.mIndex,
-                                                "size": bigButton.checked ?
-                                                            PlayerControlBarModel.WIDGET_BIG :
-                                                            PlayerControlBarModel.WIDGET_NORMAL})
+                                                "size": PlayerControlBarModel.WIDGET_NORMAL})
             else{
                 var srcIndex = drag.source.DelegateModel.itemsIndex
                 var destIndex = parent.DelegateModel.itemsIndex
