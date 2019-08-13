@@ -54,8 +54,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCInputItem.m \
 	gui/macosx/library/VLCLibraryAlbumTableCellView.h \
 	gui/macosx/library/VLCLibraryAlbumTableCellView.m \
-	gui/macosx/library/VLCLibraryAlternativeAudioViewController.h \
-	gui/macosx/library/VLCLibraryAlternativeAudioViewController.m \
 	gui/macosx/library/VLCLibraryAudioDataSource.h \
 	gui/macosx/library/VLCLibraryAudioDataSource.m \
 	gui/macosx/library/VLCLibraryCollectionViewItem.h \
@@ -74,6 +72,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibrarySortingMenuController.m \
 	gui/macosx/library/VLCLibraryTableCellView.h \
 	gui/macosx/library/VLCLibraryTableCellView.m \
+	gui/macosx/library/VLCLibraryTiledAudioViewController.h \
+	gui/macosx/library/VLCLibraryTiledAudioViewController.m \
 	gui/macosx/library/VLCLibraryVideoDataSource.h \
 	gui/macosx/library/VLCLibraryVideoDataSource.m \
 	gui/macosx/library/VLCLibraryWindow.h \

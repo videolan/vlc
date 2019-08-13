@@ -62,9 +62,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSButton *repeatPlaylistButton;
 @property (readwrite, weak) IBOutlet NSButton *shufflePlaylistButton;
 @property (readwrite, weak) IBOutlet VLCRoundedCornerTextField *playlistCounterTextField;
-@property (readwrite, weak) IBOutlet NSView *alternativeAudioView;
-@property (readwrite, weak) IBOutlet NSCollectionView *alternativeAudioCollectionView;
-@property (readwrite, weak) IBOutlet NSSegmentedControl *alternativeAudioSegmentedControl;
+@property (readwrite, weak) IBOutlet NSView *tiledAudioView;
+@property (readwrite, weak) IBOutlet NSCollectionView *tiledAudioCollectionView;
+@property (readwrite, weak) IBOutlet NSSegmentedControl *audioSegmentedControl;
 @property (readwrite, weak) IBOutlet NSButton *librarySortButton;
 
 @property (readonly) BOOL nativeFullscreenMode;

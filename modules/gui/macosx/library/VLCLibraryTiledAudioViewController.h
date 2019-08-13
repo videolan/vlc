@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryAlternativeAudioViewController.h: MacOS X interface module
+ * VLCLibraryTiledAudioViewController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
 
-@interface VLCLibraryAlternativeAudioViewController : NSObject
+@interface VLCLibraryTiledAudioViewController : NSObject
 
 @property (readwrite, assign) NSCollectionView *collectionView;
 @property (readwrite, assign) NSSegmentedControl *segmentedControl;

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryAlternativeAudioViewController.m: MacOS X interface module
+ * VLCLibraryTiledAudioViewController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryAlternativeAudioViewController.h"
+#import "VLCLibraryTiledAudioViewController.h"
 
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryCollectionViewItem.h"
@@ -29,14 +29,14 @@
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
 
-@interface VLCLibraryAlternativeAudioViewController () <NSCollectionViewDelegate, NSCollectionViewDataSource>
+@interface VLCLibraryTiledAudioViewController () <NSCollectionViewDelegate, NSCollectionViewDataSource>
 {
     NSArray *_displayedCollection;
     enum vlc_ml_parent_type _currentParentType;
 }
 @end
 
-@implementation VLCLibraryAlternativeAudioViewController
+@implementation VLCLibraryTiledAudioViewController
 
 - (void)setupAppearance
 {
