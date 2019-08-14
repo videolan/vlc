@@ -35,6 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) NSSegmentedControl *segmentedControl;
 @property (readwrite, assign) NSTableView *collectionSelectionTableView;
 @property (readwrite, assign) NSTableView *groupSelectionTableView;
+@property (readwrite, assign) NSCollectionView *collectionView;
 
 - (void)setupAppearance;
 - (void)reloadAppearance;

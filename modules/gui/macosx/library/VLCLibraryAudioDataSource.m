@@ -26,11 +26,19 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryAlbumTableCellView.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
 
 static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
+
+@interface VLCLibraryAudioDataSource () <NSCollectionViewDelegate, NSCollectionViewDataSource>
+{
+    NSArray *_displayedCollection;
+    enum vlc_ml_parent_type _currentParentType;
+}
+@end
 
 @implementation VLCLibraryAudioDataSource
 
@@ -49,6 +57,15 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
         [self.segmentedControl setLabel:availableCollections[x] forSegment:x];
     }
 
+    _collectionView.dataSource = self;
+    _collectionView.delegate = self;
+    [_collectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
+    NSCollectionViewFlowLayout *flowLayout = _collectionView.collectionViewLayout;
+    flowLayout.itemSize = CGSizeMake(214., 260.);
+    flowLayout.sectionInset = NSEdgeInsetsMake(20., 20., 20., 20.);
+    flowLayout.minimumLineSpacing = 20.;
+    flowLayout.minimumInteritemSpacing = 20.;
+
     [self reloadAppearance];
 }
 
@@ -60,40 +77,45 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
 
     [self.collectionSelectionTableView reloadData];
     [self.groupSelectionTableView reloadData];
+
+    [self.collectionView reloadData];
 }
 
 - (IBAction)segmentedControlAction:(id)sender
 {
+    switch (_segmentedControl.selectedSegment) {
+        case 0:
+            _displayedCollection = [self.libraryModel listOfArtists];
+            _currentParentType = VLC_ML_PARENT_ARTIST;
+            break;
+        case 1:
+            _displayedCollection = [self.libraryModel listOfAlbums];
+            _currentParentType = VLC_ML_PARENT_ALBUM;
+            break;
+        case 2:
+            _displayedCollection = [self.libraryModel listOfAudioMedia];
+            _currentParentType = VLC_ML_PARENT_UNKNOWN;
+            break;
+        case 3:
+            _displayedCollection = [self.libraryModel listOfGenres];
+            _currentParentType = VLC_ML_PARENT_GENRE;
+            break;
+
+        default:
+            NSAssert(1, @"reached the unreachable");
+            break;
+    }
+    [self.collectionView reloadData];
+
     [self.collectionSelectionTableView reloadData];
     [self.groupSelectionTableView reloadData];
 }
 
+#pragma mark - table view data source and delegation
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    NSInteger ret = 0;
-
-    switch (_segmentedControl.selectedSegment) {
-        case 0: // artists
-            ret = _libraryModel.numberOfArtists;
-            break;
-
-        case 1: // albums
-            ret = _libraryModel.numberOfAlbums;
-            break;
-
-        case 2: // songs
-            ret = _libraryModel.numberOfAudioMedia;
-            break;
-
-        case 3: // genres
-            ret = _libraryModel.numberOfGenres;
-            break;
-
-        default:
-            break;
-    }
-
-    return ret;
+    return _displayedCollection.count;
 }
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
@@ -118,11 +140,10 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
         cellView.identifier = VLCAudioLibraryCellIdentifier;
     }
 
-    switch (self.segmentedControl.selectedSegment) {
-        case 0: // artists
+    switch (_currentParentType) {
+        case VLC_ML_PARENT_ARTIST:
         {
-            NSArray *listOfArtists = [_libraryModel listOfArtists];
-            VLCMediaLibraryArtist *artist = listOfArtists[row];
+            VLCMediaLibraryArtist *artist = _displayedCollection[row];
 
             cellView.singlePrimaryTitleTextField.hidden = NO;
             cellView.singlePrimaryTitleTextField.stringValue = artist.name;
@@ -137,10 +158,9 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
             cellView.representedImageView.image = image;
             break;
         }
-        case 1: // albums
+        case VLC_ML_PARENT_ALBUM:
         {
-            NSArray *listOfAlbums = [_libraryModel listOfAlbums];
-            VLCMediaLibraryAlbum *album = listOfAlbums[row];
+            VLCMediaLibraryAlbum *album = _displayedCollection[row];
 
             cellView.primaryTitleTextField.hidden = NO;
             cellView.secondaryTitleTextField.hidden = NO;
@@ -157,10 +177,9 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
             cellView.representedImageView.image = image;
             break;
         }
-        case 2: // songs
+        case VLC_ML_PARENT_UNKNOWN:
         {
-            NSArray *listOfAudioMedia = [_libraryModel listOfAudioMedia];
-            VLCMediaLibraryMediaItem *mediaItem = listOfAudioMedia[row];
+            VLCMediaLibraryMediaItem *mediaItem = _displayedCollection[row];
 
             NSImage *image;
             if (mediaItem.smallArtworkGenerated) {
@@ -196,10 +215,9 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
             }
             break;
         }
-        case 3: // genres
+        case VLC_ML_PARENT_GENRE:
         {
-            NSArray *listOfGenres = [_libraryModel listOfGenres];
-            VLCMediaLibraryGenre *genre = listOfGenres[row];
+            VLCMediaLibraryGenre *genre = _displayedCollection[row];
 
             cellView.primaryTitleTextField.hidden = NO;
             cellView.secondaryTitleTextField.hidden = NO;
@@ -211,6 +229,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
             break;
         }
         default:
+            NSAssert(1, @"reached the unreachable");
             break;
     }
 
@@ -219,41 +238,108 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
-    switch (self.segmentedControl.selectedSegment) {
-        case 0: // artists
+    switch (_currentParentType) {
+        case VLC_ML_PARENT_ARTIST:
         {
-            NSArray *listOfArtists = [_libraryModel listOfArtists];
-            VLCMediaLibraryArtist *artist = listOfArtists[self.collectionSelectionTableView.selectedRow];
+            VLCMediaLibraryArtist *artist = _displayedCollection[self.collectionSelectionTableView.selectedRow];
             NSArray *albumsForArtist = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_ARTIST forID:artist.artistID];
             _groupDataSource.representedListOfAlbums = albumsForArtist;
             break;
         }
-        case 1: // albums
+        case VLC_ML_PARENT_ALBUM:
         {
-            NSArray *listOfAlbums = [_libraryModel listOfAlbums];
-            VLCMediaLibraryAlbum *album = listOfAlbums[self.collectionSelectionTableView.selectedRow];
+            VLCMediaLibraryAlbum *album = _displayedCollection[self.collectionSelectionTableView.selectedRow];
             _groupDataSource.representedListOfAlbums = @[album];
             break;
         }
-        case 2: // songs
+        case VLC_ML_PARENT_UNKNOWN:
         {
             // FIXME: we have nothing to show here
             _groupDataSource.representedListOfAlbums = nil;
             break;
         }
-        case 3: // genres
+        case VLC_ML_PARENT_GENRE:
         {
-            NSArray *listOfGenres = [_libraryModel listOfGenres];
-            VLCMediaLibraryGenre *genre = listOfGenres[self.collectionSelectionTableView.selectedRow];
+            VLCMediaLibraryGenre *genre = _displayedCollection[self.collectionSelectionTableView.selectedRow];
             NSArray *albumsForGenre = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_GENRE forID:genre.genreID];
             _groupDataSource.representedListOfAlbums = albumsForGenre;
             break;
         }
         default:
+            NSAssert(1, @"reached the unreachable");
             break;
     }
 
     [self.groupSelectionTableView reloadData];
+}
+
+#pragma mark - collection view data source and delegation
+
+- (NSInteger)collectionView:(NSCollectionView *)collectionView
+     numberOfItemsInSection:(NSInteger)section
+{
+    return _displayedCollection.count;
+}
+
+- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
+{
+    return 1;
+}
+
+- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
+     itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
+{
+    VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    switch (_currentParentType) {
+        case VLC_ML_PARENT_ARTIST:
+        {
+            VLCMediaLibraryArtist *artist = _displayedCollection[indexPath.item];
+            viewItem.mediaTitleTextField.stringValue = artist.name;
+            viewItem.durationTextField.stringValue = [NSString stringWithFormat:_NS("%u albums, %u songs"), artist.numberOfAlbums, artist.numberOfTracks];
+            NSImage *image;
+            if (artist.artworkMRL.length > 0) {
+                image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:artist.artworkMRL]];
+            }
+            if (!image) {
+                image = [NSImage imageNamed: @"noart.png"];
+            }
+            viewItem.mediaImageView.image = image;
+            break;
+        }
+        case VLC_ML_PARENT_ALBUM:
+        {
+            VLCMediaLibraryAlbum *album = _displayedCollection[indexPath.item];
+            viewItem.mediaTitleTextField.stringValue = album.title;
+            viewItem.durationTextField.stringValue = [NSString stringWithFormat:_NS("%u songs"), album.numberOfTracks];
+            NSImage *image;
+            if (album.artworkMRL.length > 0) {
+                image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:album.artworkMRL]];
+            }
+            if (!image) {
+                image = [NSImage imageNamed: @"noart.png"];
+            }
+            viewItem.mediaImageView.image = image;
+            break;
+        }
+        case VLC_ML_PARENT_UNKNOWN:
+        {
+            VLCMediaLibraryMediaItem *mediaItem = _displayedCollection[indexPath.item];
+            viewItem.representedMediaItem = mediaItem;
+            break;
+        }
+        case VLC_ML_PARENT_GENRE:
+        {
+            VLCMediaLibraryGenre *genre = _displayedCollection[indexPath.item];
+            viewItem.mediaTitleTextField.stringValue = genre.name;
+            viewItem.durationTextField.stringValue = [NSString stringWithFormat:_NS("%u items"), genre.numberOfTracks];
+            viewItem.mediaImageView.image = [NSImage imageNamed: @"noart.png"];
+        }
+
+        default:
+            break;
+    }
+
+    return viewItem;
 }
 
 @end

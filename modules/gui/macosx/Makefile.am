@@ -72,8 +72,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibrarySortingMenuController.m \
 	gui/macosx/library/VLCLibraryTableCellView.h \
 	gui/macosx/library/VLCLibraryTableCellView.m \
-	gui/macosx/library/VLCLibraryTiledAudioViewController.h \
-	gui/macosx/library/VLCLibraryTiledAudioViewController.m \
 	gui/macosx/library/VLCLibraryVideoDataSource.h \
 	gui/macosx/library/VLCLibraryVideoDataSource.m \
 	gui/macosx/library/VLCLibraryWindow.h \

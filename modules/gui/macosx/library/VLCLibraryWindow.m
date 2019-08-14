@@ -38,7 +38,6 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
-#import "library/VLCLibraryTiledAudioViewController.h"
 #import "library/VLCLibrarySortingMenuController.h"
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
@@ -72,7 +71,6 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
     VLCLibraryGroupDataSource *_libraryAudioGroupDataSource;
     VLCLibrarySortingMenuController *_librarySortingMenuController;
     VLCMediaSourceBaseDataSource *_mediaSourceDataSource;
-    VLCLibraryTiledAudioViewController *_gridAudioViewController;
     VLCPlaylistSortingMenuController *_playlistSortingMenuController;
 
     VLCPlaylistController *_playlistController;
@@ -224,6 +222,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     _libraryAudioDataSource.collectionSelectionTableView = _audioCollectionSelectionTableView;
     _libraryAudioDataSource.groupSelectionTableView = _audioGroupSelectionTableView;
     _libraryAudioDataSource.segmentedControl = self.audioSegmentedControl;
+    _libraryAudioDataSource.collectionView = self.audioLibraryCollectionView;
+    [_libraryAudioDataSource setupAppearance];
     _audioCollectionSelectionTableView.dataSource = _libraryAudioDataSource;
     _audioCollectionSelectionTableView.delegate = _libraryAudioDataSource;
     _audioCollectionSelectionTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
@@ -247,12 +247,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     self.upNextLabel.stringValue = _NS("Playlist");
     [self updateColorsBasedOnAppearance];
     self.openMediaButton.title = _NS("Open media...");
-
-    _gridAudioViewController = [[VLCLibraryTiledAudioViewController alloc] init];
-    _gridAudioViewController.collectionView = self.audioLibraryCollectionView;
-    _gridAudioViewController.segmentedControl = self.audioSegmentedControl;
-    _gridAudioViewController.libraryModel = mainInstance.libraryController.libraryModel;
-    [_gridAudioViewController setupAppearance];
 
     _mainSplitView.delegate = self;
     _lastPlaylistWidthBeforeCollaps = VLCLibraryWindowDefaultPlaylistWidth;
@@ -417,7 +411,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     if (self.gridVsListSegmentedControl.selectedSegment == 0) {
         _audioLibrarySplitView.hidden = YES;
         _audioCollectionViewScrollView.hidden = NO;
-        [_gridAudioViewController reloadAppearance];
+        [_libraryAudioDataSource reloadAppearance];
     } else {
         _audioLibrarySplitView.hidden = NO;
         _audioLibrarySplitView.wantsLayer = YES;
