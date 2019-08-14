@@ -39,7 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) IBOutlet NSTextField *albumNameTextField;
 @property (readwrite, assign) IBOutlet NSTextField *summaryTextField;
 @property (readwrite, assign) IBOutlet NSTextField *yearTextField;
-@property (readwrite, assign) IBOutlet NSTableView *tracksTableView;
 @property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
 
 @property (readwrite, assign, nonatomic) VLCMediaLibraryAlbum *representedAlbum;

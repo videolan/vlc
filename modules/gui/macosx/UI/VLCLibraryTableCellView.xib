@@ -16,7 +16,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="398" height="71"/>
                 </customView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ohB-P0-nCv">
-                    <rect key="frame" x="76" y="27" width="37" height="17"/>
+                    <rect key="frame" x="76" y="27" width="321" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="ZPw-XO-XD1">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -24,7 +24,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xJW-ps-ycn">
-                    <rect key="frame" x="76" y="39" width="37" height="17"/>
+                    <rect key="frame" x="76" y="39" width="321" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="aCe-ia-0Ww">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -39,7 +39,7 @@
                     </constraints>
                 </customView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TPv-k2-6XS">
-                    <rect key="frame" x="76" y="16" width="37" height="17"/>
+                    <rect key="frame" x="76" y="16" width="321" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="jZ4-pa-K3T">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -71,13 +71,13 @@
                 <constraint firstItem="TPv-k2-6XS" firstAttribute="leading" secondItem="ohB-P0-nCv" secondAttribute="leading" id="4qb-9H-TVg"/>
                 <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="3" id="8hv-Qt-uAI"/>
                 <constraint firstItem="9U4-xB-uBz" firstAttribute="centerY" secondItem="Ydb-7n-5Cd" secondAttribute="centerY" id="BrT-ZR-zAc"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="xJW-ps-ycn" secondAttribute="trailing" constant="3" id="DYW-KQ-pre"/>
+                <constraint firstAttribute="trailing" secondItem="xJW-ps-ycn" secondAttribute="trailing" constant="3" id="DYW-KQ-pre"/>
                 <constraint firstItem="xJW-ps-ycn" firstAttribute="leading" secondItem="ohB-P0-nCv" secondAttribute="leading" id="DYk-9g-adD"/>
                 <constraint firstItem="ffE-px-l0g" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="EMs-It-nUH"/>
                 <constraint firstAttribute="bottom" secondItem="ffE-px-l0g" secondAttribute="bottom" id="I7D-8N-oA1"/>
                 <constraint firstItem="ffE-px-l0g" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="M01-2i-CLZ"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="TPv-k2-6XS" secondAttribute="trailing" constant="3" id="PQV-7d-ldF"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="ohB-P0-nCv" secondAttribute="trailing" constant="3" id="Sm0-L4-7aP"/>
+                <constraint firstAttribute="trailing" secondItem="TPv-k2-6XS" secondAttribute="trailing" constant="3" id="PQV-7d-ldF"/>
+                <constraint firstAttribute="trailing" secondItem="ohB-P0-nCv" secondAttribute="trailing" constant="3" id="Sm0-L4-7aP"/>
                 <constraint firstAttribute="bottom" secondItem="Ydb-7n-5Cd" secondAttribute="bottom" constant="3" id="aVd-Ld-lUH"/>
                 <constraint firstItem="TPv-k2-6XS" firstAttribute="top" secondItem="9U4-xB-uBz" secondAttribute="bottom" constant="2" id="bpM-Qh-hOY"/>
                 <constraint firstItem="NFZ-x0-t5c" firstAttribute="centerY" secondItem="Ydb-7n-5Cd" secondAttribute="centerY" id="dRw-WH-Y00"/>
