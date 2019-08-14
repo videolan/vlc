@@ -383,4 +383,13 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     return cellView;
 }
 
+- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
+{
+    VLCMediaLibraryAlbum *album = _representedListOfAlbums[row];
+    if (!album) {
+        return -1;
+    }
+    return [VLCLibraryAlbumTableCellView heightForAlbum:album];
+}
+
 @end

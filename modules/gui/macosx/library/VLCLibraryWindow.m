@@ -39,6 +39,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibrarySortingMenuController.h"
+#import "library/VLCLibraryAlbumTableCellView.h"
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 
@@ -231,7 +232,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     _libraryAudioDataSource.groupDataSource = _libraryAudioGroupDataSource;
     _audioGroupSelectionTableView.dataSource = _libraryAudioGroupDataSource;
     _audioGroupSelectionTableView.delegate = _libraryAudioGroupDataSource;
-    _audioGroupSelectionTableView.rowHeight = 450.;
+    _audioGroupSelectionTableView.rowHeight = [VLCLibraryAlbumTableCellView defaultHeight];
 
     _mediaSourceDataSource = [[VLCMediaSourceBaseDataSource alloc] init];
     _mediaSourceDataSource.collectionView = _mediaSourceCollectionView;
@@ -414,8 +415,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
         [_libraryAudioDataSource reloadAppearance];
     } else {
         _audioLibrarySplitView.hidden = NO;
-        _audioLibrarySplitView.wantsLayer = YES;
-        _audioLibrarySplitView.layer.backgroundColor = [NSColor redColor].CGColor;
         _audioCollectionViewScrollView.hidden = YES;
         [_libraryAudioDataSource reloadAppearance];
         [_audioCollectionSelectionTableView reloadData];

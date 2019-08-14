@@ -32,6 +32,7 @@
 
 NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
 const CGFloat VLCLibraryTracksRowHeight = 50.;
+const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
 @interface VLCLibraryTracksDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
 
@@ -47,6 +48,21 @@ const CGFloat VLCLibraryTracksRowHeight = 50.;
 @end
 
 @implementation VLCLibraryAlbumTableCellView
+
++ (CGFloat)defaultHeight
+{
+    return VLCLibraryAlbumTableCellViewDefaultHeight;
+}
+
++ (CGFloat)heightForAlbum:(VLCMediaLibraryAlbum *)album
+{
+    if (!album) {
+        return [VLCLibraryAlbumTableCellView defaultHeight];
+    }
+
+    size_t numberOfTracks = album.numberOfTracks;
+    return [VLCLibraryAlbumTableCellView defaultHeight] + numberOfTracks * VLCLibraryTracksRowHeight;
+}
 
 - (void)awakeFromNib
 {
