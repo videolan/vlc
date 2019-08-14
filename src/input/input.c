@@ -2040,6 +2040,7 @@ static bool Control( input_thread_t *p_input,
                                     DEMUX_GET_LENGTH, &i_length ) && i_length > 0 )
                 {
                     double f_pos = (double)i_time / (double)i_length;
+                    f_pos = VLC_CLIP(f_pos, 0.0, 1.0);
                     i_ret = demux_Control( input_priv(p_input)->master->p_demux,
                                             DEMUX_SET_POSITION, f_pos,
                                             !input_priv(p_input)->b_fast_seek );
