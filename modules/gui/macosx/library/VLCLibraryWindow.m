@@ -72,7 +72,7 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
     VLCLibraryGroupDataSource *_libraryAudioGroupDataSource;
     VLCLibrarySortingMenuController *_librarySortingMenuController;
     VLCMediaSourceBaseDataSource *_mediaSourceDataSource;
-    VLCLibraryTiledAudioViewController *_tiledAudioViewController;
+    VLCLibraryTiledAudioViewController *_gridAudioViewController;
     VLCPlaylistSortingMenuController *_playlistSortingMenuController;
 
     VLCPlaylistController *_playlistController;
@@ -248,11 +248,11 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     [self updateColorsBasedOnAppearance];
     self.openMediaButton.title = _NS("Open media...");
 
-    _tiledAudioViewController = [[VLCLibraryTiledAudioViewController alloc] init];
-    _tiledAudioViewController.collectionView = self.tiledAudioCollectionView;
-    _tiledAudioViewController.segmentedControl = self.audioSegmentedControl;
-    _tiledAudioViewController.libraryModel = mainInstance.libraryController.libraryModel;
-    [_tiledAudioViewController setupAppearance];
+    _gridAudioViewController = [[VLCLibraryTiledAudioViewController alloc] init];
+    _gridAudioViewController.collectionView = self.audioLibraryCollectionView;
+    _gridAudioViewController.segmentedControl = self.audioSegmentedControl;
+    _gridAudioViewController.libraryModel = mainInstance.libraryController.libraryModel;
+    [_gridAudioViewController setupAppearance];
 
     _mainSplitView.delegate = self;
     _lastPlaylistWidthBeforeCollaps = VLCLibraryWindowDefaultPlaylistWidth;
@@ -366,13 +366,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
             break;
 
         case 1:
-            if (self.gridVsListSegmentedControl.selectedSegment == 0) {
-                [self showGridAudioLibrary];
-            } else {
-                [self showListAudioLibrary];
-            }
-            self.gridVsListSegmentedControl.target = self;
-            self.gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
+            [self showAudioLibrary];
             break;
 
         default:
@@ -386,11 +380,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     if (_mediaSourceView.superview != nil) {
         [_mediaSourceView removeFromSuperview];
     }
-    if (_audioLibrarySplitView.superview != nil) {
-        [_audioLibrarySplitView removeFromSuperview];
-    }
-    if (_tiledAudioView.superview != nil) {
-        [_tiledAudioView removeFromSuperview];
+    if (_audioLibraryView.superview != nil) {
+        [_audioLibraryView removeFromSuperview];
     }
     if (_videoLibraryStackView.superview == nil) {
         _videoLibraryStackView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -405,7 +396,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     _audioSegmentedControl.hidden = YES;
 }
 
-- (void)showGridAudioLibrary
+- (void)showAudioLibrary
 {
     if (_mediaSourceView.superview != nil) {
         [_mediaSourceView removeFromSuperview];
@@ -413,43 +404,30 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     if (_videoLibraryStackView.superview != nil) {
         [_videoLibraryStackView removeFromSuperview];
     }
-    if (_audioLibrarySplitView.superview != nil) {
-        [_audioLibrarySplitView removeFromSuperview];
+    if (_audioLibraryView.superview == nil) {
+        _audioLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
+        [_libraryTargetView addSubview:_audioLibraryView];
+        NSDictionary *dict = NSDictionaryOfVariableBindings(_audioLibraryView);
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_audioLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
     }
-    if (_tiledAudioView.superview == nil) {
-        _tiledAudioView.translatesAutoresizingMaskIntoConstraints = NO;
-        [_libraryTargetView addSubview:_tiledAudioView];
-        NSDictionary *dict = NSDictionaryOfVariableBindings(_tiledAudioView);
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_tiledAudioView(>=572.)]|" options:0 metrics:0 views:dict]];
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_tiledAudioView(>=444.)]|" options:0 metrics:0 views:dict]];
-    }
-    [_tiledAudioViewController reloadAppearance];
     _librarySortButton.hidden = NO;
     _audioSegmentedControl.hidden = NO;
-}
 
-- (void)showListAudioLibrary
-{
-    if (_mediaSourceView.superview != nil) {
-        [_mediaSourceView removeFromSuperview];
+    if (self.gridVsListSegmentedControl.selectedSegment == 0) {
+        _audioLibrarySplitView.hidden = YES;
+        _audioCollectionViewScrollView.hidden = NO;
+        [_gridAudioViewController reloadAppearance];
+    } else {
+        _audioLibrarySplitView.hidden = NO;
+        _audioLibrarySplitView.wantsLayer = YES;
+        _audioLibrarySplitView.layer.backgroundColor = [NSColor redColor].CGColor;
+        _audioCollectionViewScrollView.hidden = YES;
+        [_libraryAudioDataSource reloadAppearance];
+        [_audioCollectionSelectionTableView reloadData];
     }
-    if (_videoLibraryStackView.superview != nil) {
-        [_videoLibraryStackView removeFromSuperview];
-    }
-    if (_tiledAudioView.superview != nil) {
-        [_tiledAudioView removeFromSuperview];
-    }
-    if (_audioLibrarySplitView.superview == nil) {
-        _audioLibrarySplitView.translatesAutoresizingMaskIntoConstraints = NO;
-        [_libraryTargetView addSubview:_audioLibrarySplitView];
-        NSDictionary *dict = NSDictionaryOfVariableBindings(_audioLibrarySplitView);
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_audioLibrarySplitView(>=572.)]|" options:0 metrics:0 views:dict]];
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibrarySplitView(>=444.)]|" options:0 metrics:0 views:dict]];
-    }
-    [_libraryAudioDataSource reloadAppearance];
-    [_audioCollectionSelectionTableView reloadData];
-    _librarySortButton.hidden = NO;
-    _audioSegmentedControl.hidden = NO;
+    self.gridVsListSegmentedControl.target = self;
+    self.gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
 }
 
 - (void)showMediaSourceAppearance
@@ -457,11 +435,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     if (_videoLibraryStackView.superview != nil) {
         [_videoLibraryStackView removeFromSuperview];
     }
-    if (_audioLibrarySplitView.superview != nil) {
-        [_audioLibrarySplitView removeFromSuperview];
-    }
-    if (_tiledAudioView.superview != nil) {
-        [_tiledAudioView removeFromSuperview];
+    if (_audioLibraryView.superview != nil) {
+        [_audioLibraryView removeFromSuperview];
     }
     if (_mediaSourceView.superview == nil) {
         _mediaSourceView.translatesAutoresizingMaskIntoConstraints = NO;
