@@ -11,7 +11,7 @@ ifeq ($(call need_pkg,"dav1d"),)
 PKGS_FOUND += dav1d
 endif
 
-DAV1D_CONF = -D build_tests=false -D build_tools=false
+DAV1D_CONF = -D enable_tests=false -D enable_tools=false
 ifdef HAVE_WIN32
 DAV1D_CONF += -D win32_ver=false
 endif
