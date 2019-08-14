@@ -16,6 +16,7 @@ $(TARBALLS)/libmodplug-$(MODPLUG_VERSION).tar.gz:
 libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz .sum-modplug
 	$(UNPACK)
 	$(APPLY) $(SRC)/modplug/modplug-win32-static.patch
+	$(APPLY) $(SRC)/modplug/macosx-do-not-force-min-version.patch
 	$(call pkg_static,"libmodplug.pc.in")
 	$(MOVE)
 
