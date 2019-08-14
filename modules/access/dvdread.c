@@ -61,6 +61,7 @@
 #include <dvdread/nav_print.h>
 
 #include <assert.h>
+#include <limits.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -797,8 +798,12 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
         p_sys->i_title_blocks = 0;
         for( int i = i_start_cell; i <= i_end_cell; i++ )
         {
-            p_sys->i_title_blocks += p_pgc->cell_playback[i].last_sector -
-                p_pgc->cell_playback[i].first_sector + 1;
+            const uint32_t cell_blocks = p_pgc->cell_playback[i].last_sector -
+                                         p_pgc->cell_playback[i].first_sector + 1;
+            if(unlikely( cell_blocks == 0 || cell_blocks > INT_MAX ||
+                 INT_MAX - p_sys->i_title_blocks < (int)cell_blocks ))
+                return VLC_EGENERIC;
+            p_sys->i_title_blocks += cell_blocks;
         }
 
         msg_Dbg( p_demux, "title %d vts_title %d pgc %d pgn %d "
