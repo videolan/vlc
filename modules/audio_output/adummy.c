@@ -29,22 +29,58 @@
 #include <vlc_aout.h>
 #include <vlc_cpu.h>
 
-static int Open( vlc_object_t * p_this );
+static int Open(vlc_object_t *);
+static void Close(vlc_object_t *);
 
 vlc_module_begin ()
     set_shortname( N_("Dummy") )
     set_description( N_("Dummy audio output") )
     set_capability( "audio output", 0 )
-    set_callback( Open )
+    set_callbacks( Open, Close )
     add_shortcut( "dummy" )
 vlc_module_end ()
 
 #define A52_FRAME_NB 1536
 
+struct aout_sys
+{
+    vlc_tick_t first_play_date;
+    vlc_tick_t length;
+};
+
+static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
+{
+    struct aout_sys *sys = aout->sys;
+
+    if (unlikely(sys->first_play_date == VLC_TICK_INVALID))
+    {
+        *delay = 0;
+        return 0;
+    }
+
+    vlc_tick_t time_since_first_play = vlc_tick_now() - sys->first_play_date;
+    assert(time_since_first_play >= 0);
+
+    if (likely(sys->length > time_since_first_play))
+    {
+        *delay = sys->length - time_since_first_play;
+        return 0;
+    }
+
+    msg_Warn(aout, "underflow");
+    return -1;
+}
+
 static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
 {
+    struct aout_sys *sys = aout->sys;
+
+    if (unlikely(sys->first_play_date == VLC_TICK_INVALID))
+        sys->first_play_date = vlc_tick_now();
+    sys->length += block->i_length;
+
     block_Release( block );
-    (void) aout; (void) date;
+    (void) date;
 }
 
 static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
@@ -54,7 +90,10 @@ static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
 
 static void Flush(audio_output_t *aout)
 {
-    (void) aout;
+    struct aout_sys *sys = aout->sys;
+
+    sys->first_play_date = VLC_TICK_INVALID;
+    sys->length = 0;
 }
 
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
@@ -93,12 +132,24 @@ static void Stop(audio_output_t *aout)
     (void) aout;
 }
 
+static void Close(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    free(aout->sys);
+}
+
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
 
+    struct aout_sys *sys = aout->sys = malloc(sizeof(*sys));
+    if (!sys)
+        return VLC_ENOMEM;
+    sys->first_play_date = VLC_TICK_INVALID;
+    sys->length = 0;
+
     aout->start = Start;
-    aout->time_get = aout_TimeGetDefault;
+    aout->time_get = TimeGet;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
