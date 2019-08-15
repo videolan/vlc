@@ -142,6 +142,12 @@ void MLNetworkModel::setTree(QVariant parentTree)
     }
     emit treeChanged();
 }
+void MLNetworkModel::setIsOnProviderList(bool b)
+{
+    m_isOnProviderList = b;
+
+    emit isOnProviderListChanged();
+}
 
 bool MLNetworkModel::initializeMediaSources()
 {
@@ -157,6 +163,7 @@ bool MLNetworkModel::initializeMediaSources()
     if ( m_treeItem.media == nullptr )
     {
         // If there's no target media, we're handling device discovery
+        setIsOnProviderList( true );
         auto provider = vlc_media_source_provider_Get( libvlc );
 
         using SourceMetaPtr = std::unique_ptr<vlc_media_source_meta_list_t,
@@ -184,6 +191,7 @@ bool MLNetworkModel::initializeMediaSources()
         return m_listeners.empty() == false;
     }
     // Otherwise, we're listing content from a device or folder
+    setIsOnProviderList( false );
     auto tree = m_treeItem.source->tree;
     std::unique_ptr<SourceListener> l{ new SourceListener( m_treeItem.source, this ) };
     if ( l->listener == nullptr )

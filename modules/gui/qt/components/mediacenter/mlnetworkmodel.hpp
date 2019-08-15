@@ -77,6 +77,7 @@ public:
 
     Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
     Q_PROPERTY(QVariant tree READ getTree WRITE setTree NOTIFY treeChanged)
+    Q_PROPERTY(bool is_on_provider_list READ getIsOnProviderList WRITE setIsOnProviderList NOTIFY isOnProviderListChanged)
 
     explicit MLNetworkModel(QObject* parent = nullptr);
     MLNetworkModel( QmlMainContext* ctx, QString parentMrl, QObject* parent = nullptr );
@@ -90,13 +91,16 @@ public:
 
     void setCtx(QmlMainContext* ctx);
     void setTree(QVariant tree);
+    void setIsOnProviderList(bool b);
 
     inline QmlMainContext* getCtx() { return m_ctx; }
     inline QVariant getTree() { return QVariant::fromValue( m_treeItem); }
+    inline bool getIsOnProviderList() { return m_isOnProviderList; }
 
 signals:
     void ctxChanged();
     void treeChanged();
+    void isOnProviderListChanged();
 
 private:
     struct Item
@@ -168,6 +172,7 @@ private:
     vlc_medialibrary_t* m_ml;
     bool m_hasTree = false;
     NetworkTreeItem m_treeItem;
+    bool m_isOnProviderList;
     std::vector<std::unique_ptr<SourceListener>> m_listeners;
 };
 
