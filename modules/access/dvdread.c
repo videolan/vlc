@@ -1133,12 +1133,16 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
     }
 
 #if 1
-    int i_sub_cell = 0;
+    int i_sub_cell = 1;
     /* Find sub_cell */
-    while( p_vts->vts_c_adt->cell_adr_table[i_sub_cell].start_sector <
-           p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu-1] )
+    /* need to check cell # <= vob count as cell table alloc only ensures:
+     * info_length / sizeof(cell_adr_t) < c_adt->nr_of_vobs, see ifo_read.c */
+    const uint32_t vobu_start_sector = p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu-1];
+    for( int i = 0; i<p_vts->vts_c_adt->nr_of_vobs; i++ )
     {
-        i_sub_cell++;
+        const cell_adr_t *p_cell = &p_vts->vts_c_adt->cell_adr_table[i];
+        if(p_cell->start_sector <= vobu_start_sector)
+           i_sub_cell = i + 1;
     }
 
     msg_Dbg( p_demux, "cell %d i_sub_cell %d chapter %d vobu %d "
