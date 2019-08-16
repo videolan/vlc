@@ -177,7 +177,14 @@ struct audio_output
       *
       * If the audio output clock is exactly synchronized with the system
       * monotonic clock (i.e. vlc_tick_now()), then aout_TimeGetDefault() can
-      * implement this callback.
+      * implement this callback. In that case, drain must be implemented (since
+      * the default implementation uses the delay to wait for the end of the
+      * stream).
+      *
+      * This callback is called before the first play() in order to get the
+      * initial delay (the hw latency). Most modules won't be able to know this
+      * latency before the first play. In that case, they should return -1 and
+      * handle the first play() date, cf. play() documentation.
       *
       * \param delay pointer to the delay until the next sample to be written
       *              to the playback buffer is rendered [OUT]
@@ -188,6 +195,12 @@ struct audio_output
 
     void (*play)(audio_output_t *, block_t *block, vlc_tick_t date);
     /**< Queues a block of samples for playback (mandatory, cannot be NULL).
+      *
+      * The first play() date (after a flush()/start()) will be most likely in
+      * the future. Modules that don't know the hw latency before a first play
+      * (when they return -1 from the first time_get()) will need to handle
+      * this. They can play a silence buffer with 'length = date - now()', or
+      * configure their render callback to start at the given date.
       *
       * \param block block of audio samples
       * \param date intended system time to render the first sample
