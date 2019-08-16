@@ -59,18 +59,11 @@ struct vlc_player_input
     enum vlc_player_state state;
     enum vlc_player_error error;
     float rate;
-    double output_rate;
     int capabilities;
     vlc_tick_t length;
 
     float position;
     vlc_tick_t time;
-    vlc_tick_t input_time_date;
-
-    vlc_tick_t output_time;
-    vlc_tick_t output_time_date;
-
-    vlc_tick_t pause_date;
 
     bool recording;
 
