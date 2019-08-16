@@ -1058,7 +1058,6 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_chapter = 0;
     int i_cell = 0;
-    int i_vobu = 0;
     int i_block;
     const pgc_t *p_pgc = p_sys->p_cur_pgc;
     const ifo_handle_t *p_vts = p_sys->p_vts_file;
@@ -1105,9 +1104,15 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
     }
 
     /* Find vobu */
-    while( (int)p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu] <= i_block )
+    /* see ifo_read.c / ifoRead_VOBU_ADMAP_internal for index count */
+    int i_vobu = 1;
+    const size_t i_vobu_sect_index_count =
+            (p_vts->vts_vobu_admap->last_byte + 1 - VOBU_ADMAP_SIZE) / sizeof(uint32_t);
+    for( size_t i=0; i<i_vobu_sect_index_count; i++ )
     {
-        i_vobu++;
+        if( p_vts->vts_vobu_admap->vobu_start_sectors[i] > (uint32_t) i_block )
+            break;
+        i_vobu = i + 1;
     }
 
 #if 1
@@ -1116,7 +1121,7 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
     /* need to check cell # <= vob count as cell table alloc only ensures:
      * info_length / sizeof(cell_adr_t) < c_adt->nr_of_vobs, see ifo_read.c */
     const uint32_t vobu_start_sector = p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu-1];
-    for( int i = 0; i<p_vts->vts_c_adt->nr_of_vobs; i++ )
+    for( int i = 0; i + 1<p_vts->vts_c_adt->nr_of_vobs; i++ )
     {
         const cell_adr_t *p_cell = &p_vts->vts_c_adt->cell_adr_table[i];
         if(p_cell->start_sector <= vobu_start_sector)
@@ -1132,7 +1137,10 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
 #endif
 
     p_sys->i_cur_block = i_block;
-    p_sys->i_next_vobu = p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu];
+    if(likely( (size_t)i_vobu < i_vobu_sect_index_count ))
+        p_sys->i_next_vobu = p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu];
+    else
+        p_sys->i_next_vobu = i_block;
     p_sys->i_pack_len = p_sys->i_next_vobu - i_block;
     p_sys->i_cur_cell = i_cell;
     p_sys->i_chapter = i_chapter;
