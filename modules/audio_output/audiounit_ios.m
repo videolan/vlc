@@ -612,10 +612,16 @@ static int
 Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
-    aout_sys_t *sys = calloc(1, sizeof (*sys));
 
+    aout_sys_t *sys = p_aout->sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
+
+    if (ca_Open(aout) != VLC_SUCCESS)
+    {
+        free(sys);
+        return VLC_EGENERIC;
+    }
 
     sys->avInstance = [AVAudioSession sharedInstance];
     assert(sys->avInstance != NULL);
@@ -623,6 +629,7 @@ Open(vlc_object_t *obj)
     sys->aoutWrapper = [[AoutWrapper alloc] initWithAout:aout];
     if (sys->aoutWrapper == NULL)
     {
+        ca_Close(aout);
         free(sys);
         return VLC_ENOMEM;
     }
@@ -630,7 +637,6 @@ Open(vlc_object_t *obj)
     sys->b_muted = false;
     sys->b_preferred_channels_set = false;
     sys->au_dev = var_InheritBool(aout, "spdif") ? AU_DEV_ENCODED : AU_DEV_PCM;
-    aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
     aout->device_select = DeviceSelect;
@@ -640,7 +646,6 @@ Open(vlc_object_t *obj)
     for (unsigned int i = 0; i< sizeof(au_devs) / sizeof(au_devs[0]); ++i)
         aout_HotplugReport(aout, au_devs[i].psz_id, au_devs[i].psz_name);
 
-    ca_Open(aout);
     return VLC_SUCCESS;
 }
 
