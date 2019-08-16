@@ -27,7 +27,7 @@ Button{
     contentItem: Text {
         text: control.text
         font: control.font
-        color: control.hovered || activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
+        color: control.hovered || control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
     }
