@@ -42,6 +42,13 @@ FramesToUs(struct aout_sys_common *p_sys, uint64_t i_nb_frames)
     return vlc_tick_from_samples(i_nb_frames, p_sys->i_rate);
 }
 
+static inline vlc_tick_t
+HostTimeToTick(uint64_t i_host_time)
+{
+    assert(tinfo.denom != 0);
+    return VLC_TICK_FROM_NS(i_host_time * tinfo.numer / tinfo.denom);
+}
+
 static void
 ca_ClearOutBuffers(audio_output_t *p_aout)
 {
@@ -199,8 +206,7 @@ ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
         return -1;
     }
 
-    const uint64_t i_render_time_us = p_sys->i_render_host_time
-                                    * tinfo.numer / tinfo.denom / 1000;
+    const vlc_tick_t i_render_time_us = HostTimeToTick(p_sys->i_render_host_time);
     const vlc_tick_t i_render_delay = i_render_time_us - vlc_tick_now();
 
     const int64_t i_out_frames = BytesToFrames(p_sys, p_sys->i_out_size);
