@@ -478,6 +478,7 @@ static int Demux( demux_t *p_demux )
         /* Basic check to be sure we don't have a empty title
          * go to next title if so */
         //assert( p_buffer[41] == 0xbf && p_buffer[1027] == 0xbf );
+        DemuxBlock( p_demux, p_buffer, DVD_VIDEO_LB_LEN );
 
         /* Parse the contained dsi packet */
         DvdReadHandleDSI( p_demux, p_buffer );
@@ -503,12 +504,8 @@ static int Demux( demux_t *p_demux )
             return 0; /* EOF */
         }
 
-        /* FIXME: Ugly kludge: we send the pack block to the input for it
-         * sometimes has a zero scr and restart the sync */
         p_sys->i_cur_block++;
         p_sys->i_title_offset++;
-
-        DemuxBlock( p_demux, p_buffer, DVD_VIDEO_LB_LEN );
     }
 
     if( p_sys->i_cur_cell >= p_sys->p_cur_pgc->nr_of_cells )
