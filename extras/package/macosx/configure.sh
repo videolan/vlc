@@ -15,7 +15,7 @@ case "${ARCH}" in
 esac
 
 OPTIONS="
-        --prefix=`pwd`/vlc_install_dir
+        --prefix=/
         --enable-macosx
         --enable-merge-ffmpeg
         --enable-osx-notifications

@@ -1,3 +1,6 @@
+macos_destdir=$(abs_top_builddir)/macos-install
+
+
 if HAVE_DARWIN
 noinst_DATA = pseudo-bundle
 endif
@@ -10,12 +13,18 @@ pseudo-bundle:
 	$(LN_S) -hf $(CONTRIB_DIR)/Frameworks
 	cd $(top_builddir)/bin/Contents/Resources/ && find $(abs_top_srcdir)/modules/gui/macosx/Resources/ -type f -exec $(LN_S) -f {} \;
 
+macos-install:
+	rm -Rf "$(macos_destdir)"
+	mkdir "$(macos_destdir)"
+	DESTDIR="$(macos_destdir)" $(MAKE) install
+	touch "$(macos_destdir)"
+
 # VLC.app for packaging and giving it to your friends
 # use package-macosx to get a nice dmg
-VLC.app: install
+VLC.app: macos-install
 	rm -Rf $@
 	## Copy Contents
-	cp -R "$(datadir)/macosx/" $@
+	cp -R "$(macos_destdir)$(datadir)/macosx/" $@
 	## Copy .strings file and .nib files
 	cp -R "$(top_builddir)/modules/gui/macosx/UI" $@/Contents/Resources/Base.lproj
 	## Copy Info.plist and convert to binary
@@ -33,23 +42,23 @@ endif
 	mkdir -p $@/Contents/MacOS/
 if BUILD_LUA
 	## Copy lua scripts
-	cp -r "$(pkgdatadir)/lua" $@/Contents/Resources/share/
-	cp -r "$(pkglibexecdir)/lua" $@/Contents/Frameworks/
+	cp -r "$(macos_destdir)$(pkgdatadir)/lua" $@/Contents/Resources/share/
+	cp -r "$(macos_destdir)$(pkglibexecdir)/lua" $@/Contents/Frameworks/
 endif
 	## HRTFs
 	cp -r "$(srcdir)/share/hrtfs" $@/Contents/Resources/share/
 	## Copy translations
-	-cp -a "$(datadir)/locale" $@/Contents/Resources/share/
+	-cp -a "$(macos_destdir)$(datadir)/locale" $@/Contents/Resources/share/
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
 	## Copy libs
-	cp -a "$(libdir)"/libvlc*.dylib $@/Contents/Frameworks/
+	cp -a "$(macos_destdir)$(libdir)"/libvlc*.dylib $@/Contents/Frameworks/
 	## Copy plugins
 	mkdir -p $@/Contents/Frameworks/plugins
-	find "$(pkglibdir)/plugins" -name 'lib*_plugin.dylib' -maxdepth 2 -exec cp -a {} $@/Contents/Frameworks/plugins \;
+	find "$(macos_destdir)$(pkglibdir)/plugins" -name 'lib*_plugin.dylib' -maxdepth 2 -exec cp -a {} $@/Contents/Frameworks/plugins \;
 	## Copy libbluray jar
 	-cp -a "$(CONTRIB_DIR)"/share/java/libbluray*.jar $@/Contents/Frameworks/plugins/
 	## Install binary
-	cp "$(prefix)/bin/vlc" $@/Contents/MacOS/VLC
+	cp "$(macos_destdir)$(prefix)/bin/vlc" $@/Contents/MacOS/VLC
 	install_name_tool -rpath "$(libdir)" "@executable_path/../Frameworks/" $@/Contents/MacOS/VLC
 	## Generate plugin cache
 	VLC_LIB_PATH="$@/Contents/Frameworks" bin/vlc-cache-gen $@/Contents/Frameworks/plugins
@@ -117,7 +126,7 @@ package-translations:
 	$(AMTAR) chof - $(srcdir)/vlc-translations-$(VERSION) \
 	  | GZIP=$(GZIP_ENV) gzip -c >$(srcdir)/vlc-translations-$(VERSION).tar.gz
 
-.PHONY: package-macosx package-macosx-zip package-macosx-release package-translations pseudo-bundle
+.PHONY: package-macosx package-macosx-zip package-macosx-release package-translations pseudo-bundle macos-install
 
 ###############################################################################
 # Mac OS X project
