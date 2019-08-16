@@ -48,11 +48,30 @@ FramesToUs(struct aout_sys_common *p_sys, uint64_t i_nb_frames)
     return i_nb_frames * CLOCK_FREQ / p_sys->i_rate;
 }
 
-static inline mdate_t
+static inline size_t
+FramesToBytes(struct aout_sys_common *p_sys, uint64_t i_frames)
+{
+    return i_frames * p_sys->i_bytes_per_frame / p_sys->i_frame_length;
+}
+
+static inline uint64_t
+UsToFrames(struct aout_sys_common *p_sys, mtime_t i_us)
+{
+    return i_us * p_sys->i_rate / CLOCK_FREQ;
+}
+
+static inline mtime_t
 HostTimeToTick(uint64_t i_host_time)
 {
     assert(tinfo.denom != 0);
     return i_host_time * tinfo.numer / tinfo.denom / 1000;
+}
+
+static inline uint64_t
+TickToHostTime(mtime_t i_us)
+{
+    assert(tinfo.denom != 0);
+    return i_us * 1000 * tinfo.denom / tinfo.numer;
 }
 
 static void
@@ -151,9 +170,6 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
 
     lock_lock(p_sys);
 
-    p_sys->i_render_host_time = i_host_time;
-    p_sys->i_render_frames = i_frames;
-
     if (p_sys->b_do_flush)
     {
         ca_ClearOutBuffers(p_aout);
@@ -162,8 +178,41 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
         vlc_sem_post(&p_sys->flush_sem);
     }
 
-    if (p_sys->b_paused)
+    if (p_sys->b_paused || unlikely(p_sys->i_first_render_host_time == 0))
         goto drop;
+
+    /* Start deferred: write silence (zeros) until we reach the first render
+     * host time. */
+    if (unlikely(p_sys->i_first_render_host_time > i_host_time ))
+    {
+        /* Convert the requested bytes into host time and check that it does
+         * not overlap between the first_render host time and the current one.
+         * */
+        const size_t i_requested_us =
+            FramesToUs(p_sys, BytesToFrames(p_sys, i_requested));
+        const uint64_t i_requested_host_time = TickToHostTime(i_requested_us);
+        if (p_sys->i_first_render_host_time >= i_host_time + i_requested_host_time)
+        {
+            /* Fill the buffer with silence */
+            goto drop;
+        }
+
+        /* Write silence to reach the first_render host time */
+        const mtime_t i_silence_us =
+            HostTimeToTick(p_sys->i_first_render_host_time - i_host_time);
+
+        const uint64_t i_silence_bytes =
+            FramesToBytes(p_sys, UsToFrames(p_sys, i_silence_us));
+        assert(i_silence_bytes <= i_requested);
+        memset(p_output, 0, i_silence_bytes);
+
+        i_requested -= i_silence_bytes;
+
+        /* Start the first rendering */
+    }
+
+    p_sys->i_render_host_time = i_host_time;
+    p_sys->i_render_frames = i_frames;
 
     size_t i_copied = 0;
     block_t *p_block = p_sys->p_out_chain;
@@ -218,8 +267,9 @@ ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
 
     lock_lock(p_sys);
 
-    if (p_sys->i_render_host_time == 0)
+    if (p_sys->i_render_host_time == 0 || p_sys->i_first_render_host_time == 0)
     {
+        /* Not yet started (or reached the first_render host time) */
         lock_unlock(p_sys);
         return -1;
     }
@@ -274,7 +324,7 @@ ca_Flush(audio_output_t *p_aout, bool wait)
         }
     }
 
-    p_sys->i_render_host_time = 0;
+    p_sys->i_render_host_time = p_sys->i_first_render_host_time = 0;
     p_sys->i_render_frames = 0;
     lock_unlock(p_sys);
 
@@ -304,6 +354,13 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
                            VLC_CODEC_FL32);
 
     lock_lock(p_sys);
+
+    if (p_sys->i_first_render_host_time == 0)
+    {
+        /* Setup the first render time */
+        p_sys->i_first_render_host_time = TickToHostTime(date);
+    }
+
     do
     {
         const size_t i_avalaible_bytes =
@@ -374,7 +431,7 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 
     p_sys->i_underrun_size = 0;
     p_sys->b_paused = false;
-    p_sys->i_render_host_time = 0;
+    p_sys->i_render_host_time = p_sys->i_first_render_host_time = 0;
     p_sys->i_render_frames = 0;
 
     p_sys->i_rate = fmt->i_rate;
