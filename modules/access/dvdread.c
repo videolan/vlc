@@ -1057,7 +1057,6 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
     int i_chapter = 0;
     int i_cell = 0;
     int i_vobu = 0;
-    int i_sub_cell = 0;
     int i_block;
     const pgc_t *p_pgc = p_sys->p_cur_pgc;
     const ifo_handle_t *p_vts = p_sys->p_vts_file;
@@ -1109,6 +1108,8 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
         i_vobu++;
     }
 
+#if 1
+    int i_sub_cell = 0;
     /* Find sub_cell */
     while( p_vts->vts_c_adt->cell_adr_table[i_sub_cell].start_sector <
            p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu-1] )
@@ -1116,7 +1117,6 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
         i_sub_cell++;
     }
 
-#if 1
     msg_Dbg( p_demux, "cell %d i_sub_cell %d chapter %d vobu %d "
              "cell_sector %d vobu_sector %d sub_cell_sector %d",
              i_cell, i_sub_cell, i_chapter, i_vobu,
