@@ -28,12 +28,6 @@
 #import <dlfcn.h>
 #import <mach/mach_time.h>
 
-static struct
-{
-    void (*lock)(os_unfair_lock *lock);
-    void (*unlock)(os_unfair_lock *lock);
-} unfair_lock;
-
 static mach_timebase_info_data_t tinfo;
 
 static inline uint64_t
@@ -63,47 +57,40 @@ ca_ClearOutBuffers(audio_output_t *p_aout)
 static void
 ca_init_once(void)
 {
-    unfair_lock.lock = os_unfair_lock_lock;
-    if (!unfair_lock.lock)
-        return;
-    unfair_lock.unlock = os_unfair_lock_unlock;
-    if (!unfair_lock.unlock)
-        unfair_lock.lock = NULL;
-
     if (mach_timebase_info(&tinfo) != KERN_SUCCESS)
         tinfo.numer = tinfo.denom = 0;
 }
 
-static void
+static inline void
 lock_init(struct aout_sys_common *p_sys)
 {
-    if (unfair_lock.lock)
+    if (likely(os_unfair_lock_lock))
         p_sys->lock.unfair = OS_UNFAIR_LOCK_INIT;
     else
         vlc_mutex_init(&p_sys->lock.mutex);
 }
 
-static void
+static inline void
 lock_destroy(struct aout_sys_common *p_sys)
 {
-    if (!unfair_lock.lock)
+    if (unlikely(!os_unfair_lock_lock))
         vlc_mutex_destroy(&p_sys->lock.mutex);
 }
 
-static void
+static inline void
 lock_lock(struct aout_sys_common *p_sys)
 {
-    if (unfair_lock.lock)
-        unfair_lock.lock(&p_sys->lock.unfair);
+    if (likely(os_unfair_lock_lock))
+        os_unfair_lock_lock(&p_sys->lock.unfair);
     else
         vlc_mutex_lock(&p_sys->lock.mutex);
 }
 
-static void
+static inline void
 lock_unlock(struct aout_sys_common *p_sys)
 {
-    if (unfair_lock.lock)
-        unfair_lock.unlock(&p_sys->lock.unfair);
+    if (likely(os_unfair_lock_lock))
+        os_unfair_lock_unlock(&p_sys->lock.unfair);
     else
         vlc_mutex_unlock(&p_sys->lock.mutex);
 }
