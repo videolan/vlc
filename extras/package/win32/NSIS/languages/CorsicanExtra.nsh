@@ -66,7 +66,7 @@ ${LangFileString} MessageBox_VLCRunning "VLC pare dighjà in funzione è hà da 
 ${LangFileString} MessageBox_VLCUnableToClose "Stu stalladore ùn hà micca pussutu chjode VLC, ci vole à fallu manualmente."
 ${LangFileString} MessageBox_InstallAborted "Installazione interrotta !"
 
-${LangFileString} Reinstall_Headline "Dighjà Installatu"
+${LangFileString} Reinstall_Headline "Dighjà installatu"
 ${LangFileString} Reinstall_HeadlineInstall "Sceglie cumu vulete installà VLC."
 ${LangFileString} Reinstall_HeadlineMaintenance "Sceglie l’ozzione di mantenenza ch’ellu ci vole à fà."
 ${LangFileString} Reinstall_MessageOlder "Una versione più vechja di VLC hè installata nant’à u vostru sistema. Selezziunà l’operazione chì ci vole à fà è cliccà Seguente per cuntinuà."
