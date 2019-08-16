@@ -82,7 +82,7 @@ struct aout_sys_common
     mtime_t             i_dev_latency_us;
 };
 
-void ca_Open(audio_output_t *p_aout);
+int ca_Open(audio_output_t *p_aout);
 
 void ca_Close(audio_output_t *p_aout);
 

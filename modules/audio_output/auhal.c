@@ -1702,9 +1702,16 @@ static void Close(vlc_object_t *obj)
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *p_aout = (audio_output_t *)obj;
-    aout_sys_t *p_sys = calloc(1, sizeof (*p_sys));
+
+    aout_sys_t *p_sys = p_aout->sys = calloc(1, sizeof (*p_sys));
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
+
+    if (ca_Open(p_aout) != VLC_SUCCESS)
+    {
+        free(p_sys);
+        return VLC_EGENERIC;
+    }
 
     vlc_mutex_init(&p_sys->device_list_lock);
     vlc_mutex_init(&p_sys->selected_device_lock);
@@ -1714,7 +1721,6 @@ static int Open(vlc_object_t *obj)
     memset(&p_sys->sfmt_revert, 0, sizeof(p_sys->sfmt_revert));
     p_sys->i_stream_id = 0;
 
-    p_aout->sys = p_sys;
     p_aout->start = Start;
     p_aout->stop = Stop;
     p_aout->volume_set = VolumeSet;
@@ -1772,6 +1778,5 @@ static int Open(vlc_object_t *obj)
     p_sys->b_mute = var_InheritBool(p_aout, "mute");
     aout_MuteReport(p_aout, p_sys->b_mute);
 
-    ca_Open(p_aout);
     return VLC_SUCCESS;
 }

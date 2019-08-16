@@ -81,13 +81,6 @@ ca_ClearOutBuffers(audio_output_t *p_aout)
 }
 
 static void
-ca_init_once(void)
-{
-    if (mach_timebase_info(&tinfo) != KERN_SUCCESS)
-        tinfo.numer = tinfo.denom = 0;
-}
-
-static inline void
 lock_init(struct aout_sys_common *p_sys)
 {
     if (likely(os_unfair_lock_lock))
@@ -121,13 +114,16 @@ lock_unlock(struct aout_sys_common *p_sys)
         vlc_mutex_unlock(&p_sys->lock.mutex);
 }
 
-void
+int
 ca_Open(audio_output_t *p_aout)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once(&once, ca_init_once);
+    if (mach_timebase_info(&tinfo) != KERN_SUCCESS)
+    {
+        tinfo.numer = tinfo.denom = 0;
+        return VLC_EGENERIC;
+    }
 
     vlc_sem_init(&p_sys->flush_sem, 0);
     lock_init(p_sys);
@@ -137,6 +133,8 @@ ca_Open(audio_output_t *p_aout)
     p_aout->pause = ca_Pause;
     p_aout->flush = ca_Flush;
     p_aout->time_get = ca_TimeGet;
+
+    return VLC_SUCCESS;
 }
 
 void
@@ -258,9 +256,6 @@ int
 ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
-
-    if (unlikely(tinfo.denom == 0))
-        return -1;
 
     lock_lock(p_sys);
 
