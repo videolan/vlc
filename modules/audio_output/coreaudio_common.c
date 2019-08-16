@@ -48,6 +48,13 @@ FramesToUs(struct aout_sys_common *p_sys, uint64_t i_nb_frames)
     return i_nb_frames * CLOCK_FREQ / p_sys->i_rate;
 }
 
+static inline mdate_t
+HostTimeToTick(uint64_t i_host_time)
+{
+    assert(tinfo.denom != 0);
+    return i_host_time * tinfo.numer / tinfo.denom / 1000;
+}
+
 static void
 ca_ClearOutBuffers(audio_output_t *p_aout)
 {
@@ -217,8 +224,7 @@ ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
         return -1;
     }
 
-    const uint64_t i_render_time_us = p_sys->i_render_host_time
-                                    * tinfo.numer / tinfo.denom / 1000;
+    const mtime_t i_render_time_us = HostTimeToTick(p_sys->i_render_host_time);
     const mtime_t i_render_delay = i_render_time_us - mdate();
 
     const int64_t i_out_frames = BytesToFrames(p_sys, p_sys->i_out_size);
