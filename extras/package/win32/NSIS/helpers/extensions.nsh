@@ -258,6 +258,8 @@ FunctionEnd
   !insertmacro ${_action} Other ".vlc"
   !insertmacro ${_action} Other ".wvx"
   !insertmacro ${_action} Other ".xspf"
+  !insertmacro ${_action} Other ".wpl"
+  !insertmacro ${_action} Other ".zpl"
 !macroend
 
 !macro MacroUnassociatedExtensions _action
