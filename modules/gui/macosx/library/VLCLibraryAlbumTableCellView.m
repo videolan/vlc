@@ -78,6 +78,8 @@ const CGFloat LayoutSpacer;
     _tracksDataSource = [[VLCLibraryTracksDataSource alloc] init];
     _tracksTableView.dataSource = _tracksDataSource;
     _tracksTableView.delegate = _tracksDataSource;
+    _tracksTableView.doubleAction = @selector(tracksTableViewDoubleClickAction:);
+    _tracksTableView.target = self;
     [self addSubview:_tracksTableView];
     NSDictionary *dict = NSDictionaryOfVariableBindings(_tracksTableView, _representedImageView);
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-20-[_tracksTableView]-20-|" options:0 metrics:0 views:dict]];
@@ -137,6 +139,20 @@ const CGFloat LayoutSpacer;
 
     _tracksDataSource.representedAlbum = _representedAlbum;
     [_tracksTableView reloadData];
+}
+
+- (void)tracksTableViewDoubleClickAction:(id)sender
+{
+    if (!_libraryController) {
+        _libraryController = [[VLCMain sharedInstance] libraryController];
+    }
+
+    NSArray *tracks = [_representedAlbum tracksAsMediaItems];
+    NSUInteger trackCount = tracks.count;
+    NSInteger clickedRow = _tracksTableView.clickedRow;
+    if (clickedRow < trackCount) {
+        [_libraryController appendItemToPlaylist:tracks[_tracksTableView.clickedRow] playImmediately:YES];
+    }
 }
 
 @end

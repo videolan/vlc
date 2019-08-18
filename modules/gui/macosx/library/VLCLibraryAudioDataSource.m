@@ -22,7 +22,10 @@
 
 #import "VLCLibraryAudioDataSource.h"
 
+#import "main/VLCMain.h"
+
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryAlbumTableCellView.h"
@@ -65,6 +68,9 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     flowLayout.sectionInset = NSEdgeInsetsMake(20., 20., 20., 20.);
     flowLayout.minimumLineSpacing = 20.;
     flowLayout.minimumInteritemSpacing = 20.;
+
+    _groupSelectionTableView.target = self;
+    _groupSelectionTableView.doubleAction = @selector(groubSelectionDoubleClickAction:);
 
     [self reloadAppearance];
 }
@@ -271,6 +277,34 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     }
 
     [self.groupSelectionTableView reloadData];
+}
+
+#pragma mark - table view double click actions
+
+- (void)groubSelectionDoubleClickAction:(id)sender
+{
+    NSArray *listOfAlbums = _groupDataSource.representedListOfAlbums;
+    NSUInteger albumCount = listOfAlbums.count;
+    if (!listOfAlbums || albumCount == 0) {
+        return;
+    }
+
+    NSInteger clickedRow = _groupSelectionTableView.clickedRow;
+    if (clickedRow > albumCount) {
+        return;
+    }
+
+    VLCLibraryController *libraryController = [[VLCMain sharedInstance] libraryController];
+
+    NSArray *tracks = [listOfAlbums[clickedRow] tracksAsMediaItems];
+    NSUInteger trackCount = tracks.count;
+    BOOL playImmediately = YES;
+    for (NSUInteger x = 0; x < trackCount; x++) {
+        [libraryController appendItemToPlaylist:tracks[x] playImmediately:playImmediately];
+        if (playImmediately) {
+            playImmediately = NO;
+        }
+    }
 }
 
 #pragma mark - collection view data source and delegation
