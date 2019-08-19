@@ -502,6 +502,13 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_voutMenuvolup setTitle: _NS("Volume Up")];
     [_voutMenuvoldown setTitle: _NS("Volume Down")];
     [_voutMenumute setTitle: _NS("Mute")];
+    [_voutMenuAudiotrack setTitle: _NS("Audio Track")];
+    [_voutMenuAudiotrackMenu setTitle: _NS("Audio Track")];
+    [_voutMenuVideotrack setTitle: _NS("Video Track")];
+    [_voutMenuVideotrackMenu setTitle: _NS("Video Track")];
+    [_voutMenuOpenSubtitleFile setTitle:_NS("Add Subtitle File...")];
+    [_voutMenuSubtitlestrack setTitle: _NS("Subtitles Track")];
+    [_voutMenuSubtitlestrackMenu setTitle: _NS("Subtitles Track")];
     [_voutMenufullscreen setTitle: _NS("Fullscreen")];
     [_voutMenusnapshot setTitle: _NS("Snapshot")];
 }
@@ -713,6 +720,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (void)setSubtitleMenuEnabled:(BOOL)b_enabled
 {
     [_openSubtitleFile setEnabled: b_enabled];
+    [_voutMenuOpenSubtitleFile setEnabled: b_enabled];
     if (b_enabled) {
         [_subtitle_bgopacityLabel_gray setHidden: YES];
         [_subtitle_bgopacityLabel setHidden: NO];
@@ -836,7 +844,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)updateRecordState
 {
-    [_record setState:_playerController.enableRecording];
+    NSControlStateValue state = _playerController.enableRecording ? NSOnState : NSOffState;
+    [_record setState:state];
+    [_voutMenuRecord setState:state];
 }
 
 - (IBAction)setPlaybackRate:(id)sender
@@ -891,17 +901,20 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     NSArray *tracks = _playerController.audioTracks;
     NSUInteger numberOfTracks = tracks.count;
     [self rebuildTracksMenu:_audiotrackMenu withMetadata:tracks count:numberOfTracks category:AUDIO_ES];
-    _audiotrack.enabled = numberOfTracks > 0 ? YES : NO;
+    [self rebuildTracksMenu:_voutMenuAudiotrackMenu withMetadata:tracks count:numberOfTracks category:AUDIO_ES];
+    _voutMenuAudiotrack.enabled = _audiotrack.enabled = numberOfTracks > 0 ? YES : NO;
 
     tracks = _playerController.videoTracks;
     numberOfTracks = tracks.count;
     [self rebuildTracksMenu:_videotrackMenu withMetadata:tracks count:numberOfTracks category:VIDEO_ES];
-    _videotrack.enabled = numberOfTracks > 0 ? YES : NO;
+    [self rebuildTracksMenu:_voutMenuVideotrackMenu withMetadata:tracks count:numberOfTracks category:VIDEO_ES];
+    _voutMenuVideotrack.enabled = _videotrack.enabled = numberOfTracks > 0 ? YES : NO;
 
     tracks = _playerController.subtitleTracks;
     numberOfTracks = tracks.count;
     [self rebuildTracksMenu:_subtitle_tracksMenu withMetadata:tracks count:numberOfTracks category:SPU_ES];
-    _subtitle_track.enabled = numberOfTracks > 0 ? YES : NO;
+    [self rebuildTracksMenu:_voutMenuSubtitlestrackMenu withMetadata:tracks count:numberOfTracks category:SPU_ES];
+    _voutMenuSubtitlestrack.enabled = _subtitle_track.enabled = numberOfTracks > 0 ? YES : NO;
 }
 
 - (void)rebuildTracksMenu:(NSMenu *)menu
@@ -1787,7 +1800,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                mi == _voutMenunext      ||
                mi == _dockMenunext) {
         enabled = _playlistController.hasNextPlaylistItem;
-    } else if (mi == _record) {
+    } else if (mi == _record || mi == _voutMenuRecord) {
         enabled = _playerController.recordable;
     } else if (mi == _random) {
         enum vlc_playlist_playback_order playbackOrder = [_playlistController playbackOrder];
@@ -1829,7 +1842,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
             vout_Release(p_vout);
         }
 
-    } else if (mi == _openSubtitleFile) {
+    } else if (mi == _openSubtitleFile || mi == _voutMenuOpenSubtitleFile) {
         enabled = YES;
     } else {
         NSMenuItem *_parent = [mi parentItem];

@@ -197,11 +197,19 @@
 @property (readwrite, strong) IBOutlet NSMenu *voutMenu;
 @property (readwrite, strong) IBOutlet NSMenuItem *voutMenuplay;
 @property (readwrite, strong) IBOutlet NSMenuItem *voutMenustop;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuRecord;
 @property (readwrite, strong) IBOutlet NSMenuItem *voutMenuprev;
 @property (readwrite, strong) IBOutlet NSMenuItem *voutMenunext;
 @property (readwrite, strong) IBOutlet NSMenuItem *voutMenuvolup;
 @property (readwrite, strong) IBOutlet NSMenuItem *voutMenuvoldown;
 @property (readwrite, strong) IBOutlet NSMenuItem *voutMenumute;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuAudiotrack;
+@property (readwrite, strong) IBOutlet NSMenu *voutMenuAudiotrackMenu;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuVideotrack;
+@property (readwrite, strong) IBOutlet NSMenu *voutMenuVideotrackMenu;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuOpenSubtitleFile;
+@property (readwrite, strong) IBOutlet NSMenuItem *voutMenuSubtitlestrack;
+@property (readwrite, strong) IBOutlet NSMenu *voutMenuSubtitlestrackMenu;
 @property (readwrite, strong) IBOutlet NSMenuItem *voutMenufullscreen;
 @property (readwrite, strong) IBOutlet NSMenuItem *voutMenusnapshot;
 

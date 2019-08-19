@@ -156,6 +156,14 @@
                 <outlet property="vol_down" destination="1065" id="iI9-ay-pAs"/>
                 <outlet property="vol_up" destination="1064" id="8I9-3j-p1J"/>
                 <outlet property="voutMenu" destination="2730" id="ZHq-j3-Ggd"/>
+                <outlet property="voutMenuAudiotrack" destination="n8w-vf-ZVR" id="b8A-Vn-Xoe"/>
+                <outlet property="voutMenuAudiotrackMenu" destination="y7z-2t-aNd" id="fzG-vh-4te"/>
+                <outlet property="voutMenuOpenSubtitleFile" destination="dqb-Ht-ibF" id="4Y5-vb-c51"/>
+                <outlet property="voutMenuRecord" destination="LA2-yH-mAD" id="SJJ-ZD-ee1"/>
+                <outlet property="voutMenuSubtitlestrack" destination="5H6-1N-Hjz" id="LdO-F9-cTL"/>
+                <outlet property="voutMenuSubtitlestrackMenu" destination="juF-Df-Fzd" id="exR-TY-zmI"/>
+                <outlet property="voutMenuVideotrack" destination="mqn-dW-9kE" id="Y9j-G3-FF3"/>
+                <outlet property="voutMenuVideotrackMenu" destination="UmV-y6-gd3" id="RqR-qO-YSj"/>
                 <outlet property="voutMenufullscreen" destination="2732" id="NC7-qA-BIE"/>
                 <outlet property="voutMenumute" destination="2743" id="k5B-Oz-GjX"/>
                 <outlet property="voutMenunext" destination="2739" id="CkI-w1-GZo"/>
@@ -875,6 +883,12 @@
                         <action selector="stop:" target="-2" id="3I6-RI-EYq"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Record" enabled="NO" id="LA2-yH-mAD">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="toggleRecord:" target="-2" id="hpP-Ik-xWJ"/>
+                    </connections>
+                </menuItem>
                 <menuItem isSeparatorItem="YES" id="2737">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
@@ -909,6 +923,23 @@
                 <menuItem isSeparatorItem="YES" id="2738">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
+                <menuItem title="Audio track" id="n8w-vf-ZVR">
+                    <menu key="submenu" title="Audio track" id="y7z-2t-aNd"/>
+                </menuItem>
+                <menuItem title="Video track" id="mqn-dW-9kE">
+                    <menu key="submenu" title="Video track" id="UmV-y6-gd3"/>
+                </menuItem>
+                <menuItem title="Open File..." id="dqb-Ht-ibF">
+                    <connections>
+                        <action selector="addSubtitleFile:" target="-2" id="YXj-Mu-ank"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Subtitle track" id="5H6-1N-Hjz">
+                    <menu key="submenu" title="Subtitle track" id="juF-Df-Fzd"/>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="K9n-42-WrB">
+                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                </menuItem>
                 <menuItem title="Fullscreen" id="2732">
                     <connections>
                         <action selector="toggleFullscreen:" target="-2" id="7fK-95-1OE"/>
@@ -923,6 +954,7 @@
                     </connections>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="-35" y="361"/>
         </menu>
         <customView id="4596" userLabel="Rate Menu View">
             <rect key="frame" x="0.0" y="0.0" width="307" height="53"/>
