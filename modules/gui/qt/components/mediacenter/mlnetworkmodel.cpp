@@ -148,6 +148,13 @@ void MLNetworkModel::setIsOnProviderList(bool b)
 
     emit isOnProviderListChanged();
 }
+void MLNetworkModel::setSdSource(QString s)
+{
+    beginResetModel();
+    m_sdSource = s;
+    emit sdSourceChanged();
+    endResetModel();
+}
 
 bool MLNetworkModel::initializeMediaSources()
 {
@@ -168,7 +175,16 @@ bool MLNetworkModel::initializeMediaSources()
 
         using SourceMetaPtr = std::unique_ptr<vlc_media_source_meta_list_t,
                                               decltype( &vlc_media_source_meta_list_Delete )>;
-        SourceMetaPtr providerList( vlc_media_source_provider_List( provider, SD_CAT_LAN ),
+
+        services_discovery_category_e cat = SD_CAT_LAN;
+        if ( m_sdSource == "SD_CAT_DEVICES" )
+            cat = SD_CAT_DEVICES;
+        else if ( m_sdSource == "SD_CAT_MYCOMPUTER" )
+            cat = SD_CAT_MYCOMPUTER;
+        else if ( m_sdSource == "SD_CAT_INTERNET" )
+            cat = SD_CAT_INTERNET;
+
+        SourceMetaPtr providerList( vlc_media_source_provider_List( provider, cat ),
                                     &vlc_media_source_meta_list_Delete );
         if ( providerList == nullptr )
             return false;
@@ -276,9 +292,8 @@ void MLNetworkModel::refreshMediaList( MediaSourcePtr mediaSource,
         item.name = it->psz_name;
         item.protocol = "";
         item.indexed = false;
-        item.type = (it->i_type == ITEM_TYPE_DIRECTORY || it->i_type == ITEM_TYPE_NODE) ?
-                TYPE_DIR : TYPE_FILE;
-        item.mainMrl = item.type == TYPE_DIR ?
+        item.type = static_cast<ItemType>(it->i_type);
+        item.mainMrl = (item.type == TYPE_DIRECTORY || item.type == TYPE_NODE) ?
                     QUrl::fromEncoded(QByteArray(it->psz_uri).append('/')) :
                     QUrl::fromEncoded(it->psz_uri);
 
@@ -330,7 +345,7 @@ void MLNetworkModel::refreshDeviceList( MediaSourcePtr mediaSource, input_item_n
         item.name = qfu(children[i]->p_item->psz_name);
         item.mrls.push_back( item.mainMrl );
         item.indexed = false;
-        item.type = TYPE_SHARE;
+        item.type = static_cast<ItemType>( children[i]->p_item->i_type );
         item.canBeIndexed = canBeIndexed( item.mainMrl , item.type );
         item.protocol = item.mainMrl.scheme();
         item.tree = NetworkTreeItem{ mediaSource,
@@ -403,5 +418,5 @@ void MLNetworkModel::SourceListener::onItemRemoved( vlc_media_tree_t *, input_it
 
 bool MLNetworkModel::canBeIndexed(const QUrl& url , ItemType itemType )
 {
-    return itemType != TYPE_FILE && (url.scheme() == "smb" || url.scheme() == "ftp");
+    return itemType != ITEM_TYPE_FILE && (url.scheme() == "smb" || url.scheme() == "ftp");
 }
