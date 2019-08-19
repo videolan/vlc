@@ -385,11 +385,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *va_arg( args, int * ) = 1; /* Chapter offset */
 
             /* Duplicate title infos */
-            *pi_int = p_sys->i_titles;
+            *pi_int = 0;
             *ppp_title = vlc_alloc( p_sys->i_titles, sizeof(input_title_t *) );
-            for( i = 0; i < p_sys->i_titles; i++ )
+            if(!*ppp_title)
+                return VLC_EGENERIC;
+            for (i = 0; i < p_sys->i_title; i++)
             {
-                (*ppp_title)[i] = vlc_input_title_Duplicate(p_sys->titles[i]);
+                input_title_t *p_dup = vlc_input_title_Duplicate(p_sys->titles[i]);
+                if(p_dup)
+                    (*ppp_title)[(*pi_int)++] = p_dup;
             }
             return VLC_SUCCESS;
 
