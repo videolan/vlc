@@ -87,6 +87,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 @end
 
+@interface NSMenuItem (KeyEquivalentAddition)
+- (void)matchKeyEquivalentsOfMenuItem:(NSMenuItem *)menuItem;
+@end
+
 @interface VLCMainMenu() <NSMenuDelegate>
 {
     VLCAboutWindowController *_aboutWindowController;
@@ -296,6 +300,17 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [menuItem setTag:scaleValues[i].scaleValue];
         [menuItem setTarget: self];
     }
+
+    [_voutMenuplay matchKeyEquivalentsOfMenuItem:_play];
+    [_voutMenustop matchKeyEquivalentsOfMenuItem:_stop];
+    [_voutMenunext matchKeyEquivalentsOfMenuItem:_next];
+    [_voutMenuprev matchKeyEquivalentsOfMenuItem:_previous];
+    [_voutMenuRecord matchKeyEquivalentsOfMenuItem:_record];
+    [_voutMenuvolup matchKeyEquivalentsOfMenuItem:_vol_up];
+    [_voutMenuvoldown matchKeyEquivalentsOfMenuItem:_vol_down];
+    [_voutMenumute matchKeyEquivalentsOfMenuItem:_mute];
+    [_voutMenufullscreen matchKeyEquivalentsOfMenuItem:_fullscreenItem];
+    [_voutMenusnapshot matchKeyEquivalentsOfMenuItem:_snapshot];
 }
 
 - (void)setupMenu:(NSMenu *)menu withIntList:(char *)psz_name andSelector:(SEL)selector
@@ -1928,6 +1943,16 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         free(_variableValue.psz_string);
     }
     free(_variableName);
+}
+
+@end
+
+@implementation NSMenuItem (KeyEquivalentAddition)
+
+- (void)matchKeyEquivalentsOfMenuItem:(NSMenuItem *)menuItem
+{
+    self.keyEquivalent = menuItem.keyEquivalent;
+    self.keyEquivalentModifierMask = menuItem.keyEquivalentModifierMask;
 }
 
 @end
