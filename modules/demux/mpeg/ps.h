@@ -51,8 +51,8 @@ static inline int ps_id_to_tk( unsigned i_id )
 }
 
 typedef struct ps_psm_t ps_psm_t;
-static inline int ps_id_to_type( const ps_psm_t *, int );
-static inline const uint8_t *ps_id_to_lang( const ps_psm_t *, int );
+static inline uint8_t ps_id_to_type( const ps_psm_t *, uint16_t );
+static inline const uint8_t *ps_id_to_lang( const ps_psm_t *, uint16_t );
 
 typedef struct
 {
@@ -550,8 +550,8 @@ typedef struct
 /* Program stream map handling */
 typedef struct ps_es_t
 {
-    int i_type;
-    int i_id;
+    uint8_t i_type;
+    uint16_t i_id;
 
     ps_descriptors_t desc;
 
@@ -559,7 +559,7 @@ typedef struct ps_es_t
 
 struct ps_psm_t
 {
-    int i_version;
+    uint8_t i_version;
 
     size_t  i_es;
     ps_es_t *es;
@@ -567,7 +567,7 @@ struct ps_psm_t
     ps_descriptors_t uniqueextdesc;
 };
 
-static inline int ps_id_to_type( const ps_psm_t *p_psm, int i_id )
+static inline uint8_t ps_id_to_type( const ps_psm_t *p_psm, uint16_t i_id )
 {
     size_t i;
     for( i = 0; p_psm && i < p_psm->i_es; i++ )
@@ -577,7 +577,7 @@ static inline int ps_id_to_type( const ps_psm_t *p_psm, int i_id )
     return 0;
 }
 
-static inline const uint8_t *ps_id_to_lang( const ps_psm_t *p_psm, int i_id )
+static inline const uint8_t *ps_id_to_lang( const ps_psm_t *p_psm, uint16_t i_id )
 {
     size_t i;
     for( i = 0; p_psm && i < p_psm->i_es; i++ )
@@ -590,7 +590,7 @@ static inline const uint8_t *ps_id_to_lang( const ps_psm_t *p_psm, int i_id )
 
 static inline void ps_psm_init( ps_psm_t *p_psm )
 {
-    p_psm->i_version = 0xFFFF;
+    p_psm->i_version = 0xFF;
     p_psm->i_es = 0;
     p_psm->es = 0;
     memset( &p_psm->uniqueextdesc, 0, 3 );
@@ -629,7 +629,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm,
                                ps_track_t tk[PS_TK_COUNT], es_out_t *out )
 {
     size_t i_length, i_info_length, i_es_base;
-    int i_version;
+    uint8_t i_version;
     bool b_single_extension;
 
     // Demux() checks that we have at least 4 bytes, but we need

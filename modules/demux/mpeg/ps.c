@@ -499,7 +499,7 @@ static int Demux( demux_t *p_demux )
         break;
 
     case PS_STREAM_ID_MAP:
-        if( p_sys->psm.i_version == 0xFFFF )
+        if( p_sys->psm.i_version == 0xFF )
             msg_Dbg( p_demux, "contains a PSM");
 
         ps_psm_fill( &p_sys->psm,
