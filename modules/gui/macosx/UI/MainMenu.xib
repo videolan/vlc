@@ -120,6 +120,13 @@
                 <outlet property="snapshot" destination="2249" id="6bO-HY-I3I"/>
                 <outlet property="sortPlaylist" destination="lkj-Wj-TYr" id="T45-2w-c0O"/>
                 <outlet property="stop" destination="5156" id="irh-Cr-vBT"/>
+                <outlet property="subtitleSize" destination="5543" id="PTJ-Qy-QQd"/>
+                <outlet property="subtitleSizeLabel" destination="Jqh-Tt-S94" id="xLh-4s-Sis"/>
+                <outlet property="subtitleSizeLargerLabel" destination="S6g-As-Drf" id="29s-r1-Oqc"/>
+                <outlet property="subtitleSizeSlider" destination="bMX-Y8-2vL" id="7Ai-PA-3Qr"/>
+                <outlet property="subtitleSizeSmallerLabel" destination="DE3-cs-bVc" id="74W-Xn-pGS"/>
+                <outlet property="subtitleSizeTextField" destination="uVr-yv-xcp" id="45Z-1j-gDB"/>
+                <outlet property="subtitleSizeView" destination="GSo-om-Xt7" id="qOx-XX-QUJ"/>
                 <outlet property="subtitle_bgcolor" destination="5581" id="moz-G5-DBl"/>
                 <outlet property="subtitle_bgcolorMenu" destination="5582" id="gPd-5S-3xK"/>
                 <outlet property="subtitle_bgopacity" destination="5568" id="aPB-o5-iU6"/>
@@ -129,8 +136,6 @@
                 <outlet property="subtitle_bgopacity_view" destination="5547" id="KR2-v5-OeA"/>
                 <outlet property="subtitle_outlinethickness" destination="5571" id="Zml-NY-nvy"/>
                 <outlet property="subtitle_outlinethicknessMenu" destination="5572" id="x2V-5T-aCd"/>
-                <outlet property="subtitle_size" destination="5543" id="rxS-Zy-Moz"/>
-                <outlet property="subtitle_sizeMenu" destination="5544" id="5PH-co-f3W"/>
                 <outlet property="subtitle_textcolor" destination="5576" id="RjP-9r-hxv"/>
                 <outlet property="subtitle_textcolorMenu" destination="5577" id="RDh-MP-fR3"/>
                 <outlet property="subtitle_track" destination="5459" id="fwz-2h-teb"/>
@@ -624,9 +629,8 @@
                                 <menu key="submenu" title="Subtitle track" id="5460"/>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="5580"/>
-                            <menuItem title="Size" id="5543">
+                            <menuItem title="Size (View)" id="5543">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Size" id="5544"/>
                             </menuItem>
                             <menuItem title="Text Color" id="5576">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -1035,7 +1039,7 @@
                 <constraint firstItem="4599" firstAttribute="right" secondItem="4597" secondAttribute="right" id="wQZ-1a-DAZ"/>
                 <constraint firstItem="4600" firstAttribute="left" secondItem="4597" secondAttribute="left" id="zGp-3d-2RP"/>
             </constraints>
-            <point key="canvasLocation" x="288.5" y="149.5"/>
+            <point key="canvasLocation" x="423" y="153"/>
         </customView>
         <customView id="5547" userLabel="Sub BG Opacity">
             <rect key="frame" x="0.0" y="0.0" width="309" height="39"/>
@@ -1082,5 +1086,74 @@
             <point key="canvasLocation" x="296.5" y="285.5"/>
         </customView>
         <userDefaultsController representsSharedInstance="YES" id="uFO-sP-uo6"/>
+        <customView id="GSo-om-Xt7" userLabel="Subtitle Size View">
+            <rect key="frame" x="0.0" y="0.0" width="307" height="53"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bMX-Y8-2vL">
+                    <rect key="frame" x="28" y="4" width="261" height="15"/>
+                    <sliderCell key="cell" controlSize="mini" continuous="YES" enabled="NO" state="on" alignment="left" minValue="10" maxValue="500" doubleValue="100" tickMarkPosition="above" numberOfTickMarks="17" sliderType="linear" id="OPq-bA-vRD"/>
+                    <connections>
+                        <action selector="subtitleSize:" target="-2" id="4G5-va-xcG"/>
+                    </connections>
+                </slider>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DE3-cs-bVc">
+                    <rect key="frame" x="26" y="19" width="44" height="14"/>
+                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" alignment="left" title="Smaller" id="hxi-rv-sC7">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S6g-As-Drf">
+                    <rect key="frame" x="253" y="19" width="38" height="14"/>
+                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Larger" id="RQ6-7K-AGB">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <box horizontalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Vem-jM-Vb3">
+                    <rect key="frame" x="156" y="11" width="5" height="8"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="8" id="id8-4P-5M4"/>
+                    </constraints>
+                </box>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jqh-Tt-S94">
+                    <rect key="frame" x="19" y="35" width="85" height="18"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" title="Subtitle Size" id="yvk-IW-B4l">
+                        <font key="font" metaFont="system" size="14"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uVr-yv-xcp">
+                    <rect key="frame" x="273" y="35" width="18" height="18"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="1x" id="Mvq-OA-4Tt">
+                        <font key="font" metaFont="system" size="14"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="bMX-Y8-2vL" firstAttribute="top" secondItem="Vem-jM-Vb3" secondAttribute="bottom" constant="-8" id="0bg-Km-JNT"/>
+                <constraint firstItem="Vem-jM-Vb3" firstAttribute="centerX" secondItem="bMX-Y8-2vL" secondAttribute="centerX" id="31A-hu-zHO"/>
+                <constraint firstAttribute="bottom" secondItem="bMX-Y8-2vL" secondAttribute="bottom" constant="4" id="54h-q1-adq"/>
+                <constraint firstItem="S6g-As-Drf" firstAttribute="right" secondItem="bMX-Y8-2vL" secondAttribute="right" id="5a8-fp-fQO"/>
+                <constraint firstAttribute="trailing" secondItem="bMX-Y8-2vL" secondAttribute="trailing" constant="18" id="7yN-xS-oYm"/>
+                <constraint firstItem="DE3-cs-bVc" firstAttribute="left" secondItem="bMX-Y8-2vL" secondAttribute="left" id="8a5-cN-2yz"/>
+                <constraint firstItem="uVr-yv-xcp" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Jqh-Tt-S94" secondAttribute="trailing" constant="10" id="ACe-IL-9DG"/>
+                <constraint firstItem="Jqh-Tt-S94" firstAttribute="top" secondItem="GSo-om-Xt7" secondAttribute="top" id="Ar2-W0-5Xu"/>
+                <constraint firstItem="DE3-cs-bVc" firstAttribute="centerY" secondItem="S6g-As-Drf" secondAttribute="centerY" id="UaQ-Um-sWN"/>
+                <constraint firstItem="bMX-Y8-2vL" firstAttribute="top" secondItem="DE3-cs-bVc" secondAttribute="bottom" id="c6I-Na-KV1"/>
+                <constraint firstItem="Jqh-Tt-S94" firstAttribute="leading" secondItem="GSo-om-Xt7" secondAttribute="leading" constant="21" id="cYQ-Os-xxJ"/>
+                <constraint firstItem="uVr-yv-xcp" firstAttribute="trailing" secondItem="bMX-Y8-2vL" secondAttribute="trailing" id="eoR-UG-pdH"/>
+                <constraint firstItem="uVr-yv-xcp" firstAttribute="centerY" secondItem="Jqh-Tt-S94" secondAttribute="centerY" id="s3X-tb-Ora"/>
+                <constraint firstItem="bMX-Y8-2vL" firstAttribute="top" secondItem="Jqh-Tt-S94" secondAttribute="bottom" constant="16" id="ybL-Ac-zUJ"/>
+                <constraint firstItem="bMX-Y8-2vL" firstAttribute="leading" secondItem="GSo-om-Xt7" secondAttribute="leading" constant="28" id="yyk-px-6zZ"/>
+            </constraints>
+            <point key="canvasLocation" x="423" y="362"/>
+        </customView>
     </objects>
 </document>

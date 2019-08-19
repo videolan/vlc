@@ -143,8 +143,13 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *subtitle_track;
 @property (readwrite, weak) IBOutlet NSMenu *subtitle_tracksMenu;
 @property (readwrite, weak) IBOutlet NSMenuItem *openSubtitleFile;
-@property (readwrite, weak) IBOutlet NSMenu *subtitle_sizeMenu;
-@property (readwrite, weak) IBOutlet NSMenuItem *subtitle_size;
+@property (readwrite, weak) IBOutlet NSMenuItem *subtitleSize;
+@property (readwrite, weak) IBOutlet NSView *subtitleSizeView;
+@property (readwrite, weak) IBOutlet NSTextField *subtitleSizeLabel;
+@property (readwrite, weak) IBOutlet NSTextField *subtitleSizeSmallerLabel;
+@property (readwrite, weak) IBOutlet NSTextField *subtitleSizeLargerLabel;
+@property (readwrite, weak) IBOutlet NSSlider *subtitleSizeSlider;
+@property (readwrite, weak) IBOutlet NSTextField *subtitleSizeTextField;
 @property (readwrite, weak) IBOutlet NSMenu *subtitle_textcolorMenu;
 @property (readwrite, weak) IBOutlet NSMenuItem *subtitle_textcolor;
 @property (readwrite, weak) IBOutlet NSMenu *subtitle_bgcolorMenu;
@@ -258,6 +263,7 @@
 - (IBAction)createVideoSnapshot:(id)sender;
 
 - (IBAction)addSubtitleFile:(id)sender;
+- (IBAction)subtitleSize:(id)sender;
 - (IBAction)switchSubtitleBackgroundOpacity:(id)sender;
 - (IBAction)telxTransparent:(id)sender;
 - (IBAction)telxNavLink:(id)sender;

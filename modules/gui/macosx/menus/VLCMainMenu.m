@@ -137,6 +137,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     }
 
     [self setRateControlsEnabled:NO];
+    [self setSubtitleSizeControlsEnabled:NO];
 
 #ifdef HAVE_SPARKLE
     [_checkForUpdate setAction:@selector(checkForUpdates:)];
@@ -281,25 +282,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [self setupMenu: _subtitle_bgcolorMenu withIntList:"freetype-background-color" andSelector:@selector(switchSubtitleOption:)];
     [self setupMenu: _subtitle_outlinethicknessMenu withIntList:"freetype-outline-thickness" andSelector:@selector(switchSubtitleOption:)];
 #endif
-
-    /* Build size menu based on different scale factors */
-    struct {
-        const char *const name;
-        int scaleValue;
-    } scaleValues[] = {
-        { N_("Smaller"), 50},
-        { N_("Small"),   75},
-        { N_("Normal"), 100},
-        { N_("Large"),  125},
-        { N_("Larger"), 150},
-        { NULL, 0 }
-    };
-
-    for (int i = 0; scaleValues[i].name; i++) {
-        NSMenuItem *menuItem = [_subtitle_sizeMenu addItemWithTitle: _NS(scaleValues[i].name) action:@selector(switchSubtitleSize:) keyEquivalent:@""];
-        [menuItem setTag:scaleValues[i].scaleValue];
-        [menuItem setTarget: self];
-    }
 
     [_voutMenuplay matchKeyEquivalentsOfMenuItem:_play];
     [_voutMenustop matchKeyEquivalentsOfMenuItem:_stop];
@@ -460,7 +442,11 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_openSubtitleFile setTitle: _NS("Add Subtitle File...")];
     [_subtitle_track setTitle: _NS("Subtitles Track")];
     [_subtitle_tracksMenu setTitle: _NS("Subtitles Track")];
-    [_subtitle_size setTitle: _NS("Text Size")];
+    [_subtitleSizeView setAutoresizingMask: NSViewWidthSizable];
+    [_subtitleSize setView: _subtitleSizeView];
+    [_subtitleSizeLabel setStringValue: _NS("Subtitles Size")];
+    [_subtitleSizeSmallerLabel setStringValue: _NS("Smaller")];
+    [_subtitleSizeLargerLabel setStringValue: _NS("Larger")];
     [_subtitle_textcolor setTitle: _NS("Text Color")];
     [_subtitle_outlinethickness setTitle: _NS("Outline Thickness")];
 
@@ -685,10 +671,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         inputItem = nil;
 
         [self setRateControlsEnabled:_playerController.rateChangable];
+        [self setSubtitleSizeControlsEnabled:YES];
     } else {
         [_postprocessing setEnabled:NO];
         [self setSubmenusEnabled:NO];
         [self setRateControlsEnabled:NO];
+        [self setSubtitleSizeControlsEnabled:NO];
     }
 }
 
@@ -753,12 +741,25 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [self updatePlaybackRate];
 
     NSColor *color = b_enabled ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
-
     [_rateLabel setTextColor:color];
     [_rate_slowerLabel setTextColor:color];
     [_rate_normalLabel setTextColor:color];
     [_rate_fasterLabel setTextColor:color];
     [_rateTextField setTextColor:color];
+}
+
+- (void)setSubtitleSizeControlsEnabled:(BOOL)b_enabled
+{
+    [_subtitleSizeSlider setEnabled: b_enabled];
+    unsigned int scaleFactor = _playerController.subtitleTextScalingFactor;
+    [_subtitleSizeSlider setIntValue:scaleFactor];
+    [_subtitleSizeTextField setStringValue: [NSString stringWithFormat:@"%.2fx", scaleFactor / 100.]];
+
+    NSColor *color = b_enabled ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
+    [_subtitleSizeLabel setTextColor:color];
+    [_subtitleSizeSmallerLabel setTextColor:color];
+    [_subtitleSizeLargerLabel setTextColor:color];
+    [_subtitleSizeTextField setTextColor:color];
 }
 
 #pragma mark - View
@@ -1237,9 +1238,11 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     }
 }
 
-- (void)switchSubtitleSize:(id)sender
+- (IBAction)subtitleSize:(id)sender
 {
-    _playerController.subtitleTextScalingFactor = (unsigned int)[sender tag];
+    unsigned int scaleFactor = _subtitleSizeSlider.intValue;
+    _playerController.subtitleTextScalingFactor = scaleFactor;
+    [_subtitleSizeTextField setStringValue: [NSString stringWithFormat:@"%.2fx", scaleFactor / 100.]];
 }
 
 - (void)switchSubtitleOption:(id)sender
@@ -1861,8 +1864,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         enabled = YES;
     } else {
         NSMenuItem *_parent = [mi parentItem];
-        if (_parent == _subtitle_size || mi == _subtitle_size           ||
-            _parent == _subtitle_textcolor || mi == _subtitle_textcolor ||
+        if (_parent == _subtitle_textcolor || mi == _subtitle_textcolor ||
             _parent == _subtitle_bgcolor || mi == _subtitle_bgcolor     ||
             _parent == _subtitle_bgopacity || mi == _subtitle_bgopacity ||
             _parent == _subtitle_outlinethickness || mi == _subtitle_outlinethickness
