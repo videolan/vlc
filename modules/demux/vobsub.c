@@ -675,7 +675,7 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
         memcpy( p_pkt->p_buffer, p, i_size);
         p += i_size;
 
-        i_id = ps_pkt_id( p_pkt );
+        i_id = ps_pkt_id( p_pkt->p_buffer, p_pkt->i_buffer );
         if( (i_id&0xffe0) != 0xbd20 ||
             ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, 1 ) )
         {

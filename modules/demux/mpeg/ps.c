@@ -302,7 +302,7 @@ static int Probe( demux_t *p_demux, bool b_end )
         return VLC_DEMUXER_EOF;
     }
 
-    i_id = ps_pkt_id( p_pkt );
+    i_id = ps_pkt_id( p_pkt->p_buffer, p_pkt->i_buffer );
     if( i_id >= 0xc0 )
     {
         ps_track_t *tk = &p_sys->tk[ps_id_to_tk(i_id)];
@@ -322,7 +322,8 @@ static int Probe( demux_t *p_demux, bool b_end )
     else if( i_id == PS_STREAM_ID_PACK_HEADER )
     {
         vlc_tick_t i_scr; int dummy;
-        if( !b_end && !ps_pkt_parse_pack( p_pkt, &i_scr, &dummy ) )
+        if( !b_end && !ps_pkt_parse_pack( p_pkt->p_buffer, p_pkt->i_buffer,
+                                          &i_scr, &dummy ) )
         {
             if( p_sys->i_first_scr == VLC_TICK_INVALID )
                 p_sys->i_first_scr = i_scr;
@@ -460,7 +461,8 @@ static int Demux( demux_t *p_demux )
         break;
 
     case PS_STREAM_ID_PACK_HEADER:
-        if( !ps_pkt_parse_pack( p_pkt, &p_sys->i_pack_scr, &i_mux_rate ) )
+        if( !ps_pkt_parse_pack( p_pkt->p_buffer, p_pkt->i_buffer,
+                                &p_sys->i_pack_scr, &i_mux_rate ) )
         {
             if( p_sys->i_first_scr == VLC_TICK_INVALID )
                 p_sys->i_first_scr = p_sys->i_pack_scr;
@@ -476,7 +478,8 @@ static int Demux( demux_t *p_demux )
         break;
 
     case PS_STREAM_ID_SYSTEM_HEADER:
-        if( !ps_pkt_parse_system( p_pkt, &p_sys->psm, p_sys->tk ) )
+        if( !ps_pkt_parse_system( p_pkt->p_buffer, p_pkt->i_buffer,
+                                  &p_sys->psm, p_sys->tk ) )
         {
             int i;
             for( i = 0; i < PS_TK_COUNT; i++ )
@@ -499,7 +502,9 @@ static int Demux( demux_t *p_demux )
         if( p_sys->psm.i_version == 0xFFFF )
             msg_Dbg( p_demux, "contains a PSM");
 
-        ps_psm_fill( &p_sys->psm, p_pkt, p_sys->tk, p_demux->out );
+        ps_psm_fill( &p_sys->psm,
+                     p_pkt->p_buffer, p_pkt->i_buffer,
+                     p_sys->tk, p_demux->out );
         block_Release( p_pkt );
         break;
 
@@ -514,7 +519,7 @@ static int Demux( demux_t *p_demux )
     case PS_STREAM_ID_PRIVATE_STREAM1:
     case PS_STREAM_ID_EXTENDED:
         {
-            int i_id = ps_pkt_id( p_pkt );
+            int i_id = ps_pkt_id( p_pkt->p_buffer, p_pkt->i_buffer );
             /* Small heuristic to improve MLP detection from AOB */
             if( i_id == 0xa001 &&
                 p_sys->i_aob_mlp_count < 500 )
@@ -533,7 +538,8 @@ static int Demux( demux_t *p_demux )
 
             if( !tk->b_configured )
             {
-                if( !ps_track_fill( tk, &p_sys->psm, i_id, p_pkt, false ) )
+                if( !ps_track_fill( tk, &p_sys->psm, i_id,
+                                    p_pkt->p_buffer, p_pkt->i_buffer, false ) )
                 {
                     /* No PSM and no probing yet */
                     if( p_sys->format == PSMF_PS )
