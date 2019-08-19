@@ -1397,6 +1397,8 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
 
         /* Create a block */
         block_t *p_pkt = block_Alloc( i_size );
+        if( !p_pkt )
+            return VLC_EGENERIC;
         memcpy( p_pkt->p_buffer, p, i_size);
 
         /* Parse it and send it */
