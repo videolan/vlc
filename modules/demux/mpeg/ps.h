@@ -37,7 +37,10 @@
 #define PS_TK_COUNT (256+256+256+8 - 0xc0)
 static inline int ps_id_to_tk( unsigned i_id )
 {
-    if( i_id <= 0xff )
+    assert(i_id >= 0xc0);
+    if(unlikely(i_id < 0xc0))
+        return 0;
+    else if( i_id <= 0xff )
         return i_id - 0xc0;
     else if( (i_id & 0xff00) == 0xbd00 )
         return 256-0xC0 + (i_id & 0xff);
