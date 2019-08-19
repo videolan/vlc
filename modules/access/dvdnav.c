@@ -1504,6 +1504,7 @@ static void ESNew( demux_t *p_demux, int i_id )
     demux_sys_t *p_sys = p_demux->p_sys;
     ps_track_t  *tk = &p_sys->tk[ps_id_to_tk(i_id)];
     bool  b_select = false;
+    int i_lang = 0xffff;
 
     if( tk->b_configured ) return;
 
@@ -1542,14 +1543,7 @@ static void ESNew( demux_t *p_demux, int i_id )
         }
         if( i_audio >= 0 )
         {
-            int i_lang = dvdnav_audio_stream_to_lang( p_sys->dvdnav, i_audio );
-            if( i_lang != 0xffff )
-            {
-                tk->fmt.psz_language = malloc( 3 );
-                tk->fmt.psz_language[0] = (i_lang >> 8)&0xff;
-                tk->fmt.psz_language[1] = (i_lang     )&0xff;
-                tk->fmt.psz_language[2] = 0;
-            }
+            i_lang = dvdnav_audio_stream_to_lang( p_sys->dvdnav, i_audio );
             if( dvdnav_get_active_audio_stream( p_sys->dvdnav ) == i_audio )
             {
                 b_select = true;
@@ -1559,14 +1553,7 @@ static void ESNew( demux_t *p_demux, int i_id )
     else if( tk->fmt.i_cat == SPU_ES )
     {
         int32_t i_title, i_part;
-        int i_lang = dvdnav_spu_stream_to_lang( p_sys->dvdnav, i_id&0x1f );
-        if( i_lang != 0xffff )
-        {
-            tk->fmt.psz_language = malloc( 3 );
-            tk->fmt.psz_language[0] = (i_lang >> 8)&0xff;
-            tk->fmt.psz_language[1] = (i_lang     )&0xff;
-            tk->fmt.psz_language[2] = 0;
-        }
+        i_lang = dvdnav_spu_stream_to_lang( p_sys->dvdnav, i_id&0x1f );
 
         /* Palette */
         tk->fmt.subs.spu.palette[0] = SPU_PALETTE_DEFINED;
@@ -1579,6 +1566,17 @@ static void ESNew( demux_t *p_demux, int i_id )
             dvdnav_get_active_spu_stream( p_sys->dvdnav ) == (i_id&0x1f) )
         {
             b_select = true;
+        }
+    }
+
+    if( i_lang != 0xffff )
+    {
+        tk->fmt.psz_language = malloc( 3 );
+        if( tk->fmt.psz_language )
+        {
+            tk->fmt.psz_language[0] = (i_lang >> 8)&0xff;
+            tk->fmt.psz_language[1] = (i_lang     )&0xff;
+            tk->fmt.psz_language[2] = 0;
         }
     }
 
