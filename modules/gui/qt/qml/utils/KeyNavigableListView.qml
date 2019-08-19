@@ -44,6 +44,7 @@ NavigableFocusScope {
     property alias contentX: view.contentX
     property alias contentY:  view.contentY
     property alias contentHeight: view.contentHeight
+    property alias contentWidth: view.contentWidth
 
     property alias footer: view.footer
     property alias footerItem: view.footerItem
