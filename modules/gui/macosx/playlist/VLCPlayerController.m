@@ -1387,10 +1387,11 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     [_defaultNotificationCenter postNotificationName:VLCPlayerTrackListChanged object:nil];
 }
 
-- (void)selectTrack:(VLCTrackMetaData *)track
+- (void)selectTrack:(VLCTrackMetaData *)track exclusively:(BOOL)exclusiveSelection
 {
     vlc_player_Lock(_p_player);
-    vlc_player_SelectEsId(_p_player, track.esID, VLC_PLAYER_SELECT_EXCLUSIVE);
+    const enum es_format_category_e formatCategory = vlc_es_id_GetCat(track.esID);
+    vlc_player_SelectEsId(_p_player, track.esID, (formatCategory == AUDIO_ES || exclusiveSelection) ? VLC_PLAYER_SELECT_EXCLUSIVE : VLC_PLAYER_SELECT_SIMULTANEOUS);
     vlc_player_Unlock(_p_player);
 }
 
@@ -1767,7 +1768,7 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"%@: name: %@", [VLCTrackMetaData className], self.name];
+    return [NSString stringWithFormat:@"%@: name: %@, selected: %i", [VLCTrackMetaData className], self.name, self.selected];
 }
 
 @end

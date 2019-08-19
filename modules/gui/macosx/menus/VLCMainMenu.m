@@ -187,6 +187,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                                name:VLCPlayerTrackListChanged
                              object:nil];
     [notificationCenter addObserver:self
+                           selector:@selector(updateTrackHandlingMenus:)
+                               name:VLCPlayerTrackSelectionChanged
+                             object:nil];
+    [notificationCenter addObserver:self
                            selector:@selector(updateTitleAndChapterMenus:)
                                name:VLCPlayerTitleListChanged
                              object:nil];
@@ -906,6 +910,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                  category:(enum es_format_category_e)category
 {
     [menu removeAllItems];
+    BOOL itemSelected = NO;
 
     NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:_NS("Disable")
                                                       action:@selector(unselectTrackCategory:)
@@ -923,14 +928,25 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [menuItem setTarget:self];
         [menuItem setRepresentedObject:metaDataItem];
         [menuItem setEnabled:YES];
-        [menuItem setState:metaDataItem.selected ? NSOnState : NSOffState];
+        if (metaDataItem.selected) {
+            itemSelected = YES;
+            [menuItem setState:NSOnState];
+        } else {
+            [menuItem setState:NSOffState];
+        }
         [menu addItem:menuItem];
+    }
+
+    /* select the "Disabled" item in case no track is selected */
+    if (!itemSelected) {
+        [menu.itemArray.firstObject setState:NSOnState];
     }
 }
 
 - (void)selectTrack:(NSMenuItem *)sender
 {
-    [_playerController selectTrack:[sender representedObject]];
+    NSEvent *currentEvent = [NSApp currentEvent];
+    [_playerController selectTrack:[sender representedObject] exclusively:!(currentEvent.modifierFlags & NSAlternateKeyMask)];
 }
 
 - (void)unselectTrackCategory:(NSMenuItem *)sender

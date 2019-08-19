@@ -716,10 +716,12 @@ extern const CGFloat VLCVolumeDefault;
 
 /**
  * select a track
+ * @param the track to select
+ * @param indicate whether multiple tracks may be played (video and SPU only)
  * @note since tracks are unique, you do not need to specify the type
  * @note listen to VLCTrackSelectionChanged to be notified once the change occured
  */
-- (void)selectTrack:(VLCTrackMetaData *)track;
+- (void)selectTrack:(VLCTrackMetaData *)track exclusively:(BOOL)exclusiveSelection;
 
 /**
  * unselect a track
