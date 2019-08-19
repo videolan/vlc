@@ -35,7 +35,7 @@
 
 /* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream, 8 for 0xa0 AOB stream */
 #define PS_TK_COUNT (256+256+256+8 - 0xc0)
-static inline int ps_id_to_tk( unsigned i_id )
+static inline unsigned ps_id_to_tk( unsigned i_id )
 {
     assert(i_id >= 0xc0);
     if(unlikely(i_id < 0xc0))
@@ -491,7 +491,7 @@ static inline int ps_pkt_parse_system( const uint8_t *p_pkt, size_t i_pkt,
         if( i_id < 0xc0 )
             continue;
 
-        int i_tk = ps_id_to_tk( i_id );
+        unsigned i_tk = ps_id_to_tk( i_id );
         if( !tk[i_tk].b_configured )
             ps_track_fill( &tk[i_tk], p_psm, i_id, NULL, 0, false );
     }
