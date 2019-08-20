@@ -230,7 +230,7 @@ struct encoder_owner_callbacks
  *
  * @return the held decoder device, NULL if none should be used
  */
-VLC_API vlc_decoder_device *encoder_GetDecoderDevice( encoder_t * );
+VLC_API vlc_decoder_device *vlc_encoder_GetDecoderDevice( encoder_t * );
 
 
 /**

@@ -297,7 +297,7 @@ vlc_decoder_device* vlc_video_context_HoldDevice(vlc_video_context *vctx)
 
 
 /** encoder **/
-vlc_decoder_device *encoder_GetDecoderDevice( encoder_t *enc )
+vlc_decoder_device *vlc_encoder_GetDecoderDevice( encoder_t *enc )
 {
     vlc_assert( enc->fmt_in.i_cat == VIDEO_ES && enc->cbs != NULL );
     if ( unlikely(enc->fmt_in.i_cat != VIDEO_ES || enc->cbs == NULL ) )
