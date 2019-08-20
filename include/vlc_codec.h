@@ -214,6 +214,25 @@ struct decoder_cc_desc_t
  * @}
  */
 
+struct encoder_owner_callbacks
+{
+    struct
+    {
+        vlc_decoder_device *(*get_device)( encoder_t * );
+    } video;
+};
+
+/**
+ * Creates/Updates the output decoder device.
+ *
+ * \note
+ * This function is not reentrant.
+ *
+ * @return the held decoder device, NULL if none should be used
+ */
+VLC_API vlc_decoder_device *encoder_GetDecoderDevice( encoder_t * );
+
+
 /**
  * \defgroup encoder Encoder
  * \ingroup sout
@@ -247,6 +266,9 @@ struct encoder_t
 
     /* Encoder config */
     config_chain_t *p_cfg;
+
+    /* Private structure for the owner of the encoder */
+    const struct encoder_owner_callbacks *cbs;
 };
 
 /**

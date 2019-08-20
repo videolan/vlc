@@ -294,3 +294,14 @@ vlc_decoder_device* vlc_video_context_HoldDevice(vlc_video_context *vctx)
         return NULL;
     return vlc_decoder_device_Hold( vctx->device );
 }
+
+
+/** encoder **/
+vlc_decoder_device *encoder_GetDecoderDevice( encoder_t *enc )
+{
+    vlc_assert( enc->fmt_in.i_cat == VIDEO_ES && enc->cbs != NULL );
+    if ( unlikely(enc->fmt_in.i_cat != VIDEO_ES || enc->cbs == NULL ) )
+        return NULL;
+
+    return enc->cbs->video.get_device( enc );
+}
