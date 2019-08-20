@@ -27,10 +27,25 @@ import "qrc:///style/"
 
 Utils.GridItem {
     id: item
+    function getImage(type){
+        switch (type){
 
+        case MLNetworkModel.TYPE_DISC:
+            return  "qrc:///type/disc.svg"
+        case MLNetworkModel.TYPE_CARD:
+            return  "qrc:///type/capture-card.svg"
+        case MLNetworkModel.TYPE_STREAM:
+            return  "qrc:///type/stream.svg"
+        case MLNetworkModel.TYPE_PLAYLIST:
+            return  "qrc:///type/playlist.svg"
+
+        default:
+            return "qrc:///type/directory_black.svg"
+        }
+    }
     pictureWidth: VLCStyle.network_normal
     pictureHeight: VLCStyle.network_normal
-    image: "qrc:///type/directory_black.svg"
+    image: item.getImage(model.type)
     subtitle: model.mrl
     title: model.name || qsTr("Unknown share")
     focus: true

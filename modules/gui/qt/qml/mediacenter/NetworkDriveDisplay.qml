@@ -42,7 +42,7 @@ Utils.ListItem {
     }
     line1: model.name || qsTr("Unknown share")
     line2: model.mrl
-    imageText: model.type === MLNetworkModel.TYPE_SHARE ? model.protocol : ""
+    imageText: (model.type !== MLNetworkModel.TYPE_DIRECTORY && model.type !== MLNetworkModel.TYPE_NODE) ? model.protocol : ""
 
     showContextButton: true
     onContextMenuButtonClicked: {
