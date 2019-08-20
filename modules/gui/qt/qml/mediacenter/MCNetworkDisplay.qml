@@ -71,61 +71,54 @@ Utils.NavigableFocusScope {
 
         onClosed: contextMenu.parent.forceActiveFocus()
     }
-    Utils.SelectableDelegateModel {
+
+    MLNetworkModel {
+        id: providerModel
+        ctx: mainctx
+        tree: undefined
+    }
+
+    MLNetworkModel {
+        id: favModel
+        ctx: mainctx
+        tree: undefined
+        sd_source: "SD_CAT_DEVICES"
+    }
+    MLNetworkModel {
+        id: machineModel
+        ctx: mainctx
+        tree: undefined
+        sd_source: "SD_CAT_DEVICES"
+    }
+    MLNetworkModel {
+        id: lanModel
+        ctx: mainctx
+        tree: undefined
+        sd_source: "SD_CAT_LAN"
+    }
+
+    MCNetworksSectionSelectableDM{
         id: delegateModel
+        model: providerModel
+        viewIndexPropertyName: "currentIndexProvider"
+    }
 
-        model:  MLNetworkModel {
-            id: mlModel
-            ctx: mainctx
-            tree: undefined
-        }
+    MCNetworksSectionSelectableDM{
+        id: favDM
+        model: favModel
+        viewIndexPropertyName: "currentIndexFavourites"
+    }
 
-        delegate: Package {
-            id: element
-            Loader {
-                id: delegateLoaderGrid
-                focus: true
-                Package.name: "grid"
-                source: model.type == MLNetworkModel.TYPE_FILE ?
-                            "qrc:///mediacenter/NetworkFileDisplayGrid.qml" :
-                            "qrc:///mediacenter/NetworkDriveDisplayGrid.qml";
-            }
+    MCNetworksSectionSelectableDM{
+        id: machineDM
+        model: machineModel
+        viewIndexPropertyName: "currentIndexMachine"
+    }
 
-            Loader {
-                id: delegateLoader
-                focus: true
-                Package.name: "list"
-                source: model.type == MLNetworkModel.TYPE_FILE ?
-                            "qrc:///mediacenter/NetworkFileDisplay.qml" :
-                            "qrc:///mediacenter/NetworkDriveDisplay.qml";
-            }
-            Connections {
-                target: delegateLoader.item
-                onActionLeft: root.actionLeft(0)
-                onActionRight: root.actionRight(0)
-            }
-
-        }
-
-        function actionAtIndex(index) {
-            if ( delegateModel.selectedGroup.count > 1 ) {
-                var list = []
-                for (var i = 0; i < delegateModel.selectedGroup.count; i++) {
-                    var type = delegateModel.selectedGroup.get(i).model.type;
-                    var mrl = delegateModel.selectedGroup.get(i).model.mrl;
-                    if (type == MLNetworkModel.TYPE_FILE)
-                        list.push(mrl)
-                }
-                medialib.addAndPlay( list )
-            } else {
-                if (delegateModel.items.get(index).model.type != MLNetworkModel.TYPE_FILE)  {
-                    root.tree = delegateModel.items.get(index).model.tree
-                    history.push(["mc", "network", { tree: delegateModel.items.get(index).model.tree }], History.Stay);
-                } else {
-                    medialib.addAndPlay( delegateModel.items.get(index).model.mrl );
-                }
-            }
-        }
+    MCNetworksSectionSelectableDM{
+        id: lanDM
+        model: lanModel
+        viewIndexPropertyName: "currentIndexLan"
     }
 
     /*
@@ -134,12 +127,15 @@ Utils.NavigableFocusScope {
      * selectedGroup update itself after this event
      */
     onActiveFocusChanged: {
-        if (activeFocus && delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
+        if (delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
             var initialIndex = 0
-            if (view.currentItem.currentIndex !== -1)
-                initialIndex = view.currentItem.currentIndex
+            if (view.currentIndexProvider !== -1)
+                initialIndex = view.currentIndexProvider
             delegateModel.items.get(initialIndex).inSelected = true
-            view.currentItem.currentIndex = initialIndex
+            view.currentIndexProvider = initialIndex
+        }
+    }
+
         }
     }
 
@@ -199,11 +195,18 @@ Utils.NavigableFocusScope {
         anchors.fill:parent
         clip: true
         focus: true
-        initialItem: medialib.gridView ? gridComponent : listComponent
-        property int currentIndex: -1
+        initialItem: isOnProviderList ? topComponent : medialib.gridView ? gridComponent : listComponent
+        property bool isOnProviderList: providerModel.is_on_provider_list
+        property int currentIndexProvider: -1
+
+        property int currentIndexFavourites: -1
+        property int currentIndexMachine: -1
+        property int currentIndexLan: -1
         Connections {
             target: medialib
             onGridViewChanged: {
+                if (view.isOnProviderList)
+                    return
                 if (medialib.gridView)
                     view.replace(gridComponent)
                 else
@@ -214,7 +217,11 @@ Utils.NavigableFocusScope {
 
     Label {
         anchors.centerIn: parent
-        visible: delegateModel.items.count === 0
+        visible: providerModel.is_on_provider_list?
+                     (machineDM.items.count === 0
+                      && lanDM.items.count === 0
+                      && favDM.items.count === 0 )
+                   : delegateModel.items.count === 0
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
         text: qsTr("No network shares found")
