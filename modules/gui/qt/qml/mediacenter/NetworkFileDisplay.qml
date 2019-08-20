@@ -51,8 +51,8 @@ Utils.ListItem {
             contextMenu.model = model
             contextMenu.popup(this)
         }
-        delegateModel.updateSelection( modifier, view.currentIndex, index )
-        view.currentIndex = index
+        delegateModel.updateSelection( modifier, view[viewIndexPropertyName], index )
+        view[viewIndexPropertyName] = index
         this.forceActiveFocus()
     }
     onItemDoubleClicked: {

@@ -56,8 +56,8 @@ Utils.GridItem {
             contextMenu.model = model
             contextMenu.popup(menuParent)
         }
-        delegateModel.updateSelection( modifier ,  view.currentIndex, index)
-        view.currentItem.currentIndex = index
+        delegateModel.updateSelection( modifier ,  view[viewIndexPropertyName], index)
+        view[viewIndexPropertyName] = index
         item.forceActiveFocus()
     }
     noActionButtons: true
