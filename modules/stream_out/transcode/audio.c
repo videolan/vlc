@@ -165,7 +165,7 @@ int transcode_audio_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
      * This should be enough to initialize the encoder for the first time (it
      * will be reloaded when all informations from the decoder are available).
      * */
-    if( transcode_encoder_test( VLC_OBJECT(p_stream),
+    if( transcode_encoder_test( sout_EncoderCreate(p_stream, sizeof(encoder_t)),
                                 id->p_enccfg,
                                 &id->decoder_out,
                                 id->p_decoder->fmt_out.i_codec,

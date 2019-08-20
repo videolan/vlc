@@ -283,16 +283,12 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
              (const char *)&p_enc_in->i_chroma);
 }
 
-int transcode_encoder_video_test( vlc_object_t *p_obj,
+int transcode_encoder_video_test( encoder_t *p_encoder,
                                   const transcode_encoder_config_t *p_cfg,
                                   const es_format_t *p_dec_fmtin,
                                   vlc_fourcc_t i_codec_in,
                                   es_format_t *p_enc_wanted_in )
 {
-    encoder_t *p_encoder = sout_EncoderCreate( p_obj, sizeof(encoder_t) );
-    if( !p_encoder )
-        return VLC_EGENERIC;
-
     p_encoder->i_threads = p_cfg->video.threads.i_count;
     p_encoder->p_cfg = p_cfg->p_config_chain;
 
@@ -324,7 +320,7 @@ int transcode_encoder_video_test( vlc_object_t *p_obj,
     module_t *p_module = module_need( p_encoder, "encoder", p_cfg->psz_name, true );
     if( !p_module )
     {
-        msg_Err( p_obj, "cannot find video encoder (module:%s fourcc:%4.4s). "
+        msg_Err( p_encoder, "cannot find video encoder (module:%s fourcc:%4.4s). "
                            "Take a look few lines earlier to see possible reason.",
                  p_cfg->psz_name ? p_cfg->psz_name : "any",
                  (char *)&p_cfg->i_codec );

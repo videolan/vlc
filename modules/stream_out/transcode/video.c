@@ -220,7 +220,7 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     es_format_t encoder_tested_fmt_in;
     es_format_Init( &encoder_tested_fmt_in, id->decoder_out.i_cat, 0 );
 
-    if( transcode_encoder_test( VLC_OBJECT(p_stream),
+    if( transcode_encoder_test( sout_EncoderCreate(p_stream, sizeof(struct encoder_t)),
                                 id->p_enccfg,
                                 &id->p_decoder->fmt_in,
                                 id->p_decoder->fmt_out.i_codec,

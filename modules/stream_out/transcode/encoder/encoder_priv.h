@@ -49,13 +49,13 @@ block_t * transcode_encoder_spu_encode( transcode_encoder_t *p_enc, subpicture_t
 int transcode_encoder_audio_drain( transcode_encoder_t *p_enc, block_t **out );
 int transcode_encoder_video_drain( transcode_encoder_t *p_enc, block_t **out );
 
-int transcode_encoder_video_test( vlc_object_t *p_obj,
+int transcode_encoder_video_test( encoder_t *p_encoder,
                                   const transcode_encoder_config_t *p_cfg,
                                   const es_format_t *p_dec_fmtin,
                                   vlc_fourcc_t i_codec_in,
                                   es_format_t *p_enc_wanted_in );
 
-int transcode_encoder_audio_test( vlc_object_t *p_obj,
+int transcode_encoder_audio_test( encoder_t *p_encoder,
                                   const transcode_encoder_config_t *p_cfg,
                                   const es_format_t *p_dec_out,
                                   vlc_fourcc_t i_codec_in,

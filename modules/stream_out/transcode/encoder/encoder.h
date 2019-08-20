@@ -78,7 +78,7 @@ bool transcode_encoder_opened( const transcode_encoder_t * );
 int transcode_encoder_open( transcode_encoder_t *, const transcode_encoder_config_t * );
 int transcode_encoder_drain( transcode_encoder_t *, block_t ** );
 
-int transcode_encoder_test( vlc_object_t *p_obj,
+int transcode_encoder_test( encoder_t *p_encoder,
                             const transcode_encoder_config_t *p_cfg,
                             const es_format_t *p_dec_fmtin,
                             vlc_fourcc_t i_codec_in,

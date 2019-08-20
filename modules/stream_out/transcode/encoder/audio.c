@@ -139,16 +139,12 @@ int transcode_encoder_audio_configure( const transcode_encoder_config_t *p_cfg,
     return encoder_audio_configure( p_cfg, p_dec_out, p_enc->p_encoder, b_keep_fmtin );
 }
 
-int transcode_encoder_audio_test( vlc_object_t *p_obj,
+int transcode_encoder_audio_test( encoder_t *p_encoder,
                                   const transcode_encoder_config_t *p_cfg,
                                   const es_format_t *p_dec_out,
                                   vlc_fourcc_t i_codec_in,
                                   es_format_t *p_enc_wanted_in )
 {
-    encoder_t *p_encoder = sout_EncoderCreate( p_obj, sizeof(encoder_t) );
-    if( !p_encoder )
-        return VLC_EGENERIC;
-
     p_encoder->p_cfg = p_cfg->p_config_chain;
 
     es_format_Init( &p_encoder->fmt_in, AUDIO_ES, i_codec_in );
@@ -176,7 +172,7 @@ int transcode_encoder_audio_test( vlc_object_t *p_obj,
     module_t *p_module = module_need( p_encoder, "encoder", p_cfg->psz_name, true );
     if( !p_module )
     {
-        msg_Err( p_obj, "cannot find audio encoder (module:%s fourcc:%4.4s). "
+        msg_Err( p_encoder, "cannot find audio encoder (module:%s fourcc:%4.4s). "
                            "Take a look few lines earlier to see possible reason.",
                            p_cfg->psz_name ? p_cfg->psz_name : "any",
                            (char *)&p_cfg->i_codec );

@@ -220,19 +220,22 @@ int transcode_encoder_drain( transcode_encoder_t *p_enc, block_t **out )
     }
 }
 
-int transcode_encoder_test( vlc_object_t *p_obj,
+int transcode_encoder_test( encoder_t *p_encoder,
                             const transcode_encoder_config_t *p_cfg,
                             const es_format_t *p_dec_fmtin,
                             vlc_fourcc_t i_codec_in,
                             es_format_t *p_enc_wanted_in )
 {
+    if( !p_encoder )
+        return VLC_EGENERIC;
+
     switch ( p_dec_fmtin->i_cat )
     {
         case VIDEO_ES:
-            return transcode_encoder_video_test( p_obj, p_cfg, p_dec_fmtin,
+            return transcode_encoder_video_test( p_encoder, p_cfg, p_dec_fmtin,
                                                  i_codec_in, p_enc_wanted_in );
         case AUDIO_ES:
-            return transcode_encoder_audio_test( p_obj, p_cfg, p_dec_fmtin,
+            return transcode_encoder_audio_test( p_encoder, p_cfg, p_dec_fmtin,
                                                  i_codec_in, p_enc_wanted_in );
         default:
             return VLC_EGENERIC;
