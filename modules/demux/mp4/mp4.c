@@ -249,9 +249,22 @@ static uint32_t stream_ReadU32( stream_t *s, void *p_read, uint32_t i_toread )
     return i_return;
 }
 
-static inline bool MP4_isMetadata(const mp4_track_t *tk)
+static int MP4_reftypeToFlag( vlc_fourcc_t i_reftype )
 {
-    return tk->as_reftype != 0 && tk->as_reftype != ATOM_subt;
+    switch( i_reftype )
+    {
+        case ATOM_chap:
+            return USEAS_CHAPTERS;
+        case VLC_FOURCC('t','m','c','d'):
+            return USEAS_TIMECODE;
+        default:
+            return USEAS_NONE;
+    }
+}
+
+static bool MP4_isMetadata( const mp4_track_t *tk )
+{
+    return tk->i_use_flags & (USEAS_CHAPTERS|USEAS_TIMECODE);
 }
 
 static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id )
@@ -1014,7 +1027,11 @@ static int Open( vlc_object_t * p_this )
             {
                 mp4_track_t *reftk = MP4_GetTrackByTrackID(p_demux, refdata->i_track_ID[j]);
                 if(reftk)
-                    reftk->as_reftype = p_refbox->i_type;
+                {
+                    msg_Dbg( p_demux, "track 0x%x refs track 0x%x for %4.4s", i,
+                             refdata->i_track_ID[j], (const char *) &p_refbox->i_type );
+                    reftk->i_use_flags |= MP4_reftypeToFlag( p_refbox->i_type );
+                }
             }
         }
     }
@@ -1029,7 +1046,7 @@ static int Open( vlc_object_t * p_this )
         MP4_Box_t *p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%u]", i );
         MP4_TrackSetup( p_demux, &p_sys->track[i], p_trak, true, !b_enabled_es );
 
-        if( p_sys->track[i].b_ok && !p_sys->track[i].as_reftype )
+        if( p_sys->track[i].b_ok && ! MP4_isMetadata(&p_sys->track[i]) )
         {
             const char *psz_cat;
             switch( p_sys->track[i].fmt.i_cat )
@@ -1055,7 +1072,7 @@ static int Open( vlc_object_t * p_this )
                      p_sys->track[i].fmt.psz_language ?
                      p_sys->track[i].fmt.psz_language : "undef" );
         }
-        else if( p_sys->track[i].b_ok && p_sys->track[i].as_reftype == ATOM_chap )
+        else if( p_sys->track[i].b_ok && (p_sys->track[i].i_use_flags & USEAS_CHAPTERS) )
         {
             msg_Dbg( p_demux, "using track[Id 0x%x] for chapter language %s",
                      p_sys->track[i].i_track_ID,
@@ -1064,8 +1081,8 @@ static int Open( vlc_object_t * p_this )
         }
         else
         {
-            msg_Dbg( p_demux, "ignoring track[Id 0x%x]",
-                     p_sys->track[i].i_track_ID );
+            msg_Dbg( p_demux, "ignoring track[Id 0x%x] %d refs %x",
+                     p_sys->track[i].i_track_ID, p_sys->track[i].b_ok, p_sys->track[i].i_use_flags );
         }
     }
 
@@ -1322,7 +1339,7 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
     if( !tk->b_ok || tk->i_sample >= tk->i_sample_count )
         return VLC_DEMUXER_EOS;
 
-    if( tk->as_reftype == ATOM_chap )
+    if( tk->i_use_flags & USEAS_CHAPTERS )
         return VLC_DEMUXER_SUCCESS;
 
     uint32_t i_run_seq = MP4_TrackGetRunSeq( tk );
@@ -2412,7 +2429,7 @@ static void LoadChapter( demux_t  *p_demux )
         for( unsigned i = 0; i < p_sys->i_tracks; i++ )
         {
             mp4_track_t *tk = &p_sys->track[i];
-            if(tk->b_ok && tk->as_reftype == ATOM_chap &&
+            if(tk->b_ok && (tk->i_use_flags & USEAS_CHAPTERS) &&
                tk->fmt.i_cat == SPU_ES && tk->fmt.i_codec == VLC_CODEC_TX3G)
             {
                 LoadChapterApple( p_demux, tk );
@@ -3549,7 +3566,7 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
 
     /* Disable chapter only track */
     if( p_track->fmt.i_cat == UNKNOWN_ES &&
-        p_track->as_reftype == ATOM_chap )
+       (p_track->i_use_flags & USEAS_CHAPTERS) )
         p_track->b_enable = false;
 
     const MP4_Box_t *p_tsel;
