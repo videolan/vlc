@@ -126,7 +126,16 @@ const CGFloat LayoutSpacer;
     if (_representedAlbum.year > 0) {
         self.yearTextField.intValue = _representedAlbum.year;
     }
-    self.summaryTextField.stringValue = _representedAlbum.summary;
+
+    if (_representedAlbum.summary.length > 0) {
+        self.summaryTextField.stringValue = _representedAlbum.summary;
+    } else {
+        if (_representedAlbum.numberOfTracks > 1) {
+            self.summaryTextField.stringValue = [NSString stringWithFormat:_NS("%i tracks"), _representedAlbum.numberOfTracks];
+        } else {
+            self.summaryTextField.stringValue = _NS("1 track");
+        }
+    }
 
     NSImage *image;
     if (_representedAlbum.artworkMRL.length > 0) {

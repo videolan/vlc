@@ -329,7 +329,19 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
         {
             VLCMediaLibraryArtist *artist = _displayedCollection[indexPath.item];
             viewItem.mediaTitleTextField.stringValue = artist.name;
-            viewItem.durationTextField.stringValue = [NSString stringWithFormat:_NS("%u albums, %u songs"), artist.numberOfAlbums, artist.numberOfTracks];
+            NSString *countMetadataString;
+            if (artist.numberOfAlbums > 1) {
+                countMetadataString = [NSString stringWithFormat:_NS("%u albums"), artist.numberOfAlbums];
+            } else {
+                countMetadataString = _NS("1 album");
+            }
+            if (artist.numberOfTracks > 1) {
+                countMetadataString = [countMetadataString stringByAppendingFormat:@", %@", [NSString stringWithFormat:_NS("%u songs"), artist.numberOfTracks]];
+            } else {
+                countMetadataString = [countMetadataString stringByAppendingFormat:@", %@", _NS("1 song")];
+            }
+            viewItem.durationTextField.stringValue = countMetadataString;
+
             NSImage *image;
             if (artist.artworkMRL.length > 0) {
                 image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:artist.artworkMRL]];
@@ -344,7 +356,11 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
         {
             VLCMediaLibraryAlbum *album = _displayedCollection[indexPath.item];
             viewItem.mediaTitleTextField.stringValue = album.title;
-            viewItem.durationTextField.stringValue = [NSString stringWithFormat:_NS("%u songs"), album.numberOfTracks];
+            if (album.numberOfTracks > 1) {
+                viewItem.durationTextField.stringValue = [NSString stringWithFormat:_NS("%u songs"), album.numberOfTracks];
+            } else {
+                viewItem.durationTextField.stringValue = _NS("1 song");
+            }
             NSImage *image;
             if (album.artworkMRL.length > 0) {
                 image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:album.artworkMRL]];
@@ -365,7 +381,11 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
         {
             VLCMediaLibraryGenre *genre = _displayedCollection[indexPath.item];
             viewItem.mediaTitleTextField.stringValue = genre.name;
-            viewItem.durationTextField.stringValue = [NSString stringWithFormat:_NS("%u items"), genre.numberOfTracks];
+            if (genre.numberOfTracks > 1) {
+                viewItem.durationTextField.stringValue = [NSString stringWithFormat:_NS("%u songs"), genre.numberOfTracks];
+            } else {
+                viewItem.durationTextField.stringValue = _NS("1 song");
+            }
             viewItem.mediaImageView.image = [NSImage imageNamed: @"noart.png"];
         }
 
