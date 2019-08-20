@@ -29,7 +29,7 @@ import "qrc:///style/"
 Utils.NavigableFocusScope {
     id: root
 
-    property alias tree: mlModel.tree
+    property alias tree: providerModel.tree
     Utils.MenuExt {
         id: contextMenu
         property var model: ({})
@@ -136,6 +136,61 @@ Utils.NavigableFocusScope {
         }
     }
 
+    Component{
+        id: topComponent
+        Flickable{
+            id: flickable
+            height: view.height
+            width: view.width
+            contentHeight: allSections.implicitHeight
+            ScrollBar.vertical: ScrollBar{}
+            onActiveFocusChanged: {
+                if(activeFocus)
+                    favouritesSection.forceActiveFocus()
+            }
+            function shiftX(index){
+                return machineSection.shiftX(index)
+            }
+            Rectangle{
+                id: allSections
+                color: VLCStyle.colors.bg
+                implicitHeight: childrenRect.height
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+                MCNetworksSection{
+                    id: favouritesSection
+                    text: qsTr("Favourites")
+                    currentIndex: view.currentIndexFavourites
+                    selectableDelegateModel: favDM
+                    visible: favDM.items.count > 0
+                    onActionDown: machineSection.focus = true
+                    onActionUp: root.actionUp(index)
+                }
+
+                MCNetworksSection{
+                    id: machineSection
+                    anchors.top: favouritesSection.bottom
+                    text: qsTr("Machine")
+                    currentIndex: view.currentIndexMachine
+                    selectableDelegateModel: machineDM
+                    visible: machineDM.items.count > 0
+                    onActionDown: lanSection.focus = true
+                    onActionUp: favouritesSection.focus = true
+                }
+                MCNetworksSection{
+                    id: lanSection
+                    anchors.top: machineSection.bottom
+                    text: qsTr("Lan")
+                    currentIndex: view.currentIndexLan
+                    selectableDelegateModel: lanDM
+                    visible: lanDM.items.count > 0
+                    onActionDown: root.actionDown(index)
+                    onActionUp: machineSection.focus = true
+                }
+            }
+
         }
     }
 
@@ -149,6 +204,7 @@ Utils.NavigableFocusScope {
 
            model: delegateModel.parts.grid
            modelCount: delegateModel.items.count
+           currentIndex: view.currentIndexProvider
 
            focus: true
 
@@ -174,6 +230,7 @@ Utils.NavigableFocusScope {
            width: view.width
            model: delegateModel.parts.list
            modelCount: delegateModel.items.count
+           currentIndex: view.currentIndexProvider
 
            focus: true
            spacing: VLCStyle.margin_xxxsmall
