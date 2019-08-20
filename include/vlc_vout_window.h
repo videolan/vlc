@@ -191,7 +191,7 @@ struct vout_window_callbacks {
     /**
      * Callback for window size changes.
      *
-     * This callback function (if non-NULL) is invoked when the windowing
+     * This callback function is invoked when the windowing
      * system changes the window size.
      *
      * This event may occur synchronously when the window is created or a size
