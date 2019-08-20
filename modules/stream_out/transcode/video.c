@@ -60,12 +60,36 @@ static const video_format_t* filtered_video_format( sout_stream_id_sys_t *id,
     return &p_pic->format;
 }
 
+struct encoder_owner
+{
+    encoder_t enc;
+    sout_stream_id_sys_t *id;
+};
+
 static vlc_decoder_device *TranscodeHoldDecoderDevice(vlc_object_t *o, sout_stream_id_sys_t *id)
 {
     if (id->dec_dev == NULL)
         id->dec_dev = vlc_decoder_device_Create( o, NULL );
     return id->dec_dev ? vlc_decoder_device_Hold(id->dec_dev) : NULL;
 }
+
+static inline struct encoder_owner *enc_get_owner( encoder_t *p_enc )
+{
+    return container_of( p_enc, struct encoder_owner, enc );
+}
+
+static vlc_decoder_device *video_get_encoder_device( encoder_t *enc )
+{
+    struct encoder_owner *p_owner = enc_get_owner( enc );
+    if (p_owner->id->dec_dev == NULL)
+        p_owner->id->dec_dev = vlc_decoder_device_Create( &enc->obj, NULL );
+
+    return p_owner->id->dec_dev ? vlc_decoder_device_Hold(p_owner->id->dec_dev) : NULL;
+}
+
+static const struct encoder_owner_callbacks encoder_video_transcode_cbs = {
+    { video_get_encoder_device, }
+};
 
 static vlc_decoder_device * video_get_decoder_device( decoder_t *p_dec )
 {
@@ -220,7 +244,20 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     es_format_t encoder_tested_fmt_in;
     es_format_Init( &encoder_tested_fmt_in, id->decoder_out.i_cat, 0 );
 
-    if( transcode_encoder_test( sout_EncoderCreate(p_stream, sizeof(struct encoder_t)),
+    struct encoder_owner *p_enc_owner = (struct encoder_owner*)sout_EncoderCreate(p_stream, sizeof(struct encoder_owner));
+    if ( unlikely(p_enc_owner == NULL))
+    {
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
+        id->p_decoder->p_module = NULL;
+        video_format_Clean( &id->fmt_input_video );
+        es_format_Clean( &id->decoder_out );
+        es_format_Clean( &encoder_tested_fmt_in );
+        return VLC_EGENERIC;
+    }
+    p_enc_owner->id = id;
+    p_enc_owner->enc.cbs = &encoder_video_transcode_cbs;
+
+    if( transcode_encoder_test( &p_enc_owner->enc,
                                 id->p_enccfg,
                                 &id->p_decoder->fmt_in,
                                 id->p_decoder->fmt_out.i_codec,
@@ -234,7 +271,17 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
         return VLC_EGENERIC;
     }
 
-    id->encoder = transcode_encoder_new( sout_EncoderCreate(VLC_OBJECT(p_stream), sizeof(encoder_t)), &encoder_tested_fmt_in );
+    p_enc_owner = (struct encoder_owner *)sout_EncoderCreate(p_stream, sizeof(struct encoder_owner));
+    if ( unlikely(p_enc_owner == NULL))
+    {
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
+        id->p_decoder->p_module = NULL;
+        es_format_Clean( &encoder_tested_fmt_in );
+        es_format_Clean( &id->decoder_out );
+        return VLC_EGENERIC;
+    }
+
+    id->encoder = transcode_encoder_new( &p_enc_owner->enc, &encoder_tested_fmt_in );
     if( !id->encoder )
     {
         module_unneed( id->p_decoder, id->p_decoder->p_module );
@@ -244,6 +291,9 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
         es_format_Clean( &id->decoder_out );
         return VLC_EGENERIC;
     }
+    p_enc_owner->id = id;
+    p_enc_owner->enc.cbs = &encoder_video_transcode_cbs;
+
     /* Will use this format as encoder input for now */
     transcode_encoder_update_format_in( id->encoder, &encoder_tested_fmt_in );
 
