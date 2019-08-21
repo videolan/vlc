@@ -80,6 +80,7 @@ static struct {
     { "bg",    "български език" },
     { "ca",    "Català" },
     { "zh_TW", "正體中文" },
+    { "co",    "Corsu" },
     { "cs",    "Čeština" },
     { "cy",    "Cymraeg" },
     { "da",    "Dansk" },

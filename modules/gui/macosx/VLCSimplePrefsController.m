@@ -66,6 +66,7 @@ static struct {
     { "bg",    "български език",        NO },
     { "ca",    "Català",                NO },
     { "zh_TW", "正體中文",                NO },
+    { "co",    "Corsu",                 NO },
     { "cs",    "Čeština",               NO },
     { "cy",    "Cymraeg",               NO },
     { "da",    "Dansk",                 NO },
