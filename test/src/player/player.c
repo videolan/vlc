@@ -142,6 +142,7 @@ REPORT_LIST
 struct media_params
 {
     vlc_tick_t length;
+    vlc_tick_t audio_sample_length;
     size_t track_count[DATA_ES];
     size_t program_count;
 
@@ -158,6 +159,7 @@ struct media_params
 
 #define DEFAULT_MEDIA_PARAMS(param_length) { \
     .length = param_length, \
+    .audio_sample_length = VLC_TICK_FROM_MS(100), \
     .track_count = { \
         [VIDEO_ES] = 1, \
         [AUDIO_ES] = 1, \
@@ -628,14 +630,15 @@ create_mock_media(const char *name, const struct media_params *params)
         "mock://video_width=4;video_height=4;"
         "video_track_count=%zu;audio_track_count=%zu;sub_track_count=%zu;"
         "program_count=%zu;video_packetized=%d;audio_packetized=%d;"
-        "sub_packetized=%d;length=%"PRId64";title_count=%zu;chapter_count=%zu;"
+        "sub_packetized=%d;length=%"PRId64";audio_sample_length=%"PRId64";"
+        "title_count=%zu;chapter_count=%zu;"
         "can_seek=%d;can_pause=%d;error=%d;null_names=%d",
         params->track_count[VIDEO_ES], params->track_count[AUDIO_ES],
         params->track_count[SPU_ES], params->program_count,
         params->video_packetized, params->audio_packetized,
-        params->sub_packetized, params->length, params->title_count,
-        params->chapter_count, params->can_seek, params->can_pause,
-        params->error, params->null_names);
+        params->sub_packetized, params->length, params->audio_sample_length,
+        params->title_count, params->chapter_count, params->can_seek,
+        params->can_pause, params->error, params->null_names);
     assert(ret != -1);
 
     input_item_t *item = input_item_New(url, name);
