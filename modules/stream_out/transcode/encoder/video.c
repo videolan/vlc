@@ -212,7 +212,6 @@ static void transcode_video_size_config_apply( vlc_object_t *p_obj,
 }
 
 void transcode_encoder_video_configure( vlc_object_t *p_obj,
-                                        const video_format_t *p_dec_in,
                                         const video_format_t *p_dec_out,
                                         const transcode_encoder_config_t *p_cfg,
                                         const video_format_t *p_src,
@@ -234,7 +233,9 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
     }
 
     /* Complete source format */
-    p_enc_in->orientation = p_enc_out->orientation = p_dec_in->orientation;
+    p_enc_in->orientation = ORIENT_NORMAL;
+    p_enc_out->orientation = p_enc_in->orientation;
+
     p_enc_in->i_chroma = p_enc->p_encoder->fmt_in.i_codec;
 
     transcode_video_framerate_apply( p_src, p_enc_out );

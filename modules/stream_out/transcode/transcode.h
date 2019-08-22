@@ -16,6 +16,7 @@ typedef struct
             char            *psz_deinterlace;
             config_chain_t  *p_deinterlace_cfg;
             char            *psz_spu_sources;
+            bool             b_reorient;
         } video;
     };
 } sout_filters_config_t;
@@ -121,7 +122,10 @@ struct sout_stream_id_sys_t
          struct
          {
              filter_chain_t  *p_f_chain; /**< Video filters */
+             filter_chain_t  *p_conv_nonstatic;
+             filter_chain_t  *p_conv_static;
              filter_chain_t  *p_uf_chain; /**< User-specified video filters */
+             filter_chain_t  *p_final_conv_static;
              filter_t        *p_spu_blender;
              spu_t           *p_spu;
              video_format_t  fmt_input_video;
@@ -169,6 +173,15 @@ static inline void es_format_SetMeta( es_format_t *p_dst, const es_format_t *p_s
     {
         free( p_dst->psz_description );
         p_dst->psz_description = strdup( p_src->psz_description );
+    }
+}
+
+static inline void transcode_remove_filters( filter_chain_t **pp )
+{
+    if( *pp )
+    {
+        filter_chain_Delete( *pp );
+        *pp = NULL;
     }
 }
 

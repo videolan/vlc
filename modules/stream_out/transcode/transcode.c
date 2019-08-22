@@ -465,6 +465,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->senc_cfg.spu.i_height = (p_sys->venc_cfg.video.i_height) ? p_sys->venc_cfg.video.i_height : 720;
     vlc_mutex_init( &p_sys->lock );
 
+    /* Blending can't work outside of normal orientation */
+    p_sys->vfilters_cfg.video.b_reorient = p_sys->b_soverlay ||
+                                           p_sys->vfilters_cfg.video.psz_spu_sources;
+
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
