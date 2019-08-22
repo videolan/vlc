@@ -66,8 +66,20 @@ static char* ArtCacheGetDirPath( const char *psz_arturl, const char *psz_artist,
     if( !EMPTY_STR(psz_artist) && !EMPTY_STR(psz_album) )
     {
         char *psz_album_sanitized = strdup( psz_album );
+        if (!psz_album_sanitized)
+        {
+            free( psz_cachedir );
+            return NULL;
+        }
         filename_sanitize( psz_album_sanitized );
+
         char *psz_artist_sanitized = strdup( psz_artist );
+        if (!psz_artist_sanitized)
+        {
+            free( psz_cachedir );
+            free( psz_album_sanitized );
+            return NULL;
+        }
         filename_sanitize( psz_artist_sanitized );
         if( asprintf( &psz_dir, "%s" DIR_SEP "art" DIR_SEP "artistalbum"
                       DIR_SEP "%s" DIR_SEP "%s", psz_cachedir,
