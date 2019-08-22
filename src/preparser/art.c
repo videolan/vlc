@@ -58,7 +58,8 @@ static void ArtCacheCreateDir( const char *psz_dir )
 }
 
 static char* ArtCacheGetDirPath( const char *psz_arturl, const char *psz_artist,
-                                 const char *psz_album,  const char *psz_title )
+                                 const char *psz_album,  const char *psz_date,
+                                 const char *psz_title )
 {
     char *psz_dir;
     char *psz_cachedir = config_GetUserDir(VLC_CACHE_DIR);
@@ -81,12 +82,20 @@ static char* ArtCacheGetDirPath( const char *psz_arturl, const char *psz_artist,
             return NULL;
         }
         filename_sanitize( psz_artist_sanitized );
+
+        char *psz_date_sanitized = !EMPTY_STR(psz_date) ? strdup( psz_date ) : NULL;
+        if (psz_date_sanitized)
+            filename_sanitize(psz_date_sanitized);
+
         if( asprintf( &psz_dir, "%s" DIR_SEP "art" DIR_SEP "artistalbum"
-                      DIR_SEP "%s" DIR_SEP "%s", psz_cachedir,
-                      psz_artist_sanitized, psz_album_sanitized ) == -1 )
+                      DIR_SEP "%s" DIR_SEP "%s" DIR_SEP "%s", psz_cachedir,
+                      psz_artist_sanitized,
+                      psz_date_sanitized ? psz_date_sanitized : "0000",
+                      psz_album_sanitized ) == -1 )
             psz_dir = NULL;
         free( psz_album_sanitized );
         free( psz_artist_sanitized );
+        free( psz_date_sanitized );
     }
     else
     {
@@ -121,6 +130,7 @@ static char *ArtCachePath( input_item_t *p_item )
     const char *psz_album;
     const char *psz_arturl;
     const char *psz_title;
+    const char *psz_date;
 
     vlc_mutex_lock( &p_item->lock );
 
@@ -133,14 +143,14 @@ static char *ArtCachePath( input_item_t *p_item )
     psz_album = vlc_meta_Get( p_item->p_meta, vlc_meta_Album );
     psz_arturl = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
     psz_title = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
+    psz_date = vlc_meta_Get( p_item->p_meta, vlc_meta_Date );
     if( !psz_title )
         psz_title = p_item->psz_name;
-
 
     if( (EMPTY_STR(psz_artist) || EMPTY_STR(psz_album) ) && !psz_arturl )
         goto end;
 
-    psz_path = ArtCacheGetDirPath( psz_arturl, psz_artist, psz_album, psz_title );
+    psz_path = ArtCacheGetDirPath( psz_arturl, psz_artist, psz_album, psz_date, psz_title );
 
 end:
     vlc_mutex_unlock( &p_item->lock );

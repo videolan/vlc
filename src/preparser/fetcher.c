@@ -81,14 +81,16 @@ static char* CreateCacheKey( input_item_t* item )
 
     char const* artist = vlc_meta_Get( item->p_meta, vlc_meta_Artist );
     char const* album = vlc_meta_Get( item->p_meta, vlc_meta_Album );
+    char const *date = vlc_meta_Get( item->p_meta, vlc_meta_Date );
     char* key;
 
     /**
      * Simple concatenation of artist and album can lead to the same key
      * for entities that should not have such. Imagine { dogs, tick } and
      * { dog, stick } */
-    if( !artist || !album || asprintf( &key, "%s:%zu:%s:%zu",
-          artist, strlen( artist ), album, strlen( album ) ) < 0 )
+    if( !artist || !album || asprintf( &key, "%s:%zu:%s:%zu:%s",
+          artist, strlen( artist ), album, strlen( album ),
+          date ? date : "0000" ) < 0 )
     {
         key = NULL;
     }
