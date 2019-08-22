@@ -859,7 +859,7 @@ static const struct vout_window_operations em_ops = {
 /**
  * Wrap an existing X11 window to embed the video.
  */
-static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
+static int EmOpen (vout_window_t *wnd)
 {
     int ret = VLC_EGENERIC;
     xcb_window_t window = var_InheritInteger (wnd, "drawable-xid");
@@ -907,7 +907,6 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
 
     wnd->ops = &em_ops;
-    (void) cfg;
     return VLC_SUCCESS;
 
 error:
