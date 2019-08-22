@@ -272,7 +272,7 @@ picture_t *AllocPicture( filter_t *p_filter )
             fmt.i_width  = dstDesc.Width;
             fmt.i_height = dstDesc.Height;
             if (AllocateTextures(p_filter, &p_sys->d3d_dev, cfg,
-                                 &fmt, 1, pic_sys->texture) != VLC_SUCCESS)
+                                 &fmt, 1, pic_sys->texture, NULL) != VLC_SUCCESS)
             {
                 free(pic_sys);
                 return NULL;

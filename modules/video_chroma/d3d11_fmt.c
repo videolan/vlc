@@ -600,7 +600,8 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *o,
 #undef AllocateTextures
 int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
                       const d3d_format_t *cfg, const video_format_t *fmt,
-                      unsigned pool_size, ID3D11Texture2D *textures[] )
+                      unsigned pool_size, ID3D11Texture2D *textures[],
+                      plane_t out_planes[] )
 {
     plane_t planes[PICTURE_PLANE_MAX];
     int plane, plane_count;
@@ -639,16 +640,6 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
         assert(cfg->resourceFormat[1] == cfg->resourceFormat[0]);
         assert(cfg->resourceFormat[2] == cfg->resourceFormat[0]);
 
-        for( int i = 0; i < plane_count; i++ )
-        {
-            plane_t *p = &planes[i];
-
-            p->i_lines         = fmt->i_height * p_chroma_desc->p[i].h.num / p_chroma_desc->p[i].h.den;
-            p->i_visible_lines = fmt->i_visible_height * p_chroma_desc->p[i].h.num / p_chroma_desc->p[i].h.den;
-            p->i_pitch         = fmt->i_width * p_chroma_desc->p[i].w.num / p_chroma_desc->p[i].w.den * p_chroma_desc->pixel_size;
-            p->i_visible_pitch = fmt->i_visible_width * p_chroma_desc->p[i].w.num / p_chroma_desc->p[i].w.den * p_chroma_desc->pixel_size;
-            p->i_pixel_pitch   = p_chroma_desc->pixel_size;
-        }
     } else {
         plane_count = 1;
         texDesc.Format = cfg->formatTexture;
@@ -661,6 +652,16 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
             goto error;
         }
     }
+    for( int i = 0; i < p_chroma_desc->plane_count; i++ )
+    {
+        plane_t *p = &planes[i];
+
+        p->i_lines         = fmt->i_height * p_chroma_desc->p[i].h.num / p_chroma_desc->p[i].h.den;
+        p->i_visible_lines = fmt->i_visible_height * p_chroma_desc->p[i].h.num / p_chroma_desc->p[i].h.den;
+        p->i_pitch         = fmt->i_width * p_chroma_desc->p[i].w.num / p_chroma_desc->p[i].w.den * p_chroma_desc->pixel_size;
+        p->i_visible_pitch = fmt->i_visible_width * p_chroma_desc->p[i].w.num / p_chroma_desc->p[i].w.den * p_chroma_desc->pixel_size;
+        p->i_pixel_pitch   = p_chroma_desc->pixel_size;
+    }
 
     for (unsigned picture_count = 0; picture_count < pool_size; picture_count++) {
         for (plane = 0; plane < plane_count; plane++)
@@ -669,8 +670,8 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
                 textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] = slicedTexture;
                 ID3D11Texture2D_AddRef(slicedTexture);
             } else {
-                texDesc.Height = fmt->i_height * p_chroma_desc->p[plane].h.num / p_chroma_desc->p[plane].h.den;
-                texDesc.Width = fmt->i_width * p_chroma_desc->p[plane].w.num / p_chroma_desc->p[plane].w.den;
+                texDesc.Height = planes[plane].i_lines;
+                texDesc.Width  = planes[plane].i_pitch;
                 hr = ID3D11Device_CreateTexture2D( d3d_dev->d3ddevice, &texDesc, NULL, &textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] );
                 if (FAILED(hr)) {
                     msg_Err(obj, "CreateTexture2D failed for the %d pool. (hr=0x%lX)", pool_size, hr);
@@ -678,6 +679,11 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
                 }
             }
         }
+        if (out_planes)
+            for (plane = 0; plane < p_chroma_desc->plane_count; plane++)
+            {
+                out_planes[plane] = planes[plane];
+            }
         for (; plane < D3D11_MAX_SHADER_VIEW; plane++) {
             if (!cfg->resourceFormat[plane])
                 textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] = NULL;

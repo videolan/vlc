@@ -28,6 +28,8 @@
 
 #include "dxgi_fmt.h"
 
+#include <vlc_picture.h>
+
 DEFINE_GUID(GUID_CONTEXT_MUTEX, 0x472e8835, 0x3f8e, 0x4f93, 0xa0, 0xcb, 0x25, 0x79, 0x77, 0x6c, 0xed, 0x86);
 
 /* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics
@@ -145,8 +147,9 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *,
     FindD3D11Format(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 
 int AllocateTextures(vlc_object_t *, d3d11_device_t *, const d3d_format_t *,
-                     const video_format_t *, unsigned pool_size, ID3D11Texture2D *textures[]);
-#define AllocateTextures(a,b,c,d,e,f)  AllocateTextures(VLC_OBJECT(a),b,c,d,e,f)
+                     const video_format_t *, unsigned pool_size, ID3D11Texture2D *textures[],
+                     plane_t planes[]);
+#define AllocateTextures(a,b,c,d,e,f,g)  AllocateTextures(VLC_OBJECT(a),b,c,d,e,f,g)
 
 static inline void d3d11_device_lock(d3d11_device_t *d3d_dev)
 {

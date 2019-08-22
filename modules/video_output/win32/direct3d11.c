@@ -105,6 +105,7 @@ struct vout_display_sys_t
     ID3D11Query              *prepareWait;
 
     picture_sys_d3d11_t      stagingSys;
+    plane_t                  stagingPlanes[PICTURE_PLANE_MAX];
     picture_pool_t           *pool; /* hardware decoding pool */
 
     d3d_vshader_t            projectionVShader;
@@ -425,7 +426,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         /* only provide enough for the filters, we can still do direct rendering */
         slices = __MIN(slices, 6);
 
-    if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &sys->area.texture_source, slices, textures))
+    if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &sys->area.texture_source, slices, textures, NULL))
         goto error;
 
     pictures = calloc(pool_size, sizeof(*pictures));
@@ -631,10 +632,8 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     if (sys->picQuad.textureFormat->formatTexture == DXGI_FORMAT_UNKNOWN || !is_d3d11_opaque(picture->format.i_chroma))
     {
         D3D11_MAPPED_SUBRESOURCE mappedResource;
-        D3D11_TEXTURE2D_DESC texDesc;
         int i;
         HRESULT hr;
-        plane_t planes[PICTURE_PLANE_MAX];
 
         bool b_mapped = true;
         for (i = 0; i < picture->i_planes; i++) {
@@ -647,19 +646,14 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 b_mapped = false;
                 break;
             }
-            ID3D11Texture2D_GetDesc(sys->stagingSys.texture[i], &texDesc);
-            planes[i].i_lines = texDesc.Height;
-            planes[i].i_pitch = mappedResource.RowPitch;
-            planes[i].p_pixels = mappedResource.pData;
-
-            planes[i].i_visible_lines = picture->p[i].i_visible_lines;
-            planes[i].i_visible_pitch = picture->p[i].i_visible_pitch;
+            sys->stagingPlanes[i].i_pitch = mappedResource.RowPitch;
+            sys->stagingPlanes[i].p_pixels = mappedResource.pData;
         }
 
         if (b_mapped)
         {
             for (i = 0; i < picture->i_planes; i++)
-                plane_CopyPixels(&planes[i], &picture->p[i]);
+                plane_CopyPixels(&sys->stagingPlanes[i], &picture->p[i]);
 
             for (i = 0; i < picture->i_planes; i++)
                 ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[i], 0);
@@ -1195,7 +1189,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         /* we need a staging texture */
         ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
 
-        if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &sys->area.texture_source, 1, textures))
+        if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &sys->area.texture_source, 1, textures, sys->stagingPlanes))
         {
             msg_Err(vd, "Failed to allocate the staging texture");
             return VLC_EGENERIC;
@@ -1394,7 +1388,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (unlikely(d3dquad==NULL)) {
                 continue;
             }
-            if (AllocateTextures(vd, &sys->d3d_dev, sys->regionQuad.textureFormat, &r->p_picture->format, 1, d3dquad->picSys.texture)) {
+            if (AllocateTextures(vd, &sys->d3d_dev, sys->regionQuad.textureFormat, &r->p_picture->format, 1, d3dquad->picSys.texture, NULL)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 for (int j=0; j<D3D11_MAX_SHADER_VIEW; j++)
