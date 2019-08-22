@@ -806,9 +806,14 @@ static int media_parse(libvlc_media_t *media, bool b_async,
 
         if (parse_flag & libvlc_media_parse_network)
             parse_scope |= META_REQUEST_OPTION_SCOPE_NETWORK;
+        if (parse_flag & libvlc_media_fetch_local)
+            parse_scope |= META_REQUEST_OPTION_FETCH_LOCAL;
         if (parse_flag & libvlc_media_do_interact)
             parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
-        ret = libvlc_MetadataRequest(libvlc, item, parse_scope, &input_preparser_callbacks, media, timeout, media);
+
+        ret = libvlc_MetadataRequest(libvlc, item, parse_scope,
+                                     &input_preparser_callbacks, media,
+                                     timeout, media);
         if (ret != VLC_SUCCESS)
             return ret;
     }

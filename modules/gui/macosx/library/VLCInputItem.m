@@ -542,7 +542,8 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
 
     return libvlc_MetadataRequest(vlc_object_instance(getIntf()),
                                   _vlcInputItem,
-                                  META_REQUEST_OPTION_SCOPE_ANY,
+                                  META_REQUEST_OPTION_SCOPE_ANY |
+                                  META_REQUEST_OPTION_FETCH_LOCAL,
                                   &preparseCallbacks,
                                   (__bridge void *)self,
                                   -1, NULL);

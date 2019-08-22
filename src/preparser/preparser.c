@@ -42,6 +42,7 @@ struct input_preparser_t
 typedef struct input_preparser_req_t
 {
     input_item_t *item;
+    input_item_meta_request_option_t options;
     const input_preparser_callbacks_t *cbs;
     void *userdata;
     vlc_atomic_rc_t rc;
@@ -58,6 +59,7 @@ typedef struct input_preparser_task_t
 } input_preparser_task_t;
 
 static input_preparser_req_t *ReqCreate(input_item_t *item,
+                                        input_item_meta_request_option_t options,
                                         const input_preparser_callbacks_t *cbs,
                                         void *userdata)
 {
@@ -66,6 +68,7 @@ static input_preparser_req_t *ReqCreate(input_item_t *item,
         return NULL;
 
     req->item = item;
+    req->options = options;
     req->cbs = cbs;
     req->userdata = userdata;
     vlc_atomic_rc_init(&req->rc);
@@ -197,11 +200,12 @@ static void PreparserCloseInput( void* preparser_, void* task_ )
 
     input_item_parser_id_Release( task->parser );
 
-    if( preparser->fetcher )
+    if( preparser->fetcher && (req->options & META_REQUEST_OPTION_FETCH_ANY) )
     {
         task->preparse_status = status;
-        if (!input_fetcher_Push(preparser->fetcher, item, 0,
-                               &input_fetcher_callbacks, task))
+        if (!input_fetcher_Push(preparser->fetcher, item,
+                                req->options & META_REQUEST_OPTION_FETCH_ANY,
+                                &input_fetcher_callbacks, task))
         {
             ReqHold(task->req);
             return;
@@ -280,7 +284,8 @@ void input_preparser_Push( input_preparser_t *preparser,
             return;
     }
 
-    struct input_preparser_req_t *req = ReqCreate(item, cbs, cbs_userdata);
+    struct input_preparser_req_t *req = ReqCreate(item, i_options,
+                                                  cbs, cbs_userdata);
 
     if (background_worker_Push(preparser->worker, req, id, timeout))
         if (req->cbs && cbs->on_preparse_ended)

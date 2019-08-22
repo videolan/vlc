@@ -537,6 +537,7 @@ int libvlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
                            int timeout, void *id)
 {
     libvlc_priv_t *priv = libvlc_priv(libvlc);
+    assert(i_options & META_REQUEST_OPTION_SCOPE_ANY);
 
     if (unlikely(priv->parser == NULL))
         return VLC_ENOMEM;
@@ -559,11 +560,13 @@ int libvlc_ArtRequest(libvlc_int_t *libvlc, input_item_t *item,
                       void *cbs_userdata)
 {
     libvlc_priv_t *priv = libvlc_priv(libvlc);
+    assert(i_options & META_REQUEST_OPTION_FETCH_ANY);
 
     if (unlikely(priv->parser == NULL))
         return VLC_ENOMEM;
 
-    input_preparser_fetcher_Push(priv->parser, item, i_options, cbs, cbs_userdata);
+    input_preparser_fetcher_Push(priv->parser, item, i_options,
+                                 cbs, cbs_userdata);
     return VLC_SUCCESS;
 }
 

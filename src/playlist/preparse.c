@@ -120,7 +120,9 @@ vlc_playlist_Preparse(vlc_playlist_t *playlist, input_item_t *input)
     VLC_UNUSED(input_preparser_callbacks);
 #else
     /* vlc_MetadataRequest is not exported */
-    vlc_MetadataRequest(playlist->libvlc, input, META_REQUEST_OPTION_NONE,
+    vlc_MetadataRequest(playlist->libvlc, input,
+                        META_REQUEST_OPTION_SCOPE_LOCAL |
+                        META_REQUEST_OPTION_FETCH_LOCAL,
                         &input_preparser_callbacks, playlist, -1, NULL);
 #endif
 }

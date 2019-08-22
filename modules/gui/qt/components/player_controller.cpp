@@ -1436,8 +1436,8 @@ void PlayerController::requestArtUpdate( input_item_t *p_item, bool b_forced )
                 return;
         }
         libvlc_ArtRequest( vlc_object_instance(d->p_intf), p_item,
-                           (b_forced) ? META_REQUEST_OPTION_SCOPE_ANY
-                                      : META_REQUEST_OPTION_NONE,
+                           (b_forced) ? META_REQUEST_OPTION_FETCH_ANY
+                                      : META_REQUEST_OPTION_FETCH_LOCAL,
                            &input_fetcher_cbs, this );
     }
 }

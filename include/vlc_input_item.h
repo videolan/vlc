@@ -462,7 +462,10 @@ typedef enum input_item_meta_request_option_t
     META_REQUEST_OPTION_SCOPE_LOCAL   = 0x01,
     META_REQUEST_OPTION_SCOPE_NETWORK = 0x02,
     META_REQUEST_OPTION_SCOPE_ANY     = 0x03,
-    META_REQUEST_OPTION_DO_INTERACT   = 0x04
+    META_REQUEST_OPTION_FETCH_LOCAL   = 0x04,
+    META_REQUEST_OPTION_FETCH_NETWORK = 0x08,
+    META_REQUEST_OPTION_FETCH_ANY     = 0x0C,
+    META_REQUEST_OPTION_DO_INTERACT   = 0x10,
 } input_item_meta_request_option_t;
 
 /* status of the on_preparse_ended() callback */
