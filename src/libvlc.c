@@ -514,12 +514,6 @@ int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
     if (unlikely(priv->parser == NULL))
         return VLC_ENOMEM;
 
-    if( i_options & META_REQUEST_OPTION_DO_INTERACT )
-    {
-        vlc_mutex_lock( &item->lock );
-        item->b_preparse_interact = true;
-        vlc_mutex_unlock( &item->lock );
-    }
     input_preparser_Push( priv->parser, item, i_options, cbs, cbs_userdata, timeout, id );
     return VLC_SUCCESS;
 

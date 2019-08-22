@@ -267,6 +267,8 @@ void input_preparser_Push( input_preparser_t *preparser,
     vlc_mutex_lock( &item->lock );
     enum input_item_type_e i_type = item->i_type;
     int b_net = item->b_net;
+    if( i_options & META_REQUEST_OPTION_DO_INTERACT )
+        item->b_preparse_interact = true;
     vlc_mutex_unlock( &item->lock );
 
     switch( i_type )
