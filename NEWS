@@ -1,3 +1,12 @@
+Changes between 3.0.8 and 3.0.9:
+----------------------------------
+
+Core:
+ * Work around busy looping when playing an invalid item through VLM 
+
+Misc:
+ * Add missing .wpl & .zpl file associations on Windows
+
 Changes between 3.0.7.1 and 3.0.8:
 ----------------------------------
 
