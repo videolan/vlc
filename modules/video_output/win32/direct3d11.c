@@ -629,7 +629,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->picQuad.textureFormat->formatTexture == DXGI_FORMAT_UNKNOWN || !is_d3d11_opaque(picture->format.i_chroma))
+    if (sys->picQuad.textureFormat->formatTexture == DXGI_FORMAT_UNKNOWN)
     {
         D3D11_MAPPED_SUBRESOURCE mappedResource;
         int i;
@@ -657,6 +657,30 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
 
             for (i = 0; i < picture->i_planes; i++)
                 ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[i], 0);
+        }
+    }
+    else if (!is_d3d11_opaque(picture->format.i_chroma))
+    {
+        D3D11_MAPPED_SUBRESOURCE mappedResource;
+        HRESULT hr;
+
+        hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[0],
+                                        0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+        if( unlikely(FAILED(hr)) )
+            msg_Err(vd, "Failed to map the %4.4s staging picture. (hr=0x%lX)", (const char*)&picture->format.i_chroma, hr);
+        else
+        {
+            uint8_t *buf = mappedResource.pData;
+            for (int i = 0; i < picture->i_planes; i++)
+            {
+                sys->stagingPlanes[i].p_pixels = buf;
+
+                plane_CopyPixels(&sys->stagingPlanes[i], &picture->p[i]);
+
+                buf += sys->stagingPlanes[i].i_pitch * sys->stagingPlanes[i].i_lines;
+            }
+
+            ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[0], 0);
         }
     }
     else
