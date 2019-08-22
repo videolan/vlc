@@ -487,7 +487,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             if( !transcode_encoder_opened( id->encoder ) &&
                 transcode_encoder_open( id->encoder, id->p_enccfg ) != VLC_SUCCESS )
             {
-                msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s). "
+                msg_Err( p_stream, "cannot find video encoder (module:%s fourcc:%4.4s). "
                                    "Take a look few lines earlier to see possible reason.",
                                    id->p_enccfg->psz_name ? id->p_enccfg->psz_name : "any",
                                    (char *)&id->p_enccfg->i_codec );
