@@ -805,7 +805,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
     [self setupField:_osd_fontTextField forOption: "freetype-font"];
     [self setupButton:_osd_font_colorPopup forIntList: "freetype-color"];
-    _osd_font_sizeSlider.intValue = (int)config_GetInt("macosx-spu-scale-factor");
+    _osd_font_sizeSlider.intValue = (int)config_GetInt("sub-text-scale");
     [_osd_font_sizeTextField setStringValue: [NSString stringWithFormat:@"%.2fx", _osd_font_sizeSlider.intValue / 100.]];
     i = config_GetInt("freetype-opacity") * 100.0 / 255.0 + 0.5;
     [_osd_opacityTextField setIntValue: i];
@@ -1082,7 +1082,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         config_PutPsz("freetype-font", [[_osd_fontTextField stringValue] UTF8String]);
         SaveIntList(_osd_font_colorPopup, "freetype-color");
-        config_PutInt("macosx-spu-scale-factor", _osd_font_sizeSlider.intValue);
+        config_PutInt("sub-text-scale", _osd_font_sizeSlider.intValue);
         config_PutInt("freetype-opacity", [_osd_opacityTextField intValue] * 255.0 / 100.0 + 0.5);
         config_PutInt("freetype-bold", [_osd_forceboldCheckbox state]);
         SaveIntList(_osd_outline_colorPopup, "freetype-outline-color");

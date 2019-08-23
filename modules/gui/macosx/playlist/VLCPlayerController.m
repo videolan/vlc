@@ -587,8 +587,6 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
             _remoteControlService = [[VLCRemoteControlService alloc] init];
             [_remoteControlService subscribeToRemoteCommands];
         }
-
-        self.subtitleTextScalingFactor = (unsigned int)config_GetInt("macosx-spu-scale-factor");
     }
 
     return self;

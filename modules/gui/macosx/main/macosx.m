@@ -122,9 +122,6 @@ static const char *const itunes_list_text[] = {
 #define CONTINUE_PLAYBACK_TEXT N_("Continue playback where you left off")
 #define CONTINUE_PLAYBACK_LONGTEXT N_("VLC will store playback positions of the last 30 items you played. If you re-open one of those, playback will continue.")
 
-#define SUBTITLES_SCALE_FACTOR N_("Subtitles Scale Factor")
-#define SUBTITLES_SCALE_FACTOR_LONGTEXT N_("The scale factor for text based subtitles with typical playback.")
-
 static const int continue_playback_list[] =
 { 0, 1, 2 };
 static const char *const continue_playback_list_text[] = {
@@ -148,7 +145,6 @@ vlc_module_begin()
         add_bool("macosx-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true)
         add_integer_with_range("macosx-max-volume", 125, 60, 200, VOLUME_MAX_TEXT, VOLUME_MAX_TEXT, true)
         add_bool("macosx-large-text", false, LARGE_LISTFONT_TEXT, LARGE_LISTFONT_TEXT, false)
-        add_integer_with_range("macosx-spu-scale-factor", 100, 10, 500, SUBTITLES_SCALE_FACTOR, SUBTITLES_SCALE_FACTOR, false)
 
     set_section(N_("Behavior"), 0)
         add_bool("macosx-autoplay", true, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT, false)
