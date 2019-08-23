@@ -506,18 +506,18 @@ static const struct vlc_player_cbs player_callbacks = {
 
 #pragma mark - video specific callback implementations
 
-static void cb_player_vout_fullscreen_changed(vlc_player_t *p_player, vout_thread_t *p_vout, bool isFullscreen, void *p_data)
+static void cb_player_vout_fullscreen_changed(vout_thread_t *p_vout, bool isFullscreen, void *p_data)
 {
-    VLC_UNUSED(p_player); VLC_UNUSED(p_vout);
+    VLC_UNUSED(p_vout);
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
         [playerController fullscreenChanged:isFullscreen];
     });
 }
 
-static void cb_player_vout_wallpaper_mode_changed(vlc_player_t *p_player, vout_thread_t *p_vout,  bool wallpaperModeEnabled, void *p_data)
+static void cb_player_vout_wallpaper_mode_changed(vout_thread_t *p_vout,  bool wallpaperModeEnabled, void *p_data)
 {
-    VLC_UNUSED(p_player); VLC_UNUSED(p_vout);
+    VLC_UNUSED(p_vout);
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
         [playerController wallpaperModeChanged:wallpaperModeEnabled];
@@ -531,18 +531,18 @@ static const struct vlc_player_vout_cbs player_vout_callbacks = {
 
 #pragma mark - video specific callback implementations
 
-static void cb_player_aout_volume_changed(vlc_player_t *p_player, float volume, void *p_data)
+static void cb_player_aout_volume_changed(audio_output_t *aout, float volume, void *p_data)
 {
-    VLC_UNUSED(p_player);
+    VLC_UNUSED(aout);
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
         [playerController volumeChanged:volume];
     });
 }
 
-static void cb_player_aout_mute_changed(vlc_player_t *p_player, bool muted, void *p_data)
+static void cb_player_aout_mute_changed(audio_output_t *aout, bool muted, void *p_data)
 {
-    VLC_UNUSED(p_player);
+    VLC_UNUSED(aout);
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
         [playerController muteChanged:muted];

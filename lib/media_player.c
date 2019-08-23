@@ -430,9 +430,9 @@ on_vout_changed(vlc_player_t *player, enum vlc_player_vout_action action,
 // player aout callbacks
 
 static void
-on_volume_changed(vlc_player_t *player, float new_volume, void *data)
+on_volume_changed(audio_output_t *aout, float new_volume, void *data)
 {
-    (void) player;
+    (void) aout;
 
     libvlc_media_player_t *mp = data;
 
@@ -444,9 +444,9 @@ on_volume_changed(vlc_player_t *player, float new_volume, void *data)
 }
 
 static void
-on_mute_changed(vlc_player_t *player, bool new_muted, void *data)
+on_mute_changed(audio_output_t *aout, bool new_muted, void *data)
 {
-    (void) player;
+    (void) aout;
 
     libvlc_media_player_t *mp = data;
 
@@ -458,9 +458,9 @@ on_mute_changed(vlc_player_t *player, bool new_muted, void *data)
 }
 
 static void
-on_audio_device_changed(vlc_player_t *player, const char *device, void *data)
+on_audio_device_changed(audio_output_t *aout, const char *device, void *data)
 {
-    (void) player;
+    (void) aout;
 
     libvlc_media_player_t *mp = data;
 

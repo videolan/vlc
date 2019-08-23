@@ -259,17 +259,17 @@ void on_player_vout_changed( vlc_player_t *player,
     VlcProc::onGenericCallback( "vout", val, data );
 }
 
-void on_player_aout_volume_changed( vlc_player_t *player,
+void on_player_aout_volume_changed( audio_output *aout,
                                     float volume, void *data )
 {
-    (void)player;
+    (void)aout;
     vlc_value_t val = { .f_float = volume };
     VlcProc::onGenericCallback( "volume", val, data );
 }
 
-void on_player_aout_mute_changed( vlc_player_t *player, bool mute, void *data )
+void on_player_aout_mute_changed( audio_output_t *aout, bool mute, void *data )
 {
-    (void)player;
+    (void)aout;
     vlc_value_t val = { .b_bool = mute};
     VlcProc::onGenericCallback( "mute", val, data );
 }

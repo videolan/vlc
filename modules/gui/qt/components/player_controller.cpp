@@ -790,7 +790,7 @@ static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_ac
 
 //player vout callbacks
 
-static void on_player_vout_fullscreen_changed(vlc_player_t *, vout_thread_t* vout, bool is_fullscreen, void *data)
+static void on_player_vout_fullscreen_changed(vout_thread_t* vout, bool is_fullscreen, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_vout_fullscreen_changed %s", is_fullscreen ? "fullscreen" : "windowed");
@@ -808,7 +808,7 @@ static void on_player_vout_fullscreen_changed(vlc_player_t *, vout_thread_t* vou
     });
 }
 
-static void on_player_vout_wallpaper_mode_changed(vlc_player_t *, vout_thread_t* vout, bool enabled, void *data)
+static void on_player_vout_wallpaper_mode_changed(vout_thread_t* vout, bool enabled, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_vout_wallpaper_mode_changed");
@@ -828,7 +828,7 @@ static void on_player_vout_wallpaper_mode_changed(vlc_player_t *, vout_thread_t*
 
 //player aout callbacks
 
-static void on_player_aout_volume_changed(vlc_player_t *, float volume, void *data)
+static void on_player_aout_volume_changed(audio_output_t *, float volume, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_aout_volume_changed");
@@ -838,7 +838,7 @@ static void on_player_aout_volume_changed(vlc_player_t *, float volume, void *da
     });
 }
 
-static void on_player_aout_mute_changed(vlc_player_t *, bool muted, void *data)
+static void on_player_aout_mute_changed(audio_output_t *, bool muted, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_aout_mute_changed");

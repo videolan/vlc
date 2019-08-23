@@ -151,11 +151,10 @@ static void player_on_position_changed(vlc_player_t *,
 static void player_on_media_meta_changed(vlc_player_t *,
                                          input_item_t *, void *);
 
-static void player_aout_on_volume_changed(vlc_player_t *, float, void *);
-static void player_aout_on_mute_changed(vlc_player_t *, bool, void *);
+static void player_aout_on_volume_changed(audio_output_t *, float, void *);
+static void player_aout_on_mute_changed(audio_output_t *, bool, void *);
 
-static void player_vout_on_fullscreen_changed(vlc_player_t *,
-                                              vout_thread_t *, bool, void *);
+static void player_vout_on_fullscreen_changed(vout_thread_t *, bool, void *);
 
 /*****************************************************************************
  * Module descriptor
@@ -1142,28 +1141,27 @@ player_on_media_meta_changed(vlc_player_t *player,
 }
 
 static void
-player_aout_on_volume_changed(vlc_player_t *player, float volume, void *data)
+player_aout_on_volume_changed(audio_output_t *aout, float volume, void *data)
 {
     add_event_signal(data,
             &(callback_info_t){ .signal = SIGNAL_VOLUME_CHANGE });
-    (void) player; (void) volume;
+    (void) aout; (void) volume;
 }
 
 static void
-player_aout_on_mute_changed(vlc_player_t *player, bool muted, void *data)
+player_aout_on_mute_changed(audio_output_t *aout, bool muted, void *data)
 {
     add_event_signal(data,
             &(callback_info_t){ .signal = SIGNAL_VOLUME_MUTED });
-    (void) player; (void) muted;
+    (void) aout; (void) muted;
 }
 
 static void
-player_vout_on_fullscreen_changed(vlc_player_t *player,
-                                  vout_thread_t *vout, bool enabled,
+player_vout_on_fullscreen_changed(vout_thread_t *vout, bool enabled,
                                   void *data)
 {
     add_event_signal(data, &(callback_info_t){ .signal = SIGNAL_FULLSCREEN });
-    (void) player; (void) vout; (void) enabled;
+    (void) vout; (void) enabled;
 }
 
 /*****************************************************************************

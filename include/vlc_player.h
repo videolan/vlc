@@ -2115,11 +2115,8 @@ typedef struct vlc_player_aout_listener_id vlc_player_aout_listener_id;
  *
  * Can be registered with vlc_player_aout_AddListener().
  *
- * These callbacks are *not* called with the player locked. It is safe to lock
- * the player and call any vlc_player functions from these callbacks.
- *
- * @warning To avoid deadlocks, users should never call audio_output_t
- * functions from these callbacks.
+ * @warning To avoid deadlocks, users should never call audio_output_t and
+ * vlc_player_t functions from these callbacks.
  */
 struct vlc_player_aout_cbs
 {
@@ -2128,34 +2125,34 @@ struct vlc_player_aout_cbs
      *
      * @see vlc_player_aout_SetVolume()
      *
-     * @param player unlocked player instance
+     * @param aout the main aout of the player
      * @param new_volume volume in the range [0;2.f]
      * @param data opaque pointer set by vlc_player_aout_AddListener()
      */
-    void (*on_volume_changed)(vlc_player_t *player,
-        float new_volume, void *data);
+    void (*on_volume_changed)(audio_output_t *aout, float new_volume,
+        void *data);
 
     /**
      * Called when the mute state has changed
      *
      * @see vlc_player_aout_Mute()
      *
-     * @param player unlocked player instance
+     * @param aout the main aout of the player
      * @param new_mute true if muted
      * @param data opaque pointer set by vlc_player_aout_AddListener()
      */
-    void (*on_mute_changed)(vlc_player_t *player,
-        bool new_muted, void *data);
+    void (*on_mute_changed)(audio_output_t *aout, bool new_muted,
+        void *data);
 
     /**
      * Called when the audio device has changed
      *
-     * @param player unlocked player instance
+     * @param aout the main aout of the player
      * @param device the device name
      * @param data opaque pointer set by vlc_player_aout_AddListener()
      */
-    void (*on_device_changed)(vlc_player_t *player, const char *device,
-                              void *data);
+    void (*on_device_changed)(audio_output_t *aout, const char *device,
+        void *data);
 };
 
 /**
@@ -2330,15 +2327,12 @@ enum vlc_player_vout_action
  *
  * Can be registered with vlc_player_vout_AddListener().
  *
- * These callbacks are *not* called with the player locked. It is safe to lock
- * the player and call any vlc_player functions from these callbacks.
- *
  * @note The state changed from the callbacks can be either applied on the
  * player (and all future video outputs), or on a specified video output. The
  * state is applied on the player when the vout argument is NULL.
  *
- * @warning To avoid deadlocks, users should never call vout_thread_t functions
- * from these callbacks.
+ * @warning To avoid deadlocks, users should never call vout_thread_t and
+ * vlc_player_t functions from these callbacks.
  */
 struct vlc_player_vout_cbs
 {
@@ -2347,26 +2341,24 @@ struct vlc_player_vout_cbs
      *
      * @see vlc_player_vout_SetFullscreen()
      *
-     * @param player unlocked player instance
      * @param vout cf. vlc_player_vout_cbs note
      * @param enabled true when fullscreen is enabled
      * @param data opaque pointer set by vlc_player_vout_AddListener()
      */
-    void (*on_fullscreen_changed)(vlc_player_t *player,
-        vout_thread_t *vout, bool enabled, void *data);
+    void (*on_fullscreen_changed)(vout_thread_t *vout, bool enabled,
+        void *data);
 
     /**
      * Called when the player and/or vout wallpaper mode has changed
      *
      * @see vlc_player_vout_SetWallpaperModeEnabled()
      *
-     * @param player unlocked player instance
      * @param vout cf. vlc_player_vout_cbs note
      * @param enabled true when wallpaper mode is enabled
      * @param data opaque pointer set by vlc_player_vout_AddListener()
      */
-    void (*on_wallpaper_mode_changed)(vlc_player_t *player,
-        vout_thread_t *vout, bool enabled, void *data);
+    void (*on_wallpaper_mode_changed)(vout_thread_t *vout, bool enabled,
+        void *data);
 };
 
 

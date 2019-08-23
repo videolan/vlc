@@ -34,7 +34,7 @@
     vlc_list_foreach(listener, &player->vout_listeners, node) \
     { \
         if (listener->cbs->event) \
-            listener->cbs->event(player, ##__VA_ARGS__, listener->cbs_data); \
+            listener->cbs->event(__VA_ARGS__, listener->cbs_data); \
     } \
     vlc_mutex_unlock(&player->vout_listeners_lock); \
 } while(0)

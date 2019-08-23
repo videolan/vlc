@@ -35,7 +35,7 @@
     vlc_list_foreach(listener, &player->aout_listeners, node) \
     { \
         if (listener->cbs->event) \
-            listener->cbs->event(player, ##__VA_ARGS__, listener->cbs_data); \
+            listener->cbs->event(__VA_ARGS__, listener->cbs_data); \
     } \
     vlc_mutex_unlock(&player->aout_listeners_lock); \
 } while(0)
@@ -89,7 +89,8 @@ vlc_player_AoutCallback(vlc_object_t *this, const char *var,
     {
         if (oldval.f_float != newval.f_float)
         {
-            vlc_player_aout_SendEvent(player, on_volume_changed, newval.f_float);
+            vlc_player_aout_SendEvent(player, on_volume_changed,
+                                      (audio_output_t *)this, newval.f_float);
             vlc_player_osd_Volume(player, false);
         }
     }
@@ -97,7 +98,8 @@ vlc_player_AoutCallback(vlc_object_t *this, const char *var,
     {
         if (oldval.b_bool != newval.b_bool)
         {
-            vlc_player_aout_SendEvent(player, on_mute_changed, newval.b_bool);
+            vlc_player_aout_SendEvent(player, on_mute_changed,
+                                      (audio_output_t *)this, newval.b_bool);
             vlc_player_osd_Volume(player, true);
         }
     }
@@ -108,7 +110,7 @@ vlc_player_AoutCallback(vlc_object_t *this, const char *var,
         /* support NULL values for string comparison */
         if (old != new && (!old || !new || strcmp(old, new)))
             vlc_player_aout_SendEvent(player, on_device_changed,
-                                      newval.psz_string);
+                                      (audio_output_t *)this, newval.psz_string);
     }
     else
         vlc_assert_unreachable();

@@ -20,7 +20,7 @@
 
 extern "C" {
 
-static void on_player_aout_device_changed(vlc_player_t *,const char *device, void *data)
+static void on_player_aout_device_changed(audio_output_t *,const char *device, void *data)
 {
     AudioDeviceModel* that = static_cast<AudioDeviceModel*>(data);
     QMetaObject::invokeMethod(that, [that, device=QString::fromUtf8(device)](){

@@ -353,8 +353,8 @@ player_on_position_changed(vlc_player_t *player,
 }
 
 static void
-player_aout_on_volume_changed(vlc_player_t *player, float volume, void *data)
-{ VLC_UNUSED(player);
+player_aout_on_volume_changed(audio_output_t *aout, float volume, void *data)
+{ VLC_UNUSED(aout);
     intf_thread_t *p_intf = data;
     vlc_mutex_lock(&p_intf->p_sys->status_lock);
     msg_rc(STATUS_CHANGE "( audio volume: %ld )",
