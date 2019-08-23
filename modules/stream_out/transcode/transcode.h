@@ -202,10 +202,10 @@ int  transcode_audio_init   ( sout_stream_t *, const es_format_t *,
 
 /* VIDEO */
 
-void transcode_video_clean  ( sout_stream_t *, sout_stream_id_sys_t * );
+void transcode_video_clean  ( sout_stream_id_sys_t * );
 int  transcode_video_process( sout_stream_t *, sout_stream_id_sys_t *,
                                      block_t *, block_t ** );
-int transcode_video_get_output_dimensions( sout_stream_t *, sout_stream_id_sys_t *,
+int transcode_video_get_output_dimensions( sout_stream_id_sys_t *,
                                            unsigned *w, unsigned *h );
 void transcode_video_push_spu( sout_stream_t *, sout_stream_id_sys_t *, subpicture_t * );
 int  transcode_video_init    ( sout_stream_t *, const es_format_t *,

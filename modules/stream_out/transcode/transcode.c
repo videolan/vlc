@@ -528,8 +528,7 @@ static int GetVideoDimensions( void *cbdata, unsigned *w, unsigned *h )
     int i_ret = VLC_EGENERIC;
     vlc_mutex_lock( &p_sys->lock );
     if( p_sys->id_video )
-        i_ret = transcode_video_get_output_dimensions( p_stream,
-                                                       p_sys->id_video, w, h );
+        i_ret = transcode_video_get_output_dimensions( p_sys->id_video, w, h );
     vlc_mutex_unlock( &p_sys->lock );
     return i_ret;
 }
@@ -706,7 +705,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
             if( id == p_sys->id_video )
                 p_sys->id_video = NULL;
             vlc_mutex_unlock( &p_sys->lock );
-            transcode_video_clean( p_stream, id );
+            transcode_video_clean( id );
             break;
         case SPU_ES:
             decoder_Destroy( id->p_decoder );

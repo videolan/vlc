@@ -438,11 +438,8 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
     return VLC_SUCCESS;
 }
 
-void transcode_video_clean( sout_stream_t *p_stream,
-                                   sout_stream_id_sys_t *id )
+void transcode_video_clean( sout_stream_id_sys_t *id )
 {
-    VLC_UNUSED(p_stream);
-
     /* Close encoder */
     transcode_encoder_close( id->encoder );
     transcode_encoder_delete( id->encoder );
@@ -474,10 +471,9 @@ void transcode_video_push_spu( sout_stream_t *p_stream, sout_stream_id_sys_t *id
         spu_PutSubpicture( id->p_spu, p_subpicture );
 }
 
-int transcode_video_get_output_dimensions( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
+int transcode_video_get_output_dimensions( sout_stream_id_sys_t *id,
                                            unsigned *w, unsigned *h )
 {
-    VLC_UNUSED(p_stream);
     vlc_mutex_lock( &id->fifo.lock );
     *w = id->decoder_out.video.i_visible_width;
     *h = id->decoder_out.video.i_visible_height;
@@ -485,11 +481,8 @@ int transcode_video_get_output_dimensions( sout_stream_t *p_stream, sout_stream_
     return (*w && *h) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-static picture_t * RenderSubpictures( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
-                                       picture_t *p_pic )
+static picture_t * RenderSubpictures( sout_stream_id_sys_t *id, picture_t *p_pic )
 {
-    VLC_UNUSED(p_stream);
-
     if( !id->p_spu )
         return p_pic;
 
@@ -687,7 +680,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                     break;
 
                 /* Blend subpictures */
-                p_in = RenderSubpictures( p_stream, id, p_in );
+                p_in = RenderSubpictures( id, p_in );
 
                 if( p_in )
                 {
