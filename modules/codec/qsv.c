@@ -874,7 +874,7 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
          (!pic && async_task_t_fifo_GetCount(&sys->packets)))
     {
         assert(async_task_t_fifo_Show(&sys->packets)->syncp != 0);
-        async_task_t *task = async_task_t_fifo_Get(&sys->packets);
+        task = async_task_t_fifo_Get(&sys->packets);
         block = qsv_synchronize_block( enc, task );
         free(task->syncp);
         free(task);
