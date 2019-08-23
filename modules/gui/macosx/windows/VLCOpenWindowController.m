@@ -308,17 +308,6 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
         [_fileSubAlignPopup selectItemAtIndex: p_item->value.i];
     }
-
-    p_item = config_FindConfig("freetype-rel-fontsize");
-
-    if (p_item) {
-        for (i_index = 0; i_index < p_item->list_count; i_index++) {
-            [_fileSubSizePopup addItemWithTitle: _NS(p_item->list_text[i_index])];
-
-            if (p_item->value.i == p_item->list.i[i_index])
-                [_fileSubSizePopup selectItemAtIndex: i_index];
-        }
-    }
 }
 
 - (void)initSubtitlesPanelStrings
@@ -339,8 +328,6 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     [_fileSubFPSStepper setEnabled: NO];
     [_fileSubEncodingLabel setStringValue: _NS("Subtitle encoding")];
     [_fileSubEncodingPopup removeAllItems];
-    [_fileSubSizeLabel setStringValue: _NS("Font size")];
-    [_fileSubSizePopup removeAllItems];
     [_fileSubAlignLabel setStringValue: _NS("Subtitle alignment")];
     [_fileSubAlignPopup removeAllItems];
     [_fileSubOKButton setStringValue: _NS("OK")];
@@ -428,8 +415,6 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
 - (void)addSubtitleOptionsToArray:(NSMutableArray *)options
 {
-    module_config_t * p_item;
-
     [options addObject: [NSString stringWithFormat: @"sub-file=%@", _subPath]];
     if ([_fileSubOverrideCheckbox state] == NSOnState) {
         [options addObject: [NSString stringWithFormat: @"sub-delay=%f", ([self fileSubDelay] * 10)]];
@@ -439,14 +424,6 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
                          @"subsdec-encoding=%@", [[_fileSubEncodingPopup selectedItem] representedObject]]];
     [options addObject: [NSString stringWithFormat:
                          @"subsdec-align=%li", [_fileSubAlignPopup indexOfSelectedItem]]];
-
-    p_item = config_FindConfig("freetype-rel-fontsize");
-
-    if (p_item) {
-        [options addObject: [NSString stringWithFormat:
-                             @"freetype-rel-fontsize=%i",
-                             p_item->list.i[[_fileSubSizePopup indexOfSelectedItem]]]];
-    }
 }
 
 - (void)addTimingOptionsToArray:(NSMutableArray *)options

@@ -142,8 +142,6 @@
 @property (readwrite, weak) IBOutlet NSStepper *fileSubFPSStepper;
 @property (readwrite, weak) IBOutlet NSPopUpButton *fileSubEncodingPopup;
 @property (readwrite, weak) IBOutlet NSTextField *fileSubEncodingLabel;
-@property (readwrite, weak) IBOutlet NSPopUpButton *fileSubSizePopup;
-@property (readwrite, weak) IBOutlet NSTextField *fileSubSizeLabel;
 @property (readwrite, weak) IBOutlet NSPopUpButton *fileSubAlignPopup;
 @property (readwrite, weak) IBOutlet NSTextField *fileSubAlignLabel;
 @property (readwrite, weak) IBOutlet NSButton *fileSubOKButton;
