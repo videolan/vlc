@@ -732,7 +732,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         chroma = NULL;
     } else {
         sys->vlc_fourcc = fmtp->i_chroma;
-        msg_Dbg(vd, "Chroma %4s invalid, using default", chroma);
+        msg_Dbg(vd, "Chroma not defined, using default");
     }
 
     chroma = var_InheritString(vd, "kms-drm-chroma");
