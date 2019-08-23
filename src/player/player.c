@@ -891,6 +891,11 @@ vlc_player_SelectPrevChapter(vlc_player_t *player)
 void
 vlc_player_Lock(vlc_player_t *player)
 {
+    /* Vout and aout locks should not be held, cf. vlc_player_vout_cbs and
+     * vlc_player_aout_cbs documentation */
+    assert(!vlc_mutex_marked(&player->vout_listeners_lock));
+    assert(!vlc_mutex_marked(&player->aout_listeners_lock));
+
     vlc_mutex_lock(&player->lock);
 }
 
