@@ -488,14 +488,12 @@ block_t * transcode_encoder_video_encode( transcode_encoder_t *p_enc, picture_t 
     {
         return p_enc->p_encoder->pf_encode_video( p_enc->p_encoder, p_pic );
     }
-    else
-    {
-        vlc_sem_wait( &p_enc->picture_pool_has_room );
-        vlc_mutex_lock( &p_enc->lock_out );
-        picture_Hold( p_pic );
-        picture_fifo_Push( p_enc->pp_pics, p_pic );
-        vlc_cond_signal( &p_enc->cond );
-        vlc_mutex_unlock( &p_enc->lock_out );
-        return NULL;
-    }
+
+    vlc_sem_wait( &p_enc->picture_pool_has_room );
+    vlc_mutex_lock( &p_enc->lock_out );
+    picture_Hold( p_pic );
+    picture_fifo_Push( p_enc->pp_pics, p_pic );
+    vlc_cond_signal( &p_enc->cond );
+    vlc_mutex_unlock( &p_enc->lock_out );
+    return NULL;
 }
