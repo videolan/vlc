@@ -108,7 +108,7 @@ std::vector<std::unique_ptr<MLVideo> > MLRecentsVideoModel::fetch()
         if( media.i_type == VLC_ML_MEDIA_TYPE_VIDEO )
         {
             m_video_count++;
-            res.emplace_back( std::unique_ptr<MLVideo>{ new MLVideo( m_ml, &media ) } );
+            res.emplace_back( std::make_unique<MLVideo>( m_ml, &media ) );
         }
     return res;
 }

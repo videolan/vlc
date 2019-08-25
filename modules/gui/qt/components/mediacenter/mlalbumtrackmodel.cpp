@@ -130,7 +130,7 @@ std::vector<std::unique_ptr<MLAlbumTrack>> MLAlbumTrackModel::fetch()
         return {};
     std::vector<std::unique_ptr<MLAlbumTrack>> res;
     for( const vlc_ml_media_t& media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
-        res.emplace_back( std::unique_ptr<MLAlbumTrack>{ new MLAlbumTrack( m_ml, &media ) } );
+        res.emplace_back( std::make_unique<MLAlbumTrack>( m_ml, &media ) );
     return res;
 }
 

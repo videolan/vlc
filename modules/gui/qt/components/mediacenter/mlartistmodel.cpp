@@ -86,7 +86,7 @@ std::vector<std::unique_ptr<MLArtist>> MLArtistModel::fetch()
         return {};
     std::vector<std::unique_ptr<MLArtist>> res;
     for( const vlc_ml_artist_t& artist: ml_range_iterate<vlc_ml_artist_t>( artist_list ) )
-        res.emplace_back( new MLArtist( &artist ) );
+        res.emplace_back( std::make_unique<MLArtist>( &artist ) );
     return res;
 }
 

@@ -89,7 +89,7 @@ std::vector<std::unique_ptr<MLAlbum>> MLAlbumModel::fetch( )
         return {};
     std::vector<std::unique_ptr<MLAlbum>> res;
     for( const vlc_ml_album_t& album: ml_range_iterate<vlc_ml_album_t>( album_list ) )
-        res.emplace_back( new MLAlbum( m_ml, &album ) );
+        res.emplace_back( std::make_unique<MLAlbum>( m_ml, &album ) );
     return res;
 }
 

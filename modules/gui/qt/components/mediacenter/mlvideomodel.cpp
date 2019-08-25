@@ -117,7 +117,7 @@ std::vector<std::unique_ptr<MLVideo> > MLVideoModel::fetch()
         return {};
     std::vector<std::unique_ptr<MLVideo>> res;
     for( vlc_ml_media_t &media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
-        res.emplace_back( std::unique_ptr<MLVideo>{ new MLVideo(m_ml, &media) } );
+        res.emplace_back( std::make_unique<MLVideo>(m_ml, &media) );
     return res;
 }
 
