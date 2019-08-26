@@ -174,6 +174,8 @@ void filter_chain_Delete( filter_chain_t *p_chain )
     filter_chain_Clear( p_chain );
 
     es_format_Clean( &p_chain->fmt_in );
+    if ( p_chain->vctx_in )
+        vlc_video_context_Release( p_chain->vctx_in );
     es_format_Clean( &p_chain->fmt_out );
 
     free( p_chain );
@@ -181,7 +183,8 @@ void filter_chain_Delete( filter_chain_t *p_chain )
 /**
  * Filter chain reinitialisation
  */
-void filter_chain_Reset( filter_chain_t *p_chain, const es_format_t *p_fmt_in,
+void filter_chain_Reset( filter_chain_t *p_chain,
+                         const es_format_t *p_fmt_in, vlc_video_context *vctx_in,
                          const es_format_t *p_fmt_out )
 {
     filter_chain_Clear( p_chain );
@@ -189,6 +192,9 @@ void filter_chain_Reset( filter_chain_t *p_chain, const es_format_t *p_fmt_in,
     assert(p_fmt_in != NULL);
     es_format_Clean( &p_chain->fmt_in );
     es_format_Copy( &p_chain->fmt_in, p_fmt_in );
+    if ( p_chain->vctx_in )
+        vlc_video_context_Release( p_chain->vctx_in );
+    p_chain->vctx_in = vctx_in ? vlc_video_context_Hold(vctx_in) : NULL;
 
     assert(p_fmt_out != NULL);
     es_format_Clean( &p_chain->fmt_out );

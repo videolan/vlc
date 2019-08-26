@@ -814,6 +814,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
 
     es_format_t fmt_target;
     es_format_InitFromVideo(&fmt_target, source ? source : &vout->p->filter.src_fmt);
+    vlc_video_context *vctx_target   = source ? src_vctx : vout->p->filter.src_vctx;
 
     const es_format_t *p_fmt_current = &fmt_target;
 
@@ -823,7 +824,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         filter_chain_t *chain = a == 0 ? vout->p->filter.chain_static :
                                          vout->p->filter.chain_interactive;
 
-        filter_chain_Reset(chain, p_fmt_current, p_fmt_current);
+        filter_chain_Reset(chain, p_fmt_current, vctx_target, p_fmt_current);
         for (size_t i = 0; i < vlc_array_count(array); i++) {
             vout_filter_t *e = vlc_array_item_at_index(array, i);
             msg_Dbg(vout, "Adding '%s' as %s", e->name, a == 0 ? "static" : "interactive");
@@ -853,8 +854,8 @@ static void ThreadChangeFilters(vout_thread_t *vout,
                                          &fmt_target) != 0) {
             msg_Err(vout, "Failed to compensate for the format changes, removing all filters");
             ThreadDelAllFilterCallbacks(vout);
-            filter_chain_Reset(vout->p->filter.chain_static,      &fmt_target, &fmt_target);
-            filter_chain_Reset(vout->p->filter.chain_interactive, &fmt_target, &fmt_target);
+            filter_chain_Reset(vout->p->filter.chain_static,      &fmt_target, vctx_target, &fmt_target);
+            filter_chain_Reset(vout->p->filter.chain_interactive, &fmt_target, vctx_target, &fmt_target);
         }
     }
 
@@ -996,7 +997,9 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_t *vout, picture_t *pic,
     dst.video.i_chroma = VLC_CODEC_RGB32;
     video_format_FixRgb(&dst.video);
 
-    filter_chain_Reset(filterc, &src, &dst);
+    filter_chain_Reset(filterc, &src,
+                       NULL /* TODO output video context of blender */,
+                       &dst);
 
     if (filter_chain_AppendConverter(filterc, &dst) != 0)
     {

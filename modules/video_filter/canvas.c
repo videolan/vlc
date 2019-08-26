@@ -333,7 +333,7 @@ static int Activate( vlc_object_t *p_this )
     fmt.video.i_width = p_filter->fmt_in.video.i_width * fmt.video.i_visible_width / p_filter->fmt_in.video.i_visible_width;
     fmt.video.i_height = p_filter->fmt_in.video.i_height * fmt.video.i_visible_height / p_filter->fmt_in.video.i_visible_height;
 
-    filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, &fmt );
+    filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, p_filter->vctx_in, &fmt );
     /* Append scaling module */
     if ( filter_chain_AppendConverter( p_sys->p_chain, NULL ) )
     {

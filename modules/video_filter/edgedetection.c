@@ -105,7 +105,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     /* Clear filter chain */
-    filter_chain_Reset( sys, &p_filter->fmt_in, &p_filter->fmt_in);
+    filter_chain_Reset( sys, &p_filter->fmt_in, p_filter->vctx_in, &p_filter->fmt_in);
     /* Add adjust filter to turn frame black-and-white */
     i_ret = filter_chain_AppendFromString( sys, "adjust{saturation=0}" );
     if ( i_ret == -1 )

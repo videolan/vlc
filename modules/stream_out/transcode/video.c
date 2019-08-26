@@ -99,7 +99,7 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
     msg_Dbg( p_obj, "Checking if filter chain %4.4s -> %4.4s is possible",
                  (char *)&p_dec->fmt_out.i_codec, (char*)&p_enc_in->i_codec );
     test_chain = filter_chain_NewVideo( p_obj, false, NULL );
-    filter_chain_Reset( test_chain, &p_dec->fmt_out, &p_dec->fmt_out );
+    filter_chain_Reset( test_chain, &p_dec->fmt_out, vctx, p_enc_in );
 
     int chain_works = filter_chain_AppendConverter( test_chain, p_enc_in );
     filter_chain_Delete( test_chain );
@@ -241,6 +241,7 @@ static const struct filter_video_callbacks transcode_filter_video_cbs =
 static int transcode_video_set_conversions( sout_stream_t *p_stream,
                                             sout_stream_id_sys_t *id,
                                             const es_format_t **pp_src,
+                                            vlc_video_context **pp_src_vctx,
                                             const es_format_t *p_dst,
                                             bool b_reorient )
 {
@@ -287,7 +288,7 @@ static int transcode_video_set_conversions( sout_stream_t *p_stream,
         *pp_chain = filter_chain_NewVideo( p_stream, step == STEP_NONSTATIC, &owner );
         if( !*pp_chain )
             return VLC_EGENERIC;
-        filter_chain_Reset( *pp_chain, *pp_src, p_tmpdst );
+        filter_chain_Reset( *pp_chain, *pp_src, *pp_src_vctx, p_tmpdst );
 
         if( filter_chain_AppendConverter( *pp_chain, p_tmpdst ) != VLC_SUCCESS )
             return VLC_EGENERIC;
@@ -308,6 +309,7 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
                                          const sout_filters_config_t *p_cfg,
                                          bool b_master_sync,
                                          const es_format_t *p_src,
+                                         vlc_video_context *src_ctx,
                                          const es_format_t *p_dst,
                                          sout_stream_id_sys_t *id )
 {
@@ -319,7 +321,7 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
     id->p_f_chain = filter_chain_NewVideo( p_stream, false, &owner );
     if( !id->p_f_chain )
         return VLC_EGENERIC;
-    filter_chain_Reset( id->p_f_chain, p_src, p_src );
+    filter_chain_Reset( id->p_f_chain, p_src, src_ctx, p_src );
 
     /* Deinterlace */
     if( p_cfg->video.psz_deinterlace != NULL )
@@ -338,7 +340,7 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
     }
 
     /* Chroma and other conversions */
-    if( transcode_video_set_conversions( p_stream, id, &p_src, p_dst,
+    if( transcode_video_set_conversions( p_stream, id, &p_src, &src_ctx, p_dst,
                                          p_cfg->video.b_reorient ) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
@@ -349,7 +351,7 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
         id->p_uf_chain = filter_chain_NewVideo( p_stream, true, &owner );
         if(!id->p_uf_chain)
             return VLC_EGENERIC;
-        filter_chain_Reset( id->p_uf_chain, p_src, p_dst );
+        filter_chain_Reset( id->p_uf_chain, p_src, src_ctx, p_dst );
         filter_chain_AppendFromString( id->p_uf_chain, p_cfg->psz_filters );
         p_src = filter_chain_GetFmtOut( id->p_uf_chain );
         debug_format( p_stream, p_src );
@@ -554,6 +556,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                                                   id->p_filterscfg,
                                                  (id->p_enccfg->video.fps.num > 0),
                                                  &tmpfmt,
+                                                 picture_GetVideoContext(p_pic),
                                                  transcode_encoder_format_in( id->encoder ),
                                                  id ) != VLC_SUCCESS )
                     goto error;

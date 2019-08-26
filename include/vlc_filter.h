@@ -384,9 +384,13 @@ VLC_API void filter_chain_Delete( filter_chain_t * );
  *
  * \param p_chain pointer to filter chain
  * \param p_fmt_in new fmt_in params
+ * \paramt vctx_in new input video context
  * \param p_fmt_out new fmt_out params
  */
-VLC_API void filter_chain_Reset( filter_chain_t *, const es_format_t *, const es_format_t * );
+VLC_API void filter_chain_Reset( filter_chain_t *p_chain,
+                                 const es_format_t *p_fmt_in,
+                                 vlc_video_context *vctx_in,
+                                 const es_format_t *p_fmt_out );
 
 /**
  * Remove all existing filters

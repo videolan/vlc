@@ -378,7 +378,7 @@ static int BuildFilterChain( filter_t *p_filter )
     const vlc_fourcc_t *pi_allowed_chromas = get_allowed_chromas( p_filter );
     for( int i = 0; pi_allowed_chromas[i]; i++ )
     {
-        filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, &p_filter->fmt_out );
+        filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, p_filter->vctx_in, &p_filter->fmt_out );
 
         const vlc_fourcc_t i_chroma = pi_allowed_chromas[i];
         if( i_chroma == p_filter->fmt_in.i_codec ||
@@ -418,7 +418,7 @@ static int BuildFilterChain( filter_t *p_filter )
         es_format_Clean( &fmt_mid );
     }
     if( i_ret != VLC_SUCCESS )
-        filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, &p_filter->fmt_out );
+        filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, p_filter->vctx_in, &p_filter->fmt_out );
 
     return i_ret;
 }
@@ -429,7 +429,7 @@ static int BuildFilterChain( filter_t *p_filter )
 static int CreateChain( filter_t *p_filter, const es_format_t *p_fmt_mid )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, &p_filter->fmt_out );
+    filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, p_filter->vctx_in, &p_filter->fmt_out );
 
     if( p_filter->fmt_in.video.orientation != p_fmt_mid->video.orientation)
     {
@@ -467,7 +467,7 @@ error:
 static int CreateResizeChromaChain( filter_t *p_filter, const es_format_t *p_fmt_mid )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, &p_filter->fmt_out );
+    filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, p_filter->vctx_in, &p_filter->fmt_out );
 
     int i_ret = filter_chain_AppendConverter( p_sys->p_chain, p_fmt_mid );
     if( i_ret != VLC_SUCCESS )

@@ -503,7 +503,7 @@ static const struct filter_video_callbacks transcode_filter_video_cbs =
     transcode_video_filter_buffer_new, NULL,
 };
 
-filter_chain_t * VideoDecodedStream::VideoFilterCreate(const es_format_t *p_srcfmt)
+filter_chain_t * VideoDecodedStream::VideoFilterCreate(const es_format_t *p_srcfmt, vlc_video_context *vctx)
 {
     filter_chain_t *p_chain;
     filter_owner_t owner;
@@ -513,7 +513,7 @@ filter_chain_t * VideoDecodedStream::VideoFilterCreate(const es_format_t *p_srcf
     p_chain = filter_chain_NewVideo(p_stream, false, &owner);
     if(!p_chain)
         return NULL;
-    filter_chain_Reset(p_chain, p_srcfmt, &requestedoutput);
+    filter_chain_Reset(p_chain, p_srcfmt, vctx, &requestedoutput);
 
     if(p_srcfmt->video.i_chroma != requestedoutput.video.i_chroma)
     {
@@ -547,7 +547,8 @@ void VideoDecodedStream::Output(picture_t *p_pic)
 
         if(p_filters_chain)
             filter_chain_Delete(p_filters_chain);
-        p_filters_chain = VideoFilterCreate(&p_owner->last_fmt_update);
+        p_filters_chain = VideoFilterCreate(&p_owner->last_fmt_update,
+                                            picture_GetVideoContext(p_pic));
         if(!p_filters_chain)
         {
             picture_Release(p_pic);
