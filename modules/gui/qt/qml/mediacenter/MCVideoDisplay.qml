@@ -357,7 +357,12 @@ Utils.NavigableFocusScope {
                         onActionLeft: root.actionLeft(index)
                         onActionRight: root.actionRight(index)
                         onActionDown: root.actionDown(index)
-                        onActionUp: recentsGV.forceActiveFocus()
+                        onActionUp: {
+                            if (recentsSection.visible)
+                                recentsGV.forceActiveFocus()
+                            else
+                                root.actionUp(index)
+                        }
                         onActionCancel: root.actionCancel(index)
 
                         /*
