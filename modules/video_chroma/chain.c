@@ -289,10 +289,7 @@ static int BuildTransformChain( filter_t *p_filter )
     EsFormatMergeSize( &fmt_mid, &p_filter->fmt_out, &p_filter->fmt_in );
     i_ret = CreateChain( p_filter, &fmt_mid );
     es_format_Clean( &fmt_mid );
-    if( i_ret == VLC_SUCCESS )
-        return VLC_SUCCESS;
-
-    return VLC_EGENERIC;
+    return i_ret;
 }
 
 static int BuildChromaResize( filter_t *p_filter )
