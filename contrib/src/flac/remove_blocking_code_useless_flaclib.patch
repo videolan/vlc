@@ -1,11 +1,11 @@
---- flac/src/share/grabbag/file.c.orig	2014-11-27 02:19:47.048799991 +0100
-+++ flac/src/share/grabbag/file.c	2016-05-13 16:32:33.727811662 +0200
-@@ -117,34 +117,7 @@
+--- flac-orig/src/share/grabbag/file.c	2019-08-26 11:13:17.600801754 -0400
++++ flac/src/share/grabbag/file.c	2019-08-26 11:27:16.801546222 -0400
+@@ -118,34 +118,7 @@
  FLAC__bool grabbag__file_are_same(const char *f1, const char *f2)
  {
- #if defined _MSC_VER || defined __MINGW32__
+ #if defined _WIN32 && !defined __CYGWIN__
 -	/* see
--	 * http://www.hydrogenaudio.org/forums/index.php?showtopic=49439&pid=444300&st=0
+-	 *  http://www.hydrogenaudio.org/forums/index.php?showtopic=49439&pid=444300&st=0
 -	 *  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/fs/getfileinformationbyhandle.asp
 -	 *  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/fs/by_handle_file_information_str.asp
 -	 *  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/fs/createfile.asp
@@ -32,7 +32,7 @@
 -	if(h2 != INVALID_HANDLE_VALUE)
 -		CloseHandle(h2);
 -	return same;
-+    return true;
++	return true;
  #else
  	struct flac_stat_s s1, s2;
  	return f1 && f2 && flac_stat(f1, &s1) == 0 && flac_stat(f2, &s2) == 0 && s1.st_ino == s2.st_ino && s1.st_dev == s2.st_dev;
