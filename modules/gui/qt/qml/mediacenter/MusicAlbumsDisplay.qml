@@ -167,7 +167,6 @@ Utils.NavigableFocusScope {
             }
 
             model: delegateModel
-            modelTop: delegateModel.parts.gridTop
             modelCount: delegateModel.items.count
 
             onActionAtIndex: {

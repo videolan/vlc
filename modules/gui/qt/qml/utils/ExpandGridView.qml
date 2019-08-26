@@ -32,7 +32,6 @@ NavigableFocusScope {
 
     //model to be rendered, model has to be passed twice, as they cannot be shared between views
     property alias model: flickable.model
-    property variant modelTop
     property int modelCount: 0
 
     property int currentIndex: 0

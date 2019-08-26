@@ -317,7 +317,6 @@ Utils.NavigableFocusScope {
                         anchors.fill: parent
                         flickableDirection:  Flickable.VerticalFlick
                         model: videosDelegate
-                        modelTop: videosDelegate.parts.gridTop
                         modelCount: videosDelegate.items.count
 
                         expandDelegateImplicitHeight: view.height/3
