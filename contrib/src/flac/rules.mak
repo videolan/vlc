@@ -1,6 +1,6 @@
 # FLAC
 
-FLAC_VERSION := 1.3.2
+FLAC_VERSION := 1.3.3
 FLAC_URL := http://downloads.xiph.org/releases/flac/flac-$(FLAC_VERSION).tar.xz
 
 PKGS += flac

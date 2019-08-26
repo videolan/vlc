@@ -1,17 +1,20 @@
---- flac/src/libFLAC/windows_unicode_filenames.c.orig	2017-01-05 16:36:45.696358168 +0100
-+++ flac/src/libFLAC/windows_unicode_filenames.c	2017-01-05 17:03:41.052478210 +0100
-@@ -35,6 +35,7 @@
+--- flac-orig/src/share/win_utf8_io/win_utf8_io.c	2019-08-26 11:13:17.600801754 -0400
++++ flac/src/share/win_utf8_io/win_utf8_io.c	2019-08-26 11:20:27.895132487 -0400
+@@ -34,8 +34,10 @@
+ #endif
  
- #include <io.h>
+ #include <windows.h>
++#include <winapifamily.h>
+ #include "share/win_utf8_io.h"
  #include "share/windows_unicode_filenames.h"
 +#include <winapifamily.h>
  
- /* convert UTF-8 back to WCHAR. Caller is responsible for freeing memory */
- static wchar_t *wchar_from_utf8(const char *str)
-@@ -186,7 +187,11 @@
- HANDLE WINAPI flac_internal_CreateFile_utf8(const char *lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
+ #define UTF8_BUFFER_SIZE 32768
+ 
+@@ -153,7 +155,11 @@
+ HANDLE WINAPI CreateFile_utf8(const char *lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
  {
- 	if (!utf8_filenames) {
+ 	if (!flac_internal_get_utf8_filenames()) {
 +#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) 
  		return CreateFileA(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
 +#else
@@ -20,3 +23,37 @@
  	} else {
  		wchar_t *wname;
  		HANDLE handle = INVALID_HANDLE_VALUE;
+@@ -182,11 +188,13 @@
+ int win_get_console_width(void)
+ {
+ 	int width = 80;
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	CONSOLE_SCREEN_BUFFER_INFO csbi;
+ 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+ 	if(hOut != INVALID_HANDLE_VALUE && hOut != NULL)
+ 		if (GetConsoleScreenBufferInfo(hOut, &csbi) != 0)
+ 			width = csbi.dwSize.X;
++#endif
+ 	return width;
+ }
+ 
+@@ -194,6 +202,11 @@
+ 
+ static int wprint_console(FILE *stream, const wchar_t *text, size_t len)
+ {
++#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++	(void)stream;
++	OutputDebugStringW(text);
++	return len;
++#else
+ 	DWORD out;
+ 	int ret;
+ 
+@@ -220,6 +233,7 @@
+ 	if (ret < 0)
+ 		return ret;
+ 	return len;
++#endif
+ }
+ 
+ int printf_utf8(const char *format, ...)
