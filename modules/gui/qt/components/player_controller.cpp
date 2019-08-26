@@ -1050,14 +1050,14 @@ void PlayerController::setTime(VLCTick new_time)
 {
     Q_D(PlayerController);
     vlc_player_locker lock{ d->m_player };
-    return vlc_player_SetTime( d->m_player, new_time );
+    vlc_player_SetTime( d->m_player, new_time );
 }
 
 void PlayerController::setPosition(float position)
 {
     Q_D(PlayerController);
     vlc_player_locker lock{ d->m_player };
-    return vlc_player_SetPosition( d->m_player, position );
+    vlc_player_SetPosition( d->m_player, position );
 }
 
 void PlayerController::jumpFwd()
