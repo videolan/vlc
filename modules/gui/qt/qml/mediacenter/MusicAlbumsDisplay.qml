@@ -160,7 +160,6 @@ Utils.NavigableFocusScope {
                     anchors.fill: parent
                     onActionCancel:  gridView_id.retract()
                     onActionUp:  gridView_id.retract()
-                    onActionDown: gridView_id.retract()
                     onActionLeft: root.actionLeft(index)
                     onActionRight: root.actionRight(index)
                 }
