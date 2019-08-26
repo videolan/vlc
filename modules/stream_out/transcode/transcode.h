@@ -42,8 +42,6 @@ typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
 
 typedef struct
 {
-    sout_stream_id_sys_t *id_video;
-
     bool                  b_soverlay;
 
     /* Audio */
@@ -57,9 +55,13 @@ typedef struct
     /* SPU */
     transcode_encoder_config_t senc_cfg;
 
+    /* Shared betweeen streams */
+    vlc_mutex_t     lock;
     /* Sync */
     bool            b_master_sync;
     sout_stream_id_sys_t *id_master_sync;
+    /* Spu's video */
+    sout_stream_id_sys_t *id_video;
 
 } sout_stream_sys_t;
 
