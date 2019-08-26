@@ -496,8 +496,6 @@ static void DeleteSoutStreamID( sout_stream_id_sys_t *id )
 {
     if( id )
     {
-        decoder_Destroy( id->p_decoder );
-
         vlc_mutex_destroy(&id->fifo.lock);
         free( id );
     }
@@ -660,6 +658,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     return id;
 
 error:
+    decoder_Destroy( id->p_decoder );
     DeleteSoutStreamID( id );
     return NULL;
 }
@@ -668,29 +667,35 @@ static void Del( sout_stream_t *p_stream, void *_id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
+
     if( id->b_transcode )
     {
-        switch( id->p_decoder->fmt_in.i_cat )
+        int i_cat = id->p_decoder ? id->p_decoder->fmt_in.i_cat : UNKNOWN_ES;
+        switch( i_cat )
         {
         case AUDIO_ES:
             Send( p_stream, id, NULL );
+            decoder_Destroy( id->p_decoder );
             transcode_audio_clean( p_stream, id );
             if( id == p_sys->id_master_sync )
                 p_sys->id_master_sync = NULL;
             break;
         case VIDEO_ES:
             Send( p_stream, id, NULL );
+            decoder_Destroy( id->p_decoder );
             if( id == p_sys->id_video )
                 p_sys->id_video = NULL;
             transcode_video_clean( p_stream, id );
             break;
         case SPU_ES:
+            decoder_Destroy( id->p_decoder );
             transcode_spu_clean( p_stream, id );
             break;
         default:
             break;
         }
     }
+    else decoder_Destroy( id->p_decoder );
 
     if( id->downstream_id ) sout_StreamIdDel( p_stream->p_next, id->downstream_id );
 
