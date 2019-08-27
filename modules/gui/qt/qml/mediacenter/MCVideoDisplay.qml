@@ -315,7 +315,6 @@ Utils.NavigableFocusScope {
 
                         activeFocusOnTab:true
                         anchors.fill: parent
-                        flickableDirection:  Flickable.VerticalFlick
                         model: videosDelegate
                         modelCount: videosDelegate.items.count
 

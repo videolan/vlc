@@ -40,7 +40,6 @@ NavigableFocusScope {
     property alias contentX: flickable.contentX
     property bool isSingleRow: false
     property bool isAnimating: animateRetractItem.running || animateExpandItem.running
-    property alias flickableDirection: flickable.flickableDirection
 
     /// the id of the item to be expanded
     property int _expandIndex: -1
@@ -89,10 +88,9 @@ NavigableFocusScope {
     Flickable {
         id: flickable
         clip: true
-        ScrollBar.horizontal: ScrollBar{
-            anchors.bottom: flickable.bottom
-            anchors.left: flickable.left
-        }
+
+        flickableDirection: Flickable.VerticalFlick
+        ScrollBar.vertical: ScrollBar { }
 
         Loader {
             id: headerItemLoader
