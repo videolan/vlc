@@ -977,7 +977,6 @@ static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture
 {
     decoder_t *p_dec = &p_owner->dec;
     vout_thread_t  *p_vout = p_owner->p_vout;
-    bool prerolled;
 
     if( p_picture->date == VLC_TICK_INVALID )
         /* FIXME: VLC_TICK_INVALID -- verify video_output */
@@ -988,14 +987,14 @@ static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture
     }
 
     vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->i_preroll_end > p_picture->date )
+    bool prerolled = p_owner->i_preroll_end != (vlc_tick_t)INT64_MIN;
+    if( prerolled && p_owner->i_preroll_end > p_picture->date )
     {
         vlc_mutex_unlock( &p_owner->lock );
         picture_Release( p_picture );
         return VLC_SUCCESS;
     }
 
-    prerolled = p_owner->i_preroll_end > (vlc_tick_t)INT64_MIN;
     p_owner->i_preroll_end = (vlc_tick_t)INT64_MIN;
     vlc_mutex_unlock( &p_owner->lock );
 
@@ -1123,7 +1122,6 @@ static void DecoderQueueThumbnail( decoder_t *p_dec, picture_t *p_pic )
 static int DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio )
 {
     decoder_t *p_dec = &p_owner->dec;
-    bool prerolled;
 
     assert( p_audio != NULL );
 
@@ -1135,14 +1133,14 @@ static int DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio )
     }
 
     vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->i_preroll_end > p_audio->i_pts )
+    bool prerolled = p_owner->i_preroll_end != (vlc_tick_t)INT64_MIN;
+    if( prerolled && p_owner->i_preroll_end > p_audio->i_pts )
     {
         vlc_mutex_unlock( &p_owner->lock );
         block_Release( p_audio );
         return VLC_SUCCESS;
     }
 
-    prerolled = p_owner->i_preroll_end > (vlc_tick_t)INT64_MIN;
     p_owner->i_preroll_end = (vlc_tick_t)INT64_MIN;
     vlc_mutex_unlock( &p_owner->lock );
 
