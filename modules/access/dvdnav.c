@@ -690,7 +690,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             const char *title_name = NULL;
 
             dvdnav_get_title_string(p_sys->dvdnav, &title_name);
-            if( (NULL != title_name) && ('\0' != title_name[0]) )
+            if( (NULL != title_name) && ('\0' != title_name[0]) && IsUTF8(title_name) )
             {
                 vlc_meta_t *p_meta = va_arg( args, vlc_meta_t* );
                 vlc_meta_Set( p_meta, vlc_meta_Title, title_name );
