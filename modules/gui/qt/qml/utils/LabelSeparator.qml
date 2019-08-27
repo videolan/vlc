@@ -23,10 +23,6 @@ import "qrc:///style/"
 Item{
     id: control
     height: childrenRect.height
-    anchors{
-        left: parent.left
-        right: parent.right
-    }
 
     property alias text: txt.text
 
