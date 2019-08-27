@@ -616,6 +616,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/menus/ViewMenu.qml \
 	gui/qt/qml/menus/VideoMenu.qml \
 	gui/qt/qml/mediacenter/ArtistTopBanner.qml \
+	gui/qt/qml/mediacenter/AudioGridItem.qml \
 	gui/qt/qml/mediacenter/MCMainDisplay.qml \
 	gui/qt/qml/mediacenter/MCMusicDisplay.qml \
 	gui/qt/qml/mediacenter/MCVideoDisplay.qml \

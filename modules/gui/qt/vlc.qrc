@@ -226,6 +226,7 @@
         <file alias="MCVideoListDisplay.qml">qml/mediacenter/MCVideoListDisplay.qml</file>
         <file alias="NetworkFileDisplayGrid.qml">qml/mediacenter/NetworkFileDisplayGrid.qml</file>
         <file alias="NetworkDriveDisplayGrid.qml">qml/mediacenter/NetworkDriveDisplayGrid.qml</file>
+        <file alias="AudioGridItem.qml">qml/mediacenter/AudioGridItem.qml</file>
     </qresource>
     <qresource prefix="/style">
         <file alias="qmldir">qml/style/qmldir</file>
