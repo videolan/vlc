@@ -63,6 +63,7 @@ Utils.NavigableFocusScope {
                 id: playingItemInfo
                 Layout.fillHeight: true
                 width: childrenRect.width
+                focus: true
 
                 Rectangle {
                     anchors.fill: parent
