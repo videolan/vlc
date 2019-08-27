@@ -122,8 +122,10 @@ NavigableFocusScope {
         }
 
         function getItemPos(id) {
+            var colCount = flickable.getNbItemsPerRow()
+            var remainingSpace = flickable.width - colCount * root.cellWidth
             var rowCol = getItemRowCol(id)
-            return [rowCol[0] * root.cellWidth, rowCol[1] * root.cellHeight]
+            return [(rowCol[0] * root.cellWidth) + (remainingSpace / 2), rowCol[1] * root.cellHeight]
         }
 
         function getExpandItemGridId() {
