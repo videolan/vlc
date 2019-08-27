@@ -109,6 +109,10 @@ struct decoder_owner
     /* -- Theses variables need locking on read *and* write -- */
     /* Preroll */
     vlc_tick_t i_preroll_end;
+
+#define PREROLL_NONE    INT64_MIN // vlc_tick_t
+#define PREROLL_FORCED  INT64_MAX // vlc_tick_t
+
     /* Pause & Rate */
     bool reset_out_state;
     vlc_tick_t pause_date;
@@ -773,11 +777,11 @@ static void DecoderWaitUnblock( struct decoder_owner *p_owner )
 static inline void DecoderUpdatePreroll( vlc_tick_t *pi_preroll, const block_t *p )
 {
     if( p->i_flags & BLOCK_FLAG_PREROLL )
-        *pi_preroll = (vlc_tick_t)INT64_MAX;
+        *pi_preroll = PREROLL_FORCED;
     /* Check if we can use the packet for end of preroll */
     else if( (p->i_flags & BLOCK_FLAG_DISCONTINUITY) &&
              (p->i_buffer == 0 || (p->i_flags & BLOCK_FLAG_CORRUPTED)) )
-        *pi_preroll = (vlc_tick_t)INT64_MAX;
+        *pi_preroll = PREROLL_FORCED;
     else if( p->i_dts != VLC_TICK_INVALID )
         *pi_preroll = __MIN( *pi_preroll, p->i_dts );
     else if( p->i_pts != VLC_TICK_INVALID )
@@ -987,7 +991,7 @@ static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture
     }
 
     vlc_mutex_lock( &p_owner->lock );
-    bool prerolled = p_owner->i_preroll_end != (vlc_tick_t)INT64_MIN;
+    bool prerolled = p_owner->i_preroll_end != PREROLL_NONE;
     if( prerolled && p_owner->i_preroll_end > p_picture->date )
     {
         vlc_mutex_unlock( &p_owner->lock );
@@ -995,7 +999,7 @@ static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture
         return VLC_SUCCESS;
     }
 
-    p_owner->i_preroll_end = (vlc_tick_t)INT64_MIN;
+    p_owner->i_preroll_end = PREROLL_NONE;
     vlc_mutex_unlock( &p_owner->lock );
 
     if( unlikely(prerolled) )
@@ -1119,7 +1123,7 @@ static int DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio )
     }
 
     vlc_mutex_lock( &p_owner->lock );
-    bool prerolled = p_owner->i_preroll_end != (vlc_tick_t)INT64_MIN;
+    bool prerolled = p_owner->i_preroll_end != PREROLL_NONE;
     if( prerolled && p_owner->i_preroll_end > p_audio->i_pts )
     {
         vlc_mutex_unlock( &p_owner->lock );
@@ -1127,7 +1131,7 @@ static int DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio )
         return VLC_SUCCESS;
     }
 
-    p_owner->i_preroll_end = (vlc_tick_t)INT64_MIN;
+    p_owner->i_preroll_end = PREROLL_NONE;
     vlc_mutex_unlock( &p_owner->lock );
 
     if( unlikely(prerolled) )
@@ -1452,7 +1456,7 @@ static void DecoderProcessFlush( struct decoder_owner *p_owner )
         }
     }
 
-    p_owner->i_preroll_end = (vlc_tick_t)INT64_MIN;
+    p_owner->i_preroll_end = PREROLL_NONE;
     vlc_mutex_unlock( &p_owner->lock );
 }
 
@@ -1750,7 +1754,7 @@ static struct decoder_owner * CreateDecoder( vlc_object_t *p_parent,
     p_dec = &p_owner->dec;
 
     p_owner->p_clock = p_clock;
-    p_owner->i_preroll_end = (vlc_tick_t)INT64_MIN;
+    p_owner->i_preroll_end = PREROLL_NONE;
     p_owner->p_resource = p_resource;
     p_owner->cbs = cbs;
     p_owner->cbs_userdata = cbs_userdata;
