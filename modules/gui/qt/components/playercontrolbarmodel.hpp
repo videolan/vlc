@@ -110,7 +110,7 @@ signals:
     void configNameChanged(QString);
 
 protected:
-    intf_thread_t       *p_intf;
+    intf_thread_t       *p_intf  = nullptr;
 
 private:
     QVector<IconToolButton> mButtons;
@@ -123,7 +123,7 @@ private:
     void addProfiles();
     void loadConfig();
 
-    QmlMainContext* m_mainCtx;
+    QmlMainContext* m_mainCtx = nullptr;
 
 public slots:
     Q_INVOKABLE void insert(int index, QVariantMap bdata);

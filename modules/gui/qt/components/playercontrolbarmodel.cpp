@@ -180,12 +180,10 @@ void PlayerControlBarModel::setMainCtx(QmlMainContext* ctx)
     if(ctx == nullptr && m_mainCtx == ctx)
         return;
     m_mainCtx = ctx;
+    p_intf = m_mainCtx->getIntf();
+    assert(p_intf != nullptr);
+    reloadModel();
     emit ctxChanged(ctx);
-    intf_thread_t *temp_intf = m_mainCtx->getIntf();
-    if(temp_intf != nullptr && temp_intf != p_intf)
-        p_intf = temp_intf;
-    else
-        return;
 }
 
 void PlayerControlBarModel::setConfigName(QString name)
@@ -197,6 +195,8 @@ void PlayerControlBarModel::setConfigName(QString name)
         defaultConfig = MAIN_TB1_DEFAULT;
     else
         defaultConfig = MINI_TB_DEFAULT;
+    if  (m_mainCtx)
+        reloadModel();
     emit configNameChanged(name);
 }
 
