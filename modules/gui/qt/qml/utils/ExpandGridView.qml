@@ -47,7 +47,7 @@ NavigableFocusScope {
     property int _newExpandIndex: -1
 
     //delegate to display the extended item
-    property Component gridDelegate: Item{}
+    property Component delegate: Item{}
     property Component expandDelegate: Item{}
     property Item expanderItem: Item{}
 
@@ -229,7 +229,7 @@ NavigableFocusScope {
             if (nbItems > _unusedItemList.length + Object.keys(toKeep).length) {
                 var toCreate = nbItems - (_unusedItemList.length + Object.keys(toKeep).length)
                 for (i = 0; i < toCreate; ++i) {
-                    val = root.gridDelegate.createObject(contentItem);
+                    val = root.delegate.createObject(contentItem);
                     _unusedItemList.push(val)
                 }
             }

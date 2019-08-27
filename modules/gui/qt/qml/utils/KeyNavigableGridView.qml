@@ -31,6 +31,7 @@ NavigableFocusScope {
     //forward view properties
     property alias interactive: view.interactive
     property alias model: view.model
+    property alias delegate: view.delegate
 
     property alias cellWidth: view.cellWidth
     property alias cellHeight: view.cellHeight

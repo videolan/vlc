@@ -42,7 +42,7 @@ Utils.ExpandGridView {
     property real gridDelegatePictureHeight: VLCStyle.video_normal_height
 
 
-    gridDelegate: Utils.GridItem {
+    delegate: Utils.GridItem {
         property variant delegateModelItem: ({
                                                  model: ({}),
                                                  itemsIndex: 0,

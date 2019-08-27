@@ -117,7 +117,7 @@ Utils.NavigableFocusScope {
             cellWidth: VLCStyle.cover_normal + VLCStyle.margin_small
             cellHeight: VLCStyle.cover_normal + VLCStyle.fontHeight_normal * 2
 
-            gridDelegate: Utils.GridItem {
+            delegate: Utils.GridItem {
                 property variant delegateModelItem: ({
                     model: ({}),
                     itemsIndex: 0,
