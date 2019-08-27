@@ -51,6 +51,9 @@ NavigableFocusScope {
     property Component expandDelegate: Item{}
     property Item expanderItem: Item{}
 
+    property Component headerDelegate: Item{}
+    property int headerHeight: headerItemLoader.implicitHeight
+
     //signals emitted when selected items is updated from keyboard
     signal selectionUpdated( int keyModifiers, int oldIndex,int newIndex )
     signal selectAll()
@@ -91,6 +94,17 @@ NavigableFocusScope {
             anchors.left: flickable.left
         }
 
+        Loader {
+            id: headerItemLoader
+            visible: flickable.contentY < root.headerHeight
+            sourceComponent: headerDelegate
+            onLoaded: {
+                item.x = 0
+                item.y = 0
+            }
+        }
+
+
         property variant model
         property alias expandItem: expandItemLoader.item
         //root.expandDelegate.createObject(contentItem, {"height": 0})
@@ -125,7 +139,7 @@ NavigableFocusScope {
             var colCount = flickable.getNbItemsPerRow()
             var remainingSpace = flickable.width - colCount * root.cellWidth
             var rowCol = getItemRowCol(id)
-            return [(rowCol[0] * root.cellWidth) + (remainingSpace / 2), rowCol[1] * root.cellHeight]
+            return [(rowCol[0] * root.cellWidth) + (remainingSpace / 2), rowCol[1] * root.cellHeight + headerHeight]
         }
 
         function getExpandItemGridId() {
@@ -143,16 +157,18 @@ NavigableFocusScope {
         property variant idChildrenMap: ({})
 
         function getFirstAndLastInstanciatedItemIds() {
-            var contentYWithoutExpand = contentY
+            var myContentY = contentY - root.headerHeight
+
+            var contentYWithoutExpand = myContentY
             var heightWithoutExpand = height
             if (root._expandIndex !== -1) {
-                if (contentY >= expandItem.y && contentY < expandItem.y + expandItem.height)
+                if (myContentY >= expandItem.y && myContentY < expandItem.y + expandItem.height)
                     contentYWithoutExpand = expandItem.y
-                if (contentY >= expandItem.y + expandItem.height)
-                    contentYWithoutExpand = contentY - expandItem.height
+                if (myContentY >= expandItem.y + expandItem.height)
+                    contentYWithoutExpand = myContentY - expandItem.height
 
-                var expandYStart = Math.max(contentY, expandItem.y)
-                var expandYEnd = Math.min(contentY + height, expandItem.y + expandItem.height)
+                var expandYStart = Math.max(myContentY, expandItem.y)
+                var expandYEnd = Math.min(myContentY + height, expandItem.y + expandItem.height)
                 var expandDisplayedHeight = Math.max(expandYEnd - expandYStart, 0)
                 heightWithoutExpand -= expandDisplayedHeight
             }
