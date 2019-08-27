@@ -42,53 +42,9 @@ Utils.NavigableFocusScope {
         }
 
         delegate: Package {
-            id: element
-            Utils.GridItem {
-                Package.name: "grid"
-                id: gridItem
-                image: VLCStyle.noArtAlbum
-                title: model.name || "Unknown genre"
-                selected: element.DelegateModel.inSelected
-
-                onItemClicked: {
-                    delegateModel.updateSelection( modifier , view.currentItem.currentIndex, index)
-                    view.currentItem.currentIndex = index
-                    view.currentItem.forceActiveFocus()
-                }
-                onPlayClicked: {
-                    medialib.addAndPlay( model.id )
-                }
-                onItemDoubleClicked: {
-                    history.push(["mc", "music", "albums", { parentId: model.id } ], History.Go)
-                }
-                onAddToPlaylistClicked: {
-                    medialib.addToPlaylist( model.id );
-                }
-
-                //replace image with a mutlicovers preview
-                Utils.MultiCoverPreview {
-                    id: multicover
-                    visible: false
-                    width: VLCStyle.cover_normal
-                    height: VLCStyle.cover_normal
-
-                    albums: MLAlbumModel {
-                        ml: medialib
-                        parentId: model.id
-                    }
-                }
-
-                Component.onCompleted: {
-                    multicover.grabToImage(function(result) {
-                        gridItem.sourceSize = undefined
-                        gridItem.image = result.url
-                        //multicover.destroy()
-                    })
-                }
-            }
-
             Utils.ListItem {
                 Package.name: "list"
+
                 width: root.width
                 height: VLCStyle.icon_normal + VLCStyle.margin_small
 
@@ -153,11 +109,50 @@ Utils.NavigableFocusScope {
     /* Grid View */
     Component {
         id: gridComponent
-        Utils.KeyNavigableGridView {
+        Utils.ExpandGridView {
             id: gridView_id
 
-            model: delegateModel.parts.grid
+            model: delegateModel
             modelCount: delegateModel.items.count
+            delegate: AudioGridItem {
+                id: gridItem
+
+                image: VLCStyle.noArtAlbum
+                title: modelData.name || "Unknown genre"
+                subtitle: ""
+                //selected: element.DelegateModel.inSelected
+
+                onItemClicked: {
+                    delegateModel.updateSelection( modifier , view.currentItem.currentIndex, index)
+                    view.currentItem.currentIndex = index
+                    view.currentItem.forceActiveFocus()
+                }
+
+                onItemDoubleClicked: {
+                    history.push(["mc", "music", "albums", { parentId: modelData.id } ], History.Go)
+                }
+
+                //replace image with a mutlicovers preview
+                Utils.MultiCoverPreview {
+                    id: multicover
+                    visible: false
+                    width: VLCStyle.cover_normal
+                    height: VLCStyle.cover_normal
+
+                    albums: MLAlbumModel {
+                        ml: medialib
+                        parentId: modelData.id
+                    }
+                }
+
+                Component.onCompleted: {
+                    multicover.grabToImage(function(result) {
+                        gridItem.sourceSize = undefined
+                        gridItem.image = result.url
+                        //multicover.destroy()
+                    })
+                }
+            }
 
             focus: true
 
@@ -175,7 +170,6 @@ Utils.NavigableFocusScope {
             onActionCancel: root.actionCancel(index)
         }
     }
-
 
     Component {
         id: listComponent

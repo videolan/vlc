@@ -116,26 +116,14 @@ Utils.NavigableFocusScope {
             cellWidth: VLCStyle.cover_normal + VLCStyle.margin_small
             cellHeight: VLCStyle.cover_normal + VLCStyle.fontHeight_normal * 2
 
-            delegate: Utils.GridItem {
-                property variant delegateModelItem: ({
-                    model: ({}),
-                    itemsIndex: 0,
-                    inSelected: false
-                })
+            delegate: AudioGridItem {
+                id: audioGridItem
 
-                image: delegateModelItem.model.cover || VLCStyle.noArtAlbum
-                title: delegateModelItem.model.title || qsTr("Unknown title")
-                subtitle: delegateModelItem.model.main_artist || qsTr("Unknown artist")
-                selected: delegateModelItem.inSelected
                 onItemClicked : {
-                    delegateModel.updateSelection( modifier , view.currentItem.currentIndex, delegateModelItem.itemsIndex)
-                    view.currentItem.currentIndex = delegateModelItem.itemsIndex
-                    //view.currentItem.forceActiveFocus()
-                    view._switchExpandItem( delegateModelItem.itemsIndex )
-
+                    delegateModel.updateSelection( modifier , root.currentIndex, index)
+                    root.currentIndex = index
+                    view._switchExpandItem( index )
                 }
-                onPlayClicked: medialib.addAndPlay( delegateModelItem.model.id )
-                onAddToPlaylistClicked : medialib.addToPlaylist( delegateModelItem.model.id )
             }
 
             expandDelegate:  Rectangle {
