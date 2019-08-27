@@ -744,7 +744,7 @@ typedef struct {
 static void ThreadChangeFilters(vout_thread_t *vout,
                                 const video_format_t *source,
                                 const char *filters,
-                                int deinterlace,
+                                const bool *new_deinterlace,
                                 bool is_locked)
 {
     ThreadFilterFlush(vout, is_locked);
@@ -756,8 +756,8 @@ static void ThreadChangeFilters(vout_thread_t *vout,
     vlc_array_init(&array_static);
     vlc_array_init(&array_interactive);
 
-    vout->p->filter.has_deint =
-         deinterlace == 1 || (deinterlace == -1 && vout->p->filter.has_deint);
+    if (new_deinterlace != NULL)
+        vout->p->filter.has_deint = *new_deinterlace;
 
     if (vout->p->filter.has_deint)
     {
@@ -903,7 +903,7 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool fra
                     }
                 }
                 if (!VideoFormatIsCropArEqual(&decoded->format, &vout->p->filter.format))
-                    ThreadChangeFilters(vout, &decoded->format, vout->p->filter.configuration, -1, true);
+                    ThreadChangeFilters(vout, &decoded->format, vout->p->filter.configuration, NULL, true);
             }
         }
 
@@ -1573,11 +1573,11 @@ static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         ThreadChangeFilters(vout, NULL,
                             cmd.string != NULL ?
                             cmd.string : vout->p->filter.configuration,
-                            -1, false);
+                            NULL, false);
         break;
     case VOUT_CONTROL_CHANGE_INTERLACE:
         ThreadChangeFilters(vout, NULL, vout->p->filter.configuration,
-                            cmd.boolean ? 1 : 0, false);
+                            &cmd.boolean, false);
         break;
     case VOUT_CONTROL_MOUSE_STATE:
         ThreadProcessMouseState(vout, &cmd.mouse);
