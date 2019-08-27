@@ -636,6 +636,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/mediacenter/NetworkDriveDisplayGrid.qml \
 	gui/qt/qml/mediacenter/NetworkListItem.qml \
 	gui/qt/qml/mediacenter/VideoExpandableGrid.qml \
+	gui/qt/qml/mediacenter/VideoGridItem.qml \
 	gui/qt/qml/playlist/PlaylistListView.qml \
 	gui/qt/qml/playlist/PlaylistMainView.qml \
 	gui/qt/qml/playlist/PLItem.qml \
