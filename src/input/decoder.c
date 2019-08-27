@@ -1118,8 +1118,7 @@ static void DecoderQueueThumbnail( decoder_t *p_dec, picture_t *p_pic )
 
 }
 
-static void DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio,
-                             unsigned *restrict pi_lost_sum )
+static int DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio )
 {
     decoder_t *p_dec = &p_owner->dec;
     bool prerolled;
@@ -1131,7 +1130,7 @@ static void DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio,
     {
         vlc_mutex_unlock( &p_owner->lock );
         block_Release( p_audio );
-        return;
+        return VLC_SUCCESS;
     }
 
     prerolled = p_owner->i_preroll_end > (vlc_tick_t)INT64_MIN;
@@ -1150,9 +1149,8 @@ static void DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio,
     if( p_audio->i_pts == VLC_TICK_INVALID ) // FIXME --VLC_TICK_INVALID verify audio_output/*
     {
         msg_Warn( p_dec, "non-dated audio buffer received" );
-        *pi_lost_sum += 1;
         block_Release( p_audio );
-        return;
+        return VLC_EGENERIC;
     }
 
     /* */
@@ -1184,14 +1182,12 @@ static void DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio,
              * previous (failing) aout but will try to create a new one. */
             atomic_store( &p_owner->reload, RELOAD_DECODER_AOUT );
         }
+        return VLC_SUCCESS;
     }
-    else
-    {
-        msg_Dbg( p_dec, "discarded audio buffer" );
-        *pi_lost_sum += 1;
-        block_Release( p_audio );
-    }
-    return;
+
+    msg_Dbg( p_dec, "discarded audio buffer" );
+    block_Release( p_audio );
+    return VLC_EGENERIC;
 }
 
 static void DecoderUpdateStatAudio( struct decoder_owner *p_owner,
@@ -1212,12 +1208,11 @@ static void DecoderUpdateStatAudio( struct decoder_owner *p_owner,
 
 static void DecoderQueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
 {
-    unsigned lost = 0;
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
-    DecoderPlayAudio( p_owner, p_aout_buf, &lost );
+    int success = DecoderPlayAudio( p_owner, p_aout_buf );
 
-    p_owner->pf_update_stat( p_owner, 1, lost );
+    p_owner->pf_update_stat( p_owner, 1, success != VLC_SUCCESS ? 1 : 0 );
 }
 
 static void DecoderPlaySpu( struct decoder_owner *p_owner, subpicture_t *p_subpic )
