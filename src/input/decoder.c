@@ -973,8 +973,7 @@ static void DecoderQueueCc( decoder_t *p_videodec, block_t *p_cc,
     }
 }
 
-static void DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture,
-                             unsigned *restrict pi_lost_sum )
+static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture )
 {
     decoder_t *p_dec = &p_owner->dec;
     vout_thread_t  *p_vout = p_owner->p_vout;
@@ -985,7 +984,7 @@ static void DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_pictur
     {
         vlc_mutex_unlock( &p_owner->lock );
         picture_Release( p_picture );
-        return;
+        return VLC_SUCCESS;
     }
 
     prerolled = p_owner->i_preroll_end > (vlc_tick_t)INT64_MIN;
@@ -1059,10 +1058,10 @@ static void DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_pictur
         goto discard;
     }
 
-    return;
+    return VLC_SUCCESS;
 discard:
-    *pi_lost_sum += 1;
     picture_Release( p_picture );
+    return VLC_EGENERIC;
 }
 
 static void DecoderUpdateStatVideo( struct decoder_owner *p_owner,
@@ -1084,12 +1083,11 @@ static void DecoderUpdateStatVideo( struct decoder_owner *p_owner,
 static void DecoderQueueVideo( decoder_t *p_dec, picture_t *p_pic )
 {
     assert( p_pic );
-    unsigned i_lost = 0;
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
-    DecoderPlayVideo( p_owner, p_pic, &i_lost );
+    int success = DecoderPlayVideo( p_owner, p_pic );
 
-    p_owner->pf_update_stat( p_owner, 1, i_lost );
+    p_owner->pf_update_stat( p_owner, 1, success != VLC_SUCCESS ? 1 : 0 );
 }
 
 static int thumbnailer_update_format( decoder_t *p_dec )
