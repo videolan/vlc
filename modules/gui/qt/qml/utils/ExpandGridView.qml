@@ -155,6 +155,7 @@ NavigableFocusScope {
         }
 
         property variant idChildrenMap: ({})
+        property variant _unusedItemList: []
 
         function getFirstAndLastInstanciatedItemIds() {
             var myContentY = contentY - root.headerHeight
@@ -211,31 +212,32 @@ NavigableFocusScope {
 
             // Clean the no longer used ids
             var toKeep = {}
-            var toUse = []
+
             for (var id in idChildrenMap) {
                 var val = idChildrenMap[id]
-                if (id >= firstId && id < lastId)
+
+                if (id >= firstId && id < lastId) {
                     toKeep[id] = val
-                else {
-                    toUse.push(val)
+                } else {
+                    _unusedItemList.push(val)
                     val.visible = false
                 }
             }
             idChildrenMap = toKeep
 
             // Create delegates if we do not have enough
-            if (nbItems > toUse.length + Object.keys(toKeep).length) {
-                var toCreate = nbItems - (toUse.length + Object.keys(toKeep).length)
+            if (nbItems > _unusedItemList.length + Object.keys(toKeep).length) {
+                var toCreate = nbItems - (_unusedItemList.length + Object.keys(toKeep).length)
                 for (i = 0; i < toCreate; ++i) {
                     val = root.gridDelegate.createObject(contentItem);
-                    toUse.push(val)
+                    _unusedItemList.push(val)
                 }
             }
 
             // Place the delegates before the expandItem
             for (i = firstId; i < topGridEndId; ++i) {
                 var pos = getItemPos(i)
-                var item = getChild(i, toUse)
+                var item = getChild(i, _unusedItemList)
                 item.delegateModelItem = model.items.get(i)
                 item.x = pos[0]
                 item.y = pos[1]
@@ -248,7 +250,7 @@ NavigableFocusScope {
             // Place the delegates after the expandItem
             for (i = topGridEndId; i < lastId; ++i) {
                 pos = getItemPos(i)
-                item = getChild(i, toUse)
+                item = getChild(i, _unusedItemList)
                 item.delegateModelItem = model.items.get(i)
                 item.x = pos[0]
                 item.y = pos[1] + expandItem.height
