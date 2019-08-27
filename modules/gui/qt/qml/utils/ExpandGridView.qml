@@ -35,8 +35,8 @@ NavigableFocusScope {
     property int modelCount: 0
 
     property int currentIndex: 0
-    property real contentHeight: flickable.contentHeight
-    property real contentWidth: flickable.contentWidth
+    property alias contentHeight: flickable.contentHeight
+    property alias contentWidth: flickable.contentWidth
     property alias contentX: flickable.contentX
     property bool isSingleRow: false
     property bool isAnimating: animateRetractItem.running || animateExpandItem.running
