@@ -125,7 +125,7 @@ struct vout_thread_sys_t
         vlc_tick_t  date;
         vlc_tick_t  timestamp;
         bool        is_interlaced;
-        picture_t   *decoded;
+        picture_t   *decoded; // decoded picture before passed through chain_static
         picture_t   *current;
         picture_t   *next;
     } displayed;
