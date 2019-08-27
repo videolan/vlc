@@ -58,7 +58,6 @@ Utils.ExpandGridView {
         isVideo: true
         isNew: delegateModelItem.model.playcount < 1
         progress: Math.max(0, delegateModelItem.model.saved_position)
-        shiftX: expandableGV.isSingleRow ? 0 : expandableGV.shiftX(delegateModelItem.model.index)
         pictureWidth: expandableGV.gridDelegatePictureWidth
         pictureHeight: expandableGV.gridDelegatePictureHeight
 
@@ -81,7 +80,6 @@ Utils.ExpandGridView {
         color: "transparent"
         Rectangle{
             id:arrowRect
-            x: expandableGV.expanderItem.x + (expandableGV.expanderItem.shiftX/2) + (expandableGV.cellWidth/2)
             y: -(width/2)
             width: VLCStyle.icon_normal
             height: VLCStyle.icon_normal

@@ -35,7 +35,6 @@ Utils.GridItem {
     focus: true
 
     selected: element.DelegateModel.inSelected
-    shiftX: view.currentItem.shiftX(model.index)
     onItemClicked : {
         if (key == Qt.RightButton){
             contextMenu.model = model

@@ -32,9 +32,6 @@ Rectangle {
     signal actionDown(int index)
     signal actionUp(int index)
 
-    function shiftX(index){
-        return sectionListView.shiftX(index)
-    }
     function adjustTopFlickableViewBound(){
 
         const itemTop = networkSection.y + sectionListView.currentItem.y

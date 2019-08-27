@@ -29,9 +29,6 @@ NavigableFocusScope {
     signal selectAll()
     signal actionAtIndex( int index )
 
-    //here to keep the same interface as GridView
-    function shiftX( index ) { return 0 }
-
     //forward view properties
     property alias spacing: view.spacing
     property alias interactive: view.interactive

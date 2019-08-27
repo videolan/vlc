@@ -62,12 +62,6 @@ NavigableFocusScope {
         flickable.layout()
     }
 
-    function shiftX(index) {
-        var colCount = flickable.getNbItemsPerRow()
-        var rightSpace = width - colCount * root.cellWidth
-        return ((index % colCount) + 1) * (rightSpace / (colCount + 1))
-    }
-
     function switchExpandItem(index,item) {
         if (item)
             root.expanderItem = item

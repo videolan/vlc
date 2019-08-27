@@ -33,7 +33,6 @@ Rectangle {
     property string title: ""
     property string subtitle: ""
     property bool selected: false
-    property int shiftX: 0
     property bool noActionButtons: false
     property bool showContextButton: isVideo
 
@@ -59,7 +58,6 @@ Rectangle {
     
     Rectangle {
         id: gridItem
-        x: shiftX
         width: childrenRect.width
         height: childrenRect.height
         color: "transparent"

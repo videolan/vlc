@@ -148,9 +148,7 @@ Utils.NavigableFocusScope {
                 if(activeFocus)
                     favouritesSection.forceActiveFocus()
             }
-            function shiftX(index){
-                return machineSection.shiftX(index)
-            }
+
             Rectangle{
                 id: allSections
                 color: VLCStyle.colors.bg

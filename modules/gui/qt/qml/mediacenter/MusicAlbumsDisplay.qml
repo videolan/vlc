@@ -124,7 +124,6 @@ Utils.NavigableFocusScope {
                     inSelected: false
                 })
 
-                shiftX: view.currentItem.shiftX(delegateModelItem.itemsIndex)
                 image: delegateModelItem.model.cover || VLCStyle.noArtAlbum
                 title: delegateModelItem.model.title || qsTr("Unknown title")
                 subtitle: delegateModelItem.model.main_artist || qsTr("Unknown artist")

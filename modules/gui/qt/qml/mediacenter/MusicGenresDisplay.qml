@@ -50,8 +50,6 @@ Utils.NavigableFocusScope {
                 title: model.name || "Unknown genre"
                 selected: element.DelegateModel.inSelected
 
-                shiftX: view.currentItem.shiftX(model.index)
-
                 onItemClicked: {
                     delegateModel.updateSelection( modifier , view.currentItem.currentIndex, index)
                     view.currentItem.currentIndex = index
