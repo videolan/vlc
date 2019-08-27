@@ -979,6 +979,14 @@ static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture
     vout_thread_t  *p_vout = p_owner->p_vout;
     bool prerolled;
 
+    if( p_picture->date == VLC_TICK_INVALID )
+        /* FIXME: VLC_TICK_INVALID -- verify video_output */
+    {
+        msg_Warn( p_dec, "non-dated video buffer received" );
+        picture_Release( p_picture );
+        return VLC_EGENERIC;
+    }
+
     vlc_mutex_lock( &p_owner->lock );
     if( p_owner->i_preroll_end > p_picture->date )
     {
@@ -997,12 +1005,6 @@ static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture
 
         if( p_vout )
             vout_FlushAll( p_vout );
-    }
-
-    if( p_picture->date == VLC_TICK_INVALID )
-    {
-        msg_Warn( p_dec, "non-dated video buffer received" );
-        goto discard;
     }
 
     /* */
