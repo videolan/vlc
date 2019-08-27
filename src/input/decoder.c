@@ -1025,8 +1025,6 @@ static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture
         p_picture->b_force = true;
     }
 
-    const bool b_dated = p_picture->date != VLC_TICK_INVALID;
-
     vlc_mutex_unlock( &p_owner->lock );
 
     /* FIXME: The *input* FIFO should not be locked here. This will not work
@@ -1040,24 +1038,12 @@ static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture
     if( p_vout == NULL )
         goto discard;
 
-    if( p_picture->b_force || p_picture->date != VLC_TICK_INVALID )
-        /* FIXME: VLC_TICK_INVALID -- verify video_output */
+    if( p_picture->b_still )
     {
-        if( p_picture->b_still )
-        {
-            /* Ensure no earlier higher pts breaks still state */
-            vout_Flush( p_vout, p_picture->date );
-        }
-        vout_PutPicture( p_vout, p_picture );
+        /* Ensure no earlier higher pts breaks still state */
+        vout_Flush( p_vout, p_picture->date );
     }
-    else
-    {
-        if( b_dated )
-            msg_Warn( p_dec, "early picture skipped" );
-        else
-            msg_Warn( p_dec, "non-dated video buffer received" );
-        goto discard;
-    }
+    vout_PutPicture( p_vout, p_picture );
 
     return VLC_SUCCESS;
 discard:
