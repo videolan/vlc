@@ -287,9 +287,7 @@ static int transcode_video_set_conversions( sout_stream_t *p_stream,
                 ? &id->p_conv_nonstatic
                 : &id->p_conv_static;
 
-        id->p_conv_nonstatic = filter_chain_NewVideo( p_stream,
-                                                      step == STEP_NONSTATIC,
-                                                      &owner );
+        *pp_chain = filter_chain_NewVideo( p_stream, step == STEP_NONSTATIC, &owner );
         if( !*pp_chain )
             return VLC_EGENERIC;
         filter_chain_Reset( *pp_chain, *pp_src, p_tmpdst );
@@ -600,8 +598,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         {
             /* Run filter chain */
             filter_chain_t * primary_chains[] = { id->p_f_chain,
-                                                  id->p_conv_static,
-                                                  id->p_conv_nonstatic };
+                                                  id->p_conv_nonstatic,
+                                                  id->p_conv_static };
             for( size_t i=0; p_in && i<ARRAY_SIZE(primary_chains); i++ )
             {
                 if( !primary_chains[i] )
