@@ -1127,6 +1127,13 @@ static int DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio )
 
     assert( p_audio != NULL );
 
+    if( p_audio->i_pts == VLC_TICK_INVALID ) // FIXME --VLC_TICK_INVALID verify audio_output/*
+    {
+        msg_Warn( p_dec, "non-dated audio buffer received" );
+        block_Release( p_audio );
+        return VLC_EGENERIC;
+    }
+
     vlc_mutex_lock( &p_owner->lock );
     if( p_owner->i_preroll_end > p_audio->i_pts )
     {
@@ -1148,13 +1155,6 @@ static int DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio )
     }
 
     /* */
-    if( p_audio->i_pts == VLC_TICK_INVALID ) // FIXME --VLC_TICK_INVALID verify audio_output/*
-    {
-        msg_Warn( p_dec, "non-dated audio buffer received" );
-        block_Release( p_audio );
-        return VLC_EGENERIC;
-    }
-
     /* */
     vlc_mutex_lock( &p_owner->lock );
     if( p_owner->b_waiting )
