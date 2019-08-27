@@ -44,7 +44,7 @@ RowLayout{
                     return
                 else
                     if (!buttonrow._focusGiven){
-                        buttonloader.item.forceActiveFocus()
+                        buttonloader.item.focus = true
                         buttonrow._focusGiven = true
                     }
                 if(buttonloader.item instanceof Utils.IconToolButton)
