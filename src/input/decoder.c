@@ -1036,7 +1036,10 @@ static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture
 
     /* */
     if( p_vout == NULL )
-        goto discard;
+    {
+        picture_Release( p_picture );
+        return VLC_EGENERIC;
+    }
 
     if( p_picture->b_still )
     {
@@ -1046,9 +1049,6 @@ static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture
     vout_PutPicture( p_vout, p_picture );
 
     return VLC_SUCCESS;
-discard:
-    picture_Release( p_picture );
-    return VLC_EGENERIC;
 }
 
 static void DecoderUpdateStatVideo( struct decoder_owner *p_owner,
@@ -1153,27 +1153,27 @@ static int DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio )
 
     audio_output_t *p_aout = p_owner->p_aout;
 
-    if( p_aout != NULL )
+    if( p_aout == NULL )
     {
-        int status = aout_DecPlay( p_aout, p_audio );
-        if( status == AOUT_DEC_CHANGED )
-        {
-            /* Only reload the decoder */
-            RequestReload( p_owner );
-        }
-        else if( status == AOUT_DEC_FAILED )
-        {
-            /* If we reload because the aout failed, we should release it. That
-             * way, a next call to aout_update_format() won't re-use the
-             * previous (failing) aout but will try to create a new one. */
-            atomic_store( &p_owner->reload, RELOAD_DECODER_AOUT );
-        }
-        return VLC_SUCCESS;
+        msg_Dbg( p_dec, "discarded audio buffer" );
+        block_Release( p_audio );
+        return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_dec, "discarded audio buffer" );
-    block_Release( p_audio );
-    return VLC_EGENERIC;
+    int status = aout_DecPlay( p_aout, p_audio );
+    if( status == AOUT_DEC_CHANGED )
+    {
+        /* Only reload the decoder */
+        RequestReload( p_owner );
+    }
+    else if( status == AOUT_DEC_FAILED )
+    {
+        /* If we reload because the aout failed, we should release it. That
+            * way, a next call to aout_update_format() won't re-use the
+            * previous (failing) aout but will try to create a new one. */
+        atomic_store( &p_owner->reload, RELOAD_DECODER_AOUT );
+    }
+    return VLC_SUCCESS;
 }
 
 static void DecoderUpdateStatAudio( struct decoder_owner *p_owner,
