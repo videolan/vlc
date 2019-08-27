@@ -1167,7 +1167,7 @@ static int DecoderPlayAudio( struct decoder_owner *p_owner, block_t *p_audio )
 
     audio_output_t *p_aout = p_owner->p_aout;
 
-    if( p_aout != NULL && p_audio->i_pts != VLC_TICK_INVALID )
+    if( p_aout != NULL )
     {
         int status = aout_DecPlay( p_aout, p_audio );
         if( status == AOUT_DEC_CHANGED )
