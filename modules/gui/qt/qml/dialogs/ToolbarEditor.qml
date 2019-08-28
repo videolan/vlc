@@ -128,15 +128,12 @@ Rectangle{
         id: playerControlBarModel
         mainCtx: mainctx
         configName: "MainPlayerToolbar"
-        /* Load the model when mainctx is set */
-        Component.onCompleted: reloadModel()
     }
 
     PlayerControlBarModel {
         id: miniPlayerModel
         mainCtx: mainctx
         configName: "MiniPlayerToolbar"
-        Component.onCompleted: reloadModel()
     }
 
     Player.ControlButtons{

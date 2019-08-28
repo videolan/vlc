@@ -155,8 +155,6 @@ Utils.NavigableFocusScope {
             id: miniPlayerModel
             mainCtx: mainctx
             configName: "MiniPlayerToolbar"
-            /* Load the model when mainctx is set */
-            Component.onCompleted: reloadModel()
         }
 
         ControlButtons {

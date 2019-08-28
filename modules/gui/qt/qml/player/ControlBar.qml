@@ -136,8 +136,6 @@ Utils.NavigableFocusScope {
         id:playerControlBarModel
         mainCtx: mainctx
         configName: "MainPlayerToolbar"
-        /* Load the model when mainctx is set */
-        Component.onCompleted: reloadModel()
     }
 
     ControlButtons{
