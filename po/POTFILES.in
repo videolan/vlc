@@ -539,6 +539,8 @@ modules/gui/macosx/panels/VLCVideoEffectsWindowController.h
 modules/gui/macosx/panels/VLCVideoEffectsWindowController.m
 modules/gui/macosx/panels/dialogs/VLCCoreDialogProvider.h
 modules/gui/macosx/panels/dialogs/VLCCoreDialogProvider.m
+modules/gui/macosx/panels/dialogs/VLCCustomCropArWindowController.h
+modules/gui/macosx/panels/dialogs/VLCCustomCropArWindowController.m
 modules/gui/macosx/panels/dialogs/VLCPopupPanelController.h
 modules/gui/macosx/panels/dialogs/VLCPopupPanelController.m
 modules/gui/macosx/panels/dialogs/VLCResumeDialogController.h

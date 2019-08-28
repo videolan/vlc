@@ -133,6 +133,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/panels/VLCVideoEffectsWindowController.m \
 	gui/macosx/panels/dialogs/VLCCoreDialogProvider.h \
 	gui/macosx/panels/dialogs/VLCCoreDialogProvider.m \
+	gui/macosx/panels/dialogs/VLCCustomCropArWindowController.h \
+	gui/macosx/panels/dialogs/VLCCustomCropArWindowController.m \
 	gui/macosx/panels/dialogs/VLCPopupPanelController.h \
 	gui/macosx/panels/dialogs/VLCPopupPanelController.m \
 	gui/macosx/panels/dialogs/VLCResumeDialogController.h \
@@ -269,6 +271,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/Help.xib \
 	gui/macosx/UI/LogMessageWindow.xib \
 	gui/macosx/UI/MainMenu.xib \
+	gui/macosx/UI/VLCCustomCropARPanel.xib \
 	gui/macosx/UI/VLCLibraryAlbumTableCellView.xib \
 	gui/macosx/UI/VLCLibraryWindow.xib \
 	gui/macosx/UI/VLCLibraryTableCellView.xib \

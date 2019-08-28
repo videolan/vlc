@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCCustomCropArWindowController">
+            <connections>
+                <outlet property="applyButton" destination="ggs-u2-5DB" id="KYB-GX-w4R"/>
+                <outlet property="cancelButton" destination="J1x-uo-ZpT" id="oVQ-qk-o98"/>
+                <outlet property="denominatorTextField" destination="Smg-Kh-Pjv" id="WhX-dO-loi"/>
+                <outlet property="numeratorTextField" destination="KFt-K5-ogc" id="dE7-LF-UfA"/>
+                <outlet property="titleLabel" destination="bB6-Le-Ilg" id="MQv-r9-Qdw"/>
+                <outlet property="window" destination="Fqe-af-Tt9" id="u4H-rX-p0W"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Custom Crop" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="Fqe-af-Tt9" userLabel="CustomCropAr">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="429" y="553" width="265" height="110"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <view key="contentView" id="NrR-3A-NOR">
+                <rect key="frame" x="0.0" y="0.0" width="265" height="122"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                <subviews>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="bB6-Le-Ilg" userLabel="Testlabel">
+                        <rect key="frame" x="86" y="99" width="93" height="17"/>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Custom Crop" id="vXn-nw-Nrc">
+                            <font key="font" metaFont="systemBold"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Smg-Kh-Pjv" userLabel="Mins Text Field">
+                        <rect key="frame" x="145" y="59" width="33" height="22"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="0" drawsBackground="YES" id="2wj-p0-8uH">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                        <connections>
+                            <outlet property="nextKeyView" destination="J1x-uo-ZpT" id="jSh-vr-TWH"/>
+                        </connections>
+                    </textField>
+                    <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KFt-K5-ogc" userLabel="Hours Text Field">
+                        <rect key="frame" x="87" y="59" width="33" height="22"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="33" id="xwZ-sK-Qq8"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="0" drawsBackground="YES" id="UWz-WZ-unY">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                        <connections>
+                            <outlet property="nextKeyView" destination="Smg-Kh-Pjv" id="OlL-xH-Oc6"/>
+                        </connections>
+                    </textField>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="vW2-B8-0jf" userLabel="Testlabel">
+                        <rect key="frame" x="126" y="62" width="13" height="17"/>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title=":" id="OUw-pe-eva">
+                            <font key="font" metaFont="systemBold"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ggs-u2-5DB">
+                        <rect key="frame" x="176" y="13" width="75" height="32"/>
+                        <buttonCell key="cell" type="push" title="Apply" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1nM-QF-enb">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="buttonPressed:" target="-2" id="irY-sT-eAB"/>
+                            <outlet property="nextKeyView" destination="KFt-K5-ogc" id="SZR-3a-Nhx"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J1x-uo-ZpT">
+                        <rect key="frame" x="94" y="13" width="82" height="32"/>
+                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="AHd-5X-fcR">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="buttonPressed:" target="-2" id="dp8-L6-N7m"/>
+                            <outlet property="nextKeyView" destination="ggs-u2-5DB" id="tW3-MQ-uef"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="ggs-u2-5DB" secondAttribute="trailing" constant="20" id="1W0-1s-3gv"/>
+                    <constraint firstItem="KFt-K5-ogc" firstAttribute="width" secondItem="Smg-Kh-Pjv" secondAttribute="width" id="24N-1L-5Qx"/>
+                    <constraint firstItem="Smg-Kh-Pjv" firstAttribute="centerY" secondItem="vW2-B8-0jf" secondAttribute="centerY" id="2mI-T4-igU"/>
+                    <constraint firstItem="J1x-uo-ZpT" firstAttribute="top" secondItem="Smg-Kh-Pjv" secondAttribute="bottom" constant="18" id="4tw-eG-Guy"/>
+                    <constraint firstItem="ggs-u2-5DB" firstAttribute="centerY" secondItem="J1x-uo-ZpT" secondAttribute="centerY" id="5tD-9J-E96"/>
+                    <constraint firstAttribute="bottom" secondItem="ggs-u2-5DB" secondAttribute="bottom" constant="20" id="8kZ-L4-ND0"/>
+                    <constraint firstItem="bB6-Le-Ilg" firstAttribute="top" secondItem="NrR-3A-NOR" secondAttribute="top" constant="6" id="AmG-Sh-CJP"/>
+                    <constraint firstItem="Smg-Kh-Pjv" firstAttribute="leading" secondItem="vW2-B8-0jf" secondAttribute="trailing" constant="8" id="OEg-PS-VM3"/>
+                    <constraint firstItem="ggs-u2-5DB" firstAttribute="leading" secondItem="J1x-uo-ZpT" secondAttribute="trailing" constant="12" id="aCf-3u-Xfg"/>
+                    <constraint firstItem="vW2-B8-0jf" firstAttribute="centerX" secondItem="NrR-3A-NOR" secondAttribute="centerX" id="ddl-Ly-MTh"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="bB6-Le-Ilg" secondAttribute="trailing" constant="20" symbolic="YES" id="epj-mp-Lnm"/>
+                    <constraint firstItem="bB6-Le-Ilg" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NrR-3A-NOR" secondAttribute="leading" constant="20" symbolic="YES" id="j6a-V4-oje"/>
+                    <constraint firstItem="KFt-K5-ogc" firstAttribute="centerY" secondItem="vW2-B8-0jf" secondAttribute="centerY" id="kWs-Sa-960"/>
+                    <constraint firstItem="Smg-Kh-Pjv" firstAttribute="baseline" secondItem="KFt-K5-ogc" secondAttribute="baseline" id="mOE-Qf-1wF"/>
+                    <constraint firstItem="KFt-K5-ogc" firstAttribute="top" secondItem="bB6-Le-Ilg" secondAttribute="bottom" constant="18" id="oqx-8I-mgW"/>
+                    <constraint firstItem="vW2-B8-0jf" firstAttribute="leading" secondItem="KFt-K5-ogc" secondAttribute="trailing" constant="8" id="sHD-Ov-r3y"/>
+                    <constraint firstItem="bB6-Le-Ilg" firstAttribute="centerX" secondItem="NrR-3A-NOR" secondAttribute="centerX" id="uga-pS-4jS"/>
+                </constraints>
+            </view>
+            <connections>
+                <outlet property="initialFirstResponder" destination="KFt-K5-ogc" id="RUn-tc-Qvg"/>
+            </connections>
+            <point key="canvasLocation" x="146.5" y="157"/>
+        </window>
+    </objects>
+</document>

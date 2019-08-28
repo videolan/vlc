@@ -137,6 +137,7 @@
 		7D903EAF224392B400917358 /* timespec_get.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EAE224392B400917358 /* timespec_get.c */; };
 		7D903EB6224394BE00917358 /* specific.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EB5224394BE00917358 /* specific.c */; };
 		7D903EB92243952100917358 /* threads.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EB82243952100917358 /* threads.c */; };
+		7D93D8FC2316C2DC001C0063 /* VLCCustomCropArWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D93D8FB2316C2DC001C0063 /* VLCCustomCropArWindowController.m */; };
 		7DB40D2A20CBCEB500F63173 /* VLCMainMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB40D2920CBCEB500F63173 /* VLCMainMenu.m */; };
 		7DB40D2D20CBCEC200F63173 /* VLCStatusBarIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB40D2B20CBCEC200F63173 /* VLCStatusBarIcon.m */; };
 		7DB7F1EC20CC036D00C2CAED /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DB7F1EB20CC036D00C2CAED /* AudioUnit.framework */; };
@@ -527,6 +528,9 @@
 		7D903EAE224392B400917358 /* timespec_get.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = timespec_get.c; path = ../../../../compat/timespec_get.c; sourceTree = "<group>"; };
 		7D903EB5224394BE00917358 /* specific.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = specific.c; path = ../../../src/darwin/specific.c; sourceTree = "<group>"; };
 		7D903EB82243952100917358 /* threads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = threads.c; path = ../../../../src/misc/threads.c; sourceTree = "<group>"; };
+		7D93D8F92316C142001C0063 /* VLCCustomCropARPanel.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCCustomCropARPanel.xib; sourceTree = "<group>"; };
+		7D93D8FA2316C2DC001C0063 /* VLCCustomCropArWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCCustomCropArWindowController.h; sourceTree = "<group>"; };
+		7D93D8FB2316C2DC001C0063 /* VLCCustomCropArWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCCustomCropArWindowController.m; sourceTree = "<group>"; };
 		7DB40D2820CBCEB500F63173 /* VLCMainMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCMainMenu.h; sourceTree = "<group>"; };
 		7DB40D2920CBCEB500F63173 /* VLCMainMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCMainMenu.m; sourceTree = "<group>"; };
 		7DB40D2B20CBCEC200F63173 /* VLCStatusBarIcon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCStatusBarIcon.m; sourceTree = "<group>"; };
@@ -1105,6 +1109,8 @@
 				CC461F6D160078340022423C /* VLCTextfieldPanelController.m */,
 				1C7CB91A1D787E7600388902 /* VLCPopupPanelController.h */,
 				1C7CB91B1D787E7600388902 /* VLCPopupPanelController.m */,
+				7D93D8FA2316C2DC001C0063 /* VLCCustomCropArWindowController.h */,
+				7D93D8FB2316C2DC001C0063 /* VLCCustomCropArWindowController.m */,
 			);
 			path = dialogs;
 			sourceTree = "<group>";
@@ -1540,6 +1546,7 @@
 				7DF14FBC2270CB1C0008ABE4 /* VLCMediaSourceDeviceCollectionViewItem.xib */,
 				6B82241A1E4D2A9000833BE1 /* VLCStatusBarIconMainMenu.xib */,
 				6B8224181E4D2A9000833BE1 /* VLCFullScreenPanel.xib */,
+				7D93D8F92316C142001C0063 /* VLCCustomCropARPanel.xib */,
 				6B8223FE1E4D2A8F00833BE1 /* About.xib */,
 				6B8223FF1E4D2A9000833BE1 /* AddonManager.xib */,
 				6B8224001E4D2A9000833BE1 /* AudioEffects.xib */,
@@ -1707,6 +1714,7 @@
 				7DFBDCB7226CDFD600B700A5 /* VLCImageView.m in Sources */,
 				7D404ABF2281892C00B28EF4 /* NSView+VLCAdditions.m in Sources */,
 				7DE9C7DD220728420089108F /* VLCPlayerController.m in Sources */,
+				7D93D8FC2316C2DC001C0063 /* VLCCustomCropArWindowController.m in Sources */,
 				1C3113941E508C6900D4DD76 /* VLCAddonsWindowController.m in Sources */,
 				7D2E0EDE20CD206F0033A221 /* VLCVideoWindowCommon.m in Sources */,
 				1C3113961E508C6900D4DD76 /* applescript.m in Sources */,

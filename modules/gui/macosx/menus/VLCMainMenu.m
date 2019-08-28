@@ -37,6 +37,7 @@
 #import "panels/VLCVideoEffectsWindowController.h"
 #import "panels/VLCBookmarksWindowController.h"
 #import "panels/dialogs/VLCCoreDialogProvider.h"
+#import "panels/dialogs/VLCCustomCropArWindowController.h"
 #import "panels/VLCInformationWindowController.h"
 #import "panels/VLCTimeSelectionPanelController.h"
 
@@ -106,6 +107,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     NSMenu *_playlistTableColumnsContextMenu;
 
     __strong VLCTimeSelectionPanelController *_timeSelectionPanel;
+    __strong VLCCustomCropArWindowController *_customARController;
 }
 @end
 
@@ -647,12 +649,14 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                         objectType:VLCObjectTypeVout
                                var:"aspect-ratio"
                           selector:@selector(toggleVar:)];
+            [self appendCustomizationItem:_aspect_ratio];
 
             [self setupVarMenuItem:_crop
                             target:VLC_OBJECT(p_vout)
                         objectType:VLCObjectTypeVout
                                var:"crop"
                           selector:@selector(toggleVar:)];
+            [self appendCustomizationItem:_crop];
 
             [self setupVarMenuItem:_deinterlace
                             target:VLC_OBJECT(p_vout)
@@ -1619,7 +1623,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     free(text);
 }
 
-
 - (void)setupVarMenu:(NSMenu *)menu
          forMenuItem:(NSMenuItem *)parent
               target:(vlc_object_t *)p_object
@@ -1770,6 +1773,49 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         p_object = [menuContent vlcObject];
         var_Set(p_object, [menuContent variableName], [menuContent variableValue]);
     }
+}
+
+#pragma mark - crop and AR customization
+
+- (void)appendCustomizationItem:(NSMenuItem *)menuItem
+{
+    NSMenu *submenu = menuItem.submenu;
+    NSMenuItem *customizationItem = [[NSMenuItem alloc] initWithTitle:_NS("Custom")
+                                                               action:menuItem == _aspect_ratio ? @selector(performCustomAspectRatio:) : @selector(performCustomCrop:)
+                                                        keyEquivalent:@""];
+    [customizationItem setTarget:self];
+    [submenu addItem:[NSMenuItem separatorItem]];
+    [submenu addItem:customizationItem];
+}
+
+- (void)performCustomCropOrAspectRatioActionWithVariable:(const char *)variable andl10nString:(NSString *)l10nString
+{
+    if (!_customARController) {
+        _customARController = [[VLCCustomCropArWindowController alloc] init];
+    }
+    _customARController.title = l10nString;
+    [_customARController runModalForWindow:[NSApp mainWindow]
+                         completionHandler:^(NSInteger returnCode, NSString * _Nonnull geometry) {
+                             if (returnCode != NSModalResponseOK) {
+                                 return;
+                             }
+
+                             vout_thread_t *p_vout = [self->_playerController videoOutputThreadForKeyWindow];
+                             if (p_vout) {
+                                 var_SetString(p_vout, variable, [geometry UTF8String]);
+                                 vout_Release(p_vout);
+                             }
+                         }];
+}
+
+- (void)performCustomAspectRatio:(id)sender
+{
+    [self performCustomCropOrAspectRatioActionWithVariable:"aspect-ratio" andl10nString:_NS("Aspect Ratio")];
+}
+
+- (void)performCustomCrop:(id)sender
+{
+    [self performCustomCropOrAspectRatioActionWithVariable:"crop" andl10nString:_NS("Crop")];
 }
 
 #pragma mark - menu delegation
