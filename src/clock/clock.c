@@ -59,7 +59,8 @@ struct vlc_clock_main_t
 struct vlc_clock_t
 {
     vlc_tick_t (*update)(vlc_clock_t *clock, vlc_tick_t system_now,
-                         vlc_tick_t ts, double rate);
+                         vlc_tick_t ts, double rate,
+                         unsigned frame_rate, unsigned frame_rate_base);
     void (*reset)(vlc_clock_t *clock);
     vlc_tick_t (*set_delay)(vlc_clock_t *clock, vlc_tick_t delay);
     void (*set_dejitter)(vlc_clock_t *clock, vlc_tick_t delay);
@@ -97,15 +98,20 @@ static void vlc_clock_main_reset(vlc_clock_main_t *main_clock)
 
 static inline void vlc_clock_on_update(vlc_clock_t *clock,
                                        vlc_tick_t system_now,
-                                       vlc_tick_t ts, double rate)
+                                       vlc_tick_t ts, double rate,
+                                       unsigned frame_rate,
+                                       unsigned frame_rate_base)
 {
     if (clock->cbs)
-        clock->cbs->on_update(system_now, ts, rate, clock->cbs_data);
+        clock->cbs->on_update(system_now, ts, rate, frame_rate, frame_rate_base,
+                              clock->cbs_data);
 }
 
 static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                                           vlc_tick_t system_now,
-                                          vlc_tick_t original_ts, double rate)
+                                          vlc_tick_t original_ts, double rate,
+                                          unsigned frame_rate,
+                                          unsigned frame_rate_base)
 {
     vlc_clock_main_t *main_clock = clock->owner;
 
@@ -142,7 +148,8 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
 
     vlc_mutex_unlock(&main_clock->lock);
 
-    vlc_clock_on_update(clock, system_now, original_ts, rate);
+    vlc_clock_on_update(clock, system_now, original_ts, rate, frame_rate,
+                        frame_rate_base);
     return VLC_TICK_INVALID;
 }
 
@@ -173,7 +180,7 @@ static void vlc_clock_master_reset(vlc_clock_t *clock)
 
     vlc_mutex_unlock(&main_clock->lock);
 
-    vlc_clock_on_update(clock, VLC_TICK_INVALID, VLC_TICK_INVALID, 1.f);
+    vlc_clock_on_update(clock, VLC_TICK_INVALID, VLC_TICK_INVALID, 1.f, 0, 0);
 }
 
 static vlc_tick_t vlc_clock_master_set_delay(vlc_clock_t *clock, vlc_tick_t delay)
@@ -277,7 +284,9 @@ static vlc_tick_t vlc_clock_master_to_system_locked(vlc_clock_t *clock,
 
 static vlc_tick_t vlc_clock_slave_update(vlc_clock_t *clock,
                                          vlc_tick_t system_now,
-                                         vlc_tick_t ts, double rate)
+                                         vlc_tick_t ts, double rate,
+                                         unsigned frame_rate,
+                                         unsigned frame_rate_base)
 {
     vlc_clock_main_t *main_clock = clock->owner;
     vlc_mutex_lock(&main_clock->lock);
@@ -286,7 +295,7 @@ static vlc_tick_t vlc_clock_slave_update(vlc_clock_t *clock,
 
     vlc_mutex_unlock(&main_clock->lock);
 
-    vlc_clock_on_update(clock, computed, ts, rate);
+    vlc_clock_on_update(clock, computed, ts, rate, frame_rate, frame_rate_base);
     return computed != INT64_MAX ? computed - system_now : INT64_MAX;
 }
 
@@ -299,7 +308,7 @@ static void vlc_clock_slave_reset(vlc_clock_t *clock)
 
     vlc_mutex_unlock(&main_clock->lock);
 
-    vlc_clock_on_update(clock, VLC_TICK_INVALID, VLC_TICK_INVALID, 1.0f);
+    vlc_clock_on_update(clock, VLC_TICK_INVALID, VLC_TICK_INVALID, 1.0f, 0, 0);
 }
 
 static vlc_tick_t vlc_clock_slave_set_delay(vlc_clock_t *clock, vlc_tick_t delay)
@@ -458,7 +467,14 @@ void vlc_clock_main_Delete(vlc_clock_main_t *main_clock)
 vlc_tick_t vlc_clock_Update(vlc_clock_t *clock, vlc_tick_t system_now,
                             vlc_tick_t ts, double rate)
 {
-    return clock->update(clock, system_now, ts, rate);
+    return clock->update(clock, system_now, ts, rate, 0, 0);
+}
+
+vlc_tick_t vlc_clock_UpdateVideo(vlc_clock_t *clock, vlc_tick_t system_now,
+                                 vlc_tick_t ts, double rate,
+                                 unsigned frame_rate, unsigned frame_rate_base)
+{
+    return clock->update(clock, system_now, ts, rate, frame_rate, frame_rate_base);
 }
 
 void vlc_clock_Reset(vlc_clock_t *clock)

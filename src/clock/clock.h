@@ -45,9 +45,12 @@ struct vlc_clock_cbs
      * @param ts stream timestamp or VLC_TICK_INVALID when the clock is reset,
      * should be subtracted with VLC_TICK_0 to get the original value
      * @param rate rate used when updated
+     * @param frame_rate fps of the video owning the clock
+     * @param frame_rate_base fps denominator
      * @param data opaque pointer set from vlc_clock_main_New()
      */
     void (*on_update)(vlc_tick_t system_ts, vlc_tick_t ts, double rate,
+                      unsigned frame_rate, unsigned frame_rate_base,
                       void *data);
 };
 
@@ -125,6 +128,16 @@ void vlc_clock_Delete(vlc_clock_t *clock);
  */
 vlc_tick_t vlc_clock_Update(vlc_clock_t *clock, vlc_tick_t system_now,
                             vlc_tick_t ts, double rate);
+
+/**
+ * This function will update the video clock drift and returns the drift
+ *
+ * Same behavior than vlc_clock_Update() except that the video is passed to the
+ * clock, this will be used for clock update callbacks.
+ */
+vlc_tick_t vlc_clock_UpdateVideo(vlc_clock_t *clock, vlc_tick_t system_now,
+                                 vlc_tick_t ts, double rate,
+                                 unsigned frame_rate, unsigned frame_rate_base);
 
 /**
  * This function resets the clock drift
