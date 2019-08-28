@@ -74,6 +74,8 @@ StreamFormat::StreamFormat( const std::string &mimetype )
         std::string tail = mime.substr(pos + 1);
         if(tail == "mp4")
             formatid = StreamFormat::MP4;
+        else if(tail == "aac")
+            formatid = StreamFormat::PACKEDAAC;
         else if (tail == "mp2t")
             formatid = StreamFormat::MPEG2TS;
         else if (tail == "vtt")
