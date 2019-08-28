@@ -117,7 +117,8 @@ struct demux_sys
 {
     mock_track_vector tracks;
     vlc_tick_t pts;
-    vlc_tick_t step_length;
+    vlc_tick_t audio_pts;
+    vlc_tick_t video_pts;
 
     int current_title;
     vlc_tick_t chapter_gap;
@@ -205,7 +206,7 @@ Control(demux_t *demux, int query, va_list args)
                 if (new_title >= sys->title_count)
                     return VLC_EGENERIC;
                 sys->current_title = new_title;
-                sys->pts = VLC_TICK_0;
+                sys->pts = sys->audio_pts = sys->video_pts = VLC_TICK_0;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -215,7 +216,8 @@ Control(demux_t *demux, int query, va_list args)
                 const int seekpoint_idx = va_arg(args, int);
                 if (seekpoint_idx < sys->chapter_count)
                 {
-                    sys->pts = seekpoint_idx * sys->chapter_gap;
+                    sys->pts = sys->audio_pts = sys->video_pts =
+                        (seekpoint_idx * sys->chapter_gap) + VLC_TICK_0;
                     return VLC_SUCCESS;
                 }
             }
@@ -242,7 +244,7 @@ Control(demux_t *demux, int query, va_list args)
         case DEMUX_SET_POSITION:
             if (!sys->can_seek)
                 return VLC_EGENERIC;
-            sys->pts = va_arg(args, double) * sys->length;
+            sys->pts = sys->video_pts = sys->audio_pts = va_arg(args, double) * sys->length;
             return VLC_SUCCESS;
         case DEMUX_GET_LENGTH:
             *va_arg(args, vlc_tick_t *) = sys->length;
@@ -253,7 +255,7 @@ Control(demux_t *demux, int query, va_list args)
         case DEMUX_SET_TIME:
             if (!sys->can_seek)
                 return VLC_EGENERIC;
-            sys->pts = va_arg(args, vlc_tick_t);
+            sys->pts = sys->video_pts = sys->audio_pts = va_arg(args, vlc_tick_t);
             return VLC_SUCCESS;
         case DEMUX_GET_TITLE_INFO:
             if (sys->title_count > 0)
@@ -330,11 +332,10 @@ Control(demux_t *demux, int query, va_list args)
 }
 
 static block_t *
-CreateAudioBlock(demux_t *demux, struct mock_track *track)
+CreateAudioBlock(demux_t *demux, struct mock_track *track, vlc_tick_t length)
 {
-    struct demux_sys *sys = demux->p_sys;
     const int64_t samples =
-        samples_from_vlc_tick(sys->step_length, track->fmt.audio.i_rate);
+        samples_from_vlc_tick(length, track->fmt.audio.i_rate);
     const int64_t bytes = samples / track->fmt.audio.i_frame_length
                         * track->fmt.audio.i_bytes_per_frame;
     block_t *b = block_Alloc(bytes);
@@ -342,6 +343,7 @@ CreateAudioBlock(demux_t *demux, struct mock_track *track)
         return NULL;
     memset(b->p_buffer, 0, b->i_buffer);
     return b;
+    (void) demux;
 }
 
 struct video_block
@@ -382,7 +384,7 @@ CreateVideoBlock(demux_t *demux, struct mock_track *track)
     size_t block_len = 0;
     for (int i = 0; i < pic->i_planes; ++i)
         block_len += pic->p[i].i_lines * pic->p[i].i_pitch;
-    memset(pic->p[0].p_pixels, (sys->pts / VLC_TICK_FROM_MS(10)) % 255,
+    memset(pic->p[0].p_pixels, (sys->video_pts / VLC_TICK_FROM_MS(10)) % 255,
            block_len);
     return block_Init(&video->b, &cbs, pic->p[0].p_pixels, block_len);
     (void) demux;
@@ -393,7 +395,7 @@ CreateSubBlock(demux_t *demux, struct mock_track *track)
 {
     struct demux_sys *sys = demux->p_sys;
     char *text;
-    if (asprintf(&text, "subtitle @ %"PRId64, sys->pts) == -1)
+    if (asprintf(&text, "subtitle @ %"PRId64, sys->video_pts) == -1)
         return NULL;
     size_t len = strlen(text) + 1;
 
@@ -559,6 +561,77 @@ InitSubTracks(demux_t *demux, int group, size_t count)
 }
 
 static int
+DemuxAudio(demux_t *demux, vlc_tick_t step_length, vlc_tick_t end_pts)
+{
+    struct demux_sys *sys = demux->p_sys;
+
+    while (sys->audio_pts < end_pts)
+    {
+        struct mock_track *track;
+        vlc_vector_foreach(track, &sys->tracks)
+        {
+            block_t *block;
+            switch (track->fmt.i_cat)
+            {
+                case AUDIO_ES:
+                    block = CreateAudioBlock(demux, track, step_length);
+                    break;
+                default:
+                    continue;
+            }
+            if (!block)
+                return VLC_EGENERIC;
+
+            block->i_length = step_length;
+            block->i_pts = block->i_dts = sys->audio_pts;
+
+            int ret = es_out_Send(demux->out, track->id, block);
+            if (ret != VLC_SUCCESS)
+                return ret;
+        }
+        sys->audio_pts += step_length; 
+    }
+    return VLC_SUCCESS;
+}
+
+static int
+DemuxVideo(demux_t *demux, vlc_tick_t step_length, vlc_tick_t end_pts)
+{
+    struct demux_sys *sys = demux->p_sys;
+
+    while (sys->video_pts < end_pts)
+    {
+        struct mock_track *track;
+        vlc_vector_foreach(track, &sys->tracks)
+        {
+            block_t *block;
+            switch (track->fmt.i_cat)
+            {
+                case VIDEO_ES:
+                    block = CreateVideoBlock(demux, track);
+                    break;
+                case SPU_ES:
+                    block = CreateSubBlock(demux, track);
+                    break;
+                default:
+                    continue;
+            }
+            if (!block)
+                return VLC_EGENERIC;
+
+            block->i_length = step_length;
+            block->i_pts = block->i_dts = sys->video_pts;
+
+            int ret = es_out_Send(demux->out, track->id, block);
+            if (ret != VLC_SUCCESS)
+                return ret;
+        }
+        sys->video_pts += step_length;
+    }
+    return VLC_SUCCESS;
+}
+
+static int
 Demux(demux_t *demux)
 {
     struct demux_sys *sys = demux->p_sys;
@@ -566,57 +639,91 @@ Demux(demux_t *demux)
     if (sys->error)
         return VLC_DEMUXER_EGENERIC;
 
-    struct mock_track *track;
-    vlc_vector_foreach(track, &sys->tracks)
-    {
-        block_t *block;
-        switch (track->fmt.i_cat)
-        {
-            case AUDIO_ES:
-                block = CreateAudioBlock(demux, track);
-                break;
-            case VIDEO_ES:
-                block = CreateVideoBlock(demux, track);
-                break;
-            case SPU_ES:
-                block = CreateSubBlock(demux, track);
-                break;
-            default:
-                vlc_assert_unreachable();
-        }
-        if (!block)
-            return VLC_DEMUXER_EGENERIC;
-        block->i_length = sys->step_length;
-        block->i_pts = block->i_dts = sys->pts;
-        int ret = es_out_Send(demux->out, track->id, block);
-        if (ret != VLC_SUCCESS)
-            return VLC_DEMUXER_EGENERIC;
-    }
-    es_out_SetPCR(demux->out, sys->pts);
-    sys->pts += sys->step_length;
+    if (sys->audio_track_count > 0
+     && (sys->video_track_count > 0 || sys->sub_track_count > 0))
+        sys->pts = __MIN(sys->audio_pts, sys->video_pts);
+    else if (sys->audio_track_count > 0)
+        sys->pts = sys->audio_pts;
+    else
+        sys->pts = sys->video_pts;
+
     if (sys->pts > sys->length)
         sys->pts = sys->length;
+    es_out_SetPCR(demux->out, sys->pts);
 
+    const vlc_tick_t video_step_length =
+        (sys->video_track_count > 0 || sys->sub_track_count > 0) ?
+         VLC_TICK_FROM_SEC(1) * sys->video_frame_rate_base
+                              / sys->video_frame_rate : 0;
+
+    const vlc_tick_t audio_step_length =
+        sys->audio_track_count > 0 ? sys->audio_sample_length : 0;
+
+    const vlc_tick_t step_length = __MAX(audio_step_length, video_step_length);
+
+    int ret = VLC_SUCCESS;
+    bool audio_eof = true, video_eof = true;
+    if (sys->audio_track_count > 0)
+    {
+        ret = DemuxAudio(demux, audio_step_length,
+                         __MIN(step_length + sys->audio_pts, sys->length));
+        if (sys->audio_pts + audio_step_length < sys->length)
+            audio_eof = false;
+    }
+
+    if (ret == VLC_SUCCESS
+     && (sys->video_track_count > 0 || sys->sub_track_count > 0))
+    {
+        ret = DemuxVideo(demux, video_step_length,
+                         __MIN(step_length + sys->video_pts, sys->length));
+        if (sys->video_pts + video_step_length < sys->length)
+            video_eof = false;
+    }
+
+    if (ret != VLC_SUCCESS)
+        return VLC_DEMUXER_EGENERIC;
+
+    /* Add late tracks if any */
     if (sys->add_video_track_at != VLC_TICK_INVALID &&
         sys->add_video_track_at <= sys->pts)
     {
-        InitVideoTracks(demux, 0, 1);
         sys->add_video_track_at = VLC_TICK_INVALID;
+
+        ret = InitVideoTracks(demux, 0, 1);
+        if (ret != VLC_SUCCESS)
+            return VLC_DEMUXER_EGENERIC;
+        sys->video_track_count++;
+        sys->video_pts = sys->pts;
+        video_eof = false;
     }
+
     if (sys->add_audio_track_at != VLC_TICK_INVALID &&
         sys->add_audio_track_at <= sys->pts)
     {
-        InitAudioTracks(demux, 0, 1);
         sys->add_audio_track_at = VLC_TICK_INVALID;
+
+        ret = InitAudioTracks(demux, 0, 1);
+        if (ret != VLC_SUCCESS)
+            return VLC_DEMUXER_EGENERIC;
+        sys->audio_track_count++;
+        sys->audio_pts = sys->pts;
+        audio_eof = false;
     }
+
     if (sys->add_spu_track_at != VLC_TICK_INVALID &&
         sys->add_spu_track_at <= sys->pts)
     {
-        InitSubTracks(demux, 0, 1);
         sys->add_spu_track_at = VLC_TICK_INVALID;
+
+        ret = InitSubTracks(demux, 0, 1);
+        if (ret != VLC_SUCCESS)
+            return VLC_DEMUXER_EGENERIC;
+        sys->sub_track_count++;
+        sys->video_pts = sys->pts;
+        video_eof = false;
     }
 
-    return sys->pts == sys->length ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
+    return audio_eof && video_eof ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
 }
 
 static void
@@ -709,13 +816,8 @@ Open(vlc_object_t *obj)
             goto error;
     }
 
-    if (sys->video_track_count > 0)
-        sys->step_length = VLC_TICK_FROM_SEC(1) * sys->video_frame_rate_base
-                         / sys->video_frame_rate;
-    else
-        sys->step_length = sys->audio_sample_length;
 
-    sys->pts = VLC_TICK_0;
+    sys->pts = sys->audio_pts = sys->video_pts = VLC_TICK_0;
     sys->current_title = 0;
     sys->chapter_gap = sys->chapter_count > 0 ?
                        (sys->length / sys->chapter_count) : VLC_TICK_INVALID;
