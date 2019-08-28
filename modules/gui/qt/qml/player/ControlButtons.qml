@@ -220,6 +220,7 @@ Item{
         id:spacerDelegate
         Item {
             id: spacer
+            enabled: false
             implicitWidth: VLCStyle.icon_normal
             implicitHeight: VLCStyle.icon_normal
             property alias spacetextExt: spacetext
@@ -246,6 +247,7 @@ Item{
         id: extendiblespacerDelegate
         Item{
             id: extendedspacer
+            enabled: false
             implicitWidth: VLCStyle.widthExtendedSpacer
             implicitHeight: VLCStyle.icon_normal
             property bool paintOnly: false
