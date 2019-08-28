@@ -385,8 +385,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_previous setTitle: _NS("Previous")];
     [_next setTitle: _NS("Next")];
     [_random setTitle: _NS("Random")];
-    [_repeat setTitle: _NS("Repeat One")];
-    [_loop setTitle: _NS("Repeat All")];
+    [_repeat setTitle: _NS("Repeat")];
     [_AtoBloop setTitle: _NS("A→B Loop")];
     [_sortPlaylist setTitle: _NS("Sort Playlist")];
     [_quitAfterPB setTitle: _NS("Quit after Playback")];
@@ -578,6 +577,11 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     key = config_GetPsz("key-random");
     [_random setKeyEquivalent: VLCKeyToString(key)];
     [_random setKeyEquivalentModifierMask: VLCModifiersToCocoa(key)];
+    FREENULL(key);
+
+    key = config_GetPsz("key-loop");
+    [_repeat setKeyEquivalent: VLCKeyToString(key)];
+    [_repeat setKeyEquivalentModifierMask: VLCModifiersToCocoa(key)];
     FREENULL(key);
 
     key = config_GetPsz("key-zoom-half");
@@ -798,18 +802,11 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (IBAction)repeat:(id)sender
 {
     if (_playlistController.playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT) {
+        _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+    } else if (_playlistController.playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL) {
         _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
     } else {
         _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
-    }
-}
-
-- (IBAction)loop:(id)sender
-{
-    if (_playlistController.playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL) {
-        _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
-    } else {
-        _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
     }
 }
 
@@ -1531,19 +1528,19 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (void)setRepeatOne
 {
     [_repeat setState: NSOnState];
-    [_loop setState: NSOffState];
+    [_repeat setTitle: _NS("Repeat One")];
 }
 
 - (void)setRepeatAll
 {
-    [_repeat setState: NSOffState];
-    [_loop setState: NSOnState];
+    [_repeat setState: NSOnState];
+    [_repeat setTitle: _NS("Repeat All")];
 }
 
 - (void)setRepeatOff
 {
     [_repeat setState: NSOffState];
-    [_loop setState: NSOffState];
+    [_repeat setTitle: _NS("Repeat")];
 }
 
 #pragma mark - Dynamic menu creation and validation
@@ -1823,12 +1820,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     } else if (mi == _random) {
         enum vlc_playlist_playback_order playbackOrder = [_playlistController playbackOrder];
         [mi setState: playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSOnState : NSOffState];
-    } else if (mi == _repeat) {
-        enum vlc_playlist_playback_repeat playbackRepeat = [_playlistController playbackRepeat];
-        [mi setState: playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT ? NSOnState : NSOffState];
-    } else if (mi == _loop) {
-        enum vlc_playlist_playback_repeat playbackRepeat = [_playlistController playbackRepeat];
-        [mi setState: playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL ? NSOnState : NSOffState];
     } else if (mi == _quitAfterPB) {
         BOOL state = _playerController.actionAfterStop == VLC_PLAYER_MEDIA_STOPPED_EXIT;
         [mi setState: state ? NSOnState : NSOffState];

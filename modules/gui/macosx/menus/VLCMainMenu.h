@@ -86,7 +86,6 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *next;
 @property (readwrite, weak) IBOutlet NSMenuItem *random;
 @property (readwrite, weak) IBOutlet NSMenuItem *repeat;
-@property (readwrite, weak) IBOutlet NSMenuItem *loop;
 @property (readwrite, weak) IBOutlet NSMenuItem *AtoBloop;
 @property (readwrite, weak) IBOutlet NSMenuItem *sortPlaylist;
 @property (readwrite, weak) IBOutlet NSMenuItem *quitAfterPB;
@@ -240,7 +239,6 @@
 - (IBAction)next:(id)sender;
 - (IBAction)random:(id)sender;
 - (IBAction)repeat:(id)sender;
-- (IBAction)loop:(id)sender;
 
 - (IBAction)forward:(id)sender;
 - (IBAction)backward:(id)sender;

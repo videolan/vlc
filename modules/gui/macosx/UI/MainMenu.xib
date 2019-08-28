@@ -68,7 +68,6 @@
                 <outlet property="info" destination="1192" id="BPE-5A-AU4"/>
                 <outlet property="jumpToTime" destination="5138" id="XK6-rV-lr9"/>
                 <outlet property="license" destination="2834" id="0tU-nu-6dP"/>
-                <outlet property="loop" destination="5151" id="scu-xu-Tvh"/>
                 <outlet property="mcopyItem" destination="197" id="aBx-7l-f4e"/>
                 <outlet property="messages" destination="1003" id="q4C-pt-kQo"/>
                 <outlet property="minimize" destination="5606" id="tN3-Ho-T0c"/>
@@ -447,17 +446,12 @@
                                     <action selector="random:" target="-2" id="oVh-n6-tgV"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Repeat Item" keyEquivalent="r" id="5143">
+                            <menuItem title="Repeat Item" keyEquivalent="L" id="5143">
                                 <connections>
                                     <action selector="repeat:" target="-2" id="ThK-0C-9oZ"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Repeat Playlist" keyEquivalent="l" id="5151">
-                                <connections>
-                                    <action selector="loop:" target="-2" id="Oqv-EO-vhg"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="A→B Loop" keyEquivalent="L" id="5409">
+                            <menuItem title="A→B Loop" keyEquivalent="l" id="5409">
                                 <connections>
                                     <action selector="toggleAtoBloop:" target="-2" id="Wrv-He-P33"/>
                                 </connections>
