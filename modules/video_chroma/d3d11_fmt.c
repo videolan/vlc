@@ -604,7 +604,7 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
                       plane_t out_planes[] )
 {
     plane_t planes[PICTURE_PLANE_MAX];
-    int plane, plane_count;
+    unsigned plane, plane_count;
     HRESULT hr;
     ID3D11Texture2D *slicedTexture = NULL;
     D3D11_TEXTURE2D_DESC texDesc;
@@ -652,7 +652,7 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
             goto error;
         }
     }
-    for( int i = 0; i < p_chroma_desc->plane_count; i++ )
+    for( unsigned i = 0; i < p_chroma_desc->plane_count; i++ )
     {
         plane_t *p = &planes[i];
 
