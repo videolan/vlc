@@ -120,7 +120,7 @@ struct demux_sys
     vlc_tick_t step_length;
 
     int current_title;
-    size_t chapter_gap;
+    vlc_tick_t chapter_gap;
 
 #define X(var_name, type, module_header_type, getter, default_value) \
     type var_name;
@@ -210,7 +210,7 @@ Control(demux_t *demux, int query, va_list args)
             }
             return VLC_EGENERIC;
         case DEMUX_SET_SEEKPOINT:
-            if (sys->chapter_gap > 0)
+            if (sys->chapter_gap != VLC_TICK_INVALID)
             {
                 const int seekpoint_idx = va_arg(args, int);
                 if (seekpoint_idx < sys->chapter_count)
@@ -230,7 +230,7 @@ Control(demux_t *demux, int query, va_list args)
             }
             return VLC_EGENERIC;
         case DEMUX_GET_SEEKPOINT:
-            if (sys->chapter_gap > 0)
+            if (sys->chapter_gap != VLC_TICK_INVALID)
             {
                 *va_arg(args, int *) = sys->pts / sys->chapter_gap;
                 return VLC_SUCCESS;
@@ -718,7 +718,7 @@ Open(vlc_object_t *obj)
     sys->pts = VLC_TICK_0;
     sys->current_title = 0;
     sys->chapter_gap = sys->chapter_count > 0 ?
-                       (sys->length / sys->chapter_count) : 0;
+                       (sys->length / sys->chapter_count) : VLC_TICK_INVALID;
 
     demux->pf_control = Control;
     demux->pf_demux = Demux;
