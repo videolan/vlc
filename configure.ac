@@ -2063,6 +2063,19 @@ AS_IF([test "$enable_v4l2" != "no"], [
 AM_CONDITIONAL([HAVE_V4L2], [test "${have_v4l2}" != "no"])
 
 dnl
+dnl  NVDEC decoder/encoder
+dnl
+AC_ARG_ENABLE([nvdec], AS_HELP_STRING([--disable-nvdec],
+  [disable NVDEC decoder (default auto)]))
+have_nvdec="no"
+AS_IF([test "$enable_nvdec" != "no"], [
+  AC_CHECK_HEADERS([ffnvcodec/dynlink_loader.h], [
+    have_nvdec="yes"
+  ])
+])
+AM_CONDITIONAL([HAVE_NVDEC], [test "${have_nvdec}" != "no"])
+
+dnl
 dnl special access module for Blackmagic SDI cards
 dnl
 AC_ARG_ENABLE([decklink],
