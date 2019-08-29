@@ -298,7 +298,7 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     priv->b_thumbnailing = option == INPUT_CREATE_OPTION_THUMBNAILING;
     priv->b_can_pace_control = true;
     priv->i_start = 0;
-    priv->i_time  = 0;
+    priv->i_time = VLC_TICK_INVALID;
     priv->i_stop  = 0;
     priv->i_title_offset = input_priv(p_input)->i_seekpoint_offset = 0;
     priv->i_state = INIT_S;
@@ -527,7 +527,7 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed )
     if( p_priv->i_stop > 0 )
     {
         if( demux_Control( p_demux, DEMUX_GET_TIME, &p_priv->i_time ) )
-            p_priv->i_time = 0;
+            p_priv->i_time = VLC_TICK_INVALID;
 
         if( p_priv->i_stop <= p_priv->i_time )
             i_ret = VLC_DEMUXER_EOF;
@@ -611,8 +611,8 @@ static void MainLoopStatistics( input_thread_t *p_input )
 {
     input_thread_private_t *priv = input_priv(p_input);
     double f_position = 0.0;
-    vlc_tick_t i_time = 0;
-    vlc_tick_t i_length = 0;
+    vlc_tick_t i_time;
+    vlc_tick_t i_length;
 
     /* update input status variables */
     if( demux_Control( priv->master->p_demux,
@@ -620,11 +620,11 @@ static void MainLoopStatistics( input_thread_t *p_input )
         f_position = 0.0;
 
     if( demux_Control( priv->master->p_demux, DEMUX_GET_TIME, &i_time ) )
-        i_time = 0;
+        i_time = VLC_TICK_INVALID;
     input_priv(p_input)->i_time = i_time;
 
     if( demux_Control( priv->master->p_demux, DEMUX_GET_LENGTH, &i_length ) )
-        i_length = 0;
+        i_length = VLC_TICK_INVALID;
 
     es_out_SetTimes( priv->p_es_out, f_position, i_time, i_length );
 
@@ -1269,11 +1269,11 @@ static int Init( input_thread_t * p_input )
     /* Init length */
     vlc_tick_t i_length;
     if( demux_Control( master->p_demux, DEMUX_GET_LENGTH, &i_length ) )
-        i_length = 0;
-    if( i_length <= 0 )
+        i_length = VLC_TICK_INVALID;
+    if( i_length == VLC_TICK_INVALID )
         i_length = input_item_GetDuration( priv->p_item );
 
-    input_SendEventTimes( p_input, 0.0, 0, i_length );
+    input_SendEventTimes( p_input, 0.0, VLC_TICK_INVALID, i_length );
 
     if( !priv->b_preparsing )
     {

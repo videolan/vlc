@@ -3290,11 +3290,14 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
             else
                 i_delay = 0;
 
-            i_time -= i_delay;
-            if( i_time < 0 )
-                i_time = 0;
+            if( i_time != VLC_TICK_INVALID )
+            {
+                i_time -= i_delay;
+                if( i_time < VLC_TICK_0 )
+                    i_time = VLC_TICK_0;
+            }
 
-            if( i_length > 0 )
+            if( i_length != VLC_TICK_INVALID )
                 f_position -= (double)i_delay / i_length;
             if( f_position < 0 )
                 f_position = 0;
