@@ -59,19 +59,12 @@ Utils.NavigableFocusScope {
         RowLayout {
             anchors.fill: parent
 
-            Item {
+            Rectangle {
                 id: playingItemInfo
                 Layout.fillHeight: true
                 width: childrenRect.width
                 focus: true
-
-                Rectangle {
-                    anchors.fill: parent
-                    visible: parent.activeFocus
-                    color: VLCStyle.colors.accent
-                    border.width: 0
-                    border.color: VLCStyle.colors.accent
-                }
+                color: activeFocus ? VLCStyle.colors.accent :  "transparent"
 
                 MouseArea {
                     anchors.fill: parent
