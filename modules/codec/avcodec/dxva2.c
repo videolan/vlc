@@ -357,16 +357,7 @@ static int D3dCreateDevice(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    if (!sys->d3d_dev.dev) {
-        HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, -1, &sys->d3d_dev);
-        if (FAILED(hr))
-        {
-            msg_Err(va, "IDirect3D9_CreateDevice failed");
-            return VLC_EGENERIC;
-        }
-    } else {
-        msg_Dbg(va, "Reusing Direct3D9 device");
-    }
+    assert(sys->d3d_dev.dev); // coming from the decoder device
 
     HRESULT (WINAPI *CreateDeviceManager9)(UINT *pResetToken,
                                            IDirect3DDeviceManager9 **);
