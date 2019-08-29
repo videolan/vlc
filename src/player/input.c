@@ -732,6 +732,7 @@ input_thread_Events(input_thread_t *input_thread,
             if (input->length != event->times.length)
             {
                 input->length = event->times.length;
+                input_item_SetDuration(input_GetItem(input->thread), event->times.length);
                 vlc_player_SendEvent(player, on_length_changed, input->length);
                 changed = true;
             }
