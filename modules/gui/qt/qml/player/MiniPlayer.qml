@@ -62,6 +62,7 @@ Utils.NavigableFocusScope {
             Rectangle {
                 id: playingItemInfo
                 Layout.fillHeight: true
+                Layout.preferredWidth: playingItemInfoRow.implicitWidth
                 width: childrenRect.width
                 focus: true
                 color: activeFocus ? VLCStyle.colors.accent :  "transparent"
@@ -82,6 +83,7 @@ Utils.NavigableFocusScope {
                 }
 
                 Row {
+                    id: playingItemInfoRow
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
 
@@ -127,11 +129,14 @@ Utils.NavigableFocusScope {
 
             PlayerButtonsLayout {
                 id: buttonrow
-                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                Layout.rightMargin: VLCStyle.margin_normal
+
                 model: miniPlayerModel
                 defaultSize: VLCStyle.icon_normal
 
+                Layout.alignment: Qt.AlignVCenter
+                Layout.rightMargin: VLCStyle.margin_normal
+                Layout.preferredWidth: buttonrow.implicitWidth
+                Layout.preferredHeight: buttonrow.implicitHeight
 
                 onActionUp: root.actionUp(index)
                 onActionDown: root.actionDown(index)
