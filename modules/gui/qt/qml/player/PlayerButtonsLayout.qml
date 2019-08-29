@@ -26,12 +26,26 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///utils/" as Utils
 
-RowLayout{
-    id: buttonrow
-    property bool _focusGiven: false
+Utils.NavigableFocusScope {
+    id: playerButtonsLayout
     property alias model: buttonsRepeater.model
     property var defaultSize: VLCStyle.icon_medium
     property bool forceColors: false
+
+    property alias implicitWidth: buttonrow.implicitWidth
+    property alias implicitHeight: buttonrow.implicitHeight
+
+    Keys.priority: Keys.AfterItem
+    Keys.onPressed: {
+        if (!event.accepted)
+            defaultKeyAction(event, 0)
+    }
+
+RowLayout{
+    id: buttonrow
+    property bool _focusGiven: false
+
+    anchors.fill: parent
 
     Repeater{
         id: buttonsRepeater
@@ -70,4 +84,6 @@ RowLayout{
             }
         }
     }
+}
+
 }

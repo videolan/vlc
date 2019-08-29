@@ -84,8 +84,13 @@ Utils.NavigableFocusScope {
             Keys.onDownPressed: buttons.focus = true
         }
 
-        Utils.NavigableFocusScope {
+
+        PlayerButtonsLayout {
             id: buttons
+
+            model: playerControlBarModel
+            forceColors: true
+
             Layout.fillHeight: true
             Layout.fillWidth: true
 
@@ -105,27 +110,8 @@ Utils.NavigableFocusScope {
 
             Keys.priority: Keys.AfterItem
             Keys.onPressed: defaultKeyAction(event, 0)
-
-            ToolBar {
-                id: buttonstoolbar
-                focusPolicy: Qt.StrongFocus
-                focus: true
-                rightPadding: 0
-                leftPadding: 0
-                anchors.fill: parent
-
-                background: Rectangle {
-                    color: "transparent"
-                }
-
-                PlayerButtonsLayout {
-                    focus: true
-                    anchors.fill: parent
-                    model: playerControlBarModel
-                    forceColors: true
-                }
-            }
         }
+
     }
     Connections{
         target: rootWindow

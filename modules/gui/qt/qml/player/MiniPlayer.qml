@@ -125,7 +125,7 @@ Utils.NavigableFocusScope {
                     }
                 }
 
-                KeyNavigation.right: buttonrow.children[0].item
+                KeyNavigation.right: buttonrow
             }
 
             Item {
@@ -138,16 +138,20 @@ Utils.NavigableFocusScope {
                 Layout.rightMargin: VLCStyle.margin_normal
                 model: miniPlayerModel
                 defaultSize: VLCStyle.icon_normal
-            }
 
+
+                onActionUp: root.actionUp(index)
+                onActionDown: root.actionDown(index)
+                onActionLeft: playingItemInfo.forceActiveFocus()
+                onActionRight: root.actionRight(index)
+                onActionCancel: root.actionCancel(index)
+            }
         }
 
         Connections{
             target: rootWindow
             onToolBarConfUpdated: {
-                playingItemInfo.KeyNavigation.right = null
                 miniPlayerModel.reloadModel()
-                playingItemInfo.KeyNavigation.right = buttonrow.children[0].item
             }
         }
 
