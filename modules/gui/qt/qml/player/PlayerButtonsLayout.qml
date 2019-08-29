@@ -49,28 +49,30 @@ RowLayout{
 
     Repeater{
         id: buttonsRepeater
+
+        onItemRemoved: {
+            if (item.focus) {
+                buttonrow._focusGiven = false
+            }
+        }
+
         delegate: Loader{
             id: buttonloader
 
             sourceComponent: controlmodelbuttons.returnbuttondelegate(model.id)
             onLoaded: {
-                if (! buttonloader.item.acceptFocus)
-                    return
-                else
-                    if (!buttonrow._focusGiven){
-                        buttonloader.item.focus = true
-                        buttonrow._focusGiven = true
-                    }
+                if (!buttonrow._focusGiven) {
+                    buttonloader.focus = true
+                    buttonrow._focusGiven = true
+                }
+                buttonloader.item.focus = true
+
                 if(buttonloader.item instanceof Utils.IconToolButton)
                     buttonloader.item.size = model.size === PlayerControlBarModel.WIDGET_BIG ?
-                                VLCStyle.icon_large : defaultSize
-
-                var buttonindex = DelegateModel.itemsIndex
-                while(buttonindex > 0 && !(buttonrow.children[buttonindex-1].item.acceptFocus))
-                    buttonindex = buttonindex-1
+                                VLCStyle.icon_large : playerButtonsLayout.defaultSize
 
                 //force buttons color
-                if (buttonrow.forceColors) {
+                if (playerButtonsLayout.forceColors) {
                     if ( buttonloader.item.color )
                         buttonloader.item.color = VLCStyle.colors.playerFg
                     if ( buttonloader.item.bgColor )
@@ -79,8 +81,8 @@ RowLayout{
                         buttonloader.item.borderColor = VLCStyle.colors.playerBorder
                 }
 
-                if (buttonindex > 0)
-                    buttonloader.item.KeyNavigation.left = buttonrow.children[buttonindex-1].item
+                if (index > 0)
+                    buttonloader.item.KeyNavigation.left = buttonrow.children[index-1].item
             }
         }
     }
