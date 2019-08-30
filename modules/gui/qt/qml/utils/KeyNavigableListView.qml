@@ -184,4 +184,24 @@ NavigableFocusScope {
             }
         }
     }
+
+    RoundButton{
+        id: leftBtn
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        text:"<"
+        onClicked: listview_id.prevPage()
+        visible: view.orientation === ListView.Horizontal && view.contentX > 0
+    }
+
+
+    RoundButton{
+        id: rightBtn
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        text:">"
+        onClicked: listview_id.nextPage()
+        visible: view.orientation === ListView.Horizontal && (view.contentWidth - view.width - view.contentX) > 0
+    }
 }
+
