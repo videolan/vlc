@@ -125,7 +125,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)awakeFromNib
 {
-    _timeSelectionPanel = [[VLCTimeSelectionPanelController alloc] init];
     _playlistController = [[VLCMain sharedInstance] playlistController];
     _playerController = _playlistController.playerController;
 
@@ -895,6 +894,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)goToSpecificTime:(id)sender
 {
+    if (!_timeSelectionPanel) {
+        _timeSelectionPanel = [[VLCTimeSelectionPanelController alloc] init];
+    }
     vlc_tick_t length = _playerController.length;
     [_timeSelectionPanel setMaxTime:(int)SEC_FROM_VLC_TICK(length)];
     vlc_tick_t time = _playerController.time;

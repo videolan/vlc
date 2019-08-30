@@ -36,10 +36,8 @@
 - (id)init
 {
     self = [super initWithWindowNibName:@"TimeSelectionPanel"];
-
     return self;
 }
-
 
 #pragma mark - UI handling
 
@@ -109,10 +107,7 @@
 
 - (void)runModalForWindow:(NSWindow *)window completionHandler:(TimeSelectionCompletionHandler)handler
 {
-    [self window];
-
-    _completionHandler = [handler copy];
-
+    _completionHandler = handler;
     [window beginSheet:self.window completionHandler:nil];
 }
 

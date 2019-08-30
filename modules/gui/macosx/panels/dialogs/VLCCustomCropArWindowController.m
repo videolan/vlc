@@ -38,7 +38,7 @@
 
 - (void)windowDidLoad {
     [super windowDidLoad];
-    
+
     [_applyButton setTitle:_NS("Apply")];
     [_cancelButton setTitle:_NS("Cancel")];
     [_titleLabel setStringValue:self.title];
