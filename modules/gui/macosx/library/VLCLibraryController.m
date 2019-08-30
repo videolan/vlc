@@ -118,6 +118,10 @@ float kVLCDefaultThumbnailPosition = .15;
         return VLC_ENOOBJ;
     }
     input_item_t *p_inputItem = vlc_ml_get_input_item(_p_libraryInstance, mediaItem.libraryID);
+    if (!p_inputItem) {
+        msg_Err(getIntf(), "No input item found for media id %lli", mediaItem.libraryID);
+        return VLC_ENOITEM;
+    }
     int ret = [[[VLCMain sharedInstance] playlistController] addInputItem:p_inputItem atPosition:-1 startPlayback:playImmediately];
     input_item_Release(p_inputItem);
     if (ret == VLC_SUCCESS) {
