@@ -82,11 +82,6 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return view;
 }
 
-- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
-{
-    NSLog(@"library selection changed: %@", indexPaths);
-}
-
 #pragma mark - drag and drop support
 
 - (BOOL)collectionView:(NSCollectionView *)collectionView

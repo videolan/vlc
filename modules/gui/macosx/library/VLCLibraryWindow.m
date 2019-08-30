@@ -570,6 +570,10 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
 - (void)enableVideoPlaybackAppearance
 {
+    [_mediaSourceView removeFromSuperviewWithoutNeedingDisplay];
+    [_videoLibraryStackView removeFromSuperviewWithoutNeedingDisplay];
+    [_audioLibraryView removeFromSuperviewWithoutNeedingDisplay];
+
     [self.videoView setHidden:NO];
 
     if (self.nativeFullscreenMode) {
@@ -606,6 +610,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
     [self setAlphaValue:1.0];
     [self.videoView setHidden:YES];
+    [self segmentedControlAction:nil];
 
     if (self.nativeFullscreenMode) {
         [self showControlsBar];
