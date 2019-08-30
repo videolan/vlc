@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) VLCLibraryModel *libraryModel;
 
 - (int)appendItemToPlaylist:(VLCMediaLibraryMediaItem *)mediaItem playImmediately:(BOOL)playImmediately;
+- (int)appendItemsToPlaylist:(NSArray <VLCMediaLibraryMediaItem *> *)mediaItemArray playFirstItemImmediately:(BOOL)playFirstItemImmediately;
 - (void)showItemInFinder:(VLCMediaLibraryMediaItem *)mediaItem;
 - (int)attemptToGenerateThumbnailForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem;
 

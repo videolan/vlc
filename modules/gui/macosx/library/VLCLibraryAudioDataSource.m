@@ -71,6 +71,8 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
 
     _groupSelectionTableView.target = self;
     _groupSelectionTableView.doubleAction = @selector(groubSelectionDoubleClickAction:);
+    _collectionSelectionTableView.target = self;
+    _collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
 
     [self reloadAppearance];
 }
@@ -297,13 +299,55 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     VLCLibraryController *libraryController = [[VLCMain sharedInstance] libraryController];
 
     NSArray *tracks = [listOfAlbums[clickedRow] tracksAsMediaItems];
-    NSUInteger trackCount = tracks.count;
-    BOOL playImmediately = YES;
-    for (NSUInteger x = 0; x < trackCount; x++) {
-        [libraryController appendItemToPlaylist:tracks[x] playImmediately:playImmediately];
-        if (playImmediately) {
-            playImmediately = NO;
+    [libraryController appendItemsToPlaylist:tracks playFirstItemImmediately:YES];
+}
+
+- (void)collectionSelectionDoubleClickAction:(id)sender
+{
+    NSArray *listOfAlbums;
+
+    switch (_currentParentType) {
+        case VLC_ML_PARENT_ARTIST:
+        {
+            VLCMediaLibraryArtist *artist = _displayedCollection[self.collectionSelectionTableView.selectedRow];
+            listOfAlbums = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_ARTIST forID:artist.artistID];
+            break;
         }
+        case VLC_ML_PARENT_ALBUM:
+        {
+            VLCMediaLibraryAlbum *album = _displayedCollection[self.collectionSelectionTableView.selectedRow];
+            listOfAlbums = @[album];
+            break;
+        }
+        case VLC_ML_PARENT_UNKNOWN:
+        {
+            // FIXME: we have nothing to show here
+            listOfAlbums = nil;
+            break;
+        }
+        case VLC_ML_PARENT_GENRE:
+        {
+            VLCMediaLibraryGenre *genre = _displayedCollection[self.collectionSelectionTableView.selectedRow];
+            listOfAlbums = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_GENRE forID:genre.genreID];
+            break;
+        }
+        default:
+            NSAssert(1, @"reached the unreachable");
+            break;
+    }
+
+    if (!listOfAlbums) {
+        return;
+    }
+    NSUInteger albumCount = listOfAlbums.count;
+    if (albumCount == 0) {
+        return;
+    }
+
+    VLCLibraryController *libraryController = [[VLCMain sharedInstance] libraryController];
+    for (NSUInteger x = 0; x < albumCount; x++) {
+        NSArray *tracks = [listOfAlbums[x] tracksAsMediaItems];
+        [libraryController appendItemsToPlaylist:tracks playFirstItemImmediately:YES];
     }
 }
 

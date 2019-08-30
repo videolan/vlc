@@ -130,6 +130,27 @@ float kVLCDefaultThumbnailPosition = .15;
     return ret;
 }
 
+- (int)appendItemsToPlaylist:(NSArray <VLCMediaLibraryMediaItem *> *)mediaItemArray playFirstItemImmediately:(BOOL)playFirstItemImmediately
+{
+    if (!_p_libraryInstance) {
+        return VLC_ENOOBJ;
+    }
+
+    NSUInteger itemCount = [mediaItemArray count];
+    int ret = VLC_SUCCESS;
+    for (NSUInteger x = 0; x < itemCount; x++) {
+        if (unlikely(x == 0 && playFirstItemImmediately)) {
+            ret = [self appendItemToPlaylist:mediaItemArray[x] playImmediately:YES];
+        } else {
+            ret = [self appendItemToPlaylist:mediaItemArray[x] playImmediately:NO];
+        }
+        if (unlikely(ret != VLC_SUCCESS)) {
+            break;
+        }
+    }
+    return ret;
+}
+
 - (void)showItemInFinder:(VLCMediaLibraryMediaItem *)mediaItem;
 {
     if (mediaItem == nil) {
