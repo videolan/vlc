@@ -83,7 +83,6 @@
 @property (readwrite, weak) IBOutlet NSTextField *hotkeysLabel;
 @property (readwrite, weak) IBOutlet NSTableView *hotkeys_listbox;
 @property (readwrite, weak) IBOutlet NSButton *hotkeys_mediakeysCheckbox;
-@property (readwrite, weak) IBOutlet NSButton *hotkeys_dimKeyboardCheckbox;
 
 // input pane
 @property (readwrite, strong) IBOutlet NSView *inputView;

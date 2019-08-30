@@ -38,7 +38,6 @@
                 <outlet property="hotkeys_change_okButton" destination="2791" id="CTo-iG-kmD"/>
                 <outlet property="hotkeys_change_takenLabel" destination="2803" id="IL0-j6-d9h"/>
                 <outlet property="hotkeys_change_win" destination="2677" id="rwN-5b-lyj"/>
-                <outlet property="hotkeys_dimKeyboardCheckbox" destination="Gjp-57-RUZ" id="IeI-rL-DwJ"/>
                 <outlet property="hotkeys_listbox" destination="2670" id="i2J-F5-aT6"/>
                 <outlet property="hotkeys_mediakeysCheckbox" destination="6Ro-o1-WEd" id="fGa-18-7ey"/>
                 <outlet property="inputView" destination="2562" id="FPv-Zx-DLZ"/>
@@ -1847,13 +1846,13 @@ Gw
             <rect key="frame" x="0.0" y="0.0" width="570" height="494"/>
             <subviews>
                 <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="0.0" verticalLineScroll="19" verticalPageScroll="0.0" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2669">
-                    <rect key="frame" x="20" y="87" width="530" height="362"/>
+                    <rect key="frame" x="20" y="54" width="530" height="395"/>
                     <clipView key="contentView" id="EbT-aN-Pgg">
-                        <rect key="frame" x="1" y="0.0" width="528" height="361"/>
+                        <rect key="frame" x="1" y="0.0" width="528" height="394"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveName="sprefs_hotkeys_view" headerView="3541" id="2670">
-                                <rect key="frame" x="0.0" y="0.0" width="528" height="338"/>
+                                <rect key="frame" x="0.0" y="0.0" width="528" height="371"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1918,7 +1917,7 @@ Gw
                     </textFieldCell>
                 </textField>
                 <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="6Ro-o1-WEd">
-                    <rect key="frame" x="18" y="51" width="225" height="18"/>
+                    <rect key="frame" x="18" y="18" width="225" height="18"/>
                     <buttonCell key="cell" type="check" title="Control playback with media keys" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="kZN-TJ-neV">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -1927,25 +1926,13 @@ Gw
                         <action selector="hotkeySettingChanged:" target="-2" id="TcH-tQ-KTD"/>
                     </connections>
                 </button>
-                <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="Gjp-57-RUZ">
-                    <rect key="frame" x="18" y="18" width="328" height="18"/>
-                    <buttonCell key="cell" type="check" title="Dim keyboard backlight during fullscreen playback" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="bTZ-p2-Jsa">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="hotkeySettingChanged:" target="-2" id="4oo-j1-Uhs"/>
-                    </connections>
-                </button>
             </subviews>
             <constraints>
                 <constraint firstItem="2669" firstAttribute="leading" secondItem="2673" secondAttribute="leading" id="07J-bM-GTd"/>
-                <constraint firstItem="Gjp-57-RUZ" firstAttribute="leading" secondItem="6Ro-o1-WEd" secondAttribute="leading" id="0dF-zN-dVK"/>
                 <constraint firstItem="6Ro-o1-WEd" firstAttribute="top" secondItem="2669" secondAttribute="bottom" constant="20" id="8B2-PI-H5C"/>
-                <constraint firstAttribute="bottom" secondItem="Gjp-57-RUZ" secondAttribute="bottom" constant="20" id="8dn-tg-H5s"/>
                 <constraint firstAttribute="trailing" secondItem="2669" secondAttribute="trailing" constant="20" id="9ma-RK-c6X"/>
                 <constraint firstItem="2673" firstAttribute="leading" secondItem="2668" secondAttribute="leading" constant="20" id="HYF-Bu-NcI"/>
-                <constraint firstItem="Gjp-57-RUZ" firstAttribute="top" secondItem="6Ro-o1-WEd" secondAttribute="bottom" constant="19" id="NCm-yd-mjg"/>
+                <constraint firstAttribute="bottom" secondItem="6Ro-o1-WEd" secondAttribute="bottom" constant="20" id="LHQ-FJ-GlZ"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2673" secondAttribute="trailing" constant="20" id="Sdf-9E-91g"/>
                 <constraint firstItem="2669" firstAttribute="top" secondItem="2673" secondAttribute="bottom" constant="8" id="cl3-aB-HqL"/>
                 <constraint firstItem="2673" firstAttribute="top" secondItem="2668" secondAttribute="top" constant="20" id="cmU-2H-taN"/>
