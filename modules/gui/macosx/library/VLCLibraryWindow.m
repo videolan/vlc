@@ -438,7 +438,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_mediaSourceView(>=572.)]|" options:0 metrics:0 views:dict]];
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_mediaSourceView(>=444.)]|" options:0 metrics:0 views:dict]];
     }
-    _mediaSourceDataSource.mediaSourceMode = _segmentedTitleControl.selectedSegment == 3 ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
+    _mediaSourceDataSource.mediaSourceMode = _segmentedTitleControl.selectedSegment == 2 ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
     _librarySortButton.hidden = YES;
     _audioSegmentedControl.hidden = YES;
     [_mediaSourceDataSource reloadViews];
