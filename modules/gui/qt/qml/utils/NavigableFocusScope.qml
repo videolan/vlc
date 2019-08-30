@@ -33,24 +33,71 @@ FocusScope {
     signal actionRight( int index )
     signal actionCancel( int index )
 
+    property var navigationParent: undefined
+    property var navigationUp: defaultNavigationUp
+    property var navigationDown: defaultNavigationDown
+    property var navigationLeft: defaultNavigationLeft
+    property var navigationRight: defaultNavigationRight
+    property var navigationCancel: defaultNavigationCancel
+
+    function defaultNavigationUp(index) {
+        if (navigationParent) {
+            navigationParent.navigationUp(index)
+        } else {
+            actionUp(index)
+        }
+    }
+
+    function defaultNavigationDown(index) {
+        if (navigationParent) {
+            navigationParent.navigationDown(index)
+        } else {
+            actionDown(index)
+        }
+    }
+
+    function defaultNavigationLeft(index) {
+        if (navigationParent) {
+            navigationParent.navigationLeft(index)
+        } else {
+            actionLeft(index)
+        }
+    }
+
+    function defaultNavigationRight(index) {
+        if (navigationParent) {
+            navigationParent.navigationRight(index)
+        } else {
+            actionRight(index)
+        }
+    }
+
+    function defaultNavigationCancel(index) {
+        if (navigationParent) {
+            navigationParent.navigationCancel(index)
+        } else {
+            actionCancel(index)
+        }
+    }
+
     function defaultKeyAction(event, index) {
         if (event.accepted)
             return
         if ( event.key === Qt.Key_Down || event.matches(StandardKey.MoveToNextLine) ||event.matches(StandardKey.SelectNextLine) ) {
             event.accepted = true
-            actionDown( index )
+            navigationDown( index )
         } else if ( event.key === Qt.Key_Up || event.matches(StandardKey.MoveToPreviousLine) ||event.matches(StandardKey.SelectPreviousLine) ) {
             event.accepted = true
-            actionUp( index  )
+            navigationUp( index  )
         } else if (event.key === Qt.Key_Right || event.matches(StandardKey.MoveToNextChar) ) {
             event.accepted = true
-            actionRight( index )
+            navigationRight( index )
         } else if (event.key === Qt.Key_Left || event.matches(StandardKey.MoveToPreviousChar) ) {
             event.accepted = true
-            actionLeft( index )
+            navigationLeft( index )
         } else if ( event.key === Qt.Key_Back || event.key === Qt.Key_Cancel || event.matches(StandardKey.Back) || event.matches(StandardKey.Cancel)) {
             event.accepted = true
-            actionCancel( index )
+            navigationCancel( index )
         }
     }
 }
