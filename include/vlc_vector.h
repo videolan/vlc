@@ -591,7 +591,10 @@ vlc_vector_move_(char *array, size_t index, size_t count, size_t target)
  * \param index the index of item to remove
  */
 #define vlc_vector_swap_remove(pv, index) \
-    (pv)->data[index] = (pv)->data[--(pv)->size]
+    do { \
+        (pv)->data[index] = (pv)->data[(pv)->size-1]; \
+        (pv)->size--; \
+    } while(0)
 
 /**
  * Return the index of an item.
