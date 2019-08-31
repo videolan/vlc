@@ -58,6 +58,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (readonly) NSString *type;
 
+@property (readonly) NSString *userReadableType;
+
 /**
  The iconURI of the renderer item
  */

@@ -107,15 +107,24 @@
     }
 
     // Create a menu item
-    NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:item.name
-                                                      action:@selector(selectRenderer:)
-                                               keyEquivalent:@""];
+    NSMenuItem *menuItem = [[NSMenuItem alloc] init];
+    menuItem.target = self;
+    menuItem.action = @selector(selectRenderer:);
+    menuItem.keyEquivalent = @"";
     if (item.capabilityFlags & VLC_RENDERER_CAN_VIDEO)
-        [menuItem setImage:[NSImage imageNamed:@"sidebar-movie"]];
+        menuItem.image = [NSImage imageNamed:@"sidebar-movie"];
     else
-        [menuItem setImage:[NSImage imageNamed:@"sidebar-music"]];
-    [menuItem setTarget:self];
-    [menuItem setRepresentedObject:item];
+        menuItem.image = [NSImage imageNamed:@"sidebar-music"];
+    menuItem.representedObject = item;
+
+    NSString *unformattedTitle = [NSString stringWithFormat:@"%@ %@", item.name, item.userReadableType];
+    NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithString:unformattedTitle
+                                                                              attributes:nil];
+    [title addAttributes:@{NSBaselineOffsetAttributeName : @(2),
+                           NSFontAttributeName : [NSFont boldSystemFontOfSize:8]}
+                   range:[unformattedTitle rangeOfString:item.userReadableType options:NSBackwardsSearch]];
+    menuItem.attributedTitle = title;
+
     [_rendererMenu insertItem:menuItem atIndex:[_rendererMenu indexOfItem:_rendererNoneItem] + 1];
 }
 

@@ -73,6 +73,17 @@
     return toNSStr(vlc_renderer_item_type(_rendererItem));
 }
 
+- (NSString *)userReadableType
+{
+    NSString *type = [self type];
+    if ([type isEqualToString:@"stream_out_dlna"]) {
+        return @"DLNA";
+    } else if ([type isEqualToString:@"chromecast"]) {
+        return @"Chromecast";
+    }
+    return type;
+}
+
 - (int)capabilityFlags
 {
     return vlc_renderer_item_flags(_rendererItem);
