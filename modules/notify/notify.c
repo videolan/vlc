@@ -345,7 +345,7 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
     if( pix )
     {
         notify_notification_set_icon_from_pixbuf( notification, pix );
-        gdk_pixbuf_unref( pix );
+        g_object_unref( pix );
     }
 
     /* Adds previous and next buttons in the notification if actions are supported. */
