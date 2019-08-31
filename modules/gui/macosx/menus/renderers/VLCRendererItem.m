@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCRendererItem.m: Wrapper class for vlc_renderer_item_t
  *****************************************************************************
- * Copyright (C) 2016 VLC authors and VideoLAN
+ * Copyright (C) 2016, 2019 VLC authors and VideoLAN
  *
  * Authors: Marvin Scholz <epirat07 at gmail dot com>
  *
@@ -48,28 +48,29 @@
     _rendererItem = nil;
 }
 
-- (NSString*)name
+- (NSString *)description
 {
-    const char *name = vlc_renderer_item_name(_rendererItem);
-    if (!name)
-        return nil;
-    return [NSString stringWithUTF8String:name];
+    return [NSString stringWithFormat:@"%@: name: %@, type: %@", [self className], self.name, self.type];
+}
+
+- (NSString *)name
+{
+    return toNSStr(vlc_renderer_item_name(_rendererItem));
 }
 
 - (NSString*)identifier
 {
-    const char *sout = vlc_renderer_item_sout(_rendererItem);
-    if (!sout)
-        return nil;
-    return [NSString stringWithUTF8String:sout];
+    return toNSStr(vlc_renderer_item_sout(_rendererItem));
 }
 
 - (NSString*)iconURI
 {
-    const char *uri = vlc_renderer_item_icon_uri(_rendererItem);
-    if (!uri)
-        return nil;
-    return [NSString stringWithUTF8String:uri];
+    return toNSStr(vlc_renderer_item_icon_uri(_rendererItem));
+}
+
+- (NSString *)type
+{
+    return toNSStr(vlc_renderer_item_type(_rendererItem));
 }
 
 - (int)capabilityFlags
