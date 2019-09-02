@@ -43,6 +43,11 @@ typedef struct
 
     struct va_pic_context  *surface[MAX_SURFACE_COUNT];
 
+    const struct va_pool_cfg *callbacks;
+
+} va_pool_t;
+
+struct va_pool_cfg {
     int (*pf_create_device)(vlc_va_t *);
     void (*pf_destroy_device)(vlc_va_sys_t *);
 
@@ -71,10 +76,9 @@ typedef struct
      * Create a new context for the surface being acquired
      */
     struct va_pic_context* (*pf_new_surface_context)(vlc_va_t *, int surface_index);
+};
 
-} va_pool_t;
-
-int va_pool_Open(vlc_va_t *, va_pool_t *);
+int va_pool_Open(vlc_va_t *, const struct va_pool_cfg *, va_pool_t *);
 void va_pool_Close(vlc_va_t *va, va_pool_t *);
 int va_pool_SetupDecoder(vlc_va_t *, va_pool_t *, const AVCodecContext *, unsigned count, int alignment);
 int va_pool_SetupSurfaces(vlc_va_t *, va_pool_t *, unsigned count);

@@ -341,14 +341,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     dx_sys = &sys->dx_sys;
 
-    dx_sys->va_pool.pf_create_device           = D3dCreateDevice;
-    dx_sys->va_pool.pf_destroy_device          = D3dDestroyDevice;
-    dx_sys->va_pool.pf_create_video_service    = DxCreateVideoService;
-    dx_sys->va_pool.pf_destroy_video_service   = DxDestroyVideoService;
-    dx_sys->va_pool.pf_create_decoder_surfaces = DxCreateDecoderSurfaces;
-    dx_sys->va_pool.pf_destroy_surfaces        = DxDestroySurfaces;
-    dx_sys->va_pool.pf_setup_avcodec_ctx       = SetupAVCodecContext;
-    dx_sys->va_pool.pf_new_surface_context     = NewSurfacePicContext;
     dx_sys->pf_get_input_list          = DxGetInputList;
     dx_sys->pf_setup_output            = DxSetupOutput;
 
@@ -387,7 +379,19 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         }
     }
 
-    err = directx_va_Open(va, &sys->dx_sys);
+    static const struct va_pool_cfg pool_cfg = {
+        D3dCreateDevice,
+        D3dDestroyDevice,
+        NULL, NULL,
+        DxCreateVideoService,
+        DxDestroyVideoService,
+        DxCreateDecoderSurfaces,
+        DxDestroySurfaces,
+        SetupAVCodecContext,
+        NewSurfacePicContext,
+    };
+
+    err = directx_va_Open(va, &pool_cfg, &sys->dx_sys);
     if (err!=VLC_SUCCESS)
         goto error;
 

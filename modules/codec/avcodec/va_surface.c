@@ -48,7 +48,7 @@ static void DestroyVideoDecoder(vlc_va_sys_t *sys, va_pool_t *va_pool)
 {
     for (unsigned i = 0; i < va_pool->surface_count; i++)
         va_surface_Release(va_pool->surface[i]->va_surface);
-    va_pool->pf_destroy_surfaces(sys);
+    va_pool->callbacks->pf_destroy_surfaces(sys);
     va_pool->surface_count = 0;
 }
 
@@ -97,7 +97,7 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
     fmt.i_frame_rate      = avctx->framerate.num;
     fmt.i_frame_rate_base = avctx->framerate.den;
 
-    err = va_pool->pf_create_decoder_surfaces(va, avctx->codec_id, &fmt, count);
+    err = va_pool->callbacks->pf_create_decoder_surfaces(va, avctx->codec_id, &fmt, count);
     if (err == VLC_SUCCESS)
     {
         va_pool->surface_width  = surface_width;
@@ -107,7 +107,7 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
 done:
     va_pool->surface_count = i;
     if (err == VLC_SUCCESS)
-        va_pool->pf_setup_avcodec_ctx(va->sys);
+        va_pool->callbacks->pf_setup_avcodec_ctx(va->sys);
 
     return err;
 }
@@ -121,7 +121,7 @@ int va_pool_SetupSurfaces(vlc_va_t *va, va_pool_t *va_pool, unsigned count)
         struct vlc_va_surface_t *p_surface = malloc(sizeof(*p_surface));
         if (unlikely(p_surface==NULL))
             goto done;
-        va_pool->surface[i] = va_pool->pf_new_surface_context(va, i);
+        va_pool->surface[i] = va_pool->callbacks->pf_new_surface_context(va, i);
         if (unlikely(va_pool->surface[i]==NULL))
         {
             free(p_surface);
@@ -135,7 +135,7 @@ int va_pool_SetupSurfaces(vlc_va_t *va, va_pool_t *va_pool, unsigned count)
 done:
     va_pool->surface_count = i;
     if (err == VLC_SUCCESS)
-        va_pool->pf_setup_avcodec_ctx(va->sys);
+        va_pool->callbacks->pf_setup_avcodec_ctx(va->sys);
 
     return err;
 }
@@ -191,31 +191,33 @@ void va_surface_Release(vlc_va_surface_t *surface)
 void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)
 {
     DestroyVideoDecoder(va->sys, va_pool);
-    va_pool->pf_destroy_video_service(va);
-    if (va_pool->pf_destroy_device_manager)
-        va_pool->pf_destroy_device_manager(va);
-    va_pool->pf_destroy_device(va->sys);
+    va_pool->callbacks->pf_destroy_video_service(va);
+    if (va_pool->callbacks->pf_destroy_device_manager)
+        va_pool->callbacks->pf_destroy_device_manager(va);
+    va_pool->callbacks->pf_destroy_device(va->sys);
 }
 
-int va_pool_Open(vlc_va_t *va, va_pool_t *va_pool)
+int va_pool_Open(vlc_va_t *va, const struct va_pool_cfg *cbs, va_pool_t *va_pool)
 {
     /* */
-    if (va_pool->pf_create_device(va)) {
+    if (cbs->pf_create_device(va)) {
         msg_Err(va, "Failed to create device");
         goto error;
     }
     msg_Dbg(va, "CreateDevice succeed");
 
-    if (va_pool->pf_create_device_manager &&
-        va_pool->pf_create_device_manager(va) != VLC_SUCCESS) {
+    if (cbs->pf_create_device_manager &&
+        cbs->pf_create_device_manager(va) != VLC_SUCCESS) {
         msg_Err(va, "CreateDeviceManager failed");
         goto error;
     }
 
-    if (va_pool->pf_create_video_service(va)) {
+    if (cbs->pf_create_video_service(va)) {
         msg_Err(va, "CreateVideoService failed");
         goto error;
     }
+
+    va_pool->callbacks = cbs;
 
     return VLC_SUCCESS;
 
