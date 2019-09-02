@@ -280,7 +280,8 @@ char *directx_va_GetDecoderName(const GUID *guid)
 
 /* */
 int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, const AVCodecContext *avctx,
-                     const es_format_t *fmt, int flag_xbox, GUID *found_guid)
+                     const es_format_t *fmt, int flag_xbox,
+                     video_format_t *fmt_out, unsigned *surfaces, GUID *found_guid)
 {
     /* */
     if (FindVideoServiceConversion(va, dx_sys, fmt, avctx, found_guid)) {
@@ -323,7 +324,30 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, const AVCodecContext *
     if ( avctx->active_thread_type & FF_THREAD_FRAME )
         surface_count += avctx->thread_count;
 
-    return va_pool_SetupDecoder(va, &dx_sys->va_pool, avctx, surface_count, surface_alignment);
+    if (avctx->coded_width <= 0 || avctx->coded_height <= 0)
+        return VLC_EGENERIC;
+
+    assert((surface_alignment & (surface_alignment - 1)) == 0); /* power of 2 */
+#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
+    int surface_width  = ALIGN(avctx->coded_width,  surface_alignment);
+    int surface_height = ALIGN(avctx->coded_height, surface_alignment);
+
+    if (avctx->coded_width != surface_width || avctx->coded_height != surface_height)
+        msg_Warn( va, "surface dimensions (%dx%d) differ from avcodec dimensions (%dx%d)",
+                  surface_width, surface_height,
+                  avctx->coded_width, avctx->coded_height);
+
+    *fmt_out = fmt->video;
+    fmt_out->i_width  = surface_width;
+    fmt_out->i_height = surface_height;
+
+    /* FIXME transmit a video_format_t by VaSetup directly */
+    fmt_out->i_frame_rate      = avctx->framerate.num;
+    fmt_out->i_frame_rate_base = avctx->framerate.den;
+
+
+    *surfaces = surface_count;
+    return VLC_SUCCESS;
 }
 
 void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)

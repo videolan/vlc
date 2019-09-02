@@ -314,7 +314,12 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (err!=VLC_SUCCESS)
         goto error;
 
-    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt, 0, &sys->decoder_guid);
+    video_format_t fmt_out;
+    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt, 0, &fmt_out, &sys->hw.surface_count, &sys->decoder_guid);
+    if (err != VLC_SUCCESS)
+        goto error;
+
+    err = va_pool_SetupDecoder(va, &sys->dx_sys.va_pool, ctx, &fmt_out, sys->hw.surface_count);
     if (err != VLC_SUCCESS)
         goto error;
 

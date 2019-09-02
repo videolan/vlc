@@ -56,27 +56,14 @@ static void DestroyVideoDecoder(vlc_va_sys_t *sys, va_pool_t *va_pool)
 static int SetupSurfaces(vlc_va_t *, va_pool_t *, unsigned count);
 
 /* */
-int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx, unsigned count, int alignment)
+int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
+                         const video_format_t *fmt, unsigned count)
 {
     int err = VLC_ENOMEM;
-    unsigned i = va_pool->surface_count;
-
-    if (avctx->coded_width <= 0 || avctx->coded_height <= 0)
-        return VLC_EGENERIC;
-
-    assert((alignment & (alignment - 1)) == 0); /* power of 2 */
-#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
-    int surface_width  = ALIGN(avctx->coded_width,  alignment);
-    int surface_height = ALIGN(avctx->coded_height, alignment);
-
-    if (avctx->coded_width != surface_width || avctx->coded_height != surface_height)
-        msg_Warn( va, "surface dimensions (%dx%d) differ from avcodec dimensions (%dx%d)",
-                  surface_width, surface_height,
-                  avctx->coded_width, avctx->coded_height);
 
     if ( va_pool->surface_count >= count &&
-         va_pool->surface_width == surface_width &&
-         va_pool->surface_height == surface_height )
+         va_pool->surface_width  == fmt->i_width &&
+         va_pool->surface_height == fmt->i_height )
     {
         msg_Dbg(va, "reusing surface pool");
         err = VLC_SUCCESS;
@@ -92,23 +79,15 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
     if (count > MAX_SURFACE_COUNT)
         return VLC_EGENERIC;
 
-    /* FIXME transmit a video_format_t by VaSetup directly */
-    video_format_t fmt;
-    memset(&fmt, 0, sizeof(fmt));
-    fmt.i_width  = surface_width;
-    fmt.i_height = surface_height;
-    fmt.i_frame_rate      = avctx->framerate.num;
-    fmt.i_frame_rate_base = avctx->framerate.den;
-
-    err = va_pool->callbacks->pf_create_decoder_surfaces(va, avctx->codec_id, &fmt, count);
+    err = va_pool->callbacks->pf_create_decoder_surfaces(va, avctx->codec_id, fmt, count);
     if (err == VLC_SUCCESS)
     {
-        va_pool->surface_width  = surface_width;
-        va_pool->surface_height = surface_height;
+        va_pool->surface_width  = fmt->i_width;
+        va_pool->surface_height = fmt->i_height;
+        va_pool->surface_count = va_pool->can_extern_pool ? 0 : count;
     }
 
 done:
-    va_pool->surface_count = i;
     if (err == VLC_SUCCESS)
         err = SetupSurfaces(va, va_pool, count);
 
