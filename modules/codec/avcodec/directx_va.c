@@ -263,7 +263,7 @@ static const directx_va_mode_t DXVA_MODES[] = {
     { NULL, NULL, 0, NULL }
 };
 
-static int FindVideoServiceConversion(vlc_va_t *, const directx_sys_t *, const es_format_t *, const AVCodecContext *, GUID *found_guid);
+static int FindVideoServiceConversion(vlc_va_t *, const directx_sys_t *, const es_format_t *, video_format_t *fmt_out, const AVCodecContext *, GUID *found_guid);
 
 char *directx_va_GetDecoderName(const GUID *guid)
 {
@@ -283,12 +283,6 @@ int directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_sys, const AVCodecCon
                      const es_format_t *fmt, int flag_xbox,
                      video_format_t *fmt_out, unsigned *surfaces, GUID *found_guid)
 {
-    /* */
-    if (FindVideoServiceConversion(va, dx_sys, fmt, avctx, found_guid)) {
-        msg_Err(va, "FindVideoServiceConversion failed");
-        return VLC_EGENERIC;
-    }
-
     int surface_alignment = 16;
     unsigned surface_count = 2;
 
@@ -345,7 +339,11 @@ int directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_sys, const AVCodecCon
     fmt_out->i_frame_rate      = avctx->framerate.num;
     fmt_out->i_frame_rate_base = avctx->framerate.den;
 
-
+    /* */
+    if (FindVideoServiceConversion(va, dx_sys, fmt, fmt_out, avctx, found_guid)) {
+        msg_Err(va, "FindVideoServiceConversion failed");
+        return VLC_EGENERIC;
+    }
     *surfaces = surface_count;
     return VLC_SUCCESS;
 }
@@ -388,7 +386,7 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
  * Find the best suited decoder mode GUID and render format.
  */
 static int FindVideoServiceConversion(vlc_va_t *va, const directx_sys_t *dx_sys,
-                                      const es_format_t *fmt, const AVCodecContext *avctx,
+                                      const es_format_t *fmt, video_format_t *fmt_out, const AVCodecContext *avctx,
                                       GUID *found_guid)
 {
     input_list_t p_list = { 0 };
@@ -436,7 +434,7 @@ static int FindVideoServiceConversion(vlc_va_t *va, const directx_sys_t *dx_sys,
 
         /* */
         msg_Dbg(va, "Trying to use '%s' as input", mode->name);
-        if (dx_sys->pf_setup_output(va, mode->guid, &fmt->video)==VLC_SUCCESS)
+        if (dx_sys->pf_setup_output(va, mode->guid, fmt_out)==VLC_SUCCESS)
         {
             *found_guid = *mode->guid;
             err = VLC_SUCCESS;
