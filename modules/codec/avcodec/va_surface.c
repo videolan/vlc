@@ -42,12 +42,13 @@ typedef int VA_PICSYS;
 
 struct vlc_va_surface_t {
     atomic_uintptr_t     refcount;
+    struct va_pic_context *pic_va_ctx;
 };
 
 static void DestroyVideoDecoder(vlc_va_sys_t *sys, va_pool_t *va_pool)
 {
     for (unsigned i = 0; i < va_pool->surface_count; i++)
-        va_surface_Release(va_pool->surface[i]->va_surface);
+        va_surface_Release(va_pool->surface[i]);
     va_pool->callbacks->pf_destroy_surfaces(sys);
     va_pool->surface_count = 0;
 }
@@ -119,17 +120,17 @@ static int SetupSurfaces(vlc_va_t *va, va_pool_t *va_pool, unsigned count)
     int err = VLC_ENOMEM;
 
     for (unsigned i = 0; i < va_pool->surface_count; i++) {
-        struct vlc_va_surface_t *p_surface = malloc(sizeof(*p_surface));
+        vlc_va_surface_t *p_surface = malloc(sizeof(*p_surface));
         if (unlikely(p_surface==NULL))
             goto done;
-        va_pool->surface[i] = va_pool->callbacks->pf_new_surface_context(va, i);
-        if (unlikely(va_pool->surface[i]==NULL))
+        p_surface->pic_va_ctx = va_pool->callbacks->pf_new_surface_context(va, i, p_surface);
+        if (unlikely(p_surface->pic_va_ctx==NULL))
         {
             free(p_surface);
             goto done;
         }
-        va_pool->surface[i]->va_surface = p_surface;
-        atomic_init(&va_pool->surface[i]->va_surface->refcount, 1);
+        va_pool->surface[i] = p_surface;
+        atomic_init(&p_surface->refcount, 1);
     }
     err = VLC_SUCCESS;
 
@@ -143,14 +144,14 @@ done:
 static picture_context_t *GetSurface(va_pool_t *va_pool)
 {
     for (unsigned i = 0; i < va_pool->surface_count; i++) {
-        struct va_pic_context *surface = va_pool->surface[i];
+        vlc_va_surface_t *surface = va_pool->surface[i];
         uintptr_t expected = 1;
 
-        if (atomic_compare_exchange_strong(&surface->va_surface->refcount, &expected, 2))
+        if (atomic_compare_exchange_strong(&surface->refcount, &expected, 2))
         {
-            picture_context_t *field = surface->s.copy(&surface->s);
+            picture_context_t *field = surface->pic_va_ctx->s.copy(&surface->pic_va_ctx->s);
             /* the copy should have added an extra reference */
-            atomic_fetch_sub(&surface->va_surface->refcount, 1);
+            atomic_fetch_sub(&surface->refcount, 1);
             return field;
         }
     }

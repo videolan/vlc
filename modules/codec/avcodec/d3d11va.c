@@ -208,7 +208,7 @@ done:
     return pic_ctx;
 }
 
-static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_index)
+static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_index, vlc_va_surface_t *va_surface)
 {
     vlc_va_sys_t *sys = va->sys;
     ID3D11VideoDecoderOutputView *surface = sys->hw_surface[surface_index];
@@ -235,6 +235,7 @@ static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_ind
      * CreatePicContext(), undo one of them otherwise we need an extra release
      * when the pool is emptied */
     ReleaseD3D11PictureSys(&pic_ctx->picsys);
+    pic_ctx->va_surface = va_surface;
     return pic_ctx;
 }
 

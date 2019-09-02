@@ -41,7 +41,7 @@ typedef struct
     int          surface_width;
     int          surface_height;
 
-    struct va_pic_context  *surface[MAX_SURFACE_COUNT];
+    vlc_va_surface_t *surface[MAX_SURFACE_COUNT];
 
     const struct va_pool_cfg *callbacks;
 
@@ -71,7 +71,7 @@ struct va_pool_cfg {
     /**
      * Create a new context for the surface being acquired
      */
-    struct va_pic_context* (*pf_new_surface_context)(vlc_va_t *, int surface_index);
+    struct va_pic_context* (*pf_new_surface_context)(vlc_va_t *, int surface_index, vlc_va_surface_t *);
 };
 
 int va_pool_Open(vlc_va_t *, const struct va_pool_cfg *, va_pool_t *);
