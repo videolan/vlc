@@ -232,8 +232,6 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 static void Close(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
-    if ( sys == NULL )
-        return;
 
     directx_va_Close(va, &sys->dx_sys);
 
@@ -292,7 +290,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         msg_Warn(va, "cannot load DXVA2 decoder DLL");
         D3D9_Destroy( &sys->hd3d );
         free( sys );
-        goto error;
+        return VLC_EGENERIC;
     }
 
     dx_sys = &sys->dx_sys;
