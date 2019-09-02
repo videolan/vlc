@@ -53,7 +53,6 @@ typedef struct input_list_t {
 typedef struct
 {
     va_pool_t             va_pool;
-    bool                  can_extern_pool;
 
     /**
      * Read the list of possible input GUIDs

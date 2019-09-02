@@ -45,6 +45,8 @@ typedef struct
 
     const struct va_pool_cfg *callbacks;
 
+    bool                  can_extern_pool;
+
 } va_pool_t;
 
 struct va_pool_cfg {
@@ -64,7 +66,7 @@ struct va_pool_cfg {
     /**
      * Set the avcodec hw context after the decoder is created
      */
-    void (*pf_setup_avcodec_ctx)(vlc_va_sys_t *);
+    void (*pf_setup_avcodec_ctx)(vlc_va_sys_t *, unsigned surfaces);
 
     /**
      * Create a new context for the surface being acquired

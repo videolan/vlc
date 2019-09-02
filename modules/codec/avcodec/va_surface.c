@@ -107,7 +107,7 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
 done:
     va_pool->surface_count = i;
     if (err == VLC_SUCCESS)
-        va_pool->callbacks->pf_setup_avcodec_ctx(va->sys);
+        va_pool->callbacks->pf_setup_avcodec_ctx(va->sys, count);
 
     return err;
 }
@@ -115,9 +115,8 @@ done:
 int va_pool_SetupSurfaces(vlc_va_t *va, va_pool_t *va_pool, unsigned count)
 {
     int err = VLC_ENOMEM;
-    unsigned i = va_pool->surface_count;
 
-    for (i = 0; i < count; i++) {
+    for (unsigned i = 0; i < va_pool->surface_count; i++) {
         struct vlc_va_surface_t *p_surface = malloc(sizeof(*p_surface));
         if (unlikely(p_surface==NULL))
             goto done;
@@ -133,9 +132,8 @@ int va_pool_SetupSurfaces(vlc_va_t *va, va_pool_t *va_pool, unsigned count)
     err = VLC_SUCCESS;
 
 done:
-    va_pool->surface_count = i;
     if (err == VLC_SUCCESS)
-        va_pool->callbacks->pf_setup_avcodec_ctx(va->sys);
+        va_pool->callbacks->pf_setup_avcodec_ctx(va->sys, count);
 
     return err;
 }

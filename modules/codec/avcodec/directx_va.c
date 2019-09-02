@@ -326,7 +326,7 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, const AVCodecContext *
     int err = va_pool_SetupDecoder(va, &dx_sys->va_pool, avctx, surface_count, surface_alignment);
     if (err != VLC_SUCCESS)
         return err;
-    if (dx_sys->can_extern_pool)
+    if (dx_sys->va_pool.can_extern_pool)
         return VLC_SUCCESS;
     return va_pool_SetupSurfaces(va, &dx_sys->va_pool, surface_count);
 }
