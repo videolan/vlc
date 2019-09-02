@@ -382,7 +382,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     static const struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
         D3dDestroyDevice,
-        NULL, NULL,
         DxCreateVideoService,
         DxDestroyVideoService,
         DxCreateDecoderSurfaces,
@@ -505,8 +504,7 @@ static void DxDestroyVideoService(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
     directx_sys_t *dx_sys = &sys->dx_sys;
-    if (dx_sys->d3ddec)
-        ID3D11VideoDevice_Release(dx_sys->d3ddec);
+    ID3D11VideoDevice_Release(dx_sys->d3ddec);
 }
 
 static void ReleaseInputList(input_list_t *p_list)

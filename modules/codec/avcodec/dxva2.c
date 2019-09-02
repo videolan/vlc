@@ -137,9 +137,6 @@ struct vlc_va_sys_t
 static int D3dCreateDevice(vlc_va_t *);
 static void D3dDestroyDevice(vlc_va_t *);
 
-static int D3dCreateDeviceManager(vlc_va_t *);
-static void D3dDestroyDeviceManager(vlc_va_t *);
-
 static int DxCreateVideoService(vlc_va_t *);
 static void DxDestroyVideoService(vlc_va_t *);
 static int DxGetInputList(vlc_va_t *, input_list_t *);
@@ -306,8 +303,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     static const struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
         D3dDestroyDevice,
-        D3dCreateDeviceManager,
-        D3dDestroyDeviceManager,
         DxCreateVideoService,
         DxDestroyVideoService,
         DxCreateVideoDecoder,
@@ -355,37 +350,16 @@ static int D3dCreateDevice(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    if (sys->d3d_dev.dev) {
+    if (!sys->d3d_dev.dev) {
+        HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, -1, &sys->d3d_dev);
+        if (FAILED(hr))
+        {
+            msg_Err(va, "IDirect3D9_CreateDevice failed");
+            return VLC_EGENERIC;
+        }
+    } else {
         msg_Dbg(va, "Reusing Direct3D9 device");
-        return VLC_SUCCESS;
     }
-
-    HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, -1, &sys->d3d_dev);
-    if (FAILED(hr))
-    {
-        msg_Err(va, "IDirect3D9_CreateDevice failed");
-        return VLC_EGENERIC;
-    }
-
-    return VLC_SUCCESS;
-}
-
-/**
- * It releases a Direct3D device and its resources.
- */
-static void D3dDestroyDevice(vlc_va_t *va)
-{
-    vlc_va_sys_t *sys = va->sys;
-    D3D9_ReleaseDevice(&sys->d3d_dev);
-    D3D9_Destroy( &sys->hd3d );
-}
-
-/**
- * It creates a Direct3D device manager
- */
-static int D3dCreateDeviceManager(vlc_va_t *va)
-{
-    vlc_va_sys_t *sys = va->sys;
 
     HRESULT (WINAPI *CreateDeviceManager9)(UINT *pResetToken,
                                            IDirect3DDeviceManager9 **);
@@ -400,28 +374,31 @@ static int D3dCreateDeviceManager(vlc_va_t *va)
     msg_Dbg(va, "got CreateDeviceManager9");
 
     UINT token;
-    IDirect3DDeviceManager9 *devmng;
-    if (FAILED(CreateDeviceManager9(&token, &devmng))) {
+    if (FAILED(CreateDeviceManager9(&token, &sys->devmng))) {
         msg_Err(va, " OurDirect3DCreateDeviceManager9 failed");
         return VLC_EGENERIC;
     }
-    sys->devmng = devmng;
     msg_Dbg(va, "obtained IDirect3DDeviceManager9");
 
-    HRESULT hr = IDirect3DDeviceManager9_ResetDevice(devmng, sys->d3d_dev.dev, token);
+    HRESULT hr = IDirect3DDeviceManager9_ResetDevice(sys->devmng, sys->d3d_dev.dev, token);
     if (FAILED(hr)) {
-        msg_Err(va, "IDirect3DDeviceManager9_ResetDevice failed: %08x", (unsigned)hr);
+        msg_Err(va, "IDirect3DDeviceManager9_ResetDevice failed: 0x%lX)", hr);
+        IDirect3DDeviceManager9_Release(sys->devmng);
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
 }
+
 /**
- * It destroys a Direct3D device manager
+ * It releases a Direct3D device and its resources.
  */
-static void D3dDestroyDeviceManager(vlc_va_t *va)
+static void D3dDestroyDevice(vlc_va_t *va)
 {
-    if (va->sys->devmng)
-        IDirect3DDeviceManager9_Release(va->sys->devmng);
+    vlc_va_sys_t *sys = va->sys;
+    if (sys->devmng)
+        IDirect3DDeviceManager9_Release(sys->devmng);
+    D3D9_ReleaseDevice(&sys->d3d_dev);
+    D3D9_Destroy( &sys->hd3d );
 }
 
 /**
@@ -460,14 +437,10 @@ static void DxDestroyVideoService(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
     directx_sys_t *dx_sys = &sys->dx_sys;
-    if (sys->device)
-    {
-        HRESULT hr = IDirect3DDeviceManager9_CloseDeviceHandle(sys->devmng, sys->device);
-        if (FAILED(hr))
-            msg_Warn(va, "Failed to release device handle 0x%p. (hr=0x%lX)", sys->device, hr);
-    }
-    if (dx_sys->d3ddec)
-        IDirectXVideoDecoderService_Release(dx_sys->d3ddec);
+    HRESULT hr = IDirect3DDeviceManager9_CloseDeviceHandle(sys->devmng, sys->device);
+    if (FAILED(hr))
+        msg_Warn(va, "Failed to release device handle 0x%p. (hr=0x%lX)", sys->device, hr);
+    IDirectXVideoDecoderService_Release(dx_sys->d3ddec);
 }
 
 static void ReleaseInputList(input_list_t *p_list)
