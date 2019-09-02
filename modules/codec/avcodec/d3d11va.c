@@ -128,8 +128,6 @@ struct vlc_va_sys_t
 static int D3dCreateDevice(vlc_va_t *);
 static void D3dDestroyDevice(vlc_va_t *);
 
-static int DxCreateVideoService(vlc_va_t *);
-static void DxDestroyVideoService(vlc_va_t *);
 static int DxGetInputList(vlc_va_t *, input_list_t *);
 static int DxSetupOutput(vlc_va_t *, const GUID *, const video_format_t *);
 
@@ -382,8 +380,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     static const struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
         D3dDestroyDevice,
-        DxCreateVideoService,
-        DxDestroyVideoService,
         DxCreateDecoderSurfaces,
         DxDestroySurfaces,
         SetupAVCodecContext,
@@ -430,27 +426,26 @@ static int D3dCreateDevice(vlc_va_t *va)
     if (sys->d3d_dev.d3ddevice && sys->d3d_dev.d3dcontext) {
         msg_Dbg(va, "Reusing Direct3D11 device");
         ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
-        return VLC_SUCCESS;
     }
-
-#if VLC_WINSTORE_APP
-    if (sys->d3d_dev.d3dcontext == NULL)
-        sys->d3d_dev.d3dcontext = var_InheritInteger(va, "winrt-d3dcontext"); /* LEGACY */
-#endif
-    if (sys->d3d_dev.d3dcontext != NULL)
-    {
-        ID3D11DeviceContext_GetDevice(sys->d3d_dev.d3dcontext, &sys->d3d_dev.d3ddevice);
-        ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
-        ID3D11Device_Release(sys->d3d_dev.d3ddevice);
-    }
-
-    /* */
     else
     {
-        hr = D3D11_CreateDevice(va, &sys->hd3d, NULL, true, &sys->d3d_dev);
-        if (FAILED(hr)) {
-            msg_Err(va, "D3D11CreateDevice failed. (hr=0x%lX)", hr);
-            return VLC_EGENERIC;
+#if VLC_WINSTORE_APP
+        if (sys->d3d_dev.d3dcontext == NULL)
+            sys->d3d_dev.d3dcontext = var_InheritInteger(va, "winrt-d3dcontext"); /* LEGACY */
+#endif
+        if (sys->d3d_dev.d3dcontext != NULL)
+        {
+            ID3D11DeviceContext_GetDevice(sys->d3d_dev.d3dcontext, &sys->d3d_dev.d3ddevice);
+            ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
+            ID3D11Device_Release(sys->d3d_dev.d3ddevice);
+        }
+        else
+        {
+            hr = D3D11_CreateDevice(va, &sys->hd3d, NULL, true, &sys->d3d_dev);
+            if (FAILED(hr)) {
+                msg_Err(va, "D3D11CreateDevice failed. (hr=0x%lX)", hr);
+                return VLC_EGENERIC;
+            }
         }
     }
 
@@ -464,6 +459,18 @@ static int D3dCreateDevice(vlc_va_t *va)
     }
     sys->d3dvidctx = d3dvidctx;
 
+    void *d3dviddev = NULL;
+    hr = ID3D11Device_QueryInterface(sys->d3d_dev.d3ddevice, &IID_ID3D11VideoDevice, &d3dviddev);
+    if (FAILED(hr)) {
+       msg_Err(va, "Could not Query ID3D11VideoDevice Interface. (hr=0x%lX)", hr);
+       ID3D11DeviceContext_Release(sys->d3d_dev.d3dcontext);
+       ID3D11Device_Release(sys->d3d_dev.d3ddevice);
+       ID3D11VideoContext_Release(sys->d3dvidctx);
+       return VLC_EGENERIC;
+    }
+    directx_sys_t *dx_sys = &sys->dx_sys;
+    dx_sys->d3ddec = d3dviddev;
+
     return VLC_SUCCESS;
 }
 
@@ -473,38 +480,10 @@ static int D3dCreateDevice(vlc_va_t *va)
 static void D3dDestroyDevice(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
-    if (sys->d3dvidctx)
-        ID3D11VideoContext_Release(sys->d3dvidctx);
-    D3D11_ReleaseDevice( &sys->d3d_dev );
-}
-
-/**
- * It creates a DirectX video service
- */
-static int DxCreateVideoService(vlc_va_t *va)
-{
-    vlc_va_sys_t *sys = va->sys;
-    directx_sys_t *dx_sys = &sys->dx_sys;
-
-    void *d3dviddev = NULL;
-    HRESULT hr = ID3D11Device_QueryInterface(sys->d3d_dev.d3ddevice, &IID_ID3D11VideoDevice, &d3dviddev);
-    if (FAILED(hr)) {
-       msg_Err(va, "Could not Query ID3D11VideoDevice Interface. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
-    }
-    dx_sys->d3ddec = d3dviddev;
-
-    return VLC_SUCCESS;
-}
-
-/**
- * It destroys a DirectX video service
- */
-static void DxDestroyVideoService(vlc_va_t *va)
-{
-    vlc_va_sys_t *sys = va->sys;
     directx_sys_t *dx_sys = &sys->dx_sys;
     ID3D11VideoDevice_Release(dx_sys->d3ddec);
+    ID3D11VideoContext_Release(sys->d3dvidctx);
+    D3D11_ReleaseDevice( &sys->d3d_dev );
 }
 
 static void ReleaseInputList(input_list_t *p_list)

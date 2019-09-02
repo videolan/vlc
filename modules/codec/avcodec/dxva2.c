@@ -137,8 +137,6 @@ struct vlc_va_sys_t
 static int D3dCreateDevice(vlc_va_t *);
 static void D3dDestroyDevice(vlc_va_t *);
 
-static int DxCreateVideoService(vlc_va_t *);
-static void DxDestroyVideoService(vlc_va_t *);
 static int DxGetInputList(vlc_va_t *, input_list_t *);
 static int DxSetupOutput(vlc_va_t *, const GUID *, const video_format_t *);
 
@@ -303,8 +301,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     static const struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
         D3dDestroyDevice,
-        DxCreateVideoService,
-        DxDestroyVideoService,
         DxCreateVideoDecoder,
         DxDestroyVideoDecoder,
         SetupAVCodecContext,
@@ -386,6 +382,26 @@ static int D3dCreateDevice(vlc_va_t *va)
         IDirect3DDeviceManager9_Release(sys->devmng);
         return VLC_EGENERIC;
     }
+
+    hr = IDirect3DDeviceManager9_OpenDeviceHandle(sys->devmng, &sys->device);
+    if (FAILED(hr)) {
+        msg_Err(va, "OpenDeviceHandle failed");
+        IDirect3DDeviceManager9_Release(sys->devmng);
+        return VLC_EGENERIC;
+    }
+
+    void *pv;
+    hr = IDirect3DDeviceManager9_GetVideoService(sys->devmng, sys->device,
+                                        &IID_IDirectXVideoDecoderService, &pv);
+    if (FAILED(hr)) {
+        msg_Err(va, "GetVideoService failed");
+        IDirect3DDeviceManager9_CloseDeviceHandle(sys->devmng, sys->device);
+        IDirect3DDeviceManager9_Release(sys->devmng);
+        return VLC_EGENERIC;
+    }
+    directx_sys_t *dx_sys = &sys->dx_sys;
+    dx_sys->d3ddec = pv;
+
     return VLC_SUCCESS;
 }
 
@@ -395,52 +411,14 @@ static int D3dCreateDevice(vlc_va_t *va)
 static void D3dDestroyDevice(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
-    if (sys->devmng)
-        IDirect3DDeviceManager9_Release(sys->devmng);
-    D3D9_ReleaseDevice(&sys->d3d_dev);
-    D3D9_Destroy( &sys->hd3d );
-}
-
-/**
- * It creates a DirectX video service
- */
-static int DxCreateVideoService(vlc_va_t *va)
-{
-    vlc_va_sys_t *sys = va->sys;
-    directx_sys_t *dx_sys = &sys->dx_sys;
-    HRESULT hr;
-
-    HANDLE device;
-    hr = IDirect3DDeviceManager9_OpenDeviceHandle(sys->devmng, &device);
-    if (FAILED(hr)) {
-        msg_Err(va, "OpenDeviceHandle failed");
-        return VLC_EGENERIC;
-    }
-    sys->device = device;
-
-    void *pv;
-    hr = IDirect3DDeviceManager9_GetVideoService(sys->devmng, device,
-                                        &IID_IDirectXVideoDecoderService, &pv);
-    if (FAILED(hr)) {
-        msg_Err(va, "GetVideoService failed");
-        return VLC_EGENERIC;
-    }
-    dx_sys->d3ddec = pv;
-
-    return VLC_SUCCESS;
-}
-
-/**
- * It destroys a DirectX video service
- */
-static void DxDestroyVideoService(vlc_va_t *va)
-{
-    vlc_va_sys_t *sys = va->sys;
     directx_sys_t *dx_sys = &sys->dx_sys;
     HRESULT hr = IDirect3DDeviceManager9_CloseDeviceHandle(sys->devmng, sys->device);
     if (FAILED(hr))
         msg_Warn(va, "Failed to release device handle 0x%p. (hr=0x%lX)", sys->device, hr);
     IDirectXVideoDecoderService_Release(dx_sys->d3ddec);
+    IDirect3DDeviceManager9_Release(sys->devmng);
+    D3D9_ReleaseDevice(&sys->d3d_dev);
+    D3D9_Destroy( &sys->hd3d );
 }
 
 static void ReleaseInputList(input_list_t *p_list)

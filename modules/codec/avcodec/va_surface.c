@@ -191,7 +191,6 @@ void va_surface_Release(vlc_va_surface_t *surface)
 void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)
 {
     DestroyVideoDecoder(va->sys, va_pool);
-    va_pool->callbacks->pf_destroy_video_service(va);
     va_pool->callbacks->pf_destroy_device(va);
 }
 
@@ -200,20 +199,12 @@ int va_pool_Open(vlc_va_t *va, const struct va_pool_cfg *cbs, va_pool_t *va_pool
     /* */
     if (cbs->pf_create_device(va)) {
         msg_Err(va, "Failed to create device");
-        goto error;
+        return VLC_EGENERIC;
     }
     msg_Dbg(va, "CreateDevice succeed");
-
-    if (cbs->pf_create_video_service(va)) {
-        msg_Err(va, "CreateVideoService failed");
-        goto error;
-    }
 
     va_pool->callbacks = cbs;
 
     return VLC_SUCCESS;
-
-error:
-    return VLC_EGENERIC;
 }
 
