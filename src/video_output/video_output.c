@@ -770,6 +770,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         }
     }
 
+    if (filters == NULL) filters = vout->p->filter.configuration;
     char *current = filters ? strdup(filters) : NULL;
     while (current) {
         config_chain_t *cfg;
@@ -903,7 +904,7 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool fra
                     }
                 }
                 if (!VideoFormatIsCropArEqual(&decoded->format, &vout->p->filter.format))
-                    ThreadChangeFilters(vout, &decoded->format, vout->p->filter.configuration, NULL, true);
+                    ThreadChangeFilters(vout, &decoded->format, NULL, NULL, true);
             }
         }
 
@@ -1570,14 +1571,10 @@ static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
 {
     switch(cmd.type) {
     case VOUT_CONTROL_CHANGE_FILTERS:
-        ThreadChangeFilters(vout, NULL,
-                            cmd.string != NULL ?
-                            cmd.string : vout->p->filter.configuration,
-                            NULL, false);
+        ThreadChangeFilters(vout, NULL, cmd.string, NULL, false);
         break;
     case VOUT_CONTROL_CHANGE_INTERLACE:
-        ThreadChangeFilters(vout, NULL, vout->p->filter.configuration,
-                            &cmd.boolean, false);
+        ThreadChangeFilters(vout, NULL, NULL, &cmd.boolean, false);
         break;
     case VOUT_CONTROL_MOUSE_STATE:
         ThreadProcessMouseState(vout, &cmd.mouse);
