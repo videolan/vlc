@@ -1192,9 +1192,24 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     if (!is_forced)
     {
         system_now = vlc_tick_now();
-        vlc_clock_Wait(sys->clock, system_now, pts, sys->rate,
-                       VOUT_REDISPLAY_DELAY);
+        if (unlikely(system_now > system_pts))
+        {
+            /* vd->prepare took too much time. Tell the clock that the pts was
+             * rendered late. */
+            system_pts = system_now;
+        }
+        else
+        {
+            /* Wait to reach system_pts */
+            vlc_clock_Wait(sys->clock, system_now, pts, sys->rate,
+                           VOUT_REDISPLAY_DELAY);
+
+            /* Don't touch system_pts. Tell the clock that the pts was rendered
+             * at the expected date */
+        }
+        vlc_clock_Update(sys->clock, system_pts, pts, sys->rate);
     }
+    sys->displayed.date = system_pts;
 
     /* Display the direct buffer returned by vout_RenderPicture */
     vout_display_Display(vd, todisplay);
@@ -1202,16 +1217,6 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
     if (subpic)
         subpicture_Delete(subpic);
-
-    if (!is_forced)
-    {
-        system_now = vlc_tick_now();
-        const vlc_tick_t drift = vlc_clock_Update(sys->clock, system_now,
-                                                  pts, sys->rate);
-        if (drift != VLC_TICK_INVALID && drift != INT64_MAX)
-            system_now += drift;
-    }
-    sys->displayed.date = system_now;
 
     vout_statistic_AddDisplayed(&sys->statistic, 1);
 
