@@ -55,9 +55,6 @@ typedef struct
     va_pool_t             va_pool;
     bool                  can_extern_pool;
 
-    /* for pre allocation */
-    D3D_DecoderSurface     *hw_surface[MAX_SURFACE_COUNT];
-
     /* Video service */
     GUID                   input;
 

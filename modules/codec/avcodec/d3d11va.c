@@ -54,7 +54,6 @@ typedef picture_sys_d3d11_t VA_PICSYS;
 #include "va_surface.h"
 
 #define D3D_DecoderType     ID3D11VideoDecoder
-#define D3D_DecoderSurface  ID3D11VideoDecoderOutputView
 #include "directx_va.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
@@ -121,6 +120,9 @@ struct vlc_va_sys_t
     /* avcodec internals */
     struct AVD3D11VAContext      hw;
 
+    /* pool */
+    ID3D11VideoDecoderOutputView *hw_surface[MAX_SURFACE_COUNT];
+
     ID3D11ShaderResourceView     *renderSrc[MAX_SURFACE_COUNT * D3D11_MAX_SHADER_VIEW];
 };
 
@@ -143,7 +145,7 @@ static void SetupAVCodecContext(vlc_va_sys_t *sys)
     sys->hw.decoder = dx_sys->decoder;
     sys->hw.cfg = &sys->cfg;
     sys->hw.surface_count = dx_sys->va_pool.surface_count;
-    sys->hw.surface = dx_sys->hw_surface;
+    sys->hw.surface = sys->hw_surface;
     sys->hw.context_mutex = sys->d3d_dev.context_mutex;
 
     if (IsEqualGUID(&dx_sys->input, &DXVA_Intel_H264_NoFGT_ClearVideo))
@@ -214,8 +216,7 @@ done:
 static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_index)
 {
     vlc_va_sys_t *sys = va->sys;
-    directx_sys_t *dx_sys = &sys->dx_sys;
-    ID3D11VideoDecoderOutputView *surface = dx_sys->hw_surface[surface_index];
+    ID3D11VideoDecoderOutputView *surface = sys->hw_surface[surface_index];
     ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW];
     ID3D11Resource *p_resource;
     ID3D11VideoDecoderOutputView_GetResource(surface, &p_resource);
@@ -734,7 +735,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         for (surface_idx = 0; surface_idx < surface_count; surface_idx++) {
             picture_t *pic = decoder_NewPicture( (decoder_t*) vlc_object_parent(va) );
             sys->extern_pics[surface_idx] = pic;
-            dx_sys->hw_surface[surface_idx] = NULL;
+            sys->hw_surface[surface_idx] = NULL;
             if (pic==NULL)
             {
                 msg_Warn(va, "not enough decoder pictures %d out of %d", surface_idx, surface_count);
@@ -771,17 +772,17 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 
             D3D11_AllocateResourceView(va, sys->d3d_dev.d3ddevice, textureFmt, pic->p_sys->texture, pic->p_sys->slice_index, pic->p_sys->renderSrc);
 
-            dx_sys->hw_surface[surface_idx] = p_sys->decoder;
+            sys->hw_surface[surface_idx] = p_sys->decoder;
         }
 
         if (!dx_sys->can_extern_pool)
         {
             for (size_t i = 0; i < surface_idx; ++i)
             {
-                if (dx_sys->hw_surface[i])
+                if (sys->hw_surface[i])
                 {
-                    ID3D11VideoDecoderOutputView_Release(dx_sys->hw_surface[i]);
-                    dx_sys->hw_surface[i] = NULL;
+                    ID3D11VideoDecoderOutputView_Release(sys->hw_surface[i]);
+                    sys->hw_surface[i] = NULL;
                 }
                 if (sys->extern_pics[i])
                 {
@@ -830,7 +831,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
             hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( sys->d3ddec,
                                                                  (ID3D11Resource*) p_texture,
                                                                  &viewDesc,
-                                                                 &dx_sys->hw_surface[surface_idx] );
+                                                                 &sys->hw_surface[surface_idx] );
             if (FAILED(hr)) {
                 msg_Err(va, "CreateVideoDecoderOutputView %d failed. (hr=0x%lX)", surface_idx, hr);
                 ID3D11Texture2D_Release(p_texture);
@@ -923,13 +924,13 @@ static void DxDestroySurfaces(vlc_va_sys_t *sys)
     directx_sys_t *dx_sys = &sys->dx_sys;
     if (dx_sys->va_pool.surface_count && !dx_sys->can_extern_pool) {
         ID3D11Resource *p_texture;
-        ID3D11VideoDecoderOutputView_GetResource( dx_sys->hw_surface[0], &p_texture );
+        ID3D11VideoDecoderOutputView_GetResource( sys->hw_surface[0], &p_texture );
         ID3D11Resource_Release(p_texture);
         ID3D11Resource_Release(p_texture);
     }
     for (unsigned i = 0; i < dx_sys->va_pool.surface_count; i++)
     {
-        ID3D11VideoDecoderOutputView_Release( dx_sys->hw_surface[i] );
+        ID3D11VideoDecoderOutputView_Release( sys->hw_surface[i] );
         for (int j = 0; j < D3D11_MAX_SHADER_VIEW; j++)
         {
             if (sys->renderSrc[i*D3D11_MAX_SHADER_VIEW + j])
