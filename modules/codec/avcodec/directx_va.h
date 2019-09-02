@@ -52,8 +52,6 @@ typedef struct input_list_t {
 #define MAX_SURFACE_COUNT (64)
 typedef struct
 {
-    va_pool_t             va_pool;
-
     /**
      * Read the list of possible input GUIDs
      */
@@ -66,8 +64,6 @@ typedef struct
 
 } directx_sys_t;
 
-int directx_va_Open(vlc_va_t *, const struct va_pool_cfg *, directx_sys_t *);
-void directx_va_Close(vlc_va_t *, directx_sys_t *);
 int directx_va_Setup(vlc_va_t *, directx_sys_t *, const AVCodecContext *avctx, const es_format_t *, int flag_xbox,
                      video_format_t *fmt_out, unsigned *surface_count, GUID *found_guid);
 char *directx_va_GetDecoderName(const GUID *guid);

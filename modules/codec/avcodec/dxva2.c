@@ -128,6 +128,7 @@ struct vlc_va_sys_t
     IDirectXVideoDecoderService  *d3ddec;
 
     /* pool */
+    va_pool_t           va_pool;
     IDirect3DSurface9   *hw_surface[MAX_SURFACE_COUNT];
 
     /* avcodec internals */
@@ -221,7 +222,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
         return VLC_EGENERIC;
     }
 
-    picture_context_t *pic_ctx = va_pool_Get(&sys->dx_sys.va_pool);
+    picture_context_t *pic_ctx = va_pool_Get(&sys->va_pool);
     if (likely(pic_ctx==NULL))
         return VLC_ENOITEM;
 
@@ -234,7 +235,7 @@ static void Close(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    directx_va_Close(va, &sys->dx_sys);
+    va_pool_Close(va, &sys->va_pool);
 
     if (sys->dxva2_dll)
         FreeLibrary(sys->dxva2_dll);
@@ -310,7 +311,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     va->sys = sys;
 
-    err = directx_va_Open(va, &pool_cfg, &sys->dx_sys);
+    err = va_pool_Open(va, &pool_cfg, &sys->va_pool);
     if (err!=VLC_SUCCESS)
         goto error;
 
@@ -319,7 +320,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (err != VLC_SUCCESS)
         goto error;
 
-    err = va_pool_SetupDecoder(va, &sys->dx_sys.va_pool, ctx, &fmt_out, sys->hw.surface_count);
+    err = va_pool_SetupDecoder(va, &sys->va_pool, ctx, &fmt_out, sys->hw.surface_count);
     if (err != VLC_SUCCESS)
         goto error;
 
@@ -657,10 +658,9 @@ error:
 
 static void DxDestroyVideoDecoder(vlc_va_sys_t *sys)
 {
-    directx_sys_t *dx_sys = &sys->dx_sys;
     /* releases a reference on each decoder surface */
     if (sys->hw.decoder)
         IDirectXVideoDecoder_Release(sys->hw.decoder);
-    for (unsigned i = 0; i < dx_sys->va_pool.surface_count; i++)
+    for (unsigned i = 0; i < sys->va_pool.surface_count; i++)
         IDirect3DSurface9_Release(sys->hw_surface[i]);
 }
