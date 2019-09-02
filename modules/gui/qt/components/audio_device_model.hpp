@@ -52,7 +52,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
 private:
-    int m_inputs;
+    int m_inputs = 0;
     char **m_names;
     char **m_ids;
     QString m_current;
