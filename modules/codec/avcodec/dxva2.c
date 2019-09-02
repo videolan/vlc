@@ -124,6 +124,7 @@ struct vlc_va_sys_t
 
     /* Video decoder */
     DXVA2_ConfigPictureDecode    cfg;
+    GUID                         decoder_guid;
     IDirectXVideoDecoderService  *d3ddec;
     IDirectXVideoDecoder         *dxdecoder;
 
@@ -155,7 +156,7 @@ static void SetupAVCodecContext(vlc_va_sys_t *sys)
     sys->hw.surface_count = dx_sys->va_pool.surface_count;
     sys->hw.surface = sys->hw_surface;
 
-    if (IsEqualGUID(&dx_sys->input, &DXVA_Intel_H264_NoFGT_ClearVideo))
+    if (IsEqualGUID(&sys->decoder_guid, &DXVA_Intel_H264_NoFGT_ClearVideo))
         sys->hw.workaround |= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
 }
 
@@ -318,7 +319,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (err!=VLC_SUCCESS)
         goto error;
 
-    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt, 0);
+    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt, 0, &sys->decoder_guid);
     if (err != VLC_SUCCESS)
         goto error;
 
@@ -592,7 +593,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
     UINT                      cfg_count = 0;
     DXVA2_ConfigPictureDecode *cfg_list = NULL;
     hr = IDirectXVideoDecoderService_GetDecoderConfigurations(p_sys->d3ddec,
-                                                              &sys->input,
+                                                              &p_sys->decoder_guid,
                                                               &dsc,
                                                               NULL,
                                                               &cfg_count,
@@ -637,7 +638,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
     /* Create the decoder */
     /* adds a reference on each decoder surface */
     if (FAILED(IDirectXVideoDecoderService_CreateVideoDecoder(p_sys->d3ddec,
-                                                              &sys->input,
+                                                              &p_sys->decoder_guid,
                                                               &dsc,
                                                               &p_sys->cfg,
                                                               p_sys->hw_surface,

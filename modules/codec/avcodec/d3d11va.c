@@ -114,6 +114,7 @@ struct vlc_va_sys_t
 
     /* Video decoder */
     D3D11_VIDEO_DECODER_CONFIG   cfg;
+    GUID                         decoder_guid;
     ID3D11VideoDevice            *d3ddec;
     ID3D11VideoDecoder           *dxdecoder;
 
@@ -148,7 +149,7 @@ static void SetupAVCodecContext(vlc_va_sys_t *sys)
     sys->hw.surface = sys->hw_surface;
     sys->hw.context_mutex = sys->d3d_dev.context_mutex;
 
-    if (IsEqualGUID(&dx_sys->input, &DXVA_Intel_H264_NoFGT_ClearVideo))
+    if (IsEqualGUID(&sys->decoder_guid, &DXVA_Intel_H264_NoFGT_ClearVideo))
         sys->hw.workaround |= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
 }
 
@@ -259,7 +260,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
                 HRESULT hr;
                 D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
                 ZeroMemory(&viewDesc, sizeof(viewDesc));
-                viewDesc.DecodeProfile = sys->dx_sys.input;
+                viewDesc.DecodeProfile = sys->decoder_guid;
                 viewDesc.ViewDimension = D3D11_VDOV_DIMENSION_TEXTURE2D;
                 viewDesc.Texture2D.ArraySlice = p_sys->slice_index;
 
@@ -391,7 +392,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (err!=VLC_SUCCESS)
         goto error;
 
-    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt, isXboxHardware(sys->d3d_dev.d3ddevice));
+    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt, isXboxHardware(sys->d3d_dev.d3ddevice), &sys->decoder_guid);
     if (err != VLC_SUCCESS)
         goto error;
 
@@ -708,7 +709,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 
     D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
     ZeroMemory(&viewDesc, sizeof(viewDesc));
-    viewDesc.DecodeProfile = dx_sys->input;
+    viewDesc.DecodeProfile = sys->decoder_guid;
     viewDesc.ViewDimension = D3D11_VDOV_DIMENSION_TEXTURE2D;
 
     const d3d_format_t *textureFmt = NULL;
@@ -851,7 +852,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 
     D3D11_VIDEO_DECODER_DESC decoderDesc;
     ZeroMemory(&decoderDesc, sizeof(decoderDesc));
-    decoderDesc.Guid = dx_sys->input;
+    decoderDesc.Guid = sys->decoder_guid;
     decoderDesc.SampleWidth = fmt->i_width;
     decoderDesc.SampleHeight = fmt->i_height;
     decoderDesc.OutputFormat = sys->render;
