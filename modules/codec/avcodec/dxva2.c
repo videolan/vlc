@@ -126,7 +126,6 @@ struct vlc_va_sys_t
     DXVA2_ConfigPictureDecode    cfg;
     GUID                         decoder_guid;
     IDirectXVideoDecoderService  *d3ddec;
-    IDirectXVideoDecoder         *dxdecoder;
 
     /* pool */
     IDirect3DSurface9   *hw_surface[MAX_SURFACE_COUNT];
@@ -149,7 +148,6 @@ static void DxDestroyVideoDecoder(vlc_va_sys_t *);
 
 static void SetupAVCodecContext(vlc_va_sys_t *sys, unsigned surfaces)
 {
-    sys->hw.decoder = sys->dxdecoder;
     sys->hw.cfg = &sys->cfg;
     sys->hw.surface_count = surfaces;
     sys->hw.surface = sys->hw_surface;
@@ -198,7 +196,7 @@ static struct va_pic_context *CreatePicContext(IDirect3DSurface9 *surface, IDire
 static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_index)
 {
     vlc_va_sys_t *sys = va->sys;
-    struct va_pic_context *pic_ctx = CreatePicContext(sys->hw_surface[surface_index], sys->dxdecoder);
+    struct va_pic_context *pic_ctx = CreatePicContext(sys->hw_surface[surface_index], sys->hw.decoder);
     if (unlikely(pic_ctx==NULL))
         return NULL;
     /* all the resources are acquired during surfaces init, and a second time in
@@ -657,8 +655,8 @@ static void DxDestroyVideoDecoder(vlc_va_sys_t *sys)
 {
     directx_sys_t *dx_sys = &sys->dx_sys;
     /* releases a reference on each decoder surface */
-    if (sys->dxdecoder)
-        IDirectXVideoDecoder_Release(sys->dxdecoder);
+    if (sys->hw.decoder)
+        IDirectXVideoDecoder_Release(sys->hw.decoder);
     for (unsigned i = 0; i < dx_sys->va_pool.surface_count; i++)
         IDirect3DSurface9_Release(sys->hw_surface[i]);
 }
