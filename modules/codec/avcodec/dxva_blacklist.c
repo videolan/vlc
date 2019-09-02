@@ -29,8 +29,6 @@
 
 #include "../../video_chroma/dxgi_fmt.h"
 
-#define D3D_DecoderType     IUnknown
-
 #include "directx_va.h"
 
 extern const GUID DXVA2_ModeMPEG2_VLD;

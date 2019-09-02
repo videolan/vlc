@@ -53,7 +53,6 @@
 typedef picture_sys_d3d11_t VA_PICSYS;
 #include "va_surface.h"
 
-#define D3D_DecoderType     ID3D11VideoDecoder
 #include "directx_va.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
@@ -116,6 +115,7 @@ struct vlc_va_sys_t
     /* Video decoder */
     D3D11_VIDEO_DECODER_CONFIG   cfg;
     ID3D11VideoDevice            *d3ddec;
+    ID3D11VideoDecoder           *dxdecoder;
 
     /* avcodec internals */
     struct AVD3D11VAContext      hw;
@@ -142,7 +142,7 @@ static void SetupAVCodecContext(vlc_va_sys_t *sys)
     directx_sys_t *dx_sys = &sys->dx_sys;
 
     sys->hw.video_context = sys->d3dvidctx;
-    sys->hw.decoder = dx_sys->decoder;
+    sys->hw.decoder = sys->dxdecoder;
     sys->hw.cfg = &sys->cfg;
     sys->hw.surface_count = dx_sys->va_pool.surface_count;
     sys->hw.surface = sys->hw_surface;
@@ -910,10 +910,10 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     hr = ID3D11VideoDevice_CreateVideoDecoder( sys->d3ddec, &decoderDesc, &sys->cfg, &decoder );
     if (FAILED(hr)) {
         msg_Err(va, "ID3D11VideoDevice_CreateVideoDecoder failed. (hr=0x%lX)", hr);
-        dx_sys->decoder = NULL;
+        sys->dxdecoder = NULL;
         return VLC_EGENERIC;
     }
-    dx_sys->decoder = decoder;
+    sys->dxdecoder = decoder;
 
     msg_Dbg(va, "DxCreateDecoderSurfaces succeed");
     return VLC_SUCCESS;
@@ -937,9 +937,6 @@ static void DxDestroySurfaces(vlc_va_sys_t *sys)
                 ID3D11ShaderResourceView_Release(sys->renderSrc[i*D3D11_MAX_SHADER_VIEW + j]);
         }
     }
-    if (dx_sys->decoder)
-    {
-        ID3D11VideoDecoder_Release(dx_sys->decoder);
-        dx_sys->decoder = NULL;
-    }
+    if (sys->dxdecoder)
+        ID3D11VideoDecoder_Release(sys->dxdecoder);
 }

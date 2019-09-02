@@ -58,9 +58,6 @@ typedef struct
     /* Video service */
     GUID                   input;
 
-    /* Video decoder */
-    D3D_DecoderType        *decoder;
-
     /**
      * Read the list of possible input GUIDs
      */

@@ -35,7 +35,6 @@
 
 #define COBJMACROS
 
-#define D3D_DecoderType     IUnknown
 #include "directx_va.h"
 
 #include "avcodec.h"
