@@ -97,7 +97,6 @@ DEFINE_GUID(DXVA2_NoEncrypt,                        0x1b81bed0, 0xa0c7, 0x11d3, 
 
 struct vlc_va_sys_t
 {
-    directx_sys_t                dx_sys;
     UINT                         totalTextureSlices;
     unsigned                     textureWidth;
     unsigned                     textureHeight;
@@ -307,7 +306,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, void *picsys)
 {
     int err = VLC_EGENERIC;
-    directx_sys_t *dx_sys;
 
     ctx->hwaccel_context = NULL;
 
@@ -334,11 +332,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     err = D3D11_Create( va, &sys->hd3d, false );
     if (err != VLC_SUCCESS)
         goto error;
-
-    dx_sys = &sys->dx_sys;
-
-    dx_sys->pf_get_input_list          = DxGetInputList;
-    dx_sys->pf_setup_output            = DxSetupOutput;
 
     va->sys = sys;
 
@@ -389,7 +382,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         goto error;
 
     video_format_t fmt_out;
-    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt, isXboxHardware(sys->d3d_dev.d3ddevice), &fmt_out, &sys->hw.surface_count, &sys->decoder_guid);
+    static const directx_sys_t dx_sys = { DxGetInputList, DxSetupOutput };
+    err = directx_va_Setup(va, &dx_sys, ctx, fmt, isXboxHardware(sys->d3d_dev.d3ddevice), &fmt_out, &sys->hw.surface_count, &sys->decoder_guid);
     if (err != VLC_SUCCESS)
         goto error;
 

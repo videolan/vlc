@@ -106,8 +106,6 @@ static const d3d9_format_t *D3dFindFormat(D3DFORMAT format)
 
 struct vlc_va_sys_t
 {
-    directx_sys_t         dx_sys;
-
     /* Direct3D */
     d3d9_handle_t          hd3d;
     d3d9_device_t          d3d_dev;
@@ -249,7 +247,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                 const es_format_t *fmt, void *picsys)
 {
     int err = VLC_EGENERIC;
-    directx_sys_t *dx_sys;
 
     if (pix_fmt != AV_PIX_FMT_DXVA2_VLD)
         return VLC_EGENERIC;
@@ -295,8 +292,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         return VLC_EGENERIC;
     }
 
-    dx_sys = &sys->dx_sys;
-
     static const struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
         D3dDestroyDevice,
@@ -306,9 +301,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         NewSurfacePicContext,
     };
 
-    dx_sys->pf_get_input_list          = DxGetInputList;
-    dx_sys->pf_setup_output            = DxSetupOutput;
-
     va->sys = sys;
 
     err = va_pool_Open(va, &pool_cfg, &sys->va_pool);
@@ -316,7 +308,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         goto error;
 
     video_format_t fmt_out;
-    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt, 0, &fmt_out, &sys->hw.surface_count, &sys->decoder_guid);
+    static const directx_sys_t dx_sys = { DxGetInputList, DxSetupOutput };
+    err = directx_va_Setup(va, &dx_sys, ctx, fmt, 0, &fmt_out, &sys->hw.surface_count, &sys->decoder_guid);
     if (err != VLC_SUCCESS)
         goto error;
 
