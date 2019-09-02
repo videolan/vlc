@@ -1141,7 +1141,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
     system_now = vlc_tick_now();
     const vlc_tick_t pts = todisplay->date;
-    const vlc_tick_t system_pts =
+    vlc_tick_t system_pts = is_forced ? system_now :
         vlc_clock_ConvertToSystem(sys->clock, system_now, pts, sys->rate);
 
     if (vd->prepare != NULL)
