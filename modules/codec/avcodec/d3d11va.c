@@ -54,7 +54,6 @@ typedef picture_sys_d3d11_t VA_PICSYS;
 #include "va_surface.h"
 
 #define D3D_DecoderType     ID3D11VideoDecoder
-#define D3D_DecoderDevice   ID3D11VideoDevice
 #define D3D_DecoderSurface  ID3D11VideoDecoderOutputView
 #include "directx_va.h"
 
@@ -117,6 +116,7 @@ struct vlc_va_sys_t
 
     /* Video decoder */
     D3D11_VIDEO_DECODER_CONFIG   cfg;
+    ID3D11VideoDevice            *d3ddec;
 
     /* avcodec internals */
     struct AVD3D11VAContext      hw;
@@ -262,7 +262,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
                 viewDesc.ViewDimension = D3D11_VDOV_DIMENSION_TEXTURE2D;
                 viewDesc.Texture2D.ArraySlice = p_sys->slice_index;
 
-                hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( sys->dx_sys.d3ddec,
+                hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( sys->d3ddec,
                                                                      p_sys->resource[KNOWN_DXGI_INDEX],
                                                                      &viewDesc,
                                                                      &p_sys->decoder );
@@ -468,8 +468,7 @@ static int D3dCreateDevice(vlc_va_t *va)
        ID3D11VideoContext_Release(sys->d3dvidctx);
        return VLC_EGENERIC;
     }
-    directx_sys_t *dx_sys = &sys->dx_sys;
-    dx_sys->d3ddec = d3dviddev;
+    sys->d3ddec = d3dviddev;
 
     return VLC_SUCCESS;
 }
@@ -480,8 +479,7 @@ static int D3dCreateDevice(vlc_va_t *va)
 static void D3dDestroyDevice(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
-    directx_sys_t *dx_sys = &sys->dx_sys;
-    ID3D11VideoDevice_Release(dx_sys->d3ddec);
+    ID3D11VideoDevice_Release(sys->d3ddec);
     ID3D11VideoContext_Release(sys->d3dvidctx);
     D3D11_ReleaseDevice( &sys->d3d_dev );
 }
@@ -494,10 +492,9 @@ static void ReleaseInputList(input_list_t *p_list)
 static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
 {
     vlc_va_sys_t *sys = va->sys;
-    directx_sys_t *dx_sys = &sys->dx_sys;
     HRESULT hr;
 
-    UINT input_count = ID3D11VideoDevice_GetVideoDecoderProfileCount(dx_sys->d3ddec);
+    UINT input_count = ID3D11VideoDevice_GetVideoDecoderProfileCount(sys->d3ddec);
 
     p_list->count = input_count;
     p_list->list = calloc(input_count, sizeof(*p_list->list));
@@ -507,7 +504,7 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
     p_list->pf_release = ReleaseInputList;
 
     for (unsigned i = 0; i < input_count; i++) {
-        hr = ID3D11VideoDevice_GetVideoDecoderProfile(dx_sys->d3ddec, i, &p_list->list[i]);
+        hr = ID3D11VideoDevice_GetVideoDecoderProfile(sys->d3ddec, i, &p_list->list[i]);
         if (FAILED(hr))
         {
             msg_Err(va, "GetVideoDecoderProfile %d failed. (hr=0x%lX)", i, hr);
@@ -531,7 +528,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
 #ifndef NDEBUG
     BOOL bSupported = false;
     for (int format = 0; format < 188; format++) {
-        hr = ID3D11VideoDevice_CheckVideoDecoderFormat(dx_sys->d3ddec, input, format, &bSupported);
+        hr = ID3D11VideoDevice_CheckVideoDecoderFormat(sys->d3ddec, input, format, &bSupported);
         if (SUCCEEDED(hr) && bSupported)
             msg_Dbg(va, "format %s is supported for output", DxgiFormatToStr(format));
     }
@@ -571,7 +568,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     for (idx = 0; processorInput[idx] != DXGI_FORMAT_UNKNOWN; ++idx)
     {
         BOOL is_supported = false;
-        hr = ID3D11VideoDevice_CheckVideoDecoderFormat(dx_sys->d3ddec, input, processorInput[idx], &is_supported);
+        hr = ID3D11VideoDevice_CheckVideoDecoderFormat(sys->d3ddec, input, processorInput[idx], &is_supported);
         if (SUCCEEDED(hr) && is_supported)
             msg_Dbg(va, "%s output is supported for decoder %s.", DxgiFormatToStr(processorInput[idx]), psz_decoder_name);
         else
@@ -607,7 +604,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
         decoderDesc.OutputFormat = processorInput[idx];
 
         UINT cfg_count = 0;
-        hr = ID3D11VideoDevice_GetVideoDecoderConfigCount( dx_sys->d3ddec, &decoderDesc, &cfg_count );
+        hr = ID3D11VideoDevice_GetVideoDecoderConfigCount( sys->d3ddec, &decoderDesc, &cfg_count );
         if (FAILED(hr))
         {
             msg_Err( va, "Failed to get configuration for decoder %s. (hr=0x%lX)", psz_decoder_name, hr );
@@ -762,7 +759,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 #endif
 
             viewDesc.Texture2D.ArraySlice = p_sys->slice_index;
-            hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( dx_sys->d3ddec,
+            hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( sys->d3ddec,
                                                                  p_sys->resource[KNOWN_DXGI_INDEX],
                                                                  &viewDesc,
                                                                  &p_sys->decoder );
@@ -830,7 +827,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
             sys->extern_pics[surface_idx] = NULL;
             viewDesc.Texture2D.ArraySlice = surface_idx;
 
-            hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( dx_sys->d3ddec,
+            hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( sys->d3ddec,
                                                                  (ID3D11Resource*) p_texture,
                                                                  &viewDesc,
                                                                  &dx_sys->hw_surface[surface_idx] );
@@ -859,7 +856,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     decoderDesc.OutputFormat = sys->render;
 
     UINT cfg_count;
-    hr = ID3D11VideoDevice_GetVideoDecoderConfigCount( dx_sys->d3ddec, &decoderDesc, &cfg_count );
+    hr = ID3D11VideoDevice_GetVideoDecoderConfigCount( sys->d3ddec, &decoderDesc, &cfg_count );
     if (FAILED(hr)) {
         msg_Err(va, "GetVideoDecoderConfigCount failed. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
@@ -868,7 +865,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     /* List all configurations available for the decoder */
     D3D11_VIDEO_DECODER_CONFIG cfg_list[cfg_count];
     for (unsigned i = 0; i < cfg_count; i++) {
-        hr = ID3D11VideoDevice_GetVideoDecoderConfig( dx_sys->d3ddec, &decoderDesc, i, &cfg_list[i] );
+        hr = ID3D11VideoDevice_GetVideoDecoderConfig( sys->d3ddec, &decoderDesc, i, &cfg_list[i] );
         if (FAILED(hr)) {
             msg_Err(va, "GetVideoDecoderConfig failed. (hr=0x%lX)", hr);
             return VLC_EGENERIC;
@@ -909,7 +906,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 
     /* Create the decoder */
     ID3D11VideoDecoder *decoder;
-    hr = ID3D11VideoDevice_CreateVideoDecoder( dx_sys->d3ddec, &decoderDesc, &sys->cfg, &decoder );
+    hr = ID3D11VideoDevice_CreateVideoDecoder( sys->d3ddec, &decoderDesc, &sys->cfg, &decoder );
     if (FAILED(hr)) {
         msg_Err(va, "ID3D11VideoDevice_CreateVideoDecoder failed. (hr=0x%lX)", hr);
         dx_sys->decoder = NULL;

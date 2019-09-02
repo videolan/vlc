@@ -36,7 +36,6 @@
 #define COBJMACROS
 
 #define D3D_DecoderType     IUnknown
-#define D3D_DecoderDevice   IUnknown
 #define D3D_DecoderSurface  IUnknown
 #include "directx_va.h"
 

@@ -60,7 +60,6 @@ typedef struct
 
     /* Video service */
     GUID                   input;
-    D3D_DecoderDevice      *d3ddec;
 
     /* Video decoder */
     D3D_DecoderType        *decoder;
