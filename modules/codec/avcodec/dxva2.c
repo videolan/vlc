@@ -135,7 +135,7 @@ struct vlc_va_sys_t
 
 /* */
 static int D3dCreateDevice(vlc_va_t *);
-static void D3dDestroyDevice(vlc_va_sys_t *);
+static void D3dDestroyDevice(vlc_va_t *);
 
 static int D3dCreateDeviceManager(vlc_va_t *);
 static void D3dDestroyDeviceManager(vlc_va_t *);
@@ -373,8 +373,9 @@ static int D3dCreateDevice(vlc_va_t *va)
 /**
  * It releases a Direct3D device and its resources.
  */
-static void D3dDestroyDevice(vlc_va_sys_t *sys)
+static void D3dDestroyDevice(vlc_va_t *va)
 {
+    vlc_va_sys_t *sys = va->sys;
     D3D9_ReleaseDevice(&sys->d3d_dev);
     D3D9_Destroy( &sys->hd3d );
 }

@@ -49,7 +49,7 @@ typedef struct
 
 struct va_pool_cfg {
     int (*pf_create_device)(vlc_va_t *);
-    void (*pf_destroy_device)(vlc_va_sys_t *);
+    void (*pf_destroy_device)(vlc_va_t *);
 
     int (*pf_create_device_manager)(vlc_va_t *);
     void (*pf_destroy_device_manager)(vlc_va_t *);

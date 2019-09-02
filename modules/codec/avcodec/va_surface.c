@@ -194,7 +194,7 @@ void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)
     va_pool->callbacks->pf_destroy_video_service(va);
     if (va_pool->callbacks->pf_destroy_device_manager)
         va_pool->callbacks->pf_destroy_device_manager(va);
-    va_pool->callbacks->pf_destroy_device(va->sys);
+    va_pool->callbacks->pf_destroy_device(va);
 }
 
 int va_pool_Open(vlc_va_t *va, const struct va_pool_cfg *cbs, va_pool_t *va_pool)
