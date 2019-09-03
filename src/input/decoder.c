@@ -320,7 +320,7 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
 
         /* Parameters changed, restart the aout */
         vlc_mutex_lock( &p_owner->lock );
-        p_owner->p_aout = NULL;
+        p_owner->p_aout = NULL; // the DecoderThread should not use the old aout anymore
         vlc_mutex_unlock( &p_owner->lock );
         aout_DecDelete( p_aout );
 
@@ -535,7 +535,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
         vlc_mutex_lock( &p_owner->lock );
 
         p_vout = p_owner->p_vout;
-        p_owner->p_vout = NULL;
+        p_owner->p_vout = NULL; // the DecoderThread should not use the old vout anymore
         vlc_mutex_unlock( &p_owner->lock );
 
         unsigned dpb_size;
@@ -639,7 +639,7 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
             p_owner->i_spu_channel = VOUT_SPU_CHANNEL_INVALID;
 
             vout_Release(p_owner->p_vout);
-            p_owner->p_vout = NULL;
+            p_owner->p_vout = NULL; // the DecoderThread should not use the old vout anymore
             vlc_mutex_unlock( &p_owner->lock );
         }
         return NULL;
@@ -670,7 +670,7 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
         if (p_owner->i_spu_channel == VOUT_SPU_CHANNEL_INVALID)
         {
             /* The new vout doesn't support SPU, aborting... */
-            p_owner->p_vout = NULL;
+            p_owner->p_vout = NULL; // the DecoderThread should not use the old vout anymore
             vlc_mutex_unlock(&p_owner->lock);
             vout_Release(p_vout);
             return NULL;
