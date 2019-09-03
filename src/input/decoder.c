@@ -1000,7 +1000,6 @@ static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture
     }
 
     p_owner->i_preroll_end = PREROLL_NONE;
-    vlc_mutex_unlock( &p_owner->lock );
 
     if( unlikely(prerolled) )
     {
@@ -1009,9 +1008,6 @@ static int DecoderPlayVideo( struct decoder_owner *p_owner, picture_t *p_picture
         if( p_vout )
             vout_FlushAll( p_vout );
     }
-
-    /* */
-    vlc_mutex_lock( &p_owner->lock );
 
     if( p_owner->b_waiting && !p_owner->b_first )
     {
