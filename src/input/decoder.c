@@ -101,7 +101,26 @@ struct decoder_owner
     vlc_cond_t  wait_acknowledge;
     vlc_cond_t  wait_fifo; /* TODO: merge with wait_acknowledge */
 
-    /* -- These variables need locking on write(only) -- */
+    /*
+     * 3 threads can read/write these output variables, the DecoderThread, the
+     * input thread, and the ModuleThread. The ModuleThread is either the
+     * DecoderThread for synchronous modules or any thread for asynchronous
+     * modules.
+     *
+     * Asynchronous modules are responsible for serializing/locking every
+     * output calls in any thread as long as the decoder_UpdateVideoFormat() or
+     * decoder_NewPicture() calls are not concurrent, cf.
+     * decoder_UpdateVideoFormat() and decoder_NewPicture() notes.
+     *
+     * The ModuleThread is the owner of these variables, it should hold
+     * the lock when writing them but doesn't have to hold it when using them.
+     *
+     * The DecoderThread should always hold the lock when reading/using
+     * aout/vouts.
+     *
+     * The input thread can read these variables in order to stop outputs, when
+     * both ModuleThread and DecoderThread are stopped (from DecoderDelete()).
+     */
     audio_output_t *p_aout;
 
     vout_thread_t   *p_vout;
