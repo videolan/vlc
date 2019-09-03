@@ -505,9 +505,10 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             }
             else
                 p_sys->p_buf = NULL;
+
+            date_Increment( &p_sys->pts, p_sys->headerinfo.i_frame_length );
         }
 
-        date_Increment( &p_sys->pts, p_sys->headerinfo.i_frame_length );
         if( out )
             out->i_length = date_Get( &p_sys->pts ) - out->i_pts;
         else
