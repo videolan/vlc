@@ -240,10 +240,8 @@ static int DecoderThread_Reload( struct decoder_owner *p_owner, bool b_packetize
     {
         assert( p_owner->fmt.i_cat == AUDIO_ES );
         audio_output_t *p_aout = p_owner->p_aout;
-
-        vlc_mutex_lock( &p_owner->lock );
+        // no need to lock, the decoder and DecoderOutputThreads are dead
         p_owner->p_aout = NULL;
-        vlc_mutex_unlock( &p_owner->lock );
         if( p_aout )
         {
             aout_DecDelete( p_aout );
