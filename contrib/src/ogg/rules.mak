@@ -1,6 +1,6 @@
 # libogg
 
-OGG_VERSION := 1.3.3
+OGG_VERSION := 1.3.4
 
 OGG_URL := http://downloads.xiph.org/releases/ogg/libogg-$(OGG_VERSION).tar.xz
 #OGG_CVSROOT := :pserver:anoncvs@xiph.org:/usr/local/cvsroot
@@ -19,6 +19,7 @@ libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 	$(UNPACK)
 	$(APPLY) $(SRC)/ogg/libogg-configure.patch
 	$(APPLY) $(SRC)/ogg/libogg-disable-check.patch
+	$(APPLY) $(SRC)/ogg/libogg-uint-macos.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
