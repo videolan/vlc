@@ -35,7 +35,7 @@ apps:
 parts:
   desktop-qt5-vlc:
     source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-commit: de8dc068a05d24cea5c0438863280ab641226570
+    source-commit: 6287772a8820c682f9692cff428e245d6af77f11
     source-subdir: qt/
     plugin: make
     make-parameters: ["FLAVOR=qt5"]
