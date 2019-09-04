@@ -169,6 +169,7 @@ struct vlc_player_t
     } destructor;
 };
 
+#ifndef NDEBUG
 /*
  * Assert that the player mutex is locked.
  *
@@ -181,6 +182,9 @@ vlc_player_assert_locked(vlc_player_t *player)
     assert(player);
     vlc_mutex_assert(&player->lock);
 }
+#else
+#define vlc_player_assert_locked(x) ((void) (0))
+#endif
 
 static inline struct vlc_player_input *
 vlc_player_get_input_locked(vlc_player_t *player)
