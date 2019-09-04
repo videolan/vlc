@@ -5,7 +5,7 @@
  * Copyright (C) 2002-2007 Rémi Denis-Courmont
  * $Id$
  *
- * Author: Rémi Denis-Courmont <rem # videolan.org>
+ * Author: Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by

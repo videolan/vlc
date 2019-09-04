@@ -5,7 +5,7 @@
 ## Copyright (C) 2005-2008 the VideoLAN team
 ##
 ##  Authors: Sam Hocevar <sam@zoy.org>
-##           Rémi Denis-Courmont <rem # videolan # org>
+##           Rémi Denis-Courmont
 
 set -e
 
