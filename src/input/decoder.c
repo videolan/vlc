@@ -1291,7 +1291,6 @@ static void DecoderThread_DecodeBlock( struct decoder_owner *p_owner, block_t *p
     switch( ret )
     {
         case VLCDEC_SUCCESS:
-            p_owner->pf_update_stat( p_owner, 1, 0 );
             break;
         case VLCDEC_ECRITICAL:
             p_owner->error = true;
