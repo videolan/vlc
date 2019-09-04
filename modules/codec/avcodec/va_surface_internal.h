@@ -74,7 +74,7 @@ struct va_pool_cfg {
     picture_context_t* (*pf_new_surface_context)(vlc_va_t *, int surface_index, vlc_va_surface_t *);
 };
 
-int va_pool_Open(vlc_va_t *, const struct va_pool_cfg *, va_pool_t *);
+va_pool_t * va_pool_Create(vlc_va_t *, const struct va_pool_cfg *);
 void va_pool_Close(vlc_va_t *va, va_pool_t *);
 int va_pool_SetupDecoder(vlc_va_t *, va_pool_t *, const AVCodecContext *, const video_format_t *, unsigned count);
 vlc_va_surface_t *va_pool_Get(va_pool_t *);

@@ -180,8 +180,12 @@ void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)
     }
 }
 
-int va_pool_Open(vlc_va_t *va, const struct va_pool_cfg *cbs, va_pool_t *va_pool)
+va_pool_t * va_pool_Create(vlc_va_t *va, const struct va_pool_cfg *cbs)
 {
+    va_pool_t *va_pool = malloc(sizeof(*va_pool));
+    if (unlikely(va_pool == NULL))
+        return NULL;
+
     va_pool->callbacks = cbs;
 
     /* */
@@ -191,6 +195,8 @@ int va_pool_Open(vlc_va_t *va, const struct va_pool_cfg *cbs, va_pool_t *va_pool
     }
     msg_Dbg(va, "CreateDevice succeed");
 
-    return VLC_SUCCESS;
+    va_pool->surface_count = 0;
+    va_pool->can_extern_pool = false;
+    return va_pool;
 }
 

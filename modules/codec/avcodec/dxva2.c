@@ -132,7 +132,7 @@ struct vlc_va_sys_t
     IDirectXVideoDecoderService  *d3ddec;
 
     /* pool */
-    va_pool_t           va_pool;
+    va_pool_t           *va_pool;
     IDirect3DSurface9   *hw_surface[MAX_SURFACE_COUNT];
 
     /* avcodec internals */
@@ -222,7 +222,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
         return VLC_EGENERIC;
     }
 
-    vlc_va_surface_t *va_surface = va_pool_Get(&sys->va_pool);
+    vlc_va_surface_t *va_surface = va_pool_Get(sys->va_pool);
     if (unlikely(va_surface==NULL))
         return VLC_ENOITEM;
 
@@ -243,7 +243,7 @@ static void Close(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    va_pool_Close(va, &sys->va_pool);
+    va_pool_Close(va, sys->va_pool);
 
     if (sys->dxva2_dll)
         FreeLibrary(sys->dxva2_dll);
@@ -314,9 +314,12 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
 
     va->sys = sys;
 
-    err = va_pool_Open(va, &pool_cfg, &sys->va_pool);
-    if (err!=VLC_SUCCESS)
+    sys->va_pool = va_pool_Create(va, &pool_cfg);
+    if (sys->va_pool == NULL)
+    {
+        err = VLC_EGENERIC;
         goto error;
+    }
 
     video_format_t fmt_out;
     static const directx_sys_t dx_sys = { DxGetInputList, DxSetupOutput };
@@ -324,7 +327,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     if (sys->selected_decoder == NULL)
         goto error;
 
-    err = va_pool_SetupDecoder(va, &sys->va_pool, ctx, &fmt_out, sys->hw.surface_count);
+    err = va_pool_SetupDecoder(va, sys->va_pool, ctx, &fmt_out, sys->hw.surface_count);
     if (err != VLC_SUCCESS)
         goto error;
 
@@ -663,6 +666,9 @@ static void DxDestroyVideoDecoder(vlc_va_sys_t *sys)
     /* releases a reference on each decoder surface */
     if (sys->hw.decoder)
         IDirectXVideoDecoder_Release(sys->hw.decoder);
-    for (unsigned i = 0; i < sys->va_pool.surface_count; i++)
-        IDirect3DSurface9_Release(sys->hw_surface[i]);
+    if (sys->hw_surface[0])
+    {
+        for (unsigned i = 0; i < sys->hw.surface_count; i++)
+            IDirect3DSurface9_Release(sys->hw_surface[i]);
+    }
 }
