@@ -771,7 +771,7 @@ void decoder_AbortPictures( decoder_t *p_dec, bool b_abort )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
-    vlc_mutex_lock( &p_owner->lock );
+    vlc_mutex_lock( &p_owner->lock ); // called in DecoderThread
     if( p_owner->p_vout != NULL )
         vout_Cancel( p_owner->p_vout, b_abort );
     vlc_mutex_unlock( &p_owner->lock );
