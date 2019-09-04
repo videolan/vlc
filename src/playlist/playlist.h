@@ -63,15 +63,15 @@ struct vlc_playlist
     uint64_t idgen;
 };
 
+/* Also disable vlc_assert_locked in tests since the symbol is not exported */
+#if !defined(NDEBUG) && !defined(TEST_PLAYLIST)
 static inline void
 vlc_playlist_AssertLocked(vlc_playlist_t *playlist)
 {
-#ifdef TEST_PLAYLIST
-    /* disable vlc_assert_locked in tests since the symbol is not exported */
-    VLC_UNUSED(playlist);
-#else
     vlc_player_assert_locked(playlist->player);
-#endif
 }
+#else
+#define vlc_playlist_AssertLocked(x) ((void) (0))
+#endif
 
 #endif

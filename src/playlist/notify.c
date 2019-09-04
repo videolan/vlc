@@ -70,7 +70,9 @@ void
 vlc_playlist_RemoveListener(vlc_playlist_t *playlist,
                             vlc_playlist_listener_id *listener)
 {
-    vlc_playlist_AssertLocked(playlist);
+    /* The playlist head is not needed to remove a node, but the list must be
+     * locked. */
+    vlc_playlist_AssertLocked(playlist); VLC_UNUSED(playlist);
 
     vlc_list_remove(&listener->node);
     free(listener);
