@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright © 2004-2018 VLC authors and VideoLAN
  *
- * Authors: Rémi Denis-Courmont <rem # videolan.org> (original plugin)
+ * Authors: Rémi Denis-Courmont (original plugin)
  *          Christian Henz <henz # c-lab.de>
  *          Mirsal Ennaime <mirsal dot ennaime at gmail dot com>
  *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>

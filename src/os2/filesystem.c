@@ -5,7 +5,7 @@
  * Copyright © 2005-2008 Rémi Denis-Courmont
  * Copyright (C) 2012 KO Myung-Hun
  *
- * Authors: Rémi Denis-Courmont <rem # videolan.org>
+ * Authors: Rémi Denis-Courmont
  *          KO Myung-Hun <komh@chollian.net>
  *
  * This program is free software; you can redistribute it and/or modify it

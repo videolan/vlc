@@ -6,7 +6,7 @@
  * Copyright (C) 2011 KO Myung-Hun
  *
  * Authors: KO Myung-Hun <komh@chollian.net>
- *          Rémi Denis-Courmont <rem # videolan.org>
+ *          Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by

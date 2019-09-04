@@ -5,7 +5,7 @@
  * Copyright © 2006 Rémi Denis-Courmont
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr> - original code
- *          Rémi Denis-Courmont <rem # videolan.org> - EPSV support
+ *          Rémi Denis-Courmont - EPSV support
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by

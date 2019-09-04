@@ -6,7 +6,7 @@
  * Author: Sam Hocevar <sam@zoy.org>                      (generic C routine)
  *         Sigmund Augdal Helberg <sigmunau@videolan.org> (MMXEXT, 3DNow, SSE2)
  *         Eric Petit <eric.petit@lapsus.org>             (Altivec)
- *         Rémi Denis-Courmont <remi@remlab.net>          (ARM NEON)
+ *         Rémi Denis-Courmont                            (ARM NEON)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by

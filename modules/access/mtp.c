@@ -6,7 +6,7 @@
  *
  * Authors: Fabio Ritrovato <exsephiroth87@gmail.com>
  * Original file.c: Christophe Massiot <massiot@via.ecp.fr>
- *                  Rémi Denis-Courmont <rem # videolan # org>
+ *                  Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by

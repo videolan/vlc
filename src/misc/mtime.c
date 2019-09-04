@@ -6,7 +6,7 @@
  * Copyright © 2006-2007 Rémi Denis-Courmont
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
- *          Rémi Denis-Courmont <rem$videolan,org>
+ *          Rémi Denis-Courmont
  *          Gisle Vanem
  *
  * This program is free software; you can redistribute it and/or modify it

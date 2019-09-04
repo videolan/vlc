@@ -5,7 +5,7 @@
  * Copyright © 2005-2006 Rémi Denis-Courmont
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
- *          Rémi Denis-Courmont <rem # videolan.org>
+ *          Rémi Denis-Courmont
  *          Christophe Mutricy <xtophe at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify it
