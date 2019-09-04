@@ -1,0 +1,28 @@
+From 4a43f2bd4d7e12b5d994f48e18cf014008d204ce Mon Sep 17 00:00:00 2001
+From: sezero <sezero@users.sourceforge.net>
+Date: Mon, 5 Aug 2019 02:00:40 +0300
+Subject: [PATCH] Do not assume that sys/param.h defines MIN and MAX
+
+One such example is sys/param.h from MinGW.
+---
+ src/libFLAC/include/private/macros.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/libFLAC/include/private/macros.h b/src/libFLAC/include/private/macros.h
+index 02eada45..3a8072ec 100644
+--- a/src/libFLAC/include/private/macros.h
++++ b/src/libFLAC/include/private/macros.h
+@@ -51,8 +51,10 @@
+ /* Whatever other unix that has sys/param.h */
+ #elif defined(HAVE_SYS_PARAM_H)
+ #include <sys/param.h>
++#if defined(MIN) && defined(MAX)
+ #define flac_max(a,b) MAX(a,b)
+ #define flac_min(a,b) MIN(a,b)
++#endif
+ 
+ /* Windows VS has them in stdlib.h.. XXX:Untested */
+ #elif defined(_MSC_VER)
+-- 
+2.17.1
+
