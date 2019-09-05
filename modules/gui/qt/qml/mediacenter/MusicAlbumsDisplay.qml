@@ -126,29 +126,13 @@ Utils.NavigableFocusScope {
                 }
             }
 
-            expandDelegate:  Rectangle {
+            expandDelegate: MusicAlbumsGridExpandDelegate {
                 id: expandDelegateId
-                implicitHeight: albumDetail.implicitHeight
                 width: root.width
-                color: VLCStyle.colors.bgAlt
-                property int currentId: -1
-                property alias model : albumDetail.model
-                property alias currentItemY: albumDetail.currentItemY
-                property alias currentItemHeight: albumDetail.currentItemHeight
-
-                onActiveFocusChanged: {
-                    if (activeFocus)
-                        albumDetail.forceActiveFocus()
-                }
-
-                MusicAlbumsGridExpandDelegate {
-                    id: albumDetail
-                    anchors.fill: parent
-                    onActionCancel:  gridView_id.retract()
-                    onActionUp:  gridView_id.retract()
-                    onActionLeft: root.actionLeft(index)
-                    onActionRight: root.actionRight(index)
-                }
+                onActionCancel:  gridView_id.retract()
+                onActionUp:  gridView_id.retract()
+                onActionLeft: root.actionLeft(index)
+                onActionRight: root.actionRight(index)
             }
 
             model: delegateModel
