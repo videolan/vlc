@@ -386,7 +386,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     };
 
     psz_chain = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
-    msg_Dbg( p_stream, "psz_chain: %s", psz_chain );
+    msg_Dbg( p_stream, "psz_chain: '%s'", psz_chain ? psz_chain : "");
     if( psz_chain )
     {
         filter_owner_t owner = {
@@ -581,7 +581,8 @@ inline static int video_update_format_decoder( decoder_t *p_dec )
     {
         // update the filter after the format changed/is known
         char *psz_chain = var_GetNonEmptyString( p_owner->p_stream, CFG_PREFIX "vfilter" );
-        msg_Dbg( p_owner->p_stream, "update filter: %s", psz_chain );
+        msg_Dbg( p_owner->p_stream, "update filter: '%s'",
+                 psz_chain ?  psz_chain : "" );
         if( psz_chain )
         {
             es_format_t fmt;
