@@ -896,7 +896,8 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         case( VLC_FOURCC( '.', 'm', 'p', '3' ) ):
         case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
         {
-            p_track->fmt.i_codec = VLC_CODEC_MPGA;
+            p_track->fmt.i_codec = VLC_CODEC_MP3;
+            p_track->fmt.b_packetized = false;
             break;
         }
         case ATOM_XiVs:
