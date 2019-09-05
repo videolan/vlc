@@ -380,7 +380,7 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p
 
     /* Create user specified video filters */
     psz_chain = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
-    msg_Dbg( p_stream, "psz_chain: %s", psz_chain );
+    msg_Dbg( p_stream, "psz_chain: '%s'", psz_chain ? psz_chain : "");
     if( psz_chain )
     {
         filter_owner_t owner = {
