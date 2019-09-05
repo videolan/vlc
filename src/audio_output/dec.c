@@ -307,6 +307,9 @@ void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
     vlc_tick_t drift =
         -vlc_clock_Update(owner->sync.clock, system_ts, audio_ts, rate);
 
+    if (unlikely(drift == INT64_MAX))
+        return; /* cf. INT64_MAX comment in aout_DecPlay() */
+
     /* Late audio output.
      * This can happen due to insufficient caching, scheduling jitter
      * or bug in the decoder. Ideally, the output would seek backward. But that
@@ -456,9 +459,16 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     vlc_tick_t system_now = vlc_tick_now();
     aout_DecSynchronize(aout, system_now, original_pts);
 
-    const vlc_tick_t play_date =
+    vlc_tick_t play_date =
         vlc_clock_ConvertToSystem(owner->sync.clock, system_now, original_pts,
                                   owner->sync.rate);
+    if (unlikely(play_date == INT64_MAX))
+    {
+        /* The clock is paused but not the output, play the audio anyway since
+         * we can't delay audio playback from here. */
+        play_date = system_now;
+
+    }
     /* Output */
     owner->sync.discontinuity = false;
     aout->play(aout, block, play_date);
