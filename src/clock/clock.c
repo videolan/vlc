@@ -123,6 +123,10 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
 
     vlc_mutex_lock(&main_clock->lock);
 
+    /* If system_now is INT64_MAX, the update is forced, don't modify anything
+     * but only notify the new clock point. */
+    if (system_now != INT64_MAX)
+    {
     if (main_clock->offset != VLC_TICK_INVALID && ts != main_clock->last.stream)
     {
         /* We have a reference so we can update coeff */
@@ -145,6 +149,7 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
 
     main_clock->rate = rate;
     vlc_cond_broadcast(&main_clock->cond);
+    }
 
     vlc_mutex_unlock(&main_clock->lock);
 
@@ -291,7 +296,10 @@ static vlc_tick_t vlc_clock_slave_update(vlc_clock_t *clock,
     vlc_clock_main_t *main_clock = clock->owner;
     vlc_mutex_lock(&main_clock->lock);
 
-    vlc_tick_t computed = clock->to_system_locked(clock, system_now, ts, rate);
+    /* If system_now is INT64_MAX, the update is forced, don't modify anything
+     * but only notify the new clock point. */
+    vlc_tick_t computed = system_now == INT64_MAX ? INT64_MAX
+                        : clock->to_system_locked(clock, system_now, ts, rate);
 
     vlc_mutex_unlock(&main_clock->lock);
 

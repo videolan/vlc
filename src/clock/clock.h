@@ -123,6 +123,8 @@ void vlc_clock_Delete(vlc_clock_t *clock);
 
 /**
  * This function will update the clock drift and returns the drift
+ * @param system_now valid system time or INT64_MAX is the updated point is
+ * forced (when paused for example)
  * @return a valid drift relative time, VLC_TICK_INVALID if there is no drift
  * (clock is master) or INT64_MAX if the clock is paused
  */
