@@ -127,28 +127,29 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
      * but only notify the new clock point. */
     if (system_now != INT64_MAX)
     {
-    if (main_clock->offset != VLC_TICK_INVALID && ts != main_clock->last.stream)
-    {
-        /* We have a reference so we can update coeff */
-        double instant_coeff = (system_now - main_clock->last.system)
-                             / (double)(ts - main_clock->last.stream);
-        if (rate == main_clock->rate)
+        if (main_clock->offset != VLC_TICK_INVALID
+         && ts != main_clock->last.stream)
         {
-            instant_coeff *= rate;
-            AvgUpdate(&main_clock->coeff_avg, instant_coeff);
-            main_clock->coeff = AvgGet(&main_clock->coeff_avg);
+            /* We have a reference so we can update coeff */
+            double instant_coeff = (system_now - main_clock->last.system)
+                                 / (double)(ts - main_clock->last.stream);
+            if (rate == main_clock->rate)
+            {
+                instant_coeff *= rate;
+                AvgUpdate(&main_clock->coeff_avg, instant_coeff);
+                main_clock->coeff = AvgGet(&main_clock->coeff_avg);
+            }
         }
-    }
-    else
-        main_clock->wait_sync_ref =
-            clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
+        else
+            main_clock->wait_sync_ref =
+                clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
 
-    main_clock->offset = system_now - ts * main_clock->coeff / rate;
+        main_clock->offset = system_now - ts * main_clock->coeff / rate;
 
-    main_clock->last = clock_point_Create(system_now, ts);
+        main_clock->last = clock_point_Create(system_now, ts);
 
-    main_clock->rate = rate;
-    vlc_cond_broadcast(&main_clock->cond);
+        main_clock->rate = rate;
+        vlc_cond_broadcast(&main_clock->cond);
     }
 
     vlc_mutex_unlock(&main_clock->lock);
