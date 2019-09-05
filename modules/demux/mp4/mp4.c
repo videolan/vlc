@@ -3755,6 +3755,8 @@ static inline uint32_t MP4_GetFixedSampleSize( const mp4_track_t *p_track,
         case ATOM_twos:
         case ATOM_sowt:
         case ATOM_raw:
+        case VLC_CODEC_U8:
+        case VLC_CODEC_S8:
         case VLC_CODEC_S16L:
         case VLC_CODEC_S16B:
         case VLC_CODEC_S24L:
