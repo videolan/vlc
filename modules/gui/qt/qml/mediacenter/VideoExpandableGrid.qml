@@ -26,48 +26,12 @@ import "qrc:///style/"
 
 Utils.ExpandGridView {
     id: expandableGV
-    signal gridItemClicked(Item menuParent,int key,int modifier,variant delegateModelItem)
-    signal gridItemContextButtonClicked(Item menuParent,variant delegateModelItem)
-    signal gridItemSelectedChanged(bool selected,Item item)
-
-    property Item currentItem: Item{}
 
     activeFocusOnTab:true
-    anchors.fill: parent
 
     property real expandDelegateImplicitHeight: parent.height
     property real expandDelegateWidth: parent.width
 
-    property real gridDelegatePictureWidth: VLCStyle.video_normal_width
-    property real gridDelegatePictureHeight: VLCStyle.video_normal_height
-
-
-    delegate: Utils.GridItem {
-        property variant delegateModelItem: ({
-                                                 model: ({}),
-                                                 itemsIndex: 0,
-                                                 inSelected: false
-                                             })
-
-        image: delegateModelItem.model.thumbnail || VLCStyle.noArtCover
-        title: delegateModelItem.model.title || qsTr("Unknown title")
-        selected: expandableGV.activeFocus && (delegateModelItem.inSelected || contextButtonDown )
-        infoLeft: delegateModelItem.model.duration || ""
-        resolution: delegateModelItem.model.resolution_name || ""
-        channel: delegateModelItem.model.channel || ""
-        isVideo: true
-        isNew: delegateModelItem.model.playcount < 1
-        progress: Math.max(0, delegateModelItem.model.saved_position)
-        pictureWidth: expandableGV.gridDelegatePictureWidth
-        pictureHeight: expandableGV.gridDelegatePictureHeight
-
-        onItemClicked : expandableGV.gridItemClicked(menuParent,key,modifier, delegateModelItem)
-
-        onPlayClicked: medialib.addAndPlay( delegateModelItem.model.id )
-        onAddToPlaylistClicked : medialib.addToPlaylist( delegateModelItem.model.id )
-        onContextMenuButtonClicked: expandableGV.gridItemContextButtonClicked(menuParent,delegateModelItem)
-        onSelectedChanged:expandableGV.gridItemSelectedChanged(selected,this)
-    }
     expandDelegate:  Rectangle {
         id: expandRect
         property int currentId: -1
@@ -343,7 +307,8 @@ Utils.ExpandGridView {
 
     }
 
-    cellWidth: (VLCStyle.video_normal_width) + VLCStyle.margin_large
+
+    cellWidth: (VLCStyle.video_normal_width)
     cellHeight: (VLCStyle.video_normal_height) + VLCStyle.margin_xlarge + VLCStyle.margin_normal
 
     onSelectAll: expandableGV.model.selectAll()
