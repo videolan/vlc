@@ -127,7 +127,7 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
     main_clock->rate = rate;
     vlc_cond_broadcast(&main_clock->cond);
     vlc_mutex_unlock(&main_clock->lock);
-    return 0;
+    return VLC_TICK_INVALID;
 }
 
 static void vlc_clock_master_reset(vlc_clock_t *clock)
@@ -266,7 +266,7 @@ static vlc_tick_t vlc_clock_slave_update(vlc_clock_t *clock,
 
     vlc_tick_t computed = clock->to_system_locked(clock, system_now, ts, rate);
     vlc_mutex_unlock(&main_clock->lock);
-    return computed != INT64_MAX ? computed - system_now : VLC_TICK_INVALID;
+    return computed != INT64_MAX ? computed - system_now : INT64_MAX;
 }
 
 static void vlc_clock_slave_reset(vlc_clock_t *clock)

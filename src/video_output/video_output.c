@@ -1176,7 +1176,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         system_now = vlc_tick_now();
         const vlc_tick_t drift = vlc_clock_Update(sys->clock, system_now,
                                                   pts, sys->rate);
-        if (drift != VLC_TICK_INVALID)
+        if (drift != VLC_TICK_INVALID && drift != INT64_MAX)
             system_now += drift;
     }
     sys->displayed.date = system_now;

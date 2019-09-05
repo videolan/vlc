@@ -95,6 +95,8 @@ void vlc_clock_Delete(vlc_clock_t *clock);
 
 /**
  * This function will update the clock drift and returns the drift
+ * @return a valid drift relative time, VLC_TICK_INVALID if there is no drift
+ * (clock is master) or INT64_MAX if the clock is paused
  */
 vlc_tick_t vlc_clock_Update(vlc_clock_t *clock, vlc_tick_t system_now,
                             vlc_tick_t ts, double rate);
@@ -120,6 +122,7 @@ int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
 
 /**
  * This function converts a timestamp from stream to system
+ * @return the valid system time or INT64_MAX when the clock is paused
  */
 vlc_tick_t vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
                                      vlc_tick_t ts, double rate);
