@@ -55,7 +55,8 @@ Rectangle {
     signal itemDoubleClicked(Item menuParent, int keys, int modifier)
     signal contextMenuButtonClicked(Item menuParent)
 
-    
+    property int index: 0
+
     Rectangle {
         id: gridItem
         width: childrenRect.width

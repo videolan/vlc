@@ -236,7 +236,9 @@ NavigableFocusScope {
             for (i = firstId; i < topGridEndId; ++i) {
                 var pos = getItemPos(i)
                 var item = getChild(i, _unusedItemList)
-                item.delegateModelItem = model.items.get(i)
+                item.model = model.items.get(i).model
+                item.index = i
+                item.selected = model.items.get(i).inSelected
                 item.x = pos[0]
                 item.y = pos[1]
                 item.visible = true
@@ -249,7 +251,9 @@ NavigableFocusScope {
             for (i = topGridEndId; i < lastId; ++i) {
                 pos = getItemPos(i)
                 item = getChild(i, _unusedItemList)
-                item.delegateModelItem = model.items.get(i)
+                item.model = model.items.get(i).model
+                item.index = i
+                item.selected = model.items.get(i).inSelected
                 item.x = pos[0]
                 item.y = pos[1] + expandItem.height
                 item.visible = true

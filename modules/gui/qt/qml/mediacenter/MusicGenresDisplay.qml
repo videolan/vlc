@@ -118,7 +118,7 @@ Utils.NavigableFocusScope {
                 id: gridItem
 
                 image: VLCStyle.noArtAlbum
-                title: modelData.name || "Unknown genre"
+                title: model.name || "Unknown genre"
                 subtitle: ""
                 //selected: element.DelegateModel.inSelected
 
@@ -129,7 +129,7 @@ Utils.NavigableFocusScope {
                 }
 
                 onItemDoubleClicked: {
-                    history.push(["mc", "music", "albums", { parentId: modelData.id } ], History.Go)
+                    history.push(["mc", "music", "albums", { parentId: model.id } ], History.Go)
                 }
 
                 //replace image with a mutlicovers preview
@@ -141,7 +141,7 @@ Utils.NavigableFocusScope {
 
                     albums: MLAlbumModel {
                         ml: medialib
-                        parentId: modelData.id
+                        parentId: model.id
                     }
                 }
 

@@ -49,7 +49,6 @@ Utils.GridItem {
     subtitle: model.mrl
     title: model.name || qsTr("Unknown share")
     focus: true
-    selected: parent.activeFocus && element.DelegateModel.inSelected
     onItemClicked : {
         if (key == Qt.RightButton){
             contextMenu.model = model
