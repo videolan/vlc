@@ -865,7 +865,8 @@ static void ThreadChangeFilters(vout_thread_t *vout,
 
 
 /* */
-static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool frame_by_frame)
+static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse,
+                                       bool frame_by_frame, bool *paused)
 {
     bool is_late_dropped = vout->p->is_late_dropped && !vout->p->pause.is_on && !frame_by_frame;
     vout_thread_sys_t *sys = vout->p;
@@ -888,7 +889,19 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool fra
                     const vlc_tick_t system_pts =
                         vlc_clock_ConvertToSystem(vout->p->clock, date,
                                                   decoded->date, sys->rate);
-                    const vlc_tick_t late = date - system_pts;
+
+                    vlc_tick_t late;
+                    if (system_pts == INT64_MAX)
+                    {
+                        /* The clock is paused, notify it (so that the current
+                         * picture is displayed but not the next one), this
+                         * current picture can't be be late. */
+                        *paused = true;
+                        late = 0;
+                    }
+                    else
+                        late = date - system_pts;
+
                     vlc_tick_t late_threshold;
                     if (decoded->format.i_frame_rate && decoded->format.i_frame_rate_base)
                         late_threshold = VLC_TICK_FROM_MS(500) * decoded->format.i_frame_rate_base / decoded->format.i_frame_rate;
@@ -1010,9 +1023,20 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     if (sys->pause.is_on)
         render_subtitle_date = sys->pause.date;
     else
+    {
         render_subtitle_date = filtered->date <= 1 ? system_now :
             vlc_clock_ConvertToSystem(sys->clock, system_now, filtered->date,
                                       sys->rate);
+
+        /* The clock is paused, it's too late to fallback to the previous
+         * picture, display the current picture anyway and force the rendering
+         * to now. */
+        if (unlikely(render_subtitle_date == INT64_MAX))
+        {
+            render_subtitle_date = system_now;
+            is_forced = true;
+        }
+    }
 
     /*
      * Get the subpicture to be displayed
@@ -1143,6 +1167,14 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     const vlc_tick_t pts = todisplay->date;
     vlc_tick_t system_pts = is_forced ? system_now :
         vlc_clock_ConvertToSystem(sys->clock, system_now, pts, sys->rate);
+    if (unlikely(system_pts == INT64_MAX))
+    {
+        /* The clock is paused, it's too late to fallback to the previous
+         * picture, display the current picture anyway and force the rendering
+         * to now. */
+        system_pts = system_now;
+        is_forced = true;
+    }
 
     if (vd->prepare != NULL)
         vd->prepare(vd, todisplay, do_dr_spu ? subpic : NULL, system_pts);
@@ -1196,11 +1228,12 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
     assert(sys->clock);
 
     if (first)
-        if (ThreadDisplayPreparePicture(vout, true, frame_by_frame)) /* FIXME not sure it is ok */
+        if (ThreadDisplayPreparePicture(vout, true, frame_by_frame, &paused)) /* FIXME not sure it is ok */
             return VLC_EGENERIC;
 
     if (!paused || frame_by_frame)
-        while (!sys->displayed.next && !ThreadDisplayPreparePicture(vout, false, frame_by_frame))
+        while (!sys->displayed.next
+            && !ThreadDisplayPreparePicture(vout, false, frame_by_frame, &paused))
             ;
 
     const vlc_tick_t system_now = vlc_tick_now();
@@ -1213,10 +1246,17 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
         const vlc_tick_t next_system_pts =
             vlc_clock_ConvertToSystem(sys->clock, system_now,
                                       sys->displayed.next->date, sys->rate);
-
-        date_next = next_system_pts - render_delay;
-        if (date_next <= system_now)
-            drop_next_frame = true;
+        if (unlikely(next_system_pts == INT64_MAX))
+        {
+            /* The clock was just paused, don't display the next frame (keep
+             * the current one). */
+            paused = true;
+        }
+        {
+            date_next = next_system_pts - render_delay;
+            if (date_next <= system_now)
+                drop_next_frame = true;
+        }
     }
 
     /* FIXME/XXX we must redisplay the last decoded picture (because
