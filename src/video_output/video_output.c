@@ -1233,7 +1233,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
     vlc_tick_t date_refresh = VLC_TICK_INVALID;
     if (sys->displayed.date != VLC_TICK_INVALID) {
         date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
-        refresh = date_refresh <= vlc_tick_now();
+        refresh = date_refresh <= system_now;
     }
     bool force_refresh = !drop_next_frame && refresh;
 
