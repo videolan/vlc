@@ -641,7 +641,7 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
         assert(cfg->resourceFormat[2] == cfg->resourceFormat[0]);
 
     } else {
-        plane_count = 1;
+        plane_count = __MAX(1, p_chroma_desc->plane_count);
         texDesc.Format = cfg->formatTexture;
         texDesc.Height = fmt->i_height;
         texDesc.Width = fmt->i_width;
