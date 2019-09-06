@@ -79,12 +79,6 @@ Utils.NavigableFocusScope {
     }
 
     MLNetworkModel {
-        id: favModel
-        ctx: mainctx
-        tree: undefined
-        sd_source: "SD_CAT_DEVICES"
-    }
-    MLNetworkModel {
         id: machineModel
         ctx: mainctx
         tree: undefined
@@ -101,12 +95,6 @@ Utils.NavigableFocusScope {
         id: delegateModel
         model: providerModel
         viewIndexPropertyName: "currentIndexProvider"
-    }
-
-    MCNetworksSectionSelectableDM{
-        id: favDM
-        model: favModel
-        viewIndexPropertyName: "currentIndexFavourites"
     }
 
     MCNetworksSectionSelectableDM{
@@ -136,56 +124,108 @@ Utils.NavigableFocusScope {
         }
     }
 
+
     Component{
         id: topComponent
-        Flickable{
-            id: flickable
+
+        Utils.NavigableFocusScope {
+            id: topFocusScope
             height: view.height
             width: view.width
-            contentHeight: allSections.implicitHeight
-            ScrollBar.vertical: ScrollBar{}
-            onActiveFocusChanged: {
-                if(activeFocus)
-                    favouritesSection.forceActiveFocus()
+
+            Label {
+                anchors.centerIn: parent
+                visible: (machineDM.items.count === 0 && lanDM.items.count === 0 )
+                font.pixelSize: VLCStyle.fontHeight_xxlarge
+                color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
+                text: qsTr("No network shares found")
             }
 
-            Rectangle{
-                id: allSections
-                color: VLCStyle.colors.bg
-                implicitHeight: childrenRect.height
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                }
-                MCNetworksSection{
-                    id: favouritesSection
-                    text: qsTr("Favourites")
-                    currentIndex: view.currentIndexFavourites
-                    selectableDelegateModel: favDM
-                    visible: favDM.items.count > 0
-                    onActionDown: machineSection.focus = true
-                    onActionUp: root.actionUp(index)
+            ScrollView {
+                id: flickable
+                anchors.fill: parent
+                ScrollBar.vertical: ScrollBar{}
+                focus: true
+
+                Column {
+                    width: parent.width
+                    height: implicitHeight
+
+                    Utils.LabelSeparator {
+                        text: qsTr("Devices")
+                        width: flickable.width
+                        visible: machineDM.items.count !== 0
+                    }
+
+                    Utils.KeyNavigableListView {
+                        id: deviceSection
+
+                        focus: false
+                        visible: machineDM.items.count !== 0
+
+                        width: flickable.width
+                        height: 150 //FIXME
+                        orientation: ListView.Horizontal
+
+                        model: machineDM.parts.grid
+                        modelCount: machineDM.items.count
+
+                        onSelectAll: machineDM.selectAll()
+                        onSelectionUpdated:  machineDM.updateSelection( keyModifiers, oldIndex, newIndex )
+                        onActionAtIndex: machineDM.actionAtIndex(index)
+
+                        onActionLeft: topFocusScope.actionLeft(index)
+                        onActionRight: topFocusScope.actionRight(index)
+                        onActionUp:  topFocusScope.actionUp(index)
+                        onActionDown: if (lanSection.visible) lanSection.focus = true; else topFocusScope.actionDown(index);
+                        onActionCancel: topFocusScope.actionCancel(index)
+                    }
+
+                    Utils.LabelSeparator {
+                        text: qsTr("LAN")
+                        width: flickable.width
+                        visible: lanDM.items.count !== 0
+                    }
+
+                    Utils.KeyNavigableListView {
+                        id: lanSection
+
+                        visible: lanDM.items.count !== 0
+                        focus: false
+
+                        width: flickable.width
+                        height: 150 //FIXME
+                        orientation: ListView.Horizontal
+
+                        model: lanDM.parts.grid
+                        modelCount: lanDM.items.count
+
+                        onSelectAll: lanDM.selectAll()
+                        onSelectionUpdated:  lanDM.updateSelection( keyModifiers, oldIndex, newIndex )
+                        onActionAtIndex: lanDM.actionAtIndex(index)
+
+                        onActionLeft: topFocusScope.actionLeft(index)
+                        onActionRight: topFocusScope.actionRight(index)
+                        onActionUp: if (deviceSection.visible) deviceSection.focus = true; else topFocusScope.actionUp(index);
+                        onActionDown: topFocusScope.actionDown(index)
+                        onActionCancel: topFocusScope.actionCancel(index)
+                    }
                 }
 
-                MCNetworksSection{
-                    id: machineSection
-                    anchors.top: favouritesSection.bottom
-                    text: qsTr("Machine")
-                    currentIndex: view.currentIndexMachine
-                    selectableDelegateModel: machineDM
-                    visible: machineDM.items.count > 0
-                    onActionDown: lanSection.focus = true
-                    onActionUp: favouritesSection.focus = true
-                }
-                MCNetworksSection{
-                    id: lanSection
-                    anchors.top: machineSection.bottom
-                    text: qsTr("Lan")
-                    currentIndex: view.currentIndexLan
-                    selectableDelegateModel: lanDM
-                    visible: lanDM.items.count > 0
-                    onActionDown: root.actionDown(index)
-                    onActionUp: machineSection.focus = true
+            }
+
+            onActionLeft: root.actionLeft(index)
+            onActionRight: root.actionRight(index)
+            onActionUp:  root.actionUp(index)
+            onActionDown: root.actionDown(index)
+            onActionCancel: root.actionCancel(index)
+
+            onActiveFocusChanged: {
+                if (!deviceSection.focus && !lanSection.focus) {
+                    if (deviceSection.visible)
+                        deviceSection.focus = true
+                    else if (lanSection.visible)
+                        lanSection.focus = true
                 }
             }
 
@@ -254,7 +294,6 @@ Utils.NavigableFocusScope {
         property bool isOnProviderList: providerModel.is_on_provider_list
         property int currentIndexProvider: -1
 
-        property int currentIndexFavourites: -1
         property int currentIndexMachine: -1
         property int currentIndexLan: -1
         Connections {
@@ -268,17 +307,6 @@ Utils.NavigableFocusScope {
                     view.replace(listComponent)
             }
         }
-}
-
-    Label {
-        anchors.centerIn: parent
-        visible: providerModel.is_on_provider_list?
-                     (machineDM.items.count === 0
-                      && lanDM.items.count === 0
-                      && favDM.items.count === 0 )
-                   : delegateModel.items.count === 0
-        font.pixelSize: VLCStyle.fontHeight_xxlarge
-        color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        text: qsTr("No network shares found")
     }
+
 }

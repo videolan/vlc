@@ -158,7 +158,6 @@ Utils.NavigableFocusScope {
             }
 
                     }
-                }
 
     }
 
