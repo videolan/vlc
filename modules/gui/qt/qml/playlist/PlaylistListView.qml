@@ -158,29 +158,31 @@ Utils.NavigableFocusScope {
                 updateSelection(keyModifiers, oldIndex, newIndex);
             }
         }
+
         Keys.onDeletePressed: onDelete()
-        onActionRight: {
+
+        navigationParent: root
+        navigationRight: function() {
             overlay.state = "normal"
             overlay.focus = true
         }
-        onActionLeft: {
+        navigationLeft: function(index) {
             if (mode === "normal") {
-                root.actionLeft(index)
+                root.navigationLeft(index)
             } else {
                 overlay.state = "hidden"
                 mode = "normal"
             }
         }
-        onActionCancel: {
+        navigationCancel: function(index) {
             if (mode === "normal") {
-                root.actionCancel(index)
+                root.navigationCancel(index)
             } else {
                 overlay.state = "hidden"
                 mode = "normal"
             }
         }
-        onActionUp: root.actionUp(index)
-        onActionDown: root.actionDown(index)
+
         onActionAtIndex: {
             if (mode === "select")
                 root.plmodel.toggleSelected(index)

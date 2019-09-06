@@ -141,10 +141,16 @@ Utils.KeyNavigableTableView {
         }
         medialib.addAndPlay(list)
     }
-    onActionLeft:  isFocusOnContextButton ? isFocusOnContextButton = false : root.actionLeft(index)
-    onActionRight: !isFocusOnContextButton ? isFocusOnContextButton = true : root.actionRight(index)
-    onActionDown:   root.actionDown(index)
-    onActionUp:     root.actionUp(index)
-    onActionCancel: root.actionCancel(index)
-
+    navigationLeft:  function(index) {
+        if (isFocusOnContextButton )
+            isFocusOnContextButton = false
+        else
+            defaultNavigationLeft(index)
+    }
+    navigationRight: function(index) {
+        if (!isFocusOnContextButton)
+            isFocusOnContextButton = true
+        else
+            defaultNavigationRight(index)
+    }
 }

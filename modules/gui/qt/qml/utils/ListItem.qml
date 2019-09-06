@@ -163,12 +163,12 @@ NavigableFocusScope {
 
                 Keys.onRightPressed: {
                     if (actionButtons.length === 0 && !root.showContextButton)
-                        root.actionRight(0)
+                        root.navigationRight(0)
                     else
                         toolButtons.focus = true
                 }
                 Keys.onLeftPressed: {
-                    root.actionLeft(0)
+                    root.navigationLeft(0)
                 }
             }
 
@@ -211,7 +211,7 @@ NavigableFocusScope {
                 }
                 Keys.onRightPressed: {
                if (toolButtons.focusIndex === (actionButtons.length - (!root.showContextButton ? 1 : 0) ) )
-                        root.actionRight(0)
+                        root.navigationRight(0)
                     else {
                         toolButtons.focusIndex += 1
                     }

@@ -134,10 +134,12 @@ Utils.NavigableFocusScope {
             expandDelegate: MusicAlbumsGridExpandDelegate {
                 id: expandDelegateId
                 width: root.width
-                onActionCancel:  gridView_id.retract()
-                onActionUp:  gridView_id.retract()
-                onActionLeft: root.actionLeft(index)
-                onActionRight: root.actionRight(index)
+
+                navigationParent: root
+                navigationCancel:  function() {  gridView_id.retract() }
+                navigationUp: function() {  gridView_id.retract() }
+                navigationDown: function() {}
+
             }
 
             model: delegateModel
@@ -153,11 +155,7 @@ Utils.NavigableFocusScope {
             onSelectAll: delegateModel.selectAll()
             onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
 
-            onActionLeft: root.actionLeft(index)
-            onActionRight: root.actionRight(index)
-            onActionDown: root.actionDown(index)
-            onActionUp: root.actionUp(index)
-            onActionCancel: root.actionCancel(index)
+            navigationParent: root
         }
     }
 
@@ -180,11 +178,7 @@ Utils.NavigableFocusScope {
             onSelectAll: delegateModel.selectAll()
             onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
 
-            onActionLeft: root.actionLeft(index)
-            onActionRight: root.actionRight(index)
-            onActionDown: root.actionDown(index)
-            onActionUp: root.actionUp(index)
-            onActionCancel: root.actionCancel(index)
+            navigationParent: root
         }
     }
 

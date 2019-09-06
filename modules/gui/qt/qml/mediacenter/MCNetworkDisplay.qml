@@ -174,11 +174,13 @@ Utils.NavigableFocusScope {
                         onSelectionUpdated:  machineDM.updateSelection( keyModifiers, oldIndex, newIndex )
                         onActionAtIndex: machineDM.actionAtIndex(index)
 
-                        onActionLeft: topFocusScope.actionLeft(index)
-                        onActionRight: topFocusScope.actionRight(index)
-                        onActionUp:  topFocusScope.actionUp(index)
-                        onActionDown: if (lanSection.visible) lanSection.focus = true; else topFocusScope.actionDown(index);
-                        onActionCancel: topFocusScope.actionCancel(index)
+                        navigationParent: topFocusScope
+                        navigationDown: function (index) {
+                            if (lanSection.visible)
+                                lanSection.focus = true;
+                            else
+                                topFocusScope.navigationDown(index);
+                        }
                     }
 
                     Utils.LabelSeparator {
@@ -204,21 +206,20 @@ Utils.NavigableFocusScope {
                         onSelectionUpdated:  lanDM.updateSelection( keyModifiers, oldIndex, newIndex )
                         onActionAtIndex: lanDM.actionAtIndex(index)
 
-                        onActionLeft: topFocusScope.actionLeft(index)
-                        onActionRight: topFocusScope.actionRight(index)
-                        onActionUp: if (deviceSection.visible) deviceSection.focus = true; else topFocusScope.actionUp(index);
-                        onActionDown: topFocusScope.actionDown(index)
-                        onActionCancel: topFocusScope.actionCancel(index)
+
+                        navigationParent: topFocusScope
+                        navigationUp: function (index) {
+                            if (deviceSection.visible)
+                                deviceSection.focus = true;
+                            else
+                                topFocusScope.navigationUp(index);
+                        }
                     }
                 }
 
             }
 
-            onActionLeft: root.actionLeft(index)
-            onActionRight: root.actionRight(index)
-            onActionUp:  root.actionUp(index)
-            onActionDown: root.actionDown(index)
-            onActionCancel: root.actionCancel(index)
+            navigationParent: root
 
             onActiveFocusChanged: {
                 if (!deviceSection.focus && !lanSection.focus) {
@@ -253,11 +254,7 @@ Utils.NavigableFocusScope {
            onSelectionUpdated:  delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
            onActionAtIndex: delegateModel.actionAtIndex(index)
 
-           onActionLeft: root.actionLeft(index)
-           onActionRight: root.actionRight(index)
-           onActionUp: root.actionUp(index)
-           onActionDown: root.actionDown(index)
-           onActionCancel: root.actionCancel(index)
+           navigationParent: root
        }
    }
 
@@ -277,11 +274,7 @@ Utils.NavigableFocusScope {
            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
            onActionAtIndex: delegateModel.actionAtIndex(index)
 
-           onActionLeft: root.actionLeft(index)
-           onActionRight: root.actionRight(index)
-           onActionDown: root.actionDown(index)
-           onActionUp: root.actionUp(index)
-           onActionCancel: root.actionCancel(index)
+           navigationParent: root
        }
    }
 

@@ -159,11 +159,8 @@ Utils.NavigableFocusScope {
                     toolbarAutoHide.restart()
             }
 
-            onActionDown: controlBarView.forceActiveFocus()
-            onActionUp: rootPlayer.actionUp(index)
-            onActionLeft: rootPlayer.actionLeft(index)
-            onActionRight: rootPlayer.actionRight(index)
-            onActionCancel: rootPlayer.actionCancel(index)
+            navigationParent: rootPlayer
+            navigationDown: function () { controlBarView.forceActiveFocus() }
 
             Keys.onPressed: {
                 if (event.accepted)
@@ -262,11 +259,8 @@ Utils.NavigableFocusScope {
                             toolbarAutoHide.restart()
                     }
 
-                    onActionUp: topcontrolView.forceActiveFocus()
-                    onActionDown: rootPlayer.actionDown(index)
-                    onActionLeft: rootPlayer.actionLeft(index)
-                    onActionRight: rootPlayer.actionRight(index)
-                    onActionCancel: rootPlayer.actionCancel(index)
+                    navigationParent: rootPlayer
+                    navigationUp: function() { topcontrolView.forceActiveFocus() }
 
                     //unhandled keys are forwarded as hotkeys
                     Keys.onPressed: {

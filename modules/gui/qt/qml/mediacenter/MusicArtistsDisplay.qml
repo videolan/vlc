@@ -129,11 +129,8 @@ Utils.NavigableFocusScope {
             onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onCurrentIndexChanged: delegateModel.actionAtIndex(currentIndex)
 
-            onActionRight: view.focus = true
-            onActionLeft: root.actionLeft(index)
-            onActionUp: root.actionUp(index)
-            onActionDown: root.actionDown(index)
-            onActionCancel: root.actionCancel(index)
+            navigationParent: root
+            navigationRight: function () { view.focus = true }
         }
 
         FocusScope {
@@ -158,12 +155,9 @@ Utils.NavigableFocusScope {
 
                 focus: true
                 parentId: artistId
-                onActionLeft: artistList.focus = true
 
-                onActionRight: root.actionRight(index)
-                onActionUp: root.actionUp(index)
-                onActionDown: root.actionDown(index)
-                onActionCancel: root.actionCancel(index)
+                navigationParent: root
+                navigationLeft: function () { artistList.focus = true }
             }
 
         }

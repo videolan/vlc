@@ -50,8 +50,8 @@ Utils.SelectableDelegateModel {
         }
         Connections {
             target: delegateLoader.item
-            onActionLeft: root.actionLeft(0)
-            onActionRight: root.actionRight(0)
+            onActionLeft: root.navigationLeft(0)
+            onActionRight: root.navigationRight(0)
         }
 
     }

@@ -108,8 +108,8 @@ NavigableFocusScope {
         Connections {
             target: view.currentItem
             ignoreUnknownSignals: true
-            onActionRight: listview_id.actionRight(currentIndex)
-            onActionLeft: listview_id.actionLeft(currentIndex)
+            onActionRight: listview_id.navigationRight(currentIndex)
+            onActionLeft: listview_id.navigationLeft(currentIndex)
             onActionDown: {
                 if ( currentIndex !== modelCount - 1 ) {
                     var newIndex = currentIndex + 1
@@ -117,7 +117,7 @@ NavigableFocusScope {
                     currentIndex = newIndex
                     selectionUpdated(0, oldIndex, newIndex)
                 } else {
-                    root.actionDown(currentIndex)
+                    root.navigationDown(currentIndex)
                 }
             }
             onActionUp: {
@@ -127,7 +127,7 @@ NavigableFocusScope {
                     currentIndex = newIndex
                     selectionUpdated(0, oldIndex, newIndex)
                 } else {
-                    root.actionUp(currentIndex)
+                    root.navigationUp(currentIndex)
                 }
             }
         }

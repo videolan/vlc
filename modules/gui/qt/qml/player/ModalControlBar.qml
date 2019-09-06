@@ -36,11 +36,7 @@ Utils.NavigableFocusScope {
 
             onShowTrackBar: root.state = "tracks"
 
-            onActionUp: root.actionUp(index)
-            onActionDown: root.actionDown(index)
-            onActionLeft: root.actionLeft(index)
-            onActionRight: root.actionRight(index)
-            onActionCancel: root.actionCancel(index)
+            navigationParent: root
         }
     }
 
@@ -48,12 +44,9 @@ Utils.NavigableFocusScope {
         id: trackbarComp_id
         TrackSelector {
             focus: true
-            onActionCancel:  root.state = "control"
 
-            onActionUp: root.actionUp(index)
-            onActionDown: root.actionDown(index)
-            onActionLeft: root.actionLeft(index)
-            onActionRight: root.actionRight(index)
+            navigationParent: root
+            navigationCancel: function() { root.state = "control" }
         }
     }
 

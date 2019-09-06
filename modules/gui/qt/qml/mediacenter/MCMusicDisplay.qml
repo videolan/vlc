@@ -104,11 +104,11 @@ Utils.NavigableFocusScope {
         Connections {
             target: stackView.currentItem
             ignoreUnknownSignals: true
-            onActionLeft:   root.actionLeft(index)
-            onActionRight:  root.actionRight(index)
-            onActionDown:   root.actionDown(index)
-            onActionUp:     root.actionUp(index)
-            onActionCancel: root.actionCancel(index)
+            onActionLeft:   root.navigationLeft(index)
+            onActionRight:  root.navigationRight(index)
+            onActionDown:   root.navigationDown(index)
+            onActionUp:     root.navigationUp(index)
+            onActionCancel: root.navigationCancel(index)
         }
     }
 }

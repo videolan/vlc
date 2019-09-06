@@ -163,11 +163,7 @@ Utils.NavigableFocusScope {
             onSelectionUpdated:  delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onActionAtIndex: delegateModel.actionAtIndex(index)
 
-            onActionLeft: root.actionLeft(index)
-            onActionRight: root.actionRight(index)
-            onActionUp: root.actionUp(index)
-            onActionDown: root.actionDown(index)
-            onActionCancel: root.actionCancel(index)
+            navigationParent: root
         }
     }
 
@@ -187,11 +183,7 @@ Utils.NavigableFocusScope {
             onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onActionAtIndex: delegateModel.actionAtIndex(index)
 
-            onActionLeft: root.actionLeft(index)
-            onActionRight: root.actionRight(index)
-            onActionUp: root.actionUp(index)
-            onActionDown: root.actionDown(index)
-            onActionCancel: root.actionCancel(index)
+            navigationParent: root
         }
     }
 

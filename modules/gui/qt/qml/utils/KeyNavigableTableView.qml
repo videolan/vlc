@@ -217,12 +217,9 @@ NavigableFocusScope {
 
         onSelectAll: delegateModel.selectAll()
         onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-        onActionLeft: root.actionLeft(index)
-        onActionRight: root.actionRight(index)
-        onActionUp: root.actionUp(index)
-        onActionDown: root.actionDown(index)
-        onActionCancel: root.actionCancel(index)
         onActionAtIndex: root.actionForSelection( delegateModel.selectedGroup )
+
+        navigationParent: root
     }
 
     /*

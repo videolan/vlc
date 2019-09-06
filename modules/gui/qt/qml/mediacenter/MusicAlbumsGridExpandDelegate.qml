@@ -208,11 +208,8 @@ Utils.NavigableFocusScope {
                 }
                 focus: true
 
-                onActionLeft:  playButton.forceActiveFocus()
-                onActionRight: root.actionRight(index)
-                onActionUp: root.actionUp(index)
-                onActionDown: root.actionDown(index)
-                onActionCancel: root.actionCancel(index)
+                navigationParent: root
+                navigationLeft: function() { playButton.forceActiveFocus() }
             }
 
             Item {

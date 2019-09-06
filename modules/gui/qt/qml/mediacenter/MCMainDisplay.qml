@@ -138,11 +138,8 @@ Utils.NavigableFocusScope {
                         contentModel = stackView.currentItem.contentModel
                     }
 
-                    onActionDown: stackView.focus = true
-                    onActionLeft: root.actionLeft(index)
-                    onActionRight: root.actionRight(index)
-                    onActionUp: root.actionUp(index)
-                    onActionCancel: root.actionCancel(index)
+                    navigationParent: root
+                    navigationDown: function() { stackView.focus = true }
                 }
 
                 Item {
@@ -255,7 +252,7 @@ Utils.NavigableFocusScope {
 
                     onActionUp: stackView.focus = true
                     onActionCancel: sourcesBanner.focus = true
-                    onActionDown: medialibId.actionDown(index)
+                    onActionDown: medialibId.navigationDown(index)
                 }
             }
 
@@ -265,13 +262,13 @@ Utils.NavigableFocusScope {
 
                 onActionUp: sourcesBanner.focus = true
                 onActionCancel: stackViewZone.focus = true
-                onActionLeft: medialibId.actionLeft(index)
-                onActionRight: medialibId.actionRight(index)
+                onActionLeft: medialibId.navigationLeft(index)
+                onActionRight: medialibId.navigationRight(index)
                 onActionDown: {
                     if (miniPlayer.expanded)
                         miniPlayer.focus = true
                     else
-                        medialibId.actionDown(index)
+                        medialibId.navigationDown(index)
                 }
             }
 

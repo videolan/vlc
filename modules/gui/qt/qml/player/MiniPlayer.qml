@@ -138,11 +138,8 @@ Utils.NavigableFocusScope {
                 Layout.preferredWidth: buttonrow.implicitWidth
                 Layout.preferredHeight: buttonrow.implicitHeight
 
-                onActionUp: root.actionUp(index)
-                onActionDown: root.actionDown(index)
-                onActionLeft: playingItemInfo.forceActiveFocus()
-                onActionRight: root.actionRight(index)
-                onActionCancel: root.actionCancel(index)
+                navigationParent: root
+                navigationLeft: function() {  playingItemInfo.forceActiveFocus() }
             }
         }
 

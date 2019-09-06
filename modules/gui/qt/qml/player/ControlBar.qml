@@ -96,17 +96,14 @@ Utils.NavigableFocusScope {
 
             focus: true
 
-            onActionUp: {
+            navigationParent: root
+            navigationUp: function(index) {
                 if (trackPositionSlider.enabled)
                     trackPositionSlider.focus = true
                 else
-                    root.actionUp(index)
+                    root.navigationUp(index)
             }
 
-            onActionDown: root.actionDown(index)
-            onActionLeft: root.actionLeft(index)
-            onActionRight: root.actionRight(index)
-            onActionCancel: root.actionCancel(index)
 
             Keys.priority: Keys.AfterItem
             Keys.onPressed: defaultKeyAction(event, 0)

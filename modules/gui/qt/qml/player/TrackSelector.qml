@@ -72,7 +72,7 @@ Utils.NavigableFocusScope {
         anchors.verticalCenter: parent.verticalCenter
         size: VLCStyle.icon_large
         text: VLCIcons.exit
-        onClicked: root.actionCancel(0)
+        onClicked: root.navigationCancel(0)
         KeyNavigation.right: trackTypeTumbler
     }
 

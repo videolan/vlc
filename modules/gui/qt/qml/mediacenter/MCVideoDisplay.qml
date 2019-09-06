@@ -139,11 +139,7 @@ Utils.NavigableFocusScope {
                             }
                         }
 
-                        onActionLeft: root.actionLeft(index)
-                        onActionRight: root.actionRight(index)
-                        onActionDown: root.actionDown(index)
-                        onActionUp: root.actionUp(index)
-                        onActionCancel: root.actionCancel(index)
+                        navigationParent: root
 
                         /*
                          *define the intial position/selection
@@ -174,6 +170,8 @@ Utils.NavigableFocusScope {
                 contextMenu.model = menuModel
                 contextMenu.popup(menuParent)
             }
+
+            navigationParent: root
         }
     }
 
