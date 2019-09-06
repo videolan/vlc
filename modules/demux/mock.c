@@ -109,6 +109,7 @@ var_InheritFourcc(vlc_object_t *obj, const char *name)
     X(can_control_rate, bool, add_bool, var_InheritBool, true) \
     X(can_record, bool, add_bool, var_InheritBool, true) \
     X(error, bool, add_bool, var_InheritBool, false) \
+    X(pts_delay, unsigned, add_integer, var_InheritUnsigned, MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY)) \
     X(add_video_track_at, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_INVALID ) \
     X(add_audio_track_at, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_INVALID ) \
     X(add_spu_track_at, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_INVALID ) \
@@ -191,7 +192,7 @@ Control(demux_t *demux, int query, va_list args)
             *va_arg(args, bool *) = sys->can_control_pace;
             return VLC_SUCCESS;
         case DEMUX_GET_PTS_DELAY:
-            *va_arg(args, vlc_tick_t *) = 0;
+            *va_arg(args, vlc_tick_t *) = VLC_TICK_FROM_MS(sys->pts_delay);
             return VLC_SUCCESS;
         case DEMUX_GET_META:
             return VLC_EGENERIC;
