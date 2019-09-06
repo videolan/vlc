@@ -546,7 +546,7 @@ static void ActivateSets(decoder_t *p_dec,
     p_sys->p_active_vps = p_vps;
     if(p_sps)
     {
-        if(!p_dec->fmt_in.video.i_frame_rate || !p_dec->fmt_in.video.i_frame_rate_base)
+        if(!p_dec->fmt_out.video.i_frame_rate || !p_dec->fmt_out.video.i_frame_rate_base)
         {
             unsigned num, den;
             if(hevc_get_frame_rate( p_sps, p_vps, &num, &den ))
@@ -558,6 +558,8 @@ static void ActivateSets(decoder_t *p_dec,
                    num <= UINT_MAX / 2)
                     date_Change(&p_sys->dts, 2 * num, den);
             }
+            p_dec->fmt_out.video.i_frame_rate = p_sys->dts.i_divider_num >> 1;
+            p_dec->fmt_out.video.i_frame_rate_base = p_sys->dts.i_divider_den;
         }
 
         if(p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF)
