@@ -1252,12 +1252,6 @@ static void ModuleThread_PlaySpu( struct decoder_owner *p_owner, subpicture_t *p
     vout_PutSubpicture( p_vout, p_subpic );
 }
 
-static void ModuleThread_UpdateStatSpu( struct decoder_owner *p_owner,
-                                  unsigned decoded, unsigned lost )
-{
-    (void) p_owner; (void) decoded; (void) lost;
-}
-
 static void ModuleThread_QueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
 {
     assert( p_spu );
@@ -1860,7 +1854,6 @@ static struct decoder_owner * CreateDecoder( vlc_object_t *p_parent,
             break;
         case SPU_ES:
             p_dec->cbs = &dec_spu_cbs;
-            p_owner->pf_update_stat = ModuleThread_UpdateStatSpu;
             break;
         default:
             msg_Err( p_dec, "unknown ES format" );
