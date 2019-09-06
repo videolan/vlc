@@ -1192,9 +1192,9 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         }
 #endif
 
+    system_now = vlc_tick_now();
     if (!is_forced)
     {
-        system_now = vlc_tick_now();
         if (unlikely(system_now > system_pts))
         {
             /* vd->prepare took too much time. Tell the clock that the pts was
@@ -1210,10 +1210,16 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
             /* Don't touch system_pts. Tell the clock that the pts was rendered
              * at the expected date */
         }
-        vlc_clock_UpdateVideo(sys->clock, system_pts, pts, sys->rate,
-                              frame_rate, frame_rate_base);
+        sys->displayed.date = system_pts;
     }
-    sys->displayed.date = system_pts;
+    else
+    {
+        sys->displayed.date = system_now;
+        /* Tell the clock that the pts was forced */
+        system_pts = INT64_MAX;
+    }
+    vlc_clock_UpdateVideo(sys->clock, system_pts, pts, sys->rate,
+                          frame_rate, frame_rate_base);
 
     /* Display the direct buffer returned by vout_RenderPicture */
     vout_display_Display(vd, todisplay);
