@@ -1190,19 +1190,17 @@ static int ModuleThread_PlayAudio( struct decoder_owner *p_owner, block_t *p_aud
 }
 
 static void ModuleThread_UpdateStatAudio( struct decoder_owner *p_owner,
-                                          unsigned lost )
+                                          bool lost )
 {
     unsigned played = 0;
-
+    unsigned aout_lost = 0;
     if( p_owner->p_aout != NULL )
     {
-        unsigned aout_lost;
-
         aout_DecGetResetStats( p_owner->p_aout, &aout_lost, &played );
-        lost += aout_lost;
     }
+    if (lost) aout_lost++;
 
-    decoder_Notify(p_owner, on_new_audio_stats, 1, lost, played);
+    decoder_Notify(p_owner, on_new_audio_stats, 1, aout_lost, played);
 }
 
 static void ModuleThread_QueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
@@ -1211,7 +1209,7 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
 
     int success = ModuleThread_PlayAudio( p_owner, p_aout_buf );
 
-    ModuleThread_UpdateStatAudio( p_owner, success != VLC_SUCCESS ? 1 : 0 );
+    ModuleThread_UpdateStatAudio( p_owner, success != VLC_SUCCESS );
 }
 
 static void ModuleThread_PlaySpu( struct decoder_owner *p_owner, subpicture_t *p_subpic )
