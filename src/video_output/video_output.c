@@ -1176,6 +1176,9 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         is_forced = true;
     }
 
+    const unsigned frame_rate = todisplay->format.i_frame_rate;
+    const unsigned frame_rate_base = todisplay->format.i_frame_rate_base;
+
     if (vd->prepare != NULL)
         vd->prepare(vd, todisplay, do_dr_spu ? subpic : NULL, system_pts);
 
@@ -1207,7 +1210,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
             /* Don't touch system_pts. Tell the clock that the pts was rendered
              * at the expected date */
         }
-        vlc_clock_Update(sys->clock, system_pts, pts, sys->rate);
+        vlc_clock_UpdateVideo(sys->clock, system_pts, pts, sys->rate,
+                              frame_rate, frame_rate_base);
     }
     sys->displayed.date = system_pts;
 
