@@ -209,7 +209,6 @@
         <file alias="MCMusicDisplay.qml">qml/mediacenter/MCMusicDisplay.qml</file>
         <file alias="MCVideoDisplay.qml">qml/mediacenter/MCVideoDisplay.qml</file>
         <file alias="MCNetworkDisplay.qml">qml/mediacenter/MCNetworkDisplay.qml</file>
-        <file alias="MCNetworksSection.qml">qml/mediacenter/MCNetworksSection.qml</file>
         <file alias="MCNetworksSectionSelectableDM.qml">qml/mediacenter/MCNetworksSectionSelectableDM.qml</file>
         <file alias="MusicAlbumsDisplay.qml">qml/mediacenter/MusicAlbumsDisplay.qml</file>
         <file alias="MusicAlbumsGridExpandDelegate.qml">qml/mediacenter/MusicAlbumsGridExpandDelegate.qml</file>
