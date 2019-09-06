@@ -39,6 +39,9 @@ Utils.NavigableFocusScope {
     property alias parentId: delegateModel.parentId
     property var currentIndex: view.currentItem.currentIndex
 
+
+    property Component header: Item{}
+
     Utils.SelectableDelegateModel {
         id: delegateModel
         property alias parentId: albumModelId.parentId
@@ -116,6 +119,8 @@ Utils.NavigableFocusScope {
             cellWidth: VLCStyle.cover_normal + VLCStyle.margin_small
             cellHeight: VLCStyle.cover_normal + VLCStyle.fontHeight_normal * 2
 
+            headerDelegate: root.header
+
             delegate: AudioGridItem {
                 id: audioGridItem
 
@@ -161,6 +166,8 @@ Utils.NavigableFocusScope {
         /* ListView */
         Utils.KeyNavigableListView {
             id: listView_id
+
+            header: root.header
 
             interactive: root.interactive
 
