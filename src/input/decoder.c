@@ -1067,19 +1067,17 @@ static int ModuleThread_PlayVideo( struct decoder_owner *p_owner, picture_t *p_p
 }
 
 static void ModuleThread_UpdateStatVideo( struct decoder_owner *p_owner,
-                                          unsigned lost )
+                                          bool lost )
 {
     unsigned displayed = 0;
-
+    unsigned vout_lost = 0;
     if( p_owner->p_vout != NULL )
     {
-        unsigned vout_lost = 0;
-
         vout_GetResetStatistic( p_owner->p_vout, &displayed, &vout_lost );
-        lost += vout_lost;
     }
+    if (lost) vout_lost++;
 
-    decoder_Notify(p_owner, on_new_video_stats, 1, lost, displayed);
+    decoder_Notify(p_owner, on_new_video_stats, 1, vout_lost, displayed);
 }
 
 static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
@@ -1089,7 +1087,7 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
 
     int success = ModuleThread_PlayVideo( p_owner, p_pic );
 
-    ModuleThread_UpdateStatVideo( p_owner, success != VLC_SUCCESS ? 1 : 0 );
+    ModuleThread_UpdateStatVideo( p_owner, success != VLC_SUCCESS );
 }
 
 static int thumbnailer_update_format( decoder_t *p_dec )
