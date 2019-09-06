@@ -73,9 +73,9 @@ Utils.NavigableFocusScope {
         Component.onCompleted: {
             pageModel.forEach(function(e) {
                 append({
-                    displayText: e.displayText,
-                    name: e.name,
-                })
+                           displayText: e.displayText,
+                           name: e.name,
+                       })
             })
         }
     }

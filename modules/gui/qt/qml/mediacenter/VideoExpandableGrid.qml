@@ -217,11 +217,11 @@ Utils.ExpandGridView {
                             id:reptr
                             anchors.fill: parent
                             model: [
-                                    {label: qsTr("Rename Video"), ic: VLCIcons.rename},
-                                    {label: qsTr("Enqueue"), ic: VLCIcons.add},
-                                    {label: qsTr("Share"), ic: VLCIcons.lan},
-                                    {label: qsTr("Delete"), ic: VLCIcons.del}
-                                ]
+                                {label: qsTr("Rename Video"), ic: VLCIcons.rename},
+                                {label: qsTr("Enqueue"), ic: VLCIcons.add},
+                                {label: qsTr("Share"), ic: VLCIcons.lan},
+                                {label: qsTr("Delete"), ic: VLCIcons.del}
+                            ]
                             
                             delegate: Button {
                                 id: reptrBtn

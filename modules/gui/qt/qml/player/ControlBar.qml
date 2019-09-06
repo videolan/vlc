@@ -63,8 +63,8 @@ Utils.NavigableFocusScope {
 
             Text {
                 text: (rootWindow.showRemainingTime && player.remainingTime.valid())
-                    ? "-" + player.remainingTime.toString()
-                    : player.length.toString()
+                      ? "-" + player.remainingTime.toString()
+                      : player.length.toString()
                 color: VLCStyle.colors.playerFg
                 font.pixelSize: VLCStyle.fontSize_normal
                 font.bold: true

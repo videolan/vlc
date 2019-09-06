@@ -381,51 +381,51 @@ Utils.NavigableFocusScope {
 
                             onClicked: mainMenu.openBelow(this)
 
-                        Menus.MainDropdownMenu {
-                            id: mainMenu
-                            onClosed: {
-                                if (mainMenu.activeFocus)
-                                    menu_selector.forceActiveFocus()
+                            Menus.MainDropdownMenu {
+                                id: mainMenu
+                                onClosed: {
+                                    if (mainMenu.activeFocus)
+                                        menu_selector.forceActiveFocus()
+                                }
                             }
                         }
                     }
-                }
 
-                // Content model states
-                states: [
-                    State {
-                        name: "contentModel"
-                        when: root.contentModel !== undefined
-                        PropertyChanges {
-                            target: searchBox
-                            visible: true
+                    // Content model states
+                    states: [
+                        State {
+                            name: "contentModel"
+                            when: root.contentModel !== undefined
+                            PropertyChanges {
+                                target: searchBox
+                                visible: true
+                            }
+                            PropertyChanges {
+                                target: sortControl
+                                visible: true
+                            }
+                        },
+                        State {
+                            name: "noContentModel"
+                            when: root.contentModel === undefined
+                            PropertyChanges {
+                                target: searchBox
+                                visible: false
+                            }
+                            PropertyChanges {
+                                target: sortControl
+                                visible: false
+                            }
                         }
-                        PropertyChanges {
-                            target: sortControl
-                            visible: true
-                        }
-                    },
-                    State {
-                        name: "noContentModel"
-                        when: root.contentModel === undefined
-                        PropertyChanges {
-                            target: searchBox
-                            visible: false
-                        }
-                        PropertyChanges {
-                            target: sortControl
-                            visible: false
-                        }
-                    }
-                ]
+                    ]
+                }
             }
         }
-    }
 
-    Keys.priority: Keys.AfterItem
-    Keys.onPressed: {
-        if (!event.accepted)
-            defaultKeyAction(event, 0)
+        Keys.priority: Keys.AfterItem
+        Keys.onPressed: {
+            if (!event.accepted)
+                defaultKeyAction(event, 0)
+        }
     }
-}
 }

@@ -42,9 +42,9 @@ Utils.NavigableFocusScope {
             id: instanciator
             function perform(id){
                 switch(id){
-                    case 0: console.log("not implemented"); break;
-                    case 1: contextMenu.model.indexed = !contextMenu.model.indexed; break;
-                    default: console.log("unknown id:",id)
+                case 0: console.log("not implemented"); break;
+                case 1: contextMenu.model.indexed = !contextMenu.model.indexed; break;
+                default: console.log("unknown id:",id)
                 }
                 contextMenu.close()
             }
@@ -233,50 +233,50 @@ Utils.NavigableFocusScope {
         }
     }
 
-   Component{
-       id: gridComponent
+    Component{
+        id: gridComponent
 
-       Utils.KeyNavigableGridView {
-           id: gridView_id
-           height: view.height
-           width: view.width
+        Utils.KeyNavigableGridView {
+            id: gridView_id
+            height: view.height
+            width: view.width
 
-           model: delegateModel.parts.grid
-           modelCount: delegateModel.items.count
-           currentIndex: view.currentIndexProvider
+            model: delegateModel.parts.grid
+            modelCount: delegateModel.items.count
+            currentIndex: view.currentIndexProvider
 
-           focus: true
+            focus: true
 
-           cellWidth: VLCStyle.network_normal + VLCStyle.margin_large
-           cellHeight: VLCStyle.network_normal + VLCStyle.margin_xlarge
+            cellWidth: VLCStyle.network_normal + VLCStyle.margin_large
+            cellHeight: VLCStyle.network_normal + VLCStyle.margin_xlarge
 
-           onSelectAll: delegateModel.selectAll()
-           onSelectionUpdated:  delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-           onActionAtIndex: delegateModel.actionAtIndex(index)
+            onSelectAll: delegateModel.selectAll()
+            onSelectionUpdated:  delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+            onActionAtIndex: delegateModel.actionAtIndex(index)
 
-           navigationParent: root
-       }
-   }
+            navigationParent: root
+        }
+    }
 
-   Component{
-       id: listComponent
-       Utils.KeyNavigableListView {
-           height: view.height
-           width: view.width
-           model: delegateModel.parts.list
-           modelCount: delegateModel.items.count
-           currentIndex: view.currentIndexProvider
+    Component{
+        id: listComponent
+        Utils.KeyNavigableListView {
+            height: view.height
+            width: view.width
+            model: delegateModel.parts.list
+            modelCount: delegateModel.items.count
+            currentIndex: view.currentIndexProvider
 
-           focus: true
-           spacing: VLCStyle.margin_xxxsmall
+            focus: true
+            spacing: VLCStyle.margin_xxxsmall
 
-           onSelectAll: delegateModel.selectAll()
-           onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-           onActionAtIndex: delegateModel.actionAtIndex(index)
+            onSelectAll: delegateModel.selectAll()
+            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+            onActionAtIndex: delegateModel.actionAtIndex(index)
 
-           navigationParent: root
-       }
-   }
+            navigationParent: root
+        }
+    }
 
     Utils.StackViewExt {
         id: view

@@ -325,7 +325,7 @@ Utils.NavigableFocusScope {
         id: filter
         source: rootQMLView
         filterEnabled: controlBarView.state === "visible"
-            && (controlBarView.focus || topcontrolView.focus)
+                       && (controlBarView.focus || topcontrolView.focus)
         Keys.onPressed: toolbarAutoHide.setVisible(5000)
     }
 

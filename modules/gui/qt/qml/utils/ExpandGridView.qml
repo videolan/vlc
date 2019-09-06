@@ -442,9 +442,9 @@ NavigableFocusScope {
         } else if (event.key === Qt.Key_PageDown || event.matches(StandardKey.MoveToNextPage) ||event.matches(StandardKey.SelectNextPage)) {
             newIndex = Math.min(root.modelCount - 1, currentIndex + colCount * 5)
         } else if (event.key === Qt.Key_Up || event.matches(StandardKey.MoveToPreviousLine) ||event.matches(StandardKey.SelectPreviousLine)) {
-             if (Math.floor(currentIndex / colCount) !== 0) { //we are not on the first line
+            if (Math.floor(currentIndex / colCount) !== 0) { //we are not on the first line
                 newIndex = Math.max(0, currentIndex - colCount)
-             }
+            }
         } else if (event.key === Qt.Key_PageUp || event.matches(StandardKey.MoveToPreviousPage) ||event.matches(StandardKey.SelectPreviousPage)) {
             newIndex = Math.max(0, currentIndex - colCount * 5)
         }

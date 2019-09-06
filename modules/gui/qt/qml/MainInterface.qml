@@ -127,7 +127,7 @@ Rectangle {
                 target: player
                 onPlayingStateChanged: {
                     if (player.playingState === PlayerController.PLAYING_STATE_STOPPED
-                        && history.current.view === "player") {
+                            && history.current.view === "player") {
                         history.previous(History.Go)
                     }
                 }
@@ -137,8 +137,8 @@ Rectangle {
                 target: player.videoTracks
                 onDataChanged: {
                     if (player.videoTracks.rowCount() > 0
-                        && player.playingState === PlayerController.PLAYING_STATE_PLAYING
-                        && history.current.view !== "player") {
+                            && player.playingState === PlayerController.PLAYING_STATE_PLAYING
+                            && history.current.view !== "player") {
                         history.push(["player"], History.Go)
                     }
                 }

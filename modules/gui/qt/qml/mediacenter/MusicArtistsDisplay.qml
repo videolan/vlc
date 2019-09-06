@@ -149,8 +149,8 @@ Utils.NavigableFocusScope {
                     width: albumSubView.width
                     focus: false
                     artist: (artistList.currentIndex >= 0)
-                        ? delegateModel.items.get(artistList.currentIndex).model
-                        : ({})
+                            ? delegateModel.items.get(artistList.currentIndex).model
+                            : ({})
                 }
 
                 focus: true

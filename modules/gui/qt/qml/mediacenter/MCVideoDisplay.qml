@@ -41,50 +41,50 @@ Utils.NavigableFocusScope {
     }
 
     Utils.MenuExt {
-           id: contextMenu
-           property var model: ({})
-           closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
+        id: contextMenu
+        property var model: ({})
+        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
 
-           Utils.MenuItemExt {
-               id: playMenuItem
-               text: "Play from start"
-               onTriggered: medialib.addAndPlay( contextMenu.model.id )
-           }
-           Utils.MenuItemExt {
-               text: "Play all"
-               onTriggered: console.log("not implemented")
-           }
-           Utils.MenuItemExt {
-               text: "Play as audio"
-               onTriggered: console.log("not implemented")
-           }
-           Utils.MenuItemExt {
-               text: "Enqueue"
-               onTriggered: medialib.addToPlaylist( contextMenu.model.id )
-           }
-           Utils.MenuItemExt {
-               enabled: medialib.gridView
-               text: "Information"
-               onTriggered: {
-                   view.currentItem.switchExpandItem(contextMenu.model.index, view.currentItem.currentItem)
-               }
-           }
-           Utils.MenuItemExt {
-               text: "Download subtitles"
-               onTriggered: console.log("not implemented")
-           }
-           Utils.MenuItemExt {
-               text: "Add to playlist"
-               onTriggered: console.log("not implemented")
-           }
-           Utils.MenuItemExt {
-               text: "Delete"
-               onTriggered: deleteDialog.open()
-           }
+        Utils.MenuItemExt {
+            id: playMenuItem
+            text: "Play from start"
+            onTriggered: medialib.addAndPlay( contextMenu.model.id )
+        }
+        Utils.MenuItemExt {
+            text: "Play all"
+            onTriggered: console.log("not implemented")
+        }
+        Utils.MenuItemExt {
+            text: "Play as audio"
+            onTriggered: console.log("not implemented")
+        }
+        Utils.MenuItemExt {
+            text: "Enqueue"
+            onTriggered: medialib.addToPlaylist( contextMenu.model.id )
+        }
+        Utils.MenuItemExt {
+            enabled: medialib.gridView
+            text: "Information"
+            onTriggered: {
+                view.currentItem.switchExpandItem(contextMenu.model.index, view.currentItem.currentItem)
+            }
+        }
+        Utils.MenuItemExt {
+            text: "Download subtitles"
+            onTriggered: console.log("not implemented")
+        }
+        Utils.MenuItemExt {
+            text: "Add to playlist"
+            onTriggered: console.log("not implemented")
+        }
+        Utils.MenuItemExt {
+            text: "Delete"
+            onTriggered: deleteDialog.open()
+        }
 
-           onClosed: contextMenu.parent.forceActiveFocus()
+        onClosed: contextMenu.parent.forceActiveFocus()
 
-       }
+    }
     Utils.SelectableDelegateModel {
         id: videosDelegate
 
@@ -106,42 +106,42 @@ Utils.NavigableFocusScope {
     Component {
         id: gridComponent
 
-                    VideoExpandableGrid {
-                        id: videosGV
-                        property Item currentItem: Item{}
+        VideoExpandableGrid {
+            id: videosGV
+            property Item currentItem: Item{}
 
-                        activeFocusOnTab:true
-                        model: videosDelegate
-                        modelCount: videosDelegate.items.count
+            activeFocusOnTab:true
+            model: videosDelegate
+            modelCount: videosDelegate.items.count
 
-                        headerDelegate: Utils.LabelSeparator {
-                            id: videosSeparator
-                            width: videosGV.width
-                            text: qsTr("Videos")
-                        }
+            headerDelegate: Utils.LabelSeparator {
+                id: videosSeparator
+                width: videosGV.width
+                text: qsTr("Videos")
+            }
 
 
-                        expandDelegateImplicitHeight: view.height/3
-                        expandDelegateWidth: view.width
+            expandDelegateImplicitHeight: view.height/3
+            expandDelegateWidth: view.width
 
-                        delegate: VideoGridItem {
-                            id: videoGridItem
+            delegate: VideoGridItem {
+                id: videoGridItem
 
-                            onItemClicked : {
-                                if (key == Qt.RightButton){
-                                    contextMenu.model = videoGridItem.model
-                                    contextMenu.popup(menuParent)
-                                }
-                                videosDelegate.updateSelection( modifier , videosGV.currentIndex, index)
-                                videosGV.currentIndex = index
-                                videosGV.forceActiveFocus()
-                                videosGV.renderLayout()
-                            }
-                        }
+                onItemClicked : {
+                    if (key == Qt.RightButton){
+                        contextMenu.model = videoGridItem.model
+                        contextMenu.popup(menuParent)
+                    }
+                    videosDelegate.updateSelection( modifier , videosGV.currentIndex, index)
+                    videosGV.currentIndex = index
+                    videosGV.forceActiveFocus()
+                    videosGV.renderLayout()
+                }
+            }
 
-                        navigationParent: root
+            navigationParent: root
 
-                        /*
+            /*
                          *define the intial position/selection
                          * This is done on activeFocus rather than Component.onCompleted because videosDelegate.
                          * selectedGroup update itself after this event
@@ -152,7 +152,7 @@ Utils.NavigableFocusScope {
                 }
             }
 
-                    }
+        }
 
     }
 
@@ -175,21 +175,21 @@ Utils.NavigableFocusScope {
         }
     }
 
-        Utils.StackViewExt {
-            id: view
-            anchors.fill:parent
-            clip: true
-            focus: true
-            initialItem: medialib.gridView ? gridComponent : listComponent
-            Connections {
-                target: medialib
-                onGridViewChanged: {
-                    if (medialib.gridView)
-                        view.replace(gridComponent)
-                    else
-                        view.replace(listComponent)
-                }
+    Utils.StackViewExt {
+        id: view
+        anchors.fill:parent
+        clip: true
+        focus: true
+        initialItem: medialib.gridView ? gridComponent : listComponent
+        Connections {
+            target: medialib
+            onGridViewChanged: {
+                if (medialib.gridView)
+                    view.replace(gridComponent)
+                else
+                    view.replace(listComponent)
             }
+        }
 
     }
     Label {

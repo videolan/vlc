@@ -82,8 +82,8 @@ Rectangle {
             Layout.preferredHeight: VLCStyle.icon_normal
             Layout.preferredWidth: VLCStyle.icon_normal
             imageSource: !model.indexed ? "qrc:///buttons/playlist/playlist_add.svg" :
-                ((mouse.containsMouse || activeFocus) ? "qrc:///toolbar/clear.svg" :
-                                       "qrc:///valid.svg" )
+                                          ((mouse.containsMouse || activeFocus) ? "qrc:///toolbar/clear.svg" :
+                                                                                  "qrc:///valid.svg" )
             onClicked: {
                 root.indexClicked(mouse.buttons, mouse.modifiers);
             }

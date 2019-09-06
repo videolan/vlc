@@ -105,17 +105,17 @@ NavigableFocusScope {
                         color: VLCStyle.colors.bg
                         radius: height / 10
 
-                    Row {
-                        anchors {
-                            fill: parent
-                        }
-                        Repeater {
-                            model: sortModel
+                        Row {
+                            anchors {
+                                fill: parent
+                            }
+                            Repeater {
+                                model: sortModel
 
-                            Item {
-                                height: parent.height
-                                width: model.width * view.width
-                                Layout.alignment: Qt.AlignVCenter
+                                Item {
+                                    height: parent.height
+                                    width: model.width * view.width
+                                    Layout.alignment: Qt.AlignVCenter
                                     Loader{
                                         anchors.fill: parent
                                         sourceComponent: colDelegate
@@ -125,9 +125,9 @@ NavigableFocusScope {
 
                                     }
 
+                                }
                             }
                         }
-                    }   
                     }
                 }
             }
