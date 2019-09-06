@@ -114,7 +114,6 @@ Utils.NavigableFocusScope {
                         model: videosDelegate
                         modelCount: videosDelegate.items.count
 
-                        headerHeight: VLCStyle.fontSize_xxlarge + VLCStyle.margin_large * 2
                         headerDelegate: Utils.LabelSeparator {
                             id: videosSeparator
                             width: videosGV.width

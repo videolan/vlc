@@ -27,23 +27,11 @@ import "qrc:///style/"
 
 Rectangle {
     id: root
-    property var artist: undefined
-    onArtistChanged: {
-        if (artist != undefined) {
-            artistImage.source = artist.cover || VLCStyle.noArtArtist
-            artistName.text = artist.name
-        }
-        else {
-            artistImage.source = VLCStyle.noArtArtist
-            artistName.text = ""
-        }
-    }
+    property var artist: ({})
 
     color: VLCStyle.colors.bg
 
-    property int contentY: 0
     height: VLCStyle.heightBar_xlarge
-
 
     Rectangle {
         id: artistImageContainer
@@ -61,7 +49,7 @@ Rectangle {
 
         Image {
             id: artistImage
-            source: VLCStyle.noArtArtist
+            source: artist.cover || VLCStyle.noArtArtist
             fillMode: Image.PreserveAspectCrop
             anchors.fill: parent
         }
@@ -78,7 +66,7 @@ Rectangle {
 
     Text {
         id: artistName
-        text: ""
+        text: artist.name || qsTr("No artist")
 
         anchors {
             verticalCenter: parent.verticalCenter
@@ -94,35 +82,4 @@ Rectangle {
         elide: Text.ElideRight
         color: VLCStyle.colors.text
     }
-
-
-    states: [
-        State {
-            name: "full"
-            PropertyChanges {
-                target: artistImageContainer
-                width: VLCStyle.cover_small
-                height: VLCStyle.cover_small
-            }
-            PropertyChanges {
-                target: artistName
-                font.pixelSize: VLCStyle.fontSize_xxxlarge
-            }
-            when: contentY < VLCStyle.heightBar_large
-        },
-        State {
-            name: "small"
-            PropertyChanges {
-                target: artistImageContainer
-                width: VLCStyle.icon_normal
-                height: VLCStyle.icon_normal
-            }
-            PropertyChanges {
-                target: artistName
-                font.pixelSize: VLCStyle.fontSize_large
-                anchors.leftMargin: VLCStyle.margin_small
-            }
-            when: contentY >= VLCStyle.heightBar_large
-        }
-    ]
 }
