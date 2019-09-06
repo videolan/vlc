@@ -78,8 +78,6 @@ struct decoder_owner
 
     vlc_thread_t     thread;
 
-    void (*pf_update_stat)( struct decoder_owner *, unsigned decoded, unsigned lost );
-
     /* Some decoders require already packetized data (ie. not truncated) */
     decoder_t *p_packetizer;
     bool b_packetizer;
@@ -1091,7 +1089,7 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
 
     int success = ModuleThread_PlayVideo( p_owner, p_pic );
 
-    p_owner->pf_update_stat( p_owner, 1, success != VLC_SUCCESS ? 1 : 0 );
+    ModuleThread_UpdateStatVideo( p_owner, 1, success != VLC_SUCCESS ? 1 : 0 );
 }
 
 static int thumbnailer_update_format( decoder_t *p_dec )
@@ -1215,7 +1213,7 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
 
     int success = ModuleThread_PlayAudio( p_owner, p_aout_buf );
 
-    p_owner->pf_update_stat( p_owner, 1, success != VLC_SUCCESS ? 1 : 0 );
+    ModuleThread_UpdateStatAudio( p_owner, 1, success != VLC_SUCCESS ? 1 : 0 );
 }
 
 static void ModuleThread_PlaySpu( struct decoder_owner *p_owner, subpicture_t *p_subpic )
@@ -1846,11 +1844,9 @@ static struct decoder_owner * CreateDecoder( vlc_object_t *p_parent,
                 p_dec->cbs = &dec_video_cbs;
             else
                 p_dec->cbs = &dec_thumbnailer_cbs;
-            p_owner->pf_update_stat = ModuleThread_UpdateStatVideo;
             break;
         case AUDIO_ES:
             p_dec->cbs = &dec_audio_cbs;
-            p_owner->pf_update_stat = ModuleThread_UpdateStatAudio;
             break;
         case SPU_ES:
             p_dec->cbs = &dec_spu_cbs;
