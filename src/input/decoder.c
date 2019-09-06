@@ -1067,7 +1067,7 @@ static int ModuleThread_PlayVideo( struct decoder_owner *p_owner, picture_t *p_p
 }
 
 static void ModuleThread_UpdateStatVideo( struct decoder_owner *p_owner,
-                                          unsigned decoded, unsigned lost )
+                                          unsigned lost )
 {
     unsigned displayed = 0;
 
@@ -1079,7 +1079,7 @@ static void ModuleThread_UpdateStatVideo( struct decoder_owner *p_owner,
         lost += vout_lost;
     }
 
-    decoder_Notify(p_owner, on_new_video_stats, decoded, lost, displayed);
+    decoder_Notify(p_owner, on_new_video_stats, 1, lost, displayed);
 }
 
 static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
@@ -1089,7 +1089,7 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
 
     int success = ModuleThread_PlayVideo( p_owner, p_pic );
 
-    ModuleThread_UpdateStatVideo( p_owner, 1, success != VLC_SUCCESS ? 1 : 0 );
+    ModuleThread_UpdateStatVideo( p_owner, success != VLC_SUCCESS ? 1 : 0 );
 }
 
 static int thumbnailer_update_format( decoder_t *p_dec )
@@ -1192,7 +1192,7 @@ static int ModuleThread_PlayAudio( struct decoder_owner *p_owner, block_t *p_aud
 }
 
 static void ModuleThread_UpdateStatAudio( struct decoder_owner *p_owner,
-                                          unsigned decoded, unsigned lost )
+                                          unsigned lost )
 {
     unsigned played = 0;
 
@@ -1204,7 +1204,7 @@ static void ModuleThread_UpdateStatAudio( struct decoder_owner *p_owner,
         lost += aout_lost;
     }
 
-    decoder_Notify(p_owner, on_new_audio_stats, decoded, lost, played);
+    decoder_Notify(p_owner, on_new_audio_stats, 1, lost, played);
 }
 
 static void ModuleThread_QueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
@@ -1213,7 +1213,7 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
 
     int success = ModuleThread_PlayAudio( p_owner, p_aout_buf );
 
-    ModuleThread_UpdateStatAudio( p_owner, 1, success != VLC_SUCCESS ? 1 : 0 );
+    ModuleThread_UpdateStatAudio( p_owner, success != VLC_SUCCESS ? 1 : 0 );
 }
 
 static void ModuleThread_PlaySpu( struct decoder_owner *p_owner, subpicture_t *p_subpic )
