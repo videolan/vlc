@@ -76,18 +76,14 @@ Utils.NavigableFocusScope {
             }
 
             onPlayClicked: {
-                console.log('Clicked on play : '+model.name);
                 medialib.addAndPlay( model.id )
             }
             onAddToPlaylistClicked: {
-                console.log('Clicked on addToPlaylist : '+model.name);
                 medialib.addToPlaylist( model.id );
             }
         }
 
         function actionAtIndex(index) {
-            console.log("actionAtIndex", index)
-            artistBanner.artist = delegateModel.items.get(index).model
             if (delegateModel.selectedGroup.count > 1) {
                 var list = []
                 for (var i = 0; i < delegateModel.selectedGroup.count; i++)
@@ -146,30 +142,30 @@ Utils.NavigableFocusScope {
             height: parent.height
 
             property alias currentIndex: albumSubView.currentIndex
-            ColumnLayout {
-                anchors.fill: parent
-                ArtistTopBanner {
-                    id: artistBanner
-                    Layout.fillWidth: true
-                    focus: false
-                    //contentY: albumsView.contentY
-                    contentY: 0
-                    artist: undefined
-                }
-                MusicAlbumsDisplay {
-                    id: albumSubView
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    focus: true
-                    parentId: artistId
-                    onActionLeft: artistList.focus = true
 
-                    onActionRight: root.actionRight(index)
-                    onActionUp: root.actionUp(index)
-                    onActionDown: root.actionDown(index)
-                    onActionCancel: root.actionCancel(index)
+            MusicAlbumsDisplay {
+                id: albumSubView
+                anchors.fill: parent
+
+                header: ArtistTopBanner {
+                    id: artistBanner
+                    width: albumSubView.width
+                    focus: false
+                    artist: (artistList.currentIndex >= 0)
+                        ? delegateModel.items.get(artistList.currentIndex).model
+                        : ({})
                 }
+
+                focus: true
+                parentId: artistId
+                onActionLeft: artistList.focus = true
+
+                onActionRight: root.actionRight(index)
+                onActionUp: root.actionUp(index)
+                onActionDown: root.actionDown(index)
+                onActionCancel: root.actionCancel(index)
             }
+
         }
     }
 
