@@ -19,6 +19,7 @@ libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 	$(UNPACK)
 	$(APPLY) $(SRC)/ogg/libogg-configure.patch
 	$(APPLY) $(SRC)/ogg/libogg-disable-check.patch
+	$(APPLY) $(SRC)/ogg/libogg-uint-macos.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
