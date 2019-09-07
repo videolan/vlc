@@ -346,17 +346,17 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
         if ( f_fps < 0.001f ) f_fps = 0.001f;
         p_sys->frame_rate_den = 1000;
         p_sys->frame_rate_num = 1000 * f_fps;
-        date_Init( &p_sys->dts, p_sys->frame_rate_num, p_sys->frame_rate_den );
+        date_Init( &p_sys->dts, 2 * p_sys->frame_rate_num, p_sys->frame_rate_den );
     }
     else
-        date_Init( &p_sys->dts, 25000, 1000 );
+        date_Init( &p_sys->dts, 2 * 30000, 1000 );
     date_Set( &p_sys->dts, VLC_TS_0 );
 
     /* Load the mpegvideo packetizer */
     es_format_Init( &fmt, VIDEO_ES, i_codec );
     if( f_fps )
     {
-        fmt.video.i_frame_rate = p_sys->dts.i_divider_num;
+        fmt.video.i_frame_rate = p_sys->dts.i_divider_num >> 1;
         fmt.video.i_frame_rate_base = p_sys->dts.i_divider_den;
     }
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, psz_module );
@@ -458,22 +458,14 @@ static int Demux( demux_t *p_demux)
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
             if( frame )
             {
-                if( !p_sys->frame_rate_den )
+                if( p_sys->p_packetizer->fmt_out.video.i_frame_rate_base &&
+                    p_sys->p_packetizer->fmt_out.video.i_frame_rate_base != p_sys->frame_rate_den &&
+                    p_sys->p_packetizer->fmt_out.video.i_frame_rate &&
+                    p_sys->p_packetizer->fmt_out.video.i_frame_rate_base != p_sys->frame_rate_num )
                 {
-                    /* Use packetizer's one */
-                    if( p_sys->p_packetizer->fmt_out.video.i_frame_rate_base &&
-                        p_sys->p_packetizer->fmt_out.video.i_frame_rate )
-                    {
-                        p_sys->frame_rate_num = p_sys->p_packetizer->fmt_out.video.i_frame_rate;
-                        p_sys->frame_rate_den = p_sys->p_packetizer->fmt_out.video.i_frame_rate_base;
-                    }
-                    else
-                    {
-                        p_sys->frame_rate_num = 25000;
-                        p_sys->frame_rate_den = 1000;
-                    }
-                    date_Init( &p_sys->dts, 2 * p_sys->frame_rate_num, p_sys->frame_rate_den );
-                    date_Set( &p_sys->dts, VLC_TS_0 );
+                    p_sys->frame_rate_num = p_sys->p_packetizer->fmt_out.video.i_frame_rate;
+                    p_sys->frame_rate_den = p_sys->p_packetizer->fmt_out.video.i_frame_rate_base;
+                    date_Change( &p_sys->dts, 2 * p_sys->frame_rate_num, p_sys->frame_rate_den );
                     msg_Dbg( p_demux, "using %.2f fps", (double) p_sys->frame_rate_num / p_sys->frame_rate_den );
                 }
 
