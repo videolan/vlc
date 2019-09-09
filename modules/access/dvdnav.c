@@ -993,6 +993,7 @@ static int Demux( demux_t *p_demux )
                         vlc_mutex_unlock( &p_sys->event_lock );
                     }
                     es_out_Del( p_sys->p_tf_out, tk->es );
+                    tk->es = NULL;
                 }
             }
             tk->b_configured = false;
