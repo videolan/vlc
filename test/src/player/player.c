@@ -625,7 +625,8 @@ create_mock_media(const char *name, const struct media_params *params)
     assert(params);
     char *url;
     int ret = asprintf(&url,
-        "mock://video_track_count=%zu;audio_track_count=%zu;sub_track_count=%zu;"
+        "mock://video_width=4;video_height=4;"
+        "video_track_count=%zu;audio_track_count=%zu;sub_track_count=%zu;"
         "program_count=%zu;video_packetized=%d;audio_packetized=%d;"
         "sub_packetized=%d;length=%"PRId64";title_count=%zu;chapter_count=%zu;"
         "can_seek=%d;can_pause=%d;error=%d;null_names=%d",
