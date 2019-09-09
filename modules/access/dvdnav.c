@@ -977,7 +977,11 @@ static int Demux( demux_t *p_demux )
             if( tk->b_configured )
             {
                 es_format_Clean( &tk->fmt );
-                if( tk->es ) es_out_Del( p_demux->out, tk->es );
+                if( tk->es ) 
+                {
+                    es_out_Del( p_demux->out, tk->es );
+                    tk->es = NULL;
+                }
             }
             tk->b_configured = false;
         }
