@@ -1040,6 +1040,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
         }
         break;
+    case DEMUX_GET_NORMAL_TIME:
+        if ((p_sys->b_access_control && !EITCurrentEventTime( p_pmt, p_sys, NULL, NULL))
+         || (!p_pmt || p_pmt->pcr.i_current == -1 || p_pmt->pcr.i_first == -1))
+            return VLC_EGENERIC; /* use VLC_TICK_0 as Normal Play Time*/
+
+        /* Use the first pcr of the current program as Normal Play Time */
+        *va_arg( args, vlc_tick_t * ) = FROM_SCALE( p_pmt->pcr.i_first );
+        return VLC_SUCCESS;
 
     case DEMUX_GET_LENGTH:
         if( p_sys->b_access_control )
