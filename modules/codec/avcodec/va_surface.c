@@ -176,14 +176,14 @@ void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)
 
 int va_pool_Open(vlc_va_t *va, const struct va_pool_cfg *cbs, va_pool_t *va_pool)
 {
+    va_pool->callbacks = cbs;
+
     /* */
     if (cbs->pf_create_device(va)) {
         msg_Err(va, "Failed to create device");
         return VLC_EGENERIC;
     }
     msg_Dbg(va, "CreateDevice succeed");
-
-    va_pool->callbacks = cbs;
 
     return VLC_SUCCESS;
 }

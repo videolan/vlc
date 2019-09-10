@@ -476,8 +476,10 @@ static int D3dCreateDevice(vlc_va_t *va)
 static void D3dDestroyDevice(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
-    ID3D11VideoDevice_Release(sys->d3ddec);
-    ID3D11VideoContext_Release(sys->hw.video_context);
+    if (sys->d3ddec)
+        ID3D11VideoDevice_Release(sys->d3ddec);
+    if (sys->hw.video_context)
+        ID3D11VideoContext_Release(sys->hw.video_context);
     D3D11_ReleaseDevice( &sys->d3d_dev );
 }
 
