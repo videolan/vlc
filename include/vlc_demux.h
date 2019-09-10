@@ -178,6 +178,8 @@ enum demux_query_e
     DEMUX_GET_LENGTH,           /* arg1= vlc_tick_t *   res=    */
     DEMUX_GET_TIME,             /* arg1= vlc_tick_t *   res=    */
     DEMUX_SET_TIME,             /* arg1= vlc_tick_t arg2= bool b_precise   res=can fail    */
+    /* Normal or original time, used mainly by the ts module */
+    DEMUX_GET_NORMAL_TIME,      /* arg1= vlc_tick_t *   res= can fail, in that case VLC_TICK_0 will be used as NORMAL_TIME */
 
     /**
      * \todo Document

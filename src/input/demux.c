@@ -338,7 +338,8 @@ int demux_vaControlHelper( stream_t *s,
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
-
+        case DEMUX_GET_NORMAL_TIME:
+            return VLC_EGENERIC;
 
         case DEMUX_SET_POSITION:
             f = va_arg( args, double );
