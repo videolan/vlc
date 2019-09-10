@@ -128,7 +128,7 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
             return VLC_EGENERIC;
 
         /* Do a bit shift if samples are stored on LSB */
-        if (chroma != VLC_CODEC_P010)
+        if (chroma != VLC_CODEC_P010 && chroma != VLC_CODEC_P016)
             yuv_range_correction = (float)((1 << 16) - 1)
                                  / ((1 << desc->pixel_bits) - 1);
     }
