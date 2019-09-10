@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCApplication.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2016 VLC authors and VideoLAN
+ * Copyright (C) 2002-2019 VLC authors and VideoLAN
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
@@ -28,12 +28,74 @@
  *****************************************************************************/
 
 #import "VLCApplication.h"
+#import "extensions/NSString+Helpers.h"
 
 /*****************************************************************************
  * VLCApplication implementation
  *****************************************************************************/
 
+@interface VLCApplication ()
+{
+    NSURL *_appLocationURL;
+}
+
+@end
+
 @implementation VLCApplication
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(appBecameActive:)
+                                                     name:NSApplicationDidBecomeActiveNotification
+                                                   object:nil];
+        /* we need to keep a file reference to the app's current location so we can find out where
+         * it ends-up after being relocated or rename */
+        _appLocationURL = [[[NSBundle mainBundle] bundleURL] fileReferenceURL];
+
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)appBecameActive:(NSNotification *)aNotification
+{
+    if ([[[NSBundle mainBundle] bundleURL] checkResourceIsReachableAndReturnError:nil]) {
+        return;
+    }
+
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setAlertStyle:NSAlertStyleCritical];
+    [alert setMessageText:_NS("VLC has been moved or renamed")];
+    [alert setInformativeText:_NS("To prevent errors, VLC must be relaunched.\n\nIf you cannot quit immediately, click Continue, then quit and relaunch as soon as possible to avoid problems.")];
+    [alert addButtonWithTitle:_NS("Restart")];
+    [alert addButtonWithTitle:_NS("Quit")];
+    [alert addButtonWithTitle:_NS("Continue (Not Recommended)")];
+
+    NSInteger alertButton = [alert runModal];
+
+    if (alertButton == NSAlertThirdButtonReturn) {
+        return;
+    }
+
+    if (alertButton == NSAlertFirstButtonReturn) {
+        /* terminate and restart
+         * NOTE you may not use [VLCMain relaunchApplication] here as it depends on the app not having moved and WILL crash */
+        [[NSWorkspace sharedWorkspace] launchApplicationAtURL:_appLocationURL.absoluteURL
+                                                      options:NSWorkspaceLaunchNewInstance
+                                                configuration:@{}
+                                                        error:nil];
+    }
+
+    [self terminate:self];
+}
+
 // when user selects the quit menu from dock it sends a terminate:
 // but we need to send a stop: to properly exits libvlc.
 // However, we are not able to change the action-method sent by this standard menu item.
