@@ -94,6 +94,9 @@ static const struct
 #ifdef AV_PIX_FMT_P010
     {VLC_CODEC_P010, AV_PIX_FMT_P010, 0, 0, 0 },
 #endif
+#ifdef AV_PIX_FMT_P016
+    {VLC_CODEC_P016, AV_PIX_FMT_P016, 0, 0, 0 },
+#endif
 
     {VLC_CODEC_I422_9L, AV_PIX_FMT_YUV422P9LE, 0, 0, 0 },
     {VLC_CODEC_I422_9B, AV_PIX_FMT_YUV422P9BE, 0, 0, 0 },
