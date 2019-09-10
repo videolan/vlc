@@ -185,6 +185,7 @@ static const struct { vlc_fourcc_t fcc; struct fmt_desc desc; } formats[] = {
     { VLC_CODEC_NV12,           {SEMIPLANAR(2,  8, _420)} },
     { VLC_CODEC_NV21,           {SEMIPLANAR(2,  8, _420)} },
     { VLC_CODEC_P010,           {SEMIPLANAR(2, 16, _420)} },
+    { VLC_CODEC_P016,           {SEMIPLANAR(2, 16, _420)} },
     { VLC_CODEC_NV16,           {SEMIPLANAR(2,  8, _422)} },
     { VLC_CODEC_NV61,           {SEMIPLANAR(2,  8, _422)} },
     { VLC_CODEC_NV24,           {SEMIPLANAR(2,  8, _444)} },
