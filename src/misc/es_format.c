@@ -115,6 +115,9 @@ void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,
     case VLC_CODEC_P010:
         p_fmt->i_bits_per_pixel = 15;
         break;
+    case VLC_CODEC_P016:
+        p_fmt->i_bits_per_pixel = 20;
+        break;
     case VLC_CODEC_I411:
     case VLC_CODEC_YV12:
     case VLC_CODEC_I420:

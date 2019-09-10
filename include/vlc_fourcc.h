@@ -291,6 +291,8 @@
 #define VLC_CODEC_NV42            VLC_FOURCC('N','V','4','2')
 /* 2 planes Y/UV 4:2:0 10-bit */
 #define VLC_CODEC_P010            VLC_FOURCC('P','0','1','0')
+/* 2 planes Y/UV 4:2:0 16-bit */
+#define VLC_CODEC_P016            VLC_FOURCC('P','0','1','6')
 
 /* Packed YUV */
 
