@@ -56,11 +56,12 @@ static inline void input_SendEventCapabilities(input_thread_t *p_input,
 
 static inline void input_SendEventTimes(input_thread_t *p_input,
                                         double f_position, vlc_tick_t i_time,
+                                        vlc_tick_t i_normal_time,
                                         vlc_tick_t i_length)
 {
     input_SendEvent(p_input, &(struct vlc_input_event) {
         .type = INPUT_EVENT_TIMES,
-        .times = { f_position, i_time, i_length }
+        .times = { f_position, i_time, i_normal_time, i_length }
     });
 }
 

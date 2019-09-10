@@ -161,6 +161,7 @@ struct vlc_input_event_times
 {
     float percentage;
     vlc_tick_t ms;
+    vlc_tick_t normal_time;
     vlc_tick_t length;
 };
 
@@ -463,6 +464,7 @@ typedef struct input_thread_private_t
     bool        b_recording;
     bool        b_thumbnailing;
     float       rate;
+    vlc_tick_t  normal_time;
 
     /* Playtime configuration and state */
     vlc_tick_t  i_start;    /* :start-time,0 by default */

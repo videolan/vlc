@@ -3309,6 +3309,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
     {
         double f_position = va_arg( args, double );
         vlc_tick_t i_time = va_arg( args, vlc_tick_t );
+        vlc_tick_t i_normal_time = va_arg( args, vlc_tick_t );
         vlc_tick_t i_length = va_arg( args, vlc_tick_t );
 
         if( !p_sys->b_buffering )
@@ -3334,12 +3335,14 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
             if( f_position < 0 )
                 f_position = 0;
 
+            assert( i_normal_time >= VLC_TICK_0 );
+
             input_SendEventTimes( p_sys->p_input, f_position, i_time,
-                                  i_length );
+                                  i_normal_time, i_length );
         }
         else
             input_SendEventTimes( p_sys->p_input, 0.0, VLC_TICK_INVALID,
-                                  i_length );
+                                  i_normal_time, i_length );
         return VLC_SUCCESS;
     }
     case ES_OUT_SET_JITTER:

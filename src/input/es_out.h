@@ -76,7 +76,7 @@ enum es_out_query_private_e
     ES_OUT_SET_FRAME_NEXT,                          /*                          res=can fail */
 
     /* Set position/time/length */
-    ES_OUT_SET_TIMES,                               /* arg1=double f_position arg2=vlc_tick_t i_time arg3=vlc_tick_t i_length res=cannot fail */
+    ES_OUT_SET_TIMES,                               /* arg1=double f_position arg2=vlc_tick_t i_time arg3=vlc_tick_t i_normal_time arg4=vlc_tick_t i_length res=cannot fail */
 
     /* Set jitter */
     ES_OUT_SET_JITTER,                              /* arg1=vlc_tick_t i_pts_delay arg2= vlc_tick_t i_pts_jitter, arg2=int i_cr_average res=cannot fail */
@@ -149,9 +149,12 @@ static inline int es_out_SetFrameNext( es_out_t *p_out )
 {
     return es_out_Control( p_out, ES_OUT_SET_FRAME_NEXT );
 }
-static inline void es_out_SetTimes( es_out_t *p_out, double f_position, vlc_tick_t i_time, vlc_tick_t i_length )
+static inline void es_out_SetTimes( es_out_t *p_out, double f_position,
+                                    vlc_tick_t i_time, vlc_tick_t i_normal_time,
+                                    vlc_tick_t i_length )
 {
-    int i_ret = es_out_Control( p_out, ES_OUT_SET_TIMES, f_position, i_time, i_length );
+    int i_ret = es_out_Control( p_out, ES_OUT_SET_TIMES, f_position, i_time,
+                                i_normal_time, i_length );
     assert( !i_ret );
 }
 static inline void es_out_SetJitter( es_out_t *p_out,

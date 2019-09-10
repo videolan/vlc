@@ -135,6 +135,7 @@ typedef struct attribute_packed
             /* FIXME Really too big (double make the whole thing too big) */
             double  f_position;
             vlc_tick_t i_time;
+            vlc_tick_t i_normal_time;
             vlc_tick_t i_length;
         } times;
         struct
@@ -1517,10 +1518,12 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     {
         double f_position = va_arg( args, double );
         vlc_tick_t i_time = va_arg( args, vlc_tick_t );
+        vlc_tick_t i_normal_time = va_arg( args, vlc_tick_t );
         vlc_tick_t i_length = va_arg( args, vlc_tick_t );
 
         p_cmd->u.control.u.times.f_position = f_position;
         p_cmd->u.control.u.times.i_time = i_time;
+        p_cmd->u.control.u.times.i_normal_time = i_normal_time;
         p_cmd->u.control.u.times.i_length = i_length;
         break;
     }
@@ -1612,6 +1615,7 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
     case ES_OUT_SET_TIMES:
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.times.f_position,
                                                p_cmd->u.control.u.times.i_time,
+                                               p_cmd->u.control.u.times.i_normal_time,
                                                p_cmd->u.control.u.times.i_length );
     case ES_OUT_SET_JITTER:
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.jitter.i_pts_delay,
