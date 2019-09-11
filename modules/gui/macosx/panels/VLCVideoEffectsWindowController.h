@@ -144,9 +144,6 @@
 @property (readwrite, weak) IBOutlet NSSlider *addLogoTransparencySlider;
 @property (readwrite, weak) IBOutlet NSButton *anaglyphCheckbox;
 
-@property (strong) VLCPopupPanelController *popupPanel;
-@property (strong) VLCTextfieldPanelController *textfieldPanel;
-
 /* text field / stepper binding values */
 /* use setter to modify gui elements */
 @property (nonatomic) int cropLeftValue;

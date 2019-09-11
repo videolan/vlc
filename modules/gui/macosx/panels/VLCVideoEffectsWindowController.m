@@ -45,6 +45,13 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 #pragma mark -
 #pragma mark Initialization
 
+@interface VLCVideoEffectsWindowController()
+{
+    VLCPopupPanelController *_popupPanel;
+    VLCTextfieldPanelController *_textfieldPanel;
+}
+@end
+
 @implementation VLCVideoEffectsWindowController
 
 + (void)initialize
@@ -81,9 +88,6 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
                                selector:@selector(saveCurrentProfileAtTerminate:)
                                    name:NSApplicationWillTerminateNotification
                                  object:nil];
-
-        self.popupPanel = [[VLCPopupPanelController alloc] init];
-        self.textfieldPanel = [[VLCTextfieldPanelController alloc] init];
 
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         if ([defaults boolForKey:@"VideoEffectApplyProfileOnStartup"]) {
@@ -789,6 +793,10 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 
 - (void)addProfile:(id)sender
 {
+    if (!_textfieldPanel) {
+        _textfieldPanel = [[VLCTextfieldPanelController alloc] init];
+    }
+
     /* show panel */
     [[_textfieldPanel window] setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
     [_textfieldPanel setTitleString:_NS("Duplicate current profile for a new profile")];
@@ -843,6 +851,10 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 
 - (void)removeProfile:(id)sender
 {
+    if (!_popupPanel) {
+        _popupPanel = [[VLCPopupPanelController alloc] init];
+    }
+
     /* show panel */
     [[_popupPanel window] setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
     [_popupPanel setTitleString:_NS("Remove a preset")];

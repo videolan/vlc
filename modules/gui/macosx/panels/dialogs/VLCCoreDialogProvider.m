@@ -156,8 +156,6 @@ static void updateProgressCallback(void *p_data,
         msg_Dbg(getIntf(), "Register dialog provider");
         [[NSBundle mainBundle] loadNibNamed:@"CoreDialogs" owner:self topLevelObjects:nil];
 
-        _errorPanel = [[VLCErrorWindowController alloc] init];
-
         intf_thread_t *p_intf = getIntf();
         /* subscribe to various interactive dialogues */
 
@@ -199,6 +197,9 @@ static void updateProgressCallback(void *p_data,
 
 - (void)displayError:(NSArray *)dialogData
 {
+    if (!_errorPanel) {
+        _errorPanel = [[VLCErrorWindowController alloc] init];
+    }
     [_errorPanel showWindow:nil];
     [_errorPanel addError:[dialogData objectAtIndex:0] withMsg:[dialogData objectAtIndex:1]];
 }

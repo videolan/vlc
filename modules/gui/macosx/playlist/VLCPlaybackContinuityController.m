@@ -63,7 +63,6 @@
                                selector:@selector(playbackStatusUpdated:)
                                    name:VLCPlayerStateChanged
                                  object:nil];
-        _resumeDialogController = [[VLCResumeDialogController alloc] init];
     }
     return self;
 }
@@ -196,6 +195,10 @@
         return;
     }
 
+    if (!_resumeDialogController) {
+        _resumeDialogController = [[VLCResumeDialogController alloc] init];
+    }
+
     [_resumeDialogController showWindowWithItem:inputItem
                                withLastPosition:(lastPlaybackPosition * duration) / 1000
                                 completionBlock:completionBlock];
@@ -226,6 +229,10 @@
     if (!ask) { // always
         completionBlock(RESUME_NOW);
         return;
+    }
+
+    if (!_resumeDialogController) {
+        _resumeDialogController = [[VLCResumeDialogController alloc] init];
     }
 
     [_resumeDialogController showWindowWithItem:inputItem

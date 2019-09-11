@@ -207,8 +207,7 @@ static VLCMain *sharedInstance = nil;
     if (self) {
         _p_intf = getIntf();
 
-        VLCApplication *sharedApplication = [VLCApplication sharedApplication];
-        sharedApplication.delegate = self;
+        [VLCApplication sharedApplication].delegate = self;
 
         _playlistController = [[VLCPlaylistController alloc] initWithPlaylist:vlc_intf_GetMainPlaylist(_p_intf)];
         _libraryController = [[VLCLibraryController alloc] init];
@@ -220,11 +219,7 @@ static VLCMain *sharedInstance = nil;
         _coredialogs = [[VLCCoreDialogProvider alloc] init];
 
         _mainmenu = [[VLCMainMenu alloc] init];
-        _statusBarIcon = [[VLCStatusBarIcon alloc] init];
-
         _voutProvider = [[VLCVideoOutputProvider alloc] init];
-
-        _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
 
         // Load them here already to apply stored profiles
         _videoEffectsPanel = [[VLCVideoEffectsWindowController alloc] init];
@@ -232,21 +227,6 @@ static VLCMain *sharedInstance = nil;
 
         if ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen)
             [_playlistController.playerController setFullscreen:YES];
-
-        if (var_InheritInteger(_p_intf, "macosx-icon-change")) {
-            /* After day 354 of the year, the usual VLC cone is replaced by another cone
-             * wearing a Father Xmas hat.
-             * Note: this icon doesn't represent an endorsement of The Coca-Cola Company.
-             */
-            NSCalendar *gregorian =
-            [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-            NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSCalendarUnitDay inUnit:NSCalendarUnitYear forDate:[NSDate date]];
-
-            if (dayOfYear >= 354)
-                [sharedApplication setApplicationIconImage: [NSImage imageNamed:@"VLC-Xmas"]];
-            else
-                [sharedApplication setApplicationIconImage: [NSImage imageNamed:@"VLC"]];
-        }
     }
 
     return self;
@@ -261,17 +241,35 @@ static VLCMain *sharedInstance = nil;
 #ifdef HAVE_SPARKLE
     [[SUUpdater sharedUpdater] setDelegate:self];
 #endif
+
+    if (var_InheritInteger(_p_intf, "macosx-icon-change")) {
+        /* After day 354 of the year, the usual VLC cone is replaced by another cone
+         * wearing a Father Xmas hat.
+         * Note: this icon doesn't represent an endorsement of The Coca-Cola Company.
+         */
+        NSCalendar *gregorian =
+        [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+        NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSCalendarUnitDay inUnit:NSCalendarUnitYear forDate:[NSDate date]];
+
+        if (dayOfYear >= 354)
+            [[VLCApplication sharedApplication] setApplicationIconImage: [NSImage imageNamed:@"VLC-Xmas"]];
+        else
+            [[VLCApplication sharedApplication] setApplicationIconImage: [NSImage imageNamed:@"VLC"]];
+    }
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     _launched = YES;
+    _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
     [_libraryWindowController.window makeKeyAndOrderFront:nil];
 
     if (!_p_intf)
         return;
 
     [self migrateOldPreferences];
+
+    _statusBarIcon = [[VLCStatusBarIcon alloc] init];
 }
 
 #pragma mark -

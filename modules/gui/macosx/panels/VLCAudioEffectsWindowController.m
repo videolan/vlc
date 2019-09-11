@@ -53,6 +53,8 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
 @interface VLCAudioEffectsWindowController ()
 {
     VLCPlayerController *_playerController;
+    VLCPopupPanelController *_popupPanel;
+    VLCTextfieldPanelController *_textfieldPanel;
 }
 @end
 
@@ -112,9 +114,6 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
     if (self) {
         dispatch_async(dispatch_get_main_queue(), ^{
             self->_playerController = [[[VLCMain sharedInstance] playlistController] playerController];
-
-            self.popupPanel = [[VLCPopupPanelController alloc] init];
-            self.textfieldPanel = [[VLCTextfieldPanelController alloc] init];
 
             NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
             if ([defaults boolForKey:@"AudioEffectApplyProfileOnStartup"])
@@ -512,6 +511,10 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
 
 - (void)addAudioEffectsProfile:(id)sender
 {
+    if (!_textfieldPanel) {
+        _textfieldPanel = [[VLCTextfieldPanelController alloc] init];
+    }
+
     /* show panel */
     [_textfieldPanel setTitleString:_NS("Duplicate current profile for a new profile")];
     [_textfieldPanel setSubTitleString:_NS("Enter a name for the new profile:")];
@@ -562,6 +565,10 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
 
 - (void)removeAudioEffectsProfile:(id)sender
 {
+    if (!_popupPanel) {
+        _popupPanel = [[VLCPopupPanelController alloc] init];
+    }
+
     /* show panel */
     [_popupPanel setTitleString:_NS("Remove a preset")];
     [_popupPanel setSubTitleString:_NS("Select the preset you would like to remove:")];
@@ -807,6 +814,10 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)addPresetAction:(id)sender
 {
+    if (!_textfieldPanel) {
+        _textfieldPanel = [[VLCTextfieldPanelController alloc] init];
+    }
+
     /* show panel */
     [_textfieldPanel setTitleString:_NS("Save current selection as new preset")];
     [_textfieldPanel setSubTitleString:_NS("Enter a name for the new preset:")];
@@ -850,6 +861,10 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)deletePresetAction:(id)sender
 {
+    if (!_popupPanel) {
+        _popupPanel = [[VLCPopupPanelController alloc] init];
+    }
+
     [_popupPanel setTitleString:_NS("Remove a preset")];
     [_popupPanel setSubTitleString:_NS("Select the preset you would like to remove:")];
     [_popupPanel setOkButtonString:_NS("Remove")];

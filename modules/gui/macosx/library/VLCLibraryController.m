@@ -64,12 +64,13 @@ float kVLCDefaultThumbnailPosition = .15;
                                           name:NSApplicationWillBecomeActiveNotification
                                         object:nil];
         [defaultNotificationCenter addObserver:self
+                                      selector:@selector(applicationWillBecomeActive:)
+                                          name:NSApplicationDidFinishLaunchingNotification
+                                        object:nil];
+        [defaultNotificationCenter addObserver:self
                                       selector:@selector(playbackStateChanged:)
                                           name:VLCPlayerStateChanged
                                         object:nil];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self lazyLoad];
-        });
     }
     return self;
 }
@@ -78,11 +79,6 @@ float kVLCDefaultThumbnailPosition = .15;
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     _p_libraryInstance = NULL;
-}
-
-- (void)lazyLoad
-{
-    [self applicationWillEnterBackground:nil];
 }
 
 - (void)applicationWillEnterBackground:(NSNotification *)aNotification

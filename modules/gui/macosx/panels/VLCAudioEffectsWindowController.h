@@ -106,9 +106,6 @@
 @property (readwrite, weak) IBOutlet NSButton *filterScaleTempoCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *filterStereoEnhancerCheckbox;
 
-@property (strong) VLCPopupPanelController *popupPanel;
-@property (strong) VLCTextfieldPanelController *textfieldPanel;
-
 /* generic */
 - (IBAction)profileSelectorAction:(id)sender;
 - (IBAction)applyProfileCheckboxChanged:(id)sender;
