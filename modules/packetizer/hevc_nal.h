@@ -35,7 +35,11 @@ enum hevc_general_profile_idc_e
     HEVC_PROFILE_IDC_MAIN_STILL_PICTURE = 3,
     HEVC_PROFILE_IDC_REXT               = 4, /* range extensions */
     HEVC_PROFILE_IDC_HIGH_THROUGHPUT    = 5,
+    HEVC_PROFILE_IDC_MULTIVIEW_MAIN     = 6,
+    HEVC_PROFILE_IDC_SCALABLE_MAIN      = 7,
+    HEVC_PROFILE_IDC_3D_MAIN            = 8,
     HEVC_PROFILE_IDC_SCREEN_EXTENDED    = 9,
+    HEVC_PROFILE_IDC_SCALABLE_REXT      = 10,
 };
 
 enum hevc_level_idc_e
