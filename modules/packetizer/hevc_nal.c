@@ -1363,6 +1363,54 @@ bool hevc_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
     return true;
 }
 
+static unsigned hevc_make_indication( const hevc_inner_profile_tier_level_t *p )
+{
+    uint8_t flags[] =
+    {
+        p->idc4to7.max_14bit_constraint_flag,
+        p->idc4to7.max_12bit_constraint_flag,
+        p->idc4to7.max_10bit_constraint_flag,
+        p->idc4to7.max_8bit_constraint_flag,
+        p->idc4to7.max_422chroma_constraint_flag,
+        p->idc4to7.max_420chroma_constraint_flag,
+        p->idc4to7.max_monochrome_constraint_flag,
+        p->idc4to7.intra_constraint_flag,
+        p->idc4to7.one_picture_only_constraint_flag,
+        p->idc4to7.lower_bit_rate_constraint_flag,
+    };
+    unsigned indication = 0;
+    for( size_t i=0; i<ARRAY_SIZE(flags); i++ )
+    {
+        if( flags[i] )
+            indication |= (1 << (ARRAY_SIZE(flags) - 1 - i));
+    }
+    return indication;
+}
+
+enum vlc_hevc_profile_e hevc_get_vlc_profile( const hevc_sequence_parameter_set_t *p_sps )
+{
+    unsigned indication = 0;
+    enum hevc_general_profile_idc_e profile = p_sps->profile_tier_level.general.profile_idc;
+    switch( profile )
+    {
+        case HEVC_PROFILE_IDC_REXT:
+            indication = hevc_make_indication( &p_sps->profile_tier_level.general ) & 0x1FF;
+            break;
+        case HEVC_PROFILE_IDC_HIGH_THROUGHPUT:
+        case HEVC_PROFILE_IDC_SCREEN_EXTENDED:
+            indication = hevc_make_indication( &p_sps->profile_tier_level.general );
+            break;
+        default:
+            break;
+    }
+
+    /* all intras have insignifiant lowest bit */
+    if( p_sps->profile_tier_level.general.idc4to7.intra_constraint_flag )
+        indication &= ~1;
+
+    return (indication << HEVC_INDICATION_SHIFT) | profile;
+}
+
 /*
  * HEVCDecoderConfigurationRecord operations
  */
