@@ -417,45 +417,45 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
     }
     else
     {
-    p_pic = decoder_NewPicture(p_dec);
-    if (unlikely(p_pic == NULL))
-        return 0;
+        p_pic = decoder_NewPicture(p_dec);
+        if (unlikely(p_pic == NULL))
+            return 0;
 
-    result = CALL_CUDA_DEC(cuCtxPushCurrent, p_sys->cuCtx);
-    if (unlikely(result != VLC_SUCCESS))
-    {
-        picture_Release(p_pic);
-        return 0;
-    }
+        result = CALL_CUDA_DEC(cuCtxPushCurrent, p_sys->cuCtx);
+        if (unlikely(result != VLC_SUCCESS))
+        {
+            picture_Release(p_pic);
+            return 0;
+        }
 
-    unsigned int i_pitch;
+        unsigned int i_pitch;
 
-    // Map decoded frame to a device pointer
-    result = CALL_CUVID( cuvidMapVideoFrame, p_sys->cudecoder, p_dispinfo->picture_index,
-                         &frameDevicePtr, &i_pitch, &params );
-    if (result != VLC_SUCCESS)
-        goto error;
-
-    // Copy decoded frame into a new VLC picture
-    size_t srcY = 0;
-    for (int i_plane = 0; i_plane < p_pic->i_planes; i_plane++) {
-        plane_t plane = p_pic->p[i_plane];
-        CUDA_MEMCPY2D cu_cpy = {
-            .srcMemoryType  = CU_MEMORYTYPE_DEVICE,
-            .srcDevice      = frameDevicePtr,
-            .srcY           = srcY,
-            .srcPitch       = i_pitch,
-            .dstMemoryType  = CU_MEMORYTYPE_HOST,
-            .dstHost        = plane.p_pixels,
-            .dstPitch       = plane.i_pitch,
-            .WidthInBytes   = i_pitch,
-            .Height         = plane.i_visible_lines,
-        };
-        result = CALL_CUDA_DEC(cuMemcpy2D, &cu_cpy);
+        // Map decoded frame to a device pointer
+        result = CALL_CUVID( cuvidMapVideoFrame, p_sys->cudecoder, p_dispinfo->picture_index,
+                            &frameDevicePtr, &i_pitch, &params );
         if (result != VLC_SUCCESS)
             goto error;
-         srcY += p_sys->decoderHeight;
-    }
+
+        // Copy decoded frame into a new VLC picture
+        size_t srcY = 0;
+        for (int i_plane = 0; i_plane < p_pic->i_planes; i_plane++) {
+            plane_t plane = p_pic->p[i_plane];
+            CUDA_MEMCPY2D cu_cpy = {
+                .srcMemoryType  = CU_MEMORYTYPE_DEVICE,
+                .srcDevice      = frameDevicePtr,
+                .srcY           = srcY,
+                .srcPitch       = i_pitch,
+                .dstMemoryType  = CU_MEMORYTYPE_HOST,
+                .dstHost        = plane.p_pixels,
+                .dstPitch       = plane.i_pitch,
+                .WidthInBytes   = i_pitch,
+                .Height         = plane.i_visible_lines,
+            };
+            result = CALL_CUDA_DEC(cuMemcpy2D, &cu_cpy);
+            if (result != VLC_SUCCESS)
+                goto error;
+            srcY += p_sys->decoderHeight;
+        }
     }
 
     // Release surface on GPU
