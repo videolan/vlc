@@ -555,6 +555,23 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     NULL,
 };
 
+static int BossCallback(vlc_object_t *p_this,
+                        const char *psz_var,
+                        vlc_value_t oldval,
+                        vlc_value_t new_val,
+                        void *p_data)
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval); VLC_UNUSED(new_val);
+    @autoreleasepool {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+            [playerController pause];
+            [[NSApplication sharedApplication] hide:nil];
+        });
+        return VLC_SUCCESS;
+    }
+}
+
 #pragma mark - controller initialization
 
 @implementation VLCPlayerController
@@ -583,6 +600,10 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
         _playerVoutListenerID = vlc_player_vout_AddListener(_p_player,
                                                             &player_vout_callbacks,
                                                             (__bridge void *)self);
+
+        libvlc_int_t *libvlc = vlc_object_instance(getIntf());
+        var_AddCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
+
         if (@available(macOS 10.12.2, *)) {
             _remoteControlService = [[VLCRemoteControlService alloc] init];
             [_remoteControlService subscribeToRemoteCommands];
@@ -594,6 +615,9 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
+    libvlc_int_t *libvlc = vlc_object_instance(getIntf());
+    var_DelCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
+
     [self onPlaybackHasTruelyEnded:nil];
     if (@available(macOS 10.12.2, *)) {
         [_remoteControlService unsubscribeFromRemoteCommands];

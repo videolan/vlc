@@ -94,10 +94,8 @@ NSString *VLCConfigurationChangedNotification = @"VLCConfigurationChangedNotific
 <NSApplicationDelegate>
 #endif
 {
-    intf_thread_t *p_intf;
-    BOOL launched;
-
-    BOOL b_active_videoplayback;
+    intf_thread_t *_p_intf;
+    BOOL _launched;
 
     VLCMainMenu *_mainmenu;
     VLCPrefs *_prefs;
@@ -115,7 +113,7 @@ NSString *VLCConfigurationChangedNotification = @"VLCConfigurationChangedNotific
     VLCLibraryWindowController *_libraryWindowController;
     VLCClickerManager *_clickerManager;
 
-    bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
+    bool _interfaceIsTerminating; /* Makes sure applicationWillTerminate will be called only once */
 }
 + (void)killInstance;
 - (void)applicationWillTerminate:(NSNotification *)notification;
@@ -167,22 +165,6 @@ void CloseIntf (vlc_object_t *p_this)
     p_interface_thread = nil;
 }
 
-#pragma mark -
-#pragma mark Variables Callback
-
-static int BossCallback(vlc_object_t *p_this, const char *psz_var,
-                        vlc_value_t oldval, vlc_value_t new_val, void *param)
-{
-    @autoreleasepool {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[[VLCMain sharedInstance] playlistController] pausePlayback];
-            [[NSApplication sharedApplication] hide:nil];
-        });
-
-        return VLC_SUCCESS;
-    }
-}
-
 /*****************************************************************************
  * VLCMain implementation
  *****************************************************************************/
@@ -223,11 +205,12 @@ static VLCMain *sharedInstance = nil;
 {
     self = [super init];
     if (self) {
-        p_intf = getIntf();
+        _p_intf = getIntf();
 
-        [VLCApplication sharedApplication].delegate = self;
+        VLCApplication *sharedApplication = [VLCApplication sharedApplication];
+        sharedApplication.delegate = self;
 
-        _playlistController = [[VLCPlaylistController alloc] initWithPlaylist:vlc_intf_GetMainPlaylist(p_intf)];
+        _playlistController = [[VLCPlaylistController alloc] initWithPlaylist:vlc_intf_GetMainPlaylist(_p_intf)];
         _libraryController = [[VLCLibraryController alloc] init];
         _continuityController = [[VLCPlaybackContinuityController alloc] init];
 
@@ -243,9 +226,6 @@ static VLCMain *sharedInstance = nil;
 
         _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
 
-        libvlc_int_t *libvlc = vlc_object_instance(p_intf);
-        var_AddCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
-
         // Load them here already to apply stored profiles
         _videoEffectsPanel = [[VLCVideoEffectsWindowController alloc] init];
         _audioEffectsPanel = [[VLCAudioEffectsWindowController alloc] init];
@@ -253,7 +233,7 @@ static VLCMain *sharedInstance = nil;
         if ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen)
             [_playlistController.playerController setFullscreen:YES];
 
-        if (var_InheritInteger(p_intf, "macosx-icon-change")) {
+        if (var_InheritInteger(_p_intf, "macosx-icon-change")) {
             /* After day 354 of the year, the usual VLC cone is replaced by another cone
              * wearing a Father Xmas hat.
              * Note: this icon doesn't represent an endorsement of The Coca-Cola Company.
@@ -263,9 +243,9 @@ static VLCMain *sharedInstance = nil;
             NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSCalendarUnitDay inUnit:NSCalendarUnitYear forDate:[NSDate date]];
 
             if (dayOfYear >= 354)
-                [[VLCApplication sharedApplication] setApplicationIconImage: [NSImage imageNamed:@"VLC-Xmas"]];
+                [sharedApplication setApplicationIconImage: [NSImage imageNamed:@"VLC-Xmas"]];
             else
-                [[VLCApplication sharedApplication] setApplicationIconImage: [NSImage imageNamed:@"VLC"]];
+                [sharedApplication setApplicationIconImage: [NSImage imageNamed:@"VLC"]];
         }
     }
 
@@ -285,24 +265,13 @@ static VLCMain *sharedInstance = nil;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    launched = YES;
+    _launched = YES;
     [_libraryWindowController.window makeKeyAndOrderFront:nil];
 
-    if (!p_intf)
+    if (!_p_intf)
         return;
 
     [self migrateOldPreferences];
-
-    /* Handle sleep notification */
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
-           name:NSWorkspaceWillSleepNotification object:nil];
-
-    // respect playlist-autostart
-    if (var_GetBool(p_intf, "playlist-autostart")) {
-        if ([_playlistController.playlistModel numberOfPlaylistItems] > 0) {
-            [_playlistController startPlaylist];
-        }
-    }
 }
 
 #pragma mark -
@@ -310,30 +279,24 @@ static VLCMain *sharedInstance = nil;
 
 - (BOOL)isTerminating
 {
-    return b_intf_terminating;
+    return _interfaceIsTerminating;
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
-    msg_Dbg(getIntf(), "applicationWillTerminate called");
-    if (b_intf_terminating)
+    if (_interfaceIsTerminating)
         return;
-    b_intf_terminating = true;
+    _interfaceIsTerminating = true;
+
     NSNotificationCenter *notiticationCenter = [NSNotificationCenter defaultCenter];
-
-    _continuityController = nil;
-
     if (notification == nil) {
         [notiticationCenter postNotificationName: NSApplicationWillTerminateNotification object: nil];
     }
-
-    libvlc_int_t *libvlc = vlc_object_instance(p_intf);
-    var_DelCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
-
     [notiticationCenter removeObserver: self];
 
     // closes all open vouts
     _voutProvider = nil;
+    _continuityController = nil;
 
     /* write cached user defaults to disk */
     CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
@@ -361,15 +324,6 @@ static VLCMain *sharedInstance = nil;
 #endif
 
 #pragma mark -
-#pragma mark Other notification
-
-/* Triggered when the computer goes to sleep */
-- (void)computerWillSleep: (NSNotification *)notification
-{
-    [_playlistController pausePlayback];
-}
-
-#pragma mark -
 #pragma mark File opening over dock icon
 
 - (void)application:(NSApplication *)o_app openFiles:(NSArray *)o_names
@@ -379,7 +333,7 @@ static VLCMain *sharedInstance = nil;
     // will add the item, but cocoa also calls this function. In this case, the
     // invocation is ignored here.
     NSArray *resultItems = o_names;
-    if (launched == NO) {
+    if (_launched == NO) {
         NSArray *launchArgs = [[NSProcessInfo processInfo] arguments];
 
         if (launchArgs) {

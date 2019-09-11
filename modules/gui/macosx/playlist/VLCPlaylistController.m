@@ -207,6 +207,10 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
                                        selector:@selector(applicationWillTerminate:)
                                            name:NSApplicationWillTerminateNotification
                                          object:nil];
+        [_defaultNotificationCenter addObserver:self
+                                       selector:@selector(applicationDidFinishLaunching:)
+                                           name:NSApplicationDidFinishLaunchingNotification
+                                         object:nil];
         _p_playlist = playlist;
 
         /* set initial values, further updates through callbacks */
@@ -226,6 +230,22 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     return self;
 }
 
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+    /* Handle sleep notification */
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+                                                           selector:@selector(computerWillSleep:)
+                                                               name:NSWorkspaceWillSleepNotification
+                                                             object:nil];
+
+    // respect playlist-autostart
+    if (var_GetBool(getIntf(), "playlist-autostart")) {
+        if ([self.playlistModel numberOfPlaylistItems] > 0) {
+            [self startPlaylist];
+        }
+    }
+}
+
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
     if (_p_playlist) {
@@ -237,8 +257,14 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     }
 }
 
+- (void)computerWillSleep:(NSNotification *)notification
+{
+    [self pausePlayback];
+}
+
 - (void)dealloc
 {
+    [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
     [_defaultNotificationCenter removeObserver:self];
 }
 
