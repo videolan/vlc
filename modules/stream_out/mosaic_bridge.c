@@ -600,7 +600,6 @@ inline static int video_update_format_decoder( decoder_t *p_dec )
 
 inline static picture_t *video_new_buffer_filter( filter_t *p_filter )
 {
-    struct decoder_owner *p_owner = p_filter->owner.sys;
     return picture_NewFromFormat( &p_filter->fmt_out.video );
 }
 
