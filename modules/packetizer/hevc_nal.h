@@ -38,6 +38,23 @@ enum hevc_general_profile_idc_e
     HEVC_PROFILE_IDC_SCREEN_EXTENDED    = 9,
 };
 
+enum hevc_level_idc_e
+{
+    HEVC_LEVEL_IDC_1   = 30, /* stored as 30 times the level number */
+    HEVC_LEVEL_IDC_2   = 60,
+    HEVC_LEVEL_IDC_2_1 = 63,
+    HEVC_LEVEL_IDC_3   = 90,
+    HEVC_LEVEL_IDC_3_1 = 93,
+    HEVC_LEVEL_IDC_4   = 120,
+    HEVC_LEVEL_IDC_4_1 = 123,
+    HEVC_LEVEL_IDC_5   = 150,
+    HEVC_LEVEL_IDC_5_1 = 153,
+    HEVC_LEVEL_IDC_5_2 = 156,
+    HEVC_LEVEL_IDC_6   = 180,
+    HEVC_LEVEL_IDC_6_1 = 183,
+    HEVC_LEVEL_IDC_6_2 = 186,
+    HEVC_LEVEL_IDC_8_5 = 255,
+};
 
 /* Values built from 9 bits mapping of the A-2 bitstream indications for conformance */
 #define HEVC_EXT_PROFILE_MONOCHROME                 0x1F9
