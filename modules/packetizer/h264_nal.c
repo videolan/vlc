@@ -58,6 +58,9 @@ enum h264_level_numbers_e
     H264_LEVEL_NUMBER_5   = 50,
     H264_LEVEL_NUMBER_5_1 = 51,
     H264_LEVEL_NUMBER_5_2 = 52,
+    H264_LEVEL_NUMBER_6   = 60,
+    H264_LEVEL_NUMBER_6_1 = 61,
+    H264_LEVEL_NUMBER_6_2 = 62,
 };
 
 const struct
@@ -82,6 +85,9 @@ const struct
     { H264_LEVEL_NUMBER_5,   { 110400 } },
     { H264_LEVEL_NUMBER_5_1, { 184320 } },
     { H264_LEVEL_NUMBER_5_2, { 184320 } },
+    { H264_LEVEL_NUMBER_6,   { 696320 } },
+    { H264_LEVEL_NUMBER_6_1, { 696320 } },
+    { H264_LEVEL_NUMBER_6_2, { 696320 } },
 };
 
 /*
