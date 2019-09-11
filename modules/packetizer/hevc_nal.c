@@ -65,6 +65,7 @@ typedef struct
         nal_u1_t intra_constraint_flag;
         nal_u1_t one_picture_only_constraint_flag;
         nal_u1_t lower_bit_rate_constraint_flag;
+        nal_u1_t max_14bit_constraint_flag;
     } idc4to7;
     struct
     {
@@ -561,8 +562,8 @@ static bool hevc_parse_inner_profile_tier_level_rbsp( bs_t *p_bs,
     p_in->non_packed_constraint_flag = bs_read1( p_bs );
     p_in->frame_only_constraint_flag = bs_read1( p_bs );
 
-    if( ( p_in->profile_idc >= 4 && p_in->profile_idc <= 7 ) ||
-        ( p_in->profile_compatibility_flag & 0x0F000000 ) )
+    if( ( p_in->profile_idc >= 4 && p_in->profile_idc <= 10 ) ||
+        ( p_in->profile_compatibility_flag & 0x0F700000 ) )
     {
         p_in->idc4to7.max_12bit_constraint_flag = bs_read1( p_bs );
         p_in->idc4to7.max_10bit_constraint_flag = bs_read1( p_bs );
@@ -573,19 +574,34 @@ static bool hevc_parse_inner_profile_tier_level_rbsp( bs_t *p_bs,
         p_in->idc4to7.intra_constraint_flag = bs_read1( p_bs );
         p_in->idc4to7.one_picture_only_constraint_flag = bs_read1( p_bs );
         p_in->idc4to7.lower_bit_rate_constraint_flag = bs_read1( p_bs );
-        (void) bs_read( p_bs, 2 );
+        if( p_in->profile_idc == 5 ||
+            p_in->profile_idc == 9 ||
+            p_in->profile_idc == 10 ||
+           (p_in->profile_compatibility_flag & 0x08600000) )
+        {
+            p_in->idc4to7.max_14bit_constraint_flag = bs_read1( p_bs );
+            bs_skip( p_bs, 33 );
+        }
+        else bs_skip( p_bs, 34 );
+    }
+    else if( p_in->profile_idc == 2 ||
+            (p_in->profile_compatibility_flag & 0x20000000) )
+    {
+        bs_skip( p_bs, 7 );
+        p_in->idc4to7.one_picture_only_constraint_flag = bs_read1( p_bs );
+        bs_skip( p_bs, 35 );
     }
     else
     {
-        (void) bs_read( p_bs, 11 );
+        bs_read( p_bs, 43 );
     }
-    (void) bs_read( p_bs, 32 );
 
     if( ( p_in->profile_idc >= 1 && p_in->profile_idc <= 5 ) ||
-        ( p_in->profile_compatibility_flag & 0x7C000000 ) )
+         p_in->profile_idc == 9 ||
+        ( p_in->profile_compatibility_flag & 0x7C400000 ) )
         p_in->idc1to5.inbld_flag = bs_read1( p_bs );
     else
-        (void) bs_read1( p_bs );
+        bs_skip( p_bs, 1 );
 
     return true;
 }
