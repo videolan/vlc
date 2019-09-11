@@ -29,11 +29,13 @@
 
 enum hevc_general_profile_idc_e
 {
-    HEVC_PROFILE_NONE               = 0,
-    HEVC_PROFILE_MAIN               = 1,
-    HEVC_PROFILE_MAIN_10            = 2,
-    HEVC_PROFILE_MAIN_STILL_PICTURE = 3,
-    HEVC_PROFILE_REXT               = 4, /* range extensions */
+    HEVC_PROFILE_IDC_NONE               = 0,
+    HEVC_PROFILE_IDC_MAIN               = 1,
+    HEVC_PROFILE_IDC_MAIN_10            = 2,
+    HEVC_PROFILE_IDC_MAIN_STILL_PICTURE = 3,
+    HEVC_PROFILE_IDC_REXT               = 4, /* range extensions */
+    HEVC_PROFILE_IDC_HIGH_THROUGHPUT    = 5,
+    HEVC_PROFILE_IDC_SCREEN_EXTENDED    = 9,
 };
 
 
