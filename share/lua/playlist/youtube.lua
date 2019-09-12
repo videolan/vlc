@@ -205,7 +205,7 @@ function pick_url( url_map, fmt, js_url )
                 local s = string.match( stream, "s=([^&,]+)" )
                 if s then
                     s = vlc.strings.decode_uri( s )
-                    vlc.msg.err( "Found "..string.len( s ).."-character scrambled signature for youtube video URL, attempting to descramble... " )
+                    vlc.msg.dbg( "Found "..string.len( s ).."-character scrambled signature for youtube video URL, attempting to descramble... " )
                     if js_url then
                         s = js_descramble( s, js_url )
                     else
