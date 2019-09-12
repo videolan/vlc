@@ -38,7 +38,9 @@
 #endif
 
 #ifdef HAVE_ALTIVEC_H
+#   undef bool
 #   include <altivec.h>
+#   define bool _Bool
 #endif
 
 /*****************************************************************************
