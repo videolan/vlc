@@ -334,6 +334,12 @@ static int login( stream_t *p_access )
     if( smb_connect( p_access, psz_login, psz_password, psz_domain )
                      != VLC_SUCCESS )
     {
+        if (var_Type(p_access, "smb-dialog-failed") != 0)
+        {
+            /* A higher priority smb module (likely smb2) already requested
+             * credentials to the users. It is useless to request it again. */
+            goto error;
+        }
         while( vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
                                    SMB_LOGIN_DIALOG_TITLE,
                                    SMB_LOGIN_DIALOG_TEXT, p_sys->netbios_name ) )
