@@ -681,6 +681,13 @@ Open(vlc_object_t *p_obj)
         if (error && *error)
             vlc_dialog_display_error(access,
                                      "SMB2 operation failed", "%s", error);
+        if (credential.i_get_order == GET_FROM_DIALOG)
+        {
+            /* Tell other smb modules (likely dsm) that we already requested
+             * credential to the users and that it it useless to try again.
+             * This avoid to show 2 login dialogs for the same access. */
+            var_Create(access, "smb-dialog-failed", VLC_VAR_VOID);
+        }
         goto error;
     }
 
