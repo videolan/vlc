@@ -669,9 +669,10 @@ Open(vlc_object_t *p_obj)
 
     if (ret != 0)
     {
-        vlc_dialog_display_error(access,
-                                 _("SMB2 operation failed"), "%s",
-                                 smb2_get_error(sys->smb2));
+        const char *error = smb2_get_error(sys->smb2);
+        if (error && *error)
+            vlc_dialog_display_error(access,
+                                     _("SMB2 operation failed"), "%s", error);
         goto error;
     }
 
