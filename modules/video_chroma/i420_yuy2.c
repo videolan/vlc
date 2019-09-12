@@ -36,7 +36,9 @@
 #include <vlc_cpu.h>
 
 #if defined (MODULE_NAME_IS_i420_yuy2_altivec) && defined(HAVE_ALTIVEC_H)
+#   undef bool
 #   include <altivec.h>
+#   define bool _Bool
 #endif
 
 #include "i420_yuy2.h"
