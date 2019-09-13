@@ -154,12 +154,10 @@ static void SetupAVCodecContext(vlc_va_sys_t *sys, unsigned surfaces)
 static void d3d11va_pic_context_destroy(picture_context_t *opaque)
 {
     struct d3d11va_pic_context *pic_ctx = D3D11VA_PICCONTEXT_FROM_PICCTX(opaque);
-    if (pic_ctx->va_surface)
-    {
-        ReleaseD3D11PictureSys(&pic_ctx->ctx.picsys);
-        va_surface_Release(pic_ctx->va_surface);
-        free(pic_ctx);
-    }
+    struct vlc_va_surface_t *va_surface = pic_ctx->va_surface;
+    d3d11_pic_context_destroy(&pic_ctx->ctx.s);
+    if (va_surface)
+        va_surface_Release(va_surface);
 }
 
 static struct d3d11va_pic_context *CreatePicContext(ID3D11VideoDecoderOutputView *,
@@ -176,10 +174,9 @@ static picture_context_t *d3d11va_pic_context_copy(picture_context_t *ctx)
                                                       src_ctx->ctx.picsys.slice_index, src_ctx->ctx.picsys.renderSrc);
     if (unlikely(pic_ctx==NULL))
         return NULL;
-    if (src_ctx->va_surface) {
-        pic_ctx->va_surface = src_ctx->va_surface;
+    pic_ctx->va_surface = src_ctx->va_surface;
+    if (pic_ctx->va_surface)
         va_surface_AddRef(pic_ctx->va_surface);
-    }
     return &pic_ctx->ctx.s;
 }
 
@@ -288,10 +285,18 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     else
 #endif
     {
-        picture_context_t *pic_ctx = va_pool_Get(&sys->va_pool);
-        if (unlikely(pic_ctx == NULL))
+        vlc_va_surface_t *va_surface = va_pool_Get(&sys->va_pool);
+        if (unlikely(va_surface == NULL))
             return VLC_ENOITEM;
-        pic->context = pic_ctx;
+        picture_context_t *pic_ctx = va_surface_GetContext(va_surface);
+        pic->context = pic_ctx->copy(pic_ctx);
+        if (unlikely(pic->context == NULL))
+        {
+            va_surface_Release(va_surface);
+            return VLC_ENOITEM;
+        }
+        // the internal copy adds an extra reference we already had with va_pool_Get()
+        va_surface_Release(va_surface);
     }
     *data = (uint8_t*)D3D11VA_PICCONTEXT_FROM_PICCTX(pic->context)->ctx.picsys.decoder;
     return VLC_SUCCESS;

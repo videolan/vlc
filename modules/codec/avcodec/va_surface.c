@@ -39,7 +39,7 @@
 #include "avcodec.h"
 
 struct vlc_va_surface_t {
-    atomic_uintptr_t     refcount;
+    atomic_uintptr_t     refcount; // 1 ref for the surface existance, 1 per surface/clone in-flight
     picture_context_t    *pic_va_ctx;
 };
 
@@ -118,7 +118,7 @@ done:
     return err;
 }
 
-static picture_context_t *GetSurface(va_pool_t *va_pool)
+static vlc_va_surface_t *GetSurface(va_pool_t *va_pool)
 {
     for (unsigned i = 0; i < va_pool->surface_count; i++) {
         vlc_va_surface_t *surface = va_pool->surface[i];
@@ -126,25 +126,24 @@ static picture_context_t *GetSurface(va_pool_t *va_pool)
 
         if (atomic_compare_exchange_strong(&surface->refcount, &expected, 2))
         {
-            picture_context_t *pic_ctx = surface->pic_va_ctx;
-            picture_context_t *field = pic_ctx->copy(pic_ctx);
             /* the copy should have added an extra reference */
             atomic_fetch_sub(&surface->refcount, 1);
-            return field;
+            va_surface_AddRef(surface);
+            return surface;
         }
     }
     return NULL;
 }
 
-picture_context_t *va_pool_Get(va_pool_t *va_pool)
+vlc_va_surface_t *va_pool_Get(va_pool_t *va_pool)
 {
     unsigned tries = (VLC_TICK_FROM_SEC(1) + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
-    picture_context_t *field;
+    vlc_va_surface_t *surface;
 
     if (va_pool->surface_count == 0)
         return NULL;
 
-    while ((field = GetSurface(va_pool)) == NULL)
+    while ((surface = GetSurface(va_pool)) == NULL)
     {
         if (--tries == 0)
             return NULL;
@@ -152,7 +151,12 @@ picture_context_t *va_pool_Get(va_pool_t *va_pool)
          * XXX: Both this and the core should use a semaphore or a CV. */
         vlc_tick_sleep(VOUT_OUTMEM_SLEEP);
     }
-    return field;
+    return surface;
+}
+
+picture_context_t *va_surface_GetContext(vlc_va_surface_t *surface)
+{
+    return surface->pic_va_ctx;
 }
 
 void va_surface_AddRef(vlc_va_surface_t *surface)

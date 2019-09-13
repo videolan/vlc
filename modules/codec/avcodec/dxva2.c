@@ -161,20 +161,17 @@ static void SetupAVCodecContext(vlc_va_sys_t *sys, unsigned surfaces)
 
 static void dxva2_pic_context_destroy(picture_context_t *opaque)
 {
-    struct dxva2_pic_context *pic_ctx = (struct dxva2_pic_context*)opaque;
-    if (pic_ctx->va_surface)
-    {
-        ReleaseD3D9PictureSys(&pic_ctx->ctx.picsys);
-        va_surface_Release(pic_ctx->va_surface);
-        free(pic_ctx);
-    }
+    struct dxva2_pic_context *pic_ctx = DXVA2_PICCONTEXT_FROM_PICCTX(opaque);
+    struct vlc_va_surface_t *va_surface = pic_ctx->va_surface;
+    d3d9_pic_context_destroy(&pic_ctx->ctx.s);
+    va_surface_Release(va_surface);
 }
 
 static struct dxva2_pic_context *CreatePicContext(IDirect3DSurface9 *, IDirectXVideoDecoder *);
 
 static picture_context_t *dxva2_pic_context_copy(picture_context_t *ctx)
 {
-    struct dxva2_pic_context *src_ctx = (struct dxva2_pic_context*)ctx;
+    struct dxva2_pic_context *src_ctx = DXVA2_PICCONTEXT_FROM_PICCTX(ctx);
     struct dxva2_pic_context *pic_ctx = CreatePicContext(src_ctx->ctx.picsys.surface, src_ctx->ctx.picsys.decoder);
     if (unlikely(pic_ctx==NULL))
         return NULL;
@@ -225,12 +222,20 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
         return VLC_EGENERIC;
     }
 
-    picture_context_t *pic_ctx = va_pool_Get(&sys->va_pool);
-    if (likely(pic_ctx==NULL))
+    vlc_va_surface_t *va_surface = va_pool_Get(&sys->va_pool);
+    if (unlikely(va_surface==NULL))
         return VLC_ENOITEM;
 
-    pic->context = pic_ctx;
-    *data = (uint8_t*)DXVA2_PICCONTEXT_FROM_PICCTX(pic->context)->ctx.picsys.surface;
+    picture_context_t *pic_ctx = va_surface_GetContext(va_surface);
+    pic->context = pic_ctx->copy(pic_ctx);
+    if (unlikely(pic->context == NULL))
+    {
+        va_surface_Release(va_surface);
+        return VLC_ENOITEM;
+    }
+    // the internal copy adds an extra reference we already had with va_pool_Get()
+    va_surface_Release(va_surface);
+    *data = (uint8_t*)DXVA2_PICCONTEXT_FROM_PICCTX(pic_ctx)->ctx.picsys.surface;
     return VLC_SUCCESS;
 }
 
