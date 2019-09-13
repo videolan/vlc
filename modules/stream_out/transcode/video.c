@@ -131,6 +131,7 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
         return 0;
     }
 
+    id->decoder_vctx_out = vctx;
     es_format_Clean( &id->decoder_out );
     es_format_Copy( &id->decoder_out, &p_dec->fmt_out );
 
@@ -198,6 +199,7 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     id->fifo.pic.last = &id->fifo.pic.first;
     id->b_transcode = true;
     es_format_Init( &id->decoder_out, VIDEO_ES, 0 );
+    id->decoder_vctx_out = NULL;
 
     /* Open decoder
      */
@@ -229,6 +231,7 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     {
         es_format_Clean( &id->decoder_out );
         es_format_Copy( &id->decoder_out, &id->p_decoder->fmt_out );
+        id->decoder_vctx_out = NULL /* TODO id->p_decoder->vctx_out*/;
     }
 
     /*
@@ -603,6 +606,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             }
 
             video_format_Copy( &id->decoder_out.video, &p_pic->format );
+            id->decoder_vctx_out = picture_GetVideoContext(p_pic);
 
             if( !transcode_video_filters_configured( id ) )
             {
@@ -610,7 +614,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                                                   id->p_filterscfg,
                                                  (id->p_enccfg->video.fps.num > 0),
                                                  &id->decoder_out,
-                                                 picture_GetVideoContext(p_pic),
+                                                 id->decoder_vctx_out,
                                                  transcode_encoder_format_in( id->encoder ),
                                                  id ) != VLC_SUCCESS )
                     goto error;
