@@ -71,6 +71,18 @@ vlcSetSymbolEnvironment() {
     export ac_cv_func_getentropy=no
     export ac_cv_func_mkostemp=no
     export ac_cv_func_mkostemps=no
+    export ac_cv_func_timingsafe_bcmp=no
+
+    # Added symbols in macOS 10.13 / iOS 11 / tvOS 11
+    export ac_cv_func_utimensat=no
+    export ac_cv_func_futimens=no
+
+    # Added symbol in macOS 10.14 / iOS 12 / tvOS 9
+    export ac_cv_func_thread_get_register_pointer_values=no
+
+    # Added symbols in macOS 10.15 / iOS 13 / tvOS 13
+    export ac_cv_func_aligned_alloc=no
+    export ac_cv_func_timespec_get=no
 }
 
 vlcSetContribEnvironment() {
