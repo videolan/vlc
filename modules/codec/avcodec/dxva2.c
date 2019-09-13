@@ -190,7 +190,7 @@ static struct va_pic_context *CreatePicContext(IDirect3DSurface9 *surface, IDire
     return pic_ctx;
 }
 
-static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_index, vlc_va_surface_t *va_surface)
+static picture_context_t* NewSurfacePicContext(vlc_va_t *va, int surface_index, vlc_va_surface_t *va_surface)
 {
     vlc_va_sys_t *sys = va->sys;
     struct va_pic_context *pic_ctx = CreatePicContext(sys->hw_surface[surface_index], sys->hw.decoder);
@@ -201,7 +201,7 @@ static struct va_pic_context* NewSurfacePicContext(vlc_va_t *va, int surface_ind
      * when the pool is emptied */
     ReleaseD3D9PictureSys(&pic_ctx->picsys);
     pic_ctx->va_surface = va_surface;
-    return pic_ctx;
+    return &pic_ctx->s;
 }
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)

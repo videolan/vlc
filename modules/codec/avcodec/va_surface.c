@@ -35,14 +35,12 @@
 #include <vlc_picture.h>
 
 #include "va_surface_internal.h"
-typedef int VA_PICSYS;
-#include "va_surface.h"
 
 #include "avcodec.h"
 
 struct vlc_va_surface_t {
     atomic_uintptr_t     refcount;
-    struct va_pic_context *pic_va_ctx;
+    picture_context_t    *pic_va_ctx;
 };
 
 static void DestroyVideoDecoder(vlc_va_sys_t *sys, va_pool_t *va_pool)
@@ -128,7 +126,8 @@ static picture_context_t *GetSurface(va_pool_t *va_pool)
 
         if (atomic_compare_exchange_strong(&surface->refcount, &expected, 2))
         {
-            picture_context_t *field = surface->pic_va_ctx->s.copy(&surface->pic_va_ctx->s);
+            picture_context_t *pic_ctx = surface->pic_va_ctx;
+            picture_context_t *field = pic_ctx->copy(pic_ctx);
             /* the copy should have added an extra reference */
             atomic_fetch_sub(&surface->refcount, 1);
             return field;

@@ -71,7 +71,7 @@ struct va_pool_cfg {
     /**
      * Create a new context for the surface being acquired
      */
-    struct va_pic_context* (*pf_new_surface_context)(vlc_va_t *, int surface_index, vlc_va_surface_t *);
+    picture_context_t* (*pf_new_surface_context)(vlc_va_t *, int surface_index, vlc_va_surface_t *);
 };
 
 int va_pool_Open(vlc_va_t *, const struct va_pool_cfg *, va_pool_t *);
