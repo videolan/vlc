@@ -220,6 +220,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                            selector:@selector(mediaItemChanged:)
                                name:VLCPlaylistCurrentItemChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(voutListChanged:)
+                               name:VLCPlayerListOfVideoOutputThreadsChanged object:nil];
 
     [self setupVarMenuItem:_add_intf
                     target:VLC_OBJECT(getIntf())
@@ -625,54 +628,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     VLCInputItem *inputItem = _playerController.currentMedia;
 
     if (inputItem != NULL) {
-        audio_output_t *p_aout = [_playerController mainAudioOutput];
-        if (p_aout != NULL) {
-            [self setupVarMenuItem:_channels
-                            target:VLC_OBJECT(p_aout)
-                        objectType:VLCObjectTypeAout
-                               var:"stereo-mode"
-                          selector:@selector(toggleVar:)];
-
-            [self setupVarMenuItem:_visual
-                            target:VLC_OBJECT(p_aout)
-                        objectType:VLCObjectTypeAout
-                               var:"visual"
-                          selector:@selector(toggleVar:)];
-            aout_Release(p_aout);
-        }
-
-        vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
-        if (p_vout != NULL) {
-            [self setupVarMenuItem:_aspect_ratio
-                            target:VLC_OBJECT(p_vout)
-                        objectType:VLCObjectTypeVout
-                               var:"aspect-ratio"
-                          selector:@selector(toggleVar:)];
-            [self appendCustomizationItem:_aspect_ratio];
-
-            [self setupVarMenuItem:_crop
-                            target:VLC_OBJECT(p_vout)
-                        objectType:VLCObjectTypeVout
-                               var:"crop"
-                          selector:@selector(toggleVar:)];
-            [self appendCustomizationItem:_crop];
-
-            [self setupVarMenuItem:_deinterlace
-                            target:VLC_OBJECT(p_vout)
-                        objectType:VLCObjectTypeVout
-                               var:"deinterlace"
-                          selector:@selector(toggleVar:)];
-
-            [self setupVarMenuItem:_deinterlace_mode
-                            target:VLC_OBJECT(p_vout)
-                        objectType:VLCObjectTypeVout
-                               var:"deinterlace-mode"
-                          selector:@selector(toggleVar:)];
-
-            vout_Release(p_vout);
-
-            [self refreshVoutDeviceMenu:nil];
-        }
+        [self rebuildAoutMenu];
+        [self rebuildVoutMenu];
         [_postprocessing setEnabled:YES];
         [self setSubmenusEnabled:YES];
         inputItem = nil;
@@ -685,6 +642,69 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [self setRateControlsEnabled:NO];
         [self setSubtitleSizeControlsEnabled:NO];
     }
+}
+
+- (void)rebuildAoutMenu
+{
+    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    if (!p_aout) {
+        return;
+    }
+    [self setupVarMenuItem:_channels
+                    target:VLC_OBJECT(p_aout)
+                objectType:VLCObjectTypeAout
+                       var:"stereo-mode"
+                  selector:@selector(toggleVar:)];
+
+    [self setupVarMenuItem:_visual
+                    target:VLC_OBJECT(p_aout)
+                objectType:VLCObjectTypeAout
+                       var:"visual"
+                  selector:@selector(toggleVar:)];
+    aout_Release(p_aout);
+}
+
+- (void)voutListChanged:(NSNotification *)aNotification
+{
+    [self rebuildVoutMenu];
+}
+
+- (void)rebuildVoutMenu
+{
+    vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
+    if (!p_vout) {
+        return;
+    }
+
+    [self setupVarMenuItem:_aspect_ratio
+                    target:VLC_OBJECT(p_vout)
+                objectType:VLCObjectTypeVout
+                       var:"aspect-ratio"
+                  selector:@selector(toggleVar:)];
+    [self appendCustomizationItem:_aspect_ratio];
+
+    [self setupVarMenuItem:_crop
+                    target:VLC_OBJECT(p_vout)
+                objectType:VLCObjectTypeVout
+                       var:"crop"
+                  selector:@selector(toggleVar:)];
+    [self appendCustomizationItem:_crop];
+
+    [self setupVarMenuItem:_deinterlace
+                    target:VLC_OBJECT(p_vout)
+                objectType:VLCObjectTypeVout
+                       var:"deinterlace"
+                  selector:@selector(toggleVar:)];
+
+    [self setupVarMenuItem:_deinterlace_mode
+                    target:VLC_OBJECT(p_vout)
+                objectType:VLCObjectTypeVout
+                       var:"deinterlace-mode"
+                  selector:@selector(toggleVar:)];
+
+    vout_Release(p_vout);
+
+    [self refreshVoutDeviceMenu:nil];
 }
 
 - (void)refreshVoutDeviceMenu:(NSNotification *)notification
@@ -1591,8 +1611,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         return;
     }
 
-    if (var_Get(p_object, psz_variable, &val) < 0)
+    if (var_Get(p_object, psz_variable, &val) < 0) {
         return;
+    }
 
     VLCAutoGeneratedMenuContent *data;
     switch(i_type & VLC_VAR_TYPE) {
