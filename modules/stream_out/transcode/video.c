@@ -225,8 +225,6 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
         es_format_Clean( &id->decoder_out );
         return VLC_EGENERIC;
     }
-    video_format_Init( &id->fmt_input_video, 0 );
-
     if( id->decoder_out.i_codec == 0 ) /* format_update can happen on open() */
     {
         es_format_Clean( &id->decoder_out );
@@ -249,7 +247,6 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     {
         module_unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = NULL;
-        video_format_Clean( &id->fmt_input_video );
         es_format_Clean( &id->decoder_out );
         es_format_Clean( &encoder_tested_fmt_in );
         return VLC_EGENERIC;
@@ -265,7 +262,6 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     {
         module_unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = NULL;
-        video_format_Clean( &id->fmt_input_video );
         es_format_Clean( &id->decoder_out );
         es_format_Clean( &encoder_tested_fmt_in );
         return VLC_EGENERIC;
@@ -286,7 +282,6 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     {
         module_unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = NULL;
-        video_format_Clean( &id->fmt_input_video );
         es_format_Clean( &encoder_tested_fmt_in );
         es_format_Clean( &id->decoder_out );
         return VLC_EGENERIC;
@@ -452,7 +447,6 @@ void transcode_video_clean( sout_stream_t *p_stream,
     transcode_encoder_close( id->encoder );
     transcode_encoder_delete( id->encoder );
 
-    video_format_Clean( &id->fmt_input_video );
     es_format_Clean( &id->decoder_out );
 
     /* Close filters */
@@ -485,13 +479,8 @@ int transcode_video_get_output_dimensions( sout_stream_t *p_stream, sout_stream_
 {
     VLC_UNUSED(p_stream);
     vlc_mutex_lock( &id->fifo.lock );
-    *w = id->fmt_input_video.i_visible_width;
-    *h = id->fmt_input_video.i_visible_height;
-    if( !*w || !*h )
-    {
-        *w = id->decoder_out.video.i_visible_width;
-        *h = id->decoder_out.video.i_visible_height;
-    }
+    *w = id->decoder_out.video.i_visible_width;
+    *h = id->decoder_out.video.i_visible_height;
     vlc_mutex_unlock( &id->fifo.lock );
     return (*w && *h) ? VLC_SUCCESS : VLC_EGENERIC;
 }
@@ -589,7 +578,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         }
 
         if( p_pic && ( unlikely(!transcode_encoder_opened(id->encoder)) ||
-              !video_format_IsSimilar( &id->fmt_input_video, &p_pic->format ) ) )
+              !video_format_IsSimilar( &id->decoder_out.video, &p_pic->format ) ) )
         {
             if( !transcode_encoder_opened(id->encoder) ) /* Configure Encoder input/output */
             {
@@ -604,8 +593,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             else /* picture format has changed */
             {
                 msg_Info( p_stream, "aspect-ratio changed, reiniting. %i -> %i : %i -> %i.",
-                            id->fmt_input_video.i_sar_num, p_pic->format.i_sar_num,
-                            id->fmt_input_video.i_sar_den, p_pic->format.i_sar_den
+                            id->decoder_out.video.i_sar_num, p_pic->format.i_sar_num,
+                            id->decoder_out.video.i_sar_den, p_pic->format.i_sar_den
                         );
                 /* Close filters, encoder format input can't change */
                 transcode_remove_filters( &id->p_f_chain );
@@ -617,20 +606,17 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                     filter_DeleteBlend( id->p_spu_blender );
                 id->p_spu_blender = NULL;
 
-                video_format_Clean( &id->fmt_input_video );
+                video_format_Clean( &id->decoder_out.video );
             }
 
-            video_format_Copy( &id->fmt_input_video, &p_pic->format );
+            video_format_Copy( &id->decoder_out.video, &p_pic->format );
 
             if( !transcode_video_filters_configured( id ) )
             {
-                es_format_t tmpfmt;
-                es_format_Init( &tmpfmt, VIDEO_ES, id->fmt_input_video.i_chroma );
-                tmpfmt.video = id->fmt_input_video;
                 if( transcode_video_filters_init( p_stream,
                                                   id->p_filterscfg,
                                                  (id->p_enccfg->video.fps.num > 0),
-                                                 &tmpfmt,
+                                                 &id->decoder_out,
                                                  picture_GetVideoContext(p_pic),
                                                  transcode_encoder_format_in( id->encoder ),
                                                  id ) != VLC_SUCCESS )
