@@ -97,6 +97,7 @@ var_InheritFourcc(vlc_object_t *obj, const char *name)
     X(video_frame_rate, unsigned, add_integer, var_InheritUnsigned, 25) \
     X(video_frame_rate_base, unsigned, add_integer, var_InheritUnsigned, 1) \
     X(video_packetized, bool, add_bool, var_InheritBool, true) \
+    X(input_sample_length, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_FROM_MS(40) ) \
     X(sub_track_count, ssize_t, add_integer, var_InheritSsize, 0) \
     X(sub_packetized, bool, add_bool, var_InheritBool, true) \
     X(title_count, ssize_t, add_integer, var_InheritSsize, 0 ) \
@@ -645,7 +646,7 @@ Demux(demux_t *demux)
         sys->pts = __MIN(sys->audio_pts, sys->video_pts);
     else if (sys->audio_track_count > 0)
         sys->pts = sys->audio_pts;
-    else
+    else if (sys->video_track_count > 0 || sys->sub_track_count > 0)
         sys->pts = sys->video_pts;
 
     if (sys->pts > sys->length)
@@ -663,7 +664,7 @@ Demux(demux_t *demux)
     const vlc_tick_t step_length = __MAX(audio_step_length, video_step_length);
 
     int ret = VLC_SUCCESS;
-    bool audio_eof = true, video_eof = true;
+    bool audio_eof = true, video_eof = true, input_eof = true;
     if (sys->audio_track_count > 0)
     {
         ret = DemuxAudio(demux, audio_step_length,
@@ -679,6 +680,14 @@ Demux(demux_t *demux)
                          __MIN(step_length + sys->video_pts, sys->length));
         if (sys->video_pts + video_step_length < sys->length)
             video_eof = false;
+    }
+
+    /* No audio/video/sub: simulate that we read some inputs */
+    if (step_length == 0)
+    {
+        sys->pts += sys->input_sample_length;
+        if (sys->pts + sys->input_sample_length < sys->length)
+            input_eof = false;
     }
 
     if (ret != VLC_SUCCESS)
@@ -724,7 +733,8 @@ Demux(demux_t *demux)
         video_eof = false;
     }
 
-    return audio_eof && video_eof ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
+    return audio_eof && video_eof && input_eof ? VLC_DEMUXER_EOF
+                                               : VLC_DEMUXER_SUCCESS;
 }
 
 static void
