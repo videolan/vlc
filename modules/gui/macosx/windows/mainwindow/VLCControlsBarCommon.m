@@ -228,9 +228,11 @@
 
 - (IBAction)timeSliderAction:(id)sender
 {
-    float f_updatedDelta;
+    float newPosition;
+    NSEvent *theEvent = [NSApp currentEvent];
+    NSEventType theEventType = [theEvent type];
 
-    switch([[NSApp currentEvent] type]) {
+    switch (theEventType) {
         case NSLeftMouseUp:
             /* Ignore mouse up, as this is a continous slider and
              * when the user does a single click to a position on the slider,
@@ -242,18 +244,18 @@
             return;
         case NSLeftMouseDown:
         case NSLeftMouseDragged:
-            f_updatedDelta = [sender floatValue];
+            newPosition = [sender floatValue];
             break;
         case NSScrollWheel:
-            f_updatedDelta = [sender floatValue];
+            newPosition = [sender floatValue];
             break;
 
         default:
             return;
     }
 
-    [_playerController setPositionFast:f_updatedDelta / 10000.];
-    [self.timeSlider setFloatValue:f_updatedDelta];
+    [_playerController setPositionFast:newPosition];
+    [self.timeSlider setFloatValue:newPosition];
 }
 
 - (IBAction)fullscreen:(id)sender
@@ -279,7 +281,7 @@
     }
 
     [self.timeSlider setKnobHidden:NO];
-    [self.timeSlider setFloatValue:(10000. * _playerController.position)];
+    [self.timeSlider setFloatValue:_playerController.position];
 
     vlc_tick_t duration = inputItem.duration;
     bool buffering = _playerController.playerState == VLC_PLAYER_STATE_STARTED;

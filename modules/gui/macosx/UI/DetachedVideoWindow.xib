@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,11 +13,11 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="VLC media player" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="detachedvideowindow" animationBehavior="default" id="2" userLabel="Detached Video Window" customClass="VLCDetachedVideoWindow">
+        <window title="VLC media player" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="detachedvideowindow" animationBehavior="default" id="2" userLabel="Detached Video Window" customClass="VLCDetachedVideoWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="91" y="467" width="363" height="239"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
             <view key="contentView" id="4">
                 <rect key="frame" x="0.0" y="0.0" width="363" height="239"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -29,7 +29,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="363" height="36"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Vae-cT-EEI" userLabel="Play controls group">
-                                        <rect key="frame" x="8" y="6" width="85" height="23"/>
+                                        <rect key="frame" x="8" y="7" width="85" height="23"/>
                                         <subviews>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="11">
                                                 <rect key="frame" x="0.0" y="0.0" width="29" height="23"/>
@@ -81,7 +81,7 @@
                                         <constraints>
                                             <constraint firstAttribute="height" constant="14" id="MYp-CS-yPe"/>
                                         </constraints>
-                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10000" doubleValue="3260.3068524096384" tickMarkPosition="above" sliderType="linear" id="23" customClass="VLCSliderCell">
+                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="0.32600000000000001" tickMarkPosition="above" sliderType="linear" id="23" customClass="VLCSliderCell">
                                             <font key="font" size="12" name="Helvetica"/>
                                         </sliderCell>
                                         <connections>
@@ -89,7 +89,7 @@
                                         </connections>
                                     </slider>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="VLCTimeField">
-                                        <rect key="frame" x="264" y="11" width="56" height="13"/>
+                                        <rect key="frame" x="264" y="12" width="56" height="13"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="52" id="EvZ-Sy-m25"/>
                                             <constraint firstAttribute="height" constant="13" id="LYT-Sd-Gf6"/>
@@ -101,7 +101,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="8">
-                                        <rect key="frame" x="326" y="6" width="29" height="23"/>
+                                        <rect key="frame" x="326" y="7" width="29" height="23"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="29" id="VjW-79-ABX"/>
                                             <constraint firstAttribute="height" constant="23" id="fNg-pN-oQw"/>
