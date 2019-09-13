@@ -630,15 +630,14 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     if (inputItem != NULL) {
         [self rebuildAoutMenu];
         [self rebuildVoutMenu];
-        [_postprocessing setEnabled:YES];
-        [self setSubmenusEnabled:YES];
         inputItem = nil;
 
         [self setRateControlsEnabled:_playerController.rateChangable];
         [self setSubtitleSizeControlsEnabled:YES];
     } else {
         [_postprocessing setEnabled:NO];
-        [self setSubmenusEnabled:NO];
+        [self setAudioSubMenusEnabled:NO];
+        [self setVideoSubmenusEnabled:NO];
         [self setRateControlsEnabled:NO];
         [self setSubtitleSizeControlsEnabled:NO];
     }
@@ -662,6 +661,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                        var:"visual"
                   selector:@selector(toggleVar:)];
     aout_Release(p_aout);
+    [self setAudioSubMenusEnabled:YES];
 }
 
 - (void)voutListChanged:(NSNotification *)aNotification
@@ -705,6 +705,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     vout_Release(p_vout);
 
     [self refreshVoutDeviceMenu:nil];
+
+    BOOL activeVideoPlayback = _playerController.activeVideoPlayback;
+    [self setVideoSubmenusEnabled:activeVideoPlayback];
 }
 
 - (void)refreshVoutDeviceMenu:(NSNotification *)notification
@@ -735,16 +738,21 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [[submenu itemWithTag: var_InheritInteger(getIntf(), "macosx-vdev")] setState: NSOnState];
 }
 
-- (void)setSubmenusEnabled:(BOOL)b_enabled
+- (void)setAudioSubMenusEnabled:(BOOL)enabled
 {
-    [_visual setEnabled: b_enabled];
-    [_channels setEnabled: b_enabled];
-    [_deinterlace setEnabled: b_enabled];
-    [_deinterlace_mode setEnabled: b_enabled];
-    [_screen setEnabled: b_enabled];
-    [_aspect_ratio setEnabled: b_enabled];
-    [_crop setEnabled: b_enabled];
-    [self setSubtitleMenuEnabled: b_enabled];
+    [_visual setEnabled: enabled];
+    [_channels setEnabled: enabled];
+}
+
+- (void)setVideoSubmenusEnabled:(BOOL)enabled
+{
+    [_deinterlace setEnabled: enabled];
+    [_deinterlace_mode setEnabled: enabled];
+    [_screen setEnabled: enabled];
+    [_aspect_ratio setEnabled: enabled];
+    [_crop setEnabled: enabled];
+    [_postprocessing setEnabled: enabled];
+    [self setSubtitleMenuEnabled: enabled];
 }
 
 - (void)setSubtitleMenuEnabled:(BOOL)b_enabled
@@ -1507,10 +1515,19 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (void)playbackStateChanged:(NSNotification *)aNotification
 {
     enum vlc_player_state playerState = [_playlistController playerController].playerState;
-    if (playerState == VLC_PLAYER_STATE_PLAYING) {
-        [self setPause];
-    } else {
-        [self setPlay];
+
+    switch (playerState) {
+        case VLC_PLAYER_STATE_PLAYING:
+            [self setPause];
+            break;
+
+        case VLC_PLAYER_STATE_STOPPED:
+            [self setVideoSubmenusEnabled:NO];
+            [self setAudioSubMenusEnabled:NO];
+
+        default:
+            [self setPlay];
+            break;
     }
 }
 
