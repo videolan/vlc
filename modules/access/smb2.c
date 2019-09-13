@@ -608,6 +608,8 @@ Open(vlc_object_t *p_obj)
         goto error;
     }
 
+    smb2_set_security_mode(sys->smb2, SMB2_NEGOTIATE_SIGNING_ENABLED);
+
     if (sys->encoded_url.psz_path == NULL)
         sys->encoded_url.psz_path = (char *) "/";
 
