@@ -55,9 +55,11 @@
     addItem.target = self;
     NSMenuItem *revealItem = [[NSMenuItem alloc] initWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
     revealItem.target = self;
+    NSMenuItem *deleteItem = [[NSMenuItem alloc] initWithTitle:_NS("Delete from Library") action:@selector(moveToTrash:) keyEquivalent:@""];
+    deleteItem.target = self;
 
     _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
-    _libraryMenu.itemArray = @[playItem, appendItem, revealItem, [NSMenuItem separatorItem], addItem];
+    _libraryMenu.itemArray = @[playItem, appendItem, revealItem, deleteItem, [NSMenuItem separatorItem], addItem];
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
@@ -100,6 +102,18 @@
 - (void)revealInFinder:(id)sender
 {
     [[[VLCMain sharedInstance] libraryController] showItemInFinder:self.representedMediaItem];
+}
+
+- (void)moveToTrash:(id)sender
+{
+    NSArray *filesToTrash = self.representedMediaItem.files;
+    NSUInteger trashCount = filesToTrash.count;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+
+    for (NSUInteger x = 0; x < trashCount; x++) {
+        VLCMediaLibraryFile *fileToTrash = filesToTrash[x];
+        [fileManager trashItemAtURL:fileToTrash.fileURL resultingItemURL:nil error:nil];
+    }
 }
 
 @end

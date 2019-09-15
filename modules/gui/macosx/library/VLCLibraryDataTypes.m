@@ -58,6 +58,11 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     return [NSString stringWithFormat:@"%@ — type: %i, MRL: %@", NSStringFromClass([self class]), _fileType, _MRL];
 }
 
+- (NSURL *)fileURL
+{
+    return [NSURL URLWithString:_MRL];
+}
+
 @end
 
 @implementation VLCMediaLibraryTrack
