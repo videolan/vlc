@@ -59,8 +59,8 @@
 
 - (void)windowDidLoad
 {
-    [_titleLabel setStringValue:_NS("Continue playback?")];
-    [_resumeButton setTitle:_NS("Continue")];
+    [_titleLabel setStringValue:_NS("Continue playback")];
+    [_resumeButton setTitle:_NS("Continue playback")];
 
     [_alwaysResumeCheckbox setTitle:_NS("Always continue media playback")];
 }
