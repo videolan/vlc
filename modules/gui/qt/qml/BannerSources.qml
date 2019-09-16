@@ -75,13 +75,25 @@ Utils.NavigableFocusScope {
 
             spacing: VLCStyle.margin_xxsmall
 
+            RowLayout {
+                width: parent.width
+                spacing: 0
+
+
+                Image {
+                    Layout.preferredWidth: VLCStyle.icon_normal
+                    Layout.preferredHeight: VLCStyle.icon_normal
+                    Layout.alignment: Qt.AlignLeft
+
+                    sourceSize.width: VLCStyle.icon_normal
+                    sourceSize.height: VLCStyle.icon_normal
+
+                    source: "qrc:///logo/cone.svg"
+                }
+
             /* Button for the sources */
             TabBar {
                 id: buttonView
-
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                }
 
                 Layout.preferredHeight: VLCStyle.icon_normal
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -206,6 +218,9 @@ Utils.NavigableFocusScope {
                         }
                     }
                 }
+            }
+
+
             }
 
             RowLayout {
