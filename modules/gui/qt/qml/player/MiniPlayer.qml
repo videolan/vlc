@@ -164,7 +164,7 @@ Utils.NavigableFocusScope {
             if (!event.accepted)
                 defaultKeyAction(event, 0)
             if (!event.accepted)
-                rootWindow.sendHotkey(event.key);
+                rootWindow.sendHotkey(event.key, event.modifiers);
         }
 
     }

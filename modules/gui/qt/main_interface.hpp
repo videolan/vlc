@@ -238,7 +238,7 @@ protected slots:
     void setFullScreen( bool );
     void onInputChanged( bool );
 
-    void sendHotkey( Qt::Key key );
+    void sendHotkey(Qt::Key key, Qt::KeyboardModifiers modifiers );
 
 signals:
     void askGetVideo( bool );

@@ -322,9 +322,9 @@ void MainInterface::onInputChanged( bool hasInput )
 #ifdef KeyPress
 #undef KeyPress
 #endif
-void MainInterface::sendHotkey( Qt::Key key )
+void MainInterface::sendHotkey(Qt::Key key , Qt::KeyboardModifiers modifiers)
 {
-    QKeyEvent event(QEvent::KeyPress, key, Qt::NoModifier);
+    QKeyEvent event(QEvent::KeyPress, key, modifiers );
     int vlckey = qtEventToVLCKey(&event);
     var_SetInteger(vlc_object_instance(p_intf), "key-pressed", vlckey);
 }

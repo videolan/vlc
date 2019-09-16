@@ -168,7 +168,7 @@ Utils.NavigableFocusScope {
                 if (event.key === Qt.Key_Menu) {
                     toolbarAutoHide.toggleForceVisible()
                 } else {
-                    rootWindow.sendHotkey(event.key);
+                    rootWindow.sendHotkey(event.key, event.modifiers);
                 }
             }
         }
@@ -269,7 +269,7 @@ Utils.NavigableFocusScope {
                         if (event.key === Qt.Key_Menu)
                             toolbarAutoHide.toggleForceVisible()
                         else
-                            rootWindow.sendHotkey(event.key);
+                            rootWindow.sendHotkey(event.key, event.modifiers);
                     }
                 }
             }
