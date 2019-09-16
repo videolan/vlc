@@ -100,6 +100,8 @@ typedef struct nvdec_ctx {
     CUdeviceptr                 outputDevicePtr[MAX_POOL_SIZE];
     unsigned int                outputPitch;
     picture_pool_t              *out_pool;
+
+    vlc_video_context           *vctx_out;
 } nvdec_ctx_t;
 
 #define CALL_CUDA_DEC(func, ...) CudaCheckErr(VLC_OBJECT(p_dec),  p_sys->cudaFunctions, p_sys->cudaFunctions->func(__VA_ARGS__), #func)
@@ -288,7 +290,7 @@ clean_pics:
 
     CALL_CUDA_DEC(cuCtxPopCurrent, NULL);
 
-    ret = decoder_UpdateVideoFormat(p_dec);
+    ret = decoder_UpdateVideoOutput(p_dec, p_sys->vctx_out);
     return (ret == VLC_SUCCESS);
 error:
     p_sys->b_nvparser_success = false;
@@ -858,6 +860,20 @@ static int OpenDecoder(vlc_object_t *p_this)
         goto error;
     }
 
+    vlc_decoder_device *dec_device = decoder_GetDecoderDevice( p_dec );
+    if (dec_device == NULL)
+        goto error;
+    if (dec_device->type == VLC_DECODER_DEVICE_NVDEC)
+    {
+        p_sys->vctx_out = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_NVDEC, 0, NULL );
+    }
+    vlc_decoder_device_Release(dec_device);
+    if (unlikely(p_sys->vctx_out == NULL))
+    {
+        msg_Err(p_dec, "failed to create a video context");
+        goto error;
+    }
+
     vlc_fourcc_t output_chromas[3];
     size_t chroma_idx = 0;
     if (cudaChroma == cudaVideoChromaFormat_420)
@@ -876,7 +892,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     for (chroma_idx = 0; output_chromas[chroma_idx] != 0; chroma_idx++)
     {
         p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma = output_chromas[chroma_idx];
-        result = decoder_UpdateVideoFormat(p_dec);
+        result = decoder_UpdateVideoOutput(p_dec, p_sys->vctx_out);
         if (result == VLC_SUCCESS)
         {
             msg_Dbg(p_dec, "using chroma %4.4s", (char*)&p_dec->fmt_out.video.i_chroma);
@@ -924,6 +940,8 @@ static void CloseDecoder(vlc_object_t *p_this)
         CALL_CUVID(cuvidDestroyVideoParser, p_sys->cuparser);
     if (p_sys->cuCtx)
         CALL_CUDA_DEC(cuCtxDestroy, p_sys->cuCtx);
+    if (p_sys->vctx_out)
+        vlc_video_context_Release(p_sys->vctx_out);
     cuda_free_functions(&p_sys->cudaFunctions);
     cuvid_free_functions(&p_sys->cuvidFunctions);
     if (p_sys->b_is_hxxx)
