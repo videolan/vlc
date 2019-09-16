@@ -31,13 +31,28 @@ Utils.SelectableDelegateModel {
     property string viewIndexPropertyName: "currentIndex"
     delegate: Package {
         id: element
-        Loader {
-            id: delegateLoaderGrid
+        NetworkGridItem {
+            id: delegateGrid
             focus: true
             Package.name: "grid"
-            source: model.type == MLNetworkModel.TYPE_FILE ?
-                        "qrc:///mediacenter/NetworkFileDisplayGrid.qml" :
-                        "qrc:///mediacenter/NetworkDriveDisplayGrid.qml";
+
+            onItemClicked : {
+                delegateModel.updateSelection( modifier ,  view[viewIndexPropertyName], index)
+                view[viewIndexPropertyName] = index
+                delegateGrid.forceActiveFocus()
+            }
+
+            onItemDoubleClicked: {
+                if (model.type === MLNetworkModel.TYPE_NODE || model.type === MLNetworkModel.TYPE_DIRECTORY)
+                    history.push( ["mc", "network", { tree: model.tree } ], History.Go)
+                else
+                    medialib.addAndPlay( model.mrl )
+            }
+
+            onContextMenuButtonClicked: {
+                contextMenu.model = model
+                contextMenu.popup(menuParent)
+            }
         }
 
         Loader {

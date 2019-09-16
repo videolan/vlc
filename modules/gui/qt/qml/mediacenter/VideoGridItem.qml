@@ -31,9 +31,9 @@ Utils.GridItem {
     channel: model.channel || ""
     isVideo: true
     isNew: model.playcount < 1
+    showContextButton: true
     progress: model.saved_position > 0 ? model.saved_position : 0
     pictureWidth: VLCStyle.video_normal_width
     pictureHeight: VLCStyle.video_normal_height
-    onPlayClicked: if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
-    onAddToPlaylistClicked : if ( model.id !== undefined ) { medialib.addToPlaylist( model.id ) }
+    onItemDoubleClicked: if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
 }

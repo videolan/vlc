@@ -127,11 +127,12 @@ Utils.NavigableFocusScope {
             delegate: VideoGridItem {
                 id: videoGridItem
 
+                onContextMenuButtonClicked: {
+                    contextMenu.model = videoGridItem.model
+                    contextMenu.popup(menuParent)
+                }
+
                 onItemClicked : {
-                    if (key == Qt.RightButton){
-                        contextMenu.model = videoGridItem.model
-                        contextMenu.popup(menuParent)
-                    }
                     videosDelegate.updateSelection( modifier , videosGV.currentIndex, index)
                     videosGV.currentIndex = index
                     videosGV.forceActiveFocus()
@@ -142,10 +143,10 @@ Utils.NavigableFocusScope {
             navigationParent: root
 
             /*
-                         *define the intial position/selection
-                         * This is done on activeFocus rather than Component.onCompleted because videosDelegate.
-                         * selectedGroup update itself after this event
-                         */
+             *define the intial position/selection
+             * This is done on activeFocus rather than Component.onCompleted because videosDelegate.
+             * selectedGroup update itself after this event
+             */
             onActiveFocusChanged: {
                 if (activeFocus && videosDelegate.items.count > 0 && videosDelegate.selectedGroup.count === 0) {
                     videosDelegate.items.get(0).inSelected = true
@@ -166,6 +167,7 @@ Utils.NavigableFocusScope {
                 contextMenu.model = menuModel
                 contextMenu.popup(menuParent,contextMenu.width,0)
             }
+
             onRightClick:{
                 contextMenu.model = menuModel
                 contextMenu.popup(menuParent)

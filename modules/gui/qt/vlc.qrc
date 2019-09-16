@@ -221,11 +221,10 @@
         <file alias="MCMainDisplay.qml">qml/mediacenter/MCMainDisplay.qml</file>
         <file alias="NetworkDriveDisplay.qml">qml/mediacenter/NetworkDriveDisplay.qml</file>
         <file alias="NetworkFileDisplay.qml">qml/mediacenter/NetworkFileDisplay.qml</file>
+        <file alias="NetworkGridItem.qml">qml/mediacenter/NetworkGridItem.qml</file>
         <file alias="NetworkListItem.qml">qml/mediacenter/NetworkListItem.qml</file>
         <file alias="VideoExpandableGrid.qml">qml/mediacenter/VideoExpandableGrid.qml</file>
         <file alias="MCVideoListDisplay.qml">qml/mediacenter/MCVideoListDisplay.qml</file>
-        <file alias="NetworkFileDisplayGrid.qml">qml/mediacenter/NetworkFileDisplayGrid.qml</file>
-        <file alias="NetworkDriveDisplayGrid.qml">qml/mediacenter/NetworkDriveDisplayGrid.qml</file>
         <file alias="VideoGridItem.qml">qml/mediacenter/VideoGridItem.qml</file>
         <file alias="AudioGridItem.qml">qml/mediacenter/AudioGridItem.qml</file>
     </qresource>

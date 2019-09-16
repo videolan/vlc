@@ -19,6 +19,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQml.Models 2.2
 
+import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
 import "qrc:///utils/" as Utils
@@ -29,34 +30,23 @@ Utils.GridItem {
 
     pictureWidth: VLCStyle.network_normal
     pictureHeight: VLCStyle.network_normal
-    image: "qrc:///type/file_black.svg"
-    subtitle: model.mrl || ""
-    title: model.name || qsTr("Unknown share")
-    focus: true
-
-    selected: element.DelegateModel.inSelected
-    onItemClicked : {
-        if (key == Qt.RightButton){
-            contextMenu.model = model
-            contextMenu.popup(menuParent)
+    image: {
+        switch (model.type){
+        case MLNetworkModel.TYPE_DISC:
+            return  "qrc:///type/disc.svg"
+        case MLNetworkModel.TYPE_CARD:
+            return  "qrc:///type/capture-card.svg"
+        case MLNetworkModel.TYPE_STREAM:
+            return  "qrc:///type/stream.svg"
+        case MLNetworkModel.TYPE_PLAYLIST:
+            return  "qrc:///type/playlist.svg"
+        case MLNetworkModel.TYPE_FILE:
+            return  "qrc:///type/file_black.svg"
+        default:
+            return "qrc:///type/directory_black.svg"
         }
-        delegateModel.updateSelection( modifier , view[viewIndexPropertyName], index)
-        view[viewIndexPropertyName] = index
-        item.forceActiveFocus()
     }
+    subtitle: model.mrl
+    title: model.name || qsTr("Unknown share")
     showContextButton: true
-
-    onItemDoubleClicked: {
-        medialib.addAndPlay( model.mrl )
-    }
-    onPlayClicked: {
-        medialib.addAndPlay( model.mrl )
-    }
-    onAddToPlaylistClicked: {
-        medialib.addToPlaylist( model.mrl );
-    }
-    onContextMenuButtonClicked: {
-        contextMenu.model = model
-        contextMenu.popup(menuParent)
-    }
 }

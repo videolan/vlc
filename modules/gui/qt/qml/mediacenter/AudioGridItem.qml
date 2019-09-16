@@ -30,6 +30,5 @@ Utils.GridItem {
     isVideo: false
     pictureWidth: VLCStyle.cover_normal
     pictureHeight: VLCStyle.cover_normal
-    onPlayClicked: if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
-    onAddToPlaylistClicked : if ( model.id !== undefined ) { medialib.addToPlaylist( model.id ) }
+    onItemDoubleClicked: if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
 }
