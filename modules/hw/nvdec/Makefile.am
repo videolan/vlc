@@ -10,3 +10,10 @@ libnvdec_plugin_la_LIBADD = $(LIBDL)
 if HAVE_NVDEC
 codec_LTLIBRARIES += libnvdec_plugin.la
 endif
+
+libnvdec_chroma_plugin_la_SOURCES = hw/nvdec/chroma.c hw/nvdec/nvdec_fmt.h
+libnvdec_chroma_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(nvdecdir)'
+if HAVE_NVDEC
+nvdec_LTLIBRARIES = libnvdec_chroma_plugin.la
+endif
+

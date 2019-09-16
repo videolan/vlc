@@ -46,6 +46,9 @@ typedef struct
     CUdeviceptr  devidePtr;
     unsigned int bufferPitch;
     unsigned int bufferHeight;
+
+    // temporary until the filters get it from their environment/video context
+    decoder_device_nvdec_t nvdecDevice;
 } pic_context_nvdec_t;
 
 #endif /* include-guard */
