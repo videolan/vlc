@@ -40,12 +40,6 @@ ToolButton {
 
     contentItem: Item {
 
-        Rectangle{
-            anchors.fill: parent
-            visible: control.checked && !paintOnly
-            color: VLCStyle.colors.bannerHover
-        }
-
         Rectangle {
             anchors.fill: parent
             visible: control.activeFocus || control.hovered || control.highlighted
@@ -77,6 +71,20 @@ ToolButton {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
 
+            }
+
+            Label {
+                text: VLCIcons.active_indicator
+                color: control.enabled ? control.color : control.colorDisabled
+                visible: !control.paintOnly && control.checked
+
+                anchors.centerIn: parent
+
+                font.pixelSize: control.size
+                font.family: VLCIcons.fontFamily
+
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
             }
 
         }

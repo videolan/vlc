@@ -435,6 +435,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/playlist/repeat_all.svg \
 	gui/qt/pixmaps/playlist/repeat_off.svg \
 	gui/qt/pixmaps/playlist/repeat_one.svg \
+	gui/qt/pixmaps/playlist/active_indicator.svg \
 	gui/qt/pixmaps/playlist/shuffle_on.svg \
 	gui/qt/pixmaps/playlist/dropzone.svg \
 	gui/qt/pixmaps/playlist/sidebar-icons/capture.svg \
