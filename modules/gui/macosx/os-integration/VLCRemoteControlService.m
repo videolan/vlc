@@ -28,12 +28,21 @@
 #import "main/CompatibilityFixes.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+#import "library/VLCInputItem.h"
+#import "extensions/NSString+Helpers.h"
 
 #define kVLCSettingPlaybackForwardSkipLength @(60)
 #define kVLCSettingPlaybackBackwardSkipLength @(60)
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
+
+@interface VLCRemoteControlService()
+{
+    VLCPlaylistController *_playlistController;
+    VLCPlayerController *_playerController;
+}
+@end
 
 @implementation VLCRemoteControlService
 
@@ -52,6 +61,118 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
                                 cc.changePlaybackPositionCommand,
                                 nil];
     return [commands copy];
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _playlistController = [[VLCMain sharedInstance] playlistController];
+        _playerController = [_playlistController playerController];
+
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                               selector:@selector(playbackPositionUpdated:)
+                                   name:VLCPlayerTimeAndPositionChanged
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(metaDataChangedForCurrentMedia:)
+                                   name:VLCPlayerMetadataChangedForCurrentMedia
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(playbackRateChanged:)
+                                   name:VLCPlayerRateChanged
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(metaDataChangedForCurrentMedia:)
+                                   name:VLCPlaylistCurrentItemChanged
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(playbackStateChanged:)
+                                   name:VLCPlayerStateChanged
+                                 object:nil];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)playbackStateChanged:(NSNotification *)aNotification
+{
+    enum vlc_player_state playerState = _playerController.playerState;
+    MPNowPlayingInfoCenter *nowPlayingInfoCenter = [MPNowPlayingInfoCenter defaultCenter];
+
+    switch (playerState) {
+        case VLC_PLAYER_STATE_PLAYING:
+            nowPlayingInfoCenter.playbackState = MPNowPlayingPlaybackStatePlaying;
+            break;
+
+        case VLC_PLAYER_STATE_PAUSED:
+            nowPlayingInfoCenter.playbackState = MPNowPlayingPlaybackStatePaused;
+            break;
+
+        case VLC_PLAYER_STATE_STOPPED:
+        case VLC_PLAYER_STATE_STOPPING:
+            nowPlayingInfoCenter.playbackState = MPNowPlayingPlaybackStateStopped;
+            break;
+
+        default:
+            nowPlayingInfoCenter.playbackState = MPNowPlayingPlaybackStateUnknown;
+            break;
+    }
+}
+
+- (void)playbackPositionUpdated:(NSNotification *)aNotification
+{
+    MPNowPlayingInfoCenter *nowPlayingInfoCenter = [MPNowPlayingInfoCenter defaultCenter];
+
+    NSMutableDictionary *currentlyPlayingTrackInfo = [nowPlayingInfoCenter.nowPlayingInfo mutableCopy];
+    [self setTimeInformationForDictionary:currentlyPlayingTrackInfo];
+
+    nowPlayingInfoCenter.nowPlayingInfo = currentlyPlayingTrackInfo;
+}
+
+- (void)playbackRateChanged:(NSNotification *)aNotification
+{
+    MPNowPlayingInfoCenter *nowPlayingInfoCenter = [MPNowPlayingInfoCenter defaultCenter];
+
+    NSMutableDictionary *currentlyPlayingTrackInfo = [nowPlayingInfoCenter.nowPlayingInfo mutableCopy];
+    [self setRateInformationForDictionary:currentlyPlayingTrackInfo];
+
+    nowPlayingInfoCenter.nowPlayingInfo = currentlyPlayingTrackInfo;
+}
+
+- (void)metaDataChangedForCurrentMedia:(NSNotification *)aNotification
+{
+    VLCInputItem *inputItem = _playerController.currentMedia;
+
+    NSMutableDictionary *currentlyPlayingTrackInfo = [NSMutableDictionary dictionary];
+    [self setTimeInformationForDictionary:currentlyPlayingTrackInfo];
+    [self setRateInformationForDictionary:currentlyPlayingTrackInfo];
+
+    currentlyPlayingTrackInfo[MPMediaItemPropertyTitle] = inputItem.title;
+    currentlyPlayingTrackInfo[MPMediaItemPropertyArtist] = inputItem.artist;
+    currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTitle] = inputItem.albumName;
+    currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTrackNumber] = @([inputItem.trackNumber intValue]);
+    currentlyPlayingTrackInfo[MPMediaItemPropertyPlaybackDuration] = @(SEC_FROM_VLC_TICK(inputItem.duration));
+
+    [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = currentlyPlayingTrackInfo;
+}
+
+- (void)setTimeInformationForDictionary:(NSMutableDictionary *)dictionary
+{
+    /* we don't set the duration here because this would add a dependency on the input item
+     * additionally, when duration changes, the metadata callback is triggered anyway */
+    dictionary[MPNowPlayingInfoPropertyElapsedPlaybackTime] = @(SEC_FROM_VLC_TICK([_playerController time]));
+    dictionary[MPNowPlayingInfoPropertyPlaybackProgress] = @([_playerController position]);
+}
+
+- (void)setRateInformationForDictionary:(NSMutableDictionary *)dictionary
+{
+    dictionary[MPNowPlayingInfoPropertyPlaybackRate] = @([_playerController playbackRate]);
 }
 
 - (void)subscribeToRemoteCommands
@@ -89,41 +210,39 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
 - (MPRemoteCommandHandlerStatus )remoteCommandEvent:(MPRemoteCommandEvent *)event
 {
     MPRemoteCommandCenter *cc = [MPRemoteCommandCenter sharedCommandCenter];
-    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
-    VLCPlayerController *playerController = [playlistController playerController];
 
     if (event.command == cc.playCommand) {
-        return [playlistController startPlaylist] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusNoActionableNowPlayingItem;
+        return [_playlistController startPlaylist] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusNoActionableNowPlayingItem;
     }
     if (event.command == cc.pauseCommand) {
-        [playlistController pausePlayback];
+        [_playlistController pausePlayback];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.stopCommand) {
-        [playlistController stopPlayback];
+        [_playlistController stopPlayback];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.togglePlayPauseCommand) {
-        [playerController togglePlayPause];
+        [_playerController togglePlayPause];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.nextTrackCommand) {
-        return [playlistController playNextItem] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusCommandFailed;
+        return [_playlistController playNextItem] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusCommandFailed;
     }
     if (event.command == cc.previousTrackCommand) {
-        return [playlistController playPreviousItem] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusCommandFailed;
+        return [_playlistController playPreviousItem] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusCommandFailed;
     }
     if (event.command == cc.skipForwardCommand) {
-        [playerController jumpForwardMedium];
+        [_playerController jumpForwardMedium];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.skipBackwardCommand) {
-        [playerController jumpBackwardMedium];
+        [_playerController jumpBackwardMedium];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.changePlaybackPositionCommand) {
         MPChangePlaybackPositionCommandEvent *positionEvent = (MPChangePlaybackPositionCommandEvent *)event;
-        [playerController setTimeFast:vlc_tick_from_sec( positionEvent.positionTime )];
+        [_playerController setTimeFast:vlc_tick_from_sec( positionEvent.positionTime )];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.changeRepeatModeCommand) {
@@ -131,21 +250,21 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
         MPRepeatType repeatType = repeatEvent.repeatType;
         switch (repeatType) {
             case MPRepeatTypeAll:
-                [playlistController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_ALL];
+                [_playlistController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_ALL];
                  break;
 
             case MPRepeatTypeOne:
-                [playlistController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT];
+                [_playlistController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT];
                 break;
 
             default:
-                [playlistController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_NONE];;
+                [_playlistController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_NONE];;
                 break;
         }
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.changeShuffleModeCommand) {
-        [playlistController setPlaybackOrder:[playlistController playbackOrder] == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL];
+        [_playlistController setPlaybackOrder:[_playlistController playbackOrder] == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL];
         return MPRemoteCommandHandlerStatusSuccess;
     }
 

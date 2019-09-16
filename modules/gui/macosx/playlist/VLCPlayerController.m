@@ -34,8 +34,6 @@
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoWindowCommon.h"
 
-#import <MediaPlayer/MediaPlayer.h>
-
 NSString *VLCPlayerElementaryStreamID = @"VLCPlayerElementaryStreamID";
 NSString *VLCTick = @"VLCTick";
 NSString *VLCPlayerCurrentMediaItemChanged = @"VLCPlayerCurrentMediaItemChanged";
@@ -585,6 +583,10 @@ static int BossCallback(vlc_object_t *p_this,
                                        selector:@selector(applicationWillTerminate:)
                                            name:NSApplicationWillTerminateNotification
                                          object:nil];
+        [_defaultNotificationCenter addObserver:self
+                                       selector:@selector(applicationDidFinishLaunching:)
+                                           name:NSApplicationDidFinishLaunchingNotification
+                                         object:nil];
         _position = -1.f;
         _time = VLC_TICK_INVALID;
         _p_player = player;
@@ -603,14 +605,17 @@ static int BossCallback(vlc_object_t *p_this,
 
         libvlc_int_t *libvlc = vlc_object_instance(getIntf());
         var_AddCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
-
-        if (@available(macOS 10.12.2, *)) {
-            _remoteControlService = [[VLCRemoteControlService alloc] init];
-            [_remoteControlService subscribeToRemoteCommands];
-        }
     }
 
     return self;
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+    if (@available(macOS 10.12.2, *)) {
+        _remoteControlService = [[VLCRemoteControlService alloc] init];
+        [_remoteControlService subscribeToRemoteCommands];
+    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
@@ -709,36 +714,6 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)metaDataChangedForInput:(input_item_t *)inputItem
 {
-    if (@available(macOS 10.12.2, *)) {
-        NSMutableDictionary *currentlyPlayingTrackInfo = [NSMutableDictionary dictionary];
-
-        currentlyPlayingTrackInfo[MPMediaItemPropertyPlaybackDuration] = @(SEC_FROM_VLC_TICK(input_item_GetDuration(inputItem)));
-        currentlyPlayingTrackInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = @(SEC_FROM_VLC_TICK([self time]));
-        currentlyPlayingTrackInfo[MPNowPlayingInfoPropertyPlaybackRate] = @([self playbackRate]);
-
-        char *psz_title = input_item_GetTitle(inputItem);
-        if (!psz_title)
-            psz_title = input_item_GetName(inputItem);
-        currentlyPlayingTrackInfo[MPMediaItemPropertyTitle] = toNSStr(psz_title);
-        FREENULL(psz_title);
-
-        char *psz_artist = input_item_GetArtist(inputItem);
-        currentlyPlayingTrackInfo[MPMediaItemPropertyArtist] = toNSStr(psz_artist);
-        FREENULL(psz_artist);
-
-        char *psz_album = input_item_GetAlbum(inputItem);
-        currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTitle] = toNSStr(psz_album);
-        FREENULL(psz_album);
-
-        char *psz_track_number = input_item_GetTrackNumber(inputItem);
-        currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTrackNumber] = @([toNSStr(psz_track_number) intValue]);
-        FREENULL(psz_track_number);
-
-        [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = currentlyPlayingTrackInfo;
-    }
-
-    input_item_Release(inputItem);
-
     [_defaultNotificationCenter postNotificationName:VLCPlayerMetadataChangedForCurrentMedia
                                               object:self];
 }
@@ -834,27 +809,6 @@ static int BossCallback(vlc_object_t *p_this,
 
     [_defaultNotificationCenter postNotificationName:VLCPlayerStateChanged
                                               object:self];
-
-    if (@available(macOS 10.12.2, *)) {
-        switch (_playerState) {
-            case VLC_PLAYER_STATE_PLAYING:
-                [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStatePlaying;
-                break;
-
-            case VLC_PLAYER_STATE_PAUSED:
-                [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStatePaused;
-                break;
-
-            case VLC_PLAYER_STATE_STOPPED:
-            case VLC_PLAYER_STATE_STOPPING:
-                [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStateStopped;
-                break;
-
-            default:
-                [MPNowPlayingInfoCenter defaultCenter].playbackState = MPNowPlayingPlaybackStateUnknown;
-                break;
-        }
-    }
 
     /* notify third party apps through an informal protocol that our state changed */
     [[NSDistributedNotificationCenter defaultCenter] postNotificationName:@"VLCPlayerStateDidChange"
