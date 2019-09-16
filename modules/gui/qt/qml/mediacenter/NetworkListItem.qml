@@ -16,77 +16,50 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
-import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.4
+import QtQml.Models 2.2
+
+import org.videolan.vlc 0.1
+import org.videolan.medialib 0.1
 
 import "qrc:///utils/" as Utils
 import "qrc:///style/"
 
-Rectangle {
-    id: root
-    signal indexClicked
-    signal itemClicked(int keys, int modifier)
-    signal itemDoubleClicked(int keys, int modifier)
+Utils.ListItem {
+    id: item
 
-    property alias hovered: mouse.containsMouse
+    width: root.width
+    height: VLCStyle.icon_normal + VLCStyle.margin_small
 
-    property Component cover: Item {}
-    property alias line1: line1_text.text
-    property alias line2: line2_text.text
+    focus: true
 
-    MouseArea {
-        id: mouse
-        anchors.fill: parent
-        hoverEnabled: true
-        onClicked: {
-            root.itemClicked(mouse.buttons, mouse.modifiers);
-        }
-        onDoubleClicked: {
-            root.itemDoubleClicked(mouse.buttons, mouse.modifiers);
-        }
-    }
+    color: VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, this.hovered, this.activeFocus)
 
-    RowLayout {
-        anchors.fill: parent
-        Loader {
-            Layout.preferredWidth: VLCStyle.icon_normal
-            Layout.preferredHeight: VLCStyle.icon_normal
-            sourceComponent: root.cover
-        }
-        Column {
-            Text{
-                id: line1_text
-                font.bold: true
-                elide: Text.ElideRight
-                color: VLCStyle.colors.text
-                font.pixelSize: VLCStyle.fontSize_normal
-                enabled: text !== ""
-            }
-            Text{
-                id: line2_text
-                text: ""
-                elide: Text.ElideRight
-                color: VLCStyle.colors.text
-                font.pixelSize: VLCStyle.fontSize_xsmall
-                enabled: text !== ""
-            }
-        }
-
-        Item {
-            Layout.fillWidth: true
-        }
-
-        Utils.ImageToolButton {
-            id: indexButton
-            visible: model.can_index
-            Layout.preferredHeight: VLCStyle.icon_normal
-            Layout.preferredWidth: VLCStyle.icon_normal
-            imageSource: !model.indexed ? "qrc:///buttons/playlist/playlist_add.svg" :
-                                          ((mouse.containsMouse || activeFocus) ? "qrc:///toolbar/clear.svg" :
-                                                                                  "qrc:///valid.svg" )
-            onClicked: {
-                root.indexClicked(mouse.buttons, mouse.modifiers);
+    cover: Image {
+        id: cover_obj
+        fillMode: Image.PreserveAspectFit
+        source: {
+            switch (model.type) {
+            case MLNetworkModel.TYPE_DISC:
+                return  "qrc:///type/disc.svg"
+            case MLNetworkModel.TYPE_CARD:
+                return  "qrc:///type/capture-card.svg"
+            case MLNetworkModel.TYPE_STREAM:
+                return  "qrc:///type/stream.svg"
+            case MLNetworkModel.TYPE_PLAYLIST:
+                return  "qrc:///type/playlist.svg"
+            case MLNetworkModel.TYPE_FILE:
+                return  "qrc:///type/file_black.svg"
+            default:
+                return "qrc:///type/directory_black.svg"
             }
         }
     }
+    line1: model.name || qsTr("Unknown share")
+    line2: model.mrl
+    imageText: (model.type !== MLNetworkModel.TYPE_DIRECTORY && model.type !== MLNetworkModel.TYPE_NODE) ? model.protocol : ""
+
+    showContextButton: true
+
+    actionButtons: []
 }

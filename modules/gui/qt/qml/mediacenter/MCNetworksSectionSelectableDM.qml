@@ -55,16 +55,29 @@ Utils.SelectableDelegateModel {
             }
         }
 
-        Loader {
-            id: delegateLoader
+        NetworkListItem {
+            id: delegateList
             focus: true
             Package.name: "list"
-            source: model.type == MLNetworkModel.TYPE_FILE ?
-                        "qrc:///mediacenter/NetworkFileDisplay.qml" :
-                        "qrc:///mediacenter/NetworkDriveDisplay.qml";
-        }
-        Connections {
-            target: delegateLoader.item
+
+            onItemClicked : {
+                delegateModel.updateSelection( modifier, view[viewIndexPropertyName], index )
+                view[viewIndexPropertyName] = index
+                delegateList.forceActiveFocus()
+            }
+
+            onItemDoubleClicked: {
+                if (model.type === MLNetworkModel.TYPE_NODE || model.type === MLNetworkModel.TYPE_DIRECTORY)
+                    history.push( ["mc", "network", { tree: model.tree } ], History.Go)
+                else
+                    medialib.addAndPlay( model.mrl )
+            }
+
+            onContextMenuButtonClicked: {
+                contextMenu.model = model
+                contextMenu.popup(menuParent)
+            }
+
             onActionLeft: root.navigationLeft(0)
             onActionRight: root.navigationRight(0)
         }

@@ -89,7 +89,10 @@ NavigableFocusScope {
             hoverEnabled: true
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: {
-                root.itemClicked(mouse.button, mouse.modifiers);
+                if (mouse.button === Qt.RightButton)
+                    contextMenuButtonClicked(root);
+                else
+                    root.itemClicked(mouse.button, mouse.modifiers);
             }
             onDoubleClicked: {
                 root.itemDoubleClicked(mouse.buttons, mouse.modifiers);

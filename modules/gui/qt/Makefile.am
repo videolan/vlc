@@ -633,8 +633,6 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/mediacenter/MusicGenresDisplay.qml \
 	gui/qt/qml/mediacenter/MusicTracksDisplay.qml \
 	gui/qt/qml/mediacenter/MusicTrackListDisplay.qml \
-	gui/qt/qml/mediacenter/NetworkDriveDisplay.qml \
-	gui/qt/qml/mediacenter/NetworkFileDisplay.qml \
 	gui/qt/qml/mediacenter/NetworkGridItem.qml \
 	gui/qt/qml/mediacenter/NetworkListItem.qml \
 	gui/qt/qml/mediacenter/VideoExpandableGrid.qml \
