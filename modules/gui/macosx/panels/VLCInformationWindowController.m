@@ -35,8 +35,8 @@
 
 @interface VLCCodecInformationTreeItem : NSObject
 
-@property (readwrite) NSString *name;
-@property (readwrite) NSString *value;
+@property (readwrite) NSString *propertyName;
+@property (readwrite) NSString *propertyValue;
 
 @property (readwrite) NSArray *children;
 
@@ -46,7 +46,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"%@: name: %@ value: %@ children: %lu", NSStringFromClass([self class]), self.name, self.value, self.children.count];
+    return [NSString stringWithFormat:@"%@: name: %@ value: %@ children: %lu", NSStringFromClass([self class]), self.propertyName, self.propertyValue, self.children.count];
 }
 
 @end
@@ -354,15 +354,15 @@
             info_t *info;
 
             VLCCodecInformationTreeItem *subItem = [[VLCCodecInformationTreeItem alloc] init];
-            subItem.name = toNSStr(cat->psz_name);
+            subItem.propertyName = toNSStr(cat->psz_name);
 
             // Build list of codec details
             NSMutableArray *infos = [NSMutableArray array];
 
             info_foreach(info, &cat->infos) {
                 VLCCodecInformationTreeItem *infoItem = [[VLCCodecInformationTreeItem alloc] init];
-                infoItem.name = toNSStr(info->psz_name);
-                infoItem.value = toNSStr(info->psz_value);
+                infoItem.propertyName = toNSStr(info->psz_name);
+                infoItem.propertyValue = toNSStr(info->psz_value);
                 [infos addObject:infoItem];
             }
 
@@ -444,9 +444,9 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
         return @"";
 
     if ([[tableColumn identifier] isEqualToString:@"0"]) {
-        return [item name];
+        return [item propertyName];
     } else {
-        return [item value];
+        return [item propertyValue];
     }
 }
 
