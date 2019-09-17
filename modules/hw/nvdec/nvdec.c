@@ -379,8 +379,6 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
         picctx->devidePtr = p_sys->outputDevicePtr[pool_idx];
         picctx->bufferPitch = p_sys->outputPitch;
         picctx->bufferHeight = p_sys->decoderHeight;
-        picctx->nvdecDevice.cuCtx = p_sys->cuCtx;
-        picctx->nvdecDevice.cudaFunctions = p_sys->cudaFunctions;
 
         size_t srcY = 0;
         size_t dstY = 0;

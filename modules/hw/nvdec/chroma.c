@@ -42,11 +42,6 @@ vlc_module_begin()
     set_callbacks(OpenCUDAToCPU, NULL)
 vlc_module_end()
 
-typedef struct
-{
-    vlc_decoder_device *device;
-} nvdec_filter_sys_t;
-
 #define CALL_CUDA(func, ...) CudaCheckErr(VLC_OBJECT(p_filter), devsys->cudaFunctions, devsys->cudaFunctions->func(__VA_ARGS__), #func)
 
 
@@ -60,7 +55,8 @@ static picture_t * FilterCUDAToCPU( filter_t *p_filter, picture_t *src )
     }
 
     pic_context_nvdec_t *srcpic = container_of(src->context, pic_context_nvdec_t, ctx);
-    decoder_device_nvdec_t *devsys = &srcpic->nvdecDevice;
+    vlc_decoder_device *dec_dev = vlc_video_context_HoldDevice(p_filter->vctx_in);
+    decoder_device_nvdec_t *devsys =  GetNVDECOpaqueDevice(dec_dev);
 
     int result;
     result = CALL_CUDA(cuCtxPushCurrent, devsys->cuCtx);
@@ -68,6 +64,7 @@ static picture_t * FilterCUDAToCPU( filter_t *p_filter, picture_t *src )
     {
         picture_Release(dst);
         picture_Release(src);
+        vlc_decoder_device_Release(dec_dev);
         return NULL;
     }
 
@@ -99,6 +96,7 @@ static picture_t * FilterCUDAToCPU( filter_t *p_filter, picture_t *src )
 done:
     CALL_CUDA(cuCtxPopCurrent, NULL);
     picture_Release(src);
+    vlc_decoder_device_Release(dec_dev);
     return dst;
 }
 
