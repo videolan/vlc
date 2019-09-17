@@ -95,9 +95,8 @@ Utils.SelectableDelegateModel {
             }
             medialib.addAndPlay( list )
         } else {
-            if (delegateModel.items.get(index).model.type != MLNetworkModel.TYPE_FILE)  {
-                console.log("not file")
-                root.tree = delegateModel.items.get(index).model.tree
+            if (delegateModel.items.get(index).model.type === MLNetworkModel.TYPE_DIRECTORY
+                    || delegateModel.items.get(index).model.type === MLNetworkModel.TYPE_NODE)  {
                 history.push(["mc", "network", { tree: delegateModel.items.get(index).model.tree }], History.Go);
             } else {
                 medialib.addAndPlay( delegateModel.items.get(index).model.mrl );
