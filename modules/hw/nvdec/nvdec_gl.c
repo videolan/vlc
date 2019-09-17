@@ -1,0 +1,231 @@
+/*****************************************************************************
+ * converter_nvdec.c: OpenGL NVDEC opaque converter
+ *****************************************************************************
+ * Copyright (C) 2019 VLC authors, VideoLAN and VideoLabs
+ *
+ * Authors: Steve Lhomme <robux4@videolabs.io>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <assert.h>
+
+#include <vlc_common.h>
+#include <vlc_vout_window.h>
+#include <vlc_codec.h>
+
+#include <ffnvcodec/dynlink_loader.h>
+
+#include "../../hw/nvdec/nvdec_fmt.h"
+
+#include "../../video_output/opengl/internal.h"
+#include <GL/glext.h>
+
+static int Open(vlc_object_t *);
+static void Close(vlc_object_t *);
+
+vlc_module_begin ()
+    set_description("NVDEC OpenGL surface converter")
+    set_capability("glconv", 2)
+    set_callbacks(Open, Close)
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    add_shortcut("nvdec")
+vlc_module_end ()
+
+typedef struct {
+    vlc_decoder_device *device;
+    CUcontext cuConverterCtx;
+    CUgraphicsResource cu_res[PICTURE_PLANE_MAX]; // Y, UV for NV12/P010
+    CUarray mappedArray[PICTURE_PLANE_MAX];
+} converter_sys_t;
+
+static inline int CudaCall(const opengl_tex_converter_t *tc, CUresult result, const char *psz_func)
+{
+    if (unlikely(result != CUDA_SUCCESS)) {
+        const char *psz_err, *psz_err_str;
+        vlc_decoder_device *device = tc->dec_device;
+        decoder_device_nvdec_t *devsys = device->opaque;
+        devsys->cudaFunctions->cuGetErrorName(result, &psz_err);
+        devsys->cudaFunctions->cuGetErrorString(result, &psz_err_str);
+        msg_Err((vlc_object_t *)&tc->obj, "%s failed: %s (%s)", psz_func, psz_err_str, psz_err);
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
+#define CALL_CUDA(func, ...) CudaCall(tc, devsys->cudaFunctions->func(__VA_ARGS__), #func)
+
+static int tc_nvdec_gl_allocate_texture(const opengl_tex_converter_t *tc, GLuint *textures,
+                                const GLsizei *tex_width, const GLsizei *tex_height)
+{
+    converter_sys_t *p_sys = tc->priv;
+    vlc_decoder_device *device = tc->dec_device;
+    decoder_device_nvdec_t *devsys = device->opaque;
+
+    int result;
+    result = CALL_CUDA(cuCtxPushCurrent, p_sys->cuConverterCtx ? p_sys->cuConverterCtx : devsys->cuCtx);
+    if (result != VLC_SUCCESS)
+        return result;
+
+    for (unsigned i = 0; i < tc->tex_count; i++)
+    {
+        tc->vt->BindTexture(tc->tex_target, textures[i]);
+        tc->vt->TexImage2D(tc->tex_target, 0, tc->texs[i].internal,
+                           tex_width[i], tex_height[i], 0, tc->texs[i].format,
+                           tc->texs[i].type, NULL);
+        if (tc->vt->GetError() != GL_NO_ERROR)
+        {
+            msg_Err(tc->gl, "could not alloc PBO buffers");
+            return VLC_EGENERIC;
+        }
+
+        result = CALL_CUDA(cuGraphicsGLRegisterImage, &p_sys->cu_res[i], textures[i], tc->tex_target, CU_GRAPHICS_REGISTER_FLAGS_WRITE_DISCARD);
+
+        result = CALL_CUDA(cuGraphicsMapResources, 1, &p_sys->cu_res[i], 0);
+        result = CALL_CUDA(cuGraphicsSubResourceGetMappedArray, &p_sys->mappedArray[i], p_sys->cu_res[i], 0, 0);
+        result = CALL_CUDA(cuGraphicsUnmapResources, 1, &p_sys->cu_res[i], 0);
+
+        tc->vt->BindTexture(tc->tex_target, 0);
+    }
+
+    CALL_CUDA(cuCtxPopCurrent, NULL);
+    return result;
+}
+
+static int
+tc_nvdec_gl_update(opengl_tex_converter_t const *tc, GLuint textures[],
+                   GLsizei const tex_widths[], GLsizei const tex_heights[],
+                   picture_t *pic, size_t const plane_offsets[])
+{
+    VLC_UNUSED(plane_offsets);
+    VLC_UNUSED(textures);
+
+    converter_sys_t *p_sys = tc->priv;
+    vlc_decoder_device *device = tc->dec_device;
+    decoder_device_nvdec_t *devsys = device->opaque;
+    pic_context_nvdec_t *srcpic = container_of(pic->context, pic_context_nvdec_t, ctx);
+
+    int result;
+    result = CALL_CUDA(cuCtxPushCurrent, p_sys->cuConverterCtx ? p_sys->cuConverterCtx : devsys->cuCtx);
+    if (result != VLC_SUCCESS)
+        return result;
+
+    // copy the planes from the pic context to mappedArray
+    size_t srcY = 0;
+    for (unsigned i = 0; i < tc->tex_count; i++)
+    {
+        CUDA_MEMCPY2D cu_cpy = {
+            .srcMemoryType  = CU_MEMORYTYPE_DEVICE,
+            .srcDevice      = srcpic->devidePtr,
+            .srcPitch       = srcpic->bufferPitch,
+            .srcY           = srcY,
+            .dstMemoryType = CU_MEMORYTYPE_ARRAY,
+            .dstArray = p_sys->mappedArray[i],
+            .WidthInBytes = tex_widths[0],
+            .Height = tex_heights[i],
+        };
+        if (tc->fmt.i_chroma != VLC_CODEC_NVDEC_OPAQUE)
+            cu_cpy.WidthInBytes *= 2;
+        result = CALL_CUDA(cuMemcpy2DAsync, &cu_cpy, 0);
+        if (result != VLC_SUCCESS)
+            goto error;
+        srcY += srcpic->bufferHeight;
+    }
+
+error:
+    CALL_CUDA(cuCtxPopCurrent, NULL);
+    return result;
+}
+
+static void Close(vlc_object_t *obj)
+{
+    opengl_tex_converter_t *tc = (void *)obj;
+    converter_sys_t *p_sys = tc->priv;
+    vlc_decoder_device_Release(p_sys->device);
+}
+
+static int Open(vlc_object_t *obj)
+{
+    opengl_tex_converter_t *tc = (void *) obj;
+    if (!is_nvdec_opaque(tc->fmt.i_chroma))
+        return VLC_EGENERIC;
+
+    vlc_decoder_device *device = tc->dec_device;
+    if (device == NULL || device->type != VLC_DECODER_DEVICE_NVDEC)
+        return VLC_EGENERIC;
+    device = vlc_decoder_device_Hold(device);
+
+    converter_sys_t *p_sys = vlc_obj_malloc(VLC_OBJECT(tc), sizeof(*p_sys));
+    if (unlikely(p_sys == NULL))
+    {
+        vlc_decoder_device_Release(device);
+        return VLC_ENOMEM;
+    }
+    for (size_t i=0; i < ARRAY_SIZE(p_sys->cu_res); i++)
+        p_sys->cu_res[i] = NULL;
+    p_sys->cuConverterCtx = NULL;
+    p_sys->device = device;
+
+    decoder_device_nvdec_t *devsys = device->opaque;
+    int result;
+    CUdevice cuDecDevice = 0;
+    unsigned int device_count;
+    result = CALL_CUDA(cuGLGetDevices, &device_count, &cuDecDevice, 1, CU_GL_DEVICE_LIST_ALL);
+    if (result < 0)
+    {
+        vlc_decoder_device_Release(device);
+        return result;
+    }
+
+    CUdevice cuConverterDevice;
+    CALL_CUDA(cuCtxPushCurrent, devsys->cuCtx);
+    result = CALL_CUDA(cuCtxGetDevice, &cuConverterDevice);
+    CALL_CUDA(cuCtxPopCurrent, NULL);
+
+    if (cuConverterDevice != cuDecDevice)
+    {
+        result = CALL_CUDA(cuCtxCreate, &p_sys->cuConverterCtx, 0, cuConverterDevice);
+        if (result != VLC_SUCCESS)
+        {
+        }
+    }
+
+    vlc_fourcc_t render_chroma;
+    switch (tc->fmt.i_chroma)
+    {
+        case VLC_CODEC_NVDEC_OPAQUE_10B: render_chroma = VLC_CODEC_P010; break;
+        case VLC_CODEC_NVDEC_OPAQUE_16B: render_chroma = VLC_CODEC_P016; break;
+        case VLC_CODEC_NVDEC_OPAQUE:
+        default:                         render_chroma = VLC_CODEC_NV12; break;
+    }
+
+    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, render_chroma, tc->fmt.space);
+    if (!tc->fshader)
+    {
+        Close(obj);
+        return VLC_EGENERIC;
+    }
+
+    tc->pf_allocate_textures = tc_nvdec_gl_allocate_texture;
+    tc->pf_update = tc_nvdec_gl_update;
+    tc->priv = p_sys;
+
+    return VLC_SUCCESS;
+}
