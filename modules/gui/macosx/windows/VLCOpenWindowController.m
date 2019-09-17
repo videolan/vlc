@@ -344,11 +344,14 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
         newMRL = @"";
 
     _MRL = newMRL;
-    [self.mrlTextField performSelectorOnMainThread:@selector(setStringValue:) withObject:_MRL waitUntilDone:NO];
-    if ([_MRL length] > 0)
-        [_okButton setEnabled: YES];
-    else
-        [_okButton setEnabled: NO];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.mrlTextField setStringValue:self.MRL];
+        if ([self.MRL length] > 0)
+            [self.okButton setEnabled: YES];
+        else
+            [self.okButton setEnabled: NO];
+    });
 }
 
 - (NSString *)MRL
@@ -796,7 +799,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
             _opticalDevices = [[NSArray alloc] initWithArray: o_result];
         }
 
-        [self performSelectorOnMainThread:@selector(updateMediaSelector:) withObject:nil waitUntilDone:NO];
+        [self updateMediaSelector:NO];
     }
 }
 
@@ -809,7 +812,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
             [_specialMediaFolders addObject:deviceDescription];
         }
 
-        [self performSelectorOnMainThread:@selector(updateMediaSelector:) withObject:[NSNumber numberWithBool:YES] waitUntilDone:NO];
+        [self updateMediaSelector:YES];
     }
 }
 
@@ -818,41 +821,43 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     [NSThread detachNewThreadSelector:@selector(scanDevices) toTarget:self withObject:nil];
 }
 
-- (void)updateMediaSelector:(NSNumber *)selection
+- (void)updateMediaSelector:(BOOL)selected
 {
-    [_allMediaDevices removeAllObjects];
-    [_discSelectorPopup removeAllItems];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->_allMediaDevices removeAllObjects];
+        [self->_discSelectorPopup removeAllItems];
 
-    @synchronized (self) {
-        [_allMediaDevices addObjectsFromArray:_opticalDevices];
-        [_allMediaDevices addObjectsFromArray:_specialMediaFolders];
-    }
-
-    NSUInteger count = [_allMediaDevices count];
-    if (count > 0) {
-        for (NSUInteger i = 0; i < count ; i++) {
-            NSDictionary *o_dict = [_allMediaDevices objectAtIndex:i];
-            [_discSelectorPopup addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:[o_dict objectForKey:@"path"]]];
+        @synchronized (self) {
+            [self->_allMediaDevices addObjectsFromArray:self->_opticalDevices];
+            [self->_allMediaDevices addObjectsFromArray:self->_specialMediaFolders];
         }
 
-        if ([_discSelectorPopup numberOfItems] <= 1)
-            [_discSelectorPopup setHidden: YES];
-        else
-            [_discSelectorPopup setHidden: NO];
+        NSUInteger count = [self->_allMediaDevices count];
+        if (count > 0) {
+            for (NSUInteger i = 0; i < count ; i++) {
+                NSDictionary *deviceDict = [self->_allMediaDevices objectAtIndex:i];
+                [self->_discSelectorPopup addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:[deviceDict objectForKey:@"path"]]];
+            }
 
-        // select newly added media folder
-        if (selection && [selection boolValue])
-            [_discSelectorPopup selectItemAtIndex: [[_discSelectorPopup itemArray] count] - 1];
+            if ([self->_discSelectorPopup numberOfItems] <= 1)
+                [self->_discSelectorPopup setHidden: YES];
+            else
+                [self->_discSelectorPopup setHidden: NO];
 
-        // only trigger MRL update if the tab view is active
-        if ([[[_tabView selectedTabViewItem] identifier] isEqualToString:VLCOpenDiscTabViewId])
-            [self discSelectorChanged:nil];
-    } else {
-        msg_Dbg(getIntf(), "no optical media found");
-        [_discSelectorPopup setHidden: YES];
-        [self setMRL:@""];
-        [self showOpticalMediaView: _discNoDiscView withIcon: [NSImage imageNamed: @"NSApplicationIcon"]];
-    }
+            // select newly added media folder
+            if (selected)
+                [self->_discSelectorPopup selectItemAtIndex: [[self->_discSelectorPopup itemArray] count] - 1];
+
+            // only trigger MRL update if the tab view is active
+            if ([[[self->_tabView selectedTabViewItem] identifier] isEqualToString:VLCOpenDiscTabViewId])
+                [self discSelectorChanged:nil];
+        } else {
+            msg_Dbg(getIntf(), "no optical media found");
+            [self->_discSelectorPopup setHidden: YES];
+            [self setMRL:@""];
+            [self showOpticalMediaView: self->_discNoDiscView withIcon: [NSImage imageNamed: @"NSApplicationIcon"]];
+        }
+    });
 }
 
 - (IBAction)discSelectorChanged:(id)sender
