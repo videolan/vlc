@@ -6,17 +6,17 @@
 # Benny Beat <bennybeat@gmail.com>, 2016-2018
 # Eva Castillo <evac1295@gmail.com>, 2013
 # Jaume Ferrer <jaumeferrerg@msn.com>, 2016
-# jmontane <joan@montane.cat>, 2013-2015,2018
+# Joan Montané <joan@montane.cat>, 2013-2015,2018-2019
+# Jordi Serratosa <jordis@softcatala.cat>, 2018
 # Lorena Gomes and Xènia Albà, April 2005
 # Pau Iranzo <paugnu@gmail.com>, 2013-2016
-# Jordi Serratosa <jordis@softcatala.cat>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-09-17 05:15+0200\n"
+"Last-Translator: Joan Montané <joan@montane.cat>, 2019\n"
 "Language-Team: Catalan (https://www.transifex.com/yaron/teams/16553/ca/)\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -1139,7 +1139,7 @@ msgstr ""
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
-msgstr ""
+msgstr "Orientació"
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
