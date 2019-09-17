@@ -265,21 +265,8 @@ static void Close(vout_display_t *vd)
         [sys->glView setVoutDisplay:nil];
 
         var_Destroy (vd, "drawable-nsobject");
-        if ([(id)sys->container respondsToSelector:@selector(removeVoutSubview:)])
-        /* This will retain sys->glView */
-            [(id)sys->container performSelectorOnMainThread:@selector(removeVoutSubview:)
-                                                 withObject:sys->glView
-                                              waitUntilDone:NO];
-
-        /* release on main thread as explained in Open() */
-        [(id)sys->container performSelectorOnMainThread:@selector(release)
-                                             withObject:nil
-                                          waitUntilDone:NO];
-        [sys->glView performSelectorOnMainThread:@selector(removeFromSuperview)
-                                      withObject:nil
-                                   waitUntilDone:NO];
-
         var_Destroy(vlc_object_parent(vd), "macosx-glcontext");
+
         if (sys->vgl != NULL)
         {
             vlc_gl_MakeCurrent(sys->gl);
@@ -294,7 +281,19 @@ static void Close(vout_display_t *vd)
             vlc_object_delete(sys->gl);
         }
 
-        [sys->glView release];
+        VLCOpenGLVideoView *glView = sys->glView;
+        id<VLCVideoViewEmbedding> viewContainer = sys->container;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([viewContainer respondsToSelector:@selector(removeVoutSubview:)]) {
+                /* This will retain sys->glView */
+                [viewContainer removeVoutSubview:sys->glView];
+            }
+
+            /* release on main thread as explained in Open() */
+            [viewContainer release];
+            [glView removeFromSuperview];
+            [glView release];
+        });
 
         free (sys);
     }
