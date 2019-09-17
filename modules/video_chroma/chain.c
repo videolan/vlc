@@ -457,7 +457,7 @@ static int CreateChain( filter_t *p_parent, const es_format_t *p_fmt_mid )
     return VLC_SUCCESS;
 error:
     //Clean up.
-    filter_chain_Reset( p_sys->p_chain, NULL, NULL );
+    filter_chain_Clear( p_sys->p_chain );
     return VLC_EGENERIC;
 }
 
@@ -491,7 +491,7 @@ static int CreateResizeChromaChain( filter_t *p_parent, const es_format_t *p_fmt
                                               NULL, &p_parent->fmt_out );
 
     if( i_ret != VLC_SUCCESS )
-        filter_chain_Reset( p_sys->p_chain, NULL, NULL );
+        filter_chain_Clear( p_sys->p_chain );
     return i_ret;
 }
 

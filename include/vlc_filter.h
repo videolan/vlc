@@ -350,10 +350,17 @@ VLC_API void filter_chain_Delete( filter_chain_t * );
  * reset p_fmt_in and p_fmt_out to the new values.
  *
  * \param p_chain pointer to filter chain
- * \param p_fmt_in new fmt_in params, may be NULL to leave input fmt unchanged
- * \param p_fmt_out new fmt_out params, may be NULL to leave output fmt unchanged
+ * \param p_fmt_in new fmt_in params
+ * \param p_fmt_out new fmt_out params
  */
 VLC_API void filter_chain_Reset( filter_chain_t *, const es_format_t *, const es_format_t * );
+
+/**
+ * Remove all existing filters
+ *
+ * \param p_chain pointer to filter chain
+ */
+VLC_API void filter_chain_Clear(filter_chain_t *);
 
 /**
  * Append a filter to the chain.

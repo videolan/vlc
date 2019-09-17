@@ -149,13 +149,18 @@ filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
     return chain;
 }
 
+void filter_chain_Clear( filter_chain_t *p_chain )
+{
+    while( p_chain->first != NULL )
+        filter_chain_DeleteFilter( p_chain, &p_chain->first->filter );
+}
+
 /**
  * Filter chain destruction
  */
 void filter_chain_Delete( filter_chain_t *p_chain )
 {
-    while( p_chain->first != NULL )
-        filter_chain_DeleteFilter( p_chain, &p_chain->first->filter );
+    filter_chain_Clear( p_chain );
 
     es_format_Clean( &p_chain->fmt_in );
     es_format_Clean( &p_chain->fmt_out );
@@ -168,19 +173,15 @@ void filter_chain_Delete( filter_chain_t *p_chain )
 void filter_chain_Reset( filter_chain_t *p_chain, const es_format_t *p_fmt_in,
                          const es_format_t *p_fmt_out )
 {
-    while( p_chain->first != NULL )
-        filter_chain_DeleteFilter( p_chain, &p_chain->first->filter );
+    filter_chain_Clear( p_chain );
 
-    if( p_fmt_in )
-    {
-        es_format_Clean( &p_chain->fmt_in );
-        es_format_Copy( &p_chain->fmt_in, p_fmt_in );
-    }
-    if( p_fmt_out )
-    {
-        es_format_Clean( &p_chain->fmt_out );
-        es_format_Copy( &p_chain->fmt_out, p_fmt_out );
-    }
+    assert(p_fmt_in != NULL);
+    es_format_Clean( &p_chain->fmt_in );
+    es_format_Copy( &p_chain->fmt_in, p_fmt_in );
+
+    assert(p_fmt_out != NULL);
+    es_format_Clean( &p_chain->fmt_out );
+    es_format_Copy( &p_chain->fmt_out, p_fmt_out );
 }
 
 static filter_t *filter_chain_AppendInner( filter_chain_t *chain,

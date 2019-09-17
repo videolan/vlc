@@ -1806,7 +1806,7 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
                 filter_chain_ForEach(sys->filter_chain,
                                      SubFilterDelProxyCallbacks,
                                      sys->vout);
-            filter_chain_Reset(sys->filter_chain, NULL, NULL);
+            filter_chain_Clear(sys->filter_chain);
 
             filter_chain_AppendFromString(spu->p->filter_chain, chain_update);
             if (sys->vout)
@@ -1815,7 +1815,7 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
                                      sys->vout);
         }
         else
-            filter_chain_Reset(sys->filter_chain, NULL, NULL);
+            filter_chain_Clear(sys->filter_chain);
 
         /* "sub-source"  was formerly "sub-filter", so now the "sub-filter"
         configuration may contain sub-filters or sub-sources configurations.
@@ -1913,7 +1913,7 @@ subpicture_t *spu_Render(spu_t *spu,
                 filter_chain_ForEach(sys->source_chain,
                                      SubSourceDelProxyCallbacks,
                                      sys->vout);
-        filter_chain_Reset(sys->source_chain, NULL, NULL);
+        filter_chain_Clear(sys->source_chain);
 
         filter_chain_AppendFromString(spu->p->source_chain, chain_update);
         if (sys->vout)
