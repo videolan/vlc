@@ -126,7 +126,7 @@ struct sout_stream_id_sys_t
              filter_chain_t  *p_conv_static;
              filter_chain_t  *p_uf_chain; /**< User-specified video filters */
              filter_chain_t  *p_final_conv_static;
-             filter_t        *p_spu_blender;
+             vlc_blender_t   *p_spu_blender;
              spu_t           *p_spu;
              video_format_t  fmt_input_video;
          };

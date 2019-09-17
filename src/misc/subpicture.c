@@ -289,7 +289,7 @@ void subpicture_region_ChainDelete( subpicture_region_t *p_head )
 #include <vlc_filter.h>
 
 unsigned picture_BlendSubpicture(picture_t *dst,
-                                 filter_t *blend, subpicture_t *src)
+                                 vlc_blender_t *blend, subpicture_t *src)
 {
     unsigned done = 0;
 

@@ -125,7 +125,7 @@ struct vout_display_sys_t
 
     bool b_displayed;
     bool b_sub_invalid;
-    filter_t *p_spu_blend;
+    vlc_blender_t *p_spu_blend;
     picture_t *p_sub_pic;
     buffer_bounds *p_sub_buffer_bounds;
     int64_t i_sub_last_order;

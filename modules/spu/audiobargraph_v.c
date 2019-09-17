@@ -125,7 +125,7 @@ typedef struct
  */
 typedef struct
 {
-    filter_t *p_blend;
+    vlc_blender_t *p_blend;
 
     vlc_mutex_t lock;
 

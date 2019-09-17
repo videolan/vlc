@@ -101,10 +101,10 @@ void filter_DelProxyCallbacks( vlc_object_t *obj, filter_t *filter,
 
 /* */
 
-filter_t *filter_NewBlend( vlc_object_t *p_this,
+vlc_blender_t *filter_NewBlend( vlc_object_t *p_this,
                            const video_format_t *p_dst_chroma )
 {
-    filter_t *p_blend = vlc_custom_create( p_this, sizeof(*p_blend), "blend" );
+    vlc_blender_t *p_blend = vlc_custom_create( p_this, sizeof(*p_blend), "blend" );
     if( !p_blend )
         return NULL;
 
@@ -125,7 +125,7 @@ filter_t *filter_NewBlend( vlc_object_t *p_this,
     return p_blend;
 }
 
-int filter_ConfigureBlend( filter_t *p_blend,
+int filter_ConfigureBlend( vlc_blender_t *p_blend,
                            int i_dst_width, int i_dst_height,
                            const video_format_t *p_src )
 {
@@ -157,7 +157,7 @@ int filter_ConfigureBlend( filter_t *p_blend,
     return VLC_SUCCESS;
 }
 
-int filter_Blend( filter_t *p_blend,
+int filter_Blend( vlc_blender_t *p_blend,
                   picture_t *p_dst, int i_dst_x, int i_dst_y,
                   const picture_t *p_src, int i_alpha )
 {
@@ -168,7 +168,7 @@ int filter_Blend( filter_t *p_blend,
     return VLC_SUCCESS;
 }
 
-void filter_DeleteBlend( filter_t *p_blend )
+void filter_DeleteBlend( vlc_blender_t *p_blend )
 {
     if( p_blend->p_module )
         module_unneed( p_blend, p_blend->p_module );
