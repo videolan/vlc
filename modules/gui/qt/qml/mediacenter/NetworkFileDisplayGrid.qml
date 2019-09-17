@@ -30,8 +30,8 @@ Utils.GridItem {
     pictureWidth: VLCStyle.network_normal
     pictureHeight: VLCStyle.network_normal
     image: "qrc:///type/file_black.svg"
-    subtitle: model.name || qsTr("Unknown share")
-    title: model.mrl
+    subtitle: model.mrl || ""
+    title: model.name || qsTr("Unknown share")
     focus: true
 
     selected: element.DelegateModel.inSelected
