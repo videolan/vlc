@@ -51,6 +51,7 @@ Codecs:
  * Improve 708 decoder
  * Support AGM decoder
  * Support VP4 decoder
+ * Add NVDEC hardware decoder
 
 Access:
  * Enable SMB2 / SMB3 support on mobile ports with libsmb2
