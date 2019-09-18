@@ -190,14 +190,17 @@ NavigableFocusScope {
                             focus: index === toolButtons.focusIndex
                         }
                         }                        
-                        Utils.ContextButton{
+                        IconToolButton {
                             id: contextButton
-                            color: contextButton.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-                            focus: actionButtons.length == toolButtons.focusIndex
+                            size: VLCStyle.icon_normal
+                            text: VLCIcons.ellipsis
+
                             visible: root.showContextButton
-                            backgroundColor: hovered || activeFocus ? VLCStyle.colors.getBgColor(
-                                                 root.isSelected, root.hovered,
-                                                 root.activeFocus) : "transparent"
+                            focus: actionButtons.length == toolButtons.focusIndex
+
+                            highlightColor: VLCStyle.colors.getBgColor(
+                                                root.isSelected, root.hovered,
+                                                root.activeFocus)
                             onClicked: root.contextMenuButtonClicked(this)
                         }
                     }
