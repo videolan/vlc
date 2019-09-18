@@ -3,30 +3,30 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Anaïs V. <anais.vidal1@gmail.com>, 2014
-# Paul Caranton <caranton.paul@gmail.com>, 2015
-# Christophe Lherieau <skimpax@gmail.com>, 2013
-# Emmanuel Simond <emmanuel.simond@gmail.com>, 2013
-# Damien Erambert <damien.erambert@me.com>, 2013
-# Eric Lassauge <lassauge@users.sourceforge.net>, 2013-2015,2018
-# Pierre Ynard <linkfanel@yahoo.fr>, 2018-2019
-# Freddydelanuit Dec <fred.dec@free.fr>, 2014
-# Rafaël Carré <funman@videolan.org>, 2014
-# Hugo Beauzée-Luyssen <hugo@beauzee.fr>, 2015
-# Yann Ricquebourg <yann.ricquebourg@gmail.com>, 2015-2019
-# Benoit Andrieu <benoit.andrieu@gmail.com>, 2017
-# Mortimer <doug.mortimer@netcourrier.com>, 2017
-# Romain Constantin <romzer2330@gmail.com>, 2018
-# Lionel Hannequin <lionel.hannequin@free.fr>, 2018
 # Alpha Ratz <alpharatz@live.fr>, 2018
+# Anaïs V. <anais.vidal1@gmail.com>, 2014
+# Benoit Andrieu <benoit.andrieu@gmail.com>, 2017
+# Christophe Lherieau <skimpax@gmail.com>, 2013
+# Damien Erambert <damien.erambert@me.com>, 2013
+# Emmanuel Simond <emmanuel.simond@gmail.com>, 2013
+# Eric Lassauge <lassauge@users.sourceforge.net>, 2013-2015,2018
+# Freddydelanuit Dec <fred.dec@free.fr>, 2014
+# Hugo Beauzée-Luyssen <hugo@beauzee.fr>, 2015
 # Irriep Nala Novram <allannkorh@yahoo.fr>, 2018
+# Lionel Hannequin <lionel.hannequin@free.fr>, 2018
+# Mortimer <doug.mortimer@netcourrier.com>, 2017
+# Paul Caranton <caranton.paul@gmail.com>, 2015
+# Pierre Ynard <linkfanel@yahoo.fr>, 2018-2019
+# Rafaël Carré <funman@videolan.org>, 2014
+# Romain Constantin <romzer2330@gmail.com>, 2018
+# Yann Ricquebourg <yann.ricquebourg@gmail.com>, 2015-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-07-03 23:00+0200\n"
-"Last-Translator: Yann Ricquebourg <yann.ricquebourg@gmail.com>, 2019\n"
+"PO-Revision-Date: 2020-02-28 21:04+0100\n"
+"Last-Translator: JeanDeLaMouche <urgau@numericable.fr>, 2020\n"
 "Language-Team: French (https://www.transifex.com/yaron/teams/16553/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -2663,9 +2663,9 @@ msgid ""
 "IDs (SIDs). Only use this option if you want to read a multi-program stream "
 "(like DVB streams for example)."
 msgstr ""
-"Choisir les programmes à sélectionner en donnant une liste de Service IDs, "
-"séparés par des virgules. N'utiliser cette option que pour lire un flux "
-"multiprogrammes (tel qu'un flux DVB, par exemple)."
+"Choisir les programmes à sélectionner via une liste d'identifiants de "
+"service (des SID), séparés par des virgules. N'utiliser cette option que "
+"pour lire un flux multiprogramme (un flux DVB par exemple). "
 
 #: src/libvlc-module.c:578 modules/gui/qt/ui/open_disk.h:309
 msgid "Audio track"
@@ -4448,7 +4448,7 @@ msgstr "Choisir la touche pour changer l'échelle des sous-titres"
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
-msgstr "Synchro sous-titre / signet temporel audio"
+msgstr "Synchro sous-titrage / signet temporel audio"
 
 #: src/libvlc-module.c:1330
 msgid "Select the key to bookmark audio timestamp when syncing subtitles."
@@ -4458,7 +4458,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1331
 msgid "Subtitle sync / bookmark subtitle timestamp"
-msgstr "Synchro sous-titre / signet temporel sous-titre"
+msgstr "Synchro sous-titrage / signet temporel de sous-titrage"
 
 #: src/libvlc-module.c:1332
 msgid "Select the key to bookmark subtitle timestamp when syncing subtitles."
@@ -4468,7 +4468,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1333
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
-msgstr "Synchro sous-titre / signet temporel"
+msgstr "Synchro sous-titrage / synchroniser signets audio & sous-titrage"
 
 #: src/libvlc-module.c:1334
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
@@ -4478,7 +4478,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1335
 msgid "Subtitle sync / reset audio & subtitle synchronization"
-msgstr "Synchro sous-titre / restaurer"
+msgstr "Synchro sous-titre / réinitialiser la synchro audio & sous-titrage"
 
 #: src/libvlc-module.c:1336
 msgid "Select the key to reset synchronization of audio & subtitle timestamps."
@@ -6298,7 +6298,7 @@ msgstr "Blu-ray"
 
 #: modules/access/bluray.c:104
 msgid "Blu-ray Disc support (libbluray)"
-msgstr "Support de disque Blu-ray (libbluray)"
+msgstr "Prise en charge des disques Blu-ray (libbluray)"
 
 #: modules/access/bluray.c:845
 msgid "Path doesn't appear to be a Blu-ray"
@@ -6363,7 +6363,7 @@ msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
 "The disc will be played without menus."
 msgstr ""
-"Ce disque Blu-ray nécessite Java pour le support des menus.%s\n"
+"Ce disque Blu-ray nécessite Java pour la prise en charge des menus.%s\n"
 "Le disque sera lu sans les menus."
 
 #: modules/access/bluray.c:924
@@ -6863,8 +6863,8 @@ msgstr ""
 msgid ""
 "The device you selected cannot be used, because its type is not supported."
 msgstr ""
-"VLC ne peut pas utiliser le périphérique « %s », car son type n'est pas "
-"supporté."
+"Le périphérique que vous avez sélectionné ne peut pas être utilisé car son "
+"type n’est pas pris en charge."
 
 #: modules/access/dshow/dshow.cpp:1126
 #, c-format
@@ -9173,7 +9173,7 @@ msgstr "[vcd:][périphérique][#[titre][,[chapitre]]]"
 
 #: modules/access/vdr.c:72
 msgid "Support for VDR recordings (http://www.tvdr.de/)."
-msgstr "Support de l'enregistrement VDR (http://www.tvdr.de/)."
+msgstr "Prise en charge de l'enregistrement VDR (http://www.tvdr.de/)."
 
 #: modules/access/vdr.c:74
 msgid "Chapter offset in ms"
@@ -10328,8 +10328,8 @@ msgid ""
 "Different resampling algorithms are supported. The best one is slower, while "
 "the fast one exhibits low quality."
 msgstr ""
-"Plusieurs algorithmes de rééchantilllonnage sont supportés. Le meilleur est "
-"lent, alors que le rapide est de moins bonne qualité."
+"Plusieurs algorithmes de rééchantillonnage sont pris en charge. Le meilleur "
+"est lent, alors que le rapide est de moins bonne qualité."
 
 #: modules/audio_filter/resampler/src.c:49
 msgid "Sinc function (best quality)"
@@ -10860,9 +10860,9 @@ msgid ""
 "The option allows you to enable or disable the high-quality float32 audio "
 "output mode (which is not well supported by some soundcards)."
 msgstr ""
-"Cette option vous permet d'activer ou de désactver le mode de sortie audio "
-"haute qualité en virgule flottante (qui n'est pas très bien supporté par "
-"toutes les cartes son)."
+"Cette option vous permet d'activer ou de désactiver le mode de sortie audio "
+"haute qualité en virgule flottante (qui n'est pas très bien pris en charge "
+"par toutes les cartes son)."
 
 #: modules/codec/a52.c:70
 msgid "A/52 dynamic range compression"
@@ -11772,7 +11772,7 @@ msgstr ""
 
 #: modules/codec/fluidsynth.c:57
 msgid "Polyphony"
-msgstr "Poliphonie"
+msgstr "Polyphonie"
 
 #: modules/codec/fluidsynth.c:59
 msgid ""
@@ -12142,7 +12142,7 @@ msgstr "Empaqueteur audio PCM linéaire"
 
 #: modules/codec/lpcm.c:71
 msgid "Linear PCM audio encoder"
-msgstr "Encodeur audio pour PCM linéaire"
+msgstr "Encodeur audio PCM linéaire"
 
 #: modules/codec/mad.c:78
 msgid "MPEG audio layer I/II/III decoder"
@@ -13549,7 +13549,8 @@ msgstr ""
 
 #: modules/codec/x264.c:89
 msgid "Enable compatibility hacks for Blu-ray support"
-msgstr "Activer le contournement de compatibilité pour le support Blu-ray"
+msgstr ""
+"Activer les contournements de compatibilité pour la prise en charge Blu-ray"
 
 #: modules/codec/x264.c:90
 msgid ""
@@ -14640,7 +14641,7 @@ msgstr "Enregistrement effectué"
 
 #: modules/control/hotkeys.c:606
 msgid "Sub sync: bookmarked audio time"
-msgstr "Synchro sous-titres : signet temps audio"
+msgstr "Synchro sous-titres : instant audio marqué"
 
 #: modules/control/hotkeys.c:621 modules/control/hotkeys.c:690
 msgid "No active subtitle"
@@ -14648,7 +14649,7 @@ msgstr "Pas de sous-titres actifs"
 
 #: modules/control/hotkeys.c:627
 msgid "Sub sync: bookmarked subtitle time"
-msgstr "Synchro sous-titrage : temps mis en signet"
+msgstr "Synchro sous-titrage : instant sous-titrage marqué"
 
 #: modules/control/hotkeys.c:647
 msgid "Sub sync: set bookmarks first!"
@@ -14657,11 +14658,11 @@ msgstr "Synchro sous-titrage : configurer d'abord des signets !"
 #: modules/control/hotkeys.c:656
 #, c-format
 msgid "Sub sync: corrected %i ms (total delay = %i ms)"
-msgstr "Synchro sous-titres : correction %i ms (délai total = %is ms)"
+msgstr "Synchro sous-titres : corrigée de %i ms (total = %i ms)"
 
 #: modules/control/hotkeys.c:669
 msgid "Sub sync: delay reset"
-msgstr "Synchro sous-titres : effacement retard"
+msgstr "Synchro sous-titres : retard réinitialisé"
 
 #: modules/control/hotkeys.c:698
 #, c-format
@@ -14835,7 +14836,7 @@ msgstr "Synchronisation réseau"
 
 #: modules/control/ntservice.c:46
 msgid "Install Windows Service"
-msgstr "Installer le service NT/2K/XP"
+msgstr "Installer le service Windows"
 
 #: modules/control/ntservice.c:48
 msgid "Install the Service and exit."
@@ -14843,7 +14844,7 @@ msgstr "Installer le service et quitter."
 
 #: modules/control/ntservice.c:49
 msgid "Uninstall Windows Service"
-msgstr "Désinstaller le service NT/2K/XP"
+msgstr "Désinstaller le service Windows"
 
 #: modules/control/ntservice.c:51
 msgid "Uninstall the Service and exit."
@@ -16490,7 +16491,7 @@ msgstr "Démultiplexeur XA"
 
 #: modules/demux/xiph_metadata.c:588
 msgid "Unknown category"
-msgstr "catégorie inconnue"
+msgstr "Catégorie inconnue"
 
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
@@ -17491,7 +17492,7 @@ msgstr "Contrôler les lecteurs de musique externe"
 msgid "VLC will pause and resume supported music players on playback."
 msgstr ""
 "VLC pourra mettre en pause et reprendre la lecture sur les lecteurs de "
-"musiques supportés."
+"musiques pris en charge."
 
 #: modules/gui/macosx/macosx.m:128
 msgid "Use large text for list views"
@@ -18419,7 +18420,7 @@ msgstr "Reprendre la lecture ?"
 #: modules/gui/macosx/VLCSimplePrefsController.m:822
 #: modules/gui/qt/dialogs/firstrun.cpp:106
 msgid "Continue"
-msgstr "Reprendre"
+msgstr "Continuer"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
 msgid "Always continue media playback"
@@ -18872,7 +18873,7 @@ msgstr "Sous-titres/Vidéo"
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:55
 #: modules/gui/qt/components/extended_panels.cpp:1428
 msgid "Subtitle track synchronization:"
-msgstr "Synchronisation de piste sous-titres :"
+msgstr "Synchronisation de piste de sous-titres :"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:57
 msgid "A positive value means that the subtitles are ahead of the video"
@@ -19455,7 +19456,7 @@ msgstr "[Boucler]"
 #: modules/gui/ncurses.c:1057
 #, c-format
 msgid " Source   : %s"
-msgstr " Source  : %s"
+msgstr " Source   : %s"
 
 #: modules/gui/ncurses.c:1090
 #, c-format
@@ -19464,16 +19465,16 @@ msgstr " Position : %s/%s"
 
 #: modules/gui/ncurses.c:1095
 msgid " Volume   : Mute"
-msgstr "Volume : muet"
+msgstr " Volume   : muet"
 
 #: modules/gui/ncurses.c:1096
 #, c-format
 msgid " Volume   : %3ld%%"
-msgstr "Volume : %3ld%%"
+msgstr " Volume   : %3ld%%"
 
 #: modules/gui/ncurses.c:1096
 msgid " Volume   : ----"
-msgstr "Volume : ----"
+msgstr " Volume   : ----"
 
 #: modules/gui/ncurses.c:1102
 #, c-format
@@ -23492,11 +23493,11 @@ msgstr "Ancien serveur de VoD RTSP"
 
 #: modules/misc/securetransport.c:55
 msgid "TLS support for OS X and iOS"
-msgstr "Support de TLS pour OS X et iOS"
+msgstr "Prise en charge de TLS pour OS X et iOS"
 
 #: modules/misc/securetransport.c:68
 msgid "TLS server support for OS X"
-msgstr "Support du serveur TLS pour OS X"
+msgstr "Prise en charge du serveur TLS pour OS X"
 
 #: modules/misc/securetransport.c:338
 #, c-format
@@ -23670,7 +23671,7 @@ msgstr "Multiplexeur PS"
 
 #: modules/mux/mpeg/ts.c:102
 msgid "Video PID"
-msgstr "Vidéo PID"
+msgstr "PID vidéo"
 
 #: modules/mux/mpeg/ts.c:103
 msgid ""
@@ -23866,7 +23867,7 @@ msgstr "Chiffrer la vidéo avec CSA"
 
 #: modules/mux/mpeg/ts.c:181
 msgid "CSA Key in use"
-msgstr "Clé CSA"
+msgstr "Clé CSA utilisée"
 
 #: modules/mux/mpeg/ts.c:182
 msgid ""
@@ -27854,7 +27855,7 @@ msgid ""
 "Select the resolution for the framebuffer. Currently it supports the values "
 "0=QCIF 1=CIF 2=NTSC 3=PAL, 4=auto (default 4=auto)"
 msgstr ""
-"Sélectionner la résolution du « framebuffer ». Les valeurs supportées sont "
+"Sélectionner la résolution du « framebuffer ». Les valeurs acceptées sont "
 "0=QCIF 1=CIF 2=NTSC 3=PAL, 4=auto (défault 4=auto)"
 
 #: modules/video_output/fb.c:70
@@ -29623,7 +29624,7 @@ msgstr "Ceci est l'interface par défaut de VLC, avec un style natif."
 
 #: modules/gui/qt/ui/sprefs_interface.h:534
 msgid "Use native style"
-msgstr "Utiliser un style natif"
+msgstr "Utiliser le style natif"
 
 #: modules/gui/qt/ui/sprefs_interface.h:535
 msgid "Resize interface to video size"
