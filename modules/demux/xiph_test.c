@@ -54,7 +54,7 @@ struct params_s
     unsigned packets_count;
     bool lavc;
     vlc_fourcc_t codec;
-    uint8_t *p_append;
+    void *p_append;
     int i_append;
 };
 
