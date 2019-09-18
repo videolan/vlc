@@ -1088,11 +1088,13 @@ bool libvlc_video_direct3d_set_callbacks(libvlc_media_player_t *mp,
     {
         var_SetString ( mp, "vout", "direct3d11" );
         var_SetString ( mp, "avcodec-hw", "d3d11va");
+        var_SetString ( mp, "dec-dev", "d3d11-device" );
     }
     else if ( engine == libvlc_video_direct3d_engine_d3d9 )
     {
         var_SetString ( mp, "vout", "direct3d9" );
         var_SetString ( mp, "avcodec-hw", "dxva2");
+        var_SetString ( mp, "dec-dev", "d3d9-device" );
     }
     else
         return false;
