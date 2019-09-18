@@ -613,7 +613,7 @@ Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
 
-    aout_sys_t *sys = p_aout->sys = calloc(1, sizeof (*sys));
+    aout_sys_t *sys = aout->sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
