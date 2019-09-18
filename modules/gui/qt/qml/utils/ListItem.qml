@@ -94,134 +94,134 @@ NavigableFocusScope {
             onDoubleClicked: {
                 root.itemDoubleClicked(mouse.buttons, mouse.modifiers);
             }
-        RectangularGlow {
-            id: glow
-            anchors.fill: innerRect
-            spread: 0.1
-            glowRadius: VLCStyle.margin_xxsmall
-            color: VLCStyle.colors.getBgColor(
-                       root.isSelected, root.hovered,
-                       root.activeFocus)
-        }
-        Rectangle {
-            id: innerRect
-            radius: height / 10
-            anchors.fill: parent
-            anchors.margins: VLCStyle.margin_xxsmall
-            anchors.verticalCenter: parent.verticalCenter
-            color: VLCStyle.colors.bg
-
-        RowLayout {
-            anchors.fill: parent
-            anchors.rightMargin: VLCStyle.margin_xxsmall
-            Item {
-                Layout.preferredWidth: VLCStyle.icon_normal
-                Layout.preferredHeight: VLCStyle.icon_normal
-                Loader {
-                    anchors.fill: parent
-                    sourceComponent: root.cover
-                }
-                Text {
-                    id: cover_text
-                    anchors.centerIn: parent
-                    color: VLCStyle.colors.lightText
-                    font.pixelSize: VLCStyle.fontSize_xsmall
-                }
+            RectangularGlow {
+                id: glow
+                anchors.fill: innerRect
+                spread: 0.1
+                glowRadius: VLCStyle.margin_xxsmall
+                color: VLCStyle.colors.getBgColor(
+                           root.isSelected, root.hovered,
+                           root.activeFocus)
             }
-            FocusScope {
-                id: presentation
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                focus: true
+            Rectangle {
+                id: innerRect
+                radius: height / 10
+                anchors.fill: parent
+                anchors.margins: VLCStyle.margin_xxsmall
+                anchors.verticalCenter: parent.verticalCenter
+                color: VLCStyle.colors.bg
 
-                Column {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        verticalCenter: parent.verticalCenter
-                    }
-
-                    Text {
-                        id: line1_text
-                        width: parent.width
-
-                        elide: Text.ElideRight
-                        color: VLCStyle.colors.text
-                        font.pixelSize: VLCStyle.fontSize_normal
-                        enabled: text !== ""
-                    }
-                    Text {
-                        id: line2_text
-                        width: parent.width
-                        elide: Text.ElideRight
-                        color: VLCStyle.colors.lightText
-                        font.pixelSize: VLCStyle.fontSize_small
-                        visible: text !== ""
-                        enabled: text !== ""
-                    }
-                }
-
-                Keys.onRightPressed: {
-                    if (actionButtons.length === 0 && !root.showContextButton)
-                        root.navigationRight(0)
-                    else
-                        toolButtons.focus = true
-                }
-                Keys.onLeftPressed: {
-                    root.navigationLeft(0)
-                }
-            }
-
-            FocusScope {
-                id: toolButtons
-                Layout.preferredHeight: VLCStyle.icon_normal
-                Layout.preferredWidth: toolButtonsRow.implicitWidth
-                Layout.alignment: Qt.AlignVCenter
-                visible: mouse.containsMouse || root.activeFocus
-                property int focusIndex: 0
-                Row {
-                    id: toolButtonsRow
+                RowLayout {
                     anchors.fill: parent
-                    Repeater {
-                        id: buttons
-                        model: actionButtons
-                        delegate: Loader {
-                            sourceComponent: modelData
-                            focus: index === toolButtons.focusIndex
+                    anchors.rightMargin: VLCStyle.margin_xxsmall
+                    Item {
+                        Layout.preferredWidth: VLCStyle.icon_normal
+                        Layout.preferredHeight: VLCStyle.icon_normal
+                        Loader {
+                            anchors.fill: parent
+                            sourceComponent: root.cover
                         }
-                        }                        
-                        IconToolButton {
-                            id: contextButton
-                            size: VLCStyle.icon_normal
-                            text: VLCIcons.ellipsis
-
-                            visible: root.showContextButton
-                            focus: actionButtons.length == toolButtons.focusIndex
-
-                            highlightColor: VLCStyle.colors.getBgColor(
-                                                root.isSelected, root.hovered,
-                                                root.activeFocus)
-                            onClicked: root.contextMenuButtonClicked(this)
+                        Text {
+                            id: cover_text
+                            anchors.centerIn: parent
+                            color: VLCStyle.colors.lightText
+                            font.pixelSize: VLCStyle.fontSize_xsmall
                         }
                     }
-                }
-                Keys.onLeftPressed: {
-                    if (toolButtons.focusIndex === 0)
-                        presentation.focus = true
-                    else {
-                        toolButtons.focusIndex -= 1
+                    FocusScope {
+                        id: presentation
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        focus: true
+
+                        Column {
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                id: line1_text
+                                width: parent.width
+
+                                elide: Text.ElideRight
+                                color: VLCStyle.colors.text
+                                font.pixelSize: VLCStyle.fontSize_normal
+                                enabled: text !== ""
+                            }
+                            Text {
+                                id: line2_text
+                                width: parent.width
+                                elide: Text.ElideRight
+                                color: VLCStyle.colors.lightText
+                                font.pixelSize: VLCStyle.fontSize_small
+                                visible: text !== ""
+                                enabled: text !== ""
+                            }
+                        }
+
+                        Keys.onRightPressed: {
+                            if (actionButtons.length === 0 && !root.showContextButton)
+                                root.navigationRight(0)
+                            else
+                                toolButtons.focus = true
+                        }
+                        Keys.onLeftPressed: {
+                            root.navigationLeft(0)
+                        }
                     }
-                }
-                Keys.onRightPressed: {
-               if (toolButtons.focusIndex === (actionButtons.length - (!root.showContextButton ? 1 : 0) ) )
-                        root.navigationRight(0)
-                    else {
-                        toolButtons.focusIndex += 1
+
+                    FocusScope {
+                        id: toolButtons
+                        Layout.preferredHeight: VLCStyle.icon_normal
+                        Layout.preferredWidth: toolButtonsRow.implicitWidth
+                        Layout.alignment: Qt.AlignVCenter
+                        visible: mouse.containsMouse || root.activeFocus
+                        property int focusIndex: 0
+                        Row {
+                            id: toolButtonsRow
+                            anchors.fill: parent
+                            Repeater {
+                                id: buttons
+                                model: actionButtons
+                                delegate: Loader {
+                                    sourceComponent: modelData
+                                    focus: index === toolButtons.focusIndex
+                                }
+                            }
+                            IconToolButton {
+                                id: contextButton
+                                size: VLCStyle.icon_normal
+                                text: VLCIcons.ellipsis
+
+                                visible: root.showContextButton
+                                focus: actionButtons.length == toolButtons.focusIndex
+
+                                highlightColor: VLCStyle.colors.getBgColor(
+                                                    root.isSelected, root.hovered,
+                                                    root.activeFocus)
+                                onClicked: root.contextMenuButtonClicked(this)
+                            }
+                        }
+                    }
+                    Keys.onLeftPressed: {
+                        if (toolButtons.focusIndex === 0)
+                            presentation.focus = true
+                        else {
+                            toolButtons.focusIndex -= 1
+                        }
+                    }
+                    Keys.onRightPressed: {
+                        if (toolButtons.focusIndex === (actionButtons.length - (!root.showContextButton ? 1 : 0) ) )
+                            root.navigationRight(0)
+                        else {
+                            toolButtons.focusIndex += 1
+                        }
                     }
                 }
             }
-        }
-        }
         }
     }
+}
 
