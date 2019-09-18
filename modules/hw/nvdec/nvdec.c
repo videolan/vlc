@@ -39,6 +39,7 @@
 
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
+static int DecoderContextOpen(vlc_decoder_device *, vout_window_t *);
 
 #define DEINTERLACE_MODULE_TEXT N_("Integrated deinterlacing")
 #define DEINTERLACE_MODULE_LONGTEXT N_( "Specify the deinterlace mode to use." )
@@ -64,6 +65,9 @@ vlc_module_begin ()
                  DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT, true )
         change_integer_list( ppsi_deinterlace_type, ppsz_deinterlace_type )
     set_callbacks(OpenDecoder, CloseDecoder)
+    add_submodule()
+        set_callback_dec_device(DecoderContextOpen, 3)
+        add_shortcut("nvdec-device")
 vlc_module_end ()
 
 /* */
@@ -112,6 +116,7 @@ static inline int CudaCall(decoder_t *p_dec, CUresult result, const char *psz_fu
 }
 
 #define CALL_CUDA_DEC(func, ...) CudaCall(p_dec,  p_sys->cudaFunctions->func(__VA_ARGS__), #func)
+#define CALL_CUDA_DEV(func, ...) CudaCall(device, p_sys->cudaFunctions->func(__VA_ARGS__), #func)
 #define CALL_CUVID(func, ...)    CudaCall(p_dec,  p_sys->cuvidFunctions->func(__VA_ARGS__), #func)
 
 static vlc_fourcc_t MapSurfaceChroma(cudaVideoChromaFormat chroma, unsigned bitDepth)
@@ -930,5 +935,53 @@ static void CloseDecoder(vlc_object_t *p_this)
     cuvid_free_functions(&p_sys->cuvidFunctions);
     if (p_sys->b_is_hxxx)
         hxxx_helper_clean(&p_sys->hh);
+}
+
+/** Decoder Device **/
+static void DecoderContextClose(vlc_decoder_device *device)
+{
+    decoder_device_nvdec_t *p_sys = device->opaque;
+    if (p_sys->cuCtx)
+        CALL_CUDA_DEV(cuCtxDestroy, p_sys->cuCtx);
+    cuda_free_functions(&p_sys->cudaFunctions);
+}
+
+static const struct vlc_decoder_device_operations dev_ops = {
+    .close = DecoderContextClose,
+};
+
+static int
+DecoderContextOpen(vlc_decoder_device *device, vout_window_t *window)
+{
+    VLC_UNUSED(window);
+
+    decoder_device_nvdec_t *p_sys = vlc_obj_malloc(VLC_OBJECT(device), sizeof(*p_sys));
+    if (unlikely(p_sys == NULL))
+        return VLC_ENOMEM;
+    device->opaque = p_sys;
+    p_sys->cudaFunctions = NULL;
+
+    int result = cuda_load_functions(&p_sys->cudaFunctions, device);
+    if (result != VLC_SUCCESS) {
+        return VLC_EGENERIC;
+    }
+
+    result = CALL_CUDA_DEV(cuInit, 0);
+    if (result != VLC_SUCCESS)
+    {
+        DecoderContextClose(device);
+        return result;
+    }
+
+    result = CALL_CUDA_DEV(cuCtxCreate, &p_sys->cuCtx, 0, 0);
+    if (result != VLC_SUCCESS)
+    {
+        DecoderContextClose(device);
+        return result;
+    }
+
+    device->ops = &dev_ops;
+    device->type = VLC_DECODER_DEVICE_NVDEC;
+    return VLC_SUCCESS;
 }
 

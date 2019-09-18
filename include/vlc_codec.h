@@ -491,6 +491,7 @@ enum vlc_decoder_device_type
     VLC_DECODER_DEVICE_DXVA2,
     VLC_DECODER_DEVICE_D3D11VA,
     VLC_DECODER_DEVICE_AWINDOW,
+    VLC_DECODER_DEVICE_NVDEC,
     VLC_DECODER_DEVICE_MMAL,
 };
 
@@ -525,6 +526,7 @@ typedef struct vlc_decoder_device
      * DXVA2: IDirect3DDevice9*
      * D3D11VA: ID3D11DeviceContext*
      * AWindow: android AWindowHandler*
+     * NVDEC: decoder_device_nvdec_t*
      * MMAL: MMAL_PORT_T*
      */
     void *opaque;

@@ -25,6 +25,13 @@
 
 #include <ffnvcodec/dynlink_loader.h>
 
+typedef struct {
+
+    CudaFunctions  *cudaFunctions;
+    CUcontext      cuCtx;
+
+} decoder_device_nvdec_t;
+
 static inline bool is_nvdec_opaque(vlc_fourcc_t fourcc)
 {
     return fourcc == VLC_CODEC_NVDEC_OPAQUE ||
