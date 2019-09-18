@@ -238,7 +238,7 @@ static int DecoderThread_Reload( struct decoder_owner *p_owner, bool b_packetize
     {
         assert( p_owner->fmt.i_cat == AUDIO_ES );
         audio_output_t *p_aout = p_owner->p_aout;
-        // no need to lock, the decoder and DecoderOutputThreads are dead
+        // no need to lock, the decoder and ModuleThread are dead
         p_owner->p_aout = NULL;
         if( p_aout )
         {
