@@ -71,7 +71,7 @@ static const struct vlc_decoder_device_operations d3d11_dev_ops = {
     .close = D3D11CloseDecoderDevice,
 };
 
-int D3D11OpenDecoderDevice(vlc_decoder_device *device, vout_window_t *wnd)
+static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vout_window_t *wnd)
 {
     VLC_UNUSED(wnd);
     d3d11_decoder_device *sys = vlc_obj_malloc(VLC_OBJECT(device), sizeof(*sys));
@@ -114,6 +114,19 @@ int D3D11OpenDecoderDevice(vlc_decoder_device *device, vout_window_t *wnd)
         else
         {
             /* internal decoder device */
+#if !VLC_WINSTORE_APP
+            if (!forced)
+            {
+                /* Allow using D3D11 automatically starting from Windows 8.1 */
+                bool isWin81OrGreater = false;
+                HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+                if (likely(hKernel32 != NULL))
+                    isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
+                if (!isWin81OrGreater)
+                    return VLC_EGENERIC;
+            }
+#endif /* !VLC_WINSTORE_APP */
+
             HRESULT hr = D3D11_CreateDevice( device, &sys->hd3d, NULL,
                                             true /* is_d3d11_opaque(chroma) */,
                                             &sys->d3d_dev );
@@ -143,4 +156,14 @@ error:
     D3D11_Destroy(&sys->hd3d);
     vlc_obj_free( VLC_OBJECT(device), sys );
     return VLC_EGENERIC;
+}
+
+int D3D11OpenDecoderDeviceW8(vlc_decoder_device *device, vout_window_t *wnd)
+{
+    return D3D11OpenDecoderDevice(device, false, wnd);
+}
+
+int D3D11OpenDecoderDeviceAny(vlc_decoder_device *device, vout_window_t *wnd)
+{
+    return D3D11OpenDecoderDevice(device, true, wnd);
 }

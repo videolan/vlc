@@ -588,7 +588,11 @@ vlc_module_begin()
 
     add_submodule()
     set_description(N_("Direct3D11"))
-    set_callback_dec_device( D3D11OpenDecoderDevice, 20 )
+    set_callback_dec_device( D3D11OpenDecoderDeviceW8, 20 )
+
+    add_submodule()
+    set_description(N_("Direct3D11"))
+    set_callback_dec_device( D3D11OpenDecoderDeviceAny, 8 )
 #if VLC_WINSTORE_APP
     /* LEGACY, the d3dcontext and swapchain were given by the host app */
     add_integer("winrt-d3dcontext",    0x0, NULL, NULL, true) /* ID3D11DeviceContext* */
