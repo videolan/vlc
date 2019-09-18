@@ -80,7 +80,6 @@ vlc_module_begin ()
     add_bool("direct3d11-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT, true)
 
 #if VLC_WINSTORE_APP
-    add_integer("winrt-d3dcontext",    0x0, NULL, NULL, true) /* ID3D11DeviceContext* */
     add_integer("winrt-swapchain",     0x0, NULL, NULL, true) /* IDXGISwapChain1*     */
 #endif
 
@@ -123,8 +122,6 @@ struct vout_display_sys_t
 
     /* outside rendering */
     void *outside_opaque;
-    libvlc_video_direct3d_device_setup_cb    setupDeviceCb;
-    libvlc_video_direct3d_device_cleanup_cb  cleanupDeviceCb;
     libvlc_video_direct3d_update_output_cb   updateOutputCb;
     libvlc_video_swap_cb                     swapCb;
     libvlc_video_direct3d_start_end_rendering_cb startEndRenderingCb;
@@ -323,34 +320,44 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     CommonInit(vd, &sys->area, cfg);
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
-    sys->setupDeviceCb       = var_InheritAddress( vd, "vout-cb-setup" );
-    sys->cleanupDeviceCb     = var_InheritAddress( vd, "vout-cb-cleanup" );
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
     sys->swapCb              = var_InheritAddress( vd, "vout-cb-swap" );
     sys->startEndRenderingCb = var_InheritAddress( vd, "vout-cb-make-current" );
     sys->selectPlaneCb       = var_InheritAddress( vd, "vout-cb-select-plane" );
 
-    if ( sys->setupDeviceCb == NULL || sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
+    d3d11_decoder_device_t *d3d11_decoder = NULL;
+    if ( context && context->device->type == VLC_DECODER_DEVICE_D3D11VA )
+        d3d11_decoder = context->device->opaque;
+
+    HRESULT hr;
+    if (d3d11_decoder && d3d11_decoder->device)
     {
-#if VLC_WINSTORE_APP
-        /* LEGACY, the d3dcontext and swapchain were given by the host app */
-        if (var_InheritInteger(vd, "winrt-d3dcontext") == 0)
-        {
-            msg_Err(vd, "missing direct3d context for winstore");
-            goto error;
-        }
-#else /* !VLC_WINSTORE_APP */
+        hr = D3D11_CreateDeviceExternal(vd, d3d11_decoder->device,
+                                        is_d3d11_opaque(vd->source.i_chroma),
+                                        &sys->d3d_dev);
+    }
+    else
+    {
+        // No d3d11 device, we create one
+        hr = D3D11_CreateDevice(vd, &sys->hd3d, NULL, false, &sys->d3d_dev);
+    }
+    if (FAILED(hr)) {
+        msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
+        goto error;
+    }
+
+    if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
+    {
+#if !VLC_WINSTORE_APP
         if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
                        vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
             goto error;
 #endif /* !VLC_WINSTORE_APP */
 
         /* use our internal swapchain callbacks */
-        sys->outside_opaque      = CreateLocalSwapchainHandle(VLC_OBJECT(vd), &sys->hd3d, sys->sys.hvideownd);
+        sys->outside_opaque      = CreateLocalSwapchainHandle(VLC_OBJECT(vd), sys->sys.hvideownd, sys->d3d_dev.d3dcontext);
         if (unlikely(sys->outside_opaque == NULL))
             goto error;
-        sys->setupDeviceCb       = LocalSwapchainSetupDevice;
-        sys->cleanupDeviceCb     = LocalSwapchainCleanupDevice;
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;
         sys->swapCb              = LocalSwapchainSwap;
         sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
@@ -366,7 +373,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (Direct3D11 output)");
-    msg_Dbg(vd, "Direct3D11 device adapter successfully initialized");
+    msg_Dbg(vd, "Direct3D11 display adapter successfully initialized");
 
     vd->info.can_scale_spu        = true;
 
@@ -870,29 +877,6 @@ static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
 {
     vout_display_sys_t *sys = vd->sys;
-    HRESULT hr = E_FAIL;
-
-    libvlc_video_direct3d_device_cfg_t cfg = {
-        .hardware_decoding = is_d3d11_opaque( vd->source.i_chroma ),
-    };
-    libvlc_video_direct3d_device_setup_t out;
-    if ( !sys->setupDeviceCb( &sys->outside_opaque, &cfg, &out ) ||
-         out.device_context == NULL )
-    {
-        msg_Err(vd, "Missing external ID3D11DeviceContext");
-        return VLC_EGENERIC;
-    }
-    ID3D11DeviceContext *d3d11_ctx = out.device_context;
-    hr = D3D11_CreateDeviceExternal(vd, d3d11_ctx,
-                                    is_d3d11_opaque(vd->source.i_chroma),
-                                    &sys->d3d_dev);
-    if (FAILED(hr)) {
-        msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
-        if ( sys->cleanupDeviceCb )
-            sys->cleanupDeviceCb( sys->outside_opaque );
-        return VLC_EGENERIC;
-    }
-
     video_format_t fmt;
     video_format_Copy(&fmt, &vd->source);
     int err = SetupOutputFormat(vd, &fmt);
@@ -918,8 +902,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
         }
         if (err != VLC_SUCCESS)
         {
-            if ( sys->cleanupDeviceCb )
-                sys->cleanupDeviceCb( sys->outside_opaque );
+            if ( sys->swapCb == LocalSwapchainSwap )
+                LocalSwapchainCleanupDevice( sys->outside_opaque );
             return err;
         }
     }
@@ -953,8 +937,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
 
     if (Direct3D11CreateGenericResources(vd)) {
         msg_Err(vd, "Failed to allocate resources");
-        if ( sys->cleanupDeviceCb )
-            sys->cleanupDeviceCb( sys->outside_opaque );
+        if ( sys->swapCb == LocalSwapchainSwap )
+            LocalSwapchainCleanupDevice( sys->outside_opaque );
         return VLC_EGENERIC;
     }
 
@@ -1065,10 +1049,10 @@ static void Direct3D11Close(vout_display_t *vd)
 
     D3D11_ReleaseDevice( &sys->d3d_dev );
 
-    if ( sys->cleanupDeviceCb )
-        sys->cleanupDeviceCb( sys->outside_opaque );
+    if ( sys->swapCb == LocalSwapchainSwap )
+        LocalSwapchainCleanupDevice( sys->outside_opaque );
 
-    msg_Dbg(vd, "Direct3D11 device adapter closed");
+    msg_Dbg(vd, "Direct3D11 display adapter closed");
 }
 
 static void UpdatePicQuadPosition(vout_display_t *vd)

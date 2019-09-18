@@ -33,6 +33,7 @@
 
 #include <assert.h>
 
+#include <windows.h>
 #if !defined(_WIN32_WINNT) || _WIN32_WINNT < _WIN32_WINNT_WIN7
 # undef _WIN32_WINNT
 # define _WIN32_WINNT _WIN32_WINNT_WIN7
@@ -49,6 +50,7 @@
 
 #include "d3d11_swapchain.h"
 #include "d3d11_shaders.h"
+#include "../../video_chroma/d3d9_fmt.h"
 
 typedef enum video_color_axis {
     COLOR_AXIS_RGB,
@@ -68,7 +70,6 @@ typedef struct {
 struct d3d11_local_swapchain
 {
     vlc_object_t           *obj;
-    d3d11_handle_t         *hd3d;
     d3d11_device_t         d3d_dev;
 
     const d3d_format_t     *pixelFormat;
@@ -432,30 +433,6 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc
     return true;
 }
 
-bool LocalSwapchainSetupDevice( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
-{
-    struct d3d11_local_swapchain *display = *opaque;
-    HRESULT hr;
-#if VLC_WINSTORE_APP
-    ID3D11DeviceContext *legacy_ctx = var_InheritInteger( display->obj, "winrt-d3dcontext" ); /* LEGACY */
-    if ( legacy_ctx == NULL )
-        hr = E_FAIL;
-    else
-        hr = D3D11_CreateDeviceExternal( display->obj,
-                                         legacy_ctx,
-                                         cfg->hardware_decoding,
-                                         &display->d3d_dev );
-#else /* !VLC_WINSTORE_APP */
-    hr = D3D11_CreateDevice( display->obj, display->hd3d, NULL,
-                             cfg->hardware_decoding,
-                             &display->d3d_dev );
-#endif /* !VLC_WINSTORE_APP */
-    if ( FAILED( hr ) )
-        return false;
-    out->device_context = display->d3d_dev.d3dcontext;
-    return true;
-}
-
 void LocalSwapchainCleanupDevice( void *opaque )
 {
     struct d3d11_local_swapchain *display = opaque;
@@ -563,16 +540,17 @@ bool LocalSwapchainSelectPlane( void *opaque, size_t plane )
     return true;
 }
 
-void *CreateLocalSwapchainHandle(vlc_object_t *o, d3d11_handle_t *hd3d, HWND hwnd)
+void *CreateLocalSwapchainHandle(vlc_object_t *o, HWND hwnd, ID3D11DeviceContext *d3d11_ctx)
 {
     struct d3d11_local_swapchain *display = vlc_obj_calloc(o, 1, sizeof(*display));
-    if (likely(display != NULL))
-    {
-        display->obj = o;
-        display->hd3d = hd3d;
+    if (unlikely(display == NULL))
+        return NULL;
+
+    display->obj = o;
 #if !VLC_WINSTORE_APP
-        display->swapchainHwnd = hwnd;
+    display->swapchainHwnd = hwnd;
 #endif /* !VLC_WINSTORE_APP */
-    }
+    D3D11_CreateDeviceExternal( o, d3d11_ctx, false /* is_d3d11_opaque(vd->source.i_chroma) */, &display->d3d_dev);
+
     return display;
 }

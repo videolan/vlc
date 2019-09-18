@@ -25,11 +25,11 @@
 #define VLC_D3D11_SWAPCHAIN_H
 
 #include <vlc_common.h>
+#include <vlc_codec.h>
 #include "../../video_chroma/d3d11_fmt.h"
 
-void *CreateLocalSwapchainHandle(vlc_object_t *, d3d11_handle_t *, HWND);
+void *CreateLocalSwapchainHandle(vlc_object_t *, HWND, ID3D11DeviceContext *);
 
-bool LocalSwapchainSetupDevice( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out );
 void LocalSwapchainCleanupDevice( void *opaque );
 void LocalSwapchainSwap( void *opaque );
 bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out );
