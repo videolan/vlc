@@ -102,22 +102,9 @@ typedef struct nvdec_ctx {
     picture_pool_t              *out_pool;
 } nvdec_ctx_t;
 
-static inline int CudaCall(decoder_t *p_dec, CUresult result, const char *psz_func)
-{
-    if (unlikely(result != CUDA_SUCCESS)) {
-        const char *psz_err, *psz_err_str;
-        nvdec_ctx_t *p_sys = p_dec->p_sys;
-        p_sys->cudaFunctions->cuGetErrorName(result, &psz_err);
-        p_sys->cudaFunctions->cuGetErrorString(result, &psz_err_str);
-        msg_Err(p_dec, "%s failed: %s (%s)", psz_func, psz_err_str, psz_err);
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-
-#define CALL_CUDA_DEC(func, ...) CudaCall(p_dec,  p_sys->cudaFunctions->func(__VA_ARGS__), #func)
-#define CALL_CUDA_DEV(func, ...) CudaCall(device, p_sys->cudaFunctions->func(__VA_ARGS__), #func)
-#define CALL_CUVID(func, ...)    CudaCall(p_dec,  p_sys->cuvidFunctions->func(__VA_ARGS__), #func)
+#define CALL_CUDA_DEC(func, ...) CudaCheckErr(VLC_OBJECT(p_dec),  p_sys->cudaFunctions, p_sys->cudaFunctions->func(__VA_ARGS__), #func)
+#define CALL_CUDA_DEV(func, ...) CudaCheckErr(VLC_OBJECT(device), p_sys->cudaFunctions, p_sys->cudaFunctions->func(__VA_ARGS__), #func)
+#define CALL_CUVID(func, ...)    CudaCheckErr(VLC_OBJECT(p_dec),  p_sys->cudaFunctions, p_sys->cuvidFunctions->func(__VA_ARGS__), #func)
 
 static vlc_fourcc_t MapSurfaceChroma(cudaVideoChromaFormat chroma, unsigned bitDepth)
 {

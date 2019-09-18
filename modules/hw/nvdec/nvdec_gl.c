@@ -32,7 +32,7 @@
 
 #include <ffnvcodec/dynlink_loader.h>
 
-#include "../../hw/nvdec/nvdec_fmt.h"
+#include "nvdec_fmt.h"
 
 #include "../../video_output/opengl/internal.h"
 #include <GL/glext.h>
@@ -56,21 +56,7 @@ typedef struct {
     CUarray mappedArray[PICTURE_PLANE_MAX];
 } converter_sys_t;
 
-static inline int CudaCall(const opengl_tex_converter_t *tc, CUresult result, const char *psz_func)
-{
-    if (unlikely(result != CUDA_SUCCESS)) {
-        const char *psz_err, *psz_err_str;
-        vlc_decoder_device *device = tc->dec_device;
-        decoder_device_nvdec_t *devsys = device->opaque;
-        devsys->cudaFunctions->cuGetErrorName(result, &psz_err);
-        devsys->cudaFunctions->cuGetErrorString(result, &psz_err_str);
-        msg_Err((vlc_object_t *)&tc->obj, "%s failed: %s (%s)", psz_func, psz_err_str, psz_err);
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-
-#define CALL_CUDA(func, ...) CudaCall(tc, devsys->cudaFunctions->func(__VA_ARGS__), #func)
+#define CALL_CUDA(func, ...) CudaCheckErr((vlc_object_t*)&tc->obj, devsys->cudaFunctions, devsys->cudaFunctions->func(__VA_ARGS__), #func)
 
 static int tc_nvdec_gl_allocate_texture(const opengl_tex_converter_t *tc, GLuint *textures,
                                 const GLsizei *tex_width, const GLsizei *tex_height)

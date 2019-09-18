@@ -47,19 +47,7 @@ typedef struct
     vlc_decoder_device *device;
 } nvdec_filter_sys_t;
 
-static inline int CudaCall(filter_t *p_filter, decoder_device_nvdec_t *devsys, CUresult result, const char *psz_func)
-{
-    if (unlikely(result != CUDA_SUCCESS)) {
-        const char *psz_err, *psz_err_str;
-        devsys->cudaFunctions->cuGetErrorName(result, &psz_err);
-        devsys->cudaFunctions->cuGetErrorString(result, &psz_err_str);
-        msg_Err(p_filter, "%s failed: %s (%s)", psz_func, psz_err_str, psz_err);
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-
-#define CALL_CUDA(func, ...) CudaCall(p_filter, devsys, devsys->cudaFunctions->func(__VA_ARGS__), #func)
+#define CALL_CUDA(func, ...) CudaCheckErr(VLC_OBJECT(p_filter), devsys->cudaFunctions, devsys->cudaFunctions->func(__VA_ARGS__), #func)
 
 
 static picture_t * FilterCUDAToCPU( filter_t *p_filter, picture_t *src )

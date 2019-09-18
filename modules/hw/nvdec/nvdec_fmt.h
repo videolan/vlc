@@ -32,6 +32,18 @@ typedef struct {
 
 } decoder_device_nvdec_t;
 
+static inline int CudaCheckErr(vlc_object_t *obj, CudaFunctions *cudaFunctions, CUresult result, const char *psz_func)
+{
+    if (unlikely(result != CUDA_SUCCESS)) {
+        const char *psz_err, *psz_err_str;
+        cudaFunctions->cuGetErrorName(result, &psz_err);
+        cudaFunctions->cuGetErrorString(result, &psz_err_str);
+        msg_Err(obj, "%s failed: %s (%s)", psz_func, psz_err_str, psz_err);
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
 static inline bool is_nvdec_opaque(vlc_fourcc_t fourcc)
 {
     return fourcc == VLC_CODEC_NVDEC_OPAQUE ||
