@@ -71,7 +71,7 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cf
     }
 
     /* interim texture */
-    D3D11_TEXTURE2D_DESC texDesc = { 0 };
+    D3D11_TEXTURE2D_DESC texDesc = { };
     texDesc.MipLevels = 1;
     texDesc.SampleDesc.Count = 1;
     texDesc.MiscFlags = 0;
@@ -145,7 +145,7 @@ static void EndRender(struct render_context *ctx)
     RECT currentRect;
     GetWindowRect(scd.OutputWindow, &currentRect);
 
-    D3D11_VIEWPORT viewport = { 0 };
+    D3D11_VIEWPORT viewport = { };
     viewport.TopLeftX = 0;
     viewport.TopLeftY = 0;
     viewport.Width = SCREEN_WIDTH; //currentRect.right - currentRect.left;
@@ -263,7 +263,7 @@ struct SHADER_INPUT {
 static void init_direct3d(struct render_context *ctx, HWND hWnd)
 {
     HRESULT hr;
-    DXGI_SWAP_CHAIN_DESC scd = { 0 };
+    DXGI_SWAP_CHAIN_DESC scd = { };
 
     scd.BufferCount = 1;
     scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -351,7 +351,7 @@ static void init_direct3d(struct render_context *ctx, HWND hWnd)
     ctx->d3dctx->Unmap(ctx->pVertexBuffer, NULL);
 
     ctx->quadIndexCount = 6;
-    D3D11_BUFFER_DESC quadDesc = { 0 };
+    D3D11_BUFFER_DESC quadDesc = { };
     quadDesc.Usage = D3D11_USAGE_DYNAMIC;
     quadDesc.ByteWidth = sizeof(WORD) * ctx->quadIndexCount;
     quadDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -443,7 +443,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 {
     HWND hWnd;
     WNDCLASSEX wc;
-    struct render_context Context = { 0 };
+    struct render_context Context = { };
     char *file_path;
     libvlc_instance_t *p_libvlc;
     libvlc_media_t *p_media;
