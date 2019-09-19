@@ -107,7 +107,8 @@ bool MLNetworkModel::setData( const QModelIndex& idx, const QVariant& value, int
     if ( role != NETWORK_INDEXED )
         return false;
     auto enabled = value.toBool();
-    assert( m_items[idx.row()].indexed != enabled );
+    if ( m_items[idx.row()].indexed == enabled )
+        return  false;
     int res;
     if ( enabled )
         res = vlc_ml_add_folder( m_ml, qtu( m_items[idx.row()].mainMrl.toString( QUrl::None ) ) );
