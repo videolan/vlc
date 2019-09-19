@@ -597,6 +597,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/utils/SpinBoxExt.qml \
 	gui/qt/qml/utils/StackViewExt.qml \
 	gui/qt/qml/utils/ScanProgressBar.qml \
+	gui/qt/qml/utils/TabButtonExt.qml \
 	gui/qt/qml/utils/LabelSeparator.qml \
 	gui/qt/qml/utils/RoundButton.qml \
 	gui/qt/qml/utils/RoundImage.qml \

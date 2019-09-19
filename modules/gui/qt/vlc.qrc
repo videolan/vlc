@@ -205,6 +205,7 @@
         <file alias="RoundImage.qml">qml/utils/RoundImage.qml</file>
         <file alias="VideoQualityLabel.qml">qml/utils/VideoQualityLabel.qml</file>
         <file alias="VideoProgressBar.qml">qml/utils/VideoProgressBar.qml</file>
+        <file alias="TabButtonExt.qml">qml/utils/TabButtonExt.qml</file>
     </qresource>
     <qresource prefix="/mediacenter">
         <file alias="MCMusicDisplay.qml">qml/mediacenter/MCMusicDisplay.qml</file>
