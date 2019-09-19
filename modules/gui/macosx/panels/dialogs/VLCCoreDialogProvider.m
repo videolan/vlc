@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCCoreDialogProvider.m: Mac OS X Core Dialogs
  *****************************************************************************
- * Copyright (C) 2005-2016 VLC authors and VideoLAN
+ * Copyright (C) 2005-2019 VLC authors and VideoLAN
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
@@ -32,15 +32,32 @@
 
 @interface VLCCoreDialogProvider ()
 
-- (void)displayError:(NSArray *)dialogData;
+- (void)displayErrorWithTitle:(NSString *)title text:(NSString *)text;
 
-- (void)displayLoginDialog:(NSArray *)dialogData;
+- (void)displayLoginDialog:(vlc_dialog_id *)dialogID
+                     title:(NSString *)title
+                      text:(NSString *)text
+                  username:(NSString *)username
+                askToStore:(BOOL)askToStore;
 
-- (void)displayQuestion:(NSArray *)dialogData;
+- (void)displayQuestion:(vlc_dialog_id *)dialogID
+                  title:(NSString *)title
+                   text:(NSString *)text
+                   type:(vlc_dialog_question_type)questionType
+             cancelText:(NSString *)cancelText
+            action1Text:(NSString *)action1Text
+            action2Text:(NSString *)action2Text;
 
-- (void)displayProgressDialog:(NSArray *)dialogData;
+- (void)displayProgressDialog:(vlc_dialog_id *)dialogID
+                        title:(NSString *)title
+                         text:(NSString *)text
+                indeterminate:(BOOL)indeterminate
+                     position:(float)position
+                  cancelTitle:(NSString *)cancelTitle;
 
-- (void)updateDisplayedProgressDialog:(NSArray *)dialogData;
+- (void)updateDisplayedProgressDialog:(vlc_dialog_id *)dialogID
+                             position:(float)position
+                                 text:(NSString *)text;
 
 @end
 
@@ -51,10 +68,11 @@ static void displayErrorCallback(void *p_data,
 {
     @autoreleasepool {
         VLCCoreDialogProvider *dialogProvider = (__bridge VLCCoreDialogProvider *)p_data;
-        [dialogProvider performSelectorOnMainThread:@selector(displayError:)
-                                         withObject:@[toNSStr(psz_title),
-                                                      toNSStr(psz_text)]
-                                      waitUntilDone:NO];
+        NSString *title = toNSStr(psz_title);
+        NSString *text = toNSStr(psz_text);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [dialogProvider displayErrorWithTitle:title text:text];
+        });
     }
 }
 
@@ -67,13 +85,16 @@ static void displayLoginCallback(void *p_data,
 {
     @autoreleasepool {
         VLCCoreDialogProvider *dialogProvider = (__bridge VLCCoreDialogProvider *)p_data;
-        [dialogProvider performSelectorOnMainThread:@selector(displayLoginDialog:)
-                                         withObject:@[[NSValue valueWithPointer:p_id],
-                                                      toNSStr(psz_title),
-                                                      toNSStr(psz_text),
-                                                      toNSStr(psz_default_username),
-                                                      @(b_ask_store)]
-                                      waitUntilDone:NO];
+        NSString *title = toNSStr(psz_title);
+        NSString *text = toNSStr(psz_text);
+        NSString *defaultUsername = toNSStr(psz_default_username);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [dialogProvider displayLoginDialog:p_id
+                                         title:title
+                                          text:text
+                                      username:defaultUsername
+                                    askToStore:b_ask_store];
+        });
     }
 }
 
@@ -88,15 +109,20 @@ static void displayQuestionCallback(void *p_data,
 {
     @autoreleasepool {
         VLCCoreDialogProvider *dialogProvider = (__bridge  VLCCoreDialogProvider *)p_data;
-        [dialogProvider performSelectorOnMainThread:@selector(displayQuestion:)
-                                         withObject:@[[NSValue valueWithPointer:p_id],
-                                                      toNSStr(psz_title),
-                                                      toNSStr(psz_text),
-                                                      @(i_type),
-                                                      toNSStr(psz_cancel),
-                                                      toNSStr(psz_action1),
-                                                      toNSStr(psz_action2)]
-                                      waitUntilDone:NO];
+        NSString *title = toNSStr(psz_title);
+        NSString *text = toNSStr(psz_text);
+        NSString *cancelText = toNSStr(psz_cancel);
+        NSString *action1Text = toNSStr(psz_action1);
+        NSString *action2Text = toNSStr(psz_action2);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [dialogProvider displayQuestion:p_id
+                                      title:title
+                                       text:text
+                                       type:i_type
+                                 cancelText:cancelText
+                                action1Text:action1Text
+                                action2Text:action2Text];
+        });
     }
 }
 
@@ -110,14 +136,14 @@ static void displayProgressCallback(void *p_data,
 {
     @autoreleasepool {
         VLCCoreDialogProvider *dialogProvider = (__bridge VLCCoreDialogProvider *)p_data;
-        [dialogProvider performSelectorOnMainThread:@selector(displayProgressDialog:)
-                                         withObject:@[[NSValue valueWithPointer:p_id],
-                                                      toNSStr(psz_title),
-                                                      toNSStr(psz_text),
-                                                      @(b_indeterminate),
-                                                      @(f_position),
-                                                      toNSStr(psz_cancel)]
-                                      waitUntilDone:NO];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [dialogProvider displayProgressDialog:p_id
+                                            title:toNSStr(psz_title)
+                                             text:toNSStr(psz_text)
+                                    indeterminate:b_indeterminate
+                                         position:f_position
+                                      cancelTitle:toNSStr(psz_cancel)];
+        });
     }
 }
 
@@ -138,11 +164,11 @@ static void updateProgressCallback(void *p_data,
 {
     @autoreleasepool {
         VLCCoreDialogProvider *dialogProvider = (__bridge VLCCoreDialogProvider *)p_data;
-        [dialogProvider performSelectorOnMainThread:@selector(updateDisplayedProgressDialog:)
-                                         withObject:@[[NSValue valueWithPointer:p_id],
-                                                      @(f_value),
-                                                      toNSStr(psz_text)]
-                                      waitUntilDone:NO];
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+            [dialogProvider updateDisplayedProgressDialog:p_id
+                                                 position:f_value
+                                                     text:toNSStr(psz_text)];
+        });
     }
 }
 
@@ -195,40 +221,45 @@ static void updateProgressCallback(void *p_data,
     [_progressIndicator setUsesThreadedAnimation: YES];
 }
 
-- (void)displayError:(NSArray *)dialogData
+- (void)displayErrorWithTitle:(NSString *)title text:(NSString *)text
 {
     if (!_errorPanel) {
         _errorPanel = [[VLCErrorWindowController alloc] init];
     }
     [_errorPanel showWindow:nil];
-    [_errorPanel addError:[dialogData objectAtIndex:0] withMsg:[dialogData objectAtIndex:1]];
+    [_errorPanel addError:title withMsg:text];
 }
 
-- (void)displayLoginDialog:(NSArray *)dialogData
+- (void)displayLoginDialog:(vlc_dialog_id *)dialogID
+                     title:(NSString *)title
+                      text:(NSString *)text
+                  username:(NSString *)username
+                askToStore:(BOOL)askToStore
 {
-    [_authenticationTitleLabel setStringValue:[dialogData objectAtIndex:1]];
-    _authenticationWindow.title = [dialogData objectAtIndex:1];
-    [_authenticationDescriptionLabel setStringValue:[dialogData objectAtIndex:2]];
+    [_authenticationTitleLabel setStringValue:title];
+    _authenticationWindow.title = title;
+    [_authenticationDescriptionLabel setStringValue:text];
 
-    [_authenticationLoginTextField setStringValue:[dialogData objectAtIndex:3]];
+    [_authenticationLoginTextField setStringValue:username];
     [_authenticationPasswordTextField setStringValue:@""];
 
-    _authenticationStorePasswordCheckbox.hidden = ![[dialogData objectAtIndex:4] boolValue];
+    _authenticationStorePasswordCheckbox.hidden = !askToStore;
     _authenticationStorePasswordCheckbox.state = NSOffState;
 
     [_authenticationWindow center];
     NSInteger returnValue = [NSApp runModalForWindow:_authenticationWindow];
     [_authenticationWindow close];
 
-    NSString *username = _authenticationLoginTextField.stringValue;
+    username = _authenticationLoginTextField.stringValue;
     NSString *password = _authenticationPasswordTextField.stringValue;
-    if (returnValue == 0)
-        vlc_dialog_id_dismiss([[dialogData objectAtIndex:0] pointerValue]);
-    else
-        vlc_dialog_id_post_login([[dialogData objectAtIndex:0] pointerValue],
-                             username ? [username UTF8String] : NULL,
-                             password ? [password UTF8String] : NULL,
-                             _authenticationStorePasswordCheckbox.state == NSOnState);
+    if (returnValue == 0) {
+        vlc_dialog_id_dismiss(dialogID);
+    } else {
+        vlc_dialog_id_post_login(dialogID,
+                                 username ? [username UTF8String] : NULL,
+                                 password ? [password UTF8String] : NULL,
+                                 _authenticationStorePasswordCheckbox.state == NSOnState);
+    }
 }
 
 - (IBAction)authenticationDialogAction:(id)sender
@@ -239,16 +270,23 @@ static void updateProgressCallback(void *p_data,
         [NSApp stopModalWithCode: 0];
 }
 
-- (void)displayQuestion:(NSArray *)dialogData
+- (void)displayQuestion:(vlc_dialog_id *)dialogID
+                  title:(NSString *)title
+                   text:(NSString *)text
+                   type:(vlc_dialog_question_type)questionType
+             cancelText:(NSString *)cancelText
+            action1Text:(NSString *)action1Text
+            action2Text:(NSString *)action2Text;
 {
     NSAlert *alert = [[NSAlert alloc] init];
-    [alert setMessageText:[dialogData objectAtIndex:1]];
-    [alert setInformativeText:[dialogData objectAtIndex:2]];
-    [alert addButtonWithTitle:[dialogData objectAtIndex:5]];
-    [alert addButtonWithTitle:[dialogData objectAtIndex:6]];
-    [alert addButtonWithTitle:[dialogData objectAtIndex:4]];
+    [alert setMessageText:title];
+    [alert setInformativeText:text];
+    [alert addButtonWithTitle:action1Text];
+    [alert addButtonWithTitle:action2Text];
+    [alert addButtonWithTitle:cancelText];
+    [alert.buttons.lastObject setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]];
 
-    switch ([[dialogData objectAtIndex:3] intValue]) {
+    switch (questionType) {
         case VLC_DIALOG_QUESTION_WARNING:
             [alert setAlertStyle:NSWarningAlertStyle];
             break;
@@ -263,32 +301,37 @@ static void updateProgressCallback(void *p_data,
     NSInteger returnValue = [alert runModal];
     switch (returnValue) {
         case NSAlertFirstButtonReturn:
-            vlc_dialog_id_post_action([[dialogData objectAtIndex:0] pointerValue], 1);
+            vlc_dialog_id_post_action(dialogID, 1);
             break;
 
         case NSAlertSecondButtonReturn:
-            vlc_dialog_id_post_action([[dialogData objectAtIndex:0] pointerValue], 2);
+            vlc_dialog_id_post_action(dialogID, 2);
             break;
 
         case NSAlertThirdButtonReturn:
         default:
-            vlc_dialog_id_dismiss([[dialogData objectAtIndex:0] pointerValue]);
+            vlc_dialog_id_dismiss(dialogID);
     }
 
 }
 
-- (void)displayProgressDialog:(NSArray *)dialogData
+- (void)displayProgressDialog:(vlc_dialog_id *)dialogID
+                        title:(NSString *)title
+                         text:(NSString *)text
+                indeterminate:(BOOL)indeterminate
+                     position:(float)position
+                  cancelTitle:(NSString *)cancelTitle
 {
-    _progressTitleLabel.stringValue = [dialogData objectAtIndex:1];
-    _progressWindow.title = [dialogData objectAtIndex:1];
+    _progressTitleLabel.stringValue = title;
+    _progressWindow.title = title;
 
-    _progressDescriptionLabel.stringValue = [dialogData objectAtIndex:2];
+    _progressDescriptionLabel.stringValue = text;
 
-    _progressIndicator.indeterminate = [[dialogData objectAtIndex:3] boolValue];
-    _progressIndicator.doubleValue = [[dialogData objectAtIndex:4] doubleValue];
+    _progressIndicator.indeterminate = indeterminate;
+    _progressIndicator.doubleValue = position;
 
-    if ([[dialogData objectAtIndex:5] length] > 0) {
-        _progressCancelButton.title = [dialogData objectAtIndex:5];
+    if ([cancelTitle length] > 0) {
+        _progressCancelButton.title = cancelTitle;
         _progressCancelButton.enabled = YES;
     } else {
         _progressCancelButton.title = _NS("Cancel");
@@ -303,15 +346,16 @@ static void updateProgressCallback(void *p_data,
 
     [_progressIndicator stopAnimation:self];
 
-    vlc_dialog_id_dismiss([[dialogData objectAtIndex:0] pointerValue]);
+    vlc_dialog_id_dismiss(dialogID);
 }
 
-- (void)updateDisplayedProgressDialog:(NSArray *)dialogData
-
+- (void)updateDisplayedProgressDialog:(vlc_dialog_id *)dialogID
+                             position:(float)position
+                                 text:(NSString *)text
 {
     if (!_progressIndicator.indeterminate) {
-        _progressIndicator.doubleValue = [[dialogData objectAtIndex:1] doubleValue];
-        _progressDescriptionLabel.stringValue = [dialogData objectAtIndex:2];
+        _progressIndicator.doubleValue = position;
+        _progressDescriptionLabel.stringValue = text;
     }
 }
 
