@@ -217,6 +217,14 @@ struct vlc_list_it vlc_list_it_start(const struct vlc_list *head)
     return it;
 }
 
+static inline
+struct vlc_list_it vlc_list_it_reverse_start(const struct vlc_list *head)
+{
+    struct vlc_list *first = head->prev;
+
+    return (struct vlc_list_it){ head, first, first->prev };
+}
+
 static inline bool vlc_list_it_continue(const struct vlc_list_it *restrict it)
 {
     return it->current != it->head;
@@ -228,6 +236,14 @@ static inline void vlc_list_it_next(struct vlc_list_it *restrict it)
 
     it->current = next;
     it->next = next->next;
+}
+
+static inline void vlc_list_it_prev(struct vlc_list_it *restrict it)
+{
+    struct vlc_list *next = it->next;
+
+    it->current = next;
+    it->next = next->prev;
 }
 
 #define vlc_list_entry_aligned_size(p) \
@@ -263,6 +279,28 @@ static inline void vlc_list_it_next(struct vlc_list_it *restrict it)
           && ((pos) = vlc_list_entry_p((vlc_list_it__##pos).current, \
                                        pos, member), true); \
          vlc_list_it_next(&(vlc_list_it__##pos)))
+
+/**
+ * List iteration macro.
+ *
+ * This macro iterates over all elements (excluding the head) of a list,
+ * in reversed order from the first to the last.
+ *
+ * For each iteration, it sets the cursor variable to the current element.
+ *
+ * \param pos Cursor pointer variable identifier.
+ * \param head Head pointer of the list to iterate [IN].
+ * \param member Identifier of the member of the data type
+ *               serving as list node.
+ * \note It it safe to delete the current item while iterating.
+ * It is however <b>not</b> safe to delete another item.
+ */
+#define vlc_list_reverse_foreach(pos, head, member) \
+    for (struct vlc_list_it vlc_list_it_##pos = vlc_list_it_reverse_start(head); \
+         vlc_list_it_continue(&(vlc_list_it_##pos)) \
+          && ((pos) = vlc_list_entry_p((vlc_list_it_##pos).current, \
+                                       pos, member), true); \
+         vlc_list_it_prev(&(vlc_list_it_##pos)))
 
 /**
  * Converts a list node pointer to an element pointer.
