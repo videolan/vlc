@@ -55,13 +55,6 @@ vlcSetSymbolEnvironment() {
     # here. This allows compilation also with newer macOS SDKs.
     # List assumes macOS 10.10 / iOS 8 at minimum.
 
-    # Added symbols in macOS 10.13 / iOS 11 / watchOS 4
-    export ac_cv_func_open_wmemstream=no
-    export ac_cv_func_fmemopen=no
-    export ac_cv_func_open_memstream=no
-    export ac_cv_func_futimens=no
-    export ac_cv_func_utimensat=no
-
     # Added symbols in macOS 10.12 / iOS 10 / watchOS 3
     export ac_cv_func_basename_r=no
     export ac_cv_func_clock_getres=no
@@ -73,9 +66,12 @@ vlcSetSymbolEnvironment() {
     export ac_cv_func_mkostemps=no
     export ac_cv_func_timingsafe_bcmp=no
 
-    # Added symbols in macOS 10.13 / iOS 11 / tvOS 11
-    export ac_cv_func_utimensat=no
+    # Added symbols in macOS 10.13 / iOS 11 / watchOS 4 / tvOS 11
+    export ac_cv_func_open_wmemstream=no
+    export ac_cv_func_fmemopen=no
+    export ac_cv_func_open_memstream=no
     export ac_cv_func_futimens=no
+    export ac_cv_func_utimensat=no
 
     # Added symbol in macOS 10.14 / iOS 12 / tvOS 9
     export ac_cv_func_thread_get_register_pointer_values=no
