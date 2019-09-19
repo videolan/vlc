@@ -659,6 +659,7 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
             vout_UnregisterSubpictureChannel(p_owner->p_vout,
                                              p_owner->i_spu_channel);
             vout_Release(p_owner->p_vout);
+            p_owner->p_vout = NULL; // the DecoderThread should not use the old vout anymore
         }
 
         enum vlc_vout_order channel_order;
@@ -670,7 +671,6 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
         if (p_owner->i_spu_channel == VOUT_SPU_CHANNEL_INVALID)
         {
             /* The new vout doesn't support SPU, aborting... */
-            p_owner->p_vout = NULL; // the DecoderThread should not use the old vout anymore
             vlc_mutex_unlock(&p_owner->lock);
             vout_Release(p_vout);
             return NULL;
