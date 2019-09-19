@@ -1753,6 +1753,8 @@ static struct decoder_owner * CreateDecoder( vlc_object_t *p_parent,
 {
     decoder_t *p_dec;
     struct decoder_owner *p_owner;
+    static_assert(offsetof(struct decoder_owner, dec) == 0,
+                  "the decoder must be first in the owner structure");
 
     p_owner = vlc_custom_create( p_parent, sizeof( *p_owner ), "decoder" );
     if( p_owner == NULL )
@@ -1973,7 +1975,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     vlc_mutex_destroy( &p_owner->lock );
     vlc_mutex_destroy( &p_owner->mouse_lock );
 
-    decoder_Destroy( p_dec );
+    decoder_Destroy( &p_owner->dec );
 }
 
 /* */
