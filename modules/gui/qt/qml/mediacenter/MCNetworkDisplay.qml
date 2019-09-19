@@ -32,40 +32,56 @@ Utils.NavigableFocusScope {
     property alias tree: providerModel.tree
     Utils.MenuExt {
         id: contextMenu
+        property var delegateModel: undefined
         property var model: ({})
-        property bool isIndexible: !contextMenu.model ? false : Boolean(contextMenu.model.can_index)
-        property bool isFileType: !contextMenu.model ? false : contextMenu.model.type === MLNetworkModel.TYPE_FILE
         closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
         focus:true
 
         Instantiator {
             id: instanciator
-            function perform(id){
-                switch(id){
-                case 0: console.log("not implemented"); break;
-                case 1: contextMenu.model.indexed = !contextMenu.model.indexed; break;
-                default: console.log("unknown id:",id)
-                }
-                contextMenu.close()
-            }
-            model: [
-                {
-                    active: contextMenu.isFileType,
-                    text: qsTr("Play all"),
-                    performId: 0
+            property var modelActions: {
+                "play": function() {
+                    if (delegateModel) {
+                        delegateModel.playSelection()
+                    }
+                    contextMenu.close()
                 },
-                {
-                    active: contextMenu.isIndexible,
-                    text: !contextMenu.model ? "" : contextMenu.model.indexed ? qsTr("Unindex") : qsTr("Index") ,
-                    performId: 1
+                "enqueue": function() {
+                    if (delegateModel)
+                        delegateModel.enqueueSelection()
+                    contextMenu.close()
+                },
+                "index": function(index) {
+                    contextMenu.model.indexed = contextMenu.model.indexed
+                    contextMenu.close()
+                }
+            }
+
+            model: [{
+                    active: true,
+                    text: qsTr("Play"),
+                    action: "play"
+                }, {
+                    active: true,
+                    text: qsTr("Enqueue"),
+                    action: "enqueue"
+                }, {
+                    active:  contextMenu.model && !!contextMenu.model.can_index,
+                    text: contextMenu.model && contextMenu.model.indexed ? qsTr("Unindex") : qsTr("Index"),
+                    action: "index"
                 }
             ]
+
             onObjectAdded: model[index].active && contextMenu.insertItem( index, object )
             onObjectRemoved: model[index].active && contextMenu.removeItem( object )
             delegate: Utils.MenuItemExt {
                 focus: true
                 text: modelData.text
-                onTriggered: instanciator.perform(modelData.performId)
+                onTriggered: {
+                    if (modelData.action && instanciator.modelActions[modelData.action]) {
+                        instanciator.modelActions[modelData.action]()
+                    }
+                }
             }
         }
 

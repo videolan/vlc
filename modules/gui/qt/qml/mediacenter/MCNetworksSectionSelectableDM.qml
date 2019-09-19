@@ -51,6 +51,7 @@ Utils.SelectableDelegateModel {
 
             onContextMenuButtonClicked: {
                 contextMenu.model = model
+                contextMenu.delegateModel = delegateModel
                 contextMenu.popup(menuParent)
             }
         }
@@ -75,6 +76,7 @@ Utils.SelectableDelegateModel {
 
             onContextMenuButtonClicked: {
                 contextMenu.model = model
+                contextMenu.delegateModel = delegateModel
                 contextMenu.popup(menuParent)
             }
 
@@ -84,22 +86,44 @@ Utils.SelectableDelegateModel {
 
     }
 
+    function switchIndex() {
+        var list = []
+        for (var i = 0; i < delegateModel.selectedGroup.count; i++) {
+            var obj = delegateModel.selectedGroup.get(i)
+            if (obj.model.can_index) {
+                console.log("index", obj.model.mrl, obj.model.indexed)
+                obj.model.indexed = !obj.model.indexed
+            }
+        }
+    }
+
+    function playSelection() {
+        var list = []
+        for (var i = 0; i < delegateModel.selectedGroup.count; i++) {
+            var mrl = delegateModel.selectedGroup.get(i).model.mrl;
+            list.push(mrl)
+        }
+        medialib.addAndPlay( list )
+    }
+
+    function enqueueSelection() {
+        var list = []
+        for (var i = 0; i < delegateModel.selectedGroup.count; i++) {
+            var mrl = delegateModel.selectedGroup.get(i).model.mrl;
+            list.push(mrl)
+        }
+        medialib.addToPlaylist( list )
+    }
+
     function actionAtIndex(index) {
         if ( delegateModel.selectedGroup.count > 1 ) {
-            var list = []
-            for (var i = 0; i < delegateModel.selectedGroup.count; i++) {
-                var type = delegateModel.selectedGroup.get(i).model.type;
-                var mrl = delegateModel.selectedGroup.get(i).model.mrl;
-                if (type == MLNetworkModel.TYPE_FILE)
-                    list.push(mrl)
-            }
-            medialib.addAndPlay( list )
+            playSelection()
         } else {
             if (delegateModel.items.get(index).model.type === MLNetworkModel.TYPE_DIRECTORY
                     || delegateModel.items.get(index).model.type === MLNetworkModel.TYPE_NODE)  {
                 history.push(["mc", "network", { tree: delegateModel.items.get(index).model.tree }], History.Go);
             } else {
-                medialib.addAndPlay( delegateModel.items.get(index).model.mrl );
+                playSelection()
             }
         }
     }
