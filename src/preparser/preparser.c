@@ -203,13 +203,14 @@ static void PreparserCloseInput( void* preparser_, void* task_ )
     if( preparser->fetcher && (req->options & META_REQUEST_OPTION_FETCH_ANY) )
     {
         task->preparse_status = status;
+        ReqHold(task->req);
         if (!input_fetcher_Push(preparser->fetcher, item,
                                 req->options & META_REQUEST_OPTION_FETCH_ANY,
                                 &input_fetcher_callbacks, task))
         {
-            ReqHold(task->req);
             return;
         }
+        ReqRelease(task->req);
     }
 
     free(task);
