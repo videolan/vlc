@@ -50,7 +50,6 @@
 
 struct vlc_va_sys_t
 {
-    vlc_decoder_device *dec_device;
     struct vaapi_context hw_ctx;
 };
 
@@ -139,7 +138,6 @@ static void Delete(vlc_va_t *va)
 
     vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
     vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
-    vlc_decoder_device_Release(sys->dec_device);
     free(sys);
 }
 
@@ -147,10 +145,11 @@ static const struct vlc_va_operations ops = { Get, Delete, };
 
 static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                   enum PixelFormat pix_fmt,
-                  const es_format_t *fmt, void *p_sys, vlc_decoder_device *device)
+                  const es_format_t *fmt, void *p_sys, vlc_decoder_device *dec_device)
 {
     VLC_UNUSED(desc);
-    if (pix_fmt != AV_PIX_FMT_VAAPI_VLD || p_sys == NULL)
+    if (pix_fmt != AV_PIX_FMT_VAAPI_VLD || dec_device == NULL ||
+        dec_device->type != VLC_DECODER_DEVICE_VAAPI)
         return VLC_EGENERIC;
 
     vlc_va_sys_t *sys = malloc(sizeof *sys);
@@ -162,10 +161,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
 
     int ret = VLC_EGENERIC;
 
-    /* The picture must be allocated by the vout */
-    VADisplay va_dpy;
-    vlc_decoder_device *dec_device =
-        vlc_vaapi_PicSysHoldInstance(p_sys, &va_dpy);
+    VADisplay va_dpy = dec_device->opaque;
 
     VASurfaceID *render_targets;
     unsigned num_render_targets;
@@ -183,7 +179,6 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
         goto error;
 
     /* */
-    sys->dec_device = dec_device;
     sys->hw_ctx.display = va_dpy;
     sys->hw_ctx.config_id = VA_INVALID_ID;
     sys->hw_ctx.context_id = VA_INVALID_ID;
@@ -215,7 +210,6 @@ error:
     if (sys->hw_ctx.config_id != VA_INVALID_ID)
         vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
     free(sys);
-    vlc_decoder_device_Release(dec_device);
     return ret;
 }
 
