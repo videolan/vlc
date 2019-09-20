@@ -188,11 +188,13 @@ struct vlc_video_context
     vlc_atomic_rc_t    rc;
     vlc_decoder_device *device;
     const struct vlc_video_context_operations *ops;
+    enum vlc_video_context_type private_type;
     size_t private_size;
     uint8_t private[];
 };
 
 vlc_video_context * vlc_video_context_Create(vlc_decoder_device *device,
+                                          enum vlc_video_context_type private_type,
                                           size_t private_size,
                                           const struct vlc_video_context_operations *ops)
 {
@@ -200,6 +202,7 @@ vlc_video_context * vlc_video_context_Create(vlc_decoder_device *device,
     if (unlikely(vctx == NULL))
         return NULL;
     vlc_atomic_rc_init( &vctx->rc );
+    vctx->private_type = private_type;
     vctx->private_size = private_size;
     vctx->device = device;
     if (vctx->device)
@@ -208,9 +211,16 @@ vlc_video_context * vlc_video_context_Create(vlc_decoder_device *device,
     return vctx;
 }
 
-void *vlc_video_context_GetPrivate(vlc_video_context *vctx)
+void *vlc_video_context_GetPrivate(vlc_video_context *vctx, enum vlc_video_context_type type)
 {
-    return &vctx->private;
+    if (vctx && vctx->private_type == type)
+        return &vctx->private;
+    return NULL;
+}
+
+enum vlc_video_context_type vlc_video_context_GetType(const vlc_video_context *vctx)
+{
+    return vctx->private_type;
 }
 
 vlc_video_context *vlc_video_context_Hold(vlc_video_context *vctx)
@@ -226,7 +236,7 @@ void vlc_video_context_Release(vlc_video_context *vctx)
         if (vctx->device)
             vlc_decoder_device_Release( vctx->device );
         if ( vctx->ops && vctx->ops->destroy )
-            vctx->ops->destroy( vlc_video_context_GetPrivate(vctx) );
+            vctx->ops->destroy( vlc_video_context_GetPrivate(vctx, vctx->private_type) );
         free(vctx);
     }
 }

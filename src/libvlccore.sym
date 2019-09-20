@@ -947,6 +947,7 @@ vlc_media_tree_Preparse
 vlc_viewpoint_to_4x4
 vlc_video_context_Create
 vlc_video_context_Release
+vlc_video_context_GetType
 vlc_video_context_GetPrivate
 vlc_video_context_Hold
 vlc_video_context_HoldDevice

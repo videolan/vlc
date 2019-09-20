@@ -87,12 +87,28 @@ struct vlc_video_context_operations
     void (*destroy)(void *priv);
 };
 
+/** Decoder device type */
+enum vlc_video_context_type
+{
+    VLC_VIDEO_CONTEXT_NONE,
+    VLC_VIDEO_CONTEXT_VAAPI,
+    VLC_VIDEO_CONTEXT_VDPAU,
+    VLC_VIDEO_CONTEXT_DXVA2,
+    VLC_VIDEO_CONTEXT_D3D11VA,
+    VLC_VIDEO_CONTEXT_AWINDOW,
+    VLC_VIDEO_CONTEXT_NVDEC,
+    VLC_VIDEO_CONTEXT_CVPX,
+    VLC_VIDEO_CONTEXT_MMAL,
+};
+
 VLC_API vlc_video_context * vlc_video_context_Create(vlc_decoder_device *,
+                                        enum vlc_video_context_type private_type,
                                         size_t private_size,
                                         const struct vlc_video_context_operations *);
 VLC_API void vlc_video_context_Release(vlc_video_context *);
 
-VLC_API void *vlc_video_context_GetPrivate(vlc_video_context *);
+VLC_API enum vlc_video_context_type vlc_video_context_GetType(const vlc_video_context *);
+VLC_API void *vlc_video_context_GetPrivate(vlc_video_context *, enum vlc_video_context_type);
 VLC_API vlc_video_context *vlc_video_context_Hold(vlc_video_context *);
 
 /**
