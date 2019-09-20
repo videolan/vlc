@@ -319,7 +319,7 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
     vd->display = vlc_vidsplit_Display;
     vd->control = vlc_vidsplit_Control;
     vd->close = vlc_vidsplit_Close;
-    (void) cfg; (void) fmtp; (void) ctx;
+    (void) fmtp; (void) ctx;
     return VLC_SUCCESS;
 }
 
