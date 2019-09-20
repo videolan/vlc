@@ -181,3 +181,18 @@ vlc_decoder_device_Release(vlc_decoder_device *device)
         vlc_object_delete(device);
     }
 }
+
+/* video context */
+
+vlc_video_context * vlc_video_context_Create(vlc_decoder_device *device)
+{
+    vlc_video_context *vctx = malloc(sizeof(*vctx));
+    if (unlikely(vctx == NULL))
+        return NULL;
+    vctx->device = device;
+    return vctx;
+}
+void vlc_video_context_Release(vlc_video_context *vctx)
+{
+    free(vctx);
+}

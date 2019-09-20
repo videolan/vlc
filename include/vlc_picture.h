@@ -85,6 +85,9 @@ typedef struct vlc_video_context
     vlc_decoder_device *device;
 } vlc_video_context;
 
+VLC_API vlc_video_context * vlc_video_context_Create(vlc_decoder_device *);
+VLC_API void vlc_video_context_Release(vlc_video_context *);
+
 /**
  * Video picture
  */
