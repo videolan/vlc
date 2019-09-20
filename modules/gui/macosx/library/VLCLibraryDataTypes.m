@@ -295,8 +295,12 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         _playCount = p_mediaItem->i_playcount;
         _lastPlayedDate = p_mediaItem->i_last_played_date;
         _title = toNSStr(p_mediaItem->psz_title);
-        _smallArtworkMRL = toNSStr(p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl);
-        _smallArtworkGenerated = p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].b_generated;
+        _smallArtworkGenerated = p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
+        if (_smallArtworkGenerated) {
+            _smallArtworkMRL = toNSStr(p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl);
+        } else {
+            _smallArtworkMRL = nil;
+        }
         _favorited = p_mediaItem->b_is_favorite;
 
         switch (p_mediaItem->i_subtype) {
