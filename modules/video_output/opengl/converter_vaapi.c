@@ -224,11 +224,12 @@ tc_vaegl_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
     vlc_object_t *o = VLC_OBJECT(tc->gl);
     struct priv *priv = tc->priv;
 
-    vlc_decoder_device *dec_device = tc->vctx->device;
+    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(tc->vctx);
     picture_pool_t *pool =
         vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), dec_device, priv->vadpy,
                           requested_count, &priv->va_surface_ids, &tc->fmt,
                           true);
+    vlc_decoder_device_Release(dec_device);
     if (!pool)
         return NULL;
 
@@ -333,20 +334,29 @@ Open(vlc_object_t *obj)
 
     if (tc->vctx == NULL)
         return VLC_EGENERIC;
-    vlc_decoder_device *dec_device = tc->vctx->device;
+    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(tc->vctx);
     if (dec_device->type != VLC_DECODER_DEVICE_VAAPI
      || !vlc_vaapi_IsChromaOpaque(tc->fmt.i_chroma)
      || tc->gl->ext != VLC_GL_EXT_EGL
      || tc->gl->egl.createImageKHR == NULL
      || tc->gl->egl.destroyImageKHR == NULL)
+    {
+        vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
+    }
 
     if (!vlc_gl_StrHasToken(tc->glexts, "GL_OES_EGL_image"))
+    {
+        vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
+    }
 
     const char *eglexts = tc->gl->egl.queryString(tc->gl, EGL_EXTENSIONS);
     if (eglexts == NULL || !vlc_gl_StrHasToken(eglexts, "EGL_EXT_image_dma_buf_import"))
+    {
+        vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
+    }
 
     struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
     if (unlikely(tc->priv == NULL))
@@ -391,8 +401,11 @@ Open(vlc_object_t *obj)
     tc->pf_update  = tc_vaegl_update;
     tc->pf_get_pool = tc_vaegl_get_pool;
 
+    vlc_decoder_device_Release(dec_device);
+
     return VLC_SUCCESS;
 error:
+    vlc_decoder_device_Release(dec_device);
     free(priv);
     return VLC_EGENERIC;
 }

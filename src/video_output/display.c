@@ -770,7 +770,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     if (owner)
         vd->owner = *owner;
 
-    vlc_video_context *fake_vctx = vlc_video_context_Create(dec_device);
+    vlc_video_context *fake_vctx = vlc_video_context_Create(dec_device, 0, NULL);
 
     if (vlc_module_load(vd, "vout display", module, module && *module != '\0',
                         vout_display_start, vd, &osys->cfg, &vd->fmt,

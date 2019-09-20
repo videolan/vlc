@@ -105,7 +105,7 @@ static inline d3d9_decoder_device_t *GetD3D9OpaqueDevice(vlc_decoder_device *dev
 
 static inline d3d9_decoder_device_t *GetD3D9OpaqueContext(vlc_video_context *vctx)
 {
-    vlc_decoder_device *device = vctx ? vctx->device : NULL;
+    vlc_decoder_device *device = vctx ? vlc_video_context_HoldDevice(vctx) : NULL;
     if (unlikely(device == NULL))
         return NULL;
     d3d9_decoder_device_t *res = NULL;
@@ -114,6 +114,7 @@ static inline d3d9_decoder_device_t *GetD3D9OpaqueContext(vlc_video_context *vct
         assert(device->opaque != NULL);
         res = GetD3D9OpaqueDevice(device);
     }
+    vlc_decoder_device_Release(device);
     return res;
 }
 

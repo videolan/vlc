@@ -157,10 +157,9 @@ static int Open(vlc_object_t *obj)
     if (!is_nvdec_opaque(tc->fmt.i_chroma))
         return VLC_EGENERIC;
 
-    vlc_decoder_device *device = tc->vctx->device;
+    vlc_decoder_device *device = vlc_video_context_HoldDevice(tc->vctx);
     if (device == NULL || device->type != VLC_DECODER_DEVICE_NVDEC)
         return VLC_EGENERIC;
-    device = vlc_decoder_device_Hold(device);
 
     converter_sys_t *p_sys = vlc_obj_malloc(VLC_OBJECT(tc), sizeof(*p_sys));
     if (unlikely(p_sys == NULL))

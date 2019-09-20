@@ -31,6 +31,7 @@
 #include <vlc_atomic.h>
 #include <vlc_meta.h>
 #include <vlc_modules.h>
+#include <vlc_picture.h>
 #include "libvlc.h"
 
 void decoder_Init( decoder_t *p_dec, const es_format_t *restrict p_fmt )
@@ -184,15 +185,57 @@ vlc_decoder_device_Release(vlc_decoder_device *device)
 
 /* video context */
 
-vlc_video_context * vlc_video_context_Create(vlc_decoder_device *device)
+struct vlc_video_context
 {
-    vlc_video_context *vctx = malloc(sizeof(*vctx));
+    vlc_atomic_rc_t    rc;
+    vlc_decoder_device *device;
+    const struct vlc_video_context_operations *ops;
+    size_t private_size;
+    uint8_t private[];
+};
+
+vlc_video_context * vlc_video_context_Create(vlc_decoder_device *device,
+                                          size_t private_size,
+                                          const struct vlc_video_context_operations *ops)
+{
+    vlc_video_context *vctx = malloc(sizeof(*vctx) + private_size);
     if (unlikely(vctx == NULL))
         return NULL;
+    vlc_atomic_rc_init( &vctx->rc );
+    vctx->private_size = private_size;
     vctx->device = device;
+    if (vctx->device)
+        vlc_decoder_device_Hold( vctx->device );
+    vctx->ops = ops;
     return vctx;
 }
+
+void *vlc_video_context_GetPrivate(vlc_video_context *vctx)
+{
+    return &vctx->private;
+}
+
+vlc_video_context *vlc_video_context_Hold(vlc_video_context *vctx)
+{
+    vlc_atomic_rc_inc( &vctx->rc );
+    return vctx;
+}
+
 void vlc_video_context_Release(vlc_video_context *vctx)
 {
-    free(vctx);
+    if ( vlc_atomic_rc_dec( &vctx->rc ) )
+    {
+        if (vctx->device)
+            vlc_decoder_device_Release( vctx->device );
+        if ( vctx->ops && vctx->ops->destroy )
+            vctx->ops->destroy( vlc_video_context_GetPrivate(vctx) );
+        free(vctx);
+    }
+}
+
+vlc_decoder_device* vlc_video_context_HoldDevice(vlc_video_context *vctx)
+{
+    if (!vctx->device)
+        return NULL;
+    return vlc_decoder_device_Hold( vctx->device );
 }

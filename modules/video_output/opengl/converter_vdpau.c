@@ -62,10 +62,13 @@ static picture_pool_t *
 tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
                      unsigned int requested_count)
 {
-    vlc_decoder_device *dec_device = tc->vctx->device;
-    return vlc_vdp_output_pool_create(dec_device->opaque,
+    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(tc->vctx);
+    picture_pool_t *pool;
+    pool = vlc_vdp_output_pool_create(dec_device->opaque,
                                       VDP_RGBA_FORMAT_B8G8R8A8,
                                       &tc->fmt, requested_count);
+    vlc_decoder_device_Release(dec_device);
+    return pool;
 }
 
 static int
@@ -113,8 +116,9 @@ Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
     _glVDPAUFiniNV(); assert(tc->vt->GetError() == GL_NO_ERROR);
-    vlc_decoder_device *dec_device = tc->vctx->device;
+    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(tc->vctx);
     vdp_release_x11(dec_device->opaque);
+    vlc_decoder_device_Release(dec_device);
 }
 
 static int
@@ -123,14 +127,17 @@ Open(vlc_object_t *obj)
     opengl_tex_converter_t *tc = (void *) obj;
     if (tc->vctx == NULL)
         return VLC_EGENERIC;
-    vlc_decoder_device *dec_device = tc->vctx->device;
+    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(tc->vctx);
     if (dec_device->type != VLC_DECODER_DEVICE_VDPAU
      || (tc->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
       && tc->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
       && tc->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
      || !vlc_gl_StrHasToken(tc->glexts, "GL_NV_vdpau_interop")
      || tc->gl->surface->type != VOUT_WINDOW_TYPE_XID)
+    {
+        vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
+    }
 
     tc->fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
 
@@ -143,6 +150,7 @@ Open(vlc_object_t *obj)
                              VDP_FUNC_ID_GET_PROC_ADDRESS, &vdp_gpa)
         != VDP_STATUS_OK)
     {
+        vlc_decoder_device_Release(dec_device);
         vdp_release_x11(vdp);
         return VLC_EGENERIC;
     }
@@ -151,6 +159,7 @@ Open(vlc_object_t *obj)
     _##fct = vlc_gl_GetProcAddress(tc->gl, #fct); \
     if (!_##fct) \
     { \
+        vlc_decoder_device_Release(dec_device); \
         vdp_release_x11(vdp); \
         return VLC_EGENERIC; \
     }
@@ -166,6 +175,8 @@ Open(vlc_object_t *obj)
 #undef SAFE_GPA
 
     INTEROP_CALL(glVDPAUInitNV, (void *)(uintptr_t)device, vdp_gpa);
+
+    vlc_decoder_device_Release(dec_device);
 
     tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D,
                                               VLC_CODEC_RGB32,

@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
+#include <vlc_codec.h>
 #include <vlc_vout_display.h>
 #include <vlc_video_splitter.h>
 
@@ -289,8 +290,11 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
         }
 
         vdcfg.window = part->window;
+        vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(ctx);
         vout_display_t *display = vout_display_New(obj, &output->fmt, &vdcfg,
-                                                   modname, ctx->device, NULL);
+                                                   modname, dec_device, NULL);
+        if (dec_device)
+            vlc_decoder_device_Release(dec_device);
         if (display == NULL) {
             vout_window_Disable(part->window);
             vout_window_Delete(part->window);

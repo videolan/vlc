@@ -80,13 +80,28 @@ typedef struct picture_buffer_t
 } picture_buffer_t;
 
 typedef struct vlc_decoder_device vlc_decoder_device;
-typedef struct vlc_video_context
-{
-    vlc_decoder_device *device;
-} vlc_video_context;
+typedef struct vlc_video_context vlc_video_context;
 
-VLC_API vlc_video_context * vlc_video_context_Create(vlc_decoder_device *);
+struct vlc_video_context_operations
+{
+    void (*destroy)(void *priv);
+};
+
+VLC_API vlc_video_context * vlc_video_context_Create(vlc_decoder_device *,
+                                        size_t private_size,
+                                        const struct vlc_video_context_operations *);
 VLC_API void vlc_video_context_Release(vlc_video_context *);
+
+VLC_API void *vlc_video_context_GetPrivate(vlc_video_context *);
+VLC_API vlc_video_context *vlc_video_context_Hold(vlc_video_context *);
+
+/**
+ * Get the decoder device used by the device context.
+ *
+ * This will increment the refcount of the decoder device.
+ */
+VLC_API vlc_decoder_device *vlc_video_context_HoldDevice(vlc_video_context *);
+
 
 /**
  * Video picture
