@@ -168,10 +168,13 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
         vlc_vaapi_PicSysHoldInstance(p_sys, &va_dpy);
 
     VASurfaceID *render_targets;
-    unsigned num_render_targets =
+    unsigned num_render_targets;
+#if 0 // TODO create the render targets locally
+    num_render_targets =
         vlc_vaapi_PicSysGetRenderTargets(p_sys, &render_targets);
     if (num_render_targets == 0)
         goto error;
+#endif
 
     VAProfile i_profile;
     unsigned count;

@@ -333,7 +333,8 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
 
 static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
                                   enum AVPixelFormat fmt,
-                                  enum AVPixelFormat swfmt)
+                                  enum AVPixelFormat swfmt,
+                                  vlc_decoder_device **pp_dec_device)
 {
     video_format_t fmt_out;
     int val;
@@ -367,7 +368,15 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
         dec->fmt_out.video.mastering = dec->fmt_in.video.mastering;
     dec->fmt_out.video.lighting = dec->fmt_in.video.lighting;
 
-    return decoder_UpdateVideoFormat(dec);
+    vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(dec);
+    if (dec_dev)
+    {
+        if (pp_dec_device)
+            *pp_dec_device = dec_dev;
+        else
+            vlc_decoder_device_Release(dec_dev);
+    }
+    return 0;
 }
 
 static bool chroma_compatible(vlc_fourcc_t a, vlc_fourcc_t b)
@@ -1239,7 +1248,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
              * then picture buffer can be allocated. */
             if (p_sys->p_va == NULL
              && lavc_UpdateVideoFormat(p_dec, p_context, p_context->pix_fmt,
-                                       p_context->pix_fmt) == 0)
+                                       p_context->pix_fmt, NULL) == 0
+             && decoder_UpdateVideoOutput(p_dec) == 0)
                 p_pic = decoder_NewPicture(p_dec);
 
             if( !p_pic )
@@ -1592,7 +1602,8 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
         /* Most unaccelerated decoders do not call get_format(), so we need to
          * update the output video format here. The MT semaphore must be held
          * to protect p_dec->fmt_out. */
-        if (lavc_UpdateVideoFormat(dec, ctx, ctx->pix_fmt, ctx->pix_fmt))
+        if (lavc_UpdateVideoFormat(dec, ctx, ctx->pix_fmt, ctx->pix_fmt, NULL) ||
+            decoder_UpdateVideoOutput(dec))
         {
             vlc_mutex_unlock(&sys->lock);
             return -1;
@@ -1731,21 +1742,29 @@ no_reuse:
             continue;
         }
         const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(hwfmt);
+        vlc_decoder_device *init_device = NULL;
         msg_Dbg(p_dec, "trying format %s", dsc ? dsc->name : "unknown");
-        if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt))
+        if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt, &init_device) ||
+            init_device == NULL)
             continue; /* Unsupported brand of hardware acceleration */
         vlc_mutex_unlock(&p_sys->lock);
 
-        picture_t *test_pic = decoder_NewPicture(p_dec);
-        assert(!test_pic || test_pic->format.i_chroma == p_dec->fmt_out.video.i_chroma);
+        // TEMP: decoder_NewPicture cannot be used until decoder_UpdateVideoOutput is called
         vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, src_desc, hwfmt,
                                   &p_dec->fmt_in,
-                                  test_pic ? test_pic->p_sys : NULL);
-        if (test_pic)
-            picture_Release(test_pic);
+                                  NULL);
+        if (init_device)
+            vlc_decoder_device_Release(init_device);
         vlc_mutex_lock(&p_sys->lock);
         if (va == NULL)
             continue; /* Unsupported codec profile or such */
+
+        if (decoder_UpdateVideoOutput(p_dec))
+        {
+            vlc_va_Delete(va);
+            p_context->hwaccel_context = NULL;
+            continue; /* Unsupported codec profile or such */
+        }
 
         p_sys->p_va = va;
         p_sys->pix_fmt = hwfmt;
