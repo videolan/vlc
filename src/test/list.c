@@ -56,6 +56,8 @@ int main (void)
     vlc_list_init(&head);
     vlc_list_foreach(elem, &head, node)
         assert(0); /* No iteration on an empty list */
+    vlc_list_reverse_foreach(elem, &head, node)
+        assert(0); /* No iteration on an empty list */
     assert(vlc_list_is_empty(&head));
 
     vlc_list_init(&head); /* List can be reinitialized */
@@ -64,12 +66,20 @@ int main (void)
     vlc_list_foreach(elem, &head, node)
         assert(elem->i == 1), count++;
     assert(count == 1);
+    count = 0;
+    vlc_list_reverse_foreach(elem, &head, node)
+        assert(elem->i == 1), count++;
+    assert(count == 1);
 
     back = make_elem(2);
     vlc_list_append(back, &head);
     count = 0;
     vlc_list_foreach(elem, &head, node)
         assert(elem->i == count + 1), count++;
+    assert(count == 2);
+    count = 0;
+    vlc_list_reverse_foreach(elem, &head, node)
+        assert(elem->i == 2 - count), count++;
     assert(count == 2);
 
     vlc_list_prepend(make_elem(3), &head);
@@ -87,6 +97,13 @@ int main (void)
     }
     assert(vlc_list_is_empty(&head));
 
+    vlc_list_prepend(make_elem(3), &head);
+    vlc_list_reverse_foreach(elem, &head, node)
+    {
+        vlc_list_remove(&elem->node);
+        free(elem);
+    }
+    assert(vlc_list_is_empty(&head));
 
     /*
      * Create a list from 10 to 30, inserting the 10 last element first
