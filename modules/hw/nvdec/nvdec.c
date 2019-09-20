@@ -930,7 +930,7 @@ static void CloseDecoder(vlc_object_t *p_this)
 /** Decoder Device **/
 static void DecoderContextClose(vlc_decoder_device *device)
 {
-    decoder_device_nvdec_t *p_sys = device->opaque;
+    decoder_device_nvdec_t *p_sys = GetNVDECOpaqueDevice(device);
     if (p_sys->cuCtx)
         CALL_CUDA_DEV(cuCtxDestroy, p_sys->cuCtx);
     cuda_free_functions(&p_sys->cudaFunctions);

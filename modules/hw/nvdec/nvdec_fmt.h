@@ -32,6 +32,13 @@ typedef struct {
 
 } decoder_device_nvdec_t;
 
+static inline decoder_device_nvdec_t *GetNVDECOpaqueDevice(vlc_decoder_device *device)
+{
+    if (device == NULL || device->type != VLC_DECODER_DEVICE_NVDEC)
+        return NULL;
+    return device->opaque;
+}
+
 static inline int CudaCheckErr(vlc_object_t *obj, CudaFunctions *cudaFunctions, CUresult result, const char *psz_func)
 {
     if (unlikely(result != CUDA_SUCCESS)) {

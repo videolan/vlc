@@ -62,8 +62,8 @@ static int tc_nvdec_gl_allocate_texture(const opengl_tex_converter_t *tc, GLuint
                                 const GLsizei *tex_width, const GLsizei *tex_height)
 {
     converter_sys_t *p_sys = tc->priv;
-    vlc_decoder_device *device = tc->dec_device;
-    decoder_device_nvdec_t *devsys = device->opaque;
+    vlc_decoder_device *device = p_sys->device;
+    decoder_device_nvdec_t *devsys = GetNVDECOpaqueDevice(device);
 
     int result;
     result = CALL_CUDA(cuCtxPushCurrent, p_sys->cuConverterCtx ? p_sys->cuConverterCtx : devsys->cuCtx);
@@ -104,8 +104,8 @@ tc_nvdec_gl_update(opengl_tex_converter_t const *tc, GLuint textures[],
     VLC_UNUSED(textures);
 
     converter_sys_t *p_sys = tc->priv;
-    vlc_decoder_device *device = tc->dec_device;
-    decoder_device_nvdec_t *devsys = device->opaque;
+    vlc_decoder_device *device = p_sys->device;
+    decoder_device_nvdec_t *devsys = GetNVDECOpaqueDevice(device);
     pic_context_nvdec_t *srcpic = container_of(pic->context, pic_context_nvdec_t, ctx);
 
     int result;
@@ -169,7 +169,7 @@ static int Open(vlc_object_t *obj)
     p_sys->cuConverterCtx = NULL;
     p_sys->device = device;
 
-    decoder_device_nvdec_t *devsys = device->opaque;
+    decoder_device_nvdec_t *devsys = GetNVDECOpaqueDevice(device);
     int result;
     CUdevice cuDecDevice = 0;
     unsigned int device_count;
