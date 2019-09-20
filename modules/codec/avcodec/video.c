@@ -1180,6 +1180,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( p_frame_info->b_eos )
             p_sys->b_first_frame = true;
 
+        post_mt( p_sys );
+
         /* Compute the PTS */
 #ifdef FF_API_PKT_PTS
         int64_t av_pts = frame->pts == AV_NOPTS_VALUE ? frame->pkt_dts : frame->pts;
@@ -1206,6 +1208,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
            ( p_dec->b_frame_drop_allowed && (frame->flags & AV_FRAME_FLAG_CORRUPT) &&
              !p_sys->b_show_corrupted ) )
         {
+            wait_mt( p_sys );
             av_frame_free(&frame);
             continue;
         }
@@ -1223,6 +1226,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                       = malloc( sizeof(video_palette_t) );
             if( !p_palette )
             {
+                wait_mt( p_sys );
                 b_error = true;
                 av_frame_free(&frame);
                 break;
@@ -1235,6 +1239,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGBP;
             if( decoder_UpdateVideoFormat( p_dec ) )
             {
+                wait_mt( p_sys );
                 av_frame_free(&frame);
                 continue;
             }
@@ -1252,6 +1257,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             if( !p_pic )
             {
+                wait_mt( p_sys );
                 av_frame_free(&frame);
                 break;
             }
@@ -1259,6 +1265,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             /* Fill picture_t from AVFrame */
             if( lavc_CopyPicture( p_dec, p_pic, frame ) != VLC_SUCCESS )
             {
+                wait_mt( p_sys );
                 av_frame_free(&frame);
                 picture_Release( p_pic );
                 break;
@@ -1274,6 +1281,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_pic = picture_Clone( p_pic );
             if( unlikely(p_pic == NULL) )
             {
+                wait_mt( p_sys );
                 av_frame_free(&frame);
                 break;
             }
@@ -1312,11 +1320,14 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if(p_frame_info->b_eos)
                 p_pic->b_still = true;
             p_sys->b_first_frame = false;
+            wait_mt( p_sys );
             decoder_QueueVideo( p_dec, p_pic );
         }
         else
+        {
+            wait_mt( p_sys );
             picture_Release( p_pic );
-
+        }
     } while( true );
 
     /* After draining, we need to reset decoder with a flush */
@@ -1601,14 +1612,18 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
             return -1;
         }
     }
-    post_mt(sys);
 
     if (sys->p_va != NULL)
-        return lavc_va_GetFrame(ctx, frame);
+    {
+        int ret = lavc_va_GetFrame(ctx, frame);
+        post_mt(sys);
+        return ret;
+    }
 
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so we need to check for direct rendering again. */
     int ret = lavc_dr_GetFrame(ctx, frame);
+    post_mt(sys);
     if (ret)
         ret = avcodec_default_get_buffer2(ctx, frame, flags);
     return ret;
@@ -1740,12 +1755,11 @@ no_reuse:
                                   test_pic ? test_pic->p_sys : NULL);
         if (test_pic)
             picture_Release(test_pic);
+        wait_mt(p_sys);
         if (va == NULL)
-        {
-            wait_mt(p_sys);
             continue; /* Unsupported codec profile or such */
-        }
 
+        post_mt(p_sys);
         p_sys->p_va = va;
         p_sys->pix_fmt = hwfmt;
         p_context->draw_horiz_band = NULL;
