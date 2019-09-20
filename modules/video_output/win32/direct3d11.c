@@ -325,12 +325,9 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->startEndRenderingCb = var_InheritAddress( vd, "vout-cb-make-current" );
     sys->selectPlaneCb       = var_InheritAddress( vd, "vout-cb-select-plane" );
 
-    d3d11_decoder_device_t *d3d11_decoder = NULL;
-    if ( context && context->device->type == VLC_DECODER_DEVICE_D3D11VA )
-        d3d11_decoder = context->device->opaque;
-
     HRESULT hr;
-    if (d3d11_decoder && d3d11_decoder->device)
+    d3d11_decoder_device_t *d3d11_decoder = GetD3D11OpaqueContext(context);
+    if ( d3d11_decoder == NULL )
     {
         hr = D3D11_CreateDeviceExternal(vd, d3d11_decoder->device,
                                         is_d3d11_opaque(vd->source.i_chroma),
