@@ -87,6 +87,10 @@ int main (void)
     }
     assert(vlc_list_is_empty(&head));
 
+
+    /*
+     * Create a list from 10 to 30, inserting the 10 last element first
+     */
     for (int i = 20; i < 30; i++)
         vlc_list_append(make_elem(i), &head);
     for (int i = 19; i >= 10; i--)
