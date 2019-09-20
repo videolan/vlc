@@ -662,9 +662,9 @@ Open(vlc_object_t *p_obj)
     {
         sys->error_status = 0;
         ret = vlc_smb2_open_share(access, smb2_url, &credential);
-        if (ret == 0)
-            vlc_credential_store(&credential, access);
     }
+    if (ret == 0)
+        vlc_credential_store(&credential, access);
     vlc_credential_clean(&credential);
 
     if (ret != 0)
