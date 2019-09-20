@@ -27,12 +27,13 @@
 #import "main/VLCMain.h"
 #import "windows/VLCErrorWindowController.h"
 
-/* for the icon in our custom error panel */
-#import <ApplicationServices/ApplicationServices.h>
+#import <vlc_common.h>
+#import <vlc_dialog.h>
 
 @interface VLCCoreDialogProvider ()
 
-- (void)displayErrorWithTitle:(NSString *)title text:(NSString *)text;
+- (void)displayErrorWithTitle:(NSString *)title
+                         text:(NSString *)text;
 
 - (void)displayLoginDialog:(vlc_dialog_id *)dialogID
                      title:(NSString *)title
@@ -60,7 +61,6 @@
                                  text:(NSString *)text;
 
 @end
-
 
 static void displayErrorCallback(void *p_data,
                                  const char *psz_title,
@@ -210,7 +210,6 @@ static void updateProgressCallback(void *p_data,
 
 -(void)awakeFromNib
 {
-    _progressCancelled = NO;
     [_authenticationLoginLabel setStringValue: _NS("Username")];
     [_authenticationPasswordLabel setStringValue: _NS("Password")];
     [_authenticationCancelButton setTitle: _NS("Cancel")];

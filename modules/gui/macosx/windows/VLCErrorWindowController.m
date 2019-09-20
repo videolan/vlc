@@ -30,7 +30,6 @@
     NSMutableArray *_errors;
     NSMutableArray *_icons;
 }
-
 @end
 
 @implementation VLCErrorWindowController
@@ -64,12 +63,10 @@
     NSMutableAttributedString * ourError;
     ourError = [[NSMutableAttributedString alloc] initWithString:
                 [NSString stringWithFormat:@"%@\n%@", title, message]
-                                                      attributes:
-                [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize:11] forKey: NSFontAttributeName]];
-    [ourError
-     addAttribute: NSFontAttributeName
-     value: [NSFont boldSystemFontOfSize:11]
-     range: NSMakeRange(0, [title length])];
+                                                      attributes:@{NSFontAttributeName : [NSFont systemFontOfSize:11]}];
+    [ourError addAttribute: NSFontAttributeName
+                     value: [NSFont boldSystemFontOfSize:11]
+                     range: NSMakeRange(0, [title length])];
     [_errors addObject: ourError];
 
     [_icons addObject: [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kAlertStopIcon)]];
@@ -92,8 +89,8 @@
     return [_errors count];
 }
 
-- (id)tableView:(NSTableView *)theDataTable objectValueForTableColumn:
-(NSTableColumn *)theTableColumn row: (NSInteger)row
+- (id)tableView:(NSTableView *)theDataTable objectValueForTableColumn:(NSTableColumn *)theTableColumn
+            row: (NSInteger)row
 {
     if ([[theTableColumn identifier] isEqualToString: @"error_msg"])
         return [_errors objectAtIndex:row];

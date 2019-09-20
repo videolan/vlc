@@ -21,8 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <vlc_common.h>
-#import <vlc_dialog.h>
 #import <Cocoa/Cocoa.h>
 
 /*****************************************************************************
@@ -54,10 +52,7 @@
 @property (readwrite, weak) IBOutlet NSTextField *progressDescriptionLabel;
 @property (readwrite, weak) IBOutlet NSTextField *progressTitleLabel;
 
-
 @property (readonly) VLCErrorWindowController* errorPanel;
-
-@property (atomic,readwrite) BOOL progressCancelled;
 
 - (IBAction)authenticationDialogAction:(id)sender;
 
