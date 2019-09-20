@@ -351,9 +351,10 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
 
     sys->d3d_dev.d3ddevice = NULL;
     sys->render = DXGI_FORMAT_UNKNOWN;
-    picture_sys_d3d11_t *p_sys = picsys;
-    if ( p_sys != NULL && p_sys->context != NULL ) {
-        HRESULT hr = D3D11_CreateDeviceExternal(va, p_sys->context, true, &sys->d3d_dev);
+    d3d11_decoder_device_t *d3d11_device = GetD3D11OpaqueDevice( dec_device );
+    if ( d3d11_device != NULL )
+    {
+        HRESULT hr = D3D11_CreateDeviceExternal(va, d3d11_device->device, true, &sys->d3d_dev);
         if (FAILED(hr))
             msg_Err(va, "can't use the provided D3D11 context");
         else
@@ -361,22 +362,27 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
             if (sys->d3d_dev.context_mutex == INVALID_HANDLE_VALUE)
                 msg_Warn(va, "No mutex found to lock the decoder");
             void *d3dvidctx = NULL;
-            hr = ID3D11DeviceContext_QueryInterface(p_sys->context, &IID_ID3D11VideoContext, &d3dvidctx);
+            hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
             if (FAILED(hr)) {
                msg_Err(va, "Could not Query ID3D11VideoContext Interface from the picture. (hr=0x%lX)", hr);
                D3D11_ReleaseDevice(&sys->d3d_dev);
             } else {
                 sys->hw.video_context = d3dvidctx;
 
-                assert(p_sys->texture[KNOWN_DXGI_INDEX] != NULL);
-                D3D11_TEXTURE2D_DESC dstDesc;
-                ID3D11Texture2D_GetDesc( p_sys->texture[KNOWN_DXGI_INDEX], &dstDesc);
-                sys->render = dstDesc.Format;
-                if (dstDesc.BindFlags & D3D11_BIND_DECODER)
+                if (picsys != NULL)
                 {
-                    sys->textureWidth = dstDesc.Width;
-                    sys->textureHeight = dstDesc.Height;
-                    sys->totalTextureSlices = dstDesc.ArraySize;
+                    picture_sys_d3d11_t *p_sys = picsys;
+                    /* TODO this will go away in push, we decide the decoding format */
+                    assert(p_sys->texture[KNOWN_DXGI_INDEX] != NULL);
+                    D3D11_TEXTURE2D_DESC dstDesc;
+                    ID3D11Texture2D_GetDesc( p_sys->texture[KNOWN_DXGI_INDEX], &dstDesc);
+                    sys->render = dstDesc.Format;
+                    if (dstDesc.BindFlags & D3D11_BIND_DECODER)
+                    {
+                        sys->textureWidth = dstDesc.Width;
+                        sys->textureHeight = dstDesc.Height;
+                        sys->totalTextureSlices = dstDesc.ArraySize;
+                    }
                 }
             }
         }
