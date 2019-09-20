@@ -1916,7 +1916,7 @@ GLConvOpen(vlc_object_t *obj)
 
     HRESULT hr;
     int adapter = -1;
-    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueDevice( tc->dec_device );
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext( tc->vctx );
     if ( d3d9_decoder != NULL )
     {
         D3D9_CloneExternal(&priv->hd3d, d3d9_decoder->device);

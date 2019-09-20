@@ -588,7 +588,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
         if (desc->plane_count == 0)
         {
             /* Opaque chroma: load a module to handle it */
-            tc->dec_device = context ? context->device : NULL;
+            tc->vctx = context;
             tc->p_module = module_need_var(tc, "glconv", "glconv");
         }
 

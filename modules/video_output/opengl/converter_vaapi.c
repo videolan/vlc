@@ -224,8 +224,9 @@ tc_vaegl_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
     vlc_object_t *o = VLC_OBJECT(tc->gl);
     struct priv *priv = tc->priv;
 
+    vlc_decoder_device *dec_device = tc->vctx->device;
     picture_pool_t *pool =
-        vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), tc->dec_device, priv->vadpy,
+        vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), dec_device, priv->vadpy,
                           requested_count, &priv->va_surface_ids, &tc->fmt,
                           true);
     if (!pool)
@@ -330,8 +331,10 @@ Open(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
 
-    if (tc->dec_device == NULL
-     || tc->dec_device->type != VLC_DECODER_DEVICE_VAAPI
+    if (tc->vctx == NULL)
+        return VLC_EGENERIC;
+    vlc_decoder_device *dec_device = tc->vctx->device;
+    if (dec_device->type != VLC_DECODER_DEVICE_VAAPI
      || !vlc_vaapi_IsChromaOpaque(tc->fmt.i_chroma)
      || tc->gl->ext != VLC_GL_EXT_EGL
      || tc->gl->egl.createImageKHR == NULL
@@ -374,7 +377,7 @@ Open(vlc_object_t *obj)
     if (priv->glEGLImageTargetTexture2DOES == NULL)
         goto error;
 
-    priv->vadpy = tc->dec_device->opaque;
+    priv->vadpy = dec_device->opaque;
     assert(priv->vadpy != NULL);
 
     if (tc_va_check_interop_blacklist(tc, priv->vadpy))

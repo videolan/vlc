@@ -157,7 +157,7 @@ static int Open(vlc_object_t *obj)
     if (!is_nvdec_opaque(tc->fmt.i_chroma))
         return VLC_EGENERIC;
 
-    vlc_decoder_device *device = tc->dec_device;
+    vlc_decoder_device *device = tc->vctx->device;
     if (device == NULL || device->type != VLC_DECODER_DEVICE_NVDEC)
         return VLC_EGENERIC;
     device = vlc_decoder_device_Hold(device);
