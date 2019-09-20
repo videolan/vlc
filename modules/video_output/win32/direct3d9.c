@@ -41,7 +41,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_codec.h>
 #include <vlc_vout_display.h>
 
 #include <vlc/libvlc.h>
@@ -1655,9 +1654,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->startEndRenderingCb = NULL;
     }
 
-    d3d9_decoder_device_t *d3d9_decoder = NULL;
-    if ( context && context->device->type == VLC_DECODER_DEVICE_DXVA2 )
-        d3d9_decoder = context->device->opaque;
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(context);
     if ( d3d9_decoder == NULL )
     {
         // No d3d9 device, we create one
@@ -1922,9 +1919,9 @@ GLConvOpen(vlc_object_t *obj)
 
     HRESULT hr;
     int adapter = -1;
-    if (tc->dec_device->type == VLC_DECODER_DEVICE_DXVA2)
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueDevice( tc->dec_device );
+    if ( d3d9_decoder != NULL )
     {
-        d3d9_decoder_device_t *d3d9_decoder = tc->dec_device->opaque;
         D3D9_CloneExternal(&priv->hd3d, d3d9_decoder->device);
         adapter = d3d9_decoder->adapter;
     }

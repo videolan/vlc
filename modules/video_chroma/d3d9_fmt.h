@@ -24,6 +24,7 @@
 #define VLC_VIDEOCHROMA_D3D9_FMT_H_
 
 #include <vlc_picture.h>
+#include <vlc_codec.h>
 
 #define COBJMACROS
 #include <d3d9.h>
@@ -82,6 +83,27 @@ static inline bool is_d3d9_opaque(vlc_fourcc_t chroma)
     default:
         return false;
     }
+}
+
+static inline d3d9_decoder_device_t *GetD3D9OpaqueDevice(vlc_decoder_device *device)
+{
+    if (device == NULL || device->type != VLC_DECODER_DEVICE_DXVA2)
+        return NULL;
+    return device->opaque;
+}
+
+static inline d3d9_decoder_device_t *GetD3D9OpaqueContext(vlc_video_context *vctx)
+{
+    vlc_decoder_device *device = vctx ? vctx->device : NULL;
+    if (unlikely(device == NULL))
+        return NULL;
+    d3d9_decoder_device_t *res = NULL;
+    if (device->type == VLC_DECODER_DEVICE_DXVA2)
+    {
+        assert(device->opaque != NULL);
+        res = GetD3D9OpaqueDevice(device);
+    }
+    return res;
 }
 
 static inline void AcquireD3D9PictureSys(picture_sys_d3d9_t *p_sys)
