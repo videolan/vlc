@@ -111,7 +111,7 @@ h:redirect( url_dst, url_src ): Redirect all connections from url_src to url_dst
 Player
 ------
 player.is_playing(): Return true if input exists.
-player.add_subtitle(url): Add a subtitle file (by path) to the current input
+player.add_subtitle(url, autoselect=false): Add a subtitle file (by path) to the current input
 player.item(): Get the current input item. Input item methods are:
   :uri(): Get item's URI.
   :name(): Get item's name.
