@@ -268,25 +268,25 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
     /* Load dll*/
-    picture_sys_d3d9_t *p_sys = picsys;
-    if (p_sys!=NULL && p_sys->surface!=NULL)
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueDevice( dec_device );
+    if ( d3d9_decoder != NULL )
     {
-        IDirect3DDevice9 *device;
-        if ( FAILED(IDirect3DSurface9_GetDevice( p_sys->surface, &device )) )
+        D3D9_CloneExternal(&sys->hd3d, d3d9_decoder->device);
+        HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, d3d9_decoder->adapter, &sys->d3d_dev);
+        if ( FAILED(hr) )
         {
+            D3D9_Destroy(&sys->hd3d);
             free( sys );
             return VLC_EGENERIC;
         }
-        if ( D3D9_CreateExternal(&sys->hd3d, device) != VLC_SUCCESS ||
-             FAILED(D3D9_CreateDeviceExternal( device, &sys->hd3d, &sys->d3d_dev)) )
+        if (picsys != NULL)
         {
-            IDirect3DDevice9_Release(device);
-            free( sys );
-            return VLC_EGENERIC;
+            picture_sys_d3d9_t *p_sys = picsys;
+            /* TODO this will go away in push, we decide the decoding format */
+            D3DSURFACE_DESC src;
+            if (SUCCEEDED(IDirect3DSurface9_GetDesc(p_sys->surface, &src)))
+                sys->render = src.Format;
         }
-        D3DSURFACE_DESC src;
-        if (SUCCEEDED(IDirect3DSurface9_GetDesc(p_sys->surface, &src)))
-            sys->render = src.Format;
     }
     else if (D3D9_Create(va, &sys->hd3d) != VLC_SUCCESS) {
         msg_Warn(va, "cannot load d3d9.dll");
