@@ -148,7 +148,7 @@ static const struct vlc_va_operations ops = { Get, Delete, };
 
 static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                   enum PixelFormat pix_fmt,
-                  const es_format_t *fmt, void *p_sys, vlc_decoder_device *dec_device)
+                  const es_format_t *fmt, vlc_decoder_device *dec_device)
 {
     VLC_UNUSED(desc);
     if (pix_fmt != AV_PIX_FMT_VAAPI_VLD || dec_device == NULL ||

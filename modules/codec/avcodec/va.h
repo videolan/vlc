@@ -44,7 +44,7 @@ struct vlc_va_t {
 
 typedef int (*vlc_va_open)(vlc_va_t *, AVCodecContext *, const AVPixFmtDescriptor *,
                            enum PixelFormat,
-                           const es_format_t *, void *, vlc_decoder_device *);
+                           const es_format_t *, vlc_decoder_device *);
 
 #define set_va_callback(activate, priority) \
     { \
@@ -71,7 +71,7 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt);
  */
 vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *, const AVPixFmtDescriptor *,
                      enum PixelFormat, const es_format_t *fmt,
-                     vlc_decoder_device *device, void *p_sys);
+                     vlc_decoder_device *device);
 
 /**
  * Get a hardware video surface for a libavcodec frame.

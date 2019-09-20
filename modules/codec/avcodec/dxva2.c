@@ -49,7 +49,7 @@ struct dxva2_pic_context
 #include "directx_va.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, const AVPixFmtDescriptor *, enum PixelFormat,
-                const es_format_t *, void *, vlc_decoder_device *);
+                const es_format_t *, vlc_decoder_device *);
 
 vlc_module_begin()
     set_description(N_("DirectX Video Acceleration (DXVA) 2.0"))
@@ -255,7 +255,7 @@ static const struct vlc_va_operations ops = { Get, Close, };
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                 enum PixelFormat pix_fmt,
-                const es_format_t *fmt, void *picsys, vlc_decoder_device *dec_device)
+                const es_format_t *fmt, vlc_decoder_device *dec_device)
 {
     int err = VLC_EGENERIC;
 
@@ -278,14 +278,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
             D3D9_Destroy(&sys->hd3d);
             free( sys );
             return VLC_EGENERIC;
-        }
-        if (picsys != NULL)
-        {
-            picture_sys_d3d9_t *p_sys = picsys;
-            /* TODO this will go away in push, we decide the decoding format */
-            D3DSURFACE_DESC src;
-            if (SUCCEEDED(IDirect3DSurface9_GetDesc(p_sys->surface, &src)))
-                sys->render = src.Format;
         }
     }
     else if (D3D9_Create(va, &sys->hd3d) != VLC_SUCCESS) {

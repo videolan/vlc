@@ -62,7 +62,7 @@ struct d3d11va_pic_context
 #include "directx_va.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, const AVPixFmtDescriptor *, enum PixelFormat,
-                const es_format_t *, void *, vlc_decoder_device *);
+                const es_format_t *, vlc_decoder_device *);
 
 vlc_module_begin()
     set_description(N_("Direct3D11 Video Acceleration"))
@@ -317,7 +317,7 @@ static const struct vlc_va_operations ops = { Get, Close, };
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                 enum PixelFormat pix_fmt,
-                const es_format_t *fmt, void *picsys, vlc_decoder_device *dec_device)
+                const es_format_t *fmt, vlc_decoder_device *dec_device)
 {
     int err = VLC_EGENERIC;
 
@@ -368,22 +368,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
                D3D11_ReleaseDevice(&sys->d3d_dev);
             } else {
                 sys->hw.video_context = d3dvidctx;
-
-                if (picsys != NULL)
-                {
-                    picture_sys_d3d11_t *p_sys = picsys;
-                    /* TODO this will go away in push, we decide the decoding format */
-                    assert(p_sys->texture[KNOWN_DXGI_INDEX] != NULL);
-                    D3D11_TEXTURE2D_DESC dstDesc;
-                    ID3D11Texture2D_GetDesc( p_sys->texture[KNOWN_DXGI_INDEX], &dstDesc);
-                    sys->render = dstDesc.Format;
-                    if (dstDesc.BindFlags & D3D11_BIND_DECODER)
-                    {
-                        sys->textureWidth = dstDesc.Width;
-                        sys->textureHeight = dstDesc.Height;
-                        sys->totalTextureSlices = dstDesc.ArraySize;
-                    }
-                }
             }
         }
     }

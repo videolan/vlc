@@ -1749,10 +1749,9 @@ no_reuse:
             continue; /* Unsupported brand of hardware acceleration */
         vlc_mutex_unlock(&p_sys->lock);
 
-        // TEMP: decoder_NewPicture cannot be used until decoder_UpdateVideoOutput is called
         vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, src_desc, hwfmt,
                                   &p_dec->fmt_in,
-                                  init_device, NULL);
+                                  init_device);
         if (init_device)
             vlc_decoder_device_Release(init_device);
         vlc_mutex_lock(&p_sys->lock);
