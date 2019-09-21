@@ -124,7 +124,7 @@ int DirRead (stream_t *access, input_item_node_t *node)
         struct stat st;
         int type;
 
-#ifdef HAVE_OPENAT
+#ifdef HAVE_FSTATAT
         if (fstatat(dirfd(sys->dir), entry, &st, 0))
             continue;
 #else
