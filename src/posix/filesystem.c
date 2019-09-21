@@ -62,14 +62,7 @@ int vlc_open (const char *filename, int flags, ...)
         mode = va_arg (ap, unsigned int);
     va_end (ap);
 
-#ifdef O_CLOEXEC
     return open(filename, flags | O_CLOEXEC, mode);
-#else
-    int fd = open(filename, flags, mode);
-    if (fd != -1)
-        vlc_cloexec(fd);
-    return -1;
-#endif
 }
 
 int vlc_openat (int dir, const char *filename, int flags, ...)
@@ -95,7 +88,7 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
 
 int vlc_mkstemp (char *template)
 {
-#if defined (HAVE_MKOSTEMP) && defined (O_CLOEXEC)
+#if defined (HAVE_MKOSTEMP)
     return mkostemp(template, O_CLOEXEC);
 #else
     int fd = mkstemp(template);
