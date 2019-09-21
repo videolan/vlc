@@ -204,8 +204,12 @@ int vlc_scandir( const char *dirname, char ***namelist,
 
 int vlc_mkstemp( char *template )
 {
-    static const char digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    static const int i_digits = sizeof(digits)/sizeof(*digits) - 1;
+    static const char bytes[] =
+        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqstruvwxyz_-";
+    static const size_t nbytes = ARRAY_SIZE(bytes) - 1;
+
+    static_assert(((ARRAY_SIZE(bytes) - 1) & (ARRAY_SIZE(bytes) - 2)) == 0,
+                  "statistical bias");
 
     /* */
     assert( template );
@@ -228,7 +232,7 @@ int vlc_mkstemp( char *template )
 
         vlc_rand_bytes( pi_rand, sizeof(pi_rand) );
         for( int j = 0; j < 6; j++ )
-            psz_rand[j] = digits[pi_rand[j] % i_digits];
+            psz_rand[j] = bytes[pi_rand[j] % nbytes];
 
         /* */
         int fd = vlc_open( template, O_CREAT | O_EXCL | O_RDWR, 0600 );
