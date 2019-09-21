@@ -199,10 +199,9 @@ int vlc_scandir( const char *dirname, char ***namelist,
     return val;
 }
 
-#if defined (_WIN32) || defined (__OS2__)
 # include <vlc_rand.h>
 
-int vlc_mkstemp( char *template )
+VLC_WEAK int vlc_mkstemp(char *template)
 {
     static const char bytes[] =
         "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqstruvwxyz_-";
@@ -243,4 +242,3 @@ int vlc_mkstemp( char *template )
     errno = EEXIST;
     return -1;
 }
-#endif

@@ -45,7 +45,7 @@
 #include <vlc_common.h>
 #include <vlc_fs.h>
 
-#if !defined(HAVE_ACCEPT4) || !defined HAVE_MKOSTEMP
+#if !defined(HAVE_ACCEPT4)
 static inline void vlc_cloexec(int fd)
 {
     fcntl(fd, F_SETFD, FD_CLOEXEC | fcntl(fd, F_GETFD));
@@ -86,17 +86,12 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
 #endif
 }
 
+#ifdef HAVE_MKOSTEMP
 int vlc_mkstemp (char *template)
 {
-#if defined (HAVE_MKOSTEMP)
     return mkostemp(template, O_CLOEXEC);
-#else
-    int fd = mkstemp(template);
-    if (fd != -1)
-        vlc_cloexec(fd);
-    return fd;
-#endif
 }
+#endif
 
 VLC_WEAK int vlc_memfd(void)
 {
