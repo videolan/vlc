@@ -185,14 +185,7 @@ char *vlc_getcwd (void)
 
 int vlc_dup (int oldfd)
 {
-#ifdef F_DUPFD_CLOEXEC
     return fcntl (oldfd, F_DUPFD_CLOEXEC, 0);
-#else
-    int newfd = dup (oldfd);
-    if (newfd != -1)
-        vlc_cloexec(oldfd);
-    return newfd;
-#endif
 }
 
 int vlc_pipe (int fds[2])
