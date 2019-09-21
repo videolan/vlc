@@ -5,15 +5,15 @@
 # Translators:
 # Tomas <jawnuolis@gmail.com>, 2013
 # Karolis Runas <karolis.runas@yahoo.com>, 2014
-# Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2009-2018
+# Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2009-2019
 # Vaidotas Kalvelis <vaidotaskal@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-09-21 11:52+0200\n"
+"Last-Translator: Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2019\n"
 "Language-Team: Lithuanian (https://www.transifex.com/yaron/teams/16553/lt/)\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
@@ -6813,7 +6813,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:138
 msgid "Hierarchy mode"
-msgstr "Hierarchinis režimas"
+msgstr "Hierarchinė veiksena"
 
 #: modules/access/dtv/access.c:146
 msgid "DVB-T2 Physical Layer Pipe"
