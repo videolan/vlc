@@ -75,15 +75,7 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
         mode = va_arg (ap, unsigned int);
     va_end (ap);
 
-#ifdef HAVE_OPENAT
     return openat(dir, filename, flags | O_CLOEXEC, mode);
-#else
-    VLC_UNUSED (dir);
-    VLC_UNUSED (filename);
-    VLC_UNUSED (mode);
-    errno = ENOSYS;
-    return -1;
-#endif
 }
 
 #ifdef HAVE_MKOSTEMP
