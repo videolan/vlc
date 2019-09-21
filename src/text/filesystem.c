@@ -207,19 +207,17 @@ int vlc_mkstemp( char *template )
     static const char bytes[] =
         "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqstruvwxyz_-";
     static const size_t nbytes = ARRAY_SIZE(bytes) - 1;
+    char *pattern;
 
     static_assert(((ARRAY_SIZE(bytes) - 1) & (ARRAY_SIZE(bytes) - 2)) == 0,
                   "statistical bias");
 
-    /* */
-    assert( template );
-
     /* Check template validity */
-    const size_t i_length = strlen( template );
-    char *psz_rand = &template[i_length-6];
+    assert(template != NULL);
 
-    if( i_length < 6 || strcmp( psz_rand, "XXXXXX" ) )
-    {
+    const size_t len = strlen(template);
+    if (len < 6
+     || strcmp(pattern = template + len - 6, "XXXXXX")) {
         errno = EINVAL;
         return -1;
     }
@@ -232,7 +230,7 @@ int vlc_mkstemp( char *template )
 
         vlc_rand_bytes( pi_rand, sizeof(pi_rand) );
         for( int j = 0; j < 6; j++ )
-            psz_rand[j] = bytes[pi_rand[j] % nbytes];
+            pattern[j] = bytes[pi_rand[j] % nbytes];
 
         /* */
         int fd = vlc_open( template, O_CREAT | O_EXCL | O_RDWR, 0600 );
