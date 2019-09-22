@@ -854,16 +854,26 @@ static int vlc_h2_parse_frame_window_update(struct vlc_h2_parser *p,
                                             struct vlc_h2_frame *f, size_t len,
                                             uint_fast32_t id)
 {
-    free(f);
-
     if (len != 4)
     {
+        free(f);
+
         if (id == 0)
             return vlc_h2_parse_error(p, VLC_H2_FRAME_SIZE_ERROR);
         return vlc_h2_stream_error(p, id, VLC_H2_FRAME_SIZE_ERROR);
     }
 
-    /* Nothing to do as we do not send data for the time being. */
+    uint_fast32_t credit = GetDWBE(vlc_h2_frame_payload(f)) & 0x7fffffffu;
+
+    free(f);
+
+    if (credit == 0)
+    {
+        if (id == 0)
+            return vlc_h2_parse_error(p, VLC_H2_PROTOCOL_ERROR);
+        return vlc_h2_stream_error(p, id, VLC_H2_PROTOCOL_ERROR);
+    }
+
     return 0;
 }
 
