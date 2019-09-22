@@ -354,7 +354,7 @@ SkinsRect X11Factory::getWorkArea() const
         }
     }
     msg_Dbg( getIntf(),"WorkArea: %ix%i at +%i+%i", w, h, x, y );
-    return SkinsRect( x, y, w, h );
+    return SkinsRect( x, y, x + w, y + h );
 }
 
 
