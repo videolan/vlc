@@ -70,7 +70,7 @@ UString::UString( intf_thread_t *pIntf, const char *pString ):
     }
     if( !pCur || *pCur )
     {
-        msg_Err( pIntf, "invalid UTF8 string: %s", pString );
+        msg_Err( pIntf, "invalid UTF8 string: %s", pString ? pString : "nil" );
         m_length = 0;
         m_pString = NULL;
         return;
