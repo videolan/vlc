@@ -197,8 +197,20 @@ static int vlc_h2_stream_error(void *ctx, uint_fast32_t id, uint_fast32_t code)
 {
     assert(ctx == CTX);
 
-    assert(id == STREAM_ID + 2);
-    assert(code == VLC_H2_REFUSED_STREAM);
+    switch (id)
+    {
+        case STREAM_ID + 2:
+            assert(code == VLC_H2_REFUSED_STREAM);
+            break;
+        case STREAM_ID + 4:
+            assert(code == VLC_H2_PROTOCOL_ERROR);
+            break;
+        case STREAM_ID + 6:
+            assert(code == VLC_H2_FRAME_SIZE_ERROR);
+            break;
+        default:
+            assert(0);
+    }
     return 0;
 }
 
@@ -460,6 +472,12 @@ int main(void)
     test_bad_seq(CTX, localize(ping()), NULL);
     test_bad_seq(CTX, localize(goaway()), NULL);
     test_bad_seq(CTX, resize(goaway(), 7), NULL);
+    test_bad_seq(CTX, vlc_h2_frame_window_update(0, 0), NULL);
+    test_bad_seq(CTX, resize(vlc_h2_frame_window_update(0, 0), 3), NULL);
+
+    test_seq(CTX, resize(vlc_h2_frame_window_update(STREAM_ID + 6, 0), 5),
+             NULL);
+    test_seq(CTX, vlc_h2_frame_window_update(STREAM_ID + 4, 0), NULL);
 
     /* TODO: PUSH_PROMISE, PRIORITY, padding, unknown, invalid stuff... */
 
