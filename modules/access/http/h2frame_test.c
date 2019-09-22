@@ -128,6 +128,12 @@ static void vlc_h2_window_status(void *ctx, uint32_t *rcwd)
     *rcwd = (1u << 31) - 1;
 }
 
+static void vlc_h2_window_update(void *ctx, uint_fast32_t credit)
+{
+    assert(ctx == CTX);
+    assert(credit == 0x1000);
+}
+
 #define STREAM_ID 0x76543210
 char stream_cookie; /* dummy unique value */
 
@@ -328,6 +334,7 @@ static const struct vlc_h2_parser_cbs vlc_h2_frame_test_callbacks =
     vlc_h2_error,
     vlc_h2_reset,
     vlc_h2_window_status,
+    vlc_h2_window_update,
     vlc_h2_stream_lookup,
     vlc_h2_stream_error,
     vlc_h2_stream_headers,

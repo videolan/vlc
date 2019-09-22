@@ -874,6 +874,8 @@ static int vlc_h2_parse_frame_window_update(struct vlc_h2_parser *p,
         return vlc_h2_stream_error(p, id, VLC_H2_PROTOCOL_ERROR);
     }
 
+    if (id == 0)
+        p->cbs->window_update(p->opaque, credit);
     return 0;
 }
 
