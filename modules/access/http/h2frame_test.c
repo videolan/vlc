@@ -227,6 +227,12 @@ static int vlc_h2_stream_reset(void *ctx, uint_fast32_t code)
     return 0;
 }
 
+static void vlc_h2_stream_window_update(void *ctx, uint_fast32_t credit)
+{
+    assert(ctx == &stream_cookie);
+    (void) credit;
+}
+
 /* Frame formatting */
 static struct vlc_h2_frame *resize(struct vlc_h2_frame *f, size_t size)
 {   /* NOTE: increasing size would require realloc() */
@@ -341,6 +347,7 @@ static const struct vlc_h2_parser_cbs vlc_h2_frame_test_callbacks =
     vlc_h2_stream_data,
     vlc_h2_stream_end,
     vlc_h2_stream_reset,
+    vlc_h2_stream_window_update,
 };
 
 static unsigned test_seq(void *ctx, ...)

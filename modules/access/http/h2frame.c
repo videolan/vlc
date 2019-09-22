@@ -876,6 +876,13 @@ static int vlc_h2_parse_frame_window_update(struct vlc_h2_parser *p,
 
     if (id == 0)
         p->cbs->window_update(p->opaque, credit);
+    else
+    {
+        void *s = vlc_h2_stream_lookup(p, id);
+
+        if (s != NULL)
+            p->cbs->stream_window_update(s, credit);
+    }
     return 0;
 }
 

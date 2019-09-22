@@ -114,6 +114,7 @@ struct vlc_h2_parser_cbs
     int  (*stream_data)(void *ctx, struct vlc_h2_frame *f);
     void (*stream_end)(void *ctx);
     int  (*stream_reset)(void *ctx, uint_fast32_t code);
+    void (*stream_window_update)(void *ctx, uint_fast32_t credit);
 };
 
 struct vlc_h2_parser *vlc_h2_parse_init(void *ctx,
