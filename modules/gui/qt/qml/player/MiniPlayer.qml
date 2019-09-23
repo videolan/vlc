@@ -139,7 +139,7 @@ Utils.NavigableFocusScope {
                 Layout.preferredHeight: buttonrow.implicitHeight
 
                 navigationParent: root
-                navigationLeft: function() {  playingItemInfo.forceActiveFocus() }
+                navigationLeftItem: playingItemInfo
             }
         }
 

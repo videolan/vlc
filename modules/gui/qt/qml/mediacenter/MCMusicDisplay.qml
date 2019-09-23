@@ -45,10 +45,10 @@ Utils.NavigableFocusScope {
         contentModel = stackView.currentItem.model
     }
 
-    Component { id: albumComp; MusicAlbumsDisplay{ } }
-    Component { id: artistComp; MusicArtistsDisplay{ } }
-    Component { id: genresComp; MusicGenresDisplay{ } }
-    Component { id: tracksComp; MusicTrackListDisplay{ } }
+    Component { id: albumComp; MusicAlbumsDisplay{ navigationParent: root } }
+    Component { id: artistComp; MusicArtistsDisplay{ navigationParent: root } }
+    Component { id: genresComp; MusicGenresDisplay{ navigationParent: root } }
+    Component { id: tracksComp; MusicTrackListDisplay{  navigationParent: root } }
 
     readonly property var pageModel: [{
             displayText: qsTr("Albums"),
@@ -99,16 +99,6 @@ Utils.NavigableFocusScope {
                 if (!found)
                     replace(pageModel[0].component)
             }
-        }
-
-        Connections {
-            target: stackView.currentItem
-            ignoreUnknownSignals: true
-            onActionLeft:   root.navigationLeft(index)
-            onActionRight:  root.navigationRight(index)
-            onActionDown:   root.navigationDown(index)
-            onActionUp:     root.navigationUp(index)
-            onActionCancel: root.navigationCancel(index)
         }
     }
 }

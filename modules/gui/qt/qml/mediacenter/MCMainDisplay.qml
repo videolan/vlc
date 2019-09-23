@@ -36,17 +36,32 @@ Utils.NavigableFocusScope {
 
     Component {
         id: musicComp
-        MCMusicDisplay {}
+        MCMusicDisplay {
+            navigationParent: medialibId
+            navigationUpItem: sourcesBanner
+            navigationDownItem: miniPlayer.expanded ? miniPlayer : medialibId
+            navigationCancelItem: stackViewZone
+        }
     }
 
     Component {
         id: videoComp
-        MCVideoDisplay {}
+        MCVideoDisplay {
+            navigationParent: medialibId
+            navigationUpItem: sourcesBanner
+            navigationDownItem: miniPlayer.expanded ? miniPlayer : medialibId
+            navigationCancelItem: stackViewZone
+        }
     }
 
     Component {
         id: networkComp
-        MCNetworkDisplay {}
+        MCNetworkDisplay {
+            navigationParent: medialibId
+            navigationUpItem: sourcesBanner
+            navigationDownItem: miniPlayer.expanded ? miniPlayer : medialibId
+            navigationCancelItem: stackViewZone
+        }
     }
 
     readonly property var pageModel: [
@@ -141,7 +156,7 @@ Utils.NavigableFocusScope {
                     }
 
                     navigationParent: root
-                    navigationDown: function() { stackView.focus = true }
+                    navigationDownItem: stackView
                 }
 
                 Item {
@@ -254,25 +269,13 @@ Utils.NavigableFocusScope {
                 Player.MiniPlayer {
                     id: miniPlayer
 
-                    onActionUp: stackView.focus = true
-                    onActionCancel: sourcesBanner.focus = true
-                    onActionDown: medialibId.navigationDown(index)
-                }
-            }
-
-            Connections {
-                target: stackView.currentItem
-                ignoreUnknownSignals: true
-
-                onActionUp: sourcesBanner.focus = true
-                onActionCancel: stackViewZone.focus = true
-                onActionLeft: medialibId.navigationLeft(index)
-                onActionRight: medialibId.navigationRight(index)
-                onActionDown: {
-                    if (miniPlayer.expanded)
-                        miniPlayer.focus = true
-                    else
-                        medialibId.navigationDown(index)
+                    navigationParent: medialibId
+                    navigationUpItem: stackView
+                    navigationCancelItem:sourcesBanner
+                    onExpandedChanged: {
+                        if (!expanded && miniPlayer.activeFocus)
+                            stackView.forceActiveFocus()
+                    }
                 }
             }
 
