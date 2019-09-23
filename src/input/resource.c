@@ -366,9 +366,10 @@ void input_resource_PutVout(input_resource_t *p_resource,
     vlc_mutex_unlock( &p_resource->lock );
 }
 
-vout_thread_t *input_resource_GetVout(input_resource_t *p_resource,
+vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
                                       const vout_configuration_t *cfg,
-                                      enum vlc_vout_order *order)
+                                      enum vlc_vout_order *order,
+                                      vlc_decoder_device **pp_dec_dev)
 {
     vout_configuration_t cfg_buf;
     vout_thread_t *vout;

@@ -122,6 +122,7 @@ struct decoder_owner
     audio_output_t *p_aout;
 
     vout_thread_t   *p_vout;
+    vlc_decoder_device *p_dec_dev; // TEMPORARY
 
     /* -- Theses variables need locking on read *and* write -- */
     /* Preroll */
@@ -549,13 +550,17 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner)
         .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
         .mouse_event = MouseEvent, .mouse_opaque = p_dec
     };
-    p_vout = input_resource_GetVout( p_owner->p_resource,
-                                    &cfg, &order );
+    vlc_decoder_device *dec_dev = NULL;
+    p_vout = input_resource_GetVoutDecoderDevice( p_owner->p_resource,
+                                    &cfg, &order, &dec_dev );
     if (p_vout)
         decoder_Notify(p_owner, on_vout_added, p_vout, order);
 
     vlc_mutex_lock( &p_owner->lock );
     p_owner->p_vout = p_vout;
+    if ( p_owner->p_dec_dev != NULL )
+        vlc_decoder_device_Release( p_owner->p_dec_dev );
+    p_owner->p_dec_dev = dec_dev;
 
     DecoderUpdateFormatLocked( p_owner );
     p_owner->fmt.video.i_chroma = p_dec->fmt_out.i_codec;
@@ -1927,6 +1932,9 @@ static void DeleteDecoder( decoder_t * p_dec )
 
     const enum es_format_category_e i_cat =p_dec->fmt_in.i_cat;
     decoder_Clean( p_dec );
+
+    if ( p_owner->p_dec_dev )
+        vlc_decoder_device_Release( p_owner->p_dec_dev );
 
     /* Free all packets still in the decoder fifo. */
     block_FifoRelease( p_owner->p_fifo );
