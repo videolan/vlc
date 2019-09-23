@@ -213,7 +213,8 @@ static int Open(vlc_object_t *p_this)
     packetizer_Init(&p_sys->packetizer,
                     p_hevc_startcode, sizeof(p_hevc_startcode), startcode_FindAnnexB,
                     p_hevc_startcode, 1, 5,
-                    PacketizeReset, PacketizeParse, PacketizeValidate, p_dec);
+                    PacketizeReset, PacketizeParse, PacketizeValidate, NULL,
+                    p_dec);
 
     /* Copy properties */
     es_format_Copy(&p_dec->fmt_out, &p_dec->fmt_in);

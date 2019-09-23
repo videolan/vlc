@@ -38,6 +38,7 @@ enum
 
 typedef void (*packetizer_reset_t)( void *p_private, bool b_flush );
 typedef block_t *(*packetizer_parse_t)( void *p_private, bool *pb_ts_used, block_t * );
+typedef block_t *(*packetizer_drain_t)( void *p_private );
 typedef int (*packetizer_validate_t)( void *p_private, block_t * );
 
 typedef struct
@@ -59,6 +60,7 @@ typedef struct
     packetizer_reset_t    pf_reset;
     packetizer_parse_t    pf_parse;
     packetizer_validate_t pf_validate;
+    packetizer_drain_t    pf_drain;
 
 } packetizer_t;
 
@@ -70,6 +72,7 @@ static inline void packetizer_Init( packetizer_t *p_pack,
                                     packetizer_reset_t pf_reset,
                                     packetizer_parse_t pf_parse,
                                     packetizer_validate_t pf_validate,
+                                    packetizer_drain_t pf_drain,
                                     void *p_private )
 {
     p_pack->i_state = STATE_NOSYNC;
@@ -86,6 +89,7 @@ static inline void packetizer_Init( packetizer_t *p_pack,
     p_pack->pf_reset = pf_reset;
     p_pack->pf_parse = pf_parse;
     p_pack->pf_validate = pf_validate;
+    p_pack->pf_drain = pf_drain;
     p_pack->p_private = p_private;
 }
 
@@ -102,16 +106,16 @@ static inline void packetizer_Flush( packetizer_t *p_pack )
     p_pack->pf_reset( p_pack->p_private, true );
 }
 
-static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_block )
+static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_block )
 {
     block_t *p_block = ( pp_block ) ? *pp_block : NULL;
 
     if( p_block == NULL && p_pack->bytestream.p_block == NULL )
-        return NULL; /* nothing to do */
+        return NULL;
 
     if( p_block && unlikely( p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) ) )
     {
-        block_t *p_drained = packetizer_Packetize( p_pack, NULL );
+        block_t *p_drained = packetizer_PacketizeBlock( p_pack, NULL );
         if( p_drained )
             return p_drained;
 
@@ -231,6 +235,24 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
             return p_pic;
         }
     }
+}
+
+static block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_block )
+{
+    block_t *p_out = packetizer_PacketizeBlock( p_pack, pp_block );
+    if( p_out )
+        return p_out;
+    /* handle caller drain */
+    if( pp_block == NULL && p_pack->pf_drain )
+    {
+        p_out = p_pack->pf_drain( p_pack->p_private );
+        if( p_out && p_pack->pf_validate( p_pack->p_private, p_out ) )
+        {
+            block_Release( p_out );
+            p_out = NULL;
+        }
+    }
+    return p_out;
 }
 
 static inline void packetizer_Header( packetizer_t *p_pack,

@@ -145,7 +145,8 @@ static int Open( vlc_object_t *p_this )
     packetizer_Init( &p_sys->packetizer,
                      p_mp4v_startcode, sizeof(p_mp4v_startcode), startcode_FindAnnexB,
                      NULL, 0, 4,
-                     PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
+                     PacketizeReset, PacketizeParse, PacketizeValidate, NULL,
+                     p_dec );
 
     p_sys->p_frame = NULL;
     p_sys->pp_last = &p_sys->p_frame;
