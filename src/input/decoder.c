@@ -458,6 +458,45 @@ static void FixDisplayFormat(decoder_t *p_dec, video_format_t *fmt)
     video_format_AdjustColorSpace( fmt );
 }
 
+static int CreateDisplay(struct decoder_owner *p_owner, vlc_decoder_device *dec_dev, vout_thread_t *p_vout)
+{
+    if (!p_vout)
+        return -1;
+
+    decoder_t *p_dec = &p_owner->dec;
+
+    video_format_t fmt;
+    FixDisplayFormat( p_dec, &fmt );
+
+    unsigned dpb_size;
+    switch( p_dec->fmt_in.i_codec )
+    {
+    case VLC_CODEC_HEVC:
+    case VLC_CODEC_H264:
+    case VLC_CODEC_DIRAC: /* FIXME valid ? */
+        dpb_size = 18;
+        break;
+    case VLC_CODEC_AV1:
+        dpb_size = 10;
+        break;
+    case VLC_CODEC_VP5:
+    case VLC_CODEC_VP6:
+    case VLC_CODEC_VP6F:
+    case VLC_CODEC_VP8:
+        dpb_size = 3;
+        break;
+    default:
+        dpb_size = 2;
+        break;
+    }
+    vout_configuration_t cfg = {
+        .vout = p_vout, .clock = p_owner->p_clock, .fmt = &fmt,
+        .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
+        .mouse_event = MouseEvent, .mouse_opaque = p_dec,
+    };
+    return input_resource_StartVout( p_owner->p_resource, dec_dev, &cfg);
+}
+
 static int CreateVoutIfNeeded(struct decoder_owner *p_owner)
 {
     decoder_t *p_dec = &p_owner->dec;
@@ -533,36 +572,8 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner)
     vlc_decoder_device *dec_dev = NULL;
     p_vout = input_resource_GetVoutDecoderDevice( p_owner->p_resource,
                                     &cfg, &order, &dec_dev );
-    if (p_vout)
-    {
-        unsigned dpb_size;
-        switch( p_dec->fmt_in.i_codec )
-        {
-        case VLC_CODEC_HEVC:
-        case VLC_CODEC_H264:
-        case VLC_CODEC_DIRAC: /* FIXME valid ? */
-            dpb_size = 18;
-            break;
-        case VLC_CODEC_AV1:
-            dpb_size = 10;
-            break;
-        case VLC_CODEC_VP5:
-        case VLC_CODEC_VP6:
-        case VLC_CODEC_VP6F:
-        case VLC_CODEC_VP8:
-            dpb_size = 3;
-            break;
-        default:
-            dpb_size = 2;
-            break;
-        }
-        cfg.dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1;
-        cfg.vout = p_vout;
-        if (input_resource_StartVout( p_owner->p_resource, dec_dev, &cfg) != 0)
-        {
-            p_vout = NULL;
-        }
-    }
+    if (CreateDisplay( p_owner, dec_dev, p_vout ) != 0)
+        p_vout = NULL;
     if (p_vout)
         decoder_Notify(p_owner, on_vout_added, p_vout, order);
 
