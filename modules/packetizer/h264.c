@@ -334,7 +334,8 @@ static int Open( vlc_object_t *p_this )
     packetizer_Init( &p_sys->packetizer,
                      p_h264_startcode, sizeof(p_h264_startcode), startcode_FindAnnexB,
                      p_h264_startcode, 1, 5,
-                     PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
+                     PacketizeReset, PacketizeParse, PacketizeValidate, NULL,
+                     p_dec );
 
     p_sys->b_slice = false;
     p_sys->frame.p_head = NULL;
