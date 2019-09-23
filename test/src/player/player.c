@@ -148,6 +148,9 @@ struct media_params
 
     bool video_packetized, audio_packetized, sub_packetized;
 
+    unsigned video_frame_rate;
+    unsigned video_frame_rate_base;
+
     size_t title_count;
     size_t chapter_count;
 
@@ -167,6 +170,8 @@ struct media_params
     }, \
     .program_count = 0, \
     .video_packetized = true, .audio_packetized = true, .sub_packetized = true,\
+    .video_frame_rate = 25, \
+    .video_frame_rate_base = 1, \
     .title_count = 0, \
     .chapter_count = 0, \
     .can_seek = true, \
@@ -631,14 +636,16 @@ create_mock_media(const char *name, const struct media_params *params)
         "video_track_count=%zu;audio_track_count=%zu;sub_track_count=%zu;"
         "program_count=%zu;video_packetized=%d;audio_packetized=%d;"
         "sub_packetized=%d;length=%"PRId64";audio_sample_length=%"PRId64";"
+        "video_frame_rate=%u;video_frame_rate_base=%u;"
         "title_count=%zu;chapter_count=%zu;"
         "can_seek=%d;can_pause=%d;error=%d;null_names=%d",
         params->track_count[VIDEO_ES], params->track_count[AUDIO_ES],
         params->track_count[SPU_ES], params->program_count,
         params->video_packetized, params->audio_packetized,
         params->sub_packetized, params->length, params->audio_sample_length,
-        params->title_count, params->chapter_count, params->can_seek,
-        params->can_pause, params->error, params->null_names);
+        params->video_frame_rate, params->video_frame_rate_base,
+        params->title_count, params->chapter_count,
+        params->can_seek, params->can_pause, params->error, params->null_names);
     assert(ret != -1);
 
     input_item_t *item = input_item_New(url, name);
