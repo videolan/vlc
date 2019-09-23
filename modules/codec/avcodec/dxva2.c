@@ -264,14 +264,14 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         if ( FAILED(IDirect3DSurface9_GetDevice( p_sys->surface, &device )) )
         {
             free( sys );
-            goto error;
+            return VLC_EGENERIC;
         }
         if ( D3D9_CreateExternal(&sys->hd3d, device) != VLC_SUCCESS ||
              FAILED(D3D9_CreateDeviceExternal( device, &sys->hd3d, &sys->d3d_dev)) )
         {
             IDirect3DDevice9_Release(device);
             free( sys );
-            goto error;
+            return VLC_EGENERIC;
         }
         D3DSURFACE_DESC src;
         if (SUCCEEDED(IDirect3DSurface9_GetDesc(p_sys->surface, &src)))
@@ -280,7 +280,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     else if (D3D9_Create(va, &sys->hd3d) != VLC_SUCCESS) {
         msg_Warn(va, "cannot load d3d9.dll");
         free( sys );
-        goto error;
+        return VLC_EGENERIC;
     }
 
     /* Load dll*/
