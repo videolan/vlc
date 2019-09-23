@@ -35,7 +35,11 @@
 #include "nvdec_fmt.h"
 
 #include "../../video_output/opengl/internal.h"
-#include <GL/glext.h>
+
+// glew.h conflicts with glext.h, but also makes glext.h unnecessary.
+#ifndef __GLEW_H__
+#  include <GL/glext.h>
+#endif
 
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
