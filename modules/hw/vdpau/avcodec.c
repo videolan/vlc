@@ -48,6 +48,7 @@ struct vlc_va_sys_t
     void *hwaccel_context;
     uint32_t width;
     uint32_t height;
+    vlc_video_context *vctx;
     vlc_vdp_video_field_t *pool[];
 };
 
@@ -126,6 +127,7 @@ static void Close(vlc_va_t *va)
     for (unsigned i = 0; sys->pool[i] != NULL; i++)
         vlc_vdp_video_destroy(sys->pool[i]);
     vdp_release_x11(sys->vdp);
+    vlc_video_context_Release(sys->vctx);
     if (sys->hwaccel_context)
         av_free(sys->hwaccel_context);
     free(sys);
@@ -212,6 +214,10 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
         goto error;
     }
 
+    sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_VDPAU, 0, NULL );
+    if (sys->vctx == NULL)
+        goto error;
+
     if (i < refs)
         msg_Warn(va, "video RAM low (allocated %u of %u buffers)",
                  i, refs);
@@ -220,6 +226,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     if (vdp_get_information_string(sys->vdp, &infos) == VDP_STATUS_OK)
         msg_Info(va, "Using %s", infos);
 
+    *vtcx_out = sys->vctx;
     va->ops = &ops;
     return VLC_SUCCESS;
 
