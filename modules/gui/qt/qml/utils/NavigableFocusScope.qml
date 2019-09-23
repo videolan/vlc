@@ -33,6 +33,8 @@ FocusScope {
     signal actionRight( int index )
     signal actionCancel( int index )
 
+    property bool navigable: true
+
     property var navigationParent: undefined
     property var navigationUp: defaultNavigationUp
     property var navigationDown: defaultNavigationDown
@@ -40,8 +42,23 @@ FocusScope {
     property var navigationRight: defaultNavigationRight
     property var navigationCancel: defaultNavigationCancel
 
+    property var navigationUpItem: undefined
+    property var navigationDownItem: undefined
+    property var navigationLeftItem: undefined
+    property var navigationRightItem: undefined
+    property var navigationCancelItem: undefined
+
+
     function defaultNavigationUp(index) {
-        if (navigationParent) {
+        if (navigationUpItem) {
+            var item = navigationUpItem
+            while (item && (!item.visible || !item.enabled || !(item.navigable === undefined || item.navigable))) {
+                item = item.navigationUpItem
+            }
+            if (item) {
+                item.forceActiveFocus()
+            }
+        } else if (navigationParent) {
             navigationParent.navigationUp(index)
         } else {
             actionUp(index)
@@ -49,7 +66,15 @@ FocusScope {
     }
 
     function defaultNavigationDown(index) {
-        if (navigationParent) {
+        if (navigationDownItem) {
+            var item = navigationDownItem
+            while (item && (!item.visible || !item.enabled || !(item.navigable === undefined || item.navigable))) {
+                item = item.navigationDownItem
+            }
+            if (item) {
+                item.forceActiveFocus()
+            }
+        } else if (navigationParent) {
             navigationParent.navigationDown(index)
         } else {
             actionDown(index)
@@ -57,7 +82,15 @@ FocusScope {
     }
 
     function defaultNavigationLeft(index) {
-        if (navigationParent) {
+        if (navigationLeftItem) {
+            var item = navigationLeftItem
+            while (item && (!item.visible || !item.enabled || !(item.navigable === undefined || item.navigable))) {
+                item = item.navigationLeftItem
+            }
+            if (item) {
+                item.forceActiveFocus()
+            }
+        } else if (navigationParent) {
             navigationParent.navigationLeft(index)
         } else {
             actionLeft(index)
@@ -65,7 +98,15 @@ FocusScope {
     }
 
     function defaultNavigationRight(index) {
-        if (navigationParent) {
+        if (navigationRightItem) {
+            var item = navigationRightItem
+            while (item && (!item.visible || !item.enabled || !(item.navigable === undefined || item.navigable))) {
+                item = item.navigationRightItem
+            }
+            if (item) {
+                item.forceActiveFocus()
+            }
+        } else if (navigationParent) {
             navigationParent.navigationRight(index)
         } else {
             actionRight(index)
@@ -73,7 +114,15 @@ FocusScope {
     }
 
     function defaultNavigationCancel(index) {
-        if (navigationParent) {
+        if (navigationCancelItem) {
+            var item = navigationCancelItem
+            while (item && (!item.visible || !item.enabled || !(item.navigable === undefined || item.navigable))) {
+                item = item.navigationCancelItem
+            }
+            if (item) {
+                item.forceActiveFocus()
+            }
+        } else if (navigationParent) {
             navigationParent.navigationCancel(index)
         } else {
             actionCancel(index)
