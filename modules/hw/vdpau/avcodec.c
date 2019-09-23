@@ -135,7 +135,8 @@ static const struct vlc_va_operations ops = { Lock, Close, };
 
 static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *desc,
                 enum PixelFormat pix_fmt,
-                const es_format_t *fmt, vlc_decoder_device *dec_device)
+                const es_format_t *fmt, vlc_decoder_device *dec_device,
+                vlc_video_context **vtcx_out)
 {
     if (pix_fmt != AV_PIX_FMT_VDPAU|| dec_device == NULL ||
         dec_device->type != VLC_DECODER_DEVICE_VDPAU)

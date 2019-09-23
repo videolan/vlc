@@ -368,13 +368,10 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
         dec->fmt_out.video.mastering = dec->fmt_in.video.mastering;
     dec->fmt_out.video.lighting = dec->fmt_in.video.lighting;
 
-    vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(dec);
-    if (dec_dev)
+    if (pp_dec_device)
     {
-        if (pp_dec_device)
-            *pp_dec_device = dec_dev;
-        else
-            vlc_decoder_device_Release(dec_dev);
+        *pp_dec_device = decoder_GetDecoderDevice(dec);
+        return *pp_dec_device == NULL;
     }
     return 0;
 }
@@ -1749,16 +1746,18 @@ no_reuse:
             continue; /* Unsupported brand of hardware acceleration */
         vlc_mutex_unlock(&p_sys->lock);
 
+        vlc_video_context *vctx_out;
         vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, src_desc, hwfmt,
                                   &p_dec->fmt_in,
-                                  init_device);
+                                  init_device, &vctx_out);
         if (init_device)
             vlc_decoder_device_Release(init_device);
         vlc_mutex_lock(&p_sys->lock);
         if (va == NULL)
             continue; /* Unsupported codec profile or such */
+        assert(vctx_out != NULL);
 
-        if (decoder_UpdateVideoOutput(p_dec, NULL))
+        if (decoder_UpdateVideoOutput(p_dec, vctx_out))
         {
             vlc_va_Delete(va);
             p_context->hwaccel_context = NULL;

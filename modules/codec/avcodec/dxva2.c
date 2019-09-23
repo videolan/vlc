@@ -49,7 +49,7 @@ struct dxva2_pic_context
 #include "directx_va.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, const AVPixFmtDescriptor *, enum PixelFormat,
-                const es_format_t *, vlc_decoder_device *);
+                const es_format_t *, vlc_decoder_device *, vlc_video_context **);
 
 vlc_module_begin()
     set_description(N_("DirectX Video Acceleration (DXVA) 2.0"))
@@ -255,7 +255,8 @@ static const struct vlc_va_operations ops = { Get, Close, };
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                 enum PixelFormat pix_fmt,
-                const es_format_t *fmt, vlc_decoder_device *dec_device)
+                const es_format_t *fmt, vlc_decoder_device *dec_device,
+                vlc_video_context **vtcx_out)
 {
     int err = VLC_EGENERIC;
 
