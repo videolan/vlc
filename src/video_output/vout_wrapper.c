@@ -55,7 +55,8 @@ static void VoutViewpointMoved(void *sys, const vlc_viewpoint_t *vp)
  *
  *****************************************************************************/
 vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
-                     const char *splitter_name, const vout_display_cfg_t *cfg)
+                     const char *splitter_name, const vout_display_cfg_t *cfg,
+                     vlc_decoder_device *dec_device)
 {
     vout_thread_sys_t *sys = vout->p;
     vout_display_t *vd;
