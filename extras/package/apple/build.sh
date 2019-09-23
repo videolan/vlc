@@ -53,7 +53,7 @@ readonly VLC_BUILD_DIR=$(pwd)
 # Whether verbose output is enabled or not
 VLC_SCRIPT_VERBOSE=0
 # Architecture of the host (OS that the result will run on)
-VLC_HOST_ARCH=x86_64
+VLC_HOST_ARCH="x86_64"
 # Host platform information
 VLC_HOST_PLATFORM=
 VLC_HOST_TRIPLET=
@@ -80,6 +80,15 @@ VLC_APPLE_SDK_PATH=
 # SDK version
 # Set in the validate_sdk_name function
 VLC_APPLE_SDK_VERSION=
+# Indicated if prebuilt contribs package
+# should be created
+VLC_MAKE_PREBUILT_CONTRIBS=0
+# Indicates that prebuit contribs should be
+# used instead of building the contribs from source
+VLC_USE_PREBUILT_CONTRIBS=0
+# User-provided URL from where to fetch contribs, empty
+# for the default chosen by contrib system
+VLC_PREBUILT_CONTRIBS_URL=${VLC_PREBUILT_CONTRIBS_URL:-""}
 
 ##########################################################
 #                    Helper functions                    #
@@ -88,11 +97,19 @@ VLC_APPLE_SDK_VERSION=
 # Print command line usage
 usage()
 {
-    echo "Usage: $VLC_SCRIPT_NAME [--arch=ARCH]"
-    echo " --arch=ARCH    architecture to build for"
+    echo "Usage: $VLC_SCRIPT_NAME [options]"
+    echo " --arch=ARCH    Architecture to build for"
     echo "                  (i386|x86_64|armv7|armv7s|arm64)"
-    echo " --sdk=SDK      name of the SDK to build with (see 'xcodebuild -showsdks')"
-    echo " --help         print this help"
+    echo " --sdk=SDK      Name of the SDK to build with (see 'xcodebuild -showsdks')"
+    echo " --help         Print this help"
+    echo ""
+    echo "Advanced options:"
+    echo " --package-contribs        Create a prebuilt contrib package"
+    echo " --with-prebuilt-contribs  Use prebuilt contribs instead of building"
+    echo "                           them from source"
+    echo "Environment variables:"
+    echo " VLC_PREBUILT_CONTRIBS_URL  URL to fetch the prebuilt contrib archive"
+    echo "                            from when --with-prebuilt-contribs is used"
 }
 
 # Print error message and terminate script with status 1
@@ -309,6 +326,15 @@ do
         --sdk=*)
             VLC_APPLE_SDK_NAME="${1#--sdk=}"
             ;;
+        --package-contribs)
+            VLC_MAKE_PREBUILT_CONTRIBS=1
+            ;;
+        --with-prebuilt-contribs)
+            VLC_USE_PREBUILT_CONTRIBS=1
+            ;;
+        VLC_PREBUILT_CONTRIBS_URL=*)
+            VLC_PREBUILT_CONTRIBS_URL="${1#VLC_PREBUILT_CONTRIBS_URL=}"
+            ;;
         *)
             echo >&2 "ERROR: Unrecognized option '$1'"
             usage
@@ -318,13 +344,22 @@ do
     shift
 done
 
+# Validate arguments
+if [ "$VLC_MAKE_PREBUILT_CONTRIBS" -gt "0" ] && 
+   [ "$VLC_USE_PREBUILT_CONTRIBS" -gt "0" ]; then
+    echo >&2 "ERROR: The --package-contribs and --with-prebuilt-contribs options"
+    echo >&2 "       can not be used together."
+    usage
+    exit 1
+fi
+
 # Check for some required tools before proceeding
 check_tool xcrun
 
 # TODO: Better command to get SDK name if none is set:
 # xcodebuild -sdk $(xcrun --show-sdk-path) -version | awk -F '[()]' '{ print $2; exit; }'
 # Aditionally a lot more is reported by this command, so this needs some more
-# awk parsing or something to get other values with just only query.
+# awk parsing or something to get other values with just one query.
 
 # Validate given SDK name
 validate_sdk_name "$VLC_APPLE_SDK_NAME"
@@ -401,8 +436,11 @@ echo ""
 ##########################################################
 #                     Contribs build                     #
 ##########################################################
-
-echo "Building contribs for $VLC_HOST_ARCH"
+if [ "$VLC_USE_PREBUILT_CONTRIBS" -gt "0" ]; then
+    echo "Fetching prebuilt contribs"
+else
+    echo "Building contribs for $VLC_HOST_ARCH"
+fi
 
 # For contribs set flag to error on partial availability
 set_host_envvars "-Werror=partial-availability"
@@ -436,10 +474,26 @@ mkdir -p "$VLC_CONTRIB_INSTALL_DIR"
     "${VLC_CONTRIB_OPTIONS[@]}" \
 || abort_err "Bootstrapping contribs failed"
 
-$MAKE list
+if [ "$VLC_USE_PREBUILT_CONTRIBS" -gt "0" ]; then
+    # Fetch prebuilt contribs
+    if [ -z "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+        $MAKE prebuilt || abort_err "Fetching prebuilt contribs failed"
+    else
+        $MAKE prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" \
+            || abort_err "Fetching prebuilt contribs from ${VLC_PREBUILT_CONTRIBS_URL} failed"
+    fi
+else
+    # Print list of contribs that will be built
+    $MAKE list
 
-# Build contribs
-$MAKE || abort_err "Building contribs failed"
+    # Build contribs
+    $MAKE || abort_err "Building contribs failed"
+
+    # Make prebuilt contribs package
+    if [ "$VLC_MAKE_PREBUILT_CONTRIBS" -gt "0" ]; then
+        $MAKE package || abort_err "Creating prebuilt contribs package failed"
+    fi
+fi
 
 echo ""
 
