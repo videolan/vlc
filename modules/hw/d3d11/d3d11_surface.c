@@ -511,7 +511,7 @@ static filter_t *CreateCPUtoGPUFilter( vlc_object_t *p_this, const es_format_t *
     if (unlikely(p_filter == NULL))
         return NULL;
 
-    static const struct filter_video_callbacks cbs = { NewBuffer };
+    static const struct filter_video_callbacks cbs = { NewBuffer, NULL /*TODO*/ };
     p_filter->b_allow_fmt_out_change = false;
     p_filter->owner.video = &cbs;
     p_filter->owner.sys = p_this;

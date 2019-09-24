@@ -141,7 +141,7 @@ static picture_t *video_chain_new( filter_t *p_filter )
 
 static const struct filter_video_callbacks canvas_cbs =
 {
-    video_chain_new,
+    video_chain_new, NULL,
 };
 
 /*****************************************************************************

@@ -123,9 +123,18 @@ static picture_t *filter_chain_VideoBufferNew( filter_t *filter )
     return pic;
 }
 
+static vlc_decoder_device * filter_chain_HoldDecoderDevice(vlc_object_t *o, void *sys)
+{
+    filter_chain_t *chain = sys;
+    if (!chain->parent_video_owner.video->hold_device)
+        return NULL;
+
+    return chain->parent_video_owner.video->hold_device(o, chain->parent_video_owner.sys);
+}
+
 static const struct filter_video_callbacks filter_chain_video_cbs =
 {
-    filter_chain_VideoBufferNew,
+    filter_chain_VideoBufferNew, filter_chain_HoldDecoderDevice,
 };
 
 #undef filter_chain_NewVideo

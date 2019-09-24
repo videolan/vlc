@@ -40,6 +40,7 @@
 struct filter_video_callbacks
 {
     picture_t *(*buffer_new)(filter_t *);
+    vlc_decoder_device * (*hold_device)(vlc_object_t *, void *sys);
 };
 
 struct filter_subpicture_callbacks
@@ -190,6 +191,14 @@ static inline void filter_ChangeViewpoint( filter_t *p_filter,
 {
     if( p_filter->pf_change_viewpoint != NULL )
         p_filter->pf_change_viewpoint( p_filter, vp );
+}
+
+static inline vlc_decoder_device * filter_HoldDecoderDevice( filter_t *p_filter )
+{
+    if ( !p_filter->owner.video || !p_filter->owner.video->hold_device )
+        return NULL;
+
+    return p_filter->owner.video->hold_device( VLC_OBJECT(p_filter), p_filter->owner.sys );
 }
 
 /**

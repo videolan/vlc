@@ -1522,10 +1522,10 @@ static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_c
     video_format_Copy(&sys->filter.src_fmt, &sys->original);
 
     static const struct filter_video_callbacks static_cbs = {
-        VoutVideoFilterStaticNewPicture,
+        VoutVideoFilterStaticNewPicture, NULL/*TODO*/,
     };
     static const struct filter_video_callbacks interactive_cbs = {
-        VoutVideoFilterInteractiveNewPicture,
+        VoutVideoFilterInteractiveNewPicture, NULL/*TODO*/,
     };
     filter_owner_t owner = {
         .video = &static_cbs,

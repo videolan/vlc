@@ -140,9 +140,16 @@ static picture_t *BufferChainNew( filter_t *p_filter )
 
 #define CHAIN_LEVEL_MAX 2
 
+static vlc_decoder_device * HoldChainDecoderDevice(vlc_object_t *o, void *sys)
+{
+    VLC_UNUSED(o);
+    filter_t *p_chain_parent = sys;
+    return filter_HoldDecoderDevice( p_chain_parent );
+}
+
 static const struct filter_video_callbacks filter_video_chain_cbs =
 {
-    BufferChainNew,
+    BufferChainNew, HoldChainDecoderDevice,
 };
 
 /*****************************************************************************

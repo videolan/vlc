@@ -288,8 +288,15 @@ typedef struct {
     picture_pool_t *pool;
 } vout_display_priv_t;
 
+static vlc_decoder_device * DisplayHoldDecoderDevice(vlc_object_t *o, void *sys)
+{
+    vout_display_t *vd = sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+    return osys->src_vctx ? vlc_video_context_HoldDevice(osys->src_vctx) : NULL;
+}
+
 static const struct filter_video_callbacks vout_display_filter_cbs = {
-    VideoBufferNew,
+    VideoBufferNew, DisplayHoldDecoderDevice,
 };
 
 static int VoutDisplayCreateRender(vout_display_t *vd)
