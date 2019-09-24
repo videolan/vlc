@@ -45,6 +45,7 @@ Utils.NavigableFocusScope {
     property alias subTabModel: localMenuGroup.model
     signal toogleMenu()
 
+    property var extraLocalActions: undefined
 
     property var playlistWidget: undefined
 
@@ -191,6 +192,10 @@ Utils.NavigableFocusScope {
                     }
 
                     model: ObjectModel {
+                        id: localContextModel
+
+                        property int countExtra: 0
+
                         Utils.IconToolButton {
                             id: list_grid_btn
                             size: VLCStyle.icon_normal
@@ -214,6 +219,23 @@ Utils.NavigableFocusScope {
                                     var sorting = model.get(currentIndex);
                                     contentModel.sortCriteria = sorting.criteria
                                 }
+                            }
+                        }
+                    }
+
+                    Connections {
+                        target: root
+                        onExtraLocalActionsChanged : {
+                            for (var i = 0; i < localContextModel.countExtra; i++) {
+                                localContextModel.remove(localContextModel.count - localContextModel.countExtra, localContextModel.countExtra)
+                            }
+
+                            if (root.extraLocalActions && root.extraLocalActions instanceof ObjectModel) {
+                                for (i = 0; i < root.extraLocalActions.count; i++)
+                                    localContextModel.append(root.extraLocalActions.get(i))
+                                localContextModel.countExtra = root.extraLocalActions.count
+                            } else {
+                                localContextModel.countExtra = 0
                             }
                         }
                     }

@@ -127,6 +127,7 @@ Utils.NavigableFocusScope {
                         subTabModel = stackView.currentItem.tabModel
                         sortModel = stackView.currentItem.sortModel
                         contentModel = stackView.currentItem.contentModel
+                        extraLocalActions = stackView.currentItem.extraLocalActions
 
                         selectedIndex = index
                     }
@@ -136,6 +137,7 @@ Utils.NavigableFocusScope {
                         stackView.currentItem.loadIndex(index)
                         sortModel = stackView.currentItem.sortModel
                         contentModel = stackView.currentItem.contentModel
+                        extraLocalActions = stackView.currentItem.extraLocalActions
                     }
 
                     navigationParent: root
@@ -186,6 +188,8 @@ Utils.NavigableFocusScope {
                             sourcesBanner.subTabModel = stackView.currentItem.tabModel
                             sourcesBanner.sortModel = stackView.currentItem.sortModel
                             sourcesBanner.contentModel = stackView.currentItem.contentModel
+                            sourcesBanner.extraLocalActions = stackView.currentItem.extraLocalActions
+
                             // Restore sourcesBanner state
                             sourcesBanner.selectedIndex = pageModel.findIndex(function (e) {
                                 return e.name === root.view
