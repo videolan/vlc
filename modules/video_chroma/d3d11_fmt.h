@@ -92,6 +92,11 @@ typedef struct
     ID3D11DeviceContext *device;
 } d3d11_decoder_device_t;
 
+typedef struct
+{
+    ID3D11DeviceContext *device;
+} d3d11_video_context_t;
+
 /* index to use for texture/resource that use a known DXGI format
  * (ie not DXGI_FORMAT_UNKNWON) */
 #define KNOWN_DXGI_INDEX   0
@@ -103,6 +108,8 @@ static inline bool is_d3d11_opaque(vlc_fourcc_t chroma)
            chroma == VLC_CODEC_D3D11_OPAQUE_RGBA ||
            chroma == VLC_CODEC_D3D11_OPAQUE_BGRA;
 }
+
+const struct vlc_video_context_operations d3d11_vctx_ops;
 
 #define D3D11_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
     container_of((pic_ctx), struct d3d11_pic_context, s)
@@ -129,6 +136,11 @@ static inline d3d11_decoder_device_t *GetD3D11OpaqueContext(vlc_video_context *v
     }
     vlc_decoder_device_Release(device);
     return res;
+}
+
+static inline d3d11_video_context_t *GetD3D11ContextPrivate(vlc_video_context *vctx)
+{
+    return (d3d11_video_context_t *) vlc_video_context_GetPrivate( vctx, VLC_VIDEO_CONTEXT_D3D11VA );
 }
 
 void AcquireD3D11PictureSys(picture_sys_d3d11_t *p_sys);

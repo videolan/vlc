@@ -368,7 +368,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
             if (sys->d3d_dev.context_mutex == INVALID_HANDLE_VALUE)
                 msg_Warn(va, "No mutex found to lock the decoder");
 
-            sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_D3D11VA, 0, NULL );
+            sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_D3D11VA, sizeof(d3d11_video_context_t), &d3d11_vctx_ops );
             if (likely(sys->vctx != NULL))
             {
                 void *d3dvidctx = NULL;
@@ -380,6 +380,9 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
                     sys->vctx = NULL;
                 } else {
                     sys->hw.video_context = d3dvidctx;
+                    d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
+                    priv->device = sys->d3d_dev.d3dcontext;
+                    ID3D11DeviceContext_Release(priv->device);
                 }
             }
         }
