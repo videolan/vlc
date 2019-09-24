@@ -279,6 +279,11 @@ Utils.NavigableFocusScope {
             onActionAtIndex: delegateModel.actionAtIndex(index)
 
             navigationParent: root
+
+            header:  Utils.LabelSeparator {
+                text: providerModel.name
+                width: view.width
+            }
         }
     }
 
@@ -299,6 +304,11 @@ Utils.NavigableFocusScope {
             onActionAtIndex: delegateModel.actionAtIndex(index)
 
             navigationParent: root
+
+            header:  Utils.LabelSeparator {
+                text: providerModel.name
+                width: view.width
+            }
         }
     }
 
