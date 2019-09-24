@@ -79,6 +79,11 @@ typedef struct
     int            adapter;
 } d3d9_decoder_device_t;
 
+typedef struct
+{
+    IDirect3DDevice9 *dev;
+} d3d9_video_context_t;
+
 static inline bool is_d3d9_opaque(vlc_fourcc_t chroma)
 {
     switch (chroma)
@@ -90,6 +95,8 @@ static inline bool is_d3d9_opaque(vlc_fourcc_t chroma)
         return false;
     }
 }
+
+const struct vlc_video_context_operations d3d9_vctx_ops;
 
 #define D3D9_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
     container_of((pic_ctx), struct d3d9_pic_context, s)
@@ -116,6 +123,11 @@ static inline d3d9_decoder_device_t *GetD3D9OpaqueContext(vlc_video_context *vct
     }
     vlc_decoder_device_Release(device);
     return res;
+}
+
+static inline d3d9_video_context_t *GetD3D9ContextPrivate(vlc_video_context *vctx)
+{
+    return (d3d9_video_context_t *) vlc_video_context_GetPrivate( vctx, VLC_VIDEO_CONTEXT_DXVA2 );
 }
 
 static inline void AcquireD3D9PictureSys(picture_sys_d3d9_t *p_sys)
