@@ -249,6 +249,18 @@ static void Close(vlc_va_t *va)
 
 static const struct vlc_va_operations ops = { Get, Close, };
 
+static const d3d_format_t *GetDirectRenderingFormat(vlc_va_t *vd, vlc_fourcc_t i_src_chroma)
+{
+    UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
+    return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, false, 0, 0, 0, true, supportFlags );
+}
+
+static const d3d_format_t *GetDirectDecoderFormat(vlc_va_t *vd, vlc_fourcc_t i_src_chroma)
+{
+    UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
+    return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, false, 0, 0, 0, true, supportFlags );
+}
+
 static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                 const es_format_t *fmt_in, vlc_decoder_device *dec_device,
                 video_format_t *fmt_out, vlc_video_context **vtcx_out)
@@ -458,8 +470,12 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
 
     DXGI_FORMAT processorInput[6];
     int idx = 0;
-    if ( sys->render != DXGI_FORMAT_UNKNOWN )
-        processorInput[idx++] = sys->render;
+    const d3d_format_t *decoder_format = GetDirectRenderingFormat(va, fmt->i_chroma);
+    if (decoder_format == NULL)
+        decoder_format = GetDirectDecoderFormat(va, fmt->i_chroma);
+    if (decoder_format != NULL)
+        processorInput[idx++] = decoder_format->formatTexture;
+
     if (mode->bit_depth > 10)
         processorInput[idx++] = DXGI_FORMAT_P016;
     if (mode->bit_depth == 10)
