@@ -119,6 +119,22 @@ bool MLNetworkModel::setData( const QModelIndex& idx, const QVariant& value, int
     return res == VLC_SUCCESS;
 }
 
+void MLNetworkModel::setIndexed(bool indexed)
+{
+    if (indexed == m_indexed || !m_canBeIndexed)
+        return;
+    int res;
+    if ( indexed )
+        res = vlc_ml_add_folder( m_ml, qtu( m_url.toString( QUrl::None ) ) );
+    else
+        res = vlc_ml_remove_folder( m_ml, qtu( m_url.toString( QUrl::None ) ) );
+
+    if (res == VLC_SUCCESS) {
+        m_indexed = indexed;
+        emit isIndexedChanged();
+    }
+}
+
 void MLNetworkModel::setCtx(QmlMainContext* ctx)
 {
     if (ctx) {
@@ -213,6 +229,23 @@ bool MLNetworkModel::initializeMediaSources()
     std::unique_ptr<SourceListener> l{ new SourceListener( m_treeItem.source, this ) };
     if ( l->listener == nullptr )
         return false;
+
+    if (m_treeItem.media)
+    {
+        m_name = m_treeItem.media->psz_name;
+        emit nameChanged();
+        m_url = QUrl::fromEncoded( QByteArray{ m_treeItem.media->psz_uri }.append( '/' ) );
+        emit urlChanged();
+        m_type = static_cast<ItemType>(m_treeItem.media->i_type);
+        emit typeChanged();
+        m_canBeIndexed = canBeIndexed( m_url, m_type );
+        emit canBeIndexedChanged();
+        if ( vlc_ml_is_indexed( m_ml, QByteArray(m_treeItem.media->psz_uri).append('/').constData(), &m_indexed ) != VLC_SUCCESS ) {
+            m_indexed = false;
+        }
+        emit isIndexedChanged();
+    }
+
     vlc_media_tree_Preparse( tree, libvlc, m_treeItem.media.get() );
     m_listeners.push_back( std::move( l ) );
 

@@ -85,6 +85,12 @@ public:
     Q_PROPERTY(bool is_on_provider_list READ getIsOnProviderList WRITE setIsOnProviderList NOTIFY isOnProviderListChanged)
     Q_PROPERTY(QString sd_source READ getSdSource WRITE setSdSource NOTIFY sdSourceChanged)
 
+    Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
+    Q_PROPERTY(QUrl url READ getUrl NOTIFY urlChanged)
+    Q_PROPERTY(ItemType type READ getType NOTIFY typeChanged)
+    Q_PROPERTY(bool indexed READ isIndexed WRITE setIndexed NOTIFY isIndexedChanged)
+    Q_PROPERTY(bool canBeIndexed READ canBeIndexed NOTIFY canBeIndexedChanged)
+
     explicit MLNetworkModel(QObject* parent = nullptr);
     MLNetworkModel( QmlMainContext* ctx, QString parentMrl, QObject* parent = nullptr );
 
@@ -95,17 +101,31 @@ public:
     Qt::ItemFlags flags( const QModelIndex& idx ) const override;
     bool setData( const QModelIndex& idx,const QVariant& value, int role ) override;
 
+
+    void setIndexed(bool indexed);
     void setCtx(QmlMainContext* ctx);
     void setTree(QVariant tree);
     void setIsOnProviderList(bool b);
     void setSdSource(QString s);
 
-    inline QmlMainContext* getCtx() { return m_ctx; }
-    inline QVariant getTree() { return QVariant::fromValue( m_treeItem); }
-    inline bool getIsOnProviderList() { return m_isOnProviderList; }
-    inline QString getSdSource() { return m_sdSource; }
+    inline QString getName() const { return m_name; }
+    inline QUrl getUrl() const { return m_url; }
+    inline ItemType getType() const { return m_type; }
+    inline bool isIndexed() const { return m_indexed; }
+    inline bool canBeIndexed() const { return m_canBeIndexed; }
+
+    inline QmlMainContext* getCtx() const { return m_ctx; }
+    inline QVariant getTree() const { return QVariant::fromValue( m_treeItem); }
+    inline bool getIsOnProviderList() const { return m_isOnProviderList; }
+    inline QString getSdSource() const { return m_sdSource; }
 
 signals:
+    void nameChanged();
+    void urlChanged();
+    void typeChanged();
+    void isIndexedChanged();
+    void canBeIndexedChanged();
+
     void ctxChanged();
     void treeChanged();
     void isOnProviderListChanged();
@@ -175,6 +195,13 @@ private:
         ListenerPtr listener;
         MLNetworkModel *model;
     };
+
+    //properties of the current node
+    QString m_name;
+    QUrl m_url;
+    ItemType m_type = ItemType::TYPE_UNKNOWN;
+    bool m_indexed = false;
+    bool m_canBeIndexed  = false;
 
     std::vector<Item> m_items;
     QmlMainContext* m_ctx = nullptr;
