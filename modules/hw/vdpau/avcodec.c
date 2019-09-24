@@ -40,16 +40,21 @@
 #include "vlc_vdpau.h"
 #include "../../codec/avcodec/va.h"
 
-struct vlc_va_sys_t
+struct video_context_private
 {
     vdp_t *vdp;
+    vlc_vdp_video_field_t *pool[];
+};
+
+struct vlc_va_sys_t
+{
+    struct video_context_private vctx_priv;
     VdpDevice device;
     VdpChromaType type;
     void *hwaccel_context;
     uint32_t width;
     uint32_t height;
     vlc_video_context *vctx;
-    vlc_vdp_video_field_t *pool[];
 };
 
 static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va)
@@ -58,18 +63,18 @@ static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va)
     VdpVideoSurface surface;
     VdpStatus err;
 
-    err = vdp_video_surface_create(sys->vdp, sys->device, sys->type,
+    err = vdp_video_surface_create(sys->vctx_priv.vdp, sys->device, sys->type,
                                    sys->width, sys->height, &surface);
     if (err != VDP_STATUS_OK)
     {
         msg_Err(va, "%s creation failure: %s", "video surface",
-                vdp_get_error_string(sys->vdp, err));
+                vdp_get_error_string(sys->vctx_priv.vdp, err));
         return NULL;
     }
 
-    vlc_vdp_video_field_t *field = vlc_vdp_video_create(sys->vdp, surface);
+    vlc_vdp_video_field_t *field = vlc_vdp_video_create(sys->vctx_priv.vdp, surface);
     if (unlikely(field == NULL))
-        vdp_video_surface_destroy(sys->vdp, surface);
+        vdp_video_surface_destroy(sys->vctx_priv.vdp, surface);
     return field;
 }
 
@@ -77,7 +82,7 @@ static vlc_vdp_video_field_t *GetSurface(vlc_va_sys_t *sys)
 {
     vlc_vdp_video_field_t *f;
 
-    for (unsigned i = 0; (f = sys->pool[i]) != NULL; i++)
+    for (unsigned i = 0; (f = sys->vctx_priv.pool[i]) != NULL; i++)
     {
         uintptr_t expected = 1;
 
@@ -124,9 +129,9 @@ static void Close(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    for (unsigned i = 0; sys->pool[i] != NULL; i++)
-        vlc_vdp_video_destroy(sys->pool[i]);
-    vdp_release_x11(sys->vdp);
+    for (unsigned i = 0; sys->vctx_priv.pool[i] != NULL; i++)
+        vlc_vdp_video_destroy(sys->vctx_priv.pool[i]);
+    vdp_release_x11(sys->vctx_priv.vdp);
     vlc_video_context_Release(sys->vctx);
     if (sys->hwaccel_context)
         av_free(sys->hwaccel_context);
@@ -173,7 +178,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
 
     unsigned refs = avctx->refs + 2 * avctx->thread_count + 5;
     vlc_va_sys_t *sys = malloc(sizeof (*sys)
-                               + (refs + 1) * sizeof (sys->pool[0]));
+                               + (refs + 1) * sizeof (sys->vctx_priv.pool[0]));
     if (unlikely(sys == NULL))
        return VLC_ENOMEM;
 
@@ -181,12 +186,12 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     sys->width = width;
     sys->height = height;
     sys->hwaccel_context = NULL;
-    sys->vdp = GetVDPAUOpaqueDevice(dec_device);
-    vdp_hold_x11(sys->vdp, &sys->device);
+    sys->vctx_priv.vdp = GetVDPAUOpaqueDevice(dec_device);
+    vdp_hold_x11(sys->vctx_priv.vdp, &sys->device);
 
     unsigned flags = AV_HWACCEL_FLAG_ALLOW_HIGH_DEPTH;
 
-    err = vdp_get_proc_address(sys->vdp, sys->device,
+    err = vdp_get_proc_address(sys->vctx_priv.vdp, sys->device,
                                VDP_FUNC_ID_GET_PROC_ADDRESS, &func);
     if (err != VDP_STATUS_OK)
         goto error;
@@ -199,18 +204,18 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     unsigned i = 0;
     while (i < refs)
     {
-        sys->pool[i] = CreateSurface(va);
-        if (sys->pool[i] == NULL)
+        sys->vctx_priv.pool[i] = CreateSurface(va);
+        if (sys->vctx_priv.pool[i] == NULL)
             break;
         i++;
     }
-    sys->pool[i] = NULL;
+    sys->vctx_priv.pool[i] = NULL;
 
     if (i < avctx->refs + 3u)
     {
         msg_Err(va, "not enough video RAM");
         while (i > 0)
-            vlc_vdp_video_destroy(sys->pool[--i]);
+            vlc_vdp_video_destroy(sys->vctx_priv.pool[--i]);
         goto error;
     }
 
@@ -223,7 +228,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
                  i, refs);
 
     const char *infos;
-    if (vdp_get_information_string(sys->vdp, &infos) == VDP_STATUS_OK)
+    if (vdp_get_information_string(sys->vctx_priv.vdp, &infos) == VDP_STATUS_OK)
         msg_Info(va, "Using %s", infos);
 
     *vtcx_out = sys->vctx;
@@ -233,7 +238,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
 error:
     if (sys->hwaccel_context)
         av_free(sys->hwaccel_context);
-    vdp_release_x11(sys->vdp);
+    vdp_release_x11(sys->vctx_priv.vdp);
     free(sys);
     return VLC_EGENERIC;
 }
