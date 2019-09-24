@@ -71,7 +71,7 @@ void transcode_encoder_update_format_out( transcode_encoder_t *, const es_format
 block_t * transcode_encoder_encode( transcode_encoder_t *, void * );
 block_t * transcode_encoder_get_output_async( transcode_encoder_t * );
 void transcode_encoder_delete( transcode_encoder_t * );
-transcode_encoder_t * transcode_encoder_new( vlc_object_t *, const es_format_t * );
+transcode_encoder_t * transcode_encoder_new( encoder_t *, const es_format_t * );
 void transcode_encoder_close( transcode_encoder_t * );
 
 bool transcode_encoder_opened( const transcode_encoder_t * );

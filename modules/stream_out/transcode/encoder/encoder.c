@@ -59,9 +59,12 @@ void transcode_encoder_delete( transcode_encoder_t *p_enc )
     free( p_enc );
 }
 
-transcode_encoder_t * transcode_encoder_new( vlc_object_t *p_obj,
+transcode_encoder_t * transcode_encoder_new( encoder_t *p_encoder,
                                              const es_format_t *p_fmt )
 {
+    if( !p_encoder )
+        return NULL;
+
     switch( p_fmt->i_cat )
     {
         case VIDEO_ES:
@@ -74,14 +77,12 @@ transcode_encoder_t * transcode_encoder_new( vlc_object_t *p_obj,
 
     transcode_encoder_t *p_enc = calloc( 1, sizeof(*p_enc) );
     if( !p_enc )
-        return NULL;
-
-    p_enc->p_encoder = sout_EncoderCreate( p_obj );
-    if( !p_enc->p_encoder )
     {
-        free( p_enc );
+        vlc_object_delete(p_encoder);
         return NULL;
     }
+
+    p_enc->p_encoder = p_encoder;
     p_enc->p_encoder->p_module = NULL;
 
     /* Create destination format */

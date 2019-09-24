@@ -234,7 +234,7 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
         return VLC_EGENERIC;
     }
 
-    id->encoder = transcode_encoder_new( VLC_OBJECT(p_stream), &encoder_tested_fmt_in );
+    id->encoder = transcode_encoder_new( sout_EncoderCreate(VLC_OBJECT(p_stream)), &encoder_tested_fmt_in );
     if( !id->encoder )
     {
         module_unneed( id->p_decoder, id->p_decoder->p_module );
