@@ -243,6 +243,7 @@ vlc_video_context * vlc_video_context_Create(vlc_decoder_device *device,
                                           size_t private_size,
                                           const struct vlc_video_context_operations *ops)
 {
+    assert(private_type != VLC_VIDEO_CONTEXT_NONE); // use a NULL video context for that
     vlc_video_context *vctx = malloc(sizeof(*vctx) + private_size);
     if (unlikely(vctx == NULL))
         return NULL;
