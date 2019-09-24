@@ -599,7 +599,7 @@ DemuxAudio(demux_t *demux, vlc_tick_t step_length, vlc_tick_t end_pts)
             if (ret != VLC_SUCCESS)
                 return ret;
         }
-        sys->audio_pts += step_length; 
+        sys->audio_pts += step_length;
     }
     return VLC_SUCCESS;
 }
