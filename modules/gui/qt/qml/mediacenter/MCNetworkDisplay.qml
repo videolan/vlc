@@ -29,6 +29,14 @@ import "qrc:///style/"
 Utils.NavigableFocusScope {
     id: root
 
+    property var extraLocalActions: ObjectModel {
+        Utils.TabButtonExt {
+            text:  providerModel.indexed ?  qsTr("Unindex Folder") : qsTr("Index Folder")
+            visible: !view.isOnProviderList && providerModel.canBeIndexed
+            onClicked: providerModel.indexed = !providerModel.indexed
+        }
+    }
+
     property alias tree: providerModel.tree
     Utils.MenuExt {
         id: contextMenu
@@ -67,7 +75,7 @@ Utils.NavigableFocusScope {
                     action: "enqueue"
                 }, {
                     active:  contextMenu.model && !!contextMenu.model.can_index,
-                    text: contextMenu.model && contextMenu.model.indexed ? qsTr("Unindex") : qsTr("Index"),
+                    text: contextMenu.model && contextMenu.model.indexed ? qsTr("Add to Media Library") : qsTr("Remove to Media Library"),
                     action: "index"
                 }
             ]
