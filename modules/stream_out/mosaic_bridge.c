@@ -64,6 +64,7 @@ typedef struct
 struct decoder_owner
 {
     decoder_t dec;
+    vlc_decoder_device *dec_dev;
     sout_stream_t *p_stream;
 };
 
@@ -251,6 +252,16 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+static vlc_decoder_device * video_get_decoder_device( decoder_t *p_dec )
+{
+    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+    if ( p_owner->dec_dev == NULL )
+    {
+        p_owner->dec_dev = vlc_decoder_device_Create(&p_dec->obj, NULL);
+    }
+    return p_owner->dec_dev ? vlc_decoder_device_Hold(p_owner->dec_dev) : NULL;
+}
+
 /*****************************************************************************
  * Close
  *****************************************************************************/
@@ -273,6 +284,12 @@ static void Close( vlc_object_t * p_this )
 
 static void ReleaseDecoder( decoder_t *p_dec )
 {
+    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+    if ( p_owner->dec_dev )
+    {
+        vlc_decoder_device_Release( p_owner->dec_dev );
+        p_owner->dec_dev = NULL;
+    }
     decoder_Destroy( p_dec );
 }
 
@@ -326,6 +343,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     static const struct decoder_owner_callbacks dec_cbs =
     {
         .video = {
+            .get_device = video_get_decoder_device,
             .format_update = video_update_format_decoder,
             .queue = decoder_queue_video,
         },
