@@ -215,6 +215,7 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
                                         const video_format_t *p_dec_out,
                                         const transcode_encoder_config_t *p_cfg,
                                         const video_format_t *p_src,
+                                        vlc_video_context *vctx_in,
                                         transcode_encoder_t *p_enc )
 {
     video_format_t *p_enc_in = &p_enc->p_encoder->fmt_in.video;
@@ -259,6 +260,8 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
     msg_Dbg( p_obj, "encoder aspect is %u:%u",
              p_enc_out->i_sar_num * p_enc_out->i_width,
              p_enc_out->i_sar_den * p_enc_out->i_height );
+
+    p_enc->p_encoder->vctx_in = vctx_in;
 
     /* Keep colorspace etc info along */
     p_enc_out->space     = p_src->space;

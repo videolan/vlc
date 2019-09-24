@@ -88,6 +88,7 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
                                         const video_format_t *p_dec_out,
                                         const transcode_encoder_config_t *p_cfg,
                                         const video_format_t *p_src,
+                                        vlc_video_context *vctx_in,
                                         transcode_encoder_t *p_enc );
 
 void transcode_video_framerate_apply( const video_format_t *p_src,

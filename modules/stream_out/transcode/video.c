@@ -582,7 +582,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 transcode_encoder_video_configure( VLC_OBJECT(p_stream),
                                                    &id->p_decoder->fmt_out.video,
                                                    id->p_enccfg,
-                                                   filtered_video_format( id, p_pic ),
+                                                   &p_pic->format,
+                                                   picture_GetVideoContext(p_pic),
                                                    id->encoder );
                 /* will be opened below */
             }

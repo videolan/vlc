@@ -250,6 +250,7 @@ struct encoder_t
 
     /* Properties of the input data fed to the encoder */
     es_format_t         fmt_in;
+    vlc_video_context   *vctx_in; /* for video */
 
     /* Properties of the output of the encoder */
     es_format_t         fmt_out;
