@@ -117,7 +117,7 @@ Rectangle {
 
                         VideoProgressBar {
                             value: root.progress
-                            visible: isVideo
+                            visible: isVideo && root.progress > 0
                             anchors {
                                 bottom: parent.bottom
                                 left: parent.left

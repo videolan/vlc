@@ -86,7 +86,8 @@ Utils.KeyNavigableTableView {
                         color: "limegreen"
                     }
                     Utils.VideoProgressBar {
-                        value: !rowModel ? "" : rowModel.saved_position
+                        value: !rowModel ? 0 : rowModel.saved_position
+                        visible: value > 0
                         anchors {
                             bottom: parent.bottom
                             left: parent.left
