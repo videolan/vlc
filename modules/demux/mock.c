@@ -125,6 +125,8 @@ struct demux_sys
     int current_title;
     vlc_tick_t chapter_gap;
 
+    unsigned int updates;
+
 #define X(var_name, type, module_header_type, getter, default_value) \
     type var_name;
     LIST_OPTIONS
@@ -209,6 +211,7 @@ Control(demux_t *demux, int query, va_list args)
                     return VLC_EGENERIC;
                 sys->current_title = new_title;
                 sys->pts = sys->audio_pts = sys->video_pts = VLC_TICK_0;
+                sys->updates |= INPUT_UPDATE_TITLE;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -225,7 +228,12 @@ Control(demux_t *demux, int query, va_list args)
             }
             return VLC_EGENERIC;
         case DEMUX_TEST_AND_CLEAR_FLAGS:
-            return VLC_EGENERIC;
+        {
+            unsigned *restrict flags = va_arg(args, unsigned *);
+            *flags &= sys->updates;
+            sys->updates &= ~*flags;
+            return VLC_SUCCESS;
+        }
         case DEMUX_GET_TITLE:
             if (sys->title_count > 0)
             {
@@ -832,6 +840,7 @@ Open(vlc_object_t *obj)
     sys->current_title = 0;
     sys->chapter_gap = sys->chapter_count > 0 ?
                        (sys->length / sys->chapter_count) : VLC_TICK_INVALID;
+    sys->updates = 0;
 
     demux->pf_control = Control;
     demux->pf_demux = Demux;
