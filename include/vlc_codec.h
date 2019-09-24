@@ -53,6 +53,8 @@ struct decoder_owner_callbacks
 
             /* cf. decoder_NewPicture, can be called from any decoder thread */
             picture_t*  (*buffer_new)( decoder_t * );
+            /* cf. decoder_AbortPictures */
+            void        (*abort_pictures)( decoder_t *, bool b_abort );
             /* cf.decoder_QueueVideo */
             void        (*queue)( decoder_t *, picture_t * );
             /* cf.decoder_QueueCC */

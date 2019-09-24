@@ -767,7 +767,7 @@ static void RequestReload( struct decoder_owner *p_owner )
     atomic_compare_exchange_strong( &p_owner->reload, &expected, RELOAD_DECODER );
 }
 
-void decoder_AbortPictures( decoder_t *p_dec, bool b_abort )
+static void DecoderThread_AbortPictures( decoder_t *p_dec, bool b_abort )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
@@ -1703,6 +1703,7 @@ static const struct decoder_owner_callbacks dec_video_cbs =
     .video = {
         .format_update = ModuleThread_UpdateVideoFormat,
         .buffer_new = ModuleThread_NewVideoBuffer,
+        .abort_pictures = DecoderThread_AbortPictures,
         .queue = ModuleThread_QueueVideo,
         .queue_cc = ModuleThread_QueueCc,
         .get_display_date = ModuleThread_GetDisplayDate,
