@@ -327,7 +327,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     HRESULT hr;
     d3d11_decoder_device_t *d3d11_decoder = GetD3D11OpaqueContext(context);
-    if ( d3d11_decoder == NULL )
+    if ( d3d11_decoder != NULL )
     {
         hr = D3D11_CreateDeviceExternal(vd, d3d11_decoder->device,
                                         is_d3d11_opaque(vd->source.i_chroma),
