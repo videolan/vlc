@@ -31,6 +31,12 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 
+static const int64_t MinimumDuration = 3 * 60 * 1000;
+static const float MinimumStorePercent = 0.05;
+static const float MaximumStorePercent = 0.95;
+static const int64_t MinimumStoreTime = 60 * 1000;
+static const int64_t MinimumStoreRemainingTime = 60 * 1000;
+
 @interface VLCPlaybackContinuityController()
 {
     VLCInputItem *_currentInput;
@@ -182,6 +188,10 @@
     float lastPlaybackPosition = libraryMediaItem.lastPlaybackPosition;
     int64_t duration = libraryMediaItem.duration;
 
+    if (lastPlaybackPosition < MinimumStorePercent || duration < MinimumDuration) {
+        return;
+    }
+
     CompletionBlock completionBlock = ^(enum ResumeResult result) {
         if (result == RESUME_RESTART)
             return;
@@ -239,12 +249,6 @@
                                withLastPosition:lastPosition.intValue
                                 completionBlock:completionBlock];
 }
-
-static const int64_t MinimumDuration = 3 * 60 * 1000;
-static const float MinimumStorePercent = 0.5;
-static const float MaximumStorePercent = 0.95;
-static const int64_t MinimumStoreTime = 60 * 1000;
-static const int64_t MinimumStoreRemainingTime = 60 * 1000;
 
 BOOL ShouldStorePlaybackPosition(float position, int64_t duration)
 {
