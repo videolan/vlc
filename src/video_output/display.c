@@ -286,9 +286,6 @@ typedef struct {
     atomic_bool reset_pictures;
 #endif
     picture_pool_t *pool;
-
-    /* temporary: must come from decoder module */
-    vlc_video_context video_context;
 } vout_display_priv_t;
 
 static const struct filter_video_callbacks vout_display_filter_cbs = {
@@ -734,6 +731,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
                                  const video_format_t *source,
                                  const vout_display_cfg_t *cfg,
                                  const char *module,
+                                 vlc_decoder_device *dec_device,
                                  const vout_display_owner_t *owner)
 {
     vout_display_priv_t *osys = vlc_custom_create(parent, sizeof (*osys),
@@ -772,13 +770,11 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     if (owner)
         vd->owner = *owner;
 
-    osys->video_context.device = vlc_decoder_device_Create(osys->cfg.window);
-    vlc_video_context *video_context = osys->video_context.device ?
-        &osys->video_context : NULL;
+    vlc_video_context fake_vtcx = { .device = dec_device };
 
     if (vlc_module_load(vd, "vout display", module, module && *module != '\0',
                         vout_display_start, vd, &osys->cfg, &vd->fmt,
-                        video_context) == NULL)
+                        &fake_vtcx) == NULL)
         goto error;
 
 #if defined(__OS2__)
@@ -803,8 +799,6 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     return vd;
 error:
     video_format_Clean(&vd->source);
-    if (osys->video_context.device)
-        vlc_decoder_device_Release(osys->video_context.device);
     vlc_object_delete(vd);
     return NULL;
 }
@@ -822,9 +816,6 @@ void vout_display_Delete(vout_display_t *vd)
     if (vd->close != NULL)
         vd->close(vd);
     vlc_objres_clear(VLC_OBJECT(vd));
-
-    if (osys->video_context.device)
-        vlc_decoder_device_Release(osys->video_context.device);
 
     video_format_Clean(&vd->source);
     video_format_Clean(&vd->fmt);

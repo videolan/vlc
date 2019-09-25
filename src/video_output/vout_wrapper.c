@@ -73,8 +73,8 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
     else
         modlist = "splitter,none";
 
-    vd = vout_display_New(VLC_OBJECT(vout), &sys->original, cfg, modlist,
-                          &owner);
+    vd = vout_display_New(VLC_OBJECT(vout), &sys->original, cfg,
+                          modlist, sys->dec_device, &owner);
     free(modlistbuf);
 
     if (vd == NULL)

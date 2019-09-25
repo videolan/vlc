@@ -309,7 +309,7 @@ struct vout_display_t {
 VLC_API
 vout_display_t *vout_display_New(vlc_object_t *, const video_format_t *,
     const vout_display_cfg_t *, const char *module,
-    const vout_display_owner_t *);
+    vlc_decoder_device *, const vout_display_owner_t *);
 
 /**
  * Destroys a video output display.

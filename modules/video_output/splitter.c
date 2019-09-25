@@ -290,7 +290,7 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
 
         vdcfg.window = part->window;
         vout_display_t *display = vout_display_New(obj, &output->fmt, &vdcfg,
-                                                   modname, NULL);
+                                                   modname, ctx->device, NULL);
         if (display == NULL) {
             vout_window_Disable(part->window);
             vout_window_Delete(part->window);
@@ -310,7 +310,7 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
     vd->display = vlc_vidsplit_Display;
     vd->control = vlc_vidsplit_Control;
     vd->close = vlc_vidsplit_Close;
-    (void) fmtp; (void) ctx;
+    (void) fmtp;
     return VLC_SUCCESS;
 }
 
