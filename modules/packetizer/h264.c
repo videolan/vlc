@@ -994,17 +994,9 @@ static block_t *OutputPicture( decoder_t *p_dec )
 
     if( p_pic->i_length == 0 )
     {
-        if( p_sps->vui.i_time_scale )
-        {
-            p_pic->i_length = CLOCK_FREQ * i_num_clock_ts *
-                              p_sps->vui.i_num_units_in_tick / p_sps->vui.i_time_scale;
-        }
-        else
-        {
-            date_t next = p_sys->dts;
-            date_Increment( &next, i_num_clock_ts );
-            p_pic->i_length = date_Get( &next ) - date_Get( &p_sys->dts );
-        }
+        date_t next = p_sys->dts;
+        date_Increment( &next, i_num_clock_ts );
+        p_pic->i_length = date_Get( &next ) - date_Get( &p_sys->dts );
     }
 
 #if 0
