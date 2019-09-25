@@ -210,28 +210,30 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
             p_dec->fmt_out.video.i_sar_den = p_sps->vui.i_sar_den;
         }
 
-        if( p_sps->vui.b_valid )
+        if( !p_dec->fmt_out.video.i_frame_rate ||
+            !p_dec->fmt_out.video.i_frame_rate_base )
         {
-            if( !p_dec->fmt_in.video.i_frame_rate_base &&
-                p_sps->vui.i_num_units_in_tick > 0 && p_sps->vui.i_time_scale > 1 )
+            /* on first run == if fmt_in does not provide frame rate info */
+            /* If we have frame rate info in the stream */
+            if(p_sps->vui.b_valid &&
+               p_sps->vui.i_num_units_in_tick > 0 &&
+               p_sps->vui.i_time_scale > 1 )
             {
-                const unsigned i_rate_base = p_sps->vui.i_num_units_in_tick;
-                const unsigned i_rate = p_sps->vui.i_time_scale >> 1; /* num_clock_ts == 2 */
-                if( i_rate_base != p_dec->fmt_out.video.i_frame_rate_base ||
-                    i_rate != p_dec->fmt_out.video.i_frame_rate )
-                {
-                    p_dec->fmt_out.video.i_frame_rate_base = i_rate_base;
-                    p_dec->fmt_out.video.i_frame_rate = i_rate;
-                    date_Change( &p_sys->dts, p_sps->vui.i_time_scale, p_sps->vui.i_num_units_in_tick );
-                }
+                date_Change( &p_sys->dts, p_sps->vui.i_time_scale,
+                                          p_sps->vui.i_num_units_in_tick );
             }
-            if( p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF )
-            {
-                h264_get_colorimetry( p_sps, &p_dec->fmt_out.video.primaries,
-                                      &p_dec->fmt_out.video.transfer,
-                                      &p_dec->fmt_out.video.space,
-                                      &p_dec->fmt_out.video.color_range );
-            }
+            /* else use the default num/den */
+            p_dec->fmt_out.video.i_frame_rate = p_sys->dts.i_divider_num >> 1; /* num_clock_ts == 2 */
+            p_dec->fmt_out.video.i_frame_rate_base = p_sys->dts.i_divider_den;
+        }
+
+        if( p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF &&
+            p_sps->vui.b_valid )
+        {
+            h264_get_colorimetry( p_sps, &p_dec->fmt_out.video.primaries,
+                                  &p_dec->fmt_out.video.transfer,
+                                  &p_dec->fmt_out.video.space,
+                                  &p_dec->fmt_out.video.color_range );
         }
 
         if( p_dec->fmt_out.i_extra == 0 && p_pps )
