@@ -35,6 +35,8 @@
     int _currentResumeTimeout;
     CompletionBlock _completionBlock;
     NSTimer *_countdownTimer;
+    VLCInputItem *_inputItem;
+    NSInteger _lastPosition;
 }
 @end
 
@@ -63,20 +65,18 @@
     [_resumeButton setTitle:_NS("Continue playback")];
 
     [_alwaysResumeCheckbox setTitle:_NS("Always continue media playback")];
+
+    [self updateTextLabels];
 }
 
 - (void)showWindowWithItem:(VLCInputItem *)inputItem withLastPosition:(NSInteger)pos completionBlock:(CompletionBlock)block
 {
+    _inputItem = inputItem;
+    _lastPosition = pos;
     _currentResumeTimeout = 10;
     _completionBlock = [block copy];
 
-    NSString *restartButtonLabel = _NS("Restart playback");
-    restartButtonLabel = [restartButtonLabel stringByAppendingFormat:@" (%d)", _currentResumeTimeout];
-    [_restartButton setTitle:restartButtonLabel];
-
-    NSString *labelString = [NSString stringWithFormat:_NS("Playback of \"%@\" will continue at %@"), inputItem.title, [NSString stringWithTime:pos]];
-    [_descriptionLabel setStringValue:labelString];
-    [_alwaysResumeCheckbox setState:NSOffState];
+    [self updateTextLabels];
 
     _countdownTimer = [NSTimer scheduledTimerWithTimeInterval:1
                                                        target:self
@@ -88,6 +88,21 @@
     [window setLevel:[[[VLCMain sharedInstance] voutProvider] currentStatusWindowLevel]];
     [window center];
     [window makeKeyAndOrderFront:nil];
+}
+
+- (void)updateTextLabels
+{
+    NSString *restartButtonLabel = _NS("Restart playback");
+    restartButtonLabel = [restartButtonLabel stringByAppendingFormat:@" (%d)", _currentResumeTimeout];
+    [_restartButton setTitle:restartButtonLabel];
+
+    if (!_inputItem) {
+        return;
+    }
+
+    NSString *labelString = [NSString stringWithFormat:_NS("Playback of \"%@\" will continue at %@"), _inputItem.title, [NSString stringWithTime:_lastPosition]];
+    [_descriptionLabel setStringValue:labelString];
+    [_alwaysResumeCheckbox setState:NSOffState];
 }
 
 - (void)updateAlertWindow:(NSTimer *)timer
