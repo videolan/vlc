@@ -144,6 +144,7 @@ static void PacketizeFlush( decoder_t * );
 static void PacketizeReset( void *p_private, bool b_broken );
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
 static int PacketizeValidate( void *p_private, block_t * );
+static block_t * PacketizeDrain( void *p_private );
 
 static block_t *ParseNALBlock( decoder_t *, bool *pb_ts_used, block_t * );
 
@@ -337,7 +338,7 @@ static int Open( vlc_object_t *p_this )
     packetizer_Init( &p_sys->packetizer,
                      p_h264_startcode, sizeof(p_h264_startcode), startcode_FindAnnexB,
                      p_h264_startcode, 1, 5,
-                     PacketizeReset, PacketizeParse, PacketizeValidate, NULL,
+                     PacketizeReset, PacketizeParse, PacketizeValidate, PacketizeDrain,
                      p_dec );
 
     p_sys->b_slice = false;
@@ -578,6 +579,24 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
     VLC_UNUSED(p_private);
     VLC_UNUSED(p_au);
     return VLC_SUCCESS;
+}
+
+static block_t * PacketizeDrain( void *p_private )
+{
+    decoder_t *p_dec = p_private;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( !p_sys->b_slice )
+        return NULL;
+
+    block_t *p_out = OutputPicture( p_dec );
+    if( p_out && (p_out->i_flags & BLOCK_FLAG_DROP) )
+    {
+        block_Release( p_out );
+        p_out = NULL;
+    }
+
+    return p_out;
 }
 
 /*****************************************************************************
