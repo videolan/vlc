@@ -67,7 +67,7 @@ NavigableFocusScope {
 
                 width: root.width
                 height: root.rowHeight
-                color: VLCStyle.colors.bg
+                color: VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, hoverArea.containsMouse, lineView.activeFocus)
 
                 MouseArea {
                     id: hoverArea
@@ -89,24 +89,13 @@ NavigableFocusScope {
                     onDoubleClicked: {
                         actionForSelection(delegateModel.selectedGroup)
                     }
-                    RectangularGlow {
-                        visible: element.DelegateModel.inSelected || hoverArea.containsMouse
-                        anchors.fill: parent
-                        glowRadius: VLCStyle.margin_xxsmall
-                        color: VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, hoverArea.containsMouse, lineView.activeFocus)
-                    }
-
-                    Rectangle{
-                        anchors.fill: parent
-                        anchors.topMargin: VLCStyle.margin_xxsmall
-                        anchors.bottomMargin: VLCStyle.margin_xxsmall
-                        anchors.leftMargin: VLCStyle.margin_xxxsmall
-                        anchors.rightMargin: VLCStyle.margin_xxxsmall
-                        color: VLCStyle.colors.bg
-                        radius: height / 10
 
                         Row {
                             anchors {
+                                topMargin: VLCStyle.margin_xxsmall
+                                bottomMargin: VLCStyle.margin_xxsmall
+                                leftMargin: VLCStyle.margin_xxxsmall
+                                rightMargin: VLCStyle.margin_xxxsmall
                                 fill: parent
                             }
                             Repeater {
@@ -128,7 +117,7 @@ NavigableFocusScope {
                                 }
                             }
                         }
-                    }
+
                 }
             }
         }
