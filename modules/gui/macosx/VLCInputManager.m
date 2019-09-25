@@ -618,6 +618,16 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 }
 
+static const int64_t MinimumDuration = 3 * 60 * 1000;
+static const float MinimumStorePercent = 0.05;
+static const float MaximumStorePercent = 0.95;
+
+BOOL ShouldStorePlaybackPosition(float position, int64_t duration)
+{
+    return duration > MinimumDuration &&
+        position > MinimumStorePercent && position < MaximumStorePercent;
+}
+
 - (void)storePlaybackPositionForItem:(input_thread_t *)p_input_thread
 {
     if (!var_InheritBool(getIntf(), "macosx-recentitems"))
@@ -645,7 +655,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     NSMutableArray *mediaList = [[defaults objectForKey:@"recentlyPlayedMediaList"] mutableCopy];
 
-    if (relativePos > .05 && relativePos < .95 && dur > 180) {
+    if (ShouldStorePlaybackPosition(relativePos, dur*1000)) {
         msg_Dbg(getIntf(), "Store current playback position of %f", relativePos);
         [mutDict setObject:[NSNumber numberWithInt:pos] forKey:url];
 
