@@ -48,8 +48,6 @@ Utils.NavigableFocusScope {
                 width: root.width
                 height: VLCStyle.icon_normal + VLCStyle.margin_small
 
-                color: VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, this.hovered, this.activeFocus)
-
                 cover:  Utils.MultiCoverPreview {
                     albums: MLAlbumModel {
                         ml: medialib

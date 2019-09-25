@@ -60,8 +60,6 @@ Utils.NavigableFocusScope {
                 width: root.width
                 height: VLCStyle.icon_normal + VLCStyle.margin_small
 
-                color: VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, this.hovered, this.activeFocus)
-
                 cover: Image {
                     id: cover_obj
                     fillMode: Image.PreserveAspectFit

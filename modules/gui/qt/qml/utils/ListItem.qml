@@ -39,7 +39,7 @@ NavigableFocusScope {
     property alias line2: line2_text.text
     property alias imageText: cover_text.text
 
-    property alias color: glow.color
+    property alias color: linerect.color
     property bool showContextButton: false
 
     Component {
@@ -49,6 +49,8 @@ NavigableFocusScope {
             text: VLCIcons.add
 
             focus: true
+
+            font.underline: activeFocus
 
             highlightColor: VLCStyle.colors.getBgColor(
                                 root.isSelected, root.hovered,
@@ -69,6 +71,8 @@ NavigableFocusScope {
 
             focus: true
 
+            font.underline: activeFocus
+
             highlightColor: VLCStyle.colors.getBgColor(
                                 root.isSelected, root.hovered,
                                 root.activeFocus)
@@ -81,7 +85,9 @@ NavigableFocusScope {
     Rectangle {
         id: linerect
         anchors.fill: parent
-        color: "transparent"
+        color: VLCStyle.colors.getBgColor(
+                   root.isSelected, root.hovered,
+                   root.activeFocus)
 
         MouseArea {
             id: mouse
@@ -97,22 +103,13 @@ NavigableFocusScope {
             onDoubleClicked: {
                 root.itemDoubleClicked(mouse.buttons, mouse.modifiers);
             }
-            RectangularGlow {
-                id: glow
-                anchors.fill: innerRect
-                spread: 0.1
-                glowRadius: VLCStyle.margin_xxsmall
-                color: VLCStyle.colors.getBgColor(
-                           root.isSelected, root.hovered,
-                           root.activeFocus)
-            }
-            Rectangle {
+
+
+            Item {
                 id: innerRect
-                radius: height / 10
                 anchors.fill: parent
                 anchors.margins: VLCStyle.margin_xxsmall
                 anchors.verticalCenter: parent.verticalCenter
-                color: VLCStyle.colors.bg
 
                 RowLayout {
                     anchors.fill: parent
@@ -200,6 +197,8 @@ NavigableFocusScope {
 
                                 visible: root.showContextButton
                                 focus: actionButtons.length == toolButtons.focusIndex
+
+                                font.underline: activeFocus
 
                                 highlightColor: VLCStyle.colors.getBgColor(
                                                     root.isSelected, root.hovered,
