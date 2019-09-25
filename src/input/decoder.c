@@ -501,79 +501,77 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner)
         need_vout = true;
     }
 
-    if( need_vout )
+    if( !need_vout )
+        return 0; // vout unchanged
+
+    if( !p_dec->fmt_out.video.i_width ||
+        !p_dec->fmt_out.video.i_height ||
+        p_dec->fmt_out.video.i_width < p_dec->fmt_out.video.i_visible_width ||
+        p_dec->fmt_out.video.i_height < p_dec->fmt_out.video.i_visible_height )
     {
-        vout_thread_t *p_vout;
-
-        if( !p_dec->fmt_out.video.i_width ||
-            !p_dec->fmt_out.video.i_height ||
-            p_dec->fmt_out.video.i_width < p_dec->fmt_out.video.i_visible_width ||
-            p_dec->fmt_out.video.i_height < p_dec->fmt_out.video.i_visible_height )
-        {
-            /* Can't create a new vout without display size */
-            return -1;
-        }
-
-        video_format_t fmt;
-        FixDisplayFormat(p_dec, &fmt);
-
-        vlc_mutex_lock( &p_owner->lock );
-
-        p_vout = p_owner->p_vout;
-        p_owner->p_vout = NULL; // the DecoderThread should not use the old vout anymore
-        vlc_mutex_unlock( &p_owner->lock );
-
-        unsigned dpb_size;
-        switch( p_dec->fmt_in.i_codec )
-        {
-        case VLC_CODEC_HEVC:
-        case VLC_CODEC_H264:
-        case VLC_CODEC_DIRAC: /* FIXME valid ? */
-            dpb_size = 18;
-            break;
-        case VLC_CODEC_AV1:
-            dpb_size = 10;
-            break;
-        case VLC_CODEC_VP5:
-        case VLC_CODEC_VP6:
-        case VLC_CODEC_VP6F:
-        case VLC_CODEC_VP8:
-            dpb_size = 3;
-            break;
-        default:
-            dpb_size = 2;
-            break;
-        }
-        enum vlc_vout_order order;
-        p_vout = input_resource_GetVout( p_owner->p_resource,
-            &(vout_configuration_t) {
-                .vout = p_vout, .clock = p_owner->p_clock, .fmt = &fmt,
-                .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
-                .mouse_event = MouseEvent, .mouse_opaque = p_dec
-            }, &order );
-        if (p_vout)
-            decoder_Notify(p_owner, on_vout_added, p_vout, order);
-
-        vlc_mutex_lock( &p_owner->lock );
-        p_owner->p_vout = p_vout;
-
-        DecoderUpdateFormatLocked( p_owner );
-        p_owner->fmt.video.i_chroma = p_dec->fmt_out.i_codec;
-        vlc_mutex_unlock( &p_owner->lock );
-
-        if( p_vout == NULL )
-        {
-            msg_Err( p_dec, "failed to create video output" );
-            return -1;
-        }
-
-        vlc_fifo_Lock( p_owner->p_fifo );
-        p_owner->reset_out_state = true;
-        vlc_fifo_Unlock( p_owner->p_fifo );
-
-        return 1; // new vout was created
+        /* Can't create a new vout without display size */
+        return -1;
     }
-    return 0; // vout unchanged
+
+    video_format_t fmt;
+    FixDisplayFormat(p_dec, &fmt);
+
+    vlc_mutex_lock( &p_owner->lock );
+
+    vout_thread_t *p_vout = p_owner->p_vout;
+    p_owner->p_vout = NULL; // the DecoderThread should not use the old vout anymore
+    vlc_mutex_unlock( &p_owner->lock );
+
+    unsigned dpb_size;
+    switch( p_dec->fmt_in.i_codec )
+    {
+    case VLC_CODEC_HEVC:
+    case VLC_CODEC_H264:
+    case VLC_CODEC_DIRAC: /* FIXME valid ? */
+        dpb_size = 18;
+        break;
+    case VLC_CODEC_AV1:
+        dpb_size = 10;
+        break;
+    case VLC_CODEC_VP5:
+    case VLC_CODEC_VP6:
+    case VLC_CODEC_VP6F:
+    case VLC_CODEC_VP8:
+        dpb_size = 3;
+        break;
+    default:
+        dpb_size = 2;
+        break;
+    }
+    enum vlc_vout_order order;
+    vout_configuration_t cfg = {
+        .vout = p_vout, .clock = p_owner->p_clock, .fmt = &fmt,
+        .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
+        .mouse_event = MouseEvent, .mouse_opaque = p_dec
+    };
+    p_vout = input_resource_GetVout( p_owner->p_resource,
+                                    &cfg, &order );
+    if (p_vout)
+        decoder_Notify(p_owner, on_vout_added, p_vout, order);
+
+    vlc_mutex_lock( &p_owner->lock );
+    p_owner->p_vout = p_vout;
+
+    DecoderUpdateFormatLocked( p_owner );
+    p_owner->fmt.video.i_chroma = p_dec->fmt_out.i_codec;
+    vlc_mutex_unlock( &p_owner->lock );
+
+    if( p_vout == NULL )
+    {
+        msg_Err( p_dec, "failed to create video output" );
+        return -1;
+    }
+
+    vlc_fifo_Lock( p_owner->p_fifo );
+    p_owner->reset_out_state = true;
+    vlc_fifo_Unlock( p_owner->p_fifo );
+
+    return 1; // new vout was created
 }
 
 static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
