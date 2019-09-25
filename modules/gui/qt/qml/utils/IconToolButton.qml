@@ -55,6 +55,7 @@ ToolButton {
 
             font.pixelSize: control.size
             font.family: VLCIcons.fontFamily
+            font.underline: control.font.underline
 
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
