@@ -66,7 +66,12 @@ Utils.NavigableFocusScope{
                     size: VLCStyle.icon_normal
                     text: VLCIcons.exit
                     color: VLCStyle.colors.playerFg
-                    onClicked: history.previous(History.Go)
+                    onClicked: {
+                        if (player.playingState === PlayerController.PLAYING_STATE_PAUSED) {
+                           mainPlaylistController.stop()
+                        }
+                        history.previous(History.Go)
+                    }
                     KeyNavigation.right: playlistBtn
                     focus: true
                 }
