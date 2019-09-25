@@ -80,9 +80,13 @@ float kVLCDefaultThumbnailPosition = .15;
     }
     VLCPlayerController *playerController = aNotification.object;
     if (playerController.playerState == VLC_PLAYER_STATE_PLAYING) {
-        vlc_ml_pause_background(_p_libraryInstance);
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+            vlc_ml_pause_background(self->_p_libraryInstance);
+        });
     } else {
-        vlc_ml_resume_background(_p_libraryInstance);
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+            vlc_ml_resume_background(self->_p_libraryInstance);
+        });
     }
 }
 
