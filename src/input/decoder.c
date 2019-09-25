@@ -455,11 +455,10 @@ static void FixDisplayFormat(decoder_t *p_dec, video_format_t *fmt)
     video_format_AdjustColorSpace( fmt );
 }
 
-static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
+static int CreateVoutIfNeeded(struct decoder_owner *p_owner)
 {
-    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+    decoder_t *p_dec = &p_owner->dec;
     bool need_vout = false;
-    bool need_format_update = false;
 
     if( p_owner->p_vout == NULL )
     {
@@ -500,22 +499,6 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
     {
         msg_Dbg(p_dec, "vout change: multiview");
         need_vout = true;
-    }
-
-    if ( memcmp( &p_dec->fmt_out.video.mastering,
-                 &p_owner->fmt.video.mastering,
-                 sizeof(p_owner->fmt.video.mastering)) )
-    {
-        msg_Dbg(p_dec, "vout update: mastering data");
-        need_format_update = true;
-    }
-    if ( p_dec->fmt_out.video.lighting.MaxCLL !=
-         p_owner->fmt.video.lighting.MaxCLL ||
-         p_dec->fmt_out.video.lighting.MaxFALL !=
-         p_owner->fmt.video.lighting.MaxFALL )
-    {
-        msg_Dbg(p_dec, "vout update: lighting data");
-        need_format_update = true;
     }
 
     if( need_vout )
@@ -587,8 +570,37 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
         vlc_fifo_Lock( p_owner->p_fifo );
         p_owner->reset_out_state = true;
         vlc_fifo_Unlock( p_owner->p_fifo );
+
+        return 1; // new vout was created
     }
-    else
+    return 0; // vout unchanged
+}
+
+static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
+{
+    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+
+    int created_vout = CreateVoutIfNeeded(p_owner);
+    if (created_vout != 0)
+        return created_vout == -1 ? -1 : 0; // error or new vout was created
+
+    bool need_format_update = false;
+    if ( memcmp( &p_dec->fmt_out.video.mastering,
+                 &p_owner->fmt.video.mastering,
+                 sizeof(p_owner->fmt.video.mastering)) )
+    {
+        msg_Dbg(p_dec, "vout update: mastering data");
+        need_format_update = true;
+    }
+    if ( p_dec->fmt_out.video.lighting.MaxCLL !=
+         p_owner->fmt.video.lighting.MaxCLL ||
+         p_dec->fmt_out.video.lighting.MaxFALL !=
+         p_owner->fmt.video.lighting.MaxFALL )
+    {
+        msg_Dbg(p_dec, "vout update: lighting data");
+        need_format_update = true;
+    }
+
     if ( need_format_update )
     {
         /* the format has changed but we don't need a new vout */
