@@ -173,6 +173,7 @@ struct vout_thread_sys_t
     /* Video output window */
     bool            window_enabled;
     vlc_mutex_t     window_lock;
+    vlc_decoder_device *dec_device;
 
     /* Video output display */
     vout_display_cfg_t display_cfg;
@@ -196,6 +197,14 @@ vout_thread_t *vout_Create(vlc_object_t *obj) VLC_USED;
 vout_thread_t *vout_CreateDummy(vlc_object_t *obj) VLC_USED;
 
 /**
+ * Setup the vout for the given configuration and get an associated decoder device.
+ *
+ * \param cfg the video configuration requested.
+ * \return pointer to a decoder device reference to use with the vout or NULL
+ */
+vlc_decoder_device *vout_GetDevice(const vout_configuration_t *cfg);
+
+/**
  * Returns a suitable vout or release the given one.
  *
  * If cfg->fmt is non NULL and valid, a vout will be returned, reusing cfg->vout
@@ -206,6 +215,7 @@ vout_thread_t *vout_CreateDummy(vlc_object_t *obj) VLC_USED;
  *
  * \param cfg the video configuration requested.
  * \param input used to get attachments for spu filters
+ * \param dec_dev pointer to receive the decoder device reference to use with the vout or NULL
  * \retval 0 on success
  * \retval -1 on error
  */

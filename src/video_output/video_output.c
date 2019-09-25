@@ -49,6 +49,7 @@
 #include <vlc_vout_osd.h>
 #include <vlc_image.h>
 #include <vlc_plugin.h>
+#include <vlc_codec.h>
 
 #include <libvlc.h>
 #include "vout_internal.h"
@@ -1744,6 +1745,11 @@ static void vout_DisableWindow(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
     vlc_mutex_lock(&sys->window_lock);
+    if (sys->dec_device)
+    {
+        vlc_decoder_device_Release(sys->dec_device);
+        sys->dec_device = NULL;
+    }
     if (sys->window_enabled) {
         vout_window_Disable(sys->display_cfg.window);
         sys->window_enabled = false;
@@ -1801,6 +1807,9 @@ void vout_Release(vout_thread_t *vout)
     /* Destroy the locks */
     vlc_mutex_destroy(&vout->p->window_lock);
     vlc_mutex_destroy(&vout->p->filter.lock);
+
+    if (sys->dec_device)
+        vlc_decoder_device_Release(sys->dec_device);
 
     assert(!sys->window_enabled);
     vout_display_window_Delete(sys->display_cfg.window);
@@ -1933,7 +1942,7 @@ vout_thread_t *vout_Hold(vout_thread_t *vout)
     return vout;
 }
 
-static int vout_EnableWindow(const vout_configuration_t *cfg)
+static int vout_EnableWindow(const vout_configuration_t *cfg, vlc_decoder_device **pp_dec_device)
 {
     vout_thread_t *vout = cfg->vout;
     vout_thread_sys_t *sys = vout->p;
@@ -1956,6 +1965,8 @@ static int vout_EnableWindow(const vout_configuration_t *cfg)
         if (cfg->dpb_size <= sys->dpb_size) {
             video_format_Clean(&original);
             /* It is assumed that the SPU input matches input already. */
+            if (pp_dec_device)
+                *pp_dec_device = sys->dec_device ? vlc_decoder_device_Hold( sys->dec_device ) : NULL;
             return 0;
         }
         msg_Warn(vout, "DPB need to be increased");
@@ -1992,8 +2003,14 @@ static int vout_EnableWindow(const vout_configuration_t *cfg)
         sys->window_enabled = true;
     } else
         vout_UpdateWindowSizeLocked(vout);
-    vlc_mutex_unlock(&sys->window_lock);
 
+    if (pp_dec_device)
+    {
+        if (sys->dec_device == NULL)
+            sys->dec_device = vlc_decoder_device_Create(sys->display_cfg.window);
+        *pp_dec_device = sys->dec_device ? vlc_decoder_device_Hold( sys->dec_device ) : NULL;
+    }
+    vlc_mutex_unlock(&sys->window_lock);
     return 0;
 }
 
@@ -2002,7 +2019,7 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
     vout_thread_t *vout = cfg->vout;
     vout_thread_sys_t *sys = vout->p;
 
-    if (vout_EnableWindow(cfg) != 0)
+    if (vout_EnableWindow(cfg, NULL) != 0)
         return -1;
 
     sys->delay = 0;
@@ -2027,4 +2044,12 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
         spu_Attach(sys->spu, input);
     vout_IntfReinit(vout);
     return 0;
+}
+
+vlc_decoder_device *vout_GetDevice(const vout_configuration_t *cfg)
+{
+    vlc_decoder_device *dec_device = NULL;
+    if (vout_EnableWindow(cfg, &dec_device) != 0)
+        return NULL;
+    return dec_device;
 }
