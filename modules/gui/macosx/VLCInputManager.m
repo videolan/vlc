@@ -621,11 +621,27 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 static const int64_t MinimumDuration = 3 * 60 * 1000;
 static const float MinimumStorePercent = 0.05;
 static const float MaximumStorePercent = 0.95;
+static const int64_t MinimumStoreTime = 60 * 1000;
+static const int64_t MinimumStoreRemainingTime = 60 * 1000;
 
 BOOL ShouldStorePlaybackPosition(float position, int64_t duration)
 {
-    return duration > MinimumDuration &&
-        position > MinimumStorePercent && position < MaximumStorePercent;
+    int64_t positionTime = position * duration;
+    int64_t remainingTime = duration - positionTime;
+
+    if (duration < MinimumDuration) {
+        return NO;
+    }
+
+    if (position < MinimumStorePercent && positionTime < MinimumStoreTime) {
+        return NO;
+    }
+
+    if (position > MaximumStorePercent && remainingTime < MinimumStoreRemainingTime) {
+        return NO;
+    }
+
+    return YES;
 }
 
 - (void)storePlaybackPositionForItem:(input_thread_t *)p_input_thread
