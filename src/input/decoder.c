@@ -395,6 +395,66 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
     return 0;
 }
 
+static void FixDisplayFormat(decoder_t *p_dec, video_format_t *fmt)
+{
+    *fmt = p_dec->fmt_out.video;
+    fmt->i_chroma = p_dec->fmt_out.i_codec;
+
+    if( vlc_fourcc_IsYUV( fmt->i_chroma ) )
+    {
+        const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription( fmt->i_chroma );
+        for( unsigned int i = 0; dsc && i < dsc->plane_count; i++ )
+        {
+            while( fmt->i_width % dsc->p[i].w.den )
+                fmt->i_width++;
+            while( fmt->i_height % dsc->p[i].h.den )
+                fmt->i_height++;
+        }
+    }
+
+    if( !fmt->i_visible_width || !fmt->i_visible_height )
+    {
+        if( p_dec->fmt_in.video.i_visible_width &&
+            p_dec->fmt_in.video.i_visible_height )
+        {
+            fmt->i_visible_width  = p_dec->fmt_in.video.i_visible_width;
+            fmt->i_visible_height = p_dec->fmt_in.video.i_visible_height;
+            fmt->i_x_offset       = p_dec->fmt_in.video.i_x_offset;
+            fmt->i_y_offset       = p_dec->fmt_in.video.i_y_offset;
+        }
+        else
+        {
+            fmt->i_visible_width  = fmt->i_width;
+            fmt->i_visible_height = fmt->i_height;
+            fmt->i_x_offset       = 0;
+            fmt->i_y_offset       = 0;
+        }
+    }
+
+    if( fmt->i_visible_height == 1088 &&
+        var_CreateGetBool( p_dec, "hdtv-fix" ) )
+    {
+        fmt->i_visible_height = 1080;
+        if( !(fmt->i_sar_num % 136))
+        {
+            fmt->i_sar_num *= 135;
+            fmt->i_sar_den *= 136;
+        }
+        msg_Warn( p_dec, "Fixing broken HDTV stream (display_height=1088)");
+    }
+
+    if( !fmt->i_sar_num || !fmt->i_sar_den )
+    {
+        fmt->i_sar_num = 1;
+        fmt->i_sar_den = 1;
+    }
+
+    vlc_ureduce( &fmt->i_sar_num, &fmt->i_sar_den,
+                    fmt->i_sar_num, fmt->i_sar_den, 50000 );
+
+    video_format_AdjustColorSpace( fmt );
+}
+
 static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
@@ -471,62 +531,8 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
             return -1;
         }
 
-        video_format_t fmt = p_dec->fmt_out.video;
-        fmt.i_chroma = p_dec->fmt_out.i_codec;
-
-        if( vlc_fourcc_IsYUV( fmt.i_chroma ) )
-        {
-            const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription( fmt.i_chroma );
-            for( unsigned int i = 0; dsc && i < dsc->plane_count; i++ )
-            {
-                while( fmt.i_width % dsc->p[i].w.den )
-                    fmt.i_width++;
-                while( fmt.i_height % dsc->p[i].h.den )
-                    fmt.i_height++;
-            }
-        }
-
-        if( !fmt.i_visible_width || !fmt.i_visible_height )
-        {
-            if( p_dec->fmt_in.video.i_visible_width &&
-                p_dec->fmt_in.video.i_visible_height )
-            {
-                fmt.i_visible_width  = p_dec->fmt_in.video.i_visible_width;
-                fmt.i_visible_height = p_dec->fmt_in.video.i_visible_height;
-                fmt.i_x_offset       = p_dec->fmt_in.video.i_x_offset;
-                fmt.i_y_offset       = p_dec->fmt_in.video.i_y_offset;
-            }
-            else
-            {
-                fmt.i_visible_width  = fmt.i_width;
-                fmt.i_visible_height = fmt.i_height;
-                fmt.i_x_offset       = 0;
-                fmt.i_y_offset       = 0;
-            }
-        }
-
-        if( fmt.i_visible_height == 1088 &&
-            var_CreateGetBool( p_dec, "hdtv-fix" ) )
-        {
-            fmt.i_visible_height = 1080;
-            if( !(fmt.i_sar_num % 136))
-            {
-                fmt.i_sar_num *= 135;
-                fmt.i_sar_den *= 136;
-            }
-            msg_Warn( p_dec, "Fixing broken HDTV stream (display_height=1088)");
-        }
-
-        if( !fmt.i_sar_num || !fmt.i_sar_den )
-        {
-            fmt.i_sar_num = 1;
-            fmt.i_sar_den = 1;
-        }
-
-        vlc_ureduce( &fmt.i_sar_num, &fmt.i_sar_den,
-                     fmt.i_sar_num, fmt.i_sar_den, 50000 );
-
-        video_format_AdjustColorSpace( &fmt );
+        video_format_t fmt;
+        FixDisplayFormat(p_dec, &fmt);
 
         vlc_mutex_lock( &p_owner->lock );
 
