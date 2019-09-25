@@ -279,6 +279,9 @@ Utils.NavigableFocusScope {
             onActionAtIndex: delegateModel.actionAtIndex(index)
 
             navigationParent: root
+            navigationCancel: function() {
+                history.previous(History.Go)
+            }
 
             header:  Utils.LabelSeparator {
                 text: providerModel.name
@@ -304,6 +307,9 @@ Utils.NavigableFocusScope {
             onActionAtIndex: delegateModel.actionAtIndex(index)
 
             navigationParent: root
+            navigationCancel: function() {
+                history.previous(History.Go)
+            }
 
             header:  Utils.LabelSeparator {
                 text: providerModel.name
