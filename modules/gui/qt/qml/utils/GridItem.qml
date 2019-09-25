@@ -56,11 +56,10 @@ Rectangle {
 
     property int index: 0
 
-    Rectangle {
+    Item {
         id: gridItem
         width: childrenRect.width
         height: childrenRect.height
-        color: "transparent"
         
         MouseArea {
             id: mouseArea
@@ -91,17 +90,11 @@ Rectangle {
                     id: cover_bg
                     width: picture.width
                     height: picture.height
-                    color: (cover.status !== Image.Ready) ? VLCStyle.colors.banner : "transparent"
 
-                    RectangularGlow {
-                        visible: picture.highlighted || mouseArea.containsMouse
-                        anchors.fill: cover
-                        spread: 0.1
-                        glowRadius: VLCStyle.margin_xxsmall
-                        color: VLCStyle.colors.getBgColor(
-                                   selected, mouseArea.containsMouse,
-                                   root.activeFocus)
-                    }
+
+                    color: VLCStyle.colors.getBgColor(
+                               selected, mouseArea.containsMouse,
+                               root.activeFocus)
 
                     RoundImage {
                         id: cover
