@@ -66,7 +66,7 @@ typedef struct
     const AVCodec  *p_codec;
 
     /* Video decoder specific part */
-    date_t  pts;
+    date_t  pts; /* Protected by lock */
 
     /* Closed captions for decoders */
     cc_data_t cc;
@@ -102,23 +102,15 @@ typedef struct
     bool palette_sent;
 
     /* VA API */
-    vlc_va_t *p_va;
+    vlc_va_t *p_va; /* Protected by lock */
     enum PixelFormat pix_fmt;
     int profile;
     int level;
 
-    vlc_sem_t sem_mt;
+    /* Protect dec->fmt_out, decoder_Update*() and decoder_NewPicture()
+     * functions */
+    vlc_mutex_t lock;
 } decoder_sys_t;
-
-static inline void wait_mt(decoder_sys_t *sys)
-{
-    vlc_sem_wait(&sys->sem_mt);
-}
-
-static inline void post_mt(decoder_sys_t *sys)
-{
-    vlc_sem_post(&sys->sem_mt);
-}
 
 /*****************************************************************************
  * Local prototypes
@@ -486,9 +478,7 @@ static int OpenVideoCodec( decoder_t *p_dec )
         ctx->active_thread_type = FF_THREAD_SLICE;
     }
 
-    post_mt( p_sys );
     ret = ffmpeg_OpenCodec( p_dec, ctx, codec );
-    wait_mt( p_sys );
     if( ret < 0 )
         return ret;
 
@@ -542,7 +532,7 @@ int InitVideoDec( vlc_object_t *obj )
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
     p_sys->p_va = NULL;
-    vlc_sem_init( &p_sys->sem_mt, 0 );
+    vlc_mutex_init( &p_sys->lock );
 
     /* ***** Fill p_context with init values ***** */
     p_context->codec_tag = ffmpeg_CodecTag( p_dec->fmt_in.i_original_fourcc ?
@@ -687,7 +677,7 @@ int InitVideoDec( vlc_object_t *obj )
     /* ***** Open the codec ***** */
     if( OpenVideoCodec( p_dec ) < 0 )
     {
-        vlc_sem_destroy( &p_sys->sem_mt );
+        vlc_mutex_destroy( &p_sys->lock );
         free( p_sys );
         avcodec_free_context( &p_context );
         return VLC_EGENERIC;
@@ -722,11 +712,9 @@ static void Flush( decoder_t *p_dec )
      * and workers threads */
     decoder_AbortPictures( p_dec, true );
 
-    post_mt( p_sys );
     /* do not flush buffers if codec hasn't been opened (theora/vorbis/VC1) */
     if( avcodec_is_open( p_context ) )
         avcodec_flush_buffers( p_context );
-    wait_mt( p_sys );
 
     /* Reset cancel state to false */
     decoder_AbortPictures( p_dec, false );
@@ -1071,8 +1059,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         int i_used = 0;
 
-        post_mt( p_sys );
-
         if( (p_block && p_block->i_buffer > 0) || b_drain )
         {
             AVPacket pkt;
@@ -1159,8 +1145,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
         bool not_received_frame = ret;
 
-        wait_mt( p_sys );
-
         if( p_block )
         {
             /* Consumed bytes */
@@ -1180,7 +1164,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( p_frame_info->b_eos )
             p_sys->b_first_frame = true;
 
-        post_mt( p_sys );
+        vlc_mutex_lock(&p_sys->lock);
 
         /* Compute the PTS */
 #ifdef FF_API_PKT_PTS
@@ -1208,7 +1192,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
            ( p_dec->b_frame_drop_allowed && (frame->flags & AV_FRAME_FLAG_CORRUPT) &&
              !p_sys->b_show_corrupted ) )
         {
-            wait_mt( p_sys );
+            vlc_mutex_unlock(&p_sys->lock);
             av_frame_free(&frame);
             continue;
         }
@@ -1226,7 +1210,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                       = malloc( sizeof(video_palette_t) );
             if( !p_palette )
             {
-                wait_mt( p_sys );
+                vlc_mutex_unlock(&p_sys->lock);
                 b_error = true;
                 av_frame_free(&frame);
                 break;
@@ -1239,7 +1223,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGBP;
             if( decoder_UpdateVideoFormat( p_dec ) )
             {
-                wait_mt( p_sys );
+                vlc_mutex_unlock(&p_sys->lock);
                 av_frame_free(&frame);
                 continue;
             }
@@ -1257,7 +1241,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             if( !p_pic )
             {
-                wait_mt( p_sys );
+                vlc_mutex_unlock(&p_sys->lock);
                 av_frame_free(&frame);
                 break;
             }
@@ -1265,7 +1249,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             /* Fill picture_t from AVFrame */
             if( lavc_CopyPicture( p_dec, p_pic, frame ) != VLC_SUCCESS )
             {
-                wait_mt( p_sys );
+                vlc_mutex_unlock(&p_sys->lock);
                 av_frame_free(&frame);
                 picture_Release( p_pic );
                 break;
@@ -1281,7 +1265,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_pic = picture_Clone( p_pic );
             if( unlikely(p_pic == NULL) )
             {
-                wait_mt( p_sys );
+                vlc_mutex_unlock(&p_sys->lock);
                 av_frame_free(&frame);
                 break;
             }
@@ -1320,12 +1304,12 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if(p_frame_info->b_eos)
                 p_pic->b_still = true;
             p_sys->b_first_frame = false;
-            wait_mt( p_sys );
+            vlc_mutex_unlock(&p_sys->lock);
             decoder_QueueVideo( p_dec, p_pic );
         }
         else
         {
-            wait_mt( p_sys );
+            vlc_mutex_unlock(&p_sys->lock);
             picture_Release( p_pic );
         }
     } while( true );
@@ -1380,13 +1364,9 @@ void EndVideoDec( vlc_object_t *obj )
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *ctx = p_sys->p_context;
 
-    post_mt( p_sys );
-
     /* do not flush buffers if codec hasn't been opened (theora/vorbis/VC1) */
     if( avcodec_is_open( ctx ) )
         avcodec_flush_buffers( ctx );
-
-    wait_mt( p_sys );
 
     cc_Flush( &p_sys->cc );
 
@@ -1395,7 +1375,7 @@ void EndVideoDec( vlc_object_t *obj )
     if( p_sys->p_va )
         vlc_va_Delete( p_sys->p_va );
 
-    vlc_sem_destroy( &p_sys->sem_mt );
+    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 
@@ -1594,12 +1574,12 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     }
     frame->opaque = NULL;
 
-    wait_mt(sys);
+    vlc_mutex_lock(&sys->lock);
     if (sys->p_va == NULL)
     {
         if (!sys->b_direct_rendering)
         {
-            post_mt(sys);
+            vlc_mutex_unlock(&sys->lock);
             return avcodec_default_get_buffer2(ctx, frame, flags);
         }
 
@@ -1608,7 +1588,7 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
          * to protect p_dec->fmt_out. */
         if (lavc_UpdateVideoFormat(dec, ctx, ctx->pix_fmt, ctx->pix_fmt))
         {
-            post_mt(sys);
+            vlc_mutex_unlock(&sys->lock);
             return -1;
         }
     }
@@ -1616,14 +1596,14 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     if (sys->p_va != NULL)
     {
         int ret = lavc_va_GetFrame(ctx, frame);
-        post_mt(sys);
+        vlc_mutex_unlock(&sys->lock);
         return ret;
     }
 
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so we need to check for direct rendering again. */
     int ret = lavc_dr_GetFrame(ctx, frame);
-    post_mt(sys);
+    vlc_mutex_unlock(&sys->lock);
     if (ret)
         ret = avcodec_default_get_buffer2(ctx, frame, flags);
     return ret;
@@ -1711,7 +1691,7 @@ no_reuse:
     }
 #endif
 
-    wait_mt(p_sys);
+    vlc_mutex_lock(&p_sys->lock);
 
     static const enum PixelFormat hwfmts[] =
     {
@@ -1746,7 +1726,7 @@ no_reuse:
         msg_Dbg(p_dec, "trying format %s", dsc ? dsc->name : "unknown");
         if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt))
             continue; /* Unsupported brand of hardware acceleration */
-        post_mt(p_sys);
+        vlc_mutex_unlock(&p_sys->lock);
 
         picture_t *test_pic = decoder_NewPicture(p_dec);
         assert(!test_pic || test_pic->format.i_chroma == p_dec->fmt_out.video.i_chroma);
@@ -1755,18 +1735,18 @@ no_reuse:
                                   test_pic ? test_pic->p_sys : NULL);
         if (test_pic)
             picture_Release(test_pic);
-        wait_mt(p_sys);
+        vlc_mutex_lock(&p_sys->lock);
         if (va == NULL)
             continue; /* Unsupported codec profile or such */
 
-        post_mt(p_sys);
         p_sys->p_va = va;
         p_sys->pix_fmt = hwfmt;
         p_context->draw_horiz_band = NULL;
+        vlc_mutex_unlock(&p_sys->lock);
         return hwfmt;
     }
 
-    post_mt(p_sys);
+    vlc_mutex_unlock(&p_sys->lock);
     /* Fallback to default behaviour */
     p_sys->pix_fmt = swfmt;
     return swfmt;
