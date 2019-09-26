@@ -458,18 +458,20 @@ static void FixDisplayFormat(decoder_t *p_dec, video_format_t *fmt)
     video_format_AdjustColorSpace( fmt );
 }
 
+static int CreateVoutIfNeeded(struct decoder_owner *, vout_thread_t **, enum vlc_vout_order *, vlc_decoder_device **);
+
+
 static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
-    vlc_mutex_lock( &p_owner->lock );
+    enum vlc_vout_order vout_order;
+    vout_thread_t *p_vout = NULL;
+    int created_vout = CreateVoutIfNeeded(p_owner, &p_vout, &vout_order, NULL);
+    if (created_vout == -1)
+        return -1; // error
 
-    vout_thread_t *p_vout = p_owner->p_vout;
-    enum vlc_vout_order vout_order = p_owner->vout_order;
-    vlc_mutex_unlock( &p_owner->lock );
-
-    if (!p_vout)
-        return -1;
+    // configure the new vout
 
     video_format_t fmt;
     FixDisplayFormat( p_dec, &fmt );
@@ -518,7 +520,9 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
     return res;
 }
 
-static int CreateVoutIfNeeded(struct decoder_owner *p_owner, vlc_decoder_device **pp_dec_dev)
+static int CreateVoutIfNeeded(struct decoder_owner *p_owner,
+                              vout_thread_t **pp_vout, enum vlc_vout_order *order,
+                              vlc_decoder_device **pp_dec_dev)
 {
     decoder_t *p_dec = &p_owner->dec;
     bool need_vout = false;
@@ -565,7 +569,16 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner, vlc_decoder_device 
     }
 
     if( !need_vout )
+    {
+        if (pp_vout)
+        {
+            vlc_mutex_lock( &p_owner->lock );
+            *pp_vout = p_owner->p_vout;
+            *order = p_owner->vout_order;
+            vlc_mutex_unlock( &p_owner->lock );
+        }
         return 0; // vout unchanged
+    }
 
     if( !p_dec->fmt_out.video.i_width ||
         !p_dec->fmt_out.video.i_height ||
@@ -586,17 +599,19 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner, vlc_decoder_device 
     vlc_mutex_unlock( &p_owner->lock );
 
     if ( pp_dec_dev ) *pp_dec_dev = NULL;
-    enum vlc_vout_order order;
     vout_configuration_t cfg = {
         .vout = p_vout, .clock = p_owner->p_clock, .fmt = &fmt,
         .mouse_event = MouseEvent, .mouse_opaque = p_dec
     };
     p_vout = input_resource_GetVoutDecoderDevice( p_owner->p_resource,
-                                    &cfg, &order, pp_dec_dev );
+                                    &cfg, order, pp_dec_dev );
+
+    if (pp_vout)
+        *pp_vout = p_vout;
 
     vlc_mutex_lock( &p_owner->lock );
     p_owner->p_vout = p_vout;
-    p_owner->vout_order = order;
+    p_owner->vout_order = *order;
     if ( pp_dec_dev )
     {
         if ( p_owner->p_dec_dev != NULL )
@@ -630,8 +645,9 @@ static vlc_decoder_device * ModuleThread_GetDecoderDevice( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
+    enum vlc_vout_order vout_order;
     vlc_decoder_device *dec_device = NULL;
-    int created_vout = CreateVoutIfNeeded(p_owner, &dec_device);
+    int created_vout = CreateVoutIfNeeded(p_owner, NULL, &vout_order, &dec_device);
     if (created_vout == -1)
     {
         if ( dec_device )
