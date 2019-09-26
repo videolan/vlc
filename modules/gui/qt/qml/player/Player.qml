@@ -120,7 +120,11 @@ Utils.NavigableFocusScope {
         property point mousePosition: Qt.point(0,0)
 
         Keys.onPressed: {
-            if (event.key === Qt.Key_Menu) {
+            if (event.key === Qt.Key_Menu
+                    || event.key === Qt.Key_Back
+                    || event.key === Qt.Key_Backspace
+                    || event.matches(StandardKey.Back)
+                    || event.matches(StandardKey.Cancel)) {
                 toolbarAutoHide.toggleForceVisible()
             }
         }
@@ -170,7 +174,10 @@ Utils.NavigableFocusScope {
             Keys.onPressed: {
                 if (event.accepted)
                     return
-                if (event.key === Qt.Key_Menu) {
+                if (event.key === Qt.Key_Menu
+                        || event.key === Qt.Key_Backspace
+                        || event.matches(StandardKey.Back)
+                        || event.matches(StandardKey.Cancel)) {
                     toolbarAutoHide.toggleForceVisible()
                 } else {
                     rootWindow.sendHotkey(event.key, event.modifiers);
@@ -267,7 +274,10 @@ Utils.NavigableFocusScope {
                     Keys.onPressed: {
                         if (event.accepted)
                             return
-                        if (event.key === Qt.Key_Menu)
+                        if (event.key === Qt.Key_Menu
+                                || event.key === Qt.Key_Backspace
+                                || event.matches(StandardKey.Back)
+                                || event.matches(StandardKey.Cancel))
                             toolbarAutoHide.toggleForceVisible()
                         else
                             rootWindow.sendHotkey(event.key, event.modifiers);
