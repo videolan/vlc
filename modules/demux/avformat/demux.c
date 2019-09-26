@@ -375,13 +375,16 @@ int avformat_OpenDemux( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    p_sys->ic->pb->seekable = b_can_seek ? AVIO_SEEKABLE_NORMAL : 0;
-    error = avformat_open_input(&p_sys->ic, psz_url, p_sys->fmt, NULL);
+    /* get all options, open_input will consume its own options from the dict */
+    AVDictionary *options = BuildAVOptions( p_demux );
 
+    p_sys->ic->pb->seekable = b_can_seek ? AVIO_SEEKABLE_NORMAL : 0;
+    error = avformat_open_input( &p_sys->ic, psz_url, p_sys->fmt, &options );
     if( error < 0 )
     {
         msg_Err( p_demux, "Could not open %s: %s", psz_url,
                  vlc_strerror_c(AVUNERROR(error)) );
+        av_dict_free( &options );
         av_free( pb->buffer );
         av_free( pb );
         p_sys->ic = NULL;
@@ -389,7 +392,8 @@ int avformat_OpenDemux( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    FindStreamInfo( p_demux, BuildAVOptions( p_demux ) );
+    /* pass remaining options for as streams options */
+    FindStreamInfo( p_demux, options );
 
     unsigned nb_streams = p_sys->ic->nb_streams; /* it may have changed */
     if( !nb_streams )
