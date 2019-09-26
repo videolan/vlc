@@ -30,8 +30,6 @@ import "qrc:///menus/" as Menus
 Utils.NavigableFocusScope {
     id: rootPlayer
 
-    property alias playlistWidget: playlistpopup
-
     //center image
     Rectangle {
         visible: !rootWindow.hasEmbededVideo
@@ -159,8 +157,15 @@ Utils.NavigableFocusScope {
                     toolbarAutoHide.restart()
             }
 
+            onTogglePlaylistVisiblity:  {
+                if (rootWindow.playlistDocked)
+                    playlistpopup.showPlaylist = !playlistpopup.showPlaylist
+                else
+                    rootWindow.playlistVisible = !rootWindow.playlistVisible
+            }
+
             navigationParent: rootPlayer
-            navigationDown: function () { controlBarView.forceActiveFocus() }
+            navigationDownItem: playlistpopup.showPlaylist ? playlistpopup : controlBarView
 
             Keys.onPressed: {
                 if (event.accepted)
@@ -181,11 +186,11 @@ Utils.NavigableFocusScope {
             right: parent.right
             bottom: controlBarView.top
         }
-
+        property bool showPlaylist: false
         property var previousFocus: undefined
         focus: false
         edge: Utils.DrawerExt.Edges.Right
-        state: (rootWindow.playlistDocked && rootWindow.playlistVisible) ? "visible" : "hidden"
+        state: showPlaylist && rootWindow.playlistDocked ? "visible" : "hidden"
         component: Rectangle {
             color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
             width: rootPlayer.width/4
@@ -195,27 +200,23 @@ Utils.NavigableFocusScope {
                 id: playlistView
                 focus: true
                 anchors.fill: parent
-                onActionLeft: playlistpopup.closeAndFocus(playlistpopup.previousFocus)
-                onActionCancel: playlistpopup.closeAndFocus(playlistpopup.previousFocus)
+
+                navigationParent: rootPlayer
+                navigationUpItem: topcontrolView
+                navigationDownItem: controlBarView
+                navigationLeft: function() {
+                    playlistpopup.showPlaylist = false
+                    controlBarView.forceActiveFocus()
+                }
+                navigationCancel: function() {
+                    playlistpopup.showPlaylist = false
+                    controlBarView.forceActiveFocus()
+                }
             }
         }
         onStateChanged: {
             if (state === "hidden")
                 toolbarAutoHide.restart()
-        }
-
-        function gainFocus(previous) {
-            console.log("gain Focus")
-            playlistpopup.previousFocus = previous
-            playlistpopup.forceActiveFocus()
-        }
-
-
-        function closeAndFocus(item){
-            rootWindow.playlistVisible = false
-            if (!item)
-                return
-            item.forceActiveFocus()
         }
     }
 
@@ -260,7 +261,7 @@ Utils.NavigableFocusScope {
                     }
 
                     navigationParent: rootPlayer
-                    navigationUp: function() { topcontrolView.forceActiveFocus() }
+                    navigationUpItem: playlistpopup.showPlaylist ? playlistpopup : topcontrolView
 
                     //unhandled keys are forwarded as hotkeys
                     Keys.onPressed: {

@@ -34,6 +34,8 @@ Utils.NavigableFocusScope{
                               || topcontrollerMouseArea.containsMouse || lockAutoHide
     property bool lockAutoHide: false
 
+    signal togglePlaylistVisiblity();
+
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)
 
@@ -79,12 +81,7 @@ Utils.NavigableFocusScope{
                     size: VLCStyle.icon_normal
                     text: VLCIcons.playlist
                     color: VLCStyle.colors.playerFg
-                    onClicked: {
-                        rootWindow.playlistVisible = !rootWindow.playlistVisible
-                        if (rootWindow.playlistVisible && rootWindow.playlistDocked) {
-                            playlistWidget.gainFocus(playlistBtn)
-                        }
-                    }
+                    onClicked: togglePlaylistVisiblity()
                     property bool acceptFocus: true
                 }
             }
