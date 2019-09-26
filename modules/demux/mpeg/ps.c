@@ -457,6 +457,7 @@ static int Demux( demux_t *p_demux )
     switch( i_stream_id )
     {
     case PS_STREAM_ID_END_STREAM:
+    case PS_STREAM_ID_PADDING:
         block_Release( p_pkt );
         break;
 
