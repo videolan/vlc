@@ -379,6 +379,10 @@ libudp_plugin_la_SOURCES = access/udp.c
 libudp_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libudp_plugin.la
 
+libamt_plugin_la_SOURCES = access/amt.c
+libamt_plugin_la_LIBADD = $(SOCKET_LIBS)
+access_LTLIBRARIES += libamt_plugin.la
+
 libunc_plugin_la_SOURCES = access/unc.c access/smb_common.h
 libunc_plugin_la_LIBADD = -lmpr -lnetapi32
 if HAVE_WIN32
