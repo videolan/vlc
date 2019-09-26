@@ -69,7 +69,6 @@ struct vlc_clock_t
 
     vlc_clock_main_t *owner;
     vlc_tick_t delay;
-    vlc_tick_t dejitter;
 
     const struct vlc_clock_cbs *cbs;
     void *cbs_data;
