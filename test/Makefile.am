@@ -37,6 +37,7 @@ check_PROGRAMS = \
 	test_modules_packetizer_hxxx \
 	test_modules_packetizer_h264 \
 	test_modules_packetizer_hevc \
+	test_modules_packetizer_mpegvideo \
 	test_modules_keystore \
 	test_modules_demux_dashuri
 if ENABLE_SOUT
@@ -146,6 +147,9 @@ test_modules_packetizer_h264_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_packetizer_hevc_SOURCES = modules/packetizer/hevc.c \
 				modules/packetizer/packetizer.h
 test_modules_packetizer_hevc_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_modules_packetizer_mpegvideo_SOURCES = modules/packetizer/mpegvideo.c \
+				modules/packetizer/packetizer.h
+test_modules_packetizer_mpegvideo_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_keystore_SOURCES = modules/keystore/test.c
 test_modules_keystore_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_tls_SOURCES = modules/misc/tls.c
