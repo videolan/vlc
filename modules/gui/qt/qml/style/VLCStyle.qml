@@ -132,6 +132,15 @@ Item {
     property int button_width_normal: 96 * scale
     property int button_width_large: 128 * scale
 
+
+    //GridItem
+    property int gridItem_default_height: VLCStyle.cover_small + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small + VLCStyle.margin_xxxsmall * 2
+    property int gridItem_default_width: VLCStyle.cover_small + VLCStyle.margin_small * 2
+
+    property int gridItem_video_height: VLCStyle.video_normal_height + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small * 2  + VLCStyle.margin_xxxsmall * 3
+    property int gridItem_video_width: VLCStyle.video_normal_width + VLCStyle.margin_small * 2
+
+
     //timings
     property int delayToolTipAppear: 500;
     property int timingPlaylistClose: 1000;

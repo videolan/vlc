@@ -175,6 +175,8 @@ Utils.NavigableFocusScope {
                     width: parent.width
                     height: implicitHeight
 
+                    spacing: VLCStyle.margin_normal
+
                     Utils.LabelSeparator {
                         text: qsTr("Devices")
                         width: flickable.width
@@ -188,7 +190,7 @@ Utils.NavigableFocusScope {
                         visible: machineDM.items.count !== 0
 
                         width: flickable.width
-                        height: 150 //FIXME
+                        height: VLCStyle.gridItem_default_height
                         orientation: ListView.Horizontal
 
                         model: machineDM.parts.grid
@@ -220,7 +222,7 @@ Utils.NavigableFocusScope {
                         focus: false
 
                         width: flickable.width
-                        height: 150 //FIXME
+                        height: VLCStyle.gridItem_default_height
                         orientation: ListView.Horizontal
 
                         model: lanDM.parts.grid
