@@ -56,6 +56,8 @@ Rectangle {
 
     property int index: 0
 
+    Keys.onMenuPressed: root.contextMenuButtonClicked(cover_bg)
+
     Item {
         id: gridItem
         width: childrenRect.width

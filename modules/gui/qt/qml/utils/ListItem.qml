@@ -42,6 +42,8 @@ NavigableFocusScope {
     property alias color: linerect.color
     property bool showContextButton: false
 
+    Keys.onMenuPressed: root.contextMenuButtonClicked(cover_bg)
+
     Component {
         id: actionAdd
         IconToolButton {
