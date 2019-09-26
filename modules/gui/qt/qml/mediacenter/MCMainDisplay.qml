@@ -39,6 +39,7 @@ Utils.NavigableFocusScope {
         MCMusicDisplay {
             navigationParent: medialibId
             navigationUpItem: sourcesBanner
+            navigationRightItem: playlist
             navigationDownItem: miniPlayer.expanded ? miniPlayer : medialibId
             navigationCancelItem: stackViewZone
         }
@@ -49,6 +50,7 @@ Utils.NavigableFocusScope {
         MCVideoDisplay {
             navigationParent: medialibId
             navigationUpItem: sourcesBanner
+            navigationRightItem: playlist
             navigationDownItem: miniPlayer.expanded ? miniPlayer : medialibId
             navigationCancelItem: stackViewZone
         }
@@ -59,6 +61,7 @@ Utils.NavigableFocusScope {
         MCNetworkDisplay {
             navigationParent: medialibId
             navigationUpItem: sourcesBanner
+            navigationRightItem: playlist
             navigationDownItem: miniPlayer.expanded ? miniPlayer : medialibId
             navigationCancelItem: stackViewZone
         }
@@ -104,12 +107,6 @@ Utils.NavigableFocusScope {
             focus: true
             id: medialibId
             anchors.fill: parent
-            onActionRight: {
-                if (rootWindow.playlistDocked) {
-                    rootWindow.playlistVisible = true
-                    playlist.gainFocus(medialibId)
-                }
-            }
 
             ColumnLayout {
                 id: column
@@ -129,8 +126,6 @@ Utils.NavigableFocusScope {
 
                     focus: true
                     model: root.tabModel
-
-                    playlistWidget: playlist
 
                     onItemClicked: {
                         sourcesBanner.subTabModel = undefined
@@ -196,7 +191,12 @@ Utils.NavigableFocusScope {
 
                     Utils.StackViewExt {
                         id: stackView
-                        anchors.fill: parent
+                        anchors {
+                            top: parent.top
+                            left: parent.left
+                            bottom: parent.bottom
+                            right: playlist.visible ? playlist.left : parent.right
+                        }
 
                         Component.onCompleted: {
                             var found = stackView.loadView(root.pageModel, root.view, root.viewProperties)
@@ -214,54 +214,34 @@ Utils.NavigableFocusScope {
                                     return e.name === stackView.currentItem.view
                                 })
                         }
+                    }
 
-                        Utils.DrawerExt {
-                            z: 1
-                            id: playlist
+
+                    PL.PlaylistListView {
+                        id: playlist
+                        focus: true
+                        width: root.width/4
+                        visible: rootWindow.playlistDocked && rootWindow.playlistVisible
+                        anchors {
+                            top: parent.top
+                            right: parent.right
+                            bottom: parent.bottom
+                        }
+
+                        navigationParent: medialibId
+                        navigationLeftItem: stackView
+                        navigationUpItem: sourcesBanner
+                        navigationDownItem: miniPlayer.expanded ? miniPlayer : undefined
+                        navigationCancelItem: stackViewZone
+
+                        Rectangle {
                             anchors {
                                 top: parent.top
-                                right: parent.right
+                                left: parent.left
                                 bottom: parent.bottom
                             }
-                            focus: false
-                            edge: Utils.DrawerExt.Edges.Right
-
-                            property var previousFocus: undefined
-
-                            state: (rootWindow.playlistDocked && rootWindow.playlistVisible) ? "visible" : "hidden"
-
-                            function gainFocus(previous) {
-                                playlist.previousFocus = previous
-                                playlist.forceActiveFocus()
-                            }
-                            component: Rectangle {
-                                color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.9)
-                                width: root.width/3
-                                height: playlist.height
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    propagateComposedEvents: false
-                                    hoverEnabled: true
-                                    preventStealing: true
-                                    onWheel: event.accepted = true
-
-                                    PL.PlaylistListView {
-                                        id: playlistView
-                                        focus: true
-                                        anchors.fill: parent
-                                        onActionLeft: playlist.closeAndFocus(stackView.currentItem)
-                                        onActionCancel: playlist.closeAndFocus(playlist.previousFocus)
-                                        onActionUp: playlist.closeAndFocus(playlist.previousFocus)
-                                    }
-                                }
-                            }
-                            function closeAndFocus(item){
-                                rootWindow.playlistVisible = false
-                                if (!item)
-                                    return
-                                item.forceActiveFocus()
-                            }
+                            width: VLCStyle.margin_xxsmall
+                            color: VLCStyle.colors.banner
                         }
                     }
                 }

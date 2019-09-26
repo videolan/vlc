@@ -47,8 +47,6 @@ Utils.NavigableFocusScope {
 
     property var extraLocalActions: undefined
 
-    property var playlistWidget: undefined
-
     // Triggered when the toogleView button is selected
     function toggleView () {
         medialib.gridView = !medialib.gridView
@@ -283,12 +281,7 @@ Utils.NavigableFocusScope {
                             size: VLCStyle.icon_normal
                             text: VLCIcons.playlist
 
-                            onClicked: {
-                                rootWindow.playlistVisible = !rootWindow.playlistVisible
-                                if (playlistWidget && rootWindow.playlistVisible && rootWindow.playlistDocked)
-                                    playlistWidget.gainFocus(playlist_btn)
-
-                            }
+                            onClicked:  rootWindow.playlistVisible = !rootWindow.playlistVisible
                         }
                     }
 
