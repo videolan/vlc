@@ -166,9 +166,9 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
 
                 /* When flusing and we don't find a startcode, suppose that
                  * the data extend up to the end */
-                block_ChainProperties( p_pack->bytestream.p_chain,
-                                       NULL, &p_pack->i_offset, NULL );
-                p_pack->i_offset -= p_pack->bytestream.i_block_offset;
+                p_pack->i_offset = block_BytestreamRemaining(&p_pack->bytestream);
+                if( p_pack->i_offset == 0 )
+                    return NULL;
 
                 if( p_pack->i_offset <= (size_t)p_pack->i_startcode &&
                     (p_pack->bytestream.p_block->i_flags & BLOCK_FLAG_AU_END) == 0 )
