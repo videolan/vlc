@@ -136,8 +136,6 @@ typedef struct
     date_t  prev_iframe_dts;
 
     /* Sequence properties */
-    unsigned    i_frame_rate;
-    unsigned    i_frame_rate_base;
     bool  b_seq_progressive;
     bool  b_low_delay;
     int         i_aspect_ratio_info;
@@ -237,9 +235,6 @@ static int Open( vlc_object_t *p_this )
     }
     date_Init( &p_sys->dts, 2 * num, den ); /* fields / den */
     date_Init( &p_sys->prev_iframe_dts, 2 * num, den );
-
-    p_sys->i_frame_rate = num;
-    p_sys->i_frame_rate_base = den;
 
     p_sys->b_seq_progressive = true;
     p_sys->b_low_delay = true;
@@ -710,8 +705,8 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     if( startcode == GROUP_STARTCODE )
     {
         /* Group start code */
-        if( p_sys->p_seq &&
-            p_sys->i_seq_old > p_sys->i_frame_rate/p_sys->i_frame_rate_base )
+        unsigned i_fps = p_sys->dts.i_divider_num / (p_sys->dts.i_divider_den << 1);
+        if( p_sys->p_seq && p_sys->i_seq_old > i_fps )
         {
             /* Useful for mpeg1: repeat sequence header every second */
             block_ChainLastAppend( &p_sys->pp_last, block_Duplicate( p_sys->p_seq ) );
@@ -759,24 +754,21 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         /* TODO: MPEG1 aspect ratio */
 
         unsigned num, den;
-        num = code_to_frame_rate[p_frag->p_buffer[7]&0x0f][0]; /* frames / den */
+        num = code_to_frame_rate[p_frag->p_buffer[7]&0x0f][0] << 1; /* frames / den */
         den = code_to_frame_rate[p_frag->p_buffer[7]&0x0f][1];
 
-        if( num && den && num <= UINT_MAX/2 &&
-           ( p_sys->i_frame_rate != num || p_sys->i_frame_rate_base != den ) )
+        if( num && den &&
+           ( p_sys->dts.i_divider_num != num || p_sys->dts.i_divider_den != den ) )
         {
             /* Only of not specified by container */
             if ( !p_dec->fmt_in.video.i_frame_rate ||
                  !p_dec->fmt_in.video.i_frame_rate_base )
             {
-                date_Change( &p_sys->dts, 2 * num, den ); /* fields / den */
-                date_Change( &p_sys->prev_iframe_dts, 2 * num, den );
-                p_dec->fmt_out.video.i_frame_rate = num;
+                date_Change( &p_sys->dts, num, den ); /* fields / den */
+                date_Change( &p_sys->prev_iframe_dts, num, den );
+                p_dec->fmt_out.video.i_frame_rate = num >> 1;
                 p_dec->fmt_out.video.i_frame_rate_base = den;
             }
-            /* store internal values */
-            p_sys->i_frame_rate = num;
-            p_sys->i_frame_rate_base = den;
         }
 
         p_sys->b_seq_progressive = true;
