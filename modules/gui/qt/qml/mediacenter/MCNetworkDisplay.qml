@@ -29,294 +29,26 @@ import "qrc:///style/"
 Utils.NavigableFocusScope {
     id: root
 
-    property var extraLocalActions: ObjectModel {
-        Utils.TabButtonExt {
-            text:  providerModel.indexed ?  qsTr("Unindex Folder") : qsTr("Index Folder")
-            visible: !view.isOnProviderList && providerModel.canBeIndexed
-            onClicked: providerModel.indexed = !providerModel.indexed
-        }
+    property var extraLocalActions: undefined
+
+    property var tree: undefined
+    onTreeChanged:  loadView()
+    Component.onCompleted: loadView()
+
+    //reset view
+    function loadDefaultView() {
+        root.tree = undefined
     }
 
-    property alias tree: providerModel.tree
-    Utils.MenuExt {
-        id: contextMenu
-        property var delegateModel: undefined
-        property var model: ({})
-        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
-        focus:true
-
-        Instantiator {
-            id: instanciator
-            property var modelActions: {
-                "play": function() {
-                    if (delegateModel) {
-                        delegateModel.playSelection()
-                    }
-                    contextMenu.close()
-                },
-                "enqueue": function() {
-                    if (delegateModel)
-                        delegateModel.enqueueSelection()
-                    contextMenu.close()
-                },
-                "index": function(index) {
-                    contextMenu.model.indexed = contextMenu.model.indexed
-                    contextMenu.close()
-                }
-            }
-
-            model: [{
-                    active: true,
-                    text: qsTr("Play"),
-                    action: "play"
-                }, {
-                    active: true,
-                    text: qsTr("Enqueue"),
-                    action: "enqueue"
-                }, {
-                    active:  contextMenu.model && !!contextMenu.model.can_index,
-                    text: contextMenu.model && contextMenu.model.indexed ? qsTr("Add to Media Library") : qsTr("Remove to Media Library"),
-                    action: "index"
-                }
-            ]
-
-            onObjectAdded: model[index].active && contextMenu.insertItem( index, object )
-            onObjectRemoved: model[index].active && contextMenu.removeItem( object )
-            delegate: Utils.MenuItemExt {
-                focus: true
-                text: modelData.text
-                onTriggered: {
-                    if (modelData.action && instanciator.modelActions[modelData.action]) {
-                        instanciator.modelActions[modelData.action]()
-                    }
-                }
-            }
-        }
-
-        onClosed: contextMenu.parent.forceActiveFocus()
-    }
-
-    MLNetworkModel {
-        id: providerModel
-        ctx: mainctx
-        tree: undefined
-    }
-
-    MLNetworkModel {
-        id: machineModel
-        ctx: mainctx
-        tree: undefined
-        sd_source: "SD_CAT_DEVICES"
-    }
-    MLNetworkModel {
-        id: lanModel
-        ctx: mainctx
-        tree: undefined
-        sd_source: "SD_CAT_LAN"
-    }
-
-    MCNetworksSectionSelectableDM{
-        id: delegateModel
-        model: providerModel
-        viewIndexPropertyName: "currentIndexProvider"
-    }
-
-    MCNetworksSectionSelectableDM{
-        id: machineDM
-        model: machineModel
-        viewIndexPropertyName: "currentIndexMachine"
-    }
-
-    MCNetworksSectionSelectableDM{
-        id: lanDM
-        model: lanModel
-        viewIndexPropertyName: "currentIndexLan"
-    }
-
-    /*
-     *define the intial position/selection
-     * This is done on activeFocus rather than Component.onCompleted because delegateModel.
-     * selectedGroup update itself after this event
-     */
-    onActiveFocusChanged: {
-        if (delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
-            var initialIndex = 0
-            if (view.currentIndexProvider !== -1)
-                initialIndex = view.currentIndexProvider
-            delegateModel.items.get(initialIndex).inSelected = true
-            view.currentIndexProvider = initialIndex
-        }
-    }
-
-
-    Component{
-        id: topComponent
-
-        Utils.NavigableFocusScope {
-            id: topFocusScope
-            height: view.height
-            width: view.width
-
-            Label {
-                anchors.centerIn: parent
-                visible: (machineDM.items.count === 0 && lanDM.items.count === 0 )
-                font.pixelSize: VLCStyle.fontHeight_xxlarge
-                color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-                text: qsTr("No network shares found")
-            }
-
-            ScrollView {
-                id: flickable
-                anchors.fill: parent
-                ScrollBar.vertical: ScrollBar{}
-                focus: true
-
-                Column {
-                    width: parent.width
-                    height: implicitHeight
-
-                    spacing: VLCStyle.margin_normal
-
-                    Utils.LabelSeparator {
-                        text: qsTr("Devices")
-                        width: flickable.width
-                        visible: machineDM.items.count !== 0
-                    }
-
-                    Utils.KeyNavigableListView {
-                        id: deviceSection
-
-                        focus: false
-                        visible: machineDM.items.count !== 0
-
-                        width: flickable.width
-                        height: VLCStyle.gridItem_default_height
-                        orientation: ListView.Horizontal
-
-                        model: machineDM.parts.grid
-                        modelCount: machineDM.items.count
-
-                        onSelectAll: machineDM.selectAll()
-                        onSelectionUpdated:  machineDM.updateSelection( keyModifiers, oldIndex, newIndex )
-                        onActionAtIndex: machineDM.actionAtIndex(index)
-
-                        navigationParent: topFocusScope
-                        navigationDown: function (index) {
-                            if (lanSection.visible)
-                                lanSection.focus = true;
-                            else
-                                topFocusScope.navigationDown(index);
-                        }
-                    }
-
-                    Utils.LabelSeparator {
-                        text: qsTr("LAN")
-                        width: flickable.width
-                        visible: lanDM.items.count !== 0
-                    }
-
-                    Utils.KeyNavigableListView {
-                        id: lanSection
-
-                        visible: lanDM.items.count !== 0
-                        focus: false
-
-                        width: flickable.width
-                        height: VLCStyle.gridItem_default_height
-                        orientation: ListView.Horizontal
-
-                        model: lanDM.parts.grid
-                        modelCount: lanDM.items.count
-
-                        onSelectAll: lanDM.selectAll()
-                        onSelectionUpdated:  lanDM.updateSelection( keyModifiers, oldIndex, newIndex )
-                        onActionAtIndex: lanDM.actionAtIndex(index)
-
-
-                        navigationParent: topFocusScope
-                        navigationUp: function (index) {
-                            if (deviceSection.visible)
-                                deviceSection.focus = true;
-                            else
-                                topFocusScope.navigationUp(index);
-                        }
-                    }
-                }
-
-            }
-
-            navigationParent: root
-
-            onActiveFocusChanged: {
-                if (!deviceSection.focus && !lanSection.focus) {
-                    if (deviceSection.visible)
-                        deviceSection.focus = true
-                    else if (lanSection.visible)
-                        lanSection.focus = true
-                }
-            }
-
-        }
-    }
-
-    Component{
-        id: gridComponent
-
-        Utils.KeyNavigableGridView {
-            id: gridView_id
-            height: view.height
-            width: view.width
-
-            model: delegateModel.parts.grid
-            modelCount: delegateModel.items.count
-            currentIndex: view.currentIndexProvider
-
-            focus: true
-
-            cellWidth: VLCStyle.network_normal + VLCStyle.margin_large
-            cellHeight: VLCStyle.network_normal + VLCStyle.margin_xlarge
-
-            onSelectAll: delegateModel.selectAll()
-            onSelectionUpdated:  delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: delegateModel.actionAtIndex(index)
-
-            navigationParent: root
-            navigationCancel: function() {
-                history.previous(History.Go)
-            }
-
-            header:  Utils.LabelSeparator {
-                text: providerModel.name
-                width: view.width
-            }
-        }
-    }
-
-    Component{
-        id: listComponent
-        Utils.KeyNavigableListView {
-            height: view.height
-            width: view.width
-            model: delegateModel.parts.list
-            modelCount: delegateModel.items.count
-            currentIndex: view.currentIndexProvider
-
-            focus: true
-            spacing: VLCStyle.margin_xxxsmall
-
-            onSelectAll: delegateModel.selectAll()
-            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: delegateModel.actionAtIndex(index)
-
-            navigationParent: root
-            navigationCancel: function() {
-                history.previous(History.Go)
-            }
-
-            header:  Utils.LabelSeparator {
-                text: providerModel.name
-                width: view.width
-            }
+    function loadView() {
+        var page = "";
+        if (root.tree === undefined)
+            page ="qrc:///mediacenter/MCNetworkHomeDisplay.qml"
+        else
+            page = "qrc:///mediacenter/MCNetworkBrowseDisplay.qml"
+        view.replace(page)
+        if (root.tree) {
+            view.currentItem.tree = root.tree
         }
     }
 
@@ -325,23 +57,10 @@ Utils.NavigableFocusScope {
         anchors.fill:parent
         clip: true
         focus: true
-        initialItem: isOnProviderList ? topComponent : medialib.gridView ? gridComponent : listComponent
-        property bool isOnProviderList: providerModel.is_on_provider_list
-        property int currentIndexProvider: -1
 
-        property int currentIndexMachine: -1
-        property int currentIndexLan: -1
-        Connections {
-            target: medialib
-            onGridViewChanged: {
-                if (view.isOnProviderList)
-                    return
-                if (medialib.gridView)
-                    view.replace(gridComponent)
-                else
-                    view.replace(listComponent)
-            }
+        onCurrentItemChanged: {
+            extraLocalActions = view.currentItem.extraLocalActions
+            view.currentItem.navigationParent = root
         }
     }
-
 }

@@ -28,6 +28,8 @@ import "qrc:///style/"
 
 Utils.SelectableDelegateModel {
     id: delegateModel
+    property int currentIndex: -1
+
     property string viewIndexPropertyName: "currentIndex"
     delegate: Package {
         id: element
@@ -37,8 +39,8 @@ Utils.SelectableDelegateModel {
             Package.name: "grid"
 
             onItemClicked : {
-                delegateModel.updateSelection( modifier ,  view[viewIndexPropertyName], index)
-                view[viewIndexPropertyName] = index
+                delegateModel.updateSelection( modifier ,  delegateModel.currentIndex, index)
+                delegateModel.currentIndex = index
                 delegateGrid.forceActiveFocus()
             }
 
@@ -62,8 +64,8 @@ Utils.SelectableDelegateModel {
             Package.name: "list"
 
             onItemClicked : {
-                delegateModel.updateSelection( modifier, view[viewIndexPropertyName], index )
-                view[viewIndexPropertyName] = index
+                delegateModel.updateSelection( modifier, delegateModel.currentIndex, index )
+                delegateModel.currentIndex = index
                 delegateList.forceActiveFocus()
             }
 
@@ -91,7 +93,6 @@ Utils.SelectableDelegateModel {
         for (var i = 0; i < delegateModel.selectedGroup.count; i++) {
             var obj = delegateModel.selectedGroup.get(i)
             if (obj.model.can_index) {
-                console.log("index", obj.model.mrl, obj.model.indexed)
                 obj.model.indexed = !obj.model.indexed
             }
         }
