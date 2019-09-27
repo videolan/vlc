@@ -402,11 +402,6 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
     return 0;
 }
 
-static void FixDisplayFormat(decoder_t *p_dec, video_format_t *fmt)
-{
-    *fmt = p_dec->fmt_out.video;
-}
-
 static int CreateVoutIfNeeded(struct decoder_owner *, vout_thread_t **, enum vlc_vout_order *, vlc_decoder_device **);
 
 
@@ -430,9 +425,6 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
     p_owner->vctx = vctx ? vlc_video_context_Hold(vctx) : NULL;
 
     // configure the new vout
-
-    video_format_t fmt;
-    FixDisplayFormat( p_dec, &fmt );
 
     if ( p_owner->out_pool == NULL )
     {
@@ -458,7 +450,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
             break;
         }
 
-        p_owner->out_pool = picture_pool_NewFromFormat( &fmt,
+        p_owner->out_pool = picture_pool_NewFromFormat( &p_dec->fmt_out.video,
                             dpb_size + p_dec->i_extra_picture_buffers + 1 );
         if (p_owner->out_pool == NULL)
             return -1;
@@ -466,14 +458,14 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
     int res;
     if (p_owner->vout_thread_started)
     {
-        res = vout_ChangeSource(p_vout, &fmt);
+        res = vout_ChangeSource(p_vout, &p_dec->fmt_out.video);
         if (res == 0)
             // the display/thread is started and can handle the new source format
             return 0;
     }
 
     vout_configuration_t cfg = {
-        .vout = p_vout, .clock = p_owner->p_clock, .fmt = &fmt,
+        .vout = p_vout, .clock = p_owner->p_clock, .fmt = &p_dec->fmt_out.video,
         .mouse_event = MouseEvent, .mouse_opaque = p_dec,
     };
     res = input_resource_StartVout( p_owner->p_resource, vctx, &cfg);
@@ -554,9 +546,6 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner,
         return -1;
     }
 
-    video_format_t fmt;
-    FixDisplayFormat(p_dec, &fmt);
-
     vlc_mutex_lock( &p_owner->lock );
 
     vout_thread_t *p_vout = p_owner->p_vout;
@@ -565,7 +554,7 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner,
 
     if ( pp_dec_dev ) *pp_dec_dev = NULL;
     vout_device_configuration_t cfg = {
-        .vout = p_vout, .fmt = &fmt,
+        .vout = p_vout, .fmt = &p_dec->fmt_out.video,
     };
     p_vout = input_resource_GetVoutDecoderDevice( p_owner->p_resource,
                                     &cfg, order, pp_dec_dev );
