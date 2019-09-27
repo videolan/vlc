@@ -106,8 +106,8 @@
  */
 @interface VLCInfoTreeItem : NSObject
 
-@property (readwrite) NSString *name;
-@property (readwrite) NSString *value;
+@property (readwrite) NSString *propertyName;
+@property (readwrite) NSString *propertyValue;
 
 @property (readwrite) NSArray *children;
 
