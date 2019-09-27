@@ -257,6 +257,15 @@ drop:
     lock_unlock(p_sys);
 }
 
+static mtime_t
+ca_GetLatencyLocked(audio_output_t *p_aout)
+{
+    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+
+    const int64_t i_out_frames = BytesToFrames(p_sys, p_sys->i_out_size);
+    return FramesToUs(p_sys, i_out_frames + p_sys->i_render_frames);
+}
+
 int
 ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
 {
@@ -277,10 +286,8 @@ ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
     const mtime_t i_render_time_us = HostTimeToTick(p_sys->i_render_host_time);
     const mtime_t i_render_delay = i_render_time_us - mdate();
 
-    const int64_t i_out_frames = BytesToFrames(p_sys, p_sys->i_out_size);
-    *delay = FramesToUs(p_sys, i_out_frames + p_sys->i_render_frames)
-           + p_sys->i_dev_latency_us + i_render_delay;
-
+    *delay = ca_GetLatencyLocked(p_aout) + i_render_delay
+           + p_sys->i_dev_latency_us;
     lock_unlock(p_sys);
     return 0;
 }
@@ -355,10 +362,14 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
 
     lock_lock(p_sys);
 
-    if (p_sys->i_first_render_host_time == 0)
+    if (p_sys->i_render_host_time == 0)
     {
-        /* Setup the first render time */
-        p_sys->i_first_render_host_time = TickToHostTime(date);
+        /* Setup the first render time, this date must be updated until the
+         * first (non-silence/zero) frame is rendered by the render callback.
+         * Once the rendering is truly started, the date can be ignored. */
+
+        const mtime_t first_render_time = p_block->i_pts - ca_GetLatencyLocked(p_aout);
+        p_sys->i_first_render_host_time = TickToHostTime(first_render_time);
     }
 
     do
