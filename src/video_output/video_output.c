@@ -2074,7 +2074,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     return 0;
 }
 
-vlc_decoder_device *vout_GetDevice(const vout_configuration_t *cfg)
+vlc_decoder_device *vout_GetDevice(const vout_device_configuration_t *cfg)
 {
     vlc_decoder_device *dec_device = NULL;
 

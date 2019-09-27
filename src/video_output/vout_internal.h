@@ -48,6 +48,11 @@
  */
 typedef struct {
     vout_thread_t        *vout;
+    const video_format_t *fmt; // for the initial window dimensions
+} vout_device_configuration_t;
+
+typedef struct {
+    vout_thread_t        *vout;
     vlc_clock_t          *clock;
     const video_format_t *fmt;
     unsigned             dpb_size;
@@ -202,7 +207,7 @@ vout_thread_t *vout_CreateDummy(vlc_object_t *obj) VLC_USED;
  * \param cfg the video configuration requested.
  * \return pointer to a decoder device reference to use with the vout or NULL
  */
-vlc_decoder_device *vout_GetDevice(const vout_configuration_t *cfg);
+vlc_decoder_device *vout_GetDevice(const vout_device_configuration_t *cfg);
 
 /**
  * Returns a suitable vout or release the given one.

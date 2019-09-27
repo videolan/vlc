@@ -608,9 +608,8 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner,
     vlc_mutex_unlock( &p_owner->lock );
 
     if ( pp_dec_dev ) *pp_dec_dev = NULL;
-    vout_configuration_t cfg = {
-        .vout = p_vout, .clock = p_owner->p_clock, .fmt = &fmt,
-        .mouse_event = MouseEvent, .mouse_opaque = p_dec
+    vout_device_configuration_t cfg = {
+        .vout = p_vout, .fmt = &fmt,
     };
     p_vout = input_resource_GetVoutDecoderDevice( p_owner->p_resource,
                                     &cfg, order, pp_dec_dev );
