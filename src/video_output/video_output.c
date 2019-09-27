@@ -148,14 +148,16 @@ static void vout_display_SizeWindow(unsigned *restrict width,
     *height = (h * cfg->zoom.num) / cfg->zoom.den;
 }
 
-static void vout_SizeWindow(vout_thread_t *vout, unsigned *restrict width,
+static void vout_SizeWindow(vout_thread_t *vout,
+                            const video_format_t *original,
+                            unsigned *restrict width,
                             unsigned *restrict height)
 {
     vout_thread_sys_t *sys = vout->p;
-    unsigned w = sys->original.i_visible_width;
-    unsigned h = sys->original.i_visible_height;
-    unsigned sar_num = sys->original.i_sar_num;
-    unsigned sar_den = sys->original.i_sar_num;
+    unsigned w = original->i_visible_width;
+    unsigned h = original->i_visible_height;
+    unsigned sar_num = original->i_sar_num;
+    unsigned sar_den = original->i_sar_num;
 
     switch (sys->source.crop.mode) {
         case VOUT_CROP_NONE:
@@ -191,7 +193,7 @@ static void vout_SizeWindow(vout_thread_t *vout, unsigned *restrict width,
 
     /* If the vout thread is running, the window lock must be held here. */
     vout_display_SizeWindow(width, height, w, h, sar_num, sar_den,
-                            sys->original.orientation,
+                            original->orientation,
                             &sys->display_cfg);
 }
 
@@ -204,7 +206,7 @@ static void vout_UpdateWindowSizeLocked(vout_thread_t *vout)
 
     vlc_mutex_lock(&sys->display_lock);
     if (sys->display != NULL) {
-        vout_SizeWindow(vout, &width, &height);
+        vout_SizeWindow(vout, &sys->original, &width, &height);
         vlc_mutex_unlock(&sys->display_lock);
 
         msg_Dbg(vout, "requested window size: %ux%u", width, height);
@@ -1992,7 +1994,7 @@ static int vout_EnableWindow(const vout_configuration_t *cfg, vlc_decoder_device
         };
 
         VoutGetDisplayCfg(vout, &original, &sys->display_cfg);
-        vout_SizeWindow(vout, &wcfg.width, &wcfg.height);
+        vout_SizeWindow(vout, &original, &wcfg.width, &wcfg.height);
 
         if (vout_window_Enable(sys->display_cfg.window, &wcfg)) {
             vlc_mutex_unlock(&sys->window_lock);
