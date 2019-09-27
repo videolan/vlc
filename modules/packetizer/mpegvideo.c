@@ -139,7 +139,6 @@ typedef struct
     bool  b_seq_progressive;
     bool  b_low_delay;
     int         i_aspect_ratio_info;
-    bool  b_inited;
 
     /* Picture properties */
     int i_temporal_ref;
@@ -247,7 +246,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_top_field_first = 0;
     p_sys->i_repeat_first_field = 0;
     p_sys->i_progressive_frame = 0;
-    p_sys->b_inited = 0;
 
     p_sys->i_last_ref_pts = VLC_TICK_INVALID;
     p_sys->b_second_field = 0;
@@ -753,36 +751,35 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
         /* TODO: MPEG1 aspect ratio */
 
-        unsigned num, den;
-        num = code_to_frame_rate[p_frag->p_buffer[7]&0x0f][0] << 1; /* frames / den */
-        den = code_to_frame_rate[p_frag->p_buffer[7]&0x0f][1];
-
-        if( num && den &&
-           ( p_sys->dts.i_divider_num != num || p_sys->dts.i_divider_den != den ) )
+        /* Only of not specified by container */
+        if ( !p_dec->fmt_in.video.i_frame_rate ||
+             !p_dec->fmt_in.video.i_frame_rate_base )
         {
-            /* Only of not specified by container */
-            if ( !p_dec->fmt_in.video.i_frame_rate ||
-                 !p_dec->fmt_in.video.i_frame_rate_base )
+            /* frames / den */
+            unsigned num = code_to_frame_rate[p_frag->p_buffer[7]&0x0f][0] << 1;
+            unsigned den = code_to_frame_rate[p_frag->p_buffer[7]&0x0f][1];
+            if( num && den ) /* fields / den */
             {
-                date_Change( &p_sys->dts, num, den ); /* fields / den */
+                date_Change( &p_sys->dts, num, den );
                 date_Change( &p_sys->prev_iframe_dts, num, den );
-                p_dec->fmt_out.video.i_frame_rate = num >> 1;
-                p_dec->fmt_out.video.i_frame_rate_base = den;
             }
+        }
+
+        if( p_dec->fmt_out.video.i_frame_rate != (p_sys->dts.i_divider_num >> 1) ||
+            p_dec->fmt_out.video.i_frame_rate_base != p_sys->dts.i_divider_den )
+        {
+            p_dec->fmt_out.video.i_frame_rate = p_sys->dts.i_divider_num >> 1;
+            p_dec->fmt_out.video.i_frame_rate_base = p_sys->dts.i_divider_den;
+
+            msg_Dbg( p_dec, "size %ux%u/%ux%u fps %u:%u",
+                 p_dec->fmt_out.video.i_visible_width, p_dec->fmt_out.video.i_visible_height,
+                 p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height,
+                 p_dec->fmt_out.video.i_frame_rate,
+                 p_dec->fmt_out.video.i_frame_rate_base);
         }
 
         p_sys->b_seq_progressive = true;
         p_sys->b_low_delay = true;
-
-
-        if ( !p_sys->b_inited )
-        {
-            msg_Dbg( p_dec, "size %ux%u/%ux%u fps=%.3f(%u/%u)",
-                 p_dec->fmt_out.video.i_visible_width, p_dec->fmt_out.video.i_visible_height,
-                 p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height,
-                 (num > 1 && den > 1) ? (float) num / den : .0, num, den );
-            p_sys->b_inited = 1;
-        }
     }
     else if( startcode == EXTENSION_STARTCODE && p_frag->i_buffer > 4 )
     {
