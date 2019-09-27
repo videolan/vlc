@@ -170,8 +170,11 @@ void va_surface_Release(vlc_va_surface_t *surface)
 
 void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)
 {
-    DestroyVideoDecoder(va->sys, va_pool);
-    va_pool->callbacks->pf_destroy_device(va);
+    if (va_pool->callbacks)
+    {
+        DestroyVideoDecoder(va->sys, va_pool);
+        va_pool->callbacks->pf_destroy_device(va);
+    }
 }
 
 int va_pool_Open(vlc_va_t *va, const struct va_pool_cfg *cbs, va_pool_t *va_pool)
