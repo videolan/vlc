@@ -1972,15 +1972,13 @@ int vout_ChangeSource( vout_thread_t *vout, const video_format_t *original, unsi
     return -1;
 }
 
-static int vout_EnableWindow(const vout_configuration_t *cfg, const video_format_t *original,
+static int vout_EnableWindow(vout_thread_t *vout, const video_format_t *original,
                              vlc_decoder_device **pp_dec_device)
 {
-    vout_thread_t *vout = cfg->vout;
     vout_thread_sys_t *sys = vout->p;
 
     assert(!sys->dummy);
     assert(vout != NULL);
-    assert(cfg->clock != NULL);
 
     vlc_mutex_lock(&sys->window_lock);
     if (!sys->window_enabled) {
@@ -2022,6 +2020,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     vout_thread_sys_t *sys = vout->p;
 
     assert(cfg->fmt != NULL);
+    assert(cfg->clock != NULL);
 
     if (!VoutCheckFormat(cfg->fmt))
         /* don't stop the display and keep sys->original */
@@ -2036,7 +2035,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
         return 0;
     }
 
-    if (vout_EnableWindow(cfg, &original, NULL) != 0)
+    if (vout_EnableWindow(vout, &original, NULL) != 0)
     {
         /* the window was not enabled, nor the display started */
         msg_Err(vout, "failed to enable window");
@@ -2087,7 +2086,7 @@ vlc_decoder_device *vout_GetDevice(const vout_configuration_t *cfg)
     video_format_t original;
     VoutFixFormat(&original, cfg->fmt);
 
-    int res = vout_EnableWindow(cfg, &original, &dec_device);
+    int res = vout_EnableWindow(cfg->vout, &original, &dec_device);
     video_format_Clean(&original);
     if (res != 0)
         return NULL;
