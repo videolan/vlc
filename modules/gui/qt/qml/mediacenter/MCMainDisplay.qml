@@ -34,6 +34,28 @@ Utils.NavigableFocusScope {
     property string view: ""
     property var viewProperties: ({})
 
+    onViewChanged: loadView()
+    onViewPropertiesChanged: loadView()
+    Component.onCompleted: loadView()
+
+    function loadView() {
+        var found = stackView.loadView(root.pageModel, root.view, root.viewProperties)
+
+        sourcesBanner.subTabModel = stackView.currentItem.tabModel
+        sourcesBanner.sortModel = stackView.currentItem.sortModel
+        sourcesBanner.contentModel = stackView.currentItem.contentModel
+        sourcesBanner.extraLocalActions = stackView.currentItem.extraLocalActions
+        // Restore sourcesBanner state
+        sourcesBanner.selectedIndex = pageModel.findIndex(function (e) {
+            return e.name === root.view
+        })
+        if (stackView.currentItem.pageModel !== undefined)
+            sourcesBanner.subSelectedIndex = stackView.currentItem.pageModel.findIndex(function (e) {
+                return e.name === stackView.currentItem.view
+            })
+    }
+
+
     Component {
         id: musicComp
         MCMusicDisplay {
@@ -129,17 +151,9 @@ Utils.NavigableFocusScope {
 
                     onItemClicked: {
                         sourcesBanner.subTabModel = undefined
-
                         var name = root.tabModel.get(index).name
-                        stackView.replace(root.pageModel[index].component)
-                        history.push(["mc", name], History.Stay)
-
-                        subTabModel = stackView.currentItem.tabModel
-                        sortModel = stackView.currentItem.sortModel
-                        contentModel = stackView.currentItem.contentModel
-                        extraLocalActions = stackView.currentItem.extraLocalActions
-
                         selectedIndex = index
+                        history.push(["mc", name], History.Go)
                     }
 
                     onSubItemClicked: {
@@ -196,23 +210,6 @@ Utils.NavigableFocusScope {
                             left: parent.left
                             bottom: parent.bottom
                             right: playlist.visible ? playlist.left : parent.right
-                        }
-
-                        Component.onCompleted: {
-                            var found = stackView.loadView(root.pageModel, root.view, root.viewProperties)
-                            sourcesBanner.subTabModel = stackView.currentItem.tabModel
-                            sourcesBanner.sortModel = stackView.currentItem.sortModel
-                            sourcesBanner.contentModel = stackView.currentItem.contentModel
-                            sourcesBanner.extraLocalActions = stackView.currentItem.extraLocalActions
-
-                            // Restore sourcesBanner state
-                            sourcesBanner.selectedIndex = pageModel.findIndex(function (e) {
-                                return e.name === root.view
-                            })
-                            if (stackView.currentItem.pageModel !== undefined)
-                                sourcesBanner.subSelectedIndex = stackView.currentItem.pageModel.findIndex(function (e) {
-                                    return e.name === stackView.currentItem.view
-                                })
                         }
                     }
 

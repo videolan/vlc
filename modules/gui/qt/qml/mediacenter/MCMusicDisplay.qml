@@ -37,12 +37,26 @@ Utils.NavigableFocusScope {
     property var sortModel
     property var contentModel
 
-    function loadIndex(index) {
-        stackView.replace(root.pageModel[index].component)
-        history.push(["mc", "music", root.pageModel[index].name], History.Stay)
-        stackView.focus = true
+    onViewChanged: loadView()
+    onViewProperties: loadView()
+    Component.onCompleted: loadView()
+
+    function loadView() {
+        var found = stackView.loadView(root.pageModel, view, viewProperties)
+        if (!found)
+            stackView.replace(root.pageModel[0].component)
         sortModel = stackView.currentItem.sortModel
         contentModel = stackView.currentItem.model
+    }
+
+    //reset view
+    function loadDefaultView() {
+        root.view = "albums"
+        root.viewProperties= ({})
+    }
+
+    function loadIndex(index) {
+        history.push(["mc", "music", root.pageModel[index].name], History.Go)
     }
 
     Component { id: albumComp; MusicAlbumsDisplay{ navigationParent: root } }
@@ -92,12 +106,9 @@ Utils.NavigableFocusScope {
             Layout.margins: VLCStyle.margin_normal
             focus: true
 
-            Component.onCompleted: {
-                var found = stackView.loadView(root.pageModel, view, viewProperties)
+            onCurrentItemChanged: {
                 sortModel = stackView.currentItem.sortModel
                 contentModel = stackView.currentItem.model
-                if (!found)
-                    replace(pageModel[0].component)
             }
         }
     }

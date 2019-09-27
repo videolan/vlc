@@ -24,6 +24,8 @@ import QtQuick.Controls 2.4
 StackView {
     id: root
 
+    property string _currentView: ""
+
     replaceEnter: Transition {
         PropertyAnimation {
             property: "opacity"
@@ -52,6 +54,19 @@ StackView {
      */
     function loadView(viewModel, view, viewProperties)
     {
+        if (view === _currentView) {
+            if (Object.keys(viewProperties).length === 0 && root.currentItem.hasOwnProperty("loadDefaultView") ) {
+                root.currentItem.loadDefaultView()
+            } else {
+                for ( var viewProp in viewProperties ) {
+                    if ( root.currentItem.hasOwnProperty(viewProp) ) {
+                        root.currentItem[viewProp] = viewProperties[viewProp]
+                    }
+                }
+            }
+            return true
+        }
+
         var found = false
         for (var tab = 0; tab < viewModel.length; tab++ )
         {
@@ -81,6 +96,8 @@ StackView {
         }
         if (!found)
             console.warn("unable to load view " + view)
+        else
+            _currentView = view
         return found
     }
 }
