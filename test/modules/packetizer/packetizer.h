@@ -39,6 +39,7 @@ struct params_s
     unsigned i_rate_den;
     unsigned i_read_size;
     unsigned i_frame_count;
+    bool b_extra;
 };
 
 #define BAILOUT(run) { fprintf(stderr, "failed %s line %d\n", run, __LINE__); \
@@ -139,7 +140,7 @@ static int test_packetize(const char *run,
         EXPECT(p_block != NULL);
     }
 
-    EXPECT(p->fmt_out.i_extra);
+    EXPECT(!!params->b_extra == !!p->fmt_out.i_extra);
 
     delete_packetizer(p);
 

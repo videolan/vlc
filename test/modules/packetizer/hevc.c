@@ -129,6 +129,7 @@ int main(void)
     params.i_rate_num = 0;
     params.i_rate_den = 0;
     params.i_frame_count = 2*25;
+    params.b_extra = true;
 
     params.i_read_size = 500;
     RUN("block 500", test_packetize,
