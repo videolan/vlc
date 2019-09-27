@@ -749,7 +749,7 @@ typedef struct {
 } vout_filter_t;
 
 static void ThreadChangeFilters(vout_thread_t *vout,
-                                const video_format_t *source,
+                                const video_format_t *source, vlc_video_context *src_vctx,
                                 const char *filters,
                                 const bool *new_deinterlace,
                                 bool is_locked)
@@ -867,6 +867,9 @@ static void ThreadChangeFilters(vout_thread_t *vout,
     if (source) {
         video_format_Clean(&vout->p->filter.src_fmt);
         video_format_Copy(&vout->p->filter.src_fmt, source);
+        if (vout->p->filter.src_vctx)
+            vlc_video_context_Release(vout->p->filter.src_vctx);
+        vout->p->filter.src_vctx = src_vctx ? vlc_video_context_Hold(src_vctx) : NULL;
     }
 
     if (!is_locked)
@@ -926,8 +929,9 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse,
                         msg_Dbg(vout, "picture might be displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
                     }
                 }
+                vlc_video_context *pic_vctx = picture_GetVideoContext(decoded);
                 if (!VideoFormatIsCropArEqual(&decoded->format, &vout->p->filter.src_fmt))
-                    ThreadChangeFilters(vout, &decoded->format, NULL, NULL, true);
+                    ThreadChangeFilters(vout, &decoded->format, pic_vctx, NULL, NULL, true);
             }
         }
 
@@ -1535,6 +1539,7 @@ static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_c
 
     sys->filter.configuration = NULL;
     video_format_Copy(&sys->filter.src_fmt, &sys->original);
+    sys->filter.src_vctx = vctx ? vlc_video_context_Hold(vctx) : NULL;
 
     static const struct filter_video_callbacks static_cbs = {
         VoutVideoFilterStaticNewPicture, VoutHoldDecoderDevice,
@@ -1635,6 +1640,11 @@ error:
     if (sys->filter.chain_static != NULL)
         filter_chain_Delete(sys->filter.chain_static);
     video_format_Clean(&sys->filter.src_fmt);
+    if (sys->filter.src_vctx)
+    {
+        vlc_video_context_Release(sys->filter.src_vctx);
+        sys->filter.src_vctx = NULL;
+    }
     if (sys->decoder_fifo != NULL)
     {
         picture_fifo_Delete(sys->decoder_fifo);
@@ -1647,10 +1657,10 @@ static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
 {
     switch(cmd.type) {
     case VOUT_CONTROL_CHANGE_FILTERS:
-        ThreadChangeFilters(vout, NULL, cmd.string, NULL, false);
+        ThreadChangeFilters(vout, NULL, NULL, cmd.string, NULL, false);
         break;
     case VOUT_CONTROL_CHANGE_INTERLACE:
-        ThreadChangeFilters(vout, NULL, NULL, &cmd.boolean, false);
+        ThreadChangeFilters(vout, NULL, NULL, NULL, &cmd.boolean, false);
         break;
     case VOUT_CONTROL_MOUSE_STATE:
         ThreadProcessMouseState(vout, &cmd.mouse);
@@ -1731,6 +1741,11 @@ static void vout_ReleaseDisplay(vout_thread_t *vout)
     filter_chain_Delete(sys->filter.chain_interactive);
     filter_chain_Delete(sys->filter.chain_static);
     video_format_Clean(&sys->filter.src_fmt);
+    if (sys->filter.src_vctx)
+    {
+        vlc_video_context_Release(sys->filter.src_vctx);
+        sys->filter.src_vctx = NULL;
+    }
     free(sys->filter.configuration);
 
     if (sys->decoder_fifo != NULL)

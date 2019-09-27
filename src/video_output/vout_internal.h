@@ -163,6 +163,7 @@ struct vout_thread_sys_t
         vlc_mutex_t     lock;
         char            *configuration;
         video_format_t    src_fmt;
+        vlc_video_context *src_vctx;
         struct filter_chain_t *chain_static;
         struct filter_chain_t *chain_interactive;
         bool            has_deint;
