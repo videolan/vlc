@@ -594,6 +594,8 @@ static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_bl
         p_block->i_flags |= p_sys->i_next_block_flags;
         p_sys->i_next_block_flags = 0;
     }
+    else *pb_ts_used = false; /* only clear up if output */
+
     return p_block;
 }
 
