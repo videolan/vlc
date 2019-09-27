@@ -140,8 +140,9 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
     return hr;
 }
 
-static HRESULT Play(aout_stream_t *s, block_t *block)
+static HRESULT Play(aout_stream_t *s, block_t *block, vlc_tick_t date)
 {
+    (void) date;
     aout_stream_sys_t *sys = s->sys;
     void *pv;
     HRESULT hr;

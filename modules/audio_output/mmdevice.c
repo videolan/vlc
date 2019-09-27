@@ -141,11 +141,10 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
     HRESULT hr;
 
     EnterMTA();
-    hr = aout_stream_Play(sys->stream, block);
+    hr = aout_stream_Play(sys->stream, block, date);
     LeaveMTA();
 
     vlc_FromHR(aout, hr);
-    (void) date;
 }
 
 static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)

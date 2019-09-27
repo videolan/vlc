@@ -294,8 +294,9 @@ static HRESULT Play( vlc_object_t *obj, aout_stream_sys_t *sys,
     return dsresult;
 }
 
-static HRESULT StreamPlay( aout_stream_t *s, block_t *block )
+static HRESULT StreamPlay( aout_stream_t *s, block_t *block, vlc_tick_t date )
 {
+    (void) date;
     return Play( VLC_OBJECT(s), s->sys, block );
 }
 

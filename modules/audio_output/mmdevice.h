@@ -38,7 +38,7 @@ struct aout_stream
 
     void (*stop)(aout_stream_t *);
     HRESULT (*time_get)(aout_stream_t *, vlc_tick_t *);
-    HRESULT (*play)(aout_stream_t *, block_t *);
+    HRESULT (*play)(aout_stream_t *, block_t *, vlc_tick_t);
     HRESULT (*pause)(aout_stream_t *, bool);
     HRESULT (*flush)(aout_stream_t *);
 
@@ -71,9 +71,10 @@ static inline HRESULT aout_stream_TimeGet(aout_stream_t *s, vlc_tick_t *delay)
     return (s->time_get)(s, delay);
 }
 
-static inline HRESULT aout_stream_Play(aout_stream_t *s, block_t *block)
+static inline HRESULT aout_stream_Play(aout_stream_t *s, block_t *block,
+                                       vlc_tick_t date)
 {
-    return (s->play)(s, block);
+    return (s->play)(s, block, date);
 }
 
 static inline HRESULT aout_stream_Pause(aout_stream_t *s, bool paused)
