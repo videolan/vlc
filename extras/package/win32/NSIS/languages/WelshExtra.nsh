@@ -57,6 +57,8 @@ ${LangFileString} Action_OnArrivalSVCDMovie "Chwarae ffilm SVCD"
 ${LangFileString} Action_OnArrivalVideoFiles "Chwarae ffeiliau fideo"
 ${LangFileString} Action_OnArrivalMusicFiles "Chwarae ffeiliau sain"
 ${LangFileString} Action_OnArrivalDVDAudio "Chwarae DVD sain"
+${LangFileString} Action_OnArrivalBluray "Chwarae Blu-ray"
+
 ${LangFileString} License_NextText "Wedi ei ddarllen, rydych yn ymwybodol o'ch hawliau. Cliciwch $\"Nesaf$\" i barhau."
 
 ${LangFileString} Detail_CheckProcesses "Yn gwirio..."
