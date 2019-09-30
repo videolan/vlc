@@ -239,6 +239,7 @@ NavigableFocusScope {
                 item.model = model.items.get(i).model
                 item.index = i
                 item.selected = model.items.get(i).inSelected
+                item.focus = false
                 item.x = pos[0]
                 item.y = pos[1]
                 item.visible = true
@@ -252,6 +253,7 @@ NavigableFocusScope {
                 pos = getItemPos(i)
                 item = getChild(i, _unusedItemList)
                 item.model = model.items.get(i).model
+                item.focus = false
                 item.index = i
                 item.selected = model.items.get(i).inSelected
                 item.x = pos[0]
