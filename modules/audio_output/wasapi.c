@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_codecs.h>
 #include <vlc_aout.h>
+#include <vlc_atomic.h>
 #include <vlc_plugin.h>
 
 #include <audioclient.h>
@@ -90,6 +91,12 @@ static msftime_t GetQPC(void)
 typedef struct aout_stream_sys
 {
     IAudioClient *client;
+    HANDLE hTimer;
+
+#define STARTED_STATE_INIT 0
+#define STARTED_STATE_OK 1
+#define STARTED_STATE_ERROR 2
+    atomic_char started_state;
 
     uint8_t chans_table[AOUT_CHAN_MAX];
     uint8_t chans_to_reorder;
@@ -101,6 +108,15 @@ typedef struct aout_stream_sys
     UINT32 frames; /**< Total buffer size (frames) */
 } aout_stream_sys_t;
 
+static void ResetTimer(aout_stream_t *s)
+{
+    aout_stream_sys_t *sys = s->sys;
+    if (sys->hTimer != NULL)
+    {
+        DeleteTimerQueueTimer(NULL, sys->hTimer, INVALID_HANDLE_VALUE);
+        sys->hTimer = NULL;
+    }
+}
 
 /*** VLC audio output callbacks ***/
 static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
@@ -109,6 +125,9 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
     void *pv;
     UINT64 pos, qpcpos, freq;
     HRESULT hr;
+
+    if (atomic_load(&sys->started_state) != STARTED_STATE_OK)
+        return E_FAIL;
 
     hr = IAudioClient_GetService(sys->client, &IID_IAudioClock, &pv);
     if (FAILED(hr))
@@ -140,12 +159,77 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
     return hr;
 }
 
+static void CALLBACK StartDeferredCallback(void *val, BOOLEAN timeout)
+{
+    aout_stream_t *s = val;
+    aout_stream_sys_t *sys = s->sys;
+
+    HRESULT hr = IAudioClient_Start(sys->client);
+    atomic_store(&sys->started_state,
+                 SUCCEEDED(hr) ? STARTED_STATE_OK : STARTED_STATE_ERROR);
+    (void) timeout;
+}
+
+static HRESULT StartDeferred(aout_stream_t *s, vlc_tick_t date)
+{
+    aout_stream_sys_t *sys = s->sys;
+    vlc_tick_t written = vlc_tick_from_frac(sys->written, sys->rate);
+    vlc_tick_t start_delay = date - vlc_tick_now() - written;
+    DWORD start_delay_ms = start_delay > 0 ? MS_FROM_VLC_TICK(start_delay) : 0;
+    BOOL timer_updated = false;
+
+    /* Create or update the current timer */
+    if (start_delay_ms > 0)
+    {
+        if (sys->hTimer == NULL)
+            timer_updated =
+                CreateTimerQueueTimer(&sys->hTimer, NULL, StartDeferredCallback,
+                                      s, start_delay_ms, 0,
+                                      WT_EXECUTEDEFAULT | WT_EXECUTEONLYONCE);
+        else
+            timer_updated =
+                ChangeTimerQueueTimer(NULL, sys->hTimer, start_delay_ms, 0);
+        if (!timer_updated)
+            msg_Warn(s, "timer update failed, starting now");
+    }
+    else
+        ResetTimer(s);
+
+    if (!timer_updated)
+    {
+        HRESULT hr = IAudioClient_Start(sys->client);
+        if (FAILED(hr))
+        {
+            atomic_store(&sys->started_state, STARTED_STATE_ERROR);
+            return hr;
+        }
+        atomic_store(&sys->started_state, STARTED_STATE_OK);
+    }
+    else
+        msg_Dbg(s, "deferring start (%"PRId64" us)", start_delay);
+
+    return S_OK;
+}
+
 static HRESULT Play(aout_stream_t *s, block_t *block, vlc_tick_t date)
 {
     (void) date;
     aout_stream_sys_t *sys = s->sys;
     void *pv;
     HRESULT hr;
+
+    char started_state = atomic_load(&sys->started_state);
+    if (unlikely(started_state == STARTED_STATE_ERROR))
+    {
+        hr = E_FAIL;
+        goto out;
+    }
+    else if (started_state == STARTED_STATE_INIT)
+    {
+        hr = StartDeferred(s, date);
+        if (FAILED(hr))
+            goto out;
+    }
 
     if (sys->chans_to_reorder)
         aout_ChannelReorder(block->p_buffer, block->i_buffer,
@@ -191,7 +275,6 @@ static HRESULT Play(aout_stream_t *s, block_t *block, vlc_tick_t date)
             msg_Err(s, "cannot release buffer (error 0x%lX)", hr);
             break;
         }
-        IAudioClient_Start(sys->client);
 
         block->p_buffer += copy;
         block->i_buffer -= copy;
@@ -216,7 +299,14 @@ static HRESULT Pause(aout_stream_t *s, bool paused)
     HRESULT hr;
 
     if (paused)
-        hr = IAudioClient_Stop(sys->client);
+    {
+        ResetTimer(s);
+        if (atomic_load(&sys->started_state) == STARTED_STATE_OK)
+            hr = IAudioClient_Stop(sys->client);
+        else
+            hr = S_OK;
+        /* Don't reset the timer state, we won't have to start deferred again. */
+    }
     else
         hr = IAudioClient_Start(sys->client);
     if (FAILED(hr))
@@ -230,9 +320,16 @@ static HRESULT Flush(aout_stream_t *s)
     aout_stream_sys_t *sys = s->sys;
     HRESULT hr;
 
-    IAudioClient_Stop(sys->client);
+    ResetTimer(s);
+    /* Reset the timer state, the next start need to be deferred. */
+    if (atomic_exchange(&sys->started_state, STARTED_STATE_INIT) == STARTED_STATE_OK)
+    {
+        IAudioClient_Stop(sys->client);
+        hr = IAudioClient_Reset(sys->client);
+    }
+    else
+        hr = S_OK;
 
-    hr = IAudioClient_Reset(sys->client);
     if (SUCCEEDED(hr))
     {
         msg_Dbg(s, "reset");
@@ -460,7 +557,11 @@ static void Stop(aout_stream_t *s)
 {
     aout_stream_sys_t *sys = s->sys;
 
-    IAudioClient_Stop(sys->client); /* should not be needed */
+    ResetTimer(s);
+
+    if (atomic_load(&sys->started_state) == STARTED_STATE_OK)
+        IAudioClient_Stop(sys->client);
+
     IAudioClient_Release(sys->client);
 
     free(sys);
@@ -478,6 +579,8 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     if (unlikely(sys == NULL))
         return E_OUTOFMEMORY;
     sys->client = NULL;
+    sys->hTimer = NULL;
+    atomic_init(&sys->started_state, STARTED_STATE_INIT);
 
     /* Configure audio stream */
     WAVEFORMATEXTENSIBLE_IEC61937 wf_iec61937;
