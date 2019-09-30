@@ -45,8 +45,6 @@ typedef struct
 
     const struct va_pool_cfg *callbacks;
 
-    bool                  can_extern_pool;
-
 } va_pool_t;
 
 struct va_pool_cfg {

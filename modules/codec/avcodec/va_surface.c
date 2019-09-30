@@ -84,7 +84,7 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
     {
         va_pool->surface_width  = fmt->i_width;
         va_pool->surface_height = fmt->i_height;
-        va_pool->surface_count = va_pool->can_extern_pool ? 0 : count;
+        va_pool->surface_count = count;
     }
 
 done:
@@ -198,7 +198,7 @@ va_pool_t * va_pool_Create(vlc_va_t *va, const struct va_pool_cfg *cbs)
     msg_Dbg(va, "CreateDevice succeed");
 
     va_pool->surface_count = 0;
-    va_pool->can_extern_pool = false;
+
     return va_pool;
 }
 
