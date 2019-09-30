@@ -520,15 +520,12 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
         .mouse_event = MouseEvent, .mouse_opaque = p_dec,
     };
-    vlc_decoder_device *dec_dev = p_owner->vctx ? vlc_video_context_HoldDevice(vctx) : NULL;
-    res = input_resource_StartVout( p_owner->p_resource, dec_dev, &cfg);
+    res = input_resource_StartVout( p_owner->p_resource, vctx, &cfg);
     if (res == 0)
     {
         p_owner->vout_thread_started = true;
         decoder_Notify(p_owner, on_vout_started, p_vout, vout_order);
     }
-    if (dec_dev)
-        vlc_decoder_device_Release(dec_dev);
     return res;
 }
 

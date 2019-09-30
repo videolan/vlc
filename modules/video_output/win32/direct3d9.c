@@ -1662,8 +1662,12 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (d3d9_decoder != NULL && d3d9_decoder->device != NULL)
         D3D9_CloneExternal( &sys->hd3d, d3d9_decoder->device );
 
+    d3d9_video_context_t *octx = GetD3D9ContextPrivate(context);
     HRESULT hr;
-    hr = D3D9_CreateDevice(vd, &sys->hd3d, d3d9_decoder ? d3d9_decoder->adapter : -1, &sys->d3d_dev);
+    if (octx != NULL)
+        hr = D3D9_CreateDeviceExternal(octx->dev, &sys->hd3d, &sys->d3d_dev);
+    else
+        hr = D3D9_CreateDevice(vd, &sys->hd3d, d3d9_decoder ? d3d9_decoder->adapter : -1, &sys->d3d_dev);
 
     if (FAILED(hr)) {
         msg_Err( vd, "D3D9 Creation failed! (hr=0x%lX)", hr);

@@ -215,11 +215,11 @@ vlc_decoder_device *vout_GetDevice(const vout_configuration_t *cfg);
  *
  * \param cfg the video configuration requested.
  * \param input used to get attachments for spu filters
- * \param dec_dev pointer to receive the decoder device reference to use with the vout or NULL
+ * \param vctx pointer to the video context to use with the vout or NULL
  * \retval 0 on success
  * \retval -1 on error
  */
-int vout_Request(const vout_configuration_t *cfg, vlc_decoder_device *dec_dev, input_thread_t *input);
+int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input_thread_t *input);
 
 /**
  * Disables a vout.
@@ -275,7 +275,7 @@ void vout_IntfDeinit(vlc_object_t *);
 
 /* */
 vout_display_t *vout_OpenWrapper(vout_thread_t *, const char *,
-                     const vout_display_cfg_t *, vlc_decoder_device *);
+                     const vout_display_cfg_t *, vlc_video_context *);
 void vout_CloseWrapper(vout_thread_t *, vout_display_t *vd);
 
 /* */

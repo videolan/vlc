@@ -41,7 +41,7 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *,
                                       const vout_configuration_t *,
                                       enum vlc_vout_order *order,
                                       vlc_decoder_device **);
-int input_resource_StartVout(input_resource_t *, vlc_decoder_device *, const vout_configuration_t *);
+int input_resource_StartVout(input_resource_t *, vlc_video_context *, const vout_configuration_t *);
 void input_resource_PutVout(input_resource_t *, vout_thread_t *);
 
 /**

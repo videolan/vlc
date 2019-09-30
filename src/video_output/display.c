@@ -729,9 +729,9 @@ void vout_SetDisplayViewpoint(vout_display_t *vd,
 
 vout_display_t *vout_display_New(vlc_object_t *parent,
                                  const video_format_t *source,
+                                 vlc_video_context *vctx,
                                  const vout_display_cfg_t *cfg,
                                  const char *module,
-                                 vlc_decoder_device *dec_device,
                                  const vout_display_owner_t *owner)
 {
     vout_display_priv_t *osys = vlc_custom_create(parent, sizeof (*osys),
@@ -770,11 +770,9 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     if (owner)
         vd->owner = *owner;
 
-    vlc_video_context *fake_vctx = vlc_video_context_Create(dec_device, VLC_VIDEO_CONTEXT_NONE, 0, NULL);
-
     if (vlc_module_load(vd, "vout display", module, module && *module != '\0',
                         vout_display_start, vd, &osys->cfg, &vd->fmt,
-                        fake_vctx) == NULL)
+                        vctx) == NULL)
         goto error;
 
 #if defined(__OS2__)
@@ -796,12 +794,8 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
         video_format_Clean(&vd->fmt);
         goto error;
     }
-    if (fake_vctx)
-        vlc_video_context_Release(fake_vctx);
     return vd;
 error:
-    if (fake_vctx)
-        vlc_video_context_Release(fake_vctx);
     video_format_Clean(&vd->source);
     vlc_object_delete(vd);
     return NULL;

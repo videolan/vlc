@@ -435,11 +435,11 @@ out:
 }
 
 int input_resource_StartVout(input_resource_t *p_resource,
-                              vlc_decoder_device *dec_dev,
+                              vlc_video_context *vctx,
                               const vout_configuration_t *cfg)
 {
     vlc_mutex_lock( &p_resource->lock );
-    if (vout_Request(cfg, dec_dev, p_resource->p_input)) {
+    if (vout_Request(cfg, vctx, p_resource->p_input)) {
         input_resource_PutVoutLocked(p_resource, cfg->vout);
         vlc_mutex_unlock(&p_resource->lock);
         return -1;

@@ -1499,7 +1499,7 @@ static void ThreadProcessMouseState(vout_thread_t *vout,
         vout->p->mouse_event(m, vout->p->mouse_opaque);
 }
 
-static int vout_Start(vout_thread_t *vout, vlc_decoder_device *dec_dev, const vout_configuration_t *cfg)
+static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_configuration_t *cfg)
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
@@ -1537,6 +1537,16 @@ static int vout_Start(vout_thread_t *vout, vlc_decoder_device *dec_dev, const vo
     unsigned num, den;
 
     vlc_mutex_lock(&sys->window_lock);
+#ifndef NDEBUG
+    if (vctx)
+    {
+        // make sure the decoder device we receive matches the one we have cached
+        vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(vctx);
+        assert(dec_device && dec_device == sys->dec_device);
+        vlc_decoder_device_Release(dec_device);
+    }
+#endif
+
     dcfg = sys->display_cfg;
 
     switch (sys->source.crop.mode) {
@@ -1565,7 +1575,7 @@ static int vout_Start(vout_thread_t *vout, vlc_decoder_device *dec_dev, const vo
     vlc_mutex_lock(&sys->display_lock);
     vlc_mutex_unlock(&sys->window_lock);
 
-    sys->display = vout_OpenWrapper(vout, sys->splitter_name, &dcfg, dec_dev);
+    sys->display = vout_OpenWrapper(vout, sys->splitter_name, &dcfg, vctx);
     if (sys->display == NULL) {
         vlc_mutex_unlock(&sys->display_lock);
         goto error;
@@ -2006,7 +2016,7 @@ static int vout_EnableWindow(const vout_configuration_t *cfg, const video_format
     return 0;
 }
 
-int vout_Request(const vout_configuration_t *cfg, vlc_decoder_device *dec_dev, input_thread_t *input)
+int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input_thread_t *input)
 {
     vout_thread_t *vout = cfg->vout;
     vout_thread_sys_t *sys = vout->p;
@@ -2046,7 +2056,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_decoder_device *dec_dev, i
     sys->clock = cfg->clock;
     sys->delay = 0;
 
-    if (vout_Start(vout, dec_dev, cfg))
+    if (vout_Start(vout, vctx, cfg))
     {
         msg_Err(vout, "video output display creation failed");
         video_format_Clean(&sys->original);
