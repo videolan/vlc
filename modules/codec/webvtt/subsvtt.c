@@ -1262,7 +1262,10 @@ static webvtt_dom_node_t * CreateDomNodes( const char *psz_text, unsigned *pi_li
                      * like <b><v stuff>foo</b> */
                     p_parent = webvtt_domnode_getParentByTag( p_parent, psz_tagname );
                     if( p_parent ) /* continue as parent next */
+                    {
                         pp_append = &p_parent->p_next;
+                        p_parent = p_parent->p_parent;
+                    }
                     else /* back as top node */
                         pp_append = &p_head->p_next;
                     while( *pp_append )
