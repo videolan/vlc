@@ -366,32 +366,7 @@ static int D3dCreateDevice(vlc_va_t *va)
     vlc_va_sys_t *sys = va->sys;
     HRESULT hr;
 
-    if (sys->d3d_dev.d3ddevice && sys->d3d_dev.d3dcontext) {
-        msg_Dbg(va, "Reusing Direct3D11 device");
-        ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
-    }
-    else
-    {
-#if VLC_WINSTORE_APP
-        if (sys->d3d_dev.d3dcontext == NULL)
-            sys->d3d_dev.d3dcontext = var_InheritInteger(va, "winrt-d3dcontext"); /* LEGACY */
-#endif
-        if (sys->d3d_dev.d3dcontext != NULL)
-        {
-            ID3D11DeviceContext_GetDevice(sys->d3d_dev.d3dcontext, &sys->d3d_dev.d3ddevice);
-            ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
-            ID3D11Device_Release(sys->d3d_dev.d3ddevice);
-        }
-        else
-        {
-            hr = D3D11_CreateDevice(va, &sys->hd3d, NULL, true, &sys->d3d_dev);
-            if (FAILED(hr)) {
-                msg_Err(va, "D3D11CreateDevice failed. (hr=0x%lX)", hr);
-                return VLC_EGENERIC;
-            }
-        }
-    }
-
+    assert(sys->d3d_dev.d3ddevice && sys->d3d_dev.d3dcontext);
     void *d3dvidctx = NULL;
     hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
     if (FAILED(hr)) {
