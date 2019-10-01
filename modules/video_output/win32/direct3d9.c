@@ -56,9 +56,6 @@
 #endif
 #include "../../video_chroma/d3d9_fmt.h"
 
-typedef picture_sys_d3d9_t VA_PICSYS;
-#include "../../codec/avcodec/va_surface.h"
-
 #include "common.h"
 #include "builtin_shaders.h"
 #include "../../video_chroma/copy.h"
@@ -1272,7 +1269,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
      * wrapper, we can't */
     IDirect3DSurface9 *surface;
 
-    picture_sys_d3d9_t *p_sys = picture->p_sys;
+    picture_sys_d3d9_t *p_sys = ActiveD3D9PictureSys(picture);
     surface = p_sys->surface;
     if ( !is_d3d9_opaque(picture->format.i_chroma) )
     {
@@ -1291,14 +1288,14 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     }
     else if (picture->context)
     {
-        const struct va_pic_context *pic_ctx = (struct va_pic_context*)picture->context;
-        if (pic_ctx->picsys.surface != surface)
+        const picture_sys_d3d9_t *picsys = ActiveD3D9PictureSys(picture);
+        if (picsys->surface != surface)
         {
             D3DSURFACE_DESC srcDesc, dstDesc;
-            IDirect3DSurface9_GetDesc(pic_ctx->picsys.surface, &srcDesc);
+            IDirect3DSurface9_GetDesc(picsys->surface, &srcDesc);
             IDirect3DSurface9_GetDesc(surface, &dstDesc);
             if ( srcDesc.Width == dstDesc.Width && srcDesc.Height == dstDesc.Height )
-                surface = pic_ctx->picsys.surface;
+                surface = picsys->surface;
             else
             {
                 HRESULT hr;
@@ -1308,7 +1305,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
                 visibleSource.right = picture->format.i_visible_width;
                 visibleSource.bottom = picture->format.i_visible_height;
 
-                hr = IDirect3DDevice9_StretchRect( p_d3d9_dev->dev, pic_ctx->picsys.surface, &visibleSource, surface, &visibleSource, D3DTEXF_NONE);
+                hr = IDirect3DDevice9_StretchRect( p_d3d9_dev->dev, picsys->surface, &visibleSource, surface, &visibleSource, D3DTEXF_NONE);
                 if (FAILED(hr)) {
                     msg_Err(vd, "Failed to copy the hw surface to the decoder surface (hr=0x%lX)", hr );
                 }
@@ -1782,7 +1779,7 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
     struct glpriv *priv = tc->priv;
     HRESULT hr;
 
-    picture_sys_d3d9_t *picsys = ActivePictureSys(pic);
+    picture_sys_d3d9_t *picsys = ActiveD3D9PictureSys(pic);
     if (unlikely(!picsys || !priv->gl_render))
         return VLC_EGENERIC;
 

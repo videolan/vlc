@@ -41,6 +41,12 @@ typedef struct
     HINSTANCE            dxva2_dll;
 } picture_sys_d3d9_t;
 
+struct d3d9_pic_context
+{
+    picture_context_t         s;
+    picture_sys_d3d9_t        picsys;
+};
+
 typedef struct
 {
     HINSTANCE               hdll;       /* handle of the opened d3d9 dll */
@@ -84,6 +90,11 @@ static inline bool is_d3d9_opaque(vlc_fourcc_t chroma)
         return false;
     }
 }
+
+#define D3D9_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
+    container_of((pic_ctx), struct d3d9_pic_context, s)
+
+picture_sys_d3d9_t *ActiveD3D9PictureSys(picture_t *);
 
 static inline d3d9_decoder_device_t *GetD3D9OpaqueDevice(vlc_decoder_device *device)
 {
@@ -137,5 +148,8 @@ void D3D9_CloneExternal(d3d9_handle_t *, IDirect3D9 *);
 void D3D9_Destroy(d3d9_handle_t *);
 
 int D3D9_FillPresentationParameters(d3d9_handle_t *, const d3d9_device_t *, D3DPRESENT_PARAMETERS *);
+
+void d3d9_pic_context_destroy(picture_context_t *);
+picture_context_t *d3d9_pic_context_copy(picture_context_t *);
 
 #endif /* VLC_VIDEOCHROMA_D3D9_FMT_H_ */

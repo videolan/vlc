@@ -40,9 +40,6 @@
 
 #include "d3d9_filters.h"
 
-typedef picture_sys_d3d9_t VA_PICSYS;
-#include "../../codec/avcodec/va_surface.h"
-
 typedef struct
 {
     HINSTANCE                      hdecoder_dll;
@@ -145,7 +142,7 @@ static void FillSample( DXVA2_VideoSample *p_sample,
                         const RECT *p_area,
                         int i_field )
 {
-    picture_sys_d3d9_t *p_sys_src = ActivePictureSys(p_pic);
+    picture_sys_d3d9_t *p_sys_src = ActiveD3D9PictureSys(p_pic);
 
     p_sample->SrcSurface = p_sys_src->surface;
     p_sample->SampleFormat.SampleFormat = p_pic->b_top_field_first ?
@@ -203,7 +200,7 @@ static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
     picture_t *p_cur  = sys->context.pp_history[1];
     picture_t *p_next = sys->context.pp_history[2];
 
-    picture_sys_d3d9_t *p_sys_src = ActivePictureSys(src);
+    picture_sys_d3d9_t *p_sys_src = ActiveD3D9PictureSys(src);
 
     hr = IDirect3DSurface9_GetDesc( p_sys_src->surface, &srcDesc );
     if (unlikely(FAILED(hr)))
@@ -286,26 +283,6 @@ static const struct filter_mode_t *GetFilterMode(const char *mode)
     return NULL;
 }
 
-static void d3d9_pic_context_destroy(struct picture_context_t *ctx)
-{
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)ctx;
-    ReleaseD3D9PictureSys(&pic_ctx->picsys);
-    free(pic_ctx);
-}
-
-static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t *ctx)
-{
-    struct va_pic_context *src_ctx = (struct va_pic_context*)ctx;
-    struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
-    if (unlikely(pic_ctx==NULL))
-        return NULL;
-    pic_ctx->s.destroy = d3d9_pic_context_destroy;
-    pic_ctx->s.copy    = d3d9_pic_context_copy;
-    pic_ctx->picsys = src_ctx->picsys;
-    AcquireD3D9PictureSys(&pic_ctx->picsys);
-    return &pic_ctx->s;
-}
-
 picture_t *AllocPicture( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -344,11 +321,12 @@ picture_t *AllocPicture( filter_t *p_filter )
             b_local_texture = true;
         }
         /* the picture might be duplicated for snapshots so it needs a context */
-        struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+        struct d3d9_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
         if (likely(pic_ctx!=NULL))
         {
-            pic_ctx->s.destroy = d3d9_pic_context_destroy;
-            pic_ctx->s.copy    = d3d9_pic_context_copy;
+            pic_ctx->s = (picture_context_t) {
+                d3d9_pic_context_destroy, d3d9_pic_context_copy,
+            };
             pic_ctx->picsys = *pic_sys;
             AcquireD3D9PictureSys( &pic_ctx->picsys );
             pic->context = &pic_ctx->s;

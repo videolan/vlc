@@ -37,8 +37,14 @@
 #include <libavcodec/dxva2.h>
 #include "../../video_chroma/d3d9_fmt.h"
 
-typedef picture_sys_d3d9_t VA_PICSYS;
-#include "va_surface.h"
+struct dxva2_pic_context
+{
+    struct d3d9_pic_context ctx;
+    struct vlc_va_surface_t *va_surface;
+};
+
+#define DXVA2_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
+    container_of((pic_ctx), struct dxva2_pic_context, ctx.s)
 
 #include "directx_va.h"
 
@@ -153,55 +159,56 @@ static void SetupAVCodecContext(vlc_va_sys_t *sys, unsigned surfaces)
     sys->hw.workaround = sys->selected_decoder->workaround;
 }
 
-static void d3d9_pic_context_destroy(struct picture_context_t *opaque)
+static void dxva2_pic_context_destroy(picture_context_t *opaque)
 {
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)opaque;
+    struct dxva2_pic_context *pic_ctx = (struct dxva2_pic_context*)opaque;
     if (pic_ctx->va_surface)
     {
-        ReleaseD3D9PictureSys(&pic_ctx->picsys);
+        ReleaseD3D9PictureSys(&pic_ctx->ctx.picsys);
         va_surface_Release(pic_ctx->va_surface);
         free(pic_ctx);
     }
 }
 
-static struct va_pic_context *CreatePicContext(IDirect3DSurface9 *, IDirectXVideoDecoder *);
+static struct dxva2_pic_context *CreatePicContext(IDirect3DSurface9 *, IDirectXVideoDecoder *);
 
-static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t *ctx)
+static picture_context_t *dxva2_pic_context_copy(picture_context_t *ctx)
 {
-    struct va_pic_context *src_ctx = (struct va_pic_context*)ctx;
-    struct va_pic_context *pic_ctx = CreatePicContext(src_ctx->picsys.surface, src_ctx->picsys.decoder);
+    struct dxva2_pic_context *src_ctx = (struct dxva2_pic_context*)ctx;
+    struct dxva2_pic_context *pic_ctx = CreatePicContext(src_ctx->ctx.picsys.surface, src_ctx->ctx.picsys.decoder);
     if (unlikely(pic_ctx==NULL))
         return NULL;
     pic_ctx->va_surface = src_ctx->va_surface;
     va_surface_AddRef(pic_ctx->va_surface);
-    return &pic_ctx->s;
+    return &pic_ctx->ctx.s;
 }
 
-static struct va_pic_context *CreatePicContext(IDirect3DSurface9 *surface, IDirectXVideoDecoder *decoder)
+static struct dxva2_pic_context *CreatePicContext(IDirect3DSurface9 *surface, IDirectXVideoDecoder *decoder)
 {
-    struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    struct dxva2_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
     if (unlikely(pic_ctx==NULL))
         return NULL;
-    pic_ctx->s.destroy = d3d9_pic_context_destroy;
-    pic_ctx->s.copy    = d3d9_pic_context_copy;
-    pic_ctx->picsys.surface = surface;
-    pic_ctx->picsys.decoder = decoder;
-    AcquireD3D9PictureSys(&pic_ctx->picsys);
+    pic_ctx->ctx.s = (picture_context_t) {
+        dxva2_pic_context_destroy, dxva2_pic_context_copy,
+    };
+    pic_ctx->ctx.picsys.surface = surface;
+    pic_ctx->ctx.picsys.decoder = decoder;
+    AcquireD3D9PictureSys(&pic_ctx->ctx.picsys);
     return pic_ctx;
 }
 
 static picture_context_t* NewSurfacePicContext(vlc_va_t *va, int surface_index, vlc_va_surface_t *va_surface)
 {
     vlc_va_sys_t *sys = va->sys;
-    struct va_pic_context *pic_ctx = CreatePicContext(sys->hw_surface[surface_index], sys->hw.decoder);
+    struct dxva2_pic_context *pic_ctx = CreatePicContext(sys->hw_surface[surface_index], sys->hw.decoder);
     if (unlikely(pic_ctx==NULL))
         return NULL;
     /* all the resources are acquired during surfaces init, and a second time in
      * CreatePicContext(), undo one of them otherwise we need an extra release
      * when the pool is emptied */
-    ReleaseD3D9PictureSys(&pic_ctx->picsys);
+    ReleaseD3D9PictureSys(&pic_ctx->ctx.picsys);
     pic_ctx->va_surface = va_surface;
-    return &pic_ctx->s;
+    return &pic_ctx->ctx.s;
 }
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
@@ -223,7 +230,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
         return VLC_ENOITEM;
 
     pic->context = pic_ctx;
-    *data = (uint8_t*)((struct va_pic_context*)pic->context)->picsys.surface;
+    *data = (uint8_t*)DXVA2_PICCONTEXT_FROM_PICCTX(pic->context)->ctx.picsys.surface;
     return VLC_SUCCESS;
 }
 

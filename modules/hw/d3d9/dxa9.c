@@ -41,9 +41,6 @@
 #include <d3d9.h>
 #include "../../video_chroma/d3d9_fmt.h"
 
-typedef picture_sys_d3d9_t VA_PICSYS;
-#include "../../codec/avcodec/va_surface.h"
-
 typedef struct
 {
     /* GPU to CPU */
@@ -74,7 +71,7 @@ static bool GetLock(filter_t *p_filter, IDirect3DSurface9 *d3d,
 static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     copy_cache_t *p_copy_cache = (copy_cache_t*) p_filter->p_sys;
-    picture_sys_d3d9_t *p_sys = &((struct va_pic_context *)src->context)->picsys;
+    picture_sys_d3d9_t *p_sys = ActiveD3D9PictureSys(src);
 
     D3DSURFACE_DESC desc;
     D3DLOCKED_RECT lock;
@@ -144,7 +141,7 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 static void DXA9_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     copy_cache_t *p_copy_cache = (copy_cache_t*) p_filter->p_sys;
-    picture_sys_d3d9_t *p_sys = &((struct va_pic_context *)src->context)->picsys;
+    picture_sys_d3d9_t *p_sys = ActiveD3D9PictureSys(src);
 
     D3DSURFACE_DESC desc;
     D3DLOCKED_RECT lock;
@@ -231,26 +228,6 @@ struct d3d_pic_context
     picture_context_t s;
 };
 
-static void d3d9_pic_context_destroy(struct picture_context_t *ctx)
-{
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)ctx;
-    ReleaseD3D9PictureSys(&pic_ctx->picsys);
-    free(pic_ctx);
-}
-
-static struct picture_context_t *d3d9_pic_context_copy(struct picture_context_t *ctx)
-{
-    struct va_pic_context *src_ctx = (struct va_pic_context*)ctx;
-    struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
-    if (unlikely(pic_ctx==NULL))
-        return NULL;
-    pic_ctx->s.destroy = d3d9_pic_context_destroy;
-    pic_ctx->s.copy    = d3d9_pic_context_copy;
-    pic_ctx->picsys = src_ctx->picsys;
-    AcquireD3D9PictureSys(&pic_ctx->picsys);
-    return &pic_ctx->s;
-}
-
 static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = p_filter->p_sys;
@@ -283,11 +260,12 @@ static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
 
     if (dst->context == NULL)
     {
-        struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+        struct d3d9_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
         if (likely(pic_ctx))
         {
-            pic_ctx->s.destroy = d3d9_pic_context_destroy;
-            pic_ctx->s.copy    = d3d9_pic_context_copy;
+            pic_ctx->s = (picture_context_t) {
+                d3d9_pic_context_destroy, d3d9_pic_context_copy,
+            };
             pic_ctx->picsys = *p_sys;
             AcquireD3D9PictureSys(&pic_ctx->picsys);
             dst->context = &pic_ctx->s;
