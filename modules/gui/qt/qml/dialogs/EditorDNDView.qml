@@ -91,7 +91,7 @@ ListView {
         anchors.verticalCenter: currentIndex > 0 ? parent.verticalCenter : undefined
         color: VLCStyle.colors.bgHover
     }
-    displaced: Transition {
-        NumberAnimation { properties: "x,y"; easing.type: Easing.OutQuad }
-    }
+
+    highlightMoveDuration: 0 //ms
+    highlightResizeDuration: 0 //ms
 }

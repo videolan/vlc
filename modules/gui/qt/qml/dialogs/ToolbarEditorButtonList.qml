@@ -34,6 +34,8 @@ GridView{
     ScrollBar.vertical: ScrollBar {}
     model: controlButtons.buttonL.length
 
+    highlightMoveDuration: 0 //ms
+
     delegate:MouseArea{
         id:dragArea
         objectName: "buttonsList"
