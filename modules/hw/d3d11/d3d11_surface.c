@@ -45,9 +45,6 @@
 #include "d3d11_processor.h"
 #include "../../video_chroma/d3d11_fmt.h"
 
-typedef picture_sys_d3d11_t VA_PICSYS;
-#include "../../codec/avcodec/va_surface.h"
-
 #ifdef ID3D11VideoContext_VideoProcessorBlt
 #define CAN_PROCESSOR 1
 #else
@@ -238,7 +235,7 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 
     filter_sys_t *sys = p_filter->p_sys;
-    picture_sys_d3d11_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
+    picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(src);
 
     D3D11_TEXTURE2D_DESC desc;
     D3D11_MAPPED_SUBRESOURCE lock;
@@ -367,7 +364,7 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 
     filter_sys_t *sys = p_filter->p_sys;
-    picture_sys_d3d11_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
+    picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(src);
 
     D3D11_TEXTURE2D_DESC desc;
     D3D11_MAPPED_SUBRESOURCE lock;
@@ -457,7 +454,7 @@ static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = p_filter->p_sys;
     assert(src->context != NULL);
-    picture_sys_d3d11_t *p_sys = &((struct va_pic_context*)src->context)->picsys;
+    picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(src);
 
     D3D11_TEXTURE2D_DESC desc;
     D3D11_MAPPED_SUBRESOURCE lock;
@@ -551,30 +548,10 @@ static filter_t *CreateCPUtoGPUFilter( vlc_object_t *p_this, const es_format_t *
     return p_filter;
 }
 
-static void d3d11_pic_context_destroy(struct picture_context_t *opaque)
-{
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)opaque;
-    ReleaseD3D11PictureSys(&pic_ctx->picsys);
-    free(pic_ctx);
-}
-
-static struct picture_context_t *d3d11_pic_context_copy(struct picture_context_t *ctx)
-{
-    struct va_pic_context *src_ctx = (struct va_pic_context*)ctx;
-    struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
-    if (unlikely(pic_ctx==NULL))
-        return NULL;
-    pic_ctx->s.destroy = d3d11_pic_context_destroy;
-    pic_ctx->s.copy    = d3d11_pic_context_copy;
-    pic_ctx->picsys = src_ctx->picsys;
-    AcquireD3D11PictureSys(&pic_ctx->picsys);
-    return &pic_ctx->s;
-}
-
 static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = p_filter->p_sys;
-    picture_sys_d3d11_t *p_sys = dst->p_sys;
+    picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(dst);
     if (unlikely(p_sys==NULL))
     {
         /* the output filter configuration may have changed since the filter
@@ -613,11 +590,12 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
                                               &copyBox);
     if (dst->context == NULL)
     {
-        struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+        struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
         if (likely(pic_ctx))
         {
-            pic_ctx->s.destroy = d3d11_pic_context_destroy;
-            pic_ctx->s.copy    = d3d11_pic_context_copy;
+            pic_ctx->s = (picture_context_t) {
+                d3d11_pic_context_destroy, d3d11_pic_context_copy,
+            };
             pic_ctx->picsys = *p_sys;
             AcquireD3D11PictureSys(&pic_ctx->picsys);
             dst->context = &pic_ctx->s;

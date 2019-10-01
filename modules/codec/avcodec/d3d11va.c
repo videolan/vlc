@@ -50,8 +50,14 @@
 
 #include "../../video_chroma/d3d11_fmt.h"
 
-typedef picture_sys_d3d11_t VA_PICSYS;
-#include "va_surface.h"
+struct d3d11va_pic_context
+{
+    struct d3d11_pic_context  ctx;
+    struct vlc_va_surface_t   *va_surface;
+};
+
+#define D3D11VA_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
+    container_of((pic_ctx), struct d3d11va_pic_context, ctx.s)
 
 #include "directx_va.h"
 
@@ -145,63 +151,66 @@ static void SetupAVCodecContext(vlc_va_sys_t *sys, unsigned surfaces)
     sys->hw.workaround = sys->selected_decoder->workaround;
 }
 
-static void d3d11_pic_context_destroy(struct picture_context_t *opaque)
+static void d3d11va_pic_context_destroy(picture_context_t *opaque)
 {
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)opaque;
+    struct d3d11va_pic_context *pic_ctx = D3D11VA_PICCONTEXT_FROM_PICCTX(opaque);
     if (pic_ctx->va_surface)
+    {
+        ReleaseD3D11PictureSys(&pic_ctx->ctx.picsys);
         va_surface_Release(pic_ctx->va_surface);
-    ReleaseD3D11PictureSys(&pic_ctx->picsys);
-    free(pic_ctx);
+        free(pic_ctx);
+    }
 }
 
-static struct va_pic_context *CreatePicContext(ID3D11VideoDecoderOutputView *,
+static struct d3d11va_pic_context *CreatePicContext(ID3D11VideoDecoderOutputView *,
                                                ID3D11Resource *,
                                                ID3D11DeviceContext *,
                                                UINT slice,
                                                ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW]);
 
-static struct picture_context_t *d3d11_pic_context_copy(struct picture_context_t *ctx)
+static picture_context_t *d3d11va_pic_context_copy(picture_context_t *ctx)
 {
-    struct va_pic_context *src_ctx = (struct va_pic_context*)ctx;
-    struct va_pic_context *pic_ctx = CreatePicContext(src_ctx->picsys.decoder,
-                                                      src_ctx->picsys.resource[0], src_ctx->picsys.context,
-                                                      src_ctx->picsys.slice_index, src_ctx->picsys.renderSrc);
+    struct d3d11va_pic_context *src_ctx = D3D11VA_PICCONTEXT_FROM_PICCTX(ctx);
+    struct d3d11va_pic_context *pic_ctx = CreatePicContext(src_ctx->ctx.picsys.decoder,
+                                                      src_ctx->ctx.picsys.resource[0], src_ctx->ctx.picsys.context,
+                                                      src_ctx->ctx.picsys.slice_index, src_ctx->ctx.picsys.renderSrc);
     if (unlikely(pic_ctx==NULL))
         return NULL;
     if (src_ctx->va_surface) {
         pic_ctx->va_surface = src_ctx->va_surface;
         va_surface_AddRef(pic_ctx->va_surface);
     }
-    return &pic_ctx->s;
+    return &pic_ctx->ctx.s;
 }
 
-static struct va_pic_context *CreatePicContext(
+static struct d3d11va_pic_context *CreatePicContext(
                                                   ID3D11VideoDecoderOutputView *decoderSurface,
                                                   ID3D11Resource *p_resource,
                                                   ID3D11DeviceContext *context,
                                                   UINT slice,
                                                   ID3D11ShaderResourceView *renderSrc[D3D11_MAX_SHADER_VIEW])
 {
-    struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    struct d3d11va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
     if (unlikely(pic_ctx==NULL))
         goto done;
-    pic_ctx->s.destroy = d3d11_pic_context_destroy;
-    pic_ctx->s.copy    = d3d11_pic_context_copy;
+    pic_ctx->ctx.s = (picture_context_t) {
+        d3d11va_pic_context_destroy, d3d11va_pic_context_copy,
+    };
 
     D3D11_TEXTURE2D_DESC txDesc;
     ID3D11Texture2D_GetDesc((ID3D11Texture2D*)p_resource, &txDesc);
 
-    pic_ctx->picsys.formatTexture = txDesc.Format;
-    pic_ctx->picsys.context = context;
-    pic_ctx->picsys.slice_index = slice;
-    pic_ctx->picsys.decoder = decoderSurface;
+    pic_ctx->ctx.picsys.formatTexture = txDesc.Format;
+    pic_ctx->ctx.picsys.context = context;
+    pic_ctx->ctx.picsys.slice_index = slice;
+    pic_ctx->ctx.picsys.decoder = decoderSurface;
     for (int i=0;i<D3D11_MAX_SHADER_VIEW; i++)
     {
-        pic_ctx->picsys.resource[i] = p_resource;
-        pic_ctx->picsys.renderSrc[i] = renderSrc[i];
+        pic_ctx->ctx.picsys.resource[i] = p_resource;
+        pic_ctx->ctx.picsys.renderSrc[i] = renderSrc[i];
     }
-    AcquireD3D11PictureSys(&pic_ctx->picsys);
-    pic_ctx->picsys.context = context;
+    AcquireD3D11PictureSys(&pic_ctx->ctx.picsys);
+    pic_ctx->ctx.picsys.context = context;
 done:
     return pic_ctx;
 }
@@ -220,7 +229,7 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, int surface_index, 
     for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++)
         resourceView[i] = sys->renderSrc[viewDesc.Texture2D.ArraySlice*D3D11_MAX_SHADER_VIEW + i];
 
-    struct va_pic_context *pic_ctx = CreatePicContext(
+    struct d3d11va_pic_context *pic_ctx = CreatePicContext(
                                                   surface,
                                                   p_resource,
                                                   sys->d3d_dev.d3dcontext,
@@ -232,9 +241,9 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, int surface_index, 
     /* all the resources are acquired during surfaces init, and a second time in
      * CreatePicContext(), undo one of them otherwise we need an extra release
      * when the pool is emptied */
-    ReleaseD3D11PictureSys(&pic_ctx->picsys);
+    ReleaseD3D11PictureSys(&pic_ctx->ctx.picsys);
     pic_ctx->va_surface = va_surface;
-    return &pic_ctx->s;
+    return &pic_ctx->ctx.s;
 }
 
 static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
@@ -265,14 +274,15 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
                     return VLC_EGENERIC;
             }
 
-            pic->context = (picture_context_t*)CreatePicContext(
+            struct d3d11va_pic_context *pic_ctx = CreatePicContext(
                                              p_sys->decoder,
                                              p_sys->resource[KNOWN_DXGI_INDEX],
                                              sys->d3d_dev.d3dcontext,
                                              p_sys->slice_index,
                                              p_sys->renderSrc );
-            if (pic->context == NULL)
+            if (pic_ctx == NULL)
                 return VLC_EGENERIC;
+            pic->context = &pic_ctx->ctx.s;
         }
     }
     else
@@ -283,7 +293,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
             return VLC_ENOITEM;
         pic->context = pic_ctx;
     }
-    *data = (uint8_t*)((struct va_pic_context *)pic->context)->picsys.decoder;
+    *data = (uint8_t*)D3D11VA_PICCONTEXT_FROM_PICCTX(pic->context)->ctx.picsys.decoder;
     return VLC_SUCCESS;
 }
 

@@ -81,6 +81,12 @@ typedef struct
     DXGI_FORMAT                   formatTexture;
 } picture_sys_d3d11_t;
 
+struct d3d11_pic_context
+{
+    picture_context_t         s;
+    picture_sys_d3d11_t       picsys;
+};
+
 typedef struct
 {
     ID3D11DeviceContext *device;
@@ -97,6 +103,11 @@ static inline bool is_d3d11_opaque(vlc_fourcc_t chroma)
            chroma == VLC_CODEC_D3D11_OPAQUE_RGBA ||
            chroma == VLC_CODEC_D3D11_OPAQUE_BGRA;
 }
+
+#define D3D11_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
+    container_of((pic_ctx), struct d3d11_pic_context, s)
+
+picture_sys_d3d11_t *ActiveD3D11PictureSys(picture_t *);
 
 static inline d3d11_decoder_device_t *GetD3D11OpaqueDevice(vlc_decoder_device *device)
 {
@@ -190,5 +201,8 @@ static inline void d3d11_device_unlock(d3d11_device_t *d3d_dev)
     if( d3d_dev->context_mutex  != INVALID_HANDLE_VALUE )
         ReleaseMutex( d3d_dev->context_mutex );
 }
+
+void d3d11_pic_context_destroy(picture_context_t *);
+picture_context_t *d3d11_pic_context_copy(picture_context_t *);
 
 #endif /* include-guard */

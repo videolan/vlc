@@ -38,8 +38,14 @@
 
 #include "d3d11_fmt.h"
 
-typedef picture_sys_d3d11_t VA_PICSYS;
-#include "../codec/avcodec/va_surface.h"
+picture_sys_d3d11_t *ActiveD3D11PictureSys(picture_t *pic)
+{
+    if (unlikely(pic->context == NULL))
+        return pic->p_sys;
+
+    struct d3d11_pic_context *pic_ctx = D3D11_PICCONTEXT_FROM_PICCTX(pic->context);
+    return &pic_ctx->picsys;
+}
 
 void AcquireD3D11PictureSys(picture_sys_d3d11_t *p_sys)
 {
@@ -784,4 +790,21 @@ void D3D11_Destroy(d3d11_handle_t *hd3d)
         FreeLibrary(hd3d->dxgidebug_dll);
 #endif
 #endif
+}
+
+void d3d11_pic_context_destroy(picture_context_t *ctx)
+{
+    struct d3d11_pic_context *pic_ctx = D3D11_PICCONTEXT_FROM_PICCTX(ctx);
+    ReleaseD3D11PictureSys(&pic_ctx->picsys);
+    free(pic_ctx);
+}
+
+picture_context_t *d3d11_pic_context_copy(picture_context_t *ctx)
+{
+    struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    if (unlikely(pic_ctx==NULL))
+        return NULL;
+    *pic_ctx = *D3D11_PICCONTEXT_FROM_PICCTX(ctx);
+    AcquireD3D11PictureSys(&pic_ctx->picsys);
+    return &pic_ctx->s;
 }

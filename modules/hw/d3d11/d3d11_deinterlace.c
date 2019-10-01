@@ -39,9 +39,6 @@
 #include "../../video_chroma/d3d11_fmt.h"
 #include "../../video_filter/deinterlace/common.h"
 
-typedef picture_sys_d3d11_t VA_PICSYS;
-#include "../../codec/avcodec/va_surface.h"
-
 typedef struct
 {
     d3d11_handle_t                 hd3d;
@@ -88,7 +85,7 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     VLC_UNUSED(order);
     HRESULT hr;
     filter_sys_t *p_sys = p_filter->p_sys;
-    picture_sys_d3d11_t *p_out_sys = p_outpic->p_sys;
+    picture_sys_d3d11_t *p_out_sys = ActiveD3D11PictureSys(p_outpic);
 
     picture_t *p_prev = p_sys->context.pp_history[0];
     picture_t *p_cur  = p_sys->context.pp_history[1];
@@ -108,17 +105,17 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
 
     if( p_cur && p_next )
     {
-        picture_sys_d3d11_t *picsys_next = ActivePictureSys(p_next);
+        picture_sys_d3d11_t *picsys_next = ActiveD3D11PictureSys(p_next);
         if ( unlikely(!picsys_next) || FAILED(D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, picsys_next) ))
             return VLC_EGENERIC;
 
-        picture_sys_d3d11_t *picsys_cur = ActivePictureSys(p_cur);
+        picture_sys_d3d11_t *picsys_cur = ActiveD3D11PictureSys(p_cur);
         if ( unlikely(!picsys_cur) || FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, picsys_cur) ))
             return VLC_EGENERIC;
 
         if ( p_prev )
         {
-            picture_sys_d3d11_t *picsys_prev = ActivePictureSys(p_prev);
+            picture_sys_d3d11_t *picsys_prev = ActiveD3D11PictureSys(p_prev);
             if ( unlikely(!picsys_prev) || FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, picsys_prev) ))
                 return VLC_EGENERIC;
 
@@ -139,7 +136,7 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
     }
     else
     {
-        picture_sys_d3d11_t *p_sys_src = ActivePictureSys(p_pic);
+        picture_sys_d3d11_t *p_sys_src = ActiveD3D11PictureSys(p_pic);
         if ( unlikely(!p_sys_src) || FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, p_sys_src) ))
             return VLC_EGENERIC;
 
@@ -211,26 +208,6 @@ static const struct filter_mode_t *GetFilterMode(const char *mode)
     return NULL;
 }
 
-static void d3d11_pic_context_destroy(struct picture_context_t *opaque)
-{
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)opaque;
-    ReleaseD3D11PictureSys(&pic_ctx->picsys);
-    free(pic_ctx);
-}
-
-static struct picture_context_t *d3d11_pic_context_copy(struct picture_context_t *ctx)
-{
-    struct va_pic_context *src_ctx = (struct va_pic_context*)ctx;
-    struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
-    if (unlikely(pic_ctx==NULL))
-        return NULL;
-    pic_ctx->s.destroy = d3d11_pic_context_destroy;
-    pic_ctx->s.copy    = d3d11_pic_context_copy;
-    pic_ctx->picsys = src_ctx->picsys;
-    AcquireD3D11PictureSys(&pic_ctx->picsys);
-    return &pic_ctx->s;
-}
-
 picture_t *AllocPicture( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -284,11 +261,12 @@ picture_t *AllocPicture( filter_t *p_filter )
 
         }
         /* the picture might be duplicated for snapshots so it needs a context */
-        struct va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+        struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
         if (likely(pic_ctx!=NULL))
         {
-            pic_ctx->s.destroy = d3d11_pic_context_destroy;
-            pic_ctx->s.copy    = d3d11_pic_context_copy;
+            pic_ctx->s = (picture_context_t) {
+                d3d11_pic_context_destroy, d3d11_pic_context_copy,
+            };
             pic_ctx->picsys = *pic_sys;
             AcquireD3D11PictureSys( &pic_ctx->picsys );
             pic->context = &pic_ctx->s;

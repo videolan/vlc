@@ -51,8 +51,6 @@
 # include <windows.ui.xaml.media.dxinterop.h> */
 
 #include "../../video_chroma/d3d11_fmt.h"
-typedef picture_sys_d3d11_t VA_PICSYS;
-#include "../../codec/avcodec/va_surface.h"
 
 #include "d3d11_quad.h"
 #include "d3d11_shaders.h"
@@ -689,7 +687,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     }
     else
     {
-        picture_sys_d3d11_t *p_sys = ActivePictureSys(picture);
+        picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(picture);
 
         d3d11_device_lock( &sys->d3d_dev );
 
@@ -753,7 +751,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader)
         renderSrc = sys->stagingSys.renderSrc;
     else {
-        picture_sys_d3d11_t *p_sys = ActivePictureSys(picture);
+        picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(picture);
         renderSrc = p_sys->renderSrc;
     }
     D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad,

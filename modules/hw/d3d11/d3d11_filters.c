@@ -42,9 +42,6 @@
 #include "d3d11_processor.h"
 #include "../../video_chroma/d3d11_fmt.h"
 
-typedef picture_sys_d3d11_t VA_PICSYS;
-#include "../../codec/avcodec/va_surface.h"
-
 #ifdef __MINGW32__
 #define D3D11_VIDEO_PROCESSOR_FILTER_CAPS_BRIGHTNESS   0x1
 #define D3D11_VIDEO_PROCESSOR_FILTER_CAPS_CONTRAST     0x2
@@ -197,7 +194,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    picture_sys_d3d11_t *p_src_sys = ActivePictureSys(p_pic);
+    picture_sys_d3d11_t *p_src_sys = ActiveD3D11PictureSys(p_pic);
     if (FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, p_src_sys) ))
     {
         picture_Release( p_pic );
