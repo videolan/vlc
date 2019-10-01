@@ -56,6 +56,7 @@ Codecs:
 Access:
  * Enable SMB2 / SMB3 support on mobile ports with libsmb2
  * Added support for the RIST (Reliable Internet Stream Transport) Protocol
+ * Added support for the AMT (Automatic Multicast Tunneling) Protocol
  * Added avaudiocapture module as a replacement for qtsound, which is removed now
  * Audio CD data tracks are now correctly detected and skipped
  * Deprecates Audio CD CDDB lookups in favor of more accurate Musicbrainz
