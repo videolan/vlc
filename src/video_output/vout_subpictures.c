@@ -49,9 +49,13 @@
 
 /* Hold of subpicture with original ts */
 typedef struct {
-    subpicture_t *subpic;
-    vlc_tick_t orgstart;
+    /* Shared with prerendering thread */
+    subpicture_t *subpic; /* picture to be rendered */
+    /* */
+    vlc_tick_t orgstart; /* original picture timestamp, for conversion updates */
     vlc_tick_t orgstop;
+    vlc_tick_t start; /* current entry rendering time, */
+    vlc_tick_t stop;  /* set to subpicture at rendering time */
     bool is_late;
     enum vlc_vout_order channel_order;
 } spu_render_entry_t;
@@ -149,6 +153,8 @@ static int spu_channel_Push(struct spu_channel *channel, subpicture_t *subpic,
         .subpic = subpic,
         .orgstart = orgstart,
         .orgstop = orgstop,
+        .start = subpic->i_start,
+        .stop = subpic->i_stop,
     };
     return vlc_vector_push(&channel->entries, entry) ? VLC_SUCCESS : VLC_EGENERIC;
 }
@@ -601,8 +607,8 @@ static size_t spu_channel_UpdateDates(struct spu_channel *channel,
     {
         spu_render_entry_t *render_entry = &channel->entries.data[index];
 
-        render_entry->subpic->i_start = date_array[index * 2];
-        render_entry->subpic->i_stop = date_array[index * 2 + 1];
+        render_entry->start = date_array[index * 2];
+        render_entry->stop = date_array[index * 2 + 1];
     }
 
     free(date_array);
@@ -626,7 +632,7 @@ spu_render_entry_IsSelected(spu_render_entry_t *render_entry, size_t channel_id,
     const vlc_tick_t render_date =
         subpic->b_subtitle ? render_subtitle_date : system_now;
 
-    if (render_date && render_date < subpic->i_start)
+    if (render_date && render_date < render_entry->start)
         return false; /* Too early, come back next monday */
     return true;
 }
@@ -694,20 +700,20 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             vlc_tick_t *ephemer_date_ptr  = current->b_subtitle ? &ephemer_subtitle_date  : &ephemer_osd_date;
             int64_t *ephemer_order_ptr = current->b_subtitle ? &ephemer_subtitle_order : &ephemer_system_order;
             if (current->i_start >= *ephemer_date_ptr) {
-                *ephemer_date_ptr = current->i_start;
+                *ephemer_date_ptr = render_entry->start;
                 if (current->i_order > *ephemer_order_ptr)
                     *ephemer_order_ptr = current->i_order;
             }
 
-            is_stop_valid = !current->b_ephemer || current->i_stop > current->i_start;
+            is_stop_valid = !current->b_ephemer || render_entry->stop > render_entry->start;
 
-            is_late = is_stop_valid && current->i_stop <= render_date;
+            is_late = is_stop_valid && render_entry->stop <= render_date;
 
             /* start_date will be used for correct automatic overlap support
              * in case picture that should not be displayed anymore (display_time)
              * overlap with a picture to be displayed (render_entry->start)  */
             if (current->b_subtitle && !is_late && !current->b_ephemer)
-                start_date = current->i_start;
+                start_date = render_entry->start;
 
             /* */
             render_entry->is_late = is_late;
@@ -738,11 +744,11 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             const int64_t ephemer_order = current->b_subtitle ? ephemer_subtitle_order : ephemer_system_order;
 
             /* Destroy late and obsolete ephemer subpictures */
-            bool is_rejeted = is_late && current->i_stop  <= stop_date;
+            bool is_rejeted = is_late && render_entry->stop  <= stop_date;
             if (current->b_ephemer) {
-                if (current->i_start < ephemer_date)
+                if (render_entry->start < ephemer_date)
                     is_rejeted = true;
-                else if (current->i_start == ephemer_date &&
+                else if (render_entry->start == ephemer_date &&
                          current->i_order < ephemer_order)
                     is_rejeted = true;
             }
@@ -1871,7 +1877,7 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
     if (channel->clock)
     {
         vlc_tick_t system_now = vlc_tick_now();
-        vlc_tick_t times[2] = { subpic->i_start, subpic->i_stop };
+        vlc_tick_t times[2] = { orgstart, orgstop };
         vlc_clock_ConvertArrayToSystem(channel->clock, system_now,
                                        times, 2, channel->rate);
         subpic->i_start = times[0];
@@ -1969,6 +1975,10 @@ subpicture_t *spu_Render(spu_t *spu,
         subpicture_t *subpic = entry->subpic;
 
         spu_PrerenderSync(sys, entry->subpic);
+
+        /* Update time to clock */
+        entry->subpic->i_start = entry->start;
+        entry->subpic->i_stop = entry->stop;
 
         if (!subpic->updater.pf_validate)
             continue;
