@@ -1097,19 +1097,28 @@ static picture_t *thumbnailer_buffer_new( decoder_t *p_dec )
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     /* Avoid decoding more than one frame when a thumbnail was
      * already generated */
+    vlc_mutex_lock( &p_owner->lock );
     if( !p_owner->b_first )
+    {
+        vlc_mutex_unlock( &p_owner->lock );
         return NULL;
+    }
+    vlc_mutex_unlock( &p_owner->lock );
     return picture_NewFromFormat( &p_dec->fmt_out.video );
 }
 
 static void ModuleThread_QueueThumbnail( decoder_t *p_dec, picture_t *p_pic )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
-    if( p_owner->b_first )
-    {
+    bool b_first;
+
+    vlc_mutex_lock( &p_owner->lock );
+    b_first = p_owner->b_first;
+    p_owner->b_first = false;
+    vlc_mutex_unlock( &p_owner->lock );
+
+    if( b_first )
         decoder_Notify(p_owner, on_thumbnail_ready, p_pic);
-        p_owner->b_first = false;
-    }
     picture_Release( p_pic );
 
 }
