@@ -23,7 +23,8 @@ libpacketizer_h264_plugin_la_SOURCES = \
         packetizer/iso_color_tables.h
 libpacketizer_vc1_plugin_la_SOURCES = packetizer/vc1.c \
         packetizer/hxxx_ep3b.h \
-        packetizer/hxxx_nal.h
+        packetizer/hxxx_nal.h \
+        packetizer/iso_color_tables.h
 libpacketizer_mlp_plugin_la_SOURCES = packetizer/mlp.c
 libpacketizer_flac_plugin_la_SOURCES = packetizer/flac.c \
         packetizer/flac.h
