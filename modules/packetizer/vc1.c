@@ -582,7 +582,8 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
                 if( !p_sys->b_sequence_header )
                     msg_Dbg( p_dec, "frame rate %d/%d", p_es->video.i_frame_rate, p_es->video.i_frame_rate_base );
             }
-            if( bs_read1( &s ) ) /* Color Format */
+            if( bs_read1( &s ) && /* Color Format */
+                p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF )
             {
                 p_es->video.primaries = iso_23001_8_cp_to_vlc_primaries( bs_read( &s, 8 ) );
                 p_es->video.transfer = iso_23001_8_tc_to_vlc_xfer( bs_read( &s, 8 ) );
