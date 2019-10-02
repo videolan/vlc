@@ -713,12 +713,14 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     result = cuvid_load_functions(&p_sys->cuvidFunctions, p_dec);
     if (result != VLC_SUCCESS) {
-        hxxx_helper_clean(&p_sys->hh);
+        if (p_sys->b_is_hxxx)
+            hxxx_helper_clean(&p_sys->hh);
         return VLC_EGENERIC;
     }
     result = cuda_load_functions(&p_sys->cudaFunctions, p_dec);
     if (result != VLC_SUCCESS) {
-        hxxx_helper_clean(&p_sys->hh);
+        if (p_sys->b_is_hxxx)
+            hxxx_helper_clean(&p_sys->hh);
         return VLC_EGENERIC;
     }
 
@@ -756,7 +758,8 @@ static int OpenDecoder(vlc_object_t *p_this)
         result = hxxx_helper_get_chroma_chroma(&p_sys->hh, &i_chroma_idc,
                                             &i_depth_luma, &i_depth_chroma);
         if (result != VLC_SUCCESS) {
-            hxxx_helper_clean(&p_sys->hh);
+            if (p_sys->b_is_hxxx)
+                hxxx_helper_clean(&p_sys->hh);
             return VLC_EGENERIC;
         }
         cudaChroma = MapChomaIDC(i_chroma_idc);
