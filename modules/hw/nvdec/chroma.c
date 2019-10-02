@@ -94,6 +94,7 @@ static picture_t * FilterCUDAToCPU( filter_t *p_filter, picture_t *src )
         }
         srcY += srcpic->bufferHeight;
     }
+    picture_CopyProperties(dst, src);
 
 done:
     CALL_CUDA(cuCtxPopCurrent, NULL);
