@@ -86,13 +86,32 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
     const bool use_dr = !vout_IsDisplayFiltered(vd);
     const bool allow_dr = !vd->info.has_pictures_invalid && use_dr;
     const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
-    const unsigned decoder_picture  = 1 + sys->dpb_size;
+    unsigned decoder_picture  = 1 + sys->dpb_size;
     const unsigned kept_picture     = 1; /* last displayed picture */
     const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
                                       private_picture +
                                       kept_picture;
-    const unsigned display_pool_size = allow_dr ? __MAX(VOUT_MAX_PICTURES,
-                                                        reserved_picture + decoder_picture) : 3;
+    unsigned display_pool_size;
+
+    /* TODO: During the push transition, both decoder and vout handle a picture
+     * pool. Therefore we can lower this picture count when we know it is
+     * handled by the decoder. The vout pool will be only used for filters */
+    switch (vctx ? vlc_video_context_GetType(vctx) : VLC_VIDEO_CONTEXT_NONE)
+    {
+    case VLC_VIDEO_CONTEXT_VAAPI:
+    case VLC_VIDEO_CONTEXT_VDPAU:
+    case VLC_VIDEO_CONTEXT_NVDEC:
+    case VLC_VIDEO_CONTEXT_DXVA2:
+    case VLC_VIDEO_CONTEXT_D3D11VA:
+        display_pool_size = reserved_picture;
+        decoder_picture = 0;
+        break;
+    default:
+        display_pool_size = allow_dr ? __MAX(VOUT_MAX_PICTURES,
+                                             reserved_picture + decoder_picture) : 3;
+        break;
+    }
+
     picture_pool_t *display_pool = vout_GetPool(vd, display_pool_size);
     if (display_pool == NULL)
         goto error;
