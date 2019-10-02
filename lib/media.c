@@ -394,7 +394,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
 
     p_md->p_libvlc_instance = p_instance;
     p_md->p_input_item      = p_input_item;
-    p_md->i_refcount        = 1;
+    vlc_atomic_rc_init(&p_md->refcount);
 
     vlc_cond_init(&p_md->parsed_cond);
     vlc_mutex_init(&p_md->parsed_lock);
@@ -547,9 +547,7 @@ void libvlc_media_release( libvlc_media_t *p_md )
     if (!p_md)
         return;
 
-    p_md->i_refcount--;
-
-    if( p_md->i_refcount > 0 )
+    if(!vlc_atomic_rc_dec( &p_md->refcount ))
         return;
 
     uninstall_input_item_observer( p_md );
@@ -585,7 +583,7 @@ void libvlc_media_release( libvlc_media_t *p_md )
 void libvlc_media_retain( libvlc_media_t *p_md )
 {
     assert (p_md);
-    p_md->i_refcount++;
+    vlc_atomic_rc_inc(&p_md->refcount);
 }
 
 /**************************************************************************
