@@ -702,7 +702,6 @@ static void Flush( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;
 
-    date_Set(&p_sys->pts, VLC_TICK_INVALID); /* To make sure we recover properly */
     p_sys->i_late_frames = 0;
     p_sys->framedrop = FRAMEDROP_NONE;
     cc_Flush( &p_sys->cc );
@@ -715,6 +714,8 @@ static void Flush( decoder_t *p_dec )
     /* do not flush buffers if codec hasn't been opened (theora/vorbis/VC1) */
     if( avcodec_is_open( p_context ) )
         avcodec_flush_buffers( p_context );
+
+    date_Set(&p_sys->pts, VLC_TICK_INVALID); /* To make sure we recover properly */
 
     /* Reset cancel state to false */
     decoder_AbortPictures( p_dec, false );
@@ -759,7 +760,9 @@ static block_t * filter_earlydropped_blocks( decoder_t *p_dec, block_t *block )
                             "dropping frame (computer too slow ?)",
                      p_sys->p_context->reordered_opaque - p_sys->i_last_output_frame );
 
+            vlc_mutex_lock(&p_sys->lock);
             date_Set( &p_sys->pts, VLC_TICK_INVALID ); /* To make sure we recover properly */
+            vlc_mutex_unlock(&p_sys->lock);
             block_Release( block );
             p_sys->i_late_frames--;
             return NULL;
@@ -1339,7 +1342,10 @@ static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
         p_sys->i_last_output_frame = -1;
         p_sys->framedrop = FRAMEDROP_NONE;
 
+        vlc_mutex_lock(&p_sys->lock);
         date_Set( &p_sys->pts, VLC_TICK_INVALID ); /* To make sure we recover properly */
+        vlc_mutex_unlock(&p_sys->lock);
+
         cc_Flush( &p_sys->cc );
 
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
