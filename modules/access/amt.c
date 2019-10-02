@@ -649,7 +649,7 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
     {
         struct sockaddr temp;
         socklen_t temp_size = sizeof( struct sockaddr );
-        len = recvfrom( sys->sAMT, &pkt, sys->mtu + tunnel, 0, (struct sockaddr*)&temp, &temp_size );
+        len = recvfrom( sys->sAMT, (char *)pkt->p_buffer, sys->mtu + tunnel, 0, (struct sockaddr*)&temp, &temp_size );
     }
 
     /* If the payload length is greater than the MTU then the overflow buffer was utilized */
@@ -1168,7 +1168,7 @@ static bool amt_rcv_relay_adv( stream_t *p_access )
 
     struct sockaddr temp;
     socklen_t temp_size = sizeof( struct sockaddr );
-    ssize_t len = recvfrom( sys->sAMT, &pkt, RELAY_ADV_MSG_LEN, 0, &temp, &temp_size );
+    ssize_t len = recvfrom( sys->sAMT, pkt, RELAY_ADV_MSG_LEN, 0, &temp, &temp_size );
 
     if (len < 0)
     {
@@ -1261,7 +1261,7 @@ static bool amt_rcv_relay_mem_query( stream_t *p_access )
             return false;
     }
 
-    ssize_t len = recv( sys->sAMT, &pkt, RELAY_QUERY_MSG_LEN, 0 );
+    ssize_t len = recv( sys->sAMT, pkt, RELAY_QUERY_MSG_LEN, 0 );
 
     if (len < 0 || len != RELAY_QUERY_MSG_LEN)
     {
