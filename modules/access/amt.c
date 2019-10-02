@@ -1193,7 +1193,7 @@ static bool amt_rcv_relay_adv( stream_t *p_access )
     memcpy( &relay_adv_msg.ulRcvNonce, &pkt[NONCE_LEN], NONCE_LEN );
     if( sys->glob_ulNonce != relay_adv_msg.ulRcvNonce )
     {
-        msg_Err( p_access, "Discovery nonces differ! currNonce:%x rcvd%x", sys->glob_ulNonce, ntohl(relay_adv_msg.ulRcvNonce) );
+        msg_Err( p_access, "Discovery nonces differ! currNonce:%x rcvd%x", sys->glob_ulNonce, (uint32_t) ntohl(relay_adv_msg.ulRcvNonce) );
         return false;
     }
 
