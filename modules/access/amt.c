@@ -648,7 +648,7 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
     else
     {
         struct sockaddr temp;
-        uint32_t temp_size = sizeof( struct sockaddr );
+        socklen_t temp_size = sizeof( struct sockaddr );
         len = recvfrom( sys->sAMT, &pkt, sys->mtu + tunnel, 0, (struct sockaddr*)&temp, &temp_size );
     }
 
@@ -1167,7 +1167,7 @@ static bool amt_rcv_relay_adv( stream_t *p_access )
     }
 
     struct sockaddr temp;
-    uint32_t temp_size = sizeof( struct sockaddr );
+    socklen_t temp_size = sizeof( struct sockaddr );
     ssize_t len = recvfrom( sys->sAMT, &pkt, RELAY_ADV_MSG_LEN, 0, &temp, &temp_size );
 
     if (len < 0)
