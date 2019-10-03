@@ -258,7 +258,11 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             vlc_a52_header_t a52;
             if( !vlc_a52_header_Parse( &a52, p_header, VLC_A52_MIN_HEADER_SIZE )
              && a52.b_eac3 && a52.bs.eac3.strmtyp == EAC3_STRMTYP_DEPENDENT )
+            {
                 p_sys->i_input_size += a52.i_size;
+                p_dec->fmt_out.i_codec = VLC_CODEC_A52;
+                p_dec->fmt_out.i_profile = VLC_A52_PROFILE_EAC3_DEPENDENT;
+            }
 
             p_sys->i_state = STATE_GET_DATA;
             break;

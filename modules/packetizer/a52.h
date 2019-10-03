@@ -36,6 +36,8 @@
 #define VLC_A52_EAC3_BSI_SIZE    ((532 + 7)/8)
 #define VLC_A52_EAC3_HEADER_SIZE (VLC_A52_EAC3_BSI_SIZE + 2)
 
+#define VLC_A52_PROFILE_EAC3_DEPENDENT 1
+
 /**
  * AC3 header information.
  */
