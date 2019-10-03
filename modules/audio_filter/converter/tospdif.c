@@ -219,7 +219,7 @@ static int write_buffer_ac3( filter_t *p_filter, block_t *p_in_buf )
     static const size_t a52_size = A52_FRAME_NB * 4;
 
     if( unlikely( p_in_buf->i_buffer < 6
-     || p_in_buf->i_buffer > a52_size
+     || p_in_buf->i_buffer + SPDIF_HEADER_SIZE > a52_size
      || p_in_buf->i_nb_samples != A52_FRAME_NB ) )
     {
         /* Input is not correctly packetizer. Try to parse the buffer in order
