@@ -1,8 +1,21 @@
 /* compile: g++ d3d11_player.cpp -o d3d11_player.exe -L<path/libvlc> -lvlc -ld3d11 -ld3dcompiler_47 -luuid */
 
+/* This is the most extreme use case where libvlc is given its own ID3D11DeviceContext
+   and draws in a texture shared with the ID3D11DeviceContext of the app.
+
+   It's possible to share the ID3D11DeviceContext as long as the proper PixelShader
+   calls are overridden in the app after each libvlc drawing (see libvlc D3D11 doc).
+
+   It's also possible to use the SwapChain directly with libvlc and let it draw on its
+   entire area instead of drawing in a texture.
+*/
+
 #include <windows.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
+
+#include <d3d11_1.h>
+#include <dxgi1_2.h>
 
 #include <vlc/vlc.h>
 
@@ -15,6 +28,13 @@
 
 struct render_context
 {
+    /* resources shared by VLC */
+    ID3D11Device            *d3deviceVLC;
+    ID3D11DeviceContext     *d3dctxVLC;
+    ID3D11Texture2D         *textureVLC; // shared between VLC and the app
+    HANDLE                  sharedHandled; // handle of the texture used by VLC and the app
+    ID3D11RenderTargetView  *textureRenderTarget;
+
     /* Direct3D11 device/context */
     ID3D11Device        *d3device;
     ID3D11DeviceContext *d3dctx;
@@ -38,7 +58,6 @@ struct render_context
     /* texture VLC renders into */
     ID3D11Texture2D          *texture;
     ID3D11ShaderResourceView *textureShaderInput;
-    ID3D11RenderTargetView   *textureRenderTarget;
 
     CRITICAL_SECTION sizeLock; // the ReportSize callback cannot be called during/after the Cleanup_cb is called
     unsigned width, height;
@@ -58,6 +77,11 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cf
     {
         ctx->texture->Release();
         ctx->texture = NULL;
+    }
+    if (ctx->textureVLC)
+    {
+        ctx->textureVLC->Release();
+        ctx->textureVLC = NULL;
     }
     if (ctx->textureShaderInput)
     {
@@ -82,9 +106,20 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cf
     texDesc.Format = renderFormat;
     texDesc.Height = cfg->height;
     texDesc.Width  = cfg->width;
+    texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
 
     hr = ctx->d3device->CreateTexture2D( &texDesc, NULL, &ctx->texture );
     if (FAILED(hr)) return false;
+
+    IDXGIResource1* sharedResource = NULL;
+    ctx->texture->QueryInterface(__uuidof(IDXGIResource1), (LPVOID*) &sharedResource);
+    hr = sharedResource->CreateSharedHandle(NULL, DXGI_SHARED_RESOURCE_READ, NULL, &ctx->sharedHandled);
+    sharedResource->Release();
+
+    ID3D11Device1* d3d11VLC1;
+    ctx->d3deviceVLC->QueryInterface(__uuidof(ID3D11Device1), (LPVOID*) &d3d11VLC1);
+    hr = d3d11VLC1->OpenSharedResource1(ctx->sharedHandled, __uuidof(ID3D11Texture2D), (void**)&ctx->textureVLC);
+    d3d11VLC1->Release();
 
     D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc;
     ZeroMemory(&resviewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
@@ -98,7 +133,7 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cf
         .Format = texDesc.Format,
         .ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D,
     };
-    hr = ctx->d3device->CreateRenderTargetView(ctx->texture, &renderTargetViewDesc, &ctx->textureRenderTarget);
+    hr = ctx->d3deviceVLC->CreateRenderTargetView(ctx->textureVLC, &renderTargetViewDesc, &ctx->textureRenderTarget);
     if (FAILED(hr)) return false;
 
 
@@ -162,14 +197,7 @@ static bool StartRendering_cb( void *opaque, bool enter, const libvlc_video_dire
     if ( enter )
     {
         static const FLOAT blackRGBA[4] = {0.5f, 0.5f, 0.0f, 1.0f};
-
-        /* force unbinding the input texture, otherwise we get:
-         * OMSetRenderTargets: Resource being set to OM RenderTarget slot 0 is still bound on input! */
-        ID3D11ShaderResourceView *reset = NULL;
-        ctx->d3dctx->PSSetShaderResources(0, 1, &reset);
-        //ctx->d3dctx->Flush();
-
-        ctx->d3dctx->ClearRenderTargetView( ctx->textureRenderTarget, blackRGBA);
+        ctx->d3dctxVLC->ClearRenderTargetView( ctx->textureRenderTarget, blackRGBA);
         return true;
     }
 
@@ -182,14 +210,14 @@ static bool SelectPlane_cb( void *opaque, size_t plane )
     struct render_context *ctx = static_cast<struct render_context *>( opaque );
     if ( plane != 0 ) // we only support one packed RGBA plane (DXGI_FORMAT_R8G8B8A8_UNORM)
         return false;
-    ctx->d3dctx->OMSetRenderTargets( 1, &ctx->textureRenderTarget, NULL );
+    ctx->d3dctxVLC->OMSetRenderTargets( 1, &ctx->textureRenderTarget, NULL );
     return true;
 }
 
 static bool Setup_cb( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
 {
     struct render_context *ctx = static_cast<struct render_context *>(*opaque);
-    out->device_context = ctx->d3dctx;
+    out->device_context = ctx->d3dctxVLC;
     return true;
 }
 
@@ -275,7 +303,7 @@ static void init_direct3d(struct render_context *ctx, HWND hWnd)
     scd.Windowed = TRUE;
     scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    UINT creationFlags = D3D11_CREATE_DEVICE_VIDEO_SUPPORT; /* needed for hardware decoding */
+    UINT creationFlags = 0;
 #ifndef NDEBUG
     creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
@@ -300,6 +328,14 @@ static void init_direct3d(struct render_context *ctx, HWND hWnd)
         pMultithread->SetMultithreadProtected(TRUE);
         pMultithread->Release();
     }
+
+    D3D11CreateDevice(NULL,
+                      D3D_DRIVER_TYPE_HARDWARE,
+                      NULL,
+                      creationFlags | D3D11_CREATE_DEVICE_VIDEO_SUPPORT, /* needed for hardware decoding */
+                      NULL, 0,
+                      D3D11_SDK_VERSION,
+                      &ctx->d3deviceVLC, NULL, &ctx->d3dctxVLC);
 
     ID3D11Texture2D *pBackBuffer;
     ctx->swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
@@ -384,6 +420,9 @@ static void init_direct3d(struct render_context *ctx, HWND hWnd)
 
 static void release_direct3d(struct render_context *ctx)
 {
+    ctx->d3deviceVLC->Release();
+    ctx->d3dctxVLC->Release();
+
     ctx->samplerState->Release();
     ctx->textureRenderTarget->Release();
     ctx->textureShaderInput->Release();
