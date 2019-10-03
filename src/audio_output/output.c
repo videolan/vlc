@@ -517,16 +517,22 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
 
 /**
  * Starts an audio output stream.
+ * \param output_codec codec accepted by the module, it can be different than
+ * the codec from the mixer_format in case of DTSHD/DTS or EAC3/AC3 fallback
  * \warning The caller must NOT hold the audio output lock.
  */
 int aout_OutputNew (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
     audio_sample_format_t *fmt = &owner->mixer_format;
+    audio_sample_format_t *filter_fmt = &owner->filter_format;
     aout_filters_cfg_t *filters_cfg = &owner->filters_cfg;
 
     audio_channel_type_t input_chan_type = fmt->channel_type;
     unsigned i_nb_input_channels = fmt->i_channels;
+    vlc_fourcc_t formats[] = {
+        fmt->i_format, 0, 0
+    };
 
     /* Ideally, the audio filters would be created before the audio output,
      * and the ideal audio format would be the output of the filters chain.
@@ -561,11 +567,33 @@ int aout_OutputNew (audio_output_t *aout)
         aout_FormatPrepare (fmt);
         assert (aout_FormatNbChannels(fmt) > 0);
     }
+    else
+    {
+        switch (fmt->i_format)
+        {
+            case VLC_CODEC_DTS:
+                if (owner->input_profile > 0)
+                {
+                    assert(ARRAY_SIZE(formats) >= 3);
+                    /* DTSHD can be played as DTSHD or as DTS */
+                    formats[0] = VLC_CODEC_DTSHD;
+                    formats[1] = VLC_CODEC_DTS;
+                }
+                break;
+            default:
+                break;
+        }
+    }
 
     aout->current_sink_info.headphones = false;
 
     vlc_mutex_lock(&owner->lock);
-    int ret = aout->start(aout, fmt);
+    int ret = VLC_EGENERIC;
+    for (size_t i = 0; formats[i] != 0 && ret != VLC_SUCCESS; ++i)
+    {
+        filter_fmt->i_format = fmt->i_format = formats[i];
+        ret = aout->start(aout, fmt);
+    }
     assert(aout->flush && aout->play && aout->time_get && aout->pause);
     vlc_mutex_unlock(&owner->lock);
     if (ret)

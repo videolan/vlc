@@ -362,7 +362,7 @@ static void vlc_HdmiToWave(WAVEFORMATEXTENSIBLE_IEC61937 *restrict wf_iec61937,
 
     switch (audio->i_format)
     {
-    case VLC_CODEC_DTS:
+    case VLC_CODEC_DTSHD:
         wf->SubFormat = _KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD;
         wf->Format.nChannels = 8;
         wf->dwChannelMask = KSAUDIO_SPEAKER_7POINT1;
@@ -591,17 +591,6 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     audio_sample_format_t fmt = *pfmt;
     bool b_spdif = AOUT_FMT_SPDIF(&fmt);
     bool b_hdmi = AOUT_FMT_HDMI(&fmt);
-    bool b_dtshd = false;
-
-    if (fmt.i_format == VLC_CODEC_DTS)
-    {
-        b_dtshd = var_GetBool(vlc_object_parent(s), "dtshd");
-        if (b_dtshd)
-        {
-            b_hdmi = true;
-            b_spdif = false;
-        }
-    }
 
     void *pv;
     HRESULT hr = aout_stream_Activate(s, &IID_IAudioClient, NULL, &pv);
@@ -662,15 +651,6 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
 
     if (FAILED(hr))
     {
-        if (pfmt->i_format == VLC_CODEC_DTS && b_hdmi)
-        {
-            msg_Warn(s, "cannot negotiate DTS at 768khz IEC958 rate (HDMI), "
-                     "fallback to 48kHz (S/PDIF) (error 0x%lX)", hr);
-            IAudioClient_Release(sys->client);
-            free(sys);
-            var_SetBool(vlc_object_parent(s), "dtshd", false);
-            return Start(s, pfmt, sid);
-        }
         msg_Err(s, "cannot negotiate audio format (error 0x%lX)%s", hr,
                 hr == AUDCLNT_E_UNSUPPORTED_FORMAT
                 && fmt.i_format == VLC_CODEC_SPDIFL ?

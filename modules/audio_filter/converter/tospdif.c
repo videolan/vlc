@@ -96,6 +96,7 @@ static bool is_big_endian( filter_t *p_filter, block_t *p_in_buf )
         case VLC_CODEC_TRUEHD:
             return true;
         case VLC_CODEC_DTS:
+        case VLC_CODEC_DTSHD:
             return p_in_buf->p_buffer[0] == 0x1F
                 || p_in_buf->p_buffer[0] == 0x7F;
         default:
@@ -569,14 +570,11 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         case VLC_CODEC_TRUEHD:
             i_ret = write_buffer_truehd( p_filter, p_in_buf );
             break;
+        case VLC_CODEC_DTSHD:
+            i_ret = write_buffer_dtshd( p_filter, p_in_buf );
+            break;
         case VLC_CODEC_DTS:
-            /* if the fmt_out is configured for a higher rate than 48kHz
-             * (IEC958 rate), use the DTS-HD framing to pass the DTS Core and
-             * or DTS substreams (like DTS-HD MA). */
-            if( p_filter->fmt_out.audio.i_rate > 48000 )
-                i_ret = write_buffer_dtshd( p_filter, p_in_buf );
-            else
-                i_ret = write_buffer_dts( p_filter, p_in_buf );
+            i_ret = write_buffer_dts( p_filter, p_in_buf );
             break;
         default:
             vlc_assert_unreachable();
@@ -606,6 +604,7 @@ static int Open( vlc_object_t *p_this )
     filter_sys_t *p_sys;
 
     if( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_DTS &&
+          p_filter->fmt_in.audio.i_format != VLC_CODEC_DTSHD &&
           p_filter->fmt_in.audio.i_format != VLC_CODEC_A52 &&
           p_filter->fmt_in.audio.i_format != VLC_CODEC_EAC3 &&
           p_filter->fmt_in.audio.i_format != VLC_CODEC_MLP &&

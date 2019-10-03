@@ -76,7 +76,18 @@ typedef struct
 
     int requested_stereo_mode; /**< Requested stereo mode set by the user */
 
+    /* Original input format and profile, won't change for the lifetime of a
+     * stream (between aout_DecNew() and aout_DecDelete()). */
+    int                   input_profile;
     audio_sample_format_t input_format;
+
+    /* Format used to configure the conversion filters. It is based on the
+     * input_format but its fourcc can be different when the module is handling
+     * codec passthrough. Indeed, in case of DTSHD->DTS or EAC3->AC3 fallback,
+     * the filter need to know which codec is handled by the output. */
+    audio_sample_format_t filter_format;
+
+    /* Output format used and modified by the module. */
     audio_sample_format_t mixer_format;
 
     aout_filters_cfg_t filters_cfg;

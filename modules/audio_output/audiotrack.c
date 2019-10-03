@@ -1075,24 +1075,18 @@ AudioTrack_Create( JNIEnv *env, audio_output_t *p_aout,
 }
 
 static bool
-AudioTrack_HasEncoding( audio_output_t *p_aout, vlc_fourcc_t i_format,
-                        bool *p_dtshd )
+AudioTrack_HasEncoding( audio_output_t *p_aout, vlc_fourcc_t i_format )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
 #define MATCH_ENCODING_FLAG(x) jfields.AudioFormat.has_##x && \
     ( p_sys->i_encoding_flags == 0 || p_sys->i_encoding_flags & (1 << jfields.AudioFormat.x) )
 
-    *p_dtshd = false;
     switch( i_format )
     {
+        case VLC_CODEC_DTSHD:
+            return MATCH_ENCODING_FLAG( ENCODING_DTS_HD );
         case VLC_CODEC_DTS:
-            if( MATCH_ENCODING_FLAG( ENCODING_DTS_HD )
-             && var_GetBool( p_aout, "dtshd" ) )
-            {
-                *p_dtshd = true;
-                return true;
-            }
             return MATCH_ENCODING_FLAG( ENCODING_DTS );
         case VLC_CODEC_A52:
             return MATCH_ENCODING_FLAG( ENCODING_AC3 );
@@ -1112,8 +1106,7 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
     aout_sys_t *p_sys = p_aout->sys;
     int i_at_format;
 
-    bool b_dtshd;
-    if( !AudioTrack_HasEncoding( p_aout, p_sys->fmt.i_format, &b_dtshd ) )
+    if( !AudioTrack_HasEncoding( p_aout, p_sys->fmt.i_format ) )
         return VLC_EGENERIC;
 
     if( jfields.AudioFormat.has_ENCODING_IEC61937 )
@@ -1134,11 +1127,12 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
             case VLC_CODEC_DTS:
                 p_sys->fmt.i_bytes_per_frame = 4;
                 p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
-                if( b_dtshd )
-                {
-                    p_sys->fmt.i_rate = 192000;
-                    p_sys->fmt.i_bytes_per_frame = 16;
-                }
+                break;
+            case VLC_CODEC_DTSHD:
+                p_sys->fmt.i_bytes_per_frame = 4;
+                p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
+                p_sys->fmt.i_rate = 192000;
+                p_sys->fmt.i_bytes_per_frame = 16;
                 break;
             case VLC_CODEC_EAC3:
                 p_sys->fmt.i_rate = 192000;
@@ -2190,15 +2184,15 @@ static int DeviceSelect(audio_output_t *p_aout, const char *p_id)
         if( at_dev == AT_DEV_ENCODED )
         {
             static const vlc_fourcc_t enc_fourccs[] = {
-                VLC_CODEC_DTS, VLC_CODEC_A52, VLC_CODEC_EAC3, VLC_CODEC_TRUEHD,
+                VLC_CODEC_DTS, VLC_CODEC_DTSHD, VLC_CODEC_A52, VLC_CODEC_EAC3,
+                VLC_CODEC_TRUEHD,
             };
             for( size_t i = 0;
                  i < sizeof( enc_fourccs ) / sizeof( enc_fourccs[0] ); ++i )
             {
-                bool b_dtshd;
-                if( AudioTrack_HasEncoding( p_aout, enc_fourccs[i], &b_dtshd ) )
+                if( AudioTrack_HasEncoding( p_aout, enc_fourccs[i] ) )
                     msg_Dbg( p_aout, "device has %4.4s passthrough support",
-                             b_dtshd ? "dtsh" : (const char *)&enc_fourccs[i] );
+                             (const char *)&enc_fourccs[i] );
             }
         }
     }

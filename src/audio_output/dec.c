@@ -92,14 +92,9 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
     owner->volume = aout_volume_New (p_aout, p_replay_gain);
 
     atomic_store_explicit(&owner->restart, 0, memory_order_relaxed);
-    owner->input_format = *p_format;
+    owner->input_profile = profile;
+    owner->filter_format = owner->mixer_format = owner->input_format = *p_format;
 
-    /* TODO: 3.0 HACK: we need to put i_profile inside audio_format_t for 4.0
-     * */
-    if( owner->input_format.i_format == VLC_CODEC_DTS )
-        var_SetBool( p_aout, "dtshd", profile > 0 );
-
-    owner->mixer_format = owner->input_format;
     owner->sync.clock = clock;
 
     owner->filters_cfg = AOUT_FILTERS_CFG_INIT;
@@ -109,7 +104,7 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
 
     /* Create the audio filtering "input" pipeline */
     owner->filters = aout_FiltersNewWithClock(VLC_OBJECT(p_aout), clock,
-                                              &owner->input_format,
+                                              &owner->filter_format,
                                               &owner->mixer_format,
                                               &owner->filters_cfg);
     if (owner->filters == NULL)
@@ -167,7 +162,7 @@ static int aout_CheckReady (audio_output_t *aout)
             msg_Dbg (aout, "restarting output...");
             if (owner->mixer_format.i_format)
                 aout_OutputDelete (aout);
-            owner->mixer_format = owner->input_format;
+            owner->filter_format = owner->mixer_format = owner->input_format;
             owner->filters_cfg = AOUT_FILTERS_CFG_INIT;
             if (aout_OutputNew (aout))
                 owner->mixer_format.i_format = 0;
@@ -189,7 +184,7 @@ static int aout_CheckReady (audio_output_t *aout)
         {
             owner->filters = aout_FiltersNewWithClock(VLC_OBJECT(aout),
                                                       owner->sync.clock,
-                                                      &owner->input_format,
+                                                      &owner->filter_format,
                                                       &owner->mixer_format,
                                                       &owner->filters_cfg);
             if (owner->filters == NULL)
