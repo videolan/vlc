@@ -5,7 +5,7 @@ GMP_URL := https://gmplib.org/download/gmp-$(GMP_VERSION)/gmp-$(GMP_VERSION).tar
 
 GMP_CONF :=
 
-ifeq ($(CC),clang)
+ifdef HAVE_CLANG
 ifeq ($(ARCH),mipsel)
 GMP_CONF += --disable-assembly
 endif
