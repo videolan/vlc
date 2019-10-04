@@ -17,13 +17,14 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 
 import "qrc:///style/"
 
-ProgressBar {
+T.ProgressBar {
     visible: !medialib.idle
 
-    id: progressBar_id
+    id: control
     from: 0
     to: 100
     height: progressText_id.height
@@ -31,11 +32,66 @@ ProgressBar {
     anchors.bottomMargin: 10
     value: medialib.parsingProgress
     indeterminate: medialib.discoveryPending
+
+    contentItem: Item {
+        implicitHeight: 24
+        implicitWidth: 120
+
+        Rectangle {
+            width: control.indeterminate ?  parent.width : (control.visualPosition * parent.width)
+            height: parent.height
+            color: VLCStyle.colors.bgAlt
+
+            Rectangle {
+                width: control.width * 0.2
+                height: parent.height
+                visible: control.indeterminate
+                color: VLCStyle.colors.buffer
+
+                property double pos: 0
+                x: (pos / 1000) * (parent.width * 0.8)
+
+                SequentialAnimation on pos {
+                    id: loadingAnim
+                    running: control.indeterminate
+                    loops: Animation.Infinite
+                    PropertyAnimation {
+                        from: 0.0
+                        to: 1000
+                        duration: 2000
+                        easing.type: "OutBounce"
+                    }
+                    PauseAnimation {
+                        duration: 500
+                    }
+                    PropertyAnimation {
+                        from: 1000
+                        to: 0.0
+                        duration: 2000
+                        easing.type: "OutBounce"
+                    }
+                    PauseAnimation {
+                        duration: 500
+                    }
+                }
+            }
+        }
+    }
+
+    background: Rectangle {
+        implicitHeight: 24
+        implicitWidth: 120
+        radius: 2
+        color: VLCStyle.colors.bg
+    }
+
     Text {
         id: progressText_id
         color: VLCStyle.colors.text
+        style: Text.Outline
+        styleColor: VLCStyle.colors.bg
         text:  medialib.discoveryPending ? medialib.discoveryEntryPoint : (medialib.parsingProgress + "%")
-        z: progressBar_id.z + 1
+        z: control.z + 1
         anchors.horizontalCenter: parent.horizontalCenter
         visible: true
     }
