@@ -128,6 +128,9 @@ make -j$JOBS -k || make -j1
 if [ "$PACKAGE" = "yes" ]; then
 make package
 fi
+elif [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
+make .luac
 else
 make prebuilt
 make .luac
