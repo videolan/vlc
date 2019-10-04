@@ -59,6 +59,7 @@ typedef struct {
     };
     enum AVCodecID codec;
     const int    *p_profiles; // NULL or ends with 0
+    int           workaround;
 } directx_va_mode_t;
 
 #define MAX_SURFACE_COUNT (64)

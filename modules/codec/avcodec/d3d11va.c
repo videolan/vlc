@@ -142,9 +142,7 @@ static void SetupAVCodecContext(vlc_va_sys_t *sys, unsigned surfaces)
     sys->hw.surface_count = surfaces;
     sys->hw.surface = sys->hw_surface;
     sys->hw.context_mutex = sys->d3d_dev.context_mutex;
-
-    if (IsEqualGUID(sys->selected_decoder->guid, &DXVA_Intel_H264_NoFGT_ClearVideo))
-        sys->hw.workaround |= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
+    sys->hw.workaround = sys->selected_decoder->workaround;
 }
 
 static void d3d11_pic_context_destroy(struct picture_context_t *opaque)
