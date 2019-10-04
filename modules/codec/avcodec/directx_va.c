@@ -260,8 +260,8 @@ static const directx_va_mode_t DXVA_MODES[] = {
     { NULL, NULL, 0, 0, NULL }
 };
 
-static int FindVideoServiceConversion(vlc_va_t *, const directx_sys_t *, const es_format_t *, video_format_t *fmt_out,
-                                      const AVCodecContext *, const AVPixFmtDescriptor *, GUID *found_guid);
+static const directx_va_mode_t *FindVideoServiceConversion(vlc_va_t *, const directx_sys_t *, const es_format_t *, video_format_t *fmt_out,
+                                      const AVCodecContext *, const AVPixFmtDescriptor *);
 
 static char *directx_va_GetDecoderName(const GUID *guid)
 {
@@ -277,10 +277,10 @@ static char *directx_va_GetDecoderName(const GUID *guid)
 }
 
 /* */
-int directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_sys,
+const directx_va_mode_t *directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_sys,
                      const AVCodecContext *avctx, const AVPixFmtDescriptor *desc,
                      const es_format_t *fmt, int flag_xbox,
-                     video_format_t *fmt_out, unsigned *surfaces, GUID *found_guid)
+                     video_format_t *fmt_out, unsigned *surfaces)
 {
     int surface_alignment = 16;
     unsigned surface_count = 2;
@@ -318,7 +318,7 @@ int directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_sys,
         surface_count += avctx->thread_count;
 
     if (avctx->coded_width <= 0 || avctx->coded_height <= 0)
-        return VLC_EGENERIC;
+        return NULL;
 
     assert((surface_alignment & (surface_alignment - 1)) == 0); /* power of 2 */
 #define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
@@ -339,12 +339,13 @@ int directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_sys,
     fmt_out->i_frame_rate_base = avctx->framerate.den;
 
     /* */
-    if (FindVideoServiceConversion(va, dx_sys, fmt, fmt_out, avctx, desc, found_guid)) {
+    const directx_va_mode_t *res = FindVideoServiceConversion(va, dx_sys, fmt, fmt_out, avctx, desc);
+    if (res == NULL) {
         msg_Err(va, "FindVideoServiceConversion failed");
-        return VLC_EGENERIC;
+        return NULL;
     }
     *surfaces = surface_count;
-    return VLC_SUCCESS;
+    return res;
 }
 
 static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *fmt,
@@ -384,21 +385,20 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
 /**
  * Find the best suited decoder mode GUID and render format.
  */
-static int FindVideoServiceConversion(vlc_va_t *va, const directx_sys_t *dx_sys,
+static const directx_va_mode_t * FindVideoServiceConversion(vlc_va_t *va, const directx_sys_t *dx_sys,
                                       const es_format_t *fmt, video_format_t *fmt_out,
-                                      const AVCodecContext *avctx, const AVPixFmtDescriptor *desc,
-                                      GUID *found_guid)
+                                      const AVCodecContext *avctx, const AVPixFmtDescriptor *desc)
 {
     input_list_t p_list = { 0 };
     int err = dx_sys->pf_get_input_list(va, &p_list);
     if (err != VLC_SUCCESS)
-        return err;
+        return NULL;
     if (p_list.count == 0) {
         msg_Warn( va, "No input format found for HWAccel" );
-        return VLC_EGENERIC;
+        return NULL;
     }
 
-    err = VLC_EGENERIC;
+    const directx_va_mode_t *res = NULL;
     /* Retreive supported modes from the decoder service */
     for (unsigned i = 0; i < p_list.count; i++) {
         const GUID *g = &p_list.list[i];
@@ -440,12 +440,11 @@ static int FindVideoServiceConversion(vlc_va_t *va, const directx_sys_t *dx_sys,
         msg_Dbg(va, "Trying to use '%s' as input", mode->name);
         if (dx_sys->pf_setup_output(va, mode, fmt_out)==VLC_SUCCESS)
         {
-            *found_guid = *mode->guid;
-            err = VLC_SUCCESS;
+            res = mode;
             break;
         }
     }
 
     p_list.pf_release(&p_list);
-    return err;
+    return res;
 }

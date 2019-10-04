@@ -122,7 +122,7 @@ struct vlc_va_sys_t
 
     /* Video decoder */
     DXVA2_ConfigPictureDecode    cfg;
-    GUID                         decoder_guid;
+    const directx_va_mode_t       *selected_decoder;
     IDirectXVideoDecoderService  *d3ddec;
 
     /* pool */
@@ -151,7 +151,7 @@ static void SetupAVCodecContext(vlc_va_sys_t *sys, unsigned surfaces)
     sys->hw.surface_count = surfaces;
     sys->hw.surface = sys->hw_surface;
 
-    if (IsEqualGUID(&sys->decoder_guid, &DXVA_Intel_H264_NoFGT_ClearVideo))
+    if (IsEqualGUID(sys->selected_decoder->guid, &DXVA_Intel_H264_NoFGT_ClearVideo))
         sys->hw.workaround |= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
 }
 
@@ -310,8 +310,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
 
     video_format_t fmt_out;
     static const directx_sys_t dx_sys = { DxGetInputList, DxSetupOutput };
-    err = directx_va_Setup(va, &dx_sys, ctx, desc, fmt, 0, &fmt_out, &sys->hw.surface_count, &sys->decoder_guid);
-    if (err != VLC_SUCCESS)
+    sys->selected_decoder = directx_va_Setup(va, &dx_sys, ctx, desc, fmt, 0, &fmt_out, &sys->hw.surface_count);
+    if (sys->selected_decoder == NULL)
         goto error;
 
     err = va_pool_SetupDecoder(va, &sys->va_pool, ctx, &fmt_out, sys->hw.surface_count);
@@ -585,7 +585,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
     UINT                      cfg_count = 0;
     DXVA2_ConfigPictureDecode *cfg_list = NULL;
     hr = IDirectXVideoDecoderService_GetDecoderConfigurations(sys->d3ddec,
-                                                              &sys->decoder_guid,
+                                                              sys->selected_decoder->guid,
                                                               &dsc,
                                                               NULL,
                                                               &cfg_count,
@@ -630,7 +630,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
     /* Create the decoder */
     /* adds a reference on each decoder surface */
     if (FAILED(IDirectXVideoDecoderService_CreateVideoDecoder(sys->d3ddec,
-                                                              &sys->decoder_guid,
+                                                              sys->selected_decoder->guid,
                                                               &dsc,
                                                               &sys->cfg,
                                                               sys->hw_surface,
