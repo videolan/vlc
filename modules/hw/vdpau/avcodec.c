@@ -132,7 +132,8 @@ static void Close(vlc_va_t *va)
 
 static const struct vlc_va_operations ops = { Lock, Close, };
 
-static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
+static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *desc,
+                enum PixelFormat pix_fmt,
                 const es_format_t *fmt, void *p_sys)
 {
     if (pix_fmt != AV_PIX_FMT_VDPAU)
@@ -140,6 +141,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
 
     (void) fmt;
     (void) p_sys;
+    (void) desc;
     void *func;
     VdpStatus err;
     VdpChromaType type;

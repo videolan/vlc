@@ -55,7 +55,7 @@ typedef picture_sys_d3d11_t VA_PICSYS;
 
 #include "directx_va.h"
 
-static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
+static int Open(vlc_va_t *, AVCodecContext *, const AVPixFmtDescriptor *, enum PixelFormat,
                 const es_format_t *, void *);
 
 vlc_module_begin()
@@ -302,7 +302,8 @@ static void Close(vlc_va_t *va)
 
 static const struct vlc_va_operations ops = { Get, Close, };
 
-static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
+static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
+                enum PixelFormat pix_fmt,
                 const es_format_t *fmt, void *picsys)
 {
     int err = VLC_EGENERIC;
@@ -383,7 +384,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     video_format_t fmt_out;
     static const directx_sys_t dx_sys = { DxGetInputList, DxSetupOutput };
-    err = directx_va_Setup(va, &dx_sys, ctx, fmt, isXboxHardware(sys->d3d_dev.d3ddevice), &fmt_out, &sys->hw.surface_count, &sys->decoder_guid);
+    err = directx_va_Setup(va, &dx_sys, ctx, desc, fmt, isXboxHardware(sys->d3d_dev.d3ddevice), &fmt_out, &sys->hw.surface_count, &sys->decoder_guid);
     if (err != VLC_SUCCESS)
         goto error;
 

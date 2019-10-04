@@ -92,16 +92,18 @@ static int vlc_va_Start(void *func, bool forced, va_list ap)
 {
     vlc_va_t *va = va_arg(ap, vlc_va_t *);
     AVCodecContext *ctx = va_arg(ap, AVCodecContext *);
+    const AVPixFmtDescriptor *src_desc = va_arg(ap, const AVPixFmtDescriptor *);
     enum PixelFormat pix_fmt = va_arg(ap, enum PixelFormat);
     const es_format_t *fmt = va_arg(ap, const es_format_t *);
     void *p_sys = va_arg(ap, void *);
     vlc_va_open open = func;
 
     (void) forced;
-    return open(va, ctx, pix_fmt, fmt, p_sys);
+    return open(va, ctx, src_desc, pix_fmt, fmt, p_sys);
 }
 
-vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
+vlc_va_t *vlc_va_New(vlc_object_t *obj,
+                     AVCodecContext *avctx, const AVPixFmtDescriptor *src_desc,
                      enum PixelFormat pix_fmt, const es_format_t *fmt,
                      void *sys)
 {
@@ -112,7 +114,7 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
     char *modlist = var_InheritString(obj, "avcodec-hw");
 
     if (vlc_module_load(va, "hw decoder", modlist, true,
-                        vlc_va_Start, va, avctx, pix_fmt, fmt, sys) == NULL)
+                        vlc_va_Start, va, avctx, src_desc, pix_fmt, fmt, sys) == NULL)
     {
         vlc_object_delete(va);
         va = NULL;

@@ -267,7 +267,8 @@ static const directx_va_mode_t DXVA_MODES[] = {
     { NULL, NULL, 0, NULL }
 };
 
-static int FindVideoServiceConversion(vlc_va_t *, const directx_sys_t *, const es_format_t *, video_format_t *fmt_out, const AVCodecContext *, GUID *found_guid);
+static int FindVideoServiceConversion(vlc_va_t *, const directx_sys_t *, const es_format_t *, video_format_t *fmt_out,
+                                      const AVCodecContext *, const AVPixFmtDescriptor *, GUID *found_guid);
 
 char *directx_va_GetDecoderName(const GUID *guid)
 {
@@ -283,7 +284,8 @@ char *directx_va_GetDecoderName(const GUID *guid)
 }
 
 /* */
-int directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_sys, const AVCodecContext *avctx,
+int directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_sys,
+                     const AVCodecContext *avctx, const AVPixFmtDescriptor *desc,
                      const es_format_t *fmt, int flag_xbox,
                      video_format_t *fmt_out, unsigned *surfaces, GUID *found_guid)
 {
@@ -344,7 +346,7 @@ int directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_sys, const AVCodecCon
     fmt_out->i_frame_rate_base = avctx->framerate.den;
 
     /* */
-    if (FindVideoServiceConversion(va, dx_sys, fmt, fmt_out, avctx, found_guid)) {
+    if (FindVideoServiceConversion(va, dx_sys, fmt, fmt_out, avctx, desc, found_guid)) {
         msg_Err(va, "FindVideoServiceConversion failed");
         return VLC_EGENERIC;
     }
@@ -390,7 +392,8 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
  * Find the best suited decoder mode GUID and render format.
  */
 static int FindVideoServiceConversion(vlc_va_t *va, const directx_sys_t *dx_sys,
-                                      const es_format_t *fmt, video_format_t *fmt_out, const AVCodecContext *avctx,
+                                      const es_format_t *fmt, video_format_t *fmt_out,
+                                      const AVCodecContext *avctx, const AVPixFmtDescriptor *desc,
                                       GUID *found_guid)
 {
     input_list_t p_list = { 0 };
