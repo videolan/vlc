@@ -274,7 +274,8 @@ static const directx_va_mode_t DXVA_MODES[] = {
     { NULL, NULL, 0, NULL }
 };
 
-static int FindVideoServiceConversion(vlc_va_t *, directx_sys_t *, const es_format_t *, const AVCodecContext *);
+static int FindVideoServiceConversion(vlc_va_t *, directx_sys_t *, const es_format_t *,
+                                      const AVCodecContext *, const AVPixFmtDescriptor *);
 
 char *directx_va_GetDecoderName(const GUID *guid)
 {
@@ -290,11 +291,12 @@ char *directx_va_GetDecoderName(const GUID *guid)
 }
 
 /* */
-int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, const AVCodecContext *avctx,
+int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys,
+                     const AVCodecContext *avctx, const AVPixFmtDescriptor *desc,
                      const es_format_t *fmt, int flag_xbox)
 {
     /* */
-    if (FindVideoServiceConversion(va, dx_sys, fmt, avctx)) {
+    if (FindVideoServiceConversion(va, dx_sys, fmt, avctx, desc)) {
         msg_Err(va, "FindVideoServiceConversion failed");
         return VLC_EGENERIC;
     }
@@ -396,7 +398,8 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
  * Find the best suited decoder mode GUID and render format.
  */
 static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys,
-                                      const es_format_t *fmt, const AVCodecContext *avctx)
+                                      const es_format_t *fmt,
+                                      const AVCodecContext *avctx, const AVPixFmtDescriptor *desc)
 {
     input_list_t p_list = { 0 };
     int err = dx_sys->pf_get_input_list(va, &p_list);

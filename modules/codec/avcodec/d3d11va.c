@@ -55,7 +55,7 @@
 #define D3D_DecoderSurface  ID3D11VideoDecoderOutputView
 #include "directx_va.h"
 
-static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
+static int Open(vlc_va_t *, AVCodecContext *, const AVPixFmtDescriptor *, enum PixelFormat,
                 const es_format_t *, picture_sys_t *p_sys);
 static void Close(vlc_va_t *, void **);
 
@@ -307,7 +307,8 @@ static void Close(vlc_va_t *va, void **ctx)
     free(sys);
 }
 
-static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
+static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
+                enum PixelFormat pix_fmt,
                 const es_format_t *fmt, picture_sys_t *p_sys)
 {
     int err = VLC_EGENERIC;
@@ -398,7 +399,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (err!=VLC_SUCCESS)
         goto error;
 
-    err = directx_va_Setup(va, &sys->dx_sys, ctx, fmt, isXboxHardware(&sys->d3d_dev));
+    err = directx_va_Setup(va, &sys->dx_sys, ctx, desc, fmt, isXboxHardware(&sys->d3d_dev));
     if (err != VLC_SUCCESS)
         goto error;
 

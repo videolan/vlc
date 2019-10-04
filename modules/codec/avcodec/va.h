@@ -25,6 +25,7 @@
 
 #ifndef VLC_AVCODEC_VA_H
 #define VLC_AVCODEC_VA_H 1
+#include <libavutil/pixdesc.h>
 
 typedef struct vlc_va_t vlc_va_t;
 typedef struct vlc_va_sys_t vlc_va_sys_t;
@@ -54,7 +55,7 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt);
  * @param fmt VLC format of the content to decode
  * @return a new VLC object on success, NULL on error.
  */
-vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *,
+vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *, const AVPixFmtDescriptor *,
                      enum PixelFormat, const es_format_t *fmt,
                      picture_sys_t *p_sys);
 

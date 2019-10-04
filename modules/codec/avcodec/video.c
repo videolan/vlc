@@ -1631,6 +1631,8 @@ no_reuse:
         AV_PIX_FMT_NONE,
     };
 
+    const AVPixFmtDescriptor *src_desc = av_pix_fmt_desc_get(swfmt);
+
     for( size_t i = 0; hwfmts[i] != AV_PIX_FMT_NONE; i++ )
     {
         enum PixelFormat hwfmt = AV_PIX_FMT_NONE;
@@ -1657,7 +1659,7 @@ no_reuse:
 
         picture_t *test_pic = decoder_NewPicture(p_dec);
         assert(!test_pic || test_pic->format.i_chroma == p_dec->fmt_out.video.i_chroma);
-        vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, hwfmt,
+        vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, src_desc, hwfmt,
                                   &p_dec->fmt_in,
                                   test_pic ? test_pic->p_sys : NULL);
         if (test_pic)
