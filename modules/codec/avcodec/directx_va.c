@@ -59,6 +59,8 @@ static const int PROF_HEVC_MAIN[]    = { FF_PROFILE_HEVC_MAIN,
 static const int PROF_HEVC_MAIN10[]  = { FF_PROFILE_HEVC_MAIN,
                                          FF_PROFILE_HEVC_MAIN_10,
                                          FF_PROFILE_UNKNOWN };
+static const int PROF_HEVC_MAIN_REXT[]  = { FF_PROFILE_HEVC_REXT,
+                                            FF_PROFILE_UNKNOWN };
 
 static const int PROF_VP9_MAIN[]    = { FF_PROFILE_VP9_0, FF_PROFILE_UNKNOWN };
 static const int PROF_VP9_10[]      = { FF_PROFILE_VP9_2, FF_PROFILE_UNKNOWN };
@@ -139,6 +141,15 @@ DEFINE_GUID(DXVA_ModeMPEG4pt2_VLD_AdvSimple_Avivo,  0x7C74ADC6, 0xe2ba, 0x4ade, 
 
 DEFINE_GUID(DXVA_ModeHEVC_VLD_Main,                 0x5b11d51b, 0x2f4c, 0x4452,0xbc,0xc3,0x09,0xf2,0xa1,0x16,0x0c,0xc0);
 DEFINE_GUID(DXVA_ModeHEVC_VLD_Main10,               0x107af0e0, 0xef1a, 0x4d19,0xab,0xa8,0x67,0xa1,0x63,0x07,0x3d,0x13);
+
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main_Intel,           0x8c56eb1e, 0x2b47, 0x466f, 0x8d, 0x33, 0x7d, 0xbc, 0xd6, 0x3f, 0x3d, 0xf2);
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main10_Intel,         0x75fc75f7, 0xc589, 0x4a07, 0xa2, 0x5b, 0x72, 0xe0, 0x3b, 0x03, 0x83, 0xb3);
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main12_Intel,         0x8ff8a3aa, 0xc456, 0x4132, 0xb6, 0xef, 0x69, 0xd9, 0xdd, 0x72, 0x57, 0x1d);
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main422_10_Intel,     0xe484dcb8, 0xcac9, 0x4859, 0x99, 0xf5, 0x5c, 0x0d, 0x45, 0x06, 0x90, 0x89);
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main422_12_Intel,     0xc23dd857, 0x874b, 0x423c, 0xb6, 0xe0, 0x82, 0xce, 0xaa, 0x9b, 0x11, 0x8a);
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main444_Intel,        0x41a5af96, 0xe415, 0x4b0c, 0x9d, 0x03, 0x90, 0x78, 0x58, 0xe2, 0x3e, 0x78);
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main444_10_Intel,     0x6a6a81ba, 0x912a, 0x485d, 0xb5, 0x7f, 0xcc, 0xd2, 0xd3, 0x7b, 0x8d, 0x94);
+DEFINE_GUID(DXVA_ModeHEVC_VLD_Main444_12_Intel,     0x5b08e35d, 0x0c66, 0x4c51, 0xa6, 0xf1, 0x89, 0xd0, 0x0c, 0xb2, 0xc1, 0x97);
 
 DEFINE_GUID(DXVA_ModeH264_VLD_Stereo_Progressive_NoFGT,     0xd79be8da, 0x0cf1, 0x4c81,0xb8,0x2a,0x69,0xa4,0xe2,0x36,0xf4,0x3d);
 DEFINE_GUID(DXVA_ModeH264_VLD_Stereo_NoFGT,                 0xf9aaccbb, 0xc2b6, 0x4cfc,0x87,0x79,0x57,0x07,0xb1,0x76,0x05,0x52);
@@ -236,6 +247,17 @@ static const directx_va_mode_t DXVA_MODES[] = {
     { "MPEG-4 Part 2 variable-length decoder, Simple&Advanced Profile, Avivo",        &DXVA_ModeMPEG4pt2_VLD_AdvSimple_Avivo, 8, {1, 1}, 0, NULL, 0 },
 
     /* HEVC */
+    // Intel specific GUID support
+    { "HEVC Main profile (Intel)",                                                    &DXVA_ModeHEVC_VLD_Main_Intel,           8, {1, 1}, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN, 0 },
+    { "HEVC Main 10 profile (Intel)",                                                 &DXVA_ModeHEVC_VLD_Main10_Intel,        10, {1, 1}, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN10, 0 },
+#ifdef FF_DXVA2_WORKAROUND_HEVC_REXT
+    { "HEVC Main profile 4:2:2 Range Extension (Intel)",                              &DXVA_ModeHEVC_VLD_Main12_Intel,         8, {1, 0}, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT },
+    { "HEVC Main 10 profile 4:2:2 Range Extension (Intel)",                           &DXVA_ModeHEVC_VLD_Main422_10_Intel,    10, {1, 0}, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT },
+    { "HEVC Main 12 profile 4:2:2 Range Extension (Intel)",                           &DXVA_ModeHEVC_VLD_Main422_12_Intel,    12, {1, 0}, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT },
+    { "HEVC Main profile 4:4:4 Range Extension (Intel)",                              &DXVA_ModeHEVC_VLD_Main444_Intel,        8, {0, 0}, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT },
+    { "HEVC Main 10 profile 4:4:4 Range Extension (Intel)",                           &DXVA_ModeHEVC_VLD_Main444_10_Intel,    10, {0, 0}, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT },
+    { "HEVC Main 12 profile 4:4:4 Range Extension (Intel)",                           &DXVA_ModeHEVC_VLD_Main444_12_Intel,    12, {0, 0}, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT },
+#endif
     { "HEVC Main profile",                                                            &DXVA_ModeHEVC_VLD_Main,                8, {1, 1}, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN, 0 },
     { "HEVC Main 10 profile",                                                         &DXVA_ModeHEVC_VLD_Main10,              10, {1, 1}, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN10, 0 },
 
