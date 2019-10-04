@@ -952,6 +952,8 @@ DecoderContextOpen(vlc_decoder_device *device, vout_window_t *window)
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
     device->opaque = p_sys;
+    device->ops = &dev_ops;
+    device->type = VLC_DECODER_DEVICE_NVDEC;
     p_sys->cudaFunctions = NULL;
 
     int result = cuda_load_functions(&p_sys->cudaFunctions, device);
@@ -973,8 +975,6 @@ DecoderContextOpen(vlc_decoder_device *device, vout_window_t *window)
         return result;
     }
 
-    device->ops = &dev_ops;
-    device->type = VLC_DECODER_DEVICE_NVDEC;
     return VLC_SUCCESS;
 }
 
