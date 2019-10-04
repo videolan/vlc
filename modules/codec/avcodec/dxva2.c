@@ -139,7 +139,7 @@ static int D3dCreateDevice(vlc_va_t *);
 static void D3dDestroyDevice(vlc_va_t *);
 
 static int DxGetInputList(vlc_va_t *, input_list_t *);
-static int DxSetupOutput(vlc_va_t *, const GUID *, const video_format_t *);
+static int DxSetupOutput(vlc_va_t *, const directx_va_mode_t *, const video_format_t *);
 
 static int DxCreateVideoDecoder(vlc_va_t *, int codec_id,
                                 const video_format_t *, unsigned surface_count);
@@ -440,7 +440,7 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
     return VLC_SUCCESS;
 }
 
-static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *fmt)
+static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const video_format_t *fmt)
 {
     VLC_UNUSED(fmt);
     vlc_va_sys_t *sys = va->sys;
@@ -457,11 +457,9 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
         driverBuild += ((identifier.DriverVersion.LowPart >> 16) - 100) * 1000;
     }
     if (!directx_va_canUseDecoder(va, identifier.VendorId, identifier.DeviceId,
-                                  input, driverBuild))
+                                  mode->guid, driverBuild))
     {
-        char* psz_decoder_name = directx_va_GetDecoderName(input);
-        msg_Warn(va, "GPU blacklisted for %s codec", psz_decoder_name);
-        free(psz_decoder_name);
+        msg_Warn(va, "GPU blacklisted for %s codec", mode->name);
         return VLC_EGENERIC;
     }
 
@@ -469,7 +467,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     UINT      output_count = 0;
     D3DFORMAT *output_list = NULL;
     if (FAILED(IDirectXVideoDecoderService_GetDecoderRenderTargets(sys->d3ddec,
-                                                                   input,
+                                                                   mode->guid,
                                                                    &output_count,
                                                                    &output_list))) {
         msg_Err(va, "IDirectXVideoDecoderService_GetDecoderRenderTargets failed");

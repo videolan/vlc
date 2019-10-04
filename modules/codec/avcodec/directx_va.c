@@ -159,14 +159,6 @@ DEFINE_GUID(DXVA_ModeVP9_VLD_Profile0,              0x463707f8, 0xa1d0, 0x4585, 
 DEFINE_GUID(DXVA_ModeVP9_VLD_10bit_Profile2,        0xa4c749ef, 0x6ecf, 0x48aa, 0x84, 0x48, 0x50, 0xa7, 0xa1, 0x16, 0x5f, 0xf7);
 DEFINE_GUID(DXVA_ModeVP9_VLD_Intel,                 0x76988a52, 0xdf13, 0x419a, 0x8e, 0x64, 0xff, 0xcf, 0x4a, 0x33, 0x6c, 0xf5);
 
-typedef struct {
-    const char   *name;
-    const GUID   *guid;
-    int           bit_depth;
-    enum AVCodecID codec;
-    const int    *p_profiles; // NULL or ends with 0
-} directx_va_mode_t;
-
 /* XXX Prefered modes must come first */
 static const directx_va_mode_t DXVA_MODES[] = {
     /* MPEG-1/2 */
@@ -271,7 +263,7 @@ static const directx_va_mode_t DXVA_MODES[] = {
 static int FindVideoServiceConversion(vlc_va_t *, const directx_sys_t *, const es_format_t *, video_format_t *fmt_out,
                                       const AVCodecContext *, const AVPixFmtDescriptor *, GUID *found_guid);
 
-char *directx_va_GetDecoderName(const GUID *guid)
+static char *directx_va_GetDecoderName(const GUID *guid)
 {
     for (unsigned i = 0; DXVA_MODES[i].name; i++) {
         if (IsEqualGUID(DXVA_MODES[i].guid, guid))
@@ -432,25 +424,21 @@ static int FindVideoServiceConversion(vlc_va_t *va, const directx_sys_t *dx_sys,
         int src_bit_depth = (desc && desc->nb_components) ? desc->comp[0].depth : 8;
         if (src_bit_depth != mode->bit_depth)
         {
-            char *psz_name = directx_va_GetDecoderName(mode->guid);
             msg_Warn( va, "Unsupported bitdepth %d for %s ",
-                    src_bit_depth, psz_name );
-            free( psz_name );
+                    src_bit_depth, mode->name );
             continue;
         }
 
         if (!profile_supported( mode, fmt, avctx ))
         {
-            char *psz_name = directx_va_GetDecoderName(mode->guid);
             msg_Warn( va, "Unsupported profile %d for %s ",
-                    fmt->i_profile, psz_name );
-            free( psz_name );
+                    fmt->i_profile, mode->name );
             continue;
         }
 
         /* */
         msg_Dbg(va, "Trying to use '%s' as input", mode->name);
-        if (dx_sys->pf_setup_output(va, mode->guid, fmt_out)==VLC_SUCCESS)
+        if (dx_sys->pf_setup_output(va, mode, fmt_out)==VLC_SUCCESS)
         {
             *found_guid = *mode->guid;
             err = VLC_SUCCESS;

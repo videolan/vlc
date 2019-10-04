@@ -49,6 +49,14 @@ typedef struct input_list_t {
     unsigned count;
 } input_list_t;
 
+typedef struct {
+    const char   *name;
+    const GUID   *guid;
+    int           bit_depth;
+    enum AVCodecID codec;
+    const int    *p_profiles; // NULL or ends with 0
+} directx_va_mode_t;
+
 #define MAX_SURFACE_COUNT (64)
 typedef struct
 {
@@ -60,14 +68,13 @@ typedef struct
      * Find a suitable decoder configuration for the input and set the
      * internal state to use that output
      */
-    int (*pf_setup_output)(vlc_va_t *, const GUID *input, const video_format_t *fmt);
+    int (*pf_setup_output)(vlc_va_t *, const directx_va_mode_t *, const video_format_t *fmt);
 
 } directx_sys_t;
 
 int directx_va_Setup(vlc_va_t *, const directx_sys_t *, const AVCodecContext *, const AVPixFmtDescriptor *,
                      const es_format_t *, int flag_xbox,
                      video_format_t *fmt_out, unsigned *surface_count, GUID *found_guid);
-char *directx_va_GetDecoderName(const GUID *guid);
 bool directx_va_canUseDecoder(vlc_va_t *, UINT VendorId, UINT DeviceId, const GUID *pCodec, UINT driverBuild);
 
 #endif /* AVCODEC_DIRECTX_VA_H */

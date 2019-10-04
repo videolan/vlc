@@ -130,7 +130,7 @@ static int D3dCreateDevice(vlc_va_t *);
 static void D3dDestroyDevice(vlc_va_t *);
 
 static int DxGetInputList(vlc_va_t *, input_list_t *);
-static int DxSetupOutput(vlc_va_t *, const GUID *, const video_format_t *);
+static int DxSetupOutput(vlc_va_t *, const directx_va_mode_t *, const video_format_t *);
 
 static int DxCreateDecoderSurfaces(vlc_va_t *, int codec_id,
                                    const video_format_t *fmt, unsigned surface_count);
@@ -519,7 +519,7 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
 extern const GUID DXVA_ModeHEVC_VLD_Main10;
 extern const GUID DXVA_ModeVP9_VLD_10bit_Profile2;
 
-static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *fmt)
+static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const video_format_t *fmt)
 {
     vlc_va_sys_t *sys = va->sys;
     HRESULT hr;
@@ -527,7 +527,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
 #ifndef NDEBUG
     BOOL bSupported = false;
     for (int format = 0; format < 188; format++) {
-        hr = ID3D11VideoDevice_CheckVideoDecoderFormat(sys->d3ddec, input, format, &bSupported);
+        hr = ID3D11VideoDevice_CheckVideoDecoderFormat(sys->d3ddec, mode->guid, format, &bSupported);
         if (SUCCEEDED(hr) && bSupported)
             msg_Dbg(va, "format %s is supported for output", DxgiFormatToStr(format));
     }
@@ -543,13 +543,10 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     if (FAILED(hr))
         return VLC_EGENERIC;
 
-    char *psz_decoder_name = directx_va_GetDecoderName(input);
-
     if (!directx_va_canUseDecoder(va, adapterDesc.VendorId, adapterDesc.DeviceId,
-                                  input, sys->d3d_dev.WDDM.build))
+                                  mode->guid, sys->d3d_dev.WDDM.build))
     {
-        msg_Warn(va, "GPU blacklisted for %s codec", psz_decoder_name);
-        free(psz_decoder_name);
+        msg_Warn(va, "GPU blacklisted for %s codec", mode->name);
         return VLC_EGENERIC;
     }
 
@@ -557,7 +554,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     int idx = 0;
     if ( sys->render != DXGI_FORMAT_UNKNOWN )
         processorInput[idx++] = sys->render;
-    if (IsEqualGUID(input, &DXVA_ModeHEVC_VLD_Main10) || IsEqualGUID(input, &DXVA_ModeVP9_VLD_10bit_Profile2))
+    if (IsEqualGUID(mode->guid, &DXVA_ModeHEVC_VLD_Main10) || IsEqualGUID(mode->guid, &DXVA_ModeVP9_VLD_10bit_Profile2))
         processorInput[idx++] = DXGI_FORMAT_P010;
     processorInput[idx++] = DXGI_FORMAT_NV12;
     processorInput[idx++] = DXGI_FORMAT_420_OPAQUE;
@@ -567,12 +564,12 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     for (idx = 0; processorInput[idx] != DXGI_FORMAT_UNKNOWN; ++idx)
     {
         BOOL is_supported = false;
-        hr = ID3D11VideoDevice_CheckVideoDecoderFormat(sys->d3ddec, input, processorInput[idx], &is_supported);
+        hr = ID3D11VideoDevice_CheckVideoDecoderFormat(sys->d3ddec, mode->guid, processorInput[idx], &is_supported);
         if (SUCCEEDED(hr) && is_supported)
-            msg_Dbg(va, "%s output is supported for decoder %s.", DxgiFormatToStr(processorInput[idx]), psz_decoder_name);
+            msg_Dbg(va, "%s output is supported for decoder %s.", DxgiFormatToStr(processorInput[idx]), mode->name);
         else
         {
-            msg_Dbg(va, "Can't get a decoder output format %s for decoder %s.", DxgiFormatToStr(processorInput[idx]), psz_decoder_name);
+            msg_Dbg(va, "Can't get a decoder output format %s for decoder %s.", DxgiFormatToStr(processorInput[idx]), mode->name);
             continue;
         }
 
@@ -597,7 +594,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
 
         D3D11_VIDEO_DECODER_DESC decoderDesc;
         ZeroMemory(&decoderDesc, sizeof(decoderDesc));
-        decoderDesc.Guid = *input;
+        decoderDesc.Guid = *mode->guid;
         decoderDesc.SampleWidth = fmt->i_width;
         decoderDesc.SampleHeight = fmt->i_height;
         decoderDesc.OutputFormat = processorInput[idx];
@@ -606,7 +603,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
         hr = ID3D11VideoDevice_GetVideoDecoderConfigCount( sys->d3ddec, &decoderDesc, &cfg_count );
         if (FAILED(hr))
         {
-            msg_Err( va, "Failed to get configuration for decoder %s. (hr=0x%lX)", psz_decoder_name, hr );
+            msg_Err( va, "Failed to get configuration for decoder %s. (hr=0x%lX)", mode->name, hr );
             continue;
         }
         if (cfg_count == 0) {
@@ -616,7 +613,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
             continue;
         }
 
-        msg_Dbg(va, "Using output format %s for decoder %s", DxgiFormatToStr(processorInput[idx]), psz_decoder_name);
+        msg_Dbg(va, "Using output format %s for decoder %s", DxgiFormatToStr(processorInput[idx]), mode->name);
         if ( sys->render == processorInput[idx] && sys->totalTextureSlices > 4)
         {
             if (CanUseVoutPool(&sys->d3d_dev, sys->totalTextureSlices))
@@ -625,10 +622,8 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
                 msg_Warn( va, "use internal pool" );
         }
         sys->render = processorInput[idx];
-        free(psz_decoder_name);
         return VLC_SUCCESS;
     }
-    free(psz_decoder_name);
 
     msg_Dbg(va, "Output format from picture source not supported.");
     return VLC_EGENERIC;
