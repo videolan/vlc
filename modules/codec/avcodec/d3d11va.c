@@ -516,9 +516,6 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
     return VLC_SUCCESS;
 }
 
-extern const GUID DXVA_ModeHEVC_VLD_Main10;
-extern const GUID DXVA_ModeVP9_VLD_10bit_Profile2;
-
 static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const video_format_t *fmt)
 {
     vlc_va_sys_t *sys = va->sys;
@@ -550,11 +547,13 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
         return VLC_EGENERIC;
     }
 
-    DXGI_FORMAT processorInput[5];
+    DXGI_FORMAT processorInput[6];
     int idx = 0;
     if ( sys->render != DXGI_FORMAT_UNKNOWN )
         processorInput[idx++] = sys->render;
-    if (IsEqualGUID(mode->guid, &DXVA_ModeHEVC_VLD_Main10) || IsEqualGUID(mode->guid, &DXVA_ModeVP9_VLD_10bit_Profile2))
+    if (mode->bit_depth > 10)
+        processorInput[idx++] = DXGI_FORMAT_P016;
+    if (mode->bit_depth == 10)
         processorInput[idx++] = DXGI_FORMAT_P010;
     processorInput[idx++] = DXGI_FORMAT_NV12;
     processorInput[idx++] = DXGI_FORMAT_420_OPAQUE;
