@@ -49,17 +49,21 @@ struct picture_sys_t {
 #include "../../packetizer/hevc_nal.h"
 
 static const int PROF_MPEG2_MAIN[]   = { FF_PROFILE_MPEG2_SIMPLE,
-                                         FF_PROFILE_MPEG2_MAIN, 0 };
+                                         FF_PROFILE_MPEG2_MAIN,
+                                         FF_PROFILE_UNKNOWN };
 static const int PROF_H264_HIGH[]    = { FF_PROFILE_H264_BASELINE,
                                          FF_PROFILE_H264_CONSTRAINED_BASELINE,
                                          FF_PROFILE_H264_MAIN,
-                                         FF_PROFILE_H264_HIGH, 0 };
-static const int PROF_HEVC_MAIN[]    = { FF_PROFILE_HEVC_MAIN, 0 };
+                                         FF_PROFILE_H264_HIGH,
+                                         FF_PROFILE_UNKNOWN };
+static const int PROF_HEVC_MAIN[]    = { FF_PROFILE_HEVC_MAIN,
+                                         FF_PROFILE_UNKNOWN };
 static const int PROF_HEVC_MAIN10[]  = { FF_PROFILE_HEVC_MAIN,
-                                         FF_PROFILE_HEVC_MAIN_10, 0 };
+                                         FF_PROFILE_HEVC_MAIN_10,
+                                         FF_PROFILE_UNKNOWN };
 
-static const int PROF_VP9_MAIN[]    = { FF_PROFILE_VP9_0, 0 };
-static const int PROF_VP9_10[]      = { FF_PROFILE_VP9_2, 0 };
+static const int PROF_VP9_MAIN[]    = { FF_PROFILE_VP9_0, FF_PROFILE_UNKNOWN };
+static const int PROF_VP9_10[]      = { FF_PROFILE_VP9_2, FF_PROFILE_UNKNOWN };
 
 #include <winapifamily.h>
 #if defined(WINAPI_FAMILY)
@@ -376,7 +380,7 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
 
         if (profile <= 0)
             is_supported = true;
-        else for (const int *p_profile = &mode->p_profiles[0]; *p_profile; ++p_profile)
+        else for (const int *p_profile = &mode->p_profiles[0]; *p_profile != FF_PROFILE_UNKNOWN; ++p_profile)
         {
             if (*p_profile == profile)
             {
