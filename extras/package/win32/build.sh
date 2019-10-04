@@ -96,11 +96,22 @@ esac
 JOBS=`getconf _NPROCESSORS_ONLN 2>&1`
 TRIPLET=$ARCH-w64-mingw32
 
+# Check if compiling with clang
+CC=${CC:-$TRIPLET-gcc}
+if ! printf "#ifdef __clang__\n#error CLANG\n#endif" | $CC -E -; then
+    COMPILING_WITH_CLANG=1
+fi
+
 info "Building extra tools"
 cd extras/tools
+
+# Force libtool build when compiling with clang
+if [ "$COMPILING_WITH_CLANG" -gt 0 ] && [ ! -d "libtool" ]; then
+    FORCED_TOOLS="libtool"
+fi
 # bootstrap only if needed in interactive mode
 if [ "$INTERACTIVE" != "yes" ] || [ ! -f ./Makefile ]; then
-    ./bootstrap
+    NEEDED="$FORCED_TOOLS" ./bootstrap
 fi
 make -j$JOBS
 export PATH="$PWD/build/bin":"$PATH"
