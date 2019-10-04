@@ -43,11 +43,11 @@ static int audio_update_format( decoder_t *p_dec )
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     sout_stream_id_sys_t *id = p_owner->id;
 
-    if( !AOUT_FMT_LINEAR(&p_dec->fmt_out.audio) )
-        return VLC_EGENERIC;
-
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
     aout_FormatPrepare( &p_dec->fmt_out.audio );
+
+    if( !AOUT_FMT_LINEAR(&p_dec->fmt_out.audio) )
+        return VLC_EGENERIC;
 
     vlc_mutex_lock(&id->fifo.lock);
     es_format_Clean( &id->decoder_out );
