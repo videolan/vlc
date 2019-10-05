@@ -125,7 +125,6 @@
 #define AMT_PORT 2268
 
 #define DEFAULT_MTU (1500u - (20 + 8))
-#define MAX_IPV4_UDP (65535u - (20 + 8))
 
 /* IPv4 Header Format */
 typedef struct _amt_ip {
@@ -212,7 +211,6 @@ typedef struct _access_sys_t
 {
     char *relay;
     char relayDisco[INET_ADDRSTRLEN];
-    block_t *overflow_block;
 
     vlc_timer_t updateTimer;
 
@@ -310,14 +308,6 @@ static int Open( vlc_object_t *p_this )
     p_access->p_sys = sys;
 
     sys->fd = sys->sAMT = sys->sQuery = -1;
-
-    /* Protective packet overflow buffer designed to accommodate maximum IPv4 UDP payload minus the anticapated MTU */
-    sys->overflow_block = block_Alloc(MAX_IPV4_UDP - sys->mtu);
-    if( unlikely( sys->overflow_block == NULL ) )
-    {
-        VLC_ret = VLC_EGENERIC;
-        goto cleanup;
-    }
 
     psz_name = strdup( p_access->psz_location );
     if ( unlikely( psz_name == NULL ) )
@@ -490,8 +480,6 @@ cleanup: /* fall through */
     if ( VLC_ret != VLC_SUCCESS )
     {
         free( sys->relay );
-        if( sys->overflow_block )
-            block_Release( sys->overflow_block );
         if( sys->fd != -1 )
             net_Close( sys->fd );
     }
@@ -522,10 +510,6 @@ static void Close( vlc_object_t *p_this )
         amt_send_mem_update( p_access, sys->relayDisco, true );
     }
     free( sys->relay );
-
-    /* If overflow block allocated then free the memory */
-    if( sys->overflow_block )
-        block_Release( sys->overflow_block );
 
     net_Close( sys->fd );
     if( sys->sAMT != -1 )
@@ -576,21 +560,6 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
     if ( unlikely( pkt == NULL ) )
         return NULL;
 
-    /* Structure initialized to hold anticipated MTU buffer along with protective overflow buffer */
-    struct iovec iov[] = {{
-        .iov_base = pkt->p_buffer,
-        .iov_len = sys->mtu + tunnel,
-    },{
-        .iov_base = sys->overflow_block->p_buffer,
-        .iov_len = sys->overflow_block->i_buffer,
-    }};
-
-    /* References the two element array above to be passed into recvmsg */
-    struct msghdr msg = {
-        .msg_iov = iov,
-        .msg_iovlen = 2,
-    };
-
     struct pollfd ufd[1];
 
     if( sys->tryAMT )
@@ -621,8 +590,8 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
     /* If using AMT tunneling perform basic checks and point to beginning of the payload */
     if( sys->tryAMT )
     {
-        /* AMT is a wrapper for UDP streams, so recvmsg is used. */
-        len = recvmsg( sys->sAMT, &msg, 0 );
+        /* AMT is a wrapper for UDP streams, so recv is used. */
+        len = recv( sys->sAMT, pkt->p_buffer, sys->mtu + tunnel, 0 );
 
         /* Check for the integrity of the received AMT packet */
         if( len < 0 || *(pkt->p_buffer) != AMT_MULT_DATA )
@@ -650,27 +619,6 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
         struct sockaddr temp;
         socklen_t temp_size = sizeof( struct sockaddr );
         len = recvfrom( sys->sAMT, (char *)pkt->p_buffer, sys->mtu + tunnel, 0, (struct sockaddr*)&temp, &temp_size );
-    }
-
-    /* If the payload length is greater than the MTU then the overflow buffer was utilized */
-    if ( unlikely( len > 0 && (size_t) len > sys->mtu ) )
-    {
-        msg_Warn(p_access, "%zd bytes packet received (MTU was %zd), adjusting mtu", len, sys->mtu);
-
-        block_t *gather_block = sys->overflow_block;
-
-        /* Allocate a new overflow buffer based on the received payload length */
-        sys->overflow_block = block_Alloc(MAX_IPV4_UDP - len);
-
-        /* Set number of bytes consumed in the overflow block */
-        gather_block->i_buffer = len - sys->mtu;
-
-        /* Chain the anticipated packet and overflow buffers, copy into a single buffer and free the chain */
-        pkt->p_next = gather_block;
-        pkt = block_ChainGather( pkt );
-
-        /* Adjust the anticipated MTU to match the payload received */
-        sys->mtu = len;
     }
 
     /* Set the offset to payload start */
