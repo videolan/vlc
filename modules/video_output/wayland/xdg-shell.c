@@ -239,8 +239,6 @@ static void SetDecoration(vout_window_t *wnd, bool decorated)
     if (deco_mode != ZXDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE)
         msg_Err(wnd, "server-side decoration not supported");
 }
-#else
-# define SetDecoration(wnd, deco) ((void) wnd, (void)(deco))
 #endif
 
 static int Enable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
@@ -253,7 +251,12 @@ static int Enable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
     else
         xdg_toplevel_unset_fullscreen(sys->toplevel);
 
+#ifdef XDG_SHELL
     SetDecoration(wnd, cfg->is_decorated);
+#else
+    if (cfg->is_decorated)
+        return VLC_EGENERIC;
+#endif
     vout_window_SetSize(wnd, cfg->width, cfg->height);
     wl_surface_commit(wnd->handle.wl);
     wl_display_flush(display);
