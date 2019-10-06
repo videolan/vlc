@@ -410,43 +410,129 @@ static const struct wl_shell_surface_listener wl_shell_surface_cbs =
 #define xdg_surface_cbs wl_shell_surface_cbs
 #endif
 
-static void registry_global_cb(void *data, struct wl_registry *registry,
-                               uint32_t name, const char *iface, uint32_t vers)
+static void register_wl_compositor(void *data, struct wl_registry *registry,
+                                   uint32_t name, uint32_t vers)
 {
     vout_window_t *wnd = data;
     vout_window_sys_t *sys = wnd->sys;
 
+    if (likely(sys->compositor == NULL))
+        sys->compositor = wl_registry_bind(registry, name,
+                                           &wl_compositor_interface, vers);
+}
+
+static void register_wl_output(void *data, struct wl_registry *registry,
+                               uint32_t name, uint32_t vers)
+{
+    vout_window_t *wnd = data;
+    vout_window_sys_t *sys = wnd->sys;
+
+    output_create(sys->outputs, registry, name, vers);
+}
+
+static void register_wl_seat(void *data, struct wl_registry *registry,
+                             uint32_t name, uint32_t vers)
+{
+    vout_window_t *wnd = data;
+    vout_window_sys_t *sys = wnd->sys;
+
+    seat_create(wnd, registry, name, vers, &sys->seats);
+}
+
+#ifndef XDG_SHELL
+static void register_wl_shell(void *data, struct wl_registry *registry,
+                              uint32_t name, uint32_t vers)
+{
+    vout_window_t *wnd = data;
+    vout_window_sys_t *sys = wnd->sys;
+
+    if (likely(sys->wm_base == NULL))
+        sys->wm_base = wl_registry_bind(registry, name, &wl_shell_interface,
+                                        vers);
+}
+#endif
+
+static void register_wl_shm(void *data, struct wl_registry *registry,
+                            uint32_t name, uint32_t vers)
+{
+    vout_window_t *wnd = data;
+    vout_window_sys_t *sys = wnd->sys;
+
+    if (likely(sys->shm == NULL))
+        sys->shm = wl_registry_bind(registry, name, &wl_shm_interface, vers);
+}
+
+#ifdef XDG_SHELL
+static void register_xdg_wm_base(void *data, struct wl_registry *registry,
+                                 uint32_t name, uint32_t vers)
+{
+    vout_window_t *wnd = data;
+    vout_window_sys_t *sys = wnd->sys;
+
+    if (likely(sys->wm_base == NULL))
+        sys->wm_base = wl_registry_bind(registry, name, &xdg_wm_base_interface,
+                                        vers);
+}
+
+static void register_xdg_decoration_manager(void *data,
+                                            struct wl_registry *registry,
+                                            uint32_t name, uint32_t vers)
+{
+    vout_window_t *wnd = data;
+    vout_window_sys_t *sys = wnd->sys;
+
+    if (likely(sys->deco_manager == NULL))
+        sys->deco_manager = wl_registry_bind(registry, name,
+                                  &zxdg_decoration_manager_v1_interface, vers);
+}
+#endif
+
+struct registry_handler
+{
+    const char *iface;
+    void (*global)(void *, struct wl_registry *, uint32_t, uint32_t);
+    uint32_t max_version;
+};
+
+static const struct registry_handler global_handlers[] =
+{
+     { "wl_compositor", register_wl_compositor, 2 },
+     { "wl_output", register_wl_output, 1},
+     { "wl_seat", register_wl_seat, UINT32_C(-1) },
+#ifndef XDG_SHELL
+     { "wl_shell", register_wl_shell, 1 },
+#endif
+     { "wl_shm", register_wl_shm, 1 },
+#ifdef XDG_SHELL
+     { "xdg_wm_base", register_xdg_wm_base, 1 },
+     { "zxdg_decoration_manager_v1", register_xdg_decoration_manager, 1 },
+#endif
+};
+
+static int rghcmp(const void *a, const void *b)
+{
+    const char *iface = a;
+    const struct registry_handler *handler = b;
+
+    return strcmp(iface, handler->iface);
+}
+
+static void registry_global_cb(void *data, struct wl_registry *registry,
+                               uint32_t name, const char *iface, uint32_t vers)
+{
+    vout_window_t *wnd = data;
+    const struct registry_handler *h;
+
     msg_Dbg(wnd, "global %3"PRIu32": %s version %"PRIu32, name, iface, vers);
 
-    if (!strcmp(iface, "wl_compositor"))
-        sys->compositor = wl_registry_bind(registry, name,
-                                           &wl_compositor_interface,
-                                           (vers < 2) ? vers : 2);
-    else
-#ifdef XDG_SHELL
-    if (!strcmp(iface, "xdg_wm_base"))
-        sys->wm_base = wl_registry_bind(registry, name, &xdg_wm_base_interface,
-                                        1);
-#else
-    if (!strcmp(iface, "wl_shell"))
-        sys->wm_base = wl_registry_bind(registry, name, &wl_shell_interface,
-                                        1);
-#endif
-    else
-    if (!strcmp(iface, "wl_shm"))
-        sys->shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
-    else
-    if (!strcmp(iface, "wl_seat"))
-        seat_create(wnd, registry, name, vers, &sys->seats);
-    else
-    if (!strcmp(iface, "wl_output"))
-        output_create(sys->outputs, registry, name, vers);
-#ifdef XDG_SHELL
-    else
-    if (!strcmp(iface, "zxdg_decoration_manager_v1"))
-        sys->deco_manager = wl_registry_bind(registry, name,
-                                     &zxdg_decoration_manager_v1_interface, 1);
-#endif
+    h = bsearch(iface, global_handlers, ARRAY_SIZE(global_handlers),
+                sizeof (*h), rghcmp);
+    if (h != NULL)
+    {
+        uint32_t version = (vers < h->max_version) ? vers : h->max_version;
+
+        h->global(data, registry, name, version);
+    }
 }
 
 static void registry_global_remove_cb(void *data, struct wl_registry *registry,
