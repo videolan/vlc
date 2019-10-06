@@ -34,6 +34,12 @@
 
 /* TODO: xdg_output protocol */
 
+struct output_list
+{
+    vout_window_t *owner;
+    struct wl_list outputs;
+};
+
 struct output_data
 {
     vout_window_t *owner;
@@ -101,9 +107,23 @@ static const struct wl_output_listener wl_output_cbs =
     output_scale_cb,
 };
 
-int output_create(vout_window_t *wnd, struct wl_registry *registry,
-                  uint32_t name, uint32_t version, struct wl_list *list)
+struct output_list *output_list_create(vout_window_t *wnd)
 {
+    struct output_list *ol = malloc(sizeof (*ol));
+    if (unlikely(ol == NULL))
+        return NULL;
+
+    ol->owner = wnd;
+    wl_list_init(&ol->outputs);
+    return ol;
+}
+
+int output_create(struct output_list *ol, struct wl_registry *registry,
+                  uint32_t name, uint32_t version)
+{
+    if (unlikely(ol == NULL))
+        return -1;
+
     struct output_data *od = malloc(sizeof (*od));
     if (unlikely(od == NULL))
         return -1;
@@ -119,21 +139,21 @@ int output_create(vout_window_t *wnd, struct wl_registry *registry,
         return -1;
     }
 
-    od->owner = wnd;
+    od->owner = ol->owner;
     od->name = name;
     od->version = version;
 
     wl_output_add_listener(od->wl_output, &wl_output_cbs, od);
-    wl_list_insert(list, &od->node);
+    wl_list_insert(&ol->outputs, &od->node);
     return 0;
 }
 
-static void output_destroy(struct output_data *od)
+static void output_destroy(struct output_list *ol, struct output_data *od)
 {
     char idstr[11];
 
     sprintf(idstr, "%"PRIu32, od->name);
-    vout_window_ReportOutputDevice(od->owner, idstr, NULL);
+    vout_window_ReportOutputDevice(ol->owner, idstr, NULL);
 
     wl_list_remove(&od->node);
 
@@ -144,15 +164,19 @@ static void output_destroy(struct output_data *od)
     free(od);
 }
 
-int output_destroy_one(struct wl_list *list, uint32_t name)
+int output_destroy_by_name(struct output_list *ol, uint32_t name)
 {
+    if (unlikely(ol == NULL))
+        return -1;
+
+    struct wl_list *list = &ol->outputs;
     struct output_data *od;
 
     wl_list_for_each(od, list, node)
     {
         if (od->name == name)
         {
-            output_destroy(od);
+            output_destroy(ol, od);
             /* Note: return here so no needs for safe walk variant */
             return 0;
         }
@@ -161,8 +185,15 @@ int output_destroy_one(struct wl_list *list, uint32_t name)
     return -1;
 }
 
-void output_destroy_all(struct wl_list *list)
+void output_list_destroy(struct output_list *ol)
 {
+    if (ol == NULL)
+        return;
+
+    struct wl_list *list = &ol->outputs;
+
     while (!wl_list_empty(list))
-        output_destroy(container_of(list->next, struct output_data, node));
+        output_destroy(ol, container_of(list->next, struct output_data, node));
+
+    free(ol);
 }

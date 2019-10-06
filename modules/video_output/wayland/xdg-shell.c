@@ -99,7 +99,7 @@ typedef struct
         bool configured;
     } wm;
 
-    struct wl_list outputs;
+    struct output_list *outputs;
     struct wl_list seats;
     struct wl_cursor_theme *cursor_theme;
     struct wl_cursor *cursor;
@@ -440,7 +440,7 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
         seat_create(wnd, registry, name, vers, &sys->seats);
     else
     if (!strcmp(iface, "wl_output"))
-        output_create(wnd, registry, name, vers, &sys->outputs);
+        output_create(sys->outputs, registry, name, vers);
 #ifdef XDG_SHELL
     else
     if (!strcmp(iface, "zxdg_decoration_manager_v1"))
@@ -459,7 +459,7 @@ static void registry_global_remove_cb(void *data, struct wl_registry *registry,
 
     if (seat_destroy_one(&sys->seats, name) == 0)
         return;
-    if (output_destroy_one(&sys->outputs, name) == 0)
+    if (output_destroy_by_name(sys->outputs, name) == 0)
         return;
 
     (void) registry;
@@ -526,7 +526,7 @@ static int Open(vout_window_t *wnd)
     sys->wm.configured = false;
     sys->set.width = 0;
     sys->set.height = 0;
-    wl_list_init(&sys->outputs);
+    sys->outputs = output_list_create(wnd);
     wl_list_init(&sys->seats);
     sys->cursor_theme = NULL;
     sys->cursor_surface = NULL;
@@ -542,6 +542,7 @@ static int Open(vout_window_t *wnd)
 
     if (display == NULL)
     {
+        output_list_destroy(sys->outputs);
         free(sys);
         return VLC_EGENERIC;
     }
@@ -625,7 +626,7 @@ static int Open(vout_window_t *wnd)
 
 error:
     seat_destroy_all(&sys->seats);
-    output_destroy_all(&sys->outputs);
+    output_list_destroy(sys->outputs);
 #ifdef XDG_SHELL
     if (sys->deco != NULL)
         zxdg_toplevel_decoration_v1_destroy(sys->deco);
@@ -667,7 +668,7 @@ static void Close(vout_window_t *wnd)
 
     vlc_mutex_destroy(&sys->lock);
     seat_destroy_all(&sys->seats);
-    output_destroy_all(&sys->outputs);
+    output_list_destroy(sys->outputs);
 #ifdef XDG_SHELL
     if (sys->deco != NULL)
         zxdg_toplevel_decoration_v1_destroy(sys->deco);
