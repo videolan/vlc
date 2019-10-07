@@ -96,7 +96,7 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
     owner->sync.clock = clock;
 
     owner->filters_cfg = AOUT_FILTERS_CFG_INIT;
-    if (aout_OutputNew (p_aout, &owner->mixer_format, &owner->filters_cfg))
+    if (aout_OutputNew (p_aout))
         goto error;
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
@@ -162,7 +162,7 @@ static int aout_CheckReady (audio_output_t *aout)
                 aout_OutputDelete (aout);
             owner->mixer_format = owner->input_format;
             owner->filters_cfg = AOUT_FILTERS_CFG_INIT;
-            if (aout_OutputNew (aout, &owner->mixer_format, &owner->filters_cfg))
+            if (aout_OutputNew (aout))
                 owner->mixer_format.i_format = 0;
             aout_volume_SetFormat (owner->volume,
                                    owner->mixer_format.i_format);

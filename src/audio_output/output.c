@@ -517,13 +517,13 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
 
 /**
  * Starts an audio output stream.
- * \param fmt audio output stream format [IN/OUT]
  * \warning The caller must NOT hold the audio output lock.
  */
-int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
-                    aout_filters_cfg_t *filters_cfg)
+int aout_OutputNew (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
+    audio_sample_format_t *fmt = &owner->mixer_format;
+    aout_filters_cfg_t *filters_cfg = &owner->filters_cfg;
 
     audio_channel_type_t input_chan_type = fmt->channel_type;
     unsigned i_nb_input_channels = fmt->i_channels;
