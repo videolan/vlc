@@ -101,7 +101,8 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
     /* Create the audio filtering "input" pipeline */
-    owner->filters = aout_FiltersNewWithClock(VLC_OBJECT(p_aout), clock, p_format,
+    owner->filters = aout_FiltersNewWithClock(VLC_OBJECT(p_aout), clock,
+                                              &owner->input_format,
                                               &owner->mixer_format,
                                               &owner->filters_cfg);
     if (owner->filters == NULL)
