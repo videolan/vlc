@@ -223,6 +223,9 @@ void vout_GetResetStatistic(vout_thread_t *vout, unsigned *restrict displayed,
 bool vout_IsEmpty(vout_thread_t *vout)
 {
     assert(!vout->p->dummy);
+    if (!vout->p->decoder_fifo)
+        return true;
+
     picture_t *picture = picture_fifo_Peek(vout->p->decoder_fifo);
     if (picture)
         picture_Release(picture);
@@ -1596,7 +1599,10 @@ error:
         filter_chain_Delete(sys->filter.chain_static);
     video_format_Clean(&sys->filter.format);
     if (sys->decoder_fifo != NULL)
+    {
         picture_fifo_Delete(sys->decoder_fifo);
+        sys->decoder_fifo = NULL;
+    }
     return VLC_EGENERIC;
 }
 
@@ -1706,7 +1712,10 @@ void vout_StopDisplay(vout_thread_t *vout)
     free(sys->filter.configuration);
 
     if (sys->decoder_fifo != NULL)
+    {
         picture_fifo_Delete(sys->decoder_fifo);
+        sys->decoder_fifo = NULL;
+    }
     assert(sys->decoder_pool == NULL);
 
     if (sys->mouse_event)
