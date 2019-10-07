@@ -54,7 +54,8 @@ static void aout_Drain(audio_output_t *aout)
  * Creates an audio output
  */
 int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
-                vlc_clock_t *clock, const audio_replay_gain_t *p_replay_gain)
+                int profile, vlc_clock_t *clock,
+                const audio_replay_gain_t *p_replay_gain)
 {
     assert(p_aout);
     assert(p_format);
@@ -92,6 +93,12 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
 
     atomic_store_explicit(&owner->restart, 0, memory_order_relaxed);
     owner->input_format = *p_format;
+
+    /* TODO: 3.0 HACK: we need to put i_profile inside audio_format_t for 4.0
+     * */
+    if( owner->input_format.i_format == VLC_CODEC_DTS )
+        var_SetBool( p_aout, "dtshd", profile > 0 );
+
     owner->mixer_format = owner->input_format;
     owner->sync.clock = clock;
 
