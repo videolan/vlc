@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQml.Models 2.11
+import QtQuick.Layouts 1.3
 
 import org.videolan.medialib 0.1
 
@@ -32,7 +34,7 @@ Utils.ExpandGridView {
     property real expandDelegateImplicitHeight: parent.height
     property real expandDelegateWidth: parent.width
 
-    expandDelegate:  Rectangle {
+    expandDelegate:  Utils.NavigableFocusScope {
         id: expandRect
         property int currentId: -1
         property var model : ({})
@@ -41,51 +43,73 @@ Utils.ExpandGridView {
         implicitHeight: expandableGV.expandDelegateImplicitHeight
         width: expandableGV.expandDelegateWidth
 
-        color: "transparent"
-        Rectangle{
+        navigationParent: expandableGV
+        navigationCancel:  function() {  expandableGV.retract() }
+        navigationUp: function() {  expandableGV.retract() }
+        navigationDown: function() { expandableGV.retract() }
+
+        //arrow
+        Item {
             id:arrowRect
             y: -(width/2)
-            width: VLCStyle.icon_normal
-            height: VLCStyle.icon_normal
-            color: VLCStyle.colors.text
-            rotation: 45
+            x: expandableGV.getItemPos(expandableGV._expandIndex)[0] + (expandableGV.cellWidth / 2) - (width/2)
             visible: !expandableGV.isAnimating
+            clip: true
+            width: Math.sqrt(2) *VLCStyle.icon_normal
+            height: width/2
+
+            Rectangle{
+                x: 0
+                y: parent.height
+                width: VLCStyle.icon_normal
+                height: VLCStyle.icon_normal
+                color: VLCStyle.colors.bgAlt
+                transformOrigin: Item.TopLeft
+                rotation: -45
+            }
         }
+
+
         Rectangle{
             height: parent.height
             width: parent.width
             clip: true
-            color: VLCStyle.colors.text
+            color: VLCStyle.colors.bgAlt
             x: expandableGV.contentX
 
-            Rectangle {
-                color: "transparent"
-                height: parent.height
+            RowLayout {
                 anchors {
-                    left:parent.left
-                    right:parent.right
+                    fill: parent
+                    topMargin: VLCStyle.margin_xsmall
+                    bottomMargin: VLCStyle.margin_xsmall
+                    leftMargin: VLCStyle.margin_normal
                 }
 
+                spacing: VLCStyle.margin_small
 
                 Image {
                     id: img
-                    anchors.left: parent.left
-                    anchors.leftMargin: VLCStyle.margin_large
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: VLCStyle.cover_large
-                    height: VLCStyle.cover_large
+                    Layout.alignment: Qt.AlignCenter
+                    Layout.preferredWidth: width
+                    Layout.preferredHeight: height
+
+                    width: VLCStyle.cover_xlarge
+                    height: VLCStyle.cover_xlarge
                     fillMode:Image.PreserveAspectFit
 
-                    source: model.thumbnail || ""
+                    source: model.thumbnail || VLCStyle.noArtCover
                 }
+
                 Column{
                     id: infoCol
                     height: childrenRect.height
-                    anchors.left:img.right
-                    anchors.leftMargin: VLCStyle.margin_normal
-                    anchors.verticalCenter: parent.verticalCenter
+                    width: Math.min(title.implicitWidth, 200*VLCStyle.scale)
+
+                    Layout.alignment: Qt.AlignCenter
+                    Layout.preferredWidth: width
+                    Layout.preferredHeight: height
+
                     spacing: VLCStyle.margin_small
-                    width: 300 * VLCStyle.scale
                     Text{
                         id: newtxt
                         font.pixelSize: VLCStyle.fontSize_normal
@@ -94,90 +118,42 @@ Utils.ExpandGridView {
                         color: VLCStyle.colors.accent
                         visible: model.playcount < 1
                     }
-                    Column{
+                    Text{
+                        id: title
+                        wrapMode: Text.Wrap
+                        font.pixelSize: VLCStyle.fontSize_xlarge
+                        font.weight: Font.ExtraBold
+                        text: model.title || ""
+                        color: VLCStyle.colors.text
                         width: parent.width
-                        spacing: VLCStyle.margin_xsmall
-                        Text{
-                            id: title
-                            wrapMode: Text.Wrap
-                            font.pixelSize: VLCStyle.fontSize_large
-                            font.weight: Font.ExtraBold
-                            text: model.title || ""
-                            color: VLCStyle.colors.bg
-                            width: parent.width
-                        }
-                        Text {
-                            id: time
-                            text: model.duration || ""
-                            color: VLCStyle.colors.textInactive
-                            font.pixelSize: VLCStyle.fontSize_small
-                        }
                     }
-
-                    Button {
-                        id: playBtn
-                        hoverEnabled: true
-                        width: VLCStyle.icon_xlarge
-                        height: VLCStyle.icon_medium
-                        background: Rectangle{
-                            color: playBtn.pressed? VLCStyle.colors.textInactive: VLCStyle.colors.accent
-                            width: parent.width
-                            height: parent.height
-                            radius: playBtn.width/3
-                        }
-                        contentItem:Item{
-                            implicitWidth: childrenRect.width
-                            implicitHeight: childrenRect.height
-                            anchors.centerIn: playBtn
-
-                            Label {
-                                anchors.verticalCenter: parent.verticalCenter
-                                id: icon
-                                text:  playBtn.fontIcon
-                                font.family: VLCIcons.fontFamily
-                                font.pixelSize: parent.height
-                                color: playBtn.pressed || playBtn.hovered?  VLCStyle.colors.bg : VLCStyle.colors.bgAlt
-                            }
-
-
-                            Label {
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: icon.right
-                                text: playBtn.text
-                                font: playBtn.font
-                                color: playBtn.pressed || playBtn.hovered? VLCStyle.colors.bg : VLCStyle.colors.bgAlt
-
-                            }
-                        }
-
-
-                        property string fontIcon: VLCIcons.play
-
-                        text: qsTr("Play Video")
-                        onClicked: medialib.addAndPlay( model.id )
+                    Text {
+                        id: time
+                        text: model.duration || ""
+                        color: VLCStyle.colors.textInactive
+                        font.pixelSize: VLCStyle.fontSize_small
                     }
                 }
-                Flickable{
-                    anchors{
-                        left: infoCol.right
-                        right: controlCol.left
-                        top: parent.top
-                        bottom: parent.bottom
-                        topMargin: VLCStyle.margin_small
-                        bottomMargin: VLCStyle.margin_small
-                    }
-                    width: parent.width
-                    contentHeight: infoInnerCol.height
-                    Column{
-                        id: infoInnerCol
-                        height: childrenRect.height
-                        anchors{
-                            left: parent.left
-                            right: parent.right
-                        }
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: VLCStyle.margin_xsmall
-                        Repeater {
+
+
+                Utils.NavigableFocusScope {
+                    id: infoPanel
+
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+
+                    ScrollView {
+                        id: infoPannelScrollView
+                        contentHeight: infoInnerCol.height
+
+                        anchors.fill: parent
+
+                        focus: true
+                        clip: true
+
+                        ListView {
+                            id: infoInnerCol
+                            spacing: VLCStyle.margin_xsmall
                             model: [
                                 {text: qsTr("File Name"),    data: expandRect.model.title, bold: true},
                                 {text: qsTr("Path"),         data: expandRect.model.mrl},
@@ -189,122 +165,123 @@ Utils.ExpandGridView {
                             ]
                             delegate: Label {
                                 font.bold: Boolean(modelData.bold)
+                                font.pixelSize: VLCStyle.fontSize_normal
                                 text: modelData.text + ": " + modelData.data
-                                color: VLCStyle.colors.textInactive
+                                color: VLCStyle.colors.text
                                 width: parent.width
                                 wrapMode: Label.Wrap
                             }
                         }
-                    }
-                }
-
-                Rectangle{
-                    id: controlCol
-                    anchors.right: parent.right
-                    width: 300 * VLCStyle.scale
-                    height: parent.height
-                    color: VLCStyle.colors.text
-
-                    Column{
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        spacing: VLCStyle.margin_normal
-                        Repeater {
-                            id:reptr
-                            anchors.fill: parent
-                            model: [
-                                {label: qsTr("Rename Video"), ic: VLCIcons.rename},
-                                {label: qsTr("Enqueue"), ic: VLCIcons.add},
-                                {label: qsTr("Share"), ic: VLCIcons.lan},
-                                {label: qsTr("Delete"), ic: VLCIcons.del}
-                            ]
-                            
-                            delegate: Button {
-                                id: reptrBtn
-                                hoverEnabled: true
-                                width: reptr.width
-                                background: Rectangle{
-                                    color: pressed? "#000": VLCStyle.colors.text
-                                    width: parent.width
-                                    height: parent.height
-                                    radius: 3
-                                }
-                                contentItem: Item{
-                                    implicitWidth: childrenRect.width
-                                    implicitHeight: childrenRect.height
-
-                                    Label {
-                                        id: icon
-                                        text:  reptrBtn.fontIcon
-                                        font.family: VLCIcons.fontFamily
-                                        font.pixelSize: VLCStyle.icon_normal
-                                        verticalAlignment: Text.AlignVCenter
-                                        color: pressed || hovered? VLCStyle.colors.accent : VLCStyle.colors.bgAlt
-                                    }
-
-
-                                    Label {
-                                        anchors.left: icon.right
-                                        anchors.leftMargin: VLCStyle.margin_normal
-                                        text: reptrBtn.text
-                                        font: reptrBtn.font
-                                        verticalAlignment: Text.AlignVCenter
-                                        color: pressed || hovered? VLCStyle.colors.accent : VLCStyle.colors.bgAlt
-                                    }
-                                }
-
-
-                                text: modelData.label
-                                property string fontIcon: modelData.ic
-                                onClicked: reptr.handleClick(index)
-                            }
-                            function handleClick(index){
-                                switch(index){
-                                case 1:medialib.addToPlaylist( expandRect.model.id )
-                                    break
-
-                                default:
-                                    console.log("you clicked on an unhandled index:",index)
-                                }
+                        Keys.priority: Keys.BeforeItem
+                        Keys.onPressed: {
+                            if (event.key !== Qt.Key_Up && event.key !== Qt.Key_Down) {
+                                infoPanel.defaultKeyAction(event, 0)
                             }
                         }
                     }
+
+                    Rectangle {
+                        z: 2
+                        anchors.fill: parent
+                        border.width: 1
+                        border.color: VLCStyle.colors.accent
+                        color: "transparent"
+                        visible: infoPanel.activeFocus
+                    }
+
+                    Rectangle {
+                        anchors { top: parent.top; left: parent.left;  right: parent.right }
+                        z: 1
+                        visible: !infoPannelScrollView.contentItem.atYBeginning
+                        height: parent.height * 0.2
+                        gradient: Gradient{
+                            GradientStop { position: 0.0; color: VLCStyle.colors.bgAlt }
+                            GradientStop { position: 1.0; color: "transparent" }
+                        }
+                    }
+
+                    Rectangle {
+                        anchors { bottom: parent.bottom; left: parent.left;  right: parent.right }
+                        z: 1
+                        visible: !infoPannelScrollView.contentItem.atYEnd
+                        height: parent.height * 0.2
+                        gradient: Gradient{
+                            GradientStop { position: 0.0; color: "transparent" }
+                            GradientStop { position: 1.0; color: VLCStyle.colors.bgAlt }
+                        }
+                    }
+
+                    navigationParent: expandRect
+                    navigationRightItem: actionButtons
                 }
 
-
-            }
-            Button {
-                id: closeBtn
-                hoverEnabled: true
-                width: VLCStyle.icon_medium
-                height: VLCStyle.icon_medium
-                anchors.right: parent.right
-                background: Rectangle{
-                    color: closeBtn.pressed? "#000": VLCStyle.colors.text
-                    width: parent.width
+                Rectangle {
                     height: parent.height
-                    radius: 3
-                }
-                contentItem:Label {
-                    text: closeBtn.text
-                    font: VLCIcons.fontFamily
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    color: closeBtn.pressed || closeBtn.hovered? VLCStyle.colors.accent : VLCStyle.colors.bgAlt
+                    width: 1
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "transparent" }
+                        GradientStop { position: 0.25; color: VLCStyle.colors.buttonBorder }
+                        GradientStop { position: 0.75; color: VLCStyle.colors.buttonBorder }
+                        GradientStop { position: 1.0; color: "transparent" }
+                    }
+
                 }
 
-                text: VLCIcons.close
-                font.pixelSize: VLCStyle.icon_normal
-                font.family: VLCIcons.fontFamily
-                onClicked: expandableGV.retract()
+                Utils.NavigableCol {
+                    id: actionButtons
+
+                    focus: true
+
+                    Layout.alignment: Qt.AlignCenter
+                    Layout.preferredWidth: childrenRect.width
+
+                    model: ObjectModel {
+                        Utils.TabButtonExt {
+                            id: playActionBtn
+                            iconTxt: VLCIcons.play
+                            text: qsTr("Play")
+                            onClicked: medialib.addAndPlay( expandRect.model.id )
+                        }
+
+                        Utils.TabButtonExt {
+                            id: enqueueActionBtn
+                            iconTxt: VLCIcons.add
+                            text: qsTr("Enqueue")
+                            onClicked: medialib.addToPlaylist( expandRect.model.id )
+                        }
+                    }
+
+                    navigationParent: expandRect
+                    navigationLeftItem: infoPanel
+                    navigationRightItem: closeButton
+                }
+
+
+                Utils.NavigableFocusScope {
+                    id: closeButton
+
+                    Layout.alignment: Qt.AlignTop | Qt.AlignVCenter
+                    Layout.preferredWidth: closeButtonId.size
+                    Layout.preferredHeight: closeButtonId.size
+
+                    Utils.IconToolButton {
+                        id: closeButtonId
+
+                        size: VLCStyle.icon_normal
+                        text: VLCIcons.close
+                        color: VLCStyle.colors.lightText
+
+                        focus: true
+                        onClicked: expandableGV.retract()
+                    }
+
+                    Keys.priority: Keys.AfterItem
+                    Keys.onPressed: defaultKeyAction(event, 0)
+                    navigationParent: expandRect
+                    navigationLeftItem: actionButtons
+                }
             }
-
         }
-
     }
 
 
@@ -313,6 +290,6 @@ Utils.ExpandGridView {
 
     onSelectAll: expandableGV.model.selectAll()
     onSelectionUpdated: expandableGV.model.updateSelection( keyModifiers, oldIndex, newIndex )
-    onActionAtIndex: expandableGV.model.actionAtIndex(index)
+    onActionAtIndex: switchExpandItem( index )
 
 }
