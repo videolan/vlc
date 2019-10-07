@@ -580,6 +580,14 @@ int aout_OutputNew (audio_output_t *aout)
                     formats[1] = VLC_CODEC_DTS;
                 }
                 break;
+            case VLC_CODEC_A52:
+                if (owner->input_profile > 0)
+                {
+                    assert(ARRAY_SIZE(formats) >= 3);
+                    formats[0] = VLC_CODEC_EAC3;
+                    formats[1] = VLC_CODEC_A52;
+                }
+                break;
             default:
                 break;
         }
