@@ -84,6 +84,7 @@
 
 #define AOUT_FMT_HDMI( p_format )                   \
     ( (p_format)->i_format == VLC_CODEC_EAC3        \
+    ||(p_format)->i_format == VLC_CODEC_DTSHD       \
     ||(p_format)->i_format == VLC_CODEC_TRUEHD      \
     ||(p_format)->i_format == VLC_CODEC_MLP         \
     )

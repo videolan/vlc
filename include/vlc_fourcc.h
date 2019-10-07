@@ -444,6 +444,8 @@
 #define VLC_CODEC_A52                        VLC_FOURCC('a','5','2',' ')
 #define VLC_CODEC_EAC3                       VLC_FOURCC('e','a','c','3')
 #define VLC_CODEC_DTS                        VLC_FOURCC('d','t','s',' ')
+/* Only used by outputs and filters */
+#define VLC_CODEC_DTSHD                      VLC_FOURCC('d','t','s','h')
 #define VLC_CODEC_WMA1                       VLC_FOURCC('W','M','A','1')
 #define VLC_CODEC_WMA2                       VLC_FOURCC('W','M','A','2')
 #define VLC_CODEC_WMAP                       VLC_FOURCC('W','M','A','P')
