@@ -38,7 +38,6 @@ NavigableFocusScope {
     property alias contentHeight: flickable.contentHeight
     property alias contentWidth: flickable.contentWidth
     property alias contentX: flickable.contentX
-    property bool isSingleRow: false
     property bool isAnimating: animateRetractItem.running || animateExpandItem.running
 
     /// the id of the item to be expanded
@@ -84,6 +83,25 @@ NavigableFocusScope {
         flickable.retract()
     }
 
+    function getNbItemsPerRow() {
+        return Math.max(Math.floor(width / root.cellWidth), 1)
+    }
+
+    function getItemRowCol(id) {
+        var nbItemsPerRow = getNbItemsPerRow()
+        var rowId = Math.floor(id / nbItemsPerRow)
+        var colId = id % nbItemsPerRow
+        return [colId, rowId]
+    }
+
+    function getItemPos(id) {
+        var colCount = root.getNbItemsPerRow()
+        var remainingSpace = flickable.width - colCount * root.cellWidth
+        var rowCol = getItemRowCol(id)
+        return [(rowCol[0] * root.cellWidth) + (remainingSpace / 2), rowCol[1] * root.cellHeight + headerHeight]
+    }
+
+
     //Gridview visible above the expanded item
     Flickable {
         id: flickable
@@ -120,32 +138,12 @@ NavigableFocusScope {
         onHeightChanged: { layout() }
         onContentYChanged: { layout() }
 
-        function getNbItemsPerRow() {
-            if (isSingleRow)
-                return model.count
-            return Math.max(Math.floor(width / root.cellWidth), 1)
-        }
-
-        function getItemRowCol(id) {
-            var nbItemsPerRow = getNbItemsPerRow()
-            var rowId = Math.floor(id / nbItemsPerRow)
-            var colId = id % nbItemsPerRow
-            return [colId, rowId]
-        }
-
-        function getItemPos(id) {
-            var colCount = flickable.getNbItemsPerRow()
-            var remainingSpace = flickable.width - colCount * root.cellWidth
-            var rowCol = getItemRowCol(id)
-            return [(rowCol[0] * root.cellWidth) + (remainingSpace / 2), rowCol[1] * root.cellHeight + headerHeight]
-        }
-
         function getExpandItemGridId() {
             var ret
             if (root._expandIndex !== -1) {
-                var rowCol = getItemRowCol(root._expandIndex)
+                var rowCol = root.getItemRowCol(root._expandIndex)
                 var rowId = rowCol[1] + 1
-                ret = rowId * getNbItemsPerRow()
+                ret = rowId * root.getNbItemsPerRow()
             } else {
                 ret = model.count
             }
@@ -173,10 +171,10 @@ NavigableFocusScope {
             }
 
             var rowId = Math.floor(contentYWithoutExpand / root.cellHeight)
-            var firstId = Math.max(rowId * getNbItemsPerRow(), 0)
+            var firstId = Math.max(rowId * root.getNbItemsPerRow(), 0)
 
             rowId = Math.ceil((contentYWithoutExpand + heightWithoutExpand) / root.cellHeight)
-            var lastId = Math.min(rowId * getNbItemsPerRow(), model.count)
+            var lastId = Math.min(rowId * root.getNbItemsPerRow(), model.count)
 
             return [firstId, lastId]
         }
@@ -234,7 +232,7 @@ NavigableFocusScope {
 
             // Place the delegates before the expandItem
             for (i = firstId; i < topGridEndId; ++i) {
-                var pos = getItemPos(i)
+                var pos = root.getItemPos(i)
                 var item = getChild(i, _unusedItemList)
                 item.model = model.items.get(i).model
                 item.index = i
@@ -246,11 +244,11 @@ NavigableFocusScope {
             }
 
             if (root._expandIndex !== -1)
-                expandItem.y = getItemPos(expandItemGridId)[1]
+                expandItem.y = root.getItemPos(expandItemGridId)[1]
 
             // Place the delegates after the expandItem
             for (i = topGridEndId; i < lastId; ++i) {
-                pos = getItemPos(i)
+                pos = root.getItemPos(i)
                 item = getChild(i, _unusedItemList)
                 item.model = model.items.get(i).model
                 item.focus = false
@@ -262,11 +260,11 @@ NavigableFocusScope {
             }
 
             // Calculate and set the contentHeight
-            var newContentHeight = getItemPos(model.count - 1)[1] + root.cellHeight
+            var newContentHeight = root.getItemPos(model.count - 1)[1] + root.cellHeight
             if (root._expandIndex !== -1)
                 newContentHeight += expandItem.height
             contentHeight = newContentHeight
-            contentWidth = root.cellWidth * getNbItemsPerRow()
+            contentWidth = root.cellWidth * root.getNbItemsPerRow()
             setCurrentItemFocus()
         }
 
@@ -295,7 +293,7 @@ NavigableFocusScope {
             }
             onCurrentItemYChanged: {
                 var newContentY = flickable.contentY;
-                var currentItemYPos = flickable.getItemPos(currentIndex)[1] + cellHeight + flickable.expandItem.currentItemY
+                var currentItemYPos = root.getItemPos(currentIndex)[1] + cellHeight + flickable.expandItem.currentItemY
                 if (currentItemYPos + flickable.expandItem.currentItemHeight > flickable.contentY + flickable.height) {
                     //move viewport to see current item bottom
                     newContentY = Math.min(
@@ -338,7 +336,7 @@ NavigableFocusScope {
             // Sliding animation
 
             var newContentY = flickable.contentY;
-            var currentItemYPos = flickable.getItemPos(currentIndex)[1]
+            var currentItemYPos = root.getItemPos(currentIndex)[1]
             if (currentItemYPos + cellHeight + expandItemHeight > flickable.contentY + flickable.height) {
                 if (cellHeight + expandItemHeight > flickable.height)
                     newContentY = currentItemYPos
@@ -405,7 +403,7 @@ NavigableFocusScope {
 
     function animateToCurrentIndex() {
         var newContentY = flickable.contentY;
-        var currentItemYPos = flickable.getItemPos(currentIndex)[1]
+        var currentItemYPos = root.getItemPos(currentIndex)[1]
         if (currentItemYPos + cellHeight > flickable.contentY + flickable.height) {
             //move viewport to see current item bottom
             newContentY = Math.min(
@@ -426,7 +424,7 @@ NavigableFocusScope {
     }
 
     Keys.onPressed: {
-        var colCount = flickable.getNbItemsPerRow()
+        var colCount = root.getNbItemsPerRow()
 
         var newIndex = -1
         if (event.key === Qt.Key_Right || event.matches(StandardKey.MoveToNextChar)) {
@@ -438,7 +436,7 @@ NavigableFocusScope {
                 newIndex = Math.max(0, currentIndex - 1)
             }
         } else if (event.key === Qt.Key_Down || event.matches(StandardKey.MoveToNextLine) ||event.matches(StandardKey.SelectNextLine) ) {
-            if (!isSingleRow && Math.floor(currentIndex / colCount) !== Math.floor(root.modelCount / colCount)) { //we are not on the last line
+            if (Math.floor(currentIndex / colCount) !== Math.floor(root.modelCount / colCount)) { //we are not on the last line
                 newIndex = Math.min(root.modelCount - 1, currentIndex + colCount)
             }
         } else if (event.key === Qt.Key_PageDown || event.matches(StandardKey.MoveToNextPage) ||event.matches(StandardKey.SelectNextPage)) {
