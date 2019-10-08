@@ -341,7 +341,6 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     vlc_tick_t i_maxdate;
-    int i_read;
 
     for( int i = 0; i < p_sys->i_tracks; i++ )
     {
@@ -380,30 +379,20 @@ static int Demux( demux_t *p_demux )
                 continue;
             }
 
-            /* allocate a packet */
-            if( ( p_block = block_Alloc( i_size ) ) == NULL )
-            {
-                tk->i_current_subtitle++;
-                continue;
-            }
-
             /* read data */
-            i_read = vlc_stream_Read( p_sys->p_vobsub_stream, p_block->p_buffer, i_size );
-            if( i_read <= 6 )
+            p_block = vlc_stream_Block( p_sys->p_vobsub_stream, i_size );
+            if( p_block )
             {
+                if( p_block->i_buffer > 6 )
+                {
+                    /* pts */
+                    p_block->i_pts = VLC_TICK_0 + tk->p_subtitles[tk->i_current_subtitle].i_start;
+
+                    /* demux this block */
+                    DemuxVobSub( p_demux, p_block );
+                }
                 block_Release( p_block );
-                tk->i_current_subtitle++;
-                continue;
             }
-            p_block->i_buffer = i_read;
-
-            /* pts */
-            p_block->i_pts = VLC_TICK_0 + tk->p_subtitles[tk->i_current_subtitle].i_start;
-
-            /* demux this block */
-            DemuxVobSub( p_demux, p_block );
-
-            block_Release( p_block );
 
             tk->i_current_subtitle++;
         }
