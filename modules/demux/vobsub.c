@@ -516,9 +516,13 @@ static int ParseVobSubIDX( demux_t *p_demux )
                 language[0] = '\0';
             }
 
+            vobsub_track_t *p_realloc = vlc_reallocarray( p_sys->track,
+                                                          p_sys->i_tracks + 1,
+                                                          sizeof(*p_realloc) );
+            if( !p_realloc )
+                return VLC_EGENERIC;
+            p_sys->track = p_realloc;
             p_sys->i_tracks++;
-            p_sys->track = xrealloc( p_sys->track,
-                    sizeof( vobsub_track_t ) * (p_sys->i_tracks + 1 ) );
 
             /* Init the track */
             vobsub_track_t *current_tk = &p_sys->track[p_sys->i_tracks - 1];
@@ -568,15 +572,17 @@ static int ParseVobSubIDX( demux_t *p_demux )
                 i_start = vlc_tick_from_sec( h * 3600 + m * 60 + s ) + VLC_TICK_FROM_MS( ms );
                 i_location = loc;
 
-                current_tk->i_subtitles++;
-                current_tk->p_subtitles =
-                    xrealloc( current_tk->p_subtitles,
-                      sizeof( subtitle_t ) * (current_tk->i_subtitles + 1 ) );
-                current_sub = &current_tk->p_subtitles[current_tk->i_subtitles - 1];
-
-                current_sub->i_start = i_start * i_sign;
-                current_sub->i_start += current_tk->i_delay;
-                current_sub->i_vobsub_location = i_location;
+                subtitle_t *p_realloc = vlc_reallocarray( current_tk->p_subtitles,
+                                                          current_tk->i_subtitles + 1,
+                                                          sizeof(*p_realloc) );
+                if( p_realloc )
+                {
+                    current_tk->p_subtitles = p_realloc;
+                    current_sub = &p_realloc[current_tk->i_subtitles++];
+                    current_sub->i_start = i_start * i_sign;
+                    current_sub->i_start += current_tk->i_delay;
+                    current_sub->i_vobsub_location = i_location;
+                }
             }
             else
             {
