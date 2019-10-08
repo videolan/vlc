@@ -62,9 +62,11 @@ static inline int vobsub_size_parse( const char *psz_buf,
                                      int *pi_original_frame_width,
                                      int *pi_original_frame_height )
 {
-    if( sscanf( psz_buf, "size: %dx%d",
-                pi_original_frame_width, pi_original_frame_height ) == 2 )
+    int w, h;
+    if( sscanf( psz_buf, "size: %dx%d", &w, &h ) == 2 )
     {
+        *pi_original_frame_width = w;
+        *pi_original_frame_height = h;
         return VLC_SUCCESS;
     }
     else
