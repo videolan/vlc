@@ -842,6 +842,9 @@ static int ReadMeta( vlc_object_t* p_this)
     free( psz_uri );
     if( p_stream == NULL )
         return VLC_EGENERIC;
+    stream_t* p_filter = vlc_stream_FilterNew( p_stream, "prefetch,cache" );
+    if( p_filter )
+        p_stream = p_filter;
 
     VlcIostream s( p_stream );
     f = FileRef( &s );
