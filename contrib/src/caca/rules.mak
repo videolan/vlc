@@ -41,6 +41,9 @@ endif
 ifdef HAVE_WIN32
 CACA_CONF += --disable-ncurses
 endif
+ifdef HAVE_LINUX
+CACA_CONF += --disable-ncurses
+endif
 
 .caca: caca
 	$(RECONF)
