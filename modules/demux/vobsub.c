@@ -345,28 +345,29 @@ static int Demux( demux_t *p_demux )
 
     for( int i = 0; i < p_sys->i_tracks; i++ )
     {
-#define tk p_sys->track[i]
-        if( tk.i_current_subtitle >= tk.i_subtitles )
+        vobsub_track_t *tk = &p_sys->track[i];
+
+        if( tk->i_current_subtitle >= tk->i_subtitles )
             continue;
 
         i_maxdate = p_sys->i_next_demux_date;
-        if( i_maxdate <= 0 && tk.i_current_subtitle < tk.i_subtitles )
+        if( i_maxdate <= 0 && tk->i_current_subtitle < tk->i_subtitles )
         {
             /* Should not happen */
-            i_maxdate = tk.p_subtitles[tk.i_current_subtitle].i_start + 1;
+            i_maxdate = tk->p_subtitles[tk->i_current_subtitle].i_start + 1;
         }
 
-        while( tk.i_current_subtitle < tk.i_subtitles &&
-               tk.p_subtitles[tk.i_current_subtitle].i_start < i_maxdate )
+        while( tk->i_current_subtitle < tk->i_subtitles &&
+               tk->p_subtitles[tk->i_current_subtitle].i_start < i_maxdate )
         {
-            int i_pos = tk.p_subtitles[tk.i_current_subtitle].i_vobsub_location;
+            int i_pos = tk->p_subtitles[tk->i_current_subtitle].i_vobsub_location;
             block_t *p_block;
             int i_size = 0;
 
             /* first compute SPU size */
-            if( tk.i_current_subtitle + 1 < tk.i_subtitles )
+            if( tk->i_current_subtitle + 1 < tk->i_subtitles )
             {
-                i_size = tk.p_subtitles[tk.i_current_subtitle+1].i_vobsub_location - i_pos;
+                i_size = tk->p_subtitles[tk->i_current_subtitle+1].i_vobsub_location - i_pos;
             }
             if( i_size <= 0 ) i_size = 65535;   /* Invalid or EOF */
 
@@ -375,14 +376,14 @@ static int Demux( demux_t *p_demux )
             {
                 msg_Warn( p_demux,
                           "cannot seek in the VobSub to the correct time %d", i_pos );
-                tk.i_current_subtitle++;
+                tk->i_current_subtitle++;
                 continue;
             }
 
             /* allocate a packet */
             if( ( p_block = block_Alloc( i_size ) ) == NULL )
             {
-                tk.i_current_subtitle++;
+                tk->i_current_subtitle++;
                 continue;
             }
 
@@ -391,22 +392,21 @@ static int Demux( demux_t *p_demux )
             if( i_read <= 6 )
             {
                 block_Release( p_block );
-                tk.i_current_subtitle++;
+                tk->i_current_subtitle++;
                 continue;
             }
             p_block->i_buffer = i_read;
 
             /* pts */
-            p_block->i_pts = VLC_TICK_0 + tk.p_subtitles[tk.i_current_subtitle].i_start;
+            p_block->i_pts = VLC_TICK_0 + tk->p_subtitles[tk->i_current_subtitle].i_start;
 
             /* demux this block */
             DemuxVobSub( p_demux, p_block );
 
             block_Release( p_block );
 
-            tk.i_current_subtitle++;
+            tk->i_current_subtitle++;
         }
-#undef tk
     }
 
     /* */
