@@ -552,12 +552,13 @@ static int ParseVobSubIDX( demux_t *p_demux )
              * timestamp: [sign]hh:mm:ss:mss, filepos: loc
              * loc is the hex location of the spu in the .sub file
              */
-            int h, m, s, ms, loc = 0;
+            int h, m, s, ms;
+            int64_t loc = 0;
             vlc_tick_t i_start;
             int64_t i_location = 0;
 
             if( p_sys->i_tracks > 0 &&
-                sscanf( line, "timestamp: %d:%d:%d:%d, filepos: %x",
+                sscanf( line, "timestamp: %02d:%02d:%02d:%03d, filepos: %"SCNx64,
                         &h, &m, &s, &ms, &loc ) == 5  )
             {
                 vobsub_track_t *current_tk = &p_sys->track[p_sys->i_tracks - 1];
@@ -593,7 +594,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
             vlc_tick_t i_gap = 0;
 
             if( p_sys->i_tracks > 0 &&
-                sscanf( line, "%*celay: %d%n:%d:%d:%d",
+                sscanf( line, "%*celay: %02d%n:%02d:%02d:%03d",
                         &h, &count, &m, &s, &ms ) >= 4 )
             {
                 vobsub_track_t *current_tk = &p_sys->track[p_sys->i_tracks - 1];
