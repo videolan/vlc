@@ -194,6 +194,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/buttons/DeckButtonsLayout.hpp \
 	gui/qt/util/buttons/RoundButton.cpp \
 	gui/qt/util/buttons/RoundButton.hpp \
+	gui/qt/util/qvlcframe.cpp \
 	gui/qt/util/qvlcframe.hpp \
 	gui/qt/util/qvlcapp.hpp \
 	gui/qt/util/qmleventfilter.cpp \
