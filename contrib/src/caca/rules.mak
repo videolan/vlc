@@ -28,6 +28,7 @@ caca: libcaca-$(CACA_VERSION).tar.gz .sum-caca
 	mv caca/config.sub caca/config.guess caca/.auto
 
 CACA_CONF := \
+	--disable-gl \
 	--disable-imlib2 \
 	--disable-doc \
 	--disable-ruby \
