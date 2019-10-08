@@ -529,7 +529,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
             memset( current_tk, 0, sizeof( vobsub_track_t ) );
             current_tk->i_current_subtitle = 0;
             current_tk->i_subtitles = 0;
-            current_tk->p_subtitles = xmalloc( sizeof( subtitle_t ) );
+            current_tk->p_subtitles = NULL;
             current_tk->i_track_id = i_track_id;
             current_tk->i_delay = (vlc_tick_t)0;
 
