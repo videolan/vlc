@@ -18,6 +18,7 @@ Demux:
  * Fix glitches in TS over HLS
  * Add real probing of HLS streams
  * Fix HLS MIME type fallback
+ * Fix TTML entities not passed to decoder
 
 Decoder:
  * Fix WebVTT subtitles rendering
