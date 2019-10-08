@@ -329,7 +329,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         default:
-            msg_Warn( p_demux, "unknown query in subtitle control" );
             return VLC_EGENERIC;
     }
 }
