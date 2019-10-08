@@ -166,17 +166,14 @@ static int Open ( vlc_object_t *p_this )
 
     /* Find the total length of the vobsubs */
     p_sys->i_length = 0;
-    if( p_sys->i_tracks > 0 )
+    for( int i = 0; i < p_sys->i_tracks; i++ )
     {
-        for( int i = 0; i < p_sys->i_tracks; i++ )
-        {
-            if( p_sys->track[i].i_subtitles > 1 )
-            {
-                if( p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start > p_sys->i_length )
-                    p_sys->i_length = p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start;
-            }
-        }
+        if( !p_sys->track[i].i_subtitles )
+            continue;
+        if( p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start > p_sys->i_length )
+            p_sys->i_length = p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start;
     }
+
     if ( p_sys->i_length != 0)
         p_sys->i_length += VLC_TICK_FROM_SEC( 1 );
 
