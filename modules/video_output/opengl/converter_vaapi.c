@@ -328,6 +328,28 @@ tc_va_check_interop_blacklist(opengl_tex_converter_t *tc, VADisplay *vadpy)
 }
 
 static int
+tc_va_check_derive_image(opengl_tex_converter_t *tc,
+                         vlc_decoder_device *dec_device)
+{
+    vlc_object_t *o = VLC_OBJECT(tc->gl);
+    struct priv *priv = tc->priv;
+    VASurfaceID *va_surface_ids;
+
+    picture_pool_t *pool = vlc_vaapi_PoolNew(o, dec_device, priv->vadpy, 1,
+                                             &va_surface_ids, &tc->fmt, true);
+    if (!pool)
+        return VLC_EGENERIC;
+
+    VAImage va_image = { .image_id = VA_INVALID_ID };
+    int ret = vlc_vaapi_DeriveImage(o, priv->vadpy, va_surface_ids[0],
+                                    &va_image);
+
+    picture_pool_Release(pool);
+
+    return ret;
+}
+
+static int
 Open(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
@@ -391,6 +413,9 @@ Open(vlc_object_t *obj)
     assert(priv->vadpy != NULL);
 
     if (tc_va_check_interop_blacklist(tc, priv->vadpy))
+        goto error;
+
+    if (tc_va_check_derive_image(tc, dec_device))
         goto error;
 
     tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, vlc_sw_chroma,
