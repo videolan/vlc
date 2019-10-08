@@ -105,6 +105,16 @@ static char *tt_genTiming( tt_time_t t )
     return i_ret < 0 ? NULL : psz;
 }
 
+static void tt_MemstreamPutEntities( struct vlc_memstream *p_stream, const char *psz )
+{
+    char *psz_entities = vlc_xml_encode( psz );
+    if( psz_entities )
+    {
+        vlc_memstream_puts( p_stream, psz_entities );
+        free( psz_entities );
+    }
+}
+
 static void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_node_t* p_node )
 {
     bool b_timed_node = false;
@@ -131,14 +141,15 @@ static void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_n
             }
             else
             {
-                psz_value = (char const*)p_entry->p_value;
+                psz_value = p_entry->p_value;
             }
 
             if( psz_value == NULL )
                 continue;
 
-            vlc_memstream_printf( p_stream, " %s=\"%s\"",
-                                  p_entry->psz_key, psz_value );
+            vlc_memstream_printf( p_stream, " %s=\"", p_entry->psz_key );
+            tt_MemstreamPutEntities( p_stream, psz_value );
+            vlc_memstream_putc( p_stream, '"' );
         }
     }
 
@@ -172,7 +183,7 @@ static void tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t 
             return;
 
         vlc_memstream_putc( p_stream, '<' );
-        vlc_memstream_puts( p_stream, p_node->psz_node_name );
+        tt_MemstreamPutEntities( p_stream, p_node->psz_node_name );
 
         tt_node_AttributesToText( p_stream, p_node );
 
@@ -192,7 +203,9 @@ static void tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t 
                 tt_node_ToText( p_stream, p_child, playbacktime );
             }
 
-            vlc_memstream_printf( p_stream, "</%s>", p_node->psz_node_name );
+            vlc_memstream_puts( p_stream, "</" );
+            tt_MemstreamPutEntities( p_stream, p_node->psz_node_name );
+            vlc_memstream_putc( p_stream, '>' );
         }
         else
             vlc_memstream_puts( p_stream, "/>" );
@@ -200,7 +213,7 @@ static void tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t 
     else
     {
         const tt_textnode_t *p_textnode = (const tt_textnode_t *) p_basenode;
-        vlc_memstream_puts( p_stream, p_textnode->psz_text );
+        tt_MemstreamPutEntities( p_stream, p_textnode->psz_text );
     }
 }
 
