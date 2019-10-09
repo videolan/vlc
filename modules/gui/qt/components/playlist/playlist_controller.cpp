@@ -361,6 +361,9 @@ PlaylistControllerModel::append(const QVector<Media> &media, bool startPlaying)
     PlaylistLocker locker(d->m_playlist);
 
     auto rawMedia = toRaw<input_item_t *>(media);
+    /* We can't append an empty media. */
+    assert(rawMedia.size() > 0);
+
     int ret = vlc_playlist_Append(d->m_playlist,
                                   rawMedia.constData(), rawMedia.size());
     if (ret != VLC_SUCCESS)
@@ -382,6 +385,9 @@ PlaylistControllerModel::insert(size_t index, const QVector<Media> &media, bool 
     PlaylistLocker locker(d->m_playlist);
 
     auto rawMedia = toRaw<input_item_t *>(media);
+    /* We can't insert an empty media. */
+    assert(rawMedia.size() > 0);
+
     int ret = vlc_playlist_RequestInsert(d->m_playlist, index,
                                          rawMedia.constData(), rawMedia.size());
     if (ret != VLC_SUCCESS)
