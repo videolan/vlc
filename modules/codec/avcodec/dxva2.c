@@ -243,7 +243,8 @@ static void Close(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    va_pool_Close(va, sys->va_pool);
+    if (sys->va_pool)
+        va_pool_Close(va, sys->va_pool);
 
     if (sys->dxva2_dll)
         FreeLibrary(sys->dxva2_dll);
