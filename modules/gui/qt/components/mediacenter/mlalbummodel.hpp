@@ -33,6 +33,20 @@ class MLAlbumModel : public MLSlidingWindowModel<MLAlbum>
     Q_OBJECT
 
 public:
+    enum Roles
+    {
+        ALBUM_ID = Qt::UserRole + 1,
+        ALBUM_TITLE,
+        ALBUM_RELEASE_YEAR,
+        ALBUM_SHORT_SUMMARY,
+        ALBUM_COVER,
+        ALBUM_MAIN_ARTIST,
+        ALBUM_NB_TRACKS,
+        ALBUM_DURATION
+    };
+    Q_ENUM(Roles)
+
+public:
     explicit MLAlbumModel(QObject *parent = nullptr);
     virtual ~MLAlbumModel() = default;
 

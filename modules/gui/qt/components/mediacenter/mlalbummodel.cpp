@@ -18,20 +18,6 @@
 
 #include "mlalbummodel.hpp"
 
-namespace {
-    enum Roles
-    {
-        ALBUM_ID = Qt::UserRole + 1,
-        ALBUM_TITLE,
-        ALBUM_RELEASE_YEAR,
-        ALBUM_SHORT_SUMMARY,
-        ALBUM_COVER,
-        ALBUM_MAIN_ARTIST,
-        ALBUM_NB_TRACKS,
-        ALBUM_DURATION
-    };
-}
-
 QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumModel::M_names_to_criteria = {
     {"id", VLC_ML_SORTING_DEFAULT},
     {"title", VLC_ML_SORTING_ALBUM},
