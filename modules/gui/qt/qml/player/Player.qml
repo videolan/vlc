@@ -30,6 +30,14 @@ import "qrc:///menus/" as Menus
 Utils.NavigableFocusScope {
     id: rootPlayer
 
+    //menu/overlay to dismiss
+    property var _menu: undefined
+
+    function dismiss() {
+        if (_menu)
+            _menu.dismiss()
+    }
+
     //center image
     Rectangle {
         visible: !rootWindow.hasEmbededVideo

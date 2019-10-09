@@ -206,7 +206,86 @@ Item{
             id: langBtn
             size: VLCStyle.icon_medium
             text: VLCIcons.audiosub
-            onClicked: root.showTrackBar()
+
+            onClicked: {
+                root._lockAutoHide += 1
+                langMenu.open()
+            }
+
+            PlayerMenu {
+                id: langMenu
+                parent: rootPlayer
+                onOpened: rootPlayer._menu = langMenu
+                onMenuClosed: {
+                    root._lockAutoHide -= 1
+                    langBtn.forceActiveFocus()
+                    rootPlayer._menu = undefined
+                }
+                focus: true
+
+                title: qsTr("Languages and Tracks")
+
+                PlayerMenu {
+                    id: subtrackMenu
+                    onOpened: rootPlayer._menu = subtrackMenu
+                    parentMenu: langMenu
+                    title: qsTr("Subtitle Track")
+                    enabled: player.isPlaying && player.subtitleTracks.count > 0
+                    Repeater {
+                        model: player.subtitleTracks
+                        PlayerMenuItem {
+                            parentMenu:  subtrackMenu
+                            text: model.display
+                            checkable: true
+                            checked: model.checked
+                            onTriggered: model.checked = !model.checked
+                        }
+                    }
+                    onMenuClosed: langMenu.menuClosed()
+                }
+
+                PlayerMenu {
+                    id: audiotrackMenu
+                    title: qsTr("Audio Track")
+
+                    parentMenu: langMenu
+                    onOpened: rootPlayer._menu = audiotrackMenu
+
+                    enabled: player.isPlaying && player.audioTracks.count > 0
+                    Repeater {
+                        model: player.audioTracks
+                        PlayerMenuItem {
+                            parentMenu: audiotrackMenu
+
+                            text: model.display
+                            checkable: true
+                            checked: model.checked
+                            onTriggered: model.checked = !model.checked
+                        }
+                    }
+                    onMenuClosed: langMenu.menuClosed()
+                }
+
+                PlayerMenu {
+                    id: videotrackMenu
+                    title: qsTr("Video Track")
+                    parentMenu: langMenu
+                    onOpened: rootPlayer._menu = videotrackMenu
+                    enabled: player.isPlaying && player.videoTracks.count > 0
+                    Repeater {
+                        model: player.videoTracks
+                        PlayerMenuItem {
+                            parentMenu: videotrackMenu
+                            text: model.display
+                            checkable: true
+                            checked: model.checked
+                            onTriggered: model.checked = !model.checked
+                        }
+                    }
+                    onMenuClosed: langMenu.menuClosed()
+                }
+            }
+
             property bool acceptFocus: true
         }
     }
