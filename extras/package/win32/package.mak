@@ -29,12 +29,10 @@ package-win-sdk: package-win-install
 	mkdir -p "$(win32_destdir)/sdk/lib/"
 	cp -r $(prefix)/include "$(win32_destdir)/sdk"
 	cp -r $(prefix)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
-	cp -rv $(prefix)/lib/libvlc.dll.a "$(win32_destdir)/sdk/lib/libvlc.lib"
-	cp -rv $(prefix)/lib/libvlccore.dll.a "$(win32_destdir)/sdk/lib/libvlccore.lib"
 	$(DLLTOOL) -D libvlc.dll -l "$(win32_destdir)/sdk/lib/libvlc.lib" -d "$(top_builddir)/lib/.libs/libvlc.dll.def"
-	echo "INPUT(libvlc.lib)" > "$(win32_destdir)/sdk/lib/vlc.lib"
+	cp -rv "$(win32_destdir)/sdk/lib/libvlc.lib" "$(win32_destdir)/sdk/lib/libvlc.dll.a"
 	$(DLLTOOL) -D libvlccore.dll -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(top_builddir)/src/.libs/libvlccore.dll.def"
-	echo "INPUT(libvlccore.lib)" > "$(win32_destdir)/sdk/lib/vlccore.lib"
+	cp -rv "$(win32_destdir)/sdk/lib/libvlccore.lib" "$(win32_destdir)/sdk/lib/libvlccore.dll.a"
 
 package-win-common: package-win-install package-win-sdk
 # Executables, major libs
