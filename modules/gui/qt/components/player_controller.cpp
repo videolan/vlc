@@ -498,6 +498,11 @@ static void on_player_titles_changed(vlc_player_t *, struct vlc_player_title_lis
             that->m_hasTitles = hasTitles;
             emit that->q_func()->hasTitlesChanged(hasTitles);
         }
+        if (!hasTitles && that->m_hasChapters)
+        {
+            that->m_hasChapters = false;
+            emit that->q_func()->hasChaptersChanged(false);
+        }
         if (hasMenu != that->m_hasMenu)
         {
             that->m_hasMenu = hasMenu;
