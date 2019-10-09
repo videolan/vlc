@@ -1427,7 +1427,7 @@ int MediaLibrary::listGenre( int listQuery, const medialibrary::QueryParameters*
             if ( pattern != nullptr )
                 query = genre->searchTracks( pattern, paramsPtr );
             else
-                query = genre->tracks( paramsPtr );
+                query = genre->tracks( false, paramsPtr );
             if ( query == nullptr )
                 return VLC_EGENERIC;
             switch ( listQuery )
