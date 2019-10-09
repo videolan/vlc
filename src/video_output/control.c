@@ -53,6 +53,8 @@ void vout_control_Init(vout_control_t *ctrl)
     vlc_cond_init(&ctrl->wait_request);
     vlc_cond_init(&ctrl->wait_available);
 
+    ctrl->is_held = false;
+    ctrl->is_waiting = false;
     ctrl->is_dead = false;
     ctrl->can_sleep = true;
     ARRAY_INIT(ctrl->cmd);
