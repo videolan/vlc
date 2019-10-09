@@ -66,6 +66,8 @@ public:
         LANG_BUTTON,
         MENU_BUTTON,
         BACK_BUTTON,
+        CHAPTER_PREVIOUS_BUTTON,
+        CHAPTER_NEXT_BUTTON,
         BUTTON_MAX,
 
         SPLITTER = 0x20,

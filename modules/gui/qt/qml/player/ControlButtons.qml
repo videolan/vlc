@@ -51,6 +51,8 @@ Item{
         { id:  PlayerControlBarModel.LANG_BUTTON, label: VLCIcons.audiosub, text: qsTr("Open subtitles")},
         { id:  PlayerControlBarModel.MENU_BUTTON, label: VLCIcons.menu, text: qsTr("Menu Button")},
         { id:  PlayerControlBarModel.BACK_BUTTON, label: VLCIcons.exit, text: qsTr("Back Button")},
+        { id:  PlayerControlBarModel.CHAPTER_PREVIOUS_BUTTON, label: VLCIcons.dvd_prev, text: qsTr("Previous chapter")},
+        { id:  PlayerControlBarModel.CHAPTER_NEXT_BUTTON, label: VLCIcons.dvd_next, text: qsTr("Next chapter")},
         { id:  PlayerControlBarModel.VOLUME, label: VLCIcons.volume_high, text: qsTr("Volume Widget")},
         { id:  PlayerControlBarModel.TELETEXT_BUTTONS, label: VLCIcons.tvtelx, text: qsTr("Teletext")},
         { id:  PlayerControlBarModel.ASPECT_RATIO_COMBOBOX, label: VLCIcons.aspect_ratio, text: qsTr("Aspect Ratio")},
@@ -68,6 +70,8 @@ Item{
         case PlayerControlBarModel.LANG_BUTTON: return langBtnDelegate
         case PlayerControlBarModel.PLAYLIST_BUTTON:return playlistBtnDelegate
         case PlayerControlBarModel.MENU_BUTTON:return  menuBtnDelegate
+        case PlayerControlBarModel.CHAPTER_PREVIOUS_BUTTON:return  chapterPreviousBtnDelegate
+        case PlayerControlBarModel.CHAPTER_NEXT_BUTTON:return  chapterNextBtnDelegate
         case PlayerControlBarModel.BACK_BUTTON:return  backBtnDelegate
         case PlayerControlBarModel.WIDGET_SPACER:return  spacerDelegate
         case PlayerControlBarModel.WIDGET_SPACER_EXTEND:return  extendiblespacerDelegate
@@ -151,6 +155,36 @@ Item{
             property bool acceptFocus: true
         }
     }
+
+    Component{
+        id: chapterPreviousBtnDelegate
+        Utils.IconToolButton {
+            id: chapterPreviousBtnDelegate
+            size: VLCStyle.icon_medium
+            width: visible? VLCStyle.icon_medium : 0
+            text: VLCIcons.dvd_prev
+            onClicked: player.chapterPrev()
+            visible: player.hasChapters
+            enabled: visible
+            property bool acceptFocus: visible
+        }
+    }
+
+
+    Component{
+        id: chapterNextBtnDelegate
+        Utils.IconToolButton {
+            id: chapterPreviousBtnDelegate
+            size: VLCStyle.icon_medium
+            width: visible? VLCStyle.icon_medium : 0
+            text: VLCIcons.dvd_next
+            onClicked: player.chapterNext()
+            visible: player.hasChapters
+            enabled: visible
+            property bool acceptFocus: visible
+        }
+    }
+
 
     Component{
         id: repeatBtnDelegate
