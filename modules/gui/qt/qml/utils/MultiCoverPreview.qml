@@ -33,6 +33,7 @@
 
 import QtQuick 2.11
 import QtQuick.Layouts 1.3
+import org.videolan.medialib 0.1
 import "qrc:///style"
 
 Item {
@@ -49,7 +50,6 @@ Item {
         rowSpacing: VLCStyle.margin_xxxsmall
 
         Repeater {
-            property int count: albums.rowCount()
             model: Math.min(albums.rowCount(), 4)
 
             /* One cover */
@@ -60,7 +60,7 @@ Item {
                 Layout.columnSpan: albums.rowCount() === 1 ? 2 : 1
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                source: albums.get(index).cover || VLCStyle.noArtAlbum
+                source: albums.data(albums.index(index, 0), MLAlbumModel.ALBUM_COVER) || VLCStyle.noArtAlbum
                 fillMode: Image.PreserveAspectCrop
                 sourceSize: Qt.size(width, height)
             }
