@@ -403,6 +403,7 @@ TOPSRC_BUILT=$(python3 -c "import os; print(os.path.relpath('$BOOTSTRAP_PATH', '
 add_make "TOPSRC = $TOPSRC"
 add_make "TOPSRC_BUILT = $TOPSRC_BUILT"
 add_make "TOPDST = .."
+add_make "-include config.mak"
 add_make 'include $(TOPSRC)/src/main.mak'
 echo "Bootstrap completed."
 make help
