@@ -271,6 +271,8 @@
         <file alias="MiniPlayer.qml">qml/player/MiniPlayer.qml</file>
         <file alias="TopBar.qml">qml/player/TopBar.qml</file>
         <file alias="PlayerButtonsLayout.qml">qml/player/PlayerButtonsLayout.qml</file>
+        <file alias="PlayerMenu.qml">qml/player/PlayerMenu.qml</file>
+        <file alias="PlayerMenuItem.qml">qml/player/PlayerMenuItem.qml</file>
     </qresource>
     <qresource prefix="/about">
         <file alias="About.qml">qml/about/About.qml</file>

@@ -78,6 +78,7 @@ Item {
     property color videosGridInfoLeft: "grey"
 
     property color playerFg: "white"
+    property color playerFgInactive: "#888888"
     property color playerBg: "black"
     property color playerBorder: "#222222"
 
