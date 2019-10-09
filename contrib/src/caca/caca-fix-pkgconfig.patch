@@ -1,0 +1,10 @@
+diff -Naur libcaca-0.99.beta17.a/caca/caca.pc.in libcaca-0.99.beta17.b/caca/caca.pc.in
+--- libcaca-0.99.beta17.a/caca/caca.pc.in	2009-11-17 16:58:37.000000000 +0100
++++ libcaca-0.99.beta17.b/caca/caca.pc.in	2019-10-09 09:04:48.297412878 +0200
+@@ -9,5 +9,5 @@
+ Requires: 
+ Conflicts: 
+ Libs: -L${libdir} -lcaca
+-Libs.private: @ZLIB_LIBS@
++Libs.private: @ZLIB_LIBS@ @CACA_LIBS@
+ Cflags: -I${includedir}

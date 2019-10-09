@@ -23,6 +23,7 @@ caca: libcaca-$(CACA_VERSION).tar.gz .sum-caca
 	$(APPLY) $(SRC)/caca/caca-osx-sdkofourchoice.patch
 	$(APPLY) $(SRC)/caca/caca-win32-static.patch
 	$(APPLY) $(SRC)/caca/caca-fix-ln-call.patch
+	$(APPLY) $(SRC)/caca/caca-fix-pkgconfig.patch
 	$(call pkg_static,"caca/caca.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
