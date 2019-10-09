@@ -42,6 +42,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
+#include <vlc_fs.h>
 
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_picture.h>
@@ -840,7 +841,7 @@ static int Direct3D9CreateShaders(vout_display_t *vd)
             goto error;
         }
         /* Open file, find its size with fseek/ftell and read its content in a buffer. */
-        fs = fopen(filepath, "rb");
+        fs = vlc_fopen(filepath, "rb");
         if (!fs)
             goto error;
         int ret = fseek(fs, 0, SEEK_END);
