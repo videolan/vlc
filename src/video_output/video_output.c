@@ -1324,6 +1324,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
 void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
 {
     assert(!vout->p->dummy);
+    assert(vout->p->display);
 
     vout_control_Hold(&vout->p->control);
     assert(!vout->p->pause.is_on || !is_paused);
@@ -1381,6 +1382,7 @@ void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
+    assert(sys->display);
 
     vout_control_Hold(&sys->control);
     vout_FlushUnlocked(vout, false, date);
@@ -1390,6 +1392,7 @@ void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
 void vout_NextPicture(vout_thread_t *vout, vlc_tick_t *duration)
 {
     assert(!vout->p->dummy);
+    assert(vout->p->display);
     *duration = 0;
 
     vout_control_Hold(&vout->p->control);
@@ -1413,6 +1416,7 @@ void vout_ChangeDelay(vout_thread_t *vout, vlc_tick_t delay)
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
+    assert(sys->display);
 
     vout_control_Hold(&sys->control);
     vlc_clock_SetDelay(vout->p->clock, delay);
@@ -1424,6 +1428,7 @@ void vout_ChangeRate(vout_thread_t *vout, float rate)
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
+    assert(sys->display);
 
     vout_control_Hold(&sys->control);
     sys->rate = rate;
@@ -1610,6 +1615,7 @@ void vout_Cancel(vout_thread_t *vout, bool canceled)
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
+    assert(sys->display);
 
     vout_control_Hold(&sys->control);
     if (sys->decoder_pool != NULL)
