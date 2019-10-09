@@ -155,8 +155,6 @@ static void DestroyVout( input_resource_t *p_resource )
         vout_Close( p_resource->p_vout_free );
         p_resource->p_vout_free = NULL;
     }
-
-    p_resource->p_vout_free = NULL;
 }
 
 static void DisplayVoutTitle( input_resource_t *p_resource,
