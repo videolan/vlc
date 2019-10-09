@@ -343,8 +343,8 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
      * while the clock was paused */
     if (source->es == es_source && source->es)
     {
-        if (frame_rate != 0 && frame_rate != source->smpte.frame_rate
-         || frame_rate_base != source->smpte.frame_rate_base)
+        if (frame_rate != 0 && (frame_rate != source->smpte.frame_rate
+         || frame_rate_base != source->smpte.frame_rate_base))
         {
             assert(frame_rate_base != 0);
             player->timer.last_ts = VLC_TICK_INVALID;
