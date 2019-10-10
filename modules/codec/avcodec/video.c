@@ -80,6 +80,7 @@ struct decoder_sys_t
     /* Hack to force display of still pictures */
     bool b_first_frame;
 
+    bool b_draining;
 
     /* */
     bool palette_sent;
@@ -603,6 +604,7 @@ int InitVideoDec( vlc_object_t *obj )
     p_sys->b_first_frame = true;
     p_sys->i_late_frames = 0;
     p_sys->b_from_preroll = false;
+    p_sys->b_draining = false;
 
     /* Set output properties */
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS )
@@ -655,6 +657,7 @@ static void Flush( decoder_t *p_dec )
 
     date_Set(&p_sys->pts, VLC_TS_INVALID); /* To make sure we recover properly */
     p_sys->i_late_frames = 0;
+    p_sys->b_draining = false;
     cc_Flush( &p_sys->cc );
 
     /* Abort pictures in order to unblock all avcodec workers threads waiting
@@ -1001,57 +1004,61 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
                 FF_INPUT_BUFFER_PADDING_SIZE );
     }
 
-    while( !p_block || p_block->i_buffer > 0 || eos_spotted )
+    do
     {
-        int i_used;
-        AVPacket pkt;
+        int ret;
+        int i_used = 0;
+        const bool b_has_data = ( p_block && p_block->i_buffer > 0 );
+        const bool b_start_drain = ((pp_block == NULL) || eos_spotted) && !p_sys->b_draining;
 
         post_mt( p_sys );
 
-        av_init_packet( &pkt );
-        if( p_block && p_block->i_buffer > 0 )
+        if( b_has_data || b_start_drain )
         {
-            pkt.data = p_block->p_buffer;
-            pkt.size = p_block->i_buffer;
-            pkt.pts = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : AV_NOPTS_VALUE;
-            pkt.dts = p_block->i_dts > VLC_TS_INVALID ? p_block->i_dts : AV_NOPTS_VALUE;
-        }
-        else
-        {
-            /* Return delayed frames if codec has CODEC_CAP_DELAY */
-            pkt.data = NULL;
-            pkt.size = 0;
-        }
-
-        if( !p_sys->palette_sent )
-        {
-            uint8_t *pal = av_packet_new_side_data(&pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
-            if (pal) {
-                memcpy(pal, p_dec->fmt_in.video.p_palette->palette, AVPALETTE_SIZE);
-                p_sys->palette_sent = true;
-            }
-        }
-
-        /* Make sure we don't reuse the same timestamps twice */
-        if( p_block )
-        {
-            p_block->i_pts =
-            p_block->i_dts = VLC_TS_INVALID;
-        }
-
-        int ret = avcodec_send_packet(p_context, &pkt);
-        if( ret != 0 && ret != AVERROR(EAGAIN) )
-        {
-            if (ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL))
+            AVPacket pkt;
+            av_init_packet( &pkt );
+            if( b_has_data )
             {
-                msg_Err(p_dec, "avcodec_send_packet critical error");
-                *error = true;
+                pkt.data = p_block->p_buffer;
+                pkt.size = p_block->i_buffer;
+                pkt.pts = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : AV_NOPTS_VALUE;
+                pkt.dts = p_block->i_dts > VLC_TS_INVALID ? p_block->i_dts : AV_NOPTS_VALUE;
+
+                /* Make sure we don't reuse the same timestamps twice */
+                p_block->i_pts =
+                p_block->i_dts = VLC_TS_INVALID;
             }
+            else /* start drain */
+            {
+                /* Return delayed frames if codec has CODEC_CAP_DELAY */
+                pkt.data = NULL;
+                pkt.size = 0;
+                p_sys->b_draining = true;
+            }
+
+            if( !p_sys->palette_sent )
+            {
+                uint8_t *pal = av_packet_new_side_data(&pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
+                if (pal) {
+                    memcpy(pal, p_dec->fmt_in.video.p_palette->palette, AVPALETTE_SIZE);
+                    p_sys->palette_sent = true;
+                }
+            }
+
+            ret = avcodec_send_packet(p_context, &pkt);
+            if( ret != 0 && ret != AVERROR(EAGAIN) )
+            {
+                if (ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL))
+                {
+                    msg_Err(p_dec, "avcodec_send_packet critical error");
+                    *error = true;
+                }
+                av_packet_unref( &pkt );
+                break;
+            }
+            i_used = ret != AVERROR(EAGAIN) ? pkt.size : 0;
             av_packet_unref( &pkt );
-            break;
         }
-        i_used = ret != AVERROR(EAGAIN) ? pkt.size : 0;
-        av_packet_unref( &pkt );
 
         AVFrame *frame = av_frame_alloc();
         if (unlikely(frame == NULL))
@@ -1071,7 +1078,10 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
             av_frame_free(&frame);
             /* After draining, we need to reset decoder with a flush */
             if( ret == AVERROR_EOF )
+            {
                 avcodec_flush_buffers( p_sys->p_context );
+                p_sys->b_draining = false;
+            }
             break;
         }
         bool not_received_frame = ret;
@@ -1232,10 +1242,15 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         }
         else
             picture_Release( p_pic );
-    }
+    } while( true );
 
     if( p_block )
         block_Release( p_block );
+    if( p_sys->b_draining )
+    {
+        avcodec_flush_buffers( p_sys->p_context );
+        p_sys->b_draining = false;
+    }
     return NULL;
 }
 
