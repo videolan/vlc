@@ -1700,15 +1700,13 @@ void vout_StopDisplay(vout_thread_t *vout)
         filter_DeleteBlend(sys->spu_blend);
 
     /* Destroy the rendering display */
-    if (sys->display != NULL) {
-        if (sys->decoder_pool != NULL)
-            vout_FlushUnlocked(vout, true, INT64_MAX);
+    if (sys->decoder_pool != NULL)
+        vout_FlushUnlocked(vout, true, INT64_MAX);
 
-        vlc_mutex_lock(&sys->display_lock);
-        vout_CloseWrapper(vout, sys->display);
-        sys->display = NULL;
-        vlc_mutex_unlock(&sys->display_lock);
-    }
+    vlc_mutex_lock(&sys->display_lock);
+    vout_CloseWrapper(vout, sys->display);
+    sys->display = NULL;
+    vlc_mutex_unlock(&sys->display_lock);
 
     /* Destroy the video filters */
     ThreadDelAllFilterCallbacks(vout);
