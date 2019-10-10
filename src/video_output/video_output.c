@@ -1732,6 +1732,17 @@ void vout_StopDisplay(vout_thread_t *vout)
     video_format_Clean(&sys->original);
 }
 
+static void vout_DisableWindow(vout_thread_t *vout)
+{
+    vout_thread_sys_t *sys = vout->p;
+    vlc_mutex_lock(&sys->window_lock);
+    if (sys->window_enabled) {
+        vout_window_Disable(sys->display_cfg.window);
+        sys->window_enabled = false;
+    }
+    vlc_mutex_unlock(&sys->window_lock);
+}
+
 void vout_Stop(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
@@ -1740,12 +1751,7 @@ void vout_Stop(vout_thread_t *vout)
     if (sys->display != NULL)
         vout_StopDisplay(vout);
 
-    vlc_mutex_lock(&sys->window_lock);
-    if (sys->window_enabled) {
-        vout_window_Disable(sys->display_cfg.window);
-        sys->window_enabled = false;
-    }
-    vlc_mutex_unlock(&sys->window_lock);
+    vout_DisableWindow(vout);
 }
 
 void vout_Close(vout_thread_t *vout)
@@ -1986,10 +1992,7 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
 
     if (vout_Start(vout, cfg))
     {
-        vlc_mutex_lock(&sys->window_lock);
-        vout_window_Disable(sys->display_cfg.window);
-        sys->window_enabled = false;
-        vlc_mutex_unlock(&sys->window_lock);
+        vout_DisableWindow(vout);
         goto error;
     }
     if (vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
