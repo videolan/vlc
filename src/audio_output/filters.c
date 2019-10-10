@@ -501,7 +501,7 @@ aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *obj, const vlc_clock_t *c
     filters->count = 0;
     if (clock)
     {
-        filters->clock = vlc_clock_CreateSlave(clock);
+        filters->clock = vlc_clock_CreateSlave(clock, AUDIO_ES);
         if (!filters->clock)
             goto error;
     }

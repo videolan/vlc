@@ -106,15 +106,17 @@ vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
  * You must use vlc_clock_Delete to free it.
  */
 vlc_clock_t *vlc_clock_main_CreateSlave(vlc_clock_main_t *main_clock,
-                                         const struct vlc_clock_cbs *cbs,
-                                         void *cbs_data);
+                                        enum es_format_category_e cat,
+                                        const struct vlc_clock_cbs *cbs,
+                                        void *cbs_data);
 
 /**
  * This function creates a new slave vlc_clock_t interface
  *
  * You must use vlc_clock_Delete to free it.
  */
-vlc_clock_t *vlc_clock_CreateSlave(const vlc_clock_t *clock);
+vlc_clock_t *vlc_clock_CreateSlave(const vlc_clock_t *clock,
+                                   enum es_format_category_e cat);
 
 /**
  * This function free the resources allocated by vlc_clock*Create*()
