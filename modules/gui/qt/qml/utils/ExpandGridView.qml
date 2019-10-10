@@ -330,20 +330,8 @@ NavigableFocusScope {
             animateExpandItem.start()
 
             // Sliding animation
-
-            var newContentY = flickable.contentY;
-            var currentItemYPos = root.getItemPos(currentIndex)[1]
-            if (currentItemYPos + cellHeight + expandItemHeight > flickable.contentY + flickable.height) {
-                if (cellHeight + expandItemHeight > flickable.height)
-                    newContentY = currentItemYPos
-                else
-                    newContentY = Math.min(
-                                currentItemYPos + cellHeight + expandItemHeight - flickable.height,
-                                flickable.contentHeight + expandItemHeight - flickable.height)
-            }
-
-            if (newContentY !== flickable.contentY)
-                animateFlickableContentY(newContentY)
+            var currentItemYPos = root.getItemPos(_expandIndex)[1]
+            animateFlickableContentY(currentItemYPos)
         }
 
         function retract() {
