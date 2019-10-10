@@ -39,6 +39,7 @@
 #include <medialibrary/IVideoTrack.h>
 #include <medialibrary/IFolder.h>
 #include <medialibrary/filesystem/IDevice.h>
+#include <medialibrary/filesystem/Errors.h>
 
 #include <algorithm>
 
@@ -288,7 +289,7 @@ bool Convert( const medialibrary::IFile* input, vlc_ml_file_t& output )
         if( !strdup_helper( input->mrl(), output.psz_mrl ) )
             return false;
     }
-    catch ( const medialibrary::fs::DeviceRemovedException& )
+    catch ( const medialibrary::fs::errors::DeviceRemoved& )
     {
         output.psz_mrl = nullptr;
         output.b_present = false;
@@ -410,7 +411,7 @@ bool Convert( const medialibrary::IFolder* input, vlc_ml_entry_point_t& output )
             return false;
         output.b_present = true;
     }
-    catch ( const medialibrary::fs::DeviceRemovedException& )
+    catch ( const medialibrary::fs::errors::DeviceRemoved& )
     {
         output.psz_mrl = nullptr;
         output.b_present = false;
@@ -434,7 +435,7 @@ input_item_t* MediaToInputItem( const medialibrary::IMedia* media )
     {
         mrl = (*it)->mrl();
     }
-    catch ( const medialibrary::fs::DeviceRemovedException& ex )
+    catch ( const medialibrary::fs::errors::DeviceRemoved& ex )
     {
         return nullptr;
     }
