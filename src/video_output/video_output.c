@@ -1925,7 +1925,7 @@ vout_thread_t *vout_Hold(vout_thread_t *vout)
     return vout;
 }
 
-int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
+static int vout_EnableWindow(const vout_configuration_t *cfg)
 {
     vout_thread_t *vout = cfg->vout;
     vout_thread_sys_t *sys = vout->p;
@@ -1984,13 +1984,23 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
         sys->window_enabled = true;
     } else
         vout_UpdateWindowSizeLocked(vout);
+    vlc_mutex_unlock(&sys->window_lock);
+
+    return 0;
+}
+
+int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
+{
+    vout_thread_t *vout = cfg->vout;
+    vout_thread_sys_t *sys = vout->p;
+
+    if (vout_EnableWindow(cfg) != 0)
+        return -1;
 
     sys->delay = 0;
     sys->rate = 1.f;
     sys->clock = cfg->clock;
     sys->delay = 0;
-
-    vlc_mutex_unlock(&sys->window_lock);
 
     if (vout_Start(vout, cfg))
     {
