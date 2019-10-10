@@ -37,7 +37,7 @@ public:
     const std::string& name() const override;
     const std::string& extension() const override;
     unsigned int lastModificationDate() const override;
-    unsigned int size() const override;
+    int64_t size() const override;
     inline bool isNetwork() const override { return true; }
 
 private:

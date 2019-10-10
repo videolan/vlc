@@ -641,6 +641,10 @@ enum vlc_ml_event_type
      * vlc_ml_event_t::history_changed::history_type
      */
     VLC_ML_EVENT_HISTORY_CHANGED,
+    /**
+     * Sent when an application requested rescan starts being processed.
+     */
+    VLC_ML_EVENT_RESCAN_STARTED,
 };
 
 typedef struct vlc_ml_event_t

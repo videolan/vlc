@@ -335,6 +335,13 @@ void MediaLibrary::onHistoryChanged( medialibrary::HistoryType historyType )
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
+void MediaLibrary::onRescanStarted()
+{
+    vlc_ml_event_t ev;
+    ev.i_type = VLC_ML_EVENT_RESCAN_STARTED;
+    m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
+}
+
 MediaLibrary::MediaLibrary( vlc_medialibrary_module_t* ml )
     : m_vlc_ml( ml )
 {

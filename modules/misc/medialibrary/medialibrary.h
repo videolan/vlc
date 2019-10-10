@@ -196,6 +196,7 @@ public:
                                        medialibrary::ThumbnailSizeType sizeType,
                                        bool success) override;
     virtual void onHistoryChanged( medialibrary::HistoryType historyType ) override;
+    virtual void onRescanStarted() override;
 };
 
 bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output );

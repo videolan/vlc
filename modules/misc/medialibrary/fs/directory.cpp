@@ -35,6 +35,7 @@
 #include <vlc_input.h>
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
+#include <medialibrary/filesystem/Errors.h>
 
 using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
                                               input_item_Hold,
@@ -92,7 +93,7 @@ std::shared_ptr<IFile> SDDirectory::file(const std::string& mrl) const
                                 return f->name() == fileName;
                             });
     if ( it == cend( fs ) )
-        throw std::runtime_error( mrl + " wasn't found in the directory" );
+        throw medialibrary::fs::errors::NotFound( mrl, m_mrl );
     return *it;
 }
 
@@ -168,9 +169,8 @@ static bool request_metadata_sync( libvlc_int_t *libvlc, input_item_t *media,
         auto res = req.cond.timedwait( req.lock, deadline );
         if (res != 0 )
         {
-            throw std::system_error( ETIMEDOUT, std::generic_category(),
-                                     "Failed to browse network directory: "
-                                     "Network is too slow");
+            throw medialibrary::fs::errors::System( ETIMEDOUT,
+                "Failed to browse network directory: Network is too slow" );
         }
     }
     return req.success;
@@ -189,9 +189,8 @@ SDDirectory::read() const
     auto status = request_metadata_sync( m_fs.libvlc(), media.get(), &children);
 
     if ( status == false )
-        throw std::system_error(EIO, std::generic_category(),
-                                "Failed to browse network directory: "
-                                "Unknown error");
+        throw medialibrary::fs::errors::System( EIO,
+            "Failed to browse network directory: Unknown error" );
 
     for (const InputItemPtr &m : children)
     {

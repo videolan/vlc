@@ -59,7 +59,7 @@ SDFile::lastModificationDate() const
     return 0;
 }
 
-unsigned int
+int64_t
 SDFile::size() const
 {
     return 0;

@@ -1,4 +1,4 @@
-MEDIALIBRARY_HASH := 18148bcaf26964d22ebdda26a475ed1ed533046b
+MEDIALIBRARY_HASH := a6a3bf2cf19fcff5c816ac478ad4086fa9ea4193
 MEDIALIBRARY_VERSION := git-$(MEDIALIBRARY_HASH)
 MEDIALIBRARY_GITURL := https://code.videolan.org/videolan/medialibrary.git
 
@@ -10,7 +10,7 @@ endif
 DEPS_medialibrary = sqlite $(DEPS_sqlite)
 
 $(TARBALLS)/medialibrary-$(MEDIALIBRARY_VERSION).tar.xz:
-	$(call download_git,$(MEDIALIBRARY_GITURL),,$(MEDIALIBRARY_HASH))
+	$(call download_git,$(MEDIALIBRARY_GITURL),0.6.x,$(MEDIALIBRARY_HASH))
 
 .sum-medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.xz
 	$(call check_githash,$(MEDIALIBRARY_HASH))
