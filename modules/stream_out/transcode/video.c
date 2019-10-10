@@ -70,7 +70,7 @@ static void debug_format( sout_stream_t *p_stream, const es_format_t *fmt )
              fmt->video.orientation );
 }
 
-static int video_update_format_decoder( decoder_t *p_dec )
+static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vctx )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     sout_stream_id_sys_t *id = p_owner->id;

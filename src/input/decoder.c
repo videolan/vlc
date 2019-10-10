@@ -84,6 +84,7 @@ struct decoder_owner
 
     /* Current format in use by the output */
     es_format_t    fmt;
+    vlc_video_context *vctx;
 
     /* */
     atomic_bool    b_fmt_description;
@@ -461,7 +462,7 @@ static void FixDisplayFormat(decoder_t *p_dec, video_format_t *fmt)
 static int CreateVoutIfNeeded(struct decoder_owner *, vout_thread_t **, enum vlc_vout_order *, vlc_decoder_device **);
 
 
-static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
+static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *vctx )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
@@ -470,6 +471,15 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
     int created_vout = CreateVoutIfNeeded(p_owner, &p_vout, &vout_order, NULL);
     if (created_vout == -1)
         return -1; // error
+    if (created_vout == 0)
+    {
+        // video context didn't change
+        if (vctx != NULL && p_owner->vctx == vctx)
+            return 0;
+    }
+    if (p_owner->vctx)
+        vlc_video_context_Release(p_owner->vctx);
+    p_owner->vctx = vctx ? vlc_video_context_Hold(vctx) : NULL;
 
     // configure the new vout
 
@@ -511,12 +521,15 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec )
         .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
         .mouse_event = MouseEvent, .mouse_opaque = p_dec,
     };
-    res = input_resource_StartVout( p_owner->p_resource, p_owner->p_dec_dev, &cfg);
+    vlc_decoder_device *dec_dev = p_owner->vctx ? vlc_video_context_HoldDevice(vctx) : NULL;
+    res = input_resource_StartVout( p_owner->p_resource, dec_dev, &cfg);
     if (res == 0)
     {
         p_owner->vout_thread_started = true;
         decoder_Notify(p_owner, on_vout_started, p_vout, vout_order);
     }
+    if (dec_dev)
+        vlc_decoder_device_Release(dec_dev);
     return res;
 }
 
@@ -1183,8 +1196,9 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
     ModuleThread_UpdateStatVideo( p_owner, success != VLC_SUCCESS );
 }
 
-static int thumbnailer_update_format( decoder_t *p_dec )
+static int thumbnailer_update_format( decoder_t *p_dec, vlc_video_context *vctx_out )
 {
+    VLC_UNUSED(vctx_out);
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
     return 0;
 }
@@ -2013,6 +2027,9 @@ static void DeleteDecoder( decoder_t * p_dec )
 
     if ( p_owner->p_dec_dev )
         vlc_decoder_device_Release( p_owner->p_dec_dev );
+
+    if (p_owner->vctx)
+        vlc_video_context_Release( p_owner->vctx );
 
     /* Free all packets still in the decoder fifo. */
     block_FifoRelease( p_owner->p_fifo );

@@ -50,7 +50,7 @@ struct decoder_owner_callbacks
         struct
         {
             vlc_decoder_device * (*get_device)( decoder_t * );
-            int         (*format_update)( decoder_t * );
+            int         (*format_update)( decoder_t *, vlc_video_context * );
 
             /* cf. decoder_NewPicture, can be called from any decoder thread */
             picture_t*  (*buffer_new)( decoder_t * );
@@ -300,7 +300,7 @@ static inline vlc_decoder_device * decoder_GetDecoderDevice( decoder_t *dec )
  *
  * @return 0 if the video output was set up successfully, -1 otherwise.
  */
-VLC_API int decoder_UpdateVideoOutput( decoder_t *dec );
+VLC_API int decoder_UpdateVideoOutput( decoder_t *dec, vlc_video_context *vctx_out );
 
 /**
  * Updates the video output format.

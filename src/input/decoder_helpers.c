@@ -80,17 +80,17 @@ int decoder_UpdateVideoFormat( decoder_t *dec )
 {
     vlc_decoder_device *dec_dev = decoder_GetDecoderDevice( dec );
     if (dec_dev) vlc_decoder_device_Release( dec_dev );
-    return decoder_UpdateVideoOutput( dec );
+    return decoder_UpdateVideoOutput( dec, NULL );
 }
 
-int decoder_UpdateVideoOutput( decoder_t *dec )
+int decoder_UpdateVideoOutput( decoder_t *dec, vlc_video_context *vctx_out )
 {
     vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
     if ( unlikely(dec->fmt_in.i_cat != VIDEO_ES || dec->cbs == NULL ||
                   dec->cbs->video.format_update == NULL) )
         return -1;
 
-    return dec->cbs->video.format_update( dec );
+    return dec->cbs->video.format_update( dec, vctx_out );
 }
 
 picture_t *decoder_NewPicture( decoder_t *dec )

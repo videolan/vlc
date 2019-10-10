@@ -1249,7 +1249,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if (p_sys->p_va == NULL
              && lavc_UpdateVideoFormat(p_dec, p_context, p_context->pix_fmt,
                                        p_context->pix_fmt, NULL) == 0
-             && decoder_UpdateVideoOutput(p_dec) == 0)
+             && decoder_UpdateVideoOutput(p_dec, NULL) == 0)
                 p_pic = decoder_NewPicture(p_dec);
 
             if( !p_pic )
@@ -1603,7 +1603,7 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
          * update the output video format here. The MT semaphore must be held
          * to protect p_dec->fmt_out. */
         if (lavc_UpdateVideoFormat(dec, ctx, ctx->pix_fmt, ctx->pix_fmt, NULL) ||
-            decoder_UpdateVideoOutput(dec))
+            decoder_UpdateVideoOutput(dec, NULL))
         {
             vlc_mutex_unlock(&sys->lock);
             return -1;
@@ -1758,7 +1758,7 @@ no_reuse:
         if (va == NULL)
             continue; /* Unsupported codec profile or such */
 
-        if (decoder_UpdateVideoOutput(p_dec))
+        if (decoder_UpdateVideoOutput(p_dec, NULL))
         {
             vlc_va_Delete(va);
             p_context->hwaccel_context = NULL;
