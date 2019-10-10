@@ -126,6 +126,8 @@ Utils.NavigableFocusScope {
                     || event.matches(StandardKey.Back)
                     || event.matches(StandardKey.Cancel)) {
                 toolbarAutoHide.toggleForceVisible()
+            } else {
+                rootWindow.sendHotkey(event.key, event.modifiers);
             }
         }
 
