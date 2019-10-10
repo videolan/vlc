@@ -66,7 +66,7 @@ Utils.NavigableFocusScope {
             enabled: medialib.gridView
             text: "Information"
             onTriggered: {
-                view.currentItem.switchExpandItem(contextMenu.model.index, view.currentItem.currentItem)
+                view.currentItem.switchExpandItem(contextMenu.model.index)
             }
         }
         Utils.MenuItemExt {

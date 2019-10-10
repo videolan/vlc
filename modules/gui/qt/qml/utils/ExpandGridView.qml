@@ -47,7 +47,6 @@ NavigableFocusScope {
     //delegate to display the extended item
     property Component delegate: Item{}
     property Component expandDelegate: Item{}
-    property Item expanderItem: Item{}
 
     property Component headerDelegate: Item{}
     property int headerHeight: headerItemLoader.implicitHeight
@@ -63,10 +62,7 @@ NavigableFocusScope {
         flickable.layout()
     }
 
-    function switchExpandItem(index,item) {
-        if (item)
-            root.expanderItem = item
-
+    function switchExpandItem(index) {
         if (index === _expandIndex)
             _newExpandIndex = -1
         else
