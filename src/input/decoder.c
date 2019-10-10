@@ -123,6 +123,7 @@ struct decoder_owner
 
     vout_thread_t   *p_vout;
     vlc_decoder_device *p_dec_dev; // TEMPORARY
+    bool            vout_thread_added;
 
     /* -- Theses variables need locking on read *and* write -- */
     /* Preroll */
@@ -657,6 +658,7 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
 
             vout_Release(p_owner->p_vout);
             p_owner->p_vout = NULL; // the DecoderThread should not use the old vout anymore
+            p_owner->vout_thread_added = false;
             vlc_mutex_unlock( &p_owner->lock );
         }
         return NULL;
@@ -677,6 +679,7 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
                                              p_owner->i_spu_channel);
             vout_Release(p_owner->p_vout);
             p_owner->p_vout = NULL; // the DecoderThread should not use the old vout anymore
+            p_owner->vout_thread_added = false;
         }
 
         enum vlc_vout_order channel_order;
@@ -694,6 +697,7 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
         }
 
         p_owner->p_vout = p_vout;
+        p_owner->vout_thread_added = true;
         vlc_mutex_unlock(&p_owner->lock);
 
         assert(channel_order != VLC_VOUT_ORDER_NONE);
@@ -1795,6 +1799,7 @@ static struct decoder_owner * CreateDecoder( vlc_object_t *p_parent,
     p_owner->cbs_userdata = cbs_userdata;
     p_owner->p_aout = NULL;
     p_owner->p_vout = NULL;
+    p_owner->vout_thread_added = false;
     p_owner->i_spu_channel = VOUT_SPU_CHANNEL_INVALID;
     p_owner->i_spu_order = 0;
     p_owner->p_sout = p_sout;
@@ -1964,9 +1969,13 @@ static void DeleteDecoder( decoder_t * p_dec )
 
             if (vout != NULL)
             {
-                /* Reset the cancel state that was set before joining the decoder
-                 * thread */
-                vout_Cancel(vout, false);
+                if (p_owner->vout_thread_added)
+                {
+                    /* Reset the cancel state that was set before joining the decoder
+                    * thread */
+                    vout_Cancel(vout, false);
+                    p_owner->vout_thread_added = false;
+                }
                 decoder_Notify(p_owner, on_vout_deleted, vout);
                 input_resource_PutVout(p_owner->p_resource, vout);
             }
@@ -1982,6 +1991,7 @@ static void DeleteDecoder( decoder_t * p_dec )
                 vout_UnregisterSubpictureChannel( p_owner->p_vout,
                                                   p_owner->i_spu_channel );
                 vout_Release(p_owner->p_vout);
+                p_owner->vout_thread_added = false;
             }
             break;
         }
@@ -2147,7 +2157,7 @@ void input_DecoderDelete( decoder_t *p_dec )
      *
      * This unblocks the thread, allowing the decoder module to join all its
      * worker threads (if any) and the decoder thread to terminate. */
-    if( p_dec->fmt_in.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
+    if( p_dec->fmt_in.i_cat == VIDEO_ES && p_owner->p_vout != NULL && p_owner->vout_thread_added )
         vout_Cancel( p_owner->p_vout, true );
     vlc_mutex_unlock( &p_owner->lock );
 
