@@ -1688,13 +1688,11 @@ noreturn static void *Thread(void *object)
     }
 }
 
-void vout_StopDisplay(vout_thread_t *vout)
+static void vout_ReleaseDisplay(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
 
     assert(sys->display != NULL);
-    vlc_cancel(sys->thread);
-    vlc_join(sys->thread, NULL);
 
     if (sys->spu_blend != NULL)
         filter_DeleteBlend(sys->spu_blend);
@@ -1730,6 +1728,16 @@ void vout_StopDisplay(vout_thread_t *vout)
     sys->mouse_event = NULL;
     sys->clock = NULL;
     video_format_Clean(&sys->original);
+}
+
+void vout_StopDisplay(vout_thread_t *vout)
+{
+    vout_thread_sys_t *sys = vout->p;
+
+    vlc_cancel(sys->thread);
+    vlc_join(sys->thread, NULL);
+
+    vout_ReleaseDisplay(vout);
 }
 
 static void vout_DisableWindow(vout_thread_t *vout)
@@ -2010,7 +2018,8 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
         return -1;
     }
     if (vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
-        vout_Stop(vout);
+        vout_ReleaseDisplay(vout);
+        vout_DisableWindow(vout);
         return -1;
     }
 
