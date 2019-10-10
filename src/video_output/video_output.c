@@ -1944,6 +1944,24 @@ vout_thread_t *vout_Hold(vout_thread_t *vout)
     return vout;
 }
 
+int vout_ChangeSource( vout_thread_t *vout, const video_format_t *original, unsigned dpb_size )
+{
+    vout_thread_sys_t *sys = vout->p;
+
+     /* TODO: If dimensions are equal or slightly smaller, update the aspect
+     * ratio and crop settings, instead of recreating a display.
+     */
+    if (video_format_IsSimilar(original, &sys->original)) {
+        if (dpb_size <= sys->dpb_size) {
+            /* It is assumed that the SPU input matches input already. */
+            return 0;
+        }
+        msg_Warn(vout, "DPB need to be increased");
+    }
+
+    return -1;
+}
+
 static int vout_EnableWindow(const vout_configuration_t *cfg, const video_format_t *original,
                              vlc_decoder_device **pp_dec_device)
 {
@@ -2002,15 +2020,10 @@ int vout_Request(const vout_configuration_t *cfg, vlc_decoder_device *dec_dev, i
     video_format_t original;
     VoutFixFormat(&original, cfg->fmt);
 
-    /* TODO: If dimensions are equal or slightly smaller, update the aspect
-     * ratio and crop settings, instead of recreating a display.
-     */
-    if (video_format_IsSimilar(&original, &sys->original)) {
-        if (cfg->dpb_size <= sys->dpb_size) {
-            video_format_Clean(&original);
-            return 0;
-        }
-        msg_Warn(vout, "DPB need to be increased");
+    if (vout_ChangeSource(vout, &original, cfg->dpb_size) == 0)
+    {
+        video_format_Clean(&original);
+        return 0;
     }
 
     if (vout_EnableWindow(cfg, &original, NULL) != 0)

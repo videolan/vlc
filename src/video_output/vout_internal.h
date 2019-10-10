@@ -242,6 +242,14 @@ void vout_StopDisplay(vout_thread_t *);
  */
 void vout_Close( vout_thread_t *p_vout );
 
+/**
+ * Set the new source format for a started vout
+ *
+ * \retval 0 on success
+ * \retval -1 on error, the vout needs to be restarted to handle the format
+ */
+int vout_ChangeSource( vout_thread_t *p_vout, const video_format_t *fmt, unsigned dpb_size );
+
 /* TODO to move them to vlc_vout.h */
 void vout_ChangeFullscreen(vout_thread_t *, const char *id);
 void vout_ChangeWindowed(vout_thread_t *);
