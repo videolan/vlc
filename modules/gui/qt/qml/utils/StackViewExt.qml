@@ -54,6 +54,9 @@ StackView {
      */
     function loadView(viewModel, view, viewProperties)
     {
+        if (root.currentItem && root.currentItem.hasOwnProperty("dismiss"))
+            root.currentItem.dismiss()
+
         if (view === _currentView) {
             if (Object.keys(viewProperties).length === 0 && root.currentItem.hasOwnProperty("loadDefaultView") ) {
                 root.currentItem.loadDefaultView()
