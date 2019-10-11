@@ -122,6 +122,7 @@ struct decoder_owner
     audio_output_t *p_aout;
 
     vout_thread_t   *p_vout;
+    enum vlc_vout_order vout_order;
     vlc_decoder_device *p_dec_dev; // TEMPORARY
     bool            vout_thread_added;
 
@@ -567,6 +568,7 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner)
 
     vlc_mutex_lock( &p_owner->lock );
     p_owner->p_vout = p_vout;
+    p_owner->vout_order = order;
     if ( p_owner->p_dec_dev != NULL )
         vlc_decoder_device_Release( p_owner->p_dec_dev );
     p_owner->p_dec_dev = dec_dev;
@@ -706,6 +708,7 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
 
         p_owner->p_vout = p_vout;
         p_owner->vout_thread_added = true;
+        p_owner->vout_order = channel_order;
         vlc_mutex_unlock(&p_owner->lock);
 
         assert(channel_order != VLC_VOUT_ORDER_NONE);
