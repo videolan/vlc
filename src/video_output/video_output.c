@@ -1977,7 +1977,9 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
 
         if (vout_window_Enable(sys->display_cfg.window, &wcfg)) {
             vlc_mutex_unlock(&sys->window_lock);
-            goto error;
+            msg_Err(vout, "failed to enable window");
+            video_format_Clean(&sys->original);
+            return -1;
         }
         sys->window_enabled = true;
     } else
@@ -1992,14 +1994,13 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
 
     if (vout_Start(vout, cfg))
     {
+        msg_Err(vout, "video output display creation failed");
+        video_format_Clean(&sys->original);
         vout_DisableWindow(vout);
-        goto error;
+        return -1;
     }
     if (vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
         vout_Stop(vout);
-error:
-        msg_Err(vout, "video output creation failed");
-        video_format_Clean(&sys->original);
         return -1;
     }
 
