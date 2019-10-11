@@ -1944,42 +1944,15 @@ vout_thread_t *vout_Hold(vout_thread_t *vout)
     return vout;
 }
 
-static int vout_EnableWindow(const vout_configuration_t *cfg, vlc_decoder_device **pp_dec_device)
+static int vout_EnableWindow(const vout_configuration_t *cfg, const video_format_t *original,
+                             vlc_decoder_device **pp_dec_device)
 {
     vout_thread_t *vout = cfg->vout;
     vout_thread_sys_t *sys = vout->p;
 
     assert(!sys->dummy);
     assert(vout != NULL);
-    assert(cfg->fmt != NULL);
     assert(cfg->clock != NULL);
-
-    if (!VoutCheckFormat(cfg->fmt))
-        return -1;
-
-    video_format_t original;
-    VoutFixFormat(&original, cfg->fmt);
-
-    /* TODO: If dimensions are equal or slightly smaller, update the aspect
-     * ratio and crop settings, instead of recreating a display.
-     */
-    if (video_format_IsSimilar(&original, &sys->original)) {
-        if (cfg->dpb_size <= sys->dpb_size) {
-            video_format_Clean(&original);
-            /* It is assumed that the SPU input matches input already. */
-            if (pp_dec_device)
-                *pp_dec_device = sys->dec_device ? vlc_decoder_device_Hold( sys->dec_device ) : NULL;
-            return 0;
-        }
-        msg_Warn(vout, "DPB need to be increased");
-    }
-
-    if (sys->display != NULL)
-        vout_StopDisplay(vout);
-
-    vout_ReinitInterlacingSupport(vout);
-
-    sys->original = original;
 
     vlc_mutex_lock(&sys->window_lock);
     if (!sys->window_enabled) {
@@ -1993,13 +1966,12 @@ static int vout_EnableWindow(const vout_configuration_t *cfg, vlc_decoder_device
 #endif
         };
 
-        VoutGetDisplayCfg(vout, &original, &sys->display_cfg);
-        vout_SizeWindow(vout, &original, &wcfg.width, &wcfg.height);
+        VoutGetDisplayCfg(vout, original, &sys->display_cfg);
+        vout_SizeWindow(vout, original, &wcfg.width, &wcfg.height);
 
         if (vout_window_Enable(sys->display_cfg.window, &wcfg)) {
             vlc_mutex_unlock(&sys->window_lock);
             msg_Err(vout, "failed to enable window");
-            video_format_Clean(&sys->original);
             return -1;
         }
         sys->window_enabled = true;
@@ -2021,8 +1993,40 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
     vout_thread_t *vout = cfg->vout;
     vout_thread_sys_t *sys = vout->p;
 
-    if (vout_EnableWindow(cfg, NULL) != 0)
+    assert(cfg->fmt != NULL);
+
+    if (!VoutCheckFormat(cfg->fmt))
+        /* don't stop the display and keep sys->original */
         return -1;
+
+    video_format_t original;
+    VoutFixFormat(&original, cfg->fmt);
+
+    /* TODO: If dimensions are equal or slightly smaller, update the aspect
+     * ratio and crop settings, instead of recreating a display.
+     */
+    if (video_format_IsSimilar(&original, &sys->original)) {
+        if (cfg->dpb_size <= sys->dpb_size) {
+            video_format_Clean(&original);
+            return 0;
+        }
+        msg_Warn(vout, "DPB need to be increased");
+    }
+
+    if (vout_EnableWindow(cfg, &original, NULL) != 0)
+    {
+        /* the window was not enabled, nor the display started */
+        msg_Err(vout, "failed to enable window");
+        video_format_Clean(&original);
+        return -1;
+    }
+
+    if (sys->display != NULL)
+        vout_StopDisplay(vout);
+
+    vout_ReinitInterlacingSupport(vout);
+
+    sys->original = original;
 
     sys->delay = 0;
     sys->rate = 1.f;
@@ -2051,7 +2055,18 @@ int vout_Request(const vout_configuration_t *cfg, input_thread_t *input)
 vlc_decoder_device *vout_GetDevice(const vout_configuration_t *cfg)
 {
     vlc_decoder_device *dec_device = NULL;
-    if (vout_EnableWindow(cfg, &dec_device) != 0)
+
+    assert(cfg->fmt != NULL);
+
+    if (!VoutCheckFormat(cfg->fmt))
+        return NULL;
+
+    video_format_t original;
+    VoutFixFormat(&original, cfg->fmt);
+
+    int res = vout_EnableWindow(cfg, &original, &dec_device);
+    video_format_Clean(&original);
+    if (res != 0)
         return NULL;
     return dec_device;
 }
