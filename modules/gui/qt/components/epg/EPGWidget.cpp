@@ -23,7 +23,7 @@
 #include "qt.hpp"
 
 #include <vlc_epg.h>
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 
 #include <QStackedWidget>
 #include <QVBoxLayout>

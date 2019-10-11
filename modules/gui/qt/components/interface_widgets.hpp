@@ -30,7 +30,7 @@
 #endif
 
 #include "main_interface.hpp" /* Interface integration */
-#include "components/player_controller.hpp"  /* Speed control */
+#include "player/player_controller.hpp"  /* Speed control */
 
 #include "components/controller.hpp"
 #include "components/controller_widget.hpp"

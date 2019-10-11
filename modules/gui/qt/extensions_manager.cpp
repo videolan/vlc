@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #include "extensions_manager.hpp"
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 #include "dialogs/extensions.hpp"
 
 #include <vlc_modules.h>

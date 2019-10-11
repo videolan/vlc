@@ -36,7 +36,7 @@
 #include "util/imagehelper.hpp"
 
 #include "qt.hpp"
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 
 #include <QGroupBox>
 #include <QLabel>

@@ -29,7 +29,7 @@
 #include "dialogs/extended.hpp"
 
 #include "main_interface.hpp" /* Needed for external MI size */
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 
 #include <QTabWidget>
 #include <QGridLayout>

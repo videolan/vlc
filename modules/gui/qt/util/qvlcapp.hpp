@@ -30,7 +30,7 @@
 #if defined(Q_OS_WIN)
 #   include "qt.hpp"
 #   include <windows.h>
-#   include "components/player_controller.hpp"
+#   include "player/player_controller.hpp"
 #endif
 
 class QVLCApp : public QApplication

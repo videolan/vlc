@@ -91,7 +91,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/info_panels.cpp gui/qt/components/info_panels.hpp \
 	gui/qt/components/info_widgets.cpp gui/qt/components/info_widgets.hpp \
 	gui/qt/components/navigation_history.cpp gui/qt/components/navigation_history.hpp \
-	gui/qt/components/player_controller.cpp gui/qt/components/player_controller.hpp gui/qt/components/player_controller_p.hpp \
+	gui/qt/player/player_controller.cpp gui/qt/player/player_controller.hpp gui/qt/player/player_controller_p.hpp \
+	gui/qt/player/playercontrolbarmodel.cpp gui/qt/player/playercontrolbarmodel.hpp \
 	gui/qt/components/preferences_widgets.cpp \
 	gui/qt/components/preferences_widgets.hpp \
 	gui/qt/components/selectable_list_model.hpp \
@@ -104,7 +105,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/interface_widgets.cpp \
 	gui/qt/components/interface_widgets.hpp \
 	gui/qt/components/controller.cpp gui/qt/components/controller.hpp \
-	gui/qt/components/playercontrolbarmodel.cpp gui/qt/components/playercontrolbarmodel.hpp \
 	gui/qt/components/controller_widget.cpp \
 	gui/qt/components/controller_widget.hpp \
 	gui/qt/components/recent_media_model.cpp  \
@@ -185,7 +185,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/sout/profiles.hpp \
 	gui/qt/util/animators.cpp gui/qt/util/animators.hpp \
 	gui/qt/util/input_slider.cpp gui/qt/util/input_slider.hpp \
-	gui/qt/util/input_models.cpp gui/qt/util/input_models.hpp \
+	gui/qt/player/input_models.cpp gui/qt/player/input_models.hpp \
 	gui/qt/util/timetooltip.cpp gui/qt/util/timetooltip.hpp \
 	gui/qt/util/customwidgets.cpp gui/qt/util/customwidgets.hpp \
 	gui/qt/util/searchlineedit.cpp gui/qt/util/searchlineedit.hpp \
@@ -264,7 +264,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/extended_panels.moc.cpp \
 	gui/qt/components/info_panels.moc.cpp \
 	gui/qt/components/info_widgets.moc.cpp \
-	gui/qt/components/player_controller.moc.cpp \
+	gui/qt/player/player_controller.moc.cpp \
+	gui/qt/player/playercontrolbarmodel.moc.cpp \
 	gui/qt/components/preferences_widgets.moc.cpp \
 	gui/qt/components/complete_preferences.moc.cpp \
 	gui/qt/components/simple_preferences.moc.cpp \
@@ -272,7 +273,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/interface_widgets.moc.cpp \
 	gui/qt/components/navigation_history.moc.cpp \
 	gui/qt/components/controller.moc.cpp \
-	gui/qt/components/playercontrolbarmodel.moc.cpp \
 	gui/qt/components/controller_widget.moc.cpp \
 	gui/qt/components/custom_menus.moc.cpp \
 	gui/qt/components/recent_media_model.moc.cpp \
@@ -312,7 +312,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/sout/sout_widgets.moc.cpp \
 	gui/qt/util/animators.moc.cpp \
 	gui/qt/util/input_slider.moc.cpp \
-	gui/qt/util/input_models.moc.cpp \
+	gui/qt/player/input_models.moc.cpp \
 	gui/qt/util/timetooltip.moc.cpp \
 	gui/qt/util/customwidgets.moc.cpp \
 	gui/qt/util/qmleventfilter.moc.cpp \
@@ -563,18 +563,18 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/MainInterface.qml \
 	gui/qt/qml/BannerSources.qml \
 	gui/qt/qml/about/About.qml \
-	gui/qt/qml/player/Player.qml \
-	gui/qt/qml/player/TrackInfo.qml \
-	gui/qt/qml/player/ControlBar.qml \
-	gui/qt/qml/player/ControlButtons.qml \
-	gui/qt/qml/player/PlayerButtonsLayout.qml \
-	gui/qt/qml/player/PlayerMenu.qml \
-	gui/qt/qml/player/PlayerMenuItem.qml \
-	gui/qt/qml/player/VolumeWidget.qml \
-	gui/qt/qml/player/SliderBar.qml \
-	gui/qt/qml/player/TeletextWidget.qml \
-	gui/qt/qml/player/MiniPlayer.qml \
-	gui/qt/qml/player/TopBar.qml \
+	gui/qt/player/qml/Player.qml \
+	gui/qt/player/qml/TrackInfo.qml \
+	gui/qt/player/qml/ControlBar.qml \
+	gui/qt/player/qml/ControlButtons.qml \
+	gui/qt/player/qml/PlayerButtonsLayout.qml \
+	gui/qt/player/qml/PlayerMenu.qml \
+	gui/qt/player/qml/PlayerMenuItem.qml \
+	gui/qt/player/qml/VolumeWidget.qml \
+	gui/qt/player/qml/SliderBar.qml \
+	gui/qt/player/qml/TeletextWidget.qml \
+	gui/qt/player/qml/MiniPlayer.qml \
+	gui/qt/player/qml/TopBar.qml \
 	gui/qt/qml/dialogs/Dialogs.qml \
 	gui/qt/qml/dialogs/ModalDialog.qml \
 	gui/qt/qml/dialogs/EditorDummyButton.qml \

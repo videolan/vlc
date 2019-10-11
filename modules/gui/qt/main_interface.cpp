@@ -29,7 +29,7 @@
 #include "qt.hpp"
 
 #include "main_interface.hpp"
-#include "components/player_controller.hpp"                    // Creation
+#include "player/player_controller.hpp"                    // Creation
 #include "managers/renderer_manager.hpp"
 
 #include "util/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
@@ -59,7 +59,7 @@
 #include "components/navigation_history.hpp"
 #include "components/aboutmodel.hpp"
 #include "components/dialogmodel.hpp"
-#include "components/playercontrolbarmodel.hpp"
+#include "player/playercontrolbarmodel.hpp"
 
 #include "components/voutwindow/qvoutwindowdummy.hpp"
 

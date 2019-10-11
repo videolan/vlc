@@ -41,7 +41,7 @@
 #include <QDateTime>
 
 #include "qt.hpp"
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 
 EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {

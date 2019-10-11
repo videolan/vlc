@@ -22,7 +22,7 @@
 #include <QAbstractListModel>
 #include <QVector>
 
-#include "qml_main_context.hpp"
+#include "components/qml_main_context.hpp"
 
 class PlayerControlBarModel : public QAbstractListModel
 {

@@ -25,7 +25,7 @@
 #endif
 
 #include "dialogs/bookmarks.hpp"
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 
 #include <QHBoxLayout>
 #include <QSpacerItem>

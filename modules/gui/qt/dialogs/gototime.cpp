@@ -25,7 +25,7 @@
 
 #include "dialogs/gototime.hpp"
 
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 
 #include <QTabWidget>
 #include <QLabel>

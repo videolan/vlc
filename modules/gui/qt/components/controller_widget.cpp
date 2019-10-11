@@ -28,7 +28,7 @@
 #include "controller.hpp"
 
 #include "playlist/playlist_controller.hpp"
-#include "components/player_controller.hpp"         /* Get notification of Volume Change */
+#include "player/player_controller.hpp"         /* Get notification of Volume Change */
 #include "util/input_slider.hpp"     /* SoundSlider */
 #include "util/imagehelper.hpp"
 #include "vlc_player.h"

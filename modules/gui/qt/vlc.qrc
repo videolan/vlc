@@ -261,18 +261,18 @@
         <file alias="PopupMenu.qml">qml/menus/PopupMenu.qml</file>
     </qresource>
     <qresource prefix="/player">
-        <file alias="Player.qml">qml/player/Player.qml</file>
-        <file alias="ControlBar.qml">qml/player/ControlBar.qml</file>
-        <file alias="SliderBar.qml">qml/player/SliderBar.qml</file>
-        <file alias="TrackInfo.qml">qml/player/TrackInfo.qml</file>
-        <file alias="ControlButtons.qml">qml/player/ControlButtons.qml</file>
-        <file alias="VolumeWidget.qml">qml/player/VolumeWidget.qml</file>
-        <file alias="TeletextWidget.qml">qml/player/TeletextWidget.qml</file>
-        <file alias="MiniPlayer.qml">qml/player/MiniPlayer.qml</file>
-        <file alias="TopBar.qml">qml/player/TopBar.qml</file>
-        <file alias="PlayerButtonsLayout.qml">qml/player/PlayerButtonsLayout.qml</file>
-        <file alias="PlayerMenu.qml">qml/player/PlayerMenu.qml</file>
-        <file alias="PlayerMenuItem.qml">qml/player/PlayerMenuItem.qml</file>
+        <file alias="Player.qml">player/qml/Player.qml</file>
+        <file alias="ControlBar.qml">player/qml/ControlBar.qml</file>
+        <file alias="SliderBar.qml">player/qml/SliderBar.qml</file>
+        <file alias="TrackInfo.qml">player/qml/TrackInfo.qml</file>
+        <file alias="ControlButtons.qml">player/qml/ControlButtons.qml</file>
+        <file alias="VolumeWidget.qml">player/qml/VolumeWidget.qml</file>
+        <file alias="TeletextWidget.qml">player/qml/TeletextWidget.qml</file>
+        <file alias="MiniPlayer.qml">player/qml/MiniPlayer.qml</file>
+        <file alias="TopBar.qml">player/qml/TopBar.qml</file>
+        <file alias="PlayerButtonsLayout.qml">player/qml/PlayerButtonsLayout.qml</file>
+        <file alias="PlayerMenu.qml">player/qml/PlayerMenu.qml</file>
+        <file alias="PlayerMenuItem.qml">player/qml/PlayerMenuItem.qml</file>
     </qresource>
     <qresource prefix="/about">
         <file alias="About.qml">qml/about/About.qml</file>

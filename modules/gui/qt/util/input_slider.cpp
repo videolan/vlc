@@ -30,9 +30,9 @@
 
 #include "util/input_slider.hpp"
 #include "util/timetooltip.hpp"
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 #include "imagehelper.hpp"
-#include "input_models.hpp"
+#include "player/input_models.hpp"
 
 #include <QPaintEvent>
 #include <QPainter>

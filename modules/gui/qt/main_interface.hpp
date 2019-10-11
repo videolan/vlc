@@ -27,7 +27,7 @@
 #include "qt.hpp"
 
 #include "util/qvlcframe.hpp"
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 #include "components/voutwindow/qvoutwindow.hpp"
 
 #include <QSystemTrayIcon>

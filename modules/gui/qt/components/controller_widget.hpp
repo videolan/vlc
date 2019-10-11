@@ -28,7 +28,7 @@
 #endif
 
 #include "qt.hpp"
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 #include "playlist/playlist_controller.hpp"
 
 #include <QWidget>

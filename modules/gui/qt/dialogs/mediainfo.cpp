@@ -26,7 +26,7 @@
 #endif
 
 #include "dialogs/mediainfo.hpp"
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 
 #include <vlc_url.h>
 

@@ -22,7 +22,7 @@
 
 #include "dialogs/toolbareditor.hpp"
 #include "components/settings.hpp"
-#include "components/playercontrolbarmodel.hpp"
+#include "player/playercontrolbarmodel.hpp"
 #include "main_interface.hpp"
 
 #include <QInputDialog>

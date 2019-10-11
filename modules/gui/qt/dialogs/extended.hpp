@@ -27,7 +27,7 @@
 
 #include "components/extended_panels.hpp"
 #include "util/singleton.hpp"
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 
 class QTabWidget;
 

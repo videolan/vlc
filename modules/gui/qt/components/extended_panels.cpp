@@ -47,7 +47,7 @@
 #include "components/extended_panels.hpp"
 #include "dialogs/preferences.hpp"
 #include "qt.hpp"
-#include "components/player_controller.hpp"
+#include "player/player_controller.hpp"
 #include "util/qt_dirs.hpp"
 #include "util/customwidgets.hpp"
 #include "dialogs_provider.hpp"

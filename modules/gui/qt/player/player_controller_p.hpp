@@ -21,7 +21,7 @@
 
 #include "player_controller.hpp"
 #include "adapters/variables.hpp"
-#include "util/input_models.hpp"
+#include "input_models.hpp"
 #include "adapters/var_choice_model.hpp"
 
 #include <QTimer>

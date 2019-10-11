@@ -46,7 +46,7 @@ extern "C" char **environ;
 
 #include "qt.hpp"
 
-#include "components/player_controller.hpp"    /* THEMIM destruction */
+#include "player/player_controller.hpp"    /* THEMIM destruction */
 #include "playlist/playlist_controller.hpp" /* THEMPL creation */
 #include "dialogs_provider.hpp" /* THEDP creation */
 #ifdef _WIN32

@@ -39,7 +39,7 @@
 
 #include "main_interface.hpp"                     /* View modifications */
 #include "dialogs_provider.hpp"                   /* Dialogs display */
-#include "components/player_controller.hpp"                      /* Input Management */
+#include "player/player_controller.hpp"                      /* Input Management */
 #include "playlist/playlist_controller.hpp"
 #include "recents.hpp"                            /* Recent Items */
 #include "extensions_manager.hpp"                 /* Extensions menu */
