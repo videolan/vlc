@@ -71,6 +71,7 @@ typedef struct
 
     /* samples */
     date_t date;
+    vlc_tick_t i_last_length;
 
     /* temporary buffer */
     block_t *p_block;
@@ -173,6 +174,8 @@ static int Open( vlc_object_t *p_this )
         cfg->defSampleRate = p_dec->fmt_in.audio.i_rate;
     cfg->outputFormat = HAVE_FPU ? FAAD_FMT_FLOAT : FAAD_FMT_16BIT;
     NeAACDecSetConfiguration( p_sys->hfaad, cfg );
+
+    p_sys->i_last_length = 0;
 
     /* buffer */
     p_sys->p_block = NULL;
@@ -321,7 +324,10 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 
     if( i_pts != VLC_TICK_INVALID && i_pts != date_Get( &p_sys->date ) )
     {
-        date_Set( &p_sys->date, i_pts );
+        if( p_sys->i_last_length == 0 ||
+            /* We need to be permissive and rebase dts when it's really way off */
+            llabs( i_pts - date_Get( &p_sys->date ) ) > p_sys->i_last_length * 3 / 2  )
+            date_Set( &p_sys->date, i_pts );
     }
     else if( date_Get( &p_sys->date ) == VLC_TICK_INVALID )
     {
@@ -558,7 +564,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             p_out->i_length = date_Increment( &p_sys->date,
                                               frame.samples / frame.channels )
                               - p_out->i_pts;
-
+            p_sys->i_last_length = p_out->i_length;
             if ( p_dec->fmt_out.audio.channel_type == AUDIO_CHANNEL_TYPE_BITMAP )
             {
                 /* Don't kill speakers if some weird mapping does not gets 1:1 */
