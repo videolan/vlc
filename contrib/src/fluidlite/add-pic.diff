@@ -1,0 +1,11 @@
+--- ./CMakeLists.txt.orig	2019-10-11 19:18:01.000000000 +0200
++++ ./CMakeLists.txt	2019-10-11 19:18:04.000000000 +0200
+@@ -4,6 +4,8 @@ include(FindPkgConfig)
+ 
+ project(fluidlite)
+ 
++set(CMAKE_POSITION_INDEPENDENT_CODE ON)
++
+ list(APPEND HEADERS
+     include/fluidlite.h
+     )

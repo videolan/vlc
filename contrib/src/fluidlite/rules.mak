@@ -22,6 +22,7 @@ DEPS_fluidlite = ogg $(DEPS_ogg)
 
 fluidlite: fluidlite-$(FLUID_HASH).tar.xz .sum-fluidlite
 	$(UNPACK)
+	$(APPLY) $(SRC)/fluidlite/add-pic.diff
 	$(MOVE)
 
 .fluidlite: fluidlite toolchain.cmake
