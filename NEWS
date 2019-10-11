@@ -4,6 +4,17 @@ Changes between 3.0.8 and 3.0.9:
 Core:
  * Work around busy looping when playing an invalid item through VLM 
 
+Demux:
+ * Fix TTML entities not passed to decoder
+ * Misc raw H264/HEVC frame rate fixes
+
+Packetizers:
+ * Fixes H264/HEVC incomplete draining in some cases
+ * packetizer_helper: Fix potential trailing junk on last packet
+
+Decoder:
+ * avcodec: revector video decoder to fix incomplete drain
+
 Misc:
  * Add missing .wpl & .zpl file associations on Windows
 
@@ -18,7 +29,6 @@ Demux:
  * Fix glitches in TS over HLS
  * Add real probing of HLS streams
  * Fix HLS MIME type fallback
- * Fix TTML entities not passed to decoder
 
 Decoder:
  * Fix WebVTT subtitles rendering
