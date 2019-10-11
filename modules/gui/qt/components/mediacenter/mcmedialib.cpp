@@ -22,8 +22,8 @@
 
 #include <vlc_playlist.h>
 #include <vlc_input_item.h>
-#include "components/playlist/media.hpp"
-#include "components/playlist/playlist_controller.hpp"
+#include "playlist/media.hpp"
+#include "playlist/playlist_controller.hpp"
 #include <QSettings>
 
 MCMediaLib::MCMediaLib(intf_thread_t *_intf, QObject *_parent)

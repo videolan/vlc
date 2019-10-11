@@ -47,7 +47,7 @@ extern "C" char **environ;
 #include "qt.hpp"
 
 #include "components/player_controller.hpp"    /* THEMIM destruction */
-#include "components/playlist/playlist_controller.hpp" /* THEMPL creation */
+#include "playlist/playlist_controller.hpp" /* THEMPL creation */
 #include "dialogs_provider.hpp" /* THEDP creation */
 #ifdef _WIN32
 # include "main_interface_win32.hpp"
@@ -61,7 +61,7 @@ extern "C" char **environ;
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 
 #include <QVector>
-#include "components/playlist/playlist_item.hpp"
+#include "playlist/playlist_item.hpp"
 
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>

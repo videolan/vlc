@@ -27,7 +27,7 @@
 #include "menus.hpp"
 #include "util/qt_dirs.hpp"
 #include <vlc_cxx_helpers.hpp>
-#include "components/playlist/playlist_controller.hpp"
+#include "playlist/playlist_controller.hpp"
 
 #include <QStringList>
 #include <QRegExp>

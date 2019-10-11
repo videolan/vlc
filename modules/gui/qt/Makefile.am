@@ -167,17 +167,17 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/mediacenter/mlvideomodel.hpp \
 	gui/qt/components/mediacenter/mlrecentsvideomodel.cpp \
 	gui/qt/components/mediacenter/mlrecentsvideomodel.hpp \
-	gui/qt/components/playlist/media.hpp \
-	gui/qt/components/playlist/playlist_common.cpp \
-	gui/qt/components/playlist/playlist_common.hpp \
-	gui/qt/components/playlist/playlist_controller.cpp \
-	gui/qt/components/playlist/playlist_controller.hpp \
-	gui/qt/components/playlist/playlist_controller_p.hpp \
-	gui/qt/components/playlist/playlist_item.cpp \
-	gui/qt/components/playlist/playlist_item.hpp \
-	gui/qt/components/playlist/playlist_model.cpp \
-	gui/qt/components/playlist/playlist_model.hpp \
-	gui/qt/components/playlist/playlist_model_p.hpp \
+	gui/qt/playlist/media.hpp \
+	gui/qt/playlist/playlist_common.cpp \
+	gui/qt/playlist/playlist_common.hpp \
+	gui/qt/playlist/playlist_controller.cpp \
+	gui/qt/playlist/playlist_controller.hpp \
+	gui/qt/playlist/playlist_controller_p.hpp \
+	gui/qt/playlist/playlist_item.cpp \
+	gui/qt/playlist/playlist_item.hpp \
+	gui/qt/playlist/playlist_model.cpp \
+	gui/qt/playlist/playlist_model.hpp \
+	gui/qt/playlist/playlist_model_p.hpp \
 	gui/qt/components/sout/profile_selector.cpp \
 	gui/qt/components/sout/profile_selector.hpp \
 	gui/qt/components/sout/sout_widgets.cpp \
@@ -304,10 +304,10 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/mediacenter/mlvideo.moc.cpp \
 	gui/qt/components/mediacenter/mlvideomodel.moc.cpp \
 	gui/qt/components/mediacenter/mlrecentsvideomodel.moc.cpp \
-	gui/qt/components/playlist/playlist_common.moc.cpp \
-	gui/qt/components/playlist/playlist_item.moc.cpp \
-	gui/qt/components/playlist/playlist_model.moc.cpp \
-	gui/qt/components/playlist/playlist_controller.moc.cpp \
+	gui/qt/playlist/playlist_common.moc.cpp \
+	gui/qt/playlist/playlist_item.moc.cpp \
+	gui/qt/playlist/playlist_model.moc.cpp \
+	gui/qt/playlist/playlist_controller.moc.cpp \
 	gui/qt/components/sout/profile_selector.moc.cpp \
 	gui/qt/components/sout/sout_widgets.moc.cpp \
 	gui/qt/util/animators.moc.cpp \
@@ -648,12 +648,12 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/mediacenter/NetworkListItem.qml \
 	gui/qt/qml/mediacenter/VideoInfoExpandPanel.qml \
 	gui/qt/qml/mediacenter/VideoGridItem.qml \
-	gui/qt/qml/playlist/PlaylistListView.qml \
-	gui/qt/qml/playlist/PlaylistMainView.qml \
-	gui/qt/qml/playlist/PlaylistToolbar.qml \
-	gui/qt/qml/playlist/PLItem.qml \
-	gui/qt/qml/playlist/PLItemFooter.qml \
-	gui/qt/qml/playlist/PlaylistMenu.qml \
+	gui/qt/playlist/qml/PlaylistListView.qml \
+	gui/qt/playlist/qml/PlaylistMainView.qml \
+	gui/qt/playlist/qml/PlaylistToolbar.qml \
+	gui/qt/playlist/qml/PLItem.qml \
+	gui/qt/playlist/qml/PLItemFooter.qml \
+	gui/qt/playlist/qml/PlaylistMenu.qml \
 	gui/qt/qml/style/qmldir \
 	gui/qt/qml/style/VLCIcons.qml \
 	gui/qt/qml/style/VLCStyle.qml \

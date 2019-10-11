@@ -20,8 +20,8 @@
 
 #include "mlhelper.hpp"
 
-#include "components/playlist/media.hpp"
-#include "components/playlist/playlist_controller.hpp"
+#include "playlist/media.hpp"
+#include "playlist/playlist_controller.hpp"
 
 namespace {
 
@@ -380,4 +380,3 @@ bool MLNetworkMediaModel::canBeIndexed(const QUrl& url , ItemType itemType )
 {
     return static_cast<input_item_type_e>(itemType) != ITEM_TYPE_FILE && (url.scheme() == "smb" || url.scheme() == "ftp");
 }
-

@@ -21,7 +21,7 @@
 #include "qt.hpp"
 
 #include <QObject>
-#include <components/playlist/playlist_common.hpp>
+#include <playlist/playlist_common.hpp>
 
 class MainInterface;
 /**

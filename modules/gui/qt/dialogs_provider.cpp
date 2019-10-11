@@ -30,7 +30,7 @@
 #include "qt.hpp"
 #include "dialogs_provider.hpp"
 #include "components/player_controller.hpp" /* Load Subtitles */
-#include "components/playlist/playlist_controller.hpp"
+#include "playlist/playlist_controller.hpp"
 #include "menus.hpp"
 #include "recents.hpp"
 #include "util/qt_dirs.hpp"

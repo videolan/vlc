@@ -34,7 +34,7 @@
 #include "util/buttons/RoundButton.hpp"
 
 #include "dialogs_provider.hpp"                     /* Opening Dialogs */
-#include "components/playlist/playlist_controller.hpp"
+#include "playlist/playlist_controller.hpp"
 
 #include "util/input_slider.hpp"                         /* SeekSlider */
 #include "util/customwidgets.hpp"                       /* qEventToKey */

@@ -19,8 +19,8 @@
 #include "mlnetworkdevicemodel.hpp"
 #include "mlnetworkmediamodel.hpp"
 
-#include "components/playlist/media.hpp"
-#include "components/playlist/playlist_controller.hpp"
+#include "playlist/media.hpp"
+#include "playlist/playlist_controller.hpp"
 
 namespace {
 

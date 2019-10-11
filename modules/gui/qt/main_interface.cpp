@@ -40,7 +40,7 @@
 #include "components/controller.hpp"            // controllers
 #include "dialogs/firstrun.hpp"                 // First Run
 
-#include "components/playlist/playlist_model.hpp"
+#include "playlist/playlist_model.hpp"
 #include <vlc_playlist.h>
 
 #include "components/mediacenter/mcmedialib.hpp"

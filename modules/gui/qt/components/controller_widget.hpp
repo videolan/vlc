@@ -29,7 +29,7 @@
 
 #include "qt.hpp"
 #include "components/player_controller.hpp"
-#include "components/playlist/playlist_controller.hpp"
+#include "playlist/playlist_controller.hpp"
 
 #include <QWidget>
 #include <QToolButton>
