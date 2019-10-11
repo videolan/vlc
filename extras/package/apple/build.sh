@@ -247,6 +247,11 @@ validate_sdk_name()
 # Set env variables used to define compilers and flags
 # Arguments:
 #   Additional flags for use with C-like compilers
+# Globals:
+#   VLC_DEPLOYMENT_TARGET_CFLAG
+#   VLC_DEPLOYMENT_TARGET_LDFLAG
+#   VLC_APPLE_SDK_PATH
+#   VLC_HOST_ARCH
 set_host_envvars()
 {
     # Flags to be used for C-like compilers (C, C++, Obj-C)
@@ -269,6 +274,44 @@ set_host_envvars()
     export AR="ar"
     export STRIP="strip"
     export RANLIB="ranlib"
+}
+
+# Write config.mak for contribs
+# Globals:
+#   VLC_DEPLOYMENT_TARGET_CFLAG
+#   VLC_DEPLOYMENT_TARGET_LDFLAG
+#   VLC_APPLE_SDK_PATH
+#   VLC_HOST_ARCH
+write_config_mak()
+{
+    # Flags to be used for C-like compilers (C, C++, Obj-C)
+    local clike_flags="$VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH $1"
+
+    local vlc_cppflags="-arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH"
+    local vlc_cflags="$clike_flags"
+    local vlc_cxxflags="$clike_flags"
+    local vlc_objcflags="$clike_flags"
+
+    local vlc_ldflags="$VLC_DEPLOYMENT_TARGET_LDFLAG -arch $VLC_HOST_ARCH"
+
+    echo "Creating makefile..."
+    test -e config.mak && unlink config.mak
+    exec 3>config.mak || return $?
+
+    printf '# This file was automatically generated!\n\n' >&3
+    printf '%s := %s\n' "CPPFLAGS" "${vlc_cppflags}" >&3
+    printf '%s := %s\n' "CFLAGS" "${vlc_cflags}" >&3
+    printf '%s := %s\n' "CXXFLAGS" "${vlc_cxxflags}" >&3
+    printf '%s := %s\n' "OBJCFLAGS" "${vlc_objcflags}" >&3
+    printf '%s := %s\n' "LDFLAGS" "${vlc_ldflags}" >&3
+    printf '%s := %s\n' "CC" "clang" >&3
+    printf '%s := %s\n' "CPP" "clang -E" >&3
+    printf '%s := %s\n' "CXX" "clang++" >&3
+    printf '%s := %s\n' "OBJC" "clang" >&3
+    printf '%s := %s\n' "LD" "ld" >&3
+    printf '%s := %s\n' "AR" "ar" >&3
+    printf '%s := %s\n' "STRIP" "strip" >&3
+    printf '%s := %s\n' "RANLIB" "ranlib" >&3
 }
 
 # Generate the source file with the needed array for
@@ -442,9 +485,6 @@ else
     echo "Building contribs for $VLC_HOST_ARCH"
 fi
 
-# For contribs set flag to error on partial availability
-set_host_envvars "-Werror=partial-availability"
-
 # Set symbol blacklist for autoconf
 vlcSetSymbolEnvironment > /dev/null
 
@@ -466,6 +506,10 @@ cd "contrib-$VLC_PSEUDO_TRIPLET" || abort_err "Failed cd to contrib build dir"
 
 # Create contrib install dir if it does not already exist
 mkdir -p "$VLC_CONTRIB_INSTALL_DIR"
+
+# Write config.mak with flags for the build and compiler overrides
+# Set flag to error on partial availability
+write_config_mak "-Werror=partial-availability"
 
 # Bootstrap contribs
 ../bootstrap \
