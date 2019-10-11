@@ -124,7 +124,6 @@ struct decoder_owner
 
     vout_thread_t   *p_vout;
     enum vlc_vout_order vout_order;
-    vlc_decoder_device *p_dec_dev; // TEMPORARY
     bool            vout_thread_started;
 
     /* -- Theses variables need locking on read *and* write -- */
@@ -627,14 +626,11 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner,
     p_owner->vout_order = *order;
     if ( pp_dec_dev )
     {
-        if ( p_owner->p_dec_dev != NULL )
-            vlc_decoder_device_Release( p_owner->p_dec_dev );
         if( p_vout == NULL && *pp_dec_dev != NULL )
         {
             vlc_decoder_device_Release( *pp_dec_dev );
             *pp_dec_dev = NULL;
         }
-        p_owner->p_dec_dev = *pp_dec_dev ? vlc_decoder_device_Hold(*pp_dec_dev) : NULL;
     }
 
     DecoderUpdateFormatLocked( p_owner );
@@ -2024,9 +2020,6 @@ static void DeleteDecoder( decoder_t * p_dec )
 
     const enum es_format_category_e i_cat =p_dec->fmt_in.i_cat;
     decoder_Clean( p_dec );
-
-    if ( p_owner->p_dec_dev )
-        vlc_decoder_device_Release( p_owner->p_dec_dev );
 
     if (p_owner->vctx)
         vlc_video_context_Release( p_owner->vctx );
