@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "ml_folders_model.hpp"
+#include "mlfoldersmodel.hpp"
 #include <cassert>
 
 MlFoldersModel::MlFoldersModel( vlc_medialibrary_t *p_ml , QObject *parent )

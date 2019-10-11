@@ -178,7 +178,7 @@ Utils.NavigableFocusScope {
 
     Component {
         id: listComponent
-        MCVideoListDisplay {
+        VideoListDisplay {
             height: view.height
             width: view.width
             onContextMenuButtonClicked:{

@@ -18,7 +18,7 @@
 
 #include "networkmediamodel.hpp"
 
-#include "components/mediacenter/mlhelper.hpp"
+#include "medialibrary/mlhelper.hpp"
 
 #include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"

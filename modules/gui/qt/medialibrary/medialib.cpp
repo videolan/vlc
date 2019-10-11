@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "mcmedialib.hpp"
+#include "medialib.hpp"
 #include "mlhelper.hpp"
 #include "recents.hpp"
 
@@ -26,7 +26,7 @@
 #include "playlist/playlist_controller.hpp"
 #include <QSettings>
 
-MCMediaLib::MCMediaLib(intf_thread_t *_intf, QObject *_parent)
+MediaLib::MediaLib(intf_thread_t *_intf, QObject *_parent)
     : QObject( _parent )
     , m_intf( _intf )
     , m_gridView ( m_intf->p_sys->mainSettings->value("medialib-gridView",true).toBool() )
@@ -35,24 +35,24 @@ MCMediaLib::MCMediaLib(intf_thread_t *_intf, QObject *_parent)
         vlc_ml_event_unregister_callback( m_ml, cb );
       })
 {
-    m_event_cb.reset( vlc_ml_event_register_callback( m_ml, MCMediaLib::onMediaLibraryEvent,
+    m_event_cb.reset( vlc_ml_event_register_callback( m_ml, MediaLib::onMediaLibraryEvent,
                                                       this ) );
 }
 
 // Should the items be displayed as a grid or as list ?
-bool MCMediaLib::isGridView() const
+bool MediaLib::isGridView() const
 {
     return m_gridView;
 }
 
-void MCMediaLib::setGridView(bool state)
+void MediaLib::setGridView(bool state)
 {
     m_gridView = state;
     m_intf->p_sys->mainSettings->setValue("medialib-gridView",state);
     emit gridViewChanged();
 }
 
-void MCMediaLib::openMRLFromMedia(const vlc_ml_media_t& media, bool start )
+void MediaLib::openMRLFromMedia(const vlc_ml_media_t& media, bool start )
 {
     if (!media.p_files)
         return;
@@ -64,20 +64,20 @@ void MCMediaLib::openMRLFromMedia(const vlc_ml_media_t& media, bool start )
     }
 }
 
-void MCMediaLib::addToPlaylist(const QString& mrl)
+void MediaLib::addToPlaylist(const QString& mrl)
 {
     vlc::playlist::Media media{ mrl, mrl };
     m_intf->p_sys->p_mainPlaylistController->append( {media}, false );
 }
 
-void MCMediaLib::addToPlaylist(const QUrl& mrl)
+void MediaLib::addToPlaylist(const QUrl& mrl)
 {
     vlc::playlist::Media media{ mrl.toString(QUrl::None), mrl.fileName() };
     m_intf->p_sys->p_mainPlaylistController->append( {media} , false );
 }
 
 // A specific item has been asked to be added to the playlist
-void MCMediaLib::addToPlaylist(const MLParentId & itemId)
+void MediaLib::addToPlaylist(const MLParentId & itemId)
 {
     //invalid item
     if (itemId.id == 0)
@@ -109,7 +109,7 @@ void MCMediaLib::addToPlaylist(const MLParentId & itemId)
     }
 }
 
-void MCMediaLib::addToPlaylist(const QVariantList& itemIdList)
+void MediaLib::addToPlaylist(const QVariantList& itemIdList)
 {
     for (const QVariant& varValue: itemIdList)
     {
@@ -133,7 +133,7 @@ void MCMediaLib::addToPlaylist(const QVariantList& itemIdList)
 
 // A specific item has been asked to be played,
 // so it's added to the playlist and played
-void MCMediaLib::addAndPlay(const MLParentId & itemId )
+void MediaLib::addAndPlay(const MLParentId & itemId )
 {
     if (itemId.id == 0)
         return;
@@ -163,20 +163,20 @@ void MCMediaLib::addAndPlay(const MLParentId & itemId )
     }
 }
 
-void MCMediaLib::addAndPlay(const QString& mrl)
+void MediaLib::addAndPlay(const QString& mrl)
 {
     vlc::playlist::Media media{ mrl, mrl };
     m_intf->p_sys->p_mainPlaylistController->append( {media}, true );
 }
 
-void MCMediaLib::addAndPlay(const QUrl& mrl)
+void MediaLib::addAndPlay(const QUrl& mrl)
 {
     vlc::playlist::Media media{ mrl.toString(QUrl::None), mrl.fileName() };
     m_intf->p_sys->p_mainPlaylistController->append( {media}, true );
 }
 
 
-void MCMediaLib::addAndPlay(const QVariantList& itemIdList)
+void MediaLib::addAndPlay(const QVariantList& itemIdList)
 {
     bool b_start = true;
     for (const QVariant& varValue: itemIdList)
@@ -211,14 +211,14 @@ void MCMediaLib::addAndPlay(const QVariantList& itemIdList)
     }
 }
 
-vlc_medialibrary_t* MCMediaLib::vlcMl()
+vlc_medialibrary_t* MediaLib::vlcMl()
 {
     return vlc_ml_instance_get( m_intf );
 }
 
-void MCMediaLib::onMediaLibraryEvent( void* data, const vlc_ml_event_t* event )
+void MediaLib::onMediaLibraryEvent( void* data, const vlc_ml_event_t* event )
 {
-    MCMediaLib* self = static_cast<MCMediaLib*>( data );
+    MediaLib* self = static_cast<MediaLib*>( data );
     switch ( event->i_type )
     {
         case VLC_ML_EVENT_PARSING_PROGRESS_UPDATED:

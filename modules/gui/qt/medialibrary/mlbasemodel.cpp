@@ -18,7 +18,7 @@
 
 #include <cassert>
 #include "mlbasemodel.hpp"
-#include "mcmedialib.hpp"
+#include "medialib.hpp"
 #include <vlc_cxx_helpers.hpp>
 
 MLBaseModel::MLBaseModel(QObject *parent)
@@ -112,15 +112,15 @@ void MLBaseModel::unsetParentId()
     emit parentIdChanged();
 }
 
-MCMediaLib* MLBaseModel::ml() const
+MediaLib* MLBaseModel::ml() const
 {
-    return m_mcMediaLib;
+    return m_mediaLib;
 }
 
-void MLBaseModel::setMl(MCMediaLib* mcMl)
+void MLBaseModel::setMl(MediaLib* medialib)
 {
-    m_ml = mcMl->vlcMl();
-    m_mcMediaLib = mcMl;
+    m_ml = medialib->vlcMl();
+    m_mediaLib = medialib;
     if ( m_ml_event_handle == nullptr )
         m_ml_event_handle.reset( vlc_ml_event_register_callback( m_ml, onVlcMlEvent, this ) );
 }

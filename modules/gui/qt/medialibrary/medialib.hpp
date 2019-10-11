@@ -34,7 +34,7 @@
 #include "qt.hpp"
 #include "mlqmltypes.hpp"
 
-class MCMediaLib : public QObject
+class MediaLib : public QObject
 {
     Q_OBJECT
 
@@ -45,7 +45,7 @@ class MCMediaLib : public QObject
     Q_PROPERTY(bool idle READ idle NOTIFY idleChanged)
 
 public:
-    MCMediaLib(intf_thread_t* _intf, QObject* _parent = nullptr );
+    MediaLib(intf_thread_t* _intf, QObject* _parent = nullptr );
 
     Q_INVOKABLE void addToPlaylist(const MLParentId &itemId);
     Q_INVOKABLE void addToPlaylist(const QString& mrl);

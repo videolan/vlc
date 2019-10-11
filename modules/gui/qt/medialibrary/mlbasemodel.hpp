@@ -29,10 +29,10 @@
 #include <QAbstractListModel>
 #include "vlc_media_library.h"
 #include "mlqmltypes.hpp"
-#include "mcmedialib.hpp"
+#include "medialib.hpp"
 #include <memory>
 
-class MCMediaLib;
+class MediaLib;
 
 class MLBaseModel : public QAbstractListModel
 {
@@ -45,7 +45,7 @@ public:
     Q_INVOKABLE void sortByColumn(QByteArray name, Qt::SortOrder order);
 
     Q_PROPERTY( MLParentId parentId READ parentId WRITE setParentId NOTIFY parentIdChanged RESET unsetParentId )
-    Q_PROPERTY( MCMediaLib* ml READ ml WRITE setMl )
+    Q_PROPERTY( MediaLib* ml READ ml WRITE setMl )
     Q_PROPERTY( unsigned int maxItems MEMBER m_nb_max_items )
     Q_PROPERTY( QString searchPattern READ searchPattern WRITE setSearchPattern )
 
@@ -79,8 +79,8 @@ protected:
     void setParentId(MLParentId parentId);
     void unsetParentId();
 
-    MCMediaLib* ml() const;
-    void setMl(MCMediaLib* ml);
+    MediaLib* ml() const;
+    void setMl(MediaLib* ml);
 
     const QString& searchPattern() const;
     void setSearchPattern( const QString& pattern );
@@ -96,7 +96,7 @@ protected:
     MLParentId m_parent;
 
     vlc_medialibrary_t* m_ml;
-    MCMediaLib* m_mcMediaLib;
+    MediaLib* m_mediaLib;
     mutable vlc_ml_query_params_t m_query_param;
     std::unique_ptr<char, void(*)(void*)> m_search_pattern_cstr;
     QString m_search_pattern;

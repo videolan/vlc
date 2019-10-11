@@ -40,7 +40,7 @@
 #include <QDialogButtonBox>
 #include <QTableView>
 #include <QFileDialog>
-#include "components/mediacenter/ml_folders_model.hpp"
+#include "medialibrary/mlfoldersmodel.hpp"
 
 #ifdef _WIN32
 # include "util/registry.hpp"

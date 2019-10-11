@@ -29,7 +29,7 @@
 #include <QAbstractListModel>
 #include <QUrl>
 #include <QList>
-#include "components/mediacenter/mlhelper.hpp"
+#include "mlhelper.hpp"
 
 #include <vlc_media_library.h>
 

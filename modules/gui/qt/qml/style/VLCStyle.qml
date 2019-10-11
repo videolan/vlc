@@ -92,7 +92,7 @@ Item {
     property int heightBar_xlarge: 128 * scale;
     property int heightBar_xxlarge: 256 * scale;
 
-    property int minWidthMediacenter: 500 * scale;
+    property int minWindowWidth: 500 * scale;
     property int maxWidthPlaylist: 400 * scale;
     property int defaultWidthPlaylist: 300 * scale;
     property int closedWidthPlaylist: 20 * scale;

@@ -43,14 +43,15 @@
 #include "playlist/playlist_model.hpp"
 #include <vlc_playlist.h>
 
-#include "components/mediacenter/mcmedialib.hpp"
-#include "components/mediacenter/mlqmltypes.hpp"
-#include "components/mediacenter/mlalbummodel.hpp"
-#include "components/mediacenter/mlartistmodel.hpp"
-#include "components/mediacenter/mlalbumtrackmodel.hpp"
-#include "components/mediacenter/mlgenremodel.hpp"
-#include "components/mediacenter/mlvideomodel.hpp"
-#include "components/mediacenter/mlrecentsvideomodel.hpp"
+#include "medialibrary/medialib.hpp"
+#include "medialibrary/mlqmltypes.hpp"
+#include "medialibrary/mlalbummodel.hpp"
+#include "medialibrary/mlartistmodel.hpp"
+#include "medialibrary/mlalbumtrackmodel.hpp"
+#include "medialibrary/mlgenremodel.hpp"
+#include "medialibrary/mlvideomodel.hpp"
+#include "medialibrary/mlrecentsvideomodel.hpp"
+
 #include "components/recent_media_model.hpp"
 #include "components/settings.hpp"
 
@@ -403,7 +404,7 @@ void MainInterface::createMainWidget( QSettings * )
 
     if (b_hasMedialibrary)
     {
-        MCMediaLib *medialib = new MCMediaLib(p_intf, mediacenterView);
+        MediaLib *medialib = new MediaLib(p_intf, mediacenterView);
         rootCtx->setContextProperty( "medialib", medialib );
     }
     else

@@ -75,7 +75,7 @@ Rectangle {
 
     readonly property var pageModel: [
         { name: "about", component: aboutComp },
-        { name: "mc", url: "qrc:///mediacenter/MCMainDisplay.qml" },
+        { name: "mc", url: "qrc:///medialibrary/MainDisplay.qml" },
         { name: "playlist", url: "qrc:///playlist/PlaylistMainView.qml" },
         { name: "player", component: audioplayerComp },
     ]

@@ -113,8 +113,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/settings.hpp \
 	gui/qt/components/audio_device_model.cpp  \
 	gui/qt/components/audio_device_model.hpp \
-	gui/qt/components/mediacenter/ml_folders_model.hpp  \
-	gui/qt/components/mediacenter/ml_folders_model.cpp \
 	gui/qt/components/voutwindow/videosurface.cpp \
 	gui/qt/components/voutwindow/videosurface.hpp \
 	gui/qt/components/voutwindow/qvoutwindow.cpp \
@@ -133,34 +131,36 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/epg/EPGView.cpp gui/qt/components/epg/EPGView.hpp \
 	gui/qt/components/epg/EPGWidget.cpp \
 	gui/qt/components/epg/EPGWidget.hpp \
-	gui/qt/components/mediacenter/mcmedialib.cpp \
-	gui/qt/components/mediacenter/mcmedialib.hpp \
-	gui/qt/components/mediacenter/mlhelper.hpp \
-	gui/qt/components/mediacenter/mlqmltypes.hpp \
-	gui/qt/components/mediacenter/mlbasemodel.cpp \
-	gui/qt/components/mediacenter/mlbasemodel.hpp \
-	gui/qt/components/mediacenter/mlalbum.cpp \
-	gui/qt/components/mediacenter/mlalbum.hpp \
-	gui/qt/components/mediacenter/mlalbummodel.cpp \
-	gui/qt/components/mediacenter/mlalbummodel.hpp \
-	gui/qt/components/mediacenter/mlalbumtrack.cpp \
-	gui/qt/components/mediacenter/mlalbumtrack.hpp \
-	gui/qt/components/mediacenter/mlalbumtrackmodel.cpp \
-	gui/qt/components/mediacenter/mlalbumtrackmodel.hpp \
-	gui/qt/components/mediacenter/mlartist.cpp \
-	gui/qt/components/mediacenter/mlartist.hpp \
-	gui/qt/components/mediacenter/mlartistmodel.cpp \
-	gui/qt/components/mediacenter/mlartistmodel.hpp \
-	gui/qt/components/mediacenter/mlgenre.cpp \
-	gui/qt/components/mediacenter/mlgenre.hpp \
-	gui/qt/components/mediacenter/mlgenremodel.cpp \
-	gui/qt/components/mediacenter/mlgenremodel.hpp \
-	gui/qt/components/mediacenter/mlvideo.hpp \
-	gui/qt/components/mediacenter/mlvideo.cpp \
-	gui/qt/components/mediacenter/mlvideomodel.cpp \
-	gui/qt/components/mediacenter/mlvideomodel.hpp \
-	gui/qt/components/mediacenter/mlrecentsvideomodel.cpp \
-	gui/qt/components/mediacenter/mlrecentsvideomodel.hpp \
+	gui/qt/medialibrary/medialib.cpp \
+	gui/qt/medialibrary/medialib.hpp \
+	gui/qt/medialibrary/mlhelper.hpp \
+	gui/qt/medialibrary/mlqmltypes.hpp \
+	gui/qt/medialibrary/mlbasemodel.cpp \
+	gui/qt/medialibrary/mlbasemodel.hpp \
+	gui/qt/medialibrary/mlalbum.cpp \
+	gui/qt/medialibrary/mlalbum.hpp \
+	gui/qt/medialibrary/mlalbummodel.cpp \
+	gui/qt/medialibrary/mlalbummodel.hpp \
+	gui/qt/medialibrary/mlalbumtrack.cpp \
+	gui/qt/medialibrary/mlalbumtrack.hpp \
+	gui/qt/medialibrary/mlalbumtrackmodel.cpp \
+	gui/qt/medialibrary/mlalbumtrackmodel.hpp \
+	gui/qt/medialibrary/mlartist.cpp \
+	gui/qt/medialibrary/mlartist.hpp \
+	gui/qt/medialibrary/mlartistmodel.cpp \
+	gui/qt/medialibrary/mlartistmodel.hpp \
+	gui/qt/medialibrary/mlfoldersmodel.cpp \
+	gui/qt/medialibrary/mlfoldersmodel.hpp \
+	gui/qt/medialibrary/mlgenre.cpp \
+	gui/qt/medialibrary/mlgenre.hpp \
+	gui/qt/medialibrary/mlgenremodel.cpp \
+	gui/qt/medialibrary/mlgenremodel.hpp \
+	gui/qt/medialibrary/mlvideo.hpp \
+	gui/qt/medialibrary/mlvideo.cpp \
+	gui/qt/medialibrary/mlvideomodel.cpp \
+	gui/qt/medialibrary/mlvideomodel.hpp \
+	gui/qt/medialibrary/mlrecentsvideomodel.cpp \
+	gui/qt/medialibrary/mlrecentsvideomodel.hpp \
 	gui/qt/network/networkdevicemodel.cpp \
 	gui/qt/network/networkdevicemodel.hpp \
 	gui/qt/network/networkmediamodel.cpp \
@@ -279,7 +279,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/selectable_list_model.moc.cpp \
 	gui/qt/components/settings.moc.cpp \
 	gui/qt/components/audio_device_model.moc.cpp \
-	gui/qt/components/mediacenter/ml_folders_model.moc.cpp \
 	gui/qt/components/voutwindow/videosurface.moc.cpp \
 	gui/qt/components/voutwindow/qvoutwindow.moc.cpp \
 	gui/qt/components/voutwindow/qvoutwindowdummy.moc.cpp \
@@ -288,20 +287,21 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/epg/EPGRuler.moc.cpp \
 	gui/qt/components/epg/EPGView.moc.cpp \
 	gui/qt/components/epg/EPGWidget.moc.cpp \
-	gui/qt/components/mediacenter/mcmedialib.moc.cpp \
-	gui/qt/components/mediacenter/mlqmltypes.moc.cpp \
-	gui/qt/components/mediacenter/mlbasemodel.moc.cpp \
-	gui/qt/components/mediacenter/mlalbum.moc.cpp \
-	gui/qt/components/mediacenter/mlalbummodel.moc.cpp \
-	gui/qt/components/mediacenter/mlalbumtrack.moc.cpp \
-	gui/qt/components/mediacenter/mlalbumtrackmodel.moc.cpp \
-	gui/qt/components/mediacenter/mlartist.moc.cpp \
-	gui/qt/components/mediacenter/mlartistmodel.moc.cpp \
-	gui/qt/components/mediacenter/mlgenre.moc.cpp \
-	gui/qt/components/mediacenter/mlgenremodel.moc.cpp \
-	gui/qt/components/mediacenter/mlvideo.moc.cpp \
-	gui/qt/components/mediacenter/mlvideomodel.moc.cpp \
-	gui/qt/components/mediacenter/mlrecentsvideomodel.moc.cpp \
+	gui/qt/medialibrary/medialib.moc.cpp \
+	gui/qt/medialibrary/mlqmltypes.moc.cpp \
+	gui/qt/medialibrary/mlbasemodel.moc.cpp \
+	gui/qt/medialibrary/mlalbum.moc.cpp \
+	gui/qt/medialibrary/mlalbummodel.moc.cpp \
+	gui/qt/medialibrary/mlalbumtrack.moc.cpp \
+	gui/qt/medialibrary/mlalbumtrackmodel.moc.cpp \
+	gui/qt/medialibrary/mlartist.moc.cpp \
+	gui/qt/medialibrary/mlartistmodel.moc.cpp \
+	gui/qt/medialibrary/mlfoldersmodel.moc.cpp \
+	gui/qt/medialibrary/mlgenre.moc.cpp \
+	gui/qt/medialibrary/mlgenremodel.moc.cpp \
+	gui/qt/medialibrary/mlvideo.moc.cpp \
+	gui/qt/medialibrary/mlvideomodel.moc.cpp \
+	gui/qt/medialibrary/mlrecentsvideomodel.moc.cpp \
 	gui/qt/network/networkdevicemodel.moc.cpp \
 	gui/qt/network/networkmediamodel.moc.cpp \
 	gui/qt/network/networksourcelistener.moc.cpp \
@@ -629,26 +629,26 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/menus/ToolsMenu.qml \
 	gui/qt/qml/menus/ViewMenu.qml \
 	gui/qt/qml/menus/VideoMenu.qml \
-	gui/qt/qml/mediacenter/ArtistTopBanner.qml \
-	gui/qt/qml/mediacenter/AudioGridItem.qml \
-	gui/qt/qml/mediacenter/MCMainDisplay.qml \
-	gui/qt/qml/mediacenter/MCMusicDisplay.qml \
-	gui/qt/qml/mediacenter/MCVideoDisplay.qml \
-	gui/qt/qml/mediacenter/MCVideoListDisplay.qml \
+	gui/qt/medialibrary/qml/ArtistTopBanner.qml \
+	gui/qt/medialibrary/qml/AudioGridItem.qml \
+	gui/qt/medialibrary/qml/MainDisplay.qml \
+	gui/qt/medialibrary/qml/MusicDisplay.qml \
+	gui/qt/medialibrary/qml/VideoDisplay.qml \
+	gui/qt/medialibrary/qml/VideoListDisplay.qml \
+	gui/qt/medialibrary/qml/MusicAlbumsDisplay.qml \
+	gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml \
+	gui/qt/medialibrary/qml/MusicArtistsDisplay.qml \
+	gui/qt/medialibrary/qml/MusicGenresDisplay.qml \
+	gui/qt/medialibrary/qml/MusicTracksDisplay.qml \
+	gui/qt/medialibrary/qml/MusicTrackListDisplay.qml \
+	gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml \
+	gui/qt/medialibrary/qml/VideoGridItem.qml \
 	gui/qt/network/qml/NetworkDisplay.qml \
 	gui/qt/network/qml/NetworkBrowseDisplay.qml \
 	gui/qt/network/qml/NetworkHomeDisplay.qml \
 	gui/qt/network/qml/NetworksSectionSelectableDM.qml \
 	gui/qt/network/qml/NetworkGridItem.qml \
 	gui/qt/network/qml/NetworkListItem.qml \
-	gui/qt/qml/mediacenter/MusicAlbumsDisplay.qml \
-	gui/qt/qml/mediacenter/MusicAlbumsGridExpandDelegate.qml \
-	gui/qt/qml/mediacenter/MusicArtistsDisplay.qml \
-	gui/qt/qml/mediacenter/MusicGenresDisplay.qml \
-	gui/qt/qml/mediacenter/MusicTracksDisplay.qml \
-	gui/qt/qml/mediacenter/MusicTrackListDisplay.qml \
-	gui/qt/qml/mediacenter/VideoInfoExpandPanel.qml \
-	gui/qt/qml/mediacenter/VideoGridItem.qml \
 	gui/qt/playlist/qml/PlaylistListView.qml \
 	gui/qt/playlist/qml/PlaylistMainView.qml \
 	gui/qt/playlist/qml/PlaylistToolbar.qml \

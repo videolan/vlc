@@ -26,7 +26,7 @@
 #include <QObject>
 #include "mlbasemodel.hpp"
 #include "mlalbum.hpp"
-#include "mcmedialib.hpp"
+#include "medialib.hpp"
 
 class MLAlbumModel : public MLSlidingWindowModel<MLAlbum>
 {

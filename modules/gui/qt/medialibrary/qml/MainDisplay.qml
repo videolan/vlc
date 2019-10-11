@@ -60,7 +60,7 @@ Utils.NavigableFocusScope {
 
     Component {
         id: musicComp
-        MCMusicDisplay {
+        MusicDisplay {
             navigationParent: medialibId
             navigationUpItem: sourcesBanner
             navigationRightItem: playlist
@@ -71,7 +71,7 @@ Utils.NavigableFocusScope {
 
     Component {
         id: videoComp
-        MCVideoDisplay {
+        VideoDisplay {
             navigationParent: medialibId
             navigationUpItem: sourcesBanner
             navigationRightItem: playlist
@@ -136,7 +136,7 @@ Utils.NavigableFocusScope {
                 id: column
                 anchors.fill: parent
 
-                Layout.minimumWidth: VLCStyle.minWidthMediacenter
+                Layout.minimumWidth: VLCStyle.minWindowWidth
                 spacing: 0
 
                 /* Source selection*/
