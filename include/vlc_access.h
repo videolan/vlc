@@ -77,4 +77,4 @@ VLC_API int access_vaDirectoryControlHelper( stream_t *p_access, int i_query, va
  * @} @}
  */
 
-#endif
+#endif Statement
