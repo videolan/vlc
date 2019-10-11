@@ -93,7 +93,7 @@ SDFileSystemFactory::createDevice(const std::string &uuid)
 {
     vlc::threads::mutex_locker locker(m_mutex);
 
-    vlc_tick_t deadline = vlc_tick_now() + VLC_TICK_FROM_SEC(5);
+    vlc_tick_t deadline = vlc_tick_now() + VLC_TICK_FROM_SEC(15);
     while ( true )
     {
         auto it = std::find_if(m_devices.cbegin(), m_devices.cend(),

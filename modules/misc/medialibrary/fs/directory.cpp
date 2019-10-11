@@ -147,7 +147,7 @@ static bool request_metadata_sync( libvlc_int_t *libvlc, input_item_t *media,
     metadata_request req;
     req.children = out_children;
     req.probe = false;
-    auto deadline = vlc_tick_now() + VLC_TICK_FROM_SEC( 5 );
+    auto deadline = vlc_tick_now() + VLC_TICK_FROM_SEC( 15 );
 
     media->i_preparse_depth = 1;
 
