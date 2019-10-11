@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "mlnetworkdevicemodel.hpp"
-#include "mlnetworkmediamodel.hpp"
+#include "networkdevicemodel.hpp"
+#include "networkmediamodel.hpp"
 
 #include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"
@@ -35,13 +35,13 @@ enum Role {
 
 }
 
-MLNetworkDeviceModel::MLNetworkDeviceModel( QObject* parent )
+NetworkDeviceModel::NetworkDeviceModel( QObject* parent )
     : QAbstractListModel( parent )
     , m_ml( nullptr )
 {
 }
 
-QVariant MLNetworkDeviceModel::data( const QModelIndex& index, int role ) const
+QVariant NetworkDeviceModel::data( const QModelIndex& index, int role ) const
 {
     if (!m_ctx)
         return {};
@@ -68,7 +68,7 @@ QVariant MLNetworkDeviceModel::data( const QModelIndex& index, int role ) const
     }
 }
 
-QHash<int, QByteArray> MLNetworkDeviceModel::roleNames() const
+QHash<int, QByteArray> NetworkDeviceModel::roleNames() const
 {
     return {
         { NETWORK_NAME, "name" },
@@ -81,7 +81,7 @@ QHash<int, QByteArray> MLNetworkDeviceModel::roleNames() const
 }
 
 
-int MLNetworkDeviceModel::rowCount(const QModelIndex& parent) const
+int NetworkDeviceModel::rowCount(const QModelIndex& parent) const
 {
     if ( parent.isValid() )
         return 0;
@@ -90,7 +90,7 @@ int MLNetworkDeviceModel::rowCount(const QModelIndex& parent) const
 }
 
 
-void MLNetworkDeviceModel::setCtx(QmlMainContext* ctx)
+void NetworkDeviceModel::setCtx(QmlMainContext* ctx)
 {
     if (ctx) {
         m_ctx = ctx;
@@ -102,7 +102,7 @@ void MLNetworkDeviceModel::setCtx(QmlMainContext* ctx)
     emit ctxChanged();
 }
 
-void MLNetworkDeviceModel::setSdSource(SDCatType s)
+void NetworkDeviceModel::setSdSource(SDCatType s)
 {
     m_sdSource = s;
     if (m_ctx && m_sdSource != CAT_UNDEFINED) {
@@ -112,7 +112,7 @@ void MLNetworkDeviceModel::setSdSource(SDCatType s)
 }
 
 
-bool MLNetworkDeviceModel::addToPlaylist(int index)
+bool NetworkDeviceModel::addToPlaylist(int index)
 {
     if (!(m_ctx && m_sdSource != CAT_MYCOMPUTER))
         return false;
@@ -123,7 +123,7 @@ bool MLNetworkDeviceModel::addToPlaylist(int index)
     return true;
 }
 
-bool MLNetworkDeviceModel::addToPlaylist(const QVariantList &itemIdList)
+bool NetworkDeviceModel::addToPlaylist(const QVariantList &itemIdList)
 {
     bool ret = false;
     for (const QVariant& varValue: itemIdList)
@@ -137,7 +137,7 @@ bool MLNetworkDeviceModel::addToPlaylist(const QVariantList &itemIdList)
     return ret;
 }
 
-bool MLNetworkDeviceModel::addAndPlay(int index)
+bool NetworkDeviceModel::addAndPlay(int index)
 {
     if (!(m_ctx && m_sdSource != CAT_MYCOMPUTER))
         return false;
@@ -149,7 +149,7 @@ bool MLNetworkDeviceModel::addAndPlay(int index)
     return true;
 }
 
-bool MLNetworkDeviceModel::addAndPlay(const QVariantList& itemIdList)
+bool NetworkDeviceModel::addAndPlay(const QVariantList& itemIdList)
 {
     bool ret = false;
     for (const QVariant& varValue: itemIdList)
@@ -166,7 +166,7 @@ bool MLNetworkDeviceModel::addAndPlay(const QVariantList& itemIdList)
     return ret;
 }
 
-bool MLNetworkDeviceModel::initializeMediaSources()
+bool NetworkDeviceModel::initializeMediaSources()
 {
     auto libvlc = vlc_object_instance(m_ctx->getIntf());
 
@@ -196,7 +196,7 @@ bool MLNetworkDeviceModel::initializeMediaSources()
                                                                      meta->name );
         if ( mediaSource == nullptr )
             continue;
-        std::unique_ptr<MLNetworkSourceListener> l{ new MLNetworkSourceListener(
+        std::unique_ptr<NetworkSourceListener> l{ new NetworkSourceListener(
                         MediaSourcePtr{ mediaSource, false }, this ) };
         if ( l->listener == nullptr )
             return false;
@@ -206,19 +206,19 @@ bool MLNetworkDeviceModel::initializeMediaSources()
 }
 
 
-void MLNetworkDeviceModel::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node )
+void NetworkDeviceModel::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node )
 {
     refreshDeviceList( std::move( mediaSource), node->pp_children, node->i_children, true );
 }
 
-void MLNetworkDeviceModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t*,
+void NetworkDeviceModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t*,
                                   input_item_node_t *const children[],
                                   size_t count )
 {
     refreshDeviceList( std::move( mediaSource ), children, count, false );
 }
 
-void MLNetworkDeviceModel::onItemRemoved( MediaSourcePtr,
+void NetworkDeviceModel::onItemRemoved( MediaSourcePtr,
                                     input_item_node_t *const children[],
                                     size_t count )
 {
@@ -255,7 +255,7 @@ void MLNetworkDeviceModel::onItemRemoved( MediaSourcePtr,
     }
 }
 
-void MLNetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count, bool clear )
+void NetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count, bool clear )
 {
     if ( clear == true )
     {

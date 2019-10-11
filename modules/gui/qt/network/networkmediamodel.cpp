@@ -16,9 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "mlnetworkmediamodel.hpp"
+#include "networkmediamodel.hpp"
 
-#include "mlhelper.hpp"
+#include "components/mediacenter/mlhelper.hpp"
 
 #include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"
@@ -38,13 +38,13 @@ enum Role {
 
 }
 
-MLNetworkMediaModel::MLNetworkMediaModel( QObject* parent )
+NetworkMediaModel::NetworkMediaModel( QObject* parent )
     : QAbstractListModel( parent )
     , m_ml( nullptr )
 {
 }
 
-QVariant MLNetworkMediaModel::data( const QModelIndex& index, int role ) const
+QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
 {
     if (!m_ctx)
         return {};
@@ -75,7 +75,7 @@ QVariant MLNetworkMediaModel::data( const QModelIndex& index, int role ) const
     }
 }
 
-QHash<int, QByteArray> MLNetworkMediaModel::roleNames() const
+QHash<int, QByteArray> NetworkMediaModel::roleNames() const
 {
     return {
         { NETWORK_NAME, "name" },
@@ -89,7 +89,7 @@ QHash<int, QByteArray> MLNetworkMediaModel::roleNames() const
     };
 }
 
-int MLNetworkMediaModel::rowCount(const QModelIndex& parent) const
+int NetworkMediaModel::rowCount(const QModelIndex& parent) const
 {
     if ( parent.isValid() )
         return 0;
@@ -97,14 +97,14 @@ int MLNetworkMediaModel::rowCount(const QModelIndex& parent) const
     return static_cast<int>( m_items.size() );
 }
 
-Qt::ItemFlags MLNetworkMediaModel::flags( const QModelIndex& idx ) const
+Qt::ItemFlags NetworkMediaModel::flags( const QModelIndex& idx ) const
 {
     return QAbstractListModel::flags( idx ) | Qt::ItemIsEditable;
 }
 
-bool MLNetworkMediaModel::setData( const QModelIndex& idx, const QVariant& value, int role )
+bool NetworkMediaModel::setData( const QModelIndex& idx, const QVariant& value, int role )
 {
-    printf("MLNetworkMediaModel::setData `\n");
+    printf("NetworkMediaModel::setData `\n");
     if (!m_ml)
         return false;
 
@@ -113,7 +113,7 @@ bool MLNetworkMediaModel::setData( const QModelIndex& idx, const QVariant& value
     auto enabled = value.toBool();
     if ( m_items[idx.row()].indexed == enabled )
         return  false;
-    printf("MLNetworkMediaModel::setData change indexed`\n");
+    printf("NetworkMediaModel::setData change indexed`\n");
     int res;
     if ( enabled )
         res = vlc_ml_add_folder( m_ml, qtu( m_items[idx.row()].mainMrl.toString( QUrl::None ) ) );
@@ -125,7 +125,7 @@ bool MLNetworkMediaModel::setData( const QModelIndex& idx, const QVariant& value
 }
 
 
-void MLNetworkMediaModel::setIndexed(bool indexed)
+void NetworkMediaModel::setIndexed(bool indexed)
 {
     if (indexed == m_indexed || !m_canBeIndexed)
         return;
@@ -141,7 +141,7 @@ void MLNetworkMediaModel::setIndexed(bool indexed)
     }
 }
 
-void MLNetworkMediaModel::setCtx(QmlMainContext* ctx)
+void NetworkMediaModel::setCtx(QmlMainContext* ctx)
 {
     if (ctx) {
         m_ctx = ctx;
@@ -153,7 +153,7 @@ void MLNetworkMediaModel::setCtx(QmlMainContext* ctx)
     emit ctxChanged();
 }
 
-void MLNetworkMediaModel::setTree(QVariant parentTree)
+void NetworkMediaModel::setTree(QVariant parentTree)
 {
     if (parentTree.canConvert<NetworkTreeItem>())
         m_treeItem = parentTree.value<NetworkTreeItem>();
@@ -166,7 +166,7 @@ void MLNetworkMediaModel::setTree(QVariant parentTree)
     emit treeChanged();
 }
 
-bool MLNetworkMediaModel::addToPlaylist(int index)
+bool NetworkMediaModel::addToPlaylist(int index)
 {
     if (!(m_ctx && m_hasTree))
         return false;
@@ -178,7 +178,7 @@ bool MLNetworkMediaModel::addToPlaylist(int index)
     return true;
 }
 
-bool MLNetworkMediaModel::addToPlaylist(const QVariantList &itemIdList)
+bool NetworkMediaModel::addToPlaylist(const QVariantList &itemIdList)
 {
     bool ret = false;
     for (const QVariant& varValue: itemIdList)
@@ -192,7 +192,7 @@ bool MLNetworkMediaModel::addToPlaylist(const QVariantList &itemIdList)
     return ret;
 }
 
-bool MLNetworkMediaModel::addAndPlay(int index)
+bool NetworkMediaModel::addAndPlay(int index)
 {
     if (!(m_ctx && m_hasTree))
         return false;
@@ -204,7 +204,7 @@ bool MLNetworkMediaModel::addAndPlay(int index)
     return true;
 }
 
-bool MLNetworkMediaModel::addAndPlay(const QVariantList& itemIdList)
+bool NetworkMediaModel::addAndPlay(const QVariantList& itemIdList)
 {
     bool ret = false;
     for (const QVariant& varValue: itemIdList)
@@ -222,7 +222,7 @@ bool MLNetworkMediaModel::addAndPlay(const QVariantList& itemIdList)
 }
 
 
-bool MLNetworkMediaModel::initializeMediaSources()
+bool NetworkMediaModel::initializeMediaSources()
 {
     auto libvlc = vlc_object_instance(m_ctx->getIntf());
 
@@ -237,7 +237,7 @@ bool MLNetworkMediaModel::initializeMediaSources()
         return false;
 
     auto tree = m_treeItem.source->tree;
-    std::unique_ptr<MLNetworkSourceListener> l{ new MLNetworkSourceListener( m_treeItem.source, this ) };
+    std::unique_ptr<NetworkSourceListener> l{ new NetworkSourceListener( m_treeItem.source, this ) };
     if ( l->listener == nullptr )
         return false;
 
@@ -267,7 +267,7 @@ bool MLNetworkMediaModel::initializeMediaSources()
     return true;
 }
 
-void MLNetworkMediaModel::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t*)
+void NetworkMediaModel::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t*)
 {
     input_item_node_t *res;
     input_item_node_t *parent;
@@ -277,7 +277,7 @@ void MLNetworkMediaModel::onItemCleared( MediaSourcePtr mediaSource, input_item_
     refreshMediaList( std::move( mediaSource ), res->pp_children, res->i_children, true );
 }
 
-void MLNetworkMediaModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent,
+void NetworkMediaModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent,
                                   input_item_node_t *const children[],
                                   size_t count )
 {
@@ -285,7 +285,7 @@ void MLNetworkMediaModel::onItemAdded( MediaSourcePtr mediaSource, input_item_no
         refreshMediaList( std::move( mediaSource ), children, count, false );
 }
 
-void MLNetworkMediaModel::onItemRemoved( MediaSourcePtr,
+void NetworkMediaModel::onItemRemoved( MediaSourcePtr,
                                     input_item_node_t *const children[],
                                     size_t count )
 {
@@ -322,7 +322,7 @@ void MLNetworkMediaModel::onItemRemoved( MediaSourcePtr,
     }
 }
 
-void MLNetworkMediaModel::onItemPreparseEnded(MediaSourcePtr, input_item_node_t*, enum input_item_preparse_status)
+void NetworkMediaModel::onItemPreparseEnded(MediaSourcePtr, input_item_node_t*, enum input_item_preparse_status)
 {
     QMetaObject::invokeMethod(this, [this]() {
         m_parsingPending = false;
@@ -330,7 +330,7 @@ void MLNetworkMediaModel::onItemPreparseEnded(MediaSourcePtr, input_item_node_t*
     });
 }
 
-void MLNetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
+void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
                                        input_item_node_t* const children[], size_t count,
                                        bool clear )
 {
@@ -376,7 +376,7 @@ void MLNetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
     });
 }
 
-bool MLNetworkMediaModel::canBeIndexed(const QUrl& url , ItemType itemType )
+bool NetworkMediaModel::canBeIndexed(const QUrl& url , ItemType itemType )
 {
     return static_cast<input_item_type_e>(itemType) != ITEM_TYPE_FILE && (url.scheme() == "smb" || url.scheme() == "ftp");
 }

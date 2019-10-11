@@ -33,7 +33,7 @@
 #include <memory>
 #include <functional>
 
-class MLNetworkSourceListener
+class NetworkSourceListener
 {
 public:
     using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
@@ -54,14 +54,14 @@ public:
     };
 
 public:
-    MLNetworkSourceListener( MediaSourcePtr s, SourceListenerCb* m );
-    MLNetworkSourceListener();
+    NetworkSourceListener( MediaSourcePtr s, SourceListenerCb* m );
+    NetworkSourceListener();
 
-    MLNetworkSourceListener( MLNetworkSourceListener&& ) = default;
-    MLNetworkSourceListener& operator=( MLNetworkSourceListener&& ) = default;
+    NetworkSourceListener( NetworkSourceListener&& ) = default;
+    NetworkSourceListener& operator=( NetworkSourceListener&& ) = default;
 
-    MLNetworkSourceListener( const MLNetworkSourceListener& ) = delete;
-    MLNetworkSourceListener& operator=( const MLNetworkSourceListener& ) = delete;
+    NetworkSourceListener( const NetworkSourceListener& ) = delete;
+    NetworkSourceListener& operator=( const NetworkSourceListener& ) = delete;
 
     static void onItemCleared( vlc_media_tree_t* tree, input_item_node_t* node,
                                void* userdata );

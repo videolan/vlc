@@ -27,6 +27,7 @@ import "qrc:///utils/" as Utils
 import "qrc:///utils/KeyHelper.js" as KeyHelper
 import "qrc:///playlist/" as PL
 import "qrc:///player/" as Player
+import "qrc:///network/" as Network
 
 Utils.NavigableFocusScope {
     id: root
@@ -81,7 +82,7 @@ Utils.NavigableFocusScope {
 
     Component {
         id: networkComp
-        MCNetworkDisplay {
+        Network.NetworkDisplay {
             navigationParent: medialibId
             navigationUpItem: sourcesBanner
             navigationRightItem: playlist

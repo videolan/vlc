@@ -25,28 +25,41 @@ import org.videolan.medialib 0.1
 import "qrc:///utils/" as Utils
 import "qrc:///style/"
 
-Utils.GridItem {
+Utils.ListItem {
     id: item
 
-    pictureWidth: VLCStyle.network_normal
-    pictureHeight: VLCStyle.network_normal
-    image: {
-        switch (model.type){
-        case MLNetworkMediaModel.TYPE_DISC:
-            return  "qrc:///type/disc.svg"
-        case MLNetworkMediaModel.TYPE_CARD:
-            return  "qrc:///type/capture-card.svg"
-        case MLNetworkMediaModel.TYPE_STREAM:
-            return  "qrc:///type/stream.svg"
-        case MLNetworkMediaModel.TYPE_PLAYLIST:
-            return  "qrc:///type/playlist.svg"
-        case MLNetworkMediaModel.TYPE_FILE:
-            return  "qrc:///type/file_black.svg"
-        default:
-            return "qrc:///type/directory_black.svg"
+    width: root.width
+    height: VLCStyle.icon_normal + VLCStyle.margin_small
+
+    focus: true
+
+    color: VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, this.hovered, this.activeFocus)
+
+    cover: Image {
+        id: cover_obj
+        fillMode: Image.PreserveAspectFit
+        source: {
+            switch (model.type) {
+            case NetworkMediaModel.TYPE_DISC:
+                return  "qrc:///type/disc.svg"
+            case NetworkMediaModel.TYPE_CARD:
+                return  "qrc:///type/capture-card.svg"
+            case NetworkMediaModel.TYPE_STREAM:
+                return  "qrc:///type/stream.svg"
+            case NetworkMediaModel.TYPE_PLAYLIST:
+                return  "qrc:///type/playlist.svg"
+            case NetworkMediaModel.TYPE_FILE:
+                return  "qrc:///type/file_black.svg"
+            default:
+                return "qrc:///type/directory_black.svg"
+            }
         }
     }
-    subtitle: model.mrl
-    title: model.name || qsTr("Unknown share")
+    line1: model.name || qsTr("Unknown share")
+    line2: model.mrl
+    imageText: (model.type !== NetworkMediaModel.TYPE_DIRECTORY && model.type !== NetworkMediaModel.TYPE_NODE) ? model.protocol : ""
+
     showContextButton: true
+
+    actionButtons: []
 }

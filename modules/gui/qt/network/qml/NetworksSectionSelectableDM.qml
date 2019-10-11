@@ -45,7 +45,7 @@ Utils.SelectableDelegateModel {
             }
 
             onItemDoubleClicked: {
-                if (model.type === MLNetworkMediaModel.TYPE_NODE || model.type === MLNetworkMediaModel.TYPE_DIRECTORY)
+                if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
                     history.push( ["mc", "network", { tree: model.tree } ], History.Go)
                 else
                     delegateModel.model.addAndPlay( index )
@@ -70,7 +70,7 @@ Utils.SelectableDelegateModel {
             }
 
             onItemDoubleClicked: {
-                if (model.type === MLNetworkMediaModel.TYPE_NODE || model.type === MLNetworkMediaModel.TYPE_DIRECTORY)
+                if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
                     history.push( ["mc", "network", { tree: model.tree } ], History.Go)
                 else
                     delegateModel.model.addAndPlay( index )
@@ -120,8 +120,8 @@ Utils.SelectableDelegateModel {
         if ( delegateModel.selectedGroup.count > 1 ) {
             playSelection()
         } else {
-            if (delegateModel.items.get(index).model.type === MLNetworkMediaModel.TYPE_DIRECTORY
-                    || delegateModel.items.get(index).model.type === MLNetworkMediaModel.TYPE_NODE)  {
+            if (delegateModel.items.get(index).model.type === NetworkMediaModel.TYPE_DIRECTORY
+                    || delegateModel.items.get(index).model.type === NetworkMediaModel.TYPE_NODE)  {
                 console.log("push network tree", delegateModel.items.get(index).model.tree)
                 history.push(["mc", "network", { tree: delegateModel.items.get(index).model.tree }], History.Go);
             } else {

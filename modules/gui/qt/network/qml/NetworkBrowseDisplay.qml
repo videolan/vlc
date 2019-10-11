@@ -39,13 +39,13 @@ Utils.NavigableFocusScope {
         }
     }
 
-    MLNetworkMediaModel {
+    NetworkMediaModel {
         id: providerModel
         ctx: mainctx
         tree: undefined
     }
 
-    MCNetworksSectionSelectableDM{
+    NetworksSectionSelectableDM{
         id: delegateModel
         model: providerModel
     }
@@ -148,15 +148,15 @@ Utils.NavigableFocusScope {
 
                 image: {
                     switch (model.type){
-                    case MLNetworkMediaModel.TYPE_DISC:
+                    case NetworkMediaModel.TYPE_DISC:
                         return  "qrc:///type/disc.svg"
-                    case MLNetworkMediaModel.TYPE_CARD:
+                    case NetworkMediaModel.TYPE_CARD:
                         return  "qrc:///type/capture-card.svg"
-                    case MLNetworkMediaModel.TYPE_STREAM:
+                    case NetworkMediaModel.TYPE_STREAM:
                         return  "qrc:///type/stream.svg"
-                    case MLNetworkMediaModel.TYPE_PLAYLIST:
+                    case NetworkMediaModel.TYPE_PLAYLIST:
                         return  "qrc:///type/playlist.svg"
-                    case MLNetworkMediaModel.TYPE_FILE:
+                    case NetworkMediaModel.TYPE_FILE:
                         return  "qrc:///type/file_black.svg"
                     default:
                         return "qrc:///type/directory_black.svg"
@@ -173,7 +173,7 @@ Utils.NavigableFocusScope {
                 }
 
                 onItemDoubleClicked: {
-                    if (model.type === MLNetworkMediaModel.TYPE_NODE || model.type === MLNetworkMediaModel.TYPE_DIRECTORY)
+                    if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
                         history.push( ["mc", "network", { tree: model.tree } ], History.Go)
                     else
                         delegateModel.model.addAndPlay( index )

@@ -18,7 +18,6 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQml.Models 2.2
-import QtQml 2.11
 
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
@@ -26,41 +25,28 @@ import org.videolan.medialib 0.1
 import "qrc:///utils/" as Utils
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
-    id: root
+Utils.GridItem {
+    id: item
 
-    property var extraLocalActions: undefined
-
-    property var tree: undefined
-    onTreeChanged:  loadView()
-    Component.onCompleted: loadView()
-
-    //reset view
-    function loadDefaultView() {
-        root.tree = undefined
-    }
-
-    function loadView() {
-        var page = "";
-        if (root.tree === undefined)
-            page ="qrc:///mediacenter/MCNetworkHomeDisplay.qml"
-        else
-            page = "qrc:///mediacenter/MCNetworkBrowseDisplay.qml"
-        view.replace(page)
-        if (root.tree) {
-            view.currentItem.tree = root.tree
+    pictureWidth: VLCStyle.network_normal
+    pictureHeight: VLCStyle.network_normal
+    image: {
+        switch (model.type){
+        case NetworkMediaModel.TYPE_DISC:
+            return  "qrc:///type/disc.svg"
+        case NetworkMediaModel.TYPE_CARD:
+            return  "qrc:///type/capture-card.svg"
+        case NetworkMediaModel.TYPE_STREAM:
+            return  "qrc:///type/stream.svg"
+        case NetworkMediaModel.TYPE_PLAYLIST:
+            return  "qrc:///type/playlist.svg"
+        case NetworkMediaModel.TYPE_FILE:
+            return  "qrc:///type/file_black.svg"
+        default:
+            return "qrc:///type/directory_black.svg"
         }
     }
-
-    Utils.StackViewExt {
-        id: view
-        anchors.fill:parent
-        clip: true
-        focus: true
-
-        onCurrentItemChanged: {
-            extraLocalActions = view.currentItem.extraLocalActions
-            view.currentItem.navigationParent = root
-        }
-    }
+    subtitle: model.mrl
+    title: model.name || qsTr("Unknown share")
+    showContextButton: true
 }

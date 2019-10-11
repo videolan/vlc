@@ -37,21 +37,21 @@ Utils.NavigableFocusScope {
         text: qsTr("No network shares found")
     }
 
-    MCNetworksSectionSelectableDM{
+    NetworksSectionSelectableDM{
         id: machineDM
-        model: MLNetworkDeviceModel {
+        model: NetworkDeviceModel {
             id: machineModel
             ctx: mainctx
-            sd_source: MLNetworkDeviceModel.CAT_DEVICES
+            sd_source: NetworkDeviceModel.CAT_DEVICES
         }
     }
 
-    MCNetworksSectionSelectableDM{
+    NetworksSectionSelectableDM{
         id: lanDM
-        model: MLNetworkDeviceModel {
+        model: NetworkDeviceModel {
             id: lanModel
             ctx: mainctx
-            sd_source: MLNetworkDeviceModel.CAT_LAN
+            sd_source: NetworkDeviceModel.CAT_LAN
         }
     }
 

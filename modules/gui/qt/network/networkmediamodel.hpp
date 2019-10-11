@@ -31,7 +31,7 @@
 #include <vlc_cxx_helpers.hpp>
 
 #include <components/qml_main_context.hpp>
-#include "mlnetworksourcelistener.hpp"
+#include "networksourcelistener.hpp"
 
 #include <memory>
 
@@ -67,7 +67,7 @@ public:
     InputItemPtr media;
 };
 
-class MLNetworkMediaModel : public QAbstractListModel, public MLNetworkSourceListener::SourceListenerCb
+class NetworkMediaModel : public QAbstractListModel, public NetworkSourceListener::SourceListenerCb
 {
     Q_OBJECT
 
@@ -96,8 +96,8 @@ public:
     Q_PROPERTY(bool parsingPending READ getParsingPending NOTIFY parsingPendingChanged)
 
 
-    explicit MLNetworkMediaModel(QObject* parent = nullptr);
-    MLNetworkMediaModel( QmlMainContext* ctx, QString parentMrl, QObject* parent = nullptr );
+    explicit NetworkMediaModel(QObject* parent = nullptr);
+    NetworkMediaModel( QmlMainContext* ctx, QString parentMrl, QObject* parent = nullptr );
 
     QVariant data(const QModelIndex& index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
@@ -178,7 +178,7 @@ private:
     vlc_medialibrary_t* m_ml;
     bool m_hasTree = false;
     NetworkTreeItem m_treeItem;
-    std::unique_ptr<MLNetworkSourceListener> m_listener;
+    std::unique_ptr<NetworkSourceListener> m_listener;
 };
 
 #endif // MLNETWORKMEDIAMODEL_HPP

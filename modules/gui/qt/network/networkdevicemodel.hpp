@@ -31,11 +31,11 @@
 #include <vlc_cxx_helpers.hpp>
 
 #include <components/qml_main_context.hpp>
-#include "mlnetworksourcelistener.hpp"
+#include "networksourcelistener.hpp"
 
 #include <memory>
 
-class MLNetworkDeviceModel : public QAbstractListModel, public MLNetworkSourceListener::SourceListenerCb
+class NetworkDeviceModel : public QAbstractListModel, public NetworkSourceListener::SourceListenerCb
 {
     Q_OBJECT
 public:
@@ -68,7 +68,7 @@ public:
 
 
 public:
-    MLNetworkDeviceModel( QObject* parent = nullptr );
+    NetworkDeviceModel( QObject* parent = nullptr );
 
     QVariant data(const QModelIndex& index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
@@ -122,7 +122,7 @@ private:
     vlc_medialibrary_t* m_ml = nullptr;
     SDCatType m_sdSource = CAT_UNDEFINED;
 
-    std::vector<std::unique_ptr<MLNetworkSourceListener>> m_listeners;
+    std::vector<std::unique_ptr<NetworkSourceListener>> m_listeners;
 };
 
 #endif // MLNETWORKDEVICEMODEL_HPP

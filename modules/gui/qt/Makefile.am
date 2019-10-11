@@ -155,18 +155,18 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/mediacenter/mlgenre.hpp \
 	gui/qt/components/mediacenter/mlgenremodel.cpp \
 	gui/qt/components/mediacenter/mlgenremodel.hpp \
-	gui/qt/components/mediacenter/mlnetworkdevicemodel.cpp \
-	gui/qt/components/mediacenter/mlnetworkdevicemodel.hpp \
-	gui/qt/components/mediacenter/mlnetworkmediamodel.cpp \
-	gui/qt/components/mediacenter/mlnetworkmediamodel.hpp \
-	gui/qt/components/mediacenter/mlnetworksourcelistener.cpp \
-	gui/qt/components/mediacenter/mlnetworksourcelistener.hpp \
 	gui/qt/components/mediacenter/mlvideo.hpp \
 	gui/qt/components/mediacenter/mlvideo.cpp \
 	gui/qt/components/mediacenter/mlvideomodel.cpp \
 	gui/qt/components/mediacenter/mlvideomodel.hpp \
 	gui/qt/components/mediacenter/mlrecentsvideomodel.cpp \
 	gui/qt/components/mediacenter/mlrecentsvideomodel.hpp \
+	gui/qt/network/networkdevicemodel.cpp \
+	gui/qt/network/networkdevicemodel.hpp \
+	gui/qt/network/networkmediamodel.cpp \
+	gui/qt/network/networkmediamodel.hpp \
+	gui/qt/network/networksourcelistener.cpp \
+	gui/qt/network/networksourcelistener.hpp \
 	gui/qt/playlist/media.hpp \
 	gui/qt/playlist/playlist_common.cpp \
 	gui/qt/playlist/playlist_common.hpp \
@@ -299,11 +299,12 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/mediacenter/mlartistmodel.moc.cpp \
 	gui/qt/components/mediacenter/mlgenre.moc.cpp \
 	gui/qt/components/mediacenter/mlgenremodel.moc.cpp \
-	gui/qt/components/mediacenter/mlnetworkdevicemodel.moc.cpp \
-	gui/qt/components/mediacenter/mlnetworkmediamodel.moc.cpp \
 	gui/qt/components/mediacenter/mlvideo.moc.cpp \
 	gui/qt/components/mediacenter/mlvideomodel.moc.cpp \
 	gui/qt/components/mediacenter/mlrecentsvideomodel.moc.cpp \
+	gui/qt/network/networkdevicemodel.moc.cpp \
+	gui/qt/network/networkmediamodel.moc.cpp \
+	gui/qt/network/networksourcelistener.moc.cpp \
 	gui/qt/playlist/playlist_common.moc.cpp \
 	gui/qt/playlist/playlist_item.moc.cpp \
 	gui/qt/playlist/playlist_model.moc.cpp \
@@ -634,18 +635,18 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/mediacenter/MCMusicDisplay.qml \
 	gui/qt/qml/mediacenter/MCVideoDisplay.qml \
 	gui/qt/qml/mediacenter/MCVideoListDisplay.qml \
-	gui/qt/qml/mediacenter/MCNetworkDisplay.qml \
-	gui/qt/qml/mediacenter/MCNetworkBrowseDisplay.qml \
-	gui/qt/qml/mediacenter/MCNetworkHomeDisplay.qml \
-	gui/qt/qml/mediacenter/MCNetworksSectionSelectableDM.qml \
+	gui/qt/network/qml/NetworkDisplay.qml \
+	gui/qt/network/qml/NetworkBrowseDisplay.qml \
+	gui/qt/network/qml/NetworkHomeDisplay.qml \
+	gui/qt/network/qml/NetworksSectionSelectableDM.qml \
+	gui/qt/network/qml/NetworkGridItem.qml \
+	gui/qt/network/qml/NetworkListItem.qml \
 	gui/qt/qml/mediacenter/MusicAlbumsDisplay.qml \
 	gui/qt/qml/mediacenter/MusicAlbumsGridExpandDelegate.qml \
 	gui/qt/qml/mediacenter/MusicArtistsDisplay.qml \
 	gui/qt/qml/mediacenter/MusicGenresDisplay.qml \
 	gui/qt/qml/mediacenter/MusicTracksDisplay.qml \
 	gui/qt/qml/mediacenter/MusicTrackListDisplay.qml \
-	gui/qt/qml/mediacenter/NetworkGridItem.qml \
-	gui/qt/qml/mediacenter/NetworkListItem.qml \
 	gui/qt/qml/mediacenter/VideoInfoExpandPanel.qml \
 	gui/qt/qml/mediacenter/VideoGridItem.qml \
 	gui/qt/playlist/qml/PlaylistListView.qml \
