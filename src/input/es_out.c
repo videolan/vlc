@@ -270,7 +270,7 @@ static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
         vlc_list_foreach( pos, (!fetes_i ? &p_sys->es : &p_sys->es_slaves), node )
 
 static void
-decoder_on_vout_added(decoder_t *decoder, vout_thread_t *vout,
+decoder_on_vout_started(decoder_t *decoder, vout_thread_t *vout,
                       enum vlc_vout_order order, void *userdata)
 {
     (void) decoder;
@@ -283,7 +283,7 @@ decoder_on_vout_added(decoder_t *decoder, vout_thread_t *vout,
         return;
 
     struct vlc_input_event_vout event = {
-        .action = VLC_INPUT_EVENT_VOUT_ADDED,
+        .action = VLC_INPUT_EVENT_VOUT_STARTED,
         .vout = vout,
         .order = order,
         .id = &id->id,
@@ -293,7 +293,7 @@ decoder_on_vout_added(decoder_t *decoder, vout_thread_t *vout,
 }
 
 static void
-decoder_on_vout_deleted(decoder_t *decoder, vout_thread_t *vout, void *userdata)
+decoder_on_vout_stopped(decoder_t *decoder, vout_thread_t *vout, void *userdata)
 {
     (void) decoder;
 
@@ -305,7 +305,7 @@ decoder_on_vout_deleted(decoder_t *decoder, vout_thread_t *vout, void *userdata)
         return;
 
     struct vlc_input_event_vout event = {
-        .action = VLC_INPUT_EVENT_VOUT_DELETED,
+        .action = VLC_INPUT_EVENT_VOUT_STOPPED,
         .vout = vout,
         .order = VLC_VOUT_ORDER_NONE,
         .id = &id->id,
@@ -402,8 +402,8 @@ decoder_get_attachments(decoder_t *decoder,
 }
 
 static const struct input_decoder_callbacks decoder_cbs = {
-    .on_vout_added = decoder_on_vout_added,
-    .on_vout_deleted = decoder_on_vout_deleted,
+    .on_vout_started = decoder_on_vout_started,
+    .on_vout_stopped = decoder_on_vout_stopped,
     .on_thumbnail_ready = decoder_on_thumbnail_ready,
     .on_new_video_stats = decoder_on_new_video_stats,
     .on_new_audio_stats = decoder_on_new_audio_stats,

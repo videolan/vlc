@@ -575,7 +575,7 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner)
     if (CreateDisplay( p_owner, dec_dev, p_vout ) != 0)
         p_vout = NULL;
     if (p_vout)
-        decoder_Notify(p_owner, on_vout_added, p_vout, order);
+        decoder_Notify(p_owner, on_vout_started, p_vout, order);
 
     vlc_mutex_lock( &p_owner->lock );
     p_owner->p_vout = p_vout;
@@ -670,7 +670,7 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
         if( p_owner->p_vout )
         {
             assert(p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID);
-            decoder_Notify(p_owner, on_vout_deleted, p_owner->p_vout);
+            decoder_Notify(p_owner, on_vout_stopped, p_owner->p_vout);
 
             vlc_mutex_lock( &p_owner->lock );
             vout_UnregisterSubpictureChannel(p_owner->p_vout,
@@ -688,7 +688,7 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
     if( p_owner->p_vout != p_vout )
     {
         if (p_owner->p_vout) /* notify the previous vout deletion unlocked */
-            decoder_Notify(p_owner, on_vout_deleted, p_owner->p_vout);
+            decoder_Notify(p_owner, on_vout_stopped, p_owner->p_vout);
 
         vlc_mutex_lock(&p_owner->lock);
 
@@ -723,7 +723,7 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
         vlc_mutex_unlock(&p_owner->lock);
 
         assert(channel_order != VLC_VOUT_ORDER_NONE);
-        decoder_Notify(p_owner, on_vout_added, p_vout, channel_order);
+        decoder_Notify(p_owner, on_vout_started, p_vout, channel_order);
     }
     else
         vout_Release(p_vout);
@@ -1998,7 +1998,7 @@ static void DeleteDecoder( decoder_t * p_dec )
                     vout_Cancel(vout, false);
                     p_owner->vout_thread_added = false;
                 }
-                decoder_Notify(p_owner, on_vout_deleted, vout);
+                decoder_Notify(p_owner, on_vout_stopped, vout);
                 input_resource_PutVout(p_owner->p_resource, vout);
             }
             break;
@@ -2008,7 +2008,7 @@ static void DeleteDecoder( decoder_t * p_dec )
             if( p_owner->p_vout )
             {
                 assert( p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID );
-                decoder_Notify(p_owner, on_vout_deleted, p_owner->p_vout);
+                decoder_Notify(p_owner, on_vout_stopped, p_owner->p_vout);
 
                 vout_UnregisterSubpictureChannel( p_owner->p_vout,
                                                   p_owner->i_spu_channel );

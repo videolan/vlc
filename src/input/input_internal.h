@@ -244,8 +244,8 @@ struct vlc_input_event_signal {
 struct vlc_input_event_vout
 {
     enum {
-        VLC_INPUT_EVENT_VOUT_ADDED,
-        VLC_INPUT_EVENT_VOUT_DELETED,
+        VLC_INPUT_EVENT_VOUT_STARTED,
+        VLC_INPUT_EVENT_VOUT_STOPPED,
     } action;
     vout_thread_t *vout;
     enum vlc_vout_order order;

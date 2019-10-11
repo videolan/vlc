@@ -30,10 +30,10 @@
 
 struct input_decoder_callbacks {
     /* notifications */
-    void (*on_vout_added)(decoder_t *decoder, vout_thread_t *vout,
+    void (*on_vout_started)(decoder_t *decoder, vout_thread_t *vout,
                           enum vlc_vout_order vout_order,
                           void *userdata);
-    void (*on_vout_deleted)(decoder_t *decoder, vout_thread_t *vout,
+    void (*on_vout_stopped)(decoder_t *decoder, vout_thread_t *vout,
                             void *userdata);
     void (*on_thumbnail_ready)(decoder_t *decoder, picture_t *pic,
                                void *userdata);

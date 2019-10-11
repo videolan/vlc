@@ -626,7 +626,7 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
 
     switch (ev->action)
     {
-        case VLC_INPUT_EVENT_VOUT_ADDED:
+        case VLC_INPUT_EVENT_VOUT_STARTED:
             trackpriv->vout = ev->vout;
             vlc_player_SendEvent(player, on_vout_changed,
                                  VLC_PLAYER_VOUT_STARTED, ev->vout,
@@ -638,7 +638,7 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
                 vlc_player_vout_AddCallbacks(player, ev->vout);
             }
             break;
-        case VLC_INPUT_EVENT_VOUT_DELETED:
+        case VLC_INPUT_EVENT_VOUT_STOPPED:
             if (is_video_es)
             {
                 /* Un-register vout callbacks before the vout list event */
