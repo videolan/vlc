@@ -2028,7 +2028,7 @@ static void DeleteDecoder( decoder_t * p_dec )
             {
                 /* Reset the cancel state that was set before joining the decoder
                  * thread */
-                vout_Cancel(vout, false);
+                vout_StopDisplay(vout);
                 p_owner->vout_thread_started = false;
                 decoder_Notify(p_owner, on_vout_stopped, vout);
                 input_resource_PutVout(p_owner->p_resource, vout);
