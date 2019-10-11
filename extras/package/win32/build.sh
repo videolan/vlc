@@ -132,18 +132,18 @@ fi
 
 # Rebuild the contribs or use the prebuilt ones
 if [ "$PREBUILT" != "yes" ]; then
-make list
-make -j$JOBS fetch
-make -j$JOBS -k || make -j1
-if [ "$PACKAGE" = "yes" ]; then
-make package
-fi
+    make list
+    make -j$JOBS fetch
+    make -j$JOBS -k || make -j1
+    if [ "$PACKAGE" = "yes" ]; then
+        make package
+    fi
 elif [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
-make .luac
+    make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
+    make .luac
 else
-make prebuilt
-make .luac
+    make prebuilt
+    make .luac
 fi
 cd ../..
 
