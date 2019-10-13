@@ -135,10 +135,8 @@ static int test_packetize(const char *run,
     if(params->i_frame_count)
     {
         EXPECT(outchain != NULL);
-
-        p_block = block_ChainGather(outchain);
-        EXPECT(p_block != NULL);
     }
+    block_ChainRelease(outchain);
 
     EXPECT(!!params->b_extra == !!p->fmt_out.i_extra);
 
