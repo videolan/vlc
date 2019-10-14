@@ -690,7 +690,8 @@ static int Open( vlc_object_t * p_this )
                     }
 
                     tk->i_width_bytes = p_bih->biWidth * (p_bih->biBitCount >> 3);
-                    /* RGB DIB are coded from bottom to top */
+                    /* Unintuitively RGB DIB are always coded from bottom to top,
+                     * except when height is negative */
                     if ( p_bih->biHeight <= INT32_MAX )
                         tk->b_flipped = true;
                     /* else
