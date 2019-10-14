@@ -334,11 +334,90 @@ static void BuildExtraData( decoder_t *p_dec )
             p_sys->ep.p_ep->p_buffer, p_sys->ep.p_ep->i_buffer );
 }
 
+static block_t *OutputFrame( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    const int i_pic_flags = p_sys->p_frame->i_flags;
+
+    /* Prepend SH and EP on I */
+    if( i_pic_flags & BLOCK_FLAG_TYPE_I )
+    {
+        block_t *p_list = block_Duplicate( p_sys->sh.p_sh );
+        block_t *p_ep = block_Duplicate( p_sys->ep.p_ep );
+        if( p_ep )
+            block_ChainAppend( &p_list, p_ep );
+        block_ChainAppend( &p_list, p_sys->p_frame );
+        p_list->i_flags = i_pic_flags;
+        p_sys->p_frame = p_list;
+    }
+
+    vlc_tick_t i_dts = p_sys->i_frame_dts;
+    vlc_tick_t i_pts = p_sys->i_frame_pts;
+
+    /* */
+    block_t *p_pic = block_ChainGather( p_sys->p_frame );
+    if( p_pic )
+    {
+        p_pic->i_dts = p_sys->i_frame_dts;
+        p_pic->i_pts = p_sys->i_frame_pts;
+    }
+
+    /* */
+    if( p_sys->i_frame_dts != VLC_TICK_INVALID )
+        p_sys->i_interpolated_dts = i_dts;
+
+    /* We can interpolate dts/pts only if we have a frame rate */
+    if( p_dec->fmt_out.video.i_frame_rate != 0 && p_dec->fmt_out.video.i_frame_rate_base != 0 )
+    {
+        if( p_sys->i_interpolated_dts != VLC_TICK_INVALID )
+            p_sys->i_interpolated_dts += vlc_tick_from_samples(
+                                         p_dec->fmt_out.video.i_frame_rate_base,
+                                         p_dec->fmt_out.video.i_frame_rate);
+
+        //msg_Dbg( p_dec, "-------------- XXX0 dts=%"PRId64" pts=%"PRId64" interpolated=%"PRId64,
+        //         i_dts, i_pts, p_sys->i_interpolated_dts );
+        if( i_dts == VLC_TICK_INVALID )
+            i_dts = p_sys->i_interpolated_dts;
+
+        if( i_pts == VLC_TICK_INVALID )
+        {
+            if( !p_sys->sh.b_has_bframe || (i_pic_flags & BLOCK_FLAG_TYPE_B ) )
+                i_pts = i_dts;
+            /* TODO compute pts for other case */
+        }
+    }
+
+    if( p_pic )
+    {
+        p_pic->i_dts = i_dts;
+        p_pic->i_pts = i_pts;
+    }
+
+    //msg_Dbg( p_dec, "-------------- dts=%"PRId64" pts=%"PRId64, i_dts, i_pts );
+
+    /* CC */
+    p_sys->i_cc_pts = i_pts;
+    p_sys->i_cc_dts = i_dts;
+    p_sys->i_cc_flags = i_pic_flags;
+
+    p_sys->cc = p_sys->cc_next;
+    cc_Flush( &p_sys->cc_next );
+
+    /* Reset context */
+    p_sys->b_frame = false;
+    p_sys->i_frame_dts = VLC_TICK_INVALID;
+    p_sys->i_frame_pts = VLC_TICK_INVALID;
+    p_sys->p_frame = NULL;
+    p_sys->pp_last = &p_sys->p_frame;
+
+    return p_pic;
+}
+
 /* ParseIDU: parse an Independent Decoding Unit */
 static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_pic;
+    block_t *p_pic = NULL;
     const idu_type_t idu = p_frag->p_buffer[3];
 
     *pb_ts_used = false;
@@ -358,71 +437,13 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
      * But It should not be a problem for decoder */
 
     /* Do we have completed a frame */
-    p_pic = NULL;
     if( p_sys->b_frame &&
         idu != IDU_TYPE_FRAME_USER_DATA &&
         idu != IDU_TYPE_FIELD && idu != IDU_TYPE_FIELD_USER_DATA &&
         idu != IDU_TYPE_SLICE && idu != IDU_TYPE_SLICE_USER_DATA &&
         idu != IDU_TYPE_END_OF_SEQUENCE )
     {
-        /* Prepend SH and EP on I */
-        if( p_sys->p_frame->i_flags & BLOCK_FLAG_TYPE_I )
-        {
-            block_t *p_list = block_Duplicate( p_sys->sh.p_sh );
-            block_ChainAppend( &p_list, block_Duplicate( p_sys->ep.p_ep ) );
-            block_ChainAppend( &p_list, p_sys->p_frame );
-
-            p_list->i_flags = p_sys->p_frame->i_flags;
-
-            p_sys->p_frame = p_list;
-        }
-
-        /* */
-        p_pic = block_ChainGather( p_sys->p_frame );
-        p_pic->i_dts = p_sys->i_frame_dts;
-        p_pic->i_pts = p_sys->i_frame_pts;
-
-        /* */
-        if( p_pic->i_dts != VLC_TICK_INVALID )
-            p_sys->i_interpolated_dts = p_pic->i_dts;
-
-        /* We can interpolate dts/pts only if we have a frame rate */
-        if( p_dec->fmt_out.video.i_frame_rate != 0 && p_dec->fmt_out.video.i_frame_rate_base != 0 )
-        {
-            if( p_sys->i_interpolated_dts != VLC_TICK_INVALID )
-                p_sys->i_interpolated_dts += vlc_tick_from_samples(
-                                             p_dec->fmt_out.video.i_frame_rate_base,
-                                             p_dec->fmt_out.video.i_frame_rate);
-
-            //msg_Dbg( p_dec, "-------------- XXX0 dts=%"PRId64" pts=%"PRId64" interpolated=%"PRId64,
-            //         p_pic->i_dts, p_pic->i_pts, p_sys->i_interpolated_dts );
-            if( p_pic->i_dts == VLC_TICK_INVALID )
-                p_pic->i_dts = p_sys->i_interpolated_dts;
-
-            if( p_pic->i_pts == VLC_TICK_INVALID )
-            {
-                if( !p_sys->sh.b_has_bframe || (p_pic->i_flags & BLOCK_FLAG_TYPE_B ) )
-                    p_pic->i_pts = p_pic->i_dts;
-                /* TODO compute pts for other case */
-            }
-        }
-
-        //msg_Dbg( p_dec, "-------------- dts=%"PRId64" pts=%"PRId64, p_pic->i_dts, p_pic->i_pts );
-
-        /* CC */
-        p_sys->i_cc_pts = p_pic->i_pts;
-        p_sys->i_cc_dts = p_pic->i_dts;
-        p_sys->i_cc_flags = p_pic->i_flags;
-
-        p_sys->cc = p_sys->cc_next;
-        cc_Flush( &p_sys->cc_next );
-
-        /* Reset context */
-        p_sys->b_frame = false;
-        p_sys->i_frame_dts = VLC_TICK_INVALID;
-        p_sys->i_frame_pts = VLC_TICK_INVALID;
-        p_sys->p_frame = NULL;
-        p_sys->pp_last = &p_sys->p_frame;
+        p_pic = OutputFrame( p_dec );
     }
 
     /*  */
