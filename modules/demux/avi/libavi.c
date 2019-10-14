@@ -548,7 +548,8 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
                      "strf: video:%4.4s %"PRIu32"x%"PRIu32" planes:%d %dbpp",
                      (char*)&p_chk->strf.vids.p_bih->biCompression,
                      (uint32_t)p_chk->strf.vids.p_bih->biWidth,
-                     (uint32_t)p_chk->strf.vids.p_bih->biHeight,
+                     p_chk->strf.vids.p_bih->biHeight <= INT32_MAX ? p_chk->strf.vids.p_bih->biHeight
+                                                                   : -1 * p_chk->strf.vids.p_bih->biHeight,
                      p_chk->strf.vids.p_bih->biPlanes,
                      p_chk->strf.vids.p_bih->biBitCount );
 #endif

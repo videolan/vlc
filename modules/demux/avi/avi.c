@@ -637,8 +637,9 @@ static int Open( vlc_object_t * p_this )
 
                 msg_Dbg( p_demux, "stream[%u] video(%4.4s) %"PRIu32"x%"PRIu32" %dbpp %ffps",
                          i, (char*)&p_vids->p_bih->biCompression,
-                         (uint32_t)p_vids->p_bih->biWidth,
-                         (uint32_t)p_vids->p_bih->biHeight,
+                         p_vids->p_bih->biWidth,
+                         (p_vids->p_bih->biHeight <= INT_MAX) ? p_vids->p_bih->biHeight
+                                                              : -1 * p_vids->p_bih->biHeight,
                          p_vids->p_bih->biBitCount,
                          (float)tk->i_rate/(float)tk->i_scale );
                 break;
