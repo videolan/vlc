@@ -174,8 +174,8 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
         }
 
         p_props->i_stride = p_bih->biWidth * (p_bih->biBitCount >> 3);
-        /* RGB DIB are coded from bottom to top */
-        if ( p_bih->biHeight < INT32_MAX ) p_props->b_flipped = true;
+        /* Unintuitively RGB DIB are always coded from bottom to top,
+         * except when height is negative */
         if ( p_bih->biHeight <= INT32_MAX )
             p_props->b_flipped = true;
         /* else
@@ -205,7 +205,9 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
     fmt->video.i_height = p_bih->biHeight;
     fmt->video.i_bits_per_pixel = p_bih->biBitCount;
 
-    /* Uncompressed Bitmap or YUV, YUV being always topdown */
+    /* Uncompressed Bitmap or YUV, YUV being always top to bottom whatever
+     * height sign is, and compressed must also not use flip, so positive
+     * values only here */
     if ( fmt->video.i_height > INT32_MAX )
         fmt->video.i_height =
             (unsigned int)(-(int)p_bih->biHeight);
