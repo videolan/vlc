@@ -209,8 +209,7 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
      * height sign is, and compressed must also not use flip, so positive
      * values only here */
     if ( fmt->video.i_height > INT32_MAX )
-        fmt->video.i_height =
-            (unsigned int)(-(int)p_bih->biHeight);
+        fmt->video.i_height = -1 * p_bih->biHeight;
 
     return VLC_SUCCESS;
 }
