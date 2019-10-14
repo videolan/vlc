@@ -129,6 +129,8 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cf
     hr = ctx->d3device->CreateShaderResourceView(ctx->texture, &resviewDesc, &ctx->textureShaderInput );
     if (FAILED(hr)) return false;
 
+    ctx->d3dctx->PSSetShaderResources(0, 1, &ctx->textureShaderInput);
+
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {
         .Format = texDesc.Format,
         .ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D,
@@ -157,36 +159,7 @@ static void EndRender(struct render_context *ctx)
     /* render into the swapchain */
     static const FLOAT orangeRGBA[4] = {1.0f, 0.5f, 0.0f, 1.0f};
 
-    ctx->d3dctx->OMSetRenderTargets(1, &ctx->swapchainRenderTarget, NULL);
     ctx->d3dctx->ClearRenderTargetView(ctx->swapchainRenderTarget, orangeRGBA);
-
-    ctx->d3dctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    ctx->d3dctx->IASetInputLayout(ctx->pShadersInputLayout);
-    UINT offset = 0;
-    ctx->d3dctx->IASetVertexBuffers(0, 1, &ctx->pVertexBuffer, &ctx->vertexBufferStride, &offset);
-    ctx->d3dctx->IASetIndexBuffer(ctx->pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-
-    ctx->d3dctx->VSSetShader(ctx->pVS, 0, 0);
-
-    ctx->d3dctx->PSSetSamplers(0, 1, &ctx->samplerState);
-
-    ctx->d3dctx->PSSetShaderResources(0, 1, &ctx->textureShaderInput);
-
-    ctx->d3dctx->PSSetShader(ctx->pPS, 0, 0);
-
-    DXGI_SWAP_CHAIN_DESC scd;
-    ctx->swapchain->GetDesc(&scd);
-    RECT currentRect;
-    GetWindowRect(scd.OutputWindow, &currentRect);
-
-    D3D11_VIEWPORT viewport = { };
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.Width = SCREEN_WIDTH; //currentRect.right - currentRect.left;
-    viewport.Height = SCREEN_HEIGHT; //currentRect.bottom - currentRect.top;
-
-    ctx->d3dctx->RSSetViewports(1, &viewport);
 
     ctx->d3dctx->DrawIndexed(ctx->quadIndexCount, 0, 0);
 }
@@ -329,6 +302,15 @@ static void init_direct3d(struct render_context *ctx, HWND hWnd)
         pMultithread->Release();
     }
 
+    // RECT currentRect;
+    // GetWindowRect(hWnd, &currentRect);
+    //currentRect.right - currentRect.left;
+    //currentRect.bottom - currentRect.top;
+
+    D3D11_VIEWPORT viewport = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0 };
+
+    ctx->d3dctx->RSSetViewports(1, &viewport);
+
     D3D11CreateDevice(NULL,
                       D3D_DRIVER_TYPE_HARDWARE,
                       NULL,
@@ -342,6 +324,8 @@ static void init_direct3d(struct render_context *ctx, HWND hWnd)
 
     ctx->d3device->CreateRenderTargetView(pBackBuffer, NULL, &ctx->swapchainRenderTarget);
     pBackBuffer->Release();
+
+    ctx->d3dctx->OMSetRenderTargets(1, &ctx->swapchainRenderTarget, NULL);
 
     ID3D10Blob *VS, *PS, *pErrBlob;
     char *err;
@@ -405,6 +389,16 @@ static void init_direct3d(struct render_context *ctx, HWND hWnd)
     triangle_pos[5] = 3;
     ctx->d3dctx->Unmap(ctx->pIndexBuffer, NULL);
 
+    ctx->d3dctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    ctx->d3dctx->IASetInputLayout(ctx->pShadersInputLayout);
+    UINT offset = 0;
+    ctx->d3dctx->IASetVertexBuffers(0, 1, &ctx->pVertexBuffer, &ctx->vertexBufferStride, &offset);
+    ctx->d3dctx->IASetIndexBuffer(ctx->pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+
+    ctx->d3dctx->VSSetShader(ctx->pVS, 0, 0);
+    ctx->d3dctx->PSSetShader(ctx->pPS, 0, 0);
+
     D3D11_SAMPLER_DESC sampDesc;
     ZeroMemory(&sampDesc, sizeof(sampDesc));
     sampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
@@ -416,6 +410,8 @@ static void init_direct3d(struct render_context *ctx, HWND hWnd)
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
     hr = ctx->d3device->CreateSamplerState(&sampDesc, &ctx->samplerState);
+    ctx->d3dctx->PSSetSamplers(0, 1, &ctx->samplerState);
+
 }
 
 static void release_direct3d(struct render_context *ctx)
