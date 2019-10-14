@@ -722,8 +722,7 @@ static int Open( vlc_object_t * p_this )
 
                  /* Uncompresse Bitmap or YUV, YUV being always topdown */
                 if ( tk->fmt.video.i_height > INT32_MAX )
-                    tk->fmt.video.i_height =
-                        (unsigned int)(-(int)p_bih->biHeight);
+                    tk->fmt.video.i_height = -1 * p_bih->biHeight;
 
                 avi_chunk_vprp_t *p_vprp = AVI_ChunkFind( p_strl, AVIFOURCC_vprp, 0, false );
                 if( p_vprp )
