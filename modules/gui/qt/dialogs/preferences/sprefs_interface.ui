@@ -710,7 +710,7 @@
   <customwidget>
    <class>InterfacePreviewWidget</class>
    <extends>QLabel</extends>
-   <header>components/preferences_widgets.hpp</header>
+   <header>dialogs/preferences/preferences_widgets.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -39,7 +39,7 @@
 
 /* The dialogs */
 #include "dialogs/bookmarks.hpp"
-#include "dialogs/preferences.hpp"
+#include "dialogs/preferences/preferences.hpp"
 #include "dialogs/mediainfo.hpp"
 #include "dialogs/messages.hpp"
 #include "dialogs/extended.hpp"

@@ -14,7 +14,7 @@
 SUFFIXES += .ui .h .hpp .moc.cpp .qml
 
 libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt/ui
+	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt/ -I$(builddir)/gui/qt/ui
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
 libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM)
 libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)'
@@ -58,7 +58,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/adapters/variables.cpp gui/qt/adapters/variables.hpp \
 	gui/qt/adapters/var_choice_model.cpp  gui/qt/adapters/var_choice_model.hpp \
 	gui/qt/dialogs/bookmarks.cpp gui/qt/dialogs/bookmarks.hpp \
-	gui/qt/dialogs/preferences.cpp gui/qt/dialogs/preferences.hpp \
 	gui/qt/dialogs/mediainfo.cpp gui/qt/dialogs/mediainfo.hpp \
 	gui/qt/dialogs/epg.cpp gui/qt/dialogs/epg.hpp \
 	gui/qt/dialogs/extended.cpp gui/qt/dialogs/extended.hpp \
@@ -93,14 +92,15 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/navigation_history.cpp gui/qt/components/navigation_history.hpp \
 	gui/qt/player/player_controller.cpp gui/qt/player/player_controller.hpp gui/qt/player/player_controller_p.hpp \
 	gui/qt/player/playercontrolbarmodel.cpp gui/qt/player/playercontrolbarmodel.hpp \
-	gui/qt/components/preferences_widgets.cpp \
-	gui/qt/components/preferences_widgets.hpp \
 	gui/qt/components/selectable_list_model.hpp \
 	gui/qt/components/selectable_list_model.cpp \
-	gui/qt/components/complete_preferences.cpp \
-	gui/qt/components/complete_preferences.hpp \
-	gui/qt/components/simple_preferences.cpp \
-	gui/qt/components/simple_preferences.hpp \
+	gui/qt/dialogs/preferences/preferences.cpp gui/qt/preferences/preferences.hpp \
+	gui/qt/dialogs/preferences/preferences_widgets.cpp \
+	gui/qt/dialogs/preferences/preferences_widgets.hpp \
+	gui/qt/dialogs/preferences/complete_preferences.cpp \
+	gui/qt/dialogs/preferences/complete_preferences.hpp \
+	gui/qt/dialogs/preferences/simple_preferences.cpp \
+	gui/qt/dialogs/preferences/simple_preferences.hpp \
 	gui/qt/components/open_panels.cpp gui/qt/components/open_panels.hpp \
 	gui/qt/components/interface_widgets.cpp \
 	gui/qt/components/interface_widgets.hpp \
@@ -245,7 +245,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/epg.moc.cpp \
 	gui/qt/dialogs/errors.moc.cpp \
 	gui/qt/dialogs/plugins.moc.cpp \
-	gui/qt/dialogs/preferences.moc.cpp \
 	gui/qt/dialogs/sout.moc.cpp \
 	gui/qt/dialogs/convert.moc.cpp \
 	gui/qt/dialogs/help.moc.cpp \
@@ -266,9 +265,10 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/info_widgets.moc.cpp \
 	gui/qt/player/player_controller.moc.cpp \
 	gui/qt/player/playercontrolbarmodel.moc.cpp \
-	gui/qt/components/preferences_widgets.moc.cpp \
-	gui/qt/components/complete_preferences.moc.cpp \
-	gui/qt/components/simple_preferences.moc.cpp \
+	gui/qt/dialogs/preferences/preferences.moc.cpp \
+	gui/qt/dialogs/preferences/preferences_widgets.moc.cpp \
+	gui/qt/dialogs/preferences/complete_preferences.moc.cpp \
+	gui/qt/dialogs/preferences/simple_preferences.moc.cpp \
 	gui/qt/components/open_panels.moc.cpp \
 	gui/qt/components/interface_widgets.moc.cpp \
 	gui/qt/components/navigation_history.moc.cpp \
@@ -341,11 +341,11 @@ nodist_libqt_plugin_la_SOURCES += \
 	gui/qt/ui/ui_vlm.h \
 	gui/qt/ui/ui_podcast_configuration.h \
 	gui/qt/ui/ui_profiles.h \
-	gui/qt/ui/ui_sprefs_audio.h \
-	gui/qt/ui/ui_sprefs_input.h \
-	gui/qt/ui/ui_sprefs_interface.h \
-	gui/qt/ui/ui_sprefs_subtitles.h \
-	gui/qt/ui/ui_sprefs_video.h \
+	gui/qt/dialogs/preferences/ui_sprefs_audio.h \
+	gui/qt/dialogs/preferences/ui_sprefs_input.h \
+	gui/qt/dialogs/preferences/ui_sprefs_interface.h \
+	gui/qt/dialogs/preferences/ui_sprefs_subtitles.h \
+	gui/qt/dialogs/preferences/ui_sprefs_video.h \
 	gui/qt/ui/ui_streampanel.h \
 	gui/qt/ui/ui_messages_panel.h \
 	gui/qt/ui/ui_about.h \
@@ -380,11 +380,11 @@ libqt_plugin_la_UI = \
 	gui/qt/ui/open.ui \
 	gui/qt/ui/podcast_configuration.ui \
 	gui/qt/ui/profiles.ui \
-	gui/qt/ui/sprefs_audio.ui \
-	gui/qt/ui/sprefs_input.ui \
-	gui/qt/ui/sprefs_interface.ui \
-	gui/qt/ui/sprefs_subtitles.ui \
-	gui/qt/ui/sprefs_video.ui \
+	gui/qt/dialogs/preferences/sprefs_audio.ui \
+	gui/qt/dialogs/preferences/sprefs_input.ui \
+	gui/qt/dialogs/preferences/sprefs_interface.ui \
+	gui/qt/dialogs/preferences/sprefs_subtitles.ui \
+	gui/qt/dialogs/preferences/sprefs_video.ui \
 	gui/qt/ui/streampanel.ui \
 	gui/qt/ui/messages_panel.ui \
 	gui/qt/ui/about.ui \

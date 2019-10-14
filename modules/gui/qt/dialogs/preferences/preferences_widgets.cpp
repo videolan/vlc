@@ -30,7 +30,7 @@
 # include "config.h"
 #endif
 
-#include "components/preferences_widgets.hpp"
+#include "dialogs/preferences/preferences_widgets.hpp"
 #include "util/customwidgets.hpp"
 #include "util/searchlineedit.hpp"
 #include "util/qt_dirs.hpp"

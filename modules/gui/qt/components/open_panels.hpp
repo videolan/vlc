@@ -31,7 +31,7 @@
 # include "config.h"
 #endif
 
-#include "components/preferences_widgets.hpp"
+#include "dialogs/preferences/preferences_widgets.hpp"
 
 #include "ui_open_file.h"
 #include "ui_open_disk.h"

@@ -35,8 +35,8 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 
-#include "components/complete_preferences.hpp"
-#include "components/preferences_widgets.hpp"
+#include "dialogs/preferences/complete_preferences.hpp"
+#include "dialogs/preferences/preferences_widgets.hpp"
 
 #include <vlc_config_cat.h>
 #include <vlc_intf_strings.h>

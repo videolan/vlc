@@ -24,7 +24,7 @@
 #define QVLC_PREFS_DIALOG_H_ 1
 
 #include "util/qvlcframe.hpp"
-#include "components/simple_preferences.hpp"
+#include "dialogs/preferences/simple_preferences.hpp"
 
 class PrefsTree;
 class SPrefsCatList;

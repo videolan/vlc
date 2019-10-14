@@ -26,8 +26,8 @@
 # include "config.h"
 #endif
 
-#include "components/simple_preferences.hpp"
-#include "components/preferences_widgets.hpp"
+#include "simple_preferences.hpp"
+#include "preferences_widgets.hpp"
 
 #include <vlc_config_cat.h>
 #include <vlc_configuration.h>

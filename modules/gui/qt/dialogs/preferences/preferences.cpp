@@ -25,12 +25,12 @@
 # include "config.h"
 #endif
 
-#include "dialogs/preferences.hpp"
+#include "dialogs/preferences/preferences.hpp"
 #include "util/qvlcframe.hpp"
 #include "dialogs/errors.hpp"
 
-#include "components/complete_preferences.hpp"
-#include "components/simple_preferences.hpp"
+#include "dialogs/preferences/complete_preferences.hpp"
+#include "dialogs/preferences/simple_preferences.hpp"
 #include "util/searchlineedit.hpp"
 #include "util/qvlcframe.hpp"
 #include "main_interface.hpp"
