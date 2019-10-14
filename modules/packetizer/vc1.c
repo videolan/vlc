@@ -128,7 +128,9 @@ static void Flush( decoder_t * );
 static void PacketizeReset( void *p_private, bool b_broken );
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
 static int PacketizeValidate( void *p_private, block_t * );
+static block_t *PacketizeDrain( void *p_private );
 
+static block_t *OutputFrame( decoder_t *p_dec );
 static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag );
 static block_t *GetCc( decoder_t *p_dec, decoder_cc_desc_t * );
 
@@ -160,7 +162,7 @@ static int Open( vlc_object_t *p_this )
     packetizer_Init( &p_sys->packetizer,
                      p_vc1_startcode, sizeof(p_vc1_startcode), startcode_FindAnnexB,
                      NULL, 0, 4,
-                     PacketizeReset, PacketizeParse, PacketizeValidate, NULL,
+                     PacketizeReset, PacketizeParse, PacketizeValidate, PacketizeDrain,
                      p_dec );
 
     p_sys->b_sequence_header = false;
@@ -315,6 +317,13 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
     }
     VLC_UNUSED(p_au);
     return VLC_SUCCESS;
+}
+
+static block_t * PacketizeDrain( void *p_private )
+{
+    decoder_t *p_dec = p_private;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    return p_sys->b_frame ? OutputFrame( p_dec ) : NULL;
 }
 
 /* BuildExtraData: gather sequence header and entry point */
