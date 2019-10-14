@@ -721,8 +721,8 @@ modules/gui/qt/dialogs/errors.cpp
 modules/gui/qt/dialogs/errors.hpp
 modules/gui/qt/dialogs/extended.cpp
 modules/gui/qt/dialogs/extended.hpp
-modules/gui/qt/dialogs/extensions.cpp
-modules/gui/qt/dialogs/extensions.hpp
+modules/gui/qt/dialogs/extensions/extensions.cpp
+modules/gui/qt/dialogs/extensions/extensions.hpp
 modules/gui/qt/dialogs/fingerprintdialog.cpp
 modules/gui/qt/dialogs/fingerprintdialog.hpp
 modules/gui/qt/dialogs/firstrun.cpp
@@ -753,8 +753,8 @@ modules/gui/qt/dialogs/vlm.cpp
 modules/gui/qt/dialogs/vlm.hpp
 modules/gui/qt/dialogs_provider.cpp
 modules/gui/qt/dialogs_provider.hpp
-modules/gui/qt/extensions_manager.cpp
-modules/gui/qt/extensions_manager.hpp
+modules/gui/qt/dialogs/extensions/extensions_manager.cpp
+modules/gui/qt/dialogs/extensions/extensions_manager.hpp
 modules/gui/qt/main_interface.cpp
 modules/gui/qt/main_interface.hpp
 modules/gui/qt/main_interface_win32.cpp

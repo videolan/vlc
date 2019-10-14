@@ -54,7 +54,7 @@ extern "C" char **environ;
 #else
 # include "main_interface.hpp"   /* MainInterface creation */
 #endif
-#include "extensions_manager.hpp" /* Extensions manager */
+#include "dialogs/extensions/extensions_manager.hpp" /* Extensions manager */
 #include "managers/addons_manager.hpp" /* Addons manager */
 #include "dialogs/help.hpp"     /* Launch Update */
 #include "recents.hpp"          /* Recents Item destruction */

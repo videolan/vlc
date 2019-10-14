@@ -22,7 +22,7 @@
 
 #include "extensions_manager.hpp"
 #include "player/player_controller.hpp"
-#include "dialogs/extensions.hpp"
+#include "extensions.hpp"
 
 #include <vlc_modules.h>
 #include "assert.h"

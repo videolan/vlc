@@ -42,7 +42,7 @@
 #include "player/player_controller.hpp"                      /* Input Management */
 #include "playlist/playlist_controller.hpp"
 #include "recents.hpp"                            /* Recent Items */
-#include "extensions_manager.hpp"                 /* Extensions menu */
+#include "dialogs/extensions/extensions_manager.hpp"                 /* Extensions menu */
 #include "components/extended_panels.hpp"
 #include "adapters/var_choice_model.hpp"
 

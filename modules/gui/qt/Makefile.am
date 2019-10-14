@@ -49,7 +49,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/menus.cpp gui/qt/menus.hpp \
 	gui/qt/main_interface.cpp gui/qt/main_interface.hpp \
 	gui/qt/dialogs_provider.cpp gui/qt/dialogs_provider.hpp \
-	gui/qt/extensions_manager.cpp gui/qt/extensions_manager.hpp \
 	gui/qt/managers/addons_manager.cpp gui/qt/managers/addons_manager.hpp \
 	gui/qt/managers/renderer_manager.cpp gui/qt/managers/renderer_manager.hpp \
 	gui/qt/recents.cpp gui/qt/recents.hpp \
@@ -76,7 +75,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/firstrun.cpp gui/qt/dialogs/firstrun.hpp \
 	gui/qt/dialogs/podcast_configuration.cpp \
 	gui/qt/dialogs/podcast_configuration.hpp \
-	gui/qt/dialogs/extensions.cpp gui/qt/dialogs/extensions.hpp \
+	gui/qt/dialogs/extensions/extensions.cpp gui/qt/dialogs/extensions/extensions.hpp \
+	gui/qt/dialogs/extensions/extensions_manager.cpp gui/qt/dialogs/extensions/extensions_manager.hpp \
 	gui/qt/dialogs/fingerprintdialog.cpp \
 	gui/qt/dialogs/fingerprintdialog.hpp \
 	gui/qt/components/qml_main_context.cpp \
@@ -231,7 +231,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/main_interface.moc.cpp \
 	gui/qt/menus.moc.cpp \
 	gui/qt/dialogs_provider.moc.cpp \
-	gui/qt/extensions_manager.moc.cpp \
 	gui/qt/managers/addons_manager.moc.cpp \
 	gui/qt/managers/renderer_manager.moc.cpp \
 	gui/qt/recents.moc.cpp \
@@ -255,7 +254,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/openurl.moc.cpp \
 	gui/qt/dialogs/podcast_configuration.moc.cpp \
 	gui/qt/dialogs/firstrun.moc.cpp \
-	gui/qt/dialogs/extensions.moc.cpp \
+	gui/qt/dialogs/extensions/extensions_manager.moc.cpp \
+	gui/qt/dialogs/extensions/extensions.moc.cpp \
 	gui/qt/dialogs/fingerprintdialog.moc.cpp \
 	gui/qt/components/qml_main_context.moc.cpp \
 	gui/qt/components/aboutmodel.moc.cpp \

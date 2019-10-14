@@ -28,7 +28,7 @@
 #include "plugins.hpp"
 
 #include "util/searchlineedit.hpp"
-#include "extensions_manager.hpp"
+#include "dialogs/extensions/extensions_manager.hpp"
 #include "managers/addons_manager.hpp"
 #include "util/animators.hpp"
 #include "util/imagehelper.hpp"
