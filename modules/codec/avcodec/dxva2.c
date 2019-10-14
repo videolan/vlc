@@ -326,7 +326,10 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     static const directx_sys_t dx_sys = { DxGetInputList, DxSetupOutput };
     sys->selected_decoder = directx_va_Setup(va, &dx_sys, ctx, desc, fmt, 0, &fmt_out, &sys->hw.surface_count);
     if (sys->selected_decoder == NULL)
+    {
+        err = VLC_EGENERIC;
         goto error;
+    }
 
     err = va_pool_SetupDecoder(va, sys->va_pool, ctx, &fmt_out, sys->hw.surface_count);
     if (err != VLC_SUCCESS)
