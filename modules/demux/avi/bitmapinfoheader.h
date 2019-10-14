@@ -176,6 +176,10 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
         p_props->i_stride = p_bih->biWidth * (p_bih->biBitCount >> 3);
         /* RGB DIB are coded from bottom to top */
         if ( p_bih->biHeight < INT32_MAX ) p_props->b_flipped = true;
+        if ( p_bih->biHeight <= INT32_MAX )
+            p_props->b_flipped = true;
+        /* else
+         *     set below to positive value */
     }
     else /* Compressed codecs */
     {
