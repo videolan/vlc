@@ -316,6 +316,8 @@
 #define VLC_CODEC_Y210            VLC_FOURCC('Y','2','1','0')
 /* Packed YUV 4:4:4 V:U:Y:A */
 #define VLC_CODEC_VUYA            VLC_FOURCC('V','U','Y','A')
+/* 10-bit Packed YUV 4:4:4 V10:U10:Y10:A2 */
+#define VLC_CODEC_Y410            VLC_FOURCC('Y','4','1','0')
 
 
 /* RGB */
