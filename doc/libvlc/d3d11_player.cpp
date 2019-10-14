@@ -113,7 +113,7 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cf
 
     IDXGIResource1* sharedResource = NULL;
     ctx->texture->QueryInterface(__uuidof(IDXGIResource1), (LPVOID*) &sharedResource);
-    hr = sharedResource->CreateSharedHandle(NULL, DXGI_SHARED_RESOURCE_READ, NULL, &ctx->sharedHandled);
+    hr = sharedResource->CreateSharedHandle(NULL, DXGI_SHARED_RESOURCE_READ|DXGI_SHARED_RESOURCE_WRITE, NULL, &ctx->sharedHandled);
     sharedResource->Release();
 
     ID3D11Device1* d3d11VLC1;
