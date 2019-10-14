@@ -155,27 +155,27 @@ static void Swap_cb( void* opaque )
     ctx->swapchain->Present( 0, 0 );
 }
 
-static void EndRender(struct render_context *ctx)
-{
-    /* render into the swapchain */
-    static const FLOAT orangeRGBA[4] = {1.0f, 0.5f, 0.0f, 1.0f};
-
-    ctx->d3dctx->ClearRenderTargetView(ctx->swapchainRenderTarget, orangeRGBA);
-
-    ctx->d3dctx->DrawIndexed(ctx->quadIndexCount, 0, 0);
-}
-
 static bool StartRendering_cb( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *hdr10 )
 {
     struct render_context *ctx = static_cast<struct render_context *>( opaque );
     if ( enter )
     {
-        static const FLOAT blackRGBA[4] = {0.5f, 0.5f, 0.0f, 1.0f};
-        ctx->d3dctxVLC->ClearRenderTargetView( ctx->textureRenderTarget, blackRGBA);
-        return true;
+        // DEBUG: draw greenish background to show where libvlc doesn't draw in the texture
+        // Normally you should Clear with a black background
+        static const FLOAT greenRGBA[4] = {0.5f, 0.5f, 0.0f, 1.0f};
+        ctx->d3dctxVLC->ClearRenderTargetView( ctx->textureRenderTarget, greenRGBA);
+    }
+    else
+    {
+        static const FLOAT orangeRGBA[4] = {1.0f, 0.5f, 0.0f, 1.0f};
+        ctx->d3dctx->ClearRenderTargetView(ctx->swapchainRenderTarget, orangeRGBA);
+
+        // Render into the swapchain
+        // We start the drawing of the shared texture in our app as early as possible
+        // in hope it's done as soon as Swap_cb is called
+        ctx->d3dctx->DrawIndexed(ctx->quadIndexCount, 0, 0);
     }
 
-    EndRender( ctx );
     return true;
 }
 
