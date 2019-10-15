@@ -500,6 +500,13 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
      * should correspond to this number */
     avas_setPreferredNumberOfChannels(p_aout, fmt);
 
+    BOOL success = [p_sys->avInstance setPreferredSampleRate:fmt->i_rate error:nil];
+    if (!success)
+    {
+        /* Not critical, we can use any sample rates */
+        msg_Dbg(p_aout, "failed to set preferred sample rate");
+    }
+
     enum port_type port_type;
     int ret = avas_GetOptimalChannelLayout(p_aout, &port_type, &layout);
     if (ret != VLC_SUCCESS)
