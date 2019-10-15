@@ -1417,6 +1417,35 @@ static void End( input_thread_t * p_input )
     }
 }
 
+static size_t ControlGetReducedIndexLocked( input_thread_t *p_input,
+                                            input_control_t *c )
+{
+    input_thread_private_t *sys = input_priv(p_input);
+
+    if( sys->i_control == 0 )
+        return 0;
+
+    input_control_t *prev_control = &sys->control[sys->i_control - 1];
+    const int i_lt = prev_control->i_type;
+    const int i_ct = c->i_type;
+
+    if( i_lt == i_ct )
+    {
+        if ( i_ct == INPUT_CONTROL_SET_STATE ||
+             i_ct == INPUT_CONTROL_SET_RATE ||
+             i_ct == INPUT_CONTROL_SET_POSITION ||
+             i_ct == INPUT_CONTROL_SET_TIME ||
+             i_ct == INPUT_CONTROL_SET_PROGRAM ||
+             i_ct == INPUT_CONTROL_SET_TITLE ||
+             i_ct == INPUT_CONTROL_SET_SEEKPOINT )
+        {
+            return sys->i_control - 1;
+        }
+    }
+
+    return sys->i_control;
+}
+
 /*****************************************************************************
  * Control
  *****************************************************************************/
@@ -1426,7 +1455,15 @@ int input_ControlPush( input_thread_t *p_input,
     input_thread_private_t *sys = input_priv(p_input);
 
     vlc_mutex_lock( &sys->lock_control );
-    if( sys->is_stopped || sys->i_control >= INPUT_CONTROL_FIFO_SIZE )
+    input_control_t c = {
+        .i_type = i_type,
+    };
+    if( p_param )
+        c.param = *p_param;
+
+    size_t i_next_control_idx = ControlGetReducedIndexLocked( p_input, &c );
+
+    if( sys->is_stopped || i_next_control_idx >= INPUT_CONTROL_FIFO_SIZE )
     {
         if( sys->is_stopped )
             msg_Dbg( p_input, "input control stopped, trashing type=%d",
@@ -1439,56 +1476,14 @@ int input_ControlPush( input_thread_t *p_input,
         vlc_mutex_unlock( &sys->lock_control );
         return VLC_EGENERIC;
     }
-    else
-    {
-        input_control_t c;
-        c.i_type = i_type;
-        if( p_param )
-            c.param = *p_param;
-        else
-            memset( &c.param, 0, sizeof(c.param) );
 
-        sys->control[sys->i_control++] = c;
+    sys->control[i_next_control_idx] = c;
+    sys->i_control = i_next_control_idx + 1;
 
-        vlc_cond_signal( &sys->wait_control );
-        vlc_mutex_unlock( &sys->lock_control );
-        return VLC_SUCCESS;
-    }
+    vlc_cond_signal( &sys->wait_control );
+    vlc_mutex_unlock( &sys->lock_control );
+    return VLC_SUCCESS;
 }
-
-static size_t ControlGetReducedIndexLocked( input_thread_t *p_input )
-{
-    const int i_lt = input_priv(p_input)->control[0].i_type;
-    size_t i;
-    for( i = 1; i < input_priv(p_input)->i_control; i++ )
-    {
-        const int i_ct = input_priv(p_input)->control[i].i_type;
-
-        if( i_lt == i_ct &&
-            ( i_ct == INPUT_CONTROL_SET_STATE ||
-              i_ct == INPUT_CONTROL_SET_RATE ||
-              i_ct == INPUT_CONTROL_SET_POSITION ||
-              i_ct == INPUT_CONTROL_SET_TIME ||
-              i_ct == INPUT_CONTROL_SET_PROGRAM ||
-              i_ct == INPUT_CONTROL_SET_TITLE ||
-              i_ct == INPUT_CONTROL_SET_SEEKPOINT ) )
-        {
-            continue;
-        }
-        else
-        {
-            /* TODO but that's not that important
-                - merge SET_X with SET_X_CMD
-                - ignore SET_SEEKPOINT/SET_POSITION/SET_TIME before a SET_TITLE
-                - ignore SET_SEEKPOINT/SET_POSITION/SET_TIME before another among them
-                - ?
-                */
-            break;
-        }
-    }
-    return i - 1;
-}
-
 
 static inline int ControlPop( input_thread_t *p_input,
                               int *pi_type, input_control_param_t *p_param,
@@ -1520,21 +1515,12 @@ static inline int ControlPop( input_thread_t *p_input,
     }
 
     /* */
-    const size_t i_index = ControlGetReducedIndexLocked( p_input );
+    *pi_type = p_sys->control[0].i_type;
+    *p_param   = p_sys->control[0].param;
 
-    for( size_t i = 0; i < i_index; ++i )
-    {
-        /* Release Reduced controls */
-        ControlRelease( p_sys->control[i].i_type, &p_sys->control[i].param );
-    }
-
-    /* */
-    *pi_type = p_sys->control[i_index].i_type;
-    *p_param   = p_sys->control[i_index].param;
-
-    p_sys->i_control -= i_index + 1;
+    p_sys->i_control --;
     if( p_sys->i_control > 0 )
-        memmove( &p_sys->control[0], &p_sys->control[i_index+1],
+        memmove( &p_sys->control[0], &p_sys->control[1],
                  sizeof(*p_sys->control) * p_sys->i_control );
     vlc_mutex_unlock( &p_sys->lock_control );
 
