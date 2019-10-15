@@ -31,8 +31,8 @@
 #include <vlc_url.h>
 
 #include "util/qvlcframe.hpp"
-#include "ui_open.h"
-#include "components/open_panels.hpp"
+#include "dialogs/open/ui_open.h"
+#include "dialogs/open/open_panels.hpp"
 
 enum {
     OPEN_FILE_TAB,

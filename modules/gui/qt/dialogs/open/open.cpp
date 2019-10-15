@@ -24,7 +24,7 @@
 # include "config.h"
 #endif
 
-#include "dialogs/open.hpp"
+#include "dialogs/open/open.hpp"
 #include "dialogs_provider.hpp"
 #include "recents.hpp"
 #include "util/qt_dirs.hpp"
@@ -507,4 +507,3 @@ QStringList OpenDialog::SeparateEntries( const QString& entries )
 
     return entries_array;
 }
-

@@ -24,7 +24,7 @@
 # include "config.h"
 #endif
 
-#include "dialogs/openurl.hpp"
+#include "dialogs/open/openurl.hpp"
 #include "util/searchlineedit.hpp"
 #include "util/validators.hpp"
 

@@ -32,7 +32,7 @@
 
 #include "qt.hpp"
 
-#include "dialogs/open.hpp"
+#include "dialogs/open/open.hpp"
 #include <QObject>
 #include <QStringList>
 

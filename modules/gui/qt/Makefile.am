@@ -67,8 +67,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/gototime.cpp gui/qt/dialogs/gototime.hpp \
 	gui/qt/dialogs/toolbar.cpp gui/qt/dialogs/toolbar.hpp \
 	gui/qt/dialogs/toolbareditor.cpp gui/qt/dialogs/toolbareditor.hpp \
-	gui/qt/dialogs/open.cpp gui/qt/dialogs/open.hpp \
-	gui/qt/dialogs/openurl.cpp gui/qt/dialogs/openurl.hpp \
+	gui/qt/dialogs/open/open.cpp gui/qt/dialogs/open/open.hpp \
+	gui/qt/dialogs/open/openurl.cpp gui/qt/dialogs/open/openurl.hpp \
 	gui/qt/dialogs/vlm.cpp gui/qt/dialogs/vlm.hpp \
 	gui/qt/dialogs/firstrun.cpp gui/qt/dialogs/firstrun.hpp \
 	gui/qt/dialogs/podcast_configuration.cpp \
@@ -99,7 +99,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/preferences/complete_preferences.hpp \
 	gui/qt/dialogs/preferences/simple_preferences.cpp \
 	gui/qt/dialogs/preferences/simple_preferences.hpp \
-	gui/qt/components/open_panels.cpp gui/qt/components/open_panels.hpp \
+	gui/qt/dialogs/open/open_panels.cpp gui/qt/dialogs/open/open_panels.hpp \
 	gui/qt/components/interface_widgets.cpp \
 	gui/qt/components/interface_widgets.hpp \
 	gui/qt/components/controller.cpp gui/qt/components/controller.hpp \
@@ -249,8 +249,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/gototime.moc.cpp \
 	gui/qt/dialogs/toolbar.moc.cpp \
 	gui/qt/dialogs/toolbareditor.moc.cpp \
-	gui/qt/dialogs/open.moc.cpp \
-	gui/qt/dialogs/openurl.moc.cpp \
+	gui/qt/dialogs/open/open.moc.cpp \
+	gui/qt/dialogs/open/openurl.moc.cpp \
 	gui/qt/dialogs/podcast_configuration.moc.cpp \
 	gui/qt/dialogs/firstrun.moc.cpp \
 	gui/qt/dialogs/extensions/extensions_manager.moc.cpp \
@@ -267,7 +267,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/preferences/preferences_widgets.moc.cpp \
 	gui/qt/dialogs/preferences/complete_preferences.moc.cpp \
 	gui/qt/dialogs/preferences/simple_preferences.moc.cpp \
-	gui/qt/components/open_panels.moc.cpp \
+	gui/qt/dialogs/open/open_panels.moc.cpp \
 	gui/qt/components/interface_widgets.moc.cpp \
 	gui/qt/components/navigation_history.moc.cpp \
 	gui/qt/components/controller.moc.cpp \
@@ -334,11 +334,11 @@ endif
 nodist_libqt_plugin_la_SOURCES += \
 	gui/qt/ui/ui_equalizer.h \
 	gui/qt/ui/ui_video_effects.h \
-	gui/qt/ui/ui_open_file.h \
-	gui/qt/ui/ui_open_disk.h \
-	gui/qt/ui/ui_open_net.h \
-	gui/qt/ui/ui_open_capture.h \
-	gui/qt/ui/ui_open.h \
+	gui/qt/dialogs/open/ui_open_file.h \
+	gui/qt/dialogs/open/ui_open_disk.h \
+	gui/qt/dialogs/open/ui_open_net.h \
+	gui/qt/dialogs/open/ui_open_capture.h \
+	gui/qt/dialogs/open/ui_open.h \
 	gui/qt/ui/ui_vlm.h \
 	gui/qt/ui/ui_podcast_configuration.h \
 	gui/qt/dialogs/sout/ui_profiles.h \
@@ -374,11 +374,11 @@ endif
 libqt_plugin_la_UI = \
 	gui/qt/ui/equalizer.ui \
 	gui/qt/ui/video_effects.ui \
-	gui/qt/ui/open_file.ui \
-	gui/qt/ui/open_disk.ui \
-	gui/qt/ui/open_net.ui \
-	gui/qt/ui/open_capture.ui \
-	gui/qt/ui/open.ui \
+	gui/qt/dialogs/open/open_file.ui \
+	gui/qt/dialogs/open/open_disk.ui \
+	gui/qt/dialogs/open/open_net.ui \
+	gui/qt/dialogs/open/open_capture.ui \
+	gui/qt/dialogs/open/open.ui \
 	gui/qt/ui/podcast_configuration.ui \
 	gui/qt/dialogs/sout/profiles.ui \
 	gui/qt/dialogs/preferences/sprefs_audio.ui \

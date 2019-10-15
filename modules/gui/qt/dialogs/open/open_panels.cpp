@@ -30,8 +30,8 @@
 #endif
 
 #include "qt.hpp"
-#include "components/open_panels.hpp"
-#include "dialogs/open.hpp"
+#include "open_panels.hpp"
+#include "dialogs/open/open.hpp"
 #include "dialogs_provider.hpp" /* Open Subtitle file */
 #include "util/qt_dirs.hpp"
 #include "util/validators.hpp"
@@ -57,7 +57,7 @@
     I_DIR_OR_FOLDER( N_("Select a device or a VIDEO_TS directory"), \
                      N_("Select a device or a VIDEO_TS folder") )
 
-#include "../../eject.c"
+#include "../../../eject.c"
 
 /* Populate a combobox with the devices matching a pattern.
    Combobox will automatically do autocompletion on the edit zone */
@@ -1430,4 +1430,3 @@ void CaptureOpenPanel::advancedDialog()
     delete adv;
     module_config_free( p_config );
 }
-
