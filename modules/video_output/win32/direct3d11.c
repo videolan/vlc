@@ -960,6 +960,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
         switch (fmt->i_chroma)
         {
         case VLC_CODEC_D3D11_OPAQUE:
+        case VLC_CODEC_NVDEC_OPAQUE:
             bits_per_channel = 8;
             widthDenominator = heightDenominator = 2;
             break;
@@ -969,7 +970,12 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
             widthDenominator = heightDenominator = 1;
             break;
         case VLC_CODEC_D3D11_OPAQUE_10B:
+        case VLC_CODEC_NVDEC_OPAQUE_10B:
             bits_per_channel = 10;
+            widthDenominator = heightDenominator = 2;
+            break;
+        case VLC_CODEC_NVDEC_OPAQUE_16B:
+            bits_per_channel = 16;
             widthDenominator = heightDenominator = 2;
             break;
         default:
