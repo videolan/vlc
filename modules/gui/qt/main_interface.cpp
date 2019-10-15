@@ -59,7 +59,7 @@
 #include "network/networkdevicemodel.hpp"
 
 #include "components/navigation_history.hpp"
-#include "components/aboutmodel.hpp"
+#include "dialogs/help/aboutmodel.hpp"
 #include "components/dialogmodel.hpp"
 #include "player/playercontrolbarmodel.hpp"
 

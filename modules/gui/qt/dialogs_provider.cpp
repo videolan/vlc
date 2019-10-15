@@ -48,7 +48,7 @@
 #include "dialogs/convert.hpp"
 #include "dialogs/open.hpp"
 #include "dialogs/openurl.hpp"
-#include "dialogs/help.hpp"
+#include "dialogs/help/help.hpp"
 #include "dialogs/gototime.hpp"
 #include "dialogs/podcast_configuration.hpp"
 #include "dialogs/toolbar.hpp"

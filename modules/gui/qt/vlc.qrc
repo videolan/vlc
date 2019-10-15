@@ -277,7 +277,7 @@
         <file alias="PlayerMenuItem.qml">player/qml/PlayerMenuItem.qml</file>
     </qresource>
     <qresource prefix="/about">
-        <file alias="About.qml">qml/about/About.qml</file>
+        <file alias="About.qml">dialogs/help/qml/About.qml</file>
     </qresource>
     <qresource prefix="/dialogs">
         <file alias="Dialogs.qml">qml/dialogs/Dialogs.qml</file>

@@ -63,7 +63,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/plugins/addons_manager.cpp gui/qt/dialogs/plugins/addons_manager.hpp \
 	gui/qt/dialogs/sout.cpp gui/qt/dialogs/sout.hpp \
 	gui/qt/dialogs/convert.cpp gui/qt/dialogs/convert.hpp \
-	gui/qt/dialogs/help.cpp gui/qt/dialogs/help.hpp \
+	gui/qt/dialogs/help/help.cpp gui/qt/dialogs/help/help.hpp \
 	gui/qt/dialogs/gototime.cpp gui/qt/dialogs/gototime.hpp \
 	gui/qt/dialogs/toolbar.cpp gui/qt/dialogs/toolbar.hpp \
 	gui/qt/dialogs/toolbareditor.cpp gui/qt/dialogs/toolbareditor.hpp \
@@ -81,8 +81,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/fingerprint/chromaprint.hpp \
 	gui/qt/components/qml_main_context.cpp \
 	gui/qt/components/qml_main_context.hpp \
-	gui/qt/components/aboutmodel.cpp \
-	gui/qt/components/aboutmodel.hpp \
+	gui/qt/dialogs/help/aboutmodel.cpp \
+	gui/qt/dialogs/help/aboutmodel.hpp \
 	gui/qt/components/dialogmodel.cpp \
 	gui/qt/components/dialogmodel.hpp \
 	gui/qt/components/extended_panels.cpp \
@@ -245,7 +245,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/plugins/plugins.moc.cpp \
 	gui/qt/dialogs/sout.moc.cpp \
 	gui/qt/dialogs/convert.moc.cpp \
-	gui/qt/dialogs/help.moc.cpp \
+	gui/qt/dialogs/help/help.moc.cpp \
 	gui/qt/dialogs/gototime.moc.cpp \
 	gui/qt/dialogs/toolbar.moc.cpp \
 	gui/qt/dialogs/toolbareditor.moc.cpp \
@@ -258,7 +258,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.moc.cpp \
 	gui/qt/dialogs/fingerprint/chromaprint.moc.cpp \
 	gui/qt/components/qml_main_context.moc.cpp \
-	gui/qt/components/aboutmodel.moc.cpp \
+	gui/qt/dialogs/help/aboutmodel.moc.cpp \
 	gui/qt/components/dialogmodel.moc.cpp \
 	gui/qt/components/extended_panels.moc.cpp \
 	gui/qt/components/info_panels.moc.cpp \
@@ -349,8 +349,8 @@ nodist_libqt_plugin_la_SOURCES += \
 	gui/qt/dialogs/preferences/ui_sprefs_video.h \
 	gui/qt/ui/ui_streampanel.h \
 	gui/qt/ui/ui_messages_panel.h \
-	gui/qt/ui/ui_about.h \
-	gui/qt/ui/ui_update.h \
+	gui/qt/dialogs/help/ui_about.h \
+	gui/qt/dialogs/help/ui_update.h \
 	gui/qt/dialogs/fingerprint/ui_fingerprintdialog.h \
 	gui/qt/ui/ui_sout.h
 
@@ -388,8 +388,8 @@ libqt_plugin_la_UI = \
 	gui/qt/dialogs/preferences/sprefs_video.ui \
 	gui/qt/ui/streampanel.ui \
 	gui/qt/ui/messages_panel.ui \
-	gui/qt/ui/about.ui \
-	gui/qt/ui/update.ui \
+	gui/qt/dialogs/help/about.ui \
+	gui/qt/dialogs/help/update.ui \
 	gui/qt/ui/sout.ui \
 	gui/qt/ui/vlm.ui \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.ui
@@ -564,7 +564,7 @@ libqt_plugin_la_RES = \
 libqt_plugin_la_QML = \
 	gui/qt/qml/MainInterface.qml \
 	gui/qt/qml/BannerSources.qml \
-	gui/qt/qml/about/About.qml \
+	gui/qt/dialogs/help/qml/About.qml \
 	gui/qt/player/qml/Player.qml \
 	gui/qt/player/qml/TrackInfo.qml \
 	gui/qt/player/qml/ControlBar.qml \

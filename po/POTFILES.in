@@ -729,8 +729,8 @@ modules/gui/qt/dialogs/firstrun.cpp
 modules/gui/qt/dialogs/firstrun.hpp
 modules/gui/qt/dialogs/gototime.cpp
 modules/gui/qt/dialogs/gototime.hpp
-modules/gui/qt/dialogs/help.cpp
-modules/gui/qt/dialogs/help.hpp
+modules/gui/qt/dialogs/help/help.cpp
+modules/gui/qt/dialogs/help/help.hpp
 modules/gui/qt/dialogs/mediainfo.cpp
 modules/gui/qt/dialogs/mediainfo.hpp
 modules/gui/qt/dialogs/messages.cpp
@@ -1275,7 +1275,7 @@ share/lua/http/mobile_view.html
 # qt .ui files
 # uncomment (and prepend $builddir} if you want to generate a proper vlc.pot
 
-#modules/gui/qt/ui/ui_about.h
+#modules/gui/qt/dialogs/help/ui_about.h
 #modules/gui/qt/ui/ui_equalizer.h
 #modules/gui/qt/ui/ui_messages_panel.h
 #modules/gui/qt/ui/ui_open.h
@@ -1292,6 +1292,6 @@ share/lua/http/mobile_view.html
 #modules/gui/qt/dialogs/preferences/ui_sprefs_subtitles.h
 #modules/gui/qt/dialogs/preferences/ui_sprefs_video.h
 #modules/gui/qt/ui/ui_streampanel.h
-#modules/gui/qt/ui/ui_update.h
+#modules/gui/qt/dialogs/help/ui_update.h
 #modules/gui/qt/ui/ui_video_effects.h
 #modules/gui/qt/ui/ui_vlm.h
