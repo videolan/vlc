@@ -141,6 +141,12 @@ vlc_smb2_mainloop(stream_t *access, bool teardown)
     int timeout = -1;
     int (*poll_func)(struct pollfd *, unsigned, int) = vlc_poll_i11e;
 
+    /* vlc_smb2_mainloop() can be called to clean-up after an error, but this
+     * function can override the error_status (from async cbs). Therefore,
+     * store the original error_status in order to restore it at the end of
+     * this call (since we want to keep the first and original error status). */
+    int original_error_status = sys->error_status;
+
     if (teardown)
     {
         /* Don't use vlc_poll_i11e that will return immediately with the EINTR
@@ -187,7 +193,11 @@ vlc_smb2_mainloop(stream_t *access, bool teardown)
              && smb2_service(sys->smb2, p_fds[0].revents) < 0)
             VLC_SMB2_SET_GENERIC_ERROR(access, "smb2_service");
     }
-    return sys->error_status == 0 ? 0 : -1;
+
+    int ret = sys->error_status == 0 ? 0 : -1;
+    if (original_error_status != 0)
+        sys->error_status = original_error_status;
+    return ret;
 }
 
 #define VLC_SMB2_GENERIC_CB() \
