@@ -385,6 +385,12 @@ AM_CONDITIONAL([HAVE_X86ASM], [test -n "${X86ASM}" && test -n "${X86ASMFLAGS}"])
 AM_COND_IF([HAVE_X86ASM], [
   AC_DEFINE([HAVE_X86ASM], [1], [Use external asm on x86.])
 ])
+
+dnl  Because DOLT is not able to handle --with-pic
+dnl  correctly, manually add -DPIC to the options for
+dnl  nasm / yasm here.
+AS_IF([test x$with_pic = xyes], [X86ASMDEFS="${X86ASMDEFS} -DPIC"])
+
 AC_SUBST([X86ASMFLAGS])
 AC_SUBST([X86ASMDEFS])
 
