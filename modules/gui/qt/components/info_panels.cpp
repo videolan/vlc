@@ -30,8 +30,8 @@
 #include "components/info_panels.hpp"
 #include "components/interface_widgets.hpp"
 #include "info_widgets.hpp"
-#include "dialogs/fingerprintdialog.hpp"
-#include "adapters/chromaprint.hpp"
+#include "dialogs/fingerprint/fingerprintdialog.hpp"
+#include "dialogs/fingerprint/chromaprint.hpp"
 
 #include <assert.h>
 #include <vlc_url.h>

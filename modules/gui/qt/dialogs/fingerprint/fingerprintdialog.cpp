@@ -18,10 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "fingerprintdialog.hpp"
-#include "ui_fingerprintdialog.h"
+#include "dialogs/fingerprint/fingerprintdialog.hpp"
+#include "dialogs/fingerprint/ui_fingerprintdialog.h"
 
-#include "adapters/chromaprint.hpp"
+#include "dialogs/fingerprint/chromaprint.hpp"
 #include <vlc_url.h>
 
 #include <QLabel>

@@ -51,7 +51,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs_provider.cpp gui/qt/dialogs_provider.hpp \
 	gui/qt/managers/renderer_manager.cpp gui/qt/managers/renderer_manager.hpp \
 	gui/qt/recents.cpp gui/qt/recents.hpp \
-	gui/qt/adapters/chromaprint.cpp gui/qt/adapters/chromaprint.hpp \
 	gui/qt/adapters/var_common_p.hpp \
 	gui/qt/adapters/variables.cpp gui/qt/adapters/variables.hpp \
 	gui/qt/adapters/var_choice_model.cpp  gui/qt/adapters/var_choice_model.hpp \
@@ -76,8 +75,10 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/podcast_configuration.hpp \
 	gui/qt/dialogs/extensions/extensions.cpp gui/qt/dialogs/extensions/extensions.hpp \
 	gui/qt/dialogs/extensions/extensions_manager.cpp gui/qt/dialogs/extensions/extensions_manager.hpp \
-	gui/qt/dialogs/fingerprintdialog.cpp \
-	gui/qt/dialogs/fingerprintdialog.hpp \
+	gui/qt/dialogs/fingerprint/fingerprintdialog.cpp \
+	gui/qt/dialogs/fingerprint/fingerprintdialog.hpp \
+	gui/qt/dialogs/fingerprint/chromaprint.cpp \
+	gui/qt/dialogs/fingerprint/chromaprint.hpp \
 	gui/qt/components/qml_main_context.cpp \
 	gui/qt/components/qml_main_context.hpp \
 	gui/qt/components/aboutmodel.cpp \
@@ -233,7 +234,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs_provider.moc.cpp \
 	gui/qt/managers/renderer_manager.moc.cpp \
 	gui/qt/recents.moc.cpp \
-	gui/qt/adapters/chromaprint.moc.cpp \
 	gui/qt/adapters/variables.moc.cpp \
 	gui/qt/adapters/var_choice_model.moc.cpp \
 	gui/qt/dialogs/bookmarks.moc.cpp \
@@ -255,7 +255,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/firstrun.moc.cpp \
 	gui/qt/dialogs/extensions/extensions_manager.moc.cpp \
 	gui/qt/dialogs/extensions/extensions.moc.cpp \
-	gui/qt/dialogs/fingerprintdialog.moc.cpp \
+	gui/qt/dialogs/fingerprint/fingerprintdialog.moc.cpp \
+	gui/qt/dialogs/fingerprint/chromaprint.moc.cpp \
 	gui/qt/components/qml_main_context.moc.cpp \
 	gui/qt/components/aboutmodel.moc.cpp \
 	gui/qt/components/dialogmodel.moc.cpp \
@@ -350,7 +351,7 @@ nodist_libqt_plugin_la_SOURCES += \
 	gui/qt/ui/ui_messages_panel.h \
 	gui/qt/ui/ui_about.h \
 	gui/qt/ui/ui_update.h \
-	gui/qt/ui/ui_fingerprintdialog.h \
+	gui/qt/dialogs/fingerprint/ui_fingerprintdialog.h \
 	gui/qt/ui/ui_sout.h
 
 # User interface compilation
@@ -391,7 +392,7 @@ libqt_plugin_la_UI = \
 	gui/qt/ui/update.ui \
 	gui/qt/ui/sout.ui \
 	gui/qt/ui/vlm.ui \
-	gui/qt/ui/fingerprintdialog.ui
+	gui/qt/dialogs/fingerprint/fingerprintdialog.ui
 EXTRA_DIST += $(libqt_plugin_la_UI)
 
 ui_%.h: %.ui
