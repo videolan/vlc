@@ -49,7 +49,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/menus.cpp gui/qt/menus.hpp \
 	gui/qt/main_interface.cpp gui/qt/main_interface.hpp \
 	gui/qt/dialogs_provider.cpp gui/qt/dialogs_provider.hpp \
-	gui/qt/managers/addons_manager.cpp gui/qt/managers/addons_manager.hpp \
 	gui/qt/managers/renderer_manager.cpp gui/qt/managers/renderer_manager.hpp \
 	gui/qt/recents.cpp gui/qt/recents.hpp \
 	gui/qt/adapters/chromaprint.cpp gui/qt/adapters/chromaprint.hpp \
@@ -62,7 +61,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/extended.cpp gui/qt/dialogs/extended.hpp \
 	gui/qt/dialogs/messages.cpp gui/qt/dialogs/messages.hpp \
 	gui/qt/dialogs/errors.cpp gui/qt/dialogs/errors.hpp \
-	gui/qt/dialogs/plugins.cpp gui/qt/dialogs/plugins.hpp \
+	gui/qt/dialogs/plugins/plugins.cpp gui/qt/dialogs/plugins/plugins.hpp \
+	gui/qt/dialogs/plugins/addons_manager.cpp gui/qt/dialogs/plugins/addons_manager.hpp \
 	gui/qt/dialogs/sout.cpp gui/qt/dialogs/sout.hpp \
 	gui/qt/dialogs/convert.cpp gui/qt/dialogs/convert.hpp \
 	gui/qt/dialogs/help.cpp gui/qt/dialogs/help.hpp \
@@ -231,7 +231,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/main_interface.moc.cpp \
 	gui/qt/menus.moc.cpp \
 	gui/qt/dialogs_provider.moc.cpp \
-	gui/qt/managers/addons_manager.moc.cpp \
 	gui/qt/managers/renderer_manager.moc.cpp \
 	gui/qt/recents.moc.cpp \
 	gui/qt/adapters/chromaprint.moc.cpp \
@@ -243,7 +242,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/messages.moc.cpp \
 	gui/qt/dialogs/epg.moc.cpp \
 	gui/qt/dialogs/errors.moc.cpp \
-	gui/qt/dialogs/plugins.moc.cpp \
+	gui/qt/dialogs/plugins/addons_manager.moc.cpp \
+	gui/qt/dialogs/plugins/plugins.moc.cpp \
 	gui/qt/dialogs/sout.moc.cpp \
 	gui/qt/dialogs/convert.moc.cpp \
 	gui/qt/dialogs/help.moc.cpp \

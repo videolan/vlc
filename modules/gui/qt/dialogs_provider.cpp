@@ -53,7 +53,7 @@
 #include "dialogs/podcast_configuration.hpp"
 #include "dialogs/toolbar.hpp"
 #include "dialogs/toolbareditor.hpp"
-#include "dialogs/plugins.hpp"
+#include "dialogs/plugins/plugins.hpp"
 #include "dialogs/epg.hpp"
 #include "dialogs/errors.hpp"
 

@@ -739,8 +739,8 @@ modules/gui/qt/dialogs/open.cpp
 modules/gui/qt/dialogs/open.hpp
 modules/gui/qt/dialogs/openurl.cpp
 modules/gui/qt/dialogs/openurl.hpp
-modules/gui/qt/dialogs/plugins.cpp
-modules/gui/qt/dialogs/plugins.hpp
+modules/gui/qt/dialogs/plugins/plugins.cpp
+modules/gui/qt/dialogs/plugins/plugins.hpp
 modules/gui/qt/dialogs/podcast_configuration.cpp
 modules/gui/qt/dialogs/podcast_configuration.hpp
 modules/gui/qt/dialogs/preferences/preferences.cpp
@@ -759,8 +759,8 @@ modules/gui/qt/main_interface.cpp
 modules/gui/qt/main_interface.hpp
 modules/gui/qt/main_interface_win32.cpp
 modules/gui/qt/main_interface_win32.hpp
-modules/gui/qt/managers/addons_manager.cpp
-modules/gui/qt/managers/addons_manager.hpp
+modules/gui/qt/dialogs/plugins/addons_manager.cpp
+modules/gui/qt/dialogs/plugins/addons_manager.hpp
 modules/gui/qt/menus.cpp
 modules/gui/qt/menus.hpp
 modules/gui/qt/qt.cpp

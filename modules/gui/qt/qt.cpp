@@ -55,7 +55,7 @@ extern "C" char **environ;
 # include "main_interface.hpp"   /* MainInterface creation */
 #endif
 #include "dialogs/extensions/extensions_manager.hpp" /* Extensions manager */
-#include "managers/addons_manager.hpp" /* Addons manager */
+#include "dialogs/plugins/addons_manager.hpp" /* Addons manager */
 #include "dialogs/help.hpp"     /* Launch Update */
 #include "recents.hpp"          /* Recents Item destruction */
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
