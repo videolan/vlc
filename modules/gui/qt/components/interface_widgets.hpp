@@ -35,7 +35,7 @@
 #include "components/controller.hpp"
 #include "components/controller_widget.hpp"
 #include "dialogs_provider.hpp"
-#include "components/info_panels.hpp"
+#include "dialogs/mediainfo/info_panels.hpp"
 
 #include <QWidget>
 #include <QFrame>

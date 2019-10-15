@@ -694,10 +694,10 @@ modules/gui/qt/dialogs/epg/EPGWidget.cpp
 modules/gui/qt/dialogs/epg/EPGWidget.hpp
 modules/gui/qt/components/extended_panels.cpp
 modules/gui/qt/components/extended_panels.hpp
-modules/gui/qt/components/info_panels.cpp
-modules/gui/qt/components/info_panels.hpp
-modules/gui/qt/components/info_widgets.cpp
-modules/gui/qt/components/info_widgets.hpp
+modules/gui/qt/dialogs/mediainfo/info_panels.cpp
+modules/gui/qt/dialogs/mediainfo/info_panels.hpp
+modules/gui/qt/dialogs/mediainfo/info_widgets.cpp
+modules/gui/qt/dialogs/mediainfo/info_widgets.hpp
 modules/gui/qt/components/interface_widgets.cpp
 modules/gui/qt/components/interface_widgets.hpp
 modules/gui/qt/components/open_panels.cpp
@@ -731,8 +731,8 @@ modules/gui/qt/dialogs/gototime.cpp
 modules/gui/qt/dialogs/gototime.hpp
 modules/gui/qt/dialogs/help/help.cpp
 modules/gui/qt/dialogs/help/help.hpp
-modules/gui/qt/dialogs/mediainfo.cpp
-modules/gui/qt/dialogs/mediainfo.hpp
+modules/gui/qt/dialogs/mediainfo/mediainfo.cpp
+modules/gui/qt/dialogs/mediainfo/mediainfo.hpp
 modules/gui/qt/dialogs/messages.cpp
 modules/gui/qt/dialogs/messages.hpp
 modules/gui/qt/dialogs/open.cpp

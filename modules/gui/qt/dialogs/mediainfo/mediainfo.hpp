@@ -25,7 +25,7 @@
 #define QVLC_MEDIAINFO_DIALOG_H_ 1
 
 #include "util/qvlcframe.hpp"
-#include "components/info_panels.hpp"
+#include "info_panels.hpp"
 #include "util/singleton.hpp"
 
 class QTabWidget;

@@ -40,7 +40,7 @@
 /* The dialogs */
 #include "dialogs/bookmarks.hpp"
 #include "dialogs/preferences/preferences.hpp"
-#include "dialogs/mediainfo.hpp"
+#include "dialogs/mediainfo/mediainfo.hpp"
 #include "dialogs/messages.hpp"
 #include "dialogs/extended.hpp"
 #include "dialogs/vlm.hpp"

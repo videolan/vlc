@@ -55,7 +55,9 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/adapters/variables.cpp gui/qt/adapters/variables.hpp \
 	gui/qt/adapters/var_choice_model.cpp  gui/qt/adapters/var_choice_model.hpp \
 	gui/qt/dialogs/bookmarks.cpp gui/qt/dialogs/bookmarks.hpp \
-	gui/qt/dialogs/mediainfo.cpp gui/qt/dialogs/mediainfo.hpp \
+	gui/qt/dialogs/mediainfo/mediainfo.cpp gui/qt/dialogs/mediainfo/mediainfo.hpp \
+	gui/qt/dialogs/mediainfo/info_panels.cpp gui/qt/dialogs/mediainfo/info_panels.hpp \
+	gui/qt/dialogs/mediainfo/info_widgets.cpp gui/qt/dialogs/mediainfo/info_widgets.hpp \
 	gui/qt/dialogs/extended.cpp gui/qt/dialogs/extended.hpp \
 	gui/qt/dialogs/messages.cpp gui/qt/dialogs/messages.hpp \
 	gui/qt/dialogs/errors.cpp gui/qt/dialogs/errors.hpp \
@@ -85,8 +87,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/dialogmodel.hpp \
 	gui/qt/components/extended_panels.cpp \
 	gui/qt/components/extended_panels.hpp \
-	gui/qt/components/info_panels.cpp gui/qt/components/info_panels.hpp \
-	gui/qt/components/info_widgets.cpp gui/qt/components/info_widgets.hpp \
 	gui/qt/components/navigation_history.cpp gui/qt/components/navigation_history.hpp \
 	gui/qt/player/player_controller.cpp gui/qt/player/player_controller.hpp gui/qt/player/player_controller_p.hpp \
 	gui/qt/player/playercontrolbarmodel.cpp gui/qt/player/playercontrolbarmodel.hpp \
@@ -237,7 +237,9 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/adapters/variables.moc.cpp \
 	gui/qt/adapters/var_choice_model.moc.cpp \
 	gui/qt/dialogs/bookmarks.moc.cpp \
-	gui/qt/dialogs/mediainfo.moc.cpp \
+	gui/qt/dialogs/mediainfo/mediainfo.moc.cpp \
+	gui/qt/dialogs/mediainfo/info_panels.moc.cpp \
+	gui/qt/dialogs/mediainfo/info_widgets.moc.cpp \
 	gui/qt/dialogs/extended.moc.cpp \
 	gui/qt/dialogs/messages.moc.cpp \
 	gui/qt/dialogs/errors.moc.cpp \
@@ -259,8 +261,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/help/aboutmodel.moc.cpp \
 	gui/qt/components/dialogmodel.moc.cpp \
 	gui/qt/components/extended_panels.moc.cpp \
-	gui/qt/components/info_panels.moc.cpp \
-	gui/qt/components/info_widgets.moc.cpp \
 	gui/qt/player/player_controller.moc.cpp \
 	gui/qt/player/playercontrolbarmodel.moc.cpp \
 	gui/qt/dialogs/preferences/preferences.moc.cpp \
