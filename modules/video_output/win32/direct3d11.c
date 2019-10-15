@@ -1192,6 +1192,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     {
         /* we need a staging texture */
         ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
+        if (!is_d3d11_opaque(fmt->i_chroma))
+            sys->area.texture_source.i_chroma = sys->picQuad.textureFormat->fourcc;
 
         if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &sys->area.texture_source, 1, textures, sys->stagingPlanes))
         {
