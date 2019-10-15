@@ -57,7 +57,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/adapters/var_choice_model.cpp  gui/qt/adapters/var_choice_model.hpp \
 	gui/qt/dialogs/bookmarks.cpp gui/qt/dialogs/bookmarks.hpp \
 	gui/qt/dialogs/mediainfo.cpp gui/qt/dialogs/mediainfo.hpp \
-	gui/qt/dialogs/epg.cpp gui/qt/dialogs/epg.hpp \
 	gui/qt/dialogs/extended.cpp gui/qt/dialogs/extended.hpp \
 	gui/qt/dialogs/messages.cpp gui/qt/dialogs/messages.hpp \
 	gui/qt/dialogs/errors.cpp gui/qt/dialogs/errors.hpp \
@@ -121,16 +120,17 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/voutwindow/qvoutwindowdummy.hpp \
 	gui/qt/components/custom_menus.cpp \
 	gui/qt/components/custom_menus.hpp \
-	gui/qt/components/epg/EPGChannels.cpp \
-	gui/qt/components/epg/EPGChannels.hpp \
-	gui/qt/components/epg/EPGItem.cpp \
-	gui/qt/components/epg/EPGItem.hpp \
-	gui/qt/components/epg/EPGProgram.cpp \
-	gui/qt/components/epg/EPGProgram.hpp \
-	gui/qt/components/epg/EPGRuler.cpp gui/qt/components/epg/EPGRuler.hpp \
-	gui/qt/components/epg/EPGView.cpp gui/qt/components/epg/EPGView.hpp \
-	gui/qt/components/epg/EPGWidget.cpp \
-	gui/qt/components/epg/EPGWidget.hpp \
+	gui/qt/dialogs/epg/epg.cpp gui/qt/dialogs/epg/epg.hpp \
+	gui/qt/dialogs/epg/EPGChannels.cpp \
+	gui/qt/dialogs/epg/EPGChannels.hpp \
+	gui/qt/dialogs/epg/EPGItem.cpp \
+	gui/qt/dialogs/epg/EPGItem.hpp \
+	gui/qt/dialogs/epg/EPGProgram.cpp \
+	gui/qt/dialogs/epg/EPGProgram.hpp \
+	gui/qt/dialogs/epg/EPGRuler.cpp gui/qt/dialogs/epg/EPGRuler.hpp \
+	gui/qt/dialogs/epg/EPGView.cpp gui/qt/dialogs/epg/EPGView.hpp \
+	gui/qt/dialogs/epg/EPGWidget.cpp \
+	gui/qt/dialogs/epg/EPGWidget.hpp \
 	gui/qt/medialibrary/medialib.cpp \
 	gui/qt/medialibrary/medialib.hpp \
 	gui/qt/medialibrary/mlhelper.hpp \
@@ -240,7 +240,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/mediainfo.moc.cpp \
 	gui/qt/dialogs/extended.moc.cpp \
 	gui/qt/dialogs/messages.moc.cpp \
-	gui/qt/dialogs/epg.moc.cpp \
 	gui/qt/dialogs/errors.moc.cpp \
 	gui/qt/dialogs/plugins/addons_manager.moc.cpp \
 	gui/qt/dialogs/plugins/plugins.moc.cpp \
@@ -282,11 +281,12 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/voutwindow/videosurface.moc.cpp \
 	gui/qt/components/voutwindow/qvoutwindow.moc.cpp \
 	gui/qt/components/voutwindow/qvoutwindowdummy.moc.cpp \
-	gui/qt/components/epg/EPGChannels.moc.cpp \
-	gui/qt/components/epg/EPGProgram.moc.cpp \
-	gui/qt/components/epg/EPGRuler.moc.cpp \
-	gui/qt/components/epg/EPGView.moc.cpp \
-	gui/qt/components/epg/EPGWidget.moc.cpp \
+	gui/qt/dialogs/epg/epg.moc.cpp \
+	gui/qt/dialogs/epg/EPGChannels.moc.cpp \
+	gui/qt/dialogs/epg/EPGProgram.moc.cpp \
+	gui/qt/dialogs/epg/EPGRuler.moc.cpp \
+	gui/qt/dialogs/epg/EPGView.moc.cpp \
+	gui/qt/dialogs/epg/EPGWidget.moc.cpp \
 	gui/qt/medialibrary/medialib.moc.cpp \
 	gui/qt/medialibrary/mlqmltypes.moc.cpp \
 	gui/qt/medialibrary/mlbasemodel.moc.cpp \

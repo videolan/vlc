@@ -54,7 +54,7 @@
 #include "dialogs/toolbar.hpp"
 #include "dialogs/toolbareditor.hpp"
 #include "dialogs/plugins/plugins.hpp"
-#include "dialogs/epg.hpp"
+#include "dialogs/epg/epg.hpp"
 #include "dialogs/errors.hpp"
 
 #include <QEvent>

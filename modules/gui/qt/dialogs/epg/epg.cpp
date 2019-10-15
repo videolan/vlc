@@ -24,10 +24,10 @@
 # include "config.h"
 #endif
 
-#include "dialogs/epg.hpp"
+#include "epg.hpp"
 
-#include "components/epg/EPGWidget.hpp"
-#include "components/epg/EPGItem.hpp"
+#include "EPGWidget.hpp"
+#include "EPGItem.hpp"
 
 #include <QVBoxLayout>
 #include <QSplitter>
