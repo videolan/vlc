@@ -675,6 +675,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             uint8_t *buf = mappedResource.pData;
             for (int i = 0; i < picture->i_planes; i++)
             {
+                sys->stagingPlanes[i].i_pitch = mappedResource.RowPitch;
                 sys->stagingPlanes[i].p_pixels = buf;
 
                 plane_CopyPixels(&sys->stagingPlanes[i], &picture->p[i]);
