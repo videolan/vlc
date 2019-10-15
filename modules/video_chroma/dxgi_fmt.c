@@ -53,7 +53,7 @@ static const dxgi_format_t dxgi_formats[] = {
     { "P010",        DXGI_FORMAT_P010,                VLC_CODEC_P010     },
     { "P016",        DXGI_FORMAT_P016,                VLC_CODEC_P016     },
     { "Y210",        DXGI_FORMAT_Y210,                VLC_CODEC_Y210     },
-    { "Y410",        DXGI_FORMAT_Y410,                0                  },
+    { "Y410",        DXGI_FORMAT_Y410,                VLC_CODEC_Y410     },
     { "NV11",        DXGI_FORMAT_NV11,                0                  },
     { "RGB10A2",     DXGI_FORMAT_R10G10B10A2_UNORM,   VLC_CODEC_RGBA10   },
     { "RGB16",       DXGI_FORMAT_R16G16B16A16_UNORM,  VLC_CODEC_RGBA64   },
