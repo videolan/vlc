@@ -37,6 +37,7 @@
 #include <vlc_network.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <string.h>
 #ifdef HAVE_SYS_SOCKET_H
 # include <sys/socket.h>
@@ -269,32 +270,37 @@ static int get_address( stream_t *p_access )
     return VLC_SUCCESS;
 }
 
+/* Returns an errno code */
 static int smb_connect( stream_t *p_access, const char *psz_login,
                         const char *psz_password, const char *psz_domain)
 {
     access_sys_t *p_sys = p_access->p_sys;
+    int ret;
 
     smb_session_set_creds( p_sys->p_session, psz_domain,
                            psz_login, psz_password );
-    if( smb_session_login( p_sys->p_session ) == DSM_SUCCESS )
-    {
-        if( p_sys->psz_share )
-        {
-            /* Connect to the share */
-            if( smb_tree_connect( p_sys->p_session, p_sys->psz_share,
-                                  &p_sys->i_tid ) != DSM_SUCCESS )
-                return VLC_EGENERIC;
+    if( smb_session_login( p_sys->p_session ) != DSM_SUCCESS )
+        return EACCES;
 
-            /* Let's finally ask a handle to the file we wanna read ! */
-            return smb_fopen( p_sys->p_session, p_sys->i_tid, p_sys->psz_path,
-                              SMB_MOD_RO, &p_sys->i_fd )
-                              == DSM_SUCCESS ? VLC_SUCCESS : VLC_EGENERIC;
-        }
-        else
-            return VLC_SUCCESS;
-    }
-    else
-        return VLC_EGENERIC;
+    if( !p_sys->psz_share )
+        return 0;
+
+    /* Connect to the share */
+    ret = smb_tree_connect( p_sys->p_session, p_sys->psz_share, &p_sys->i_tid );
+    if( ret != DSM_SUCCESS )
+        goto error;
+
+    /* Let's finally ask a handle to the file we wanna read ! */
+    ret = smb_fopen( p_sys->p_session, p_sys->i_tid, p_sys->psz_path,
+                     SMB_MOD_RO, &p_sys->i_fd );
+    if( ret != DSM_SUCCESS )
+        goto error;
+
+    return 0;
+
+error:
+    return ret == DSM_ERROR_NT && smb_session_get_nt_status( p_sys->p_session )
+        == NT_STATUS_ACCESS_DENIED ? EACCES : ENOENT;
 }
 
 /* Performs login with existing credentials and ask the user for new ones on
@@ -329,8 +335,11 @@ static int login( stream_t *p_access )
     psz_domain = credential.psz_realm ? credential.psz_realm : p_sys->netbios_name;
 
     /* Try to authenticate on the remote machine */
-    if( smb_connect( p_access, psz_login, psz_password, psz_domain )
-                     != VLC_SUCCESS )
+    int connect_err = smb_connect( p_access, psz_login, psz_password, psz_domain );
+    if( connect_err == ENOENT )
+        goto error;
+
+    if( connect_err == EACCES )
     {
         if (var_Type(p_access, "smb-dialog-failed") != 0)
         {
@@ -338,7 +347,8 @@ static int login( stream_t *p_access )
              * credentials to the users. It is useless to request it again. */
             goto error;
         }
-        while( vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
+        while( connect_err == EACCES
+            && vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
                                    SMB_LOGIN_DIALOG_TITLE,
                                    SMB_LOGIN_DIALOG_TEXT, p_sys->netbios_name ) )
         {
@@ -347,21 +357,23 @@ static int login( stream_t *p_access )
             psz_password = credential.psz_password;
             psz_domain = credential.psz_realm ? credential.psz_realm
                                               : p_sys->netbios_name;
-            if( smb_connect( p_access, psz_login, psz_password, psz_domain )
-                             == VLC_SUCCESS )
-                goto success;
+            connect_err = smb_connect( p_access, psz_login, psz_password, psz_domain );
         }
 
-        msg_Err( p_access, "Unable to login" );
-        goto error;
+        if( connect_err != 0 )
+        {
+            msg_Err( p_access, "Unable to login" );
+            goto error;
+        }
     }
-    else if( smb_session_is_guest( p_sys->p_session ) == 1 )
+    assert( connect_err == 0 );
+
+    if( smb_session_is_guest( p_sys->p_session ) == 1 )
     {
         msg_Warn( p_access, "Login failure but you were logged in as a Guest");
         b_guest = true;
     }
 
-success:
     msg_Warn( p_access, "Creds: username = '%s', domain = '%s'",
              psz_login, psz_domain );
     if( !b_guest )
