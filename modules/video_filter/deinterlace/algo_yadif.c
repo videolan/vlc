@@ -112,7 +112,7 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
         void (*filter)(uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8_t *next,
                        int w, int prefs, int mrefs, int parity, int mode);
 
-#if defined(HAVE_X86ASM) && !defined (__ANDROID__)
+#if defined(HAVE_X86ASM)
         if( vlc_CPU_SSSE3() )
             filter = vlcpriv_yadif_filter_line_ssse3;
         else

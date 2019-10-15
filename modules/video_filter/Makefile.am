@@ -136,11 +136,8 @@ libdeinterlace_plugin_la_SOURCES = \
 	video_filter/deinterlace/algo_ivtc.c video_filter/deinterlace/algo_ivtc.h
 # inline ASM doesn't build with -O0
 libdeinterlace_plugin_la_CFLAGS = $(AM_CFLAGS) -O2
-# Disabled on Android due to text reloc issues
-if !HAVE_ANDROID
 if HAVE_X86ASM
 libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/yadif_x86.asm
-endif
 endif
 if HAVE_NEON
 libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_arm.S
