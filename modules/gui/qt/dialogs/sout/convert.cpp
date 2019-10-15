@@ -24,9 +24,9 @@
 # include "config.h"
 #endif
 
-#include "dialogs/sout.hpp"
-#include "dialogs/convert.hpp"
-#include "components/sout/sout_widgets.hpp"
+#include "dialogs/sout/sout.hpp"
+#include "dialogs/sout/convert.hpp"
+#include "dialogs/sout/sout_widgets.hpp"
 
 #include "util/qt_dirs.hpp"
 

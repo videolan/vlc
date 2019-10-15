@@ -61,8 +61,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/errors.cpp gui/qt/dialogs/errors.hpp \
 	gui/qt/dialogs/plugins/plugins.cpp gui/qt/dialogs/plugins/plugins.hpp \
 	gui/qt/dialogs/plugins/addons_manager.cpp gui/qt/dialogs/plugins/addons_manager.hpp \
-	gui/qt/dialogs/sout.cpp gui/qt/dialogs/sout.hpp \
-	gui/qt/dialogs/convert.cpp gui/qt/dialogs/convert.hpp \
 	gui/qt/dialogs/help/help.cpp gui/qt/dialogs/help/help.hpp \
 	gui/qt/dialogs/gototime.cpp gui/qt/dialogs/gototime.hpp \
 	gui/qt/dialogs/toolbar.cpp gui/qt/dialogs/toolbar.hpp \
@@ -179,11 +177,13 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/playlist/playlist_model.cpp \
 	gui/qt/playlist/playlist_model.hpp \
 	gui/qt/playlist/playlist_model_p.hpp \
-	gui/qt/components/sout/profile_selector.cpp \
-	gui/qt/components/sout/profile_selector.hpp \
-	gui/qt/components/sout/sout_widgets.cpp \
-	gui/qt/components/sout/sout_widgets.hpp \
-	gui/qt/components/sout/profiles.hpp \
+	gui/qt/dialogs/sout/convert.cpp gui/qt/dialogs/sout/convert.hpp \
+	gui/qt/dialogs/sout/sout.cpp gui/qt/dialogs/sout/sout.hpp \
+	gui/qt/dialogs/sout/profile_selector.cpp \
+	gui/qt/dialogs/sout/profile_selector.hpp \
+	gui/qt/dialogs/sout/sout_widgets.cpp \
+	gui/qt/dialogs/sout/sout_widgets.hpp \
+	gui/qt/dialogs/sout/profiles.hpp \
 	gui/qt/util/animators.cpp gui/qt/util/animators.hpp \
 	gui/qt/util/input_slider.cpp gui/qt/util/input_slider.hpp \
 	gui/qt/player/input_models.cpp gui/qt/player/input_models.hpp \
@@ -243,8 +243,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/errors.moc.cpp \
 	gui/qt/dialogs/plugins/addons_manager.moc.cpp \
 	gui/qt/dialogs/plugins/plugins.moc.cpp \
-	gui/qt/dialogs/sout.moc.cpp \
-	gui/qt/dialogs/convert.moc.cpp \
 	gui/qt/dialogs/help/help.moc.cpp \
 	gui/qt/dialogs/gototime.moc.cpp \
 	gui/qt/dialogs/toolbar.moc.cpp \
@@ -310,8 +308,10 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/playlist/playlist_item.moc.cpp \
 	gui/qt/playlist/playlist_model.moc.cpp \
 	gui/qt/playlist/playlist_controller.moc.cpp \
-	gui/qt/components/sout/profile_selector.moc.cpp \
-	gui/qt/components/sout/sout_widgets.moc.cpp \
+	gui/qt/dialogs/sout/convert.moc.cpp \
+	gui/qt/dialogs/sout/sout.moc.cpp \
+	gui/qt/dialogs/sout/profile_selector.moc.cpp \
+	gui/qt/dialogs/sout/sout_widgets.moc.cpp \
 	gui/qt/util/animators.moc.cpp \
 	gui/qt/util/input_slider.moc.cpp \
 	gui/qt/player/input_models.moc.cpp \
@@ -341,7 +341,7 @@ nodist_libqt_plugin_la_SOURCES += \
 	gui/qt/ui/ui_open.h \
 	gui/qt/ui/ui_vlm.h \
 	gui/qt/ui/ui_podcast_configuration.h \
-	gui/qt/ui/ui_profiles.h \
+	gui/qt/dialogs/sout/ui_profiles.h \
 	gui/qt/dialogs/preferences/ui_sprefs_audio.h \
 	gui/qt/dialogs/preferences/ui_sprefs_input.h \
 	gui/qt/dialogs/preferences/ui_sprefs_interface.h \
@@ -352,7 +352,7 @@ nodist_libqt_plugin_la_SOURCES += \
 	gui/qt/dialogs/help/ui_about.h \
 	gui/qt/dialogs/help/ui_update.h \
 	gui/qt/dialogs/fingerprint/ui_fingerprintdialog.h \
-	gui/qt/ui/ui_sout.h
+	gui/qt/dialogs/sout/ui_sout.h
 
 # User interface compilation
 
@@ -380,7 +380,7 @@ libqt_plugin_la_UI = \
 	gui/qt/ui/open_capture.ui \
 	gui/qt/ui/open.ui \
 	gui/qt/ui/podcast_configuration.ui \
-	gui/qt/ui/profiles.ui \
+	gui/qt/dialogs/sout/profiles.ui \
 	gui/qt/dialogs/preferences/sprefs_audio.ui \
 	gui/qt/dialogs/preferences/sprefs_input.ui \
 	gui/qt/dialogs/preferences/sprefs_interface.ui \
@@ -390,7 +390,7 @@ libqt_plugin_la_UI = \
 	gui/qt/ui/messages_panel.ui \
 	gui/qt/dialogs/help/about.ui \
 	gui/qt/dialogs/help/update.ui \
-	gui/qt/ui/sout.ui \
+	gui/qt/dialogs/sout/sout.ui \
 	gui/qt/ui/vlm.ui \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.ui
 EXTRA_DIST += $(libqt_plugin_la_UI)

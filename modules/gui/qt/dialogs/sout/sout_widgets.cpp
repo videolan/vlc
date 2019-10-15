@@ -23,8 +23,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "components/sout/sout_widgets.hpp"
-#include "dialogs/sout.hpp"
+#include "dialogs/sout/sout_widgets.hpp"
+#include "dialogs/sout/sout.hpp"
 #include "util/soutchain.hpp"
 #include "util/qt_dirs.hpp"
 #include <vlc_intf_strings.h>
@@ -584,4 +584,3 @@ QString ICEDestBox::getMRL( const QString& )
     m.end();
     return m.to_string();
 }
-

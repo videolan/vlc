@@ -194,13 +194,13 @@
   <customwidget>
    <class>VLCProfileSelector</class>
    <extends>QWidget</extends>
-   <header>components/sout/profile_selector.hpp</header>
+   <header>dialogs/sout/profile_selector.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SoutInputBox</class>
    <extends>QGroupBox</extends>
-   <header>components/sout/sout_widgets.hpp</header>
+   <header>dialogs/sout/sout_widgets.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -20,10 +20,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
-#include "components/sout/profile_selector.hpp"
-#include "components/sout/profiles.hpp"
-#include "dialogs/sout.hpp"
+#include "dialogs/sout/profile_selector.hpp"
+#include "dialogs/sout/profiles.hpp"
+#include "dialogs/sout/sout.hpp"
 #include "util/soutchain.hpp"
 
 #include <QHBoxLayout>

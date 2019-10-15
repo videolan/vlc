@@ -31,7 +31,7 @@
 
 #include "util/qvlcframe.hpp"
 #include "util/soutchain.hpp"
-#include "ui_profiles.h"
+#include "dialogs/sout/ui_profiles.h"
 
 class QComboBox;
 

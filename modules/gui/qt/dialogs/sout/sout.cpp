@@ -26,9 +26,9 @@
 # include "config.h"
 #endif
 
-#include "dialogs/sout.hpp"
+#include "dialogs/sout/sout.hpp"
 #include "util/qt_dirs.hpp"
-#include "components/sout/sout_widgets.hpp"
+#include "dialogs/sout/sout_widgets.hpp"
 
 #include <QString>
 #include <QFileDialog>
@@ -235,4 +235,3 @@ void SoutDialog::updateChain()
 
     ui.mrlEdit->setPlainText( chain );
 }
-

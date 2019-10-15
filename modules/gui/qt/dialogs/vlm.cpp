@@ -29,7 +29,7 @@
 #ifdef ENABLE_VLM
 #include "dialogs/vlm.hpp"
 #include "dialogs/open.hpp"
-#include "dialogs/sout.hpp"
+#include "dialogs/sout/sout.hpp"
 #include "util/qt_dirs.hpp"
 
 #include <QString>

@@ -21,7 +21,7 @@
 
 #include "util/qvlcframe.hpp"                                 /* QVLCDialog */
 #include "components/qml_main_context.hpp"
-#include "components/sout/profile_selector.hpp"
+#include "dialogs/sout/profile_selector.hpp"
 
 #include <QAbstractListModel>
 #include <QVector>
