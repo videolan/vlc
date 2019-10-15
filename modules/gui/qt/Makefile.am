@@ -58,7 +58,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/mediainfo/mediainfo.cpp gui/qt/dialogs/mediainfo/mediainfo.hpp \
 	gui/qt/dialogs/mediainfo/info_panels.cpp gui/qt/dialogs/mediainfo/info_panels.hpp \
 	gui/qt/dialogs/mediainfo/info_widgets.cpp gui/qt/dialogs/mediainfo/info_widgets.hpp \
-	gui/qt/dialogs/extended.cpp gui/qt/dialogs/extended.hpp \
+	gui/qt/dialogs/extended/extended.cpp gui/qt/dialogs/extended/extended.hpp \
 	gui/qt/dialogs/messages.cpp gui/qt/dialogs/messages.hpp \
 	gui/qt/dialogs/errors.cpp gui/qt/dialogs/errors.hpp \
 	gui/qt/dialogs/plugins/plugins.cpp gui/qt/dialogs/plugins/plugins.hpp \
@@ -85,8 +85,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/help/aboutmodel.hpp \
 	gui/qt/components/dialogmodel.cpp \
 	gui/qt/components/dialogmodel.hpp \
-	gui/qt/components/extended_panels.cpp \
-	gui/qt/components/extended_panels.hpp \
+	gui/qt/dialogs/extended/extended_panels.cpp \
+	gui/qt/dialogs/extended/extended_panels.hpp \
 	gui/qt/components/navigation_history.cpp gui/qt/components/navigation_history.hpp \
 	gui/qt/player/player_controller.cpp gui/qt/player/player_controller.hpp gui/qt/player/player_controller_p.hpp \
 	gui/qt/player/playercontrolbarmodel.cpp gui/qt/player/playercontrolbarmodel.hpp \
@@ -240,7 +240,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/mediainfo/mediainfo.moc.cpp \
 	gui/qt/dialogs/mediainfo/info_panels.moc.cpp \
 	gui/qt/dialogs/mediainfo/info_widgets.moc.cpp \
-	gui/qt/dialogs/extended.moc.cpp \
+	gui/qt/dialogs/extended/extended.moc.cpp \
 	gui/qt/dialogs/messages.moc.cpp \
 	gui/qt/dialogs/errors.moc.cpp \
 	gui/qt/dialogs/plugins/addons_manager.moc.cpp \
@@ -260,7 +260,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/qml_main_context.moc.cpp \
 	gui/qt/dialogs/help/aboutmodel.moc.cpp \
 	gui/qt/components/dialogmodel.moc.cpp \
-	gui/qt/components/extended_panels.moc.cpp \
+	gui/qt/dialogs/extended/extended_panels.moc.cpp \
 	gui/qt/player/player_controller.moc.cpp \
 	gui/qt/player/playercontrolbarmodel.moc.cpp \
 	gui/qt/dialogs/preferences/preferences.moc.cpp \
@@ -332,8 +332,8 @@ nodist_libqt_plugin_la_SOURCES += gui/qt/main_interface_win32.moc.cpp
 endif
 
 nodist_libqt_plugin_la_SOURCES += \
-	gui/qt/ui/ui_equalizer.h \
-	gui/qt/ui/ui_video_effects.h \
+	gui/qt/dialogs/extended/ui_equalizer.h \
+	gui/qt/dialogs/extended/ui_video_effects.h \
 	gui/qt/dialogs/open/ui_open_file.h \
 	gui/qt/dialogs/open/ui_open_disk.h \
 	gui/qt/dialogs/open/ui_open_net.h \
@@ -372,8 +372,8 @@ MOC_CPPFLAGS += -D_WIN32
 endif
 
 libqt_plugin_la_UI = \
-	gui/qt/ui/equalizer.ui \
-	gui/qt/ui/video_effects.ui \
+	gui/qt/dialogs/extended/equalizer.ui \
+	gui/qt/dialogs/extended/video_effects.ui \
 	gui/qt/dialogs/open/open_file.ui \
 	gui/qt/dialogs/open/open_disk.ui \
 	gui/qt/dialogs/open/open_net.ui \

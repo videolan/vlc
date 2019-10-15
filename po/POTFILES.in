@@ -692,8 +692,8 @@ modules/gui/qt/dialogs/epg/EPGView.cpp
 modules/gui/qt/dialogs/epg/EPGView.hpp
 modules/gui/qt/dialogs/epg/EPGWidget.cpp
 modules/gui/qt/dialogs/epg/EPGWidget.hpp
-modules/gui/qt/components/extended_panels.cpp
-modules/gui/qt/components/extended_panels.hpp
+modules/gui/qt/dialogs/extended/extended_panels.cpp
+modules/gui/qt/dialogs/extended/extended_panels.hpp
 modules/gui/qt/dialogs/mediainfo/info_panels.cpp
 modules/gui/qt/dialogs/mediainfo/info_panels.hpp
 modules/gui/qt/dialogs/mediainfo/info_widgets.cpp
@@ -719,8 +719,8 @@ modules/gui/qt/dialogs/epg/epg.cpp
 modules/gui/qt/dialogs/epg/epg.hpp
 modules/gui/qt/dialogs/errors.cpp
 modules/gui/qt/dialogs/errors.hpp
-modules/gui/qt/dialogs/extended.cpp
-modules/gui/qt/dialogs/extended.hpp
+modules/gui/qt/dialogs/extended/extended.cpp
+modules/gui/qt/dialogs/extended/extended.hpp
 modules/gui/qt/dialogs/extensions/extensions.cpp
 modules/gui/qt/dialogs/extensions/extensions.hpp
 modules/gui/qt/dialogs/fingerprint/fingerprintdialog.cpp
@@ -1276,7 +1276,7 @@ share/lua/http/mobile_view.html
 # uncomment (and prepend $builddir} if you want to generate a proper vlc.pot
 
 #modules/gui/qt/dialogs/help/ui_about.h
-#modules/gui/qt/ui/ui_equalizer.h
+#modules/gui/qt/dialogs/extended/ui_equalizer.h
 #modules/gui/qt/ui/ui_messages_panel.h
 #modules/gui/qt/dialogs/open/ui_open.h
 #modules/gui/qt/dialogs/open/ui_open_capture.h
@@ -1293,5 +1293,5 @@ share/lua/http/mobile_view.html
 #modules/gui/qt/dialogs/preferences/ui_sprefs_video.h
 #modules/gui/qt/ui/ui_streampanel.h
 #modules/gui/qt/dialogs/help/ui_update.h
-#modules/gui/qt/ui/ui_video_effects.h
+#modules/gui/qt/dialogs/extended/ui_video_effects.h
 #modules/gui/qt/ui/ui_vlm.h

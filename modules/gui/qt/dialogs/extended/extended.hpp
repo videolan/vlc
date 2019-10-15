@@ -25,7 +25,7 @@
 
 #include "util/qvlcframe.hpp"
 
-#include "components/extended_panels.hpp"
+#include "extended_panels.hpp"
 #include "util/singleton.hpp"
 #include "player/player_controller.hpp"
 
@@ -65,4 +65,3 @@ private slots:
 };
 
 #endif
-

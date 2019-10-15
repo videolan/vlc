@@ -44,7 +44,7 @@
 #include <QApplication>
 #include <QScreen>
 
-#include "components/extended_panels.hpp"
+#include "extended_panels.hpp"
 #include "dialogs/preferences/preferences.hpp"
 #include "qt.hpp"
 #include "player/player_controller.hpp"
@@ -52,7 +52,7 @@
 #include "util/customwidgets.hpp"
 #include "dialogs_provider.hpp"
 
-#include "../../audio_filter/equalizer_presets.h"
+#include "../../../../audio_filter/equalizer_presets.h"
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 #include <vlc_player.h>

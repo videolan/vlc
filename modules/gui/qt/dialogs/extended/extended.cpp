@@ -26,7 +26,7 @@
 
 #include <assert.h>
 
-#include "dialogs/extended.hpp"
+#include "extended.hpp"
 
 #include "main_interface.hpp" /* Needed for external MI size */
 #include "player/player_controller.hpp"

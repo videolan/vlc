@@ -43,7 +43,7 @@
 #include "playlist/playlist_controller.hpp"
 #include "recents.hpp"                            /* Recent Items */
 #include "dialogs/extensions/extensions_manager.hpp"                 /* Extensions menu */
-#include "components/extended_panels.hpp"
+#include "dialogs/extended/extended_panels.hpp"
 #include "adapters/var_choice_model.hpp"
 
 #include <QMenu>
