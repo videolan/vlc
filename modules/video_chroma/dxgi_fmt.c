@@ -43,7 +43,7 @@ static const dxgi_format_t dxgi_formats[] = {
     { "BGRX",        DXGI_FORMAT_B8G8R8X8_UNORM,      VLC_CODEC_RGB32    },
     { "BGRA",        DXGI_FORMAT_B8G8R8A8_UNORM,      VLC_CODEC_BGRA     },
     { "BGRA_SRGB",   DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, VLC_CODEC_BGRA     },
-    { "AYUV",        DXGI_FORMAT_AYUV,                VLC_CODEC_YUVA     },
+    { "AYUV",        DXGI_FORMAT_AYUV,                VLC_CODEC_VUYA     },
     { "YUY2",        DXGI_FORMAT_YUY2,                VLC_CODEC_YUYV     },
     { "AI44",        DXGI_FORMAT_AI44,                0                  },
     { "P8",          DXGI_FORMAT_P8,                  0                  },
