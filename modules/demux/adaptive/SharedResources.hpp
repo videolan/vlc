@@ -27,6 +27,7 @@ namespace adaptive
     namespace http
     {
         class AuthStorage;
+        class AbstractConnectionManager;
     }
 
     namespace encryption
@@ -44,10 +45,12 @@ namespace adaptive
             ~SharedResources();
             AuthStorage *getAuthStorage();
             Keyring     *getKeyring();
+            AbstractConnectionManager *getConnManager();
 
         private:
             AuthStorage *authStorage;
             Keyring *encryptionKeyring;
+            AbstractConnectionManager *connManager;
     };
 }
 
