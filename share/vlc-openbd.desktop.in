@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=VLC media player (Blu-ray)
+NoDisplay=true
+Exec=@bindir@/vlc --started-from-file bluray://%f
+Icon=vlc
+Terminal=false
+Type=Application
+MimeType=x-content/video-bluray

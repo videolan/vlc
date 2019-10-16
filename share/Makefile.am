@@ -5,7 +5,7 @@ EXTRA_DIST =
 desktopdir = $(datadir)/applications
 if !HAVE_WIN32
 if !HAVE_DARWIN
-desktop_DATA = vlc.desktop
+desktop_DATA = vlc.desktop vlc-openbd.desktop vlc-opendvd.desktop vlc-openvcd.desktop vlc-opencda.desktop
 appdatadir = $(datarootdir)/metainfo
 appdata_DATA = $(appdata_in_files:.xml.in=.xml)
 appdata_in_files = vlc.appdata.xml.in
@@ -13,9 +13,10 @@ endif
 endif
 
 EXTRA_DIST += vlc.desktop.in vlc.desktop.mimetypes
+EXTRA_DIST += vlc-openbd.desktop.in vlc-opendvd.desktop.in vlc-openvcd.desktop.in vlc-opencda.desktop.in
 CLEANFILES += $(desktop_DATA) $(appdata_DATA)
 
-vlc.desktop: vlc.desktop.in $(top_builddir)/config.status
+%.desktop: %.desktop.in $(top_builddir)/config.status
 	$(AM_V_GEN)mimetypes="$$(sed 's/\s*#.*$$//g' $(srcdir)/vlc.desktop.mimetypes | egrep -v '^$$' | tr "\n" ';')"; \
 	sed \
 		-e 's,\@bindir\@,$(bindir),g' \
