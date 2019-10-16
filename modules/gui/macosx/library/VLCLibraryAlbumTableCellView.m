@@ -63,7 +63,7 @@ const CGFloat LayoutSpacer;
     }
 
     size_t numberOfTracks = album.numberOfTracks;
-    return [VLCLibraryAlbumTableCellView defaultHeight] + numberOfTracks * VLCLibraryTracksRowHeight;
+    return [VLCLibraryAlbumTableCellView defaultHeight] + numberOfTracks * VLCLibraryTracksRowHeight + numberOfTracks * 0.5;
 }
 
 - (void)awakeFromNib
