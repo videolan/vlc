@@ -109,8 +109,13 @@ AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &para
     if(unlikely(!factory || !downloader))
         return NULL;
 
-    if(!localAllowed && params.isLocal())
-        return NULL;
+    if(params.isLocal())
+    {
+        if(!localAllowed)
+            return NULL;
+        /* Only access can read local files */
+        params.setUseAccess(true);
+    }
 
     vlc_mutex_lock(&lock);
     AbstractConnection *conn = reuseConnection(params);
