@@ -56,14 +56,6 @@ float kVLCDefaultThumbnailPosition = .15;
 
         NSNotificationCenter *defaultNotificationCenter = [NSNotificationCenter defaultCenter];
         [defaultNotificationCenter addObserver:self
-                                      selector:@selector(applicationWillEnterBackground:)
-                                          name:NSApplicationWillResignActiveNotification
-                                        object:nil];
-        [defaultNotificationCenter addObserver:self
-                                      selector:@selector(applicationWillBecomeActive:)
-                                          name:NSApplicationWillBecomeActiveNotification
-                                        object:nil];
-        [defaultNotificationCenter addObserver:self
                                       selector:@selector(applicationWillBecomeActive:)
                                           name:NSApplicationDidFinishLaunchingNotification
                                         object:nil];
@@ -79,20 +71,6 @@ float kVLCDefaultThumbnailPosition = .15;
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     _p_libraryInstance = NULL;
-}
-
-- (void)applicationWillEnterBackground:(NSNotification *)aNotification
-{
-    if (_p_libraryInstance) {
-        vlc_ml_resume_background(_p_libraryInstance);
-    }
-}
-
-- (void)applicationWillBecomeActive:(NSNotification *)aNotification
-{
-    if (_p_libraryInstance) {
-        vlc_ml_pause_background(_p_libraryInstance);
-    }
 }
 
 - (void)playbackStateChanged:(NSNotification *)aNotification
