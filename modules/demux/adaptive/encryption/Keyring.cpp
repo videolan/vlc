@@ -23,7 +23,6 @@
 #endif
 
 #include "Keyring.hpp"
-#include "../http/AuthStorage.hpp"
 #include "../tools/Retrieve.hpp"
 
 #include <vlc_block.h>
@@ -31,7 +30,6 @@
 #include <algorithm>
 
 using namespace adaptive::encryption;
-using namespace adaptive::http;
 
 Keyring::Keyring(vlc_object_t *obj_)
 {
@@ -44,7 +42,7 @@ Keyring::~Keyring()
     vlc_mutex_destroy(&lock);
 }
 
-KeyringKey Keyring::getKey(AuthStorage *auth, const std::string &uri)
+KeyringKey Keyring::getKey(SharedResources *resources, const std::string &uri)
 {
     KeyringKey key;
 
@@ -54,7 +52,7 @@ KeyringKey Keyring::getKey(AuthStorage *auth, const std::string &uri)
     {
         /* Pretty bad inside the lock */
         msg_Dbg(obj, "Retrieving AES key %s", uri.c_str());
-        block_t *p_block = Retrieve::HTTP(obj, auth, uri);
+        block_t *p_block = Retrieve::HTTP(resources, uri);
         if(p_block)
         {
             if(p_block->i_buffer == 16)
