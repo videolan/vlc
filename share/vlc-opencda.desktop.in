@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=VLC media player (Audio CD)
+NoDisplay=true
+Exec=@bindir@/vlc --started-from-file cdda://%f
+Icon=vlc
+Terminal=false
+Type=Application
+MimeType=x-content/audio-cdda
