@@ -313,7 +313,7 @@ const directx_va_mode_t *directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_
         surface_count += 16;
         break;
     case AV_CODEC_ID_VP9:
-        surface_count += 4;
+        surface_count += 8 + 1;
         break;
     default:
         surface_count += 2;
