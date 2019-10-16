@@ -30,11 +30,14 @@
 
 using namespace adaptive;
 
-SharedResources::SharedResources(vlc_object_t *obj)
+SharedResources::SharedResources(vlc_object_t *obj, bool local)
 {
     authStorage = new AuthStorage(obj);
     encryptionKeyring = new Keyring(obj);
-    connManager = new HTTPConnectionManager(obj, authStorage);
+    HTTPConnectionManager *m = new HTTPConnectionManager(obj, authStorage);
+    if(m && local)
+        m->setLocalConnectionsAllowed();
+    connManager = m;
 }
 
 SharedResources::~SharedResources()

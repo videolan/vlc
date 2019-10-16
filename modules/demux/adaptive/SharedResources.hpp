@@ -41,7 +41,7 @@ namespace adaptive
     class SharedResources
     {
         public:
-            SharedResources(vlc_object_t *);
+            SharedResources(vlc_object_t *, bool = false);
             ~SharedResources();
             AuthStorage *getAuthStorage();
             Keyring     *getKeyring();
