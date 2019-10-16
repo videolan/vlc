@@ -40,6 +40,7 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt)
         case AV_PIX_FMT_VAAPI_VLD:
             switch (swfmt)
             {
+                case AV_PIX_FMT_YUVJ420P:
                 case AV_PIX_FMT_YUV420P:
                     return VLC_CODEC_VAAPI_420;
                 case AV_PIX_FMT_YUV420P10LE:
