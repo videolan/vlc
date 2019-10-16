@@ -225,6 +225,17 @@ Item{
 
                 title: qsTr("Languages and Tracks")
 
+
+                Connections {
+                    target: player
+                    onInputChanged: {
+                        subtrackMenu.dismiss()
+                        audiotrackMenu.dismiss()
+                        videotrackMenu.dismiss()
+                        langMenu.dismiss()
+                    }
+                }
+
                 PlayerMenu {
                     id: subtrackMenu
                     onOpened: rootPlayer._menu = subtrackMenu
