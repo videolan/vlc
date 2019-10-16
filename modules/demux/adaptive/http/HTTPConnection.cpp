@@ -293,6 +293,11 @@ enum RequestStatus
        !locationparams.getUrl().empty())
     {
         msg_Info(p_object, "%d redirection to %s", replycode, locationparams.getUrl().c_str());
+        if(locationparams.isLocal() && !params.isLocal())
+        {
+            msg_Err(p_object, "redirection to local rejected");
+            return RequestStatus::GenericError;
+        }
         return RequestStatus::Redirection;
     }
     else if (replycode != 200 && replycode != 206)
