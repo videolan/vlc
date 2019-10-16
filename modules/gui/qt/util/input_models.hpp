@@ -44,6 +44,9 @@
 class TrackListModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
+
+
 public:
     TrackListModel(vlc_player_t* player, QObject* parent = nullptr);
 
@@ -62,6 +65,11 @@ public:
     void clear();
 
     QHash<int, QByteArray> roleNames() const override;
+
+    inline int getCount() const { return m_data.size(); }
+
+signals:
+    void countChanged();
 
 private:
     vlc_player_t* m_player;
@@ -95,6 +103,8 @@ private:
 class TitleListModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
+
 public:
 
     TitleListModel(vlc_player_t* player, QObject* parent = nullptr);
@@ -114,6 +124,11 @@ public:
     void resetTitles(vlc_player_title_list* newTitleList);
 
     QHash<int, QByteArray> roleNames() const override;
+
+    inline int getCount() const { return m_count; }
+
+signals:
+    void countChanged();
 
 private:
     vlc_player_t* m_player;
@@ -137,6 +152,8 @@ private:
 class ChapterListModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
+
 public:
     //user role
     enum ChapterListRoles {
@@ -160,6 +177,11 @@ public:
 
     void resetTitle(const vlc_player_title* newTitle);
 
+    inline int getCount() const { return (m_title == nullptr) ?  0 : m_title->chapter_count; }
+
+signals:
+    void countChanged();
+
 public slots:
     QString getNameAtPosition(float pos) const;
 
@@ -182,6 +204,8 @@ private:
 class ProgramListModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
+
 public:
     ProgramListModel(vlc_player_t* player, QObject* parent = nullptr);
 
@@ -200,6 +224,11 @@ public:
     void clear();
 
     QHash<int, QByteArray> roleNames() const override;
+
+    inline int getCount() const { return m_data.size(); }
+
+signals:
+    void countChanged();
 
 private:
     vlc_player_t* m_player;
