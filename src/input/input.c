@@ -1441,6 +1441,16 @@ static size_t ControlGetReducedIndexLocked( input_thread_t *p_input,
         {
             return sys->i_control - 1;
         }
+        else if ( i_ct == INPUT_CONTROL_JUMP_TIME )
+        {
+            c->param.time.i_val += prev_control->param.time.i_val;
+            return sys->i_control - 1;
+        }
+        else if ( i_ct == INPUT_CONTROL_JUMP_POSITION )
+        {
+            c->param.pos.f_val += prev_control->param.pos.f_val;
+            return sys->i_control - 1;
+        }
     }
 
     return sys->i_control;
