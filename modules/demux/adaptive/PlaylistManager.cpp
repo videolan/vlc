@@ -53,7 +53,6 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
                                   AbstractPlaylist *pl,
                                   AbstractStreamFactory *factory,
                                   AbstractAdaptationLogic::LogicType type ) :
-             conManager     ( NULL ),
              logicType      ( type ),
              logic          ( NULL ),
              playlist       ( pl ),
@@ -87,7 +86,6 @@ PlaylistManager::~PlaylistManager   ()
     delete streamFactory;
     unsetPeriod();
     delete playlist;
-    delete conManager;
     delete logic;
     delete resources;
     vlc_cond_destroy(&waitcond);
@@ -110,7 +108,7 @@ bool PlaylistManager::setupPeriod()
     if(!currentPeriod)
         return false;
 
-    if(!logic && !(logic = createLogic(logicType, conManager)))
+    if(!logic && !(logic = createLogic(logicType, resources->getConnManager())))
         return false;
 
     std::vector<BaseAdaptationSet*> sets = currentPeriod->getAdaptationSets();
@@ -125,7 +123,7 @@ bool PlaylistManager::setupPeriod()
                 continue;
 
             AbstractStream *st = streamFactory->create(p_demux, set->getStreamFormat(),
-                                                       tracker, conManager);
+                                                       tracker, resources->getConnManager());
             if(!st)
             {
                 delete tracker;
@@ -147,13 +145,6 @@ bool PlaylistManager::setupPeriod()
 
 bool PlaylistManager::init()
 {
-    if(!conManager &&
-       !(conManager =
-         new (std::nothrow) HTTPConnectionManager(VLC_OBJECT(p_demux->s),
-                                                  resources->getAuthStorage()))
-      )
-        return false;
-
     if(!setupPeriod())
         return false;
 
@@ -167,7 +158,7 @@ bool PlaylistManager::init()
 
 bool PlaylistManager::start()
 {
-    if(b_thread || !conManager)
+    if(b_thread)
         return false;
 
     b_thread = !vlc_clone(&thread, managerThread,

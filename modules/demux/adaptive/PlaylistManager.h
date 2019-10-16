@@ -92,7 +92,6 @@ namespace adaptive
                                                          AbstractConnectionManager *);
 
             SharedResources                     *resources;
-            AbstractConnectionManager           *conManager;
             AbstractAdaptationLogic::LogicType  logicType;
             AbstractAdaptationLogic             *logic;
             AbstractPlaylist                    *playlist;
