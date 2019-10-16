@@ -182,6 +182,9 @@ float kVLCDefaultThumbnailPosition = .15;
     if (!_p_libraryInstance) {
         return VLC_ENOOBJ;
     }
+    if (!fileURL) {
+        return VLC_EBADVAR;
+    }
     return vlc_ml_add_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
 
@@ -189,6 +192,9 @@ float kVLCDefaultThumbnailPosition = .15;
 {
     if (!_p_libraryInstance) {
         return VLC_ENOOBJ;
+    }
+    if (!fileURL) {
+        return VLC_EBADVAR;
     }
     return vlc_ml_ban_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
@@ -198,6 +204,9 @@ float kVLCDefaultThumbnailPosition = .15;
     if (!_p_libraryInstance) {
         return VLC_ENOOBJ;
     }
+    if (!fileURL) {
+        return VLC_EBADVAR;
+    }
     return vlc_ml_unban_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
 
@@ -205,6 +214,9 @@ float kVLCDefaultThumbnailPosition = .15;
 {
     if (!_p_libraryInstance) {
         return VLC_ENOOBJ;
+    }
+    if (!fileURL) {
+        return VLC_EBADVAR;
     }
     return vlc_ml_remove_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
