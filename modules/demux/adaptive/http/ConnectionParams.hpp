@@ -59,6 +59,7 @@ namespace adaptive
                 const std::string & getScheme() const;
                 const std::string & getHostname() const;
                 const std::string & getPath() const;
+                bool isLocal() const;
                 void setPath(const std::string &);
                 uint16_t getPort() const;
 
