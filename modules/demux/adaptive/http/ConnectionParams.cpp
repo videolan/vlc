@@ -83,6 +83,11 @@ uint16_t ConnectionParams::getPort() const
     return port;
 }
 
+bool ConnectionParams::isLocal() const
+{
+    return scheme != "http" && scheme != "https";
+}
+
 void ConnectionParams::parse()
 {
     vlc_url_t url_components;
