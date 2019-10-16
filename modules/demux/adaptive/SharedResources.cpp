@@ -23,6 +23,7 @@
 
 #include "SharedResources.hpp"
 #include "http/AuthStorage.hpp"
+#include "http/HTTPConnectionManager.h"
 #include "encryption/Keyring.hpp"
 
 #include <vlc_common.h>
@@ -33,10 +34,12 @@ SharedResources::SharedResources(vlc_object_t *obj)
 {
     authStorage = new AuthStorage(obj);
     encryptionKeyring = new Keyring(obj);
+    connManager = new HTTPConnectionManager(obj, authStorage);
 }
 
 SharedResources::~SharedResources()
 {
+    delete connManager;
     delete encryptionKeyring;
     delete authStorage;
 }
@@ -49,4 +52,9 @@ AuthStorage * SharedResources::getAuthStorage()
 Keyring * SharedResources::getKeyring()
 {
     return encryptionKeyring;
+}
+
+AbstractConnectionManager * SharedResources::getConnManager()
+{
+    return connManager;
 }
