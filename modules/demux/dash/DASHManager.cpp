@@ -103,8 +103,7 @@ bool DASHManager::updatePlaylist()
     {
         std::string url(p_demux->psz_url);
 
-        block_t *p_block = Retrieve::HTTP(VLC_OBJECT(p_demux),
-                                          resources->getAuthStorage(), url);
+        block_t *p_block = Retrieve::HTTP(resources, url);
         if(!p_block)
             return false;
 

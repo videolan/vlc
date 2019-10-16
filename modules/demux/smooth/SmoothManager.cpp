@@ -57,8 +57,7 @@ Manifest * SmoothManager::fetchManifest()
 {
     std::string playlisturl(p_demux->psz_url);
 
-    block_t *p_block = Retrieve::HTTP(VLC_OBJECT(p_demux),
-                                      resources->getAuthStorage(), playlisturl);
+    block_t *p_block = Retrieve::HTTP(resources, playlisturl);
     if(!p_block)
         return NULL;
 

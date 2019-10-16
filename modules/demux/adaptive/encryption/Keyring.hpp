@@ -29,10 +29,7 @@
 
 namespace adaptive
 {
-    namespace http
-    {
-        class AuthStorage;
-    }
+    class SharedResources;
 
     namespace encryption
     {
@@ -43,7 +40,7 @@ namespace adaptive
             public:
                 Keyring(vlc_object_t *);
                 ~Keyring();
-                KeyringKey getKey(http::AuthStorage *, const std::string &);
+                KeyringKey getKey(SharedResources *, const std::string &);
 
             private:
                 static const int MAX_KEYS = 50;

@@ -157,8 +157,7 @@ void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptation
 
 bool M3U8Parser::appendSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representation *rep)
 {
-    block_t *p_block = Retrieve::HTTP(p_obj, resources->getAuthStorage(),
-                                      rep->getPlaylistUrl().toString());
+    block_t *p_block = Retrieve::HTTP(resources, rep->getPlaylistUrl().toString());
     if(p_block)
     {
         stream_t *substream = vlc_stream_MemoryNew(p_obj, p_block->p_buffer, p_block->i_buffer, true);
@@ -412,8 +411,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                                 playlist->getUrlSegment(), sessionEncryption) &&
                !sessionEncryption.uri.empty())
             {
-                resources->getKeyring()->getKey(resources->getAuthStorage(),
-                                                sessionEncryption.uri);
+                resources->getKeyring()->getKey(resources, sessionEncryption.uri);
             }
         }
 

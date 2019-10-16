@@ -27,17 +27,17 @@
 #include "../http/HTTPConnectionManager.h"
 #include "../http/HTTPConnection.hpp"
 #include "../http/Chunk.h"
+#include "../SharedResources.hpp"
 
 using namespace adaptive;
 using namespace adaptive::http;
 
-block_t * Retrieve::HTTP(vlc_object_t *obj, AuthStorage *auth, const std::string &uri)
+block_t * Retrieve::HTTP(SharedResources *resources, const std::string &uri)
 {
-    HTTPConnectionManager connManager(obj, auth);
     HTTPChunk *datachunk;
     try
     {
-        datachunk = new HTTPChunk(uri, &connManager, ID(), true);
+        datachunk = new HTTPChunk(uri, resources->getConnManager(), ID(), true);
     } catch (...) {
         return NULL;
     }
