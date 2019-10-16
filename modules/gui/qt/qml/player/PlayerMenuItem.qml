@@ -124,6 +124,13 @@ T.MenuItem {
         event.accepted = false
     }
 
+    Keys.onReleased: {
+        if (KeyHelper.matchCancel(event)) {
+            event.accepted = true
+            parentMenu.dismiss()
+        }
+    }
+
     onTriggered: {
         if (parentMenu && subMenu) {
             parentMenu._emitMenuClose = false

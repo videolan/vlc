@@ -39,6 +39,9 @@ T.Menu {
     modal: true
     cascade: false
 
+    //don't CloseOnEscape, otherwise the event is processed before our key handlers
+    closePolicy: Popup.CloseOnPressOutside
+
     x:0
     y:0
     width: parent.width / 4
