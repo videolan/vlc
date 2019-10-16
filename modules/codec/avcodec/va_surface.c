@@ -38,6 +38,8 @@
 
 #include "avcodec.h"
 
+#define MAX_GET_RETRIES  ((VLC_TICK_FROM_SEC(1) + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP)
+
 struct vlc_va_surface_t {
     atomic_uintptr_t     refcount; // 1 ref for the surface existance, 1 per surface/clone in-flight
     picture_context_t    *pic_va_ctx;
@@ -137,7 +139,7 @@ static vlc_va_surface_t *GetSurface(va_pool_t *va_pool)
 
 vlc_va_surface_t *va_pool_Get(va_pool_t *va_pool)
 {
-    unsigned tries = (VLC_TICK_FROM_SEC(1) + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
+    unsigned tries = MAX_GET_RETRIES;
     vlc_va_surface_t *surface;
 
     if (va_pool->surface_count == 0)
