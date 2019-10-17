@@ -56,10 +56,6 @@ float kVLCDefaultThumbnailPosition = .15;
 
         NSNotificationCenter *defaultNotificationCenter = [NSNotificationCenter defaultCenter];
         [defaultNotificationCenter addObserver:self
-                                      selector:@selector(applicationWillBecomeActive:)
-                                          name:NSApplicationDidFinishLaunchingNotification
-                                        object:nil];
-        [defaultNotificationCenter addObserver:self
                                       selector:@selector(playbackStateChanged:)
                                           name:VLCPlayerStateChanged
                                         object:nil];
