@@ -40,6 +40,12 @@
 
 #define MAX_GET_RETRIES  ((VLC_TICK_FROM_SEC(1) + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP)
 
+struct vlc_va_surface_t {
+    unsigned             index;
+    atomic_uintptr_t     refcount; // 1 ref for the surface existance, 1 per surface/clone in-flight
+    va_pool_t            *va_pool;
+};
+
 struct va_pool_t
 {
     /* */
@@ -47,26 +53,18 @@ struct va_pool_t
     unsigned     surface_width;
     unsigned     surface_height;
 
-    vlc_va_surface_t *surface[MAX_SURFACE_COUNT];
+    vlc_va_surface_t surface[MAX_SURFACE_COUNT];
 
     struct va_pool_cfg callbacks;
-};
-
-struct vlc_va_surface_t {
-    unsigned             index;
-    atomic_uintptr_t     refcount; // 1 ref for the surface existance, 1 per surface/clone in-flight
-    va_pool_t            *va_pool;
 };
 
 static void ReleasePoolSurfaces(va_pool_t *va_pool)
 {
     for (unsigned i = 0; i < va_pool->surface_count; i++)
-        va_surface_Release(va_pool->surface[i]);
+        va_surface_Release(&va_pool->surface[i]);
     va_pool->callbacks.pf_destroy_surfaces(va_pool->callbacks.opaque);
     va_pool->surface_count = 0;
 }
-
-static int SetupSurfaces(va_pool_t *);
 
 /* */
 int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
@@ -102,29 +100,15 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
 
 done:
     if (err == VLC_SUCCESS)
-        err = SetupSurfaces(va_pool);
-
-    return err;
-}
-
-static int SetupSurfaces(va_pool_t *va_pool)
-{
-    int err = VLC_ENOMEM;
-
-    for (unsigned i = 0; i < va_pool->surface_count; i++) {
-        vlc_va_surface_t *p_surface = malloc(sizeof(*p_surface));
-        if (unlikely(p_surface==NULL))
-            goto done;
-        p_surface->index = i;
-        p_surface->va_pool = va_pool;
-        va_pool->surface[i] = p_surface;
-        atomic_init(&p_surface->refcount, 1);
-    }
-    err = VLC_SUCCESS;
-
-done:
-    if (err == VLC_SUCCESS)
+    {
+        for (unsigned i = 0; i < va_pool->surface_count; i++) {
+            vlc_va_surface_t *surface = &va_pool->surface[i];
+            atomic_init(&surface->refcount, 1);
+            surface->index = i;
+            surface->va_pool = va_pool;
+        }
         va_pool->callbacks.pf_setup_avcodec_ctx(va_pool->callbacks.opaque);
+    }
 
     return err;
 }
@@ -132,7 +116,7 @@ done:
 static vlc_va_surface_t *GetSurface(va_pool_t *va_pool)
 {
     for (unsigned i = 0; i < va_pool->surface_count; i++) {
-        vlc_va_surface_t *surface = va_pool->surface[i];
+        vlc_va_surface_t *surface = &va_pool->surface[i];
         uintptr_t expected = 1;
 
         if (atomic_compare_exchange_strong(&surface->refcount, &expected, 2))
@@ -174,7 +158,8 @@ void va_surface_Release(vlc_va_surface_t *surface)
 {
     if (atomic_fetch_sub(&surface->refcount, 1) != 1)
         return;
-    free(surface);
+
+    // TODO release more resources
 }
 
 unsigned va_surface_GetIndex(vlc_va_surface_t *surface)
