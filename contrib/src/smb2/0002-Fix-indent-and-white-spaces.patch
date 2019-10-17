@@ -1,0 +1,97 @@
+From 13800418c0c2a8c1b26bf1acb0810004fb874213 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Tue, 30 Jul 2019 17:46:49 +0200
+Subject: [PATCH 2/4] Fix indent and white spaces
+
+No functional changes.
+---
+ lib/init.c | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/lib/init.c b/lib/init.c
+index e6cf1e5..eab69a5 100644
+--- a/lib/init.c
++++ b/lib/init.c
+@@ -69,12 +69,12 @@ smb2_parse_args(struct smb2_context *smb2, const char *args)
+         while (args && *args != 0) {
+                 char *next, *value;
+ 
+-		next = strchr(args, '&');
++                next = strchr(args, '&');
+                 if (next) {
+                         *(next++) = '\0';
+                 }
+ 
+-		value = strchr(args, '=');
++                value = strchr(args, '=');
+                 if (value) {
+                         *(value++) = '\0';
+                 }
+@@ -135,7 +135,7 @@ struct smb2_url *smb2_parse_url(struct smb2_context *smb2, const char *url)
+                 smb2_set_error(smb2, "URL is too long");
+                 return NULL;
+         }
+-	strncpy(str, url + 6, MAX_URL_SIZE);
++        strncpy(str, url + 6, MAX_URL_SIZE);
+ 
+         args = strchr(str, '?');
+         if (args) {
+@@ -165,7 +165,7 @@ struct smb2_url *smb2_parse_url(struct smb2_context *smb2, const char *url)
+                 *(tmp++) = '\0';
+                 u->user = strdup(ptr);
+                 ptr = tmp;
+-	}
++        }
+         /* server */
+         if ((tmp = strchr(ptr, '/')) != NULL) {
+                 *(tmp++) = '\0';
+@@ -287,7 +287,7 @@ void smb2_destroy_context(struct smb2_context *smb2)
+ void smb2_free_iovector(struct smb2_context *smb2, struct smb2_io_vectors *v)
+ {
+         int i;
+-        
++
+         for (i = 0; i < v->niov; i++) {
+                 if (v->iov[i].free) {
+                         v->iov[i].free(v->iov[i].buf);
+@@ -316,25 +316,25 @@ struct smb2_iovec *smb2_add_iovector(struct smb2_context *smb2,
+ 
+ void smb2_set_error(struct smb2_context *smb2, const char *error_string, ...)
+ {
+-	va_list ap;
+-	char errstr[MAX_ERROR_SIZE] = {0};
++        va_list ap;
++        char errstr[MAX_ERROR_SIZE] = {0};
+ 
+-	va_start(ap, error_string);
+-	if (vsnprintf(errstr, MAX_ERROR_SIZE, error_string, ap) < 0) {
+-		strncpy(errstr, "could not format error string!",
++        va_start(ap, error_string);
++        if (vsnprintf(errstr, MAX_ERROR_SIZE, error_string, ap) < 0) {
++                strncpy(errstr, "could not format error string!",
+                         MAX_ERROR_SIZE);
+-	}
+-	va_end(ap);
+-	if (smb2 != NULL) {
+-		strncpy(smb2->error_string, errstr, MAX_ERROR_SIZE);
+-	}
++        }
++        va_end(ap);
++        if (smb2 != NULL) {
++                strncpy(smb2->error_string, errstr, MAX_ERROR_SIZE);
++        }
+ }
+ 
+ const char *smb2_get_error(struct smb2_context *smb2)
+ {
+-	return smb2 ? smb2->error_string : "";
++        return smb2 ? smb2->error_string : "";
+ }
+-        
++
+ const char *smb2_get_client_guid(struct smb2_context *smb2)
+ {
+         return smb2->client_guid;
+-- 
+2.20.1
+

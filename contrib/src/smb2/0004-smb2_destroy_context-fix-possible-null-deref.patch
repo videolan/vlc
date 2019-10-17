@@ -1,0 +1,48 @@
+From 6e2126a854292621548948a3d30e6023943d7c99 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Thu, 8 Aug 2019 15:18:31 +0200
+Subject: [PATCH 4/4] smb2_destroy_context: fix possible null-deref
+
+This could happen when the smb2_close_async() command was aborted
+(smb2_service() not being called).
+---
+ lib/init.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/lib/init.c b/lib/init.c
+index 4387cd0..03903fb 100644
+--- a/lib/init.c
++++ b/lib/init.c
+@@ -255,14 +255,6 @@ void smb2_destroy_context(struct smb2_context *smb2)
+                 smb2->fd = -1;
+         }
+ 
+-        if (smb2->fhs) {
+-                smb2_free_all_fhs(smb2);
+-        }
+-
+-        if (smb2->dirs) {
+-                smb2_free_all_dirs(smb2);
+-        }
+-
+         while (smb2->outqueue) {
+                 struct smb2_pdu *pdu = smb2->outqueue;
+ 
+@@ -283,6 +275,14 @@ void smb2_destroy_context(struct smb2_context *smb2)
+                 smb2->pdu = NULL;
+         }
+ 
++        if (smb2->fhs) {
++                smb2_free_all_fhs(smb2);
++        }
++
++        if (smb2->dirs) {
++                smb2_free_all_dirs(smb2);
++        }
++
+         free(smb2->session_key);
+         smb2->session_key = NULL;
+ 
+-- 
+2.20.1
+

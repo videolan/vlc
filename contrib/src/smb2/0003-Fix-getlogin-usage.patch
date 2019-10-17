@@ -1,0 +1,70 @@
+From 434a880dc7f304eafb2377e26d47d93187109b14 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Tue, 30 Jul 2019 18:02:14 +0200
+Subject: [PATCH 3/4] Fix getlogin() usage
+
+Use the reentrant version (the getlogin() string was statically allocated and
+could be overwritten on subsequent calls).
+
+Also check for error and use "Guest" as a fallback.
+---
+ lib/init.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/lib/init.c b/lib/init.c
+index eab69a5..4387cd0 100644
+--- a/lib/init.c
++++ b/lib/init.c
+@@ -52,17 +52,27 @@
+ #define MAX_URL_SIZE 256
+ 
+ #ifdef _MSC_VER
+-#define getlogin() "Guest"
++#include <errno.h>
++#define getlogin_r(a,b) ENXIO
+ #define random rand
+ #define getpid GetCurrentProcessId
+ #endif // _MSC_VER
+ 
+ #ifdef ESP_PLATFORM
++#include <errno.h>
+ #include <esp_system.h>
+ #define random esp_random
+-#define getlogin() "Guest"
++#define getlogin_r(a,b) ENXIO
+ #endif
+ 
++#ifdef __ANDROID__
++#include <errno.h>
++// getlogin_r() was added in API 28
++#if __ANDROID_API__ < 28
++#define getlogin_r(a,b) ENXIO
++#endif
++#endif // __ANDROID__
++
+ static int
+ smb2_parse_args(struct smb2_context *smb2, const char *args)
+ {
+@@ -206,7 +216,8 @@ void smb2_destroy_url(struct smb2_url *url)
+ struct smb2_context *smb2_init_context(void)
+ {
+         struct smb2_context *smb2;
+-        int i;
++        char buf[1024];
++        int i, ret;
+ 
+         smb2 = malloc(sizeof(struct smb2_context));
+         if (smb2 == NULL) {
+@@ -214,7 +225,8 @@ struct smb2_context *smb2_init_context(void)
+         }
+         memset(smb2, 0, sizeof(struct smb2_context));
+ 
+-        smb2_set_user(smb2, getlogin());
++        ret = getlogin_r(buf, sizeof(buf));
++        smb2_set_user(smb2, ret == 0 ? buf : "Guest");
+         smb2->fd = -1;
+         smb2->sec = SMB2_SEC_UNDEFINED;
+         smb2->version = SMB2_VERSION_ANY;
+-- 
+2.20.1
+
