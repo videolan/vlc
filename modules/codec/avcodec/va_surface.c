@@ -40,6 +40,18 @@
 
 #define MAX_GET_RETRIES  ((VLC_TICK_FROM_SEC(1) + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP)
 
+struct va_pool_t
+{
+    /* */
+    unsigned     surface_count;
+    unsigned     surface_width;
+    unsigned     surface_height;
+
+    vlc_va_surface_t *surface[MAX_SURFACE_COUNT];
+
+    const struct va_pool_cfg *callbacks;
+};
+
 struct vlc_va_surface_t {
     atomic_uintptr_t     refcount; // 1 ref for the surface existance, 1 per surface/clone in-flight
     picture_context_t    *pic_va_ctx;

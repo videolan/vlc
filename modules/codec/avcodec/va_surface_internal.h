@@ -32,20 +32,9 @@
 
 /* */
 typedef struct vlc_va_surface_t vlc_va_surface_t;
+typedef struct va_pool_t va_pool_t;
 
 #define MAX_SURFACE_COUNT (64)
-typedef struct
-{
-    /* */
-    unsigned     surface_count;
-    int          surface_width;
-    int          surface_height;
-
-    vlc_va_surface_t *surface[MAX_SURFACE_COUNT];
-
-    const struct va_pool_cfg *callbacks;
-
-} va_pool_t;
 
 struct va_pool_cfg {
     int (*pf_create_device)(vlc_va_t *);
