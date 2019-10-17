@@ -151,10 +151,9 @@ static int DxCreateVideoDecoder(vlc_va_t *, int codec_id,
                                 const video_format_t *, unsigned surface_count);
 static void DxDestroyVideoDecoder(vlc_va_sys_t *);
 
-static void SetupAVCodecContext(vlc_va_sys_t *sys, unsigned surfaces)
+static void SetupAVCodecContext(vlc_va_sys_t *sys)
 {
     sys->hw.cfg = &sys->cfg;
-    sys->hw.surface_count = surfaces;
     sys->hw.surface = sys->hw_surface;
     sys->hw.workaround = sys->selected_decoder->workaround;
 }

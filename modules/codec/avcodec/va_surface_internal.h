@@ -66,7 +66,7 @@ struct va_pool_cfg {
     /**
      * Set the avcodec hw context after the decoder is created
      */
-    void (*pf_setup_avcodec_ctx)(vlc_va_sys_t *, unsigned surfaces);
+    void (*pf_setup_avcodec_ctx)(vlc_va_sys_t *);
 
     /**
      * Create a new context for the surface being acquired
