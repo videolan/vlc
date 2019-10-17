@@ -193,7 +193,7 @@ va_pool_t * va_pool_Create(vlc_va_t *va, const struct va_pool_cfg *cbs)
     /* */
     if (cbs->pf_create_device(va)) {
         msg_Err(va, "Failed to create device");
-        return VLC_EGENERIC;
+        return NULL;
     }
     msg_Dbg(va, "CreateDevice succeed");
 
