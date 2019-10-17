@@ -5,12 +5,12 @@
 #USE_FFMPEG ?= 1
 
 ifndef USE_LIBAV
-FFMPEG_HASH=0e833f615b59cd7611374d1d77257eaf00635ad7
+FFMPEG_HASH=1e35519fe0b8bbad84641e83d49138152720b544
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
 USE_FFMPEG := 1
 else
-FFMPEG_HASH=35ed7f93dbc72d733e454ae464b1324f38af62a0
+FFMPEG_HASH=e5afa1b556542fd7a52a0a9b409c80f2e6e1e9bb
 FFMPEG_GITURL := git://git.libav.org/libav.git
 FFMPEG_LAVC_MIN := 57.16.0
 endif
@@ -244,9 +244,6 @@ ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
 	$(APPLY) $(SRC)/ffmpeg/dxva_vc1_crash.patch
 	$(APPLY) $(SRC)/ffmpeg/h264_early_SAR.patch
-	$(APPLY) $(SRC)/ffmpeg/ffmpeg-mkv-overshoot.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-hevcdec-set-the-SEI-parameters-early-on-the-.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-h264_slice-set-the-SEI-parameters-early-on-t.patch
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch
