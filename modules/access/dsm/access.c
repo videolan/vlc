@@ -58,7 +58,15 @@ int bdsm_SdOpen( vlc_object_t * );
 void bdsm_SdClose( vlc_object_t * );
 int bdsm_sd_probe_Open( vlc_object_t * );
 
-static int Open( vlc_object_t * );
+#define SMB_FORCE_V1_TEXT N_("Force the SMBv1 protocol (At your own risk)")
+#define SMB_FORCE_V1_LONGTEXT \
+    N_("Enable it, at your own risk, if you can't connect to Windows shares. " \
+    "If this option is needed, you should consider updating your Windows / " \
+    "Samba server and disabling the SMBv1 protocol as using this protocol " \
+    "has security implications.")
+
+static int OpenNotForced( vlc_object_t * );
+static int OpenForced( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 VLC_SD_PROBE_HELPER( "dsm", N_("Windows networks"), SD_CAT_LAN )
@@ -69,14 +77,21 @@ vlc_module_begin ()
     set_shortname( "dsm" )
     set_description( N_("libdsm SMB input") )
     set_help(BDSM_HELP)
-    set_capability( "access", 20 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_string( "smb-user", NULL, SMB_USER_TEXT, SMB_USER_LONGTEXT, false )
     add_password("smb-pwd", NULL, SMB_PASS_TEXT, SMB_PASS_LONGTEXT)
     add_string( "smb-domain", NULL, SMB_DOMAIN_TEXT, SMB_DOMAIN_LONGTEXT, false )
+    add_bool( "smb-force-v1", false, SMB_FORCE_V1_TEXT, SMB_FORCE_V1_LONGTEXT, false )
     add_shortcut( "smb", "cifs" )
-    set_callbacks( Open, Close )
+
+    set_capability( "access", 22 )
+    set_callbacks( OpenForced, Close )
+
+    add_submodule()
+        set_capability( "access", 20 )
+        set_callbacks( OpenNotForced, Close )
+        add_shortcut( "smb", "cifs" )
 
     add_submodule()
         add_shortcut( "dsm-sd" )
@@ -194,6 +209,23 @@ static int Open( vlc_object_t *p_this )
     error:
         Close( p_this );
         return VLC_EGENERIC;
+}
+
+static int OpenForced( vlc_object_t *p_this )
+{
+    if( !var_InheritBool( p_this , "smb-force-v1" ) )
+        return VLC_EGENERIC;
+
+    msg_Warn( p_this, "SMB 2/3 disabled by the user, using *unsafe* SMB 1" );
+    return Open( p_this );
+}
+
+static int OpenNotForced( vlc_object_t *p_this )
+{
+    if( var_InheritBool( p_this , "smb-force-v1" ) )
+        return VLC_EGENERIC; /* OpenForced should have breen probed first */
+
+    return Open( p_this );
 }
 
 /*****************************************************************************
