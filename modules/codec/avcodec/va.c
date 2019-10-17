@@ -53,8 +53,11 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt)
             {
                 case AV_PIX_FMT_YUV420P10LE:
                     return VLC_CODEC_D3D9_OPAQUE_10B;
-                default:
+                case AV_PIX_FMT_YUVJ420P:
+                case AV_PIX_FMT_YUV420P:
                     return VLC_CODEC_D3D9_OPAQUE;
+                default:
+                    return 0;
             }
             break;
 
@@ -63,8 +66,11 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt)
             {
                 case AV_PIX_FMT_YUV420P10LE:
                     return VLC_CODEC_D3D11_OPAQUE_10B;
-                default:
+                case AV_PIX_FMT_YUVJ420P:
+                case AV_PIX_FMT_YUV420P:
                     return VLC_CODEC_D3D11_OPAQUE;
+                default:
+                    return 0;
             }
         break;
 
