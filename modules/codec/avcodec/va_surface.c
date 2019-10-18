@@ -57,7 +57,7 @@ struct va_pool_t
 
     struct va_pool_cfg callbacks;
 
-    atomic_uintptr_t  poolrefs;
+    atomic_uintptr_t  poolrefs; // 1 ref for the pool creator, 1 ref per surface alive
 };
 
 static void va_pool_AddRef(va_pool_t *va_pool)
@@ -119,6 +119,7 @@ done:
         for (unsigned i = 0; i < va_pool->surface_count; i++) {
             vlc_va_surface_t *surface = &va_pool->surface[i];
             atomic_init(&surface->refcount, 1);
+            va_pool_AddRef(va_pool);
             surface->index = i;
             surface->va_pool = va_pool;
         }
@@ -174,7 +175,7 @@ void va_surface_Release(vlc_va_surface_t *surface)
     if (atomic_fetch_sub(&surface->refcount, 1) != 1)
         return;
 
-    // TODO release more resources
+    va_pool_Release(surface->va_pool);
 }
 
 unsigned va_surface_GetIndex(vlc_va_surface_t *surface)
@@ -210,4 +211,3 @@ va_pool_t * va_pool_Create(vlc_va_t *va, const struct va_pool_cfg *cbs)
 
     return va_pool;
 }
-
