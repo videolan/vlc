@@ -85,19 +85,13 @@ static void ReleasePoolSurfaces(va_pool_t *va_pool)
 int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
                          const video_format_t *fmt, unsigned count)
 {
-    int err = VLC_ENOMEM;
-
     if ( va_pool->surface_count >= count &&
          va_pool->surface_width  == fmt->i_width &&
          va_pool->surface_height == fmt->i_height )
     {
         msg_Dbg(va, "reusing surface pool");
-        err = VLC_SUCCESS;
         goto done;
     }
-
-    /* */
-    ReleasePoolSurfaces(va_pool);
 
     /* */
     msg_Dbg(va, "va_pool_SetupDecoder id %d %dx%d count: %d", avctx->codec_id, avctx->coded_width, avctx->coded_height, count);
@@ -105,28 +99,25 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
     if (count > MAX_SURFACE_COUNT)
         return VLC_EGENERIC;
 
-    err = va_pool->callbacks.pf_create_decoder_surfaces(va, avctx->codec_id, fmt, count);
-    if (err == VLC_SUCCESS)
-    {
-        va_pool->surface_width  = fmt->i_width;
-        va_pool->surface_height = fmt->i_height;
-        va_pool->surface_count = count;
-    }
+    int err = va_pool->callbacks.pf_create_decoder_surfaces(va, avctx->codec_id, fmt, count);
+    if (err != VLC_SUCCESS)
+        return err;
 
+    va_pool->surface_width  = fmt->i_width;
+    va_pool->surface_height = fmt->i_height;
+    va_pool->surface_count = count;
+
+    for (unsigned i = 0; i < va_pool->surface_count; i++) {
+        vlc_va_surface_t *surface = &va_pool->surface[i];
+        atomic_init(&surface->refcount, 1);
+        va_pool_AddRef(va_pool);
+        surface->index = i;
+        surface->va_pool = va_pool;
+    }
 done:
-    if (err == VLC_SUCCESS)
-    {
-        for (unsigned i = 0; i < va_pool->surface_count; i++) {
-            vlc_va_surface_t *surface = &va_pool->surface[i];
-            atomic_init(&surface->refcount, 1);
-            va_pool_AddRef(va_pool);
-            surface->index = i;
-            surface->va_pool = va_pool;
-        }
-        va_pool->callbacks.pf_setup_avcodec_ctx(va_pool->callbacks.opaque);
-    }
+    va_pool->callbacks.pf_setup_avcodec_ctx(va_pool->callbacks.opaque);
 
-    return err;
+    return VLC_SUCCESS;
 }
 
 static vlc_va_surface_t *GetSurface(va_pool_t *va_pool)
