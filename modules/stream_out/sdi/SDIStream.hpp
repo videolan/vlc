@@ -85,6 +85,7 @@ namespace sdi_sout
         public:
             StreamID(int);
             StreamID(int, int);
+            StreamID(const StreamID &) = default;
             StreamID& operator=(const StreamID &);
             bool      operator==(const StreamID &) const;
             std::string toString() const;
