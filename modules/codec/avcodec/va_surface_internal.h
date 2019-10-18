@@ -38,7 +38,10 @@ typedef struct va_pool_t va_pool_t;
 
 struct va_pool_cfg {
     int (*pf_create_device)(vlc_va_t *);
-    void (*pf_destroy_device)(vlc_va_t *);
+    /**
+     * Destroy resources allocated with the surfaces and the associated decoder
+     */
+    void (*pf_destroy_device)(void *opaque);
 
     /**
      * Create the DirectX surfaces in hw_surface and the decoder in decoder
@@ -46,10 +49,6 @@ struct va_pool_cfg {
     int (*pf_create_decoder_surfaces)(vlc_va_t *, int codec_id,
                                       const video_format_t *fmt,
                                       unsigned surface_count);
-    /**
-     * Destroy resources allocated with the surfaces and the associated decoder
-     */
-    void (*pf_destroy_surfaces)(void *opaque);
     /**
      * Set the avcodec hw context after the decoder is created
      */

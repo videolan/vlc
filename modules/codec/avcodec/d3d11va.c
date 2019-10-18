@@ -121,7 +121,6 @@ struct vlc_va_sys_t
 
 /* */
 static int D3dCreateDevice(vlc_va_t *);
-static void D3dDestroyDevice(vlc_va_t *);
 
 static int DxGetInputList(vlc_va_t *, input_list_t *);
 static int DxSetupOutput(vlc_va_t *, const directx_va_mode_t *, const video_format_t *);
@@ -250,10 +249,6 @@ static void Close(vlc_va_t *va)
 
     if (sys->vctx)
         vlc_video_context_Release(sys->vctx);
-
-    D3D11_Destroy( &sys->hd3d );
-
-    free(sys);
 }
 
 static const struct vlc_va_operations ops = { Get, Close, };
@@ -335,9 +330,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
 
     struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
-        D3dDestroyDevice,
-        DxCreateDecoderSurfaces,
         DxDestroySurfaces,
+        DxCreateDecoderSurfaces,
         SetupAVCodecContext,
         sys,
     };
@@ -440,19 +434,6 @@ static int D3dCreateDevice(vlc_va_t *va)
     sys->d3ddec = d3dviddev;
 
     return VLC_SUCCESS;
-}
-
-/**
- * It releases a Direct3D device and its resources.
- */
-static void D3dDestroyDevice(vlc_va_t *va)
-{
-    vlc_va_sys_t *sys = va->sys;
-    if (sys->d3ddec)
-        ID3D11VideoDevice_Release(sys->d3ddec);
-    if (sys->hw.video_context)
-        ID3D11VideoContext_Release(sys->hw.video_context);
-    D3D11_ReleaseDevice( &sys->d3d_dev );
 }
 
 static void ReleaseInputList(input_list_t *p_list)
@@ -796,4 +777,14 @@ static void DxDestroySurfaces(void *opaque)
     }
     if (sys->hw.decoder)
         ID3D11VideoDecoder_Release(sys->hw.decoder);
+
+    if (sys->d3ddec)
+        ID3D11VideoDevice_Release(sys->d3ddec);
+    if (sys->hw.video_context)
+        ID3D11VideoContext_Release(sys->hw.video_context);
+    D3D11_ReleaseDevice( &sys->d3d_dev );
+
+    D3D11_Destroy( &sys->hd3d );
+
+    free(sys);
 }

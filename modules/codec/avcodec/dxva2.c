@@ -144,7 +144,6 @@ struct vlc_va_sys_t
 
 /* */
 static int D3dCreateDevice(vlc_va_t *);
-static void D3dDestroyDevice(vlc_va_t *);
 
 static int DxGetInputList(vlc_va_t *, input_list_t *);
 static int DxSetupOutput(vlc_va_t *, const directx_va_mode_t *, const video_format_t *);
@@ -243,11 +242,6 @@ static void Close(vlc_va_t *va)
 
     if (sys->vctx)
         vlc_video_context_Release(sys->vctx);
-
-    if (sys->dxva2_dll)
-        FreeLibrary(sys->dxva2_dll);
-
-    free(sys);
 }
 
 static const struct vlc_va_operations ops = { Get, Close, };
@@ -320,9 +314,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
 
     struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
-        D3dDestroyDevice,
-        DxCreateVideoDecoder,
         DxDestroyVideoDecoder,
+        DxCreateVideoDecoder,
         SetupAVCodecContext,
         sys,
     };
@@ -445,6 +438,10 @@ static void D3dDestroyDevice(vlc_va_t *va)
     IDirect3DDeviceManager9_Release(sys->devmng);
     D3D9_ReleaseDevice(&sys->d3d_dev);
     D3D9_Destroy( &sys->hd3d );
+    if (sys->dxva2_dll)
+        FreeLibrary(sys->dxva2_dll);
+
+    free(sys);
 }
 
 static void ReleaseInputList(input_list_t *p_list)
@@ -689,4 +686,13 @@ static void DxDestroyVideoDecoder(void *opaque)
         for (unsigned i = 0; i < sys->hw.surface_count; i++)
             IDirect3DSurface9_Release(sys->hw_surface[i]);
     }
+    IDirect3DDeviceManager9_CloseDeviceHandle(sys->devmng, sys->device);
+    IDirectXVideoDecoderService_Release(sys->d3ddec);
+    IDirect3DDeviceManager9_Release(sys->devmng);
+    D3D9_ReleaseDevice(&sys->d3d_dev);
+    D3D9_Destroy( &sys->hd3d );
+    if (sys->dxva2_dll)
+        FreeLibrary(sys->dxva2_dll);
+
+    free(sys);
 }
