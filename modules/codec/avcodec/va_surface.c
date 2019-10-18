@@ -53,6 +53,7 @@ struct va_pool_t
 };
 
 struct vlc_va_surface_t {
+    unsigned             index;
     atomic_uintptr_t     refcount; // 1 ref for the surface existance, 1 per surface/clone in-flight
     picture_context_t    *pic_va_ctx;
 };
@@ -114,6 +115,7 @@ static int SetupSurfaces(vlc_va_t *va, va_pool_t *va_pool)
         vlc_va_surface_t *p_surface = malloc(sizeof(*p_surface));
         if (unlikely(p_surface==NULL))
             goto done;
+        p_surface->index = i;
         p_surface->pic_va_ctx = va_pool->callbacks.pf_new_surface_context(va, i, p_surface);
         if (unlikely(p_surface->pic_va_ctx==NULL))
         {
@@ -183,6 +185,11 @@ void va_surface_Release(vlc_va_surface_t *surface)
     if (atomic_fetch_sub(&surface->refcount, 1) != 1)
         return;
     free(surface);
+}
+
+unsigned va_surface_GetIndex(vlc_va_surface_t *surface)
+{
+    return surface->index;
 }
 
 void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)

@@ -69,6 +69,7 @@ int va_pool_SetupDecoder(vlc_va_t *, va_pool_t *, const AVCodecContext *, const 
 vlc_va_surface_t *va_pool_Get(va_pool_t *);
 
 picture_context_t *va_surface_GetContext(vlc_va_surface_t *);
+unsigned va_surface_GetIndex(vlc_va_surface_t *surface);
 void va_surface_AddRef(vlc_va_surface_t *surface);
 void va_surface_Release(vlc_va_surface_t *surface);
 
