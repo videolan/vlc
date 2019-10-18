@@ -151,10 +151,11 @@ static int DxSetupOutput(vlc_va_t *, const directx_va_mode_t *, const video_form
 
 static int DxCreateVideoDecoder(vlc_va_t *, int codec_id,
                                 const video_format_t *, unsigned surface_count);
-static void DxDestroyVideoDecoder(vlc_va_sys_t *);
+static void DxDestroyVideoDecoder(void *);
 
-static void SetupAVCodecContext(vlc_va_sys_t *sys)
+static void SetupAVCodecContext(void *opaque)
 {
+    vlc_va_sys_t *sys = opaque;
     sys->hw.cfg = &sys->cfg;
     sys->hw.surface = sys->hw_surface;
     sys->hw.workaround = sys->selected_decoder->workaround;
@@ -324,13 +325,14 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         return VLC_EGENERIC;
     }
 
-    static const struct va_pool_cfg pool_cfg = {
+    struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
         D3dDestroyDevice,
         DxCreateVideoDecoder,
         DxDestroyVideoDecoder,
         SetupAVCodecContext,
         NewSurfacePicContext,
+        sys,
     };
 
     sys->va_pool = va_pool_Create(va, &pool_cfg);
@@ -684,8 +686,9 @@ error:
     return VLC_EGENERIC;
 }
 
-static void DxDestroyVideoDecoder(vlc_va_sys_t *sys)
+static void DxDestroyVideoDecoder(void *opaque)
 {
+    vlc_va_sys_t *sys = opaque;
     /* releases a reference on each decoder surface */
     if (sys->hw.decoder)
         IDirectXVideoDecoder_Release(sys->hw.decoder);

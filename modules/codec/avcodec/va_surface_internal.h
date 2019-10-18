@@ -49,16 +49,18 @@ struct va_pool_cfg {
     /**
      * Destroy resources allocated with the surfaces and the associated decoder
      */
-    void (*pf_destroy_surfaces)(vlc_va_sys_t *);
+    void (*pf_destroy_surfaces)(void *opaque);
     /**
      * Set the avcodec hw context after the decoder is created
      */
-    void (*pf_setup_avcodec_ctx)(vlc_va_sys_t *);
+    void (*pf_setup_avcodec_ctx)(void *opaque);
 
     /**
      * Create a new context for the surface being acquired
      */
     picture_context_t* (*pf_new_surface_context)(vlc_va_t *, int surface_index, vlc_va_surface_t *);
+
+    void *opaque;
 };
 
 va_pool_t * va_pool_Create(vlc_va_t *, const struct va_pool_cfg *);

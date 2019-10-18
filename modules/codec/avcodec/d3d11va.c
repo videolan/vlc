@@ -128,10 +128,11 @@ static int DxSetupOutput(vlc_va_t *, const directx_va_mode_t *, const video_form
 
 static int DxCreateDecoderSurfaces(vlc_va_t *, int codec_id,
                                    const video_format_t *fmt, unsigned surface_count);
-static void DxDestroySurfaces(vlc_va_sys_t *);
+static void DxDestroySurfaces(void *);
 
-static void SetupAVCodecContext(vlc_va_sys_t *sys)
+static void SetupAVCodecContext(void *opaque)
 {
+    vlc_va_sys_t *sys = opaque;
     sys->hw.cfg = &sys->cfg;
     sys->hw.surface = sys->hw_surface;
     sys->hw.context_mutex = sys->d3d_dev.context_mutex;
@@ -339,13 +340,14 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         goto error;
     }
 
-    static const struct va_pool_cfg pool_cfg = {
+    struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
         D3dDestroyDevice,
         DxCreateDecoderSurfaces,
         DxDestroySurfaces,
         SetupAVCodecContext,
         NewSurfacePicContext,
+        sys,
     };
 
     sys->va_pool = va_pool_Create(va, &pool_cfg);
@@ -782,8 +784,9 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     return VLC_SUCCESS;
 }
 
-static void DxDestroySurfaces(vlc_va_sys_t *sys)
+static void DxDestroySurfaces(void *opaque)
 {
+    vlc_va_sys_t *sys = opaque;
     if (sys->hw_surface[0]) {
         ID3D11Resource *p_texture;
         ID3D11VideoDecoderOutputView_GetResource( sys->hw_surface[0], &p_texture );
