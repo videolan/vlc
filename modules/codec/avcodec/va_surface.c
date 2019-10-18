@@ -66,7 +66,7 @@ static void ReleasePoolSurfaces(va_pool_t *va_pool)
     va_pool->surface_count = 0;
 }
 
-static int SetupSurfaces(vlc_va_t *, va_pool_t *);
+static int SetupSurfaces(va_pool_t *);
 
 /* */
 int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
@@ -102,12 +102,12 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
 
 done:
     if (err == VLC_SUCCESS)
-        err = SetupSurfaces(va, va_pool);
+        err = SetupSurfaces(va_pool);
 
     return err;
 }
 
-static int SetupSurfaces(vlc_va_t *va, va_pool_t *va_pool)
+static int SetupSurfaces(va_pool_t *va_pool)
 {
     int err = VLC_ENOMEM;
 
