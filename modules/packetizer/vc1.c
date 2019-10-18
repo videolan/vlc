@@ -92,9 +92,9 @@ typedef struct
     vlc_tick_t i_frame_pts;
     block_t    *p_frame;
     block_t    **pp_last;
+    date_t     dts;
 
 
-    vlc_tick_t i_interpolated_dts;
     bool    b_check_startcode;
 
     /* */
@@ -175,7 +175,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_frame = NULL;
     p_sys->pp_last = &p_sys->p_frame;
 
-    p_sys->i_interpolated_dts = VLC_TICK_INVALID;
+    if( p_dec->fmt_in.video.i_frame_rate && p_dec->fmt_in.video.i_frame_rate_base )
+        date_Init( &p_sys->dts, p_dec->fmt_in.video.i_frame_rate * 2,
+                                p_dec->fmt_in.video.i_frame_rate_base );
+    else
+        date_Init( &p_sys->dts, 30000*2, 1000 );
     p_sys->b_check_startcode = p_dec->fmt_in.b_packetized;
 
     if( p_dec->fmt_out.i_extra > 0 )
@@ -290,7 +294,7 @@ static void PacketizeReset( void *p_private, bool b_flush )
 
     p_sys->i_frame_dts = VLC_TICK_INVALID;
     p_sys->i_frame_pts = VLC_TICK_INVALID;
-    p_sys->i_interpolated_dts = VLC_TICK_INVALID;
+    date_Set( &p_sys->dts, VLC_TICK_INVALID );
 }
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
 {
@@ -304,7 +308,7 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
     decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->i_interpolated_dts == VLC_TICK_INVALID )
+    if( date_Get( &p_sys->dts ) == VLC_TICK_INVALID )
     {
         msg_Dbg( p_dec, "need a starting pts/dts" );
         return VLC_EGENERIC;
@@ -363,28 +367,16 @@ static block_t *OutputFrame( decoder_t *p_dec )
     }
 
     /* */
-    if( p_sys->i_frame_dts != VLC_TICK_INVALID )
-        p_sys->i_interpolated_dts = i_dts;
+    if( i_dts == VLC_TICK_INVALID )
+        i_dts = date_Get( &p_sys->dts );
+    else
+        date_Set( &p_sys->dts, i_dts );
 
-    /* We can interpolate dts/pts only if we have a frame rate */
-    if( p_dec->fmt_out.video.i_frame_rate != 0 && p_dec->fmt_out.video.i_frame_rate_base != 0 )
+    if( i_pts == VLC_TICK_INVALID )
     {
-        if( p_sys->i_interpolated_dts != VLC_TICK_INVALID )
-            p_sys->i_interpolated_dts += vlc_tick_from_samples(
-                                         p_dec->fmt_out.video.i_frame_rate_base,
-                                         p_dec->fmt_out.video.i_frame_rate);
-
-        //msg_Dbg( p_dec, "-------------- XXX0 dts=%"PRId64" pts=%"PRId64" interpolated=%"PRId64,
-        //         i_dts, i_pts, p_sys->i_interpolated_dts );
-        if( i_dts == VLC_TICK_INVALID )
-            i_dts = p_sys->i_interpolated_dts;
-
-        if( i_pts == VLC_TICK_INVALID )
-        {
-            if( !p_sys->sh.b_has_bframe || (i_pic_flags & BLOCK_FLAG_TYPE_B ) )
-                i_pts = i_dts;
-            /* TODO compute pts for other case */
-        }
+        if( !p_sys->sh.b_has_bframe || (i_pic_flags & BLOCK_FLAG_TYPE_B ) )
+            i_pts = i_dts;
+        /* TODO compute pts for other case */
     }
 
     if( p_pic )
@@ -394,6 +386,14 @@ static block_t *OutputFrame( decoder_t *p_dec )
     }
 
     //msg_Dbg( p_dec, "-------------- dts=%"PRId64" pts=%"PRId64, i_dts, i_pts );
+
+    /* We can interpolate dts/pts only if we have a frame rate */
+    if( p_dec->fmt_out.video.i_frame_rate && p_dec->fmt_out.video.i_frame_rate_base )
+    {
+        date_Increment( &p_sys->dts, 2 );
+    //    msg_Dbg( p_dec, "-------------- XXX0 dts=%"PRId64" pts=%"PRId64" interpolated=%"PRId64,
+    //             i_dts, i_pts, date_Get( &p_sys->dts ) );
+    }
 
     /* CC */
     p_sys->i_cc_pts = i_pts;
@@ -604,7 +604,10 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
                     vlc_ureduce( &p_es->video.i_frame_rate, &p_es->video.i_frame_rate_base, i_fps_num, i_fps_den, 0 );
 
                 if( !p_sys->b_sequence_header )
+                {
                     msg_Dbg( p_dec, "frame rate %d/%d", p_es->video.i_frame_rate, p_es->video.i_frame_rate_base );
+                    date_Change( &p_sys->dts, p_es->video.i_frame_rate * 2, p_es->video.i_frame_rate_base );
+                }
             }
             if( bs_read1( &s ) && /* Color Format */
                 p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF )
