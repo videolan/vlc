@@ -198,9 +198,9 @@ done:
     return pic_ctx;
 }
 
-static picture_context_t* NewSurfacePicContext(void *opaque, vlc_va_surface_t *va_surface)
+static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *va_surface)
 {
-    vlc_va_sys_t *sys = opaque;
+    vlc_va_sys_t *sys = va->sys;
     ID3D11VideoDecoderOutputView *surface = sys->hw_surface[va_surface_GetIndex(va_surface)];
     ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW];
     ID3D11Resource *p_resource;
@@ -231,7 +231,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     vlc_va_surface_t *va_surface = va_pool_Get(sys->va_pool);
     if (unlikely(va_surface == NULL))
         return VLC_ENOITEM;
-    pic->context = va_surface_GetContext(va_surface);
+    pic->context = NewSurfacePicContext(va, va_surface);
     if (unlikely(pic->context == NULL))
     {
         va_surface_Release(va_surface);
@@ -339,7 +339,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         DxCreateDecoderSurfaces,
         DxDestroySurfaces,
         SetupAVCodecContext,
-        NewSurfacePicContext,
         sys,
     };
 

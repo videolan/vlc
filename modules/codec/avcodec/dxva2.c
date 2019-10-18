@@ -196,9 +196,9 @@ static struct dxva2_pic_context *CreatePicContext(IDirect3DSurface9 *surface, ID
     return pic_ctx;
 }
 
-static picture_context_t* NewSurfacePicContext(void *opaque, vlc_va_surface_t *va_surface)
+static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *va_surface)
 {
-    vlc_va_sys_t *sys = opaque;
+    vlc_va_sys_t *sys = va->sys;
     struct dxva2_pic_context *pic_ctx = CreatePicContext(sys->hw_surface[va_surface_GetIndex(va_surface)], sys->hw.decoder);
     if (unlikely(pic_ctx==NULL))
         return NULL;
@@ -224,7 +224,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     if (unlikely(va_surface==NULL))
         return VLC_ENOITEM;
 
-    pic->context = va_surface_GetContext(va_surface);
+    pic->context = NewSurfacePicContext(va, va_surface);
     if (unlikely(pic->context == NULL))
     {
         va_surface_Release(va_surface);
@@ -324,7 +324,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         DxCreateVideoDecoder,
         DxDestroyVideoDecoder,
         SetupAVCodecContext,
-        NewSurfacePicContext,
         sys,
     };
 

@@ -165,14 +165,6 @@ vlc_va_surface_t *va_pool_Get(va_pool_t *va_pool)
     return surface;
 }
 
-picture_context_t *va_surface_GetContext(vlc_va_surface_t *surface)
-{
-    picture_context_t *pic_va_ctx = surface->va_pool->callbacks.pf_new_surface_context(surface->va_pool->callbacks.opaque, surface);
-    if (unlikely(pic_va_ctx==NULL))
-        return NULL;
-    return pic_va_ctx;
-}
-
 void va_surface_AddRef(vlc_va_surface_t *surface)
 {
     atomic_fetch_add(&surface->refcount, 1);
