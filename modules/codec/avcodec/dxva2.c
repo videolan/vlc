@@ -238,7 +238,7 @@ static void Close(vlc_va_t *va)
     vlc_va_sys_t *sys = va->sys;
 
     if (sys->va_pool)
-        va_pool_Close(va, sys->va_pool);
+        va_pool_Close(sys->va_pool);
 
     if (sys->vctx)
         vlc_video_context_Release(sys->vctx);

@@ -168,7 +168,7 @@ unsigned va_surface_GetIndex(vlc_va_surface_t *surface)
     return surface->index;
 }
 
-void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)
+void va_pool_Close(va_pool_t *va_pool)
 {
     for (unsigned i = 0; i < va_pool->surface_count; i++)
         va_surface_Release(&va_pool->surface[i]);
