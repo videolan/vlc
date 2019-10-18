@@ -1809,8 +1809,8 @@ void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_success)
 {
     if (b_success)
     {
-        rdh_attach_slaves(p_rdh, p_rdh->p_node);
         rdh_sort(p_rdh->p_node);
+        rdh_attach_slaves(p_rdh, p_rdh->p_node);
     }
     free(p_rdh->psz_ignored_exts);
 
