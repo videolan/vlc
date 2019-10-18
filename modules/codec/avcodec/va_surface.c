@@ -118,7 +118,7 @@ static int SetupSurfaces(vlc_va_t *va, va_pool_t *va_pool)
             goto done;
         p_surface->index = i;
         p_surface->va_pool = va_pool;
-        p_surface->pic_va_ctx = va_pool->callbacks.pf_new_surface_context(va, p_surface);
+        p_surface->pic_va_ctx = va_pool->callbacks.pf_new_surface_context(va_pool->callbacks.opaque, p_surface);
         if (unlikely(p_surface->pic_va_ctx==NULL))
         {
             free(p_surface);

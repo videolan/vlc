@@ -58,7 +58,7 @@ struct va_pool_cfg {
     /**
      * Create a new context for the surface being acquired
      */
-    picture_context_t* (*pf_new_surface_context)(vlc_va_t *, vlc_va_surface_t *);
+    picture_context_t* (*pf_new_surface_context)(void *opaque, vlc_va_surface_t *);
 
     void *opaque;
 };

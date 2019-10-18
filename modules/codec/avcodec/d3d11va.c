@@ -198,9 +198,9 @@ done:
     return pic_ctx;
 }
 
-static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *va_surface)
+static picture_context_t* NewSurfacePicContext(void *opaque, vlc_va_surface_t *va_surface)
 {
-    vlc_va_sys_t *sys = va->sys;
+    vlc_va_sys_t *sys = opaque;
     ID3D11VideoDecoderOutputView *surface = sys->hw_surface[va_surface_GetIndex(va_surface)];
     ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW];
     ID3D11Resource *p_resource;
