@@ -56,7 +56,22 @@ struct va_pool_t
     vlc_va_surface_t surface[MAX_SURFACE_COUNT];
 
     struct va_pool_cfg callbacks;
+
+    atomic_uintptr_t  poolrefs;
 };
+
+static void va_pool_AddRef(va_pool_t *va_pool)
+{
+    atomic_fetch_add(&va_pool->poolrefs, 1);
+}
+
+static void va_pool_Release(va_pool_t *va_pool)
+{
+    if (atomic_fetch_sub(&va_pool->poolrefs, 1) != 1)
+        return;
+
+    free(va_pool);
+}
 
 static void ReleasePoolSurfaces(va_pool_t *va_pool)
 {
@@ -170,7 +185,9 @@ unsigned va_surface_GetIndex(vlc_va_surface_t *surface)
 void va_pool_Close(vlc_va_t *va, va_pool_t *va_pool)
 {
     ReleasePoolSurfaces(va_pool);
-    va_pool->callbacks.pf_destroy_device(va);
+    void (*pf_destroy_device)(vlc_va_t *) = va_pool->callbacks.pf_destroy_device;
+    va_pool_Release(va_pool);
+    pf_destroy_device(va);
 }
 
 va_pool_t * va_pool_Create(vlc_va_t *va, const struct va_pool_cfg *cbs)
@@ -189,6 +206,7 @@ va_pool_t * va_pool_Create(vlc_va_t *va, const struct va_pool_cfg *cbs)
     msg_Dbg(va, "CreateDevice succeed");
 
     va_pool->surface_count = 0;
+    atomic_init(&va_pool->poolrefs, 1);
 
     return va_pool;
 }
