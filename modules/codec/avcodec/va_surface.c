@@ -56,6 +56,7 @@ struct vlc_va_surface_t {
     unsigned             index;
     atomic_uintptr_t     refcount; // 1 ref for the surface existance, 1 per surface/clone in-flight
     picture_context_t    *pic_va_ctx;
+    va_pool_t            *va_pool;
 };
 
 static void ReleasePoolSurfaces(va_pool_t *va_pool)
@@ -116,6 +117,7 @@ static int SetupSurfaces(vlc_va_t *va, va_pool_t *va_pool)
         if (unlikely(p_surface==NULL))
             goto done;
         p_surface->index = i;
+        p_surface->va_pool = va_pool;
         p_surface->pic_va_ctx = va_pool->callbacks.pf_new_surface_context(va, i, p_surface);
         if (unlikely(p_surface->pic_va_ctx==NULL))
         {
