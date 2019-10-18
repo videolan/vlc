@@ -237,7 +237,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     }
     // the internal copy adds an extra reference we already had with va_pool_Get()
     va_surface_Release(va_surface);
-    *data = (uint8_t*)DXVA2_PICCONTEXT_FROM_PICCTX(pic_ctx)->ctx.picsys.surface;
+    *data = (uint8_t*)DXVA2_PICCONTEXT_FROM_PICCTX(pic->context)->ctx.picsys.surface;
     return VLC_SUCCESS;
 }
 
