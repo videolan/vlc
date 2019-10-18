@@ -198,10 +198,10 @@ done:
     return pic_ctx;
 }
 
-static picture_context_t* NewSurfacePicContext(vlc_va_t *va, int surface_index, vlc_va_surface_t *va_surface)
+static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *va_surface)
 {
     vlc_va_sys_t *sys = va->sys;
-    ID3D11VideoDecoderOutputView *surface = sys->hw_surface[surface_index];
+    ID3D11VideoDecoderOutputView *surface = sys->hw_surface[va_surface_GetIndex(va_surface)];
     ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW];
     ID3D11Resource *p_resource;
     ID3D11VideoDecoderOutputView_GetResource(surface, &p_resource);

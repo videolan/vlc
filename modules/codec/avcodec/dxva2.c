@@ -196,10 +196,10 @@ static struct dxva2_pic_context *CreatePicContext(IDirect3DSurface9 *surface, ID
     return pic_ctx;
 }
 
-static picture_context_t* NewSurfacePicContext(vlc_va_t *va, int surface_index, vlc_va_surface_t *va_surface)
+static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *va_surface)
 {
     vlc_va_sys_t *sys = va->sys;
-    struct dxva2_pic_context *pic_ctx = CreatePicContext(sys->hw_surface[surface_index], sys->hw.decoder);
+    struct dxva2_pic_context *pic_ctx = CreatePicContext(sys->hw_surface[va_surface_GetIndex(va_surface)], sys->hw.decoder);
     if (unlikely(pic_ctx==NULL))
         return NULL;
     /* all the resources are acquired during surfaces init, and a second time in
