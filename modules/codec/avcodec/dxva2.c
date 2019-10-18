@@ -202,10 +202,6 @@ static picture_context_t* NewSurfacePicContext(void *opaque, vlc_va_surface_t *v
     struct dxva2_pic_context *pic_ctx = CreatePicContext(sys->hw_surface[va_surface_GetIndex(va_surface)], sys->hw.decoder);
     if (unlikely(pic_ctx==NULL))
         return NULL;
-    /* all the resources are acquired during surfaces init, and a second time in
-     * CreatePicContext(), undo one of them otherwise we need an extra release
-     * when the pool is emptied */
-    ReleaseD3D9PictureSys(&pic_ctx->ctx.picsys);
     pic_ctx->va_surface = va_surface;
     return &pic_ctx->ctx.s;
 }
@@ -228,15 +224,12 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     if (unlikely(va_surface==NULL))
         return VLC_ENOITEM;
 
-    picture_context_t *pic_ctx = va_surface_GetContext(va_surface);
-    pic->context = pic_ctx->copy(pic_ctx);
+    pic->context = va_surface_GetContext(va_surface);
     if (unlikely(pic->context == NULL))
     {
         va_surface_Release(va_surface);
         return VLC_ENOITEM;
     }
-    // the internal copy adds an extra reference we already had with va_pool_Get()
-    va_surface_Release(va_surface);
     *data = (uint8_t*)DXVA2_PICCONTEXT_FROM_PICCTX(pic->context)->ctx.picsys.surface;
     return VLC_SUCCESS;
 }
