@@ -639,6 +639,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         case VLC_CODEC_HEVC:
         case VLC_CODEC_H264:
         case VLC_CODEC_DIRAC: /* FIXME valid ? */
+        case VLC_CODEC_VVC:
             dpb_size = 18;
             break;
         case VLC_CODEC_AV1:

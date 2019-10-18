@@ -39,6 +39,7 @@
 #define VLC_CODEC_H263P           VLC_FOURCC('I','L','V','R')
 #define VLC_CODEC_FLV1            VLC_FOURCC('F','L','V','1')
 #define VLC_CODEC_H261            VLC_FOURCC('h','2','6','1')
+#define VLC_CODEC_VVC             VLC_FOURCC('h','2','6','6')
 #define VLC_CODEC_MJPG            VLC_FOURCC('M','J','P','G')
 #define VLC_CODEC_MJPGB           VLC_FOURCC('m','j','p','b')
 #define VLC_CODEC_LJPG            VLC_FOURCC('L','J','P','G')
