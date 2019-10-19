@@ -458,7 +458,8 @@ static void EITExtractDrDescItems( demux_t *p_demux, const dvbpsi_extended_event
                 continue;
             }
 
-            msg_Dbg( p_demux, "       - desc='%s' item='%s'", psz_key, psz_itm );
+            msg_Dbg( p_demux, "       - desc='%s' item='%s'",
+                     psz_key ? psz_key : "(null)", psz_itm );
             if( b_appending )
             {
                 /* Continued items */
