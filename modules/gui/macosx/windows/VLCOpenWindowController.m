@@ -179,7 +179,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     [sharedNotificationCenter addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
 
     [self qtkToggleUIElements:nil];
-    [self updateMediaSelector:nil];
+    [self updateMediaSelector:NO];
     [self scanOpticalMedia:nil];
 
     [self setMRL: @""];
