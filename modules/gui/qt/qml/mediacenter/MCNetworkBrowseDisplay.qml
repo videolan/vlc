@@ -242,5 +242,10 @@ Utils.NavigableFocusScope {
             }
         }
 
+        Utils.BusyIndicatorExt {
+            runningDelayed: providerModel.parsingPending
+            anchors.centerIn: parent
+            z: 1
+        }
     }
 }
