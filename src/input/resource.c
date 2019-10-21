@@ -335,7 +335,7 @@ static void input_resource_PutVoutLocked(input_resource_t *p_resource,
     {
         vlc_mutex_unlock(&p_resource->lock_hold);
 
-        assert(p_resource->p_vout_free == NULL);
+        assert(p_resource->p_vout_free == NULL || p_resource->p_vout_free == vout);
         msg_Dbg(p_resource->p_parent, "saving a free vout");
         p_resource->p_vout_free = vout;
     }
@@ -418,7 +418,7 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
         int index;
         TAB_FIND(p_resource->i_vout, p_resource->pp_vout, cfg->vout, index );
         assert(index >= 0);
-        assert(p_resource->p_vout_free == NULL);
+        assert(p_resource->p_vout_free == NULL || p_resource->p_vout_free == cfg->vout);
     }
 #endif
 
