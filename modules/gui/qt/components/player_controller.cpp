@@ -239,7 +239,9 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
 
     if (!new_media)
     {
-        emit that->q_func()->inputChanged(false);
+        that->callAsync([that] () {
+            emit that->q_func()->inputChanged(false);
+        });
         return;
     }
 
@@ -721,7 +723,9 @@ static void on_player_media_epg_changed(vlc_player_t *, input_item_t *, void *da
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_item_epg_changed");
-    emit that->q_func()->epgChanged();
+    that->callAsync([that] () {
+        emit that->q_func()->epgChanged();
+    });
 }
 
 static void on_player_subitems_changed(vlc_player_t *, input_item_t *, input_item_node_t *, void *data)
