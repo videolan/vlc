@@ -1119,6 +1119,22 @@ input_item_t *input_item_Copy( input_item_t *p_input )
         vlc_meta_Merge( meta, p_input->p_meta );
     }
     b_net = p_input->b_net;
+
+    if( likely(item != NULL) && p_input->i_slaves > 0 )
+    {
+        for( int i = 0; i < p_input->i_slaves; i++ )
+        {
+            input_item_slave_t* slave = input_item_slave_New(
+                        p_input->pp_slaves[i]->psz_uri,
+                        p_input->pp_slaves[i]->i_type,
+                        p_input->pp_slaves[i]->i_priority);
+            if( unlikely(slave != NULL) )
+            {
+                TAB_APPEND(item->i_slaves, item->pp_slaves, slave);
+            }
+        }
+    }
+
     vlc_mutex_unlock( &p_input->lock );
 
     if( likely(item != NULL) )
