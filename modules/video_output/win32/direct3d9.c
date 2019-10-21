@@ -1888,6 +1888,10 @@ GLConvOpen(vlc_object_t *obj)
      && tc->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B)
         return VLC_EGENERIC;
 
+    d3d9_video_context_t *vctx_sys = GetD3D9ContextPrivate( tc->vctx );
+    if ( vctx_sys == NULL )
+        return VLC_EGENERIC;
+
     if (tc->gl->ext != VLC_GL_EXT_WGL || !tc->gl->wgl.getExtensionsString)
         return VLC_EGENERIC;
 
@@ -1919,27 +1923,16 @@ GLConvOpen(vlc_object_t *obj)
     tc->priv = priv;
     priv->vt = vt;
 
-    HRESULT hr;
-    int adapter = -1;
-    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext( tc->vctx );
-    if ( d3d9_decoder != NULL )
-    {
-        D3D9_CloneExternal(&priv->hd3d, d3d9_decoder->device);
-        adapter = d3d9_decoder->adapter;
-    }
-    else
-    {
-        if (D3D9_Create(obj, &priv->hd3d) != VLC_SUCCESS)
-            goto error;
-    }
+    if (D3D9_Create(obj, &priv->hd3d) != VLC_SUCCESS)
+        goto error;
     if (!priv->hd3d.use_ex)
     {
         msg_Warn(obj, "DX/GL interrop only working on d3d9x");
         goto error;
     }
 
-    hr = D3D9_CreateDevice(obj, &priv->hd3d, adapter,
-                            &priv->d3d_dev);
+    HRESULT hr;
+    hr = D3D9_CreateDeviceExternal(vctx_sys->dev, &priv->hd3d, &priv->d3d_dev );
     if (FAILED(hr))
         goto error;
 
