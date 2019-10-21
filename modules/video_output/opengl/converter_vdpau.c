@@ -194,17 +194,17 @@ Open(vlc_object_t *obj)
 }
 
 static void
-DecoderContextClose(vlc_decoder_device *device)
+DecoderDeviceClose(vlc_decoder_device *device)
 {
     vdp_release_x11(device->opaque);
 }
 
 static const struct vlc_decoder_device_operations dev_ops = {
-    .close = DecoderContextClose,
+    .close = DecoderDeviceClose,
 };
 
 static int
-DecoderContextOpen(vlc_decoder_device *device, vout_window_t *window)
+DecoderDeviceOpen(vlc_decoder_device *device, vout_window_t *window)
 {
     if (!window || !vlc_xlib_init(VLC_OBJECT(window)))
         return VLC_EGENERIC;
@@ -229,5 +229,5 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_shortcut("vdpau")
     add_submodule()
-        set_callback_dec_device(DecoderContextOpen, 3)
+        set_callback_dec_device(DecoderDeviceOpen, 3)
 vlc_module_end ()
