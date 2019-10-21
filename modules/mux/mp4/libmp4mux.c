@@ -158,8 +158,11 @@ mp4mux_trackinfo_t * mp4mux_track_Add(mp4mux_handle_t *h, unsigned id,
 
 bool mp4mux_track_AddEdit(mp4mux_trackinfo_t *t, const mp4mux_edit_t *p_newedit)
 {
-    mp4mux_edit_t *p_realloc = realloc( t->p_edits, sizeof(mp4mux_edit_t) *
-                                       (t->i_edits_count + 1) );
+    if(t->i_edits_count + 1 < t->i_edits_count)
+        return false;
+    mp4mux_edit_t *p_realloc = vlc_reallocarray( t->p_edits,
+                                                 t->i_edits_count + 1,
+                                                 sizeof(*p_realloc) );
     if(unlikely(!p_realloc))
         return false;
 
