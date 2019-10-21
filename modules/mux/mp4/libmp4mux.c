@@ -196,8 +196,11 @@ bool mp4mux_track_AddSample(mp4mux_trackinfo_t *t, const mp4mux_sample_t *entry)
     /* XXX: -1 to always have 2 entry for easy adding of empty SPU */
     if (t->i_samples_count + 2 >= t->i_samples_max)
     {
-        mp4mux_sample_t *p_realloc =
-                realloc(t->samples, sizeof(*p_realloc) * (t->i_samples_max + 1000));
+        if(t->i_samples_max + 1000 < t->i_samples_max)
+            return false;
+        mp4mux_sample_t *p_realloc = vlc_reallocarray(t->samples,
+                                                      t->i_samples_max + 1000,
+                                                      sizeof(*p_realloc));
         if(!p_realloc)
             return false;
         t->samples = p_realloc;
