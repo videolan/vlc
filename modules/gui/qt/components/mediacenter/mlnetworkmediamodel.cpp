@@ -166,6 +166,62 @@ void MLNetworkMediaModel::setTree(QVariant parentTree)
     emit treeChanged();
 }
 
+bool MLNetworkMediaModel::addToPlaylist(int index)
+{
+    if (!(m_ctx && m_hasTree))
+        return false;
+    if (index < 0 || index >= m_items.size() )
+        return false;
+    auto item =  m_items[index];
+    vlc::playlist::Media media{ item.tree.media.get() };
+    m_ctx->getIntf()->p_sys->p_mainPlaylistController->append( { media }, false);
+    return true;
+}
+
+bool MLNetworkMediaModel::addToPlaylist(const QVariantList &itemIdList)
+{
+    bool ret = false;
+    for (const QVariant& varValue: itemIdList)
+    {
+        if (varValue.canConvert<int>())
+        {
+            auto index = varValue.value<int>();
+            ret |= addToPlaylist(index);
+        }
+    }
+    return ret;
+}
+
+bool MLNetworkMediaModel::addAndPlay(int index)
+{
+    if (!(m_ctx && m_hasTree))
+        return false;
+    if (index < 0 || index >= m_items.size() )
+        return false;
+    auto item =  m_items[index];
+    vlc::playlist::Media media{ item.tree.media.get() };
+    m_ctx->getIntf()->p_sys->p_mainPlaylistController->append( { media }, true);
+    return true;
+}
+
+bool MLNetworkMediaModel::addAndPlay(const QVariantList& itemIdList)
+{
+    bool ret = false;
+    for (const QVariant& varValue: itemIdList)
+    {
+        if (varValue.canConvert<int>())
+        {
+            auto index = varValue.value<int>();
+            if (!ret)
+                ret |= addAndPlay(index);
+            else
+                ret |= addToPlaylist(index);
+        }
+    }
+    return ret;
+}
+
+
 bool MLNetworkMediaModel::initializeMediaSources()
 {
     auto libvlc = vlc_object_instance(m_ctx->getIntf());

@@ -176,7 +176,7 @@ Utils.NavigableFocusScope {
                     if (model.type === MLNetworkMediaModel.TYPE_NODE || model.type === MLNetworkMediaModel.TYPE_DIRECTORY)
                         history.push( ["mc", "network", { tree: model.tree } ], History.Go)
                     else
-                        medialib.addAndPlay( model.mrl )
+                        delegateModel.model.addAndPlay( index )
                 }
 
                 onContextMenuButtonClicked: {

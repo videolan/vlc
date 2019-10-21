@@ -118,6 +118,11 @@ public:
     inline bool isIndexed() const { return m_indexed; }
     inline bool canBeIndexed() const { return m_canBeIndexed; }
 
+    Q_INVOKABLE bool addToPlaylist( int index );
+    Q_INVOKABLE bool addToPlaylist(const QVariantList& itemIdList);
+    Q_INVOKABLE bool addAndPlay( int index );
+    Q_INVOKABLE bool addAndPlay(const QVariantList& itemIdList);
+
 signals:
     void nameChanged();
     void urlChanged();

@@ -111,6 +111,61 @@ void MLNetworkDeviceModel::setSdSource(SDCatType s)
     emit sdSourceChanged();
 }
 
+
+bool MLNetworkDeviceModel::addToPlaylist(int index)
+{
+    if (!(m_ctx && m_sdSource != CAT_MYCOMPUTER))
+        return false;
+    if (index < 0 || index >= m_items.size() )
+        return false;
+    auto item =  m_items[index];
+    vlc::playlist::Media media{ item.inputItem.get() };
+    return true;
+}
+
+bool MLNetworkDeviceModel::addToPlaylist(const QVariantList &itemIdList)
+{
+    bool ret = false;
+    for (const QVariant& varValue: itemIdList)
+    {
+        if (varValue.canConvert<int>())
+        {
+            auto index = varValue.value<int>();
+            ret |= addToPlaylist(index);
+        }
+    }
+    return ret;
+}
+
+bool MLNetworkDeviceModel::addAndPlay(int index)
+{
+    if (!(m_ctx && m_sdSource != CAT_MYCOMPUTER))
+        return false;
+    if (index < 0 || index >= m_items.size() )
+        return false;
+    auto item =  m_items[index];
+    vlc::playlist::Media media{ item.inputItem.get() };
+    m_ctx->getIntf()->p_sys->p_mainPlaylistController->append( { media }, true);
+    return true;
+}
+
+bool MLNetworkDeviceModel::addAndPlay(const QVariantList& itemIdList)
+{
+    bool ret = false;
+    for (const QVariant& varValue: itemIdList)
+    {
+        if (varValue.canConvert<int>())
+        {
+            auto index = varValue.value<int>();
+            if (!ret)
+                ret |= addAndPlay(index);
+            else
+                ret |= addToPlaylist(index);
+        }
+    }
+    return ret;
+}
+
 bool MLNetworkDeviceModel::initializeMediaSources()
 {
     auto libvlc = vlc_object_instance(m_ctx->getIntf());
