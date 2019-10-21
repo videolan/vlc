@@ -176,6 +176,7 @@
         <file alias="MainInterface.qml">qml/MainInterface.qml</file>
     </qresource>
     <qresource prefix="/utils">
+        <file alias="BusyIndicatorExt.qml">qml/utils/BusyIndicatorExt.qml</file>
         <file alias="MultiCoverPreview.qml">qml/utils/MultiCoverPreview.qml</file>
         <file alias="GridItem.qml">qml/utils/GridItem.qml</file>
         <file alias="ListItem.qml">qml/utils/ListItem.qml</file>
