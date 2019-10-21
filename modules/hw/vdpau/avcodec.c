@@ -193,7 +193,21 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
         return VLC_EGENERIC;
     }
 
-    unsigned refs = avctx->refs + 2 * avctx->thread_count + 5;
+    unsigned codec_refs;
+    switch (avctx->codec_id)
+    {
+        case AV_CODEC_ID_HEVC:
+        case AV_CODEC_ID_H264:
+            codec_refs = avctx->refs; // we can rely on this
+            break;
+        case AV_CODEC_ID_VP9:
+            codec_refs = 8;
+            break;
+        default:
+            codec_refs = 2;
+            break;
+    }
+    const unsigned refs = codec_refs + 2 * avctx->thread_count + 5;
     vlc_va_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
        return VLC_ENOMEM;
@@ -239,7 +253,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     }
     vctx_priv->pool[i] = NULL;
 
-    if (i < avctx->refs + 3u)
+    if (i < codec_refs + 3u)
     {
         msg_Err(va, "not enough video RAM");
         while (i > 0)
