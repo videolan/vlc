@@ -425,25 +425,6 @@ static int D3dCreateDevice(vlc_va_t *va)
     return VLC_SUCCESS;
 }
 
-/**
- * It releases a Direct3D device and its resources.
- */
-static void D3dDestroyDevice(vlc_va_t *va)
-{
-    vlc_va_sys_t *sys = va->sys;
-    HRESULT hr = IDirect3DDeviceManager9_CloseDeviceHandle(sys->devmng, sys->device);
-    if (FAILED(hr))
-        msg_Warn(va, "Failed to release device handle 0x%p. (hr=0x%lX)", sys->device, hr);
-    IDirectXVideoDecoderService_Release(sys->d3ddec);
-    IDirect3DDeviceManager9_Release(sys->devmng);
-    D3D9_ReleaseDevice(&sys->d3d_dev);
-    D3D9_Destroy( &sys->hd3d );
-    if (sys->dxva2_dll)
-        FreeLibrary(sys->dxva2_dll);
-
-    free(sys);
-}
-
 static void ReleaseInputList(input_list_t *p_list)
 {
     CoTaskMemFree(p_list->list);
