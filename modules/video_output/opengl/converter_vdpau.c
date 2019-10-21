@@ -58,17 +58,19 @@ static PFNGLVDPAUSURFACEACCESSNVPROC            _glVDPAUSurfaceAccessNV;
 static PFNGLVDPAUMAPSURFACESNVPROC              _glVDPAUMapSurfacesNV;
 static PFNGLVDPAUUNMAPSURFACESNVPROC            _glVDPAUUnmapSurfacesNV;
 
+typedef struct {
+    vlc_decoder_device *dec_device;
+} converter_sys_t;
+
 static picture_pool_t *
 tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
                      unsigned int requested_count)
 {
-    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(tc->vctx);
-    picture_pool_t *pool;
-    pool = vlc_vdp_output_pool_create(dec_device->opaque,
+    converter_sys_t *sys = tc->priv;
+    vlc_decoder_device *dec_device = sys->dec_device;
+    return vlc_vdp_output_pool_create(dec_device->opaque,
                                       VDP_RGBA_FORMAT_B8G8R8A8,
                                       &tc->fmt, requested_count);
-    vlc_decoder_device_Release(dec_device);
-    return pool;
 }
 
 static int
@@ -116,7 +118,8 @@ Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
     _glVDPAUFiniNV(); assert(tc->vt->GetError() == GL_NO_ERROR);
-    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(tc->vctx);
+    converter_sys_t *sys = tc->priv;
+    vlc_decoder_device *dec_device = sys->dec_device;
     vdp_release_x11(dec_device->opaque);
     vlc_decoder_device_Release(dec_device);
 }
@@ -138,6 +141,14 @@ Open(vlc_object_t *obj)
         vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
     }
+
+    converter_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(tc), sizeof(*sys));
+    if (unlikely(sys == NULL))
+    {
+        vlc_decoder_device_Release(dec_device);
+        return VLC_ENOMEM;
+    }
+    sys->dec_device = dec_device;
 
     tc->fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
 
@@ -176,8 +187,6 @@ Open(vlc_object_t *obj)
 
     INTEROP_CALL(glVDPAUInitNV, (void *)(uintptr_t)device, vdp_gpa);
 
-    vlc_decoder_device_Release(dec_device);
-
     tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D,
                                               VLC_CODEC_RGB32,
                                               COLOR_SPACE_UNDEF);
@@ -189,6 +198,7 @@ Open(vlc_object_t *obj)
 
     tc->pf_get_pool = tc_vdpau_gl_get_pool;
     tc->pf_update = tc_vdpau_gl_update;
+    tc->priv = sys;
 
     return VLC_SUCCESS;
 }
