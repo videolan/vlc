@@ -50,7 +50,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
 - (void)prepareForUse
 {
-    [_tableView registerForDraggedTypes:@[VLCMediaLibraryMediaItemPasteboardType, NSFilenamesPboardType]];
+    [_tableView registerForDraggedTypes:@[VLCMediaLibraryMediaItemPasteboardType, VLCPlaylistItemPasteboardType, NSFilenamesPboardType]];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
@@ -102,6 +102,14 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
     [_tableView reloadData];
 }
 
+- (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
+{
+    NSPasteboardItem *pboardItem = [[NSPasteboardItem alloc] init];
+    VLCPlaylistItem *playlistItem = [_playlistModel playlistItemAtIndex:row];
+    [pboardItem setString:[@(playlistItem.uniqueID) stringValue] forType:VLCPlaylistItemPasteboardType];
+    return pboardItem;
+}
+
 - (NSDragOperation)tableView:(NSTableView *)tableView
                 validateDrop:(id<NSDraggingInfo>)info
                  proposedRow:(NSInteger)row
@@ -115,8 +123,17 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
               row:(NSInteger)row
     dropOperation:(NSTableViewDropOperation)dropOperation
 {
+    NSString *encodedIDtoMove = [info.draggingPasteboard stringForType:VLCPlaylistItemPasteboardType];
+    if (encodedIDtoMove != nil) {
+        int64_t uniqueID = [encodedIDtoMove integerValue];
+        [_playlistController moveItemWithID:uniqueID toPosition:row];
+        return YES;
+    }
+
+    /* check whether the receive data is a library item from the left-hand side */
     NSData *data = [info.draggingPasteboard dataForType:VLCMediaLibraryMediaItemPasteboardType];
     if (!data) {
+        /* it's not, so check if it is a file handle from the Finder */
         id propertyList = [info.draggingPasteboard propertyListForType:NSFilenamesPboardType];
         if (propertyList == nil) {
             return NO;
@@ -142,6 +159,8 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
         }
         return NO;
     }
+
+    /* it is a media library item, so unarchive it and add it to the playlist */
     NSArray *array = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     if (!data) {
         return NO;

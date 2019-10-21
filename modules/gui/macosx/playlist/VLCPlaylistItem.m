@@ -29,6 +29,8 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 
+NSString *VLCPlaylistItemPasteboardType = @"org.videolan.vlc.playlistitemtype";
+
 @implementation VLCPlaylistItem
 
 - (instancetype)initWithPlaylistItem:(vlc_playlist_item_t *)p_item
@@ -50,6 +52,11 @@
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"item %p, title: %@ duration %lli", &_playlistItem, _title, _duration];
+}
+
+- (uint64_t)uniqueID
+{
+    return vlc_playlist_item_GetId(_playlistItem);
 }
 
 - (VLCInputItem *)inputItem

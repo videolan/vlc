@@ -28,9 +28,12 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCInputItem;
 @class VLCMediaLibraryMediaItem;
 
+extern NSString *VLCPlaylistItemPasteboardType;
+
 @interface VLCPlaylistItem : NSObject
 
 @property (readonly) vlc_playlist_item_t *playlistItem;
+@property (readonly) uint64_t uniqueID;
 @property (readwrite, retain) NSString *title;
 @property (readonly, copy, nullable) NSURL *url;
 @property (readonly, copy, nullable) NSString *path;

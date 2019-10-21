@@ -69,6 +69,13 @@
     [_playlistArray insertObjects:array atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index, count)]];
 }
 
+- (void)moveItemAtIndex:(size_t)index toTarget:(size_t)target
+{
+    VLCPlaylistItem *item = [_playlistArray objectAtIndex:index];
+    [_playlistArray removeObjectAtIndex:index];
+    [_playlistArray insertObject:item atIndex:target];
+}
+
 - (void)removeItemsInRange:(NSRange)range
 {
     [_playlistArray removeObjectsInRange:range];

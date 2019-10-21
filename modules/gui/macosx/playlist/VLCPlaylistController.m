@@ -52,6 +52,7 @@ NSString *VLCPlaylistItemsRemoved = @"VLCPlaylistItemsRemoved";
 
 - (void)playlistResetWithItems:(NSArray *)items;
 - (void)playlistAdded:(NSArray *)items atIndex:(size_t)insertionIndex count:(size_t)numberOfItems;
+- (void)playlistMovedIndex:(size_t)index toTarget:(size_t)target numberOfItems:(size_t)count;
 - (void)playlistRemovedItemsAtIndex:(size_t)index count:(size_t)numberOfItems;
 - (void)playlistUpdatedForIndex:(size_t)firstUpdatedIndex items:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems;
 - (void)playlistPlaybackRepeatUpdated:(enum vlc_playlist_playback_repeat)currentRepeatMode;
@@ -97,6 +98,19 @@ cb_playlist_items_added(vlc_playlist_t *playlist,
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
         [playlistController playlistAdded:array atIndex:insertionIndex count:numberOfAddedItems];
+    });
+}
+
+static void
+cb_playlist_items_moved(vlc_playlist_t *playlist,
+                        size_t index,
+                        size_t numberOfMovedItems,
+                        size_t target,
+                        void *p_data)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+        [playlistController playlistMovedIndex:index toTarget:target numberOfItems:numberOfMovedItems];
     });
 }
 
@@ -183,7 +197,7 @@ cb_playlist_has_next_changed(vlc_playlist_t *playlist,
 static const struct vlc_playlist_callbacks playlist_callbacks = {
     cb_playlist_items_reset,
     cb_playlist_items_added,
-    NULL,
+    cb_playlist_items_moved,
     cb_playlist_items_removed,
     cb_playlist_items_updated,
     cb_playlist_playback_repeat_changed,
@@ -286,6 +300,12 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
     [_playlistDataSource playlistUpdated];
     [_defaultNotificationCenter postNotificationName:VLCPlaylistItemsAdded object:self];
+}
+
+- (void)playlistMovedIndex:(size_t)index toTarget:(size_t)target numberOfItems:(size_t)count
+{
+    [_playlistModel moveItemAtIndex:index toTarget:target];
+    [_playlistDataSource playlistUpdated];
 }
 
 - (void)playlistRemovedItemsAtIndex:(size_t)index count:(size_t)numberOfItems
@@ -420,6 +440,19 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
         ret = vlc_playlist_PlayAt(_p_playlist, insertionIndex);
     }
     vlc_playlist_Unlock(_p_playlist);
+    return ret;
+}
+
+- (int)moveItemWithID:(int64_t)uniqueID toPosition:(size_t)target
+{
+    vlc_playlist_item_t **items = calloc(1, sizeof(vlc_playlist_item_t *));
+    vlc_playlist_Lock(_p_playlist);
+    ssize_t itemIndex = vlc_playlist_IndexOfId(_p_playlist, uniqueID);
+    vlc_playlist_item_t *p_item = vlc_playlist_Get(_p_playlist, itemIndex);
+    items[0] = p_item;
+    int ret = vlc_playlist_RequestMove(_p_playlist, items, 1, target, itemIndex);
+    vlc_playlist_Unlock(_p_playlist);
+    free(items);
     return ret;
 }
 

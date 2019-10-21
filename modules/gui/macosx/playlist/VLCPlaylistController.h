@@ -133,6 +133,14 @@ extern NSString *VLCPlaylistItemsRemoved;
       startPlayback:(BOOL)startPlayback;
 
 /**
+ * Move an item with a given unique ID to a new position
+ * @param uniqueID the ID of the playlist item to move
+ * @param target the target index of where to move the item
+ * @return returns VLC_SUCCESS or an error
+ */
+- (int)moveItemWithID:(int64_t)uniqueID toPosition:(size_t)target;
+
+/**
  * Remove all items at the given index set
  * @param indexes Set of indexes to remove
  */
