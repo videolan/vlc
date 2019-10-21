@@ -39,21 +39,19 @@ Utils.NavigableFocusScope {
 
     MCNetworksSectionSelectableDM{
         id: machineDM
-        model: MLNetworkModel {
+        model: MLNetworkDeviceModel {
             id: machineModel
             ctx: mainctx
-            tree: undefined
-            sd_source: "SD_CAT_DEVICES"
+            sd_source: MLNetworkDeviceModel.CAT_DEVICES
         }
     }
 
     MCNetworksSectionSelectableDM{
         id: lanDM
-        model: MLNetworkModel {
+        model: MLNetworkDeviceModel {
             id: lanModel
             ctx: mainctx
-            tree: undefined
-            sd_source: "SD_CAT_LAN"
+            sd_source: MLNetworkDeviceModel.CAT_LAN
         }
     }
 

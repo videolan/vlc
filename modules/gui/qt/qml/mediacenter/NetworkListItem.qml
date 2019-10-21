@@ -40,15 +40,15 @@ Utils.ListItem {
         fillMode: Image.PreserveAspectFit
         source: {
             switch (model.type) {
-            case MLNetworkModel.TYPE_DISC:
+            case MLNetworkMediaModel.TYPE_DISC:
                 return  "qrc:///type/disc.svg"
-            case MLNetworkModel.TYPE_CARD:
+            case MLNetworkMediaModel.TYPE_CARD:
                 return  "qrc:///type/capture-card.svg"
-            case MLNetworkModel.TYPE_STREAM:
+            case MLNetworkMediaModel.TYPE_STREAM:
                 return  "qrc:///type/stream.svg"
-            case MLNetworkModel.TYPE_PLAYLIST:
+            case MLNetworkMediaModel.TYPE_PLAYLIST:
                 return  "qrc:///type/playlist.svg"
-            case MLNetworkModel.TYPE_FILE:
+            case MLNetworkMediaModel.TYPE_FILE:
                 return  "qrc:///type/file_black.svg"
             default:
                 return "qrc:///type/directory_black.svg"
@@ -57,7 +57,7 @@ Utils.ListItem {
     }
     line1: model.name || qsTr("Unknown share")
     line2: model.mrl
-    imageText: (model.type !== MLNetworkModel.TYPE_DIRECTORY && model.type !== MLNetworkModel.TYPE_NODE) ? model.protocol : ""
+    imageText: (model.type !== MLNetworkMediaModel.TYPE_DIRECTORY && model.type !== MLNetworkMediaModel.TYPE_NODE) ? model.protocol : ""
 
     showContextButton: true
 

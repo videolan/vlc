@@ -32,15 +32,15 @@ Utils.GridItem {
     pictureHeight: VLCStyle.network_normal
     image: {
         switch (model.type){
-        case MLNetworkModel.TYPE_DISC:
+        case MLNetworkMediaModel.TYPE_DISC:
             return  "qrc:///type/disc.svg"
-        case MLNetworkModel.TYPE_CARD:
+        case MLNetworkMediaModel.TYPE_CARD:
             return  "qrc:///type/capture-card.svg"
-        case MLNetworkModel.TYPE_STREAM:
+        case MLNetworkMediaModel.TYPE_STREAM:
             return  "qrc:///type/stream.svg"
-        case MLNetworkModel.TYPE_PLAYLIST:
+        case MLNetworkMediaModel.TYPE_PLAYLIST:
             return  "qrc:///type/playlist.svg"
-        case MLNetworkModel.TYPE_FILE:
+        case MLNetworkMediaModel.TYPE_FILE:
             return  "qrc:///type/file_black.svg"
         default:
             return "qrc:///type/directory_black.svg"

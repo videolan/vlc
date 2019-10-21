@@ -39,7 +39,7 @@ Utils.NavigableFocusScope {
         }
     }
 
-    MLNetworkModel {
+    MLNetworkMediaModel {
         id: providerModel
         ctx: mainctx
         tree: undefined
@@ -148,15 +148,15 @@ Utils.NavigableFocusScope {
 
                 image: {
                     switch (model.type){
-                    case MLNetworkModel.TYPE_DISC:
+                    case MLNetworkMediaModel.TYPE_DISC:
                         return  "qrc:///type/disc.svg"
-                    case MLNetworkModel.TYPE_CARD:
+                    case MLNetworkMediaModel.TYPE_CARD:
                         return  "qrc:///type/capture-card.svg"
-                    case MLNetworkModel.TYPE_STREAM:
+                    case MLNetworkMediaModel.TYPE_STREAM:
                         return  "qrc:///type/stream.svg"
-                    case MLNetworkModel.TYPE_PLAYLIST:
+                    case MLNetworkMediaModel.TYPE_PLAYLIST:
                         return  "qrc:///type/playlist.svg"
-                    case MLNetworkModel.TYPE_FILE:
+                    case MLNetworkMediaModel.TYPE_FILE:
                         return  "qrc:///type/file_black.svg"
                     default:
                         return "qrc:///type/directory_black.svg"
@@ -173,7 +173,7 @@ Utils.NavigableFocusScope {
                 }
 
                 onItemDoubleClicked: {
-                    if (model.type === MLNetworkModel.TYPE_NODE || model.type === MLNetworkModel.TYPE_DIRECTORY)
+                    if (model.type === MLNetworkMediaModel.TYPE_NODE || model.type === MLNetworkMediaModel.TYPE_DIRECTORY)
                         history.push( ["mc", "network", { tree: model.tree } ], History.Go)
                     else
                         medialib.addAndPlay( model.mrl )
