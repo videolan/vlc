@@ -140,7 +140,7 @@ mp4mux_trackinfo_t * mp4mux_track_Add(mp4mux_handle_t *h, unsigned id,
                                       const es_format_t *fmt, uint32_t timescale)
 {
     mp4mux_trackinfo_t *t = malloc(sizeof(*t));
-    if(!mp4mux_trackinfo_Init(t, 0, 0))
+    if(!t || !mp4mux_trackinfo_Init(t, 0, 0))
     {
         free(t);
         return NULL;
