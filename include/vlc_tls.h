@@ -54,7 +54,7 @@
  * - callback vlc_tls_operations.writev,
  * - callback vlc_tls_operations.shutdown.
  *
- * The following funcitons are treated as receiving data:
+ * The following functions are treated as receiving data:
  * - vlc_tls_Read(),
  * - vlc_tls_GetLine(),
  * - callback vlc_tls_operations.readv,
