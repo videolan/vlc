@@ -48,7 +48,7 @@ struct va_pool_cfg {
      */
     int (*pf_create_decoder_surfaces)(vlc_va_t *, int codec_id,
                                       const video_format_t *fmt,
-                                      unsigned surface_count);
+                                      size_t surface_count);
     /**
      * Set the avcodec hw context after the decoder is created
      */
@@ -59,10 +59,10 @@ struct va_pool_cfg {
 
 va_pool_t * va_pool_Create(vlc_va_t *, const struct va_pool_cfg *);
 void va_pool_Close(va_pool_t *);
-int va_pool_SetupDecoder(vlc_va_t *, va_pool_t *, const AVCodecContext *, const video_format_t *, unsigned count);
+int va_pool_SetupDecoder(vlc_va_t *, va_pool_t *, const AVCodecContext *, const video_format_t *, size_t count);
 vlc_va_surface_t *va_pool_Get(va_pool_t *);
 
-unsigned va_surface_GetIndex(vlc_va_surface_t *surface);
+size_t va_surface_GetIndex(const vlc_va_surface_t *surface);
 void va_surface_AddRef(vlc_va_surface_t *surface);
 void va_surface_Release(vlc_va_surface_t *surface);
 

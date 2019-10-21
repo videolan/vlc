@@ -41,7 +41,7 @@
 #define MAX_GET_RETRIES  ((VLC_TICK_FROM_SEC(1) + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP)
 
 struct vlc_va_surface_t {
-    unsigned             index;
+    size_t               index;
     atomic_uintptr_t     refcount; // 1 ref for the surface existance, 1 per surface/clone in-flight
     va_pool_t            *va_pool;
 };
@@ -49,7 +49,7 @@ struct vlc_va_surface_t {
 struct va_pool_t
 {
     /* */
-    unsigned     surface_count;
+    size_t       surface_count;
     unsigned     surface_width;
     unsigned     surface_height;
 
@@ -77,7 +77,7 @@ static void va_pool_Release(va_pool_t *va_pool)
 
 /* */
 int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
-                         const video_format_t *fmt, unsigned count)
+                         const video_format_t *fmt, size_t count)
 {
     if ( va_pool->surface_count >= count &&
          va_pool->surface_width  == fmt->i_width &&
@@ -101,7 +101,7 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
     va_pool->surface_height = fmt->i_height;
     va_pool->surface_count = count;
 
-    for (unsigned i = 0; i < va_pool->surface_count; i++) {
+    for (size_t i = 0; i < va_pool->surface_count; i++) {
         vlc_va_surface_t *surface = &va_pool->surface[i];
         atomic_init(&surface->refcount, 1);
         va_pool_AddRef(va_pool);
@@ -163,7 +163,7 @@ void va_surface_Release(vlc_va_surface_t *surface)
     va_pool_Release(surface->va_pool);
 }
 
-unsigned va_surface_GetIndex(vlc_va_surface_t *surface)
+size_t va_surface_GetIndex(const vlc_va_surface_t *surface)
 {
     return surface->index;
 }

@@ -126,7 +126,7 @@ static int DxGetInputList(vlc_va_t *, input_list_t *);
 static int DxSetupOutput(vlc_va_t *, const directx_va_mode_t *, const video_format_t *);
 
 static int DxCreateDecoderSurfaces(vlc_va_t *, int codec_id,
-                                   const video_format_t *fmt, unsigned surface_count);
+                                   const video_format_t *fmt, size_t surface_count);
 static void DxDestroySurfaces(void *);
 
 static void SetupAVCodecContext(void *opaque)
@@ -594,7 +594,7 @@ static bool CanUseDecoderPadding(vlc_va_sys_t *sys)
  * It creates a Direct3D11 decoder using the given video format
  */
 static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
-                                   const video_format_t *fmt, unsigned surface_count)
+                                   const video_format_t *fmt, size_t surface_count)
 {
     vlc_va_sys_t *sys = va->sys;
     HRESULT hr;

@@ -149,7 +149,7 @@ static int DxGetInputList(vlc_va_t *, input_list_t *);
 static int DxSetupOutput(vlc_va_t *, const directx_va_mode_t *, const video_format_t *);
 
 static int DxCreateVideoDecoder(vlc_va_t *, int codec_id,
-                                const video_format_t *, unsigned surface_count);
+                                const video_format_t *, size_t surface_count);
 static void DxDestroyVideoDecoder(void *);
 
 static void SetupAVCodecContext(void *opaque)
@@ -542,7 +542,7 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
  * It creates a DXVA2 decoder using the given video format
  */
 static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
-                                const video_format_t *fmt, unsigned surface_count)
+                                const video_format_t *fmt, size_t surface_count)
 {
     vlc_va_sys_t *sys = va->sys;
     HRESULT hr;
@@ -670,7 +670,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
     msg_Dbg(va, "IDirectXVideoDecoderService_CreateVideoDecoder succeed");
     return VLC_SUCCESS;
 error:
-    for (unsigned i = 0; i < surface_count; i++)
+    for (size_t i = 0; i < surface_count; i++)
         IDirect3DSurface9_Release( sys->hw_surface[i] );
     return VLC_EGENERIC;
 }
