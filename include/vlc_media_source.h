@@ -111,6 +111,19 @@ struct vlc_media_tree_callbacks
     (*on_children_removed)(vlc_media_tree_t *tree, input_item_node_t *node,
                            input_item_node_t *const children[], size_t count,
                            void *userdata);
+
+    /**
+     * Called when the preparsing of a node is complete
+     *
+     * \param tree     the media tree
+     * \param node     the node being parsed
+     * \param status   the reason for the preparsing termination
+     * \param userdata userdata provided to AddListener()
+     */
+    void
+    (*on_preparse_end)(vlc_media_tree_t *tree, input_item_node_t * node,
+                       enum input_item_preparse_status status,
+                       void *userdata);
 };
 
 /**
