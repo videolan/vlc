@@ -259,6 +259,9 @@ bool MLNetworkMediaModel::initializeMediaSources()
 
 
     vlc_media_tree_Preparse( tree, libvlc, m_treeItem.media.get() );
+    m_parsingPending = true;
+    emit parsingPendingChanged(m_parsingPending);
+
     m_listener = std::move( l );
 
     return true;
@@ -317,6 +320,14 @@ void MLNetworkMediaModel::onItemRemoved( MediaSourcePtr,
             endRemoveRows();
         });
     }
+}
+
+void MLNetworkMediaModel::onItemPreparseEnded(MediaSourcePtr mediaSource, input_item_node_t* node, enum input_item_preparse_status status)
+{
+    QMetaObject::invokeMethod(this, [this]() {
+        m_parsingPending = false;
+        emit parsingPendingChanged(false);
+    });
 }
 
 void MLNetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,

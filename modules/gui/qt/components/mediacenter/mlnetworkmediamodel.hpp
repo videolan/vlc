@@ -93,6 +93,7 @@ public:
     Q_PROPERTY(ItemType type READ getType NOTIFY typeChanged)
     Q_PROPERTY(bool indexed READ isIndexed WRITE setIndexed NOTIFY isIndexedChanged)
     Q_PROPERTY(bool canBeIndexed READ canBeIndexed NOTIFY canBeIndexedChanged)
+    Q_PROPERTY(bool parsingPending READ getParsingPending NOTIFY parsingPendingChanged)
 
 
     explicit MLNetworkMediaModel(QObject* parent = nullptr);
@@ -117,6 +118,7 @@ public:
     inline ItemType getType() const { return m_type; }
     inline bool isIndexed() const { return m_indexed; }
     inline bool canBeIndexed() const { return m_canBeIndexed; }
+    inline bool getParsingPending() const { return m_parsingPending; }
 
     Q_INVOKABLE bool addToPlaylist( int index );
     Q_INVOKABLE bool addToPlaylist(const QVariantList& itemIdList);
@@ -129,6 +131,7 @@ signals:
     void typeChanged();
     void isIndexedChanged();
     void canBeIndexedChanged();
+    void parsingPendingChanged(bool);
 
     void ctxChanged();
     void treeChanged();
@@ -154,6 +157,7 @@ private:
     void onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node ) override;
     void onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) override;
     void onItemRemoved( MediaSourcePtr mediaSource, input_item_node_t *const children[], size_t count ) override;
+    void onItemPreparseEnded( MediaSourcePtr mediaSource, input_item_node_t* node, enum input_item_preparse_status status ) override;
 
     void refreshMediaList(MediaSourcePtr s, input_item_node_t* const children[], size_t count , bool clear);
 
@@ -166,6 +170,7 @@ private:
     ItemType m_type = ItemType::TYPE_UNKNOWN;
     bool m_indexed = false;
     bool m_canBeIndexed  = false;
+    bool m_parsingPending = false;
 
 
     std::vector<Item> m_items;

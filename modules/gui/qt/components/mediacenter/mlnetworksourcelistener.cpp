@@ -14,7 +14,8 @@ MLNetworkSourceListener::MLNetworkSourceListener(MediaSourcePtr s, SourceListene
     static const vlc_media_tree_callbacks cbs {
         &MLNetworkSourceListener::onItemCleared,
         &MLNetworkSourceListener::onItemAdded,
-        &MLNetworkSourceListener::onItemRemoved
+        &MLNetworkSourceListener::onItemRemoved,
+        &MLNetworkSourceListener::onItemPreparseEnded
     };
     auto l = vlc_media_tree_AddListener( s->tree, &cbs, this, true );
     if ( l == nullptr )
@@ -48,4 +49,10 @@ void MLNetworkSourceListener::onItemRemoved( vlc_media_tree_t *, input_item_node
 {
     auto* self = static_cast<MLNetworkSourceListener*>( userdata );
     self->cb->onItemRemoved( self->source, children, count );
+}
+
+void MLNetworkSourceListener::onItemPreparseEnded(vlc_media_tree_t *, input_item_node_t * node, enum input_item_preparse_status status, void *userdata)
+{
+    auto* self = static_cast<MLNetworkSourceListener*>( userdata );
+    self->cb->onItemPreparseEnded( self->source, node, status );
 }
