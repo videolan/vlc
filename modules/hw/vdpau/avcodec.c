@@ -141,7 +141,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
                 vlc_video_context **vtcx_out)
 {
     if (pix_fmt != AV_PIX_FMT_VDPAU|| dec_device == NULL ||
-        dec_device->type != VLC_DECODER_DEVICE_VDPAU)
+        GetVDPAUOpaqueDevice(dec_device) == NULL)
         return VLC_EGENERIC;
 
     (void) fmt;
@@ -181,7 +181,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     sys->width = width;
     sys->height = height;
     sys->hwaccel_context = NULL;
-    sys->vdp = dec_device->opaque;
+    sys->vdp = GetVDPAUOpaqueDevice(dec_device);
     vdp_hold_x11(sys->vdp, &sys->device);
 
     unsigned flags = AV_HWACCEL_FLAG_ALLOW_HIGH_DEPTH;

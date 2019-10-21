@@ -68,7 +68,7 @@ tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
 {
     converter_sys_t *sys = tc->priv;
     vlc_decoder_device *dec_device = sys->dec_device;
-    return vlc_vdp_output_pool_create(dec_device->opaque,
+    return vlc_vdp_output_pool_create(GetVDPAUOpaqueDevice(dec_device),
                                       VDP_RGBA_FORMAT_B8G8R8A8,
                                       &tc->fmt, requested_count);
 }
@@ -120,7 +120,7 @@ Close(vlc_object_t *obj)
     _glVDPAUFiniNV(); assert(tc->vt->GetError() == GL_NO_ERROR);
     converter_sys_t *sys = tc->priv;
     vlc_decoder_device *dec_device = sys->dec_device;
-    vdp_release_x11(dec_device->opaque);
+    vdp_release_x11(GetVDPAUOpaqueDevice(dec_device));
     vlc_decoder_device_Release(dec_device);
 }
 
@@ -131,7 +131,7 @@ Open(vlc_object_t *obj)
     if (tc->vctx == NULL)
         return VLC_EGENERIC;
     vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(tc->vctx);
-    if (dec_device->type != VLC_DECODER_DEVICE_VDPAU
+    if (GetVDPAUOpaqueDevice(dec_device) == NULL
      || (tc->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
       && tc->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
       && tc->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
@@ -153,7 +153,7 @@ Open(vlc_object_t *obj)
     tc->fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
 
     VdpDevice device;
-    vdp_t *vdp = dec_device->opaque;
+    vdp_t *vdp = GetVDPAUOpaqueDevice(dec_device);
     vdp_hold_x11(vdp, &device);
 
     void *vdp_gpa;
@@ -206,7 +206,7 @@ Open(vlc_object_t *obj)
 static void
 DecoderDeviceClose(vlc_decoder_device *device)
 {
-    vdp_release_x11(device->opaque);
+    vdp_release_x11(GetVDPAUOpaqueDevice(device));
 }
 
 static const struct vlc_decoder_device_operations dev_ops = {
