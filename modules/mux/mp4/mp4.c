@@ -135,9 +135,9 @@ typedef struct
     vlc_tick_t   i_length_neg;
 
     /* applies to current segment only */
-    int64_t      i_first_dts;
-    int64_t      i_last_dts;
-    int64_t      i_last_pts;
+    vlc_tick_t   i_first_dts;
+    vlc_tick_t   i_last_dts;
+    vlc_tick_t   i_last_pts;
 
     /*** mp4frag ***/
     bool         b_hasiframes;
