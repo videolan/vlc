@@ -61,6 +61,13 @@ static void Close( vlc_object_t * );
 #define AUTO_CONNECT_TEXT N_( "Auto connection" )
 #define AUTO_CONNECT_LONGTEXT N_( \
     "Automatically connect VLC input ports to available output ports." )
+#define CHANNELS_TEXT N_( "Channels" )
+#define CHANNELS_LONGTEXT N_( \
+    "Number of input channels VLC should expose to the jack server." )
+#define PORTS_TEXT N_( "Ports" )
+#define PORTS_LONGTEXT N_( \
+    "Output ports in jack that VLC should read from, URI-encoded and " \
+    "separated with a comma." )
 
 vlc_module_begin ()
      set_description( N_("JACK audio input") )
@@ -73,6 +80,16 @@ vlc_module_begin ()
          PACE_TEXT, PACE_LONGTEXT, true )
      add_bool( "jack-input-auto-connect", false,
          AUTO_CONNECT_TEXT, AUTO_CONNECT_LONGTEXT, false )
+
+     /* Channels, potentially from MRL. */
+     add_integer( "jack-input-channels", 0,
+         CHANNELS_TEXT, CHANNELS_LONGTEXT, false )
+        change_safe()
+
+    /* Ports, potentially from MRL. */
+     add_string( "jack-input-ports", NULL,
+         PORTS_TEXT, PORTS_LONGTEXT, false )
+        change_safe()
 
      add_shortcut( "jack" )
      set_callbacks( Open, Close )
