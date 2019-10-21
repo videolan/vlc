@@ -127,7 +127,6 @@ typedef struct
 static int Demux( demux_t * );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
-static void Parse ( demux_t * );
 static void Port_finder( demux_t * );
 static int Process( jack_nframes_t i_frames, void *p_arg );
 
@@ -155,7 +154,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Parse MRL */
-    Parse( p_demux );
+    var_LocationParse( p_demux, p_demux->psz_location, "jack-input-" );
+    p_sys->i_channels = var_GetInteger( p_demux,  "jack-input-channels" );
+    p_sys->psz_ports = var_GetString( p_demux,  "jack-input-ports" );
 
     /* Create var */
     var_Create( p_demux, "jack-input-use-vlc-pace",
@@ -535,88 +536,3 @@ static void Port_finder( demux_t *p_demux )
 
     p_sys->i_match_ports = i_total_out_ports;
 }
-
-
-/*****************************************************************************
- * Parse: Parse the MRL
- *****************************************************************************/
-static void Parse( demux_t *p_demux )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    char *psz_dup = strdup( p_demux->psz_location );
-    char *psz_parser = psz_dup;
-
-    if( !strncmp( psz_parser, "channels=", strlen( "channels=" ) ) )
-    {
-        p_sys->i_channels = abs( strtol( psz_parser + strlen( "channels=" ),
-            &psz_parser, 0 ) );
-    }
-    else if( !strncmp( psz_parser, "ports=", strlen( "ports=" ) ) )
-    {
-        int i_len;
-        psz_parser += strlen( "ports=" );
-        if( strchr( psz_parser, ':' ) )
-        {
-            i_len = strchr( psz_parser, ':' ) - psz_parser;
-        }
-        else
-        {
-            i_len = strlen( psz_parser );
-        }
-        p_sys->psz_ports = strndup( psz_parser, i_len );
-        psz_parser += i_len;
-    }
-    else
-    {
-        msg_Warn( p_demux, "unknown option" );
-    }
-
-    while( *psz_parser && *psz_parser != ':' )
-    {
-        psz_parser++;
-    }
-
-    if( *psz_parser == ':' )
-    {
-        for( ;; )
-        {
-            *psz_parser++ = '\0';
-            if( !strncmp( psz_parser, "channels=", strlen( "channels=" ) ) )
-            {
-                p_sys->i_channels = abs( strtol(
-                    psz_parser + strlen( "channels=" ), &psz_parser, 0 ) );
-            }
-            else if( !strncmp( psz_parser, "ports=", strlen( "ports=" ) ) )
-            {
-                int i_len;
-                psz_parser += strlen( "ports=" );
-                if( strchr( psz_parser, ':' ) )
-                {
-                    i_len = strchr( psz_parser, ':' ) - psz_parser;
-                }
-                else
-                {
-                    i_len = strlen( psz_parser );
-                }
-                p_sys->psz_ports = strndup( psz_parser, i_len );
-                psz_parser += i_len;
-            }
-            else
-            {
-                msg_Warn( p_demux, "unknown option" );
-            }
-            while( *psz_parser && *psz_parser != ':' )
-            {
-                psz_parser++;
-            }
-
-            if( *psz_parser == '\0' )
-            {
-                break;
-            }
-        }
-    }
-
-    free( psz_dup );
-}
-
