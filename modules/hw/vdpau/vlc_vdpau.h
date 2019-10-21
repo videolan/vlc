@@ -21,6 +21,7 @@
 #ifndef VLC_VDPAU_H
 # include <stdint.h>
 # include <vdpau/vdpau.h>
+#include <vlc_codec.h>
 
 typedef struct vdp_s vdp_t;
 
@@ -273,6 +274,13 @@ typedef struct vlc_vdp_video_field
     VdpProcamp procamp;
     float sharpen;
 } vlc_vdp_video_field_t;
+
+static inline vdp_t *GetVDPAUOpaqueDevice(vlc_decoder_device *device)
+{
+    if (device == NULL || device->type != VLC_DECODER_DEVICE_VDPAU)
+        return NULL;
+    return device->opaque;
+}
 
 /**
  * Attaches a VDPAU video surface as context of a VLC picture.
