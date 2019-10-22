@@ -133,11 +133,6 @@ typedef struct libvlc_media_stats_t
     /* Audio output */
     int         i_played_abuffers;
     int         i_lost_abuffers;
-
-    /* Stream output */
-    int         i_sent_packets;
-    int         i_sent_bytes;
-    float       f_send_bitrate;
 } libvlc_media_stats_t;
 
 typedef struct libvlc_audio_track_t

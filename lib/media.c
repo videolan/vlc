@@ -728,10 +728,6 @@ bool libvlc_media_get_stats(libvlc_media_t *p_md,
     p_stats->i_played_abuffers = p_itm_stats->i_played_abuffers;
     p_stats->i_lost_abuffers = p_itm_stats->i_lost_abuffers;
 
-    p_stats->i_sent_packets = 0;
-    p_stats->i_sent_bytes = 0;
-    p_stats->f_send_bitrate = 0.;
-
     vlc_mutex_unlock( &item->lock );
     return true;
 }
