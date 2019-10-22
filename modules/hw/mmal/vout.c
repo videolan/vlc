@@ -326,7 +326,6 @@ out:
 
 static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
     char response[20]; /* answer is hvs_update_fields=%1d */
     unsigned i;
