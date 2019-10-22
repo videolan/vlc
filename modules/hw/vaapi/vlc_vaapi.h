@@ -153,6 +153,13 @@ vlc_vaapi_EndPicture(vlc_object_t *o, VADisplay dpy, VAContextID ctx);
  * VAAPI helpers *
  *****************/
 
+struct vaapi_pic_context
+{
+    picture_context_t s;
+    VASurfaceID surface;
+    VADisplay va_dpy;
+};
+
 /* Creates a VAConfigID */
 VAConfigID
 vlc_vaapi_CreateConfigChecked(vlc_object_t *o, VADisplay dpy,
@@ -189,5 +196,21 @@ vlc_vaapi_IsChromaOpaque(int i_vlc_chroma)
     return i_vlc_chroma == VLC_CODEC_VAAPI_420
         || i_vlc_chroma == VLC_CODEC_VAAPI_420_10BPP;
 }
+
+void vlc_chroma_to_vaapi(int i_vlc_chroma, unsigned *va_rt_format, int *va_fourcc);
+
+/* This macro is designed to wrap any VA call, and in case of failure,
+   display the VA error string then goto the 'error' label (which you must
+   define). */
+#define VA_CALL(o, f, args...)                          \
+    do                                                  \
+    {                                                   \
+        VAStatus s = f(args);                           \
+        if (s != VA_STATUS_SUCCESS)                     \
+        {                                               \
+            msg_Err(o, "%s: %s", #f, vaErrorStr(s));    \
+            goto error;                                 \
+        }                                               \
+    } while (0)
 
 #endif /* VLC_VAAPI_H */

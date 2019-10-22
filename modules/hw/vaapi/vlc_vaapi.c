@@ -42,21 +42,7 @@
 #include <vlc_filter.h>
 #include <vlc_picture_pool.h>
 
-/* This macro is designed to wrap any VA call, and in case of failure,
-   display the VA error string then goto the 'error' label (which you must
-   define). */
-#define VA_CALL(o, f, args...)                          \
-    do                                                  \
-    {                                                   \
-        VAStatus s = f(args);                           \
-        if (s != VA_STATUS_SUCCESS)                     \
-        {                                               \
-            msg_Err(o, "%s: %s", #f, vaErrorStr(s));    \
-            goto error;                                 \
-        }                                               \
-    } while (0)
-
-static void
+void
 vlc_chroma_to_vaapi(int i_vlc_chroma, unsigned *va_rt_format, int *va_fourcc)
 {
     switch (i_vlc_chroma)
@@ -417,9 +403,7 @@ error:
 
 struct vaapi_pic_ctx
 {
-    picture_context_t s;
-    VASurfaceID surface;
-    VADisplay va_dpy;
+    struct vaapi_pic_context ctx;
     picture_t *picref;
 };
 
@@ -470,12 +454,12 @@ pic_ctx_copy_cb(struct picture_context_t *opaque)
     if (dst_ctx == NULL)
         return NULL;
 
-    dst_ctx->s.destroy = pic_ctx_destroy_cb;
-    dst_ctx->s.copy = pic_ctx_copy_cb;
-    dst_ctx->surface = src_ctx->surface;
-    dst_ctx->va_dpy = src_ctx->va_dpy;
+    dst_ctx->ctx.s.destroy = pic_ctx_destroy_cb;
+    dst_ctx->ctx.s.copy = pic_ctx_copy_cb;
+    dst_ctx->ctx.surface = src_ctx->ctx.surface;
+    dst_ctx->ctx.va_dpy = src_ctx->ctx.va_dpy;
     dst_ctx->picref = picture_Hold(src_ctx->picref);
-    return &dst_ctx->s;
+    return &dst_ctx->ctx.s;
 }
 
 static void
@@ -532,10 +516,10 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
             goto error_pic;
         }
         p_sys->instance = instance;
-        p_sys->ctx.s.destroy = pic_sys_ctx_destroy_cb;
-        p_sys->ctx.s.copy = pic_ctx_copy_cb;
-        p_sys->ctx.surface = instance->render_targets[i];
-        p_sys->ctx.va_dpy = dpy;
+        p_sys->ctx.ctx.s.destroy = pic_sys_ctx_destroy_cb;
+        p_sys->ctx.ctx.s.copy = pic_ctx_copy_cb;
+        p_sys->ctx.ctx.surface = instance->render_targets[i];
+        p_sys->ctx.ctx.va_dpy = dpy;
         p_sys->ctx.picref = NULL;
         picture_resource_t rsc = {
             .p_sys = p_sys,
@@ -595,7 +579,7 @@ vlc_vaapi_PicAttachContext(picture_t *pic)
 
     picture_sys_t *p_sys = pic->p_sys;
     p_sys->ctx.picref = pic;
-    pic->context = &p_sys->ctx.s;
+    pic->context = &p_sys->ctx.ctx.s;
 }
 
 VASurfaceID
@@ -604,7 +588,7 @@ vlc_vaapi_PicGetSurface(picture_t *pic)
     ASSERT_VAAPI_CHROMA(pic);
     assert(pic->context);
 
-    return ((struct vaapi_pic_ctx *)pic->context)->surface;
+    return ((struct vaapi_pic_ctx *)pic->context)->ctx.surface;
 }
 
 VADisplay
@@ -614,5 +598,5 @@ vlc_vaapi_PicGetDisplay(picture_t *pic)
     assert(pic->context);
 
     struct vaapi_pic_ctx *pic_ctx = (struct vaapi_pic_ctx *)pic->context;
-    return pic_ctx->va_dpy;
+    return pic_ctx->ctx.va_dpy;
 }
