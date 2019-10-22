@@ -253,17 +253,13 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     }
     vctx_priv->pool[i] = NULL;
 
-    if (i < codec_refs + 3u)
+    if (i < refs)
     {
         msg_Err(va, "not enough video RAM");
         while (i > 0)
             vlc_vdp_video_destroy(vctx_priv->pool[--i]);
         goto error;
     }
-
-    if (i < refs)
-        msg_Warn(va, "video RAM low (allocated %u of %u buffers)",
-                 i, refs);
 
     const char *infos;
     if (vdp_get_information_string(vctx_priv->vdp, &infos) == VDP_STATUS_OK)
