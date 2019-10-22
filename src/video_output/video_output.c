@@ -420,7 +420,7 @@ void vout_ChangeDisplaySize(vout_thread_t *vout,
 {
     vout_thread_sys_t *sys = vout->p;
 
-    assert(!vout->p->dummy);
+    assert(!sys->dummy);
 
     /* DO NOT call this outside the vout window callbacks */
     vlc_mutex_lock(&sys->display_lock);
@@ -551,8 +551,8 @@ void vout_ChangeCropWindow(vout_thread_t *vout,
     vlc_mutex_unlock(&sys->window_lock);
 
     if (sys->display != NULL)
-        vout_SetDisplayCrop(vout->p->display, 0, 0, x, y, width, height);
-    vlc_mutex_unlock(&vout->p->display_lock);
+        vout_SetDisplayCrop(sys->display, 0, 0, x, y, width, height);
+    vlc_mutex_unlock(&sys->display_lock);
 }
 
 void vout_ChangeCropBorder(vout_thread_t *vout,
@@ -583,7 +583,7 @@ void vout_ChangeCropBorder(vout_thread_t *vout,
     vlc_mutex_unlock(&sys->window_lock);
 
     if (sys->display != NULL)
-        vout_SetDisplayCrop(vout->p->display, 0, 0,
+        vout_SetDisplayCrop(sys->display, 0, 0,
                             left, top, -right, -bottom);
     vlc_mutex_unlock(&sys->display_lock);
 }
@@ -631,7 +631,7 @@ void vout_ChangeViewpoint(vout_thread_t *vout,
 
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_VIEWPOINT);
     cmd.viewpoint = *p_viewpoint;
-    vout_control_Push(&vout->p->control, &cmd);
+    vout_control_Push(&sys->control, &cmd);
 }
 
 /* */
@@ -1352,33 +1352,33 @@ static void vout_FlushUnlocked(vout_thread_t *vout, bool below,
 {
     vout_thread_sys_t *sys = vout->p;
 
-    vout->p->step.timestamp = VLC_TICK_INVALID;
-    vout->p->step.last      = VLC_TICK_INVALID;
+    sys->step.timestamp = VLC_TICK_INVALID;
+    sys->step.last      = VLC_TICK_INVALID;
 
     ThreadFilterFlush(vout, false); /* FIXME too much */
 
-    picture_t *last = vout->p->displayed.decoded;
+    picture_t *last = sys->displayed.decoded;
     if (last) {
         if ((date == VLC_TICK_INVALID) ||
             ( below && last->date <= date) ||
             (!below && last->date >= date)) {
             picture_Release(last);
 
-            vout->p->displayed.decoded   = NULL;
-            vout->p->displayed.date      = VLC_TICK_INVALID;
-            vout->p->displayed.timestamp = VLC_TICK_INVALID;
+            sys->displayed.decoded   = NULL;
+            sys->displayed.date      = VLC_TICK_INVALID;
+            sys->displayed.timestamp = VLC_TICK_INVALID;
         }
     }
 
-    picture_fifo_Flush(vout->p->decoder_fifo, date, below);
+    picture_fifo_Flush(sys->decoder_fifo, date, below);
 
     assert(sys->display != NULL);
-    vlc_mutex_lock(&vout->p->display_lock);
-    vout_FilterFlush(vout->p->display);
-    vlc_mutex_unlock(&vout->p->display_lock);
+    vlc_mutex_lock(&sys->display_lock);
+    vout_FilterFlush(sys->display);
+    vlc_mutex_unlock(&sys->display_lock);
 
-    vlc_clock_Reset(vout->p->clock);
-    vlc_clock_SetDelay(vout->p->clock, vout->p->delay);
+    vlc_clock_Reset(sys->clock);
+    vlc_clock_SetDelay(sys->clock, sys->delay);
 }
 
 void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
@@ -1422,8 +1422,8 @@ void vout_ChangeDelay(vout_thread_t *vout, vlc_tick_t delay)
     assert(sys->display);
 
     vout_control_Hold(&sys->control);
-    vlc_clock_SetDelay(vout->p->clock, delay);
-    vout->p->delay = delay;
+    vlc_clock_SetDelay(sys->clock, delay);
+    sys->delay = delay;
     vout_control_Release(&sys->control);
 }
 
@@ -1814,11 +1814,11 @@ void vout_Release(vout_thread_t *vout)
         return;
     }
 
-    free(vout->p->splitter_name);
+    free(sys->splitter_name);
 
     /* Destroy the locks */
-    vlc_mutex_destroy(&vout->p->window_lock);
-    vlc_mutex_destroy(&vout->p->filter.lock);
+    vlc_mutex_destroy(&sys->window_lock);
+    vlc_mutex_destroy(&sys->filter.lock);
 
     if (sys->dec_device)
         vlc_decoder_device_Release(sys->dec_device);
@@ -1826,15 +1826,15 @@ void vout_Release(vout_thread_t *vout)
     assert(!sys->window_enabled);
     vout_display_window_Delete(sys->display_cfg.window);
 
-    vout_control_Clean(&vout->p->control);
+    vout_control_Clean(&sys->control);
     vlc_mutex_destroy(&sys->display_lock);
 
     /* */
-    vout_statistic_Clean(&vout->p->statistic);
+    vout_statistic_Clean(&sys->statistic);
 
     /* */
-    vout_snapshot_Destroy(vout->p->snapshot);
-    video_format_Clean(&vout->p->original);
+    vout_snapshot_Destroy(sys->snapshot);
+    video_format_Clean(&sys->original);
     vlc_object_delete(VLC_OBJECT(vout));
 }
 
