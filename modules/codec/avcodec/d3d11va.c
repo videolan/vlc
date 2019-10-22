@@ -658,7 +658,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     ID3D11Texture2D *p_texture;
     hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &p_texture );
     if (FAILED(hr)) {
-        msg_Err(va, "CreateTexture2D %d failed. (hr=0x%lX)", surface_count, hr);
+        msg_Err(va, "CreateTexture2D %zu failed. (hr=0x%lX)", surface_count, hr);
         return VLC_EGENERIC;
     }
 
@@ -683,7 +683,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
                                 &sys->renderSrc[surface_idx * D3D11_MAX_SHADER_VIEW]);
         }
     }
-    msg_Dbg(va, "ID3D11VideoDecoderOutputView succeed with %d surfaces (%dx%d)",
+    msg_Dbg(va, "ID3D11VideoDecoderOutputView succeed with %zu surfaces (%dx%d)",
             surface_count, fmt->i_width, fmt->i_height);
 
     D3D11_VIDEO_DECODER_DESC decoderDesc;

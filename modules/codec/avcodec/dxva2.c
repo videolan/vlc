@@ -538,10 +538,10 @@ static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
                                                          sys->hw_surface,
                                                          NULL);
     if (FAILED(hr)) {
-        msg_Err(va, "IDirectXVideoAccelerationService_CreateSurface %d failed (hr=0x%lX)", surface_count - 1, hr);
+        msg_Err(va, "IDirectXVideoAccelerationService_CreateSurface %zu failed (hr=0x%lX)", surface_count - 1, hr);
         return VLC_EGENERIC;
     }
-    msg_Dbg(va, "IDirectXVideoAccelerationService_CreateSurface succeed with %d surfaces (%dx%d)",
+    msg_Dbg(va, "IDirectXVideoAccelerationService_CreateSurface succeed with %zu surfaces (%dx%d)",
             surface_count, fmt->i_width, fmt->i_height);
 
     IDirect3DSurface9 *tstCrash;
