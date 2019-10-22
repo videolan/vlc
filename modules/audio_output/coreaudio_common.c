@@ -263,7 +263,8 @@ ca_GetLatencyLocked(audio_output_t *p_aout)
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
     const int64_t i_out_frames = BytesToFrames(p_sys, p_sys->i_out_size);
-    return FramesToUs(p_sys, i_out_frames + p_sys->i_render_frames);
+    return FramesToUs(p_sys, i_out_frames + p_sys->i_render_frames)
+           + p_sys->i_dev_latency_us;
 }
 
 int
@@ -286,8 +287,7 @@ ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
     const mtime_t i_render_time_us = HostTimeToTick(p_sys->i_render_host_time);
     const mtime_t i_render_delay = i_render_time_us - mdate();
 
-    *delay = ca_GetLatencyLocked(p_aout) + i_render_delay
-           + p_sys->i_dev_latency_us;
+    *delay = ca_GetLatencyLocked(p_aout) + i_render_delay;
     lock_unlock(p_sys);
     return 0;
 }
