@@ -419,6 +419,7 @@ struct vaapi_pic_ctx
 {
     picture_context_t s;
     VASurfaceID surface;
+    VADisplay va_dpy;
     picture_t *picref;
 };
 
@@ -472,6 +473,7 @@ pic_ctx_copy_cb(struct picture_context_t *opaque)
     dst_ctx->s.destroy = pic_ctx_destroy_cb;
     dst_ctx->s.copy = pic_ctx_copy_cb;
     dst_ctx->surface = src_ctx->surface;
+    dst_ctx->va_dpy = src_ctx->va_dpy;
     dst_ctx->picref = picture_Hold(src_ctx->picref);
     return &dst_ctx->s;
 }
@@ -533,6 +535,7 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
         p_sys->ctx.s.destroy = pic_sys_ctx_destroy_cb;
         p_sys->ctx.s.copy = pic_ctx_copy_cb;
         p_sys->ctx.surface = instance->render_targets[i];
+        p_sys->ctx.va_dpy = dpy;
         p_sys->ctx.picref = NULL;
         picture_resource_t rsc = {
             .p_sys = p_sys,
@@ -610,6 +613,6 @@ vlc_vaapi_PicGetDisplay(picture_t *pic)
     ASSERT_VAAPI_CHROMA(pic);
     assert(pic->context);
 
-    picture_sys_t *p_sys = ((struct vaapi_pic_ctx *)pic->context)->picref->p_sys;
-    return p_sys->instance->va_dpy;
+    struct vaapi_pic_ctx *pic_ctx = (struct vaapi_pic_ctx *)pic->context;
+    return pic_ctx->va_dpy;
 }
