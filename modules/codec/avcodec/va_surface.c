@@ -76,7 +76,7 @@ static void va_pool_Release(va_pool_t *va_pool)
 }
 
 /* */
-int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx,
+int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, AVCodecContext *avctx,
                          const video_format_t *fmt, size_t count)
 {
     if ( va_pool->surface_count >= count &&
@@ -109,7 +109,7 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
         surface->va_pool = va_pool;
     }
 done:
-    va_pool->callbacks.pf_setup_avcodec_ctx(va_pool->callbacks.opaque);
+    va_pool->callbacks.pf_setup_avcodec_ctx(va_pool->callbacks.opaque, avctx);
 
     return VLC_SUCCESS;
 }

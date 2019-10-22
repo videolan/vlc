@@ -152,12 +152,13 @@ static int DxCreateVideoDecoder(vlc_va_t *, int codec_id,
                                 const video_format_t *, size_t surface_count);
 static void DxDestroyVideoDecoder(void *);
 
-static void SetupAVCodecContext(void *opaque)
+static void SetupAVCodecContext(void *opaque, AVCodecContext *avctx)
 {
     vlc_va_sys_t *sys = opaque;
     sys->hw.cfg = &sys->cfg;
     sys->hw.surface = sys->hw_surface;
     sys->hw.workaround = sys->selected_decoder->workaround;
+    avctx->hwaccel_context = &sys->hw;
 }
 
 static void dxva2_pic_context_destroy(picture_context_t *opaque)
@@ -347,8 +348,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
                     (int)sizeof(d3dai.Description), d3dai.Description,
                     DxgiVendorStr(d3dai.VendorId), d3dai.VendorId, d3dai.DeviceId, d3dai.Revision);
     }
-
-    ctx->hwaccel_context = &sys->hw;
 
     va->ops = &ops;
     *vtcx_out = sys->vctx;
