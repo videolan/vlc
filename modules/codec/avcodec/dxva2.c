@@ -238,11 +238,11 @@ static void Close(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    if (sys->va_pool)
-        va_pool_Close(sys->va_pool);
-
     if (sys->vctx)
         vlc_video_context_Release(sys->vctx);
+
+    if (sys->va_pool)
+        va_pool_Close(sys->va_pool);
 }
 
 static const struct vlc_va_operations ops = { Get, NULL, Close, };
