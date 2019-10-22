@@ -779,7 +779,10 @@ static int media_parse(libvlc_media_t *media, bool b_async,
     needed = !media->has_asked_preparse;
     media->has_asked_preparse = true;
     if (needed)
+    {
         media->is_parsed = false;
+        media->parsed_status = 0;
+    }
     vlc_mutex_unlock(&media->parsed_lock);
 
     if (needed)
