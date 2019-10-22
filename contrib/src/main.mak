@@ -478,8 +478,8 @@ vlc-contrib-$(HOST)-latest.tar.bz2:
 prebuilt: vlc-contrib-$(HOST)-latest.tar.bz2
 	$(RM) -r $(PREFIX)
 	-$(UNPACK)
-	mv $(HOST) $(TOPDST)
-	cd $(PREFIX) && $(SRC)/change_prefix.sh
+	mv $(HOST) $(PREFIX)
+	cd $(PREFIX) && $(abspath $(SRC))/change_prefix.sh
 ifdef HAVE_WIN32
 ifndef HAVE_CROSS_COMPILE
 	$(RM) `find $(PREFIX)/bin | file -f- | grep ELF | awk -F: '{print $$1}' | xargs`
@@ -495,7 +495,10 @@ package: install
 		cd share; rm -Rf man doc gtk-doc info lua projectM; cd ..; \
 		rm -Rf man sbin etc lib/lua lib/sidplay
 	cd tmp/$(notdir $(PREFIX)) && $(abspath $(SRC))/change_prefix.sh $(PREFIX) @@CONTRIB_PREFIX@@
-	(cd tmp && tar c $(notdir $(PREFIX))/) | bzip2 -c > ../vlc-contrib-$(HOST)-$(DATE).tar.bz2
+ifneq ($(notdir $(PREFIX)),$(HOST))
+	(cd tmp && mv $(notdir $(PREFIX)) $(HOST))
+endif
+	(cd tmp && tar c $(HOST)/) | bzip2 -c > ../vlc-contrib-$(HOST)-$(DATE).tar.bz2
 
 list:
 	@echo All packages:
