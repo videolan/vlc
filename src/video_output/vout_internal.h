@@ -55,7 +55,6 @@ typedef struct {
     vout_thread_t        *vout;
     vlc_clock_t          *clock;
     const video_format_t *fmt;
-    unsigned             dpb_size;
     vlc_mouse_event      mouse_event;
     void                 *mouse_opaque;
 } vout_configuration_t;
@@ -108,7 +107,6 @@ struct vout_thread_sys_t
             };
         } crop;
     } source;
-    unsigned        dpb_size;
 
     /* Snapshot interface */
     struct vout_snapshot *snapshot;
@@ -253,7 +251,7 @@ void vout_Close( vout_thread_t *p_vout );
  * \retval 0 on success
  * \retval -1 on error, the vout needs to be restarted to handle the format
  */
-int vout_ChangeSource( vout_thread_t *p_vout, const video_format_t *fmt, unsigned dpb_size );
+int vout_ChangeSource( vout_thread_t *p_vout, const video_format_t *fmt );
 
 /* TODO to move them to vlc_vout.h */
 void vout_ChangeFullscreen(vout_thread_t *, const char *id);

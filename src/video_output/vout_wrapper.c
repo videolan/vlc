@@ -86,7 +86,6 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
     const bool use_dr = !vout_IsDisplayFiltered(vd);
     const bool allow_dr = !vd->info.has_pictures_invalid && use_dr;
     const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
-    unsigned decoder_picture  = 1 + sys->dpb_size;
     const unsigned kept_picture     = 1; /* last displayed picture */
     const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
                                       private_picture +
@@ -104,11 +103,10 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
     case VLC_VIDEO_CONTEXT_DXVA2:
     case VLC_VIDEO_CONTEXT_D3D11VA:
         display_pool_size = reserved_picture;
-        decoder_picture = 0;
         break;
     default:
         display_pool_size = allow_dr ? __MAX(VOUT_MAX_PICTURES,
-                                             reserved_picture + decoder_picture) : 3;
+                                             reserved_picture) : 3;
         break;
     }
 
@@ -125,21 +123,17 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
 #endif
 
     if (allow_dr &&
-        picture_pool_GetSize(display_pool) >= reserved_picture + decoder_picture) {
-        sys->dpb_size     = picture_pool_GetSize(display_pool) - reserved_picture;
+        picture_pool_GetSize(display_pool) >= reserved_picture) {
         sys->decoder_pool = display_pool;
     } else {
         sys->decoder_pool = decoder_pool =
             picture_pool_NewFromFormat(&vd->source,
                                        __MAX(VOUT_MAX_PICTURES,
-                                             reserved_picture + decoder_picture - DISPLAY_PICTURE_COUNT));
+                                             reserved_picture - DISPLAY_PICTURE_COUNT));
         if (!sys->decoder_pool)
             goto error;
         if (allow_dr) {
             msg_Warn(vout, "Not enough direct buffers, using system memory");
-            sys->dpb_size = 0;
-        } else {
-            sys->dpb_size = picture_pool_GetSize(sys->decoder_pool) - reserved_picture;
         }
         if (use_dr)
             sys->display_pool = vout_GetPool(vd, 3);

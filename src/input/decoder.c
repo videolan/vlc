@@ -521,7 +521,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
     int res;
     if (p_owner->vout_thread_started)
     {
-        res = vout_ChangeSource(p_vout, &fmt, 0);
+        res = vout_ChangeSource(p_vout, &fmt);
         if (res == 0)
             // the display/thread is started and can handle the new source format
             return 0;
@@ -529,7 +529,6 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
 
     vout_configuration_t cfg = {
         .vout = p_vout, .clock = p_owner->p_clock, .fmt = &fmt,
-        .dpb_size = 0,
         .mouse_event = MouseEvent, .mouse_opaque = p_dec,
     };
     res = input_resource_StartVout( p_owner->p_resource, vctx, &cfg);

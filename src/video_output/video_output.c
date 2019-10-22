@@ -1508,7 +1508,6 @@ static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_c
     sys->mouse_opaque = cfg->mouse_opaque;
     vlc_mouse_Init(&sys->mouse);
 
-    sys->dpb_size = cfg->dpb_size;
     sys->decoder_fifo = picture_fifo_New();
     sys->decoder_pool = NULL;
     sys->display_pool = NULL;
@@ -1954,7 +1953,7 @@ vout_thread_t *vout_Hold(vout_thread_t *vout)
     return vout;
 }
 
-int vout_ChangeSource( vout_thread_t *vout, const video_format_t *original, unsigned dpb_size )
+int vout_ChangeSource( vout_thread_t *vout, const video_format_t *original )
 {
     vout_thread_sys_t *sys = vout->p;
 
@@ -1962,11 +1961,8 @@ int vout_ChangeSource( vout_thread_t *vout, const video_format_t *original, unsi
      * ratio and crop settings, instead of recreating a display.
      */
     if (video_format_IsSimilar(original, &sys->original)) {
-        if (dpb_size <= sys->dpb_size) {
-            /* It is assumed that the SPU input matches input already. */
-            return 0;
-        }
-        msg_Warn(vout, "DPB need to be increased");
+        /* It is assumed that the SPU input matches input already. */
+        return 0;
     }
 
     return -1;
@@ -2029,7 +2025,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     video_format_t original;
     VoutFixFormat(&original, cfg->fmt);
 
-    if (vout_ChangeSource(vout, &original, cfg->dpb_size) == 0)
+    if (vout_ChangeSource(vout, &original) == 0)
     {
         video_format_Clean(&original);
         return 0;
