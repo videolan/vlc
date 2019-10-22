@@ -1,0 +1,320 @@
+stages:
+    - build
+
+default:
+    before_script:
+        - set -x
+        - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
+        - export VLC_PREBUILT_CONTRIBS_URL="https://artifacts.videolan.org/vlc/${CI_JOB_NAME}-contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2"
+
+variables:
+    VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20190416165205
+    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20190416180622
+    VLC_WIN_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-mingw:20190621125349
+    VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20190416182140
+    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20190717134531
+
+.variables-debian: &variables-debian
+        HOST_ARCH: x86_64
+        TRIPLET: $HOST_ARCH-linux-gnu
+
+.variables-win32: &variables-win32
+        HOST_ARCH: i686
+        TRIPLET: $HOST_ARCH-w64-mingw32
+
+.variables-win64: &variables-win64
+        HOST_ARCH: x86_64
+        TRIPLET: $HOST_ARCH-w64-mingw32
+
+.variables-win64-llvm: &variables-win64-llvm
+        HOST_ARCH: x86_64
+        TRIPLET: $HOST_ARCH-w64-mingw32
+        WINE_SDK_PATH: /usr/include/wine/wine/windows/
+
+.variables-macos: &variables-macos
+        VLC_PATH: /Users/videolanci/sandbox/bin
+        VLC_FORCE_KERNELVERSION: 18
+        HOST_ARCH: x86_64
+        TRIPLET: $HOST_ARCH-apple-darwin$VLC_FORCE_KERNELVERSION
+
+.variables-ios: &variables-ios
+        VLC_PATH: /Users/videolanci/sandbox/bin
+        HOST_ARCH: aarch64
+        TRIPLET: $HOST_ARCH-apple-iphoneos
+        MAKEFLAGS: -j4
+
+.variables-android-arm: &variables-android-arm
+        ANDROID_ARCH: arm
+        TRIPLET: arm-linux-androideabi
+
+.variables-android-arm64: &variables-android-arm64
+        ANDROID_ARCH: arm64
+        TRIPLET: aarch64-linux-android
+
+.variables-android-x86: &variables-android-x86
+        ANDROID_ARCH: x86
+        TRIPLET: i686-linux-android
+
+.variables-android-x86_64: &variables-android-x86_64
+        ANDROID_ARCH: x86_64
+        TRIPLET: x86_64-linux-android
+
+#
+# Common rules for jobs
+#
+.contrib-common: &contrib-common
+    stage: build
+    tags:
+        - docker
+        - amd64
+        - zorin
+    only:
+        refs:
+            - merge_requests
+            - gitlab-ci
+        changes:
+            - "contrib/**/*"
+            - "extras/tools/**/*"
+    after_script:
+        - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
+        - mv contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2
+
+.continuous-common:
+    stage: build
+    tags:
+        - docker
+        - amd64
+        - zorin
+    only:
+        refs:
+            - merge_requests
+            - gitlab-ci
+    except:
+        changes:
+            - "contrib/**/*"
+            - "extras/tools/**/*"
+
+#
+# Windows continuous
+#
+.win-continuous:
+    extends: .continuous-common
+    script: |
+        set -x
+        extras/package/win32/build.sh -p -a $HOST_ARCH
+    artifacts:
+        paths:
+            - win??/vlc-*-win??.exe
+
+win32:
+    extends: .win-continuous
+    image:
+        name: $VLC_WIN32_IMAGE
+    variables: *variables-win32
+
+win64:
+    extends: .win-continuous
+    image:
+        name: $VLC_WIN64_IMAGE
+    variables: *variables-win64
+
+win64-llvm:
+    extends: .win-continuous
+    image:
+        name: $VLC_WIN_LLVM_IMAGE
+    variables: *variables-win64-llvm
+
+#
+# Windows contrib
+#
+.win-contrib:
+    extends: .contrib-common
+    script: |
+        extras/package/win32/build.sh -l -c -a $HOST_ARCH -i n
+        mv contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2
+    artifacts:
+        paths:
+            - contrib/vlc-contrib-${TRIPLET}-*.tar.bz2
+            - win??/vlc-*-win??.exe
+
+win32-contrib:
+    extends: .win-contrib
+    image:
+        name: $VLC_WIN32_IMAGE
+    variables: *variables-win32
+
+win64-contrib:
+    extends: .win-contrib
+    image:
+        name: $VLC_WIN64_IMAGE
+    variables: *variables-win64
+
+win64-llvm-contrib:
+    extends: .win-contrib
+    image:
+        name: $VLC_WIN_LLVM_IMAGE
+    variables: *variables-win64-llvm
+
+#
+# Debian continuous
+#
+debian:
+    extends: .continuous-common
+    image:
+        name: $VLC_DEBIAN_IMAGE
+    script: |
+        export NCPU=$(getconf _NPROCESSORS_ONLN)
+        cd extras/tools && ./bootstrap && make -j$NCPU --output-sync=recurse
+        export PATH=`pwd`/build/bin:$PATH
+        cd ../../
+        mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
+        ../bootstrap
+        curl -f -L "${VLC_PREBUILT_CONTRIBS_URL}" -o vlc-contrib-$TRIPLET-latest.tar.bz2
+        make prebuilt
+        cd ../../
+        ./bootstrap
+        ./configure
+        make -j$NCPU
+        VLC_TEST_TIMEOUT=60 sh -x ./test/make_check_wrapper.sh -j4
+    variables: *variables-debian
+
+#
+# Debian contrib
+#
+debian-contrib:
+    extends: .contrib-common
+    image:
+        name: $VLC_DEBIAN_IMAGE
+    script: |
+        export NCPU=$(getconf _NPROCESSORS_ONLN)
+        cd extras/tools && ./bootstrap && make -j$NCPU --output-sync=recurse
+        export PATH=`pwd`/build/bin:$PATH
+        cd ../../
+        cd contrib && mkdir native && cd native
+        ../bootstrap
+        make list
+        make -j$NCPU --output-sync=recurse fetch
+        make -j$NCPU --output-sync=recurse
+        make package
+        cd ../../
+        ./bootstrap
+        ./configure
+        make -j$NCPU
+        VLC_TEST_TIMEOUT=60 sh -x ./test/make_check_wrapper.sh -j4
+    artifacts:
+        paths:
+            - contrib/vlc-contrib-*.tar.bz2
+    variables: *variables-debian
+
+#
+# macOS continuous
+#
+macos:
+    extends: .continuous-common
+    tags: [macos]
+    script: |
+        mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
+        curl -f -L ${VLC_PREBUILT_CONTRIBS_URL} -o vlc-contrib-$TRIPLET-latest.tar.bz2
+        cd ../../
+        mkdir build && cd build
+        ../extras/package/macosx/build.sh
+    variables: *variables-macos
+
+#
+# macOS contrib
+#
+macos-contrib:
+    extends: .contrib-common
+    tags: [macos]
+    script: |
+        mkdir build && cd build
+        ../extras/package/macosx/build.sh -c -p
+    artifacts:
+        paths:
+            - contrib/vlc-contrib-*.tar.bz2
+            - build/vlc-*-dev.dmg
+    variables: *variables-macos
+
+#
+# iOS continuous
+#
+ios:
+    extends: .continuous-common
+    tags: [macos]
+    script: |
+        mkdir build && cd build
+        ../extras/package/apple/build.sh --sdk=iphoneos --arch=aarch64 \
+            --with-prebuilt-contribs
+    variables: *variables-ios
+
+#
+# iOS contrib
+#
+ios-contrib:
+    extends: .contrib-common
+    tags: [macos]
+    script: |
+        mkdir build && cd build
+        ../extras/package/apple/build.sh --sdk=iphoneos --arch=aarch64 --package-contribs
+    artifacts:
+        paths:
+            - contrib/vlc-contrib-*.tar.bz2
+    variables: *variables-ios
+
+#
+# Android continuous
+#
+.android-continuous:
+    extends: .continuous-common
+    image:
+        name: $VLC_ANDROID_IMAGE
+    script: |
+        wget https://code.videolan.org/videolan/vlc-android/raw/master/compile-libvlc.sh
+        /bin/sh ./compile-libvlc.sh -a $ANDROID_ARCH --with-prebuilt-contribs
+
+android-arm:
+    extends: .android-continuous
+    variables: *variables-android-arm
+
+android-arm64:
+    extends: .android-continuous
+    variables: *variables-android-arm64
+
+android-x86:
+    extends: .android-continuous
+    variables: *variables-android-x86
+
+android-x86_64:
+    extends: .android-continuous
+    variables: *variables-android-x86_64
+
+#
+# Android contrib
+#
+.android-contrib:
+    extends: .contrib-common
+    image:
+        name: $VLC_ANDROID_IMAGE
+    script: |
+        wget https://code.videolan.org/videolan/vlc-android/raw/master/compile-libvlc.sh
+        /bin/sh ./compile-libvlc.sh -a $ANDROID_ARCH --package-contribs
+    artifacts:
+        paths:
+            - contrib/vlc-contrib-*.tar.bz2
+
+android-arm-contrib:
+    extends: .android-contrib
+    variables: *variables-android-arm
+
+android-arm64-contrib:
+    extends: .android-contrib
+    variables: *variables-android-arm64
+
+android-x86-contrib:
+    extends: .android-contrib
+    variables: *variables-android-x86
+
+android-x86_64-contrib:
+    extends: .android-contrib
+    variables: *variables-android-x86_64
+
