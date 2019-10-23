@@ -7,6 +7,7 @@ Core:
 Demux:
  * Fix TTML entities not passed to decoder
  * Misc raw H264/HEVC frame rate fixes
+ * Fixed adaptive regression on TS format change (mostly HLS)
 
 Packetizers:
  * Fixes H264/HEVC incomplete draining in some cases
