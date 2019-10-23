@@ -668,7 +668,6 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
             hr = E_INVALIDARG;
             goto error;
         }
-        shared_mode = AUDCLNT_SHAREMODE_SHARED;
         msg_Dbg(s, "modified format");
         pwf = pwf_closest;
     }
