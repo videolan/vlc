@@ -11,7 +11,7 @@ variables:
     VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20190416165205
     VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20190416180622
     VLC_WIN_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-mingw:20190621125349
-    VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20190416182140
+    VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20191023134128
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20190717134531
 
 .variables-debian: &variables-debian
@@ -318,3 +318,25 @@ android-x86_64-contrib:
     extends: .android-contrib
     variables: *variables-android-x86_64
 
+
+#
+# VLC Documentation
+#
+pages:
+    tags:
+        - docker
+        - amd64
+        - zorin
+    image:
+        name: $VLC_DEBIAN_IMAGE
+    stage: build
+    script:
+        - ./bootstrap
+        - ./configure
+        - make doc
+        - mv doc/doxygen/html public
+    artifacts:
+        paths:
+            - public
+    only:
+        - schedules
