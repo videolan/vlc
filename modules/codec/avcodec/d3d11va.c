@@ -139,30 +139,30 @@ static void SetupAVCodecContext(void *opaque, AVCodecContext *avctx)
     avctx->hwaccel_context = &sys->hw;
 }
 
-static void d3d11va_pic_context_destroy(picture_context_t *opaque)
+static void d3d11va_pic_context_destroy(picture_context_t *ctx)
 {
-    struct d3d11va_pic_context *pic_ctx = D3D11VA_PICCONTEXT_FROM_PICCTX(opaque);
+    struct d3d11va_pic_context *pic_ctx = D3D11VA_PICCONTEXT_FROM_PICCTX(ctx);
     struct vlc_va_surface_t *va_surface = pic_ctx->va_surface;
-    d3d11_pic_context_destroy(&pic_ctx->ctx.s);
+    static_assert(offsetof(struct d3d11va_pic_context, ctx.s) == 0,
+        "Cast assumption failure");
+    d3d11_pic_context_destroy(ctx);
     va_surface_Release(va_surface);
 }
-
-static struct d3d11va_pic_context *CreatePicContext(ID3D11VideoDecoderOutputView *,
-                                               ID3D11Resource *,
-                                               ID3D11DeviceContext *,
-                                               UINT slice,
-                                               ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW]);
 
 static picture_context_t *d3d11va_pic_context_copy(picture_context_t *ctx)
 {
     struct d3d11va_pic_context *src_ctx = D3D11VA_PICCONTEXT_FROM_PICCTX(ctx);
-    struct d3d11va_pic_context *pic_ctx = CreatePicContext(src_ctx->ctx.picsys.decoder,
-                                                      src_ctx->ctx.picsys.resource[0], src_ctx->ctx.picsys.context,
-                                                      src_ctx->ctx.picsys.slice_index, src_ctx->ctx.picsys.renderSrc);
+    struct d3d11va_pic_context *pic_ctx = malloc(sizeof(*pic_ctx));
     if (unlikely(pic_ctx==NULL))
         return NULL;
-    pic_ctx->va_surface = src_ctx->va_surface;
+    *pic_ctx = *src_ctx;
     va_surface_AddRef(pic_ctx->va_surface);
+    for (int i=0;i<D3D11_MAX_SHADER_VIEW; i++)
+    {
+        pic_ctx->ctx.picsys.resource[i]  = src_ctx->ctx.picsys.resource[i];
+        pic_ctx->ctx.picsys.renderSrc[i] = src_ctx->ctx.picsys.renderSrc[i];
+    }
+    AcquireD3D11PictureSys(&pic_ctx->ctx.picsys);
     return &pic_ctx->ctx.s;
 }
 
@@ -237,7 +237,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
         va_surface_Release(va_surface);
         return VLC_ENOITEM;
     }
-    *data = (uint8_t*)D3D11VA_PICCONTEXT_FROM_PICCTX(pic->context)->ctx.picsys.decoder;
+    *data = (uint8_t*)sys->hw_surface[va_surface_GetIndex(va_surface)];
     return VLC_SUCCESS;
 }
 
