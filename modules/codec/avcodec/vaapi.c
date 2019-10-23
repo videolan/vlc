@@ -182,7 +182,7 @@ static void Delete(vlc_va_t *va)
     va_pool_Close(sys->va_pool);
 }
 
-static const struct vlc_va_operations ops = { Get, NULL, Delete, };
+static const struct vlc_va_operations ops = { Get, Delete, };
 
 static int VAAPICreateDevice(vlc_va_t *va)
 {

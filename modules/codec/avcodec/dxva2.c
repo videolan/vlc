@@ -245,7 +245,7 @@ static void Close(vlc_va_t *va)
         va_pool_Close(sys->va_pool);
 }
 
-static const struct vlc_va_operations ops = { Get, NULL, Close, };
+static const struct vlc_va_operations ops = { Get, Close, };
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                 enum PixelFormat pix_fmt,

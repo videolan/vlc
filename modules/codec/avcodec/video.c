@@ -1472,9 +1472,7 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
     vlc_va_t *va = p_sys->p_va;
 
     picture_t *pic;
-    pic = vlc_va_GetPicture(va, &dec->fmt_out.video);
-    if (pic == NULL)
-        pic = decoder_NewPicture(dec);
+    pic = decoder_NewPicture(dec);
     if (pic == NULL)
         return -1;
 
