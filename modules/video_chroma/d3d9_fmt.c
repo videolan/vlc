@@ -28,6 +28,9 @@
 #include <initguid.h>
 #include "d3d9_fmt.h"
 
+#define D3D9_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
+    container_of((pic_ctx), struct d3d9_pic_context, s)
+
 picture_sys_d3d9_t *ActiveD3D9PictureSys(picture_t *pic)
 {
     if (unlikely(pic->context == NULL))

@@ -98,9 +98,6 @@ static inline bool is_d3d9_opaque(vlc_fourcc_t chroma)
 
 const struct vlc_video_context_operations d3d9_vctx_ops;
 
-#define D3D9_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
-    container_of((pic_ctx), struct d3d9_pic_context, s)
-
 picture_sys_d3d9_t *ActiveD3D9PictureSys(picture_t *);
 
 static inline d3d9_decoder_device_t *GetD3D9OpaqueDevice(vlc_decoder_device *device)
