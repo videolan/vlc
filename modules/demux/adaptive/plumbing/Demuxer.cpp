@@ -124,6 +124,11 @@ bool MimeDemuxer::create()
     if(!demuxer || !demuxer->create())
         return false;
 
+    b_startsfromzero = demuxer->alwaysStartsFromZero();
+    b_reinitsonseek = demuxer->needsRestartOnSeek();
+    b_alwaysrestarts =  demuxer->needsRestartOnEachSegment();
+    b_candetectswitches = demuxer->bitstreamSwitchCompatible();
+
     return true;
 }
 
