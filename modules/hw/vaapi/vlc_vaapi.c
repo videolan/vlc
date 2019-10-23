@@ -571,15 +571,23 @@ vlc_vaapi_PicSysHoldInstance(void *_sys, VADisplay *dpy)
 } while(0)
 
 void
+vlc_vaapi_PicSetContext(picture_t *pic, struct vaapi_pic_context *vaapi_ctx)
+{
+    ASSERT_VAAPI_CHROMA(pic);
+    assert(pic->context == NULL);
+
+    pic->context = &vaapi_ctx->s;
+}
+
+void
 vlc_vaapi_PicAttachContext(picture_t *pic)
 {
     ASSERT_VAAPI_CHROMA(pic);
     assert(pic->p_sys != NULL);
-    assert(pic->context == NULL);
 
     picture_sys_t *p_sys = pic->p_sys;
     p_sys->ctx.picref = pic;
-    pic->context = &p_sys->ctx.ctx.s;
+    vlc_vaapi_PicSetContext(pic, &p_sys->ctx.ctx);
 }
 
 VASurfaceID
@@ -588,7 +596,7 @@ vlc_vaapi_PicGetSurface(picture_t *pic)
     ASSERT_VAAPI_CHROMA(pic);
     assert(pic->context);
 
-    return ((struct vaapi_pic_ctx *)pic->context)->ctx.surface;
+    return ((struct vaapi_pic_context *)pic->context)->surface;
 }
 
 VADisplay
@@ -597,6 +605,6 @@ vlc_vaapi_PicGetDisplay(picture_t *pic)
     ASSERT_VAAPI_CHROMA(pic);
     assert(pic->context);
 
-    struct vaapi_pic_ctx *pic_ctx = (struct vaapi_pic_ctx *)pic->context;
-    return pic_ctx->ctx.va_dpy;
+    struct vaapi_pic_context *pic_ctx = (struct vaapi_pic_context *)pic->context;
+    return pic_ctx->va_dpy;
 }

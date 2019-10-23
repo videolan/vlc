@@ -182,6 +182,10 @@ vlc_vaapi_PicSysHoldInstance(void *sys, VADisplay *dpy);
 void
 vlc_vaapi_PicAttachContext(picture_t *pic);
 
+/* Attachs the VASurface to the picture context */
+void
+vlc_vaapi_PicSetContext(picture_t *pic, struct vaapi_pic_context *);
+
 /* Get the VASurfaceID attached to the pic */
 VASurfaceID
 vlc_vaapi_PicGetSurface(picture_t *pic);

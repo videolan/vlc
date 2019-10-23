@@ -129,7 +129,9 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     (void) va;
 
     vlc_vaapi_PicAttachContext(pic);
-    *data = (void *) (uintptr_t) vlc_vaapi_PicGetSurface(pic);
+    struct vaapi_pic_context *vaapi_ctx =
+        container_of(pic->context, struct vaapi_pic_context, s);
+    *data = (void *) (uintptr_t) vaapi_ctx->surface;
 
     return VLC_SUCCESS;
 }
