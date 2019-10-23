@@ -612,6 +612,10 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
         shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
         /* The max buffer duration in exclusive mode is 200ms */
         buffer_duration = MSFTIME_FROM_MS(200);
+
+        hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
+                                            pwf, NULL);
+        pwf_closest = NULL;
     }
     else if (AOUT_FMT_LINEAR(&fmt))
     {
@@ -637,15 +641,13 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
             vlc_ToWave(pwfe, &fmt);
             buffer_duration = MSFTIME_FROM_VLC_TICK(AOUT_MAX_PREPARE_TIME);
         }
+
+        hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
+                                            pwf, &pwf_closest);
     }
     else
-    {
         hr = E_FAIL;
-        goto error;
-    }
 
-    hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
-                                        pwf, &pwf_closest);
 
     if (FAILED(hr))
     {
