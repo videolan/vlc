@@ -601,16 +601,14 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     }
     sys->client = pv;
 
-    if (b_spdif)
+
+    if (b_spdif || b_hdmi)
     {
-        vlc_SpdifToWave(pwfe, &fmt);
-        shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
-        /* The max buffer duration in exclusive mode is 200ms */
-        buffer_duration = MSFTIME_FROM_MS(200);
-    }
-    else if (b_hdmi)
-    {
-        vlc_HdmiToWave(&wf_iec61937, &fmt);
+        if (b_spdif)
+            vlc_SpdifToWave(pwfe, &fmt);
+        else
+            vlc_HdmiToWave(&wf_iec61937, &fmt);
+
         shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
         /* The max buffer duration in exclusive mode is 200ms */
         buffer_duration = MSFTIME_FROM_MS(200);
