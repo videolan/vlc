@@ -71,7 +71,7 @@ variables:
     only:
         refs:
             - merge_requests
-            - gitlab-ci
+            - master
         changes:
             - "contrib/**/*"
             - "extras/tools/**/*"
@@ -88,7 +88,7 @@ variables:
     only:
         refs:
             - merge_requests
-            - gitlab-ci
+            - master
     except:
         changes:
             - "contrib/**/*"
