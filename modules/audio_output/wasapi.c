@@ -106,6 +106,7 @@ typedef struct aout_stream_sys
     unsigned block_align;
     UINT64 written; /**< Frames written to the buffer */
     UINT32 frames; /**< Total buffer size (frames) */
+    bool s24s32; /**< Output configured as S24N, but input as S32N */
 } aout_stream_sys_t;
 
 static void ResetTimer(aout_stream_t *s)
@@ -268,7 +269,28 @@ static HRESULT Play(aout_stream_t *s, block_t *block, vlc_tick_t date)
 
         const size_t copy = frames * sys->block_align;
 
-        memcpy(dst, block->p_buffer, copy);
+        if (!sys->s24s32)
+        {
+            memcpy(dst, block->p_buffer, copy);
+            block->p_buffer += copy;
+            block->i_buffer -= copy;
+        }
+        else
+        {
+            /* Convert back S32L to S24L. The following is doing the opposite
+             * of S24LDecode() from codec/araw.c */
+            BYTE *end = dst + copy;
+            while (dst < end)
+            {
+                dst[0] = block->p_buffer[1];
+                dst[1] = block->p_buffer[2];
+                dst[2] = block->p_buffer[3];
+                dst += 3;
+                block->p_buffer += 4;
+                block->i_buffer -= 4;
+            }
+
+        }
         hr = IAudioRenderClient_ReleaseBuffer(render, frames, 0);
         if (FAILED(hr))
         {
@@ -276,8 +298,6 @@ static HRESULT Play(aout_stream_t *s, block_t *block, vlc_tick_t date)
             break;
         }
 
-        block->p_buffer += copy;
-        block->i_buffer -= copy;
         block->i_nb_samples -= frames;
         sys->written += frames;
         if (block->i_nb_samples == 0)
@@ -512,6 +532,7 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
             switch (wf->wBitsPerSample)
             {
                 case 32:
+                case 24:
                     audio->i_format = VLC_CODEC_S32N;
                     break;
                 case 16:
@@ -679,6 +700,9 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     sys->format = fmt.i_format;
     sys->block_align = pwf->nBlockAlign;
     sys->rate = pwf->nSamplesPerSec;
+    sys->s24s32 = pwf->wBitsPerSample == 24 && fmt.i_format == VLC_CODEC_S32N;
+    if (sys->s24s32)
+        msg_Dbg(s, "audio device configured as s24");
 
     hr = IAudioClient_Initialize(sys->client, shared_mode, 0, buffer_duration,
                                  0, pwf, sid);
