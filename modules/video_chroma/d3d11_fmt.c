@@ -38,6 +38,9 @@
 
 #include "d3d11_fmt.h"
 
+#define D3D11_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
+    container_of((pic_ctx), struct d3d11_pic_context, s)
+
 picture_sys_d3d11_t *ActiveD3D11PictureSys(picture_t *pic)
 {
     if (unlikely(pic->context == NULL))

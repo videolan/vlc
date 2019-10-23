@@ -111,9 +111,6 @@ static inline bool is_d3d11_opaque(vlc_fourcc_t chroma)
 
 const struct vlc_video_context_operations d3d11_vctx_ops;
 
-#define D3D11_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
-    container_of((pic_ctx), struct d3d11_pic_context, s)
-
 picture_sys_d3d11_t *ActiveD3D11PictureSys(picture_t *);
 
 static inline d3d11_decoder_device_t *GetD3D11OpaqueDevice(vlc_decoder_device *device)
