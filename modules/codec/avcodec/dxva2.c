@@ -161,24 +161,25 @@ static void SetupAVCodecContext(void *opaque, AVCodecContext *avctx)
     avctx->hwaccel_context = &sys->hw;
 }
 
-static void dxva2_pic_context_destroy(picture_context_t *opaque)
+static void dxva2_pic_context_destroy(picture_context_t *ctx)
 {
-    struct dxva2_pic_context *pic_ctx = DXVA2_PICCONTEXT_FROM_PICCTX(opaque);
+    struct dxva2_pic_context *pic_ctx = DXVA2_PICCONTEXT_FROM_PICCTX(ctx);
     struct vlc_va_surface_t *va_surface = pic_ctx->va_surface;
-    d3d9_pic_context_destroy(&pic_ctx->ctx.s);
+    static_assert(offsetof(struct dxva2_pic_context, ctx.s) == 0,
+        "Cast assumption failure");
+    d3d9_pic_context_destroy(ctx);
     va_surface_Release(va_surface);
 }
-
-static struct dxva2_pic_context *CreatePicContext(IDirect3DSurface9 *, IDirectXVideoDecoder *);
 
 static picture_context_t *dxva2_pic_context_copy(picture_context_t *ctx)
 {
     struct dxva2_pic_context *src_ctx = DXVA2_PICCONTEXT_FROM_PICCTX(ctx);
-    struct dxva2_pic_context *pic_ctx = CreatePicContext(src_ctx->ctx.picsys.surface, src_ctx->ctx.picsys.decoder);
+    struct dxva2_pic_context *pic_ctx = malloc(sizeof(*pic_ctx));
     if (unlikely(pic_ctx==NULL))
         return NULL;
-    pic_ctx->va_surface = src_ctx->va_surface;
+    *pic_ctx = *src_ctx;
     va_surface_AddRef(pic_ctx->va_surface);
+    AcquireD3D9PictureSys(&pic_ctx->ctx.picsys);
     return &pic_ctx->ctx.s;
 }
 
