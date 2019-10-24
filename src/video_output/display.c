@@ -455,6 +455,10 @@ static void vout_display_Reset(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
+#ifdef _WIN32
+    osys->reset_pictures = false;
+#endif
+
     if (osys->converters != NULL) {
         filter_chain_Delete(osys->converters);
         osys->converters = NULL;
