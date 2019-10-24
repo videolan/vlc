@@ -222,7 +222,9 @@ static xcb_cursor_t CursorCreate(xcb_connection_t *conn, xcb_window_t root)
 
 static int ProcessEvent(vout_window_t *wnd, xcb_generic_event_t *ev)
 {
+#ifdef HAVE_XKBCOMMON
     vout_window_sys_t *sys = wnd->sys;
+#endif
     int ret = 0;
 
     switch (ev->response_type & 0x7f)
