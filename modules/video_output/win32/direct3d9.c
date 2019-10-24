@@ -880,7 +880,7 @@ error:
 /**
  * It creates the picture and scene resources.
  */
-static int Direct3D9CreateResources(vout_display_t *vd, video_format_t *fmt)
+static int Direct3D9CreateResources(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -929,7 +929,7 @@ static int Direct3D9CreateResources(vout_display_t *vd, video_format_t *fmt)
 /**
  * It reset the Direct3D9 device and its resources.
  */
-static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
+static int Direct3D9Reset(vout_display_t *vd, const video_format_t *fmtp)
 {
     vout_display_sys_t *sys = vd->sys;
     d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
@@ -1533,17 +1533,16 @@ static int Control(vout_display_t *vd, int query, va_list args)
     switch (query) {
     case VOUT_DISPLAY_RESET_PICTURES:
     {
-        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-        video_format_t *fmt = va_arg(args, video_format_t *);
         /* FIXME what to do here in case of failure */
         if (sys->reset_device) {
+            va_arg(args, const vout_display_cfg_t *);
+            const video_format_t *fmt = va_arg(args, video_format_t *);
             if (Direct3D9Reset(vd, fmt)) {
                 msg_Err(vd, "Failed to reset device");
                 return VLC_EGENERIC;
             }
             sys->reset_device = false;
         }
-        (void) cfg;
         return VLC_SUCCESS;
     }
     default:
