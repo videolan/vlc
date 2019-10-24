@@ -105,6 +105,7 @@ fi
 info "Building extra tools"
 cd extras/tools
 
+export PATH="$PWD/build/bin":"$PATH"
 # Force libtool build when compiling with clang
 if [ "$COMPILING_WITH_CLANG" -gt 0 ] && [ ! -d "libtool" ]; then
     FORCED_TOOLS="libtool"
@@ -114,7 +115,6 @@ if [ "$INTERACTIVE" != "yes" ] || [ ! -f ./Makefile ]; then
     NEEDED="$FORCED_TOOLS" ./bootstrap
 fi
 make -j$JOBS
-export PATH="$PWD/build/bin":"$PATH"
 cd ../../
 
 export USE_FFMPEG=1
