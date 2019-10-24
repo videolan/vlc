@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-20 15:52+0200\n"
+"PO-Revision-Date: 2019-10-24 10:21+0200\n"
 "Last-Translator: Thomas De Rocker <thomasderocker at outlook dot com>, 2019\n"
 "Language-Team: Dutch (https://www.transifex.com/yaron/teams/16553/nl/)\n"
 "Language: nl\n"
@@ -2559,7 +2559,7 @@ msgid ""
 "detailed settings are available in Advanced / Network Sync."
 msgstr ""
 "Hiermee kunt u de klokken van de server en client gelijk zetten. De "
-"gedetaileerde instellingen zijn beschikbaar in Geavanceerd/Netwerksync."
+"gedetailleerde instellingen zijn beschikbaar in Geavanceerd/Netwerksync."
 
 #: src/libvlc-module.c:540 src/video_output/vout_intf.c:98
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
@@ -6383,7 +6383,7 @@ msgstr "Invoerlijst"
 #: modules/access/concat.c:305
 msgid "Comma-separated list of input URLs to concatenate."
 msgstr ""
-"Lijst van invoer-url's, gescheiden door komma's, om aaneen te schakelen."
+"Lijst van invoer-URL's, gescheiden door komma's, om aaneen te schakelen."
 
 #: modules/access/concat.c:308
 msgid "Concatenation"
@@ -20124,11 +20124,11 @@ msgstr "Weergavegrootte"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
 msgid "Increase"
-msgstr "Verhogen"
+msgstr "Vergroten"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:275
 msgid "Decrease"
-msgstr "Verlagen"
+msgstr "Verkleinen"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:406
 msgid "Playlist View Mode"
@@ -20144,11 +20144,11 @@ msgstr ""
 
 #: modules/gui/qt/components/playlist/standardpanel.hpp:143
 msgid "Icons"
-msgstr "Iconen"
+msgstr "Pictogrammen"
 
 #: modules/gui/qt/components/playlist/standardpanel.hpp:144
 msgid "Detailed List"
-msgstr "Gedetaileerde lijst"
+msgstr "Gedetailleerde lijst"
 
 #: modules/gui/qt/components/playlist/standardpanel.hpp:145
 msgid "List"
@@ -20160,7 +20160,7 @@ msgstr "PictureFlow"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:305
 msgid "Select File"
-msgstr "Selecteer bestand"
+msgstr "Bestand selecteren"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1134
 msgid ""
@@ -20188,7 +20188,7 @@ msgstr "Sneltoets"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1152
 msgid "Application level hotkey"
-msgstr "Toepassings-sneltoets"
+msgstr "Sneltoets op niveau van toepassing"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1153
 #: modules/gui/qt/components/preferences_widgets.cpp:1413
@@ -20197,7 +20197,7 @@ msgstr "Globaal"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1154
 msgid "Desktop level hotkey"
-msgstr "Sneltoets bureaubladniveau"
+msgstr "Sneltoets op niveau van bureaublad"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1237
 #: modules/gui/qt/components/preferences_widgets.cpp:1238
@@ -20343,7 +20343,7 @@ msgstr "Nieuw profiel aanmaken"
 #: modules/gui/qt/components/sout/profile_selector.cpp:449
 #: modules/gui/qt/dialogs/bookmarks.cpp:47
 msgid "Create"
-msgstr "Maken"
+msgstr "Aanmaken"
 
 #: modules/gui/qt/components/sout/profile_selector.cpp:635
 msgid "This muxer is not provided directly by VLC: It could be missing."
@@ -20469,7 +20469,7 @@ msgstr "Alle bladwijzers verwijderen"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:57 modules/video_filter/extract.c:68
 msgid "Extract"
-msgstr "Extract"
+msgstr "Uitpakken"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:62 modules/gui/qt/dialogs/epg.cpp:92
 #: modules/gui/qt/dialogs/errors.cpp:49 modules/gui/qt/dialogs/extended.cpp:130
@@ -20664,7 +20664,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/help.cpp:214
 msgid "&Recheck version"
-msgstr "Opnieuw"
+msgstr "Opnieuw controleren"
 
 #: modules/gui/qt/dialogs/help.cpp:217
 msgid "&Yes"
@@ -20852,7 +20852,7 @@ msgstr "Meer informatie..."
 
 #: modules/gui/qt/dialogs/plugins.cpp:259
 msgid "Reload extensions"
-msgstr "Extensies herladen"
+msgstr "Extensies opnieuw laden"
 
 #: modules/gui/qt/dialogs/plugins.cpp:378
 msgid ""
@@ -20961,7 +20961,7 @@ msgstr "Opslaan en dialoogvenster sluiten"
 
 #: modules/gui/qt/dialogs/preferences.cpp:98
 msgid "&Reset Preferences"
-msgstr "Standaa&rdinstellingen"
+msgstr "Voorkeuren herstellen"
 
 #: modules/gui/qt/dialogs/preferences.cpp:167
 msgid "Only show current"
@@ -21823,15 +21823,15 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:188
 msgid "When to raise the interface"
-msgstr "Wanneer de interface te verhogen"
+msgstr "Wanneer de interface naar voor te brengen"
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
 "This option allows the interface to be raised automatically when a video/"
 "audio playback starts, or never."
 msgstr ""
-"Deze optie staat toe dat de interface automatisch verhoogd wordt wanneer het "
-"afspelen van video/audio begint, of nooit."
+"Deze optie staat toe dat de interface automatisch naar voor gebracht wordt "
+"wanneer het afspelen van video/audio begint, of nooit."
 
 #: modules/gui/qt/qt.cpp:192
 msgid "Fullscreen controller mouse sensitivity"
@@ -29593,7 +29593,7 @@ msgstr "Popup weergeven bij mediawijziging:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:539
 msgid "Start in minimal view mode"
-msgstr "Opstarten in minimale weergave"
+msgstr "In minimale weergavemodus starten"
 
 #: modules/gui/qt/ui/sprefs_interface.h:540
 msgid "Force window style:"
@@ -29609,7 +29609,7 @@ msgstr "Pictogram in systeemvak weergeven"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
 msgid "Auto raising the interface:"
-msgstr "De interface automatisch verhogen:"
+msgstr "De interface automatisch naar voor brengen:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Skin resource file:"
