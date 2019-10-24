@@ -343,8 +343,9 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
             vout_display_place_t place;
             vout_display_PlacePicture(&place, &vd->source, &cfg_tmp);
-            if (OpenglLock(sys->gl))
-                return VLC_EGENERIC;
+            if (unlikely(OpenglLock(sys->gl)))
+                // don't return an error or we need to handle VOUT_DISPLAY_RESET_PICTURES
+                return VLC_SUCCESS;
 
             vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
             OpenglUnlock(sys->gl);
