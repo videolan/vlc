@@ -93,6 +93,8 @@ esac
 
 #####
 
+SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
+
 JOBS=`getconf _NPROCESSORS_ONLN 2>&1`
 TRIPLET=$ARCH-w64-mingw32
 
@@ -103,6 +105,7 @@ if ! printf "#ifdef __clang__\n#error CLANG\n#endif" | $CC -E -; then
 fi
 
 info "Building extra tools"
+mkdir -p extras/tools
 cd extras/tools
 
 export PATH="$PWD/build/bin":"$PATH"
@@ -112,7 +115,7 @@ if [ "$COMPILING_WITH_CLANG" -gt 0 ] && [ ! -d "libtool" ]; then
 fi
 # bootstrap only if needed in interactive mode
 if [ "$INTERACTIVE" != "yes" ] || [ ! -f ./Makefile ]; then
-    NEEDED="$FORCED_TOOLS" ./bootstrap
+    NEEDED="$FORCED_TOOLS" ${SCRIPT_PATH}/../../tools/bootstrap
 fi
 make -j$JOBS
 cd ../../
@@ -142,7 +145,7 @@ fi
 if [ "$RELEASE" != "yes" ]; then
      CONTRIBFLAGS="$CONTRIBFLAGS --disable-optim"
 fi
-../bootstrap --host=$TRIPLET $CONTRIBFLAGS
+${SCRIPT_PATH}/../../../contrib/bootstrap --host=$TRIPLET $CONTRIBFLAGS
 
 # Rebuild the contribs or use the prebuilt ones
 if [ "$PREBUILT" != "yes" ]; then
@@ -163,7 +166,7 @@ cd ../..
 
 info "Bootstrapping"
 
-./bootstrap
+${SCRIPT_PATH}/../../../bootstrap
 
 info "Configuring VLC"
 mkdir -p $SHORTARCH
@@ -183,7 +186,7 @@ if [ ! -z "$WITH_PDB" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --enable-pdb"
 fi
 
-../extras/package/win32/configure.sh --host=$TRIPLET $CONFIGFLAGS
+${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$TRIPLET $CONFIGFLAGS
 
 info "Compiling"
 make -j$JOBS
