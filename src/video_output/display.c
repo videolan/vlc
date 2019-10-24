@@ -360,7 +360,6 @@ void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     msg_Err(vd, "picture buffers invalidated asynchronously");
-    assert(vd->info.has_pictures_invalid);
     atomic_store_explicit(&osys->reset_pictures, true, memory_order_release);
 #else
     (void) vd;
