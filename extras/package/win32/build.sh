@@ -139,6 +139,9 @@ fi
 if [ ! -z "$BREAKPAD" ]; then
      CONTRIBFLAGS="$CONTRIBFLAGS --enable-breakpad"
 fi
+if [ "$RELEASE" != "yes" ]; then
+     CONTRIBFLAGS="$CONTRIBFLAGS --disable-optim"
+fi
 ../bootstrap --host=$TRIPLET $CONTRIBFLAGS
 
 # Rebuild the contribs or use the prebuilt ones
