@@ -1106,8 +1106,6 @@ static void media_on_thumbnail_ready( void* data, picture_t* thumbnail )
     libvlc_event_send( &p_media->event_manager, &event );
     if ( pic != NULL )
         libvlc_picture_release( pic );
-    libvlc_media_release( p_media );
-    free( req );
 }
 
 libvlc_media_thumbnail_request_t*
@@ -1188,6 +1186,10 @@ void libvlc_media_thumbnail_cancel( libvlc_media_thumbnail_request_t *req )
     libvlc_priv_t *p_priv = libvlc_priv(req->md->p_libvlc_instance->p_libvlc_int);
     assert( p_priv->p_thumbnailer != NULL );
     vlc_thumbnailer_Cancel( p_priv->p_thumbnailer, req->req );
+}
+
+void libvlc_media_thumbnail_destroy( libvlc_media_thumbnail_request_t *req )
+{
     libvlc_media_release( req->md );
     free( req );
 }
