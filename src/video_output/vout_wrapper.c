@@ -82,8 +82,6 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
 
     sys->display_pool = NULL;
 
-    const bool use_dr = !vout_IsDisplayFiltered(vd);
-    const bool allow_dr = !vd->info.has_pictures_invalid && use_dr;
     const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
     const unsigned kept_picture     = 1; /* last displayed picture */
     const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
