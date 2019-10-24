@@ -163,7 +163,7 @@ info "Bootstrapping"
 ./bootstrap
 
 info "Configuring VLC"
-mkdir $SHORTARCH || true
+mkdir -p $SHORTARCH
 cd $SHORTARCH
 
 CONFIGFLAGS=""
