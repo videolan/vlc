@@ -602,13 +602,13 @@ int aout_OutputNew (audio_output_t *aout)
         filter_fmt->i_format = fmt->i_format = formats[i];
         ret = aout->start(aout, fmt);
     }
-    assert(aout->flush && aout->play && aout->time_get && aout->pause);
     vlc_mutex_unlock(&owner->lock);
     if (ret)
     {
         msg_Err (aout, "module not functional");
         return -1;
     }
+    assert(aout->flush && aout->play && aout->time_get && aout->pause);
 
     aout_PrepareStereoMode (aout, fmt, filters_cfg, input_chan_type,
                             i_nb_input_channels);
