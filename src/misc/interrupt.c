@@ -151,7 +151,7 @@ static int vlc_interrupt_finish(vlc_interrupt_t *ctx)
     if (ctx->interrupted)
     {
         ret = EINTR;
-        ctx->interrupted = atomic_load(&ctx->killed);
+        ctx->interrupted = false;
     }
     vlc_mutex_unlock(&ctx->lock);
     return ret;
