@@ -118,7 +118,7 @@ export PATH="$PWD/build/bin":"$PATH"
 cd ../../
 
 export USE_FFMPEG=1
-export PKG_CONFIG_LIBDIR=$PWD/contrib/$TRIPLET/lib/pkgconfig
+export PKG_CONFIG_LIBDIR="$PWD/contrib/$TRIPLET/lib/pkgconfig"
 export PATH="$PWD/contrib/$TRIPLET/bin":"$PATH"
 
 if [ "$INTERACTIVE" = "yes" ]; then
