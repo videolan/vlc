@@ -1063,6 +1063,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     bool b_drain = ( pp_block == NULL );
     bool b_drained = false;
+    bool b_first_output_sequence = true;
 
     do
     {
@@ -1193,8 +1194,12 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         const vlc_tick_t i_next_pts = interpolate_next_pts(p_dec, frame);
 
-        update_late_frame_count( p_dec, p_block, vlc_tick_now(), i_pts,
-                                 i_next_pts, frame->reordered_opaque);
+        if( b_first_output_sequence )
+        {
+            update_late_frame_count( p_dec, p_block, vlc_tick_now(), i_pts,
+                                     i_next_pts, frame->reordered_opaque);
+            b_first_output_sequence = false;
+        }
 
         if( !p_frame_info->b_display ||
            ( !p_sys->p_va && !frame->linesize[0] ) ||
