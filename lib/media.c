@@ -1181,14 +1181,14 @@ libvlc_media_thumbnail_request_by_pos( libvlc_media_t *md, float pos,
     return req;
 }
 
-void libvlc_media_thumbnail_cancel( libvlc_media_thumbnail_request_t *req )
+void libvlc_media_thumbnail_request_cancel( libvlc_media_thumbnail_request_t *req )
 {
     libvlc_priv_t *p_priv = libvlc_priv(req->md->p_libvlc_instance->p_libvlc_int);
     assert( p_priv->p_thumbnailer != NULL );
     vlc_thumbnailer_Cancel( p_priv->p_thumbnailer, req->req );
 }
 
-void libvlc_media_thumbnail_destroy( libvlc_media_thumbnail_request_t *req )
+void libvlc_media_thumbnail_request_destroy( libvlc_media_thumbnail_request_t *req )
 {
     libvlc_media_release( req->md );
     free( req );
