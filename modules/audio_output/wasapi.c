@@ -588,6 +588,153 @@ static void Stop(aout_stream_t *s)
     free(sys);
 }
 
+/*
+ * This function will try to find the closest PCM format that is accepted by
+ * the sound card. Exclusive here means a direct access to the sound card. The
+ * format arguments and the return code of this function behave exactly like
+ * IAudioClient_IsFormatSupported().
+ */
+static HRESULT GetExclusivePCMFormat(IAudioClient *c, const WAVEFORMATEX *pwf,
+                                     WAVEFORMATEX **ppwf_closest)
+{
+    HRESULT hr;
+    const AUDCLNT_SHAREMODE exclusive = AUDCLNT_SHAREMODE_EXCLUSIVE;
+
+    *ppwf_closest = NULL;
+
+    /* First try the input format */
+    hr = IAudioClient_IsFormatSupported(c, exclusive, pwf, NULL);
+
+    if (hr != AUDCLNT_E_UNSUPPORTED_FORMAT)
+    {
+        assert(hr != S_FALSE); /* S_FALSE reserved for shared mode */
+        return hr;
+    }
+
+    /* This format come from vlc_ToWave() */
+    assert(pwf->wFormatTag == WAVE_FORMAT_EXTENSIBLE);
+    const WAVEFORMATEXTENSIBLE *pwfe = (void *) pwf;
+    assert(IsEqualIID(&pwfe->SubFormat, &KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
+        || IsEqualIID(&pwfe->SubFormat, &KSDATAFORMAT_SUBTYPE_PCM));
+
+    /* Allocate the output closest format */
+    WAVEFORMATEXTENSIBLE *pwfe_closest =
+        CoTaskMemAlloc(sizeof(WAVEFORMATEXTENSIBLE));
+    if (!pwfe_closest)
+        return E_FAIL;
+    WAVEFORMATEX *pwf_closest = &pwfe_closest->Format;
+
+    /* Setup the fallback arrays. There are 3 properties to check: the format,
+     * the samplerate and the channels. There are maximum of 4 formats to
+     * check, 3 samplerates, and 2 channels configuration. So, that is a
+     * maximum of 4x3x2=24 checks */
+
+    /* The format candidates order is dependent of the input format. We don't
+     * want to use a high quality format when it's not needed but we prefer to
+     * use a high quality format instead of a lower one */
+    static const uint16_t bits_pcm8_candidates[] =  {  8, 16, 24, 32 };
+    static const uint16_t bits_pcm16_candidates[] = { 16, 24, 32, 8  };
+    static const uint16_t bits_pcm24_candidates[] = { 24, 32, 16, 8  };
+    static const uint16_t bits_pcm32_candidates[] = { 32, 24, 16, 8  };
+
+    static const size_t bits_candidates_size = ARRAY_SIZE(bits_pcm8_candidates);
+
+    const uint16_t *bits_candidates;
+    switch (pwf->wBitsPerSample)
+    {
+        case 64: /* fall through */
+        case 32: bits_candidates = bits_pcm32_candidates; break;
+        case 24: bits_candidates = bits_pcm24_candidates; break;
+        case 16: bits_candidates = bits_pcm16_candidates; break;
+        case 8:  bits_candidates = bits_pcm8_candidates;  break;
+        default: vlc_assert_unreachable();
+    }
+
+    /* Check the input samplerate, then 48kHz and 44.1khz */
+    const uint32_t samplerate_candidates[] = {
+        pwf->nSamplesPerSec,
+        pwf->nSamplesPerSec == 48000 ? 0 : 48000,
+        pwf->nSamplesPerSec == 44100 ? 0 : 44100,
+    };
+    const size_t samplerate_candidates_size = ARRAY_SIZE(samplerate_candidates);
+
+    /* Check the input number of channels, then stereo */
+    const uint16_t channels_candidates[] = {
+        pwf->nChannels,
+        pwf->nChannels == 2 ? 0 : 2,
+    };
+    const size_t channels_candidates_size = ARRAY_SIZE(channels_candidates);
+
+    /* Let's try everything */
+    for (size_t bits_idx = 0; bits_idx < bits_candidates_size; ++bits_idx)
+    {
+        uint16_t bits = bits_candidates[bits_idx];
+
+        for (size_t samplerate_idx = 0;
+             samplerate_idx < samplerate_candidates_size;
+             ++samplerate_idx)
+        {
+            const uint32_t samplerate = samplerate_candidates[samplerate_idx];
+
+            if (samplerate == 0)
+                continue;
+
+            for (size_t channels_idx = 0;
+                 channels_idx < channels_candidates_size;
+                 ++channels_idx)
+            {
+                const uint16_t channels = channels_candidates[channels_idx];
+                if (channels == 0)
+                    continue;
+
+                pwfe_closest->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
+                pwfe_closest->SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
+                pwfe_closest->Format.nSamplesPerSec = samplerate;
+                pwfe_closest->Format.wBitsPerSample = bits;
+                pwfe_closest->Samples.wValidBitsPerSample = bits;
+                pwfe_closest->Format.nChannels = channels;
+                pwfe_closest->Format.nBlockAlign = bits / 8 * channels;
+                pwfe_closest->Format.nAvgBytesPerSec =
+                    pwfe_closest->Format.nBlockAlign * samplerate;
+
+                if (channels == pwf->nChannels)
+                {
+                    /* Use The input channel configuration */
+                    pwfe_closest->dwChannelMask = pwfe->dwChannelMask;
+                }
+                else
+                {
+                    assert(channels == 2);
+                    pwfe_closest->dwChannelMask =
+                        SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT;
+                }
+                pwfe_closest->Format.cbSize = pwfe->Format.cbSize;
+
+                hr = IAudioClient_IsFormatSupported(c, exclusive,
+                                                    pwf_closest, NULL);
+
+                if (hr != AUDCLNT_E_UNSUPPORTED_FORMAT)
+                {
+                    if (hr == S_OK)
+                    {
+                        *ppwf_closest = pwf_closest;
+                        /* return S_FALSE when the closest format need to be
+                         * used (like IAudioClient_IsFormatSupported()) */
+                        return S_FALSE;
+                    }
+                    assert(hr != S_FALSE); /* S_FALSE reserved for shared mode */
+                    CoTaskMemFree(pwfe_closest);
+                    return hr; /* Unknown error */
+                }
+            }
+        }
+    }
+
+    /* No format found */
+    CoTaskMemFree(pwfe_closest);
+    return AUDCLNT_E_UNSUPPORTED_FORMAT;
+}
+
 static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
                      const GUID *sid)
 {
@@ -640,8 +787,6 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     }
     else if (AOUT_FMT_LINEAR(&fmt))
     {
-        shared_mode = AUDCLNT_SHAREMODE_SHARED;
-
         if (fmt.channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
         {
             fmt.channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
@@ -663,8 +808,19 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
             buffer_duration = MSFTIME_FROM_VLC_TICK(AOUT_MAX_PREPARE_TIME);
         }
 
-        hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
-                                            pwf, &pwf_closest);
+        /* Cache the var in the parent object (audio_output_t). */
+        if (var_CreateGetBool(vlc_object_parent(s), "wasapi-exclusive"))
+        {
+            shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
+            buffer_duration = MSFTIME_FROM_MS(200);
+            hr = GetExclusivePCMFormat(sys->client, pwf, &pwf_closest);
+        }
+        else
+        {
+            shared_mode = AUDCLNT_SHAREMODE_SHARED;
+            hr = IAudioClient_IsFormatSupported(sys->client, shared_mode,
+                                                pwf, &pwf_closest);
+        }
     }
     else
         hr = E_FAIL;
@@ -748,11 +904,21 @@ error:
     return hr;
 }
 
+#define WASAPI_EXCLUSIVE_TEXT N_("Use exclusive mode")
+#define WASAPI_EXCLUSIVE_LONGTEXT N_( \
+    "VLC will have a direct connection of the audio endpoint device. " \
+    "This mode can be used to reduce the audio latency or " \
+    "to assure that the audio stream won't be modified by the OS. " \
+    "This mode is more likely to fail if the soundcard format is not " \
+    "handled by VLC.")
+
 vlc_module_begin()
     set_shortname("WASAPI")
     set_description(N_("Windows Audio Session API output"))
     set_capability("aout stream", 50)
     set_category(CAT_AUDIO)
+    add_bool("wasapi-exclusive", false, WASAPI_EXCLUSIVE_TEXT,
+             WASAPI_EXCLUSIVE_LONGTEXT, true)
     set_subcategory(SUBCAT_AUDIO_AOUT)
     set_callback(Start)
 vlc_module_end()
