@@ -191,6 +191,7 @@ static void UnsetFullscreen(vout_window_t *wnd)
     {
         SetWindowLong(sys->hwnd, GWL_STYLE, sys->i_window_style);
         SetWindowPlacement(sys->hwnd, &sys->window_placement);
+        sys->window_placement.length = 0;
     }
     ShowWindow(sys->hwnd, SW_SHOWNORMAL);
 }
