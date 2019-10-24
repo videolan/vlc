@@ -283,7 +283,7 @@ typedef struct {
       * can be done and nothing will be displayed */
     filter_chain_t *converters;
 #ifdef _WIN32
-    atomic_bool reset_pictures;
+    bool reset_pictures; // set/read under the same lock as the control
 #endif
     picture_pool_t *pool;
 } vout_display_priv_t;
@@ -360,7 +360,7 @@ void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     msg_Err(vd, "picture buffers invalidated asynchronously");
-    atomic_store_explicit(&osys->reset_pictures, true, memory_order_release);
+    osys->reset_pictures = true;
 #else
     (void) vd;
     vlc_assert_unreachable();
@@ -476,9 +476,8 @@ static void vout_display_CheckReset(vout_display_t *vd)
 #ifdef _WIN32
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (unlikely(atomic_exchange_explicit(&osys->reset_pictures, false,
-                                          memory_order_relaxed))) {
-        atomic_thread_fence(memory_order_acquire);
+    if (unlikely(osys->reset_pictures)) {
+        osys->reset_pictures = false;
         vout_display_Reset(vd);
     }
 #else
@@ -736,7 +735,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
                                        &osys->cfg.display.height,
                                        source, &osys->cfg);
 #ifdef _WIN32
-    atomic_init(&osys->reset_pictures, false);
+    osys->reset_pictures = false;
 #endif
     osys->pool = NULL;
 
