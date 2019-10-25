@@ -1,0 +1,152 @@
+From d876dcd536fbb9111cf6d910095f93f9a98ffd03 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Thu, 24 Oct 2019 17:49:16 +0200
+Subject: [PATCH 5/5] smb2_connect_share_async: don't return ENOMEM if connect
+ fails
+
+---
+ include/smb2/libsmb2.h |  2 +-
+ lib/libsmb2.c          |  6 ++++--
+ lib/socket.c           | 40 +++++++++++++++++++++++++++++++---------
+ 3 files changed, 36 insertions(+), 12 deletions(-)
+
+diff --git a/include/smb2/libsmb2.h b/include/smb2/libsmb2.h
+index 4352ea3..a7a0160 100644
+--- a/include/smb2/libsmb2.h
++++ b/include/smb2/libsmb2.h
+@@ -176,7 +176,7 @@ const char *smb2_get_client_guid(struct smb2_context *smb2);
+  * status can be either of :
+  *    0     : Connection was successful. Command_data is NULL.
+  *
+- *   <0     : Failed to establish the connection. Command_data is NULL.
++ *   -errno : Failed to establish the connection. Command_data is NULL.
+  */
+ int smb2_connect_async(struct smb2_context *smb2, const char *server,
+                        smb2_command_cb cb, void *cb_data);
+diff --git a/lib/libsmb2.c b/lib/libsmb2.c
+index 7ff78c8..afe00a6 100644
+--- a/lib/libsmb2.c
++++ b/lib/libsmb2.c
+@@ -822,6 +822,7 @@ smb2_connect_share_async(struct smb2_context *smb2,
+                          smb2_command_cb cb, void *cb_data)
+ {
+         struct connect_data *c_data;
++        int err;
+ 
+         if (smb2->server) {
+                 free(discard_const(smb2->server));
+@@ -879,9 +880,10 @@ smb2_connect_share_async(struct smb2_context *smb2,
+         c_data->cb = cb;
+         c_data->cb_data = cb_data;
+ 
+-        if (smb2_connect_async(smb2, server, connect_cb, c_data) != 0) {
++        err = smb2_connect_async(smb2, server, connect_cb, c_data);
++        if (err != 0) {
+                 free_c_data(smb2, c_data);
+-                return -ENOMEM;
++                return err;
+         }
+ 
+         return 0;
+diff --git a/lib/socket.c b/lib/socket.c
+index 5e4beb1..4a7bf98 100644
+--- a/lib/socket.c
++++ b/lib/socket.c
+@@ -579,19 +579,19 @@ smb2_connect_async(struct smb2_context *smb2, const char *server,
+         struct addrinfo *ai = NULL;
+         struct sockaddr_storage ss;
+         socklen_t socksize;
+-        int family;
++        int family, err;
+ 
+         if (smb2->fd != -1) {
+                 smb2_set_error(smb2, "Trying to connect but already "
+                                "connected.");
+-                return -1;
++                return -EINVAL;
+         }
+ 
+         addr = strdup(server);
+         if (addr == NULL) {
+                 smb2_set_error(smb2, "Out-of-memory: "
+                                "Failed to strdup server address.");
+-                return -1;
++                return -ENOMEM;
+         }
+         host = addr;
+         port = host;
+@@ -606,7 +606,7 @@ smb2_connect_async(struct smb2_context *smb2, const char *server,
+                         free(addr);
+                         smb2_set_error(smb2, "Invalid address:%s  "
+                                 "Missing ']' in IPv6 address", server);
+-                        return -1;
++                        return -EINVAL;
+                 }
+                 *str = 0;
+                 port = str + 1;
+@@ -620,11 +620,33 @@ smb2_connect_async(struct smb2_context *smb2, const char *server,
+         }
+ 
+         /* is it a hostname ? */
+-        if (getaddrinfo(host, port, NULL, &ai) != 0) {
++        err = getaddrinfo(host, port, NULL, &ai);
++        if (err != 0) {
+                 free(addr);
+                 smb2_set_error(smb2, "Invalid address:%s  "
+                                "Can not resolv into IPv4/v6.", server);
+-                return -1;
++                switch (err) {
++                    case EAI_AGAIN:
++                        return -EAGAIN;
++                    case EAI_NONAME:
++#if EAI_NODATA != EAI_NONAME /* Equal in MSCV */
++                    case EAI_NODATA:
++#endif
++                    case EAI_SERVICE:
++                    case EAI_FAIL:
++#ifdef EAI_ADDRFAMILY /* Not available in MSVC */
++                    case EAI_ADDRFAMILY:
++#endif
++                        return -EIO;
++                    case EAI_MEMORY:
++                        return -ENOMEM;
++#ifdef EAI_SYSTEM /* Not available in MSVC */
++                    case EAI_SYSTEM:
++                        return -errno;
++#endif
++                    default:
++                        return -EINVAL;
++                }
+         }
+         free(addr);
+ 
+@@ -651,7 +673,7 @@ smb2_connect_async(struct smb2_context *smb2, const char *server,
+                                 "Only IPv4/IPv6 supported so far.",
+                                 ai->ai_family);
+                 freeaddrinfo(ai);
+-                return -1;
++                return -EINVAL;
+ 
+         }
+         family = ai->ai_family;
+@@ -665,7 +687,7 @@ smb2_connect_async(struct smb2_context *smb2, const char *server,
+ 	if (smb2->fd == -1) {
+ 		smb2_set_error(smb2, "Failed to open smb2 socket. "
+                                "Errno:%s(%d).", strerror(errno), errno);
+-		return -1;
++		return -EIO;
+ 	}
+ 
+ 	set_nonblocking(smb2->fd);
+@@ -681,7 +703,7 @@ smb2_connect_async(struct smb2_context *smb2, const char *server,
+ 			"%s(%d)", strerror(errno), errno);
+ 		close(smb2->fd);
+ 		smb2->fd = -1;
+-		return -1;
++		return -EIO;
+ 	}
+ 
+         return 0;
+-- 
+2.20.1
+
