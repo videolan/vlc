@@ -236,6 +236,13 @@ libwebvtt_plugin_la_SOURCES += codec/webvtt/CSSGrammar.y \
                                codec/webvtt/css_style.c \
                                codec/webvtt/css_style.h \
                                codec/webvtt/css_bridge.h
+css_parser_test_CFLAGS = $(libwebvtt_plugin_la_CFLAGS)
+css_parser_test_SOURCES = codec/webvtt/css_test.c \
+                          codec/webvtt/css_parser.c \
+                          codec/webvtt/CSSGrammar.y \
+                          codec/webvtt/CSSLexer.l
+check_PROGRAMS += css_parser_test
+TESTS += css_parser_test
 endif
 
 libsvcdsub_plugin_la_SOURCES = codec/svcdsub.c demux/mpeg/timestamps.h
