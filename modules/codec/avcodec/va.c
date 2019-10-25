@@ -101,13 +101,13 @@ static int vlc_va_Start(void *func, bool forced, va_list ap)
     AVCodecContext *ctx = va_arg(ap, AVCodecContext *);
     const AVPixFmtDescriptor *src_desc = va_arg(ap, const AVPixFmtDescriptor *);
     enum PixelFormat pix_fmt = va_arg(ap, enum PixelFormat);
-    const es_format_t *fmt = va_arg(ap, const es_format_t *);
+    const es_format_t *fmt_in = va_arg(ap, const es_format_t *);
     vlc_decoder_device *device = va_arg(ap, vlc_decoder_device *);
     vlc_video_context **vtcx_out = va_arg(ap, vlc_video_context **);
     vlc_va_open open = func;
 
     (void) forced;
-    return open(va, ctx, src_desc, pix_fmt, fmt, device, vtcx_out);
+    return open(va, ctx, src_desc, pix_fmt, fmt_in, device, vtcx_out);
 }
 
 vlc_va_t *vlc_va_New(vlc_object_t *obj,

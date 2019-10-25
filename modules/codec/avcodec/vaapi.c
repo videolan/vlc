@@ -57,7 +57,7 @@ struct vlc_va_sys_t
     VASurfaceID render_targets[MAX_SURFACE_COUNT];
 };
 
-static int GetVaProfile(const AVCodecContext *ctx, const es_format_t *fmt,
+static int GetVaProfile(const AVCodecContext *ctx, const es_format_t *fmt_in,
                         VAProfile *va_profile, int *vlc_chroma,
                         unsigned *pic_count)
 {
@@ -86,9 +86,9 @@ static int GetVaProfile(const AVCodecContext *ctx, const es_format_t *fmt,
         count = 18;
         break;
     case AV_CODEC_ID_HEVC:
-        if (fmt->i_profile == FF_PROFILE_HEVC_MAIN)
+        if (fmt_in->i_profile == FF_PROFILE_HEVC_MAIN)
             i_profile = VAProfileHEVCMain;
-        else if (fmt->i_profile == FF_PROFILE_HEVC_MAIN_10)
+        else if (fmt_in->i_profile == FF_PROFILE_HEVC_MAIN_10)
         {
             i_profile = VAProfileHEVCMain10;
             i_vlc_chroma = VLC_CODEC_VAAPI_420_10BPP;
@@ -237,7 +237,7 @@ static void VAAPISetupAVCodecContext(void *opaque, AVCodecContext *avctx)
 
 static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                   enum PixelFormat pix_fmt,
-                  const es_format_t *fmt, vlc_decoder_device *dec_device,
+                  const es_format_t *fmt_in, vlc_decoder_device *dec_device,
                   vlc_video_context **vtcx_out)
 {
     VLC_UNUSED(desc);
@@ -259,7 +259,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
     VAProfile i_profile;
     unsigned count;
     int i_vlc_chroma;
-    if (GetVaProfile(ctx, fmt, &i_profile, &i_vlc_chroma, &count) != VLC_SUCCESS)
+    if (GetVaProfile(ctx, fmt_in, &i_profile, &i_vlc_chroma, &count) != VLC_SUCCESS)
         goto error;
 
     /* */
@@ -268,7 +268,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
     sys->hw_ctx.context_id = VA_INVALID_ID;
     va->sys = sys;
 
-    video_format_t fmt_video = fmt->video;
+    video_format_t fmt_video = fmt_in->video;
     fmt_video.i_chroma = i_vlc_chroma;
 
     struct va_pool_cfg pool_cfg = {

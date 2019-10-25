@@ -158,14 +158,14 @@ const struct vlc_video_context_operations vdpau_vctx_ops = {
 
 static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *desc,
                 enum PixelFormat pix_fmt,
-                const es_format_t *fmt, vlc_decoder_device *dec_device,
+                const es_format_t *fmt_in, vlc_decoder_device *dec_device,
                 vlc_video_context **vtcx_out)
 {
     if (pix_fmt != AV_PIX_FMT_VDPAU|| dec_device == NULL ||
         GetVDPAUOpaqueDevice(dec_device) == NULL)
         return VLC_EGENERIC;
 
-    (void) fmt;
+    (void) fmt_in;
     (void) desc;
     void *func;
     VdpStatus err;

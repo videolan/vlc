@@ -251,7 +251,7 @@ static const struct vlc_va_operations ops = { Get, Close, };
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                 enum PixelFormat pix_fmt,
-                const es_format_t *fmt, vlc_decoder_device *dec_device,
+                const es_format_t *fmt_in, vlc_decoder_device *dec_device,
                 vlc_video_context **vtcx_out)
 {
     int err = VLC_EGENERIC;
@@ -322,7 +322,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
 
     video_format_t fmt_out;
     static const directx_sys_t dx_sys = { DxGetInputList, DxSetupOutput };
-    sys->selected_decoder = directx_va_Setup(va, &dx_sys, ctx, desc, fmt, isXboxHardware(sys->d3d_dev.d3ddevice), &fmt_out, &sys->hw.surface_count);
+    sys->selected_decoder = directx_va_Setup(va, &dx_sys, ctx, desc, fmt_in, isXboxHardware(sys->d3d_dev.d3ddevice),
+                                             &fmt_out, &sys->hw.surface_count);
     if (sys->selected_decoder == NULL)
     {
         err = VLC_EGENERIC;
