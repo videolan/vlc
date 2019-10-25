@@ -35,6 +35,7 @@
 #include <vlc_variables.h>
 #include <vlc_keystore.h>
 #include <vlc_network.h>
+#include <vlc_interrupt.h>
 
 #include <assert.h>
 #include <errno.h>
@@ -144,6 +145,7 @@ static int Open( vlc_object_t *p_this )
     stream_t     *p_access = (stream_t*)p_this;
     access_sys_t *p_sys;
     smb_stat st;
+    int status = DSM_ERROR_GENERIC;
 
     /* Init p_access */
     p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
@@ -162,17 +164,23 @@ static int Open( vlc_object_t *p_this )
         goto error;
 
     if( get_address( p_access ) != VLC_SUCCESS )
+    {
+        status = DSM_ERROR_NETWORK;
         goto error;
+    }
 
     msg_Dbg( p_access, "Session: Host name = %s, ip = %s", p_sys->netbios_name,
              inet_ntoa( p_sys->addr ) );
 
     /* Now that we have the required data, let's establish a session */
-    if( smb_session_connect( p_sys->p_session, p_sys->netbios_name,
-                             p_sys->addr.s_addr, SMB_TRANSPORT_TCP )
-                             != DSM_SUCCESS )
+    status = smb_session_connect( p_sys->p_session, p_sys->netbios_name,
+                                  p_sys->addr.s_addr, SMB_TRANSPORT_TCP );
+    if( status != DSM_SUCCESS )
     {
         msg_Err( p_access, "Unable to connect/negotiate SMB session");
+        /* FIXME: libdsm wrongly return network error when the server can't
+         * handle the SMBv1 protocol */
+        status = DSM_ERROR_GENERIC;
         goto error;
     }
 
@@ -208,7 +216,14 @@ static int Open( vlc_object_t *p_this )
 
     error:
         Close( p_this );
-        return VLC_EGENERIC;
+
+        /* Returning VLC_ETIMEOUT will stop the module probe and prevent to
+         * load the next smb module. The dsm module can return this specific
+         * error in case of network error (DSM_ERROR_NETWORK) or when the user
+         * asked to cancel it (vlc_killed()). Indeed, in these cases, it is
+         * useless to try next smb modules. */
+        return vlc_killed() || status == DSM_ERROR_NETWORK ? VLC_ETIMEOUT
+             : VLC_EGENERIC;
 }
 
 static int OpenForced( vlc_object_t *p_this )
