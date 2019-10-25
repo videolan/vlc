@@ -517,20 +517,18 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
         }
 
-        if( date_Get( &p_sys->pts ) > VLC_TS_INVALID )
+        out = block_heap_Alloc( p_sys->p_buf, p_sys->i_frame_size );
+        if( out )
         {
-            out = block_heap_Alloc( p_sys->p_buf, p_sys->i_frame_size );
-            if( out )
-            {
-                out->i_dts = out->i_pts = date_Get( &p_sys->pts );
-                out->i_flags = p_sys->i_next_block_flags;
-                p_sys->i_next_block_flags = 0;
-            }
-            else
-                p_sys->p_buf = NULL;
-
-            date_Increment( &p_sys->pts, p_sys->headerinfo.i_frame_length );
+            out->i_dts = out->i_pts = date_Get( &p_sys->pts );
+            out->i_flags = p_sys->i_next_block_flags;
+            p_sys->i_next_block_flags = 0;
+            if( out->i_pts != VLC_TS_INVALID )
+                date_Increment( &p_sys->pts, p_sys->headerinfo.i_frame_length );
         }
+        else
+            p_sys->p_buf = NULL;
+
 
         if( out )
             out->i_length = date_Get( &p_sys->pts ) - out->i_pts;
