@@ -277,31 +277,29 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
 
     sys->d3d_dev.d3ddevice = NULL;
     sys->render = DXGI_FORMAT_UNKNOWN;
+    HRESULT hr = D3D11_CreateDeviceExternal(va, d3d11_device->device, true, &sys->d3d_dev);
+    if (FAILED(hr))
+        msg_Err(va, "can't use the provided D3D11 context");
+    else
     {
-        HRESULT hr = D3D11_CreateDeviceExternal(va, d3d11_device->device, true, &sys->d3d_dev);
-        if (FAILED(hr))
-            msg_Err(va, "can't use the provided D3D11 context");
-        else
-        {
-            if (sys->d3d_dev.context_mutex == INVALID_HANDLE_VALUE)
-                msg_Warn(va, "No mutex found to lock the decoder");
+        if (sys->d3d_dev.context_mutex == INVALID_HANDLE_VALUE)
+            msg_Warn(va, "No mutex found to lock the decoder");
 
-            sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_D3D11VA, sizeof(d3d11_video_context_t), &d3d11_vctx_ops );
-            if (likely(sys->vctx != NULL))
-            {
-                void *d3dvidctx = NULL;
-                hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
-                if (FAILED(hr)) {
-                    msg_Err(va, "Could not Query ID3D11VideoContext Interface from the picture. (hr=0x%lX)", hr);
-                    D3D11_ReleaseDevice(&sys->d3d_dev);
-                    vlc_video_context_Release( sys->vctx );
-                    sys->vctx = NULL;
-                } else {
-                    sys->hw.video_context = d3dvidctx;
-                    d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
-                    priv->device = sys->d3d_dev.d3dcontext;
-                    ID3D11DeviceContext_Release(priv->device);
-                }
+        sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_D3D11VA, sizeof(d3d11_video_context_t), &d3d11_vctx_ops );
+        if (likely(sys->vctx != NULL))
+        {
+            void *d3dvidctx = NULL;
+            hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
+            if (FAILED(hr)) {
+                msg_Err(va, "Could not Query ID3D11VideoContext Interface from the picture. (hr=0x%lX)", hr);
+                D3D11_ReleaseDevice(&sys->d3d_dev);
+                vlc_video_context_Release( sys->vctx );
+                sys->vctx = NULL;
+            } else {
+                sys->hw.video_context = d3dvidctx;
+                d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
+                priv->device = sys->d3d_dev.d3dcontext;
+                ID3D11DeviceContext_Release(priv->device);
             }
         }
     }
