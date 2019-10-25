@@ -2033,7 +2033,7 @@ static int vout_EnableWindow(vout_thread_t *vout, const video_format_t *original
     if (pp_dec_device)
     {
         if (sys->dec_device == NULL)
-            sys->dec_device = vlc_decoder_device_Create(sys->display_cfg.window);
+            sys->dec_device = vlc_decoder_device_Create(&vout->obj, sys->display_cfg.window);
         *pp_dec_device = sys->dec_device ? vlc_decoder_device_Hold( sys->dec_device ) : NULL;
     }
     vlc_mutex_unlock(&sys->window_lock);

@@ -182,13 +182,13 @@ static int decoder_device_Open(void *func, bool forced, va_list ap)
 }
 
 vlc_decoder_device *
-vlc_decoder_device_Create(vout_window_t *window)
+vlc_decoder_device_Create(vlc_object_t *o, vout_window_t *window)
 {
     struct vlc_decoder_device_priv *priv =
-            vlc_object_create(window, sizeof (*priv));
+            vlc_object_create(o, sizeof (*priv));
     if (!priv)
         return NULL;
-    char *name = var_InheritString(window, "dec-dev");
+    char *name = var_InheritString(o, "dec-dev");
     module_t *module = vlc_module_load(&priv->device, "decoder device", name,
                                     true, decoder_device_Open, &priv->device,
                                     window);

@@ -604,8 +604,8 @@ typedef int (*vlc_decoder_device_Open)(vlc_decoder_device *device,
  * This function will be hidden in the future. It is now used by opengl vout
  * module as a transition.
  */
-VLC_USED vlc_decoder_device *
-vlc_decoder_device_Create(vout_window_t *window);
+vlc_decoder_device *
+vlc_decoder_device_Create(vlc_object_t *, vout_window_t *window) VLC_USED;
 
 /**
  * Hold a decoder device
