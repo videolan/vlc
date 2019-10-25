@@ -716,10 +716,9 @@ static bool webvtt_domnode_Match_Attribute( const webvtt_dom_node_t *p_node,
     return false;
 }
 
-static bool webvtt_domnode_MatchType( decoder_t *p_dec, const webvtt_dom_node_t *p_node,
+static bool webvtt_domnode_MatchType( const webvtt_dom_node_t *p_node,
                                       const vlc_css_selector_t *p_sel, vlc_tick_t i_playbacktime )
 {
-    VLC_UNUSED(p_dec);
     switch( p_sel->type )
     {
         case SELECTOR_SIMPLE:
@@ -785,25 +784,25 @@ static void webvtt_domnode_setCSSStyle( webvtt_dom_node_t *p_node, text_style_t 
 }
 
 #ifdef HAVE_CSS
-static void webvtt_domnode_SelectNodesInTree( decoder_t *p_dec, const vlc_css_selector_t *p_sel,
-                                              const webvtt_dom_node_t *p_tree, int i_max_depth,
+static void webvtt_domnode_SelectNodesInTree( const webvtt_dom_node_t *p_tree,
+                                              const vlc_css_selector_t *p_sel, int i_max_depth,
                                               vlc_tick_t i_playbacktime, vlc_array_t *p_results );
 
-static void webvtt_domnode_SelectChildNodesInTree( decoder_t *p_dec, const vlc_css_selector_t *p_sel,
-                                                   const webvtt_dom_node_t *p_root, int i_max_depth,
+static void webvtt_domnode_SelectChildNodesInTree( const webvtt_dom_node_t *p_tree,
+                                                   const vlc_css_selector_t *p_sel, int i_max_depth,
                                                    vlc_tick_t i_playbacktime, vlc_array_t *p_results )
 {
-    const webvtt_dom_node_t *p_child = webvtt_domnode_getFirstChild( p_root );
+    const webvtt_dom_node_t *p_child = webvtt_domnode_getFirstChild( p_tree );
     if( i_max_depth > 0 )
     {
         for( ; p_child; p_child = p_child->p_next )
-            webvtt_domnode_SelectNodesInTree( p_dec, p_sel, p_child, i_max_depth - 1,
+            webvtt_domnode_SelectNodesInTree( p_child, p_sel, i_max_depth - 1,
                                               i_playbacktime, p_results );
     }
 }
 
-static void webvtt_domnode_SelectNodesBySpeficier( decoder_t *p_dec, const vlc_css_selector_t *p_spec,
-                                                   const webvtt_dom_node_t *p_node,
+static void webvtt_domnode_SelectNodesBySpeficier( const webvtt_dom_node_t *p_node,
+                                                   const vlc_css_selector_t *p_spec,
                                                    vlc_tick_t i_playbacktime, vlc_array_t *p_results )
 {
     if( p_spec == NULL )
@@ -812,65 +811,66 @@ static void webvtt_domnode_SelectNodesBySpeficier( decoder_t *p_dec, const vlc_c
     switch( p_spec->combinator )
     {
         case RELATION_DESCENDENT:
-            webvtt_domnode_SelectChildNodesInTree( p_dec, p_spec, p_node, WEBVTT_MAX_DEPTH,
+            webvtt_domnode_SelectChildNodesInTree( p_node, p_spec, WEBVTT_MAX_DEPTH,
                                                    i_playbacktime, p_results );
             break;
         case RELATION_DIRECTADJACENT:
             for( const webvtt_dom_node_t *p_adj = p_node->p_next; p_adj; p_adj = p_adj->p_next )
-                webvtt_domnode_SelectChildNodesInTree( p_dec, p_spec, p_adj, 1,
+                webvtt_domnode_SelectChildNodesInTree( p_adj, p_spec, 1,
                                                        i_playbacktime, p_results );
             break;
         case RELATION_INDIRECTADJACENT:
             for( const webvtt_dom_node_t *p_adj = webvtt_domnode_getFirstChild( p_node->p_parent );
                                           p_adj && p_adj != p_node; p_adj = p_adj->p_next )
-                webvtt_domnode_SelectChildNodesInTree( p_dec, p_spec, p_adj, 1,
+                webvtt_domnode_SelectChildNodesInTree( p_adj, p_spec, 1,
                                                        i_playbacktime, p_results );
             break;
         case RELATION_CHILD:
-            webvtt_domnode_SelectChildNodesInTree( p_dec, p_spec, p_node, 1,
+            webvtt_domnode_SelectChildNodesInTree( p_node, p_spec, 1,
                                                    i_playbacktime, p_results );
             break;
         case RELATION_SELF:
-            webvtt_domnode_SelectNodesInTree( p_dec, p_spec, p_node, WEBVTT_MAX_DEPTH,
+            webvtt_domnode_SelectNodesInTree( p_node, p_spec, WEBVTT_MAX_DEPTH,
                                               i_playbacktime, p_results );
     }
 }
 
-static void webvtt_domnode_SelectNodesInTree( decoder_t *p_dec, const vlc_css_selector_t *p_sel,
-                                              const webvtt_dom_node_t *p_root, int i_max_depth,
+static void webvtt_domnode_SelectNodesInTree( const webvtt_dom_node_t *p_node,
+                                              const vlc_css_selector_t *p_sel, int i_max_depth,
                                               vlc_tick_t i_playbacktime, vlc_array_t *p_results )
 {
-    if( p_root == NULL )
+    if( p_node == NULL )
         return;
 
-    if( webvtt_domnode_MatchType( p_dec, p_root, p_sel, i_playbacktime ) )
+    if( webvtt_domnode_MatchType( p_node, p_sel, i_playbacktime ) )
     {
         if( p_sel->specifiers.p_first == NULL )
         {
             /* End of matching, this node is part of results */
-            (void) vlc_array_append( p_results, (void *) p_root );
+            (void) vlc_array_append( p_results, (void *) p_node );
         }
-        else webvtt_domnode_SelectNodesBySpeficier( p_dec, p_sel->specifiers.p_first, p_root,
+        else webvtt_domnode_SelectNodesBySpeficier( p_node, p_sel->specifiers.p_first,
                                                     i_playbacktime, p_results );
     }
 
     /* lookup other subnodes */
-    webvtt_domnode_SelectChildNodesInTree( p_dec, p_sel, p_root, i_max_depth - 1,
+    webvtt_domnode_SelectChildNodesInTree( p_node, p_sel, i_max_depth - 1,
                                            i_playbacktime, p_results );
 }
 
-static void webvtt_domnode_SelectRuleNodes( decoder_t *p_dec, const vlc_css_rule_t *p_rule,
+static void webvtt_domnode_SelectRuleNodes( const webvtt_dom_node_t *p_root, const vlc_css_rule_t *p_rule,
                                             vlc_tick_t i_playbacktime, vlc_array_t *p_results )
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    const webvtt_dom_node_t *p_cues = p_sys->p_root->p_child;
+    if(!p_root || p_root->type != NODE_TAG)
+        return;
+    const webvtt_dom_node_t *p_cues = ((const webvtt_dom_tag_t *)p_root)->p_child;
     for( const vlc_css_selector_t *p_sel = p_rule->p_selectors; p_sel; p_sel = p_sel->p_next )
     {
         vlc_array_t tempresults;
         vlc_array_init( &tempresults );
         for( const webvtt_dom_node_t *p_node = p_cues; p_node; p_node = p_node->p_next )
         {
-            webvtt_domnode_SelectNodesInTree( p_dec, p_sel, p_node, WEBVTT_MAX_DEPTH,
+            webvtt_domnode_SelectNodesInTree( p_node, p_sel, WEBVTT_MAX_DEPTH,
                                               i_playbacktime, &tempresults );
         }
         for( size_t i=0; i<vlc_array_count(&tempresults); i++ )
@@ -1684,12 +1684,15 @@ static void ClearCSSStyles( webvtt_dom_node_t *p_node )
 static void ApplyCSSRules( decoder_t *p_dec, const vlc_css_rule_t *p_rule,
                            vlc_tick_t i_playbacktime )
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     for ( ;  p_rule ; p_rule = p_rule->p_next )
     {
         vlc_array_t results;
         vlc_array_init( &results );
 
-        webvtt_domnode_SelectRuleNodes( p_dec, p_rule, i_playbacktime, &results );
+        webvtt_domnode_SelectRuleNodes( (webvtt_dom_node_t *) p_sys->p_root,
+                                        p_rule, i_playbacktime, &results );
 
         for( const vlc_css_declaration_t *p_decl = p_rule->p_declarations;
                                           p_decl; p_decl = p_decl->p_next )
