@@ -17,6 +17,9 @@ Packetizers:
 Decoder:
  * avcodec: revector video decoder to fix incomplete drain
 
+macOS:
+ * Fix Apple Remote support on macOS Catalina
+
 Misc:
  * Add missing .wpl & .zpl file associations on Windows
 
