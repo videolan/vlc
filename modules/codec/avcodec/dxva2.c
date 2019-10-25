@@ -257,14 +257,16 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     if (pix_fmt != AV_PIX_FMT_DXVA2_VLD)
         return VLC_EGENERIC;
 
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueDevice( dec_device );
+    if ( d3d9_decoder == NULL )
+        return VLC_EGENERIC;
+
     ctx->hwaccel_context = NULL;
 
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
     /* Load dll*/
-    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueDevice( dec_device );
-    if ( d3d9_decoder != NULL )
     {
         D3D9_CloneExternal(&sys->hd3d, d3d9_decoder->device);
         HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, d3d9_decoder->adapter, &sys->d3d_dev);
@@ -287,20 +289,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         octx->dev = sys->d3d_dev.dev;
         IDirect3DDevice9_AddRef(octx->dev);
     }
-    else if (D3D9_Create(va, &sys->hd3d) != VLC_SUCCESS) {
-        msg_Warn(va, "cannot load d3d9.dll");
-        free( sys );
-        return VLC_EGENERIC;
-    }
 
     va->sys = sys;
-
-    if (sys->vctx == NULL)
-    {
-        msg_Dbg(va, "no video context");
-        err = VLC_EGENERIC;
-        goto error;
-    }
 
     /* Load dll*/
     sys->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
