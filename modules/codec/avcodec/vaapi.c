@@ -176,7 +176,6 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 static void Delete(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
-    vlc_object_t *o = VLC_OBJECT(va);
 
     vlc_video_context_Release(sys->vctx);
     va_pool_Close(sys->va_pool);
@@ -267,6 +266,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
     sys->hw_ctx.display = va_dpy;
     sys->hw_ctx.config_id = VA_INVALID_ID;
     sys->hw_ctx.context_id = VA_INVALID_ID;
+    va->sys = sys;
 
     video_format_t fmt_video = fmt->video;
     fmt_video.i_chroma = i_vlc_chroma;
@@ -308,7 +308,6 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
     if (sys->vctx == NULL)
         goto error;
 
-    va->sys = sys;
     va->ops = &ops;
     *vtcx_out = sys->vctx;
     return VLC_SUCCESS;
