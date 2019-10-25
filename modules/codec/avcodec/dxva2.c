@@ -266,29 +266,28 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
-    /* Load dll*/
-    {
-        D3D9_CloneExternal(&sys->hd3d, d3d9_decoder->device);
-        HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, d3d9_decoder->adapter, &sys->d3d_dev);
-        if ( FAILED(hr) )
-        {
-            D3D9_Destroy(&sys->hd3d);
-            free( sys );
-            return VLC_EGENERIC;
-        }
 
-        sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_DXVA2, sizeof(d3d9_video_context_t), &d3d9_vctx_ops );
-        if (likely(sys->vctx == NULL))
-        {
-            D3D9_ReleaseDevice(&sys->d3d_dev);
-            D3D9_Destroy(&sys->hd3d);
-            free( sys );
-            return VLC_EGENERIC;
-        }
-        d3d9_video_context_t *octx = GetD3D9ContextPrivate(sys->vctx);
-        octx->dev = sys->d3d_dev.dev;
-        IDirect3DDevice9_AddRef(octx->dev);
+    D3D9_CloneExternal(&sys->hd3d, d3d9_decoder->device);
+    HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, d3d9_decoder->adapter, &sys->d3d_dev);
+    if ( FAILED(hr) )
+    {
+        D3D9_Destroy(&sys->hd3d);
+        free( sys );
+        return VLC_EGENERIC;
     }
+
+    sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_DXVA2,
+                                          sizeof(d3d9_video_context_t), &d3d9_vctx_ops );
+    if (likely(sys->vctx == NULL))
+    {
+        D3D9_ReleaseDevice(&sys->d3d_dev);
+        D3D9_Destroy(&sys->hd3d);
+        free( sys );
+        return VLC_EGENERIC;
+    }
+    d3d9_video_context_t *octx = GetD3D9ContextPrivate(sys->vctx);
+    octx->dev = sys->d3d_dev.dev;
+    IDirect3DDevice9_AddRef(octx->dev);
 
     va->sys = sys;
 
