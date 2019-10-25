@@ -261,18 +261,9 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     if (pix_fmt != AV_PIX_FMT_D3D11VA_VLD)
         return VLC_EGENERIC;
 
-#if !VLC_WINSTORE_APP
-    /* Allow using D3D11VA automatically starting from Windows 8.1 */
-    if (!va->obj.force)
-    {
-        bool isWin81OrGreater = false;
-        HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
-        if (likely(hKernel32 != NULL))
-            isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
-        if (!isWin81OrGreater)
-            return VLC_EGENERIC;
-    }
-#endif
+    d3d11_decoder_device_t *d3d11_device = GetD3D11OpaqueDevice( dec_device );
+    if ( d3d11_device == NULL )
+        return VLC_EGENERIC;
 
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
@@ -286,8 +277,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
 
     sys->d3d_dev.d3ddevice = NULL;
     sys->render = DXGI_FORMAT_UNKNOWN;
-    d3d11_decoder_device_t *d3d11_device = GetD3D11OpaqueDevice( dec_device );
-    if ( d3d11_device != NULL )
     {
         HRESULT hr = D3D11_CreateDeviceExternal(va, d3d11_device->device, true, &sys->d3d_dev);
         if (FAILED(hr))
