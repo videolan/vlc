@@ -499,10 +499,11 @@ vlc_smb2_open_share(stream_t *access, const struct smb2_url *smb2_url,
     smb2_set_password(sys->smb2, password);
     smb2_set_domain(sys->smb2, domain ? domain : "");
 
-    if (smb2_connect_share_async(sys->smb2, smb2_url->server, share,
-                                 username, smb2_generic_cb, access) < 0)
+    int err = smb2_connect_share_async(sys->smb2, smb2_url->server, share,
+                                       username, smb2_generic_cb, access);
+    if (err < 0)
     {
-        VLC_SMB2_SET_ERROR(access, "smb2_connect_share_async", 1);
+        VLC_SMB2_SET_ERROR(access, "smb2_connect_share_async", err);
         goto error;
     }
     if (vlc_smb2_mainloop(access, false) != 0)
@@ -729,7 +730,14 @@ error:
     }
     vlc_UrlClean(&sys->encoded_url);
     free(var_domain);
-    return VLC_EGENERIC;
+
+    /* Returning VLC_ETIMEOUT will stop the module probe and prevent to load
+     * the next smb module. The smb2 module can return this specific error in
+     * case of network error (EIO) or when the user asked to cancel it
+     * (vlc_killed()). Indeed, in these cases, it is useless to try next smb
+     * modules. */
+    return vlc_killed() || sys->error_status == -EIO ? VLC_ETIMEOUT
+         : VLC_EGENERIC;
 }
 
 static void
