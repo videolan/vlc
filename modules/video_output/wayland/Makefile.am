@@ -1,5 +1,7 @@
 ### Wayland ###
-libwl_shm_plugin_la_SOURCES = video_output/wayland/shm.c
+libwl_shm_plugin_la_SOURCES = \
+	video_output/wayland/registry.c video_output/wayland/registry.h \
+	video_output/wayland/shm.c
 nodist_libwl_shm_plugin_la_SOURCES = \
 	video_output/wayland/viewporter-client-protocol.h \
 	video_output/wayland/viewporter-protocol.c

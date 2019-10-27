@@ -35,6 +35,7 @@
 
 #include <wayland-client.h>
 #include "viewporter-client-protocol.h"
+#include "registry.h"
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -55,7 +56,6 @@ struct vout_display_sys_t
 
     unsigned display_width;
     unsigned display_height;
-    bool use_buffer_transform;
 };
 
 struct buffer_data
@@ -238,40 +238,6 @@ static const struct wl_shm_listener shm_cbs =
     shm_format_cb,
 };
 
-static void registry_global_cb(void *data, struct wl_registry *registry,
-                               uint32_t name, const char *iface, uint32_t vers)
-{
-    vout_display_t *vd = data;
-    vout_display_sys_t *sys = vd->sys;
-
-    msg_Dbg(vd, "global %3"PRIu32": %s version %"PRIu32, name, iface, vers);
-
-    if (!strcmp(iface, "wl_shm"))
-        sys->shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
-    else
-    if (!strcmp(iface, "wp_viewporter"))
-        sys->viewporter = wl_registry_bind(registry, name,
-                                           &wp_viewporter_interface, 1);
-    else
-    if (!strcmp(iface, "wl_compositor"))
-        sys->use_buffer_transform = vers >= 2;
-}
-
-static void registry_global_remove_cb(void *data, struct wl_registry *registry,
-                                      uint32_t name)
-{
-    vout_display_t *vd = data;
-
-    msg_Dbg(vd, "global remove %3"PRIu32, name);
-    (void) registry;
-}
-
-static const struct wl_registry_listener registry_cbs =
-{
-    registry_global_cb,
-    registry_global_remove_cb,
-};
-
 static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -312,11 +278,9 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->embed = NULL;
     sys->eventq = NULL;
     sys->shm = NULL;
-    sys->viewporter = NULL;
     sys->active_buffers = 0;
     sys->display_width = cfg->display.width;
     sys->display_height = cfg->display.height;
-    sys->use_buffer_transform = false;
 
     /* Get window */
     sys->embed = cfg->window;
@@ -328,17 +292,18 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (sys->eventq == NULL)
         goto error;
 
-    struct wl_registry *registry = wl_display_get_registry(display);
+    struct vlc_wl_registry *registry = vlc_wl_registry_get(display,
+                                                           sys->eventq);
     if (registry == NULL)
         goto error;
 
-    wl_proxy_set_queue((struct wl_proxy *)registry, sys->eventq);
-    wl_registry_add_listener(registry, &registry_cbs, vd);
-    wl_display_roundtrip_queue(display, sys->eventq);
-    wl_registry_destroy(registry);
-
+    sys->shm = vlc_wl_shm_get(registry);
     if (sys->shm == NULL)
         goto error;
+
+    sys->viewporter = (struct wp_viewporter *)
+                      vlc_wl_interface_bind(registry, "wp_viewporter",
+                                            &wp_viewporter_interface, NULL);
 
     wl_shm_add_listener(sys->shm, &shm_cbs, vd);
     wl_display_roundtrip_queue(display, sys->eventq);
@@ -361,7 +326,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         [ORIENT_RIGHT_BOTTOM] = WL_OUTPUT_TRANSFORM_FLIPPED_90,
     };
 
-    if (sys->use_buffer_transform)
+    if (vlc_wl_interface_get_version(registry, "wl_compositor") >= 2)
     {
         wl_surface_set_buffer_transform(surface,
                                         transforms[fmtp->orientation]);
@@ -379,15 +344,16 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->control = Control;
     vd->close = Close;
 
+    vlc_wl_registry_destroy(registry);
     (void) context;
     return VLC_SUCCESS;
 
 error:
-    if (sys->viewporter != NULL)
-        wp_viewporter_destroy(sys->viewporter);
-
     if (sys->shm != NULL)
         wl_shm_destroy(sys->shm);
+
+    if (registry != NULL)
+        vlc_wl_registry_destroy(registry);
 
     if (sys->eventq != NULL)
         wl_event_queue_destroy(sys->eventq);
