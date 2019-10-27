@@ -90,7 +90,7 @@ static int parse (FILE *in)
         if (val < 4)
             sym->uname[0] = '\0';
 
-        struct keysym **psym = tsearch (sym, &root, cmpkey);
+        void **psym = tsearch (sym, &root, cmpkey);
         if (psym == NULL)
             abort ();
         if (*psym != sym)
