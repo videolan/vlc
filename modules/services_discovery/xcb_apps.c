@@ -330,7 +330,7 @@ static void UpdateApps (services_discovery_t *sd)
         xcb_window_t id = *(ent++);
         struct app *app;
 
-        struct app **pa = tfind (&id, &oldnodes, cmpapp);
+        void **pa = tfind (&id, &oldnodes, cmpapp);
         if (pa != NULL) /* existing entry */
         {
             app = *pa;
