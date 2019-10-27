@@ -82,7 +82,7 @@ static void vlc_lock_mark(const void *lock, void **rootp)
     mark->object = lock;
     mark->refs = 0;
 
-    struct vlc_lock_mark **entry = tsearch(mark, rootp, vlc_lock_mark_cmp);
+    void **entry = tsearch(mark, rootp, vlc_lock_mark_cmp);
     if (unlikely(entry == NULL))
         abort();
 
@@ -98,7 +98,7 @@ static void vlc_lock_mark(const void *lock, void **rootp)
 static void vlc_lock_unmark(const void *lock, void **rootp)
 {
     struct vlc_lock_mark *mark = &(struct vlc_lock_mark){ lock, 0 };
-    struct vlc_lock_mark **entry = tfind(mark, rootp, vlc_lock_mark_cmp);
+    void **entry = tfind(mark, rootp, vlc_lock_mark_cmp);
 
     assert(entry != NULL);
     mark = *entry;
