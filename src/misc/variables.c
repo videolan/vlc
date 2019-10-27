@@ -148,7 +148,7 @@ static int varcmp( const void *a, const void *b )
 static variable_t *Lookup( vlc_object_t *obj, const char *psz_name )
 {
     vlc_object_internals_t *priv = vlc_internals( obj );
-    variable_t **pp_var;
+    void **pp_var;
 
     vlc_mutex_lock(&priv->var_lock);
     pp_var = tfind( &psz_name, &priv->var_root, varcmp );
@@ -352,7 +352,8 @@ int (var_Create)( vlc_object_t *p_this, const char *psz_name, int i_type )
         var_Inherit(p_this, psz_name, i_type, &p_var->val);
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-    variable_t **pp_var, *p_oldvar;
+    void **pp_var;
+    variable_t *p_oldvar;
     int ret = VLC_SUCCESS;
 
     vlc_mutex_lock( &p_priv->var_lock );
