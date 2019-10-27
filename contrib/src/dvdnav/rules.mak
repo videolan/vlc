@@ -21,7 +21,7 @@ $(TARBALLS)/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
 
 dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2 .sum-dvdnav
 	$(UNPACK)
-	cd $(UNPACK_DIR) && sed -i -e 's,Requires.private,Requires,g' misc/*.pc.in
+	$(call pkg_static,"misc/dvdnav.pc.in")
 	$(MOVE)
 
 DEPS_dvdnav = dvdread $(DEPS_dvdread)
