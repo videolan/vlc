@@ -163,7 +163,7 @@ static int AddSource (services_discovery_t *sd, const pa_source_info *info)
     d->index = info->index;
     d->item = item;
 
-    struct device **dp = tsearch (d, &sys->root, cmpsrc);
+    void **dp = tsearch (d, &sys->root, cmpsrc);
     if (dp == NULL) /* Out-of-memory */
     {
         free (d);
@@ -205,7 +205,7 @@ static void RemoveSource (services_discovery_t *sd, uint32_t idx)
 {
     services_discovery_sys_t *sys = sd->p_sys;
 
-    struct device **dp = tfind (&idx, &sys->root, cmpsrc);
+    void **dp = tfind (&idx, &sys->root, cmpsrc);
     if (dp == NULL)
         return;
 
