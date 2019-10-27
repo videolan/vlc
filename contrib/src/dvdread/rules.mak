@@ -20,7 +20,7 @@ $(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
 
 dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 	$(UNPACK)
-	cd $(UNPACK_DIR) && sed -i -e 's,Requires.private,Requires,g' misc/*.pc.in
+	$(call pkg_static,"misc/dvdread.pc.in")
 	$(MOVE)
 
 DEPS_dvdread = dvdcss $(DEPS_dvdcss)
