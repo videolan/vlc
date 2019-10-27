@@ -79,7 +79,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
             [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Plus]    forKey:@"35_23_22_17_14_4_3_35_23_22_4_3_"];
             [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Minus]   forKey:@"35_23_22_18_14_4_3_35_23_22_4_3_"];
             [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu]           forKey:@"35_24_23_22_4_3_35_24_23_22_4_3_"];
-            [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]           forKey:@"35_23_22_10_4_3_35_23_22_10_4_3_"];
+            [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]           forKey:@"35_25_23_22_4_3_35_25_23_22_4_3_"];
             [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight]          forKey:@"35_26_23_22_4_3_35_26_23_22_4_3_"];
             [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft]           forKey:@"35_27_23_22_4_3_35_27_23_22_4_3_"];
             [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight_Hold]     forKey:@"35_23_22_16_14_4_3_"];
