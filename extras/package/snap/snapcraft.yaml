@@ -30,6 +30,8 @@ apps:
       - desktop
       - desktop-legacy
       - dvb
+      - audio-playback
+      - audio-record
     slots:
       - mpris
 
