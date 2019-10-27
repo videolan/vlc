@@ -13,6 +13,7 @@ $(TARBALLS)/glew-$(GLEW_VERSION).tgz:
 
 glew: glew-$(GLEW_VERSION).tgz .sum-glew
 	$(UNPACK)
+	$(APPLY) $(SRC)/glew/glew-drop-debug-postfix.patch
 	$(MOVE)
 
 .glew: glew toolchain.cmake
