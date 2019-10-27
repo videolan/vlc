@@ -1,0 +1,11 @@
+--- glew.pristine/build/cmake/CMakeLists.txt	2017-07-31 14:25:39.000000000 +0300
++++ glew/build/cmake/CMakeLists.txt	2019-10-27 06:26:55.413590264 +0300
+@@ -13,8 +13,6 @@
+   cmake_policy (SET CMP0042 NEW)
+ endif()
+ 
+-set(CMAKE_DEBUG_POSTFIX d)
+-
+ option (BUILD_UTILS "utilities" ON)
+ option (GLEW_REGAL "Regal mode" OFF)
+ option (GLEW_OSMESA "OSMesa mode" OFF)
