@@ -118,7 +118,7 @@ static int vlc_module_store(module_t *mod)
     if (unlikely(cap->name == NULL))
         goto error;
 
-    vlc_modcap_t **cp = tsearch(cap, &modules.caps_tree, vlc_modcap_cmp);
+    void **cp = tsearch(cap, &modules.caps_tree, vlc_modcap_cmp);
     if (unlikely(cp == NULL))
         goto error;
 
@@ -787,7 +787,7 @@ module_t **module_list_get (size_t *n)
  */
 ssize_t module_list_cap (module_t ***restrict list, const char *name)
 {
-    const vlc_modcap_t **cp = tfind(&name, &modules.caps_tree, vlc_modcap_cmp);
+    const void **cp = tfind(&name, &modules.caps_tree, vlc_modcap_cmp);
     if (cp == NULL)
     {
         *list = NULL;

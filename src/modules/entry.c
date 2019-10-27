@@ -512,8 +512,7 @@ static int vlc_plugin_gpa_cb(void *ctx, void *tgt, int propid, ...)
     sym->name = name;
     sym->addr = addr;
 
-    struct vlc_plugin_symbol **symp = tsearch(sym, rootp,
-                                              vlc_plugin_symbol_compare);
+    void **symp = tsearch(sym, rootp, vlc_plugin_symbol_compare);
     if (unlikely(symp == NULL))
     {   /* Memory error */
         free(sym);
@@ -522,7 +521,10 @@ static int vlc_plugin_gpa_cb(void *ctx, void *tgt, int propid, ...)
 
     if (*symp != sym)
     {   /* Duplicate symbol */
-        assert((*symp)->addr == sym->addr);
+#ifndef NDEBUG
+        const struct vlc_plugin_symbol *oldsym = *symp;
+        assert(oldsym->addr == sym->addr);
+#endif
         free(sym);
     }
     return 0;
@@ -565,13 +567,14 @@ static int vlc_plugin_get_symbol(void *root, const char *name,
         return 0;
     }
 
-    const struct vlc_plugin_symbol **symp = tfind(&name, &root,
-                                                  vlc_plugin_symbol_compare);
+    const void **symp = tfind(&name, &root, vlc_plugin_symbol_compare);
 
     if (symp == NULL)
         return -1;
 
-    *addrp = (*symp)->addr;
+    const struct vlc_plugin_symbol *sym = *symp;
+
+    *addrp = sym->addr;
     return 0;
 }
 
