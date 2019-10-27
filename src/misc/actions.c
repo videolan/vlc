@@ -403,16 +403,18 @@ static int vlc_key_to_action (vlc_object_t *obj, const char *varname,
                               vlc_value_t prevkey, vlc_value_t curkey, void *d)
 {
     void *const *map = d;
-    const struct mapping **pent;
+    const void **pent;
     uint32_t keycode = curkey.i_int;
 
     pent = tfind (&keycode, map, keycmp);
     if (pent == NULL)
         return VLC_SUCCESS;
 
+    const struct mapping *ent = *pent;
+
     (void) varname;
     (void) prevkey;
-    return var_SetInteger (obj, "key-action", (*pent)->action);
+    return var_SetInteger (obj, "key-action", ent->action);
 }
 
 /**
@@ -426,7 +428,7 @@ static int add_mapping (void **map, uint32_t keycode, vlc_action_id_t action)
     entry->key = keycode;
     entry->action = action;
 
-    struct mapping **pent = tsearch (entry, map, keycmp);
+    void **pent = tsearch (entry, map, keycmp);
     if (unlikely(pent == NULL))
         return ENOMEM;
     if (*pent != entry)
