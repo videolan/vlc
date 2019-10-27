@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-07-29 08:09+0200\n"
+"PO-Revision-Date: 2019-10-27 10:12+0100\n"
 "Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2019\n"
 "Language-Team: Latvian (https://www.transifex.com/yaron/teams/16553/lv/)\n"
 "Language: lv\n"
@@ -1437,7 +1437,7 @@ msgstr "Subtitru celiņš"
 
 #: src/input/var.c:264
 msgid "Next title"
-msgstr "Nākošais virsraksts"
+msgstr "Nākamais virsraksts"
 
 #: src/input/var.c:271
 msgid "Previous title"
@@ -1463,7 +1463,7 @@ msgstr "Nodaļa %i"
 
 #: src/input/var.c:380 modules/gui/qt/dialogs/toolbar.cpp:514
 msgid "Next chapter"
-msgstr "Nākošā nodaļa"
+msgstr "Nākamā nodaļa"
 
 #: src/input/var.c:385 modules/gui/qt/dialogs/toolbar.cpp:504
 msgid "Previous chapter"
@@ -1729,7 +1729,7 @@ msgstr "Atcerēties audio skaļumu"
 msgid ""
 "The volume can be recorded and automatically restored next time VLC is used."
 msgstr ""
-"Skaļums var tikt ierakstīts un automātiski atjaunots nākošreiz, kad VLC tiek "
+"Skaļums var tikt ierakstīts un automātiski atjaunots nākamreiz, kad VLC tiek "
 "lietots."
 
 #: src/libvlc-module.c:161
@@ -4085,13 +4085,13 @@ msgstr "Lēnāk (smalki)"
 #: modules/gui/qt/dialogs/sout.cpp:93 modules/notify/notify.c:335
 #: modules/gui/qt/ui/streampanel.h:179
 msgid "Next"
-msgstr "Nākošais"
+msgstr "Nākamais"
 
 #: src/libvlc-module.c:1247
 msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr ""
 "Atlasiet karsto taustiņu, kuru lietot, lai atskaņošanas sarakstā izlaistu uz "
-"nākošo vienumu."
+"nākamo vienumu."
 
 #: src/libvlc-module.c:1248 modules/control/hotkeys.c:414
 #: modules/gui/macosx/VLCControlsBarCommon.m:193
@@ -4200,11 +4200,11 @@ msgstr "Atlasiet karsto taustiņu, lai veiktu garu lēcienu uz priekšu."
 
 #: src/libvlc-module.c:1280 modules/control/hotkeys.c:599
 msgid "Next frame"
-msgstr "Nākošais kadrs"
+msgstr "Nākamais kadrs"
 
 #: src/libvlc-module.c:1282
 msgid "Select the hotkey to got to the next video frame."
-msgstr "Atlasiet karsto taustiņu, lai tiktu uz nākošo video kadru."
+msgstr "Atlasiet karsto taustiņu, lai tiktu uz nākamo video kadru."
 
 #: src/libvlc-module.c:1284
 msgid "Very short jump length"
@@ -4324,11 +4324,11 @@ msgstr "Atlasiet taustiņu, lai no DVD izvēlētos iepriekšējo virsrakstu"
 
 #: src/libvlc-module.c:1309
 msgid "Select next DVD title"
-msgstr "Atlasīt nākošo DVD virsrakstu"
+msgstr "Atlasīt nākamo DVD virsrakstu"
 
 #: src/libvlc-module.c:1310
 msgid "Select the key to choose the next title from the DVD"
-msgstr "Atlasiet taustiņu, lai no DVD izvēlētos nākošo virsrakstu"
+msgstr "Atlasiet taustiņu, lai no DVD izvēlētos nākamo virsrakstu"
 
 #: src/libvlc-module.c:1311
 msgid "Select prev DVD chapter"
@@ -4340,11 +4340,11 @@ msgstr "Atlasiet taustiņu, lai no DVD izvēlētos iepriekšējo nodaļu"
 
 #: src/libvlc-module.c:1313
 msgid "Select next DVD chapter"
-msgstr "Atlasīt nākošo DVD nodaļu"
+msgstr "Atlasīt nākamo DVD nodaļu"
 
 #: src/libvlc-module.c:1314
 msgid "Select the key to choose the next chapter from the DVD"
-msgstr "Atlasiet taustiņu, lai no DVD izvēlētos nākošo nodaļu"
+msgstr "Atlasiet taustiņu, lai no DVD izvēlētos nākamo nodaļu"
 
 #: src/libvlc-module.c:1315
 msgid "Volume up"
@@ -4652,11 +4652,11 @@ msgstr "Pārslēgt subtitru celiņa redzamību."
 
 #: src/libvlc-module.c:1397
 msgid "Cycle next program Service ID"
-msgstr "Ciklēt nākošo programmas Pakalpojuma ID"
+msgstr "Ciklēt nākamo programmas Pakalpojuma ID"
 
 #: src/libvlc-module.c:1398
 msgid "Cycle through the available next program Service IDs (SIDs)."
-msgstr "Ciklēt caur pieejamajiem nākošās programmas Pakalpojuma IDiem (SID)."
+msgstr "Ciklēt caur pieejamajiem nākamās programmas Pakalpojuma ID (SID)."
 
 #: src/libvlc-module.c:1399
 msgid "Cycle previous program Service ID"
@@ -4664,8 +4664,7 @@ msgstr "Ciklēt iepriekšējo programmas Pakalpojuma ID"
 
 #: src/libvlc-module.c:1400
 msgid "Cycle through the available previous program Service IDs (SIDs)."
-msgstr ""
-"Ciklēt caur pieejamajiem iepriekšējās programmas Pakalpojuma IDiem (SID)."
+msgstr "Ciklēt caur pieejamajiem iepriekšējās programmas Pakalpojuma ID (SID)."
 
 #: src/libvlc-module.c:1401
 msgid "Cycle source aspect ratio"
@@ -5034,7 +5033,7 @@ msgstr "Pārlūka apturēšana"
 #: modules/gui/qt/ui/podcast_configuration.h:102
 #: modules/gui/qt/ui/streampanel.h:170
 msgid "Delete"
-msgstr "Delete"
+msgstr "Dzēst"
 
 #: src/misc/actions.c:63
 msgid "Down"
@@ -5126,11 +5125,11 @@ msgstr "Medija izvēlne"
 
 #: src/misc/actions.c:86
 msgid "Media Next Frame"
-msgstr "Medija nākošais kadrs"
+msgstr "Medija nākamais kadrs"
 
 #: src/misc/actions.c:87
 msgid "Media Next Track"
-msgstr "Medija nākošais celiņš"
+msgstr "Medija nākamais celiņš"
 
 #: src/misc/actions.c:88
 msgid "Media Play Pause"
@@ -5358,7 +5357,7 @@ msgid ""
 "file \"%s\". Thus, it was deleted."
 msgstr ""
 "Nebija iespējams lejupielādēt kriptogrāfisko parakstu lejupielādētajai "
-"datnei \"%s\". Tādējādi tā tika izdzēsta."
+"datnei \"%s\". Tādējādi tā tika dzēsta."
 
 #: src/misc/update.c:661 src/misc/update.c:673
 msgid "Invalid signature"
@@ -5371,7 +5370,7 @@ msgid ""
 "could not be used to securely verify it. Thus, the file was deleted."
 msgstr ""
 "Kriptogrāfiskais paraksts lejupielādētajai datnei \"%s\" bija nederīgs un "
-"nevarēja tikt lietots, lai droši pārbaudītu to. Tādējādi datne tika izdzēsta."
+"nevarēja tikt lietots, lai droši pārbaudītu to. Tādējādi datne tika dzēsta."
 
 #: src/misc/update.c:686
 msgid "File not verifiable"
@@ -5384,7 +5383,7 @@ msgid ""
 "was deleted."
 msgstr ""
 "Nebija iespējams droši pārbaudīt lejupielādēto datni \"%s\". Tādējādi tā "
-"tika izdzēsta."
+"tika dzēsta."
 
 #: src/misc/update.c:698 src/misc/update.c:710
 msgid "File corrupted"
@@ -5393,7 +5392,7 @@ msgstr "Datne bojāta"
 #: src/misc/update.c:699 src/misc/update.c:711
 #, c-format
 msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
-msgstr "Lejupielādētā datne \"%s\" bija bojāta. Tādējādi tā tika izdzēsta."
+msgstr "Lejupielādētā datne \"%s\" bija bojāta. Tādējādi tā tika dzēsta."
 
 #: src/misc/update.c:723
 msgid ""
@@ -14864,7 +14863,7 @@ msgstr "| stop . . . . . . . . . . . . . . . . . . apturēt straumi"
 #: modules/control/oldrc.c:793
 msgid "| next . . . . . . . . . . . . . .  next playlist item"
 msgstr ""
-"| next . . . . . . . . . . . . . .  nākošais atskaņošanas saraksta vienums"
+"| next . . . . . . . . . . . . . .  nākamais atskaņošanas saraksta vienums"
 
 #: modules/control/oldrc.c:794
 msgid "| prev . . . . . . . . . . . .  previous playlist item"
@@ -14904,7 +14903,7 @@ msgstr "| title [X]  . . . . . . iestatīt/iegūt virsrakstu pašreizējā vienu
 
 #: modules/control/oldrc.c:802
 msgid "| title_n  . . . . . . . .  next title in current item"
-msgstr "| title_n  . . . . . . . .  nākošais nosaukums pašreizējā vienumā"
+msgstr "| title_n  . . . . . . . .  nākamais virsraksts pašreizējā vienumā"
 
 #: modules/control/oldrc.c:803
 msgid "| title_p  . . . . . .  previous title in current item"
@@ -14916,7 +14915,7 @@ msgstr "| chapter [X]  . . . . iestatīt/iegūt nodaļu pašreizējā vienumā"
 
 #: modules/control/oldrc.c:805
 msgid "| chapter_n  . . . . . .  next chapter in current item"
-msgstr "| chapter_n  . . . . . .  nākošā nodaļa pašreizējā vienumā"
+msgstr "| chapter_n  . . . . . .  nākamā nodaļa pašreizējā vienumā"
 
 #: modules/control/oldrc.c:806
 msgid "| chapter_p  . . . .  previous chapter in current item"
@@ -16800,7 +16799,7 @@ msgstr "Doties uz iepriekšējo vienumu"
 #: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
 msgid "Go to next item"
-msgstr "Doties uz nākošo vienumu"
+msgstr "Doties uz nākamo vienumu"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
@@ -17222,7 +17221,7 @@ msgid ""
 "By default, VLC will allow you to switch to the next or previous item with "
 "the Apple Remote. You can disable this behavior with this option."
 msgstr ""
-"Pēc noklusējuma VLC atļaus jums pārslēgties uz nākošo vai iepriekšējo "
+"Pēc noklusējuma VLC atļaus jums pārslēgties uz nākamo vai iepriekšējo "
 "vienumu ar Apple Remote. Jūs varat izslēgt šo izturēšanos ar šo opciju."
 
 #: modules/gui/macosx/macosx.m:88
@@ -17323,11 +17322,11 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:116 modules/gui/macosx/VLCMainMenu.m:375
 msgid "Show Previous & Next Buttons"
-msgstr "Rādīt pogas Iepriekšējais un Nākošais"
+msgstr "Rādīt pogas \"Iepriekšējais\" un \"Nākamais\""
 
 #: modules/gui/macosx/macosx.m:117
 msgid "Shows the previous and next buttons in the main window."
-msgstr "Parāda iepriekšējais un nākošais pogas galvenajā logā."
+msgstr "Parāda galvenajā logā pogas \"Iepriekšējais\" un \"Nākamais\"."
 
 #: modules/gui/macosx/macosx.m:119 modules/gui/macosx/VLCMainMenu.m:377
 msgid "Show Shuffle & Repeat Buttons"
@@ -19183,15 +19182,15 @@ msgstr " b                      Ciklēt caur video celiņiem"
 #: modules/gui/ncurses.c:883
 msgid " n, p                   Next/Previous playlist item"
 msgstr ""
-" n, p                   Nākošais/iepriekšējais atskaņošanas saraksta vienums"
+" n, p                   Nākamais/iepriekšējais atskaņošanas saraksta vienums"
 
 #: modules/gui/ncurses.c:884
 msgid " [, ]                   Next/Previous title"
-msgstr " [, ]                   Nākošais/iepriekšējais virsraksts"
+msgstr " [, ]                   Nākamais/iepriekšējais virsraksts"
 
 #: modules/gui/ncurses.c:885
 msgid " <, >                   Next/Previous chapter"
-msgstr " <, >                   Nākošā/iepriekšējā nodaļa"
+msgstr " <, >                   Nākamā/iepriekšējā nodaļa"
 
 #. xgettext: You can use ← and → characters
 #: modules/gui/ncurses.c:887
@@ -19257,7 +19256,7 @@ msgstr " /                      Lūkoties pēc vienuma"
 
 #: modules/gui/ncurses.c:908
 msgid " ;                      Look for the next item"
-msgstr " ;                      Lūkoties pēc nākošā vienuma"
+msgstr " ;                      Lūkoties pēc nākamā vienuma"
 
 #: modules/gui/ncurses.c:909
 msgid " A                      Add an entry"
@@ -19266,7 +19265,7 @@ msgstr " A                     Pievienot ierakstu"
 #. xgettext: You can use ⌫ character to translate <backspace>
 #: modules/gui/ncurses.c:911
 msgid " D, <backspace>, <del>  Delete an entry"
-msgstr " D, <backspace>, <del>  Izdzēst ierakstu"
+msgstr " D, <backspace>, <del>  Dzēst ierakstu"
 
 #: modules/gui/ncurses.c:912
 msgid " e                      Eject (if stopped)"
@@ -19403,7 +19402,7 @@ msgstr "Iepriekšējais / soli atpakaļ"
 
 #: modules/gui/qt/components/controller.hpp:108
 msgid "Next / Forward"
-msgstr "Nākošais / uz priekšu"
+msgstr "Nākamais / uz priekšu"
 
 #: modules/gui/qt/components/controller.hpp:109
 msgid "De-Fullscreen"
@@ -19458,7 +19457,7 @@ msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Next media in the playlist, skip forward when held"
-msgstr "Nākošais medijs atskaņošanas sarakstā, izlaist uz priekšu, kad turēts"
+msgstr "Nākamais medijs atskaņošanas sarakstā, izlaist uz priekšu, kad turēts"
 
 #: modules/gui/qt/components/controller.hpp:119
 msgid "Toggle the video in fullscreen"
@@ -19502,7 +19501,7 @@ msgstr "Iepriekšējais medijs atskaņošanas sarakstā"
 
 #: modules/gui/qt/components/controller.hpp:125
 msgid "Next media in the playlist"
-msgstr "Nākošais medijs atskaņošanas sarakstā"
+msgstr "Nākamais medijs atskaņošanas sarakstā"
 
 #: modules/gui/qt/components/controller.hpp:126
 #: modules/gui/qt/components/open_panels.cpp:259
@@ -20081,7 +20080,7 @@ msgid ""
 "key to remove hotkeys."
 msgstr ""
 "Atlasiet darbību vai veiciet dubulto klikšķi uz tās, lai mainītu saistīto "
-"karsto taustiņu. Lietojiet taustiņu \"delete\", lai noņemtu karstos "
+"karsto taustiņu. Lietojiet taustiņu \"Delete\", lai noņemtu karstos "
 "taustiņus."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
@@ -20120,7 +20119,7 @@ msgid ""
 "Delete key to remove."
 msgstr ""
 "Dubultklikšķis, lai mainītu.\n"
-"Dzēšanas taustiņš, lai aizvāktu."
+"Taustiņš \"Delete\", lai noņemtu."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1414
 msgid "Hotkey change"
@@ -20372,7 +20371,7 @@ msgstr "Dzēst atlasīto vienumu"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:54
 msgid "Delete all the bookmarks"
-msgstr "Izdzēst visas grāmatzīmes"
+msgstr "Dzēst visas grāmatzīmes"
 
 #: modules/gui/qt/dialogs/bookmarks.cpp:57 modules/video_filter/extract.c:68
 msgid "Extract"
@@ -20848,7 +20847,7 @@ msgstr "Datnes"
 
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:35
 msgid "Deletes the selected item"
-msgstr "Izdzēš atlasīto vienumu"
+msgstr "Dzēš atlasīto vienumu"
 
 #: modules/gui/qt/dialogs/preferences.cpp:72
 msgid "Show settings"
@@ -20918,7 +20917,7 @@ msgstr ""
 "Šis vednis atļaus jums straumēt vai pārveidot jūsu mediju lietošanai lokāli, "
 "jūsu privātajā tīklā vai Internetā.\n"
 "Jums vajadzētu sākt, pārbaudot, ka avots atbilst tam, ko jūs vēlaties, lai "
-"tas būtu jūsu ievade, un tad nospiediet pogu \"Nākošais\", lai turpinātu.\n"
+"tas būtu jūsu ievade, un tad nospiediet pogu \"Nākamais\", lai turpinātu.\n"
 
 #: modules/gui/qt/dialogs/sout.cpp:58
 msgid ""
@@ -20948,7 +20947,7 @@ msgstr "Plakana poga"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:77
 msgid "Next widget style"
-msgstr "Nākošais logrīka stils"
+msgstr "Nākamais logrīka stils"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:78
 msgid "Big Button"
@@ -21446,7 +21445,7 @@ msgstr "&Iepriekšējais"
 
 #: modules/gui/qt/menus.cpp:851
 msgid "Ne&xt"
-msgstr "&Nākošais"
+msgstr "&Nākamais"
 
 #: modules/gui/qt/menus.cpp:869
 msgid "Sp&eed"
@@ -21735,15 +21734,15 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:188
 msgid "When to raise the interface"
-msgstr "Kad pacelt saskarni"
+msgstr "Kad parādīt saskarni"
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
 "This option allows the interface to be raised automatically when a video/"
 "audio playback starts, or never."
 msgstr ""
-"Šī opcija atļauj saskarnei tikt paceltai automātiski, kad sākas video/audio "
-"atskaņošana, vai arī nekad netikt paceltai."
+"Šī opcija atļauj saskarnei tikt parādītai automātiski, kad sākas video/audio "
+"atskaņošana, vai arī nekad netikt parādītai."
 
 #: modules/gui/qt/qt.cpp:192
 msgid "Fullscreen controller mouse sensitivity"
@@ -23855,7 +23854,7 @@ msgid ""
 "Normally the packetizer would sync on the next full frame. This flags "
 "instructs the packetizer to sync on the first Intra Frame found."
 msgstr ""
-"Normāli paketizētājs sinhronizētu uz nākošā pilnā kadra. Šis karodziņš "
+"Normāli paketizētājs sinhronizētu uz nākamā pilnā kadra. Šis karodziņš "
 "instruē paketizētāju sinhronizēt uz pirmā atrastā iekšējā kadrā."
 
 #: modules/packetizer/mpegvideo.c:74
@@ -23993,8 +23992,7 @@ msgstr "SAP noildze (sekundes)"
 msgid ""
 "Delay after which SAP items get deleted if no new announcement is received."
 msgstr ""
-"Aizture, pēc kuras SAP vienumi tiek izdzēsti, ja nav saņemti jauni "
-"paziņojumi."
+"Aizture, pēc kuras SAP vienumi tiek dzēsti, ja nav saņemti jauni paziņojumi."
 
 #: modules/services_discovery/sap.c:90
 msgid "Try to parse the announce"
@@ -24968,7 +24966,7 @@ msgstr "Automātiskā izdzēšana"
 
 #: modules/stream_out/autodel.c:47
 msgid "Automatically add/delete input streams"
-msgstr "Automātiski pievienot/izdzēst ievades straumes"
+msgstr "Automātiski pievienot/dzēst ievades straumes"
 
 #: modules/stream_out/bridge.c:43
 msgid ""
@@ -25009,8 +25007,8 @@ msgid ""
 "Offset to add to the stream IDs specified in bridge_out to obtain the stream "
 "IDs bridge_in will register."
 msgstr ""
-"Nobīde, kuru pievienot pie straumes IDiem, norādīta iekš bridge_out, lai "
-"iegūtu straumes IDus, kurus reģistrēs bridge_in."
+"Nobīde, kuru pievienot pie straumes identifikatoriem, norādīta iekš "
+"bridge_out, lai iegūtu straumes identifikatorus, kurus reģistrēs bridge_in."
 
 #: modules/stream_out/bridge.c:60
 msgid "Name of current instance"
@@ -29474,7 +29472,7 @@ msgstr "Rādīt sistēmjoslas ikonu"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
 msgid "Auto raising the interface:"
-msgstr "Saskarnes automātiskā pacelšana:"
+msgstr "Saskarnes automātiskā parādīšana:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Skin resource file:"
