@@ -102,6 +102,8 @@ TRIPLET=$ARCH-w64-mingw32
 CC=${CC:-$TRIPLET-gcc}
 if ! printf "#ifdef __clang__\n#error CLANG\n#endif" | $CC -E -; then
     COMPILING_WITH_CLANG=1
+else
+    COMPILING_WITH_CLANG=0
 fi
 
 info "Building extra tools"
