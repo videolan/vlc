@@ -20,6 +20,7 @@ $(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
 
 dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 	$(UNPACK)
+	$(APPLY) $(SRC)/dvdread/only-use-getmntentr-when-available.patch
 	$(call pkg_static,"misc/dvdread.pc.in")
 	$(MOVE)
 

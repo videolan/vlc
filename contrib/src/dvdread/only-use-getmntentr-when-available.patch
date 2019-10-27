@@ -1,0 +1,48 @@
+From da2245e4eccca4b8816ecba3d99c6c2134e3d07c Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Thu, 24 Oct 2019 14:42:55 +0200
+Subject: [PATCH] only use getmntent_r if available
+
+---
+ configure.ac     | 3 +++
+ src/dvd_reader.c | 7 ++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 78a8c3b..b2754bb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -65,6 +65,9 @@ AS_CASE([$host],
+ AS_CASE([$host],
+   [*-os2-*], LDFLAGS="-no-undefined -Zbin-files $LDFLAGS")
+ 
++AS_CASE([$host],
++  [*-linux-*], [AC_CHECK_FUNCS([getmntent_r])])
++
+ AC_ARG_WITH([libdvdcss],
+   AS_HELP_STRING([--with-libdvdcss], [Link directly against libdvdcss @<:@default=no@:>@]))
+ 
+diff --git a/src/dvd_reader.c b/src/dvd_reader.c
+index 27dd527..6cea7b5 100644
+--- a/src/dvd_reader.c
++++ b/src/dvd_reader.c
+@@ -543,10 +543,15 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
+ #elif defined(__linux__)
+     mntfile = fopen( _PATH_MOUNTED, "r" );
+     if( mntfile ) {
++
++#ifdef HAVE_GETMNTENT_R
+       struct mntent *me, mbuf;
+       char buf [8192];
+-
+       while( ( me = getmntent_r( mntfile, &mbuf, buf, sizeof(buf) ) ) ) {
++#else
++      struct mntent *me;
++      while( ( me = getmntent( mntfile ) ) ) {
++#endif
+         if( !strcmp( me->mnt_dir, path_copy ) ) {
+           fprintf( stderr,
+                    "libdvdread: Attempting to use device %s"
+-- 
+2.22.0
+
