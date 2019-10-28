@@ -350,9 +350,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     if ( priv->p_thumbnailer )
         vlc_thumbnailer_Release( priv->p_thumbnailer );
 
-    if( priv->media_source_provider )
-        vlc_media_source_provider_Delete( priv->media_source_provider );
-
     libvlc_InternalDialogClean( p_libvlc );
     libvlc_InternalKeystoreClean( p_libvlc );
 
@@ -384,6 +381,9 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     if ( priv->p_media_library )
         libvlc_MlRelease( priv->p_media_library );
+
+    if( priv->media_source_provider )
+        vlc_media_source_provider_Delete( priv->media_source_provider );
 
     libvlc_InternalActionsClean( p_libvlc );
 
