@@ -281,7 +281,6 @@ end
 
 getplaylist = function ()
     local p
-
     if _GET["search"] then
         if _GET["search"] ~= "" then
             _G.search_key = _GET["search"]
@@ -291,7 +290,7 @@ getplaylist = function ()
         local key = vlc.strings.decode_uri(_GET["search"])
         p = vlc.playlist.search(key)
     else
-        p = vlc.playlist.get()
+        p = vlc.playlist.list()
     end
 
     --logTable(p) --Uncomment to debug
@@ -299,34 +298,14 @@ getplaylist = function ()
     return p
 end
 
-parseplaylist = function (item)
-    if item.flags.disabled then return end
-
-    if (item.children) then
+parseplaylist = function (list)
+    local playlist = {}
+    local current_item_id = vlc.playlist.current()
+    for i, item in ipairs(list) do
         local result={}
-        local name = (item.name or "")
 
-        result["type"]="node"
-        result.id=tostring(item.id)
-        result.name=tostring(name)
-        result.ro=item.flags.ro and "ro" or "rw"
-
-        --store children in an array
-        --we use _array as a proxy for arrays
-        result.children={}
-        result.children._array={}
-
-        for _, child in ipairs(item.children) do
-            local nextChild=parseplaylist(child)
-            table.insert(result.children._array,nextChild)
-        end
-
-        return result
-    else
-        local result={}
         local name, path = item.name or ""
         local path = item.path or ""
-        local current_item_id = vlc.playlist.current()
 
         -- Is the item the one currently played
         if(current_item_id ~= nil) then
@@ -334,16 +313,14 @@ parseplaylist = function (item)
                 result.current = "current"
             end
         end
-
         result["type"]="leaf"
         result.id=tostring(item.id)
         result.uri=tostring(path)
         result.name=name
-        result.ro=item.flags.ro and "ro" or "rw"
         result.duration=math.floor(item.duration)
-
-        return result
+        playlist[i] = result
     end
+    return playlist
 
 end
 
