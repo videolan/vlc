@@ -77,9 +77,6 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
     vlc_object_t        *p_obj = p_owner->p_obj;
     filter_chain_t       *test_chain;
 
-    /* will need proper chroma for get_buffer */
-    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
-
     vlc_mutex_lock( &id->fifo.lock );
 
     const es_format_t *p_enc_in = transcode_encoder_format_in( id->encoder );
