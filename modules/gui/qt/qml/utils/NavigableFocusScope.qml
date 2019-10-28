@@ -150,4 +150,18 @@ FocusScope {
             navigationCancel( index )
         }
     }
+
+    function defaultKeyReleaseAction(event, index) {
+        if (event.accepted)
+            return
+
+        if ( KeyHelper.matchLeft(event)
+                || KeyHelper.matchRight(event)
+                || KeyHelper.matchUp(event)
+                || KeyHelper.matchDown(event)
+                || KeyHelper.matchCancel(event) )
+        {
+            event.accepted = true
+        }
+    }
 }
