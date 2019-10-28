@@ -84,12 +84,14 @@ int decoder_UpdateVideoFormat( decoder_t *dec )
 int decoder_UpdateVideoOutput( decoder_t *dec, vlc_video_context *vctx_out )
 {
     vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
-    if ( unlikely(dec->fmt_in.i_cat != VIDEO_ES || dec->cbs == NULL ||
-                  dec->cbs->video.format_update == NULL) )
+    if ( unlikely(dec->fmt_in.i_cat != VIDEO_ES || dec->cbs == NULL) )
         return -1;
 
     /* */
     dec->fmt_out.video.i_chroma = dec->fmt_out.i_codec;
+
+    if (dec->cbs->video.format_update == NULL)
+        return 0;
 
     return dec->cbs->video.format_update( dec, vctx_out );
 }
