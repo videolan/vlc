@@ -402,6 +402,13 @@ picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
     return osys->pool;
 }
 
+bool vout_IsDisplayFiltered(vout_display_t *vd)
+{
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+
+    return osys->converters == NULL || !filter_chain_IsEmpty(osys->converters);
+}
+
 picture_t *vout_ConvertForDisplay(vout_display_t *vd, picture_t *picture)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
