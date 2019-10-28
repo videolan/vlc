@@ -656,13 +656,6 @@ vlc_fourcc_t image_Mime2Fourcc( const char *psz_mime )
     return 0;
 }
 
-static int video_update_format( decoder_t *p_dec, vlc_video_context *vctx_out )
-{
-    VLC_UNUSED(vctx_out);
-    VLC_UNUSED(p_dec);
-    return 0;
-}
-
 static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fmt )
 {
     decoder_t *p_dec;
@@ -679,7 +672,6 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fm
     static const struct decoder_owner_callbacks dec_cbs =
     {
         .video = {
-            .format_update = video_update_format,
             .queue = ImageQueueVideo,
         },
     };
