@@ -227,18 +227,20 @@ struct vlc_wl_registry *vlc_wl_registry_get(struct wl_display *display,
     if (unlikely(vr == NULL))
         return NULL;
 
-    vr->registry = wl_display_get_registry(display);
+    struct wl_display *wrapper = wl_proxy_create_wrapper(display);
+    if (unlikely(wrapper == NULL))
+        goto error;
+
+    wl_proxy_set_queue((struct wl_proxy *)wrapper, queue);
+    vr->registry = wl_display_get_registry(wrapper);
+    wl_proxy_wrapper_destroy(wrapper);
+
     if (unlikely(vr->registry == NULL))
-    {
-        free(vr);
-        return NULL;
-    }
+        goto error;
 
     vr->interfaces = NULL;
     vr->names = NULL;
 
-    /* FIXME: setting queue is not thread safe */
-    wl_proxy_set_queue((struct wl_proxy *)vr->registry, queue);
     wl_registry_add_listener(vr->registry, &registry_cbs, vr);
 
      /* complete registry enumeration */
@@ -248,6 +250,9 @@ struct vlc_wl_registry *vlc_wl_registry_get(struct wl_display *display,
         vr = NULL;
     }
 
+    return vr;
+error:
+    free(vr);
     return vr;
 }
 
