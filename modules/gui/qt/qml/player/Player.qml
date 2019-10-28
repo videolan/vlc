@@ -39,6 +39,33 @@ Utils.NavigableFocusScope {
             _menu.dismiss()
     }
 
+    Keys.priority: Keys.AfterItem
+    Keys.onPressed: {
+        if (event.accepted)
+            return
+        defaultKeyAction(event, 0)
+    }
+
+    Keys.onReleased: {
+        if (event.accepted)
+            return
+        if (event.key === Qt.Key_Menu) {
+            toolbarAutoHide.toggleForceVisible()
+        } else if (KeyHelper.matchCancel(event)) {
+
+            if (player.playingState === PlayerController.PLAYING_STATE_PAUSED) {
+               mainPlaylistController.stop()
+            }
+            history.previous(History.Go)
+        } else {
+            defaultKeyReleaseAction(event, 0)
+        }
+
+        //unhandled keys are forwarded as hotkeys
+        if (!event.accepted)
+            rootWindow.sendHotkey(event.key, event.modifiers);
+    }
+
     //center image
     Rectangle {
         visible: !rootWindow.hasEmbededVideo
@@ -128,18 +155,6 @@ Utils.NavigableFocusScope {
 
         property point mousePosition: Qt.point(0,0)
 
-        Keys.onPressed: {
-            if (event.key === Qt.Key_Menu
-                    || event.key === Qt.Key_Back
-                    || event.key === Qt.Key_Backspace
-                    || event.matches(StandardKey.Back)
-                    || event.matches(StandardKey.Cancel)) {
-                toolbarAutoHide.toggleForceVisible()
-            } else {
-                rootWindow.sendHotkey(event.key, event.modifiers);
-            }
-        }
-
         onMouseMoved:{
             //short interval for mouse events
             toolbarAutoHide.setVisible(1000)
@@ -181,19 +196,6 @@ Utils.NavigableFocusScope {
 
             navigationParent: rootPlayer
             navigationDownItem: playlistpopup.showPlaylist ? playlistpopup : controlBarView
-
-            Keys.onPressed: {
-                if (event.accepted)
-                    return
-                if (event.key === Qt.Key_Menu
-                        || event.key === Qt.Key_Backspace
-                        || event.matches(StandardKey.Back)
-                        || event.matches(StandardKey.Cancel)) {
-                    toolbarAutoHide.toggleForceVisible()
-                } else {
-                    rootWindow.sendHotkey(event.key, event.modifiers);
-                }
-            }
         }
     }
 
@@ -280,19 +282,6 @@ Utils.NavigableFocusScope {
 
                     navigationParent: rootPlayer
                     navigationUpItem: playlistpopup.showPlaylist ? playlistpopup : topcontrolView
-
-                    //unhandled keys are forwarded as hotkeys
-                    Keys.onPressed: {
-                        if (event.accepted)
-                            return
-                        if (event.key === Qt.Key_Menu
-                                || event.key === Qt.Key_Backspace
-                                || event.matches(StandardKey.Back)
-                                || event.matches(StandardKey.Cancel))
-                            toolbarAutoHide.toggleForceVisible()
-                        else
-                            rootWindow.sendHotkey(event.key, event.modifiers);
-                    }
                 }
             }
         }
