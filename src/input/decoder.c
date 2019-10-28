@@ -405,7 +405,6 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
 static void FixDisplayFormat(decoder_t *p_dec, video_format_t *fmt)
 {
     *fmt = p_dec->fmt_out.video;
-    fmt->i_chroma = p_dec->fmt_out.i_codec;
 
     if( vlc_fourcc_IsYUV( fmt->i_chroma ) )
     {
