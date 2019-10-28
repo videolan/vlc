@@ -64,8 +64,6 @@ typedef struct
 struct decoder_owner
 {
     decoder_t dec;
-    /* Current format in use by the output */
-    video_format_t video;
     sout_stream_t *p_stream;
 };
 
@@ -306,7 +304,6 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     };
     p_sys->p_decoder->cbs = &dec_cbs;
 
-    p_owner->video = p_fmt->video;
     p_owner->p_stream = p_stream;
     //p_sys->p_decoder->p_cfg = p_sys->p_video_cfg;
 
@@ -574,7 +571,6 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 inline static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vctx )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
-    p_owner->video = p_dec->fmt_out.video;
     sout_stream_sys_t *p_sys = p_owner->p_stream->p_sys;
     if ( p_sys->p_vf2 )
     {
@@ -585,7 +581,7 @@ inline static int video_update_format_decoder( decoder_t *p_dec, vlc_video_conte
         if( psz_chain )
         {
             es_format_t fmt;
-            es_format_InitFromVideo( &fmt, &p_owner->video );
+            es_format_InitFromVideo( &fmt, &p_dec->fmt_out.video );
             if( p_sys->i_chroma )
                 fmt.video.i_chroma = p_sys->i_chroma;
             filter_chain_Reset( p_sys->p_vf2, &fmt, &fmt );
