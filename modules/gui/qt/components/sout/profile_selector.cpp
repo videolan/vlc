@@ -204,7 +204,7 @@ void VLCProfileSelector::updateOptions( int i )
     if ( rx.indexIn( options ) != -1 )
         return updateOptionsOldFormat( i );
 
-    transcode = "";
+    transcode.clear();
 
     QStringList tuples = options.split( ";" );
     typedef QHash<QString, QString> proptovalueHashType;
@@ -243,8 +243,7 @@ void VLCProfileSelector::updateOptions( int i )
     }\
     else value = QString()
 
-    SoutChain smrl;
-    smrl.begin( "transcode" );
+    transcode.begin( "transcode" );
 
     /* First muxer options */
     HASHPICK( "muxer", "mux" );
@@ -258,19 +257,19 @@ void VLCProfileSelector::updateOptions( int i )
 
         if ( !value.isEmpty() )
         {
-            smrl.option( "vcodec", value );
+            transcode.option( "vcodec", value );
 
             HASHPICK( "vcodec", "bitrate" );
             if ( value.toInt() > 0 )
             {
-                smrl.option( "vb", value.toInt() );
+                transcode.option( "vb", value.toInt() );
             }
 
             HASHPICK( "video", "filters" );
             if ( !value.isEmpty() )
             {
                 QStringList valuesList = QUrl::fromPercentEncoding( value.toLatin1() ).split( ";" );
-                smrl.option( "vfilter", valuesList.join( ":" ) );
+                transcode.option( "vfilter", valuesList.join( ":" ) );
             }
 
             /*if ( codec is h264 )*/
@@ -287,28 +286,28 @@ void VLCProfileSelector::updateOptions( int i )
                     codecoptions << QUrl::fromPercentEncoding( value.toLatin1() );
 
                 if ( codecoptions.count() )
-                    smrl.option( "venc",
+                    transcode.option( "venc",
                         QString("x264{%1}").arg( codecoptions.join(",") ) );
             }
 
             HASHPICK( "vcodec", "framerate" );
             if ( !value.isEmpty() && value.toInt() > 0 )
-                smrl.option( "fps", value );
+                transcode.option( "fps", value );
 
             HASHPICK( "vcodec", "scale" );
             if ( !value.isEmpty() )
-                smrl.option( "scale", value );
+                transcode.option( "scale", value );
 
             HASHPICK( "vcodec", "width" );
             if ( !value.isEmpty() && value.toInt() > 0 )
-                smrl.option( "width", value );
+                transcode.option( "width", value );
 
             HASHPICK( "vcodec", "height" );
             if ( !value.isEmpty() && value.toInt() > 0 )
-                smrl.option( "height", value );
+                transcode.option( "height", value );
         }
     } else {
-        smrl.option( "vcodec", "none" );
+        transcode.option( "vcodec", "none" );
     }
 
     HASHPICK( "audio", "enable" );
@@ -317,27 +316,27 @@ void VLCProfileSelector::updateOptions( int i )
         HASHPICK( "audio", "codec" );
         if ( !value.isEmpty() )
         {
-            smrl.option( "acodec", value );
+            transcode.option( "acodec", value );
 
             HASHPICK( "acodec", "bitrate" );
-            smrl.option( "ab", value.toInt() );
+            transcode.option( "ab", value.toInt() );
 
             HASHPICK( "acodec", "channels" );
-            smrl.option( "channels", value.toInt() );
+            transcode.option( "channels", value.toInt() );
 
             HASHPICK( "acodec", "samplerate" );
-            smrl.option( "samplerate", value.toInt() );
+            transcode.option( "samplerate", value.toInt() );
 
             HASHPICK( "audio", "filters" );
             if ( !value.isEmpty() )
             {
                 QStringList valuesList = QUrl::fromPercentEncoding( value.toLatin1() ).split( ";" );
-                smrl.option( "afilter", valuesList.join( ":" ) );
+                transcode.option( "afilter", valuesList.join( ":" ) );
             }
 
         }
     } else {
-        smrl.option( "acodec", "none" );
+        transcode.option( "acodec", "none" );
     }
 
     HASHPICK( "subtitles", "enable" );
@@ -347,19 +346,17 @@ void VLCProfileSelector::updateOptions( int i )
         if ( value.isEmpty() )
         {
             HASHPICK( "subtitles", "codec" );
-            smrl.option( "scodec", value );
+            transcode.option( "scodec", value );
         }
         else
         {
-            smrl.option( "soverlay" );
+            transcode.option( "soverlay" );
         }
     } else {
-        smrl.option( "scodec", "none" );
+        transcode.option( "scodec", "none" );
     }
-    smrl.end();
+    transcode.end();
 #undef HASHPICK
-
-    transcode = smrl.to_string();
 
     cleanup:
     /* Temp hash tables cleanup */
@@ -377,52 +374,49 @@ void VLCProfileSelector::updateOptionsOldFormat( int i )
 
     mux = options[0];
 
-    SoutChain smrl;
     if( options[1].toInt() || options[2].toInt() || options[3].toInt() )
     {
-        smrl.begin( "transcode" );
+        transcode.begin( "transcode" );
 
         if( options[1].toInt() )
         {
-            smrl.option( "vcodec", options[4] );
+            transcode.option( "vcodec", options[4] );
             if( options[4] != "none" )
             {
-                smrl.option( "vb", options[5].toInt() );
+                transcode.option( "vb", options[5].toInt() );
                 if( !options[7].isEmpty() && options[7].toInt() > 0 )
-                    smrl.option( "fps", options[7] );
+                    transcode.option( "fps", options[7] );
                 if( !options[6].isEmpty() )
-                    smrl.option( "scale", options[6] );
+                    transcode.option( "scale", options[6] );
                 if( !options[8].isEmpty() && options[8].toInt() > 0 )
-                    smrl.option( "width", options[8].toInt() );
+                    transcode.option( "width", options[8].toInt() );
                 if( !options[9].isEmpty() && options[9].toInt() > 0 )
-                    smrl.option( "height", options[9].toInt() );
+                    transcode.option( "height", options[9].toInt() );
             }
         }
 
         if( options[2].toInt() )
         {
-            smrl.option( "acodec", options[10] );
+            transcode.option( "acodec", options[10] );
             if( options[10] != "none" )
             {
-                smrl.option( "ab", options[11].toInt() );
-                smrl.option( "channels", options[12].toInt() );
-                smrl.option( "samplerate", options[13].toInt() );
+                transcode.option( "ab", options[11].toInt() );
+                transcode.option( "channels", options[12].toInt() );
+                transcode.option( "samplerate", options[13].toInt() );
             }
         }
 
         if( options[3].toInt() )
         {
-            smrl.option( "scodec", options[14] );
+            transcode.option( "scodec", options[14] );
             if( options[15].toInt() )
-                smrl.option( "soverlay" );
+                transcode.option( "soverlay" );
         }
 
-        smrl.end();
-
-        transcode = smrl.to_string();
+        transcode.end();
     }
     else
-        transcode = "";
+        transcode.clear();
     emit optionsChanged();
 }
 

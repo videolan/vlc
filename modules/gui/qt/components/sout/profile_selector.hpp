@@ -30,6 +30,7 @@
 #include <QHash>
 
 #include "util/qvlcframe.hpp"
+#include "util/soutchain.hpp"
 #include "ui_profiles.h"
 
 class QComboBox;
@@ -42,14 +43,14 @@ public:
     VLCProfileSelector( QWidget *_parent );
     ~VLCProfileSelector();
     QString getMux() { return mux; }
-    QString getTranscode() { return transcode; }
+    SoutChain getTranscode() { return transcode; }
 private:
     QComboBox *profileBox;
     void fillProfilesCombo();
     void editProfile( const QString&, const QString& );
     void saveProfiles();
     QString mux;
-    QString transcode;
+    SoutChain transcode;
 private slots:
     void newProfile();
     void editProfile();

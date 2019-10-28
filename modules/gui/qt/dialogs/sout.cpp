@@ -179,9 +179,9 @@ void SoutDialog::updateChain()
     QString qs_mux = ui.profileSelect->getMux();
 
     SoutChain smrl( ":sout=#" );
-    if( !ui.profileSelect->getTranscode().isEmpty() && ui.transcodeBox->isChecked() )
+    if( !ui.profileSelect->getTranscode().to_string().isEmpty() && ui.transcodeBox->isChecked() )
     {
-        smrl.begin( ui.profileSelect->getTranscode() );
+        smrl.begin( ui.profileSelect->getTranscode().to_string() );
         smrl.end();
     }
 

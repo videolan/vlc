@@ -176,21 +176,20 @@ void ConvertDialog::close()
 
     for(int i = 0; i < incomingMRLs->length(); i++)
     {
-        QString mrl;
+        SoutChain mrl;
 
         if( dumpRadio->isChecked() )
         {
-            mrl = "demux=dump :demuxdump-file=" + fileLine->text();
+            mrl.header("demux=dump :demuxdump-file=" + fileLine->text());
         }
         else
         {
-            mrl = "sout=#" + profile->getTranscode();
+            mrl = profile->getTranscode();
+            mrl.header( "sout=#" + mrl.getHeader() );
             if( deinterBox->isChecked() )
             {
-                mrl.remove( '}' );
-                mrl += ",deinterlace}";
+                mrl.option("deinterlace");
             }
-            mrl += ":";
 
             QString newFileName;
 
@@ -229,15 +228,29 @@ void ConvertDialog::close()
 
             newFileName.replace( QChar('\''), "\\\'" );
 
-            QString chain = QString("std{access=file{no-overwrite},mux=%1,dst='%2'}")
-                                    .arg( profile->getMux() ).arg( newFileName );
+
+            mrl.end();
+            SoutModule dstModule("std");
+            SoutModule file("file");
+            file.option("no-overwrite");
+            dstModule.option("access", file);
+            dstModule.option("mux", profile->getMux());
+            dstModule.option("dst", "'" + newFileName + "'");
+
             if( displayBox->isChecked() )
-                mrl += QString( "duplicate{dst=display,dst=%1}" ).arg( chain );
+            {
+                SoutModule duplicate("duplicate");
+                duplicate.option("dst", "display");
+                duplicate.option("dst", dstModule);
+                mrl.module(duplicate);
+            }
             else
-                mrl += chain;
+            {
+                mrl.module(dstModule);
+            }
         }
-        msg_Dbg( p_intf, "Transcode chain: %s", qtu( mrl ) );
-        mrls.append(mrl);
+        msg_Dbg( p_intf, "Transcode chain: %s", qtu( mrl.to_string() ) );
+        mrls.append(mrl.to_string());
     }
     accept();
 }
