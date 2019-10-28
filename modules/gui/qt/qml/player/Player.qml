@@ -269,14 +269,14 @@ Utils.NavigableFocusScope {
                 hoverEnabled: true
                 anchors.fill: parent
 
-                ModalControlBar {
+                ControlBar {
                     id: controllerId
                     focus: true
                     anchors.fill: parent
 
-                    forceNoAutoHide: playlistpopup.state === "visible" || !player.hasVideoOutput || !rootWindow.hasEmbededVideo || controllerMouseArea.containsMouse
+                    property bool disableAutoHide: playlistpopup.state === "visible" || !player.hasVideoOutput || !rootWindow.hasEmbededVideo || controllerMouseArea.containsMouse
                     onNoAutoHideChanged: {
-                        if (!noAutoHide)
+                        if (!noAutoHide && disableAutoHide)
                             toolbarAutoHide.restart()
                     }
 

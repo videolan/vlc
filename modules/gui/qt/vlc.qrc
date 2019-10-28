@@ -264,8 +264,6 @@
         <file alias="ControlBar.qml">qml/player/ControlBar.qml</file>
         <file alias="SliderBar.qml">qml/player/SliderBar.qml</file>
         <file alias="TrackInfo.qml">qml/player/TrackInfo.qml</file>
-        <file alias="TrackSelector.qml">qml/player/TrackSelector.qml</file>
-        <file alias="ModalControlBar.qml">qml/player/ModalControlBar.qml</file>
         <file alias="ControlButtons.qml">qml/player/ControlButtons.qml</file>
         <file alias="VolumeWidget.qml">qml/player/VolumeWidget.qml</file>
         <file alias="TeletextWidget.qml">qml/player/TeletextWidget.qml</file>

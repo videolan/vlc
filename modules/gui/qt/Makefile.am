@@ -565,14 +565,12 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/about/About.qml \
 	gui/qt/qml/player/Player.qml \
 	gui/qt/qml/player/TrackInfo.qml \
-	gui/qt/qml/player/TrackSelector.qml \
 	gui/qt/qml/player/ControlBar.qml \
 	gui/qt/qml/player/ControlButtons.qml \
 	gui/qt/qml/player/PlayerButtonsLayout.qml \
 	gui/qt/qml/player/PlayerMenu.qml \
 	gui/qt/qml/player/PlayerMenuItem.qml \
 	gui/qt/qml/player/VolumeWidget.qml \
-	gui/qt/qml/player/ModalControlBar.qml \
 	gui/qt/qml/player/SliderBar.qml \
 	gui/qt/qml/player/TeletextWidget.qml \
 	gui/qt/qml/player/MiniPlayer.qml \
