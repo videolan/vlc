@@ -486,9 +486,6 @@ int VideoDecodedStream::VideoDecCallback_update_format(decoder_t *p_dec,
     struct decoder_owner *p_owner;
     p_owner = container_of(p_dec, struct decoder_owner, dec);
 
-    /* fixup */
-    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
-
     es_format_Clean(&p_owner->last_fmt_update);
     es_format_Copy(&p_owner->last_fmt_update, &p_dec->fmt_out);
 
