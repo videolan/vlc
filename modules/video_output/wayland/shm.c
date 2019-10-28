@@ -287,13 +287,13 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     assert(sys->embed != NULL);
 
     struct wl_display *display = sys->embed->display.wl;
+    struct vlc_wl_registry *registry = NULL;
 
     sys->eventq = wl_display_create_queue(display);
     if (sys->eventq == NULL)
         goto error;
 
-    struct vlc_wl_registry *registry = vlc_wl_registry_get(display,
-                                                           sys->eventq);
+    registry = vlc_wl_registry_get(display, sys->eventq);
     if (registry == NULL)
         goto error;
 
