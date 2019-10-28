@@ -659,7 +659,7 @@ vlc_fourcc_t image_Mime2Fourcc( const char *psz_mime )
 static int video_update_format( decoder_t *p_dec, vlc_video_context *vctx_out )
 {
     VLC_UNUSED(vctx_out);
-    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
+    VLC_UNUSED(p_dec);
     return 0;
 }
 
