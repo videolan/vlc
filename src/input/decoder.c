@@ -1210,13 +1210,6 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
     ModuleThread_UpdateStatVideo( p_owner, success != VLC_SUCCESS );
 }
 
-static int thumbnailer_update_format( decoder_t *p_dec, vlc_video_context *vctx_out )
-{
-    VLC_UNUSED(vctx_out);
-    VLC_UNUSED(p_dec);
-    return 0;
-}
-
 static picture_t *thumbnailer_buffer_new( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
@@ -1845,7 +1838,6 @@ static const struct decoder_owner_callbacks dec_video_cbs =
 static const struct decoder_owner_callbacks dec_thumbnailer_cbs =
 {
     .video = {
-        .format_update = thumbnailer_update_format,
         .buffer_new = thumbnailer_buffer_new,
         .queue = ModuleThread_QueueThumbnail,
     },
