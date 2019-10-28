@@ -417,8 +417,6 @@ static void FixDisplayFormat(decoder_t *p_dec, video_format_t *fmt)
                 fmt->i_height++;
         }
     }
-
-    video_format_AdjustColorSpace( fmt );
 }
 
 static int CreateVoutIfNeeded(struct decoder_owner *, vout_thread_t **, enum vlc_vout_order *, vlc_decoder_device **);

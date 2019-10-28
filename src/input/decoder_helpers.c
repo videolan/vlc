@@ -131,6 +131,8 @@ int decoder_UpdateVideoOutput( decoder_t *dec, vlc_video_context *vctx_out )
         }
     }
 
+    video_format_AdjustColorSpace( &dec->fmt_out.video );
+
     if (dec->cbs->video.format_update == NULL)
         return 0;
 
