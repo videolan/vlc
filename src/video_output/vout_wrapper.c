@@ -98,8 +98,17 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
                  reserved_picture, picture_pool_GetSize(display_pool));
 #endif
 
-    sys->private_pool = picture_pool_Reserve(display_pool, private_picture);
+    if (!vout_IsDisplayFiltered(vd) &&
+        picture_pool_GetSize(display_pool) >= reserved_picture) {
+        sys->private_pool = picture_pool_Reserve(display_pool, private_picture);
+    } else {
+        sys->private_pool =
+            picture_pool_NewFromFormat(&vd->source,
+                                       __MAX(VOUT_MAX_PICTURES,
+                                             reserved_picture - DISPLAY_PICTURE_COUNT));
+    }
     if (sys->private_pool == NULL) {
+        picture_pool_Release(display_pool);
         goto error;
     }
     sys->display_pool = display_pool;
