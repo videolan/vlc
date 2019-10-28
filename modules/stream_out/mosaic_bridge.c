@@ -625,9 +625,6 @@ static void video_update_format( video_format_t *video, es_format_t *fmt_out )
 
         *video = fmt_out->video;
     }
-
-    /* */
-    fmt_out->video.i_chroma = fmt_out->i_codec;
 }
 
 /**********************************************************************
