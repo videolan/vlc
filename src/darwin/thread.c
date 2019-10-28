@@ -172,7 +172,35 @@ int vlc_mutex_trylock (vlc_mutex_t *p_mutex)
 void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 {
     int val = pthread_mutex_unlock( p_mutex );
-    VLC_THREAD_ASSERT ("unlocking mutex");
+    /* FIXME: We can't check for the success of the unlock
+     * here as due to a bug in Apple pthread implementation.
+     * The `pthread_cond_wait` function does not behave like
+     * it should According to POSIX, pthread_cond_wait is a
+     * cancellation point and when a thread is cancelled while
+     * in a condition wait, the mutex is re-acquired before
+     * calling the first cancellation cleanup handler:
+     *
+     * > The effect is as if the thread were unblocked, allowed
+     * > to execute up to the point of returning from the call to
+     * > pthread_cond_timedwait() or pthread_cond_wait(), but at
+     * > that point notices the cancellation request and instead
+     * > of returning to the caller of pthread_cond_timedwait()
+     * > or pthread_cond_wait(), starts the thread cancellation
+     * > activities, which includes calling cancellation cleanup
+     * > handlers.
+     *
+     * Unfortunately the mutex is not locked sometimes, causing
+     * the call to `pthread_mutex_unlock` to fail.
+     * Until this is fixed, enabling this assertion would lead to
+     * spurious test failures and VLC crashes when compiling with
+     * debug enabled, which would make it nearly impossible to
+     * proeprly test with debug builds on macOS.
+     * This was reported to Apple as FB6152751.
+     */
+#ifndef NDEBUG
+    if (val != EPERM)
+        VLC_THREAD_ASSERT ("unlocking mutex");
+#endif
     vlc_mutex_unmark(p_mutex);
 }
 
