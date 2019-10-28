@@ -236,7 +236,7 @@ void ConvertDialog::close()
             else
                 mrl += chain;
         }
-        msg_Dbg( p_intf, "Transcode MRL: %s", qtu( mrl ) );
+        msg_Dbg( p_intf, "Transcode chain: %s", qtu( mrl ) );
         mrls.append(mrl);
     }
     accept();

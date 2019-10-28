@@ -36,7 +36,7 @@
 #include <QSpinBox>
 #include <assert.h>
 
-SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& inputMRL )
+SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& inputChain )
            : QWizard( parent )
 {
     p_intf = _p_intf;
@@ -46,7 +46,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
 
     /* UI stuff */
     ui.setupUi( this );
-    ui.inputBox->setMRL( inputMRL );
+    ui.inputBox->setMRL( inputChain );
     ui.helpEdit->setPlainText( qtr("This wizard will allow you to stream or "
             "convert your media for use locally, on your private network, "
             "or on the Internet.\n"
@@ -78,16 +78,16 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
 
     BUTTONACT( ui.addButton, addDest() );
 
-//     /* Connect everything to the updateMRL function */
-#define CB( x ) CONNECT( ui.x, toggled( bool ), this, updateMRL() );
-#define CT( x ) CONNECT( ui.x, textChanged( const QString& ), this, updateMRL() );
-#define CS( x ) CONNECT( ui.x, valueChanged( int ), this, updateMRL() );
-#define CC( x ) CONNECT( ui.x, currentIndexChanged( int ), this, updateMRL() );
+//     /* Connect everything to the updateChain function */
+#define CB( x ) CONNECT( ui.x, toggled( bool ), this, updateChain() );
+#define CT( x ) CONNECT( ui.x, textChanged( const QString& ), this, updateChain() );
+#define CS( x ) CONNECT( ui.x, valueChanged( int ), this, updateChain() );
+#define CC( x ) CONNECT( ui.x, currentIndexChanged( int ), this, updateChain() );
 
     /* Misc */
     CB( soutAll );
     CB( localOutput ); CB( transcodeBox );
-    CONNECT( ui.profileSelect, optionsChanged(), this, updateMRL() );
+    CONNECT( ui.profileSelect, optionsChanged(), this, updateChain() );
 
     setButtonText( QWizard::BackButton, qtr("Back") );
     setButtonText( QWizard::CancelButton, qtr("Cancel") );
@@ -107,7 +107,7 @@ void SoutDialog::closeTab( int i )
     QWidget* temp = ui.destTab->widget( i );
     ui.destTab->removeTab( i );
     delete temp;
-    updateMRL();
+    updateChain();
 }
 
 void SoutDialog::addDest( )
@@ -163,22 +163,22 @@ void SoutDialog::addDest( )
     }
 
     int index = ui.destTab->addTab( db, caption );
-    CONNECT( db, mrlUpdated(), this, updateMRL() );
+    CONNECT( db, mrlUpdated(), this, updateChain() );
     ui.destTab->setCurrentIndex( index );
-    updateMRL();
+    updateChain();
 }
 
 void SoutDialog::done( int r )
 {
-    mrl = ui.mrlEdit->toPlainText();
+    chain = ui.mrlEdit->toPlainText();
     QWizard::done(r);
 }
 
-void SoutDialog::updateMRL()
+void SoutDialog::updateChain()
 {
     QString qs_mux = ui.profileSelect->getMux();
 
-    SoutMrl smrl( ":sout=#" );
+    SoutChain smrl( ":sout=#" );
     if( !ui.profileSelect->getTranscode().isEmpty() && ui.transcodeBox->isChecked() )
     {
         smrl.begin( ui.profileSelect->getTranscode() );
@@ -224,15 +224,15 @@ void SoutDialog::updateMRL()
 
     if ( multi ) smrl.end();
 
-    mrl = smrl.getMrl();
+    chain = smrl.to_string();
 
     if( ui.soutAll->isChecked() )
-        mrl.append( " :sout-all" );
+        chain.append( " :sout-all" );
     else
-        mrl.append( " :no-sout-all" );
+        chain.append( " :no-sout-all" );
 
-    mrl.append( " :sout-keep" );
+    chain.append( " :sout-keep" );
 
-    ui.mrlEdit->setPlainText( mrl );
+    ui.mrlEdit->setPlainText( chain );
 }
 

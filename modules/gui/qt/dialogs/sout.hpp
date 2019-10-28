@@ -36,17 +36,17 @@
 
 class QPushButton;
 
-class SoutMrl
+class SoutChain
 {
 public:
-    SoutMrl( const QString& head = "")
+    SoutChain( const QString& head = "")
     {
         mrl = head;
         b_first = true;
         b_has_bracket = false;
     }
 
-    QString getMrl()
+    QString to_string()
     {
         return mrl;
     }
@@ -110,23 +110,23 @@ class SoutDialog : public QWizard
 {
     Q_OBJECT
 public:
-    SoutDialog( QWidget* parent, intf_thread_t *, const QString& mrl = "");
+    SoutDialog( QWidget* parent, intf_thread_t *, const QString& chain = "");
     virtual ~SoutDialog(){}
 
-    QString getMrl(){ return mrl; }
+    QString getChain(){ return chain; }
 
 protected:
     virtual void done( int );
 private:
     Ui::Sout ui;
 
-    QString mrl;
+    QString chain;
     QPushButton *okButton;
 
     intf_thread_t* p_intf;
 
 public slots:
-    void updateMRL();
+    void updateChain();
 
 private slots:
     void closeTab( int );

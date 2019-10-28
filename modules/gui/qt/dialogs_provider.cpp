@@ -679,7 +679,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
         s->setAttribute( Qt::WA_QuitOnClose, false ); // See #4883
         if( s->exec() == QDialog::Accepted )
         {
-            outputMRLs.append(s->getMrl());
+            outputMRLs.append(s->getChain());
             delete s;
         }
         else
@@ -704,7 +704,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
         }
     }
 
-    /* Get SoutMRL(s) */
+    /* Get SoutChain(s) */
     if( !outputMRLs.isEmpty() )
     {
         QVector<vlc::playlist::Media> outputMedias;

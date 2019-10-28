@@ -242,7 +242,7 @@ void VLCProfileSelector::updateOptions( int i )
     }\
     else value = QString()
 
-    SoutMrl smrl;
+    SoutChain smrl;
     smrl.begin( "transcode" );
 
     /* First muxer options */
@@ -358,7 +358,7 @@ void VLCProfileSelector::updateOptions( int i )
     smrl.end();
 #undef HASHPICK
 
-    transcode = smrl.getMrl();
+    transcode = smrl.to_string();
 
     cleanup:
     /* Temp hash tables cleanup */
@@ -376,7 +376,7 @@ void VLCProfileSelector::updateOptionsOldFormat( int i )
 
     mux = options[0];
 
-    SoutMrl smrl;
+    SoutChain smrl;
     if( options[1].toInt() || options[2].toInt() || options[3].toInt() )
     {
         smrl.begin( "transcode" );
@@ -418,7 +418,7 @@ void VLCProfileSelector::updateOptionsOldFormat( int i )
 
         smrl.end();
 
-        transcode = smrl.getMrl();
+        transcode = smrl.to_string();
     }
     else
         transcode = "";

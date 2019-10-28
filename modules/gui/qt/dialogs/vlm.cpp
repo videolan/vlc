@@ -378,8 +378,8 @@ void VLMDialog::selectOutput()
     SoutDialog *s = new SoutDialog( this, p_intf );
     if( s->exec() == QDialog::Accepted )
     {
-        int i = s->getMrl().indexOf( " " );
-        ui.outputLedit->setText( s->getMrl().left( i ) );
+        int i = s->getChain().indexOf( " " );
+        ui.outputLedit->setText( s->getChain().left( i ) );
     }
 }
 
