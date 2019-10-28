@@ -24,6 +24,7 @@
 #include "components/sout/profile_selector.hpp"
 #include "components/sout/profiles.hpp"
 #include "dialogs/sout.hpp"
+#include "util/soutchain.hpp"
 
 #include <QHBoxLayout>
 #include <QToolButton>
