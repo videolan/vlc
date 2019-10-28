@@ -121,6 +121,7 @@ SDDevice::matchesMountpoint( const std::string& mrl ) const
                         continue;
                     std::string tmpUrl(tmpUrl_psz);
                     free(tmpUrl_psz);
+                    vlc_UrlClean( &probedUrl );
                     return std::make_tuple( true, tmpUrl );
                 }
             }
@@ -131,6 +132,7 @@ SDDevice::matchesMountpoint( const std::string& mrl ) const
             }
         }
         vlc_UrlClean( &url );
+        vlc_UrlClean( &probedUrl );
         return std::make_tuple( true, m );
     }
     vlc_UrlClean( &probedUrl );
