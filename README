@@ -36,7 +36,7 @@ README             - This file.
 THANKS             - VLC contributors.
 
 bin/               - VLC binaries.
-bindings/          - libVLC bindings to other languages.
+bindings/          - lib VLC bindings to other languages.
 compat/            - compatibility library for operating systems missing
                      essential functionalities.
 contrib/           - Facilities for retrieving external libraries and building
