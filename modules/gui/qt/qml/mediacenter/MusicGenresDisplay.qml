@@ -48,11 +48,11 @@ Utils.NavigableFocusScope {
                 width: root.width
                 height: VLCStyle.icon_normal + VLCStyle.margin_small
 
-                cover:  Utils.MultiCoverPreview {
-                    albums: MLAlbumModel {
-                        ml: medialib
-                        parentId: model.id
-                    }
+                cover: Image {
+                    id: cover_obj
+                    fillMode: Image.PreserveAspectFit
+                    source: model.cover || VLCStyle.noArtAlbum
+                    sourceSize: Qt.size(width, height)
                 }
 
                 line1: (model.name || "Unknown genre")+" - "+model.nb_tracks+" tracks"
@@ -115,7 +115,7 @@ Utils.NavigableFocusScope {
             delegate: AudioGridItem {
                 id: gridItem
 
-                image: VLCStyle.noArtAlbum
+                image: model.cover || VLCStyle.noArtAlbum
                 title: model.name || "Unknown genre"
                 subtitle: ""
                 //selected: element.DelegateModel.inSelected
@@ -128,27 +128,6 @@ Utils.NavigableFocusScope {
 
                 onItemDoubleClicked: {
                     history.push(["mc", "music", "albums", { parentId: model.id } ], History.Go)
-                }
-
-                //replace image with a mutlicovers preview
-                Utils.MultiCoverPreview {
-                    id: multicover
-                    visible: false
-                    width: VLCStyle.cover_normal
-                    height: VLCStyle.cover_normal
-
-                    albums: MLAlbumModel {
-                        ml: medialib
-                        parentId: model.id
-                    }
-                }
-
-                Component.onCompleted: {
-                    multicover.grabToImage(function(result) {
-                        gridItem.sourceSize = undefined
-                        gridItem.image = result.url
-                        //multicover.destroy()
-                    })
                 }
             }
 
