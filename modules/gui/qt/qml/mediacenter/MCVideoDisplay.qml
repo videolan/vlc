@@ -106,7 +106,7 @@ Utils.NavigableFocusScope {
     Component {
         id: gridComponent
 
-        VideoExpandableGrid {
+        Utils.ExpandGridView {
             id: videosGV
             property Item currentItem: Item{}
 
@@ -137,6 +137,21 @@ Utils.NavigableFocusScope {
                 }
             }
 
+            expandDelegate: VideoInfoExpandPanel {
+                visible: !videosGV.isAnimating
+
+                height: implicitHeight
+                width: videosGV.width
+
+                onRetract: videosGV.retract()
+                notchPosition: videosGV.getItemPos(videosGV._expandIndex)[0] + (videosGV.cellWidth / 2)
+
+                navigationParent: videosGV
+                navigationCancel:  function() {  videosGV.retract() }
+                navigationUp: function() {  videosGV.retract() }
+                navigationDown: function() { videosGV.retract() }
+            }
+
             navigationParent: root
 
             /*
@@ -150,6 +165,12 @@ Utils.NavigableFocusScope {
                 }
             }
 
+            cellWidth: (VLCStyle.video_normal_width)
+            cellHeight: (VLCStyle.video_normal_height) + VLCStyle.margin_xlarge + VLCStyle.margin_normal
+
+            onSelectAll: videosGV.model.selectAll()
+            onSelectionUpdated: videosGV.model.updateSelection( keyModifiers, oldIndex, newIndex )
+            onActionAtIndex: switchExpandItem( index )
         }
 
     }

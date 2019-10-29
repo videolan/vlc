@@ -23,36 +23,24 @@ import QtQuick.Layouts 1.3
 import org.videolan.medialib 0.1
 
 import "qrc:///utils/" as Utils
-import "qrc:///dialogs/" as DG
 import "qrc:///style/"
 
-Utils.ExpandGridView {
-    id: expandableGV
-
-    activeFocusOnTab:true
-
-    expandDelegate:  Utils.NavigableFocusScope {
+Utils.NavigableFocusScope {
         id: expandRect
+
         property int currentId: -1
         property var model : ({})
         property alias currentItemY: expandRect.y
         property alias currentItemHeight: expandRect.height
-        height: implicitHeight
-        implicitHeight: arrowRect.implicitHeight
-            + contentRect.implicitHeight
-        width: expandableGV.width
-
-        navigationParent: expandableGV
-        navigationCancel:  function() {  expandableGV.retract() }
-        navigationUp: function() {  expandableGV.retract() }
-        navigationDown: function() { expandableGV.retract() }
+        implicitHeight: arrowRect.implicitHeight + contentRect.implicitHeight
+        property int notchPosition: 0
+        signal retract()
 
         //arrow
         Item {
             id:arrowRect
             y: -(width/2)
-            x: expandableGV.getItemPos(expandableGV._expandIndex)[0] + (expandableGV.cellWidth / 2) - (width/2)
-            visible: !expandableGV.isAnimating
+            x: notchPosition  - (width/2)
             clip: true
             width: Math.sqrt(2) *VLCStyle.icon_normal
             height: width/2
@@ -77,7 +65,6 @@ Utils.ExpandGridView {
             width: parent.width
             clip: true
             color: VLCStyle.colors.bgAlt
-            visible: !expandableGV.isAnimating
 
             RowLayout {
                 id: contentLayout
@@ -276,7 +263,7 @@ Utils.ExpandGridView {
                         color: VLCStyle.colors.lightText
 
                         focus: true
-                        onClicked: expandableGV.retract()
+                        onClicked: expandRect.retract()
                     }
 
                     Keys.priority: Keys.AfterItem
@@ -287,13 +274,3 @@ Utils.ExpandGridView {
             }
         }
     }
-
-
-    cellWidth: (VLCStyle.video_normal_width)
-    cellHeight: (VLCStyle.video_normal_height) + VLCStyle.margin_xlarge + VLCStyle.margin_normal
-
-    onSelectAll: expandableGV.model.selectAll()
-    onSelectionUpdated: expandableGV.model.updateSelection( keyModifiers, oldIndex, newIndex )
-    onActionAtIndex: switchExpandItem( index )
-
-}
