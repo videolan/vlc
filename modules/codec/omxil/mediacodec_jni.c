@@ -314,6 +314,36 @@ struct mc_api_sys
     jobject input_buffers, output_buffers;
 };
 
+static char *GetManufacturer(JNIEnv *env)
+{
+    char *manufacturer = NULL;
+
+    jclass clazz = (*env)->FindClass(env, "android/os/Build");
+    if (CHECK_EXCEPTION())
+        return NULL;
+
+    jfieldID id = (*env)->GetStaticFieldID(env, clazz, "MANUFACTURER",
+                                           "Ljava/lang/String;");
+    if (CHECK_EXCEPTION())
+        goto end;
+
+    jstring jstr = (*env)->GetStaticObjectField(env, clazz, id);
+
+    if (CHECK_EXCEPTION())
+        goto end;
+
+    const char *str = (*env)->GetStringUTFChars(env, jstr, 0);
+    if (str)
+    {
+        manufacturer = strdup(str);
+        (*env)->ReleaseStringUTFChars(env, jstr, str);
+    }
+
+end:
+    (*env)->DeleteLocalRef(env, clazz);
+    return manufacturer;
+}
+
 /*****************************************************************************
  * MediaCodec_GetName
  *****************************************************************************/
@@ -455,6 +485,22 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
                 psz_name[name_len] = '\0';
 
                 bool ignore_size = false;
+
+                /* The AVC MediaCodec implementation on Amazon fire TV seems to
+                 * report the Output surface size instead of the AVC size. This
+                 * bug is specific to Amazon devices since other MTK
+                 * implementations report the correct size. The manufacturer is
+                 * checked only if the codec matches the MKT AVC one in order
+                 * to avoid extra manufacturer check for other every devices.
+                 * */
+                static const char mtk_avc[] = "OMX.MTK.VIDEO.DECODER.AVC";
+                if (strncmp(psz_name, mtk_avc, sizeof(mtk_avc) - 1) == 0)
+                {
+                    char *manufacturer = GetManufacturer(env);
+                    if (manufacturer && strcmp(manufacturer, "Amazon") == 0)
+                        ignore_size = true;
+                    free(manufacturer);
+                }
 
                 if (ignore_size)
                 {
