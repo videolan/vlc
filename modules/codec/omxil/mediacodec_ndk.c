@@ -38,6 +38,13 @@
 
 #include "mediacodec.h"
 
+static_assert(MC_API_NO_QUIRKS == OMXCODEC_NO_QUIRKS
+    && MC_API_QUIRKS_NEED_CSD == OMXCODEC_QUIRKS_NEED_CSD
+    && MC_API_VIDEO_QUIRKS_IGNORE_PADDING == OMXCODEC_VIDEO_QUIRKS_IGNORE_PADDING
+    && MC_API_VIDEO_QUIRKS_SUPPORT_INTERLACED == OMXCODEC_VIDEO_QUIRKS_SUPPORT_INTERLACED
+    && MC_API_AUDIO_QUIRKS_NEED_CHANNELS == OMXCODEC_AUDIO_QUIRKS_NEED_CHANNELS,
+    "mediacodec.h/omx_utils.h mismatch");
+
 char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
                          int hxxx_profile, int *p_quirks);
 
