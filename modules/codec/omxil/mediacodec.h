@@ -47,6 +47,7 @@ int MediaCodecNdk_Init(mc_api*);
 
 /* MediaCodec only QUIRKS */
 #define MC_API_VIDEO_QUIRKS_ADAPTIVE 0x1000
+#define MC_API_VIDEO_QUIRKS_IGNORE_SIZE 0x2000
 
 struct mc_api_out
 {
