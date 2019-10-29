@@ -28,6 +28,7 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 #import "library/VLCInputItem.h"
+#import "windows/VLCDetachedAudioWindow.h"
 
 @interface VLCStatusBarIcon ()
 {
@@ -55,6 +56,8 @@
 
     BOOL _showTimeElapsed;
     NSString *_currentPlaybackUrl;
+
+    VLCDetachedAudioWindow *_detachedAudioWindow;
 }
 @end
 
@@ -491,6 +494,17 @@
 - (IBAction)quitAction:(id)sender
 {
     [[NSApplication sharedApplication] terminate:nil];
+}
+
+- (IBAction)statusBarIconShowMiniAudioPlayer:(id)sender
+{
+    if (!_detachedAudioWindow) {
+        NSWindowController *windowController = [[NSWindowController alloc] initWithWindowNibName:@"VLCDetachedAudioWindow"];
+        [windowController loadWindow];
+        _detachedAudioWindow = (VLCDetachedAudioWindow *)[windowController window];
+    }
+
+    [_detachedAudioWindow makeKeyAndOrderFront:sender];
 }
 
 @end

@@ -213,6 +213,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCWrappableTextField.m \
 	gui/macosx/windows/VLCAboutWindowController.h \
 	gui/macosx/windows/VLCAboutWindowController.m \
+	gui/macosx/windows/VLCDetachedAudioWindow.h \
+	gui/macosx/windows/VLCDetachedAudioWindow.m \
 	gui/macosx/windows/VLCErrorWindowController.h \
 	gui/macosx/windows/VLCErrorWindowController.m \
 	gui/macosx/windows/VLCHelpWindowController.h \
@@ -272,6 +274,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/LogMessageWindow.xib \
 	gui/macosx/UI/MainMenu.xib \
 	gui/macosx/UI/VLCCustomCropARPanel.xib \
+	gui/macosx/UI/VLCDetachedAudioWindow.xib \
 	gui/macosx/UI/VLCLibraryAlbumTableCellView.xib \
 	gui/macosx/UI/VLCLibraryWindow.xib \
 	gui/macosx/UI/VLCLibraryTableCellView.xib \

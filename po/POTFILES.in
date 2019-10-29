@@ -618,6 +618,8 @@ modules/gui/macosx/views/VLCWrappableTextField.h
 modules/gui/macosx/views/VLCWrappableTextField.m
 modules/gui/macosx/windows/VLCAboutWindowController.h
 modules/gui/macosx/windows/VLCAboutWindowController.m
+modules/gui/macosx/windows/VLCDetachedAudioWindow.h
+modules/gui/macosx/windows/VLCDetachedAudioWindow.m
 modules/gui/macosx/windows/VLCErrorWindowController.h
 modules/gui/macosx/windows/VLCErrorWindowController.m
 modules/gui/macosx/windows/VLCHelpWindowController.h

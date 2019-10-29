@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15400" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15400"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -57,6 +57,12 @@
                         <action selector="statusBarIconShowMainWindow:" target="-2" id="s0T-6f-d13"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Show Audio Player" id="7yT-ex-xl5">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="statusBarIconShowMiniAudioPlayer:" target="-2" id="wXR-JP-3xI"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Quit" id="539">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
@@ -79,8 +85,8 @@
                     </constraints>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="VLC" id="7Ns-2s-EgU"/>
                 </imageView>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Byt-pH-60l">
-                    <rect key="frame" x="74" y="42" width="167" height="17"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="749" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Byt-pH-60l">
+                    <rect key="frame" x="74" y="40" width="167" height="19"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="The Fox (What Does the Fox Say?) to this very very" usesSingleLineMode="YES" id="Fo7-qA-sCC">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -88,7 +94,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="FnZ-Gr-BKf">
-                    <rect key="frame" x="74" y="27" width="167" height="17"/>
+                    <rect key="frame" x="74" y="26" width="167" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="by Ylvis" usesSingleLineMode="YES" id="TWt-2V-iGT">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -96,7 +102,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="SKt-XT-Vki">
-                    <rect key="frame" x="74" y="12" width="167" height="17"/>
+                    <rect key="frame" x="74" y="12" width="167" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="on “The Fox”" usesSingleLineMode="YES" id="IKI-Pl-Iji">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -122,11 +128,11 @@
             <point key="canvasLocation" x="370.5" y="-52"/>
         </customView>
         <customView id="v97-Ct-Yqs">
-            <rect key="frame" x="0.0" y="0.0" width="251" height="45"/>
+            <rect key="frame" x="0.0" y="1" width="251" height="44"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rih-mA-gAq">
-                    <rect key="frame" x="103" y="-153" width="4" height="15"/>
+                    <rect key="frame" x="103" y="-154" width="4" height="15"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" alignment="center" transparent="YES" imageScaling="proportionallyDown" inset="2" id="RbD-Js-cLU">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -137,7 +143,7 @@
                     </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="p8X-zU-PwN" customClass="VLCImageButton">
-                    <rect key="frame" x="85" y="20" width="24" height="24"/>
+                    <rect key="frame" x="85" y="19" width="24" height="24"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="24" id="5IV-1l-2UV"/>
                         <constraint firstAttribute="width" secondItem="p8X-zU-PwN" secondAttribute="height" multiplier="1:1" id="lkX-DA-UeD"/>
@@ -151,7 +157,7 @@
                     </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="lvI-lN-t4O" customClass="VLCImageButton">
-                    <rect key="frame" x="114" y="20" width="24" height="24"/>
+                    <rect key="frame" x="114" y="19" width="24" height="24"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="24" id="VH7-ja-clp"/>
                         <constraint firstAttribute="width" secondItem="lvI-lN-t4O" secondAttribute="height" multiplier="1:1" id="kzq-fw-PfK"/>
@@ -168,7 +174,7 @@
                     </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="NHj-Vf-SPF" customClass="VLCImageButton">
-                    <rect key="frame" x="142" y="20" width="24" height="24"/>
+                    <rect key="frame" x="142" y="19" width="24" height="24"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="NHj-Vf-SPF" secondAttribute="height" multiplier="1:1" id="WY1-gG-mtJ"/>
                         <constraint firstAttribute="height" constant="24" id="YJ5-t2-qjF"/>
@@ -196,7 +202,7 @@
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z3X-aG-Veg">
-                    <rect key="frame" x="88" y="1" width="33" height="17"/>
+                    <rect key="frame" x="88" y="1" width="33" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="right" title="--:--" usesSingleLineMode="YES" id="CLT-p2-bxf">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -204,7 +210,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="za4-8d-tZy">
-                    <rect key="frame" x="119" y="1" width="13" height="17"/>
+                    <rect key="frame" x="119" y="1" width="13" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="/" usesSingleLineMode="YES" id="y3P-oA-eTa">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -212,7 +218,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wXO-2p-mxK">
-                    <rect key="frame" x="126" y="1" width="33" height="17"/>
+                    <rect key="frame" x="126" y="1" width="33" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="--:--" usesSingleLineMode="YES" id="vF8-Z8-vhW">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>

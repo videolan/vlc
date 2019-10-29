@@ -36,5 +36,6 @@
 - (IBAction)statusBarIconNext:(id)sender;
 - (IBAction)statusBarIconPrevious:(id)sender;
 - (IBAction)statusBarIconToggleRandom:(id)sender;
+- (IBAction)statusBarIconShowMiniAudioPlayer:(id)sender;
 
 @end
