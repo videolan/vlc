@@ -1024,10 +1024,21 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             i_height = p_out->conf.video.height;
         }
 
-        p_dec->fmt_out.video.i_visible_width =
-        p_dec->fmt_out.video.i_width = i_width;
-        p_dec->fmt_out.video.i_visible_height =
-        p_dec->fmt_out.video.i_height = i_height;
+        if (!(p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_IGNORE_SIZE))
+        {
+            p_dec->fmt_out.video.i_visible_width =
+            p_dec->fmt_out.video.i_width = i_width;
+            p_dec->fmt_out.video.i_visible_height =
+            p_dec->fmt_out.video.i_height = i_height;
+        }
+        else
+        {
+            p_dec->fmt_out.video.i_visible_width =
+            p_dec->fmt_out.video.i_width = p_sys->video.i_input_width;
+            p_dec->fmt_out.video.i_visible_height =
+            p_dec->fmt_out.video.i_height = p_sys->video.i_input_height;
+            msg_Dbg(p_dec, "video size ignored from MediaCodec");
+        }
 
         p_sys->video.i_stride = p_out->conf.video.stride;
         p_sys->video.i_slice_height = p_out->conf.video.slice_height;

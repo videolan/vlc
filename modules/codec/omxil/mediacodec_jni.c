@@ -454,7 +454,17 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
                 memcpy(psz_name, name_ptr, name_len);
                 psz_name[name_len] = '\0';
 
-                if (b_adaptive)
+                bool ignore_size = false;
+
+                if (ignore_size)
+                {
+                    *p_quirks |= MC_API_VIDEO_QUIRKS_IGNORE_SIZE;
+                    /* If the MediaCodec size is ignored, the adaptive mode
+                     * should be disabled in order to trigger the hxxx_helper
+                     * parsers that will parse the correct video size. Hence
+                     * the following 'else if' */
+                }
+                else if (b_adaptive)
                     *p_quirks |= MC_API_VIDEO_QUIRKS_ADAPTIVE;
             }
         }
