@@ -597,7 +597,6 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/utils/MenuExt.qml \
 	gui/qt/qml/utils/MenuItemExt.qml \
 	gui/qt/qml/utils/ListItem.qml \
-	gui/qt/qml/utils/MultiCoverPreview.qml \
 	gui/qt/qml/utils/ExpandGridView.qml \
 	gui/qt/qml/utils/NavigableFocusScope.qml \
 	gui/qt/qml/utils/NavigableCol.qml \
