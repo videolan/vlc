@@ -279,14 +279,21 @@ void MLNetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_
         item.inputItem = InputItemPtr(children[i]->p_item);
 
         QMetaObject::invokeMethod(this, [this, item]() mutable {
-            auto it = std::find_if( begin( m_items ), end( m_items ), [&item](const Item& i) {
-                return QString::compare(item.name , i.name, Qt::CaseInsensitive ) == 0 &&
-                        item.mainMrl.scheme() == i.mainMrl.scheme();
+            auto it = std::upper_bound(begin( m_items ), end( m_items ), item, [](const Item& a, const Item& b) {
+                int comp =  QString::compare(a.name , b.name, Qt::CaseInsensitive );
+                if (comp == 0)
+                    comp = QString::compare(a.mainMrl.scheme(), b.mainMrl.scheme());
+                return comp <= 0;
             });
-            if ( it != end( m_items ) )
+
+            if (it != end( m_items )
+                && QString::compare(it->name , item.name, Qt::CaseInsensitive ) == 0
+                && it->mainMrl.scheme() == item.mainMrl.scheme())
                 return;
-            beginInsertRows( {}, m_items.size(), m_items.size() );
-            m_items.push_back( std::move( item ) );
+
+            int pos = std::distance(begin(m_items), it);
+            beginInsertRows( {}, pos, pos );
+            m_items.insert( it, std::move( item ) );
             endInsertRows();
         });
     }
