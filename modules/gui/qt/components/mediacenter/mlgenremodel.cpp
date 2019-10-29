@@ -29,6 +29,7 @@ namespace {
         GENRE_ARTISTS,
         GENRE_TRACKS,
         GENRE_ALBUMS,
+        GENRE_COVER
     };
 }
 
@@ -59,6 +60,8 @@ QVariant MLGenreModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue( ml_genre->getName() );
     case GENRE_NB_TRACKS:
         return QVariant::fromValue( ml_genre->getNbTracks() );
+    case GENRE_COVER:
+        return QVariant::fromValue( ml_genre->getCover() );
     default :
         return QVariant();
     }
@@ -72,7 +75,8 @@ QHash<int, QByteArray> MLGenreModel::roleNames() const
         { GENRE_NB_TRACKS, "nb_tracks" },
         { GENRE_ARTISTS, "artists" },
         { GENRE_TRACKS, "tracks" },
-        { GENRE_ALBUMS, "albums" }
+        { GENRE_ALBUMS, "albums" },
+        { GENRE_COVER, "cover" }
     };
 }
 
@@ -85,7 +89,7 @@ std::vector<std::unique_ptr<MLGenre>> MLGenreModel::fetch()
         return {};
     std::vector<std::unique_ptr<MLGenre>> res;
     for( const vlc_ml_genre_t& genre: ml_range_iterate<vlc_ml_genre_t>( genre_list ) )
-        res.emplace_back( std::unique_ptr<MLGenre>{ new MLGenre( &genre ) } );
+        res.emplace_back( std::unique_ptr<MLGenre>{ new MLGenre( m_ml, &genre ) } );
     return res;
 }
 
