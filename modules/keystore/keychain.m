@@ -344,7 +344,8 @@ static unsigned int Find(vlc_keystore *p_keystore,
         NSMutableDictionary *passwordFetchQuery = [baseLookupQuery mutableCopy];
         [passwordFetchQuery setObject:(__bridge id)kCFBooleanTrue forKey:(__bridge id)kSecReturnData];
         [passwordFetchQuery setObject:(__bridge id)kSecMatchLimitOne forKey:(__bridge id)kSecMatchLimit];
-        [passwordFetchQuery setObject:accountName forKey:(__bridge id)kSecAttrAccount];
+        if (accountName)
+            [passwordFetchQuery setObject:accountName forKey:(__bridge id)kSecAttrAccount];
 
         CFTypeRef secretResult = NULL;
         status = SecItemCopyMatching((__bridge CFDictionaryRef)passwordFetchQuery, &secretResult);
@@ -354,7 +355,7 @@ static unsigned int Find(vlc_keystore *p_keystore,
             return 0;
         }
 
-        if (!p_entry->ppsz_values[KEY_USER]) {
+        if (!p_entry->ppsz_values[KEY_USER] && accountName) {
             msg_Dbg(p_keystore, "using account name from the keychain for login");
             p_entry->ppsz_values[KEY_USER] = strdup([accountName UTF8String]);
         }
