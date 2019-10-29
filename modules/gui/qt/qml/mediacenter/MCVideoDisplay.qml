@@ -121,9 +121,6 @@ Utils.NavigableFocusScope {
             }
 
 
-            expandDelegateImplicitHeight: view.height/3
-            expandDelegateWidth: view.width
-
             delegate: VideoGridItem {
                 id: videoGridItem
 

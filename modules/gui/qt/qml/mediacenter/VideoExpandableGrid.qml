@@ -31,17 +31,16 @@ Utils.ExpandGridView {
 
     activeFocusOnTab:true
 
-    property real expandDelegateImplicitHeight: parent.height
-    property real expandDelegateWidth: parent.width
-
     expandDelegate:  Utils.NavigableFocusScope {
         id: expandRect
         property int currentId: -1
         property var model : ({})
         property alias currentItemY: expandRect.y
         property alias currentItemHeight: expandRect.height
-        implicitHeight: expandableGV.expandDelegateImplicitHeight
-        width: expandableGV.expandDelegateWidth
+        height: implicitHeight
+        implicitHeight: arrowRect.implicitHeight
+            + contentRect.implicitHeight
+        width: expandableGV.width
 
         navigationParent: expandableGV
         navigationCancel:  function() {  expandableGV.retract() }
@@ -57,6 +56,7 @@ Utils.ExpandGridView {
             clip: true
             width: Math.sqrt(2) *VLCStyle.icon_normal
             height: width/2
+            implicitHeight: width/2
 
             Rectangle{
                 x: 0
@@ -71,13 +71,16 @@ Utils.ExpandGridView {
 
 
         Rectangle{
-            height: parent.height
+            id: contentRect
+            height: implicitHeight
+            implicitHeight: contentLayout.implicitHeight + VLCStyle.margin_xsmall * 2
             width: parent.width
             clip: true
             color: VLCStyle.colors.bgAlt
-            x: expandableGV.contentX
+            visible: !expandableGV.isAnimating
 
             RowLayout {
+                id: contentLayout
                 anchors {
                     fill: parent
                     topMargin: VLCStyle.margin_xsmall
@@ -216,8 +219,9 @@ Utils.ExpandGridView {
                 }
 
                 Rectangle {
-                    height: parent.height
                     width: 1
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
                     gradient: Gradient {
                         GradientStop { position: 0.0; color: "transparent" }
                         GradientStop { position: 0.25; color: VLCStyle.colors.buttonBorder }
