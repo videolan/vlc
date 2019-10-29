@@ -39,7 +39,7 @@
 #include "mediacodec.h"
 
 char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
-                         int hxxx_profile, bool *p_adaptive);
+                         int hxxx_profile, int *p_quirks);
 
 #define THREAD_NAME "mediacodec_ndk"
 
@@ -625,17 +625,16 @@ static void Clean(mc_api *api)
 static int Prepare(mc_api * api, int i_profile)
 {
     free(api->psz_name);
-    bool b_adaptive;
+
+    api->i_quirks = 0;
     api->psz_name = MediaCodec_GetName(api->p_obj, api->psz_mime,
-                                       i_profile, &b_adaptive);
+                                       i_profile, &api->i_quirks);
     if (!api->psz_name)
         return MC_API_ERROR;
-    api->i_quirks = OMXCodec_GetQuirks(api->i_cat, api->i_codec, api->psz_name,
-                                       strlen(api->psz_name));
+    api->i_quirks |= OMXCodec_GetQuirks(api->i_cat, api->i_codec, api->psz_name,
+                                        strlen(api->psz_name));
     /* Allow interlaced picture after API 21 */
     api->i_quirks |= MC_API_VIDEO_QUIRKS_SUPPORT_INTERLACED;
-    if (b_adaptive)
-        api->i_quirks |= MC_API_VIDEO_QUIRKS_ADAPTIVE;
     return 0;
 }
 
