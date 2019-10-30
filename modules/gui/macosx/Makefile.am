@@ -439,18 +439,10 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/Pref-Icons/VLCInterfaceCone.png \
 	gui/macosx/Resources/Pref-Icons/VLCSubtitleCone.png \
 	gui/macosx/Resources/Pref-Icons/VLCVideoCone.png \
-	gui/macosx/Resources/sidebar-icons/sidebar-local.png \
-	gui/macosx/Resources/sidebar-icons/sidebar-local@2x.png \
 	gui/macosx/Resources/sidebar-icons/sidebar-movie.png \
 	gui/macosx/Resources/sidebar-icons/sidebar-movie@2x.png \
 	gui/macosx/Resources/sidebar-icons/sidebar-music.png \
 	gui/macosx/Resources/sidebar-icons/sidebar-music@2x.png \
-	gui/macosx/Resources/sidebar-icons/sidebar-pictures.png \
-	gui/macosx/Resources/sidebar-icons/sidebar-pictures@2x.png \
-	gui/macosx/Resources/sidebar-icons/sidebar-playlist.png \
-	gui/macosx/Resources/sidebar-icons/sidebar-playlist@2x.png \
-	gui/macosx/Resources/sidebar-icons/sidebar-podcast.png \
-	gui/macosx/Resources/sidebar-icons/sidebar-podcast@2x.png \
 	gui/macosx/Resources/Button-Icons/VLCNextTemplate.pdf \
 	gui/macosx/Resources/Button-Icons/VLCPauseTemplate.pdf \
 	gui/macosx/Resources/Button-Icons/VLCPlayTemplate.pdf \

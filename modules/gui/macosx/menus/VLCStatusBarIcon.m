@@ -459,12 +459,6 @@
     }
 }
 
-// Action: Stop playback
-- (IBAction)statusBarIconStop:(id)sender
-{
-    [[[VLCMain sharedInstance] playlistController] stopPlayback];
-}
-
 // Action: Go to next track
 - (IBAction)statusBarIconNext:(id)sender
 {

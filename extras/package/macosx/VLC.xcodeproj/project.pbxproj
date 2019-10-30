@@ -407,18 +407,10 @@
 		6B8229C21E4D2CFC00833BE1 /* VLCInterfaceCone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = VLCInterfaceCone.png; sourceTree = "<group>"; };
 		6B8229C31E4D2CFC00833BE1 /* VLCSubtitleCone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = VLCSubtitleCone.png; sourceTree = "<group>"; };
 		6B8229C41E4D2CFC00833BE1 /* VLCVideoCone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = VLCVideoCone.png; sourceTree = "<group>"; };
-		6B8229CC1E4D2D4700833BE1 /* sidebar-local.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar-local.png"; sourceTree = "<group>"; };
-		6B8229CD1E4D2D4700833BE1 /* sidebar-local@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar-local@2x.png"; sourceTree = "<group>"; };
 		6B8229CE1E4D2D4700833BE1 /* sidebar-movie.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar-movie.png"; sourceTree = "<group>"; };
 		6B8229CF1E4D2D4700833BE1 /* sidebar-movie@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar-movie@2x.png"; sourceTree = "<group>"; };
 		6B8229D01E4D2D4700833BE1 /* sidebar-music.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar-music.png"; sourceTree = "<group>"; };
 		6B8229D11E4D2D4700833BE1 /* sidebar-music@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar-music@2x.png"; sourceTree = "<group>"; };
-		6B8229D21E4D2D4700833BE1 /* sidebar-pictures.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar-pictures.png"; sourceTree = "<group>"; };
-		6B8229D31E4D2D4700833BE1 /* sidebar-pictures@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar-pictures@2x.png"; sourceTree = "<group>"; };
-		6B8229D41E4D2D4700833BE1 /* sidebar-playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar-playlist.png"; sourceTree = "<group>"; };
-		6B8229D51E4D2D4700833BE1 /* sidebar-playlist@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar-playlist@2x.png"; sourceTree = "<group>"; };
-		6B8229D61E4D2D4700833BE1 /* sidebar-podcast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar-podcast.png"; sourceTree = "<group>"; };
-		6B8229D71E4D2D4700833BE1 /* sidebar-podcast@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar-podcast@2x.png"; sourceTree = "<group>"; };
 		6B8229FD1E4D2DB400833BE1 /* noart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = noart.png; sourceTree = "<group>"; };
 		6B8229FF1E4D2DD100833BE1 /* vlc.scriptSuite */ = {isa = PBXFileReference; lastKnownFileType = text.plist.scriptSuite; path = vlc.scriptSuite; sourceTree = "<group>"; };
 		6B822A001E4D2DD100833BE1 /* vlc.scriptTerminology */ = {isa = PBXFileReference; lastKnownFileType = text.plist.scriptTerminology; path = vlc.scriptTerminology; sourceTree = "<group>"; };
@@ -1318,18 +1310,10 @@
 		6B8229CB1E4D2D2C00833BE1 /* Sidebar Icons */ = {
 			isa = PBXGroup;
 			children = (
-				6B8229CC1E4D2D4700833BE1 /* sidebar-local.png */,
-				6B8229CD1E4D2D4700833BE1 /* sidebar-local@2x.png */,
 				6B8229CE1E4D2D4700833BE1 /* sidebar-movie.png */,
 				6B8229CF1E4D2D4700833BE1 /* sidebar-movie@2x.png */,
 				6B8229D01E4D2D4700833BE1 /* sidebar-music.png */,
 				6B8229D11E4D2D4700833BE1 /* sidebar-music@2x.png */,
-				6B8229D21E4D2D4700833BE1 /* sidebar-pictures.png */,
-				6B8229D31E4D2D4700833BE1 /* sidebar-pictures@2x.png */,
-				6B8229D41E4D2D4700833BE1 /* sidebar-playlist.png */,
-				6B8229D51E4D2D4700833BE1 /* sidebar-playlist@2x.png */,
-				6B8229D61E4D2D4700833BE1 /* sidebar-podcast.png */,
-				6B8229D71E4D2D4700833BE1 /* sidebar-podcast@2x.png */,
 			);
 			name = "Sidebar Icons";
 			path = "sidebar-icons";
