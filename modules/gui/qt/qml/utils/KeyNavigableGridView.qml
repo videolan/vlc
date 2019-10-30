@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import "KeyHelper.js" as KeyHelper
 
 
 NavigableFocusScope {
@@ -67,25 +68,25 @@ NavigableFocusScope {
 
         Keys.onPressed: {
             var newIndex = -1
-            if (event.key === Qt.Key_Right || event.matches(StandardKey.MoveToNextChar)) {
+            if (KeyHelper.matchRight(event)) {
                 if ((currentIndex + 1) % _colCount !== 0) {//are we not at the end of line
                     newIndex = Math.min(gridview_id.modelCount - 1, currentIndex + 1)
                 }
-            } else if (event.key === Qt.Key_Left || event.matches(StandardKey.MoveToPreviousChar)) {
+            } else if (KeyHelper.matchLeft(event)) {
                 if (currentIndex % _colCount !== 0) {//are we not at the begining of line
                     newIndex = Math.max(0, currentIndex - 1)
                 }
-            } else if (event.key === Qt.Key_Down || event.matches(StandardKey.MoveToNextLine) ||event.matches(StandardKey.SelectNextLine) ) {
+            } else if (KeyHelper.matchDown(event)) {
                 if (Math.floor(currentIndex / _colCount) !== Math.floor(gridview_id.modelCount / _colCount)) { //we are not on the last line
                     newIndex = Math.min(gridview_id.modelCount - 1, currentIndex + _colCount)
                 }
-            } else if (event.key === Qt.Key_PageDown || event.matches(StandardKey.MoveToNextPage) ||event.matches(StandardKey.SelectNextPage)) {
+            } else if (KeyHelper.matchPageDown(event)) {
                 newIndex = Math.min(gridview_id.modelCount - 1, currentIndex + _colCount * 5)
-            } else if (event.key === Qt.Key_Up || event.matches(StandardKey.MoveToPreviousLine) ||event.matches(StandardKey.SelectPreviousLine)) {
+            } else if (KeyHelper.matchUp(event)) {
                 if (Math.floor(currentIndex / _colCount) !== 0) { //we are not on the first line
                     newIndex = Math.max(0, currentIndex - _colCount)
                 }
-            } else if (event.key === Qt.Key_PageUp || event.matches(StandardKey.MoveToPreviousPage) ||event.matches(StandardKey.SelectPreviousPage)) {
+            } else if (KeyHelper.matchPageUp(event)) {
                 newIndex = Math.max(0, currentIndex - _colCount * 5)
             }
 
@@ -104,7 +105,7 @@ NavigableFocusScope {
             if (event.matches(StandardKey.SelectAll)) {
                 event.accepted = true
                 selectAll()
-            } else if (event.key === Qt.Key_Space || event.matches(StandardKey.InsertParagraphSeparator)) { //enter/return/space
+            } else if (KeyHelper.matchOk(event)) {
                 event.accepted = true
                 actionAtIndex(currentIndex)
             }

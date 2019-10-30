@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.3
 import org.videolan.vlc 0.1
 
 import "qrc:///utils/" as Utils
+import "qrc:///utils/KeyHelper.js" as KeyHelper
 import "qrc:///style/"
 
 Utils.NavigableFocusScope {
@@ -73,12 +74,12 @@ Utils.NavigableFocusScope {
                 }
 
                 Keys.onPressed: {
-                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                    if (KeyHelper.matchOk(event) ) {
                         event.accepted = true
                     }
                 }
                 Keys.onReleased: {
-                    if (!event.accepted && (event.key === Qt.Key_Return || event.key === Qt.Key_Space))
+                    if (!event.accepted && KeyHelper.matchOk(event))
                         history.push(["player"], History.Go)
                 }
 

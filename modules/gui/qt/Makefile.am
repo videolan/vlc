@@ -585,6 +585,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/dialogs/EditorTabButton.qml \
 	gui/qt/qml/dialogs/ToolbarEditorButtonList.qml \
 	gui/qt/qml/dialogs/ToolbarEditor.qml \
+	gui/qt/qml/utils/KeyHelper.js \
 	gui/qt/qml/utils/BusyIndicatorExt.qml \
 	gui/qt/qml/utils/DNDLabel.qml \
 	gui/qt/qml/utils/ToolTipArea.qml \

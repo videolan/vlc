@@ -22,6 +22,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///utils/" as Utils
+import "qrc:///utils/KeyHelper.js" as KeyHelper
 
 Utils.NavigableFocusScope {
     id: root
@@ -139,7 +140,7 @@ Utils.NavigableFocusScope {
                     Layout.alignment:  Qt.AlignHCenter
 
                     Keys.onPressed:  {
-                        if (event.key === Qt.Key_Left) {
+                        if (KeyHelper.matchLeft(event)) {
                             backBtn.focus = true
                             event.accepted = true
                         }

@@ -27,6 +27,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///utils/" as Utils
+import "qrc:///utils/KeyHelper.js" as KeyHelper
 
 T.MenuItem {
     id: control
@@ -122,6 +123,7 @@ T.MenuItem {
         }
         event.accepted = false
     }
+
     onTriggered: {
         if (parentMenu && subMenu) {
             parentMenu._emitMenuClose = false

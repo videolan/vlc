@@ -24,6 +24,7 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///qml/"
 import "qrc:///utils/" as Utils
+import "qrc:///utils/KeyHelper.js" as KeyHelper
 import "qrc:///playlist/" as PL
 import "qrc:///player/" as Player
 
@@ -187,7 +188,7 @@ Utils.NavigableFocusScope {
                                 defaultKeyAction(event, 0)
                         }
                         Keys.onReleased: {
-                            if (!event.accepted && (event.key === Qt.Key_Return || event.key === Qt.Key_Space)) {
+                            if (!event.accepted && KeyHelper.matchOk(event)) {
                                 event.accepted = true
                                 stackView.focus = true
                             }

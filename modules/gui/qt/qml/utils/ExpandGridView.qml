@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import "KeyHelper.js" as KeyHelper
 
 NavigableFocusScope {
     id: root
@@ -411,25 +412,25 @@ NavigableFocusScope {
         var colCount = root.getNbItemsPerRow()
 
         var newIndex = -1
-        if (event.key === Qt.Key_Right || event.matches(StandardKey.MoveToNextChar)) {
+        if (KeyHelper.matchRight(event)) {
             if ((currentIndex + 1) % colCount !== 0) {//are we not at the end of line
                 newIndex = Math.min(root.modelCount - 1, currentIndex + 1)
             }
-        } else if (event.key === Qt.Key_Left || event.matches(StandardKey.MoveToPreviousChar)) {
+        } else if (KeyHelper.matchLeft(event)) {
             if (currentIndex % colCount !== 0) {//are we not at the begining of line
                 newIndex = Math.max(0, currentIndex - 1)
             }
-        } else if (event.key === Qt.Key_Down || event.matches(StandardKey.MoveToNextLine) ||event.matches(StandardKey.SelectNextLine) ) {
+        } else if (KeyHelper.matchDown(event)) {
             if (Math.floor(currentIndex / colCount) !== Math.floor(root.modelCount / colCount)) { //we are not on the last line
                 newIndex = Math.min(root.modelCount - 1, currentIndex + colCount)
             }
-        } else if (event.key === Qt.Key_PageDown || event.matches(StandardKey.MoveToNextPage) ||event.matches(StandardKey.SelectNextPage)) {
+        } else if (KeyHelper.matchPageDown(event)) {
             newIndex = Math.min(root.modelCount - 1, currentIndex + colCount * 5)
-        } else if (event.key === Qt.Key_Up || event.matches(StandardKey.MoveToPreviousLine) ||event.matches(StandardKey.SelectPreviousLine)) {
+        } else if (KeyHelper.matchUp(event)) {
             if (Math.floor(currentIndex / colCount) !== 0) { //we are not on the first line
                 newIndex = Math.max(0, currentIndex - colCount)
             }
-        } else if (event.key === Qt.Key_PageUp || event.matches(StandardKey.MoveToPreviousPage) ||event.matches(StandardKey.SelectPreviousPage)) {
+        } else if (KeyHelper.matchPageUp(event)) {
             newIndex = Math.max(0, currentIndex - colCount * 5)
         }
 
@@ -449,7 +450,7 @@ NavigableFocusScope {
         if (event.matches(StandardKey.SelectAll)) {
             event.accepted = true
             root.selectAll()
-        } else if (event.key === Qt.Key_Space || event.matches(StandardKey.InsertParagraphSeparator)) { //enter/return/space
+        } else if ( KeyHelper.matchOk(event) ) {
             event.accepted = true
             root.actionAtIndex(currentIndex)
         }

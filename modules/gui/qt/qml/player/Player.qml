@@ -24,6 +24,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///utils/" as Utils
+import "qrc:///utils/KeyHelper.js" as KeyHelper
 import "qrc:///playlist/" as PL
 import "qrc:///menus/" as Menus
 

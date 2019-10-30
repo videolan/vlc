@@ -19,6 +19,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 import "qrc:///style/"
+import "KeyHelper.js" as KeyHelper
 
 NavigableFocusScope {
     id: listview_id
@@ -137,28 +138,28 @@ NavigableFocusScope {
 
             if (orientation === ListView.Vertical)
             {
-                if ( event.key === Qt.Key_Down || event.matches(StandardKey.MoveToNextLine) ||event.matches(StandardKey.SelectNextLine) ) {
+                if ( KeyHelper.matchDown(event) ) {
                     if (currentIndex !== modelCount - 1 )
                         newIndex = currentIndex + 1
-                } else if ( event.key === Qt.Key_PageDown || event.matches(StandardKey.MoveToNextPage) ||event.matches(StandardKey.SelectNextPage)) {
+                } else if ( KeyHelper.matchPageDown(event) ) {
                     newIndex = Math.min(modelCount - 1, currentIndex + 10)
-                } else if ( event.key === Qt.Key_Up || event.matches(StandardKey.MoveToPreviousLine) ||event.matches(StandardKey.SelectPreviousLine) ) {
+                } else if ( KeyHelper.matchUp(event) ) {
                     if ( currentIndex !== 0 )
                         newIndex = currentIndex - 1
-                } else if ( event.key === Qt.Key_PageUp || event.matches(StandardKey.MoveToPreviousPage) ||event.matches(StandardKey.SelectPreviousPage)) {
+                } else if ( KeyHelper.matchPageUp(event) ) {
                     newIndex = Math.max(0, currentIndex - 10)
                 }
             }else{
-                if ( event.key === Qt.Key_Right || event.matches(StandardKey.SelectNextLine) ) {
+                if ( KeyHelper.matchRight(event) ) {
                     if (currentIndex !== modelCount - 1 )
                         newIndex = currentIndex + 1
                 }
-                else if ( event.key === Qt.Key_PageDown || event.matches(StandardKey.MoveToNextPage) ||event.matches(StandardKey.SelectNextPage)) {
+                else if ( KeyHelper.matchPageDown(event) ) {
                     newIndex = Math.min(modelCount - 1, currentIndex + 10)
-                } else if ( event.key === Qt.Key_Left || event.matches(StandardKey.SelectPreviousLine) ) {
+                } else if ( KeyHelper.matchLeft(event) ) {
                     if ( currentIndex !== 0 )
                         newIndex = currentIndex - 1
-                } else if ( event.key === Qt.Key_PageUp || event.matches(StandardKey.MoveToPreviousPage) ||event.matches(StandardKey.SelectPreviousPage)) {
+                } else if ( KeyHelper.matchPageUp(event) ) {
                     newIndex = Math.max(0, currentIndex - 10)
                 }
             }
@@ -178,7 +179,7 @@ NavigableFocusScope {
             if (event.matches(StandardKey.SelectAll)) {
                 event.accepted = true
                 selectAll()
-            } else if (event.key === Qt.Key_Space || event.matches(StandardKey.InsertParagraphSeparator)) { //enter/return/space
+            } else if ( KeyHelper.matchOk(event) ) { //enter/return/space
                 event.accepted = true
                 actionAtIndex(currentIndex)
             }

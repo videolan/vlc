@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import "KeyHelper.js" as KeyHelper
 
 /*
  * This class is designed to be inherited, It provide basic key handling to navigate between view
@@ -132,19 +133,19 @@ FocusScope {
     function defaultKeyAction(event, index) {
         if (event.accepted)
             return
-        if ( event.key === Qt.Key_Down || event.matches(StandardKey.MoveToNextLine) ||event.matches(StandardKey.SelectNextLine) ) {
+        if ( KeyHelper.matchDown(event) ) {
             event.accepted = true
             navigationDown( index )
-        } else if ( event.key === Qt.Key_Up || event.matches(StandardKey.MoveToPreviousLine) ||event.matches(StandardKey.SelectPreviousLine) ) {
+        } else if ( KeyHelper.matchUp(event) ) {
             event.accepted = true
             navigationUp( index  )
-        } else if (event.key === Qt.Key_Right || event.matches(StandardKey.MoveToNextChar) ) {
+        } else if ( KeyHelper.matchRight(event) ) {
             event.accepted = true
             navigationRight( index )
-        } else if (event.key === Qt.Key_Left || event.matches(StandardKey.MoveToPreviousChar) ) {
+        } else if ( KeyHelper.matchLeft(event) ) {
             event.accepted = true
             navigationLeft( index )
-        } else if ( event.key === Qt.Key_Back || event.key === Qt.Key_Cancel || event.matches(StandardKey.Back) || event.matches(StandardKey.Cancel)) {
+        } else if ( KeyHelper.matchCancel(event) ) {
             event.accepted = true
             navigationCancel( index )
         }
