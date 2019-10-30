@@ -51,6 +51,13 @@ T.Menu {
 
     onOpened: {
         control._emitMenuClose = true
+
+        for (var i = 0; i < control.count; i++) {
+            if (control.itemAt(i).enabled) {
+                control.currentIndex = i
+                break
+            }
+        }
     }
 
     onClosed: {
