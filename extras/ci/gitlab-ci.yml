@@ -5,7 +5,11 @@ default:
     before_script:
         - set -x
         - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
-        - export VLC_PREBUILT_CONTRIBS_URL="https://artifacts.videolan.org/vlc/${CI_JOB_NAME}-contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2"
+        - export VLC_PREBUILT_CONTRIBS_URL="https://artifacts.videolan.org/vlc/${CI_JOB_NAME}/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2"
+        - if ! extras/ci/check-url.sh "$VLC_PREBUILT_CONTRIBS_URL"; then unset VLC_PREBUILT_CONTRIBS_URL; fi
+    after_script:
+        - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
+        - mv contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 >/dev/null || true
 
 variables:
     VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20190416165205
@@ -59,277 +63,167 @@ variables:
         ANDROID_ARCH: x86_64
         TRIPLET: x86_64-linux-android
 
-#
-# Common rules for jobs
-#
-.contrib-common: &contrib-common
+# Common rules
+.base-template:
     stage: build
-    tags:
-        - docker
-        - amd64
-        - zorin
     only:
         refs:
             - merge_requests
             - master
-        changes:
-            - "contrib/**/*"
-            - "extras/tools/**/*"
-    after_script:
-        - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
-        - mv contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2
-
-.continuous-common:
-    stage: build
-    tags:
-        - docker
-        - amd64
-        - zorin
-    only:
-        refs:
-            - merge_requests
-            - master
-    except:
-        changes:
-            - "contrib/**/*"
-            - "extras/tools/**/*"
-
-#
-# Windows continuous
-#
-.win-continuous:
-    extends: .continuous-common
-    script: |
-        set -x
-        extras/package/win32/build.sh -p -a $HOST_ARCH
     artifacts:
         paths:
-            - win??/vlc-*-win??.exe
+            - contrib/vlc-contrib-${TRIPLET}-*.tar.bz2
+
+# Common rules for jobs using docker
+.docker-template:
+    extends: .base-template
+    tags:
+        - docker
+        - amd64
+        - zorin
+
+#
+# Windows
+#
+.win-common:
+    extends: .docker-template
+    script: |
+        if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+            echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
+            extras/package/win32/build.sh -p -a $HOST_ARCH
+        else
+            extras/package/win32/build.sh -c -a $HOST_ARCH
+        fi
 
 win32:
-    extends: .win-continuous
+    extends: .win-common
     image:
         name: $VLC_WIN32_IMAGE
     variables: *variables-win32
 
 win64:
-    extends: .win-continuous
+    extends: .win-common
     image:
         name: $VLC_WIN64_IMAGE
     variables: *variables-win64
 
 win64-llvm:
-    extends: .win-continuous
+    extends: .win-common
     image:
         name: $VLC_WIN_LLVM_IMAGE
     variables: *variables-win64-llvm
 
 #
-# Windows contrib
-#
-.win-contrib:
-    extends: .contrib-common
-    script: |
-        extras/package/win32/build.sh -l -c -a $HOST_ARCH -i n
-        mv contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2
-    artifacts:
-        paths:
-            - contrib/vlc-contrib-${TRIPLET}-*.tar.bz2
-            - win??/vlc-*-win??.exe
-
-win32-contrib:
-    extends: .win-contrib
-    image:
-        name: $VLC_WIN32_IMAGE
-    variables: *variables-win32
-
-win64-contrib:
-    extends: .win-contrib
-    image:
-        name: $VLC_WIN64_IMAGE
-    variables: *variables-win64
-
-win64-llvm-contrib:
-    extends: .win-contrib
-    image:
-        name: $VLC_WIN_LLVM_IMAGE
-    variables: *variables-win64-llvm
-
-#
-# Debian continuous
+# Debian
 #
 debian:
-    extends: .continuous-common
+    extends: .docker-template
     image:
         name: $VLC_DEBIAN_IMAGE
     script: |
         export NCPU=$(getconf _NPROCESSORS_ONLN)
-        cd extras/tools && ./bootstrap && make -j$NCPU --output-sync=recurse
-        export PATH=`pwd`/build/bin:$PATH
-        cd ../../
+
+        # Build tools
+        ( cd extras/tools && ./bootstrap && make -j$NCPU --output-sync=recurse )
+        export PATH="$(pwd)/extras/tools/build/bin:$PATH"
+
+        # Build contribs
         mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
         ../bootstrap
-        curl -f -L "${VLC_PREBUILT_CONTRIBS_URL}" -o vlc-contrib-$TRIPLET-latest.tar.bz2
-        make prebuilt
+        if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+            echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
+            make prebuilt PREBUILT_URL="${VLC_PREBUILT_CONTRIBS_URL}"
+        else
+            make -j$NCPU --output-sync=recurse fetch
+            make -j$NCPU --output-sync=recurse
+            make package
+        fi
         cd ../../
+
+        # Build VLC
         ./bootstrap
         ./configure
         make -j$NCPU
+
+        # Run tests
         VLC_TEST_TIMEOUT=60 sh -x ./test/make_check_wrapper.sh -j4
     variables: *variables-debian
 
 #
-# Debian contrib
-#
-debian-contrib:
-    extends: .contrib-common
-    image:
-        name: $VLC_DEBIAN_IMAGE
-    script: |
-        export NCPU=$(getconf _NPROCESSORS_ONLN)
-        cd extras/tools && ./bootstrap && make -j$NCPU --output-sync=recurse
-        export PATH=`pwd`/build/bin:$PATH
-        cd ../../
-        cd contrib && mkdir native && cd native
-        ../bootstrap
-        make list
-        make -j$NCPU --output-sync=recurse fetch
-        make -j$NCPU --output-sync=recurse
-        make package
-        cd ../../
-        ./bootstrap
-        ./configure
-        make -j$NCPU
-        VLC_TEST_TIMEOUT=60 sh -x ./test/make_check_wrapper.sh -j4
-    artifacts:
-        paths:
-            - contrib/vlc-contrib-*.tar.bz2
-    variables: *variables-debian
-
-#
-# macOS continuous
+# macOS
 #
 macos:
-    extends: .continuous-common
-    tags: [macos]
+    extends: .base-template
+    tags:
+        - macos
     script: |
-        mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
-        curl -f -L ${VLC_PREBUILT_CONTRIBS_URL} -o vlc-contrib-$TRIPLET-latest.tar.bz2
-        cd ../../
+        if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+            echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
+            mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
+            curl -f -L ${VLC_PREBUILT_CONTRIBS_URL} -o vlc-contrib-$TRIPLET-latest.tar.bz2
+            cd ../../
+        else
+            EXTRA_BUILD_FLAGS="-c"
+        fi
         mkdir build && cd build
-        ../extras/package/macosx/build.sh
+        ../extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS
     variables: *variables-macos
 
 #
-# macOS contrib
-#
-macos-contrib:
-    extends: .contrib-common
-    tags: [macos]
-    script: |
-        mkdir build && cd build
-        ../extras/package/macosx/build.sh -c -p
-    artifacts:
-        paths:
-            - contrib/vlc-contrib-*.tar.bz2
-            - build/vlc-*-dev.dmg
-    variables: *variables-macos
-
-#
-# iOS continuous
+# iOS
 #
 ios:
-    extends: .continuous-common
-    tags: [macos]
+    extends: .base-template
+    tags:
+        - macos
     script: |
         mkdir build && cd build
-        ../extras/package/apple/build.sh --sdk=iphoneos --arch=aarch64 \
-            --with-prebuilt-contribs
+        if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+            ../extras/package/apple/build.sh --sdk=iphoneos --arch=aarch64 \
+                --with-prebuilt-contribs
+        else
+            ../extras/package/apple/build.sh --sdk=iphoneos --arch=aarch64 --package-contribs
+        fi
     variables: *variables-ios
 
 #
-# iOS contrib
+# Android
 #
-ios-contrib:
-    extends: .contrib-common
-    tags: [macos]
-    script: |
-        mkdir build && cd build
-        ../extras/package/apple/build.sh --sdk=iphoneos --arch=aarch64 --package-contribs
-    artifacts:
-        paths:
-            - contrib/vlc-contrib-*.tar.bz2
-    variables: *variables-ios
-
-#
-# Android continuous
-#
-.android-continuous:
-    extends: .continuous-common
+.android-common:
+    extends: .docker-template
     image:
         name: $VLC_ANDROID_IMAGE
     script: |
         wget https://code.videolan.org/videolan/vlc-android/raw/master/compile-libvlc.sh
-        /bin/sh ./compile-libvlc.sh -a $ANDROID_ARCH --with-prebuilt-contribs
+        if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+            /bin/sh ./compile-libvlc.sh -a $ANDROID_ARCH --with-prebuilt-contribs
+        else
+            /bin/sh ./compile-libvlc.sh -a $ANDROID_ARCH --package-contribs
+        fi
 
 android-arm:
-    extends: .android-continuous
+    extends: .android-common
     variables: *variables-android-arm
 
 android-arm64:
-    extends: .android-continuous
+    extends: .android-common
     variables: *variables-android-arm64
 
 android-x86:
-    extends: .android-continuous
+    extends: .android-common
     variables: *variables-android-x86
 
 android-x86_64:
-    extends: .android-continuous
+    extends: .android-common
     variables: *variables-android-x86_64
-
-#
-# Android contrib
-#
-.android-contrib:
-    extends: .contrib-common
-    image:
-        name: $VLC_ANDROID_IMAGE
-    script: |
-        wget https://code.videolan.org/videolan/vlc-android/raw/master/compile-libvlc.sh
-        /bin/sh ./compile-libvlc.sh -a $ANDROID_ARCH --package-contribs
-    artifacts:
-        paths:
-            - contrib/vlc-contrib-*.tar.bz2
-
-android-arm-contrib:
-    extends: .android-contrib
-    variables: *variables-android-arm
-
-android-arm64-contrib:
-    extends: .android-contrib
-    variables: *variables-android-arm64
-
-android-x86-contrib:
-    extends: .android-contrib
-    variables: *variables-android-x86
-
-android-x86_64-contrib:
-    extends: .android-contrib
-    variables: *variables-android-x86_64
-
 
 #
 # VLC Documentation
 #
 pages:
-    tags:
-        - docker
-        - amd64
-        - zorin
+    extends: .docker-template
     image:
         name: $VLC_DEBIAN_IMAGE
-    stage: build
     script:
         - ./bootstrap
         - ./configure
