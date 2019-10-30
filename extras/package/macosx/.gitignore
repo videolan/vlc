@@ -6,3 +6,4 @@ Info.plist
 *.xcworkspace
 xcuserdata
 XCBuildData
+xcshareddata
