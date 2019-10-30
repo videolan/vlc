@@ -131,10 +131,10 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(APPLY) $(TOOLS)/libtool-2.4.6-san.patch
 	$(APPLY) $(TOOLS)/libtool-2.4.6-clang-libs.patch
 	$(APPLY) $(TOOLS)/libtool-2.4.6-response-files.patch
-	(cd $(UNPACK_DIR) && autoreconf -fv)
 	$(MOVE)
 
 .buildlibtool: libtool .automake .help2man
+	(cd $(UNPACK_DIR) && autoreconf -fv)
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	ln -sf libtool $(PREFIX)/bin/glibtool
 	ln -sf libtoolize $(PREFIX)/bin/glibtoolize
