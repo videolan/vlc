@@ -237,9 +237,8 @@ static void *Thread(void *data)
             }
 
             /* Discard some historical data to make room. */
-            len = history;
+            len = history > sys->buffer_length ? sys->buffer_length : history;
 
-            assert(len <= sys->buffer_length);
             sys->buffer_offset += len;
             sys->buffer_length -= len;
         }
