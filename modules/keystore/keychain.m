@@ -230,6 +230,7 @@ static int SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMutab
     const char *psz_path = ppsz_values[KEY_PATH];
     const char *psz_port = ppsz_values[KEY_PORT];
     const char *psz_realm = ppsz_values[KEY_REALM];
+    const char *psz_authtype = ppsz_values[KEY_AUTHTYPE];
 
     if (psz_label) {
         [query setObject:[NSString stringWithUTF8String:psz_label] forKey:(__bridge id)kSecAttrLabel];
@@ -267,6 +268,23 @@ static int SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMutab
     }
     if (psz_realm) {
         [query setObject:[NSString stringWithUTF8String:psz_realm] forKey:(__bridge id)kSecAttrSecurityDomain];
+    }
+    if (psz_authtype) {
+        if (strncasecmp(psz_protocol, "http", 4) == 0) {
+            const struct vlc2secattr tab[] =
+            { /* /!\ Alphabetical order /!\ */
+                { "Basic", kSecAttrAuthenticationTypeHTTPBasic },
+                { "Digest", kSecAttrAuthenticationTypeHTTPDigest },
+            };
+            const struct vlc2secattr *entry =
+                bsearch(psz_authtype, tab, ARRAY_SIZE(tab), sizeof(tab[0]), vlc2secattr_cmp);
+            if (entry)
+                [query setObject:(__bridge id)entry->secattr forKey:(__bridge id)kSecAttrAuthenticationType];
+        }
+        else if (strcasecmp(psz_protocol, "smb") == 0) {
+            if (strcmp(psz_authtype, "2") == 0)
+                [query setObject:(__bridge id)kSecAttrAuthenticationTypeMSN forKey:(__bridge id)kSecAttrAuthenticationType];
+        }
     }
 
     return VLC_SUCCESS;
@@ -319,6 +337,29 @@ static int FillEntryValues(const NSDictionary *item, char *ppsz_values[KEY_MAX])
     {
         ppsz_values[KEY_REALM] = strdup([realm UTF8String]);
         if (!ppsz_values[KEY_REALM])
+            return VLC_ENOMEM;
+    }
+
+    const char *auth_val = NULL;
+    if ([protocol isEqualToString:(__bridge NSString*)kSecAttrProtocolHTTP]
+     || [protocol isEqualToString:(__bridge NSString*)kSecAttrProtocolHTTPS])
+    {
+        id authtype = [item objectForKey:(__bridge id)kSecAttrAuthenticationType];
+        if (authtype == (__bridge id)kSecAttrAuthenticationTypeHTTPBasic)
+            auth_val = "Basic";
+        else if (authtype == (__bridge id)kSecAttrAuthenticationTypeHTTPDigest)
+            auth_val = "Digest";
+    }
+    else if ([protocol isEqualToString:(__bridge NSString*)kSecAttrProtocolSMB])
+    {
+        id keytype = [item objectForKey:(__bridge id)kSecAttrAuthenticationType];
+        if (keytype == (__bridge id)kSecAttrAuthenticationTypeMSN)
+            auth_val = "2";
+    }
+    if (auth_val)
+    {
+        ppsz_values[KEY_AUTHTYPE] = strdup(auth_val);
+        if (!ppsz_values[KEY_AUTHTYPE])
             return VLC_ENOMEM;
     }
 
