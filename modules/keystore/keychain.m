@@ -205,7 +205,20 @@ static void SetAccessibilityForQuery(vlc_keystore *p_keystore,
     }
 }
 
-static void SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMutableDictionary *query, const char *psz_label)
+struct vlc2secattr
+{
+    const char *vlc;
+    const CFStringRef secattr;
+};
+
+static int vlc2secattr_cmp(const void *key_, const void *entry_)
+{
+    const struct vlc2secattr *entry = entry_;
+    const char *key = key_;
+    return strcasecmp(key, entry->vlc);
+}
+
+static int SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMutableDictionary *query, const char *psz_label)
 {
     const char *psz_protocol = ppsz_values[KEY_PROTOCOL];
     const char *psz_user = ppsz_values[KEY_USER];
@@ -217,7 +230,23 @@ static void SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMuta
         [query setObject:[NSString stringWithUTF8String:psz_label] forKey:(__bridge id)kSecAttrLabel];
     }
     if (psz_protocol) {
-        [query setObject:[NSString stringWithUTF8String:psz_protocol] forKey:(__bridge id)kSecAttrProtocol];
+        const struct vlc2secattr tab[] =
+        { /* /!\ Alphabetical order /!\ */
+            { "ftp", kSecAttrProtocolFTP },
+            { "ftps", kSecAttrProtocolFTPS },
+            { "http", kSecAttrProtocolHTTP },
+            { "https", kSecAttrProtocolHTTPS },
+            { "rtsp", kSecAttrProtocolRTSP },
+            { "sftp", kSecAttrProtocolSSH },
+            { "smb", kSecAttrProtocolSMB },
+        };
+
+        const struct vlc2secattr *entry =
+            bsearch(psz_protocol, tab, ARRAY_SIZE(tab), sizeof(tab[0]), vlc2secattr_cmp);
+        if (!entry)
+            return VLC_EGENERIC;
+
+        [query setObject:(__bridge id)entry->secattr forKey:(__bridge id)kSecAttrProtocol];
     }
     if (psz_user) {
         [query setObject:[NSString stringWithUTF8String:psz_user] forKey:(__bridge id)kSecAttrAccount];
@@ -231,6 +260,8 @@ static void SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMuta
     if (psz_port) {
         [query setObject:[NSNumber numberWithInt:atoi(psz_port)] forKey:(__bridge id)kSecAttrPort];
     }
+
+    return VLC_SUCCESS;
 }
 
 static int Store(vlc_keystore *p_keystore,
@@ -251,7 +282,8 @@ static int Store(vlc_keystore *p_keystore,
     NSMutableDictionary *searchQuery = CreateQuery(p_keystore);
 
     /* set attributes */
-    SetAttributesForQuery(ppsz_values, searchQuery, psz_label);
+    if (SetAttributesForQuery(ppsz_values, searchQuery, psz_label))
+        return VLC_EGENERIC;
 
     // One return type must be added for SecItemCopyMatching, even if not used.
     // Older macOS versions (10.7) are very picky here...
@@ -309,7 +341,8 @@ static unsigned int Find(vlc_keystore *p_keystore,
     msg_Dbg(p_keystore, "Lookup keychain entry for server %s", ppsz_values[KEY_SERVER]);
 
     /* set attributes */
-    SetAttributesForQuery(ppsz_values, baseLookupQuery, NULL);
+    if (SetAttributesForQuery(ppsz_values, baseLookupQuery, NULL))
+        return 0;
 
     /* search */
     NSMutableDictionary *searchQuery = [baseLookupQuery mutableCopy];
@@ -392,7 +425,8 @@ static unsigned int Remove(vlc_keystore *p_keystore,
     NSMutableDictionary *query = CreateQuery(p_keystore);
     OSStatus status;
 
-    SetAttributesForQuery(ppsz_values, query, NULL);
+    if (SetAttributesForQuery(ppsz_values, query, NULL))
+        return 0;
 
     [query setObject:@(YES) forKey:(__bridge id)kSecReturnAttributes];
     [query setObject:(__bridge id)kSecMatchLimitAll forKey:(__bridge id)kSecMatchLimit];
