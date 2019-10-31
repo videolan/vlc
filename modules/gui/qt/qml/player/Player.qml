@@ -261,7 +261,7 @@ Utils.NavigableFocusScope {
             }
 
             width: controlBarView.width
-            height: controllerId.implicitHeight
+            height: controllerId.implicitHeight + controllerId.anchors.bottomMargin
             property alias noAutoHide: controllerId.noAutoHide
 
             MouseArea {
@@ -273,6 +273,9 @@ Utils.NavigableFocusScope {
                     id: controllerId
                     focus: true
                     anchors.fill: parent
+                    anchors.leftMargin: VLCStyle.applicationHorizontalMargin
+                    anchors.rightMargin: VLCStyle.applicationHorizontalMargin
+                    anchors.bottomMargin: VLCStyle.applicationVerticalMargin
 
                     property bool disableAutoHide: playlistpopup.state === "visible" || !player.hasVideoOutput || !rootWindow.hasEmbededVideo || controllerMouseArea.containsMouse
                     onNoAutoHideChanged: {

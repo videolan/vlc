@@ -45,6 +45,7 @@ T.MenuItem {
 
     font.pixelSize: VLCStyle.fontSize_normal
 
+    leftPadding: VLCStyle.applicationHorizontalMargin
 
     property var parentMenu: undefined
 

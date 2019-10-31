@@ -31,6 +31,9 @@ Utils.NavigableFocusScope {
         playlistId: mainctx.playlist
     }
 
+    property int leftPadding: 0
+    property int rightPadding: 0
+
     //label for DnD
     Utils.DNDLabel {
         id: dragItem
@@ -96,6 +99,9 @@ Utils.NavigableFocusScope {
             id: plitem
             plmodel: root.plmodel
             width: root.width
+
+            leftPadding: root.leftPadding
+            rightPadding: root.rightPadding
 
             onItemClicked : {
                 /* to receive keys events */

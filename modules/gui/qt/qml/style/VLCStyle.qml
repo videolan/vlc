@@ -141,6 +141,11 @@ Item {
     property int gridItem_video_width: VLCStyle.video_normal_width + VLCStyle.margin_small * 2
 
 
+    //global application margin "safe area"
+    property int applicationHorizontalMargin: 0
+    property int applicationVerticalMargin: 0
+
+
     //timings
     property int delayToolTipAppear: 500;
     property int timingPlaylistClose: 1000;

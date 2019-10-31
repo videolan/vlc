@@ -59,6 +59,9 @@ Utils.NavigableFocusScope {
 
         RowLayout {
             anchors.fill: parent
+            anchors.leftMargin: VLCStyle.applicationHorizontalMargin
+            anchors.rightMargin: VLCStyle.applicationHorizontalMargin
+            anchors.bottomMargin: VLCStyle.applicationVerticalMargin
 
             Rectangle {
                 id: playingItemInfo

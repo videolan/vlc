@@ -211,6 +211,10 @@ Utils.NavigableFocusScope {
                             left: parent.left
                             bottom: parent.bottom
                             right: playlist.visible ? playlist.left : parent.right
+                            rightMargin: (rootWindow.playlistDocked && rootWindow.playlistVisible)
+                                         ? 0
+                                         : VLCStyle.applicationHorizontalMargin
+                            leftMargin: VLCStyle.applicationHorizontalMargin
                         }
                     }
 
@@ -225,6 +229,8 @@ Utils.NavigableFocusScope {
                             right: parent.right
                             bottom: parent.bottom
                         }
+
+                        rightPadding: VLCStyle.applicationHorizontalMargin
 
                         navigationParent: medialibId
                         navigationLeftItem: stackView
@@ -261,6 +267,8 @@ Utils.NavigableFocusScope {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
+                anchors.rightMargin: VLCStyle.applicationHorizontalMargin
+                anchors.leftMargin: VLCStyle.applicationHorizontalMargin
             }
         }
 

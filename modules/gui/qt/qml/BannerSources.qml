@@ -30,7 +30,7 @@ import "qrc:///menus/" as Menus
 Utils.NavigableFocusScope {
     id: root
 
-    height: (VLCStyle.icon_normal + VLCStyle.margin_xxsmall) * 2
+    height: (VLCStyle.icon_normal + VLCStyle.margin_xxsmall) * 2 + VLCStyle.applicationVerticalMargin
 
     property int selectedIndex: 0
     property int subSelectedIndex: 0
@@ -63,7 +63,12 @@ Utils.NavigableFocusScope {
         Column {
 
             id: col
-            anchors.fill: parent
+            anchors {
+                fill: parent
+                leftMargin: VLCStyle.applicationHorizontalMargin
+                rightMargin: VLCStyle.applicationHorizontalMargin
+                topMargin: VLCStyle.applicationVerticalMargin
+            }
 
             spacing: VLCStyle.margin_xxsmall
 

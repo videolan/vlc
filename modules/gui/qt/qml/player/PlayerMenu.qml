@@ -36,6 +36,9 @@ T.Menu {
 
     font.pixelSize: VLCStyle.fontSize_normal
 
+    topPadding: VLCStyle.applicationVerticalMargin
+    bottomPadding: VLCStyle.applicationVerticalMargin
+
     modal: true
     cascade: false
 
@@ -71,6 +74,7 @@ T.Menu {
 
     contentItem: ListView {
         header: Label {
+            leftPadding: VLCStyle.applicationHorizontalMargin
             text: control.title
             color: VLCStyle.colors.playerFg
             font.bold: true

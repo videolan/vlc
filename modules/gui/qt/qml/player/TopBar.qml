@@ -26,7 +26,7 @@ import "qrc:///utils/" as Utils
 
 Utils.NavigableFocusScope{
     id: topFocusScope
-    height: VLCStyle.icon_topbar
+    height: topcontrolContent.implicitHeight
     property bool noAutoHide: false
 
     property bool noAutoHideInt: !player.hasVideoOutput
@@ -43,6 +43,7 @@ Utils.NavigableFocusScope{
         id : topcontrolContent
         color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
         anchors.fill: parent
+        implicitHeight: VLCStyle.icon_topbar + topcontrollerMouseArea.anchors.topMargin
 
         gradient: Gradient {
             GradientStop { position: 0.0; color: VLCStyle.colors.playerBg }
@@ -54,6 +55,9 @@ Utils.NavigableFocusScope{
             id: topcontrollerMouseArea
             hoverEnabled: true
             anchors.fill: parent
+            anchors.topMargin: VLCStyle.applicationVerticalMargin
+            anchors.leftMargin: VLCStyle.applicationHorizontalMargin
+            anchors.rightMargin: VLCStyle.applicationHorizontalMargin
 
             RowLayout{
                 anchors.fill: parent

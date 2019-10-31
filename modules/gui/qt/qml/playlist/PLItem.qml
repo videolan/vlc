@@ -38,6 +38,9 @@ Rectangle {
     property var dragitem: null
     signal dropedMovedAt(int target, var drop)
 
+    property int leftPadding: 0
+    property int rightPadding: 0
+
 
     // Should the cover be displayed
     //property alias showCover: cover.visible
@@ -93,7 +96,11 @@ Rectangle {
 
         RowLayout {
             id: content
-            anchors.fill: parent
+            anchors {
+                fill: parent
+                leftMargin: root.leftPadding
+                rightMargin: root.rightPadding
+            }
 
             /* Cover of the associated album */
             Image {
