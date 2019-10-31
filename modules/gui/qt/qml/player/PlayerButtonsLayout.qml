@@ -32,8 +32,8 @@ Utils.NavigableFocusScope {
     property var defaultSize: VLCStyle.icon_medium
     property bool forceColors: false
 
-    property alias implicitWidth: buttonrow.implicitWidth
-    property alias implicitHeight: buttonrow.implicitHeight
+    implicitWidth: buttonrow.implicitWidth
+    implicitHeight: buttonrow.implicitHeight
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: {

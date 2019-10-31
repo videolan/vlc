@@ -41,7 +41,10 @@ Utils.NavigableFocusScope {
     Keys.onPressed: defaultKeyAction(event, 0)
     onActionCancel: history.previous(History.Go)
 
+    implicitHeight: columnLayout.implicitHeight
+
     ColumnLayout {
+        id: columnLayout
         anchors.fill: parent
         spacing: VLCStyle.margin_xsmall
         anchors.leftMargin: VLCStyle.margin_xlarge

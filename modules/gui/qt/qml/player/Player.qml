@@ -261,7 +261,7 @@ Utils.NavigableFocusScope {
             }
 
             width: controlBarView.width
-            height: 90 * VLCStyle.scale
+            height: controllerId.implicitHeight
             property alias noAutoHide: controllerId.noAutoHide
 
             MouseArea {
