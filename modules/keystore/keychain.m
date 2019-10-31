@@ -268,6 +268,51 @@ static int SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMutab
     return VLC_SUCCESS;
 }
 
+static int FillEntryValues(const NSDictionary *item, char *ppsz_values[KEY_MAX])
+{
+    NSString *protocol = [item objectForKey:(__bridge id)kSecAttrProtocol];
+    if (protocol)
+    {
+        ppsz_values[KEY_PROTOCOL] = strdup([protocol UTF8String]);
+        if (!ppsz_values[KEY_PROTOCOL])
+            return VLC_ENOMEM;
+    }
+
+    NSString *user = [item objectForKey:(__bridge id)kSecAttrAccount];
+    if (user)
+    {
+        ppsz_values[KEY_USER] = strdup([user UTF8String]);
+        if (!ppsz_values[KEY_USER])
+            return VLC_ENOMEM;
+    }
+
+    NSString *server = [item objectForKey:(__bridge id)kSecAttrServer];
+    if (server)
+    {
+        ppsz_values[KEY_SERVER] = strdup([server UTF8String]);
+        if (!ppsz_values[KEY_SERVER])
+            return VLC_ENOMEM;
+    }
+
+    NSString *path = [item objectForKey:(__bridge id)kSecAttrPath];
+    if (path)
+    {
+        ppsz_values[KEY_PATH] = strdup([path UTF8String]);
+        if (!ppsz_values[KEY_PATH])
+            return VLC_ENOMEM;
+    }
+
+    NSNumber *port = [item objectForKey:(__bridge id)kSecAttrPort];
+    if (port)
+    {
+        ppsz_values[KEY_PORT] = strdup([[port stringValue] UTF8String]);
+        if (!ppsz_values[KEY_PORT])
+            return VLC_ENOMEM;
+    }
+
+    return VLC_SUCCESS;
+}
+
 static int Store(vlc_keystore *p_keystore,
                  const char *const ppsz_values[KEY_MAX],
                  const uint8_t *p_secret,
@@ -370,12 +415,13 @@ static unsigned int Find(vlc_keystore *p_keystore,
 
     for (NSUInteger i = 0; i < count; i++) {
         vlc_keystore_entry *p_entry = &p_entries[i];
-        if (ks_values_copy((const char **)p_entry->ppsz_values, ppsz_values) != VLC_SUCCESS) {
+        NSDictionary *keychainItem = [listOfResults objectAtIndex:i];
+
+        if (FillEntryValues(keychainItem, p_entry->ppsz_values))
+        {
             vlc_keystore_release_entries(p_entries, 1);
             return 0;
         }
-
-        NSDictionary *keychainItem = [listOfResults objectAtIndex:i];
 
         NSString *accountName = [keychainItem objectForKey:(__bridge id)kSecAttrAccount];
         NSMutableDictionary *passwordFetchQuery = [baseLookupQuery mutableCopy];
@@ -390,11 +436,6 @@ static unsigned int Find(vlc_keystore *p_keystore,
             msg_Err(p_keystore, "Lookup error: %i (%s)", status, [ErrorForStatus(status) UTF8String]);
             vlc_keystore_release_entries(p_entries, (unsigned int)count);
             return 0;
-        }
-
-        if (!p_entry->ppsz_values[KEY_USER] && accountName) {
-            msg_Dbg(p_keystore, "using account name from the keychain for login");
-            p_entry->ppsz_values[KEY_USER] = strdup([accountName UTF8String]);
         }
 
         NSData *secretData = (__bridge_transfer NSData *)secretResult;
