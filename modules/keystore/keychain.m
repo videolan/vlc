@@ -178,31 +178,35 @@ static void SetAccessibilityForQuery(vlc_keystore *p_keystore,
                                      NSMutableDictionary *query)
 {
     int accessibilityType = var_InheritInteger(p_keystore, "keychain-accessibility-type");
+    CFStringRef secattr;
     switch (accessibilityType) {
         case 1:
-            [query setObject:(__bridge id)kSecAttrAccessibleAfterFirstUnlock forKey:(__bridge id)kSecAttrAccessible];
+            secattr = kSecAttrAccessibleAfterFirstUnlock;
             break;
         case 2:
-            [query setObject:(__bridge id)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly forKey:(__bridge id)kSecAttrAccessible];
+            secattr = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly;
             break;
         case 3:
-            [query setObject:(__bridge id)kSecAttrAccessibleAlways forKey:(__bridge id)kSecAttrAccessible];
+            secattr = kSecAttrAccessibleAlways;
             break;
         case 4:
-            [query setObject:(__bridge id)kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly forKey:(__bridge id)kSecAttrAccessible];
+            secattr = kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly;
             break;
         case 5:
-            [query setObject:(__bridge id)kSecAttrAccessibleAlwaysThisDeviceOnly forKey:(__bridge id)kSecAttrAccessible];
+            secattr = kSecAttrAccessibleAlwaysThisDeviceOnly;
             break;
         case 6:
-            [query setObject:(__bridge id)kSecAttrAccessibleWhenUnlocked forKey:(__bridge id)kSecAttrAccessible];
+            secattr = kSecAttrAccessibleWhenUnlocked;
             break;
         case 7:
-            [query setObject:(__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly forKey:(__bridge id)kSecAttrAccessible];
+            secattr = kSecAttrAccessibleWhenUnlockedThisDeviceOnly;
             break;
         default:
+            secattr = nil;
             break;
     }
+    if (secattr != nil)
+        [query setObject:(__bridge id)secattr forKey:(__bridge id)kSecAttrAccessible];
 }
 
 struct vlc2secattr
