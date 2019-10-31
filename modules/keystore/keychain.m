@@ -229,6 +229,7 @@ static int SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMutab
     const char *psz_server = ppsz_values[KEY_SERVER];
     const char *psz_path = ppsz_values[KEY_PATH];
     const char *psz_port = ppsz_values[KEY_PORT];
+    const char *psz_realm = ppsz_values[KEY_REALM];
 
     if (psz_label) {
         [query setObject:[NSString stringWithUTF8String:psz_label] forKey:(__bridge id)kSecAttrLabel];
@@ -263,6 +264,9 @@ static int SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMutab
     }
     if (psz_port) {
         [query setObject:[NSNumber numberWithInt:atoi(psz_port)] forKey:(__bridge id)kSecAttrPort];
+    }
+    if (psz_realm) {
+        [query setObject:[NSString stringWithUTF8String:psz_realm] forKey:(__bridge id)kSecAttrSecurityDomain];
     }
 
     return VLC_SUCCESS;
@@ -307,6 +311,14 @@ static int FillEntryValues(const NSDictionary *item, char *ppsz_values[KEY_MAX])
     {
         ppsz_values[KEY_PORT] = strdup([[port stringValue] UTF8String]);
         if (!ppsz_values[KEY_PORT])
+            return VLC_ENOMEM;
+    }
+
+    NSString *realm = [item objectForKey:(__bridge id)kSecAttrSecurityDomain];
+    if (realm)
+    {
+        ppsz_values[KEY_REALM] = strdup([realm UTF8String]);
+        if (!ppsz_values[KEY_REALM])
             return VLC_ENOMEM;
     }
 
