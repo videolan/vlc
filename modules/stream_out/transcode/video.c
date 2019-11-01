@@ -491,7 +491,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 {
     *out = NULL;
 
-    const bool b_eos = in && (in->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
+    bool b_eos = in && (in->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
 
     int ret = id->p_decoder->pf_decode( id->p_decoder, in );
     if( ret != VLCDEC_SUCCESS )
@@ -644,8 +644,14 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             if( transcode_encoder_drain( id->encoder, out ) != VLC_SUCCESS )
                 goto error;
             transcode_encoder_close( id->encoder );
-            if( b_eos )
-                tag_last_block_with_flag( out, BLOCK_FLAG_END_OF_SEQUENCE );
+            /* Close filters */
+            transcode_remove_filters( &id->p_f_chain );
+            transcode_remove_filters( &id->p_conv_nonstatic );
+            transcode_remove_filters( &id->p_conv_static );
+            transcode_remove_filters( &id->p_uf_chain );
+            transcode_remove_filters( &id->p_final_conv_static );
+            tag_last_block_with_flag( out, BLOCK_FLAG_END_OF_SEQUENCE );
+            b_eos = false;
         }
 
         continue;
