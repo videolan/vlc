@@ -173,6 +173,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/preferences/prefs_widgets.m \
 	gui/macosx/views/VLCBottomBarView.h \
 	gui/macosx/views/VLCBottomBarView.m \
+	gui/macosx/views/VLCCustomWindowButton.h \
+	gui/macosx/views/VLCCustomWindowButton.m \
 	gui/macosx/views/VLCDefaultValueSlider.h \
 	gui/macosx/views/VLCDefaultValueSlider.m \
 	gui/macosx/views/VLCDefaultValueSliderCell.h \
@@ -456,7 +458,19 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/Button-Icons/VLCVolumeOnTemplate.pdf \
 	gui/macosx/Resources/Button-Icons/VLCVolumeOffTemplate.pdf \
 	gui/macosx/Resources/Button-Icons/VLCClearLogTemplate.pdf \
-	gui/macosx/Resources/Button-Icons/VLCSaveTemplate.pdf
+	gui/macosx/Resources/Button-Icons/VLCSaveTemplate.pdf \
+	gui/macosx/Resources/Button-Icons/window-close-graphite.png \
+	gui/macosx/Resources/Button-Icons/window-close-graphite@2x.png \
+	gui/macosx/Resources/Button-Icons/window-close-on-graphite.png \
+	gui/macosx/Resources/Button-Icons/window-close-on-graphite@2x.png \
+	gui/macosx/Resources/Button-Icons/window-close-on.png \
+	gui/macosx/Resources/Button-Icons/window-close-on@2x.png \
+	gui/macosx/Resources/Button-Icons/window-close-over-graphite.png \
+	gui/macosx/Resources/Button-Icons/window-close-over-graphite@2x.png \
+	gui/macosx/Resources/Button-Icons/window-close-over.png \
+	gui/macosx/Resources/Button-Icons/window-close-over@2x.png \
+	gui/macosx/Resources/Button-Icons/window-close.png \
+	gui/macosx/Resources/Button-Icons/window-close@2x.png
 
 libmacosx_plugin_la_RES += \
 	gui/macosx/Resources/dsa_pub.pem \

@@ -120,6 +120,7 @@
 		7D445D8B22032B9200263D34 /* VLCPlaylistTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D445D8A22032B9200263D34 /* VLCPlaylistTableView.m */; };
 		7D445D8E2203375100263D34 /* VLCPlaylistMenuController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D445D8D2203375100263D34 /* VLCPlaylistMenuController.m */; };
 		7D460B0C229EB4C700097948 /* VLCDragDropView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D460B0B229EB4C700097948 /* VLCDragDropView.m */; };
+		7D61DCE4236C1937008133CF /* VLCCustomWindowButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D61DCE3236C1937008133CF /* VLCCustomWindowButton.m */; };
 		7D66D4362200BC340040D04A /* VLCClickerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D66D4352200BC340040D04A /* VLCClickerManager.m */; };
 		7D66D4392200C5B80040D04A /* VLCVideoFilterHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D66D4382200C5B80040D04A /* VLCVideoFilterHelper.m */; };
 		7D66D43C2200D6090040D04A /* VLCDetachedVideoWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D66D43B2200D6090040D04A /* VLCDetachedVideoWindow.m */; };
@@ -497,6 +498,8 @@
 		7D5678EC1D5BA1DC002698F3 /* VLCApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCApplication.m; sourceTree = "<group>"; };
 		7D5678EE1D5BA397002698F3 /* VLCMainWindowControlsBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCMainWindowControlsBar.h; sourceTree = "<group>"; };
 		7D5678EF1D5BA397002698F3 /* VLCMainWindowControlsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCMainWindowControlsBar.m; sourceTree = "<group>"; };
+		7D61DCE2236C1937008133CF /* VLCCustomWindowButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCCustomWindowButton.h; sourceTree = "<group>"; };
+		7D61DCE3236C1937008133CF /* VLCCustomWindowButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCCustomWindowButton.m; sourceTree = "<group>"; };
 		7D66D4342200BC340040D04A /* VLCClickerManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCClickerManager.h; sourceTree = "<group>"; };
 		7D66D4352200BC340040D04A /* VLCClickerManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCClickerManager.m; sourceTree = "<group>"; };
 		7D66D4372200C5B80040D04A /* VLCVideoFilterHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCVideoFilterHelper.h; sourceTree = "<group>"; };
@@ -825,6 +828,8 @@
 		1C1ED5062204AB7C00811EC0 /* views */ = {
 			isa = PBXGroup;
 			children = (
+				7D61DCE2236C1937008133CF /* VLCCustomWindowButton.h */,
+				7D61DCE3236C1937008133CF /* VLCCustomWindowButton.m */,
 				6B0292E41F43256300A50082 /* VLCBottomBarView.h */,
 				6B0292E51F43256300A50082 /* VLCBottomBarView.m */,
 				6B6A499A1DFD9B23009128AC /* VLCDefaultValueSlider.h */,
@@ -1658,6 +1663,7 @@
 				7D2554C522C8E8B500F2D9C2 /* VLCMediaSourceDeviceCollectionViewItem.m in Sources */,
 				1CCC88F52078A3D500E5626F /* SyncTracks.xib in Sources */,
 				1CCC88F62078A3D500E5626F /* VLCInformationWindow.xib in Sources */,
+				7D61DCE4236C1937008133CF /* VLCCustomWindowButton.m in Sources */,
 				7DFFF90123682D4800C8B0C9 /* VLCDetachedAudioWindow.m in Sources */,
 				7D66D4392200C5B80040D04A /* VLCVideoFilterHelper.m in Sources */,
 				7D445D812202524000263D34 /* VLCPlaylistController.m in Sources */,
