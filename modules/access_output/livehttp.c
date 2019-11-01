@@ -180,7 +180,6 @@ typedef struct
     char *psz_indexUrl;
     char *psz_keyfile;
     vlc_tick_t i_keyfile_modification;
-    vlc_tick_t i_opendts;
     vlc_tick_t  i_seglenm;
     uint32_t i_segment;
     size_t  i_seglen;
@@ -253,7 +252,6 @@ static int Open( vlc_object_t *p_this )
     vlc_array_init( &p_sys->segments_t );
 
     p_sys->stuffing_size = 0;
-    p_sys->i_opendts = VLC_TICK_INVALID;
 
     p_sys->psz_indexPath = NULL;
     psz_idx = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "index" );
@@ -908,8 +906,14 @@ static int CheckSegmentChange( sout_access_out_t *p_access, block_t *p_buffer )
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     ssize_t writevalue = 0;
 
-    if( p_sys->i_handle > 0 && p_sys->b_segment_has_data &&
-       (( p_buffer->i_length + p_buffer->i_dts - p_sys->i_opendts ) >= p_sys->i_seglenm ) )
+    vlc_tick_t current_length = 0;
+    vlc_tick_t ongoing_length = 0;
+
+    block_ChainProperties( p_sys->full_segments, NULL, NULL, &current_length );
+    block_ChainProperties( p_sys->ongoing_segment, NULL, NULL, &ongoing_length );
+
+    if( p_sys->i_handle > 0 &&
+       (( p_buffer->i_length + current_length + ongoing_length ) >= p_sys->i_seglenm ) )
     {
         writevalue = writeSegment( p_access );
         if( unlikely( writevalue < 0 ) )
@@ -923,16 +927,6 @@ static int CheckSegmentChange( sout_access_out_t *p_access, block_t *p_buffer )
 
     if ( unlikely( p_sys->i_handle < 0 ) )
     {
-        p_sys->i_opendts = p_buffer->i_dts;
-
-        if( p_sys->ongoing_segment && ( p_sys->ongoing_segment->i_dts < p_sys->i_opendts) )
-            p_sys->i_opendts = p_sys->ongoing_segment->i_dts;
-
-        if( p_sys->full_segments && ( p_sys->full_segments->i_dts < p_sys->i_opendts) )
-            p_sys->i_opendts = p_sys->full_segments->i_dts;
-
-        msg_Dbg( p_access, "Setting new opendts %"PRId64, p_sys->i_opendts );
-
         if ( openNextFile( p_access, p_sys ) < 0 )
            return -1;
     }
@@ -945,15 +939,11 @@ static ssize_t writeSegment( sout_access_out_t *p_access )
     msg_Dbg( p_access, "Writing all full segments" );
 
     block_t *output = p_sys->full_segments;
-    vlc_tick_t output_last_length;
-    if( *p_sys->full_segments_end )
-        output_last_length = (*p_sys->full_segments_end)->i_length;
-    else if( output )
-        output_last_length = output->i_length;
-    else
-        output_last_length = 0;
     p_sys->full_segments = NULL;
     p_sys->full_segments_end = &p_sys->full_segments;
+
+    vlc_tick_t current_length = 0;
+    block_ChainProperties( output, NULL, NULL, &current_length );
 
     ssize_t i_write=0;
     bool crypted = false;
@@ -998,8 +988,7 @@ static ssize_t writeSegment( sout_access_out_t *p_access )
            return -1;
         }
 
-        p_sys->f_seglen = secf_from_vlc_tick(output_last_length +
-                                    output->i_dts - p_sys->i_opendts);
+        p_sys->f_seglen = secf_from_vlc_tick( current_length );
 
         if ( (size_t)val >= output->i_buffer )
         {
