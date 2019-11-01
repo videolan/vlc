@@ -265,6 +265,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
                     aout_FiltersDelete( p_stream, id->p_af_chain );
                     id->p_af_chain = NULL;
                 }
+                id->fmt_input_audio = id->decoder_out.audio;
             }
 
             if( !id->p_af_chain &&
