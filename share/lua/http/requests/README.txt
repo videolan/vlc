@@ -173,7 +173,7 @@ Commands available from API version 2
 > select the video track (use the number from the stream)
   ?command=video_track&val=<val>
 
-> select the sibtitle track (use the number from the stream)
+> select the subtitle track (use the number from the stream)
   ?command=subtitle_track&val=<val>
 
 playlist.xml or playlist.json:
