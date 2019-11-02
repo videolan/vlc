@@ -453,7 +453,10 @@ static int probe( stream_t* source )
     } const magicbytes[] = {
         /* keep heaviest at top */
         { 257, 5, "ustar" },              //TAR
-        { 0,   7, "Rar!\x1A\x07" },       //RAR
+#if ARCHIVE_VERSION_NUMBER >= 3004000
+        { 0,   8, "Rar!\x1A\x07\x01" },   //RAR5.0
+#endif
+        { 0,   7, "Rar!\x1A\x07" },       //RAR4.x
         { 0,   6, "7z\xBC\xAF\x27\x1C" }, //7z
         { 0,   4, "xar!" },               //XAR
         { 0,   4, "PK\x03\x04" },         //ZIP
