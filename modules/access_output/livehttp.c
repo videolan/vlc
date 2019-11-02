@@ -168,7 +168,7 @@ typedef struct output_segment
     char *psz_uri;
     char *psz_key_uri;
     char *psz_duration;
-    float f_seglength;
+    vlc_tick_t segment_length;
     uint32_t i_segment_number;
     uint8_t aes_ivs[16];
 } output_segment_t;
@@ -180,10 +180,9 @@ typedef struct
     char *psz_indexUrl;
     char *psz_keyfile;
     vlc_tick_t i_keyfile_modification;
-    vlc_tick_t  i_seglenm;
+    vlc_tick_t segment_max_length;
+    vlc_tick_t current_segment_length;
     uint32_t i_segment;
-    size_t  i_seglen;
-    float   f_seglen;
     block_t *full_segments;
     block_t **full_segments_end;
     block_t *ongoing_segment;
@@ -231,9 +230,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Try to get within asked segment length */
-    p_sys->i_seglen = var_GetInteger( p_access, SOUT_CFG_PREFIX "seglen" );
+    size_t i_seglen = var_GetInteger( p_access, SOUT_CFG_PREFIX "seglen" );
 
-    p_sys->i_seglenm = vlc_tick_from_sec( p_sys->i_seglen );
+    p_sys->segment_max_length = vlc_tick_from_sec( i_seglen );
     p_sys->full_segments = NULL;
     p_sys->full_segments_end = &p_sys->full_segments;
 
@@ -510,18 +509,18 @@ static void destroySegment( output_segment_t *segment )
 }
 
 /************************************************************************
- * segmentAmountNeeded: check that playlist has atleast 3*p_sys->i_seglength of segments
+ * segmentAmountNeeded: check that playlist has atleast 3*p_sys->segment_max_length of segments
  * return how many segments are needed for that (max of p_sys->i_segment )
  ************************************************************************/
 static uint32_t segmentAmountNeeded( sout_access_out_sys_t *p_sys )
 {
-    float duration = .0f;
+    vlc_tick_t duration = 0;
     for( size_t index = 1; index <= vlc_array_count( &p_sys->segments_t ); index++ )
     {
         output_segment_t* segment = vlc_array_item_at_index( &p_sys->segments_t, vlc_array_count( &p_sys->segments_t ) - index );
-        duration += segment->f_seglength;
+        duration += segment->segment_length;
 
-        if( duration >= (float)( 3 * p_sys->i_seglen ) )
+        if( duration >= ( 3 * p_sys->segment_max_length ) )
             return __MAX(index, p_sys->i_numsegs);
     }
     return vlc_array_count( &p_sys->segments_t ) - 1;
@@ -532,23 +531,23 @@ static uint32_t segmentAmountNeeded( sout_access_out_sys_t *p_sys )
 /************************************************************************
  * isFirstItemRemovable: Check for draft 11 section 6.2.2
  * check that the first item has been around outside playlist
- * segment->f_seglength + (p_sys->i_numsegs * p_sys->i_seglen) before it is removed.
+ * segment->segment_length + (p_sys->i_numsegs * p_sys->segment_max_length) before it is removed.
  ************************************************************************/
 static bool isFirstItemRemovable( sout_access_out_sys_t *p_sys, uint32_t i_firstseg, uint32_t i_index_offset )
 {
-    float duration = .0f;
+    vlc_tick_t duration = 0;
 
-    /* Check that segment has been out of playlist for seglength + (p_sys->i_numsegs * p_sys->i_seglen) amount
+    /* Check that segment has been out of playlist for segment_length + (p_sys->i_numsegs * p_sys->segment_max_length) amount
      * We check this by calculating duration of the items that replaced first item in playlist
      */
     for( unsigned int index = 0; index < i_index_offset; index++ )
     {
         output_segment_t *segment = vlc_array_item_at_index( &p_sys->segments_t, p_sys->i_segment - i_firstseg + index );
-        duration += segment->f_seglength;
+        duration += segment->segment_length;
     }
     output_segment_t *first = vlc_array_item_at_index( &p_sys->segments_t, 0 );
 
-    return duration >= (first->f_seglength + (float)(p_sys->i_numsegs * p_sys->i_seglen));
+    return duration >= (first->segment_length + (p_sys->i_numsegs * p_sys->segment_max_length));
 }
 
 /************************************************************************
@@ -589,8 +588,8 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
             return -1;
         }
 
-        if ( fprintf( fp, "#EXTM3U\n#EXT-X-TARGETDURATION:%zu\n#EXT-X-VERSION:3\n#EXT-X-ALLOW-CACHE:%s"
-                          "%s\n#EXT-X-MEDIA-SEQUENCE:%"PRIu32"\n%s", p_sys->i_seglen,
+        if ( fprintf( fp, "#EXTM3U\n#EXT-X-TARGETDURATION:%.0f\n#EXT-X-VERSION:3\n#EXT-X-ALLOW-CACHE:%s"
+                          "%s\n#EXT-X-MEDIA-SEQUENCE:%"PRIu32"\n%s", ceil(secf_from_vlc_tick( p_sys->segment_max_length )) ,
                           p_sys->b_caching ? "YES" : "NO",
                           p_sys->i_numsegs > 0 ? "" : b_isend ? "\n#EXT-X-PLAYLIST-TYPE:VOD" : "\n#EXT-X-PLAYLIST-TYPE:EVENT",
                           i_firstseg, ((p_sys->i_initial_segment > 1) && (p_sys->i_initial_segment == i_firstseg)) ? "#EXT-X-DISCONTINUITY\n" : ""
@@ -731,12 +730,12 @@ static void closeCurrentSegment( sout_access_out_t *p_access, sout_access_out_sy
         vlc_close( p_sys->i_handle );
         p_sys->i_handle = -1;
 
-        if( ! ( us_asprintf( &segment->psz_duration, "%.2f", p_sys->f_seglen ) ) )
+        if( ! ( us_asprintf( &segment->psz_duration, "%.2f", secf_from_vlc_tick( p_sys->current_segment_length )) ) )
         {
             msg_Err( p_access, "Couldn't set duration on closed segment");
             return;
         }
-        segment->f_seglength = p_sys->f_seglen;
+        segment->segment_length = p_sys->current_segment_length;
 
         segment->i_segment_number = p_sys->i_segment;
 
@@ -913,7 +912,7 @@ static int CheckSegmentChange( sout_access_out_t *p_access, block_t *p_buffer )
     block_ChainProperties( p_sys->ongoing_segment, NULL, NULL, &ongoing_length );
 
     if( p_sys->i_handle > 0 &&
-       (( p_buffer->i_length + current_length + ongoing_length ) >= p_sys->i_seglenm ) )
+       (( p_buffer->i_length + current_length + ongoing_length ) >= p_sys->segment_max_length ) )
     {
         writevalue = writeSegment( p_access );
         if( unlikely( writevalue < 0 ) )
@@ -947,6 +946,7 @@ static ssize_t writeSegment( sout_access_out_t *p_access )
 
     ssize_t i_write=0;
     bool crypted = false;
+    p_sys->current_segment_length = current_length;
     while( output )
     {
         if( p_sys->key_uri && !crypted )
@@ -988,7 +988,6 @@ static ssize_t writeSegment( sout_access_out_t *p_access )
            return -1;
         }
 
-        p_sys->f_seglen = secf_from_vlc_tick( current_length );
 
         if ( (size_t)val >= output->i_buffer )
         {
