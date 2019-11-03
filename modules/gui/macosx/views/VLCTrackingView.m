@@ -32,12 +32,33 @@
 
 - (void)mouseExited:(NSEvent *)event
 {
-    self.viewToHide.hidden = YES;
+    if (self.animatesTransition) {
+        [self.viewToHide setAlphaValue:1.0];
+        __weak typeof(self.viewToHide) weakViewToHide = self.viewToHide;
+        [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
+            [[NSAnimationContext currentContext] setDuration:0.9];
+            [[weakViewToHide animator] setAlphaValue:0.0];
+        } completionHandler:^{
+            [weakViewToHide setHidden:YES];
+        }];
+    } else {
+        self.viewToHide.hidden = YES;
+    }
 }
 
 - (void)mouseEntered:(NSEvent *)event
 {
-    self.viewToHide.hidden = NO;
+    if (self.animatesTransition) {
+        [self.viewToHide setAlphaValue:.0];
+        [self.viewToHide setHidden:NO];
+        __weak typeof(self.viewToHide) weakViewToHide = self.viewToHide;
+        [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
+            [[NSAnimationContext currentContext] setDuration:0.9];
+            [[weakViewToHide animator] setAlphaValue:1.0];
+        } completionHandler:nil];
+    } else {
+        self.viewToHide.hidden = NO;
+    }
 }
 
 - (void)updateTrackingAreas
