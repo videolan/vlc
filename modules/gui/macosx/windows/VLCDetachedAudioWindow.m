@@ -43,11 +43,12 @@
 - (void)awakeFromNib
 {
     self.title = @"";
+    self.imageView.cropsImagesToRoundedCorners = NO;
 
     _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
     VLCTrackingView *trackingView = self.contentView;
-    trackingView.viewToHide = self.bottomBarView;
-    self.bottomBarView.hidden = YES;
+    trackingView.viewToHide = self.wrapperView;
+    trackingView.animatesTransition = YES;
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self selector:@selector(inputItemChanged:) name:VLCPlayerCurrentMediaItemChanged object:nil];
@@ -68,7 +69,6 @@
     } else {
         [self.imageView setImage:[NSImage imageNamed:@"noart.png"]];
     }
-
 }
 
 - (BOOL)canBecomeKeyWindow
@@ -84,6 +84,15 @@
 - (BOOL)isMovableByWindowBackground
 {
     return YES;
+}
+
+- (BOOL)performKeyEquivalent:(NSEvent *)event
+{
+    if (event.modifierFlags & NSEventModifierFlagCommand && event.keyCode == 13) {
+        [self closeAndAnimate:YES];
+        return YES;
+    }
+    return [super performKeyEquivalent:event];
 }
 
 @end

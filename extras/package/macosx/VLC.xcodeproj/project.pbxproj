@@ -500,6 +500,18 @@
 		7D5678EF1D5BA397002698F3 /* VLCMainWindowControlsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCMainWindowControlsBar.m; sourceTree = "<group>"; };
 		7D61DCE2236C1937008133CF /* VLCCustomWindowButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCCustomWindowButton.h; sourceTree = "<group>"; };
 		7D61DCE3236C1937008133CF /* VLCCustomWindowButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCCustomWindowButton.m; sourceTree = "<group>"; };
+		7D61DCE7236C6A3D008133CF /* window-close.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close.png"; path = "Button-Icons/window-close.png"; sourceTree = "<group>"; };
+		7D61DCE8236C6A3D008133CF /* window-close-on-graphite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-on-graphite@2x.png"; path = "Button-Icons/window-close-on-graphite@2x.png"; sourceTree = "<group>"; };
+		7D61DCE9236C6A3D008133CF /* window-close-over-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-over-graphite.png"; path = "Button-Icons/window-close-over-graphite.png"; sourceTree = "<group>"; };
+		7D61DCEA236C6A3D008133CF /* window-close-over@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-over@2x.png"; path = "Button-Icons/window-close-over@2x.png"; sourceTree = "<group>"; };
+		7D61DCEB236C6A3D008133CF /* window-close-on-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-on-graphite.png"; path = "Button-Icons/window-close-on-graphite.png"; sourceTree = "<group>"; };
+		7D61DCEC236C6A3D008133CF /* window-close-on@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-on@2x.png"; path = "Button-Icons/window-close-on@2x.png"; sourceTree = "<group>"; };
+		7D61DCED236C6A3D008133CF /* window-close-graphite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-graphite@2x.png"; path = "Button-Icons/window-close-graphite@2x.png"; sourceTree = "<group>"; };
+		7D61DCEE236C6A3D008133CF /* window-close-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-on.png"; path = "Button-Icons/window-close-on.png"; sourceTree = "<group>"; };
+		7D61DCEF236C6A3D008133CF /* window-close-over-graphite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-over-graphite@2x.png"; path = "Button-Icons/window-close-over-graphite@2x.png"; sourceTree = "<group>"; };
+		7D61DCF0236C6A3D008133CF /* window-close-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-over.png"; path = "Button-Icons/window-close-over.png"; sourceTree = "<group>"; };
+		7D61DCF1236C6A3D008133CF /* window-close@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close@2x.png"; path = "Button-Icons/window-close@2x.png"; sourceTree = "<group>"; };
+		7D61DCF2236C6A3D008133CF /* window-close-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-graphite.png"; path = "Button-Icons/window-close-graphite.png"; sourceTree = "<group>"; };
 		7D66D4342200BC340040D04A /* VLCClickerManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCClickerManager.h; sourceTree = "<group>"; };
 		7D66D4352200BC340040D04A /* VLCClickerManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCClickerManager.m; sourceTree = "<group>"; };
 		7D66D4372200C5B80040D04A /* VLCVideoFilterHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCVideoFilterHelper.h; sourceTree = "<group>"; };
@@ -1378,6 +1390,25 @@
 			name = "Library Window";
 			sourceTree = "<group>";
 		};
+		7D61DCE6236C6A26008133CF /* Window Button Images */ = {
+			isa = PBXGroup;
+			children = (
+				7D61DCF2236C6A3D008133CF /* window-close-graphite.png */,
+				7D61DCED236C6A3D008133CF /* window-close-graphite@2x.png */,
+				7D61DCEB236C6A3D008133CF /* window-close-on-graphite.png */,
+				7D61DCE8236C6A3D008133CF /* window-close-on-graphite@2x.png */,
+				7D61DCEE236C6A3D008133CF /* window-close-on.png */,
+				7D61DCEC236C6A3D008133CF /* window-close-on@2x.png */,
+				7D61DCE9236C6A3D008133CF /* window-close-over-graphite.png */,
+				7D61DCEF236C6A3D008133CF /* window-close-over-graphite@2x.png */,
+				7D61DCF0236C6A3D008133CF /* window-close-over.png */,
+				7D61DCEA236C6A3D008133CF /* window-close-over@2x.png */,
+				7D61DCE7236C6A3D008133CF /* window-close.png */,
+				7D61DCF1236C6A3D008133CF /* window-close@2x.png */,
+			);
+			name = "Window Button Images";
+			sourceTree = "<group>";
+		};
 		7D903EB4224393C700917358 /* core dependencies */ = {
 			isa = PBXGroup;
 			children = (
@@ -1462,6 +1493,7 @@
 		CC0430EE13B2461A00D7D52E /* UI Graphics */ = {
 			isa = PBXGroup;
 			children = (
+				7D61DCE6236C6A26008133CF /* Window Button Images */,
 				7D28E63C2275C80E0098D30E /* Library Window */,
 				6B82255A1E4D2BE400833BE1 /* Main Window */,
 				6B8229CB1E4D2D2C00833BE1 /* Sidebar Icons */,
