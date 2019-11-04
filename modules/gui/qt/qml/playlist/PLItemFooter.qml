@@ -21,6 +21,10 @@ import "qrc:///style/"
 
 Item {
     id: foot
+
+    signal dropURLAtEnd(var urlList)
+    signal moveAtEnd()
+
     property bool _dropVisible: false
 
     width: parent.width
@@ -44,10 +48,13 @@ Item {
         onExited: foot._dropVisible = false
         onDropped: {
             if (drop.hasUrls) {
-                console.log("add urls", drop.urls)
-                delegateModel.onDropUrlAtEnd(drop.urls)
+                //force conversion to an actual list
+                var urlList = []
+                for ( var url in drop.urls)
+                    urlList.push(drop.urls[url])
+                dropURLAtEnd(urlList)
             } else {
-                delegateModel.onDropMovedAtEnd()
+                moveAtEnd()
             }
             drop.accept()
             foot._dropVisible = false

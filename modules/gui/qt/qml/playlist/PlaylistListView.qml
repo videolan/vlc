@@ -88,7 +88,10 @@ Utils.NavigableFocusScope {
             }
         }
 
-        footer: PLItemFooter {}
+        footer: PLItemFooter {
+            onDropURLAtEnd: mainPlaylistController.insert(root.plmodel.count, urlList)
+            onMoveAtEnd: root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
+        }
 
         delegate: PLItem {
             /*
@@ -135,7 +138,11 @@ Utils.NavigableFocusScope {
 
             onDropedMovedAt: {
                 if (drop.hasUrls) {
-                    mainPlaylistController.insert(target, drop.urls)
+                    //force conversion to an actual list
+                    var urlList = []
+                    for ( var url in drop.urls)
+                        urlList.push(drop.urls[url])
+                    mainPlaylistController.insert(target, urlList)
                 } else {
                     root.plmodel.moveItemsPre(root.plmodel.getSelection(), target)
                 }
