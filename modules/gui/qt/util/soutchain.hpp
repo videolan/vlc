@@ -45,7 +45,7 @@ public:
 private:
     typedef QPair<QString, SoutOption> OptionPairType;
     typedef QList<OptionPairType> OptionsType;
-    const QString moduleName;
+    QString moduleName;
     OptionsType options;
 };
 
@@ -81,9 +81,9 @@ public:
 
 private:
     enum Kind{ String, Nested };
-    const Kind kind;
-    const QString stringValue;
-    const SoutModule nestedModule;
+    Kind kind;
+    QString stringValue;
+    SoutModule nestedModule;
 };
 
 
