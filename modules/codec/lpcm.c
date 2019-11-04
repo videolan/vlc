@@ -1039,7 +1039,7 @@ static int BdHeader( decoder_sys_t *p_sys,
     default:
         return -1;
     }
-    switch( (h >> 8) & 0x0f ) 
+    switch( (h >> 8) & 0x0f )
     {
     case 1:
         *pi_rate = 48000;
