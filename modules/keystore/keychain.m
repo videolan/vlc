@@ -395,8 +395,6 @@ static int Store(vlc_keystore *p_keystore,
 
     /* search */
     status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, &result);
-    /* create storage unit */
-    NSData *secretData = [NSData dataWithBytes:p_secret length:i_secret_len];
 
     if (status == errSecSuccess) {
         msg_Dbg(p_keystore, "the item was already known to keychain, so it will be updated");
@@ -404,6 +402,7 @@ static int Store(vlc_keystore *p_keystore,
         query = [[NSMutableDictionary alloc] init];
 
         /* just set the secret data */
+        NSData *secretData = [NSData dataWithBytes:p_secret length:i_secret_len];
         [query setObject:secretData forKey:(__bridge id)kSecValueData];
         [query setObject:@(kVlc4Creator) forKey:(__bridge id)kSecAttrCreator];
 
@@ -420,6 +419,7 @@ static int Store(vlc_keystore *p_keystore,
         SetAccessibilityForQuery(p_keystore, query);
 
         /* set secret data */
+        NSData *secretData = [NSData dataWithBytes:p_secret length:i_secret_len];
         [query setObject:secretData forKey:(__bridge id)kSecValueData];
         [query setObject:@(kVlc4Creator) forKey:(__bridge id)kSecAttrCreator];
 
