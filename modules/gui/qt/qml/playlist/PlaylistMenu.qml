@@ -17,259 +17,205 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Controls.impl 2.4
 import QtQuick.Layouts 1.3
 
+import "qrc:///utils/" as Utils
+import "qrc:///utils/KeyHelper.js" as KeyHelper
 import "qrc:///style/"
 
-FocusScope{
-    id: root
+Utils.NavigableFocusScope {
+    id: overlayMenu
+    visible: false
 
-    signal menuExit()
-    signal play()
-    signal clear()
-    signal selectionMode()
-    signal moveMode()
+    property alias models: playlistMenu.models
+    property alias currentModel: playlistMenu.currentModel
 
-    Keys.onPressed: {
-        if (event.matches(StandardKey.MoveToPreviousChar)  //left
-            || event.matches(StandardKey.MoveToNextChar) //right
-            || event.matches(StandardKey.Back)
-            || event.matches(StandardKey.Cancel) //esc
-        ) {
-            _exitMenu();
-            event.accepted = true
-            return;
+    property int leftPadding: 0
+    property int rightPadding: 0
+
+    onActiveFocusChanged: {
+        if (!activeFocus) {
+            overlayMenu.close()
         }
     }
 
-    width: VLCStyle.icon_large
-    height: VLCStyle.icon_large * 5
-    property int _hiddentX: VLCStyle.icon_large
-
-    function _exitMenu() {
-        root.state = "hidden"
-        menuExit()
+    function close() {
+        overlayMenu.visible = false
+        view.forceActiveFocus()
     }
 
-    Item {
-        id: overlay
-        anchors.fill: parent
+    function open() {
+        playlistMenu.currentModel = "rootmenu"
+        playlistMenu.menuHierachy = []
+        overlayMenu.visible = true
+        overlayMenu.forceActiveFocus()
+    }
 
-        Column {
-            anchors.right: parent.right
-            spacing: VLCStyle.margin_xsmall
+    function pushMenu(menu) {
+        playlistMenu.menuHierachy.push(playlistMenu.currentModel)
+        playlistMenu.currentModel = menu
+    }
 
-            RoundButton {
-                id: playButton
+    property real drawerRatio: 0
+    Behavior on drawerRatio {
+        NumberAnimation {
+            duration: 150
+        }
+    }
+    onVisibleChanged: {
+        drawerRatio = visible ? 0.9 : 0
+    }
 
-                height: activeFocus ? VLCStyle.icon_normal * 1.3 : VLCStyle.icon_normal
-                width: activeFocus ? VLCStyle.icon_normal * 1.3 : VLCStyle.icon_normal
-                x: root._hiddentX
+    Rectangle {
+        color: "black"
+        anchors {
+            left: parent.left
+            top: parent.top
+            bottom: parent.bottom
+        }
+        width: parent.width * (1 - drawerRatio)
+        opacity: 0.4
+    }
 
-                KeyNavigation.down: clearButton
-                contentItem: Label {
-                    text: VLCIcons.play
-                    font.family: VLCIcons.fontFamily
-                    font.pixelSize: VLCStyle.icon_normal
-                    color: "black"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+
+    Rectangle {
+        color: "black"
+        anchors {
+            right: parent.right
+            top: parent.top
+            bottom: parent.bottom
+        }
+        width: parent.width * drawerRatio
+        opacity: 0.9
+
+
+        //avoid mouse event to be propagated to the widget below
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+        }
+
+
+        Utils.KeyNavigableListView {
+            id: playlistMenu
+            anchors.fill: parent
+            focus: true
+
+            property var models: {
+                "rootmenu" : {
+                    "title" : "",
+                    "entries" : []
                 }
+            }
+            property string currentModel: "rootmenu"
+            property var menuHierachy: []
+
+            model: models[currentModel]["entries"]
+            modelCount: models[currentModel]["entries"].length
+
+            header: Label {
+                text: models[currentModel]["title"]
+                color: "white"
+                font.pixelSize: VLCStyle.fontSize_xlarge
+                font.bold: true
+
+                leftPadding: VLCStyle.margin_small
+                rightPadding: VLCStyle.margin_small
+                topPadding: VLCStyle.margin_xsmall
+                bottomPadding: VLCStyle.margin_xsmall
+                height: VLCStyle.fontHeight_xlarge + topPadding + bottomPadding
+            }
+
+            delegate: Button {
+                id: control
+                text: modelData.text
+                width: playlistMenu.width
+
+                leftPadding: VLCStyle.margin_small + root.leftPadding
+                rightPadding: VLCStyle.margin_small + root.rightPadding
+
+                icon.width: VLCStyle.fontHeight_normal
+                icon.height: VLCStyle.fontHeight_normal
+
+                contentItem: Label {
+                    text: control.text
+                    color: "white"
+                    font.pixelSize: VLCStyle.fontSize_normal
+                    leftPadding: VLCStyle.icon_small
+
+                }
+
+                background: Rectangle {
+                    implicitWidth: 100
+                    implicitHeight: VLCStyle.fontHeight_normal
+                    color: control.activeFocus ? "orange" : "transparent"
+
+                    ColorImage {
+                        width: control.icon.width
+                        height: control.icon.height
+
+                        x: control.mirrored ? control.width - width - control.rightPadding : control.leftPadding
+                        y: control.topPadding + (control.availableHeight - height) / 2
+
+                        source: control.checked ? "qrc:/qt-project.org/imports/QtQuick/Controls.2/images/check.png"
+                            : modelData.icon.source ? modelData.icon.source
+                            : ""
+                        visible: true
+                        color: control.enabled ? VLCStyle.colors.playerFg : VLCStyle.colors.playerFgInactive
+                    }
+
+                    ColorImage {
+                        x: control.mirrored ? control.leftPadding : control.width - width - control.rightPadding
+                        y: control.topPadding + (control.availableHeight - height) / 2
+
+                        width: VLCStyle.icon_xsmall
+                        height: VLCStyle.icon_xsmall
+
+                        visible: !!modelData["subMenu"]
+                        mirror: control.mirrored
+                        color: control.enabled ? VLCStyle.colors.playerFg : VLCStyle.colors.playerFgInactive
+                        source: "qrc:/qt-project.org/imports/QtQuick/Controls.2/images/arrow-indicator.png"
+                    }
+                }
+
                 onClicked: {
-                    play()
-                    _exitMenu()
-                }
-                focus: true
-                background: Rectangle {
-                    radius: parent.radius
-                    implicitHeight: parent.width
-                    implicitWidth: parent.height
-                    color: "palegreen"
-                }
-            }
-            RoundButton {
-                id: clearButton
 
-                height: activeFocus ? VLCStyle.icon_normal * 1.3 : VLCStyle.icon_normal
-                width: activeFocus ? VLCStyle.icon_normal * 1.3 : VLCStyle.icon_normal
-                x: root._hiddentX
-
-                KeyNavigation.down: selectButton
-                contentItem: Label {
-                    text: VLCIcons.clear
-                    font.family: VLCIcons.fontFamily
-                    font.pixelSize: VLCStyle.icon_normal
-                    color: "black"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                onClicked: {
-                    clear()
-                    _exitMenu()
-                }
-                background: Rectangle {
-                    radius: parent.radius
-                    implicitHeight: parent.width
-                    implicitWidth: parent.height
-                    color: "pink"
-                }
-            }
-            RoundButton {
-                id: selectButton
-
-                height: activeFocus ? VLCStyle.icon_normal * 1.3 : VLCStyle.icon_normal
-                width: activeFocus ? VLCStyle.icon_normal * 1.3 : VLCStyle.icon_normal
-                x: root._hiddentX
-
-                KeyNavigation.down: moveButton
-                contentItem: Label {
-                    text: VLCIcons.playlist
-                    font.family: VLCIcons.fontFamily
-                    font.pixelSize: VLCStyle.icon_normal
-                    color: "black"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+                    if (!!modelData["subMenu"]) {
+                        pushMenu(modelData["subMenu"])
+                    } else {
+                        modelData.trigger()
+                        overlayMenu.close()
+                    }
                 }
 
-                checkable: true
-                checked: false
-                onClicked:  root.state = checked ? "select" : "normal"
-                onCheckedChanged: selectionMode(checked)
-                background: Rectangle {
-                    radius: parent.radius
-                    implicitHeight: parent.width
-                    implicitWidth: parent.height
-                    color: "lightblue"
-                }
-            }
-            RoundButton {
-                id: moveButton
-
-                height: activeFocus ? VLCStyle.icon_normal * 1.3 : VLCStyle.icon_normal
-                width: activeFocus ? VLCStyle.icon_normal * 1.3 : VLCStyle.icon_normal
-                x: root._hiddentX
-
-                KeyNavigation.down: backButton
-
-                contentItem: Label {
-                    text: VLCIcons.space
-                    font.family: VLCIcons.fontFamily
-                    font.pixelSize: VLCStyle.icon_normal
-                    color: "black"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+                Keys.onPressed:  {
+                    if (KeyHelper.matchRight(event)) {
+                        if (!!modelData["subMenu"]) {
+                            pushMenu(modelData["subMenu"])
+                            event.accepted = true
+                        }
+                    } else if (KeyHelper.matchLeft(event)) {
+                        if (playlistMenu.menuHierachy.length > 0) {
+                            playlistMenu.currentModel = playlistMenu.menuHierachy.pop()
+                            event.accepted = true
+                        } else {
+                            overlayMenu.close()
+                        }
+                    }
                 }
 
-                checkable: true
-                checked: false
-                onClicked:  root.state = checked ? "move" : "normal"
-                onCheckedChanged: moveMode(checked)
-                background: Rectangle {
-                    radius: parent.radius
-                    implicitHeight: parent.width
-                    implicitWidth: parent.height
-                    color: "lightyellow"
-                }
-            }
-            RoundButton {
-                id: backButton
-                height: activeFocus ? VLCStyle.icon_normal * 1.3 : VLCStyle.icon_normal
-                width: activeFocus ? VLCStyle.icon_normal * 1.3 : VLCStyle.icon_normal
-                x: root._hiddentX
-
-                contentItem: Label {
-                    text: VLCIcons.exit
-                    font.family: VLCIcons.fontFamily
-                    font.pixelSize: VLCStyle.icon_normal
-                    color: "black"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-
-                onClicked:  _exitMenu()
-
-                background: Rectangle {
-                    radius: parent.radius
-                    implicitHeight: parent.width
-                    implicitWidth: parent.height
-                    color: "lightgrey"
+                Keys.onReleased: {
+                    if (KeyHelper.matchCancel(event)) {
+                        event.accepted = true
+                        if (playlistMenu.menuHierachy.length > 0) {
+                            playlistMenu.currentModel = playlistMenu.menuHierachy.pop()
+                        } else {
+                            overlayMenu.close()
+                        }
+                    }
                 }
             }
         }
     }
-
-    state: "hidden"
-    states: [
-        State {
-            name: "hidden"
-            PropertyChanges { target: selectButton; checked: false }
-            PropertyChanges { target: moveButton; checked: false }
-        },
-        State {
-            name: "normal"
-            PropertyChanges { target: moveButton; checked: false }
-            PropertyChanges { target: selectButton; checked: false }
-        },
-        State {
-            name: "select"
-            PropertyChanges { target: selectButton; checked: true }
-            PropertyChanges { target: moveButton; checked: false }
-        },
-        State {
-            name: "move"
-            PropertyChanges { target: selectButton; checked: false }
-            PropertyChanges { target: moveButton; checked: true }
-        }
-    ]
-
-    transitions: [
-        Transition {
-            from: "hidden"; to: "*"
-            ParallelAnimation {
-                SequentialAnimation {
-                    NumberAnimation { target: playButton; properties: "x"; duration: 200; from: _hiddentX; to: 0 }
-                }
-                SequentialAnimation {
-                    PauseAnimation { duration: 25 }
-                    NumberAnimation { target: clearButton; properties: "x"; duration: 200; from: _hiddentX; to: 0 }
-                }
-                SequentialAnimation {
-                    PauseAnimation { duration: 75 }
-                    NumberAnimation { target: selectButton; properties: "x"; duration: 200; from: _hiddentX; to: 0 }
-                }
-                SequentialAnimation {
-                    PauseAnimation { duration: 50 }
-                    NumberAnimation { target: moveButton; properties: "x"; duration: 200; from: _hiddentX; to: 0 }
-                }
-                SequentialAnimation {
-                    PauseAnimation { duration: 100 }
-                    NumberAnimation { target: backButton; properties: "x"; duration: 200; from: _hiddentX; to: 0 }
-                }
-            }
-        },
-        Transition {
-            from: "*"; to: "hidden"
-            ParallelAnimation {
-                SequentialAnimation {
-                    PauseAnimation { duration: 100 }
-                    NumberAnimation { target: playButton; properties: "x"; duration: 200; from: 0; to: _hiddentX }
-                }
-                SequentialAnimation {
-                    PauseAnimation { duration: 75 }
-                    NumberAnimation { target: clearButton; properties: "x"; duration: 200; from: 0; to: _hiddentX }
-                }
-                SequentialAnimation {
-                    PauseAnimation { duration: 50 }
-                    NumberAnimation { target: selectButton; properties: "x"; duration: 200; from: 0; to: _hiddentX }
-                }
-                SequentialAnimation {
-                    PauseAnimation { duration: 25 }
-                    NumberAnimation { target: moveButton; properties: "x"; duration: 200; from: 0; to: _hiddentX }
-                }
-                SequentialAnimation {
-                    NumberAnimation { target: backButton; properties: "x"; duration: 200; from: 0; to: _hiddentX }
-                }
-            }
-        }
-    ]
 }

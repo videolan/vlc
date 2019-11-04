@@ -22,6 +22,7 @@ import QtQml.Models 2.2
 import org.videolan.vlc 0.1
 
 import "qrc:///utils/" as Utils
+import "qrc:///utils/KeyHelper.js" as KeyHelper
 import "qrc:///style/"
 
 Utils.NavigableFocusScope {
@@ -39,28 +40,75 @@ Utils.NavigableFocusScope {
         id: dragItem
     }
 
-
-    /* popup side menu allowing to perform group action  */
     PlaylistMenu {
-        id: overlay
-
-        anchors.verticalCenter: root.verticalCenter
-        anchors.right: view.right
+        id: overlayMenu
+        anchors.fill: parent
         z: 2
 
-        onMenuExit:{
-            view.mode = "normal"
-            view.focus = true
-        }
-        onClear: view.onDelete()
-        onPlay: view.onPlay()
-        onSelectionMode:  {
-            view.mode = selectionMode ? "select" : "normal"
-            view.focus = true
-        }
-        onMoveMode: {
-            view.mode = moveMode ? "move" : "normal"
-            view.focus = true
+        navigationParent: root
+        navigationLeftItem: view
+
+        leftPadding: root.leftPadding
+        rightPadding: root.rightPadding
+
+        //rootmenu
+        Action { id:playAction;         text: qsTr("Play");             onTriggered: view.onPlay(); icon.source: "qrc:///toolbar/play_b.svg" }
+        Action { id:deleteAction;       text: qsTr("Delete");           onTriggered: view.onDelete() }
+        Action { id:clearAllAction;     text: qsTr("Clear Playlist");   onTriggered: mainPlaylistController.clear() }
+        Action { id:selectAllAction;    text: qsTr("Select All");       onTriggered: root.plmodel.selectAll() }
+        Action { id:shuffleAction;      text: qsTr("Suffle playlist");  onTriggered: mainPlaylistController.shuffle(); icon.source: "qrc:///buttons/playlist/shuffle_on.svg" }
+        Action { id:sortAction;         text: qsTr("Sort");             property string subMenu: "sortmenu"}
+        Action { id:selectTracksAction; text: qsTr("Select Tracks");    onTriggered: view.mode = "select" }
+        Action { id:moveTracksAction;   text: qsTr("Move Selection");   onTriggered: view.mode = "move" }
+
+        //sortmenu
+        Action { id: sortTitleAction;   text: qsTr("Tile");
+            onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_TITLE, PlaylistControllerModel.SORT_ORDER_ASC)}
+        Action { id: sortDurationAction;text: qsTr("Duration");
+            onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_DURATION, PlaylistControllerModel.SORT_ORDER_ASC)}
+        Action { id: sortArtistAction;  text: qsTr("Artist");
+            onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_ARTIST, PlaylistControllerModel.SORT_ORDER_ASC)}
+        Action { id: sortAlbumAction;   text: qsTr("Album");
+            onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_ALBUM, PlaylistControllerModel.SORT_ORDER_ASC)}
+        Action { id: sortGenreAction;   text: qsTr("Genre");
+            onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_GENRE, PlaylistControllerModel.SORT_ORDER_ASC)}
+        Action { id: sortDateAction;    text: qsTr("Date");
+            onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_DATE, PlaylistControllerModel.SORT_ORDER_ASC)}
+        Action { id: sortTrackAction;   text: qsTr("Track number");
+            onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_TRACK_NUMBER, PlaylistControllerModel.SORT_ORDER_ASC)}
+        Action { id: sortURLAction;     text: qsTr("URL");
+            onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_URL, PlaylistControllerModel.SORT_ORDER_ASC)}
+        Action { id: sortRatingAction;  text: qsTr("Rating");
+            onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_RATIN, PlaylistControllerModel.SORT_ORDER_ASC)}
+
+        models: {
+            "rootmenu" : {
+                title: qsTr("Playlist"),
+                entries: [
+                    playAction,
+                    deleteAction,
+                    clearAllAction,
+                    selectAllAction,
+                    shuffleAction,
+                    sortAction,
+                    selectTracksAction,
+                    moveTracksAction
+                ]
+            },
+            "sortmenu" :{
+                title: qsTr("Sort Playlist"),
+                entries:  [
+                    sortTitleAction,
+                    sortDurationAction,
+                    sortArtistAction,
+                    sortAlbumAction,
+                    sortGenreAction,
+                    sortDateAction,
+                    sortTrackAction,
+                    sortURLAction,
+                    sortRatingAction,
+                ]
+            }
         }
     }
 
@@ -176,17 +224,16 @@ Utils.NavigableFocusScope {
         }
 
         Keys.onDeletePressed: onDelete()
+        Keys.onMenuPressed: overlayMenu.open()
 
         navigationParent: root
-        navigationRight: function() {
-            overlay.state = "normal"
-            overlay.focus = true
+        navigationRight: function(index) {
+            overlayMenu.open()
         }
         navigationLeft: function(index) {
             if (mode === "normal") {
                 root.navigationLeft(index)
             } else {
-                overlay.state = "hidden"
                 mode = "normal"
             }
         }
@@ -194,7 +241,6 @@ Utils.NavigableFocusScope {
             if (mode === "normal") {
                 root.navigationCancel(index)
             } else {
-                overlay.state = "hidden"
                 mode = "normal"
             }
         }
@@ -264,14 +310,14 @@ Utils.NavigableFocusScope {
                 }
             }
         }
-    }
 
-    Label {
-        anchors.centerIn: parent
-        visible: plmodel.count === 0
-        font.pixelSize: VLCStyle.fontHeight_xxlarge
-        color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        text: qsTr("playlist is empty")
+        Label {
+            anchors.centerIn: parent
+            visible: plmodel.count === 0
+            font.pixelSize: VLCStyle.fontHeight_xxlarge
+            color: view.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
+            text: qsTr("playlist is empty")
+        }
     }
 
     Keys.priority: Keys.AfterItem
