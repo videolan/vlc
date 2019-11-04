@@ -94,10 +94,11 @@ static NSMutableDictionary * CreateQuery(vlc_keystore *p_keystore)
 
     [dictionary setObject:@"VLC-Password-Service" forKey:(__bridge id)kSecAttrService];
 
-    const char * psz_access_group = var_InheritString(p_keystore, "keychain-access-group");
+    char * psz_access_group = var_InheritString(p_keystore, "keychain-access-group");
     if (psz_access_group) {
         [dictionary setObject:[NSString stringWithUTF8String:psz_access_group] forKey:(__bridge id)kSecAttrAccessGroup];
     }
+    free(psz_access_group);
 
     id syncValue;
     int syncMode = var_InheritInteger(p_keystore, "keychain-synchronize");
