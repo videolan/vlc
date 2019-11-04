@@ -57,6 +57,13 @@ static subpicture_t *spu_new_buffer_decoder(decoder_t *dec,
     return subpicture_New (p_subpic);
 }
 
+static vlc_decoder_device * get_no_device( decoder_t *dec )
+{
+    (void) dec;
+    // no decoder device for this test
+    return NULL;
+}
+
 static void queue_video(decoder_t *dec, picture_t *pic)
 {
     (void) dec;
@@ -136,6 +143,7 @@ decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
     static const struct decoder_owner_callbacks dec_video_cbs =
     {
         .video = {
+            .get_device = get_no_device,
             .queue = queue_video,
             .queue_cc = queue_cc,
         },
