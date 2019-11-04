@@ -92,7 +92,14 @@ static NSMutableDictionary * CreateQuery(vlc_keystore *p_keystore)
     NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:3];
     [dictionary setObject:(__bridge id)kSecClassInternetPassword forKey:(__bridge id)kSecClass];
 
+    /* kSecAttrService is only valid for kSecClassGenericPassword but not for
+     * kSecClassInternetPassword. Nevertheless, it is used on macOS for the
+     * wrong password type. It has always worked for now, and changing it would
+     * need to handle a password migration. Using this attribute on iOS cause a
+     * errSecNoSuchAttr error. */
+#if !TARGET_OS_IPHONE
     [dictionary setObject:@"VLC-Password-Service" forKey:(__bridge id)kSecAttrService];
+#endif
 
     char * psz_access_group = var_InheritString(p_keystore, "keychain-access-group");
     if (psz_access_group) {
