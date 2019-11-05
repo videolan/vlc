@@ -813,7 +813,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         vlc_mutex_lock(&vout->p->filter.lock);
 
     es_format_t fmt_target;
-    es_format_InitFromVideo(&fmt_target, source ? source : &vout->p->filter.format);
+    es_format_InitFromVideo(&fmt_target, source ? source : &vout->p->filter.src_fmt);
 
     const es_format_t *p_fmt_current = &fmt_target;
 
@@ -865,8 +865,8 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         vout->p->filter.configuration = filters ? strdup(filters) : NULL;
     }
     if (source) {
-        video_format_Clean(&vout->p->filter.format);
-        video_format_Copy(&vout->p->filter.format, source);
+        video_format_Clean(&vout->p->filter.src_fmt);
+        video_format_Copy(&vout->p->filter.src_fmt, source);
     }
 
     if (!is_locked)
@@ -926,7 +926,7 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse,
                         msg_Dbg(vout, "picture might be displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
                     }
                 }
-                if (!VideoFormatIsCropArEqual(&decoded->format, &vout->p->filter.format))
+                if (!VideoFormatIsCropArEqual(&decoded->format, &vout->p->filter.src_fmt))
                     ThreadChangeFilters(vout, &decoded->format, NULL, NULL, true);
             }
         }
@@ -1517,7 +1517,7 @@ static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_c
     sys->private_pool = NULL;
 
     sys->filter.configuration = NULL;
-    video_format_Copy(&sys->filter.format, &sys->original);
+    video_format_Copy(&sys->filter.src_fmt, &sys->original);
 
     static const struct filter_video_callbacks static_cbs = {
         VoutVideoFilterStaticNewPicture,
@@ -1617,7 +1617,7 @@ error:
     }
     if (sys->filter.chain_static != NULL)
         filter_chain_Delete(sys->filter.chain_static);
-    video_format_Clean(&sys->filter.format);
+    video_format_Clean(&sys->filter.src_fmt);
     if (sys->decoder_fifo != NULL)
     {
         picture_fifo_Delete(sys->decoder_fifo);
@@ -1713,7 +1713,7 @@ static void vout_ReleaseDisplay(vout_thread_t *vout)
     ThreadDelAllFilterCallbacks(vout);
     filter_chain_Delete(sys->filter.chain_interactive);
     filter_chain_Delete(sys->filter.chain_static);
-    video_format_Clean(&sys->filter.format);
+    video_format_Clean(&sys->filter.src_fmt);
     free(sys->filter.configuration);
 
     if (sys->decoder_fifo != NULL)
