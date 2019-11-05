@@ -840,7 +840,10 @@ static void ThreadChangeFilters(vout_thread_t *vout,
             free(e->name);
             free(e);
         }
-        p_fmt_current = filter_chain_GetFmtOut(chain);
+        if (!filter_chain_IsEmpty(chain))
+        {
+            p_fmt_current = filter_chain_GetFmtOut(chain);
+        }
         vlc_array_clear(array);
     }
 
