@@ -41,7 +41,7 @@ variables:
         HOST_ARCH: x86_64
         TRIPLET: $HOST_ARCH-apple-darwin$VLC_FORCE_KERNELVERSION
 
-.variables-ios: &variables-ios
+.variables-ios-arm64: &variables-ios-arm64
         VLC_PATH: /Users/videolanci/sandbox/bin
         HOST_ARCH: aarch64
         TRIPLET: $HOST_ARCH-apple-iphoneos
@@ -171,19 +171,22 @@ macos:
 #
 # iOS
 #
-ios:
+.ios-common:
     extends: .base-template
     tags:
         - macos
     script: |
         mkdir build && cd build
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-            ../extras/package/apple/build.sh --sdk=iphoneos --arch=aarch64 \
+            ../extras/package/apple/build.sh --sdk=iphoneos --arch=$HOST_ARCH \
                 --with-prebuilt-contribs
         else
-            ../extras/package/apple/build.sh --sdk=iphoneos --arch=aarch64 --package-contribs
+            ../extras/package/apple/build.sh --sdk=iphoneos --arch=$HOST_ARCH --package-contribs
         fi
-    variables: *variables-ios
+
+ios-arm64:
+    extends: .ios-common
+    variables: *variables-ios-arm64
 
 #
 # Android
