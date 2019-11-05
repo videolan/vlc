@@ -27,7 +27,7 @@
 
 #include <assert.h>
 
-#if defined (HAVE_MNTENT_H) && defined(HAVE_SYS_STAT_H)
+#ifdef HAVE_GETMNTENT_R
 # include <mntent.h>
 #endif
 #include <fcntl.h>      /* O_* */
@@ -404,7 +404,7 @@ static void  notifyDiscontinuityToParser( demux_sys_t *p_sys );
 static void FindMountPoint(char **file)
 {
     char *device = *file;
-#if defined (HAVE_MNTENT_H) && defined (HAVE_SYS_STAT_H)
+#ifdef HAVE_GETMNTENT_R
     /* bd path may be a symlink (e.g. /dev/dvd -> /dev/sr0), so make sure
      * we look up the real device */
     char *bd_device = realpath(device, NULL);
