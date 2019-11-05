@@ -49,22 +49,7 @@ static void
 vlc_thread_fatal_print (const char *action, int error,
                         const char *function, const char *file, unsigned line)
 {
-    char buf[1000];
-    const char *msg;
-
-    switch (strerror_r (error, buf, sizeof (buf)))
-    {
-        case 0:
-            msg = buf;
-            break;
-        case ERANGE: /* should never happen */
-            msg = "unknown (too big to display)";
-            break;
-        default:
-            msg = "unknown (invalid error number)";
-            break;
-    }
-
+    const char *msg = vlc_strerror_c(error);
     fprintf(stderr, "LibVLC fatal error %s (%d) in thread %lu "
             "at %s:%u in %s\n Error message: %s\n",
             action, error, vlc_thread_id (), file, line, function, msg);
