@@ -109,6 +109,7 @@ filter_chain_AppendFromString
 filter_chain_Delete
 filter_chain_DeleteFilter
 filter_chain_GetFmtOut
+filter_chain_GetVideoCtxOut
 filter_chain_IsEmpty
 filter_chain_MouseFilter
 filter_chain_NewVideo

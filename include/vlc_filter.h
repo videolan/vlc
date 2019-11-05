@@ -458,6 +458,14 @@ VLC_API bool filter_chain_IsEmpty(const filter_chain_t *chain);
 VLC_API const es_format_t *filter_chain_GetFmtOut(const filter_chain_t *chain);
 
 /**
+ * Get last output video context of the last element in the filter chain.
+ * \note doesn't create change the reference count
+ *
+ * \param chain filter chain
+ */
+VLC_API vlc_video_context *filter_chain_GetVideoCtxOut(const filter_chain_t *chain);
+
+/**
  * Apply the filter chain to a video picture.
  *
  * \param chain pointer to filter chain

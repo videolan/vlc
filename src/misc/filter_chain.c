@@ -412,6 +412,16 @@ const es_format_t *filter_chain_GetFmtOut( const filter_chain_t *p_chain )
     return &p_chain->fmt_out;
 }
 
+vlc_video_context *filter_chain_GetVideoCtxOut(const filter_chain_t *p_chain)
+{
+    if( p_chain->last != NULL )
+        return p_chain->last->filter.vctx_out;
+
+    /* No filter was added, the filter chain has no effect, make sure the chromas are compatible */
+    assert(p_chain->fmt_in.video.i_chroma == p_chain->fmt_out.video.i_chroma);
+    return p_chain->vctx_in;
+}
+
 static picture_t *FilterChainVideoFilter( chained_filter_t *f, picture_t *p_pic )
 {
     for( ; f != NULL; f = f->next )
