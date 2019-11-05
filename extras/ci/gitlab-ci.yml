@@ -43,7 +43,7 @@ variables:
 
 .variables-ios-arm64: &variables-ios-arm64
         VLC_PATH: /Users/videolanci/sandbox/bin
-        HOST_ARCH: aarch64
+        HOST_ARCH: arm64
         TRIPLET: $HOST_ARCH-apple-iphoneos
         MAKEFLAGS: -j4
 
