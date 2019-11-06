@@ -43,6 +43,7 @@ $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
 	$(APPLY) $(SRC)/ass/ass-macosx.patch
+	$(APPLY) $(SRC)/ass/coretext-errorhandling.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/ass/use-topendir.patch
 	$(APPLY) $(SRC)/ass/libass-no-tchar.patch
