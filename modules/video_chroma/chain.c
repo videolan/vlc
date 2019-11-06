@@ -210,6 +210,7 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
         es_format_Copy( &p_filter->fmt_out,
                         filter_chain_GetFmtOut( p_sys->p_chain ) );
     }
+    assert(p_filter->vctx_out == filter_chain_GetVideoCtxOut( p_sys->p_chain ));
     /* */
     p_filter->pf_video_filter = Chain;
     return VLC_SUCCESS;
@@ -412,6 +413,7 @@ static int BuildFilterChain( filter_t *p_filter )
                     p_filter->pf_video_mouse = ChainMouse;
                 es_format_Clean( &fmt_mid );
                 i_ret = VLC_SUCCESS;
+                p_filter->vctx_out = filter_chain_GetVideoCtxOut( p_sys->p_chain );
                 break;
             }
         }
@@ -437,8 +439,11 @@ static int CreateChain( filter_t *p_filter, const es_format_t *p_fmt_mid )
         // Check if filter was enough:
         if( p_transform == NULL )
             return VLC_EGENERIC;
-        if( es_format_IsSimilar(&p_transform->fmt_out, &p_filter->fmt_out ))
-           return VLC_SUCCESS;
+        if( es_format_IsSimilar(&p_transform->fmt_out, &p_filter->fmt_out ) )
+        {
+            p_filter->vctx_out = p_transform->vctx_out;
+            return VLC_SUCCESS;
+        }
     }
     else
     {
@@ -457,6 +462,7 @@ static int CreateChain( filter_t *p_filter, const es_format_t *p_fmt_mid )
         if( filter_chain_AppendConverter( p_sys->p_chain, &p_filter->fmt_out ) )
             goto error;
     }
+    p_filter->vctx_out = filter_chain_GetVideoCtxOut( p_sys->p_chain );
     return VLC_SUCCESS;
 error:
     //Clean up.
@@ -492,6 +498,9 @@ static int CreateResizeChromaChain( filter_t *p_filter, const es_format_t *p_fmt
 
     if( i_ret != VLC_SUCCESS )
         filter_chain_Clear( p_sys->p_chain );
+    else
+        p_filter->vctx_out = filter_chain_GetVideoCtxOut( p_sys->p_chain );
+
     return i_ret;
 }
 
