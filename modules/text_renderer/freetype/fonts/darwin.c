@@ -46,7 +46,13 @@ void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path
 char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
 {
     CFURLRef url = CTFontDescriptorCopyAttribute(fontDescriptor, kCTFontURLAttribute);
+    if (url == NULL)
+        return NULL;
     CFStringRef path = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle);
+    if (path == NULL) {
+        CFRelease(url);
+        return NULL;
+    }
     char *retPath = FromCFString(path, kCFStringEncodingUTF8);
     CFRelease(path);
     CFRelease(url);
