@@ -241,11 +241,7 @@ vlc_family_t *CoreText_GetFallbacks(filter_t *p_filter, const char *psz_family, 
     psz_fontPath = getPathForFontDescription(fallbackFontDescriptor);
 
     /* check if the path is empty, which can happen in rare circumstances */
-    if (psz_fontPath != NULL) {
-        if (strcmp("", psz_fontPath) == 0) {
-            goto done;
-        }
-    } else {
+    if (psz_fontPath == NULL || *psz_fontPath == '\0') {
         goto done;
     }
 
