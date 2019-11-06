@@ -106,6 +106,7 @@ static int Create( vlc_object_t *p_this )
     switch( p_filter->fmt_in.video.i_chroma )
     {
         CASE_PLANAR_YUV
+            assert(p_filter->vctx_in == NULL);
             break;
 
         default:
