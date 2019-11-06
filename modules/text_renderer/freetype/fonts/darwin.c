@@ -84,7 +84,13 @@ static char* CFStringCopyCString(CFStringRef cfString, CFStringEncoding cfString
 char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
 {
     CFURLRef url = CTFontDescriptorCopyAttribute(fontDescriptor, kCTFontURLAttribute);
+    if (url == NULL)
+        return NULL;
     CFStringRef path = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle);
+    if (path == NULL) {
+        CFRelease(url);
+        return NULL;
+    }
     char *retPath = CFStringCopyCString(path, kCFStringEncodingUTF8);
     CFRelease(path);
     CFRelease(url);
