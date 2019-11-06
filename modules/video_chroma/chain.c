@@ -209,6 +209,7 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
         es_format_Clean( &p_filter->fmt_out );
         es_format_Copy( &p_filter->fmt_out,
                         filter_chain_GetFmtOut( p_sys->p_chain ) );
+        p_filter->vctx_out = filter_chain_GetVideoCtxOut( p_sys->p_chain );
     }
     assert(p_filter->vctx_out == filter_chain_GetVideoCtxOut( p_sys->p_chain ));
     /* */
