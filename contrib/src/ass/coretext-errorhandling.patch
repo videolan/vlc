@@ -1,0 +1,27 @@
+diff --git a/libass/ass_coretext.c b/libass/ass_coretext.c
+index 59a8a2d..7371f7c 100644
+--- a/libass/ass_coretext.c
++++ b/libass/ass_coretext.c
+@@ -96,7 +96,13 @@ static bool check_glyph(void *priv, uint32_t code)
+ static char *get_font_file(CTFontDescriptorRef fontd)
+ {
+     CFURLRef url = CTFontDescriptorCopyAttribute(fontd, kCTFontURLAttribute);
++    if (!url)
++        return NULL;
+     CFStringRef path = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle);
++    if (!path) {
++        SAFE_CFRelease(url);
++        return NULL;
++    }
+     char *buffer = cfstr2buf(path);
+     SAFE_CFRelease(path);
+     SAFE_CFRelease(url);
+@@ -133,7 +139,7 @@ static void process_descriptors(ASS_Library *lib, ASS_FontProvider *provider,
+         int index = -1;
+ 
+         char *path = get_font_file(fontd);
+-        if (strcmp("", path) == 0) {
++        if (!path || strcmp("", path) == 0) {
+             // skip the font if the URL field in the font descriptor is empty
+             free(path);
+             continue;
