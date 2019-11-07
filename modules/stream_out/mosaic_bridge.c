@@ -295,6 +295,29 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     p_sys->p_decoder->fmt_out.p_extra = 0;
     p_sys->p_decoder->pf_decode = NULL;
 
+    /* Create user specified video filters */
+    static const struct filter_video_callbacks cbs =
+    {
+        video_new_buffer_filter,
+    };
+
+    psz_chain = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
+    msg_Dbg( p_stream, "psz_chain: '%s'", psz_chain ? psz_chain : "");
+    if( psz_chain )
+    {
+        filter_owner_t owner = {
+            .video = &cbs,
+            .sys = p_owner,
+        };
+
+        p_sys->p_vf2 = filter_chain_NewVideo( p_stream, false, &owner );
+        free( psz_chain );
+    }
+    else
+    {
+        p_sys->p_vf2 = NULL;
+    }
+
     static const struct decoder_owner_callbacks dec_cbs =
     {
         .video = {
@@ -374,41 +397,6 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     }
 
     msg_Dbg( p_stream, "mosaic bridge id=%s pos=%d", p_es->psz_id, i );
-
-    /* Create user specified video filters */
-    static const struct filter_video_callbacks cbs =
-    {
-        video_new_buffer_filter,
-    };
-
-    psz_chain = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
-    msg_Dbg( p_stream, "psz_chain: '%s'", psz_chain ? psz_chain : "");
-    if( psz_chain )
-    {
-        filter_owner_t owner = {
-            .video = &cbs,
-            .sys = p_owner,
-        };
-
-        p_sys->p_vf2 = filter_chain_NewVideo( p_stream, false, &owner );
-        if (p_sys->p_vf2 != NULL)
-        {
-            es_format_t fmt;
-            // at this point the decoder may not have called video_update_format_decoder()
-            // so we don't know the actual decoder format yet
-            es_format_Copy( &fmt, &p_sys->p_decoder->fmt_out );
-            if( p_sys->i_chroma )
-                fmt.video.i_chroma = p_sys->i_chroma;
-            filter_chain_Reset( p_sys->p_vf2, &fmt, &fmt );
-            es_format_Clean( &fmt );
-            filter_chain_AppendFromString( p_sys->p_vf2, psz_chain );
-        }
-        free( psz_chain );
-    }
-    else
-    {
-        p_sys->p_vf2 = NULL;
-    }
 
     return p_sys;
 }
