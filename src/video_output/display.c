@@ -338,7 +338,7 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
         es_format_InitFromVideo(&dst, i == 0 ? &v_dst : &v_dst_cmp);
 
         filter_chain_Reset(osys->converters, &src, &dst);
-        ret = filter_chain_AppendConverter(osys->converters, NULL, &dst);
+        ret = filter_chain_AppendConverter(osys->converters, &dst);
         es_format_Clean(&dst);
         if (ret == 0)
             break;

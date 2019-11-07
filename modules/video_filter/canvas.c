@@ -335,7 +335,7 @@ static int Activate( vlc_object_t *p_this )
 
     filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, &fmt );
     /* Append scaling module */
-    if ( filter_chain_AppendConverter( p_sys->p_chain, NULL, NULL ) )
+    if ( filter_chain_AppendConverter( p_sys->p_chain, NULL ) )
     {
         msg_Err( p_filter, "Could not append scaling filter" );
         free( p_sys );

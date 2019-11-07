@@ -390,7 +390,7 @@ static int BuildFilterChain( filter_t *p_filter )
         video_format_FixRgb(&fmt_mid.video);
 
         if( filter_chain_AppendConverter( p_sys->p_chain,
-                                          NULL, &fmt_mid ) == VLC_SUCCESS )
+                                          &fmt_mid ) == VLC_SUCCESS )
         {
             p_sys->p_video_filter =
                 filter_chain_AppendFilter( p_sys->p_chain,
@@ -435,8 +435,7 @@ static int CreateChain( filter_t *p_filter, const es_format_t *p_fmt_mid )
     }
     else
     {
-        if( filter_chain_AppendConverter( p_sys->p_chain,
-                                          NULL, p_fmt_mid ) )
+        if( filter_chain_AppendConverter( p_sys->p_chain, p_fmt_mid ) )
             return VLC_EGENERIC;
     }
 
@@ -448,8 +447,7 @@ static int CreateChain( filter_t *p_filter, const es_format_t *p_fmt_mid )
     }
     else
     {
-        if( filter_chain_AppendConverter( p_sys->p_chain,
-                                          NULL, &p_filter->fmt_out ) )
+        if( filter_chain_AppendConverter( p_sys->p_chain, &p_filter->fmt_out ) )
             goto error;
     }
     return VLC_SUCCESS;
@@ -464,8 +462,7 @@ static int CreateResizeChromaChain( filter_t *p_filter, const es_format_t *p_fmt
     filter_sys_t *p_sys = p_filter->p_sys;
     filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, &p_filter->fmt_out );
 
-    int i_ret = filter_chain_AppendConverter( p_sys->p_chain,
-                                              NULL, p_fmt_mid );
+    int i_ret = filter_chain_AppendConverter( p_sys->p_chain, p_fmt_mid );
     if( i_ret != VLC_SUCCESS )
         return i_ret;
 
@@ -480,13 +477,11 @@ static int CreateResizeChromaChain( filter_t *p_filter, const es_format_t *p_fmt
                         filter_chain_GetFmtOut( p_sys->p_chain ) );
         fmt_out.video.i_chroma = p_filter->fmt_out.video.i_chroma;
 
-        i_ret = filter_chain_AppendConverter( p_sys->p_chain,
-                                              NULL, &fmt_out );
+        i_ret = filter_chain_AppendConverter( p_sys->p_chain, &fmt_out );
         es_format_Clean( &fmt_out );
     }
     else
-        i_ret = filter_chain_AppendConverter( p_sys->p_chain,
-                                              NULL, &p_filter->fmt_out );
+        i_ret = filter_chain_AppendConverter( p_sys->p_chain, &p_filter->fmt_out );
 
     if( i_ret != VLC_SUCCESS )
         filter_chain_Clear( p_sys->p_chain );

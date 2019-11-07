@@ -517,7 +517,7 @@ filter_chain_t * VideoDecodedStream::VideoFilterCreate(const es_format_t *p_srcf
 
     if(p_srcfmt->video.i_chroma != requestedoutput.video.i_chroma)
     {
-        if(filter_chain_AppendConverter(p_chain, NULL, &requestedoutput) != VLC_SUCCESS)
+        if(filter_chain_AppendConverter(p_chain, &requestedoutput) != VLC_SUCCESS)
         {
             filter_chain_Delete(p_chain);
             return NULL;
