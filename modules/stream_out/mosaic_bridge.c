@@ -571,7 +571,10 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
             es_format_t fmt;
             es_format_InitFromVideo( &fmt, &p_dec->fmt_out.video );
             if( p_sys->i_chroma )
+            {
                 fmt.video.i_chroma = p_sys->i_chroma;
+                vctx = NULL; // CPU chroma, no video context
+            }
             filter_chain_Reset( p_sys->p_vf2, &fmt, &fmt );
             es_format_Clean( &fmt );
             filter_chain_AppendFromString( p_sys->p_vf2, psz_chain );
