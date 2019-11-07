@@ -850,7 +850,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
     if (!es_format_IsSimilar(p_fmt_current, &fmt_target)) {
         msg_Dbg(vout, "Adding a filter to compensate for format changes");
         if (filter_chain_AppendConverter(vout->p->filter.chain_interactive,
-                                         p_fmt_current, &fmt_target) != 0) {
+                                         NULL, &fmt_target) != 0) {
             msg_Err(vout, "Failed to compensate for the format changes, removing all filters");
             ThreadDelAllFilterCallbacks(vout);
             filter_chain_Reset(vout->p->filter.chain_static,      &fmt_target, &fmt_target);
@@ -979,7 +979,7 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_t *vout, picture_t *pic,
 
     filter_chain_Reset(filterc, &src, &dst);
 
-    if (filter_chain_AppendConverter(filterc, &src, &dst) != 0)
+    if (filter_chain_AppendConverter(filterc, NULL, &dst) != 0)
     {
         filter_chain_Delete(filterc);
         return NULL;

@@ -101,7 +101,7 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
     test_chain = filter_chain_NewVideo( p_obj, false, NULL );
     filter_chain_Reset( test_chain, &p_dec->fmt_out, &p_dec->fmt_out );
 
-    int chain_works = filter_chain_AppendConverter( test_chain, &p_dec->fmt_out, p_enc_in );
+    int chain_works = filter_chain_AppendConverter( test_chain, NULL, p_enc_in );
     filter_chain_Delete( test_chain );
 
     msg_Dbg( p_obj, "Filter chain testing done, input chroma %4.4s seems to be %s for transcode",
@@ -289,7 +289,7 @@ static int transcode_video_set_conversions( sout_stream_t *p_stream,
             return VLC_EGENERIC;
         filter_chain_Reset( *pp_chain, *pp_src, p_tmpdst );
 
-        if( filter_chain_AppendConverter( *pp_chain, *pp_src, p_tmpdst ) != VLC_SUCCESS )
+        if( filter_chain_AppendConverter( *pp_chain, NULL, p_tmpdst ) != VLC_SUCCESS )
             return VLC_EGENERIC;
 
         *pp_src = filter_chain_GetFmtOut( *pp_chain );
