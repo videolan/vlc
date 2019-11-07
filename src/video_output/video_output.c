@@ -977,6 +977,8 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_t *vout, picture_t *pic,
     dst.video.i_chroma = VLC_CODEC_RGB32;
     video_format_FixRgb(&dst.video);
 
+    filter_chain_Reset(filterc, &src, &dst);
+
     if (filter_chain_AppendConverter(filterc, &src, &dst) != 0)
     {
         filter_chain_Delete(filterc);
