@@ -1148,7 +1148,7 @@ vlc_player_Start(vlc_player_t *player)
     return ret;
 }
 
-void
+int
 vlc_player_Stop(vlc_player_t *player)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
@@ -1158,12 +1158,12 @@ vlc_player_Stop(vlc_player_t *player)
     vlc_player_InvalidateNextMedia(player);
 
     if (!input || !player->started)
-        return;
+        return VLC_EGENERIC;
     player->started = false;
 
     vlc_player_destructor_AddInput(player, input);
     player->input = NULL;
-
+    return VLC_SUCCESS;
 }
 
 void

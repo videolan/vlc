@@ -443,12 +443,14 @@ vlc_player_Start(vlc_player_t *player);
 /**
  * Stop the playback of the current media
  *
- * @note This function is asynchronous. Users should wait on
- * STOPPED state event to know when the stop is finished.
+ * @note This function is asynchronous. In case of success, the user should wait
+ * for the STOPPED state event to know when the stop is finished.
  *
  * @param player locked player instance
+ * @return VLC_SUCCESS if the player is being stopped, VLC_EGENERIC otherwise
+ * (no-op)
  */
-VLC_API void
+VLC_API int
 vlc_player_Stop(vlc_player_t *player);
 
 /**
