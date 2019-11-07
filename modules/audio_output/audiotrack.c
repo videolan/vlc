@@ -1804,7 +1804,7 @@ AudioTrack_Thread( void *p_data )
             /* Don't wake up the thread when there is new data since we are
              * waiting for more space */
             p_sys->b_thread_waiting = true;
-            while( p_sys->b_thread_running && i_ret != ETIMEDOUT )
+            while( p_sys->b_thread_running && i_ret == 0 )
                 i_ret = vlc_cond_timedwait( &p_sys->thread_cond,
                                             &p_sys->lock,
                                             i_play_deadline );
