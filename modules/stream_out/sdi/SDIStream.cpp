@@ -522,13 +522,13 @@ filter_chain_t * VideoDecodedStream::VideoFilterCreate(const es_format_t *p_srcf
             filter_chain_Delete(p_chain);
             return NULL;
         }
-    }
 
-    const es_format_t *p_fmt_out = filter_chain_GetFmtOut(p_chain);
-    if(!es_format_IsSimilar(&requestedoutput, p_fmt_out))
-    {
-        filter_chain_Delete(p_chain);
-        return NULL;
+        const es_format_t *p_fmt_out = filter_chain_GetFmtOut(p_chain);
+        if(!es_format_IsSimilar(&requestedoutput, p_fmt_out))
+        {
+            filter_chain_Delete(p_chain);
+            return NULL;
+        }
     }
 
     return p_chain;
