@@ -186,7 +186,7 @@ void filter_chain_Reset( filter_chain_t *p_chain, const es_format_t *p_fmt_in,
 
 static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     const char *name, const char *capability, config_chain_t *cfg,
-    const es_format_t *fmt_in, const es_format_t *fmt_out )
+    const es_format_t *fmt_out )
 {
     chained_filter_t *chained =
         vlc_custom_create( chain->obj, sizeof(*chained), "filter" );
@@ -195,13 +195,11 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
 
     filter_t *filter = &chained->filter;
 
-    if( fmt_in == NULL )
-    {
+    const es_format_t *fmt_in;
         if( chain->last != NULL )
             fmt_in = &chain->last->filter.fmt_out;
         else
             fmt_in = &chain->fmt_in;
-    }
 
     if( fmt_out == NULL )
         fmt_out = &chain->fmt_out;
@@ -274,14 +272,14 @@ filter_t *filter_chain_AppendFilter( filter_chain_t *chain,
     const es_format_t *fmt_out )
 {
     return filter_chain_AppendInner( chain, name, chain->filter_cap, cfg,
-                                     NULL, fmt_out );
+                                     fmt_out );
 }
 
 int filter_chain_AppendConverter( filter_chain_t *chain,
     const es_format_t *fmt_out )
 {
     return filter_chain_AppendInner( chain, NULL, chain->conv_cap, NULL,
-                                     NULL, fmt_out ) != NULL ? 0 : -1;
+                                     fmt_out ) != NULL ? 0 : -1;
 }
 
 void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
