@@ -271,10 +271,10 @@ error:
 
 filter_t *filter_chain_AppendFilter( filter_chain_t *chain,
     const char *name, config_chain_t *cfg,
-    const es_format_t *fmt_in, const es_format_t *fmt_out )
+    const es_format_t *fmt_out )
 {
     return filter_chain_AppendInner( chain, name, chain->filter_cap, cfg,
-                                     fmt_in, fmt_out );
+                                     NULL, fmt_out );
 }
 
 int filter_chain_AppendConverter( filter_chain_t *chain,
@@ -335,8 +335,7 @@ int filter_chain_AppendFromString( filter_chain_t *chain, const char *str )
         free( buf );
         buf = next;
 
-        filter_t *filter = filter_chain_AppendFilter( chain, name, cfg,
-                                                      NULL, NULL );
+        filter_t *filter = filter_chain_AppendFilter( chain, name, cfg, NULL );
         if( cfg )
             config_ChainDestroy( cfg );
 

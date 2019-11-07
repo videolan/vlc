@@ -395,7 +395,7 @@ static int BuildFilterChain( filter_t *p_filter )
             p_sys->p_video_filter =
                 filter_chain_AppendFilter( p_sys->p_chain,
                                            p_filter->psz_name, p_filter->p_cfg,
-                                           NULL, &fmt_mid );
+                                           &fmt_mid );
             if( p_sys->p_video_filter )
             {
                 filter_AddProxyCallbacks( p_filter,
@@ -532,7 +532,7 @@ static filter_t * AppendTransform( filter_chain_t *p_chain, const es_format_t *p
     snprintf( config, 100, "transform{type=%s}", type );
     char *next = config_ChainCreate( &name, &cfg, config );
 
-    filter_t *p_filter = filter_chain_AppendFilter( p_chain, name, cfg, NULL, p_fmt2 );
+    filter_t *p_filter = filter_chain_AppendFilter( p_chain, name, cfg, p_fmt2 );
 
     config_ChainDestroy(cfg);
     free(name);

@@ -369,12 +369,11 @@ VLC_API void filter_chain_Clear(filter_chain_t *);
  *
  * \param chain filter chain to append a filter to
  * \param name filter name
- * \param fmt_in filter input format
  * \param fmt_out filter output format
  * \return a pointer to the filter or NULL on error
  */
 VLC_API filter_t *filter_chain_AppendFilter(filter_chain_t *chain,
-    const char *name, config_chain_t *cfg, const es_format_t *fmt_in,
+    const char *name, config_chain_t *cfg,
     const es_format_t *fmt_out);
 
 /**

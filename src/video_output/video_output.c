@@ -828,7 +828,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
             vout_filter_t *e = vlc_array_item_at_index(array, i);
             msg_Dbg(vout, "Adding '%s' as %s", e->name, a == 0 ? "static" : "interactive");
             filter_t *filter = filter_chain_AppendFilter(chain, e->name, e->cfg,
-                               NULL, NULL);
+                               NULL);
             if (!filter)
             {
                 msg_Err(vout, "Failed to add filter '%s'", e->name);
