@@ -327,13 +327,13 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
         filter_chain_AppendFilter( id->p_f_chain,
                                    p_cfg->video.psz_deinterlace,
                                    p_cfg->video.p_deinterlace_cfg,
-                                   p_src, p_src );
+                                   NULL, p_src );
         p_src = filter_chain_GetFmtOut( id->p_f_chain );
     }
 
     if( b_master_sync )
     {
-        filter_chain_AppendFilter( id->p_f_chain, "fps", NULL, p_src, p_dst );
+        filter_chain_AppendFilter( id->p_f_chain, "fps", NULL, NULL, p_dst );
         p_src = filter_chain_GetFmtOut( id->p_f_chain );
     }
 
