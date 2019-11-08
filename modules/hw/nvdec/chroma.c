@@ -104,6 +104,9 @@ static int OpenCUDAToCPU( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
+    if ( p_filter->vctx_in == NULL ||
+         vlc_video_context_GetType(p_filter->vctx_in) != VLC_VIDEO_CONTEXT_NVDEC )
+        return VLC_EGENERIC;
     if ( !( ( p_filter->fmt_in.video.i_chroma  == VLC_CODEC_NVDEC_OPAQUE &&
               p_filter->fmt_out.video.i_chroma == VLC_CODEC_NV12 ) ||
             ( p_filter->fmt_in.video.i_chroma  == VLC_CODEC_NVDEC_OPAQUE_10B &&
