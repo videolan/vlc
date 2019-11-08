@@ -129,6 +129,9 @@ static int Open(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
 
+    if ( filter->vctx_in == NULL ||
+         vlc_video_context_GetType(filter->vctx_in) != VLC_VIDEO_CONTEXT_VDPAU )
+        return VLC_EGENERIC;
     if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
      && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
      && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)

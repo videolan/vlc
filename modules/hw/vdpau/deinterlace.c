@@ -100,6 +100,9 @@ static int Open(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
 
+    if ( filter->vctx_in == NULL ||
+         vlc_video_context_GetType(filter->vctx_in) != VLC_VIDEO_CONTEXT_VDPAU )
+        return VLC_EGENERIC;
     if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
      && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
      && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
@@ -119,6 +122,7 @@ static int Open(vlc_object_t *obj)
     filter->pf_video_filter = Deinterlace;
     filter->p_sys = sys;
     filter->fmt_out.video.i_frame_rate *= 2;
+    filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);
     return VLC_SUCCESS;
 }
 
@@ -127,6 +131,7 @@ static void Close(vlc_object_t *obj)
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = filter->p_sys;
 
+    vlc_video_context_Release(filter->vctx_out);
     free(sys);
 }
 
