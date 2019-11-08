@@ -411,7 +411,7 @@ struct pic_sys_vaapi_instance
 {
     atomic_int pic_refcount;
     VADisplay va_dpy;
-    vlc_decoder_device *dec_device;
+    vlc_video_context *vctx;
     unsigned num_render_targets;
     VASurfaceID render_targets[];
 };
@@ -432,7 +432,6 @@ pool_pic_destroy_cb(picture_t *pic)
     {
         vaDestroySurfaces(instance->va_dpy, instance->render_targets,
                           instance->num_render_targets);
-        vlc_decoder_device_Release(instance->dec_device);
         free(instance);
     }
     free(pic->p_sys);
@@ -467,7 +466,7 @@ pic_sys_ctx_destroy_cb(struct picture_context_t *opaque)
 }
 
 picture_pool_t *
-vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
+vlc_vaapi_PoolNew(vlc_object_t *o, vlc_video_context *vctx,
                   VADisplay dpy, unsigned count, VASurfaceID **render_targets,
                   const video_format_t *restrict fmt)
 {
@@ -533,7 +532,7 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
 
     atomic_store(&instance->pic_refcount, count);
     instance->va_dpy = dpy;
-    instance->dec_device = vlc_decoder_device_Hold(dec_device);
+    instance->vctx = vctx;
 
     *render_targets = instance->render_targets;
     return pool;
@@ -556,7 +555,7 @@ vlc_vaapi_PicSysHoldInstance(void *_sys, VADisplay *dpy)
     picture_sys_t *sys = (picture_sys_t *)_sys;
     assert(sys->instance != NULL);
     *dpy = sys->instance->va_dpy;
-    return vlc_decoder_device_Hold(sys->instance->dec_device);
+    return vlc_video_context_HoldDevice(sys->instance->vctx);
 }
 
 #define ASSERT_VAAPI_CHROMA(pic) do { \

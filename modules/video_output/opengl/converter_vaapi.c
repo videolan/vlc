@@ -233,11 +233,9 @@ tc_vaegl_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
     vlc_object_t *o = VLC_OBJECT(tc->gl);
     struct priv *priv = tc->priv;
 
-    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(tc->vctx);
     picture_pool_t *pool =
-        vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), dec_device, priv->vadpy,
+        vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), tc->vctx, priv->vadpy,
                           requested_count, &priv->va_surface_ids, &tc->fmt);
-    vlc_decoder_device_Release(dec_device);
     if (!pool)
         return NULL;
 
@@ -336,14 +334,13 @@ tc_va_check_interop_blacklist(opengl_tex_converter_t *tc, VADisplay *vadpy)
 }
 
 static int
-tc_va_check_derive_image(opengl_tex_converter_t *tc,
-                         vlc_decoder_device *dec_device)
+tc_va_check_derive_image(opengl_tex_converter_t *tc)
 {
     vlc_object_t *o = VLC_OBJECT(tc->gl);
     struct priv *priv = tc->priv;
     VASurfaceID *va_surface_ids;
 
-    picture_pool_t *pool = vlc_vaapi_PoolNew(o, dec_device, priv->vadpy, 1,
+    picture_pool_t *pool = vlc_vaapi_PoolNew(o, tc->vctx, priv->vadpy, 1,
                                              &va_surface_ids, &tc->fmt);
     if (!pool)
         return VLC_EGENERIC;
@@ -423,7 +420,7 @@ Open(vlc_object_t *obj)
     if (tc_va_check_interop_blacklist(tc, priv->vadpy))
         goto error;
 
-    if (tc_va_check_derive_image(tc, dec_device))
+    if (tc_va_check_derive_image(tc))
         goto error;
 
     tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, vlc_sw_chroma,

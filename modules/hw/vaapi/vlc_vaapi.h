@@ -169,7 +169,7 @@ vlc_vaapi_CreateConfigChecked(vlc_object_t *o, VADisplay dpy,
 /* Create a pool backed by VASurfaceID. render_targets will destroyed once
  * the pool and every pictures are released. */
 picture_pool_t *
-vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
+vlc_vaapi_PoolNew(vlc_object_t *o, vlc_video_context *vctx,
                   VADisplay dpy, unsigned count, VASurfaceID **render_targets,
                   const video_format_t *restrict fmt);
 
