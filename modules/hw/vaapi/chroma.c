@@ -345,14 +345,14 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
     filter_sys->image_fallback_failed = false;
     if (is_upload)
     {
-        filter_sys->dec_device = vlc_vaapi_FilterHoldInstance(filter,
-                                                               &filter_sys->dpy);
-
+        filter_sys->dec_device = filter_HoldDecoderDeviceType( filter, VLC_DECODER_DEVICE_VAAPI );
         if (filter_sys->dec_device == NULL)
         {
             free(filter_sys);
             return VLC_EGENERIC;
         }
+
+        filter_sys->dpy = filter_sys->dec_device->opaque;
 
         filter->vctx_out = vlc_video_context_Create( filter_sys->dec_device, VLC_VIDEO_CONTEXT_VAAPI, 0, NULL );
 
@@ -362,7 +362,7 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
                               &filter->fmt_out.video);
         if (!filter_sys->dest_pics)
         {
-            vlc_vaapi_FilterReleaseInstance(filter, filter_sys->dec_device);
+            vlc_decoder_device_Release(filter_sys->dec_device);
             vlc_video_context_Release(filter->vctx_out);
             filter->vctx_out = NULL;
             free(filter_sys);
@@ -384,7 +384,7 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
         if (is_upload)
         {
             picture_pool_Release(filter_sys->dest_pics);
-            vlc_vaapi_FilterReleaseInstance(filter, filter_sys->dec_device);
+            vlc_decoder_device_Release(filter_sys->dec_device);
             vlc_video_context_Release(filter->vctx_out);
             filter->vctx_out = NULL;
         }
@@ -411,7 +411,7 @@ vlc_vaapi_CloseChroma(vlc_object_t *obj)
     if (filter_sys->dest_pics)
         picture_pool_Release(filter_sys->dest_pics);
     if (filter_sys->dec_device != NULL)
-        vlc_vaapi_FilterReleaseInstance(filter, filter_sys->dec_device);
+        vlc_decoder_device_Release(filter_sys->dec_device);
     CopyCleanCache(&filter_sys->cache);
     if (filter->vctx_out)
         vlc_video_context_Release(filter->vctx_out);
