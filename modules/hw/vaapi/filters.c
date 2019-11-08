@@ -441,6 +441,8 @@ Open(filter_t * filter,
         pf_use_pipeline_caps(p_data, p_pipeline_caps))
         goto error;
 
+    filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);
+
     return VLC_SUCCESS;
 
 error:
@@ -470,6 +472,7 @@ Close(filter_t *filter, filter_sys_t * filter_sys)
     vlc_vaapi_DestroyContext(obj, filter_sys->va.dpy, filter_sys->va.ctx);
     vlc_vaapi_DestroyConfig(obj, filter_sys->va.dpy, filter_sys->va.conf);
     vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va.dec_device);
+    vlc_video_context_Release(filter->vctx_out);
     free(filter_sys);
 }
 
