@@ -487,6 +487,8 @@ static bool vout_display_CheckReset(vout_display_t *vd)
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     return osys->reset_pictures;
+#else
+    VLC_UNUSED(vd);
 #endif
     return false;
 }
