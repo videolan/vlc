@@ -289,15 +289,12 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
 
     if (!is_d3d11_opaque(filter->fmt_in.video.i_chroma))
         return VLC_EGENERIC;
+    if ( GetD3D11ContextPrivate(filter->vctx_in) == NULL )
+        return VLC_EGENERIC;
     if (!video_format_IsSimilar(&filter->fmt_in.video, &filter->fmt_out.video))
         return VLC_EGENERIC;
 
     d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate( filter->vctx_in );
-    if (unlikely(vtcx_sys == NULL))
-    {
-        msg_Dbg(filter, "Filter without a context");
-        return VLC_EGENERIC;
-    }
 
     filter_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
