@@ -410,8 +410,6 @@ struct vaapi_pic_ctx
 struct pic_sys_vaapi_instance
 {
     atomic_int pic_refcount;
-    VADisplay va_dpy;
-    vlc_video_context *vctx;
     unsigned num_render_targets;
     VASurfaceID render_targets[];
 };
@@ -532,8 +530,6 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_video_context *vctx,
         goto error_pic;
 
     atomic_store(&instance->pic_refcount, count);
-    instance->va_dpy = dpy;
-    instance->vctx = vctx;
 
     *render_targets = instance->render_targets;
     return pool;
@@ -548,15 +544,6 @@ error_pic:
 error:
     free(instance);
     return NULL;
-}
-
-vlc_decoder_device *
-vlc_vaapi_PicSysHoldInstance(void *_sys, VADisplay *dpy)
-{
-    picture_sys_t *sys = (picture_sys_t *)_sys;
-    assert(sys->instance != NULL);
-    *dpy = sys->instance->va_dpy;
-    return vlc_video_context_HoldDevice(sys->instance->vctx);
 }
 
 #define ASSERT_VAAPI_CHROMA(pic) do { \

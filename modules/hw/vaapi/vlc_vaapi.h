@@ -173,10 +173,6 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_video_context *vctx,
                   VADisplay dpy, unsigned count, VASurfaceID **render_targets,
                   const video_format_t *restrict fmt);
 
-/* Get and hold the VADisplay instance attached to the picture sys */
-vlc_decoder_device *
-vlc_vaapi_PicSysHoldInstance(void *sys, VADisplay *dpy);
-
 /* Attachs the VASurface to the picture context, the picture must be allocated
  * by a vaapi pool (see vlc_vaapi_PoolNew()) */
 void
