@@ -430,7 +430,7 @@ pool_pic_destroy_cb(picture_t *pic)
 
     if (atomic_fetch_sub(&instance->pic_refcount, 1) == 1)
     {
-        vaDestroySurfaces(instance->va_dpy, instance->render_targets,
+        vaDestroySurfaces(p_sys->ctx.ctx.va_dpy, instance->render_targets,
                           instance->num_render_targets);
         free(instance);
     }
@@ -542,7 +542,7 @@ error_pic:
     while (count > 0)
         picture_Release(pics[--count]);
 
-    VA_CALL(o, vaDestroySurfaces, instance->va_dpy, instance->render_targets,
+    VA_CALL(o, vaDestroySurfaces, dpy, instance->render_targets,
             instance->num_render_targets);
 
 error:
