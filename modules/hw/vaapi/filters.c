@@ -297,6 +297,8 @@ Open(filter_t * filter,
 {
     filter_sys_t *      filter_sys;
 
+    if (filter->vctx_in == NULL ||
+        vlc_video_context_GetType(filter->vctx_in) != VLC_VIDEO_CONTEXT_VAAPI)
     if (!vlc_vaapi_IsChromaOpaque(filter->fmt_out.video.i_chroma) ||
         !video_format_IsSimilar(&filter->fmt_out.video, &filter->fmt_in.video))
         return VLC_EGENERIC;
