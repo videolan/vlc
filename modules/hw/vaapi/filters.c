@@ -375,10 +375,9 @@ Open(filter_t * filter,
     filter_sys->va.conf = VA_INVALID_ID;
     filter_sys->va.ctx = VA_INVALID_ID;
     filter_sys->va.buf = VA_INVALID_ID;
-    filter_sys->va.dec_device =
-        vlc_vaapi_FilterHoldInstance(filter, &filter_sys->va.dpy);
-    if (!filter_sys->va.dec_device)
-        goto error;
+    filter_sys->va.dec_device = vlc_video_context_HoldDevice(filter->vctx_in);
+    filter_sys->va.dpy = filter_sys->va.dec_device->opaque;
+    assert(filter_sys->va.dec_device);
 
     filter_sys->dest_pics =
         vlc_vaapi_PoolNew(VLC_OBJECT(filter), filter->vctx_in,
@@ -458,7 +457,7 @@ error:
     if (filter_sys->dest_pics)
         picture_pool_Release(filter_sys->dest_pics);
     if (filter_sys->va.dec_device)
-        vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va.dec_device);
+        vlc_decoder_device_Release(filter_sys->va.dec_device);
     free(filter_sys);
     return VLC_EGENERIC;
 }
@@ -471,7 +470,7 @@ Close(filter_t *filter, filter_sys_t * filter_sys)
     vlc_vaapi_DestroyBuffer(obj, filter_sys->va.dpy, filter_sys->va.buf);
     vlc_vaapi_DestroyContext(obj, filter_sys->va.dpy, filter_sys->va.ctx);
     vlc_vaapi_DestroyConfig(obj, filter_sys->va.dpy, filter_sys->va.conf);
-    vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va.dec_device);
+    vlc_decoder_device_Release(filter_sys->va.dec_device);
     vlc_video_context_Release(filter->vctx_out);
     free(filter_sys);
 }
