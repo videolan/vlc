@@ -235,6 +235,8 @@ static int D3D9OpenAdjust(vlc_object_t *obj)
     if (filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE
      && filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B)
         return VLC_EGENERIC;
+    if ( GetD3D9ContextPrivate(filter->vctx_in) == NULL )
+        return VLC_EGENERIC;
     if (!video_format_IsSimilar(&filter->fmt_in.video, &filter->fmt_out.video))
         return VLC_EGENERIC;
 

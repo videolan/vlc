@@ -292,6 +292,8 @@ int D3D9OpenConverter( vlc_object_t *obj )
     if ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE &&
          p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B )
         return VLC_EGENERIC;
+    if ( GetD3D9ContextPrivate(p_filter->vctx_in) == NULL )
+        return VLC_EGENERIC;
 
     if ( p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height
          || p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width )

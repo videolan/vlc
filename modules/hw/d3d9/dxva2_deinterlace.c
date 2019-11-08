@@ -352,6 +352,8 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
     if (filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE
      && filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B)
         return VLC_EGENERIC;
+    if ( GetD3D9ContextPrivate(filter->vctx_in) == NULL )
+        return VLC_EGENERIC;
     if (!video_format_IsSimilar(&filter->fmt_in.video, &filter->fmt_out.video))
         return VLC_EGENERIC;
 
@@ -364,11 +366,6 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
         goto error;
 
     d3d9_video_context_t *vtcx_sys = GetD3D9ContextPrivate( filter->vctx_in );
-    if (!vtcx_sys)
-    {
-        msg_Dbg(filter, "Filter without a context");
-        goto error;
-    }
 
     d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext( filter->vctx_in );
 
