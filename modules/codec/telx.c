@@ -40,7 +40,7 @@
 #ifdef TELX_DEBUG
 #   define dbg( a ) msg_Dbg a
 #else
-#   define dbg( a )
+#   define dbg( a ) (void) 0
 #endif
 
 /*****************************************************************************
