@@ -95,9 +95,9 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     BOOL b_nodvdmenus;
     NSView *_currentOpticalMediaView;
     NSImageView *_currentOpticalMediaIconView;
-    NSMutableArray *_allMediaDevices;
-    NSArray *_opticalDevices;
-    NSMutableArray *_specialMediaFolders;
+    NSMutableArray <VLCOpenBlockDeviceDescription *>*_allMediaDevices;
+    NSArray <VLCOpenBlockDeviceDescription *>*_opticalDevices;
+    NSMutableArray <VLCOpenBlockDeviceDescription *>*_specialMediaFolders;
     NSString *_filePath;
     NSString *_fileSlavePath;
     NSString *_subPath;
@@ -835,8 +835,8 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
         NSUInteger count = [self->_allMediaDevices count];
         if (count > 0) {
             for (NSUInteger i = 0; i < count ; i++) {
-                NSDictionary *deviceDict = [self->_allMediaDevices objectAtIndex:i];
-                [self->_discSelectorPopup addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:[deviceDict objectForKey:@"path"]]];
+                VLCOpenBlockDeviceDescription *deviceDescription = [self->_allMediaDevices objectAtIndex:i];
+                [self->_discSelectorPopup addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:deviceDescription.path]];
             }
 
             if ([self->_discSelectorPopup numberOfItems] <= 1)
