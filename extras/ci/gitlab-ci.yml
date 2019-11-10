@@ -80,7 +80,6 @@ variables:
     tags:
         - docker
         - amd64
-        - zorin
 
 #
 # Windows
