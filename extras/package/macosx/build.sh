@@ -37,6 +37,7 @@ OPTIONS:
    -a <arch>     Use the specified arch (default: $ARCH)
    -C            Use the specified VLC build dir
    -b <url>      Enable breakpad support and send crash reports to this URL
+   -d            Disable debug mode (on by default)
 EOF
 
 }
@@ -51,7 +52,7 @@ spopd()
     popd > /dev/null
 }
 
-while getopts "hvrcpi:k:a:j:C:b:" OPTION
+while getopts "hvrcdpi:k:a:j:C:b:" OPTION
 do
      case $OPTION in
          h)
@@ -61,6 +62,9 @@ do
          q)
              set +x
              QUIET="yes"
+         ;;
+         d)
+             NODEBUG="yes"
          ;;
          r)
              REBUILD="yes"
@@ -197,6 +201,9 @@ CONFIGFLAGS=""
 if [ ! -z "$BREAKPAD" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --with-breakpad=$BREAKPAD"
 fi
+if [ "$NODEBUG" = "yes" ]; then
+     CONFIGFLAGS="$CONFIGFLAGS --disable-debug"
+fi
 
 if [ "${vlcroot}/configure" -nt Makefile ]; then
 
@@ -208,7 +215,6 @@ if [ "${vlcroot}/configure" -nt Makefile ]; then
       $CONFIGFLAGS \
       $VLC_CONFIGURE_ARGS > $out
 fi
-
 
 #
 # make
