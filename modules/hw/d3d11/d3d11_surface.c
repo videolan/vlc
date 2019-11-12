@@ -502,7 +502,14 @@ static picture_t *NewBuffer(filter_t *p_filter)
     return p_sys->staging_pic;
 }
 
-static filter_t *CreateCPUtoGPUFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in,
+static vlc_decoder_device * HoldD3D11DecoderDevice(vlc_object_t *o, void *sys)
+{
+    VLC_UNUSED(o);
+    filter_t *p_this = sys;
+    return filter_HoldDecoderDevice(p_this);
+}
+
+static filter_t *CreateCPUtoGPUFilter( filter_t *p_this, const es_format_t *p_fmt_in,
                                vlc_fourcc_t dst_chroma )
 {
     filter_t *p_filter;
@@ -511,7 +518,7 @@ static filter_t *CreateCPUtoGPUFilter( vlc_object_t *p_this, const es_format_t *
     if (unlikely(p_filter == NULL))
         return NULL;
 
-    static const struct filter_video_callbacks cbs = { NewBuffer, NULL /*TODO*/ };
+    static const struct filter_video_callbacks cbs = { NewBuffer, HoldD3D11DecoderDevice };
     p_filter->b_allow_fmt_out_change = false;
     p_filter->owner.video = &cbs;
     p_filter->owner.sys = p_this;
@@ -749,7 +756,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
 
     if ( p_filter->fmt_in.video.i_chroma != d3d_fourcc )
     {
-        p_cpu_filter = CreateCPUtoGPUFilter(VLC_OBJECT(p_filter), &p_filter->fmt_in, p_dst->format.i_chroma);
+        p_cpu_filter = CreateCPUtoGPUFilter(p_filter, &p_filter->fmt_in, p_dst->format.i_chroma);
         if (!p_cpu_filter)
             goto done;
     }
