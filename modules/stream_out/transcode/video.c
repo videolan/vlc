@@ -60,14 +60,17 @@ static const video_format_t* filtered_video_format( sout_stream_id_sys_t *id,
     return &p_pic->format;
 }
 
+static vlc_decoder_device *TranscodeHoldDecoderDevice(vlc_object_t *o, sout_stream_id_sys_t *id)
+{
+    if (id->dec_dev == NULL)
+        id->dec_dev = vlc_decoder_device_Create( o, NULL );
+    return id->dec_dev ? vlc_decoder_device_Hold(id->dec_dev) : NULL;
+}
+
 static vlc_decoder_device * video_get_decoder_device( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
-    if (p_owner->id->dec_dev == NULL)
-    {
-        p_owner->id->dec_dev = vlc_decoder_device_Create( &p_dec->obj, NULL );
-    }
-    return p_owner->id->dec_dev ? vlc_decoder_device_Hold(p_owner->id->dec_dev) : NULL;
+    return TranscodeHoldDecoderDevice(&p_dec->obj, p_owner->id);
 }
 
 static void debug_format( sout_stream_t *p_stream, const es_format_t *fmt )
@@ -78,6 +81,12 @@ static void debug_format( sout_stream_t *p_stream, const es_format_t *fmt )
              fmt->video.i_visible_width, fmt->video.i_visible_height,
              fmt->video.i_width, fmt->video.i_height,
              fmt->video.orientation );
+}
+
+static vlc_decoder_device * transcode_video_filter_hold_device(vlc_object_t *o, void *sys)
+{
+    sout_stream_id_sys_t *id = sys;
+    return TranscodeHoldDecoderDevice(o, id);
 }
 
 static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vctx )
@@ -245,7 +254,7 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
 
 static const struct filter_video_callbacks transcode_filter_video_cbs =
 {
-    transcode_video_filter_buffer_new, NULL/*TODO*/,
+    transcode_video_filter_buffer_new, transcode_video_filter_hold_device,
 };
 
 /* Take care of the scaling and chroma conversions. */
