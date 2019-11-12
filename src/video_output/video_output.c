@@ -821,8 +821,8 @@ static void ThreadChangeFilters(vout_thread_t *vout,
     }
 
     es_format_t fmt_target;
-    es_format_InitFromVideo(&fmt_target, source ? source : &vout->p->filter.src_fmt);
-    vlc_video_context *vctx_target   = source ? src_vctx : vout->p->filter.src_vctx;
+    es_format_InitFromVideo(&fmt_target, &vout->p->filter.src_fmt);
+    vlc_video_context *vctx_target  = vout->p->filter.src_vctx;
 
     const es_format_t *p_fmt_current = &fmt_target;
     vlc_video_context *vctx_current = vctx_target;
