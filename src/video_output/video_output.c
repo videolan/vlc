@@ -958,8 +958,15 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse,
     return VLC_SUCCESS;
 }
 
+static vlc_decoder_device * VoutHoldDecoderDevice(vlc_object_t *o, void *sys)
+{
+    VLC_UNUSED(o);
+    vout_thread_t *vout = sys;
+    return vout->p->dec_device ? vlc_decoder_device_Hold( vout->p->dec_device ) : NULL;
+}
+
 static const struct filter_video_callbacks vout_video_cbs = {
-    NULL, NULL /* TODO */
+    NULL, VoutHoldDecoderDevice,
 };
 
 static picture_t *ConvertRGB32AndBlend(vout_thread_t *vout, picture_t *pic,
@@ -1530,10 +1537,10 @@ static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_c
     video_format_Copy(&sys->filter.src_fmt, &sys->original);
 
     static const struct filter_video_callbacks static_cbs = {
-        VoutVideoFilterStaticNewPicture, NULL/*TODO*/,
+        VoutVideoFilterStaticNewPicture, VoutHoldDecoderDevice,
     };
     static const struct filter_video_callbacks interactive_cbs = {
-        VoutVideoFilterInteractiveNewPicture, NULL/*TODO*/,
+        VoutVideoFilterInteractiveNewPicture, VoutHoldDecoderDevice,
     };
     filter_owner_t owner = {
         .video = &static_cbs,
