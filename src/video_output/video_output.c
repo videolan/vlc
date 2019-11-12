@@ -812,6 +812,14 @@ static void ThreadChangeFilters(vout_thread_t *vout,
     if (!is_locked)
         vlc_mutex_lock(&vout->p->filter.lock);
 
+    if (source) {
+        video_format_Clean(&vout->p->filter.src_fmt);
+        video_format_Copy(&vout->p->filter.src_fmt, source);
+        if (vout->p->filter.src_vctx)
+            vlc_video_context_Release(vout->p->filter.src_vctx);
+        vout->p->filter.src_vctx = src_vctx ? vlc_video_context_Hold(src_vctx) : NULL;
+    }
+
     es_format_t fmt_target;
     es_format_InitFromVideo(&fmt_target, source ? source : &vout->p->filter.src_fmt);
     vlc_video_context *vctx_target   = source ? src_vctx : vout->p->filter.src_vctx;
@@ -866,13 +874,6 @@ static void ThreadChangeFilters(vout_thread_t *vout,
     if (vout->p->filter.configuration != filters) {
         free(vout->p->filter.configuration);
         vout->p->filter.configuration = filters ? strdup(filters) : NULL;
-    }
-    if (source) {
-        video_format_Clean(&vout->p->filter.src_fmt);
-        video_format_Copy(&vout->p->filter.src_fmt, source);
-        if (vout->p->filter.src_vctx)
-            vlc_video_context_Release(vout->p->filter.src_vctx);
-        vout->p->filter.src_vctx = src_vctx ? vlc_video_context_Hold(src_vctx) : NULL;
     }
 
     if (!is_locked)
