@@ -47,8 +47,6 @@ typedef struct
     copy_cache_t      cache;
 
     /* CPU to GPU */
-    d3d9_handle_t     hd3d;
-    d3d9_device_t     d3d_dev;
     filter_t          *filter;
     picture_t         *staging;
 } filter_sys_t;
@@ -257,10 +255,12 @@ static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
 
     IDirect3DSurface9_UnlockRect(p_staging_sys->surface);
 
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(p_filter->vctx_out);
+
     RECT visibleSource = {
         .right = dst->format.i_width, .bottom = dst->format.i_height,
     };
-    IDirect3DDevice9_StretchRect( sys->d3d_dev.dev,
+    IDirect3DDevice9_StretchRect( d3d9_decoder->d3ddev.dev,
                                   p_staging_sys->surface, &visibleSource,
                                   p_sys->surface, &visibleSource,
                                   D3DTEXF_NONE );
@@ -336,13 +336,6 @@ int D3D9OpenConverter( vlc_object_t *obj )
         return VLC_ENOMEM;
     }
 
-    if (unlikely(D3D9_Create( p_filter, &p_sys->hd3d ) != VLC_SUCCESS)) {
-        msg_Warn(p_filter, "cannot load d3d9.dll, aborting");
-        CopyCleanCache(&p_sys->cache);
-        free(p_sys);
-        return VLC_EGENERIC;
-    }
-
     p_filter->p_sys = p_sys;
     return VLC_SUCCESS;
 }
@@ -375,65 +368,114 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
         return VLC_EGENERIC;
     }
 
-    filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
-    if (!p_sys)
-         return VLC_ENOMEM;
-
-    video_format_Init(&fmt_staging, 0);
-    if (unlikely(D3D9_Create( p_filter, &p_sys->hd3d ) != VLC_SUCCESS)) {
-        msg_Warn(p_filter, "cannot load d3d9.dll, aborting");
-        free(p_sys);
+    vlc_decoder_device *dec_device = filter_HoldDecoderDeviceType( p_filter, VLC_DECODER_DEVICE_DXVA2 );
+    if (dec_device == NULL)
+    {
+        msg_Err(p_filter, "Missing decoder device");
+        return VLC_EGENERIC;
+    }
+    d3d9_decoder_device_t *devsys = GetD3D9OpaqueDevice(dec_device);
+    if (devsys == NULL)
+    {
+        msg_Err(p_filter, "Incompatible decoder device %d", dec_device->type);
+        vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
     }
 
-    D3DSURFACE_DESC texDesc;
-    D3D9_FilterHoldInstance(p_filter, &p_sys->d3d_dev, &texDesc);
-    if (!p_sys->d3d_dev.dev)
+    filter_sys_t *p_sys = calloc(1, sizeof(filter_sys_t));
+    if (!p_sys)
     {
-        msg_Dbg(p_filter, "Filter without a context");
+        vlc_decoder_device_Release(dec_device);
+        return VLC_ENOMEM;
+    }
+
+    video_format_Init(&fmt_staging, 0);
+
+    p_filter->vctx_out = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_DXVA2, sizeof(d3d9_video_context_t),
+                                                   &d3d9_vctx_ops );
+    vlc_decoder_device_Release(dec_device);
+
+    if ( p_filter->vctx_out == NULL )
+    {
+        msg_Err(p_filter, "Failed to create the video context");
         goto done;
     }
-    if (texDesc.Format == 0)
-        goto done;
 
-    if ( p_filter->fmt_in.video.i_chroma != texDesc.Format )
+    d3d9_video_context_t *vctx_sys = GetD3D9ContextPrivate( p_filter->vctx_out );
+
+    static const D3DFORMAT outputFormats8[] = {
+        MAKEFOURCC('I','4','2','0'),
+        MAKEFOURCC('Y','V','1','2'),
+        MAKEFOURCC('N','V','1','2'),
+        D3DFMT_UNKNOWN
+    };
+    static const D3DFORMAT outputFormats10[] = {
+        MAKEFOURCC('P','0','1','0'),
+        MAKEFOURCC('I','4','2','0'),
+        MAKEFOURCC('Y','V','1','2'),
+        MAKEFOURCC('N','V','1','2'),
+        D3DFMT_UNKNOWN
+    };
+
+    vctx_sys->format = D3DFMT_UNKNOWN;
+    const D3DFORMAT *list;
+    switch( p_filter->fmt_in.video.i_chroma ) {
+    case VLC_CODEC_I420:
+    case VLC_CODEC_YV12:
+        list = outputFormats8;
+        break;
+    case VLC_CODEC_I420_10L:
+    case VLC_CODEC_P010:
+        list = outputFormats10;
+        break;
+    default:
+        vlc_assert_unreachable();
+    }
+    while (*list != D3DFMT_UNKNOWN)
     {
-        picture_resource_t res = {
-            .pf_destroy = DestroyPicture,
-        };
-        picture_sys_d3d9_t *res_sys = calloc(1, sizeof(picture_sys_d3d9_t));
-        if (res_sys == NULL) {
-            err = VLC_ENOMEM;
-            goto done;
-        }
-        res.p_sys = res_sys;
-
-        video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
-        fmt_staging.i_chroma = texDesc.Format;
-        fmt_staging.i_height = texDesc.Height;
-        fmt_staging.i_width  = texDesc.Width;
-
-        p_dst = picture_NewFromResource(&fmt_staging, &res);
-        if (p_dst == NULL) {
-            msg_Err(p_filter, "Failed to map create the temporary picture.");
-            goto done;
-        }
-        picture_Setup(p_dst, &p_dst->format);
-
-        HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_sys->d3d_dev.dev,
-                                                          p_dst->format.i_width,
-                                                          p_dst->format.i_height,
-                                                          texDesc.Format,
+        HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(devsys->d3ddev.dev,
+                                                          p_filter->fmt_out.video.i_width,
+                                                          p_filter->fmt_out.video.i_height,
+                                                          *list,
                                                           D3DPOOL_DEFAULT,
                                                           &texture,
                                                           NULL);
-        if (FAILED(hr)) {
-            msg_Err(p_filter, "Failed to create a %4.4s staging texture to extract surface pixels (hr=0x%lX)", (char *)texDesc.Format, hr );
-            goto done;
+        if (SUCCEEDED(hr)) {
+            vctx_sys->format = *list;
+            msg_Dbg(p_filter, "using pixel format %4.4s", (char*)&vctx_sys->format);
+            break;
         }
-        res_sys->surface = texture;
-        IDirect3DSurface9_AddRef(texture);
+        list++;
+    }
+    if (vctx_sys->format == D3DFMT_UNKNOWN)
+    {
+        msg_Err(p_filter, "Failed to find a usable pixel format");
+        goto done;
+    }
 
+    picture_resource_t res = {
+        .pf_destroy = DestroyPicture,
+    };
+    picture_sys_d3d9_t *res_sys = calloc(1, sizeof(picture_sys_d3d9_t));
+    if (res_sys == NULL) {
+        err = VLC_ENOMEM;
+        goto done;
+    }
+    res.p_sys = res_sys;
+    res_sys->surface = texture;
+
+    video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
+    fmt_staging.i_chroma = vctx_sys->format;
+
+    p_dst = picture_NewFromResource(&fmt_staging, &res);
+    if (p_dst == NULL) {
+        msg_Err(p_filter, "Failed to map create the temporary picture.");
+        goto done;
+    }
+    picture_Setup(p_dst, &p_dst->format);
+
+    if ( p_filter->fmt_in.video.i_chroma != vctx_sys->format )
+    {
         p_cpu_filter = CreateFilter(p_filter, &p_filter->fmt_in, p_dst->format.i_chroma);
         if (!p_cpu_filter)
             goto done;
@@ -450,8 +492,7 @@ done:
     {
         if (texture)
             IDirect3DSurface9_Release(texture);
-        D3D9_FilterReleaseInstance(&p_sys->d3d_dev);
-        D3D9_Destroy( &p_sys->hd3d );
+        vlc_video_context_Release(p_filter->vctx_out);
         free(p_sys);
     }
     return err;
@@ -462,7 +503,6 @@ void D3D9CloseConverter( vlc_object_t *obj )
     filter_t *p_filter = (filter_t *)obj;
     filter_sys_t *p_sys = p_filter->p_sys;
     CopyCleanCache( &p_sys->cache );
-    D3D9_Destroy( &p_sys->hd3d );
     free( p_sys );
     p_filter->p_sys = NULL;
 }
@@ -473,8 +513,7 @@ void D3D9CloseCPUConverter( vlc_object_t *obj )
     filter_sys_t *p_sys = p_filter->p_sys;
     DeleteFilter(p_sys->filter);
     picture_Release(p_sys->staging);
-    D3D9_FilterReleaseInstance(&p_sys->d3d_dev);
-    D3D9_Destroy( &p_sys->hd3d );
+    vlc_video_context_Release(p_filter->vctx_out);
     free( p_sys );
     p_filter->p_sys = NULL;
 }
