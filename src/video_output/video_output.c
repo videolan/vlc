@@ -749,7 +749,6 @@ typedef struct {
 } vout_filter_t;
 
 static void ThreadChangeFilters(vout_thread_t *vout,
-                                const video_format_t *source, vlc_video_context *src_vctx,
                                 const char *filters,
                                 const bool *new_deinterlace,
                                 bool is_locked)
@@ -811,14 +810,6 @@ static void ThreadChangeFilters(vout_thread_t *vout,
 
     if (!is_locked)
         vlc_mutex_lock(&vout->p->filter.lock);
-
-    if (source) {
-        video_format_Clean(&vout->p->filter.src_fmt);
-        video_format_Copy(&vout->p->filter.src_fmt, source);
-        if (vout->p->filter.src_vctx)
-            vlc_video_context_Release(vout->p->filter.src_vctx);
-        vout->p->filter.src_vctx = src_vctx ? vlc_video_context_Hold(src_vctx) : NULL;
-    }
 
     es_format_t fmt_target;
     es_format_InitFromVideo(&fmt_target, &vout->p->filter.src_fmt);
@@ -935,7 +926,17 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse,
                 }
                 vlc_video_context *pic_vctx = picture_GetVideoContext(decoded);
                 if (!VideoFormatIsCropArEqual(&decoded->format, &vout->p->filter.src_fmt))
-                    ThreadChangeFilters(vout, &decoded->format, pic_vctx, NULL, NULL, true);
+                {
+                    // we received an aspect ratio change
+                    // Update the filters with the filter source format with the new aspect ratio
+                    video_format_Clean(&vout->p->filter.src_fmt);
+                    video_format_Copy(&vout->p->filter.src_fmt, &decoded->format);
+                    if (vout->p->filter.src_vctx)
+                        vlc_video_context_Release(vout->p->filter.src_vctx);
+                    vout->p->filter.src_vctx = pic_vctx ? vlc_video_context_Hold(pic_vctx) : NULL;
+
+                    ThreadChangeFilters(vout, NULL, NULL, true);
+                }
             }
         }
 
@@ -1663,10 +1664,10 @@ static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
 {
     switch(cmd.type) {
     case VOUT_CONTROL_CHANGE_FILTERS:
-        ThreadChangeFilters(vout, NULL, NULL, cmd.string, NULL, false);
+        ThreadChangeFilters(vout, cmd.string, NULL, false);
         break;
     case VOUT_CONTROL_CHANGE_INTERLACE:
-        ThreadChangeFilters(vout, NULL, NULL, NULL, &cmd.boolean, false);
+        ThreadChangeFilters(vout, NULL, &cmd.boolean, false);
         break;
     case VOUT_CONTROL_MOUSE_STATE:
         ThreadProcessMouseState(vout, &cmd.mouse);
