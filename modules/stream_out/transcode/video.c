@@ -294,6 +294,7 @@ static int transcode_video_set_conversions( sout_stream_t *p_stream,
             return VLC_EGENERIC;
 
         *pp_src = filter_chain_GetFmtOut( *pp_chain );
+        *pp_src_vctx = filter_chain_GetVideoCtxOut( *pp_chain );
         debug_format( p_stream, *pp_src );
     }
 
@@ -331,12 +332,14 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
                                    p_cfg->video.p_deinterlace_cfg,
                                    p_src );
         p_src = filter_chain_GetFmtOut( id->p_f_chain );
+        src_ctx = filter_chain_GetVideoCtxOut( id->p_f_chain );
     }
 
     if( b_master_sync )
     {
         filter_chain_AppendFilter( id->p_f_chain, "fps", NULL, p_dst );
         p_src = filter_chain_GetFmtOut( id->p_f_chain );
+        src_ctx = filter_chain_GetVideoCtxOut( id->p_f_chain );
     }
 
     /* Chroma and other conversions */
