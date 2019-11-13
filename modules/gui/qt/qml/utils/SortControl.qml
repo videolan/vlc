@@ -52,7 +52,7 @@ Utils.NavigableFocusScope {
         id: button
 
         size: VLCStyle.icon_normal
-        text: VLCIcons.topbar_sort
+        iconText: VLCIcons.topbar_sort
 
         focus: true
 

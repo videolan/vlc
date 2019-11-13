@@ -102,7 +102,7 @@ Item{
         Utils.IconToolButton {
             id: backBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.exit
+            iconText: VLCIcons.exit
             onClicked: history.previous(History.Go)
             property bool acceptFocus: true
         }
@@ -114,7 +114,7 @@ Item{
             id: randomBtn
             size: VLCStyle.icon_medium
             checked: mainPlaylistController.random
-            text: VLCIcons.shuffle_on
+            iconText: VLCIcons.shuffle_on
             onClicked: mainPlaylistController.toggleRandom()
             property bool acceptFocus: true
         }
@@ -125,7 +125,7 @@ Item{
         Utils.IconToolButton {
             id: prevBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.previous
+            iconText: VLCIcons.previous
             onClicked: mainPlaylistController.prev()
             property bool acceptFocus: true
         }
@@ -136,7 +136,7 @@ Item{
         Utils.IconToolButton {
             id: playBtn
             size: VLCStyle.icon_medium
-            text: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
+            iconText: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
                    && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
                   ? VLCIcons.pause
                   : VLCIcons.play
@@ -150,7 +150,7 @@ Item{
         Utils.IconToolButton {
             id: nextBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.next
+            iconText: VLCIcons.next
             onClicked: mainPlaylistController.next()
             property bool acceptFocus: true
         }
@@ -162,7 +162,7 @@ Item{
             id: chapterPreviousBtnDelegate
             size: VLCStyle.icon_medium
             width: visible? VLCStyle.icon_medium : 0
-            text: VLCIcons.dvd_prev
+            iconText: VLCIcons.dvd_prev
             onClicked: player.chapterPrev()
             visible: player.hasChapters
             enabled: visible
@@ -177,7 +177,7 @@ Item{
             id: chapterPreviousBtnDelegate
             size: VLCStyle.icon_medium
             width: visible? VLCStyle.icon_medium : 0
-            text: VLCIcons.dvd_next
+            iconText: VLCIcons.dvd_next
             onClicked: player.chapterNext()
             visible: player.hasChapters
             enabled: visible
@@ -192,7 +192,7 @@ Item{
             id: repeatBtn
             size: VLCStyle.icon_medium
             checked: mainPlaylistController.repeatMode !== PlaylistControllerModel.PLAYBACK_REPEAT_NONE
-            text: (mainPlaylistController.repeatMode === PlaylistControllerModel.PLAYBACK_REPEAT_CURRENT)
+            iconText: (mainPlaylistController.repeatMode === PlaylistControllerModel.PLAYBACK_REPEAT_CURRENT)
                   ? VLCIcons.repeat_one
                   : VLCIcons.repeat_all
             onClicked: mainPlaylistController.toggleRepeatMode()
@@ -205,7 +205,7 @@ Item{
         Utils.IconToolButton {
             id: langBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.audiosub
+            iconText: VLCIcons.audiosub
 
             onClicked: {
                 root._lockAutoHide += 1
@@ -306,7 +306,7 @@ Item{
         Utils.IconToolButton {
             id: playlistBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.playlist
+            iconText: VLCIcons.playlist
             onClicked: {
                 rootWindow.playlistVisible = !rootWindow.playlistVisible
                 if (rootWindow.playlistVisible && rootWindow.playlistDocked) {
@@ -323,7 +323,7 @@ Item{
         Utils.IconToolButton {
             id: menuBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.menu
+            iconText: VLCIcons.menu
             onClicked: {
                 root._lockAutoHide += 1
                 mainMenu.openAbove(this)
@@ -402,7 +402,7 @@ Item{
         Utils.IconToolButton{
             id: fullScreenBtn
             size: VLCStyle.icon_medium
-            text: rootWindow.interfaceFullScreen ?VLCIcons.defullscreen :VLCIcons.fullscreen
+            iconText: rootWindow.interfaceFullScreen ?VLCIcons.defullscreen :VLCIcons.fullscreen
             onClicked: rootWindow.interfaceFullScreen = !rootWindow.interfaceFullScreen
             property bool acceptFocus: true
         }
@@ -413,7 +413,7 @@ Item{
         Utils.IconToolButton{
             id: recordBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.record
+            iconText: VLCIcons.record
             enabled: !paintOnly && player.isPlaying
             checked: player.isRecording
             onClicked: player.toggleRecord()
@@ -427,7 +427,7 @@ Item{
             id: abBtn
             size: VLCStyle.icon_medium
             checked: player.ABloopState !== PlayerController.ABLOOP_STATE_NONE
-            text: switch(player.ABloopState) {
+            iconText: switch(player.ABloopState) {
                   case PlayerController.ABLOOP_STATE_A: return VLCIcons.atob_bg_b
                   case PlayerController.ABLOOP_STATE_B: return VLCIcons.atob_bg_none
                   case PlayerController.ABLOOP_STATE_NONE: return VLCIcons.atob_bg_ab
@@ -450,7 +450,7 @@ Item{
             id: snapshotBtn
             size: VLCStyle.icon_medium
             enabled: !paintOnly && player.isPlaying
-            text: VLCIcons.snapshot
+            iconText: VLCIcons.snapshot
             onClicked: player.snapshot()
             property bool acceptFocus: true
         }
@@ -463,7 +463,7 @@ Item{
             id: stopBtn
             size: VLCStyle.icon_medium
             enabled: !paintOnly && player.isPlaying
-            text: VLCIcons.stop
+            iconText: VLCIcons.stop
             onClicked: mainPlaylistController.stop()
             property bool acceptFocus: true
         }
@@ -475,7 +475,7 @@ Item{
             id: infoBtn
             size: VLCStyle.icon_medium
             enabled: !paintOnly && player.isPlaying
-            text: VLCIcons.info
+            iconText: VLCIcons.info
             onClicked: dialogProvider.mediaInfoDialog()
             property bool acceptFocus: true
         }
@@ -488,7 +488,7 @@ Item{
             id: frameBtn
             size: VLCStyle.icon_medium
             enabled: !paintOnly && player.isPlaying
-            text: VLCIcons.frame_by_frame
+            iconText: VLCIcons.frame_by_frame
             onClicked: player.frameNext()
             property bool acceptFocus: true
         }
@@ -500,7 +500,7 @@ Item{
         Utils.IconToolButton{
             id: fasterBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.faster
+            iconText: VLCIcons.faster
             onClicked: player.faster()
             property bool acceptFocus: true
         }
@@ -512,7 +512,7 @@ Item{
         Utils.IconToolButton{
             id: slowerBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.slower
+            iconText: VLCIcons.slower
             onClicked: player.slower()
             property bool acceptFocus: true
         }
@@ -523,7 +523,7 @@ Item{
         Utils.IconToolButton{
             id: openMediaBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.eject
+            iconText: VLCIcons.eject
             onClicked: dialogProvider.openDialog()
             property bool acceptFocus: true
         }
@@ -545,7 +545,7 @@ Item{
         Utils.IconToolButton{
             id: stepfwdBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.skip_for
+            iconText: VLCIcons.skip_for
             onClicked: player.jumpFwd()
             property bool acceptFocus: true
         }
@@ -556,7 +556,7 @@ Item{
         Utils.IconToolButton{
             id: stepBackBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.skip_back
+            iconText: VLCIcons.skip_back
             onClicked: player.jumpBwd()
             property bool acceptFocus: true
         }
@@ -567,7 +567,7 @@ Item{
         Utils.IconToolButton{
             id: quitBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.clear
+            iconText: VLCIcons.clear
             onClicked: rootWindow.close()
             property bool acceptFocus: true
         }

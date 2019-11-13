@@ -49,7 +49,7 @@ FocusScope{
         Utils.IconToolButton{
             id: teleActivateBtn
             paintOnly: widgetfscope.paintOnly
-            text: VLCIcons.tv
+            iconText: VLCIcons.tv
             size: VLCStyle.icon_normal
             onClicked: player.teletextEnabled = !player.teletextEnabled
             color: widgetfscope.color
@@ -62,7 +62,7 @@ FocusScope{
         Utils.IconToolButton{
             id: teleTransparencyBtn
             paintOnly: widgetfscope.paintOnly
-            text: VLCIcons.tvtelx
+            iconText: VLCIcons.tvtelx
             size: VLCStyle.icon_normal
             opacity: 0.5
             enabled: player.teletextEnabled
@@ -88,7 +88,7 @@ FocusScope{
             paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
-            text: VLCIcons.record
+            iconText: VLCIcons.record
             onClicked: player.teletextPage = PlayerController.TELE_INDEX
             color: "grey"
             colorDisabled: "grey"
@@ -99,7 +99,7 @@ FocusScope{
             paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
-            text: VLCIcons.record
+            iconText: VLCIcons.record
             onClicked: player.teletextPage = PlayerController.TELE_RED
             color: "red"
             colorDisabled: "grey"
@@ -110,7 +110,7 @@ FocusScope{
             paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
-            text: VLCIcons.record
+            iconText: VLCIcons.record
             onClicked: player.teletextPage = PlayerController.TELE_GREEN
             color: "green"
             colorDisabled: "grey"
@@ -121,7 +121,7 @@ FocusScope{
             paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
-            text: VLCIcons.record
+            iconText: VLCIcons.record
             onClicked: player.teletextPage = PlayerController.TELE_YELLOW
             color: "yellow"
             colorDisabled: "grey"
@@ -132,7 +132,7 @@ FocusScope{
             paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
-            text: VLCIcons.record
+            iconText: VLCIcons.record
             onClicked: player.teletextPage = PlayerController.TELE_BLUE
             color: "blue"
             colorDisabled: "grey"

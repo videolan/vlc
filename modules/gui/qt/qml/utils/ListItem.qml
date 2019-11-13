@@ -48,7 +48,7 @@ NavigableFocusScope {
         id: actionAdd
         IconToolButton {
             size: VLCStyle.icon_normal
-            text: VLCIcons.add
+            iconText: VLCIcons.add
 
             focus: true
 
@@ -69,7 +69,7 @@ NavigableFocusScope {
             id: add_and_play_icon
             size: VLCStyle.icon_normal
             //visible: mouse.containsMouse  || root.activeFocus
-            text: VLCIcons.play
+            iconText: VLCIcons.play
 
             focus: true
 
@@ -195,7 +195,7 @@ NavigableFocusScope {
                             IconToolButton {
                                 id: contextButton
                                 size: VLCStyle.icon_normal
-                                text: VLCIcons.ellipsis
+                                iconText: VLCIcons.ellipsis
 
                                 visible: root.showContextButton
                                 focus: actionButtons.length == toolButtons.focusIndex

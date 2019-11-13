@@ -30,6 +30,7 @@ ToolButton {
 
     padding: 0
 
+    property string iconText: ""
     property color color: VLCStyle.colors.buttonText
     property color colorDisabled: VLCStyle.colors.lightText
     property color colorOverlay: "transparent"
@@ -48,7 +49,7 @@ ToolButton {
 
         Label {
             id: text
-            text: control.text
+            text: control.iconText
             color: control.enabled ? control.color : control.colorDisabled
 
             anchors.centerIn: parent

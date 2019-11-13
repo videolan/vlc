@@ -44,7 +44,7 @@ FocusScope{
             id: volumeBtn
             paintOnly: widgetfscope.paintOnly
             size: VLCStyle.icon_normal
-            text:
+            iconText:
                 if( player.muted )
                     VLCIcons.volume_muted
                 else if ( player.volume < .33 )

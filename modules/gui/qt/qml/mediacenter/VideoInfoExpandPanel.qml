@@ -259,7 +259,7 @@ Utils.NavigableFocusScope {
                     id: closeButtonId
 
                     size: VLCStyle.icon_normal
-                    text: VLCIcons.close
+                    iconText: VLCIcons.close
                     color: VLCStyle.colors.lightText
 
                     focus: true

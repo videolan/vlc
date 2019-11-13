@@ -97,7 +97,7 @@ Utils.NavigableFocusScope {
                 id: icon
 
                 size: VLCStyle.icon_normal
-                text: VLCIcons.topbar_filter
+                iconText: VLCIcons.topbar_filter
 
                 focus: true
 

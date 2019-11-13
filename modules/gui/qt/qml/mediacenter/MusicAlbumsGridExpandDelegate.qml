@@ -84,7 +84,7 @@ Utils.NavigableFocusScope {
                         size: VLCStyle.icon_normal
                         Layout.alignment: Qt.AlignHCenter
 
-                        text: VLCIcons.add
+                        iconText: VLCIcons.add
 
                         onClicked: medialib.addToPlaylist(model.id)
 
@@ -98,7 +98,7 @@ Utils.NavigableFocusScope {
                         Layout.alignment: Qt.AlignHCenter
                         size: VLCStyle.icon_normal
 
-                        text: VLCIcons.play
+                        iconText: VLCIcons.play
 
                         onClicked: medialib.addAndPlay(model.id)
 
