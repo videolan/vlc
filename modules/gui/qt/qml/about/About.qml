@@ -94,6 +94,7 @@ Utils.NavigableFocusScope {
                     id: backBtn
                     size: VLCStyle.icon_large
                     iconText: VLCIcons.exit
+                    text: qsTr("Back")
                     Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
                     KeyNavigation.right: textScroll
 

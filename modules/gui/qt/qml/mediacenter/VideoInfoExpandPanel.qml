@@ -260,6 +260,7 @@ Utils.NavigableFocusScope {
 
                     size: VLCStyle.icon_normal
                     iconText: VLCIcons.close
+                    text: qsTr("Close")
                     color: VLCStyle.colors.lightText
 
                     focus: true

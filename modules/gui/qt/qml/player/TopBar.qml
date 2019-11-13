@@ -69,6 +69,7 @@ Utils.NavigableFocusScope{
                     objectName: "IconToolButton"
                     size: VLCStyle.icon_normal
                     iconText: VLCIcons.exit
+                    text: qsTr("Back")
                     color: VLCStyle.colors.playerFg
                     onClicked: {
                         if (player.playingState === PlayerController.PLAYING_STATE_PAUSED) {
@@ -89,6 +90,7 @@ Utils.NavigableFocusScope{
                     objectName: PlayerControlBarModel.PLAYLIST_BUTTON
                     size: VLCStyle.icon_normal
                     iconText: VLCIcons.playlist
+                    text: qsTr("Playlist")
                     color: VLCStyle.colors.playerFg
                     onClicked: togglePlaylistVisiblity()
                     property bool acceptFocus: true

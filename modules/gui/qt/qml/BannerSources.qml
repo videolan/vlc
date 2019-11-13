@@ -98,6 +98,7 @@ Utils.NavigableFocusScope {
                             id: history_back
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.topbar_previous
+                            text: qsTr("Previous")
                             onClicked: history.previous(History.Go)
                             enabled: !history.previousEmpty
                         }
@@ -106,6 +107,7 @@ Utils.NavigableFocusScope {
                             id: history_next
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.topbar_next
+                            text: qsTr("Next")
                             onClicked: history.next(History.Go)
                             enabled: !history.nextEmpty
                         }
@@ -162,6 +164,7 @@ Utils.NavigableFocusScope {
 
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.menu
+                            text: qsTr("Menu")
 
                             onClicked: mainMenu.openBelow(this)
 
@@ -203,6 +206,7 @@ Utils.NavigableFocusScope {
                             id: list_grid_btn
                             size: VLCStyle.icon_normal
                             iconText: medialib.gridView ? VLCIcons.list : VLCIcons.grid
+                            text: qsTr("List/Grid")
                             onClicked: medialib.gridView = !medialib.gridView
                         }
 
@@ -284,6 +288,7 @@ Utils.NavigableFocusScope {
 
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.playlist
+                            text: qsTr("Playlist")
 
                             onClicked:  rootWindow.playlistVisible = !rootWindow.playlistVisible
                         }
