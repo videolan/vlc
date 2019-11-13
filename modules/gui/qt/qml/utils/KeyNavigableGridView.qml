@@ -51,6 +51,8 @@ NavigableFocusScope {
 
     property alias currentIndex: view.currentIndex
 
+    Accessible.role: Accessible.Table
+
     GridView {
         id: view
 

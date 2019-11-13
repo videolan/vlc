@@ -33,4 +33,5 @@ ProgressBar {
             color: VLCStyle.colors.accent
         }
     }
+    Accessible.ignored: true
 }

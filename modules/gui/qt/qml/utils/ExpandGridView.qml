@@ -59,6 +59,8 @@ NavigableFocusScope {
 
     property double _expandRetractSpeed: 1.
 
+    Accessible.role: Accessible.Table
+
     function renderLayout() {
         flickable.layout()
     }

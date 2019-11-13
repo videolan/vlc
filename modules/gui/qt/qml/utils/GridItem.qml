@@ -58,6 +58,9 @@ Rectangle {
 
     Keys.onMenuPressed: root.contextMenuButtonClicked(cover_bg)
 
+    Accessible.role: Accessible.Cell
+    Accessible.name: title
+
     Item {
         id: gridItem
         width: childrenRect.width

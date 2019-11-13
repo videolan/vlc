@@ -44,6 +44,9 @@ NavigableFocusScope {
 
     Keys.onMenuPressed: root.contextMenuButtonClicked(cover_bg)
 
+    Accessible.role: Accessible.ListItem
+    Accessible.name: line1
+
     Component {
         id: actionAdd
         IconToolButton {

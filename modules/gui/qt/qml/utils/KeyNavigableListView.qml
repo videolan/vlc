@@ -58,6 +58,8 @@ NavigableFocusScope {
     property alias section: view.section
     property alias orientation: view.orientation
 
+    Accessible.role: Accessible.List
+
     function nextPage() {
         view.contentX += (Math.min(view.width, (view.contentWidth - view.width - view.contentX ) ))
     }

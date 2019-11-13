@@ -52,6 +52,8 @@ NavigableFocusScope {
     property real rowHeight: VLCStyle.fontHeight_normal + VLCStyle.margin_large
     property alias spacing: view.spacing
 
+    Accessible.role: Accessible.Table
+
     Utils.SelectableDelegateModel {
         id: delegateModel
 

@@ -34,4 +34,5 @@ Label {
         opacity: 0.5
         radius: 3
     }
+    Accessible.ignored: true
 }

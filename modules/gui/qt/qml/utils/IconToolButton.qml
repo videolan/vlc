@@ -61,6 +61,8 @@ ToolButton {
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
 
+            Accessible.ignored: true
+
             Label {
                 text: control.textOverlay
                 color: control.colorOverlay
@@ -72,6 +74,8 @@ ToolButton {
 
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
+
+                Accessible.ignored: true
 
             }
 
@@ -87,6 +91,8 @@ ToolButton {
 
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
+
+                Accessible.ignored: true
             }
 
         }
