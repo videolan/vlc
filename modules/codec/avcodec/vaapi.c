@@ -145,6 +145,7 @@ static picture_context_t *vaapi_dec_pic_context_copy(picture_context_t *src)
     if (unlikely(pic_ctx == NULL))
         return NULL;
     *pic_ctx = *src_ctx;
+    vlc_video_context_Hold(pic_ctx->ctx.s.vctx);
     va_surface_AddRef(pic_ctx->va_surface);
     return &pic_ctx->ctx.s;
 }
@@ -163,7 +164,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     }
     vaapi_ctx->ctx.s = (picture_context_t) {
         vaapi_dec_pic_context_destroy, vaapi_dec_pic_context_copy,
-        NULL /*TODO*/
+        sys->vctx,
     };
     vaapi_ctx->ctx.surface = sys->render_targets[va_surface_GetIndex(va_surface)];
     vaapi_ctx->ctx.va_dpy = sys->hw_ctx.display;

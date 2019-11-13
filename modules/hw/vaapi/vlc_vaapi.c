@@ -454,6 +454,7 @@ pic_ctx_copy_cb(struct picture_context_t *opaque)
         return NULL;
 
     *dst_ctx = *src_ctx;
+    vlc_video_context_Hold(dst_ctx->ctx.s.vctx);
     dst_ctx->ctx.s.destroy = pic_ctx_destroy_cb;
     picture_Hold(dst_ctx->picref);
     return &dst_ctx->ctx.s;
@@ -508,7 +509,7 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_video_context *vctx,
         p_sys->instance = instance;
         p_sys->ctx.ctx.s = (picture_context_t) {
             pic_sys_ctx_destroy_cb, pic_ctx_copy_cb,
-            NULL /*TODO*/
+            vctx, // it will be held during PicSetContext
         };
         p_sys->ctx.ctx.surface = instance->render_targets[i];
         p_sys->ctx.ctx.va_dpy = dpy;
@@ -569,6 +570,7 @@ vlc_vaapi_PicSetContext(picture_t *pic, struct vaapi_pic_context *vaapi_ctx)
     assert(pic->context == NULL);
 
     pic->context = &vaapi_ctx->s;
+    vlc_video_context_Hold(vaapi_ctx->s.vctx);
 }
 
 void
