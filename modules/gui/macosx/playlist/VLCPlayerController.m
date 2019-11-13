@@ -88,8 +88,9 @@ const CGFloat VLCVolumeDefault = 1.;
     /* remote control support */
     VLCRemoteControlService *_remoteControlService;
 
-    /* iTunes/Spotify play/pause support */
+    /* iTunes/Apple Music/Spotify play/pause support */
     BOOL _iTunesPlaybackWasPaused;
+    BOOL _appleMusicPlaybackWasPaused;
     BOOL _SpotifyPlaybackWasPaused;
 
     NSTimer *_playbackHasTruelyEndedTimer;
@@ -862,6 +863,17 @@ static int BossCallback(vlc_object_t *p_this,
         }
     }
 
+    if (!_appleMusicPlaybackWasPaused) {
+        iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
+        if (iTunesApp && [iTunesApp isRunning]) {
+            if ([iTunesApp playerState] == iTunesEPlSPlaying) {
+                msg_Dbg(p_intf, "pausing Apple Music");
+                [iTunesApp pause];
+                _appleMusicPlaybackWasPaused = YES;
+            }
+        }
+    }
+
     // pause Spotify
     if (!_SpotifyPlaybackWasPaused) {
         SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
@@ -891,6 +903,16 @@ static int BossCallback(vlc_object_t *p_this,
             }
         }
 
+        if (_appleMusicPlaybackWasPaused) {
+            iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
+            if (iTunesApp && [iTunesApp isRunning]) {
+                if ([iTunesApp playerState] == iTunesEPlSPaused) {
+                    msg_Dbg(p_intf, "unpausing Apple Music");
+                    [iTunesApp playpause];
+                }
+            }
+        }
+
         if (_SpotifyPlaybackWasPaused) {
             SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
             if (spotifyApp) {
@@ -905,6 +927,7 @@ static int BossCallback(vlc_object_t *p_this,
     }
 
     _iTunesPlaybackWasPaused = NO;
+    _appleMusicPlaybackWasPaused = NO;
     _SpotifyPlaybackWasPaused = NO;
 }
 
