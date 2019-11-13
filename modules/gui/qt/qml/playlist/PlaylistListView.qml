@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Layouts 1.3
 import QtQml.Models 2.2
 
 import org.videolan.vlc 0.1
@@ -112,10 +113,16 @@ Utils.NavigableFocusScope {
         }
     }
 
+    ColumnLayout {
+        anchors.fill: parent
+
+
     Utils.KeyNavigableListView {
         id: view
 
-        anchors.fill: parent
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+
         focus: true
 
         model: root.plmodel
@@ -318,6 +325,17 @@ Utils.NavigableFocusScope {
             color: view.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
             text: qsTr("playlist is empty")
         }
+    }
+
+    PlaylistToolbar {
+        Layout.fillWidth: true
+
+        leftPadding: root.leftPadding
+        rightPadding: root.rightPadding
+        navigationParent: root
+        navigationUpItem: view
+    }
+
     }
 
     Keys.priority: Keys.AfterItem

@@ -244,6 +244,7 @@
         <file alias="PlaylistMenu.qml">qml/playlist/PlaylistMenu.qml</file>
         <file alias="PLItemFooter.qml">qml/playlist/PLItemFooter.qml</file>
         <file alias="PlaylistMainView.qml">qml/playlist/PlaylistMainView.qml</file>
+        <file alias="PlaylistToolbar.qml">qml/playlist/PlaylistToolbar.qml</file>
     </qresource>
     <qresource prefix="/menus">
         <file alias="AudioMenu.qml">qml/menus/AudioMenu.qml</file>

@@ -650,6 +650,7 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/mediacenter/VideoGridItem.qml \
 	gui/qt/qml/playlist/PlaylistListView.qml \
 	gui/qt/qml/playlist/PlaylistMainView.qml \
+	gui/qt/qml/playlist/PlaylistToolbar.qml \
 	gui/qt/qml/playlist/PLItem.qml \
 	gui/qt/qml/playlist/PLItemFooter.qml \
 	gui/qt/qml/playlist/PlaylistMenu.qml \
