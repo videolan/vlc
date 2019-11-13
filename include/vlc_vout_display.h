@@ -62,7 +62,14 @@ typedef struct vlc_video_align {
 } vlc_video_align_t;
 
 /**
- * Initial/Current configuration for a vout_display_t
+ * User configuration for a video output display (\ref vout_display_t)
+ *
+ * This primarily controls the size of the display area within the video
+ * window, as follows:
+ * - If \ref is_display_filled is set,
+ *   the video size is fitted to the display size.
+ * - Otherwise, the video size is determined from the original video format,
+ *   multiplied by the zoom factor.
  */
 typedef struct vout_display_cfg {
     struct vout_window_t *window; /**< Window */
@@ -70,25 +77,20 @@ typedef struct vout_display_cfg {
     bool is_fullscreen VLC_DEPRECATED;  /* Is the display fullscreen */
 #endif
 
-    /* Display properties */
+    /** Display properties */
     struct {
-        /* Display size */
-        unsigned  width;
-        unsigned  height;
-
-        /* Display SAR */
-        vlc_rational_t sar;
+        unsigned width; /**< Requested display pixel width (0 by default). */
+        unsigned height; /**< Requested display pixel height (0 by default). */
+        vlc_rational_t sar; /**< Requested sample aspect ratio */
     } display;
 
-    /* Alignment of the picture inside the display */
+    /** Alignment of the video within the window */
     vlc_video_align_t align;
 
-    /* Do we fill up the display with the video */
+    /** Automatic scaling/fitting flag */
     bool is_display_filled;
 
-    /* Zoom to use
-     * It will be applied to the whole display if b_display_filled is set, otherwise
-     * only on the video source */
+    /** Zoom ratio */
     struct {
         unsigned num;
         unsigned den;
