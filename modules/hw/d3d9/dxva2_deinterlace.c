@@ -326,7 +326,7 @@ picture_t *AllocPicture( filter_t *p_filter )
         {
             pic_ctx->s = (picture_context_t) {
                 d3d9_pic_context_destroy, d3d9_pic_context_copy,
-                NULL /*TODO*/
+                vlc_video_context_Hold(p_filter->vctx_in),
             };
             pic_ctx->picsys = *pic_sys;
             AcquireD3D9PictureSys( &pic_ctx->picsys );

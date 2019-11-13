@@ -175,19 +175,20 @@ static picture_context_t *dxva2_pic_context_copy(picture_context_t *ctx)
     if (unlikely(pic_ctx==NULL))
         return NULL;
     *pic_ctx = *src_ctx;
+    vlc_video_context_Hold(pic_ctx->ctx.s.vctx);
     va_surface_AddRef(pic_ctx->va_surface);
     AcquireD3D9PictureSys(&pic_ctx->ctx.picsys);
     return &pic_ctx->ctx.s;
 }
 
-static struct dxva2_pic_context *CreatePicContext(IDirect3DSurface9 *surface)
+static struct dxva2_pic_context *CreatePicContext(IDirect3DSurface9 *surface, vlc_video_context *vctx)
 {
     struct dxva2_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
     if (unlikely(pic_ctx==NULL))
         return NULL;
     pic_ctx->ctx.s = (picture_context_t) {
         dxva2_pic_context_destroy, dxva2_pic_context_copy,
-        NULL /*TODO*/
+        vlc_video_context_Hold(vctx),
     };
     pic_ctx->ctx.picsys.surface = surface;
     AcquireD3D9PictureSys(&pic_ctx->ctx.picsys);
@@ -197,7 +198,7 @@ static struct dxva2_pic_context *CreatePicContext(IDirect3DSurface9 *surface)
 static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *va_surface)
 {
     vlc_va_sys_t *sys = va->sys;
-    struct dxva2_pic_context *pic_ctx = CreatePicContext(sys->hw_surface[va_surface_GetIndex(va_surface)]);
+    struct dxva2_pic_context *pic_ctx = CreatePicContext(sys->hw_surface[va_surface_GetIndex(va_surface)], sys->vctx);
     if (unlikely(pic_ctx==NULL))
         return NULL;
     pic_ctx->va_surface = va_surface;
