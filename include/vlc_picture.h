@@ -69,6 +69,7 @@ typedef struct picture_context_t
 {
     void (*destroy)(struct picture_context_t *);
     struct picture_context_t *(*copy)(struct picture_context_t *);
+    struct vlc_video_context *vctx;
 } picture_context_t;
 
 typedef struct picture_buffer_t
@@ -160,6 +161,11 @@ struct picture_t
 
     atomic_uintptr_t refs;
 };
+
+static inline vlc_video_context* picture_GetVideoContext(picture_t *pic)
+{
+    return pic->context ? pic->context->vctx : NULL;
+}
 
 /**
  * This function will create a new picture.

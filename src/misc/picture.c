@@ -43,7 +43,10 @@ static void PictureDestroyContext( picture_t *p_picture )
     picture_context_t *ctx = p_picture->context;
     if (ctx != NULL)
     {
+        vlc_video_context *vctx = ctx->vctx;
         ctx->destroy(ctx);
+        if (vctx)
+            vlc_video_context_Release(vctx);
         p_picture->context = NULL;
     }
 }

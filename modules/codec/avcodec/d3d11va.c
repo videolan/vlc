@@ -177,6 +177,7 @@ static struct d3d11va_pic_context *CreatePicContext(
         return NULL;
     pic_ctx->ctx.s = (picture_context_t) {
         d3d11va_pic_context_destroy, d3d11va_pic_context_copy,
+        NULL /*TODO*/
     };
 
     D3D11_TEXTURE2D_DESC txDesc;

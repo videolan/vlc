@@ -187,6 +187,7 @@ static struct dxva2_pic_context *CreatePicContext(IDirect3DSurface9 *surface)
         return NULL;
     pic_ctx->ctx.s = (picture_context_t) {
         dxva2_pic_context_destroy, dxva2_pic_context_copy,
+        NULL /*TODO*/
     };
     pic_ctx->ctx.picsys.surface = surface;
     AcquireD3D9PictureSys(&pic_ctx->ctx.picsys);

@@ -509,6 +509,7 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
         p_sys->instance = instance;
         p_sys->ctx.ctx.s = (picture_context_t) {
             pic_sys_ctx_destroy_cb, pic_ctx_copy_cb,
+            NULL /*TODO*/
         };
         p_sys->ctx.ctx.surface = instance->render_targets[i];
         p_sys->ctx.ctx.va_dpy = dpy;

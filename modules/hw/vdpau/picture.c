@@ -96,6 +96,7 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
 
     field->context = (picture_context_t) {
         VideoSurfaceDestroy, VideoSurfaceCopy,
+        NULL /*TODO*/
     };
     field->frame = frame;
     field->structure = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;

@@ -163,6 +163,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     }
     vaapi_ctx->ctx.s = (picture_context_t) {
         vaapi_dec_pic_context_destroy, vaapi_dec_pic_context_copy,
+        NULL /*TODO*/
     };
     vaapi_ctx->ctx.surface = sys->render_targets[va_surface_GetIndex(va_surface)];
     vaapi_ctx->ctx.va_dpy = sys->hw_ctx.display;

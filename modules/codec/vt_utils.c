@@ -89,6 +89,7 @@ cvpxpic_attach_common(picture_t *p_pic, CVPixelBufferRef cvpx,
     }
     ctx->s = (picture_context_t) {
         pf_destroy, cvpxpic_copy_cb,
+        NULL // no video context for now
     };
     ctx->cvpx = CVPixelBufferRetain(cvpx);
     ctx->nb_fields = p_pic->i_nb_fields;

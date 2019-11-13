@@ -372,6 +372,7 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
             goto error;
         picctx->ctx = (picture_context_t) {
             NVDecCtxDestroy, NVDecCtxClone,
+            NULL /*TODO*/
         };
         uintptr_t pool_idx = (uintptr_t)p_pic->p_sys;
         picctx->devidePtr = p_sys->outputDevicePtr[pool_idx];
