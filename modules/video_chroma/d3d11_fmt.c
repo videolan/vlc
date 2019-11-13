@@ -787,6 +787,7 @@ picture_context_t *d3d11_pic_context_copy(picture_context_t *ctx)
     if (unlikely(pic_ctx==NULL))
         return NULL;
     *pic_ctx = *D3D11_PICCONTEXT_FROM_PICCTX(ctx);
+    vlc_video_context_Hold(pic_ctx->s.vctx);
     AcquireD3D11PictureSys(&pic_ctx->picsys);
     return &pic_ctx->s;
 }

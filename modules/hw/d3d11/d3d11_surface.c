@@ -585,7 +585,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         {
             pic_ctx->s = (picture_context_t) {
                 d3d11_pic_context_destroy, d3d11_pic_context_copy,
-                NULL /*TODO*/
+                vlc_video_context_Hold(p_filter->vctx_out),
             };
             pic_ctx->picsys = *p_sys;
             AcquireD3D11PictureSys(&pic_ctx->picsys);
