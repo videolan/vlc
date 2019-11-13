@@ -817,6 +817,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
     vlc_video_context *vctx_target   = source ? src_vctx : vout->p->filter.src_vctx;
 
     const es_format_t *p_fmt_current = &fmt_target;
+    vlc_video_context *vctx_current = vctx_target;
 
     for (int a = 0; a < 2; a++) {
         vlc_array_t    *array = a == 0 ? &array_static :
@@ -824,7 +825,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         filter_chain_t *chain = a == 0 ? vout->p->filter.chain_static :
                                          vout->p->filter.chain_interactive;
 
-        filter_chain_Reset(chain, p_fmt_current, vctx_target, p_fmt_current);
+        filter_chain_Reset(chain, p_fmt_current, vctx_current, p_fmt_current);
         for (size_t i = 0; i < vlc_array_count(array); i++) {
             vout_filter_t *e = vlc_array_item_at_index(array, i);
             msg_Dbg(vout, "Adding '%s' as %s", e->name, a == 0 ? "static" : "interactive");
@@ -844,6 +845,7 @@ static void ThreadChangeFilters(vout_thread_t *vout,
         if (!filter_chain_IsEmpty(chain))
         {
             p_fmt_current = filter_chain_GetFmtOut(chain);
+            vctx_current = filter_chain_GetVideoCtxOut(chain);
         }
         vlc_array_clear(array);
     }
