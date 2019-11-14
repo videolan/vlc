@@ -138,7 +138,7 @@ typedef struct
  *****************************************************************************/
 static int  OpenDecoderJni(vlc_object_t *);
 static int  OpenDecoderNdk(vlc_object_t *);
-static void CleanDecoder(decoder_t *);
+static void CleanDecoder(decoder_sys_t *);
 static void CloseDecoder(vlc_object_t *);
 
 static int Video_OnNewBlock(decoder_t *, block_t **);
@@ -157,11 +157,11 @@ static int Audio_ProcessOutput(decoder_t *, mc_api_out *, picture_t **,
 
 static void DecodeFlushLocked(decoder_t *);
 static void DecodeFlush(decoder_t *);
-static void StopMediaCodec(decoder_t *);
+static void StopMediaCodec(decoder_sys_t *);
 static void *OutThread(void *);
 
-static void InvalidateAllPictures(decoder_t *);
-static void RemoveInflightPictures(decoder_t *);
+static void InvalidateAllPictures(decoder_sys_t *);
+static void RemoveInflightPictures(decoder_sys_t *);
 
 /*****************************************************************************
  * Module descriptor
@@ -209,22 +209,19 @@ vlc_module_begin ()
         add_shortcut("mediacodec_jni")
 vlc_module_end ()
 
-static void CSDFree(decoder_t *p_dec)
+static void CSDFree(decoder_sys_t *p_sys)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
     for (unsigned int i = 0; i < p_sys->i_csd_count; ++i)
         block_Release(p_sys->pp_csd[i]);
     p_sys->i_csd_count = 0;
 }
 
 /* Init the p_sys->p_csd that will be sent from DecodeBlock */
-static void CSDInit(decoder_t *p_dec, block_t *p_blocks, size_t i_count)
+static void CSDInit(decoder_sys_t *p_sys, block_t *p_blocks, size_t i_count)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     assert(i_count <= MAX_CSD_COUNT);
 
-    CSDFree(p_dec);
+    CSDFree(p_sys);
 
     for (size_t i = 0; i < i_count; ++i)
     {
@@ -239,14 +236,14 @@ static void CSDInit(decoder_t *p_dec, block_t *p_blocks, size_t i_count)
     p_sys->i_csd_send = 0;
 }
 
-static int CSDDup(decoder_t *p_dec, const void *p_buf, size_t i_buf)
+static int CSDDup(decoder_sys_t *p_sys, const void *p_buf, size_t i_buf)
 {
     block_t *p_block = block_Alloc(i_buf);
     if (!p_block)
         return VLC_ENOMEM;
     memcpy(p_block->p_buffer, p_buf, i_buf);
 
-    CSDInit(p_dec, p_block, 1);
+    CSDInit(p_sys, p_block, 1);
     return VLC_SUCCESS;
 }
 
@@ -277,7 +274,7 @@ static int H264SetCSD(decoder_t *p_dec, bool *p_size_changed)
     block_t *p_spspps_blocks = h264_helper_get_annexb_config(hh);
 
     if (p_spspps_blocks != NULL)
-        CSDInit(p_dec, p_spspps_blocks, 2);
+        CSDInit(p_sys, p_spspps_blocks, 2);
 
     HXXXInitSize(p_dec, p_size_changed);
 
@@ -302,7 +299,7 @@ static int HEVCSetCSD(decoder_t *p_dec, bool *p_size_changed)
             block_ChainRelease(p_xps_blocks);
             return VLC_ENOMEM;
         }
-        CSDInit(p_dec, p_monolith, 1);
+        CSDInit(p_sys, p_monolith, 1);
     }
 
     HXXXInitSize(p_dec, p_size_changed);
@@ -372,7 +369,7 @@ static int ParseVideoExtraVc1(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
         return VLC_EGENERIC;
 
     p_sys->pf_on_new_block = VideoVC1_OnNewBlock;
-    return CSDDup(p_dec, p_extra + offset, i_extra - offset);
+    return CSDDup(p_sys, p_extra + offset, i_extra - offset);
 }
 
 static int ParseVideoExtraWmv3(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
@@ -405,7 +402,7 @@ static int ParseVideoExtraWmv3(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     SetDWLE(&(p_data[12]), p_dec->fmt_in.video.i_height);
     SetDWLE(&(p_data[16]), p_dec->fmt_in.video.i_width);
 
-    return CSDDup(p_dec, p_data, sizeof(p_data));
+    return CSDDup(p_dec->p_sys, p_data, sizeof(p_data));
 }
 
 static int ParseExtra(decoder_t *p_dec)
@@ -435,7 +432,7 @@ static int ParseExtra(decoder_t *p_dec)
     }
     /* Set default CSD */
     if (p_dec->fmt_in.i_extra)
-        return CSDDup(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
+        return CSDDup(p_sys, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
     else
         return VLC_SUCCESS;
 }
@@ -526,14 +523,12 @@ static int StartMediaCodec(decoder_t *p_dec)
 /*****************************************************************************
  * StopMediaCodec: Close the mediacodec instance
  *****************************************************************************/
-static void StopMediaCodec(decoder_t *p_dec)
+static void StopMediaCodec(decoder_sys_t *p_sys)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
     /* Remove all pictures that are currently in flight in order
      * to prevent the vout from using destroyed output buffers. */
     if (p_sys->api.b_direct_rendering)
-        RemoveInflightPictures(p_dec);
+        RemoveInflightPictures(p_sys);
 
     p_sys->api.stop(&p_sys->api);
 }
@@ -816,7 +811,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
 bailout:
     CleanInputVideo(p_dec);
-    CleanDecoder(p_dec);
+    CleanDecoder(p_sys);
     return VLC_EGENERIC;
 }
 
@@ -841,17 +836,15 @@ static void AbortDecoderLocked(decoder_t *p_dec)
     }
 }
 
-static void CleanDecoder(decoder_t *p_dec)
+static void CleanDecoder(decoder_sys_t *p_sys)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
     vlc_mutex_destroy(&p_sys->lock);
     vlc_cond_destroy(&p_sys->cond);
     vlc_cond_destroy(&p_sys->dec_cond);
 
-    StopMediaCodec(p_dec);
+    StopMediaCodec(p_sys);
 
-    CSDFree(p_dec);
+    CSDFree(p_sys);
     p_sys->api.clean(&p_sys->api);
 
     free(p_sys);
@@ -875,7 +868,8 @@ static void CloseDecoder(vlc_object_t *p_this)
     vlc_join(p_sys->out_thread, NULL);
 
     CleanInputVideo(p_dec);
-    CleanDecoder(p_dec);
+
+    CleanDecoder(p_sys);
 }
 
 /*****************************************************************************
@@ -896,10 +890,8 @@ static void ReleasePictureTs(decoder_t *p_dec, unsigned i_index, vlc_tick_t i_ts
     p_sys->api.release_out_ts(&p_sys->api, i_index, i_ts * INT64_C(1000));
 }
 
-static void InvalidateAllPictures(decoder_t *p_dec)
+static void InvalidateAllPictures(decoder_sys_t *p_sys)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
     for (unsigned int i = 0; i < p_sys->video.i_inflight_pictures; ++i)
         AndroidOpaquePicture_Release(p_sys->video.pp_inflight_pictures[i],
                                      false);
@@ -923,10 +915,8 @@ static int InsertInflightPicture(decoder_t *p_dec, picture_sys_t *p_picsys)
     return 0;
 }
 
-static void RemoveInflightPictures(decoder_t *p_dec)
+static void RemoveInflightPictures(decoder_sys_t *p_sys)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
     for (unsigned int i = 0; i < p_sys->video.i_inflight_pictures; ++i)
         AndroidOpaquePicture_DetachDecoder(p_sys->video.pp_inflight_pictures[i]);
     TAB_CLEAN(p_sys->video.i_inflight_pictures,
@@ -1422,7 +1412,7 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
             if (!b_dequeue_timeout)
             {
                 msg_Warn(p_dec, "Decoder stuck: invalidate all buffers");
-                InvalidateAllPictures(p_dec);
+                InvalidateAllPictures(p_sys);
                 b_dequeue_timeout = true;
                 continue;
             }
@@ -1537,7 +1527,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
 
         if (b_restart)
         {
-            StopMediaCodec(p_dec);
+            StopMediaCodec(p_sys);
 
             int i_ret = StartMediaCodec(p_dec);
             switch (i_ret)
@@ -1694,7 +1684,7 @@ static void Video_OnFlush(decoder_t *p_dec)
      * since flushing make all previous indices returned by
      * MediaCodec invalid. */
     if (p_sys->api.b_direct_rendering)
-        InvalidateAllPictures(p_dec);
+        InvalidateAllPictures(p_sys);
 }
 
 static int Audio_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
