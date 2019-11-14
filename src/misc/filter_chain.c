@@ -196,10 +196,10 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     filter_t *filter = &chained->filter;
 
     const es_format_t *fmt_in;
-        if( chain->last != NULL )
-            fmt_in = &chain->last->filter.fmt_out;
-        else
-            fmt_in = &chain->fmt_in;
+    if( chain->last != NULL )
+        fmt_in = &chain->last->filter.fmt_out;
+    else
+        fmt_in = &chain->fmt_in;
 
     if( fmt_out == NULL )
         fmt_out = &chain->fmt_out;
