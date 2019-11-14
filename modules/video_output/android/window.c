@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
+#include <vlc_codec.h>
 
 #include <dlfcn.h>
 #include <jni.h>
@@ -39,6 +40,7 @@
 
 static int Open(vout_window_t *);
 static void Close(vout_window_t *);
+static int OpenDecDevice(vlc_decoder_device *device, vout_window_t *window);
 
 /*
  * Module descriptor
@@ -50,6 +52,9 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_capability("vout window", 10)
     set_callback(Open)
+    add_submodule ()
+        set_callback_dec_device(OpenDecDevice, 1)
+        add_shortcut("android")
 vlc_module_end()
 
 
@@ -104,4 +109,21 @@ static int Open(vout_window_t *wnd)
 static void Close(vout_window_t *wnd)
 {
     AWindowHandler_destroy(wnd->handle.anativewindow);
+}
+
+static int
+OpenDecDevice(vlc_decoder_device *device, vout_window_t *window)
+{
+    if (!window || window->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
+        return VLC_EGENERIC;
+
+    static const struct vlc_decoder_device_operations ops = 
+    {
+        .close = NULL,
+    };
+    device->ops = &ops;
+    device->type = VLC_DECODER_DEVICE_AWINDOW;
+    device->opaque = window->handle.anativewindow;
+
+    return VLC_SUCCESS;
 }

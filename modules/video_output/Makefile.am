@@ -274,7 +274,6 @@ libandroid_window_plugin_la_CFLAGS = $(AM_CFLAGS)
 libandroid_window_plugin_la_LIBADD = $(LIBDL)
 
 libandroid_display_plugin_la_SOURCES = video_output/android/display.c \
-	video_output/android/display.h \
 	video_output/android/utils.c video_output/android/utils.h
 libandroid_display_plugin_la_CFLAGS = $(AM_CFLAGS)
 libandroid_display_plugin_la_LIBADD = $(LIBDL)

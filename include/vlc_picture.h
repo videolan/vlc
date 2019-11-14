@@ -96,7 +96,7 @@ enum vlc_video_context_type
     VLC_VIDEO_CONTEXT_VDPAU,
     VLC_VIDEO_CONTEXT_DXVA2, /**< private: d3d9_video_context_t* */
     VLC_VIDEO_CONTEXT_D3D11VA,  /**< private: d3d11_video_context_t* */
-    VLC_VIDEO_CONTEXT_AWINDOW,
+    VLC_VIDEO_CONTEXT_AWINDOW, /**< private: android_video_context_t* */
     VLC_VIDEO_CONTEXT_NVDEC,
     VLC_VIDEO_CONTEXT_CVPX,
     VLC_VIDEO_CONTEXT_MMAL,

@@ -27,11 +27,11 @@
 #endif
 
 #include "converter.h"
-#include "../android/display.h"
 #include "../android/utils.h"
 
 struct priv
 {
+    android_video_context_t *avctx;
     AWindowHandler *awh;
     const float *transform_mtx;
     bool stex_attached;
@@ -40,23 +40,6 @@ struct priv
         GLint uSTMatrix;
     } uloc;
 };
-
-static int
-pool_lock_pic(picture_t *p_pic)
-{
-    picture_sys_t *p_picsys = p_pic->p_sys;
-
-    p_picsys->b_locked = true;
-    return 0;
-}
-
-static void
-pool_unlock_pic(picture_t *p_pic)
-{
-    picture_sys_t *p_picsys = p_pic->p_sys;
-
-    AndroidOpaquePicture_Release(p_picsys, false);
-}
 
 static int
 tc_anop_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
@@ -74,75 +57,22 @@ tc_anop_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
     return VLC_SUCCESS;
 }
 
-static picture_pool_t *
-tc_anop_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
-{
-    struct priv *priv = tc->priv;
-#define FORCED_COUNT 31
-    requested_count = FORCED_COUNT;
-    picture_t *picture[FORCED_COUNT] = {NULL, };
-    unsigned count;
-
-    for (count = 0; count < requested_count; count++)
-    {
-        picture_sys_t *p_picsys = calloc(1, sizeof(*p_picsys));
-        if (unlikely(p_picsys == NULL))
-            goto error;
-        picture_resource_t rsc = {
-            .p_sys = p_picsys,
-            .pf_destroy = AndroidOpaquePicture_DetachVout,
-        };
-
-        p_picsys->hw.b_vd_ref = true;
-        p_picsys->hw.p_surface = SurfaceTexture_getANativeWindow(priv->awh);
-        p_picsys->hw.p_jsurface = SurfaceTexture_getSurface(priv->awh);
-        p_picsys->hw.i_index = -1;
-        vlc_mutex_init(&p_picsys->hw.lock);
-
-        picture[count] = picture_NewFromResource(&tc->fmt, &rsc);
-        if (!picture[count])
-        {
-            free(p_picsys);
-            goto error;
-        }
-    }
-
-    /* Wrap the pictures into a pool */
-    picture_pool_configuration_t pool_cfg = {
-        .picture_count = requested_count,
-        .picture       = picture,
-        .lock          = pool_lock_pic,
-        .unlock        = pool_unlock_pic,
-    };
-    picture_pool_t *pool = picture_pool_NewExtended(&pool_cfg);
-    if (!pool)
-        goto error;
-
-    return pool;
-error:
-    for (unsigned i = 0; i < count; i++)
-        picture_Release(picture[i]);
-    return NULL;
-}
-
 static int
 tc_anop_update(const opengl_tex_converter_t *tc, GLuint *textures,
                const GLsizei *tex_width, const GLsizei *tex_height,
                picture_t *pic, const size_t *plane_offset)
 {
-    picture_sys_t *p_sys = pic->p_sys;
     (void) tex_width; (void) tex_height; (void) plane_offset;
+    assert(pic->context);
     assert(textures[0] != 0);
 
     if (plane_offset != NULL)
         return VLC_EGENERIC;
 
-    if (!p_sys->b_locked)
-        return VLC_SUCCESS;
-
     struct priv *priv = tc->priv;
 
-    AndroidOpaquePicture_Release(pic->p_sys, true);
+    if (!priv->avctx->render(pic->context))
+        return VLC_SUCCESS; /* already rendered */
 
     if (SurfaceTexture_waitAndUpdateTexImage(priv->awh, &priv->transform_mtx)
         != VLC_SUCCESS)
@@ -195,7 +125,14 @@ Open(vlc_object_t *obj)
     opengl_tex_converter_t *tc = (void *) obj;
 
     if (tc->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
-     || !tc->gl->surface->handle.anativewindow)
+     || !tc->gl->surface->handle.anativewindow
+     || !tc->vctx)
+        return VLC_EGENERIC;
+
+    android_video_context_t *avctx =
+        vlc_video_context_GetPrivate(tc->vctx, VLC_VIDEO_CONTEXT_AWINDOW);
+
+    if (avctx->id != AWindow_SurfaceTexture)
         return VLC_EGENERIC;
 
     tc->priv = malloc(sizeof(struct priv));
@@ -203,12 +140,12 @@ Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     struct priv *priv = tc->priv;
+    priv->avctx = avctx;
     priv->awh = tc->gl->surface->handle.anativewindow;
     priv->transform_mtx = NULL;
     priv->stex_attached = false;
 
     tc->pf_allocate_textures = tc_anop_allocate_textures;
-    tc->pf_get_pool       = tc_anop_get_pool;
     tc->pf_update         = tc_anop_update;
     tc->pf_fetch_locations = tc_anop_fetch_locations;
     tc->pf_prepare_shader = tc_anop_prepare_shader;

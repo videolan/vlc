@@ -68,6 +68,16 @@ typedef struct
                                 const struct awh_mouse_coords *coords);
 } awh_events_t;
 
+typedef struct android_video_context_t android_video_context_t;
+
+struct android_video_context_t
+{
+    enum AWindow_ID id;
+    void *dec_opaque;
+    bool (*render)(struct picture_context_t *ctx);
+    bool (*render_ts)(struct picture_context_t *ctx, vlc_tick_t ts);
+};
+
 /**
  * Attach or get a JNIEnv*
  *

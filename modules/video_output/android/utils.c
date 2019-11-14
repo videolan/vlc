@@ -537,6 +537,21 @@ AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events)
     p_awh->b_has_video_layout_listener =
         flags & AWINDOW_REGISTER_FLAGS_HAS_VIDEO_LAYOUT_LISTENER;
 
+    if (p_awh->b_has_video_layout_listener)
+    {
+        /* XXX: HACK: force mediacodec to setup an OpenGL surface when the vout
+         * is forced to gles2. Indeed, setting b_has_video_layout_listener to
+         * false will result in mediacodec using the AWindow_SurfaceTexture
+         * surface.
+         */
+        char *vout_modules = var_InheritString(wnd, "vout");
+        if (vout_modules
+         && (strncmp(vout_modules, "gles2", sizeof("gles2") - 1) == 0
+          || strncmp(vout_modules, "opengles2", sizeof("opengles2") - 1) == 0))
+            p_awh->b_has_video_layout_listener = false;
+        free(vout_modules);
+    }
+
     return p_awh;
 }
 
