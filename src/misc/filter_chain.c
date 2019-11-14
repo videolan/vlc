@@ -51,6 +51,7 @@ struct filter_chain_t
     chained_filter_t *first, *last; /**< List of filters */
 
     es_format_t fmt_in; /**< Chain input format (constant) */
+    vlc_video_context *vctx_in; /**< Chain input video context (set on Reset) */
     es_format_t fmt_out; /**< Chain output format (constant) */
     bool b_allow_fmt_out_change; /**< Each filter can change the output */
     const char *filter_cap; /**< Filter modules capability */
@@ -77,6 +78,7 @@ static filter_chain_t *filter_chain_NewInner( vlc_object_t *obj,
     chain->first = NULL;
     chain->last = NULL;
     es_format_Init( &chain->fmt_in, cat, 0 );
+    chain->vctx_in = NULL;
     es_format_Init( &chain->fmt_out, cat, 0 );
     chain->b_allow_fmt_out_change = fmt_out_change;
     chain->filter_cap = cap;
@@ -205,15 +207,23 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     filter_t *filter = &chained->filter;
 
     const es_format_t *fmt_in;
+    vlc_video_context *vctx_in;
     if( chain->last != NULL )
+    {
         fmt_in = &chain->last->filter.fmt_out;
+        vctx_in = chain->last->filter.vctx_out;
+    }
     else
+    {
         fmt_in = &chain->fmt_in;
+        vctx_in = chain->vctx_in;
+    }
 
     if( fmt_out == NULL )
         fmt_out = &chain->fmt_out;
 
     es_format_Copy( &filter->fmt_in, fmt_in );
+    filter->vctx_in = vctx_in;
     es_format_Copy( &filter->fmt_out, fmt_out );
     filter->b_allow_fmt_out_change = chain->b_allow_fmt_out_change;
     filter->p_cfg = cfg;
