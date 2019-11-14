@@ -193,14 +193,9 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
  *
  *****************************************************************************/
 
-static picture_priv_t *picture_NewPrivate(const video_format_t *restrict p_fmt,
-                                          size_t extra)
+static bool picture_InitPrivate(const video_format_t *restrict p_fmt,
+                                picture_priv_t *priv)
 {
-    /* */
-    picture_priv_t *priv = malloc(sizeof (*priv) + extra);
-    if( unlikely(priv == NULL) )
-        return NULL;
-
     picture_t *p_picture = &priv->picture;
 
     memset( p_picture, 0, sizeof( *p_picture ) );
@@ -210,22 +205,28 @@ static picture_priv_t *picture_NewPrivate(const video_format_t *restrict p_fmt,
     if( picture_Setup( p_picture, p_fmt ) )
     {
         free( p_picture );
-        return NULL;
+        return false;
     }
 
     atomic_init(&p_picture->refs, 1);
     priv->gc.opaque = NULL;
 
-    return priv;
+    return true;
 }
 
 picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_resource_t *p_resource )
 {
     assert(p_resource != NULL);
 
-    picture_priv_t *priv = picture_NewPrivate(p_fmt, 0);
+    picture_priv_t *priv = malloc(sizeof(*priv));
     if (unlikely(priv == NULL))
         return NULL;
+
+    if (!picture_InitPrivate(p_fmt, priv))
+    {
+        free(priv);
+        return NULL;
+    }
 
     picture_t *p_picture = &priv->picture;
 
@@ -248,11 +249,23 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
 
 #define PICTURE_SW_SIZE_MAX (UINT32_C(1) << 28) /* 256MB: 8K * 8K * 4*/
 
+struct picture_priv_buffer_t {
+    picture_priv_t   priv;
+    picture_buffer_t res;
+};
+
 picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
 {
-    picture_priv_t *priv = picture_NewPrivate(fmt, sizeof (picture_buffer_t));
-    if (unlikely(priv == NULL))
+    static_assert(offsetof(struct picture_priv_buffer_t, priv)==0,
+                  "misplaced picture_priv_t, destroy won't work");
+
+    struct picture_priv_buffer_t *privbuf = malloc(sizeof(*privbuf));
+    if (unlikely(privbuf == NULL))
         return NULL;
+
+    picture_priv_t *priv = &privbuf->priv;
+    if (!picture_InitPrivate(fmt, priv))
+        goto error;
 
     priv->gc.destroy = picture_DestroyFromFormat;
 
@@ -278,7 +291,7 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
     if (unlikely(pic_size >= PICTURE_SW_SIZE_MAX))
         goto error;
 
-    picture_buffer_t *res = (void *)priv->extra;
+    picture_buffer_t *res = &privbuf->res;
 
     unsigned char *buf = picture_Allocate(&res->fd, pic_size);
     if (unlikely(buf == NULL))
@@ -298,7 +311,7 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
 
     return pic;
 error:
-    free(pic);
+    free(privbuf);
     return NULL;
 }
 

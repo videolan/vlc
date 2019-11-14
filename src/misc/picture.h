@@ -31,8 +31,6 @@ typedef struct
         void (*destroy)(picture_t *);
         void *opaque;
     } gc;
-
-    max_align_t extra[];
 } picture_priv_t;
 
 void *picture_Allocate(int *, size_t);
