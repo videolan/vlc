@@ -35,3 +35,5 @@ typedef struct
 
 void *picture_Allocate(int *, size_t);
 void picture_Deallocate(int, void *, size_t);
+
+picture_t * picture_InternalClone(picture_t *, void (*pf_destroy)(picture_t *), void *);

@@ -95,23 +95,9 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
 {
     picture_t *picture = pool->picture[offset];
     uintptr_t sys = ((uintptr_t)pool) + offset;
-    picture_resource_t res = {
-        .p_sys = picture->p_sys,
-        .pf_destroy = picture_pool_ReleasePicture,
-    };
 
-    for (int i = 0; i < picture->i_planes; i++) {
-        res.p[i].p_pixels = picture->p[i].p_pixels;
-        res.p[i].i_lines = picture->p[i].i_lines;
-        res.p[i].i_pitch = picture->p[i].i_pitch;
-    }
-
-    picture_t *clone = picture_NewFromResource(&picture->format, &res);
-    if (likely(clone != NULL)) {
-        ((picture_priv_t *)clone)->gc.opaque = (void *)sys;
-        picture_Hold(picture);
-    }
-    return clone;
+    return picture_InternalClone(picture, picture_pool_ReleasePicture,
+                                 (void*)sys);
 }
 
 picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
@@ -295,6 +281,7 @@ bool picture_pool_OwnsPic(picture_pool_t *pool, picture_t *pic)
         if (priv->gc.opaque == NULL)
             return false; /* not a pooled picture */
 
+        /* cloned picture from picture_Clone() */
         pic = priv->gc.opaque;
         priv = (picture_priv_t *)pic;
     }

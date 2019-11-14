@@ -418,12 +418,12 @@ static void picture_DestroyClone(picture_t *clone)
     picture_Release(picture);
 }
 
-picture_t *picture_Clone(picture_t *picture)
+picture_t *picture_InternalClone(picture_t *picture,
+                                 void (*pf_destroy)(picture_t *), void *opaque)
 {
-    /* TODO: merge common code with picture_pool_ClonePicture(). */
     picture_resource_t res = {
         .p_sys = picture->p_sys,
-        .pf_destroy = picture_DestroyClone,
+        .pf_destroy = pf_destroy,
     };
 
     for (int i = 0; i < picture->i_planes; i++) {
@@ -434,9 +434,16 @@ picture_t *picture_Clone(picture_t *picture)
 
     picture_t *clone = picture_NewFromResource(&picture->format, &res);
     if (likely(clone != NULL)) {
-        ((picture_priv_t *)clone)->gc.opaque = picture;
+        ((picture_priv_t *)clone)->gc.opaque = opaque;
         picture_Hold(picture);
+    }
+    return clone;
+}
 
+picture_t *picture_Clone(picture_t *picture)
+{
+    picture_t *clone = picture_InternalClone(picture, picture_DestroyClone, picture);
+    if (likely(clone != NULL)) {
         if (picture->context != NULL)
             clone->context = picture->context->copy(picture->context);
     }
