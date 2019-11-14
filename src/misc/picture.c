@@ -276,6 +276,7 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
     }
 
     /* Calculate how big the new image should be */
+    assert(pic->i_planes <= PICTURE_PLANE_MAX);
     size_t plane_sizes[PICTURE_PLANE_MAX];
     size_t pic_size = 0;
 
