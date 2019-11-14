@@ -538,6 +538,21 @@ static void StopMediaCodec(decoder_t *p_dec)
     p_sys->api.stop(&p_sys->api);
 }
 
+static void CleanInputVideo(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (p_dec->fmt_in.i_cat == VIDEO_ES)
+    {
+        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
+         || p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
+            hxxx_helper_clean(&p_sys->video.hh);
+
+        if (p_sys->video.timestamp_fifo)
+            timestamp_FifoRelease(p_sys->video.timestamp_fifo);
+    }
+}
+
 /*****************************************************************************
  * OpenDecoder: Create the decoder instance
  *****************************************************************************/
@@ -800,6 +815,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     return VLC_SUCCESS;
 
 bailout:
+    CleanInputVideo(p_dec);
     CleanDecoder(p_dec);
     return VLC_EGENERIC;
 }
@@ -838,15 +854,6 @@ static void CleanDecoder(decoder_t *p_dec)
     CSDFree(p_dec);
     p_sys->api.clean(&p_sys->api);
 
-    if (p_dec->fmt_in.i_cat == VIDEO_ES)
-    {
-        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
-         || p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
-            hxxx_helper_clean(&p_sys->video.hh);
-
-        if (p_sys->video.timestamp_fifo)
-            timestamp_FifoRelease(p_sys->video.timestamp_fifo);
-    }
     free(p_sys);
 }
 
@@ -867,6 +874,7 @@ static void CloseDecoder(vlc_object_t *p_this)
 
     vlc_join(p_sys->out_thread, NULL);
 
+    CleanInputVideo(p_dec);
     CleanDecoder(p_dec);
 }
 
