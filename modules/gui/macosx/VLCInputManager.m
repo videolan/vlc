@@ -158,8 +158,9 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     IOPMAssertionID userActivityAssertionID;
 
-    /* iTunes/Spotify play/pause support */
+    /* iTunes/Apple Music/Spotify play/pause support */
     BOOL b_has_itunes_paused;
+    BOOL b_has_applemusic_paused;
     BOOL b_has_spotify_paused;
 
     NSTimer *hasEndedTimer;
@@ -368,6 +369,18 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         }
     }
 
+    // pause Apple Music
+    if (!b_has_applemusic_paused) {
+        iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
+        if (iTunesApp && [iTunesApp isRunning]) {
+            if ([iTunesApp playerState] == iTunesEPlSPlaying) {
+                msg_Dbg(p_intf, "pausing Apple Music");
+                [iTunesApp pause];
+                b_has_itunes_paused = YES;
+            }
+        }
+    }
+
     // pause Spotify
     if (!b_has_spotify_paused) {
         SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
@@ -398,6 +411,16 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
             }
         }
 
+        if (b_has_applemusic_paused) {
+            iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
+            if (iTunesApp && [iTunesApp isRunning]) {
+                if ([iTunesApp playerState] == iTunesEPlSPaused) {
+                    msg_Dbg(p_intf, "unpausing Apple Music");
+                    [iTunesApp playpause];
+                }
+            }
+        }
+
         if (b_has_spotify_paused) {
             SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
             if (spotifyApp) {
@@ -412,6 +435,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     }
 
     b_has_itunes_paused = NO;
+    b_has_applemusic_paused = NO;
     b_has_spotify_paused = NO;
 }
 

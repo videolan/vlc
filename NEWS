@@ -7,7 +7,7 @@ Core:
 Demux:
  * Fix TTML entities not passed to decoder
  * Misc raw H264/HEVC frame rate fixes
- * Fixed adaptive regression on TS format change (mostly HLS)
+ * Fix adaptive regression on TS format change (mostly HLS)
 
 Packetizers:
  * Fixes H264/HEVC incomplete draining in some cases
@@ -19,6 +19,7 @@ Decoder:
 
 macOS:
  * Fix Apple Remote support on macOS Catalina
+ * Add support for pausing Apple Music on macOS Catalina
 
 Misc:
  * Add missing .wpl & .zpl file associations on Windows
