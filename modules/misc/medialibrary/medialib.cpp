@@ -414,7 +414,6 @@ bool MediaLibrary::Start()
 
     auto networkFs = std::make_shared<vlc::medialibrary::SDFileSystemFactory>( VLC_OBJECT( m_vlc_ml ), "smb://");
     ml->addNetworkFileSystemFactory( networkFs );
-    // Disabled by default for now
     ml->setDiscoverNetworkEnabled( true );
 
     if ( ml->start() == false )
