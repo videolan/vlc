@@ -345,28 +345,25 @@ void MediaLibrary::onRescanStarted()
 MediaLibrary::MediaLibrary( vlc_medialibrary_module_t* ml )
     : m_vlc_ml( ml )
 {
-}
-
-bool MediaLibrary::Start()
-{
-    if ( m_ml != nullptr )
-        return true;
-
-    std::unique_ptr<medialibrary::IMediaLibrary> ml( NewMediaLibrary() );
+    m_ml.reset( NewMediaLibrary() );
 
     m_logger.reset( new Logger( VLC_OBJECT( m_vlc_ml ) ) );
-    ml->setVerbosity( var_InheritInteger( VLC_OBJECT( m_vlc_ml ), "verbose" ) >= 4 ?
+    m_ml->setVerbosity( var_InheritInteger( VLC_OBJECT( m_vlc_ml ), "verbose" ) >= 4 ?
                           medialibrary::LogLevel::Debug : medialibrary::LogLevel::Info );
-    ml->setLogger( m_logger.get() );
+    m_ml->setLogger( m_logger.get() );
+}
 
+bool MediaLibrary::Init()
+{
+    if ( m_ml->isInitialized() == true )
+        return true;
     auto userDir = vlc::wrap_cptr( config_GetUserDir( VLC_USERDATA_DIR ) );
     std::string mlDir = std::string{ userDir.get() } + "/ml/";
 
-    auto initStatus = ml->initialize( mlDir + "ml.db", mlDir + "/mlstorage/", this );
+    auto initStatus = m_ml->initialize( mlDir + "ml.db", mlDir + "/mlstorage/", this );
     switch ( initStatus )
     {
         case medialibrary::InitializeResult::AlreadyInitialized:
-            msg_Info( m_vlc_ml, "MediaLibrary was already initialized" );
             return true;
         case medialibrary::InitializeResult::Failed:
             msg_Err( m_vlc_ml, "Medialibrary failed to initialize" );
@@ -388,10 +385,10 @@ bool MediaLibrary::Start()
             switch ( res )
             {
                 case 1:
-                    ml->clearDatabase( true );
+                    m_ml->clearDatabase( true );
                     break;
                 case 2:
-                    ml->clearDatabase( false );
+                    m_ml->clearDatabase( false );
                     break;
                 default:
                     return false;
@@ -400,10 +397,10 @@ bool MediaLibrary::Start()
         }
     }
 
-    ml->addParserService( std::make_shared<MetadataExtractor>( VLC_OBJECT( m_vlc_ml ) ) );
+    m_ml->addParserService( std::make_shared<MetadataExtractor>( VLC_OBJECT( m_vlc_ml ) ) );
     try
     {
-        ml->addThumbnailer( std::make_shared<Thumbnailer>( m_vlc_ml ) );
+        m_ml->addThumbnailer( std::make_shared<Thumbnailer>( m_vlc_ml ) );
     }
     catch ( const std::runtime_error& ex )
     {
@@ -413,10 +410,18 @@ bool MediaLibrary::Start()
     }
 
     auto networkFs = std::make_shared<vlc::medialibrary::SDFileSystemFactory>( VLC_OBJECT( m_vlc_ml ), "smb://");
-    ml->addNetworkFileSystemFactory( networkFs );
-    ml->setDiscoverNetworkEnabled( true );
+    m_ml->addNetworkFileSystemFactory( networkFs );
+    m_ml->setDiscoverNetworkEnabled( true );
 
-    if ( ml->start() == false )
+    return true;
+}
+
+bool MediaLibrary::Start()
+{
+    if ( Init() == false )
+        return false;
+
+    if ( m_ml->start() == false )
     {
         msg_Err( m_vlc_ml, "Failed to start the MediaLibrary" );
         return false;
@@ -425,7 +430,7 @@ bool MediaLibrary::Start()
     // Reload entry points we already know about, and then add potential new ones.
     // Doing it the other way around would cause the initial scan to be performed
     // twice, as we start discovering the new folders, then reload them.
-    ml->reload();
+    m_ml->reload();
 
     auto folders = vlc::wrap_cptr( var_InheritString( m_vlc_ml, "ml-folders" ) );
     if ( folders != nullptr && strlen( folders.get() ) > 0 )
@@ -433,7 +438,7 @@ bool MediaLibrary::Start()
         std::istringstream ss( folders.get() );
         std::string folder;
         while ( std::getline( ss, folder, ';' ) )
-            ml->discover( folder );
+            m_ml->discover( folder );
     }
     else
     {
@@ -444,13 +449,12 @@ bool MediaLibrary::Start()
             if( folder == nullptr )
                 continue;
             auto folderMrl = vlc::wrap_cptr( vlc_path2uri( folder.get(), nullptr ) );
-            ml->discover( folderMrl.get() );
+            m_ml->discover( folderMrl.get() );
             varValue += std::string{ ";" } + folderMrl.get();
         }
         if ( varValue.empty() == false )
             config_PutPsz( "ml-folders", varValue.c_str()+1 ); /* skip initial ';' */
     }
-    m_ml = std::move( ml );
     return true;
 }
 
