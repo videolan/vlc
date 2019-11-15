@@ -460,8 +460,25 @@ bool MediaLibrary::Start()
 
 int MediaLibrary::Control( int query, va_list args )
 {
-    if ( Start() == false )
-        return VLC_EGENERIC;
+    switch ( query )
+    {
+        case VLC_ML_ADD_FOLDER:
+        case VLC_ML_REMOVE_FOLDER:
+        case VLC_ML_BAN_FOLDER:
+        case VLC_ML_UNBAN_FOLDER:
+        case VLC_ML_RELOAD_FOLDER:
+        case VLC_ML_RESUME_BACKGROUND:
+        case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
+        {
+            /* These operations require the media library to be started
+             * ie. that the background threads are started */
+            if ( Start() == false )
+                return VLC_EGENERIC;
+            break;
+        }
+        default:
+            break;
+    }
 
     switch ( query )
     {
