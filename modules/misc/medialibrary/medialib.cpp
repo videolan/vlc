@@ -556,7 +556,7 @@ int MediaLibrary::Control( int query, va_list args )
 
 int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_list args )
 {
-    if ( Start() == false )
+    if ( Init() == false )
         return VLC_EGENERIC;
 
     medialibrary::QueryParameters p{};
@@ -849,7 +849,7 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
 
 void* MediaLibrary::Get( int query, va_list args )
 {
-    if ( Start() == false )
+    if ( Init() == false )
         return nullptr;
 
     switch ( query )
