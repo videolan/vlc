@@ -706,10 +706,12 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
         {
             medialibrary::Query<medialibrary::IArtist> query;
             bool includeAll = va_arg( args, int ) != 0;
+            auto artistsIncluded = includeAll ? medialibrary::ArtistIncluded::All :
+                                                medialibrary::ArtistIncluded::AlbumArtistOnly;
             if ( psz_pattern != nullptr )
-                query = m_ml->searchArtists( psz_pattern, includeAll, paramsPtr );
+                query = m_ml->searchArtists( psz_pattern, artistsIncluded, paramsPtr );
             else
-                query = m_ml->artists( includeAll, paramsPtr );
+                query = m_ml->artists( artistsIncluded, paramsPtr );
             if ( query == nullptr )
                 return VLC_EGENERIC;
             auto res = ml_convert_list<vlc_ml_artist_list_t, vlc_ml_artist_t>(
@@ -721,10 +723,12 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
         {
             medialibrary::Query<medialibrary::IArtist> query;
             bool includeAll = va_arg( args, int ) != 0;
+            auto artistsIncluded = includeAll ? medialibrary::ArtistIncluded::All :
+                                                medialibrary::ArtistIncluded::AlbumArtistOnly;
             if ( psz_pattern != nullptr )
-                query = m_ml->searchArtists( psz_pattern, includeAll, paramsPtr );
+                query = m_ml->searchArtists( psz_pattern, artistsIncluded, paramsPtr );
             else
-                query = m_ml->artists( includeAll, paramsPtr );
+                query = m_ml->artists( artistsIncluded, paramsPtr );
             if ( query == nullptr )
                 return VLC_EGENERIC;
             *va_arg( args, size_t* ) = query->count();
@@ -1433,7 +1437,8 @@ int MediaLibrary::listGenre( int listQuery, const medialibrary::QueryParameters*
             if ( pattern != nullptr )
                 query = genre->searchTracks( pattern, paramsPtr );
             else
-                query = genre->tracks( false, paramsPtr );
+                query = genre->tracks( medialibrary::IGenre::TracksIncluded::All,
+                                       paramsPtr );
             if ( query == nullptr )
                 return VLC_EGENERIC;
             switch ( listQuery )

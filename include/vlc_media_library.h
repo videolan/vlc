@@ -39,8 +39,6 @@ typedef enum vlc_ml_media_type_t
     VLC_ML_MEDIA_TYPE_UNKNOWN,
     VLC_ML_MEDIA_TYPE_VIDEO,
     VLC_ML_MEDIA_TYPE_AUDIO,
-    VLC_ML_MEDIA_TYPE_EXTERNAL,
-    VLC_ML_MEDIA_TYPE_STREAM,
 } vlc_ml_media_type_t;
 
 typedef enum vlc_ml_media_subtype_t

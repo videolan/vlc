@@ -53,9 +53,9 @@ void Thumbnailer::onThumbnailComplete( void* data, picture_t* thumbnail )
     ctx->thumbnailer->m_cond.signal();
 }
 
-bool Thumbnailer::generate( const std::string& mrl, uint32_t desiredWidth,
-                            uint32_t desiredHeight, float position,
-                            const std::string& dest )
+bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
+                            uint32_t desiredWidth, uint32_t desiredHeight,
+                            float position, const std::string& dest )
 {
     ThumbnailerCtx ctx{};
     auto item = vlc::wrap_cptr( input_item_New( mrl.c_str(), nullptr ),

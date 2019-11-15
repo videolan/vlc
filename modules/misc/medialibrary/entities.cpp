@@ -65,7 +65,8 @@ static bool convertThumbnails( const T input, vlc_ml_thumbnail_t *output )
     for ( auto i = 0u; i < VLC_ML_THUMBNAIL_SIZE_COUNT; ++i )
     {
         auto sizeType = static_cast<medialibrary::ThumbnailSizeType>( i );
-        if ( input->isThumbnailGenerated( sizeType ) == false )
+        if ( input->thumbnailStatus( sizeType ) !=
+             medialibrary::ThumbnailStatus::Available )
         {
             output[i].psz_mrl = nullptr;
             output[i].b_generated = false;
@@ -97,8 +98,8 @@ bool Convert( const medialibrary::IAlbumTrack* input, vlc_ml_album_track_t& outp
 
 bool Convert( const medialibrary::IShowEpisode* input, vlc_ml_show_episode_t& output )
 {
-    output.i_episode_nb = input->episodeNumber();
-    output.i_season_number = input->seasonNumber();
+    output.i_episode_nb = input->episodeId();
+    output.i_season_number = input->seasonId();
 
     if( !strdup_helper( input->shortSummary(), output.psz_summary ) ||
         !strdup_helper( input->tvdbId(), output.psz_tvdb_id ) )
@@ -226,14 +227,9 @@ bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output )
             }
             break;
         }
-        case medialibrary::IMedia::Type::External:
-            output.i_type = VLC_ML_MEDIA_TYPE_EXTERNAL;
-            break;
-        case medialibrary::IMedia::Type::Stream:
-            output.i_type = VLC_ML_MEDIA_TYPE_STREAM;
-            break;
         case medialibrary::IMedia::Type::Unknown:
-            vlc_assert_unreachable();
+            output.i_type = VLC_ML_MEDIA_TYPE_UNKNOWN;
+            break;
     }
     output.i_year = input->releaseDate();
     output.i_duration = input->duration();
@@ -444,7 +440,8 @@ input_item_t* MediaToInputItem( const medialibrary::IMedia* media )
                                    VLC_TICK_FROM_MS( media->duration() ),
                                    ITEM_TYPE_FILE, ITEM_NET_UNKNOWN ),
                 &input_item_Release );
-    if ( media->isThumbnailGenerated( medialibrary::ThumbnailSizeType::Thumbnail ) == true )
+    auto thumbnailStatus = media->thumbnailStatus( medialibrary::ThumbnailSizeType::Thumbnail );
+    if ( thumbnailStatus == medialibrary::ThumbnailStatus::Missing )
     {
         auto thumbnail = media->thumbnailMrl( medialibrary::ThumbnailSizeType::Thumbnail );
         if ( thumbnail.length() > 0 )
@@ -452,8 +449,6 @@ input_item_t* MediaToInputItem( const medialibrary::IMedia* media )
     }
     switch ( media->type() )
     {
-        case medialibrary::IMedia::Type::External:
-        case medialibrary::IMedia::Type::Stream:
         case medialibrary::IMedia::Type::Unknown:
             // Those types are not analyzed
             break;
