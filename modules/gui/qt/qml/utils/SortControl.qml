@@ -59,12 +59,13 @@ Utils.NavigableFocusScope {
             else
                 popup.open()
         }
+
     }
 
     Popup {
         id: popup
 
-        y: (popupAlignment & Qt.AlignBottom) ? (root.height - 1) : 1
+        y: (popupAlignment & Qt.AlignBottom) ? (root.height + 1) : - (implicitHeight + 1)
         x: (popupAlignment & Qt.AlignRight) ? (button.width - width) :  0
         width: root.listWidth
         implicitHeight: contentItem.implicitHeight + padding * 2

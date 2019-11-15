@@ -212,7 +212,7 @@ Utils.NavigableFocusScope {
                             textRole: "text"
                             listWidth: VLCStyle.widthSortBox
 
-                            popupAlignment: Qt.AlignLeft
+                            popupAlignment: Qt.AlignLeft | Qt.AlignBottom
 
                             visible: !!root.contentModel
                             enabled: visible
