@@ -38,7 +38,7 @@ Utils.NavigableFocusScope {
     property var contentModel
 
     onViewChanged: loadView()
-    onViewProperties: loadView()
+    onViewPropertiesChanged: loadView()
     Component.onCompleted: loadView()
 
     function loadView() {
