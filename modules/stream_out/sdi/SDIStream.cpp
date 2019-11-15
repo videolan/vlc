@@ -567,24 +567,23 @@ void VideoDecodedStream::Output(picture_t *p_pic)
     struct decoder_owner *p_owner;
     p_owner = container_of(p_decoder, struct decoder_owner, dec);
 
-    if(!es_format_IsSimilar(&p_owner->last_fmt_update, &p_owner->decoder_out))
+    if(!es_format_IsSimilar(&p_owner->decoder_out, &p_owner->last_fmt_update))
     {
+        es_format_Clean(&p_owner->decoder_out);
+        es_format_Copy(&p_owner->decoder_out, &p_owner->last_fmt_update);
 
         msg_Dbg(p_stream, "decoder output format now %4.4s",
-                (char*)&p_owner->last_fmt_update.i_codec);
+                (char*)&p_owner->decoder_out.i_codec);
 
         if(p_filters_chain)
             filter_chain_Delete(p_filters_chain);
-        p_filters_chain = VideoFilterCreate(&p_owner->last_fmt_update,
+        p_filters_chain = VideoFilterCreate(&p_owner->decoder_out,
                                             picture_GetVideoContext(p_pic));
         if(!p_filters_chain)
         {
             picture_Release(p_pic);
             return;
         }
-
-        es_format_Clean(&p_owner->decoder_out);
-        es_format_Copy(&p_owner->decoder_out, &p_owner->last_fmt_update);
     }
 
     if(p_filters_chain)
@@ -625,24 +624,24 @@ void AudioDecodedStream::Output(block_t *p_block)
     struct decoder_owner *p_owner;
     p_owner = container_of(p_decoder, struct decoder_owner, dec);
 
-    if(!es_format_IsSimilar(&p_owner->last_fmt_update, &p_owner->decoder_out))
+    if(!es_format_IsSimilar(&p_owner->decoder_out, &p_owner->last_fmt_update))
     {
+        es_format_Clean(&p_owner->decoder_out);
+        es_format_Copy(&p_owner->decoder_out, &p_owner->last_fmt_update);
+
         msg_Dbg(p_stream, "decoder output format now %4.4s %u channels",
-                (char*)&p_owner->last_fmt_update.i_codec,
-                p_owner->last_fmt_update.audio.i_channels);
+                (char*)&p_owner->decoder_out.i_codec,
+                p_owner->decoder_out.audio.i_channels);
 
         if(p_filters)
             aout_FiltersDelete(p_stream, p_filters);
-        p_filters = AudioFiltersCreate(&p_owner->last_fmt_update);
+        p_filters = AudioFiltersCreate(&p_owner->decoder_out);
         if(!p_filters)
         {
             msg_Err(p_stream, "filter creation failed");
             block_Release(p_block);
             return;
         }
-
-        es_format_Clean(&p_owner->decoder_out);
-        es_format_Copy(&p_owner->decoder_out, &p_owner->last_fmt_update);
     }
 
     /* Run filter chain */
@@ -650,10 +649,10 @@ void AudioDecodedStream::Output(block_t *p_block)
         p_block = aout_FiltersPlay(p_filters, p_block, 1.f);
 
     if(p_block && !p_block->i_nb_samples &&
-       p_owner->last_fmt_update.audio.i_bytes_per_frame )
+       p_owner->decoder_out.audio.i_bytes_per_frame )
     {
         p_block->i_nb_samples = p_block->i_buffer /
-                p_owner->last_fmt_update.audio.i_bytes_per_frame;
+                p_owner->decoder_out.audio.i_bytes_per_frame;
     }
 
     if(p_block)
