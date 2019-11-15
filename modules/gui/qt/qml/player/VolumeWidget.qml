@@ -22,6 +22,7 @@ import QtGraphicalEffects 1.0
 
 import "qrc:///utils/" as Utils
 import "qrc:///style/"
+import "qrc:///utils/KeyHelper.js" as KeyHelper
 
 FocusScope{
     id: widgetfscope
@@ -71,7 +72,15 @@ FocusScope{
             opacity: player.muted ? 0.5 : 1
             focus: true
 
-            Keys.onSpacePressed: player.muted = !player.muted
+            Keys.onReleased: {
+                if (event.accepted)
+                    return;
+                if (KeyHelper.matchOk(event)) {
+                    player.muted = !player.muted
+                    event.accepted = true
+                }
+            }
+
             Keys.onUpPressed: volControl.increase()
             Keys.onDownPressed: volControl.decrease()
             Keys.onRightPressed: {
