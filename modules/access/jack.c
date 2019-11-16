@@ -513,6 +513,7 @@ static void Port_finder( demux_t *p_demux )
 
             free( pp_jack_port_output );
         }
+        free( psz_uri );
     }
 
     p_sys->i_match_ports = i_total_out_ports;
