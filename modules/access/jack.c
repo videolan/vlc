@@ -310,6 +310,7 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->pp_jack_port_input );
     free( p_sys->pp_jack_buffer );
     free( p_sys->pp_jack_port_table );
+    free( p_sys->psz_ports );
 }
 
 
