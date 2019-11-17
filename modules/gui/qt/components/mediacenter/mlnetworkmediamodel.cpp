@@ -170,7 +170,7 @@ bool MLNetworkMediaModel::addToPlaylist(int index)
 {
     if (!(m_ctx && m_hasTree))
         return false;
-    if (index < 0 || index >= m_items.size() )
+    if (index < 0 || (size_t)index >= m_items.size() )
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.tree.media.get() };
@@ -196,7 +196,7 @@ bool MLNetworkMediaModel::addAndPlay(int index)
 {
     if (!(m_ctx && m_hasTree))
         return false;
-    if (index < 0 || index >= m_items.size() )
+    if (index < 0 || (size_t)index >= m_items.size() )
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.tree.media.get() };
@@ -267,7 +267,7 @@ bool MLNetworkMediaModel::initializeMediaSources()
     return true;
 }
 
-void MLNetworkMediaModel::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node )
+void MLNetworkMediaModel::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t*)
 {
     input_item_node_t *res;
     input_item_node_t *parent;
@@ -322,7 +322,7 @@ void MLNetworkMediaModel::onItemRemoved( MediaSourcePtr,
     }
 }
 
-void MLNetworkMediaModel::onItemPreparseEnded(MediaSourcePtr mediaSource, input_item_node_t* node, enum input_item_preparse_status status)
+void MLNetworkMediaModel::onItemPreparseEnded(MediaSourcePtr, input_item_node_t*, enum input_item_preparse_status)
 {
     QMetaObject::invokeMethod(this, [this]() {
         m_parsingPending = false;
