@@ -116,7 +116,7 @@ bool MLNetworkDeviceModel::addToPlaylist(int index)
 {
     if (!(m_ctx && m_sdSource != CAT_MYCOMPUTER))
         return false;
-    if (index < 0 || index >= m_items.size() )
+    if (index < 0 || (size_t)index >= m_items.size() )
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.inputItem.get() };
@@ -141,7 +141,7 @@ bool MLNetworkDeviceModel::addAndPlay(int index)
 {
     if (!(m_ctx && m_sdSource != CAT_MYCOMPUTER))
         return false;
-    if (index < 0 || index >= m_items.size() )
+    if (index < 0 || (size_t)index >= m_items.size() )
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.inputItem.get() };
@@ -211,7 +211,7 @@ void MLNetworkDeviceModel::onItemCleared( MediaSourcePtr mediaSource, input_item
     refreshDeviceList( std::move( mediaSource), node->pp_children, node->i_children, true );
 }
 
-void MLNetworkDeviceModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent,
+void MLNetworkDeviceModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t*,
                                   input_item_node_t *const children[],
                                   size_t count )
 {
