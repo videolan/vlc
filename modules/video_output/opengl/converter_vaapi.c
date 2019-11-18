@@ -348,6 +348,49 @@ tc_va_check_derive_image(opengl_tex_converter_t *tc)
     VAImage va_image = { .image_id = VA_INVALID_ID };
     int ret = vlc_vaapi_DeriveImage(o, priv->vadpy, va_surface_ids[0],
                                     &va_image);
+    if (ret != VLC_SUCCESS)
+        goto done;
+    assert(va_image.format.fourcc == priv->fourcc);
+
+    const vlc_chroma_description_t *image_desc =
+        vlc_fourcc_GetChromaDescription(va_image.format.fourcc);
+    assert(image_desc->plane_count == va_image.num_planes);
+
+    VABufferInfo va_buffer_info = (VABufferInfo) {
+        .mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME
+    };
+    ret = vlc_vaapi_AcquireBufferHandle(o ,priv->vadpy, va_image.buf,
+                                        &va_buffer_info);
+    if (ret != VLC_SUCCESS)
+        goto done;
+
+    for (unsigned i = 0; i < image_desc->plane_count; ++i)
+    {
+        unsigned w_num = image_desc->p[i].w.num;
+        if (image_desc->plane_count == 2 && i == 1)
+            // for NV12/P010 the second plane uses GL_RG which has a double pitch
+            w_num /= 2;
+        EGLint w = (va_image.width * w_num) / image_desc->p[i].w.den;
+        EGLint h = (va_image.height * image_desc->p[i].h.num) / image_desc->p[i].h.den;
+        EGLImageKHR egl_image =
+            vaegl_image_create(tc, w, h, priv->drm_fourccs[i], va_buffer_info.handle,
+                               va_image.offsets[i], va_image.pitches[i]);
+        if (egl_image == NULL)
+        {
+            msg_Warn(o, "Can't create Image KHR: kernel too old ?");
+            ret = VLC_EGENERIC;
+            goto done;
+        }
+        vaegl_image_destroy(tc, egl_image);
+    }
+
+done:
+    if (va_image.image_id != VA_INVALID_ID)
+    {
+        if (va_image.buf != VA_INVALID_ID)
+            vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, va_image.buf);
+        vlc_vaapi_DestroyImage(o, priv->vadpy, va_image.image_id);
+    }
 
     picture_pool_Release(pool);
 
