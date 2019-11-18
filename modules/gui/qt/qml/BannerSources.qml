@@ -217,10 +217,9 @@ Utils.NavigableFocusScope {
                             visible: !!root.contentModel
                             enabled: visible
 
-                            onCurrentIndexChanged: {
-                                if (model !== undefined && contentModel !== undefined) {
-                                    var sorting = model.get(currentIndex);
-                                    contentModel.sortCriteria = sorting.criteria
+                            onSortSelected: {
+                                if (contentModel !== undefined) {
+                                    contentModel.sortCriteria = modelData.criteria
                                 }
                             }
                         }

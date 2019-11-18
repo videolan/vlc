@@ -34,6 +34,9 @@ Utils.NavigableFocusScope {
     property int popupAlignment: Qt.AlignRight | Qt.AlignBottom
     property int listWidth
     property alias currentIndex: list.currentIndex
+    property alias focusPolicy: button.focusPolicy
+
+    signal sortSelected(var modelData)
 
     onFocusChanged: {
         if (!focus)
@@ -145,6 +148,7 @@ Utils.NavigableFocusScope {
 
                 onClicked: {
                     root.currentIndex = index
+                    root.sortSelected(model)
                     popup.close()
                 }
             }
