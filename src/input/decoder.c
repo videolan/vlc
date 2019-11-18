@@ -453,7 +453,12 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         p_owner->out_pool = picture_pool_NewFromFormat( &p_dec->fmt_out.video,
                             dpb_size + p_dec->i_extra_picture_buffers + 1 );
         if (p_owner->out_pool == NULL)
+        {
+            msg_Err(p_dec, "Failed to create a pool of %d %4.4s pictures",
+                           dpb_size + p_dec->i_extra_picture_buffers + 1,
+                           (char*)&p_dec->fmt_out.video.i_chroma);
             return -1;
+        }
     }
     int res;
     if (p_owner->vout_thread_started)
