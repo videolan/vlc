@@ -216,6 +216,17 @@ Utils.NavigableFocusScope {
                                          : VLCStyle.applicationHorizontalMargin
                             leftMargin: VLCStyle.applicationHorizontalMargin
                         }
+
+                        Utils.ScanProgressBar {
+                            z: 1
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                bottom: parent.bottom
+                                rightMargin: VLCStyle.margin_small
+                                leftMargin: VLCStyle.margin_small
+                            }
+                        }
                     }
 
 
@@ -261,14 +272,6 @@ Utils.NavigableFocusScope {
                             stackView.forceActiveFocus()
                     }
                 }
-            }
-
-            Utils.ScanProgressBar {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.rightMargin: VLCStyle.applicationHorizontalMargin
-                anchors.leftMargin: VLCStyle.applicationHorizontalMargin
             }
         }
 
