@@ -204,81 +204,6 @@ static HINSTANCE Direct3D9LoadShaderLibrary(void)
     return instance;
 }
 
-static void DestroyPicture(picture_t *picture)
-{
-    ReleaseD3D9PictureSys(picture->p_sys);
-
-    free(picture->p_sys);
-}
-
-/* */
-static picture_pool_t *Direct3D9CreatePicturePool(vlc_object_t *o,
-    d3d9_device_t *p_d3d9_dev, const video_format_t *fmt, unsigned count)
-{
-    D3DFORMAT format;
-    switch (fmt->i_chroma)
-    {
-    case VLC_CODEC_D3D9_OPAQUE_10B:
-        format = MAKEFOURCC('P','0','1','0');
-        break;
-    case VLC_CODEC_D3D9_OPAQUE:
-        format = MAKEFOURCC('N','V','1','2');
-        break;
-    default:
-        return NULL;
-    }
-
-    picture_t **pictures = calloc(count, sizeof(*pictures));
-    if (!pictures)
-        return NULL;
-
-    picture_pool_t*   pool = NULL;
-    unsigned          picture_count = 0;
-
-    for (picture_count = 0; picture_count < count; ++picture_count)
-    {
-        picture_sys_d3d9_t *picsys = calloc(1, sizeof(*picsys));
-        if (unlikely(picsys == NULL))
-            goto error;
-
-        HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_d3d9_dev->dev,
-                                                          fmt->i_width,
-                                                          fmt->i_height,
-                                                          format,
-                                                          D3DPOOL_DEFAULT,
-                                                          &picsys->surface,
-                                                          NULL);
-        if (FAILED(hr)) {
-           msg_Err(o, "Failed to allocate surface %d (hr=0x%lX)", picture_count, hr);
-           free(picsys);
-           goto error;
-        }
-
-        picture_resource_t resource = {
-            .p_sys = picsys,
-            .pf_destroy = DestroyPicture,
-        };
-
-        picture_t *picture = picture_NewFromResource(fmt, &resource);
-        if (unlikely(picture == NULL)) {
-            free(picsys);
-            goto error;
-        }
-
-        pictures[picture_count] = picture;
-    }
-
-    pool = picture_pool_New( count, pictures );
-
-error:
-    if (pool == NULL && pictures) {
-        for (unsigned i=0;i<picture_count; ++i)
-            picture_Release(pictures[i]);
-    }
-    free(pictures);
-    return pool;
-}
-
 /**
  * Compute the vertex ordering needed to rotate the video. Without
  * rotation, the vertices of the rectangle are defined in a clockwise
@@ -1807,14 +1732,6 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
     return VLC_SUCCESS;
 }
 
-static picture_pool_t *
-GLConvGetPool(const opengl_tex_converter_t *tc, unsigned requested_count)
-{
-    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(tc->vctx);
-    return Direct3D9CreatePicturePool(VLC_OBJECT(tc->gl), &d3d9_decoder->d3ddev,
-                                      &tc->fmt, requested_count);
-}
-
 static int
 GLConvAllocateTextures(const opengl_tex_converter_t *tc, GLuint *textures,
                        const GLsizei *tex_width, const GLsizei *tex_height)
@@ -1941,7 +1858,6 @@ GLConvOpen(vlc_object_t *obj)
     }
 
     tc->pf_update  = GLConvUpdate;
-    tc->pf_get_pool = GLConvGetPool;
     tc->pf_allocate_textures = GLConvAllocateTextures;
 
     tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, VLC_CODEC_RGB32,
